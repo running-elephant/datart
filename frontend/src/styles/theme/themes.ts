@@ -1,0 +1,97 @@
+import { lighten, rgba } from 'polished';
+import {
+  BLACK,
+  BLUE,
+  ERROR,
+  G10,
+  G20,
+  G30,
+  G40,
+  G50,
+  G60,
+  G70,
+  G80,
+  G90,
+  GREEN,
+  HIGHLIGHT,
+  INFO,
+  NORMAL,
+  ORANGE,
+  PRIMARY,
+  PROCESSING,
+  RED,
+  SUCCESS,
+  WARNING,
+  WHITE,
+  YELLOW,
+} from '../StyleConstants';
+
+const common = {
+  primary: PRIMARY,
+  info: INFO,
+  success: SUCCESS,
+  processing: PROCESSING,
+  error: ERROR,
+  highlight: HIGHLIGHT,
+  warning: WARNING,
+  normal: NORMAL,
+
+  blue: BLUE,
+  green: GREEN,
+  orange: ORANGE,
+  yellow: YELLOW,
+  red: RED,
+  white: WHITE,
+  black: BLACK,
+};
+
+const lightTheme = {
+  bodyBackground: G10,
+  componentBackground: WHITE,
+  emphasisBackground: G20,
+  highlightBackground: G30,
+  textColor: G90,
+  textColorSub: G80,
+  textColorSnd: G70,
+  textColorLight: G60,
+  textColorDisabled: G50,
+  iconColorHover: rgba(BLACK, 0.75),
+  borderColorBase: G40,
+  borderColorEmphasis: G30,
+  borderColorSplit: G20,
+  shadow1: `0 1px 3px 0 ${rgba(lighten(0.15, BLACK), 0.1)}`,
+  shadow2: `0 4px 16px 0 ${rgba(lighten(0.15, BLACK), 0.12)}`,
+  shadow3: `0 12px 32px 0 ${rgba(lighten(0.15, BLACK), 0.16)}`,
+  shadowSider: `0px 0 32px 0px ${rgba(G70, 0.075)}`,
+  shadowBlock: `0px 0 32px 0px ${rgba(G70, 0.025)}`,
+  ...common,
+};
+
+const darkTheme: Theme = {
+  bodyBackground: BLACK,
+  componentBackground: rgba(WHITE, 0.08),
+  emphasisBackground: rgba(WHITE, 0.12),
+  highlightBackground: rgba(WHITE, 0.16),
+  textColor: rgba(WHITE, 0.85),
+  textColorSub: rgba(WHITE, 0.75),
+  textColorSnd: rgba(WHITE, 0.65),
+  textColorLight: rgba(WHITE, 0.45),
+  textColorDisabled: rgba(WHITE, 0.3),
+  iconColorHover: rgba(WHITE, 0.75),
+  borderColorBase: '#434343',
+  borderColorEmphasis: '#373737',
+  borderColorSplit: '#303030',
+  shadow1: `0 1px 5px 0 ${rgba(BLACK, 0.1)}`,
+  shadow2: `0 6px 18px 0 ${rgba(BLACK, 0.4)}`,
+  shadow3: `0 10px 32px 0 ${rgba(BLACK, 0.54)}`,
+  shadowSider: 'none',
+  shadowBlock: 'none',
+  ...common,
+};
+
+export type Theme = typeof lightTheme;
+
+export const themes = {
+  light: lightTheme,
+  dark: darkTheme,
+};

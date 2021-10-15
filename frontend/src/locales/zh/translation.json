@@ -1,0 +1,351 @@
+{
+  "main": {
+    "nav": {
+      "download": {
+        "title": "下载列表"
+      }
+    }
+  },
+  "viz": {
+    "common": {
+      "enum": {
+        "filterOperator": {
+          "EQ": "相等",
+          "NE": "不相等",
+          "IS_NULL": "为空",
+          "NOT_NULL": "不为空",
+          "LIKE": "包含",
+          "NOT_LIKE": "不包含",
+          "PREFIX_LIKE": "前缀包含",
+          "PREFIX_NOT_LIKE": "前缀不包含",
+          "SUFFIX_LIKE": "后缀包含",
+          "SUFFIX_NOT_LIKE": "后缀不包含",
+          "BETWEEN": "区间",
+          "IN": "包括",
+          "NOT_IN": "不包括",
+          "LT": "小于",
+          "GT": "大于",
+          "LTE": "小于或等于",
+          "GTE": "大于或等于"
+        },
+        "aggregateTypes": {
+          "NONE": "不聚合",
+          "SUM": "总计",
+          "AVG": "平均值",
+          "COUNT": "计数",
+          "COUNT_DISTINCT": "去重计数",
+          "MAX": "最大值",
+          "MIN": "最小值"
+        },
+        "controllerFacadeTypes": {
+          "dropdownList": "下拉列表",
+          "radioGroup": "单选按钮",
+          "multiDropdownList": "多选下拉列表",
+          "rangeTime": "日期范围",
+          "rangeValue": "数值范围",
+          "text": "文本",
+          "tree": "下拉树列表",
+          "value": "数值",
+          "time": "日期",
+          "slider": "滑块"
+        },
+        "controllerVisibilityTypes": {
+          "hide": "隐藏",
+          "show": "显示",
+          "condition": "条件"
+        }
+      },
+      "filter": {
+        "title": "条件筛选",
+        "filterName": "名称",
+        "filterAggregate": "聚合方式",
+        "filterVisibility": "是否可见",
+        "aggregates": "聚合方式",
+        "filterOption": "筛选方式",
+        "visibility": "是否显示",
+        "facade": "控制器",
+        "widthOption": "宽度",
+        "columnName": "当前编辑列名称",
+        "arrange": "编排",
+        "hide": "隐藏",
+        "show": "显示",
+        "condition": "条件",
+        "min": "最小值",
+        "max": "最大值",
+        "radioType": "样式",
+        "default": "默认",
+        "button": "按钮",
+        "date": {
+          "recommend": "推荐",
+          "manual": "手动",
+          "today": "今天",
+          "yesterday": "昨天",
+          "this_week": "本周",
+          "last_7_days": "过去 7天",
+          "last_30_days": "过去 30天",
+          "last_90_days": "过去 90天",
+          "last_1_month": "过去 1个月",
+          "last_1_year": "过去 1年",
+          "or": "或者",
+          "seconds": "秒",
+          "minutes": "分钟",
+          "hours": "小时",
+          "days": "天",
+          "weeks": "星期",
+          "months": "月",
+          "years": "年",
+          "ago": "以前",
+          "fromNow": "以后",
+          "pleaseSelect": "请选择",
+          "currentTime": "当前时间",
+          "startTime": "开始时间",
+          "endTime": "结束时间",
+          "exact": "精确",
+          "relative": "相对"
+        },
+        "category": {
+          "general": "常规",
+          "customize": "自定义",
+          "condition": "条件",
+          "sourceList": "源列表",
+          "targetList": "默认列表",
+          "moveToLeft": "移除",
+          "moveToRight": "增加",
+          "include": "不排除",
+          "notInclude": "排除",
+          "tableHeaderKey": "值",
+          "tableHeaderLabel": "标题",
+          "tableHeaderAction": "操作",
+          "deleteRow": "删除",
+          "setDefault": "设为默认",
+          "setUnDefault": "取消默认",
+          "addRow": "增加行",
+          "AddFromFields": "从当前字段增加行",
+          "associateField": "关联父字段",
+          "labelField": "显示字段",
+          "useTree": "启用树模型",
+          "load": "加载"
+        }
+      }
+    },
+    "management": {
+      "title": "插件管理",
+      "subTitle": "插件列表",
+      "table": {
+        "header": {
+          "name": "名称",
+          "description": "描述",
+          "type": "类型",
+          "action": "操作"
+        }
+      }
+    },
+    "workbench": {
+      "goBack": "返回管理页面",
+      "header": {
+        "goBack": "返回",
+        "run": "执行",
+        "save": "保存",
+        "saveToDashboard": "保存到仪表盘",
+        "login": "登陆",
+        "lang": {
+          "zh": "中文",
+          "en": "英文"
+        },
+        "format": {
+          "local": "本地",
+          "date": "日期",
+          "ll": "LL",
+          "lll": "LLL"
+        }
+      },
+      "dataview": {
+        "createComputedFields": "创建计算字段",
+        "createVariableFields": "创建查询变量",
+        "fieldName": "名称",
+        "type": "类型",
+        "field": "字段",
+        "variable": "变量",
+        "functions": "函数列表",
+        "editField": "编辑",
+        "deleteField": "删除"
+      }
+    },
+    "palette": {
+      "title": {
+        "content": "数据",
+        "design": "样式",
+        "setting": "配置"
+      },
+      "style": {
+        "font": "字体",
+        "pleaseSelect": "请选择 ...",
+        "table": {
+          "header": {
+            "merge": "合并",
+            "moveUp": "上移",
+            "moveDown": "下移",
+            "columnName": "表头名称",
+            "backgroundColor": "背景",
+            "font": "字体",
+            "align": {
+              "title": "对齐方式",
+              "left": "左对齐",
+              "center": "居中对齐",
+              "right": "右对齐"
+            }
+          }
+        },
+        "visualMap": {
+          "title": "视觉映射",
+          "show": "显示视觉映射",
+          "orient": "方向",
+          "align": "对齐方式",
+          "itemWidth": "宽度",
+          "itemHeight": "高度",
+          "startColor": "开始颜色",
+          "endColor": "结束颜色"
+        },
+        "margin": {
+          "title": "边距",
+          "left": "左边距",
+          "right": "右边距",
+          "bottom": "底边距",
+          "top": "上边距",
+          "containLabel": "包含标题"
+        }
+      },
+      "data": {
+        "metrics": "维度",
+        "deminsion": "指标",
+        "mixed": "混合",
+        "filter": "筛选",
+        "colorize": "着色",
+        "info": "信息",
+        "sort": "排序",
+        "size": "大小",
+        "drop": "请拖拽数据列到这里",
+        "actions": {
+          "sort": {
+            "title": "排序",
+            "none": "默认排序",
+            "asc": "升序排列",
+            "desc": "降序排列",
+            "customize": "自定义"
+          },
+          "format": {
+            "title": "格式设置",
+            "default": "默认值",
+            "numeric": "数值型",
+            "currency": "货币型",
+            "percentage": "百分比型",
+            "scientific": "科学计数型",
+            "decimalPlace": "小数位数",
+            "unit": "单位",
+            "useSeparator": "启用分隔符"
+          },
+          "aggregation": "聚合",
+          "aggregationlimit": "聚合",
+          "alias": {
+            "title": "字段设置",
+            "name": "字段别名",
+            "description": "名称描述"
+          },
+          "filter": {
+            "title": "条件筛选"
+          },
+          "color": {
+            "enable": "启用颜色",
+            "start": "起始颜色",
+            "end": "结束颜色"
+          }
+        },
+        "axis": {
+          "y": {
+            "left": "左指标轴",
+            "right": "右指标轴"
+          }
+        },
+        "enum": {
+          "actionType": {
+            "sortable": "排序",
+            "alias": "别名",
+            "format": "格式",
+            "aggregate": "聚合",
+            "aggregateLimit": "聚合",
+            "filter": "过滤",
+            "categoryFilter": "类别过滤",
+            "colorize": "着色",
+            "colorRange": "着色",
+            "colorSingle": "着色",
+            "size": "大小"
+          }
+        }
+      },
+      "setting": {
+        "pleaseSelect": "请选择 ...",
+        "displayCount": "显示数量",
+        "enableCache": "启用缓存",
+        "cacheExpire": "缓存时长(秒)",
+        "autoLoad": "自动加载",
+        "enableRaw": "原始数据",
+        "reference": {
+          "markLine": "参考线",
+          "markArea": "参考区间",
+          "valueType": "值类型",
+          "constantValue": "常量值",
+          "metric": "关联指标",
+          "startValueType": "起始值类型",
+          "startConstantValue": "起始常量值",
+          "startMetric": "起始关联指标",
+          "endValueType": "结束值类型",
+          "endConstantValue": "结束常量值",
+          "endMetric": "结束关联指标",
+          "font": "字体",
+          "showLabel": "显示标签",
+          "position": "标签位置",
+          "lineStyle": "线条样式",
+          "opacity": "透明度",
+          "backgroundColor": "背景颜色",
+          "borderStyle": "边框样式"
+        }
+      },
+      "present": {
+        "graph": "图表",
+        "raw": "原始数据",
+        "sql": "SQL"
+      }
+    },
+    "chartPreview": {
+      "common": {
+        "confirm": "请确认",
+        "ok": "确认",
+        "cancel": "取消"
+      },
+      "edit": "编辑",
+      "run": "运行",
+      "publish": "发布",
+      "unpublish": "取消发布",
+      "share": {
+        "link": "链接",
+        "password": "密码",
+        "expireDate": "截止日期",
+        "enablePassword": "启用密码",
+        "generateLink": "生成链接",
+        "shareLink": "分享链接",
+        "downloadData": "下载数据"
+      }
+    }
+  },
+  "share": {
+    "common": {
+      "confirm": "请确认",
+      "ok": "确认",
+      "cancel": "取消"
+    },
+    "modal": {
+      "password": "密码",
+      "pleaseInputPassword": "请输入密码"
+    }
+  }
+}
