@@ -13,7 +13,7 @@ yarn.lock
 # production
 /build
 /share
-
+*.zip
 # misc
 .DS_Store
 .datart-cli
