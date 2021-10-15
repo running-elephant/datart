@@ -1,0 +1,61 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import produce from 'immer';
+import React, { FC, useContext, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { BoardContext } from '../contexts/BoardContext';
+import { WidgetContext } from '../contexts/WidgetContext';
+import { selectEditWidgetById } from '../pages/BoardEditor/slice/selectors';
+import { HistoryEditBoard } from '../pages/BoardEditor/slice/types';
+import { selectWidgetBy2Id } from '../slice/selector';
+import { BoardState } from '../slice/types';
+import { adaptBoardImageUrl } from '../utils';
+export const WidgetProvider: FC<{ widgetId: string }> = ({
+  widgetId,
+  children,
+}) => {
+  const { boardId, boardType, editing } = useContext(BoardContext);
+  // 浏览模式
+  const boardWidget = useSelector((state: { board: BoardState }) =>
+    selectWidgetBy2Id(state, boardId, widgetId),
+  );
+  // 编辑模式
+  const editWidget = useSelector((state: { editBoard: HistoryEditBoard }) =>
+    selectEditWidgetById(state, widgetId),
+  );
+  const widget = useMemo(() => {
+    const widget = editing ? editWidget : boardWidget;
+    if (widget) {
+      // 为了board可以被整体复制，服务端拷贝文件图片文件 副本到新的boardId文件夹下，前端替换掉原来的boardId 使用当前boardId
+      //这样副本 图片引用可以不受原来 board 资源删除影响
+      // url=resources/image/dashboard/3062ff86cdcb47b3bba75565b3f2991d/2e1cac3a-600c-4636-b858-cbcb07f4a3b3
+      const adaptBoardImageWidget = produce(widget, draft => {
+        draft.config.background.image = adaptBoardImageUrl(
+          widget.config.background.image,
+          boardId,
+        );
+      });
+      return adaptBoardImageWidget;
+    }
+    return widget;
+  }, [editing, editWidget, boardWidget, boardId]);
+  return widget ? (
+    <WidgetContext.Provider value={widget}>{children}</WidgetContext.Provider>
+  ) : null;
+};
