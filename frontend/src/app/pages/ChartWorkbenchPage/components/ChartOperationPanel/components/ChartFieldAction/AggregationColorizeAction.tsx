@@ -17,7 +17,7 @@
  */
 
 import { Col, Row } from 'antd';
-import Theme from 'app/assets/theme/echart.project.json';
+import Theme from 'app/assets/theme/echarts_default_theme.json';
 import { ColorTag, ReactColorPicker } from 'app/components/ReactColorPicker';
 import { ChartDataSectionField } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
@@ -35,7 +35,7 @@ const AggregationColorizeAction: FC<{
   ) => void;
 }> = memo(({ config, dataset, onConfigChange }) => {
   const actionNeedNewRequest = true;
-  const [themeColors] = useState(Theme.theme.color);
+  const [themeColors] = useState(Theme.color);
   const [colors, setColors] = useState(() => {
     const colorizedColumnName = config.colName;
     const colorizeIndex =
