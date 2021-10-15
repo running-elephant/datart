@@ -26,6 +26,7 @@ class ChartPluginLoader {
     const customModelPaths = [
       './custom-chart-plugins/demo-custom-line-chart.js',
       // './custom-chart-plugins/demo-echart-3d-bar-chart.js',
+      './custom-chart-plugins/demo-d3js-scatter-chart.js',
     ];
 
     const loadPluginTasks = customModelPaths.map(async path => {

@@ -482,7 +482,7 @@ function DemoCustomLineChart({ dHelper }) {
     meta: {
       id: 'demo-custom-line-chart',
       name: '[DEMO]用户自定义折线图',
-      icon: 'star',
+      icon: 'chart',
       requirements: [
         {
           group: 1,
