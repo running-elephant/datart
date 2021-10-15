@@ -115,7 +115,7 @@ const config: ChartConfig = {
             fontSize: '12',
             fontWeight: 'normal',
             fontStyle: 'normal',
-            color: 'black',
+            color: '#495057',
           },
         },
       ],
@@ -172,7 +172,7 @@ const config: ChartConfig = {
             fontSize: '12',
             fontWeight: 'normal',
             fontStyle: 'normal',
-            color: 'black',
+            color: '#495057',
           },
         },
       ],
@@ -201,7 +201,7 @@ const config: ChartConfig = {
           default: {
             type: 'solid',
             width: 1,
-            color: 'black',
+            color: '#ced4da',
           },
         },
         {
@@ -220,7 +220,7 @@ const config: ChartConfig = {
             fontSize: '12',
             fontWeight: 'normal',
             fontStyle: 'normal',
-            color: 'black',
+            color: '#495057',
           },
         },
         {
@@ -239,7 +239,7 @@ const config: ChartConfig = {
             fontSize: '12',
             fontWeight: 'normal',
             fontStyle: 'normal',
-            color: 'black',
+            color: '#495057',
           },
         },
         {
@@ -303,7 +303,7 @@ const config: ChartConfig = {
           default: {
             type: 'solid',
             width: 1,
-            color: 'black',
+            color: '#ced4da',
           },
         },
         {
@@ -322,7 +322,7 @@ const config: ChartConfig = {
             fontSize: '12',
             fontWeight: 'normal',
             fontStyle: 'normal',
-            color: 'black',
+            color: '#495057',
           },
         },
         {
@@ -341,7 +341,7 @@ const config: ChartConfig = {
             fontSize: '12',
             fontWeight: 'normal',
             fontStyle: 'normal',
-            color: 'black',
+            color: '#495057',
           },
         },
         {
@@ -399,7 +399,7 @@ const config: ChartConfig = {
           default: {
             type: 'dashed',
             width: 1,
-            color: 'grey',
+            color: '#ced4da',
           },
         },
         {
@@ -415,7 +415,7 @@ const config: ChartConfig = {
           default: {
             type: 'dashed',
             width: 1,
-            color: 'grey',
+            color: '#ced4da',
           },
         },
       ],

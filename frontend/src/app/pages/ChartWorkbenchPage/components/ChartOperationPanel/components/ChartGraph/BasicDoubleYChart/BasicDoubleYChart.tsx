@@ -266,7 +266,6 @@ class BasicDoubleYChart extends Chart {
 
     return {
       type: 'category',
-      boundaryGap: false,
       tooltip: { show: true },
       inverse,
       axisLabel: getAxisLabel(

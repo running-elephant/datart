@@ -77,7 +77,7 @@ const config: ChartConfig = {
         {
           label: 'map.areaColor',
           key: 'areaColor',
-          default: '#eee',
+          default: '#e9ecef',
           comType: 'fontColor',
         },
         {
@@ -89,7 +89,7 @@ const config: ChartConfig = {
         {
           label: 'map.areaEmphasisColor',
           key: 'areaEmphasisColor',
-          default: '#eee',
+          default: '#dee2e6',
           comType: 'fontColor',
         },
         {
@@ -99,7 +99,7 @@ const config: ChartConfig = {
           default: {
             type: 'dashed',
             width: 1,
-            color: '#000',
+            color: '#ced4da',
           },
         },
       ],
@@ -147,7 +147,7 @@ const config: ChartConfig = {
             fontSize: '12',
             fontWeight: 'normal',
             fontStyle: 'normal',
-            color: 'black',
+            color: '#495057',
           },
         },
       ],
@@ -211,7 +211,7 @@ const config: ChartConfig = {
             fontSize: '12',
             fontWeight: 'normal',
             fontStyle: 'normal',
-            color: 'black',
+            color: '#495057',
           },
         },
       ],

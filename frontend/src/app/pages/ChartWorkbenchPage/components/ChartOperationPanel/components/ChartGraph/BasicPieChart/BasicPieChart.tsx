@@ -107,7 +107,6 @@ class BasicPieChart extends Chart {
       return {
         name: getColumnRenderName(config),
         type: 'category',
-        boundaryGap: false,
         tooltip: { show: true },
         data: UniqArray(dataColumns.map(dc => dc[getValueByColumnKey(config)])),
       };

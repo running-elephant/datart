@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { AreaChartOutlined } from '@ant-design/icons';
+import { LoadingOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
 import useMount from 'app/pages/ChartWorkbenchPage/hooks/useMount';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
@@ -132,8 +132,7 @@ const ChartLifecycleAdapter: React.FC<{
   return (
     <Spin
       spinning={containerStatus !== ContainerStatus.SUCCESS}
-      indicator={<AreaChartOutlined spin />}
-      size="large"
+      indicator={<LoadingOutlined spin />}
       delay={500}
     >
       <div
