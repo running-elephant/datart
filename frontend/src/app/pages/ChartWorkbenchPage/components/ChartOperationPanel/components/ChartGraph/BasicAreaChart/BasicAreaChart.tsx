@@ -27,7 +27,6 @@ class BasicAreaChart extends Chart {
   option = {
     xAxis: {
       type: 'category',
-      boundaryGap: false,
       data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     },
     yAxis: {

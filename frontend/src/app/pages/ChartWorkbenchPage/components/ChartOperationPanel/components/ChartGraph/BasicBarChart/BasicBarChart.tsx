@@ -125,7 +125,6 @@ class BasicBarChart extends Chart {
     const xAxisColumns = (groupConfigs || []).map(config => {
       return {
         type: 'category',
-        boundaryGap: false,
         tooltip: { show: true },
         data: UniqArray(dataColumns.map(dc => dc[getValueByColumnKey(config)])),
       };

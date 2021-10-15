@@ -122,7 +122,7 @@ const config: ChartConfig = {
             fontSize: '12',
             fontWeight: 'normal',
             fontStyle: 'normal',
-            color: 'black',
+            color: '#495057',
           },
         },
         {
@@ -206,7 +206,7 @@ const config: ChartConfig = {
             fontSize: '12',
             fontWeight: 'normal',
             fontStyle: 'normal',
-            color: 'black',
+            color: '#495057',
           },
         },
       ],

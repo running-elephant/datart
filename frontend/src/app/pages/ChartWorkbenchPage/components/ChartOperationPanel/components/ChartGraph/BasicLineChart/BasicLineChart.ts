@@ -129,7 +129,6 @@ class BasicLineChart extends Chart {
     const xAxisColumns = groupConfigs.map(config => {
       return {
         type: 'category',
-        boundaryGap: false,
         tooltip: { show: true },
         data: dataColumns.map(dc => dc[getValueByColumnKey(config)]),
       };

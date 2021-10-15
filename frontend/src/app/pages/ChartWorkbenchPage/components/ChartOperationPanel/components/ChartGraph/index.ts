@@ -16,10 +16,6 @@
  * limitations under the License.
  */
 
-import AntVF2Chart from './AntVF2Chart';
-import AntVG2RoseChart from './AntVG2RoseChart';
-import AntVG6TreeChart from './AntVG6TreeChart';
-import AntVX6Chart from './AntVX6Chart';
 import AreaChart from './AreaChart';
 import BasicAreaChart from './BasicAreaChart';
 import BasicBarChart from './BasicBarChart';
@@ -28,57 +24,35 @@ import BasicFunnelChart from './BasicFunnelChart';
 import BasicLineChart from './BasicLineChart';
 import BasicOutlineMapChart from './BasicOutlineMapChart';
 import BasicPieChart from './BasicPieChart';
-import BasicRadarChart from './BasicRadarChart';
 import BasicScatterChart from './BasicScatterChart';
 import BasicTableChart from './BasicTableChart';
-import ChartJSChart from './ChartJSChart';
 import ClusterBarChart from './ClusterBarChart';
 import ClusterColumnChart from './ClusterColumnChart';
-import D3USMapChart from './D3USMapChart';
 import DoughnutChart from './DoughnutChart';
 import FenZuTableChart from './FenZuTableChart';
-import GaodeMapChart from './GaodeMapChart';
-import LifeExpectancyChart from './LifeExpectancyChart';
 import LineChart from './LineChart';
 import MingXiTableChart from './MingXiTableChart';
 import NormalOutlineMapChart from './NormalOutlineMapChart';
 import PercentageStackBarChart from './PercentageStackBarChart';
 import PercentageStackColumnChart from './PercentageStackColumnChart';
 import PieChart from './PieChart';
-import ReactVizXYPlotChart from './ReactVizXYPlotChart';
-import ReChartsChart from './ReChartsChart';
-import RephaelPaperChart from './RephaelPaperChart';
 import RoseChart from './RoseChart';
 import ScatterOutlineMapChart from './ScatterOutlineMapChart';
 import ScoreChart from './ScoreChart';
 import StackAreaChart from './StackAreaChart';
 import StackBarChart from './StackBarChart';
 import StackColumnChart from './StackColumnChart';
-import VueJSChart from './VueJSChart';
-import WaterfallChart from './WaterfallChart';
 import WordCloudChart from './WordCloudChart';
-import ZRenderTextChart from './ZRenderTextChart';
 
 const WidgetPlugins = {
   BasicFunnelChart,
   BasicLineChart,
   BasicAreaChart,
-  BasicRadarChart,
   BasicBarChart,
   BasicTableChart,
   BasicPieChart,
   BasicScatterChart,
   BasicDoubleYChart,
-  D3USMapChart,
-  AntVG2RoseChart,
-  AntVF2Chart,
-  AntVG6TreeChart,
-  AntVX6Chart,
-  ChartJSChart,
-  ReChartsChart,
-  RephaelPaperChart,
-  ReactVizXYPlotChart,
-  VueJSChart,
   ClusterColumnChart,
   ClusterBarChart,
   StackColumnChart,
@@ -91,15 +65,11 @@ const WidgetPlugins = {
   PieChart,
   DoughnutChart,
   RoseChart,
-  WaterfallChart,
   ScoreChart,
   MingXiTableChart,
   FenZuTableChart,
   BasicOutlineMapChart,
-  ZRenderTextChart,
-  LifeExpectancyChart,
   WordCloudChart,
-  GaodeMapChart,
   NormalOutlineMapChart,
   ScatterOutlineMapChart,
 };

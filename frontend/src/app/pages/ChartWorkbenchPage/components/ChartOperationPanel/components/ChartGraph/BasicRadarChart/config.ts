@@ -148,7 +148,7 @@ const config: ChartConfig = {
         {
           label: 'bar.width',
           key: 'width',
-          default: 10,
+          default: 0,
           comType: 'inputNumber',
         },
         {
