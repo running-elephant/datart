@@ -1,0 +1,179 @@
+/*
+ * Datart
+ * <p>
+ * Copyright 2021
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package datart.data.provider;
+
+import datart.core.data.provider.*;
+import datart.data.provider.base.DataProviderException;
+import datart.data.provider.optimize.DataProviderExecuteOptimizer;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.stream.Collectors;
+
+@Service
+@Slf4j
+public class ProviderManager extends DataProviderExecuteOptimizer implements DataProviderManager {
+
+    private static final Map<String, DataProvider> cachedDataProviders = new ConcurrentSkipListMap<>();
+
+    @Override
+    public List<DataProviderInfo> getSupportedDataProviders() {
+        ArrayList<DataProviderInfo> providerInfos = new ArrayList<>();
+        loadDataProviders();
+        for (DataProvider dataProvider : cachedDataProviders.values()) {
+            try {
+                providerInfos.add(dataProvider.getBaseInfo());
+            } catch (IOException e) {
+                log.error("DataProvider init error {" + dataProvider.getClass().getName() + "}", e);
+            }
+        }
+        return providerInfos;
+    }
+
+    @Override
+    public DataProviderConfigTemplate getSourceConfigTemplate(String type) throws IOException {
+        return getNotNoneDataProvider(type).getConfigTemplate();
+    }
+
+    @Override
+    public Object testConnection(DataProviderSource source) throws Exception {
+        return getNotNoneDataProvider(source.getType()).test(source);
+    }
+
+    @Override
+    public Set<String> readAllDatabases(DataProviderSource source) {
+        return getNotNoneDataProvider(source.getType()).readAllDatabases(source);
+    }
+
+    @Override
+    public Set<String> readTables(DataProviderSource source, String database) {
+        return getNotNoneDataProvider(source.getType()).readTables(source, database);
+    }
+
+    @Override
+    public Set<Column> readTableColumns(DataProviderSource source, String database, String table) {
+        return getNotNoneDataProvider(source.getType()).readTableColumns(source, database, table);
+    }
+
+    @Override
+    public Dataframe execute(DataProviderSource source, QueryScript queryScript, ExecuteParam param) throws Exception {
+
+        Dataframe dataframe;
+
+        String queryKey = DataProviderUtils.toCacheKey(source, queryScript, param);
+
+        if (param.isCacheEnable()) {
+            dataframe = getFromCache(queryKey);
+            if (dataframe != null) {
+                return dataframe;
+            }
+        }
+
+        if (param.isConcurrencyOptimize()) {
+            dataframe = runOptimize(queryKey, source, queryScript, param);
+        } else {
+            dataframe = run(source, queryScript, param);
+        }
+
+        if (param.isCacheEnable()) {
+            setCache(queryKey, dataframe, param.getCacheExpires());
+        }
+        return dataframe;
+
+    }
+
+    @Override
+    public Set<StdSqlOperator> supportedStdFunctions(DataProviderSource source) {
+        return getNotNoneDataProvider(source.getType()).supportedStdFunctions(source);
+    }
+
+    @Override
+    public boolean validateFunction(DataProviderSource source, String snippet) {
+        DataProvider provider = getNotNoneDataProvider(source.getType());
+        return provider.validateFunction(source, snippet);
+    }
+
+    private void excludeColumns(Dataframe data, Set<String> columns) {
+        if (data == null
+                || CollectionUtils.isEmpty(data.getColumns())
+                || columns == null
+                || columns.size() == 0
+                || columns.contains("*")) {
+            return;
+        }
+
+        List<Integer> excludeIndex = new LinkedList<>();
+        for (int i = 0; i < data.getColumns().size(); i++) {
+            Column column = data.getColumns().get(i);
+            if (!columns.contains(column.getName())) {
+                excludeIndex.add(i);
+                data.getColumns().remove(column);
+            }
+        }
+        if (excludeIndex.size() > 0) {
+            List<List<Object>> rows = data.getRows().parallelStream().map(row -> {
+                List<Object> r = new LinkedList<>();
+                for (int i = 0; i < row.size(); i++) {
+                    if (excludeIndex.size() > 0 && i == excludeIndex.get(0)) {
+                        excludeIndex.remove(0);
+                    } else {
+                        r.add(row.get(i));
+                    }
+                }
+                return r;
+            }).collect(Collectors.toList());
+            data.setRows(rows);
+        }
+    }
+
+
+    private DataProvider getNotNoneDataProvider(String type) {
+        if (cachedDataProviders.size() == 0) {
+            loadDataProviders();
+        }
+        DataProvider dataProvider = cachedDataProviders.get(type);
+        if (dataProvider == null) {
+            throw new DataProviderException("No data provider type " + type);
+        }
+        return dataProvider;
+    }
+
+    private void loadDataProviders() {
+        ServiceLoader<DataProvider> load = ServiceLoader.load(DataProvider.class);
+        for (DataProvider dataProvider : load) {
+            try {
+                cachedDataProviders.put(dataProvider.getType(), dataProvider);
+            } catch (IOException e) {
+                log.error("", e);
+            }
+        }
+    }
+
+    @Override
+    public Dataframe run(DataProviderSource source, QueryScript queryScript, ExecuteParam param) throws Exception {
+        Dataframe dataframe = getNotNoneDataProvider(source.getType()).execute(source, queryScript, param);
+        excludeColumns(dataframe, param.getIncludeColumns());
+        return dataframe;
+    }
+
+}

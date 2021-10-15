@@ -1,0 +1,38 @@
+{
+  "type": "FILE",
+  "name": "file-data-provider",
+  "syntax": {
+  },
+  "attributes": [
+    {
+      "name": "schemas",
+      "type": "files",
+      "children": [
+        {
+          "name": "format",
+          "required": true,
+          "defaultValue": "",
+          "type": "string",
+          "description": "file format , csv or excel",
+          "options": [
+            "XLSX",
+            "CSV"
+          ]
+        },
+        {
+          "name": "path",
+          "required": true,
+          "defaultValue": "",
+          "type": "string",
+          "description": "file path"
+        },
+        {
+          "name": "schema",
+          "required": true,
+          "defaultValue": "",
+          "type": "schema"
+        }
+      ]
+    }
+  ]
+}

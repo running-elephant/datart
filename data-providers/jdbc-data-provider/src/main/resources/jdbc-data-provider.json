@@ -1,0 +1,60 @@
+{
+  "type": "JDBC",
+  "name": "jdbc-data-provider",
+  "syntax": {
+    "name": "SQL",
+    "keywords": [
+      "SELECT",
+      "FROM",
+      "JOIN"
+    ]
+  },
+  "attributes": [
+    {
+      "name": "dbType",
+      "type": "string",
+      "required": true,
+      "defaultValue": "",
+      "description": "database type"
+    },
+    {
+      "name": "url",
+      "type": "string",
+      "required": true,
+      "defaultValue": "",
+      "description": "connect url"
+    },
+    {
+      "name": "user",
+      "type": "string",
+      "required": true,
+      "defaultValue": "root"
+    },
+    {
+      "name": "password",
+      "required": true,
+      "encrypt": true,
+      "defaultValue": "",
+      "type": "password"
+    },
+    {
+      "name": "driverClass",
+      "defaultValue": "",
+      "type": "string"
+    },
+    {
+      "name": "serverAggregate",
+      "type": "bool",
+      "required": true,
+      "defaultValue": false,
+      "description": "enable server aggregate"
+    },
+    {
+      "name": "properties",
+      "type": "object",
+      "required": false,
+      "defaultValue": "",
+      "description": "connection params"
+    }
+  ]
+}

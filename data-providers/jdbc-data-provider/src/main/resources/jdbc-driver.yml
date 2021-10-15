@@ -1,0 +1,157 @@
+ACCESS:
+  db-type: ACCESS
+  name: ACCESS
+  driver-class:
+  url-prefix:
+
+BIG_QUERY:
+  db-type: BIG_QUERY
+  name: BIG_QUERY
+  driver-class:
+  url-prefix:
+
+CALCITE:
+  db-type: CALCITE
+  name: CALCITE
+  driver-class:
+  url-prefix:
+
+CLICKHOUSE:
+  db-type: CLICKHOUSE
+  name: CLICKHOUSE
+  driver-class:
+  url-prefix:
+
+MSSQL:
+  db-type: MSSQL
+  name: MSSQL
+  driver-class: com.microsoft.jdbc.sqlserver.SQLServerDriver
+  url-prefix: jdbc:microsoft:sqlserver://
+
+MYSQL:
+  db-type: MYSQL
+  name: MYSQL
+  driver-class: com.mysql.cj.jdbc.Driver
+  url-prefix: jdbc:mysql://
+
+ORACLE:
+  db-type: ORACLE
+  name: ORACLE
+  driver-class: oracle.jdbc.driver.OracleDriver
+  adapter-class: datart.data.provider.jdbc.adapters.OracleDataProviderAdapter
+  url-prefix: jdbc:oracle:thin:@
+DERBY:
+  db-type: DERBY
+  name: DERBY
+  driver-class:
+  url-prefix:
+DB2:
+  db-type: DB2
+  name: DB2
+  driver-class: com.ibm.db2.jdbc.app.DB2Driver
+  url-prefix: jdbc:db2://
+
+FIREBIRD:
+  db-type: FIREBIRD
+  name: FIREBIRD
+  driver-class:
+  url-prefix:
+H2:
+  db-type: H2
+  name: H2
+  driver-class:
+  url-prefix:
+HIVE:
+  db-type: HIVE
+  name: HIVE
+  driver-class:
+  url-prefix:
+INFORMIX:
+  db-type: INFORMIX
+  name: INFORMIX
+  driver-class: com.informix.jdbc.IfxDriver
+  url-prefix: jdbc:informix-sqli://
+INGRES:
+  db-type: INGRES
+  name: INGRES
+  driver-class:
+  url-prefix:
+JETHRO:
+  db-type: JETHRO
+  name: JETHRO
+  driver-class:
+  url-prefix:
+LUCIDDB:
+  db-type: LUCIDDB
+  name: LUCIDDB
+  driver-class:
+  url-prefix:
+INTERBASE:
+  db-type: INTERBASE
+  name: INTERBASE
+  driver-class:
+  url-prefix:
+PHOENIX:
+  db-type: PHOENIX
+  name: PHOENIX
+  driver-class:
+  url-prefix:
+PRESTO:
+  db-type: PRESTO
+  name: PRESTO
+  driver-class:
+  url-prefix:
+
+NETEZZA:
+  db-type: NETEZZA
+  name: NETEZZA
+  driver-class:
+  url-prefix:
+INFOBRIGHT:
+  db-type: INFOBRIGHT
+  name: INFOBRIGHT
+  driver-class:
+  url-prefix:
+NEOVIEW:
+  db-type: NEOVIEW
+  name: NEOVIEW
+  driver-class:
+  url-prefix:
+SYBASE:
+  db-type: SYBASE
+  name: SYBASE
+  driver-class: com.sybase.jdbc3.jdbc.SybDriver
+  url-prefix: jdbc:sybase:Tds
+
+TERADATA:
+  db-type: TERADATA
+  name: TERADATA
+  driver-class:
+  url-prefix:
+HSQLDB:
+  db-type: HSQLDB
+  name: HSQLDB
+  driver-class:
+  url-prefix:
+VERTICA:
+  db-type: VERTICA
+  name: VERTICA
+  driver-class:
+  url-prefix:
+SQLSTREAM:
+  db-type: SQLSTREAM
+  name: SQLSTREAM
+  driver-class:
+  url-prefix:
+SPARK:
+  db-type: SPARK
+  name: SPARK
+  driver-class:
+  url-prefix:
+
+POSTGRESQL:
+  db-type: POSTGRESQL
+  name: POSTGRESQL
+  driver-class: org.postgresql.Driver
+  url-prefix: jdbc:postgresql://
+
