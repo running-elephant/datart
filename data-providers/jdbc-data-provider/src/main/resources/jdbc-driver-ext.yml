@@ -1,0 +1,16 @@
+# mysql
+MYSQL:
+  db-type: mysql
+  name: mysql
+  driver-class: com.mysql.cj.jdbc.Driver
+  identifier-quote: \`
+  url-prefix: jdbc:mysql://
+
+# oracle
+ORACLE:
+  db-type: oracle
+  name: oracle
+  driver-class: com.mysql.jdbc.Driver
+  identifier-quote: \"
+  adapter-class: datart.data.provider.jdbc.adapters.OracleDataProviderAdapter
+  url-prefix: jdbc:mysql://

@@ -1,0 +1,82 @@
+{
+  "type": "HTTP",
+  "name": "http-data-provider",
+  "syntax": {
+  },
+  "attributes": [
+    {
+      "name": "schemas",
+      "type": "array",
+      "key": "tableName",
+      "children": [
+        {
+          "name": "url",
+          "required": true,
+          "defaultValue": "http://",
+          "type": "string"
+        },
+        {
+          "name": "method",
+          "required": true,
+          "defaultValue": "GET",
+          "type": "string"
+        },
+        {
+          "name": "tableName",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "property",
+          "defaultValue": "",
+          "description": "The property name of the list data in JSON",
+          "type": "string"
+        },
+        {
+          "name": "schema",
+          "defaultValue": "",
+          "type": "schema"
+        },
+        {
+          "name": "username",
+          "defaultValue": "",
+          "type": "string"
+        },
+        {
+          "name": "password",
+          "defaultValue": "",
+          "type": "password"
+        },
+        {
+          "name": "timeout",
+          "defaultValue": 0,
+          "description": "request timeout",
+          "type": "number"
+        },
+        {
+          "name": "ResponseParser",
+          "defaultValue": "",
+          "description": "Http Response Parser",
+          "type": "string"
+        },
+        {
+          "name": "headers",
+          "type": "object"
+        },
+        {
+          "name": "queryParam",
+          "type": "object"
+        },
+        {
+          "name": "body",
+          "type": "string"
+        },
+        {
+          "name": "contentType",
+          "type": "string",
+          "defaultValue": "application/json"
+        }
+      ]
+    }
+  ]
+}

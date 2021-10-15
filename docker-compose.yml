@@ -1,0 +1,21 @@
+version: '3'
+services:
+  datart:
+    image: java:8
+    hostname: datart
+    container_name: datart
+    restart: always
+    networks:
+      retech_test:
+        ipv4_address: 172.16.1.150
+    volumes:
+      - "/root/docker-compose/datart/datart-server-1.0.0-alpha.0:/datart"
+    entrypoint: [ "sh","/datart/bin/datart-server.sh" ]
+    environment:
+      - TZ=Asia/Shanghai
+    logging:
+      options:
+        max-size: "5g"
+networks:
+  retech_test:
+    external: true
