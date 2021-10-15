@@ -1,0 +1,125 @@
+import Dashboard from 'app/pages/DashBoardPage/pages/Dashboard';
+import { useCascadeAccess } from 'app/pages/MainPage/Access';
+import { StoryPagePreview } from 'app/pages/StoryBoardPage/Preview/Preview';
+import classnames from 'classnames';
+import { memo, useMemo } from 'react';
+import styled from 'styled-components/macro';
+import { getPath } from 'utils/utils';
+import {
+  PermissionLevels,
+  ResourceTypes,
+} from '../../PermissionPage/constants';
+import { ChartPreviewBoard } from '../ChartPreview';
+import { FolderViewModel, VizTab } from '../slice/types';
+
+interface VizContainerProps {
+  tab: VizTab;
+  orgId: string;
+  vizs: FolderViewModel[];
+  selectedId?: string;
+}
+
+export const VizContainer = memo(
+  ({ tab, orgId, vizs, selectedId }: VizContainerProps) => {
+    const { id, name, type, search, parentId } = tab;
+
+    const path = useMemo(
+      () =>
+        ['DATACHART', 'DASHBOARD'].includes(type)
+          ? getPath(
+              vizs as Array<{ id: string; parentId: string }>,
+              { id, parentId },
+              [],
+            )
+          : [id],
+      [vizs, id, type, parentId],
+    );
+    const allowDownload = useCascadeAccess({
+      module: ResourceTypes.Viz,
+      path,
+      level: PermissionLevels.Download,
+    })(true);
+    const allowShare = useCascadeAccess({
+      module: ResourceTypes.Viz,
+      path,
+      level: PermissionLevels.Share,
+    })(true);
+    const allowManage = useCascadeAccess({
+      module: ResourceTypes.Viz,
+      path,
+      level: PermissionLevels.Manage,
+    })(true);
+
+    let content;
+
+    switch (type) {
+      case 'DASHBOARD':
+        content = (
+          <Dashboard
+            key={id}
+            id={id}
+            autoFit={true}
+            filterSearchUrl={search}
+            allowDownload={allowDownload}
+            allowShare={allowShare}
+            showZoomCtrl={true}
+            allowManage={allowManage}
+          />
+        );
+        break;
+      case 'DATACHART':
+        content = (
+          <ChartPreviewBoard
+            key={id}
+            backendChartId={id}
+            orgId={orgId}
+            filterSearchUrl={search}
+            allowDownload={allowDownload}
+            allowShare={allowShare}
+            allowManage={allowManage}
+          />
+        );
+        break;
+      case 'STORYBOARD':
+        content = (
+          <StoryPagePreview
+            storyId={id}
+            allowShare={allowShare}
+            allowManage={allowManage}
+          />
+        );
+        break;
+      default:
+        content = (
+          <Dumb>
+            <h2 key={name}>{name}</h2>
+          </Dumb>
+        );
+        break;
+    }
+    return (
+      <Container
+        key={id}
+        className={classnames({ selected: id === selectedId })}
+      >
+        {content}
+      </Container>
+    );
+  },
+);
+
+const Container = styled.div`
+  display: none;
+  flex: 1;
+  flex-direction: column;
+
+  &.selected {
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+  }
+`;
+
+const Dumb = styled.div`
+  height: 100%;
+`;
