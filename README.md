@@ -17,7 +17,7 @@ unzip datart-server-1.0.0-alpha.0-install
 - 创建数据库，并将bin/datart.sql导入到数据库中
 
 ```bash
-mysql> cereate database datart;
+mysql> create database datart;
 mysql> use datart;
 mysql> source bin/datart.sql
 ```
