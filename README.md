@@ -1,3 +1,8 @@
+## 0 demo
+- http://datart-demo.retech.cc
+- 用户名：demo
+- 密码：123456
+
 ## 1 环境准备
 
 - JDK 1.8+
