@@ -410,7 +410,7 @@ export function flattenHeaderRowsWithoutGroupRow<
   T extends {
     isGroup?: boolean;
     children?: T[];
-  }
+  },
 >(groupedHeaderRow: T) {
   const childRows = (groupedHeaderRow.children || []).flatMap(child =>
     flattenHeaderRowsWithoutGroupRow(child),
@@ -524,10 +524,14 @@ export function getDataColumnMaxAndMin(
   return { min, max };
 }
 
-export function getSeriesTooltips4Scatter(params, tooltipItemConfigs) {
+export function getSeriesTooltips4Scatter(
+  params,
+  tooltipItemConfigs,
+  start?: number,
+) {
   const dataValues = params?.[0]?.value;
   return tooltipItemConfigs.map((config, index) =>
-    valueFormatter(config, dataValues?.[index]),
+    valueFormatter(config, dataValues?.[!!start ? start + index : index]),
   );
 }
 
