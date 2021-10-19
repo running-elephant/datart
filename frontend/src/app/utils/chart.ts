@@ -546,7 +546,7 @@ export function getSeriesTooltips4Rectangular(
   }
   if (!groupConfigs?.length) {
     return aggConfigs.map(config =>
-      valueFormatter(config, dataColumns?.[0]?.[getColumnRenderName(config)]),
+      valueFormatter(config, dataColumns?.[0]?.[getValueByColumnKey(config)]),
     );
   }
   if (groupConfigs?.[0]) {
@@ -555,7 +555,7 @@ export function getSeriesTooltips4Rectangular(
       dc => dc[getValueByColumnKey(groupConfig)] === params?.[0]?.axisValue,
     );
     return aggConfigs.map(config =>
-      valueFormatter(config, dataRow?.[getColumnRenderName(config)]),
+      valueFormatter(config, dataRow?.[getValueByColumnKey(config)]),
     );
   }
   return [];
@@ -572,7 +572,7 @@ export function getSeriesTooltips4Polar(
   }
   if (!groupConfigs?.length) {
     return aggConfigs.map(config =>
-      valueFormatter(config, dataColumns?.[0]?.[getColumnRenderName(config)]),
+      valueFormatter(config, dataColumns?.[0]?.[getValueByColumnKey(config)]),
     );
   }
   if (groupConfigs?.[0]) {
@@ -580,7 +580,7 @@ export function getSeriesTooltips4Polar(
       groupConfigs?.map(config => dc[config?.colName]).join('-');
     const dataRow = dataColumns.find(dc => rowKeyFn(dc) === params?.name);
     return aggConfigs.map(config =>
-      valueFormatter(config, dataRow?.[getColumnRenderName(config)]),
+      valueFormatter(config, dataRow?.[getValueByColumnKey(config)]),
     );
   }
   return [];
