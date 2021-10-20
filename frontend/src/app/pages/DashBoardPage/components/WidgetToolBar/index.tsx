@@ -56,6 +56,9 @@ const WidgetToolBar: FC<WidgetToolBarProps> = memo(({ widgetType }) => {
       );
     }
   };
+  const loadingIcon = () => {
+    return loading ? <SyncOutlined spin style={{ color: PRIMARY }} /> : null;
+  };
   const linkageIcon = () => {
     if (inLinking) {
       return (
@@ -78,7 +81,7 @@ const WidgetToolBar: FC<WidgetToolBarProps> = memo(({ widgetType }) => {
     <StyleWrap onClick={ssp} className="widget-tool-bar">
       <Space>
         {renderedIcon()}
-        {loading ? <SyncOutlined spin style={{ color: PRIMARY }} /> : null}
+        {loadingIcon()}
         {linkageIcon()}
         <WidgetActionDropdown widget={widget} />
       </Space>
