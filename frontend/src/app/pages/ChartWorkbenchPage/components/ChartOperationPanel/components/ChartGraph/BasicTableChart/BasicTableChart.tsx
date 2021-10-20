@@ -32,9 +32,6 @@ import AntdTableChartAdapter from '../../ChartTools/AntdTableChartAdapter';
 import Config from './config';
 
 class BasicTableChart extends ReactChart {
-  dependency = [
-    'https://cdnjs.cloudflare.com/ajax/libs/antd/4.15.2/antd.min.css',
-  ];
   isISOContainer = 'react-table';
   config = Config;
 

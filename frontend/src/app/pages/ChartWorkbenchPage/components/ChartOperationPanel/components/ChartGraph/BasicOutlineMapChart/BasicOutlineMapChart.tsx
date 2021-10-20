@@ -22,9 +22,9 @@ import ChartConfig, {
 } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
 import {
-  getColumnRenderName,
   getDataColumnMaxAndMin,
   getScatterSymbolSizeFn,
+  getSeriesTooltips4Scatter,
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
@@ -261,14 +261,14 @@ class BasicOutlineMapChart extends Chart {
               ),
               value: this.mappingGeoCoordination(
                 row[getValueByColumnKey(groupConfigs[0])],
-                row[getValueByColumnKey(sizeConfigs[0])] || defaultSizeValue,
                 row[getValueByColumnKey(aggregateConfigs[0])] ||
                   defaultColorValue,
+                row[getValueByColumnKey(sizeConfigs[0])] || defaultSizeValue,
               ),
             };
           })
           ?.filter(d => !!d.name && d.value !== undefined),
-        symbolSize: getScatterSymbolSizeFn(2, max, min, cycleRatio),
+        symbolSize: getScatterSymbolSizeFn(3, max, min, cycleRatio),
         label: {
           formatter: '{b}',
           position: 'right',
@@ -292,23 +292,20 @@ class BasicOutlineMapChart extends Chart {
   ) {
     return {
       trigger: 'item',
-      formatter: function (params) {
-        if (params.componentType !== 'series') {
-          return params.name;
+      formatter: function (seriesParams) {
+        if (seriesParams.componentType !== 'series') {
+          return seriesParams.name;
         }
-        const seriesInfos = [sizeConfigs?.[0], aggregateConfigs?.[0]]
-          .map((config, index) => {
-            if (!config) {
-              return null;
-            }
-            const datas = params?.data?.value || [];
-            const currentValue = Array.isArray(datas)
-              ? datas?.[index + 2]
-              : datas;
-            return `${getColumnRenderName(config)}: ${currentValue}`;
-          })
-          .filter(Boolean);
-        return params.name + '<br/>' + seriesInfos.join('<br/>');
+
+        return []
+          .concat(
+            getSeriesTooltips4Scatter(
+              [seriesParams],
+              [].concat(aggregateConfigs).concat(sizeConfigs),
+              2,
+            ),
+          )
+          .join('<br />');
       },
     };
   }
@@ -376,7 +373,7 @@ class BasicOutlineMapChart extends Chart {
       {
         type: 'continuous',
         seriesIndex: 0,
-        dimension: this.isNormalGeoMap ? undefined : 3,
+        dimension: this.isNormalGeoMap ? undefined : 2,
         show,
         orient,
         align,

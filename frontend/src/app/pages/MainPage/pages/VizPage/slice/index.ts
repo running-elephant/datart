@@ -461,6 +461,7 @@ const slice = createSlice({
         state.chartPreviews[index] = {
           ...state.chartPreviews[index],
           dataset: action.payload?.data,
+          version: uuidv4(),
         };
       },
     );
