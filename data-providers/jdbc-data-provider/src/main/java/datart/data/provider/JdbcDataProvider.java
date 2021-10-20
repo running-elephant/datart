@@ -270,19 +270,13 @@ public class JdbcDataProvider extends DataProvider {
             //Build in database types
             Map<String, Map<String, String>> buildIn = loadYml(JDBC_DRIVER_BUILD_IN);
             // user ext database types
-//            buildIn.putAll(loadYml(JDBC_DRIVER_EXT));
+            buildIn.putAll(loadYml(JDBC_DRIVER_EXT));
 
             return buildIn.entrySet().stream().map(entry -> {
                 try {
                     JdbcDriverInfo jdbcDriverInfo = objectMapper.convertValue(entry.getValue(), JdbcDriverInfo.class);
                     if (StringUtils.isBlank(jdbcDriverInfo.getAdapterClass())) {
                         jdbcDriverInfo.setAdapterClass(DEFAULT_ADAPTER);
-                    }
-                    if (StringUtils.isBlank(jdbcDriverInfo.getVariableQuote())) {
-                        jdbcDriverInfo.setVariableQuote(Const.DEFAULT_VARIABLE_QUOTE);
-                    }
-                    if (StringUtils.isBlank(jdbcDriverInfo.getStringValueQuote())) {
-                        jdbcDriverInfo.setStringValueQuote(SqlScriptRender.DEFAULT_STRING_VALUE_QUOTE);
                     }
                     jdbcDriverInfo.setDbType(jdbcDriverInfo.getDbType().toUpperCase());
                     return jdbcDriverInfo;
