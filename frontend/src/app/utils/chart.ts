@@ -535,6 +535,35 @@ export function getSeriesTooltips4Scatter(
   );
 }
 
+export function getSeriesTooltips4Rectangular2(
+  tooltipParam: {
+    data: {
+      name: string;
+      rowData: { [key: string]: any };
+    };
+  },
+  groupConfigs: ChartDataSectionField[],
+  colorConfigs: ChartDataSectionField[],
+  aggConfigs: ChartDataSectionField[],
+  infoConfigs?: ChartDataSectionField[],
+  sizeConfigs?: ChartDataSectionField[],
+): string {
+  console.log('aaaaa ----> ', tooltipParam);
+  const aggConfigName = tooltipParam?.data?.name;
+  const row = tooltipParam?.data?.rowData || {};
+  const tooltips: string[] = ([] as any[])
+    .concat(groupConfigs || [])
+    .concat(colorConfigs || [])
+    .concat(
+      aggConfigs.filter(agg => getColumnRenderName(agg) === aggConfigName) ||
+        [],
+    )
+    .concat(sizeConfigs || [])
+    .concat(infoConfigs || [])
+    .map(config => valueFormatter(config, row?.[getValueByColumnKey(config)]));
+  return tooltips.join('<br />');
+}
+
 export function getSeriesTooltips4Rectangular(
   params,
   groupConfigs,
@@ -607,5 +636,11 @@ export function getScatterSymbolSizeFn(
     return (
       (val?.[valueIndex] / distance) * scaleRatio * defaultScatterPointPixelSize
     );
+  };
+}
+
+export function getExtraSeriesRowData(data) {
+  return {
+    rowData: data,
   };
 }

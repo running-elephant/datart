@@ -26,8 +26,9 @@ import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
 import {
   getColumnRenderName,
   getCustomSortableColumns,
+  getExtraSeriesRowData,
   getReference,
-  getSeriesTooltips4Rectangular,
+  getSeriesTooltips4Rectangular2,
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
@@ -137,6 +138,7 @@ class BasicBarChart extends Chart {
       dataColumns,
       groupConfigs,
       aggregateConfigs,
+      infoConfigs,
       xAxisColumns,
     );
 
@@ -144,7 +146,6 @@ class BasicBarChart extends Chart {
       xAxis: this.getXAxis(styleConfigs, xAxisColumns),
       yAxis: this.getYAxis(styleConfigs, series),
     };
-
     if (this.isStackMode) {
       this.makeStackSeries(styleConfigs, series);
     }
@@ -158,14 +159,13 @@ class BasicBarChart extends Chart {
 
     return {
       tooltip: {
-        trigger: 'axis',
+        trigger: 'item',
         formatter: this.getTooltipFormmaterFunc(
           styleConfigs,
           groupConfigs,
           aggregateConfigs,
           colorConfigs,
           infoConfigs,
-          dataColumns,
         ),
       },
       legend: this.getLegendStyle(styleConfigs, series),
@@ -196,11 +196,13 @@ class BasicBarChart extends Chart {
     dataColumns,
     groupConfigs,
     aggregateConfigs,
+    infoConfigs,
     xAxisColumns,
   ) {
     const xAxisColumnName = getValueByColumnKey(groupConfigs?.[0]);
     const yAxisColumnNames = aggregateConfigs.map(getValueByColumnKey);
     const colorColumnName = getValueByColumnKey(colorConfigs[0]);
+    const infoColumnNames = infoConfigs.map(getValueByColumnKey);
 
     if (!colorConfigs.length) {
       const flatSeries = aggregateConfigs.map(aggConfig => {
@@ -213,7 +215,8 @@ class BasicBarChart extends Chart {
           ),
           name: getColumnRenderName(aggConfig),
           data: dataColumns.map(dc => ({
-            ...aggConfig,
+            ...getExtraSeriesRowData(dc),
+            name: getColumnRenderName(aggConfig),
             value: dc[getValueByColumnKey(aggConfig)],
           })),
         };
@@ -223,9 +226,10 @@ class BasicBarChart extends Chart {
 
     const secondGroupInfos = this.getColorizeGroupSeriesColumns(
       dataColumns,
-      [colorColumnName],
+      colorColumnName,
       xAxisColumnName,
       yAxisColumnNames,
+      infoColumnNames,
     );
 
     const colorizeGroupedSeries = aggregateConfigs.flatMap(aggConfig => {
@@ -246,22 +250,11 @@ class BasicBarChart extends Chart {
           ),
           name: k,
           data: xAxisColumns[0].data.map(d => {
-            const target = v.find(col => col[xAxisColumnName] === d);
-            const series = {
-              seriesColName: colorColumnName,
-              valueColName: getColumnRenderName(aggConfig),
-            };
-            if (target) {
-              return {
-                ...aggConfig,
-                ...series,
-                value: target[getColumnRenderName(aggConfig)],
-              };
-            }
+            const dc = v.find(col => col[xAxisColumnName] === d);
             return {
-              ...aggConfig,
-              ...series,
-              value: 0,
+              ...getExtraSeriesRowData(dc),
+              name: getColumnRenderName(aggConfig),
+              value: dc?.[getValueByColumnKey(aggConfig)] || 0,
             };
           }),
           itemStyle: this.getSerieItemStyle(styleConfigs, {
@@ -306,31 +299,37 @@ class BasicBarChart extends Chart {
   }
 
   private makePercentageSeries(styles, series) {
-    const _getValue = data => {
+    const _getAbsValue = data => {
       if (typeof data === 'object' && data !== null && 'value' in data) {
-        return data.value;
+        return Math.abs(data.value || 0);
       }
       return data;
     };
 
-    const _convertToPercentage = (data: [], totalArray: []) => {
+    const _convertToPercentage = (data: [{ value: any }], totalArray: []) => {
       return (data || []).map((d, dataIndex) => {
         const sum = totalArray[dataIndex];
-        return toPrecision((_getValue(d) / sum) * 100, 2);
+        const percentageValue = toPrecision((_getAbsValue(d) / sum) * 100, 2);
+        return {
+          ...d,
+          value: percentageValue,
+          total: sum,
+        };
       });
     };
 
-    const yAxisColumnsTotal = (series[0]?.data || []).map((_, dataRowIndex) => {
-      const sum = series.reduce((acc, cur) => {
-        const value = +_getValue(cur.data[dataRowIndex] || 0);
-        acc = acc + value;
-        return acc;
-      }, 0);
-      return sum;
-    });
-
+    const _sereisTotalArrayByDataIndex = (series?.[0]?.data || []).map(
+      (_, index) => {
+        const sum = series.reduce((acc, cur) => {
+          const value = +_getAbsValue(cur.data?.[index] || 0);
+          acc = acc + value;
+          return acc;
+        }, 0);
+        return sum;
+      },
+    );
     (series || []).forEach(s => {
-      s.data = _convertToPercentage(s.data, yAxisColumnsTotal);
+      s.data = _convertToPercentage(s.data, _sereisTotalArrayByDataIndex);
     });
     return series;
   }
@@ -585,47 +584,42 @@ class BasicBarChart extends Chart {
     aggregateConfigs,
     colorConfigs,
     infoConfigs,
-    dataColumns,
   ) {
     return seriesParams => {
-      const tooltips = !!groupConfigs.length
-        ? [`${getColumnRenderName(groupConfigs[0])}: ${seriesParams[0].name}`]
-        : [];
-
-      return tooltips
-        .concat(
-          getSeriesTooltips4Rectangular(
-            seriesParams,
-            groupConfigs,
-            []
-              .concat(aggregateConfigs)
-              .concat(colorConfigs)
-              .concat(infoConfigs),
-            dataColumns,
-          ),
-        )
-        .join('<br />');
+      const params = Array.isArray(seriesParams)
+        ? seriesParams
+        : [seriesParams];
+      return getSeriesTooltips4Rectangular2(
+        params[0],
+        groupConfigs,
+        colorConfigs,
+        aggregateConfigs,
+        infoConfigs,
+      );
     };
   }
 
   getColorizeGroupSeriesColumns(
     dataColumns: any[],
-    secondGroupKeys: string[],
+    groupByKey: string,
     xAxisColumnName: string,
     aggregateKeys: string[],
+    infoColumnNames: string[],
   ) {
-    const groupByKey = secondGroupKeys[0];
-
     const groupedDataColumnObject = dataColumns.reduce((acc, cur) => {
-      const colKey = cur[groupByKey] || 'default';
+      const colKey = cur[groupByKey] || 'defaultGroupKey';
 
       if (!acc[colKey]) {
         acc[colKey] = [];
       }
-      const value = aggregateKeys.concat([xAxisColumnName]).reduce((a, k) => {
-        a[k] = cur[k];
-        return a;
-      }, {});
+      const value = aggregateKeys
+        .concat([xAxisColumnName])
+        .concat(infoColumnNames || [])
+        .concat([groupByKey])
+        .reduce((a, k) => {
+          a[k] = cur[k];
+          return a;
+        }, {});
       acc[colKey].push(value);
       return acc;
     }, {});
