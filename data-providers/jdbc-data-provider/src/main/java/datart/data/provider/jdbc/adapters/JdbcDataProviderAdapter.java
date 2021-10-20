@@ -159,16 +159,17 @@ public class JdbcDataProviderAdapter implements Closeable {
         Dataframe dataframe;
         try (Connection conn = getConn()) {
             Statement statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            statement.setFetchSize(pageInfo.getPageSize());
             try (ResultSet resultSet = statement.executeQuery(selectSql)) {
 
                 initPageInfo(pageInfo, resultSet);
 
                 //paging through  sql
-                if (supportPaging()) {
-                    dataframe = ResultSetMapper.mapToTableData(resultSet);
-                    dataframe.setPageInfo(pageInfo);
-                    return dataframe;
-                }
+//                if (supportPaging()) {
+//                    dataframe = ResultSetMapper.mapToTableData(resultSet);
+//                    dataframe.setPageInfo(pageInfo);
+//                    return dataframe;
+//                }
 
                 //paging through  jdbc
                 resultSet.absolute((int) Math.min(pageInfo.getTotal(), (pageInfo.getPageNo() - 1) * pageInfo.getPageSize()));

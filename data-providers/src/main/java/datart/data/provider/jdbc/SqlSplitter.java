@@ -20,14 +20,19 @@ package datart.data.provider.jdbc;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 public class SqlSplitter {
 
+    public static final char DEFAULT_DELIMITER = ';';
+
     public static List<String> splitEscaped(String string, char delimiter) {
-        List<Token> tokens = tokenize(Objects.requireNonNull(string), delimiter);
+        List<Token> tokens = tokenize(string, delimiter);
         return processTokens(string, tokens);
+    }
+
+    public static List<String> splitEscaped(String string) {
+        return splitEscaped(string, DEFAULT_DELIMITER);
     }
 
     private static List<String> processTokens(String string, List<Token> tokens) {
@@ -95,7 +100,7 @@ public class SqlSplitter {
     private static int consumeSingleLineComment(String string, int cursor, StringBuilder builder) {
         for (int i = cursor + 1; i < string.length(); i++) {
             final char c = string.charAt(i);
-            if (c == '\n') {
+            if (c == '\n' || i == string.length() - 1) {
                 return i + 1;
             } else {
                 builder.append(c);

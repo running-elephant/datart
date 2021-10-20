@@ -34,12 +34,7 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 @Service
 public class FileServiceImpl extends BaseService implements FileService {
@@ -70,11 +65,6 @@ public class FileServiceImpl extends BaseService implements FileService {
         } catch (Exception e) {
             return false;
         }
-    }
-
-    @Override
-    public Set<String> listFiles(String path, String extension) throws Exception {
-        return FileUtils.walkDir(new File(path), extension);
     }
 
     private String saveVizImage(FileOwner fileOwner, String ownerId, MultipartFile file, String fileName) throws IOException {
