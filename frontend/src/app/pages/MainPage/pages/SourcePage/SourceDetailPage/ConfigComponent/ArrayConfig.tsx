@@ -207,6 +207,7 @@ export function ArrayConfig({
             subFormRowKey={attr.key}
             subFormRowKeyValidator={subFormRowKeyValidator}
             disabled={disabled}
+            allowManage={allowManage}
             onTest={test}
           />
         ))}
