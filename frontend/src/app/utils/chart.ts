@@ -548,7 +548,6 @@ export function getSeriesTooltips4Rectangular2(
   infoConfigs?: ChartDataSectionField[],
   sizeConfigs?: ChartDataSectionField[],
 ): string {
-  console.log('aaaaa ----> ', tooltipParam);
   const aggConfigName = tooltipParam?.data?.name;
   const row = tooltipParam?.data?.rowData || {};
   const tooltips: string[] = ([] as any[])
@@ -643,4 +642,38 @@ export function getExtraSeriesRowData(data) {
   return {
     rowData: data,
   };
+}
+
+export function getColorizeGroupSeriesColumns(
+  dataColumns: any[],
+  groupByKey: string,
+  xAxisColumnName: string,
+  aggregateKeys: string[],
+  infoColumnNames: string[],
+) {
+  const groupedDataColumnObject = dataColumns.reduce((acc, cur) => {
+    const colKey = cur[groupByKey] || 'defaultGroupKey';
+
+    if (!acc[colKey]) {
+      acc[colKey] = [];
+    }
+    const value = aggregateKeys
+      .concat([xAxisColumnName])
+      .concat(infoColumnNames || [])
+      .concat([groupByKey])
+      .reduce((a, k) => {
+        a[k] = cur[k];
+        return a;
+      }, {});
+    acc[colKey].push(value);
+    return acc;
+  }, {});
+
+  let collection = [] as any;
+  Object.entries(groupedDataColumnObject).forEach(([k, v]) => {
+    let a = {};
+    a[k] = v;
+    collection.push(a);
+  });
+  return collection;
 }
