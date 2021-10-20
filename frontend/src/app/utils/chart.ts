@@ -550,6 +550,7 @@ export function getSeriesTooltips4Rectangular2(
 ): string {
   const aggConfigName = tooltipParam?.data?.name;
   const row = tooltipParam?.data?.rowData || {};
+
   const tooltips: string[] = ([] as any[])
     .concat(groupConfigs || [])
     .concat(colorConfigs || [])
@@ -557,6 +558,30 @@ export function getSeriesTooltips4Rectangular2(
       aggConfigs.filter(agg => getColumnRenderName(agg) === aggConfigName) ||
         [],
     )
+    .concat(sizeConfigs || [])
+    .concat(infoConfigs || [])
+    .map(config => valueFormatter(config, row?.[getValueByColumnKey(config)]));
+  return tooltips.join('<br />');
+}
+
+export function getSeriesTooltips4Polar2(
+  tooltipParam: {
+    data: {
+      name: string;
+      rowData: { [key: string]: any };
+    };
+  },
+  groupConfigs: ChartDataSectionField[],
+  colorConfigs: ChartDataSectionField[],
+  aggConfigs: ChartDataSectionField[],
+  infoConfigs?: ChartDataSectionField[],
+  sizeConfigs?: ChartDataSectionField[],
+): string {
+  const row = tooltipParam?.data?.rowData || {};
+  const tooltips: string[] = ([] as any[])
+    .concat(groupConfigs || [])
+    .concat(colorConfigs || [])
+    .concat(aggConfigs || [])
     .concat(sizeConfigs || [])
     .concat(infoConfigs || [])
     .map(config => valueFormatter(config, row?.[getValueByColumnKey(config)]));
