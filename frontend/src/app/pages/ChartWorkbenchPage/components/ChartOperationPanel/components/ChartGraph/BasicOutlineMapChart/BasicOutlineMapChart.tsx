@@ -178,11 +178,11 @@ class BasicOutlineMapChart extends Chart {
       emphasis: {
         focus: enableFocus ? 'self' : 'none',
         itemStyle: {
-          color: areaEmphasisColor,
+          areaColor: areaEmphasisColor,
         },
       },
       itemStyle: {
-        color: areaColor,
+        areaColor: areaColor,
         borderType: borderStyle?.type,
         borderWidth: borderStyle?.width,
         borderColor: borderStyle?.color,
