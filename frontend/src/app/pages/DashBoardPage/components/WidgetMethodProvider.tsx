@@ -120,7 +120,13 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       }
     },
 
-    [dispatch, orgId, widget.config.content.type, widget.datachartId],
+    [
+      dispatch,
+      orgId,
+      widget.config.content.type,
+      widget.config.name,
+      widget.datachartId,
+    ],
   );
   const onWidgetFullScreen = useCallback(
     (editing: boolean, recordId: string, itemId: string) => {
