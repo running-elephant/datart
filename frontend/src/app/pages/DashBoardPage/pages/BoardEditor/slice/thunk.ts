@@ -351,7 +351,7 @@ export const getEditWidgetDataAsync = createAsyncThunk<
 
     switch (curWidget.config.type) {
       case 'filter':
-        dispatch(getEditFilterDataAsync(curWidget));
+        await dispatch(getEditFilterDataAsync(curWidget));
         return null;
       case 'media':
         return null;
@@ -393,7 +393,7 @@ export const getEditFilterDataAsync = createAsyncThunk<
   null,
   Widget,
   { state: RootState }
->('board/getFilterDataAsync', async (widget, { getState, dispatch }) => {
+>('editBoard/getFilterDataAsync', async (widget, { getState, dispatch }) => {
   const content = widget.config.content as FilterWidgetContent;
   const widgetFilter = content.widgetFilter;
   if (widgetFilter.assistViewField) {
