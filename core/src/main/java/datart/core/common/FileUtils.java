@@ -70,12 +70,12 @@ public class FileUtils {
         }
     }
 
-    public static Set<String> walkDir(File file, String extension) {
+    public static Set<String> walkDir(File file, String extension, boolean recursion) {
         if (file == null || !file.exists()) {
             return Collections.emptySet();
         }
         if (file.isFile()) {
-            return Collections.singleton(file.getPath());
+            return Collections.singleton(file.getName());
         } else {
             File[] files = file.listFiles(pathname -> extension == null || pathname.getName().endsWith(extension));
             if (files == null) {
@@ -84,9 +84,9 @@ public class FileUtils {
             Set<String> names = new LinkedHashSet<>();
             for (File f : files) {
                 if (f.isFile()) {
-                    names.add(f.getPath());
-                } else {
-                    names.addAll(walkDir(f, extension));
+                    names.add(f.getName());
+                } else if (recursion) {
+                    names.addAll(walkDir(f, extension, recursion));
                 }
             }
             return names;
