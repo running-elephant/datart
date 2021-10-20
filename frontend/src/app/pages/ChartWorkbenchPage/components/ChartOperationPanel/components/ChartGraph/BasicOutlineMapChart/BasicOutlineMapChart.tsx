@@ -23,8 +23,9 @@ import ChartConfig, {
 import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
 import {
   getDataColumnMaxAndMin,
+  getExtraSeriesRowData,
   getScatterSymbolSizeFn,
-  getSeriesTooltips4Scatter,
+  getSeriesTooltips4Polar2,
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
@@ -177,11 +178,11 @@ class BasicOutlineMapChart extends Chart {
       emphasis: {
         focus: enableFocus ? 'self' : 'none',
         itemStyle: {
-          color: areaEmphasisColor,
+          areaColor: areaEmphasisColor,
         },
       },
       itemStyle: {
-        color: areaColor,
+        areaColor: areaColor,
         borderType: borderStyle?.type,
         borderWidth: borderStyle?.width,
         borderColor: borderStyle?.color,
@@ -218,6 +219,7 @@ class BasicOutlineMapChart extends Chart {
         data: objDataColumns
           ?.map(row => {
             return {
+              ...getExtraSeriesRowData(row),
               name: this.mappingGeoName(
                 row[getValueByColumnKey(groupConfigs[0])],
               ),
@@ -256,6 +258,7 @@ class BasicOutlineMapChart extends Chart {
         data: objDataColumns
           ?.map(row => {
             return {
+              ...getExtraSeriesRowData(row),
               name: this.mappingGeoName(
                 row[getValueByColumnKey(groupConfigs[0])],
               ),
@@ -296,16 +299,14 @@ class BasicOutlineMapChart extends Chart {
         if (seriesParams.componentType !== 'series') {
           return seriesParams.name;
         }
-
-        return []
-          .concat(
-            getSeriesTooltips4Scatter(
-              [seriesParams],
-              [].concat(aggregateConfigs).concat(sizeConfigs),
-              2,
-            ),
-          )
-          .join('<br />');
+        return getSeriesTooltips4Polar2(
+          seriesParams,
+          groupConfigs,
+          [],
+          aggregateConfigs,
+          [],
+          sizeConfigs,
+        );
       },
     };
   }
