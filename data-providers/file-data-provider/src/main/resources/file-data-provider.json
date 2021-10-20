@@ -7,6 +7,7 @@
     {
       "name": "schemas",
       "type": "files",
+      "key": "tableName",
       "children": [
         {
           "name": "format",
@@ -27,10 +28,16 @@
           "description": "file path"
         },
         {
-          "name": "schema",
+          "name": "columns",
           "required": true,
           "defaultValue": "",
           "type": "schema"
+        },
+        {
+          "name": "tableName",
+          "required": true,
+          "defaultValue": "",
+          "type": "string"
         }
       ]
     }

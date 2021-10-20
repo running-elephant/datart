@@ -21,6 +21,11 @@ package datart.core.common;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
 public class FileUtils {
 
@@ -62,6 +67,29 @@ public class FileUtils {
                 file.delete();
             } catch (Exception ignored) {
             }
+        }
+    }
+
+    public static Set<String> walkDir(File file, String extension) {
+        if (file == null || !file.exists()) {
+            return Collections.emptySet();
+        }
+        if (file.isFile()) {
+            return Collections.singleton(file.getPath());
+        } else {
+            File[] files = file.listFiles(pathname -> extension == null || pathname.getName().endsWith(extension));
+            if (files == null) {
+                return Collections.emptySet();
+            }
+            Set<String> names = new LinkedHashSet<>();
+            for (File f : files) {
+                if (f.isFile()) {
+                    names.add(f.getPath());
+                } else {
+                    names.addAll(walkDir(f, extension));
+                }
+            }
+            return names;
         }
     }
 
