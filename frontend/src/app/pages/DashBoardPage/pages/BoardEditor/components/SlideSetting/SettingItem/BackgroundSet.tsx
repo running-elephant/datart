@@ -30,7 +30,6 @@ export const BackgroundSet: FC<{
       <Form.Item label="背景颜色">
         <ColorSet filedName={'backgroundColor'} filedValue={background.color} />
       </Form.Item>
-      {/* <ItemLabel> 背景图片: </ItemLabel> */}
       <ImageUpload
         form={form}
         onForceUpdate={onForceUpdate}
