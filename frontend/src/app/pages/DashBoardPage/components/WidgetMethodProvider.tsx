@@ -36,9 +36,12 @@ import {
   editWidgetInfoActions,
 } from '../pages/BoardEditor/slice';
 import { editChartInWidgetAction } from '../pages/BoardEditor/slice/actions';
-import { getEditWidgetDataAsync } from '../pages/BoardEditor/slice/thunk';
+import {
+  getEditChartWidgetDataAsync,
+  getEditWidgetDataAsync,
+} from '../pages/BoardEditor/slice/thunk';
 import { boardActions } from '../slice';
-import { getWidgetDataAsync } from '../slice/thunk';
+import { getChartWidgetDataAsync, getWidgetDataAsync } from '../slice/thunk';
 import {
   BoardLinkFilter,
   Widget,
@@ -276,6 +279,38 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     },
     [boardId, dispatch, editing, onToggleLinkage, onWidgetGetData, widgetId],
   );
+  const getTableChartData = useCallback(
+    (options: { widget: Widget; params: any }) => {
+      const { params } = options;
+      console.log('--params', params);
+      if (editing) {
+        dispatch(
+          getEditChartWidgetDataAsync({
+            widgetId,
+            option: {
+              pageInfo: {
+                pageNo: params.value.page,
+              },
+            },
+          }),
+        );
+      } else {
+        dispatch(
+          getChartWidgetDataAsync({
+            boardId,
+            widgetId,
+            renderMode,
+            option: {
+              pageInfo: {
+                pageNo: params.value.page,
+              },
+            },
+          }),
+        );
+      }
+    },
+    [boardId, dispatch, editing, renderMode, widgetId],
+  );
   const onWidgetAction = useCallback(
     (action: widgetActionType, widgetType: WidgetType) => {
       switch (action) {
@@ -319,6 +354,13 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
 
   const widgetChartClick = useCallback(
     (widget: Widget, params: ChartMouseEventParams) => {
+      // table 分页
+      if (params?.seriesType === 'table' && params?.seriesName === 'paging') {
+        // table 分页逻辑
+        getTableChartData({ widget, params });
+
+        return;
+      }
       // jump
       const jumpConfig = widget.config?.jumpConfig;
       if (jumpConfig && jumpConfig.open) {
@@ -335,13 +377,12 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
         }
       }
       // linkage
-      const hasLinkage =
-        widget.config.linkageConfig && widget.config.linkageConfig.open;
-      if (hasLinkage) {
+      const linkageConfig = widget.config.linkageConfig;
+      if (linkageConfig?.open) {
         toLinkingWidgets(widget, params);
       }
     },
-    [history, orgId, toLinkingWidgets],
+    [getTableChartData, history, orgId, toLinkingWidgets],
   );
   const Methods: WidgetMethodContextProps = {
     onWidgetAction: onWidgetAction,

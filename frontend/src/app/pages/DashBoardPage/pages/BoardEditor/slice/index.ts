@@ -10,6 +10,7 @@ import {
   WidgetPanel,
 } from 'app/pages/DashBoardPage/slice/types';
 import { getInitBoardInfo } from 'app/pages/DashBoardPage/utils/board';
+import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { Layout } from 'react-grid-layout';
 /** { excludeAction,includeAction } */
 import undoable, { includeAction } from 'redux-undo';
@@ -202,13 +203,24 @@ const widgetInfoRecordSlice = createSlice({
     changeWidgetInLinking(
       state,
       action: PayloadAction<{
-        boardId: string;
+        boardId?: string;
         widgetId: string;
         toggle: boolean;
       }>,
     ) {
-      const { boardId, widgetId, toggle } = action.payload;
+      const { widgetId, toggle } = action.payload;
       state[widgetId].inLinking = toggle;
+    },
+    changePageInfo(
+      state,
+      action: PayloadAction<{
+        boardId?: string;
+        widgetId: string;
+        pageInfo: Partial<PageInfo> | undefined;
+      }>,
+    ) {
+      const { widgetId, pageInfo } = action.payload;
+      state[widgetId].pageInfo = pageInfo || { pageNo: 1 };
     },
   },
   extraReducers: builder => {

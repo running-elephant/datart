@@ -27,6 +27,7 @@ import {
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { createWidgetInfo } from '../utils/widget';
+import { PageInfo } from './../../MainPage/pages/ViewPage/slice/types';
 import { getWidgetDataAsync } from './thunk';
 import { BoardInfo, BoardState, Widget } from './types';
 
@@ -146,7 +147,7 @@ const boardSlice = createSlice({
       views.forEach(view => {
         state.viewMap[view.id] = view;
       });
-    }, 
+    },
     setWidgetData(state, action: PayloadAction<WidgetData>) {
       const widgetData = action.payload;
       state.widgetDataMap[widgetData.id] = widgetData;
@@ -219,6 +220,19 @@ const boardSlice = createSlice({
       const { boardId, publish } = action.payload;
       // 1 发布了， 2 取消发布
       state.boardRecord[boardId].status = publish;
+    },
+    changePageInfo(
+      state,
+      action: PayloadAction<{
+        boardId: string;
+        widgetId: string;
+        pageInfo: Partial<PageInfo> | undefined;
+      }>,
+    ) {
+      const { boardId, widgetId, pageInfo } = action.payload;
+      state.widgetInfoRecord[boardId][widgetId].pageInfo = pageInfo || {
+        pageNo: 1,
+      };
     },
   },
   extraReducers: builder => {
