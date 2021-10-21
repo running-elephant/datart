@@ -19,6 +19,7 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import { ChartMouseEventParams } from 'app/pages/ChartWorkbenchPage/models/Chart';
+import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import React, { FC, useCallback, useContext } from 'react';
@@ -44,6 +45,7 @@ import { boardActions } from '../slice';
 import { getChartWidgetDataAsync, getWidgetDataAsync } from '../slice/thunk';
 import {
   BoardLinkFilter,
+  JumpConfig,
   Widget,
   WidgetContentChartType,
   WidgetType,
@@ -55,7 +57,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   widgetId,
   children,
 }) => {
-  const { boardId, boardType, editing, renderMode } = useContext(BoardContext);
+  const { boardId, editing, renderMode } = useContext(BoardContext);
   const widget = useContext(WidgetContext);
   const dispatch = useDispatch();
   const history = useHistory();
@@ -279,18 +281,36 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     },
     [boardId, dispatch, editing, onToggleLinkage, onWidgetGetData, widgetId],
   );
+  const clickJump = useCallback(
+    (values: { jumpConfig: JumpConfig; params: ChartMouseEventParams }) => {
+      const { jumpConfig, params } = values;
+      const targetId = jumpConfig?.target?.relId;
+
+      if (typeof jumpConfig?.filter === 'object') {
+        const searchParamsStr = urlSearchTransfer.toUrlString({
+          [jumpConfig?.filter?.filterId]: params?.name,
+        });
+        if (targetId) {
+          history.push(
+            `/organizations/${orgId}/vizs/${targetId}?${searchParamsStr}`,
+          );
+        }
+      }
+    },
+    [history, orgId],
+  );
   const getTableChartData = useCallback(
     (options: { widget: Widget; params: any }) => {
       const { params } = options;
-      console.log('--params', params);
+      const pageInfo: Partial<PageInfo> = {
+        pageNo: params.value.page,
+      };
       if (editing) {
         dispatch(
           getEditChartWidgetDataAsync({
             widgetId,
             option: {
-              pageInfo: {
-                pageNo: params.value.page,
-              },
+              pageInfo,
             },
           }),
         );
@@ -301,9 +321,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
             widgetId,
             renderMode,
             option: {
-              pageInfo: {
-                pageNo: params.value.page,
-              },
+              pageInfo,
             },
           }),
         );
@@ -358,31 +376,22 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       if (params?.seriesType === 'table' && params?.seriesName === 'paging') {
         // table 分页逻辑
         getTableChartData({ widget, params });
-
         return;
       }
       // jump
       const jumpConfig = widget.config?.jumpConfig;
       if (jumpConfig && jumpConfig.open) {
-        const targetId = jumpConfig?.target?.relId;
-        if (typeof jumpConfig?.filter === 'object') {
-          const searchParamsStr = urlSearchTransfer.toUrlString({
-            [jumpConfig?.filter?.filterId]: params?.name,
-          });
-          if (targetId) {
-            history.push(
-              `/organizations/${orgId}/vizs/${targetId}?${searchParamsStr}`,
-            );
-          }
-        }
+        clickJump({ jumpConfig, params });
+        return;
       }
       // linkage
       const linkageConfig = widget.config.linkageConfig;
       if (linkageConfig?.open) {
         toLinkingWidgets(widget, params);
+        return;
       }
     },
-    [getTableChartData, history, orgId, toLinkingWidgets],
+    [clickJump, getTableChartData, toLinkingWidgets],
   );
   const Methods: WidgetMethodContextProps = {
     onWidgetAction: onWidgetAction,

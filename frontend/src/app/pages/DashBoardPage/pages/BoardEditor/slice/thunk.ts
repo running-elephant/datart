@@ -335,7 +335,6 @@ export const getEditWidgetDataAsync = createAsyncThunk<
   null,
   { widgetId: string; option?: getDataOption },
   { state: RootState }
-  // { state: { board: BoardState } }
 >(
   'editBoard/getEditWidgetDataAsync',
   async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
