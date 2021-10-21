@@ -240,6 +240,8 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Override
     public String login(PasswordToken passwordToken) {
         securityManager.login(passwordToken);
+        User user = userMapper.selectByNameOrEmail(passwordToken.getSubject());
+        passwordToken.setPassword(user.getPassword());
         return JwtUtils.toJwtString(passwordToken);
     }
 

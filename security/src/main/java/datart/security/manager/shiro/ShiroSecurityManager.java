@@ -100,7 +100,8 @@ public class ShiroSecurityManager implements DatartSecurityManager {
         if (!user.getActive()) {
             throw new AuthException("User not activated");
         }
-        login(new PasswordToken(user.getUsername(), user.getPassword(), System.currentTimeMillis()));
+        passwordToken = new PasswordToken(user.getUsername(), user.getPassword(), System.currentTimeMillis());
+        login(passwordToken);
         return JwtUtils.toJwtString(passwordToken);
     }
 
