@@ -1,6 +1,7 @@
 import {
   Button,
   Form,
+  FormInstance,
   FormItemProps,
   Input,
   Radio,
@@ -10,12 +11,16 @@ import {
 import { QueryResult } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { DataProviderAttribute } from 'app/pages/MainPage/slice/types';
 import { Rule } from 'rc-field-form/lib/interface';
+import { ReactElement } from 'react';
 import { ArrayConfig } from './ArrayConfig';
+import { FileUpload } from './FileUpload';
 import { Properties } from './Properties';
 import { SchemaComponent } from './SchemaComponent';
 
 interface ConfigComponentProps {
   attr: DataProviderAttribute;
+  form?: FormInstance;
+  sourceId?: string;
   testLoading?: boolean;
   disabled?: boolean;
   allowManage?: boolean;
@@ -32,6 +37,8 @@ interface ConfigComponentProps {
 
 export function ConfigComponent({
   attr,
+  form,
+  sourceId,
   testLoading,
   disabled,
   allowManage,
@@ -43,7 +50,7 @@ export function ConfigComponent({
   onDbTypeChange,
 }: ConfigComponentProps) {
   const { name, description, required, defaultValue, type, options } = attr;
-  let component;
+  let component: ReactElement | null = null;
   let extraFormItemProps: Partial<FormItemProps> = {};
 
   switch (name) {
@@ -79,6 +86,18 @@ export function ConfigComponent({
           ))}
         </Select>
       );
+      break;
+    case 'path':
+      component = (
+        <FileUpload
+          form={form}
+          sourceId={sourceId}
+          loading={testLoading}
+          onTest={onTest}
+        />
+      );
+      break;
+    case 'format':
       break;
     default:
       switch (type) {
@@ -124,9 +143,11 @@ export function ConfigComponent({
           extraFormItemProps.wrapperCol = { span: 16 };
           break;
         case 'array':
+        case 'files':
           component = (
             <ArrayConfig
               attr={attr}
+              sourceId={sourceId}
               testLoading={testLoading}
               disabled={disabled}
               allowManage={allowManage}
@@ -163,7 +184,7 @@ export function ConfigComponent({
     });
   }
 
-  return (
+  return !['path', 'format'].includes(name) ? (
     <Form.Item
       name={['config', name]}
       label={name}
@@ -174,5 +195,7 @@ export function ConfigComponent({
     >
       {component}
     </Form.Item>
+  ) : (
+    component
   );
 }

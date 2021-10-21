@@ -3,7 +3,7 @@ import { memo } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouteMatch } from 'react-router';
 import styled from 'styled-components/macro';
-import { SPACE_MD } from 'styles/StyleConstants';
+import { SPACE_LG } from 'styles/StyleConstants';
 import { ResourceTypes, SubjectTypes, Viewpoints } from '../constants';
 import { ResourcesPermissionSetting } from './ResourcesPermissionSetting';
 import { SubjectPermissionSetting } from './SubjectsPermissionSetting';
@@ -41,7 +41,7 @@ export const Main = memo(() => {
 
 const Wrapper = styled.div`
   flex: 1;
-  padding: ${SPACE_MD};
+  padding: ${SPACE_LG};
   overflow-y: auto;
 
   .ant-card-head {
