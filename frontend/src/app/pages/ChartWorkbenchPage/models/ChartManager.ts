@@ -18,6 +18,7 @@
 
 import WidgetPlugins from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartGraph';
 import ChartTools from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
+import { getChartPluginPaths } from 'app/utils/fetch';
 import { CloneValueDeep } from 'utils/object';
 import Chart from './Chart';
 import ChartMetadata from './ChartMetadata';
@@ -63,7 +64,8 @@ class ChartManager {
     if (this._isLoaded) {
       return;
     }
-    return await this._loadCustomizeCharts();
+    const pluginsPaths = await getChartPluginPaths();
+    return await this._loadCustomizeCharts(pluginsPaths);
   }
 
   public getAllChartMetas(): ChartMetadata[] {
@@ -81,13 +83,15 @@ class ChartManager {
     return this._charts[0];
   }
 
-  private async _loadCustomizeCharts() {
+  private async _loadCustomizeCharts(paths: string[]) {
     if (this._isLoaded) {
       return this._charts;
     }
 
-    const customCharts = await this._loader.loadPlugins();
-    this._charts = this._charts.concat(customCharts);
+    const customCharts = await this._loader.loadPlugins(paths);
+    this._charts = this._charts.concat(
+      customCharts?.filter(Boolean) as Chart[],
+    );
     this._isLoaded = true;
     return this._charts;
   }
