@@ -20,6 +20,7 @@ import { ChartEditorProps } from '../components/ChartEditor';
 import { editBoardStackSlice } from './childSlice/stackSlice';
 import {
   getEditBoardDetail,
+  getEditChartWidgetDataAsync,
   getEditWidgetDataAsync,
   toUpdateDashboard,
 } from './thunk';
@@ -236,10 +237,20 @@ const widgetInfoRecordSlice = createSlice({
       const { widgetId } = action.meta.arg;
       state[widgetId].loading = false;
     });
+    builder.addCase(getEditChartWidgetDataAsync.pending, (state, action) => {
+      const { widgetId } = action.meta.arg;
+      state[widgetId].loading = true;
+    });
+    builder.addCase(getEditChartWidgetDataAsync.fulfilled, (state, action) => {
+      const { widgetId } = action.meta.arg;
+      state[widgetId].loading = false;
+    });
+    builder.addCase(getEditChartWidgetDataAsync.rejected, (state, action) => {
+      const { widgetId } = action.meta.arg;
+      state[widgetId].loading = false;
+    });
   },
 });
-// getEditWidgetDataAsync
-// editWidgetDataActions
 const editWidgetDataSlice = createSlice({
   name: 'editBoard',
   initialState: {} as EditBoardState['widgetDataMap'],
