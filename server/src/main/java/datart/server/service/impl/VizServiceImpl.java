@@ -18,6 +18,7 @@
 package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
+import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.security.base.ResourceType;
 import datart.server.base.dto.*;
@@ -306,15 +307,15 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     private void createFolder(ResourceType type, String id, String name, String orgId, String parentId) {
-        FolderCreateParam folderCreateParam = new FolderCreateParam();
         Folder folder = new Folder();
+        folder.setId(UUIDGenerator.generate());
         folder.setRelType(type.name());
         folder.setRelId(id);
         folder.setParentId(parentId);
         folder.setOrgId(orgId);
         folder.setName(name);
-        folder.setIndex(Double.MAX_VALUE);
-        folderService.create(folderCreateParam);
+        folder.setIndex(0D);
+        folderService.getDefaultMapper().insert(folder);
     }
 
 }

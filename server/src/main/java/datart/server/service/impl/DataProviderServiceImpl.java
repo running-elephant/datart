@@ -219,6 +219,10 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                 .variables(variables)
                 .build();
 
+        if (viewExecuteParam.getPageInfo().getPageNo() < 1) {
+            viewExecuteParam.getPageInfo().setPageNo(1);
+        }
+
         ExecuteParam queryParam = ExecuteParam.builder()
                 .columns(viewExecuteParam.getColumns())
                 .keywords(viewExecuteParam.getKeywords())

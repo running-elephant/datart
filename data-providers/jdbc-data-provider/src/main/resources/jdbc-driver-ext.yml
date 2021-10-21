@@ -1,16 +1,14 @@
-# mysql
-MYSQL:
-  db-type: mysql
-  name: mysql
-  driver-class: com.mysql.cj.jdbc.Driver
-  identifier-quote: \`
-  url-prefix: jdbc:mysql://
+IMPALA:
+  db-type: "impala"
+  name: "impala"
+  driver-class: "com.mysql.cj.jdbc.Driver"
+  identifier-quote: "`"
+  url-prefix:
 
-# oracle
-ORACLE:
-  db-type: oracle
-  name: oracle
-  driver-class: com.mysql.jdbc.Driver
-  identifier-quote: \"
-  adapter-class: datart.data.provider.jdbc.adapters.OracleDataProviderAdapter
-  url-prefix: jdbc:mysql://
+MYSQL8:
+  db-type: "mysql8"
+  name: "mysql8"
+  driver-class: "com.mysql.cj.jdbc.Driver"
+  identifier-quote: "`"
+  literal-quote: "'"
+  url-prefix:
