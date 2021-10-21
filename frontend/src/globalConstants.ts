@@ -27,8 +27,8 @@ export enum StorageKeys {
 }
 export const BASE_API_URL = '/api/v1';
 export const BASE_RESOURCE_URL = '/';
-// 30 min
-export const DEFAULT_AUTHORIZATION_TOKEN_EXPIRATION = 1000 * 60 * 30;
+// 1 hour
+export const DEFAULT_AUTHORIZATION_TOKEN_EXPIRATION = 1000 * 60 * 60;
 
 export enum CommonFormTypes {
   Add = 'add',
