@@ -89,7 +89,7 @@ export const makeDownloadDataTask =
       message.success('下载任务创建成功');
     }
     resolve();
-  }; 
+  };
 // TODO
 export const makeShareDownloadDataTask =
   (params: {
@@ -169,6 +169,7 @@ export async function generateShareLinkAsync(
   });
   return response?.data;
 }
+
 export const dealFileSave = (data, headers) => {
   const fileNames = /filename[^;\n=]*=((['"]).*?\2|[^;\n]*)/g.exec(
     headers?.['content-disposition'] || '',
@@ -177,6 +178,7 @@ export const dealFileSave = (data, headers) => {
   const blob = new Blob([data], { type: '**application/octet-stream**' });
   saveAs(blob, String(encodeFileName?.replaceAll('"', '')) || 'unknown.xlsx');
 };
+
 export async function downloadFile(id) {
   const [data, headers] = (await requestWithHeader({
     url: `download/files/${id}`,
@@ -184,4 +186,22 @@ export async function downloadFile(id) {
     responseType: 'blob',
   })) as any;
   dealFileSave(data, headers);
+}
+
+export async function fetchPluginChart(path) {
+  const result = await request(path, {
+    baseURL: '/',
+    headers: { Accept: 'application/javascript' },
+  }).catch(error => {
+    console.error(error);
+  });
+  return result || '';
+}
+
+export async function getChartPluginPaths() {
+  const response = await request<string[]>({
+    method: 'GET',
+    url: `plugins/custom/charts`,
+  });
+  return response?.data || [];
 }
