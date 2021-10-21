@@ -10,6 +10,11 @@
       "key": "tableName",
       "children": [
         {
+          "name": "tableName",
+          "required": true,
+          "type": "string"
+        },
+        {
           "name": "url",
           "required": true,
           "defaultValue": "http://",
@@ -19,11 +24,6 @@
           "name": "method",
           "required": true,
           "defaultValue": "GET",
-          "type": "string"
-        },
-        {
-          "name": "tableName",
-          "required": true,
           "type": "string"
         },
         {
