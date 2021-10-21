@@ -26,11 +26,11 @@ import java.io.Serializable;
 @Builder
 public class PageInfo implements Serializable {
 
-    private int pageSize;
+    private long pageSize;
 
-    private int pageNo;
+    private long pageNo;
 
-    private int total;
+    private long total;
 
     @Override
     public String toString() {

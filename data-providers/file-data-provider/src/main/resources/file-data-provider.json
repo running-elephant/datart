@@ -29,7 +29,6 @@
         },
         {
           "name": "columns",
-          "required": true,
           "defaultValue": "",
           "type": "schema"
         },
