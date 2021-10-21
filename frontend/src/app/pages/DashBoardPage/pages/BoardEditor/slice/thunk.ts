@@ -333,12 +333,12 @@ export const renderedEditWidgetAsync = createAsyncThunk<
 );
 export const getEditWidgetDataAsync = createAsyncThunk<
   null,
-  { widgetId: string; option?: any },
+  { widgetId: string; option?: getDataOption },
   { state: RootState }
   // { state: { board: BoardState } }
 >(
   'editBoard/getEditWidgetDataAsync',
-  async ({ widgetId }, { getState, dispatch, rejectWithValue }) => {
+  async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
     const rootState = getState() as RootState;
     const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
     const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
@@ -355,7 +355,7 @@ export const getEditWidgetDataAsync = createAsyncThunk<
       case 'container':
         return null;
       case 'chart':
-        await dispatch(getEditChartWidgetDataAsync({ widgetId }));
+        await dispatch(getEditChartWidgetDataAsync({ widgetId, option }));
         return null;
       default:
         return null;

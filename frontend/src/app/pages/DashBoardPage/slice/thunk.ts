@@ -56,8 +56,6 @@ export const fetchBoardDetail = createAsyncThunk<null, GetBoardDetailParams>(
           filterSearchMap: { params: params?.filterSearchParams },
         }),
       );
-      // let res = getBoardQuery(data);
-      // console.log('--res', res);
       return null;
     } catch (error) {
       errorHandle(error);
@@ -109,12 +107,17 @@ export const renderedWidgetAsync = createAsyncThunk<
 
 export const getWidgetDataAsync = createAsyncThunk<
   null,
-  { boardId: string; widgetId: string; renderMode: VizRenderMode | undefined },
+  {
+    boardId: string;
+    widgetId: string;
+    renderMode: VizRenderMode | undefined;
+    option?: getDataOption;
+  },
   { state: RootState }
 >(
   'board/getWidgetDataAsync',
   async (
-    { boardId, widgetId, renderMode },
+    { boardId, widgetId, renderMode, option },
     { getState, dispatch, rejectWithValue },
   ) => {
     const boardState = getState() as { board: BoardState };
@@ -125,7 +128,7 @@ export const getWidgetDataAsync = createAsyncThunk<
       case 'chart':
         try {
           await dispatch(
-            getChartWidgetDataAsync({ boardId, widgetId, renderMode }),
+            getChartWidgetDataAsync({ boardId, widgetId, renderMode, option }),
           );
           if (renderMode === 'schedule') {
             dispatch(
