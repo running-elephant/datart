@@ -20,9 +20,11 @@ package datart.data.provider;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.DataProviderSource;
 import datart.core.data.provider.Dataframe;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.CollectionUtils;
 
@@ -89,7 +91,7 @@ public class HttpDataProvider extends DefaultDataProvider {
         for (Map<String, Object> schema : schemas) {
             HttpRequestParam httpRequestParam = convert2RequestParam(schema);
             Dataframe dataframe = new HttpDataFetcher(httpRequestParam).fetchData();
-            dataframe.setName(schema.get(TABLE).toString());
+            dataframe.setName(StringUtils.isNoneBlank(schema.getOrDefault(TABLE, "").toString()) ? schema.get(TABLE).toString() : "TEST" + UUIDGenerator.generate());
             dataframes.add(dataframe);
         }
 
