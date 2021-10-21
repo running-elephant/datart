@@ -10,7 +10,7 @@ import { message } from 'antd';
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import { registerTheme } from 'echarts';
 import { StorageKeys } from 'globalConstants';
-import React, { useLayoutEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -26,7 +26,7 @@ import { LazyForgetPasswordPage } from './pages/ForgetPasswordPage/Loadable';
 import { LazyLoginPage } from './pages/LoginPage/Loadable';
 import { LazyRegisterPage } from './pages/RegisterPage/Loadable';
 import { useAppSlice } from './slice';
-import { logout, setLoggedInUser } from './slice/thunks';
+import { getSystemInfo, logout, setLoggedInUser } from './slice/thunks';
 registerTheme('default', echartsDefaultTheme);
 
 export function App() {
@@ -49,6 +49,10 @@ export function App() {
       dispatch(logout());
     }
   }, [dispatch, logged]);
+
+  useEffect(() => {
+    dispatch(getSystemInfo());
+  }, [dispatch]);
 
   return (
     <BrowserRouter>

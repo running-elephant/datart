@@ -1,5 +1,6 @@
 export interface AppState {
   loggedInUser: null | User;
+  systemInfo: null | SystemInfo;
   loginLoading: boolean;
   registerLoading: boolean;
   saveProfileLoading: boolean;
@@ -14,6 +15,11 @@ export interface User {
   name: string | null;
   description: string;
   orgOwner?: boolean;
+}
+
+export interface SystemInfo {
+  tokenTimeout: string;
+  version: string;
 }
 
 export interface ModifyUserPassword {

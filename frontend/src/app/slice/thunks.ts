@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { StorageKeys } from 'globalConstants';
-import { removeToken, setToken } from 'utils/auth';
+import { removeToken, setToken, setTokenExpiration } from 'utils/auth';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { appActions } from '.';
@@ -10,6 +10,7 @@ import {
   ModifyPasswordParams,
   RegisterParams,
   SaveProfileParams,
+  SystemInfo,
   User,
   UserInfoByTokenParams,
 } from './types';
@@ -21,7 +22,7 @@ export const login = createAsyncThunk<User, LoginParams>(
       const { data } = await request<User>({
         url: '/users/login',
         method: 'POST',
-        params,
+        data: params,
       });
       localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(data));
       resolve();
@@ -150,3 +151,19 @@ export const modifyAccountPassword = createAsyncThunk<
     throw error;
   }
 });
+
+export const getSystemInfo = createAsyncThunk<SystemInfo>(
+  'app/getSystemInfo',
+  async () => {
+    try {
+      const { data } = await request<SystemInfo>('/sys/info');
+      // minute -> millisecond
+      const tokenTimeout = Number(data.tokenTimeout) * 60 * 1000;
+      setTokenExpiration(tokenTimeout);
+      return data;
+    } catch (error) {
+      errorHandle(error);
+      throw error;
+    }
+  },
+);
