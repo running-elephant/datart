@@ -19,7 +19,7 @@ import { ControllerFacadeTypes } from 'app/pages/ChartWorkbenchPage/components/C
 import ChartDataView, {
   ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-import { FilterSearchParams, FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
+import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { FilterSqlOperator } from 'globalConstants';
 import produce from 'immer';
 import { DeltaStatic } from 'quill';
@@ -180,18 +180,19 @@ export const createWidget = (option: {
   return widget;
 };
 export const createWidgetInfo = (id: string): WidgetInfo => {
-  return {
+  const widgetInfo: WidgetInfo = {
     id: id,
     loading: false,
     editing: false,
     inLinking: false,
-    dragging: false,
-    resizing: false,
-    polling: false,
     selected: false,
-    selectItems: [],
     rendered: false,
-  } as WidgetInfo;
+    pageInfo: {
+      pageNo: 1,
+    },
+    selectItems: [],
+  };
+  return widgetInfo;
 };
 export const createWidgetRect = (
   boardType: BoardType,

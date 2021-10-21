@@ -481,6 +481,7 @@ class BasicTableChart extends ReactChart {
     const eventParams = {
       componentType: 'series',
       seriesType: 'table',
+      name: value,
       seriesName, // column name/index
       dataIndex, // row index
       value, // cell value

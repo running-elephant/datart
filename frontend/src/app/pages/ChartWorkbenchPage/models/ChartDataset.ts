@@ -1,3 +1,4 @@
+import { PageInfo } from './../../MainPage/pages/ViewPage/slice/types';
 /**
  * Datart
  *
@@ -33,11 +34,7 @@ class ChartDataset {
   }
 }
 
-export type ChartDatasetPageInfo = {
-  pageNo?: number;
-  pageSize?: number;
-  total?: number;
-};
+export type ChartDatasetPageInfo = Partial<PageInfo>;
 
 export type ChartDatasetMeta = {
   name?: string;
