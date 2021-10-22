@@ -38,6 +38,7 @@ import {
   BoardType,
   BorderConfig,
   ChartWidgetContent,
+  ContainerItem,
   ContainerWidgetContent,
   ContainerWidgetType,
   DashboardConfig,
@@ -376,8 +377,19 @@ export const getWidgetMapByServer = (
       const curItem = (
         widgetMap[parentWidgetId].config.content as ContainerWidgetContent
       ).itemMap[childTabId];
-      curItem.childWidgetId = widget.id;
-      curItem.name = widget.config.name;
+      if (curItem) {
+        curItem.childWidgetId = widget.id;
+        curItem.name = widget.config.name;
+      } else {
+        let newItem: ContainerItem = {
+          tabId: childTabId,
+          name: widget.config.name,
+          childWidgetId: widget.id,
+        };
+        (
+          widgetMap[parentWidgetId].config.content as ContainerWidgetContent
+        ).itemMap[childTabId] = newItem;
+      }
     }
 
     // 处理 widgetFilter visibility依赖关系 id, url参数修改filter
