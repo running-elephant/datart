@@ -239,7 +239,11 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     @Override
     public String login(PasswordToken passwordToken) {
-        securityManager.login(passwordToken);
+        try {
+            securityManager.login(passwordToken);
+        } catch (Exception e) {
+            throw new ParamException("登录失败，用户名或密码错误");
+        }
         User user = userMapper.selectByNameOrEmail(passwordToken.getSubject());
         passwordToken.setPassword(user.getPassword());
         return JwtUtils.toJwtString(passwordToken);

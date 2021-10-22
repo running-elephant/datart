@@ -27,4 +27,6 @@ public class SystemInfo {
 
     private String tokenTimeout;
 
+    private boolean mailEnable;
+
 }

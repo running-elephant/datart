@@ -29,14 +29,18 @@ public class SysServiceImpl implements SysService {
     @Value("${datart.version}")
     private String version;
 
-    @Value("${datart.security.token.timeout-min}")
+    @Value("${datart.security.token.timeout-min:30}")
     private String tokenTimeout;
+
+    @Value("${datart.user.active.send-mail:false}")
+    private boolean sendMail;
 
     @Override
     public SystemInfo getSysInfo() {
         SystemInfo systemInfo = new SystemInfo();
         systemInfo.setVersion(version);
         systemInfo.setTokenTimeout(tokenTimeout);
+        systemInfo.setMailEnable(sendMail);
         return systemInfo;
     }
 }
