@@ -88,7 +88,6 @@ const GridLayout: React.FC<GridLayoutProps> = props => {
   );
   const lazyLoad = useCallback(() => {
     if (!layoutWrap.current) return;
-    // console.log('lazyLoad');
     if (!scrollThrottle.current) {
       requestAnimationFrame(() => {
         const waitingItems = layoutInfos.current.filter(item => !item.rendered);
