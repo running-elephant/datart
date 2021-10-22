@@ -18,9 +18,10 @@ import {
   getStoryboards,
   initChartPreviewData,
   publishViz,
+  unarchiveViz,
   updateFilterAndFetchDataset,
 } from './thunks';
-import { VizState, VizTab } from './types';
+import { ArchivedViz, VizState, VizTab } from './types';
 import { transferChartConfig } from './utils';
 
 export const initialState: VizState = {
@@ -144,7 +145,7 @@ const slice = createSlice({
         id,
         name,
         vizType: 'DATACHART',
-        deleteLoading: false,
+        loading: false,
       }));
     });
     builder.addCase(getArchivedDatacharts.rejected, state => {
@@ -161,7 +162,7 @@ const slice = createSlice({
         id,
         name,
         vizType: 'DASHBOARD',
-        deleteLoading: false,
+        loading: false,
       }));
     });
     builder.addCase(getArchivedDashboards.rejected, state => {
@@ -178,7 +179,7 @@ const slice = createSlice({
         id,
         name,
         vizType: 'STORYBOARD',
-        deleteLoading: false,
+        loading: false,
       }));
     });
     builder.addCase(getArchivedStoryboards.rejected, state => {
@@ -261,6 +262,64 @@ const slice = createSlice({
       state.publishLoading = false;
     });
 
+    // unarchiveViz
+    builder.addCase(unarchiveViz.pending, (state, action) => {
+      const { id, vizType } = action.meta.arg.params;
+      let viz: undefined | ArchivedViz;
+      switch (vizType) {
+        case 'DASHBOARD':
+          viz = state.archivedDashboards.find(d => d.id === id);
+          break;
+        case 'DATACHART':
+          viz = state.archivedDatacharts.find(d => d.id === id);
+          break;
+        case 'STORYBOARD':
+          viz = state.archivedStoryboards.find(s => s.id === id);
+          break;
+      }
+      if (viz) {
+        viz.loading = true;
+      }
+    });
+    builder.addCase(unarchiveViz.fulfilled, (state, action) => {
+      const { id, vizType } = action.meta.arg.params;
+      switch (vizType) {
+        case 'DASHBOARD':
+          state.archivedDashboards = state.archivedDashboards.filter(
+            d => d.id !== id,
+          );
+          break;
+        case 'DATACHART':
+          state.archivedDatacharts = state.archivedDatacharts.filter(
+            d => d.id !== id,
+          );
+          break;
+        case 'STORYBOARD':
+          state.archivedStoryboards = state.archivedStoryboards.filter(
+            s => s.id !== id,
+          );
+          break;
+      }
+    });
+    builder.addCase(unarchiveViz.rejected, (state, action) => {
+      const { id, vizType } = action.meta.arg.params;
+      let viz: undefined | ArchivedViz;
+      switch (vizType) {
+        case 'DASHBOARD':
+          viz = state.archivedDashboards.find(d => d.id === id);
+          break;
+        case 'DATACHART':
+          viz = state.archivedDatacharts.find(d => d.id === id);
+          break;
+        case 'STORYBOARD':
+          viz = state.archivedStoryboards.find(s => s.id === id);
+          break;
+      }
+      if (viz) {
+        viz.loading = false;
+      }
+    });
+
     // deleteViz
     builder.addCase(deleteViz.pending, (state, action) => {
       const {
@@ -283,17 +342,17 @@ const slice = createSlice({
         if (type === 'DASHBOARD') {
           const dashboard = state.archivedDashboards.find(a => a.id === id);
           if (dashboard) {
-            dashboard.deleteLoading = true;
+            dashboard.loading = true;
           }
         } else if (type === 'DATACHART') {
           const datachart = state.archivedDatacharts.find(a => a.id === id);
           if (datachart) {
-            datachart.deleteLoading = true;
+            datachart.loading = true;
           }
         } else if (type === 'STORYBOARD') {
           const storyboard = state.archivedStoryboards.find(a => a.id === id);
           if (storyboard) {
-            storyboard.deleteLoading = true;
+            storyboard.loading = true;
           }
         } else {
           const folder = state.vizs.find(v => v.id === id);
@@ -353,17 +412,17 @@ const slice = createSlice({
         if (type === 'DASHBOARD') {
           const dashboard = state.archivedDashboards.find(a => a.id === id);
           if (dashboard) {
-            dashboard.deleteLoading = false;
+            dashboard.loading = false;
           }
         } else if (type === 'DATACHART') {
           const datachart = state.archivedDatacharts.find(a => a.id === id);
           if (datachart) {
-            datachart.deleteLoading = false;
+            datachart.loading = false;
           }
         } else if (type === 'STORYBOARD') {
           const storyboard = state.archivedStoryboards.find(a => a.id === id);
           if (storyboard) {
-            storyboard.deleteLoading = false;
+            storyboard.loading = false;
           }
         } else {
           const folder = state.vizs.find(v => v.id === id);

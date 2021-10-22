@@ -193,17 +193,16 @@ export const editFolder = createAsyncThunk<
   }
 });
 
-export const unarchiveViz = createAsyncThunk<boolean, UnarchiveVizParams>(
+export const unarchiveViz = createAsyncThunk<void, UnarchiveVizParams>(
   'viz/unarchiveViz',
-  async ({ params, resolve }) => {
+  async ({ params: { id, name, vizType, parentId }, resolve }) => {
     try {
-      const { data } = await request<boolean>({
-        url: `/viz/unarchive/${params.id}`,
+      await request<boolean>({
+        url: `/viz/unarchive/${id}`,
         method: 'PUT',
-        params,
+        params: { vizType, newName: name, parentId },
       });
       resolve();
-      return data;
     } catch (error) {
       errorHandle(error);
       throw error;
