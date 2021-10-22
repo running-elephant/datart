@@ -18,15 +18,26 @@
 
 package datart.server.service.impl;
 
+import datart.core.common.Application;
 import datart.core.common.FileUtils;
 import datart.server.service.CustomPluginService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.request.RequestContextHolder;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,12 +49,12 @@ public class CustomPluginServiceImpl implements CustomPluginService {
     private static final String CUSTOM_JS_PATH = "custom-chart-plugins";
 
     @Override
-    public Set<String> scanCustomChartPlugins() {
-        URL resource = getClass().getClassLoader().getResource("static/" + CUSTOM_JS_PATH);
-        if (Objects.isNull(resource)) {
+    public Set<String> scanCustomChartPlugins() throws MalformedURLException {
+        URL url = Application.getBean(ServletContext.class).getResource(CUSTOM_JS_PATH);
+        if (Objects.isNull(url)) {
             return Collections.emptySet();
         }
-        Set<String> names = FileUtils.walkDir(new File(resource.getFile()), ".js", false);
+        Set<String> names = FileUtils.walkDir(new File(url.getFile()), ".js", false);
         if (CollectionUtils.isEmpty(names)) {
             return Collections.emptySet();
         }

@@ -159,7 +159,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         Dataframe dataframe;
         try (Connection conn = getConn()) {
             Statement statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            statement.setFetchSize(pageInfo.getPageSize());
+            statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), Integer.MAX_VALUE));
             try (ResultSet resultSet = statement.executeQuery(selectSql)) {
 
                 initPageInfo(pageInfo, resultSet);

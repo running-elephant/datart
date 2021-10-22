@@ -72,7 +72,7 @@ export interface ArchivedViz {
   id: string;
   name: string;
   vizType: VizType;
-  deleteLoading: boolean;
+  loading: boolean;
 }
 
 export interface ChartPreview {

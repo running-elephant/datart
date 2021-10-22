@@ -23,6 +23,7 @@ import datart.security.exception.PermissionDeniedException;
 import datart.server.base.dto.ResponseData;
 import datart.server.base.exception.NotFoundException;
 import datart.server.base.exception.ParamException;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
@@ -36,6 +37,17 @@ import java.util.stream.Collectors;
 @Slf4j
 @ControllerAdvice
 public class WebExceptionHandler {
+
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseData<String> exceptionHandler(ExpiredJwtException e) {
+        ResponseData.ResponseDataBuilder<String> builder = ResponseData.builder();
+        return builder.success(false)
+                .message(e.getMessage())
+                .exception(e)
+                .build();
+    }
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)

@@ -7,6 +7,7 @@ import {
   ContainerWidgetContent,
   DataChart,
   FilterWidgetContent,
+  getDataOption,
   SaveDashboard,
   ServerDatachart,
   ServerView,
@@ -176,9 +177,7 @@ export const toUpdateDashboard = createAsyncThunk<
         data: updateData,
       });
       // TODO
-      // 截屏上传图片
       // 清空历史栈
-
       // 更新当前编辑面板的旧数据 widget Id 还都是本地的不对，应该更新成服务端id
       //
       callback();
@@ -334,17 +333,14 @@ export const renderedEditWidgetAsync = createAsyncThunk<
 );
 export const getEditWidgetDataAsync = createAsyncThunk<
   null,
-  { widgetId: string },
+  { widgetId: string; option?: getDataOption },
   { state: RootState }
-  // { state: { board: BoardState } }
 >(
   'editBoard/getEditWidgetDataAsync',
-  async ({ widgetId }, { getState, dispatch, rejectWithValue }) => {
+  async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
     const rootState = getState() as RootState;
     const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
     const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
-    const boardInfo = rootState.editBoard?.boardInfo as BoardInfo;
-    const boardState = rootState.board as BoardState;
 
     const curWidget = widgetMap[widgetId];
     if (!curWidget) return null;
@@ -358,35 +354,11 @@ export const getEditWidgetDataAsync = createAsyncThunk<
       case 'container':
         return null;
       case 'chart':
+        await dispatch(getEditChartWidgetDataAsync({ widgetId, option }));
+        return null;
       default:
-        break;
+        return null;
     }
-    // 处理chart 类型
-    if (curWidget.config.type !== 'chart') {
-      return null;
-    }
-    if (curWidget.datachartId) {
-      const dataChartMap = boardState.dataChartMap;
-      const viewMap = boardState.viewMap;
-      const boardLinkFilters = boardInfo.linkFilter;
-      let requestParams = getChartWidgetRequestParams({
-        widgetId,
-        widgetMap,
-        viewMap,
-        dataChartMap,
-        boardLinkFilters,
-      });
-
-      const { data } = await request<WidgetData>({
-        method: 'POST',
-        url: `data-provider/execute`,
-        data: requestParams,
-      });
-      const widgetData: WidgetData = { ...data, id: widgetId };
-      dispatch(editWidgetDataActions.setWidgetData(widgetData));
-    }
-
-    return null;
   },
 );
 export const getEditFilterDataAsync = createAsyncThunk<
@@ -415,6 +387,58 @@ export const getEditFilterDataAsync = createAsyncThunk<
   }
   return null;
 });
+export const getEditChartWidgetDataAsync = createAsyncThunk<
+  null,
+  {
+    widgetId: string;
+    option?: getDataOption;
+  },
+  { state: RootState }
+>(
+  'editBoard/getEditChartWidgetDataAsync',
+  async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
+    const rootState = getState() as RootState;
+    const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
+    const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
+    const editBoard = rootState.editBoard;
+    const boardInfo = editBoard?.boardInfo as BoardInfo;
+    const boardState = rootState.board as BoardState;
+    const widgetInfo = editBoard?.widgetInfoRecord[widgetId];
+    const viewMap = boardState.viewMap;
+    const curWidget = widgetMap[widgetId];
+
+    if (!curWidget) return null;
+    const dataChartMap = boardState.dataChartMap;
+    const boardLinkFilters = boardInfo.linkFilter;
+
+    let requestParams = getChartWidgetRequestParams({
+      widgetId,
+      widgetMap,
+      viewMap,
+      option,
+      widgetInfo,
+      dataChartMap,
+      boardLinkFilters,
+    });
+
+    let widgetData;
+    const { data } = await request<WidgetData>({
+      method: 'POST',
+      url: `data-provider/execute`,
+      data: requestParams,
+    });
+    widgetData = { ...data, id: widgetId };
+    dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
+    // changePageInfo
+    dispatch(
+      editWidgetInfoActions.changePageInfo({
+        widgetId,
+        pageInfo: data.pageInfo,
+      }),
+    );
+    return null;
+  },
+);
 
 // 复制 copy
 export const copyWidgetByIds = createAsyncThunk<

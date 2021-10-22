@@ -15,29 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package datart.core.base;
 
-import lombok.Builder;
+package datart.server.base.dto;
+
 import lombok.Data;
 
-import java.io.Serializable;
-
 @Data
-@Builder
-public class PageInfo implements Serializable {
+public class SystemInfo {
 
-    private long pageSize;
+    private String version;
 
-    private long pageNo;
+    private String tokenTimeout;
 
-    private long total;
+    private boolean mailEnable;
 
-    @Override
-    public String toString() {
-        return "PageInfo{" +
-                "pageSize=" + pageSize +
-                ", pageNo=" + pageNo +
-                ", total=" + total +
-                '}';
-    }
 }

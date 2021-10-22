@@ -15,13 +15,10 @@ export function errorHandle(error) {
     // AxiosError
     const { response } = error as AxiosError;
     switch (response?.status) {
-      case 403:
-        message.error({ key: '403', content: '未登录或会话过期，请重新登录' });
+      case 401:
+        message.error({ key: '401', content: '未登录或会话过期，请重新登录' });
         removeToken();
         break;
-      // case 401:
-      //   message.error({ key: '401', content: '您没有权限访问此数据' });
-      //   break;
       default:
         message.error(response?.data.message || error.message);
         break;

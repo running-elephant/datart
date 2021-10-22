@@ -27,7 +27,8 @@ import {
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { createWidgetInfo } from '../utils/widget';
-import { getWidgetDataAsync } from './thunk';
+import { PageInfo } from './../../MainPage/pages/ViewPage/slice/types';
+import { getChartWidgetDataAsync, getWidgetDataAsync } from './thunk';
 import { BoardInfo, BoardState, Widget } from './types';
 
 export const boardInit: BoardState = {
@@ -146,7 +147,7 @@ const boardSlice = createSlice({
       views.forEach(view => {
         state.viewMap[view.id] = view;
       });
-    }, 
+    },
     setWidgetData(state, action: PayloadAction<WidgetData>) {
       const widgetData = action.payload;
       state.widgetDataMap[widgetData.id] = widgetData;
@@ -220,6 +221,19 @@ const boardSlice = createSlice({
       // 1 发布了， 2 取消发布
       state.boardRecord[boardId].status = publish;
     },
+    changePageInfo(
+      state,
+      action: PayloadAction<{
+        boardId: string;
+        widgetId: string;
+        pageInfo: Partial<PageInfo> | undefined;
+      }>,
+    ) {
+      const { boardId, widgetId, pageInfo } = action.payload;
+      state.widgetInfoRecord[boardId][widgetId].pageInfo = pageInfo || {
+        pageNo: 1,
+      };
+    },
   },
   extraReducers: builder => {
     // getWidgetDataAsync
@@ -236,6 +250,24 @@ const boardSlice = createSlice({
       } catch (error) {}
     });
     builder.addCase(getWidgetDataAsync.rejected, (state, action) => {
+      const { boardId, widgetId } = action.meta.arg;
+      try {
+        state.widgetInfoRecord[boardId][widgetId].loading = false;
+      } catch (error) {}
+    });
+    builder.addCase(getChartWidgetDataAsync.pending, (state, action) => {
+      const { boardId, widgetId } = action.meta.arg;
+      try {
+        state.widgetInfoRecord[boardId][widgetId].loading = true;
+      } catch (error) {}
+    });
+    builder.addCase(getChartWidgetDataAsync.fulfilled, (state, action) => {
+      const { boardId, widgetId } = action.meta.arg;
+      try {
+        state.widgetInfoRecord[boardId][widgetId].loading = false;
+      } catch (error) {}
+    });
+    builder.addCase(getChartWidgetDataAsync.rejected, (state, action) => {
       const { boardId, widgetId } = action.meta.arg;
       try {
         state.widgetInfoRecord[boardId][widgetId].loading = false;

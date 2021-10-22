@@ -10,6 +10,12 @@
       "key": "tableName",
       "children": [
         {
+          "name": "tableName",
+          "required": true,
+          "defaultValue": "",
+          "type": "string"
+        },
+        {
           "name": "format",
           "required": true,
           "defaultValue": "",
@@ -29,15 +35,8 @@
         },
         {
           "name": "columns",
-          "required": true,
           "defaultValue": "",
           "type": "schema"
-        },
-        {
-          "name": "tableName",
-          "required": true,
-          "defaultValue": "",
-          "type": "string"
         }
       ]
     }

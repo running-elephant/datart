@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { generateShareLinkAsync } from 'app/utils/fetch';
 import { debounce } from 'lodash';
 import React, { FC, useContext } from 'react';
@@ -54,11 +55,26 @@ export const BoardActionProvider: FC<{ id: string }> = ({
 
     refreshWidgetsByFilter: debounce((widget: Widget) => {
       const widgetIds = getNeedRefreshWidgetsByFilter(widget);
+      const pageInfo: Partial<PageInfo> = {
+        pageNo: 1,
+      };
       widgetIds.forEach(widgetId => {
         if (editing) {
-          dispatch(getEditWidgetDataAsync({ widgetId }));
+          dispatch(
+            getEditWidgetDataAsync({
+              widgetId,
+              option: { pageInfo },
+            }),
+          );
         } else {
-          dispatch(getWidgetDataAsync({ boardId, widgetId, renderMode }));
+          dispatch(
+            getWidgetDataAsync({
+              boardId,
+              widgetId,
+              renderMode,
+              option: { pageInfo },
+            }),
+          );
         }
       });
     }, 500),

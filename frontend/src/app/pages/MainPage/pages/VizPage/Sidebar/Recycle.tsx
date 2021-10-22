@@ -87,7 +87,7 @@ export const Recycle = memo(
                 vizType,
                 type: CommonFormTypes.Edit,
                 visible: true,
-                initialValues: { name, parentId: void 0 },
+                initialValues: { id, name, parentId: void 0 },
                 onSave: (values, onClose) => {
                   dispatch(
                     unarchiveViz({
@@ -126,7 +126,7 @@ export const Recycle = memo(
         <List
           dataSource={list}
           loading={listLoading && { indicator: <LoadingOutlined /> }}
-          renderItem={({ id, name, vizType, deleteLoading }) => {
+          renderItem={({ id, name, vizType, loading }) => {
             let allowManage = false;
             if (type === 'viz') {
               const viz = vizs.find(v => v.id === id);
@@ -158,7 +158,7 @@ export const Recycle = memo(
                 selected={selectedId === id}
                 className={classnames({
                   recycle: true,
-                  disabled: deleteLoading,
+                  disabled: loading,
                 })}
                 onClick={toDetail(id)}
                 actions={[

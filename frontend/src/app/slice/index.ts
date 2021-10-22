@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import {
+  getSystemInfo,
   getUserInfoByToken,
   login,
   logout,
@@ -13,6 +14,7 @@ import { AppState, User } from './types';
 
 export const initialState: AppState = {
   loggedInUser: null,
+  systemInfo: null,
   loginLoading: false,
   registerLoading: false,
   saveProfileLoading: false,
@@ -80,15 +82,21 @@ const slice = createSlice({
     builder.addCase(saveProfile.rejected, state => {
       state.saveProfileLoading = false;
     });
+
     // modifyAccountPassword
     builder.addCase(modifyAccountPassword.pending, state => {
       state.modifyPasswordLoading = true;
     });
-    builder.addCase(modifyAccountPassword.fulfilled, (state) => {
+    builder.addCase(modifyAccountPassword.fulfilled, state => {
       state.modifyPasswordLoading = false;
     });
     builder.addCase(modifyAccountPassword.rejected, state => {
       state.modifyPasswordLoading = false;
+    });
+
+    // getSystemInfo
+    builder.addCase(getSystemInfo.fulfilled, (state, action) => {
+      state.systemInfo = action.payload;
     });
   },
 });
