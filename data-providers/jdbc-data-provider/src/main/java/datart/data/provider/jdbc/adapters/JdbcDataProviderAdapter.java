@@ -158,13 +158,21 @@ public class JdbcDataProviderAdapter implements Closeable {
     public Dataframe execute(String selectSql, PageInfo pageInfo) throws SQLException {
         Dataframe dataframe;
         try (Connection conn = getConn()) {
-            Statement statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            Statement statement = null;
+            try {
+                statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            } catch (SQLFeatureNotSupportedException e) {
+                if (driverInfo != null) {
+                    log.info(driverInfo.getDbType() + ":" + e.getMessage());
+                }
+                statement = conn.createStatement();
+            }
             statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), Integer.MAX_VALUE));
             try (ResultSet resultSet = statement.executeQuery(selectSql)) {
 
                 initPageInfo(pageInfo, resultSet);
 
-                //paging through  sql
+                // TODO paging through  sql
 //                if (supportPaging()) {
 //                    dataframe = ResultSetMapper.mapToTableData(resultSet);
 //                    dataframe.setPageInfo(pageInfo);
@@ -172,8 +180,14 @@ public class JdbcDataProviderAdapter implements Closeable {
 //                }
 
                 //paging through  jdbc
-                resultSet.absolute((int) Math.min(pageInfo.getTotal(), (pageInfo.getPageNo() - 1) * pageInfo.getPageSize()));
-
+                try {
+                    resultSet.absolute((int) Math.min(pageInfo.getTotal(), (pageInfo.getPageNo() - 1) * pageInfo.getPageSize()));
+                } catch (Exception e) {
+                    int count = 0;
+                    while (count < (pageInfo.getPageNo() - 1) * pageInfo.getPageSize() && resultSet.next()) {
+                        count++;
+                    }
+                }
                 dataframe = ResultSetMapper.mapToTableData(resultSet, pageInfo.getPageSize());
                 dataframe.setPageInfo(pageInfo);
                 return dataframe;
@@ -217,9 +231,16 @@ public class JdbcDataProviderAdapter implements Closeable {
     }
 
     private void initPageInfo(PageInfo pageInfo, ResultSet resultSet) throws SQLException {
-        resultSet.last();
-        pageInfo.setTotal(resultSet.getRow());
-        resultSet.first();
+        try {
+            if (pageInfo.getPageNo() < 1) {
+                pageInfo.setPageNo(1);
+            }
+            resultSet.last();
+            pageInfo.setTotal(resultSet.getRow());
+            resultSet.first();
+        } catch (Exception e) {
+            pageInfo.setTotal(pageInfo.getPageSize());
+        }
     }
 
 }

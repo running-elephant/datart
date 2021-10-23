@@ -238,6 +238,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public boolean deleteDashboard(String dashboardId, boolean archive) {
         return dashboardService.delete(dashboardId, archive);
     }
