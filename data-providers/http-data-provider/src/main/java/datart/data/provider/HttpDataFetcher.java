@@ -18,8 +18,10 @@
 package datart.data.provider;
 
 import datart.core.data.provider.Dataframe;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
@@ -33,6 +35,7 @@ import org.springframework.util.CollectionUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class HttpDataFetcher {
@@ -94,6 +97,11 @@ public class HttpDataFetcher {
         httpRequest.setURI(createUri(param));
 
         withHeaders(param, httpRequest);
+
+        if (StringUtils.isNotBlank(param.getUsername()) && StringUtils.isNotBlank(param.getPassword())) {
+            String auth = param.getUsername() + ":" + param.getPassword();
+            httpRequest.addHeader(HttpHeaders.AUTHORIZATION, "Basic " + Base64.encodeBase64String(auth.getBytes(StandardCharsets.UTF_8)));
+        }
 
         return httpRequest;
     }
