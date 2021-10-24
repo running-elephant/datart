@@ -135,7 +135,7 @@ export function Navbar() {
       },
       {
         name: 'members',
-        title: '成员',
+        title: '成员与角色',
         icon: <i className="iconfont icon-users1" />,
         isActive: (_, location) =>
           !!location.pathname.match(
