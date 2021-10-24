@@ -8,6 +8,7 @@ import { getPath } from 'utils/utils';
 import {
   PermissionLevels,
   ResourceTypes,
+  VizResourceSubTypes,
 } from '../../PermissionPage/constants';
 import { ChartPreviewBoard } from '../ChartPreview';
 import { FolderViewModel, VizTab } from '../slice/types';
@@ -21,18 +22,18 @@ interface VizContainerProps {
 
 export const VizContainer = memo(
   ({ tab, orgId, vizs, selectedId }: VizContainerProps) => {
-    const { id, name, type, search, parentId } = tab;
+    const { id, name, type, search, parentId, permissionId } = tab;
 
     const path = useMemo(
       () =>
         ['DATACHART', 'DASHBOARD'].includes(type)
           ? getPath(
               vizs as Array<{ id: string; parentId: string }>,
-              { id, parentId },
-              [],
+              { id: permissionId!, parentId },
+              VizResourceSubTypes.Folder,
             )
           : [id],
-      [vizs, id, type, parentId],
+      [vizs, id, permissionId, type, parentId],
     );
     const allowDownload = useCascadeAccess({
       module: ResourceTypes.Viz,

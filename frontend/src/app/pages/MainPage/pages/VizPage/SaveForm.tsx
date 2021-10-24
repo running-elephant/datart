@@ -3,16 +3,22 @@ import { ModalForm, ModalFormProps } from 'app/components';
 import { BoardTypeMap } from 'app/pages/DashBoardPage/slice/types';
 import debounce from 'debounce-promise';
 import { CommonFormTypes } from 'globalConstants';
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { request } from 'utils/request';
-import { selectOrgId } from '../../slice/selectors';
+import { getCascadeAccess } from '../../Access';
+import {
+  selectIsOrgOwner,
+  selectOrgId,
+  selectPermissionMap,
+} from '../../slice/selectors';
+import { PermissionLevels, ResourceTypes } from '../PermissionPage/constants';
 import { SaveFormContext } from './SaveFormContext';
 import {
+  makeSelectVizFolderTree,
   selectSaveFolderLoading,
   selectSaveStoryboardLoading,
-  selectVizFolderTree,
 } from './slice/selectors';
 
 const VIZ_TYPE_TITLES = {
@@ -34,14 +40,29 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     onCancel,
     onAfterClose,
   } = useContext(SaveFormContext);
-  const treeData = useSelector(state =>
-    selectVizFolderTree(state, { id: initialValues?.id }),
-  );
+  const selectVizFolderTree = useMemo(makeSelectVizFolderTree, []);
   const saveFolderLoading = useSelector(selectSaveFolderLoading);
   const saveStoryboardLoading = useSelector(selectSaveStoryboardLoading);
   const orgId = useSelector(selectOrgId);
+  const isOwner = useSelector(selectIsOrgOwner);
+  const permissionMap = useSelector(selectPermissionMap);
   const formRef = useRef<FormInstance>();
 
+  const getDisabled = useCallback(
+    (_, path: string[]) =>
+      !getCascadeAccess(
+        isOwner,
+        permissionMap,
+        ResourceTypes.Viz,
+        path,
+        PermissionLevels.Create,
+      ),
+    [isOwner, permissionMap],
+  );
+
+  const treeData = useSelector(state =>
+    selectVizFolderTree(state, { id: initialValues?.id, getDisabled }),
+  );
   useEffect(() => {
     if (initialValues) {
       formRef.current?.setFieldsValue(initialValues);

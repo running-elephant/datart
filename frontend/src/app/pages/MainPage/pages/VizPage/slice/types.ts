@@ -88,6 +88,7 @@ export interface VizTab {
   name: string;
   type: VizType;
   parentId: string | null;
+  permissionId?: string;
   search?: string;
 }
 
