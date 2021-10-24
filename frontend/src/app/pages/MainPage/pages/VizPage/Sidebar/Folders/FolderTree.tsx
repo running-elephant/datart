@@ -1,12 +1,17 @@
 import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
 import { Menu, message, Popconfirm, TreeDataNode } from 'antd';
 import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
+import { CascadeAccess } from 'app/pages/MainPage/Access';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
 import React, { useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { stopPPG } from 'utils/utils';
+import {
+  PermissionLevels,
+  ResourceTypes,
+} from '../../../PermissionPage/constants';
 import { SaveFormContext } from '../../SaveFormContext';
 import { selectVizListLoading } from '../../slice/selectors';
 import {
@@ -116,41 +121,47 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
       return (
         <TreeTitle>
           <h4>{`${node.title}`}</h4>
-          <Popup
-            trigger={['click']}
-            placement="bottom"
-            content={
-              <Menu
-                prefixCls="ant-dropdown-menu"
-                selectable={false}
-                onClick={moreMenuClick(node)}
-              >
-                <MenuListItem
-                  key="info"
-                  prefix={<EditOutlined className="icon" />}
-                >
-                  基本信息
-                </MenuListItem>
-                <MenuListItem
-                  key="delete"
-                  prefix={<DeleteOutlined className="icon" />}
-                >
-                  <Popconfirm
-                    title={`确定${
-                      node.relType === 'FOLDER' ? '删除' : '移至回收站'
-                    }？`}
-                    onConfirm={archiveViz(node)}
-                  >
-                    {node.relType === 'FOLDER' ? '删除' : '移至回收站'}
-                  </Popconfirm>
-                </MenuListItem>
-              </Menu>
-            }
+          <CascadeAccess
+            module={ResourceTypes.Viz}
+            path={node.path}
+            level={PermissionLevels.Manage}
           >
-            <span className="action" onClick={stopPPG}>
-              <MoreOutlined />
-            </span>
-          </Popup>
+            <Popup
+              trigger={['click']}
+              placement="bottom"
+              content={
+                <Menu
+                  prefixCls="ant-dropdown-menu"
+                  selectable={false}
+                  onClick={moreMenuClick(node)}
+                >
+                  <MenuListItem
+                    key="info"
+                    prefix={<EditOutlined className="icon" />}
+                  >
+                    基本信息
+                  </MenuListItem>
+                  <MenuListItem
+                    key="delete"
+                    prefix={<DeleteOutlined className="icon" />}
+                  >
+                    <Popconfirm
+                      title={`确定${
+                        node.relType === 'FOLDER' ? '删除' : '移至回收站'
+                      }？`}
+                      onConfirm={archiveViz(node)}
+                    >
+                      {node.relType === 'FOLDER' ? '删除' : '移至回收站'}
+                    </Popconfirm>
+                  </MenuListItem>
+                </Menu>
+              }
+            >
+              <span className="action" onClick={stopPPG}>
+                <MoreOutlined />
+              </span>
+            </Popup>
+          </CascadeAccess>
         </TreeTitle>
       );
     },

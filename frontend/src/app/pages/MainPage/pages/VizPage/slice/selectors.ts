@@ -4,6 +4,7 @@ import { ReactElement } from 'react';
 import { RootState } from 'types';
 import { listToTree } from 'utils/utils';
 import { initialState } from '.';
+import { VizResourceSubTypes } from '../../PermissionPage/constants';
 import { FolderViewModel } from './types';
 
 const selectDomain = (state: RootState) => state.viz || initialState;
@@ -36,21 +37,34 @@ export const makeSelectVizTree = () =>
       listToTree(
         vizs.map(v => ({ ...v, isFolder: v.relType === 'FOLDER' })),
         null,
-        [],
+        [VizResourceSubTypes.Folder],
         { getIcon, getDisabled },
       ),
   );
 
-export const selectVizFolderTree = createSelector(
-  [selectVizs, (_, props: { id?: string }) => props.id],
-  (vizs, id) =>
-    listToTree(
-      vizs &&
-        vizs
-          .filter(v => v.relType === 'FOLDER' && v.id !== id)
-          .map(v => ({ ...v, isFolder: true })),
-    ),
-);
+export const makeSelectVizFolderTree = () =>
+  createSelector(
+    [
+      selectVizs,
+      (_, props: { id?: string }) => props.id,
+      (
+        _,
+        props: {
+          getDisabled: (o: FolderViewModel, path: string[]) => boolean;
+        },
+      ) => props.getDisabled,
+    ],
+    (vizs, id, getDisabled) =>
+      listToTree(
+        vizs &&
+          vizs
+            .filter(v => v.relType === 'FOLDER' && v.id !== id)
+            .map(v => ({ ...v, isFolder: true })),
+        null,
+        [VizResourceSubTypes.Folder],
+        { getDisabled },
+      ),
+  );
 
 export const selectStoryboards = createSelector(
   [selectDomain],
