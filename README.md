@@ -1,7 +1,3 @@
----
-title: About
----
-
 ![](https://running-elephant.github.io/datart-docs/images/about/logo_with_text.jpg)
 > **新一代数据可视化开放平台，支持报表、仪表板、大屏、分析和可视化数据应用的敏捷构建。**
 
