@@ -12,4 +12,5 @@ IMPALA:
   driver-class: "com.mysql.cj.jdbc.Driver"
   literal-quote: "'"
   identifier-quote: "`"
-  url-prefix:
+  adapter-class: "datart.data.provider.jdbc.adapters.ImpalaDataProviderAdapter"
+  url-prefix: "jdbc:impala://"

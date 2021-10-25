@@ -5,7 +5,7 @@
     <parent>
         <artifactId>datart-parent</artifactId>
         <groupId>datart</groupId>
-        <version>1.0.0-alpha.0</version>
+        <version>1.0.0-alpha.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,7 +15,7 @@
         <dependency>
             <groupId>datart</groupId>
             <artifactId>datart-core</artifactId>
-            <version>${datart.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.shiro</groupId>
