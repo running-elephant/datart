@@ -27,11 +27,13 @@ import {
   getAxisLabel,
   getAxisLine,
   getAxisTick,
+  getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getCustomSortableColumns,
+  getExtraSeriesRowData,
   getNameTextStyle,
   getReference,
-  getSeriesTooltips4Rectangular,
+  getSeriesTooltips4Rectangular2,
   getSplitLine,
   getStyleValueByGroup,
   getValueByColumnKey,
@@ -142,7 +144,8 @@ class BasicLineChart extends Chart {
         areaStyle: this.isArea ? { color } : undefined,
         stack: this.isStack ? 'total' : undefined,
         data: dataColumns.map(dc => ({
-          ...aggConfig,
+          ...getExtraSeriesRowData(dc),
+          name: getColumnRenderName(aggConfig),
           value: dc[getValueByColumnKey(aggConfig)],
         })),
         itemStyle: {
@@ -155,16 +158,18 @@ class BasicLineChart extends Chart {
     });
 
     const xAxisColumnName = groupConfigs[0].colName;
+    const infoColumnNames = infoConfigs.map(getValueByColumnKey);
     const yAxisColumnNames = aggregateConfigs.map(c => getValueByColumnKey(c));
     let groupedSeriesColumns = [];
 
     if (colorConfigs.length > 0) {
       const colorColumnName = colorConfigs[0].colName;
-      groupedSeriesColumns = this.getColorizeGroupSeriesColumns(
+      groupedSeriesColumns = getColorizeGroupSeriesColumns(
         dataColumns,
-        [colorColumnName],
+        colorColumnName,
         xAxisColumnName,
         yAxisColumnNames,
+        infoColumnNames,
       ).flatMap(gsc => {
         const k = Object.keys(gsc)[0];
         const v = gsc[k];
@@ -185,21 +190,10 @@ class BasicLineChart extends Chart {
             },
             data: xAxisColumns[0].data.map(d => {
               const target = v.find(col => col[xAxisColumnName] === d);
-              const series = {
-                seriesColName: colorColumnName,
-                valueColName: getValueByColumnKey(aggConfig),
-              };
-              if (target) {
-                return {
-                  ...aggConfig,
-                  ...series,
-                  value: target?.[getValueByColumnKey(aggConfig)],
-                };
-              }
               return {
-                ...aggConfig,
-                ...series,
-                value: 0,
+                ...getExtraSeriesRowData(target),
+                name: getColumnRenderName(aggConfig),
+                value: target?.[getValueByColumnKey(aggConfig)] || 0,
               };
             }),
             ...this.getLabelStyle(styleConfigs),
@@ -216,13 +210,12 @@ class BasicLineChart extends Chart {
 
     return {
       tooltip: {
-        trigger: 'axis',
+        trigger: 'item',
         formatter: this.getTooltipFormmaterFunc(
           groupConfigs,
           aggregateConfigs,
           colorConfigs,
           infoConfigs,
-          dataColumns,
         ),
       },
       legend: this.getLegendStyle(styleConfigs, seriesNames),
@@ -441,58 +434,19 @@ class BasicLineChart extends Chart {
     aggregateConfigs,
     colorConfigs,
     infoConfigs,
-    dataColumns,
   ) {
     return seriesParams => {
-      const tooltips = !!groupConfigs.length
-        ? [`${getColumnRenderName(groupConfigs[0])}: ${seriesParams[0].name}`]
-        : [];
-
-      return tooltips
-        .concat(
-          getSeriesTooltips4Rectangular(
-            seriesParams,
-            groupConfigs,
-            []
-              .concat(aggregateConfigs)
-              .concat(colorConfigs)
-              .concat(infoConfigs),
-            dataColumns,
-          ),
-        )
-        .join('<br />');
+      const params = Array.isArray(seriesParams)
+        ? seriesParams
+        : [seriesParams];
+      return getSeriesTooltips4Rectangular2(
+        params[0],
+        groupConfigs,
+        colorConfigs,
+        aggregateConfigs,
+        infoConfigs,
+      );
     };
-  }
-
-  getColorizeGroupSeriesColumns(
-    dataColumns: any[],
-    groupKeys: string[],
-    xAxisColumnName: string,
-    aggregateKeys: string[],
-  ) {
-    const groupByKey = groupKeys[0];
-
-    const groupedDataColumnObject = dataColumns.reduce((acc, cur) => {
-      const colKey = cur[groupByKey] || 'default';
-
-      if (!acc[colKey]) {
-        acc[colKey] = [];
-      }
-      const value = aggregateKeys.concat([xAxisColumnName]).reduce((a, k) => {
-        a[k] = cur[k];
-        return a;
-      }, {});
-      acc[colKey].push(value);
-      return acc;
-    }, {});
-
-    let collection = [] as any;
-    Object.entries(groupedDataColumnObject).forEach(([k, v]) => {
-      let a = {};
-      a[k] = v;
-      collection.push(a);
-    });
-    return collection;
   }
 }
 

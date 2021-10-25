@@ -65,7 +65,7 @@ export function Main() {
           );
         }
         if ((viz as Folder).relType) {
-          const { name, relId, relType, parentId } = viz as Folder;
+          const { id, name, relId, relType, parentId } = viz as Folder;
           dispatch(
             actions.addTab({
               id: relId,
@@ -73,6 +73,7 @@ export function Main() {
               name,
               search: location.search,
               parentId,
+              permissionId: id,
             }),
           );
         } else {

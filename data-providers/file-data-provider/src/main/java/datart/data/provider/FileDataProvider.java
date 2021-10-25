@@ -28,6 +28,8 @@ import datart.core.data.provider.DataProviderSource;
 import datart.core.data.provider.Dataframe;
 import datart.data.provider.base.DataProviderException;
 import datart.data.provider.jdbc.DataTypeUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
@@ -39,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class FileDataProvider extends DefaultDataProvider {
 
     public static final String FILE_FORMAT = "format";
@@ -60,17 +63,19 @@ public class FileDataProvider extends DefaultDataProvider {
             for (Map<String, Object> schema : schemas) {
                 String path = schema.get(FILE_PATH).toString();
                 FileFormat fileFormat = FileFormat.valueOf(schema.get(FILE_FORMAT).toString().toUpperCase());
-
-                List<Map<String, String>> columnConfig = (List<Map<String, String>>) schema.get(COLUMNS);
                 List<Column> columns = null;
-                if (!CollectionUtils.isEmpty(columnConfig)) {
-                    columns = columnConfig
-                            .stream()
-                            .map(c -> new Column(c.get(COLUMN_NAME), ValueType.valueOf(c.get(COLUMN_TYPE))))
-                            .collect(Collectors.toList());
+                try {
+                    List<Map<String, String>> columnConfig = (List<Map<String, String>>) schema.get(COLUMNS);
+                    if (!CollectionUtils.isEmpty(columnConfig)) {
+                        columns = columnConfig
+                                .stream()
+                                .map(c -> new Column(c.get(COLUMN_NAME), ValueType.valueOf(c.get(COLUMN_TYPE))))
+                                .collect(Collectors.toList());
+                    }
+                } catch (ClassCastException ignored) {
                 }
                 Dataframe dataframe = loadFromPath(FileUtils.withBasePath(path), fileFormat, columns);
-                dataframe.setName(schema.containsKey(TABLE) ? schema.get(TABLE).toString() : "TEST" + UUIDGenerator.generate());
+                dataframe.setName(StringUtils.isNoneBlank(schema.getOrDefault(TABLE, "").toString()) ? schema.get(TABLE).toString() : "TEST" + UUIDGenerator.generate());
                 dataframes.add(dataframe);
             }
             return dataframes;

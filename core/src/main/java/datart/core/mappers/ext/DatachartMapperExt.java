@@ -20,7 +20,7 @@ public interface DatachartMapperExt extends DatachartMapper {
 
     @Select({
             "<script>",
-            "SELECT * FROM `datachart` WHERE `status`= 1 AND `id` IN ",
+            "SELECT * FROM `datachart` WHERE `status`!= 0 AND `id` IN ",
             "<foreach collection='datachartIds' item='item' index='index' open='(' close=')' separator=','>  #{item} </foreach> ;",
             "</script>"
     })

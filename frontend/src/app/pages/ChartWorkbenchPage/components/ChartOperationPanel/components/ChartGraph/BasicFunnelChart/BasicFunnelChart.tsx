@@ -24,10 +24,10 @@ import ChartConfig, {
 import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
 import {
   getColumnRenderName,
+  getSeriesTooltips4Scatter,
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
-  valueFormatter,
 } from 'app/utils/chart';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
@@ -114,6 +114,7 @@ class BasicFunnelChart extends Chart {
       groupConfigs,
       objDataColumns,
       colorConfigs,
+      infoConfigs,
     );
 
     return {
@@ -121,7 +122,7 @@ class BasicFunnelChart extends Chart {
         groupConfigs,
         aggregateConfigs,
         infoConfigs,
-        objDataColumns,
+        colorConfigs,
       ),
       legend: this.getLegendStyle(
         styleConfigs,
@@ -171,7 +172,7 @@ class BasicFunnelChart extends Chart {
       ...font,
       formatter: params => {
         const { name, value, percent, data } = params;
-        const formattedValue = toFormattedValue(value, data.format);
+        const formattedValue = toFormattedValue(value?.[0], data.format);
         const labels: string[] = [];
         if (deminsion) {
           labels.push(`${name}: ${formattedValue}`);
@@ -234,6 +235,7 @@ class BasicFunnelChart extends Chart {
     groupConfigs: ChartDataSectionField[],
     objDataColumns,
     colorConfigs,
+    infoConfigs,
   ) {
     const selectAll = getStyleValueByGroup(styles, 'legend', 'selectAll');
     const sort = getStyleValueByGroup(styles || [], 'funnel', 'sort');
@@ -246,7 +248,9 @@ class BasicFunnelChart extends Chart {
         return {
           ...aggConfig,
           select: selectAll,
-          value: objDataColumns[0][getValueByColumnKey(aggConfig)],
+          value: aggregateConfigs
+            .concat(infoConfigs)
+            .map(config => objDataColumns?.[0]?.[getValueByColumnKey(config)]),
           name: getColumnRenderName(aggConfig),
           itemStyle: {
             color: aggConfig?.color?.start,
@@ -257,8 +261,11 @@ class BasicFunnelChart extends Chart {
       const aggConfig = aggregateConfigs[0];
       normalizeSerieDatas = objDataColumns.map(dataColumn => {
         return {
+          ...aggConfig,
           select: selectAll,
-          value: dataColumn[getValueByColumnKey(aggConfig)],
+          value: aggregateConfigs
+            .concat(infoConfigs)
+            .map(config => dataColumn?.[getValueByColumnKey(config)]),
           name: groupConfigs
             .concat(colorConfigs)
             .map(config => config.colName)
@@ -300,10 +307,10 @@ class BasicFunnelChart extends Chart {
     const _calculateConversionAndArrivalRatio = (data, index) => {
       if (index) {
         data.conversion = this.formatPercent(
-          (data.value / seriesData[index - 1].value) * 100,
+          (data.value?.[0] / seriesData[index - 1].value?.[0]) * 100,
         );
         data.arrival = this.formatPercent(
-          (data.value / seriesData[0].value) * 100,
+          (data.value?.[0] / seriesData[0].value?.[0]) * 100,
         );
       }
       return data;
@@ -323,40 +330,31 @@ class BasicFunnelChart extends Chart {
     groupConfigs,
     aggregateConfigs,
     infoConfigs,
-    objDataColumns,
+    colorConfigs,
   ) {
     return {
       trigger: 'item',
       formatter(params) {
-        const { color, name, value, percent, data } = params;
-        const formattedValue = toFormattedValue(value, data.format);
-        const tooltips: string[] = [];
-        let basicInfo = `${name}: ${formattedValue}`;
-        if (color) {
-          basicInfo = `<span class="widget-tooltip-circle" style="background: ${color}"></span> ${basicInfo}`;
-        }
-        tooltips.push(basicInfo);
-        if (infoConfigs?.length) {
-          const group = groupConfigs?.[0];
-          let dataRow = objDataColumns?.find(
-            dc => dc[group?.colName] === params?.name,
-          );
-          if (!group) {
-            dataRow = objDataColumns?.[0];
-          }
-          infoConfigs?.forEach(config => {
-            tooltips.push(
-              valueFormatter(config, dataRow?.[getValueByColumnKey(config)]),
-            );
-          });
-        }
+        const { percent, data } = params;
+        let tooltips: string[] = !!groupConfigs.concat(colorConfigs)?.length
+          ? [
+              `${groupConfigs
+                .concat(colorConfigs)
+                ?.map(gc => getColumnRenderName(gc))
+                .join('-')}: ${params?.name}`,
+            ]
+          : [];
+        const aggTooltips = getSeriesTooltips4Scatter(
+          [params],
+          aggregateConfigs.concat(infoConfigs),
+        );
+        tooltips = tooltips.concat(aggTooltips);
         if (data.conversion) {
           tooltips.push(`转化率: ${data.conversion}%`);
         }
         if (data.arrival) {
           tooltips.push(`到达率: ${data.arrival}%`);
         }
-        tooltips.push(`百分比: ${percent}%`);
         return tooltips.join('<br/>');
       },
     };

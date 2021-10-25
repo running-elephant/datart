@@ -20,19 +20,21 @@ package datart.data.provider.base;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.util.Properties;
 
 @Data
 public class JdbcProperties {
 
+    @NotBlank
     private String dbType;
-
+    @NotBlank
     private String url;
-
+    @NotBlank
     private String user;
 
     private String password;
-
+    @NotBlank
     private String driverClass;
 
     private Properties properties;

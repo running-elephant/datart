@@ -66,10 +66,12 @@ export function CascadeAccess({
   if (!permissionMap[module]) {
     return null;
   }
-
-  const isAuthorized = path.reduce(
-    (allow, p) => allow || calcAc(isOwner, permissionMap, module, level, p),
-    false,
+  const isAuthorized = getCascadeAccess(
+    isOwner,
+    permissionMap,
+    module,
+    path,
+    level,
   );
 
   return (
@@ -119,10 +121,23 @@ export function getCascadeAccess(
   path: string[],
   level: PermissionLevels,
 ) {
-  return path.reduce(
-    (allow, p) => allow || calcAc(isOwner, permissionMap, module, level, p),
-    false,
-  );
+  // order: child -> parent
+  const inversePath = path.slice().reverse();
+  let allow = false;
+  for (let i = 0; i < inversePath.length; i += 1) {
+    const access = calcAc(
+      isOwner,
+      permissionMap,
+      module,
+      level,
+      inversePath[i],
+    );
+    if (access !== void 0) {
+      allow = access;
+      break;
+    }
+  }
+  return allow;
 }
 
 export function calcAc(
@@ -138,6 +153,8 @@ export function calcAc(
     : type === 'module'
     ? permissionMap[module]['*'] >= level
     : id
-    ? permissionMap[module][id] >= level
+    ? permissionMap[module][id] !== void 0
+      ? permissionMap[module][id] >= level
+      : void 0
     : false;
 }

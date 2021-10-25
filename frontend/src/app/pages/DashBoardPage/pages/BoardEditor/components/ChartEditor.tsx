@@ -265,7 +265,6 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
             dispatch(refreshDatasetAction({ pageInfo: { pageNo: page } }));
             return;
           }
-          console.log('//TODO: to be remove | mouse click event ----> ', param);
         },
       },
       {

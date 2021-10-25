@@ -10,6 +10,11 @@
       "key": "tableName",
       "children": [
         {
+          "name": "tableName",
+          "required": true,
+          "type": "string"
+        },
+        {
           "name": "url",
           "required": true,
           "defaultValue": "http://",
@@ -22,18 +27,13 @@
           "type": "string"
         },
         {
-          "name": "tableName",
-          "required": true,
-          "type": "string"
-        },
-        {
           "name": "property",
           "defaultValue": "",
           "description": "The property name of the list data in JSON",
           "type": "string"
         },
         {
-          "name": "schema",
+          "name": "columns",
           "defaultValue": "",
           "type": "schema"
         },

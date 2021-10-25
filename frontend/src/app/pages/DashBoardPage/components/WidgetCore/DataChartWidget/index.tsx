@@ -56,15 +56,15 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
       if (!params) {
         return;
       }
-      // console.log('--click ev', params);
-      // console.log('--dataChart', dataChart);
       widgetChartClick(widgetRef.current, params);
     },
     [widgetChartClick],
   );
 
   const chart = useMemo(() => {
-    if (!dataChart) return null;
+    if (!dataChart) {
+      return null;
+    }
     if (dataChart?.config?.chartGraphId) {
       try {
         const chartInstance = ChartManager.instance().getById(

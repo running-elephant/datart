@@ -32,7 +32,9 @@ import WidgetToolBar from '../../../WidgetToolBar';
 export const FixedFilter: React.FC<{
   itemMargin: [number, number];
 }> = memo(({ itemMargin }) => {
-  const { editing: editingBoard, boardType } = useContext(BoardContext);
+  const { editing: editingBoard, renderedWidgetById } =
+    useContext(BoardContext);
+
   const widget = useContext(WidgetContext);
   const widgetInfo = useContext(WidgetInfoContext);
   const styleWidth = getFixedFilterWidth(
@@ -49,14 +51,12 @@ export const FixedFilter: React.FC<{
   const ssp = e => {
     e.stopPropagation();
   };
-
   return (
     <Wrap width={styleWidth} itemMargin={itemMargin}>
       <BoarderWrap style={widgetStyle} onClick={ssp}>
         <WidgetName config={widget.config} zIndex={9} />
         <div className="widget-content">
           <WidgetCore />
-          {/* <WidgetFilterCore id={widget.id} /> */}
         </div>
         {editingBoard && (
           <BlockMaskLayer

@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
   ContainerWidgetContent,
   FilterWidgetContent,
+  getDataOption,
   VizRenderMode,
   Widget,
 } from 'app/pages/DashBoardPage/slice/types';
@@ -55,8 +56,6 @@ export const fetchBoardDetail = createAsyncThunk<null, GetBoardDetailParams>(
           filterSearchMap: { params: params?.filterSearchParams },
         }),
       );
-      // let res = getBoardQuery(data);
-      // console.log('--res', res);
       return null;
     } catch (error) {
       errorHandle(error);
@@ -108,12 +107,17 @@ export const renderedWidgetAsync = createAsyncThunk<
 
 export const getWidgetDataAsync = createAsyncThunk<
   null,
-  { boardId: string; widgetId: string; renderMode: VizRenderMode | undefined },
+  {
+    boardId: string;
+    widgetId: string;
+    renderMode: VizRenderMode | undefined;
+    option?: getDataOption;
+  },
   { state: RootState }
 >(
   'board/getWidgetDataAsync',
   async (
-    { boardId, widgetId, renderMode },
+    { boardId, widgetId, renderMode, option },
     { getState, dispatch, rejectWithValue },
   ) => {
     const boardState = getState() as { board: BoardState };
@@ -124,7 +128,7 @@ export const getWidgetDataAsync = createAsyncThunk<
       case 'chart':
         try {
           await dispatch(
-            getChartWidgetDataAsync({ boardId, widgetId, renderMode }),
+            getChartWidgetDataAsync({ boardId, widgetId, renderMode, option }),
           );
           if (renderMode === 'schedule') {
             dispatch(
@@ -160,19 +164,27 @@ export const getWidgetDataAsync = createAsyncThunk<
 );
 export const getChartWidgetDataAsync = createAsyncThunk<
   null,
-  { boardId: string; widgetId: string; renderMode: VizRenderMode | undefined },
+  {
+    boardId: string;
+    widgetId: string;
+    renderMode: VizRenderMode | undefined;
+    option?: getDataOption;
+  },
   { state: RootState }
 >(
   'board/getChartWidgetDataAsync',
   async (
-    { boardId, widgetId, renderMode },
+    { boardId, widgetId, renderMode, option },
     { getState, dispatch, rejectWithValue },
   ) => {
     const boardState = getState() as { board: BoardState };
 
     const widgetMapMap = boardState.board.widgetRecord;
+    const widgetInfo =
+      boardState.board?.widgetInfoRecord?.[boardId]?.[widgetId];
     const widgetMap = widgetMapMap[boardId];
     const curWidget = widgetMap[widgetId];
+
     if (!curWidget) return null;
     const viewMap = boardState.board.viewMap;
     const dataChartMap = boardState.board.dataChartMap;
@@ -183,6 +195,8 @@ export const getChartWidgetDataAsync = createAsyncThunk<
       widgetId,
       widgetMap,
       viewMap,
+      option,
+      widgetInfo,
       dataChartMap,
       boardLinkFilters,
     });
@@ -213,7 +227,13 @@ export const getChartWidgetDataAsync = createAsyncThunk<
     }
 
     dispatch(boardActions.setWidgetData(widgetData as WidgetData));
-
+    dispatch(
+      boardActions.changePageInfo({
+        boardId,
+        widgetId,
+        pageInfo: widgetData.pageInfo,
+      }),
+    );
     return null;
   },
 );

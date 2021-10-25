@@ -112,4 +112,12 @@ public abstract class DataProvider extends AutoCloseBean {
 
     public abstract boolean validateFunction(DataProviderSource source, String snippet);
 
+    /**
+     * 数据源被修改，重置数据源缓存
+     *
+     * @param source
+     */
+    public void resetSource(DataProviderSource source) {
+    }
+
 }

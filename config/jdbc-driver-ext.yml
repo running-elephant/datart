@@ -1,0 +1,16 @@
+#EXAPLE:
+#  db-type: "example"
+#  name: "example"
+#  driver-class: "com.example.jdbc.Driver"
+#  literal-quote: "'"
+#  identifier-quote: "`"
+#  url-prefix: jdbc:example://
+
+IMPALA:
+  db-type: "impala"
+  name: "impala"
+  driver-class: "com.mysql.cj.jdbc.Driver"
+  literal-quote: "'"
+  identifier-quote: "`"
+  adapter-class: "datart.data.provider.jdbc.adapters.ImpalaDataProviderAdapter"
+  url-prefix: "jdbc:impala://"

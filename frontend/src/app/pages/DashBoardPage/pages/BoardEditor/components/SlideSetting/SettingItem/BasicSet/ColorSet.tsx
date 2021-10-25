@@ -32,7 +32,7 @@ export const ColorSet: FC<{
   );
   return (
     <StyledWrap>
-      <Popover content={widgetContent} title={filedName}>
+      <Popover content={widgetContent} title={filedName} placement="left">
         <StyledColorIcon color={filedValue}>
           <BgColorsOutlined />
         </StyledColorIcon>
@@ -49,6 +49,6 @@ const StyledColorIcon = styled.span<{ color: string }>`
   font-size: 1.4em;
   color: ${p => p.color};
 
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: ${p => p.theme.componentBackground};
+  border: 1px solid ${p => p.theme.emphasisBackground};
 `;

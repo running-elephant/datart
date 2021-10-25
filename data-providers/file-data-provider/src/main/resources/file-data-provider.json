@@ -7,7 +7,14 @@
     {
       "name": "schemas",
       "type": "files",
+      "key": "tableName",
       "children": [
+        {
+          "name": "tableName",
+          "required": true,
+          "defaultValue": "",
+          "type": "string"
+        },
         {
           "name": "format",
           "required": true,
@@ -27,8 +34,7 @@
           "description": "file path"
         },
         {
-          "name": "schema",
-          "required": true,
+          "name": "columns",
           "defaultValue": "",
           "type": "schema"
         }

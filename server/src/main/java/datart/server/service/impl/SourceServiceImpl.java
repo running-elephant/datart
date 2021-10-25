@@ -23,6 +23,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import datart.core.base.consts.Const;
 import datart.core.data.provider.DataProviderConfigTemplate;
+import datart.core.data.provider.DataProviderSource;
 import datart.core.entity.Source;
 import datart.core.mappers.ext.SourceMapperExt;
 import datart.security.base.PermissionInfo;
@@ -42,6 +43,7 @@ import datart.server.service.SourceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
@@ -91,6 +93,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
+    @Transactional
     public Source create(BaseCreateParam createParam) {
         // encrypt property
         SourceCreateParam sourceCreateParam = (SourceCreateParam) createParam;
@@ -109,6 +112,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
+    @Transactional
     public boolean update(BaseUpdateParam updateParam) {
         SourceUpdateParam sourceUpdateParam = (SourceUpdateParam) updateParam;
         try {
@@ -117,10 +121,16 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        DataProviderSource providerSource = new DataProviderSource();
+        providerSource.setSourceId(updateParam.getId());
+        providerSource.setType(sourceUpdateParam.getType());
+        providerSource.setName(sourceUpdateParam.getName());
+        dataProviderService.updateSource(providerSource);
         return SourceService.super.update(updateParam);
     }
 
     @Override
+    @Transactional
     public void grantDefaultPermission(Source source) {
         if (securityManager.isOrgOwner(source.getOrgId())) {
             return;

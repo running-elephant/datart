@@ -15,16 +15,16 @@
             <outputDirectory>config</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>${project.parent.basedir}/static</directory>
+            <outputDirectory>static</outputDirectory>
+        </fileSet>
+        <fileSet>
         <directory>${project.parent.basedir}</directory>
         <outputDirectory>./</outputDirectory>
         <includes>
             <include>Dockerfile</include>
             <include>docker-compose.yml</include>
         </includes>
-    </fileSet>
-    <fileSet>
-        <directory>${project.parent.basedir}/doc</directory>
-        <outputDirectory>./doc</outputDirectory>
     </fileSet>
     </fileSets>
     <dependencySets>

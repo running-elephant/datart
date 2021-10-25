@@ -15,13 +15,10 @@ export function errorHandle(error) {
     // AxiosError
     const { response } = error as AxiosError;
     switch (response?.status) {
-      case 403:
-        message.error({ key: '403', content: '未登录或会话过期，请重新登录' });
+      case 401:
+        message.error({ key: '401', content: '未登录或会话过期，请重新登录' });
         removeToken();
         break;
-      // case 401:
-      //   message.error({ key: '401', content: '您没有权限访问此数据' });
-      //   break;
       default:
         message.error(response?.data.message || error.message);
         break;
@@ -95,12 +92,7 @@ export function listToTree<
   });
 
   return treeNodes.map(node => {
-    const children = listToTree(
-      childrenList,
-      node.key,
-      parentPath.concat(node.key),
-      options,
-    );
+    const children = listToTree(childrenList, node.key, node.path, options);
     return children?.length ? { ...node, children } : { ...node, isLeaf: true };
   });
 }
@@ -122,13 +114,14 @@ export function findTreeNode<
 export function getPath<T extends { id: string; parentId: string | null }>(
   list: T[],
   item: T,
-  path: string[],
+  rootId: string,
+  path: string[] = [],
 ) {
   if (!item?.parentId) {
-    return [item.id].concat(path);
+    return [rootId].concat(item.id).concat(path);
   } else {
     const parent = list.find(({ id }) => id === item.parentId)!;
-    return getPath(list, parent, [item.id].concat(path));
+    return getPath(list, parent, rootId, [item.id].concat(path));
   }
 }
 

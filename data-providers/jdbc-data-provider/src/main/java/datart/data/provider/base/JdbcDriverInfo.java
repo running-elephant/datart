@@ -20,22 +20,33 @@ package datart.data.provider.base;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 @Data
 public class JdbcDriverInfo {
 
+    @NotBlank
     private String dbType;
 
+    private String version;
+
+    @NotBlank
     private String name;
 
+    @NotBlank
     private String driverClass;
 
+    @NotBlank
+    private String literalQuote;
+
+    @NotBlank
     private String identifierQuote;
 
-    private String stringValueQuote;
+    private String identifierEndQuote;
+
+    private String literalEndQuote;
 
     private String adapterClass;
-
-    private String variableQuote;
 
     private String urlPrefix;
 

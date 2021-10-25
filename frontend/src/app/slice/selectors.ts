@@ -9,6 +9,16 @@ export const selectLoggedInUser = createSelector(
   appState => appState.loggedInUser,
 );
 
+export const selectSystemInfo = createSelector(
+  [selectDomain],
+  appState => appState.systemInfo,
+);
+
+export const selectVersion = createSelector(
+  [selectSystemInfo],
+  systemInfo => systemInfo?.version,
+);
+
 export const selectLoginLoading = createSelector(
   [selectDomain],
   appState => appState.loginLoading,

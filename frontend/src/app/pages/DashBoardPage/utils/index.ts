@@ -18,7 +18,9 @@ import {
   BoardLinkFilter,
   DataChart,
   FilterWidgetContent,
+  getDataOption,
   Widget,
+  WidgetInfo,
 } from './../slice/types';
 
 export const convertImageUrl = (urlKey: string = ''): string => {
@@ -204,6 +206,8 @@ export const getBoardChartRequests = (params: {
         widgetId,
         widgetMap,
         viewMap,
+        option: undefined,
+        widgetInfo: undefined,
         dataChartMap,
       });
     })
@@ -218,12 +222,21 @@ export const getBoardChartRequests = (params: {
 export const getChartWidgetRequestParams = (params: {
   widgetId: string;
   widgetMap: Record<string, Widget>;
+  widgetInfo: WidgetInfo | undefined;
+  option: getDataOption | undefined;
   viewMap: Record<string, ChartDataView>;
   dataChartMap: Record<string, DataChart>;
   boardLinkFilters?: BoardLinkFilter[];
 }) => {
-  const { widgetId, widgetMap, viewMap, dataChartMap, boardLinkFilters } =
-    params;
+  const {
+    widgetId,
+    widgetMap,
+    viewMap,
+    widgetInfo,
+    dataChartMap,
+    option,
+    boardLinkFilters,
+  } = params;
   if (!widgetId) return null;
   const curWidget = widgetMap[widgetId];
   if (!curWidget) return null;
@@ -264,6 +277,18 @@ export const getChartWidgetRequestParams = (params: {
         linkFilters.push(filter);
       });
       requestParams.filters = filters.concat(linkFilters);
+    }
+  }
+  if (widgetInfo) {
+    const { pageInfo } = widgetInfo;
+    if (requestParams.pageInfo) {
+      requestParams.pageInfo.pageNo = pageInfo.pageNo;
+    }
+  }
+  if (option) {
+    const { pageInfo } = option;
+    if (requestParams.pageInfo && pageInfo?.pageNo) {
+      requestParams.pageInfo.pageNo = pageInfo?.pageNo;
     }
   }
   return requestParams;

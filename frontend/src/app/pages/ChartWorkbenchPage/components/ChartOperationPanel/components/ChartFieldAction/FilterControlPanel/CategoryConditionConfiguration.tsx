@@ -92,7 +92,9 @@ const CategoryConditionConfiguration: FC<
     const [treeDatas, setTreeDatas] = useState<FilterValueOption[]>([]);
 
     useMount(() => {
-      handleFetchData();
+      if (curTab === FilterConditionType.List) {
+        handleFetchData();
+      }
     });
 
     const getDataOptionFields = () => {

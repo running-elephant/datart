@@ -10,6 +10,7 @@ import {
   WidgetPanel,
 } from 'app/pages/DashBoardPage/slice/types';
 import { getInitBoardInfo } from 'app/pages/DashBoardPage/utils/board';
+import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { Layout } from 'react-grid-layout';
 /** { excludeAction,includeAction } */
 import undoable, { includeAction } from 'redux-undo';
@@ -19,6 +20,7 @@ import { ChartEditorProps } from '../components/ChartEditor';
 import { editBoardStackSlice } from './childSlice/stackSlice';
 import {
   getEditBoardDetail,
+  getEditChartWidgetDataAsync,
   getEditWidgetDataAsync,
   toUpdateDashboard,
 } from './thunk';
@@ -202,13 +204,24 @@ const widgetInfoRecordSlice = createSlice({
     changeWidgetInLinking(
       state,
       action: PayloadAction<{
-        boardId: string;
+        boardId?: string;
         widgetId: string;
         toggle: boolean;
       }>,
     ) {
-      const { boardId, widgetId, toggle } = action.payload;
+      const { widgetId, toggle } = action.payload;
       state[widgetId].inLinking = toggle;
+    },
+    changePageInfo(
+      state,
+      action: PayloadAction<{
+        boardId?: string;
+        widgetId: string;
+        pageInfo: Partial<PageInfo> | undefined;
+      }>,
+    ) {
+      const { widgetId, pageInfo } = action.payload;
+      state[widgetId].pageInfo = pageInfo || { pageNo: 1 };
     },
   },
   extraReducers: builder => {
@@ -224,10 +237,20 @@ const widgetInfoRecordSlice = createSlice({
       const { widgetId } = action.meta.arg;
       state[widgetId].loading = false;
     });
+    builder.addCase(getEditChartWidgetDataAsync.pending, (state, action) => {
+      const { widgetId } = action.meta.arg;
+      state[widgetId].loading = true;
+    });
+    builder.addCase(getEditChartWidgetDataAsync.fulfilled, (state, action) => {
+      const { widgetId } = action.meta.arg;
+      state[widgetId].loading = false;
+    });
+    builder.addCase(getEditChartWidgetDataAsync.rejected, (state, action) => {
+      const { widgetId } = action.meta.arg;
+      state[widgetId].loading = false;
+    });
   },
 });
-// getEditWidgetDataAsync
-// editWidgetDataActions
 const editWidgetDataSlice = createSlice({
   name: 'editBoard',
   initialState: {} as EditBoardState['widgetDataMap'],

@@ -66,6 +66,8 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
 
     private final FolderService folderService;
 
+    private final VariableService variableService;
+
     public DashboardServiceImpl(DashboardMapperExt dashboardMapper,
                                 WidgetMapperExt widgetMapper,
                                 RelWidgetElementMapperExt rweMapper,
@@ -76,7 +78,8 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                                 ViewMapperExt viewMapper,
                                 DatachartMapperExt datachartMapper,
                                 WidgetService widgetService,
-                                FolderService folderService) {
+                                FolderService folderService,
+                                VariableService variableService) {
         this.dashboardMapper = dashboardMapper;
         this.widgetMapper = widgetMapper;
         this.rweMapper = rweMapper;
@@ -88,6 +91,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         this.datachartMapper = datachartMapper;
         this.widgetService = widgetService;
         this.folderService = folderService;
+        this.variableService = variableService;
     }
 
 
@@ -111,9 +115,9 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     @Override
     @Transactional
     public boolean archive(String id) {
+        DashboardService.super.archive(id);
         //remove from folder
-        folderMapper.deleteByRelTypeAndId(ResourceType.DASHBOARD.name(), id);
-        return DashboardService.super.archive(id);
+        return folderMapper.deleteByRelTypeAndId(ResourceType.DASHBOARD.name(), id) == 1;
     }
 
     @Override
@@ -162,17 +166,28 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
 
         dashboardDetail.setWidgets(widgetDetails);
 
+        //views
         if (!CollectionUtils.isEmpty(viewIds)) {
             dashboardDetail.setViews(viewMapper.listByIds(viewIds));
         } else {
             dashboardDetail.setViews(Collections.emptyList());
         }
+
+        // charts
         if (!CollectionUtils.isEmpty(datachartIds)) {
             dashboardDetail.setDatacharts(datachartMapper.listByIds(datachartIds));
         } else {
             dashboardDetail.setDatacharts(Collections.emptyList());
         }
 
+        //variables
+        LinkedList<Variable> variables = new LinkedList<>(variableService.listOrgQueryVariables(dashboard.getOrgId()));
+        if (!CollectionUtils.isEmpty(viewIds)) {
+            for (String viewId : viewIds) {
+                variables.addAll(variableService.listViewQueryVariables(viewId));
+            }
+        }
+        dashboardDetail.setQueryVariables(variables);
         // download permission
         dashboardDetail.setDownload(securityManager.hasPermission(PermissionHelper.vizPermission(dashboard.getOrgId(), dashboardId, Const.DOWNLOAD)));
 
@@ -222,6 +237,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     }
 
     @Override
+    @Transactional
     public boolean update(BaseUpdateParam updateParam) {
 
         DashboardUpdateParam param = (DashboardUpdateParam) updateParam;

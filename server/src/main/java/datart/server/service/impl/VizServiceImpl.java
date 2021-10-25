@@ -18,6 +18,7 @@
 package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
+import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.security.base.ResourceType;
 import datart.server.base.dto.*;
@@ -82,16 +83,19 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public Folder createFolder(FolderCreateParam createParam) {
         return folderService.create(createParam);
     }
 
     @Override
+    @Transactional
     public boolean updateFolder(FolderUpdateParam updateParam) {
         return folderService.update(updateParam);
     }
 
     @Override
+    @Transactional
     public boolean deleteFolder(String folderId) {
         return folderService.delete(folderId);
     }
@@ -102,6 +106,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public boolean publish(ResourceType resourceType, String vizId) {
         switch (resourceType) {
             case DATACHART:
@@ -116,6 +121,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public boolean unpublish(ResourceType resourceType, String vizId) {
         switch (resourceType) {
             case DATACHART:
@@ -130,6 +136,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public Folder createDatachart(DatachartCreateParam createParam) {
         return datachartService.createWithFolder(createParam);
     }
@@ -141,11 +148,13 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public Storypage createStorypage(StorypageCreateParam createParam) {
         return storypageService.create(createParam);
     }
 
     @Override
+    @Transactional
     public Storyboard createStoryboard(StoryboardCreateParam createParam) {
         return storyboardService.create(createParam);
     }
@@ -211,6 +220,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public boolean updateDatachart(DatachartUpdateParam updateParam) {
         return datachartService.update(updateParam);
     }
@@ -222,31 +232,37 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public boolean updateStorypage(StorypageUpdateParam updateParam) {
         return storypageService.update(updateParam);
     }
 
     @Override
+    @Transactional
     public boolean updateStoryboard(StoryboardUpdateParam updateParam) {
         return storyboardService.update(updateParam);
     }
 
     @Override
+    @Transactional
     public boolean deleteDatachart(String datachartId, boolean archive) {
         return datachartService.delete(datachartId, archive);
     }
 
     @Override
+    @Transactional
     public boolean deleteDashboard(String dashboardId, boolean archive) {
         return dashboardService.delete(dashboardId, archive);
     }
 
     @Override
+    @Transactional
     public boolean deleteStorypage(String storypageId) {
         return storypageService.delete(storypageId);
     }
 
     @Override
+    @Transactional
     public boolean deleteStoryboard(String storyboardId, boolean archive) {
         return storyboardService.delete(storyboardId, archive);
     }
@@ -267,6 +283,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public boolean unarchiveViz(String vizId, ResourceType vizType, String newName, String parentId) {
         switch (vizType) {
             case DASHBOARD:
@@ -306,15 +323,15 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     private void createFolder(ResourceType type, String id, String name, String orgId, String parentId) {
-        FolderCreateParam folderCreateParam = new FolderCreateParam();
         Folder folder = new Folder();
+        folder.setId(UUIDGenerator.generate());
         folder.setRelType(type.name());
         folder.setRelId(id);
         folder.setParentId(parentId);
         folder.setOrgId(orgId);
         folder.setName(name);
-        folder.setIndex(Double.MAX_VALUE);
-        folderService.create(folderCreateParam);
+        folder.setIndex(0D);
+        folderService.getDefaultMapper().insert(folder);
     }
 
 }

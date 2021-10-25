@@ -43,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Date;
@@ -107,6 +108,7 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     }
 
     @Override
+    @Transactional
     public Schedule create(BaseCreateParam createParam) {
         ScheduleCreateParam scheduleCreateParam = (ScheduleCreateParam) createParam;
         Schedule schedule = new Schedule();
@@ -128,6 +130,7 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     }
 
     @Override
+    @Transactional
     public boolean update(BaseUpdateParam updateParam) {
         ScheduleUpdateParam scheduleUpdateParam = (ScheduleUpdateParam) updateParam;
         Schedule schedule = retrieve(updateParam.getId());
@@ -198,6 +201,7 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     }
 
     @Override
+    @Transactional
     public void grantDefaultPermission(Schedule schedule) {
         if (securityManager.isOrgOwner(schedule.getOrgId())) {
             return;

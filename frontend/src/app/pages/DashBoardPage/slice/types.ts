@@ -16,10 +16,7 @@
  * limitations under the License.
  */
 import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import {
-  ChartDatasetMeta,
-  ChartDatasetPageInfo,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+import { ChartDatasetMeta } from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -36,6 +33,7 @@ import {
 import { ChartEditorProps } from '../pages/BoardEditor/components/ChartEditor';
 import { WidgetFilterFormType } from '../pages/BoardEditor/components/FilterWidgetPanel/types';
 import { ChartDataSectionField } from './../../ChartWorkbenchPage/models/ChartConfig';
+import { PageInfo } from './../../MainPage/pages/ViewPage/slice/types';
 
 export const strEnumType = <T extends string>(o: Array<T>): { [K in T]: K } => {
   return o.reduce((res, key) => {
@@ -177,22 +175,19 @@ export interface WidgetInfo {
   id: string;
   loading: boolean;
   editing: boolean;
-  dragging?: boolean;
-  resizing?: boolean;
-  polling?: boolean;
+  rendered: boolean;
   inLinking: boolean; //是否在触发联动
   selected: boolean;
+  pageInfo: Partial<PageInfo>;
   selectItems?: string[];
   parameters?: any;
-  downloadLoading?: boolean;
-  rendered: boolean;
 }
 export interface WidgetData {
   id: string;
   columns?: ChartDatasetMeta[];
   name?: string;
   rows?: string[][];
-  pageInfo?: ChartDatasetPageInfo;
+  pageInfo?: Partial<PageInfo>;
 }
 //
 export const RenderTypeMap = strEnumType([
@@ -469,4 +464,8 @@ export interface GetBoardDetailParams {
 }
 export interface ServerDatachart extends Omit<DataChart, 'config'> {
   config: string;
+}
+
+export interface getDataOption {
+  pageInfo?: Partial<PageInfo>;
 }

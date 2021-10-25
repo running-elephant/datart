@@ -42,4 +42,6 @@ public interface DataProviderManager {
 
     boolean validateFunction(DataProviderSource source, String snippet);
 
+    void updateSource(DataProviderSource source);
+
 }

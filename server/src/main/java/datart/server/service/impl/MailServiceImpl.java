@@ -30,6 +30,7 @@ import datart.server.service.BaseService;
 import datart.server.service.MailService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -74,22 +75,21 @@ public class MailServiceImpl extends BaseService implements MailService {
     private static final String FIND_PASSWORD_TEMPLATE = "mail/RestPasswordEmailTemplate";
 
 
-    private final JavaMailSender mailSender;
+    private JavaMailSender mailSender;
 
     private final TemplateEngine templateEngine;
 
 
-    //    @Value("${spring.mail.fromAddress}")
+    @Value("${spring.mail.fromAddress:null}")
     private String fromAddress;
 
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.username:null}")
     private String username;
 
     @Value("${spring.mail.senderName:Datart}")
     private String senderName;
 
-    public MailServiceImpl(JavaMailSender mailSender, TemplateEngine templateEngine) {
-        this.mailSender = mailSender;
+    public MailServiceImpl(TemplateEngine templateEngine) {
         this.templateEngine = templateEngine;
     }
 
@@ -100,11 +100,13 @@ public class MailServiceImpl extends BaseService implements MailService {
 
     @Override
     public void sendMimeMessage(MimeMessage mimeMessage) {
+        checkMailSender();
         mailSender.send(mimeMessage);
     }
 
     @Override
     public MimeMessage createMimeMessage() throws MessagingException, UnsupportedEncodingException {
+        checkMailSender();
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
         helper.setFrom(getFromAddress(), senderName);
@@ -113,6 +115,7 @@ public class MailServiceImpl extends BaseService implements MailService {
 
     @Override
     public void sendActiveMail(User user) throws MessagingException, UnsupportedEncodingException {
+        checkMailSender();
         MimeMessage activeMimeMessage = createActiveMimeMessage(user);
         mailSender.send(activeMimeMessage);
         log.info("Activate Mail was sent to {}({})", user.getUsername(), user.getEmail());
@@ -120,6 +123,7 @@ public class MailServiceImpl extends BaseService implements MailService {
 
     @Override
     public void sendInviteMail(User user, Organization org) throws UnsupportedEncodingException, MessagingException {
+        checkMailSender();
         MimeMessage inviteMimeMessage = createInviteMimeMessage(user, org);
         mailSender.send(inviteMimeMessage);
         log.info("Invite Mail was sent to {}({})", user.getUsername(), user.getEmail());
@@ -127,6 +131,7 @@ public class MailServiceImpl extends BaseService implements MailService {
 
     @Override
     public void sendVerifyCode(User user) throws UnsupportedEncodingException, MessagingException {
+        checkMailSender();
         MimeMessage verifyCodeMimeMessage = createVerifyCodeMimeMessage(user);
         mailSender.send(verifyCodeMimeMessage);
         log.info("Verify Code Mail was sent to {}({})", user.getUsername(), user.getEmail());
@@ -195,4 +200,16 @@ public class MailServiceImpl extends BaseService implements MailService {
         }
         return from;
     }
+
+    @Autowired(required = false)
+    public void setMailSender(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    public void checkMailSender() {
+        if (mailSender == null) {
+            throw new ServerException("Mail Sender not available,check mail config in application-config.yml");
+        }
+    }
+
 }

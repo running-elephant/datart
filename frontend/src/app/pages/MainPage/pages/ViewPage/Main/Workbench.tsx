@@ -36,7 +36,7 @@ export const Workbench = memo(() => {
         ? getPath(
             views as Array<{ id: string; parentId: string }>,
             { id, parentId },
-            [],
+            ResourceTypes.View,
           )
         : [],
     [views, id, parentId],

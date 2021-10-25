@@ -4,6 +4,7 @@ import { ReactElement } from 'react';
 import { RootState } from 'types';
 import { listToTree } from 'utils/utils';
 import { initialState } from '.';
+import { ResourceTypes } from '../../PermissionPage/constants';
 import { ViewSimpleViewModel, ViewViewModel } from './types';
 
 const selectDomain = (state: RootState) => state.view || initialState;
@@ -38,7 +39,7 @@ export const makeSelectViewTree = () =>
       ) => props.getDisabled,
     ],
     (views, getIcon, getDisabled) =>
-      listToTree(views, null, [], { getIcon, getDisabled }),
+      listToTree(views, null, [ResourceTypes.View], { getIcon, getDisabled }),
   );
 
 export const makeSelectViewFolderTree = () =>
@@ -57,10 +58,8 @@ export const makeSelectViewFolderTree = () =>
       listToTree(
         views && views.filter(v => v.isFolder && v.id !== id),
         null,
-        [],
-        {
-          getDisabled,
-        },
+        [ResourceTypes.View],
+        { getDisabled },
       ),
   );
 
