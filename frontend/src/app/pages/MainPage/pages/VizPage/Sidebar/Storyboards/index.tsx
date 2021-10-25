@@ -65,11 +65,11 @@ export const Storyboards = memo(({ selectedId, className }: FoldersProps) => {
   const titles = useMemo(
     () => [
       {
-        subTitle: '故事版列表',
+        subTitle: '故事板列表',
         search: true,
         ...allowCreate({
           add: {
-            items: [{ key: 'STORYBOARD', text: '新建故事版' }],
+            items: [{ key: 'STORYBOARD', text: '新建故事板' }],
             icon: <PlusOutlined />,
             callback: add,
           },

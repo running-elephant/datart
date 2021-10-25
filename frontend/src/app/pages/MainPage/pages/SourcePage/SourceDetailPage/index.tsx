@@ -148,7 +148,8 @@ export function SourceDetailPage() {
           ({ dbType }) => dbType === val,
         );
         if (selected) {
-          form.setFieldsValue({ config: { url: selected.url } });
+          const { url, driverClass } = selected;
+          form.setFieldsValue({ config: { url, driverClass } });
         }
       }
     },

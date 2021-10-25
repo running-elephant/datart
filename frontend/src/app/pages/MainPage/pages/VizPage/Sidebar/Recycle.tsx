@@ -21,6 +21,7 @@ import { getPath, stopPPG } from 'utils/utils';
 import {
   PermissionLevels,
   ResourceTypes,
+  VizResourceSubTypes,
 } from '../../PermissionPage/constants';
 import { SaveFormContext } from '../SaveFormContext';
 import { selectVizs } from '../slice/selectors';
@@ -134,7 +135,7 @@ export const Recycle = memo(
                 ? getPath(
                     vizs as Array<{ id: string; parentId: string }>,
                     { id, parentId: viz.parentId },
-                    [],
+                    VizResourceSubTypes.Folder,
                   )
                 : [id];
               allowManage = getCascadeAccess(
@@ -145,7 +146,7 @@ export const Recycle = memo(
                 PermissionLevels.Manage,
               );
             } else {
-              allowManage = calcAc(
+              allowManage = !!calcAc(
                 isOwner,
                 permissionMap,
                 ResourceTypes.Viz,

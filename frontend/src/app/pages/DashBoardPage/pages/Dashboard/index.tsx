@@ -32,7 +32,7 @@ import FullScreenPanel from '../../components/FullScreenPanel';
 import TitleHeader from '../../components/TitleHeader';
 import { boardActions } from '../../slice';
 import { makeSelectBoardConfigById } from '../../slice/selector';
-import { fetchBoardDetail, getBoardDetail } from '../../slice/thunk';
+import { fetchBoardDetail } from '../../slice/thunk';
 import { BoardState, VizRenderMode } from '../../slice/types';
 import BoardEditor from '../BoardEditor';
 import AutoBoardCore from './AutoDashboard/AutoBoardCore';
@@ -69,32 +69,28 @@ export const Dashboard: React.FC<DashboardProps> = memo(
       refreshMode: 'debounce',
       refreshRate: 2000,
     });
-    const [showBoardEditor, setShowBoardEditor] = useState(false);
-
-    const toggleBoardEditor = (bool: boolean) => {
-      setShowBoardEditor(bool);
-    };
     const searchParams = useMemo(() => {
       return filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
         : undefined;
     }, [filterSearchUrl]);
+
     useEffect(() => {
-      if (searchParams && boardId) {
+      if (boardId && fetchData) {
         dispatch(
           fetchBoardDetail({
             dashboardRelId: boardId,
             filterSearchParams: searchParams,
           }),
         );
-      } else if (boardId && fetchData) {
-        dispatch(
-          getBoardDetail({
-            dashboardRelId: boardId,
-          }),
-        );
       }
     }, [boardId, dispatch, fetchData, searchParams]);
+
+    const [showBoardEditor, setShowBoardEditor] = useState(false);
+
+    const toggleBoardEditor = (bool: boolean) => {
+      setShowBoardEditor(bool);
+    };
 
     const dashboard = useSelector((state: { board: BoardState }) =>
       makeSelectBoardConfigById()(state, boardId),

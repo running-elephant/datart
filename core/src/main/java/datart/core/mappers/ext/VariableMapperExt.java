@@ -27,6 +27,11 @@ public interface VariableMapperExt extends VariableMapper {
     List<Variable> selectViewVariables(String viewId);
 
     @Select({
+            "SELECT * FROM variable WHERE view_id = #{viewId} AND `type`='QUERY'"
+    })
+    List<Variable> selectViewQueryVariables(String viewId);
+
+    @Select({
             "SELECT * FROM variable WHERE org_id = #{orgId} AND view_id is NULL"
     })
     List<Variable> selectOrgVariables(String orgId);

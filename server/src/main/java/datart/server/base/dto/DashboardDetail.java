@@ -2,6 +2,7 @@ package datart.server.base.dto;
 
 import datart.core.entity.Dashboard;
 import datart.core.entity.Datachart;
+import datart.core.entity.Variable;
 import datart.core.entity.View;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,6 +24,8 @@ public class DashboardDetail extends Dashboard {
     private List<View> views;
 
     private List<Datachart> datacharts;
+
+    private List<Variable> queryVariables;
 
     private boolean download;
 }

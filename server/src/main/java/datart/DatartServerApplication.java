@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DatartServerApplication {
 
     public static void main(String[] args) {
-
         SpringApplication.run(DatartServerApplication.class, args);
     }
 

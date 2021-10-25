@@ -119,7 +119,7 @@ export const Recycle = memo(({ list }: RecycleProps) => {
         ? getPath(
             views as Array<{ id: string; parentId: string }>,
             { id: key, parentId },
-            [],
+            ResourceTypes.View,
           )
         : [];
       const allowManage = getCascadeAccess(

@@ -123,6 +123,16 @@ public class VariableServiceImpl extends BaseService implements VariableService 
         return convertVariables(variables);
     }
 
+    @Override
+    public List<Variable> listOrgQueryVariables(String orgId) {
+        return variableMapper.selectOrgQueryVariables(orgId);
+    }
+
+    @Override
+    public List<Variable> listViewQueryVariables(String viewId) {
+        return variableMapper.selectViewQueryVariables(viewId);
+    }
+
 
     @Override
     @Transactional
