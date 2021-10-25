@@ -42,6 +42,7 @@ import datart.server.service.SourceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
@@ -91,6 +92,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
+    @Transactional
     public Source create(BaseCreateParam createParam) {
         // encrypt property
         SourceCreateParam sourceCreateParam = (SourceCreateParam) createParam;
@@ -109,6 +111,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
+    @Transactional
     public boolean update(BaseUpdateParam updateParam) {
         SourceUpdateParam sourceUpdateParam = (SourceUpdateParam) updateParam;
         try {
@@ -121,6 +124,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
+    @Transactional
     public void grantDefaultPermission(Source source) {
         if (securityManager.isOrgOwner(source.getOrgId())) {
             return;

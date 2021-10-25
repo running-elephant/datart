@@ -24,6 +24,7 @@ import datart.security.util.PermissionHelper;
 import datart.server.service.BaseService;
 import datart.server.service.StorypageService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class StorypageServiceImpl extends BaseService implements StorypageServic
     @Override
     public void requirePermission(Storypage entity, int permission) {
         Storyboard sb = retrieve(entity.getStoryboardId(), Storyboard.class);
-        securityManager.requirePermissions(PermissionHelper.vizPermission(sb.getOrgId(),sb.getId(), permission));
+        securityManager.requirePermissions(PermissionHelper.vizPermission(sb.getOrgId(), sb.getId(), permission));
     }
 
     @Override
@@ -48,6 +49,7 @@ public class StorypageServiceImpl extends BaseService implements StorypageServic
     }
 
     @Override
+    @Transactional
     public boolean delete(String id) {
         return StorypageService.super.delete(id);
     }
