@@ -13,15 +13,13 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <spring.cloud.alibaba.version>2.2.5.RELEASE</spring.cloud.alibaba.version>
         <spring.cloud.version>2020.0.1</spring.cloud.version>
-        <datart.version>1.0.0-alpha.0</datart.version>
     </properties>
 
     <groupId>datart</groupId>
     <artifactId>datart-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0-alpha.0</version>
+    <version>1.0.0-alpha.1</version>
 
     <dependencies>
         <dependency>
@@ -41,10 +39,10 @@
         <module>core</module>
         <module>security</module>
         <module>data-providers</module>
-        <module>server</module>
         <module>data-providers/file-data-provider</module>
         <module>data-providers/http-data-provider</module>
         <module>data-providers/jdbc-data-provider</module>
+        <module>server</module>
     </modules>
 
     <repositories>
@@ -64,45 +62,43 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>com.alibaba.cloud</groupId>
-                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>${spring.cloud.alibaba.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.alibaba.cloud</groupId>-->
+<!--                <artifactId>spring-cloud-alibaba-dependencies</artifactId>-->
+<!--                <version>${spring.cloud.alibaba.version}</version>-->
+<!--                <type>pom</type>-->
+<!--                <scope>import</scope>-->
+<!--            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
-    <!--    <build>-->
-    <!--        <plugins>-->
-    <!--            &lt;!&ndash;            <plugin>&ndash;&gt;-->
-    <!--            &lt;!&ndash;                <groupId>org.springframework.boot</groupId>&ndash;&gt;-->
-    <!--            &lt;!&ndash;                <artifactId>spring-boot-maven-plugin</artifactId>&ndash;&gt;-->
-    <!--            &lt;!&ndash;            </plugin>&ndash;&gt;-->
-    <!--            <plugin>-->
-    <!--                <groupId>org.apache.maven.plugins</groupId>-->
-    <!--                <artifactId>maven-compiler-plugin</artifactId>-->
-    <!--                <configuration>-->
-    <!--                    <skip>true</skip>-->
-    <!--                </configuration>-->
-    <!--                <executions>-->
-    <!--                    <execution>-->
-    <!--                        <phase>compile</phase>-->
-    <!--                        <goals>-->
-    <!--                            <goal>compile</goal>-->
-    <!--                        </goals>-->
-    <!--                    </execution>-->
-    <!--                </executions>-->
-    <!--            </plugin>-->
-    <!--            <plugin>-->
-    <!--                <groupId>org.apache.maven.plugins</groupId>-->
-    <!--                <artifactId>maven-surefire-plugin</artifactId>-->
-    <!--                <configuration>-->
-    <!--                    <skip>true</skip>-->
-    <!--                </configuration>-->
-    <!--            </plugin>-->
-    <!--        </plugins>-->
-    <!--    </build>-->
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <configuration>
+                        <filesets>
+                            <fileset>
+                                <directory>static</directory>
+                                <includes>
+                                    <include>**</include>
+                                </includes>
+                            </fileset>
+                            <fileset>
+                                <directory>${project.basedir}</directory>
+                                <includes>
+                                    <include>datart-server-*-install.zip</include>
+                                </includes>
+                            </fileset>
+                        </filesets>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
 
 </project>
