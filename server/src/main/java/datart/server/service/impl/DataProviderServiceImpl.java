@@ -282,6 +282,11 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         return res;
     }
 
+    @Override
+    public void updateSource(DataProviderSource source) {
+        dataProviderManager.updateSource(source);
+    }
+
     private List<ScriptVariable> removePermissionVariables(List<ScriptVariable> variables) {
         return variables
                 .stream()

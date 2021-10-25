@@ -23,6 +23,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import datart.core.base.consts.Const;
 import datart.core.data.provider.DataProviderConfigTemplate;
+import datart.core.data.provider.DataProviderSource;
 import datart.core.entity.Source;
 import datart.core.mappers.ext.SourceMapperExt;
 import datart.security.base.PermissionInfo;
@@ -120,6 +121,11 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        DataProviderSource providerSource = new DataProviderSource();
+        providerSource.setSourceId(updateParam.getId());
+        providerSource.setType(sourceUpdateParam.getType());
+        providerSource.setName(sourceUpdateParam.getName());
+        dataProviderService.updateSource(providerSource);
         return SourceService.super.update(updateParam);
     }
 

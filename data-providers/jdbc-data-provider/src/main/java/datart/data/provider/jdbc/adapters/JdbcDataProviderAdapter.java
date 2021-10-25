@@ -205,7 +205,6 @@ public class JdbcDataProviderAdapter implements Closeable {
             return;
         }
         JdbcDataProvider.getDataSourceFactory().destroy(dataSource);
-
     }
 
     public boolean supportPaging() {
