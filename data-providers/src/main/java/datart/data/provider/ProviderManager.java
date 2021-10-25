@@ -52,27 +52,27 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
 
     @Override
     public DataProviderConfigTemplate getSourceConfigTemplate(String type) throws IOException {
-        return getNotNoneDataProvider(type).getConfigTemplate();
+        return getDataProviderService(type).getConfigTemplate();
     }
 
     @Override
     public Object testConnection(DataProviderSource source) throws Exception {
-        return getNotNoneDataProvider(source.getType()).test(source);
+        return getDataProviderService(source.getType()).test(source);
     }
 
     @Override
     public Set<String> readAllDatabases(DataProviderSource source) {
-        return getNotNoneDataProvider(source.getType()).readAllDatabases(source);
+        return getDataProviderService(source.getType()).readAllDatabases(source);
     }
 
     @Override
     public Set<String> readTables(DataProviderSource source, String database) {
-        return getNotNoneDataProvider(source.getType()).readTables(source, database);
+        return getDataProviderService(source.getType()).readTables(source, database);
     }
 
     @Override
     public Set<Column> readTableColumns(DataProviderSource source, String database, String table) {
-        return getNotNoneDataProvider(source.getType()).readTableColumns(source, database, table);
+        return getDataProviderService(source.getType()).readTableColumns(source, database, table);
     }
 
     @Override
@@ -104,13 +104,19 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
 
     @Override
     public Set<StdSqlOperator> supportedStdFunctions(DataProviderSource source) {
-        return getNotNoneDataProvider(source.getType()).supportedStdFunctions(source);
+        return getDataProviderService(source.getType()).supportedStdFunctions(source);
     }
 
     @Override
     public boolean validateFunction(DataProviderSource source, String snippet) {
-        DataProvider provider = getNotNoneDataProvider(source.getType());
+        DataProvider provider = getDataProviderService(source.getType());
         return provider.validateFunction(source, snippet);
+    }
+
+    @Override
+    public void updateSource(DataProviderSource source) {
+        DataProvider providerService = getDataProviderService(source.getType());
+        providerService.resetSource(source);
     }
 
     private void excludeColumns(Dataframe data, Set<String> columns) {
@@ -147,7 +153,7 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
     }
 
 
-    private DataProvider getNotNoneDataProvider(String type) {
+    private DataProvider getDataProviderService(String type) {
         if (cachedDataProviders.size() == 0) {
             loadDataProviders();
         }
@@ -171,7 +177,7 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
 
     @Override
     public Dataframe run(DataProviderSource source, QueryScript queryScript, ExecuteParam param) throws Exception {
-        Dataframe dataframe = getNotNoneDataProvider(source.getType()).execute(source, queryScript, param);
+        Dataframe dataframe = getDataProviderService(source.getType()).execute(source, queryScript, param);
         excludeColumns(dataframe, param.getIncludeColumns());
         return dataframe;
     }

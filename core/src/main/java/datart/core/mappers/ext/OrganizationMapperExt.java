@@ -31,7 +31,7 @@ public interface OrganizationMapperExt extends OrganizationMapper {
     List<User> listOrgMembers(@Param("orgId") String orgId);
 
     @Delete({
-            "DELETE FROM rel_user_organization WHERE user_id=#{userId};",
+            "DELETE FROM rel_user_organization WHERE user_id=#{userId} AND org_id=#{orgId};",
             "DELETE FROM rel_role_user WHERE user_id=#{userId} AND role_id IN (SELECT DISTINCT id FROM role r WHERE r.org_id=#{orgId});",
             "DELETE FROM role WHERE `type`='PER_USER' AND org_id=#{orgId} AND create_by=#{userId};",
     })

@@ -83,16 +83,19 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public Folder createFolder(FolderCreateParam createParam) {
         return folderService.create(createParam);
     }
 
     @Override
+    @Transactional
     public boolean updateFolder(FolderUpdateParam updateParam) {
         return folderService.update(updateParam);
     }
 
     @Override
+    @Transactional
     public boolean deleteFolder(String folderId) {
         return folderService.delete(folderId);
     }
@@ -103,6 +106,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public boolean publish(ResourceType resourceType, String vizId) {
         switch (resourceType) {
             case DATACHART:
@@ -117,6 +121,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public boolean unpublish(ResourceType resourceType, String vizId) {
         switch (resourceType) {
             case DATACHART:
@@ -131,6 +136,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public Folder createDatachart(DatachartCreateParam createParam) {
         return datachartService.createWithFolder(createParam);
     }
@@ -142,11 +148,13 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public Storypage createStorypage(StorypageCreateParam createParam) {
         return storypageService.create(createParam);
     }
 
     @Override
+    @Transactional
     public Storyboard createStoryboard(StoryboardCreateParam createParam) {
         return storyboardService.create(createParam);
     }
@@ -212,6 +220,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public boolean updateDatachart(DatachartUpdateParam updateParam) {
         return datachartService.update(updateParam);
     }
@@ -223,16 +232,19 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public boolean updateStorypage(StorypageUpdateParam updateParam) {
         return storypageService.update(updateParam);
     }
 
     @Override
+    @Transactional
     public boolean updateStoryboard(StoryboardUpdateParam updateParam) {
         return storyboardService.update(updateParam);
     }
 
     @Override
+    @Transactional
     public boolean deleteDatachart(String datachartId, boolean archive) {
         return datachartService.delete(datachartId, archive);
     }
@@ -244,11 +256,13 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public boolean deleteStorypage(String storypageId) {
         return storypageService.delete(storypageId);
     }
 
     @Override
+    @Transactional
     public boolean deleteStoryboard(String storyboardId, boolean archive) {
         return storyboardService.delete(storyboardId, archive);
     }
@@ -269,6 +283,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
+    @Transactional
     public boolean unarchiveViz(String vizId, ResourceType vizType, String newName, String parentId) {
         switch (vizType) {
             case DASHBOARD:

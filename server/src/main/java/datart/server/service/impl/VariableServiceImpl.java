@@ -75,6 +75,7 @@ public class VariableServiceImpl extends BaseService implements VariableService 
     }
 
     @Override
+    @Transactional
     public Variable create(BaseCreateParam createParam) {
         VariableCreateParam variableCreateParam = (VariableCreateParam) createParam;
         checkUnique(variableCreateParam.getOrgId(), null, variableCreateParam.getName());

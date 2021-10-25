@@ -25,6 +25,7 @@ import datart.server.service.BaseService;
 import datart.server.service.UserSettingService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -44,6 +45,7 @@ public class UserSettingServiceImpl extends BaseService implements UserSettingSe
     }
 
     @Override
+    @Transactional
     public UserSettings create(BaseCreateParam createParam) {
         UserSettings userSettings = new UserSettings();
         BeanUtils.copyProperties(createParam, userSettings);
