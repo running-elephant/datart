@@ -2,6 +2,7 @@
 - http://datart-demo.retech.cc
 - 用户名：demo
 - 密码：123456
+- 用户手册: https://running-elephant.github.io/datart-docs/
 
 ## 1 环境准备
 
