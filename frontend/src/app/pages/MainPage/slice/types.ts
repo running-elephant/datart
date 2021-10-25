@@ -69,7 +69,14 @@ export interface DataProviderConfigTemplate {
 export interface DataProviderAttribute {
   name: string;
   defaultValue: any;
-  type: 'string' | 'password' | 'bool' | 'object' | 'array' | 'schema';
+  type:
+    | 'string'
+    | 'password'
+    | 'bool'
+    | 'object'
+    | 'array'
+    | 'files'
+    | 'schema';
   key?: string;
   required?: boolean;
   description?: string;

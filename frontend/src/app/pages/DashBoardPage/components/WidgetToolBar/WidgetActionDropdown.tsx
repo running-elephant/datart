@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AppstoreFilled, EditFilled } from '@ant-design/icons';
+import { EditFilled } from '@ant-design/icons';
 import { Button, Dropdown, Menu } from 'antd';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { BoardContext } from '../../contexts/BoardContext';

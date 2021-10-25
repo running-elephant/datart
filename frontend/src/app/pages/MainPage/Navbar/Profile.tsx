@@ -120,7 +120,7 @@ export function Profile({ visible, onCancel }: ModalProps) {
         <FormItem label="姓名" name="name">
           <Input placeholder="" />
         </FormItem>
-        <FormItem label="部门" name="department">
+        <FormItem label="部门" name="department">
           <Input />
         </FormItem>
         <Form.Item wrapperCol={{ offset: 7, span: 12 }}>

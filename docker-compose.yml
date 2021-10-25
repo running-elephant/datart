@@ -1,15 +1,12 @@
 version: '3'
 services:
-  datart:
+  datart-dev:
     image: java:8
-    hostname: datart
-    container_name: datart
+    hostname: datart-dev
+    container_name: datart-dev
     restart: always
-    networks:
-      retech_test:
-        ipv4_address: 172.16.1.150
     volumes:
-      - "/root/docker-compose/datart/datart-server-1.0.0-alpha.0:/datart"
+      - "/root/docker-compose/datart/datart-dev/datart-server-1.0.0-alpha.0:/datart"
     entrypoint: [ "sh","/datart/bin/datart-server.sh" ]
     environment:
       - TZ=Asia/Shanghai

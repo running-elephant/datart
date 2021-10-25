@@ -18,22 +18,24 @@
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import * as datartChartHelper from 'app/utils/chart';
+import { fetchPluginChart } from 'app/utils/fetch';
 import { Omit } from 'utils/object';
 import { request } from 'utils/request';
 
 class ChartPluginLoader {
-  async loadPlugins() {
-    const customModelPaths = [
-      './custom-chart-plugins/demo-custom-line-chart.js',
-      // './custom-chart-plugins/demo-echart-3d-bar-chart.js',
-      './custom-chart-plugins/demo-d3js-scatter-chart.js',
-    ];
+  async loadPlugins(paths: string[]) {
+    // const customModelPaths = [
+    //   './custom-chart-plugins/demo-custom-line-chart.js',
+    //   // './custom-chart-plugins/demo-echart-3d-bar-chart.js',
+    //   './custom-chart-plugins/demo-d3js-scatter-chart.js',
+    // ];
 
-    const loadPluginTasks = customModelPaths.map(async path => {
-      const result = await request(path, {
-        baseURL: '/',
-        headers: { Accept: 'application/javascript' },
-      });
+    const loadPluginTasks = (paths || []).map(async path => {
+      const result = await fetchPluginChart(path);
+      if (!result) {
+        return Promise.resolve(result);
+      }
+
       /* Known Issue: file path only allow in src folder by create-react-app file scope limition by CRA
        * Git Issue: https://github.com/facebook/create-react-app/issues/5563
        * Suggestions: Use es6 `import` api to load file and compatible with ES Modules

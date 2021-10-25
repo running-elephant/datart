@@ -79,6 +79,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
 
     @Override
+    @Transactional
     public Role create(BaseCreateParam createParam) {
         Role role = new Role();
         BeanUtils.copyProperties(createParam, role);
@@ -91,6 +92,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
     }
 
     @Override
+    @Transactional
     public boolean delete(String id) {
         return roleMapper.deleteRole(id) > 0;
     }

@@ -74,10 +74,14 @@ export interface ViewViewModel<T = object>
 export interface QueryResult {
   columns: Schema[];
   rows: any[][];
-  pageInfo: { pageNo: number; pageSize: number; total: number };
+  pageInfo: PageInfo;
   script?: string;
 }
-
+export interface PageInfo {
+  pageNo: number;
+  pageSize: number;
+  total: number;
+}
 export interface Schema {
   name: string;
   primaryKey?: boolean;

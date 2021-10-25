@@ -46,15 +46,16 @@ const WidgetToolBar: FC<WidgetToolBarProps> = memo(({ widgetType }) => {
     e.stopPropagation();
   };
   const renderedIcon = () => {
-    if (boardType === 'free') {
-      return null;
-    } else {
-      return rendered ? null : (
-        <Tooltip title="等待加载">
-          <ClockCircleOutlined style={{ color: PRIMARY }} />
-        </Tooltip>
-      );
-    }
+    if (boardType === 'free') return null;
+    if (widget.config.type === 'filter') return null;
+    return rendered ? null : (
+      <Tooltip title="等待加载">
+        <ClockCircleOutlined style={{ color: PRIMARY }} />
+      </Tooltip>
+    );
+  };
+  const loadingIcon = () => {
+    return loading ? <SyncOutlined spin style={{ color: PRIMARY }} /> : null;
   };
   const linkageIcon = () => {
     if (inLinking) {
@@ -78,7 +79,7 @@ const WidgetToolBar: FC<WidgetToolBarProps> = memo(({ widgetType }) => {
     <StyleWrap onClick={ssp} className="widget-tool-bar">
       <Space>
         {renderedIcon()}
-        {loading ? <SyncOutlined spin style={{ color: PRIMARY }} /> : null}
+        {loadingIcon()}
         {linkageIcon()}
         <WidgetActionDropdown widget={widget} />
       </Space>

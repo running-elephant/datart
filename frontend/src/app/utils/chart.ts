@@ -410,7 +410,7 @@ export function flattenHeaderRowsWithoutGroupRow<
   T extends {
     isGroup?: boolean;
     children?: T[];
-  }
+  },
 >(groupedHeaderRow: T) {
   const childRows = (groupedHeaderRow.children || []).flatMap(child =>
     flattenHeaderRowsWithoutGroupRow(child),
@@ -524,11 +524,68 @@ export function getDataColumnMaxAndMin(
   return { min, max };
 }
 
-export function getSeriesTooltips4Scatter(params, tooltipItemConfigs) {
+export function getSeriesTooltips4Scatter(
+  params,
+  tooltipItemConfigs,
+  start?: number,
+) {
   const dataValues = params?.[0]?.value;
   return tooltipItemConfigs.map((config, index) =>
-    valueFormatter(config, dataValues?.[index]),
+    valueFormatter(config, dataValues?.[!!start ? start + index : index]),
   );
+}
+
+export function getSeriesTooltips4Rectangular2(
+  tooltipParam: {
+    data: {
+      name: string;
+      rowData: { [key: string]: any };
+    };
+  },
+  groupConfigs: ChartDataSectionField[],
+  colorConfigs: ChartDataSectionField[],
+  aggConfigs: ChartDataSectionField[],
+  infoConfigs?: ChartDataSectionField[],
+  sizeConfigs?: ChartDataSectionField[],
+): string {
+  const aggConfigName = tooltipParam?.data?.name;
+  const row = tooltipParam?.data?.rowData || {};
+
+  const tooltips: string[] = ([] as any[])
+    .concat(groupConfigs || [])
+    .concat(colorConfigs || [])
+    .concat(
+      aggConfigs.filter(agg => getColumnRenderName(agg) === aggConfigName) ||
+        [],
+    )
+    .concat(sizeConfigs || [])
+    .concat(infoConfigs || [])
+    .map(config => valueFormatter(config, row?.[getValueByColumnKey(config)]));
+  return tooltips.join('<br />');
+}
+
+export function getSeriesTooltips4Polar2(
+  tooltipParam: {
+    data: {
+      name: string;
+      rowData: { [key: string]: any };
+    };
+  },
+  groupConfigs: ChartDataSectionField[],
+  colorConfigs: ChartDataSectionField[],
+  aggConfigs: ChartDataSectionField[],
+  infoConfigs?: ChartDataSectionField[],
+  sizeConfigs?: ChartDataSectionField[],
+): string {
+  const row = tooltipParam?.data?.rowData || {};
+  const tooltips: string[] = ([] as any[])
+    .concat(groupConfigs || [])
+    .concat(colorConfigs || [])
+    .concat(aggConfigs || [])
+    .concat(sizeConfigs || [])
+    .concat(infoConfigs || [])
+    .map(config => valueFormatter(config, row?.[getValueByColumnKey(config)]));
+  return tooltips.join('<br />');
 }
 
 export function getSeriesTooltips4Rectangular(
@@ -542,7 +599,7 @@ export function getSeriesTooltips4Rectangular(
   }
   if (!groupConfigs?.length) {
     return aggConfigs.map(config =>
-      valueFormatter(config, dataColumns?.[0]?.[getColumnRenderName(config)]),
+      valueFormatter(config, dataColumns?.[0]?.[getValueByColumnKey(config)]),
     );
   }
   if (groupConfigs?.[0]) {
@@ -551,7 +608,7 @@ export function getSeriesTooltips4Rectangular(
       dc => dc[getValueByColumnKey(groupConfig)] === params?.[0]?.axisValue,
     );
     return aggConfigs.map(config =>
-      valueFormatter(config, dataRow?.[getColumnRenderName(config)]),
+      valueFormatter(config, dataRow?.[getValueByColumnKey(config)]),
     );
   }
   return [];
@@ -568,7 +625,7 @@ export function getSeriesTooltips4Polar(
   }
   if (!groupConfigs?.length) {
     return aggConfigs.map(config =>
-      valueFormatter(config, dataColumns?.[0]?.[getColumnRenderName(config)]),
+      valueFormatter(config, dataColumns?.[0]?.[getValueByColumnKey(config)]),
     );
   }
   if (groupConfigs?.[0]) {
@@ -576,7 +633,7 @@ export function getSeriesTooltips4Polar(
       groupConfigs?.map(config => dc[config?.colName]).join('-');
     const dataRow = dataColumns.find(dc => rowKeyFn(dc) === params?.name);
     return aggConfigs.map(config =>
-      valueFormatter(config, dataRow?.[getColumnRenderName(config)]),
+      valueFormatter(config, dataRow?.[getValueByColumnKey(config)]),
     );
   }
   return [];
@@ -604,4 +661,44 @@ export function getScatterSymbolSizeFn(
       (val?.[valueIndex] / distance) * scaleRatio * defaultScatterPointPixelSize
     );
   };
+}
+
+export function getExtraSeriesRowData(data) {
+  return {
+    rowData: data,
+  };
+}
+
+export function getColorizeGroupSeriesColumns(
+  dataColumns: any[],
+  groupByKey: string,
+  xAxisColumnName: string,
+  aggregateKeys: string[],
+  infoColumnNames: string[],
+) {
+  const groupedDataColumnObject = dataColumns.reduce((acc, cur) => {
+    const colKey = cur[groupByKey] || 'defaultGroupKey';
+
+    if (!acc[colKey]) {
+      acc[colKey] = [];
+    }
+    const value = aggregateKeys
+      .concat([xAxisColumnName])
+      .concat(infoColumnNames || [])
+      .concat([groupByKey])
+      .reduce((a, k) => {
+        a[k] = cur[k];
+        return a;
+      }, {});
+    acc[colKey].push(value);
+    return acc;
+  }, {});
+
+  let collection = [] as any;
+  Object.entries(groupedDataColumnObject).forEach(([k, v]) => {
+    let a = {};
+    a[k] = v;
+    collection.push(a);
+  });
+  return collection;
 }

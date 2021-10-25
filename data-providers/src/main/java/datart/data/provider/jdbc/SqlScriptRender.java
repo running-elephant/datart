@@ -57,8 +57,6 @@ public class SqlScriptRender extends ScriptRender {
 
     public static final String FALSE_CONDITION = "1=0";
 
-    public static final String DEFAULT_STRING_VALUE_QUOTE = "'";
-
     public static final char SQL_SEP = ';';
 
     public static final String REG_SQL_SINGLE_LINE_COMMENT = "--.*\\n";

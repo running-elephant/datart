@@ -34,7 +34,6 @@ public class DataSourceFactoryDruidImpl implements DataSourceFactory<DruidDataSo
     public DruidDataSource createDataSource(JdbcProperties jdbcProperties) throws Exception {
         Properties properties = configDataSource(jdbcProperties);
         DruidDataSource druidDataSource = (DruidDataSource) DruidDataSourceFactory.createDataSource(properties);
-        druidDataSource.setBreakAfterAcquireFailure(true);
         log.info("druid data source created ({})", druidDataSource.getName());
         return druidDataSource;
     }
@@ -56,16 +55,17 @@ public class DataSourceFactoryDruidImpl implements DataSourceFactory<DruidDataSo
 
         pro.setProperty(DruidDataSourceFactory.PROP_MAXWAIT, JdbcDataProvider.DEFAULT_MAX_WAIT.toString());
 
+        pro.setProperty("druid.mysql.usePingMethod", "false");
+
         // url properties
-        pro.setProperty(DruidDataSourceFactory.PROP_CONNECTIONPROPERTIES, "useUnicode=true;characterEncoding=utf8;characterSetResults=utf8");
+//        pro.setProperty(DruidDataSourceFactory.PROP_CONNECTIONPROPERTIES, "useUnicode=true;characterEncoding=utf8;characterSetResults=utf8");
 
         // wall config
-        pro.setProperty(com.alibaba.druid.pool.DruidDataSourceFactory.PROP_DEFAULTREADONLY, "true");
-        pro.setProperty("druid.wall.updateAllow", "false");
-        pro.setProperty("druid.wall.deleteAllow", "false");
-        pro.setProperty("druid.wall.insertAllow", "false");
-        pro.setProperty("druid.wall.multiStatementAllow", "true");
-        pro.setProperty("druid.failFast", "true");
+//        pro.setProperty("druid.wall.updateAllow", "false");
+//        pro.setProperty("druid.wall.deleteAllow", "false");
+//        pro.setProperty("druid.wall.insertAllow", "false");
+//        pro.setProperty("druid.wall.multiStatementAllow", "true");
+//        pro.setProperty("druid.failFast", "true");
 
         //opt config
         pro.putAll(properties.getProperties());

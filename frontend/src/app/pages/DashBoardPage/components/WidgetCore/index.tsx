@@ -63,14 +63,14 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
   }, [boardType, renderMode, renderedWidgetById, widget.id]);
   // 自动更新
   useEffect(() => {
-    // TODO 优化 组件更新 不止 chart 类型
+    // TODO 优化 组件更新规则
     let timer: NodeJS.Timeout;
     if (
       !widgetInfo.loading &&
       widgetInfo.rendered &&
       boardVisible &&
-      widget.config.type === 'chart' &&
-      widget.config.frequency > 0
+      widget.config.frequency > 0 &&
+      widget.config.autoUpdate
     ) {
       timer = setInterval(() => {
         onWidgetAction('refresh', widget.config.type);
@@ -84,6 +84,7 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
   }, [
     boardVisible,
     onWidgetAction,
+    widget.config.autoUpdate,
     widget.config.frequency,
     widget.config.type,
     widgetInfo.loading,

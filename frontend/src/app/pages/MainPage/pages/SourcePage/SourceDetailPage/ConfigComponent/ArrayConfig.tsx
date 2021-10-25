@@ -1,5 +1,12 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, FormInstance, Space, Table, TableColumnProps } from 'antd';
+import {
+  Button,
+  FormInstance,
+  Popconfirm,
+  Space,
+  Table,
+  TableColumnProps,
+} from 'antd';
 import { ModalForm } from 'app/components';
 import {
   Model,
@@ -21,6 +28,7 @@ import { SourceFormModel } from '../../slice/types';
 
 interface ArrayConfigProps {
   attr: DataProviderAttribute;
+  sourceId?: string;
   value?: object[];
   testLoading?: boolean;
   disabled?: boolean;
@@ -35,6 +43,7 @@ interface ArrayConfigProps {
 export function ArrayConfig({
   attr,
   value,
+  sourceId,
   testLoading,
   disabled,
   allowManage,
@@ -49,21 +58,6 @@ export function ArrayConfig({
   const showForm = useCallback(() => {
     setFormVisible(true);
   }, []);
-
-  const editConfig = useCallback(
-    key => () => {
-      const rowkey = attr.key;
-      if (value && rowkey) {
-        const config = value.find(o => o[rowkey] === key);
-        if (config) {
-          setFormVisible(true);
-          setEditingRowKey(key);
-          formRef.current?.setFieldsValue({ config });
-        }
-      }
-    },
-    [attr, value, formRef],
-  );
 
   const hideForm = useCallback(() => {
     setFormVisible(false);
@@ -80,25 +74,30 @@ export function ArrayConfig({
     if (values) {
       onSubFormTest &&
         onSubFormTest(values.config, result => {
-          const schema = (values.config as any).schema;
-          const lastModel = schema
-            ? (schema as Schema[]).reduce<Model>(
+          const columns = (values.config as any).columns;
+          const lastModel = columns
+            ? (columns as Schema[]).reduce<Model>(
                 (model, column) => ({
                   ...model,
                   [column.name]: {
                     ...column,
-                    category: ColumnCategories.Uncategorized,
+                    category: ColumnCategories.Uncategorized, // FIXEME
                   },
                 }),
                 {},
               )
             : {};
-          setSchemaDataSource(
-            transformQueryResultToModelAndDataSource(result, lastModel)
-              .dataSource,
+          const modelAndDataSource = transformQueryResultToModelAndDataSource(
+            result,
+            lastModel,
           );
+          setSchemaDataSource(modelAndDataSource.dataSource);
           formRef.current?.setFieldsValue({
-            config: { schema: result.columns },
+            config: {
+              columns: Object.entries(modelAndDataSource.model).map(
+                ([name, model]) => ({ name, ...model }),
+              ),
+            },
           });
         });
     }
@@ -106,9 +105,11 @@ export function ArrayConfig({
 
   const subFormRowKeyValidator = useCallback(
     val => {
-      const rowkey = attr.key;
-      if (value && rowkey) {
-        return val === editingRowKey || !value.find(v => v[rowkey] === val);
+      const configRowKey = attr.key;
+      if (value && configRowKey) {
+        return (
+          val === editingRowKey || !value.find(v => v[configRowKey] === val)
+        );
       }
       return true;
     },
@@ -117,10 +118,10 @@ export function ArrayConfig({
 
   const formSave = useCallback(
     (formValues: SourceFormModel) => {
-      const rowkey = attr.key;
-      if (value && rowkey) {
+      const configRowKey = attr.key;
+      if (value && configRowKey) {
         const index = value.findIndex(
-          o => o[rowkey] === formValues.config[rowkey],
+          o => o[configRowKey] === formValues.config[configRowKey],
         );
         if (index >= 0) {
           onChange &&
@@ -136,6 +137,35 @@ export function ArrayConfig({
         onChange && onChange([formValues.config]);
       }
       setFormVisible(false);
+    },
+    [attr, value, onChange],
+  );
+
+  const editConfig = useCallback(
+    tableRowKey => () => {
+      const configRowKey = attr.key;
+      if (value && configRowKey) {
+        const config = value.find(o => o[configRowKey] === tableRowKey);
+        if (config) {
+          setFormVisible(true);
+          setEditingRowKey(tableRowKey);
+          formRef.current?.setFieldsValue({ config });
+          if (config['path'] && config['format']) {
+            test();
+          }
+        }
+      }
+    },
+    [attr, value, formRef, test],
+  );
+
+  const delConfig = useCallback(
+    tableRowKey => () => {
+      const configRowKey = attr.key;
+      if (value && configRowKey) {
+        onChange &&
+          onChange(value.filter(o => o[configRowKey] !== tableRowKey));
+      }
     },
     [attr, value, onChange],
   );
@@ -157,15 +187,19 @@ export function ArrayConfig({
               查看
             </ActionButton>
             {allowManage && (
-              <ActionButton key="del" type="link">
-                删除
-              </ActionButton>
+              <Popconfirm
+                key="del"
+                title="确认删除？"
+                onConfirm={delConfig(record[attr.key!])}
+              >
+                <ActionButton type="link">删除</ActionButton>
+              </Popconfirm>
             )}
           </Space>
         ),
       },
     ],
-    [attr, editConfig, allowManage],
+    [attr, editConfig, delConfig, allowManage],
   );
 
   return (
@@ -202,11 +236,14 @@ export function ArrayConfig({
           <ConfigComponent
             key={childAttr.name}
             attr={childAttr}
+            form={formRef.current}
+            sourceId={sourceId}
             testLoading={testLoading}
             schemaDataSource={schemaDataSource}
             subFormRowKey={attr.key}
             subFormRowKeyValidator={subFormRowKeyValidator}
             disabled={disabled}
+            allowManage={allowManage}
             onTest={test}
           />
         ))}

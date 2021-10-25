@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { BORDER_RADIUS, SPACE_XL } from 'styles/StyleConstants';
+import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
 import { selectOrgId } from '../../../slice/selectors';
 import { useMemberSlice } from '../slice';
 import {
@@ -202,7 +202,7 @@ const Wrapper = styled.div`
 
 const Content = styled.div`
   flex: 1;
-  padding: ${SPACE_XL};
+  padding: ${SPACE_LG};
   overflow-y: auto;
 
   .ant-card {

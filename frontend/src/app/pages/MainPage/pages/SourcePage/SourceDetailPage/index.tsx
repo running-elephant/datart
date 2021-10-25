@@ -9,6 +9,7 @@ import {
   Select,
   Space,
 } from 'antd';
+import { DetailPageHeader } from 'app/components/DetailPageHeader';
 import { Access, useAccess } from 'app/pages/MainPage/Access';
 import debounce from 'debounce-promise';
 import { CommonFormTypes, COMMON_FORM_TITLE_PREFIX } from 'globalConstants';
@@ -49,8 +50,6 @@ import {
 import { Source, SourceFormModel } from '../slice/types';
 import { allowManageSource } from '../utils';
 import { ConfigComponent } from './ConfigComponent';
-import { FileConfig } from './FileConfig';
-import { FileSourceConfig } from './FileConfig/types';
 
 export function SourceDetailPage() {
   const [formType, setFormType] = useState(CommonFormTypes.Add);
@@ -149,7 +148,8 @@ export function SourceDetailPage() {
           ({ dbType }) => dbType === val,
         );
         if (selected) {
-          form.setFieldsValue({ config: { url: selected.url } });
+          const { url, driverClass } = selected;
+          form.setFieldsValue({ config: { url, driverClass } });
         }
       }
     },
@@ -185,7 +185,15 @@ export function SourceDetailPage() {
         const { data } = await request<QueryResult>({
           url: '/data-provider/test',
           method: 'POST',
-          data: { name, type: providerType, properties: config },
+          data: {
+            name,
+            type: providerType,
+            properties:
+              providerType === 'FILE'
+                ? { path: config.path, format: config.format }
+                : config,
+            sourceId: editingSource?.id,
+          },
         });
         callback(data);
       } catch (error) {
@@ -195,7 +203,7 @@ export function SourceDetailPage() {
         setTestLoading(false);
       }
     },
-    [dataProviders, providerType],
+    [dataProviders, providerType, editingSource],
   );
 
   const formSubmit = useCallback(
@@ -272,36 +280,6 @@ export function SourceDetailPage() {
     );
   }, [dispatch, history, orgId, editingSource]);
 
-  const onFileConfigChange = useCallback(
-    (schemas: FileSourceConfig[], callback) => {
-      let configStr = '';
-
-      try {
-        configStr = JSON.stringify({ schemas });
-      } catch (error) {
-        message.error((error as Error).message);
-        throw error;
-      }
-
-      dispatch(
-        editSource({
-          source: {
-            ...(editingSource as Source),
-            config: configStr,
-          },
-          resolve: () => {
-            message.success('修改成功');
-            callback();
-          },
-          reject: () => {
-            callback();
-          },
-        }),
-      );
-    },
-    [dispatch, editingSource],
-  );
-
   const titleLabelPrefix = useMemo(
     () => (isArchived ? '已归档' : COMMON_FORM_TITLE_PREFIX[formType]),
     [isArchived, formType],
@@ -309,119 +287,126 @@ export function SourceDetailPage() {
 
   return (
     <Wrapper>
-      <Card title={`${titleLabelPrefix}数据源`} bordered={false}>
-        <Form
-          name="source_form_"
-          className="detailForm"
-          form={form}
-          labelAlign="left"
-          labelCol={{ offset: 1, span: 5 }}
-          wrapperCol={{ span: 8 }}
-          onFinish={formSubmit}
-        >
-          <Form.Item
-            name="name"
-            label="名称"
-            validateFirst
-            rules={[
-              { required: true, message: '名称不能为空' },
-              {
-                validator: debounce((_, value) => {
-                  if (value === editingSource?.name) {
-                    return Promise.resolve();
-                  }
-                  return request({
-                    url: `/sources/check/name`,
-                    method: 'POST',
-                    params: { name: value, orgId },
-                  }).then(
-                    () => Promise.resolve(),
-                    () => Promise.reject(new Error('名称重复')),
-                  );
-                }, 300),
-              },
-            ]}
-          >
-            <Input disabled={isArchived} />
-          </Form.Item>
-          <Form.Item
-            name="type"
-            label="类型"
-            rules={[{ required: true, message: '类型为必选项' }]}
-          >
-            <Select
-              loading={dataProviderListLoading}
-              disabled={isArchived}
-              onChange={dataProviderChange}
-            >
-              {Object.keys(dataProviders).map(key => (
-                <Select.Option key={key} value={key}>
-                  {key}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          {dataProviderConfigTemplateLoading && <LoadingOutlined />}
-
-          {config?.attributes.map(attr => (
-            <ConfigComponent
-              key={`${providerType}_${attr.name}`}
-              attr={attr}
-              testLoading={testLoading}
-              disabled={isArchived}
-              allowManage={allowManage(true)}
-              onTest={test}
-              onSubFormTest={subFormTest}
-              onDbTypeChange={dbTypeChange}
-            />
-          ))}
+      <DetailPageHeader
+        title={`${titleLabelPrefix}数据源`}
+        actions={
           <Access {...allowManageSource(editingSource?.id)}>
-            <Form.Item label=" " colon={false}>
-              {!isArchived ? (
-                <Space>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={saveSourceLoading}
-                  >
-                    保存
-                  </Button>
-                  {formType === CommonFormTypes.Edit && (
-                    <Popconfirm title="确定移至回收站？" onConfirm={del(true)}>
-                      <Button loading={deleteSourceLoading} danger>
-                        移至回收站
-                      </Button>
-                    </Popconfirm>
-                  )}
-                </Space>
-              ) : (
-                <Space>
-                  <Popconfirm title="确定还原？" onConfirm={unarchive}>
-                    <Button loading={unarchiveSourceLoading}>还原</Button>
-                  </Popconfirm>
-                  <Popconfirm title="确认删除？" onConfirm={del(false)}>
+            {!isArchived ? (
+              <Space>
+                <Button
+                  type="primary"
+                  loading={saveSourceLoading}
+                  onClick={form.submit}
+                >
+                  保存
+                </Button>
+                {formType === CommonFormTypes.Edit && (
+                  <Popconfirm title="确定移至回收站？" onConfirm={del(true)}>
                     <Button loading={deleteSourceLoading} danger>
-                      删除
+                      移至回收站
                     </Button>
                   </Popconfirm>
-                </Space>
-              )}
-            </Form.Item>
+                )}
+              </Space>
+            ) : (
+              <Space>
+                <Popconfirm title="确定还原？" onConfirm={unarchive}>
+                  <Button loading={unarchiveSourceLoading}>还原</Button>
+                </Popconfirm>
+                <Popconfirm title="确认删除？" onConfirm={del(false)}>
+                  <Button loading={deleteSourceLoading} danger>
+                    删除
+                  </Button>
+                </Popconfirm>
+              </Space>
+            )}
           </Access>
-        </Form>
-      </Card>
-      {formType === CommonFormTypes.Edit && providerType === 'FILE' && (
-        <FileConfig
-          sourceId={sourceId}
-          disabled={isArchived}
-          onChange={onFileConfigChange}
-        />
-      )}
+        }
+      />
+      <Content>
+        <Card bordered={false}>
+          <Form
+            name="source_form_"
+            className="detailForm"
+            form={form}
+            labelAlign="left"
+            labelCol={{ offset: 1, span: 5 }}
+            wrapperCol={{ span: 8 }}
+            onFinish={formSubmit}
+          >
+            <Form.Item
+              name="name"
+              label="名称"
+              validateFirst
+              rules={[
+                { required: true, message: '名称不能为空' },
+                {
+                  validator: debounce((_, value) => {
+                    if (value === editingSource?.name) {
+                      return Promise.resolve();
+                    }
+                    return request({
+                      url: `/sources/check/name`,
+                      method: 'POST',
+                      params: { name: value, orgId },
+                    }).then(
+                      () => Promise.resolve(),
+                      () => Promise.reject(new Error('名称重复')),
+                    );
+                  }, 300),
+                },
+              ]}
+            >
+              <Input disabled={isArchived} />
+            </Form.Item>
+            <Form.Item
+              name="type"
+              label="类型"
+              rules={[{ required: true, message: '类型为必选项' }]}
+            >
+              <Select
+                loading={dataProviderListLoading}
+                disabled={isArchived}
+                onChange={dataProviderChange}
+              >
+                {Object.keys(dataProviders).map(key => (
+                  <Select.Option key={key} value={key}>
+                    {key}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+            {dataProviderConfigTemplateLoading && <LoadingOutlined />}
+
+            {(providerType !== 'FILE' || formType === CommonFormTypes.Edit) &&
+              config?.attributes.map(attr => (
+                <ConfigComponent
+                  key={`${providerType}_${attr.name}`}
+                  attr={attr}
+                  form={form}
+                  sourceId={editingSource?.id}
+                  testLoading={testLoading}
+                  disabled={isArchived}
+                  allowManage={allowManage(true)}
+                  onTest={test}
+                  onSubFormTest={subFormTest}
+                  onDbTypeChange={dbTypeChange}
+                />
+              ))}
+          </Form>
+        </Card>
+      </Content>
     </Wrapper>
   );
 }
 
 const Wrapper = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+`;
+
+const Content = styled.div`
   flex: 1;
   padding: ${SPACE_LG};
   overflow-y: auto;

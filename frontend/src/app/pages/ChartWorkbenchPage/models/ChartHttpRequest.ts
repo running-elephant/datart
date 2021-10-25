@@ -197,6 +197,9 @@ export class ChartDataRequestBuilder {
             .filter(Boolean) as any[];
         }
         const v = field.filter?.condition?.value;
+        if (!v) {
+          return null;
+        }
         return [
           {
             value: _convertTime(field.filter?.condition?.visualType, v),

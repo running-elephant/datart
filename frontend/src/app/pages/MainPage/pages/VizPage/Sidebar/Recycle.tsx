@@ -21,6 +21,7 @@ import { getPath, stopPPG } from 'utils/utils';
 import {
   PermissionLevels,
   ResourceTypes,
+  VizResourceSubTypes,
 } from '../../PermissionPage/constants';
 import { SaveFormContext } from '../SaveFormContext';
 import { selectVizs } from '../slice/selectors';
@@ -87,7 +88,7 @@ export const Recycle = memo(
                 vizType,
                 type: CommonFormTypes.Edit,
                 visible: true,
-                initialValues: { name, parentId: void 0 },
+                initialValues: { id, name, parentId: void 0 },
                 onSave: (values, onClose) => {
                   dispatch(
                     unarchiveViz({
@@ -126,7 +127,7 @@ export const Recycle = memo(
         <List
           dataSource={list}
           loading={listLoading && { indicator: <LoadingOutlined /> }}
-          renderItem={({ id, name, vizType, deleteLoading }) => {
+          renderItem={({ id, name, vizType, loading }) => {
             let allowManage = false;
             if (type === 'viz') {
               const viz = vizs.find(v => v.id === id);
@@ -134,7 +135,7 @@ export const Recycle = memo(
                 ? getPath(
                     vizs as Array<{ id: string; parentId: string }>,
                     { id, parentId: viz.parentId },
-                    [],
+                    VizResourceSubTypes.Folder,
                   )
                 : [id];
               allowManage = getCascadeAccess(
@@ -145,7 +146,7 @@ export const Recycle = memo(
                 PermissionLevels.Manage,
               );
             } else {
-              allowManage = calcAc(
+              allowManage = !!calcAc(
                 isOwner,
                 permissionMap,
                 ResourceTypes.Viz,
@@ -158,7 +159,7 @@ export const Recycle = memo(
                 selected={selectedId === id}
                 className={classnames({
                   recycle: true,
-                  disabled: deleteLoading,
+                  disabled: loading,
                 })}
                 onClick={toDetail(id)}
                 actions={[

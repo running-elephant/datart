@@ -25,10 +25,7 @@ import datart.core.entity.ext.UserBaseInfo;
 import datart.security.base.PasswordToken;
 import datart.server.base.dto.ResponseData;
 import datart.server.base.dto.UserProfile;
-import datart.server.base.params.ChangeUserPasswordParam;
-import datart.server.base.params.UserRegisterParam;
-import datart.server.base.params.UserResetPasswordParam;
-import datart.server.base.params.UserUpdateParam;
+import datart.server.base.params.*;
 import datart.server.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -112,10 +109,11 @@ public class UserController extends BaseController {
     @SkipLogin
     @ApiOperation(value = "User Login")
     @PostMapping(value = "/login")
-    public ResponseData<UserBaseInfo> login(@RequestParam(required = false) String username,
-                                            @RequestParam(required = false) String password,
+    public ResponseData<UserBaseInfo> login(@RequestBody UserLoginParam loginParam,
                                             HttpServletResponse response) {
-        PasswordToken passwordToken = new PasswordToken(username, password, System.currentTimeMillis());
+        PasswordToken passwordToken = new PasswordToken(loginParam.getUsername(),
+                loginParam.getPassword(),
+                System.currentTimeMillis());
         String token = userService.login(passwordToken);
         response.setHeader(Const.TOKEN, token);
         return ResponseData.success(new UserBaseInfo(securityManager.getCurrentUser()));

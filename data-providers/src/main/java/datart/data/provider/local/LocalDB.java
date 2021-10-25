@@ -113,11 +113,9 @@ public class LocalDB {
     private static Dataframe executeQuery(String sql, Connection connection, PageInfo pageInfo) throws SQLException {
         ResultSet resultSet = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY).executeQuery(sql);
 
-        if (pageInfo.getPageNo() <= 1) {
-            resultSet.last();
-            pageInfo.setTotal(resultSet.getRow());
-            pageInfo.setPageNo(1);
-        }
+        resultSet.last();
+        pageInfo.setTotal(resultSet.getRow());
+        resultSet.first();
 
         resultSet.absolute((int) Math.min(pageInfo.getTotal(), (pageInfo.getPageNo() - 1) * pageInfo.getPageSize()));
         Dataframe dataframe = ResultSetMapper.mapToTableData(resultSet, pageInfo.getPageSize());

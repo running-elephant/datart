@@ -219,6 +219,10 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                 .variables(variables)
                 .build();
 
+        if (viewExecuteParam.getPageInfo().getPageNo() < 1) {
+            viewExecuteParam.getPageInfo().setPageNo(1);
+        }
+
         ExecuteParam queryParam = ExecuteParam.builder()
                 .columns(viewExecuteParam.getColumns())
                 .keywords(viewExecuteParam.getKeywords())
@@ -276,6 +280,11 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         }
         String res = AESUtil.decrypt(value.replaceFirst(Const.ENCRYPT_FLAG, ""));
         return res;
+    }
+
+    @Override
+    public void updateSource(DataProviderSource source) {
+        dataProviderManager.updateSource(source);
     }
 
     private List<ScriptVariable> removePermissionVariables(List<ScriptVariable> variables) {

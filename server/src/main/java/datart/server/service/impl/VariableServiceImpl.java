@@ -75,6 +75,7 @@ public class VariableServiceImpl extends BaseService implements VariableService 
     }
 
     @Override
+    @Transactional
     public Variable create(BaseCreateParam createParam) {
         VariableCreateParam variableCreateParam = (VariableCreateParam) createParam;
         checkUnique(variableCreateParam.getOrgId(), null, variableCreateParam.getName());
@@ -121,6 +122,16 @@ public class VariableServiceImpl extends BaseService implements VariableService 
             variables = variableMapper.selectOrgVariables(orgId);
         }
         return convertVariables(variables);
+    }
+
+    @Override
+    public List<Variable> listOrgQueryVariables(String orgId) {
+        return variableMapper.selectOrgQueryVariables(orgId);
+    }
+
+    @Override
+    public List<Variable> listViewQueryVariables(String viewId) {
+        return variableMapper.selectViewQueryVariables(viewId);
     }
 
 

@@ -72,7 +72,7 @@ export interface ArchivedViz {
   id: string;
   name: string;
   vizType: VizType;
-  deleteLoading: boolean;
+  loading: boolean;
 }
 
 export interface ChartPreview {
@@ -88,6 +88,7 @@ export interface VizTab {
   name: string;
   type: VizType;
   parentId: string | null;
+  permissionId?: string;
   search?: string;
 }
 
