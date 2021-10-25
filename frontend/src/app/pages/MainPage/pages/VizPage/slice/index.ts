@@ -66,9 +66,6 @@ const slice = createSlice({
       }
     },
 
-    changeEditingStoryId(state, action: PayloadAction<string>) {
-      state.editingStoryId = action.payload;
-    },
     changePlayingStoryId(state, action: PayloadAction<string>) {
       state.playingStoryId = action.payload;
     },
