@@ -34,4 +34,6 @@ public interface DataProviderService {
 
     String decryptValue(String value);
 
+    void updateSource(DataProviderSource source);
+
 }

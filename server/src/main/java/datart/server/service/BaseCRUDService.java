@@ -72,6 +72,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
         return true;
     }
 
+    @Transactional
     default boolean delete(String id, boolean archive) {
         if (!safeDelete(id)) {
             throw new RuntimeException("Associated data exists , cannot be deleted!");
@@ -79,6 +80,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
         return archive ? archive(id) : delete(id);
     }
 
+    @Transactional
     default boolean delete(String id) {
         E retrieve = retrieve(id);
         requirePermission(retrieve, Const.MANAGE);
@@ -87,6 +89,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
         return getDefaultMapper().deleteByPrimaryKey(id) == 1;
     }
 
+    @Transactional
     default boolean archive(String id) {
         E entity = retrieve(id);
         requirePermission(entity, Const.MANAGE);
@@ -110,6 +113,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
         return true;
     }
 
+    @Transactional
     default boolean unarchive(String id) {
         E entity = retrieve(id);
         requirePermission(entity, Const.MANAGE);

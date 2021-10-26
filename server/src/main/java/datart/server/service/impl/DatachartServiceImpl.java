@@ -76,16 +76,16 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
     @Override
     @Transactional
     public boolean archive(String id) {
-        //remove from folder
         DatachartService.super.archive(id);
+        //remove from folder
         return 1 == folderMapper.deleteByRelTypeAndId(ResourceType.DATACHART.name(), id);
     }
 
     @Override
     @Transactional
     public boolean delete(String id) {
-        //remove from folder
         DatachartService.super.delete(id);
+        //remove from folder
         return 1 == folderMapper.deleteByRelTypeAndId(ResourceType.DATACHART.name(), id);
     }
 
@@ -95,6 +95,7 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
     }
 
     @Override
+    @Transactional
     public void deletePermissions(Datachart datachart) {
         rrrMapper.deleteByResource(ResourceType.DATACHART.name(), datachart.getId());
     }
@@ -134,7 +135,6 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
     }
 
     @Override
-    @Transactional
     public Folder createWithFolder(BaseCreateParam createParam) {
         // check unique
         DatachartCreateParam param = (DatachartCreateParam) createParam;

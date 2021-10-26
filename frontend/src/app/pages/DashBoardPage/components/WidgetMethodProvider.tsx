@@ -112,6 +112,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
               id: wid,
             }),
           );
+          dispatch(editDashBoardInfoActions.changeShowBlockMask(false));
           break;
         case 'media':
           dispatch(

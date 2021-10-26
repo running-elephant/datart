@@ -33,6 +33,7 @@ import datart.server.service.StoryboardService;
 import datart.server.service.StorypageService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -109,6 +110,7 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
     }
 
     @Override
+    @Transactional
     public Storyboard create(BaseCreateParam createParam) {
         Storyboard storyboard = StoryboardService.super.create(createParam);
         grantDefaultPermission(storyboard);
@@ -116,6 +118,7 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
     }
 
     @Override
+    @Transactional
     public void grantDefaultPermission(Storyboard storyboard) {
         if (securityManager.isOrgOwner(storyboard.getOrgId())) {
             return;

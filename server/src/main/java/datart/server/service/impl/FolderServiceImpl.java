@@ -123,6 +123,7 @@ public class FolderServiceImpl extends BaseService implements FolderService {
     }
 
     @Override
+    @Transactional
     public boolean delete(String id) {
         List<Folder> folders = folderMapper.selectByParentId(id);
         if (!CollectionUtils.isEmpty(folders)) {

@@ -3,7 +3,7 @@ package datart.data.provider;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import datart.core.base.consts.Const;
+import datart.core.common.FileUtils;
 import datart.core.data.provider.*;
 import datart.data.provider.base.DataProviderException;
 import datart.data.provider.base.JdbcDriverInfo;
@@ -21,6 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.sql.DataSource;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -35,7 +37,7 @@ public class JdbcDataProvider extends DataProvider {
 
     private static final String JDBC_DRIVER_BUILD_IN = "/jdbc-driver.yml";
 
-    private static final String JDBC_DRIVER_EXT = "/jdbc-driver-ext.yml";
+    private static final String JDBC_DRIVER_EXT = "config/jdbc-driver-ext.yml";
 
     public static final String DB_TYPE = "dbType";
 
@@ -270,7 +272,8 @@ public class JdbcDataProvider extends DataProvider {
             //Build in database types
             Map<String, Map<String, String>> buildIn = loadYml(JDBC_DRIVER_BUILD_IN);
             // user ext database types
-            buildIn.putAll(loadYml(JDBC_DRIVER_EXT));
+
+            buildIn.putAll(loadYml(new File(FileUtils.concatPath(System.getProperty("user.dir"), JDBC_DRIVER_EXT))));
 
             return buildIn.entrySet().stream().map(entry -> {
                 try {
@@ -296,10 +299,32 @@ public class JdbcDataProvider extends DataProvider {
             }
         }
 
+        private static Map<String, Map<String, String>> loadYml(File file) {
+            try (InputStream inputStream = new FileInputStream(file)) {
+                Yaml yaml = new Yaml();
+                return yaml.loadAs(inputStream, HashMap.class);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 
     @Override
     public String getConfigFile() {
         return "jdbc-data-provider.json";
+    }
+
+    @Override
+    public void resetSource(DataProviderSource source) {
+        try {
+            JdbcDataProviderAdapter adapter = cachedProviders.remove(source.getSourceId());
+            if (adapter != null) {
+                adapter.close();
+            }
+            log.info("jdbc source '{}-{}' updated, source has been reset", source.getSourceId(), source.getName());
+        } catch (Exception e) {
+            log.error("source reset error.", e);
+        }
     }
 }

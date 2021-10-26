@@ -2,6 +2,11 @@ spring:
   application:
     name: datart-server
 
+  datasource:
+    druid:
+      mysql:
+        usePingMethod: false
+
   main:
     banner-mode: off
 
@@ -14,7 +19,7 @@ spring:
 
   web:
     resources:
-      static-locations: classpath:/static/, file:${datart.env.file-path}
+      static-locations: file:${datart.env.file-path}
 
   messages:
     basename: i18n.datart_i18n
@@ -43,7 +48,6 @@ spring:
             threadCount: 10
             threadPriority: 5
 
-
 mybatis:
   type-aliases-package: datart.core.entity
   configuration:
@@ -54,8 +58,8 @@ logging:
   level:
     datart:
       core:
-        mappers: trace
-      data.provider.jdbc: debug
+        mappers: info
+      data.provider.jdbc: info
   config: config/logback.xml
 
 shiro:
@@ -64,5 +68,6 @@ shiro:
 
 
 datart:
+  version: 1.0.0-alpha.1
   server:
     path-prefix: /api/v1

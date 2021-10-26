@@ -115,9 +115,9 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     @Override
     @Transactional
     public boolean archive(String id) {
+        DashboardService.super.archive(id);
         //remove from folder
-        folderMapper.deleteByRelTypeAndId(ResourceType.DASHBOARD.name(), id);
-        return DashboardService.super.archive(id);
+        return folderMapper.deleteByRelTypeAndId(ResourceType.DASHBOARD.name(), id) == 1;
     }
 
     @Override
@@ -237,6 +237,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     }
 
     @Override
+    @Transactional
     public boolean update(BaseUpdateParam updateParam) {
 
         DashboardUpdateParam param = (DashboardUpdateParam) updateParam;

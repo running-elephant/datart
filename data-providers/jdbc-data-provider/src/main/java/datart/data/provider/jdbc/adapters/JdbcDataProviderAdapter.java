@@ -112,7 +112,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         try (Connection conn = getConn()) {
             Set<String> tables = new HashSet<>();
             DatabaseMetaData metadata = conn.getMetaData();
-            try (ResultSet rs = metadata.getTables(database, conn.getSchema(), null, null)) {
+            try (ResultSet rs = metadata.getTables(database, conn.getSchema(), "%", new String[]{"TABLE", "VIEW"})) {
                 while (rs.next()) {
                     String tableName = rs.getString(3);
                     tables.add(tableName);
@@ -195,7 +195,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         }
     }
 
-    private Connection getConn() throws SQLException {
+    protected Connection getConn() throws SQLException {
         return dataSource.getConnection();
     }
 
@@ -205,7 +205,6 @@ public class JdbcDataProviderAdapter implements Closeable {
             return;
         }
         JdbcDataProvider.getDataSourceFactory().destroy(dataSource);
-
     }
 
     public boolean supportPaging() {
@@ -230,7 +229,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         return sqlDialect;
     }
 
-    private void initPageInfo(PageInfo pageInfo, ResultSet resultSet) throws SQLException {
+    protected void initPageInfo(PageInfo pageInfo, ResultSet resultSet) throws SQLException {
         try {
             if (pageInfo.getPageNo() < 1) {
                 pageInfo.setPageNo(1);
