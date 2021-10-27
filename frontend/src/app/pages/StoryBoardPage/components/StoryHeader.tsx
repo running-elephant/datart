@@ -27,7 +27,7 @@ const TITLE_SUFFIX = ['[已归档]', '[未发布]'];
 
 interface StoryHeaderProps {
   name?: string;
-  storyEditing: boolean;
+
   status?: number;
   publishLoading?: boolean;
   onPublish?: () => void;
@@ -44,7 +44,7 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
     publishLoading,
     playStory,
     onPublish,
-    storyEditing,
+
     allowShare,
     allowManage,
   }) => {
