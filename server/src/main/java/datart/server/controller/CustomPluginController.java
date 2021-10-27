@@ -41,9 +41,9 @@ public class CustomPluginController extends BaseController {
         this.customPluginService = customPluginService;
     }
 
+    @SkipLogin
     @ApiOperation(value = "scan custom chart plugins")
     @GetMapping(value = "/custom/charts")
-    @SkipLogin
     public ResponseData<Set<String>> scanCustomCharts() throws MalformedURLException {
         return ResponseData.success(customPluginService.scanCustomChartPlugins());
     }
