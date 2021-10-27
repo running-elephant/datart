@@ -20,6 +20,7 @@ package datart.data.provider.jdbc.adapters;
 
 import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
+import datart.core.base.consts.ValueType;
 import datart.core.common.Application;
 import datart.core.common.BeanUtils;
 import datart.core.data.provider.Column;
@@ -75,7 +76,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         BeanUtils.validate(properties);
         try {
             Class.forName(properties.getDriverClass());
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             String errMsg = "Driver class not found " + properties.getDriverClass();
             log.error(errMsg, e);
             throw new DataProviderException(errMsg);
@@ -167,7 +168,7 @@ public class JdbcDataProviderAdapter implements Closeable {
                 }
                 statement = conn.createStatement();
             }
-            statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), Integer.MAX_VALUE));
+            statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
             try (ResultSet resultSet = statement.executeQuery(selectSql)) {
 
                 initPageInfo(pageInfo, resultSet);
@@ -188,7 +189,7 @@ public class JdbcDataProviderAdapter implements Closeable {
                         count++;
                     }
                 }
-                dataframe = ResultSetMapper.mapToTableData(resultSet, pageInfo.getPageSize());
+                dataframe = parseResult(resultSet, pageInfo.getPageSize());
                 dataframe.setPageInfo(pageInfo);
                 return dataframe;
             }
@@ -240,6 +241,21 @@ public class JdbcDataProviderAdapter implements Closeable {
         } catch (Exception e) {
             pageInfo.setTotal(pageInfo.getPageSize());
         }
+    }
+
+    protected Dataframe parseResult(ResultSet rs, long count) throws SQLException {
+        return ResultSetMapper.mapToTableData(rs, count);
+    }
+
+    protected List<Column> getColumns(ResultSet rs) throws SQLException {
+        ArrayList<Column> columns = new ArrayList<>();
+        for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+            String columnTypeName = rs.getMetaData().getColumnTypeName(i);
+            String columnName = rs.getMetaData().getColumnName(i);
+            ValueType valueType = DataTypeUtils.sqlType2DataType(columnTypeName);
+            columns.add(new Column(columnName, valueType));
+        }
+        return columns;
     }
 
 }

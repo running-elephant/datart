@@ -19,7 +19,14 @@
 package datart.data.provider.jdbc.adapters;
 
 
+import datart.core.data.provider.Column;
+import datart.core.data.provider.Dataframe;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
@@ -28,4 +35,10 @@ public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
         return Collections.singleton(jdbcProperties.getUser());
     }
 
+
+    @Override
+    protected Dataframe parseResult(ResultSet rs, long count) throws SQLException {
+
+        return super.parseResult(rs, count);
+    }
 }
