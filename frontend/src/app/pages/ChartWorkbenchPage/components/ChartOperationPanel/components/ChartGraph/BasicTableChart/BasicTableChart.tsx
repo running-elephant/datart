@@ -144,16 +144,16 @@ class BasicTableChart extends ReactChart {
   }
 
   getTableComponents(styleConfigs) {
+    const tableHeaders = this.getStyleValue(styleConfigs, [
+      'header',
+      'modal',
+      'tableHeaders',
+    ]);
+
     return {
       header: {
         cell: props => {
           const uid = props.uid;
-          const tableHeaders = this.getStyleValue(styleConfigs, [
-            'header',
-            'modal',
-            'tableHeaders',
-          ]);
-
           const _findRow = (uid, headers) => {
             let header = headers.find(h => h.uid === uid);
             if (!!header) {
@@ -376,14 +376,14 @@ class BasicTableChart extends ReactChart {
       tableHeaderStyles,
       dataColumns,
     ) =>
-      (tableHeaderStyles || [])
-        .map(style => {
-          return this.getHeaderColumnGroup(
+      tableHeaderStyles
+        ?.map(style =>
+          this.getHeaderColumnGroup(
             style,
             _getFlatColumns(groupConfigs, aggregateConfigs, dataColumns),
-          );
-        })
-        .filter(column => !!column);
+          ),
+        )
+        ?.filter(column => !!column) || [];
     return !tableHeaderStyles || tableHeaderStyles.length === 0
       ? _getFlatColumns(groupConfigs, aggregateConfigs, dataColumns)
       : _getGroupColumns(
@@ -402,6 +402,7 @@ class BasicTableChart extends ReactChart {
       return column;
     }
     return {
+      uid: tableHeader?.uid,
       title: tableHeader.label,
       onHeaderCell: record => {
         return {
