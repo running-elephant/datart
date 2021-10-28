@@ -48,7 +48,6 @@ public class FileDataProvider extends DefaultDataProvider {
 
     public static final String FILE_PATH = "path";
 
-
     @Override
     public List<Dataframe> loadFullDataFromSource(DataProviderSource config) throws Exception {
         Map<String, Object> properties = config.getProperties();
