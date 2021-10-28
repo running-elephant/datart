@@ -27,9 +27,17 @@ public interface DatachartMapperExt extends DatachartMapper {
     List<Datachart> listByIds(Set<String> datachartIds);
 
     @Select({
-            "SELECT COUNT(*) FROM rel_widget_element rwe WHERE rel_type='DATACHART' AND rel_id=#{datachartId}"
+            "SELECT",
+            "COUNT(*)",
+            "FROM",
+            "rel_widget_element rwe ",
+            "JOIN widget w ON w.id = rwe.widget_id ",
+            "JOIN dashboard d ON w.dashboard_id = d.id  ",
+            "AND d.`status` !=0 ",
+            "WHERE ",
+            "rwe.rel_type = 'DATACHART'  ",
+            "AND rwe.rel_id = #{datachartId}"
     })
     int countWidgetRels(String datachartId);
-
-
+    
 }
