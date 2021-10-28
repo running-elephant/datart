@@ -1,4 +1,5 @@
-import { TreeDataNode } from 'antd';
+import { TreeDataNode, TreeNodeProps } from 'antd';
+import { ReactElement } from 'react';
 import { SubjectTypes } from '../../PermissionPage/constants';
 import { RowPermissionRaw, Variable } from '../../VariablePage/slice/types';
 import {
@@ -145,4 +146,16 @@ export interface DeleteViewParams {
   id: string;
   archive?: boolean;
   resolve: () => void;
+}
+
+export interface SelectViewTreeProps {
+  getIcon: (
+    o: ViewSimpleViewModel,
+  ) => ReactElement | ((props: TreeNodeProps) => ReactElement);
+  getDisabled: (o: ViewSimpleViewModel) => boolean;
+}
+
+export interface SelectViewFolderTreeProps {
+  id?: string;
+  getDisabled: (o: ViewSimpleViewModel, path: string[]) => boolean;
 }
