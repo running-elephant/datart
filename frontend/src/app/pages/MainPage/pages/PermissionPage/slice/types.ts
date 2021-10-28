@@ -92,3 +92,8 @@ export interface GrantPermissionParams {
   };
   resolve: () => void;
 }
+
+export interface SelectPrivilegesProps {
+  viewpoint: Viewpoints;
+  dataSourceType: ResourceTypes | SubjectTypes;
+}
