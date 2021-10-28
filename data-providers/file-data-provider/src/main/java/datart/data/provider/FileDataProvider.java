@@ -134,7 +134,7 @@ public class FileDataProvider extends DefaultDataProvider {
         if (isHeader) {
             for (Object value : typedValues) {
                 Column column = new Column();
-                ValueType valueType = DataTypeUtils.javaType2DataType(value.getClass().getSimpleName());
+                ValueType valueType = DataTypeUtils.javaType2DataType(value);
                 column.setType(valueType);
                 column.setName(value.toString());
                 columns.add(column);
@@ -143,7 +143,7 @@ public class FileDataProvider extends DefaultDataProvider {
         } else {
             for (int i = 0; i < typedValues.size(); i++) {
                 Column column = new Column();
-                ValueType valueType = DataTypeUtils.javaType2DataType(typedValues.get(i).getClass().getSimpleName());
+                ValueType valueType = DataTypeUtils.javaType2DataType(typedValues.get(i));
                 column.setType(valueType);
                 column.setName("column" + i);
                 columns.add(column);
