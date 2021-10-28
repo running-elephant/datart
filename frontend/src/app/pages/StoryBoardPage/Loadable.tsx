@@ -27,8 +27,3 @@ export const PPTPlayer = defaultLazyLoad(
   () => import('./Player'),
   module => module.StoryPlayer,
 );
-
-export const StoryBoardPreview = defaultLazyLoad(
-  () => import('./Preview'),
-  module => module.StoryPreview,
-);

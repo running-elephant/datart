@@ -63,4 +63,6 @@ const SectionWrap = styled.section`
   width: 100% !important;
   height: 100% !important;
   padding: 0 !important;
+
+ 
 `;
