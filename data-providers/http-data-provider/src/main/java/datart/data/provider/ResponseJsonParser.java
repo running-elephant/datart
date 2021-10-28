@@ -93,7 +93,7 @@ public class ResponseJsonParser implements HttpResponseParser {
                 if (val instanceof JSONObject || val instanceof JSONArray) {
                     val = val.toString();
                 }
-                column.setType(DataTypeUtils.javaType2DataType(val.getClass().getSimpleName()));
+                column.setType(DataTypeUtils.javaType2DataType(val));
             } else {
                 column.setType(ValueType.STRING);
             }
