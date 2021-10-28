@@ -1,11 +1,9 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { TreeNodeProps } from 'antd';
-import { ReactElement } from 'react';
 import { RootState } from 'types';
 import { listToTree } from 'utils/utils';
 import { initialState } from '.';
 import { VizResourceSubTypes } from '../../PermissionPage/constants';
-import { FolderViewModel } from './types';
+import { SelectVizFolderTree, SelectVizTree } from './types';
 
 const selectDomain = (state: RootState) => state.viz || initialState;
 
@@ -18,20 +16,8 @@ export const makeSelectVizTree = () =>
   createSelector(
     [
       selectVizs,
-      (
-        _,
-        props: {
-          getIcon: (
-            o: FolderViewModel,
-          ) => ReactElement | ((props: TreeNodeProps) => ReactElement);
-        },
-      ) => props.getIcon,
-      (
-        _,
-        props: {
-          getDisabled?: (o: FolderViewModel) => boolean;
-        },
-      ) => props.getDisabled,
+      (_, props: SelectVizTree) => props.getIcon,
+      (_, props: SelectVizTree) => props.getDisabled,
     ],
     (vizs, getIcon, getDisabled) =>
       listToTree(
@@ -46,13 +32,8 @@ export const makeSelectVizFolderTree = () =>
   createSelector(
     [
       selectVizs,
-      (_, props: { id?: string }) => props.id,
-      (
-        _,
-        props: {
-          getDisabled: (o: FolderViewModel, path: string[]) => boolean;
-        },
-      ) => props.getDisabled,
+      (_, props: SelectVizFolderTree) => props.id,
+      (_, props: SelectVizFolderTree) => props.getDisabled,
     ],
     (vizs, id, getDisabled) =>
       listToTree(
