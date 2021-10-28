@@ -1,8 +1,12 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from 'types';
 import { initialState } from '.';
-import { ResourceTypes, SubjectTypes, Viewpoints } from '../constants';
-import { ResourcePermissions, SubjectPermissions } from './types';
+import { SubjectTypes, Viewpoints } from '../constants';
+import {
+  ResourcePermissions,
+  SelectPrivilegesProps,
+  SubjectPermissions,
+} from './types';
 
 const selectDomain = (state: RootState) => state.permission || initialState;
 
@@ -85,9 +89,8 @@ export const makeSelectPrivileges = () =>
   createSelector(
     [
       selectPermissionMap,
-      (_, props: { viewpoint: Viewpoints }) => props.viewpoint,
-      (_, props: { dataSourceType: ResourceTypes | SubjectTypes }) =>
-        props.dataSourceType,
+      (_, props: SelectPrivilegesProps) => props.viewpoint,
+      (_, props: SelectPrivilegesProps) => props.dataSourceType,
     ],
     (permissionMap, viewpoint, dataSourceType) => {
       if (viewpoint === Viewpoints.Resource) {

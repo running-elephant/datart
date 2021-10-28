@@ -1,11 +1,13 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { TreeNodeProps } from 'antd';
-import { ReactElement } from 'react';
 import { RootState } from 'types';
 import { listToTree } from 'utils/utils';
 import { initialState } from '.';
 import { ResourceTypes } from '../../PermissionPage/constants';
-import { ViewSimpleViewModel, ViewViewModel } from './types';
+import {
+  SelectViewFolderTreeProps,
+  SelectViewTreeProps,
+  ViewViewModel,
+} from './types';
 
 const selectDomain = (state: RootState) => state.view || initialState;
 
@@ -23,20 +25,8 @@ export const makeSelectViewTree = () =>
   createSelector(
     [
       selectViews,
-      (
-        _,
-        props: {
-          getIcon: (
-            o: ViewSimpleViewModel,
-          ) => ReactElement | ((props: TreeNodeProps) => ReactElement);
-        },
-      ) => props.getIcon,
-      (
-        _,
-        props: {
-          getDisabled: (o: ViewSimpleViewModel) => boolean;
-        },
-      ) => props.getDisabled,
+      (_, props: SelectViewTreeProps) => props.getIcon,
+      (_, props: SelectViewTreeProps) => props.getDisabled,
     ],
     (views, getIcon, getDisabled) =>
       listToTree(views, null, [ResourceTypes.View], { getIcon, getDisabled }),
@@ -46,13 +36,8 @@ export const makeSelectViewFolderTree = () =>
   createSelector(
     [
       selectViews,
-      (_, props: { id?: string }) => props.id,
-      (
-        _,
-        props: {
-          getDisabled: (o: ViewSimpleViewModel, path: string[]) => boolean;
-        },
-      ) => props.getDisabled,
+      (_, props: SelectViewFolderTreeProps) => props.id,
+      (_, props: SelectViewFolderTreeProps) => props.getDisabled,
     ],
     (views, id, getDisabled) =>
       listToTree(

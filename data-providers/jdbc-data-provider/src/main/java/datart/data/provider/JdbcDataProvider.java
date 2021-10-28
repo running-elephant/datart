@@ -145,9 +145,14 @@ public class JdbcDataProvider extends DataProvider {
         jdbcProperties.setDriverClass(StringUtils.isEmpty(driverClass) ?
                 ProviderFactory.getJdbcDriverInfo(jdbcProperties.getDbType()).getDriverClass() :
                 driverClass);
-        Properties properties = new Properties();
-        properties.putAll(config.getProperties());
-        jdbcProperties.setProperties(properties);
+        Object properties = config.getProperties().get("properties");
+        if (properties != null) {
+            if (properties instanceof Map) {
+                Properties prop = new Properties();
+                prop.putAll((Map) properties);
+                jdbcProperties.setProperties(prop);
+            }
+        }
         return jdbcProperties;
     }
 
