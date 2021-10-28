@@ -1,6 +1,8 @@
+import { TreeNodeProps } from 'antd';
 import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ReactElement } from 'react';
 
 export type VizType = [
   'DATACHART',
@@ -154,4 +156,16 @@ export interface FilterSearchParams {
 export interface FilterSearchParamsWithMatch {
   params?: FilterSearchParams;
   isMatchByName?: boolean;
+}
+
+export interface SelectVizTree {
+  getIcon: (
+    o: FolderViewModel,
+  ) => ReactElement | ((props: TreeNodeProps) => ReactElement);
+  getDisabled?: (o: FolderViewModel) => boolean;
+}
+
+export interface SelectVizFolderTree {
+  id?: string;
+  getDisabled: (o: FolderViewModel, path: string[]) => boolean;
 }
