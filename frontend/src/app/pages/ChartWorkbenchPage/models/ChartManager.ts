@@ -50,6 +50,7 @@ const {
 class ChartManager {
   private _loader = new ChartTools.ChartPluginLoader();
   private _isLoaded = false;
+  private _isChartPluginLoaded = false;
   private _charts: Chart[] = this._basicCharts();
   private static _manager: ChartManager | null = null;
 
@@ -61,11 +62,22 @@ class ChartManager {
   }
 
   public async load() {
-    if (this._isLoaded) {
+    if (this._isLoaded && this._isChartPluginLoaded) {
       return;
     }
-    const pluginsPaths = await getChartPluginPaths();
+    let pluginsPaths: string[] = [];
+    try {
+      pluginsPaths = await getChartPluginPaths();
+      this._isChartPluginLoaded = true;
+      this._isLoaded = false;
+    } catch (error) {
+      console.log(error);
+    }
     return await this._loadCustomizeCharts(pluginsPaths);
+  }
+
+  public getChartPluginLoadedStatus() {
+    return this._isChartPluginLoaded;
   }
 
   public getAllChartMetas(): ChartMetadata[] {

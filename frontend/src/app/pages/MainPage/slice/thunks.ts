@@ -1,4 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { selectLoggedInUser } from 'app/slice/selectors';
 import { RootState } from 'types';
 import { request } from 'utils/request';
@@ -32,6 +33,10 @@ export const getUserSettings = createAsyncThunk<
   string | undefined
 >('main/getUserSettings', async orgId => {
   try {
+    const chartManager = ChartManager.instance();
+    if (chartManager.getChartPluginLoadedStatus() === false) {
+      await chartManager.load();
+    }
     const [{ data: userSettings }, { data: organizations }] = await Promise.all(
       [
         request<UserSetting[]>('settings/user'),
