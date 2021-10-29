@@ -140,6 +140,12 @@ export const StoryPagePreview: React.FC<{
           publish: storyBoard.status === 1 ? true : false,
           resolve: () => {
             message.success(`${storyBoard.status === 2 ? '取消' : ''}发布成功`);
+            dispatch(
+              storyActions.changeBoardPublish({
+                stroyId: storyBoard.id,
+                publish: storyBoard.status === 1 ? 2 : 1,
+              }),
+            );
           },
         }),
       );
@@ -161,7 +167,13 @@ export const StoryPagePreview: React.FC<{
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <StoryContext.Provider value={{ stroyBoardId: storyId, editing: false }}>
+      <StoryContext.Provider
+        value={{
+          stroyBoardId: storyId,
+          editing: false,
+          allowShare: allowShare || false,
+        }}
+      >
         <Wrapper>
           <StoryHeader
             name={storyBoard?.name}
