@@ -35,6 +35,7 @@ import { makeSelectBoardConfigById } from '../../slice/selector';
 import { fetchBoardDetail } from '../../slice/thunk';
 import { BoardState, VizRenderMode } from '../../slice/types';
 import BoardEditor from '../BoardEditor';
+import { editDashBoardInfoActions } from '../BoardEditor/slice';
 import AutoBoardCore from './AutoDashboard/AutoBoardCore';
 import FreeBoardCore from './FreeDashboard/FreeBoardCore';
 export interface DashboardProps {
@@ -74,6 +75,10 @@ export const Dashboard: React.FC<DashboardProps> = memo(
         ? urlSearchTransfer.toParams(filterSearchUrl)
         : undefined;
     }, [filterSearchUrl]);
+
+    useEffect(() => {
+      dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
+    }, [dispatch]);
 
     useEffect(() => {
       if (boardId && fetchData) {
