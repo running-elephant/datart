@@ -55,3 +55,8 @@ export const selectShareExecuteTokenMap = createSelector(
   [selectDomain],
   shareState => shareState.executeTokenMap,
 );
+
+export const selectSubVizTokenMap = createSelector(
+  [selectDomain],
+  shareState => shareState.subVizTokenMap,
+);

@@ -65,3 +65,10 @@ export const selectSelectedPageIds = createSelector(
       .map(info => info.id);
   },
 );
+
+export const selectShareStoryBoard = createSelector(
+  storyBoardState,
+  storyState => {
+    return Object.values(storyState.storyMap)[0] || undefined;
+  },
+);

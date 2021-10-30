@@ -30,21 +30,25 @@ import { selectShareBoard } from '../DashBoardPage/slice/selector';
 import { VizRenderMode } from '../DashBoardPage/slice/types';
 import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
 import { urlSearchTransfer } from '../MainPage/pages/VizPage/utils';
+import { useStoryBoardSlice } from '../StoryBoardPage/slice';
+import { selectShareStoryBoard } from '../StoryBoardPage/slice/selectors';
+import BoardForShare from './BoardForShare';
 import ChartPreviewBoardForShare from './ChartPreviewBoardForShare';
 import { DownloadTaskContainer, loadShareTask } from './DownloadTaskContainer';
 import PasswordModal from './PasswordModal';
 import { downloadShareDataChartFile } from './sercive';
-import ShareBoard from './ShareBoard';
 import { useShareSlice } from './slice';
 import {
   selectChartPreview,
   selectShareExecuteTokenMap,
 } from './slice/selectors';
 import { fetchShareVizInfo } from './slice/thunks';
+import { StoryPlayerForShare } from './StoryPlayerForShare';
 export function SharePage() {
-  const { actions } = useShareSlice();
+  const { shareActions: actions } = useShareSlice();
   useEditBoardSlice();
   useBoardSlice();
+  useStoryBoardSlice();
   const dispatch = useDispatch();
   const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
   const [shareClientId, setShareClientId] = useState('');
@@ -69,10 +73,11 @@ export function SharePage() {
   }, [search]);
 
   const chartPreview = useSelector(selectChartPreview);
-  // console.log('---chartPreview', chartPreview);
 
   const shareBoard = useSelector(selectShareBoard);
-  // console.log('---shareBoard', shareBoard);
+
+  const shareStory = useSelector(selectShareStoryBoard);
+
   const fetchShareVizInfoImpl = useCallback(
     (sharePassword?: string, filterSearchParams?: FilterSearchParams) => {
       dispatch(
@@ -170,8 +175,8 @@ export function SharePage() {
         </DownloadTaskContainer>
       )}
       {/* dashboard */}
-      {shareBoard && (
-        <ShareBoard
+      {shareBoard && !shareStory && (
+        <BoardForShare
           dashboard={shareBoard}
           allowDownload={true}
           onMakeShareDownloadDataTask={onMakeShareDownloadDataTask}
@@ -181,6 +186,8 @@ export function SharePage() {
           onDownloadFile={onDownloadFile}
         />
       )}
+
+      {shareStory && <StoryPlayerForShare storyBoard={shareStory} />}
     </div>
   );
 }
