@@ -41,13 +41,13 @@ export const DownloadTaskContainer: FC<DownloadTaskContainerProps> = ({
   ...restProps
 }) => {
   const sharePolling = useSelector(selectShareDownloadPolling);
-  const { actions } = useShareSlice();
+  const { shareActions } = useShareSlice();
   const dispatch = useDispatch();
   const onSetSharePolling = useCallback(
     (polling: boolean) => {
-      dispatch(actions.setShareDownloadPolling(polling));
+      dispatch(shareActions.setShareDownloadPolling(polling));
     },
-    [dispatch, actions],
+    [dispatch, shareActions],
   );
   return (
     <>

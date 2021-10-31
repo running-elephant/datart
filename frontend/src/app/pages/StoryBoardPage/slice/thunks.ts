@@ -1,21 +1,16 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getBoardDetail } from 'app/pages/DashBoardPage/slice/thunk';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
+import { ExecuteToken } from 'app/pages/SharePage/slice/types';
 import { RootState } from 'types';
 import { request } from 'utils/request';
 import { storyActions } from '.';
-import {
-  formatStory,
-  getInitStoryPageConfig,
-  getInitStoryPageInfoMap,
-  getStoryPage,
-  getStoryPageConfig,
-  getStoryPageMap,
-} from '../utils';
+import { getInitStoryPageConfig, getStoryPageConfig } from '../utils';
+import { handleServerStoryAction } from './actions';
 import { makeSelectStoryPagesById } from './selectors';
 import {
+  ServerStoryBoard,
   StoryBoard,
-  StoryBoardOfServer,
   StoryPage,
   StoryPageOfServer,
   StoryPageRelType,
@@ -27,15 +22,6 @@ export const getStoryDetail = createAsyncThunk<null, string>(
     if (!storyId) {
       return null;
     }
-    //2 从 editor 内存中取
-    // const editDashboard = selectEditBoard(
-    //   getState() as {
-    //     editBoard: HistoryEditBoard;
-    //   },
-    // );
-    // if (editDashboard?.id === storyId) {
-    //   return null;
-    // }
     await dispatch(fetchStoryDetail(storyId));
     return null;
   },
@@ -47,32 +33,36 @@ export const fetchStoryDetail = createAsyncThunk<null, string>(
       return null;
     }
     try {
-      const { data } = await request<StoryBoardOfServer>({
+      const { data } = await request<ServerStoryBoard>({
         url: `viz/storyboards/${storyId}`,
         method: 'get',
       });
-      const pages = getStoryPage(data.storypages || []);
-      let story = formatStory(data);
-      const storyPageMap = getStoryPageMap(pages);
-      const storyPageInfoMap = getInitStoryPageInfoMap(pages);
-      dispatch(storyActions.setStoryBoard(story));
-      dispatch(storyActions.setStoryPageInfoMap({ storyId, storyPageInfoMap }));
-      dispatch(storyActions.setStoryPageMap({ storyId, storyPageMap }));
+      dispatch(
+        handleServerStoryAction({
+          data,
+          renderMode: 'read',
+          storyId,
+        }),
+      );
     } catch (error) {}
     return null;
   },
 );
 export const getPageContentDetail = createAsyncThunk<
   null,
-  { relId: string; relType: StoryPageRelType }
+  {
+    relId: string;
+    relType: StoryPageRelType;
+    vizToken?: ExecuteToken;
+  }
 >(
-  'storyBoard/getStoryDetail',
-  async ({ relId, relType }, { getState, dispatch }) => {
+  'storyBoard/getPageContentDetail',
+  async ({ relId, relType, vizToken }, { getState, dispatch }) => {
     if (!relId) {
       return null;
     }
     if (relType === 'DASHBOARD') {
-      dispatch(getBoardDetail({ dashboardRelId: relId }));
+      dispatch(getBoardDetail({ dashboardRelId: relId, vizToken }));
     }
     if (relType === 'DATACHART') {
       // TODO
