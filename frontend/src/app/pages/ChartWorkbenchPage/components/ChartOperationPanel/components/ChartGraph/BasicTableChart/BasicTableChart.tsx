@@ -66,18 +66,18 @@ class BasicTableChart extends ReactChart {
 
   onUpdated(options, context): void {
     if (!this.isMatchRequirement(options.config)) {
-      this.getInstance()?.unmount();
+      this.getInstance().unmount();
       return;
     }
 
-    this.getInstance()?.updated(
+    this.getInstance().updated(
       this.getOptions(context, options.dataset, options.config),
       context,
     );
   }
 
   onUnMount(): void {
-    this.getInstance()?.unmount();
+    this.getInstance().unmount();
   }
 
   onResize(opt: any, context): void {
@@ -457,7 +457,6 @@ class BasicTableChart extends ReactChart {
         })
       : false;
   }
-
   registerTablePagingEvents(seriesName: string, dataIndex: number, value: any) {
     const eventParams = {
       componentType: 'series',
