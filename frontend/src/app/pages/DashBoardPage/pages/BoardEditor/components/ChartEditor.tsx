@@ -260,6 +260,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       {
         name: 'click',
         callback: param => {
+          console.log(`param ---> `, param);
           if (param.seriesName === 'paging') {
             const page = param.value?.page;
             dispatch(refreshDatasetAction({ pageInfo: { pageNo: page } }));
