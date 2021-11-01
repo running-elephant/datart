@@ -79,7 +79,9 @@ class BasicPieChart extends Chart {
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {}
+  onUnMount(): void {
+    this.chart?.dispose();
+  }
 
   onResize(opt: any, context): void {
     this.chart?.resize(context);
