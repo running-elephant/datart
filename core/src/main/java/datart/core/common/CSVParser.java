@@ -21,6 +21,7 @@ import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.BaseException;
 import lombok.Data;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -95,11 +96,9 @@ public class CSVParser {
         String[] split = line.split(CSV_SPLIT);
         ValueType[] valueTypes = new ValueType[split.length];
         for (int i = 0; i < split.length; i++) {
-            try {
-                Double.parseDouble(split[i]);
+            if (NumberUtils.isNumber(split[i])) {
                 valueTypes[i] = ValueType.NUMERIC;
                 continue;
-            } catch (Exception ignore) {
             }
             try {
                 simpleDateFormat.parse(split[i]);
@@ -115,7 +114,7 @@ public class CSVParser {
     private List<Object> extractValues(String line) {
         try {
             if (StringUtils.isEmpty(line)) {
-                return Collections.EMPTY_LIST;
+                return Collections.emptyList();
             }
             LinkedList<Object> values = new LinkedList<>();
             String[] split = line.split(CSV_SPLIT);
@@ -142,7 +141,11 @@ public class CSVParser {
             case DATE:
                 return simpleDateFormat.parse(val);
             case NUMERIC:
-                return Double.parseDouble(val);
+                if (NumberUtils.isDigits(val)) {
+                    return Long.parseLong(val);
+                } else {
+                    return Double.parseDouble(val);
+                }
             default:
                 return val;
         }

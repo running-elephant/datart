@@ -48,41 +48,35 @@ public class FileDataProvider extends DefaultDataProvider {
 
     public static final String FILE_PATH = "path";
 
-
     @Override
-    public List<Dataframe> loadFullDataFromSource(DataProviderSource config) {
-        try {
-            Map<String, Object> properties = config.getProperties();
-            List<Map<String, Object>> schemas;
-            if (properties.containsKey(SCHEMAS)) {
-                schemas = (List<Map<String, Object>>) properties.get(SCHEMAS);
-            } else {
-                schemas = Collections.singletonList(properties);
-            }
-            LinkedList<Dataframe> dataframes = new LinkedList<>();
-            for (Map<String, Object> schema : schemas) {
-                String path = schema.get(FILE_PATH).toString();
-                FileFormat fileFormat = FileFormat.valueOf(schema.get(FILE_FORMAT).toString().toUpperCase());
-                List<Column> columns = null;
-                try {
-                    List<Map<String, String>> columnConfig = (List<Map<String, String>>) schema.get(COLUMNS);
-                    if (!CollectionUtils.isEmpty(columnConfig)) {
-                        columns = columnConfig
-                                .stream()
-                                .map(c -> new Column(c.get(COLUMN_NAME), ValueType.valueOf(c.get(COLUMN_TYPE))))
-                                .collect(Collectors.toList());
-                    }
-                } catch (ClassCastException ignored) {
-                }
-                Dataframe dataframe = loadFromPath(FileUtils.withBasePath(path), fileFormat, columns);
-                dataframe.setName(StringUtils.isNoneBlank(schema.getOrDefault(TABLE, "").toString()) ? schema.get(TABLE).toString() : "TEST" + UUIDGenerator.generate());
-                dataframes.add(dataframe);
-            }
-            return dataframes;
-
-        } catch (Exception e) {
-            throw new DataProviderException(e);
+    public List<Dataframe> loadFullDataFromSource(DataProviderSource config) throws Exception {
+        Map<String, Object> properties = config.getProperties();
+        List<Map<String, Object>> schemas;
+        if (properties.containsKey(SCHEMAS)) {
+            schemas = (List<Map<String, Object>>) properties.get(SCHEMAS);
+        } else {
+            schemas = Collections.singletonList(properties);
         }
+        LinkedList<Dataframe> dataframes = new LinkedList<>();
+        for (Map<String, Object> schema : schemas) {
+            String path = schema.get(FILE_PATH).toString();
+            FileFormat fileFormat = FileFormat.valueOf(schema.get(FILE_FORMAT).toString().toUpperCase());
+            List<Column> columns = null;
+            try {
+                List<Map<String, String>> columnConfig = (List<Map<String, String>>) schema.get(COLUMNS);
+                if (!CollectionUtils.isEmpty(columnConfig)) {
+                    columns = columnConfig
+                            .stream()
+                            .map(c -> new Column(c.get(COLUMN_NAME), ValueType.valueOf(c.get(COLUMN_TYPE))))
+                            .collect(Collectors.toList());
+                }
+            } catch (ClassCastException ignored) {
+            }
+            Dataframe dataframe = loadFromPath(FileUtils.withBasePath(path), fileFormat, columns);
+            dataframe.setName(StringUtils.isNoneBlank(schema.getOrDefault(TABLE, "").toString()) ? schema.get(TABLE).toString() : "TEST" + UUIDGenerator.generate());
+            dataframes.add(dataframe);
+        }
+        return dataframes;
     }
 
     private Dataframe loadFromPath(String path, FileFormat format, List<Column> columns) throws IOException {
@@ -134,7 +128,7 @@ public class FileDataProvider extends DefaultDataProvider {
         if (isHeader) {
             for (Object value : typedValues) {
                 Column column = new Column();
-                ValueType valueType = DataTypeUtils.javaType2DataType(value.getClass().getSimpleName());
+                ValueType valueType = DataTypeUtils.javaType2DataType(value);
                 column.setType(valueType);
                 column.setName(value.toString());
                 columns.add(column);
@@ -143,7 +137,7 @@ public class FileDataProvider extends DefaultDataProvider {
         } else {
             for (int i = 0; i < typedValues.size(); i++) {
                 Column column = new Column();
-                ValueType valueType = DataTypeUtils.javaType2DataType(typedValues.get(i).getClass().getSimpleName());
+                ValueType valueType = DataTypeUtils.javaType2DataType(typedValues.get(i));
                 column.setType(valueType);
                 column.setName("column" + i);
                 columns.add(column);

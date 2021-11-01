@@ -59,9 +59,21 @@ export const slice = createSlice({
     },
     setExecuteTokenMap: (
       state,
-      action: PayloadAction<Record<string, ExecuteToken>>,
+      action: PayloadAction<{
+        executeToken: Record<string, ExecuteToken>;
+      }>,
     ) => {
-      state.executeTokenMap = action.payload;
+      const { executeToken } = action.payload;
+      state.executeTokenMap = executeToken;
+    },
+    setSubVizTokenMap: (
+      state,
+      action: PayloadAction<{
+        subVizToken: Record<string, ExecuteToken> | null;
+      }>,
+    ) => {
+      const { subVizToken } = action.payload;
+      state.subVizTokenMap = subVizToken || undefined;
     },
     setDataChart: (
       state,
@@ -143,9 +155,9 @@ export const slice = createSlice({
   },
 });
 
-export const { actions, reducer } = slice;
+export const { actions: shareActions, reducer } = slice;
 
 export const useShareSlice = () => {
   useInjectReducer({ key: slice.name, reducer: slice.reducer });
-  return { actions: slice.actions };
+  return { shareActions: slice.actions };
 };

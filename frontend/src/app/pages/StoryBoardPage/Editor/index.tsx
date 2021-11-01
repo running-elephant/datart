@@ -206,6 +206,7 @@ export const StoryEditor: React.FC<{
           stroyBoardId: storyId,
           editing: true,
           name: storyBoard?.name,
+          allowShare: false,
         }}
       >
         <Wrapper>

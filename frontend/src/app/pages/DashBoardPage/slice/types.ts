@@ -21,7 +21,6 @@ import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
 import {
@@ -458,10 +457,6 @@ export interface JumpPanel {
   widgetId: string;
 }
 
-export interface GetBoardDetailParams {
-  dashboardRelId: string;
-  filterSearchParams?: FilterSearchParams;
-}
 export interface ServerDatachart extends Omit<DataChart, 'config'> {
   config: string;
 }

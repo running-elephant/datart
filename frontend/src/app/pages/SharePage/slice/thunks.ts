@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import { handleServerBoardAction } from 'app/pages/DashBoardPage/slice/asyncActions';
@@ -27,10 +26,12 @@ import {
   ChartPreview,
   FilterSearchParams,
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
+import { handleServerStoryAction } from 'app/pages/StoryBoardPage/slice/actions';
+import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { RootState } from 'types';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
-import { actions } from '.';
+import { shareActions } from '.';
 import { ShareVizInfo } from './types';
 
 export const fetchShareVizInfo = createAsyncThunk(
@@ -51,7 +52,7 @@ export const fetchShareVizInfo = createAsyncThunk(
   ) => {
     try {
       await thunkAPI.dispatch(
-        actions.saveShareInfo({ shareToken, sharePassword }),
+        shareActions.saveShareInfo({ shareToken, sharePassword }),
       );
       const { data } = await request<ShareVizInfo>({
         url: '/share/viz',
@@ -61,11 +62,19 @@ export const fetchShareVizInfo = createAsyncThunk(
           password: sharePassword,
         },
       });
-      thunkAPI.dispatch(actions.setVizType(data.vizType));
-      thunkAPI.dispatch(actions.setExecuteTokenMap(data.executeToken));
+      thunkAPI.dispatch(shareActions.setVizType(data.vizType));
+
+      thunkAPI.dispatch(
+        shareActions.setExecuteTokenMap({
+          executeToken: data.executeToken,
+        }),
+      );
+
       switch (data.vizType) {
         case 'DATACHART':
-          thunkAPI.dispatch(actions.setDataChart({ data, filterSearchParams }));
+          thunkAPI.dispatch(
+            shareActions.setDataChart({ data, filterSearchParams }),
+          );
           break;
         case 'DASHBOARD':
           const serverBoard = data.vizDetail as ServerDashboard;
@@ -80,15 +89,27 @@ export const fetchShareVizInfo = createAsyncThunk(
               },
             }),
           );
+          break;
+        case 'STORYBOARD':
+          console.log('STORYBOARD', data.vizDetail);
+          thunkAPI.dispatch(
+            shareActions.setSubVizTokenMap({
+              subVizToken: data.subVizToken,
+            }),
+          );
 
+          thunkAPI.dispatch(
+            handleServerStoryAction({
+              data: data.vizDetail as ServerStoryBoard,
+              renderMode: 'read',
+              storyId: data.vizDetail.id,
+            }),
+          );
           break;
         default:
           break;
       }
       return { data, filterSearchParams };
-      //   if (data.vizType === 'DATACHART') {
-
-      //   }
     } catch (error) {
       errorHandle(error);
       throw error;
@@ -130,7 +151,7 @@ export const updateFilterAndFetchDatasetForShare = createAsyncThunk(
     thunkAPI,
   ) => {
     await thunkAPI.dispatch(
-      actions.updateChartPreviewFilter({
+      shareActions.updateChartPreviewFilter({
         backendChartId: arg.backendChartId,
         payload: arg.payload,
       }),

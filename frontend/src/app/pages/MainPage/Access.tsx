@@ -154,7 +154,7 @@ export function calcAc(
     ? permissionMap[module]['*'] >= level
     : id
     ? permissionMap[module][id] !== void 0
-      ? permissionMap[module][id] >= level
+      ? (permissionMap[module][id] & level) === level
       : void 0
     : false;
 }
