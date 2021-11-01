@@ -79,7 +79,9 @@ class BasicDoubleYChart extends Chart {
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {}
+  onUnMount(): void {
+    this.chart?.dispose();
+  }
 
   onResize(opt: any, context): void {
     this.chart?.resize(context);
@@ -169,34 +171,33 @@ class BasicDoubleYChart extends Chart {
     rightDeminsionConfigs,
     dataColumns,
   ) {
-    const _getSeriesByDemisionPostion = () => (
-      config,
-      styles,
-      settings,
-      data,
-      direction,
-    ) => {
-      const graphType = getStyleValueByGroup(
-        styleConfigs,
-        direction,
-        'graphType',
-      );
-      const graphStyle = getStyleValueByGroup(styles, direction, 'graphStyle');
+    const _getSeriesByDemisionPostion =
+      () => (config, styles, settings, data, direction) => {
+        const graphType = getStyleValueByGroup(
+          styleConfigs,
+          direction,
+          'graphType',
+        );
+        const graphStyle = getStyleValueByGroup(
+          styles,
+          direction,
+          'graphStyle',
+        );
 
-      return {
-        name: getColumnRenderName(config),
-        type: graphType || 'line',
-        sampling: 'average',
-        data: dataColumns.map(dc => ({
-          ...config,
-          value: dc[getValueByColumnKey(config)],
-        })),
-        ...this.getGraphStyle(graphType, graphStyle),
-        ...this.getLabelStyle(styles, direction),
-        ...this.getSeriesStyle(styles),
-        ...getReference(settings, data, config, false),
+        return {
+          name: getColumnRenderName(config),
+          type: graphType || 'line',
+          sampling: 'average',
+          data: dataColumns.map(dc => ({
+            ...config,
+            value: dc[getValueByColumnKey(config)],
+          })),
+          ...this.getGraphStyle(graphType, graphStyle),
+          ...this.getLabelStyle(styles, direction),
+          ...this.getSeriesStyle(styles),
+          ...getReference(settings, data, config, false),
+        };
       };
-    };
 
     const series = []
       .concat(
