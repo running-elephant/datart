@@ -75,14 +75,14 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
       if (comType === ItemComponentType.MODAL) {
         return (
           <>
-            <ModalCallButton
+            <StyledShowModalButton
               type="ghost"
               block={true}
               title={t(data.label)}
               onClick={handleOpenStateModal}
             >
               {t(data.label)}
-            </ModalCallButton>
+            </StyledShowModalButton>
             {contextHolder}
           </>
         );
@@ -131,7 +131,7 @@ const StyledGroupLayout = styled.div<{ flatten?: boolean }>`
   padding: 0 ${p => (p.flatten ? 0 : SPACE_MD)};
 `;
 
-const ModalCallButton = styled(Button)`
+const StyledShowModalButton = styled(Button)`
   color: ${p => p.theme.textColorSnd};
   background-color: ${p => p.theme.bodyBackground};
   border: 0;
