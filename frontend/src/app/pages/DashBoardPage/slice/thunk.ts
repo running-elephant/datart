@@ -96,15 +96,12 @@ export const fetchBoardDetailInShare = createAsyncThunk<
           password: vizToken.password,
         },
       });
-      dispatch(shareActions.setVizType(data.vizType));
-
       dispatch(
         shareActions.setExecuteTokenMap({
           executeToken: data.executeToken,
         }),
       );
       const serverBoard = data.vizDetail as ServerDashboard;
-
       dispatch(
         handleServerBoardAction({
           data: serverBoard,
