@@ -314,6 +314,12 @@
         "graph": "图表",
         "raw": "原始数据",
         "sql": "SQL"
+      },
+      "graph": {
+        "group": "维度",
+        "aggregate": "度量",
+        "onlyAllow": "{{type}} 仅允许数量为 {{num}}",
+        "allowRange": "{{type}} 允许范围为 {{start}} 到 {{end}}"
       }
     },
     "chartPreview": {

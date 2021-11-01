@@ -314,6 +314,12 @@
         "graph": "Graph",
         "raw": "Raw",
         "sql": "SQL"
+      },
+      "graph": {
+        "group": "Dimensions",
+        "aggregate": "Measures",
+        "onlyAllow": "{{type}} Only Allow {{num}}",
+        "allowRange": "{{type}} Allow Range {{start}} to {{end}}"
       }
     },
     "chartPreview": {
