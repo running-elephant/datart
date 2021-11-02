@@ -36,6 +36,7 @@ import { v4 as uuidv4 } from 'uuid';
 import GroupLayout from '../Layout/GroupLayout';
 import { GroupLayoutMode, ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
+import styled from 'styled-components/macro';
 
 const { TabPane } = Tabs;
 const { Search } = Input;
@@ -160,7 +161,7 @@ const BasicUnControlledTabPanel: FC<
     };
 
     return (
-      <Tabs
+      <StyledBasicUnControlledTabPanel
         onChange={handleTabChange}
         activeKey={activeTabKey}
         type={editable ? 'editable-card' : undefined}
@@ -188,7 +189,7 @@ const BasicUnControlledTabPanel: FC<
             </TabPane>
           );
         })}
-      </Tabs>
+      </StyledBasicUnControlledTabPanel>
     );
   },
   itemLayoutComparer,
@@ -233,3 +234,9 @@ const EditableTabHeader: FC<{
 });
 
 export default BasicUnControlledTabPanel;
+
+const StyledBasicUnControlledTabPanel = styled(Tabs)`
+  & .ant-tabs-nav .ant-tabs-tab {
+    margin: 0 !important;
+  }
+`;
