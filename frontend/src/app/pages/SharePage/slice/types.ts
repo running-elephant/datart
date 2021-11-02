@@ -24,7 +24,8 @@ import {
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 
 export interface SharePageState {
-  vizType: VizType | undefined;
+  needPassword?: boolean;
+  vizType?: VizType;
   shareToken: string;
   executeToken?: string;
   executeTokenMap: Record<string, ExecuteToken>;

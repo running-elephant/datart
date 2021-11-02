@@ -60,3 +60,13 @@ export const selectSubVizTokenMap = createSelector(
   [selectDomain],
   shareState => shareState.subVizTokenMap,
 );
+
+export const selectNeedPassword = createSelector(
+  [selectDomain],
+  shareState => shareState.needPassword,
+);
+
+export const selectSharePassword = createSelector(
+  [selectDomain],
+  shareState => shareState.sharePassword,
+);

@@ -18,10 +18,12 @@
 
 import { makeShareDownloadDataTask } from 'app/utils/fetch';
 import { StorageKeys } from 'globalConstants';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
+import persistence from 'utils/persistence';
 import { v4 as uuidv4 } from 'uuid';
+import useMount from '../ChartWorkbenchPage/hooks/useMount';
 import useRouteQuery from '../ChartWorkbenchPage/hooks/useRouteQuery';
 import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
 import { useEditBoardSlice } from '../DashBoardPage/pages/BoardEditor/slice';
@@ -40,7 +42,9 @@ import { downloadShareDataChartFile } from './sercive';
 import { useShareSlice } from './slice';
 import {
   selectChartPreview,
+  selectNeedPassword,
   selectShareExecuteTokenMap,
+  selectSharePassword,
 } from './slice/selectors';
 import { fetchShareVizInfo } from './slice/thunks';
 import { StoryPlayerForShare } from './StoryPlayerForShare';
@@ -49,63 +53,62 @@ export function SharePage() {
   useEditBoardSlice();
   useBoardSlice();
   useStoryBoardSlice();
+
   const dispatch = useDispatch();
-  const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
+  const location = useLocation();
+  const search = location.search;
+
   const [shareClientId, setShareClientId] = useState('');
   const executeTokenMap = useSelector(selectShareExecuteTokenMap);
+  const needPassword = useSelector(selectNeedPassword);
+  const sharePassword = useSelector(selectSharePassword);
+  const chartPreview = useSelector(selectChartPreview);
+  const shareBoard = useSelector(selectShareBoard);
+  const shareStory = useSelector(selectShareStoryBoard);
+
   const shareToken = useRouteQuery({
     key: 'token',
   }) as string;
   const usePassword = useRouteQuery({
     key: 'usePassword',
   });
-
   // in timed task eager=true for disable board lazyLoad
   const eager = useRouteQuery({
     key: 'eager',
   });
   const renderMode: VizRenderMode = eager ? 'schedule' : 'share';
 
-  const location = useLocation();
-  const search = location.search;
   const searchParams = useMemo(() => {
     return urlSearchTransfer.toParams(search);
   }, [search]);
 
-  const chartPreview = useSelector(selectChartPreview);
-
-  const shareBoard = useSelector(selectShareBoard);
-
-  const shareStory = useSelector(selectShareStoryBoard);
-
-  const fetchShareVizInfoImpl = useCallback(
-    (sharePassword?: string, filterSearchParams?: FilterSearchParams) => {
-      dispatch(
-        fetchShareVizInfo({
-          shareToken,
-          sharePassword,
-          filterSearchParams,
-          renderMode,
-        }),
-      );
-    },
-    [dispatch, renderMode, shareToken],
-  );
-  useEffect(() => {
-    if (!shareToken) {
-      return;
-    }
-    if (!!usePassword) {
-      const previousPassword = sessionStorage.getItem(shareToken);
+  useMount(() => {
+    if (Boolean(usePassword)) {
+      const previousPassword = persistence.session.get(shareToken);
       if (previousPassword) {
-        fetchShareVizInfoImpl(previousPassword, searchParams);
+        fetchShareVizInfoImpl(shareToken, previousPassword, searchParams);
       } else {
-        setShowPasswordModal(true);
+        dispatch(actions.saveNeedPassword(true));
       }
-      return;
+    } else {
+      fetchShareVizInfoImpl(shareToken, undefined, searchParams);
     }
-    fetchShareVizInfoImpl(undefined, searchParams);
-  }, [shareToken, usePassword, fetchShareVizInfoImpl, searchParams]);
+  });
+
+  const fetchShareVizInfoImpl = (
+    token?: string,
+    pwd?: string,
+    params?: FilterSearchParams,
+  ) => {
+    dispatch(
+      fetchShareVizInfo({
+        shareToken: token,
+        sharePassword: pwd,
+        filterSearchParams: params,
+        renderMode,
+      }),
+    );
+  };
 
   const onLoadShareTask = useMemo(() => {
     const clientId = localStorage.getItem(StorageKeys.ShareClientId);
@@ -119,9 +122,10 @@ export function SharePage() {
     return () =>
       loadShareTask({
         shareToken,
+        password: sharePassword,
         clientId: shareClientId,
       });
-  }, [shareToken, shareClientId]);
+  }, [shareToken, sharePassword, shareClientId]);
 
   const onMakeShareDownloadDataTask = useCallback(
     (downloadParams: ChartRequest[], fileName: string) => {
@@ -131,39 +135,49 @@ export function SharePage() {
             clientId: shareClientId,
             executeToken: executeTokenMap,
             downloadParams: downloadParams,
+            shareToken,
             fileName: fileName,
             resolve: () => {
               dispatch(actions.setShareDownloadPolling(true));
             },
+            password: sharePassword,
           }),
         );
       }
     },
-    [shareClientId, executeTokenMap, dispatch, actions],
+    [
+      shareClientId,
+      shareToken,
+      sharePassword,
+      executeTokenMap,
+      dispatch,
+      actions,
+    ],
   );
+
   const onDownloadFile = useCallback(
     task => {
-      downloadShareDataChartFile({ downloadId: task.id, shareToken }).then(
-        () => {
-          dispatch(actions.setShareDownloadPolling(true));
-        },
-      );
+      downloadShareDataChartFile({
+        downloadId: task.id,
+        shareToken,
+        password: sharePassword,
+      }).then(() => {
+        dispatch(actions.setShareDownloadPolling(true));
+      });
     },
-    [shareToken, actions, dispatch],
+    [shareToken, sharePassword, dispatch, actions],
   );
+
   return (
     <div style={{ width: '100%', height: '100vh' }}>
       <PasswordModal
-        visible={showPasswordModal}
+        visible={Boolean(needPassword) && Boolean(usePassword)}
         onChange={sharePassword => {
-          sessionStorage.setItem(shareToken, sharePassword);
-          fetchShareVizInfoImpl(sharePassword);
-          setShowPasswordModal(false);
+          fetchShareVizInfoImpl(shareToken, sharePassword);
         }}
       />
 
-      {/* dataChart */}
-      {chartPreview && chartPreview?.backendChart && (
+      {!Boolean(needPassword) && chartPreview && chartPreview?.backendChart && (
         <DownloadTaskContainer
           onLoadTasks={onLoadShareTask}
           onDownloadFile={onDownloadFile}
@@ -174,8 +188,7 @@ export function SharePage() {
           />
         </DownloadTaskContainer>
       )}
-      {/* dashboard */}
-      {shareBoard && !shareStory && (
+      {!Boolean(needPassword) && shareBoard && !shareStory && (
         <BoardForShare
           dashboard={shareBoard}
           allowDownload={true}
@@ -186,8 +199,9 @@ export function SharePage() {
           onDownloadFile={onDownloadFile}
         />
       )}
-
-      {shareStory && <StoryPlayerForShare storyBoard={shareStory} />}
+      {!Boolean(needPassword) && shareStory && (
+        <StoryPlayerForShare storyBoard={shareStory} />
+      )}
     </div>
   );
 }

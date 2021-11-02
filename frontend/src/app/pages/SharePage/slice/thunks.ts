@@ -29,6 +29,7 @@ import {
 import { handleServerStoryAction } from 'app/pages/StoryBoardPage/slice/actions';
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { RootState } from 'types';
+import persistence from 'utils/persistence';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { shareActions } from '.';
@@ -43,18 +44,16 @@ export const fetchShareVizInfo = createAsyncThunk(
       filterSearchParams,
       renderMode,
     }: {
-      shareToken: string;
+      shareToken?: string;
       sharePassword?: string;
       filterSearchParams?: FilterSearchParams;
       renderMode?: VizRenderMode;
     },
     thunkAPI,
   ) => {
+    let data = {} as any;
     try {
-      await thunkAPI.dispatch(
-        shareActions.saveShareInfo({ shareToken, sharePassword }),
-      );
-      const { data } = await request<ShareVizInfo>({
+      const response = await request<ShareVizInfo>({
         url: '/share/viz',
         method: 'GET',
         params: {
@@ -62,58 +61,64 @@ export const fetchShareVizInfo = createAsyncThunk(
           password: sharePassword,
         },
       });
-      thunkAPI.dispatch(shareActions.setVizType(data.vizType));
-
-      thunkAPI.dispatch(
-        shareActions.setExecuteTokenMap({
-          executeToken: data.executeToken,
-        }),
-      );
-
-      switch (data.vizType) {
-        case 'DATACHART':
-          thunkAPI.dispatch(
-            shareActions.setDataChart({ data, filterSearchParams }),
-          );
-          break;
-        case 'DASHBOARD':
-          const serverBoard = data.vizDetail as ServerDashboard;
-          // setExecuteTokenMap
-          thunkAPI.dispatch(
-            handleServerBoardAction({
-              data: serverBoard,
-              renderMode: renderMode || 'share',
-              filterSearchMap: {
-                params: filterSearchParams,
-                isMatchByName: true,
-              },
-            }),
-          );
-          break;
-        case 'STORYBOARD':
-          console.log('STORYBOARD', data.vizDetail);
-          thunkAPI.dispatch(
-            shareActions.setSubVizTokenMap({
-              subVizToken: data.subVizToken,
-            }),
-          );
-
-          thunkAPI.dispatch(
-            handleServerStoryAction({
-              data: data.vizDetail as ServerStoryBoard,
-              renderMode: 'read',
-              storyId: data.vizDetail.id,
-            }),
-          );
-          break;
-        default:
-          break;
-      }
-      return { data, filterSearchParams };
+      data = response.data;
     } catch (error) {
       errorHandle(error);
       throw error;
     }
+
+    persistence.session.save(shareToken, sharePassword);
+    await thunkAPI.dispatch(shareActions.saveNeedPassword(false));
+    await thunkAPI.dispatch(
+      shareActions.saveShareInfo({ token: shareToken, pwd: sharePassword }),
+    );
+    await thunkAPI.dispatch(shareActions.setVizType(data.vizType));
+    await thunkAPI.dispatch(
+      shareActions.setExecuteTokenMap({
+        executeToken: data.executeToken,
+      }),
+    );
+
+    switch (data.vizType) {
+      case 'DATACHART':
+        thunkAPI.dispatch(
+          shareActions.setDataChart({ data, filterSearchParams }),
+        );
+        break;
+      case 'DASHBOARD':
+        const serverBoard = data.vizDetail as ServerDashboard;
+        // setExecuteTokenMap
+        thunkAPI.dispatch(
+          handleServerBoardAction({
+            data: serverBoard,
+            renderMode: renderMode || 'share',
+            filterSearchMap: {
+              params: filterSearchParams,
+              isMatchByName: true,
+            },
+          }),
+        );
+        break;
+      case 'STORYBOARD':
+        console.log('STORYBOARD', data.vizDetail);
+        thunkAPI.dispatch(
+          shareActions.setSubVizTokenMap({
+            subVizToken: data.subVizToken,
+          }),
+        );
+
+        thunkAPI.dispatch(
+          handleServerStoryAction({
+            data: data.vizDetail as ServerStoryBoard,
+            renderMode: 'read',
+            storyId: data.vizDetail.id,
+          }),
+        );
+        break;
+      default:
+        break;
+    }
+    return { data, filterSearchParams };
   },
 );
 
