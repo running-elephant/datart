@@ -129,18 +129,11 @@ const ChartWorkbenchPage: React.FC = () => {
     chart?.registerMouseEvents([
       {
         name: 'click',
-        callback: param => {
-          console.log('//TODO: to be remove | mouse click event ----> ', param);
-        },
+        callback: param => {},
       },
       {
         name: 'dblclick',
-        callback: param => {
-          console.log(
-            '//TODO: to be remove | mouse db click event ----> ',
-            param,
-          );
-        },
+        callback: param => {},
       },
     ]);
   };

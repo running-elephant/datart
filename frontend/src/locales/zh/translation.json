@@ -290,6 +290,8 @@
         "autoLoad": "自动加载",
         "enableRaw": "原始数据",
         "reference": {
+          "enableMarkLine": "启用参考线",
+          "enableMarkArea": "启用参考区间",
           "markLine": "参考线",
           "markArea": "参考区间",
           "valueType": "值类型",
@@ -314,6 +316,12 @@
         "graph": "图表",
         "raw": "原始数据",
         "sql": "SQL"
+      },
+      "graph": {
+        "group": "维度",
+        "aggregate": "度量",
+        "onlyAllow": "{{type}} 仅允许数量为 {{num}}",
+        "allowRange": "{{type}} 允许范围为 {{start}} 到 {{end}}"
       }
     },
     "chartPreview": {

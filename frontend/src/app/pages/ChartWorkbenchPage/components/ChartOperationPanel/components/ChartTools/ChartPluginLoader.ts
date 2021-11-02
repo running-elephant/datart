@@ -20,7 +20,6 @@ import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import * as datartChartHelper from 'app/utils/chart';
 import { fetchPluginChart } from 'app/utils/fetch';
 import { Omit } from 'utils/object';
-import { request } from 'utils/request';
 
 class ChartPluginLoader {
   async loadPlugins(paths: string[]) {
@@ -43,7 +42,7 @@ class ChartPluginLoader {
          */
         // eslint-disable-next-line no-new-func
         const customPlugin = Function(`"use strict"; return (${result})`)()({
-          dHelper: { ...datartChartHelper, request, tranform: () => 1 },
+          dHelper: { ...datartChartHelper },
         });
         return this.convertToDatartChartModel(customPlugin);
       } catch (e) {
