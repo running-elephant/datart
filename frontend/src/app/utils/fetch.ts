@@ -97,11 +97,20 @@ export const makeShareDownloadDataTask =
     clientId: string;
     fileName: string;
     downloadParams: ChartRequest[];
+    shareToken: string;
     executeToken?: Record<string, ExecuteToken>;
+    password?: string | null;
   }) =>
   async () => {
-    const { downloadParams, fileName, resolve, executeToken, clientId } =
-      params;
+    const {
+      downloadParams,
+      fileName,
+      resolve,
+      executeToken,
+      clientId,
+      password,
+      shareToken,
+    } = params;
     const { success } = await request<{}>({
       url: `share/download`,
       method: 'POST',
@@ -109,6 +118,8 @@ export const makeShareDownloadDataTask =
         downloadParams,
         fileName: fileName,
         executeToken,
+        password,
+        shareToken,
       },
       params: {
         clientId,
