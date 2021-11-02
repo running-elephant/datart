@@ -290,6 +290,8 @@
         "autoLoad": "Auto Load",
         "enableRaw": "Raw Data",
         "reference": {
+          "enableMarkLine": "Enable Mark Line",
+          "enableMarkArea": "Enable Mark Area",
           "markLine": "Reference Line",
           "markArea": "Reference Area",
           "valueType": "Value Type",

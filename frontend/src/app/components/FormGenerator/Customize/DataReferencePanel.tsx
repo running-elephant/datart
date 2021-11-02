@@ -42,6 +42,12 @@ const defaultRows = [
             comType: 'group',
             rows: [
               {
+                label: 'reference.enableMarkLine',
+                key: 'enableMarkLine',
+                default: false,
+                comType: 'checkbox',
+              },
+              {
                 label: 'reference.valueType',
                 key: 'valueType',
                 default: 'constant',
@@ -149,6 +155,12 @@ const defaultRows = [
             key: 'markArea',
             comType: 'group',
             rows: [
+              {
+                label: 'reference.enableMarkArea',
+                key: 'enableMarkArea',
+                default: false,
+                comType: 'checkbox',
+              },
               {
                 label: 'reference.startValueType',
                 key: 'startValueType',

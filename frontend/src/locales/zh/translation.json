@@ -290,6 +290,8 @@
         "autoLoad": "自动加载",
         "enableRaw": "原始数据",
         "reference": {
+          "enableMarkLine": "启用参考线",
+          "enableMarkArea": "启用参考区间",
           "markLine": "参考线",
           "markArea": "参考区间",
           "valueType": "值类型",
