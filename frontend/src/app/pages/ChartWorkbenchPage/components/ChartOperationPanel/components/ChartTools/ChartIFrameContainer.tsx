@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-import 'app/assets/fonts/iconfont.css';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import React from 'react';
 import Frame, { FrameContextConsumer } from 'react-frame-component';
 import styled, { StyleSheetManager } from 'styled-components/macro';
-import { getCustomizeTableStyle } from '../../../../../../../assets/ant-table.css';
 import ChartLifecycleAdapter from './ChartLifecycleAdapter';
+// eslint-disable-next-line import/no-webpack-loader-syntax
+const antdStyles = require('!!css-loader!antd/dist/antd.min.css');
 
 const ChartIFrameContainer: React.FC<{
   dataset: any;
@@ -42,19 +42,24 @@ const ChartIFrameContainer: React.FC<{
       frameBorder={0}
       style={{ ...props?.style, width: '100%', height: '100%' }}
       head={
-        <style>{`
-        body {
-          height: 100%;
-          background-color: transparent !important;
-          margin: 0;
-        }
-      `}</style>
+        <>
+          <style>
+            {`
+            body {
+              height: 100%;
+              background-color: transparent !important;
+              margin: 0;
+            }
+           `}
+          </style>
+          <style>{isTable ? antdStyles.default.toString() : ''}</style>
+        </>
       }
     >
       <FrameContextConsumer>
         {frameContext => (
           <StyleSheetManager target={frameContext.document.head}>
-            <StyledChartLifecycleAdapter isTable={isTable}>
+            <StyledChartLifecycleAdapter>
               <ChartLifecycleAdapter
                 dataset={props.dataset}
                 chart={props.chart}
@@ -71,6 +76,4 @@ const ChartIFrameContainer: React.FC<{
 
 export default ChartIFrameContainer;
 
-const StyledChartLifecycleAdapter = styled.div<{ isTable: boolean }>`
-  ${props => (props.isTable ? getCustomizeTableStyle() : '')}
-`;
+const StyledChartLifecycleAdapter = styled.div``;
