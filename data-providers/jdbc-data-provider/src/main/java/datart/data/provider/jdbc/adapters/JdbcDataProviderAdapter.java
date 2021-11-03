@@ -50,6 +50,8 @@ public class JdbcDataProviderAdapter implements Closeable {
 
     private static final String SQL_DIALECT_PACKAGE = "datart.data.provider.calcite.dialect";
 
+    protected static final String COUNT_SQL = "SELECT COUNT(*) FROM (%s) V_T";
+
     protected DataSource dataSource;
 
     protected JdbcProperties jdbcProperties;
@@ -168,10 +170,17 @@ public class JdbcDataProviderAdapter implements Closeable {
                 }
                 statement = conn.createStatement();
             }
+
             statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
             try (ResultSet resultSet = statement.executeQuery(selectSql)) {
-
-                initPageInfo(pageInfo, resultSet);
+                // get total size
+                try {
+                    resultSet.last();
+                    pageInfo.setTotal(resultSet.getRow());
+                    resultSet.first();
+                } catch (Exception e) {
+                    pageInfo.setTotal(countTotal(conn, selectSql));
+                }
 
                 // TODO paging through  sql
 //                if (supportPaging()) {
@@ -219,7 +228,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         try {
             sqlDialect = SqlDialect.DatabaseProduct.valueOf(driverInfo.getDbType().toUpperCase()).getDialect();
         } catch (Exception ignored) {
-            log.warn("Dbtype " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
+            log.warn("DBType " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
             sqlDialect = CustomSqlDialect.create(driverInfo);
         }
         try {
@@ -230,17 +239,11 @@ public class JdbcDataProviderAdapter implements Closeable {
         return sqlDialect;
     }
 
-    protected void initPageInfo(PageInfo pageInfo, ResultSet resultSet) throws SQLException {
-        try {
-            if (pageInfo.getPageNo() < 1) {
-                pageInfo.setPageNo(1);
-            }
-            resultSet.last();
-            pageInfo.setTotal(resultSet.getRow());
-            resultSet.first();
-        } catch (Exception e) {
-            pageInfo.setTotal(pageInfo.getPageSize());
-        }
+    protected int countTotal(Connection conn, String sql) throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(String.format(COUNT_SQL, sql));
+        ResultSet resultSet = preparedStatement.executeQuery();
+        resultSet.next();
+        return resultSet.getInt(1);
     }
 
     protected Dataframe parseResultSet(ResultSet rs, long count) throws SQLException {
