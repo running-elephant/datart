@@ -1,4 +1,6 @@
 .idea
 
+/static
+
 *.iml
 *.zip
