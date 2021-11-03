@@ -163,7 +163,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         try (Connection conn = getConn()) {
             Statement statement = null;
             try {
-                statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                statement = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
             } catch (SQLFeatureNotSupportedException e) {
                 if (driverInfo != null) {
                     log.info(driverInfo.getDbType() + ":" + e.getMessage());
@@ -172,15 +172,8 @@ public class JdbcDataProviderAdapter implements Closeable {
             }
 
             statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
+
             try (ResultSet resultSet = statement.executeQuery(selectSql)) {
-                // get total size
-                try {
-                    resultSet.last();
-                    pageInfo.setTotal(resultSet.getRow());
-                    resultSet.first();
-                } catch (Exception e) {
-                    pageInfo.setTotal(countTotal(conn, selectSql));
-                }
 
                 // TODO paging through  sql
 //                if (supportPaging()) {
@@ -199,6 +192,14 @@ public class JdbcDataProviderAdapter implements Closeable {
                     }
                 }
                 dataframe = parseResultSet(resultSet, pageInfo.getPageSize());
+
+                // get total size
+                try {
+                    resultSet.last();
+                    pageInfo.setTotal(resultSet.getRow());
+                } catch (Exception e) {
+                    pageInfo.setTotal(countTotal(conn, selectSql));
+                }
                 dataframe.setPageInfo(pageInfo);
                 return dataframe;
             }
