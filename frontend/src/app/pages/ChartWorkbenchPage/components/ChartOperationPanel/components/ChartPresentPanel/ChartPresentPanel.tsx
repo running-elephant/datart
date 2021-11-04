@@ -19,8 +19,8 @@
 import { Table } from 'antd';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartTools from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
-import useMount from 'app/pages/ChartWorkbenchPage/hooks/useMount';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useMount from 'app/hooks/useMount';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';

@@ -17,10 +17,7 @@
  */
 
 import { DatePicker, Select, Space } from 'antd';
-import {
-  i18NComponentProps,
-  useI18NPrefix,
-} from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix, { i18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { Moment } from 'moment';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';

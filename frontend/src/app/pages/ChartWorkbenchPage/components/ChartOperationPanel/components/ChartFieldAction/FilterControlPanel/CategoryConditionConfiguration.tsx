@@ -17,11 +17,8 @@
  */
 
 import { Button, Row, Select, Space, Tabs, Transfer, Tree } from 'antd';
-import {
-  i18NComponentProps,
-  useI18NPrefix,
-} from 'app/pages/ChartWorkbenchPage/hooks';
-import useMount from 'app/pages/ChartWorkbenchPage/hooks/useMount';
+import useI18NPrefix, { i18NComponentProps } from 'app/hooks/useI18NPrefix';
+import useMount from 'app/hooks/useMount';
 import {
   FilterConditionType,
   FilterValueOption,

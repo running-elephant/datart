@@ -17,8 +17,8 @@
  */
 
 import { Form, FormInstance, Input, Modal } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo, useRef } from 'react';
-import { useI18NPrefix } from '../ChartWorkbenchPage/hooks';
 
 const INPUT_PASSWORD_KEY = 'password-input';
 

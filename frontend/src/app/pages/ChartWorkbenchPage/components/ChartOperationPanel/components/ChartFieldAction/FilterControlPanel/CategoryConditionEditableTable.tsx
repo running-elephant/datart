@@ -18,10 +18,7 @@
 
 import { Button, Space } from 'antd';
 import DragSortEditTable from 'app/components/DragSortEditTable';
-import {
-  i18NComponentProps,
-  useI18NPrefix,
-} from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix, { i18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { FilterValueOption } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import ChartDataView from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import ChartFilterCondition, {

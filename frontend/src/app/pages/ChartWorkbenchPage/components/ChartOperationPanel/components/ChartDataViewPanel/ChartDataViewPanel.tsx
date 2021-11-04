@@ -19,11 +19,9 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { message, Popover, Select } from 'antd';
 import { ToolbarButton } from 'app/components';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
-import useStateModal, {
-  StateModalSize,
-} from 'app/pages/ChartWorkbenchPage/hooks/useStateModal';
-import useToggle from 'app/pages/ChartWorkbenchPage/hooks/useToggle';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
+import useToggle from 'app/hooks/useToggle';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewMeta,

@@ -18,7 +18,7 @@
 
 import { LeftOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { changeLang } from 'locales/i18n';
 import { FC, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

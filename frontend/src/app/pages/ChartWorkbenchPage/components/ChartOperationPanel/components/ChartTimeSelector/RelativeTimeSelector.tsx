@@ -17,10 +17,7 @@
  */
 
 import { InputNumber, Select, Space } from 'antd';
-import {
-  i18NComponentProps,
-  useI18NPrefix,
-} from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix, { i18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { getTime } from 'app/utils/time';
 import { TIME_DIRECTION, TIME_UNIT_OPTIONS } from 'globalConstants';
 import { unitOfTime } from 'moment';

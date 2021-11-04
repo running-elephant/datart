@@ -23,9 +23,9 @@ import {
   ChartDataSectionFieldActionType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+import ChartDataView from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import { ValueOf } from 'types';
-import { i18NComponentProps, useI18NPrefix } from '.';
-import ChartDataView from '../models/ChartDataView';
+import useI18NPrefix, { i18NComponentProps } from './useI18NPrefix';
 import useStateModal, { StateModalSize } from './useStateModal';
 
 function useFieldActionModal({ i18nPrefix }: i18NComponentProps) {

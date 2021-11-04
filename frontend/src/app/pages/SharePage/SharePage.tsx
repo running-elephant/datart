@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import useMount from 'app/hooks/useMount';
+import useRouteQuery from 'app/hooks/useRouteQuery';
 import { makeShareDownloadDataTask } from 'app/utils/fetch';
 import { StorageKeys } from 'globalConstants';
 import { useCallback, useMemo, useState } from 'react';
@@ -23,8 +25,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import persistence from 'utils/persistence';
 import { v4 as uuidv4 } from 'uuid';
-import useMount from '../ChartWorkbenchPage/hooks/useMount';
-import useRouteQuery from '../ChartWorkbenchPage/hooks/useRouteQuery';
 import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
 import { useEditBoardSlice } from '../DashBoardPage/pages/BoardEditor/slice';
 import { useBoardSlice } from '../DashBoardPage/slice';

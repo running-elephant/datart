@@ -17,7 +17,7 @@
  */
 
 import { Form, Radio, Space } from 'antd';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { RECOMMEND_TIME } from 'globalConstants';
 import { NamePath } from 'rc-field-form/lib/interface';
 import { FC, memo } from 'react';

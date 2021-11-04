@@ -18,7 +18,7 @@
 
 import { CheckOutlined } from '@ant-design/icons';
 import { Menu, Radio, Space } from 'antd';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   AggregateFieldSubAggregateType,
   ChartDataSectionField,

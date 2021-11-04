@@ -17,10 +17,7 @@
  */
 
 import { Tabs } from 'antd';
-import {
-  i18NComponentProps,
-  useI18NPrefix,
-} from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix, { i18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { FC, memo } from 'react';
 import ChartFilterCondition from '../../../../../models/ChartFilterCondition';
 import TimeSelector from '../../ChartTimeSelector';

@@ -18,10 +18,7 @@
 
 import { Row, Space } from 'antd';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
-import {
-  i18NComponentProps,
-  useI18NPrefix,
-} from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix, { i18NComponentProps } from 'app/hooks/useI18NPrefix';
 import {
   FilterCondition,
   FilterConditionType,

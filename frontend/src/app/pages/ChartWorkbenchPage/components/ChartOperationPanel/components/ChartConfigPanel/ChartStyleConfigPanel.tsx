@@ -19,7 +19,7 @@
 import { Collapse } from 'antd';
 import GroupLayout from 'app/components/FormGenerator/Layout/GroupLayout';
 import { GroupLayoutMode } from 'app/components/FormGenerator/types';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartDataSectionConfig,
   ChartStyleSectionConfig,
