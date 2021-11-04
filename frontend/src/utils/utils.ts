@@ -63,6 +63,7 @@ export function listToTree<
   options?: {
     getIcon?: (o: T) => ReactElement | ((props: TreeNodeProps) => ReactElement);
     getDisabled?: (o: T, path: string[]) => boolean;
+    getSelectable?: (o: T) => boolean;
   },
 ): undefined | any[] {
   if (!list) {
@@ -82,9 +83,8 @@ export function listToTree<
         value: o.id,
         path,
         ...(options?.getIcon && { icon: options.getIcon(o) }),
-        ...(options?.getDisabled && {
-          disabled: options.getDisabled(o, path),
-        }),
+        ...(options?.getDisabled && { disabled: options.getDisabled(o, path) }),
+        ...(options?.getSelectable && { selectable: options.getSelectable(o) }),
       });
     } else {
       childrenList.push(o);
