@@ -1,6 +1,7 @@
 import { Checkbox, Form, FormInstance, Select } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
 import { User } from 'app/slice/types';
+import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { memo, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { request } from 'utils/request';
@@ -33,7 +34,7 @@ export const InviteForm = memo(
           );
         }
       };
-      return debounce(searchUser, 300);
+      return debounce(searchUser, DEFAULT_DEBOUNCE_WAIT);
     }, []);
 
     const onAfterClose = useCallback(() => {

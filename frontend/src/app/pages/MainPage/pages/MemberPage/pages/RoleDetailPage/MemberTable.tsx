@@ -5,6 +5,7 @@ import {
 } from '@ant-design/icons';
 import { Button, Col, Input, Row, Table } from 'antd';
 import { User } from 'app/slice/types';
+import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { Key, memo, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -36,7 +37,7 @@ export const MemberTable = memo(
       const search = e => {
         setKeywords(e.target.value);
       };
-      return debounce(search, 300);
+      return debounce(search, DEFAULT_DEBOUNCE_WAIT);
     }, []);
 
     const removeMember = useCallback(

@@ -1,7 +1,11 @@
 import { Button, Card, Form, Input, message, Upload } from 'antd';
 import { Avatar } from 'app/components';
 import debounce from 'debounce-promise';
-import { BASE_API_URL, BASE_RESOURCE_URL } from 'globalConstants';
+import {
+  BASE_API_URL,
+  BASE_RESOURCE_URL,
+  DEFAULT_DEBOUNCE_WAIT,
+} from 'globalConstants';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -126,7 +130,7 @@ export function OrgSettingPage() {
                     () => Promise.resolve(),
                     () => Promise.reject(new Error('名称重复')),
                   );
-                }, 300),
+                }, DEFAULT_DEBOUNCE_WAIT),
               },
             ]}
           >
