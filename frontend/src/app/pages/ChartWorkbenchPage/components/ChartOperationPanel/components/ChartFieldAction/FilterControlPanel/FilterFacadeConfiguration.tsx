@@ -17,7 +17,7 @@
  */
 
 import { InputNumber, Row, Select, Space } from 'antd';
-import useI18NPrefix, { i18NComponentProps } from 'app/hooks/useI18NPrefix';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import {
   FilterConditionType,
   FilterFacade,
@@ -93,7 +93,7 @@ const FilterFacadeConfiguration: FC<
     facade?: FilterFacade;
     condition?: ChartFilterCondition;
     onChange;
-  } & i18NComponentProps
+  } & I18NComponentProps
 > = memo(
   ({ i18nPrefix, category, facade, condition, onChange: onFacadeChange }) => {
     const t = useI18NPrefix(i18nPrefix);

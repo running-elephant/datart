@@ -47,7 +47,7 @@ export type ChartDataView = {
   sourceId: string;
   model: any;
 
-  variable?: string | string[]; // TODO 未确定
+  variable?: string | string[];
   view?: { config?: string };
   config?: string;
 };

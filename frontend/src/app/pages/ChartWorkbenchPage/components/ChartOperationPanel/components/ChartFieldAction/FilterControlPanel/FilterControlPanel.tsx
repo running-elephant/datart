@@ -18,7 +18,7 @@
 
 import { Input, Select } from 'antd';
 import { FormItemEx } from 'app/components';
-import useI18NPrefix, { i18NComponentProps } from 'app/hooks/useI18NPrefix';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import {
   AggregateFieldActionType,
   ChartDataSectionConfig,
@@ -58,7 +58,7 @@ const FilterControllPanel: FC<
       needRefresh?: boolean,
     ) => void;
     fetchDataByField?: (fieldId) => Promise<string[]>;
-  } & i18NComponentProps
+  } & I18NComponentProps
 > = memo(
   ({
     config,

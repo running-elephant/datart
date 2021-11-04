@@ -17,7 +17,7 @@
  */
 
 import { Input, Radio, Row, Select, Space } from 'antd';
-import useI18NPrefix, { i18NComponentProps } from 'app/hooks/useI18NPrefix';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import {
   ChartDataSectionField,
   FilterVisibility,
@@ -32,7 +32,7 @@ const FilterVisibilityConfiguration: FC<
     visibility?: FilterVisibility;
     otherFilters?: ChartDataSectionField[];
     onChange: (visibility: FilterVisibility) => void;
-  } & i18NComponentProps
+  } & I18NComponentProps
 > = memo(({ otherFilters, visibility, onChange: onVisibilityChange }) => {
   const t = useI18NPrefix('viz.common.enum.controllerVisibilityTypes');
   const t2 = useI18NPrefix('viz.common.enum.filterOperator');

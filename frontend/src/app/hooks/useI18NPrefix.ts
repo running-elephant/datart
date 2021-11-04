@@ -21,8 +21,7 @@ import get from 'lodash/get';
 import { useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
-// TODO(Stephen): tobe upper case for interface
-export interface i18NComponentProps {
+export interface I18NComponentProps {
   i18nPrefix?: string;
 }
 

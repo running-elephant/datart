@@ -18,7 +18,7 @@
 
 import { Button, Space } from 'antd';
 import DragSortEditTable from 'app/components/DragSortEditTable';
-import useI18NPrefix, { i18NComponentProps } from 'app/hooks/useI18NPrefix';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { FilterValueOption } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import ChartDataView from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import ChartFilterCondition, {
@@ -34,7 +34,7 @@ const CategoryConditionEditableTable: FC<
     dataView?: ChartDataView;
     onConditionChange: (condition: ChartFilterCondition) => void;
     fetchDataByField?: (fieldId) => Promise<string[]>;
-  } & i18NComponentProps
+  } & I18NComponentProps
 > = memo(
   ({
     i18nPrefix,

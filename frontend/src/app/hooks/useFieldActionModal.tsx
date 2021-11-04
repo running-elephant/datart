@@ -25,10 +25,10 @@ import {
 import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
 import ChartDataView from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import { ValueOf } from 'types';
-import useI18NPrefix, { i18NComponentProps } from './useI18NPrefix';
+import useI18NPrefix, { I18NComponentProps } from './useI18NPrefix';
 import useStateModal, { StateModalSize } from './useStateModal';
 
-function useFieldActionModal({ i18nPrefix }: i18NComponentProps) {
+function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
   const t = useI18NPrefix(i18nPrefix);
   const [show, contextHolder] = useStateModal({ initState: {} });
 
