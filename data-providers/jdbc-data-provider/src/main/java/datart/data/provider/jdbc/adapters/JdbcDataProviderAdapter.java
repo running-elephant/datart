@@ -50,6 +50,8 @@ public class JdbcDataProviderAdapter implements Closeable {
 
     private static final String SQL_DIALECT_PACKAGE = "datart.data.provider.calcite.dialect";
 
+    protected static final String COUNT_SQL = "SELECT COUNT(*) FROM (%s) V_T";
+
     protected DataSource dataSource;
 
     protected JdbcProperties jdbcProperties;
@@ -161,17 +163,17 @@ public class JdbcDataProviderAdapter implements Closeable {
         try (Connection conn = getConn()) {
             Statement statement = null;
             try {
-                statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                statement = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
             } catch (SQLFeatureNotSupportedException e) {
                 if (driverInfo != null) {
                     log.info(driverInfo.getDbType() + ":" + e.getMessage());
                 }
                 statement = conn.createStatement();
             }
-            statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
-            try (ResultSet resultSet = statement.executeQuery(selectSql)) {
 
-                initPageInfo(pageInfo, resultSet);
+            statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
+
+            try (ResultSet resultSet = statement.executeQuery(selectSql)) {
 
                 // TODO paging through  sql
 //                if (supportPaging()) {
@@ -189,7 +191,15 @@ public class JdbcDataProviderAdapter implements Closeable {
                         count++;
                     }
                 }
-                dataframe = parseResult(resultSet, pageInfo.getPageSize());
+                dataframe = parseResultSet(resultSet, pageInfo.getPageSize());
+
+                // get total size
+                try {
+                    resultSet.last();
+                    pageInfo.setTotal(resultSet.getRow());
+                } catch (Exception e) {
+                    pageInfo.setTotal(countTotal(conn, selectSql));
+                }
                 dataframe.setPageInfo(pageInfo);
                 return dataframe;
             }
@@ -219,7 +229,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         try {
             sqlDialect = SqlDialect.DatabaseProduct.valueOf(driverInfo.getDbType().toUpperCase()).getDialect();
         } catch (Exception ignored) {
-            log.warn("Dbtype " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
+            log.warn("DBType " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
             sqlDialect = CustomSqlDialect.create(driverInfo);
         }
         try {
@@ -230,21 +240,32 @@ public class JdbcDataProviderAdapter implements Closeable {
         return sqlDialect;
     }
 
-    protected void initPageInfo(PageInfo pageInfo, ResultSet resultSet) throws SQLException {
-        try {
-            if (pageInfo.getPageNo() < 1) {
-                pageInfo.setPageNo(1);
-            }
-            resultSet.last();
-            pageInfo.setTotal(resultSet.getRow());
-            resultSet.first();
-        } catch (Exception e) {
-            pageInfo.setTotal(pageInfo.getPageSize());
-        }
+    protected int countTotal(Connection conn, String sql) throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(String.format(COUNT_SQL, sql));
+        ResultSet resultSet = preparedStatement.executeQuery();
+        resultSet.next();
+        return resultSet.getInt(1);
     }
 
-    protected Dataframe parseResult(ResultSet rs, long count) throws SQLException {
-        return ResultSetMapper.mapToTableData(rs, count);
+    protected Dataframe parseResultSet(ResultSet rs, long count) throws SQLException {
+        Dataframe dataframe = new Dataframe();
+        List<Column> columns = getColumns(rs);
+        ArrayList<List<Object>> rows = new ArrayList<>();
+        int c = 0;
+        while (rs.next()) {
+            ArrayList<Object> row = new ArrayList<>();
+            rows.add(row);
+            for (int i = 1; i < columns.size() + 1; i++) {
+                row.add(rs.getObject(i));
+            }
+            c++;
+            if (c >= count) {
+                break;
+            }
+        }
+        dataframe.setColumns(columns);
+        dataframe.setRows(rows);
+        return dataframe;
     }
 
     protected List<Column> getColumns(ResultSet rs) throws SQLException {
