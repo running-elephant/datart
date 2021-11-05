@@ -19,26 +19,61 @@
 package datart.data.provider.jdbc.adapters;
 
 
-import datart.core.data.provider.Column;
+import datart.core.base.PageInfo;
 import datart.core.data.provider.Dataframe;
+import datart.core.data.provider.ExecuteParam;
+import datart.core.data.provider.QueryScript;
+import datart.data.provider.jdbc.SqlScriptRender;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+@Slf4j
 public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
+
+    private static final String PAGE_SQL = "SELECT * FROM (SELECT ROWNUM V_R_N,V_T0.* FROM (%s) V_T0 WHERE ROWNUM < %d) WHERE V_R_N>=%d";
 
     public Set<String> readAllDatabases() {
         return Collections.singleton(jdbcProperties.getUser());
     }
 
+    @Override
+    protected Dataframe parseResultSet(ResultSet rs, long count) throws SQLException {
+        return super.parseResultSet(rs, count);
+    }
 
     @Override
-    protected Dataframe parseResult(ResultSet rs, long count) throws SQLException {
+    protected Dataframe executeOnSource(QueryScript script, ExecuteParam executeParam) throws Exception {
 
-        return super.parseResult(rs, count);
+        SqlScriptRender render = new SqlScriptRender(script
+                , executeParam
+                , getSqlDialect()
+                , getVariableQuote());
+
+        String sql = render.render(true, false);
+
+        String wrappedSql = pageWrapper(sql, executeParam.getPageInfo());
+
+        log.debug(wrappedSql);
+
+        Dataframe dataframe = execute(wrappedSql);
+        // fix page info
+        if (executeParam.getPageInfo().isCountTotal()) {
+            int total = executeCountSql(sql);
+            executeParam.getPageInfo().setTotal(total);
+            dataframe.setPageInfo(executeParam.getPageInfo());
+        }
+        dataframe.setScript(wrappedSql);
+        return dataframe;
     }
+
+    private String pageWrapper(String sql, PageInfo pageInfo) {
+        return String.format(PAGE_SQL,
+                sql,
+                (pageInfo.getPageNo()) * pageInfo.getPageSize(),
+                (pageInfo.getPageNo() - 1) * pageInfo.getPageSize());
+    }
+
 }

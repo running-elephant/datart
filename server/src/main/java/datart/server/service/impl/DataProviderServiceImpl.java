@@ -224,6 +224,12 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
             viewExecuteParam.getPageInfo().setPageNo(1);
         }
 
+        if (viewExecuteParam.getPageInfo().getPageSize() == 0) {
+            viewExecuteParam.getPageInfo().setPageSize(10_000);
+        }
+
+        viewExecuteParam.getPageInfo().setCountTotal(true);
+
         ExecuteParam queryParam = ExecuteParam.builder()
                 .columns(viewExecuteParam.getColumns())
                 .keywords(viewExecuteParam.getKeywords())

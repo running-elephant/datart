@@ -15,31 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package datart.core.base;
+package datart.data.provider.calcite.dialect;
 
-import lombok.Builder;
-import lombok.Data;
+public interface FetchAndOffsetSupport {
 
-import java.io.Serializable;
-
-@Data
-@Builder
-public class PageInfo implements Serializable {
-
-    private long pageSize;
-
-    private long pageNo;
-
-    private long total;
-
-    private boolean countTotal;
-
-    @Override
-    public String toString() {
-        return "PageInfo{" +
-                "pageSize=" + pageSize +
-                ", pageNo=" + pageNo +
-                ", total=" + total +
-                '}';
-    }
 }
