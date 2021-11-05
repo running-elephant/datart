@@ -17,7 +17,7 @@
  */
 
 import { Form, FormInstance, Select } from 'antd';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { AggregateFieldActionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import { FC, memo, useCallback, useEffect } from 'react';

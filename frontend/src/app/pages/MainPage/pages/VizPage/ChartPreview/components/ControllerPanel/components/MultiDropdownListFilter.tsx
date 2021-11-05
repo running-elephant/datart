@@ -17,7 +17,7 @@
  */
 
 import { TreeSelect } from 'antd';
-import useFetchFilterDataByCondtion from 'app/pages/ChartWorkbenchPage/hooks/useFetchFilterDataByCondtion';
+import useFetchFilterDataByCondtion from 'app/hooks/useFetchFilterDataByCondtion';
 import { FilterValueOption } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useMemo, useState } from 'react';

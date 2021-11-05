@@ -19,7 +19,7 @@
 import { CopyOutlined } from '@ant-design/icons';
 import { Button, Checkbox, DatePicker, Form, Input, Modal } from 'antd';
 import { FormItemEx } from 'app/components';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import moment from 'moment';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';

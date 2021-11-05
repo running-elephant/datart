@@ -18,7 +18,7 @@
 
 import { Menu } from 'antd';
 import SubMenu from 'antd/lib/menu/SubMenu';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartDataSectionField,
   ChartDataSectionFieldActionType,

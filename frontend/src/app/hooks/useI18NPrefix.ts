@@ -21,6 +21,10 @@ import get from 'lodash/get';
 import { useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
+export interface I18NComponentProps {
+  i18nPrefix?: string;
+}
+
 function usePrefixI18N(prefix?: string) {
   const { t, i18n } = useTranslation();
   const { i18NConfigs: vizI18NConfigs } = useContext(ChartI18NContext);

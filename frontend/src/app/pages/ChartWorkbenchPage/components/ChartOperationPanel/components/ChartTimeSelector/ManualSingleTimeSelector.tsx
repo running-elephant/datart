@@ -17,10 +17,7 @@
  */
 
 import { DatePicker, Select, Space } from 'antd';
-import {
-  i18NComponentProps,
-  useI18NPrefix,
-} from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { Moment } from 'moment';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -32,7 +29,7 @@ const ManualSingleTimeSelector: FC<
     isStart?: boolean;
     time?: Moment;
     onTimeChange: (time: Moment) => void;
-  } & i18NComponentProps
+  } & I18NComponentProps
 > = memo(({ isStart, i18nPrefix, time, onTimeChange }) => {
   const t = useI18NPrefix(i18nPrefix);
   const [type, setType] = useState(RelativeOrExactTime.Exact);

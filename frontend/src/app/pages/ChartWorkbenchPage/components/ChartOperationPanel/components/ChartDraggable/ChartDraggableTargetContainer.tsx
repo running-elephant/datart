@@ -27,9 +27,9 @@ import {
   SortAscendingOutlined,
 } from '@ant-design/icons';
 import { Dropdown } from 'antd';
+import useFieldActionModal from 'app/hooks/useFieldActionModal';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
-import useFieldActionModal from 'app/pages/ChartWorkbenchPage/hooks/useFieldActionModal';
 import {
   AggregateFieldActionType,
   AggregateFieldSubAggregateType,

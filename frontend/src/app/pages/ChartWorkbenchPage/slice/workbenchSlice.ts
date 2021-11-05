@@ -20,6 +20,7 @@ import {
   createAsyncThunk,
   createSelector,
   createSlice,
+  isRejected,
   PayloadAction,
 } from '@reduxjs/toolkit';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
@@ -28,8 +29,9 @@ import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { mergeConfig, transformMeta } from 'app/utils/chart';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
+import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { request } from 'utils/request';
-import { listToTree } from 'utils/utils';
+import { errorHandle, listToTree } from 'utils/utils';
 import { ChartConfigPayloadType, ChartConfigReducerActionType } from '..';
 import ChartConfig from '../models/ChartConfig';
 import ChartDataset from '../models/ChartDataset';
@@ -152,6 +154,7 @@ export const fetchDataSetAction = createAsyncThunk(
     return response.data;
   },
 );
+
 export const fetchDataViewsAction = createAsyncThunk(
   'workbench/fetchDataViewsAction',
   async (arg: { orgId }, thunkAPI) => {
@@ -173,6 +176,7 @@ export const fetchViewDetailAction = createAsyncThunk(
     return response.data;
   },
 );
+
 export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
   'workbench/updateChartConfigAndRefreshDatasetAction',
   async (
@@ -399,6 +403,11 @@ const workbenchSlice = createSlice({
             originalConfig,
             newChartConfig as ChartConfig,
           );
+        }
+      })
+      .addMatcher(isRejected, (_, action) => {
+        if (isMySliceAction(action, workbenchSlice.name)) {
+          errorHandle(action?.error);
         }
       });
   },

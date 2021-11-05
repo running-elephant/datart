@@ -100,7 +100,6 @@ export const fetchShareVizInfo = createAsyncThunk(
         );
         break;
       case 'STORYBOARD':
-        console.log('STORYBOARD', data.vizDetail);
         thunkAPI.dispatch(
           shareActions.setSubVizTokenMap({
             subVizToken: data.subVizToken,

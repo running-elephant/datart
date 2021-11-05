@@ -11,7 +11,7 @@ import { APIResponse } from 'types';
 import { removeToken } from './auth';
 
 export function errorHandle(error) {
-  if (error.response) {
+  if (error?.response) {
     // AxiosError
     const { response } = error as AxiosError;
     switch (response?.status) {
@@ -23,12 +23,13 @@ export function errorHandle(error) {
         message.error(response?.data.message || error.message);
         break;
     }
-  } else if (error.message) {
+  } else if (error?.message) {
     // Error
     message.error(error.message);
   } else {
     message.error(error);
   }
+  return error;
 }
 
 export function rejectHandle(error, rejectWithValue) {

@@ -18,7 +18,7 @@
 
 import { Tooltip } from 'antd';
 import { IW } from 'app/components';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartDataSectionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';

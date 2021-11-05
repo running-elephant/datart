@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { StateModalSize } from 'app/pages/ChartWorkbenchPage/hooks/useStateModal';
+import { StateModalSize } from 'app/hooks/useStateModal';
 import { ChartDataSectionConfig } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { ChartDataViewFieldCategory } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import { ReactNode } from 'react';

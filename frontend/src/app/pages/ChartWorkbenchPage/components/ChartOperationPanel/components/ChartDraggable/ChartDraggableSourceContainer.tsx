@@ -25,7 +25,7 @@ import {
 } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
 import { IW, ToolbarButton } from 'app/components';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,

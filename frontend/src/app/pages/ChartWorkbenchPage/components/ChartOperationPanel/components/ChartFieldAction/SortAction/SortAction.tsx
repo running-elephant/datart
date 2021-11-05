@@ -19,7 +19,7 @@
 import { CheckOutlined } from '@ant-design/icons';
 import { Col, Menu, Radio, Row, Space } from 'antd';
 import DraggableList from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/SortAction/DraggableList';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartDataSectionField,
   SortActionType,
