@@ -1,6 +1,6 @@
 import { List, Tag } from 'antd';
 import { ListItem } from 'app/components';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import {

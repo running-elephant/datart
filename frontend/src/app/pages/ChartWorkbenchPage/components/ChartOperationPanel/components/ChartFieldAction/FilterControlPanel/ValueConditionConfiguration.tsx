@@ -18,10 +18,7 @@
 
 import MultiFilterRow from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterAction/MultiFilterRow';
 import SingleFilterRow from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterAction/SingleFilterRow';
-import {
-  i18NComponentProps,
-  useI18NPrefix,
-} from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { FilterConditionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { FC, memo, useState } from 'react';
 import ChartFilterCondition, {
@@ -32,7 +29,7 @@ const ValueConditionConfiguration: FC<
   {
     condition?: ChartFilterCondition;
     onChange: (condition: ChartFilterCondition) => void;
-  } & i18NComponentProps
+  } & I18NComponentProps
 > = memo(({ i18nPrefix, condition, onChange: onConditionChange }) => {
   const t = useI18NPrefix(i18nPrefix);
   const [curFilter, setCurFilter] = useState<ChartFilterCondition>(

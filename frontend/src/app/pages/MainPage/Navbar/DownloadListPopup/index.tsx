@@ -1,8 +1,8 @@
 import { CloudDownloadOutlined } from '@ant-design/icons';
 import { Badge, Tooltip, TooltipProps } from 'antd';
 import { Popup } from 'app/components';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
-import useMount from 'app/pages/ChartWorkbenchPage/hooks/useMount';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useMount from 'app/hooks/useMount';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { DownloadTask, DownloadTaskState } from '../../slice/types';
 import { DownloadList } from './DownloadList';

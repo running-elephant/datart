@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import useMount from 'app/hooks/useMount';
+import useRouteQuery from 'app/hooks/useRouteQuery';
 import workbenchSlice, {
   backendChartSelector,
   chartConfigSelector,
@@ -35,8 +37,6 @@ import styled from 'styled-components/macro';
 import { CloneValueDeep, mergeDefaultToValue } from 'utils/object';
 import { ChartConfigReducerActionType } from '.';
 import ChartWorkbench from './components/ChartWorkbench/ChartWorkbench';
-import useMount from './hooks/useMount';
-import useRouteQuery from './hooks/useRouteQuery';
 import Chart from './models/Chart';
 import ChartManager from './models/ChartManager';
 

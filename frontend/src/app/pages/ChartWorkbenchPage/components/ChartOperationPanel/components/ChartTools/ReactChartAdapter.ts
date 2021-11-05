@@ -24,6 +24,7 @@ interface ReactChartAdapterProps {
   mounted: (container, options?, context?) => any;
   updated: (options: any, context?) => any;
   unmount: () => void;
+  resize: (opt: any) => void;
 }
 
 export default class ReactChartAdapter implements ReactChartAdapterProps {

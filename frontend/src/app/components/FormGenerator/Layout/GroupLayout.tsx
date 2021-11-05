@@ -17,7 +17,7 @@
  */
 
 import { Button, Collapse } from 'antd';
-import useStateModal from 'app/pages/ChartWorkbenchPage/hooks/useStateModal';
+import useStateModal from 'app/hooks/useStateModal';
 import { ChartStyleSectionConfig } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';

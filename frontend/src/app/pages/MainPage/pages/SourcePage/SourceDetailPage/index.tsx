@@ -12,7 +12,11 @@ import {
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
 import { Access, useAccess } from 'app/pages/MainPage/Access';
 import debounce from 'debounce-promise';
-import { CommonFormTypes, COMMON_FORM_TITLE_PREFIX } from 'globalConstants';
+import {
+  CommonFormTypes,
+  COMMON_FORM_TITLE_PREFIX,
+  DEFAULT_DEBOUNCE_WAIT,
+} from 'globalConstants';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
@@ -353,7 +357,7 @@ export function SourceDetailPage() {
                       () => Promise.resolve(),
                       () => Promise.reject(new Error('名称重复')),
                     );
-                  }, 300),
+                  }, DEFAULT_DEBOUNCE_WAIT),
                 },
               ]}
             >

@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
+
 export enum ChartDataViewFieldType {
   STRING = 'STRING',
   NUMERIC = 'NUMERIC',
@@ -38,18 +40,10 @@ export type ChartDataViewMeta = {
   expression?: string;
 };
 
-export type ChartDataView = {
-  id: string;
-  name: string;
+export type ChartDataView = View & {
   meta?: ChartDataViewMeta[];
   computedFields?: ChartDataViewMeta[];
-  script: string;
-  sourceId: string;
-  model: any;
-
-  variable?: string | string[]; // TODO 未确定
   view?: { config?: string };
-  config?: string;
 };
 
 export default ChartDataView;

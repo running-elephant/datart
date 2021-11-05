@@ -80,21 +80,26 @@ export const SubjectForm = memo(
         const memberRowPermissions = rowPermissions.filter(
           ({ subjectType }) => subjectType === SubjectTypes.User,
         );
-        setMemberRowPermissionSubjects(
-          members.map(({ id, name, username, email }) => {
-            const permission = memberRowPermissions.find(
-              ({ subjectId }) => subjectId === id,
-            );
-            return {
-              id,
-              name: name ? `${name}(${username})` : username,
-              email,
-              type: SubjectTypes.User,
-              useDefaultValue: permission ? permission.useDefaultValue : true,
-              value: permission ? permission.value : void 0,
-            };
-          }),
-        );
+        const rowPermissionSubjects: RowPermissionSubject[] = [];
+        const selectedRowKeys: string[] = [];
+        members.forEach(({ id, name, username, email }) => {
+          const permission = memberRowPermissions.find(
+            ({ subjectId }) => subjectId === id,
+          );
+          rowPermissionSubjects.push({
+            id,
+            name: name ? `${name}(${username})` : username,
+            email,
+            type: SubjectTypes.User,
+            useDefaultValue: permission ? permission.useDefaultValue : true,
+            value: permission ? permission.value : void 0,
+          });
+          if (permission) {
+            selectedRowKeys.push(id);
+          }
+        });
+        setMemberRowPermissionSubjects(rowPermissionSubjects);
+        setSelectedMemberRowKeys(selectedRowKeys);
       }
     }, [editingVariable, rowPermissions, members]);
 
