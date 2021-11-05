@@ -22,9 +22,14 @@ import ChartRequest, {
   transformToViewConfig,
 } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import {
+  DownloadTask,
+  DownloadTaskState,
+} from 'app/pages/MainPage/slice/types';
 import { ExecuteToken } from 'app/pages/SharePage/slice/types';
 import { saveAs } from 'file-saver';
 import { request, requestWithHeader } from 'utils/request';
+import { errorHandle } from 'utils/utils';
 
 export const getDistinctFields = async (
   viewId: string,
@@ -215,4 +220,24 @@ export async function getChartPluginPaths() {
     url: `plugins/custom/charts`,
   });
   return response?.data || [];
+}
+
+export async function loadShareTask(params) {
+  try {
+    const { data } = await request<DownloadTask[]>({
+      url: `/share/download/task`,
+      method: 'GET',
+      params,
+    });
+    const isNeedStopPolling = !(data || []).some(
+      v => v.status === DownloadTaskState.CREATE,
+    );
+    return {
+      isNeedStopPolling,
+      data: data || [],
+    };
+  } catch (error) {
+    errorHandle(error);
+    throw error;
+  }
 }

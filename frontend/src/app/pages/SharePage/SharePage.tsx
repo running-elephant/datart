@@ -18,7 +18,7 @@
 
 import useMount from 'app/hooks/useMount';
 import useRouteQuery from 'app/hooks/useRouteQuery';
-import { makeShareDownloadDataTask } from 'app/utils/fetch';
+import { loadShareTask, makeShareDownloadDataTask } from 'app/utils/fetch';
 import { StorageKeys } from 'globalConstants';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -36,7 +36,7 @@ import { useStoryBoardSlice } from '../StoryBoardPage/slice';
 import { selectShareStoryBoard } from '../StoryBoardPage/slice/selectors';
 import BoardForShare from './BoardForShare';
 import ChartPreviewBoardForShare from './ChartPreviewBoardForShare';
-import { DownloadTaskContainer, loadShareTask } from './DownloadTaskContainer';
+import { DownloadTaskContainer } from './DownloadTaskContainer';
 import PasswordModal from './PasswordModal';
 import { downloadShareDataChartFile } from './sercive';
 import { useShareSlice } from './slice';
