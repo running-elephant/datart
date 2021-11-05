@@ -1,3 +1,4 @@
+import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { useMemo, useState } from 'react';
 import { filterListOrTree } from 'utils/utils';
@@ -5,6 +6,7 @@ import { filterListOrTree } from 'utils/utils';
 export function useDebouncedSearch<T>(
   dataSource: T[] | undefined,
   filterFunc: (keywords: string, data: T) => boolean,
+  wait: number = DEFAULT_DEBOUNCE_WAIT,
 ) {
   const [keywords, setKeywords] = useState('');
 
@@ -20,8 +22,8 @@ export function useDebouncedSearch<T>(
     const search = e => {
       setKeywords(e.target.value);
     };
-    return debounce(search, 300);
-  }, []);
+    return debounce(search, wait);
+  }, [wait]);
 
   return {
     keywords,

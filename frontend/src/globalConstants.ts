@@ -40,6 +40,8 @@ export const COMMON_FORM_TITLE_PREFIX = {
   [CommonFormTypes.Edit]: '编辑',
 };
 
+export const DEFAULT_DEBOUNCE_WAIT = 300;
+
 export const FONT_SIZES = [
   10, 12, 13, 14, 15, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 96, 128,
 ];
