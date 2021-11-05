@@ -553,6 +553,7 @@ export function getSeriesTooltips4Scatter(
 
 export function getSeriesTooltips4Rectangular2(
   tooltipParam: {
+    componentType: string;
     data: {
       name: string;
       rowData: { [key: string]: any };
@@ -564,6 +565,10 @@ export function getSeriesTooltips4Rectangular2(
   infoConfigs?: ChartDataSectionField[],
   sizeConfigs?: ChartDataSectionField[],
 ): string {
+  if (tooltipParam?.componentType !== 'series') {
+    return '';
+  }
+
   const aggConfigName = tooltipParam?.data?.name;
   const row = tooltipParam?.data?.rowData || {};
 
