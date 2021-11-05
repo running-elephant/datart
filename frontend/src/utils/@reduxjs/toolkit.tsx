@@ -15,3 +15,7 @@ export const createSlice = <
 >(
   options: CreateSliceOptions<State, CaseReducers, Name>,
 ) => createSliceOriginal(options);
+
+export function isMySliceAction(action, targetSliceName) {
+  return action?.type?.startsWith(targetSliceName);
+}

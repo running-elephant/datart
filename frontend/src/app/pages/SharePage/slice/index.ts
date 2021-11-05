@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, isRejected, PayloadAction } from '@reduxjs/toolkit';
 import { ChartDataSectionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
@@ -24,6 +24,8 @@ import {
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transferChartConfig } from 'app/pages/MainPage/pages/VizPage/slice/utils';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
+import { isMySliceAction } from 'utils/@reduxjs/toolkit';
+import { errorHandle } from 'utils/utils';
 import { fetchShareDataSetByPreviewChartAction } from './thunks';
 // import { fetchShareDataSetByPreviewChartAction } from './thunk';
 import { ExecuteToken, SharePageState, ShareVizInfo } from './types';
@@ -140,19 +142,25 @@ export const slice = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(
-      fetchShareDataSetByPreviewChartAction.fulfilled,
-      (state, { payload }) => {
-        state.chartPreview = {
-          ...state.chartPreview,
-          dataset: payload as any,
-        };
+    builder
+      .addCase(
+        fetchShareDataSetByPreviewChartAction.fulfilled,
+        (state, { payload }) => {
+          state.chartPreview = {
+            ...state.chartPreview,
+            dataset: payload as any,
+          };
+          state.headlessBrowserRenderSign = true;
+        },
+      )
+      .addCase(fetchShareDataSetByPreviewChartAction.rejected, state => {
         state.headlessBrowserRenderSign = true;
-      },
-    );
-    builder.addCase(fetchShareDataSetByPreviewChartAction.rejected, state => {
-      state.headlessBrowserRenderSign = true;
-    });
+      })
+      .addMatcher(isRejected, (_, action) => {
+        if (isMySliceAction(action, slice.name)) {
+          errorHandle(action?.error);
+        }
+      });
   },
 });
 
