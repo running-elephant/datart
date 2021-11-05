@@ -24,12 +24,14 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
+import { ResourceTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
+import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { mergeConfig, transformMeta } from 'app/utils/chart';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { request } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import { errorHandle, listToTree } from 'utils/utils';
 import { ChartConfigPayloadType, ChartConfigReducerActionType } from '..';
 import ChartConfig from '../models/ChartConfig';
 import ChartDataset from '../models/ChartDataset';
@@ -46,15 +48,7 @@ export type BackendChart = {
   status: number;
   updateTime?: string;
   viewId: string;
-  view: {
-    id: string;
-    name: string;
-    model: string;
-    script: string;
-    meta?: any[];
-    sourceId: string;
-    config?: string;
-  };
+  view: View & { meta?: any[] };
 };
 
 export type BackendChartConfig = {
@@ -83,10 +77,16 @@ const initState: WorkbenchState = {
 
 // Selectors
 const workbenchSelector = state => state.workbench;
-export const dataviewSelector = createSelector(
-  workbenchSelector,
-  (wb: typeof initState) => wb.dataviews,
-);
+export const makeDataviewTreeSelector = () =>
+  createSelector(
+    [
+      workbenchSelector,
+      (_, props: { getSelectable: (o: ChartDataView) => boolean }) =>
+        props.getSelectable,
+    ],
+    (wb: typeof initState, getSelectable) =>
+      listToTree(wb.dataviews, null, [ResourceTypes.View], { getSelectable }),
+  );
 export const currentDataViewSelector = createSelector(
   workbenchSelector,
   (wb: typeof initState) => wb.currentDataView,
@@ -169,12 +169,7 @@ export const fetchDataViewsAction = createAsyncThunk(
 export const fetchViewDetailAction = createAsyncThunk(
   'workbench/fetchViewDetailAction',
   async (arg: { viewId }, thunkAPI) => {
-    const response = await request<{
-      id: string;
-      model: string;
-      script: string;
-      sourceId: string;
-    }>({
+    const response = await request<View>({
       method: 'GET',
       url: `views/${arg}`,
     });
@@ -367,14 +362,9 @@ const workbenchSlice = createSlice({
         }
 
         if (index !== undefined) {
-          const view = state.dataviews?.[index];
           state.currentDataView = {
-            id: payload.id,
-            name: view?.name!,
-            model: {},
+            ...payload,
             meta: transformMeta(payload.model),
-            script: payload.script,
-            sourceId: payload.sourceId,
             computedFields,
           };
         }
@@ -400,12 +390,8 @@ const workbenchSlice = createSlice({
         );
         if (!!payload) {
           state.currentDataView = {
-            id: payload?.view?.id,
-            name: payload?.view?.name,
-            model: {},
-            meta: payload?.view?.meta || transformMeta(payload?.view?.model),
-            script: payload?.view?.script,
-            sourceId: payload?.view?.sourceId,
+            ...payload.view,
+            meta: transformMeta(payload.view.model),
             computedFields: backendChartConfig?.computedFields || [],
           };
         }

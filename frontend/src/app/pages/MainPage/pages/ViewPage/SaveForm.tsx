@@ -11,6 +11,7 @@ import {
 } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
 import debounce from 'debounce-promise';
+import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import {
   useCallback,
   useContext,
@@ -140,7 +141,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
                 () => Promise.resolve(),
                 () => Promise.reject(new Error('名称重复')),
               );
-            }, 300),
+            }, DEFAULT_DEBOUNCE_WAIT),
           },
         ]}
       >
