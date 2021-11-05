@@ -16,4 +16,5 @@ public enum ValueType {
 
     SNIPPET, //will be parse to sql node
 
+    KEYWORD,
 }

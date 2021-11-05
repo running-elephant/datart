@@ -21,10 +21,8 @@ package datart.core.common;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.Set;
 
 public class FileUtils {
@@ -92,6 +90,4 @@ public class FileUtils {
             return names;
         }
     }
-
-
 }

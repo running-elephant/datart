@@ -79,7 +79,7 @@ public class LocalDB {
                     , executeParam
                     , SQL_DIALECT
                     , Const.DEFAULT_VARIABLE_QUOTE);
-            sql = render.render(true);
+            sql = render.render(true, true);
         }
 
         try (Connection connection = getConnection(persistent)) {
