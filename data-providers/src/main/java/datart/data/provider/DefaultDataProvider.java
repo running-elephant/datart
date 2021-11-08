@@ -106,11 +106,6 @@ public abstract class DefaultDataProvider extends DataProvider {
     }
 
     @Override
-    public List<DataProviderSubType> getSubTypes() {
-        return Collections.emptyList();
-    }
-
-    @Override
     public void close() throws IOException {
 
     }

@@ -22,6 +22,7 @@ import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.QueryScript;
 import datart.core.data.provider.ScriptVariable;
 import datart.data.provider.base.DataProviderException;
+import datart.data.provider.calcite.SqlBuilder;
 import datart.data.provider.calcite.SqlKindFilter;
 import datart.data.provider.calcite.SqlParserUtils;
 import datart.data.provider.calcite.SqlVariableVisitor;
@@ -101,7 +102,7 @@ public class SqlScriptRender extends ScriptRender {
         return srcSql;
     }
 
-    public String render(boolean withExecuteParam) throws SqlParseException {
+    public String render(boolean withExecuteParam, boolean withPage) throws SqlParseException {
 
         String script;
 
@@ -128,17 +129,18 @@ public class SqlScriptRender extends ScriptRender {
 
         // build with execute params
         if (withExecuteParam) {
-            selectSql = buildWithExecuteParam(selectSql, sqlDialect);
+            selectSql = SqlBuilder.builder()
+                    .withExecuteParam(executeParam)
+                    .withDialect(sqlDialect)
+                    .withBaseSql(script)
+                    .withPage(withPage)
+                    .build();
         }
 
         //replace variables
         selectSql = replaceVariables(selectSql);
 
-        String finalSql = script.replace(selectSql0, selectSql);
-
-        log.info(finalSql);
-
-        return finalSql;
+        return script.replace(selectSql0, selectSql);
     }
 
     private String findSelectSql(String script) {

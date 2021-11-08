@@ -40,7 +40,6 @@ public class ScriptRender {
 
     protected String variableQuote;
 
-
     public ScriptRender(QueryScript queryScript, ExecuteParam executeParam) {
         this.queryScript = queryScript;
         this.executeParam = executeParam;
@@ -52,15 +51,6 @@ public class ScriptRender {
         this.executeParam = executeParam;
         this.variableQuote = variableQuote;
     }
-
-    protected String buildWithExecuteParam(String script, SqlDialect sqlDialect) throws SqlParseException {
-        return SqlBuilder.builder()
-                .withExecuteParam(executeParam)
-                .withDialect(sqlDialect)
-                .withBaseSql(script)
-                .build();
-    }
-
 
     protected String getVariablePattern(String variableName) {
         variableName = StringUtils.prependIfMissing(variableName, variableQuote);

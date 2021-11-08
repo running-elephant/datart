@@ -9,6 +9,7 @@ public class SqlFragment extends SqlLiteral {
 
     /**
      * Creates a <code> Sql Snippet</code>.
+     *
      * @param value String value
      */
     public SqlFragment(String value) {
@@ -17,6 +18,8 @@ public class SqlFragment extends SqlLiteral {
 
     @Override
     public void unparse(SqlWriter writer, int leftPrec, int rightPrec) {
+        writer.print(" ");
         writer.print(value.toString());
+        writer.print(" ");
     }
 }

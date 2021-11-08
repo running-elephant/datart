@@ -46,8 +46,9 @@ const ChartDataViewPanel: FC<{
   const t = useI18NPrefix(`viz.workbench.dataview`);
   const dispatch = useDispatch();
   const dataviewTreeSelector = useMemo(makeDataviewTreeSelector, []);
+  const getSelectable = useCallback(v => !v.isFolder, []);
   const dataviewTreeData = useSelector(state =>
-    dataviewTreeSelector(state, { getSelectable: v => !v.isFolder }),
+    dataviewTreeSelector(state, getSelectable),
   );
   const [showModal, modalContextHolder] = useStateModal({});
   const [isDisplayAddNewModal, setIsDisplayAddNewModal] = useToggle();

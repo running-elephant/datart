@@ -91,8 +91,6 @@ public abstract class DataProvider extends AutoCloseBean {
         return getBaseInfo().getType();
     }
 
-    public abstract List<DataProviderSubType> getSubTypes();
-
     public abstract String getConfigFile();
 
     @Override

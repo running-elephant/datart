@@ -98,7 +98,6 @@ public class HttpDataProvider extends DefaultDataProvider {
         return dataframes;
     }
 
-
     @Override
     public String getConfigFile() {
         return "http-data-provider.json";

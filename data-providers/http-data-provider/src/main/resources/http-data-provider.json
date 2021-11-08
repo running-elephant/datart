@@ -54,7 +54,7 @@
           "type": "number"
         },
         {
-          "name": "ResponseParser",
+          "name": "responseParser",
           "defaultValue": "",
           "description": "Http Response Parser",
           "type": "string"
