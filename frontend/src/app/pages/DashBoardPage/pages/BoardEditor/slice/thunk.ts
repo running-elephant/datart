@@ -420,7 +420,9 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
       dataChartMap,
       boardLinkFilters,
     });
-
+    if (!requestParams) {
+      return null;
+    }
     let widgetData;
     const { data } = await request<WidgetData>({
       method: 'POST',
