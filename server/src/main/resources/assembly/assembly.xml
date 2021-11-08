@@ -3,7 +3,7 @@
     <formats>
         <format>zip</format>
     </formats>
-    <includeBaseDirectory>true</includeBaseDirectory>
+    <includeBaseDirectory>false</includeBaseDirectory>
     <baseDirectory>${project.build.finalName}</baseDirectory>
     <fileSets>
         <fileSet>
