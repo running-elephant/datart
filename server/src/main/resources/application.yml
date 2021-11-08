@@ -71,6 +71,6 @@ shiro:
 
 
 datart:
-  version: 1.0.0-alpha.1
+  version: 1.0.0-alpha.2
   server:
     path-prefix: /api/v1
