@@ -298,7 +298,7 @@ public class JdbcDataProviderAdapter implements Closeable {
                 , getSqlDialect()
                 , getVariableQuote());
 
-        String sql = render.render(false, false);
+        String sql = render.render(false, false, false);
         Dataframe data = execute(sql);
         data.setName(script.toQueryKey());
 
@@ -320,17 +320,17 @@ public class JdbcDataProviderAdapter implements Closeable {
 
         //server aggregation is not enabled and SQL is committed to the data source for execution
         if (supportPaging()) {
-            sql = render.render(true, true);
+            sql = render.render(true, true, false);
             log.debug(sql);
             dataframe = execute(sql);
         } else {
-            sql = render.render(true, false);
+            sql = render.render(true, false, false);
             log.debug(sql);
             dataframe = execute(sql, executeParam.getPageInfo());
         }
         // fix page info
         if (executeParam.getPageInfo().isCountTotal()) {
-            int total = executeCountSql(render.render(true, false));
+            int total = executeCountSql(render.render(true, false, true));
             executeParam.getPageInfo().setTotal(total);
             dataframe.setPageInfo(executeParam.getPageInfo());
         }

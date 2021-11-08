@@ -72,7 +72,7 @@ public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
                 , getSqlDialect()
                 , getVariableQuote());
 
-        String sql = render.render(true, false);
+        String sql = render.render(true, false, false);
 
         String wrappedSql = pageWrapper(sql, executeParam.getPageInfo());
 
@@ -81,7 +81,7 @@ public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
         Dataframe dataframe = execute(wrappedSql);
         // fix page info
         if (executeParam.getPageInfo().isCountTotal()) {
-            int total = executeCountSql(sql);
+            int total = executeCountSql(render.render(true, false, true));
             executeParam.getPageInfo().setTotal(total);
             dataframe.setPageInfo(executeParam.getPageInfo());
         }

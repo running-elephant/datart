@@ -100,7 +100,8 @@ public class SqlScriptRender extends ScriptRender {
         return srcSql;
     }
 
-    public String render(boolean withExecuteParam, boolean withPage) throws SqlParseException {
+
+    public String render(boolean withExecuteParam, boolean withPage, boolean onlySelectStatement) throws SqlParseException {
 
         String script;
 
@@ -130,7 +131,7 @@ public class SqlScriptRender extends ScriptRender {
             selectSql = SqlBuilder.builder()
                     .withExecuteParam(executeParam)
                     .withDialect(sqlDialect)
-                    .withBaseSql(script)
+                    .withBaseSql(selectSql)
                     .withPage(withPage)
                     .build();
         }
@@ -138,7 +139,7 @@ public class SqlScriptRender extends ScriptRender {
         //replace variables
         selectSql = replaceVariables(selectSql);
 
-        return script.replace(selectSql0, selectSql);
+        return onlySelectStatement ? selectSql : script.replace(selectSql0, selectSql);
     }
 
     private String findSelectSql(String script) {
