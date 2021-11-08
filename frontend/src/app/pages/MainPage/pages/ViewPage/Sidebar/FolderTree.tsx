@@ -75,7 +75,7 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
   );
 
   const moreMenuClick = useCallback(
-    ({ id, name, parentId }) =>
+    ({ id, name, parentId, index }) =>
       ({ key, domEvent }) => {
         domEvent.stopPropagation();
         switch (key) {
@@ -97,6 +97,7 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                       id,
                       ...values,
                       parentId: values.parentId || null,
+                      index,
                     },
                     resolve: onClose,
                   }),

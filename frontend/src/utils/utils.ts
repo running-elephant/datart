@@ -56,6 +56,7 @@ export function listToTree<
     name: string;
     parentId: string | null;
     isFolder: boolean;
+    index: number | null;
   },
 >(
   list: undefined | T[],
@@ -91,6 +92,8 @@ export function listToTree<
       childrenList.push(o);
     }
   });
+
+  treeNodes.sort((a, b) => Number(a.index) - Number(b.index));
 
   return treeNodes.map(node => {
     const children = listToTree(childrenList, node.key, node.path, options);
