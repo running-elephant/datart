@@ -166,18 +166,19 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
 
         dashboardDetail.setWidgets(widgetDetails);
 
-        //views
-        if (!CollectionUtils.isEmpty(viewIds)) {
-            dashboardDetail.setViews(viewMapper.listByIds(viewIds));
-        } else {
-            dashboardDetail.setViews(Collections.emptyList());
-        }
-
         // charts
         if (!CollectionUtils.isEmpty(datachartIds)) {
             dashboardDetail.setDatacharts(datachartMapper.listByIds(datachartIds));
         } else {
             dashboardDetail.setDatacharts(Collections.emptyList());
+        }
+        //views
+        List<String> chartViews = dashboardDetail.getDatacharts().stream().map(Datachart::getViewId).collect(Collectors.toList());
+        viewIds.addAll(chartViews);
+        if (!CollectionUtils.isEmpty(viewIds)) {
+            dashboardDetail.setViews(viewMapper.listByIds(viewIds));
+        } else {
+            dashboardDetail.setViews(Collections.emptyList());
         }
 
         //variables

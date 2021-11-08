@@ -20,9 +20,12 @@ package datart.data.provider.jdbc.adapters;
 
 
 import datart.core.base.PageInfo;
+import datart.core.base.consts.ValueType;
+import datart.core.data.provider.Column;
 import datart.core.data.provider.Dataframe;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.QueryScript;
+import datart.data.provider.jdbc.DataTypeUtils;
 import datart.data.provider.jdbc.SqlScriptRender;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +44,24 @@ public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
 
     @Override
     protected Dataframe parseResultSet(ResultSet rs, long count) throws SQLException {
-        return super.parseResultSet(rs, count);
+        Dataframe dataframe = new Dataframe();
+        List<Column> columns = getColumns(rs);
+        ArrayList<List<Object>> rows = new ArrayList<>();
+        int c = 0;
+        while (rs.next()) {
+            ArrayList<Object> row = new ArrayList<>();
+            rows.add(row);
+            for (int i = 2; i < columns.size() + 2; i++) {
+                row.add(rs.getObject(i));
+            }
+            c++;
+            if (c >= count) {
+                break;
+            }
+        }
+        dataframe.setColumns(columns);
+        dataframe.setRows(rows);
+        return dataframe;
     }
 
     @Override
@@ -74,6 +94,17 @@ public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
                 sql,
                 (pageInfo.getPageNo()) * pageInfo.getPageSize(),
                 (pageInfo.getPageNo() - 1) * pageInfo.getPageSize());
+    }
+
+    protected List<Column> getColumns(ResultSet rs) throws SQLException {
+        ArrayList<Column> columns = new ArrayList<>();
+        for (int i = 2; i <= rs.getMetaData().getColumnCount(); i++) {
+            String columnTypeName = rs.getMetaData().getColumnTypeName(i);
+            String columnName = rs.getMetaData().getColumnName(i);
+            ValueType valueType = DataTypeUtils.sqlType2DataType(columnTypeName);
+            columns.add(new Column(columnName, valueType));
+        }
+        return columns;
     }
 
 }
