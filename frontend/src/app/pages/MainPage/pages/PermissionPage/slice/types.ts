@@ -36,6 +36,7 @@ export interface DataSourceViewModel {
   name: string;
   type: SubjectTypes | ResourceTypes;
   parentId: string | null;
+  index: number | null;
   isFolder: boolean;
   permissionArray: PermissionLevels[];
 }

@@ -24,6 +24,7 @@ export function generateRootNode(
     name: '所有资源',
     type,
     parentId: null,
+    index: null,
     isFolder: true,
     permissionArray: getDefaultPermissionArray(),
   };
