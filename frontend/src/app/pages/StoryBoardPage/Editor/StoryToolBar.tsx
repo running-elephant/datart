@@ -15,9 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PlusOutlined } from '@ant-design/icons';
+import { LeftOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { vizActions } from 'app/pages/MainPage/pages/VizPage/slice';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import React, { memo, useCallback, useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -36,50 +35,53 @@ import { addStoryPages } from '../slice/thunks';
 import { StoryPageSetting } from './StoryPageSetting';
 import { StorySetting } from './StorySetting';
 
-export const StoryToolBar: React.FC<{}> = memo(() => {
-  const dispatch = useDispatch();
+export const StoryToolBar: React.FC<{ onCloseEditor?: () => void }> = memo(
+  ({ onCloseEditor }) => {
+    const dispatch = useDispatch();
 
-  const goView = useCallback(() => {
-    dispatch(vizActions.changeEditingStoryId(''));
-  }, [dispatch]);
-  const { stroyBoardId: storyId, name } = useContext(StoryContext);
-  const [visible, setVisible] = useState(false);
-  const chartOptionsMock = useSelector(selectVizs);
-  const chartOptions = chartOptionsMock.filter(
-    item => item.relType === 'DASHBOARD',
-  );
+    const closeEditor = useCallback(() => {
+      onCloseEditor?.();
+    }, [onCloseEditor]);
+    const { stroyBoardId: storyId, name } = useContext(StoryContext);
+    const [visible, setVisible] = useState(false);
+    const chartOptionsMock = useSelector(selectVizs);
+    const chartOptions = chartOptionsMock.filter(
+      item => item.relType === 'DASHBOARD',
+    );
 
-  const onSelectedPages = useCallback(
-    (relIds: string[]) => {
-      dispatch(addStoryPages({ storyId, relIds }));
-      setVisible(false);
-    },
-    [storyId, dispatch],
-  );
-  return (
-    <Wrapper>
-      <Title>{name}</Title>
-      <AddButton
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={() => setVisible(true)}
-      />
-      <Settings>
-        <StoryPageSetting />
-        <StorySetting />
-      </Settings>
-      <Button type="primary" className="okBtn" onClick={goView}>
-        完成
-      </Button>
-      <StoryPageAddModal
-        pageContents={chartOptions}
-        visible={visible}
-        onSelectedPages={onSelectedPages}
-        onCancel={() => setVisible(false)}
-      />
-    </Wrapper>
-  );
-});
+    const onSelectedPages = useCallback(
+      (relIds: string[]) => {
+        dispatch(addStoryPages({ storyId, relIds }));
+        setVisible(false);
+      },
+      [storyId, dispatch],
+    );
+    return (
+      <Wrapper>
+        <LeftOutlined
+          onClick={closeEditor}
+          style={{ marginRight: '10px', fontSize: '1.2rem' }}
+        />
+        <Title>{name}</Title>
+        <AddButton
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => setVisible(true)}
+        />
+        <Settings>
+          <StoryPageSetting />
+          <StorySetting />
+        </Settings>
+        <StoryPageAddModal
+          pageContents={chartOptions}
+          visible={visible}
+          onSelectedPages={onSelectedPages}
+          onCancel={() => setVisible(false)}
+        />
+      </Wrapper>
+    );
+  },
+);
 
 const Wrapper = styled.div`
   display: flex;

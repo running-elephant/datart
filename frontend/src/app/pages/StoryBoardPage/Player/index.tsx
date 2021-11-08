@@ -85,11 +85,6 @@ export const StoryPlayer: React.FC<{ storyId: string }> = memo(
       },
       [dispatch, sortedPages, storyId],
     );
-    // useEffect(() => {
-    //   if (editingStoryId) {
-    //     revealRef.current.removeEventListener('slidechanged', changePage);
-    //   }
-    // }, [changePage, editingStoryId]);
 
     useEffect(() => {
       if (sortedPages.length === 0) {
@@ -198,5 +193,8 @@ const Wrapper = styled.div`
 
   .tool-bar {
     height: 100px;
+  }
+  & .reveal .slides {
+    text-align: left;
   }
 `;

@@ -28,8 +28,6 @@ export interface VizState {
   tabs: VizTab[];
   selectedTab: string;
   dataChartListLoading: boolean;
-
-  editingStoryId?: string;
   playingStoryId?: string;
   chartPreviews: ChartPreview[];
 }

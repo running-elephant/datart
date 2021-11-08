@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, isRejected, PayloadAction } from '@reduxjs/toolkit';
 import { ChartDataSectionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
@@ -24,11 +24,14 @@ import {
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transferChartConfig } from 'app/pages/MainPage/pages/VizPage/slice/utils';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
+import { isMySliceAction } from 'utils/@reduxjs/toolkit';
+import { errorHandle } from 'utils/utils';
 import { fetchShareDataSetByPreviewChartAction } from './thunks';
 // import { fetchShareDataSetByPreviewChartAction } from './thunk';
 import { ExecuteToken, SharePageState, ShareVizInfo } from './types';
 
 export const initialState: SharePageState = {
+  needPassword: false,
   vizType: undefined,
   shareToken: '',
   executeToken: '',
@@ -44,12 +47,12 @@ export const slice = createSlice({
   name: 'share',
   initialState,
   reducers: {
-    saveShareInfo: (
-      state,
-      action: PayloadAction<{ shareToken: string; sharePassword?: string }>,
-    ) => {
-      state.shareToken = action.payload.shareToken;
-      state.sharePassword = action.payload.sharePassword;
+    saveShareInfo: (state, action: PayloadAction<{ token; pwd }>) => {
+      state.shareToken = action.payload.token;
+      state.sharePassword = action.payload.pwd;
+    },
+    saveNeedPassword: (state, action: PayloadAction<boolean>) => {
+      state.needPassword = action.payload;
     },
     setVizType: (state, action: PayloadAction<VizType | undefined>) => {
       state.vizType = action.payload;
@@ -59,9 +62,21 @@ export const slice = createSlice({
     },
     setExecuteTokenMap: (
       state,
-      action: PayloadAction<Record<string, ExecuteToken>>,
+      action: PayloadAction<{
+        executeToken: Record<string, ExecuteToken>;
+      }>,
     ) => {
-      state.executeTokenMap = action.payload;
+      const { executeToken } = action.payload;
+      state.executeTokenMap = executeToken;
+    },
+    setSubVizTokenMap: (
+      state,
+      action: PayloadAction<{
+        subVizToken: Record<string, ExecuteToken> | null;
+      }>,
+    ) => {
+      const { subVizToken } = action.payload;
+      state.subVizTokenMap = subVizToken || undefined;
     },
     setDataChart: (
       state,
@@ -127,25 +142,31 @@ export const slice = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(
-      fetchShareDataSetByPreviewChartAction.fulfilled,
-      (state, { payload }) => {
-        state.chartPreview = {
-          ...state.chartPreview,
-          dataset: payload as any,
-        };
+    builder
+      .addCase(
+        fetchShareDataSetByPreviewChartAction.fulfilled,
+        (state, { payload }) => {
+          state.chartPreview = {
+            ...state.chartPreview,
+            dataset: payload as any,
+          };
+          state.headlessBrowserRenderSign = true;
+        },
+      )
+      .addCase(fetchShareDataSetByPreviewChartAction.rejected, state => {
         state.headlessBrowserRenderSign = true;
-      },
-    );
-    builder.addCase(fetchShareDataSetByPreviewChartAction.rejected, state => {
-      state.headlessBrowserRenderSign = true;
-    });
+      })
+      .addMatcher(isRejected, (_, action) => {
+        if (isMySliceAction(action, slice.name)) {
+          errorHandle(action?.error);
+        }
+      });
   },
 });
 
-export const { actions, reducer } = slice;
+export const { actions: shareActions, reducer } = slice;
 
 export const useShareSlice = () => {
   useInjectReducer({ key: slice.name, reducer: slice.reducer });
-  return { actions: slice.actions };
+  return { shareActions: slice.actions };
 };

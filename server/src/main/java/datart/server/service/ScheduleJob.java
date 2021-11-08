@@ -173,9 +173,9 @@ public abstract class ScheduleJob implements Job, Closeable {
 
         String path = FileUtils.concatPath(Application.getFileBasePath(), FileOwner.SCHEDULE.getPath(), schedule.getId());
 
-        File file = WebUtils.screenShot2File(url, path);
+        File file = WebUtils.screenShot2File(url, path,imageWidth);
 
-        ImageUtils.resize(file.getPath(), imageWidth * 1.0, null);
+//        ImageUtils.resize(file.getPath(), imageWidth * 1.0, null);
 
         attachments.add(file);
 

@@ -24,6 +24,7 @@ import datart.core.data.provider.SingleTypedValue;
 import datart.core.data.provider.sql.*;
 import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.custom.CustomSqlBetweenOperator;
+import datart.data.provider.calcite.dialect.FetchAndOffsetSupport;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlBetweenOperator;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
@@ -47,6 +48,8 @@ public class SqlBuilder {
     private ExecuteParam executeParam;
 
     private SqlDialect dialect;
+
+    private boolean withPage;
 
     private SqlBuilder() {
     }
@@ -72,6 +75,13 @@ public class SqlBuilder {
         this.dialect = sqlDialect;
         return this;
     }
+
+
+    public SqlBuilder withPage(boolean withPage) {
+        this.withPage = withPage;
+        return this;
+    }
+
 
     /**
      * 根据页面操作生成的Aggregator,Filter,Group By, Order By等操作符，重新构建SQL。
@@ -182,6 +192,13 @@ public class SqlBuilder {
             selectList.add(SqlIdentifier.star(SqlParserPos.ZERO));
         }
 
+        SqlNode fetch = null;
+        SqlNode offset = null;
+        if (withPage && (dialect instanceof FetchAndOffsetSupport) && executeParam.getPageInfo() != null) {
+            fetch = SqlLiteral.createExactNumeric(executeParam.getPageInfo().getPageSize() + "", SqlParserPos.ZERO);
+            offset = SqlLiteral.createExactNumeric((executeParam.getPageInfo().getPageNo() - 1) * executeParam.getPageInfo().getPageSize() + "", SqlParserPos.ZERO);
+        }
+
         SqlSelect sqlSelect = new SqlSelect(SqlParserPos.ZERO,
                 keywordList,
                 selectList,
@@ -191,8 +208,8 @@ public class SqlBuilder {
                 having,
                 null,
                 orderBy.size() > 0 ? orderBy : null,
-                null,
-                null,
+                offset,
+                fetch,
                 null);
 
         return sqlSelect.toSqlString(this.dialect).getSql();
@@ -259,8 +276,7 @@ public class SqlBuilder {
         List<SqlNode> nodes = Arrays.stream(operator.getValues())
                 .map(this::convertTypedValue)
                 .collect(Collectors.toList());
-        SqlNode paramNode;
-        SqlCall sqlCall;
+
         SqlNode[] sqlNodes = null;
 
         org.apache.calcite.sql.SqlOperator sqlOp;

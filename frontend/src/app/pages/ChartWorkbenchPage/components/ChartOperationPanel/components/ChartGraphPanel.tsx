@@ -18,6 +18,7 @@
 
 import { Tooltip } from 'antd';
 import { IW } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartDataSectionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
@@ -28,7 +29,6 @@ import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
   FONT_SIZE_ICON_MD,
-  FONT_SIZE_ICON_SM,
   SPACE_MD,
   SPACE_TIMES,
   SPACE_XS,
@@ -38,6 +38,7 @@ const ChartGraphPanel: FC<{
   chart?: Chart;
   onChartChange: (c: Chart) => void;
 }> = memo(({ chart, onChartChange }) => {
+  const t = useI18NPrefix(`viz.palette.graph`);
   const chartManager = ChartManager.instance();
   const [allCharts] = useState<ChartMetadata[]>(
     chartManager.getAllChartMetas(),
@@ -54,16 +55,20 @@ const ChartGraphPanel: FC<{
   );
 
   const renderChartRequirments = requirements => {
-    const lintMessages = requirements?.map(requirement => {
+    const lintMessages = requirements?.flatMap((requirement, index) => {
       return [ChartDataSectionType.GROUP, ChartDataSectionType.AGGREGATE].map(
         type => {
           const limit = requirement[type.toLocaleLowerCase()];
           return (
-            <li key={type}>
+            <li key={type + index}>
               {Number.isInteger(limit)
-                ? `${type} only allow ${limit}`
+                ? t('onlyAllow', undefined, { type: t(type), num: limit })
                 : Array.isArray(limit) && limit.length === 2
-                ? `${type} allow range ${limit[0]} to ${limit[1]}`
+                ? t('allowRange', undefined, {
+                    type: t(type),
+                    start: limit?.[0],
+                    end: limit?.[1],
+                  })
                 : null}
             </li>
           );

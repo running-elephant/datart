@@ -1,6 +1,7 @@
 import { Checkbox, Form, FormInstance, Input, Radio } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
 import debounce from 'debounce-promise';
+import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { SPACE_XS } from 'styles/StyleConstants';
 import { request } from 'utils/request';
@@ -121,7 +122,7 @@ export const VariableForm = memo(
                   () => Promise.resolve(),
                   () => Promise.reject(new Error('名称重复')),
                 );
-              }, 300),
+              }, DEFAULT_DEBOUNCE_WAIT),
             },
             {
               validator: (_, value) => {

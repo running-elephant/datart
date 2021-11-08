@@ -6,31 +6,10 @@ import { FC, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
-import { request } from 'utils/request';
-import { errorHandle } from 'utils/utils';
-import { DownloadTask, DownloadTaskState } from '../MainPage/slice/types';
+import { DownloadTask } from '../MainPage/slice/types';
 import { useShareSlice } from './slice';
 import { selectShareDownloadPolling } from './slice/selectors';
 const SHARE_HEADER_HEIGHT = 50;
-export const loadShareTask = async params => {
-  try {
-    const { data } = await request<DownloadTask[]>({
-      url: `/share/download/task`,
-      method: 'GET',
-      params,
-    });
-    const isNeedStopPolling = !(data || []).some(
-      v => v.status === DownloadTaskState.CREATE,
-    );
-    return {
-      isNeedStopPolling,
-      data: data || [],
-    };
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
-};
 
 interface DownloadTaskContainerProps {
   onLoadTasks: OnLoadTasksType;
@@ -41,13 +20,13 @@ export const DownloadTaskContainer: FC<DownloadTaskContainerProps> = ({
   ...restProps
 }) => {
   const sharePolling = useSelector(selectShareDownloadPolling);
-  const { actions } = useShareSlice();
+  const { shareActions } = useShareSlice();
   const dispatch = useDispatch();
   const onSetSharePolling = useCallback(
     (polling: boolean) => {
-      dispatch(actions.setShareDownloadPolling(polling));
+      dispatch(shareActions.setShareDownloadPolling(polling));
     },
-    [dispatch, actions],
+    [dispatch, shareActions],
   );
   return (
     <>

@@ -98,7 +98,6 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         viewDetailDTO.setRelSubjectColumns(Collections.emptyList());
         viewDetailDTO.setVariables(Collections.emptyList());
 
-
         return viewDetailDTO;
     }
 

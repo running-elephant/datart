@@ -281,7 +281,7 @@ export type ChartDataSectionConfig = ChartConfigBase & {
   rows?: ChartDataSectionField[];
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
 
-  // TODO: keep field's filter relation for filter arrangement feature
+  // Question: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
 };
 

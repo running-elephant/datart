@@ -32,6 +32,8 @@ public class PageInfo implements Serializable {
 
     private long total;
 
+    private boolean countTotal;
+
     @Override
     public String toString() {
         return "PageInfo{" +

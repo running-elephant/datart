@@ -21,12 +21,15 @@ import {
   ChartPreview,
   VizType,
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
+import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 
 export interface SharePageState {
-  vizType: VizType | undefined;
+  needPassword?: boolean;
+  vizType?: VizType;
   shareToken: string;
   executeToken?: string;
   executeTokenMap: Record<string, ExecuteToken>;
+  subVizTokenMap?: Record<string, ExecuteToken>;
   sharePassword?: string;
   chartPreview?: ChartPreview;
   headlessBrowserRenderSign: boolean;
@@ -35,9 +38,10 @@ export interface SharePageState {
 }
 export interface ShareVizInfo {
   vizType: VizType | undefined;
-  vizDetail: BackendChart | ServerDashboard;
+  vizDetail: BackendChart | ServerDashboard | ServerStoryBoard;
   download: boolean;
   executeToken: Record<string, ExecuteToken>;
+  subVizToken: null | Record<string, ExecuteToken>;
 }
 
 export interface ShareExecuteParams {

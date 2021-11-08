@@ -38,6 +38,11 @@ public class SqlSimpleStringLiteral extends SqlCharStringLiteral {
         this.stringVal = val;
     }
 
+    public SqlSimpleStringLiteral(String val, SqlParserPos pos) {
+        this(new NlsString(val, null, null), pos);
+        this.stringVal = val;
+    }
+
     @Override
     public void unparse(SqlWriter writer, int leftPrec, int rightPrec) {
         SqlDialect dialect = writer.getDialect();

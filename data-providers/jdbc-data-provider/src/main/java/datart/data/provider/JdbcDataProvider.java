@@ -94,30 +94,7 @@ public class JdbcDataProvider extends DataProvider {
 
     @Override
     public Dataframe execute(DataProviderSource source, QueryScript script, ExecuteParam executeParam) throws Exception {
-
-        Dataframe dataframe;
-        String sql;
-
-        JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
-
-        SqlScriptRender render = new SqlScriptRender(script
-                , executeParam
-                , adapter.getSqlDialect()
-                , adapter.getVariableQuote());
-
-        //如果开启了本地聚合，先查询全量view数据，再进行本地聚合
-        if (executeParam.isServerAggregate()) {
-            sql = render.render(false);
-            Dataframe data = adapter.execute(sql);
-            data.setName(script.toQueryKey());
-            return LocalDB.queryFromLocal(data.getName(), executeParam, executeParam.isCacheEnable(), Collections.singletonList(data));
-        }
-
-        //没有开启本地聚合，将SQL提交至数据源执行
-        sql = render.render(true);
-        dataframe = adapter.execute(sql, executeParam.getPageInfo());
-        dataframe.setScript(sql);
-        return dataframe;
+        return matchProviderAdapter(source).execute(script, executeParam);
     }
 
     @Override
@@ -127,11 +104,6 @@ public class JdbcDataProvider extends DataProvider {
         } catch (IOException e) {
             log.error("The JDBC Data Provider configuration file resolves error", e);
         }
-        return null;
-    }
-
-    @Override
-    public List<DataProviderSubType> getSubTypes() {
         return null;
     }
 
@@ -145,9 +117,14 @@ public class JdbcDataProvider extends DataProvider {
         jdbcProperties.setDriverClass(StringUtils.isEmpty(driverClass) ?
                 ProviderFactory.getJdbcDriverInfo(jdbcProperties.getDbType()).getDriverClass() :
                 driverClass);
-        Properties properties = new Properties();
-        properties.putAll(config.getProperties());
-        jdbcProperties.setProperties(properties);
+        Object properties = config.getProperties().get("properties");
+        if (properties != null) {
+            if (properties instanceof Map) {
+                Properties prop = new Properties();
+                prop.putAll((Map) properties);
+                jdbcProperties.setProperties(prop);
+            }
+        }
         return jdbcProperties;
     }
 

@@ -1,6 +1,7 @@
+import { generateShareLinkAsync } from 'app/utils/fetch';
 import {
+  ServerStoryBoard,
   StoryBoard,
-  StoryBoardOfServer,
   StoryConfig,
   StoryPage,
   StoryPageConfig,
@@ -8,7 +9,7 @@ import {
   StoryPageOfServer,
 } from './slice/types';
 
-export const formatStory = (data: StoryBoardOfServer) => {
+export const formatStory = (data: ServerStoryBoard) => {
   let story = {} as StoryBoard;
   delete data.storypages;
   let config;
@@ -79,4 +80,18 @@ export const getStoryPageConfig = (configStr: string | undefined) => {
   } catch (error) {
     return getInitStoryPageConfig(0);
   }
+};
+
+export const generateShareLink = async (
+  expireDate,
+  enablePassword,
+  storyId: string,
+) => {
+  const result = await generateShareLinkAsync(
+    expireDate,
+    enablePassword,
+    storyId,
+    'STORYBOARD',
+  );
+  return result;
 };

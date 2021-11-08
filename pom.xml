@@ -19,7 +19,7 @@
     <groupId>datart</groupId>
     <artifactId>datart-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0-alpha.1</version>
+    <version>1.0.0-alpha.2</version>
 
     <dependencies>
         <dependency>
@@ -77,6 +77,9 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
+                    <configuration>
+                        <generateBackupPoms>false</generateBackupPoms>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

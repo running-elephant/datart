@@ -20,7 +20,6 @@ import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import * as datartChartHelper from 'app/utils/chart';
 import { fetchPluginChart } from 'app/utils/fetch';
 import { Omit } from 'utils/object';
-import { request } from 'utils/request';
 
 class ChartPluginLoader {
   async loadPlugins(paths: string[]) {
@@ -30,23 +29,28 @@ class ChartPluginLoader {
     //   './custom-chart-plugins/demo-d3js-scatter-chart.js',
     // ];
 
-    const loadPluginTasks = (paths || []).map(async path => {
-      const result = await fetchPluginChart(path);
-      if (!result) {
-        return Promise.resolve(result);
-      }
+    const loadPluginTasks = (paths || []).map(async (path, index) => {
+      try {
+        const result = await fetchPluginChart(path);
+        if (!result) {
+          return Promise.resolve(result);
+        }
 
-      /* Known Issue: file path only allow in src folder by create-react-app file scope limition by CRA
-       * Git Issue: https://github.com/facebook/create-react-app/issues/5563
-       * Suggestions: Use es6 `import` api to load file and compatible with ES Modules
-       */
-      // tslint:disable-next-line:no-eval
-      // eslint-disable-next-line no-eval
-      const customPlugin = eval(`(${result})`)({
-        dHelper: { ...datartChartHelper, request, tranform: () => 1 },
-      });
-      return this.convertToDatartChartModel(customPlugin);
+        /* Known Issue: file path only allow in src folder by create-react-app file scope limition by CRA
+         * Git Issue: https://github.com/facebook/create-react-app/issues/5563
+         * Suggestions: Use es6 `import` api to load file and compatible with ES Modules
+         */
+        // eslint-disable-next-line no-new-func
+        const customPlugin = Function(`"use strict"; return (${result})`)()({
+          dHelper: { ...datartChartHelper },
+        });
+        return this.convertToDatartChartModel(customPlugin);
+      } catch (e) {
+        console.error('ChartPluginLoader | plugin chart error: ', e);
+        return null;
+      }
     });
+
     return Promise.all(loadPluginTasks);
   }
 

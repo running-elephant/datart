@@ -290,6 +290,8 @@
         "autoLoad": "Auto Load",
         "enableRaw": "Raw Data",
         "reference": {
+          "enableMarkLine": "Enable Mark Line",
+          "enableMarkArea": "Enable Mark Area",
           "markLine": "Reference Line",
           "markArea": "Reference Area",
           "valueType": "Value Type",
@@ -314,6 +316,12 @@
         "graph": "Graph",
         "raw": "Raw",
         "sql": "SQL"
+      },
+      "graph": {
+        "group": "Dimensions",
+        "aggregate": "Measures",
+        "onlyAllow": "{{type}} Only Allow {{num}}",
+        "allowRange": "{{type}} Allow Range {{start}} to {{end}}"
       }
     },
     "chartPreview": {

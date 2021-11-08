@@ -248,9 +248,7 @@ export const addDataChartWidgets = createAsyncThunk<
         dashboardId: boardId,
         boardType: boardType,
         dataChartId: dcId,
-
         dataChartConfig: dataChartMap[dcId],
-        viewId: dataChartMap[dcId].viewId,
         subType: 'dataChart',
       });
       return widget;
@@ -285,9 +283,7 @@ export const addWrapChartWidget = createAsyncThunk<
       dashboardId: boardId,
       boardType: boardType,
       dataChartId: chartId,
-
       dataChartConfig: dataChart,
-      viewId: view.id,
       subType: 'widgetChart',
     });
     dispatch(addWidgetsToEditBoard([widget]));
@@ -420,7 +416,9 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
       dataChartMap,
       boardLinkFilters,
     });
-
+    if (!requestParams) {
+      return null;
+    }
     let widgetData;
     const { data } = await request<WidgetData>({
       method: 'POST',

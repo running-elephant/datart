@@ -136,6 +136,7 @@ export function getReference(
     'reference.panel.configuration',
     'rows',
   );
+
   return {
     markLine: getMarkLine(
       referenceTabs,
@@ -164,7 +165,8 @@ function getMarkLine(refTabs, dataColumns, dataConfig, isHorizionDisplay) {
         dataConfig,
         isHorizionDisplay,
       );
-    });
+    })
+    .filter(Boolean);
 
   return {
     data: markLineData,
@@ -183,12 +185,14 @@ function getMarkLineData(
   const name = mark.label;
   const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
   const show = getSettingValue(mark.rows, 'showLabel', 'value');
+  const enableMarkLine = getSettingValue(mark.rows, 'enableMarkLine', 'value');
   const position = getSettingValue(mark.rows, 'position', 'value');
   const font = getSettingValue(mark.rows, 'font', 'value');
   const lineStyle = getSettingValue(mark.rows, 'lineStyle', 'value');
   const valueType = getSettingValue(mark.rows, valueTypeKey, 'value');
   const metricUid = getSettingValue(mark.rows, metricKey, 'value');
   const metr = getValueByColumnKey(dataConfig);
+
   const metricDatas =
     dataConfig.uid === metricUid ? dataColumns.map(d => +d[metr]) : [];
   const constantValue = getSettingValue(mark.rows, constantValueKey, 'value');
@@ -206,6 +210,10 @@ function getMarkLineData(
     case 'min':
       yAxis = Math.min(...metricDatas);
       break;
+  }
+
+  if (!enableMarkLine) {
+    return null;
   }
 
   return {
@@ -230,6 +238,7 @@ function getMarkAreaData(
 ) {
   const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
   const show = getSettingValue(mark.rows, 'showLabel', 'value');
+  const enableMarkArea = getSettingValue(mark.rows, 'enableMarkArea', 'value');
   const position = getSettingValue(mark.rows, 'position', 'value');
   const font = getSettingValue(mark.rows, 'font', 'value');
   const borderStyle = getSettingValue(mark.rows, 'borderStyle', 'value');
@@ -260,6 +269,10 @@ function getMarkAreaData(
       break;
   }
 
+  if (!enableMarkArea) {
+    return null;
+  }
+
   return {
     [valueKey]: yAxis,
     name,
@@ -285,20 +298,23 @@ function getMarkArea(refTabs, dataColumns, isHorizionDisplay) {
     return acc;
   }, []);
   return {
-    data: refAreas?.map(mark => {
-      const markAreaData = ['start', 'end'].map(prefix => {
-        return getMarkAreaData(
-          mark,
-          dataColumns,
-          `${prefix}ValueType`,
-          `${prefix}ConstantValue`,
-          `${prefix}Metric`,
-          isHorizionDisplay,
-        );
-      });
-
-      return markAreaData;
-    }),
+    data: refAreas
+      ?.map(mark => {
+        const markAreaData = ['start', 'end']
+          .map(prefix => {
+            return getMarkAreaData(
+              mark,
+              dataColumns,
+              `${prefix}ValueType`,
+              `${prefix}ConstantValue`,
+              `${prefix}Metric`,
+              isHorizionDisplay,
+            );
+          })
+          .filter(Boolean);
+        return markAreaData;
+      })
+      .filter(m => Boolean(m?.length)),
   };
 }
 
@@ -537,6 +553,7 @@ export function getSeriesTooltips4Scatter(
 
 export function getSeriesTooltips4Rectangular2(
   tooltipParam: {
+    componentType: string;
     data: {
       name: string;
       rowData: { [key: string]: any };
@@ -548,6 +565,10 @@ export function getSeriesTooltips4Rectangular2(
   infoConfigs?: ChartDataSectionField[],
   sizeConfigs?: ChartDataSectionField[],
 ): string {
+  if (tooltipParam?.componentType !== 'series') {
+    return '';
+  }
+
   const aggConfigName = tooltipParam?.data?.name;
   const row = tooltipParam?.data?.rowData || {};
 

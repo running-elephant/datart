@@ -4,6 +4,7 @@ import { requestWithHeader } from 'utils/request';
 interface DownloadShareDashChartFileParams {
   downloadId: string;
   shareToken: string;
+  password?: string | null;
 }
 export async function downloadShareDataChartFile(
   params: DownloadShareDashChartFileParams,

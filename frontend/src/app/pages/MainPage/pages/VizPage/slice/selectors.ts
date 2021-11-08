@@ -116,15 +116,10 @@ export const selectSelectedTab = createSelector([selectDomain], vizState =>
   vizState.tabs.find(t => t.id === vizState.selectedTab),
 );
 
-export const selectEditingStoryId = createSelector(
-  [selectDomain],
-  vizState => vizState.editingStoryId,
-);
 export const selectPlayingStoryId = createSelector(
   [selectDomain],
   vizState => vizState.playingStoryId,
 );
-// editingStoryId
 export const selectPreviewCharts = createSelector(
   [selectDomain],
   vizState => vizState.chartPreviews,

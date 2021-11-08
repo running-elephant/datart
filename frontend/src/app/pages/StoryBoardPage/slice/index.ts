@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 import { PayloadAction } from '@reduxjs/toolkit';
-import { publishViz } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { getInitStoryPageInfo } from './../utils';
@@ -141,6 +140,14 @@ const storyBoardSlice = createSlice({
       const storyBoard = action.payload;
       state.storyMap[storyBoard.id] = storyBoard;
     },
+    changeBoardPublish(
+      state,
+      action: PayloadAction<{ stroyId: string; publish: number }>,
+    ) {
+      const { stroyId, publish } = action.payload;
+      // 1 发布了， 2 取消发布
+      state.storyMap[stroyId].status = publish;
+    },
   },
   extraReducers: builder => {
     // builder.addCase(loadStoryPagesById.pending, state => {
@@ -153,14 +160,6 @@ const storyBoardSlice = createSlice({
     // builder.addCase(loadStoryPagesById.rejected, state => {
     //   // state.organizationListLoading = false;
     // });
-
-    // publishViz
-    builder.addCase(publishViz.fulfilled, (state, action) => {
-      state.storyMap[action.meta.arg.id] = {
-        ...state.storyMap[action.meta.arg.id],
-        status: action.meta.arg.publish ? 2 : 1,
-      };
-    });
   },
 });
 export const { actions: storyActions } = storyBoardSlice;

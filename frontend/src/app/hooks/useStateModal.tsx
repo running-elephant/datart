@@ -18,7 +18,7 @@
 
 import { Form, Modal } from 'antd';
 import { useRef } from 'react';
-import { useI18NPrefix } from '.';
+import useI18NPrefix from './useI18NPrefix';
 
 export interface IStateModalContentProps {
   onChange: (o: any) => void;

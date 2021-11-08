@@ -17,7 +17,6 @@
  */
 package datart.server.service.impl;
 
-import datart.core.common.Application;
 import datart.server.service.ScheduleJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Base64Utils;
@@ -34,24 +33,17 @@ import java.util.Map;
 public class WeChartJob extends ScheduleJob {
 
     @Override
-    public void doSend() {
+    public void doSend() throws Exception {
 
         if (CollectionUtils.isEmpty(attachments)) {
             return;
         }
 
         String webHookUrl = jobConfig.getWebHookUrl();
-
-        RestTemplate restTemplate = Application.getBean(RestTemplate.class);
-
+        RestTemplate restTemplate = new RestTemplate();
         for (File attachment : attachments) {
-            try {
-                restTemplate.postForEntity(webHookUrl, createParam(attachment), Object.class);
-            } catch (Exception e) {
-                log.error("we chart send error", e);
-            }
+            restTemplate.postForEntity(webHookUrl, createParam(attachment), Object.class);
         }
-
     }
 
     private Map<String, Object> createParam(File file) throws Exception {

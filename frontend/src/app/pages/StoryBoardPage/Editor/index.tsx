@@ -49,54 +49,37 @@ import { StoryBoardState } from '../slice/types';
 import { StoryToolBar } from './StoryToolBar';
 
 const { Content } = Layout;
-export const StoryEditor: React.FC<{ storyId: string }> = memo(
-  ({ storyId }) => {
-    const domId = useMemo(() => uuidv4(), []);
-    const revealRef = useRef<any>();
-    const dispatch = useDispatch();
-    const [currentPageIndex, setCurrentPageIndex] = useState(0);
-    const storyBoard = useSelector((state: { storyBoard: StoryBoardState }) =>
-      makeSelectStoryBoardById(state, storyId),
+export const StoryEditor: React.FC<{
+  storyId: string;
+  onCloseEditor?: () => void;
+}> = memo(({ storyId, onCloseEditor }) => {
+  const domId = useMemo(() => uuidv4(), []);
+  const revealRef = useRef<any>();
+  const dispatch = useDispatch();
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const storyBoard = useSelector((state: { storyBoard: StoryBoardState }) =>
+    makeSelectStoryBoardById(state, storyId),
+  );
+  const pageMap = useSelector((state: { storyBoard: StoryBoardState }) =>
+    makeSelectStoryPagesById(state, storyId),
+  );
+
+  const sortedPages = useMemo(() => {
+    const sortedPages = Object.values(pageMap).sort(
+      (a, b) => a.config.index - b.config.index,
     );
-    const pageMap = useSelector((state: { storyBoard: StoryBoardState }) =>
-      makeSelectStoryPagesById(state, storyId),
-    );
+    return sortedPages;
+  }, [pageMap]);
 
-    const sortedPages = useMemo(() => {
-      const sortedPages = Object.values(pageMap).sort(
-        (a, b) => a.config.index - b.config.index,
-      );
-      return sortedPages;
-    }, [pageMap]);
+  useEffect(() => {
+    // dispatch(getStoryDetail(storyId));
+  }, [dispatch, storyId]);
 
-    useEffect(() => {
-      // dispatch(getStoryDetail(storyId));
-    }, [dispatch, storyId]);
-
-    const changePage = useCallback(
-      e => {
-        const { indexh: slideIdx } = e;
-        setCurrentPageIndex(slideIdx);
-        const pageId = sortedPages[slideIdx].id;
-        dispatch(
-          storyActions.changePageSelected({
-            storyId,
-            pageId,
-            multiple: false,
-          }),
-        );
-      },
-      [dispatch, sortedPages, storyId],
-    );
-
-    useEffect(() => {
-      if (sortedPages.length === 0) {
-        return;
-      }
-      if (!sortedPages[currentPageIndex]) {
-        return;
-      }
-      const pageId = sortedPages[currentPageIndex].id;
+  const changePage = useCallback(
+    e => {
+      const { indexh: slideIdx } = e;
+      setCurrentPageIndex(slideIdx);
+      const pageId = sortedPages[slideIdx].id;
       dispatch(
         storyActions.changePageSelected({
           storyId,
@@ -104,141 +87,160 @@ export const StoryEditor: React.FC<{ storyId: string }> = memo(
           multiple: false,
         }),
       );
-    }, [dispatch, currentPageIndex, sortedPages, storyId]);
-    useEffect(() => {
-      if (sortedPages.length > 0) {
-        revealRef.current = new Reveal(document.getElementById(domId), {
-          hash: false,
-          history: false,
-          controls: false,
-          controlsLayout: 'none',
-          slideNumber: 'c/t',
-          controlsTutorial: false,
-          progress: false,
-          loop: true,
-          width: '100%',
-          height: '100%',
-          margin: 0,
-          minScale: 1,
-          maxScale: 1,
-          autoSlide: null,
-          transition: 'convex',
-          // backgroundTransition: 'fade',
-          transitionSpeed: 'slow',
-          viewDistance: 100,
-          plugins: [RevealZoom],
-          keyboard: {
-            70: () => {},
-          },
-        });
-        revealRef.current?.initialize();
-        if (revealRef.current) {
-          revealRef.current.addEventListener('slidechanged', changePage);
-        }
-        return () => {
-          revealRef.current.removeEventListener('slidechanged', changePage);
-        };
+    },
+    [dispatch, sortedPages, storyId],
+  );
+
+  useEffect(() => {
+    if (sortedPages.length === 0) {
+      return;
+    }
+    if (!sortedPages[currentPageIndex]) {
+      return;
+    }
+    const pageId = sortedPages[currentPageIndex].id;
+    dispatch(
+      storyActions.changePageSelected({
+        storyId,
+        pageId,
+        multiple: false,
+      }),
+    );
+  }, [dispatch, currentPageIndex, sortedPages, storyId]);
+  useEffect(() => {
+    if (sortedPages.length > 0) {
+      revealRef.current = new Reveal(document.getElementById(domId), {
+        hash: false,
+        history: false,
+        controls: false,
+        controlsLayout: 'none',
+        slideNumber: 'c/t',
+        controlsTutorial: false,
+        progress: false,
+        loop: true,
+        width: '100%',
+        height: '100%',
+        margin: 0,
+        minScale: 1,
+        maxScale: 1,
+        autoSlide: null,
+        transition: 'convex',
+        // backgroundTransition: 'fade',
+        transitionSpeed: 'slow',
+        viewDistance: 100,
+        plugins: [RevealZoom],
+        keyboard: {
+          70: () => {},
+        },
+      });
+      revealRef.current?.initialize();
+      if (revealRef.current) {
+        revealRef.current.addEventListener('slidechanged', changePage);
       }
+      return () => {
+        revealRef.current.removeEventListener('slidechanged', changePage);
+      };
+    }
 
-      // "none" | "fade" | "slide" | "convex" | "concave" | "zoom"
-    }, [domId, changePage, sortedPages.length]);
+    // "none" | "fade" | "slide" | "convex" | "concave" | "zoom"
+  }, [domId, changePage, sortedPages.length]);
 
-    useEffect(() => {
-      const curPage = sortedPages[currentPageIndex];
-      if (!curPage || !curPage.relId || !curPage.relType) {
-        return;
+  useEffect(() => {
+    const curPage = sortedPages[currentPageIndex];
+    if (!curPage || !curPage.relId || !curPage.relType) {
+      return;
+    }
+    const { relId, relType } = curPage;
+    dispatch(getPageContentDetail({ relId, relType }));
+  }, [currentPageIndex, dispatch, sortedPages]);
+
+  const onPageClick = useCallback(
+    (index: number, pageId: string, multiple: boolean) => {
+      if (!multiple) {
+        revealRef.current.slide(index);
+      } else {
+        dispatch(
+          storyActions.changePageSelected({
+            storyId,
+            pageId,
+            multiple: true,
+          }),
+        );
       }
-      const { relId, relType } = curPage;
-      dispatch(getPageContentDetail({ relId, relType }));
-    }, [currentPageIndex, dispatch, sortedPages]);
+    },
+    [dispatch, storyId],
+  );
+  const { sizes, setSizes } = useSplitSizes({
+    limitedSide: 0,
+    range: [150, 768],
+  });
+  const siderDragEnd = useCallback(
+    sizes => {
+      setSizes(sizes);
+      dispatchResize();
+    },
 
-    const onPageClick = useCallback(
-      (index: number, pageId: string, multiple: boolean) => {
-        if (!multiple) {
-          revealRef.current.slide(index);
-        } else {
-          dispatch(
-            storyActions.changePageSelected({
-              storyId,
-              pageId,
-              multiple: true,
-            }),
-          );
-        }
-      },
-      [dispatch, storyId],
-    );
-    const { sizes, setSizes } = useSplitSizes({
-      limitedSide: 0,
-      range: [150, 768],
-    });
-    const siderDragEnd = useCallback(
-      sizes => {
-        setSizes(sizes);
-        dispatchResize();
-      },
-
-      [setSizes],
-    );
-    const onDeletePages = useCallback(
-      (pageIds: string[]) => {
-        Modal.confirm({
-          title:
-            pageIds.length > 1
-              ? '确认删除所有选中的故事页？'
-              : '确认删除此故事页？',
-          onOk: () => {
-            // onDelete(selectedIds);
-            pageIds.forEach(pageId => {
-              dispatch(deleteStoryPage({ storyId, pageId }));
-            });
-          },
-        });
-      },
-      [dispatch, storyId],
-    );
-    return (
-      <DndProvider backend={HTML5Backend}>
-        <StoryContext.Provider
-          value={{
-            stroyBoardId: storyId,
-            editing: true,
-            name: storyBoard?.name,
-          }}
-        >
-          <Wrapper>
-            <StoryToolBar />
-            <Container
-              sizes={sizes}
-              minSize={[256, 0]}
-              maxSize={[768, Infinity]}
-              gutterSize={0}
-              onDragEnd={siderDragEnd}
-              className="datart-split"
-            >
-              <PageListWrapper>
-                <PageThumbnailList
-                  sortedPages={sortedPages}
-                  onPageClick={onPageClick}
-                  onDeletePages={onDeletePages}
-                />
-              </PageListWrapper>
-              <Content>
-                <div id={domId} className="reveal">
-                  <div className="slides">
-                    {sortedPages.map((page, index) => (
-                      <StoryPageItem key={page.id} page={page} />
-                    ))}
-                  </div>
+    [setSizes],
+  );
+  const onDeletePages = useCallback(
+    (pageIds: string[]) => {
+      Modal.confirm({
+        title:
+          pageIds.length > 1
+            ? '确认删除所有选中的故事页？'
+            : '确认删除此故事页？',
+        onOk: () => {
+          // onDelete(selectedIds);
+          pageIds.forEach(pageId => {
+            dispatch(deleteStoryPage({ storyId, pageId }));
+          });
+        },
+      });
+    },
+    [dispatch, storyId],
+  );
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <StoryContext.Provider
+        value={{
+          stroyBoardId: storyId,
+          editing: true,
+          name: storyBoard?.name,
+          allowShare: false,
+        }}
+      >
+        <Wrapper>
+          <StoryToolBar onCloseEditor={onCloseEditor} />
+          <Container
+            sizes={sizes}
+            minSize={[256, 0]}
+            maxSize={[768, Infinity]}
+            gutterSize={0}
+            onDragEnd={siderDragEnd}
+            className="datart-split"
+          >
+            <PageListWrapper>
+              <PageThumbnailList
+                sortedPages={sortedPages}
+                onPageClick={onPageClick}
+                onDeletePages={onDeletePages}
+              />
+            </PageListWrapper>
+            <Content>
+              <div id={domId} className="reveal">
+                <div className="slides">
+                  {sortedPages.map((page, index) => (
+                    <StoryPageItem key={page.id} page={page} />
+                  ))}
                 </div>
-              </Content>
-            </Container>
-          </Wrapper>
-        </StoryContext.Provider>
-      </DndProvider>
-    );
-  },
-);
+              </div>
+            </Content>
+          </Container>
+        </Wrapper>
+      </StoryContext.Provider>
+    </DndProvider>
+  );
+});
 
 const Wrapper = styled.div`
   position: fixed;
@@ -259,6 +261,9 @@ const Container = styled(Split)`
   .reveal-box {
     width: 100%;
     height: 100%;
+  }
+  & .reveal .slides {
+    text-align: left;
   }
 `;
 

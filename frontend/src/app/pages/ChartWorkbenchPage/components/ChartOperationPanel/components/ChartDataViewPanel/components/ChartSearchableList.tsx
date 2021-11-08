@@ -17,7 +17,7 @@
  */
 
 import { Divider, Input, List, Space } from 'antd';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import debounce from 'lodash/debounce';
 import { FC, memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';

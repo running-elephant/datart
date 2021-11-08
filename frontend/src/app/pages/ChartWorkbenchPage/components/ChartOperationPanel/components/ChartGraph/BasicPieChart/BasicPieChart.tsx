@@ -25,6 +25,7 @@ import ChartConfig, {
 import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
 import {
   getColumnRenderName,
+  getExtraSeriesRowData,
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
@@ -79,7 +80,9 @@ class BasicPieChart extends Chart {
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {}
+  onUnMount(): void {
+    this.chart?.dispose();
+  }
 
   onResize(opt: any, context): void {
     this.chart?.resize(context);
@@ -158,6 +161,9 @@ class BasicPieChart extends Chart {
         ...this.getBarSeiesImpl(styleConfigs),
         data: aggregateConfigs.map(config => {
           return {
+            ...getExtraSeriesRowData({
+              [getValueByColumnKey(config)]: dc[getValueByColumnKey(config)],
+            }),
             name: getColumnRenderName(config),
             value: dc[getValueByColumnKey(config)],
             itemStyle: this.getDataItemStyle(config, colorConfigs, dc),
@@ -176,6 +182,7 @@ class BasicPieChart extends Chart {
         name: getColumnRenderName(config),
         data: dataColumns.map(dc => {
           return {
+            ...getExtraSeriesRowData(dc),
             name: groupedConfigNames.map(config => dc[config]).join('-'),
             value: dc[getValueByColumnKey(config)],
             itemStyle: this.getDataItemStyle(config, colorConfigs, dc),

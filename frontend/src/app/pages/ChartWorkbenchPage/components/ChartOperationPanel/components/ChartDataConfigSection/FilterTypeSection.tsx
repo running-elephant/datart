@@ -18,8 +18,8 @@
 
 import { BarsOutlined } from '@ant-design/icons';
 import { Button, Modal } from 'antd';
+import { StateModalSize } from 'app/hooks/useStateModal';
 import FilterActions from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterAction';
-import { StateModalSize } from 'app/pages/ChartWorkbenchPage/hooks/useStateModal';
 import {
   ChartDataSectionConfig,
   ChartDataSectionFieldActionType,

@@ -17,10 +17,7 @@
  */
 
 import { Tabs } from 'antd';
-import {
-  i18NComponentProps,
-  useI18NPrefix,
-} from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { FC, memo } from 'react';
 import ChartFilterCondition from '../../../../../models/ChartFilterCondition';
 import TimeSelector from '../../ChartTimeSelector';
@@ -29,7 +26,7 @@ const DateConditionConfiguration: FC<
   {
     condition?: ChartFilterCondition;
     onChange: (confconditionig: ChartFilterCondition) => void;
-  } & i18NComponentProps
+  } & I18NComponentProps
 > = memo(({ i18nPrefix, condition, onChange: onConditionChange }) => {
   const t = useI18NPrefix(i18nPrefix);
 

@@ -2,7 +2,7 @@ import { Form, FormInstance, Input, Radio, TreeSelect } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
 import { BoardTypeMap } from 'app/pages/DashBoardPage/slice/types';
 import debounce from 'debounce-promise';
-import { CommonFormTypes } from 'globalConstants';
+import { CommonFormTypes, DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -121,7 +121,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
                 () => Promise.resolve(),
                 () => Promise.reject(new Error('名称重复')),
               );
-            }, 300),
+            }, DEFAULT_DEBOUNCE_WAIT),
           },
         ]}
       >

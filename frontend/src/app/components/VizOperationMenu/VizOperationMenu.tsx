@@ -18,7 +18,7 @@
 
 import { UserOutlined } from '@ant-design/icons';
 import { Menu, Popconfirm } from 'antd';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 

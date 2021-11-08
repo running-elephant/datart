@@ -30,6 +30,6 @@ public class FolderCreateParam extends VizCreateParam {
 
     private String parentId;
 
-    private int index;
+    private double index;
 
 }

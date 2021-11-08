@@ -1,7 +1,6 @@
 import { CloseOutlined } from '@ant-design/icons';
 import { EmptyFiller, TabPane, Tabs } from 'app/components';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
-import { StoryEditor } from 'app/pages/StoryBoardPage/Editor';
 import { StoryPlayer } from 'app/pages/StoryBoardPage/Player';
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,7 +12,6 @@ import {
   selectArchivedDashboards,
   selectArchivedDatacharts,
   selectArchivedStoryboards,
-  selectEditingStoryId,
   selectPlayingStoryId,
   selectSelectedTab,
   selectStoryboards,
@@ -40,7 +38,6 @@ export function Main() {
   const tabs = useSelector(selectTabs);
   const selectedTab = useSelector(selectSelectedTab);
   const orgId = useSelector(selectOrgId);
-  const editingStoryId = useSelector(selectEditingStoryId);
   const playingStoryId = useSelector(selectPlayingStoryId);
 
   useEffect(() => {
@@ -177,8 +174,7 @@ export function Main() {
         />
       ))}
       {!tabs.length && <EmptyFiller title="请在左侧列表选择可视化" />}
-      {/* {editingBoard && <BoardEditor dashboardId={editingBoard} />} */}
-      {editingStoryId && <StoryEditor storyId={editingStoryId} />}
+
       {playingStoryId && <StoryPlayer storyId={playingStoryId} />}
     </Wrapper>
   );

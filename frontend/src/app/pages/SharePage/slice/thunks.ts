@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import { handleServerBoardAction } from 'app/pages/DashBoardPage/slice/asyncActions';
@@ -27,10 +26,13 @@ import {
   ChartPreview,
   FilterSearchParams,
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
+import { handleServerStoryAction } from 'app/pages/StoryBoardPage/slice/actions';
+import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { RootState } from 'types';
+import persistence from 'utils/persistence';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
-import { actions } from '.';
+import { shareActions } from '.';
 import { ShareVizInfo } from './types';
 
 export const fetchShareVizInfo = createAsyncThunk(
@@ -42,18 +44,16 @@ export const fetchShareVizInfo = createAsyncThunk(
       filterSearchParams,
       renderMode,
     }: {
-      shareToken: string;
+      shareToken?: string;
       sharePassword?: string;
       filterSearchParams?: FilterSearchParams;
       renderMode?: VizRenderMode;
     },
     thunkAPI,
   ) => {
+    let data = {} as any;
     try {
-      await thunkAPI.dispatch(
-        actions.saveShareInfo({ shareToken, sharePassword }),
-      );
-      const { data } = await request<ShareVizInfo>({
+      const response = await request<ShareVizInfo>({
         url: '/share/viz',
         method: 'GET',
         params: {
@@ -61,38 +61,63 @@ export const fetchShareVizInfo = createAsyncThunk(
           password: sharePassword,
         },
       });
-      thunkAPI.dispatch(actions.setVizType(data.vizType));
-      thunkAPI.dispatch(actions.setExecuteTokenMap(data.executeToken));
-      switch (data.vizType) {
-        case 'DATACHART':
-          thunkAPI.dispatch(actions.setDataChart({ data, filterSearchParams }));
-          break;
-        case 'DASHBOARD':
-          const serverBoard = data.vizDetail as ServerDashboard;
-          // setExecuteTokenMap
-          thunkAPI.dispatch(
-            handleServerBoardAction({
-              data: serverBoard,
-              renderMode: renderMode || 'share',
-              filterSearchMap: {
-                params: filterSearchParams,
-                isMatchByName: true,
-              },
-            }),
-          );
-
-          break;
-        default:
-          break;
-      }
-      return { data, filterSearchParams };
-      //   if (data.vizType === 'DATACHART') {
-
-      //   }
+      data = response.data;
     } catch (error) {
       errorHandle(error);
       throw error;
     }
+
+    persistence.session.save(shareToken, sharePassword);
+    await thunkAPI.dispatch(shareActions.saveNeedPassword(false));
+    await thunkAPI.dispatch(
+      shareActions.saveShareInfo({ token: shareToken, pwd: sharePassword }),
+    );
+    await thunkAPI.dispatch(shareActions.setVizType(data.vizType));
+    await thunkAPI.dispatch(
+      shareActions.setExecuteTokenMap({
+        executeToken: data.executeToken,
+      }),
+    );
+
+    switch (data.vizType) {
+      case 'DATACHART':
+        thunkAPI.dispatch(
+          shareActions.setDataChart({ data, filterSearchParams }),
+        );
+        break;
+      case 'DASHBOARD':
+        const serverBoard = data.vizDetail as ServerDashboard;
+        // setExecuteTokenMap
+        thunkAPI.dispatch(
+          handleServerBoardAction({
+            data: serverBoard,
+            renderMode: renderMode || 'share',
+            filterSearchMap: {
+              params: filterSearchParams,
+              isMatchByName: true,
+            },
+          }),
+        );
+        break;
+      case 'STORYBOARD':
+        thunkAPI.dispatch(
+          shareActions.setSubVizTokenMap({
+            subVizToken: data.subVizToken,
+          }),
+        );
+
+        thunkAPI.dispatch(
+          handleServerStoryAction({
+            data: data.vizDetail as ServerStoryBoard,
+            renderMode: 'read',
+            storyId: data.vizDetail.id,
+          }),
+        );
+        break;
+      default:
+        break;
+    }
+    return { data, filterSearchParams };
   },
 );
 
@@ -130,7 +155,7 @@ export const updateFilterAndFetchDatasetForShare = createAsyncThunk(
     thunkAPI,
   ) => {
     await thunkAPI.dispatch(
-      actions.updateChartPreviewFilter({
+      shareActions.updateChartPreviewFilter({
         backendChartId: arg.backendChartId,
         payload: arg.payload,
       }),

@@ -50,7 +50,7 @@ public abstract class DefaultDataProvider extends DataProvider {
     protected static final String COLUMNS = "columns";
 
     @Override
-    public Object test(DataProviderSource source) throws Exception{
+    public Object test(DataProviderSource source) throws Exception {
 
         PageInfo pageInfo = PageInfo.builder()
                 .pageSize(Integer.parseInt(source.getProperties().getOrDefault(TEST_DATA_SIZE, "100").toString()))
@@ -106,17 +106,12 @@ public abstract class DefaultDataProvider extends DataProvider {
     }
 
     @Override
-    public List<DataProviderSubType> getSubTypes() {
-        return Collections.emptyList();
-    }
-
-    @Override
     public void close() throws IOException {
 
     }
 
     @Override
-    public Dataframe execute(DataProviderSource config, QueryScript queryScript, ExecuteParam executeParam) throws Exception{
+    public Dataframe execute(DataProviderSource config, QueryScript queryScript, ExecuteParam executeParam) throws Exception {
         Dataframe dataframe;
 
         if (queryScript != null) {
@@ -154,6 +149,10 @@ public abstract class DefaultDataProvider extends DataProvider {
         values.parallelStream().forEach(vals -> {
             for (int i = 0; i < vals.size(); i++) {
                 Object val = vals.get(i);
+                if (val == null) {
+                    vals.set(i, null);
+                    continue;
+                }
                 switch (columns.get(i).getType()) {
                     case STRING:
                         val = val.toString();

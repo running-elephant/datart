@@ -49,7 +49,7 @@ export interface ShareBoardProps {
   ) => void;
 }
 
-export const ShareBoard: React.FC<ShareBoardProps> = memo(
+export const BoardForShare: React.FC<ShareBoardProps> = memo(
   ({
     dashboard,
     renderMode,
@@ -142,7 +142,7 @@ export const ShareBoard: React.FC<ShareBoardProps> = memo(
   },
 );
 
-export default ShareBoard;
+export default BoardForShare;
 const Wrapper = styled.div<{}>`
   position: fixed;
   top: 0;

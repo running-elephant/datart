@@ -18,7 +18,7 @@
 
 import { VizHeader } from 'app/components/VizHeader';
 import useResizeObserver from 'app/hooks/useResizeObserver';
-import useMount from 'app/pages/ChartWorkbenchPage/hooks/useMount';
+import useMount from 'app/hooks/useMount';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { CSSProperties, FC, memo, useState } from 'react';
