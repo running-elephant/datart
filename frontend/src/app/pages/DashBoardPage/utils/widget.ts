@@ -63,6 +63,8 @@ import {
   ServerRelation,
 } from './../slice/types';
 
+export const VALUE_SPLITTER = '###';
+
 export const createDataChartWidget = (opt: {
   dashboardId: string;
   boardType: BoardType;
@@ -438,6 +440,14 @@ export const getWidgetMapByServer = (
         if (dependentFilterId) {
           condition.dependentFilterId = dependentFilterId;
         }
+      }
+
+      //处理 assistViewField
+      if (typeof content?.widgetFilter?.assistViewFields === 'string') {
+        content.widgetFilter.assistViewFields = (
+          content.widgetFilter.assistViewFields as string
+        ).split(VALUE_SPLITTER);
+        // value.split(VALUE_SPLITTER);
       }
     }
 

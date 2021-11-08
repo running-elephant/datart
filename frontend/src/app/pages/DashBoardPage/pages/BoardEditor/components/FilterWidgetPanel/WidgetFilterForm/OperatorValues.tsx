@@ -32,9 +32,10 @@ import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetFilterFormType } from '../types';
 import { adjustSqlOperator } from '../utils';
+import { AssistViewFields } from './AssistViewFields';
 import { FilterCustomOptions } from './FilterCustomOptions';
 import FilterStringCondition from './FilterStringCondition';
-export const VALUE_SPLITER = '###';
+
 export const singleFacadeTypes = [
   ControllerFacadeTypes.DropdownList,
   ControllerFacadeTypes.RadioGroup,
@@ -43,7 +44,25 @@ export const singleFacadeTypes = [
   ControllerFacadeTypes.Time,
   ControllerFacadeTypes.Value,
 ];
-export interface Operator {}
+
+const options = [
+  {
+    value: 'zhejiang',
+    label: 'Zhejiang',
+  },
+  {
+    value: 'jiangsu',
+    label: 'Jiangsu',
+    isLeaf: false,
+    // children: [
+    //   {
+    //     value: 'nanjing',
+    //     label: 'Nanjing',
+    //   },
+    // ],
+  },
+];
+
 const OperatorValues: FC<{
   form: FormInstance<any> | undefined;
   viewMap: Record<string, ChartDataView>;
@@ -114,9 +133,9 @@ const OperatorValues: FC<{
       });
     }, []);
     const onViewFieldChange = useCallback(
-      async (value: string) => {
+      async (value: string[]) => {
         if (!value) return;
-        const [viewId, viewField] = value.split(VALUE_SPLITER);
+        const [viewId, viewField] = value;
         const dataset = await fetchNewDataset(viewId, viewField);
         setTargetKeys([]);
         setOptionValues(convertToList(dataset?.rows, selectedKeys));
@@ -127,15 +146,16 @@ const OperatorValues: FC<{
           widgetFilter: {
             ...widgetFilter,
             filterValues: [],
+            assistViewFields: value,
           },
         });
       },
       [convertToList, fetchNewDataset, form, selectedKeys],
     );
     const onInitOptions = useCallback(
-      async (value: string) => {
+      async (value: string[]) => {
         if (!value) return;
-        const [viewId, viewField] = value.split(VALUE_SPLITER);
+        const [viewId, viewField] = value;
         const dataset = await fetchNewDataset(viewId, viewField);
 
         const widgetFilter: WidgetFilterFormType =
@@ -151,12 +171,12 @@ const OperatorValues: FC<{
       [convertToList, fetchNewDataset, form],
     );
     const updateViewColumn = useCallback(() => {
-      const assistViewField = form?.getFieldValue([
+      const assistViewFields = form?.getFieldValue([
         'widgetFilter',
-        'assistViewField',
+        'assistViewFields',
       ]);
-      if (assistViewField) {
-        onInitOptions(assistViewField);
+      if (assistViewFields) {
+        onInitOptions(assistViewFields);
       }
     }, [form, onInitOptions]);
 
@@ -210,7 +230,8 @@ const OperatorValues: FC<{
         return (
           <Select.Option
             key={view.viewId}
-            value={`${view.viewId}${VALUE_SPLITER}${view.fieldValue}`}
+            // value={`${view.viewId}${VALUE_SPLITTER}${view.fieldValue}`}
+            value={''}
           >
             {`${viewMap[view.viewId]?.name}/ ${view.fieldValue}`}
           </Select.Option>
@@ -238,19 +259,27 @@ const OperatorValues: FC<{
 
         <Form.Item shouldUpdate>
           {() => {
-            // updateOptions();
             return (
               <>
                 {getOperatorType() !== 'condition' && (
-                  <Form.Item name={['widgetFilter', 'assistViewField']} noStyle>
-                    <Select
+                  <Form.Item
+                    name={['widgetFilter', 'assistViewFields']}
+                    noStyle
+                  >
+                    {/* <Select
                       allowClear
                       placeholder="select viewField"
                       onChange={onViewFieldChange}
                       style={{ margin: '6px 0' }}
                     >
                       {renderViewFieldOptions()}
-                    </Select>
+                    </Select> */}
+                    <AssistViewFields
+                      allowClear
+                      placeholder="select viewField"
+                      onChange={onViewFieldChange}
+                      style={{ margin: '6px 0' }}
+                    />
                   </Form.Item>
                 )}
                 {getOperatorType() === 'common' && (

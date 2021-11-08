@@ -28,6 +28,7 @@ import ChartDataView, {
   ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import { RelatedView } from 'app/pages/DashBoardPage/slice/types';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 
@@ -36,12 +37,13 @@ export interface RelatedViewFormProps {
   form: FormInstance<any> | undefined;
   fieldValueType: ChartDataViewFieldType;
   onChangeFieldProps: (views?: RelatedView[]) => void;
+  queryVariables: Variable[];
 }
 const Option = Select.Option;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
-  ({ viewMap, form, onChangeFieldProps }) => {
+  ({ viewMap, form, onChangeFieldProps, queryVariables }) => {
     //renderOptions
     const renderOptions = useCallback(
       (index: number) => {
@@ -53,18 +55,27 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
           relatedViews[index].filterFieldCategory ===
           ChartDataViewFieldCategory.Variable
         ) {
-          // return viewMap[relatedView.viewId].variables?.map
-          // TODO
-          return [
-            <Option key="1" value={'变量1'}>
-              {'变量1'}
-            </Option>,
-            <Option key="2" value={'变量2'}>
-              {'变量2'}
-            </Option>,
-          ];
+          // 变量
+          return queryVariables
+            .filter(v => {
+              return v.viewId === relatedViews[index].viewId || !v.viewId;
+            })
+            .map(item => (
+              <Option
+                key={item.id}
+                fieldvaluetype={item.valueType}
+                value={item.name}
+              >
+                <div
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
+                  <span>{item.name}</span>
+                  <span style={{ color: '#ccc' }}>{item.valueType}</span>
+                </div>
+              </Option>
+            ));
         } else {
-          // ChartDataViewFieldCategory.Field or other
+          // 字段
           return viewMap?.[relatedViews[index].viewId]?.meta?.map(item => (
             <Option key={item.id} fieldvaluetype={item.type} value={item.id}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -75,7 +86,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
           ));
         }
       },
-      [form, viewMap],
+      [form, queryVariables, viewMap],
     );
     const fieldValueChange = useCallback(
       (index: number) => (value, option) => {
@@ -94,6 +105,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
       (index: number) => (e: RadioChangeEvent) => {
         const relatedViews: RelatedView[] = form?.getFieldValue('relatedViews');
         relatedViews[index].filterFieldCategory = e.target.value;
+        relatedViews[index].fieldValue = void 0;
         form?.setFieldsValue({ relatedViews: relatedViews });
         onChangeFieldProps(relatedViews);
       },

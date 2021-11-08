@@ -23,7 +23,6 @@ import {
   Dashboard,
   DashboardConfig,
   DataChart,
-  SaveDashboard,
   ServerDashboard,
   ServerDatachart,
   ServerView,
@@ -48,9 +47,11 @@ export const getDashBoardByResBoard = (data: ServerDashboard): Dashboard => {
     index,
     config,
     permissions,
+    queryVariables,
   } = data;
   return {
     id,
+    queryVariables,
     name,
     orgId,
     parentId,
@@ -134,28 +135,6 @@ export const getInitBoardInfo = (
   };
 };
 
-export const initToSaveBoard = (
-  name: string = 'new board',
-  orgId: string = '694b128cab21461094166d8a10f8db2c',
-  parentId: string | null = null,
-  boardType: BoardType,
-  permissions?: any,
-  config?: DashboardConfig,
-) => {
-  let dashboard: SaveDashboard = {
-    id: 'newBoard_1',
-    thumbnail: '',
-    status: 0,
-    config: JSON.stringify(config || getInitBoardConfig(boardType || 'auto')),
-    index: 0,
-    name: name,
-    orgId: orgId,
-    parentId: parentId || null,
-    permissions: permissions || [],
-    widgetToCreate: [],
-  };
-  return dashboard;
-};
 export const getInitBoardConfig = (boardType: BoardType) => {
   const dashboardConfig: DashboardConfig = {
     background: BackgroundDefault,

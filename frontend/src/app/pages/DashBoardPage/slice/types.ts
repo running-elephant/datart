@@ -21,6 +21,7 @@ import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
 import {
@@ -62,6 +63,7 @@ export interface Dashboard {
   index?: number;
   config: DashboardConfig;
   permissions?: any;
+  queryVariables: Variable[];
 }
 export interface SaveDashboard extends Omit<Dashboard, 'config'> {
   config: string;
@@ -218,20 +220,6 @@ export interface RelationConfig {
     triggerColumn: string;
     linkerColumn: string;
   };
-  // widget
-  /**
-   * @param 'widget'
-   * @description 'filter 关联的widget 参数'
-   */
-
-  // subFilter
-  /**
-   * @param 'subFilter'
-   * @description 'subFilter 影响的下级 filter的显示隐藏'
-   */
-
-  // filterWidget
-  // linkage
 }
 export interface RelatedView {
   viewId: string;

@@ -61,7 +61,7 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
   );
   const {
     aggregate,
-    assistViewField,
+    assistViewFields,
     filterDate,
     filterFacade,
     filterValues,

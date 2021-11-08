@@ -34,7 +34,7 @@ export interface VisibilityCondition {
 export interface WidgetFilterFormType {
   aggregate: AggregateFieldActionType;
   operatorType: FilterOperatorType; //
-  assistViewField?: string; //辅助添加view字段
+  assistViewFields: string[]; //辅助添加view字段
   filterVisibility: WidgetFilterVisibility;
   sqlOperator: FilterSqlOperator;
   filterDate?: FilterDate;

@@ -1,4 +1,5 @@
 import ChartDataView, {
+  ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import {
@@ -92,6 +93,7 @@ export const getAllFiltersOfOneWidget = (
   );
   let covered = false;
   let filters: ChartRequestFilter[] = [];
+  let variables: Record<string, any[]> = {};
   filterWidgets.forEach(filterWidget => {
     const hasRelation = filterWidget.relations.find(
       re => re.targetId === chartWidget.id,
@@ -111,22 +113,29 @@ export const getAllFiltersOfOneWidget = (
     if (!values) {
       return;
     }
+    if (view.filterFieldCategory === ChartDataViewFieldCategory.Variable) {
+      const key = view.fieldValue;
+      variables[String(key)] = values.map(item => String(item.value));
+    }
+    if (view.filterFieldCategory === ChartDataViewFieldCategory.Field) {
+      const filter: ChartRequestFilter = {
+        aggOperator: widgetFilter.aggregate || null,
+        column: String(view.fieldValue),
+        sqlOperator: widgetFilter.sqlOperator,
+        values: values,
+      };
+      filters.push(filter);
+    }
 
-    const filter: ChartRequestFilter = {
-      aggOperator: widgetFilter.aggregate || null,
-      column: String(view.fieldValue),
-      sqlOperator: widgetFilter.sqlOperator,
-      values: values,
-    };
     if (widgetFilterCovered) {
       covered = true;
     }
-    filters.push(filter);
   });
 
   return {
     covered,
     filters,
+    variables,
   };
 };
 export const getWidgetFilterValues = (
@@ -258,7 +267,10 @@ export const getChartWidgetRequestParams = (params: {
   let requestParams = builder.build();
   const viewConfig = transformToViewConfig(chartDataView?.config);
   requestParams = { ...requestParams, ...viewConfig };
-  const { filters, covered } = getAllFiltersOfOneWidget(curWidget, widgetMap);
+  const { filters, covered, variables } = getAllFiltersOfOneWidget(
+    curWidget,
+    widgetMap,
+  );
   // 全局过滤 filter
   requestParams.filters = filters.concat(covered ? [] : requestParams.filters);
   // 联动 过滤
@@ -286,6 +298,9 @@ export const getChartWidgetRequestParams = (params: {
       });
       requestParams.filters = filters.concat(linkFilters);
     }
+  }
+  if (variables) {
+    requestParams.params = variables;
   }
   if (widgetInfo) {
     const { pageInfo } = widgetInfo;

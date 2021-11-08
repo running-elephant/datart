@@ -174,7 +174,7 @@ export const getInitWidgetFilter = () => {
   const widgetFilter: WidgetFilterFormType = {
     aggregate: AggregateFieldActionType.NONE,
     operatorType: OPERATOR_TYPE_ENUM.common, //
-    assistViewField: '',
+    assistViewFields: [],
     filterVisibility: {
       visibility: 'show',
     },

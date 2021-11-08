@@ -66,7 +66,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const dispatch = useDispatch();
 
   const { type, widgetId } = useSelector(selectFilterPanel);
-  const { boardId, boardType } = useContext(BoardContext);
+  const { boardId, boardType, queryVariables } = useContext(BoardContext);
 
   const allWidgets = useSelector(selectSortAllWidgets);
   const widgets = useMemo(
@@ -206,7 +206,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
 
   const onFinish = useCallback(
     values => {
-      // console.log('--values', values);
+      console.log('--values', values);
       const {
         relatedViews,
         widgetFilter,
@@ -329,7 +329,6 @@ const FilterWidgetPanel: React.FC = memo(props => {
     ],
   );
   const onSubmit = useCallback(() => {
-    // handle onFinish
     form.submit();
   }, [form]);
 
@@ -377,6 +376,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
               form={form}
               fieldValueType={fieldValueType}
               viewMap={viewMap}
+              queryVariables={queryVariables}
             />
           </div>
           <div>

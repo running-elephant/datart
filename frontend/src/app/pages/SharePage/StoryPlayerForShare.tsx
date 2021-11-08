@@ -56,7 +56,7 @@ export const StoryPlayerForShare: React.FC<{ storyBoard: StoryBoard }> = memo(
     );
 
     const subVizTokenMap = useSelector(selectSubVizTokenMap);
-    console.log('subVizTokenMap', subVizTokenMap);
+
     const sortedPages = useMemo(() => {
       const sortedPages = Object.values(pageMap).sort(
         (a, b) => a.config.index - b.config.index,

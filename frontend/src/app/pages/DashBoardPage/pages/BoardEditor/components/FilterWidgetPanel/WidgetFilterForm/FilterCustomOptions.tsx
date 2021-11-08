@@ -64,7 +64,6 @@ export const FilterCustomOptions: React.FC<FilterCustomOptionsProps> = memo(
         label: String(newKey),
         isSelected: false,
       };
-
       const currentRows = rows.concat([newRow]);
       onChangeFilterOptions(currentRows);
     };

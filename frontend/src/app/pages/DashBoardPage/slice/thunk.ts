@@ -13,7 +13,6 @@ import { RootState } from 'types';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { boardActions } from '.';
-import { VALUE_SPLITER } from '../pages/BoardEditor/components/FilterWidgetPanel/WidgetFilterForm/OperatorValues';
 import { getChartWidgetRequestParams } from '../utils';
 import { getDistinctFields } from './../../../utils/fetch';
 import { handleServerBoardAction } from './asyncActions';
@@ -309,10 +308,12 @@ export const getFilterDataAsync = createAsyncThunk<
     const widgetFilter = content.widgetFilter;
     const executeTokenMap = (getState() as RootState)?.share?.executeTokenMap;
 
-    if (widgetFilter.assistViewField) {
+    if (
+      widgetFilter.assistViewFields &&
+      Array.isArray(widgetFilter.assistViewFields)
+    ) {
       // 请求
-      const [viewId, viewField] =
-        widgetFilter.assistViewField.split(VALUE_SPLITER);
+      const [viewId, viewField] = widgetFilter.assistViewFields;
       const executeToken = executeTokenMap?.[viewId];
       const dataset = await getDistinctFields(
         viewId,

@@ -43,7 +43,6 @@ import {
   editWidgetDataActions,
   editWidgetInfoActions,
 } from '.';
-import { VALUE_SPLITER } from '../components/FilterWidgetPanel/WidgetFilterForm/OperatorValues';
 import { getDistinctFields } from './../../../../../utils/fetch';
 import { BoardInfo, BoardType, ServerDashboard } from './../../../slice/types';
 import { getDataChartMap } from './../../../utils/board';
@@ -370,10 +369,12 @@ export const getEditFilterDataAsync = createAsyncThunk<
 >('editBoard/getFilterDataAsync', async (widget, { getState, dispatch }) => {
   const content = widget.config.content as FilterWidgetContent;
   const widgetFilter = content.widgetFilter;
-  if (widgetFilter.assistViewField) {
+  if (
+    widgetFilter.assistViewFields &&
+    Array.isArray(widgetFilter.assistViewFields)
+  ) {
     // 请求
-    const [viewId, viewField] =
-      widgetFilter.assistViewField.split(VALUE_SPLITER);
+    const [viewId, viewField] = widgetFilter.assistViewFields;
     const dataset = await getDistinctFields(
       viewId,
       viewField,
@@ -508,7 +509,7 @@ export const pasteWidgets = createAsyncThunk(
       const widgetInfo = createWidgetInfo(widget.id);
       widgetInfoMap[widget.id] = widgetInfo;
     });
-    // dispatch(editWidgetInfoActions.);
+
     dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
     dispatch(editBoardStackActions.addWidgets(newWidgets));
 
