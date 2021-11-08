@@ -28,6 +28,7 @@ import { ResourceTypes } from 'app/pages/MainPage/pages/PermissionPage/constants
 import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { mergeConfig, transformMeta } from 'app/utils/chart';
 import { updateCollectionByAction } from 'app/utils/mutation';
+import { RootState } from 'types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { request } from 'utils/request';
@@ -76,40 +77,43 @@ const initState: WorkbenchState = {
 };
 
 // Selectors
-const workbenchSelector = state => state.workbench;
+const workbenchSelector = (state: RootState) => state.workbench || initState;
+export const dataviewsSelector = createSelector(
+  workbenchSelector,
+  wb => wb.dataviews,
+);
 export const makeDataviewTreeSelector = () =>
   createSelector(
     [
-      workbenchSelector,
-      (_, props: { getSelectable: (o: ChartDataView) => boolean }) =>
-        props.getSelectable,
+      dataviewsSelector,
+      (_, getSelectable: (o: ChartDataView) => boolean) => getSelectable,
     ],
-    (wb: typeof initState, getSelectable) =>
-      listToTree(wb.dataviews, null, [ResourceTypes.View], { getSelectable }),
+    (dataviews, getSelectable) =>
+      listToTree(dataviews, null, [ResourceTypes.View], { getSelectable }),
   );
 export const currentDataViewSelector = createSelector(
   workbenchSelector,
-  (wb: typeof initState) => wb.currentDataView,
+  wb => wb.currentDataView,
 );
 export const datasetsSelector = createSelector(
   workbenchSelector,
-  (wb: typeof initState) => wb.dataset,
+  wb => wb.dataset,
 );
 export const languageSelector = createSelector(
   workbenchSelector,
-  (wb: typeof initState) => wb.lang,
+  wb => wb.lang,
 );
 export const dateFormatSelector = createSelector(
   workbenchSelector,
-  (wb: typeof initState) => wb.dateFormat,
+  wb => wb.dateFormat,
 );
 export const chartConfigSelector = createSelector(
   workbenchSelector,
-  (wb: typeof initState) => wb.chartConfig,
+  wb => wb.chartConfig,
 );
 export const backendChartSelector = createSelector(
   workbenchSelector,
-  (wb: typeof initState) => wb.backendChart,
+  wb => wb.backendChart,
 );
 
 // Effects
