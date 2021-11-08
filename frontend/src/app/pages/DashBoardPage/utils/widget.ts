@@ -67,7 +67,6 @@ export const createDataChartWidget = (opt: {
   dashboardId: string;
   boardType: BoardType;
   dataChartId: string;
-  viewId: string;
   dataChartConfig: DataChart;
   subType: WidgetContentChartType;
 }) => {
@@ -81,7 +80,6 @@ export const createDataChartWidget = (opt: {
   const widget: Widget = createWidget({
     dashboardId: opt.dashboardId,
     datachartId: opt.dataChartId,
-    viewIds: opt.viewId ? [opt.viewId] : [],
     config: widgetConf,
   });
   return widget;
