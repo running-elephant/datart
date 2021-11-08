@@ -20,7 +20,7 @@ import {
   getFolders,
   removeTab,
 } from '../../slice/thunks';
-
+import { vizActions } from '../../slice';
 interface FolderTreeProps {
   selectedId?: string;
   treeData?: TreeDataNode[];
@@ -32,11 +32,9 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
   const orgId = useSelector(selectOrgId);
   const loading = useSelector(selectVizListLoading);
   const { showSaveForm } = useContext(SaveFormContext);
-
   useEffect(() => {
     dispatch(getFolders(orgId));
   }, [dispatch, orgId]);
-
   const redirect = useCallback(
     tabKey => {
       if (tabKey) {
@@ -168,15 +166,87 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
     [moreMenuClick, archiveViz],
   );
 
+  const onDrop = (info) =>{
+    const dropKey = info.node.key;
+    const dragKey = info.dragNode.key;
+    const dropPos = info.node.pos.split('-');
+    const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
+
+    const loop = (data, key, callback) => {
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].key === key) {
+          return callback(data[i], i, data);
+        }
+        if (data[i].children) {
+          loop(data[i].children, key, callback);
+        }
+      }
+    };
+
+    const data:any = treeData ? JSON.parse(JSON.stringify(treeData)) : [];
+
+    let dragObj;
+    loop(data, dragKey, (item, index, arr) => {
+      console.log(arr,index,'arr');
+      arr.splice(index, 1);
+      dragObj = item;
+    });
+
+    if (!info.dropToGap) {
+      loop(data, dropKey, item => {
+        item.children = item.children || [];
+        item.children.unshift(dragObj);
+      });
+    } else if (
+      
+      (info.node.props.children || []).length > 0 && 
+      info.node.props.expanded &&
+      dropPosition === 1 
+    ) {
+      loop(data, dropKey, item => {
+        item.children = item.children || [];
+        item.children.unshift(dragObj);
+      });
+    } else {
+      let ar;
+      let i;
+      loop(data, dropKey, (item, index, arr) => {
+        ar = arr;
+        i = index;
+      });
+
+      if(dropPosition === -1){ // 移动到第一个
+        dragObj['index'] = ar[i+1] ? (ar[i+1].index) - 1 : 0
+      }else if(i  === ar.length - 1 ){ // 移动到最后一个
+        dragObj['index'] = ar[ar.length - 1].index + 1
+      }else{ //中间
+        dragObj['index'] = (ar[i].index  + ar[i+1].index) / 2
+      }
+
+      if (dropPosition === -1) {
+        ar.splice(i, 0, dragObj);
+      } else {
+        ar.splice(i + 1, 0, dragObj);
+      }
+    }
+    console.log(data,'data');
+    // dispatch(vizActions.DrapVizTree(data));
+  };
+  console.log(treeData,'treeData');
   return (
-    <Tree
-      loading={loading}
-      treeData={treeData}
-      titleRender={renderTreeTitle}
-      onSelect={menuSelect}
-      {...(selectedId && { selectedKeys: [selectedId] })}
-      defaultExpandAll
-      draggable
-    />
+    <div>
+        <Tree
+        loading={loading}
+        treeData={treeData}
+        titleRender={renderTreeTitle}
+        onSelect={menuSelect}
+        onDrop={onDrop}
+        {...(selectedId && { selectedKeys: [selectedId] })}
+        defaultExpandAll
+        draggable
+      />
+      
+    </div>
+    
   );
 }

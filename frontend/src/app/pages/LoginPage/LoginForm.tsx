@@ -2,7 +2,7 @@ import { Button, Form, Input } from 'antd';
 import { AuthForm } from 'app/components';
 import { selectLoggedInUser, selectLoginLoading } from 'app/slice/selectors';
 import { login } from 'app/slice/thunks';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';

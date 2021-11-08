@@ -69,6 +69,7 @@ export const Recycle = memo(
             params: { id, archive: false },
             type,
             resolve: () => {
+              console.log('remove');
               message.success('删除成功');
               dispatch(removeTab({ id, resolve: redirect }));
             },

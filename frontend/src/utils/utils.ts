@@ -55,6 +55,7 @@ export function listToTree<
     name: string;
     parentId: string | null;
     isFolder: boolean;
+    index?:number;
   },
 >(
   list: undefined | T[],
@@ -90,6 +91,8 @@ export function listToTree<
       childrenList.push(o);
     }
   });
+  
+  treeNodes.sort((a, b) => Number(a.index) - Number(b.index) )
 
   return treeNodes.map(node => {
     const children = listToTree(childrenList, node.key, node.path, options);
@@ -233,4 +236,15 @@ export const ResizeEvent = new Event('resize', {
 
 export const dispatchResize = () => {
   window.dispatchEvent(ResizeEvent);
+};
+
+export const loopTree = (data, key, callback) => {
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].key === key) {
+      return callback(data[i], i, data);
+    }
+    if (data[i].children) {
+      loopTree(data[i].children, key, callback);
+    }
+  }
 };
