@@ -1,5 +1,6 @@
 import { SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { AutoComplete, Avatar, Input, Space, Tag } from 'antd';
+import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
@@ -37,7 +38,10 @@ export const MailTagFormItem: FC<MailTagFormItemProps> = ({
       setDataSource([]);
     }
   }, []);
-  const onDebouncedSearch = useMemo(() => debounce(onSearch, 300), [onSearch]);
+  const onDebouncedSearch = useMemo(
+    () => debounce(onSearch, DEFAULT_DEBOUNCE_WAIT),
+    [onSearch],
+  );
 
   const onSelectOrRemoveEmail = useCallback(
     (email: string) => {

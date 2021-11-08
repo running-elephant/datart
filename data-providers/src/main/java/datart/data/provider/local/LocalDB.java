@@ -17,6 +17,7 @@
  */
 package datart.data.provider.local;
 
+import com.google.common.collect.Lists;
 import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
 import datart.core.common.Application;
@@ -33,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.type.SqlTypeName;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.sql.*;
@@ -45,7 +47,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LocalDB {
 
-    private static final String MEM_URL = "jdbc:h2:mem:";
+    private static final String MEM_URL = "jdbc:h2:mem:/LOG=0;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0";
 
     private static String fileUrl;
 
@@ -56,6 +58,8 @@ public class LocalDB {
     private static final String SELECT_START_SQL = "SELECT * FROM %s";
 
     private static final String INSERT_SQL = "INSERT INTO %s VALUES %s";
+
+    private static final int MAX_INSERT_BATCH = 5_000;
 
     static {
         try {
@@ -75,7 +79,7 @@ public class LocalDB {
                     , executeParam
                     , SQL_DIALECT
                     , Const.DEFAULT_VARIABLE_QUOTE);
-            sql = render.render(true);
+            sql = render.render(true, true, false);
         }
 
         try (Connection connection = getConnection(persistent)) {
@@ -132,7 +136,6 @@ public class LocalDB {
 
             return ResultSetMapper.mapToTableData(resultSet);
         } catch (SQLException | SqlParseException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -152,10 +155,13 @@ public class LocalDB {
         }
         createTable(dataframe.getName(), dataframe.getColumns(), connection);
 
-        String insertSql = createInsertSql(dataframe.getName(), dataframe.getRows(), dataframe.getColumns());
+        List<String> values = createInsertValues(dataframe.getRows(), dataframe.getColumns());
 
-        connection.createStatement().execute(insertSql);
-
+        List<List<String>> partition = Lists.partition(values, MAX_INSERT_BATCH);
+        for (List<String> vals : partition) {
+            String insertSql = String.format(INSERT_SQL, dataframe.getName(), String.join(",", vals));
+            connection.createStatement().execute(insertSql);
+        }
     }
 
     private static Connection getConnection(boolean persistent) throws SQLException {
@@ -179,7 +185,7 @@ public class LocalDB {
         return String.format(TABLE_CREATE_SQL_TEMPLATE, name, sj);
     }
 
-    private static String createInsertSql(String tableName, List<List<Object>> data, List<Column> columns) {
+    private static List<String> createInsertValues(List<List<Object>> data, List<Column> columns) {
         return data.parallelStream().map(row -> {
             StringJoiner stringJoiner = new StringJoiner(",", "(", ")");
             for (int i = 0; i < row.size(); i++) {
@@ -210,12 +216,11 @@ public class LocalDB {
                         stringJoiner.add(valStr);
                         break;
                     default:
-                        stringJoiner.add("'" + val + "'");
+                        stringJoiner.add("'" + StringEscapeUtils.escapeSql(val.toString()) + "'");
                 }
             }
-            return String.format(INSERT_SQL, tableName, stringJoiner);
-        }).collect(Collectors.joining(";"));
-
+            return stringJoiner.toString();
+        }).collect(Collectors.toList());
     }
 
     private static String getFileUrl() {

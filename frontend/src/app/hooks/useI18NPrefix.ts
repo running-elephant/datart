@@ -21,12 +21,16 @@ import get from 'lodash/get';
 import { useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
+export interface I18NComponentProps {
+  i18nPrefix?: string;
+}
+
 function usePrefixI18N(prefix?: string) {
   const { t, i18n } = useTranslation();
   const { i18NConfigs: vizI18NConfigs } = useContext(ChartI18NContext);
 
   const cachedTranslateFn = useCallback(
-    (key: string, disablePrefix?: boolean) => {
+    (key: string, disablePrefix?: boolean, options?: any) => {
       if (!prefix) {
         return key;
       }
@@ -38,9 +42,9 @@ function usePrefixI18N(prefix?: string) {
         return contextTranslation;
       }
       if (disablePrefix) {
-        return t.call(null, `${key}`) as string;
+        return t.call(null, `${key}`, options) as string;
       }
-      return t.call(null, `${prefix}.${key}`) as string;
+      return t.call(null, `${prefix}.${key}`, options) as string;
     },
     [i18n.language, prefix, t, vizI18NConfigs],
   );

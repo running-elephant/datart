@@ -27,6 +27,9 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+      FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS: false
 
   quartz:
     job-store-type: jdbc
@@ -68,6 +71,6 @@ shiro:
 
 
 datart:
-  version: 1.0.0-alpha.1
+  version: 1.0.0-alpha.2
   server:
     path-prefix: /api/v1

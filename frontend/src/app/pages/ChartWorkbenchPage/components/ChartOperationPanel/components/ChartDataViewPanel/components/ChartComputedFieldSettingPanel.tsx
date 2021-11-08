@@ -18,8 +18,8 @@
 
 import { Col, Input, Row, Select, Space, Tabs } from 'antd';
 import { FormItemEx } from 'app/components';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
-import useMount from 'app/pages/ChartWorkbenchPage/hooks/useMount';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useMount from 'app/hooks/useMount';
 import { AggregateFieldActionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import {
   ChartDataViewFieldCategory,

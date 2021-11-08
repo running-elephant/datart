@@ -17,31 +17,27 @@
  */
 
 import { PlusOutlined } from '@ant-design/icons';
-import { message, Popover, Select } from 'antd';
+import { message, Popover, TreeSelect } from 'antd';
 import { ToolbarButton } from 'app/components';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
-import useStateModal, {
-  StateModalSize,
-} from 'app/pages/ChartWorkbenchPage/hooks/useStateModal';
-import useToggle from 'app/pages/ChartWorkbenchPage/hooks/useToggle';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
+import useToggle from 'app/hooks/useToggle';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewMeta,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import workbenchSlice, {
-  dataviewSelector,
   fetchViewDetailAction,
+  makeDataviewTreeSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { checkComputedFieldAsync } from 'app/utils/fetch';
 import { updateByKey } from 'app/utils/mutation';
-import { FC, memo } from 'react';
+import { FC, memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE, SPACE_XS } from 'styles/StyleConstants';
 import { ChartDraggableSourceGroupContainer } from '../ChartDraggable';
 import ChartComputedFieldSettingPanel from './components/ChartComputedFieldSettingPanel';
-
-const { Option } = Select;
 
 const ChartDataViewPanel: FC<{
   dataView?: ChartDataView;
@@ -49,7 +45,11 @@ const ChartDataViewPanel: FC<{
 }> = memo(({ dataView, onDataViewChange }) => {
   const t = useI18NPrefix(`viz.workbench.dataview`);
   const dispatch = useDispatch();
-  const dataviews = useSelector(dataviewSelector);
+  const dataviewTreeSelector = useMemo(makeDataviewTreeSelector, []);
+  const getSelectable = useCallback(v => !v.isFolder, []);
+  const dataviewTreeData = useSelector(state =>
+    dataviewTreeSelector(state, getSelectable),
+  );
   const [showModal, modalContextHolder] = useStateModal({});
   const [isDisplayAddNewModal, setIsDisplayAddNewModal] = useToggle();
 
@@ -57,6 +57,12 @@ const ChartDataViewPanel: FC<{
     onDataViewChange?.();
     dispatch(fetchViewDetailAction(value));
   };
+
+  const filterDateViewTreeNode = useCallback(
+    (inputValue, node) =>
+      node.title.toLowerCase().includes(inputValue.toLowerCase()),
+    [],
+  );
 
   const handleAddNewOrUpdateComputedField = async (
     field?: ChartDataViewMeta,
@@ -157,24 +163,16 @@ const ChartDataViewPanel: FC<{
   return (
     <StyledChartDataViewPanel>
       <Header>
-        <Select
-          style={{ flex: 1 }}
-          dropdownMatchSelectWidth
+        <TreeSelect
           showSearch
           placeholder="请选择数据视图"
-          optionFilterProp="children"
-          value={dataView?.name}
+          className="view-selector"
+          treeData={dataviewTreeData}
+          value={dataView?.id}
           onChange={handleDataViewChange}
+          filterTreeNode={filterDateViewTreeNode}
           bordered={false}
-        >
-          {dataviews?.map(ds => {
-            return (
-              <Option key={ds.id} value={ds.id}>
-                {ds.name}
-              </Option>
-            );
-          })}
-        </Select>
+        />
         <Popover
           placement="bottomRight"
           visible={isDisplayAddNewModal}
@@ -220,4 +218,8 @@ const Header = styled.div`
   flex-shrink: 0;
   align-items: center;
   padding: ${SPACE} ${SPACE_XS};
+
+  .view-selector {
+    flex: 1;
+  }
 `;

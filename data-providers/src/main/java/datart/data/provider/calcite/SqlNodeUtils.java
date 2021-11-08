@@ -24,6 +24,7 @@ import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParserPos;
+import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.util.DateString;
 import org.apache.calcite.util.TimestampString;
 
@@ -101,7 +102,7 @@ public class SqlNodeUtils {
             case BOOLEAN:
                 return SqlLiteral.createBoolean(Boolean.parseBoolean(value.getValue().toString()), SqlParserPos.ZERO);
             case DATE:
-                return SqlLiteral.createTimestamp(new TimestampString(value.getValue().toString()), 3, SqlParserPos.ZERO);
+                return SqlLiteral.createTimestamp(new TimestampString(value.getValue().toString()), 0, SqlParserPos.ZERO);
             case FRAGMENT:
                 return new SqlFragment(value.getValue().toString());
             case IDENTIFIER:

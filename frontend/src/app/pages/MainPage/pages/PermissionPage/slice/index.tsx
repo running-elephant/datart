@@ -66,6 +66,7 @@ const slice = createSlice({
         name: name ? `${name}(${username})` : username,
         type: SubjectTypes.UserRole,
         parentId: null,
+        index: null,
         isFolder: false,
         permissionArray: getDefaultPermissionArray(),
       }));
@@ -85,6 +86,7 @@ const slice = createSlice({
         name,
         type: SubjectTypes.Role,
         parentId: null,
+        index: null,
         isFolder: false,
         permissionArray: getDefaultPermissionArray(),
       }));
@@ -104,6 +106,7 @@ const slice = createSlice({
         name,
         type: ResourceTypes.Schedule,
         parentId: null,
+        index: null,
         isFolder: false,
         permissionArray: getDefaultPermissionArray(),
       }));
@@ -123,6 +126,7 @@ const slice = createSlice({
         name,
         type: ResourceTypes.Source,
         parentId: null,
+        index: null,
         isFolder: false,
         permissionArray: getDefaultPermissionArray(),
       }));
@@ -139,11 +143,12 @@ const slice = createSlice({
       const root = generateRootNode(ResourceTypes.View);
       state.viewListLoading = false;
       state.views = [root].concat(
-        action.payload.map(({ id, name, parentId, isFolder }) => ({
+        action.payload.map(({ id, name, parentId, index, isFolder }) => ({
           id,
           name,
           type: root.type,
           parentId: parentId === null ? root.id : parentId,
+          index,
           isFolder,
           permissionArray: getDefaultPermissionArray(),
         })),
@@ -164,11 +169,12 @@ const slice = createSlice({
       );
       state.folderListLoading = false;
       state.folders = [root].concat(
-        action.payload.map(({ id, name, parentId, relType }) => ({
+        action.payload.map(({ id, name, parentId, index, relType }) => ({
           id,
           name,
           type: root.type,
           parentId: parentId === null ? root.id : parentId,
+          index,
           isFolder: relType === 'FOLDER',
           permissionArray: getDefaultPermissionArray(),
         })),
@@ -189,6 +195,7 @@ const slice = createSlice({
         name,
         type: ResourceTypes.Viz,
         parentId: null,
+        index: null,
         isFolder: false,
         permissionArray: getDefaultPermissionArray(),
       }));

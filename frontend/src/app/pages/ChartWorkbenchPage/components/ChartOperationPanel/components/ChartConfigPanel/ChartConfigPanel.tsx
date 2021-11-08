@@ -23,13 +23,13 @@ import {
 } from '@ant-design/icons';
 import { Tabs } from 'antd';
 import { PaneWrapper } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartConfigPayloadType,
   ChartConfigReducerActionType,
 } from 'app/pages/ChartWorkbenchPage';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import ChartPaletteContext from 'app/pages/ChartWorkbenchPage/contexts/ChartPaletteContext';
-import DatartHooks from 'app/pages/ChartWorkbenchPage/hooks';
 import ChartConfig, {
   ChartDataSectionConfig,
   ChartStyleSectionConfig,
@@ -45,7 +45,6 @@ import ChartDataConfigPanel from './ChartDataConfigPanel';
 import ChartSettingConfigPanel from './ChartSettingConfigPanel';
 import ChartStyleConfigPanel from './ChartStyleConfigPanel';
 
-const { useI18NPrefix } = DatartHooks;
 const { TabPane } = Tabs;
 
 const ChartConfigPanel: FC<{

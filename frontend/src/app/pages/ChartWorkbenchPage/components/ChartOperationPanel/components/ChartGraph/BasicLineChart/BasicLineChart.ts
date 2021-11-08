@@ -47,6 +47,7 @@ import {
   toUnitDesc,
 } from 'app/utils/number';
 import { init } from 'echarts';
+import { UniqArray } from 'utils/object';
 import Config from './config';
 
 class BasicLineChart extends Chart {
@@ -125,88 +126,25 @@ class BasicLineChart extends Chart {
       dataset.rows,
       dataset.columns,
     );
-
     const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
-
-    const xAxisColumns = groupConfigs.map(config => {
+    const xAxisColumns = (groupConfigs || []).map(config => {
       return {
         type: 'category',
         tooltip: { show: true },
-        data: dataColumns.map(dc => dc[getValueByColumnKey(config)]),
+        data: UniqArray(dataColumns.map(dc => dc[getValueByColumnKey(config)])),
       };
     });
-    const yAxisColumns = aggregateConfigs.map(aggConfig => {
-      const color = aggConfig?.color?.start;
-      return {
-        name: getColumnRenderName(aggConfig),
-        type: 'line',
-        sampling: 'average',
-        areaStyle: this.isArea ? { color } : undefined,
-        stack: this.isStack ? 'total' : undefined,
-        data: dataColumns.map(dc => ({
-          ...getExtraSeriesRowData(dc),
-          name: getColumnRenderName(aggConfig),
-          value: dc[getValueByColumnKey(aggConfig)],
-        })),
-        itemStyle: {
-          color,
-        },
-        ...this.getLabelStyle(styleConfigs),
-        ...this.getSeriesStyle(styleConfigs),
-        ...getReference(settingConfigs, dataColumns, aggConfig, false),
-      };
-    });
-
-    const xAxisColumnName = groupConfigs[0].colName;
-    const infoColumnNames = infoConfigs.map(getValueByColumnKey);
-    const yAxisColumnNames = aggregateConfigs.map(c => getValueByColumnKey(c));
-    let groupedSeriesColumns = [];
-
-    if (colorConfigs.length > 0) {
-      const colorColumnName = colorConfigs[0].colName;
-      groupedSeriesColumns = getColorizeGroupSeriesColumns(
-        dataColumns,
-        colorColumnName,
-        xAxisColumnName,
-        yAxisColumnNames,
-        infoColumnNames,
-      ).flatMap(gsc => {
-        const k = Object.keys(gsc)[0];
-        const v = gsc[k];
-
-        const itemStyleColor = colorConfigs[0]?.color?.colors?.find(
-          c => c.key === k,
-        );
-
-        return aggregateConfigs.map(aggConfig => {
-          return {
-            name: k,
-            type: 'line',
-            sampling: 'average',
-            areaStyle: this.isArea ? {} : undefined,
-            stack: this.isStack ? 'total' : undefined,
-            itemStyle: {
-              normal: { color: itemStyleColor?.value },
-            },
-            data: xAxisColumns[0].data.map(d => {
-              const target = v.find(col => col[xAxisColumnName] === d);
-              return {
-                ...getExtraSeriesRowData(target),
-                name: getColumnRenderName(aggConfig),
-                value: target?.[getValueByColumnKey(aggConfig)] || 0,
-              };
-            }),
-            ...this.getLabelStyle(styleConfigs),
-            ...this.getSeriesStyle(styleConfigs),
-          };
-        });
-      });
-    }
-
-    const seriesNames =
-      colorConfigs.length > 0
-        ? groupedSeriesColumns.map((col: any) => col?.name)
-        : yAxisColumns.map(col => col?.name);
+    const series = this.getSeries(
+      settingConfigs,
+      styleConfigs,
+      colorConfigs,
+      dataColumns,
+      groupConfigs,
+      aggregateConfigs,
+      infoConfigs,
+      xAxisColumns,
+    );
+    const yAxisNames = aggregateConfigs.map(getColumnRenderName);
 
     return {
       tooltip: {
@@ -218,12 +156,95 @@ class BasicLineChart extends Chart {
           infoConfigs,
         ),
       },
-      legend: this.getLegendStyle(styleConfigs, seriesNames),
+      legend: this.getLegendStyle(
+        styleConfigs,
+        series?.map(s => s.name),
+      ),
       grid: this.getGrid(styleConfigs),
       xAxis: this.getXAxis(styleConfigs, xAxisColumns),
-      yAxis: this.getYAxis(styleConfigs, yAxisColumns),
-      series: colorConfigs.length > 0 ? groupedSeriesColumns : yAxisColumns,
+      yAxis: this.getYAxis(styleConfigs, yAxisNames),
+      series,
     };
+  }
+
+  getSeries(
+    settingConfigs,
+    styleConfigs,
+    colorConfigs,
+    dataColumns,
+    groupConfigs,
+    aggregateConfigs,
+    infoConfigs,
+    xAxisColumns,
+  ) {
+    if (!colorConfigs?.length) {
+      return aggregateConfigs.map(aggConfig => {
+        const color = aggConfig?.color?.start;
+        return {
+          name: getColumnRenderName(aggConfig),
+          type: 'line',
+          sampling: 'average',
+          areaStyle: this.isArea ? { color } : undefined,
+          stack: this.isStack ? 'total' : undefined,
+          data: dataColumns.map(dc => ({
+            ...getExtraSeriesRowData(dc),
+            name: getColumnRenderName(aggConfig),
+            value: dc[getValueByColumnKey(aggConfig)],
+          })),
+          itemStyle: {
+            color,
+          },
+          ...this.getLabelStyle(styleConfigs),
+          ...this.getSeriesStyle(styleConfigs),
+          ...getReference(settingConfigs, dataColumns, aggConfig, false),
+        };
+      });
+    }
+
+    const xAxisColumnName = getValueByColumnKey(groupConfigs?.[0]);
+    const yAxisColumnNames = aggregateConfigs.map(getValueByColumnKey);
+    const colorColumnName = getValueByColumnKey(colorConfigs[0]);
+    const infoColumnNames = infoConfigs.map(getValueByColumnKey);
+
+    const secondGroupInfos = getColorizeGroupSeriesColumns(
+      dataColumns,
+      colorColumnName,
+      xAxisColumnName,
+      yAxisColumnNames,
+      infoColumnNames,
+    );
+
+    return aggregateConfigs.flatMap(aggConfig => {
+      return secondGroupInfos.map(sgCol => {
+        const k = Object.keys(sgCol)[0];
+        const v = sgCol[k];
+
+        const itemStyleColor = colorConfigs[0]?.color?.colors?.find(
+          c => c.key === k,
+        );
+
+        return {
+          name: k,
+          type: 'line',
+          sampling: 'average',
+          areaStyle: this.isArea ? {} : undefined,
+          stack: this.isStack ? 'total' : undefined,
+          itemStyle: {
+            normal: { color: itemStyleColor?.value },
+          },
+          data: xAxisColumns[0].data.map(d => {
+            const target = v.find(col => col[xAxisColumnName] === d);
+            return {
+              ...getExtraSeriesRowData(target),
+              name: getColumnRenderName(aggConfig),
+              value: target?.[getValueByColumnKey(aggConfig)] || 0,
+            };
+          }),
+          ...this.getLabelStyle(styleConfigs),
+          ...this.getSeriesStyle(styleConfigs),
+        };
+      });
+    });
   }
 
   getGrid(styles) {
@@ -235,7 +256,7 @@ class BasicLineChart extends Chart {
     return { left, right, bottom, top, containLabel };
   }
 
-  getYAxis(styles, yAxisColumns) {
+  getYAxis(styles, yAxisNames) {
     const showAxis = getStyleValueByGroup(styles, 'yAxis', 'showAxis');
     const inverse = getStyleValueByGroup(styles, 'yAxis', 'inverseAxis');
     const lineStyle = getStyleValueByGroup(styles, 'yAxis', 'lineStyle');
@@ -247,9 +268,7 @@ class BasicLineChart extends Chart {
       'yAxis',
       'showTitleAndUnit',
     );
-    const name = showTitleAndUnit
-      ? yAxisColumns.map(c => c.name).join(' / ')
-      : null;
+    const name = showTitleAndUnit ? yAxisNames.join(' / ') : null;
     const nameLocation = getStyleValueByGroup(styles, 'yAxis', 'nameLocation');
     const nameGap = getStyleValueByGroup(styles, 'yAxis', 'nameGap');
     const nameRotate = getStyleValueByGroup(styles, 'yAxis', 'nameRotate');

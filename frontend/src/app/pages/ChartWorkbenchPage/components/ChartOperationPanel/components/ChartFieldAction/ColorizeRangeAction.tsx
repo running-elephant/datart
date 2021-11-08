@@ -19,7 +19,7 @@
 import { Checkbox, Col, Row } from 'antd';
 import { FormItemEx } from 'app/components/From';
 import { ReactColorPicker } from 'app/components/ReactColorPicker';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
 import { updateBy } from 'app/utils/mutation';

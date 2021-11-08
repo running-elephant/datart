@@ -1,0 +1,15 @@
+version: '3'
+services:
+  datart:
+    image: java:8
+    hostname: datart
+    container_name: datart
+    restart: always
+    volumes:
+      - "{datart application root path}:/datart"
+    entrypoint: [ "sh","/datart/bin/datart-server.sh" ]
+    environment:
+      - TZ=Asia/Shanghai
+    logging:
+      options:
+        max-size: "1g"

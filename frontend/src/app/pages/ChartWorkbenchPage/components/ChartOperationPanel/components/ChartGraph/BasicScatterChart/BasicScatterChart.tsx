@@ -76,7 +76,9 @@ class BasicScatterChart extends Chart {
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {}
+  onUnMount(): void {
+    this.chart?.dispose();
+  }
 
   onResize(opt: any, context): void {
     this.chart?.resize(opt, context);
@@ -252,8 +254,9 @@ class BasicScatterChart extends Chart {
       };
     });
 
-    const sizeValueIndex = [].concat(aggregateConfigs).concat(infoConfigs)
-      ?.length;
+    const sizeValueIndex = []
+      .concat(aggregateConfigs)
+      .concat(infoConfigs)?.length;
 
     return {
       name: colorSeriesName || seriesName,

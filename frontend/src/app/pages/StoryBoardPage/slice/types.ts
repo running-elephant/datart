@@ -31,7 +31,7 @@ export interface StoryBoard {
   status: number;
   config: StoryConfig;
 }
-export interface StoryBoardOfServer extends Omit<StoryBoard, 'config'> {
+export interface ServerStoryBoard extends Omit<StoryBoard, 'config'> {
   config: string;
   storypages?: StoryPageOfServer[];
 }

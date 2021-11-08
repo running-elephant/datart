@@ -6,6 +6,9 @@ import {
   VizRenderMode,
   Widget,
 } from 'app/pages/DashBoardPage/slice/types';
+import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
+import { shareActions } from 'app/pages/SharePage/slice';
+import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';
 import { RootState } from 'types';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
@@ -15,18 +18,20 @@ import { getChartWidgetRequestParams } from '../utils';
 import { getDistinctFields } from './../../../utils/fetch';
 import { handleServerBoardAction } from './asyncActions';
 import { selectBoardById, selectBoardWidgetMap } from './selector';
-import {
-  BoardState,
-  GetBoardDetailParams,
-  ServerDashboard,
-  WidgetData,
-} from './types';
+import { BoardState, ServerDashboard, WidgetData } from './types';
 
 /**
  * @param ''
  * @description '先拿本地缓存，没有缓存再去服务端拉数据'
  */
-export const getBoardDetail = createAsyncThunk<null, GetBoardDetailParams>(
+export const getBoardDetail = createAsyncThunk<
+  null,
+  {
+    dashboardRelId: string;
+    filterSearchParams?: FilterSearchParams;
+    vizToken?: ExecuteToken;
+  }
+>(
   'board/getBoardDetail',
   async (params, { getState, dispatch, rejectWithValue }) => {
     // 1 在 内存里找到就返回
@@ -37,25 +42,80 @@ export const getBoardDetail = createAsyncThunk<null, GetBoardDetailParams>(
     if (dashboard) {
       return null;
     }
-    await dispatch(fetchBoardDetail(params));
+    if (params.vizToken) {
+      await dispatch(
+        fetchBoardDetailInShare({ ...params, vizToken: params.vizToken }),
+      );
+    } else {
+      await dispatch(fetchBoardDetail(params));
+    }
     return null;
   },
 );
 
-export const fetchBoardDetail = createAsyncThunk<null, GetBoardDetailParams>(
-  'board/fetchBoardDetail',
+export const fetchBoardDetail = createAsyncThunk<
+  null,
+  { dashboardRelId: string; filterSearchParams?: FilterSearchParams }
+>('board/fetchBoardDetail', async (params, { dispatch, rejectWithValue }) => {
+  try {
+    const { data } = await request<ServerDashboard>(
+      `/viz/dashboards/${params?.dashboardRelId}`,
+    );
+
+    await dispatch(
+      handleServerBoardAction({
+        data,
+        renderMode: 'read',
+        filterSearchMap: { params: params?.filterSearchParams },
+      }),
+    );
+    return null;
+  } catch (error) {
+    errorHandle(error);
+    throw error;
+  }
+});
+
+export const fetchBoardDetailInShare = createAsyncThunk<
+  null,
+  {
+    dashboardRelId: string;
+    vizToken: ExecuteToken;
+    filterSearchParams?: FilterSearchParams;
+  }
+>(
+  'board/fetchBoardDetailInShare',
   async (params, { dispatch, rejectWithValue }) => {
     try {
-      const { data } = await request<ServerDashboard>(
-        `/viz/dashboards/${params?.dashboardRelId}`,
-      );
-      await dispatch(
-        handleServerBoardAction({
-          data,
-          renderMode: 'read',
-          filterSearchMap: { params: params?.filterSearchParams },
+      const { vizToken } = params;
+      const { data } = await request<ShareVizInfo>({
+        url: '/share/viz',
+        method: 'GET',
+        params: {
+          shareToken: vizToken.token,
+          password: vizToken.password,
+        },
+      });
+      dispatch(shareActions.setVizType(data.vizType));
+
+      dispatch(
+        shareActions.setExecuteTokenMap({
+          executeToken: data.executeToken,
         }),
       );
+      const serverBoard = data.vizDetail as ServerDashboard;
+
+      dispatch(
+        handleServerBoardAction({
+          data: serverBoard,
+          renderMode: 'share',
+          filterSearchMap: {
+            params: params.filterSearchParams,
+            isMatchByName: true,
+          },
+        }),
+      );
+
       return null;
     } catch (error) {
       errorHandle(error);
@@ -200,7 +260,9 @@ export const getChartWidgetDataAsync = createAsyncThunk<
       dataChartMap,
       boardLinkFilters,
     });
-
+    if (!requestParams) {
+      return null;
+    }
     let widgetData;
     if (renderMode === 'read') {
       const { data } = await request<WidgetData>({

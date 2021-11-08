@@ -18,10 +18,7 @@
 
 import { Radio, Row, Space } from 'antd';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
-import {
-  i18NComponentProps,
-  useI18NPrefix,
-} from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { FilterCondition } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { convertRelativeTimeRange } from 'app/utils/time';
 import { RECOMMEND_TIME } from 'globalConstants';
@@ -34,7 +31,7 @@ const RecommendRangeTimeSelector: FC<
   {
     condition?: FilterCondition;
     onConditionChange: (condition: ChartFilterCondition) => void;
-  } & i18NComponentProps
+  } & I18NComponentProps
 > = memo(({ i18nPrefix, condition, onConditionChange }) => {
   const t = useI18NPrefix(i18nPrefix);
   const { format } = useContext(TimeConfigContext);

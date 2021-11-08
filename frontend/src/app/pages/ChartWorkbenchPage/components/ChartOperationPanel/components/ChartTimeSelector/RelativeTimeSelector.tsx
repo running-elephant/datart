@@ -17,10 +17,7 @@
  */
 
 import { InputNumber, Select, Space } from 'antd';
-import {
-  i18NComponentProps,
-  useI18NPrefix,
-} from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { getTime } from 'app/utils/time';
 import { TIME_DIRECTION, TIME_UNIT_OPTIONS } from 'globalConstants';
 import { unitOfTime } from 'moment';
@@ -30,7 +27,7 @@ const RelativeTimeSelector: FC<
   {
     isStart?: boolean;
     onChange: (time) => void;
-  } & i18NComponentProps
+  } & I18NComponentProps
 > = memo(({ isStart, i18nPrefix, onChange }) => {
   const t = useI18NPrefix(i18nPrefix);
   const [amount, setAmount] = useState(0);

@@ -108,20 +108,26 @@ public class POIUtils {
             // 只处理第一个sheet
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.rowIterator();
+            Row row0 = sheet.getRow(0);
+            if (row0 == null) {
+                throw new RuntimeException("excel is empty");
+            }
+            int columns = row0.getPhysicalNumberOfCells();
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
-                Iterator<Cell> iterator = row.iterator();
                 LinkedList<Object> cellValues = new LinkedList<>();
+                for (int i = 0; i < columns; i++)
+                    cellValues.add(readCellValue(row.getCell(i)));
                 rows.add(cellValues);
-                while (iterator.hasNext()) {
-                    cellValues.add(readCellValue(iterator.next()));
-                }
             }
         }
         return rows;
     }
 
     private static Object readCellValue(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
         switch (cell.getCellType()) {
             case NUMERIC:
                 return cell.getNumericCellValue();
@@ -131,6 +137,5 @@ public class POIUtils {
                 return cell.getStringCellValue();
         }
     }
-
 
 }

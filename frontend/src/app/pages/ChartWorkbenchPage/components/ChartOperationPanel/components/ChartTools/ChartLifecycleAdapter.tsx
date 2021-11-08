@@ -18,7 +18,7 @@
 
 import { LoadingOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
-import useMount from 'app/pages/ChartWorkbenchPage/hooks/useMount';
+import useMount from 'app/hooks/useMount';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import ChartEventBroker, {
@@ -26,6 +26,7 @@ import ChartEventBroker, {
 } from 'app/pages/ChartWorkbenchPage/models/ChartEventBroker';
 import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 import { useFrame } from 'react-frame-component';
+import styled from 'styled-components/macro';
 import { v4 as uuidv4 } from 'uuid';
 import ChartIFrameContainerResourceLoader from './ChartIFrameContainerResourceLoader';
 
@@ -135,7 +136,7 @@ const ChartLifecycleAdapter: React.FC<{
       indicator={<LoadingOutlined spin />}
       delay={500}
     >
-      <div
+      <StyledChartLifecycleAdapter
         id={containerId}
         style={{ width: style?.width, height: style?.height }}
       />
@@ -144,3 +145,5 @@ const ChartLifecycleAdapter: React.FC<{
 };
 
 export default ChartLifecycleAdapter;
+
+const StyledChartLifecycleAdapter = styled.div``;

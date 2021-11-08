@@ -18,7 +18,7 @@
 
 import { Form, FormInstance, InputNumber, Select } from 'antd';
 import { ControllerFacadeTypes } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,

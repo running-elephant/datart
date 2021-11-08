@@ -56,7 +56,7 @@ public class WebUtils {
         }
     }
 
-    public static <T> T screenShot(String url, OutputType<T> outputType) throws Exception {
+    public static <T> T screenShot(String url, OutputType<T> outputType, int imageWidth) throws Exception {
         WebDriver webDriver = createWebDriver();
         webDriver.get(url);
 
@@ -71,19 +71,24 @@ public class WebUtils {
 
         int contentHeight = Integer.parseInt(webDriver.findElement(By.id("height")).getAttribute("value"));
 
-        // scale the window
-        webDriver.manage().window().setSize(new Dimension(contentWidth, contentHeight));
-        try {
-            Thread.sleep(2 * 1000);
-        } catch (InterruptedException ignored) {
+        if (imageWidth != contentWidth) {
+            // scale the window
+            webDriver.manage().window().setSize(new Dimension(imageWidth, contentHeight));
+            Thread.sleep(1000);
         }
+        // scale the window again
+        contentWidth = Integer.parseInt(webDriver.findElement(By.id("width")).getAttribute("value"));
+        contentHeight = Integer.parseInt(webDriver.findElement(By.id("height")).getAttribute("value"));
+        webDriver.manage().window().setSize(new Dimension(contentWidth, contentHeight));
+        Thread.sleep(1000);
+
         TakesScreenshot screenshot = (TakesScreenshot) webDriver;
         return screenshot.getScreenshotAs(outputType);
     }
 
-    public static File screenShot2File(String url, String path) throws Exception {
+    public static File screenShot2File(String url, String path, int imageWidth) throws Exception {
 
-        File temp = screenShot(url, OutputType.FILE);
+        File temp = screenShot(url, OutputType.FILE, imageWidth);
         path = FileUtils.concatPath(path, temp.getName());
         File file = new File(path);
 

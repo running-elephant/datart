@@ -21,11 +21,11 @@ import {
   FilterConditionType,
   FilterValueOption,
 } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { getDistinctFields } from 'app/utils/fetch';
-import { BackendChart } from '../slice/workbenchSlice';
 import useMount from './useMount';
 
-const useFetchFilterDataByCondtion = (
+export const useFetchFilterDataByCondtion = (
   viewId?: string,
   condition?: FilterCondition,
   onFinish?: (datas: FilterValueOption[]) => void,

@@ -18,11 +18,7 @@
 
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
-import {
-  FONT_WEIGHT_MEDIUM,
-  LINE_HEIGHT_BODY,
-  SPACE,
-} from 'styles/StyleConstants';
+import { SPACE } from 'styles/StyleConstants';
 import { ChartDataConfigSectionProps } from '.';
 import { ChartDraggableTargetContainer } from '../ChartDraggable';
 import { dataConfigSectionComparer } from './utils';
@@ -54,7 +50,5 @@ const Container = styled.div`
 `;
 
 const Title = styled.div`
-  font-weight: ${FONT_WEIGHT_MEDIUM};
-  line-height: ${LINE_HEIGHT_BODY};
-  color: ${p => p.theme.textColorSnd};
+  color: ${p => p.theme.textColor};
 `;

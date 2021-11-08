@@ -182,9 +182,10 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                 .variables(variables)
                 .build();
         DataProviderSource providerSource = toDataProviderConfig(source);
+
         ExecuteParam executeParam = ExecuteParam
                 .builder()
-                .pageInfo(PageInfo.builder().pageSize(testExecuteParam.getSize()).build())
+                .pageInfo(PageInfo.builder().pageNo(1).pageSize(testExecuteParam.getSize()).build())
                 .includeColumns(Collections.singleton("*"))
                 .serverAggregate((boolean) providerSource.getProperties().getOrDefault(SERVER_AGGREGATE, false))
                 .cacheEnable(false)
@@ -222,6 +223,12 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         if (viewExecuteParam.getPageInfo().getPageNo() < 1) {
             viewExecuteParam.getPageInfo().setPageNo(1);
         }
+
+        if (viewExecuteParam.getPageInfo().getPageSize() == 0) {
+            viewExecuteParam.getPageInfo().setPageSize(10_000);
+        }
+
+        viewExecuteParam.getPageInfo().setCountTotal(true);
 
         ExecuteParam queryParam = ExecuteParam.builder()
                 .columns(viewExecuteParam.getColumns())

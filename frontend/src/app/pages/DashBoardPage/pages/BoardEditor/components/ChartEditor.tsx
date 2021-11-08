@@ -18,6 +18,7 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
+import useMount from 'app/hooks/useMount';
 import workbenchSlice, {
   BackendChart,
   backendChartSelector,
@@ -37,7 +38,6 @@ import styled from 'styled-components/macro';
 import { CloneValueDeep, mergeDefaultToValue } from 'utils/object';
 import { ChartConfigReducerActionType } from '../../../../ChartWorkbenchPage';
 import ChartWorkbench from '../../../../ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
-import useMount from '../../../../ChartWorkbenchPage/hooks/useMount';
 import Chart from '../../../../ChartWorkbenchPage/models/Chart';
 import ChartManager from '../../../../ChartWorkbenchPage/models/ChartManager';
 import {
@@ -81,6 +81,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const chartConfig = useSelector(chartConfigSelector);
   const backendChart = useSelector(backendChartSelector);
   const [chart, setChart] = useState<Chart>();
+
   useMount(
     () => {
       const currentChart = ChartManager.instance().getDefaultChart();

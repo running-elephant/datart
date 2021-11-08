@@ -33,6 +33,7 @@ import { dispatchResize } from 'utils/utils';
 import PageThumbnailList from '../components/PageThumbnailList';
 import StoryHeader from '../components/StoryHeader';
 import StoryPageItem from '../components/StoryPageItem';
+import { StoryEditor } from '../Editor';
 import { storyActions } from '../slice';
 import {
   makeSelectStoryBoardById,
@@ -51,7 +52,8 @@ export const StoryPagePreview: React.FC<{
   const dispatch = useDispatch();
 
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const [storyEditing, setStoryEditing] = useState(false);
+  // const [storyEditing, setStoryEditing] = useState(false);
+  const [editorVisible, setEditorVisible] = useState(false);
 
   const storyBoard = useSelector((state: { storyBoard: StoryBoardState }) =>
     makeSelectStoryBoardById(state, storyId),
@@ -59,6 +61,9 @@ export const StoryPagePreview: React.FC<{
   const pageMap = useSelector((state: { storyBoard: StoryBoardState }) =>
     makeSelectStoryPagesById(state, storyId),
   );
+  const onCloseEditor = useCallback(() => {
+    setEditorVisible(false);
+  }, []);
   const publishLoading = useSelector(selectPublishLoading);
 
   const sortedPages = useMemo(() => {
@@ -74,9 +79,8 @@ export const StoryPagePreview: React.FC<{
     dispatch(getStoryDetail(storyId));
   }, [dispatch, storyId]);
   const toggleEdit = useCallback(() => {
-    setStoryEditing(c => !c);
-    dispatch(vizActions.changeEditingStoryId(storyId || ''));
-  }, [dispatch, storyId]);
+    setEditorVisible(c => !c);
+  }, []);
   const playStory = useCallback(() => {
     dispatch(vizActions.changePlayingStoryId(storyId || ''));
   }, [dispatch, storyId]);
@@ -136,6 +140,12 @@ export const StoryPagePreview: React.FC<{
           publish: storyBoard.status === 1 ? true : false,
           resolve: () => {
             message.success(`${storyBoard.status === 2 ? '取消' : ''}发布成功`);
+            dispatch(
+              storyActions.changeBoardPublish({
+                stroyId: storyBoard.id,
+                publish: storyBoard.status === 1 ? 2 : 1,
+              }),
+            );
           },
         }),
       );
@@ -157,12 +167,17 @@ export const StoryPagePreview: React.FC<{
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <StoryContext.Provider value={{ stroyBoardId: storyId, editing: false }}>
+      <StoryContext.Provider
+        value={{
+          stroyBoardId: storyId,
+          editing: false,
+          allowShare: allowShare || false,
+        }}
+      >
         <Wrapper>
           <StoryHeader
             name={storyBoard?.name}
             playStory={playStory}
-            storyEditing={storyEditing}
             status={storyBoard?.status}
             toggleEdit={toggleEdit}
             publishLoading={publishLoading}
@@ -196,6 +211,9 @@ export const StoryPagePreview: React.FC<{
               ))}
             </Content>
           </Container>
+          {editorVisible && (
+            <StoryEditor storyId={storyId} onCloseEditor={onCloseEditor} />
+          )}
         </Wrapper>
       </StoryContext.Provider>
     </DndProvider>

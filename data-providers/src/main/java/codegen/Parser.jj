@@ -101,6 +101,7 @@ import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.SourceStringReader;
 import org.apache.calcite.util.Util;
 import org.apache.calcite.util.trace.CalciteTrace;
+import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
 
 import org.slf4j.Logger;
 
@@ -4094,7 +4095,8 @@ SqlNode StringLiteral() :
     List<SqlLiteral> frags = null;
     char unicodeEscapeChar = 0;
     String charSet = null;
-    SqlCharStringLiteral literal;
+//    SqlCharStringLiteral literal;
+    SqlSimpleStringLiteral literal;
 }
 {
     // A continued string literal consists of a head fragment and one or more
@@ -4157,7 +4159,8 @@ SqlNode StringLiteral() :
     {
         p = SqlParserUtil.parseString(token.image);
         try {
-            literal = SqlLiteral.createCharString(p, charSet, getPos());
+//            literal = SqlLiteral.createCharString(p, charSet, getPos());
+            literal = new SqlSimpleStringLiteral(p, getPos());
         } catch (java.nio.charset.UnsupportedCharsetException e) {
             throw SqlUtil.newContextException(getPos(),
                 RESOURCE.unknownCharacterSet(charSet));
@@ -4176,7 +4179,8 @@ SqlNode StringLiteral() :
         {
             p = SqlParserUtil.parseString(token.image);
             try {
-                literal = SqlLiteral.createCharString(p, charSet, getPos());
+//                literal = SqlLiteral.createCharString(p, charSet, getPos());
+                literal = new SqlSimpleStringLiteral(p, getPos());
             } catch (java.nio.charset.UnsupportedCharsetException e) {
                 throw SqlUtil.newContextException(getPos(),
                     RESOURCE.unknownCharacterSet(charSet));
@@ -4217,7 +4221,8 @@ SqlNode StringLiteral() :
     {
         p = SqlParserUtil.strip(getToken(0).image, DQ, DQ, "\\\"", Casing.UNCHANGED);
         try {
-            return SqlLiteral.createCharString(p, charSet, getPos());
+//            return SqlLiteral.createCharString(p, charSet, getPos());
+            return new SqlSimpleStringLiteral(p, getPos());
         } catch (java.nio.charset.UnsupportedCharsetException e) {
             throw SqlUtil.newContextException(getPos(),
                 RESOURCE.unknownCharacterSet(charSet));
@@ -4228,7 +4233,8 @@ SqlNode StringLiteral() :
     {
         p = SqlParserUtil.strip(getToken(0).image, "'", "'", "\\'", Casing.UNCHANGED);
         try {
-            return SqlLiteral.createCharString(p, charSet, getPos());
+//            return SqlLiteral.createCharString(p, charSet, getPos());
+            return new SqlSimpleStringLiteral(p, getPos());
         } catch (java.nio.charset.UnsupportedCharsetException e) {
             throw SqlUtil.newContextException(getPos(),
                 RESOURCE.unknownCharacterSet(charSet));
@@ -4740,7 +4746,8 @@ void IdentifierSegment(List<String> names, List<SqlParserPos> positions) :
         ]
         {
             pos = span.end(this).withQuoting(true);
-            SqlLiteral lit = SqlLiteral.createCharString(image, "UTF16", pos);
+//            SqlLiteral lit = SqlLiteral.createCharString(image, "UTF16", pos);
+            SqlLiteral lit = new SqlSimpleStringLiteral(image, pos);
             lit = lit.unescapeUnicode(unicodeEscapeChar);
             id = lit.toValue();
         }

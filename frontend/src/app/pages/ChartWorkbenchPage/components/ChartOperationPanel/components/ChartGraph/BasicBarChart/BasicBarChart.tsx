@@ -123,7 +123,6 @@ class BasicBarChart extends Chart {
       dataset.columns,
     );
     const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
-
     const xAxisColumns = (groupConfigs || []).map(config => {
       return {
         type: 'category',
@@ -131,7 +130,7 @@ class BasicBarChart extends Chart {
         data: UniqArray(dataColumns.map(dc => dc[getValueByColumnKey(config)])),
       };
     });
-
+    const yAxisNames = aggregateConfigs.map(getColumnRenderName);
     const series = this.getSeries(
       settingConfigs,
       styleConfigs,
@@ -145,7 +144,7 @@ class BasicBarChart extends Chart {
 
     const axisInfo = {
       xAxis: this.getXAxis(styleConfigs, xAxisColumns),
-      yAxis: this.getYAxis(styleConfigs, series),
+      yAxis: this.getYAxis(styleConfigs, yAxisNames),
     };
     if (this.isStackMode) {
       this.makeStackSeries(styleConfigs, series);
@@ -365,7 +364,7 @@ class BasicBarChart extends Chart {
     return { left, right, bottom, top, containLabel };
   }
 
-  getYAxis(styles, yAxisColumns) {
+  getYAxis(styles, yAxisNames) {
     const showAxis = getStyleValueByGroup(styles, 'yAxis', 'showAxis');
     const inverse = getStyleValueByGroup(styles, 'yAxis', 'inverseAxis');
     const lineStyle = getStyleValueByGroup(styles, 'yAxis', 'lineStyle');
@@ -376,10 +375,7 @@ class BasicBarChart extends Chart {
       'yAxis',
       'showTitleAndUnit',
     );
-    const name = showTitleAndUnit
-      ? yAxisColumns.map(c => c.name).join(' / ')
-      : null;
-
+    const name = showTitleAndUnit ? yAxisNames.join(' / ') : null;
     const unitFont = getStyleValueByGroup(styles, 'yAxis', 'unitFont');
     const nameLocation = getStyleValueByGroup(styles, 'yAxis', 'nameLocation');
     const nameGap = getStyleValueByGroup(styles, 'yAxis', 'nameGap');

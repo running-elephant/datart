@@ -245,7 +245,7 @@ export class ChartDataRequestBuilder {
     return sortColumns.map(aggCol => ({
       column: aggCol.colName,
       operator: aggCol.sort?.type!,
-      sqlOperator: aggCol.aggregate!,
+      aggOperator: aggCol.aggregate!,
     }));
   }
 

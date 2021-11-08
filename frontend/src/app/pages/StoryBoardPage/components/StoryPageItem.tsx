@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import Dashboard from 'app/pages/DashBoardPage/pages/Dashboard';
+import { VizRenderMode } from 'app/pages/DashBoardPage/slice/types';
 import React, { useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { StoryPage } from '../slice/types';
@@ -24,7 +25,8 @@ const StoryPageItem: React.FC<{
   page: StoryPage;
   autoFit?: boolean;
   showZoomCtrl?: boolean;
-}> = ({ page, autoFit, showZoomCtrl }) => {
+  renderMode?: VizRenderMode;
+}> = ({ page, autoFit, showZoomCtrl, renderMode }) => {
   const { relId, relType } = page;
 
   const SlideContent = useMemo(() => {
@@ -37,12 +39,13 @@ const StoryPageItem: React.FC<{
           hideTitle={true}
           autoFit={autoFit}
           showZoomCtrl={showZoomCtrl}
+          renderMode={renderMode}
         />
       );
     } else {
       return null;
     }
-  }, [autoFit, relId, relType, showZoomCtrl]);
+  }, [autoFit, relId, relType, renderMode, showZoomCtrl]);
   const { in: effectIn, out: effectOut, speed } = page.config.transitionEffect;
   return (
     <SectionWrap

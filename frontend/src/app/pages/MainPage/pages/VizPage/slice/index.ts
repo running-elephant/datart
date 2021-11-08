@@ -1,7 +1,9 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, isRejected, PayloadAction } from '@reduxjs/toolkit';
 import { ChartDataSectionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
+import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { CloneValueDeep } from 'utils/object';
+import { errorHandle } from 'utils/utils';
 import { v4 as uuidv4 } from 'uuid';
 import {
   addStoryboard,
@@ -66,9 +68,6 @@ const slice = createSlice({
       }
     },
 
-    changeEditingStoryId(state, action: PayloadAction<string>) {
-      state.editingStoryId = action.payload;
-    },
     changePlayingStoryId(state, action: PayloadAction<string>) {
       state.playingStoryId = action.payload;
     },
@@ -524,17 +523,24 @@ const slice = createSlice({
         };
       },
     );
-    builder.addCase(updateFilterAndFetchDataset.fulfilled, (state, action) => {
-      const index = state.chartPreviews?.findIndex(
-        c => c.backendChartId === action.payload?.backendChartId,
-      );
-      if (index < 0) {
-        return;
+    builder
+      .addCase(updateFilterAndFetchDataset.fulfilled, (state, action) => {
+        const index = state.chartPreviews?.findIndex(
+          c => c.backendChartId === action.payload?.backendChartId,
+        );
+        if (index < 0) {
+          return;
+        }
+        state.chartPreviews[index] = {
+          ...state.chartPreviews[index],
+          version: uuidv4(),
+        };
+      });
+
+    builder.addMatcher(isRejected, (_, action) => {
+      if (isMySliceAction(action, slice.name)) {
+        errorHandle(action?.error);
       }
-      state.chartPreviews[index] = {
-        ...state.chartPreviews[index],
-        version: uuidv4(),
-      };
     });
   },
 });

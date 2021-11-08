@@ -2,7 +2,6 @@ import { createGlobalStyle } from 'styled-components';
 import {
   EMPHASIS_LEVEL,
   FONT_SIZE_BODY,
-  FONT_WEIGHT_MEDIUM,
   MODAL_LEVEL,
   SPACE_SM,
   SPACE_TIMES,
@@ -202,7 +201,6 @@ export const OverriddenStyle = createGlobalStyle`
     .ant-collapse-item >
     .ant-collapse-header {
       padding: ${SPACE_XS} 0;
-      font-weight: ${FONT_WEIGHT_MEDIUM};
       color: ${p => p.theme.textColor};
 
       .ant-collapse-arrow {
