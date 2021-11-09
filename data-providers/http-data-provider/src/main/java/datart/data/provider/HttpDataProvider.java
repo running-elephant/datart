@@ -121,7 +121,10 @@ public class HttpDataProvider extends DefaultDataProvider {
 
         httpRequestParam.setContentType(config.getOrDefault(CONTENT_TYPE, "application/json").toString());
 
-        String parserName = config.getOrDefault(RESPONSE_PARSER, DEFAULT_PARSER).toString();
+        String parserName = config.get(RESPONSE_PARSER).toString();
+        if (StringUtils.isBlank(parserName)) {
+            parserName = DEFAULT_PARSER;
+        }
 
         Class<? extends HttpResponseParser> aClass = (Class<? extends HttpResponseParser>) Class.forName(parserName);
 
