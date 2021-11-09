@@ -370,5 +370,4 @@ const DataReferencePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
 
 export default DataReferencePanel;
 
-const StyledDataReferencePanel = styled.div`
-`;
+const StyledDataReferencePanel = styled.div``;

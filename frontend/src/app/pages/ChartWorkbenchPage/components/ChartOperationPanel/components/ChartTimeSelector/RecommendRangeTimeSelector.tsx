@@ -17,8 +17,8 @@
  */
 
 import { Radio, Row, Space } from 'antd';
-import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
+import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import { FilterCondition } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { convertRelativeTimeRange } from 'app/utils/time';
 import { RECOMMEND_TIME } from 'globalConstants';
