@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
+import ChartEditor from 'app/components/ChartEditor';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import ChartEditor from 'app/pages/DashBoardPage/pages/BoardEditor/components/ChartEditor';
 import {
   DataChart,
   WidgetContentChartType,

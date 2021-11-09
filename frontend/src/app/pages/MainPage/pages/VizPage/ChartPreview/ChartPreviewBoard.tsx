@@ -17,12 +17,12 @@
  */
 
 import { message } from 'antd';
+import ChartEditor from 'app/components/ChartEditor';
 import { VizHeader } from 'app/components/VizHeader';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
-import ChartEditor from 'app/pages/DashBoardPage/pages/BoardEditor/components/ChartEditor';
 import { useMainSlice } from 'app/pages/MainPage/slice';
 import { selectDownloadPolling } from 'app/pages/MainPage/slice/selectors';
 // import { makeDownloadDataTask } from 'app/pages/MainPage/slice/thunks';

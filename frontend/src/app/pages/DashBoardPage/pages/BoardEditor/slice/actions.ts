@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Modal } from 'antd';
+import { ChartEditorBaseProps } from 'app/components/ChartEditor';
 import ChartDataView, {
   ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
@@ -37,11 +38,11 @@ import produce from 'immer';
 import { RootState } from 'types';
 import { v4 as uuidv4 } from 'uuid';
 import { editBoardStackActions, editDashBoardInfoActions } from '.';
-import { ChartEditorBaseProps } from '../components/ChartEditor';
 import { BoardType } from '../../Dashboard/slice/types';
 import { WidgetFilterFormType } from './../components/FilterWidgetPanel/types';
 import { addWidgetsToEditBoard, getEditWidgetDataAsync } from './thunk';
 import { HistoryEditBoard } from './types';
+
 const { confirm } = Modal;
 export const deleteWidgetsAction = () => async (dispatch, getState) => {
   const editBoard = getState().editBoard as HistoryEditBoard;
