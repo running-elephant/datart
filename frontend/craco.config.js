@@ -132,10 +132,10 @@ module.exports = {
     hot: true,
     proxy: {
       '/api/v1': {
-        target: 'http://localhost:8080/',
+        target: 'http://172.16.1.152:8080/',
       },
       '/resources': {
-        target: 'http://localhost:8080/',
+        target: 'http://172.16.1.152:8080/',
       },
     },
     historyApiFallback: {

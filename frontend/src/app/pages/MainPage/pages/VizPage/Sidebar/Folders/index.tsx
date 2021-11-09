@@ -31,7 +31,7 @@ import {
 import { FolderViewModel, VizType } from '../../slice/types';
 import { Recycle } from '../Recycle';
 import { FolderTree } from './FolderTree';
-
+import { setTreeIndexFn } from './utils';
 interface FoldersProps {
   selectedId?: string;
   className?: string;
@@ -109,17 +109,20 @@ export const Folders = memo(({ selectedId, className }: FoldersProps) => {
         initialValues: getInitValues(key),
         onSave: (values, onClose) => {
           const dataValues = updateValue(key, values);
+          let index = setTreeIndexFn(values,treeData);
+
           dispatch(
             addViz({
-              viz: { ...dataValues, orgId: orgId },
+              viz: { ...dataValues, orgId: orgId, index: index },
               type: key,
               resolve: onClose,
             }),
           );
+
         },
       });
     },
-    [showSaveForm, getInitValues, updateValue, dispatch, orgId],
+    [showSaveForm, getInitValues, updateValue, dispatch, orgId, treeData],
   );
 
   const titles = useMemo(

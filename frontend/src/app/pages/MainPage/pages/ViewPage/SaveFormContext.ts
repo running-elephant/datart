@@ -60,6 +60,7 @@ export const useSaveFormContext = (): SaveFormContextValue => {
       onSave,
       onAfterClose,
     }: SaveFormState) => {
+      console.log(parentIdLabel,'parentIdLabel');
       setType(type);
       setVisible(visible);
       setSimple(simple);

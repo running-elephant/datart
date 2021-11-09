@@ -105,6 +105,9 @@ const slice = createSlice({
         state[key] = value;
       });
     },
+    DrapVizTree(state,action: PayloadAction<[]>){
+      state.vizs = action.payload;
+    }
   },
   extraReducers: builder => {
     // getFolders

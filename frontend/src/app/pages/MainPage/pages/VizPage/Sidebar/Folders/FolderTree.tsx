@@ -20,10 +20,13 @@ import {
   getFolders,
   removeTab,
 } from '../../slice/thunks';
-
+import { vizActions } from '../../slice';
+import { LocalTreeDataNode } from 'app/pages/MainPage/slice/types';
+import { setTreeIndexFn } from './utils';
+import { loopTree } from 'utils/utils';
 interface FolderTreeProps {
   selectedId?: string;
-  treeData?: TreeDataNode[];
+  treeData?: LocalTreeDataNode[];
 }
 
 export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
@@ -32,11 +35,9 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
   const orgId = useSelector(selectOrgId);
   const loading = useSelector(selectVizListLoading);
   const { showSaveForm } = useContext(SaveFormContext);
-
   useEffect(() => {
     dispatch(getFolders(orgId));
   }, [dispatch, orgId]);
-
   const redirect = useCallback(
     tabKey => {
       if (tabKey) {
@@ -95,15 +96,23 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
               visible: true,
               initialValues: { ...node, parentId: node.parentId || void 0 },
               onSave: (values, onClose) => {
+                let index = node.index;
+
+                if(values.parentId && values.parentId !== node.parentId){
+                  index = setTreeIndexFn(values,treeData);
+                }
+                
                 dispatch(
                   editFolder({
                     folder: {
                       ...values,
                       parentId: values.parentId || null,
+                      index: index,
                     },
                     resolve: onClose,
                   }),
                 );
+
               },
             });
             break;
@@ -113,7 +122,7 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
             break;
         }
       },
-    [dispatch, showSaveForm],
+    [dispatch, showSaveForm, treeData],
   );
 
   const renderTreeTitle = useCallback(
@@ -168,15 +177,71 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
     [moreMenuClick, archiveViz],
   );
 
+  const onDrop = (info) =>{
+    const dropKey = info.node.key; //落下的key
+    const dragKey = info.dragNode.key;//拖动的key
+    const dropPos = info.node.pos.split('-');
+    const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
+    const data = treeData ? treeData : [];
+
+    let dragObj
+    ,   ar
+    ,   i
+    ,   index = 0;
+
+    loopTree(data, dragKey, 'key', (item) => {
+      dragObj = item;
+    });
+
+    loopTree(data, dropKey, 'key', (item, index, arr) => {
+        ar = arr;
+        i = index;
+    });
+
+    if(ar[i].parentId === dragObj.id || (ar[i].isFolder && ar[i].id === dragObj.id) ){
+      return false;
+    }
+    
+    if(!info.dropToGap){ //如果移动到二级目录里面的第一个，获取到该目录children中[0]元素的index-1
+      index = ar[i].children ? (ar[i].children[0]?.index) - 1 : 0
+    }else if(dropPosition === -1 ){ // 移动到第一个
+      index = ar[i] ? (ar[i].index) - 1 : 0
+    }else if(i  === ar.length - 1 ){ // 移动到最后一个
+      index = ar[ar.length - 1].index + 1
+    }else{ //中间
+      index = (ar[i].index  + ar[i+1].index) / 2
+    }
+
+    dispatch(
+      editFolder({
+        folder: {
+          id:dragObj.id,
+          parentId: !info.dropToGap ? ar[i].id : ar[i].parentId || null, 
+                    //如果移动到二级目录里面的第一个，就用当前目录的id,如果不是就用文件的parentId
+          index: index,
+        },
+        resolve: () =>{
+
+        },
+      }),
+    );
+
+  };
+
   return (
-    <Tree
-      loading={loading}
-      treeData={treeData}
-      titleRender={renderTreeTitle}
-      onSelect={menuSelect}
-      {...(selectedId && { selectedKeys: [selectedId] })}
-      defaultExpandAll
-      draggable
-    />
+    <div>
+        <Tree
+        loading={loading}
+        treeData={treeData}
+        titleRender={renderTreeTitle}
+        onSelect={menuSelect}
+        onDrop={onDrop}
+        {...(selectedId && { selectedKeys: [selectedId] })}
+        defaultExpandAll
+        draggable
+      />
+      
+    </div>
+    
   );
 }
