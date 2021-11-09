@@ -24,7 +24,6 @@ import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParserPos;
-import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.util.DateString;
 import org.apache.calcite.util.TimestampString;
 
@@ -116,4 +115,13 @@ public class SqlNodeUtils {
         return createSqlNode(value, null);
     }
 
+    public static String toSql(SqlNode sqlNode, SqlDialect dialect) {
+        return sqlNode.toSqlString(
+                config -> config.withDialect(dialect)
+                        .withAlwaysUseParentheses(false)
+                        .withSelectListItemsOnSeparateLines(false)
+                        .withUpdateSetListNewline(false)
+                        .withQuoteAllIdentifiers(true)
+                        .withIndentation(0)).getSql();
+    }
 }
