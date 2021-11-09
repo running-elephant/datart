@@ -34,12 +34,12 @@ import 'reveal.js/dist/reveal.css';
 import RevealZoom from 'reveal.js/plugin/zoom/plugin';
 import styled from 'styled-components/macro';
 import { v4 as uuidv4 } from 'uuid';
-import StoryPageItem from '../StoryBoardPage/components/StoryPageItem';
 import { storyActions } from '../StoryBoardPage/slice';
 import { makeSelectStoryPagesById } from '../StoryBoardPage/slice/selectors';
 import { getPageContentDetail } from '../StoryBoardPage/slice/thunks';
 import { StoryBoard, StoryBoardState } from '../StoryBoardPage/slice/types';
 import { selectSubVizTokenMap } from './slice/selectors';
+import StoryPageItem from './StoryPageItem';
 
 const { Content } = Layout;
 

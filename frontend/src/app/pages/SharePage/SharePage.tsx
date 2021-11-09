@@ -193,7 +193,7 @@ export function SharePage() {
           dashboard={shareBoard}
           allowDownload={true}
           onMakeShareDownloadDataTask={onMakeShareDownloadDataTask}
-          renderMode={renderMode} //   TODO and task
+          renderMode={renderMode}
           filterSearchUrl={''}
           onLoadShareTask={onLoadShareTask}
           onDownloadFile={onDownloadFile}

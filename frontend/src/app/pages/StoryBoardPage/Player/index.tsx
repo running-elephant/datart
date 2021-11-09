@@ -155,13 +155,7 @@ export const StoryPlayer: React.FC<{ storyId: string }> = memo(
       const { relId, relType } = curPage;
       dispatch(getPageContentDetail({ relId, relType }));
     }, [currentPageIndex, dispatch, sortedPages, pageMap]);
-    useEffect(() => {
-      setTimeout(() => {
-        // if (revealRef.current) {
-        //   fullRef.current?.requestFullscreen();
-        // }
-      }, 0);
-    }, []);
+
     return (
       <DndProvider backend={HTML5Backend}>
         <Wrapper ref={fullRef}>

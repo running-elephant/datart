@@ -30,14 +30,14 @@ import styled from 'styled-components/macro';
 import { BoardProvider } from '../../components/BoardProvider';
 import FullScreenPanel from '../../components/FullScreenPanel';
 import TitleHeader from '../../components/TitleHeader';
-import { boardActions } from './slice';
-import { makeSelectBoardConfigById } from './slice/selector';
-import { fetchBoardDetail } from './slice/thunk';
-import { BoardState, VizRenderMode } from './slice/types';
 import BoardEditor from '../BoardEditor';
 import { editDashBoardInfoActions } from '../BoardEditor/slice';
 import AutoBoardCore from './AutoDashboard/AutoBoardCore';
 import FreeBoardCore from './FreeDashboard/FreeBoardCore';
+import { boardActions } from './slice';
+import { makeSelectBoardConfigById } from './slice/selector';
+import { fetchBoardDetail } from './slice/thunk';
+import { BoardState, VizRenderMode } from './slice/types';
 export interface DashboardProps {
   id: string;
   renderMode?: VizRenderMode;
