@@ -95,7 +95,7 @@ export interface VizTab {
 export interface AddVizParams {
   viz: {
     name: string;
-    index:number;
+    index:number | null;
     description?: string;
     parentId?: string;
     orgId: string;

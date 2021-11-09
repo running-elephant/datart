@@ -93,8 +93,6 @@ export function listToTree<
     }
   });
   
-  treeNodes.sort((a, b) => Number(a.index) - Number(b.index) )
-
   treeNodes.sort((a, b) => Number(a.index) - Number(b.index));
 
   return treeNodes.map(node => {
