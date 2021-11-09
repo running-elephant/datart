@@ -48,9 +48,10 @@ export const handleServerBoardAction =
     const { datacharts, views: serverViews, widgets: serverWidgets } = data;
 
     const widgetIds = serverWidgets.map(w => w.id);
-
+    const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
     const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(
       serverWidgets,
+      dataCharts,
       filterSearchMap,
     );
 
@@ -59,7 +60,6 @@ export const handleServerBoardAction =
     if (renderMode === 'schedule') {
       boardInfo = getScheduleBoardInfo(boardInfo, widgetMap);
     }
-    const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
 
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
     const viewViews = getChartDataView(serverViews, allDataCharts);

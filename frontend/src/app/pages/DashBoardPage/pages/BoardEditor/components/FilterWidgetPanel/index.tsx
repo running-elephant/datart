@@ -152,13 +152,13 @@ const FilterWidgetPanel: React.FC = memo(props => {
               nextRelatedViews.push({ ...oldViewItem });
             } else {
               const view = viewMap[viewId];
+              if (!view) return;
               const relatedView: RelatedView = {
                 viewId: view.id,
                 filterFieldCategory: ChartDataViewFieldCategory.Field,
                 fieldValue: '',
                 fieldValueType: ChartDataViewFieldType.STRING,
               };
-
               nextRelatedViews.push(relatedView);
             }
           }
