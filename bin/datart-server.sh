@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-BASE_DIR=$(dirname $(dirname $(readlink -f "$0")))
+BASE_DIR=$(cd "$(dirname "$0")/.."; pwd -P)
 
 echo "working dir ${BASE_DIR}"
 
