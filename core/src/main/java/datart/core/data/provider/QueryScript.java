@@ -18,8 +18,10 @@
 
 package datart.core.data.provider;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.Serializable;
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class QueryScript implements Serializable {
 
     private String sourceId;

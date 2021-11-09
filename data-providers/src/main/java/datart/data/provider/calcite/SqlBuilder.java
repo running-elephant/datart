@@ -105,7 +105,7 @@ public class SqlBuilder {
         //function columns
         if (!CollectionUtils.isEmpty(executeParam.getFunctionColumns())) {
             for (FunctionColumn functionColumn : executeParam.getFunctionColumns()) {
-                functionColumnMap.put(functionColumn.getAlias(), parseSnippet(functionColumn, T));
+                functionColumnMap.put(functionColumn.getAlias(), parseSnippet(functionColumn, T, true));
             }
         }
 
@@ -211,8 +211,7 @@ public class SqlBuilder {
                 offset,
                 fetch,
                 null);
-
-        return sqlSelect.toSqlString(this.dialect).getSql();
+        return SqlNodeUtils.toSql(sqlSelect, this.dialect);
     }
 
     private SqlNode createAggNode(AggregateOperator.SqlOperator sqlOperator, String column, String alias) {
@@ -371,13 +370,24 @@ public class SqlBuilder {
         return new SqlBasicCall(sqlOp, sqlNodes, SqlParserPos.ZERO);
     }
 
-    private SqlNode parseSnippet(FunctionColumn column, String tableName) throws SqlParseException {
+    /**
+     * parse function column ,and register the column functions
+     *
+     * @param column    function column
+     * @param tableName table where function to execute
+     * @param register  whether register this function as build function
+     */
+    private SqlNode parseSnippet(FunctionColumn column, String tableName, boolean register) throws SqlParseException {
         SqlSelect sqlSelect = (SqlSelect) SqlParserUtils.parseSnippet(column.getSnippet());
         SqlNode sqlNode = sqlSelect.getSelectList().get(0);
         if (!(sqlNode instanceof SqlCall)) {
             return sqlNode;
         }
         completionIdentifier((SqlCall) sqlNode, tableName);
+        if (register) {
+            SqlFunctionRegisterVisitor visitor = new SqlFunctionRegisterVisitor();
+            visitor.visit((SqlCall) sqlNode);
+        }
         return sqlNode;
     }
 
