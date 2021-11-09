@@ -66,13 +66,13 @@ export const fetchShareVizInfo = createAsyncThunk(
       errorHandle(error);
       throw error;
     }
-
+    await thunkAPI.dispatch(shareActions.setVizType(data.vizType));
     persistence.session.save(shareToken, sharePassword);
     await thunkAPI.dispatch(shareActions.saveNeedPassword(false));
     await thunkAPI.dispatch(
       shareActions.saveShareInfo({ token: shareToken, pwd: sharePassword }),
     );
-    await thunkAPI.dispatch(shareActions.setVizType(data.vizType));
+
     await thunkAPI.dispatch(
       shareActions.setExecuteTokenMap({
         executeToken: data.executeToken,

@@ -45,6 +45,7 @@ import {
   selectNeedPassword,
   selectShareExecuteTokenMap,
   selectSharePassword,
+  selectShareVizType,
 } from './slice/selectors';
 import { fetchShareVizInfo } from './slice/thunks';
 import { StoryPlayerForShare } from './StoryPlayerForShare';
@@ -65,6 +66,7 @@ export function SharePage() {
   const chartPreview = useSelector(selectChartPreview);
   const shareBoard = useSelector(selectShareBoard);
   const shareStory = useSelector(selectShareStoryBoard);
+  const vizType = useSelector(selectShareVizType);
 
   const shareToken = useRouteQuery({
     key: 'token',
@@ -177,18 +179,21 @@ export function SharePage() {
         }}
       />
 
-      {!Boolean(needPassword) && chartPreview && chartPreview?.backendChart && (
-        <DownloadTaskContainer
-          onLoadTasks={onLoadShareTask}
-          onDownloadFile={onDownloadFile}
-        >
-          <ChartPreviewBoardForShare
-            chartPreview={chartPreview}
-            onCreateDataChartDownloadTask={onMakeShareDownloadDataTask}
-          />
-        </DownloadTaskContainer>
-      )}
-      {!Boolean(needPassword) && shareBoard && !shareStory && (
+      {!Boolean(needPassword) &&
+        vizType === 'DATACHART' &&
+        chartPreview &&
+        chartPreview?.backendChart && (
+          <DownloadTaskContainer
+            onLoadTasks={onLoadShareTask}
+            onDownloadFile={onDownloadFile}
+          >
+            <ChartPreviewBoardForShare
+              chartPreview={chartPreview}
+              onCreateDataChartDownloadTask={onMakeShareDownloadDataTask}
+            />
+          </DownloadTaskContainer>
+        )}
+      {!Boolean(needPassword) && vizType === 'DASHBOARD' && shareBoard && (
         <BoardForShare
           dashboard={shareBoard}
           allowDownload={true}
@@ -199,7 +204,7 @@ export function SharePage() {
           onDownloadFile={onDownloadFile}
         />
       )}
-      {!Boolean(needPassword) && shareStory && (
+      {!Boolean(needPassword) && vizType === 'STORYBOARD' && shareStory && (
         <StoryPlayerForShare storyBoard={shareStory} />
       )}
     </div>
