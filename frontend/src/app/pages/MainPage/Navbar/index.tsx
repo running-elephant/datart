@@ -1,17 +1,12 @@
 import {
   BankFilled,
-  DatabaseFilled,
   ExportOutlined,
   FormOutlined,
   FunctionOutlined,
   ProfileOutlined,
-  ProjectFilled,
   SafetyCertificateFilled,
-  ScheduleFilled,
   SettingFilled,
   SettingOutlined,
-  TabletFilled,
-  TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { List, Menu, Tooltip } from 'antd';

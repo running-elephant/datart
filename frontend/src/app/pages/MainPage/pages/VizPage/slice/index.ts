@@ -523,19 +523,18 @@ const slice = createSlice({
         };
       },
     );
-    builder
-      .addCase(updateFilterAndFetchDataset.fulfilled, (state, action) => {
-        const index = state.chartPreviews?.findIndex(
-          c => c.backendChartId === action.payload?.backendChartId,
-        );
-        if (index < 0) {
-          return;
-        }
-        state.chartPreviews[index] = {
-          ...state.chartPreviews[index],
-          version: uuidv4(),
-        };
-      });
+    builder.addCase(updateFilterAndFetchDataset.fulfilled, (state, action) => {
+      const index = state.chartPreviews?.findIndex(
+        c => c.backendChartId === action.payload?.backendChartId,
+      );
+      if (index < 0) {
+        return;
+      }
+      state.chartPreviews[index] = {
+        ...state.chartPreviews[index],
+        version: uuidv4(),
+      };
+    });
 
     builder.addMatcher(isRejected, (_, action) => {
       if (isMySliceAction(action, slice.name)) {

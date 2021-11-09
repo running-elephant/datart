@@ -50,7 +50,7 @@ const ControllerPanel: FC<{
   view?: BackendChart['view'];
   chartConfig?: ChartConfig;
   onChange: (type, payload) => void;
-}> = memo(({ viewId,view, chartConfig, onChange }) => {
+}> = memo(({ viewId, view, chartConfig, onChange }) => {
   const [filters, setFilters] = useState<ChartDataSectionField[]>([]);
   useEffect(() => {
     const newFilters = (chartConfig?.datas || [])

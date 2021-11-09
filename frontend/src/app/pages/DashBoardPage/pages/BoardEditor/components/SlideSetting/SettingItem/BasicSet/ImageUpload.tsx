@@ -157,5 +157,5 @@ const Wrapper = styled.div`
 `;
 
 const Placeholder = styled.p`
-  color: ${p => p.theme.textColorLight}
+  color: ${p => p.theme.textColorLight};
 `;

@@ -87,7 +87,7 @@ const VideoWidget: React.FC = () => {
         </Form.Item>
       </Form>
     </div>
-  ); 
+  );
 
   switch (mediaType) {
     case 'video':
