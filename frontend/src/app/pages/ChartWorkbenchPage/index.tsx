@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import ChartWorkbenchPage from './ChartWorkbenchPage';
 import ChartConfig from './models/ChartConfig';
 
 export const ChartConfigReducerActionType = {
@@ -33,5 +32,3 @@ export type ChartConfigPayloadType = {
   value?: any;
   needRefresh?: boolean;
 };
-
-export default ChartWorkbenchPage;

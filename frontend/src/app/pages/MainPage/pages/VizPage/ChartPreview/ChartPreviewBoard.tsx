@@ -24,7 +24,6 @@ import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { useMainSlice } from 'app/pages/MainPage/slice';
-import { selectDownloadPolling } from 'app/pages/MainPage/slice/selectors';
 // import { makeDownloadDataTask } from 'app/pages/MainPage/slice/thunks';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import {
@@ -79,7 +78,6 @@ const ChartPreviewBoard: FC<{
       refreshRate: 500,
     });
     const { actions } = useMainSlice();
-    const downloadPolling = useSelector(selectDownloadPolling);
     const chartManager = ChartManager.instance();
     const dispatch = useDispatch();
     const [version, setVersion] = useState<string>();
@@ -122,6 +120,7 @@ const ChartPreviewBoard: FC<{
           setChart(newChart);
         }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
       backendChartId,
       chart,
@@ -159,7 +158,6 @@ const ChartPreviewBoard: FC<{
     };
 
     const hanldeGotoWorkbenchPage = () => {
-      // history.push(`/charts/${backendChartId}?orgId=${orgId}`);
       setEditChartVisible(true);
     };
     const onSaveInDataChart = useCallback(

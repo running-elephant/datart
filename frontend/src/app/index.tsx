@@ -21,12 +21,12 @@ import useMount from './hooks/useMount';
 import { LoginAuthRoute } from './LoginAuthRoute';
 import { LazyActivePage } from './pages/ActivePage/Loadable';
 import { LazyAuthorizationPage } from './pages/AuthorizationPage/Loadable';
-import { LazyChartWorkbenchPage } from './pages/ChartWorkbenchPage/Loadable';
 import { LazyForgetPasswordPage } from './pages/ForgetPasswordPage/Loadable';
 import { LazyLoginPage } from './pages/LoginPage/Loadable';
 import { LazyRegisterPage } from './pages/RegisterPage/Loadable';
 import { useAppSlice } from './slice';
 import { getSystemInfo, logout, setLoggedInUser } from './slice/thunks';
+
 registerTheme('default', echartsDefaultTheme);
 
 export function App() {
@@ -64,7 +64,6 @@ export function App() {
         <meta name="description" content="Data Art" />
       </Helmet>
       <Switch>
-        <Route path="/charts/:chartId" component={LazyChartWorkbenchPage} />
         <Route path="/login" component={LazyLoginPage} />
         <Route path="/register" component={LazyRegisterPage} />
         <Route path="/active" component={LazyActivePage} />
