@@ -260,7 +260,9 @@ export const getChartWidgetDataAsync = createAsyncThunk<
       dataChartMap,
       boardLinkFilters,
     });
-
+    if (!requestParams) {
+      return null;
+    }
     let widgetData;
     if (renderMode === 'read') {
       const { data } = await request<WidgetData>({

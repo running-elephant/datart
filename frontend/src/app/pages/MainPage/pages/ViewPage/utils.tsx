@@ -16,6 +16,7 @@ export function generateEditingView(
     id: '',
     name: '',
     parentId: null,
+    index: null,
     script: '',
     config: {},
     model: {},

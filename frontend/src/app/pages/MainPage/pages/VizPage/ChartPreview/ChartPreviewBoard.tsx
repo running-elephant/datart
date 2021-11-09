@@ -137,7 +137,6 @@ const ChartPreviewBoard: FC<{
           name: 'click',
           callback: param => {
             if (param.seriesName === 'paging') {
-              // console.log(`chartPreview ---> `, chartPreview);
               if (!chartPreview) {
                 return;
               }

@@ -1,8 +1,9 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { TreeDataNode } from 'antd';
+import { createSlice, isRejected, PayloadAction } from '@reduxjs/toolkit';
 import { ChartDataSectionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
+import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { CloneValueDeep } from 'utils/object';
+import { errorHandle } from 'utils/utils';
 import { v4 as uuidv4 } from 'uuid';
 import {
   addStoryboard,
@@ -536,6 +537,12 @@ const slice = createSlice({
         ...state.chartPreviews[index],
         version: uuidv4(),
       };
+    });
+
+    builder.addMatcher(isRejected, (_, action) => {
+      if (isMySliceAction(action, slice.name)) {
+        errorHandle(action?.error);
+      }
     });
   },
 });

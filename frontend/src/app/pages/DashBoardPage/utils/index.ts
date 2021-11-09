@@ -7,6 +7,7 @@ import {
 } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import { convertRelativeTimeRange, getTime } from 'app/utils/time';
 import { FilterSqlOperator } from 'globalConstants';
+import { errorHandle } from 'utils/utils';
 import { FilterOperatorType, STORAGE_IMAGE_KEY_PREFIX } from '../constants';
 import {
   FilterDate,
@@ -244,8 +245,15 @@ export const getChartWidgetRequestParams = (params: {
   if (!curWidget.datachartId) return null;
   const dataChart = dataChartMap[curWidget.datachartId];
   if (!dataChart) return null;
+  if (!dataChart) {
+    errorHandle(`can\`t find Chart ${curWidget.datachartId}`);
+    return null;
+  }
   const chartDataView = viewMap[dataChart?.viewId];
-  if (!chartDataView) return null;
+  if (!chartDataView) {
+    errorHandle(`can\`t find View ${dataChart?.viewId}`);
+    return null;
+  }
   const builder = getChartDataRequestBuilder(dataChart);
   let requestParams = builder.build();
   const viewConfig = transformToViewConfig(chartDataView?.config);

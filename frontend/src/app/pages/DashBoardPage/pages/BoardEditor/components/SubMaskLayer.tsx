@@ -42,7 +42,8 @@ const SubMaskLayer: React.FC<SubMaskLayerProps> = ({
       }
     },
     [dispatch, selected, widgetId],
-  ); 
+  );
+
   const doubleClick = useCallback(() => {
     // if (widgetType === 'chart') return;
     dispatch(

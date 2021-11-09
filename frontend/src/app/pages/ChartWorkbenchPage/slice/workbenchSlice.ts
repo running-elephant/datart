@@ -20,13 +20,19 @@ import {
   createAsyncThunk,
   createSelector,
   createSlice,
+  isRejected,
   PayloadAction,
 } from '@reduxjs/toolkit';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
+import { ResourceTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
+import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { mergeConfig, transformMeta } from 'app/utils/chart';
 import { updateCollectionByAction } from 'app/utils/mutation';
+import { RootState } from 'types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
+import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { request } from 'utils/request';
+import { errorHandle, listToTree } from 'utils/utils';
 import { ChartConfigPayloadType, ChartConfigReducerActionType } from '..';
 import ChartConfig from '../models/ChartConfig';
 import ChartDataset from '../models/ChartDataset';
@@ -43,15 +49,7 @@ export type BackendChart = {
   status: number;
   updateTime?: string;
   viewId: string;
-  view: {
-    id: string;
-    name: string;
-    model: string;
-    script: string;
-    meta?: any[];
-    sourceId: string;
-    config?: string;
-  };
+  view: View & { meta?: any[] };
 };
 
 export type BackendChartConfig = {
@@ -79,34 +77,43 @@ const initState: WorkbenchState = {
 };
 
 // Selectors
-const workbenchSelector = state => state.workbench;
-export const dataviewSelector = createSelector(
+const workbenchSelector = (state: RootState) => state.workbench || initState;
+export const dataviewsSelector = createSelector(
   workbenchSelector,
-  (wb: typeof initState) => wb.dataviews,
+  wb => wb.dataviews,
 );
+export const makeDataviewTreeSelector = () =>
+  createSelector(
+    [
+      dataviewsSelector,
+      (_, getSelectable: (o: ChartDataView) => boolean) => getSelectable,
+    ],
+    (dataviews, getSelectable) =>
+      listToTree(dataviews, null, [ResourceTypes.View], { getSelectable }),
+  );
 export const currentDataViewSelector = createSelector(
   workbenchSelector,
-  (wb: typeof initState) => wb.currentDataView,
+  wb => wb.currentDataView,
 );
 export const datasetsSelector = createSelector(
   workbenchSelector,
-  (wb: typeof initState) => wb.dataset,
+  wb => wb.dataset,
 );
 export const languageSelector = createSelector(
   workbenchSelector,
-  (wb: typeof initState) => wb.lang,
+  wb => wb.lang,
 );
 export const dateFormatSelector = createSelector(
   workbenchSelector,
-  (wb: typeof initState) => wb.dateFormat,
+  wb => wb.dateFormat,
 );
 export const chartConfigSelector = createSelector(
   workbenchSelector,
-  (wb: typeof initState) => wb.chartConfig,
+  wb => wb.chartConfig,
 );
 export const backendChartSelector = createSelector(
   workbenchSelector,
-  (wb: typeof initState) => wb.backendChart,
+  wb => wb.backendChart,
 );
 
 // Effects
@@ -151,6 +158,7 @@ export const fetchDataSetAction = createAsyncThunk(
     return response.data;
   },
 );
+
 export const fetchDataViewsAction = createAsyncThunk(
   'workbench/fetchDataViewsAction',
   async (arg: { orgId }, thunkAPI) => {
@@ -165,18 +173,14 @@ export const fetchDataViewsAction = createAsyncThunk(
 export const fetchViewDetailAction = createAsyncThunk(
   'workbench/fetchViewDetailAction',
   async (arg: { viewId }, thunkAPI) => {
-    const response = await request<{
-      id: string;
-      model: string;
-      script: string;
-      sourceId: string;
-    }>({
+    const response = await request<View>({
       method: 'GET',
       url: `views/${arg}`,
     });
     return response.data;
   },
 );
+
 export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
   'workbench/updateChartConfigAndRefreshDatasetAction',
   async (
@@ -362,14 +366,9 @@ const workbenchSlice = createSlice({
         }
 
         if (index !== undefined) {
-          const view = state.dataviews?.[index];
           state.currentDataView = {
-            id: payload.id,
-            name: view?.name!,
-            model: {},
+            ...payload,
             meta: transformMeta(payload.model),
-            script: payload.script,
-            sourceId: payload.sourceId,
             computedFields,
           };
         }
@@ -395,12 +394,8 @@ const workbenchSlice = createSlice({
         );
         if (!!payload) {
           state.currentDataView = {
-            id: payload?.view?.id,
-            name: payload?.view?.name,
-            model: {},
-            meta: payload?.view?.meta || transformMeta(payload?.view?.model),
-            script: payload?.view?.script,
-            sourceId: payload?.view?.sourceId,
+            ...payload.view,
+            meta: transformMeta(payload?.view?.model),
             computedFields: backendChartConfig?.computedFields || [],
           };
         }
@@ -412,6 +407,11 @@ const workbenchSlice = createSlice({
             originalConfig,
             newChartConfig as ChartConfig,
           );
+        }
+      })
+      .addMatcher(isRejected, (_, action) => {
+        if (isMySliceAction(action, workbenchSlice.name)) {
+          errorHandle(action?.error);
         }
       });
   },

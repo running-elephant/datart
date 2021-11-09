@@ -33,7 +33,7 @@ import {
   Space,
 } from 'antd';
 import { FormItemEx } from 'app/components';
-import { useI18NPrefix } from 'app/pages/ChartWorkbenchPage/hooks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import {

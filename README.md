@@ -56,7 +56,7 @@ datart 是新一代数据可视化开放平台，支持各类企业数据可视�
 非常欢迎和感谢参与贡献，如何参与可参见 [Contributing]()
 
 ### 谁在使用 Adopters
-参见 [Adopters]()
+参见 [Adopters](https://github.com/running-elephant/datart/issues/137)
 
 ## License
 datart is under the Apache 2.0 license. See the [LICENSE](https://github.com/running-elephant/datart/blob/master/LICENSE) file for details.

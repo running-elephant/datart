@@ -22,7 +22,7 @@ import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.dialect.H2SqlDialect;
 import org.apache.calcite.sql.dialect.MysqlSqlDialect;
 
-public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport {
+public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, FetchAndOffsetSupport {
 
     /**
      * Creates an H2SqlDialect.

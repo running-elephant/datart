@@ -27,7 +27,7 @@ export interface ViewBase {
   id: string;
   name: string;
   parentId: string | null;
-  index?: number;
+  index: number | null;
 }
 
 export interface ViewSimple extends ViewBase {
@@ -53,7 +53,7 @@ export interface ViewViewModel<T = object>
   extends Pick<View, 'name' | 'script'> {
   id: string;
   description?: string;
-  index?: number;
+  index: number | null;
   isFolder?: boolean;
   model: Model;
   config: object;

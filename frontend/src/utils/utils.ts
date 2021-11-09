@@ -11,7 +11,7 @@ import { APIResponse } from 'types';
 import { removeToken } from './auth';
 
 export function errorHandle(error) {
-  if (error.response) {
+  if (error?.response) {
     // AxiosError
     const { response } = error as AxiosError;
     switch (response?.status) {
@@ -23,12 +23,13 @@ export function errorHandle(error) {
         message.error(response?.data.message || error.message);
         break;
     }
-  } else if (error.message) {
+  } else if (error?.message) {
     // Error
     message.error(error.message);
   } else {
     message.error(error);
   }
+  return error;
 }
 
 export function rejectHandle(error, rejectWithValue) {
@@ -55,7 +56,7 @@ export function listToTree<
     name: string;
     parentId: string | null;
     isFolder: boolean;
-    index?:number;
+    index: number | null;
   },
 >(
   list: undefined | T[],
@@ -64,6 +65,7 @@ export function listToTree<
   options?: {
     getIcon?: (o: T) => ReactElement | ((props: TreeNodeProps) => ReactElement);
     getDisabled?: (o: T, path: string[]) => boolean;
+    getSelectable?: (o: T) => boolean;
   },
 ): undefined | any[] {
   if (!list) {
@@ -83,9 +85,8 @@ export function listToTree<
         value: o.id,
         path,
         ...(options?.getIcon && { icon: options.getIcon(o) }),
-        ...(options?.getDisabled && {
-          disabled: options.getDisabled(o, path),
-        }),
+        ...(options?.getDisabled && { disabled: options.getDisabled(o, path) }),
+        ...(options?.getSelectable && { selectable: options.getSelectable(o) }),
       });
     } else {
       childrenList.push(o);
@@ -93,6 +94,8 @@ export function listToTree<
   });
   
   treeNodes.sort((a, b) => Number(a.index) - Number(b.index) )
+
+  treeNodes.sort((a, b) => Number(a.index) - Number(b.index));
 
   return treeNodes.map(node => {
     const children = listToTree(childrenList, node.key, node.path, options);
@@ -238,13 +241,13 @@ export const dispatchResize = () => {
   window.dispatchEvent(ResizeEvent);
 };
 
-export const loopTree = (data, key, callback) => {
+export const loopTree = (data, key: string, keyname: string, callback) => {
   for (let i = 0; i < data.length; i++) {
     if (data[i].key === key) {
       return callback(data[i], i, data);
     }
     if (data[i].children) {
-      loopTree(data[i].children, key, callback);
+      loopTree(data[i].children, key, keyname, callback);
     }
   }
 };

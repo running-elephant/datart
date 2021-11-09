@@ -17,11 +17,8 @@
  */
 
 import { Button, Row, Select, Space, Tabs, Transfer, Tree } from 'antd';
-import {
-  i18NComponentProps,
-  useI18NPrefix,
-} from 'app/pages/ChartWorkbenchPage/hooks';
-import useMount from 'app/pages/ChartWorkbenchPage/hooks/useMount';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
+import useMount from 'app/hooks/useMount';
 import {
   FilterConditionType,
   FilterValueOption,
@@ -45,7 +42,7 @@ const CategoryConditionConfiguration: FC<
     condition?: ChartFilterCondition;
     onChange: (condition: ChartFilterCondition) => void;
     fetchDataByField?: (fieldId) => Promise<string[]>;
-  } & i18NComponentProps
+  } & I18NComponentProps
 > = memo(
   ({
     i18nPrefix,

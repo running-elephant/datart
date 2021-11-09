@@ -1,6 +1,6 @@
 import { UserSettingTypes } from '../constants';
 import { PermissionLevels } from '../pages/PermissionPage/constants';
-
+import { TreeDataNode } from 'antd';
 export interface MainState {
   userSettings: undefined | UserSetting[];
   organizations: Organization[];
@@ -129,4 +129,7 @@ export enum DownloadTaskState {
   FINISH = 1,
   DOWNLOADED = 2,
   FAILED = -1,
+}
+export interface LocalTreeDataNode extends TreeDataNode{
+  index:number | null;
 }

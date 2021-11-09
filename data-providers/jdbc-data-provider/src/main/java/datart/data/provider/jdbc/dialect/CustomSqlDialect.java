@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package datart.data.provider.jdbc.dlalect;
+package datart.data.provider.jdbc.dialect;
 
 import datart.core.common.BeanUtils;
 import datart.data.provider.base.JdbcDriverInfo;

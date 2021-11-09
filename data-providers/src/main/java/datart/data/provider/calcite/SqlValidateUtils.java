@@ -20,12 +20,27 @@ package datart.data.provider.calcite;
 import datart.data.provider.base.DataProviderException;
 import org.apache.calcite.sql.*;
 
-public class SqlKindFilter {
+public class SqlValidateUtils {
 
-    public static void filter(SqlNode sqlCall) {
-        if (sqlCall instanceof SqlSelect) return;
+
+    /**
+     * Validate SqlNode. Only query statements can pass validation
+     */
+    public static boolean validateQuery(SqlNode sqlCall) {
+        // check select sql
+        if (sqlCall instanceof SqlSelect || sqlCall instanceof SqlOrderBy) {
+            return true;
+        }
+
+        // check union
+        if (sqlCall instanceof SqlBasicCall && SqlKind.UNION.equals(sqlCall.getKind())) {
+            return true;
+        }
+
         if (sqlCall instanceof SqlDdl || sqlCall instanceof SqlDelete || sqlCall instanceof SqlUpdate) {
             throw new DataProviderException("Operation (" + sqlCall.getKind() + ":" + sqlCall + ") is not allowed");
         }
+        return false;
     }
+
 }

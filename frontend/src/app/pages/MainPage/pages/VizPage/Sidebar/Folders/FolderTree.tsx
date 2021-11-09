@@ -21,9 +21,12 @@ import {
   removeTab,
 } from '../../slice/thunks';
 import { vizActions } from '../../slice';
+import { LocalTreeDataNode } from 'app/pages/MainPage/slice/types';
+import { setTreeIndexFn } from './utils';
+import { loopTree } from 'utils/utils';
 interface FolderTreeProps {
   selectedId?: string;
-  treeData?: TreeDataNode[];
+  treeData?: LocalTreeDataNode[];
 }
 
 export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
@@ -93,15 +96,23 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
               visible: true,
               initialValues: { ...node, parentId: node.parentId || void 0 },
               onSave: (values, onClose) => {
+                let index = node.index;
+
+                if(values.parentId && values.parentId !== node.parentId){
+                  index = setTreeIndexFn(values,treeData);
+                }
+                
                 dispatch(
                   editFolder({
                     folder: {
                       ...values,
                       parentId: values.parentId || null,
+                      index: index,
                     },
                     resolve: onClose,
                   }),
                 );
+
               },
             });
             break;
@@ -111,7 +122,7 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
             break;
         }
       },
-    [dispatch, showSaveForm],
+    [dispatch, showSaveForm, treeData],
   );
 
   const renderTreeTitle = useCallback(
@@ -167,72 +178,56 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
   );
 
   const onDrop = (info) =>{
-    const dropKey = info.node.key;
-    const dragKey = info.dragNode.key;
+    const dropKey = info.node.key; //落下的key
+    const dragKey = info.dragNode.key;//拖动的key
     const dropPos = info.node.pos.split('-');
     const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
+    const data = treeData ? treeData : [];
 
-    const loop = (data, key, callback) => {
-      for (let i = 0; i < data.length; i++) {
-        if (data[i].key === key) {
-          return callback(data[i], i, data);
-        }
-        if (data[i].children) {
-          loop(data[i].children, key, callback);
-        }
-      }
-    };
+    let dragObj
+    ,   ar
+    ,   i
+    ,   index = 0;
 
-    const data:any = treeData ? JSON.parse(JSON.stringify(treeData)) : [];
-
-    let dragObj;
-    loop(data, dragKey, (item, index, arr) => {
-      console.log(arr,index,'arr');
-      arr.splice(index, 1);
+    loopTree(data, dragKey, 'key', (item) => {
       dragObj = item;
     });
 
-    if (!info.dropToGap) {
-      loop(data, dropKey, item => {
-        item.children = item.children || [];
-        item.children.unshift(dragObj);
-      });
-    } else if (
-      
-      (info.node.props.children || []).length > 0 && 
-      info.node.props.expanded &&
-      dropPosition === 1 
-    ) {
-      loop(data, dropKey, item => {
-        item.children = item.children || [];
-        item.children.unshift(dragObj);
-      });
-    } else {
-      let ar;
-      let i;
-      loop(data, dropKey, (item, index, arr) => {
+    loopTree(data, dropKey, 'key', (item, index, arr) => {
         ar = arr;
         i = index;
-      });
+    });
 
-      if(dropPosition === -1){ // 移动到第一个
-        dragObj['index'] = ar[i+1] ? (ar[i+1].index) - 1 : 0
-      }else if(i  === ar.length - 1 ){ // 移动到最后一个
-        dragObj['index'] = ar[ar.length - 1].index + 1
-      }else{ //中间
-        dragObj['index'] = (ar[i].index  + ar[i+1].index) / 2
-      }
-
-      if (dropPosition === -1) {
-        ar.splice(i, 0, dragObj);
-      } else {
-        ar.splice(i + 1, 0, dragObj);
-      }
+    if(ar[i].parentId === dragObj.id || (ar[i].isFolder && ar[i].id === dragObj.id) ){
+      return false;
     }
-    console.log(data,'data');
-    // dispatch(vizActions.DrapVizTree(data));
+    
+    if(!info.dropToGap){ //如果移动到二级目录里面的第一个，获取到该目录children中[0]元素的index-1
+      index = ar[i].children ? (ar[i].children[0]?.index) - 1 : 0
+    }else if(dropPosition === -1 ){ // 移动到第一个
+      index = ar[i] ? (ar[i].index) - 1 : 0
+    }else if(i  === ar.length - 1 ){ // 移动到最后一个
+      index = ar[ar.length - 1].index + 1
+    }else{ //中间
+      index = (ar[i].index  + ar[i+1].index) / 2
+    }
+
+    dispatch(
+      editFolder({
+        folder: {
+          id:dragObj.id,
+          parentId: !info.dropToGap ? ar[i].id : ar[i].parentId || null, 
+                    //如果移动到二级目录里面的第一个，就用当前目录的id,如果不是就用文件的parentId
+          index: index,
+        },
+        resolve: () =>{
+
+        },
+      }),
+    );
+
   };
-  console.log(treeData,'treeData');
+
   return (
     <div>
         <Tree

@@ -23,15 +23,16 @@ import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
 import datart.core.common.Application;
 import datart.core.common.BeanUtils;
-import datart.core.data.provider.Column;
-import datart.core.data.provider.Dataframe;
+import datart.core.data.provider.*;
 import datart.data.provider.JdbcDataProvider;
 import datart.data.provider.base.DataProviderException;
 import datart.data.provider.base.JdbcDriverInfo;
 import datart.data.provider.base.JdbcProperties;
+import datart.data.provider.calcite.dialect.FetchAndOffsetSupport;
 import datart.data.provider.jdbc.DataTypeUtils;
-import datart.data.provider.jdbc.ResultSetMapper;
-import datart.data.provider.jdbc.dlalect.CustomSqlDialect;
+import datart.data.provider.jdbc.SqlScriptRender;
+import datart.data.provider.jdbc.dialect.CustomSqlDialect;
+import datart.data.provider.local.LocalDB;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,8 @@ public class JdbcDataProviderAdapter implements Closeable {
 
     private static final String SQL_DIALECT_PACKAGE = "datart.data.provider.calcite.dialect";
 
+    protected static final String COUNT_SQL = "SELECT COUNT(*) FROM (%s) V_T";
+
     protected DataSource dataSource;
 
     protected JdbcProperties jdbcProperties;
@@ -60,7 +63,7 @@ public class JdbcDataProviderAdapter implements Closeable {
 
     protected SqlDialect sqlDialect;
 
-    public void init(JdbcProperties jdbcProperties, JdbcDriverInfo driverInfo) {
+    public final void init(JdbcProperties jdbcProperties, JdbcDriverInfo driverInfo) {
         try {
             this.jdbcProperties = jdbcProperties;
             this.driverInfo = driverInfo;
@@ -137,50 +140,47 @@ public class JdbcDataProviderAdapter implements Closeable {
     }
 
 
-    public String getVariableQuote() {
+    public final String getVariableQuote() {
         return Const.DEFAULT_VARIABLE_QUOTE;
     }
 
-
-    private Column readTableColumn(ResultSet columnMetadata) throws SQLException {
+    protected Column readTableColumn(ResultSet columnMetadata) throws SQLException {
         Column column = new Column();
         column.setName(columnMetadata.getString(4));
         column.setType(DataTypeUtils.sqlType2DataType(columnMetadata.getString(6)));
         return column;
     }
 
-    public Dataframe execute(String sql) throws SQLException {
+    /**
+     * 直接执行，返回所有数据，用于支持已经支持分页的数据库，或者不需要分页的查询。
+     *
+     * @param sql 直接提交至数据源执行的SQL，通常已经包含了分页
+     * @return 全量数据
+     * @throws SQLException SQL执行异常
+     */
+    protected Dataframe execute(String sql) throws SQLException {
         try (Connection conn = getConn()) {
             Statement statement = conn.createStatement();
-            return ResultSetMapper.mapToTableData(statement.executeQuery(sql));
+            return parseResultSet(statement.executeQuery(sql));
         }
     }
 
-    public Dataframe execute(String selectSql, PageInfo pageInfo) throws SQLException {
+    /**
+     * 用于未支持SQL分页的数据库，使用通用的分页方案进行分页。
+     *
+     * @param selectSql 提交至数据源执行的SQL
+     * @param pageInfo  需要执行的分页信息
+     * @return 分页后的数据
+     * @throws SQLException SQL执行异常
+     */
+    protected Dataframe execute(String selectSql, PageInfo pageInfo) throws SQLException {
         Dataframe dataframe;
         try (Connection conn = getConn()) {
-            Statement statement = null;
-            try {
-                statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            } catch (SQLFeatureNotSupportedException e) {
-                if (driverInfo != null) {
-                    log.info(driverInfo.getDbType() + ":" + e.getMessage());
-                }
-                statement = conn.createStatement();
-            }
-            statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
+            Statement statement = conn.createStatement();
+
+            statement.setFetchSize((int) Math.min(pageInfo.isCountTotal() ? pageInfo.getPageSize() : 10_000, 10_000));
+
             try (ResultSet resultSet = statement.executeQuery(selectSql)) {
-
-                initPageInfo(pageInfo, resultSet);
-
-                // TODO paging through  sql
-//                if (supportPaging()) {
-//                    dataframe = ResultSetMapper.mapToTableData(resultSet);
-//                    dataframe.setPageInfo(pageInfo);
-//                    return dataframe;
-//                }
-
-                //paging through  jdbc
                 try {
                     resultSet.absolute((int) Math.min(pageInfo.getTotal(), (pageInfo.getPageNo() - 1) * pageInfo.getPageSize()));
                 } catch (Exception e) {
@@ -189,10 +189,33 @@ public class JdbcDataProviderAdapter implements Closeable {
                         count++;
                     }
                 }
-                dataframe = parseResult(resultSet, pageInfo.getPageSize());
-                dataframe.setPageInfo(pageInfo);
+                dataframe = parseResultSet(resultSet, pageInfo.getPageSize());
                 return dataframe;
             }
+        }
+    }
+
+    public Dataframe execute(QueryScript script, ExecuteParam executeParam) throws Exception {
+        //If server aggregation is enabled, query the full data before performing server aggregation
+        if (executeParam.isServerAggregate()) {
+            return executeLocally(script, executeParam);
+        } else {
+            return executeOnSource(script, executeParam);
+        }
+    }
+
+    /**
+     * 单独执行一次查询获取总数据量，用于分页
+     *
+     * @param sql 不包含分页的SQL
+     * @return 总记录数
+     */
+    public int executeCountSql(String sql) throws SQLException {
+        try (Connection connection = getConn()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(String.format(COUNT_SQL, sql));
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            return resultSet.getInt(1);
         }
     }
 
@@ -209,7 +232,7 @@ public class JdbcDataProviderAdapter implements Closeable {
     }
 
     public boolean supportPaging() {
-        return false;
+        return sqlDialect instanceof FetchAndOffsetSupport;
     }
 
     public SqlDialect getSqlDialect() {
@@ -219,32 +242,40 @@ public class JdbcDataProviderAdapter implements Closeable {
         try {
             sqlDialect = SqlDialect.DatabaseProduct.valueOf(driverInfo.getDbType().toUpperCase()).getDialect();
         } catch (Exception ignored) {
-            log.warn("Dbtype " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
+            log.warn("DBType " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
             sqlDialect = CustomSqlDialect.create(driverInfo);
         }
         try {
-            return Application.getBean(sqlDialect.getClass());
+            sqlDialect = Application.getBean(sqlDialect.getClass());
         } catch (Exception e) {
             log.debug("Custom sql dialect for {} not found. using default", sqlDialect.getClass().getSimpleName());
         }
         return sqlDialect;
     }
 
-    protected void initPageInfo(PageInfo pageInfo, ResultSet resultSet) throws SQLException {
-        try {
-            if (pageInfo.getPageNo() < 1) {
-                pageInfo.setPageNo(1);
-            }
-            resultSet.last();
-            pageInfo.setTotal(resultSet.getRow());
-            resultSet.first();
-        } catch (Exception e) {
-            pageInfo.setTotal(pageInfo.getPageSize());
-        }
+    protected Dataframe parseResultSet(ResultSet rs) throws SQLException {
+        return parseResultSet(rs, Long.MAX_VALUE);
     }
 
-    protected Dataframe parseResult(ResultSet rs, long count) throws SQLException {
-        return ResultSetMapper.mapToTableData(rs, count);
+    protected Dataframe parseResultSet(ResultSet rs, long count) throws SQLException {
+        Dataframe dataframe = new Dataframe();
+        List<Column> columns = getColumns(rs);
+        ArrayList<List<Object>> rows = new ArrayList<>();
+        int c = 0;
+        while (rs.next()) {
+            ArrayList<Object> row = new ArrayList<>();
+            rows.add(row);
+            for (int i = 1; i < columns.size() + 1; i++) {
+                row.add(rs.getObject(i));
+            }
+            c++;
+            if (c >= count) {
+                break;
+            }
+        }
+        dataframe.setColumns(columns);
+        dataframe.setRows(rows);
+        return dataframe;
     }
 
     protected List<Column> getColumns(ResultSet rs) throws SQLException {
@@ -256,6 +287,55 @@ public class JdbcDataProviderAdapter implements Closeable {
             columns.add(new Column(columnName, valueType));
         }
         return columns;
+    }
+
+    /**
+     * 本地执行，从数据源拉取全量数据，在本地执行聚合操作
+     */
+    protected Dataframe executeLocally(QueryScript script, ExecuteParam executeParam) throws Exception {
+        SqlScriptRender render = new SqlScriptRender(script
+                , executeParam
+                , getSqlDialect()
+                , getVariableQuote());
+
+        String sql = render.render(false, false, false);
+        Dataframe data = execute(sql);
+        data.setName(script.toQueryKey());
+
+        return LocalDB.queryFromLocal(data.getName(), executeParam, executeParam.isCacheEnable(), Collections.singletonList(data));
+    }
+
+    /**
+     * 在数据源执行，组装完整SQL，提交至数据源执行
+     */
+    protected Dataframe executeOnSource(QueryScript script, ExecuteParam executeParam) throws Exception {
+
+        Dataframe dataframe;
+        String sql;
+
+        SqlScriptRender render = new SqlScriptRender(script
+                , executeParam
+                , getSqlDialect()
+                , getVariableQuote());
+
+        //server aggregation is not enabled and SQL is committed to the data source for execution
+        if (supportPaging()) {
+            sql = render.render(true, true, false);
+            log.debug(sql);
+            dataframe = execute(sql);
+        } else {
+            sql = render.render(true, false, false);
+            log.debug(sql);
+            dataframe = execute(sql, executeParam.getPageInfo());
+        }
+        // fix page info
+        if (executeParam.getPageInfo().isCountTotal()) {
+            int total = executeCountSql(render.render(true, false, true));
+            executeParam.getPageInfo().setTotal(total);
+            dataframe.setPageInfo(executeParam.getPageInfo());
+        }
+        dataframe.setScript(sql);
+        return dataframe;
     }
 
 }

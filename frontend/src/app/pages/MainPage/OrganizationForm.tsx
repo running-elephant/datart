@@ -1,5 +1,6 @@
 import { Form, Input, Modal, ModalProps } from 'antd';
 import debounce from 'debounce-promise';
+import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
@@ -73,7 +74,7 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
                   () => Promise.resolve(),
                   () => Promise.reject(new Error('名称重复')),
                 );
-              }, 300),
+              }, DEFAULT_DEBOUNCE_WAIT),
             },
           ]}
         >
