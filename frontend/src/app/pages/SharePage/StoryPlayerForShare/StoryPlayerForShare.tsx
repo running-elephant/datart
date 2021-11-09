@@ -17,7 +17,6 @@
  */
 import { Layout } from 'antd';
 import { vizActions } from 'app/pages/MainPage/pages/VizPage/slice';
-import StoryPageItem from 'app/pages/StoryBoardPage/components/StoryPageItem';
 import React, {
   memo,
   RefObject,
@@ -40,6 +39,7 @@ import { makeSelectStoryPagesById } from '../../StoryBoardPage/slice/selectors';
 import { getPageContentDetail } from '../../StoryBoardPage/slice/thunks';
 import { StoryBoard, StoryBoardState } from '../../StoryBoardPage/slice/types';
 import { selectSubVizTokenMap } from '../slice/selectors';
+import StoryPageItem from './StoryPageItem';
 
 const { Content } = Layout;
 
@@ -56,7 +56,7 @@ export const StoryPlayerForShare: React.FC<{ storyBoard: StoryBoard }> = memo(
     );
 
     const subVizTokenMap = useSelector(selectSubVizTokenMap);
-    console.log('subVizTokenMap', subVizTokenMap);
+
     const sortedPages = useMemo(() => {
       const sortedPages = Object.values(pageMap).sort(
         (a, b) => a.config.index - b.config.index,

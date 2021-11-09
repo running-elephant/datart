@@ -40,7 +40,7 @@ import { fetchBoardDetail } from './slice/thunk';
 import { BoardState, VizRenderMode } from './slice/types';
 export interface DashboardProps {
   id: string;
-  renderMode?: VizRenderMode;
+  renderMode: VizRenderMode;
   hideTitle?: boolean;
   fetchData?: boolean;
   filterSearchUrl?: string;

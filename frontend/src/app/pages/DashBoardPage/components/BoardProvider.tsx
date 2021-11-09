@@ -30,7 +30,7 @@ import { BoardInfoProvider } from './BoardInfoProvider';
 
 export const BoardProvider: FC<{
   board: Dashboard;
-  renderMode?: VizRenderMode;
+  renderMode: VizRenderMode;
   editing: boolean;
   autoFit?: boolean;
   allowDownload?: boolean;
@@ -41,7 +41,7 @@ export const BoardProvider: FC<{
     board,
     editing,
     children,
-    renderMode = 'read',
+    renderMode,
     autoFit,
     allowDownload,
     allowShare,

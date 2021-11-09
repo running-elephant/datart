@@ -46,7 +46,7 @@ export const BoardPageItem: React.FC<BoardPageItemProps> = memo(
         board={dashboard}
         editing={false}
         autoFit={false}
-        renderMode={'share'}
+        renderMode="share"
       >
         <Wrapper>
           {boardType === 'auto' && <AutoBoardCore boardId={dashboard.id} />}

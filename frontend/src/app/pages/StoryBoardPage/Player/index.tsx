@@ -163,7 +163,12 @@ export const StoryPlayer: React.FC<{ storyId: string }> = memo(
             <div id={domId} className="reveal">
               <div className="slides">
                 {sortedPages.map((page, index) => (
-                  <StoryPageItem key={page.id} page={page} autoFit={false} />
+                  <StoryPageItem
+                    key={page.id}
+                    page={page}
+                    autoFit={false}
+                    renderMode="read"
+                  />
                 ))}
               </div>
             </div>

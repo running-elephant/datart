@@ -24,7 +24,7 @@ const StoryPageItem: React.FC<{
   page: StoryPage;
   autoFit?: boolean;
   showZoomCtrl?: boolean;
-  renderMode?: VizRenderMode;
+  renderMode: VizRenderMode;
 }> = ({ page, autoFit, showZoomCtrl, renderMode }) => {
   const { relId, relType } = page;
 

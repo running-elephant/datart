@@ -25,7 +25,10 @@ import {
   selectLayoutWidgetInfoMapById,
   selectLayoutWidgetMapById,
 } from 'app/pages/DashBoardPage/pages/Dashboard/slice/selector';
-import { BoardState, Dashboard } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import {
+  BoardState,
+  Dashboard,
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, {
   RefObject,
   useCallback,

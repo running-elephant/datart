@@ -13,9 +13,9 @@ import { RootState } from 'types';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { boardActions } from '.';
-import { VALUE_SPLITER } from '../../BoardEditor/components/FilterWidgetPanel/WidgetFilterForm/OperatorValues';
-import { getChartWidgetRequestParams } from '../../../utils';
 import { getDistinctFields } from '../../../../../utils/fetch';
+import { getChartWidgetRequestParams } from '../../../utils';
+import { VALUE_SPLITER } from '../../BoardEditor/components/FilterWidgetPanel/WidgetFilterForm/OperatorValues';
 import { handleServerBoardAction } from './asyncActions';
 import { selectBoardById, selectBoardWidgetMap } from './selector';
 import { BoardState, ServerDashboard, WidgetData } from './types';
@@ -96,7 +96,6 @@ export const fetchBoardDetailInShare = createAsyncThunk<
           password: vizToken.password,
         },
       });
-      dispatch(shareActions.setVizType(data.vizType));
 
       dispatch(
         shareActions.setExecuteTokenMap({

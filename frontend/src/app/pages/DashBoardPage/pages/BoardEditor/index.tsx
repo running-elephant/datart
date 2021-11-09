@@ -94,6 +94,7 @@ export const BoardEditor: React.FC<{
           allowDownload={allowDownload}
           allowShare={allowShare}
           allowManage={allowManage}
+          renderMode="read"
         >
           <Wrapper>
             <TitleHeader toggleBoardEditor={onCloseBoardEditor} />
