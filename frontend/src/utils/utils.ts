@@ -92,7 +92,7 @@ export function listToTree<
       childrenList.push(o);
     }
   });
-  
+
   treeNodes.sort((a, b) => Number(a.index) - Number(b.index));
 
   return treeNodes.map(node => {
@@ -239,7 +239,7 @@ export const dispatchResize = () => {
   window.dispatchEvent(ResizeEvent);
 };
 
-export const loopTree = (data, key:string, keyname:string, callback) => {
+export const loopTree = (data, key: string, keyname: string, callback) => {
   for (let i = 0; i < data.length; i++) {
     if (data[i].key === key) {
       return callback(data[i], i, data);
@@ -249,4 +249,3 @@ export const loopTree = (data, key:string, keyname:string, callback) => {
     }
   }
 };
-
