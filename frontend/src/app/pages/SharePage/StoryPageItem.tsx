@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { VizRenderMode } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, { useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { StoryPage } from '../StoryBoardPage/slice/types';
@@ -23,10 +22,7 @@ import { BoardPageItem } from './BoardPageItem';
 
 const StoryPageItem: React.FC<{
   page: StoryPage;
-  autoFit?: boolean;
-  showZoomCtrl?: boolean;
-  renderMode?: VizRenderMode;
-}> = ({ page, autoFit, showZoomCtrl, renderMode }) => {
+}> = ({ page }) => {
   const { relId, relType } = page;
 
   const SlideContent = useMemo(() => {
@@ -55,18 +51,4 @@ const SectionWrap = styled.section`
   width: 100% !important;
   height: 100% !important;
   padding: 0 !important;
-`;
-const Wrapper = styled.div<{}>`
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-
-  padding-bottom: 0;
-
-  background-color: ${p => p.theme.bodyBackground};
 `;

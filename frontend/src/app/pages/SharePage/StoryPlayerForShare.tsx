@@ -166,13 +166,8 @@ export const StoryPlayerForShare: React.FC<{ storyBoard: StoryBoard }> = memo(
           <Content>
             <div id={domId} className="reveal">
               <div className="slides">
-                {sortedPages.map((page, index) => (
-                  <StoryPageItem
-                    key={page.id}
-                    page={page}
-                    autoFit={false}
-                    renderMode="share"
-                  />
+                {sortedPages.map(page => (
+                  <StoryPageItem key={page.id} page={page} />
                 ))}
               </div>
             </div>
