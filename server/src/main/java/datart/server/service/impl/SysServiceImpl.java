@@ -23,11 +23,12 @@ import datart.server.service.SysService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+
 @Service
 public class SysServiceImpl implements SysService {
-
-    @Value("${datart.version}")
-    private String version;
 
     @Value("${datart.security.token.timeout-min:30}")
     private String tokenTimeout;
@@ -38,9 +39,21 @@ public class SysServiceImpl implements SysService {
     @Override
     public SystemInfo getSysInfo() {
         SystemInfo systemInfo = new SystemInfo();
-        systemInfo.setVersion(version);
         systemInfo.setTokenTimeout(tokenTimeout);
         systemInfo.setMailEnable(sendMail);
+        systemInfo.setVersion(getVersion());
         return systemInfo;
+    }
+
+    private String getVersion() {
+        try {
+            String jarPath = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+            JarFile jarFile = new JarFile(jarPath);
+            Manifest manifest = jarFile.getManifest();
+            Attributes mainAttributes = manifest.getMainAttributes();
+            return mainAttributes.getValue("Implementation-Version");
+        } catch (Exception e) {
+            return "dev";
+        }
     }
 }
