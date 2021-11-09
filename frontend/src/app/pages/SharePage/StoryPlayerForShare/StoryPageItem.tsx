@@ -15,9 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { StoryPage } from 'app/pages/StoryBoardPage/slice/types';
 import React, { useMemo } from 'react';
 import styled from 'styled-components/macro';
-import { StoryPage } from '../StoryBoardPage/slice/types';
 import { BoardPageItem } from './BoardPageItem';
 
 const StoryPageItem: React.FC<{

@@ -17,6 +17,7 @@
  */
 import { Layout } from 'antd';
 import { vizActions } from 'app/pages/MainPage/pages/VizPage/slice';
+import StoryPageItem from 'app/pages/StoryBoardPage/components/StoryPageItem';
 import React, {
   memo,
   RefObject,
@@ -34,12 +35,11 @@ import 'reveal.js/dist/reveal.css';
 import RevealZoom from 'reveal.js/plugin/zoom/plugin';
 import styled from 'styled-components/macro';
 import { v4 as uuidv4 } from 'uuid';
-import { storyActions } from '../StoryBoardPage/slice';
-import { makeSelectStoryPagesById } from '../StoryBoardPage/slice/selectors';
-import { getPageContentDetail } from '../StoryBoardPage/slice/thunks';
-import { StoryBoard, StoryBoardState } from '../StoryBoardPage/slice/types';
-import { selectSubVizTokenMap } from './slice/selectors';
-import StoryPageItem from './StoryPageItem';
+import { storyActions } from '../../StoryBoardPage/slice';
+import { makeSelectStoryPagesById } from '../../StoryBoardPage/slice/selectors';
+import { getPageContentDetail } from '../../StoryBoardPage/slice/thunks';
+import { StoryBoard, StoryBoardState } from '../../StoryBoardPage/slice/types';
+import { selectSubVizTokenMap } from '../slice/selectors';
 
 const { Content } = Layout;
 

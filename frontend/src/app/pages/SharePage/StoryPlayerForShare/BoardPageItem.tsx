@@ -16,15 +16,16 @@
  * limitations under the License.
  */
 import { LoadingOutlined } from '@ant-design/icons';
+import { BoardProvider } from 'app/pages/DashBoardPage/components/BoardProvider';
+import FullScreenPanel from 'app/pages/DashBoardPage/components/FullScreenPanel';
+import AutoBoardCore from 'app/pages/DashBoardPage/pages/Dashboard/AutoDashboard/AutoBoardCore';
+import FreeBoardCore from 'app/pages/DashBoardPage/pages/Dashboard/FreeDashboard/FreeBoardCore';
+import { makeSelectBoardConfigById } from 'app/pages/DashBoardPage/pages/Dashboard/slice/selector';
+import { BoardState } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, { memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { BoardProvider } from '../DashBoardPage/components/BoardProvider';
-import FullScreenPanel from '../DashBoardPage/components/FullScreenPanel';
-import AutoBoardCore from '../DashBoardPage/pages/Dashboard/AutoDashboard/AutoBoardCore';
-import FreeBoardCore from '../DashBoardPage/pages/Dashboard/FreeDashboard/FreeBoardCore';
-import { makeSelectBoardConfigById } from '../DashBoardPage/pages/Dashboard/slice/selector';
-import { BoardState } from '../DashBoardPage/pages/Dashboard/slice/types';
+
 export interface BoardPageItemProps {
   boardId: string;
 }
