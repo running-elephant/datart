@@ -68,6 +68,7 @@ export const createDataChartWidget = (opt: {
   boardType: BoardType;
   dataChartId: string;
   dataChartConfig: DataChart;
+  viewId: string;
   subType: WidgetContentChartType;
 }) => {
   const content = createChartWidgetContent(opt.subType);
@@ -80,6 +81,7 @@ export const createDataChartWidget = (opt: {
   const widget: Widget = createWidget({
     dashboardId: opt.dashboardId,
     datachartId: opt.dataChartId,
+    viewIds: opt.viewId ? [opt.viewId] : [],
     config: widgetConf,
   });
   return widget;
@@ -349,17 +351,24 @@ export const createFilterWidget = (params: {
 // TODO chart widget
 export const getWidgetMapByServer = (
   widgets: ServerWidget[],
+  dataCharts: DataChart[],
   filterSearchParamsMap?: FilterSearchParamsWithMatch,
 ) => {
   const filterSearchParams = filterSearchParamsMap?.params,
     isMatchByName = filterSearchParamsMap?.isMatchByName;
-
-  // const dataChart
+  const dataChartMap = dataCharts.reduce((acc, cur) => {
+    acc[cur.id] = cur;
+    return acc;
+  }, {} as Record<string, DataChart>);
   const widgetMap = widgets.reduce((acc, cur) => {
+    const viewIds = cur.datachartId
+      ? [dataChartMap[cur.datachartId].viewId]
+      : cur.viewIds;
     let widget: Widget = {
       ...cur,
       config: JSON.parse(cur.config),
       relations: convertWidgetRelationsToObj(cur.relations),
+      viewIds,
     };
 
     acc[cur.id] = widget;

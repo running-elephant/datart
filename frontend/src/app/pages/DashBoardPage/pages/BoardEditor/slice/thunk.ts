@@ -104,12 +104,16 @@ export const fetchEditBoardDetail = createAsyncThunk<
     const { datacharts: serverDataCharts, views: serverViews, widgets } = data;
     // TODO
     // const wrapedChart = getWidgetMapByServer(widgets);
-    const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(widgets);
+    const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
+    const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(
+      widgets,
+      dataCharts,
+    );
     const widgetInfoMap = getWidgetInfoMapByServer(widgets);
     const widgetIds = widgets.map(w => w.id);
     const boardInfo = getInitBoardInfo(dashboard.id, widgetIds);
     // datacharts
-    const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
+
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
     dispatch(boardActions.updateDataChartMap(allDataCharts));
 
@@ -249,6 +253,7 @@ export const addDataChartWidgets = createAsyncThunk<
         boardType: boardType,
         dataChartId: dcId,
         dataChartConfig: dataChartMap[dcId],
+        viewId: dataChartMap[dcId].viewId,
         subType: 'dataChart',
       });
       return widget;
@@ -283,6 +288,7 @@ export const addWrapChartWidget = createAsyncThunk<
       dashboardId: boardId,
       boardType: boardType,
       dataChartId: chartId,
+      viewId: view.id,
       dataChartConfig: dataChart,
       subType: 'widgetChart',
     });

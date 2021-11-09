@@ -199,6 +199,13 @@ export const editWrapChartWidget =
   (props: { widgetId: string; dataChart: DataChart; view: ChartDataView }) =>
   async (dispatch, getState) => {
     const { dataChart, view, widgetId } = props;
+    const editBoard = getState().editBoard as HistoryEditBoard;
+    const widgetMap = editBoard.stack.present.widgetRecord;
+    const curWidget = widgetMap[widgetId];
+    const nextWidget = produce(curWidget, draft => {
+      draft.viewIds = [dataChart.viewId];
+    });
+    dispatch(editBoardStackActions.updateWidget(nextWidget));
     const dataCharts = [dataChart];
     const viewViews = [view];
     dispatch(boardActions.setDataChartMap(dataCharts));
