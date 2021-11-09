@@ -113,7 +113,7 @@ public class SqlBuilder {
         if (!CollectionUtils.isEmpty(executeParam.getColumns())) {
             for (String column : executeParam.getColumns()) {
                 if (functionColumnMap.containsKey(column)) {
-                    selectList.add(functionColumnMap.get(column));
+                    selectList.add(SqlNodeUtils.createAliasNode(functionColumnMap.get(column), column));
                 } else {
                     selectList.add(SqlNodeUtils.createAliasNode(SqlNodeUtils.createSqlIdentifier(column, T), column));
                 }
@@ -160,10 +160,11 @@ public class SqlBuilder {
                 SqlNode sqlNode = null;
                 if (functionColumnMap.containsKey(group.getColumn())) {
                     sqlNode = functionColumnMap.get(group.getColumn());
+                    selectList.add(SqlNodeUtils.createAliasNode(sqlNode, group.getColumn()));
                 } else {
                     sqlNode = SqlNodeUtils.createSqlIdentifier(group.getColumn(), T);
+                    selectList.add(sqlNode);
                 }
-                selectList.add(sqlNode);
                 groupBy.add(sqlNode);
             }
         }
