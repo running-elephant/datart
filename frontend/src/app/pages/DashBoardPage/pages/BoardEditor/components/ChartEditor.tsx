@@ -44,7 +44,7 @@ import {
   DataChart,
   DataChartConfig,
   WidgetContentChartType,
-} from '../../../slice/types';
+} from '../../Dashboard/slice/types';
 const { confirm } = Modal;
 export interface ChartEditorBaseProps {
   dataChartId: string;

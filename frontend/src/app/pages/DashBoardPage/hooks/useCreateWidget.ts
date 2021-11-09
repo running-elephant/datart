@@ -19,7 +19,7 @@ import useResizeObserver from 'app/hooks/useResizeObserver';
 import { useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { BoardContext } from '../contexts/BoardContext';
-import { boardActions } from '../slice';
+import { boardActions } from '../pages/Dashboard/slice';
 export default function useBoardWidthHeight() {
   const { boardId, renderMode } = useContext(BoardContext);
   const HeaderHeightBuffer = 100;

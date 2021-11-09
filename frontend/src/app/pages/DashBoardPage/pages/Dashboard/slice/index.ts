@@ -23,11 +23,11 @@ import {
   DataChart,
   WidgetData,
   WidgetInfo,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
-import { createWidgetInfo } from '../utils/widget';
-import { PageInfo } from './../../MainPage/pages/ViewPage/slice/types';
+import { createWidgetInfo } from '../../../utils/widget';
+import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import { getChartWidgetDataAsync, getWidgetDataAsync } from './thunk';
 import { BoardInfo, BoardState, Widget } from './types';
 

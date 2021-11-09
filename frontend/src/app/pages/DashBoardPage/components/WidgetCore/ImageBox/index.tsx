@@ -20,7 +20,7 @@ import {
   MediaWidgetContent,
   Widget,
   WidgetInfo,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { convertImageUrl } from 'app/pages/DashBoardPage/utils';
 import React, { useMemo } from 'react';
 import styled from 'styled-components/macro';

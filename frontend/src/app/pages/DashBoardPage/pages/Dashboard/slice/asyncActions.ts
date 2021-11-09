@@ -21,18 +21,18 @@ import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/sl
 import { mainActions } from 'app/pages/MainPage/slice';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { boardActions } from '.';
-import { getBoardChartRequests } from '../utils';
+import { getBoardChartRequests } from '../../../utils';
 import {
   getChartDataView,
   getDashBoardByResBoard,
   getDataChartsByServer,
   getInitBoardInfo,
   getScheduleBoardInfo,
-} from '../utils/board';
+} from '../../../utils/board';
 import {
   getWidgetInfoMapByServer,
   getWidgetMapByServer,
-} from '../utils/widget';
+} from '../../../utils/widget';
 import { BoardState, DataChart, ServerDashboard, VizRenderMode } from './types';
 
 export const handleServerBoardAction =

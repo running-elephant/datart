@@ -21,7 +21,7 @@ import ChartEditor from 'app/pages/DashBoardPage/pages/BoardEditor/components/Ch
 import {
   DataChart,
   WidgetContentChartType,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import React, { useCallback, useContext, useEffect, useState } from 'react';

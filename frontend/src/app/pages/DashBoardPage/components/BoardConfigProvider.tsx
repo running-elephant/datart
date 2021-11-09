@@ -21,7 +21,7 @@ import {
   BoardConfigContext,
   BoardConfigContextProps,
 } from '../contexts/BoardConfigContext';
-import { DashboardConfig } from '../slice/types';
+import { DashboardConfig } from '../pages/Dashboard/slice/types';
 
 export const BoardConfigProvider: FC<{ config: DashboardConfig }> = memo(
   ({ config, children }) => {

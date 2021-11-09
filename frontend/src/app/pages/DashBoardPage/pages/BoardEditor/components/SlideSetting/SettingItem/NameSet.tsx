@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { Checkbox, Form, Input } from 'antd';
-import { WidgetNameConfig } from 'app/pages/DashBoardPage/slice/types';
+import { WidgetNameConfig } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, { FC, memo } from 'react';
 import ColorSet from './BasicSet/ColorSet';
 export const NameSet: FC<{

@@ -22,7 +22,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { BoardProvider } from '../../components/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
-import { DataChart, WidgetContentChartType } from '../../slice/types';
+import { DataChart, WidgetContentChartType } from '../Dashboard/slice/types';
 import AutoEditor from './AutoEditor/index';
 import ChartEditor from './components/ChartEditor';
 import FilterWidgetPanel from './components/FilterWidgetPanel';

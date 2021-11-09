@@ -8,7 +8,7 @@ import {
   WidgetData,
   WidgetInfo,
   WidgetPanel,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { getInitBoardInfo } from 'app/pages/DashBoardPage/utils/board';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { Layout } from 'react-grid-layout';

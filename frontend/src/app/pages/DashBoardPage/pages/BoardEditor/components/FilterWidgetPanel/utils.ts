@@ -28,7 +28,7 @@ import {
   FilterOperatorType,
   OPERATOR_TYPE_ENUM,
 } from 'app/pages/DashBoardPage/constants';
-import { FilterWidgetContent } from 'app/pages/DashBoardPage/slice/types';
+import { FilterWidgetContent } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from './../../../../../../../globalConstants';
 import { WidgetFilterFormType } from './types';

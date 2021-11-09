@@ -17,7 +17,7 @@
  */
 // TODO delete file
 import { Card, FormInstance, Switch, Table } from 'antd';
-import { Widget } from 'app/pages/DashBoardPage/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { WidgetOption } from './RelatedWidgets';
 

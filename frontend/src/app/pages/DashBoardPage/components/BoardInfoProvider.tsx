@@ -20,8 +20,8 @@ import React, { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import { BoardInfoContext } from '../contexts/BoardInfoContext';
 import { boardInfoState } from '../pages/BoardEditor/slice/selectors';
-import { selectBoardInfoById } from '../slice/selector';
-import { BoardState } from '../slice/types';
+import { selectBoardInfoById } from '../pages/Dashboard/slice/selector';
+import { BoardState } from '../pages/Dashboard/slice/types';
 
 export const BoardInfoProvider: FC<{ id: string; editing: boolean }> = memo(
   ({ id, editing, children }) => {

@@ -24,7 +24,7 @@ import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import {
   Dashboard,
   DashboardConfig,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, {
   RefObject,
   useCallback,

@@ -17,11 +17,11 @@
  */
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
-import { handleServerBoardAction } from 'app/pages/DashBoardPage/slice/asyncActions';
+import { handleServerBoardAction } from 'app/pages/DashBoardPage/pages/Dashboard/slice/asyncActions';
 import {
   ServerDashboard,
   VizRenderMode,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import {
   ChartPreview,
   FilterSearchParams,

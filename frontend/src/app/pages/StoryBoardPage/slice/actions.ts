@@ -6,7 +6,7 @@
 // dispatch(storyActions.setStoryPageInfoMap({ storyId, storyPageInfoMap }));
 // dispatch(storyActions.setStoryPageMap({ storyId, storyPageMap }));
 
-import { VizRenderMode } from 'app/pages/DashBoardPage/slice/types';
+import { VizRenderMode } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { storyActions } from '.';
 import {
   formatStory,

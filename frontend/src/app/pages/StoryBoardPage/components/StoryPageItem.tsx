@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import Dashboard from 'app/pages/DashBoardPage/pages/Dashboard';
-import { VizRenderMode } from 'app/pages/DashBoardPage/slice/types';
+import { VizRenderMode } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, { useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { StoryPage } from '../slice/types';
