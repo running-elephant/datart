@@ -56,6 +56,9 @@
     ]
   },
   "jest": {
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/**/*.{spec,test}.{js,jsx,ts,tsx}"
+    ],
     "coverageReporters": [
       "html",
       "lcov",

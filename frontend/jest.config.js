@@ -22,26 +22,3 @@ const cracoConfig = require('./craco.config.js');
 const jestConfig = createJestConfig(cracoConfig, {}, { displayName: 'Datart' });
 
 module.exports = jestConfig;
-
-// TODO(Stephen): to be merged into craco config
-// const config = {
-//   verbose: true,
-//   coverageReporters: ['html', 'lcov', 'text-summary'],
-//   collectCoverageFrom: [
-//     'src/**/*.{js,jsx,ts,tsx}',
-//     '!src/**/*/*.d.ts',
-//     '!src/**/*/Loadable.{js,jsx,ts,tsx}',
-//     '!src/**/*/messages.ts',
-//     '!src/**/*/types.ts',
-//     '!src/index.tsx',
-//   ],
-//   coverageThreshold: {
-//     global: {
-//       branches: 90,
-//       functions: 90,
-//       lines: 90,
-//       statements: 90,
-//     },
-//   },
-// };
-// module.exports = config;
