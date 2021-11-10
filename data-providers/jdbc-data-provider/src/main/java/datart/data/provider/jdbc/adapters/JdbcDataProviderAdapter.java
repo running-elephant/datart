@@ -282,7 +282,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         ArrayList<Column> columns = new ArrayList<>();
         for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
             String columnTypeName = rs.getMetaData().getColumnTypeName(i);
-            String columnName = rs.getMetaData().getColumnName(i);
+            String columnName = rs.getMetaData().getColumnLabel(i);
             ValueType valueType = DataTypeUtils.sqlType2DataType(columnTypeName);
             columns.add(new Column(columnName, valueType));
         }
