@@ -20,9 +20,10 @@ import { Tooltip } from 'antd';
 import { IW } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import { ChartDataSectionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import ChartConfig, {
+  ChartDataSectionType,
+} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
-import ChartMetadata from 'app/pages/ChartWorkbenchPage/models/ChartMetadata';
 import classnames from 'classnames';
 import { FC, memo, useCallback, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -36,13 +37,12 @@ import {
 
 const ChartGraphPanel: FC<{
   chart?: Chart;
+  chartConfig?: ChartConfig;
   onChartChange: (c: Chart) => void;
-}> = memo(({ chart, onChartChange }) => {
+}> = memo(({ chart, chartConfig, onChartChange }) => {
   const t = useI18NPrefix(`viz.palette.graph`);
   const chartManager = ChartManager.instance();
-  const [allCharts] = useState<ChartMetadata[]>(
-    chartManager.getAllChartMetas(),
-  );
+  const [allCharts] = useState<Chart[]>(chartManager.getAllCharts());
 
   const handleChartChange = useCallback(
     chartId => () => {
@@ -80,24 +80,27 @@ const ChartGraphPanel: FC<{
 
   return (
     <StyledChartGraphPanel>
-      {allCharts.map(meta => (
+      {allCharts.map(c => (
         <Tooltip
-          key={meta?.id}
+          key={c?.meta?.id}
           title={
             <>
-              {meta?.name}
-              {renderChartRequirments(meta?.requirements)}
+              {c?.meta?.name}
+              {renderChartRequirments(c?.meta?.requirements)}
             </>
           }
         >
           <IconWrapper>
             <ChartIcon
+              isMatchRequirement={c?.isMatchRequirement(chartConfig)}
               fontSize={FONT_SIZE_ICON_MD}
               size={SPACE_TIMES(9)}
-              className={classnames({ active: meta?.id === chart?.meta?.id })}
-              onClick={handleChartChange(meta?.id)}
+              className={classnames({
+                active: c?.meta?.id === chart?.meta?.id,
+              })}
+              onClick={handleChartChange(c?.meta?.id)}
             >
-              <i className={meta?.icon} />
+              <i className={c?.meta?.icon} />
             </ChartIcon>
           </IconWrapper>
         </Tooltip>
@@ -122,9 +125,10 @@ const IconWrapper = styled.span`
   padding: ${SPACE_TIMES(0.5)};
 `;
 
-const ChartIcon = styled(IW)`
+const ChartIcon = styled(IW)<{ isMatchRequirement: boolean }>`
   cursor: pointer;
   border-radius: ${BORDER_RADIUS};
+  opacity: ${p => (p.isMatchRequirement ? 1 : 0.4)};
 
   &:hover,
   &.active {
