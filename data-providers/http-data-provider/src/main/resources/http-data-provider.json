@@ -5,7 +5,7 @@
   },
   "attributes": [
     {
-      "name": "开启缓存",
+      "name": "cacheEnable",
       "type": "bool",
       "required": true,
       "defaultValue": true,
@@ -16,7 +16,7 @@
       "type": "string",
       "required": true,
       "defaultValue": "30",
-      "description": "How long (Minute) the data stored in the internal database."
+      "description": "缓存的过期时间（分钟）"
     },
     {
       "name": "schemas",

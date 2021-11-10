@@ -126,6 +126,21 @@ public abstract class DefaultDataProvider extends DataProvider {
         return LocalDB.executeLocalQuery(queryScript, executeParam, executeParam.isCacheEnable(), fullData);
     }
 
+    protected List<Column> parseColumns(Map<String, Object> schema) {
+        List<Column> columns = null;
+        try {
+            List<Map<String, String>> columnConfig = (List<Map<String, String>>) schema.get(COLUMNS);
+            if (!CollectionUtils.isEmpty(columnConfig)) {
+                columns = columnConfig
+                        .stream()
+                        .map(c -> new Column(c.get(COLUMN_NAME), ValueType.valueOf(c.get(COLUMN_TYPE))))
+                        .collect(Collectors.toList());
+            }
+        } catch (ClassCastException ignored) {
+        }
+        return columns;
+    }
+
     public abstract List<Dataframe> loadFullDataFromSource(DataProviderSource config) throws Exception;
 
     @Override

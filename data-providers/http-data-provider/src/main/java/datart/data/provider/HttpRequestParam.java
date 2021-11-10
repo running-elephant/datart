@@ -17,9 +17,11 @@
  */
 package datart.data.provider;
 
+import datart.core.data.provider.Column;
 import lombok.Data;
 import org.springframework.http.HttpMethod;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -46,5 +48,7 @@ public class HttpRequestParam {
     private String body;
 
     private String contentType;
+
+    private List<Column> columns;
 
 }
