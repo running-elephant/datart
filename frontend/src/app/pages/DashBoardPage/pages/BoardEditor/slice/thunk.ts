@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import ChartDataView from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-import { boardActions } from 'app/pages/DashBoardPage/slice';
-import { fetchBoardDetail } from 'app/pages/DashBoardPage/slice/thunk';
+import { boardActions } from 'app/pages/DashBoardPage/pages/Dashboard/slice';
+import { fetchBoardDetail } from 'app/pages/DashBoardPage/pages/Dashboard/slice/thunk';
 import {
   BoardState,
   ContainerWidgetContent,
@@ -15,7 +15,7 @@ import {
   WidgetData,
   WidgetInfo,
   WidgetOfCopy,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { getChartWidgetRequestParams } from 'app/pages/DashBoardPage/utils';
 import {
   getChartDataView,
@@ -45,7 +45,7 @@ import {
 } from '.';
 import { VALUE_SPLITER } from '../components/FilterWidgetPanel/WidgetFilterForm/OperatorValues';
 import { getDistinctFields } from './../../../../../utils/fetch';
-import { BoardInfo, BoardType, ServerDashboard } from './../../../slice/types';
+import { BoardInfo, BoardType, ServerDashboard } from '../../Dashboard/slice/types';
 import { getDataChartMap } from './../../../utils/board';
 import {
   getWidgetMapByServer,

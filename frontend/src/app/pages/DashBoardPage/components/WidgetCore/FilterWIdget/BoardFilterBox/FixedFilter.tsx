@@ -24,7 +24,7 @@ import { WidgetContext } from '../../../../contexts/WidgetContext';
 import { WidgetInfoContext } from '../../../../contexts/WidgetInfoContext';
 import BlockMaskLayer from '../../../../pages/BoardEditor/components/BlockMaskLayer';
 import { getFixedFilterWidth } from '../../../../pages/BoardEditor/components/FilterWidgetPanel/utils';
-import { FilterWidgetContent } from '../../../../slice/types';
+import { FilterWidgetContent } from '../../../../pages/Dashboard/slice/types';
 import { getWidgetSomeStyle } from '../../../../utils/widget';
 import { WidgetName } from '../../../WidgetName/WidgetName';
 import WidgetToolBar from '../../../WidgetToolBar';

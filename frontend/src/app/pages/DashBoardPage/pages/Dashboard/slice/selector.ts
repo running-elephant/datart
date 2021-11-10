@@ -22,7 +22,7 @@ import {
   getAllFilterWidget,
   getLayoutWidgets,
   getVisibleFilterWidgetIds,
-} from '../utils/widget';
+} from '../../../utils/widget';
 import { Widget, WidgetInfo } from './types';
 
 export const selectPropsId = (_: unknown, id: string) => id;

@@ -1,6 +1,6 @@
 import { CommonFormTypes } from 'globalConstants';
 import { createContext, useCallback, useState } from 'react';
-import { BoardType } from './../../../DashBoardPage/slice/types';
+import { BoardType } from '../../../DashBoardPage/pages/Dashboard/slice/types';
 import { VizType } from './slice/types';
 
 export interface SaveFormModel {

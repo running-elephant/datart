@@ -31,10 +31,10 @@ import {
   getEditWidgetDataAsync,
   toUpdateDashboard,
 } from '../pages/BoardEditor/slice/thunk';
-import { boardActions } from '../slice';
-import { boardDownLoadAction } from '../slice/asyncActions';
-import { getWidgetDataAsync } from '../slice/thunk';
-import { Widget } from '../slice/types';
+import { boardActions } from '../pages/Dashboard/slice';
+import { boardDownLoadAction } from '../pages/Dashboard/slice/asyncActions';
+import { getWidgetDataAsync } from '../pages/Dashboard/slice/thunk';
+import { Widget } from '../pages/Dashboard/slice/types';
 import { getNeedRefreshWidgetsByFilter } from '../utils/widget';
 
 export const BoardActionProvider: FC<{ id: string }> = ({

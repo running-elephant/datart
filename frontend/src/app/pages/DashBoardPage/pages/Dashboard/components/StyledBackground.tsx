@@ -18,7 +18,7 @@
 import {
   BackgroundConfig,
   BorderConfig,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { convertImageUrl } from 'app/pages/DashBoardPage/utils';
 import styled from 'styled-components/macro';
 export interface StyledBackgroundProps {

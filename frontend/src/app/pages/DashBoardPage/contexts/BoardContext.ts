@@ -17,7 +17,7 @@
  */
 
 import { createContext } from 'react';
-import { BoardType, VizRenderMode } from '../slice/types';
+import { BoardType, VizRenderMode } from '../pages/Dashboard/slice/types';
 export interface BoardContextProps {
   name: string;
   renderMode?: VizRenderMode;

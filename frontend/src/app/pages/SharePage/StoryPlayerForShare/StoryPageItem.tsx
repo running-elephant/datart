@@ -15,36 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import Dashboard from 'app/pages/DashBoardPage/pages/Dashboard';
-import { VizRenderMode } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { StoryPage } from 'app/pages/StoryBoardPage/slice/types';
 import React, { useMemo } from 'react';
 import styled from 'styled-components/macro';
-import { StoryPage } from '../slice/types';
+import { BoardPageItem } from './BoardPageItem';
+
 const StoryPageItem: React.FC<{
   page: StoryPage;
-  autoFit?: boolean;
-  showZoomCtrl?: boolean;
-  renderMode: VizRenderMode;
-}> = ({ page, autoFit, showZoomCtrl, renderMode }) => {
+}> = ({ page }) => {
   const { relId, relType } = page;
 
   const SlideContent = useMemo(() => {
     if (relType === 'DASHBOARD') {
-      return (
-        <Dashboard
-          key={relId}
-          id={relId}
-          fetchData={false}
-          hideTitle={true}
-          autoFit={autoFit}
-          showZoomCtrl={showZoomCtrl}
-          renderMode={renderMode}
-        />
-      );
+      return <BoardPageItem boardId={relId}></BoardPageItem>;
     } else {
       return null;
     }
-  }, [autoFit, relId, relType, renderMode, showZoomCtrl]);
+  }, [relId, relType]);
   const { in: effectIn, out: effectOut, speed } = page.config.transitionEffect;
   return (
     <SectionWrap

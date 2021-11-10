@@ -22,8 +22,8 @@ import { BoardContext } from '../contexts/BoardContext';
 import { WidgetDataContext } from '../contexts/WidgetDataContext';
 import { selectEditWidgetData } from '../pages/BoardEditor/slice/selectors';
 import { EditBoardState } from '../pages/BoardEditor/slice/types';
-import { selectWidgetDataById } from '../slice/selector';
-import { BoardState } from '../slice/types';
+import { selectWidgetDataById } from '../pages/Dashboard/slice/selector';
+import { BoardState } from '../pages/Dashboard/slice/types';
 
 export const WidgetDataProvider: FC<{ widgetId: string }> = ({
   widgetId,

@@ -19,7 +19,7 @@
 import { ChartMouseEventParams } from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { createContext } from 'react';
 import { widgetActionType } from '../components/WidgetToolBar/config';
-import { Widget, WidgetType } from '../slice/types';
+import { Widget, WidgetType } from '../pages/Dashboard/slice/types';
 export interface WidgetMethodContextProps {
   onWidgetAction: (action: widgetActionType, widgetType: WidgetType) => void;
   widgetChartClick: (widget: Widget, params: ChartMouseEventParams) => void;

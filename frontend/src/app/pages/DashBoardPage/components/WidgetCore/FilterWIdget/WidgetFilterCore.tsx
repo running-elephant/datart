@@ -28,7 +28,7 @@ import {
   ControlOption,
   FilterDate,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/FilterWidgetPanel/types';
-import { FilterWidgetContent } from 'app/pages/DashBoardPage/slice/types';
+import { FilterWidgetContent } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { getWidgetFilterDateValues } from 'app/pages/DashBoardPage/utils';
 import { FilterSqlOperator } from 'globalConstants';
 import produce from 'immer';

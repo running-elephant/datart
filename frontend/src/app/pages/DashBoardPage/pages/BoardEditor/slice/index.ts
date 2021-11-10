@@ -1,4 +1,5 @@
 import { combineReducers, PayloadAction } from '@reduxjs/toolkit';
+import { ChartEditorProps } from 'app/components/ChartEditor';
 import { BOARD_UNDO } from 'app/pages/DashBoardPage/constants';
 import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import {
@@ -8,7 +9,7 @@ import {
   WidgetData,
   WidgetInfo,
   WidgetPanel,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { getInitBoardInfo } from 'app/pages/DashBoardPage/utils/board';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { Layout } from 'react-grid-layout';
@@ -16,7 +17,6 @@ import { Layout } from 'react-grid-layout';
 import undoable, { includeAction } from 'redux-undo';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
-import { ChartEditorProps } from '../components/ChartEditor';
 import { editBoardStackSlice } from './childSlice/stackSlice';
 import {
   getEditBoardDetail,

@@ -1,6 +1,6 @@
 import { WorkbenchState } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
-import { BoardState } from 'app/pages/DashBoardPage/slice/types';
+import { BoardState } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { MemberState } from 'app/pages/MainPage/pages/MemberPage/slice/types';
 import { PermissionState } from 'app/pages/MainPage/pages/PermissionPage/slice/types';
 import { ScheduleState } from 'app/pages/MainPage/pages/SchedulePage/slice/types';

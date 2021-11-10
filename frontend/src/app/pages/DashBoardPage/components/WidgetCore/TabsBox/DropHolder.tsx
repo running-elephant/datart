@@ -22,7 +22,7 @@ import {
 import React, { useMemo } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
 import styled from 'styled-components/macro';
-import { ContainerItem } from '../../../slice/types';
+import { ContainerItem } from '../../../pages/Dashboard/slice/types';
 
 export interface DropHolderProps {
   tabItem: ContainerItem;

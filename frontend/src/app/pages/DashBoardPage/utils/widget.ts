@@ -56,12 +56,12 @@ import {
   WidgetInfo,
   WidgetPadding,
   WidgetType,
-} from '../slice/types';
+} from '../pages/Dashboard/slice/types';
 import {
   FilterWidgetContent,
   MediaWidgetType,
   ServerRelation,
-} from './../slice/types';
+} from '../pages/Dashboard/slice/types';
 
 export const createDataChartWidget = (opt: {
   dashboardId: string;

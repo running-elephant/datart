@@ -19,12 +19,12 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button, Layout, Menu } from 'antd';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetAllProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import { boardActions } from 'app/pages/DashBoardPage/slice';
+import { boardActions } from 'app/pages/DashBoardPage/pages/Dashboard/slice';
 import {
   makeSelectBoardFullScreenPanelById,
   selectBoardWidgetMapById,
-} from 'app/pages/DashBoardPage/slice/selector';
-import { BoardState } from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/selector';
+import { BoardState } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';

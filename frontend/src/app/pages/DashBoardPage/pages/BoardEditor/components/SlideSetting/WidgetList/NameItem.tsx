@@ -17,7 +17,7 @@
  */
 import { WidgetActionDropdown } from 'app/pages/DashBoardPage/components/WidgetToolBar/WidgetActionDropdown';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
-import { Widget, WidgetType } from 'app/pages/DashBoardPage/slice/types';
+import { Widget, WidgetType } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { XYCoord } from 'dnd-core';
 import React, { useCallback, useContext, useRef } from 'react';
 import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd';

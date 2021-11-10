@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { strEnumType, WidgetType } from '../../slice/types';
+import { strEnumType, WidgetType } from '../../pages/Dashboard/slice/types';
 export {};
 export const widgetActionTypeMap = strEnumType([
   'refresh',
