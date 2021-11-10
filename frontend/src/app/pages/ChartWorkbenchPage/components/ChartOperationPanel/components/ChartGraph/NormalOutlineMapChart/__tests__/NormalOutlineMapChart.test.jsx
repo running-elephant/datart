@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import NormalOutlineMapChart from '../NormalOutlineMapChart';
 
 describe('<NormalOutlineMapChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<NormalOutlineMapChart />);
+    component = new NormalOutlineMapChart();
   });
   test('It should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

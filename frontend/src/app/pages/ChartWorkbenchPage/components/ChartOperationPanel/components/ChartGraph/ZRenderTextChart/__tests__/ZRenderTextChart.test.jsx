@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import ZRenderTextChart from '../ZRenderTextChart';
 
 describe('<ZRenderTextChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<ZRenderTextChart />);
+    component = new ZRenderTextChart();
   });
   test('it should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

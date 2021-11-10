@@ -24,6 +24,6 @@ describe('<AntVG6TreeChart />', () => {
     component = new AntVG6TreeChart();
   });
   test('It should mount', () => {
-    expect(component.id).not.toBeNull();
+    expect(component).toBeDatartChartModel();
   });
 });

@@ -24,6 +24,6 @@ describe('<AntVX6Chart />', () => {
     component = new AntVX6Chart();
   });
   test('It should mount', () => {
-    expect(component.id).not.toBeNull();
+    expect(component).toBeDatartChartModel();
   });
 });

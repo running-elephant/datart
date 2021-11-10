@@ -16,15 +16,31 @@
  * limitations under the License.
  */
 
-import WaterfallChart from '../WaterfallChart';
+import { expect } from '@jest/globals';
 
-describe('<WaterfallChart />', () => {
-  let component;
-  beforeEach(() => {
-    component = new WaterfallChart();
-  });
+const isChartModelImpl = chart => {
+  return (
+    !!chart &&
+    !!chart.meta &&
+    !!chart.onMount &&
+    !!chart.onUpdated &&
+    !!chart.onResize &&
+    !!chart.onUnMount
+  );
+};
 
-  test('it should mount', () => {
-    expect(component).toBeDatartChartModel();
-  });
+expect.extend({
+  toBeDatartChartModel(received) {
+    if (isChartModelImpl(received)) {
+      return {
+        message: () => `expected ${received} to be Datart Chart Model`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () => `expected ${received} not to be Datart Chart Model`,
+        pass: false,
+      };
+    }
+  },
 });

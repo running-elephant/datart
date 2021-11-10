@@ -24,6 +24,6 @@ describe('<BasicRadarChart />', () => {
     component = new BasicRadarChart();
   });
   test('It should mount', () => {
-    expect(component.id).not.toBeNull();
+    expect(component).toBeDatartChartModel();
   });
 });

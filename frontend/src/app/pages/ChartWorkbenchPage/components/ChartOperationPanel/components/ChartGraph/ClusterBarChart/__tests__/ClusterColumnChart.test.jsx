@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import ClusterBarChart from '../ClusterBarChart';
 
 describe('<ClusterBarChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<ClusterBarChart />);
+    component = new ClusterBarChart();
   });
   test('It should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

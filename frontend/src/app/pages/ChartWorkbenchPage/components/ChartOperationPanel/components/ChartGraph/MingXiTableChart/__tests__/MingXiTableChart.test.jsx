@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import MingXiTableChart from '../MingXiTableChart';
 
 describe('<MingXiTableChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<MingXiTableChart />);
+    component = new MingXiTableChart();
   });
   test('it should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

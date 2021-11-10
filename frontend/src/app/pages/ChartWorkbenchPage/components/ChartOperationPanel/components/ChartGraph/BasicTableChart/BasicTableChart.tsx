@@ -26,6 +26,7 @@ import {
   getValueByColumnKey,
   transfromToObjectArray,
 } from 'app/utils/chart';
+import { toFormattedValue } from 'app/utils/number';
 import { Omit } from 'utils/object';
 import { v4 as uuidv4 } from 'uuid';
 import AntdTableChartAdapter from '../../ChartTools/AntdTableChartAdapter';
@@ -359,11 +360,12 @@ class BasicTableChart extends ReactChart {
             };
           },
           render: (value, row, rowIndex) => {
+            const formattedValue = toFormattedValue(value, c.format);
             if (!this.isAutoMerge) {
-              return value;
+              return formattedValue;
             }
             return {
-              children: value,
+              children: formattedValue,
               props: { rowSpan: columnRowSpans[rowIndex] },
             };
           },

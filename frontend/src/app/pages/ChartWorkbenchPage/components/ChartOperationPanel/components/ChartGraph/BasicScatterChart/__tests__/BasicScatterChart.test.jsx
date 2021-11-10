@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
-import PieChart from '../PieChart';
+import BasicScatterChart from '../BasicScatterChart';
 
-describe('<PieChart />', () => {
+describe('<BasicScatterChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<PieChart />);
+    component = new BasicScatterChart();
   });
-  test('it should mount', () => {
-    expect(component.length).toBe(1);
+  test('It should mount', () => {
+    expect(component).toBeDatartChartModel();
   });
 });

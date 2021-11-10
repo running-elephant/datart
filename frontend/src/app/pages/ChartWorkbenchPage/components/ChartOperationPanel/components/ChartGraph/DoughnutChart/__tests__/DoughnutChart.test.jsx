@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
-import ChinaOutlineMapChart from '../ChinaOutlineMapChart';
+import DoughnutChart from '../DoughnutChart';
 
-describe('<ChinaOutlineMapChart />', () => {
+describe('<DoughnutChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<ChinaOutlineMapChart />);
+    component = new DoughnutChart();
   });
   test('it should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

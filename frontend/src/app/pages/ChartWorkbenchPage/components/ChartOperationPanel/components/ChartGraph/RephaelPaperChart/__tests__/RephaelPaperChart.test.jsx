@@ -24,6 +24,6 @@ describe('<RephaelPaperChart />', () => {
     component = new RephaelPaperChart();
   });
   test('It should mount', () => {
-    expect(component.id).not.toBeNull();
+    expect(component).toBeDatartChartModel();
   });
 });

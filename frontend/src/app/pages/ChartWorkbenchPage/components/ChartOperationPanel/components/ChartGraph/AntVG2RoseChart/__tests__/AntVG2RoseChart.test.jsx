@@ -24,6 +24,6 @@ describe('<AntVG2RoseChart />', () => {
     component = new AntVG2RoseChart();
   });
   test('It should mount', () => {
-    expect(component.id).not.toBeNull();
+    expect(component).toBeDatartChartModel();
   });
 });

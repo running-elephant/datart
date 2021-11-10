@@ -16,15 +16,9 @@
  * limitations under the License.
  */
 
-import WaterfallChart from '../WaterfallChart';
+const { createJestConfig } = require('@craco/craco');
 
-describe('<WaterfallChart />', () => {
-  let component;
-  beforeEach(() => {
-    component = new WaterfallChart();
-  });
+const cracoConfig = require('./craco.config.js');
+const jestConfig = createJestConfig(cracoConfig, {}, { displayName: 'Datart' });
 
-  test('it should mount', () => {
-    expect(component).toBeDatartChartModel();
-  });
-});
+module.exports = jestConfig;
