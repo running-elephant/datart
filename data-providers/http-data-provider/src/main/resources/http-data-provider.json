@@ -5,6 +5,20 @@
   },
   "attributes": [
     {
+      "name": "开启缓存",
+      "type": "bool",
+      "required": true,
+      "defaultValue": true,
+      "description": "开启后会将查询的数据保存到内部数据库"
+    },
+    {
+      "name": "cacheTimeout",
+      "type": "string",
+      "required": true,
+      "defaultValue": "30",
+      "description": "How long (Minute) the data stored in the internal database."
+    },
+    {
       "name": "schemas",
       "type": "array",
       "key": "tableName",

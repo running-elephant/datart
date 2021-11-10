@@ -118,7 +118,7 @@ public abstract class DefaultDataProvider extends DataProvider {
             String queryKey = queryScript.toQueryKey();
 
             if (executeParam.isCacheEnable()) {
-                dataframe = LocalDB.queryFromLocal(queryKey, executeParam);
+                dataframe = LocalDB.executeLocalQuery(queryKey, executeParam);
                 if (dataframe != null) return dataframe;
             }
         }

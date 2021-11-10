@@ -14,9 +14,4 @@ public enum VariableTypeEnum {
      */
     PERMISSION,
 
-    /**
-     * 系统变量
-     */
-//    SYS,
-
 }

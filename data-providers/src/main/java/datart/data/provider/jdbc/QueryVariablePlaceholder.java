@@ -37,10 +37,14 @@ public class QueryVariablePlaceholder extends VariablePlaceholder {
         if (CollectionUtils.isEmpty(variable.getValues())) {
             SqlCall isNullSqlCall = createIsNullSqlCall(sqlCall.getOperandList().get(0));
             replacement = isNullSqlCall.toSqlString(sqlDialect).getSql();
-        } else {
-            replaceOperandWithVariable();
-            replacement = sqlCall.toSqlString(sqlDialect).getSql();
+            return new ReplacementPair(originalSqlFragment, replacement);
         }
-        return new ReplacementPair(originalSqlFragment, replacement);
+        if (variable.getValues().size() == 1) {
+            replaceVariable(sqlCall);
+            replacement = sqlCall.toSqlString(sqlDialect).getSql();
+            return new ReplacementPair(originalSqlFragment, replacement);
+        }
+        SqlCall fixedCall = autoFixSqlCall();
+        return new ReplacementPair(originalSqlFragment, fixedCall.toSqlString(sqlDialect, true).getSql());
     }
 }
