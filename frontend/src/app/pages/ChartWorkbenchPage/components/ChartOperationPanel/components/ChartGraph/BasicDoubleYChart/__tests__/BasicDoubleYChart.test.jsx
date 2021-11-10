@@ -16,15 +16,13 @@
  * limitations under the License.
  */
 
-import WaterfallChart from '../WaterfallChart';
-
-describe('<WaterfallChart />', () => {
+import BasicDoubleYChart from '../BasicDoubleYChart';
+describe('<BasicDoubleYChart />', () => {
   let component;
   beforeEach(() => {
-    component = new WaterfallChart();
+    component = new BasicDoubleYChart();
   });
-
-  test('it should mount', () => {
+  test('It should mount', () => {
     expect(component).toBeDatartChartModel();
   });
 });

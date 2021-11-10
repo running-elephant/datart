@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-import WaterfallChart from '../WaterfallChart';
+import BasicLineChart from '../BasicLineChart';
 
-describe('<WaterfallChart />', () => {
+describe('<BasicLineChart />', () => {
   let component;
   beforeEach(() => {
-    component = new WaterfallChart();
+    component = new BasicLineChart();
   });
-
   test('it should mount', () => {
     expect(component).toBeDatartChartModel();
   });

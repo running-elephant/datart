@@ -16,15 +16,13 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import BasicFunnelChart from '../BasicFunnelChart';
 describe('<BasicFunnelChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<BasicFunnelChart />);
+    component = new BasicFunnelChart();
   });
   test('It should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

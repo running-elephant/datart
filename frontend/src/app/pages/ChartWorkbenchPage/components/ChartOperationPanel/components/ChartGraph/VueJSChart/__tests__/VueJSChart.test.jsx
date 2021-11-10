@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-import WaterfallChart from '../WaterfallChart';
+import VueJSChart from '../VueJSChart';
 
-describe('<WaterfallChart />', () => {
+describe('<VueJSChart />', () => {
   let component;
   beforeEach(() => {
-    component = new WaterfallChart();
+    component = new VueJSChart();
   });
 
   test('it should mount', () => {
