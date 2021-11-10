@@ -21,18 +21,18 @@ import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/sl
 import { mainActions } from 'app/pages/MainPage/slice';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { boardActions } from '.';
-import { getBoardChartRequests } from '../utils';
+import { getBoardChartRequests } from '../../../utils';
 import {
   getChartDataView,
   getDashBoardByResBoard,
   getDataChartsByServer,
   getInitBoardInfo,
   getScheduleBoardInfo,
-} from '../utils/board';
+} from '../../../utils/board';
 import {
   getWidgetInfoMapByServer,
   getWidgetMapByServer,
-} from '../utils/widget';
+} from '../../../utils/widget';
 import { BoardState, DataChart, ServerDashboard, VizRenderMode } from './types';
 
 export const handleServerBoardAction =
@@ -48,9 +48,10 @@ export const handleServerBoardAction =
     const { datacharts, views: serverViews, widgets: serverWidgets } = data;
 
     const widgetIds = serverWidgets.map(w => w.id);
-
+    const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
     const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(
       serverWidgets,
+      dataCharts,
       filterSearchMap,
     );
 
@@ -59,7 +60,6 @@ export const handleServerBoardAction =
     if (renderMode === 'schedule') {
       boardInfo = getScheduleBoardInfo(boardInfo, widgetMap);
     }
-    const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
 
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
     const viewViews = getChartDataView(serverViews, allDataCharts);

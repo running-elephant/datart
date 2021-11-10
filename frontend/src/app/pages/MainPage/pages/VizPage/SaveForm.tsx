@@ -1,6 +1,6 @@
 import { Form, FormInstance, Input, Radio, TreeSelect } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
-import { BoardTypeMap } from 'app/pages/DashBoardPage/slice/types';
+import { BoardTypeMap } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import debounce from 'debounce-promise';
 import { CommonFormTypes, DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Widget, WidgetInfo } from 'app/pages/DashBoardPage/slice/types';
+import { Widget, WidgetInfo } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';

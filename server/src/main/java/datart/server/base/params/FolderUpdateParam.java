@@ -28,7 +28,7 @@ public class FolderUpdateParam extends VizUpdateParam {
 
     private String parentId;
 
-    private double index;
+    private Double index;
 
     private String description;
 

@@ -41,15 +41,15 @@ import {
   getEditChartWidgetDataAsync,
   getEditWidgetDataAsync,
 } from '../pages/BoardEditor/slice/thunk';
-import { boardActions } from '../slice';
-import { getChartWidgetDataAsync, getWidgetDataAsync } from '../slice/thunk';
+import { boardActions } from '../pages/Dashboard/slice';
+import { getChartWidgetDataAsync, getWidgetDataAsync } from '../pages/Dashboard/slice/thunk';
 import {
   BoardLinkFilter,
   JumpConfig,
   Widget,
   WidgetContentChartType,
   WidgetType,
-} from '../slice/types';
+} from '../pages/Dashboard/slice/types';
 import { widgetActionType } from './WidgetToolBar/config';
 
 const { confirm } = Modal;

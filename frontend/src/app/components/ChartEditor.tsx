@@ -36,15 +36,15 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { CloneValueDeep, mergeDefaultToValue } from 'utils/object';
-import { ChartConfigReducerActionType } from '../../../../ChartWorkbenchPage';
-import ChartWorkbench from '../../../../ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
-import Chart from '../../../../ChartWorkbenchPage/models/Chart';
-import ChartManager from '../../../../ChartWorkbenchPage/models/ChartManager';
+import { ChartConfigReducerActionType } from '../pages/ChartWorkbenchPage';
+import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
+import Chart from '../pages/ChartWorkbenchPage/models/Chart';
+import ChartManager from '../pages/ChartWorkbenchPage/models/ChartManager';
 import {
   DataChart,
   DataChartConfig,
   WidgetContentChartType,
-} from '../../../slice/types';
+} from '../pages/DashBoardPage/pages/Dashboard/slice/types';
 const { confirm } = Modal;
 export interface ChartEditorBaseProps {
   dataChartId: string;
@@ -125,6 +125,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       registerChartEvents(currentChart);
       setChart(currentChart);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backendChart]);
 
   const handleChartChange = (c: Chart) => {

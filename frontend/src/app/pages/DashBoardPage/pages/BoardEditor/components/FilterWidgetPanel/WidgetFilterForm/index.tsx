@@ -25,7 +25,7 @@ import {
   BoardType,
   Widget,
   WidgetFilterTypes,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, { memo } from 'react';
 import styled from 'styled-components/macro';
 import FilterAggOperator from './FilterAggOperator';

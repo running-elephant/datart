@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 import { Modal } from 'antd';
+import { ChartEditorBaseProps } from 'app/components/ChartEditor';
 import ChartDataView, {
   ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-import { boardActions } from 'app/pages/DashBoardPage/slice';
+import { boardActions } from 'app/pages/DashBoardPage/pages/Dashboard/slice';
 import {
   ContainerWidgetContent,
   DataChart,
@@ -28,7 +29,7 @@ import {
   Relation,
   Widget,
   WidgetFilterTypes,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import {
   createInitWidgetConfig,
   createWidget,
@@ -37,11 +38,11 @@ import produce from 'immer';
 import { RootState } from 'types';
 import { v4 as uuidv4 } from 'uuid';
 import { editBoardStackActions, editDashBoardInfoActions } from '.';
-import { ChartEditorBaseProps } from '../components/ChartEditor';
-import { BoardType } from './../../../slice/types';
+import { BoardType } from '../../Dashboard/slice/types';
 import { WidgetFilterFormType } from './../components/FilterWidgetPanel/types';
 import { addWidgetsToEditBoard, getEditWidgetDataAsync } from './thunk';
 import { HistoryEditBoard } from './types';
+
 const { confirm } = Modal;
 export const deleteWidgetsAction = () => async (dispatch, getState) => {
   const editBoard = getState().editBoard as HistoryEditBoard;
@@ -199,6 +200,13 @@ export const editWrapChartWidget =
   (props: { widgetId: string; dataChart: DataChart; view: ChartDataView }) =>
   async (dispatch, getState) => {
     const { dataChart, view, widgetId } = props;
+    const editBoard = getState().editBoard as HistoryEditBoard;
+    const widgetMap = editBoard.stack.present.widgetRecord;
+    const curWidget = widgetMap[widgetId];
+    const nextWidget = produce(curWidget, draft => {
+      draft.viewIds = [dataChart.viewId];
+    });
+    dispatch(editBoardStackActions.updateWidget(nextWidget));
     const dataCharts = [dataChart];
     const viewViews = [view];
     dispatch(boardActions.setDataChartMap(dataCharts));

@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import ChartEditor from 'app/components/ChartEditor';
 import React, { memo, useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -22,9 +23,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { BoardProvider } from '../../components/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
-import { DataChart, WidgetContentChartType } from '../../slice/types';
+import { DataChart, WidgetContentChartType } from '../Dashboard/slice/types';
 import AutoEditor from './AutoEditor/index';
-import ChartEditor from './components/ChartEditor';
 import FilterWidgetPanel from './components/FilterWidgetPanel';
 import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
@@ -36,6 +36,7 @@ import {
   selectEditBoard,
 } from './slice/selectors';
 import { getEditBoardDetail } from './slice/thunk';
+
 // import { loadEditBoardDetail } from './slice/thunk';
 
 export const BoardEditor: React.FC<{
@@ -93,6 +94,7 @@ export const BoardEditor: React.FC<{
           allowDownload={allowDownload}
           allowShare={allowShare}
           allowManage={allowManage}
+          renderMode="read"
         >
           <Wrapper>
             <TitleHeader toggleBoardEditor={onCloseBoardEditor} />

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { DataChart } from 'app/pages/DashBoardPage/slice/types';
+import { DataChart } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { createContext } from 'react';
 export const WidgetChartContext = createContext<DataChart | undefined>(
   {} as DataChart,

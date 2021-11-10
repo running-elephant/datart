@@ -22,7 +22,7 @@ import {
   getDataOption,
   Widget,
   WidgetInfo,
-} from './../slice/types';
+} from '../pages/Dashboard/slice/types';
 
 export const convertImageUrl = (urlKey: string = ''): string => {
   if (urlKey.startsWith(STORAGE_IMAGE_KEY_PREFIX)) {

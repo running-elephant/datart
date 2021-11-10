@@ -18,7 +18,7 @@
 import { Collapse, Form } from 'antd';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import { DashboardConfig } from 'app/pages/DashBoardPage/slice/types';
+import { DashboardConfig } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { getRGBAColor } from 'app/pages/DashBoardPage/utils';
 import produce from 'immer';
 import { throttle } from 'lodash';

@@ -27,7 +27,7 @@ import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-import { RelatedView } from 'app/pages/DashBoardPage/slice/types';
+import { RelatedView } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 

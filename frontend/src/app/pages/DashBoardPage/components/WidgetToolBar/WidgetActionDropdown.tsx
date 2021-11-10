@@ -20,7 +20,7 @@ import { Button, Dropdown, Menu } from 'antd';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { BoardContext } from '../../contexts/BoardContext';
 import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
-import { Widget } from '../../slice/types';
+import { Widget } from '../../pages/Dashboard/slice/types';
 import { getWidgetActionList } from '../../utils/widget';
 import { widgetActionMap } from './config';
 

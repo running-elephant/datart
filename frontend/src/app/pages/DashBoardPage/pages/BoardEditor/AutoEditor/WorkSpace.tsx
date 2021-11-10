@@ -18,7 +18,7 @@
 
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetAllProvider';
 import { BoardFilterBox } from 'app/pages/DashBoardPage/components/WidgetCore/FilterWIdget/BoardFilterBox';
-import { Dashboard } from 'app/pages/DashBoardPage/slice/types';
+import { Dashboard } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
