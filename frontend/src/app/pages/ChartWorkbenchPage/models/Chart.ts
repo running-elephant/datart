@@ -16,11 +16,9 @@
  * limitations under the License.
  */
 
+import { isMatchRequirement } from 'app/utils/chart';
 import { isEmpty } from 'utils/object';
-import ChartConfig, {
-  ChartDataSectionType,
-  ChartStyleSectionConfig,
-} from './ChartConfig';
+import ChartConfig, { ChartStyleSectionConfig } from './ChartConfig';
 import ChartDataset from './ChartDataset';
 import ChartEventBroker from './ChartEventBroker';
 import ChartMetadata from './ChartMetadata';
@@ -124,7 +122,7 @@ class Chart extends DatartChartBase {
     if (!config || !this.meta?.requirements) {
       return true;
     }
-    return this.isMatchRequirementImpl(config);
+    return isMatchRequirement(this.meta, config);
   }
 
   public getStateHistory() {
@@ -148,36 +146,6 @@ class Chart extends DatartChartBase {
   }
 
   public onResize(options, context?): void {}
-
-  protected isMatchRequirementImpl(config: ChartConfig) {
-    const dataConfig = config.datas || [];
-    const groupConfigs = dataConfig
-      .filter(
-        c =>
-          c.type === ChartDataSectionType.GROUP ||
-          c.type === ChartDataSectionType.COLOR,
-      )
-      .filter(c => !!c.required)
-      .flatMap(config => config.rows || []);
-    const aggregateConfigs = dataConfig
-      .filter(
-        c =>
-          c.type === ChartDataSectionType.AGGREGATE ||
-          c.type === ChartDataSectionType.SIZE,
-      )
-      .filter(c => !!c.required)
-      .flatMap(config => config.rows || []);
-
-    const requirements = this.meta.requirements || [];
-    return requirements.some(r => {
-      const group = (r || {})[ChartDataSectionType.GROUP];
-      const aggregate = (r || {})[ChartDataSectionType.AGGREGATE];
-      return (
-        this.isInRange(group, groupConfigs.length) &&
-        this.isInRange(aggregate, aggregateConfigs.length)
-      );
-    });
-  }
 
   protected getStyleValue(
     styleConfigs: ChartStyleSectionConfig[],
