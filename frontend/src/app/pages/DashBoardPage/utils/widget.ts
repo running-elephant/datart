@@ -43,10 +43,13 @@ import {
   ContainerWidgetType,
   DashboardConfig,
   DataChart,
+  FilterWidgetContent,
   MediaWidgetContent,
+  MediaWidgetType,
   RectConfig,
   RelatedView,
   Relation,
+  ServerRelation,
   ServerWidget,
   Widget,
   WidgetConf,
@@ -56,11 +59,6 @@ import {
   WidgetInfo,
   WidgetPadding,
   WidgetType,
-} from '../pages/Dashboard/slice/types';
-import {
-  FilterWidgetContent,
-  MediaWidgetType,
-  ServerRelation,
 } from '../pages/Dashboard/slice/types';
 
 export const createDataChartWidget = (opt: {
@@ -860,7 +858,7 @@ export const getWidgetActionList = (widget: Widget) => {
   return [
     {
       key: widgetActionTypeMap.refresh,
-      label: '刷新',
+      label: '同步数据',
       icon: '',
       disabled: false,
     },
