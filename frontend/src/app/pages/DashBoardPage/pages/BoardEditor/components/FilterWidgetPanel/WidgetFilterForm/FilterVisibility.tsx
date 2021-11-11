@@ -17,17 +17,17 @@
  */
 
 import { Form, FormInstance, Input, Radio, Select } from 'antd';
-import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import { VISIBILITY_TYPE_OPTION } from 'app/pages/DashBoardPage/constants';
 import { Widget } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
+import { ValueTypes } from '../types';
 
 const FilterVisibility: FC<{
   form: FormInstance<any> | undefined;
   otherStrFilterWidgets: Widget[];
-  fieldValueType: ChartDataViewFieldType;
+  fieldValueType: ValueTypes;
 }> = memo(({ form, fieldValueType, otherStrFilterWidgets }) => {
   const showVisibilityCondition = useCallback(() => {
     const visibilityType = form?.getFieldValue([

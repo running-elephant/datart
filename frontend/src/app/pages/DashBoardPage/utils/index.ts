@@ -14,8 +14,6 @@ import {
   FilterDate,
   WidgetFilterFormType,
 } from '../pages/BoardEditor/components/FilterWidgetPanel/types';
-import { RelativeOrExactTime } from './../../ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
-import { ChartRequestFilter } from './../../ChartWorkbenchPage/models/ChartHttpRequest';
 import {
   BoardLinkFilter,
   DataChart,
@@ -24,6 +22,9 @@ import {
   Widget,
   WidgetInfo,
 } from '../pages/Dashboard/slice/types';
+import { RelativeOrExactTime } from './../../ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
+import { ChartRequestFilter } from './../../ChartWorkbenchPage/models/ChartHttpRequest';
+import { ValueTypes } from './../pages/BoardEditor/components/FilterWidgetPanel/types';
 
 export const convertImageUrl = (urlKey: string = ''): string => {
   if (urlKey.startsWith(STORAGE_IMAGE_KEY_PREFIX)) {
@@ -139,7 +140,7 @@ export const getAllFiltersOfOneWidget = (
   };
 };
 export const getWidgetFilterValues = (
-  fieldValueType: ChartDataViewFieldType,
+  fieldValueType: ValueTypes,
   widgetFilter: WidgetFilterFormType,
 ) => {
   // Date 类型

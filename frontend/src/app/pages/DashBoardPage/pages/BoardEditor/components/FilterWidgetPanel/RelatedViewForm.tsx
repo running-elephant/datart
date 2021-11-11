@@ -31,11 +31,12 @@ import { RelatedView } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
+import { ValueTypes } from './types';
 
 export interface RelatedViewFormProps {
   viewMap: Record<string, ChartDataView>;
   form: FormInstance<any> | undefined;
-  fieldValueType: ChartDataViewFieldType;
+  fieldValueType: ValueTypes;
   onChangeFieldProps: (views?: RelatedView[]) => void;
   queryVariables: Variable[];
 }

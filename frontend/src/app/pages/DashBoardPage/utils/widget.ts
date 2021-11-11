@@ -43,10 +43,13 @@ import {
   ContainerWidgetType,
   DashboardConfig,
   DataChart,
+  FilterWidgetContent,
   MediaWidgetContent,
+  MediaWidgetType,
   RectConfig,
   RelatedView,
   Relation,
+  ServerRelation,
   ServerWidget,
   Widget,
   WidgetConf,
@@ -57,11 +60,7 @@ import {
   WidgetPadding,
   WidgetType,
 } from '../pages/Dashboard/slice/types';
-import {
-  FilterWidgetContent,
-  MediaWidgetType,
-  ServerRelation,
-} from '../pages/Dashboard/slice/types';
+import { ValueTypes } from './../pages/BoardEditor/components/FilterWidgetPanel/types';
 
 export const VALUE_SPLITTER = '###';
 
@@ -311,7 +310,7 @@ export const createFilterWidget = (params: {
   boardType: BoardType;
   relations: Relation[];
   filterName?: string;
-  fieldValueType: ChartDataViewFieldType;
+  fieldValueType: ValueTypes;
   filterPositionType: WidgetFilterTypes;
   views: RelatedView[];
   widgetFilter: WidgetFilterFormType;

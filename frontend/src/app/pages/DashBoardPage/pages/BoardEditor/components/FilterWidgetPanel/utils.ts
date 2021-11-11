@@ -31,7 +31,7 @@ import {
 import { FilterWidgetContent } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from './../../../../../../../globalConstants';
-import { WidgetFilterFormType } from './types';
+import { ValueTypes, WidgetFilterFormType } from './types';
 // export const getFilterFacadeTool = (fieldType: ChartDataViewFieldType) => {
 //   switch (fieldType) {
 //     case ChartDataViewFieldType.STRING:
@@ -198,7 +198,7 @@ export const getFixedFilterWidth = (content: FilterWidgetContent) => {
 };
 
 export const adjustSqlOperator = (
-  fieldValueType: ChartDataViewFieldType,
+  fieldValueType: ValueTypes,
   operatorType: FilterOperatorType,
 ): FilterSqlOperator => {
   if (fieldValueType === ChartDataViewFieldType.STRING) {

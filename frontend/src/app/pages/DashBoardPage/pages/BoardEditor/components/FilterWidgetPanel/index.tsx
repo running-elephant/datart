@@ -55,13 +55,14 @@ import { selectFilterPanel, selectSortAllWidgets } from '../../slice/selectors';
 import { addWidgetsToEditBoard } from '../../slice/thunk';
 import { RelatedViewForm } from './RelatedViewForm';
 import { RelatedWidgets, WidgetOption } from './RelatedWidgets';
-import { WidgetFilterFormType } from './types';
+import { ValueTypes, WidgetFilterFormType } from './types';
 import {
   formatWidgetFilter,
   getInitWidgetFilter,
   preformatWidgetFilter,
 } from './utils';
 import { WidgetFilterForm } from './WidgetFilterForm';
+
 const FilterWidgetPanel: React.FC = memo(props => {
   const dispatch = useDispatch();
 
@@ -90,7 +91,8 @@ const FilterWidgetPanel: React.FC = memo(props => {
     () => widgetMap[widgetId] || undefined,
     [widgetId, widgetMap],
   );
-  const [fieldValueType, setFieldValueType] = useState<ChartDataViewFieldType>(
+
+  const [fieldValueType, setFieldValueType] = useState<ValueTypes>(
     ChartDataViewFieldType.STRING,
   );
   const [fieldCategory, setFieldCategory] =

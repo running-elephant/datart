@@ -16,21 +16,18 @@
  * limitations under the License.
  */
 
-import { Form, FormInstance, Radio, Select, Transfer } from 'antd';
+import { Form, FormInstance, Radio, Transfer } from 'antd';
 import { ControllerFacadeTypes } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
 import { FilterValueOption } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataView, {
-  ChartDataViewFieldType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import ChartDataView from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import {
   FilterOperatorType,
   OPERATOR_TYPE_OPTION,
 } from 'app/pages/DashBoardPage/constants';
-import { RelatedView } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetFilterFormType } from '../types';
+import { ValueTypes, WidgetFilterFormType } from '../types';
 import { adjustSqlOperator } from '../utils';
 import { AssistViewFields } from './AssistViewFields';
 import { FilterCustomOptions } from './FilterCustomOptions';
@@ -45,28 +42,10 @@ export const singleFacadeTypes = [
   ControllerFacadeTypes.Value,
 ];
 
-const options = [
-  {
-    value: 'zhejiang',
-    label: 'Zhejiang',
-  },
-  {
-    value: 'jiangsu',
-    label: 'Jiangsu',
-    isLeaf: false,
-    // children: [
-    //   {
-    //     value: 'nanjing',
-    //     label: 'Nanjing',
-    //   },
-    // ],
-  },
-];
-
 const OperatorValues: FC<{
   form: FormInstance<any> | undefined;
   viewMap: Record<string, ChartDataView>;
-  fieldValueType: ChartDataViewFieldType;
+  fieldValueType: ValueTypes;
   filterValues?: any[];
   onChangeFilterValues?: (values: any[]) => void;
 }> = memo(
@@ -213,31 +192,6 @@ const OperatorValues: FC<{
       return operatorType;
     }, [form]);
 
-    const renderViewFieldOptions = useCallback(() => {
-      const relatedViews: RelatedView[] =
-        form?.getFieldValue('relatedViews') || [];
-      const trimmedViews = relatedViews.filter(
-        item => item.fieldValue && item.fieldValueType,
-      );
-      if (!trimmedViews.length) {
-        return (
-          <Select.Option key={0} value={''}>
-            {'none'}
-          </Select.Option>
-        );
-      }
-      return trimmedViews.map(view => {
-        return (
-          <Select.Option
-            key={view.viewId}
-            // value={`${view.viewId}${VALUE_SPLITTER}${view.fieldValue}`}
-            value={''}
-          >
-            {`${viewMap[view.viewId]?.name}/ ${view.fieldValue}`}
-          </Select.Option>
-        );
-      });
-    }, [form, viewMap]);
     return (
       <Wrap>
         <Form.Item

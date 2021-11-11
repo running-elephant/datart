@@ -26,8 +26,10 @@ import {
   Widget,
   WidgetFilterTypes,
 } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
 import React, { memo } from 'react';
 import styled from 'styled-components/macro';
+import { ValueTypes } from '../types';
 import FilterAggOperator from './FilterAggOperator';
 import FilterDateCondition from './FilterDate/FilterDateCondition';
 import FilterFacade from './FilterFacade';
@@ -39,7 +41,7 @@ export interface RelatedViewFormProps {
   form: FormInstance<any> | undefined;
   viewMap: Record<string, ChartDataView>;
   otherStrFilterWidgets: Widget[];
-  fieldValueType: ChartDataViewFieldType;
+  fieldValueType: ValueTypes;
   fieldCategory: ChartDataViewFieldCategory;
   boardType: BoardType;
 }
@@ -69,12 +71,20 @@ export const WidgetFilterForm: React.FC<RelatedViewFormProps> = memo(
               form={form}
             />
           )}
+          {fieldValueType === VariableValueTypes.Expression && (
+            <OperatorValues
+              fieldValueType={fieldValueType}
+              viewMap={viewMap}
+              form={form}
+            />
+          )}
           {fieldValueType === ChartDataViewFieldType.NUMERIC && (
             <FilterNumberCondition
               fieldValueType={fieldValueType}
               form={form}
             />
           )}
+
           {fieldValueType === ChartDataViewFieldType.DATE && (
             <FilterDateCondition fieldValueType={fieldValueType} form={form} />
           )}

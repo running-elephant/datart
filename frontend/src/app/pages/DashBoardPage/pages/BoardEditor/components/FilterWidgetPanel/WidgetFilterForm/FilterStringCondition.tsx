@@ -22,14 +22,14 @@ import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetFilterFormType } from '../types';
+import { ValueTypes, WidgetFilterFormType } from '../types';
 const stringConditionSetValues = [
   ...SQL_OPERATOR_OPTIONS.include,
   ...SQL_OPERATOR_OPTIONS.notInclude,
 ].map(ele => ele.value);
 const FilterStringCondition: FC<{
   form: FormInstance<any> | undefined;
-  fieldValueType: ChartDataViewFieldType;
+  fieldValueType: ValueTypes;
 }> = memo(({ form, fieldValueType }) => {
   const [sqlOperatorValue, setSqlOperatorValue] = useState<FilterSqlOperator>(
     FilterSqlOperator.Equal,
