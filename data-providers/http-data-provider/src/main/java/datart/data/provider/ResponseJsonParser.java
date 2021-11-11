@@ -28,10 +28,12 @@ import datart.data.provider.jdbc.DataTypeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -40,7 +42,7 @@ public class ResponseJsonParser implements HttpResponseParser {
     private static final String PROPERTY_SPLIT = "\\.";
 
     @Override
-    public Dataframe parseResponse(String targetPropertyName, HttpResponse response) throws IOException {
+    public Dataframe parseResponse(String targetPropertyName, HttpResponse response, List<Column> columns) throws IOException {
         String jsonString = EntityUtils.toString(response.getEntity());
 
         JSONArray array;
@@ -65,7 +67,11 @@ public class ResponseJsonParser implements HttpResponseParser {
             return dataframe;
         }
 
-        dataframe.setColumns(getSchema(array.getJSONObject(0)));
+        if (CollectionUtils.isEmpty(columns)) {
+            columns = getSchema(array.getJSONObject(0));
+        }
+
+        dataframe.setColumns(columns);
 
         List<List<Object>> rows = array.toJavaList(JSONObject.class).parallelStream()
                 .map(item -> {

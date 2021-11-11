@@ -90,11 +90,10 @@ public class HttpDataProvider extends DefaultDataProvider {
         }
         for (Map<String, Object> schema : schemas) {
             HttpRequestParam httpRequestParam = convert2RequestParam(schema);
-            Dataframe dataframe = new HttpDataFetcher(httpRequestParam).fetchData();
+            Dataframe dataframe = new HttpDataFetcher(httpRequestParam).fetchAndParse();
             dataframe.setName(StringUtils.isNoneBlank(schema.getOrDefault(TABLE, "").toString()) ? schema.get(TABLE).toString() : "TEST" + UUIDGenerator.generate());
             dataframes.add(dataframe);
         }
-
         return dataframes;
     }
 
@@ -103,27 +102,27 @@ public class HttpDataProvider extends DefaultDataProvider {
         return "http-data-provider.json";
     }
 
-    private HttpRequestParam convert2RequestParam(Map<String, Object> config) throws ClassNotFoundException {
+    private HttpRequestParam convert2RequestParam(Map<String, Object> schema) throws ClassNotFoundException {
 
         HttpRequestParam httpRequestParam = new HttpRequestParam();
 
-        httpRequestParam.setUrl(config.get(URL).toString());
+        httpRequestParam.setUrl(schema.get(URL).toString());
 
-        httpRequestParam.setPassword(config.get(PASSWORD).toString());
+        httpRequestParam.setPassword(schema.get(PASSWORD).toString());
 
-        httpRequestParam.setUsername(config.get(USERNAME).toString());
+        httpRequestParam.setUsername(schema.get(USERNAME).toString());
 
-        httpRequestParam.setMethod(HttpMethod.resolve(config.getOrDefault(REQUEST_METHOD, HttpMethod.GET.name()).toString()));
+        httpRequestParam.setMethod(HttpMethod.resolve(schema.getOrDefault(REQUEST_METHOD, HttpMethod.GET.name()).toString()));
 
-        httpRequestParam.setTimeout(Integer.parseInt(config.getOrDefault(TIMEOUT, DEFAULT_REQUEST_TIMEOUT + "").toString()));
+        httpRequestParam.setTimeout(Integer.parseInt(schema.getOrDefault(TIMEOUT, DEFAULT_REQUEST_TIMEOUT + "").toString()));
 
-        httpRequestParam.setTargetPropertyName(config.get(PROPERTY).toString());
+        httpRequestParam.setTargetPropertyName(schema.get(PROPERTY).toString());
 
-        httpRequestParam.setContentType(config.getOrDefault(CONTENT_TYPE, "application/json").toString());
+        httpRequestParam.setContentType(schema.getOrDefault(CONTENT_TYPE, "application/json").toString());
 
         String parserClass = DEFAULT_PARSER;
-        Object parser = config.get(RESPONSE_PARSER);
-        if (parser != null && StringUtils.isBlank(parser.toString())) {
+        Object parser = schema.get(RESPONSE_PARSER);
+        if (parser != null && StringUtils.isNotBlank(parser.toString())) {
             parserClass = parser.toString();
         }
 
@@ -131,11 +130,13 @@ public class HttpDataProvider extends DefaultDataProvider {
 
         httpRequestParam.setResponseParser(aClass);
 
-        httpRequestParam.setBody(config.getOrDefault(BODY, "").toString());
+        httpRequestParam.setBody(schema.getOrDefault(BODY, "").toString());
 
-        httpRequestParam.setQueryParam((Map<String, String>) config.get(QUERY_PARAM));
+        httpRequestParam.setQueryParam((Map<String, String>) schema.get(QUERY_PARAM));
 
-        httpRequestParam.setHeaders((Map<String, String>) config.get(HEADER));
+        httpRequestParam.setHeaders((Map<String, String>) schema.get(HEADER));
+
+        httpRequestParam.setColumns(parseColumns(schema));
 
         return httpRequestParam;
     }
