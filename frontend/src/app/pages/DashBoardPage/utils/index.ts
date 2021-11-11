@@ -105,23 +105,28 @@ export const getAllFiltersOfOneWidget = (
 
     const content = filterWidget.config.content as FilterWidgetContent;
     const { fieldValueType, relatedViews, widgetFilter } = content;
-    const view = relatedViews
+    const relatedViewItem = relatedViews
       .filter(view => view.fieldValue)
       .find(view => view.viewId === chartWidget.viewIds[0]);
-    if (!view) return;
+    if (!relatedViewItem) return;
 
     const values = getWidgetFilterValues(fieldValueType, widgetFilter);
     if (!values) {
       return;
     }
-    if (view.filterFieldCategory === ChartDataViewFieldCategory.Variable) {
-      const key = view.fieldValue;
-      variables[String(key)] = values.map(item => String(item.value));
+    if (
+      relatedViewItem.filterFieldCategory ===
+      ChartDataViewFieldCategory.Variable
+    ) {
+      const key = String(relatedViewItem.fieldValue);
+      variables[key] = values.map(item => String(item.value));
     }
-    if (view.filterFieldCategory === ChartDataViewFieldCategory.Field) {
+    if (
+      relatedViewItem.filterFieldCategory === ChartDataViewFieldCategory.Field
+    ) {
       const filter: ChartRequestFilter = {
         aggOperator: widgetFilter.aggregate || null,
-        column: String(view.fieldValue),
+        column: String(relatedViewItem.fieldValue),
         sqlOperator: widgetFilter.sqlOperator,
         values: values,
       };
@@ -300,6 +305,7 @@ export const getChartWidgetRequestParams = (params: {
       requestParams.filters = filters.concat(linkFilters);
     }
   }
+  // 变量
   if (variables) {
     requestParams.params = variables;
   }
