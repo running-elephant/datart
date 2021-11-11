@@ -24,6 +24,6 @@ describe('<D3USMapChart />', () => {
     component = new D3USMapChart();
   });
   test('It should mount', () => {
-    expect(component.id).not.toBeNull();
+    expect(component).toBeDatartChartModel();
   });
 });

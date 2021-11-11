@@ -18,6 +18,8 @@
 
 package datart.data.provider.jdbc;
 
+import com.google.common.collect.Iterables;
+import datart.core.base.consts.ValueType;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.QueryScript;
 import datart.core.data.provider.ScriptVariable;
@@ -117,6 +119,17 @@ public class SqlScriptRender extends ScriptRender {
                             } else return variable.getValues();
                         }));
         script = FreemarkerContext.process(queryScript.getScript(), dataMap);
+
+        // 替换脚本中的表达式类型变量
+        for (ScriptVariable variable : queryScript.getVariables()) {
+            if (ValueType.FRAGMENT.equals(variable.getValueType())) {
+                int size = Iterables.size(variable.getValues());
+                if (size != 1) {
+                    throw new RuntimeException("size of expression type variable values must be one .got " + size);
+                }
+                script = script.replace(getVariablePattern(variable.getName()), Iterables.get(variable.getValues(), 0));
+            }
+        }
 
         // find select sql
         String selectSql0 = findSelectSql(script);

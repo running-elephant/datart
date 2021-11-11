@@ -20,8 +20,10 @@ package datart.core.data.provider;
 
 import datart.core.base.PageInfo;
 import datart.core.data.provider.sql.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
@@ -29,6 +31,8 @@ import java.util.Set;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ExecuteParam implements Serializable {
 
     private List<SelectKeyword> keywords;

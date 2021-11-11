@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import FenZuTableChart from '../FenZuTableChart';
 
 describe('<FenZuTableChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<FenZuTableChart />);
+    component = new FenZuTableChart();
   });
   test('it should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

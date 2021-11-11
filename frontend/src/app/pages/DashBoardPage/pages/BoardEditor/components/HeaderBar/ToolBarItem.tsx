@@ -35,7 +35,7 @@ import { BOARD_UNDO } from 'app/pages/DashBoardPage/constants';
 import {
   BoardType,
   LightWidgetType,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import {
   createContainerWidget,
   createMediaWidget,

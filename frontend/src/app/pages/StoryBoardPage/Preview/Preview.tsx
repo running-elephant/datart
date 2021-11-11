@@ -206,6 +206,7 @@ export const StoryPagePreview: React.FC<{
                     key={page.id}
                     page={page}
                     showZoomCtrl={true}
+                    renderMode="read"
                   />
                 </PreviewPage>
               ))}

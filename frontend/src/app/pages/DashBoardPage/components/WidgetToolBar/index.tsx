@@ -29,7 +29,7 @@ import { BoardContext } from '../../contexts/BoardContext';
 import { WidgetContext } from '../../contexts/WidgetContext';
 import { WidgetInfoContext } from '../../contexts/WidgetInfoContext';
 import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
-import { WidgetType } from '../../slice/types';
+import { WidgetType } from '../../pages/Dashboard/slice/types';
 import { WidgetActionDropdown } from './WidgetActionDropdown';
 
 interface WidgetToolBarProps {

@@ -27,7 +27,7 @@ import {
   ServerDatachart,
   ServerView,
   Widget,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 // import { dataChartServerModel } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transformMeta } from 'app/utils/chart';
 import {

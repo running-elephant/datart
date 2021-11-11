@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import StackBarChart from '../StackBarChart';
 
 describe('<StackBarChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<StackBarChart />);
+    component = new StackBarChart();
   });
   test('It should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

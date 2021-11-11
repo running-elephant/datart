@@ -226,7 +226,11 @@ export const StoryEditor: React.FC<{
               <div id={domId} className="reveal">
                 <div className="slides">
                   {sortedPages.map((page, index) => (
-                    <StoryPageItem key={page.id} page={page} />
+                    <StoryPageItem
+                      key={page.id}
+                      page={page}
+                      renderMode="read"
+                    />
                   ))}
                 </div>
               </div>

@@ -15,13 +15,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Asynchronously loads the component for NotFoundPage
- */
 
-import { defaultLazyLoad } from 'utils/loadable';
+import { expect } from '@jest/globals';
 
-export const LazyChartWorkbenchPage = defaultLazyLoad(
-  () => import('./index'),
-  module => module.default,
-);
+const isChartModelImpl = chart => {
+  return (
+    !!chart &&
+    !!chart.meta &&
+    !!chart.onMount &&
+    !!chart.onUpdated &&
+    !!chart.onResize &&
+    !!chart.onUnMount
+  );
+};
+
+expect.extend({
+  toBeDatartChartModel(received) {
+    if (isChartModelImpl(received)) {
+      return {
+        message: () => `expected ${received} to be Datart Chart Model`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () => `expected ${received} not to be Datart Chart Model`,
+        pass: false,
+      };
+    }
+  },
+});

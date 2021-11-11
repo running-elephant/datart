@@ -27,9 +27,9 @@ import persistence from 'utils/persistence';
 import { v4 as uuidv4 } from 'uuid';
 import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
 import { useEditBoardSlice } from '../DashBoardPage/pages/BoardEditor/slice';
-import { useBoardSlice } from '../DashBoardPage/slice';
-import { selectShareBoard } from '../DashBoardPage/slice/selector';
-import { VizRenderMode } from '../DashBoardPage/slice/types';
+import { useBoardSlice } from '../DashBoardPage/pages/Dashboard/slice';
+import { selectShareBoard } from '../DashBoardPage/pages/Dashboard/slice/selector';
+import { VizRenderMode } from '../DashBoardPage/pages/Dashboard/slice/types';
 import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
 import { urlSearchTransfer } from '../MainPage/pages/VizPage/utils';
 import { useStoryBoardSlice } from '../StoryBoardPage/slice';
@@ -191,41 +191,33 @@ export function SharePage() {
           fetchShareVizInfoImpl(shareToken, sharePassword);
         }}
       />
-      {!Boolean(needPassword) && (
-        <>
-          {/* dataChart */}
-          {vizType === 'DATACHART' &&
-            chartPreview &&
-            chartPreview?.backendChart && (
-              <DownloadTaskContainer
-                onLoadTasks={onLoadShareTask}
-                onDownloadFile={onDownloadFile}
-              >
-                <ChartPreviewBoardForShare
-                  chartPreview={chartPreview}
-                  onCreateDataChartDownloadTask={onMakeShareDownloadDataTask}
-                />
-              </DownloadTaskContainer>
-            )}
-
-          {/* dashboard */}
-          {vizType === 'DASHBOARD' && shareBoard && (
-            <BoardForShare
-              dashboard={shareBoard}
-              allowDownload={true}
-              onMakeShareDownloadDataTask={onMakeShareDownloadDataTask}
-              renderMode={renderMode} //   TODO and task
-              filterSearchUrl={''}
-              onLoadShareTask={onLoadShareTask}
-              onDownloadFile={onDownloadFile}
+      {!Boolean(needPassword) &&
+        vizType === 'DATACHART' &&
+        chartPreview &&
+        chartPreview?.backendChart && (
+          <DownloadTaskContainer
+            onLoadTasks={onLoadShareTask}
+            onDownloadFile={onDownloadFile}
+          >
+            <ChartPreviewBoardForShare
+              chartPreview={chartPreview}
+              onCreateDataChartDownloadTask={onMakeShareDownloadDataTask}
             />
-          )}
-
-          {/* story */}
-          {vizType === 'STORYBOARD' && shareStory && (
-            <StoryPlayerForShare storyBoard={shareStory} />
-          )}
-        </>
+          </DownloadTaskContainer>
+        )}
+      {!Boolean(needPassword) && vizType === 'DASHBOARD' && shareBoard && (
+        <BoardForShare
+          dashboard={shareBoard}
+          allowDownload={true}
+          onMakeShareDownloadDataTask={onMakeShareDownloadDataTask}
+          renderMode={renderMode}
+          filterSearchUrl={''}
+          onLoadShareTask={onLoadShareTask}
+          onDownloadFile={onDownloadFile}
+        />
+      )}
+      {!Boolean(needPassword) && vizType === 'STORYBOARD' && shareStory && (
+        <StoryPlayerForShare storyBoard={shareStory} />
       )}
     </div>
   );

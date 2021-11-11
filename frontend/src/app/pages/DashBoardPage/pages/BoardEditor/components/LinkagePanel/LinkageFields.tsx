@@ -21,7 +21,7 @@ import { ChartDataSectionField } from 'app/pages/ChartWorkbenchPage/models/Chart
 import ChartDataView, {
   ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-import { Widget } from 'app/pages/DashBoardPage/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { PRIMARY } from 'styles/StyleConstants';

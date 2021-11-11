@@ -26,7 +26,7 @@ import {
   FilterOperatorType,
   OPERATOR_TYPE_OPTION,
 } from 'app/pages/DashBoardPage/constants';
-import { RelatedView } from 'app/pages/DashBoardPage/slice/types';
+import { RelatedView } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';

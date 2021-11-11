@@ -65,6 +65,7 @@ export const VizContainer = memo(
             allowShare={allowShare}
             showZoomCtrl={true}
             allowManage={allowManage}
+            renderMode="read"
           />
         );
         break;

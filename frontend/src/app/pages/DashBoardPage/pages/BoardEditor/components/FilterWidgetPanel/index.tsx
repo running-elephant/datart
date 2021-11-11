@@ -23,13 +23,13 @@ import {
   ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import { selectViewMap } from 'app/pages/DashBoardPage/slice/selector';
+import { selectViewMap } from 'app/pages/DashBoardPage/pages/Dashboard/slice/selector';
 import {
   FilterWidgetContent,
   RelatedView,
   Relation,
   WidgetFilterTypes,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import {
   convertToWidgetMap,
   createFilterWidget,

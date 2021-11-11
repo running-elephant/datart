@@ -2,7 +2,7 @@ import ChartConfig, {
   ChartDataSectionType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-import { WidgetTypeMap } from 'app/pages/DashBoardPage/slice/types';
+import { WidgetTypeMap } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { VizType } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { getColumnRenderName } from 'app/utils/chart';
 import { request } from 'utils/request';

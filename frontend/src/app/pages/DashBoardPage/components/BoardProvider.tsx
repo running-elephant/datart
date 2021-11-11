@@ -21,8 +21,8 @@ import React, { FC, memo, useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { BoardContext, BoardContextProps } from '../contexts/BoardContext';
 import { renderedEditWidgetAsync } from '../pages/BoardEditor/slice/thunk';
-import { renderedWidgetAsync } from '../slice/thunk';
-import { Dashboard, VizRenderMode } from '../slice/types';
+import { renderedWidgetAsync } from '../pages/Dashboard/slice/thunk';
+import { Dashboard, VizRenderMode } from '../pages/Dashboard/slice/types';
 import { adaptBoardImageUrl } from '../utils';
 import { BoardActionProvider } from './BoardActionProvider';
 import { BoardConfigProvider } from './BoardConfigProvider';
@@ -30,7 +30,7 @@ import { BoardInfoProvider } from './BoardInfoProvider';
 
 export const BoardProvider: FC<{
   board: Dashboard;
-  renderMode?: VizRenderMode;
+  renderMode: VizRenderMode;
   editing: boolean;
   autoFit?: boolean;
   allowDownload?: boolean;
@@ -41,7 +41,7 @@ export const BoardProvider: FC<{
     board,
     editing,
     children,
-    renderMode = 'read',
+    renderMode,
     autoFit,
     allowDownload,
     allowShare,

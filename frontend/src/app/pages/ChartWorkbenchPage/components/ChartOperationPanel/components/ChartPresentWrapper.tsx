@@ -17,7 +17,7 @@ const ChartPresentWrapper: FC<{
 }> = ({ chart, dataView, dataset, chartConfig, onChartChange }) => {
   return (
     <Wrapper>
-      <ChartGraphPanel chart={chart} onChartChange={onChartChange} />
+      <ChartGraphPanel chart={chart} chartConfig={chartConfig} onChartChange={onChartChange} />
       <ChartPresentPanel
         chart={chart}
         dataView={dataView}

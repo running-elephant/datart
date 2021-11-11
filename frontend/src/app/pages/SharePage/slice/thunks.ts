@@ -17,11 +17,11 @@
  */
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
-import { handleServerBoardAction } from 'app/pages/DashBoardPage/slice/asyncActions';
+import { handleServerBoardAction } from 'app/pages/DashBoardPage/pages/Dashboard/slice/asyncActions';
 import {
   ServerDashboard,
   VizRenderMode,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import {
   ChartPreview,
   FilterSearchParams,
@@ -66,13 +66,13 @@ export const fetchShareVizInfo = createAsyncThunk(
       errorHandle(error);
       throw error;
     }
-
+    await thunkAPI.dispatch(shareActions.setVizType(data.vizType));
     persistence.session.save(shareToken, sharePassword);
     await thunkAPI.dispatch(shareActions.saveNeedPassword(false));
     await thunkAPI.dispatch(
       shareActions.saveShareInfo({ token: shareToken, pwd: sharePassword }),
     );
-    await thunkAPI.dispatch(shareActions.setVizType(data.vizType));
+
     await thunkAPI.dispatch(
       shareActions.setExecuteTokenMap({
         executeToken: data.executeToken,

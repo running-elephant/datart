@@ -19,7 +19,7 @@ import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetName/Widget
 import { RGL_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
-import { Widget, WidgetInfo } from 'app/pages/DashBoardPage/slice/types';
+import { Widget, WidgetInfo } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
 import React, { memo, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';

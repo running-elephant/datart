@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import LifeExpectancyChart from '../LifeExpectancyChart';
 
 describe('<LifeExpectancyChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<LifeExpectancyChart />);
+    component = new LifeExpectancyChart();
   });
   test('it should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

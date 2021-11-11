@@ -24,6 +24,6 @@ describe('<AntVF2Chart />', () => {
     component = new AntVF2Chart();
   });
   test('It should mount', () => {
-    expect(component.id).not.toBeNull();
+    expect(component).toBeDatartChartModel();
   });
 });

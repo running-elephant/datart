@@ -24,7 +24,7 @@ import {
   Widget,
   WidgetData,
   WidgetInfo,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import {
   getAllFilterWidget,
   getAllFixedFilterWidgetSortedIds,

@@ -24,6 +24,6 @@ describe('<BasicTableChart />', () => {
     component = new BasicTableChart();
   });
   test('It should mount', () => {
-    expect(component.id).not.toBeNull();
+    expect(component).toBeDatartChartModel();
   });
 });

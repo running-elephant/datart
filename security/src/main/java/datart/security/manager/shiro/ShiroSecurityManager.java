@@ -74,7 +74,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
             throw new AuthException(messageResolver.getMessage("User not exists"));
         }
         if (!user.getActive()) {
-            throw new AuthException("User not activated");
+            throw new RuntimeException("User not activated");
         }
         Subject subject = SecurityUtils.getSubject();
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(token.getSubject(), token.getPassword());

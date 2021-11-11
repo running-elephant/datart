@@ -24,6 +24,6 @@ describe('<ReChartsChart />', () => {
     component = new ReChartsChart();
   });
   test('It should mount', () => {
-    expect(component.id).not.toBeNull();
+    expect(component).toBeDatartChartModel();
   });
 });

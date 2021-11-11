@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import ScatterOutlineMapChart from '../ScatterOutlineMapChart';
 
 describe('<ScatterOutlineMapChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<ScatterOutlineMapChart />);
+    component = new ScatterOutlineMapChart();
   });
   test('It should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

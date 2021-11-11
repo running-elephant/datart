@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package datart.server.config;
+package datart.core.common;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -34,6 +34,4 @@ public class JacksonSerializer {
             gen.writeString(value.toString());
         }
     }
-
-
 }

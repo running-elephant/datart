@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ChartEditorProps } from 'app/components/ChartEditor';
 import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { ChartDatasetMeta } from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
 import ChartDataView, {
@@ -24,16 +25,15 @@ import ChartDataView, {
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
+import { ChartDataSectionField } from '../../../../ChartWorkbenchPage/models/ChartConfig';
+import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import {
   BorderStyleType,
   LAYOUT_COLS,
   ScaleModeType,
   TextAlignType,
-} from '../constants';
-import { ChartEditorProps } from '../pages/BoardEditor/components/ChartEditor';
-import { WidgetFilterFormType } from '../pages/BoardEditor/components/FilterWidgetPanel/types';
-import { ChartDataSectionField } from './../../ChartWorkbenchPage/models/ChartConfig';
-import { PageInfo } from './../../MainPage/pages/ViewPage/slice/types';
+} from '../../../constants';
+import { WidgetFilterFormType } from '../../BoardEditor/components/FilterWidgetPanel/types';
 
 export const strEnumType = <T extends string>(o: Array<T>): { [K in T]: K } => {
   return o.reduce((res, key) => {

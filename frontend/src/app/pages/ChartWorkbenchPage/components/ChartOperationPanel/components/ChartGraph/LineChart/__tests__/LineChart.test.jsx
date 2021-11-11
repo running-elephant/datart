@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import LineChart from '../LineChart';
 
 describe('<LineChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<LineChart />);
+    component = new LineChart();
   });
   test('It should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

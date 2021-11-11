@@ -151,13 +151,7 @@ export const StoryPlayer: React.FC<{ storyId: string }> = memo(
       const { relId, relType } = curPage;
       dispatch(getPageContentDetail({ relId, relType }));
     }, [currentPageIndex, dispatch, sortedPages, pageMap]);
-    useEffect(() => {
-      setTimeout(() => {
-        // if (revealRef.current) {
-        //   fullRef.current?.requestFullscreen();
-        // }
-      }, 0);
-    }, []);
+
     return (
       <DndProvider backend={HTML5Backend}>
         <Wrapper ref={fullRef}>
@@ -165,7 +159,12 @@ export const StoryPlayer: React.FC<{ storyId: string }> = memo(
             <div id={domId} className="reveal">
               <div className="slides">
                 {sortedPages.map((page, index) => (
-                  <StoryPageItem key={page.id} page={page} autoFit={false} />
+                  <StoryPageItem
+                    key={page.id}
+                    page={page}
+                    autoFit={false}
+                    renderMode="read"
+                  />
                 ))}
               </div>
             </div>

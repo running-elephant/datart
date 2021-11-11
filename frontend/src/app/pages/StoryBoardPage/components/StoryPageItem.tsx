@@ -16,16 +16,15 @@
  * limitations under the License.
  */
 import Dashboard from 'app/pages/DashBoardPage/pages/Dashboard';
-import { VizRenderMode } from 'app/pages/DashBoardPage/slice/types';
+import { VizRenderMode } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import React, { useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { StoryPage } from '../slice/types';
-
 const StoryPageItem: React.FC<{
   page: StoryPage;
   autoFit?: boolean;
   showZoomCtrl?: boolean;
-  renderMode?: VizRenderMode;
+  renderMode: VizRenderMode;
 }> = ({ page, autoFit, showZoomCtrl, renderMode }) => {
   const { relId, relType } = page;
 
@@ -52,7 +51,6 @@ const StoryPageItem: React.FC<{
       className="story-page"
       data-transition={`${effectIn}${' '}${effectOut}`}
       data-transition-speed={speed}
-      // data-background-color={}
     >
       {SlideContent}
     </SectionWrap>
