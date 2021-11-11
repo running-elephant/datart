@@ -156,7 +156,7 @@ export const WidgetSetting: FC = memo(() => {
               <BorderSet border={config.border} />
             </Group>
           </Panel>
-          <Panel header="自动刷新" key="autUpdate" forceRender>
+          <Panel header="定时同步数据" key="autUpdate" forceRender>
             <Group>
               <AutoUpdateSet />
             </Group>
