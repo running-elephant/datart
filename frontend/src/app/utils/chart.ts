@@ -21,6 +21,7 @@ import ChartConfig, {
   ChartDataSectionType,
   ChartI18NSectionConfig,
   ChartStyleSectionConfig,
+  IFieldFormatConfig,
   SortActionType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { ChartDatasetMeta } from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
@@ -688,6 +689,12 @@ export function getScatterSymbolSizeFn(
 export function getExtraSeriesRowData(data) {
   return {
     rowData: data,
+  };
+}
+
+export function getExtraSeriesDataFormat(format?: IFieldFormatConfig) {
+  return {
+    format,
   };
 }
 
