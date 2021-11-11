@@ -30,6 +30,7 @@ import {
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getCustomSortableColumns,
+  getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getNameTextStyle,
   getReference,
@@ -188,6 +189,7 @@ class BasicLineChart extends Chart {
           stack: this.isStack ? 'total' : undefined,
           data: dataColumns.map(dc => ({
             ...getExtraSeriesRowData(dc),
+            ...getExtraSeriesDataFormat(aggConfig?.format),
             name: getColumnRenderName(aggConfig),
             value: dc[getValueByColumnKey(aggConfig)],
           })),
@@ -236,6 +238,7 @@ class BasicLineChart extends Chart {
             const target = v.find(col => col[xAxisColumnName] === d);
             return {
               ...getExtraSeriesRowData(target),
+              ...getExtraSeriesDataFormat(aggConfig?.format),
               name: getColumnRenderName(aggConfig),
               value: target?.[getValueByColumnKey(aggConfig)] || 0,
             };
@@ -398,10 +401,10 @@ class BasicLineChart extends Chart {
         position,
         ...font,
         formatter: params => {
-          const { name, value, data } = params;
+          const { value, data } = params;
           const formattedValue = toFormattedValue(value, data.format);
           const labels: string[] = [];
-          labels.push(`${name}: ${formattedValue}`);
+          labels.push(formattedValue);
           return labels.join('\n');
         },
       },
