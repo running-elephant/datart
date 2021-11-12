@@ -76,6 +76,7 @@ class BasicPieChart extends Chart {
       this.chart?.clear();
       return;
     }
+    console.log(`props.config ---> `, props.config);
     const newOptions = this.getOptions(props.dataset, props.config);
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }

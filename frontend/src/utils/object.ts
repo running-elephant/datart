@@ -152,7 +152,7 @@ export function mergeDefaultToValue(
     }
     // const newRows = initChartConfigValueByDefaultValue(c.rows);
     // update(c, 'rows', newRows);
-    if (!c?.rows?.length) {
+    if (!!c?.rows?.length) {
       c.rows = mergeDefaultToValue(c.rows);
     }
     return c;
