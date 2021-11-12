@@ -30,6 +30,7 @@ export const i18n = i18next
   // init i18next
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
+    lng: 'zh',
     resources: translationsJson,
     fallbackLng: 'en',
     debug:

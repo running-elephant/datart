@@ -66,7 +66,7 @@ const ChartGraphPanel: FC<{
             <li key={type + index}>
               {Number.isInteger(limit)
                 ? t('onlyAllow', undefined, {
-                    type: t('section.legend'),
+                    type: t(type),
                     num: getMaxValueStr(limit),
                   })
                 : Array.isArray(limit) && limit.length === 2

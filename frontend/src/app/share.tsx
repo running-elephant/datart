@@ -22,15 +22,10 @@ import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter } from 'react-router-dom';
 import { GlobalStyle, OverriddenStyle } from 'styles/globalStyles';
-import useMount from './hooks/useMount';
 import { LazySharePage } from './pages/SharePage/Loadable';
 registerTheme('default', echartsDefaultTheme);
 export function Share() {
   const { i18n } = useTranslation();
-
-  useMount(() => {
-    i18n.changeLanguage('zh');
-  });
 
   return (
     <BrowserRouter>
