@@ -152,7 +152,9 @@ export function mergeDefaultToValue(
     }
     // const newRows = initChartConfigValueByDefaultValue(c.rows);
     // update(c, 'rows', newRows);
-    c.rows = mergeDefaultToValue(c.rows);
+    if (!c?.rows?.length) {
+      c.rows = mergeDefaultToValue(c.rows);
+    }
     return c;
   });
 }
