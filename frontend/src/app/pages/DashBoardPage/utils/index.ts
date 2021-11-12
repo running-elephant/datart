@@ -6,6 +6,7 @@ import {
   ChartDataRequestBuilder,
   transformToViewConfig,
 } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
+import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
 import { convertRelativeTimeRange, getTime } from 'app/utils/time';
 import { FilterSqlOperator } from 'globalConstants';
 import { errorHandle } from 'utils/utils';
@@ -85,10 +86,12 @@ export const getChartGroupColumns = dataChart => {
   const groupColumns = builder.buildGroupColumns();
   return groupColumns;
 };
-export const getAllFiltersOfOneWidget = (
-  chartWidget: Widget,
-  widgetMap: Record<string, Widget>,
-) => {
+export const getAllFiltersOfOneWidget = (values: {
+  chartWidget: Widget;
+  widgetMap: Record<string, Widget>;
+  params: Record<string, string[]> | undefined;
+}) => {
+  const { chartWidget, widgetMap, params } = values;
   const filterWidgets = Object.values(widgetMap).filter(
     widget => widget.config.type === 'filter',
   );
@@ -119,7 +122,21 @@ export const getAllFiltersOfOneWidget = (
       ChartDataViewFieldCategory.Variable
     ) {
       const key = String(relatedViewItem.fieldValue);
-      variables[key] = values.map(item => String(item.value));
+      const curValues = values.map(item => String(item.value));
+      // 表达式类型是替换逻辑
+      if (fieldValueType === VariableValueTypes.Expression) {
+        variables[key] = curValues;
+      } else {
+        // 其他类型是叠加的逻辑 concat
+        if (key in variables) {
+          variables[key] = variables[key].concat(curValues);
+        } else {
+          variables[key] = curValues;
+        }
+        if (params && key in params) {
+          variables[key] = variables[key].concat(params[key]);
+        }
+      }
     }
     if (
       relatedViewItem.filterFieldCategory === ChartDataViewFieldCategory.Field
@@ -273,10 +290,12 @@ export const getChartWidgetRequestParams = (params: {
   let requestParams = builder.build();
   const viewConfig = transformToViewConfig(chartDataView?.config);
   requestParams = { ...requestParams, ...viewConfig };
-  const { filters, covered, variables } = getAllFiltersOfOneWidget(
-    curWidget,
-    widgetMap,
-  );
+
+  const { filters, covered, variables } = getAllFiltersOfOneWidget({
+    chartWidget: curWidget,
+    widgetMap: widgetMap,
+    params: requestParams.params,
+  });
   // 全局过滤 filter
   requestParams.filters = filters.concat(covered ? [] : requestParams.filters);
   // 联动 过滤
