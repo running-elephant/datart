@@ -319,7 +319,7 @@
       },
       "graph": {
         "group": "维度",
-        "aggregate": "度量",
+        "aggregate": "指标",
         "onlyAllow": "{{type}} 仅允许数量为 {{num}}",
         "allowRange": "{{type}} 允许范围为 {{start}} 到 {{end}}"
       }
