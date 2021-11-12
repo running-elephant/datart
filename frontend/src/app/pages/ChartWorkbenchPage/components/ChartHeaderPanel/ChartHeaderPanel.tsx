@@ -19,9 +19,7 @@
 import { LeftOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { changeLang } from 'locales/i18n';
 import { FC, memo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
@@ -32,10 +30,6 @@ import {
   SPACE_TIMES,
   SPACE_XS,
 } from 'styles/StyleConstants';
-import workbenchSlice, {
-  dateFormatSelector,
-  languageSelector,
-} from '../../slice/workbenchSlice';
 
 const ChartHeaderPanel: FC<{
   chartName?: string;
@@ -43,23 +37,12 @@ const ChartHeaderPanel: FC<{
   onGoBack?: () => void;
 }> = memo(({ chartName, onSaveChart, onGoBack }) => {
   const t = useI18NPrefix(`viz.workbench.header`);
-  const dispatch = useDispatch();
-  const language = useSelector(languageSelector);
-  const dateFormat = useSelector(dateFormatSelector);
-
-  const handleLocaleChange = locale => {
-    changeLang(locale);
-    dispatch(workbenchSlice.actions.changeLangugage(locale));
-  };
-
-  const handleFormatChange = format =>
-    dispatch(workbenchSlice.actions.changeDateFormat(format));
 
   return (
     <Wrapper>
       {onGoBack && (
         <GoBack>
-          <LeftOutlined className="goback" onClick={onGoBack} />
+          <LeftOutlined onClick={onGoBack} />
         </GoBack>
       )}
       <h1>{chartName}</h1>
