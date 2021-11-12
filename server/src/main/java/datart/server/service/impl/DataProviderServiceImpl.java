@@ -171,6 +171,11 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
         List<ScriptVariable> variables = getOrgVariables(source.getOrgId());
         if (!CollectionUtils.isEmpty(testExecuteParam.getVariables())) {
+            for (ScriptVariable variable : testExecuteParam.getVariables()) {
+                if (variable.isExpression()) {
+                    variable.setValueType(ValueType.FRAGMENT);
+                }
+            }
             variables.addAll(testExecuteParam.getVariables());
         }
         if (securityManager.isOrgOwner(source.getOrgId())) {
@@ -307,12 +312,17 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         variables.addAll(getOrgVariables(view.getOrgId()));
         // view自定义变量
         variables.addAll(getViewVariables(view.getId()));
-        // 用执行参数替换查询变量
         variables.stream()
                 .filter(v -> v.getType().equals(VariableTypeEnum.QUERY))
                 .forEach(v -> {
+                    //通过参数传值，进行参数替换
                     if (!CollectionUtils.isEmpty(param.getParams()) && param.getParams().containsKey(v.getName())) {
                         v.setValues(param.getParams().get(v.getName()));
+                    } else {
+                        //没有参数传值，如果是表达式类型作为默认值，在没有给定值的情况下，改变变量类型为表达式
+                        if (v.isExpression()) {
+                            v.setValueType(ValueType.FRAGMENT);
+                        }
                     }
                 });
         return variables;

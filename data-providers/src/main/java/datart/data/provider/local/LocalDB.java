@@ -35,6 +35,7 @@ import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.sql.*;
@@ -70,6 +71,15 @@ public class LocalDB {
     }
 
 
+    /**
+     * 对给定的数据进行本地聚合：将原始数据插入到H2数据库，然后在H2数据库上执行SQL进行数据查询
+     *
+     * @param queryScript  查询脚本
+     * @param executeParam 执行参数
+     * @param persistent   原始数据是持久化
+     * @param srcData      原始数据
+     * @return 查询脚本+执行参数 执行后结果
+     */
     public static Dataframe executeLocalQuery(QueryScript queryScript, ExecuteParam executeParam, boolean persistent, List<Dataframe> srcData) throws Exception {
         String sql;
         if (queryScript == null) {
@@ -95,16 +105,12 @@ public class LocalDB {
      *
      * @param queryId      查询条件的MD5摘要
      * @param executeParam 查询参数
-     * @param persistent   是否持久化传入的数据
      * @param srcData      给定的格式化数据
      * @return 根据查询参数进行二次查询后的数据
-     * @throws SQLException 本地查询异常
      */
-    public static Dataframe queryFromLocal(String queryId, ExecuteParam executeParam, boolean persistent, List<Dataframe> srcData) throws Exception {
-        try (Connection connection = getConnection(persistent)) {
-            for (Dataframe dataframe : srcData) {
-                insertTableData(dataframe, connection);
-            }
+    public static Dataframe queryFromLocal(String queryId, ExecuteParam executeParam, Dataframe srcData) throws Exception {
+        try (Connection connection = getConnection(false)) {
+            insertTableData(srcData, connection);
             return queryFromLocal(queryId, executeParam, connection);
         }
     }
@@ -128,7 +134,7 @@ public class LocalDB {
         return dataframe;
     }
 
-    public static Dataframe queryFromLocal(String queryId, ExecuteParam executeParam, boolean persistent) {
+    public static Dataframe executeLocalQuery(String queryId, ExecuteParam executeParam, boolean persistent) {
         try (Connection connection = getConnection(persistent)) {
             String sql = localQuerySql(queryId, executeParam);
 
@@ -140,8 +146,8 @@ public class LocalDB {
         }
     }
 
-    public static Dataframe queryFromLocal(String queryId, ExecuteParam executeParam) {
-        return queryFromLocal(queryId, executeParam, true);
+    public static Dataframe executeLocalQuery(String queryId, ExecuteParam executeParam) {
+        return executeLocalQuery(queryId, executeParam, true);
     }
 
     private static void createTable(String tableName, List<Column> columns, Connection connection) throws SQLException {
@@ -190,7 +196,7 @@ public class LocalDB {
             StringJoiner stringJoiner = new StringJoiner(",", "(", ")");
             for (int i = 0; i < row.size(); i++) {
                 Object val = row.get(i);
-                if (val == null) {
+                if (val == null || StringUtils.isBlank(val.toString())) {
                     stringJoiner.add(null);
                     continue;
                 }

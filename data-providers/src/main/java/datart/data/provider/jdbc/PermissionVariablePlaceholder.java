@@ -48,7 +48,7 @@ public class PermissionVariablePlaceholder extends VariablePlaceholder {
         }
 
         if (variable.getValues().size() == 1) {
-            replaceOperandWithVariable();
+            replaceVariable(sqlCall);
             return new ReplacementPair(originalSqlFragment, sqlCall.toSqlString(sqlDialect).getSql());
         }
 

@@ -278,7 +278,7 @@ const workbenchSlice = createSlice({
     saveBackendChartId: (state, action: PayloadAction<string>) => {
       state.backendChartId = action.payload;
     },
-    changeLangugage: (state, action: PayloadAction<string>) => {
+    changeLanguage: (state, action: PayloadAction<string>) => {
       state.lang = action.payload;
     },
     changeDateFormat: (state, action: PayloadAction<string>) => {
@@ -385,6 +385,7 @@ const workbenchSlice = createSlice({
         if (!payload) {
           return;
         }
+
         const backendChartConfig =
           typeof payload.config === 'string'
             ? JSON.parse(payload.config)
@@ -396,10 +397,11 @@ const workbenchSlice = createSlice({
         const currentChart = ChartManager.instance().getById(
           backendChartConfig?.chartGraphId,
         );
+
         if (!!payload) {
           state.currentDataView = {
             ...payload.view,
-            meta: transformMeta(payload?.view?.model),
+            meta: payload.view.meta || transformMeta(payload?.view?.model),
             computedFields: backendChartConfig?.computedFields || [],
           };
         }
