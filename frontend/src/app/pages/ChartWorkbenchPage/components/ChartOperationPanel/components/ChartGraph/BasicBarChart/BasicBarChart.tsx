@@ -251,7 +251,7 @@ class BasicBarChart extends Chart {
             sgCol,
           ),
           name: k,
-          data: xAxisColumns[0].data.map(d => {
+          data: xAxisColumns?.[0].data?.map(d => {
             const dc = v.find(col => col[xAxisColumnName] === d);
             return {
               ...getExtraSeriesRowData(dc),
