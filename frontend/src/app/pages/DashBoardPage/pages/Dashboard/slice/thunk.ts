@@ -172,10 +172,7 @@ export const getWidgetDataAsync = createAsyncThunk<
   { state: RootState }
 >(
   'board/getWidgetDataAsync',
-  async (
-    { boardId, widgetId, renderMode, option },
-    { getState, dispatch, rejectWithValue },
-  ) => {
+  async ({ boardId, widgetId, renderMode, option }, { getState, dispatch }) => {
     const boardState = getState() as { board: BoardState };
     const curWidget = boardState.board.widgetRecord?.[boardId]?.[widgetId];
     if (!curWidget) return null;
@@ -229,10 +226,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
   { state: RootState }
 >(
   'board/getChartWidgetDataAsync',
-  async (
-    { boardId, widgetId, renderMode, option },
-    { getState, dispatch, rejectWithValue },
-  ) => {
+  async ({ boardId, widgetId, renderMode, option }, { getState, dispatch }) => {
     const boardState = getState() as { board: BoardState };
 
     const widgetMapMap = boardState.board.widgetRecord;

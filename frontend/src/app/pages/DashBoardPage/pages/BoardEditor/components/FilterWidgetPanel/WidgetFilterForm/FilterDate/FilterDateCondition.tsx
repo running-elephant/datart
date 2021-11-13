@@ -28,9 +28,8 @@ import {
   OPERATOR_TYPE_OPTION,
 } from 'app/pages/DashBoardPage/constants';
 import { FilterSqlOperator } from 'globalConstants';
-import { FC, memo, useCallback, useEffect } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
-import { WidgetFilterFormType } from '../../types';
 import CommonTimeSetter from './CommonTimeSetter';
 import CustomTimeSetter from './CustomTimeSetter';
 
@@ -38,19 +37,27 @@ const FilterDateCondition: FC<{
   form: FormInstance<any> | undefined;
   fieldCategory: ChartDataViewFieldCategory;
   fieldValueType: ChartDataViewFieldType;
-}> = memo(({ form, fieldValueType }) => {
+}> = memo(({ form, fieldValueType, fieldCategory }) => {
   const t = useI18NPrefix('viz.common.filter.date');
+  const hasVariable = useMemo(() => {
+    return fieldCategory === ChartDataViewFieldCategory.Variable;
+  }, [fieldCategory]);
   useEffect(() => {
-    const widgetFilter: WidgetFilterFormType =
-      form?.getFieldValue('widgetFilter');
+    // const fieldCategory
+    const widgetFilter = form?.getFieldValue('widgetFilter');
+    const nextWidgetFilter = {
+      ...widgetFilter,
+      sqlOperator: hasVariable
+        ? FilterSqlOperator.In
+        : FilterSqlOperator.Between,
+      filterFacade: hasVariable
+        ? ControllerFacadeTypes.Time
+        : ControllerFacadeTypes.RangeTime,
+    };
     form?.setFieldsValue({
-      widgetFilter: {
-        ...widgetFilter,
-        sqlOperator: FilterSqlOperator.Between,
-        filterFacade: ControllerFacadeTypes.RangeTime,
-      } as WidgetFilterFormType,
+      widgetFilter: nextWidgetFilter,
     });
-  }, [form]);
+  }, [form, hasVariable]);
 
   const getCurType = useCallback(() => {
     const operatorType: FilterOperatorType = form?.getFieldValue([
@@ -96,12 +103,27 @@ const FilterDateCondition: FC<{
             )}
             {getCurType() === 'custom' && (
               <WrapCustom>
-                <div className="custom-time">
-                  <CustomTimeSetter form={form} startOrEnd={'startTime'} />
-                </div>
-                <div className="custom-time">
-                  <CustomTimeSetter form={form} startOrEnd={'endTime'} />
-                </div>
+                {hasVariable && (
+                  <>
+                    <div className="custom-time">
+                      <CustomTimeSetter
+                        hasVariable={hasVariable}
+                        form={form}
+                        startOrEnd={'startTime'}
+                      />
+                    </div>
+                  </>
+                )}
+                {!hasVariable && (
+                  <>
+                    <div className="custom-time">
+                      <CustomTimeSetter form={form} startOrEnd={'startTime'} />
+                    </div>
+                    <div className="custom-time">
+                      <CustomTimeSetter form={form} startOrEnd={'endTime'} />
+                    </div>
+                  </>
+                )}
               </WrapCustom>
             )}
           </>

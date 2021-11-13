@@ -20,13 +20,20 @@ import { DatePicker, Form, FormInstance, InputNumber, Select } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { RelativeOrExactTime } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
 import { TIME_DIRECTION, TIME_UNIT_OPTIONS } from 'globalConstants';
-import { FC, memo, useCallback } from 'react';
+import { FC, memo, useCallback, useMemo } from 'react';
 
 export const CustomTimeSetter: FC<{
   form: FormInstance<any> | undefined;
+  hasVariable?: boolean;
   startOrEnd: 'startTime' | 'endTime';
-}> = memo(({ form, startOrEnd }) => {
+}> = memo(({ form, startOrEnd, hasVariable }) => {
   const t = useI18NPrefix('viz.common.filter.date');
+  const renderText = useMemo(() => {
+    if (hasVariable) {
+      return '';
+    }
+    return startOrEnd === 'startTime' ? ' 开始时间 : ' : ' 结束时间 : ';
+  }, [hasVariable, startOrEnd]);
   const isRelativeTime = useCallback(
     startOrEnd => {
       const timeType: RelativeOrExactTime = form?.getFieldValue([
@@ -59,7 +66,7 @@ export const CustomTimeSetter: FC<{
       >
         <Select style={{ width: '80px' }}>{relativeOrExactOptions()}</Select>
       </Form.Item>
-      {startOrEnd === 'startTime' ? ' 开始时间 : ' : ' 结束时间 : '}
+      {renderText}
       <Form.Item noStyle shouldUpdate>
         {() => {
           return !isRelativeTime(startOrEnd) ? (

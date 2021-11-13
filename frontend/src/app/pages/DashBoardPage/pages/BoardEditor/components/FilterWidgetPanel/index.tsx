@@ -98,7 +98,6 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const [fieldCategory, setFieldCategory] =
     useState<ChartDataViewFieldCategory>(ChartDataViewFieldCategory.Field);
 
-  
   let widgetList = useRef<WidgetOption[]>([]);
 
   const onChangeFieldProps = useCallback(

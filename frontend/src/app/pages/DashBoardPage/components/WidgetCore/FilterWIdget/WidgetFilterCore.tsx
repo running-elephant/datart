@@ -46,6 +46,7 @@ import FilterRangTime from './FilterControler/FilterRangeTime';
 import { FilterSelect } from './FilterControler/FilterSelect';
 import { FilterSlider } from './FilterControler/FilterSlider';
 import { FilterText } from './FilterControler/FilterText';
+import FilterTime from './FilterControler/FilterTime';
 
 export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
   const widget = useContext(WidgetContext);
@@ -204,18 +205,24 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
         );
 
       case ControllerFacadeTypes.RangeTime:
-        const timeValues = getWidgetFilterDateValues(
+        const rangeTimeValues = getWidgetFilterDateValues(
           widgetFilter.operatorType,
           widgetFilter!.filterDate!,
         );
         return (
           <FilterRangTime
             onRangeTimeChange={onRangeTimeChange}
-            value={timeValues}
+            value={rangeTimeValues}
           />
         );
       case ControllerFacadeTypes.Time:
-        return <div>Time</div>;
+        const timeValues = getWidgetFilterDateValues(
+          widgetFilter.operatorType,
+          widgetFilter!.filterDate!,
+        );
+        return (
+          <FilterTime onTimeChange={onRangeTimeChange} value={timeValues} />
+        );
       default:
         break;
     }

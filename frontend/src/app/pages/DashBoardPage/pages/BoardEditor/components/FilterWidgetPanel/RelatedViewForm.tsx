@@ -25,7 +25,6 @@ import {
 } from 'antd';
 import ChartDataView, {
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
@@ -108,8 +107,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
         relatedViews[index].filterFieldCategory = e.target.value;
         relatedViews[index].fieldValue = undefined;
         form?.setFieldsValue({ relatedViews: relatedViews });
-        onChangeFieldProps(relatedViews); 
-        
+        onChangeFieldProps(relatedViews);
       },
       [form, onChangeFieldProps],
     );
@@ -182,13 +180,13 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                   return true;
                 });
                 if (!fieldCategoryIsSame) {
-                  if (errFieldType === ChartDataViewFieldType.DATE) {
-                    return Promise.reject(
-                      new Error(
-                        `if FieldType = ${ChartDataViewFieldType.DATE} But Field’s Category not same `,
-                      ),
-                    );
-                  }
+                  // if (errFieldType === ChartDataViewFieldType.DATE) {
+                  //   return Promise.reject(
+                  //     new Error(
+                  //       `if FieldType = ${ChartDataViewFieldType.DATE} But Field’s Category not same `,
+                  //     ),
+                  //   );
+                  // }
                 }
                 return Promise.resolve(relatedViews);
               },

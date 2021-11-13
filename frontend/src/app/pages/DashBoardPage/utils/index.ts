@@ -123,11 +123,12 @@ export const getAllFiltersOfOneWidget = (values: {
     ) {
       const key = String(relatedViewItem.fieldValue);
       const curValues = values.map(item => String(item.value));
-      // 表达式类型是替换逻辑
-      if (fieldValueType === VariableValueTypes.Expression) {
-        variables[key] = curValues;
+
+      if (fieldValueType !== VariableValueTypes.String) {
+        //  替换逻辑
+        variables[key] = curValues.slice(0, 1);
       } else {
-        // 其他类型是叠加的逻辑 concat
+        // String是叠加的逻辑 concat
         if (key in variables) {
           variables[key] = variables[key].concat(curValues);
         } else {
@@ -174,13 +175,16 @@ export const getWidgetFilterValues = (
       widgetFilter.operatorType,
       widgetFilter.filterDate,
     );
-    const values = timeValues.map(ele => {
-      const item = {
-        value: ele,
-        valueType: fieldValueType,
-      };
-      return item;
-    });
+    debugger;
+    const values = timeValues
+      .filter(ele => !!ele)
+      .map(ele => {
+        const item = {
+          value: ele,
+          valueType: fieldValueType,
+        };
+        return item;
+      });
     return values;
   }
   //
@@ -213,13 +217,16 @@ export const getWidgetFilterDateValues = (
     const time = getTime(+(direction + amount), unit)(unit, true);
     timeValues[0] = time.format('YYYY-MM-DD HH:mm:ss');
   }
-  if (endTime.relativeOrExact === RelativeOrExactTime.Exact) {
-    timeValues[1] = endTime.exactTime as string;
-  } else {
-    const { amount, unit, direction } = endTime.relative!;
-    const time = getTime(+(direction + amount), unit)(unit, false);
-    timeValues[1] = time.format('YYYY-MM-DD HH:mm:ss');
+  if (endTime) {
+    if (endTime.relativeOrExact === RelativeOrExactTime.Exact) {
+      timeValues[1] = endTime.exactTime as string;
+    } else {
+      const { amount, unit, direction } = endTime.relative!;
+      const time = getTime(+(direction + amount), unit)(unit, false);
+      timeValues[1] = time.format('YYYY-MM-DD HH:mm:ss');
+    }
   }
+
   return timeValues;
 };
 
