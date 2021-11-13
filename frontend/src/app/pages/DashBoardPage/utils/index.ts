@@ -175,7 +175,6 @@ export const getWidgetFilterValues = (
       widgetFilter.operatorType,
       widgetFilter.filterDate,
     );
-    debugger;
     const values = timeValues
       .filter(ele => !!ele)
       .map(ele => {
