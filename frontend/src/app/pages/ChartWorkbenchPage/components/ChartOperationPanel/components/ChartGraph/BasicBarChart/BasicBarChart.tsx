@@ -27,6 +27,7 @@ import {
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getCustomSortableColumns,
+  getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getReference,
   getSeriesTooltips4Rectangular2,
@@ -216,6 +217,7 @@ class BasicBarChart extends Chart {
           name: getColumnRenderName(aggConfig),
           data: dataColumns.map(dc => ({
             ...getExtraSeriesRowData(dc),
+            ...getExtraSeriesDataFormat(aggConfig?.format),
             name: getColumnRenderName(aggConfig),
             value: dc[getValueByColumnKey(aggConfig)],
           })),
@@ -253,6 +255,7 @@ class BasicBarChart extends Chart {
             const dc = v.find(col => col[xAxisColumnName] === d);
             return {
               ...getExtraSeriesRowData(dc),
+              ...getExtraSeriesDataFormat(aggConfig?.format),
               name: getColumnRenderName(aggConfig),
               value: dc?.[getValueByColumnKey(aggConfig)] || 0,
             };
@@ -524,10 +527,10 @@ class BasicBarChart extends Chart {
         position,
         ...font,
         formatter: params => {
-          const { name, value, data } = params;
+          const { value, data } = params;
           const formattedValue = toFormattedValue(value, data.format);
           const labels: string[] = [];
-          labels.push(`${name}: ${formattedValue}`);
+          labels.push(formattedValue);
           return labels.join('\n');
         },
       },

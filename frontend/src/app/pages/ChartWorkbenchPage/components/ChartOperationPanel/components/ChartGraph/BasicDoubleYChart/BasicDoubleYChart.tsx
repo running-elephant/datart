@@ -28,6 +28,8 @@ import {
   getAxisTick,
   getColumnRenderName,
   getCustomSortableColumns,
+  getExtraSeriesDataFormat,
+  getExtraSeriesRowData,
   getReference,
   getSeriesTooltips4Rectangular,
   getSplitLine,
@@ -190,6 +192,8 @@ class BasicDoubleYChart extends Chart {
           sampling: 'average',
           data: dataColumns.map(dc => ({
             ...config,
+            ...getExtraSeriesRowData(dc),
+            ...getExtraSeriesDataFormat(config?.format),
             value: dc[getValueByColumnKey(config)],
           })),
           ...this.getGraphStyle(graphType, graphStyle),
@@ -392,10 +396,10 @@ class BasicDoubleYChart extends Chart {
         position,
         ...LabelFont,
         formatter: params => {
-          const { name, value, data } = params;
+          const { value, data } = params;
           const formattedValue = toFormattedValue(value, data.format);
           const labels: string[] = [];
-          labels.push(`${name}: ${formattedValue}`);
+          labels.push(formattedValue);
           return labels.join('\n');
         },
       },

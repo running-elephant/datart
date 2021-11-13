@@ -124,7 +124,7 @@ export interface WidgetConf {
   name: string;
   type: WidgetType;
   autoUpdate: boolean;
-  frequency: number; // 同步数据间隔
+  frequency: number; // 定时同步频率
   rect: RectConfig; //
   background: BackgroundConfig;
   border: BorderConfig;

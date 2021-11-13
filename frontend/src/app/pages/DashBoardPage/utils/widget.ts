@@ -872,7 +872,7 @@ export const getWidgetActionList = (widget: Widget) => {
   return [
     {
       key: widgetActionTypeMap.refresh,
-      label: '刷新',
+      label: '同步数据',
       icon: '',
       disabled: false,
     },

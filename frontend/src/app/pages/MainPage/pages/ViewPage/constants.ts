@@ -54,6 +54,6 @@ export const COLUMN_CATEGORY_LABEL = {
 };
 
 export const CONCURRENCY_CONTROL_MODE_LABEL = {
-  [ConcurrencyControlModes.DirtyRead]: '延迟刷新',
+  [ConcurrencyControlModes.DirtyRead]: '延迟更新',
   [ConcurrencyControlModes.FastFailOver]: '快速失败',
 };

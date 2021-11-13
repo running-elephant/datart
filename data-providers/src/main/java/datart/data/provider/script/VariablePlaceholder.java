@@ -135,6 +135,9 @@ public abstract class VariablePlaceholder {
     protected void replaceVariable(SqlCall sqlCall) {
         for (int i = 0; i < sqlCall.operandCount(); i++) {
             SqlNode sqlNode = sqlCall.getOperandList().get(i);
+            if (sqlNode == null) {
+                continue;
+            }
             if (sqlNode instanceof SqlCall) {
                 replaceVariable((SqlCall) sqlNode);
             } else if (sqlNode instanceof SqlIdentifier) {

@@ -5,6 +5,20 @@
   },
   "attributes": [
     {
+      "name": "cacheEnable",
+      "type": "bool",
+      "required": true,
+      "defaultValue": true,
+      "description": "开启后会将查询的数据保存到内部数据库"
+    },
+    {
+      "name": "cacheTimeout",
+      "type": "string",
+      "required": true,
+      "defaultValue": "30",
+      "description": "缓存的过期时间（分钟）。设置为 -1 表示不过期，当修改数据源后，仍然会清空缓存。"
+    },
+    {
       "name": "schemas",
       "type": "files",
       "key": "tableName",

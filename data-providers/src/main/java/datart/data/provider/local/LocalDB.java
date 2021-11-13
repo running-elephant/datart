@@ -35,6 +35,7 @@ import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.sql.*;
@@ -195,7 +196,7 @@ public class LocalDB {
             StringJoiner stringJoiner = new StringJoiner(",", "(", ")");
             for (int i = 0; i < row.size(); i++) {
                 Object val = row.get(i);
-                if (val == null) {
+                if (val == null || StringUtils.isBlank(val.toString())) {
                     stringJoiner.add(null);
                     continue;
                 }

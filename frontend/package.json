@@ -18,7 +18,7 @@
     "start": "craco start",
     "build": "cross-env GENERATE_SOURCEMAP=false craco build",
     "test": "craco test",
-    "test:coverage": "npm run test --watchAll=false --coverage",
+    "test:coverage": "npm run test -- --watchAll=false --coverage",
     "checkTs": "tsc --noEmit",
     "eslint": "eslint --ext js,ts,tsx",
     "lint": "npm run eslint src",

@@ -61,17 +61,7 @@ public class FileDataProvider extends DefaultDataProvider {
         for (Map<String, Object> schema : schemas) {
             String path = schema.get(FILE_PATH).toString();
             FileFormat fileFormat = FileFormat.valueOf(schema.get(FILE_FORMAT).toString().toUpperCase());
-            List<Column> columns = null;
-            try {
-                List<Map<String, String>> columnConfig = (List<Map<String, String>>) schema.get(COLUMNS);
-                if (!CollectionUtils.isEmpty(columnConfig)) {
-                    columns = columnConfig
-                            .stream()
-                            .map(c -> new Column(c.get(COLUMN_NAME), ValueType.valueOf(c.get(COLUMN_TYPE))))
-                            .collect(Collectors.toList());
-                }
-            } catch (ClassCastException ignored) {
-            }
+            List<Column> columns = parseColumns(schema);
             Dataframe dataframe = loadFromPath(FileUtils.withBasePath(path), fileFormat, columns);
             dataframe.setName(StringUtils.isNoneBlank(schema.getOrDefault(TABLE, "").toString()) ? schema.get(TABLE).toString() : "TEST" + UUIDGenerator.generate());
             dataframes.add(dataframe);
