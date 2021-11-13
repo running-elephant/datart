@@ -34,10 +34,10 @@ export function isInRange(limit?, count?) {
   if (limit === null || limit === undefined) {
     return true;
   }
-  if (Number.isInteger(limit)) {
-    return limit === count;
+  if (Number.isInteger(+limit)) {
+    return +limit === count;
   } else if (Array.isArray(limit) && limit.length === 2) {
-    return limit[0] <= count && count <= limit[1];
+    return +limit[0] <= count && count <= +limit[1];
   }
   return false;
 }
