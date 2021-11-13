@@ -106,9 +106,10 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
       (index: number) => (e: RadioChangeEvent) => {
         const relatedViews: RelatedView[] = form?.getFieldValue('relatedViews');
         relatedViews[index].filterFieldCategory = e.target.value;
-        relatedViews[index].fieldValue = void 0;
+        relatedViews[index].fieldValue = undefined;
         form?.setFieldsValue({ relatedViews: relatedViews });
-        onChangeFieldProps(relatedViews);
+        onChangeFieldProps(relatedViews); 
+        
       },
       [form, onChangeFieldProps],
     );

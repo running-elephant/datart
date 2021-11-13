@@ -27,9 +27,10 @@ import {
   WidgetFilterTypes,
 } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
-import React, { memo } from 'react';
+import { FilterSqlOperator } from 'globalConstants';
+import React, { memo, useEffect } from 'react';
 import styled from 'styled-components/macro';
-import { ValueTypes } from '../types';
+import { ValueTypes, WidgetFilterFormType } from '../types';
 import FilterAggOperator from './FilterAggOperator';
 import FilterDateCondition from './FilterDate/FilterDateCondition';
 import FilterFacade from './FilterFacade';
@@ -55,6 +56,18 @@ export const WidgetFilterForm: React.FC<RelatedViewFormProps> = memo(
     boardType,
     otherStrFilterWidgets,
   }) => {
+    useEffect(() => {
+      if (fieldCategory === ChartDataViewFieldCategory.Variable) {
+        const widgetFilter = form?.getFieldValue('widgetFilter');
+        const nextWidgetFilter: WidgetFilterFormType = {
+          ...widgetFilter,
+          sqlOperator: FilterSqlOperator.Equal,
+        };
+        form?.setFieldsValue({
+          widgetFilter: nextWidgetFilter,
+        });
+      }
+    }, [fieldCategory, form]);
     return (
       <Wrap>
         <Form.Item name="filterName" label="名称" rules={[{ required: true }]}>
@@ -68,6 +81,7 @@ export const WidgetFilterForm: React.FC<RelatedViewFormProps> = memo(
             <OperatorValues
               fieldValueType={fieldValueType}
               viewMap={viewMap}
+              fieldCategory={fieldCategory}
               form={form}
             />
           )}
@@ -75,18 +89,24 @@ export const WidgetFilterForm: React.FC<RelatedViewFormProps> = memo(
             <OperatorValues
               fieldValueType={fieldValueType}
               viewMap={viewMap}
+              fieldCategory={fieldCategory}
               form={form}
             />
           )}
           {fieldValueType === ChartDataViewFieldType.NUMERIC && (
             <FilterNumberCondition
               fieldValueType={fieldValueType}
+              fieldCategory={fieldCategory}
               form={form}
             />
           )}
 
           {fieldValueType === ChartDataViewFieldType.DATE && (
-            <FilterDateCondition fieldValueType={fieldValueType} form={form} />
+            <FilterDateCondition
+              fieldValueType={fieldValueType}
+              form={form}
+              fieldCategory={fieldCategory}
+            />
           )}
         </Form.Item>
         <Form.Item

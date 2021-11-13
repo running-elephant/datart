@@ -19,13 +19,15 @@
 import { Form, FormInstance, Radio, Transfer } from 'antd';
 import { ControllerFacadeTypes } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
 import { FilterValueOption } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataView from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import ChartDataView, {
+  ChartDataViewFieldCategory,
+} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import {
   FilterOperatorType,
   OPERATOR_TYPE_OPTION,
 } from 'app/pages/DashBoardPage/constants';
 import { getDistinctFields } from 'app/utils/fetch';
-import { FC, memo, useCallback, useEffect, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ValueTypes, WidgetFilterFormType } from '../types';
 import { adjustSqlOperator } from '../utils';
@@ -43,13 +45,21 @@ export const singleFacadeTypes = [
 ];
 
 const OperatorValues: FC<{
-  form: FormInstance<any> | undefined;
+  form: FormInstance<{ widgetFilter: WidgetFilterFormType }> | undefined;
   viewMap: Record<string, ChartDataView>;
   fieldValueType: ValueTypes;
   filterValues?: any[];
+  fieldCategory: ChartDataViewFieldCategory;
   onChangeFilterValues?: (values: any[]) => void;
 }> = memo(
-  ({ form, viewMap, fieldValueType, onChangeFilterValues, filterValues }) => {
+  ({
+    form,
+    viewMap,
+    fieldValueType,
+    fieldCategory,
+    onChangeFilterValues,
+    filterValues,
+  }) => {
     const [optionValues, setOptionValues] = useState<FilterValueOption[]>([]);
     const [targetKeys, setTargetKeys] = useState<string[]>([]);
     const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
@@ -60,25 +70,31 @@ const OperatorValues: FC<{
       },
       [],
     );
+    const hasVariable = useMemo(() => {
+      return fieldCategory === ChartDataViewFieldCategory.Variable;
+    }, [fieldCategory]);
     const onTransferChange = useCallback(
       (nextTargetKeys, direction, moveKeys) => {
         setTargetKeys(nextTargetKeys);
-        const widgetFilter: WidgetFilterFormType = form?.getFieldValue([
+        const widgetFilter = form?.getFieldValue(
           'widgetFilter',
-        ]);
-        let filterFacade = true;
+        ) as WidgetFilterFormType;
+        let hasFilterFacade = true;
         if (
           nextTargetKeys.length > 1 &&
           singleFacadeTypes.includes(widgetFilter.filterFacade)
         ) {
-          filterFacade = false;
+          hasFilterFacade = false;
         }
+        const nextWidgetFilter: WidgetFilterFormType = {
+          ...widgetFilter,
+          filterValues: nextTargetKeys,
+          filterFacade: hasFilterFacade
+            ? widgetFilter.filterFacade
+            : ControllerFacadeTypes.DropdownList,
+        };
         form?.setFieldsValue({
-          widgetFilter: {
-            ...widgetFilter,
-            filterValues: nextTargetKeys,
-            filterFacade: filterFacade ? widgetFilter.filterFacade : '',
-          },
+          widgetFilter: nextWidgetFilter,
         });
       },
       [form],
@@ -170,25 +186,25 @@ const OperatorValues: FC<{
         const curType = e.target.value as FilterOperatorType;
         const filterSqlOperator = adjustSqlOperator(fieldValueType, curType);
 
-        const widgetFilter: WidgetFilterFormType =
-          form?.getFieldValue('widgetFilter');
-
+        const widgetFilter = form?.getFieldValue('widgetFilter');
+        const nextWidgetFilter: WidgetFilterFormType = {
+          ...widgetFilter,
+          filterFacade: undefined,
+          sqlOperator: filterSqlOperator,
+        };
         form?.setFieldsValue({
-          widgetFilter: {
-            ...widgetFilter,
-            filterFacade: '',
-            sqlOperator: filterSqlOperator,
-          },
+          widgetFilter: nextWidgetFilter,
         });
       },
       [fieldValueType, form],
     );
 
     const getOperatorType = useCallback(() => {
-      const operatorType: FilterOperatorType = form?.getFieldValue([
+      let operatorType: FilterOperatorType = form?.getFieldValue([
         'widgetFilter',
         'operatorType',
       ]);
+
       return operatorType;
     }, [form]);
 
@@ -220,14 +236,6 @@ const OperatorValues: FC<{
                     name={['widgetFilter', 'assistViewFields']}
                     noStyle
                   >
-                    {/* <Select
-                      allowClear
-                      placeholder="select viewField"
-                      onChange={onViewFieldChange}
-                      style={{ margin: '6px 0' }}
-                    >
-                      {renderViewFieldOptions()}
-                    </Select> */}
                     <AssistViewFields
                       allowClear
                       placeholder="select viewField"
@@ -259,6 +267,7 @@ const OperatorValues: FC<{
                 {getOperatorType() === 'condition' && (
                   <FilterStringCondition
                     form={form}
+                    hasVariable={hasVariable}
                     fieldValueType={fieldValueType}
                   />
                 )}

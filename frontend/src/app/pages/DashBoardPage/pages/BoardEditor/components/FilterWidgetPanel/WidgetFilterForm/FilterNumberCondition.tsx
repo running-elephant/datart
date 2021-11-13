@@ -17,7 +17,10 @@
  */
 
 import { Form, FormInstance, InputNumber, Select } from 'antd';
-import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
@@ -27,6 +30,7 @@ const numberConditionSetValues = SQL_OPERATOR_OPTIONS.compare.map(
 );
 const FilterNumberCondition: FC<{
   form: FormInstance<any> | undefined;
+  fieldCategory: ChartDataViewFieldCategory;
   fieldValueType: ChartDataViewFieldType;
 }> = memo(({ form, fieldValueType }) => {
   const [numberValues, setNumberValues] = useState<number[]>([]);

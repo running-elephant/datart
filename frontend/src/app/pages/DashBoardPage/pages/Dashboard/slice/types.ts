@@ -297,6 +297,7 @@ export interface FilterWidgetContent {
   fieldValueType: ValueTypes;
   relatedViews: RelatedView[];
   widgetFilter: WidgetFilterFormType;
+  hasVariable: boolean;
 }
 // 分析探索组件配置
 export interface ExplorerWidgetConfig {

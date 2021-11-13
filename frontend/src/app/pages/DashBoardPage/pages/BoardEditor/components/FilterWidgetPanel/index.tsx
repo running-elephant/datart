@@ -98,6 +98,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const [fieldCategory, setFieldCategory] =
     useState<ChartDataViewFieldCategory>(ChartDataViewFieldCategory.Field);
 
+  
   let widgetList = useRef<WidgetOption[]>([]);
 
   const onChangeFieldProps = useCallback(
@@ -124,13 +125,13 @@ const FilterWidgetPanel: React.FC = memo(props => {
           view.filterFieldCategory === ChartDataViewFieldCategory.Variable,
       );
       // 如果有变量 就按变量处理
-      if (hasVariable) {
-        setFieldCategory(
-          hasVariable
-            ? ChartDataViewFieldCategory.Variable
-            : ChartDataViewFieldCategory.Field,
-        );
-      }
+
+      setFieldCategory(
+        hasVariable
+          ? ChartDataViewFieldCategory.Variable
+          : ChartDataViewFieldCategory.Field,
+      );
+
       form.validateFields();
     },
     [form],
@@ -209,6 +210,9 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const onFinish = useCallback(
     values => {
       console.log('--values', values);
+      console.log('--fieldValueType', fieldValueType);
+      console.log('--fieldCategory', fieldCategory);
+
       const {
         relatedViews,
         widgetFilter,
@@ -262,6 +266,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           views: relatedViews,
           fieldValueType: fieldValueType,
           widgetFilter: formatWidgetFilter(widgetFilter),
+          hasVariable: fieldCategory === ChartDataViewFieldCategory.Variable,
         });
 
         dispatch(addWidgetsToEditBoard([widget]));
@@ -304,17 +309,18 @@ const FilterWidgetPanel: React.FC = memo(props => {
             newRelations.concat([filterToFilterRelation]);
           }
         }
-
+        const nextContent: FilterWidgetContent = {
+          ...curFilterWidget.config.content,
+          relatedViews,
+          type: positionType,
+          fieldValueType: fieldValueType,
+          widgetFilter: formatWidgetFilter(widgetFilter),
+          hasVariable: fieldCategory === ChartDataViewFieldCategory.Variable,
+        };
         const newWidget = produce(curFilterWidget, draft => {
           draft.relations = newRelations;
           draft.config.name = filterName;
-          draft.config.content = {
-            ...curFilterWidget.config.content,
-            relatedViews,
-            type: positionType,
-            fieldValueType: fieldValueType,
-            widgetFilter: formatWidgetFilter(widgetFilter),
-          } as FilterWidgetContent;
+          draft.config.content = nextContent;
         });
         dispatch(editBoardStackActions.updateWidget(newWidget));
       }
@@ -325,6 +331,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
       boardType,
       curFilterWidget,
       dispatch,
+      fieldCategory,
       fieldValueType,
       type,
       widgetMap,

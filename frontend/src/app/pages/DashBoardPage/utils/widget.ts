@@ -314,6 +314,7 @@ export const createFilterWidget = (params: {
   filterPositionType: WidgetFilterTypes;
   views: RelatedView[];
   widgetFilter: WidgetFilterFormType;
+  hasVariable: boolean;
 }) => {
   const {
     boardId,
@@ -324,11 +325,13 @@ export const createFilterWidget = (params: {
     relations,
     filterName,
     fieldValueType,
+    hasVariable,
   } = params;
   const content: FilterWidgetContent = {
     type: filterPositionType || WidgetFilterTypes.Free,
     relatedViews: views,
     fieldValueType,
+    hasVariable: hasVariable || false,
     widgetFilter: widgetFilter,
   };
 

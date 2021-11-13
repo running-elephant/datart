@@ -55,7 +55,7 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
   } = useContext(WidgetDataContext);
   const { widgetUpdate, refreshWidgetsByFilter } =
     useContext(BoardActionContext);
-  const { widgetFilter, fieldValueType } = useMemo(
+  const { widgetFilter, fieldValueType, hasVariable } = useMemo(
     () => widget.config.content as FilterWidgetContent,
     [widget],
   );
@@ -195,6 +195,7 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
       case ControllerFacadeTypes.Text:
         return (
           <FilterText
+            onlyText={hasVariable}
             value={filterValues}
             sqlOperator={sqlOperator}
             onSqlOperatorAndValues={onSqlOperatorAndValues}

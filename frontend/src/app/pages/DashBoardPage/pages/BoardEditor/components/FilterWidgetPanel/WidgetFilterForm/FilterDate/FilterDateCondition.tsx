@@ -19,7 +19,10 @@
 import { Form, FormInstance, Radio } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ControllerFacadeTypes } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
-import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import {
   FilterOperatorType,
   OPERATOR_TYPE_OPTION,
@@ -33,7 +36,7 @@ import CustomTimeSetter from './CustomTimeSetter';
 
 const FilterDateCondition: FC<{
   form: FormInstance<any> | undefined;
-
+  fieldCategory: ChartDataViewFieldCategory;
   fieldValueType: ChartDataViewFieldType;
 }> = memo(({ form, fieldValueType }) => {
   const t = useI18NPrefix('viz.common.filter.date');
