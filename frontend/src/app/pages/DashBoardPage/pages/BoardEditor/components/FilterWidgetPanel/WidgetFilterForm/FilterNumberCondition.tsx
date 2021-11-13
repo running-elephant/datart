@@ -23,7 +23,7 @@ import {
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { FilterSqlOperator } from 'globalConstants';
-import { FC, memo, useCallback, useEffect, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { WidgetFilterFormType } from '../types';
 const numberConditionSetValues = SQL_OPERATOR_OPTIONS.compare.map(
   ele => ele.value,
@@ -32,9 +32,11 @@ const FilterNumberCondition: FC<{
   form: FormInstance<any> | undefined;
   fieldCategory: ChartDataViewFieldCategory;
   fieldValueType: ChartDataViewFieldType;
-}> = memo(({ form, fieldValueType }) => {
+}> = memo(({ form, fieldValueType, fieldCategory }) => {
   const [numberValues, setNumberValues] = useState<number[]>([]);
-
+  const hasVariable = useMemo(() => {
+    return fieldCategory === ChartDataViewFieldCategory.Variable;
+  }, [fieldCategory]);
   const checkCurValue = useCallback(() => {
     const widgetFilter: WidgetFilterFormType = form?.getFieldValue([
       'widgetFilter',
@@ -45,6 +47,9 @@ const FilterNumberCondition: FC<{
     let filterValues = widgetFilter?.filterValues;
     if (!numberConditionSetValues.includes(widgetFilter?.sqlOperator)) {
       needAdjust = true;
+      sqlOperator = FilterSqlOperator.Equal;
+    }
+    if (hasVariable) {
       sqlOperator = FilterSqlOperator.Equal;
     }
     if (sqlOperator === FilterSqlOperator.Between) {
@@ -78,11 +83,11 @@ const FilterNumberCondition: FC<{
     }
 
     setNumberValues(filterValues);
-  }, [fieldValueType, form]);
+  }, [fieldValueType, form, hasVariable]);
 
   useEffect(() => {
     checkCurValue();
-  }, [checkCurValue]);
+  }, [checkCurValue, hasVariable]);
 
   const onNumberValueChange = useCallback(
     numberValues => {
@@ -134,15 +139,6 @@ const FilterNumberCondition: FC<{
             <Form.Item
               noStyle
               name={['widgetFilter', 'sqlOperator']}
-              // rules={[
-              //   {
-              //     required: true,
-              //     message: '不能为空',
-              //     validator: async (_, values: any) => {
-
-              //     },
-              //   },
-              // ]}
               wrapperCol={{ span: 8 }}
             >
               <Select
@@ -151,6 +147,7 @@ const FilterNumberCondition: FC<{
                   marginRight: '20px',
                   marginBottom: '10px',
                 }}
+                disabled={hasVariable}
               >
                 {SQL_OPERATOR_OPTIONS.compare.map(item => {
                   return (

@@ -23,7 +23,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { FilterSelect } from './FilterSelect';
 export interface FilterTextProps {
-  onlyText?: boolean;
+  hideLogic?: boolean;
   options?: ControlOption[];
   value: any[];
   sqlOperator: FilterSqlOperator;
@@ -32,7 +32,7 @@ export interface FilterTextProps {
 }
 
 export const FilterText: React.FC<FilterTextProps> = memo(
-  ({ value, sqlOperator, onlyText, onSqlOperatorAndValues }) => {
+  ({ value, sqlOperator, hideLogic, onSqlOperatorAndValues }) => {
     const [curSqlOperator, setCurSqlOperator] = useState(
       FilterSqlOperator.Equal,
     );
@@ -67,7 +67,7 @@ export const FilterText: React.FC<FilterTextProps> = memo(
 
     return (
       <StyledWrap>
-        {!onlyText && (
+        {!hideLogic && (
           <span className="control-select">
             <FilterSelect
               onValuesChange={onSelectChange}

@@ -187,6 +187,7 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
       case ControllerFacadeTypes.Value:
         return (
           <FilterNumber
+            hideLogic={hasVariable}
             value={filterValues}
             sqlOperator={sqlOperator}
             onSqlOperatorAndValues={onSqlOperatorAndValues}
@@ -195,7 +196,7 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
       case ControllerFacadeTypes.Text:
         return (
           <FilterText
-            onlyText={hasVariable}
+            hideLogic={hasVariable}
             value={filterValues}
             sqlOperator={sqlOperator}
             onSqlOperatorAndValues={onSqlOperatorAndValues}
@@ -225,6 +226,7 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
     onFilterValuesChange,
     minValue,
     maxValue,
+    hasVariable,
     sqlOperator,
     onSqlOperatorAndValues,
     widgetFilter,
