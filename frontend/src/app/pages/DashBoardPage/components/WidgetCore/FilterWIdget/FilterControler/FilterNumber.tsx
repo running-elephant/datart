@@ -24,6 +24,7 @@ import styled from 'styled-components/macro';
 import { FilterSelect } from './FilterSelect';
 export interface FilterNumberProps {
   options?: ControlOption[];
+  hideLogic?: boolean;
   value: any[];
   sqlOperator: FilterSqlOperator;
   onSqlOperatorAndValues: (sql: FilterSqlOperator, values: any[]) => void;
@@ -31,7 +32,7 @@ export interface FilterNumberProps {
 }
 
 export const FilterNumber: React.FC<FilterNumberProps> = memo(
-  ({ value, sqlOperator, onSqlOperatorAndValues }) => {
+  ({ value, sqlOperator, onSqlOperatorAndValues, hideLogic }) => {
     const [curSqlOperator, setCurSqlOperator] = useState(
       FilterSqlOperator.Equal,
     );
@@ -86,21 +87,24 @@ export const FilterNumber: React.FC<FilterNumberProps> = memo(
     );
     return (
       <StyledWrap>
-        <span className="control-select">
-          <FilterSelect
-            onValuesChange={onSelectChange}
-            value={curSqlOperator}
-            multiple={false}
-          >
-            {SQL_OPERATOR_OPTIONS.compare.map(item => {
-              return (
-                <Select.Option key={item.value} value={item.value}>
-                  {item.name}
-                </Select.Option>
-              );
-            })}
-          </FilterSelect>
-        </span>
+        {!hideLogic && (
+          <span className="control-select">
+            <FilterSelect
+              onValuesChange={onSelectChange}
+              value={curSqlOperator}
+              multiple={false}
+            >
+              {SQL_OPERATOR_OPTIONS.compare.map(item => {
+                return (
+                  <Select.Option key={item.value} value={item.value}>
+                    {item.name}
+                  </Select.Option>
+                );
+              })}
+            </FilterSelect>
+          </span>
+        )}
+
         {curSqlOperator !== FilterSqlOperator.Between && (
           <span className="control-number ">
             <InputNumber
@@ -145,10 +149,10 @@ const StyledWrap = styled.div`
   .control-select {
     display: flex;
     flex: 1;
-    width: 40%;
   }
   .control-number {
     display: flex;
+    flex: 1;
     width: 50%;
   }
   .control-2-number-box {

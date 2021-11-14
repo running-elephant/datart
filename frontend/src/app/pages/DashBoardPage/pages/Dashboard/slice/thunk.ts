@@ -15,7 +15,6 @@ import { errorHandle } from 'utils/utils';
 import { boardActions } from '.';
 import { getDistinctFields } from '../../../../../utils/fetch';
 import { getChartWidgetRequestParams } from '../../../utils';
-import { VALUE_SPLITER } from '../../BoardEditor/components/FilterWidgetPanel/WidgetFilterForm/OperatorValues';
 import { handleServerBoardAction } from './asyncActions';
 import { selectBoardById, selectBoardWidgetMap } from './selector';
 import { BoardState, ServerDashboard, WidgetData } from './types';
@@ -96,14 +95,12 @@ export const fetchBoardDetailInShare = createAsyncThunk<
           password: vizToken.password,
         },
       });
-
       dispatch(
         shareActions.setExecuteTokenMap({
           executeToken: data.executeToken,
         }),
       );
       const serverBoard = data.vizDetail as ServerDashboard;
-
       dispatch(
         handleServerBoardAction({
           data: serverBoard,
@@ -175,10 +172,7 @@ export const getWidgetDataAsync = createAsyncThunk<
   { state: RootState }
 >(
   'board/getWidgetDataAsync',
-  async (
-    { boardId, widgetId, renderMode, option },
-    { getState, dispatch, rejectWithValue },
-  ) => {
+  async ({ boardId, widgetId, renderMode, option }, { getState, dispatch }) => {
     const boardState = getState() as { board: BoardState };
     const curWidget = boardState.board.widgetRecord?.[boardId]?.[widgetId];
     if (!curWidget) return null;
@@ -232,10 +226,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
   { state: RootState }
 >(
   'board/getChartWidgetDataAsync',
-  async (
-    { boardId, widgetId, renderMode, option },
-    { getState, dispatch, rejectWithValue },
-  ) => {
+  async ({ boardId, widgetId, renderMode, option }, { getState, dispatch }) => {
     const boardState = getState() as { board: BoardState };
 
     const widgetMapMap = boardState.board.widgetRecord;
@@ -311,10 +302,12 @@ export const getFilterDataAsync = createAsyncThunk<
     const widgetFilter = content.widgetFilter;
     const executeTokenMap = (getState() as RootState)?.share?.executeTokenMap;
 
-    if (widgetFilter.assistViewField) {
+    if (
+      widgetFilter.assistViewFields &&
+      Array.isArray(widgetFilter.assistViewFields)
+    ) {
       // 请求
-      const [viewId, viewField] =
-        widgetFilter.assistViewField.split(VALUE_SPLITER);
+      const [viewId, viewField] = widgetFilter.assistViewFields;
       const executeToken = executeTokenMap?.[viewId];
       const dataset = await getDistinctFields(
         viewId,

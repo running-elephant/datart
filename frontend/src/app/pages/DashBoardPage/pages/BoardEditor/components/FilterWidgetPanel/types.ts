@@ -6,16 +6,19 @@ import {
   AggregateFieldActionType,
   FilterValueOption,
 } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import {
   FilterOperatorType,
   FilterVisibilityType,
 } from 'app/pages/DashBoardPage/constants';
 import { FilterSqlOperator } from 'globalConstants';
 import { Moment, unitOfTime } from 'moment';
+import { VariableValueTypes } from './../../../../../MainPage/pages/VariablePage/constants';
 export interface WidgetFilterVisibility {
   visibility: FilterVisibilityType;
   condition?: VisibilityCondition;
 }
+export type ValueTypes = ChartDataViewFieldType | VariableValueTypes;
 export interface ControlOption {
   label: string;
   value: string;
@@ -34,7 +37,7 @@ export interface VisibilityCondition {
 export interface WidgetFilterFormType {
   aggregate: AggregateFieldActionType;
   operatorType: FilterOperatorType; //
-  assistViewField?: string; //辅助添加view字段
+  assistViewFields: string[]; //辅助添加view字段
   filterVisibility: WidgetFilterVisibility;
   sqlOperator: FilterSqlOperator;
   filterDate?: FilterDate;

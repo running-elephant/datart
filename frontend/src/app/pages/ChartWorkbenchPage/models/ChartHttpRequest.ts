@@ -51,6 +51,7 @@ export type ChartRequest = {
   cacheExpires?: number;
   concurrencyControl?: boolean;
   concurrencyControlMode?: string;
+  params?: Record<string, string[]>;
 };
 
 export type ChartRequestFilter = {

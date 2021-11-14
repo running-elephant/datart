@@ -60,6 +60,9 @@ import {
   WidgetPadding,
   WidgetType,
 } from '../pages/Dashboard/slice/types';
+import { ValueTypes } from './../pages/BoardEditor/components/FilterWidgetPanel/types';
+
+export const VALUE_SPLITTER = '###';
 
 export const createDataChartWidget = (opt: {
   dashboardId: string;
@@ -307,10 +310,11 @@ export const createFilterWidget = (params: {
   boardType: BoardType;
   relations: Relation[];
   filterName?: string;
-  fieldValueType: ChartDataViewFieldType;
+  fieldValueType: ValueTypes;
   filterPositionType: WidgetFilterTypes;
   views: RelatedView[];
   widgetFilter: WidgetFilterFormType;
+  hasVariable: boolean;
 }) => {
   const {
     boardId,
@@ -321,11 +325,13 @@ export const createFilterWidget = (params: {
     relations,
     filterName,
     fieldValueType,
+    hasVariable,
   } = params;
   const content: FilterWidgetContent = {
     type: filterPositionType || WidgetFilterTypes.Free,
     relatedViews: views,
     fieldValueType,
+    hasVariable: hasVariable || false,
     widgetFilter: widgetFilter,
   };
 
@@ -436,6 +442,14 @@ export const getWidgetMapByServer = (
         if (dependentFilterId) {
           condition.dependentFilterId = dependentFilterId;
         }
+      }
+
+      //处理 assistViewField
+      if (typeof content?.widgetFilter?.assistViewFields === 'string') {
+        content.widgetFilter.assistViewFields = (
+          content.widgetFilter.assistViewFields as string
+        ).split(VALUE_SPLITTER);
+        // value.split(VALUE_SPLITTER);
       }
     }
 

@@ -37,7 +37,7 @@ const WorkSpace: React.FC<IProps> = () => {
   const { width: boardWidth, height: boardHeight, scaleMode } = config;
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
   const sortedLayoutWidgets = Object.values(layoutWidgetMap).sort(
-    (a, b) => b.config.index - a.config.index,
+    (a, b) => a.config.index - b.config.index,
   );
   const [rect, refGridBackground] = useClientRect<HTMLDivElement>();
   const {
@@ -58,13 +58,11 @@ const WorkSpace: React.FC<IProps> = () => {
         ref={refGridBackground}
       >
         <SlideBackground scale={scale} slideTranslate={slideTranslate}>
-          {sortedLayoutWidgets
-            .sort((a, b) => a.config.index - b.config.index)
-            .map(widgetConfig => (
-              <WidgetAllProvider key={widgetConfig.id} id={widgetConfig.id}>
-                <WidgetOfFreeEdit />
-              </WidgetAllProvider>
-            ))}
+          {sortedLayoutWidgets.map(widgetConfig => (
+            <WidgetAllProvider key={widgetConfig.id} id={widgetConfig.id}>
+              <WidgetOfFreeEdit />
+            </WidgetAllProvider>
+          ))}
         </SlideBackground>
       </div>
 

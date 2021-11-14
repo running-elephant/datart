@@ -53,6 +53,7 @@ export const BoardProvider: FC<{
       name: board.name,
       boardId: board.id,
       status: board.status,
+      queryVariables: board.queryVariables,
       renderMode,
       boardType: board.config.type,
       editing: editing,

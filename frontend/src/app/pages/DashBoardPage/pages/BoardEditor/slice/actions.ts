@@ -118,6 +118,7 @@ export const updateWidgetFilterAction =
     filterPositionType: WidgetFilterTypes;
     views: RelatedView[];
     widgetFilter: WidgetFilterFormType;
+    hasVariable?: boolean;
   }) =>
   async (dispatch, getState) => {
     const {
@@ -129,12 +130,14 @@ export const updateWidgetFilterAction =
       relations,
       fieldValueType,
       filterName,
+      hasVariable,
     } = params;
     const content: FilterWidgetContent = {
       type: filterPositionType || WidgetFilterTypes.Free,
       relatedViews: views,
       fieldValueType,
       widgetFilter: widgetFilter,
+      hasVariable: hasVariable || false,
     };
 
     const widgetConf = createInitWidgetConfig({
