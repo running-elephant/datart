@@ -10,14 +10,13 @@ import { message } from 'antd';
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import { registerTheme } from 'echarts';
 import { StorageKeys } from 'globalConstants';
-import React, { useEffect, useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { GlobalStyle, OverriddenStyle } from 'styles/globalStyles';
 import { getToken } from 'utils/auth';
-import useMount from './hooks/useMount';
 import { LoginAuthRoute } from './LoginAuthRoute';
 import { LazyActivePage } from './pages/ActivePage/Loadable';
 import { LazyAuthorizationPage } from './pages/AuthorizationPage/Loadable';
@@ -34,10 +33,6 @@ export function App() {
   const { i18n } = useTranslation();
   const logged = !!getToken();
   useAppSlice();
-
-  useMount(() => {
-    i18n.changeLanguage('zh');
-  });
 
   useLayoutEffect(() => {
     if (logged) {

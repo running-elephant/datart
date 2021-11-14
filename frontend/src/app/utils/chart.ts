@@ -30,14 +30,14 @@ import ChartMetadata from 'app/pages/ChartWorkbenchPage/models/ChartMetadata';
 import { isEmpty, meanValue, mergeDefaultToValue } from 'utils/object';
 import { toFormattedValue } from './number';
 
-export function isInRange(limit, count) {
-  if (!limit) {
+export function isInRange(limit?, count?) {
+  if (limit === null || limit === undefined) {
     return true;
   }
-  if (Number.isInteger(limit)) {
-    return limit === count;
+  if (Number.isInteger(+limit)) {
+    return +limit === count;
   } else if (Array.isArray(limit) && limit.length === 2) {
-    return limit[0] <= count && count <= limit[1];
+    return +limit[0] <= count && count <= +limit[1];
   }
   return false;
 }
@@ -732,32 +732,45 @@ export function getColorizeGroupSeriesColumns(
   return collection;
 }
 
-export function isMatchRequirement(meta: ChartMetadata, config: ChartConfig) {
-  const dataConfig = config.datas || [];
-  const groupConfigs = dataConfig
-    .filter(
-      c =>
-        c.type === ChartDataSectionType.GROUP ||
-        c.type === ChartDataSectionType.COLOR,
-    )
-    .filter(c => !!c.required)
-    .flatMap(config => config.rows || []);
-  const aggregateConfigs = dataConfig
-    .filter(
-      c =>
-        c.type === ChartDataSectionType.AGGREGATE ||
-        c.type === ChartDataSectionType.SIZE,
-    )
-    .filter(c => !!c.required)
-    .flatMap(config => config.rows || []);
+export function getRequiredGroupedSections(dataConfig?) {
+  return (
+    dataConfig
+      ?.filter(
+        c =>
+          c.type === ChartDataSectionType.GROUP ||
+          c.type === ChartDataSectionType.COLOR,
+      )
+      .filter(c => !!c.required) || []
+  );
+}
 
+export function getRequiredAggregatedSections(dataConfigs?) {
+  return (
+    dataConfigs
+      ?.filter(
+        c =>
+          c.type === ChartDataSectionType.AGGREGATE ||
+          c.type === ChartDataSectionType.SIZE,
+      )
+      .filter(c => !!c.required) || []
+  );
+}
+
+export function isMatchRequirement(meta: ChartMetadata, config: ChartConfig) {
+  const dataConfigs = config.datas || [];
+  const groupedFieldConfigs = getRequiredGroupedSections(dataConfigs).flatMap(
+    config => config.rows || [],
+  );
+  const aggregateFieldConfigs = getRequiredAggregatedSections(
+    dataConfigs,
+  ).flatMap(config => config.rows || []);
   const requirements = meta.requirements || [];
   return requirements.some(r => {
-    const group = (r || {})[ChartDataSectionType.GROUP];
-    const aggregate = (r || {})[ChartDataSectionType.AGGREGATE];
+    const group = r?.[ChartDataSectionType.GROUP];
+    const aggregate = r?.[ChartDataSectionType.AGGREGATE];
     return (
-      isInRange(group, groupConfigs.length) &&
-      isInRange(aggregate, aggregateConfigs.length)
+      isInRange(group, groupedFieldConfigs.length) &&
+      isInRange(aggregate, aggregateFieldConfigs.length)
     );
   });
 }

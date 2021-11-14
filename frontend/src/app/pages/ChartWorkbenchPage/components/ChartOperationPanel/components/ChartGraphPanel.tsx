@@ -59,15 +59,21 @@ const ChartGraphPanel: FC<{
       return [ChartDataSectionType.GROUP, ChartDataSectionType.AGGREGATE].map(
         type => {
           const limit = requirement[type.toLocaleLowerCase()];
+          const getMaxValueStr = limit =>
+            !!limit && +limit >= 999 ? 'N' : limit;
+
           return (
             <li key={type + index}>
               {Number.isInteger(limit)
-                ? t('onlyAllow', undefined, { type: t(type), num: limit })
+                ? t('onlyAllow', undefined, {
+                    type: t(type),
+                    num: getMaxValueStr(limit),
+                  })
                 : Array.isArray(limit) && limit.length === 2
                 ? t('allowRange', undefined, {
                     type: t(type),
                     start: limit?.[0],
-                    end: limit?.[1],
+                    end: getMaxValueStr(limit?.[1]),
                   })
                 : null}
             </li>

@@ -127,22 +127,26 @@ export const initWorkbenchAction = createAsyncThunk(
     },
     thunkAPI,
   ) => {
-    if (arg.orgId) {
-      await thunkAPI.dispatch(fetchDataViewsAction({ orgId: arg.orgId }));
-    }
-    if (arg.backendChartId) {
-      await thunkAPI.dispatch(
-        workbenchSlice.actions.saveBackendChartId(arg.backendChartId),
-      );
-      await thunkAPI.dispatch(
-        fetchChartAction({ chartId: arg.backendChartId }),
-      );
-      await thunkAPI.dispatch(refreshDatasetAction({}));
-    } else if (arg.backendChart) {
-      await thunkAPI.dispatch(
-        fetchChartAction({ backendChart: arg.backendChart }),
-      );
-      await thunkAPI.dispatch(refreshDatasetAction({}));
+    try {
+      if (arg.orgId) {
+        await thunkAPI.dispatch(fetchDataViewsAction({ orgId: arg.orgId }));
+      }
+      if (arg.backendChartId) {
+        await thunkAPI.dispatch(
+          workbenchSlice.actions.saveBackendChartId(arg.backendChartId),
+        );
+        await thunkAPI.dispatch(
+          fetchChartAction({ chartId: arg.backendChartId }),
+        );
+        await thunkAPI.dispatch(refreshDatasetAction({}));
+      } else if (arg.backendChart) {
+        await thunkAPI.dispatch(
+          fetchChartAction({ backendChart: arg.backendChart }),
+        );
+        await thunkAPI.dispatch(refreshDatasetAction({}));
+      }
+    } catch (error) {
+      console.error('initWorkbenchAction errors: ', error);
     }
   },
 );
