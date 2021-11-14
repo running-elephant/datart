@@ -26,6 +26,7 @@ export interface BoardContextProps {
   name: string;
   renderMode?: VizRenderMode;
   boardId: string;
+  orgId: string;
   boardType: BoardType;
   status: number;
   editing: boolean;

@@ -17,11 +17,18 @@
  */
 import { Cascader, CascaderProps } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
+import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import {
   View,
   ViewSimple,
 } from 'app/pages/MainPage/pages/ViewPage/slice/types';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 export interface AssistViewFieldsProps
@@ -31,17 +38,20 @@ export interface AssistViewFieldsProps
 }
 export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
   ({ onChange, value }) => {
+    const { orgId } = useContext(BoardContext);
     const [options, setOptions] = useState<CascaderOptionType[]>([]);
     const getChildren = useCallback(async viewId => {
       const { data } = await request<View>(`/views/${viewId}`);
-      const model = JSON.parse(data.model);
-      const items: CascaderOptionType[] = Object.keys(model).map(key => {
-        return {
-          value: key,
-          label: key,
-        };
-      });
-      return items;
+      try {
+        const model = JSON.parse(data.model);
+        const items: CascaderOptionType[] = Object.keys(model).map(key => {
+          return {
+            value: key,
+            label: key,
+          };
+        });
+        return items;
+      } catch (error) {}
     }, []);
     const setViews = useCallback(
       async orgId => {
@@ -72,8 +82,8 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
     );
 
     useEffect(() => {
-      setViews('90fa5a6c58fc45d9bf684e2177690d5b');
-    }, [setViews]);
+      setViews(orgId);
+    }, [setViews, orgId]);
 
     const loadData = useCallback(
       async (selectedOptions: CascaderOptionType[]) => {
