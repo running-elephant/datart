@@ -401,7 +401,7 @@ const workbenchSlice = createSlice({
         if (!!payload) {
           state.currentDataView = {
             ...payload.view,
-            meta: payload.view.meta || transformMeta(payload?.view?.model),
+            meta: payload.view?.meta || transformMeta(payload?.view?.model),
             computedFields: backendChartConfig?.computedFields || [],
           };
         }
