@@ -15,20 +15,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { ChartConfig } from '../../types/ChartConfig';
-
-export const ChartConfigReducerActionType = {
-  INIT: 'init',
-  STYLE: 'style',
-  DATA: 'data',
-  SETTING: 'setting',
-  I18N: 'i18n',
-};
-
-export type ChartConfigPayloadType = {
-  init?: ChartConfig;
-  ancestors?: number[];
-  value?: any;
-  needRefresh?: boolean;
-};

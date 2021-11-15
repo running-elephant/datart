@@ -36,10 +36,24 @@ import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { request } from 'utils/request';
 import { errorHandle, listToTree } from 'utils/utils';
-import { ChartConfigPayloadType, ChartConfigReducerActionType } from '..';
 import ChartRequest, {
   ChartDataRequestBuilder,
 } from '../models/ChartHttpRequest';
+
+export type ChartConfigPayloadType = {
+  init?: ChartConfig;
+  ancestors?: number[];
+  value?: any;
+  needRefresh?: boolean;
+};
+
+export const ChartConfigReducerActionType = {
+  INIT: 'init',
+  STYLE: 'style',
+  DATA: 'data',
+  SETTING: 'setting',
+  I18N: 'i18n',
+};
 
 export type BackendChart = {
   config: BackendChartConfig;

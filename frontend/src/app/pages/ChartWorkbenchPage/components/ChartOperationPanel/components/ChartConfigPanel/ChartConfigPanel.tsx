@@ -24,12 +24,12 @@ import {
 import { Tabs } from 'antd';
 import { PaneWrapper } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
+import ChartPaletteContext from 'app/pages/ChartWorkbenchPage/contexts/ChartPaletteContext';
 import {
   ChartConfigPayloadType,
   ChartConfigReducerActionType,
-} from 'app/pages/ChartWorkbenchPage';
-import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
-import ChartPaletteContext from 'app/pages/ChartWorkbenchPage/contexts/ChartPaletteContext';
+} from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
   ChartConfig,
   ChartDataSectionConfig,
