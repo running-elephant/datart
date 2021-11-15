@@ -112,16 +112,6 @@ public abstract class DefaultDataProvider extends DataProvider {
 
     @Override
     public Dataframe execute(DataProviderSource config, QueryScript queryScript, ExecuteParam executeParam) throws Exception {
-        Dataframe dataframe;
-
-        if (queryScript != null) {
-            String queryKey = queryScript.toQueryKey();
-
-            if (executeParam.isCacheEnable()) {
-                dataframe = LocalDB.executeLocalQuery(queryKey, executeParam);
-                if (dataframe != null) return dataframe;
-            }
-        }
         List<Dataframe> fullData = loadFullDataFromSource(config);
         return LocalDB.executeLocalQuery(queryScript, executeParam, executeParam.isCacheEnable(), fullData);
     }

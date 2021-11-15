@@ -156,7 +156,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
 
     @Override
     @Transactional
-    public boolean unarchive(String id, String newName, String parentId) {
+    public boolean unarchive(String id, String newName, String parentId, double index) {
 
         View view = retrieve(id);
         requirePermission(view, Const.MANAGE);
@@ -172,6 +172,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         view.setName(newName);
         view.setParentId(parentId);
         view.setStatus(Const.DATA_STATUS_ACTIVE);
+        view.setIndex(index);
         return 1 == viewMapper.updateByPrimaryKey(view);
 
     }
@@ -268,6 +269,11 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     }
 
     public boolean safeDelete(String viewId) {
+        // check children
+        if (viewMapper.checkReference(viewId) != 0) {
+            return false;
+        }
+        // check charts reference
         Datachart datachart = new Datachart();
         datachart.setViewId(viewId);
         return viewMapper.checkUnique(datachart);

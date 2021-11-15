@@ -301,7 +301,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         String sql = render.render(false, false, false);
         Dataframe data = execute(sql);
         data.setName(script.toQueryKey());
-        return LocalDB.queryFromLocal(data.getName(), executeParam, data);
+        return LocalDB.executeLocalQuery(null, executeParam, false, Collections.singletonList(data));
     }
 
     /**
