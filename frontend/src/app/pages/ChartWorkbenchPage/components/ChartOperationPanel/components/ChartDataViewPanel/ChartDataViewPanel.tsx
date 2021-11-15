@@ -25,7 +25,7 @@ import useToggle from 'app/hooks/useToggle';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewMeta,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartDataView';
 import workbenchSlice, {
   fetchViewDetailAction,
   makeDataviewTreeSelector,

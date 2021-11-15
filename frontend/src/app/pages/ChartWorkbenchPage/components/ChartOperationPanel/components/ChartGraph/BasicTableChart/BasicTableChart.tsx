@@ -17,15 +17,15 @@
  */
 
 import ReactChart from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartGraph/ReactChart';
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
-import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import ChartConfig from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import {
   getColumnRenderName,
   getCustomSortableColumns,
   getValueByColumnKey,
   transfromToObjectArray,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { Omit } from 'utils/object';
 import { v4 as uuidv4 } from 'uuid';

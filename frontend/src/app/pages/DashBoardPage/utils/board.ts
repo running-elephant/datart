@@ -1,4 +1,4 @@
-import { ChartDataView } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import { ChartDataView } from 'app/types/ChartDataView';
 /**
  * Datart
  *
@@ -29,7 +29,7 @@ import {
   Widget,
 } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 // import { dataChartServerModel } from 'app/pages/MainPage/pages/VizPage/slice/types';
-import { transformMeta } from 'app/utils/chart';
+import { transformMeta } from 'app/utils/chartHelper';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,

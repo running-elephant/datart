@@ -22,7 +22,7 @@ import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigC
 import {
   FilterCondition,
   FilterConditionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import moment from 'moment';
 import { FC, memo, useContext, useState } from 'react';
 import ChartFilterCondition, {

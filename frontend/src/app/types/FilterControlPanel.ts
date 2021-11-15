@@ -16,22 +16,31 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType } from './ChartConfig';
+export enum ControllerFacadeTypes {
+  DropdownList = 'dropdownList',
+  RadioGroup = 'radioGroup',
+  MultiDropdownList = 'multiDropdownList',
+  RangeTime = 'rangeTime',
+  RangeValue = 'rangeValue',
+  Text = 'text',
+  Tree = 'tree',
+  Value = 'value',
+  Time = 'time',
+  Slider = 'slider',
+}
 
-export type ChartMetadata = {
-  id: string;
-  name: string;
-  icon?: string;
-  requirements?: ChartRequirement[];
-};
+export enum ControllerRadioFacadeTypes {
+  Default = 'default',
+  Button = 'button',
+}
 
-export type ChartRequirement = {
-  [key in Lowercase<keyof PartialSqlAssemblyType>]?: number[] | number;
-};
+export enum RelativeOrExactTime {
+  Relative = 'relative',
+  Exact = 'exact',
+}
 
-type PartialSqlAssemblyType = Pick<
-  typeof ChartDataSectionType,
-  'GROUP' | 'AGGREGATE'
->;
-
-export default ChartMetadata;
+export enum ControllerVisibilityTypes {
+  Hide = 'hide',
+  Show = 'show',
+  Condition = 'condition',
+}

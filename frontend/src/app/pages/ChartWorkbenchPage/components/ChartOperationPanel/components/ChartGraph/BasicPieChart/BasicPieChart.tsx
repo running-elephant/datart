@@ -21,8 +21,8 @@ import ChartConfig, {
   ChartDataSectionField,
   ChartDataSectionType,
   ChartStyleSectionConfig,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+} from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import {
   getColumnRenderName,
   getExtraSeriesRowData,
@@ -30,7 +30,7 @@ import {
   getValueByColumnKey,
   transfromToObjectArray,
   valueFormatter,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
 import Config from './config';

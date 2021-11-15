@@ -17,17 +17,17 @@
  */
 
 import { Col, Form, Row } from 'antd';
-import {
-  ControllerFacadeTypes,
-  ControllerVisibilityTypes,
-} from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
 import ChartConfig, {
   ChartDataSectionField,
   ChartDataSectionType,
   FilterFieldAction,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
-import { getColumnRenderName } from 'app/utils/chart';
+import {
+  ControllerFacadeTypes,
+  ControllerVisibilityTypes,
+} from 'app/types/FilterControlPanel';
+import { getColumnRenderName } from 'app/utils/chartHelper';
 import { updateByKey } from 'app/utils/mutation';
 import { FilterSqlOperator } from 'globalConstants';
 import debounce from 'lodash/debounce';

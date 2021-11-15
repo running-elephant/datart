@@ -23,9 +23,9 @@ import DraggableList from 'app/pages/ChartWorkbenchPage/components/ChartOperatio
 import {
   ChartDataSectionField,
   SortActionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
-import { getValueByColumnKey, transfromToObjectArray } from 'app/utils/chart';
+} from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
+import { getValueByColumnKey, transfromToObjectArray } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';

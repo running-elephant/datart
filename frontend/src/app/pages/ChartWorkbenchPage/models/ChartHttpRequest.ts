@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import { getStyleValue } from 'app/utils/chart';
+import { ChartDatasetPageInfo } from 'app/types/ChartDataset';
+import { getStyleValue } from 'app/utils/chartHelper';
 import { formatTime } from 'app/utils/time';
 import { FILTER_TIME_FORMATTER_IN_QUERY } from 'globalConstants';
 import { IsKeyIn } from 'utils/object';
@@ -28,9 +29,8 @@ import {
   ChartStyleSectionConfig,
   FilterValueOption,
   SortActionType,
-} from './ChartConfig';
-import { ChartDatasetPageInfo } from './ChartDataset';
-import ChartDataView from './ChartDataView';
+} from '../../../types/ChartConfig';
+import ChartDataView from '../../../types/ChartDataView';
 
 export type ChartRequest = {
   viewId: string;

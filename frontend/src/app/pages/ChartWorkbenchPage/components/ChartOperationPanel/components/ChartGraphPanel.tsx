@@ -22,7 +22,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import ChartConfig, {
   ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import classnames from 'classnames';
 import { FC, memo, useCallback, useState } from 'react';

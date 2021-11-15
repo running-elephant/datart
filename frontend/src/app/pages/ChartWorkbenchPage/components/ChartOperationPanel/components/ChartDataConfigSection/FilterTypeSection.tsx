@@ -23,11 +23,11 @@ import FilterActions from 'app/pages/ChartWorkbenchPage/components/ChartOperatio
 import {
   ChartDataSectionConfig,
   ChartDataSectionFieldActionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartConfig';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
+import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { FC, memo, useState } from 'react';
 import { CloneValueDeep } from 'utils/object';
-import { ChartDataConfigSectionProps } from '.';
 import BaseDataConfigSection from './BaseDataConfigSection';
 import { dataConfigSectionComparer } from './utils';
 

@@ -1,4 +1,4 @@
-import { ChartStyleSectionConfig } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import produce, { Draft } from 'immer';
 
 export interface Action<T> {

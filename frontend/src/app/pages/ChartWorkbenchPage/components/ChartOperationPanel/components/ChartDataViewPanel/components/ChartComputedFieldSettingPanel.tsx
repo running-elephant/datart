@@ -19,25 +19,30 @@
 import { Col, Input, Row, Select, Space, Tabs } from 'antd';
 import { FormItemEx } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { AggregateFieldActionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { AggregateFieldActionType } from 'app/types/ChartConfig';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
   ChartDataViewMeta,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartDataView';
+import { ChartCompoutedFieldHandle } from 'app/types/CompoutedFieldEditor';
 import { FC, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
-import ChartComputedFieldEditor, {
-  ChartCompoutedFieldHandle,
-} from './ChartComputedFieldEditor/ChartComputedFieldEditor';
+import ChartComputedFieldEditor from './ChartComputedFieldEditor/ChartComputedFieldEditor';
 import ChartSearchableList from './ChartSearchableList';
 import ComputedFunctionDescriptions from './computed-function-description-map';
 
-export enum TextType {
+enum TextType {
   Field = 'field',
   Variable = 'variable',
   Function = 'function',
 }
+
+const FieldTemplate = f => `[${f}]`;
+
+const VariableTemplate = v => `$${v}$`;
+
+const FunctionTemplate = f => `${f}()`;
 
 const ChartComputedFieldSettingPanel: FC<{
   sourceId?: string;
@@ -133,10 +138,6 @@ const ChartComputedFieldSettingPanel: FC<{
       value: item.name,
     }));
   };
-
-  const FieldTemplate = f => `[${f}]`;
-  const VariableTemplate = v => `$${v}$`;
-  const FunctionTemplate = f => `${f}()`;
 
   const getInputText = (value, type) => {
     switch (type) {

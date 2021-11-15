@@ -1,4 +1,3 @@
-import { PageInfo } from './../../MainPage/pages/ViewPage/slice/types';
 /**
  * Datart
  *
@@ -17,29 +16,27 @@ import { PageInfo } from './../../MainPage/pages/ViewPage/slice/types';
  * limitations under the License.
  */
 
-class ChartDataset {
-  id?: string;
-  name?: string;
-  columns?: ChartDatasetMeta[];
-  rows?: string[][];
-  pageInfo?: ChartDatasetPageInfo;
-  script?: string;
+import { isInRange } from '../chartHelper';
 
-  constructor(id, name) {
-    this.id = id;
-    this.name = name;
-    this.columns = [];
-    this.rows = [];
-    this.pageInfo = {};
-  }
-}
-
-export type ChartDatasetPageInfo = Partial<PageInfo>;
-
-export type ChartDatasetMeta = {
-  name?: string;
-  type?: string;
-  primaryKey?: boolean;
-};
-
-export default ChartDataset;
+describe.each([
+  [0, 0, true],
+  [0, 1, false],
+  [1, 1, true],
+  [0, null, true],
+  [1, null, true],
+  [0, undefined, true],
+  [1, undefined, true],
+  [0, [1, 999], false],
+  [1, [1, 999], true],
+  [999, [1, 999], true],
+  [1000, [1, 999], false],
+  [1, '1', true],
+  [0, '1', false],
+  [1, '[1, 999]', false],
+  [1, ['1', '999'], true],
+  [0, ['1', '999'], false],
+])('isInRange Test - ', (count, limit, ifInRange) => {
+  test(`length ${count} in ${limit} limit is ${ifInRange}`, () => {
+    expect(isInRange(limit, count)).toBe(ifInRange);
+  });
+});

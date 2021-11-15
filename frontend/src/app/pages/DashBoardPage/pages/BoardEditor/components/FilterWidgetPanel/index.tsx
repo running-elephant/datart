@@ -21,7 +21,7 @@ import { Split } from 'app/components';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartDataView';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { selectViewMap } from 'app/pages/DashBoardPage/pages/Dashboard/slice/selector';
 import {

@@ -22,7 +22,7 @@ import useUpdateEffect from 'app/hooks/useUpdateEffect';
 import {
   ChartStyleSectionConfig,
   ChartStyleSectionGroup,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import { addByKey, updateByAction } from 'app/utils/mutation';
 import produce from 'immer';
 import { FC, memo, useReducer, useState } from 'react';

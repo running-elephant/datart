@@ -18,7 +18,7 @@
 
 import { Button, Collapse } from 'antd';
 import useStateModal from 'app/hooks/useStateModal';
-import { ChartStyleSectionConfig } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_MD } from 'styles/StyleConstants';

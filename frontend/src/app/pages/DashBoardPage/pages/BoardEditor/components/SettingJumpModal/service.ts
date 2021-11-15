@@ -1,10 +1,10 @@
 import ChartConfig, {
   ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartConfig';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { WidgetTypeMap } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { VizType } from 'app/pages/MainPage/pages/VizPage/slice/types';
-import { getColumnRenderName } from 'app/utils/chart';
+import { getColumnRenderName } from 'app/utils/chartHelper';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { FilterOptionItem } from './types';

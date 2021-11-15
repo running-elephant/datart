@@ -19,8 +19,8 @@
 import { Col, Row } from 'antd';
 import Theme from 'app/assets/theme/echarts_default_theme.json';
 import { ColorTag, ReactColorPicker } from 'app/components/ReactColorPicker';
-import { ChartDataSectionField } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+import { ChartDataSectionField } from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';

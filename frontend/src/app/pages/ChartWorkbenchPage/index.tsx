@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import ChartConfig from './models/ChartConfig';
+import ChartConfig from '../../types/ChartConfig';
 
 export const ChartConfigReducerActionType = {
   INIT: 'init',

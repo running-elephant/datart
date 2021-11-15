@@ -17,7 +17,7 @@
  */
 
 import { Input } from 'antd';
-import { ChartStyleSectionConfig } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';

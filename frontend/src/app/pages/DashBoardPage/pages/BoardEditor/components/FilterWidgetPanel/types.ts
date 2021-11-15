@@ -1,19 +1,20 @@
 import {
-  ControllerFacadeTypes,
-  RelativeOrExactTime,
-} from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
-import {
   AggregateFieldActionType,
   FilterValueOption,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartConfig';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import {
   FilterOperatorType,
   FilterVisibilityType,
 } from 'app/pages/DashBoardPage/constants';
+import {
+  ControllerFacadeTypes,
+  RelativeOrExactTime,
+} from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import { Moment, unitOfTime } from 'moment';
 import { VariableValueTypes } from './../../../../../MainPage/pages/VariablePage/constants';
+
 export interface WidgetFilterVisibility {
   visibility: FilterVisibilityType;
   condition?: VisibilityCondition;

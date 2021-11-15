@@ -17,7 +17,7 @@
  */
 
 import { Col, Row, Select } from 'antd';
-import { ChartStyleSectionConfig } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { FONT_FAMILIES } from 'globalConstants';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';

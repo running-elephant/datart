@@ -18,7 +18,7 @@
 
 import { Checkbox, Row } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
-import { ChartStyleSectionConfig } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { LINE_HEIGHT_ICON_MD } from 'styles/StyleConstants';

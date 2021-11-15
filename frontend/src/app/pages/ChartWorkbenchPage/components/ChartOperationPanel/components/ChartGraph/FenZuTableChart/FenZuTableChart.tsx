@@ -18,12 +18,12 @@
 
 import ChartConfig, {
   ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+} from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import {
   getCustomSortableColumns,
   transfromToObjectArray,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
 import BasicTableChart from '../BasicTableChart';
 import Config from './config';
 

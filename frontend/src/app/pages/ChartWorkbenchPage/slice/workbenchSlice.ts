@@ -26,7 +26,7 @@ import {
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { ResourceTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
-import { mergeConfig, transformMeta } from 'app/utils/chart';
+import { mergeConfig, transformMeta } from 'app/utils/chartHelper';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { RootState } from 'types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
@@ -34,9 +34,9 @@ import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { request } from 'utils/request';
 import { errorHandle, listToTree } from 'utils/utils';
 import { ChartConfigPayloadType, ChartConfigReducerActionType } from '..';
-import ChartConfig from '../models/ChartConfig';
-import ChartDataset from '../models/ChartDataset';
-import ChartDataView, { ChartDataViewMeta } from '../models/ChartDataView';
+import ChartConfig from '../../../types/ChartConfig';
+import ChartDataset from '../../../types/ChartDataset';
+import ChartDataView, { ChartDataViewMeta } from '../../../types/ChartDataView';
 import ChartRequest, {
   ChartDataRequestBuilder,
 } from '../models/ChartHttpRequest';

@@ -36,9 +36,10 @@ import {
   ChartDataSectionField,
   ChartDataSectionFieldActionType,
   ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import { ChartDataViewFieldCategory } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-import { getColumnRenderName } from 'app/utils/chart';
+} from 'app/types/ChartConfig';
+import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
+import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
+import { getColumnRenderName } from 'app/utils/chartHelper';
 import { updateBy, updateByKey } from 'app/utils/mutation';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { rgba } from 'polished';
@@ -52,7 +53,6 @@ import {
 } from 'styles/StyleConstants';
 import { ValueOf } from 'types';
 import { v4 as uuidv4 } from 'uuid';
-import { ChartDataConfigSectionProps } from '../ChartDataConfigSection';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
 import VizDraggableItem from './ChartDraggableElement';
 

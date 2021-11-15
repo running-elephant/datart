@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { createSlice, isRejected, PayloadAction } from '@reduxjs/toolkit';
-import { ChartDataSectionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartDataSectionType } from 'app/types/ChartConfig';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
   FilterSearchParams,

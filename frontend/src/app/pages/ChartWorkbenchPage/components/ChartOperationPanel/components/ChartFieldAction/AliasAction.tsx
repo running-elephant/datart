@@ -18,7 +18,7 @@
 
 import { Input } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { ChartDataSectionField } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 

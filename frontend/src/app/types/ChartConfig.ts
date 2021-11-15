@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-import { FilterSqlOperator } from 'globalConstants';
-import { ValueOf } from 'types';
 import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
-} from '../components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
+} from 'app/types/FilterControlPanel';
+import { FilterSqlOperator } from 'globalConstants';
+import { ValueOf } from 'types';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,

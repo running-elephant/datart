@@ -18,7 +18,7 @@
 
 import { Form, Input, Table, TableProps } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import { FilterValueOption } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { FilterValueOption } from 'app/types/ChartConfig';
 import {
   createContext,
   useCallback,

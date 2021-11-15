@@ -20,7 +20,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartDataSectionConfig,
   ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';

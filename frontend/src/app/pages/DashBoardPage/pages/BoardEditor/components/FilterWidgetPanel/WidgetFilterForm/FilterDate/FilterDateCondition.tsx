@@ -18,15 +18,15 @@
 
 import { Form, FormInstance, Radio } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { ControllerFacadeTypes } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartDataView';
 import {
   FilterOperatorType,
   OPERATOR_TYPE_OPTION,
 } from 'app/pages/DashBoardPage/constants';
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';

@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
+import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE } from 'styles/StyleConstants';
-import { ChartDataConfigSectionProps } from '.';
 import { ChartDraggableTargetContainer } from '../ChartDraggable';
 import { dataConfigSectionComparer } from './utils';
 

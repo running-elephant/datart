@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { PayloadAction } from '@reduxjs/toolkit';
-import ChartDataView from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import ChartDataView from 'app/types/ChartDataView';
 import {
   BoardLinkFilter,
   Dashboard,

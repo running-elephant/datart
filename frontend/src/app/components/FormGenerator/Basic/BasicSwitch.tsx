@@ -20,7 +20,7 @@ import { Col, Row, Switch } from 'antd';
 import {
   ChartStyleSectionConfig,
   ChartStyleSectionRow,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';

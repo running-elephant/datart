@@ -1,7 +1,7 @@
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
-import ChartDataView from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import ChartConfig from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
+import ChartDataView from 'app/types/ChartDataView';
 import { FC } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
@@ -17,7 +17,11 @@ const ChartPresentWrapper: FC<{
 }> = ({ chart, dataView, dataset, chartConfig, onChartChange }) => {
   return (
     <Wrapper>
-      <ChartGraphPanel chart={chart} chartConfig={chartConfig} onChartChange={onChartChange} />
+      <ChartGraphPanel
+        chart={chart}
+        chartConfig={chartConfig}
+        onChartChange={onChartChange}
+      />
       <ChartPresentPanel
         chart={chart}
         dataView={dataView}

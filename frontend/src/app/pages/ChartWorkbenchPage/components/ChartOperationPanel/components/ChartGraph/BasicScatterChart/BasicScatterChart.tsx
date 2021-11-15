@@ -19,8 +19,8 @@
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import ChartConfig, {
   ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+} from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import {
   getColumnRenderName,
   getDataColumnMaxAndMin,
@@ -30,7 +30,7 @@ import {
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Config from './config';
 

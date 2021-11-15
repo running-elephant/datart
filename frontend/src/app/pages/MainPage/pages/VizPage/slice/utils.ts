@@ -1,7 +1,7 @@
-import { ControllerFacadeTypes } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
 import ChartConfig, {
   ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSearchParams } from './types';
 
 const valueTransder = {

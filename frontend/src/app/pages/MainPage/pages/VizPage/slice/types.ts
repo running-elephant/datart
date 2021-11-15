@@ -1,6 +1,6 @@
 import { TreeNodeProps } from 'antd';
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+import ChartConfig from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { ReactElement } from 'react';
 

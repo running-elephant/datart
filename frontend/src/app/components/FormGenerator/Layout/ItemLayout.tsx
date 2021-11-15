@@ -20,7 +20,7 @@ import {
   ChartStyleSectionComponentType,
   ChartStyleSectionConfig,
   ChartStyleSectionRow,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useEffect } from 'react';
 import styled from 'styled-components/macro';

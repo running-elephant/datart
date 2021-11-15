@@ -21,7 +21,7 @@ import { FC } from 'react';
 import styled from 'styled-components/macro';
 import { DraggableItem } from './DraggableItem';
 
-export interface Source {
+interface Source {
   id: number;
   text: string;
 }

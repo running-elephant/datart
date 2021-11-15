@@ -18,12 +18,12 @@
 
 import { Form, FormInstance, InputNumber, Select } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { ControllerFacadeTypes } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartDataView';
 import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FC, memo, useCallback } from 'react';
 import { ValueTypes, WidgetFilterFormType } from '../types';
 import {

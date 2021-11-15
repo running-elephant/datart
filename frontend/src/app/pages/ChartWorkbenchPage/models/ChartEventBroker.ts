@@ -16,16 +16,10 @@
  * limitations under the License.
  */
 
+import { ChartLifecycle } from 'app/types/ChartLifecycle';
 import Chart from './Chart';
 
-export enum ChartLifecycle {
-  MOUNTED = 'mounted',
-  UPDATED = 'updated',
-  RESIZE = 'resize',
-  UNMOUNTED = 'unmount',
-}
-
-export type BrokerContext = {
+type BrokerContext = {
   window?: any;
   document?: any;
   width?: any;

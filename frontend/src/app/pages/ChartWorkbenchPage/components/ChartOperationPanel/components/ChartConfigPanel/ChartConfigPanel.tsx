@@ -33,7 +33,7 @@ import ChartPaletteContext from 'app/pages/ChartWorkbenchPage/contexts/ChartPale
 import ChartConfig, {
   ChartDataSectionConfig,
   ChartStyleSectionConfig,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import { FC, memo, useCallback, useState } from 'react';
 import styled from 'styled-components/macro';
 import {
