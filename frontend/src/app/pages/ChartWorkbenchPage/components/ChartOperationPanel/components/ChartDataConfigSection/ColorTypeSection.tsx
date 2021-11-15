@@ -17,8 +17,8 @@
  */
 
 import { ChartDataSectionFieldActionType } from 'app/types/ChartConfig';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import BaseDataConfigSection from './BaseDataConfigSection';
 import { dataConfigSectionComparer } from './utils';
@@ -26,9 +26,7 @@ import { dataConfigSectionComparer } from './utils';
 const ColorTypeSection: FC<ChartDataConfigSectionProps> = memo(
   ({ config, ...rest }) => {
     const defaultConfig = Object.assign(
-      {
-        maxFieldCount: 1,
-      },
+      {},
       {
         actions: {
           [ChartDataViewFieldType.STRING]: [

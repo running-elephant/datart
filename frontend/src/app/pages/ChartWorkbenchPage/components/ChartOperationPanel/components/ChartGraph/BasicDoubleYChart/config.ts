@@ -25,7 +25,6 @@ const config: ChartConfig = {
       key: 'metrics',
       required: true,
       type: 'group',
-      maxFieldCount: 1,
     },
     {
       label: 'axis.y.left',

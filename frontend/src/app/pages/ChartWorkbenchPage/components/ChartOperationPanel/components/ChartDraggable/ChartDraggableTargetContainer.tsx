@@ -118,15 +118,15 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               })),
             );
 
-            if (
-              !!currentConfig.maxFieldCount &&
-              currentConfig.maxFieldCount < currentColumns.length
-            ) {
-              currentColumns.splice(
-                0,
-                currentColumns.length - currentConfig.maxFieldCount,
-              );
-            }
+            // if (
+            //   !!currentConfig.maxFieldCount &&
+            //   currentConfig.maxFieldCount < currentColumns.length
+            // ) {
+            //   currentColumns.splice(
+            //     0,
+            //     currentColumns.length - currentConfig.maxFieldCount,
+            //   );
+            // }
 
             const newCurrentConfig = updateByKey(
               currentConfig,

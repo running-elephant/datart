@@ -266,11 +266,11 @@ export type AliasFieldAction = {
 
 export type ChartDataSectionConfig = ChartConfigBase & {
   type?: Lowercase<keyof typeof ChartDataSectionType>;
-  maxFieldCount?: number;
   allowSameField?: boolean;
   required?: boolean;
   rows?: ChartDataSectionField[];
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
+  limit?: null | number | string | number[];
 
   // Question: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;

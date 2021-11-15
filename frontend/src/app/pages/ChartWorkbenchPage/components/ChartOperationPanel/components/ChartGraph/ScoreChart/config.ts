@@ -25,7 +25,6 @@ const config: ChartConfig = {
       key: 'deminsion',
       required: true,
       type: 'aggregate',
-      maxFieldCount: 3,
       actions: {
         NUMERIC: ['aggregate', 'format'],
         STRING: ['aggregate', 'format'],

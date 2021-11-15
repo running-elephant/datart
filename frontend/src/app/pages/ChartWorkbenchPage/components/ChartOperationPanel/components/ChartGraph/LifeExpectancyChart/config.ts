@@ -42,7 +42,6 @@ const config: ChartConfig = {
       label: 'colorize',
       key: 'color',
       type: 'color',
-      maxFieldCount: 1,
     },
   ],
   styles: [

@@ -25,7 +25,6 @@ const config: ChartConfig = {
       key: 'metrics',
       required: true,
       type: 'group',
-      maxFieldCount: 1,
     },
     {
       label: 'deminsion',
@@ -44,7 +43,6 @@ const config: ChartConfig = {
       label: 'colorize',
       key: 'color',
       type: 'color',
-      maxFieldCount: 1,
     },
     {
       label: 'info',
