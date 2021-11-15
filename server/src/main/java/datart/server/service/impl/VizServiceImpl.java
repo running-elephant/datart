@@ -284,7 +284,7 @@ public class VizServiceImpl extends BaseService implements VizService {
 
     @Override
     @Transactional
-    public boolean unarchiveViz(String vizId, ResourceType vizType, String newName, String parentId) {
+    public boolean unarchiveViz(String vizId, ResourceType vizType, String newName, String parentId, double index) {
         switch (vizType) {
             case DASHBOARD:
                 Dashboard dashboard = dashboardService.retrieve(vizId);
@@ -292,7 +292,7 @@ public class VizServiceImpl extends BaseService implements VizService {
                 //check name
                 folderService.checkUnique(vizType, dashboard.getOrgId(), parentId, newName);
                 // add to folder
-                createFolder(vizType, vizId, newName, dashboard.getOrgId(), parentId);
+                createFolder(vizType, vizId, newName, dashboard.getOrgId(), parentId, index);
                 dashboard.setName(newName);
                 dashboard.setStatus(Const.DATA_STATUS_ACTIVE);
                 //update status
@@ -306,7 +306,7 @@ public class VizServiceImpl extends BaseService implements VizService {
                 datachart.setName(newName);
                 datachart.setStatus(Const.DATA_STATUS_ACTIVE);
                 // add to folder
-                createFolder(vizType, vizId, newName, datachart.getOrgId(), parentId);
+                createFolder(vizType, vizId, newName, datachart.getOrgId(), parentId, index);
                 return 1 == datachartService.getDefaultMapper().updateByPrimaryKey(datachart);
             case STORYBOARD:
                 Storyboard storyboard = storyboardService.retrieve(vizId);
@@ -322,7 +322,7 @@ public class VizServiceImpl extends BaseService implements VizService {
 
     }
 
-    private void createFolder(ResourceType type, String id, String name, String orgId, String parentId) {
+    private void createFolder(ResourceType type, String id, String name, String orgId, String parentId, double index) {
         Folder folder = new Folder();
         folder.setId(UUIDGenerator.generate());
         folder.setRelType(type.name());
@@ -330,7 +330,7 @@ public class VizServiceImpl extends BaseService implements VizService {
         folder.setParentId(parentId);
         folder.setOrgId(orgId);
         folder.setName(name);
-        folder.setIndex(0D);
+        folder.setIndex(index);
         folderService.getDefaultMapper().insert(folder);
     }
 
