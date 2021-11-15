@@ -25,30 +25,31 @@ import datart.core.data.provider.Column;
 import datart.core.data.provider.Dataframe;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.QueryScript;
-import datart.data.provider.calcite.SqlBuilder;
 import datart.data.provider.calcite.dialect.H2Dialect;
 import datart.data.provider.jdbc.DataTypeUtils;
 import datart.data.provider.jdbc.ResultSetMapper;
 import datart.data.provider.jdbc.SqlScriptRender;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlDialect;
-import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.type.SqlTypeName;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.h2.tools.SimpleResultSet;
 
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class LocalDB {
 
-    private static final String MEM_URL = "jdbc:h2:mem:/LOG=0;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0";
+    private static final String MEM_URL = "jdbc:h2:mem:/LOG=0;DATABASE_TO_UPPER=false;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0";
 
     private static String fileUrl;
 
@@ -60,13 +61,93 @@ public class LocalDB {
 
     private static final String INSERT_SQL = "INSERT INTO %s VALUES %s";
 
+    private static final String CREATE_TEMP_TABLE = "CREATE VIEW `%s` AS (SELECT * FROM FUNCTION_TABLE('%s'))";
+
     private static final int MAX_INSERT_BATCH = 5_000;
+
+    private static final Map<String, Dataframe> TEMP_RS_CACHE = new ConcurrentHashMap<>();
 
     static {
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException e) {
             log.error("H2 driver not found", e);
+        }
+
+    }
+
+    /**
+     * 函数表对应函数，直接从Dataframe 返回一个 ResultSet.
+     *
+     * @param conn   ResultSet 对应连接
+     * @param dataId ResultSet 对应 Dataframe
+     */
+    public static ResultSet dataframeTable(Connection conn, String dataId) throws SQLException {
+        Dataframe dataframe = TEMP_RS_CACHE.get(dataId);
+        if (dataframe == null) {
+            throw new RuntimeException("The dataframe " + dataId + " does not exist");
+        }
+        SimpleResultSet rs = new SimpleResultSet();
+        if (!CollectionUtils.isEmpty(dataframe.getColumns())) {
+            // add columns
+            for (Column column : dataframe.getColumns()) {
+                rs.addColumn(column.getName(), DataTypeUtils.valueType2SqlTypes(column.getType()), -1, -1);
+            }
+        }
+        if (conn.getMetaData().getURL().equals("jdbc:columnlist:connection")) {
+            return rs;
+        }
+        // add rows
+        if (!CollectionUtils.isEmpty(dataframe.getRows())) {
+            for (int rowIdx = 0; rowIdx < dataframe.getRows().size(); rowIdx++) {
+                List<Object> rowVals = dataframe.getRows().get(rowIdx);
+                rs.addRow(rowVals.toArray());
+            }
+        }
+        return rs;
+    }
+
+    /**
+     * 把数据注册注册为临时表，用于SQL查询
+     *
+     * @param dataframe 二维表数据
+     */
+    private static void registerDataAsTable(Dataframe dataframe, Connection connection) throws SQLException {
+        if (Objects.isNull(dataframe)) {
+            throw new RuntimeException("Empty data cannot be registered as a temporary table");
+        }
+
+        // 处理脏数据
+        dataframe.getRows().parallelStream().forEach(row -> {
+            for (int i = 0; i < row.size(); i++) {
+                Object val = row.get(i);
+                if (val instanceof String && StringUtils.isBlank(val.toString())) {
+                    row.set(i, null);
+                }
+            }
+        });
+
+        TEMP_RS_CACHE.put(dataframe.getId(), dataframe);
+        // register temporary table
+        String sql = String.format(CREATE_TEMP_TABLE, dataframe.getName(), dataframe.getId());
+        connection.prepareStatement(sql).execute();
+    }
+
+    /**
+     * 清除临时数据
+     *
+     * @param dataId data id
+     */
+    private static void unregisterData(String dataId) {
+        TEMP_RS_CACHE.remove(dataId);
+    }
+
+    private static void createFunctionTableIfNotExists(Connection connection) {
+        try {
+            Statement statement = connection.createStatement();
+            statement.execute("CREATE ALIAS FUNCTION_TABLE  FOR \"datart.data.provider.local.LocalDB.dataframeTable\"");
+        } catch (Exception e) {
+            log.warn(e.getMessage());
         }
     }
 
@@ -81,48 +162,67 @@ public class LocalDB {
      * @return 查询脚本+执行参数 执行后结果
      */
     public static Dataframe executeLocalQuery(QueryScript queryScript, ExecuteParam executeParam, boolean persistent, List<Dataframe> srcData) throws Exception {
-        String sql;
         if (queryScript == null) {
-            sql = "SELECT * FROM `" + srcData.get(0).getName() + "`";
-        } else {
-            SqlScriptRender render = new SqlScriptRender(queryScript
-                    , executeParam
-                    , SQL_DIALECT
-                    , Const.DEFAULT_VARIABLE_QUOTE);
-            sql = render.render(true, true, false);
+            // 直接以指定数据源为表进行查询，生成一个默认的SQL查询全部数据
+            queryScript = new QueryScript();
+            queryScript.setScript(String.format(SELECT_START_SQL, srcData.get(0).getName()));
+            queryScript.setVariables(Collections.emptyList());
         }
-
-        try (Connection connection = getConnection(persistent)) {
-            for (Dataframe dataframe : srcData) {
-                insertTableData(dataframe, connection);
-            }
-            return executeQuery(sql, connection, executeParam.getPageInfo());
-        }
+        return persistent ? executeInLocalDB(queryScript, executeParam, srcData) : executeInMemDB(queryScript, executeParam, srcData);
     }
 
     /**
-     * 对已有的数据根据查询参数进行本地聚合
-     *
-     * @param queryId      查询条件的MD5摘要
-     * @param executeParam 查询参数
-     * @param srcData      给定的格式化数据
-     * @return 根据查询参数进行二次查询后的数据
+     * 非持久化查询，通过函数表注册数据为临时表，执行一次后丢弃表数据。
      */
-    public static Dataframe queryFromLocal(String queryId, ExecuteParam executeParam, Dataframe srcData) throws Exception {
-        try (Connection connection = getConnection(false)) {
-            insertTableData(srcData, connection);
-            return queryFromLocal(queryId, executeParam, connection);
+    private static Dataframe executeInMemDB(QueryScript queryScript, ExecuteParam executeParam, List<Dataframe> srcData) throws Exception {
+        Connection connection = getConnection(false);
+        try {
+
+            createFunctionTableIfNotExists(connection);
+
+            for (Dataframe dataframe : srcData) {
+                registerDataAsTable(dataframe, connection);
+            }
+            return execute(connection, queryScript, executeParam);
+        } finally {
+            try {
+                connection.close();
+            } catch (Exception e) {
+                log.error("connection close error ", e);
+            }
+            for (Dataframe df : srcData) {
+                unregisterData(df.getId());
+            }
+        }
+
+    }
+
+    /**
+     * 持久化查询，将数据插入到H2表中，再进行查询
+     */
+    private static Dataframe executeInLocalDB(QueryScript queryScript, ExecuteParam executeParam, List<Dataframe> srcData) throws Exception {
+        try (Connection connection = getConnection(true)) {
+            try {
+                for (Dataframe dataframe : srcData) {
+                    insertTableData(dataframe, connection);
+                }
+            } catch (Exception e) {
+
+            }
+            return execute(connection, queryScript, executeParam);
         }
     }
 
-    private static Dataframe queryFromLocal(String queryId, ExecuteParam executeParam, Connection connection) throws Exception {
-        String sql = localQuerySql(queryId, executeParam);
-        return executeQuery(sql, connection, executeParam.getPageInfo());
-    }
+    private static Dataframe execute(Connection connection, QueryScript queryScript, ExecuteParam executeParam) throws Exception {
+        SqlScriptRender render = new SqlScriptRender(queryScript
+                , executeParam
+                , SQL_DIALECT
+                , Const.DEFAULT_VARIABLE_QUOTE);
+        String sql = render.render(true, true, false);
 
-    private static Dataframe executeQuery(String sql, Connection connection, PageInfo pageInfo) throws SQLException {
         ResultSet resultSet = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY).executeQuery(sql);
 
+        PageInfo pageInfo = executeParam.getPageInfo();
         resultSet.last();
         pageInfo.setTotal(resultSet.getRow());
         resultSet.first();
@@ -132,22 +232,7 @@ public class LocalDB {
         dataframe.setPageInfo(pageInfo);
         dataframe.setScript(sql);
         return dataframe;
-    }
 
-    public static Dataframe executeLocalQuery(String queryId, ExecuteParam executeParam, boolean persistent) {
-        try (Connection connection = getConnection(persistent)) {
-            String sql = localQuerySql(queryId, executeParam);
-
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
-
-            return ResultSetMapper.mapToTableData(resultSet);
-        } catch (SQLException | SqlParseException e) {
-            return null;
-        }
-    }
-
-    public static Dataframe executeLocalQuery(String queryId, ExecuteParam executeParam) {
-        return executeLocalQuery(queryId, executeParam, true);
     }
 
     private static void createTable(String tableName, List<Column> columns, Connection connection) throws SQLException {
@@ -171,15 +256,7 @@ public class LocalDB {
     }
 
     private static Connection getConnection(boolean persistent) throws SQLException {
-        return false ? DriverManager.getConnection(getFileUrl()) : DriverManager.getConnection(MEM_URL);
-    }
-
-    private static String localQuerySql(String queryId, ExecuteParam executeParam) throws SqlParseException {
-        return SqlBuilder.builder()
-                .withExecuteParam(executeParam)
-                .withDialect(SQL_DIALECT)
-                .withBaseSql(String.format(SELECT_START_SQL, queryId))
-                .build();
+        return persistent ? DriverManager.getConnection(getFileUrl()) : DriverManager.getConnection(MEM_URL);
     }
 
     private static String tableCreateSQL(String name, List<Column> columns) {

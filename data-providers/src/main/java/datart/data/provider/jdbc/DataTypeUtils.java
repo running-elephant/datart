@@ -22,6 +22,7 @@ import datart.core.base.consts.JavaType;
 import org.apache.calcite.sql.type.SqlTypeFamily;
 import org.apache.calcite.sql.type.SqlTypeName;
 
+import java.sql.Types;
 import java.util.Date;
 
 public class DataTypeUtils {
@@ -106,6 +107,19 @@ public class DataTypeUtils {
                 return SqlTypeName.BOOLEAN;
             default:
                 return SqlTypeName.VARCHAR;
+        }
+    }
+
+    public static int valueType2SqlTypes(ValueType valueType) {
+        switch (valueType) {
+            case NUMERIC:
+                return Types.DOUBLE;
+            case DATE:
+                return Types.DATE;
+            case BOOLEAN:
+                return Types.BOOLEAN;
+            default:
+                return Types.VARCHAR;
         }
     }
 

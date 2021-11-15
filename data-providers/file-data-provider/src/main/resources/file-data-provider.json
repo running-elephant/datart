@@ -5,20 +5,6 @@
   },
   "attributes": [
     {
-      "name": "cacheEnable",
-      "type": "bool",
-      "required": true,
-      "defaultValue": true,
-      "description": "开启后会将查询的数据保存到内部数据库"
-    },
-    {
-      "name": "cacheTimeout",
-      "type": "string",
-      "required": true,
-      "defaultValue": "30",
-      "description": "缓存的过期时间（分钟）。设置为 -1 表示不过期，当修改数据源后，仍然会清空缓存。"
-    },
-    {
       "name": "schemas",
       "type": "files",
       "key": "tableName",
@@ -34,7 +20,7 @@
           "required": true,
           "defaultValue": "",
           "type": "string",
-          "description": "file format , csv or excel",
+          "description": "文件格式，目前支持excel 和 csv。",
           "options": [
             "XLSX",
             "CSV"
@@ -45,7 +31,7 @@
           "required": true,
           "defaultValue": "",
           "type": "string",
-          "description": "file path"
+          "description": "文件路径，上传后自动生成"
         },
         {
           "name": "columns",
