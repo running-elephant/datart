@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import ChartConfig from 'app/types/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 
 const config: ChartConfig = {
   styles: [

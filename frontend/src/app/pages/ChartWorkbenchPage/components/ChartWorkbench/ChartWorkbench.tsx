@@ -20,7 +20,7 @@ import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartData
 import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig from 'app/types/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';

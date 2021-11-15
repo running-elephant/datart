@@ -17,7 +17,7 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig from 'app/types/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import React from 'react';
 import Frame, { FrameContextConsumer } from 'react-frame-component';
 import styled, { StyleSheetManager } from 'styled-components/macro';

@@ -22,7 +22,7 @@ import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartTools from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig from 'app/types/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo, useRef, useState } from 'react';

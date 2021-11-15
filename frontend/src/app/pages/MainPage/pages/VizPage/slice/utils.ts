@@ -1,6 +1,4 @@
-import ChartConfig, {
-  ChartDataSectionType,
-} from 'app/types/ChartConfig';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSearchParams } from './types';
 

@@ -337,9 +337,9 @@ export type ChartI18NSectionConfig = {
   translation: object;
 };
 
-export default class ChartConfig {
+export type ChartConfig = {
   datas?: ChartDataSectionConfig[];
   styles?: ChartStyleSectionConfig[];
   settings?: ChartStyleSectionConfig[];
   i18ns?: ChartI18NSectionConfig[];
-}
+};

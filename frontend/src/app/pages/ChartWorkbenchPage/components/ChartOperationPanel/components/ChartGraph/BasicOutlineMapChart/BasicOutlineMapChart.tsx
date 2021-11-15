@@ -17,9 +17,7 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig, {
-  ChartDataSectionType,
-} from 'app/types/ChartConfig';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import {
   getDataColumnMaxAndMin,

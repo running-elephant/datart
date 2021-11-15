@@ -18,7 +18,8 @@
 
 import { isMatchRequirement } from 'app/utils/chartHelper';
 import { isEmpty } from 'utils/object';
-import ChartConfig, {
+import {
+  ChartConfig,
   ChartStyleSectionConfig,
 } from '../../../types/ChartConfig';
 import ChartDataset from '../../../types/ChartDataset';

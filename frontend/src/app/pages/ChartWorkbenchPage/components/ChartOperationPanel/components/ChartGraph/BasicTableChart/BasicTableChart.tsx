@@ -17,7 +17,7 @@
  */
 
 import ReactChart from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartGraph/ReactChart';
-import ChartConfig from 'app/types/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import {

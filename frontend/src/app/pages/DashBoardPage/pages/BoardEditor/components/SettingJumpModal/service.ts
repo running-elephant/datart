@@ -1,9 +1,7 @@
-import ChartConfig, {
-  ChartDataSectionType,
-} from 'app/types/ChartConfig';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { WidgetTypeMap } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { VizType } from 'app/pages/MainPage/pages/VizPage/slice/types';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';

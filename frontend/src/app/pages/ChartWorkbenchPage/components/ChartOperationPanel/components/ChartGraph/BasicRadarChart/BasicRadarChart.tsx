@@ -17,7 +17,7 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig from 'app/types/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import { init } from 'echarts';
 import Config from './config';

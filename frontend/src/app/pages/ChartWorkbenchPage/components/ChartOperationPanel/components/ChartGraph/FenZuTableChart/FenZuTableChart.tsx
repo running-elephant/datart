@@ -16,9 +16,7 @@
  * limitations under the License.
  */
 
-import ChartConfig, {
-  ChartDataSectionType,
-} from 'app/types/ChartConfig';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import {
   getCustomSortableColumns,

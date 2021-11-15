@@ -20,10 +20,8 @@ import { Tooltip } from 'antd';
 import { IW } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig, {
-  ChartDataSectionType,
-} from 'app/types/ChartConfig';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import classnames from 'classnames';
 import { FC, memo, useCallback, useState } from 'react';
 import styled from 'styled-components/macro';

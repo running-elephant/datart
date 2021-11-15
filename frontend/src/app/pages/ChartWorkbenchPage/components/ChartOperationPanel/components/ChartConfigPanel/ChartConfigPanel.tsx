@@ -30,7 +30,8 @@ import {
 } from 'app/pages/ChartWorkbenchPage';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import ChartPaletteContext from 'app/pages/ChartWorkbenchPage/contexts/ChartPaletteContext';
-import ChartConfig, {
+import {
+  ChartConfig,
   ChartDataSectionConfig,
   ChartStyleSectionConfig,
 } from 'app/types/ChartConfig';

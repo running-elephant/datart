@@ -17,12 +17,13 @@
  */
 
 import { Col, Form, Row } from 'antd';
-import ChartConfig, {
+import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import {
+  ChartConfig,
   ChartDataSectionField,
   ChartDataSectionType,
   FilterFieldAction,
 } from 'app/types/ChartConfig';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,

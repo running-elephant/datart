@@ -17,7 +17,8 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig, {
+import {
+  ChartConfig,
   ChartDataSectionType,
   ChartStyleSectionConfig,
   FieldFormatType,
