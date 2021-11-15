@@ -219,15 +219,6 @@ export type ColorFieldAction = {
   colors?: Array<{ key: string; value: string }>;
 };
 
-// export type FormatFieldAction = {
-//   type?: FieldFormatType;
-//   decimalPlaces?: number;
-//   unit?: number;
-//   unitDesc?: string;
-//   useThousandSeparator?: boolean;
-//   [key: ValueOf<typeof FieldFormatType>]: number;
-// };
-
 export enum NumericUnit {
   None = '无',
   Thousand = '千/K',

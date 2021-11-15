@@ -19,14 +19,12 @@
 import { Col, Input, Row, Select, Space, Tabs } from 'antd';
 import { FormItemEx } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import useMount from 'app/hooks/useMount';
 import { AggregateFieldActionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
   ChartDataViewMeta,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-import { fetchFieldFuncitonsAsync } from 'app/utils/fetch';
 import { FC, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
 import ChartComputedFieldEditor, {
@@ -60,17 +58,9 @@ const ChartComputedFieldSettingPanel: FC<{
   const defaultFunctionCategory = 'all';
   const editorRef = useRef<ChartCompoutedFieldHandle>(null);
   const myComputedFieldRef = useRef(computedField);
-  const [selectedField, setSelectedField] = useState();
   const [selectedFunctionCategory, setSelectedFunctionCategory] = useState(
     defaultFunctionCategory,
   );
-  const [selectedFunction, setSelectedFunction] = useState();
-  const [fieldFunctions, setFieldFunctions] = useState<string[]>([]);
-
-  useMount(async () => {
-    const functions = await fetchFieldFuncitonsAsync(sourceId);
-    setFieldFunctions(functions);
-  });
 
   const hasAggregationFunction = (exp?: string) => {
     return [
@@ -162,7 +152,6 @@ const ChartComputedFieldSettingPanel: FC<{
   };
 
   const handleFieldFuncionSelected = funName => {
-    setSelectedFunction(funName);
     const functionDescription = ComputedFunctionDescriptions.find(
       f => f.name === funName,
     );
@@ -174,7 +163,6 @@ const ChartComputedFieldSettingPanel: FC<{
   };
 
   const handleFieldSelected = field => {
-    setSelectedField(field);
     editorRef.current?.insertField(getInputText(field, TextType.Field));
   };
 
