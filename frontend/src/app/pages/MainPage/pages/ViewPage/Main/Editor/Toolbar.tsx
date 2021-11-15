@@ -21,6 +21,9 @@ import {
   STICKY_LEVEL,
   WARNING,
 } from 'styles/StyleConstants';
+import { RootState } from 'types';
+import { getInsertedNodeIndex } from 'utils/utils';
+import { isParentIdEqual } from '../../../../slice/utils';
 import { selectSources } from '../../../SourcePage/slice/selectors';
 import {
   PREVIEW_SIZE_LIST,
@@ -33,7 +36,6 @@ import { useViewSlice } from '../../slice';
 import { selectCurrentEditingViewAttr } from '../../slice/selectors';
 import { saveView } from '../../slice/thunks';
 import { isNewView } from '../../utils';
-
 interface ToolbarProps {
   allowManage: boolean;
 }
@@ -74,6 +76,10 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
   const size = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'size' }),
   ) as number;
+  const ViewIndex = useSelector(state =>
+    selectCurrentEditingViewAttr(state, { name: 'index' }),
+  ) as number;
+  const viewsData = useSelector<RootState>(state => state.view?.views) as [];
 
   const isArchived = status === ViewStatus.Archived;
 
@@ -96,16 +102,32 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
       },
       parentIdLabel: '目录',
       onSave: (values, onClose) => {
+        let index = ViewIndex;
+
+        if (isParentIdEqual(parentId, values.parentId)) {
+          index = getInsertedNodeIndex(values, viewsData);
+        }
+
         dispatch(
           actions.changeCurrentEditingView({
             ...values,
             parentId: values.parentId || null,
+            index,
           }),
         );
         dispatch(saveView({ resolve: onClose }));
       },
     });
-  }, [showSaveForm, actions, dispatch, name, parentId, config]);
+  }, [
+    showSaveForm,
+    actions,
+    dispatch,
+    name,
+    parentId,
+    config,
+    viewsData,
+    ViewIndex,
+  ]);
 
   const sourceChange = useCallback(
     value => {

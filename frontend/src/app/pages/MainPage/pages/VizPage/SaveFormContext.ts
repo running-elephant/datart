@@ -7,9 +7,9 @@ export interface SaveFormModel {
   id?: string;
   name: string;
   boardType?: BoardType;
-  config?: string;
+  config?: object | string;
   description?: string;
-  parentId?: string;
+  parentId?: string | null;
 }
 
 interface SaveFormState {
@@ -34,9 +34,7 @@ const saveFormContextValue: SaveFormContextValue = {
   onCancel: () => {},
   showSaveForm: () => {},
 };
-
 export const SaveFormContext = createContext(saveFormContextValue);
-
 export const useSaveFormContext = (): SaveFormContextValue => {
   const [vizType, setVizType] = useState<VizType>('FOLDER');
   const [type, setType] = useState(CommonFormTypes.Add);
@@ -50,7 +48,6 @@ export const useSaveFormContext = (): SaveFormContextValue => {
   const onCancel = useCallback(() => {
     setVisible(false);
   }, [setVisible]);
-
   const showSaveForm = useCallback(
     ({
       vizType,

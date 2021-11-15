@@ -95,8 +95,9 @@ export interface VizTab {
 export interface AddVizParams {
   viz: {
     name: string;
+    index:number | null;
     description?: string;
-    parentId?: string;
+    parentId?: string | null;
     orgId: string;
   };
   type: VizType;
@@ -114,6 +115,7 @@ export interface UnarchiveVizParams {
     name: string;
     vizType: VizType;
     parentId: string | null;
+    index:number | null;
   };
   resolve: () => void;
 }

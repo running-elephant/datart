@@ -17,7 +17,7 @@ import { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { getPath, stopPPG } from 'utils/utils';
+import { getInsertedNodeIndex, getPath, stopPPG } from 'utils/utils';
 import {
   PermissionLevels,
   ResourceTypes,
@@ -90,6 +90,8 @@ export const Recycle = memo(
                 visible: true,
                 initialValues: { id, name, parentId: void 0 },
                 onSave: (values, onClose) => {
+                  let index = getInsertedNodeIndex(values, vizs);
+
                   dispatch(
                     unarchiveViz({
                       params: {
@@ -97,6 +99,7 @@ export const Recycle = memo(
                         vizType,
                         ...values,
                         parentId: values.parentId || null,
+                        index,
                       },
                       resolve: () => {
                         message.success('还原成功');
@@ -112,7 +115,7 @@ export const Recycle = memo(
               break;
           }
         },
-      [dispatch, showSaveForm, redirect],
+      [dispatch, showSaveForm, redirect, vizs],
     );
 
     const toDetail = useCallback(
