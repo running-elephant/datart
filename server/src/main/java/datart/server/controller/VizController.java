@@ -229,7 +229,7 @@ public class VizController extends BaseController {
     public ResponseData<Boolean> unarchiveViz(@PathVariable String vizId,
                                               @RequestParam String vizType,
                                               @RequestParam String newName,
-                                              @RequestParam String parentId,
+                                              @RequestParam(required = false) String parentId,
                                               @RequestParam Double index) {
         return ResponseData.success(vizService.unarchiveViz(vizId, ResourceType.valueOf(vizType), newName, parentId, index));
     }
