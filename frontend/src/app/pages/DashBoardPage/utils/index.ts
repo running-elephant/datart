@@ -1,12 +1,12 @@
-import ChartDataView, {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
 import {
   ChartDataRequestBuilder,
   transformToViewConfig,
 } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
+import ChartDataView, {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+} from 'app/types/ChartDataView';
 import { RelativeOrExactTime } from 'app/types/FilterControlPanel';
 import { convertRelativeTimeRange, getTime } from 'app/utils/time';
 import { FilterSqlOperator } from 'globalConstants';

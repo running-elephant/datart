@@ -102,7 +102,7 @@ export class ChartDataRequestBuilder {
     this.script = script || false;
   }
 
-  buildAggregators() {
+  private buildAggregators() {
     const aggColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
       (acc, cur) => {
         if (!cur.rows) {
@@ -126,32 +126,13 @@ export class ChartDataRequestBuilder {
     }));
   }
 
-  buildGroupColumns() {
-    const groupColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
-      (acc, cur) => {
-        if (!cur.rows) {
-          return acc;
-        }
-        if (
-          cur.type === ChartDataSectionType.GROUP ||
-          cur.type === ChartDataSectionType.COLOR
-        ) {
-          return acc.concat(cur.rows);
-        }
-        return acc;
-      },
-      [],
-    );
-    return groupColumns;
-  }
-
-  buildGroups() {
+  private buildGroups() {
     const groupColumns = this.buildGroupColumns();
 
     return groupColumns.map(groupCol => ({ column: groupCol.colName }));
   }
 
-  buildFilters(): ChartRequestFilter[] {
+  private buildFilters(): ChartRequestFilter[] {
     const fields: ChartDataSectionField[] = (this.chartDataConfigs || [])
       .reduce<ChartDataSectionField[]>((acc, cur) => {
         if (!cur.rows || cur.type !== ChartDataSectionType.FILTER) {
@@ -223,7 +204,7 @@ export class ChartDataRequestBuilder {
     return _transformToRequest(fields);
   }
 
-  buildOrders() {
+  private buildOrders() {
     const sortColumns = this.chartDataConfigs
       .reduce<ChartDataSectionField[]>((acc, cur) => {
         if (!cur.rows) {
@@ -250,17 +231,17 @@ export class ChartDataRequestBuilder {
     }));
   }
 
-  buildLimit() {
+  private buildLimit() {
     const settingStyles = this.charSettingConfigs;
     return getStyleValue(settingStyles, ['cache', 'panel', 'displayCount']);
   }
 
-  buildNativeQuery() {
+  private buildNativeQuery() {
     const settingStyles = this.charSettingConfigs;
     return getStyleValue(settingStyles, ['cache', 'panel', 'enableRaw']);
   }
 
-  buildPageInfo() {
+  private buildPageInfo() {
     const settingStyles = this.charSettingConfigs;
     const enablePaging = getStyleValue(settingStyles, [
       'paging',
@@ -278,7 +259,7 @@ export class ChartDataRequestBuilder {
     };
   }
 
-  buildFunctionColumns() {
+  private buildFunctionColumns() {
     const _removeSquareBrackets = expression => {
       if (!expression) {
         return '';
@@ -291,7 +272,7 @@ export class ChartDataRequestBuilder {
     }));
   }
 
-  buildSelectColumns() {
+  private buildSelectColumns() {
     const selectColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
       (acc, cur) => {
         if (!cur.rows) {
@@ -307,10 +288,11 @@ export class ChartDataRequestBuilder {
     return selectColumns.map(col => col.colName);
   }
 
-  buildViewConfigs() {
+  private buildViewConfigs() {
     return transformToViewConfig(this.dataView?.view?.config);
   }
-  build(): ChartRequest {
+
+  public build(): ChartRequest {
     return {
       viewId: this.dataView?.id,
       aggregators: this.buildAggregators(),
@@ -327,6 +309,25 @@ export class ChartDataRequestBuilder {
       // limit: this.buildLimit(),
       // nativeQuery: this.buildNativeQuery(),
     };
+  }
+
+  public buildGroupColumns() {
+    const groupColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
+      (acc, cur) => {
+        if (!cur.rows) {
+          return acc;
+        }
+        if (
+          cur.type === ChartDataSectionType.GROUP ||
+          cur.type === ChartDataSectionType.COLOR
+        ) {
+          return acc.concat(cur.rows);
+        }
+        return acc;
+      },
+      [],
+    );
+    return groupColumns;
   }
 }
 
