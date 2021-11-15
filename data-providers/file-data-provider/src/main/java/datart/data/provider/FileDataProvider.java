@@ -30,7 +30,6 @@ import datart.data.provider.base.DataProviderException;
 import datart.data.provider.jdbc.DataTypeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,7 +38,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class FileDataProvider extends DefaultDataProvider {

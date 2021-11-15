@@ -111,8 +111,9 @@ public class ViewController extends BaseController {
     @PutMapping(value = "/unarchive/{viewId}")
     public ResponseData<Boolean> unarchive(@PathVariable String viewId,
                                            @RequestParam String name,
+                                           @RequestParam Double index,
                                            @RequestParam(required = false) String parentId) {
-        return ResponseData.success(viewService.unarchive(viewId, name, parentId));
+        return ResponseData.success(viewService.unarchive(viewId, name, parentId, index));
     }
 
 }

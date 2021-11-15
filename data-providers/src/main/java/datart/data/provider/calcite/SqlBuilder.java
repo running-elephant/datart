@@ -196,8 +196,8 @@ public class SqlBuilder {
         SqlNode fetch = null;
         SqlNode offset = null;
         if (withPage && (dialect instanceof FetchAndOffsetSupport) && executeParam.getPageInfo() != null) {
-            fetch = SqlLiteral.createExactNumeric(executeParam.getPageInfo().getPageSize() + "", SqlParserPos.ZERO);
-            offset = SqlLiteral.createExactNumeric((executeParam.getPageInfo().getPageNo() - 1) * executeParam.getPageInfo().getPageSize() + "", SqlParserPos.ZERO);
+            fetch = SqlLiteral.createExactNumeric(Math.min(executeParam.getPageInfo().getPageSize(), Integer.MAX_VALUE) + "", SqlParserPos.ZERO);
+            offset = SqlLiteral.createExactNumeric(Math.min((executeParam.getPageInfo().getPageNo() - 1) * executeParam.getPageInfo().getPageSize(), Integer.MAX_VALUE) + "", SqlParserPos.ZERO);
         }
 
         SqlSelect sqlSelect = new SqlSelect(SqlParserPos.ZERO,

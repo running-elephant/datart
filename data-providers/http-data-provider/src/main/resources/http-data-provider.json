@@ -5,20 +5,6 @@
   },
   "attributes": [
     {
-      "name": "cacheEnable",
-      "type": "bool",
-      "required": true,
-      "defaultValue": true,
-      "description": "开启后会将查询的数据保存到内部数据库"
-    },
-    {
-      "name": "cacheTimeout",
-      "type": "string",
-      "required": true,
-      "defaultValue": "30",
-      "description": "缓存的过期时间（分钟）"
-    },
-    {
       "name": "schemas",
       "type": "array",
       "key": "tableName",
@@ -43,7 +29,7 @@
         {
           "name": "property",
           "defaultValue": "",
-          "description": "The property name of the list data in JSON",
+          "description": "Http返回结果中，JSON数组的属性名称。嵌套结构用 . 隔开。如 data.list",
           "type": "string"
         },
         {
@@ -64,13 +50,13 @@
         {
           "name": "timeout",
           "defaultValue": 0,
-          "description": "request timeout",
+          "description": "请求超时时间",
           "type": "number"
         },
         {
           "name": "responseParser",
           "defaultValue": "",
-          "description": "Http Response Parser",
+          "description": "请求结果解析器，自定义解析器时，指定解析器的全类名",
           "type": "string"
         },
         {

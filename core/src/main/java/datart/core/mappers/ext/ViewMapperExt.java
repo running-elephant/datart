@@ -15,11 +15,6 @@ public interface ViewMapperExt extends ViewMapper {
 
 
     @Select({
-            "SELECT v.* from view v where v.org_id=#{orgId} AND v.name=#{name}"
-    })
-    View selectByName(String orgId, String name);
-
-    @Select({
             "SELECT id,`name`,org_id,`index`,is_folder,parent_id,source_id,description FROM view WHERE org_id=#{orgId} AND `status`=1 ORDER BY create_time ASC "
     })
     List<View> listByOrgId(String orgId);
@@ -49,5 +44,10 @@ public interface ViewMapperExt extends ViewMapper {
             "DELETE FROM variable where view_id = #{viewId};",
     })
     int deleteAll(String viewId);
+
+    @Select({
+            "SELECT COUNT(*) FROM `view` WHERE parent_id = #{viewId} AND `status`!=0"
+    })
+    int checkReference(String viewId);
 
 }
