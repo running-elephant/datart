@@ -22,6 +22,7 @@ import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
 import { ChartDataSectionField } from '../../../../ChartWorkbenchPage/models/ChartConfig';
@@ -33,6 +34,7 @@ import {
   TextAlignType,
 } from '../../../constants';
 import { WidgetFilterFormType } from '../../BoardEditor/components/FilterWidgetPanel/types';
+import { ValueTypes } from './../../BoardEditor/components/FilterWidgetPanel/types';
 
 export const strEnumType = <T extends string>(o: Array<T>): { [K in T]: K } => {
   return o.reduce((res, key) => {
@@ -62,6 +64,7 @@ export interface Dashboard {
   index?: number;
   config: DashboardConfig;
   permissions?: any;
+  queryVariables: Variable[];
 }
 export interface SaveDashboard extends Omit<Dashboard, 'config'> {
   config: string;
@@ -218,20 +221,6 @@ export interface RelationConfig {
     triggerColumn: string;
     linkerColumn: string;
   };
-  // widget
-  /**
-   * @param 'widget'
-   * @description 'filter 关联的widget 参数'
-   */
-
-  // subFilter
-  /**
-   * @param 'subFilter'
-   * @description 'subFilter 影响的下级 filter的显示隐藏'
-   */
-
-  // filterWidget
-  // linkage
 }
 export interface RelatedView {
   viewId: string;
@@ -305,9 +294,10 @@ export interface ContainerItem {
 // 控制器组件配置
 export interface FilterWidgetContent {
   type: WidgetFilterTypes;
-  fieldValueType: ChartDataViewFieldType;
+  fieldValueType: ValueTypes;
   relatedViews: RelatedView[];
   widgetFilter: WidgetFilterFormType;
+  hasVariable: boolean;
 }
 // 分析探索组件配置
 export interface ExplorerWidgetConfig {

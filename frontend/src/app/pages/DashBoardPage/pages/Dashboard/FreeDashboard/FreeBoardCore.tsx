@@ -44,7 +44,7 @@ const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
     );
     const widgetConfigs = useMemo(() => {
       return Object.values(widgetConfigRecords).sort((w1, w2) => {
-        return w2.config.index - w1.config.index;
+        return w1.config.index - w2.config.index;
       });
     }, [widgetConfigRecords]);
 
@@ -66,15 +66,13 @@ const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
       scaleMode,
     );
     const boardChildren = useMemo(() => {
-      return widgetConfigs
-        .sort((a, b) => a.config.index - b.config.index)
-        .map(item => {
-          return (
-            <WidgetAllProvider id={item.id}>
-              <WidgetOfFree />
-            </WidgetAllProvider>
-          );
-        });
+      return widgetConfigs.map(item => {
+        return (
+          <WidgetAllProvider key={item.id} id={item.id}>
+            <WidgetOfFree />
+          </WidgetAllProvider>
+        );
+      });
     }, [widgetConfigs]);
     const { gridRef } = useBoardWidthHeight();
     return (

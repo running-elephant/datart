@@ -23,6 +23,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { FilterSelect } from './FilterSelect';
 export interface FilterTextProps {
+  hideLogic?: boolean;
   options?: ControlOption[];
   value: any[];
   sqlOperator: FilterSqlOperator;
@@ -31,7 +32,7 @@ export interface FilterTextProps {
 }
 
 export const FilterText: React.FC<FilterTextProps> = memo(
-  ({ value, sqlOperator, onSqlOperatorAndValues }) => {
+  ({ value, sqlOperator, hideLogic, onSqlOperatorAndValues }) => {
     const [curSqlOperator, setCurSqlOperator] = useState(
       FilterSqlOperator.Equal,
     );
@@ -66,32 +67,35 @@ export const FilterText: React.FC<FilterTextProps> = memo(
 
     return (
       <StyledWrap>
-        <span className="control-select">
-          <FilterSelect
-            onValuesChange={onSelectChange}
-            value={curSqlOperator}
-            multiple={false}
-          >
-            <Select.OptGroup label={`${'不排除'}`}>
-              {SQL_OPERATOR_OPTIONS.include.map(item => {
-                return (
-                  <Select.Option key={item.value} value={item.value}>
-                    {item.name}
-                  </Select.Option>
-                );
-              })}
-            </Select.OptGroup>
-            <Select.OptGroup label={`${'排除'}`}>
-              {SQL_OPERATOR_OPTIONS.notInclude.map(item => {
-                return (
-                  <Select.Option key={item.value} value={item.value}>
-                    {item.name}
-                  </Select.Option>
-                );
-              })}
-            </Select.OptGroup>
-          </FilterSelect>
-        </span>
+        {!hideLogic && (
+          <span className="control-select">
+            <FilterSelect
+              onValuesChange={onSelectChange}
+              value={curSqlOperator}
+              multiple={false}
+            >
+              <Select.OptGroup label={`${'不排除'}`}>
+                {SQL_OPERATOR_OPTIONS.include.map(item => {
+                  return (
+                    <Select.Option key={item.value} value={item.value}>
+                      {item.name}
+                    </Select.Option>
+                  );
+                })}
+              </Select.OptGroup>
+              <Select.OptGroup label={`${'排除'}`}>
+                {SQL_OPERATOR_OPTIONS.notInclude.map(item => {
+                  return (
+                    <Select.Option key={item.value} value={item.value}>
+                      {item.name}
+                    </Select.Option>
+                  );
+                })}
+              </Select.OptGroup>
+            </FilterSelect>
+          </span>
+        )}
+
         {curSqlOperator !== FilterSqlOperator.Between && (
           <span className="control-input ">
             <Input
@@ -121,7 +125,7 @@ const StyledWrap = styled.div`
   }
   .control-input {
     display: flex;
-    width: 50%;
+    flex: 1;
   }
 
   & .ant-input {

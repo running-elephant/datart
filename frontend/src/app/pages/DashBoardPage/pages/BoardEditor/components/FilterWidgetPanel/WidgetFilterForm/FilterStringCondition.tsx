@@ -22,15 +22,16 @@ import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetFilterFormType } from '../types';
+import { ValueTypes, WidgetFilterFormType } from '../types';
 const stringConditionSetValues = [
   ...SQL_OPERATOR_OPTIONS.include,
   ...SQL_OPERATOR_OPTIONS.notInclude,
 ].map(ele => ele.value);
 const FilterStringCondition: FC<{
   form: FormInstance<any> | undefined;
-  fieldValueType: ChartDataViewFieldType;
-}> = memo(({ form, fieldValueType }) => {
+  hasVariable: boolean;
+  fieldValueType: ValueTypes;
+}> = memo(({ form, fieldValueType, hasVariable }) => {
   const [sqlOperatorValue, setSqlOperatorValue] = useState<FilterSqlOperator>(
     FilterSqlOperator.Equal,
   );
@@ -50,10 +51,11 @@ const FilterStringCondition: FC<{
   const onSqlOperatorChange = useCallback(
     value => {
       setSqlOperatorValue(value);
-      const widgetFilter = form?.getFieldValue('widgetFilter');
-      form?.setFieldsValue({
-        widgetFilter: { ...widgetFilter, sqlOperator: value },
-      });
+      const widgetFilter: WidgetFilterFormType = {
+        ...form?.getFieldValue('widgetFilter'),
+        sqlOperator: value,
+      };
+      form?.setFieldsValue({ widgetFilter });
     },
     [form],
   );
@@ -63,6 +65,7 @@ const FilterStringCondition: FC<{
         value={sqlOperatorValue}
         style={{ width: '200px' }}
         placeholder="选择筛选条件值"
+        disabled={hasVariable}
         onChange={onSqlOperatorChange}
       >
         <Select.OptGroup label={`${'不排除'}`}>
@@ -85,7 +88,7 @@ const FilterStringCondition: FC<{
         </Select.OptGroup>
       </Select>
     );
-  }, [onSqlOperatorChange, sqlOperatorValue]);
+  }, [hasVariable, onSqlOperatorChange, sqlOperatorValue]);
 
   const checkCurValue = useCallback(() => {
     const widgetFilter: WidgetFilterFormType = form?.getFieldValue([
@@ -99,6 +102,9 @@ const FilterStringCondition: FC<{
       needAdjust = true;
       sqlOperator = FilterSqlOperator.Equal;
     }
+    if (hasVariable) {
+      sqlOperator = FilterSqlOperator.Equal;
+    }
     if (
       !Array.isArray(widgetFilter.filterValues) ||
       widgetFilter.filterValues.length > 1
@@ -110,14 +116,14 @@ const FilterStringCondition: FC<{
       needAdjust = false;
       filterValues = widgetFilter?.filterValues;
     }
-
+    const nextWidgetFilter: WidgetFilterFormType = {
+      ...widgetFilter,
+      sqlOperator: sqlOperator,
+      filterValues: filterValues,
+    };
     if (needAdjust) {
       form?.setFieldsValue({
-        widgetFilter: {
-          ...widgetFilter,
-          sqlOperator: sqlOperator,
-          filterValues: filterValues,
-        },
+        widgetFilter: nextWidgetFilter,
       });
     }
     setSqlOperatorValue(sqlOperator);
@@ -125,7 +131,7 @@ const FilterStringCondition: FC<{
   }, [fieldValueType, form]);
   useEffect(() => {
     checkCurValue();
-  }, [checkCurValue]);
+  }, [checkCurValue, hasVariable]);
   return (
     <Form.Item noStyle shouldUpdate>
       {() => {

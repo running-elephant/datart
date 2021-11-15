@@ -71,10 +71,6 @@ export const StoryEditor: React.FC<{
     return sortedPages;
   }, [pageMap]);
 
-  useEffect(() => {
-    // dispatch(getStoryDetail(storyId));
-  }, [dispatch, storyId]);
-
   const changePage = useCallback(
     e => {
       const { indexh: slideIdx } = e;

@@ -133,7 +133,7 @@ export type FilterOperatorType = keyof typeof OPERATOR_TYPE_ENUM;
 export const OPERATOR_TYPE_OPTION = [
   { name: '常规', value: OPERATOR_TYPE_ENUM.common },
   { name: '自定义', value: OPERATOR_TYPE_ENUM.custom },
-  { name: '条件', value: OPERATOR_TYPE_ENUM.condition },
+  { name: '手动输入', value: OPERATOR_TYPE_ENUM.condition },
 ];
 export const FilterVisibilityEnum = strEnumType(['hide', 'show', 'condition']);
 export type FilterVisibilityType = keyof typeof FilterVisibilityEnum;

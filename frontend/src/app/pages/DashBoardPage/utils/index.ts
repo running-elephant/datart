@@ -1,10 +1,12 @@
 import ChartDataView, {
+  ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import {
   ChartDataRequestBuilder,
   transformToViewConfig,
 } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
+import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
 import { convertRelativeTimeRange, getTime } from 'app/utils/time';
 import { FilterSqlOperator } from 'globalConstants';
 import { errorHandle } from 'utils/utils';
@@ -13,8 +15,6 @@ import {
   FilterDate,
   WidgetFilterFormType,
 } from '../pages/BoardEditor/components/FilterWidgetPanel/types';
-import { RelativeOrExactTime } from './../../ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
-import { ChartRequestFilter } from './../../ChartWorkbenchPage/models/ChartHttpRequest';
 import {
   BoardLinkFilter,
   DataChart,
@@ -23,6 +23,9 @@ import {
   Widget,
   WidgetInfo,
 } from '../pages/Dashboard/slice/types';
+import { RelativeOrExactTime } from './../../ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
+import { ChartRequestFilter } from './../../ChartWorkbenchPage/models/ChartHttpRequest';
+import { ValueTypes } from './../pages/BoardEditor/components/FilterWidgetPanel/types';
 
 export const convertImageUrl = (urlKey: string = ''): string => {
   if (urlKey.startsWith(STORAGE_IMAGE_KEY_PREFIX)) {
@@ -83,15 +86,18 @@ export const getChartGroupColumns = dataChart => {
   const groupColumns = builder.buildGroupColumns();
   return groupColumns;
 };
-export const getAllFiltersOfOneWidget = (
-  chartWidget: Widget,
-  widgetMap: Record<string, Widget>,
-) => {
+export const getAllFiltersOfOneWidget = (values: {
+  chartWidget: Widget;
+  widgetMap: Record<string, Widget>;
+  params: Record<string, string[]> | undefined;
+}) => {
+  const { chartWidget, widgetMap, params } = values;
   const filterWidgets = Object.values(widgetMap).filter(
     widget => widget.config.type === 'filter',
   );
   let covered = false;
   let filters: ChartRequestFilter[] = [];
+  let variables: Record<string, any[]> = {};
   filterWidgets.forEach(filterWidget => {
     const hasRelation = filterWidget.relations.find(
       re => re.targetId === chartWidget.id,
@@ -102,35 +108,62 @@ export const getAllFiltersOfOneWidget = (
 
     const content = filterWidget.config.content as FilterWidgetContent;
     const { fieldValueType, relatedViews, widgetFilter } = content;
-    const view = relatedViews
+    const relatedViewItem = relatedViews
       .filter(view => view.fieldValue)
       .find(view => view.viewId === chartWidget.viewIds[0]);
-    if (!view) return;
+    if (!relatedViewItem) return;
 
     const values = getWidgetFilterValues(fieldValueType, widgetFilter);
     if (!values) {
       return;
     }
+    if (
+      relatedViewItem.filterFieldCategory ===
+      ChartDataViewFieldCategory.Variable
+    ) {
+      const key = String(relatedViewItem.fieldValue);
+      const curValues = values.map(item => String(item.value));
 
-    const filter: ChartRequestFilter = {
-      aggOperator: widgetFilter.aggregate || null,
-      column: String(view.fieldValue),
-      sqlOperator: widgetFilter.sqlOperator,
-      values: values,
-    };
+      if (fieldValueType !== VariableValueTypes.String) {
+        //  替换逻辑
+        variables[key] = curValues.slice(0, 1);
+      } else {
+        // String是叠加的逻辑 concat
+        if (key in variables) {
+          variables[key] = variables[key].concat(curValues);
+        } else {
+          variables[key] = curValues;
+        }
+        if (params && key in params) {
+          variables[key] = variables[key].concat(params[key]);
+        }
+      }
+    }
+    if (
+      relatedViewItem.filterFieldCategory === ChartDataViewFieldCategory.Field
+    ) {
+      const filter: ChartRequestFilter = {
+        aggOperator: widgetFilter.aggregate || null,
+        column: String(relatedViewItem.fieldValue),
+        sqlOperator: widgetFilter.sqlOperator,
+        values: values,
+      };
+      filters.push(filter);
+    }
+
     if (widgetFilterCovered) {
       covered = true;
     }
-    filters.push(filter);
   });
 
   return {
     covered,
     filters,
+    variables,
   };
 };
 export const getWidgetFilterValues = (
-  fieldValueType: ChartDataViewFieldType,
+  fieldValueType: ValueTypes,
   widgetFilter: WidgetFilterFormType,
 ) => {
   // Date 类型
@@ -142,13 +175,15 @@ export const getWidgetFilterValues = (
       widgetFilter.operatorType,
       widgetFilter.filterDate,
     );
-    const values = timeValues.map(ele => {
-      const item = {
-        value: ele,
-        valueType: fieldValueType,
-      };
-      return item;
-    });
+    const values = timeValues
+      .filter(ele => !!ele)
+      .map(ele => {
+        const item = {
+          value: ele,
+          valueType: fieldValueType,
+        };
+        return item;
+      });
     return values;
   }
   //
@@ -181,13 +216,16 @@ export const getWidgetFilterDateValues = (
     const time = getTime(+(direction + amount), unit)(unit, true);
     timeValues[0] = time.format('YYYY-MM-DD HH:mm:ss');
   }
-  if (endTime.relativeOrExact === RelativeOrExactTime.Exact) {
-    timeValues[1] = endTime.exactTime as string;
-  } else {
-    const { amount, unit, direction } = endTime.relative!;
-    const time = getTime(+(direction + amount), unit)(unit, false);
-    timeValues[1] = time.format('YYYY-MM-DD HH:mm:ss');
+  if (endTime) {
+    if (endTime.relativeOrExact === RelativeOrExactTime.Exact) {
+      timeValues[1] = endTime.exactTime as string;
+    } else {
+      const { amount, unit, direction } = endTime.relative!;
+      const time = getTime(+(direction + amount), unit)(unit, false);
+      timeValues[1] = time.format('YYYY-MM-DD HH:mm:ss');
+    }
   }
+
   return timeValues;
 };
 
@@ -258,7 +296,12 @@ export const getChartWidgetRequestParams = (params: {
   let requestParams = builder.build();
   const viewConfig = transformToViewConfig(chartDataView?.config);
   requestParams = { ...requestParams, ...viewConfig };
-  const { filters, covered } = getAllFiltersOfOneWidget(curWidget, widgetMap);
+
+  const { filters, covered, variables } = getAllFiltersOfOneWidget({
+    chartWidget: curWidget,
+    widgetMap: widgetMap,
+    params: requestParams.params,
+  });
   // 全局过滤 filter
   requestParams.filters = filters.concat(covered ? [] : requestParams.filters);
   // 联动 过滤
@@ -286,6 +329,10 @@ export const getChartWidgetRequestParams = (params: {
       });
       requestParams.filters = filters.concat(linkFilters);
     }
+  }
+  // 变量
+  if (variables) {
+    requestParams.params = variables;
   }
   if (widgetInfo) {
     const { pageInfo } = widgetInfo;

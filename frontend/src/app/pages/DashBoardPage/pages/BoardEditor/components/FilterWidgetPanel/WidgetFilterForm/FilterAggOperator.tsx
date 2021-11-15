@@ -21,10 +21,11 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { AggregateFieldActionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import { FC, memo, useCallback, useEffect } from 'react';
+import { ValueTypes } from '../types';
 
 const FilterAggOperator: FC<{
   form: FormInstance<any> | undefined;
-  fieldValueType: ChartDataViewFieldType;
+  fieldValueType: ValueTypes;
 }> = memo(({ form, fieldValueType }) => {
   const t = useI18NPrefix('viz.common.enum.aggregateTypes');
 

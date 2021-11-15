@@ -21,9 +21,8 @@ import { Modal } from 'antd';
 import { ChartMouseEventParams } from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
-import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import React, { FC, useCallback, useContext } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 import { BoardContext } from '../contexts/BoardContext';
 import { WidgetContext } from '../contexts/WidgetContext';
@@ -42,7 +41,10 @@ import {
   getEditWidgetDataAsync,
 } from '../pages/BoardEditor/slice/thunk';
 import { boardActions } from '../pages/Dashboard/slice';
-import { getChartWidgetDataAsync, getWidgetDataAsync } from '../pages/Dashboard/slice/thunk';
+import {
+  getChartWidgetDataAsync,
+  getWidgetDataAsync,
+} from '../pages/Dashboard/slice/thunk';
 import {
   BoardLinkFilter,
   JumpConfig,
@@ -57,11 +59,10 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   widgetId,
   children,
 }) => {
-  const { boardId, editing, renderMode } = useContext(BoardContext);
+  const { boardId, editing, renderMode, orgId } = useContext(BoardContext);
   const widget = useContext(WidgetContext);
   const dispatch = useDispatch();
   const history = useHistory();
-  const orgId = useSelector(selectOrgId);
 
   // deleteWidget
   const onWidgetDelete = useCallback(

@@ -7,7 +7,6 @@ export enum VariableScopes {
   Public = 'PUBLIC',
   Private = 'PRIVATE',
 }
-
 export enum VariableValueTypes {
   String = 'STRING',
   Number = 'NUMERIC',

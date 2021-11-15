@@ -23,8 +23,9 @@ import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
 import { FC, memo, useCallback } from 'react';
-import { WidgetFilterFormType } from '../types';
+import { ValueTypes, WidgetFilterFormType } from '../types';
 import {
   getDateFacadeOptions,
   getNumberFacadeOptions,
@@ -33,7 +34,7 @@ import {
 
 const FilterFacade: FC<{
   form: FormInstance<any> | undefined;
-  fieldValueType: ChartDataViewFieldType;
+  fieldValueType: ValueTypes;
   fieldCategory: ChartDataViewFieldCategory;
 }> = memo(({ form, fieldValueType, fieldCategory }) => {
   // renderFacadeOptions
@@ -51,6 +52,7 @@ const FilterFacade: FC<{
       form?.getFieldValue('widgetFilter');
     switch (fieldValueType) {
       case ChartDataViewFieldType.STRING:
+      case VariableValueTypes.Expression:
         options = getStringFacadeOptions(widgetFilter?.operatorType);
         break;
       case ChartDataViewFieldType.NUMERIC:

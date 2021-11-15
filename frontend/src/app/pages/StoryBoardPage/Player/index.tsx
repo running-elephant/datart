@@ -66,10 +66,6 @@ export const StoryPlayer: React.FC<{ storyId: string }> = memo(
       return sortedPages;
     }, [pageMap]);
 
-    useEffect(() => {
-      // dispatch(getStoryDetail(storyId));
-    }, [dispatch, storyId]);
-
     const changePage = useCallback(
       e => {
         const { indexh: slideIdx } = e;
