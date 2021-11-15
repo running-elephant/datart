@@ -57,9 +57,9 @@ public class LocalDB {
 
     public static final SqlDialect SQL_DIALECT = new H2Dialect();
 
-    private static final String SELECT_START_SQL = "SELECT * FROM %s";
+    private static final String SELECT_START_SQL = "SELECT * FROM `%s` ";
 
-    private static final String INSERT_SQL = "INSERT INTO %s VALUES %s";
+    private static final String INSERT_SQL = "INSERT INTO `%s` VALUES %s";
 
     private static final String CREATE_TEMP_TABLE = "CREATE VIEW `%s` AS (SELECT * FROM FUNCTION_TABLE('%s'))";
 

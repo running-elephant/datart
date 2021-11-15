@@ -54,7 +54,6 @@ public class DataProviderConfigTemplate implements Serializable {
 
         private Object children;
 
-
     }
 
 

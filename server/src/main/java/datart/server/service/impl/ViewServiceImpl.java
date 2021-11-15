@@ -269,6 +269,11 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     }
 
     public boolean safeDelete(String viewId) {
+        // check children
+        if (viewMapper.checkReference(viewId) != 0) {
+            return false;
+        }
+        // check charts reference
         Datachart datachart = new Datachart();
         datachart.setViewId(viewId);
         return viewMapper.checkUnique(datachart);
