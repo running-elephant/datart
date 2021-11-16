@@ -82,7 +82,6 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
         BeanUtils.copyProperties(storyboard, storyboardDetail);
         // story pages
         storyboardDetail.setStorypages(storypageService.listByStoryboard(storyboardId));
-
         // download permission
         storyboardDetail.setDownload(securityManager
                 .hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), storyboardId, Const.DOWNLOAD)));
@@ -131,5 +130,10 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
         permissionInfo.setResourceId(storyboard.getId());
         permissionInfo.setPermission(Const.MANAGE);
         roleService.grantPermission(Collections.singletonList(permissionInfo));
+    }
+
+    @Override
+    public void deleteReference(Storyboard storyboard) {
+        storypageService.deleteByStoryboard(storyboard.getId());
     }
 }

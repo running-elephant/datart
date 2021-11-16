@@ -162,12 +162,14 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         requirePermission(view, Const.MANAGE);
 
         //check name
-        View check = new View();
-        check.setParentId(parentId);
-        check.setOrgId(view.getOrgId());
-        check.setName(newName);
-        checkUnique(check);
-
+        if (!view.getName().equals(newName)) {
+            View check = new View();
+            check.setParentId(parentId);
+            check.setOrgId(view.getOrgId());
+            check.setName(newName);
+            checkUnique(check);
+        }
+        
         // update status
         view.setName(newName);
         view.setParentId(parentId);
