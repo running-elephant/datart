@@ -7,7 +7,7 @@ export interface SaveFormModel {
   id?: string;
   name: string;
   boardType?: BoardType;
-  config?: object | string;
+  config?: string;
   description?: string;
   parentId?: string | null;
 }

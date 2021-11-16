@@ -15,7 +15,6 @@ import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
-import { RootState } from 'types';
 import { getInsertedNodeIndex } from 'utils/utils';
 import { SaveFormContext, SaveFormModel } from '../../SaveFormContext';
 import {
@@ -24,6 +23,7 @@ import {
   selectArchivedDashboards,
   selectArchivedDatachartLoading,
   selectArchivedDatacharts,
+  selectVizs,
 } from '../../slice/selectors';
 import {
   addViz,
@@ -43,8 +43,7 @@ export const Folders = memo(({ selectedId, className }: FoldersProps) => {
   const orgId = useSelector(selectOrgId);
   const { showSaveForm } = useContext(SaveFormContext);
   const selectVizTree = useMemo(makeSelectVizTree, []);
-  const vizNodeData = useSelector<RootState>(state => state.viz?.vizs) as [];
-
+  const vizsData = useSelector(selectVizs);
   const getInitValues = useCallback((relType: VizType) => {
     if (relType === 'DASHBOARD') {
       return {
@@ -112,7 +111,7 @@ export const Folders = memo(({ selectedId, className }: FoldersProps) => {
         onSave: (values, onClose) => {
           const dataValues = updateValue(key, values);
 
-          let index = getInsertedNodeIndex(values, vizNodeData);
+          let index = getInsertedNodeIndex(values, vizsData);
 
           dispatch(
             addViz({
@@ -124,7 +123,7 @@ export const Folders = memo(({ selectedId, className }: FoldersProps) => {
         },
       });
     },
-    [showSaveForm, getInitValues, updateValue, dispatch, orgId, vizNodeData],
+    [showSaveForm, getInitValues, updateValue, dispatch, orgId, vizsData],
   );
 
   const titles = useMemo(

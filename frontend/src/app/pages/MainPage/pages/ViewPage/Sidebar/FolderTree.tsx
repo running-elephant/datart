@@ -7,12 +7,10 @@ import {
   selectOrgId,
   selectPermissionMap,
 } from 'app/pages/MainPage/slice/selectors';
-import { LocalTreeDataNode } from 'app/pages/MainPage/slice/types';
 import { CommonFormTypes } from 'globalConstants';
 import React, { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { RootState } from 'types';
 import { getInsertedNodeIndex, onDropTreeFn, stopPPG } from 'utils/utils';
 import { isParentIdEqual } from '../../../slice/utils';
 import {
@@ -24,6 +22,7 @@ import { useViewSlice } from '../slice';
 import {
   selectCurrentEditingViewKey,
   selectViewListLoading,
+  selectViews,
 } from '../slice/selectors';
 import {
   deleteView,
@@ -45,10 +44,8 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
   const orgId = useSelector(selectOrgId);
   const isOwner = useSelector(selectIsOrgOwner);
   const permissionMap = useSelector(selectPermissionMap);
-  const viewsNodeData = useSelector<RootState>(
-    state => state.view?.views,
-  ) as Array<LocalTreeDataNode>;
   const { actions } = useViewSlice();
+  const viewsData = useSelector(selectViews);
 
   useEffect(() => {
     dispatch(getViews(orgId));
@@ -100,7 +97,7 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
               parentIdLabel: '目录',
               onSave: (values, onClose) => {
                 if (isParentIdEqual(parentId, values.parentId)) {
-                  index = getInsertedNodeIndex(values, viewsNodeData);
+                  index = getInsertedNodeIndex(values, viewsData);
                 }
 
                 dispatch(
@@ -123,7 +120,7 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
             break;
         }
       },
-    [dispatch, showSaveForm, viewsNodeData],
+    [dispatch, showSaveForm, viewsData],
   );
 
   const renderTreeTitle = useCallback(

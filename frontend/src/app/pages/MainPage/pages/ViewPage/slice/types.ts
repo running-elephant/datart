@@ -121,11 +121,6 @@ export interface VariableHierarchy extends Variable {
 
 export interface SaveViewParams {
   resolve?: () => void;
-  id?: string;
-  name?: string;
-  parentId?: string | null;
-  config?: object;
-  index?: number | null;
 }
 
 export interface UpdateViewBaseParams {

@@ -8,7 +8,6 @@ import { CommonFormTypes } from 'globalConstants';
 import React, { useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { RootState } from 'types';
 import { getInsertedNodeIndex, onDropTreeFn, stopPPG } from 'utils/utils';
 import { isParentIdEqual } from '../../../../slice/utils';
 import {
@@ -16,7 +15,7 @@ import {
   ResourceTypes,
 } from '../../../PermissionPage/constants';
 import { SaveFormContext } from '../../SaveFormContext';
-import { selectVizListLoading } from '../../slice/selectors';
+import { selectVizListLoading, selectVizs } from '../../slice/selectors';
 import {
   deleteViz,
   editFolder,
@@ -33,7 +32,7 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
   const history = useHistory();
   const orgId = useSelector(selectOrgId);
   const loading = useSelector(selectVizListLoading);
-  const vizNodeData = useSelector<RootState>(state => state.viz?.vizs) as [];
+  const vizsData = useSelector(selectVizs);
   const { showSaveForm } = useContext(SaveFormContext);
 
   useEffect(() => {
@@ -100,7 +99,7 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
               onSave: (values, onClose) => {
                 let index = node.index;
                 if (isParentIdEqual(node.parentId, values.parentId)) {
-                  index = getInsertedNodeIndex(values, vizNodeData);
+                  index = getInsertedNodeIndex(values, vizsData);
                 }
 
                 dispatch(
@@ -122,7 +121,7 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
             break;
         }
       },
-    [dispatch, showSaveForm, vizNodeData],
+    [dispatch, showSaveForm, vizsData],
   );
 
   const renderTreeTitle = useCallback(

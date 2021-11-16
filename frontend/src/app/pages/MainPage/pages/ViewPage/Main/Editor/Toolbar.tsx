@@ -21,7 +21,6 @@ import {
   STICKY_LEVEL,
   WARNING,
 } from 'styles/StyleConstants';
-import { RootState } from 'types';
 import { getInsertedNodeIndex } from 'utils/utils';
 import { isParentIdEqual } from '../../../../slice/utils';
 import { selectSources } from '../../../SourcePage/slice/selectors';
@@ -33,7 +32,10 @@ import {
 import { EditorContext } from '../../EditorContext';
 import { SaveFormContext } from '../../SaveFormContext';
 import { useViewSlice } from '../../slice';
-import { selectCurrentEditingViewAttr } from '../../slice/selectors';
+import {
+  selectCurrentEditingViewAttr,
+  selectViews,
+} from '../../slice/selectors';
 import { saveView } from '../../slice/thunks';
 import { isNewView } from '../../utils';
 interface ToolbarProps {
@@ -79,7 +81,7 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
   const ViewIndex = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'index' }),
   ) as number;
-  const viewsData = useSelector<RootState>(state => state.view?.views) as [];
+  const viewsData = useSelector(selectViews);
 
   const isArchived = status === ViewStatus.Archived;
 

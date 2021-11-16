@@ -1,4 +1,3 @@
-import { LocalTreeDataNode } from 'app/pages/MainPage/slice/types';
 import classnames from 'classnames';
 import { CommonFormTypes } from 'globalConstants';
 import debounce from 'lodash/debounce';
@@ -22,7 +21,10 @@ import { ViewStatus, ViewViewModelStages } from '../../constants';
 import { EditorContext } from '../../EditorContext';
 import { SaveFormContext } from '../../SaveFormContext';
 import { useViewSlice } from '../../slice';
-import { selectCurrentEditingViewAttr } from '../../slice/selectors';
+import {
+  selectCurrentEditingViewAttr,
+  selectViews,
+} from '../../slice/selectors';
 import {
   getEditorProvideCompletionItems,
   runSql,
@@ -56,10 +58,7 @@ export const SQLEditor = memo(() => {
     selectCurrentEditingViewAttr(state, { name: 'status' }),
   ) as ViewStatus;
   const theme = useSelector(selectThemeKey);
-
-  const viewsData = useSelector<RootState>(
-    state => state.view?.views,
-  ) as Array<LocalTreeDataNode>;
+  const viewsData = useSelector(selectViews);
 
   const run = useCallback(() => {
     const fragment = editorInstance

@@ -182,8 +182,8 @@ export const onDropTreeFn = ({ info, treeData, callback }) => {
 };
 
 export const getInsertedNodeIndex = (
-  AddData: SaveFormModel,
-  treeData?: any[],
+  AddData: Omit<SaveFormModel, 'config'> & { config?: object | string },
+  treeData: any,
 ) => {
   let index: number = 0;
 

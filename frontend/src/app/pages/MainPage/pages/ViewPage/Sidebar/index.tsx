@@ -9,19 +9,21 @@ import {
 import { ListNav, ListPane, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
-import { LocalTreeDataNode } from 'app/pages/MainPage/slice/types';
 import { CommonFormTypes } from 'globalConstants';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
-import { RootState } from 'types';
 import { getInsertedNodeIndex } from 'utils/utils';
 import { v4 as uuidv4 } from 'uuid';
 import { UNPERSISTED_ID_PREFIX } from '../constants';
 import { SaveFormContext } from '../SaveFormContext';
-import { makeSelectViewTree, selectArchived } from '../slice/selectors';
+import {
+  makeSelectViewTree,
+  selectArchived,
+  selectViews,
+} from '../slice/selectors';
 import { saveFolder } from '../slice/thunks';
 import { ViewSimpleViewModel } from '../slice/types';
 import { FolderTree } from './FolderTree';
@@ -33,6 +35,7 @@ export const Sidebar = memo(() => {
   const { showSaveForm } = useContext(SaveFormContext);
   const orgId = useSelector(selectOrgId);
   const selectViewTree = useMemo(makeSelectViewTree, []);
+  const viewsData = useSelector(selectViews);
 
   const getIcon = useCallback(
     ({ isFolder }: ViewSimpleViewModel) =>
@@ -51,10 +54,6 @@ export const Sidebar = memo(() => {
   const treeData = useSelector(state =>
     selectViewTree(state, { getIcon, getDisabled }),
   );
-
-  const viewsNodeData = useSelector<RootState>(
-    state => state.view?.views,
-  ) as Array<LocalTreeDataNode>;
 
   const { filteredData: filteredTreeData, debouncedSearch: treeSearch } =
     useDebouncedSearch(treeData, (keywords, d) =>
@@ -93,7 +92,7 @@ export const Sidebar = memo(() => {
             simple: true,
             parentIdLabel: '所属目录',
             onSave: (values, onClose) => {
-              let index = getInsertedNodeIndex(values, viewsNodeData);
+              let index = getInsertedNodeIndex(values, viewsData);
 
               dispatch(
                 saveFolder({
@@ -112,7 +111,7 @@ export const Sidebar = memo(() => {
           break;
       }
     },
-    [dispatch, history, orgId, showSaveForm, viewsNodeData],
+    [dispatch, history, orgId, showSaveForm, viewsData],
   );
 
   const titles = useMemo(
