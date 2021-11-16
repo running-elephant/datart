@@ -112,19 +112,6 @@ export function SharePage() {
     );
   };
 
-  useMount(() => {
-    if (Boolean(usePassword)) {
-      const previousPassword = persistence.session.get(shareToken);
-      if (previousPassword) {
-        fetchShareVizInfoImpl(shareToken, previousPassword, searchParams);
-      } else {
-        dispatch(actions.saveNeedPassword(true));
-      }
-    } else {
-      fetchShareVizInfoImpl(shareToken, undefined, searchParams);
-    }
-  });
-
   const onLoadShareTask = useMemo(() => {
     const clientId = localStorage.getItem(StorageKeys.ShareClientId);
     if (clientId) {
