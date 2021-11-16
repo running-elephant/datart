@@ -21,27 +21,43 @@ import moment from 'moment';
 import { FC, memo, useEffect, useState } from 'react';
 interface FilterRangTimeProps {
   value: any[];
-  onRangeTimeChange: (timeValues: string[]) => void;
+  onRangeTimeChange: (timeValues: string[] | null) => void;
 }
 const FilterRangTime: FC<FilterRangTimeProps> = memo(
   ({ value, onRangeTimeChange }) => {
-    const [timeRange, setTimeRange] = useState<string[]>(() => value);
+    const [timeRange, setTimeRange] = useState<string[] | null>(() => value);
     useEffect(() => {
-      setTimeRange(value);
+      if (!value?.[0] && !value?.[1]) {
+        setTimeRange(null);
+      } else {
+        setTimeRange(value);
+      }
     }, [value]);
     const handleDateChange = times => {
+      if (!times) {
+        setTimeRange(null);
+        onRangeTimeChange(null);
+        return;
+      }
       const formatTemp = 'YYYY-MM-DD HH:mm:ss';
       const newValues = [
-        times[0].format(formatTemp),
-        times[1].format(formatTemp),
+        times?.[0].format(formatTemp),
+        times?.[1].format(formatTemp),
       ];
       onRangeTimeChange(newValues);
     };
     return (
       <DatePicker.RangePicker
         showTime
-        allowClear={false}
-        value={[moment(timeRange[0]), moment(timeRange[1])]}
+        allowClear={true}
+        value={
+          timeRange
+            ? [
+                timeRange[0] ? moment(timeRange[0]) : null,
+                timeRange[1] ? moment(timeRange[1]) : null,
+              ]
+            : undefined
+        }
         onChange={handleDateChange}
       />
     );

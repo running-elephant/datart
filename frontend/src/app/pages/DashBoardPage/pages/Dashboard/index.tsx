@@ -31,7 +31,10 @@ import { BoardProvider } from '../../components/BoardProvider';
 import FullScreenPanel from '../../components/FullScreenPanel';
 import TitleHeader from '../../components/TitleHeader';
 import BoardEditor from '../BoardEditor';
-import { editDashBoardInfoActions } from '../BoardEditor/slice';
+import {
+  editBoardStackActions,
+  editDashBoardInfoActions,
+} from '../BoardEditor/slice';
 import AutoBoardCore from './AutoDashboard/AutoBoardCore';
 import FreeBoardCore from './FreeDashboard/FreeBoardCore';
 import { boardActions } from './slice';
@@ -89,6 +92,7 @@ export const Dashboard: React.FC<DashboardProps> = memo(
           }),
         );
       }
+      dispatch(editBoardStackActions.updateBoard({} as any));
     }, [boardId, dispatch, fetchData, searchParams]);
 
     const [showBoardEditor, setShowBoardEditor] = useState(false);

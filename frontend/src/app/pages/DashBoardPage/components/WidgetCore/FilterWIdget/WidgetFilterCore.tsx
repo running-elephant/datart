@@ -122,16 +122,16 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
     [refreshWidgetsByFilter, widget, widgetUpdate],
   );
   const onRangeTimeChange = useCallback(
-    (timeValues: string[]) => {
+    (timeValues: string[] | null) => {
       const nextFilterDate: FilterDate = {
         commonTime: '',
         startTime: {
           relativeOrExact: RelativeOrExactTime.Exact,
-          exactTime: timeValues[0],
+          exactTime: timeValues?.[0],
         },
         endTime: {
           relativeOrExact: RelativeOrExactTime.Exact,
-          exactTime: timeValues[1],
+          exactTime: timeValues?.[1],
         },
       };
       const nextWidget = produce(widget, draft => {

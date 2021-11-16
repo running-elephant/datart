@@ -59,8 +59,9 @@ export const FilterText: React.FC<FilterTextProps> = memo(
     );
     const valueChange = useCallback(
       e => {
-        setStartValue(e.target.value);
-        onChangeValues([e.target.value || '']);
+        const value = e.target.value;
+        setStartValue(value);
+        onChangeValues([value]);
       },
       [onChangeValues],
     );
@@ -100,6 +101,7 @@ export const FilterText: React.FC<FilterTextProps> = memo(
           <span className="control-input ">
             <Input
               value={startValue}
+              allowClear={true}
               onChange={valueChange}
               className="control-input-input"
             />

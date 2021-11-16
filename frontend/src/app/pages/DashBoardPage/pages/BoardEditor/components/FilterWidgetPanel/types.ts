@@ -51,7 +51,7 @@ export interface WidgetFilterFormType {
 }
 export interface FilterDate {
   // commonTime: keyof typeof RECOMMEND_TIME;
-  commonTime: string; //常用
+  commonTime: string | null; //常用
   startTime: filterDateTime;
   endTime: filterDateTime;
 }
@@ -59,7 +59,7 @@ export interface FilterDate {
 export interface filterDateTime {
   relativeOrExact: RelativeOrExactTime;
   relative?: filterRelativeTime;
-  exactTime?: Moment | string;
+  exactTime?: Moment | string | null;
 }
 export interface filterRelativeTime {
   amount: number;
