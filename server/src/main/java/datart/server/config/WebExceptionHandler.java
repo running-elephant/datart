@@ -110,10 +110,10 @@ public class WebExceptionHandler {
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(Exception.class)
     public ResponseData<String> exceptionHandler(Exception e) {
-        log.error(e.getMessage(), e);
+        log.error(e.getCause().getMessage(), e);
         ResponseData.ResponseDataBuilder<String> builder = ResponseData.builder();
         return builder.success(false)
-                .message(e.getMessage())
+                .message(e.getCause().getMessage())
                 .exception(e)
                 .build();
     }
