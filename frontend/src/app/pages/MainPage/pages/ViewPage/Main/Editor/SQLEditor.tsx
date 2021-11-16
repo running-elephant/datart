@@ -16,11 +16,15 @@ import styled from 'styled-components/macro';
 import { FONT_SIZE_BASE } from 'styles/StyleConstants';
 import { selectThemeKey } from 'styles/theme/slice/selectors';
 import { RootState } from 'types';
+import { getInsertedNodeIndex } from 'utils/utils';
 import { ViewStatus, ViewViewModelStages } from '../../constants';
 import { EditorContext } from '../../EditorContext';
 import { SaveFormContext } from '../../SaveFormContext';
 import { useViewSlice } from '../../slice';
-import { selectCurrentEditingViewAttr } from '../../slice/selectors';
+import {
+  selectCurrentEditingViewAttr,
+  selectViews,
+} from '../../slice/selectors';
 import {
   getEditorProvideCompletionItems,
   runSql,
@@ -54,6 +58,7 @@ export const SQLEditor = memo(() => {
     selectCurrentEditingViewAttr(state, { name: 'status' }),
   ) as ViewStatus;
   const theme = useSelector(selectThemeKey);
+  const viewsData = useSelector(selectViews);
 
   const run = useCallback(() => {
     const fragment = editorInstance
@@ -80,10 +85,13 @@ export const SQLEditor = memo(() => {
           visible: true,
           parentIdLabel: '目录',
           onSave: (values, onClose) => {
+            let index = getInsertedNodeIndex(values, viewsData);
+
             dispatch(
               actions.changeCurrentEditingView({
                 ...values,
                 parentId: values.parentId || null,
+                index,
               }),
             );
             save(onClose);
@@ -93,7 +101,7 @@ export const SQLEditor = memo(() => {
         save();
       }
     }
-  }, [dispatch, actions, stage, status, id, save, showSaveForm]);
+  }, [dispatch, actions, stage, status, id, save, showSaveForm, viewsData]);
 
   const editorWillMount = useCallback(
     editor => {

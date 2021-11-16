@@ -15,7 +15,7 @@ import { CommonFormTypes } from 'globalConstants';
 import { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { getPath, stopPPG } from 'utils/utils';
+import { getInsertedNodeIndex, getPath, stopPPG } from 'utils/utils';
 import {
   PermissionLevels,
   ResourceTypes,
@@ -93,9 +93,11 @@ export const Recycle = memo(({ list }: RecycleProps) => {
               initialValues: { name, parentId: null },
               parentIdLabel: '目录',
               onSave: (values, onClose) => {
+                let index = getInsertedNodeIndex(values, views);
+
                 dispatch(
                   unarchiveView({
-                    view: { ...values, id },
+                    view: { ...values, id, index },
                     resolve: () => {
                       dispatch(removeEditingView({ id, resolve: redirect }));
                       message.success('还原成功');
@@ -110,7 +112,7 @@ export const Recycle = memo(({ list }: RecycleProps) => {
             break;
         }
       },
-    [dispatch, showSaveForm, redirect],
+    [dispatch, showSaveForm, redirect, views],
   );
 
   const renderTreeTitle = useCallback(
