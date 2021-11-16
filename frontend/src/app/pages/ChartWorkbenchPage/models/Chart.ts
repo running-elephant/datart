@@ -16,18 +16,19 @@
  * limitations under the License.
  */
 
-import { isMatchRequirement } from 'app/utils/chartHelper';
-import { isEmpty } from 'utils/object';
 import {
   ChartConfig,
+  ChartDataSectionConfig,
   ChartStyleSectionConfig,
-} from '../../../types/ChartConfig';
-import ChartDataset from '../../../types/ChartDataset';
-import ChartMetadata from '../../../types/ChartMetadata';
+} from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
+import ChartMetadata from 'app/types/ChartMetadata';
 import DatartChartBase, {
   ChartMouseEvent,
   ChartStatus,
-} from '../../../types/DatartChartBase';
+} from 'app/types/DatartChartBase';
+import { isInRange } from 'app/utils/chartHelper';
+import { isEmpty } from 'utils/object';
 import ChartEventBroker from './ChartEventBroker';
 
 class Chart extends DatartChartBase {
@@ -74,11 +75,11 @@ class Chart extends DatartChartBase {
     this._mouseEvents = events;
   }
 
-  public isMatchRequirement(config) {
-    if (!config || !this.meta?.requirements) {
+  public isMatchRequirement(config?: ChartConfig) {
+    if (!config) {
       return true;
     }
-    return isMatchRequirement(this.meta, config);
+    return this.isMatchRequiredSectionLimition(config.datas);
   }
 
   public getStateHistory() {
@@ -114,20 +115,6 @@ class Chart extends DatartChartBase {
     return series?.data?.valueColName || series.seriesName;
   }
 
-  private isInRange(limit, count) {
-    if (isEmpty(limit)) {
-      return true;
-    }
-    if (Number.isInteger(limit)) {
-      return limit === count;
-    } else if (Array.isArray(limit) && limit.length === 1) {
-      return limit[0] === count;
-    } else if (Array.isArray(limit) && limit.length === 2) {
-      return limit[0] <= count && count <= limit[1];
-    }
-    return false;
-  }
-
   private getValue(
     configs: ChartStyleSectionConfig[] = [],
     paths?: string[],
@@ -146,6 +133,16 @@ class Chart extends DatartChartBase {
       return isEmpty(group) ? null : group[targetKey];
     }
     return this.getValue(group.rows, paths, targetKey);
+  }
+
+  private isMatchRequiredSectionLimition(
+    dataConfigs?: ChartDataSectionConfig[],
+  ) {
+    return (dataConfigs || [])
+      .filter(config => Boolean(config?.required))
+      .every(config => {
+        return isInRange(config?.limit, config?.rows?.length);
+      });
   }
 }
 

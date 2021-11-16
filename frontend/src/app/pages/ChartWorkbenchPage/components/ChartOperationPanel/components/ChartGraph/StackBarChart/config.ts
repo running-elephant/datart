@@ -25,6 +25,7 @@ const config: ChartConfig = {
       key: 'metrics',
       required: true,
       type: 'group',
+      limit: [0, 1],
     },
     {
       label: 'deminsion',
@@ -32,6 +33,7 @@ const config: ChartConfig = {
       required: true,
       rows: [],
       type: 'aggregate',
+      limit: [1, 999],
     },
     {
       label: 'filter',
@@ -43,6 +45,7 @@ const config: ChartConfig = {
       label: 'colorize',
       key: 'color',
       type: 'color',
+      limit: [0, 1],
     },
     {
       label: 'info',
