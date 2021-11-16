@@ -30,7 +30,7 @@ import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
   ChartDataViewMeta,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartDataView';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { FC, memo, useMemo } from 'react';
 import { useDrag } from 'react-dnd';

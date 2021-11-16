@@ -22,8 +22,8 @@ import useMount from 'app/hooks/useMount';
 import {
   FilterConditionType,
   FilterValueOption,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataView from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartConfig';
+import ChartDataView from 'app/types/ChartDataView';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useState } from 'react';

@@ -18,9 +18,9 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
-import { ChartMouseEventParams } from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
+import { ChartMouseEventParams } from 'app/types/DatartChartBase';
 import React, { FC, useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';

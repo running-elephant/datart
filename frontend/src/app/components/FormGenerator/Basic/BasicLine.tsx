@@ -18,7 +18,7 @@
 
 import { Select } from 'antd';
 import { ColorPickerPopover } from 'app/components/ReactColorPicker';
-import { ChartStyleSectionConfig } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import { CHART_LINE_STYLES, CHART_LINE_WIDTH } from 'globalConstants';
 import { FC, memo } from 'react';

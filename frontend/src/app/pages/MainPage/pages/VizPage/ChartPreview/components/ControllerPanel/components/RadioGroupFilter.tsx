@@ -18,8 +18,8 @@
 
 import { Radio } from 'antd';
 import useFetchFilterDataByCondtion from 'app/hooks/useFetchFilterDataByCondtion';
-import { ControllerRadioFacadeTypes } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
-import { FilterValueOption } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { FilterValueOption } from 'app/types/ChartConfig';
+import { ControllerRadioFacadeTypes } from 'app/types/FilterControlPanel';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useState } from 'react';
 import { IsKeyIn } from 'utils/object';

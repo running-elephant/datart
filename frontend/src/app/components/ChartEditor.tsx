@@ -22,6 +22,7 @@ import useMount from 'app/hooks/useMount';
 import workbenchSlice, {
   BackendChart,
   backendChartSelector,
+  ChartConfigReducerActionType,
   chartConfigSelector,
   currentDataViewSelector,
   datasetsSelector,
@@ -36,7 +37,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { CloneValueDeep, mergeDefaultToValue } from 'utils/object';
-import { ChartConfigReducerActionType } from '../pages/ChartWorkbenchPage';
 import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
 import Chart from '../pages/ChartWorkbenchPage/models/Chart';
 import ChartManager from '../pages/ChartWorkbenchPage/models/ChartManager';

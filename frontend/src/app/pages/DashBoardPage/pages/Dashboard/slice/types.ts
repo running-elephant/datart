@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 import { ChartEditorProps } from 'app/components/ChartEditor';
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import { ChartDatasetMeta } from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
+import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartDatasetMeta } from 'app/types/ChartDataset';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
+} from 'app/types/ChartDataView';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
-import { ChartDataSectionField } from '../../../../ChartWorkbenchPage/models/ChartConfig';
+import { ChartDataSectionField } from '../../../../../types/ChartConfig';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import {
   BorderStyleType,

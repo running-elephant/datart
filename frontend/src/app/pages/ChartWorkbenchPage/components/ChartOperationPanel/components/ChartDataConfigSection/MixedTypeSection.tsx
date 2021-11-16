@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionFieldActionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import { ChartDataSectionFieldActionType } from 'app/types/ChartConfig';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
+import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { FC, memo } from 'react';
-import { ChartDataConfigSectionProps } from '.';
 import BaseDataConfigSection from './BaseDataConfigSection';
 import { dataConfigSectionComparer } from './utils';
 

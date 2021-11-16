@@ -25,7 +25,7 @@ import {
 } from 'antd';
 import ChartDataView, {
   ChartDataViewFieldCategory,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartDataView';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import React, { memo, useCallback } from 'react';

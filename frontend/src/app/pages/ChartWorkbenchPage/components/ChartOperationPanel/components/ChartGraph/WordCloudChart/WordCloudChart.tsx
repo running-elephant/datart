@@ -17,11 +17,12 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig, {
-  ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
-import { getValueByColumnKey, transfromToObjectArray } from 'app/utils/chart';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
+import {
+  getValueByColumnKey,
+  transfromToObjectArray,
+} from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import 'echarts-wordcloud';
 import Config from './config';

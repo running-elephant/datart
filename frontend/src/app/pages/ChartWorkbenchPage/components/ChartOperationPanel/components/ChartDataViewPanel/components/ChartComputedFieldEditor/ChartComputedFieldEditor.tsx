@@ -17,6 +17,10 @@
  */
 
 import { Divider, Row } from 'antd';
+import {
+  ChartCompoutedFieldHandle,
+  FunctionDescription,
+} from 'app/types/CompoutedFieldEditor';
 import debounce from 'lodash/debounce';
 import {
   forwardRef,
@@ -29,17 +33,6 @@ import MonacoEditor from 'react-monaco-editor';
 import styled from 'styled-components/macro';
 import ChartComputedFieldEditorDarkTheme from './ChartComputedFieldEditorDarkTheme';
 import DatartQueryLanguageSpecification from './DatartQueryLanguageSpecification';
-
-export interface ChartCompoutedFieldHandle {
-  insertField: (value, funcDesc?: FunctionDescription) => void;
-}
-
-export interface FunctionDescription {
-  name: string;
-  type: string;
-  description: string;
-  syntax: string;
-}
 
 const ChartComputedFieldEditor: ForwardRefRenderFunction<
   ChartCompoutedFieldHandle,

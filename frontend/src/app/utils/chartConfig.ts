@@ -1,6 +1,4 @@
-import ChartConfig, {
-  ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 
 export const transferOldDataConfigs = (
   oldConfig?: ChartConfig,

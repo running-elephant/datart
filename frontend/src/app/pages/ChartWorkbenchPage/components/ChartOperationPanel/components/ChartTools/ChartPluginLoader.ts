@@ -17,7 +17,7 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import * as datartChartHelper from 'app/utils/chart';
+import * as datartChartHelper from 'app/utils/chartHelper';
 import { fetchPluginChart } from 'app/utils/fetch';
 import { Omit } from 'utils/object';
 

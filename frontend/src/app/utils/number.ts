@@ -20,7 +20,7 @@ import {
   FieldFormatType,
   IFieldFormatConfig,
   NumericUnit,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import moment from 'moment';
 import { isEmpty } from 'utils/object';
 

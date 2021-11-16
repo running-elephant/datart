@@ -17,10 +17,8 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig, {
-  ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import {
   getDataColumnMaxAndMin,
   getExtraSeriesRowData,
@@ -29,7 +27,7 @@ import {
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
 import { init, registerMap } from 'echarts';
 import Config from './config';
 import geoChinaCity from './geo-china-city.map.json';

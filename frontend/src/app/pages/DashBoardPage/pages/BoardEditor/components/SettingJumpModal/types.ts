@@ -1,4 +1,4 @@
-import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 export interface FilterOptionItem {
   label: string;
   value: string;

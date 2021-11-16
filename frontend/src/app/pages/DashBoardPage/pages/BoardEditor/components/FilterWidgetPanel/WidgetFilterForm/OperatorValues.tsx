@@ -17,15 +17,15 @@
  */
 
 import { Form, FormInstance, Radio, Transfer } from 'antd';
-import { ControllerFacadeTypes } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
-import { FilterValueOption } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { FilterValueOption } from 'app/types/ChartConfig';
 import ChartDataView, {
   ChartDataViewFieldCategory,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartDataView';
 import {
   FilterOperatorType,
   OPERATOR_TYPE_OPTION,
 } from 'app/pages/DashBoardPage/constants';
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';

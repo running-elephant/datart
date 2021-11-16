@@ -17,7 +17,7 @@
  */
 
 import { Form, FormInstance, Input, Select } from 'antd';
-import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useState } from 'react';

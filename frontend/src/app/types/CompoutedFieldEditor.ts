@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-import { createContext } from 'react';
-import { ChartI18NSectionConfig } from '../../../types/ChartConfig';
+export interface FunctionDescription {
+  name: string;
+  type: string;
+  description: string;
+  syntax: string;
+}
 
-const ChartI18NContext = createContext<{
-  i18NConfigs?: ChartI18NSectionConfig[];
-}>({
-  i18NConfigs: [],
-});
-
-export default ChartI18NContext;
+export interface ChartCompoutedFieldHandle {
+  insertField: (value, funcDesc?: FunctionDescription) => void;
+}

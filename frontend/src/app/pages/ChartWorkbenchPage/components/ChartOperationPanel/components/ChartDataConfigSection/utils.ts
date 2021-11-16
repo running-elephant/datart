@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartDataConfigSectionProps } from '.';
+import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 
 export function dataConfigSectionComparer(
   prevProps: ChartDataConfigSectionProps,
