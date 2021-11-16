@@ -128,7 +128,7 @@ const FilterStringCondition: FC<{
     }
     setSqlOperatorValue(sqlOperator);
     setContainValue(filterValues[0]);
-  }, [fieldValueType, form]);
+  }, [fieldValueType, form, hasVariable]);
   useEffect(() => {
     checkCurValue();
   }, [checkCurValue, hasVariable]);
@@ -139,15 +139,12 @@ const FilterStringCondition: FC<{
           <Wrap>
             <Input
               addonBefore={renderContainSelector()}
+              allowClear={true}
               value={containValue}
               placeholder="填写条件值"
               onChange={onContainValueChange}
             />
-            <Form.Item
-              noStyle
-              name={['widgetFilter', 'filterValues']}
-              rules={[{ required: true }]}
-            >
+            <Form.Item noStyle name={['widgetFilter', 'filterValues']}>
               <Select mode="multiple" style={{ display: 'none' }} />
             </Form.Item>
           </Wrap>

@@ -184,19 +184,59 @@ export const getWidgetFilterValues = (
         };
         return item;
       });
-    return values;
+    return values[0] ? values : null;
   }
-  //
+
   if (!widgetFilter.filterValues || widgetFilter.filterValues.length === 0)
     return false;
-  const values = widgetFilter.filterValues.map(ele => {
-    const item = {
-      value: ele,
-      valueType: fieldValueType,
-    };
-    return item;
-  });
-  return values;
+  // NUMERIC 类型
+  if (fieldValueType === ChartDataViewFieldType.NUMERIC) {
+    const values = widgetFilter.filterValues
+      .filter(ele => {
+        if (ele === 0) return true;
+        return !!ele;
+      })
+      .map(ele => {
+        const item = {
+          value: ele,
+          valueType: fieldValueType,
+        };
+        return item;
+      });
+    return values[0] ? values : false;
+  }
+  // string 类型
+  if (fieldValueType === ChartDataViewFieldType.STRING) {
+    const values = widgetFilter.filterValues
+      .filter(ele => {
+        if (ele.trim() === '') return false;
+        return !!ele;
+      })
+      .map(ele => {
+        const item = {
+          value: ele.trim(),
+          valueType: fieldValueType,
+        };
+        return item;
+      });
+    return values[0] ? values : false;
+  }
+  // Expression 类型
+  if (fieldValueType === VariableValueTypes.Expression) {
+    const values = widgetFilter.filterValues
+      .filter(ele => {
+        if (ele.trim() === '') return false;
+        return !!ele;
+      })
+      .map(ele => {
+        const item = {
+          value: ele.trim(),
+          valueType: fieldValueType,
+        };
+        return item;
+      });
+    return values[0] ? values : false;
+  }
 };
 export const getWidgetFilterDateValues = (
   operatorType: FilterOperatorType,
