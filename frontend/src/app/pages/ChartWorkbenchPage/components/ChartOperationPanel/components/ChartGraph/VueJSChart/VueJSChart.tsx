@@ -17,7 +17,7 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import { getStyleValueByGroup } from 'app/utils/chart';
+import { getStyleValueByGroup } from 'app/utils/chartHelper';
 import Config from './config';
 
 const getCode = () => {

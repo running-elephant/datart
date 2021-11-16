@@ -17,7 +17,6 @@
  */
 
 import { message } from 'antd';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
 import ChartRequest, {
   transformToViewConfig,
 } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
@@ -27,6 +26,7 @@ import {
   DownloadTaskState,
 } from 'app/pages/MainPage/slice/types';
 import { ExecuteToken } from 'app/pages/SharePage/slice/types';
+import ChartDataset from 'app/types/ChartDataset';
 import { saveAs } from 'file-saver';
 import { request, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';

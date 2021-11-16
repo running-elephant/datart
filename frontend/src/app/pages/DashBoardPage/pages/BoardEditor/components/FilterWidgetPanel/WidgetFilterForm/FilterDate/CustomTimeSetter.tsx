@@ -18,7 +18,7 @@
 
 import { DatePicker, Form, FormInstance, InputNumber, Select } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { RelativeOrExactTime } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
+import { RelativeOrExactTime } from 'app/types/FilterControlPanel';
 import { TIME_DIRECTION, TIME_UNIT_OPTIONS } from 'globalConstants';
 import { FC, memo, useCallback, useMemo } from 'react';
 

@@ -86,6 +86,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
         requirePermission(retrieve, Const.MANAGE);
         deleteStaticFiles(retrieve);
         deletePermissions(retrieve);
+        deleteReference(retrieve);
         return getDefaultMapper().deleteByPrimaryKey(id) == 1;
     }
 
@@ -142,6 +143,10 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
     }
 
     default void deletePermissions(E e) {
+
+    }
+
+    default void deleteReference(E e) {
 
     }
 

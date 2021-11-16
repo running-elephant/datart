@@ -1,3 +1,4 @@
+import { PageInfo } from '../pages/MainPage/pages/ViewPage/slice/types';
 /**
  * Datart
  *
@@ -16,13 +17,29 @@
  * limitations under the License.
  */
 
-import { createContext } from 'react';
-import { ChartI18NSectionConfig } from '../../../types/ChartConfig';
+class ChartDataset {
+  id?: string;
+  name?: string;
+  columns?: ChartDatasetMeta[];
+  rows?: string[][];
+  pageInfo?: ChartDatasetPageInfo;
+  script?: string;
 
-const ChartI18NContext = createContext<{
-  i18NConfigs?: ChartI18NSectionConfig[];
-}>({
-  i18NConfigs: [],
-});
+  constructor(id, name) {
+    this.id = id;
+    this.name = name;
+    this.columns = [];
+    this.rows = [];
+    this.pageInfo = {};
+  }
+}
 
-export default ChartI18NContext;
+export type ChartDatasetPageInfo = Partial<PageInfo>;
+
+export type ChartDatasetMeta = {
+  name?: string;
+  type?: string;
+  primaryKey?: boolean;
+};
+
+export default ChartDataset;

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import ChartDataView from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import ChartDataView from 'app/types/ChartDataView';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Dashboard/slice';
 import { fetchBoardDetail } from 'app/pages/DashBoardPage/pages/Dashboard/slice/thunk';
 import {

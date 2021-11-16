@@ -16,19 +16,27 @@
  * limitations under the License.
  */
 
-import ChartConfig from './models/ChartConfig';
+import { isInRange } from '../chartHelper';
 
-export const ChartConfigReducerActionType = {
-  INIT: 'init',
-  STYLE: 'style',
-  DATA: 'data',
-  SETTING: 'setting',
-  I18N: 'i18n',
-};
-
-export type ChartConfigPayloadType = {
-  init?: ChartConfig;
-  ancestors?: number[];
-  value?: any;
-  needRefresh?: boolean;
-};
+describe.each([
+  [0, 0, true],
+  [0, 1, false],
+  [1, 1, true],
+  [0, null, true],
+  [1, null, true],
+  [0, undefined, true],
+  [1, undefined, true],
+  [0, [1, 999], false],
+  [1, [1, 999], true],
+  [999, [1, 999], true],
+  [1000, [1, 999], false],
+  [1, '1', true],
+  [0, '1', false],
+  [1, '[1, 999]', false],
+  [1, ['1', '999'], true],
+  [0, ['1', '999'], false],
+])('isInRange Test - ', (count, limit, ifInRange) => {
+  test(`length ${count} in ${limit} limit is ${ifInRange}`, () => {
+    expect(isInRange(limit, count)).toBe(ifInRange);
+  });
+});

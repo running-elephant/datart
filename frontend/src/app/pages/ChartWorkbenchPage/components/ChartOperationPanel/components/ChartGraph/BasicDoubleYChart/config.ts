@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 
 const config: ChartConfig = {
   datas: [
@@ -25,7 +25,6 @@ const config: ChartConfig = {
       key: 'metrics',
       required: true,
       type: 'group',
-      maxFieldCount: 1,
     },
     {
       label: 'axis.y.left',

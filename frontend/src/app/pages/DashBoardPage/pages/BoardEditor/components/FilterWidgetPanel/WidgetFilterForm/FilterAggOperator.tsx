@@ -18,8 +18,8 @@
 
 import { Form, FormInstance, Select } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { AggregateFieldActionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import { AggregateFieldActionType } from 'app/types/ChartConfig';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FC, memo, useCallback, useEffect } from 'react';
 import { ValueTypes } from '../types';
 

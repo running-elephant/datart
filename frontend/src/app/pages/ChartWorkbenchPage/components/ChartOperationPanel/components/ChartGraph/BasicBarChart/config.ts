@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 
 const config: ChartConfig = {
   datas: [
@@ -25,7 +25,7 @@ const config: ChartConfig = {
       key: 'metrics',
       required: true,
       type: 'group',
-      maxFieldCount: 1,
+      limit: [0, 1],
     },
     {
       label: 'deminsion',
@@ -33,6 +33,7 @@ const config: ChartConfig = {
       required: true,
       rows: [],
       type: 'aggregate',
+      limit: [0, 999],
     },
     {
       label: 'filter',
@@ -44,7 +45,7 @@ const config: ChartConfig = {
       label: 'colorize',
       key: 'color',
       type: 'color',
-      maxFieldCount: 1,
+      limit: [0, 1],
     },
   ],
   styles: [

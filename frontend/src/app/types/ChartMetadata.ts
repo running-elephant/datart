@@ -1,4 +1,3 @@
-import { PageInfo } from './../../MainPage/pages/ViewPage/slice/types';
 /**
  * Datart
  *
@@ -17,29 +16,22 @@ import { PageInfo } from './../../MainPage/pages/ViewPage/slice/types';
  * limitations under the License.
  */
 
-class ChartDataset {
-  id?: string;
-  name?: string;
-  columns?: ChartDatasetMeta[];
-  rows?: string[][];
-  pageInfo?: ChartDatasetPageInfo;
-  script?: string;
+import { ChartDataSectionType } from 'app/types/ChartConfig';
 
-  constructor(id, name) {
-    this.id = id;
-    this.name = name;
-    this.columns = [];
-    this.rows = [];
-    this.pageInfo = {};
-  }
-}
-
-export type ChartDatasetPageInfo = Partial<PageInfo>;
-
-export type ChartDatasetMeta = {
-  name?: string;
-  type?: string;
-  primaryKey?: boolean;
+export type ChartMetadata = {
+  id: string;
+  name: string;
+  icon?: string;
+  requirements?: ChartRequirement[];
 };
 
-export default ChartDataset;
+export type ChartRequirement = {
+  [key in Lowercase<keyof PartialSqlAssemblyType>]?: number[] | number;
+};
+
+type PartialSqlAssemblyType = Pick<
+  typeof ChartDataSectionType,
+  'GROUP' | 'AGGREGATE'
+>;
+
+export default ChartMetadata;

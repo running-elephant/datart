@@ -149,3 +149,14 @@ export const ResizeEvent = new Event('resize', {
 });
 
 export const FILTER_TIME_FORMATTER_IN_QUERY = 'yyyy-MM-DD HH:mm:ss';
+
+export const CONTROLLER_WIDTH_OPTIONS = [
+  { label: 'auto', value: 'auto' },
+  { label: '100%', value: '24' },
+  { label: '1/2', value: '12' },
+  { label: '1/3', value: '8' },
+  { label: '1/4', value: '6' },
+  { label: '1/6', value: '4' },
+  { label: '1/8', value: '3' },
+  { label: '1/12', value: '2' },
+];

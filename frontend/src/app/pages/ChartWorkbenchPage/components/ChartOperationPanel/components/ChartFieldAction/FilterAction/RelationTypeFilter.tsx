@@ -22,8 +22,8 @@ import {
   ChartDataSectionField,
   FilterConditionType,
   FilterRelationType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import { getColumnRenderName } from 'app/utils/chart';
+} from 'app/types/ChartConfig';
+import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
 import ChartFilterCondition, {

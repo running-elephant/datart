@@ -1,7 +1,7 @@
 import { TreeNodeProps } from 'antd';
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartConfig } from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import { ReactElement } from 'react';
 
 export type VizType = [

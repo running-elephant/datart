@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { FilterCondition } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { FilterCondition } from 'app/types/ChartConfig';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import DropdownListFilter from './DropdownListFilter';
 import MultiDropdownListFilter from './MultiDropdownListFilter';

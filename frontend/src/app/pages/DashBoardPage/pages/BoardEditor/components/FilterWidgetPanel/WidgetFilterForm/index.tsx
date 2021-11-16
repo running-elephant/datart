@@ -16,18 +16,17 @@
  * limitations under the License.
  */
 import { Form, FormInstance, Input, Radio, Select } from 'antd';
-import { CONTROLLER_WIDTH_OPTIONS } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartDataView';
 import {
   BoardType,
   Widget,
   WidgetFilterTypes,
 } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
-import { FilterSqlOperator } from 'globalConstants';
+import { CONTROLLER_WIDTH_OPTIONS, FilterSqlOperator } from 'globalConstants';
 import React, { memo, useEffect } from 'react';
 import styled from 'styled-components/macro';
 import { ValueTypes, WidgetFilterFormType } from '../types';

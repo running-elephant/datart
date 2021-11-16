@@ -27,12 +27,12 @@ import { Button, Col, Input, Row, Space, Table } from 'antd';
 import {
   ChartDataSectionType,
   ChartStyleSectionConfig,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import {
   diffHeaderRows,
   flattenHeaderRowsWithoutGroupRow,
   getColumnRenderName,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
 import { DATARTSEPERATOR } from 'globalConstants';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components';

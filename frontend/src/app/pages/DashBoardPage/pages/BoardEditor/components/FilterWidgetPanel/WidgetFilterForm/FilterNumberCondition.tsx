@@ -20,7 +20,7 @@ import { Form, FormInstance, InputNumber, Select } from 'antd';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartDataView';
 import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';

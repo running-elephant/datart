@@ -15,20 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  ControllerFacadeTypes,
-  ControllerFacadeTypes as Opt,
-} from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
-import { AggregateFieldActionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+
+import { AggregateFieldActionType } from 'app/types/ChartConfig';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartDataView';
 import {
   FilterOperatorType,
   OPERATOR_TYPE_ENUM,
 } from 'app/pages/DashBoardPage/constants';
 import { FilterWidgetContent } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { ControllerFacadeTypes as Opt } from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from './../../../../../../../globalConstants';
 import { ValueTypes, WidgetFilterFormType } from './types';
@@ -44,6 +42,7 @@ import { ValueTypes, WidgetFilterFormType } from './types';
 //       return getStringFacadeOptions;
 //   }
 // };
+
 export const getStringFacadeOptions = (type: FilterOperatorType) => {
   switch (type) {
     case 'common':
@@ -183,7 +182,7 @@ export const getInitWidgetFilter = () => {
     sqlOperator: FilterSqlOperator.In,
     filterValues: [],
     filterValueOptions: [],
-    filterFacade: ControllerFacadeTypes.DropdownList,
+    filterFacade: Opt.DropdownList,
     filterWidth: '25%',
   };
   return widgetFilter;

@@ -17,7 +17,7 @@
  */
 import { Button, Form, FormInstance, Input, Space } from 'antd';
 import { DragSortEditTable } from 'app/components/DragSortEditTable';
-import { FilterValueOption } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { FilterValueOption } from 'app/types/ChartConfig';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 export interface FilterCustomOptionsProps {

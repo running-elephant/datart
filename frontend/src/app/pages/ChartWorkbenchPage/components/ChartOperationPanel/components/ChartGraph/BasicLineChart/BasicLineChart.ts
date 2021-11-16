@@ -17,12 +17,13 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig, {
+import {
+  ChartConfig,
   ChartDataSectionType,
   ChartStyleSectionConfig,
   FieldFormatType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+} from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import {
   getAxisLabel,
   getAxisLine,
@@ -39,7 +40,7 @@ import {
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
 import {
   toExponential,
   toFormattedValue,

@@ -16,27 +16,9 @@
  * limitations under the License.
  */
 
-import { isInRange } from '../chart';
-
-describe.each([
-  [0, 0, true],
-  [0, 1, false],
-  [1, 1, true],
-  [0, null, true],
-  [1, null, true],
-  [0, undefined, true],
-  [1, undefined, true],
-  [0, [1, 999], false],
-  [1, [1, 999], true],
-  [999, [1, 999], true],
-  [1000, [1, 999], false],
-  [1, '1', true],
-  [0, '1', false],
-  [1, '[1, 999]', false],
-  [1, ['1', '999'], true],
-  [0, ['1', '999'], false],
-])('isInRange Test - ', (count, limit, ifInRange) => {
-  test(`length ${count} in ${limit} limit is ${ifInRange}`, () => {
-    expect(isInRange(limit, count)).toBe(ifInRange);
-  });
-});
+export enum ChartLifecycle {
+  MOUNTED = 'mounted',
+  UPDATED = 'updated',
+  RESIZE = 'resize',
+  UNMOUNTED = 'unmount',
+}

@@ -17,7 +17,7 @@
  */
 
 import { createContext } from 'react';
-import ChartDataset from '../models/ChartDataset';
+import ChartDataset from '../../../types/ChartDataset';
 
 const ChartDatasetContext = createContext<{ dataset?: ChartDataset }>({
   dataset: {},

@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-import { FilterSqlOperator } from 'globalConstants';
-import { ValueOf } from 'types';
 import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
-} from '../components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
+} from 'app/types/FilterControlPanel';
+import { FilterSqlOperator } from 'globalConstants';
+import { ValueOf } from 'types';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -219,15 +219,6 @@ export type ColorFieldAction = {
   colors?: Array<{ key: string; value: string }>;
 };
 
-// export type FormatFieldAction = {
-//   type?: FieldFormatType;
-//   decimalPlaces?: number;
-//   unit?: number;
-//   unitDesc?: string;
-//   useThousandSeparator?: boolean;
-//   [key: ValueOf<typeof FieldFormatType>]: number;
-// };
-
 export enum NumericUnit {
   None = '无',
   Thousand = '千/K',
@@ -275,11 +266,11 @@ export type AliasFieldAction = {
 
 export type ChartDataSectionConfig = ChartConfigBase & {
   type?: Lowercase<keyof typeof ChartDataSectionType>;
-  maxFieldCount?: number;
   allowSameField?: boolean;
   required?: boolean;
   rows?: ChartDataSectionField[];
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
+  limit?: null | number | string | number[];
 
   // Question: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
@@ -346,9 +337,9 @@ export type ChartI18NSectionConfig = {
   translation: object;
 };
 
-export default class ChartConfig {
+export type ChartConfig = {
   datas?: ChartDataSectionConfig[];
   styles?: ChartStyleSectionConfig[];
   settings?: ChartStyleSectionConfig[];
   i18ns?: ChartI18NSectionConfig[];
-}
+};

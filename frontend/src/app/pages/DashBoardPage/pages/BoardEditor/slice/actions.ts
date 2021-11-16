@@ -19,7 +19,7 @@ import { Modal } from 'antd';
 import { ChartEditorBaseProps } from 'app/components/ChartEditor';
 import ChartDataView, {
   ChartDataViewFieldType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartDataView';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Dashboard/slice';
 import {
   ContainerWidgetContent,

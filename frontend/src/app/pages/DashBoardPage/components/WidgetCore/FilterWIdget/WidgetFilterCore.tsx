@@ -15,11 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  ControllerFacadeTypes,
-  RelativeOrExactTime,
-} from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterControlPanel/Constant';
-import { FilterValueOption } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+
+import { FilterValueOption } from 'app/types/ChartConfig';
 import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
@@ -30,6 +27,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/FilterWidgetPanel/types';
 import { FilterWidgetContent } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { getWidgetFilterDateValues } from 'app/pages/DashBoardPage/utils';
+import { ControllerFacadeTypes, RelativeOrExactTime } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import produce from 'immer';
 import React, {

@@ -20,7 +20,7 @@ import {
   FilterCondition,
   FilterConditionType,
   FilterValueOption,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { getDistinctFields } from 'app/utils/fetch';
 import useMount from './useMount';

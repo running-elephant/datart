@@ -1,5 +1,5 @@
 import { createSlice, isRejected, PayloadAction } from '@reduxjs/toolkit';
-import { ChartDataSectionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartDataSectionType } from 'app/types/ChartConfig';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { CloneValueDeep } from 'utils/object';

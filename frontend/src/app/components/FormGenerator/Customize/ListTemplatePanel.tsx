@@ -21,7 +21,7 @@ import { Col, Divider, List, Row, Select } from 'antd';
 import {
   ChartStyleSectionConfig,
   ChartStyleSelectorItem,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import { updateBy, updateByAction } from 'app/utils/mutation';
 import { FC, memo, useRef, useState } from 'react';
 import { AssignDeep, CloneValueDeep, isEmpty } from 'utils/object';

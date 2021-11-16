@@ -49,6 +49,11 @@ public class StorypageServiceImpl extends BaseService implements StorypageServic
     }
 
     @Override
+    public boolean deleteByStoryboard(String storyboardId) {
+        return spMapper.deleteByStoryboard(storyboardId) >= 0;
+    }
+
+    @Override
     @Transactional
     public boolean delete(String id) {
         return StorypageService.super.delete(id);

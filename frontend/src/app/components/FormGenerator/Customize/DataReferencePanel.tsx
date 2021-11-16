@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartStyleSectionConfig } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import { FC, memo, useEffect } from 'react';
 import styled from 'styled-components/macro';

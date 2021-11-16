@@ -15,7 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import ChartConfig, {
+import {
+  ChartConfig,
   ChartDataSectionConfig,
   ChartDataSectionField,
   ChartDataSectionType,
@@ -23,10 +24,10 @@ import ChartConfig, {
   ChartStyleSectionConfig,
   IFieldFormatConfig,
   SortActionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import { ChartDatasetMeta } from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
-import { ChartDataViewFieldCategory } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-import ChartMetadata from 'app/pages/ChartWorkbenchPage/models/ChartMetadata';
+} from 'app/types/ChartConfig';
+import { ChartDatasetMeta } from 'app/types/ChartDataset';
+import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
+import ChartMetadata from 'app/types/ChartMetadata';
 import { isEmpty, meanValue, mergeDefaultToValue } from 'utils/object';
 import { toFormattedValue } from './number';
 
