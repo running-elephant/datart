@@ -209,8 +209,8 @@ describe('Chart Helper ', () => {
     )} from source: ${JSON.stringify(source)} result is ${JSON.stringify(
       expected,
     )} - options ${options ? JSON.stringify(options) : ''}`, () => {
-      mergeChartStyleConfigs(target, source, options);
-      expect(JSON.stringify(target)).toBe(JSON.stringify(expected));
+      const result = mergeChartStyleConfigs(target, source, options);
+      expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
     });
   });
 

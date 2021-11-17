@@ -477,10 +477,10 @@ export function mergeChartStyleConfigs<
   T extends { key?: string; value?: any; rows?: T[] } | undefined | null,
 >(target?: T[], source?: T[], options = { useDefault: false }) {
   if (isEmptyArray(target)) {
-    return;
+    return target;
   }
   if (isEmptyArray(source) && !options?.useDefault) {
-    return;
+    return target;
   }
   for (let index = 0; index < target?.length!; index++) {
     const tEle: any = target?.[index];
@@ -500,9 +500,14 @@ export function mergeChartStyleConfigs<
       tEle['value'] = sEle?.['value'];
     }
     if ('rows' in tEle) {
-      mergeChartStyleConfigs(tEle.rows, sEle?.rows || [], options);
+      tEle['rows'] = mergeChartStyleConfigs(
+        tEle.rows,
+        sEle?.rows || [],
+        options,
+      );
     }
   }
+  return target;
 }
 
 export function mergeChartDataConfigs<
