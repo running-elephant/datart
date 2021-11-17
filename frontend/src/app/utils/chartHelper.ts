@@ -466,9 +466,11 @@ export function mergeConfig<T extends ChartConfig>(origin?: T, target?: T): T {
     return origin;
   }
   origin.datas = mergeChartDataSectionConfig(origin?.datas, target?.datas);
-  origin.styles = mergeChartStyleConfig(origin?.styles, target?.styles);
-  origin.settings = mergeChartStyleConfig(origin?.settings, target?.settings);
-  origin.i18ns = mergeChartI18NConfig(origin?.i18ns, target?.i18ns);
+  origin.styles = lagency_mergeChartStyleConfig(origin?.styles, target?.styles);
+  origin.settings = lagency_mergeChartStyleConfig(
+    origin?.settings,
+    target?.settings,
+  );
   return origin;
 }
 
@@ -523,7 +525,7 @@ export function mergeChartDataSectionConfig(
   });
 }
 
-export function mergeChartStyleConfig(
+export function lagency_mergeChartStyleConfig(
   origin?: ChartStyleSectionConfig[],
   target?: ChartStyleSectionConfig[],
 ) {
@@ -541,7 +543,7 @@ export function mergeChartStyleConfig(
           default: targetSec.default,
           value: targetSec.value,
           disabled: targetSec.disabled,
-          rows: mergeChartStyleConfig(sec.rows, targetSec.rows),
+          rows: lagency_mergeChartStyleConfig(sec.rows, targetSec.rows),
         });
       }
       return sec;
