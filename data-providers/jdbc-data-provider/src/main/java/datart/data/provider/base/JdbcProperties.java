@@ -30,7 +30,7 @@ public class JdbcProperties {
     private String dbType;
     @NotBlank
     private String url;
-    @NotBlank
+
     private String user;
 
     private String password;
