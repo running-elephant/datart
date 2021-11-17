@@ -15,10 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import ChartDataView, {
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
+import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import produce from 'immer';
@@ -32,7 +30,6 @@ import {
   BackgroundDefault,
   BorderDefault,
 } from '../constants';
-import { WidgetFilterFormType } from '../pages/BoardEditor/components/FilterWidgetPanel/types';
 import {
   BackgroundConfig,
   BoardType,
@@ -59,7 +56,8 @@ import {
   WidgetInfo,
   WidgetPadding,
   WidgetType,
-} from '../pages/Dashboard/slice/types';
+} from '../pages/Board/slice/types';
+import { WidgetFilterFormType } from '../pages/BoardEditor/components/FilterWidgetPanel/types';
 import { ValueTypes } from './../pages/BoardEditor/components/FilterWidgetPanel/types';
 
 export const VALUE_SPLITTER = '###';

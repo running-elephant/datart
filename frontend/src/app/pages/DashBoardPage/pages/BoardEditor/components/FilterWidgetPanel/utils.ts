@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
+import {
+  FilterOperatorType,
+  OPERATOR_TYPE_ENUM,
+} from 'app/pages/DashBoardPage/constants';
+import { FilterWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { AggregateFieldActionType } from 'app/types/ChartConfig';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/types/ChartDataView';
-import {
-  FilterOperatorType,
-  OPERATOR_TYPE_ENUM,
-} from 'app/pages/DashBoardPage/constants';
-import { FilterWidgetContent } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { ControllerFacadeTypes as Opt } from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from './../../../../../../../globalConstants';

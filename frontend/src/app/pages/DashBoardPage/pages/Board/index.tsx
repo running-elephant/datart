@@ -41,7 +41,7 @@ import { boardActions } from './slice';
 import { makeSelectBoardConfigById } from './slice/selector';
 import { fetchBoardDetail } from './slice/thunk';
 import { BoardState, VizRenderMode } from './slice/types';
-export interface DashboardProps {
+export interface BoardProps {
   id: string;
   renderMode: VizRenderMode;
   hideTitle?: boolean;
@@ -54,7 +54,7 @@ export interface DashboardProps {
   showZoomCtrl?: boolean;
 }
 
-export const Dashboard: React.FC<DashboardProps> = memo(
+export const Board: React.FC<BoardProps> = memo(
   ({
     id,
     hideTitle,
@@ -213,7 +213,7 @@ export const Dashboard: React.FC<DashboardProps> = memo(
   },
 );
 
-export default Dashboard;
+export default Board;
 
 const Wrapper = styled.div<{}>`
   display: flex;

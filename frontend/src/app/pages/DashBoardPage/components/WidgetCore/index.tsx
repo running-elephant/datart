@@ -27,7 +27,7 @@ import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoCo
 import {
   ContainerWidgetContent,
   MediaWidgetContent,
-} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { BoardContext } from '../../contexts/BoardContext';

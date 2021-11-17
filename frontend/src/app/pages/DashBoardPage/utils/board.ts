@@ -1,4 +1,3 @@
-import { ChartDataView } from 'app/types/ChartDataView';
 /**
  * Datart
  *
@@ -27,7 +26,8 @@ import {
   ServerDatachart,
   ServerView,
   Widget,
-} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { ChartDataView } from 'app/types/ChartDataView';
 // import { dataChartServerModel } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transformMeta } from 'app/utils/chartHelper';
 import {

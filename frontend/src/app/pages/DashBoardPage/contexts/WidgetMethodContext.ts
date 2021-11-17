@@ -19,7 +19,7 @@
 import { ChartMouseEventParams } from 'app/types/DatartChartBase';
 import { createContext } from 'react';
 import { widgetActionType } from '../components/WidgetToolBar/config';
-import { Widget, WidgetType } from '../pages/Dashboard/slice/types';
+import { Widget, WidgetType } from '../pages/Board/slice/types';
 export interface WidgetMethodContextProps {
   onWidgetAction: (action: widgetActionType, widgetType: WidgetType) => void;
   widgetChartClick: (widget: Widget, params: ChartMouseEventParams) => void;

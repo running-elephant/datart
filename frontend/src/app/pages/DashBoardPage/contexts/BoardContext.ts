@@ -21,7 +21,7 @@ import {
   BoardType,
   Dashboard,
   VizRenderMode,
-} from '../pages/Dashboard/slice/types';
+} from '../pages/Board/slice/types';
 export interface BoardContextProps {
   name: string;
   renderMode?: VizRenderMode;

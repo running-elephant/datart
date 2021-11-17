@@ -16,18 +16,21 @@
  * limitations under the License.
  */
 
-import { FilterValueOption } from 'app/types/ChartConfig';
 import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetDataContext } from 'app/pages/DashBoardPage/contexts/WidgetDataContext';
+import { FilterWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ControlOption,
   FilterDate,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/FilterWidgetPanel/types';
-import { FilterWidgetContent } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
 import { getWidgetFilterDateValues } from 'app/pages/DashBoardPage/utils';
-import { ControllerFacadeTypes, RelativeOrExactTime } from 'app/types/FilterControlPanel';
+import { FilterValueOption } from 'app/types/ChartConfig';
+import {
+  ControllerFacadeTypes,
+  RelativeOrExactTime,
+} from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import produce from 'immer';
 import React, {

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { FormInstance, Switch, Table } from 'antd';
-import { Widget } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 export type WidgetOption = {

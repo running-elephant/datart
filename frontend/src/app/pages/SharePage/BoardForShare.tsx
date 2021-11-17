@@ -26,14 +26,14 @@ import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
 import { BoardProvider } from '../DashBoardPage/components/BoardProvider';
 import FullScreenPanel from '../DashBoardPage/components/FullScreenPanel';
 import TitleHeader from '../DashBoardPage/components/TitleHeader';
-import AutoBoardCore from '../DashBoardPage/pages/Dashboard/AutoDashboard/AutoBoardCore';
-import FreeBoardCore from '../DashBoardPage/pages/Dashboard/FreeDashboard/FreeBoardCore';
-import { getBoardDownloadParams } from '../DashBoardPage/pages/Dashboard/slice/asyncActions';
-import { selectShareBoardInfo } from '../DashBoardPage/pages/Dashboard/slice/selector';
+import AutoBoardCore from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
+import FreeBoardCore from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
+import { getBoardDownloadParams } from '../DashBoardPage/pages/Board/slice/asyncActions';
+import { selectShareBoardInfo } from '../DashBoardPage/pages/Board/slice/selector';
 import {
   Dashboard,
   VizRenderMode,
-} from '../DashBoardPage/pages/Dashboard/slice/types';
+} from '../DashBoardPage/pages/Board/slice/types';
 import { OnLoadTasksType } from '../MainPage/Navbar/DownloadListPopup';
 import { DownloadTask } from '../MainPage/slice/types';
 import { DownloadTaskContainer } from './DownloadTaskContainer';

@@ -1,7 +1,6 @@
 import { combineReducers, PayloadAction } from '@reduxjs/toolkit';
 import { ChartEditorProps } from 'app/components/ChartEditor';
 import { BOARD_UNDO } from 'app/pages/DashBoardPage/constants';
-import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import {
   BoardInfo,
   BoardLinkFilter,
@@ -9,7 +8,8 @@ import {
   WidgetData,
   WidgetInfo,
   WidgetPanel,
-} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import { getInitBoardInfo } from 'app/pages/DashBoardPage/utils/board';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { Layout } from 'react-grid-layout';

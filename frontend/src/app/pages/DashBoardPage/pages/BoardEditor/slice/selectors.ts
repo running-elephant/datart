@@ -17,14 +17,14 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 import {
-  EditBoardState,
-  HistoryEditBoard,
-} from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
-import {
   Widget,
   WidgetData,
   WidgetInfo,
-} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import {
+  EditBoardState,
+  HistoryEditBoard,
+} from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import {
   getAllFilterWidget,
   getAllFixedFilterWidgetSortedIds,

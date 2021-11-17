@@ -18,7 +18,7 @@
 import { Collapse, Form } from 'antd';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
-import { Widget } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getRGBAColor } from 'app/pages/DashBoardPage/utils';
 import produce from 'immer';
 import { throttle } from 'lodash';

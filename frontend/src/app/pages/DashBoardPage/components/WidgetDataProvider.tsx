@@ -20,10 +20,10 @@ import React, { FC, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import { BoardContext } from '../contexts/BoardContext';
 import { WidgetDataContext } from '../contexts/WidgetDataContext';
+import { selectWidgetDataById } from '../pages/Board/slice/selector';
+import { BoardState } from '../pages/Board/slice/types';
 import { selectEditWidgetData } from '../pages/BoardEditor/slice/selectors';
 import { EditBoardState } from '../pages/BoardEditor/slice/types';
-import { selectWidgetDataById } from '../pages/Dashboard/slice/selector';
-import { BoardState } from '../pages/Dashboard/slice/types';
 
 export const WidgetDataProvider: FC<{ widgetId: string }> = ({
   widgetId,
