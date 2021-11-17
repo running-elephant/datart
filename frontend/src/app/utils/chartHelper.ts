@@ -28,7 +28,13 @@ import {
 import { ChartDatasetMeta } from 'app/types/ChartDataset';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
-import { isEmpty, meanValue, mergeDefaultToValue } from 'utils/object';
+import {
+  isEmpty,
+  isEmptyArray,
+  isUndefined,
+  meanValue,
+  mergeDefaultToValue,
+} from 'utils/object';
 import { toFormattedValue } from './number';
 
 export function isInRange(limit?, count?) {
@@ -464,6 +470,38 @@ export function mergeConfig<T extends ChartConfig>(origin?: T, target?: T): T {
   origin.settings = mergeChartStyleConfig(origin?.settings, target?.settings);
   origin.i18ns = mergeChartI18NConfig(origin?.i18ns, target?.i18ns);
   return origin;
+}
+
+export function mergeChartStyleConfigs<
+  T extends { key?: string; value?: any; rows?: T[] } | undefined | null,
+>(target?: T[], source?: T[], options = { useDefault: false }) {
+  if (isEmptyArray(target)) {
+    return;
+  }
+  if (isEmptyArray(source) && !options?.useDefault) {
+    return;
+  }
+  for (let index = 0; index < target?.length!; index++) {
+    const tEle: any = target?.[index];
+    if (!tEle) {
+      continue;
+    }
+
+    // options.useDefault
+    if (isUndefined(tEle['value']) && options?.useDefault) {
+      tEle['value'] = tEle?.['default'];
+    }
+
+    const sEle =
+      'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
+
+    if ('value' in tEle && !isUndefined(sEle?.['value'])) {
+      tEle['value'] = sEle?.['value'];
+    }
+    if ('rows' in tEle) {
+      mergeChartStyleConfigs(tEle.rows, sEle?.rows || [], options);
+    }
+  }
 }
 
 export function mergeChartDataSectionConfig(

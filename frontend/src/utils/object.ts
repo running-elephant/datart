@@ -112,8 +112,12 @@ export function CloneValueDeep<T>(value: T): T {
   return cloneDeep(value);
 }
 
+export function isUndefined(o) {
+  return o === undefined;
+}
+
 export function isEmpty(o) {
-  return o === null || o === undefined;
+  return o === null || isUndefined(o);
 }
 
 export function isFunc(f) {
@@ -188,6 +192,10 @@ export function isTreeModel(data) {
   return data.some(d => d?.children?.length > 0);
 }
 
-export function isEmptyArray(value) {
+export function isEmptyArray(value?) {
+  if (isEmpty(value)) {
+    return true;
+  }
+
   return Array.isArray(value) && !value?.length;
 }
