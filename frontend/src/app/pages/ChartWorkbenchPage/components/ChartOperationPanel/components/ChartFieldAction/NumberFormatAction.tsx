@@ -193,7 +193,7 @@ const NumberFormatAction: FC<{
                       const values = NumericUnitDescriptions.get(k);
                       return (
                         <Select.Option key={k} value={k}>
-                          {values?.[1]}
+                          {values?.[1] || '  '}
                         </Select.Option>
                       );
                     })}
