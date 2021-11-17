@@ -91,15 +91,15 @@ class Chart extends DatartChartBase {
   }
 
   public onMount(options, context?): void {
-    throw new Error('Method not implemented.');
+    throw new Error(`${this.meta.name} - Method not implemented.`);
   }
 
   public onUpdated(options, context?): void {
-    throw new Error('Method not implemented.');
+    throw new Error(`${this.meta.name} - Method not implemented.`);
   }
 
   public onUnMount(options, context?): void {
-    throw new Error('Method not implemented.');
+    throw new Error(`${this.meta.name} - Method not implemented.`);
   }
 
   public onResize(options, context?): void {}

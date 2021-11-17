@@ -183,6 +183,7 @@ describe('Chart Helper ', () => {
       [{ key: 'a', value: undefined, default: 0 }],
       [],
       [{ key: 'a', value: undefined, default: 0 }],
+      { useDefault: false },
     ],
     [
       [
@@ -202,6 +203,7 @@ describe('Chart Helper ', () => {
           rows: [{ value: undefined, default: 0 }],
         },
       ],
+      { useDefault: false },
     ],
   ])('mergeChartStyleConfigs Test - ', (target, source, expected, options?) => {
     test(`deep merge target: ${JSON.stringify(

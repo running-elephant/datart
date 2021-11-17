@@ -19,7 +19,6 @@ import {
   ChartConfig,
   ChartDataSectionField,
   ChartDataSectionType,
-  ChartI18NSectionConfig,
   ChartStyleSectionConfig,
   IFieldFormatConfig,
   SortActionType,
@@ -27,13 +26,7 @@ import {
 import { ChartDatasetMeta } from 'app/types/ChartDataset';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
-import {
-  isEmpty,
-  isEmptyArray,
-  isUndefined,
-  meanValue,
-  mergeDefaultToValue,
-} from 'utils/object';
+import { isEmpty, isEmptyArray, isUndefined, meanValue } from 'utils/object';
 import { toFormattedValue } from './number';
 
 export function isInRange(limit?, count?) {
@@ -472,7 +465,7 @@ export function mergeConfig<T extends ChartConfig>(origin?: T, target?: T): T {
 
 export function mergeChartStyleConfigs<
   T extends { key?: string; value?: any; rows?: T[] } | undefined | null,
->(target?: T[], source?: T[], options = { useDefault: false }) {
+>(target?: T[], source?: T[], options = { useDefault: true }) {
   if (isEmptyArray(target)) {
     return target;
   }
@@ -493,7 +486,7 @@ export function mergeChartStyleConfigs<
     const sEle =
       'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
 
-    if ('value' in tEle && !isUndefined(sEle?.['value'])) {
+    if (!isUndefined(sEle?.['value'])) {
       tEle['value'] = sEle?.['value'];
     }
     if ('rows' in tEle) {
