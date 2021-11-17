@@ -17,7 +17,6 @@
  */
 import {
   ChartConfig,
-  ChartDataSectionConfig,
   ChartDataSectionField,
   ChartDataSectionType,
   ChartI18NSectionConfig,
@@ -465,7 +464,7 @@ export function mergeConfig<T extends ChartConfig>(origin?: T, target?: T): T {
   if (!target) {
     return origin;
   }
-  origin.datas = mergeChartDataSectionConfig(origin?.datas, target?.datas);
+  origin.datas = mergeChartDataConfigs(origin?.datas, target?.datas);
   origin.styles = lagency_mergeChartStyleConfig(origin?.styles, target?.styles);
   origin.settings = lagency_mergeChartStyleConfig(
     origin?.settings,
@@ -506,22 +505,18 @@ export function mergeChartStyleConfigs<
   }
 }
 
-export function mergeChartDataSectionConfig(
-  origin?: ChartDataSectionConfig[],
-  target?: ChartDataSectionConfig[],
-) {
-  if (!target?.length) {
-    return origin || [];
+export function mergeChartDataConfigs<
+  T extends { key?: string; rows?: ChartDataSectionField[] } | undefined | null,
+>(target?: T[], source?: T[]) {
+  if (isEmptyArray(target) || isEmptyArray(source)) {
+    return target;
   }
-  if (!origin?.length) {
-    return target || [];
-  }
-  return (origin || []).map(sec => {
-    const targetSec = (target || []).find(t => t.key === sec.key);
-    if (targetSec) {
-      return Object.assign({}, sec, targetSec);
+  return (target || []).map(tEle => {
+    const sEle = (source || []).find(s => s?.key === tEle?.key);
+    if (sEle) {
+      return Object.assign({}, tEle, { rows: sEle?.rows });
     }
-    return sec;
+    return tEle;
   });
 }
 
