@@ -465,11 +465,8 @@ export function mergeConfig<T extends ChartConfig>(origin?: T, target?: T): T {
     return origin;
   }
   origin.datas = mergeChartDataConfigs(origin?.datas, target?.datas);
-  origin.styles = lagency_mergeChartStyleConfig(origin?.styles, target?.styles);
-  origin.settings = lagency_mergeChartStyleConfig(
-    origin?.settings,
-    target?.settings,
-  );
+  origin.styles = mergeChartStyleConfigs(origin?.styles, target?.styles);
+  origin.settings = mergeChartStyleConfigs(origin?.settings, target?.settings);
   return origin;
 }
 
@@ -522,51 +519,6 @@ export function mergeChartDataConfigs<
       return Object.assign({}, tEle, { rows: sEle?.rows });
     }
     return tEle;
-  });
-}
-
-export function lagency_mergeChartStyleConfig(
-  origin?: ChartStyleSectionConfig[],
-  target?: ChartStyleSectionConfig[],
-) {
-  if (!target?.length) {
-    return origin || [];
-  }
-  if (!origin?.length) {
-    return target || [];
-  }
-  return mergeDefaultToValue(
-    (origin || []).map(sec => {
-      const targetSec = (target || []).find(t => t.key === sec.key);
-      if (targetSec) {
-        return Object.assign({}, sec, {
-          default: targetSec.default,
-          value: targetSec.value,
-          disabled: targetSec.disabled,
-          rows: lagency_mergeChartStyleConfig(sec.rows, targetSec.rows),
-        });
-      }
-      return sec;
-    }),
-  );
-}
-
-export function mergeChartI18NConfig(
-  origin?: ChartI18NSectionConfig[],
-  target?: ChartI18NSectionConfig[],
-) {
-  if (!target?.length) {
-    return origin || [];
-  }
-  return (origin || []).map(sec => {
-    const targetSec = (target || []).find(t => t.lang === sec.lang);
-    if (targetSec) {
-      return Object.assign({}, sec, {
-        lang: targetSec.lang,
-        tranlation: Object.assign({}, sec.translation, targetSec.translation),
-      });
-    }
-    return sec;
   });
 }
 
