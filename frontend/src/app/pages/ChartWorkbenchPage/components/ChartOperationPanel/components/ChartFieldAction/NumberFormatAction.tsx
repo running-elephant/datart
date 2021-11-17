@@ -16,43 +16,42 @@
  * limitations under the License.
  */
 
-import { Checkbox, Col, InputNumber, Radio, Row, Select, Space } from 'antd';
+import {
+  Checkbox,
+  Col,
+  Input,
+  InputNumber,
+  Radio,
+  Row,
+  Select,
+  Space,
+} from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartDataSectionField,
   FieldFormatType,
   IFieldFormatConfig,
-  NumericUnit,
 } from 'app/types/ChartConfig';
+import { CURRENCIES } from 'app/utils/currency';
 import { updateBy } from 'app/utils/mutation';
+import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
-
-const unitDescriptionMap = new Map<string, number>([
-  [NumericUnit.None, 1],
-  [NumericUnit.Thousand, 10 ** 3],
-  [NumericUnit.TenThousand, 10 ** 4],
-  [NumericUnit.Million, 10 ** 6],
-  [NumericUnit.OneHundredMillion, 10 ** 8],
-  [NumericUnit.Billion, 10 ** 10],
-  [NumericUnit.Gigabyte, 1 << 13],
-]);
 
 const DefaultFormatDetailConfig: IFieldFormatConfig = {
   type: FieldFormatType.DEFAULT,
   [FieldFormatType.NUMERIC]: {
     decimalPlaces: 2,
-    unit: unitDescriptionMap.get(NumericUnit.None),
-    unitDesc: NumericUnit.None,
-    useThousandSeparator: true,
-  },
-  [FieldFormatType.CURRENCY]: {
-    decimalPlaces: 2,
-    unit: unitDescriptionMap.get(NumericUnit.None),
-    unitDesc: NumericUnit.None,
+    unitKey: NumberUnitKey.None,
     useThousandSeparator: true,
     prefix: '',
     suffix: '',
+  },
+  [FieldFormatType.CURRENCY]: {
+    decimalPlaces: 2,
+    unitKey: NumberUnitKey.None,
+    useThousandSeparator: true,
+    currency: '',
   },
   [FieldFormatType.PERCENTAGE]: {
     decimalPlaces: 2,
@@ -130,25 +129,71 @@ const NumberFormatAction: FC<{
               />
             </Col>
           </StyledFormatDetailRow>
-          {(FieldFormatType.NUMERIC === type ||
-            FieldFormatType.CURRENCY === type) && (
+          {FieldFormatType.CURRENCY === type && (
             <>
               <StyledFormatDetailRow>
                 <Col span={12}>{t('format.unit')}</Col>
                 <Col>
                   <Select
-                    value={formatDetail?.unitDesc}
-                    onChange={unitDesc => {
-                      const unit = unitDescriptionMap.get(unitDesc);
+                    value={formatDetail?.unitKey}
+                    onChange={unitKey => {
                       handleFormatDetailChanged(
-                        Object.assign({}, formatDetail, { unit, unitDesc }),
+                        Object.assign({}, formatDetail, { unitKey }),
                       );
                     }}
                   >
-                    {Array.from(unitDescriptionMap, ([name]) => {
+                    {Array.from(NumericUnitDescriptions.keys()).map(k => {
+                      const values = NumericUnitDescriptions.get(k);
                       return (
-                        <Select.Option key={name} value={name}>
-                          {name}
+                        <Select.Option key={k} value={k}>
+                          {values?.[1] || '  '}
+                        </Select.Option>
+                      );
+                    })}
+                  </Select>
+                </Col>
+              </StyledFormatDetailRow>
+              <StyledFormatDetailRow>
+                <Col span={12}>{t('format.currency')}</Col>
+                <Col>
+                  <Select
+                    value={formatDetail?.currency}
+                    onChange={currency => {
+                      handleFormatDetailChanged(
+                        Object.assign({}, formatDetail, { currency }),
+                      );
+                    }}
+                  >
+                    {CURRENCIES.map(c => {
+                      return (
+                        <Select.Option key={c.code} value={c.code}>
+                          {c.code}
+                        </Select.Option>
+                      );
+                    })}
+                  </Select>
+                </Col>
+              </StyledFormatDetailRow>
+            </>
+          )}
+          {FieldFormatType.NUMERIC === type && (
+            <>
+              <StyledFormatDetailRow>
+                <Col span={12}>{t('format.unit')}</Col>
+                <Col>
+                  <Select
+                    value={formatDetail?.unitKey}
+                    onChange={unitKey => {
+                      handleFormatDetailChanged(
+                        Object.assign({}, formatDetail, { unitKey }),
+                      );
+                    }}
+                  >
+                    {Array.from(NumericUnitDescriptions.keys()).map(k => {
+                      const values = NumericUnitDescriptions.get(k);
+                      return (
+                        <Select.Option key={k} value={k}>
+                          {values?.[1]}
                         </Select.Option>
                       );
                     })}
@@ -164,6 +209,36 @@ const NumberFormatAction: FC<{
                       handleFormatDetailChanged(
                         Object.assign({}, formatDetail, {
                           useThousandSeparator: e.target.checked,
+                        }),
+                      )
+                    }
+                  />
+                </Col>
+              </StyledFormatDetailRow>
+              <StyledFormatDetailRow>
+                <Col span={12}>{t('format.prefix')}</Col>
+                <Col>
+                  <Input
+                    value={formatDetail?.prefix}
+                    onChange={e =>
+                      handleFormatDetailChanged(
+                        Object.assign({}, formatDetail, {
+                          prefix: e?.target?.value,
+                        }),
+                      )
+                    }
+                  />
+                </Col>
+              </StyledFormatDetailRow>
+              <StyledFormatDetailRow>
+                <Col span={12}>{t('format.suffix')}</Col>
+                <Col>
+                  <Input
+                    value={formatDetail?.suffix}
+                    onChange={e =>
+                      handleFormatDetailChanged(
+                        Object.assign({}, formatDetail, {
+                          suffix: e?.target?.value,
                         }),
                       )
                     }

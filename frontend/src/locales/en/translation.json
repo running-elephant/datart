@@ -242,7 +242,9 @@
             "scientific": "Scientific",
             "decimalPlace": "Decimal Places",
             "unit": "Unit",
-            "useSeparator": "Use Separator"
+            "useSeparator": "Use Separator",
+            "prefix": "Prefix",
+            "suffix": "Suffix"
           },
           "aggregation": "Aggregation",
           "aggregationlimit": "Aggregation",

@@ -242,7 +242,9 @@
             "scientific": "科学计数型",
             "decimalPlace": "小数位数",
             "unit": "单位",
-            "useSeparator": "启用分隔符"
+            "useSeparator": "启用分隔符",
+            "prefix": "前缀",
+            "suffix": "后缀"
           },
           "aggregation": "聚合",
           "aggregationlimit": "聚合",

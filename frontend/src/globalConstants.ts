@@ -160,3 +160,27 @@ export const CONTROLLER_WIDTH_OPTIONS = [
   { label: '1/8', value: '3' },
   { label: '1/12', value: '2' },
 ];
+
+export enum NumberUnitKey {
+  None = 'none',
+  // Engllish Unit
+  Thousand = 'thousand',
+  Million = 'million',
+  Billion = 'billion',
+  // Chinese Unit
+  Qian = 'qian',
+  Wan = 'wan',
+  Yi = 'yi',
+}
+
+export const NumericUnitDescriptions = new Map<NumberUnitKey, [number, string]>(
+  [
+    [NumberUnitKey.None, [1, '']],
+    [NumberUnitKey.Thousand, [10 ** 3, 'K']],
+    [NumberUnitKey.Million, [10 ** 6, 'M']],
+    [NumberUnitKey.Billion, [10 ** 10, 'B']],
+    [NumberUnitKey.Qian, [10 ** 3, '千']],
+    [NumberUnitKey.Wan, [10 ** 4, '万']],
+    [NumberUnitKey.Yi, [10 ** 8, '亿']],
+  ],
+);
