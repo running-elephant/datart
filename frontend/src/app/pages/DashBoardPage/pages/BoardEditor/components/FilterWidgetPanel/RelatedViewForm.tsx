@@ -23,11 +23,11 @@ import {
   RadioChangeEvent,
   Select,
 } from 'antd';
+import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView, {
   ChartDataViewFieldCategory,
 } from 'app/types/ChartDataView';
-import { RelatedView } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
-import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { ValueTypes } from './types';

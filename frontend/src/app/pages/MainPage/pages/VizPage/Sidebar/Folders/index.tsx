@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons';
 import { ListNav, ListPane, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
-import { BoardTypeMap } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { BoardTypeMap } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getInitBoardConfig } from 'app/pages/DashBoardPage/utils/board';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';

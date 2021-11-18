@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getBoardDetail } from 'app/pages/DashBoardPage/pages/Dashboard/slice/thunk';
+import { getBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thunk';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ExecuteToken } from 'app/pages/SharePage/slice/types';
 import { RootState } from 'types';

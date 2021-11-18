@@ -13,17 +13,17 @@ import { FilterSqlOperator } from 'globalConstants';
 import { errorHandle } from 'utils/utils';
 import { FilterOperatorType, STORAGE_IMAGE_KEY_PREFIX } from '../constants';
 import {
-  FilterDate,
-  WidgetFilterFormType,
-} from '../pages/BoardEditor/components/FilterWidgetPanel/types';
-import {
   BoardLinkFilter,
   DataChart,
   FilterWidgetContent,
   getDataOption,
   Widget,
   WidgetInfo,
-} from '../pages/Dashboard/slice/types';
+} from '../pages/Board/slice/types';
+import {
+  FilterDate,
+  WidgetFilterFormType,
+} from '../pages/BoardEditor/components/FilterWidgetPanel/types';
 import { ChartRequestFilter } from './../../ChartWorkbenchPage/models/ChartHttpRequest';
 import { ValueTypes } from './../pages/BoardEditor/components/FilterWidgetPanel/types';
 

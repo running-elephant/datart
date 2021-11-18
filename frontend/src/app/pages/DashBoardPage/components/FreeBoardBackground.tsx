@@ -2,7 +2,7 @@ import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfig
 import React, { createContext, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { BoardContext } from '../contexts/BoardContext';
-import StyledBackground from '../pages/Dashboard/components/StyledBackground';
+import StyledBackground from '../pages/Board/components/StyledBackground';
 export const scaleContext = createContext<[number, number]>([1, 1]);
 export interface IProps {
   scale: [number, number];

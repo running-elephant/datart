@@ -16,18 +16,18 @@
  * limitations under the License.
  */
 import { PayloadAction } from '@reduxjs/toolkit';
-import ChartDataView from 'app/types/ChartDataView';
 import {
   BoardLinkFilter,
   Dashboard,
   DataChart,
   WidgetData,
   WidgetInfo,
-} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import ChartDataView from 'app/types/ChartDataView';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
-import { createWidgetInfo } from '../../../utils/widget';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
+import { createWidgetInfo } from '../../../utils/widget';
 import { getChartWidgetDataAsync, getWidgetDataAsync } from './thunk';
 import { BoardInfo, BoardState, Widget } from './types';
 

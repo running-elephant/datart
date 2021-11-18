@@ -1,4 +1,4 @@
-import Dashboard from 'app/pages/DashBoardPage/pages/Dashboard';
+import Board from 'app/pages/DashBoardPage/pages/Board';
 import { useCascadeAccess } from 'app/pages/MainPage/Access';
 import { StoryPagePreview } from 'app/pages/StoryBoardPage/Preview/Preview';
 import classnames from 'classnames';
@@ -56,7 +56,7 @@ export const VizContainer = memo(
     switch (type) {
       case 'DASHBOARD':
         content = (
-          <Dashboard
+          <Board
             key={id}
             id={id}
             autoFit={true}

@@ -20,8 +20,11 @@ import { Form, Modal } from 'antd';
 import {
   selectDataChartById,
   selectViewMap,
-} from 'app/pages/DashBoardPage/pages/Dashboard/slice/selector';
-import { BoardState, Relation } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/selector';
+import {
+  BoardState,
+  Relation,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getChartDataRequestBuilder } from 'app/pages/DashBoardPage/utils';
 import {
   convertToWidgetMap,
