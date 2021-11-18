@@ -20,14 +20,8 @@ import { FieldFormatType, IFieldFormatConfig } from 'app/types/ChartConfig';
 import { dinero } from 'dinero.js';
 import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
 import moment from 'moment';
-import { isEmpty } from 'utils/object';
+import { isEmpty, pipe } from 'utils/object';
 import { getCurrency, intlFormat } from './currency';
-
-type PipeFunction<T> = (value?: number, args?: T) => number | string;
-
-export function pipe<T>(...fns: PipeFunction<T>[]) {
-  return (v, o?) => (fns || []).reduce((y, f) => f(y, o), v);
-}
 
 export function toPrecision(value: any, precision: number) {
   if (isNaN(+value)) {
@@ -78,7 +72,6 @@ export function toFormattedValue(
   value?: number | string,
   format?: IFieldFormatConfig,
 ) {
-  console.log(`value ---> `, value, typeof value);
   if (value === null || value === undefined) {
     return value;
   }
