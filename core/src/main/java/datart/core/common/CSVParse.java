@@ -21,14 +21,15 @@ import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.BaseException;
 import lombok.Data;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -36,16 +37,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CSVParser {
-
-    public static final String CSV_SPLIT = ",";
+public class CSVParse {
 
     public static final ParseConfig DEFAULT_CONFIG = new ParseConfig();
 
     static {
         DEFAULT_CONFIG.setDateFormat(Const.DEFAULT_IMG_FORMAT);
     }
-
 
     private String path;
 
@@ -55,19 +53,19 @@ public class CSVParser {
 
     private SimpleDateFormat simpleDateFormat;
 
-    public static CSVParser create(String path, ParseConfig parseConfig) {
-        CSVParser csvParser = new CSVParser();
-        csvParser.path = path;
-        csvParser.parseConfig = parseConfig;
-        csvParser.simpleDateFormat = new SimpleDateFormat(parseConfig.getDateFormat());
-        return csvParser;
+    public static CSVParse create(String path, ParseConfig parseConfig) {
+        CSVParse csvParse = new CSVParse();
+        csvParse.path = path;
+        csvParse.parseConfig = parseConfig;
+        csvParse.simpleDateFormat = new SimpleDateFormat(parseConfig.getDateFormat());
+        return csvParse;
     }
 
-    public static CSVParser create(String path) {
-        CSVParser csvParser = new CSVParser();
-        csvParser.path = path;
-        csvParser.parseConfig = DEFAULT_CONFIG;
-        return csvParser;
+    public static CSVParse create(String path) {
+        CSVParse csvParse = new CSVParse();
+        csvParse.path = path;
+        csvParse.parseConfig = DEFAULT_CONFIG;
+        return csvParse;
     }
 
     public List<List<Object>> parse() throws IOException {
@@ -75,33 +73,28 @@ public class CSVParser {
         if (!file.exists()) {
             throw new BaseException("file " + path + " no exists");
         }
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-
-            List<String> lines = reader.lines().collect(Collectors.toList());
-            if (CollectionUtils.isEmpty(lines)) {
-                return Collections.EMPTY_LIST;
-            }
-            if (lines.size() < 2) {
-                types = inferDataType(lines.get(0));
-            } else {
-                types = inferDataType(lines.get(1));
-            }
-            return lines.parallelStream().map(this::extractValues)
-                    .collect(Collectors.toList());
+        List<CSVRecord> records = CSVParser.parse(file, StandardCharsets.UTF_8, CSVFormat.DEFAULT).getRecords();
+        if (CollectionUtils.isEmpty(records)) {
+            return Collections.emptyList();
         }
-
+        if (records.size() < 2) {
+            types = inferDataType(records.get(0));
+        } else {
+            types = inferDataType(records.get(1));
+        }
+        return records.parallelStream().map(this::extractValues)
+                .collect(Collectors.toList());
     }
 
-    private ValueType[] inferDataType(String line) {
-        String[] split = line.split(CSV_SPLIT);
-        ValueType[] valueTypes = new ValueType[split.length];
-        for (int i = 0; i < split.length; i++) {
-            if (NumberUtils.isNumber(split[i])) {
+    private ValueType[] inferDataType(CSVRecord record) {
+        ValueType[] valueTypes = new ValueType[record.size()];
+        for (int i = 0; i < record.size(); i++) {
+            if (NumberUtils.isNumber(record.get(i))) {
                 valueTypes[i] = ValueType.NUMERIC;
                 continue;
             }
             try {
-                simpleDateFormat.parse(split[i]);
+                simpleDateFormat.parse(record.get(i));
                 valueTypes[i] = ValueType.DATE;
                 continue;
             } catch (Exception ignore) {
@@ -111,22 +104,18 @@ public class CSVParser {
         return valueTypes;
     }
 
-    private List<Object> extractValues(String line) {
+    private List<Object> extractValues(CSVRecord record) {
         try {
-            if (StringUtils.isEmpty(line)) {
+            if (record == null || record.size() == 0) {
                 return Collections.emptyList();
             }
             LinkedList<Object> values = new LinkedList<>();
-            String[] split = line.split(CSV_SPLIT);
-            if (split.length != types.length) {
-                throw new BaseException("csv parse error,near by '" + line + "',");
-            }
-            for (int i = 0; i < split.length; i++) {
+            for (int i = 0; i < record.size(); i++) {
                 Object val;
                 try {
-                    val = parseValue(split[i], types[i]);
+                    val = parseValue(record.get(i), types[i]);
                 } catch (Exception e) {
-                    val = split[i];
+                    val = record.get(i);
                 }
                 values.add(val);
             }

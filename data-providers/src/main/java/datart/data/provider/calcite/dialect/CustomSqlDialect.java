@@ -16,25 +16,28 @@
  * limitations under the License.
  */
 
-package datart.data.provider.jdbc.dialect;
+package datart.data.provider.calcite.dialect;
 
 import datart.core.common.BeanUtils;
-import datart.data.provider.base.JdbcDriverInfo;
+import datart.data.provider.jdbc.JdbcDriverInfo;
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.config.NullCollation;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.validate.SqlConformanceEnum;
 
 public class CustomSqlDialect extends SqlDialect {
+
     private CustomSqlDialect(Context context) {
         super(context);
     }
 
+    public CustomSqlDialect(JdbcDriverInfo driverInfo){
+        this(createContext(driverInfo));
+    }
+
     public static CustomSqlDialect create(JdbcDriverInfo driverInfo) {
-
         BeanUtils.validate(driverInfo);
-
-        SqlDialect.Context context = SqlDialect.EMPTY_CONTEXT
+        Context context = SqlDialect.EMPTY_CONTEXT
                 .withDatabaseProductName(driverInfo.getName())
                 .withDatabaseVersion(driverInfo.getVersion())
                 .withConformance(SqlConformanceEnum.LENIENT)
@@ -45,5 +48,16 @@ public class CustomSqlDialect extends SqlDialect {
         return new CustomSqlDialect(context);
     }
 
+    public static Context createContext(JdbcDriverInfo driverInfo) {
+        BeanUtils.validate(driverInfo);
+        return SqlDialect.EMPTY_CONTEXT
+                .withDatabaseProductName(driverInfo.getName())
+                .withDatabaseVersion(driverInfo.getVersion())
+                .withConformance(SqlConformanceEnum.LENIENT)
+                .withIdentifierQuoteString(driverInfo.getIdentifierQuote())
+                .withLiteralQuoteString(driverInfo.getLiteralQuote())
+                .withUnquotedCasing(Casing.UNCHANGED)
+                .withNullCollation(NullCollation.LOW);
+    }
 
 }
