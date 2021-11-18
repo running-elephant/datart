@@ -40,6 +40,7 @@ import {
   BasicFontSizeSelector,
   BasicInput,
   BasicInputNumber,
+  BasicInputPercentage,
   BasicLine,
   BasicMarginWidth,
   BasicSlider,
@@ -137,6 +138,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           return <BasicColorSelector {...props} />;
         case ChartStyleSectionComponentType.INPUTNUMBER:
           return <BasicInputNumber {...props} />;
+        case ChartStyleSectionComponentType.INPUTPERCENTAGE:
+          return <BasicInputPercentage {...props} />;
         case ChartStyleSectionComponentType.SLIDER:
           return <BasicSlider {...props} />;
         case ChartStyleSectionComponentType.MARGIN_WIDTH:

@@ -80,11 +80,6 @@ const config: ChartConfig = {
           default: 0,
           comType: 'inputNumber',
         },
-        {
-          label: 'bar.gap',
-          key: 'gap',
-          comType: 'inputNumber',
-        },
       ],
     },
     {

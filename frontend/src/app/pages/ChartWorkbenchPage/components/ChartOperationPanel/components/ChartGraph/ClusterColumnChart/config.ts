@@ -83,7 +83,8 @@ const config: ChartConfig = {
         {
           label: 'bar.gap',
           key: 'gap',
-          comType: 'inputNumber',
+          default: 0.1,
+          comType: 'inputPercentage',
         },
       ],
     },

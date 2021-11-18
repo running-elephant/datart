@@ -24,6 +24,7 @@ export { default as BasicFontFamilySelector } from './BasicFontFamilySelector';
 export { default as BasicFontSizeSelector } from './BasicFontSizeSelector';
 export { default as BasicInput } from './BasicInput';
 export { default as BasicInputNumber } from './BasicInputNumber';
+export { default as BasicInputPercentage } from './BasicInputPercentage';
 export { default as BasicLine } from './BasicLine';
 export { default as BasicMarginWidth } from './BasicMarginWidth';
 export { default as BasicSlider } from './BasicSlider';
