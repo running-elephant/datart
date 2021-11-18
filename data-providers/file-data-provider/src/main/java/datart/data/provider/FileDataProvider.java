@@ -19,7 +19,7 @@ package datart.data.provider;
 
 import datart.core.base.consts.FileFormat;
 import datart.core.base.consts.ValueType;
-import datart.core.common.CSVParser;
+import datart.core.common.CSVParse;
 import datart.core.common.FileUtils;
 import datart.core.common.POIUtils;
 import datart.core.common.UUIDGenerator;
@@ -140,7 +140,7 @@ public class FileDataProvider extends DefaultDataProvider {
             case XLSX:
                 return POIUtils.loadExcel(path);
             case CSV:
-                return CSVParser.create(path).parse();
+                return CSVParse.create(path).parse();
             default:
                 throw new DataProviderException("Unsupported file format " + format.getFormat());
         }

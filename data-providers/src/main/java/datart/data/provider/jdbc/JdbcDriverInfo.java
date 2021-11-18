@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package datart.data.provider.base;
+package datart.data.provider.jdbc;
 
 import lombok.Data;
 
@@ -41,6 +41,8 @@ public class JdbcDriverInfo {
 
     @NotBlank
     private String identifierQuote;
+
+    private String sqlDialect;
 
     private String identifierEndQuote;
 

@@ -18,11 +18,19 @@
 
 package datart.data.provider.jdbc.adapters;
 
+import datart.core.data.provider.Dataframe;
+import datart.core.data.provider.ExecuteParam;
+import datart.core.data.provider.QueryScript;
+import datart.core.data.provider.sql.OrderOperator;
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 public class ImpalaDataProviderAdapter extends JdbcDataProviderAdapter {
@@ -40,5 +48,13 @@ public class ImpalaDataProviderAdapter extends JdbcDataProviderAdapter {
             }
             return tables;
         }
+    }
+
+    @Override
+    protected Dataframe executeOnSource(QueryScript script, ExecuteParam executeParam) throws Exception {
+        if (CollectionUtils.isEmpty(executeParam.getOrders())) {
+            executeParam.setOrders(Collections.singletonList(new OrderOperator()));
+        }
+        return super.executeOnSource(script, executeParam);
     }
 }

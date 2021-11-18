@@ -21,18 +21,21 @@ CLICKHOUSE:
   name: CLICKHOUSE
   driver-class:
   url-prefix:
+  sql-dialect: datart.data.provider.calcite.dialect.ClickHouseSqlDialectSupport
 
 MSSQL:
   db-type: MSSQL
   name: MSSQL
   driver-class: com.microsoft.jdbc.sqlserver.SQLServerDriver
   url-prefix: jdbc:microsoft:sqlserver://
+  sql-dialect: datart.data.provider.calcite.dialect.MsSqlStdOperatorSupport
 
 MYSQL:
   db-type: MYSQL
   name: MYSQL
   driver-class: com.mysql.cj.jdbc.Driver
   url-prefix: jdbc:mysql://
+  sql-dialect: datart.data.provider.calcite.dialect.MysqlSqlStdOperatorSupport
 
 ORACLE:
   db-type: ORACLE
@@ -40,11 +43,14 @@ ORACLE:
   driver-class: oracle.jdbc.driver.OracleDriver
   adapter-class: datart.data.provider.jdbc.adapters.OracleDataProviderAdapter
   url-prefix: jdbc:oracle:thin:@
+  sql-dialect: datart.data.provider.calcite.dialect.OracleSqlStdOperatorSupport
+
 DERBY:
   db-type: DERBY
   name: DERBY
   driver-class:
   url-prefix:
+
 DB2:
   db-type: DB2
   name: DB2
@@ -99,8 +105,8 @@ PHOENIX:
 PRESTO:
   db-type: PRESTO
   name: PRESTO
-  driver-class:
-  url-prefix:
+  driver-class: io.prestosql.jdbc.PrestoDriver
+  url-prefix: jdbc:presto://
 
 NETEZZA:
   db-type: NETEZZA
