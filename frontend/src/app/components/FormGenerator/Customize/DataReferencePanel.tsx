@@ -91,7 +91,7 @@ const defaultRows = [
                 options: {
                   getItems: cols => {
                     const sections = (cols || []).filter(col =>
-                      ['deminsion'].includes(col.key),
+                      ['metrics'].includes(col.key),
                     );
                     const columns = sections.reduce(
                       (acc, cur) => acc.concat(cur.rows || []),
@@ -205,7 +205,7 @@ const defaultRows = [
                 options: {
                   getItems: cols => {
                     const columns = (cols || [])
-                      .filter(col => ['deminsion'].includes(col.key))
+                      .filter(col => ['metrics'].includes(col.key))
                       .reduce((acc, cur) => acc.concat(cur.rows || []), [])
                       .map(c => ({
                         key: c.uid,
@@ -262,7 +262,7 @@ const defaultRows = [
                 options: {
                   getItems: cols => {
                     const columns = (cols || [])
-                      .filter(col => ['deminsion'].includes(col.key))
+                      .filter(col => ['metrics'].includes(col.key))
                       .reduce((acc, cur) => acc.concat(cur.rows || []), [])
                       .map(c => ({
                         key: c.uid,

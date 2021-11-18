@@ -54,7 +54,7 @@ const config: ChartConfig = {
           options: {
             getItems: cols => {
               const sections = (cols || []).filter(col =>
-                ['metrics', 'deminsion'].includes(col.key),
+                ['metrics', 'dimension'].includes(col.key),
               );
               const columns = sections.reduce(
                 (acc, cur) => acc.concat(cur.rows || []),

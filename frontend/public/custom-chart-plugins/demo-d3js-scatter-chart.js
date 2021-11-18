@@ -21,14 +21,14 @@ function D3JSScatterChart({ dHelper }) {
     config: {
       datas: [
         {
-          label: 'metrics',
-          key: 'metrics',
+          label: 'dimension',
+          key: 'dimension',
           required: true,
           type: 'group',
         },
         {
-          label: 'deminsion',
-          key: 'deminsion',
+          label: 'metrics',
+          key: 'metrics',
           required: true,
           type: 'aggregate',
         },

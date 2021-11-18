@@ -109,14 +109,12 @@ class BasicDoubleYChart extends Chart {
 
     const leftDeminsionConfigs = dataConfigs
       .filter(
-        c =>
-          c.type === ChartDataSectionType.AGGREGATE && c.key === 'deminsionL',
+        c => c.type === ChartDataSectionType.AGGREGATE && c.key === 'metricsL',
       )
       .flatMap(config => config.rows || []);
     const rightDeminsionConfigs = dataConfigs
       .filter(
-        c =>
-          c.type === ChartDataSectionType.AGGREGATE && c.key === 'deminsionR',
+        c => c.type === ChartDataSectionType.AGGREGATE && c.key === 'metricsR',
       )
       .flatMap(config => config.rows || []);
 

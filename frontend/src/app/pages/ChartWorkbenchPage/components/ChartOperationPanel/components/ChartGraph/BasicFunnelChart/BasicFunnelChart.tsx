@@ -162,7 +162,7 @@ class BasicFunnelChart extends Chart {
     const position = getStyleValueByGroup(styles, 'label', 'position');
     const font = getStyleValueByGroup(styles, 'label', 'font');
     const metric = getStyleValueByGroup(styles, 'label', 'metric');
-    const deminsion = getStyleValueByGroup(styles, 'label', 'deminsion');
+    const dimension = getStyleValueByGroup(styles, 'label', 'dimension');
     const conversion = getStyleValueByGroup(styles, 'label', 'conversion');
     const arrival = getStyleValueByGroup(styles, 'label', 'arrival');
     const percentage = getStyleValueByGroup(styles, 'label', 'percentage');
@@ -175,7 +175,7 @@ class BasicFunnelChart extends Chart {
         const { name, value, percent, data } = params;
         const formattedValue = toFormattedValue(value?.[0], data.format);
         const labels: string[] = [];
-        if (deminsion) {
+        if (metric) {
           labels.push(`${name}: ${formattedValue}`);
         }
         if (conversion && !isEmpty(data.conversion)) {

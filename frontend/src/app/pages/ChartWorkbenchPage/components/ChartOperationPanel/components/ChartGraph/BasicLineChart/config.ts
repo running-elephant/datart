@@ -21,15 +21,15 @@ import { ChartConfig } from 'app/types/ChartConfig';
 const config: ChartConfig = {
   datas: [
     {
-      label: 'metrics',
-      key: 'metrics',
+      label: 'dimension',
+      key: 'dimension',
       required: true,
       type: 'group',
       limit: 1,
     },
     {
-      label: 'deminsion',
-      key: 'deminsion',
+      label: 'metrics',
+      key: 'metrics',
       required: true,
       type: 'aggregate',
       limit: [1, 999],

@@ -28,13 +28,13 @@ const config: ChartConfig = {
     },
     {
       label: 'section.detail',
-      key: 'metrics',
+      key: 'dimension',
       required: true,
       type: 'group',
     },
     {
-      label: 'deminsion',
-      key: 'deminsion',
+      label: 'metrics',
+      key: 'metrics',
       required: true,
       type: 'aggregate',
     },
