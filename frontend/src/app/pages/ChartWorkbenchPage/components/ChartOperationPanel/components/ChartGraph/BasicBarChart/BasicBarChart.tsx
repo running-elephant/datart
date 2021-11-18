@@ -240,7 +240,7 @@ class BasicBarChart extends Chart {
         const k = Object.keys(sgCol)[0];
         const v = sgCol[k];
 
-        const itemStyleColor = colorConfigs[0]?.color?.colors?.find(
+        const itemStyleColor = colorConfigs?.[0]?.color?.colors?.find(
           c => c.key === k,
         );
 
@@ -252,7 +252,7 @@ class BasicBarChart extends Chart {
             sgCol,
           ),
           name: k,
-          data: xAxisColumns?.[0].data?.map(d => {
+          data: xAxisColumns?.[0]?.data?.map(d => {
             const dc = v.find(col => col[xAxisColumnName] === d);
             return {
               ...getExtraSeriesRowData(dc),

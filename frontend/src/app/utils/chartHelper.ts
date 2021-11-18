@@ -17,10 +17,8 @@
  */
 import {
   ChartConfig,
-  ChartDataSectionConfig,
   ChartDataSectionField,
   ChartDataSectionType,
-  ChartI18NSectionConfig,
   ChartStyleSectionConfig,
   IFieldFormatConfig,
   SortActionType,
@@ -28,7 +26,7 @@ import {
 import { ChartDatasetMeta } from 'app/types/ChartDataset';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
-import { isEmpty, meanValue, mergeDefaultToValue } from 'utils/object';
+import { isEmpty, isEmptyArray, isUndefined, meanValue } from 'utils/object';
 import { toFormattedValue } from './number';
 
 export function isInRange(limit?, count?) {
@@ -459,74 +457,61 @@ export function mergeConfig<T extends ChartConfig>(origin?: T, target?: T): T {
   if (!target) {
     return origin;
   }
-  origin.datas = mergeChartDataSectionConfig(origin?.datas, target?.datas);
-  origin.styles = mergeChartStyleConfig(origin?.styles, target?.styles);
-  origin.settings = mergeChartStyleConfig(origin?.settings, target?.settings);
-  origin.i18ns = mergeChartI18NConfig(origin?.i18ns, target?.i18ns);
+  origin.datas = mergeChartDataConfigs(origin?.datas, target?.datas);
+  origin.styles = mergeChartStyleConfigs(origin?.styles, target?.styles);
+  origin.settings = mergeChartStyleConfigs(origin?.settings, target?.settings);
   return origin;
 }
 
-export function mergeChartDataSectionConfig(
-  origin?: ChartDataSectionConfig[],
-  target?: ChartDataSectionConfig[],
-) {
-  if (!target?.length) {
-    return origin || [];
+export function mergeChartStyleConfigs<
+  T extends { key?: string; value?: any; rows?: T[] } | undefined | null,
+>(target?: T[], source?: T[], options = { useDefault: true }) {
+  if (isEmptyArray(target)) {
+    return target;
   }
-  if (!origin?.length) {
-    return target || [];
+  if (isEmptyArray(source) && !options?.useDefault) {
+    return target;
   }
-  return (origin || []).map(sec => {
-    const targetSec = (target || []).find(t => t.key === sec.key);
-    if (targetSec) {
-      return Object.assign({}, sec, targetSec);
+  for (let index = 0; index < target?.length!; index++) {
+    const tEle: any = target?.[index];
+    if (!tEle) {
+      continue;
     }
-    return sec;
-  });
+
+    // options.useDefault
+    if (isUndefined(tEle['value']) && options?.useDefault) {
+      tEle['value'] = tEle?.['default'];
+    }
+
+    const sEle =
+      'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
+
+    if (!isUndefined(sEle?.['value'])) {
+      tEle['value'] = sEle?.['value'];
+    }
+    if ('rows' in tEle) {
+      tEle['rows'] = mergeChartStyleConfigs(
+        tEle.rows,
+        sEle?.rows || [],
+        options,
+      );
+    }
+  }
+  return target;
 }
 
-export function mergeChartStyleConfig(
-  origin?: ChartStyleSectionConfig[],
-  target?: ChartStyleSectionConfig[],
-) {
-  if (!target?.length) {
-    return origin || [];
+export function mergeChartDataConfigs<
+  T extends { key?: string; rows?: ChartDataSectionField[] } | undefined | null,
+>(target?: T[], source?: T[]) {
+  if (isEmptyArray(target) || isEmptyArray(source)) {
+    return target;
   }
-  if (!origin?.length) {
-    return target || [];
-  }
-  return mergeDefaultToValue(
-    (origin || []).map(sec => {
-      const targetSec = (target || []).find(t => t.key === sec.key);
-      if (targetSec) {
-        return Object.assign({}, sec, {
-          default: targetSec.default,
-          value: targetSec.value,
-          disabled: targetSec.disabled,
-          rows: mergeChartStyleConfig(sec.rows, targetSec.rows),
-        });
-      }
-      return sec;
-    }),
-  );
-}
-
-export function mergeChartI18NConfig(
-  origin?: ChartI18NSectionConfig[],
-  target?: ChartI18NSectionConfig[],
-) {
-  if (!target?.length) {
-    return origin || [];
-  }
-  return (origin || []).map(sec => {
-    const targetSec = (target || []).find(t => t.lang === sec.lang);
-    if (targetSec) {
-      return Object.assign({}, sec, {
-        lang: targetSec.lang,
-        tranlation: Object.assign({}, sec.translation, targetSec.translation),
-      });
+  return (target || []).map(tEle => {
+    const sEle = (source || []).find(s => s?.key === tEle?.key);
+    if (sEle) {
+      return Object.assign({}, tEle, { rows: sEle?.rows });
     }
-    return sec;
+    return tEle;
   });
 }
 

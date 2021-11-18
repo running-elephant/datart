@@ -20,7 +20,7 @@ import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
 } from 'app/types/FilterControlPanel';
-import { FilterSqlOperator } from 'globalConstants';
+import { FilterSqlOperator, NumberUnitKey } from 'globalConstants';
 import { ValueOf } from 'types';
 import {
   ChartDataViewFieldCategory,
@@ -219,31 +219,20 @@ export type ColorFieldAction = {
   colors?: Array<{ key: string; value: string }>;
 };
 
-export enum NumericUnit {
-  None = '无',
-  Thousand = '千/K',
-  TenThousand = '万',
-  Million = '百万/M',
-  OneHundredMillion = '亿',
-  Billion = '十亿/B',
-  Gigabyte = 'G',
-}
-
 export interface IFieldFormatConfig {
   type: FieldFormatType;
   [FieldFormatType.NUMERIC]?: {
     decimalPlaces: number;
-    unit?: number;
-    unitDesc?: NumericUnit;
-    useThousandSeparator: boolean;
+    unitKey?: NumberUnitKey;
+    useThousandSeparator?: boolean;
+    prefix?: string;
+    suffix?: string;
   };
   [FieldFormatType.CURRENCY]?: {
     decimalPlaces: number;
-    unit?: number;
-    unitDesc?: NumericUnit;
-    useThousandSeparator: boolean;
-    prefix: string;
-    suffix: string;
+    unitKey?: NumberUnitKey;
+    useThousandSeparator?: boolean;
+    currency?: string;
   };
   [FieldFormatType.PERCENTAGE]?: {
     decimalPlaces: number;
