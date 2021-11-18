@@ -1,0 +1,361 @@
+{
+  "main": {
+    "nav": {
+      "download": {
+        "title": "Download List"
+      }
+    }
+  },
+  "viz": {
+    "common": {
+      "enum": {
+        "filterOperator": {
+          "EQ": "Equal",
+          "NE": "Not Equal",
+          "IS_NULL": "Null",
+          "NOT_NULL": "Not Null",
+          "LIKE": "Contain",
+          "NOT_LIKE": "Not Contain",
+          "PREFIX_LIKE": "Prefix Contain",
+          "PREFIX_NOT_LIKE": "Not Prefix Contain",
+          "SUFFIX_LIKE": "Suffix Contain",
+          "SUFFIX_NOT_LIKE": "Not Suffix Contain",
+          "BETWEEN": "Between",
+          "IN": "In",
+          "NOT_IN": "Not In",
+          "LT": "Less Than",
+          "GT": "Greater Than",
+          "LTE": "Less Than Or Equal",
+          "GTE": "Greater Than Or Equal"
+        },
+        "aggregateTypes": {
+          "NONE": "None",
+          "SUM": "Sum",
+          "AVG": "Avg",
+          "COUNT": "Count",
+          "COUNT_DISTINCT": "Distinct Count",
+          "MAX": "Max",
+          "MIN": "Min"
+        },
+        "controllerFacadeTypes": {
+          "dropdownList": "Dropdown List",
+          "radioGroup": "Radio Group",
+          "multiDropdownList": "Multipile Dropdown List",
+          "rangeTime": "Range Time",
+          "rangeValue": "Range Value",
+          "text": "Text",
+          "tree": "Tree",
+          "value": "Value",
+          "time": "Time",
+          "slider": "Slider"
+        },
+        "controllerVisibilityTypes": {
+          "hide": "Hide",
+          "show": "Show",
+          "condition": "Condition"
+        }
+      },
+      "filter": {
+        "title": "Filter",
+        "filterName": "Filter Name",
+        "filterAggregate": "Filter Aggregate",
+        "filterVisibility": "Filter Visibility",
+        "aggregates": "Aggregates",
+        "filterOption": "Filter Option",
+        "visibility": "Visibility",
+        "facade": "Facade",
+        "widthOption": "Width Option",
+        "columnName": "Current Edit Column Name",
+        "arrange": "Arrange",
+        "hide": "hide",
+        "show": "show",
+        "condition": "condition",
+        "min": "Min",
+        "max": "Max",
+        "radioType": "Style",
+        "default": "Default",
+        "button": "Button",
+        "date": {
+          "recommend": "Recommend",
+          "manual": "Mannual",
+          "today": "Today",
+          "yesterday": "Yesterday",
+          "this_week": "This Week",
+          "last_7_days": "Last 7 Days",
+          "last_30_days": "Last 30 Days",
+          "last_90_days": "Last 90 Days",
+          "last_1_month": "Last 1 Month",
+          "last_1_year": "Last 1 Year",
+          "or": " OR ",
+          "seconds": "Seconds",
+          "minutes": "Minutes",
+          "hours": "Hours",
+          "days": "Days",
+          "weeks": "Weeks",
+          "months": "Months",
+          "years": "Years",
+          "ago": "Ago",
+          "fromNow": "From Now",
+          "pleaseSelect": "Please Select",
+          "currentTime": "Current Time",
+          "startTime": "Start Time",
+          "endTime": "end Time",
+          "exact": "Exact",
+          "relative": "Relative"
+        },
+        "category": {
+          "general": "General",
+          "customize": "Customize",
+          "condition": "Condition",
+          "sourceList": "Source",
+          "targetList": "Default",
+          "moveToLeft": "Remove",
+          "moveToRight": "Add",
+          "include": "In",
+          "notInclude": "Not In",
+          "tableHeaderKey": "Value",
+          "tableHeaderLabel": "Title",
+          "tableHeaderAction": "Operation",
+          "deleteRow": "Delete",
+          "setDefault": "As Default",
+          "setUnDefault": "As UnDefault",
+          "addRow": "Add Row",
+          "AddFromFields": "Add Row Current Field",
+          "associateField": "Associate Field",
+          "labelField": "Label Field",
+          "useTree": "Tree Style",
+          "load": "Load"
+        }
+      }
+    },
+    "management": {
+      "title": "widgets manangement",
+      "subTitle": "widgets list",
+      "table": {
+        "header": {
+          "name": "Name",
+          "description": "Description",
+          "type": "Type",
+          "action": "action"
+        }
+      }
+    },
+    "workbench": {
+      "header": {
+        "goBack": "Back",
+        "run": "Run",
+        "save": "Save",
+        "saveToDashboard": "Save to Dashboard",
+        "login": "Login",
+        "lang": {
+          "zh": "ZH",
+          "en": "EN"
+        },
+        "format": {
+          "local": "local",
+          "date": "date",
+          "ll": "LL",
+          "lll": "LLL"
+        }
+      },
+      "dataview": {
+        "createComputedFields": "Create Computed Field",
+        "createVariableFields": "Create Variable Field",
+        "fieldName": "Name",
+        "type": "Type",
+        "field": "Field",
+        "variable": "Variable",
+        "functions": "Function List",
+        "editField": "Edit",
+        "deleteField": "Delete"
+      }
+    },
+    "palette": {
+      "title": {
+        "content": "Data",
+        "design": "Style",
+        "setting": "Setting"
+      },
+      "style": {
+        "font": "Font",
+        "pleaseSelect": "Please select ...",
+        "table": {
+          "header": {
+            "merge": "Merge",
+            "moveUp": "moveUp",
+            "moveDown": "moveDown",
+            "columnName": "Column Name",
+            "backgroundColor": "Background Color",
+            "font": "Font",
+            "align": {
+              "title": "Align",
+              "left": "left",
+              "center": "center",
+              "right": "right"
+            }
+          }
+        },
+        "visualMap": {
+          "title": "Visual Map",
+          "show": "Show Visual Map",
+          "orient": "Orient",
+          "align": "Align",
+          "itemWidth": "Width",
+          "itemHeight": "Height",
+          "startColor": "Start Color",
+          "endColor": "End Color"
+        },
+        "margin": {
+          "title": "Margin",
+          "left": "Left Margin",
+          "right": "Right Margin",
+          "bottom": "Bottom Margin",
+          "top": "Top Margin",
+          "containLabel": "Contain Label"
+        }
+      },
+      "data": {
+        "metrics": "Metric",
+        "deminsion": "Deminsion",
+        "mixed": "Mixed",
+        "filter": "Filter",
+        "colorize": "Color",
+        "colorRange": "Range Color",
+        "info": "Info",
+        "sort": "Sort",
+        "size": "Size",
+        "drop": "Please drag data column here",
+        "actions": {
+          "sort": {
+            "title": "Sort",
+            "none": "Default",
+            "asc": "Ascending",
+            "desc": "Descending",
+            "customize": "Customized"
+          },
+          "format": {
+            "title": "Format Setting",
+            "default": "Default",
+            "numeric": "Numeric",
+            "currency": "Currency",
+            "percentage": "Percentage",
+            "scientific": "Scientific",
+            "decimalPlace": "Decimal Places",
+            "unit": "Unit",
+            "useSeparator": "Use Separator",
+            "prefix": "Prefix",
+            "suffix": "Suffix"
+          },
+          "aggregation": "Aggregation",
+          "aggregationlimit": "Aggregation",
+          "alias": {
+            "title": "Field Setting",
+            "name": "Alias Name",
+            "description": "Name Description"
+          },
+          "filter": {
+            "title": "Filter"
+          },
+          "color": {
+            "enable": "Enable Color",
+            "start": "Start Color",
+            "end": "End Color"
+          }
+        },
+        "axis": {
+          "y": {
+            "left": "left axis demision",
+            "right": "right axis demision"
+          }
+        },
+        "enum": {
+          "actionType": {
+            "sortable": "sortable",
+            "alias": "alias",
+            "format": "format",
+            "aggregate": "aggregate",
+            "aggregateLimit": "aggregate",
+            "filter": "filter",
+            "categoryFilter": "category filter",
+            "colorize": "colorize",
+            "colorRange": "colorize",
+            "colorSingle": "colorize",
+            "size": "size"
+          }
+        }
+      },
+      "setting": {
+        "pleaseSelect": "Please select ...",
+        "displayCount": "Display Count",
+        "enableCache": "Enable Cache",
+        "cacheExpire": "Cache Expire Time(sec)",
+        "autoLoad": "Auto Load",
+        "enableRaw": "Raw Data",
+        "reference": {
+          "enableMarkLine": "Enable Mark Line",
+          "enableMarkArea": "Enable Mark Area",
+          "markLine": "Reference Line",
+          "markArea": "Reference Area",
+          "valueType": "Value Type",
+          "constantValue": "Constant Value",
+          "metric": "Reference Metric",
+          "startValueType": "Start Value Type",
+          "startConstantValue": "Start Constant Value",
+          "startMetric": "Start Reference Metric",
+          "endValueType": "End Value Type",
+          "endConstantValue": "End Constant Value",
+          "endMetric": "End Reference Metric",
+          "font": "Font",
+          "showLabel": "Show",
+          "position": "Position",
+          "lineStyle": "Line Style",
+          "opacity": "Opacity",
+          "backgroundColor": "Background Color",
+          "borderStyle": "Border Style"
+        }
+      },
+      "present": {
+        "graph": "Graph",
+        "raw": "Raw",
+        "sql": "SQL"
+      },
+      "graph": {
+        "group": "Dimensions",
+        "aggregate": "Measures",
+        "onlyAllow": "{{type}} Only Allow {{num}}",
+        "allowRange": "{{type}} Allow Range {{start}} to {{end}}"
+      }
+    },
+    "chartPreview": {
+      "common": {
+        "confirm": "Please Confirm",
+        "ok": "OK",
+        "cancel": "Cancel"
+      },
+      "edit": "Edit",
+      "run": "Run",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "share": {
+        "link": "Link",
+        "password": "Password",
+        "expireDate": "Expire Date",
+        "enablePassword": "Enable Password",
+        "generateLink": "Generate Link",
+        "shareLink": "Share Link",
+        "downloadData": "Download Data"
+      }
+    }
+  },
+  "share": {
+    "common": {
+      "confirm": "Please Confirm",
+      "ok": "OK",
+      "cancel": "Cancel"
+    },
+    "modal": {
+      "password": "Password",
+      "pleaseInputPassword": "please input password"
+    }
+  }
+}

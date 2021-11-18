@@ -1,0 +1,13 @@
+.calcfield {
+  width: 65px;
+  height: 24px;
+  padding: 3px 0;
+  margin-right: 2px;
+  user-select: all;
+  background-color: #d3e1eb;
+  border-radius: 6px;
+}
+
+.calcfield > span {
+  margin: 0 3px;
+}

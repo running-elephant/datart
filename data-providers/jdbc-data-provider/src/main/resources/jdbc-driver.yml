@@ -26,9 +26,9 @@ CLICKHOUSE:
 MSSQL:
   db-type: MSSQL
   name: MSSQL
-  driver-class: com.microsoft.jdbc.sqlserver.SQLServerDriver
-  url-prefix: jdbc:microsoft:sqlserver://
   sql-dialect: datart.data.provider.calcite.dialect.MsSqlStdOperatorSupport
+  driver-class: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  url-prefix: jdbc:sqlserver://
 
 MYSQL:
   db-type: MYSQL
