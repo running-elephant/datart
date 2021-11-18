@@ -20,7 +20,7 @@ import { Layout } from 'antd';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import HeaderBar from '../components/HeaderBar/HeaderBar';
+import BoardToolBar from '../components/BoardToolBar/BoardToolBar';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
 import WorkSpace from './WorkSpace';
@@ -36,7 +36,7 @@ const FreeEditor: React.FC = () => {
   return (
     <Layout onClick={clearSelectedWidgets}>
       <Wrapper>
-        <HeaderBar />
+        <BoardToolBar />
         <Editor>
           <WorkSpace />
           <SlideSetting />

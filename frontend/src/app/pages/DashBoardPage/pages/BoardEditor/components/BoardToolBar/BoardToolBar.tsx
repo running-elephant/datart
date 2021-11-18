@@ -19,15 +19,15 @@ import React from 'react';
 import styled from 'styled-components/macro';
 import { SPACE, SPACE_XL, STICKY_LEVEL } from 'styles/StyleConstants';
 import ToolBar from './ToolBar';
-export interface HeaderBarProps {}
-const HeaderBar: React.FC<HeaderBarProps> = () => {
+export interface BoardToolBarProps {}
+const BoardToolBar: React.FC<BoardToolBarProps> = () => {
   return (
     <Wrapper>
       <ToolBar />
     </Wrapper>
   );
 };
-export default HeaderBar;
+export default BoardToolBar;
 
 const Wrapper = styled.div`
   z-index: ${STICKY_LEVEL};
