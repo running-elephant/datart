@@ -23,7 +23,11 @@ export const hasWrongDimensionName = (config?: ChartConfig) => {
   if (!config) {
     return false;
   }
-  return Boolean(config?.datas?.find(d => d.key === 'deminsion'));
+  return Boolean(
+    config?.datas?.find(d =>
+      ['deminsion', 'deminsionL', 'deminsionR'].includes(d.key),
+    ),
+  );
 };
 
 export function alpha3(config?: ChartConfig): ChartConfig | undefined {
@@ -38,6 +42,20 @@ export function alpha3(config?: ChartConfig): ChartConfig | undefined {
       );
       if (!isUndefined(wrongNameOfDimension)) {
         wrongNameOfDimension!.key = 'metrics';
+      }
+
+      const wrongNameOfDimensionL = config?.datas?.find(
+        d => d.key === 'deminsionL',
+      );
+      if (!isUndefined(wrongNameOfDimensionL)) {
+        wrongNameOfDimensionL!.key = 'metricsL';
+      }
+
+      const wrongNameOfDimensionR = config?.datas?.find(
+        d => d.key === 'deminsionR',
+      );
+      if (!isUndefined(wrongNameOfDimensionR)) {
+        wrongNameOfDimensionR!.key = 'metricsR';
       }
     }
   } catch (error) {

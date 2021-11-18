@@ -40,6 +40,20 @@ describe('alpha3 - ', () => {
     expect(hasWrongDimensionName(config as any)).toBe(true);
   });
 
+  test('should match has wrong dimension name when config datas contains deminsionL key', () => {
+    const config = {
+      datas: [{ key: 'deminsionL' }],
+    };
+    expect(hasWrongDimensionName(config as any)).toBe(true);
+  });
+
+  test('should match has wrong dimension name when config datas contains deminsionR key', () => {
+    const config = {
+      datas: [{ key: 'deminsionR' }],
+    };
+    expect(hasWrongDimensionName(config as any)).toBe(true);
+  });
+
   test('should not change anything when datas is emtpy', () => {
     const config = {
       datas: [],
@@ -67,6 +81,23 @@ describe('alpha3 - ', () => {
       datas: [
         { key: 'metrics', value: 1 },
         { key: 'dimension', value: 2 },
+      ],
+    });
+  });
+
+  test('should change key when key name is matched', () => {
+    const config = {
+      datas: [
+        { key: 'metrics', value: 2 },
+        { key: 'deminsionL', value: 11 },
+        { key: 'deminsionR', value: 12 },
+      ],
+    };
+    expect(alpha3(config as any)).toMatchObject({
+      datas: [
+        { key: 'dimension', value: 2 },
+        { key: 'metricsL', value: 11 },
+        { key: 'metricsR', value: 12 },
       ],
     });
   });
