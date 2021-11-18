@@ -178,7 +178,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         try (Connection conn = getConn()) {
             Statement statement = conn.createStatement();
 
-            statement.setFetchSize((int) Math.min(pageInfo.isCountTotal() ? pageInfo.getPageSize() : 10_000, 10_000));
+            statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
 
             try (ResultSet resultSet = statement.executeQuery(selectSql)) {
                 try {

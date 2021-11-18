@@ -20,8 +20,8 @@ import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import React, { CSSProperties, FC, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { selectSortFixedFiltersIdsById } from '../../../../pages/Board/slice/selector';
 import { selectEditFixedFilterIds } from '../../../../pages/BoardEditor/slice/selectors';
-import { selectSortFixedFiltersIdsById } from '../../../../pages/Dashboard/slice/selector';
 import { WidgetAllProvider } from '../../../WidgetAllProvider';
 import { FixedFilter } from './FixedFilter';
 export interface BoardFilterBoxProps {}

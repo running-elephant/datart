@@ -24,11 +24,11 @@ import {
   makeSelectBoardConfigById,
   selectLayoutWidgetInfoMapById,
   selectLayoutWidgetMapById,
-} from 'app/pages/DashBoardPage/pages/Dashboard/slice/selector';
+} from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import {
   BoardState,
   Dashboard,
-} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, {
   RefObject,
   useCallback,

@@ -27,12 +27,11 @@
     {
       "name": "user",
       "type": "string",
-      "required": true,
-      "defaultValue": "root"
+      "required": false
     },
     {
       "name": "password",
-      "required": true,
+      "required": false,
       "encrypt": true,
       "defaultValue": "",
       "type": "password"

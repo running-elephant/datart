@@ -26,10 +26,10 @@ import { useLocation } from 'react-router-dom';
 import persistence from 'utils/persistence';
 import { v4 as uuidv4 } from 'uuid';
 import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
+import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';
+import { selectShareBoard } from '../DashBoardPage/pages/Board/slice/selector';
+import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
 import { useEditBoardSlice } from '../DashBoardPage/pages/BoardEditor/slice';
-import { useBoardSlice } from '../DashBoardPage/pages/Dashboard/slice';
-import { selectShareBoard } from '../DashBoardPage/pages/Dashboard/slice/selector';
-import { VizRenderMode } from '../DashBoardPage/pages/Dashboard/slice/types';
 import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
 import { urlSearchTransfer } from '../MainPage/pages/VizPage/utils';
 import { useStoryBoardSlice } from '../StoryBoardPage/slice';
@@ -111,19 +111,6 @@ export function SharePage() {
       }),
     );
   };
-
-  useMount(() => {
-    if (Boolean(usePassword)) {
-      const previousPassword = persistence.session.get(shareToken);
-      if (previousPassword) {
-        fetchShareVizInfoImpl(shareToken, previousPassword, searchParams);
-      } else {
-        dispatch(actions.saveNeedPassword(true));
-      }
-    } else {
-      fetchShareVizInfoImpl(shareToken, undefined, searchParams);
-    }
-  });
 
   const onLoadShareTask = useMemo(() => {
     const clientId = localStorage.getItem(StorageKeys.ShareClientId);

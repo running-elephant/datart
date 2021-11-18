@@ -23,7 +23,7 @@ import { WidgetChartContext } from 'app/pages/DashBoardPage/contexts/WidgetChart
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetDataContext } from 'app/pages/DashBoardPage/contexts/WidgetDataContext';
 import { WidgetMethodContext } from 'app/pages/DashBoardPage/contexts/WidgetMethodContext';
-import { Widget } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartMouseEventParams } from 'app/types/DatartChartBase';
 import React, {

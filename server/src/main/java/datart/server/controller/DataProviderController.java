@@ -29,6 +29,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
@@ -63,7 +64,7 @@ public class DataProviderController extends BaseController {
 
     @ApiOperation(value = "List databases")
     @GetMapping(value = "/{sourceId}/databases")
-    public ResponseData<Set<String>> listDatabases(@PathVariable String sourceId) {
+    public ResponseData<Set<String>> listDatabases(@PathVariable String sourceId) throws SQLException {
         checkBlank(sourceId, "sourceId");
         return ResponseData.success(dataProviderService.readAllDatabases(sourceId));
     }
@@ -71,7 +72,7 @@ public class DataProviderController extends BaseController {
     @ApiOperation(value = "List tables")
     @GetMapping(value = "/{sourceId}/{database}/tables")
     public ResponseData<Set<String>> listTables(@PathVariable String sourceId,
-                                                @PathVariable String database) {
+                                                @PathVariable String database) throws SQLException {
         checkBlank(sourceId, "sourceId");
         checkBlank(database, "database");
         return ResponseData.success(dataProviderService.readTables(sourceId, database));
@@ -81,7 +82,7 @@ public class DataProviderController extends BaseController {
     @GetMapping(value = "/{sourceId}/{database}/{table}/columns")
     public ResponseData<Set<Column>> getTableInfo(@PathVariable String sourceId,
                                                   @PathVariable String database,
-                                                  @PathVariable String table) {
+                                                  @PathVariable String table) throws SQLException {
         checkBlank(sourceId, "sourceId");
         checkBlank(database, "database");
         checkBlank(table, "table");

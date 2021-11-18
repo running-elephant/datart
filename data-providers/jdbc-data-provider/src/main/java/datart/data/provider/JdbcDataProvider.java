@@ -63,33 +63,21 @@ public class JdbcDataProvider extends DataProvider {
     }
 
     @Override
-    public Set<String> readAllDatabases(DataProviderSource source) {
-        try {
-            JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
-            return adapter.readAllDatabases();
-        } catch (SQLException e) {
-            throw new DataProviderException(e);
-        }
+    public Set<String> readAllDatabases(DataProviderSource source) throws SQLException {
+        JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
+        return adapter.readAllDatabases();
     }
 
     @Override
-    public Set<String> readTables(DataProviderSource source, String database) {
-        try {
-            JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
-            return adapter.readAllTables(database);
-        } catch (SQLException e) {
-            throw new DataProviderException(e);
-        }
+    public Set<String> readTables(DataProviderSource source, String database) throws SQLException {
+        JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
+        return adapter.readAllTables(database);
     }
 
     @Override
-    public Set<Column> readTableColumns(DataProviderSource source, String database, String table) {
-        try {
-            JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
-            return adapter.readTableColumn(database, table);
-        } catch (SQLException e) {
-            throw new DataProviderException(e);
-        }
+    public Set<Column> readTableColumns(DataProviderSource source, String database, String table) throws SQLException {
+        JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
+        return adapter.readTableColumn(database, table);
     }
 
     @Override
@@ -111,10 +99,16 @@ public class JdbcDataProvider extends DataProvider {
         JdbcProperties jdbcProperties = new JdbcProperties();
         jdbcProperties.setDbType(config.getProperties().get(DB_TYPE).toString().toUpperCase());
         jdbcProperties.setUrl(config.getProperties().get(URL).toString());
-        jdbcProperties.setUser(config.getProperties().get(USER).toString());
-        jdbcProperties.setPassword(config.getProperties().get(PASSWORD).toString());
+        Object user = config.getProperties().get(USER);
+        if (user != null && StringUtils.isNotBlank(user.toString())) {
+            jdbcProperties.setUser(user.toString());
+        }
+        Object password = config.getProperties().get(PASSWORD);
+        if (password != null && StringUtils.isNotBlank(password.toString())) {
+            jdbcProperties.setPassword(password.toString());
+        }
         String driverClass = config.getProperties().getOrDefault(DRIVER_CLASS, "").toString();
-        jdbcProperties.setDriverClass(StringUtils.isEmpty(driverClass) ?
+        jdbcProperties.setDriverClass(StringUtils.isBlank(driverClass) ?
                 ProviderFactory.getJdbcDriverInfo(jdbcProperties.getDbType()).getDriverClass() :
                 driverClass);
         Object properties = config.getProperties().get("properties");

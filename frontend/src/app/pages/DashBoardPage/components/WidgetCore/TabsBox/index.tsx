@@ -18,7 +18,7 @@
 import { Tabs } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
-import { ContainerWidgetContent } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { ContainerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useCallback, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';

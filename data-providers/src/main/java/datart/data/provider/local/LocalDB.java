@@ -218,7 +218,7 @@ public class LocalDB {
                 , executeParam
                 , SQL_DIALECT
                 , Const.DEFAULT_VARIABLE_QUOTE);
-        String sql = render.render(true, true, false);
+        String sql = render.render(true, false, false);
 
         ResultSet resultSet = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY).executeQuery(sql);
 

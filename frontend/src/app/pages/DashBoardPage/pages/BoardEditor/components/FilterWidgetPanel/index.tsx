@@ -18,24 +18,24 @@
 
 import { Form, Modal } from 'antd';
 import { Split } from 'app/components';
-import {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import { selectViewMap } from 'app/pages/DashBoardPage/pages/Dashboard/slice/selector';
+import { selectViewMap } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import {
   FilterWidgetContent,
   RelatedView,
   Relation,
   WidgetFilterTypes,
-} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   convertToWidgetMap,
   createFilterWidget,
   getCanLinkFilterWidgets,
   getOtherStringFilterWidgets,
 } from 'app/pages/DashBoardPage/utils/widget';
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+} from 'app/types/ChartDataView';
 import produce from 'immer';
 import React, {
   memo,

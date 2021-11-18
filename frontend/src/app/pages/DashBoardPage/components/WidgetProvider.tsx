@@ -21,10 +21,10 @@ import React, { FC, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { BoardContext } from '../contexts/BoardContext';
 import { WidgetContext } from '../contexts/WidgetContext';
+import { selectWidgetBy2Id } from '../pages/Board/slice/selector';
+import { BoardState } from '../pages/Board/slice/types';
 import { selectEditWidgetById } from '../pages/BoardEditor/slice/selectors';
 import { HistoryEditBoard } from '../pages/BoardEditor/slice/types';
-import { selectWidgetBy2Id } from '../pages/Dashboard/slice/selector';
-import { BoardState } from '../pages/Dashboard/slice/types';
 import { adaptBoardImageUrl } from '../utils';
 export const WidgetProvider: FC<{ widgetId: string }> = ({
   widgetId,

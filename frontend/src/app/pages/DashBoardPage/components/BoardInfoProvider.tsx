@@ -19,9 +19,9 @@
 import React, { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import { BoardInfoContext } from '../contexts/BoardInfoContext';
+import { selectBoardInfoById } from '../pages/Board/slice/selector';
+import { BoardState } from '../pages/Board/slice/types';
 import { boardInfoState } from '../pages/BoardEditor/slice/selectors';
-import { selectBoardInfoById } from '../pages/Dashboard/slice/selector';
-import { BoardState } from '../pages/Dashboard/slice/types';
 
 export const BoardInfoProvider: FC<{ id: string; editing: boolean }> = memo(
   ({ id, editing, children }) => {

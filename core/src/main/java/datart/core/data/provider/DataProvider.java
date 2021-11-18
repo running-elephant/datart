@@ -24,6 +24,7 @@ import datart.core.base.AutoCloseBean;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -54,11 +55,11 @@ public abstract class DataProvider extends AutoCloseBean {
      */
     public abstract Object test(DataProviderSource source) throws Exception;
 
-    public abstract Set<String> readAllDatabases(DataProviderSource source);
+    public abstract Set<String> readAllDatabases(DataProviderSource source) throws SQLException;
 
-    public abstract Set<String> readTables(DataProviderSource source, String database);
+    public abstract Set<String> readTables(DataProviderSource source, String database) throws SQLException;
 
-    public abstract Set<Column> readTableColumns(DataProviderSource source, String schema, String table);
+    public abstract Set<Column> readTableColumns(DataProviderSource source, String schema, String table) throws SQLException;
 
     /**
      * 读取DataProvider的配置模板，配置模板的信息是创建这个DataProvider实例时所需的信息。

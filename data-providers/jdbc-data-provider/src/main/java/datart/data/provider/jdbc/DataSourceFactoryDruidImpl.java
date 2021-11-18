@@ -49,10 +49,12 @@ public class DataSourceFactoryDruidImpl implements DataSourceFactory<DruidDataSo
         //connect params
         pro.setProperty(DruidDataSourceFactory.PROP_DRIVERCLASSNAME, properties.getDriverClass());
         pro.setProperty(DruidDataSourceFactory.PROP_URL, properties.getUrl());
-        pro.setProperty(DruidDataSourceFactory.PROP_USERNAME, properties.getUser());
-        pro.setProperty(DruidDataSourceFactory.PROP_PASSWORD, properties.getPassword());
-        pro.setProperty(DruidDataSourceFactory.PROP_PASSWORD, properties.getPassword());
-
+        if (properties.getUser() != null) {
+            pro.setProperty(DruidDataSourceFactory.PROP_USERNAME, properties.getUser());
+        }
+        if (properties.getPassword() != null) {
+            pro.setProperty(DruidDataSourceFactory.PROP_PASSWORD, properties.getPassword());
+        }
         pro.setProperty(DruidDataSourceFactory.PROP_MAXWAIT, JdbcDataProvider.DEFAULT_MAX_WAIT.toString());
 
         pro.setProperty("druid.mysql.usePingMethod", "false");

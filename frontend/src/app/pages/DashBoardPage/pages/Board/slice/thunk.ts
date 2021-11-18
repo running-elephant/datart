@@ -5,7 +5,7 @@ import {
   getDataOption,
   VizRenderMode,
   Widget,
-} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { shareActions } from 'app/pages/SharePage/slice';
 import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';

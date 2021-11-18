@@ -25,7 +25,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { G20 } from 'styles/StyleConstants';
-import { MediaWidgetContent } from '../../../pages/Dashboard/slice/types';
+import { MediaWidgetContent } from '../../../pages/Board/slice/types';
 
 const IframeWidget: React.FC<{}> = () => {
   const widget = useContext(WidgetContext);

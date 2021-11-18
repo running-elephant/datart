@@ -25,7 +25,7 @@ import {
 import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
-import { MediaWidgetContent } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { MediaWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import produce from 'immer';
 import moment from 'moment';
 import React, { useContext, useEffect, useMemo, useState } from 'react';

@@ -31,14 +31,17 @@ import { BoardProvider } from '../../components/BoardProvider';
 import FullScreenPanel from '../../components/FullScreenPanel';
 import TitleHeader from '../../components/TitleHeader';
 import BoardEditor from '../BoardEditor';
-import { editDashBoardInfoActions } from '../BoardEditor/slice';
+import {
+  editBoardStackActions,
+  editDashBoardInfoActions,
+} from '../BoardEditor/slice';
 import AutoBoardCore from './AutoDashboard/AutoBoardCore';
 import FreeBoardCore from './FreeDashboard/FreeBoardCore';
 import { boardActions } from './slice';
 import { makeSelectBoardConfigById } from './slice/selector';
 import { fetchBoardDetail } from './slice/thunk';
 import { BoardState, VizRenderMode } from './slice/types';
-export interface DashboardProps {
+export interface BoardProps {
   id: string;
   renderMode: VizRenderMode;
   hideTitle?: boolean;
@@ -51,7 +54,7 @@ export interface DashboardProps {
   showZoomCtrl?: boolean;
 }
 
-export const Dashboard: React.FC<DashboardProps> = memo(
+export const Board: React.FC<BoardProps> = memo(
   ({
     id,
     hideTitle,
@@ -89,6 +92,7 @@ export const Dashboard: React.FC<DashboardProps> = memo(
           }),
         );
       }
+      dispatch(editBoardStackActions.updateBoard({} as any));
     }, [boardId, dispatch, fetchData, searchParams]);
 
     const [showBoardEditor, setShowBoardEditor] = useState(false);
@@ -209,7 +213,7 @@ export const Dashboard: React.FC<DashboardProps> = memo(
   },
 );
 
-export default Dashboard;
+export default Board;
 
 const Wrapper = styled.div<{}>`
   display: flex;
