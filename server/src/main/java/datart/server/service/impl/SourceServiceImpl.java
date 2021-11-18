@@ -155,7 +155,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
             for (DataProviderConfigTemplate.Attribute attribute : configTemplate.getAttributes()) {
                 if (attribute.isEncrypt()
                         && jsonObject.containsKey(attribute.getName())
-                        && StringUtils.isNoneEmpty(jsonObject.get(attribute.getName()).toString())) {
+                        && StringUtils.isNotBlank(jsonObject.get(attribute.getName()).toString())) {
                     String val = jsonObject.get(attribute.getName()).toString();
                     if (val.startsWith(Const.ENCRYPT_FLAG)) {
                         jsonObject.put(attribute.getName(), val);

@@ -134,11 +134,12 @@ public class SqlScriptRender extends ScriptRender {
         // find select sql
         String selectSql0 = findSelectSql(script);
 
-        selectSql0 = cleanupSql(selectSql0);
-
         if (StringUtils.isEmpty(selectSql0)) {
             throw new DataProviderException("No valid query statement");
         }
+
+        selectSql0 = cleanupSql(selectSql0);
+
         String selectSql = selectSql0;
 
         // build with execute params
