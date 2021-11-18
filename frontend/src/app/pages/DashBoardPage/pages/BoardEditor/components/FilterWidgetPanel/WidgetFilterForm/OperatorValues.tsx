@@ -17,23 +17,22 @@
  */
 
 import { Form, FormInstance, Radio, Transfer } from 'antd';
-import { FilterValueOption } from 'app/types/ChartConfig';
-import ChartDataView, {
-  ChartDataViewFieldCategory,
-} from 'app/types/ChartDataView';
 import {
   FilterOperatorType,
   OPERATOR_TYPE_OPTION,
 } from 'app/pages/DashBoardPage/constants';
+import { FilterValueOption } from 'app/types/ChartConfig';
+import ChartDataView, {
+  ChartDataViewFieldCategory,
+} from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { getDistinctFields } from 'app/utils/fetch';
-import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ValueTypes, WidgetFilterFormType } from '../types';
 import { adjustSqlOperator } from '../utils';
 import { AssistViewFields } from './AssistViewFields';
 import { FilterCustomOptions } from './FilterCustomOptions';
-import FilterStringCondition from './FilterStringCondition';
 
 export const singleFacadeTypes = [
   ControllerFacadeTypes.DropdownList,
@@ -70,9 +69,7 @@ const OperatorValues: FC<{
       },
       [],
     );
-    const hasVariable = useMemo(() => {
-      return fieldCategory === ChartDataViewFieldCategory.Variable;
-    }, [fieldCategory]);
+
     const onTransferChange = useCallback(
       (nextTargetKeys, direction, moveKeys) => {
         setTargetKeys(nextTargetKeys);
@@ -262,13 +259,6 @@ const OperatorValues: FC<{
                   <FilterCustomOptions
                     form={form}
                     optionValues={optionValues}
-                  />
-                )}
-                {getOperatorType() === 'condition' && (
-                  <FilterStringCondition
-                    form={form}
-                    hasVariable={hasVariable}
-                    fieldValueType={fieldValueType}
                   />
                 )}
               </>

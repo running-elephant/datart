@@ -27,6 +27,8 @@ export enum ControllerFacadeTypes {
   Value = 'value',
   Time = 'time',
   Slider = 'slider',
+  QueryButton = 'queryButton',
+  ResetButton = 'resetButton',
 }
 
 export enum ControllerRadioFacadeTypes {

@@ -20,8 +20,7 @@ import {
   FilterOperatorType,
   OPERATOR_TYPE_ENUM,
 } from 'app/pages/DashBoardPage/constants';
-import { FilterWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { AggregateFieldActionType } from 'app/types/ChartConfig';
+import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -129,9 +128,9 @@ export const formatWidgetFilter = (widgetFilter: WidgetFilterFormType) => {
   if (!widgetFilter.sqlOperator) {
     widgetFilter.sqlOperator = FilterSqlOperator.In;
   }
-  if (!widgetFilter?.filterVisibility) {
-    widgetFilter.filterVisibility = {
-      visibility: 'show',
+  if (!widgetFilter?.visibility) {
+    widgetFilter.visibility = {
+      visibilityType: 'show',
     };
   }
   if (!widgetFilter?.filterWidth) {
@@ -171,11 +170,10 @@ export const formatWidgetFilter = (widgetFilter: WidgetFilterFormType) => {
 
 export const getInitWidgetFilter = () => {
   const widgetFilter: WidgetFilterFormType = {
-    aggregate: AggregateFieldActionType.NONE,
     operatorType: OPERATOR_TYPE_ENUM.common, //
     assistViewFields: [],
-    filterVisibility: {
-      visibility: 'show',
+    visibility: {
+      visibilityType: 'show',
     },
     minValue: 1,
     maxValue: 2,
@@ -187,7 +185,7 @@ export const getInitWidgetFilter = () => {
   };
   return widgetFilter;
 };
-export const getFixedFilterWidth = (content: FilterWidgetContent) => {
+export const getFixedFilterWidth = (content: ControllerWidgetContent) => {
   const { widgetFilter } = content;
   if (!widgetFilter?.filterWidth || widgetFilter?.filterWidth === 'auto') {
     return '25%';

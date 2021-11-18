@@ -15,15 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React from 'react';
+import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
+import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE, SPACE_XL, STICKY_LEVEL } from 'styles/StyleConstants';
+import { BoardToolBarContext } from './context/BoardToolBarContext';
 import ToolBar from './ToolBar';
 export interface BoardToolBarProps {}
 const BoardToolBar: React.FC<BoardToolBarProps> = () => {
+  const { boardId, boardType } = useContext(BoardContext);
   return (
     <Wrapper>
-      <ToolBar />
+      <BoardToolBarContext.Provider
+        value={{ className: '', boardId: boardId, boardType: boardType }}
+      >
+        <ToolBar />
+      </BoardToolBarContext.Provider>
     </Wrapper>
   );
 };

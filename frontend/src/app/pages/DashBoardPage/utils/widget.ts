@@ -38,9 +38,9 @@ import {
   ContainerItem,
   ContainerWidgetContent,
   ContainerWidgetType,
+  ControllerWidgetContent,
   DashboardConfig,
   DataChart,
-  FilterWidgetContent,
   MediaWidgetContent,
   MediaWidgetType,
   RectConfig,
@@ -52,7 +52,6 @@ import {
   WidgetConf,
   WidgetContent,
   WidgetContentChartType,
-  WidgetFilterTypes,
   WidgetInfo,
   WidgetPadding,
   WidgetType,
@@ -309,7 +308,7 @@ export const createFilterWidget = (params: {
   relations: Relation[];
   filterName?: string;
   fieldValueType: ValueTypes;
-  filterPositionType: WidgetFilterTypes;
+  controllerType: ControllerFacadeTypes;
   views: RelatedView[];
   widgetFilter: WidgetFilterFormType;
   hasVariable: boolean;
@@ -319,14 +318,14 @@ export const createFilterWidget = (params: {
     boardType,
     views,
     widgetFilter,
-    filterPositionType,
+    controllerType,
     relations,
     filterName,
     fieldValueType,
     hasVariable,
   } = params;
-  const content: FilterWidgetContent = {
-    type: filterPositionType || WidgetFilterTypes.Free,
+  const content: ControllerWidgetContent = {
+    type: controllerType,
     relatedViews: views,
     fieldValueType,
     hasVariable: hasVariable || false,
@@ -403,7 +402,7 @@ export const getWidgetMapByServer = (
 
     // 处理 widgetFilter visibility依赖关系 id, url参数修改filter
     if (widget.config.type === 'filter') {
-      const content = widget.config.content as FilterWidgetContent;
+      const content = widget.config.content as ControllerWidgetContent;
       // 根据 url参数修改filter 默认值
       if (filterSearchParams) {
         const paramsKey = Object.keys(filterSearchParams);
@@ -431,7 +430,7 @@ export const getWidgetMapByServer = (
         }
       }
       // 适配filter 的可见性
-      const { visibility, condition } = content.widgetFilter.filterVisibility;
+      const { visibilityType: visibility, condition } = content.widgetFilter.visibility;
       const { relations } = widget;
       if (visibility === 'condition' && condition) {
         const dependentFilterId = relations
@@ -641,7 +640,7 @@ export const getOtherStringFilterWidgets = (
     if (ele.config.type !== 'filter') {
       return false;
     }
-    const content = ele.config.content as FilterWidgetContent;
+    const content = ele.config.content as ControllerWidgetContent;
     return content.fieldValueType === ChartDataViewFieldType.STRING;
   });
   if (!widgetId) {
@@ -659,8 +658,8 @@ export const getAllFixedFilterWidgetSortedIds = (
 ) => {
   const ids = Object.values(widgetMap)
     .filter(widget => {
-      const content = widget.config.content as FilterWidgetContent;
-      return content?.type === WidgetFilterTypes.Fixed;
+      const content = widget.config.content as ControllerWidgetContent;
+      return content?.type;
     })
     .sort((a, b) => a.config.index - b.config.index)
     .map(w => w.id);
@@ -677,11 +676,9 @@ export const getVisibleFilterWidgetIds = (
   const widgets = Object.values(filterWidgetMap);
   const visibleWidgets = getNoHiddenFilters(widgets);
   const visibleFixedWidgetIds = visibleWidgets
-    .filter(w => w.config.content.type === WidgetFilterTypes.Fixed)
     .sort((a, b) => a.config.index - b.config.index)
     .map(w => w.id);
   const visibleFreeWidgetIds = visibleWidgets
-    .filter(w => w.config.content.type !== WidgetFilterTypes.Fixed)
     .sort((a, b) => a.config.index - b.config.index)
     .map(w => w.id);
   return {
@@ -692,9 +689,7 @@ export const getVisibleFilterWidgetIds = (
 
 export const getLayoutWidgets = (widgetMap: Record<string, Widget>) => {
   const noSubWidgets = Object.values(widgetMap).filter(w => !w.parentId);
-  const noFixedFilters = noSubWidgets.filter(
-    w => w.config.content.type !== WidgetFilterTypes.Fixed,
-  );
+  const noFixedFilters = noSubWidgets.filter(w => w.config.content.type);
   const noHiddenFilters = getNoHiddenFilters(noFixedFilters);
   return noHiddenFilters;
 };
@@ -704,16 +699,16 @@ export const getNoHiddenFilters = (widgets: Widget[]) => {
     if (w.config.type !== 'filter') {
       return true;
     }
-    const content = w.config.content as FilterWidgetContent;
-    const filterVisibility = content.widgetFilter.filterVisibility;
-    if (filterVisibility.visibility === 'show') {
+    const content = w.config.content as ControllerWidgetContent;
+    const filterVisibility = content.widgetFilter.visibility;
+    if (filterVisibility.visibilityType === 'show') {
       return true;
     }
-    if (filterVisibility.visibility === 'hide') {
+    if (filterVisibility.visibilityType === 'hide') {
       return false;
     }
-    if (filterVisibility.visibility === 'condition') {
-      const condition = content.widgetFilter.filterVisibility.condition;
+    if (filterVisibility.visibilityType === 'condition') {
+      const condition = content.widgetFilter.visibility.condition;
       if (condition) {
         const { dependentFilterId, relation, value: targetValue } = condition;
         const dependWidget = widgets.find(
@@ -722,7 +717,7 @@ export const getNoHiddenFilters = (widgets: Widget[]) => {
         if (!dependWidget) {
           return false;
         }
-        const content = dependWidget.config.content as FilterWidgetContent;
+        const content = dependWidget.config.content as ControllerWidgetContent;
         const dependWidgetValue = content.widgetFilter.filterValues?.[0];
         // if (!dependWidgetValue) {
         //   return false;

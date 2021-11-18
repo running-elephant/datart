@@ -1,12 +1,9 @@
 import {
-  AggregateFieldActionType,
-  FilterValueOption,
-} from 'app/types/ChartConfig';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
-import {
   FilterOperatorType,
-  FilterVisibilityType,
+  ControllerVisibilityType,
 } from 'app/pages/DashBoardPage/constants';
+import { FilterValueOption } from 'app/types/ChartConfig';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import {
   ControllerFacadeTypes,
   RelativeOrExactTime,
@@ -16,7 +13,7 @@ import { Moment, unitOfTime } from 'moment';
 import { VariableValueTypes } from './../../../../../MainPage/pages/VariablePage/constants';
 
 export interface WidgetFilterVisibility {
-  visibility: FilterVisibilityType;
+  visibilityType: ControllerVisibilityType;
   condition?: VisibilityCondition;
 }
 export type ValueTypes = ChartDataViewFieldType | VariableValueTypes;
@@ -36,10 +33,9 @@ export interface VisibilityCondition {
 }
 
 export interface WidgetFilterFormType {
-  aggregate: AggregateFieldActionType;
   operatorType: FilterOperatorType; //
   assistViewFields: string[]; //辅助添加view字段
-  filterVisibility: WidgetFilterVisibility;
+  visibility: WidgetFilterVisibility;
   sqlOperator: FilterSqlOperator;
   filterDate?: FilterDate;
   filterValues: any[];

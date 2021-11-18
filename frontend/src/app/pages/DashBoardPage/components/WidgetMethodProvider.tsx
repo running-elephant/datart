@@ -21,6 +21,7 @@ import { Modal } from 'antd';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams } from 'app/types/DatartChartBase';
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { FC, useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
@@ -105,6 +106,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
             editDashBoardInfoActions.changeFilterPanel({
               type: 'edit',
               widgetId: wid,
+              controlType: ControllerFacadeTypes.DropdownList,
             }),
           );
           break;

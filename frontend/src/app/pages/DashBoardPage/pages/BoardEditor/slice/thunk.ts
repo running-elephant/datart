@@ -4,8 +4,8 @@ import { fetchBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thun
 import {
   BoardState,
   ContainerWidgetContent,
+  ControllerWidgetContent,
   DataChart,
-  FilterWidgetContent,
   getDataOption,
   SaveDashboard,
   ServerDatachart,
@@ -368,7 +368,7 @@ export const getEditFilterDataAsync = createAsyncThunk<
   Widget,
   { state: RootState }
 >('editBoard/getFilterDataAsync', async (widget, { getState, dispatch }) => {
-  const content = widget.config.content as FilterWidgetContent;
+  const content = widget.config.content as ControllerWidgetContent;
   const widgetFilter = content.widgetFilter;
   if (
     widgetFilter.assistViewFields &&

@@ -19,13 +19,13 @@
 import { Form, FormInstance, Radio } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
-import {
   FilterOperatorType,
   OPERATOR_TYPE_OPTION,
 } from 'app/pages/DashBoardPage/constants';
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+} from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useMemo } from 'react';
@@ -76,14 +76,12 @@ const FilterDateCondition: FC<{
               <Form.Item
                 noStyle
                 name={['widgetFilter', 'operatorType']}
-                label={'筛选方式'}
+                label={'可筛选值'}
                 validateTrigger={['onChange', 'onBlur']}
                 rules={[{ required: true }]}
               >
                 <Radio.Group>
-                  {OPERATOR_TYPE_OPTION.filter(
-                    t => t.value !== 'condition',
-                  ).map(ele => {
+                  {OPERATOR_TYPE_OPTION.map(ele => {
                     return (
                       <Radio.Button key={ele.value} value={ele.value}>
                         {ele.name}
@@ -137,6 +135,7 @@ export default FilterDateCondition;
 const WrapCommon = styled.div`
   margin: 20px 10px;
 `;
+
 const WrapCustom = styled.div`
   margin: 20px 0;
   .custom-time {

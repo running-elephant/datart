@@ -20,13 +20,12 @@ import { ChartEditorBaseProps } from 'app/components/ChartEditor';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   ContainerWidgetContent,
+  ControllerWidgetContent,
   Dashboard,
   DataChart,
-  FilterWidgetContent,
   RelatedView,
   Relation,
   Widget,
-  WidgetFilterTypes,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import {
@@ -34,6 +33,7 @@ import {
   createWidget,
 } from 'app/pages/DashBoardPage/utils/widget';
 import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import produce from 'immer';
 import { RootState } from 'types';
 import { v4 as uuidv4 } from 'uuid';
@@ -130,7 +130,7 @@ export const updateWidgetFilterAction =
     relations: Relation[];
     filterName?: string;
     fieldValueType: ChartDataViewFieldType;
-    filterPositionType: WidgetFilterTypes;
+    controllerFacadeType: ControllerFacadeTypes;
     views: RelatedView[];
     widgetFilter: WidgetFilterFormType;
     hasVariable?: boolean;
@@ -141,14 +141,14 @@ export const updateWidgetFilterAction =
       boardType,
       views,
       widgetFilter,
-      filterPositionType,
+      controllerFacadeType,
       relations,
       fieldValueType,
       filterName,
       hasVariable,
     } = params;
-    const content: FilterWidgetContent = {
-      type: filterPositionType || WidgetFilterTypes.Free,
+    const content: ControllerWidgetContent = {
+      type: controllerFacadeType,
       relatedViews: views,
       fieldValueType,
       widgetFilter: widgetFilter,

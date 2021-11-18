@@ -7,7 +7,7 @@ import {
   JumpPanel,
   WidgetData,
   WidgetInfo,
-  WidgetPanel,
+  WidgetPanelParams,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import { getInitBoardInfo } from 'app/pages/DashBoardPage/utils/board';
@@ -17,6 +17,7 @@ import { Layout } from 'react-grid-layout';
 import undoable, { includeAction } from 'redux-undo';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
+import { WidgetFilterPanelParams } from './../../Board/slice/types';
 import { editBoardStackSlice } from './childSlice/stackSlice';
 import {
   getEditBoardDetail,
@@ -53,10 +54,10 @@ const editDashBoardInfoSlice = createSlice({
     changeFullScreenItem(state, action: PayloadAction<string>) {
       state.fullScreenItemId = action.payload;
     },
-    changeFilterPanel(state, action: PayloadAction<WidgetPanel>) {
+    changeFilterPanel(state, action: PayloadAction<WidgetFilterPanelParams>) {
       state.filterPanel = action.payload;
     },
-    changeLinkagePanel(state, action: PayloadAction<WidgetPanel>) {
+    changeLinkagePanel(state, action: PayloadAction<WidgetPanelParams>) {
       state.linkagePanel = action.payload;
     },
     changeJumpPanel(state, action: PayloadAction<JumpPanel>) {

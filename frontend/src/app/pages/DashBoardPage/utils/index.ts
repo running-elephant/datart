@@ -14,8 +14,8 @@ import { errorHandle } from 'utils/utils';
 import { FilterOperatorType, STORAGE_IMAGE_KEY_PREFIX } from '../constants';
 import {
   BoardLinkFilter,
+  ControllerWidgetContent,
   DataChart,
-  FilterWidgetContent,
   getDataOption,
   Widget,
   WidgetInfo,
@@ -106,7 +106,7 @@ export const getAllFiltersOfOneWidget = (values: {
 
     const { widgetFilterCovered } = hasRelation.config.filterToWidget!;
 
-    const content = filterWidget.config.content as FilterWidgetContent;
+    const content = filterWidget.config.content as ControllerWidgetContent;
     const { fieldValueType, relatedViews, widgetFilter } = content;
     const relatedViewItem = relatedViews
       .filter(view => view.fieldValue)
@@ -143,7 +143,7 @@ export const getAllFiltersOfOneWidget = (values: {
       relatedViewItem.filterFieldCategory === ChartDataViewFieldCategory.Field
     ) {
       const filter: ChartRequestFilter = {
-        aggOperator: widgetFilter.aggregate || null,
+        aggOperator: null,
         column: String(relatedViewItem.fieldValue),
         sqlOperator: widgetFilter.sqlOperator,
         values: values,

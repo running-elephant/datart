@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
   ContainerWidgetContent,
-  FilterWidgetContent,
+  ControllerWidgetContent,
   getDataOption,
   VizRenderMode,
   Widget,
@@ -298,7 +298,7 @@ export const getFilterDataAsync = createAsyncThunk<
 >(
   'board/getFilterDataAsync',
   async ({ widget, renderMode }, { getState, dispatch }) => {
-    const content = widget.config.content as FilterWidgetContent;
+    const content = widget.config.content as ControllerWidgetContent;
     const widgetFilter = content.widgetFilter;
     const executeTokenMap = (getState() as RootState)?.share?.executeTokenMap;
 

@@ -22,7 +22,7 @@ import { WidgetCore } from '../..';
 import { BoardContext } from '../../../../contexts/BoardContext';
 import { WidgetContext } from '../../../../contexts/WidgetContext';
 import { WidgetInfoContext } from '../../../../contexts/WidgetInfoContext';
-import { FilterWidgetContent } from '../../../../pages/Board/slice/types';
+import { ControllerWidgetContent } from '../../../../pages/Board/slice/types';
 import BlockMaskLayer from '../../../../pages/BoardEditor/components/BlockMaskLayer';
 import { getFixedFilterWidth } from '../../../../pages/BoardEditor/components/FilterWidgetPanel/utils';
 import { getWidgetSomeStyle } from '../../../../utils/widget';
@@ -38,7 +38,7 @@ export const FixedFilter: React.FC<{
   const widget = useContext(WidgetContext);
   const widgetInfo = useContext(WidgetInfoContext);
   const styleWidth = getFixedFilterWidth(
-    widget.config.content as FilterWidgetContent,
+    widget.config.content as ControllerWidgetContent,
   );
   const widgetStyle = useMemo(() => {
     return getWidgetSomeStyle({

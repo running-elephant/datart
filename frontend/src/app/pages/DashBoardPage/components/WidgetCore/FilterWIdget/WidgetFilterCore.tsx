@@ -20,7 +20,7 @@ import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardAction
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetDataContext } from 'app/pages/DashBoardPage/contexts/WidgetDataContext';
-import { FilterWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ControlOption,
   FilterDate,
@@ -58,11 +58,10 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
   const { widgetUpdate, refreshWidgetsByFilter } =
     useContext(BoardActionContext);
   const { widgetFilter, fieldValueType, hasVariable } = useMemo(
-    () => widget.config.content as FilterWidgetContent,
+    () => widget.config.content as ControllerWidgetContent,
     [widget],
   );
   const {
-    aggregate,
     assistViewFields,
     filterDate,
     filterFacade,
@@ -101,7 +100,7 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
     values => {
       const nextWidget = produce(widget, draft => {
         (
-          draft.config.content as FilterWidgetContent
+          draft.config.content as ControllerWidgetContent
         ).widgetFilter.filterValues = values;
       });
       widgetUpdate(nextWidget);
@@ -113,10 +112,11 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
   const onSqlOperatorAndValues = useCallback(
     (sql: FilterSqlOperator, values: any[]) => {
       const nextWidget = produce(widget, draft => {
-        (draft.config.content as FilterWidgetContent).widgetFilter.sqlOperator =
-          sql;
         (
-          draft.config.content as FilterWidgetContent
+          draft.config.content as ControllerWidgetContent
+        ).widgetFilter.sqlOperator = sql;
+        (
+          draft.config.content as ControllerWidgetContent
         ).widgetFilter.filterValues = values;
       });
       widgetUpdate(nextWidget);
@@ -139,10 +139,11 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
       };
       const nextWidget = produce(widget, draft => {
         (
-          draft.config.content as FilterWidgetContent
+          draft.config.content as ControllerWidgetContent
         ).widgetFilter.operatorType = 'custom';
-        (draft.config.content as FilterWidgetContent).widgetFilter.filterDate =
-          nextFilterDate;
+        (
+          draft.config.content as ControllerWidgetContent
+        ).widgetFilter.filterDate = nextFilterDate;
       });
       widgetUpdate(nextWidget);
       refreshWidgetsByFilter(nextWidget);

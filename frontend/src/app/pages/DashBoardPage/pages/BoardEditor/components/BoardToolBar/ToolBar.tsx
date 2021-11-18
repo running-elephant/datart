@@ -16,15 +16,15 @@
  * limitations under the License.
  */
 import { Divider, Space } from 'antd';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import React, { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import AddChartBtn from './AddChartBtn';
+import { ControlBtn } from './AddControl/ControlBtn';
+import { BoardToolBarContext } from './context/BoardToolBarContext';
 import {
   ContainerWidgetDropdown,
   CopyBtn,
   DeleteBtn,
-  FilterBtn,
   MediaWidgetDropdown,
   PasteBtn,
   RedoBtn,
@@ -35,7 +35,7 @@ import {
 
 interface ToolBarProps {}
 const ToolBar: React.FC<ToolBarProps> = props => {
-  const { boardId, boardType } = useContext(BoardContext);
+  const { boardId, boardType } = useContext(BoardToolBarContext);
 
   const ssp = e => {
     e.stopPropagation();
@@ -47,7 +47,7 @@ const ToolBar: React.FC<ToolBarProps> = props => {
           <AddChartBtn boardId={boardId} boardType={boardType} />
           <MediaWidgetDropdown boardId={boardId} boardType={boardType} />
           <ContainerWidgetDropdown boardId={boardId} boardType={boardType} />
-          <FilterBtn boardId={boardId} boardType={boardType} />
+          <ControlBtn />
           {boardType === 'free' && (
             <>
               <ToTopBtn boardId={boardId} boardType={boardType} />

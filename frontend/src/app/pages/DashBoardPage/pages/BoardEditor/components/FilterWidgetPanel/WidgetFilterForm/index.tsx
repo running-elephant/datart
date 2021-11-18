@@ -15,25 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Form, FormInstance, Input, Radio, Select } from 'antd';
+import { Form, FormInstance, Input, Select } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   BoardType,
   Widget,
-  WidgetFilterTypes,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
 import ChartDataView, {
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
 } from 'app/types/ChartDataView';
-import { CONTROLLER_WIDTH_OPTIONS, FilterSqlOperator } from 'globalConstants';
+import { FilterSqlOperator } from 'globalConstants';
 import React, { memo, useEffect } from 'react';
 import styled from 'styled-components/macro';
 import { ValueTypes, WidgetFilterFormType } from '../types';
-import FilterAggOperator from './FilterAggOperator';
-import FilterDateCondition from './FilterDate/FilterDateCondition';
-import FilterFacade from './FilterFacade';
-import FilterNumberCondition from './FilterNumberCondition';
 import FilterVisibility from './FilterVisibility';
 import OperatorValues from './OperatorValues';
 
@@ -47,14 +41,8 @@ export interface RelatedViewFormProps {
 }
 
 export const WidgetFilterForm: React.FC<RelatedViewFormProps> = memo(
-  ({
-    form,
-    viewMap,
-    fieldValueType,
-    fieldCategory,
-    boardType,
-    otherStrFilterWidgets,
-  }) => {
+  ({ form, viewMap, fieldValueType, fieldCategory, otherStrFilterWidgets }) => {
+    const t = useI18NPrefix('viz.common.enum.controllerFacadeTypes');
     useEffect(() => {
       if (fieldCategory === ChartDataViewFieldCategory.Variable) {
         const widgetFilter = form?.getFieldValue('widgetFilter');
@@ -72,41 +60,14 @@ export const WidgetFilterForm: React.FC<RelatedViewFormProps> = memo(
         <Form.Item name="filterName" label="名称" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
-        {/* 聚合方式 */}
-        {<FilterAggOperator fieldValueType={fieldValueType} form={form} />}
-        {/* 筛选方式 */}
-        <Form.Item label="筛选方式" shouldUpdate style={{ marginBottom: '0' }}>
-          {fieldValueType === ChartDataViewFieldType.STRING && (
-            <OperatorValues
-              fieldValueType={fieldValueType}
-              viewMap={viewMap}
-              fieldCategory={fieldCategory}
-              form={form}
-            />
-          )}
-          {fieldValueType === VariableValueTypes.Expression && (
-            <OperatorValues
-              fieldValueType={fieldValueType}
-              viewMap={viewMap}
-              fieldCategory={fieldCategory}
-              form={form}
-            />
-          )}
-          {fieldValueType === ChartDataViewFieldType.NUMERIC && (
-            <FilterNumberCondition
-              fieldValueType={fieldValueType}
-              fieldCategory={fieldCategory}
-              form={form}
-            />
-          )}
 
-          {fieldValueType === ChartDataViewFieldType.DATE && (
-            <FilterDateCondition
-              fieldValueType={fieldValueType}
-              form={form}
-              fieldCategory={fieldCategory}
-            />
-          )}
+        <Form.Item label="可选值" shouldUpdate style={{ marginBottom: '0' }}>
+          <OperatorValues
+            fieldValueType={fieldValueType}
+            viewMap={viewMap}
+            fieldCategory={fieldCategory}
+            form={form}
+          />
         </Form.Item>
         <Form.Item
           hidden
@@ -131,31 +92,6 @@ export const WidgetFilterForm: React.FC<RelatedViewFormProps> = memo(
           fieldValueType={fieldValueType}
           form={form}
         />
-        {/* 筛选控件类型 */}
-        <FilterFacade
-          fieldCategory={fieldCategory}
-          fieldValueType={fieldValueType}
-          form={form}
-        />
-        {/* 控件宽度 */}
-        <Form.Item name={['widgetFilter', 'filterWidth']} label="宽度">
-          <Select>
-            {CONTROLLER_WIDTH_OPTIONS.map(({ label, value }) => (
-              <Select.Option key={value} value={value}>
-                {label}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        {/* 控件位置 */}
-        {boardType === 'auto' && (
-          <Form.Item name={['type']} label="位置">
-            <Radio.Group>
-              <Radio value={WidgetFilterTypes.Free}>自由编辑</Radio>
-              <Radio value={WidgetFilterTypes.Fixed}>顶部固定</Radio>
-            </Radio.Group>
-          </Form.Item>
-        )}
       </Wrap>
     );
   },

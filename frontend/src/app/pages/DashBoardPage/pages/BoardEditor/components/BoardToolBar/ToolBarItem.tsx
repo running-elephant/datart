@@ -19,7 +19,6 @@ import {
   AppstoreAddOutlined,
   BarChartOutlined,
   ContainerOutlined,
-  ControlOutlined,
   CopyOutlined,
   DeleteOutlined,
   RedoOutlined,
@@ -43,7 +42,6 @@ import {
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ActionCreators } from 'redux-undo';
-import { editDashBoardInfoActions } from '../../slice';
 import {
   deleteWidgetsAction,
   widgetToPositionAction,
@@ -195,22 +193,6 @@ export const ToBottomBtn: React.FC<ToolBtnProps> = props => {
   );
 };
 
-export const FilterBtn: React.FC<ToolBtnProps> = props => {
-  const dispatch = useDispatch();
-  const addFilerWidget = () => {
-    dispatch(
-      editDashBoardInfoActions.changeFilterPanel({ type: 'add', widgetId: '' }),
-    );
-  };
-  return (
-    <TemButton
-      onClick={addFilerWidget}
-      icon={<ControlOutlined />}
-      tip="筛选"
-      {...props}
-    />
-  );
-};
 export const MediaWidgetDropdown: React.FC<ToolBtnProps> = props => {
   const dispatch = useDispatch();
   const { boardId, boardType } = props;
@@ -396,14 +378,14 @@ export const ChartWidgetDropdown: React.FC<ChartWidgetDropdownProps> =
       </Dropdown>
     );
   };
-export interface TemTemButtonProps extends ToolBtnProps {
+export interface TemButtonProps extends ToolBtnProps {
   onClick?: () => void;
   icon?: React.ReactNode;
   disabled?: boolean;
   label?: string;
   tip?: string;
 }
-const TemButton: React.FC<TemTemButtonProps> = props => {
+const TemButton: React.FC<TemButtonProps> = props => {
   return (
     <Tooltip title={props.tip}>
       <ToolbarButton
@@ -419,3 +401,25 @@ const TemButton: React.FC<TemTemButtonProps> = props => {
   );
 };
 export default TemButton;
+export interface TipBtnProps extends ToolBtnProps {
+  onClick?: React.MouseEventHandler<HTMLElement>;
+  icon?: React.ReactNode;
+  disabled?: boolean;
+  label?: string;
+  tip?: string;
+}
+export const WithTipButton: React.FC<TipBtnProps> = props => {
+  return (
+    <Tooltip title={props.tip}>
+      <ToolbarButton
+        className={props.className}
+        type={props.btnType || 'text'}
+        disabled={props.disabled || false}
+        onClick={props.onClick}
+        icon={props.icon}
+      >
+        {props.label}
+      </ToolbarButton>
+    </Tooltip>
+  );
+};
