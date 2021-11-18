@@ -29,18 +29,6 @@ import { ControllerFacadeTypes as Opt } from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from './../../../../../../../globalConstants';
 import { ValueTypes, WidgetFilterFormType } from './types';
-// export const getFilterFacadeTool = (fieldType: ChartDataViewFieldType) => {
-//   switch (fieldType) {
-//     case ChartDataViewFieldType.STRING:
-//       return getStringFacadeOptions;
-//     case ChartDataViewFieldType.NUMERIC:
-//       return getNumberFacadeOptions;
-//     case ChartDataViewFieldType.DATE:
-//       return getDateFacadeOptions;
-//     default:
-//       return getStringFacadeOptions;
-//   }
-// };
 
 export const getStringFacadeOptions = (type: FilterOperatorType) => {
   switch (type) {

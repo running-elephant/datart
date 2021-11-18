@@ -33,7 +33,7 @@ export const ControlBtn: React.FC<ControlBtnProps> = () => {
       editDashBoardInfoActions.changeFilterPanel({
         type: 'add',
         widgetId: '',
-        controlType: info.key as ControllerFacadeTypes,
+        controllerType: info.key as ControllerFacadeTypes,
       }),
     );
   };

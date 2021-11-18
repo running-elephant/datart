@@ -125,7 +125,7 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
         return <>{mediaElement}</>;
       case 'container':
         return <>{containerElement}</>;
-      case 'filter':
+      case 'controller':
         return <WidgetFilterCore id={widget.id} />;
       default:
         return <div>default element</div>;

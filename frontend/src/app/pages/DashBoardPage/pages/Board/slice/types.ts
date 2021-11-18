@@ -308,8 +308,7 @@ export const WidgetTypeMap = strEnumType([
   'chart',
   'media',
   'container',
-  'filter',
-  'explorer',
+  'controller',
 ]);
 export type WidgetType = keyof typeof WidgetTypeMap;
 export declare const ContainerWidgetTypes: ['tab', 'carousel'];
@@ -440,7 +439,7 @@ export interface WidgetPanelParams {
 export interface WidgetFilterPanelParams {
   type: 'add' | 'edit' | 'hide';
   widgetId: string;
-  controlType?: ControllerFacadeTypes;
+  controllerType?: ControllerFacadeTypes;
 }
 
 export interface JumpPanel {

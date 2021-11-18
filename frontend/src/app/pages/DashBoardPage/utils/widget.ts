@@ -197,8 +197,8 @@ export const createWidgetRect = (
   boardType: BoardType,
   widgetType: WidgetType,
 ): RectConfig => {
-  if (widgetType === 'filter') {
-    return getInitFilterWidgetRect(boardType);
+  if (widgetType === 'controller') {
+    return getInitControllerWidgetRect(boardType);
   }
   if (boardType === 'auto') {
     return {
@@ -217,7 +217,9 @@ export const createWidgetRect = (
     };
   }
 };
-export const getInitFilterWidgetRect = (boardType: BoardType): RectConfig => {
+export const getInitControllerWidgetRect = (
+  boardType: BoardType,
+): RectConfig => {
   if (boardType === 'auto') {
     return {
       x: 0,
@@ -334,7 +336,7 @@ export const createFilterWidget = (params: {
 
   const widgetConf = createInitWidgetConfig({
     name: filterName || 'newFilter',
-    type: 'filter',
+    type: 'controller',
     content: content,
     boardType: boardType,
   });
@@ -365,15 +367,21 @@ export const getWidgetMapByServer = (
     const viewIds = cur.datachartId
       ? [dataChartMap[cur.datachartId].viewId]
       : cur.viewIds;
-    let widget: Widget = {
-      ...cur,
-      config: JSON.parse(cur.config),
-      relations: convertWidgetRelationsToObj(cur.relations),
-      viewIds,
-    };
-
-    acc[cur.id] = widget;
-    return acc;
+    try {
+      let widget: Widget = {
+        ...cur,
+        config: JSON.parse(cur.config),
+        relations: convertWidgetRelationsToObj(cur.relations),
+        viewIds,
+      };
+      // TODO xld migration filter
+      if ((widget.config.type as any) !== 'filter') {
+        acc[cur.id] = widget;
+      }
+      return acc;
+    } catch (error) {
+      return acc;
+    }
   }, {} as Record<string, Widget>);
 
   const wrappedDataCharts: DataChart[] = [];
@@ -401,7 +409,7 @@ export const getWidgetMapByServer = (
     }
 
     // 处理 widgetFilter visibility依赖关系 id, url参数修改filter
-    if (widget.config.type === 'filter') {
+    if (widget.config.type === 'controller') {
       const content = widget.config.content as ControllerWidgetContent;
       // 根据 url参数修改filter 默认值
       if (filterSearchParams) {
@@ -430,7 +438,8 @@ export const getWidgetMapByServer = (
         }
       }
       // 适配filter 的可见性
-      const { visibilityType: visibility, condition } = content.widgetFilter.visibility;
+      const { visibilityType: visibility, condition } =
+        content.widgetFilter.visibility;
       const { relations } = widget;
       if (visibility === 'condition' && condition) {
         const dependentFilterId = relations
@@ -464,9 +473,9 @@ export const getWidgetMapByServer = (
     wrappedDataCharts,
   };
 };
-export const getWidgetInfoMapByServer = (serverWidgets: ServerWidget[]) => {
+export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {
   const widgetInfoMap = {};
-  serverWidgets.forEach(item => {
+  Object.values(widgetMap).forEach(item => {
     widgetInfoMap[item.id] = createWidgetInfo(item.id);
   });
   return widgetInfoMap;
@@ -623,21 +632,21 @@ export const convertWrapChartWidget = (params: {
  * @param ''
  * @description 'get all filter widget of board'
  */
-export const getAllFilterWidget = (widgetMap: Record<string, Widget>) => {
+export const getAllControlWidget = (widgetMap: Record<string, Widget>) => {
   const filterWidgetMap = Object.values(widgetMap)
-    .filter(widget => widget.config.type === 'filter')
+    .filter(widget => widget.config.type === 'controller')
     .reduce((acc, cur) => {
       acc[cur.id] = cur;
       return acc;
     }, {} as Record<string, Widget>);
   return filterWidgetMap;
 };
-export const getOtherStringFilterWidgets = (
+export const getOtherStringControlWidgets = (
   allWidgets: Widget[],
   widgetId: string | undefined,
 ) => {
   const allFilterWidgets = allWidgets.filter(ele => {
-    if (ele.config.type !== 'filter') {
+    if (ele.config.type !== 'controller') {
       return false;
     }
     const content = ele.config.content as ControllerWidgetContent;
@@ -696,7 +705,7 @@ export const getLayoutWidgets = (widgetMap: Record<string, Widget>) => {
 
 export const getNoHiddenFilters = (widgets: Widget[]) => {
   const noFixedFilters = widgets.filter(w => {
-    if (w.config.type !== 'filter') {
+    if (w.config.type !== 'controller') {
       return true;
     }
     const content = w.config.content as ControllerWidgetContent;

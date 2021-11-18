@@ -157,7 +157,7 @@ export const updateWidgetFilterAction =
 
     const widgetConf = createInitWidgetConfig({
       name: filterName || 'newFilter',
-      type: 'filter',
+      type: 'controller',
       content: content,
       boardType: boardType,
     });

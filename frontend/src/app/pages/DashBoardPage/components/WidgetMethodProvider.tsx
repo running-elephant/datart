@@ -101,12 +101,12 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
             }),
           );
           break;
-        case 'filter':
+        case 'controller':
           dispatch(
             editDashBoardInfoActions.changeFilterPanel({
               type: 'edit',
               widgetId: wid,
-              controlType: ControllerFacadeTypes.DropdownList,
+              controllerType: ControllerFacadeTypes.DropdownList,
             }),
           );
           break;

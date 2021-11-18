@@ -34,16 +34,14 @@ export const widgetViewActionMap: Record<WidgetType, widgetActionType[]> = {
   chart: ['refresh', 'fullScreen'],
   media: ['fullScreen'],
   container: ['info'],
-  filter: ['refresh'],
-  explorer: [],
+  controller: ['refresh'],
 };
 // 编辑 edit
 export const widgetEditActionMap: Record<WidgetType, widgetActionType[]> = {
   chart: ['refresh', 'edit', 'delete', 'makeLinkage', 'makeJump'],
   media: ['edit', 'delete'],
-  filter: ['refresh', 'edit', 'delete'],
+  controller: ['refresh', 'edit', 'delete'],
   container: ['edit', 'delete'],
-  explorer: [],
 };
 export const widgetActionMap = {
   view: widgetViewActionMap,

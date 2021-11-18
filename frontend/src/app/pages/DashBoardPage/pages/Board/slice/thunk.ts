@@ -206,7 +206,7 @@ export const getWidgetDataAsync = createAsyncThunk<
         return null;
       case 'container':
         return null;
-      case 'filter':
+      case 'controller':
         await dispatch(getFilterDataAsync({ widget: curWidget, renderMode }));
 
         return null;

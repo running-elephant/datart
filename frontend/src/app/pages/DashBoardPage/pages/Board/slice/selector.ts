@@ -19,7 +19,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from 'types';
 import { boardInit } from '.';
 import {
-  getAllFilterWidget,
+  getAllControlWidget,
   getLayoutWidgets,
   getVisibleFilterWidgetIds,
 } from '../../../utils/widget';
@@ -69,7 +69,7 @@ export const selectSortFixedFiltersIdsById = createSelector(
   (widgetRecord, id) => {
     if (!widgetRecord?.[id]) return [];
     const wMap = widgetRecord?.[id];
-    const filterWidgetMap = getAllFilterWidget(wMap);
+    const filterWidgetMap = getAllControlWidget(wMap);
     const visibleEditFixedFilterIds =
       getVisibleFilterWidgetIds(filterWidgetMap).visibleFixedWidgetIds;
     return visibleEditFixedFilterIds;

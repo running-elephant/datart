@@ -93,7 +93,7 @@ export const getAllFiltersOfOneWidget = (values: {
 }) => {
   const { chartWidget, widgetMap, params } = values;
   const filterWidgets = Object.values(widgetMap).filter(
-    widget => widget.config.type === 'filter',
+    widget => widget.config.type === 'controller',
   );
   let covered = false;
   let filters: ChartRequestFilter[] = [];

@@ -30,7 +30,7 @@ import {
   convertToWidgetMap,
   createFilterWidget,
   getCanLinkFilterWidgets,
-  getOtherStringFilterWidgets,
+  getOtherStringControlWidgets,
 } from 'app/pages/DashBoardPage/utils/widget';
 import {
   ChartDataViewFieldCategory,
@@ -76,7 +76,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
     [allWidgets],
   );
   const otherStrFilterWidgets = useMemo(
-    () => getOtherStringFilterWidgets(allWidgets, widgetId),
+    () => getOtherStringControlWidgets(allWidgets, widgetId),
     [allWidgets, widgetId],
   );
   const widgetMap = useMemo(() => convertToWidgetMap(allWidgets), [allWidgets]);

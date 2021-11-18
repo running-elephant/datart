@@ -103,14 +103,13 @@ export const fetchEditBoardDetail = createAsyncThunk<
 
     const { datacharts: serverDataCharts, views: serverViews, widgets } = data;
     // TODO
-    // const wrapedChart = getWidgetMapByServer(widgets);
     const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
     const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(
       widgets,
       dataCharts,
     );
-    const widgetInfoMap = getWidgetInfoMapByServer(widgets);
-    const widgetIds = widgets.map(w => w.id);
+    const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
+    const widgetIds = Object.values(widgetMap).map(w => w.id);
     const boardInfo = getInitBoardInfo(dashboard.id, widgetIds);
     // datacharts
 
@@ -348,7 +347,7 @@ export const getEditWidgetDataAsync = createAsyncThunk<
     if (!curWidget) return null;
 
     switch (curWidget.config.type) {
-      case 'filter':
+      case 'controller':
         await dispatch(getEditFilterDataAsync(curWidget));
         return null;
       case 'media':
