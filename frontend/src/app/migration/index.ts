@@ -29,7 +29,9 @@ import { alpha3 } from './alpha3';
  * @param {ChartConfig} config, which is going to merge
  * @returns {ChartConfig} merged results and mark the version to latest
  *  */
-export function migration(config?: ChartConfig): ChartConfig | undefined {
+export function migrateChartConfig(
+  config?: ChartConfig,
+): ChartConfig | undefined {
   if (!config) {
     return config;
   }
