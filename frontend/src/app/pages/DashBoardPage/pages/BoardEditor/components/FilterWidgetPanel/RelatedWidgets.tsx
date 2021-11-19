@@ -32,27 +32,16 @@ export const RelatedWidgets: React.FC<RelatedWidgetsProps> = memo(
   ({ widgets, relatedWidgets, onChange }) => {
     const [selectedWidgetIds, setSelectedWidgetIds] = useState<string[]>([]);
 
-    console.log('selectedWidgetIds', selectedWidgetIds);
-
-    const rowSelection = useMemo(() => {
-      return {
-        selectedRowKeys: selectedWidgetIds,
-        onChange: (keys: React.Key[]) => {
-          setSelectedWidgetIds(keys as string[]);
-          // onChange?.(keys as string[]);
-        },
-      };
-    }, [selectedWidgetIds]);
+    const rowSelection = keys => {
+      onChange?.(keys as string[]);
+    };
 
     useEffect(() => {
       if (!relatedWidgets || relatedWidgets.length === 0) {
+        setSelectedWidgetIds([]);
         return;
       }
-      let pickedWIds: string[] = [];
-      relatedWidgets?.forEach(item => {
-        pickedWIds.push(item.widgetId);
-      });
-
+      let pickedWIds: string[] = relatedWidgets.map(t => t.widgetId);
       setSelectedWidgetIds(pickedWIds);
     }, [relatedWidgets]);
 
@@ -72,7 +61,8 @@ export const RelatedWidgets: React.FC<RelatedWidgetsProps> = memo(
           rowKey={record => record.id}
           rowSelection={{
             type: 'checkbox',
-            ...rowSelection,
+            selectedRowKeys: selectedWidgetIds,
+            onChange: rowSelection,
           }}
           size={'small'}
           pagination={{ pageSize: 6 }}

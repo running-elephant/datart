@@ -373,7 +373,7 @@ export const getEditFilterDataAsync = createAsyncThunk<
   { state: RootState }
 >('editBoard/getFilterDataAsync', async (widget, { getState, dispatch }) => {
   const content = widget.config.content as ControllerWidgetContent;
-  const widgetFilter = content.widgetFilter;
+  const widgetFilter = content.controllerOption;
   if (
     widgetFilter.assistViewFields &&
     Array.isArray(widgetFilter.assistViewFields)

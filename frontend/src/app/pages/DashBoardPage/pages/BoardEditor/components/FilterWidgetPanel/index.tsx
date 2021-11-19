@@ -52,11 +52,14 @@ import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
 import { v4 as uuidv4 } from 'uuid';
 import { editBoardStackActions, editDashBoardInfoActions } from '../../slice';
-import { selectFilterPanel, selectSortAllWidgets } from '../../slice/selectors';
+import {
+  selectControllerPanel,
+  selectSortAllWidgets,
+} from '../../slice/selectors';
 import { addWidgetsToEditBoard } from '../../slice/thunk';
 import { RelatedViewForm } from './RelatedViewForm';
 import { RelatedWidgetItem, RelatedWidgets } from './RelatedWidgets';
-import { ValueTypes, WidgetFilterFormType } from './types';
+import { ValueTypes, WidgetControllerOption } from './types';
 import {
   formatWidgetFilter,
   getInitWidgetFilter,
@@ -67,7 +70,8 @@ import { WidgetFilterForm } from './WidgetFilterForm';
 const FilterWidgetPanel: React.FC = memo(props => {
   const dispatch = useDispatch();
   const t = useI18NPrefix('viz.common.enum.controllerFacadeTypes');
-  const { type, widgetId } = useSelector(selectFilterPanel);
+  const { type, widgetId, controllerType } = useSelector(selectControllerPanel);
+  console.log('type', type);
   const { boardId, boardType, queryVariables } = useContext(BoardContext);
 
   const allWidgets = useSelector(selectSortAllWidgets);
@@ -82,6 +86,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const widgetMap = useMemo(() => convertToWidgetMap(allWidgets), [allWidgets]);
   const viewMap = useSelector(selectViewMap);
 
+  const [relatedWidgets, setRelatedWidgets] = useState<RelatedWidgetItem[]>([]);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const hide = !type || type === 'hide';
@@ -99,8 +104,11 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const [fieldCategory, setFieldCategory] =
     useState<ChartDataViewFieldCategory>(ChartDataViewFieldCategory.Field);
 
-  const [relatedViews, setRelatedViews] = useState<RelatedView[]>([]);
   let widgetList = useRef<RelatedWidgetItem[]>([]);
+
+  const getFormRelatedViews = useCallback(() => {
+    return form?.getFieldValue('relatedViews') as RelatedView[];
+  }, [form]);
 
   const onChangeFieldProps = useCallback(
     (views: RelatedView[] | undefined) => {
@@ -108,7 +116,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
       if (views) {
         relatedViews = views;
       } else {
-        relatedViews = form?.getFieldValue('relatedViews');
+        relatedViews = getFormRelatedViews();
       }
 
       const trimmedViews = relatedViews.filter(
@@ -134,37 +142,43 @@ const FilterWidgetPanel: React.FC = memo(props => {
 
       form.validateFields();
     },
-    [form],
+    [form, getFormRelatedViews],
   );
   const setViews = useCallback(
-    (widgetOptions: RelatedWidgetItem[]) => {
-      widgetList.current = widgetOptions;
-
+    (relatedWidgets: RelatedWidgetItem[]) => {
+      const relatedViews = getFormRelatedViews();
       const nextRelatedViews: RelatedView[] = [];
-      widgetOptions.forEach(option => {
+      relatedWidgets.forEach(option => {
         const widget = widgetMap[option.widgetId];
         if (!widget) return;
         widget.viewIds.forEach((viewId, index) => {
+          const oldViewItem = relatedViews?.find(
+            view => view.viewId === viewId,
+          );
           const newViewItem = nextRelatedViews.find(
             view => view.viewId === viewId,
           );
-          if (newViewItem) return;
-          const view = viewMap[viewId];
-          if (!view) return;
-          const relatedView: RelatedView = {
-            viewId: view.id,
-            relatedCategory: ChartDataViewFieldCategory.Field,
-            fieldValue: '',
-            fieldValueType: ChartDataViewFieldType.STRING,
-          };
-          nextRelatedViews.push(relatedView);
+          if (!newViewItem) {
+            if (oldViewItem) {
+              nextRelatedViews.push({ ...oldViewItem });
+            } else {
+              const view = viewMap[viewId];
+              if (!view) return;
+              const relatedView: RelatedView = {
+                viewId: view.id,
+                relatedCategory: ChartDataViewFieldCategory.Field,
+                fieldValue: '',
+                fieldValueType: ChartDataViewFieldType.STRING,
+              };
+              nextRelatedViews.push(relatedView);
+            }
+          }
         });
       });
-      setRelatedViews(nextRelatedViews);
-      console.log('nextRelatedViews', nextRelatedViews);
+      form?.setFieldsValue({ relatedViews: nextRelatedViews });
       onChangeFieldProps(nextRelatedViews);
     },
-    [onChangeFieldProps, viewMap, widgetMap],
+    [form, getFormRelatedViews, onChangeFieldProps, viewMap, widgetMap],
   );
 
   // 初始化数据
@@ -182,7 +196,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
     const confContent = curFilterWidget.config
       .content as ControllerWidgetContent;
     try {
-      const { relatedViews, type, widgetFilter } = confContent;
+      const { relatedViews, type, controllerOption: widgetFilter } = confContent;
       form.setFieldsValue({
         type,
         filterName: curFilterWidget.config.name,
@@ -206,11 +220,11 @@ const FilterWidgetPanel: React.FC = memo(props => {
       console.log('--values', values);
       console.log('--fieldValueType', fieldValueType);
       console.log('--fieldCategory', fieldCategory);
-
-      const { relatedViews, widgetFilter, filterName, type } = values;
+      console.log('--type', type);
+      const { relatedViews, widgetFilter, filterName } = values;
       if (type === 'add') {
         const sourceId = uuidv4();
-        const filterToWidgetRelations: Relation[] = widgetList.current.map(
+        const filterToWidgetRelations: Relation[] = relatedWidgets.map(
           option => {
             const widget = widgetMap[option.widgetId];
             const relation: Relation = {
@@ -228,7 +242,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           },
         );
         const newRelations = [...filterToWidgetRelations];
-        const filterVisibility = (widgetFilter as WidgetFilterFormType)
+        const filterVisibility = (widgetFilter as WidgetControllerOption)
           .visibility;
         if (filterVisibility) {
           const { visibilityType: visibility, condition } = filterVisibility;
@@ -250,7 +264,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           boardType,
           filterName,
           relations: newRelations,
-          controllerType: ControllerFacadeTypes.DropdownList,
+          controllerType: controllerType!,
           views: relatedViews,
           fieldValueType: fieldValueType,
           widgetFilter: formatWidgetFilter(widgetFilter),
@@ -280,7 +294,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
             };
           });
         const newRelations = [...filterToWidgetRelations];
-        const filterVisibility = (widgetFilter as WidgetFilterFormType)
+        const filterVisibility = (widgetFilter as WidgetControllerOption)
           .visibility;
         if (filterVisibility) {
           const { visibilityType: visibility, condition } = filterVisibility;
@@ -301,7 +315,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           relatedViews,
           type: ControllerFacadeTypes.DropdownList,
           fieldValueType: fieldValueType,
-          widgetFilter: formatWidgetFilter(widgetFilter),
+          controllerOption: formatWidgetFilter(widgetFilter),
           hasVariable: fieldCategory === ChartDataViewFieldCategory.Variable,
         };
         const newWidget = produce(curFilterWidget, draft => {
@@ -320,6 +334,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
       dispatch,
       fieldCategory,
       fieldValueType,
+      type,
       widgetMap,
     ],
   );
@@ -334,19 +349,26 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const afterClose = useCallback(() => {
     form.resetFields();
     dispatch(
-      editDashBoardInfoActions.changeFilterPanel({
+      editDashBoardInfoActions.changeControllerPanel({
         type: 'hide',
         widgetId: '',
+        controllerType: undefined,
       }),
     );
   }, [dispatch, form]);
-  const onChangeRelatedWidgets = (values: any) => {
-    console.log('values', values);
-    setViews(values);
+  const onChangeRelatedWidgets = (values: string[]) => {
+    const relatedWidgets = values.map(t => {
+      const item: RelatedWidgetItem = {
+        widgetId: t,
+      };
+      return item;
+    });
+    setRelatedWidgets(relatedWidgets);
+    setViews(relatedWidgets);
   };
   return (
     <Modal
-      title={`${type} ${t(ControllerFacadeTypes.DropdownList)}`}
+      title={`${type} ${t(controllerType || '')}`}
       visible={visible}
       onOk={onSubmit}
       centered
@@ -376,19 +398,17 @@ const FilterWidgetPanel: React.FC = memo(props => {
           </div>
           <div className="split-left">
             <RelatedWidgets
-              relatedWidgets={[
-                { widgetId: '0960ec696e5a4139a42aceb92f2fe5d3' },
-              ]}
+              relatedWidgets={relatedWidgets}
               widgets={widgets}
               onChange={onChangeRelatedWidgets}
             />
             <RelatedViewForm
-              relatedViews={relatedViews}
-              onChangeFieldProps={onChangeFieldProps}
               form={form}
               fieldValueType={fieldValueType}
               viewMap={viewMap}
               queryVariables={queryVariables}
+              onChangeFieldProps={onChangeFieldProps}
+              getFormRelatedViews={getFormRelatedViews}
             />
           </div>
         </Container>

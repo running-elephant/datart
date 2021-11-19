@@ -142,9 +142,9 @@ export const selectDashDroppable = createSelector(
   [boardInfoState],
   boardInfo => boardInfo.isDroppable,
 );
-export const selectFilterPanel = createSelector(
+export const selectControllerPanel = createSelector(
   [boardInfoState],
-  boardInfo => boardInfo.filterPanel,
+  boardInfo => boardInfo.controllerPanel,
 );
 export const selectLinkagePanel = createSelector(
   [boardInfoState],

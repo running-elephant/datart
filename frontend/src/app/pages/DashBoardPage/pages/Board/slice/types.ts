@@ -36,7 +36,7 @@ import {
 } from '../../../constants';
 import {
   ValueTypes,
-  WidgetFilterFormType,
+  WidgetControllerOption,
 } from '../../BoardEditor/components/FilterWidgetPanel/types';
 
 export const strEnumType = <T extends string>(o: Array<T>): { [K in T]: K } => {
@@ -299,7 +299,7 @@ export interface ControllerWidgetContent {
   type: ControllerFacadeTypes;
   fieldValueType: ValueTypes;
   relatedViews: RelatedView[];
-  widgetFilter: WidgetFilterFormType;
+  controllerOption: WidgetControllerOption;
   hasVariable: boolean;
 }
 
@@ -412,7 +412,7 @@ export interface BoardInfo {
   clipboardWidgets: Record<string, WidgetOfCopy>;
   layouts: Layout[]; // 删除
   widgetIds: string[]; // board保存的时候 区分那些是删除的，哪些是新增的
-  filterPanel: WidgetPanelParams; //
+  controllerPanel: WidgetControllerPanelParams; //
   linkagePanel: WidgetPanelParams;
   linkFilter: BoardLinkFilter[];
   jumpPanel: JumpPanel; //
@@ -435,7 +435,7 @@ export interface WidgetPanelParams {
   type: 'add' | 'edit' | 'hide';
   widgetId: string;
 }
-export interface WidgetFilterPanelParams {
+export interface WidgetControllerPanelParams {
   type: 'add' | 'edit' | 'hide';
   widgetId: string;
   controllerType?: ControllerFacadeTypes;

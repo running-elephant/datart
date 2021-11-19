@@ -22,7 +22,7 @@ import {
 } from '../pages/Board/slice/types';
 import {
   FilterDate,
-  WidgetFilterFormType,
+  WidgetControllerOption,
 } from '../pages/BoardEditor/components/FilterWidgetPanel/types';
 import { ChartRequestFilter } from './../../ChartWorkbenchPage/models/ChartHttpRequest';
 import { ValueTypes } from './../pages/BoardEditor/components/FilterWidgetPanel/types';
@@ -105,7 +105,7 @@ export const getAllFiltersOfOneWidget = (values: {
     if (!hasRelation) return;
 
     const content = filterWidget.config.content as ControllerWidgetContent;
-    const { fieldValueType, relatedViews, widgetFilter } = content;
+    const { fieldValueType, relatedViews, controllerOption: widgetFilter } = content;
     const relatedViewItem = relatedViews
       .filter(view => view.fieldValue)
       .find(view => view.viewId === chartWidget.viewIds[0]);
@@ -158,7 +158,7 @@ export const getAllFiltersOfOneWidget = (values: {
 };
 export const getWidgetFilterValues = (
   fieldValueType: ValueTypes,
-  widgetFilter: WidgetFilterFormType,
+  widgetFilter: WidgetControllerOption,
 ) => {
   // Date 类型
   if (fieldValueType === ChartDataViewFieldType.DATE) {

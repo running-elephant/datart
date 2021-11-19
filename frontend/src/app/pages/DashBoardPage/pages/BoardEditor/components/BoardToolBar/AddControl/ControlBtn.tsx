@@ -30,7 +30,7 @@ export const ControlBtn: React.FC<ControlBtnProps> = () => {
   const dispatch = useDispatch();
   const onAddControler = (info: { key: any }) => {
     dispatch(
-      editDashBoardInfoActions.changeFilterPanel({
+      editDashBoardInfoActions.changeControllerPanel({
         type: 'add',
         widgetId: '',
         controllerType: info.key as ControllerFacadeTypes,

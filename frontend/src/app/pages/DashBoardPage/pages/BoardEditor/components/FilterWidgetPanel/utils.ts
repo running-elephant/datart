@@ -28,7 +28,7 @@ import {
 import { ControllerFacadeTypes as Opt } from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from './../../../../../../../globalConstants';
-import { ValueTypes, WidgetFilterFormType } from './types';
+import { ValueTypes, WidgetControllerOption } from './types';
 
 export const getStringFacadeOptions = (type: FilterOperatorType) => {
   switch (type) {
@@ -73,7 +73,7 @@ export const getDateFacadeOptions = (category: ChartDataViewFieldCategory) => {
 };
 // 展示前处理
 export const preformatWidgetFilter = (
-  oldWidgetFilter: WidgetFilterFormType,
+  oldWidgetFilter: WidgetControllerOption,
 ) => {
   const widgetFilter = JSON.parse(JSON.stringify(oldWidgetFilter));
   if (!widgetFilter.operatorType) {
@@ -112,7 +112,7 @@ export const preformatWidgetFilter = (
   return widgetFilter;
 };
 // 设置后处理
-export const formatWidgetFilter = (widgetFilter: WidgetFilterFormType) => {
+export const formatWidgetFilter = (widgetFilter: WidgetControllerOption) => {
   if (!widgetFilter.sqlOperator) {
     widgetFilter.sqlOperator = FilterSqlOperator.In;
   }
@@ -157,7 +157,7 @@ export const formatWidgetFilter = (widgetFilter: WidgetFilterFormType) => {
 };
 
 export const getInitWidgetFilter = () => {
-  const widgetFilter: WidgetFilterFormType = {
+  const widgetFilter: WidgetControllerOption = {
     operatorType: OPERATOR_TYPE_ENUM.common, //
     assistViewFields: [],
     visibility: {
@@ -174,7 +174,7 @@ export const getInitWidgetFilter = () => {
   return widgetFilter;
 };
 export const getFixedFilterWidth = (content: ControllerWidgetContent) => {
-  const { widgetFilter } = content;
+  const { controllerOption: widgetFilter } = content;
   if (!widgetFilter?.filterWidth || widgetFilter?.filterWidth === 'auto') {
     return '25%';
   } else {

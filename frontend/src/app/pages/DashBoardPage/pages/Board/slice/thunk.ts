@@ -299,7 +299,7 @@ export const getFilterDataAsync = createAsyncThunk<
   'board/getFilterDataAsync',
   async ({ widget, renderMode }, { getState, dispatch }) => {
     const content = widget.config.content as ControllerWidgetContent;
-    const widgetFilter = content.widgetFilter;
+    const widgetFilter = content.controllerOption;
     const executeTokenMap = (getState() as RootState)?.share?.executeTokenMap;
 
     if (

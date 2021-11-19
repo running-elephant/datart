@@ -24,7 +24,7 @@ import {
 import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { WidgetFilterFormType } from '../types';
+import { WidgetControllerOption } from '../types';
 const numberConditionSetValues = SQL_OPERATOR_OPTIONS.compare.map(
   ele => ele.value,
 );
@@ -38,7 +38,7 @@ const FilterNumberCondition: FC<{
     return fieldCategory === ChartDataViewFieldCategory.Variable;
   }, [fieldCategory]);
   const checkCurValue = useCallback(() => {
-    const widgetFilter: WidgetFilterFormType = form?.getFieldValue([
+    const widgetFilter: WidgetControllerOption = form?.getFieldValue([
       'widgetFilter',
     ]);
     // 值不符合

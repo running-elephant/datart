@@ -27,7 +27,7 @@ import ChartDataView, {
 import { FilterSqlOperator } from 'globalConstants';
 import React, { memo, useEffect } from 'react';
 import styled from 'styled-components/macro';
-import { ValueTypes, WidgetFilterFormType } from '../types';
+import { ValueTypes, WidgetControllerOption } from '../types';
 import FilterVisibility from './FilterVisibility';
 import OperatorValues from './OperatorValues';
 
@@ -42,11 +42,11 @@ export interface RelatedViewFormProps {
 
 export const WidgetFilterForm: React.FC<RelatedViewFormProps> = memo(
   ({ form, viewMap, fieldValueType, fieldCategory, otherStrFilterWidgets }) => {
-    const t = useI18NPrefix('viz.common.enum.controllerFacadeTypes');
+    const t = useI18NPrefix('viz.common.filter');
     useEffect(() => {
       if (fieldCategory === ChartDataViewFieldCategory.Variable) {
         const widgetFilter = form?.getFieldValue('widgetFilter');
-        const nextWidgetFilter: WidgetFilterFormType = {
+        const nextWidgetFilter: WidgetControllerOption = {
           ...widgetFilter,
           sqlOperator: FilterSqlOperator.Equal,
         };
@@ -57,7 +57,11 @@ export const WidgetFilterForm: React.FC<RelatedViewFormProps> = memo(
     }, [fieldCategory, form]);
     return (
       <Wrap>
-        <Form.Item name="filterName" label="名称" rules={[{ required: true }]}>
+        <Form.Item
+          name="filterName"
+          label={t('filterName')}
+          rules={[{ required: true }]}
+        >
           <Input />
         </Form.Item>
 

@@ -29,7 +29,7 @@ import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import { ValueTypes, WidgetFilterFormType } from '../types';
+import { ValueTypes, WidgetControllerOption } from '../types';
 import { adjustSqlOperator } from '../utils';
 import { AssistViewFields } from './AssistViewFields';
 import { FilterCustomOptions } from './FilterCustomOptions';
@@ -44,7 +44,7 @@ export const singleFacadeTypes = [
 ];
 
 const OperatorValues: FC<{
-  form: FormInstance<{ widgetFilter: WidgetFilterFormType }> | undefined;
+  form: FormInstance<{ widgetFilter: WidgetControllerOption }> | undefined;
   viewMap: Record<string, ChartDataView>;
   fieldValueType: ValueTypes;
   filterValues?: any[];
@@ -75,7 +75,7 @@ const OperatorValues: FC<{
         setTargetKeys(nextTargetKeys);
         const widgetFilter = form?.getFieldValue(
           'widgetFilter',
-        ) as WidgetFilterFormType;
+        ) as WidgetControllerOption;
         let hasFilterFacade = true;
         if (
           nextTargetKeys.length > 1 &&
@@ -83,7 +83,7 @@ const OperatorValues: FC<{
         ) {
           hasFilterFacade = false;
         }
-        const nextWidgetFilter: WidgetFilterFormType = {
+        const nextWidgetFilter: WidgetControllerOption = {
           ...widgetFilter,
           filterValues: nextTargetKeys,
           filterFacade: hasFilterFacade
@@ -131,7 +131,7 @@ const OperatorValues: FC<{
         const dataset = await fetchNewDataset(viewId, viewField);
         setTargetKeys([]);
         setOptionValues(convertToList(dataset?.rows, selectedKeys));
-        const widgetFilter: WidgetFilterFormType = form?.getFieldValue([
+        const widgetFilter: WidgetControllerOption = form?.getFieldValue([
           'widgetFilter',
         ]);
         form?.setFieldsValue({
@@ -150,7 +150,7 @@ const OperatorValues: FC<{
         const [viewId, viewField] = value;
         const dataset = await fetchNewDataset(viewId, viewField);
 
-        const widgetFilter: WidgetFilterFormType =
+        const widgetFilter: WidgetControllerOption =
           form?.getFieldValue('widgetFilter');
 
         setOptionValues(convertToList(dataset?.rows, []));
@@ -184,7 +184,7 @@ const OperatorValues: FC<{
         const filterSqlOperator = adjustSqlOperator(fieldValueType, curType);
 
         const widgetFilter = form?.getFieldValue('widgetFilter');
-        const nextWidgetFilter: WidgetFilterFormType = {
+        const nextWidgetFilter: WidgetControllerOption = {
           ...widgetFilter,
           filterFacade: undefined,
           sqlOperator: filterSqlOperator,

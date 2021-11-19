@@ -103,7 +103,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
           break;
         case 'controller':
           dispatch(
-            editDashBoardInfoActions.changeFilterPanel({
+            editDashBoardInfoActions.changeControllerPanel({
               type: 'edit',
               widgetId: wid,
               controllerType: ControllerFacadeTypes.DropdownList,

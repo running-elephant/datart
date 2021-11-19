@@ -17,7 +17,7 @@ import { Layout } from 'react-grid-layout';
 import undoable, { includeAction } from 'redux-undo';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
-import { WidgetFilterPanelParams } from './../../Board/slice/types';
+import { WidgetControllerPanelParams } from './../../Board/slice/types';
 import { editBoardStackSlice } from './childSlice/stackSlice';
 import {
   getEditBoardDetail,
@@ -54,8 +54,11 @@ const editDashBoardInfoSlice = createSlice({
     changeFullScreenItem(state, action: PayloadAction<string>) {
       state.fullScreenItemId = action.payload;
     },
-    changeFilterPanel(state, action: PayloadAction<WidgetFilterPanelParams>) {
-      state.filterPanel = action.payload;
+    changeControllerPanel(
+      state,
+      action: PayloadAction<WidgetControllerPanelParams>,
+    ) {
+      state.controllerPanel = action.payload;
     },
     changeLinkagePanel(state, action: PayloadAction<WidgetPanelParams>) {
       state.linkagePanel = action.payload;

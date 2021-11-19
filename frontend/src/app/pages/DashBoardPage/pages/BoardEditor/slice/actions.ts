@@ -39,7 +39,7 @@ import { RootState } from 'types';
 import { v4 as uuidv4 } from 'uuid';
 import { editBoardStackActions, editDashBoardInfoActions } from '.';
 import { BoardType } from '../../Board/slice/types';
-import { WidgetFilterFormType } from './../components/FilterWidgetPanel/types';
+import { WidgetControllerOption } from './../components/FilterWidgetPanel/types';
 import { addWidgetsToEditBoard, getEditWidgetDataAsync } from './thunk';
 import { HistoryEditBoard } from './types';
 
@@ -132,7 +132,7 @@ export const updateWidgetFilterAction =
     fieldValueType: ChartDataViewFieldType;
     controllerFacadeType: ControllerFacadeTypes;
     views: RelatedView[];
-    widgetFilter: WidgetFilterFormType;
+    widgetFilter: WidgetControllerOption;
     hasVariable?: boolean;
   }) =>
   async (dispatch, getState) => {
@@ -151,7 +151,7 @@ export const updateWidgetFilterAction =
       type: controllerFacadeType,
       relatedViews: views,
       fieldValueType,
-      widgetFilter: widgetFilter,
+      controllerOption: widgetFilter,
       hasVariable: hasVariable || false,
     };
 
@@ -171,9 +171,10 @@ export const updateWidgetFilterAction =
     });
     dispatch(addWidgetsToEditBoard([widget]));
     dispatch(
-      editDashBoardInfoActions.changeFilterPanel({
+      editDashBoardInfoActions.changeControllerPanel({
         type: 'hide',
         widgetId: '',
+        controllerType: undefined,
       }),
     );
   };

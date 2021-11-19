@@ -56,7 +56,7 @@ import {
   WidgetPadding,
   WidgetType,
 } from '../pages/Board/slice/types';
-import { WidgetFilterFormType } from '../pages/BoardEditor/components/FilterWidgetPanel/types';
+import { WidgetControllerOption } from '../pages/BoardEditor/components/FilterWidgetPanel/types';
 import { ValueTypes } from './../pages/BoardEditor/components/FilterWidgetPanel/types';
 
 export const VALUE_SPLITTER = '###';
@@ -312,7 +312,7 @@ export const createFilterWidget = (params: {
   fieldValueType: ValueTypes;
   controllerType: ControllerFacadeTypes;
   views: RelatedView[];
-  widgetFilter: WidgetFilterFormType;
+  widgetFilter: WidgetControllerOption;
   hasVariable: boolean;
 }) => {
   const {
@@ -331,7 +331,7 @@ export const createFilterWidget = (params: {
     relatedViews: views,
     fieldValueType,
     hasVariable: hasVariable || false,
-    widgetFilter: widgetFilter,
+    controllerOption: widgetFilter,
   };
 
   const widgetConf = createInitWidgetConfig({
@@ -419,27 +419,28 @@ export const getWidgetMapByServer = (
           const _value = isMatchByName
             ? filterSearchParams[widget.config.name]
             : filterSearchParams[widget.id];
-          switch (content?.widgetFilter?.filterFacade) {
+          switch (content?.controllerOption?.filterFacade) {
             case ControllerFacadeTypes.RangeTime:
               if (
-                content.widgetFilter.filterDate &&
-                content.widgetFilter.filterDate?.startTime &&
-                content.widgetFilter.filterDate?.endTime
+                content.controllerOption.filterDate &&
+                content.controllerOption.filterDate?.startTime &&
+                content.controllerOption.filterDate?.endTime
               ) {
-                content.widgetFilter.filterDate.startTime.exactTime =
+                content.controllerOption.filterDate.startTime.exactTime =
                   _value?.[0];
-                content.widgetFilter.filterDate.endTime.exactTime = _value?.[0];
+                content.controllerOption.filterDate.endTime.exactTime =
+                  _value?.[0];
               }
               break;
             default:
-              content.widgetFilter.filterValues = _value || [];
+              content.controllerOption.filterValues = _value || [];
               break;
           }
         }
       }
       // 适配filter 的可见性
       const { visibilityType: visibility, condition } =
-        content.widgetFilter.visibility;
+        content.controllerOption.visibility;
       const { relations } = widget;
       if (visibility === 'condition' && condition) {
         const dependentFilterId = relations
@@ -451,9 +452,9 @@ export const getWidgetMapByServer = (
       }
 
       //处理 assistViewField
-      if (typeof content?.widgetFilter?.assistViewFields === 'string') {
-        content.widgetFilter.assistViewFields = (
-          content.widgetFilter.assistViewFields as string
+      if (typeof content?.controllerOption?.assistViewFields === 'string') {
+        content.controllerOption.assistViewFields = (
+          content.controllerOption.assistViewFields as string
         ).split(VALUE_SPLITTER);
         // value.split(VALUE_SPLITTER);
       }
@@ -709,7 +710,7 @@ export const getNoHiddenFilters = (widgets: Widget[]) => {
       return true;
     }
     const content = w.config.content as ControllerWidgetContent;
-    const filterVisibility = content.widgetFilter.visibility;
+    const filterVisibility = content.controllerOption.visibility;
     if (filterVisibility.visibilityType === 'show') {
       return true;
     }
@@ -717,7 +718,7 @@ export const getNoHiddenFilters = (widgets: Widget[]) => {
       return false;
     }
     if (filterVisibility.visibilityType === 'condition') {
-      const condition = content.widgetFilter.visibility.condition;
+      const condition = content.controllerOption.visibility.condition;
       if (condition) {
         const { dependentFilterId, relation, value: targetValue } = condition;
         const dependWidget = widgets.find(
@@ -727,7 +728,7 @@ export const getNoHiddenFilters = (widgets: Widget[]) => {
           return false;
         }
         const content = dependWidget.config.content as ControllerWidgetContent;
-        const dependWidgetValue = content.widgetFilter.filterValues?.[0];
+        const dependWidgetValue = content.controllerOption.filterValues?.[0];
         // if (!dependWidgetValue) {
         //   return false;
         // }

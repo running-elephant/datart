@@ -30,24 +30,33 @@ import ChartDataView, {
 } from 'app/types/ChartDataView';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
+import { G90 } from 'styles/StyleConstants';
 import { ValueTypes } from './types';
 
 export interface RelatedViewFormProps {
-  relatedViews: RelatedView[];
   viewMap: Record<string, ChartDataView>;
   form: FormInstance<any> | undefined;
   fieldValueType: ValueTypes;
   queryVariables: Variable[];
   onChangeFieldProps: (views?: RelatedView[]) => void;
+  getFormRelatedViews: () => RelatedView[];
 }
 const Option = Select.Option;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
-  ({ relatedViews, viewMap, queryVariables, onChangeFieldProps }) => {
+  ({
+    viewMap,
+    form,
+    queryVariables,
+    onChangeFieldProps,
+    getFormRelatedViews,
+  }) => {
     //renderOptions
+
     const renderOptions = useCallback(
       (index: number) => {
+        const relatedViews = getFormRelatedViews();
         if (!relatedViews) {
           return null;
         }
@@ -70,7 +79,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                   style={{ display: 'flex', justifyContent: 'space-between' }}
                 >
                   <span>{item.name}</span>
-                  <span style={{ color: '#ccc' }}>{item.valueType}</span>
+                  <span style={{ color: G90 }}>{item.valueType}</span>
                 </div>
               </Option>
             ));
@@ -80,41 +89,44 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
             <Option key={item.id} fieldvaluetype={item.type} value={item.id}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>{item.id}</span>
-                <span style={{ color: '#ccc' }}>{item.type}</span>
+                <span style={{ color: G90 }}>{item.type}</span>
               </div>
             </Option>
           ));
         }
       },
-      [queryVariables, relatedViews, viewMap],
+      [getFormRelatedViews, queryVariables, viewMap],
     );
     const fieldValueChange = useCallback(
       (index: number) => (value, option) => {
+        const relatedViews = getFormRelatedViews();
         relatedViews[index].fieldValue = value;
         relatedViews[index].fieldValueType = option?.fieldvaluetype;
+        form?.setFieldsValue({ relatedViews: relatedViews });
 
         onChangeFieldProps(relatedViews);
       },
-      [relatedViews, onChangeFieldProps],
+      [getFormRelatedViews, form, onChangeFieldProps],
     );
 
     // fieldType
     const filterFieldCategoryChange = useCallback(
       (index: number) => (e: RadioChangeEvent) => {
+        const relatedViews = getFormRelatedViews();
         relatedViews[index].relatedCategory = e.target.value;
         relatedViews[index].fieldValue = undefined;
-
+        form?.setFieldsValue({ relatedViews: relatedViews });
         onChangeFieldProps(relatedViews);
       },
-      [onChangeFieldProps, relatedViews],
+      [form, getFormRelatedViews, onChangeFieldProps],
     );
     const getViewName = useCallback(
       (index: number) => {
-        // const relatedViews: RelatedView[] = form?.getFieldValue('relatedViews');
+        const relatedViews = getFormRelatedViews();
         const name = viewMap[relatedViews[index]?.viewId]?.name || '';
         return name;
       },
-      [viewMap, relatedViews],
+      [getFormRelatedViews, viewMap],
     );
 
     return (

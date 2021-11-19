@@ -57,10 +57,12 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
   } = useContext(WidgetDataContext);
   const { widgetUpdate, refreshWidgetsByFilter } =
     useContext(BoardActionContext);
-  const { widgetFilter, fieldValueType, hasVariable } = useMemo(
-    () => widget.config.content as ControllerWidgetContent,
-    [widget],
-  );
+  const {
+    controllerOption: widgetFilter,
+    fieldValueType,
+    hasVariable,
+    type,
+  } = useMemo(() => widget.config.content as ControllerWidgetContent, [widget]);
   const {
     assistViewFields,
     filterDate,
@@ -101,7 +103,7 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
       const nextWidget = produce(widget, draft => {
         (
           draft.config.content as ControllerWidgetContent
-        ).widgetFilter.filterValues = values;
+        ).controllerOption.filterValues = values;
       });
       widgetUpdate(nextWidget);
       refreshWidgetsByFilter(nextWidget);
@@ -114,10 +116,10 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
       const nextWidget = produce(widget, draft => {
         (
           draft.config.content as ControllerWidgetContent
-        ).widgetFilter.sqlOperator = sql;
+        ).controllerOption.sqlOperator = sql;
         (
           draft.config.content as ControllerWidgetContent
-        ).widgetFilter.filterValues = values;
+        ).controllerOption.filterValues = values;
       });
       widgetUpdate(nextWidget);
       refreshWidgetsByFilter(nextWidget);
@@ -140,10 +142,10 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
       const nextWidget = produce(widget, draft => {
         (
           draft.config.content as ControllerWidgetContent
-        ).widgetFilter.operatorType = 'custom';
+        ).controllerOption.operatorType = 'custom';
         (
           draft.config.content as ControllerWidgetContent
-        ).widgetFilter.filterDate = nextFilterDate;
+        ).controllerOption.filterDate = nextFilterDate;
       });
       widgetUpdate(nextWidget);
       refreshWidgetsByFilter(nextWidget);
@@ -151,7 +153,7 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
     [refreshWidgetsByFilter, widget, widgetUpdate],
   );
   const control = useMemo(() => {
-    switch (filterFacade) {
+    switch (type) {
       case ControllerFacadeTypes.DropdownList:
       case ControllerFacadeTypes.MultiDropdownList:
         const multiple =
@@ -229,6 +231,7 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
         break;
     }
   }, [
+    type,
     filterFacade,
     optionRows,
     filterValues,

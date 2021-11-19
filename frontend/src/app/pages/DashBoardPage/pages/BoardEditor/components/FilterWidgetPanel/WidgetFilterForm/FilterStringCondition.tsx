@@ -22,7 +22,7 @@ import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import { ValueTypes, WidgetFilterFormType } from '../types';
+import { ValueTypes, WidgetControllerOption } from '../types';
 const stringConditionSetValues = [
   ...SQL_OPERATOR_OPTIONS.include,
   ...SQL_OPERATOR_OPTIONS.notInclude,
@@ -51,7 +51,7 @@ const FilterStringCondition: FC<{
   const onSqlOperatorChange = useCallback(
     value => {
       setSqlOperatorValue(value);
-      const widgetFilter: WidgetFilterFormType = {
+      const widgetFilter: WidgetControllerOption = {
         ...form?.getFieldValue('widgetFilter'),
         sqlOperator: value,
       };
@@ -91,7 +91,7 @@ const FilterStringCondition: FC<{
   }, [hasVariable, onSqlOperatorChange, sqlOperatorValue]);
 
   const checkCurValue = useCallback(() => {
-    const widgetFilter: WidgetFilterFormType = form?.getFieldValue([
+    const widgetFilter: WidgetControllerOption = form?.getFieldValue([
       'widgetFilter',
     ]);
     // 值不符合
@@ -116,7 +116,7 @@ const FilterStringCondition: FC<{
       needAdjust = false;
       filterValues = widgetFilter?.filterValues;
     }
-    const nextWidgetFilter: WidgetFilterFormType = {
+    const nextWidgetFilter: WidgetControllerOption = {
       ...widgetFilter,
       sqlOperator: sqlOperator,
       filterValues: filterValues,

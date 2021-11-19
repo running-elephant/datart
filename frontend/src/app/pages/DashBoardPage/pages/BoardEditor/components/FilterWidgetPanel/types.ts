@@ -1,6 +1,6 @@
 import {
-  FilterOperatorType,
   ControllerVisibilityType,
+  FilterOperatorType,
 } from 'app/pages/DashBoardPage/constants';
 import { FilterValueOption } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
@@ -32,7 +32,7 @@ export interface VisibilityCondition {
   value: any; // any type
 }
 
-export interface WidgetFilterFormType {
+export interface WidgetControllerOption {
   operatorType: FilterOperatorType; //
   assistViewFields: string[]; //辅助添加view字段
   visibility: WidgetFilterVisibility;
