@@ -38,6 +38,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
@@ -318,6 +319,11 @@ public class JdbcDataProviderAdapter implements Closeable {
 
         String sql = render.render(false, false, false);
         Dataframe data = execute(sql);
+        if (!CollectionUtils.isEmpty(script.getSchema())) {
+            for (Column column : data.getColumns()) {
+                column.setType(script.getSchema().getOrDefault(column.getName(), column).getType());
+            }
+        }
         data.setName(script.toQueryKey());
         return LocalDB.executeLocalQuery(null, executeParam, false, Collections.singletonList(data));
     }

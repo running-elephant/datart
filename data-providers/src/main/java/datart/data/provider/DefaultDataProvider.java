@@ -24,8 +24,11 @@ import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.SqlParserUtils;
 import datart.data.provider.local.LocalDB;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -53,18 +56,13 @@ public abstract class DefaultDataProvider extends DataProvider {
 
     @Override
     public Object test(DataProviderSource source) throws Exception {
-
         PageInfo pageInfo = PageInfo.builder()
                 .pageNo(1)
                 .pageSize(Integer.parseInt(source.getProperties().getOrDefault(TEST_DATA_SIZE, "100").toString()))
                 .countTotal(false)
                 .build();
-
-        ExecuteParam executeParam = ExecuteParam.builder()
-                .pageInfo(pageInfo)
-                .cacheEnable(false)
-                .build();
-
+        ExecuteParam executeParam = ExecuteParam.empty();
+        executeParam.setPageInfo(pageInfo);
         return execute(source, null, executeParam);
     }
 
@@ -117,6 +115,17 @@ public abstract class DefaultDataProvider extends DataProvider {
     @Override
     public Dataframe execute(DataProviderSource config, QueryScript queryScript, ExecuteParam executeParam) throws Exception {
         List<Dataframe> fullData = loadFullDataFromSource(config);
+        // 如果自定义了schema,执行分两部完成。1、执行view sql，取得中间结果。2、使用中间结果，修改schema，加入执行参数，完成执行。
+        if (queryScript != null && !CollectionUtils.isEmpty(queryScript.getSchema())) {
+            Dataframe temp = LocalDB.executeLocalQuery(queryScript, ExecuteParam.empty(), false, fullData);
+            for (Column column : temp.getColumns()) {
+                column.setType(queryScript.getSchema().getOrDefault(column.getName(), column).getType());
+            }
+            temp.setRows(parseValues(temp.getRows(), temp.getColumns()));
+            temp.setName(queryScript.toQueryKey());
+            fullData = Collections.singletonList(temp);
+            queryScript = null;
+        }
         return LocalDB.executeLocalQuery(queryScript, executeParam, executeParam.isCacheEnable(), fullData);
     }
 
@@ -167,7 +176,16 @@ public abstract class DefaultDataProvider extends DataProvider {
                         val = val.toString();
                         break;
                     case NUMERIC:
-                        val = Double.parseDouble(val.toString());
+                        if (val instanceof Number) {
+                            break;
+                        }
+                        if (StringUtils.isBlank(val.toString())) {
+                            val = null;
+                        } else if (NumberUtils.isDigits(val.toString())) {
+                            val = Long.parseLong(val.toString());
+                        } else {
+                            val = Double.parseDouble(val.toString());
+                        }
                         break;
                     default:
                 }

@@ -18,6 +18,7 @@
 
 package datart.core.data.provider;
 
+import com.alibaba.fastjson.JSON;
 import datart.core.base.PageInfo;
 import datart.core.data.provider.sql.*;
 import lombok.AllArgsConstructor;
@@ -63,18 +64,13 @@ public class ExecuteParam implements Serializable {
 
     @Override
     public String toString() {
-        return "ExecuteParam{" +
-                "aggregators=" + aggregators +
-                ", filters=" + filters +
-                ", groups=" + groups +
-                ", orders=" + orders +
-                ", functionColumns=" + functionColumns +
-                ", excludeColumns=" + includeColumns +
-                ", pageInfo=" + pageInfo +
-                ", localQuery=" + serverAggregate +
-                ", concurrencyOptimize=" + concurrencyOptimize +
-                ", cacheEnable=" + cacheEnable +
-                '}';
+        return JSON.toJSONString(JSON.toJSONString(this));
+    }
+
+    public static ExecuteParam empty() {
+        ExecuteParam executeParam = new ExecuteParam();
+        executeParam.setPageInfo(PageInfo.builder().pageNo(1).pageSize(Integer.MAX_VALUE).build());
+        return executeParam;
     }
 
 }
