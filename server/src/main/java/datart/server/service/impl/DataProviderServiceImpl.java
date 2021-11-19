@@ -18,6 +18,8 @@
 
 package datart.server.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import datart.core.base.PageInfo;
@@ -52,7 +54,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class DataProviderServiceImpl extends BaseService implements DataProviderService {
-
 
     // build in variables
     private static final String VARIABLE_NAME = "DATART.USER.NAME";
@@ -206,14 +207,13 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
             return Dataframe.empty();
         }
 
+        //datasource and view
         View view = retrieve(viewExecuteParam.getViewId(), View.class, true);
-        //datasource
         Source source = retrieve(view.getSourceId(), Source.class, false);
-
         DataProviderSource providerSource = toDataProviderConfig(source);
 
+        //permission and variables
         Set<String> columns = parseColumnPermission(view);
-
         List<ScriptVariable> variables = parseVariables(view, viewExecuteParam);
 
         if (securityManager.isOrgOwner(view.getOrgId())) {
@@ -224,6 +224,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                 .test(false)
                 .script(view.getScript())
                 .variables(variables)
+                .schema(parseSchema(view.getModel()))
                 .build();
 
         if (viewExecuteParam.getPageInfo().getPageNo() < 1) {
@@ -397,6 +398,25 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 从 view 中解析配置的schema
+     *
+     * @param model view.model
+     */
+    private Map<String, Column> parseSchema(String model) {
+        HashMap<String, Column> schema = new HashMap<>();
+        if (StringUtils.isBlank(model)) {
+            return schema;
+        }
+
+        JSONObject jsonObject = JSON.parseObject(model);
+        for (String key : jsonObject.keySet()) {
+            ValueType type = ValueType.valueOf(jsonObject.getJSONObject(key).getString("type"));
+            schema.put(key, new Column(key, type));
+        }
+        return schema;
     }
 
 }
