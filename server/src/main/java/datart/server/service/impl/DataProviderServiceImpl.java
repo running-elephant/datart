@@ -45,6 +45,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -115,19 +116,19 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
     }
 
     @Override
-    public Set<String> readAllDatabases(String sourceId) {
+    public Set<String> readAllDatabases(String sourceId) throws SQLException {
         Source source = retrieve(sourceId, Source.class, false);
         return dataProviderManager.readAllDatabases(toDataProviderConfig(source));
     }
 
     @Override
-    public Set<String> readTables(String sourceId, String database) {
+    public Set<String> readTables(String sourceId, String database) throws SQLException {
         Source source = retrieve(sourceId, Source.class, false);
         return dataProviderManager.readTables(toDataProviderConfig(source), database);
     }
 
     @Override
-    public Set<Column> readTableColumns(String sourceId, String database, String table) {
+    public Set<Column> readTableColumns(String sourceId, String database, String table) throws SQLException {
         Source source = retrieve(sourceId, Source.class, false);
         return dataProviderManager.readTableColumns(toDataProviderConfig(source), database, table);
     }
@@ -232,6 +233,8 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         if (viewExecuteParam.getPageInfo().getPageSize() == 0) {
             viewExecuteParam.getPageInfo().setPageSize(10_000);
         }
+
+        viewExecuteParam.getPageInfo().setPageSize(Math.min(viewExecuteParam.getPageInfo().getPageSize(), Integer.MAX_VALUE));
 
         viewExecuteParam.getPageInfo().setCountTotal(true);
 

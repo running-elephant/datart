@@ -23,6 +23,7 @@ import datart.core.data.provider.*;
 import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.SqlParserUtils;
 import datart.data.provider.local.LocalDB;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
@@ -33,6 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
+@Slf4j
 public abstract class DefaultDataProvider extends DataProvider {
 
     public static final String TEST_DATA_SIZE = "size";
@@ -53,7 +55,9 @@ public abstract class DefaultDataProvider extends DataProvider {
     public Object test(DataProviderSource source) throws Exception {
 
         PageInfo pageInfo = PageInfo.builder()
+                .pageNo(1)
                 .pageSize(Integer.parseInt(source.getProperties().getOrDefault(TEST_DATA_SIZE, "100").toString()))
+                .countTotal(false)
                 .build();
 
         ExecuteParam executeParam = ExecuteParam.builder()

@@ -25,7 +25,7 @@ import styled from 'styled-components/macro';
 import SlideBackground from '../../../components/FreeBoardBackground';
 import useClientRect from '../../../hooks/useClientRect';
 import useSlideStyle from '../../../hooks/useSlideStyle';
-import ZoomControl from '../../Dashboard/FreeDashboard/ZoomControl';
+import ZoomControl from '../../Board/FreeDashboard/ZoomControl';
 import { selectLayoutWidgetMap } from '../slice/selectors';
 import { WidgetOfFreeEdit } from './WidgetOfFreeEdit';
 

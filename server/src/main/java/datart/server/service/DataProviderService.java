@@ -6,6 +6,7 @@ import datart.server.base.params.ViewExecuteParam;
 import datart.server.base.params.TestExecuteParam;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
@@ -18,11 +19,11 @@ public interface DataProviderService {
 
     Object testConnection(DataProviderSource source) throws Exception;
 
-    Set<String> readAllDatabases(String sourceId);
+    Set<String> readAllDatabases(String sourceId) throws SQLException;
 
-    Set<String> readTables(String sourceId, String database);
+    Set<String> readTables(String sourceId, String database) throws SQLException;
 
-    Set<Column> readTableColumns(String sourceId, String schema, String table);
+    Set<Column> readTableColumns(String sourceId, String schema, String table) throws SQLException;
 
     Dataframe testExecute(TestExecuteParam testExecuteParam) throws Exception;
 

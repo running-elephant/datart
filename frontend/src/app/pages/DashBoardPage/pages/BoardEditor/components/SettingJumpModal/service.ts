@@ -1,4 +1,4 @@
-import { WidgetTypeMap } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { WidgetTypeMap } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { VizType } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';

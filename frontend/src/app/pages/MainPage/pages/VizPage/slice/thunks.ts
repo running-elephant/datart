@@ -1,7 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
-import { Dashboard, DataChart } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import {
+  Dashboard,
+  DataChart,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { RootState } from 'types';
 import { request } from 'utils/request';

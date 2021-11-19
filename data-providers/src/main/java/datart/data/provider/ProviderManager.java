@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
@@ -61,17 +62,17 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
     }
 
     @Override
-    public Set<String> readAllDatabases(DataProviderSource source) {
+    public Set<String> readAllDatabases(DataProviderSource source) throws SQLException {
         return getDataProviderService(source.getType()).readAllDatabases(source);
     }
 
     @Override
-    public Set<String> readTables(DataProviderSource source, String database) {
+    public Set<String> readTables(DataProviderSource source, String database) throws SQLException {
         return getDataProviderService(source.getType()).readTables(source, database);
     }
 
     @Override
-    public Set<Column> readTableColumns(DataProviderSource source, String database, String table) {
+    public Set<Column> readTableColumns(DataProviderSource source, String database, String table) throws SQLException {
         return getDataProviderService(source.getType()).readTableColumns(source, database, table);
     }
 

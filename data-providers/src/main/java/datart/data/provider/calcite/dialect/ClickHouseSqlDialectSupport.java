@@ -16,38 +16,18 @@
  * limitations under the License.
  */
 
-package datart.data.provider.base;
+package datart.data.provider.calcite.dialect;
 
-import lombok.Data;
+import org.apache.calcite.sql.dialect.ClickHouseSqlDialect;
 
-import javax.validation.constraints.NotBlank;
+public class ClickHouseSqlDialectSupport extends ClickHouseSqlDialect implements FetchAndOffsetSupport {
 
-@Data
-public class JdbcDriverInfo {
+    private ClickHouseSqlDialectSupport(Context context) {
+        super(context);
+    }
 
-    @NotBlank
-    private String dbType;
-
-    private String version;
-
-    @NotBlank
-    private String name;
-
-    @NotBlank
-    private String driverClass;
-
-    @NotBlank
-    private String literalQuote;
-
-    @NotBlank
-    private String identifierQuote;
-
-    private String identifierEndQuote;
-
-    private String literalEndQuote;
-
-    private String adapterClass;
-
-    private String urlPrefix;
+    public ClickHouseSqlDialectSupport() {
+        this(DEFAULT_CONTEXT);
+    }
 
 }

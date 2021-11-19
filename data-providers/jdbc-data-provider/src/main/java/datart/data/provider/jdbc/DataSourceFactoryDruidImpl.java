@@ -21,7 +21,6 @@ package datart.data.provider.jdbc;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import datart.data.provider.JdbcDataProvider;
-import datart.data.provider.base.JdbcProperties;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
@@ -34,6 +33,10 @@ public class DataSourceFactoryDruidImpl implements DataSourceFactory<DruidDataSo
     public DruidDataSource createDataSource(JdbcProperties jdbcProperties) throws Exception {
         Properties properties = configDataSource(jdbcProperties);
         DruidDataSource druidDataSource = (DruidDataSource) DruidDataSourceFactory.createDataSource(properties);
+
+        druidDataSource.setBreakAfterAcquireFailure(true);
+        druidDataSource.setConnectionErrorRetryAttempts(0);
+
         log.info("druid data source created ({})", druidDataSource.getName());
         return druidDataSource;
     }
@@ -49,10 +52,12 @@ public class DataSourceFactoryDruidImpl implements DataSourceFactory<DruidDataSo
         //connect params
         pro.setProperty(DruidDataSourceFactory.PROP_DRIVERCLASSNAME, properties.getDriverClass());
         pro.setProperty(DruidDataSourceFactory.PROP_URL, properties.getUrl());
-        pro.setProperty(DruidDataSourceFactory.PROP_USERNAME, properties.getUser());
-        pro.setProperty(DruidDataSourceFactory.PROP_PASSWORD, properties.getPassword());
-        pro.setProperty(DruidDataSourceFactory.PROP_PASSWORD, properties.getPassword());
-
+        if (properties.getUser() != null) {
+            pro.setProperty(DruidDataSourceFactory.PROP_USERNAME, properties.getUser());
+        }
+        if (properties.getPassword() != null) {
+            pro.setProperty(DruidDataSourceFactory.PROP_PASSWORD, properties.getPassword());
+        }
         pro.setProperty(DruidDataSourceFactory.PROP_MAXWAIT, JdbcDataProvider.DEFAULT_MAX_WAIT.toString());
 
         pro.setProperty("druid.mysql.usePingMethod", "false");

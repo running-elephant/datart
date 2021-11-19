@@ -26,12 +26,12 @@ import datart.core.common.BeanUtils;
 import datart.core.data.provider.*;
 import datart.data.provider.JdbcDataProvider;
 import datart.data.provider.base.DataProviderException;
-import datart.data.provider.base.JdbcDriverInfo;
-import datart.data.provider.base.JdbcProperties;
+import datart.data.provider.calcite.dialect.CustomSqlDialect;
+import datart.data.provider.jdbc.JdbcDriverInfo;
+import datart.data.provider.jdbc.JdbcProperties;
 import datart.data.provider.calcite.dialect.FetchAndOffsetSupport;
 import datart.data.provider.jdbc.DataTypeUtils;
 import datart.data.provider.jdbc.SqlScriptRender;
-import datart.data.provider.jdbc.dialect.CustomSqlDialect;
 import datart.data.provider.local.LocalDB;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,6 +41,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
+import java.lang.reflect.Constructor;
 import java.sql.*;
 import java.util.*;
 
@@ -178,7 +179,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         try (Connection conn = getConn()) {
             Statement statement = conn.createStatement();
 
-            statement.setFetchSize((int) Math.min(pageInfo.isCountTotal() ? pageInfo.getPageSize() : 10_000, 10_000));
+            statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
 
             try (ResultSet resultSet = statement.executeQuery(selectSql)) {
                 try {
@@ -239,17 +240,34 @@ public class JdbcDataProviderAdapter implements Closeable {
         if (sqlDialect != null) {
             return sqlDialect;
         }
-        try {
-            sqlDialect = SqlDialect.DatabaseProduct.valueOf(driverInfo.getDbType().toUpperCase()).getDialect();
-        } catch (Exception ignored) {
-            log.warn("DBType " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
-            sqlDialect = CustomSqlDialect.create(driverInfo);
+
+        if (StringUtils.isNotBlank(driverInfo.getSqlDialect())) {
+            try {
+                Class<?> clz = Class.forName(driverInfo.getSqlDialect());
+                Class<?> superclass = clz.getSuperclass();
+                if (superclass.equals(CustomSqlDialect.class)) {
+                    Constructor<?> constructor = clz.getConstructor(JdbcDriverInfo.class);
+                    sqlDialect = (CustomSqlDialect) constructor.newInstance(driverInfo);
+                } else {
+                    sqlDialect = (SqlDialect) clz.newInstance();
+                }
+            } catch (Exception ignored) {
+                log.warn("Sql dialect " + driverInfo.getSqlDialect() + " not found, use default sql dialect");
+            }
         }
-        try {
-            sqlDialect = Application.getBean(sqlDialect.getClass());
-        } catch (Exception e) {
-            log.debug("Custom sql dialect for {} not found. using default", sqlDialect.getClass().getSimpleName());
+        if (sqlDialect == null) {
+            try {
+                sqlDialect = SqlDialect.DatabaseProduct.valueOf(driverInfo.getDbType().toUpperCase()).getDialect();
+            } catch (Exception ignored) {
+                log.warn("DBType " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
+                sqlDialect = new CustomSqlDialect(driverInfo);
+            }
         }
+//        try {
+//            sqlDialect = Application.getBean(sqlDialect.getClass());
+//        } catch (Exception e) {
+//            log.debug("Custom sql dialect for {} not found. using default", sqlDialect.getClass().getSimpleName());
+//        }
         return sqlDialect;
     }
 

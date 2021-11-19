@@ -19,10 +19,10 @@ import {
   BackgroundConfig,
   BorderConfig,
   strEnumType,
-} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSqlOperator } from 'globalConstants';
 import { WHITE } from 'styles/StyleConstants';
-import { WidgetType } from './pages/Dashboard/slice/types';
+import { WidgetType } from './pages/Board/slice/types';
 
 export const RGL_DRAG_HANDLE = 'dashboard-draggableHandle';
 export const STORAGE_BOARD_KEY_PREFIX = 'DATART_BOARD_DATA_';

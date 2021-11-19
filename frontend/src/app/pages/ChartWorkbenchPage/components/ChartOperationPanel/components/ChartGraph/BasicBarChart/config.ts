@@ -31,9 +31,8 @@ const config: ChartConfig = {
       label: 'deminsion',
       key: 'deminsion',
       required: true,
-      rows: [],
       type: 'aggregate',
-      limit: [0, 999],
+      limit: [1, 999],
     },
     {
       label: 'filter',

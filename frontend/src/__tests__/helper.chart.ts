@@ -17,15 +17,16 @@
  */
 
 import { expect } from '@jest/globals';
+import { isFunc } from 'utils/object';
 
 const isChartModelImpl = chart => {
   return (
-    !!chart &&
-    !!chart.meta &&
-    !!chart.onMount &&
-    !!chart.onUpdated &&
-    !!chart.onResize &&
-    !!chart.onUnMount
+    Boolean(chart) &&
+    Boolean(chart.meta) &&
+    isFunc(chart.onMount) &&
+    isFunc(chart.onUpdated) &&
+    isFunc(chart.onResize) &&
+    isFunc(chart.onUnMount)
   );
 };
 

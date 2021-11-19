@@ -18,7 +18,7 @@
 
 import { Form, FormItemProps } from 'antd';
 import { FC, memo } from 'react';
-import styeld from 'styled-components/macro';
+import styled from 'styled-components/macro';
 
 const FormItemEx: FC<FormItemProps> = memo(({ children, ...rest }) => {
   return <StyledFromItemEx {...rest}>{children}</StyledFromItemEx>;
@@ -26,7 +26,7 @@ const FormItemEx: FC<FormItemProps> = memo(({ children, ...rest }) => {
 
 export default FormItemEx;
 
-const StyledFromItemEx = styeld(Form.Item)`
+const StyledFromItemEx = styled(Form.Item)`
   margin: 0 0 0 0;
 
   .ant-form-item-control {

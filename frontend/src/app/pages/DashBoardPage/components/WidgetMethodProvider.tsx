@@ -30,6 +30,18 @@ import {
   WidgetMethodContext,
   WidgetMethodContextProps,
 } from '../contexts/WidgetMethodContext';
+import { boardActions } from '../pages/Board/slice';
+import {
+  getChartWidgetDataAsync,
+  getWidgetDataAsync,
+} from '../pages/Board/slice/thunk';
+import {
+  BoardLinkFilter,
+  JumpConfig,
+  Widget,
+  WidgetContentChartType,
+  WidgetType,
+} from '../pages/Board/slice/types';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
@@ -40,18 +52,6 @@ import {
   getEditChartWidgetDataAsync,
   getEditWidgetDataAsync,
 } from '../pages/BoardEditor/slice/thunk';
-import { boardActions } from '../pages/Dashboard/slice';
-import {
-  getChartWidgetDataAsync,
-  getWidgetDataAsync,
-} from '../pages/Dashboard/slice/thunk';
-import {
-  BoardLinkFilter,
-  JumpConfig,
-  Widget,
-  WidgetContentChartType,
-  WidgetType,
-} from '../pages/Dashboard/slice/types';
 import { widgetActionType } from './WidgetToolBar/config';
 
 const { confirm } = Modal;

@@ -41,8 +41,8 @@ export const FilterNumber: React.FC<FilterNumberProps> = memo(
 
     useEffect(() => {
       setCurSqlOperator(sqlOperator);
-      setStartValue(value[0] || 0);
-      setEndValue(value[1] || 0);
+      setStartValue(value[0]);
+      setEndValue(value[1]);
     }, [sqlOperator, value]);
 
     const onChangeValues = useCallback(
@@ -67,7 +67,7 @@ export const FilterNumber: React.FC<FilterNumberProps> = memo(
     );
     const valueChange = useCallback(
       value => {
-        onChangeValues([value || 0]);
+        onChangeValues([value]);
       },
       [onChangeValues],
     );

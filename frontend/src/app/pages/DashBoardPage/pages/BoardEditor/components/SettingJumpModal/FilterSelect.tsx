@@ -1,5 +1,5 @@
 import { Select } from 'antd';
-import { JumpConfigFilter } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { JumpConfigFilter } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FC, useCallback, useMemo } from 'react';
 import { FilterOptionItem } from './types';
 interface FilterSelectProps<T = JumpConfigFilter> {

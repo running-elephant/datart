@@ -17,7 +17,7 @@
  */
 // TODO delete file
 import { Card, FormInstance, Switch, Table } from 'antd';
-import { Widget } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { WidgetOption } from './RelatedWidgets';
 
@@ -50,19 +50,7 @@ export const SelectWidgetList: React.FC<SelectWidgetListProps> = memo(
       },
       [form],
     );
-    const linkedWidgets: LinkedWidget[] = useMemo(
-      () => [
-        // {
-        //   widgetId: '69619addb876482890030e28cdbada9f',
-        //   chartFilterCovered: true,
-        // },
-        // {
-        //   widgetId: 'dde9d324e4334c3ea74d76d42ac21394',
-        //   chartFilterCovered: true,
-        // },
-      ],
-      [],
-    );
+    const linkedWidgets: LinkedWidget[] = useMemo(() => [], []);
     useEffect(() => {
       const linkedWidgetIds = linkedWidgets.map(item => item.widgetId) || [];
       setSelectedWidgetIds(linkedWidgetIds);

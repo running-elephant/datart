@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package datart.data.provider.base;
+package datart.data.provider.jdbc;
 
 import lombok.Data;
 
@@ -30,7 +30,7 @@ public class JdbcProperties {
     private String dbType;
     @NotBlank
     private String url;
-    @NotBlank
+
     private String user;
 
     private String password;

@@ -60,9 +60,9 @@ public class SqlScriptRender extends ScriptRender {
 
     public static final char SQL_SEP = ';';
 
-    public static final String REG_SQL_SINGLE_LINE_COMMENT = "--.*\\n";
+    public static final String REG_SQL_SINGLE_LINE_COMMENT = "-{2,}.*([\r\n])";
 
-    public static final String REG_SQL_MULTI_LINE_COMMENT = "/\\*\\*(.|\\n)*\\*\\*/";
+    public static final String REG_SQL_MULTI_LINE_COMMENT = "/\\*+[\\s\\S]*\\*+/";
 
     private final SqlDialect sqlDialect;
 
@@ -85,7 +85,7 @@ public class SqlScriptRender extends ScriptRender {
         Map<String, ScriptVariable> variableMap = queryScript.getVariables()
                 .stream()
                 .collect(Collectors.toMap(v -> getVariablePattern(v.getName()), variable -> variable));
-        String srcSql = cleanupSql(selectSql);
+        String srcSql = selectSql;
         SqlNode sqlNode = null;
         try {
             sqlNode = parseSql(srcSql);
@@ -137,6 +137,9 @@ public class SqlScriptRender extends ScriptRender {
         if (StringUtils.isEmpty(selectSql0)) {
             throw new DataProviderException("No valid query statement");
         }
+
+        selectSql0 = cleanupSql(selectSql0);
+
         String selectSql = selectSql0;
 
         // build with execute params
@@ -186,10 +189,10 @@ public class SqlScriptRender extends ScriptRender {
     }
 
     private String cleanupSql(String sql) {
-        sql = sql.replace(CharUtils.CR, CharUtils.toChar(" "));
-        sql = sql.replace(CharUtils.LF, CharUtils.toChar(" "));
         sql = sql.replaceAll(REG_SQL_SINGLE_LINE_COMMENT, " ");
         sql = sql.replaceAll(REG_SQL_MULTI_LINE_COMMENT, " ");
+        sql = sql.replace(CharUtils.CR, CharUtils.toChar(" "));
+        sql = sql.replace(CharUtils.LF, CharUtils.toChar(" "));
         return sql.trim();
     }
 

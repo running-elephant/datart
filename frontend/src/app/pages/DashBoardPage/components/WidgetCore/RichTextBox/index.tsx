@@ -20,7 +20,7 @@ import {
   MediaWidgetContent,
   Widget,
   WidgetInfo,
-} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { DeltaStatic } from 'quill';
 import { ImageDrop } from 'quill-image-drop-module'; // 拖动加载图片组件。
 import QuillMarkdown from 'quilljs-markdown';

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { strEnumType } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { strEnumType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { VizType } from './../../MainPage/pages/VizPage/slice/types';
 export interface StoryBoardState {
   storyMap: Record<string, StoryBoard>;

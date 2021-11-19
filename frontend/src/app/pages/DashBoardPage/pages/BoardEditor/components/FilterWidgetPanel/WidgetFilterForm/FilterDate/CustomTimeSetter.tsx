@@ -74,7 +74,6 @@ export const CustomTimeSetter: FC<{
               noStyle
               name={['widgetFilter', 'filterDate', startOrEnd, 'exactTime']}
               validateTrigger={['onChange', 'onBlur']}
-              rules={[{ required: true }]}
             >
               <DatePicker
                 placeholder={t('pleaseSelect')}
@@ -133,7 +132,7 @@ export const CustomTimeSetter: FC<{
                 <Select style={{ width: '80px' }}>
                   {TIME_DIRECTION.map(item => {
                     return (
-                      <Select.Option value={item.value}>
+                      <Select.Option key={item.name} value={item.value}>
                         {t(item.name)}
                       </Select.Option>
                     );

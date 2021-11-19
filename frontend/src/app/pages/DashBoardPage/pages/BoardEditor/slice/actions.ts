@@ -17,10 +17,7 @@
  */
 import { Modal } from 'antd';
 import { ChartEditorBaseProps } from 'app/components/ChartEditor';
-import ChartDataView, {
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
-import { boardActions } from 'app/pages/DashBoardPage/pages/Dashboard/slice';
+import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   ContainerWidgetContent,
   DataChart,
@@ -29,16 +26,17 @@ import {
   Relation,
   Widget,
   WidgetFilterTypes,
-} from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   createInitWidgetConfig,
   createWidget,
 } from 'app/pages/DashBoardPage/utils/widget';
+import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import produce from 'immer';
 import { RootState } from 'types';
 import { v4 as uuidv4 } from 'uuid';
 import { editBoardStackActions, editDashBoardInfoActions } from '.';
-import { BoardType } from '../../Dashboard/slice/types';
+import { BoardType } from '../../Board/slice/types';
 import { WidgetFilterFormType } from './../components/FilterWidgetPanel/types';
 import { addWidgetsToEditBoard, getEditWidgetDataAsync } from './thunk';
 import { HistoryEditBoard } from './types';

@@ -17,7 +17,7 @@
  */
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
-import { ContainerItem } from 'app/pages/DashBoardPage/pages/Dashboard/slice/types';
+import { ContainerItem } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { INFO, SUCCESS } from 'styles/StyleConstants';

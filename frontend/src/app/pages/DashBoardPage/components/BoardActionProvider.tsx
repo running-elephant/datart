@@ -26,15 +26,15 @@ import {
   BoardActionContextProps,
 } from '../contexts/BoardActionContext';
 import { BoardContext } from '../contexts/BoardContext';
+import { boardActions } from '../pages/Board/slice';
+import { boardDownLoadAction } from '../pages/Board/slice/asyncActions';
+import { getWidgetDataAsync } from '../pages/Board/slice/thunk';
+import { Widget } from '../pages/Board/slice/types';
 import { editBoardStackActions } from '../pages/BoardEditor/slice';
 import {
   getEditWidgetDataAsync,
   toUpdateDashboard,
 } from '../pages/BoardEditor/slice/thunk';
-import { boardActions } from '../pages/Dashboard/slice';
-import { boardDownLoadAction } from '../pages/Dashboard/slice/asyncActions';
-import { getWidgetDataAsync } from '../pages/Dashboard/slice/thunk';
-import { Widget } from '../pages/Dashboard/slice/types';
 import { getNeedRefreshWidgetsByFilter } from '../utils/widget';
 
 export const BoardActionProvider: FC<{ id: string }> = ({
