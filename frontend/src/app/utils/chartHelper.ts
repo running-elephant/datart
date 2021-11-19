@@ -489,12 +489,15 @@ export function mergeChartStyleConfigs<
     if (!isUndefined(sEle?.['value'])) {
       tEle['value'] = sEle?.['value'];
     }
-    if ('rows' in tEle) {
+    if (!isEmptyArray(tEle?.rows)) {
       tEle['rows'] = mergeChartStyleConfigs(
         tEle.rows,
         sEle?.rows || [],
         options,
       );
+    } else if (sEle && !isEmptyArray(sEle?.rows)) {
+      // Note: we merge all rows data when target rows is emtpy
+      tEle['rows'] = sEle?.rows;
     }
   }
   return target;

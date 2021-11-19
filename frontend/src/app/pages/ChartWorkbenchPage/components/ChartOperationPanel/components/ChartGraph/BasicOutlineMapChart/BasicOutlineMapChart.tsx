@@ -324,13 +324,6 @@ class BasicOutlineMapChart extends Chart {
     return (properties?.cp || properties?.center)?.concat(values) || [];
   }
 
-  protected getLabelStyle(styles) {
-    const show = getStyleValueByGroup(styles, 'label', 'showLabel');
-    const position = getStyleValueByGroup(styles, 'label', 'position');
-    const font = getStyleValueByGroup(styles, 'label', 'font');
-    return { show, position, ...font };
-  }
-
   protected getVisualMap(
     objDataColumns,
     groupConfigs,

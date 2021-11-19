@@ -74,7 +74,12 @@ const ChartLifecycleAdapter: React.FC<{
           newBrokerRef.publish(
             ChartLifecycle.MOUNTED,
             { containerId, dataset, config },
-            { document, window, width: style.width, height: style.height },
+            {
+              document,
+              window,
+              width: style?.width,
+              height: style?.height,
+            },
           );
           eventBrokerRef.current = newBrokerRef;
           setContainerStatus(ContainerStatus.SUCCESS);
@@ -123,8 +128,8 @@ const ChartLifecycleAdapter: React.FC<{
       {
         document,
         window,
-        width: style.width,
-        height: style.height,
+        width: style?.width,
+        height: style?.height,
       },
     );
   }, [style.width, style.height, document, window]);

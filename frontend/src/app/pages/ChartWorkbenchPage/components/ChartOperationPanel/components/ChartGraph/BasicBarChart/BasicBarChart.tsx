@@ -453,7 +453,7 @@ class BasicBarChart extends Chart {
       axisLabel: {
         show: showLabel,
         rotate,
-        interval: showInterval ? interval : null,
+        interval: showInterval ? interval : 'auto',
         ...font,
       },
       axisLine: {
