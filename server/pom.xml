@@ -93,17 +93,6 @@
         </dependency>
         <dependency>
             <groupId>datart</groupId>
-            <artifactId>datart-data-provider</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>datart</groupId>
             <artifactId>datart-jdbc-data-provider</artifactId>
             <version>${project.version}</version>
         </dependency>
