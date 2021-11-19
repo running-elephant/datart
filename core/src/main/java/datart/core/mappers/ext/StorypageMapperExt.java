@@ -18,7 +18,7 @@ public interface StorypageMapperExt extends StorypageMapper {
 
 
     @Delete({
-            "DELETE FROM storypage sp WHERE sp.storyboard_id = #{storyboardId}"
+            "DELETE FROM storypage WHERE storyboard_id = #{storyboardId}"
     })
     int deleteByStoryboard(String storyboardId);
 }
