@@ -18,16 +18,18 @@
 
 package datart.data.provider.calcite.dialect;
 
-import org.apache.calcite.sql.dialect.ClickHouseSqlDialect;
+import datart.data.provider.jdbc.JdbcDriverInfo;
+import org.apache.calcite.sql.SqlNode;
+import org.apache.calcite.sql.SqlWriter;
 
-public class ClickHouseSqlDialectSupport extends ClickHouseSqlDialect implements FetchAndOffsetSupport {
+public class ImpalaSqlDialectSupport extends CustomSqlDialect implements FetchAndOffsetSupport {
 
-    private ClickHouseSqlDialectSupport(Context context) {
-        super(context);
+    public ImpalaSqlDialectSupport(JdbcDriverInfo driverInfo) {
+        super(driverInfo);
     }
 
-    public ClickHouseSqlDialectSupport() {
-        this(DEFAULT_CONTEXT);
+    @Override
+    public void unparseOffsetFetch(SqlWriter writer, SqlNode offset, SqlNode fetch) {
+        super.unparseFetchUsingLimit(writer, offset, fetch);
     }
-
 }

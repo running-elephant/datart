@@ -21,7 +21,6 @@ package datart.data.provider.jdbc;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import datart.data.provider.JdbcDataProvider;
-import datart.data.provider.base.JdbcProperties;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
@@ -34,6 +33,10 @@ public class DataSourceFactoryDruidImpl implements DataSourceFactory<DruidDataSo
     public DruidDataSource createDataSource(JdbcProperties jdbcProperties) throws Exception {
         Properties properties = configDataSource(jdbcProperties);
         DruidDataSource druidDataSource = (DruidDataSource) DruidDataSourceFactory.createDataSource(properties);
+
+        druidDataSource.setBreakAfterAcquireFailure(true);
+        druidDataSource.setConnectionErrorRetryAttempts(0);
+
         log.info("druid data source created ({})", druidDataSource.getName());
         return druidDataSource;
     }

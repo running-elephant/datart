@@ -27,7 +27,6 @@ import java.util.EnumSet;
 
 import static datart.core.data.provider.StdSqlOperator.*;
 
-@Component
 public class MysqlSqlStdOperatorSupport extends MysqlSqlDialect implements SqlStdOperatorSupport, FetchAndOffsetSupport {
 
     static {

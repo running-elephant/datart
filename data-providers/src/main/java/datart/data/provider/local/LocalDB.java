@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LocalDB {
 
-    private static final String MEM_URL = "jdbc:h2:mem:/LOG=0;DATABASE_TO_UPPER=false;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0";
+    private static final String MEM_URL = "jdbc:h2:mem:/LOG=0;MODE=MySQL;DATABASE_TO_UPPER=false;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0";
 
     private static String fileUrl;
 
@@ -99,9 +99,8 @@ public class LocalDB {
         }
         // add rows
         if (!CollectionUtils.isEmpty(dataframe.getRows())) {
-            for (int rowIdx = 0; rowIdx < dataframe.getRows().size(); rowIdx++) {
-                List<Object> rowVals = dataframe.getRows().get(rowIdx);
-                rs.addRow(rowVals.toArray());
+            for (List<Object> row : dataframe.getRows()) {
+                rs.addRow(row.toArray());
             }
         }
         return rs;
@@ -218,10 +217,10 @@ public class LocalDB {
                 , executeParam
                 , SQL_DIALECT
                 , Const.DEFAULT_VARIABLE_QUOTE);
+
         String sql = render.render(true, false, false);
 
         ResultSet resultSet = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY).executeQuery(sql);
-
         PageInfo pageInfo = executeParam.getPageInfo();
         resultSet.last();
         pageInfo.setTotal(resultSet.getRow());

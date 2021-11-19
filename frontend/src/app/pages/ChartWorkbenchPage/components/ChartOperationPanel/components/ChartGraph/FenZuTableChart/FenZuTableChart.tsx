@@ -59,10 +59,11 @@ class FenZuTableChart extends BasicTableChart {
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
+    const tablePagination = this.getPagingOptions(settingConfigs);
 
     return {
       rowKey: 'uid',
-      pagination: this.getPagingOptions(settingConfigs),
+      pagination: tablePagination,
       dataSource: this.generateTableRowUniqId(dataColumns),
       columns: this.getColumns(
         groupConfigs,
@@ -76,6 +77,7 @@ class FenZuTableChart extends BasicTableChart {
         dataset,
         clientWidth,
         clientHeight,
+        tablePagination,
       ),
     };
   }

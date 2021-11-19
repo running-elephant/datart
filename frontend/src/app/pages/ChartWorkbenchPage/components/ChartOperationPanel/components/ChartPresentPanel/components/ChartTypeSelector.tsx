@@ -46,7 +46,7 @@ const ChartTypeSelector: FC<{
   );
 
   return (
-    <StyeldChartTypeSelector>
+    <StyledChartTypeSelector>
       <TypeSelector
         fontSize={FONT_SIZE_HEADING}
         className={classnames({ active: type === ChartPresentType.GRAPH })}
@@ -68,13 +68,13 @@ const ChartTypeSelector: FC<{
       >
         <ConsoleSqlOutlined />
       </TypeSelector>
-    </StyeldChartTypeSelector>
+    </StyledChartTypeSelector>
   );
 });
 
 export default ChartTypeSelector;
 
-const StyeldChartTypeSelector = styled.div`
+const StyledChartTypeSelector = styled.div`
   display: flex;
   justify-content: flex-end;
   padding: ${SPACE} ${SPACE_XS} 0;

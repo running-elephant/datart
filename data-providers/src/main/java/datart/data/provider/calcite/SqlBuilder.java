@@ -248,7 +248,11 @@ public class SqlBuilder {
         if (functionColumnMap.containsKey(operator.getColumn())) {
             sqlNode = functionColumnMap.get(operator.getColumn());
         } else {
-            sqlNode = SqlNodeUtils.createSqlIdentifier(operator.getColumn(), T);
+            if (operator.getColumn() == null) {
+                sqlNode = SqlLiteral.createNull(SqlParserPos.ZERO);
+            } else {
+                sqlNode = SqlNodeUtils.createSqlIdentifier(operator.getColumn(), T);
+            }
         }
         if (operator.getAggOperator() != null) {
             SqlOperator aggOperator = mappingSqlAggFunction(operator.getAggOperator());
