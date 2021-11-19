@@ -49,6 +49,7 @@ const ChartIFrameContainer: React.FC<{
               height: 100%;
               background-color: transparent !important;
               margin: 0;
+              overflow:${isTable ? 'visible' : 'hidden'};
             }
            `}
           </style>

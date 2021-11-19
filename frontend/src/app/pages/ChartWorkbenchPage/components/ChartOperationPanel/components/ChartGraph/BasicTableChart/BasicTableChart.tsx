@@ -35,8 +35,8 @@ import Config from './config';
 class BasicTableChart extends ReactChart {
   isISOContainer = 'react-table';
   config = Config;
-
   protected isAutoMerge = false;
+  tableOptions = { dataset: {}, config: {} };
 
   constructor(props?) {
     super(
@@ -66,6 +66,8 @@ class BasicTableChart extends ReactChart {
   }
 
   onUpdated(options, context): void {
+    this.tableOptions = options;
+
     if (!this.isMatchRequirement(options.config)) {
       this.getInstance()?.unmount();
       return;
@@ -82,8 +84,10 @@ class BasicTableChart extends ReactChart {
   }
 
   onResize(opt: any, context): void {
-    this.getInstance()?.resize(context);
+    this.onUpdated(this.tableOptions, context);
   }
+
+  getTableY() {}
 
   getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
     if (!dataset || !config) {
@@ -115,9 +119,14 @@ class BasicTableChart extends ReactChart {
       r => r.type === ChartDataViewFieldType.NUMERIC,
     );
 
+    let tablePagination = this.getPagingOptions(
+      settingConfigs,
+      dataset?.pageInfo,
+    );
+
     return {
       rowKey: 'uid',
-      pagination: this.getPagingOptions(settingConfigs, dataset?.pageInfo),
+      pagination: tablePagination,
       dataSource: this.generateTableRowUniqId(dataColumns),
       columns: this.getColumns(
         groupConfigs,
@@ -131,6 +140,7 @@ class BasicTableChart extends ReactChart {
         dataset,
         clientWidth,
         clientHeight,
+        tablePagination,
       ),
     };
   }
@@ -419,7 +429,13 @@ class BasicTableChart extends ReactChart {
     };
   }
 
-  getAntdTableStyleOptions(styleConfigs, dataset: ChartDataset, width, height) {
+  getAntdTableStyleOptions(
+    styleConfigs,
+    dataset: ChartDataset,
+    width,
+    height,
+    tablePagination,
+  ) {
     const showTableBorder = this.getStyleValue(styleConfigs, [
       'style',
       'enableBorder',
@@ -428,7 +444,8 @@ class BasicTableChart extends ReactChart {
       'style',
       'enableFixedHeader',
     ]);
-    const tableSize = this.getStyleValue(styleConfigs, ['data', 'tableSize']);
+    const tableSize =
+      this.getStyleValue(styleConfigs, ['data', 'tableSize']) || 'default';
     const HEADER_HEIGHT = { default: 56, middle: 48, small: 40 };
     const PAGINATION_HEIGHT = { default: 64, middle: 56, small: 56 };
 
@@ -436,7 +453,10 @@ class BasicTableChart extends ReactChart {
       scroll: enableFixedHeader
         ? {
             scrollToFirstRowOnChange: true,
-            y: height - HEADER_HEIGHT[tableSize] - PAGINATION_HEIGHT[tableSize],
+            y:
+              height -
+              HEADER_HEIGHT[tableSize] -
+              (tablePagination ? PAGINATION_HEIGHT[tableSize] : 0),
           }
         : { scrollToFirstRowOnChange: true },
       bordered: !!showTableBorder,

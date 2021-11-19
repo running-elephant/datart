@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { EditFilled } from '@ant-design/icons';
+import { EllipsisOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu } from 'antd';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { BoardContext } from '../../contexts/BoardContext';
@@ -69,7 +69,7 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
         trigger={['click']}
         arrow
       >
-        <Button icon={<EditFilled />} type="link" />
+        <Button icon={<EllipsisOutlined />} type="link" />
       </Dropdown>
     );
   },
