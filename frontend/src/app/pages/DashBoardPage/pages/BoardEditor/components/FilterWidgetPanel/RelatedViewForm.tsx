@@ -33,26 +33,26 @@ import styled from 'styled-components/macro';
 import { ValueTypes } from './types';
 
 export interface RelatedViewFormProps {
+  relatedViews: RelatedView[];
   viewMap: Record<string, ChartDataView>;
   form: FormInstance<any> | undefined;
   fieldValueType: ValueTypes;
-  onChangeFieldProps: (views?: RelatedView[]) => void;
   queryVariables: Variable[];
+  onChangeFieldProps: (views?: RelatedView[]) => void;
 }
 const Option = Select.Option;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
-  ({ viewMap, form, onChangeFieldProps, queryVariables }) => {
+  ({ relatedViews, viewMap, queryVariables, onChangeFieldProps }) => {
     //renderOptions
     const renderOptions = useCallback(
       (index: number) => {
-        const relatedViews: RelatedView[] = form?.getFieldValue('relatedViews');
         if (!relatedViews) {
           return null;
         }
         if (
-          relatedViews[index].filterFieldCategory ===
+          relatedViews[index].relatedCategory ===
           ChartDataViewFieldCategory.Variable
         ) {
           // 变量
@@ -86,38 +86,35 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
           ));
         }
       },
-      [form, queryVariables, viewMap],
+      [queryVariables, relatedViews, viewMap],
     );
     const fieldValueChange = useCallback(
       (index: number) => (value, option) => {
-        const relatedViews: RelatedView[] = form?.getFieldValue('relatedViews');
         relatedViews[index].fieldValue = value;
         relatedViews[index].fieldValueType = option?.fieldvaluetype;
-        form?.setFieldsValue({ relatedViews: relatedViews });
 
         onChangeFieldProps(relatedViews);
       },
-      [onChangeFieldProps, form],
+      [relatedViews, onChangeFieldProps],
     );
 
     // fieldType
     const filterFieldCategoryChange = useCallback(
       (index: number) => (e: RadioChangeEvent) => {
-        const relatedViews: RelatedView[] = form?.getFieldValue('relatedViews');
-        relatedViews[index].filterFieldCategory = e.target.value;
+        relatedViews[index].relatedCategory = e.target.value;
         relatedViews[index].fieldValue = undefined;
-        form?.setFieldsValue({ relatedViews: relatedViews });
+
         onChangeFieldProps(relatedViews);
       },
-      [form, onChangeFieldProps],
+      [onChangeFieldProps, relatedViews],
     );
     const getViewName = useCallback(
       (index: number) => {
-        const relatedViews: RelatedView[] = form?.getFieldValue('relatedViews');
+        // const relatedViews: RelatedView[] = form?.getFieldValue('relatedViews');
         const name = viewMap[relatedViews[index]?.viewId]?.name || '';
         return name;
       },
-      [form, viewMap],
+      [viewMap, relatedViews],
     );
 
     return (
@@ -145,7 +142,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                 }
                 const baseField = trimmedRelatedViews[0].fieldValue;
                 const baseType = trimmedRelatedViews[0].fieldValueType;
-                const baseCategory = trimmedRelatedViews[0].filterFieldCategory;
+                const baseCategory = trimmedRelatedViews[0].relatedCategory;
                 let errField;
                 let errFieldType;
                 let errFieldCategory;
@@ -171,9 +168,9 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                   );
                 }
                 const fieldCategoryIsSame = trimmedRelatedViews.every(item => {
-                  const err = item.filterFieldCategory !== baseCategory;
+                  const err = item.relatedCategory !== baseCategory;
                   if (err) {
-                    errFieldCategory = item.filterFieldCategory;
+                    errFieldCategory = item.relatedCategory;
                     errFieldType = item.fieldValueType;
                     return false;
                   }

@@ -55,7 +55,7 @@ import { editBoardStackActions, editDashBoardInfoActions } from '../../slice';
 import { selectFilterPanel, selectSortAllWidgets } from '../../slice/selectors';
 import { addWidgetsToEditBoard } from '../../slice/thunk';
 import { RelatedViewForm } from './RelatedViewForm';
-import { RelatedWidgets, WidgetOption } from './RelatedWidgets';
+import { RelatedWidgetItem, RelatedWidgets } from './RelatedWidgets';
 import { ValueTypes, WidgetFilterFormType } from './types';
 import {
   formatWidgetFilter,
@@ -99,7 +99,8 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const [fieldCategory, setFieldCategory] =
     useState<ChartDataViewFieldCategory>(ChartDataViewFieldCategory.Field);
 
-  let widgetList = useRef<WidgetOption[]>([]);
+  const [relatedViews, setRelatedViews] = useState<RelatedView[]>([]);
+  let widgetList = useRef<RelatedWidgetItem[]>([]);
 
   const onChangeFieldProps = useCallback(
     (views: RelatedView[] | undefined) => {
@@ -121,8 +122,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
         trimmedViews[0].fieldValueType || ChartDataViewFieldType.STRING,
       );
       const hasVariable = trimmedViews.find(
-        view =>
-          view.filterFieldCategory === ChartDataViewFieldCategory.Variable,
+        view => view.relatedCategory === ChartDataViewFieldCategory.Variable,
       );
       // 如果有变量 就按变量处理
 
@@ -137,40 +137,34 @@ const FilterWidgetPanel: React.FC = memo(props => {
     [form],
   );
   const setViews = useCallback(
-    (widgetOptions: WidgetOption[]) => {
+    (widgetOptions: RelatedWidgetItem[]) => {
       widgetList.current = widgetOptions;
-      const relatedViews: RelatedView[] =
-        form?.getFieldValue('relatedViews') || [];
+
       const nextRelatedViews: RelatedView[] = [];
       widgetOptions.forEach(option => {
         const widget = widgetMap[option.widgetId];
         if (!widget) return;
         widget.viewIds.forEach((viewId, index) => {
-          const oldViewItem = relatedViews.find(view => view.viewId === viewId);
           const newViewItem = nextRelatedViews.find(
             view => view.viewId === viewId,
           );
-          if (!newViewItem) {
-            if (oldViewItem) {
-              nextRelatedViews.push({ ...oldViewItem });
-            } else {
-              const view = viewMap[viewId];
-              if (!view) return;
-              const relatedView: RelatedView = {
-                viewId: view.id,
-                filterFieldCategory: ChartDataViewFieldCategory.Field,
-                fieldValue: '',
-                fieldValueType: ChartDataViewFieldType.STRING,
-              };
-              nextRelatedViews.push(relatedView);
-            }
-          }
+          if (newViewItem) return;
+          const view = viewMap[viewId];
+          if (!view) return;
+          const relatedView: RelatedView = {
+            viewId: view.id,
+            relatedCategory: ChartDataViewFieldCategory.Field,
+            fieldValue: '',
+            fieldValueType: ChartDataViewFieldType.STRING,
+          };
+          nextRelatedViews.push(relatedView);
         });
       });
-      form?.setFieldsValue({ relatedViews: nextRelatedViews });
+      setRelatedViews(nextRelatedViews);
+      console.log('nextRelatedViews', nextRelatedViews);
       onChangeFieldProps(nextRelatedViews);
     },
-    [form, onChangeFieldProps, viewMap, widgetMap],
+    [onChangeFieldProps, viewMap, widgetMap],
   );
 
   // 初始化数据
@@ -199,9 +193,8 @@ const FilterWidgetPanel: React.FC = memo(props => {
     const widgetOptions = curFilterWidget?.relations
       .filter(ele => ele.config.type === 'filterToWidget')
       .map(item => {
-        const option: WidgetOption = {
+        const option: RelatedWidgetItem = {
           widgetId: item.targetId,
-          filterCovered: item.config!.filterToWidget!.widgetFilterCovered,
         };
         return option;
       });
@@ -227,7 +220,6 @@ const FilterWidgetPanel: React.FC = memo(props => {
                 type: 'filterToWidget',
                 filterToWidget: {
                   widgetRelatedViewIds: widget.viewIds,
-                  widgetFilterCovered: option.filterCovered,
                 },
               },
               id: uuidv4(),
@@ -282,7 +274,6 @@ const FilterWidgetPanel: React.FC = memo(props => {
                 type: 'filterToWidget',
                 filterToWidget: {
                   widgetRelatedViewIds: widget.viewIds,
-                  widgetFilterCovered: option.filterCovered,
                 },
               },
               id: uuidv4(),
@@ -349,6 +340,10 @@ const FilterWidgetPanel: React.FC = memo(props => {
       }),
     );
   }, [dispatch, form]);
+  const onChangeRelatedWidgets = (values: any) => {
+    console.log('values', values);
+    setViews(values);
+  };
   return (
     <Modal
       title={`${type} ${t(ControllerFacadeTypes.DropdownList)}`}
@@ -381,11 +376,14 @@ const FilterWidgetPanel: React.FC = memo(props => {
           </div>
           <div className="split-left">
             <RelatedWidgets
-              curWidget={curFilterWidget}
+              relatedWidgets={[
+                { widgetId: '0960ec696e5a4139a42aceb92f2fe5d3' },
+              ]}
               widgets={widgets}
-              onChange={setViews}
+              onChange={onChangeRelatedWidgets}
             />
             <RelatedViewForm
+              relatedViews={relatedViews}
               onChangeFieldProps={onChangeFieldProps}
               form={form}
               fieldValueType={fieldValueType}

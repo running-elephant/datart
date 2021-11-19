@@ -15,105 +15,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { FormInstance, Switch, Table } from 'antd';
+import { Table } from 'antd';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useEffect, useMemo, useState } from 'react';
 
-export type WidgetOption = {
+export type RelatedWidgetItem = {
   widgetId: string;
-  filterCovered: boolean;
 };
 export interface RelatedWidgetsProps {
+  relatedWidgets: RelatedWidgetItem[];
   widgets: Widget[];
-  form?: FormInstance<any> | undefined;
-  onChange: (widgetOptions: WidgetOption[]) => void;
-  curWidget?: Widget;
+  onChange?: (values: string[]) => void;
 }
 
 export const RelatedWidgets: React.FC<RelatedWidgetsProps> = memo(
-  ({ widgets, form, onChange, curWidget }) => {
+  ({ widgets, relatedWidgets, onChange }) => {
     const [selectedWidgetIds, setSelectedWidgetIds] = useState<string[]>([]);
-    const [filterCoveredIds, setFilterCoveredIds] = useState<string[]>([]);
 
-    const onSetViews = useCallback(
-      (widgetIds: string[], coveredIds: string[]) => {
-        const widgetOptions = widgetIds.map(wid => {
-          const option: WidgetOption = {
-            widgetId: wid,
-            filterCovered: coveredIds.includes(wid),
-          };
-          return option;
-        });
-        onChange(widgetOptions);
-      },
-      [onChange],
-    );
-
-    useEffect(() => {
-      if (!curWidget) {
-        return;
-      }
-      const relations = curWidget?.relations || [];
-      let pickedWIds: string[] = [];
-      let coveredWIds: string[] = [];
-      // let widgetOptions: WidgetOption[] = [];
-      relations?.forEach(relation => {
-        if (relation.config.type === 'filterToWidget') {
-          pickedWIds.push(relation.targetId);
-          if (relation.config.filterToWidget!.widgetFilterCovered) {
-            coveredWIds.push(relation.targetId);
-          }
-        }
-      });
-
-      setSelectedWidgetIds(pickedWIds);
-      setFilterCoveredIds(coveredWIds);
-    }, [curWidget, onSetViews]);
+    console.log('selectedWidgetIds', selectedWidgetIds);
 
     const rowSelection = useMemo(() => {
       return {
         selectedRowKeys: selectedWidgetIds,
         onChange: (keys: React.Key[]) => {
           setSelectedWidgetIds(keys as string[]);
-          onSetViews(keys as string[], filterCoveredIds);
+          // onChange?.(keys as string[]);
         },
       };
-    }, [filterCoveredIds, onSetViews, selectedWidgetIds]);
-    const changeFilterCovered = useCallback(
-      (targetId: string) => (bool: boolean) => {
-        let resIds = [...filterCoveredIds];
-        if (bool) {
-          resIds.push(targetId);
-        } else {
-          resIds = resIds.filter(id => id !== targetId);
-        }
-        setFilterCoveredIds(resIds);
-        onSetViews(selectedWidgetIds, resIds);
-      },
-      [filterCoveredIds, onSetViews, selectedWidgetIds],
-    );
+    }, [selectedWidgetIds]);
+
+    useEffect(() => {
+      if (!relatedWidgets || relatedWidgets.length === 0) {
+        return;
+      }
+      let pickedWIds: string[] = [];
+      relatedWidgets?.forEach(item => {
+        pickedWIds.push(item.widgetId);
+      });
+
+      setSelectedWidgetIds(pickedWIds);
+    }, [relatedWidgets]);
+
     const columns = useMemo(
       () => [
         {
           title: '',
-          render: (w: Widget) => <a>{w.config.name}</a>,
-        },
-
-        {
-          title: '',
-          key: 'action',
-          render: (text, record: Widget) =>
-            selectedWidgetIds.includes(record.id) && (
-              <Switch
-                checkedChildren="已接管组件筛选"
-                unCheckedChildren="未接管组件筛选"
-                onChange={changeFilterCovered(record.id)}
-                checked={filterCoveredIds.includes(record.id)}
-              />
-            ),
+          render: (w: Widget) => <span>{w.config.name}</span>,
         },
       ],
-      [changeFilterCovered, filterCoveredIds, selectedWidgetIds],
+      [],
     );
     return (
       <>
@@ -124,7 +74,6 @@ export const RelatedWidgets: React.FC<RelatedWidgetsProps> = memo(
             type: 'checkbox',
             ...rowSelection,
           }}
-          // scroll={{ y: 120 }}
           size={'small'}
           pagination={{ pageSize: 6 }}
           bordered

@@ -104,8 +104,6 @@ export const getAllFiltersOfOneWidget = (values: {
     );
     if (!hasRelation) return;
 
-    const { widgetFilterCovered } = hasRelation.config.filterToWidget!;
-
     const content = filterWidget.config.content as ControllerWidgetContent;
     const { fieldValueType, relatedViews, widgetFilter } = content;
     const relatedViewItem = relatedViews
@@ -118,7 +116,7 @@ export const getAllFiltersOfOneWidget = (values: {
       return;
     }
     if (
-      relatedViewItem.filterFieldCategory ===
+      relatedViewItem.relatedCategory ===
       ChartDataViewFieldCategory.Variable
     ) {
       const key = String(relatedViewItem.fieldValue);
@@ -140,7 +138,7 @@ export const getAllFiltersOfOneWidget = (values: {
       }
     }
     if (
-      relatedViewItem.filterFieldCategory === ChartDataViewFieldCategory.Field
+      relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Field
     ) {
       const filter: ChartRequestFilter = {
         aggOperator: null,
@@ -149,10 +147,6 @@ export const getAllFiltersOfOneWidget = (values: {
         values: values,
       };
       filters.push(filter);
-    }
-
-    if (widgetFilterCovered) {
-      covered = true;
     }
   });
 

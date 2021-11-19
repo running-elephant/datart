@@ -50,7 +50,7 @@ export const RelatedViews: React.FC<RelatedViewFormProps> = memo(
           return null;
         }
         if (
-          relatedViews[index].filterFieldCategory ===
+          relatedViews[index].relatedCategory ===
           ChartDataViewFieldCategory.Variable
         ) {
           // return viewMap[relatedView.viewId].variables?.map
@@ -93,7 +93,7 @@ export const RelatedViews: React.FC<RelatedViewFormProps> = memo(
     const filterFieldCategoryChange = useCallback(
       (index: number) => (e: RadioChangeEvent) => {
         const relatedViews: RelatedView[] = form?.getFieldValue('relatedViews');
-        relatedViews[index].filterFieldCategory = e.target.value;
+        relatedViews[index].relatedCategory = e.target.value;
         form?.setFieldsValue({ relatedViews: relatedViews });
         // onChangeFieldProps(relatedViews);
       },

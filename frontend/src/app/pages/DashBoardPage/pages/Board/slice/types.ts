@@ -218,7 +218,6 @@ export interface RelationConfig {
   type: 'filterToWidget' | 'filterToFilter' | 'widgetToWidget';
   filterToWidget?: {
     widgetRelatedViewIds: string[];
-    widgetFilterCovered: boolean;
   };
   widgetToWidget?: {
     sameView: boolean;
@@ -228,7 +227,7 @@ export interface RelationConfig {
 }
 export interface RelatedView {
   viewId: string;
-  filterFieldCategory: ChartDataViewFieldCategory;
+  relatedCategory: ChartDataViewFieldCategory;
   fieldValue: string | number | Date | undefined;
   fieldValueType: ChartDataViewFieldType | undefined;
 }
