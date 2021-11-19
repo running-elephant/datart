@@ -25,7 +25,7 @@ import {
 import { transferChartConfig } from 'app/pages/MainPage/pages/VizPage/slice/utils';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
-import { errorHandle } from 'utils/utils';
+import { errorHandle, reduxActionErrorHandler } from 'utils/utils';
 import { fetchShareDataSetByPreviewChartAction } from './thunks';
 // import { fetchShareDataSetByPreviewChartAction } from './thunk';
 import { ExecuteToken, SharePageState, ShareVizInfo } from './types';
@@ -158,7 +158,7 @@ export const slice = createSlice({
       })
       .addMatcher(isRejected, (_, action) => {
         if (isMySliceAction(action, slice.name)) {
-          errorHandle(action?.error);
+          reduxActionErrorHandler(action);
         }
       });
   },
