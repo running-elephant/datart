@@ -8,6 +8,7 @@ import {
 } from '@ant-design/icons';
 import { Divider, Dropdown, Menu, Select, Space, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
+import { Chronograph } from 'app/components/Chronograph';
 import { CommonFormTypes } from 'globalConstants';
 import React, { memo, useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -78,6 +79,9 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
   const size = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'size' }),
   ) as number;
+  const error = useSelector(state =>
+    selectCurrentEditingViewAttr(state, { name: 'error' }),
+  ) as string;
   const ViewIndex = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'index' }),
   ) as number;
@@ -210,6 +214,18 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
           >
             <ToolbarButton size="small">{`Limit: ${size}`}</ToolbarButton>
           </Dropdown>
+          <Chronograph
+            running={stage === ViewViewModelStages.Running}
+            status={
+              error
+                ? 'error'
+                : stage >= ViewViewModelStages.Running
+                ? stage === ViewViewModelStages.Running
+                  ? 'processing'
+                  : 'success'
+                : 'default'
+            }
+          />
         </Space>
       </Operates>
       {allowManage && (
