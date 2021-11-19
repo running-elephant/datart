@@ -36,7 +36,7 @@ import { RootState } from 'types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { request } from 'utils/request';
-import { errorHandle, listToTree } from 'utils/utils';
+import { listToTree, reduxActionErrorHandler, rejectHandle } from 'utils/utils';
 import ChartRequest, {
   ChartDataRequestBuilder,
 } from '../models/ChartHttpRequest';
@@ -161,7 +161,7 @@ export const initWorkbenchAction = createAsyncThunk(
         await thunkAPI.dispatch(refreshDatasetAction({}));
       }
     } catch (error) {
-      console.error('initWorkbenchAction errors: ', error);
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
   },
 );
@@ -169,34 +169,46 @@ export const initWorkbenchAction = createAsyncThunk(
 export const fetchDataSetAction = createAsyncThunk(
   'workbench/fetchDataSetAction',
   async (arg: ChartRequest, thunkAPI) => {
-    const response = await request({
-      method: 'POST',
-      url: `data-provider/execute`,
-      data: arg,
-    });
-    return response.data;
+    try {
+      const response = await request({
+        method: 'POST',
+        url: `data-provider/execute`,
+        data: arg,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectHandle(error, thunkAPI.rejectWithValue);
+    }
   },
 );
 
 export const fetchDataViewsAction = createAsyncThunk(
   'workbench/fetchDataViewsAction',
   async (arg: { orgId }, thunkAPI) => {
-    const response = await request<any[]>({
-      method: 'GET',
-      url: `views`,
-      params: arg,
-    });
-    return response.data;
+    try {
+      const response = await request<any[]>({
+        method: 'GET',
+        url: `views`,
+        params: arg,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectHandle(error, thunkAPI.rejectWithValue);
+    }
   },
 );
 export const fetchViewDetailAction = createAsyncThunk(
   'workbench/fetchViewDetailAction',
   async (arg: { viewId }, thunkAPI) => {
-    const response = await request<View>({
-      method: 'GET',
-      url: `views/${arg}`,
-    });
-    return response.data;
+    try {
+      const response = await request<View>({
+        method: 'GET',
+        url: `views/${arg}`,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectHandle(error, thunkAPI.rejectWithValue);
+    }
   },
 );
 
@@ -210,45 +222,57 @@ export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
     },
     thunkAPI,
   ) => {
-    await thunkAPI.dispatch(workbenchSlice.actions.updateChartConfig(arg));
-    if (arg.needRefresh) {
-      thunkAPI.dispatch(refreshDatasetAction({}));
+    try {
+      await thunkAPI.dispatch(workbenchSlice.actions.updateChartConfig(arg));
+      if (arg.needRefresh) {
+        thunkAPI.dispatch(refreshDatasetAction({}));
+      }
+    } catch (error) {
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
   },
 );
 export const refreshDatasetAction = createAsyncThunk(
   'workbench/refreshDatasetAction',
   async (arg: { pageInfo? }, thunkAPI) => {
-    const state = thunkAPI.getState() as any;
-    const workbenchState = state.workbench as typeof initState;
-    if (!workbenchState.currentDataView?.id) {
-      return;
+    try {
+      const state = thunkAPI.getState() as any;
+      const workbenchState = state.workbench as typeof initState;
+      if (!workbenchState.currentDataView?.id) {
+        return;
+      }
+      const builder = new ChartDataRequestBuilder(
+        {
+          ...workbenchState.currentDataView,
+          view: workbenchState?.backendChart?.view,
+        },
+        workbenchState.chartConfig?.datas,
+        workbenchState.chartConfig?.settings,
+        arg?.pageInfo,
+        true,
+      );
+      const requestParams = builder.build();
+      thunkAPI.dispatch(fetchDataSetAction(requestParams));
+    } catch (error) {
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
-    const builder = new ChartDataRequestBuilder(
-      {
-        ...workbenchState.currentDataView,
-        view: workbenchState?.backendChart?.view,
-      },
-      workbenchState.chartConfig?.datas,
-      workbenchState.chartConfig?.settings,
-      arg?.pageInfo,
-      true,
-    );
-    const requestParams = builder.build();
-    thunkAPI.dispatch(fetchDataSetAction(requestParams));
   },
 );
 export const fetchChartAction = createAsyncThunk(
   'workbench/fetchChartAction',
-  async (arg: { chartId?: string; backendChart?: BackendChart }) => {
-    if (arg?.chartId) {
-      const response = await request<BackendChart>({
-        method: 'GET',
-        url: `viz/datacharts/${arg.chartId}`,
-      });
-      return response.data;
+  async (arg: { chartId?: string; backendChart?: BackendChart }, thunkAPI) => {
+    try {
+      if (arg?.chartId) {
+        const response = await request<BackendChart>({
+          method: 'GET',
+          url: `viz/datacharts/${arg.chartId}`,
+        });
+        return response.data;
+      }
+      return arg.backendChart;
+    } catch (error) {
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
-    return arg.backendChart;
   },
 );
 export const updateChartAction = createAsyncThunk(
@@ -257,31 +281,35 @@ export const updateChartAction = createAsyncThunk(
     arg: { name; viewId; graphId; chartId; index; parentId },
     thunkAPI,
   ) => {
-    const state = thunkAPI.getState() as any;
-    const workbenchState = state.workbench as typeof initState;
+    try {
+      const state = thunkAPI.getState() as any;
+      const workbenchState = state.workbench as typeof initState;
 
-    const stringConfig = JSON.stringify({
-      chartConfig: workbenchState.chartConfig,
-      chartGraphId: arg.graphId,
-      computedFields: workbenchState.currentDataView?.computedFields || [],
-    } as BackendChartConfig);
+      const stringConfig = JSON.stringify({
+        chartConfig: workbenchState.chartConfig,
+        chartGraphId: arg.graphId,
+        computedFields: workbenchState.currentDataView?.computedFields || [],
+      } as BackendChartConfig);
 
-    const response = await request<{
-      data: boolean;
-    }>({
-      method: 'PUT',
-      url: `viz/datacharts/${arg.chartId}`,
-      data: {
-        id: arg.chartId,
-        index: arg.index,
-        parent: arg.parentId,
-        name: arg.name,
-        viewId: arg.viewId,
-        config: stringConfig,
-        permissions: [],
-      },
-    });
-    return response.data;
+      const response = await request<{
+        data: boolean;
+      }>({
+        method: 'PUT',
+        url: `viz/datacharts/${arg.chartId}`,
+        data: {
+          id: arg.chartId,
+          index: arg.index,
+          parent: arg.parentId,
+          name: arg.name,
+          viewId: arg.viewId,
+          config: stringConfig,
+          permissions: [],
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectHandle(error, thunkAPI.rejectWithValue);
+    }
   },
 );
 
@@ -432,7 +460,7 @@ const workbenchSlice = createSlice({
       })
       .addMatcher(isRejected, (_, action) => {
         if (isMySliceAction(action, workbenchSlice.name)) {
-          errorHandle(action?.error);
+          reduxActionErrorHandler(action);
         }
       });
   },

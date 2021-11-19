@@ -3,7 +3,7 @@ import { ChartDataSectionType } from 'app/types/ChartConfig';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { CloneValueDeep } from 'utils/object';
-import { errorHandle } from 'utils/utils';
+import { reduxActionErrorHandler } from 'utils/utils';
 import { v4 as uuidv4 } from 'uuid';
 import {
   addStoryboard,
@@ -538,7 +538,7 @@ const slice = createSlice({
 
     builder.addMatcher(isRejected, (_, action) => {
       if (isMySliceAction(action, slice.name)) {
-        errorHandle(action?.error);
+        reduxActionErrorHandler(action);
       }
     });
   },

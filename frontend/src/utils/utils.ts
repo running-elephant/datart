@@ -33,6 +33,14 @@ export function errorHandle(error) {
   return error;
 }
 
+export function reduxActionErrorHandler(errorAction) {
+  if (errorAction?.payload) {
+    message.error(errorAction?.payload);
+  } else if (errorAction?.error) {
+    message.error(errorAction?.error.message);
+  }
+}
+
 export function rejectHandle(error, rejectWithValue) {
   if ((error as AxiosError).response) {
     return rejectWithValue(
