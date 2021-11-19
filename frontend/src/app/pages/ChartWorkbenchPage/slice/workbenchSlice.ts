@@ -23,6 +23,7 @@ import {
   isRejected,
   PayloadAction,
 } from '@reduxjs/toolkit';
+import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { ResourceTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
@@ -425,7 +426,7 @@ const workbenchSlice = createSlice({
           const originalConfig = currentChart?.config!;
           state.chartConfig = mergeConfig(
             originalConfig,
-            newChartConfig as ChartConfig,
+            migrateChartConfig(newChartConfig) as ChartConfig,
           );
         }
       })

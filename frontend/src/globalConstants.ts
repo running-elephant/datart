@@ -168,7 +168,6 @@ export enum NumberUnitKey {
   Million = 'million',
   Billion = 'billion',
   // Chinese Unit
-  Qian = 'qian',
   Wan = 'wan',
   Yi = 'yi',
 }
@@ -179,7 +178,6 @@ export const NumericUnitDescriptions = new Map<NumberUnitKey, [number, string]>(
     [NumberUnitKey.Thousand, [10 ** 3, 'K']],
     [NumberUnitKey.Million, [10 ** 6, 'M']],
     [NumberUnitKey.Billion, [10 ** 10, 'B']],
-    [NumberUnitKey.Qian, [10 ** 3, '千']],
     [NumberUnitKey.Wan, [10 ** 4, '万']],
     [NumberUnitKey.Yi, [10 ** 8, '亿']],
   ],

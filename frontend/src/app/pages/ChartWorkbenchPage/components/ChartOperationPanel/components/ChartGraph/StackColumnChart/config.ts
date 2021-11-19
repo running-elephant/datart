@@ -21,15 +21,15 @@ import { ChartConfig } from 'app/types/ChartConfig';
 const config: ChartConfig = {
   datas: [
     {
-      label: 'metrics',
-      key: 'metrics',
+      label: 'dimension',
+      key: 'dimension',
       required: true,
       type: 'group',
       limit: [0, 1],
     },
     {
-      label: 'deminsion',
-      key: 'deminsion',
+      label: 'metrics',
+      key: 'metrics',
       required: true,
       rows: [],
       type: 'aggregate',
@@ -78,11 +78,6 @@ const config: ChartConfig = {
           label: 'bar.width',
           key: 'width',
           default: 0,
-          comType: 'inputNumber',
-        },
-        {
-          label: 'bar.gap',
-          key: 'gap',
           comType: 'inputNumber',
         },
       ],

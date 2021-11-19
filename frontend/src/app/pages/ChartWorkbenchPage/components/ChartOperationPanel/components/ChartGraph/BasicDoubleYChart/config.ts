@@ -21,20 +21,20 @@ import { ChartConfig } from 'app/types/ChartConfig';
 const config: ChartConfig = {
   datas: [
     {
-      label: 'metrics',
-      key: 'metrics',
+      label: 'dimension',
+      key: 'dimension',
       required: true,
       type: 'group',
     },
     {
       label: 'axis.y.left',
-      key: 'deminsionL',
+      key: 'metricsL',
       required: true,
       type: 'aggregate',
     },
     {
       label: 'axis.y.right',
-      key: 'deminsionR',
+      key: 'metricsR',
       required: true,
       type: 'aggregate',
     },

@@ -21,14 +21,14 @@ import { ChartConfig } from 'app/types/ChartConfig';
 const config: ChartConfig = {
   datas: [
     {
-      label: 'metrics',
-      key: 'metrics',
+      label: 'dimension',
+      key: 'dimension',
       required: true,
       type: 'group',
     },
     {
-      label: 'deminsionAndColor',
-      key: 'deminsion',
+      label: 'metricsAndColor',
+      key: 'metrics',
       required: true,
       type: 'aggregate',
       actions: {
@@ -247,7 +247,7 @@ const config: ChartConfig = {
           min: '最小值',
           max: '最大值',
         },
-        deminsionAndColor: '指标(颜色)',
+        metricsAndColor: '指标(颜色)',
         label: {
           title: '标签',
           showLabel: '显示标签',

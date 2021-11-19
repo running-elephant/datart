@@ -215,8 +215,8 @@
         }
       },
       "data": {
+        "dimension": "Dimension",
         "metrics": "Metric",
-        "deminsion": "Deminsion",
         "mixed": "Mixed",
         "filter": "Filter",
         "colorize": "Color",

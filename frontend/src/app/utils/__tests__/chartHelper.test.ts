@@ -83,6 +83,22 @@ describe('Chart Helper ', () => {
       [{ value: 2, rows: [{ value: 2 }] }],
     ],
     [
+      [{ value: 1, rows: null }],
+      [
+        { value: 2, rows: [{ value: 2, b: 2 }] },
+        { value: 3, rows: [{ value: 3 }] },
+      ],
+      [{ value: 2, rows: [{ value: 2, b: 2 }] }],
+    ],
+    [
+      [{ value: 1, rows: [] }],
+      [
+        { value: 2, rows: [{ value: 2, b: 2, c: 2, d: 2 }] },
+        { value: 3, rows: [{ value: 3 }] },
+      ],
+      [{ value: 2, rows: [{ value: 2, b: 2, c: 2, d: 2 }] }],
+    ],
+    [
       [{ key: 'a', value: 1 }],
       [{ key: 'a', value: 2 }],
       [{ key: 'a', value: 2 }],

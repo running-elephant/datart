@@ -216,8 +216,8 @@
         }
       },
       "data": {
-        "metrics": "维度",
-        "deminsion": "指标",
+        "dimension": "维度",
+        "metrics": "指标",
         "mixed": "混合",
         "filter": "筛选",
         "colorize": "着色",

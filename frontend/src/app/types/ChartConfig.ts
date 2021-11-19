@@ -176,6 +176,7 @@ export const ChartStyleSectionComponentType = {
   FONTSIZE: 'fontSize',
   FONTCOLOR: 'fontColor',
   INPUTNUMBER: 'inputNumber',
+  INPUTPERCENTAGE: 'inputPercentage',
   SLIDER: 'slider',
   GROUP: 'group',
   CACHE: 'cache',

@@ -107,18 +107,20 @@ class BasicDoubleYChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
-    const leftDeminsionConfigs = dataConfigs
+    const leftMetricsConfigs = dataConfigs
       .filter(
-        c =>
-          c.type === ChartDataSectionType.AGGREGATE && c.key === 'deminsionL',
+        c => c.type === ChartDataSectionType.AGGREGATE && c.key === 'metricsL',
       )
       .flatMap(config => config.rows || []);
-    const rightDeminsionConfigs = dataConfigs
+    const rightMetricsConfigs = dataConfigs
       .filter(
-        c =>
-          c.type === ChartDataSectionType.AGGREGATE && c.key === 'deminsionR',
+        c => c.type === ChartDataSectionType.AGGREGATE && c.key === 'metricsR',
       )
       .flatMap(config => config.rows || []);
+
+    if (!leftMetricsConfigs.concat(rightMetricsConfigs)?.length) {
+      return {};
+    }
 
     return {
       tooltip: {
@@ -129,7 +131,7 @@ class BasicDoubleYChart extends Chart {
         formatter: this.getTooltipFormmaterFunc(
           styleConfigs,
           groupConfigs,
-          leftDeminsionConfigs.concat(rightDeminsionConfigs),
+          leftMetricsConfigs.concat(rightMetricsConfigs),
           [],
           infoConfigs,
           dataColumns,
@@ -138,21 +140,19 @@ class BasicDoubleYChart extends Chart {
       grid: this.getGrid(styleConfigs),
       legend: this.getLegend(
         styleConfigs,
-        leftDeminsionConfigs
-          .concat(rightDeminsionConfigs)
-          .map(getColumnRenderName),
+        leftMetricsConfigs.concat(rightMetricsConfigs).map(getColumnRenderName),
       ),
       xAxis: this.getXAxis(styleConfigs, groupConfigs, dataColumns),
       yAxis: this.getYAxis(
         styleConfigs,
-        leftDeminsionConfigs,
-        rightDeminsionConfigs,
+        leftMetricsConfigs,
+        rightMetricsConfigs,
       ),
       series: this.getSeries(
         styleConfigs,
         settingConfigs,
-        leftDeminsionConfigs,
-        rightDeminsionConfigs,
+        leftMetricsConfigs,
+        rightMetricsConfigs,
         dataColumns,
       ),
     };
@@ -197,6 +197,7 @@ class BasicDoubleYChart extends Chart {
             ...getExtraSeriesDataFormat(config?.format),
             value: dc[getValueByColumnKey(config)],
           })),
+          ...this.getItemStyle(config),
           ...this.getGraphStyle(graphType, graphStyle),
           ...this.getLabelStyle(styles, direction),
           ...this.getSeriesStyle(styles),
@@ -232,6 +233,15 @@ class BasicDoubleYChart extends Chart {
         return config;
       });
     return series;
+  }
+
+  getItemStyle(config) {
+    const color = config?.color?.start;
+    return {
+      itemStyle: {
+        color,
+      },
+    };
   }
 
   getGraphStyle(graphType, style) {
