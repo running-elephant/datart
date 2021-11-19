@@ -31,7 +31,7 @@ class ScatterOutlineMapChart extends BasicOutlineMapChart {
       requirements: [
         {
           group: 1,
-          aggregate: [1, 2],
+          aggregate: 1,
         },
       ],
     });

@@ -21,22 +21,18 @@ import { ChartConfig } from 'app/types/ChartConfig';
 const config: ChartConfig = {
   datas: [
     {
-      label: 'section.legend',
-      key: 'color',
-      type: 'color',
-      required: true,
-    },
-    {
-      label: 'section.detail',
+      label: 'dimension',
       key: 'dimension',
       required: true,
       type: 'group',
+      limit: [0, 1],
     },
     {
       label: 'metrics',
       key: 'metrics',
       required: true,
       type: 'aggregate',
+      limit: [1, 999],
     },
     {
       label: 'filter',

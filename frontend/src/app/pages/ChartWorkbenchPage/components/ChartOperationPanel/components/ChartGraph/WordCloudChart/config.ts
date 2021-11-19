@@ -25,12 +25,14 @@ const config: ChartConfig = {
       key: 'dimension',
       required: true,
       type: 'group',
+      limit: 1,
     },
     {
       label: 'metrics',
       key: 'metrics',
       required: true,
       type: 'aggregate',
+      limit: 1,
     },
     {
       label: 'filter',
