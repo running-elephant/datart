@@ -101,15 +101,20 @@ export const fetchEditBoardDetail = createAsyncThunk<
 
     const dashboard = getDashBoardByResBoard(data);
 
-    const { datacharts: serverDataCharts, views: serverViews, widgets } = data;
+    const {
+      datacharts: serverDataCharts,
+      views: serverViews,
+      widgets: serverWidgets,
+    } = data;
     // TODO
     const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
     const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(
-      widgets,
+      serverWidgets,
       dataCharts,
     );
     const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
-    const widgetIds = Object.values(widgetMap).map(w => w.id);
+    // TODO xld migration about filter
+    const widgetIds = serverWidgets.map(w => w.id);
     const boardInfo = getInitBoardInfo(dashboard.id, widgetIds);
     // datacharts
 
