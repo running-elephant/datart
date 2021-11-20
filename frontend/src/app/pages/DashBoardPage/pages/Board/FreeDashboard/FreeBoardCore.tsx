@@ -18,7 +18,7 @@
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetAllProvider';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useCreateWidget';
+import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import { selectLayoutWidgetMapById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useContext, useMemo } from 'react';

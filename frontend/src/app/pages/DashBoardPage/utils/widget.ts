@@ -634,13 +634,13 @@ export const convertWrapChartWidget = (params: {
  * @description 'get all filter widget of board'
  */
 export const getAllControlWidget = (widgetMap: Record<string, Widget>) => {
-  const filterWidgetMap = Object.values(widgetMap)
+  const controlWidgetMap = Object.values(widgetMap)
     .filter(widget => widget.config.type === 'controller')
     .reduce((acc, cur) => {
       acc[cur.id] = cur;
       return acc;
     }, {} as Record<string, Widget>);
-  return filterWidgetMap;
+  return controlWidgetMap;
 };
 export const getOtherStringControlWidgets = (
   allWidgets: Widget[],
@@ -659,53 +659,32 @@ export const getOtherStringControlWidgets = (
     return allFilterWidgets.filter(ele => ele.id !== widgetId);
   }
 };
-/**
- * @param 'filterWidgetMap'
- * @description ''
- */
-export const getAllFixedFilterWidgetSortedIds = (
-  widgetMap: Record<string, Widget>,
-) => {
-  const ids = Object.values(widgetMap)
-    .filter(widget => {
-      const content = widget.config.content as ControllerWidgetContent;
-      return content?.type;
-    })
-    .sort((a, b) => a.config.index - b.config.index)
-    .map(w => w.id);
-  return ids;
-};
 
 /**
  * @param ''
- * @description 'get showing filters by all filterWidget of board'
+ * @description 'get showing controller by all filterWidget of board'
  */
-export const getVisibleFilterWidgetIds = (
-  filterWidgetMap: Record<string, Widget>,
+export const getVisibleControlWidgetIds = (
+  controlWidgetMap: Record<string, Widget>,
 ) => {
-  const widgets = Object.values(filterWidgetMap);
-  const visibleWidgets = getNoHiddenFilters(widgets);
-  const visibleFixedWidgetIds = visibleWidgets
-    .sort((a, b) => a.config.index - b.config.index)
-    .map(w => w.id);
+  const widgets = Object.values(controlWidgetMap);
+  const visibleWidgets = getNoHiddenControllers(widgets);
   const visibleFreeWidgetIds = visibleWidgets
     .sort((a, b) => a.config.index - b.config.index)
     .map(w => w.id);
   return {
-    visibleFixedWidgetIds,
     visibleFreeWidgetIds,
   };
 };
 
 export const getLayoutWidgets = (widgetMap: Record<string, Widget>) => {
   const noSubWidgets = Object.values(widgetMap).filter(w => !w.parentId);
-  const noFixedFilters = noSubWidgets.filter(w => w.config.content.type);
-  const noHiddenFilters = getNoHiddenFilters(noFixedFilters);
-  return noHiddenFilters;
+  const layoutWidgets = getNoHiddenControllers(noSubWidgets);
+  return layoutWidgets;
 };
 
-export const getNoHiddenFilters = (widgets: Widget[]) => {
-  const noFixedFilters = widgets.filter(w => {
+export const getNoHiddenControllers = (widgets: Widget[]) => {
+  const noHiddenControlWidgets = widgets.filter(w => {
     if (w.config.type !== 'controller') {
       return true;
     }
@@ -744,7 +723,7 @@ export const getNoHiddenFilters = (widgets: Widget[]) => {
     }
     return false;
   });
-  return noFixedFilters;
+  return noHiddenControlWidgets;
 };
 export const getNeedRefreshWidgetsByFilter = (filterWidget: Widget) => {
   const relations = filterWidget.relations;

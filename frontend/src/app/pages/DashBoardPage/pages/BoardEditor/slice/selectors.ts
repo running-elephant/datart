@@ -25,10 +25,6 @@ import {
   EditBoardState,
   HistoryEditBoard,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
-import {
-  getAllControlWidget,
-  getAllFixedFilterWidgetSortedIds,
-} from 'app/pages/DashBoardPage/utils/widget';
 import { StateWithHistory } from 'redux-undo';
 import { getLayoutWidgets } from './../../../utils/widget';
 import { EditBoardStack } from './types';
@@ -73,16 +69,6 @@ export const selectSortAllWidgets = createSelector(
     Object.values(WidgetConfig).sort((w1, w2) => {
       return w1.config.index! - w2.config.index!;
     }),
-);
-
-export const selectEditFixedFilterIds = createSelector(
-  [selectWidgetRecord],
-  widgetMap => {
-    const filterWidgetMap = getAllControlWidget(widgetMap);
-    const editFixedFilterIds =
-      getAllFixedFilterWidgetSortedIds(filterWidgetMap);
-    return editFixedFilterIds;
-  },
 );
 
 export const selectLayoutWidgetMap = createSelector(

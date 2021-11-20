@@ -311,7 +311,6 @@ export const WidgetTypeMap = strEnumType([
 ]);
 export type WidgetType = keyof typeof WidgetTypeMap;
 export declare const ContainerWidgetTypes: ['tab', 'carousel'];
-export declare const ControlWidgetTypes: ['fixed', 'auto'];
 
 export type LightWidgetType =
   | ContainerWidgetType
@@ -319,7 +318,6 @@ export type LightWidgetType =
   | ControllerFacadeTypes;
 
 export type ContainerWidgetType = typeof ContainerWidgetTypes[number];
-export type FilterWidgetType = typeof ControlWidgetTypes[number];
 
 /**
  * widgetChart 属于board 内部 配置存在widget 表内,

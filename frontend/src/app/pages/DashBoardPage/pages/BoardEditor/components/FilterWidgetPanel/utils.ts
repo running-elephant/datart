@@ -20,7 +20,6 @@ import {
   FilterOperatorType,
   OPERATOR_TYPE_ENUM,
 } from 'app/pages/DashBoardPage/constants';
-import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -172,14 +171,6 @@ export const getInitWidgetFilter = () => {
     filterWidth: '25%',
   };
   return widgetFilter;
-};
-export const getFixedFilterWidth = (content: ControllerWidgetContent) => {
-  const { controllerOption: widgetFilter } = content;
-  if (!widgetFilter?.filterWidth || widgetFilter?.filterWidth === 'auto') {
-    return '25%';
-  } else {
-    return (Number(widgetFilter?.filterWidth) / 24) * 100 + '%';
-  }
 };
 
 export const adjustSqlOperator = (

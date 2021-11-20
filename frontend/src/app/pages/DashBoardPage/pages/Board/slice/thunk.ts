@@ -207,7 +207,9 @@ export const getWidgetDataAsync = createAsyncThunk<
       case 'container':
         return null;
       case 'controller':
-        await dispatch(getFilterDataAsync({ widget: curWidget, renderMode }));
+        await dispatch(
+          getControllerOptions({ widget: curWidget, renderMode }),
+        );
 
         return null;
       default:
@@ -290,13 +292,13 @@ export const getChartWidgetDataAsync = createAsyncThunk<
   },
 );
 
-// 根据 字段获取 filter 的options
-export const getFilterDataAsync = createAsyncThunk<
+// 根据 字段获取 Controller 的options
+export const getControllerOptions = createAsyncThunk<
   null,
   { widget: Widget; renderMode: VizRenderMode | undefined },
   { state: RootState }
 >(
-  'board/getFilterDataAsync',
+  'board/getControllerOptions',
   async ({ widget, renderMode }, { getState, dispatch }) => {
     const content = widget.config.content as ControllerWidgetContent;
     const widgetFilter = content.controllerOption;

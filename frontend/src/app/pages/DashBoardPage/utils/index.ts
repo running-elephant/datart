@@ -105,19 +105,18 @@ export const getAllFiltersOfOneWidget = (values: {
     if (!hasRelation) return;
 
     const content = filterWidget.config.content as ControllerWidgetContent;
-    const { fieldValueType, relatedViews, controllerOption: widgetFilter } = content;
+    const { fieldValueType, relatedViews, controllerOption } = content;
     const relatedViewItem = relatedViews
       .filter(view => view.fieldValue)
       .find(view => view.viewId === chartWidget.viewIds[0]);
     if (!relatedViewItem) return;
 
-    const values = getWidgetFilterValues(fieldValueType, widgetFilter);
+    const values = getWidgetFilterValues(fieldValueType, controllerOption);
     if (!values) {
       return;
     }
     if (
-      relatedViewItem.relatedCategory ===
-      ChartDataViewFieldCategory.Variable
+      relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Variable
     ) {
       const key = String(relatedViewItem.fieldValue);
       const curValues = values.map(item => String(item.value));
@@ -137,13 +136,11 @@ export const getAllFiltersOfOneWidget = (values: {
         }
       }
     }
-    if (
-      relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Field
-    ) {
+    if (relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Field) {
       const filter: ChartRequestFilter = {
         aggOperator: null,
         column: String(relatedViewItem.fieldValue),
-        sqlOperator: widgetFilter.sqlOperator,
+        sqlOperator: controllerOption.sqlOperator,
         values: values,
       };
       filters.push(filter);

@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetAllProvider';
-import { BoardFilterBox } from 'app/pages/DashBoardPage/components/WidgetCore/FilterWIdget/BoardFilterBox';
 import { BREAK_POINTS } from 'app/pages/DashBoardPage/constants';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useCreateWidget';
+import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import {
   makeSelectBoardConfigById,
   selectLayoutWidgetInfoMapById,
@@ -164,16 +163,12 @@ const AutoBoardCore: React.FC<AutoBoardCoreProps> = ({ boardId }) => {
     });
   }, [layoutWidgetConfigs]);
 
-  const { filterBoxRef, gridRef } = useBoardWidthHeight();
+  const { gridRef } = useBoardWidthHeight();
 
   return (
     <Wrap>
       <StyledContainer bg={background}>
         {boardLoading ? <div>loading...</div> : null}
-        <div ref={filterBoxRef} style={{ width: '100%' }}>
-          <BoardFilterBox />
-        </div>
-
         <div className="grid-wrap" ref={gridWrapRef}>
           <div className="grid-wrap" ref={gridRef}>
             <ResponsiveGridLayout

@@ -22,13 +22,9 @@ import { BoardContext } from '../contexts/BoardContext';
 import { boardActions } from '../pages/Board/slice';
 export default function useBoardWidthHeight() {
   const { boardId, renderMode } = useContext(BoardContext);
-  const HeaderHeightBuffer = 100;
+
   const dispatch = useDispatch();
-  const { ref: filterBoxRef, height: filterBoxHeight = 200 } =
-    useResizeObserver<HTMLDivElement>({
-      refreshMode: 'debounce',
-      refreshRate: 100,
-    });
+
   const {
     ref: gridRef,
     width: gridWidth = 800,
@@ -39,13 +35,13 @@ export default function useBoardWidthHeight() {
   });
   useEffect(() => {
     const width = gridWidth;
-    const height = gridHeight + (filterBoxHeight || 0) + HeaderHeightBuffer;
+    const height = gridHeight;
     // TODO in only in  scheduleJob
     if (renderMode === 'schedule') {
       dispatch(
         boardActions.setBoardWidthHeight({ boardId, wh: [width, height] }),
       );
     }
-  }, [filterBoxHeight, gridHeight, renderMode, dispatch, boardId, gridWidth]);
-  return { filterBoxRef, gridRef };
+  }, [gridHeight, renderMode, dispatch, boardId, gridWidth]);
+  return { gridRef };
 }

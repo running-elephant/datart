@@ -18,11 +18,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from 'types';
 import { boardInit } from '.';
-import {
-  getAllControlWidget,
-  getLayoutWidgets,
-  getVisibleFilterWidgetIds,
-} from '../../../utils/widget';
+import { getLayoutWidgets } from '../../../utils/widget';
 import { Widget, WidgetInfo } from './types';
 
 export const selectPropsId = (_: unknown, id: string) => id;
@@ -63,18 +59,7 @@ export const selectBoardWidgetMapById = createSelector(
   selectPropsId,
   (widgetRecord, id) => widgetRecord[id] || {},
 );
-export const selectSortFixedFiltersIdsById = createSelector(
-  selectBoardWidgetMap,
-  selectPropsId,
-  (widgetRecord, id) => {
-    if (!widgetRecord?.[id]) return [];
-    const wMap = widgetRecord?.[id];
-    const filterWidgetMap = getAllControlWidget(wMap);
-    const visibleEditFixedFilterIds =
-      getVisibleFilterWidgetIds(filterWidgetMap).visibleFixedWidgetIds;
-    return visibleEditFixedFilterIds;
-  },
-);
+
 export const selectWidgetBy2Id = createSelector(
   selectBoardWidgetMap,
   selectPropsId,
