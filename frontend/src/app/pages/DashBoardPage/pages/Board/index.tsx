@@ -31,10 +31,8 @@ import { BoardProvider } from '../../components/BoardProvider';
 import FullScreenPanel from '../../components/FullScreenPanel';
 import TitleHeader from '../../components/TitleHeader';
 import BoardEditor from '../BoardEditor';
-import {
-  editBoardStackActions,
-  editDashBoardInfoActions,
-} from '../BoardEditor/slice';
+import { editDashBoardInfoActions } from '../BoardEditor/slice';
+import { clearEditBoardState } from '../BoardEditor/slice/actions';
 import AutoBoardCore from './AutoDashboard/AutoBoardCore';
 import FreeBoardCore from './FreeDashboard/FreeBoardCore';
 import { boardActions } from './slice';
@@ -92,7 +90,12 @@ export const Board: React.FC<BoardProps> = memo(
           }),
         );
       }
-      dispatch(editBoardStackActions.updateBoard({} as any));
+
+      // 销毁组件 清除该对象缓存
+      return () => {
+        dispatch(boardActions.clearBoardStateById(boardId));
+        dispatch(clearEditBoardState(boardId));
+      };
     }, [boardId, dispatch, fetchData, searchParams]);
 
     const [showBoardEditor, setShowBoardEditor] = useState(false);
