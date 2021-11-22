@@ -33,6 +33,18 @@ export function pipe<T1, T2>(...fns: PipeFunction<T1, T2>[]) {
   return (v, o?) => (fns || []).reduce((y, f) => f(y, o), v);
 }
 
+export function curry(fn) {
+  let _args: any[] = [];
+  const collector = (...args) => {
+    _args = _args.concat(args || []);
+    if (_args.length < fn.length) {
+      return collector.bind(null);
+    }
+    return fn.apply(null, _args);
+  };
+  return collector;
+}
+
 export function PatchUpdate<T1, T2>(
   target: T1,
   collectionKey: string,
