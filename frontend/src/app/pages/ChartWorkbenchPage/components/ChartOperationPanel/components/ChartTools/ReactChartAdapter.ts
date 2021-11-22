@@ -64,7 +64,6 @@ export default class ReactChartAdapter implements ReactChartAdapterProps {
       React.createElement(this.getComponent(), opt),
       this.domContainer,
     );
-    // TODO: to be implement
   }
 
   private getComponent() {

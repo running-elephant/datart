@@ -38,6 +38,12 @@ const editDashBoardInfoSlice = createSlice({
         state[key] = boardInfo[key];
       });
     },
+    clearEditBoardInfo(state) {
+      const boardInfo = getInitBoardInfo('default');
+      Object.keys(boardInfo).forEach(key => {
+        state[key] = boardInfo[key];
+      });
+    },
     changeDashboardEdit(state, action: PayloadAction<boolean>) {
       state.editing = action.payload;
     },
@@ -190,10 +196,10 @@ const widgetInfoRecordSlice = createSlice({
       }
     },
     addWidgetInfos(state, action: PayloadAction<Record<string, WidgetInfo>>) {
-      const widgetInfoRecord = action.payload;
-      const widgetIds = Object.keys(widgetInfoRecord);
+      const widgetInfoMap = action.payload;
+      const widgetIds = Object.keys(widgetInfoMap);
       widgetIds.forEach(id => {
-        state[id] = widgetInfoRecord[id];
+        state[id] = widgetInfoMap[id];
       });
     },
     clearWidgetInfo(state) {

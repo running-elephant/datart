@@ -35,7 +35,7 @@ import {
   selectBoardChartEditorProps,
   selectEditBoard,
 } from './slice/selectors';
-import { getEditBoardDetail } from './slice/thunk';
+import { fetchEditBoardDetail } from './slice/thunk';
 
 // import { loadEditBoardDetail } from './slice/thunk';
 
@@ -62,7 +62,8 @@ export const BoardEditor: React.FC<{
       dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
     }, [dispatch]);
     useEffect(() => {
-      dispatch(getEditBoardDetail(dashboardId));
+      // dispatch(getEditBoardDetail(dashboardId));
+      dispatch(fetchEditBoardDetail(dashboardId));
     }, [dashboardId, dispatch]);
 
     const onSaveToWidget = useCallback(

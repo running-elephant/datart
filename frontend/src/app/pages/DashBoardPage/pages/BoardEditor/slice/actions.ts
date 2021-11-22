@@ -20,6 +20,7 @@ import { ChartEditorBaseProps } from 'app/components/ChartEditor';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   ContainerWidgetContent,
+  Dashboard,
   DataChart,
   FilterWidgetContent,
   RelatedView,
@@ -27,6 +28,7 @@ import {
   Widget,
   WidgetFilterTypes,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import {
   createInitWidgetConfig,
   createWidget,
@@ -42,7 +44,22 @@ import { addWidgetsToEditBoard, getEditWidgetDataAsync } from './thunk';
 import { HistoryEditBoard } from './types';
 
 const { confirm } = Modal;
-export const deleteWidgetsAction = () => async (dispatch, getState) => {
+export const clearEditBoardState =
+  (boardId: string) => async (dispatch, getState) => {
+    const editBoard = getState().editBoard as HistoryEditBoard;
+    if (editBoard.boardInfo.id !== boardId) {
+      return;
+    }
+    await dispatch(
+      editBoardStackActions.setBoardToEditStack({
+        dashBoard: {} as Dashboard,
+        widgetRecord: {},
+      }),
+    );
+    await dispatch(editDashBoardInfoActions.clearEditBoardInfo());
+    await dispatch(editWidgetInfoActions.clearWidgetInfo());
+  };
+export const deleteWidgetsAction = () => (dispatch, getState) => {
   const editBoard = getState().editBoard as HistoryEditBoard;
   let selectedIds = Object.values(editBoard.widgetInfoRecord)
     .filter(WidgetInfo => WidgetInfo.selected)
