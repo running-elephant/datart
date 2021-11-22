@@ -147,7 +147,7 @@ export function StringInsert(source: string, value: string, index: number) {
 }
 
 export function IsKeyIn<T, K extends keyof T>(o: T, key: K): Boolean {
-  return typeof o === 'object' && key in o;
+  return !!o && typeof o === 'object' && key in o;
 }
 
 export function mergeDefaultToValue(
