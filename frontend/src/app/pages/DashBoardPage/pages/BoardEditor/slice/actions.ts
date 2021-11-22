@@ -123,12 +123,12 @@ export const widgetToPositionAction =
     dispatch(editBoardStackActions.changeTwoWidgetIndex({ curId, targetId }));
   };
 
-export const updateWidgetFilterAction =
+export const updateWidgetControllerAction =
   (params: {
     boardId: string;
     boardType: BoardType;
     relations: Relation[];
-    filterName?: string;
+    name?: string;
     fieldValueType: ChartDataViewFieldType;
     controllerFacadeType: ControllerFacadeTypes;
     views: RelatedView[];
@@ -144,19 +144,18 @@ export const updateWidgetFilterAction =
       controllerFacadeType,
       relations,
       fieldValueType,
-      filterName,
+      name,
       hasVariable,
     } = params;
     const content: ControllerWidgetContent = {
       type: controllerFacadeType,
       relatedViews: views,
-      fieldValueType,
+      name: name || 'newController',
       controllerOption: controllerOption,
-      hasVariable: hasVariable || false,
     };
 
     const widgetConf = createInitWidgetConfig({
-      name: filterName || 'newFilter',
+      name: name || 'newController',
       type: 'controller',
       content: content,
       boardType: boardType,

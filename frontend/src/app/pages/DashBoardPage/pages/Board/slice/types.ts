@@ -34,10 +34,7 @@ import {
   ScaleModeType,
   TextAlignType,
 } from '../../../constants';
-import {
-  ValueTypes,
-  WidgetControllerOption,
-} from '../../BoardEditor/components/FilterWidgetPanel/types';
+import { WidgetControllerOption } from '../../BoardEditor/components/FilterWidgetPanel/types';
 
 export const strEnumType = <T extends string>(o: Array<T>): { [K in T]: K } => {
   return o.reduce((res, key) => {
@@ -297,11 +294,9 @@ export interface ContainerItem {
 // 控制器组件配置
 export interface ControllerWidgetContent {
   type: ControllerFacadeTypes;
-  name?: string;
-  fieldValueType: ValueTypes;
+  name: string;
   relatedViews: RelatedView[];
   controllerOption: WidgetControllerOption;
-  hasVariable: boolean;
 }
 
 export const WidgetTypeMap = strEnumType([

@@ -220,7 +220,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
       console.log('--fieldValueType', fieldValueType);
       console.log('--fieldCategory', fieldCategory);
       console.log('--type', type);
-      const { relatedViews, controllerOption, filterName } = values;
+      const { relatedViews, controllerOption, name } = values;
       if (type === 'add') {
         const sourceId = uuidv4();
         const filterToWidgetRelations: Relation[] = relatedWidgets.map(
@@ -262,7 +262,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
         const widget = createFilterWidget({
           boardId,
           boardType,
-          filterName,
+          name,
           relations: newRelations,
           controllerType: controllerType!,
           views: relatedViews,
@@ -312,15 +312,14 @@ const FilterWidgetPanel: React.FC = memo(props => {
         }
         const nextContent: ControllerWidgetContent = {
           ...curFilterWidget.config.content,
+          name: '',
           relatedViews,
           type: ControllerFacadeTypes.DropdownList,
-          fieldValueType: fieldValueType,
           controllerOption: formatWidgetFilter(controllerOption),
-          hasVariable: fieldCategory === ChartDataViewFieldCategory.Variable,
         };
         const newWidget = produce(curFilterWidget, draft => {
           draft.relations = newRelations;
-          draft.config.name = filterName;
+          draft.config.name = name;
           draft.config.content = nextContent;
         });
         dispatch(editBoardStackActions.updateWidget(newWidget));

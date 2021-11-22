@@ -57,10 +57,11 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   } = useContext(WidgetDataContext);
   const { widgetUpdate, refreshWidgetsByFilter } =
     useContext(BoardActionContext);
-  const { controllerOption, fieldValueType, hasVariable, type } = useMemo(
-    () => widget.config.content as ControllerWidgetContent,
-    [widget],
-  );
+  const {
+    controllerOption,
+
+    type: facadeType,
+  } = useMemo(() => widget.config.content as ControllerWidgetContent, [widget]);
   const {
     assistViewFields,
     filterDate,
@@ -151,10 +152,10 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
     [refreshWidgetsByFilter, widget, widgetUpdate],
   );
   const control = useMemo(() => {
-    switch (type) {
+    switch (facadeType) {
       case ControllerFacadeTypes.DropdownList:
       case ControllerFacadeTypes.MultiDropdownList:
-        const multiple = type === ControllerFacadeTypes.MultiDropdownList;
+        const multiple = facadeType === ControllerFacadeTypes.MultiDropdownList;
         let selectOptions = optionRows.map(ele => {
           return { value: ele.key, label: ele.label } as ControlOption;
         });
@@ -189,7 +190,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
       case ControllerFacadeTypes.Value:
         return (
           <FilterNumber
-            hideLogic={hasVariable}
+            hideLogic={false}
             value={filterValues}
             sqlOperator={sqlOperator}
             onSqlOperatorAndValues={onSqlOperatorAndValues}
@@ -198,7 +199,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
       case ControllerFacadeTypes.Text:
         return (
           <FilterText
-            hideLogic={hasVariable}
+            hideLogic={false}
             value={filterValues}
             sqlOperator={sqlOperator}
             onSqlOperatorAndValues={onSqlOperatorAndValues}
@@ -228,13 +229,12 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         break;
     }
   }, [
-    type,
+    facadeType,
     optionRows,
     filterValues,
     onFilterValuesChange,
     minValue,
     maxValue,
-    hasVariable,
     sqlOperator,
     onSqlOperatorAndValues,
     controllerOption,

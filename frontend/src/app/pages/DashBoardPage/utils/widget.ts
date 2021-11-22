@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
-import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
+import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import produce from 'immer';
@@ -308,7 +308,7 @@ export const createFilterWidget = (params: {
   boardId: string;
   boardType: BoardType;
   relations: Relation[];
-  filterName?: string;
+  name?: string;
   fieldValueType: ValueTypes;
   controllerType: ControllerFacadeTypes;
   views: RelatedView[];
@@ -322,20 +322,19 @@ export const createFilterWidget = (params: {
     controllerOption,
     controllerType,
     relations,
-    filterName,
-    fieldValueType,
-    hasVariable,
+    name = 'newController',
   } = params;
   const content: ControllerWidgetContent = {
     type: controllerType,
     relatedViews: views,
-    fieldValueType,
-    hasVariable: hasVariable || false,
+
+    name: name,
+
     controllerOption: controllerOption,
   };
 
   const widgetConf = createInitWidgetConfig({
-    name: filterName || 'newFilter',
+    name: name,
     type: 'controller',
     content: content,
     boardType: boardType,
@@ -374,7 +373,7 @@ export const getWidgetMapByServer = (
         relations: convertWidgetRelationsToObj(cur.relations),
         viewIds,
       };
-      // TODO xld migration filter
+      // TODO xld migration about filter
       if ((widget.config.type as any) !== 'filter') {
         acc[cur.id] = widget;
       }
@@ -651,7 +650,8 @@ export const getOtherStringControlWidgets = (
       return false;
     }
     const content = ele.config.content as ControllerWidgetContent;
-    return content.fieldValueType === ChartDataViewFieldType.STRING;
+    // return content.fieldValueType === ChartDataViewFieldType.STRING;
+    return true;
   });
   if (!widgetId) {
     return allFilterWidgets;

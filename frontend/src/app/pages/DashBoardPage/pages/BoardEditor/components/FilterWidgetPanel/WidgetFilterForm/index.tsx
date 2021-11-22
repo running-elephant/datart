@@ -65,7 +65,7 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
           <Input />
         </Form.Item>
 
-        <Form.Item label="可选值" shouldUpdate style={{ marginBottom: '0' }}>
+        <Form.Item label="取值配置" shouldUpdate style={{ marginBottom: '0' }}>
           <OperatorValues
             fieldValueType={fieldValueType}
             viewMap={viewMap}
