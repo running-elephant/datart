@@ -45,6 +45,50 @@ export function curry(fn) {
   return collector;
 }
 
+export function anyPassThen(...predicates) {
+  return (value, defaultValue?) => {
+    for (let i = 0; i < predicates.length; i++) {
+      if (typeof predicates[i] === 'function' && predicates[i](value)) {
+        return predicates[i](value);
+      }
+      if (
+        isPairArray(predicates[i]) &&
+        typeof predicates[i]?.[0] === 'function' &&
+        predicates[i][0].call(null, value)
+      ) {
+        if (typeof predicates[i]?.[1] === 'function') {
+          return predicates[i][1].call(null, value);
+        }
+        return predicates[i][1];
+      }
+    }
+    return defaultValue;
+  };
+}
+
+export function isPairArray(arr?: any[]) {
+  return Array.isArray(arr) && arr?.length === 2;
+}
+
+export function isNumerical(n?: number | string) {
+  return !isEmpty(n) && !isNaN(+n!);
+}
+
+export function isNumericEqual(a?: number | string, b?: number | string) {
+  // eslint-disable-next-line eqeqeq
+  return a == b;
+}
+
+export function isInPairArrayRange(
+  count: number | string,
+  pairArray: number[],
+) {
+  if (!isPairArray(pairArray)) {
+    return false;
+  }
+  return pairArray[0] <= +count && +count <= pairArray[1];
+}
+
 export function PatchUpdate<T1, T2>(
   target: T1,
   collectionKey: string,
@@ -134,7 +178,7 @@ export function isUndefined(o) {
   return o === undefined;
 }
 
-export function isEmpty(o) {
+export function isEmpty(o?: null | any) {
   return o === null || isUndefined(o);
 }
 

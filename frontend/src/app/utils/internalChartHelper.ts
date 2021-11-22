@@ -1,5 +1,6 @@
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import { curry, pipe } from 'utils/object';
+import { isUnderUpperBound, reachLowerBoundCount } from './chartHelper';
 
 export const transferChartDataConfigs = (
   sourceConfig?: ChartConfig,
@@ -10,28 +11,21 @@ export const transferChartDataConfigs = (
   }
 
   let finalChartConfig = targetConfig;
-  finalChartConfig = transferRequiredSectionConfigs(
+  finalChartConfig = transferCommonSectionConfigs(
     sourceConfig,
     finalChartConfig,
   );
-  finalChartConfig = transferNonRequiredSectionConfigs(
-    sourceConfig,
-    finalChartConfig,
-  );
-  finalChartConfig = transferFilterAndSortSectionConfigs(
-    sourceConfig,
-    finalChartConfig,
-  );
-  // TODO(Stephen): should pipe the functions and move utils into ChartHelper.ts
+  // TODO(Stephen): 2. transfor non-data configs only by key
+
+  // TODO(Stephen): 1. should pipe the functions and move utils into ChartHelper.ts
   return finalChartConfig;
 };
 
-const transferRequiredSectionConfigs = (
+const transferCommonSectionConfigs = (
   sourceConfig: ChartConfig,
   targetConfig: ChartConfig,
 ) => {
-  let finalChartConfig = targetConfig;
-  finalChartConfig = pipe(
+  return pipe(
     ...[
       ChartDataSectionType.GROUP,
       ChartDataSectionType.AGGREGATE,
@@ -39,66 +33,52 @@ const transferRequiredSectionConfigs = (
       ChartDataSectionType.INFO,
       ChartDataSectionType.MIXED,
       ChartDataSectionType.SIZE,
-    ].map(type => curry(transferRequiredSectionConfigImpl)(type)),
+      ChartDataSectionType.FILTER,
+    ].map(type => curry(transferSectionConfigImpl)(type)),
   )(targetConfig, sourceConfig);
-  return finalChartConfig;
 };
 
-const transferNonRequiredSectionConfigs = (
-  sourceConfig: ChartConfig,
-  targetConfig: ChartConfig,
-) => {
-  const dataConfig = sourceConfig.datas || [];
-  const nonRequiredSections = dataConfig.filter(c => Boolean(!c.required));
-  nonRequiredSections.forEach(section => {
-    if (Boolean(section.rows?.length)) {
-      const taregetSection = targetConfig?.datas?.find(
-        c => c.key === section?.key,
-      );
-      if (taregetSection) {
-        taregetSection.rows = section.rows;
-      }
-    }
-  });
-  return targetConfig;
-};
-
-const transferFilterAndSortSectionConfigs = (
-  sourceConfig: ChartConfig,
-  targetConfig: ChartConfig,
-) => {
-  const dataConfig = sourceConfig.datas || [];
-  const filterConfig = dataConfig.find(
-    c => c.type === ChartDataSectionType.FILTER,
-  );
-
-  const newFilterConfigs = targetConfig?.datas?.find(
-    c => c.type === ChartDataSectionType.FILTER,
-  );
-  if (newFilterConfigs && filterConfig) {
-    newFilterConfigs.rows = filterConfig.rows;
-  }
-  return targetConfig;
-};
-
-const transferRequiredSectionConfigImpl = (
+const transferSectionConfigImpl = (
   sectionType: ChartDataSectionType,
   targetConfig?: ChartConfig,
   sourceConfig?: ChartConfig,
 ): ChartConfig => {
   const targetDataConfigs = targetConfig?.datas || [];
   const sourceDataConfigs = sourceConfig?.datas || [];
-
-  const targetSectionConfig = targetDataConfigs?.find(
-    c => c.type === sectionType,
-  );
   const sourceSectionConfigRows = sourceDataConfigs
     .filter(c => c.type === sectionType)
-    .filter(c => Boolean(c.required))
     .flatMap(config => config.rows || []);
+  const targetSectionConfigs = targetDataConfigs?.filter(
+    c => c.type === sectionType,
+  );
+  if (!targetSectionConfigs.length) {
+    return targetConfig!;
+  }
 
-  if (targetSectionConfig && Boolean(sourceSectionConfigRows?.length)) {
-    targetSectionConfig.rows = sourceSectionConfigRows;
+  while (Boolean(sourceSectionConfigRows?.length)) {
+    const row = sourceSectionConfigRows.shift();
+    const minimalRowConfig = [...targetSectionConfigs]
+      .filter(section => {
+        return isUnderUpperBound(
+          section?.limit,
+          (section?.rows || []).length + 1,
+        );
+      })
+      .sort((a, b) => {
+        if (
+          reachLowerBoundCount(a?.limit, a?.rows?.length) !==
+          reachLowerBoundCount(b?.limit, b?.rows?.length)
+        ) {
+          return (
+            reachLowerBoundCount(b?.limit, b?.rows?.length) -
+            reachLowerBoundCount(a?.limit, a?.rows?.length)
+          );
+        }
+        return (a?.rows?.length || 0) - (b?.rows?.length || 0);
+      })?.[0];
+    if (minimalRowConfig && row) {
+      minimalRowConfig.rows = (minimalRowConfig.rows || []).concat([row]);
+    }
   }
   return targetConfig!;
 };

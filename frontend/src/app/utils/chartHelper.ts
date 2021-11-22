@@ -17,6 +17,7 @@
  */
 import {
   ChartConfig,
+  ChartDataSectionConfig,
   ChartDataSectionField,
   ChartDataSectionType,
   ChartStyleSectionConfig,
@@ -26,19 +27,51 @@ import {
 import { ChartDatasetMeta } from 'app/types/ChartDataset';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
-import { isEmpty, isEmptyArray, isUndefined, meanValue } from 'utils/object';
+import {
+  anyPassThen,
+  curry,
+  isEmpty,
+  isEmptyArray,
+  isInPairArrayRange,
+  isNumerical,
+  isNumericEqual,
+  isPairArray,
+  isUndefined,
+  meanValue,
+} from 'utils/object';
 import { toFormattedValue } from './number';
 
-export function isInRange(limit?, count?) {
-  if (limit === null || limit === undefined) {
-    return true;
-  }
-  if (Number.isInteger(+limit)) {
-    return +limit === count;
-  } else if (Array.isArray(limit) && limit.length === 2) {
-    return +limit[0] <= count && count <= +limit[1];
-  }
-  return false;
+export function isInRange(
+  limit?: ChartDataSectionConfig['limit'],
+  count: number = 0,
+) {
+  return anyPassThen(
+    [isEmpty, true],
+    [isNumerical, curry(isNumericEqual)(count)],
+    [isPairArray, curry(isInPairArrayRange)(count)],
+  )(limit, true);
+}
+
+export function isUnderUpperBound(
+  limit?: ChartDataSectionConfig['limit'],
+  count: number = 0,
+) {
+  return anyPassThen(
+    [isEmpty, true],
+    [isNumerical, limit => limit >= +count],
+    [isPairArray, limit => count <= +limit[1]],
+  )(limit, true);
+}
+
+export function reachLowerBoundCount(
+  limit?: ChartDataSectionConfig['limit'],
+  count: number = 0,
+) {
+  return anyPassThen(
+    [isEmpty, 0],
+    [isNumerical, limit => limit - count],
+    [isPairArray, limit => +limit[0] - count],
+  )(limit, 0);
 }
 
 export function getStyleValue(

@@ -260,7 +260,7 @@ export type ChartDataSectionConfig = ChartConfigBase & {
   required?: boolean;
   rows?: ChartDataSectionField[];
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
-  limit?: null | number | string | number[];
+  limit?: null | number | string | number[] | string[];
 
   // Question: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
