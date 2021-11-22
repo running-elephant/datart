@@ -78,6 +78,14 @@ const boardSlice = createSlice({
         state.viewMap[view.id] = view;
       });
     },
+    clearBoardStateById(state, action: PayloadAction<string>) {
+      const boardId = action.payload;
+      delete state.boardRecord[boardId];
+      delete state.boardInfoRecord[boardId];
+      delete state.widgetRecord[boardId];
+      delete state.widgetInfoRecord[boardId];
+      // can not del :dataCharts、views
+    },
     setGroupWidgetsById(
       state,
       action: PayloadAction<{ boardId: string; widgets: Widget[] }>,
@@ -110,13 +118,7 @@ const boardSlice = createSlice({
         state.viewMap[view.id] = view;
       });
     },
-    clearCacheByBoardId(state, action: PayloadAction<string[]>) {
-      const groupIds = action.payload;
-      groupIds.forEach(id => {
-        delete state.widgetRecord[id];
-        delete state.boardRecord[id];
-      });
-    },
+
     renderedWidgets(
       state,
       action: PayloadAction<{ boardId: string; widgetIds: string[] }>,

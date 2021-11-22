@@ -98,11 +98,8 @@ export const getScheduleBoardInfo = (
 
   return newBoardInfo;
 };
-export const getInitBoardInfo = (
-  id: string,
-  widgetIds: string[] = [],
-): BoardInfo => {
-  return {
+export const getInitBoardInfo = (id: string, widgetIds: string[] = []) => {
+  const boardInfo: BoardInfo = {
     id: id,
     saving: false,
     loading: false,
@@ -133,6 +130,7 @@ export const getInitBoardInfo = (
     hasFetchItems: [],
     boardWidthHeight: [0, 0],
   };
+  return boardInfo;
 };
 
 export const getInitBoardConfig = (boardType: BoardType) => {

@@ -85,6 +85,7 @@ export const getEditBoardDetail = createAsyncThunk<
     return null;
   },
 );
+
 export const fetchEditBoardDetail = createAsyncThunk<
   null,
   string,
