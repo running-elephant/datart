@@ -66,10 +66,10 @@ export const BoardProvider: FC<{
       //
       renderedWidgetById: useCallback(
         wid => {
-          let isInitQuery = board.config.isInitQuery;
+          let initialQuery= board.config.initialQuery;
 
-          if (isInitQuery === false && renderMode !== 'schedule') {
-            //zh:如果 isInitQuery === false renderMode !=='schedule' 那么没有数据被请求 en: If isInitQuery === false renderMode !=='schedule' then no data is requested
+          if (initialQuery=== false && renderMode !== 'schedule') {
+            //zh:如果 initialQuery=== false renderMode !=='schedule' 则不请求数据 en: If initialQuery=== false renderMode !=='schedule' then no data is requested
             return false;
           }
 

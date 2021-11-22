@@ -18,7 +18,7 @@
  import { Form, Checkbox } from 'antd';
  import { NamePath } from 'rc-field-form/lib/interface';
  import React, { FC, memo } from 'react';
- export const InitQuerySet: FC<{
+ export const InitialQuerySet: FC<{
     name: NamePath;
  }> = memo(({ name}) => {
    return (
@@ -30,5 +30,5 @@
    );
  });
  
- export default InitQuerySet;
+ export default InitialQuerySet;
  

@@ -98,7 +98,7 @@ export interface DashboardConfig {
   height: number;
   gridStep: [number, number];
   scaleMode: ScaleModeType;
-  isInitQuery: boolean | undefined;
+  initialQuery: boolean;
 }
 
 export const BoardTypeMap = strEnumType(['auto', 'free']);

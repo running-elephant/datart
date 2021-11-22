@@ -34,7 +34,7 @@ import { useDispatch } from 'react-redux';
 import { editBoardStackActions } from '../../slice';
 import BackgroundSet from './SettingItem/BackgroundSet';
 import NumberSet from './SettingItem/BasicSet/NumberSet';
-import InitQuerySet from './SettingItem/InitQuerySet';
+import InitialQuerySet from './SettingItem/InitialQuerySet';
 import ScaleModeSet from './SettingItem/ScaleModeSet';
 import { Group, SettingPanel } from './SettingPanel';
 
@@ -57,7 +57,7 @@ export const BoardSetting: FC = memo(() => {
       paddingW: config.containerPadding[0],
       paddingH: config.containerPadding[1],
       rowHeight: config.rowHeight,
-      isInitQuery: config.isInitQuery === false ? false : true, //如果值为undefined也为true
+      initialQuery: config.initialQuery=== false ? false : true, // TODO migration 如果initialQuery的值为undefined默认为true 兼容旧的仪表盘没有initialQuery参数的问题 
     };
     form.setFieldsValue({ ...cacheValue.current });
   }, [config, form]);
@@ -76,7 +76,7 @@ export const BoardSetting: FC = memo(() => {
         draft.containerPadding[0] = value.paddingW;
         draft.containerPadding[1] = value.paddingH;
         draft.rowHeight = value.rowHeight;
-        draft.isInitQuery = value.isInitQuery;
+        draft.initialQuery= value.initialQuery;
       });
       dispatch(editBoardStackActions.updateBoardConfig(nextConf));
     },
@@ -147,9 +147,9 @@ export const BoardSetting: FC = memo(() => {
               />
             </Group>
           </Panel>
-          <Panel header="查询配置" key="isInitQuery" forceRender>
+          <Panel header="查询配置" key="initialQuery" forceRender>
             <Group>
-              <InitQuerySet name="isInitQuery"></InitQuerySet>
+              <InitialQuerySet name="initialQuery"></InitialQuerySet>
             </Group>
           </Panel>
         </Collapse>
