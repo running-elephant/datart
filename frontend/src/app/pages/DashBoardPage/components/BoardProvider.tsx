@@ -66,6 +66,13 @@ export const BoardProvider: FC<{
       //
       renderedWidgetById: useCallback(
         wid => {
+          console.log('renderedWidgetById')
+          let isInitQuery = board.config.isInitQuery;
+
+          if (isInitQuery === false && renderMode !== 'schedule') {
+            return false;
+          }
+          console.log('请求数据');
           if (editing) {
             dispatch(
               renderedEditWidgetAsync({ boardId: board.id, widgetId: wid }),
