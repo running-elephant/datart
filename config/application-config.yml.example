@@ -8,24 +8,24 @@ spring:
 
 # mail config
 
-  #  mail:
-  #    host: { 邮箱服务地址 }
-  #    port: { 端口号 }
-  #    username: { 邮箱地址 }
-  #    fromAddress:
-  #    password: { 邮箱服务密码 }
-  #    senderName: { 发送者昵称 }
-  #
-  #    properties:
-  #      smtp:
-  #        starttls:
-  #          enable: true
-  #          required: true
-  #        auth: true
-  #      mail:
-  #        smtp:
-  #          ssl:
-  #            enable: true
+# mail:
+#   host: { 邮箱服务地址 }
+#   port: { 端口号 }
+#   username: { 邮箱地址 }
+#   fromAddress:
+#   password: { 邮箱服务密码 }
+#   senderName: { 发送者昵称 }
+#
+#   properties:
+#     smtp:
+#       starttls:
+#         enable: true
+#         required: true
+#       auth: true
+#     mail:
+#       smtp:
+#         ssl:
+#           enable: true
 
 
 # redis config

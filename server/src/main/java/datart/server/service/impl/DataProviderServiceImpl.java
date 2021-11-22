@@ -202,7 +202,6 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
     @Override
     public Dataframe execute(ViewExecuteParam viewExecuteParam) throws Exception {
-
         if (viewExecuteParam.isEmpty()) {
             return Dataframe.empty();
         }

@@ -341,7 +341,6 @@ public class JdbcDataProviderAdapter implements Closeable {
                 , getSqlDialect()
                 , getVariableQuote());
 
-        //server aggregation is not enabled and SQL is committed to the data source for execution
         if (supportPaging()) {
             sql = render.render(true, true, false);
             log.debug(sql);
