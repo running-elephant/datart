@@ -312,14 +312,14 @@ export const createFilterWidget = (params: {
   fieldValueType: ValueTypes;
   controllerType: ControllerFacadeTypes;
   views: RelatedView[];
-  widgetFilter: WidgetControllerOption;
+  controllerOption: WidgetControllerOption;
   hasVariable: boolean;
 }) => {
   const {
     boardId,
     boardType,
     views,
-    widgetFilter,
+    controllerOption,
     controllerType,
     relations,
     filterName,
@@ -331,7 +331,7 @@ export const createFilterWidget = (params: {
     relatedViews: views,
     fieldValueType,
     hasVariable: hasVariable || false,
-    controllerOption: widgetFilter,
+    controllerOption: controllerOption,
   };
 
   const widgetConf = createInitWidgetConfig({
@@ -408,7 +408,7 @@ export const getWidgetMapByServer = (
       }
     }
 
-    // 处理 widgetFilter visibility依赖关系 id, url参数修改filter
+    // 处理 controllerOption visibility依赖关系 id, url参数修改filter
     if (widget.config.type === 'controller') {
       const content = widget.config.content as ControllerWidgetContent;
       // 根据 url参数修改filter 默认值
@@ -419,7 +419,7 @@ export const getWidgetMapByServer = (
           const _value = isMatchByName
             ? filterSearchParams[widget.config.name]
             : filterSearchParams[widget.id];
-          switch (content?.controllerOption?.filterFacade) {
+          switch (content?.type) {
             case ControllerFacadeTypes.RangeTime:
               if (
                 content.controllerOption.filterDate &&
@@ -689,14 +689,15 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
       return true;
     }
     const content = w.config.content as ControllerWidgetContent;
-    const filterVisibility = content.controllerOption.visibility;
-    if (filterVisibility.visibilityType === 'show') {
+    const visibility = content.controllerOption.visibility;
+    if (visibility.visibilityType === 'show') {
       return true;
     }
-    if (filterVisibility.visibilityType === 'hide') {
+    if (visibility.visibilityType === 'hide') {
       return false;
     }
-    if (filterVisibility.visibilityType === 'condition') {
+    if (visibility.visibilityType === 'condition') {
+      debugger;
       const condition = content.controllerOption.visibility.condition;
       if (condition) {
         const { dependentFilterId, relation, value: targetValue } = condition;

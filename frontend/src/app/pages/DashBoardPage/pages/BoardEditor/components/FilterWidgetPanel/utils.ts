@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   FilterOperatorType,
   OPERATOR_TYPE_ENUM,
@@ -74,68 +73,66 @@ export const getDateFacadeOptions = (category: ChartDataViewFieldCategory) => {
 export const preformatWidgetFilter = (
   oldWidgetFilter: WidgetControllerOption,
 ) => {
-  const widgetFilter = JSON.parse(JSON.stringify(oldWidgetFilter));
-  if (!widgetFilter.operatorType) {
-    widgetFilter.operatorType = OPERATOR_TYPE_ENUM.common;
+  const controllerOption = JSON.parse(
+    JSON.stringify(oldWidgetFilter),
+  ) as WidgetControllerOption;
+  if (!controllerOption.operatorType) {
+    controllerOption.operatorType = OPERATOR_TYPE_ENUM.common;
   }
-  if (!widgetFilter?.filterVisibility) {
-    widgetFilter.filterVisibility = {
-      visibility: 'show',
+  if (!controllerOption?.visibility) {
+    controllerOption.visibility = {
+      visibilityType: 'show',
     };
   }
 
-  if (!widgetFilter?.filterWidth) {
-    widgetFilter.filterWidth = '25%';
-  }
-
-  if (widgetFilter.filterDate) {
-    if (widgetFilter.filterDate) {
-      const filterDate = widgetFilter.filterDate;
+  if (controllerOption.filterDate) {
+    if (controllerOption.filterDate) {
+      const filterDate = controllerOption.filterDate;
       if (filterDate.startTime && filterDate.startTime.exactTime) {
         if (typeof filterDate.startTime.exactTime === 'string') {
           let exactTime = filterDate.startTime.exactTime;
           let newExactTime = moment(exactTime, 'YYYY-MM-DD HH:mm:ss');
-          widgetFilter.filterDate.startTime.exactTime = newExactTime;
+          controllerOption.filterDate.startTime.exactTime = newExactTime;
         }
       }
       if (filterDate.endTime && filterDate.endTime.exactTime) {
         if (typeof filterDate.endTime.exactTime === 'string') {
           let exactTime = filterDate.endTime.exactTime;
           let newExactTime = moment(exactTime, 'YYYY-MM-DD HH:mm:ss');
-          widgetFilter.filterDate.endTime.exactTime = newExactTime;
+          controllerOption.filterDate.endTime.exactTime = newExactTime;
         }
       }
     }
   }
 
-  return widgetFilter;
+  return controllerOption;
 };
 // 设置后处理
-export const formatWidgetFilter = (widgetFilter: WidgetControllerOption) => {
-  if (!widgetFilter.sqlOperator) {
-    widgetFilter.sqlOperator = FilterSqlOperator.In;
+export const formatWidgetFilter = (
+  controllerOption: WidgetControllerOption,
+) => {
+  if (!controllerOption.sqlOperator) {
+    controllerOption.sqlOperator = FilterSqlOperator.In;
   }
-  if (!widgetFilter?.visibility) {
-    widgetFilter.visibility = {
+  if (!controllerOption?.visibility) {
+    controllerOption.visibility = {
       visibilityType: 'show',
     };
   }
-  if (!widgetFilter?.filterWidth) {
-    widgetFilter.filterWidth = '25%';
-  }
-  if (!widgetFilter.operatorType) {
-    widgetFilter.operatorType = OPERATOR_TYPE_ENUM.common;
+
+  if (!controllerOption.operatorType) {
+    controllerOption.operatorType = OPERATOR_TYPE_ENUM.common;
   }
   if (
-    widgetFilter.filterValueOptions &&
-    widgetFilter.filterValueOptions.length > 0
+    controllerOption.filterValueOptions &&
+    controllerOption.filterValueOptions.length > 0
   ) {
-    widgetFilter.filterValues = widgetFilter.filterValueOptions
+    controllerOption.filterValues = controllerOption.filterValueOptions
       .filter(ele => ele.isSelected)
       .map(ele => ele.key);
   }
-  if (widgetFilter.filterDate) {
-    const filterDate = widgetFilter.filterDate;
+  if (controllerOption.filterDate) {
+    const filterDate = controllerOption.filterDate;
     if (filterDate.startTime && filterDate.startTime.exactTime) {
       if (typeof filterDate.startTime.exactTime !== 'string') {
         filterDate.startTime.exactTime = (
@@ -152,11 +149,11 @@ export const formatWidgetFilter = (widgetFilter: WidgetControllerOption) => {
     }
   }
 
-  return widgetFilter;
+  return controllerOption;
 };
 
 export const getInitWidgetFilter = () => {
-  const widgetFilter: WidgetControllerOption = {
+  const controllerOPtion: WidgetControllerOption = {
     operatorType: OPERATOR_TYPE_ENUM.common, //
     assistViewFields: [],
     visibility: {
@@ -167,10 +164,8 @@ export const getInitWidgetFilter = () => {
     sqlOperator: FilterSqlOperator.In,
     filterValues: [],
     filterValueOptions: [],
-    filterFacade: Opt.DropdownList,
-    filterWidth: '25%',
   };
-  return widgetFilter;
+  return controllerOPtion;
 };
 
 export const adjustSqlOperator = (

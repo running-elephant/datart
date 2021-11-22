@@ -26,7 +26,6 @@ import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/types/ChartDataView';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
@@ -44,24 +43,21 @@ const FilterDateCondition: FC<{
   }, [fieldCategory]);
   useEffect(() => {
     // const fieldCategory
-    const widgetFilter = form?.getFieldValue('widgetFilter');
-    const nextWidgetFilter = {
-      ...widgetFilter,
+    const controllerOption = form?.getFieldValue('controllerOption');
+    const nextOption = {
+      ...controllerOption,
       sqlOperator: hasVariable
         ? FilterSqlOperator.In
         : FilterSqlOperator.Between,
-      filterFacade: hasVariable
-        ? ControllerFacadeTypes.Time
-        : ControllerFacadeTypes.RangeTime,
     };
     form?.setFieldsValue({
-      widgetFilter: nextWidgetFilter,
+      controllerOption: nextOption,
     });
   }, [form, hasVariable]);
 
   const getCurType = useCallback(() => {
     const operatorType: FilterOperatorType = form?.getFieldValue([
-      'widgetFilter',
+      'controllerOption',
       'operatorType',
     ]);
     return operatorType;
@@ -75,7 +71,7 @@ const FilterDateCondition: FC<{
             <div>
               <Form.Item
                 noStyle
-                name={['widgetFilter', 'operatorType']}
+                name={['controllerOption', 'operatorType']}
                 label={'可筛选值'}
                 validateTrigger={['onChange', 'onBlur']}
                 rules={[{ required: true }]}
@@ -95,7 +91,7 @@ const FilterDateCondition: FC<{
             {getCurType() !== 'custom' && (
               <WrapCommon>
                 <CommonTimeSetter
-                  name={['widgetFilter', 'filterDate', 'commonTime']}
+                  name={['controllerOption', 'filterDate', 'commonTime']}
                 />
               </WrapCommon>
             )}

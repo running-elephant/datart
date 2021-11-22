@@ -134,12 +134,16 @@ export const OPERATOR_TYPE_OPTION = [
   { name: '常规', value: OPERATOR_TYPE_ENUM.common },
   { name: '自定义', value: OPERATOR_TYPE_ENUM.custom },
 ];
-export const FilterVisibilityEnum = strEnumType(['hide', 'show', 'condition']);
-export type ControllerVisibilityType = keyof typeof FilterVisibilityEnum;
+export const ControllerVisibilityEnum = strEnumType([
+  'hide',
+  'show',
+  'condition',
+]);
+export type ControllerVisibilityType = keyof typeof ControllerVisibilityEnum;
 export const VISIBILITY_TYPE_OPTION = [
-  { name: '显示', value: FilterVisibilityEnum.show },
-  { name: '隐藏', value: FilterVisibilityEnum.hide },
-  { name: '条件', value: FilterVisibilityEnum.condition },
+  { name: '显示', value: ControllerVisibilityEnum.show },
+  { name: '隐藏', value: ControllerVisibilityEnum.hide },
+  { name: '条件', value: ControllerVisibilityEnum.condition },
 ];
 export const SQL_OPERATOR_OPTIONS = {
   include: [

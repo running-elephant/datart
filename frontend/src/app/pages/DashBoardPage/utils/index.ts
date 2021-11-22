@@ -155,16 +155,16 @@ export const getAllFiltersOfOneWidget = (values: {
 };
 export const getWidgetFilterValues = (
   fieldValueType: ValueTypes,
-  widgetFilter: WidgetControllerOption,
+  controllerOption: WidgetControllerOption,
 ) => {
   // Date 类型
   if (fieldValueType === ChartDataViewFieldType.DATE) {
-    if (!widgetFilter?.filterDate) {
+    if (!controllerOption?.filterDate) {
       return false;
     }
     const timeValues = getWidgetFilterDateValues(
-      widgetFilter.operatorType,
-      widgetFilter.filterDate,
+      controllerOption.operatorType,
+      controllerOption.filterDate,
     );
     const values = timeValues
       .filter(ele => !!ele)
@@ -178,11 +178,14 @@ export const getWidgetFilterValues = (
     return values[0] ? values : null;
   }
 
-  if (!widgetFilter.filterValues || widgetFilter.filterValues.length === 0)
+  if (
+    !controllerOption.filterValues ||
+    controllerOption.filterValues.length === 0
+  )
     return false;
   // NUMERIC 类型
   if (fieldValueType === ChartDataViewFieldType.NUMERIC) {
-    const values = widgetFilter.filterValues
+    const values = controllerOption.filterValues
       .filter(ele => {
         if (ele === 0) return true;
         return !!ele;
@@ -198,7 +201,7 @@ export const getWidgetFilterValues = (
   }
   // string 类型
   if (fieldValueType === ChartDataViewFieldType.STRING) {
-    const values = widgetFilter.filterValues
+    const values = controllerOption.filterValues
       .filter(ele => {
         if (ele.trim() === '') return false;
         return !!ele;
@@ -214,7 +217,7 @@ export const getWidgetFilterValues = (
   }
   // Expression 类型
   if (fieldValueType === VariableValueTypes.Expression) {
-    const values = widgetFilter.filterValues
+    const values = controllerOption.filterValues
       .filter(ele => {
         if (ele.trim() === '') return false;
         return !!ele;

@@ -41,15 +41,15 @@ import React, {
   useMemo,
 } from 'react';
 import styled from 'styled-components/macro';
-import { FilterNumber } from './FilterControler/FilterNumber';
-import { FilterRadioGroup } from './FilterControler/FilterRadioGroup';
-import FilterRangTime from './FilterControler/FilterRangeTime';
-import { FilterSelect } from './FilterControler/FilterSelect';
-import { FilterSlider } from './FilterControler/FilterSlider';
-import { FilterText } from './FilterControler/FilterText';
-import FilterTime from './FilterControler/FilterTime';
+import { FilterNumber } from './Controller/FilterNumber';
+import { FilterRadioGroup } from './Controller/FilterRadioGroup';
+import FilterRangTime from './Controller/FilterRangeTime';
+import { FilterSelect } from './Controller/FilterSelect';
+import { FilterSlider } from './Controller/FilterSlider';
+import { FilterText } from './Controller/FilterText';
+import FilterTime from './Controller/FilterTime';
 
-export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
+export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   const widget = useContext(WidgetContext);
   const { renderedWidgetById } = useContext(BoardContext);
   const {
@@ -57,23 +57,21 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
   } = useContext(WidgetDataContext);
   const { widgetUpdate, refreshWidgetsByFilter } =
     useContext(BoardActionContext);
-  const {
-    controllerOption: widgetFilter,
-    fieldValueType,
-    hasVariable,
-    type,
-  } = useMemo(() => widget.config.content as ControllerWidgetContent, [widget]);
+  const { controllerOption, fieldValueType, hasVariable, type } = useMemo(
+    () => widget.config.content as ControllerWidgetContent,
+    [widget],
+  );
   const {
     assistViewFields,
     filterDate,
-    filterFacade,
+
     filterValues,
     filterValueOptions,
     operatorType,
     sqlOperator,
     minValue,
     maxValue,
-  } = useMemo(() => widgetFilter, [widgetFilter]);
+  } = useMemo(() => controllerOption, [controllerOption]);
 
   const optionRows = useMemo(() => {
     const dataRows = rows?.flat(2) || [];
@@ -156,8 +154,7 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
     switch (type) {
       case ControllerFacadeTypes.DropdownList:
       case ControllerFacadeTypes.MultiDropdownList:
-        const multiple =
-          filterFacade === ControllerFacadeTypes.MultiDropdownList;
+        const multiple = type === ControllerFacadeTypes.MultiDropdownList;
         let selectOptions = optionRows.map(ele => {
           return { value: ele.key, label: ele.label } as ControlOption;
         });
@@ -210,8 +207,8 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
 
       case ControllerFacadeTypes.RangeTime:
         const rangeTimeValues = getWidgetFilterDateValues(
-          widgetFilter.operatorType,
-          widgetFilter!.filterDate!,
+          controllerOption.operatorType,
+          controllerOption!.filterDate!,
         );
         return (
           <FilterRangTime
@@ -221,8 +218,8 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
         );
       case ControllerFacadeTypes.Time:
         const timeValues = getWidgetFilterDateValues(
-          widgetFilter.operatorType,
-          widgetFilter!.filterDate!,
+          controllerOption.operatorType,
+          controllerOption!.filterDate!,
         );
         return (
           <FilterTime onTimeChange={onRangeTimeChange} value={timeValues} />
@@ -232,7 +229,6 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
     }
   }, [
     type,
-    filterFacade,
     optionRows,
     filterValues,
     onFilterValuesChange,
@@ -241,7 +237,7 @@ export const WidgetFilterCore: React.FC<{ id: string }> = memo(({ id }) => {
     hasVariable,
     sqlOperator,
     onSqlOperatorAndValues,
-    widgetFilter,
+    controllerOption,
     onRangeTimeChange,
   ]);
   return <Wrap>{control}</Wrap>;

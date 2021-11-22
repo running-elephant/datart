@@ -17,8 +17,8 @@
  */
 
 import { Form, FormInstance, Input, Select } from 'antd';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -40,9 +40,9 @@ const FilterStringCondition: FC<{
     e => {
       const value = e.target.value;
       setContainValue(value);
-      const widgetFilter = form?.getFieldValue('widgetFilter');
+      const controllerOption = form?.getFieldValue('controllerOption');
       form?.setFieldsValue({
-        widgetFilter: { ...widgetFilter, filterValues: [value] },
+        controllerOption: { ...controllerOption, filterValues: [value] },
       });
     },
     [form],
@@ -51,11 +51,11 @@ const FilterStringCondition: FC<{
   const onSqlOperatorChange = useCallback(
     value => {
       setSqlOperatorValue(value);
-      const widgetFilter: WidgetControllerOption = {
-        ...form?.getFieldValue('widgetFilter'),
+      const controllerOption: WidgetControllerOption = {
+        ...form?.getFieldValue('controllerOption'),
         sqlOperator: value,
       };
-      form?.setFieldsValue({ widgetFilter });
+      form?.setFieldsValue({ controllerOption });
     },
     [form],
   );
@@ -91,14 +91,14 @@ const FilterStringCondition: FC<{
   }, [hasVariable, onSqlOperatorChange, sqlOperatorValue]);
 
   const checkCurValue = useCallback(() => {
-    const widgetFilter: WidgetControllerOption = form?.getFieldValue([
-      'widgetFilter',
+    const controllerOption: WidgetControllerOption = form?.getFieldValue([
+      'controllerOption',
     ]);
     // 值不符合
     let needAdjust = false;
-    let sqlOperator = widgetFilter?.sqlOperator;
-    let filterValues = widgetFilter?.filterValues;
-    if (!stringConditionSetValues.includes(widgetFilter.sqlOperator)) {
+    let sqlOperator = controllerOption?.sqlOperator;
+    let filterValues = controllerOption?.filterValues;
+    if (!stringConditionSetValues.includes(controllerOption.sqlOperator)) {
       needAdjust = true;
       sqlOperator = FilterSqlOperator.Equal;
     }
@@ -106,24 +106,24 @@ const FilterStringCondition: FC<{
       sqlOperator = FilterSqlOperator.Equal;
     }
     if (
-      !Array.isArray(widgetFilter.filterValues) ||
-      widgetFilter.filterValues.length > 1
+      !Array.isArray(controllerOption.filterValues) ||
+      controllerOption.filterValues.length > 1
     ) {
       needAdjust = true;
       filterValues = [''];
     }
     if (fieldValueType !== ChartDataViewFieldType.STRING) {
       needAdjust = false;
-      filterValues = widgetFilter?.filterValues;
+      filterValues = controllerOption?.filterValues;
     }
     const nextWidgetFilter: WidgetControllerOption = {
-      ...widgetFilter,
+      ...controllerOption,
       sqlOperator: sqlOperator,
       filterValues: filterValues,
     };
     if (needAdjust) {
       form?.setFieldsValue({
-        widgetFilter: nextWidgetFilter,
+        controllerOption: nextWidgetFilter,
       });
     }
     setSqlOperatorValue(sqlOperator);
@@ -144,7 +144,7 @@ const FilterStringCondition: FC<{
               placeholder="填写条件值"
               onChange={onContainValueChange}
             />
-            <Form.Item noStyle name={['widgetFilter', 'filterValues']}>
+            <Form.Item noStyle name={['controllerOption', 'filterValues']}>
               <Select mode="multiple" style={{ display: 'none' }} />
             </Form.Item>
           </Wrap>

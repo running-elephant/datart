@@ -28,7 +28,7 @@ import { FilterSqlOperator } from 'globalConstants';
 import React, { memo, useEffect } from 'react';
 import styled from 'styled-components/macro';
 import { ValueTypes, WidgetControllerOption } from '../types';
-import FilterVisibility from './FilterVisibility';
+import ControllerVisibility from './ControllerVisibility';
 import OperatorValues from './OperatorValues';
 
 export interface RelatedViewFormProps {
@@ -40,18 +40,18 @@ export interface RelatedViewFormProps {
   boardType: BoardType;
 }
 
-export const WidgetFilterForm: React.FC<RelatedViewFormProps> = memo(
+export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
   ({ form, viewMap, fieldValueType, fieldCategory, otherStrFilterWidgets }) => {
     const t = useI18NPrefix('viz.common.filter');
     useEffect(() => {
       if (fieldCategory === ChartDataViewFieldCategory.Variable) {
-        const widgetFilter = form?.getFieldValue('widgetFilter');
-        const nextWidgetFilter: WidgetControllerOption = {
-          ...widgetFilter,
+        const controllerOption = form?.getFieldValue('controllerOption');
+        const nextOption: WidgetControllerOption = {
+          ...controllerOption,
           sqlOperator: FilterSqlOperator.Equal,
         };
         form?.setFieldsValue({
-          widgetFilter: nextWidgetFilter,
+          controllerOption: nextOption,
         });
       }
     }, [fieldCategory, form]);
@@ -77,7 +77,7 @@ export const WidgetFilterForm: React.FC<RelatedViewFormProps> = memo(
           hidden
           noStyle
           preserve
-          name={['widgetFilter', 'filterValues']}
+          name={['controllerOption', 'filterValues']}
         >
           <Select />
         </Form.Item>
@@ -86,12 +86,12 @@ export const WidgetFilterForm: React.FC<RelatedViewFormProps> = memo(
           hidden
           noStyle
           preserve
-          name={['widgetFilter', 'sqlOperator']}
+          name={['controllerOption', 'sqlOperator']}
         >
           <Input />
         </Form.Item>
         {/* 是否显示 */}
-        <FilterVisibility
+        <ControllerVisibility
           otherStrFilterWidgets={otherStrFilterWidgets}
           fieldValueType={fieldValueType}
           form={form}

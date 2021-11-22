@@ -24,14 +24,14 @@ import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { ValueTypes } from '../types';
 
-const FilterVisibility: FC<{
+const ControllerVisibility: FC<{
   form: FormInstance<any> | undefined;
   otherStrFilterWidgets: Widget[];
   fieldValueType: ValueTypes;
 }> = memo(({ form, fieldValueType, otherStrFilterWidgets }) => {
   const showVisibilityCondition = useCallback(() => {
     const visibilityType = form?.getFieldValue([
-      'widgetFilter',
+      'controllerOption',
       'filterVisibility',
       'visibility',
     ]);
@@ -47,7 +47,7 @@ const FilterVisibility: FC<{
         return (
           <>
             <Form.Item
-              name={['widgetFilter', 'filterVisibility', 'visibility']}
+              name={['controllerOption', 'filterVisibility', 'visibility']}
               noStyle
               rules={[{ required: true }]}
             >
@@ -66,7 +66,7 @@ const FilterVisibility: FC<{
                 <StyledWarp>
                   <Form.Item
                     name={[
-                      'widgetFilter',
+                      'controllerOption',
                       'filterVisibility',
                       'condition',
                       'dependentFilterId',
@@ -87,7 +87,7 @@ const FilterVisibility: FC<{
                   {' - '}
                   <Form.Item
                     name={[
-                      'widgetFilter',
+                      'controllerOption',
                       'filterVisibility',
                       'condition',
                       'relation',
@@ -107,7 +107,7 @@ const FilterVisibility: FC<{
                   {' - '}
                   <Form.Item
                     name={[
-                      'widgetFilter',
+                      'controllerOption',
                       'filterVisibility',
                       'condition',
                       'value',
@@ -127,7 +127,7 @@ const FilterVisibility: FC<{
   );
 });
 
-export default FilterVisibility;
+export default ControllerVisibility;
 const StyledWarp = styled(Form.Item)`
   display: block;
   margin-top: 6px;

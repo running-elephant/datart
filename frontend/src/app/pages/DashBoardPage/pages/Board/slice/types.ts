@@ -297,6 +297,7 @@ export interface ContainerItem {
 // 控制器组件配置
 export interface ControllerWidgetContent {
   type: ControllerFacadeTypes;
+  name?: string;
   fieldValueType: ValueTypes;
   relatedViews: RelatedView[];
   controllerOption: WidgetControllerOption;

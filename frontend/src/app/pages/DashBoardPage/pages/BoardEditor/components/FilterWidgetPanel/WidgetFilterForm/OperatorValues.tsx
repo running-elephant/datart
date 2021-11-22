@@ -44,7 +44,7 @@ export const singleFacadeTypes = [
 ];
 
 const OperatorValues: FC<{
-  form: FormInstance<{ widgetFilter: WidgetControllerOption }> | undefined;
+  form: FormInstance<{ controllerOption: WidgetControllerOption }> | undefined;
   viewMap: Record<string, ChartDataView>;
   fieldValueType: ValueTypes;
   filterValues?: any[];
@@ -73,25 +73,16 @@ const OperatorValues: FC<{
     const onTransferChange = useCallback(
       (nextTargetKeys, direction, moveKeys) => {
         setTargetKeys(nextTargetKeys);
-        const widgetFilter = form?.getFieldValue(
-          'widgetFilter',
+        const controllerOption = form?.getFieldValue(
+          'controllerOption',
         ) as WidgetControllerOption;
-        let hasFilterFacade = true;
-        if (
-          nextTargetKeys.length > 1 &&
-          singleFacadeTypes.includes(widgetFilter.filterFacade)
-        ) {
-          hasFilterFacade = false;
-        }
+
         const nextWidgetFilter: WidgetControllerOption = {
-          ...widgetFilter,
+          ...controllerOption,
           filterValues: nextTargetKeys,
-          filterFacade: hasFilterFacade
-            ? widgetFilter.filterFacade
-            : ControllerFacadeTypes.DropdownList,
         };
         form?.setFieldsValue({
-          widgetFilter: nextWidgetFilter,
+          controllerOption: nextWidgetFilter,
         });
       },
       [form],
@@ -131,12 +122,12 @@ const OperatorValues: FC<{
         const dataset = await fetchNewDataset(viewId, viewField);
         setTargetKeys([]);
         setOptionValues(convertToList(dataset?.rows, selectedKeys));
-        const widgetFilter: WidgetControllerOption = form?.getFieldValue([
-          'widgetFilter',
+        const controllerOption: WidgetControllerOption = form?.getFieldValue([
+          'controllerOption',
         ]);
         form?.setFieldsValue({
-          widgetFilter: {
-            ...widgetFilter,
+          controllerOption: {
+            ...controllerOption,
             filterValues: [],
             assistViewFields: value,
           },
@@ -150,13 +141,13 @@ const OperatorValues: FC<{
         const [viewId, viewField] = value;
         const dataset = await fetchNewDataset(viewId, viewField);
 
-        const widgetFilter: WidgetControllerOption =
-          form?.getFieldValue('widgetFilter');
+        const controllerOption: WidgetControllerOption =
+          form?.getFieldValue('controllerOption');
 
         setOptionValues(convertToList(dataset?.rows, []));
-        if (widgetFilter.operatorType === 'common') {
-          if (widgetFilter?.filterValues) {
-            setTargetKeys(widgetFilter?.filterValues);
+        if (controllerOption.operatorType === 'common') {
+          if (controllerOption?.filterValues) {
+            setTargetKeys(controllerOption?.filterValues);
           }
         }
       },
@@ -164,7 +155,7 @@ const OperatorValues: FC<{
     );
     const updateViewColumn = useCallback(() => {
       const assistViewFields = form?.getFieldValue([
-        'widgetFilter',
+        'controllerOption',
         'assistViewFields',
       ]);
       if (assistViewFields) {
@@ -183,14 +174,14 @@ const OperatorValues: FC<{
         const curType = e.target.value as FilterOperatorType;
         const filterSqlOperator = adjustSqlOperator(fieldValueType, curType);
 
-        const widgetFilter = form?.getFieldValue('widgetFilter');
+        const controllerOption = form?.getFieldValue('controllerOption');
         const nextWidgetFilter: WidgetControllerOption = {
-          ...widgetFilter,
+          ...controllerOption,
           filterFacade: undefined,
           sqlOperator: filterSqlOperator,
         };
         form?.setFieldsValue({
-          widgetFilter: nextWidgetFilter,
+          controllerOption: nextWidgetFilter,
         });
       },
       [fieldValueType, form],
@@ -198,7 +189,7 @@ const OperatorValues: FC<{
 
     const getOperatorType = useCallback(() => {
       let operatorType: FilterOperatorType = form?.getFieldValue([
-        'widgetFilter',
+        'controllerOption',
         'operatorType',
       ]);
 
@@ -209,7 +200,7 @@ const OperatorValues: FC<{
       <Wrap>
         <Form.Item
           noStyle
-          name={['widgetFilter', 'operatorType']}
+          name={['controllerOption', 'operatorType']}
           validateTrigger={['onChange', 'onBlur']}
           rules={[{ required: true }]}
         >
@@ -230,7 +221,7 @@ const OperatorValues: FC<{
               <>
                 {getOperatorType() !== 'condition' && (
                   <Form.Item
-                    name={['widgetFilter', 'assistViewFields']}
+                    name={['controllerOption', 'assistViewFields']}
                     noStyle
                   >
                     <AssistViewFields

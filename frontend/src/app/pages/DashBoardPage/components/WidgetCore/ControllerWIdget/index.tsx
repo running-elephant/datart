@@ -16,4 +16,4 @@
  * limitations under the License.
  */
 
-export { WidgetFilterCore } from './WidgetFilterCore';
+export { ControllerWidgetCore } from './ControllerWidgetCore';

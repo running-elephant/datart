@@ -207,9 +207,7 @@ export const getWidgetDataAsync = createAsyncThunk<
       case 'container':
         return null;
       case 'controller':
-        await dispatch(
-          getControllerOptions({ widget: curWidget, renderMode }),
-        );
+        await dispatch(getControllerOptions({ widget: curWidget, renderMode }));
 
         return null;
       default:
@@ -301,15 +299,15 @@ export const getControllerOptions = createAsyncThunk<
   'board/getControllerOptions',
   async ({ widget, renderMode }, { getState, dispatch }) => {
     const content = widget.config.content as ControllerWidgetContent;
-    const widgetFilter = content.controllerOption;
+    const controllerOption = content.controllerOption;
     const executeTokenMap = (getState() as RootState)?.share?.executeTokenMap;
 
     if (
-      widgetFilter.assistViewFields &&
-      Array.isArray(widgetFilter.assistViewFields)
+      controllerOption.assistViewFields &&
+      Array.isArray(controllerOption.assistViewFields)
     ) {
       // 请求
-      const [viewId, viewField] = widgetFilter.assistViewFields;
+      const [viewId, viewField] = controllerOption.assistViewFields;
       const executeToken = executeTokenMap?.[viewId];
       const dataset = await getDistinctFields(
         viewId,

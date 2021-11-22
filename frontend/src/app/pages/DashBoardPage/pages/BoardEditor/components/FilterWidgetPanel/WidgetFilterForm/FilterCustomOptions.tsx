@@ -32,10 +32,10 @@ export const FilterCustomOptions: React.FC<FilterCustomOptionsProps> = memo(
     const onChangeFilterOptions = useCallback(
       (rows: FilterValueOption[]) => {
         setRows(rows);
-        const widgetFilter = form?.getFieldValue('widgetFilter');
+        const controllerOption = form?.getFieldValue('controllerOption');
         form?.setFieldsValue({
-          widgetFilter: {
-            ...widgetFilter,
+          controllerOption: {
+            ...controllerOption,
             filterValueOptions: [...rows.slice()],
           },
         });
@@ -44,7 +44,7 @@ export const FilterCustomOptions: React.FC<FilterCustomOptionsProps> = memo(
     );
 
     useEffect(() => {
-      const { filterValueOptions } = form?.getFieldValue('widgetFilter');
+      const { filterValueOptions } = form?.getFieldValue('controllerOption');
       setRows(filterValueOptions);
     }, [form]);
     const handleRowStateUpdate = useCallback(
@@ -149,7 +149,7 @@ export const FilterCustomOptions: React.FC<FilterCustomOptionsProps> = memo(
         <Form.Item
           noStyle
           shouldUpdate
-          name={['widgetFilter', 'filterValueOptions']}
+          name={['controllerOption', 'filterValueOptions']}
           label="备选项"
           preserve
           validateTrigger={['onBlur', 'onChange']}

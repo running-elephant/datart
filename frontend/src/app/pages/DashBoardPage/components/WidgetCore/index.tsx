@@ -34,7 +34,7 @@ import { BoardContext } from '../../contexts/BoardContext';
 import { BoardInfoContext } from '../../contexts/BoardInfoContext';
 import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
 import { getWidgetSomeStyle } from '../../utils/widget';
-import { WidgetFilterCore } from './FilterWIdget';
+import { ControllerWidgetCore } from './ControllerWIdget';
 
 export interface WidgetCoreProps {
   background?: boolean;
@@ -126,7 +126,7 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
       case 'container':
         return <>{containerElement}</>;
       case 'controller':
-        return <WidgetFilterCore id={widget.id} />;
+        return <ControllerWidgetCore id={widget.id} />;
       default:
         return <div>default element</div>;
     }

@@ -37,7 +37,7 @@ export const CustomTimeSetter: FC<{
   const isRelativeTime = useCallback(
     startOrEnd => {
       const timeType: RelativeOrExactTime = form?.getFieldValue([
-        'widgetFilter',
+        'controllerOption',
         'filterDate',
         startOrEnd,
         'relativeOrExact',
@@ -60,7 +60,7 @@ export const CustomTimeSetter: FC<{
     <>
       <Form.Item
         noStyle
-        name={['widgetFilter', 'filterDate', startOrEnd, 'relativeOrExact']}
+        name={['controllerOption', 'filterDate', startOrEnd, 'relativeOrExact']}
         validateTrigger={['onChange', 'onBlur']}
         rules={[{ required: true }]}
       >
@@ -72,7 +72,7 @@ export const CustomTimeSetter: FC<{
           return !isRelativeTime(startOrEnd) ? (
             <Form.Item
               noStyle
-              name={['widgetFilter', 'filterDate', startOrEnd, 'exactTime']}
+              name={['controllerOption', 'filterDate', startOrEnd, 'exactTime']}
               validateTrigger={['onChange', 'onBlur']}
             >
               <DatePicker
@@ -86,7 +86,7 @@ export const CustomTimeSetter: FC<{
               <Form.Item
                 noStyle
                 name={[
-                  'widgetFilter',
+                  'controllerOption',
                   'filterDate',
                   startOrEnd,
                   'relative',
@@ -100,7 +100,7 @@ export const CustomTimeSetter: FC<{
               <Form.Item
                 noStyle
                 name={[
-                  'widgetFilter',
+                  'controllerOption',
                   'filterDate',
                   startOrEnd,
                   'relative',
@@ -120,7 +120,7 @@ export const CustomTimeSetter: FC<{
               <Form.Item
                 noStyle
                 name={[
-                  'widgetFilter',
+                  'controllerOption',
                   'filterDate',
                   startOrEnd,
                   'relative',

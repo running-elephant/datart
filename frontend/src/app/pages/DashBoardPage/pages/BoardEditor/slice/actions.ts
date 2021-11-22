@@ -132,7 +132,7 @@ export const updateWidgetFilterAction =
     fieldValueType: ChartDataViewFieldType;
     controllerFacadeType: ControllerFacadeTypes;
     views: RelatedView[];
-    widgetFilter: WidgetControllerOption;
+    controllerOption: WidgetControllerOption;
     hasVariable?: boolean;
   }) =>
   async (dispatch, getState) => {
@@ -140,7 +140,7 @@ export const updateWidgetFilterAction =
       boardId,
       boardType,
       views,
-      widgetFilter,
+      controllerOption,
       controllerFacadeType,
       relations,
       fieldValueType,
@@ -151,7 +151,7 @@ export const updateWidgetFilterAction =
       type: controllerFacadeType,
       relatedViews: views,
       fieldValueType,
-      controllerOption: widgetFilter,
+      controllerOption: controllerOption,
       hasVariable: hasVariable || false,
     };
 
