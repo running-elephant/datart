@@ -66,13 +66,13 @@ export const BoardProvider: FC<{
       //
       renderedWidgetById: useCallback(
         wid => {
-          console.log('renderedWidgetById')
           let isInitQuery = board.config.isInitQuery;
 
           if (isInitQuery === false && renderMode !== 'schedule') {
+            //zh:如果 isInitQuery === false renderMode !=='schedule' 那么没有数据被请求 en: If isInitQuery === false renderMode !=='schedule' then no data is requested
             return false;
           }
-          console.log('请求数据');
+
           if (editing) {
             dispatch(
               renderedEditWidgetAsync({ boardId: board.id, widgetId: wid }),
