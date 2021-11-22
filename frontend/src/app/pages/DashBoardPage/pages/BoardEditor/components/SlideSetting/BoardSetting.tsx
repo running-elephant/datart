@@ -34,6 +34,7 @@ import { useDispatch } from 'react-redux';
 import { editBoardStackActions } from '../../slice';
 import BackgroundSet from './SettingItem/BackgroundSet';
 import NumberSet from './SettingItem/BasicSet/NumberSet';
+import InitQuerySet from './SettingItem/InitQuerySet';
 import ScaleModeSet from './SettingItem/ScaleModeSet';
 import { Group, SettingPanel } from './SettingPanel';
 
@@ -56,6 +57,7 @@ export const BoardSetting: FC = memo(() => {
       paddingW: config.containerPadding[0],
       paddingH: config.containerPadding[1],
       rowHeight: config.rowHeight,
+      isInitQuery: config.isInitQuery === false ? false : true, //如果值为undefined也为true
     };
     form.setFieldsValue({ ...cacheValue.current });
   }, [config, form]);
@@ -74,6 +76,7 @@ export const BoardSetting: FC = memo(() => {
         draft.containerPadding[0] = value.paddingW;
         draft.containerPadding[1] = value.paddingH;
         draft.rowHeight = value.rowHeight;
+        draft.isInitQuery = value.isInitQuery;
       });
       dispatch(editBoardStackActions.updateBoardConfig(nextConf));
     },
@@ -142,6 +145,11 @@ export const BoardSetting: FC = memo(() => {
                 background={config.background}
                 form={form}
               />
+            </Group>
+          </Panel>
+          <Panel header="查询配置" key="isInitQuery" forceRender>
+            <Group>
+              <InitQuerySet name="isInitQuery"></InitQuerySet>
             </Group>
           </Panel>
         </Collapse>
