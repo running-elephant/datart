@@ -1,16 +1,16 @@
 import {
-  ControllerVisibilityType,
-  FilterOperatorType,
+  ControllerVisibleType,
+  ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
 import { FilterValueOption } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { RelativeOrExactTime } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import { Moment, unitOfTime } from 'moment';
-import { VariableValueTypes } from './../../../../../MainPage/pages/VariablePage/constants';
+import { VariableValueTypes } from '../../../../../MainPage/pages/VariablePage/constants';
 
 export interface ControllerVisibility {
-  visibilityType: ControllerVisibilityType;
+  visibilityType: ControllerVisibleType;
   condition?: VisibilityCondition;
 }
 export type ValueTypes = ChartDataViewFieldType | VariableValueTypes;
@@ -30,15 +30,15 @@ export interface VisibilityCondition {
 }
 
 export interface WidgetControllerOption {
-  operatorType: FilterOperatorType; //
+  valueOptionType: ValueOptionType; //
   assistViewFields: string[]; //辅助添加view字段
   visibility: ControllerVisibility;
   sqlOperator: FilterSqlOperator;
   filterDate?: FilterDate;
   filterValues: any[];
   filterValueOptions: FilterValueOption[];
-  minValue: number;
-  maxValue: number;
+  minValue?: number;
+  maxValue?: number;
 }
 export interface FilterDate {
   // commonTime: keyof typeof RECOMMEND_TIME;

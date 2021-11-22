@@ -116,6 +116,7 @@ export const SCALE_MODE_ENUM = strEnumType([
   'scaleFull',
   'noScale',
 ]);
+
 export type ScaleModeType = keyof typeof SCALE_MODE_ENUM;
 export const SCALE_MODE__OPTIONS = [
   { name: '等比宽度缩放', value: SCALE_MODE_ENUM.scaleWidth },
@@ -124,26 +125,28 @@ export const SCALE_MODE__OPTIONS = [
   { name: '实际尺寸', value: SCALE_MODE_ENUM.noScale },
 ];
 
-export const OPERATOR_TYPE_ENUM = strEnumType([
-  'common',
-  'custom',
-  'condition',
-]);
-export type FilterOperatorType = keyof typeof OPERATOR_TYPE_ENUM;
+export const enum ValueOptionTypes {
+  Common = 'common',
+  Custom = 'custom',
+}
+export type ValueOptionType = Uncapitalize<keyof typeof ValueOptionTypes>;
 export const OPERATOR_TYPE_OPTION = [
-  { name: '常规', value: OPERATOR_TYPE_ENUM.common },
-  { name: '自定义', value: OPERATOR_TYPE_ENUM.custom },
+  { name: '常规', value: ValueOptionTypes.Common },
+  { name: '自定义', value: ValueOptionTypes.Custom },
 ];
-export const ControllerVisibilityEnum = strEnumType([
-  'hide',
-  'show',
-  'condition',
-]);
-export type ControllerVisibilityType = keyof typeof ControllerVisibilityEnum;
+
+export const enum ControllerVisibleTypes {
+  Show = 'show',
+  Hide = 'hide',
+  Condition = 'condition',
+}
+export type ControllerVisibleType = Uncapitalize<
+  keyof typeof ControllerVisibleTypes
+>;
 export const VISIBILITY_TYPE_OPTION = [
-  { name: '显示', value: ControllerVisibilityEnum.show },
-  { name: '隐藏', value: ControllerVisibilityEnum.hide },
-  { name: '条件', value: ControllerVisibilityEnum.condition },
+  { name: '显示', value: ControllerVisibleTypes.Show },
+  { name: '隐藏', value: ControllerVisibleTypes.Hide },
+  { name: '条件', value: ControllerVisibleTypes.Condition },
 ];
 export const SQL_OPERATOR_OPTIONS = {
   include: [

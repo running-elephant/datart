@@ -18,8 +18,8 @@
 
 import { Form, FormInstance, Radio, Transfer } from 'antd';
 import {
-  FilterOperatorType,
   OPERATOR_TYPE_OPTION,
+  ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
 import { FilterValueOption } from 'app/types/ChartConfig';
 import ChartDataView, {
@@ -31,7 +31,6 @@ import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ValueTypes, WidgetControllerOption } from '../types';
 import { adjustSqlOperator } from '../utils';
-import { AssistViewFields } from './AssistViewFields';
 import { FilterCustomOptions } from './FilterCustomOptions';
 
 export const singleFacadeTypes = [
@@ -43,7 +42,8 @@ export const singleFacadeTypes = [
   ControllerFacadeTypes.Value,
 ];
 
-const OperatorValues: FC<{
+const SetValueOptions: FC<{
+  controllerType: ControllerFacadeTypes;
   form: FormInstance<{ controllerOption: WidgetControllerOption }> | undefined;
   viewMap: Record<string, ChartDataView>;
   fieldValueType: ValueTypes;
@@ -52,6 +52,7 @@ const OperatorValues: FC<{
   onChangeFilterValues?: (values: any[]) => void;
 }> = memo(
   ({
+    controllerType,
     form,
     viewMap,
     fieldValueType,
@@ -145,7 +146,7 @@ const OperatorValues: FC<{
           form?.getFieldValue('controllerOption');
 
         setOptionValues(convertToList(dataset?.rows, []));
-        if (controllerOption.operatorType === 'common') {
+        if (controllerOption.valueOptionType === 'common') {
           if (controllerOption?.filterValues) {
             setTargetKeys(controllerOption?.filterValues);
           }
@@ -171,7 +172,7 @@ const OperatorValues: FC<{
 
     const onOperatorTypeChange = useCallback(
       e => {
-        const curType = e.target.value as FilterOperatorType;
+        const curType = e.target.value as ValueOptionType;
         const filterSqlOperator = adjustSqlOperator(fieldValueType, curType);
 
         const controllerOption = form?.getFieldValue('controllerOption');
@@ -188,7 +189,7 @@ const OperatorValues: FC<{
     );
 
     const getOperatorType = useCallback(() => {
-      let operatorType: FilterOperatorType = form?.getFieldValue([
+      let operatorType: ValueOptionType = form?.getFieldValue([
         'controllerOption',
         'operatorType',
       ]);
@@ -219,19 +220,6 @@ const OperatorValues: FC<{
           {() => {
             return (
               <>
-                {getOperatorType() !== 'condition' && (
-                  <Form.Item
-                    name={['controllerOption', 'assistViewFields']}
-                    noStyle
-                  >
-                    <AssistViewFields
-                      allowClear
-                      placeholder="select viewField"
-                      onChange={onViewFieldChange}
-                      style={{ margin: '6px 0' }}
-                    />
-                  </Form.Item>
-                )}
                 {getOperatorType() === 'common' && (
                   <div className="transfer">
                     <Transfer
@@ -261,7 +249,7 @@ const OperatorValues: FC<{
   },
 );
 
-export default OperatorValues;
+export default SetValueOptions;
 
 const Wrap = styled.div`
   .transfer {

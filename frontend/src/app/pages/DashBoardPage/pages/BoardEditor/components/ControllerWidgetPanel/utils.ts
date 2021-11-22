@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 import {
-  FilterOperatorType,
-  OPERATOR_TYPE_ENUM,
+  ValueOptionType,
+  ValueOptionTypes,
 } from 'app/pages/DashBoardPage/constants';
 import {
   ChartDataViewFieldCategory,
@@ -25,10 +25,10 @@ import {
 } from 'app/types/ChartDataView';
 import { ControllerFacadeTypes as Opt } from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
-import { FilterSqlOperator } from './../../../../../../../globalConstants';
+import { FilterSqlOperator } from '../../../../../../../globalConstants';
 import { ValueTypes, WidgetControllerOption } from './types';
 
-export const getStringFacadeOptions = (type: FilterOperatorType) => {
+export const getStringFacadeOptions = (type: ValueOptionType) => {
   switch (type) {
     case 'common':
       return [
@@ -39,10 +39,8 @@ export const getStringFacadeOptions = (type: FilterOperatorType) => {
       ];
     case 'custom':
       return [Opt.MultiDropdownList, Opt.DropdownList, Opt.RadioGroup];
-    case 'condition':
-      return [Opt.Text];
     default:
-      return [Opt.Text];
+      return [];
   }
 };
 
@@ -76,8 +74,8 @@ export const preformatWidgetFilter = (
   const controllerOption = JSON.parse(
     JSON.stringify(oldWidgetFilter),
   ) as WidgetControllerOption;
-  if (!controllerOption.operatorType) {
-    controllerOption.operatorType = OPERATOR_TYPE_ENUM.common;
+  if (!controllerOption.valueOptionType) {
+    controllerOption.valueOptionType = ValueOptionTypes.Common;
   }
   if (!controllerOption?.visibility) {
     controllerOption.visibility = {
@@ -120,8 +118,8 @@ export const formatWidgetFilter = (
     };
   }
 
-  if (!controllerOption.operatorType) {
-    controllerOption.operatorType = OPERATOR_TYPE_ENUM.common;
+  if (!controllerOption.valueOptionType) {
+    controllerOption.valueOptionType = ValueOptionTypes.Common;
   }
   if (
     controllerOption.filterValueOptions &&
@@ -154,7 +152,7 @@ export const formatWidgetFilter = (
 
 export const getInitWidgetFilter = () => {
   const controllerOPtion: WidgetControllerOption = {
-    operatorType: OPERATOR_TYPE_ENUM.common, //
+    valueOptionType: ValueOptionTypes.Common, //
     assistViewFields: [],
     visibility: {
       visibilityType: 'show',
@@ -170,10 +168,10 @@ export const getInitWidgetFilter = () => {
 
 export const adjustSqlOperator = (
   fieldValueType: ValueTypes,
-  operatorType: FilterOperatorType,
+  operatorType: ValueOptionType,
 ): FilterSqlOperator => {
   if (fieldValueType === ChartDataViewFieldType.STRING) {
-    if (operatorType === 'condition') {
+    if (operatorType === 'common') {
       return FilterSqlOperator.Equal;
     } else {
       return FilterSqlOperator.In;

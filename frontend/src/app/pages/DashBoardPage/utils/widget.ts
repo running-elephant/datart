@@ -56,8 +56,8 @@ import {
   WidgetPadding,
   WidgetType,
 } from '../pages/Board/slice/types';
-import { WidgetControllerOption } from '../pages/BoardEditor/components/FilterWidgetPanel/types';
-import { ValueTypes } from './../pages/BoardEditor/components/FilterWidgetPanel/types';
+import { WidgetControllerOption } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { ValueTypes } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
 
 export const VALUE_SPLITTER = '###';
 

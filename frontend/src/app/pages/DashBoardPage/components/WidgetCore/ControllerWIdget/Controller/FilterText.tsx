@@ -17,7 +17,7 @@
  */
 import { Input, Select } from 'antd';
 import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
-import { ControlOption } from 'app/pages/DashBoardPage/pages/BoardEditor/components/FilterWidgetPanel/types';
+import { ControlOption } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { FilterSqlOperator } from 'globalConstants';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';

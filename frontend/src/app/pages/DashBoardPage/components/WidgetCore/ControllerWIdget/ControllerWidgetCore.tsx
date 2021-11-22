@@ -24,7 +24,7 @@ import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/sli
 import {
   ControlOption,
   FilterDate,
-} from 'app/pages/DashBoardPage/pages/BoardEditor/components/FilterWidgetPanel/types';
+} from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getWidgetFilterDateValues } from 'app/pages/DashBoardPage/utils';
 import { FilterValueOption } from 'app/types/ChartConfig';
 import {
@@ -68,7 +68,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
 
     filterValues,
     filterValueOptions,
-    operatorType,
+    valueOptionType: operatorType,
     sqlOperator,
     minValue,
     maxValue,
@@ -141,7 +141,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
       const nextWidget = produce(widget, draft => {
         (
           draft.config.content as ControllerWidgetContent
-        ).controllerOption.operatorType = 'custom';
+        ).controllerOption.valueOptionType = 'custom';
         (
           draft.config.content as ControllerWidgetContent
         ).controllerOption.filterDate = nextFilterDate;
@@ -172,8 +172,8 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
           <FilterSlider
             value={filterValues}
             onValuesChange={onFilterValuesChange}
-            minValue={minValue}
-            maxValue={maxValue}
+            minValue={minValue!}
+            maxValue={maxValue!}
           />
         );
       case ControllerFacadeTypes.RadioGroup:
@@ -208,7 +208,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
 
       case ControllerFacadeTypes.RangeTime:
         const rangeTimeValues = getWidgetFilterDateValues(
-          controllerOption.operatorType,
+          controllerOption.valueOptionType,
           controllerOption!.filterDate!,
         );
         return (
@@ -219,7 +219,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         );
       case ControllerFacadeTypes.Time:
         const timeValues = getWidgetFilterDateValues(
-          controllerOption.operatorType,
+          controllerOption.valueOptionType,
           controllerOption!.filterDate!,
         );
         return (

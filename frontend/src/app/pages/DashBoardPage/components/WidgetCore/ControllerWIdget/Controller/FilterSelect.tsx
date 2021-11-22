@@ -17,7 +17,7 @@
  */
 import { Select } from 'antd';
 import { SelectValue } from 'antd/lib/select';
-import { ControlOption } from 'app/pages/DashBoardPage/pages/BoardEditor/components/FilterWidgetPanel/types';
+import { ControlOption } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 

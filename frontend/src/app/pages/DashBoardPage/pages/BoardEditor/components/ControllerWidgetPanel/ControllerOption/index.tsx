@@ -24,14 +24,15 @@ import {
 import ChartDataView, {
   ChartDataViewFieldCategory,
 } from 'app/types/ChartDataView';
-import { FilterSqlOperator } from 'globalConstants';
-import React, { memo, useEffect } from 'react';
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+import React, { memo } from 'react';
 import styled from 'styled-components/macro';
-import { ValueTypes, WidgetControllerOption } from '../types';
+import { ValueTypes } from '../types';
 import ControllerVisibility from './ControllerVisibility';
-import OperatorValues from './OperatorValues';
+import SetValueOptions from './SetValueOptions';
 
 export interface RelatedViewFormProps {
+  controllerType: ControllerFacadeTypes;
   form: FormInstance<any> | undefined;
   viewMap: Record<string, ChartDataView>;
   otherStrFilterWidgets: Widget[];
@@ -41,32 +42,28 @@ export interface RelatedViewFormProps {
 }
 
 export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
-  ({ form, viewMap, fieldValueType, fieldCategory, otherStrFilterWidgets }) => {
-    const t = useI18NPrefix('viz.common.filter');
-    useEffect(() => {
-      if (fieldCategory === ChartDataViewFieldCategory.Variable) {
-        const controllerOption = form?.getFieldValue('controllerOption');
-        const nextOption: WidgetControllerOption = {
-          ...controllerOption,
-          sqlOperator: FilterSqlOperator.Equal,
-        };
-        form?.setFieldsValue({
-          controllerOption: nextOption,
-        });
-      }
-    }, [fieldCategory, form]);
+  ({
+    controllerType,
+    form,
+    viewMap,
+    fieldValueType,
+    fieldCategory,
+    otherStrFilterWidgets,
+  }) => {
+    const filterT = useI18NPrefix('viz.common.filter');
     return (
       <Wrap>
         <Form.Item
-          name="filterName"
-          label={t('filterName')}
+          name="name"
+          label={filterT('filterName')}
           rules={[{ required: true }]}
         >
           <Input />
         </Form.Item>
 
         <Form.Item label="取值配置" shouldUpdate style={{ marginBottom: '0' }}>
-          <OperatorValues
+          <SetValueOptions
+            controllerType={controllerType}
             fieldValueType={fieldValueType}
             viewMap={viewMap}
             fieldCategory={fieldCategory}

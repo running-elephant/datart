@@ -19,7 +19,7 @@
 import { Form, FormInstance, Radio } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
-  FilterOperatorType,
+  ValueOptionType,
   OPERATOR_TYPE_OPTION,
 } from 'app/pages/DashBoardPage/constants';
 import {
@@ -56,7 +56,7 @@ const FilterDateCondition: FC<{
   }, [form, hasVariable]);
 
   const getCurType = useCallback(() => {
-    const operatorType: FilterOperatorType = form?.getFieldValue([
+    const operatorType: ValueOptionType = form?.getFieldValue([
       'controllerOption',
       'operatorType',
     ]);

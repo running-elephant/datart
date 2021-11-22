@@ -13,7 +13,7 @@ import {
 import { convertRelativeTimeRange, getTime } from 'app/utils/time';
 import { FilterSqlOperator } from 'globalConstants';
 import { errorHandle } from 'utils/utils';
-import { FilterOperatorType, STORAGE_IMAGE_KEY_PREFIX } from '../constants';
+import { ValueOptionType, STORAGE_IMAGE_KEY_PREFIX } from '../constants';
 import {
   BoardLinkFilter,
   ControllerWidgetContent,
@@ -25,7 +25,7 @@ import {
 import {
   FilterDate,
   WidgetControllerOption,
-} from '../pages/BoardEditor/components/FilterWidgetPanel/types';
+} from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { ChartRequestFilter } from './../../ChartWorkbenchPage/models/ChartHttpRequest';
 
 export const convertImageUrl = (urlKey: string = ''): string => {
@@ -165,7 +165,7 @@ export const getWidgetFilterValues = (opt: {
         return false;
       }
       const timeValues = getWidgetFilterDateValues(
-        controllerOption.operatorType,
+        controllerOption.valueOptionType,
         controllerOption.filterDate,
       );
       const values = timeValues
@@ -234,7 +234,7 @@ export const getWidgetFilterValues = (opt: {
   // Expression 类型
 };
 export const getWidgetFilterDateValues = (
-  operatorType: FilterOperatorType,
+  operatorType: ValueOptionType,
   filterDate: FilterDate,
 ) => {
   const { commonTime, endTime, startTime } = filterDate;

@@ -39,7 +39,7 @@ import { RootState } from 'types';
 import { v4 as uuidv4 } from 'uuid';
 import { editBoardStackActions, editDashBoardInfoActions } from '.';
 import { BoardType } from '../../Board/slice/types';
-import { WidgetControllerOption } from './../components/FilterWidgetPanel/types';
+import { WidgetControllerOption } from '../components/ControllerWidgetPanel/types';
 import { addWidgetsToEditBoard, getEditWidgetDataAsync } from './thunk';
 import { HistoryEditBoard } from './types';
 

@@ -34,7 +34,7 @@ import {
   ScaleModeType,
   TextAlignType,
 } from '../../../constants';
-import { WidgetControllerOption } from '../../BoardEditor/components/FilterWidgetPanel/types';
+import { WidgetControllerOption } from '../../BoardEditor/components/ControllerWidgetPanel/types';
 
 export const strEnumType = <T extends string>(o: Array<T>): { [K in T]: K } => {
   return o.reduce((res, key) => {

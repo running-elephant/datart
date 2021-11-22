@@ -57,6 +57,7 @@ import {
   selectSortAllWidgets,
 } from '../../slice/selectors';
 import { addWidgetsToEditBoard } from '../../slice/thunk';
+import { WidgetControlForm } from './ControllerOption';
 import { RelatedViewForm } from './RelatedViewForm';
 import { RelatedWidgetItem, RelatedWidgets } from './RelatedWidgets';
 import { ValueTypes, WidgetControllerOption } from './types';
@@ -65,7 +66,6 @@ import {
   getInitWidgetFilter,
   preformatWidgetFilter,
 } from './utils';
-import { WidgetControlForm } from './WidgetFilterForm';
 
 const FilterWidgetPanel: React.FC = memo(props => {
   const dispatch = useDispatch();
@@ -389,6 +389,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
         <Container className="datart-split">
           <div>
             <WidgetControlForm
+              controllerType={controllerType!}
               otherStrFilterWidgets={otherStrFilterWidgets}
               boardType={boardType}
               fieldCategory={fieldCategory}
