@@ -24,10 +24,10 @@ import ChartTools from 'app/pages/ChartWorkbenchPage/components/ChartOperationPa
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
-import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG, SPACE_MD } from 'styles/StyleConstants';
+import Chart404Graph from './components/Chart404Graph';
 import ChartTypeSelector, {
   ChartPresentType,
 } from './components/ChartTypeSelector';
@@ -56,6 +56,22 @@ const ChartPresentPanel: FC<{
     refreshRate: 10,
   });
 
+  const renderGraph = (containerId, chart?: Chart, chartConfig?, style?) => {
+    if (!chart?.isMatchRequirement(chartConfig)) {
+      return <Chart404Graph chart={chart} chartConfig={chartConfig} />;
+    }
+    return (
+      !!chart &&
+      chartDispatcher.getContainers(
+        containerId,
+        chart,
+        dataset,
+        chartConfig!,
+        style,
+      )
+    );
+  };
+
   const renderReusableChartContainer = () => {
     const style = {
       width: panelRef.current?.offsetWidth,
@@ -71,14 +87,7 @@ const ChartPresentPanel: FC<{
       <>
         {ChartPresentType.GRAPH === chartType && (
           <div style={{ height: '100%' }} ref={graphRef}>
-            {!!chart &&
-              chartDispatcher.getContainers(
-                containerId,
-                chart,
-                dataset,
-                chartConfig!,
-                style,
-              )}
+            {renderGraph(containerId, chart, chartConfig, style)}
           </div>
         )}
         {ChartPresentType.RAW === chartType && (
@@ -115,16 +124,16 @@ const ChartPresentPanel: FC<{
   };
 
   return (
-    <StyledVizPresentPanel ref={panelRef}>
+    <StyledChartPresentPanel ref={panelRef}>
       {renderChartTypeSelector()}
       {renderReusableChartContainer()}
-    </StyledVizPresentPanel>
+    </StyledChartPresentPanel>
   );
 });
 
 export default ChartPresentPanel;
 
-const StyledVizPresentPanel = styled.div<{ ref }>`
+const StyledChartPresentPanel = styled.div<{ ref }>`
   display: flex;
   flex: 1;
   flex-direction: column;

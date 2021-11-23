@@ -318,7 +318,8 @@
       "present": {
         "graph": "图表",
         "raw": "原始数据",
-        "sql": "SQL"
+        "sql": "SQL",
+        "needMore": "至少还需要 {{num}} 个 {{type}}"
       },
       "graph": {
         "group": "维度",

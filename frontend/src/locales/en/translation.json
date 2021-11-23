@@ -318,7 +318,8 @@
       "present": {
         "graph": "Graph",
         "raw": "Raw",
-        "sql": "SQL"
+        "sql": "SQL",
+        "needMore": "At least need {{num}} {{type}}(s)"
       },
       "graph": {
         "group": "Dimensions",

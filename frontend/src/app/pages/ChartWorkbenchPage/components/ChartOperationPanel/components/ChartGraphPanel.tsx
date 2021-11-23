@@ -95,7 +95,7 @@ const ChartGraphPanel: FC<{
           }
         >
           <IconWrapper>
-            <ChartIcon
+            <StyledChartIcon
               isMatchRequirement={c?.isMatchRequirement(chartConfig)}
               fontSize={FONT_SIZE_ICON_MD}
               size={SPACE_TIMES(9)}
@@ -105,7 +105,7 @@ const ChartGraphPanel: FC<{
               onClick={handleChartChange(c?.meta?.id)}
             >
               <i className={c?.meta?.icon} />
-            </ChartIcon>
+            </StyledChartIcon>
           </IconWrapper>
         </Tooltip>
       ))}
@@ -129,7 +129,7 @@ const IconWrapper = styled.span`
   padding: ${SPACE_TIMES(0.5)};
 `;
 
-const ChartIcon = styled(IW)<{ isMatchRequirement: boolean }>`
+const StyledChartIcon = styled(IW)<{ isMatchRequirement: boolean }>`
   cursor: pointer;
   border-radius: ${BORDER_RADIUS};
   opacity: ${p => (p.isMatchRequirement ? 1 : 0.4)};
