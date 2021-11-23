@@ -483,17 +483,17 @@ export function transformMeta(model?: string) {
   }));
 }
 
-export function mergeConfig<T extends ChartConfig>(origin?: T, target?: T): T {
-  if (!origin) {
-    return target!;
-  }
+export function mergeConfig<T extends ChartConfig>(target?: T, source?: T): T {
   if (!target) {
-    return origin;
+    return source!;
   }
-  origin.datas = mergeChartDataConfigs(origin?.datas, target?.datas);
-  origin.styles = mergeChartStyleConfigs(origin?.styles, target?.styles);
-  origin.settings = mergeChartStyleConfigs(origin?.settings, target?.settings);
-  return origin;
+  if (!source) {
+    return target;
+  }
+  target.datas = mergeChartDataConfigs(target?.datas, source?.datas);
+  target.styles = mergeChartStyleConfigs(target?.styles, source?.styles);
+  target.settings = mergeChartStyleConfigs(target?.settings, source?.settings);
+  return target;
 }
 
 export function mergeChartStyleConfigs<
@@ -523,11 +523,7 @@ export function mergeChartStyleConfigs<
       tEle['value'] = sEle?.['value'];
     }
     if (!isEmptyArray(tEle?.rows)) {
-      tEle['rows'] = mergeChartStyleConfigs(
-        tEle.rows,
-        sEle?.rows || [],
-        options,
-      );
+      tEle['rows'] = mergeChartStyleConfigs(tEle.rows, sEle?.rows, options);
     } else if (sEle && !isEmptyArray(sEle?.rows)) {
       // Note: we merge all rows data when target rows is emtpy
       tEle['rows'] = sEle?.rows;

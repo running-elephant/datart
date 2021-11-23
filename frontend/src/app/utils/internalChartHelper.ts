@@ -1,30 +1,57 @@
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import { curry, pipe } from 'utils/object';
-import { isUnderUpperBound, reachLowerBoundCount } from './chartHelper';
+import {
+  isUnderUpperBound,
+  mergeChartStyleConfigs,
+  reachLowerBoundCount,
+} from './chartHelper';
 
-export const transferChartDataConfigs = (
-  sourceConfig?: ChartConfig,
+export const transferChartConfigs = (
   targetConfig?: ChartConfig,
+  sourceConfig?: ChartConfig,
 ) => {
   if (!sourceConfig || !targetConfig) {
     return targetConfig || sourceConfig;
   }
-
-  let finalChartConfig = targetConfig;
-  finalChartConfig = transferCommonSectionConfigs(
-    sourceConfig,
-    finalChartConfig,
-  );
-  // TODO(Stephen): 2. transfor non-data configs only by key
-
-  // TODO(Stephen): 1. should pipe the functions and move utils into ChartHelper.ts
-  return finalChartConfig;
+  return pipe(
+    transferChartDataConfig,
+    transferChartStyleConfig,
+    transferChartSettingConfig,
+  )(targetConfig, sourceConfig);
 };
 
-const transferCommonSectionConfigs = (
-  sourceConfig: ChartConfig,
-  targetConfig: ChartConfig,
-) => {
+const transferChartStyleConfig = (
+  targetConfig?: ChartConfig,
+  sourceConfig?: ChartConfig,
+): ChartConfig => {
+  if (!targetConfig) {
+    return sourceConfig!;
+  }
+  targetConfig.styles = mergeChartStyleConfigs(
+    targetConfig?.styles,
+    sourceConfig?.styles,
+  );
+  return targetConfig;
+};
+
+const transferChartSettingConfig = (
+  targetConfig?: ChartConfig,
+  sourceConfig?: ChartConfig,
+): ChartConfig => {
+  if (!targetConfig) {
+    return sourceConfig!;
+  }
+  targetConfig.settings = mergeChartStyleConfigs(
+    targetConfig?.settings,
+    sourceConfig?.settings,
+  );
+  return targetConfig;
+};
+
+const transferChartDataConfig = (
+  targetConfig?: ChartConfig,
+  sourceConfig?: ChartConfig,
+): ChartConfig => {
   return pipe(
     ...[
       ChartDataSectionType.GROUP,
@@ -34,11 +61,11 @@ const transferCommonSectionConfigs = (
       ChartDataSectionType.MIXED,
       ChartDataSectionType.SIZE,
       ChartDataSectionType.FILTER,
-    ].map(type => curry(transferSectionConfigImpl)(type)),
+    ].map(type => curry(transferDataConfigImpl)(type)),
   )(targetConfig, sourceConfig);
 };
 
-const transferSectionConfigImpl = (
+const transferDataConfigImpl = (
   sectionType: ChartDataSectionType,
   targetConfig?: ChartConfig,
   sourceConfig?: ChartConfig,

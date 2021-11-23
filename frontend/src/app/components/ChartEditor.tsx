@@ -32,11 +32,11 @@ import workbenchSlice, {
   updateChartConfigAndRefreshDatasetAction,
   useWorkbenchSlice,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
-import { transferChartDataConfigs } from 'app/utils/internalChartHelper';
+import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { CloneValueDeep, mergeDefaultToValue } from 'utils/object';
+import { CloneValueDeep } from 'utils/object';
 import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
 import Chart from '../pages/ChartWorkbenchPage/models/Chart';
 import ChartManager from '../pages/ChartWorkbenchPage/models/ChartManager';
@@ -132,21 +132,17 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     registerChartEvents(c);
     setChart(c);
     const targetChartConfig = CloneValueDeep(c.config);
-    // TODO(Stephen): should keep current chart config and merge target into current
-    const finalChartConfig = transferChartDataConfigs(
-      chartConfig,
+
+    const finalChartConfig = transferChartConfigs(
       targetChartConfig,
+      chartConfig,
     );
 
     dispatch(
       workbenchSlice.actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
         payload: {
-          init: {
-            ...finalChartConfig,
-            styles: mergeDefaultToValue(finalChartConfig?.styles),
-            settings: mergeDefaultToValue(finalChartConfig?.settings),
-          },
+          init: finalChartConfig,
         },
       }),
     );

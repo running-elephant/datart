@@ -27,7 +27,7 @@ import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import uniq from 'lodash/uniq';
 
-type PipeFunction<T1, T2> = (value?: T1, args?: T2) => T1 | undefined;
+type PipeFunction<TA, TO> = (accumulator?: TA, options?: TO) => TA | undefined;
 
 export function pipe<T1, T2>(...fns: PipeFunction<T1, T2>[]) {
   return (v, o?) => (fns || []).reduce((y, f) => f(y, o), v);
