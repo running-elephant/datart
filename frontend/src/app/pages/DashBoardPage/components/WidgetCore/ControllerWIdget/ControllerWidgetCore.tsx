@@ -63,12 +63,10 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
     type: facadeType,
   } = useMemo(() => widget.config.content as ControllerWidgetContent, [widget]);
   const {
-    assistViewFields,
     filterDate,
-
     filterValues,
-    filterValueOptions,
-    valueOptionType: operatorType,
+    valueOptions: filterValueOptions,
+    valueOptionType,
     sqlOperator,
     minValue,
     maxValue,
@@ -76,7 +74,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
 
   const optionRows = useMemo(() => {
     const dataRows = rows?.flat(2) || [];
-    if (operatorType === 'common') {
+    if (valueOptionType === 'common') {
       return dataRows.map(ele => {
         const item: FilterValueOption = {
           key: ele,
@@ -85,12 +83,12 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         };
         return item;
       });
-    } else if (operatorType === 'custom') {
+    } else if (valueOptionType === 'custom') {
       return filterValueOptions;
     } else {
       return [];
     }
-  }, [filterValueOptions, operatorType, rows]);
+  }, [filterValueOptions, valueOptionType, rows]);
 
   useEffect(() => {
     // 加载数据项

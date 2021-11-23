@@ -249,7 +249,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           if (visibilityType === 'condition' && condition) {
             const filterToFilterRelation: Relation = {
               sourceId,
-              targetId: condition.dependentFilterId,
+              targetId: condition.dependentControllerId,
               config: {
                 type: 'filterToFilter',
               },
@@ -301,7 +301,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           if (visibilityType === 'condition' && condition) {
             const filterToFilterRelation: Relation = {
               sourceId,
-              targetId: condition.dependentFilterId,
+              targetId: condition.dependentControllerId,
               config: {
                 type: 'filterToFilter',
               },

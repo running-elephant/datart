@@ -15,38 +15,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Form, FormInstance, Input, Space } from 'antd';
+import { Button, FormInstance, Space } from 'antd';
 import { DragSortEditTable } from 'app/components/DragSortEditTable';
 import { FilterValueOption } from 'app/types/ChartConfig';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-export interface FilterCustomOptionsProps {
+import { WidgetControllerOption } from '../../types';
+export interface CustomOptionsProps {
   // [string]: any;
-  form: FormInstance<any> | undefined;
-  optionValues: FilterValueOption[];
+  form: FormInstance<{ controllerOption: WidgetControllerOption }> | undefined;
+  fieldRowData: FilterValueOption[];
+  getControllerOption: () => WidgetControllerOption;
 }
-export const FilterCustomOptions: React.FC<FilterCustomOptionsProps> = memo(
-  ({ optionValues, form }) => {
+export const CustomOptions: React.FC<CustomOptionsProps> = memo(
+  ({ fieldRowData, form, getControllerOption }) => {
     const [rows, setRows] = useState<FilterValueOption[]>([]);
 
     const onChangeFilterOptions = useCallback(
       (rows: FilterValueOption[]) => {
         setRows(rows);
-        const controllerOption = form?.getFieldValue('controllerOption');
+        const controllerOption = getControllerOption();
         form?.setFieldsValue({
           controllerOption: {
             ...controllerOption,
-            filterValueOptions: [...rows.slice()],
+            valueOptions: [...rows.slice()],
           },
         });
       },
-      [form],
+      [form, getControllerOption],
     );
 
     useEffect(() => {
-      const { filterValueOptions } = form?.getFieldValue('controllerOption');
-      setRows(filterValueOptions);
-    }, [form]);
+      const valueOptions = getControllerOption()?.valueOptions || [];
+      setRows(valueOptions);
+    }, [form, getControllerOption]);
     const handleRowStateUpdate = useCallback(
       (row: FilterValueOption) => {
         const oldRowIndex = rows.findIndex(r => r.index === row.index);
@@ -56,20 +58,21 @@ export const FilterCustomOptions: React.FC<FilterCustomOptionsProps> = memo(
       [onChangeFilterOptions, rows],
     );
 
-    const handleAdd = () => {
-      const newKey = rows?.length + 1;
+    const handleAdd = useCallback(() => {
+      debugger;
+      const newKey = rows?.length || 0 + 1;
       const newRow: FilterValueOption = {
         index: newKey,
         key: String(newKey),
         label: String(newKey),
         isSelected: false,
       };
-      const currentRows = rows.concat([newRow]);
+      const currentRows = rows?.concat([newRow]);
       onChangeFilterOptions(currentRows);
-    };
+    }, [onChangeFilterOptions, rows]);
     const addRowByField = useCallback(() => {
-      onChangeFilterOptions(optionValues);
-    }, [onChangeFilterOptions, optionValues]);
+      onChangeFilterOptions(fieldRowData);
+    }, [onChangeFilterOptions, fieldRowData]);
     const handleDelete = (key: React.Key) => {
       const currentRows = rows.filter(r => r.key !== key);
       onChangeFilterOptions(currentRows);
@@ -146,22 +149,11 @@ export const FilterCustomOptions: React.FC<FilterCustomOptionsProps> = memo(
     );
     return (
       <Wrap>
-        <Form.Item
-          noStyle
-          shouldUpdate
-          name={['controllerOption', 'filterValueOptions']}
-          label="备选项"
-          preserve
-          validateTrigger={['onBlur', 'onChange']}
-          rules={[{ required: true }]}
-        >
-          <Input style={{ display: 'none' }}></Input>
-        </Form.Item>
         <div>
           <Space>
             <Button onClick={addRowByField}>从字段填充备选项</Button>
             <Button onClick={handleAdd} type="primary">
-              添加一条备选项
+              +
             </Button>
           </Space>
           <DragSortEditTable

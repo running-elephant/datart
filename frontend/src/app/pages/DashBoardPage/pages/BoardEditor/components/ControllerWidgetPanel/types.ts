@@ -24,7 +24,7 @@ export interface ControlOption {
   };
 }
 export interface VisibilityCondition {
-  dependentFilterId: string;
+  dependentControllerId: string;
   relation: FilterSqlOperator.Equal | FilterSqlOperator.NotEqual; //等于或这不等于
   value: any; // any type
 }
@@ -36,7 +36,7 @@ export interface WidgetControllerOption {
   sqlOperator: FilterSqlOperator;
   filterDate?: FilterDate;
   filterValues: any[];
-  filterValueOptions: FilterValueOption[];
+  valueOptions: FilterValueOption[];
   minValue?: number;
   maxValue?: number;
 }

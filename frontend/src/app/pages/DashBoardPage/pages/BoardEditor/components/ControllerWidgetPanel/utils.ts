@@ -19,14 +19,11 @@ import {
   ValueOptionType,
   ValueOptionTypes,
 } from 'app/pages/DashBoardPage/constants';
-import {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
+import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import { ControllerFacadeTypes as Opt } from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
-import { ValueTypes, WidgetControllerOption } from './types';
+import { WidgetControllerOption } from './types';
 
 export const getStringFacadeOptions = (type: ValueOptionType) => {
   switch (type) {
@@ -122,10 +119,10 @@ export const formatWidgetFilter = (
     controllerOption.valueOptionType = ValueOptionTypes.Common;
   }
   if (
-    controllerOption.filterValueOptions &&
-    controllerOption.filterValueOptions.length > 0
+    controllerOption.valueOptions &&
+    controllerOption.valueOptions.length > 0
   ) {
-    controllerOption.filterValues = controllerOption.filterValueOptions
+    controllerOption.filterValues = controllerOption.valueOptions
       .filter(ele => ele.isSelected)
       .map(ele => ele.key);
   }
@@ -161,27 +158,7 @@ export const getInitWidgetFilter = () => {
     maxValue: 2,
     sqlOperator: FilterSqlOperator.In,
     filterValues: [],
-    filterValueOptions: [],
+    valueOptions: [],
   };
   return controllerOPtion;
-};
-
-export const adjustSqlOperator = (
-  fieldValueType: ValueTypes,
-  operatorType: ValueOptionType,
-): FilterSqlOperator => {
-  if (fieldValueType === ChartDataViewFieldType.STRING) {
-    if (operatorType === 'common') {
-      return FilterSqlOperator.Equal;
-    } else {
-      return FilterSqlOperator.In;
-    }
-  }
-  if (fieldValueType === ChartDataViewFieldType.DATE) {
-    return FilterSqlOperator.Between;
-  }
-  if (fieldValueType === ChartDataViewFieldType.NUMERIC) {
-    return FilterSqlOperator.Equal;
-  }
-  return FilterSqlOperator.In;
 };

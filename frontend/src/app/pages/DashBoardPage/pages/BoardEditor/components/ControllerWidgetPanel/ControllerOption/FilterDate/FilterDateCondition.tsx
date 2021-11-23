@@ -19,8 +19,8 @@
 import { Form, FormInstance, Radio } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
-  ValueOptionType,
   OPERATOR_TYPE_OPTION,
+  ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
 import {
   ChartDataViewFieldCategory,
@@ -37,7 +37,7 @@ const FilterDateCondition: FC<{
   fieldCategory: ChartDataViewFieldCategory;
   fieldValueType: ChartDataViewFieldType;
 }> = memo(({ form, fieldValueType, fieldCategory }) => {
-  const t = useI18NPrefix('viz.common.filter.date');
+  const dateT = useI18NPrefix('viz.common.filter.date');
   const hasVariable = useMemo(() => {
     return fieldCategory === ChartDataViewFieldCategory.Variable;
   }, [fieldCategory]);
@@ -56,11 +56,11 @@ const FilterDateCondition: FC<{
   }, [form, hasVariable]);
 
   const getCurType = useCallback(() => {
-    const operatorType: ValueOptionType = form?.getFieldValue([
+    const valueOptionType: ValueOptionType = form?.getFieldValue([
       'controllerOption',
-      'operatorType',
+      'valueOptionType',
     ]);
-    return operatorType;
+    return valueOptionType;
   }, [form]);
 
   return (
@@ -71,7 +71,7 @@ const FilterDateCondition: FC<{
             <div>
               <Form.Item
                 noStyle
-                name={['controllerOption', 'operatorType']}
+                name={['controllerOption', 'valueOptionType']}
                 label={'可筛选值'}
                 validateTrigger={['onChange', 'onBlur']}
                 rules={[{ required: true }]}

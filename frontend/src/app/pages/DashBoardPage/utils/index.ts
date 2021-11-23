@@ -13,7 +13,7 @@ import {
 import { convertRelativeTimeRange, getTime } from 'app/utils/time';
 import { FilterSqlOperator } from 'globalConstants';
 import { errorHandle } from 'utils/utils';
-import { ValueOptionType, STORAGE_IMAGE_KEY_PREFIX } from '../constants';
+import { STORAGE_IMAGE_KEY_PREFIX, ValueOptionType } from '../constants';
 import {
   BoardLinkFilter,
   ControllerWidgetContent,
@@ -220,25 +220,13 @@ export const getWidgetFilterValues = (opt: {
         });
       return strValues[0] ? strValues : false;
   }
-  // // Date 类型
-  // if (type === ChartDataViewFieldType.DATE) {
-
-  // }
-
-  // NUMERIC 类型
-  // if (type === ChartDataViewFieldType.NUMERIC) {
-
-  // }
-  // string 类型
-
-  // Expression 类型
 };
 export const getWidgetFilterDateValues = (
-  operatorType: ValueOptionType,
+  valueOptionType: ValueOptionType,
   filterDate: FilterDate,
 ) => {
   const { commonTime, endTime, startTime } = filterDate;
-  if (operatorType === 'common') {
+  if (valueOptionType === 'common') {
     const timeRange = convertRelativeTimeRange(commonTime);
     return timeRange;
   }

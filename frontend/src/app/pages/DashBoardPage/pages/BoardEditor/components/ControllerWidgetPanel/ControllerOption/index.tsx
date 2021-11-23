@@ -29,7 +29,7 @@ import React, { memo } from 'react';
 import styled from 'styled-components/macro';
 import { ValueTypes } from '../types';
 import ControllerVisibility from './ControllerVisibility';
-import SetValueOptions from './SetValueOptions';
+import { ValuesSetter } from './ValuesSetter/ValuesSetter';
 
 export interface RelatedViewFormProps {
   controllerType: ControllerFacadeTypes;
@@ -60,16 +60,12 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
         >
           <Input />
         </Form.Item>
+        <ValuesSetter
+          controllerType={controllerType}
+          form={form}
+          viewMap={viewMap}
+        />
 
-        <Form.Item label="取值配置" shouldUpdate style={{ marginBottom: '0' }}>
-          <SetValueOptions
-            controllerType={controllerType}
-            fieldValueType={fieldValueType}
-            viewMap={viewMap}
-            fieldCategory={fieldCategory}
-            form={form}
-          />
-        </Form.Item>
         <Form.Item
           hidden
           noStyle
