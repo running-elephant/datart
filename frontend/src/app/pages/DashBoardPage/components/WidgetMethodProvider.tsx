@@ -85,7 +85,8 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     [dispatch],
   );
   const onWidgetEdit = useCallback(
-    (type: WidgetType, wid: string) => {
+    (widget: Widget, wid: string) => {
+      const type = widget.config.type;
       switch (type) {
         case 'chart':
           const chartType = widget.config.content.type;
@@ -127,13 +128,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       }
     },
 
-    [
-      dispatch,
-      orgId,
-      widget.config.content.type,
-      widget.config.name,
-      widget.datachartId,
-    ],
+    [dispatch, orgId],
   );
   const onWidgetFullScreen = useCallback(
     (editing: boolean, recordId: string, itemId: string) => {
@@ -332,7 +327,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     [boardId, dispatch, editing, renderMode, widgetId],
   );
   const onWidgetAction = useCallback(
-    (action: widgetActionType, widgetType: WidgetType) => {
+    (action: widgetActionType, widget: Widget) => {
       switch (action) {
         case 'fullScreen':
           onWidgetFullScreen(editing, boardId, widgetId);
@@ -343,10 +338,10 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
           onWidgetGetData(boardId, widgetId);
           break;
         case 'delete':
-          onWidgetDelete(widgetType, widgetId);
+          onWidgetDelete(widget.config.type, widgetId);
           break;
         case 'edit':
-          onWidgetEdit(widgetType, widgetId);
+          onWidgetEdit(widget, widgetId);
           break;
         case 'makeLinkage':
           onMakeLinkage(widgetId);
