@@ -224,7 +224,8 @@
         "info": "Info",
         "sort": "Sort",
         "size": "Size",
-        "drop": "Please drag data column here",
+        "drop": "Please drag some data fields here",
+        "dropCount": "Please drag {{count}} fields here at least",
         "actions": {
           "sort": {
             "title": "Sort",
