@@ -32,7 +32,7 @@ const Chart404Graph: FC<{
 
   const renderChartLimition = () => {
     const sections = chartConfig?.datas
-      ?.filter(s => reachLowerBoundCount(s?.limit, s.rows?.length))
+      ?.filter(s => reachLowerBoundCount(s?.limit, s.rows?.length) > 0)
       .map(s => {
         return (
           <li>
