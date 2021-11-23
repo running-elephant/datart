@@ -106,7 +106,8 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
             editDashBoardInfoActions.changeControllerPanel({
               type: 'edit',
               widgetId: wid,
-              controllerType: ControllerFacadeTypes.DropdownList,
+              controllerType: widget.config.content
+                .type as ControllerFacadeTypes,
             }),
           );
           break;
