@@ -10,7 +10,7 @@ import {
   ControllerFacadeTypes,
   RelativeOrExactTime,
 } from 'app/types/FilterControlPanel';
-import { convertRelativeTimeRange, getTime } from 'app/utils/time';
+import { getTime } from 'app/utils/time';
 import { FilterSqlOperator } from 'globalConstants';
 import { errorHandle } from 'utils/utils';
 import { STORAGE_IMAGE_KEY_PREFIX, ValueOptionType } from '../constants';
@@ -23,8 +23,8 @@ import {
   WidgetInfo,
 } from '../pages/Board/slice/types';
 import {
-  FilterDate,
-  WidgetControllerOption,
+  ControllerConfig,
+  ControllerDate,
 } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { ChartRequestFilter } from './../../ChartWorkbenchPage/models/ChartHttpRequest';
 
@@ -106,7 +106,7 @@ export const getAllFiltersOfOneWidget = (values: {
     if (!hasRelation) return;
 
     const content = filterWidget.config.content as ControllerWidgetContent;
-    const { relatedViews, controllerOption, type } = content;
+    const { relatedViews, config, type } = content;
     const relatedViewItem = relatedViews
       .filter(view => view.fieldValue)
       .find(view => view.viewId === chartWidget.viewIds[0]);
@@ -115,7 +115,7 @@ export const getAllFiltersOfOneWidget = (values: {
     const values = getWidgetFilterValues({
       type,
       relatedViewItem,
-      controllerOption,
+      config: config,
     });
     if (!values) {
       return;
@@ -140,7 +140,7 @@ export const getAllFiltersOfOneWidget = (values: {
       const filter: ChartRequestFilter = {
         aggOperator: null,
         column: String(relatedViewItem.fieldValue),
-        sqlOperator: controllerOption.sqlOperator,
+        sqlOperator: config.sqlOperator,
         values: values,
       };
       filters.push(filter);
@@ -155,18 +155,18 @@ export const getAllFiltersOfOneWidget = (values: {
 export const getWidgetFilterValues = (opt: {
   type: ControllerFacadeTypes;
   relatedViewItem: RelatedView;
-  controllerOption: WidgetControllerOption;
+  config: ControllerConfig;
 }) => {
-  const { type, relatedViewItem, controllerOption } = opt;
+  const { type, relatedViewItem, config } = opt;
   switch (type) {
     case ControllerFacadeTypes.RangeTime:
     case ControllerFacadeTypes.Time:
-      if (!controllerOption?.filterDate) {
+      if (!config?.controllerDate) {
         return false;
       }
       const timeValues = getWidgetFilterDateValues(
-        controllerOption.valueOptionType,
-        controllerOption.filterDate,
+        config.valueOptionType,
+        config.controllerDate,
       );
       const values = timeValues
         .filter(ele => !!ele)
@@ -180,12 +180,9 @@ export const getWidgetFilterValues = (opt: {
       return values[0] ? values : null;
     case ControllerFacadeTypes.Value:
     case ControllerFacadeTypes.RangeValue:
-      if (
-        !controllerOption.filterValues ||
-        controllerOption.filterValues.length === 0
-      )
+      if (!config.filterValues || config.filterValues.length === 0)
         return false;
-      const numericValues = controllerOption.filterValues
+      const numericValues = config.filterValues
         .filter(ele => {
           if (ele === 0) return true;
           return !!ele;
@@ -200,13 +197,10 @@ export const getWidgetFilterValues = (opt: {
       return numericValues[0] ? numericValues : false;
 
     default:
-      if (
-        !controllerOption.filterValues ||
-        controllerOption.filterValues.length === 0
-      )
+      if (!config.filterValues || config.filterValues.length === 0)
         return false;
 
-      const strValues = controllerOption.filterValues
+      const strValues = config.filterValues
         .filter(ele => {
           if (ele.trim() === '') return false;
           return !!ele;
@@ -223,27 +217,27 @@ export const getWidgetFilterValues = (opt: {
 };
 export const getWidgetFilterDateValues = (
   valueOptionType: ValueOptionType,
-  filterDate: FilterDate,
+  filterDate: ControllerDate,
 ) => {
-  const { commonTime, endTime, startTime } = filterDate;
-  if (valueOptionType === 'common') {
-    const timeRange = convertRelativeTimeRange(commonTime);
-    return timeRange;
-  }
+  const { endTime, startTime } = filterDate;
+  // if (valueOptionType === 'common') {
+  //   const timeRange = convertRelativeTimeRange(commonTime);
+  //   return timeRange;
+  // }
   let timeValues: [string, string] = ['', ''];
 
   if (startTime.relativeOrExact === RelativeOrExactTime.Exact) {
-    timeValues[0] = startTime.exactTime as string;
+    timeValues[0] = startTime.exactValue as string;
   } else {
-    const { amount, unit, direction } = startTime.relative!;
+    const { amount, unit, direction } = startTime.relativeValue!;
     const time = getTime(+(direction + amount), unit)(unit, true);
     timeValues[0] = time.format('YYYY-MM-DD HH:mm:ss');
   }
   if (endTime) {
     if (endTime.relativeOrExact === RelativeOrExactTime.Exact) {
-      timeValues[1] = endTime.exactTime as string;
+      timeValues[1] = endTime.exactValue as string;
     } else {
-      const { amount, unit, direction } = endTime.relative!;
+      const { amount, unit, direction } = endTime.relativeValue!;
       const time = getTime(+(direction + amount), unit)(unit, false);
       timeValues[1] = time.format('YYYY-MM-DD HH:mm:ss');
     }

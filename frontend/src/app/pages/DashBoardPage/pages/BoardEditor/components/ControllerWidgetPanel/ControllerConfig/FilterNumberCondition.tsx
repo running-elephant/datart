@@ -24,12 +24,12 @@ import {
 } from 'app/types/ChartDataView';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { WidgetControllerOption } from '../types';
+import { ControllerConfig } from '../types';
 const numberConditionSetValues = SQL_OPERATOR_OPTIONS.compare.map(
   ele => ele.value,
 );
 const FilterNumberCondition: FC<{
-  form: FormInstance<any> | undefined;
+  form: FormInstance<{ config: ControllerConfig }> | undefined;
   fieldCategory: ChartDataViewFieldCategory;
   fieldValueType: ChartDataViewFieldType;
 }> = memo(({ form, fieldValueType, fieldCategory }) => {
@@ -38,14 +38,12 @@ const FilterNumberCondition: FC<{
     return fieldCategory === ChartDataViewFieldCategory.Variable;
   }, [fieldCategory]);
   const checkCurValue = useCallback(() => {
-    const controllerOption: WidgetControllerOption = form?.getFieldValue([
-      'controllerOption',
-    ]);
+    const config: ControllerConfig = form?.getFieldValue(['config']);
     // 值不符合
     let needAdjust = false;
-    let sqlOperator = controllerOption?.sqlOperator;
-    let filterValues = controllerOption?.filterValues;
-    if (!numberConditionSetValues.includes(controllerOption?.sqlOperator)) {
+    let sqlOperator = config?.sqlOperator;
+    let filterValues = config?.filterValues;
+    if (!numberConditionSetValues.includes(config?.sqlOperator)) {
       needAdjust = true;
       sqlOperator = FilterSqlOperator.Equal;
     }
@@ -53,10 +51,7 @@ const FilterNumberCondition: FC<{
       sqlOperator = FilterSqlOperator.Equal;
     }
     if (sqlOperator === FilterSqlOperator.Between) {
-      if (
-        !controllerOption?.filterValues ||
-        controllerOption?.filterValues?.length !== 2
-      ) {
+      if (!config?.filterValues || config?.filterValues?.length !== 2) {
         needAdjust = true;
         filterValues = [0, 0];
       }
@@ -74,8 +69,8 @@ const FilterNumberCondition: FC<{
 
     if (needAdjust) {
       form?.setFieldsValue({
-        controllerOption: {
-          ...controllerOption,
+        config: {
+          ...config,
           sqlOperator: sqlOperator,
           filterValues: filterValues,
         },
@@ -92,19 +87,16 @@ const FilterNumberCondition: FC<{
   const onNumberValueChange = useCallback(
     numberValues => {
       setNumberValues(numberValues);
-      const controllerOption = form?.getFieldValue('controllerOption');
+      const config = form?.getFieldValue('config');
       form?.setFieldsValue({
-        controllerOption: { ...controllerOption, filterValues: numberValues },
+        config: { ...config, filterValues: numberValues },
       });
     },
     [form],
   );
 
   const renderCompareInput = useCallback(() => {
-    const sqlOperator = form?.getFieldValue([
-      'controllerOption',
-      'sqlOperator',
-    ]);
+    const sqlOperator = form?.getFieldValue(['config', 'sqlOperator']);
     if (sqlOperator === FilterSqlOperator.Between) {
       return (
         <>
@@ -141,7 +133,7 @@ const FilterNumberCondition: FC<{
           <>
             <Form.Item
               noStyle
-              name={['controllerOption', 'sqlOperator']}
+              name={['config', 'sqlOperator']}
               wrapperCol={{ span: 8 }}
             >
               <Select

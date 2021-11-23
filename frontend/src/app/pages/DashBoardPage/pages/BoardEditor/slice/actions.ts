@@ -39,7 +39,7 @@ import { RootState } from 'types';
 import { v4 as uuidv4 } from 'uuid';
 import { editBoardStackActions, editDashBoardInfoActions } from '.';
 import { BoardType } from '../../Board/slice/types';
-import { WidgetControllerOption } from '../components/ControllerWidgetPanel/types';
+import { ControllerConfig } from '../components/ControllerWidgetPanel/types';
 import { addWidgetsToEditBoard, getEditWidgetDataAsync } from './thunk';
 import { HistoryEditBoard } from './types';
 
@@ -132,7 +132,7 @@ export const updateWidgetControllerAction =
     fieldValueType: ChartDataViewFieldType;
     controllerFacadeType: ControllerFacadeTypes;
     views: RelatedView[];
-    controllerOption: WidgetControllerOption;
+    config: ControllerConfig;
     hasVariable?: boolean;
   }) =>
   async (dispatch, getState) => {
@@ -140,7 +140,7 @@ export const updateWidgetControllerAction =
       boardId,
       boardType,
       views,
-      controllerOption,
+      config,
       controllerFacadeType,
       relations,
       fieldValueType,
@@ -151,7 +151,7 @@ export const updateWidgetControllerAction =
       type: controllerFacadeType,
       relatedViews: views,
       name: name || 'newController',
-      controllerOption: controllerOption,
+      config: config,
     };
 
     const widgetConf = createInitWidgetConfig({

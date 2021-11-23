@@ -56,8 +56,10 @@ import {
   WidgetPadding,
   WidgetType,
 } from '../pages/Board/slice/types';
-import { WidgetControllerOption } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
-import { ValueTypes } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
+import {
+  ControllerConfig,
+  ValueTypes,
+} from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
 
 export const VALUE_SPLITTER = '###';
 
@@ -312,14 +314,14 @@ export const createFilterWidget = (params: {
   fieldValueType: ValueTypes;
   controllerType: ControllerFacadeTypes;
   views: RelatedView[];
-  controllerOption: WidgetControllerOption;
+  config: ControllerConfig;
   hasVariable: boolean;
 }) => {
   const {
     boardId,
     boardType,
     views,
-    controllerOption,
+    config,
     controllerType,
     relations,
     name = 'newController',
@@ -330,7 +332,7 @@ export const createFilterWidget = (params: {
 
     name: name,
 
-    controllerOption: controllerOption,
+    config: config,
   };
 
   const widgetConf = createInitWidgetConfig({
@@ -407,7 +409,7 @@ export const getWidgetMapByServer = (
       }
     }
 
-    // 处理 controllerOption visibility依赖关系 id, url参数修改filter
+    // 处理 controller config visibility依赖关系 id, url参数修改filter
     if (widget.config.type === 'controller') {
       const content = widget.config.content as ControllerWidgetContent;
       // 根据 url参数修改filter 默认值
@@ -421,25 +423,24 @@ export const getWidgetMapByServer = (
           switch (content?.type) {
             case ControllerFacadeTypes.RangeTime:
               if (
-                content.controllerOption.filterDate &&
-                content.controllerOption.filterDate?.startTime &&
-                content.controllerOption.filterDate?.endTime
+                content.config.controllerDate &&
+                content.config.controllerDate?.startTime &&
+                content.config.controllerDate?.endTime
               ) {
-                content.controllerOption.filterDate.startTime.exactTime =
+                content.config.controllerDate.startTime.exactValue =
                   _value?.[0];
-                content.controllerOption.filterDate.endTime.exactTime =
-                  _value?.[0];
+                content.config.controllerDate.endTime.exactValue = _value?.[0];
               }
               break;
             default:
-              content.controllerOption.filterValues = _value || [];
+              content.config.filterValues = _value || [];
               break;
           }
         }
       }
       // 适配filter 的可见性
       const { visibilityType: visibility, condition } =
-        content.controllerOption.visibility;
+        content.config.visibility;
       const { relations } = widget;
       if (visibility === 'condition' && condition) {
         const dependentFilterId = relations
@@ -451,9 +452,9 @@ export const getWidgetMapByServer = (
       }
 
       //处理 assistViewField
-      if (typeof content?.controllerOption?.assistViewFields === 'string') {
-        content.controllerOption.assistViewFields = (
-          content.controllerOption.assistViewFields as string
+      if (typeof content?.config?.assistViewFields === 'string') {
+        content.config.assistViewFields = (
+          content.config.assistViewFields as string
         ).split(VALUE_SPLITTER);
         // value.split(VALUE_SPLITTER);
       }
@@ -689,7 +690,7 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
       return true;
     }
     const content = w.config.content as ControllerWidgetContent;
-    const visibility = content.controllerOption.visibility;
+    const visibility = content.config.visibility;
     if (visibility.visibilityType === 'show') {
       return true;
     }
@@ -698,9 +699,13 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
     }
     if (visibility.visibilityType === 'condition') {
       debugger;
-      const condition = content.controllerOption.visibility.condition;
+      const condition = content.config.visibility.condition;
       if (condition) {
-        const { dependentControllerId: dependentFilterId, relation, value: targetValue } = condition;
+        const {
+          dependentControllerId: dependentFilterId,
+          relation,
+          value: targetValue,
+        } = condition;
         const dependWidget = widgets.find(
           widget => widget.id === dependentFilterId,
         );
@@ -708,7 +713,7 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
           return false;
         }
         const content = dependWidget.config.content as ControllerWidgetContent;
-        const dependWidgetValue = content.controllerOption.filterValues?.[0];
+        const dependWidgetValue = content.config.filterValues?.[0];
         // if (!dependWidgetValue) {
         //   return false;
         // }

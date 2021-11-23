@@ -29,30 +29,38 @@ export interface VisibilityCondition {
   value: any; // any type
 }
 
-export interface WidgetControllerOption {
+export interface ControllerConfig {
+  required?: boolean;
   valueOptionType: ValueOptionType; //
   assistViewFields: string[]; //辅助添加view字段
   visibility: ControllerVisibility;
   sqlOperator: FilterSqlOperator;
-  filterDate?: FilterDate;
+  controllerDate?: ControllerDate;
   filterValues: any[];
   valueOptions: FilterValueOption[];
   minValue?: number;
   maxValue?: number;
 }
-export interface FilterDate {
-  // commonTime: keyof typeof RECOMMEND_TIME;
-  commonTime: string | null; //常用
-  startTime: filterDateTime;
-  endTime: filterDateTime;
+export interface ControllerDate {
+  pickerMode: PickerMode;
+  startTime: ControllerDateType;
+  endTime?: ControllerDateType;
+}
+export type PickerMode =
+  | 'year'
+  | 'month'
+  | 'quarter'
+  | 'week'
+  | 'date'
+  | 'dateTime';
+
+export interface ControllerDateType {
+  relativeOrExact: RelativeOrExactTime;
+  relativeValue?: RelativeDate;
+  exactValue?: Moment | string | null;
 }
 
-export interface filterDateTime {
-  relativeOrExact: RelativeOrExactTime;
-  relative?: filterRelativeTime;
-  exactTime?: Moment | string | null;
-}
-export interface filterRelativeTime {
+export interface RelativeDate {
   amount: number;
   unit: unitOfTime.DurationConstructor;
   direction: '-' | '+';

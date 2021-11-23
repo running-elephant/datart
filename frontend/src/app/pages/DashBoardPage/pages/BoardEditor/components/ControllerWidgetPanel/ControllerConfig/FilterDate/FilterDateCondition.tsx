@@ -43,21 +43,21 @@ const FilterDateCondition: FC<{
   }, [fieldCategory]);
   useEffect(() => {
     // const fieldCategory
-    const controllerOption = form?.getFieldValue('controllerOption');
+    const config = form?.getFieldValue('config');
     const nextOption = {
-      ...controllerOption,
+      ...config,
       sqlOperator: hasVariable
         ? FilterSqlOperator.In
         : FilterSqlOperator.Between,
     };
     form?.setFieldsValue({
-      controllerOption: nextOption,
+      config: nextOption,
     });
   }, [form, hasVariable]);
 
   const getCurType = useCallback(() => {
     const valueOptionType: ValueOptionType = form?.getFieldValue([
-      'controllerOption',
+      'config',
       'valueOptionType',
     ]);
     return valueOptionType;
@@ -71,7 +71,7 @@ const FilterDateCondition: FC<{
             <div>
               <Form.Item
                 noStyle
-                name={['controllerOption', 'valueOptionType']}
+                name={['config', 'valueOptionType']}
                 label={'可筛选值'}
                 validateTrigger={['onChange', 'onBlur']}
                 rules={[{ required: true }]}
@@ -91,7 +91,7 @@ const FilterDateCondition: FC<{
             {getCurType() !== 'custom' && (
               <WrapCommon>
                 <CommonTimeSetter
-                  name={['controllerOption', 'filterDate', 'commonTime']}
+                  name={['config', 'filterDate', 'commonTime']}
                 />
               </WrapCommon>
             )}

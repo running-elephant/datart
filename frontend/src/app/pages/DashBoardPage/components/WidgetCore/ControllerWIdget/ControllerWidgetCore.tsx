@@ -22,8 +22,8 @@ import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetDataContext } from 'app/pages/DashBoardPage/contexts/WidgetDataContext';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
+  ControllerDate,
   ControlOption,
-  FilterDate,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getWidgetFilterDateValues } from 'app/pages/DashBoardPage/utils';
 import { FilterValueOption } from 'app/types/ChartConfig';
@@ -58,19 +58,19 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   const { widgetUpdate, refreshWidgetsByFilter } =
     useContext(BoardActionContext);
   const {
-    controllerOption,
+    config,
 
     type: facadeType,
   } = useMemo(() => widget.config.content as ControllerWidgetContent, [widget]);
   const {
-    filterDate,
+    controllerDate,
     filterValues,
     valueOptions: filterValueOptions,
     valueOptionType,
     sqlOperator,
     minValue,
     maxValue,
-  } = useMemo(() => controllerOption, [controllerOption]);
+  } = useMemo(() => config, [config]);
 
   const optionRows = useMemo(() => {
     const dataRows = rows?.flat(2) || [];
@@ -98,9 +98,8 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   const onFilterValuesChange = useCallback(
     values => {
       const nextWidget = produce(widget, draft => {
-        (
-          draft.config.content as ControllerWidgetContent
-        ).controllerOption.filterValues = values;
+        (draft.config.content as ControllerWidgetContent).config.filterValues =
+          values;
       });
       widgetUpdate(nextWidget);
       refreshWidgetsByFilter(nextWidget);
@@ -111,12 +110,10 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   const onSqlOperatorAndValues = useCallback(
     (sql: FilterSqlOperator, values: any[]) => {
       const nextWidget = produce(widget, draft => {
-        (
-          draft.config.content as ControllerWidgetContent
-        ).controllerOption.sqlOperator = sql;
-        (
-          draft.config.content as ControllerWidgetContent
-        ).controllerOption.filterValues = values;
+        (draft.config.content as ControllerWidgetContent).config.sqlOperator =
+          sql;
+        (draft.config.content as ControllerWidgetContent).config.filterValues =
+          values;
       });
       widgetUpdate(nextWidget);
       refreshWidgetsByFilter(nextWidget);
@@ -125,24 +122,24 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   );
   const onRangeTimeChange = useCallback(
     (timeValues: string[] | null) => {
-      const nextFilterDate: FilterDate = {
-        commonTime: '',
+      const nextFilterDate: ControllerDate = {
+        pickerMode: 'date',
         startTime: {
           relativeOrExact: RelativeOrExactTime.Exact,
-          exactTime: timeValues?.[0],
+          exactValue: timeValues?.[0],
         },
         endTime: {
           relativeOrExact: RelativeOrExactTime.Exact,
-          exactTime: timeValues?.[1],
+          exactValue: timeValues?.[1],
         },
       };
       const nextWidget = produce(widget, draft => {
         (
           draft.config.content as ControllerWidgetContent
-        ).controllerOption.valueOptionType = 'custom';
+        ).config.valueOptionType = 'custom';
         (
           draft.config.content as ControllerWidgetContent
-        ).controllerOption.filterDate = nextFilterDate;
+        ).config.controllerDate = nextFilterDate;
       });
       widgetUpdate(nextWidget);
       refreshWidgetsByFilter(nextWidget);
@@ -206,8 +203,8 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
 
       case ControllerFacadeTypes.RangeTime:
         const rangeTimeValues = getWidgetFilterDateValues(
-          controllerOption.valueOptionType,
-          controllerOption!.filterDate!,
+          config.valueOptionType,
+          config!.controllerDate!,
         );
         return (
           <FilterRangTime
@@ -217,8 +214,8 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         );
       case ControllerFacadeTypes.Time:
         const timeValues = getWidgetFilterDateValues(
-          controllerOption.valueOptionType,
-          controllerOption!.filterDate!,
+          config.valueOptionType,
+          config!.controllerDate!,
         );
         return (
           <FilterTime onTimeChange={onRangeTimeChange} value={timeValues} />
@@ -235,7 +232,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
     maxValue,
     sqlOperator,
     onSqlOperatorAndValues,
-    controllerOption,
+    config,
     onRangeTimeChange,
   ]);
   return <Wrap>{control}</Wrap>;

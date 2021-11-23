@@ -26,19 +26,19 @@ import ChartDataView from 'app/types/ChartDataView';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetControllerOption } from '../../types';
+import { ControllerConfig } from '../../types';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
 
 const ValuesOptionsSetter: FC<{
-  form: FormInstance<{ controllerOption: WidgetControllerOption }> | undefined;
+  form: FormInstance<{ config: ControllerConfig }> | undefined;
   viewMap: Record<string, ChartDataView>;
 }> = memo(({ form, viewMap }) => {
   const [optionValues, setOptionValues] = useState<FilterValueOption[]>([]);
   const [targetKeys, setTargetKeys] = useState<string[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
-  const getControllerOption = useCallback(() => {
-    return form?.getFieldValue('controllerOption') as WidgetControllerOption;
+  const getControllerConfig = useCallback(() => {
+    return form?.getFieldValue('config') as ControllerConfig;
   }, [form]);
 
   const onTransferSelectChange = useCallback(
@@ -52,15 +52,15 @@ const ValuesOptionsSetter: FC<{
   const onTransferChange = useCallback(
     (nextTargetKeys, direction, moveKeys) => {
       setTargetKeys(nextTargetKeys);
-      const nextControllerOpt: WidgetControllerOption = {
-        ...getControllerOption(),
+      const nextControllerOpt: ControllerConfig = {
+        ...getControllerConfig(),
         filterValues: nextTargetKeys,
       };
       form?.setFieldsValue({
-        controllerOption: nextControllerOpt,
+        config: nextControllerOpt,
       });
     },
-    [form, getControllerOption],
+    [form, getControllerConfig],
   );
 
   // const
@@ -95,29 +95,29 @@ const ValuesOptionsSetter: FC<{
     async (value: string[]) => {
       const [viewId, viewField] = value;
       const dataset = await fetchNewDataset(viewId, viewField);
-      const controllerOption: WidgetControllerOption = getControllerOption();
+      const config: ControllerConfig = getControllerConfig();
       setOptionValues(convertToList(dataset?.rows, []));
-      if (controllerOption.valueOptionType === 'common') {
-        if (controllerOption?.filterValues) {
-          setTargetKeys(controllerOption?.filterValues);
+      if (config.valueOptionType === 'common') {
+        if (config?.filterValues) {
+          setTargetKeys(config?.filterValues);
         }
       }
     },
-    [convertToList, fetchNewDataset, getControllerOption],
+    [convertToList, fetchNewDataset, getControllerConfig],
   );
   const updateOptions = useCallback(() => {
-    const controllerOption = getControllerOption();
-    if (!controllerOption.valueOptionType) {
+    const config = getControllerConfig();
+    if (!config?.valueOptionType) {
       form?.setFieldsValue({
-        controllerOption: { ...controllerOption, valueOptionType: 'common' },
+        config: { ...config, valueOptionType: 'common' },
       });
     }
 
-    const assistViewFields = controllerOption?.assistViewFields;
-    if (assistViewFields[0] && assistViewFields[1]) {
+    const assistViewFields = config?.assistViewFields;
+    if (assistViewFields && assistViewFields[0] && assistViewFields[1]) {
       onInitOptions(assistViewFields);
     }
-  }, [form, getControllerOption, onInitOptions]);
+  }, [form, getControllerConfig, onInitOptions]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -132,24 +132,24 @@ const ValuesOptionsSetter: FC<{
       setTargetKeys([]);
       setOptionValues(convertToList(dataset?.rows, selectedKeys));
       form?.setFieldsValue({
-        controllerOption: {
-          ...getControllerOption(),
+        config: {
+          ...getControllerConfig(),
           assistViewFields: value,
         },
       });
     },
-    [convertToList, fetchNewDataset, form, getControllerOption, selectedKeys],
+    [convertToList, fetchNewDataset, form, getControllerConfig, selectedKeys],
   );
 
   const getOptionType = useCallback(() => {
-    return getControllerOption()?.valueOptionType as ValueOptionType;
-  }, [getControllerOption]);
+    return getControllerConfig()?.valueOptionType as ValueOptionType;
+  }, [getControllerConfig]);
 
   return (
     <Wrap>
       <Form.Item
         noStyle
-        name={['controllerOption', 'valueOptionType']}
+        name={['config', 'valueOptionType']}
         validateTrigger={['onChange', 'onBlur']}
         rules={[{ required: true }]}
       >
@@ -167,10 +167,7 @@ const ValuesOptionsSetter: FC<{
         {() => {
           return (
             <>
-              <Form.Item
-                name={['controllerOption', 'assistViewFields']}
-                noStyle
-              >
+              <Form.Item name={['config', 'assistViewFields']} noStyle>
                 <AssistViewFields
                   allowClear
                   placeholder="select viewField"
@@ -194,7 +191,7 @@ const ValuesOptionsSetter: FC<{
               )}
               {getOptionType() === 'custom' && (
                 <CustomOptions
-                  getControllerOption={getControllerOption}
+                  getControllerConfig={getControllerConfig}
                   form={form}
                   fieldRowData={optionValues}
                 />

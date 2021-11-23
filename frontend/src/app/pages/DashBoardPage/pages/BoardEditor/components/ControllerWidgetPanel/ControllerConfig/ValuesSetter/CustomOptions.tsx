@@ -20,35 +20,34 @@ import { DragSortEditTable } from 'app/components/DragSortEditTable';
 import { FilterValueOption } from 'app/types/ChartConfig';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetControllerOption } from '../../types';
+import { ControllerConfig } from '../../types';
 export interface CustomOptionsProps {
-  // [string]: any;
-  form: FormInstance<{ controllerOption: WidgetControllerOption }> | undefined;
+  form: FormInstance<{ config: ControllerConfig }> | undefined;
   fieldRowData: FilterValueOption[];
-  getControllerOption: () => WidgetControllerOption;
+  getControllerConfig: () => ControllerConfig;
 }
 export const CustomOptions: React.FC<CustomOptionsProps> = memo(
-  ({ fieldRowData, form, getControllerOption }) => {
+  ({ fieldRowData, form, getControllerConfig }) => {
     const [rows, setRows] = useState<FilterValueOption[]>([]);
 
     const onChangeFilterOptions = useCallback(
       (rows: FilterValueOption[]) => {
         setRows(rows);
-        const controllerOption = getControllerOption();
+        const config = getControllerConfig();
         form?.setFieldsValue({
-          controllerOption: {
-            ...controllerOption,
+          config: {
+            ...config,
             valueOptions: [...rows.slice()],
           },
         });
       },
-      [form, getControllerOption],
+      [form, getControllerConfig],
     );
 
     useEffect(() => {
-      const valueOptions = getControllerOption()?.valueOptions || [];
+      const valueOptions = getControllerConfig()?.valueOptions || [];
       setRows(valueOptions);
-    }, [form, getControllerOption]);
+    }, [form, getControllerConfig]);
     const handleRowStateUpdate = useCallback(
       (row: FilterValueOption) => {
         const oldRowIndex = rows.findIndex(r => r.index === row.index);

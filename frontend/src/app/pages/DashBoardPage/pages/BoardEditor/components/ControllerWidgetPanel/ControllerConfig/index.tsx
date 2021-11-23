@@ -66,21 +66,11 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
           viewMap={viewMap}
         />
 
-        <Form.Item
-          hidden
-          noStyle
-          preserve
-          name={['controllerOption', 'filterValues']}
-        >
+        <Form.Item hidden noStyle preserve name={['config', 'filterValues']}>
           <Select />
         </Form.Item>
 
-        <Form.Item
-          hidden
-          noStyle
-          preserve
-          name={['controllerOption', 'sqlOperator']}
-        >
+        <Form.Item hidden noStyle preserve name={['config', 'sqlOperator']}>
           <Input />
         </Form.Item>
         {/* 是否显示 */}

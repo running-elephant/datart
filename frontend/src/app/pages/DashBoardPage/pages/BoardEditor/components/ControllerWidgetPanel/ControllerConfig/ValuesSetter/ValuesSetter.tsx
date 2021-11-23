@@ -19,24 +19,34 @@ import { Form, FormInstance } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { useMemo } from 'react';
+import { TimeSetter } from './TimeSetter/TimeSetter';
 import ValuesOptionsSetter from './ValuesOptionsSetter';
-export const needOptionsTypes = [
+export const NeedOptionsTypes = [
   ControllerFacadeTypes.DropdownList,
   ControllerFacadeTypes.MultiDropdownList,
   ControllerFacadeTypes.RadioGroup,
 ];
+
+export const TimeTypes = [
+  ControllerFacadeTypes.Time,
+  ControllerFacadeTypes.RangeTime,
+];
+
 export const ValuesSetter: React.FC<{
   controllerType: ControllerFacadeTypes;
   form: FormInstance<any> | undefined;
   viewMap: Record<string, ChartDataView>;
 }> = ({ controllerType, form, viewMap }) => {
   const hasOption = useMemo(() => {
-    return needOptionsTypes.includes(controllerType);
+    return NeedOptionsTypes.includes(controllerType);
   }, [controllerType]);
-
+  const hasTime = useMemo(() => {
+    return TimeTypes.includes(controllerType);
+  }, [controllerType]);
   return (
     <Form.Item label="取值配置" shouldUpdate style={{ marginBottom: '0' }}>
       {hasOption && <ValuesOptionsSetter form={form} viewMap={viewMap} />}
+      {hasTime && <TimeSetter controllerType={controllerType} form={form} />}
     </Form.Item>
   );
 };

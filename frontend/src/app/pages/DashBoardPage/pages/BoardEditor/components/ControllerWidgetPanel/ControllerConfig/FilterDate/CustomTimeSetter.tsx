@@ -37,7 +37,7 @@ export const CustomTimeSetter: FC<{
   const isRelativeTime = useCallback(
     startOrEnd => {
       const timeType: RelativeOrExactTime = form?.getFieldValue([
-        'controllerOption',
+        'config',
         'filterDate',
         startOrEnd,
         'relativeOrExact',
@@ -60,7 +60,7 @@ export const CustomTimeSetter: FC<{
     <>
       <Form.Item
         noStyle
-        name={['controllerOption', 'filterDate', startOrEnd, 'relativeOrExact']}
+        name={['config', 'filterDate', startOrEnd, 'relativeOrExact']}
         validateTrigger={['onChange', 'onBlur']}
         rules={[{ required: true }]}
       >
@@ -72,7 +72,7 @@ export const CustomTimeSetter: FC<{
           return !isRelativeTime(startOrEnd) ? (
             <Form.Item
               noStyle
-              name={['controllerOption', 'filterDate', startOrEnd, 'exactTime']}
+              name={['config', 'filterDate', startOrEnd, 'exactTime']}
               validateTrigger={['onChange', 'onBlur']}
             >
               <DatePicker
@@ -86,7 +86,7 @@ export const CustomTimeSetter: FC<{
               <Form.Item
                 noStyle
                 name={[
-                  'controllerOption',
+                  'config',
                   'filterDate',
                   startOrEnd,
                   'relative',
@@ -99,13 +99,7 @@ export const CustomTimeSetter: FC<{
               </Form.Item>{' '}
               <Form.Item
                 noStyle
-                name={[
-                  'controllerOption',
-                  'filterDate',
-                  startOrEnd,
-                  'relative',
-                  'unit',
-                ]}
+                name={['config', 'filterDate', startOrEnd, 'relative', 'unit']}
                 validateTrigger={['onChange', 'onBlur']}
                 rules={[{ required: true }]}
               >
@@ -120,7 +114,7 @@ export const CustomTimeSetter: FC<{
               <Form.Item
                 noStyle
                 name={[
-                  'controllerOption',
+                  'config',
                   'filterDate',
                   startOrEnd,
                   'relative',

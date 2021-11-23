@@ -57,10 +57,10 @@ import {
   selectSortAllWidgets,
 } from '../../slice/selectors';
 import { addWidgetsToEditBoard } from '../../slice/thunk';
-import { WidgetControlForm } from './ControllerOption';
+import { WidgetControlForm } from './ControllerConfig';
 import { RelatedViewForm } from './RelatedViewForm';
 import { RelatedWidgetItem, RelatedWidgets } from './RelatedWidgets';
-import { ValueTypes, WidgetControllerOption } from './types';
+import { ControllerConfig, ValueTypes } from './types';
 import {
   formatWidgetFilter,
   getInitWidgetFilter,
@@ -185,7 +185,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
     if (!curFilterWidget || !curFilterWidget?.relations) {
       setViews([]);
       form.setFieldsValue({
-        controllerOption: preformatWidgetFilter(getInitWidgetFilter()),
+        config: preformatWidgetFilter(getInitWidgetFilter()),
         type: '',
         fieldValueType: ChartDataViewFieldType.STRING,
       });
@@ -195,12 +195,12 @@ const FilterWidgetPanel: React.FC = memo(props => {
     const confContent = curFilterWidget.config
       .content as ControllerWidgetContent;
     try {
-      const { relatedViews, type, controllerOption } = confContent;
+      const { relatedViews, type, config } = confContent;
       form.setFieldsValue({
         type,
         filterName: curFilterWidget.config.name,
         relatedViews,
-        controllerOption: preformatWidgetFilter(controllerOption),
+        config: preformatWidgetFilter(config),
       });
     } catch (error) {}
     const widgetOptions = curFilterWidget?.relations
@@ -220,7 +220,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
       console.log('--fieldValueType', fieldValueType);
       console.log('--fieldCategory', fieldCategory);
       console.log('--type', type);
-      const { relatedViews, controllerOption, name } = values;
+      const { relatedViews, config, name } = values;
       if (type === 'add') {
         const sourceId = uuidv4();
         const filterToWidgetRelations: Relation[] = relatedWidgets.map(
@@ -241,9 +241,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           },
         );
         const newRelations = [...filterToWidgetRelations];
-        const ControllerVisibility = (
-          controllerOption as WidgetControllerOption
-        ).visibility;
+        const ControllerVisibility = (config as ControllerConfig).visibility;
         if (ControllerVisibility) {
           const { visibilityType, condition } = ControllerVisibility;
           if (visibilityType === 'condition' && condition) {
@@ -267,7 +265,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           controllerType: controllerType!,
           views: relatedViews,
           fieldValueType: fieldValueType,
-          controllerOption: formatWidgetFilter(controllerOption),
+          config: formatWidgetFilter(config),
           hasVariable: fieldCategory === ChartDataViewFieldCategory.Variable,
         });
 
@@ -294,8 +292,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
             };
           });
         const newRelations = [...filterToWidgetRelations];
-        const controllerVisible = (controllerOption as WidgetControllerOption)
-          .visibility;
+        const controllerVisible = (config as ControllerConfig).visibility;
         if (controllerVisible) {
           const { visibilityType, condition } = controllerVisible;
           if (visibilityType === 'condition' && condition) {
@@ -315,7 +312,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           name: '',
           relatedViews,
           type: ControllerFacadeTypes.DropdownList,
-          controllerOption: formatWidgetFilter(controllerOption),
+          config: formatWidgetFilter(config),
         };
         const newWidget = produce(curFilterWidget, draft => {
           draft.relations = newRelations;

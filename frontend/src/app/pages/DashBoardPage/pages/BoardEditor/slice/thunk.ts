@@ -373,13 +373,10 @@ export const getEditFilterDataAsync = createAsyncThunk<
   { state: RootState }
 >('editBoard/getControllerOptions', async (widget, { getState, dispatch }) => {
   const content = widget.config.content as ControllerWidgetContent;
-  const controllerOption = content.controllerOption;
-  if (
-    controllerOption.assistViewFields &&
-    Array.isArray(controllerOption.assistViewFields)
-  ) {
+  const config = content.config;
+  if (config.assistViewFields && Array.isArray(config.assistViewFields)) {
     // 请求
-    const [viewId, viewField] = controllerOption.assistViewFields;
+    const [viewId, viewField] = config.assistViewFields;
     const dataset = await getDistinctFields(
       viewId,
       viewField,

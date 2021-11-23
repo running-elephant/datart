@@ -23,7 +23,7 @@ import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import { ControllerFacadeTypes as Opt } from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
-import { WidgetControllerOption } from './types';
+import { ControllerConfig } from './types';
 
 export const getStringFacadeOptions = (type: ValueOptionType) => {
   switch (type) {
@@ -65,90 +65,83 @@ export const getDateFacadeOptions = (category: ChartDataViewFieldCategory) => {
   }
 };
 // 展示前处理
-export const preformatWidgetFilter = (
-  oldWidgetFilter: WidgetControllerOption,
-) => {
-  const controllerOption = JSON.parse(
+export const preformatWidgetFilter = (oldWidgetFilter: ControllerConfig) => {
+  const config = JSON.parse(
     JSON.stringify(oldWidgetFilter),
-  ) as WidgetControllerOption;
-  if (!controllerOption.valueOptionType) {
-    controllerOption.valueOptionType = ValueOptionTypes.Common;
+  ) as ControllerConfig;
+  if (!config.valueOptionType) {
+    config.valueOptionType = ValueOptionTypes.Common;
   }
-  if (!controllerOption?.visibility) {
-    controllerOption.visibility = {
+  if (!config?.visibility) {
+    config.visibility = {
       visibilityType: 'show',
     };
   }
 
-  if (controllerOption.filterDate) {
-    if (controllerOption.filterDate) {
-      const filterDate = controllerOption.filterDate;
-      if (filterDate.startTime && filterDate.startTime.exactTime) {
-        if (typeof filterDate.startTime.exactTime === 'string') {
-          let exactTime = filterDate.startTime.exactTime;
+  if (config.controllerDate) {
+    if (config.controllerDate) {
+      const filterDate = config.controllerDate;
+      if (filterDate.startTime && filterDate.startTime.exactValue) {
+        if (typeof filterDate.startTime.exactValue === 'string') {
+          let exactTime = filterDate.startTime.exactValue;
           let newExactTime = moment(exactTime, 'YYYY-MM-DD HH:mm:ss');
-          controllerOption.filterDate.startTime.exactTime = newExactTime;
+          config.controllerDate.startTime.exactValue = newExactTime;
         }
       }
-      if (filterDate.endTime && filterDate.endTime.exactTime) {
-        if (typeof filterDate.endTime.exactTime === 'string') {
-          let exactTime = filterDate.endTime.exactTime;
+      if (filterDate.endTime && filterDate.endTime.exactValue) {
+        if (typeof filterDate.endTime.exactValue === 'string') {
+          let exactTime = filterDate.endTime.exactValue;
           let newExactTime = moment(exactTime, 'YYYY-MM-DD HH:mm:ss');
-          controllerOption.filterDate.endTime.exactTime = newExactTime;
+          config.controllerDate.endTime!.exactValue = newExactTime;
         }
       }
     }
   }
 
-  return controllerOption;
+  return config;
 };
 // 设置后处理
-export const formatWidgetFilter = (
-  controllerOption: WidgetControllerOption,
-) => {
-  if (!controllerOption.sqlOperator) {
-    controllerOption.sqlOperator = FilterSqlOperator.In;
+export const formatWidgetFilter = (config: ControllerConfig) => {
+  if (!config.sqlOperator) {
+    config.sqlOperator = FilterSqlOperator.In;
   }
-  if (!controllerOption?.visibility) {
-    controllerOption.visibility = {
+  if (!config?.visibility) {
+    config.visibility = {
       visibilityType: 'show',
     };
   }
 
-  if (!controllerOption.valueOptionType) {
-    controllerOption.valueOptionType = ValueOptionTypes.Common;
+  if (!config.valueOptionType) {
+    config.valueOptionType = ValueOptionTypes.Common;
   }
-  if (
-    controllerOption.valueOptions &&
-    controllerOption.valueOptions.length > 0
-  ) {
-    controllerOption.filterValues = controllerOption.valueOptions
+  if (config.valueOptions && config.valueOptions.length > 0) {
+    config.filterValues = config.valueOptions
       .filter(ele => ele.isSelected)
       .map(ele => ele.key);
   }
-  if (controllerOption.filterDate) {
-    const filterDate = controllerOption.filterDate;
-    if (filterDate.startTime && filterDate.startTime.exactTime) {
-      if (typeof filterDate.startTime.exactTime !== 'string') {
-        filterDate.startTime.exactTime = (
-          filterDate.startTime.exactTime as Moment
+  if (config.controllerDate) {
+    const filterDate = config.controllerDate;
+    if (filterDate.startTime && filterDate.startTime.exactValue) {
+      if (typeof filterDate.startTime.exactValue !== 'string') {
+        filterDate.startTime.exactValue = (
+          filterDate.startTime.exactValue as Moment
         ).format('YYYY-MM-DD HH:mm:ss');
       }
     }
-    if (filterDate.endTime && filterDate.endTime.exactTime) {
-      if (typeof filterDate.endTime.exactTime !== 'string') {
-        filterDate.endTime.exactTime = (
-          filterDate.endTime.exactTime as Moment
+    if (filterDate.endTime && filterDate.endTime.exactValue) {
+      if (typeof filterDate.endTime.exactValue !== 'string') {
+        filterDate.endTime.exactValue = (
+          filterDate.endTime.exactValue as Moment
         ).format('YYYY-MM-DD HH:mm:ss');
       }
     }
   }
 
-  return controllerOption;
+  return config;
 };
 
 export const getInitWidgetFilter = () => {
-  const controllerOPtion: WidgetControllerOption = {
+  const config: ControllerConfig = {
     valueOptionType: ValueOptionTypes.Common, //
     assistViewFields: [],
     visibility: {
@@ -160,5 +153,5 @@ export const getInitWidgetFilter = () => {
     filterValues: [],
     valueOptions: [],
   };
-  return controllerOPtion;
+  return config;
 };

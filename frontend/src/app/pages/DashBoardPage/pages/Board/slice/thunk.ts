@@ -299,15 +299,12 @@ export const getControllerOptions = createAsyncThunk<
   'board/getControllerOptions',
   async ({ widget, renderMode }, { getState, dispatch }) => {
     const content = widget.config.content as ControllerWidgetContent;
-    const controllerOption = content.controllerOption;
+    const config = content.config;
     const executeTokenMap = (getState() as RootState)?.share?.executeTokenMap;
 
-    if (
-      controllerOption.assistViewFields &&
-      Array.isArray(controllerOption.assistViewFields)
-    ) {
+    if (config.assistViewFields && Array.isArray(config.assistViewFields)) {
       // 请求
-      const [viewId, viewField] = controllerOption.assistViewFields;
+      const [viewId, viewField] = config.assistViewFields;
       const executeToken = executeTokenMap?.[viewId];
       const dataset = await getDistinctFields(
         viewId,

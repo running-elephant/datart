@@ -22,16 +22,16 @@ import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
-import { ValueTypes, WidgetControllerOption } from '../types';
+import { ControllerConfig, ValueTypes } from '../types';
 
 const ControllerVisibility: FC<{
-  form: FormInstance<{ controllerOption: WidgetControllerOption }> | undefined;
+  form: FormInstance<{ config: ControllerConfig }> | undefined;
   otherStrFilterWidgets: Widget[];
   fieldValueType: ValueTypes;
 }> = memo(({ form, fieldValueType, otherStrFilterWidgets }) => {
   const showVisibilityCondition = useCallback(() => {
     const visibilityType = form?.getFieldValue([
-      'controllerOption',
+      'config',
       'visibility',
       'visibilityType',
     ]);
@@ -47,7 +47,7 @@ const ControllerVisibility: FC<{
         return (
           <>
             <Form.Item
-              name={['controllerOption', 'visibility', 'visibilityType']}
+              name={['config', 'visibility', 'visibilityType']}
               noStyle
               rules={[{ required: true }]}
             >
@@ -66,7 +66,7 @@ const ControllerVisibility: FC<{
                 <StyledWarp>
                   <Form.Item
                     name={[
-                      'controllerOption',
+                      'config',
                       'visibility',
                       'condition',
                       'dependentControllerId',
@@ -86,12 +86,7 @@ const ControllerVisibility: FC<{
                   </Form.Item>
                   {' - '}
                   <Form.Item
-                    name={[
-                      'controllerOption',
-                      'visibility',
-                      'condition',
-                      'relation',
-                    ]}
+                    name={['config', 'visibility', 'condition', 'relation']}
                     noStyle
                     rules={[{ required: true }]}
                   >
@@ -106,12 +101,7 @@ const ControllerVisibility: FC<{
                   </Form.Item>
                   {' - '}
                   <Form.Item
-                    name={[
-                      'controllerOption',
-                      'visibility',
-                      'condition',
-                      'value',
-                    ]}
+                    name={['config', 'visibility', 'condition', 'value']}
                     noStyle
                     rules={[{ required: true }]}
                   >
