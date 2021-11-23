@@ -36,10 +36,9 @@ const CHART_TYPE_SELECTOR_HEIGHT_OFFSET = 50;
 
 const ChartPresentPanel: FC<{
   chart?: Chart;
-  dataView?: ChartDataView;
   dataset?: ChartDataset;
   chartConfig?: ChartConfig;
-}> = memo(({ chart, dataView, dataset, chartConfig }) => {
+}> = memo(({ chart, dataset, chartConfig }) => {
   const translate = useI18NPrefix(`viz.palette.present`);
   const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
   const panelRef = useRef<{ offsetWidth; offsetHeight }>(null);
