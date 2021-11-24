@@ -175,6 +175,7 @@ class BasicBarChart extends Chart {
       xAxis: axisInfo.xAxis,
       yAxis: axisInfo.yAxis,
       series,
+      color: this.getTheme(dataConfigs),
     };
   }
 

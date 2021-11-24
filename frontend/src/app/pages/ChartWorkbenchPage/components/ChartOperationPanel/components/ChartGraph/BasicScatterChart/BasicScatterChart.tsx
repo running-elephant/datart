@@ -145,6 +145,7 @@ class BasicScatterChart extends Chart {
       xAxis: this.getAxis(styleConfigs, axisColumns[0], 'xAxis'),
       yAxis: this.getAxis(styleConfigs, axisColumns[1], 'yAxis'),
       series,
+      color: this.getTheme(dataConfigs),
     };
   }
 

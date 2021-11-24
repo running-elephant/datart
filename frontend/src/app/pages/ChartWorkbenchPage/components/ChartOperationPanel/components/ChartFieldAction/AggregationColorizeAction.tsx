@@ -18,13 +18,25 @@
 
 import { Col, Row } from 'antd';
 import Theme from 'app/assets/theme/echarts_default_theme.json';
+import themeList from 'app/assets/theme/theme_list.json';
 import { ColorTag, ReactColorPicker } from 'app/components/ReactColorPicker';
-import { ChartDataSectionField } from 'app/types/ChartConfig';
+import {
+  ChartDataSectionConfig,
+  ChartDataSectionField,
+} from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
+
+const getTheme = (dataConfig?: ChartDataSectionConfig): string[] => {
+  const t = dataConfig?.extra?.theme;
+  if (t) {
+    return themeList[t];
+  }
+  return Theme.color;
+};
 
 const AggregationColorizeAction: FC<{
   config: ChartDataSectionField;
@@ -33,9 +45,10 @@ const AggregationColorizeAction: FC<{
     config: ChartDataSectionField,
     needRefresh?: boolean,
   ) => void;
-}> = memo(({ config, dataset, onConfigChange }) => {
+  dataConfig?: ChartDataSectionConfig;
+}> = memo(({ config, dataset, dataConfig, onConfigChange }) => {
   const actionNeedNewRequest = true;
-  const [themeColors] = useState(Theme.color);
+  const [themeColors] = useState(getTheme(dataConfig));
   const [colors, setColors] = useState(() => {
     const colorizedColumnName = config.colName;
     const colorizeIndex =

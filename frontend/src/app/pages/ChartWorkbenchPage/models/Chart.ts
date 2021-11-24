@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
+import themeList from 'app/assets/theme/theme_list.json';
 import {
   ChartConfig,
   ChartDataSectionConfig,
+  ChartDataSectionType,
   ChartStyleSectionConfig,
 } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
@@ -106,6 +108,19 @@ class Chart extends DatartChartBase {
   }
 
   public onResize(options, context?): void {}
+
+  protected getTheme(dataConfigs: ChartDataSectionConfig[]): any {
+    const colors = dataConfigs.filter(
+      c => c.type === ChartDataSectionType.COLOR,
+    );
+    let theme = '默认';
+
+    if (colors.length) {
+      theme = colors[0].extra?.theme || '默认';
+    }
+
+    return themeList[theme];
+  }
 
   protected getStyleValue(
     styleConfigs: ChartStyleSectionConfig[],

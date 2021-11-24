@@ -256,6 +256,7 @@ export type AliasFieldAction = {
 
 export type ChartDataSectionConfig = ChartConfigBase & {
   type?: Lowercase<keyof typeof ChartDataSectionType>;
+  extra?: Record<string, any>;
   allowSameField?: boolean;
   required?: boolean;
   rows?: ChartDataSectionField[];

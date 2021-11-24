@@ -545,7 +545,7 @@ export function mergeChartDataConfigs<
   return (target || []).map(tEle => {
     const sEle = (source || []).find(s => s?.key === tEle?.key);
     if (sEle) {
-      return Object.assign({}, tEle, { rows: sEle?.rows });
+      return Object.assign({}, tEle, sEle);
     }
     return tEle;
   });

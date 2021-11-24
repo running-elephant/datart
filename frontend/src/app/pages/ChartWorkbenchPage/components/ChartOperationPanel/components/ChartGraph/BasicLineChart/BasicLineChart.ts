@@ -166,6 +166,7 @@ class BasicLineChart extends Chart {
       xAxis: this.getXAxis(styleConfigs, xAxisColumns),
       yAxis: this.getYAxis(styleConfigs, yAxisNames),
       series,
+      color: this.getTheme(dataConfigs),
     };
   }
 

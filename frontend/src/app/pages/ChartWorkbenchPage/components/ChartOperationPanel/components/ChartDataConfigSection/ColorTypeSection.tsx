@@ -20,11 +20,12 @@ import { ChartDataSectionFieldActionType } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
+import ChartThemePanel from '../ChartThemePanel.tm';
 import BaseDataConfigSection from './BaseDataConfigSection';
 import { dataConfigSectionComparer } from './utils';
 
 const ColorTypeSection: FC<ChartDataConfigSectionProps> = memo(
-  ({ config, ...rest }) => {
+  ({ config, extra, onConfigChanged, ancestors, ...rest }) => {
     const defaultConfig = Object.assign(
       {},
       {
@@ -38,7 +39,41 @@ const ColorTypeSection: FC<ChartDataConfigSectionProps> = memo(
       config,
     );
 
-    return <BaseDataConfigSection {...rest} config={defaultConfig} />;
+    const onThemeChange = (key, value) => {
+      onConfigChanged(
+        ancestors,
+        {
+          ...defaultConfig,
+          extra: {
+            theme: key,
+          },
+        },
+        true,
+      );
+    };
+
+    const themeNode = () => {
+      const node = (
+        <ChartThemePanel
+          onClick={onThemeChange}
+          themeValue={defaultConfig.extra?.theme}
+        />
+      );
+      if (extra) {
+        return [extra, node];
+      }
+      return node;
+    };
+
+    return (
+      <BaseDataConfigSection
+        {...rest}
+        onConfigChanged={onConfigChanged}
+        ancestors={ancestors}
+        extra={themeNode}
+        config={defaultConfig}
+      />
+    );
   },
   dataConfigSectionComparer,
 );
