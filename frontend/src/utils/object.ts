@@ -45,7 +45,7 @@ export function curry(fn) {
   return collector;
 }
 
-export function anyPassThen(...predicates) {
+export function cond(...predicates) {
   return (value, defaultValue?) => {
     for (let i = 0; i < predicates.length; i++) {
       if (typeof predicates[i] === 'function' && predicates[i](value)) {
