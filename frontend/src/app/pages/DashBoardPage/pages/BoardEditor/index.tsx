@@ -37,8 +37,6 @@ import {
 } from './slice/selectors';
 import { fetchEditBoardDetail } from './slice/thunk';
 
-// import { loadEditBoardDetail } from './slice/thunk';
-
 export const BoardEditor: React.FC<{
   dashboardId: string;
   allowDownload?: boolean;

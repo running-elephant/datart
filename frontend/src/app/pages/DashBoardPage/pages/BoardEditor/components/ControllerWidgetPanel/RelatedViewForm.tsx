@@ -15,7 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Empty, Form, FormInstance, Radio, Select } from 'antd';
+import {
+  Empty,
+  Form,
+  FormInstance,
+  Radio,
+  RadioChangeEvent,
+  Select,
+} from 'antd';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView, {
@@ -45,6 +52,15 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
     getFormRelatedViews,
   }) => {
     //renderOptions
+    const filterFieldCategoryChange = useCallback(
+      (index: number) => (e: RadioChangeEvent) => {
+        const relatedViews = getFormRelatedViews();
+        relatedViews[index].relatedCategory = e.target.value;
+        relatedViews[index].fieldValue = undefined;
+        form?.setFieldsValue({ relatedViews: relatedViews });
+      },
+      [form, getFormRelatedViews],
+    );
 
     const renderOptions = useCallback(
       (index: number) => {
@@ -56,6 +72,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
           relatedViews[index].relatedCategory ===
           ChartDataViewFieldCategory.Variable
         ) {
+          debugger;
           // 变量
           return queryVariables
             .filter(v => {
@@ -136,10 +153,14 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                         <Form.Item
                           {...field}
                           validateTrigger={['onChange', 'onClick', 'onBlur']}
-                          name={[field.name, 'filterFieldCategory']}
+                          name={[field.name, 'relatedCategory']}
                           fieldKey={[field.fieldKey, 'id']}
                         >
-                          <RadioGroup value size="small">
+                          <RadioGroup
+                            value
+                            size="small"
+                            onChange={filterFieldCategoryChange(index)}
+                          >
                             <RadioButton
                               value={ChartDataViewFieldCategory.Field}
                             >
