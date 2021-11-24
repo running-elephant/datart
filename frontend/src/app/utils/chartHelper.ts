@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import {
   ChartConfig,
   ChartDataSectionConfig,
@@ -41,6 +42,9 @@ import {
 } from 'utils/object';
 import { toFormattedValue } from './number';
 
+export function getDefaultThemeColor() {
+  return echartsDefaultTheme.color;
+}
 export function isInRange(
   limit?: ChartDataSectionConfig['limit'],
   count: number = 0,
