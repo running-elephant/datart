@@ -25,9 +25,10 @@ const config: ChartConfig = {
       key: 'dimension',
       required: true,
       type: 'group',
+      limit: 1,
     },
     {
-      label: 'metricsAndColor',
+      label: 'metrics',
       key: 'metrics',
       required: true,
       type: 'aggregate',
@@ -35,6 +36,12 @@ const config: ChartConfig = {
         NUMERIC: ['aggregate', 'alias', 'format', 'colorRange'],
         STRING: ['aggregate', 'alias', 'format', 'colorRange'],
       },
+      limit: 1,
+    },
+    {
+      label: 'size',
+      key: 'size',
+      type: 'size',
     },
     {
       label: 'filter',
@@ -43,10 +50,9 @@ const config: ChartConfig = {
       allowSameField: true,
     },
     {
-      label: 'size',
-      key: 'size',
-      required: true,
-      type: 'size',
+      label: 'info',
+      key: 'info',
+      type: 'info',
     },
   ],
   styles: [

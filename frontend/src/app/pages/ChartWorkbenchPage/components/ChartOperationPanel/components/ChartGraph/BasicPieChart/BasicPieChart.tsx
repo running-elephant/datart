@@ -50,8 +50,7 @@ class BasicPieChart extends Chart {
       props?.icon || 'chartpie',
     );
     this.meta.requirements = props?.requirements || [
-      { group: [1, 999], aggregate: 1 },
-      { group: 0, aggregate: [2, 999] },
+      { group: [0, 1], aggregate: [1, 999] },
     ];
   }
 

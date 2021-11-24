@@ -18,8 +18,10 @@
 
 import {
   isInRange,
+  isUnderUpperBound,
   mergeChartDataConfigs,
   mergeChartStyleConfigs,
+  reachLowerBoundCount,
 } from '../chartHelper';
 
 describe('Chart Helper ', () => {
@@ -31,13 +33,14 @@ describe('Chart Helper ', () => {
     [1, null, true],
     [0, undefined, true],
     [1, undefined, true],
+    [1, '[1, 999]', true],
+    [0, '[1, 999]', true],
     [0, [1, 999], false],
     [1, [1, 999], true],
     [999, [1, 999], true],
     [1000, [1, 999], false],
     [1, '1', true],
     [0, '1', false],
-    [1, '[1, 999]', false],
     [1, ['1', '999'], true],
     [0, ['1', '999'], false],
   ])('isInRange Test - ', (count, limit, ifInRange) => {
@@ -285,6 +288,54 @@ describe('Chart Helper ', () => {
     )} - options ${options ? JSON.stringify(options) : ''}`, () => {
       const result = mergeChartDataConfigs(target, source as any);
       expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    });
+  });
+
+  describe.each([
+    [0, 0, true],
+    [0, 1, true],
+    [1, 1, true],
+    [0, null, true],
+    [1, null, true],
+    [0, undefined, true],
+    [1, undefined, true],
+    [1, '[1, 999]', true],
+    [0, '[1, 999]', true],
+    [0, [1, 999], true],
+    [1, [1, 999], true],
+    [999, [1, 999], true],
+    [1000, [1, 999], false],
+    [1, '1', true],
+    [0, '1', true],
+    [1, ['1', '999'], true],
+    [0, ['1', '999'], true],
+  ])('isUnderUpperBound Test - ', (count, limit, ifInRange) => {
+    test(`length ${count} in ${limit} limit under uppper bound is ${ifInRange}`, () => {
+      expect(isUnderUpperBound(limit, count)).toBe(ifInRange);
+    });
+  });
+
+  describe.each([
+    [0, 0, 0],
+    [0, 1, 1],
+    [1, 1, 0],
+    [0, null, 0],
+    [1, null, 0],
+    [0, undefined, 0],
+    [1, undefined, 0],
+    [1, '[1, 999]', 0],
+    [0, '[1, 999]', 0],
+    [0, [1, 999], 1],
+    [1, [1, 999], 0],
+    [999, [1, 999], -998],
+    [1000, [1, 999], -999],
+    [1, '1', 0],
+    [0, '1', 1],
+    [1, ['1', '999'], 0],
+    [0, ['1', '999'], 1],
+  ])('reachLowerBoundCount Test - ', (count, limit, distance) => {
+    test(`length ${count} reach ${limit} limit is ${distance}`, () => {
+      expect(reachLowerBoundCount(limit, count)).toBe(distance);
     });
   });
 });

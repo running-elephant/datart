@@ -35,11 +35,12 @@ const config: ChartConfig = {
         NUMERIC: ['aggregate', 'alias', 'format'],
         STRING: ['aggregateLimit', 'alias', 'format'],
       },
+      limit: 2,
     },
     {
-      label: 'filter',
-      key: 'filter',
-      type: 'filter',
+      label: 'colorize',
+      key: 'color',
+      type: 'color',
     },
     {
       label: 'size',
@@ -47,9 +48,9 @@ const config: ChartConfig = {
       type: 'size',
     },
     {
-      label: 'colorize',
-      key: 'color',
-      type: 'color',
+      label: 'filter',
+      key: 'filter',
+      type: 'filter',
     },
     {
       label: 'info',

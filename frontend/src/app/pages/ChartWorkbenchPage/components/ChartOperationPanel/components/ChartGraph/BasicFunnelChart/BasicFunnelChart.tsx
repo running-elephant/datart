@@ -43,11 +43,7 @@ class BasicFunnelChart extends Chart {
     super('funnel-chart', '漏斗图', 'fsux_tubiao_loudoutu');
     this.meta.requirements = [
       {
-        group: [1, 999],
-        aggregate: 1,
-      },
-      {
-        group: 0,
+        group: [0, 1],
         aggregate: [1, 999],
       },
     ];

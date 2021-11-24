@@ -25,18 +25,21 @@ const config: ChartConfig = {
       key: 'dimension',
       required: true,
       type: 'group',
+      limit: 1,
     },
     {
       label: 'axis.y.left',
       key: 'metricsL',
       required: true,
       type: 'aggregate',
+      limit: [1, 999],
     },
     {
       label: 'axis.y.right',
       key: 'metricsR',
       required: true,
       type: 'aggregate',
+      limit: [1, 999],
     },
     {
       label: 'filter',
