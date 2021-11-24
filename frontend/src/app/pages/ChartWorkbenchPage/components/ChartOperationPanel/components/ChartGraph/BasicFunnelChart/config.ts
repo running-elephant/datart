@@ -26,6 +26,10 @@ const config: ChartConfig = {
       required: true,
       type: 'group',
       limit: [0, 1],
+      actions: {
+        NUMERIC: ['alias', 'colorize', 'sortable'],
+        STRING: ['alias', 'colorize', 'sortable'],
+      },
     },
     {
       label: 'metrics',
@@ -124,12 +128,6 @@ const config: ChartConfig = {
         {
           label: 'label.metric',
           key: 'metric',
-          default: true,
-          comType: 'checkbox',
-        },
-        {
-          label: 'label.dimension',
-          key: 'dimension',
           default: true,
           comType: 'checkbox',
         },
