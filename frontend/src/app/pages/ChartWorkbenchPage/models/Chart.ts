@@ -75,7 +75,7 @@ class Chart extends DatartChartBase {
     this._mouseEvents = events;
   }
 
-  public isMatchRequirement(targetConfig?: ChartConfig) {
+  public isMatchRequirement(targetConfig?: ChartConfig): boolean {
     if (!targetConfig) {
       return true;
     }
