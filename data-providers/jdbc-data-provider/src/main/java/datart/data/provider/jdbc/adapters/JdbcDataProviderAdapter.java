@@ -325,7 +325,7 @@ public class JdbcDataProviderAdapter implements Closeable {
             }
         }
         data.setName(script.toQueryKey());
-        return LocalDB.executeLocalQuery(null, executeParam, false, Collections.singletonList(data));
+        return LocalDB.executeLocalQuery(null, executeParam, Collections.singletonList(data));
     }
 
     /**
