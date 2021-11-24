@@ -139,14 +139,28 @@ class Chart extends DatartChartBase {
   }
 
   private isMatchRequiredSectionLimition(
-    origin?: ChartDataSectionConfig[],
+    current?: ChartDataSectionConfig[],
     target?: ChartDataSectionConfig[],
   ) {
-    return (origin || [])
-      .filter(oc => Boolean(oc?.required))
-      .every(oc => {
-        const tc = target?.find(tc => tc.type === oc.type);
-        return isInRange(oc?.limit, tc?.rows?.length);
+    return (current || [])
+      .filter(cc => Boolean(cc?.required))
+      .every(cc => {
+        // The typed chart config section relation matching logic:
+        // 1. If section type exactly 1:1 match, use it
+        // 2. Else If, section type and key exactly 1:1 match, use it
+        // 3. Else, current section will match all target typed sections
+        const tc = target?.filter(tc => tc.type === cc.type) || [];
+        if (tc?.length > 1) {
+          const subTc = tc?.find(stc => stc.key === cc.key);
+          if (!subTc) {
+            const subTcTotalLength = tc
+              .flatMap(tc => tc.rows)
+              ?.filter(Boolean)?.length;
+            return isInRange(cc?.limit, subTcTotalLength);
+          }
+          return isInRange(cc?.limit, subTc?.rows?.length);
+        }
+        return isInRange(cc?.limit, tc?.[0]?.rows?.length);
       });
   }
 }

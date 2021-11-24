@@ -35,7 +35,7 @@ const Chart404Graph: FC<{
       ?.filter(s => reachLowerBoundCount(s?.limit, s.rows?.length) > 0)
       .map(s => {
         return (
-          <li>
+          <li key={s.key}>
             {t('present.needMore', false, {
               type: t('data.' + s.label),
               num: reachLowerBoundCount(s?.limit, s.rows?.length),
