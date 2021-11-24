@@ -451,10 +451,9 @@ const workbenchSlice = createSlice({
 
         const newChartConfig = backendChartConfig?.chartConfig;
         if (!!newChartConfig) {
-          const originalConfig = currentChart?.config!;
           state.chartConfig = mergeConfig(
-            originalConfig,
-            migrateChartConfig(newChartConfig) as ChartConfig,
+            currentChart?.config,
+            migrateChartConfig(newChartConfig),
           );
         }
       })

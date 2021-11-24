@@ -32,11 +32,11 @@ import workbenchSlice, {
   updateChartConfigAndRefreshDatasetAction,
   useWorkbenchSlice,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
-import { transferOldDataConfigs } from 'app/utils/chartConfig';
+import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { CloneValueDeep, mergeDefaultToValue } from 'utils/object';
+import { CloneValueDeep } from 'utils/object';
 import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
 import Chart from '../pages/ChartWorkbenchPage/models/Chart';
 import ChartManager from '../pages/ChartWorkbenchPage/models/ChartManager';
@@ -131,18 +131,18 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const handleChartChange = (c: Chart) => {
     registerChartEvents(c);
     setChart(c);
-    let clonedState = CloneValueDeep(c.config);
-    clonedState = transferOldDataConfigs(chartConfig, clonedState!);
+    const targetChartConfig = CloneValueDeep(c.config);
+
+    const finalChartConfig = transferChartConfigs(
+      targetChartConfig,
+      chartConfig,
+    );
 
     dispatch(
       workbenchSlice.actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
         payload: {
-          init: {
-            ...clonedState,
-            styles: mergeDefaultToValue(clonedState?.styles),
-            settings: mergeDefaultToValue(clonedState?.settings),
-          },
+          init: finalChartConfig,
         },
       }),
     );

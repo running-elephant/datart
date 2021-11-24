@@ -75,11 +75,14 @@ class Chart extends DatartChartBase {
     this._mouseEvents = events;
   }
 
-  public isMatchRequirement(config?: ChartConfig) {
-    if (!config) {
+  public isMatchRequirement(targetConfig?: ChartConfig) {
+    if (!targetConfig) {
       return true;
     }
-    return this.isMatchRequiredSectionLimition(config.datas);
+    return this.isMatchRequiredSectionLimition(
+      this.config?.datas,
+      targetConfig?.datas,
+    );
   }
 
   public getStateHistory() {
@@ -136,12 +139,14 @@ class Chart extends DatartChartBase {
   }
 
   private isMatchRequiredSectionLimition(
-    dataConfigs?: ChartDataSectionConfig[],
+    origin?: ChartDataSectionConfig[],
+    target?: ChartDataSectionConfig[],
   ) {
-    return (dataConfigs || [])
-      .filter(config => Boolean(config?.required))
-      .every(config => {
-        return isInRange(config?.limit, config?.rows?.length);
+    return (origin || [])
+      .filter(oc => Boolean(oc?.required))
+      .every(oc => {
+        const tc = target?.find(tc => tc.type === oc.type);
+        return isInRange(oc?.limit, tc?.rows?.length);
       });
   }
 }

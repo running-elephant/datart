@@ -73,7 +73,7 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
       widget.config.autoUpdate
     ) {
       timer = setInterval(() => {
-        onWidgetAction('refresh', widget.config.type);
+        onWidgetAction('refresh', widget);
       }, +widget.config.frequency * 1000);
     }
     return () => {
@@ -84,6 +84,7 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
   }, [
     boardVisible,
     onWidgetAction,
+    widget,
     widget.config.autoUpdate,
     widget.config.frequency,
     widget.config.type,

@@ -104,6 +104,9 @@ class BasicOutlineMapChart extends Chart {
     const sizeConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.SIZE)
       .flatMap(config => config.rows || []);
+    const infoConfigs = dataConfigs
+      .filter(c => c.type === ChartDataSectionType.INFO)
+      .flatMap(config => config.rows || []);
 
     this.registerGeoMap(styleConfigs);
 
@@ -137,11 +140,11 @@ class BasicOutlineMapChart extends Chart {
         ) as any,
       ),
       tooltip: this.getTooltip(
-        objDataColumns,
+        styleConfigs,
         groupConfigs,
         aggregateConfigs,
         sizeConfigs,
-        styleConfigs,
+        infoConfigs,
       ),
     };
   }
@@ -285,11 +288,11 @@ class BasicOutlineMapChart extends Chart {
   }
 
   protected getTooltip(
-    objDataColumns,
+    styleConfigs,
     groupConfigs,
     aggregateConfigs,
     sizeConfigs,
-    styleConfigs,
+    infoConfigs,
   ) {
     return {
       trigger: 'item',
@@ -302,7 +305,7 @@ class BasicOutlineMapChart extends Chart {
           groupConfigs,
           [],
           aggregateConfigs,
-          [],
+          infoConfigs,
           sizeConfigs,
         );
       },

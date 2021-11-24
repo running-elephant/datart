@@ -27,10 +27,66 @@ import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import uniq from 'lodash/uniq';
 
-type PipeFunction<T1, T2> = (value?: T1, args?: T2) => T1 | undefined;
+type PipeFunction<TA, TO> = (accumulator?: TA, options?: TO) => TA | undefined;
 
 export function pipe<T1, T2>(...fns: PipeFunction<T1, T2>[]) {
   return (v, o?) => (fns || []).reduce((y, f) => f(y, o), v);
+}
+
+export function curry(fn) {
+  let _args: any[] = [];
+  const collector = (...args) => {
+    _args = _args.concat(args || []);
+    if (_args.length < fn.length) {
+      return collector.bind(null);
+    }
+    return fn.apply(null, _args);
+  };
+  return collector;
+}
+
+export function anyPassThen(...predicates) {
+  return (value, defaultValue?) => {
+    for (let i = 0; i < predicates.length; i++) {
+      if (typeof predicates[i] === 'function' && predicates[i](value)) {
+        return predicates[i](value);
+      }
+      if (
+        isPairArray(predicates[i]) &&
+        typeof predicates[i]?.[0] === 'function' &&
+        predicates[i][0].call(null, value)
+      ) {
+        if (typeof predicates[i]?.[1] === 'function') {
+          return predicates[i][1].call(null, value);
+        }
+        return predicates[i][1];
+      }
+    }
+    return defaultValue;
+  };
+}
+
+export function isPairArray(arr?: any[]) {
+  return Array.isArray(arr) && arr?.length === 2;
+}
+
+export function isNumerical(n?: number | string) {
+  return !isEmpty(n) && !isNaN(+n!);
+}
+
+export function isNumericEqual(a?: number | string, b?: number | string) {
+  // eslint-disable-next-line eqeqeq
+  return a == b;
+}
+
+export function isInPairArrayRange(
+  count: number | string,
+  pairArray: number[],
+) {
+  if (!isPairArray(pairArray)) {
+    return false;
+  }
+  return pairArray[0] <= +count && +count <= pairArray[1];
 }
 
 export function PatchUpdate<T1, T2>(
@@ -122,7 +178,7 @@ export function isUndefined(o) {
   return o === undefined;
 }
 
-export function isEmpty(o) {
+export function isEmpty(o?: null | any) {
   return o === null || isUndefined(o);
 }
 
@@ -147,7 +203,7 @@ export function StringInsert(source: string, value: string, index: number) {
 }
 
 export function IsKeyIn<T, K extends keyof T>(o: T, key: K): Boolean {
-  return typeof o === 'object' && key in o;
+  return !!o && typeof o === 'object' && key in o;
 }
 
 export function mergeDefaultToValue(

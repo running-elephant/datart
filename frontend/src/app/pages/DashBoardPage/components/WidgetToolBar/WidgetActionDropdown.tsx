@@ -39,9 +39,9 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
     );
     const menuClick = useCallback(
       ({ key }) => {
-        onWidgetAction(key, widget.config.type);
+        onWidgetAction(key, widget);
       },
-      [onWidgetAction, widget.config.type],
+      [onWidgetAction, widget],
     );
     const actionList = useMemo(() => {
       const actionMap = boardEditing

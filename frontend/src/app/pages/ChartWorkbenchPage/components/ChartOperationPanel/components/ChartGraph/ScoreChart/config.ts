@@ -25,6 +25,7 @@ const config: ChartConfig = {
       key: 'metrics',
       required: true,
       type: 'aggregate',
+      limit: [1, 3],
       actions: {
         NUMERIC: ['aggregate', 'format'],
         STRING: ['aggregate', 'format'],
