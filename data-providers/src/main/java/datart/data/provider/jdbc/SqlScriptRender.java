@@ -150,6 +150,8 @@ public class SqlScriptRender extends ScriptRender {
                     .build();
         }
 
+        selectSql = cleanupSql(selectSql);
+
         //replace variables
         selectSql = replaceVariables(selectSql);
 
