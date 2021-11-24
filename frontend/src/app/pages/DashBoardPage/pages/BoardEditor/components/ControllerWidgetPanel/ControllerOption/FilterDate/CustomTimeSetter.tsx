@@ -112,7 +112,6 @@ export const CustomTimeSetter: FC<{
                 </Select>
               </Form.Item>{' '}
               <Form.Item
-                noStyle
                 name={[
                   'config',
                   'filterDate',
@@ -120,6 +119,7 @@ export const CustomTimeSetter: FC<{
                   'relative',
                   'direction',
                 ]}
+                noStyle
                 validateTrigger={['onChange', 'onBlur']}
                 rules={[{ required: true }]}
               >

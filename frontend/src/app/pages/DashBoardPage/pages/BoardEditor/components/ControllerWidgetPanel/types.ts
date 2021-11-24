@@ -30,30 +30,40 @@ export interface VisibilityCondition {
 }
 
 export interface ControllerConfig {
-  required?: boolean;
   valueOptionType: ValueOptionType; //
-  assistViewFields: string[]; //辅助添加view字段
   visibility: ControllerVisibility;
   sqlOperator: FilterSqlOperator;
-  controllerDate?: ControllerDate;
-  filterValues: any[];
   valueOptions: FilterValueOption[];
+  filterValues: any[];
+  required?: boolean;
+  assistViewFields?: string[]; //辅助添加view字段
+  controllerDate?: ControllerDate;
   minValue?: number;
   maxValue?: number;
 }
 export interface ControllerDate {
-  pickerMode: PickerMode;
+  pickerType: PickerType;
   startTime: ControllerDateType;
   endTime?: ControllerDateType;
 }
-export type PickerMode =
-  | 'year'
-  | 'month'
-  | 'quarter'
-  | 'week'
-  | 'date'
-  | 'dateTime';
+export const enum PickerTypes {
+  Year = 'year',
+  Quarter = 'quarter',
+  Month = 'month',
+  Week = 'week',
+  Date = 'date',
+  DateTime = 'dateTime',
+}
+export type PickerType = Uncapitalize<keyof typeof PickerTypes>;
 
+export const PickerTypeOptions = [
+  { name: '日期', value: PickerTypes.Date },
+  { name: '日期时间', value: PickerTypes.DateTime },
+  { name: '年', value: PickerTypes.Year },
+  { name: '月', value: PickerTypes.Month },
+  { name: '季度', value: PickerTypes.Quarter },
+  { name: '周', value: PickerTypes.Week },
+];
 export interface ControllerDateType {
   relativeOrExact: RelativeOrExactTime;
   relativeValue?: RelativeDate;

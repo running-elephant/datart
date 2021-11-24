@@ -19,6 +19,7 @@ import { Form, FormInstance, Input, Select } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   BoardType,
+  ControllerWidgetContent,
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView, {
@@ -33,7 +34,7 @@ import { ValuesSetter } from './ValuesSetter/ValuesSetter';
 
 export interface RelatedViewFormProps {
   controllerType: ControllerFacadeTypes;
-  form: FormInstance<any> | undefined;
+  form: FormInstance<ControllerWidgetContent> | undefined;
   viewMap: Record<string, ChartDataView>;
   otherStrFilterWidgets: Widget[];
   fieldValueType: ValueTypes;
@@ -47,7 +48,6 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
     form,
     viewMap,
     fieldValueType,
-    fieldCategory,
     otherStrFilterWidgets,
   }) => {
     const filterT = useI18NPrefix('viz.common.filter');

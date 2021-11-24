@@ -123,7 +123,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   const onRangeTimeChange = useCallback(
     (timeValues: string[] | null) => {
       const nextFilterDate: ControllerDate = {
-        pickerMode: 'date',
+        pickerType: 'date',
         startTime: {
           relativeOrExact: RelativeOrExactTime.Exact,
           exactValue: timeValues?.[0],
@@ -151,7 +151,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
       case ControllerFacadeTypes.DropdownList:
       case ControllerFacadeTypes.MultiDropdownList:
         const multiple = facadeType === ControllerFacadeTypes.MultiDropdownList;
-        let selectOptions = optionRows.map(ele => {
+        let selectOptions = optionRows?.map(ele => {
           return { value: ele.key, label: ele.label } as ControlOption;
         });
         return (
@@ -172,7 +172,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
           />
         );
       case ControllerFacadeTypes.RadioGroup:
-        let RadioOptions = optionRows.map(ele => {
+        let RadioOptions = optionRows?.map(ele => {
           return { value: ele.key, label: ele.label } as ControlOption;
         });
         return (

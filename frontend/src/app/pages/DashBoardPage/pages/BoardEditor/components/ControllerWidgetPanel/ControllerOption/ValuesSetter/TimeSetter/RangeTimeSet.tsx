@@ -17,10 +17,10 @@
  */
 import { DatePicker } from 'antd';
 import React, { memo } from 'react';
-import { PickerMode } from '../../../types';
+import { PickerType } from '../../../types';
 const { RangePicker } = DatePicker;
 export const RangeTimeSet: React.FC<{
-  pickerMode: PickerMode;
+  pickerMode: PickerType;
 }> = memo(({ pickerMode }) => {
   function onChange(date, dateString) {
     console.log(date, dateString);

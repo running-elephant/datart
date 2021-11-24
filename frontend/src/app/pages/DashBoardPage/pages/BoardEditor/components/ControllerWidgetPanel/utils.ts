@@ -20,7 +20,11 @@ import {
   ValueOptionTypes,
 } from 'app/pages/DashBoardPage/constants';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
-import { ControllerFacadeTypes as Opt } from 'app/types/FilterControlPanel';
+import {
+  ControllerFacadeTypes,
+  ControllerFacadeTypes as Opt,
+  RelativeOrExactTime,
+} from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
 import { ControllerConfig } from './types';
@@ -65,7 +69,10 @@ export const getDateFacadeOptions = (category: ChartDataViewFieldCategory) => {
   }
 };
 // 展示前处理
-export const preformatWidgetFilter = (oldWidgetFilter: ControllerConfig) => {
+export const preformatWidgetFilter = (
+  oldWidgetFilter: ControllerConfig,
+  type: ControllerFacadeTypes = ControllerFacadeTypes.DropdownList,
+) => {
   const config = JSON.parse(
     JSON.stringify(oldWidgetFilter),
   ) as ControllerConfig;
@@ -140,7 +147,19 @@ export const formatWidgetFilter = (config: ControllerConfig) => {
   return config;
 };
 
-export const getInitWidgetFilter = () => {
+export const getInitWidgetController = (
+  type: ControllerFacadeTypes = ControllerFacadeTypes.DropdownList,
+) => {
+  switch (type) {
+    case ControllerFacadeTypes.RangeTime:
+      return getInitControllerConfig();
+    case ControllerFacadeTypes.Time:
+      return getTimeControllerConfig();
+    default:
+      return getInitControllerConfig();
+  }
+};
+export const getInitControllerConfig = () => {
   const config: ControllerConfig = {
     valueOptionType: ValueOptionTypes.Common, //
     assistViewFields: [],
@@ -152,6 +171,18 @@ export const getInitWidgetFilter = () => {
     sqlOperator: FilterSqlOperator.In,
     filterValues: [],
     valueOptions: [],
+  };
+  return config;
+};
+
+export const getTimeControllerConfig = () => {
+  const config = getInitControllerConfig();
+  config.controllerDate = {
+    pickerType: 'date',
+    startTime: {
+      relativeOrExact: RelativeOrExactTime.Exact,
+      exactValue: null,
+    },
   };
   return config;
 };

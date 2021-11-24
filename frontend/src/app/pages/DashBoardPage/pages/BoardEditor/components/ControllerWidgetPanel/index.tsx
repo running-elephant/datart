@@ -36,7 +36,6 @@ import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/types/ChartDataView';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import produce from 'immer';
 import React, {
   memo,
@@ -57,13 +56,13 @@ import {
   selectSortAllWidgets,
 } from '../../slice/selectors';
 import { addWidgetsToEditBoard } from '../../slice/thunk';
-import { WidgetControlForm } from './ControllerConfig';
+import { WidgetControlForm } from './ControllerOption';
 import { RelatedViewForm } from './RelatedViewForm';
 import { RelatedWidgetItem, RelatedWidgets } from './RelatedWidgets';
 import { ControllerConfig, ValueTypes } from './types';
 import {
   formatWidgetFilter,
-  getInitWidgetFilter,
+  getInitWidgetController,
   preformatWidgetFilter,
 } from './utils';
 
@@ -91,7 +90,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
     const hide = !type || type === 'hide';
     setVisible(!hide);
   }, [type]);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<ControllerWidgetContent>();
   const curFilterWidget = useMemo(
     () => widgetMap[widgetId] || undefined,
     [widgetId, widgetMap],
@@ -185,9 +184,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
     if (!curFilterWidget || !curFilterWidget?.relations) {
       setViews([]);
       form.setFieldsValue({
-        config: preformatWidgetFilter(getInitWidgetFilter()),
-        type: '',
-        fieldValueType: ChartDataViewFieldType.STRING,
+        config: preformatWidgetFilter(getInitWidgetController(controllerType)),
       });
 
       return;
@@ -195,11 +192,9 @@ const FilterWidgetPanel: React.FC = memo(props => {
     const confContent = curFilterWidget.config
       .content as ControllerWidgetContent;
     try {
-      const { relatedViews, type, config } = confContent;
+      const { config } = confContent;
       form.setFieldsValue({
-        type,
-        filterName: curFilterWidget.config.name,
-        relatedViews,
+        ...confContent,
         config: preformatWidgetFilter(config),
       });
     } catch (error) {}
@@ -212,14 +207,12 @@ const FilterWidgetPanel: React.FC = memo(props => {
         return option;
       });
     setViews(widgetOptions);
-  }, [curFilterWidget, setViews, form]);
+  }, [curFilterWidget, setViews, controllerType, form]);
 
   const onFinish = useCallback(
     values => {
       console.log('--values', values);
-      console.log('--fieldValueType', fieldValueType);
-      console.log('--fieldCategory', fieldCategory);
-      console.log('--type', type);
+
       const { relatedViews, config, name } = values;
       if (type === 'add') {
         const sourceId = uuidv4();
@@ -308,10 +301,9 @@ const FilterWidgetPanel: React.FC = memo(props => {
           }
         }
         const nextContent: ControllerWidgetContent = {
-          ...curFilterWidget.config.content,
-          name: '',
+          ...(curFilterWidget.config.content as ControllerWidgetContent),
+          name,
           relatedViews,
-          type: ControllerFacadeTypes.DropdownList,
           config: formatWidgetFilter(config),
         };
         const newWidget = produce(curFilterWidget, draft => {

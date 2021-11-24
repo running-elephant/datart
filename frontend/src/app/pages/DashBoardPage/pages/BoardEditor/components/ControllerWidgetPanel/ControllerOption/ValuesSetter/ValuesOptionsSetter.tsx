@@ -147,58 +147,60 @@ const ValuesOptionsSetter: FC<{
 
   return (
     <Wrap>
-      <Form.Item
-        noStyle
-        name={['config', 'valueOptionType']}
-        validateTrigger={['onChange', 'onBlur']}
-        rules={[{ required: true }]}
-      >
-        <Radio.Group>
-          {OPERATOR_TYPE_OPTION.map(ele => {
+      <Form.Item label="取值配置" shouldUpdate style={{ marginBottom: '0' }}>
+        <Form.Item
+          name={['config', 'valueOptionType']}
+          validateTrigger={['onChange', 'onBlur']}
+          rules={[{ required: true }]}
+          style={{ marginBottom: '0' }}
+        >
+          <Radio.Group>
+            {OPERATOR_TYPE_OPTION.map(ele => {
+              return (
+                <Radio.Button key={ele.value} value={ele.value}>
+                  {ele.name}
+                </Radio.Button>
+              );
+            })}
+          </Radio.Group>
+        </Form.Item>
+        <Form.Item shouldUpdate>
+          {() => {
             return (
-              <Radio.Button key={ele.value} value={ele.value}>
-                {ele.name}
-              </Radio.Button>
-            );
-          })}
-        </Radio.Group>
-      </Form.Item>
-      <Form.Item shouldUpdate>
-        {() => {
-          return (
-            <>
-              <Form.Item name={['config', 'assistViewFields']} noStyle>
-                <AssistViewFields
-                  allowClear
-                  placeholder="select viewField"
-                  onChange={onViewFieldChange}
-                  style={{ margin: '6px 0' }}
-                />
-              </Form.Item>
-              {getOptionType() === 'common' && (
-                <div className="transfer">
-                  <Transfer
-                    operations={['增加', '移除']}
-                    dataSource={optionValues}
-                    titles={[`${'可选项'}`, `${'默认选项'}`]}
-                    targetKeys={targetKeys}
-                    selectedKeys={selectedKeys}
-                    onChange={onTransferChange}
-                    onSelectChange={onTransferSelectChange}
-                    render={item => item.label}
+              <>
+                <Form.Item name={['config', 'assistViewFields']} noStyle>
+                  <AssistViewFields
+                    allowClear
+                    placeholder="select viewField"
+                    onChange={onViewFieldChange}
+                    style={{ margin: '6px 0' }}
                   />
-                </div>
-              )}
-              {getOptionType() === 'custom' && (
-                <CustomOptions
-                  getControllerConfig={getControllerConfig}
-                  form={form}
-                  fieldRowData={optionValues}
-                />
-              )}
-            </>
-          );
-        }}
+                </Form.Item>
+                {getOptionType() === 'common' && (
+                  <div className="transfer">
+                    <Transfer
+                      operations={['增加', '移除']}
+                      dataSource={optionValues}
+                      titles={[`${'可选项'}`, `${'默认选项'}`]}
+                      targetKeys={targetKeys}
+                      selectedKeys={selectedKeys}
+                      onChange={onTransferChange}
+                      onSelectChange={onTransferSelectChange}
+                      render={item => item.label}
+                    />
+                  </div>
+                )}
+                {getOptionType() === 'custom' && (
+                  <CustomOptions
+                    getControllerConfig={getControllerConfig}
+                    form={form}
+                    fieldRowData={optionValues}
+                  />
+                )}
+              </>
+            );
+          }}
+        </Form.Item>
       </Form.Item>
     </Wrap>
   );

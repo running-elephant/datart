@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Form, FormInstance } from 'antd';
+import { FormInstance } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { useMemo } from 'react';
@@ -44,9 +44,9 @@ export const ValuesSetter: React.FC<{
     return TimeTypes.includes(controllerType);
   }, [controllerType]);
   return (
-    <Form.Item label="取值配置" shouldUpdate style={{ marginBottom: '0' }}>
+    <>
       {hasOption && <ValuesOptionsSetter form={form} viewMap={viewMap} />}
       {hasTime && <TimeSetter controllerType={controllerType} form={form} />}
-    </Form.Item>
+    </>
   );
 };
