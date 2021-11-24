@@ -48,7 +48,7 @@ const transferChartSettingConfig = (
   return targetConfig;
 };
 
-const transferChartDataConfig = (
+export const transferChartDataConfig = (
   targetConfig?: ChartConfig,
   sourceConfig?: ChartConfig,
 ): ChartConfig => {
