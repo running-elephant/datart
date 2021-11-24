@@ -22,13 +22,12 @@ import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
-import { ControllerConfig, ValueTypes } from '../types';
+import { ControllerConfig } from '../types';
 
 const ControllerVisibility: FC<{
   form: FormInstance<{ config: ControllerConfig }> | undefined;
   otherStrFilterWidgets: Widget[];
-  fieldValueType: ValueTypes;
-}> = memo(({ form, fieldValueType, otherStrFilterWidgets }) => {
+}> = memo(({ form, otherStrFilterWidgets }) => {
   const showVisibilityCondition = useCallback(() => {
     const visibilityType = form?.getFieldValue([
       'config',

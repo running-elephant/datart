@@ -58,7 +58,7 @@ import { addWidgetsToEditBoard } from '../../slice/thunk';
 import { WidgetControlForm } from './ControllerConfig';
 import { RelatedViewForm } from './RelatedViewForm';
 import { RelatedWidgetItem, RelatedWidgets } from './RelatedWidgets';
-import { ControllerConfig, ValueTypes } from './types';
+import { ControllerConfig } from './types';
 import {
   formatWidgetFilter,
   getInitWidgetController,
@@ -84,102 +84,63 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const viewMap = useSelector(selectViewMap);
 
   const [relatedWidgets, setRelatedWidgets] = useState<RelatedWidgetItem[]>([]);
+
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const hide = !type || type === 'hide';
     setVisible(!hide);
   }, [type]);
   const [form] = Form.useForm<ControllerWidgetContent>();
+
   const curFilterWidget = useMemo(
     () => widgetMap[widgetId] || undefined,
     [widgetId, widgetMap],
   );
 
-  const [fieldValueType, setFieldValueType] = useState<ValueTypes>(
-    ChartDataViewFieldType.STRING,
-  );
-  const [fieldCategory, setFieldCategory] =
-    useState<ChartDataViewFieldCategory>(ChartDataViewFieldCategory.Field);
-
   const getFormRelatedViews = useCallback(() => {
     return form?.getFieldValue('relatedViews') as RelatedView[];
   }, [form]);
 
-  const onChangeFieldProps = useCallback(
-    (views: RelatedView[] | undefined) => {
-      let relatedViews: RelatedView[] = [];
-      if (views) {
-        relatedViews = views;
-      } else {
-        relatedViews = getFormRelatedViews();
-      }
-
-      const trimmedViews = relatedViews.filter(
-        item => item.fieldValue && item.fieldValueType,
-      );
-      if (!trimmedViews || trimmedViews.length < 1) {
-        setFieldValueType(ChartDataViewFieldType.STRING);
-        return;
-      }
-      setFieldValueType(
-        trimmedViews[0].fieldValueType || ChartDataViewFieldType.STRING,
-      );
-      const hasVariable = trimmedViews.find(
-        view => view.relatedCategory === ChartDataViewFieldCategory.Variable,
-      );
-      // 如果有变量 就按变量处理
-
-      setFieldCategory(
-        hasVariable
-          ? ChartDataViewFieldCategory.Variable
-          : ChartDataViewFieldCategory.Field,
-      );
-
-      form.validateFields();
-    },
-    [form, getFormRelatedViews],
-  );
-  const setViews = useCallback(
+  const setViewsRelatedView = useCallback(
     (relatedWidgets: RelatedWidgetItem[]) => {
       const relatedViews = getFormRelatedViews();
       const nextRelatedViews: RelatedView[] = [];
-      relatedWidgets.forEach(option => {
-        const widget = widgetMap[option.widgetId];
-        if (!widget) return;
-        widget.viewIds.forEach((viewId, index) => {
-          const oldViewItem = relatedViews?.find(
-            view => view.viewId === viewId,
-          );
-          const newViewItem = nextRelatedViews.find(
-            view => view.viewId === viewId,
-          );
-          if (!newViewItem) {
-            if (oldViewItem) {
-              nextRelatedViews.push({ ...oldViewItem });
-            } else {
-              const view = viewMap[viewId];
-              if (!view) return;
-              const relatedView: RelatedView = {
-                viewId: view.id,
-                relatedCategory: ChartDataViewFieldCategory.Field,
-                fieldValue: '',
-                fieldValueType: ChartDataViewFieldType.STRING,
-              };
-              nextRelatedViews.push(relatedView);
-            }
+      relatedWidgets.forEach(widgetItem => {
+        const oldViewItem = relatedViews?.find(
+          view => view.viewId === widgetItem.viewId && viewMap[view.viewId],
+        );
+        const newViewItem = nextRelatedViews.find(
+          view => view.viewId === widgetItem.viewId && viewMap[view.viewId],
+        );
+        if (!newViewItem) {
+          if (oldViewItem) {
+            nextRelatedViews.push({ ...oldViewItem });
+          } else {
+            const view = viewMap[widgetItem.viewId];
+            if (!view) return;
+            const relatedView: RelatedView = {
+              viewId: view.id,
+              relatedCategory: ChartDataViewFieldCategory.Field,
+              fieldValue: '',
+              fieldValueType: ChartDataViewFieldType.STRING,
+            };
+            nextRelatedViews.push(relatedView);
           }
-        });
+        }
       });
-      form?.setFieldsValue({ relatedViews: nextRelatedViews });
-      onChangeFieldProps(nextRelatedViews);
+      return nextRelatedViews;
     },
-    [form, getFormRelatedViews, onChangeFieldProps, viewMap, widgetMap],
+    [getFormRelatedViews, viewMap],
   );
-
+  const setFormRelatedViews = useCallback(
+    (nextRelatedViews: RelatedView[]) => {
+      form?.setFieldsValue({ relatedViews: nextRelatedViews });
+    },
+    [form],
+  );
   // 初始化数据
   useEffect(() => {
     if (!curFilterWidget || !curFilterWidget?.relations) {
-      setViews([]);
       form.setFieldsValue({
         config: preformatWidgetFilter(getInitWidgetController(controllerType)),
         relatedViews: [],
@@ -188,23 +149,36 @@ const FilterWidgetPanel: React.FC = memo(props => {
     }
     const confContent = curFilterWidget.config
       .content as ControllerWidgetContent;
-    try {
-      const { config } = confContent;
-      form.setFieldsValue({
-        ...confContent,
-        config: preformatWidgetFilter(config),
-      });
-    } catch (error) {}
-    const widgetOptions = curFilterWidget?.relations
-      .filter(ele => ele.config.type === 'controlToWidget')
-      .map(item => {
-        const option: RelatedWidgetItem = {
-          widgetId: item.targetId,
+    const oldRelations = curFilterWidget?.relations;
+    const oldRelatedWidgetIds = oldRelations
+      .filter(t => widgetMap[t.targetId])
+      .map(t => {
+        const tt: RelatedWidgetItem = {
+          widgetId: t.targetId,
+          viewId: widgetMap[t.targetId].viewIds?.[0],
         };
-        return option;
+        return tt;
       });
-    setViews(widgetOptions);
-  }, [curFilterWidget, setViews, controllerType, form]);
+    setRelatedWidgets(oldRelatedWidgetIds);
+    debugger;
+    setFormRelatedViews(setViewsRelatedView(oldRelatedWidgetIds));
+    const oldRelatedViews = confContent.relatedViews.filter(t => t.viewId);
+    form?.setFieldsValue({ relatedViews: oldRelatedViews });
+
+    const { config } = confContent;
+    form.setFieldsValue({
+      ...confContent,
+      relatedViews: oldRelatedViews,
+      config: preformatWidgetFilter(config),
+    });
+  }, [
+    curFilterWidget,
+    controllerType,
+    form,
+    widgetMap,
+    setFormRelatedViews,
+    setViewsRelatedView,
+  ]);
 
   const onFinish = useCallback(
     values => {
@@ -256,9 +230,8 @@ const FilterWidgetPanel: React.FC = memo(props => {
           relations: newRelations,
           controllerType: controllerType!,
           views: relatedViews,
-          fieldValueType: fieldValueType,
           config: formatWidgetFilter(config),
-          hasVariable: fieldCategory === ChartDataViewFieldCategory.Variable,
+          hasVariable: false,
         });
 
         dispatch(addWidgetsToEditBoard([widget]));
@@ -321,8 +294,6 @@ const FilterWidgetPanel: React.FC = memo(props => {
       controllerType,
       curFilterWidget,
       dispatch,
-      fieldCategory,
-      fieldValueType,
       relatedWidgets,
       type,
       widgetMap,
@@ -350,11 +321,12 @@ const FilterWidgetPanel: React.FC = memo(props => {
     const relatedWidgets = values.map(t => {
       const item: RelatedWidgetItem = {
         widgetId: t,
+        viewId: widgetMap[t].viewIds?.[0],
       };
       return item;
     });
     setRelatedWidgets(relatedWidgets);
-    setViews(relatedWidgets);
+    setFormRelatedViews(setViewsRelatedView(relatedWidgets));
   };
   return (
     <Modal
@@ -381,8 +353,6 @@ const FilterWidgetPanel: React.FC = memo(props => {
               controllerType={controllerType!}
               otherStrFilterWidgets={otherStrFilterWidgets}
               boardType={boardType}
-              fieldCategory={fieldCategory}
-              fieldValueType={fieldValueType}
               viewMap={viewMap}
               form={form}
             />
@@ -395,10 +365,8 @@ const FilterWidgetPanel: React.FC = memo(props => {
             />
             <RelatedViewForm
               form={form}
-              fieldValueType={fieldValueType}
               viewMap={viewMap}
               queryVariables={queryVariables}
-              onChangeFieldProps={onChangeFieldProps}
               getFormRelatedViews={getFormRelatedViews}
             />
           </div>

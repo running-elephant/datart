@@ -22,13 +22,10 @@ import {
   ControllerWidgetContent,
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import ChartDataView, {
-  ChartDataViewFieldCategory,
-} from 'app/types/ChartDataView';
+import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { memo } from 'react';
 import styled from 'styled-components/macro';
-import { ValueTypes } from '../types';
 import ControllerVisibility from './ControllerVisibility';
 import { ValuesSetter } from './ValuesSetter/ValuesSetter';
 
@@ -37,19 +34,12 @@ export interface RelatedViewFormProps {
   form: FormInstance<ControllerWidgetContent> | undefined;
   viewMap: Record<string, ChartDataView>;
   otherStrFilterWidgets: Widget[];
-  fieldValueType: ValueTypes;
-  fieldCategory: ChartDataViewFieldCategory;
+
   boardType: BoardType;
 }
 
 export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
-  ({
-    controllerType,
-    form,
-    viewMap,
-    fieldValueType,
-    otherStrFilterWidgets,
-  }) => {
+  ({ controllerType, form, viewMap, otherStrFilterWidgets }) => {
     const filterT = useI18NPrefix('viz.common.filter');
     return (
       <Wrap>
@@ -76,7 +66,6 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
         {/* 是否显示 */}
         <ControllerVisibility
           otherStrFilterWidgets={otherStrFilterWidgets}
-          fieldValueType={fieldValueType}
           form={form}
         />
       </Wrap>

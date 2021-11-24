@@ -56,10 +56,7 @@ import {
   WidgetPadding,
   WidgetType,
 } from '../pages/Board/slice/types';
-import {
-  ControllerConfig,
-  ValueTypes,
-} from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { ControllerConfig } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
 
 export const VALUE_SPLITTER = '###';
 
@@ -311,7 +308,6 @@ export const createFilterWidget = (params: {
   boardType: BoardType;
   relations: Relation[];
   name?: string;
-  fieldValueType: ValueTypes;
   controllerType: ControllerFacadeTypes;
   views: RelatedView[];
   config: ControllerConfig;

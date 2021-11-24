@@ -21,6 +21,7 @@ import React, { memo, useEffect, useMemo, useState } from 'react';
 
 export type RelatedWidgetItem = {
   widgetId: string;
+  viewId: string;
 };
 export interface RelatedWidgetsProps {
   relatedWidgets: RelatedWidgetItem[];

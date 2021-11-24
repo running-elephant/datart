@@ -15,14 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  Empty,
-  Form,
-  FormInstance,
-  Radio,
-  RadioChangeEvent,
-  Select,
-} from 'antd';
+import { Empty, Form, FormInstance, Radio, Select } from 'antd';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView, {
@@ -31,14 +24,13 @@ import ChartDataView, {
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { G90 } from 'styles/StyleConstants';
-import { ValueTypes } from './types';
 
 export interface RelatedViewFormProps {
   viewMap: Record<string, ChartDataView>;
   form: FormInstance<any> | undefined;
-  fieldValueType: ValueTypes;
+
   queryVariables: Variable[];
-  onChangeFieldProps: (views?: RelatedView[]) => void;
+
   getFormRelatedViews: () => RelatedView[];
 }
 const Option = Select.Option;
@@ -49,7 +41,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
     viewMap,
     form,
     queryVariables,
-    onChangeFieldProps,
+
     getFormRelatedViews,
   }) => {
     //renderOptions
@@ -97,29 +89,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
       },
       [getFormRelatedViews, queryVariables, viewMap],
     );
-    const fieldValueChange = useCallback(
-      (index: number) => (value, option) => {
-        const relatedViews = getFormRelatedViews();
-        relatedViews[index].fieldValue = value;
-        relatedViews[index].fieldValueType = option?.fieldvaluetype;
-        form?.setFieldsValue({ relatedViews: relatedViews });
 
-        onChangeFieldProps(relatedViews);
-      },
-      [getFormRelatedViews, form, onChangeFieldProps],
-    );
-
-    // fieldType
-    const filterFieldCategoryChange = useCallback(
-      (index: number) => (e: RadioChangeEvent) => {
-        const relatedViews = getFormRelatedViews();
-        relatedViews[index].relatedCategory = e.target.value;
-        relatedViews[index].fieldValue = undefined;
-        form?.setFieldsValue({ relatedViews: relatedViews });
-        onChangeFieldProps(relatedViews);
-      },
-      [form, getFormRelatedViews, onChangeFieldProps],
-    );
     const getViewName = useCallback(
       (index: number) => {
         const relatedViews = getFormRelatedViews();
@@ -141,61 +111,14 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                   item => item.fieldValue && item.fieldValueType,
                 );
                 if (!relatedViews || relatedViews.length < 1) {
-                  // callback('Please Choose at least one widget component');
                   return Promise.reject(
                     new Error('Please Choose at least one widget component'),
                   );
                 }
                 if (!trimmedRelatedViews || trimmedRelatedViews.length < 1) {
-                  // callback('Please Choose at least one widget component');
                   return Promise.reject(
                     new Error('Please Choose at least one view filed'),
                   );
-                }
-                const baseField = trimmedRelatedViews[0].fieldValue;
-                const baseType = trimmedRelatedViews[0].fieldValueType;
-                const baseCategory = trimmedRelatedViews[0].relatedCategory;
-                let errField;
-                let errFieldType;
-                let errFieldCategory;
-                const fieldValueTypesIsSame = trimmedRelatedViews.every(
-                  item => {
-                    const err = item.fieldValueType !== baseType;
-                    if (err) {
-                      errField = item.fieldValue;
-                      errFieldType = item.fieldValueType;
-                      return false;
-                    }
-                    return true;
-                  },
-                );
-
-                if (!fieldValueTypesIsSame) {
-                  return Promise.reject(
-                    new Error(
-                      ` ${baseType} !=${errFieldType} . [${baseField}] : ${baseType} ,\n
-                          [${errField}] : ${errFieldType}.
-                          this needs to be the same!`,
-                    ),
-                  );
-                }
-                const fieldCategoryIsSame = trimmedRelatedViews.every(item => {
-                  const err = item.relatedCategory !== baseCategory;
-                  if (err) {
-                    errFieldCategory = item.relatedCategory;
-                    errFieldType = item.fieldValueType;
-                    return false;
-                  }
-                  return true;
-                });
-                if (!fieldCategoryIsSame) {
-                  // if (errFieldType === ChartDataViewFieldType.DATE) {
-                  //   return Promise.reject(
-                  //     new Error(
-                  //       `if FieldType = ${ChartDataViewFieldType.DATE} But Field’s Category not same `,
-                  //     ),
-                  //   );
-                  // }
                 }
                 return Promise.resolve(relatedViews);
               },
@@ -216,11 +139,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                           name={[field.name, 'filterFieldCategory']}
                           fieldKey={[field.fieldKey, 'id']}
                         >
-                          <RadioGroup
-                            value
-                            size="small"
-                            onChange={filterFieldCategoryChange(index)}
-                          >
+                          <RadioGroup value size="small">
                             <RadioButton
                               value={ChartDataViewFieldCategory.Field}
                             >
@@ -244,12 +163,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                       fieldKey={[field.fieldKey, 'id']}
                       wrapperCol={{ span: 24 }}
                     >
-                      <Select
-                        showSearch
-                        placeholder="请选择"
-                        allowClear
-                        onChange={fieldValueChange(index)}
-                      >
+                      <Select showSearch placeholder="请选择" allowClear>
                         {renderOptions(index)}
                       </Select>
                     </Form.Item>
