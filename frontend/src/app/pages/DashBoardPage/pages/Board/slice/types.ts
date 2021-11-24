@@ -123,6 +123,8 @@ export interface WidgetConf {
   index: number;
   tabId?: string; //记录在父容器tab的位置
   name: string;
+  nameConfig: WidgetNameConfig;
+  padding?: WidgetPadding;
   type: WidgetType;
   autoUpdate: boolean;
   frequency: number; // 定时同步频率
@@ -130,8 +132,6 @@ export interface WidgetConf {
   background: BackgroundConfig;
   border: BorderConfig;
   content: WidgetContent;
-  nameConfig: WidgetNameConfig;
-  padding?: WidgetPadding;
   tabIndex?: number; // 在tab 等容器widget里面的排序索引
   linkageConfig?: LinkageConfig; //联动设置
   jumpConfig?: JumpConfig; // 跳转 设置
@@ -142,7 +142,6 @@ export interface WidgetNameConfig {
   fontSize?: number;
   textAlign?: TextAlignType;
   // xieLiuDuo TODO fontSize textAlign
-  //
 }
 export interface LinkageConfig {
   open: boolean;

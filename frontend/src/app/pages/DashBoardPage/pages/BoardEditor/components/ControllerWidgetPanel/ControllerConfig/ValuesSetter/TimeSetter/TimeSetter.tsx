@@ -15,14 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Form, FormInstance, InputNumber, Radio, Select } from 'antd';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { Form, FormInstance, Select } from 'antd';
+import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ControllerFacadeTypes,
   RelativeOrExactTime,
 } from 'app/types/FilterControlPanel';
-import { TIME_DIRECTION, TIME_UNIT_OPTIONS } from 'globalConstants';
 import produce from 'immer';
 import React, { useCallback } from 'react';
 import {
@@ -30,25 +29,31 @@ import {
   PickerTypeOptions,
   RelativeDate,
 } from '../../../types';
-import { RangeTimeSet } from './RangeTimeSet';
+import { RelativeTimeSet } from './RelativeTimeSet';
 import { SingleTimeSet } from './SingleTimeSet';
 export const DateName = ['config', 'controllerDate'];
+export const sqlOperatorName = ['config', 'sqlOperator'];
 export const PickerTypeName = [...DateName, 'pickerType'];
 export const StartTimeName = [...DateName, 'startTime'];
 export const StartTimeROEName = [...StartTimeName, 'relativeOrExact'];
 export const StartTimeRelativeName = [...StartTimeName, 'relativeValue'];
+export const StartTimeExactName = [...StartTimeName, 'exactValue'];
 export const StartTimeDirectionName = [...StartTimeRelativeName, 'direction'];
 export const StartTimeUnitName = [...StartTimeRelativeName, 'unit'];
 export const StartTimeAmountName = [...StartTimeRelativeName, 'amount'];
 
-export interface TimeSetterProps {}
+export const EndTimeName = [...DateName, 'endTime'];
+export const EndTimeROEName = [...EndTimeName, 'relativeOrExact'];
+export const EndTimeRelativeName = [...EndTimeName, 'relativeValue'];
+export const EndTimeExactName = [...EndTimeName, 'exactValue'];
+export const EndTimeDirectionName = [...EndTimeRelativeName, 'direction'];
+export const EndTimeUnitName = [...EndTimeRelativeName, 'unit'];
+export const EndTimeAmountName = [...EndTimeRelativeName, 'amount'];
 
 export const TimeSetter: React.FC<{
   form: FormInstance<ControllerWidgetContent> | undefined;
   controllerType: ControllerFacadeTypes;
 }> = ({ controllerType, form }) => {
-  const filterDataT = useI18NPrefix('viz.common.filter.date');
-
   const getControllerConfig = useCallback(() => {
     return form?.getFieldValue('config') as ControllerConfig;
   }, [form]);
@@ -58,14 +63,19 @@ export const TimeSetter: React.FC<{
     return config?.controllerDate?.startTime.relativeOrExact;
   }, [getControllerConfig]);
 
+  const getEndRelativeOrExact = useCallback(() => {
+    const config = getControllerConfig();
+    return config?.controllerDate?.endTime?.relativeOrExact;
+  }, [getControllerConfig]);
+
   const getPickerType = useCallback(() => {
     return getControllerConfig()?.controllerDate?.pickerType;
   }, [getControllerConfig]);
 
-  const onRelativeChange = useCallback(
-    e => {
-      const value: RelativeOrExactTime = e.target.value;
-      if (value === RelativeOrExactTime.Relative) {
+  const onStartRelativeChange = useCallback(
+    value => {
+      const valueType: RelativeOrExactTime = value;
+      if (valueType === RelativeOrExactTime.Relative) {
         const startTime = getControllerConfig()?.controllerDate?.startTime;
         if (startTime?.relativeValue) {
         } else {
@@ -92,6 +102,74 @@ export const TimeSetter: React.FC<{
     [form, getControllerConfig],
   );
 
+  const onEndRelativeChange = useCallback(
+    value => {
+      const valueType: RelativeOrExactTime = value;
+      if (valueType === RelativeOrExactTime.Relative) {
+        const endTime = getControllerConfig()?.controllerDate?.endTime;
+        if (endTime?.relativeValue) {
+        } else {
+          const relativeValue: RelativeDate = {
+            amount: 1,
+            unit: 'd',
+            direction: '-',
+          };
+          const newControllerDate = produce(
+            getControllerConfig()!.controllerDate,
+            draft => {
+              draft!.endTime!.relativeValue = relativeValue;
+            },
+          );
+          form?.setFieldsValue({
+            config: {
+              ...getControllerConfig(),
+              controllerDate: { ...newControllerDate! },
+            },
+          });
+        }
+      }
+    },
+    [form, getControllerConfig],
+  );
+  const renderROE = useCallback((name, onChange: (value: any) => void) => {
+    return (
+      <Form.Item
+        name={name}
+        noStyle
+        shouldUpdate
+        validateTrigger={['onChange', 'onBlur']}
+        rules={[{ required: true }]}
+      >
+        <Select style={{ width: '100px' }} onChange={onChange}>
+          <Select.Option
+            key={RelativeOrExactTime.Exact}
+            value={RelativeOrExactTime.Exact}
+          >
+            {'固定值'}
+          </Select.Option>
+          <Select.Option
+            key={RelativeOrExactTime.Relative}
+            value={RelativeOrExactTime.Relative}
+          >
+            {'相对值'}
+          </Select.Option>
+        </Select>
+      </Form.Item>
+    );
+  }, []);
+  const renderExact = useCallback((name, getPickerType: () => any) => {
+    return (
+      <Form.Item
+        noStyle
+        name={name}
+        shouldUpdate
+        validateTrigger={['onChange', 'onBlur']}
+        rules={[{ required: false }]}
+      >
+        <SingleTimeSet pickerType={getPickerType()!} />
+      </Form.Item>
+    );
+  }, []);
   return (
     <Form.Item noStyle shouldUpdate>
       {() => {
@@ -117,99 +195,84 @@ export const TimeSetter: React.FC<{
             {controllerType === ControllerFacadeTypes.Time && (
               <>
                 <Form.Item
-                  name={StartTimeROEName}
-                  label={'值类型'}
+                  name={sqlOperatorName}
+                  label={'对应关系'}
                   shouldUpdate
                   validateTrigger={['onChange', 'onBlur']}
                   rules={[{ required: true }]}
                 >
-                  <Radio.Group onChange={onRelativeChange}>
-                    <Radio.Button
-                      key={RelativeOrExactTime.Exact}
-                      value={RelativeOrExactTime.Exact}
-                    >
-                      {'固定值'}
-                    </Radio.Button>
-                    <Radio.Button
-                      key={RelativeOrExactTime.Relative}
-                      value={RelativeOrExactTime.Relative}
-                    >
-                      {'相对值'}
-                    </Radio.Button>
-                  </Radio.Group>
+                  <Select>
+                    {SQL_OPERATOR_OPTIONS.time.map(item => {
+                      return (
+                        <Select.Option key={item.value} value={item.value}>
+                          {item.name}
+                        </Select.Option>
+                      );
+                    })}
+                  </Select>
                 </Form.Item>
+                <Form.Item
+                  label={'默认值'}
+                  shouldUpdate
+                  rules={[{ required: false }]}
+                >
+                  {renderROE(StartTimeROEName, onStartRelativeChange)}
 
-                <div>
-                  {getStartRelativeOrExact() === RelativeOrExactTime.Exact && (
-                    <Form.Item
-                      name={[
-                        'config',
-                        'controllerDate',
-                        'startTime',
-                        'exactValue',
-                      ]}
-                      label={'默认值'}
-                      shouldUpdate
-                      validateTrigger={['onChange', 'onBlur']}
-                      rules={[{ required: false }]}
-                    >
-                      <SingleTimeSet pickerType={getPickerType()!} />
-                    </Form.Item>
-                  )}
+                  {getStartRelativeOrExact() === RelativeOrExactTime.Exact &&
+                    renderExact(StartTimeExactName, getPickerType)}
+
                   {getStartRelativeOrExact() ===
                     RelativeOrExactTime.Relative && (
-                    <Form.Item
-                      name={StartTimeRelativeName}
-                      label={'默认值'}
-                      shouldUpdate
-                      validateTrigger={['onChange', 'onBlur']}
-                      rules={[{ required: true }]}
-                    >
-                      <Form.Item
-                        name={StartTimeAmountName}
-                        noStyle
-                        validateTrigger={['onChange', 'onBlur']}
-                        rules={[{ required: true }]}
-                      >
-                        <InputNumber step={1} min={0} />
-                      </Form.Item>
-                      <Form.Item
-                        name={StartTimeUnitName}
-                        noStyle
-                        validateTrigger={['onChange', 'onBlur']}
-                        rules={[{ required: true }]}
-                      >
-                        <Select style={{ width: '80px' }}>
-                          {TIME_UNIT_OPTIONS.map(item => (
-                            <Select.Option value={item.value}>
-                              {filterDataT(item.name)}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      </Form.Item>
-                      <Form.Item
-                        name={StartTimeDirectionName}
-                        noStyle
-                        validateTrigger={['onChange', 'onBlur']}
-                        rules={[{ required: true }]}
-                      >
-                        <Select style={{ width: '80px' }}>
-                          {TIME_DIRECTION.map(item => {
-                            return (
-                              <Select.Option key={item.name} value={item.value}>
-                                {filterDataT(item.name)}
-                              </Select.Option>
-                            );
-                          })}
-                        </Select>
-                      </Form.Item>
-                    </Form.Item>
+                    <RelativeTimeSet
+                      relativeName={StartTimeRelativeName}
+                      amountName={StartTimeAmountName}
+                      unitName={StartTimeUnitName}
+                      directionName={StartTimeDirectionName}
+                    />
                   )}
-                </div>
+                </Form.Item>
               </>
             )}
             {controllerType === ControllerFacadeTypes.RangeTime && (
-              <RangeTimeSet pickerMode={getPickerType()!} />
+              <>
+                <Form.Item
+                  label={'默认值-起始'}
+                  shouldUpdate
+                  rules={[{ required: false }]}
+                >
+                  {renderROE(StartTimeROEName, onStartRelativeChange)}
+                  {getStartRelativeOrExact() === RelativeOrExactTime.Exact &&
+                    renderExact(StartTimeExactName, getPickerType)}
+                  {getStartRelativeOrExact() ===
+                    RelativeOrExactTime.Relative && (
+                    <RelativeTimeSet
+                      relativeName={StartTimeRelativeName}
+                      amountName={StartTimeAmountName}
+                      unitName={StartTimeUnitName}
+                      directionName={StartTimeDirectionName}
+                    />
+                  )}
+                </Form.Item>
+                <Form.Item
+                  label={'默认值-结束'}
+                  shouldUpdate
+                  rules={[{ required: false }]}
+                >
+                  {renderROE(EndTimeROEName, onEndRelativeChange)}
+
+                  {getEndRelativeOrExact() === RelativeOrExactTime.Exact &&
+                    renderExact(EndTimeExactName, getPickerType)}
+
+                  {getEndRelativeOrExact() === RelativeOrExactTime.Relative && (
+                    <RelativeTimeSet
+                      relativeName={EndTimeRelativeName}
+                      amountName={EndTimeAmountName}
+                      unitName={EndTimeUnitName}
+                      directionName={EndTimeDirectionName}
+                    />
+                  )}
+                </Form.Item>
+              </>
             )}
           </>
         );

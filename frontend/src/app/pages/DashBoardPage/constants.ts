@@ -180,4 +180,12 @@ export const SQL_OPERATOR_OPTIONS = {
     { name: '为空', value: FilterSqlOperator.Null },
     { name: '不为空', value: FilterSqlOperator.NotNull },
   ],
+  time: [
+    { name: '等于', value: FilterSqlOperator.Equal },
+    { name: '不相等', value: FilterSqlOperator.NotEqual },
+    { name: '大于', value: FilterSqlOperator.GreaterThan },
+    { name: '大于或等于', value: FilterSqlOperator.GreaterThanOrEqual },
+    { name: '小于', value: FilterSqlOperator.LessThan },
+    { name: '小于或等于', value: FilterSqlOperator.LessThanOrEqual },
+  ],
 };

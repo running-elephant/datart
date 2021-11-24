@@ -20,18 +20,20 @@ import React, { memo } from 'react';
 import { PickerType } from '../../../types';
 const { RangePicker } = DatePicker;
 export const RangeTimeSet: React.FC<{
-  pickerMode: PickerType;
-}> = memo(({ pickerMode }) => {
+  pickerType: PickerType;
+  value?: any;
+  onChange?: any;
+}> = memo(({ pickerType }) => {
   function onChange(date, dateString) {
     console.log(date, dateString);
   }
 
   return (
     <>
-      {pickerMode === 'dateTime' ? (
+      {pickerType === 'dateTime' ? (
         <RangePicker showTime onChange={onChange} />
       ) : (
-        <RangePicker onChange={onChange} picker={pickerMode as any} />
+        <RangePicker onChange={onChange} picker={pickerType as any} />
       )}
     </>
   );

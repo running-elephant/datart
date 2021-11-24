@@ -58,7 +58,6 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
     );
 
     const handleAdd = useCallback(() => {
-      debugger;
       const newKey = rows?.length || 0 + 1;
       const newRow: FilterValueOption = {
         index: newKey,

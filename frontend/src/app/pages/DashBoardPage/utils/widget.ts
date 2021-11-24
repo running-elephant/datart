@@ -698,7 +698,6 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
       return false;
     }
     if (visibility.visibilityType === 'condition') {
-      debugger;
       const condition = content.config.visibility.condition;
       if (condition) {
         const {

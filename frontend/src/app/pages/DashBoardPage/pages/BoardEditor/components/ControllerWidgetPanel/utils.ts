@@ -151,9 +151,10 @@ export const getInitWidgetController = (
   type: ControllerFacadeTypes = ControllerFacadeTypes.DropdownList,
 ) => {
   switch (type) {
-    case ControllerFacadeTypes.RangeTime:
     case ControllerFacadeTypes.Time:
       return getTimeControllerConfig();
+    case ControllerFacadeTypes.RangeTime:
+      return getRangeTimeControllerConfig();
     default:
       return getInitControllerConfig();
   }
@@ -167,7 +168,7 @@ export const getInitControllerConfig = () => {
     },
     minValue: 1,
     maxValue: 2,
-    sqlOperator: FilterSqlOperator.In,
+    sqlOperator: FilterSqlOperator.Equal,
     filterValues: [],
     valueOptions: [],
   };
@@ -179,6 +180,21 @@ export const getTimeControllerConfig = () => {
   config.controllerDate = {
     pickerType: 'date',
     startTime: {
+      relativeOrExact: RelativeOrExactTime.Exact,
+      exactValue: null,
+    },
+  };
+  return config;
+};
+export const getRangeTimeControllerConfig = () => {
+  const config = getInitControllerConfig();
+  config.controllerDate = {
+    pickerType: 'date',
+    startTime: {
+      relativeOrExact: RelativeOrExactTime.Exact,
+      exactValue: null,
+    },
+    endTime: {
       relativeOrExact: RelativeOrExactTime.Exact,
       exactValue: null,
     },
