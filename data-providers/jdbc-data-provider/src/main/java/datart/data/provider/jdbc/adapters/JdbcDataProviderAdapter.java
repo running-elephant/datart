@@ -21,7 +21,6 @@ package datart.data.provider.jdbc.adapters;
 import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
-import datart.core.common.Application;
 import datart.core.common.BeanUtils;
 import datart.core.data.provider.*;
 import datart.data.provider.JdbcDataProvider;
@@ -264,11 +263,6 @@ public class JdbcDataProviderAdapter implements Closeable {
                 sqlDialect = new CustomSqlDialect(driverInfo);
             }
         }
-//        try {
-//            sqlDialect = Application.getBean(sqlDialect.getClass());
-//        } catch (Exception e) {
-//            log.debug("Custom sql dialect for {} not found. using default", sqlDialect.getClass().getSimpleName());
-//        }
         return sqlDialect;
     }
 
