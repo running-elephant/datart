@@ -107,8 +107,7 @@ export function toFormattedValue(
       formattedValue = pipe(
         unitFormater,
         decimalPlacesFormater,
-        thousandSeperatorFormater,
-        prefixsFormater,
+        numericFormater,
       )(value, numericConfig);
       break;
     case FieldFormatType.CURRENCY:
@@ -191,7 +190,7 @@ function thousandSeperatorFormater(
   return formatted;
 }
 
-function prefixsFormater(
+function numericFormater(
   value,
   config?: IFieldFormatConfig[FieldFormatType.NUMERIC],
 ) {
@@ -201,7 +200,7 @@ function prefixsFormater(
 
   const valueWithPrefixs = [
     config?.prefix || '',
-    value,
+    thousandSeperatorFormater(value, config),
     NumericUnitDescriptions.get(config?.unitKey || NumberUnitKey.None)?.[1],
     config?.suffix || '',
   ].join('');
