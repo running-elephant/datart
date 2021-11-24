@@ -43,7 +43,6 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -101,8 +100,6 @@ const FilterWidgetPanel: React.FC = memo(props => {
   );
   const [fieldCategory, setFieldCategory] =
     useState<ChartDataViewFieldCategory>(ChartDataViewFieldCategory.Field);
-
-  let widgetList = useRef<RelatedWidgetItem[]>([]);
 
   const getFormRelatedViews = useCallback(() => {
     return form?.getFieldValue('relatedViews') as RelatedView[];
@@ -185,8 +182,8 @@ const FilterWidgetPanel: React.FC = memo(props => {
       setViews([]);
       form.setFieldsValue({
         config: preformatWidgetFilter(getInitWidgetController(controllerType)),
+        relatedViews: [],
       });
-
       return;
     }
     const confContent = curFilterWidget.config
@@ -199,7 +196,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
       });
     } catch (error) {}
     const widgetOptions = curFilterWidget?.relations
-      .filter(ele => ele.config.type === 'filterToWidget')
+      .filter(ele => ele.config.type === 'controlToWidget')
       .map(item => {
         const option: RelatedWidgetItem = {
           widgetId: item.targetId,
@@ -216,37 +213,39 @@ const FilterWidgetPanel: React.FC = memo(props => {
       const { relatedViews, config, name } = values;
       if (type === 'add') {
         const sourceId = uuidv4();
-        const filterToWidgetRelations: Relation[] = relatedWidgets.map(
-          option => {
-            const widget = widgetMap[option.widgetId];
+        const controlToWidgetRelations: Relation[] = relatedWidgets
+          .filter(relatedWidgetItem => {
+            return widgetMap[relatedWidgetItem.widgetId];
+          })
+          .map(relatedWidgetItem => {
+            const widget = widgetMap[relatedWidgetItem.widgetId];
             const relation: Relation = {
               sourceId,
               targetId: widget.id,
               config: {
-                type: 'filterToWidget',
-                filterToWidget: {
+                type: 'controlToWidget',
+                controlToWidget: {
                   widgetRelatedViewIds: widget.viewIds,
                 },
               },
               id: uuidv4(),
             };
             return relation;
-          },
-        );
-        const newRelations = [...filterToWidgetRelations];
+          });
+        let newRelations = [...controlToWidgetRelations];
         const ControllerVisibility = (config as ControllerConfig).visibility;
         if (ControllerVisibility) {
           const { visibilityType, condition } = ControllerVisibility;
           if (visibilityType === 'condition' && condition) {
-            const filterToFilterRelation: Relation = {
+            const controlToControlRelation: Relation = {
               sourceId,
               targetId: condition.dependentControllerId,
               config: {
-                type: 'filterToFilter',
+                type: 'controlToControl',
               },
               id: uuidv4(),
             };
-            newRelations.concat([filterToFilterRelation]);
+            newRelations = newRelations.concat([controlToControlRelation]);
           }
         }
 
@@ -266,38 +265,38 @@ const FilterWidgetPanel: React.FC = memo(props => {
       } else if (type === 'edit') {
         const sourceId = curFilterWidget.id;
 
-        const filterToWidgetRelations: Relation[] = widgetList.current
-          .filter(option => {
-            return widgetMap[option.widgetId];
+        const controlToWidgetRelations: Relation[] = relatedWidgets
+          .filter(relatedWidgetItem => {
+            return widgetMap[relatedWidgetItem.widgetId];
           })
-          .map(option => {
-            const widget = widgetMap[option.widgetId];
+          .map(relatedWidgetItem => {
+            const widget = widgetMap[relatedWidgetItem.widgetId];
             return {
               sourceId,
               targetId: widget.id,
               config: {
-                type: 'filterToWidget',
-                filterToWidget: {
+                type: 'controlToWidget',
+                controlToWidget: {
                   widgetRelatedViewIds: widget.viewIds,
                 },
               },
               id: uuidv4(),
             };
           });
-        const newRelations = [...filterToWidgetRelations];
+        let newRelations = [...controlToWidgetRelations];
         const controllerVisible = (config as ControllerConfig).visibility;
         if (controllerVisible) {
           const { visibilityType, condition } = controllerVisible;
           if (visibilityType === 'condition' && condition) {
-            const filterToFilterRelation: Relation = {
+            const controlToControlRelation: Relation = {
               sourceId,
               targetId: condition.dependentControllerId,
               config: {
-                type: 'filterToFilter',
+                type: 'controlToControl',
               },
               id: uuidv4(),
             };
-            newRelations.concat([filterToFilterRelation]);
+            newRelations = newRelations.concat([controlToControlRelation]);
           }
         }
         const nextContent: ControllerWidgetContent = {
@@ -306,6 +305,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           relatedViews,
           config: formatWidgetFilter(config),
         };
+
         const newWidget = produce(curFilterWidget, draft => {
           draft.relations = newRelations;
           draft.config.name = name;

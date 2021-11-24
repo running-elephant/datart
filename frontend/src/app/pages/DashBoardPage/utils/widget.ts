@@ -444,7 +444,7 @@ export const getWidgetMapByServer = (
       const { relations } = widget;
       if (visibility === 'condition' && condition) {
         const dependentFilterId = relations
-          .filter(re => re.config.type === 'filterToFilter')
+          .filter(re => re.config.type === 'controlToControl')
           .map(re => re.targetId)?.[0];
         if (dependentFilterId) {
           condition.dependentControllerId = dependentFilterId;
@@ -733,7 +733,7 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
 export const getNeedRefreshWidgetsByFilter = (filterWidget: Widget) => {
   const relations = filterWidget.relations;
   const widgetIds = relations
-    .filter(ele => ele.config.type === 'filterToWidget')
+    .filter(ele => ele.config.type === 'controlToWidget')
     .map(ele => ele.targetId);
   return widgetIds;
 };

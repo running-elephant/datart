@@ -209,10 +209,14 @@ export interface Relation {
   sourceId: string;
   id?: string;
 }
-
+/**
+ * @controlToWidget Controller associated widgets
+ * @controlToControl Controller associated Controller visible
+ * @widgetToWidget widget inOther WidgetContainer
+ * */
 export interface RelationConfig {
-  type: 'filterToWidget' | 'filterToFilter' | 'widgetToWidget';
-  filterToWidget?: {
+  type: 'controlToWidget' | 'controlToControl' | 'widgetToWidget';
+  controlToWidget?: {
     widgetRelatedViewIds: string[];
   };
   widgetToWidget?: {
