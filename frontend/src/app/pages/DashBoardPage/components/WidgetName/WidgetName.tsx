@@ -28,6 +28,7 @@ export const WidgetName: FC<{ config: WidgetConf; zIndex?: number }> = memo(
     );
   },
 );
+
 const StyledWrap = styled.div<{ conf: WidgetNameConfig; zIndex?: number }>`
   position: absolute;
   top: 0;
@@ -40,9 +41,12 @@ const StyledWrap = styled.div<{ conf: WidgetNameConfig; zIndex?: number }>`
   cursor: pointer;
 
   .widget-name {
-    font-size: ${p => p.conf.fontSize};
+    font-size: ${p => p.conf.fontSize}px;
     color: ${p => p.conf.color};
     text-align: ${p => p.conf.textAlign};
+    font-family: ${p => p.conf.fontFamily};
+    font-weight: ${p => p.conf.fontWeight};
+    font-style: ${p => p.conf.fontStyle};
   }
 `;
 

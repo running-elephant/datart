@@ -22,6 +22,7 @@ import { FilterSqlOperator } from 'globalConstants';
 import produce from 'immer';
 import { DeltaStatic } from 'quill';
 import { CSSProperties } from 'react';
+import { G70 } from 'styles/StyleConstants';
 import { v4 as uuidv4 } from 'uuid';
 import { convertImageUrl, fillPx } from '.';
 import { widgetActionTypeMap } from '../components/WidgetToolBar/config';
@@ -149,7 +150,8 @@ export const createInitWidgetConfig = (opt: {
     content: opt.content,
     nameConfig: {
       show: true,
-      color: '#000',
+      textAlign:'left',
+      ...fontDefault,
     },
     padding: {
       left: 4,
@@ -159,6 +161,15 @@ export const createInitWidgetConfig = (opt: {
     },
   };
 };
+
+export const fontDefault = {
+  fontFamily: 'PingFang SC',
+  fontSize: '12',
+  fontWeight: 'normal',
+  fontStyle: 'normal',
+  color: G70,
+};
+
 export const createWidget = (option: {
   dashboardId: string;
   config: WidgetConf;
