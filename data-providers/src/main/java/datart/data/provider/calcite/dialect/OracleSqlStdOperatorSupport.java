@@ -43,6 +43,11 @@ public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements Sql
     }
 
     @Override
+    public String quoteIdentifier(String val) {
+        return val;
+    }
+
+    @Override
     public void unparseCall(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
         if (isStdSqlOperator(call)) {
             if (unparseStdSqlOperator(writer, call, leftPrec, rightPrec)) {
@@ -71,4 +76,5 @@ public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements Sql
         buf.append(val.replace(literalEndQuoteString, literalEscapedQuote));
         buf.append(literalEndQuoteString);
     }
+
 }
