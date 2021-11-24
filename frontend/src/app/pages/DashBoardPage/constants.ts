@@ -175,3 +175,8 @@ export const SQL_OPERATOR_OPTIONS = {
     { name: '不为空', value: FilterSqlOperator.NotNull },
   ],
 };
+
+export const WIDGET_TITLE_ALIGN_OPTIONS = [
+  { name: '左', value: TEXT_ALIGN_ENUM.left },
+  { name: '中', value: TEXT_ALIGN_ENUM.center },
+];
