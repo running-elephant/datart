@@ -15,24 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- import { Select,Form } from 'antd';
- import { NamePath } from 'rc-field-form/lib/interface';
- import React, { FC, memo } from 'react';
- export const SelectSet: FC<{ options: any; value: string | undefined, defaultValue?: string, name:NamePath}> = memo(
-   ({ options, value, defaultValue, name }) => {
-     return (
-        <Form.Item label="" name={name}>
-        <Select defaultValue={defaultValue} value={value}>
-            {options.map(o => (
-            <Select.Option key={o.value} value={o.value}>
-                {o.name}
-            </Select.Option>
-            ))}
-        </Select>
-        </Form.Item>
-     );
-   },
- );
- 
- export default SelectSet;
- 
+import { Form, Select } from 'antd';
+import { NamePath } from 'rc-field-form/lib/interface';
+import React, { FC, memo } from 'react';
+export const SelectSet: FC<{
+  options: any;
+  value: string | undefined;
+  defaultValue?: string;
+  name: NamePath;
+}> = memo(({ options, value, defaultValue, name }) => {
+  return (
+    <Form.Item label="" name={name}>
+      <Select defaultValue={defaultValue} value={value}>
+        {options.map(o => (
+          <Select.Option key={o.value} value={o.value}>
+            {o.name}
+          </Select.Option>
+        ))}
+      </Select>
+    </Form.Item>
+  );
+});
+
+export default SelectSet;
