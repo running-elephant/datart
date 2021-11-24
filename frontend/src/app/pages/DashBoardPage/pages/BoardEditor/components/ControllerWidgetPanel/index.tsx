@@ -56,7 +56,7 @@ import {
   selectSortAllWidgets,
 } from '../../slice/selectors';
 import { addWidgetsToEditBoard } from '../../slice/thunk';
-import { WidgetControlForm } from './ControllerOption';
+import { WidgetControlForm } from './ControllerConfig';
 import { RelatedViewForm } from './RelatedViewForm';
 import { RelatedWidgetItem, RelatedWidgets } from './RelatedWidgets';
 import { ControllerConfig, ValueTypes } from './types';

@@ -152,7 +152,6 @@ export const getInitWidgetController = (
 ) => {
   switch (type) {
     case ControllerFacadeTypes.RangeTime:
-      return getInitControllerConfig();
     case ControllerFacadeTypes.Time:
       return getTimeControllerConfig();
     default:
