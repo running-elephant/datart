@@ -86,6 +86,7 @@ export const createDataChartWidget = (opt: {
   });
   return widget;
 };
+
 export const createMediaWidget = (opt: {
   dashboardId: string;
   boardType: BoardType;
@@ -121,6 +122,7 @@ export const createContainerWidget = (opt: {
   });
   return widget;
 };
+
 export const createInitWidgetConfig = (opt: {
   type: WidgetType;
   content: WidgetContent;
@@ -150,7 +152,7 @@ export const createInitWidgetConfig = (opt: {
     content: opt.content,
     nameConfig: {
       show: true,
-      textAlign:'left',
+      textAlign: 'left',
       ...fontDefault,
     },
     padding: {
@@ -383,6 +385,7 @@ export const getWidgetMapByServer = (
       relations: convertWidgetRelationsToObj(cur.relations),
       viewIds,
     };
+    widget.config.nameConfig = { ...fontDefault, ...widget.config.nameConfig };
 
     acc[cur.id] = widget;
     return acc;
@@ -476,6 +479,7 @@ export const getWidgetMapByServer = (
     wrappedDataCharts,
   };
 };
+
 export const getWidgetInfoMapByServer = (serverWidgets: ServerWidget[]) => {
   const widgetInfoMap = {};
   serverWidgets.forEach(item => {
@@ -496,6 +500,7 @@ export const updateWidgetsRect = (
   }
   return widgets;
 };
+
 export const updateAutoWidgetsRect = (
   boardConfig: DashboardConfig,
   widgets: Widget[],
@@ -523,6 +528,7 @@ export const updateAutoWidgetsRect = (
   });
   return upDatedWidgets;
 };
+
 export const updateFreeWidgetsRect = (widgets: Widget[]) => {
   const upDatedWidgets: Widget[] = [];
   let diffValue = 0; // 避免完全重叠
@@ -570,6 +576,7 @@ export const createToSaveWidgetGroup = (
     widgetToDelete,
   };
 };
+
 export const convertWidgetToSave = (widget: Widget): ServerWidget => {
   return {
     ...widget,
@@ -577,6 +584,7 @@ export const convertWidgetToSave = (widget: Widget): ServerWidget => {
     relations: convertWidgetRelationsToSave(widget.relations) || [],
   };
 };
+
 export const convertWidgetRelationsToSave = (
   relations: Relation[] = [],
 ): ServerRelation[] => {
@@ -584,6 +592,7 @@ export const convertWidgetRelationsToSave = (
     return { ...relation, config: JSON.stringify(relation.config) };
   });
 };
+
 export const convertWidgetRelationsToObj = (
   relations: ServerRelation[] = [],
 ): Relation[] => {
@@ -598,12 +607,14 @@ export const convertWidgetRelationsToObj = (
     }
   });
 };
+
 export const convertToWidgetMap = (widgets: Widget[]) => {
   return widgets.reduce((acc, cur) => {
     acc[cur.id] = cur;
     return acc;
   }, {} as Record<string, Widget>);
 };
+
 export const createWidgetInfoMap = (widgets: Widget[]) => {
   return widgets.reduce((acc, cur) => {
     acc[cur.id] = createWidgetInfo(cur.id);
@@ -631,6 +642,7 @@ export const convertWrapChartWidget = (params: {
   });
   return widgets;
 };
+
 /**
  * @param ''
  * @description 'get all filter widget of board'
@@ -644,6 +656,7 @@ export const getAllFilterWidget = (widgetMap: Record<string, Widget>) => {
     }, {} as Record<string, Widget>);
   return filterWidgetMap;
 };
+
 export const getOtherStringFilterWidgets = (
   allWidgets: Widget[],
   widgetId: string | undefined,
@@ -661,6 +674,7 @@ export const getOtherStringFilterWidgets = (
     return allFilterWidgets.filter(ele => ele.id !== widgetId);
   }
 };
+
 /**
  * @param 'filterWidgetMap'
  * @description ''
@@ -752,6 +766,7 @@ export const getNoHiddenFilters = (widgets: Widget[]) => {
   });
   return noFixedFilters;
 };
+
 export const getNeedRefreshWidgetsByFilter = (filterWidget: Widget) => {
   const relations = filterWidget.relations;
   const widgetIds = relations
@@ -759,12 +774,14 @@ export const getNeedRefreshWidgetsByFilter = (filterWidget: Widget) => {
     .map(ele => ele.targetId);
   return widgetIds;
 };
+
 // getWidgetStyle start
 export const getWidgetStyle = (boardType: BoardType, widget: Widget) => {
   return boardType === 'auto'
     ? getAutoWidgetStyle(widget)
     : getFreeWidgetStyle(widget);
 };
+
 export const getAutoWidgetStyle = (widget: Widget) => {
   const widgetConf = widget.config;
   let widgetStyle: CSSProperties = {
@@ -781,6 +798,7 @@ export const getAutoWidgetStyle = (widget: Widget) => {
   };
   return widgetStyle;
 };
+
 export const getFreeWidgetStyle = (widget: Widget) => {
   const widgetConf = widget.config;
   const rect = widgetConf.rect;
@@ -798,6 +816,7 @@ export const getFreeWidgetStyle = (widget: Widget) => {
   };
   return widgetStyle;
 };
+
 // getWidgetStyle end
 // get some css start
 export const getBackgroundCss = (bg: BackgroundConfig) => {
@@ -809,6 +828,7 @@ export const getBackgroundCss = (bg: BackgroundConfig) => {
   };
   return css;
 };
+
 export const getBorderCss = (bd: BorderConfig) => {
   let css: CSSProperties = {
     borderColor: bd?.color,
@@ -818,6 +838,7 @@ export const getBorderCss = (bd: BorderConfig) => {
   };
   return css;
 };
+
 export const getPaddingCss = (pd: WidgetPadding) => {
   let css: CSSProperties = {
     paddingTop: pd?.top,
@@ -850,6 +871,7 @@ export const getWidgetSomeStyle = (opt: {
   };
   return style;
 };
+
 // get some css end
 // filter
 export const getCanLinkFilterWidgets = (widgets: Widget[]) => {

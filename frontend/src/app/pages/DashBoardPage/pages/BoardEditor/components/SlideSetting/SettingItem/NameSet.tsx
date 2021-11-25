@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Checkbox, Form, FormInstance, Input, Select } from 'antd';
+import { Checkbox, Form, FormInstance, Input } from 'antd';
 import BasicFont from 'app/components/FormGenerator/Basic/BasicFont';
 import { WIDGET_TITLE_ALIGN_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { WidgetNameConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -39,7 +39,7 @@ export const NameSet: FC<{
   const fontData = useMemo(() => {
     const data = {
       ...FONT_DATA,
-      value: config.fontFamily ? config : fontDefault,
+      value: config,
     };
     return data;
   }, [config]);
@@ -57,8 +57,13 @@ export const NameSet: FC<{
       <Form.Item valuePropName="checked" name={['nameConfig', 'show']}>
         <Checkbox>显示标题</Checkbox>
       </Form.Item>
-      <Form.Item label="对齐方式" >
-        <SelectSet name={['nameConfig', 'textAlign']} options={WIDGET_TITLE_ALIGN_OPTIONS} value={config.textAlign} defaultValue="left"  />
+      <Form.Item label="对齐方式">
+        <SelectSet
+          name={['nameConfig', 'textAlign']}
+          options={WIDGET_TITLE_ALIGN_OPTIONS}
+          value={config.textAlign}
+          defaultValue="left"
+        />
       </Form.Item>
       <Form.Item
         getValueFromEvent={normfontData}

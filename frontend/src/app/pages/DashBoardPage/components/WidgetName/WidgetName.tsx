@@ -19,6 +19,7 @@
 import React, { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetConf, WidgetNameConfig } from '../../pages/Board/slice/types';
+
 export const WidgetName: FC<{ config: WidgetConf; zIndex?: number }> = memo(
   ({ config, zIndex }) => {
     return (
