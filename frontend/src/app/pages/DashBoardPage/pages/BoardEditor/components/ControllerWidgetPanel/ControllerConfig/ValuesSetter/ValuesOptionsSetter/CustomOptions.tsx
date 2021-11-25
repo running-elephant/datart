@@ -73,7 +73,6 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
     }, [onChangeFilterOptions, rows]);
 
     const addRowByField = useCallback(() => {
-      debugger;
       onChangeFilterOptions(fieldRowData);
     }, [onChangeFilterOptions, fieldRowData]);
 

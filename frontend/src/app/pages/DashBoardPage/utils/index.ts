@@ -165,7 +165,7 @@ export const getWidgetFilterValues = (opt: {
       if (!config?.controllerDate) {
         return false;
       }
-      const timeValues = getWidgetFilterDateValues(
+      const timeValues = getControllerDateValues(
         config.valueOptionType,
         config.controllerDate,
       );
@@ -216,7 +216,7 @@ export const getWidgetFilterValues = (opt: {
       return strValues[0] ? strValues : false;
   }
 };
-export const getWidgetFilterDateValues = (
+export const getControllerDateValues = (
   valueOptionType: ValueOptionType,
   filterDate: ControllerDate,
 ) => {

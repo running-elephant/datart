@@ -60,8 +60,8 @@ import { RelatedViewForm } from './RelatedViewForm';
 import { RelatedWidgetItem, RelatedWidgets } from './RelatedWidgets';
 import { ControllerConfig } from './types';
 import {
-  formatWidgetFilter,
   getInitWidgetController,
+  postControlConfig,
   preformatWidgetFilter,
 } from './utils';
 
@@ -180,7 +180,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   ]);
 
   const onFinish = useCallback(
-    values => {
+    (values: ControllerWidgetContent) => {
       console.log('--values', values);
 
       const { relatedViews, config, name } = values;
@@ -229,7 +229,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           relations: newRelations,
           controllerType: controllerType!,
           views: relatedViews,
-          config: formatWidgetFilter(config),
+          config: postControlConfig(config, controllerType!),
           hasVariable: false,
         });
 
@@ -275,7 +275,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           ...(curFilterWidget.config.content as ControllerWidgetContent),
           name,
           relatedViews,
-          config: formatWidgetFilter(config),
+          config: postControlConfig(config, controllerType),
         };
 
         const newWidget = produce(curFilterWidget, draft => {
@@ -308,6 +308,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   };
   const afterClose = useCallback(() => {
     form.resetFields();
+    setRelatedWidgets([]);
     dispatch(
       editDashBoardInfoActions.changeControllerPanel({
         type: 'hide',

@@ -20,6 +20,7 @@ import {
   BorderConfig,
   strEnumType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import { WHITE } from 'styles/StyleConstants';
 import { WidgetType } from './pages/Board/slice/types';
@@ -148,45 +149,76 @@ export const VISIBILITY_TYPE_OPTION = [
   { name: '隐藏', value: ControllerVisibleTypes.Hide },
   { name: '条件', value: ControllerVisibleTypes.Condition },
 ];
-export const SQL_OPERATOR_OPTIONS = {
-  include: [
-    { name: '前缀包含', value: FilterSqlOperator.PrefixContain },
-    { name: '后缀包含', value: FilterSqlOperator.SuffixContain },
-    { name: '等于', value: FilterSqlOperator.Equal },
-    { name: '为空', value: FilterSqlOperator.Null },
+export const ALL_SQL_OPERATOR_OPTIONS = [
+  { name: '等于', value: FilterSqlOperator.Equal },
+  { name: '不相等', value: FilterSqlOperator.NotEqual },
+
+  { name: '包含', value: FilterSqlOperator.In },
+  { name: '不包含', value: FilterSqlOperator.NotIn },
+
+  { name: '为空', value: FilterSqlOperator.Null },
+  { name: '不为空', value: FilterSqlOperator.NotNull },
+
+  { name: '前缀包含', value: FilterSqlOperator.PrefixContain },
+  { name: '前缀不包含', value: FilterSqlOperator.NotPrefixContain },
+
+  { name: '后缀包含', value: FilterSqlOperator.SuffixContain },
+  { name: '后缀不包含', value: FilterSqlOperator.NotSuffixContain },
+
+  { name: '区间', value: FilterSqlOperator.Between },
+
+  { name: '大于或等于', value: FilterSqlOperator.GreaterThanOrEqual },
+  { name: '小于或等于', value: FilterSqlOperator.LessThanOrEqual },
+  { name: '大于', value: FilterSqlOperator.GreaterThan },
+  { name: '小于', value: FilterSqlOperator.LessThan },
+];
+
+export const SQL_OPERATOR_OPTIONS_TYPES = {
+  [ControllerFacadeTypes.DropdownList]: [
+    FilterSqlOperator.Equal,
+    FilterSqlOperator.NotEqual,
   ],
-  notInclude: [
-    {
-      name: '前缀不包含',
-      value: FilterSqlOperator.NotPrefixContain,
-      type: 'notInclude',
-    },
-    {
-      name: '后缀不包含',
-      value: FilterSqlOperator.NotSuffixContain,
-      type: 'notInclude',
-    },
-    { name: '不相等', value: FilterSqlOperator.NotEqual, type: 'notInclude' },
-    { name: '不为空', value: FilterSqlOperator.NotNull, type: 'notInclude' },
+  [ControllerFacadeTypes.MultiDropdownList]: [
+    FilterSqlOperator.In,
+    FilterSqlOperator.NotIn,
   ],
-  compare: [
-    { name: '区间', value: FilterSqlOperator.Between },
-    { name: '等于', value: FilterSqlOperator.Equal },
-    { name: '不相等', value: FilterSqlOperator.NotEqual },
-    { name: '大于或等于', value: FilterSqlOperator.GreaterThanOrEqual },
-    { name: '小于或等于', value: FilterSqlOperator.LessThanOrEqual },
-    { name: '大于', value: FilterSqlOperator.GreaterThan },
-    { name: '小于', value: FilterSqlOperator.LessThan },
-    { name: '为空', value: FilterSqlOperator.Null },
-    { name: '不为空', value: FilterSqlOperator.NotNull },
+  [ControllerFacadeTypes.RadioGroup]: [
+    FilterSqlOperator.Equal,
+    FilterSqlOperator.NotEqual,
   ],
-  time: [
-    { name: '等于', value: FilterSqlOperator.Equal },
-    { name: '不相等', value: FilterSqlOperator.NotEqual },
-    { name: '大于', value: FilterSqlOperator.GreaterThan },
-    { name: '大于或等于', value: FilterSqlOperator.GreaterThanOrEqual },
-    { name: '小于', value: FilterSqlOperator.LessThan },
-    { name: '小于或等于', value: FilterSqlOperator.LessThanOrEqual },
+  [ControllerFacadeTypes.Text]: [
+    FilterSqlOperator.Equal,
+    FilterSqlOperator.NotEqual,
+    FilterSqlOperator.Contain,
+    FilterSqlOperator.NotContain,
+    FilterSqlOperator.PrefixContain,
+    FilterSqlOperator.NotPrefixContain,
+    FilterSqlOperator.SuffixContain,
+    FilterSqlOperator.NotSuffixContain,
+  ],
+  [ControllerFacadeTypes.Value]: [
+    FilterSqlOperator.Equal,
+    FilterSqlOperator.NotEqual,
+    FilterSqlOperator.LessThan,
+    FilterSqlOperator.GreaterThan,
+    FilterSqlOperator.LessThanOrEqual,
+    FilterSqlOperator.GreaterThanOrEqual,
+  ],
+  [ControllerFacadeTypes.Time]: [
+    FilterSqlOperator.Equal,
+    FilterSqlOperator.NotEqual,
+    FilterSqlOperator.LessThan,
+    FilterSqlOperator.GreaterThan,
+    FilterSqlOperator.LessThanOrEqual,
+    FilterSqlOperator.GreaterThanOrEqual,
+  ],
+  [ControllerFacadeTypes.Slider]: [
+    FilterSqlOperator.Equal,
+    FilterSqlOperator.NotEqual,
+    FilterSqlOperator.LessThan,
+    FilterSqlOperator.GreaterThan,
+    FilterSqlOperator.LessThanOrEqual,
+    FilterSqlOperator.GreaterThanOrEqual,
   ],
 };
 

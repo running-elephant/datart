@@ -108,25 +108,23 @@ export const preformatWidgetFilter = (
   return config;
 };
 // 设置后处理
-export const formatWidgetFilter = (config: ControllerConfig) => {
-  if (!config.sqlOperator) {
-    config.sqlOperator = FilterSqlOperator.In;
-  }
-  if (!config?.visibility) {
-    config.visibility = {
-      visibilityType: 'show',
-    };
-  }
-
-  if (!config.valueOptionType) {
-    config.valueOptionType = ValueOptionTypes.Common;
-  }
-  if (config.valueOptions && config.valueOptions.length > 0) {
+export const postControlConfig = (
+  config: ControllerConfig,
+  type: ControllerFacadeTypes = ControllerFacadeTypes.DropdownList,
+) => {
+  if (config.valueOptions.length > 0) {
     config.controllerValues = config.valueOptions
       .filter(ele => ele.isSelected)
       .map(ele => ele.key);
   }
-  if (config.controllerDate) {
+  if (!Array.isArray(config.controllerValues)) {
+    config.controllerValues = [config.controllerValues];
+  }
+  const timeTypes = [
+    ControllerFacadeTypes.Time,
+    ControllerFacadeTypes.RangeTime,
+  ];
+  if (timeTypes.includes(type) && config.controllerDate) {
     const filterDate = config.controllerDate;
     if (filterDate.startTime && filterDate.startTime.exactValue) {
       if (typeof filterDate.startTime.exactValue !== 'string') {
@@ -151,13 +149,15 @@ export const getInitWidgetController = (
   type: ControllerFacadeTypes = ControllerFacadeTypes.DropdownList,
 ) => {
   switch (type) {
+    case ControllerFacadeTypes.MultiDropdownList:
+      return getMultiDropdownListControllerConfig();
     case ControllerFacadeTypes.Time:
       return getTimeControllerConfig();
     case ControllerFacadeTypes.RangeTime:
       return getRangeTimeControllerConfig();
     case ControllerFacadeTypes.RadioGroup:
       return getTimeControllerConfig();
-
+    case ControllerFacadeTypes.DropdownList:
     default:
       return getInitControllerConfig();
   }
@@ -193,6 +193,7 @@ export const getTimeControllerConfig = () => {
 };
 export const getRangeTimeControllerConfig = () => {
   const config = getInitControllerConfig();
+  config.sqlOperator = FilterSqlOperator.Between;
   config.controllerDate = {
     pickerType: 'date',
     startTime: {
@@ -204,6 +205,11 @@ export const getRangeTimeControllerConfig = () => {
       exactValue: null,
     },
   };
+  return config;
+};
+export const getMultiDropdownListControllerConfig = () => {
+  const config = getInitControllerConfig();
+  config.sqlOperator = FilterSqlOperator.In;
   return config;
 };
 export const getRadioGroupControllerConfig = () => {

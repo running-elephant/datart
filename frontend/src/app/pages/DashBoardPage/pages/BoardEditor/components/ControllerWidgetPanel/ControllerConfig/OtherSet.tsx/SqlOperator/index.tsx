@@ -16,7 +16,12 @@
  * limitations under the License.
  */
 import { FormItemProps } from 'antd';
+import {
+  ALL_SQL_OPERATOR_OPTIONS,
+  SQL_OPERATOR_OPTIONS_TYPES,
+} from 'app/pages/DashBoardPage/constants';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+import { FilterSqlOperator } from 'globalConstants';
 import React, { memo } from 'react';
 import { FixedSqlOperatorTypes } from '../../../types';
 import { SqlOperatorForm } from './SqlOperatorForm';
@@ -34,6 +39,12 @@ export const SqlOperator: React.FC<SqlOperatorProps> = memo(
       label: '对应关系',
       hidden: hideForm,
     };
-    return <SqlOperatorForm {...itemProps} />;
+    const optionKeys: FilterSqlOperator[] =
+      SQL_OPERATOR_OPTIONS_TYPES[controllerType] || [];
+    const options = ALL_SQL_OPERATOR_OPTIONS.filter(it =>
+      optionKeys.includes(it.value),
+    );
+
+    return <SqlOperatorForm options={options} {...itemProps} />;
   },
 );

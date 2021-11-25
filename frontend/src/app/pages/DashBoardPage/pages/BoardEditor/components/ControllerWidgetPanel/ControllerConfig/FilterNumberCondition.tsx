@@ -17,7 +17,6 @@
  */
 
 import { Form, FormInstance, InputNumber, Select } from 'antd';
-import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -25,9 +24,7 @@ import {
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { ControllerConfig } from '../types';
-const numberConditionSetValues = SQL_OPERATOR_OPTIONS.compare.map(
-  ele => ele.value,
-);
+
 const FilterNumberCondition: FC<{
   form: FormInstance<{ config: ControllerConfig }> | undefined;
   fieldCategory: ChartDataViewFieldCategory;
@@ -43,10 +40,7 @@ const FilterNumberCondition: FC<{
     let needAdjust = false;
     let sqlOperator = config?.sqlOperator;
     let filterValues = config?.controllerValues;
-    if (!numberConditionSetValues.includes(config?.sqlOperator)) {
-      needAdjust = true;
-      sqlOperator = FilterSqlOperator.Equal;
-    }
+
     if (hasVariable) {
       sqlOperator = FilterSqlOperator.Equal;
     }
@@ -144,7 +138,7 @@ const FilterNumberCondition: FC<{
                 }}
                 disabled={hasVariable}
               >
-                {SQL_OPERATOR_OPTIONS.compare.map(item => {
+                {[{ name: 1, value: 2 }].map(item => {
                   return (
                     <Select.Option key={item.value} value={item.value}>
                       {item.name}

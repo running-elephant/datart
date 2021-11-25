@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { Form } from 'antd';
 import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
@@ -25,7 +26,7 @@ import {
   ControllerDate,
   ControlOption,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
-import { getWidgetFilterDateValues } from 'app/pages/DashBoardPage/utils';
+import { getControllerDateValues } from 'app/pages/DashBoardPage/utils';
 import { FilterValueOption } from 'app/types/ChartConfig';
 import {
   ControllerFacadeTypes,
@@ -47,10 +48,13 @@ import FilterRangTime from './Controller/FilterRangeTime';
 import { FilterSelect } from './Controller/FilterSelect';
 import { FilterSlider } from './Controller/FilterSlider';
 import { FilterText } from './Controller/FilterText';
-import FilterTime from './Controller/FilterTime';
+import { SelectControllerForm } from './Controller/SelectController';
+import { TimeControllerForm } from './Controller/TimeController';
 
 export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   const widget = useContext(WidgetContext);
+  const [form] = Form.useForm();
+
   const { renderedWidgetById } = useContext(BoardContext);
   const {
     data: { rows },
@@ -95,17 +99,23 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
     renderedWidgetById(widget.id);
   }, [renderedWidgetById, widget.id]);
 
-  const onFilterValuesChange = useCallback(
+  const onControllerValuesChange = useCallback(
     values => {
+      form.submit();
+      const _values = values ? (Array.isArray(values) ? values : [values]) : [];
       const nextWidget = produce(widget, draft => {
         (
           draft.config.content as ControllerWidgetContent
-        ).config.controllerValues = values;
+        ).config.controllerValues = _values;
       });
       widgetUpdate(nextWidget);
-      refreshWidgetsByFilter(nextWidget);
+      //
+      if (true) {
+        // console.log('board 属性 自动加载属性');
+        refreshWidgetsByFilter(nextWidget);
+      }
     },
-    [refreshWidgetsByFilter, widget, widgetUpdate],
+    [form, refreshWidgetsByFilter, widget, widgetUpdate],
   );
 
   const onSqlOperatorAndValues = useCallback(
@@ -123,7 +133,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
     [refreshWidgetsByFilter, widget, widgetUpdate],
   );
   const onRangeTimeChange = useCallback(
-    (timeValues: string[] | null) => {
+    (timeValues: string[] | null | string) => {
       const nextFilterDate: ControllerDate = {
         pickerType: 'date',
         startTime: {
@@ -138,9 +148,6 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
       const nextWidget = produce(widget, draft => {
         (
           draft.config.content as ControllerWidgetContent
-        ).config.valueOptionType = 'custom';
-        (
-          draft.config.content as ControllerWidgetContent
         ).config.controllerDate = nextFilterDate;
       });
       widgetUpdate(nextWidget);
@@ -148,18 +155,49 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
     },
     [refreshWidgetsByFilter, widget, widgetUpdate],
   );
+
+  const onTimeChange = useCallback(
+    (value: string | null) => {
+      const nextFilterDate: ControllerDate = {
+        ...controllerDate!,
+        startTime: {
+          relativeOrExact: RelativeOrExactTime.Exact,
+          exactValue: value,
+        },
+      };
+      const nextWidget = produce(widget, draft => {
+        (
+          draft.config.content as ControllerWidgetContent
+        ).config.controllerDate = nextFilterDate;
+      });
+      widgetUpdate(nextWidget);
+      refreshWidgetsByFilter(nextWidget);
+    },
+    [controllerDate, refreshWidgetsByFilter, widget, widgetUpdate],
+  );
+
   const control = useMemo(() => {
+    let selectOptions = optionRows?.map(ele => {
+      return { value: ele.key, label: ele.label } as ControlOption;
+    });
+
     switch (facadeType) {
       case ControllerFacadeTypes.DropdownList:
+        return (
+          <SelectControllerForm
+            value={controllerValues?.[0]}
+            onChange={onControllerValuesChange}
+            options={selectOptions}
+            name={'value'}
+          />
+        );
       case ControllerFacadeTypes.MultiDropdownList:
         const multiple = facadeType === ControllerFacadeTypes.MultiDropdownList;
-        let selectOptions = optionRows?.map(ele => {
-          return { value: ele.key, label: ele.label } as ControlOption;
-        });
+
         return (
           <FilterSelect
             value={controllerValues}
-            onValuesChange={onFilterValuesChange}
+            onValuesChange={onControllerValuesChange}
             multiple={multiple}
             options={selectOptions}
           />
@@ -168,7 +206,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         return (
           <FilterSlider
             value={controllerValues}
-            onValuesChange={onFilterValuesChange}
+            onValuesChange={onControllerValuesChange}
             minValue={minValue!}
             maxValue={maxValue!}
           />
@@ -180,7 +218,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         return (
           <FilterRadioGroup
             value={controllerValues}
-            onValuesChange={onFilterValuesChange}
+            onValuesChange={onControllerValuesChange}
             options={RadioOptions}
           />
         );
@@ -204,7 +242,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         );
 
       case ControllerFacadeTypes.RangeTime:
-        const rangeTimeValues = getWidgetFilterDateValues(
+        const rangeTimeValues = getControllerDateValues(
           config.valueOptionType,
           config!.controllerDate!,
         );
@@ -215,29 +253,41 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
           />
         );
       case ControllerFacadeTypes.Time:
-        const timeValues = getWidgetFilterDateValues(
+        const timeValues = getControllerDateValues(
           config.valueOptionType,
           config!.controllerDate!,
         );
+        let pickerType = controllerDate!.pickerType;
         return (
-          <FilterTime onTimeChange={onRangeTimeChange} value={timeValues} />
+          <TimeControllerForm
+            onChange={onTimeChange}
+            value={timeValues[0]}
+            pickerType={pickerType}
+          />
         );
       default:
         break;
     }
   }, [
-    facadeType,
     optionRows,
+    facadeType,
     controllerValues,
-    onFilterValuesChange,
+    onControllerValuesChange,
     minValue,
     maxValue,
     sqlOperator,
     onSqlOperatorAndValues,
     config,
     onRangeTimeChange,
+    controllerDate,
   ]);
-  return <Wrap>{control}</Wrap>;
+  return (
+    <Wrap>
+      <Form form={form} name="control-Form">
+        {control}
+      </Form>
+    </Wrap>
+  );
 });
 const Wrap = styled.div`
   display: inline-block;

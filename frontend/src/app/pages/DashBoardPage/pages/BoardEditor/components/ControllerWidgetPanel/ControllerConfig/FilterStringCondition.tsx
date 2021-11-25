@@ -17,16 +17,12 @@
  */
 
 import { Form, FormInstance, Input, Select } from 'antd';
-import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ControllerConfig, ValueTypes } from '../types';
-const stringConditionSetValues = [
-  ...SQL_OPERATOR_OPTIONS.include,
-  ...SQL_OPERATOR_OPTIONS.notInclude,
-].map(ele => ele.value);
+
 const FilterStringCondition: FC<{
   form: FormInstance<{ config: ControllerConfig }> | undefined;
   hasVariable: boolean;
@@ -68,20 +64,11 @@ const FilterStringCondition: FC<{
         disabled={hasVariable}
         onChange={onSqlOperatorChange}
       >
-        <Select.OptGroup label={`${'不排除'}`}>
-          {SQL_OPERATOR_OPTIONS.include.map(item => {
-            return (
-              <Select.Option key={item.value} value={item.value}>
-                {item.name}
-              </Select.Option>
-            );
-          })}
-        </Select.OptGroup>
         <Select.OptGroup label={`${'排除'}`}>
-          {SQL_OPERATOR_OPTIONS.notInclude.map(item => {
+          {[].map(item => {
             return (
-              <Select.Option key={item.value} value={item.value}>
-                {item.name}
+              <Select.Option key={item} value={item}>
+                {item}
               </Select.Option>
             );
           })}
@@ -96,10 +83,7 @@ const FilterStringCondition: FC<{
     let needAdjust = false;
     let sqlOperator = config?.sqlOperator;
     let filterValues = config?.controllerValues;
-    if (!stringConditionSetValues.includes(config.sqlOperator)) {
-      needAdjust = true;
-      sqlOperator = FilterSqlOperator.Equal;
-    }
+
     if (hasVariable) {
       sqlOperator = FilterSqlOperator.Equal;
     }

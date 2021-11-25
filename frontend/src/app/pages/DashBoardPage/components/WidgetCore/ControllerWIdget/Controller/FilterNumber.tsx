@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 import { InputNumber, Select } from 'antd';
-import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { ControlOption } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { FilterSqlOperator } from 'globalConstants';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { FilterSelect } from './FilterSelect';
+
 export interface FilterNumberProps {
   options?: ControlOption[];
   hideLogic?: boolean;
@@ -94,7 +94,7 @@ export const FilterNumber: React.FC<FilterNumberProps> = memo(
               value={curSqlOperator}
               multiple={false}
             >
-              {SQL_OPERATOR_OPTIONS.compare.map(item => {
+              {[{ value: 1, name: 2 }].map(item => {
                 return (
                   <Select.Option key={item.value} value={item.value}>
                     {item.name}

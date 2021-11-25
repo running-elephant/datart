@@ -15,58 +15,65 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { DatePicker, FormItemProps } from 'antd';
+import { DatePicker, Form, FormItemProps } from 'antd';
 import { PickerType } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import moment from 'moment';
-import { FC, memo, useEffect, useState } from 'react';
-interface FilterTimeProps {
-  value: any[];
-  onTimeChange: (timeValues: string[]) => void;
+import React, { memo } from 'react';
+
+export interface TimeControllerProps {
+  value?: any;
+  placeholder?: string;
+  onChange: (values) => void;
+  label?: React.ReactNode;
+  name?: string;
+  required?: boolean;
+  pickerType: PickerType;
 }
-const FilterTime: FC<FilterTimeProps> = memo(({ value, onTimeChange }) => {
-  const [timeRange, setTimeRange] = useState<string[]>(() => value);
-  useEffect(() => {
-    setTimeRange(value);
-  }, [value]);
-  const handleDateChange = times => {
-    const formatTemp = 'YYYY-MM-DD HH:mm:ss';
-    const newValues = [times.format(formatTemp)];
-    onTimeChange(newValues);
-  };
-  return (
-    <DatePicker
-      showTime
-      allowClear={false}
-      value={moment(timeRange[0])}
-      onChange={handleDateChange}
-    />
-  );
-});
+
+export const TimeControllerForm: React.FC<TimeControllerProps> = memo(
+  ({ label, name, required, ...rest }) => {
+    return (
+      <Form.Item
+        name={name}
+        label={label}
+        validateTrigger={['onChange', 'onBlur']}
+        rules={[{ required: false }]}
+      >
+        <TimeController {...rest} />
+      </Form.Item>
+    );
+  },
+);
+
 export interface SingleTimeSetProps extends FormItemProps<any> {
   pickerType: PickerType;
   value?: any;
   onChange?: any;
 }
-export const SingleTimeSet: React.FC<SingleTimeSetProps> = memo(
+export const TimeController: React.FC<SingleTimeSetProps> = memo(
   ({ pickerType, value, onChange }) => {
-    function _onChange(date, dateString) {
-      onChange?.(date);
-    }
+    const _onChange = time => {
+      if (!time) {
+        return onChange(null);
+      }
+      const formatTemp = 'YYYY-MM-DD HH:mm:ss';
+      const newValues = [time.format(formatTemp)];
+      onChange(newValues);
+    };
 
     return (
       <>
         {pickerType === 'dateTime' ? (
           <DatePicker
             allowClear={true}
-            value={value?.[0]}
+            value={value ? moment(value) : null}
             showTime
             onChange={_onChange}
           />
         ) : (
           <DatePicker
             allowClear={true}
-            value={value?.[0]}
+            value={value ? moment(value) : null}
             onChange={_onChange}
             picker={pickerType as any}
           />
@@ -75,4 +82,3 @@ export const SingleTimeSet: React.FC<SingleTimeSetProps> = memo(
     );
   },
 );
-export default FilterTime;

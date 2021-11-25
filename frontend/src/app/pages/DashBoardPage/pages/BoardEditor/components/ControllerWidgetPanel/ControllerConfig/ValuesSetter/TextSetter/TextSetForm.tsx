@@ -17,11 +17,15 @@
  */
 import { Form, FormItemProps, Input } from 'antd';
 import React, { memo } from 'react';
-export interface TextSetFormProps extends FormItemProps<any> {}
-export const TextSetForm: React.FC<TextSetFormProps> = memo(({ ...rest }) => {
-  return (
-    <Form.Item {...rest}>
-      <Input />
-    </Form.Item>
-  );
-});
+export interface TextSetFormProps extends FormItemProps<any> {
+  value?: any;
+}
+export const TextSetForm: React.FC<TextSetFormProps> = memo(
+  ({ value, ...rest }) => {
+    return (
+      <Form.Item {...rest}>
+        <Input />
+      </Form.Item>
+    );
+  },
+);

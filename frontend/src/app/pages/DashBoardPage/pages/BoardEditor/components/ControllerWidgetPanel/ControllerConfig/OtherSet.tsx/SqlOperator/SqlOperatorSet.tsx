@@ -16,21 +16,21 @@
  * limitations under the License.
  */
 import { Select } from 'antd';
-import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import React, { memo } from 'react';
 export interface SqlOperatorSetProps {
   value?: any;
   onChange?: any;
+  options: { name: string; value: string }[];
 }
 export const SqlOperatorSet: React.FC<SqlOperatorSetProps> = memo(
-  ({ value, onChange }) => {
+  ({ value, onChange, options }) => {
     function _onChange(date) {
       onChange?.(date);
     }
 
     return (
       <Select value={value} onChange={_onChange}>
-        {SQL_OPERATOR_OPTIONS.time.map(item => {
+        {options.map(item => {
           return (
             <Select.Option key={item.value} value={item.value}>
               {item.name}

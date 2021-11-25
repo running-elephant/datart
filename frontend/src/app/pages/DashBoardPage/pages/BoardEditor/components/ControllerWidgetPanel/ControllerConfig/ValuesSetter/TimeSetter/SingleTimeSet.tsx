@@ -32,10 +32,16 @@ export const SingleTimeSet: React.FC<SingleTimeSetProps> = memo(
     return (
       <>
         {pickerType === 'dateTime' ? (
-          <DatePicker value={value} showTime onChange={_onChange} />
+          <DatePicker
+            value={value}
+            allowClear={true}
+            showTime
+            onChange={_onChange}
+          />
         ) : (
           <DatePicker
             value={value}
+            allowClear={true}
             onChange={_onChange}
             picker={pickerType as any}
           />

@@ -18,12 +18,14 @@
 import { Form, FormItemProps } from 'antd';
 import React, { memo } from 'react';
 import { SqlOperatorSet } from './SqlOperatorSet';
-export interface SqlOperatorFormProps extends FormItemProps<any> {}
+export interface SqlOperatorFormProps extends FormItemProps<any> {
+  options: { name: string; value: string }[];
+}
 export const SqlOperatorForm: React.FC<SqlOperatorFormProps> = memo(
-  ({ ...rest }) => {
+  ({ options, ...rest }) => {
     return (
       <Form.Item {...rest}>
-        <SqlOperatorSet />
+        <SqlOperatorSet options={options} />
       </Form.Item>
     );
   },
