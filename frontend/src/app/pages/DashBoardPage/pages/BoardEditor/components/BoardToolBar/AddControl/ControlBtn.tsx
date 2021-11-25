@@ -108,12 +108,12 @@ export const ControlBtn: React.FC<ControlBtnProps> = () => {
       type: ControllerFacadeTypes.Value,
       disabled: false,
     },
-    // {
-    //   name: '滑块',
-    //   icon: '',
-    //   type: ControllerFacadeTypes.MultiDropdownList,
-    //   disabled: false,
-    // },
+    {
+      name: '滑块',
+      icon: '',
+      type: ControllerFacadeTypes.Slider,
+      disabled: false,
+    },
   ];
   const buttonControllers = [
     {

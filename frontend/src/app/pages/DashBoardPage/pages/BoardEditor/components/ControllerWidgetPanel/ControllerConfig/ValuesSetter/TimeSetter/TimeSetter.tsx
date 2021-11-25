@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 import { Form, FormInstance, Select } from 'antd';
-import { SQL_OPERATOR_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ControllerFacadeTypes,
@@ -194,23 +193,6 @@ export const TimeSetter: React.FC<{
             </Form.Item>
             {controllerType === ControllerFacadeTypes.Time && (
               <>
-                <Form.Item
-                  name={sqlOperatorName}
-                  label={'对应关系'}
-                  shouldUpdate
-                  validateTrigger={['onChange', 'onBlur']}
-                  rules={[{ required: true }]}
-                >
-                  <Select>
-                    {SQL_OPERATOR_OPTIONS.time.map(item => {
-                      return (
-                        <Select.Option key={item.value} value={item.value}>
-                          {item.name}
-                        </Select.Option>
-                      );
-                    })}
-                  </Select>
-                </Form.Item>
                 <Form.Item
                   label={'默认值'}
                   shouldUpdate

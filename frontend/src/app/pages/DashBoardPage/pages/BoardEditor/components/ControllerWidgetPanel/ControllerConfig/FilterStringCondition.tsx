@@ -42,7 +42,7 @@ const FilterStringCondition: FC<{
       setContainValue(value);
       const config = form?.getFieldValue('config');
       form?.setFieldsValue({
-        config: { ...config, filterValues: [value] },
+        config: { ...config, controllerValues: [value] },
       });
     },
     [form],
@@ -95,7 +95,7 @@ const FilterStringCondition: FC<{
     // 值不符合
     let needAdjust = false;
     let sqlOperator = config?.sqlOperator;
-    let filterValues = config?.filterValues;
+    let filterValues = config?.controllerValues;
     if (!stringConditionSetValues.includes(config.sqlOperator)) {
       needAdjust = true;
       sqlOperator = FilterSqlOperator.Equal;
@@ -103,18 +103,21 @@ const FilterStringCondition: FC<{
     if (hasVariable) {
       sqlOperator = FilterSqlOperator.Equal;
     }
-    if (!Array.isArray(config.filterValues) || config.filterValues.length > 1) {
+    if (
+      !Array.isArray(config.controllerValues) ||
+      config.controllerValues.length > 1
+    ) {
       needAdjust = true;
       filterValues = [''];
     }
     if (fieldValueType !== ChartDataViewFieldType.STRING) {
       needAdjust = false;
-      filterValues = config?.filterValues;
+      filterValues = config?.controllerValues;
     }
     const nextWidgetFilter: ControllerConfig = {
       ...config,
       sqlOperator: sqlOperator,
-      filterValues: filterValues,
+      controllerValues: filterValues,
     };
     if (needAdjust) {
       form?.setFieldsValue({

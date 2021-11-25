@@ -15,12 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { FormInstance } from 'antd';
+import { Form, FormInstance, Select } from 'antd';
+import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { useMemo } from 'react';
+import { NumberSetter } from './NumberSetter';
+import { RangeNumberSetter } from './RangeNumberSetter/RangeNumberSet';
+import { SliderSetter } from './SliderSetter/SliderSet';
+import { TextSetter } from './TextSetter';
 import { TimeSetter } from './TimeSetter/TimeSetter';
-import ValuesOptionsSetter from './ValuesOptionsSetter';
+import ValuesOptionsSetter from './ValuesOptionsSetter/ValuesOptionsSetter';
+
+export const ControllerValuesName = ['config', 'controllerValues'];
+export const ValueOptionsName = ['config', 'valueOptions'];
 export const NeedOptionsTypes = [
   ControllerFacadeTypes.DropdownList,
   ControllerFacadeTypes.MultiDropdownList,
@@ -34,19 +42,57 @@ export const TimeTypes = [
 
 export const ValuesSetter: React.FC<{
   controllerType: ControllerFacadeTypes;
-  form: FormInstance<any> | undefined;
+  form: FormInstance<ControllerWidgetContent> | undefined;
   viewMap: Record<string, ChartDataView>;
 }> = ({ controllerType, form, viewMap }) => {
   const hasOption = useMemo(() => {
     return NeedOptionsTypes.includes(controllerType);
   }, [controllerType]);
+
   const hasTime = useMemo(() => {
     return TimeTypes.includes(controllerType);
   }, [controllerType]);
+
+  const isText = useMemo(() => {
+    return controllerType === ControllerFacadeTypes.Text;
+  }, [controllerType]);
+
+  const isNumberValue = useMemo(() => {
+    return controllerType === ControllerFacadeTypes.Value;
+  }, [controllerType]);
+
+  const isRangeNumberValue = useMemo(() => {
+    return controllerType === ControllerFacadeTypes.RangeValue;
+  }, [controllerType]);
+
+  const isSlider = useMemo(() => {
+    return controllerType === ControllerFacadeTypes.Slider;
+  }, [controllerType]);
   return (
     <>
-      {hasOption && <ValuesOptionsSetter form={form} viewMap={viewMap} />}
+      <Form.Item hidden noStyle preserve name={ControllerValuesName}>
+        <Select />
+      </Form.Item>
+      <Form.Item hidden noStyle preserve name={ValueOptionsName}>
+        <Select />
+      </Form.Item>
+      {hasOption && (
+        <ValuesOptionsSetter
+          controllerType={controllerType}
+          form={form}
+          viewMap={viewMap}
+        />
+      )}
+
       {hasTime && <TimeSetter controllerType={controllerType} form={form} />}
+
+      {isText && <TextSetter />}
+
+      {isNumberValue && <NumberSetter />}
+
+      {isRangeNumberValue && <RangeNumberSetter />}
+
+      {isSlider && <SliderSetter />}
     </>
   );
 };

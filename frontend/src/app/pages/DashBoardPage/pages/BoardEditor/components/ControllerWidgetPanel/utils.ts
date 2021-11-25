@@ -122,7 +122,7 @@ export const formatWidgetFilter = (config: ControllerConfig) => {
     config.valueOptionType = ValueOptionTypes.Common;
   }
   if (config.valueOptions && config.valueOptions.length > 0) {
-    config.filterValues = config.valueOptions
+    config.controllerValues = config.valueOptions
       .filter(ele => ele.isSelected)
       .map(ele => ele.key);
   }
@@ -155,6 +155,9 @@ export const getInitWidgetController = (
       return getTimeControllerConfig();
     case ControllerFacadeTypes.RangeTime:
       return getRangeTimeControllerConfig();
+    case ControllerFacadeTypes.RadioGroup:
+      return getTimeControllerConfig();
+
     default:
       return getInitControllerConfig();
   }
@@ -166,10 +169,12 @@ export const getInitControllerConfig = () => {
     visibility: {
       visibilityType: 'show',
     },
+    required: false,
+    canChangeSqlOperator: false,
     minValue: 1,
     maxValue: 2,
     sqlOperator: FilterSqlOperator.Equal,
-    filterValues: [],
+    controllerValues: [],
     valueOptions: [],
   };
   return config;
@@ -199,5 +204,11 @@ export const getRangeTimeControllerConfig = () => {
       exactValue: null,
     },
   };
+  return config;
+};
+export const getRadioGroupControllerConfig = () => {
+  const config = getInitControllerConfig();
+  config.sqlOperator = FilterSqlOperator.Equal;
+  config.radioButtonType = 'default';
   return config;
 };

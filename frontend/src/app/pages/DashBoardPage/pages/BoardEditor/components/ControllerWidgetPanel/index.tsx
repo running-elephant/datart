@@ -160,7 +160,6 @@ const FilterWidgetPanel: React.FC = memo(props => {
         return tt;
       });
     setRelatedWidgets(oldRelatedWidgetIds);
-    debugger;
     setFormRelatedViews(setViewsRelatedView(oldRelatedWidgetIds));
     const oldRelatedViews = confContent.relatedViews.filter(t => t.viewId);
     form?.setFieldsValue({ relatedViews: oldRelatedViews });

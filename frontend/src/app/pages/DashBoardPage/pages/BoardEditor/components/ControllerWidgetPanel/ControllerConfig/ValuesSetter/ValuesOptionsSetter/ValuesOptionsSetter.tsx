@@ -23,24 +23,41 @@ import {
 } from 'app/pages/DashBoardPage/constants';
 import { FilterValueOption } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import { ControllerConfig } from '../../types';
+import { ControllerConfig } from '../../../types';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
 
 const ValuesOptionsSetter: FC<{
+  controllerType: ControllerFacadeTypes;
   form: FormInstance<{ config: ControllerConfig }> | undefined;
   viewMap: Record<string, ChartDataView>;
-}> = memo(({ form, viewMap }) => {
+}> = memo(({ form, viewMap, controllerType }) => {
   const [optionValues, setOptionValues] = useState<FilterValueOption[]>([]);
   const [targetKeys, setTargetKeys] = useState<string[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const getControllerConfig = useCallback(() => {
     return form?.getFieldValue('config') as ControllerConfig;
   }, [form]);
-
+  const getControllerValuesByType = (
+    values: any[],
+    controllerType: ControllerFacadeTypes,
+  ) => {
+    if (values?.length === 1) {
+      return values;
+    }
+    const singleValueTypes = [
+      ControllerFacadeTypes.DropdownList,
+      ControllerFacadeTypes.RadioGroup,
+    ];
+    if (singleValueTypes.includes(controllerType)) {
+      return [values?.[0]];
+    }
+    return values;
+  };
   const onTransferSelectChange = useCallback(
     (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
       const newSelectedKeys = [...sourceSelectedKeys, ...targetSelectedKeys];
@@ -48,19 +65,22 @@ const ValuesOptionsSetter: FC<{
     },
     [],
   );
-
+  //controllerValues
   const onTransferChange = useCallback(
     (nextTargetKeys, direction, moveKeys) => {
       setTargetKeys(nextTargetKeys);
       const nextControllerOpt: ControllerConfig = {
         ...getControllerConfig(),
-        filterValues: nextTargetKeys,
+        controllerValues: getControllerValuesByType(
+          nextTargetKeys,
+          controllerType,
+        ),
       };
       form?.setFieldsValue({
         config: nextControllerOpt,
       });
     },
-    [form, getControllerConfig],
+    [controllerType, form, getControllerConfig],
   );
 
   // const
@@ -98,8 +118,8 @@ const ValuesOptionsSetter: FC<{
       const config: ControllerConfig = getControllerConfig();
       setOptionValues(convertToList(dataset?.rows, []));
       if (config.valueOptionType === 'common') {
-        if (config?.filterValues) {
-          setTargetKeys(config?.filterValues);
+        if (config?.controllerValues) {
+          setTargetKeys(config?.controllerValues);
         }
       }
     },

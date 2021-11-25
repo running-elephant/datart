@@ -42,7 +42,7 @@ const FilterNumberCondition: FC<{
     // 值不符合
     let needAdjust = false;
     let sqlOperator = config?.sqlOperator;
-    let filterValues = config?.filterValues;
+    let filterValues = config?.controllerValues;
     if (!numberConditionSetValues.includes(config?.sqlOperator)) {
       needAdjust = true;
       sqlOperator = FilterSqlOperator.Equal;
@@ -51,7 +51,7 @@ const FilterNumberCondition: FC<{
       sqlOperator = FilterSqlOperator.Equal;
     }
     if (sqlOperator === FilterSqlOperator.Between) {
-      if (!config?.filterValues || config?.filterValues?.length !== 2) {
+      if (!config?.controllerValues || config?.controllerValues?.length !== 2) {
         needAdjust = true;
         filterValues = [0, 0];
       }
@@ -72,7 +72,7 @@ const FilterNumberCondition: FC<{
         config: {
           ...config,
           sqlOperator: sqlOperator,
-          filterValues: filterValues,
+          controllerValues: filterValues,
         },
       });
     }
@@ -89,7 +89,7 @@ const FilterNumberCondition: FC<{
       setNumberValues(numberValues);
       const config = form?.getFieldValue('config');
       form?.setFieldsValue({
-        config: { ...config, filterValues: numberValues },
+        config: { ...config, controllerValues: numberValues },
       });
     },
     [form],

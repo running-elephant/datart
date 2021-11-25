@@ -1,10 +1,14 @@
+import { RadioGroupOptionType } from 'antd/lib/radio';
 import {
   ControllerVisibleType,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
 import { FilterValueOption } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
-import { RelativeOrExactTime } from 'app/types/FilterControlPanel';
+import {
+  ControllerFacadeTypes,
+  RelativeOrExactTime,
+} from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import { Moment, unitOfTime } from 'moment';
 import { VariableValueTypes } from '../../../../../MainPage/pages/VariablePage/constants';
@@ -34,12 +38,14 @@ export interface ControllerConfig {
   visibility: ControllerVisibility;
   sqlOperator: FilterSqlOperator;
   valueOptions: FilterValueOption[];
-  filterValues: any[];
-  required?: boolean;
+  controllerValues: any[];
+  required: boolean; // 是否允许空值
+  canChangeSqlOperator?: boolean; // 是否显示 sqlOperator 切换
   assistViewFields?: string[]; //辅助添加view字段
-  controllerDate?: ControllerDate;
-  minValue?: number;
-  maxValue?: number;
+  controllerDate?: ControllerDate; //存储时间
+  minValue?: number; // slider min
+  maxValue?: number; // slider max
+  radioButtonType?: RadioGroupOptionType; //按钮样式
 }
 export interface ControllerDate {
   pickerType: PickerType;
@@ -63,6 +69,12 @@ export const PickerTypeOptions = [
   { name: '月', value: PickerTypes.Month },
   { name: '季度', value: PickerTypes.Quarter },
   { name: '周', value: PickerTypes.Week },
+];
+
+export const FixedSqlOperatorTypes = [
+  ControllerFacadeTypes.RangeTime,
+  ControllerFacadeTypes.RangeSlider,
+  ControllerFacadeTypes.RangeValue,
 ];
 export interface ControllerDateType {
   relativeOrExact: RelativeOrExactTime;

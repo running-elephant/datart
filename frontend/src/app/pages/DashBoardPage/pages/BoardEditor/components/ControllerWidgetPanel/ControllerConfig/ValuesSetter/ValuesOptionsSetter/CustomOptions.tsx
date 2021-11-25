@@ -20,7 +20,7 @@ import { DragSortEditTable } from 'app/components/DragSortEditTable';
 import { FilterValueOption } from 'app/types/ChartConfig';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import { ControllerConfig } from '../../types';
+import { ControllerConfig } from '../../../types';
 export interface CustomOptionsProps {
   form: FormInstance<{ config: ControllerConfig }> | undefined;
   fieldRowData: FilterValueOption[];
@@ -34,10 +34,11 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
       (rows: FilterValueOption[]) => {
         setRows(rows);
         const config = getControllerConfig();
+        const valueOptions = [...rows.slice()];
         form?.setFieldsValue({
           config: {
             ...config,
-            valueOptions: [...rows.slice()],
+            valueOptions: valueOptions,
           },
         });
       },
@@ -48,6 +49,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
       const valueOptions = getControllerConfig()?.valueOptions || [];
       setRows(valueOptions);
     }, [form, getControllerConfig]);
+
     const handleRowStateUpdate = useCallback(
       (row: FilterValueOption) => {
         const oldRowIndex = rows.findIndex(r => r.index === row.index);
@@ -58,7 +60,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
     );
 
     const handleAdd = useCallback(() => {
-      const newKey = rows?.length || 0 + 1;
+      const newKey = rows?.length || 0;
       const newRow: FilterValueOption = {
         index: newKey,
         key: String(newKey),
@@ -68,9 +70,12 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
       const currentRows = rows?.concat([newRow]);
       onChangeFilterOptions(currentRows);
     }, [onChangeFilterOptions, rows]);
+
     const addRowByField = useCallback(() => {
+      debugger;
       onChangeFilterOptions(fieldRowData);
     }, [onChangeFilterOptions, fieldRowData]);
+
     const handleDelete = (key: React.Key) => {
       const currentRows = rows.filter(r => r.key !== key);
       onChangeFilterOptions(currentRows);

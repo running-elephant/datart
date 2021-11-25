@@ -64,7 +64,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   } = useMemo(() => widget.config.content as ControllerWidgetContent, [widget]);
   const {
     controllerDate,
-    filterValues,
+    controllerValues,
     valueOptions: filterValueOptions,
     valueOptionType,
     sqlOperator,
@@ -98,8 +98,9 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   const onFilterValuesChange = useCallback(
     values => {
       const nextWidget = produce(widget, draft => {
-        (draft.config.content as ControllerWidgetContent).config.filterValues =
-          values;
+        (
+          draft.config.content as ControllerWidgetContent
+        ).config.controllerValues = values;
       });
       widgetUpdate(nextWidget);
       refreshWidgetsByFilter(nextWidget);
@@ -112,8 +113,9 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
       const nextWidget = produce(widget, draft => {
         (draft.config.content as ControllerWidgetContent).config.sqlOperator =
           sql;
-        (draft.config.content as ControllerWidgetContent).config.filterValues =
-          values;
+        (
+          draft.config.content as ControllerWidgetContent
+        ).config.controllerValues = values;
       });
       widgetUpdate(nextWidget);
       refreshWidgetsByFilter(nextWidget);
@@ -156,7 +158,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         });
         return (
           <FilterSelect
-            value={filterValues}
+            value={controllerValues}
             onValuesChange={onFilterValuesChange}
             multiple={multiple}
             options={selectOptions}
@@ -165,7 +167,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
       case ControllerFacadeTypes.Slider:
         return (
           <FilterSlider
-            value={filterValues}
+            value={controllerValues}
             onValuesChange={onFilterValuesChange}
             minValue={minValue!}
             maxValue={maxValue!}
@@ -177,7 +179,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         });
         return (
           <FilterRadioGroup
-            value={filterValues}
+            value={controllerValues}
             onValuesChange={onFilterValuesChange}
             options={RadioOptions}
           />
@@ -186,7 +188,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         return (
           <FilterNumber
             hideLogic={false}
-            value={filterValues}
+            value={controllerValues}
             sqlOperator={sqlOperator}
             onSqlOperatorAndValues={onSqlOperatorAndValues}
           />
@@ -195,7 +197,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         return (
           <FilterText
             hideLogic={false}
-            value={filterValues}
+            value={controllerValues}
             sqlOperator={sqlOperator}
             onSqlOperatorAndValues={onSqlOperatorAndValues}
           />
@@ -226,7 +228,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   }, [
     facadeType,
     optionRows,
-    filterValues,
+    controllerValues,
     onFilterValuesChange,
     minValue,
     maxValue,

@@ -429,7 +429,7 @@ export const getWidgetMapByServer = (
               }
               break;
             default:
-              content.config.filterValues = _value || [];
+              content.config.controllerValues = _value || [];
               break;
           }
         }
@@ -708,7 +708,7 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
           return false;
         }
         const content = dependWidget.config.content as ControllerWidgetContent;
-        const dependWidgetValue = content.config.filterValues?.[0];
+        const dependWidgetValue = content.config.controllerValues?.[0];
         // if (!dependWidgetValue) {
         //   return false;
         // }

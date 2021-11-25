@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Form, FormInstance, Input, Select } from 'antd';
+import { Form, FormInstance, Input, Radio } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   BoardType,
@@ -24,9 +24,11 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import ControllerVisibility from './ControllerVisibility';
+import { RadioStyleForm } from './OtherSet.tsx/RadioStyle/RadioStyleForm';
+import { SqlOperator } from './OtherSet.tsx/SqlOperator';
 import { ValuesSetter } from './ValuesSetter/ValuesSetter';
 
 export interface RelatedViewFormProps {
@@ -41,6 +43,11 @@ export interface RelatedViewFormProps {
 export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
   ({ controllerType, form, viewMap, otherStrFilterWidgets }) => {
     const filterT = useI18NPrefix('viz.common.filter');
+
+    const hasRadio = useMemo(() => {
+      return controllerType === ControllerFacadeTypes.RadioGroup;
+    }, [controllerType]);
+
     return (
       <Wrap>
         <Form.Item
@@ -56,18 +63,18 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
           viewMap={viewMap}
         />
 
-        <Form.Item hidden noStyle preserve name={['config', 'filterValues']}>
-          <Select />
-        </Form.Item>
+        {/* sql 对应关系 */}
+        <SqlOperator controllerType={controllerType} />
 
-        <Form.Item hidden noStyle preserve name={['config', 'sqlOperator']}>
-          <Input />
-        </Form.Item>
+        {/* 按钮样式 */}
+        {hasRadio && <RadioStyleForm />}
+
         {/* 是否显示 */}
         <ControllerVisibility
           otherStrFilterWidgets={otherStrFilterWidgets}
           form={form}
         />
+        <Radio.Group options={[]} value={'2'} optionType="button" />
       </Wrap>
     );
   },

@@ -61,6 +61,15 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
       },
       [form, getFormRelatedViews],
     );
+    const fieldValueChange = useCallback(
+      (index: number) => (value, option) => {
+        const relatedViews = getFormRelatedViews();
+        relatedViews[index].fieldValue = value;
+        relatedViews[index].fieldValueType = option?.fieldvaluetype;
+        form?.setFieldsValue({ relatedViews: relatedViews });
+      },
+      [getFormRelatedViews, form],
+    );
 
     const renderOptions = useCallback(
       (index: number) => {
@@ -72,7 +81,6 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
           relatedViews[index].relatedCategory ===
           ChartDataViewFieldCategory.Variable
         ) {
-          debugger;
           // 变量
           return queryVariables
             .filter(v => {
@@ -184,7 +192,12 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                       fieldKey={[field.fieldKey, 'id']}
                       wrapperCol={{ span: 24 }}
                     >
-                      <Select showSearch placeholder="请选择" allowClear>
+                      <Select
+                        showSearch
+                        placeholder="请选择"
+                        allowClear
+                        onChange={fieldValueChange(index)}
+                      >
                         {renderOptions(index)}
                       </Select>
                     </Form.Item>

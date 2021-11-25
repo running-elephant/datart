@@ -87,12 +87,12 @@ export const getChartGroupColumns = dataChart => {
   const groupColumns = builder.buildGroupColumns();
   return groupColumns;
 };
-export const getAllFiltersOfOneWidget = (values: {
+export const getAllFiltersOfOneWidget = (options: {
   chartWidget: Widget;
   widgetMap: Record<string, Widget>;
   params: Record<string, string[]> | undefined;
 }) => {
-  const { chartWidget, widgetMap, params } = values;
+  const { chartWidget, widgetMap, params } = options;
   const filterWidgets = Object.values(widgetMap).filter(
     widget => widget.config.type === 'controller',
   );
@@ -158,6 +158,7 @@ export const getWidgetFilterValues = (opt: {
   config: ControllerConfig;
 }) => {
   const { type, relatedViewItem, config } = opt;
+  const valueType = relatedViewItem.fieldValueType;
   switch (type) {
     case ControllerFacadeTypes.RangeTime:
     case ControllerFacadeTypes.Time:
@@ -173,16 +174,16 @@ export const getWidgetFilterValues = (opt: {
         .map(ele => {
           const item = {
             value: ele,
-            valueType: type,
+            valueType: valueType || 'DATE',
           };
           return item;
         });
       return values[0] ? values : null;
     case ControllerFacadeTypes.Value:
     case ControllerFacadeTypes.RangeValue:
-      if (!config.filterValues || config.filterValues.length === 0)
+      if (!config.controllerValues || config.controllerValues.length === 0)
         return false;
-      const numericValues = config.filterValues
+      const numericValues = config.controllerValues
         .filter(ele => {
           if (ele === 0) return true;
           return !!ele;
@@ -190,17 +191,17 @@ export const getWidgetFilterValues = (opt: {
         .map(ele => {
           const item = {
             value: ele,
-            valueType: type,
+            valueType: valueType || '',
           };
           return item;
         });
       return numericValues[0] ? numericValues : false;
 
     default:
-      if (!config.filterValues || config.filterValues.length === 0)
+      if (!config.controllerValues || config.controllerValues.length === 0)
         return false;
 
-      const strValues = config.filterValues
+      const strValues = config.controllerValues
         .filter(ele => {
           if (ele.trim() === '') return false;
           return !!ele;
@@ -208,7 +209,7 @@ export const getWidgetFilterValues = (opt: {
         .map(ele => {
           const item = {
             value: ele.trim(),
-            valueType: type,
+            valueType: valueType || 'STRING',
           };
           return item;
         });
