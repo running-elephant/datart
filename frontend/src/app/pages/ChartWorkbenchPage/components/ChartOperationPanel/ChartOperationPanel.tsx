@@ -75,7 +75,6 @@ const ChartOperationPanel: FC<{
           <ChartPresentWrapper
             chart={chart}
             dataset={dataset}
-            dataView={dataView}
             chartConfig={chartConfig}
             onChartChange={onChartChange}
           />

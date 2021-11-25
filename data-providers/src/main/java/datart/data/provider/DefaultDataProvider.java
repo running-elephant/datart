@@ -28,12 +28,9 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -114,10 +111,21 @@ public abstract class DefaultDataProvider extends DataProvider {
 
     @Override
     public Dataframe execute(DataProviderSource config, QueryScript queryScript, ExecuteParam executeParam) throws Exception {
-        List<Dataframe> fullData = loadFullDataFromSource(config);
+
+        List<Dataframe> fullData = null;
+        if (!cacheExists(config)) {
+            fullData = loadFullDataFromSource(config);
+        }
+
+        boolean persistent = isCacheEnabled(config);
+        Date expire = null;
+        if (persistent) {
+            expire = getExpireTime(config);
+        }
+
         // 如果自定义了schema,执行分两部完成。1、执行view sql，取得中间结果。2、使用中间结果，修改schema，加入执行参数，完成执行。
         if (queryScript != null && !CollectionUtils.isEmpty(queryScript.getSchema())) {
-            Dataframe temp = LocalDB.executeLocalQuery(queryScript, ExecuteParam.empty(), false, fullData);
+            Dataframe temp = LocalDB.executeLocalQuery(queryScript, ExecuteParam.empty(), fullData, persistent, expire);
             for (Column column : temp.getColumns()) {
                 column.setType(queryScript.getSchema().getOrDefault(column.getName(), column).getType());
             }
@@ -125,8 +133,9 @@ public abstract class DefaultDataProvider extends DataProvider {
             temp.setName(queryScript.toQueryKey());
             fullData = Collections.singletonList(temp);
             queryScript = null;
+            persistent = false;
         }
-        return LocalDB.executeLocalQuery(queryScript, executeParam, executeParam.isCacheEnable(), fullData);
+        return LocalDB.executeLocalQuery(queryScript, executeParam, fullData, persistent, expire);
     }
 
     protected List<Column> parseColumns(Map<String, Object> schema) {
@@ -146,6 +155,20 @@ public abstract class DefaultDataProvider extends DataProvider {
 
     public abstract List<Dataframe> loadFullDataFromSource(DataProviderSource config) throws Exception;
 
+    /**
+     * 检查该数据源缓存中数据是否存在
+     */
+    public boolean cacheExists(DataProviderSource config) throws SQLException {
+        Object cacheEnable = config.getProperties().get("cacheEnable");
+        if (cacheEnable == null) {
+            return false;
+        }
+        if (!Boolean.parseBoolean(cacheEnable.toString())) {
+            return false;
+        }
+        return !LocalDB.checkCacheExpired(config.getSourceId());
+    }
+
     @Override
     public boolean validateFunction(DataProviderSource source, String snippet) {
         try {
@@ -155,6 +178,15 @@ public abstract class DefaultDataProvider extends DataProvider {
         }
 
         return true;
+    }
+
+    @Override
+    public void resetSource(DataProviderSource source) {
+        try {
+            LocalDB.clearCache(source.getSourceId());
+        } catch (Exception e) {
+            log.error("reset datasource error ", e);
+        }
     }
 
     protected List<List<Object>> parseValues(List<List<Object>> values, List<Column> columns) {
@@ -204,6 +236,24 @@ public abstract class DefaultDataProvider extends DataProvider {
         if (isHeader) {
             values.remove(0);
         }
+    }
+
+    protected boolean isCacheEnabled(DataProviderSource config) {
+        try {
+            return (boolean) config.getProperties().getOrDefault("cacheEnable", false);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    protected Date getExpireTime(DataProviderSource config) {
+        Object cacheTimeout = config.getProperties().get("cacheTimeout");
+        if (cacheTimeout == null) {
+            throw new DataProviderException("cache timeout can not be empty");
+        }
+        Calendar instance = Calendar.getInstance();
+        instance.add(Calendar.MINUTE, Integer.parseInt(cacheTimeout.toString()));
+        return instance.getTime();
     }
 
 }

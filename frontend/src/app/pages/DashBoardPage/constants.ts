@@ -189,3 +189,8 @@ export const SQL_OPERATOR_OPTIONS = {
     { name: '小于或等于', value: FilterSqlOperator.LessThanOrEqual },
   ],
 };
+
+export const WIDGET_TITLE_ALIGN_OPTIONS = [
+  { name: '左', value: TEXT_ALIGN_ENUM.left },
+  { name: '中', value: TEXT_ALIGN_ENUM.center },
+];

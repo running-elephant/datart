@@ -136,12 +136,9 @@ export interface WidgetConf {
   linkageConfig?: LinkageConfig; //联动设置
   jumpConfig?: JumpConfig; // 跳转 设置
 }
-export interface WidgetNameConfig {
+export interface WidgetNameConfig extends FontConfig {
   show: boolean;
-  color: string;
-  fontSize?: number;
   textAlign?: TextAlignType;
-  // xieLiuDuo TODO fontSize textAlign
 }
 export interface LinkageConfig {
   open: boolean;
@@ -359,11 +356,10 @@ export interface BorderConfig extends LineConfig {
 }
 
 export interface FontConfig {
-  family: string;
-  size: number;
-  weight: 'normal' | 'bold' | 'lighter';
-  style: 'normal' | 'italic';
-  decorator: 'none' | 'underline' | 'overline' | 'line-through';
+  fontFamily: string;
+  fontSize: string;
+  fontWeight: string;
+  fontStyle: string;
   color: string;
 }
 

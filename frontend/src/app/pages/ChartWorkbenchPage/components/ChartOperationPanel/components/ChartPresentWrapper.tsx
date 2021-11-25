@@ -19,7 +19,6 @@
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
-import ChartDataView from 'app/types/ChartDataView';
 import { FC } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
@@ -28,11 +27,10 @@ import ChartPresentPanel from './ChartPresentPanel';
 
 const ChartPresentWrapper: FC<{
   chart?: Chart;
-  dataView?: ChartDataView;
   dataset?: ChartDataset;
   chartConfig?: ChartConfig;
   onChartChange: (c: Chart) => void;
-}> = ({ chart, dataView, dataset, chartConfig, onChartChange }) => {
+}> = ({ chart, dataset, chartConfig, onChartChange }) => {
   return (
     <StyledChartPresentWrapper>
       <ChartGraphPanel
@@ -42,7 +40,6 @@ const ChartPresentWrapper: FC<{
       />
       <ChartPresentPanel
         chart={chart}
-        dataView={dataView}
         dataset={dataset}
         chartConfig={chartConfig}
       />

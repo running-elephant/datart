@@ -224,7 +224,8 @@
         "info": "信息",
         "sort": "排序",
         "size": "大小",
-        "drop": "请拖拽数据列到这里",
+        "drop": "请拖拽数据字段到这里",
+        "dropCount": "请至少拖拽{{count}}个数据字段到这里",
         "actions": {
           "sort": {
             "title": "排序",
@@ -317,7 +318,8 @@
       "present": {
         "graph": "图表",
         "raw": "原始数据",
-        "sql": "SQL"
+        "sql": "SQL",
+        "needMore": "至少还需要 {{num}} 个 {{type}}"
       },
       "graph": {
         "group": "维度",

@@ -83,6 +83,7 @@ const ChartDraggableElement = forwardRef<
   useImperativeHandle<any, ChartDraggableElementInstance>(ref, () => ({
     getNode: () => elementRef.current,
   }));
+
   return (
     <StyledChartDraggableElement
       className="draggable-element"
