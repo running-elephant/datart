@@ -73,9 +73,11 @@ export const ValuesSetter: React.FC<{
       <Form.Item hidden noStyle preserve name={ControllerValuesName}>
         <Select />
       </Form.Item>
-      <Form.Item hidden noStyle preserve name={ValueOptionsName}>
-        <Select />
-      </Form.Item>
+      <Form.List name={ValueOptionsName}>
+        {(fields, _, { errors }) => {
+          return fields.map(field => <></>);
+        }}
+      </Form.List>
       {hasOption && (
         <ValuesOptionsSetter
           controllerType={controllerType}
