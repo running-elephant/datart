@@ -1,8 +1,8 @@
 @font-face {
   font-family: 'iconfont';
-  src: url('iconfont.woff2?t=1634279056926') format('woff2'),
-    url('iconfont.woff?t=1634279056926') format('woff'),
-    url('iconfont.ttf?t=1634279056926') format('truetype');
+  src: url('iconfont.woff2?t=1637827678728') format('woff2'),
+    url('iconfont.woff?t=1637827678728') format('woff'),
+    url('iconfont.ttf?t=1637827678728') format('truetype');
 }
 
 .iconfont {
@@ -12,6 +12,14 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-waterfall:before {
+  content: '\e609';
+}
+
+.icon-gauge:before {
+  content: '\e607';
 }
 
 .icon-chart:before {
