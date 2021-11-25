@@ -216,6 +216,9 @@ function currencyFormater(
   }
 
   try {
+    if (!Number.isInteger(+value)) {
+      return value;
+    }
     let fractionDigits;
     if (
       !isEmpty(config?.decimalPlaces) &&
