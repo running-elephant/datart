@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Tooltip } from 'antd';
+import { Popconfirm, Tooltip } from 'antd';
 import { IW } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
@@ -98,9 +98,9 @@ const ChartGraphPanel: FC<{
     return <ul>{lintMessages}</ul>;
   };
 
-  return (
-    <StyledChartGraphPanel>
-      {allCharts.map(c => (
+  const renderCharts = () => {
+    const _getChartIcon = (c, onChange?) => {
+      return (
         <Tooltip
           key={c?.meta?.id}
           title={
@@ -118,15 +118,34 @@ const ChartGraphPanel: FC<{
               className={classnames({
                 active: c?.meta?.id === chart?.meta?.id,
               })}
-              onClick={handleChartChange(c?.meta?.id)}
+              onClick={onChange}
             >
               <i className={c?.meta?.icon} />
             </StyledChartIcon>
           </IconWrapper>
         </Tooltip>
-      ))}
-    </StyledChartGraphPanel>
-  );
+      );
+    };
+
+    return allCharts.map(c => {
+      if (c?.meta?.id !== 'mingxi-table') {
+        return _getChartIcon(c, handleChartChange(c?.meta?.id));
+      }
+
+      return (
+        <Popconfirm
+          title={t('confirm', undefined, { name: c.meta?.name })}
+          onConfirm={handleChartChange(c?.meta?.id)}
+          okText={t('ok')}
+          cancelText={t('cancel')}
+        >
+          {_getChartIcon(c)}
+        </Popconfirm>
+      );
+    });
+  };
+
+  return <StyledChartGraphPanel>{renderCharts()}</StyledChartGraphPanel>;
 });
 
 export default ChartGraphPanel;
