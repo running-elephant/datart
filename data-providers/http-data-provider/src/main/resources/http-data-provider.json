@@ -77,6 +77,20 @@
           "defaultValue": "application/json"
         }
       ]
+    },
+    {
+      "name": "cacheEnable",
+      "required": false,
+      "defaultValue": true,
+      "type": "bool",
+      "description": "是否开启本地缓存。开启后，HTTP请求结果将会缓存到服务端。"
+    },
+    {
+      "name": "cacheTimeout",
+      "required": false,
+      "type": "string",
+      "defaultValue": "5",
+      "description": "缓存超时时间（分钟）"
     }
   ]
 }

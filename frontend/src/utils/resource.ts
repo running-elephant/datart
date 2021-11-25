@@ -43,9 +43,9 @@ export const loadStyle = (url: string, iframeDocument?: Document) => {
 };
 
 export const loadScript = (url: string, iframeDocument?: Document) => {
-  if (/^[^.]+(\.[^.]+)*\.js/.test(url)) {
+  if (/^[^.]+(\.[^.]+)*\.js$/.test(url)) {
     return loadResource(url, iframeDocument);
-  } else if (/^[^.]+(\.[^.]+)*\.css/.test(url)) {
+  } else if (/^[^.]+(\.[^.]+)*\.css$/.test(url)) {
     return loadStyle(url, iframeDocument);
   }
   return loadResource(url, iframeDocument);

@@ -99,4 +99,5 @@ public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
                 (pageInfo.getPageNo() - 1) * pageInfo.getPageSize());
     }
 
+
 }

@@ -37,9 +37,12 @@ import {
   ChartDataSectionFieldActionType,
   ChartDataSectionType,
 } from 'app/types/ChartConfig';
-import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
-import { getColumnRenderName } from 'app/utils/chartHelper';
+import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
+import {
+  getColumnRenderName,
+  reachLowerBoundCount,
+} from 'app/utils/chartHelper';
 import { updateBy, updateByKey } from 'app/utils/mutation';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { rgba } from 'polished';
@@ -61,7 +64,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     ancestors,
     modalSize,
     config,
-    translate: t = title => title,
+    translate: t = (...args) => args?.[0],
     onConfigChanged,
   }) {
     const { dataset } = useContext(ChartDatasetContext);
@@ -117,17 +120,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 aggregate: defaultAggregate,
               })),
             );
-
-            // if (
-            //   !!currentConfig.maxFieldCount &&
-            //   currentConfig.maxFieldCount < currentColumns.length
-            // ) {
-            //   currentColumns.splice(
-            //     0,
-            //     currentColumns.length - currentConfig.maxFieldCount,
-            //   );
-            // }
-
             const newCurrentConfig = updateByKey(
               currentConfig,
               'rows',
@@ -203,6 +195,14 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         !currentConfig.rows ||
         !currentConfig?.rows?.filter(Boolean)?.length
       ) {
+        const fieldCount = reachLowerBoundCount(currentConfig?.limit, 0);
+        if (fieldCount > 0) {
+          return (
+            <DropPlaceholder>
+              {t('dropCount', undefined, { count: fieldCount })}
+            </DropPlaceholder>
+          );
+        }
         return <DropPlaceholder>{t('drop')}</DropPlaceholder>;
       }
 

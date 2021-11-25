@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import {
   ChartConfig,
   ChartDataSectionConfig,
@@ -28,7 +29,7 @@ import { ChartDatasetMeta } from 'app/types/ChartDataset';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
 import {
-  anyPassThen,
+  cond,
   curry,
   isEmpty,
   isEmptyArray,
@@ -41,11 +42,14 @@ import {
 } from 'utils/object';
 import { toFormattedValue } from './number';
 
+export function getDefaultThemeColor() {
+  return echartsDefaultTheme.color;
+}
 export function isInRange(
   limit?: ChartDataSectionConfig['limit'],
   count: number = 0,
 ) {
-  return anyPassThen(
+  return cond(
     [isEmpty, true],
     [isNumerical, curry(isNumericEqual)(count)],
     [isPairArray, curry(isInPairArrayRange)(count)],
@@ -56,7 +60,7 @@ export function isUnderUpperBound(
   limit?: ChartDataSectionConfig['limit'],
   count: number = 0,
 ) {
-  return anyPassThen(
+  return cond(
     [isEmpty, true],
     [isNumerical, limit => limit >= +count],
     [isPairArray, limit => count <= +limit[1]],
@@ -67,7 +71,7 @@ export function reachLowerBoundCount(
   limit?: ChartDataSectionConfig['limit'],
   count: number = 0,
 ) {
-  return anyPassThen(
+  return cond(
     [isEmpty, 0],
     [isNumerical, limit => limit - count],
     [isPairArray, limit => +limit[0] - count],

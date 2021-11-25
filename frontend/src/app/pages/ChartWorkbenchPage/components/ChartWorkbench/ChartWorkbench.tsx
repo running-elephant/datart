@@ -74,7 +74,7 @@ const ChartWorkbench: FC<{
                   onSaveChart={header?.onSaveChart}
                 />
               )}
-              <ChartOperationPanelWrapper>
+              <StyledChartOperationPanel>
                 <ChartOperationPanel
                   chart={chart}
                   chartConfig={chartConfig}
@@ -82,7 +82,7 @@ const ChartWorkbench: FC<{
                   onChartConfigChange={onChartConfigChange}
                   onDataViewChange={onDataViewChange}
                 />
-              </ChartOperationPanelWrapper>
+              </StyledChartOperationPanel>
             </StyledChartWorkbench>
           </TimeConfigContext.Provider>
         </ChartDataViewContext.Provider>
@@ -123,7 +123,7 @@ const StyledChartWorkbench = styled.div`
   }
 `;
 
-const ChartOperationPanelWrapper = styled.div`
+const StyledChartOperationPanel = styled.div`
   position: relative;
   flex: 1;
 `;

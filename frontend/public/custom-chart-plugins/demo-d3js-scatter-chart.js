@@ -155,6 +155,8 @@ function D3JSScatterChart({ dHelper }) {
       this.chart.selectAll('whatever').style('color', 'blue');
     },
 
+    onUnMount() {},
+
     getOptions(dataset, config) {
       // 当前服务端返回的数据集
       const dataConfigs = config.datas || [];

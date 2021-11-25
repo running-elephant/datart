@@ -118,10 +118,10 @@ public class SqlNodeUtils {
     public static String toSql(SqlNode sqlNode, SqlDialect dialect) {
         return sqlNode.toSqlString(
                 config -> config.withDialect(dialect)
+                        .withQuoteAllIdentifiers(true)
                         .withAlwaysUseParentheses(false)
                         .withSelectListItemsOnSeparateLines(false)
                         .withUpdateSetListNewline(false)
-                        .withQuoteAllIdentifiers(true)
                         .withIndentation(0)).getSql();
     }
 }
