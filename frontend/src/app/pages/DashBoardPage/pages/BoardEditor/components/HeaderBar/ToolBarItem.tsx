@@ -360,7 +360,7 @@ export const ChartWidgetDropdown: React.FC<ChartWidgetDropdownProps> =
     );
     const addChartTypes = [
       {
-        name: '添加公共数据图表',
+        name: '添加已有图表',
         icon: '',
         type: 'select',
       },

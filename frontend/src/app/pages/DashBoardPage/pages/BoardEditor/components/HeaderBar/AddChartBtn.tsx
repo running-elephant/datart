@@ -39,7 +39,7 @@ const AddChartBtn: React.FC<ToolBtnProps> = props => {
   // const chartOptions = useSelector(selectDataChartList);
   const chartOptionsMock = useSelector(selectVizs);
   const chartOptions = chartOptionsMock.filter(
-    item => item.relType === 'DATACHART',
+    item => item.relType !== 'DASHBOARD',
   );
 
   useEffect(() => {
