@@ -44,6 +44,7 @@ const {
   NormalOutlineMapChart,
   WordCloudChart,
   ScatterOutlineMapChart,
+  WaterfallChart,
 } = WidgetPlugins;
 
 class ChartManager {
@@ -106,6 +107,7 @@ class ChartManager {
       new StackBarChart(),
       new PercentageStackColumnChart(),
       new PercentageStackBarChart(),
+      new WaterfallChart(),
       new LineChart(),
       new AreaChart(),
       new StackAreaChart(),

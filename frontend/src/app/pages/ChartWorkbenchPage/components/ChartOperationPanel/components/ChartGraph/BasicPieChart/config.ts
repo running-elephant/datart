@@ -26,6 +26,10 @@ const config: ChartConfig = {
       required: true,
       type: 'group',
       limit: [0, 1],
+      actions: {
+        NUMERIC: ['alias', 'colorize', 'sortable'],
+        STRING: ['alias', 'colorize', 'sortable'],
+      },
     },
     {
       label: 'metrics',
