@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import {
   ChartConfig,
