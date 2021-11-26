@@ -15,20 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Form, Input } from 'antd';
-import React, { memo } from 'react';
+import { Form, Radio } from 'antd';
+import { SelectValue } from 'antd/lib/select';
+import { ControlOption } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
+import React, { memo, useCallback, useMemo } from 'react';
 import styled from 'styled-components/macro';
 
-export interface TextControllerProps {
-  value?: any;
+export interface SelectControllerProps {
+  radioButtonType?: any;
+  options?: ControlOption[];
+  value?: SelectValue;
   placeholder?: string;
   onChange: (values) => void;
   label?: React.ReactNode;
   name?: string;
   required?: boolean;
 }
-
-export const TextControllerForm: React.FC<TextControllerProps> = memo(
+export const RadioGroupControllerForm: React.FC<SelectControllerProps> = memo(
   ({ label, name, required, ...rest }) => {
     return (
       <Form.Item
@@ -37,29 +40,32 @@ export const TextControllerForm: React.FC<TextControllerProps> = memo(
         validateTrigger={['onChange', 'onBlur']}
         rules={[{ required: false }]}
       >
-        <TextController {...rest} />
+        <RadioGroupController {...rest} />
       </Form.Item>
     );
   },
 );
-export const TextController: React.FC<TextControllerProps> = memo(
-  ({ onChange, value }) => {
+export const RadioGroupController: React.FC<SelectControllerProps> = memo(
+  ({ options, onChange, value, radioButtonType, ...rest }) => {
     const _onChange = e => {
-      if (!e.target.value) {
-        return onChange(null);
-      }
-      onChange(e.target.value);
+      onChange([e.target.value]);
     };
+    const RadioItem = useMemo(() => {
+      return radioButtonType === 'button' ? Radio.Button : Radio;
+    }, [radioButtonType]);
+    const renderOptions = useCallback(() => {
+      return (options || []).map(o => (
+        <RadioItem key={o.value || o.label} value={o.value}>
+          {o.label || o.value}
+        </RadioItem>
+      ));
+    }, [RadioItem, options]);
+
     return (
       <StyledWrap>
-        <span className="control-input ">
-          <Input
-            value={value}
-            allowClear={true}
-            onChange={_onChange}
-            className="control-input-input"
-          />
-        </span>
+        <Radio.Group value={value} optionType={'button'} onChange={_onChange}>
+          {renderOptions()}
+        </Radio.Group>
       </StyledWrap>
     );
   },
@@ -70,20 +76,7 @@ const StyledWrap = styled.div`
   justify-content: space-around;
   width: 100%;
 
-  & .control-input-input {
-    width: 100%;
-  }
-  .control-select {
-    display: flex;
-    flex: 1;
-    width: 40%;
-  }
-  .control-input {
-    display: flex;
-    flex: 1;
-  }
-
   & .ant-input {
-    background-color: transparent !important;
+    background-color: transparent;
   }
 `;

@@ -46,11 +46,19 @@ export interface ControllerConfig {
   minValue?: number; // slider min
   maxValue?: number; // slider max
   radioButtonType?: RadioGroupOptionType; //按钮样式
+
+  sliderConfig?: SliderConfig;
 }
+
 export interface ControllerDate {
   pickerType: PickerType;
   startTime: ControllerDateType;
   endTime?: ControllerDateType;
+}
+export interface SliderConfig {
+  step: 1;
+  range: boolean;
+  vertical: false;
 }
 export const enum PickerTypes {
   Year = 'year',

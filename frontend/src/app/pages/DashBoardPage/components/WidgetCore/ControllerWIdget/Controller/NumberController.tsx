@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Form, Input } from 'antd';
+import { Form, InputNumber } from 'antd';
 import React, { memo } from 'react';
 import styled from 'styled-components/macro';
 
@@ -28,7 +28,7 @@ export interface TextControllerProps {
   required?: boolean;
 }
 
-export const TextControllerForm: React.FC<TextControllerProps> = memo(
+export const NumberControllerForm: React.FC<TextControllerProps> = memo(
   ({ label, name, required, ...rest }) => {
     return (
       <Form.Item
@@ -37,29 +37,21 @@ export const TextControllerForm: React.FC<TextControllerProps> = memo(
         validateTrigger={['onChange', 'onBlur']}
         rules={[{ required: false }]}
       >
-        <TextController {...rest} />
+        <NumberController {...rest} />
       </Form.Item>
     );
   },
 );
-export const TextController: React.FC<TextControllerProps> = memo(
+export const NumberController: React.FC<TextControllerProps> = memo(
   ({ onChange, value }) => {
-    const _onChange = e => {
-      if (!e.target.value) {
-        return onChange(null);
-      }
-      onChange(e.target.value);
-    };
     return (
       <StyledWrap>
-        <span className="control-input ">
-          <Input
-            value={value}
-            allowClear={true}
-            onChange={_onChange}
-            className="control-input-input"
-          />
-        </span>
+        <InputNumber
+          style={{ width: '100%' }}
+          value={value}
+          onChange={onChange}
+          className="control-number-input"
+        />
       </StyledWrap>
     );
   },
@@ -82,8 +74,10 @@ const StyledWrap = styled.div`
     display: flex;
     flex: 1;
   }
-
-  & .ant-input {
-    background-color: transparent !important;
+  &.ant-select .ant-select-selector {
+    background-color: transparent;
+  }
+  & .ant-input-number {
+    background-color: transparent;
   }
 `;

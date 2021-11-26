@@ -181,6 +181,7 @@ export const getWidgetFilterValues = (opt: {
       return values[0] ? values : null;
     case ControllerFacadeTypes.Value:
     case ControllerFacadeTypes.RangeValue:
+    case ControllerFacadeTypes.Slider:
       if (!config.controllerValues || config.controllerValues.length === 0)
         return false;
       const numericValues = config.controllerValues

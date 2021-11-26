@@ -22,7 +22,7 @@ export interface RadioStyleFormProps {}
 export const RadioStyleForm: React.FC<RadioStyleFormProps> = memo(() => {
   return (
     <Form.Item
-      name={['config', 'RadioButtonType']}
+      name={['config', 'radioButtonType']}
       label="按钮样式"
       validateTrigger={['onChange', 'onBlur']}
       rules={[{ required: true }]}

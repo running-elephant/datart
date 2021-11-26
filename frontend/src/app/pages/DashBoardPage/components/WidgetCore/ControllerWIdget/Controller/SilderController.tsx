@@ -15,21 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Form, Input } from 'antd';
+import { Form, Slider } from 'antd';
 import React, { memo } from 'react';
 import styled from 'styled-components/macro';
 
-export interface TextControllerProps {
+export interface SelectControllerProps {
   value?: any;
   placeholder?: string;
   onChange: (values) => void;
   label?: React.ReactNode;
   name?: string;
+  minValue?: number;
+  maxValue?: number;
   required?: boolean;
 }
-
-export const TextControllerForm: React.FC<TextControllerProps> = memo(
-  ({ label, name, required, ...rest }) => {
+export const SlideControllerForm: React.FC<SelectControllerProps> = memo(
+  ({ label, name, minValue, maxValue, required, ...rest }) => {
     return (
       <Form.Item
         name={name}
@@ -37,53 +38,30 @@ export const TextControllerForm: React.FC<TextControllerProps> = memo(
         validateTrigger={['onChange', 'onBlur']}
         rules={[{ required: false }]}
       >
-        <TextController {...rest} />
+        <SlideController {...rest} />
       </Form.Item>
     );
   },
 );
-export const TextController: React.FC<TextControllerProps> = memo(
-  ({ onChange, value }) => {
-    const _onChange = e => {
-      if (!e.target.value) {
-        return onChange(null);
-      }
-      onChange(e.target.value);
-    };
+export const SlideController: React.FC<SelectControllerProps> = memo(
+  ({ onChange, value, minValue, maxValue, ...rest }) => {
     return (
       <StyledWrap>
-        <span className="control-input ">
-          <Input
-            value={value}
-            allowClear={true}
-            onChange={_onChange}
-            className="control-input-input"
-          />
-        </span>
+        <Slider
+          value={value}
+          onChange={onChange}
+          min={0}
+          max={400}
+          //   {...(minValue && { min: minValue })}
+          //   {...(maxValue && { max: maxValue })}
+        />
       </StyledWrap>
     );
   },
 );
 const StyledWrap = styled.div`
-  display: flex;
+  /* display: flex;
 
   justify-content: space-around;
-  width: 100%;
-
-  & .control-input-input {
-    width: 100%;
-  }
-  .control-select {
-    display: flex;
-    flex: 1;
-    width: 40%;
-  }
-  .control-input {
-    display: flex;
-    flex: 1;
-  }
-
-  & .ant-input {
-    background-color: transparent !important;
-  }
+  width: 100%; */
 `;
