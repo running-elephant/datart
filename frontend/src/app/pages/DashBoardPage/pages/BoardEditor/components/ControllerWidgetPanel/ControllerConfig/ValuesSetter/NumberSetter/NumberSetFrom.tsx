@@ -21,9 +21,9 @@ export interface NumberSetFormProps extends FormItemProps<any> {
   onChange?: (value) => any;
 }
 export const NumberSetForm: React.FC<NumberSetFormProps> = memo(
-  ({ onChange, ...rest }) => {
+  ({ onChange, required, ...rest }) => {
     return (
-      <Form.Item {...rest}>
+      <Form.Item rules={[{ required: required }]} {...rest}>
         <InputNumber onChange={onChange} />
       </Form.Item>
     );

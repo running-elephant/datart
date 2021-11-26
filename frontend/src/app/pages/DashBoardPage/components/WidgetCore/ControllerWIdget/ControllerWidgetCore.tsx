@@ -43,9 +43,10 @@ import React, {
   useMemo,
 } from 'react';
 import styled from 'styled-components/macro';
-import { FilterSelect } from './Controller/FilterSelect';
+import { MultiSelectControllerForm } from './Controller/MultiSelectController';
 import { NumberControllerForm } from './Controller/NumberController';
 import { RadioGroupControllerForm } from './Controller/RadioGroupController';
+import { RangeNumberControllerForm } from './Controller/RangeNumberController';
 import { RangeTimeControllerForm } from './Controller/RangeTimeController';
 import { SelectControllerForm } from './Controller/SelectController';
 import { SlideControllerForm } from './Controller/SilderController';
@@ -102,8 +103,9 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   const onControllerValuesChange = useCallback(
     values => {
       form.submit();
-      // debugger;
-      console.log('values', values);
+      if (typeof values === 'object' && !Array.isArray(values)) {
+        return;
+      }
       const _values = values ? (Array.isArray(values) ? values : [values]) : [];
       const nextWidget = produce(widget, draft => {
         (
@@ -194,14 +196,12 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
           />
         );
       case ControllerFacadeTypes.MultiDropdownList:
-        const multiple = facadeType === ControllerFacadeTypes.MultiDropdownList;
-
         return (
-          <FilterSelect
+          <MultiSelectControllerForm
             value={controllerValues}
-            onValuesChange={onControllerValuesChange}
-            multiple={multiple}
+            onChange={onControllerValuesChange}
             options={selectOptions}
+            name={'value'}
           />
         );
       case ControllerFacadeTypes.Slider:
@@ -218,6 +218,14 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         return (
           <NumberControllerForm
             value={controllerValues?.[0]}
+            onChange={onControllerValuesChange}
+          />
+        );
+
+      case ControllerFacadeTypes.RangeValue:
+        return (
+          <RangeNumberControllerForm
+            value={controllerValues}
             onChange={onControllerValuesChange}
           />
         );

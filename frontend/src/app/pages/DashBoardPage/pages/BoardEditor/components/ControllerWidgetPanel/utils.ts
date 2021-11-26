@@ -155,6 +155,10 @@ export const getInitWidgetController = (
       return getTimeControllerConfig();
     case ControllerFacadeTypes.RangeTime:
       return getRangeTimeControllerConfig();
+    case ControllerFacadeTypes.RangeValue:
+      return getRangeValueControllerConfig();
+    case ControllerFacadeTypes.RangeSlider:
+      return getRangeSliderControllerConfig();
     case ControllerFacadeTypes.RadioGroup:
       return getTimeControllerConfig();
     case ControllerFacadeTypes.DropdownList:
@@ -216,5 +220,37 @@ export const getRadioGroupControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.Equal;
   config.radioButtonType = 'default';
+  return config;
+};
+export const getSliderControllerConfig = () => {
+  const config = getInitControllerConfig();
+  config.sqlOperator = FilterSqlOperator.Equal;
+  config.minValue = 1;
+  config.minValue = 200;
+  config.sliderConfig = {
+    step: 1,
+    range: false,
+    vertical: false,
+    showMarks: false,
+  };
+  return config;
+};
+export const getRangeSliderControllerConfig = () => {
+  const config = getInitControllerConfig();
+  config.sqlOperator = FilterSqlOperator.Between;
+  config.minValue = 1;
+  config.minValue = 200;
+  config.sliderConfig = {
+    step: 1,
+    range: true,
+    vertical: false,
+    showMarks: false,
+  };
+  return config;
+};
+
+export const getRangeValueControllerConfig = () => {
+  const config = getInitControllerConfig();
+  config.sqlOperator = FilterSqlOperator.Between;
   return config;
 };

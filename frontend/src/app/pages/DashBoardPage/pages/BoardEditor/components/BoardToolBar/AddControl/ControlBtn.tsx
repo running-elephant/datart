@@ -155,13 +155,13 @@ export const ControlBtn: React.FC<ControlBtnProps> = () => {
           </Menu.Item>
         ))}
       </Menu.ItemGroup>
-      <Menu.ItemGroup key="buttonControllers" title={renderTitle('按钮')}>
+      {/* <Menu.ItemGroup key="buttonControllers" title={renderTitle('按钮')}>
         {buttonControllers.map(({ name, icon, type, disabled }) => (
           <Menu.Item key={type} icon={icon} disabled={disabled}>
             {name}
           </Menu.Item>
         ))}
-      </Menu.ItemGroup>
+      </Menu.ItemGroup> */}
     </Menu>
   );
   return (

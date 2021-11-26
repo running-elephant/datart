@@ -19,14 +19,14 @@ import { Form, FormItemProps, Slider } from 'antd';
 import React, { memo, useEffect, useState } from 'react';
 import { ControllerValuesName } from '../ValuesSetter';
 
-export const SliderSetter: React.FC<{}> = memo(() => {
+export const SliderSetter: React.FC<SliderSetFormProps> = memo(props => {
   const itemProps: FormItemProps<any> = {
     preserve: true,
     name: ControllerValuesName,
     label: '默认值',
-    required: false,
+    required: true,
   };
-  return <SliderSetForm {...itemProps} />;
+  return <SliderSetForm {...props} {...itemProps} />;
 });
 
 export const RangeSliderSetter: React.FC<{}> = memo(() => {
@@ -39,10 +39,7 @@ export const RangeSliderSetter: React.FC<{}> = memo(() => {
   return <RangeSliderSetForm {...itemProps} />;
 });
 
-export interface SliderSetFormProps extends FormItemProps<any> {
-  onChange?: () => any;
-  value?: any[];
-}
+export type SliderSetFormProps = {} & FormItemProps<any> & SliderSetProps;
 
 export const RangeSliderSetForm: React.FC<SliderSetFormProps> = memo(
   ({ ...rest }) => {
@@ -58,7 +55,7 @@ export const SliderSetForm: React.FC<SliderSetFormProps> = memo(
   ({ ...rest }) => {
     return (
       <Form.Item rules={[{ required: true }]} {...rest}>
-        <SliderSet />
+        <SliderSet {...rest} />
       </Form.Item>
     );
   },
@@ -67,18 +64,21 @@ export const SliderSetForm: React.FC<SliderSetFormProps> = memo(
 export interface SliderSetProps {
   onChange?: (value) => any;
   value?: any[];
+  maxValue?: number;
+  minValue?: number;
 }
 export const SliderSet: React.FC<SliderSetProps> = memo(
-  ({ onChange, value }) => {
+  ({ onChange, value, maxValue, minValue }) => {
     const [val, setVal] = useState();
     const _onChange = _val => {
-      console.log('_val', _val);
       onChange?.([_val]);
     };
     useEffect(() => {
       setVal(value?.[0]);
     }, [value]);
-    return <Slider value={val} onChange={_onChange} />;
+    return (
+      <Slider max={maxValue} min={minValue} value={val} onChange={_onChange} />
+    );
   },
 );
 
@@ -86,7 +86,6 @@ export const RangeSliderSet: React.FC<SliderSetProps> = memo(
   ({ onChange, value }) => {
     const [val, setVal] = useState<any>();
     const _onChange = _val => {
-      console.log('_val', _val);
       onChange?.(_val);
     };
     useEffect(() => {

@@ -41,7 +41,6 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
             valueOptions: valueOptions,
           },
         });
-        console.log('config', getControllerConfig());
       },
       [form, getControllerConfig],
     );

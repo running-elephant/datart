@@ -43,8 +43,10 @@ export interface ControllerConfig {
   canChangeSqlOperator?: boolean; // 是否显示 sqlOperator 切换
   assistViewFields?: string[]; //辅助添加view字段
   controllerDate?: ControllerDate; //存储时间
+
   minValue?: number; // slider min
   maxValue?: number; // slider max
+
   radioButtonType?: RadioGroupOptionType; //按钮样式
 
   sliderConfig?: SliderConfig;
@@ -58,7 +60,8 @@ export interface ControllerDate {
 export interface SliderConfig {
   step: 1;
   range: boolean;
-  vertical: false;
+  vertical: boolean;
+  showMarks: boolean;
 }
 export const enum PickerTypes {
   Year = 'year',

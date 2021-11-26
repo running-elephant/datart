@@ -68,11 +68,9 @@ export const RangeNumberSet: React.FC<RangeNumberSetProps> = memo(
     const [startVal, setStartVal] = useState<valueType | undefined>();
     const [endVal, setEndVal] = useState<valueType | undefined>();
     const onStartChange = start => {
-      console.log('start', start);
       onChange?.([start, endVal]);
     };
     const onEndChange = end => {
-      console.log('end', end);
       onChange?.([startVal, end]);
     };
     useEffect(() => {

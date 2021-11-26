@@ -19,7 +19,9 @@ import { Form, FormInstance, Select } from 'antd';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { ControllerConfig } from '../../types';
+import { MaxAndMinSetter } from './MaxAndMinSetter';
 import { NumberSetter } from './NumberSetter';
 import { RangeNumberSetter } from './RangeNumberSetter/RangeNumberSet';
 import { SliderSetter } from './SliderSetter/SliderSet';
@@ -29,6 +31,8 @@ import ValuesOptionsSetter from './ValuesOptionsSetter/ValuesOptionsSetter';
 
 export const ControllerValuesName = ['config', 'controllerValues'];
 export const ValueOptionsName = ['config', 'valueOptions'];
+export const MaxValueName = ['config', 'maxValue'];
+export const MinValueName = ['config', 'minValue'];
 export const NeedOptionsTypes = [
   ControllerFacadeTypes.DropdownList,
   ControllerFacadeTypes.MultiDropdownList,
@@ -45,6 +49,10 @@ export const ValuesSetter: React.FC<{
   form: FormInstance<ControllerWidgetContent> | undefined;
   viewMap: Record<string, ChartDataView>;
 }> = ({ controllerType, form, viewMap }) => {
+  const getControllerConfig = useCallback(() => {
+    return form?.getFieldValue('config') as ControllerConfig;
+  }, [form]);
+
   const hasOption = useMemo(() => {
     return NeedOptionsTypes.includes(controllerType);
   }, [controllerType]);
@@ -68,6 +76,14 @@ export const ValuesSetter: React.FC<{
   const isSlider = useMemo(() => {
     return controllerType === ControllerFacadeTypes.Slider;
   }, [controllerType]);
+
+  const getMaxValue = () => {
+    const config = getControllerConfig();
+    return {
+      max: config?.maxValue,
+      min: config?.minValue,
+    };
+  };
   return (
     <>
       <Form.Item hidden noStyle preserve name={ControllerValuesName}>
@@ -94,7 +110,23 @@ export const ValuesSetter: React.FC<{
 
       {isRangeNumberValue && <RangeNumberSetter />}
 
-      {isSlider && <SliderSetter />}
+      {isSlider && (
+        <>
+          <Form.Item noStyle shouldUpdate>
+            {() => {
+              return (
+                <>
+                  <MaxAndMinSetter />
+                  <SliderSetter
+                    maxValue={getMaxValue().max}
+                    minValue={getMaxValue().min}
+                  />
+                </>
+              );
+            }}
+          </Form.Item>
+        </>
+      )}
     </>
   );
 };
