@@ -49,7 +49,7 @@ import { RadioGroupControllerForm } from './Controller/RadioGroupController';
 import { RangeNumberControllerForm } from './Controller/RangeNumberController';
 import { RangeTimeControllerForm } from './Controller/RangeTimeController';
 import { SelectControllerForm } from './Controller/SelectController';
-import { SlideControllerForm } from './Controller/SilderController';
+import { SlideControllerForm } from './Controller/SliderController';
 import { TextControllerForm } from './Controller/TextController';
 import { TimeControllerForm } from './Controller/TimeController';
 
@@ -76,7 +76,6 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
     minValue,
     maxValue,
   } = useMemo(() => config as ControllerConfig, [config]);
-
   const optionRows = useMemo(() => {
     const dataRows = rows?.flat(2) || [];
     if (valueOptionType === 'common') {
