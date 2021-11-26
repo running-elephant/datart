@@ -80,6 +80,7 @@ export type WorkbenchState = {
   currentDataView?: ChartDataView;
   dataset?: ChartDataset;
   chartConfig?: ChartConfig;
+  shadowChartConfig?: ChartConfig;
   backendChart?: BackendChart;
   backendChartId?: string;
 };
@@ -129,6 +130,10 @@ export const chartConfigSelector = createSelector(
 export const backendChartSelector = createSelector(
   workbenchSelector,
   wb => wb.backendChart,
+);
+export const shadowChartConfigSelector = createSelector(
+  workbenchSelector,
+  wb => wb.shadowChartConfig,
 );
 
 // Effects
@@ -197,6 +202,7 @@ export const fetchDataViewsAction = createAsyncThunk(
     }
   },
 );
+
 export const fetchViewDetailAction = createAsyncThunk(
   'workbench/fetchViewDetailAction',
   async (arg: { viewId }, thunkAPI) => {
@@ -224,6 +230,9 @@ export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
   ) => {
     try {
       await thunkAPI.dispatch(workbenchSlice.actions.updateChartConfig(arg));
+      await thunkAPI.dispatch(
+        workbenchSlice.actions.updateShadowChartConfig(null),
+      );
       if (arg.needRefresh) {
         thunkAPI.dispatch(refreshDatasetAction({}));
       }
@@ -232,6 +241,7 @@ export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
     }
   },
 );
+
 export const refreshDatasetAction = createAsyncThunk(
   'workbench/refreshDatasetAction',
   async (arg: { pageInfo? }, thunkAPI) => {
@@ -258,6 +268,7 @@ export const refreshDatasetAction = createAsyncThunk(
     }
   },
 );
+
 export const fetchChartAction = createAsyncThunk(
   'workbench/fetchChartAction',
   async (arg: { chartId?: string; backendChart?: BackendChart }, thunkAPI) => {
@@ -275,6 +286,7 @@ export const fetchChartAction = createAsyncThunk(
     }
   },
 );
+
 export const updateChartAction = createAsyncThunk(
   'workbench/updateChartAction',
   async (
@@ -326,6 +338,12 @@ const workbenchSlice = createSlice({
     },
     changeDateFormat: (state, action: PayloadAction<string>) => {
       state.dateFormat = action.payload;
+    },
+    updateShadowChartConfig: (
+      state,
+      action: PayloadAction<ChartConfig | null>,
+    ) => {
+      state.shadowChartConfig = action.payload || state.chartConfig;
     },
     updateChartConfig: (
       state,
@@ -455,6 +473,9 @@ const workbenchSlice = createSlice({
             currentChart?.config,
             migrateChartConfig(newChartConfig),
           );
+        }
+        if (!state.shadowChartConfig) {
+          state.shadowChartConfig = state.chartConfig;
         }
       })
       .addMatcher(isRejected, (_, action) => {

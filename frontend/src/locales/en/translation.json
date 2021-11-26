@@ -325,7 +325,10 @@
         "group": "Dimensions",
         "aggregate": "Measures",
         "onlyAllow": "{{type}} Only Allow {{num}}",
-        "allowRange": "{{type}} Allow Range {{start}} to {{end}}"
+        "allowRange": "{{type}} Allow Range {{start}} to {{end}}",
+        "confirm": "Please confirm switch to {{name}} chart that will clear all data fields",
+        "ok": "OK",
+        "cancel": "Cancel"
       }
     },
     "chartPreview": {

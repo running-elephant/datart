@@ -28,6 +28,7 @@ import workbenchSlice, {
   datasetsSelector,
   initWorkbenchAction,
   refreshDatasetAction,
+  shadowChartConfigSelector,
   updateChartAction,
   updateChartConfigAndRefreshDatasetAction,
   useWorkbenchSlice,
@@ -79,6 +80,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const dataset = useSelector(datasetsSelector);
   const dataview = useSelector(currentDataViewSelector);
   const chartConfig = useSelector(chartConfigSelector);
+  const shadowChartConfig = useSelector(shadowChartConfigSelector);
   const backendChart = useSelector(backendChartSelector);
   const [chart, setChart] = useState<Chart>();
 
@@ -117,6 +119,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       dispatch(actions.resetWorkbenchState({}));
     },
   );
+
   useEffect(() => {
     if (backendChart?.config?.chartGraphId) {
       const currentChart = ChartManager.instance().getById(
@@ -135,7 +138,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 
     const finalChartConfig = transferChartConfigs(
       targetChartConfig,
-      chartConfig,
+      shadowChartConfig || chartConfig,
     );
 
     dispatch(
@@ -257,6 +260,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     chartType,
     saveToWidget,
   ]);
+
   const registerChartEvents = chart => {
     chart?.registerMouseEvents([
       {
@@ -280,6 +284,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       },
     ]);
   };
+
   return (
     <StyledChartWorkbenchPage>
       <ChartWorkbench
