@@ -19,7 +19,7 @@ import { Divider, Space } from 'antd';
 import React, { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import AddChartBtn from './AddChartBtn';
-import { ControlBtn } from './AddControl/ControlBtn';
+import { AddControlBtn } from './AddControl/AddControlBtn';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
 import {
   ContainerWidgetDropdown,
@@ -47,7 +47,7 @@ const ToolBar: React.FC<ToolBarProps> = props => {
           <AddChartBtn boardId={boardId} boardType={boardType} />
           <MediaWidgetDropdown boardId={boardId} boardType={boardType} />
           <ContainerWidgetDropdown boardId={boardId} boardType={boardType} />
-          <ControlBtn />
+          <AddControlBtn />
           {boardType === 'free' && (
             <>
               <ToTopBtn boardId={boardId} boardType={boardType} />

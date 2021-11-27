@@ -24,16 +24,17 @@ import { G60 } from 'styles/StyleConstants';
 import { editDashBoardInfoActions } from '../../../slice';
 import { BoardToolBarContext } from '../context/BoardToolBarContext';
 import { WithTipButton } from '../ToolBarItem';
-export interface ControlBtnProps {}
-export const ControlBtn: React.FC<ControlBtnProps> = () => {
+export interface AddControlBtnProps {}
+export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   const { boardId, boardType, showLabel } = useContext(BoardToolBarContext);
   const dispatch = useDispatch();
   const onAddControler = (info: { key: any }) => {
+    const type = info.key as ControllerFacadeTypes;
     dispatch(
       editDashBoardInfoActions.changeControllerPanel({
         type: 'add',
         widgetId: '',
-        controllerType: info.key as ControllerFacadeTypes,
+        controllerType: type as ControllerFacadeTypes,
       }),
     );
   };
@@ -155,13 +156,13 @@ export const ControlBtn: React.FC<ControlBtnProps> = () => {
           </Menu.Item>
         ))}
       </Menu.ItemGroup>
-      {/* <Menu.ItemGroup key="buttonControllers" title={renderTitle('按钮')}>
+      <Menu.ItemGroup key="buttonControllers" title={renderTitle('按钮')}>
         {buttonControllers.map(({ name, icon, type, disabled }) => (
           <Menu.Item key={type} icon={icon} disabled={disabled}>
             {name}
           </Menu.Item>
         ))}
-      </Menu.ItemGroup> */}
+      </Menu.ItemGroup>
     </Menu>
   );
   return (
