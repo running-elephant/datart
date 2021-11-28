@@ -97,8 +97,8 @@ export interface DashboardConfig {
   gridStep: [number, number];
   scaleMode: ScaleModeType;
   initialQuery: boolean;
+  hasQueryControl?: boolean; // TODO migration del ? -- xld
 }
-
 export const BoardTypeMap = strEnumType(['auto', 'free']);
 export type BoardType = keyof typeof BoardTypeMap;
 
@@ -236,7 +236,7 @@ export interface ServerRelation extends Omit<Relation, 'config'> {
  * 通用
  */
 // 组件配置
-// TODO xld migration about filter
+// TODO xld migration about filter xld
 export type WidgetContent =
   | MediaWidgetContent
   | ContainerWidgetContent
@@ -415,7 +415,7 @@ export interface BoardInfo {
   linkagePanel: WidgetPanelParams;
   linkFilter: BoardLinkFilter[];
   jumpPanel: JumpPanel; //
-  chartEditorProps?: ChartEditorProps | undefined;
+  chartEditorProps?: ChartEditorProps;
   needFetchItems: string[];
   hasFetchItems: string[];
   boardWidthHeight: [number, number];

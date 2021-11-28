@@ -22,7 +22,7 @@ import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { G60 } from 'styles/StyleConstants';
-import { addControlerAction } from '../../../slice/actions/controlActions';
+import { addControllerAction } from '../../../slice/actions/controlActions';
 import { BoardToolBarContext } from '../context/BoardToolBarContext';
 import { WithTipButton } from '../ToolBarItem';
 export interface AddControlBtnProps {}
@@ -37,7 +37,7 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   const dispatch = useDispatch();
   const onAddControler = (info: { key: any }) => {
     dispatch(
-      addControlerAction({
+      addControllerAction({
         type: info.key,
         boardId: boardId,
         boardType: boardType,

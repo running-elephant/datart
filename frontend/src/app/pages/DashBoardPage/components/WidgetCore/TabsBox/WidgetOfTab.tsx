@@ -73,7 +73,7 @@ const TabWidgetContainer: React.FC<IProps> = ({ tabItem }) => {
       </ItemContainer>
       {subMask}
       <div className="sub-hoverBar" onClick={ssp}>
-        <WidgetToolBar id={widget.id} widgetType={widget.config.type} />
+        <WidgetToolBar />
       </div>
     </Wrap>
   );

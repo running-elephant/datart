@@ -44,8 +44,8 @@ export const widgetEditActionMap: Record<WidgetType, widgetActionType[]> = {
   media: ['edit', 'delete'],
   controller: ['refresh', 'edit', 'delete'],
   container: ['edit', 'delete'],
-  query: [],
-  reset: [],
+  query: ['delete'],
+  reset: ['delete'],
 };
 export const widgetActionMap = {
   view: widgetViewActionMap,

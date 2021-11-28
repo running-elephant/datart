@@ -21,14 +21,15 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { createQueryBtn } from 'app/pages/DashBoardPage/utils/widget';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
-import { editDashBoardInfoActions } from '..';
+import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { addWidgetsToEditBoard } from './../thunk';
+
 export type BtnActionParams = {
   type: ControllerFacadeTypes | WidgetType;
   boardId: string;
   boardType: BoardType;
 };
-export const addControlerAction =
+export const addControllerAction =
   (opt: BtnActionParams) => async (dispatch, getState) => {
     switch (opt.type as WidgetType) {
       case 'query':
@@ -38,6 +39,7 @@ export const addControlerAction =
           type: opt.type as any,
         });
         dispatch(addWidgetsToEditBoard([widget]));
+        dispatch(editBoardStackActions.changeBoardHasQueryControl(true));
         break;
       case 'reset':
         break;

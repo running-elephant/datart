@@ -18,6 +18,7 @@
 
 import { Form } from 'antd';
 import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetDataContext } from 'app/pages/DashBoardPage/contexts/WidgetDataContext';
@@ -33,7 +34,6 @@ import {
   ControllerFacadeTypes,
   RelativeOrExactTime,
 } from 'app/types/FilterControlPanel';
-import { FilterSqlOperator } from 'globalConstants';
 import produce from 'immer';
 import React, {
   memo,
@@ -58,6 +58,9 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   const [form] = Form.useForm();
 
   const { renderedWidgetById } = useContext(BoardContext);
+  const { config: boardConfig } = useContext(BoardConfigContext);
+  const { hasQueryControl } = boardConfig;
+
   const {
     data: { rows },
   } = useContext(WidgetDataContext);
@@ -112,29 +115,28 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         ).config.controllerValues = _values;
       });
       widgetUpdate(nextWidget);
-      //
-      if (true) {
-        // console.log('board 属性 自动加载属性');
+
+      if (!hasQueryControl) {
         refreshWidgetsByFilter(nextWidget);
       }
     },
-    [form, refreshWidgetsByFilter, widget, widgetUpdate],
+    [form, hasQueryControl, refreshWidgetsByFilter, widget, widgetUpdate],
   );
 
-  const onSqlOperatorAndValues = useCallback(
-    (sql: FilterSqlOperator, values: any[]) => {
-      const nextWidget = produce(widget, draft => {
-        (draft.config.content as ControllerWidgetContent).config.sqlOperator =
-          sql;
-        (
-          draft.config.content as ControllerWidgetContent
-        ).config.controllerValues = values;
-      });
-      widgetUpdate(nextWidget);
-      refreshWidgetsByFilter(nextWidget);
-    },
-    [refreshWidgetsByFilter, widget, widgetUpdate],
-  );
+  // const onSqlOperatorAndValues = useCallback(
+  //   (sql: FilterSqlOperator, values: any[]) => {
+  //     const nextWidget = produce(widget, draft => {
+  //       (draft.config.content as ControllerWidgetContent).config.sqlOperator =
+  //         sql;
+  //       (
+  //         draft.config.content as ControllerWidgetContent
+  //       ).config.controllerValues = values;
+  //     });
+  //     widgetUpdate(nextWidget);
+  //     refreshWidgetsByFilter(nextWidget);
+  //   },
+  //   [refreshWidgetsByFilter, widget, widgetUpdate],
+  // );
   const onRangeTimeChange = useCallback(
     (timeValues: string[] | null) => {
       const nextFilterDate: ControllerDate = {
@@ -154,9 +156,11 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         ).config.controllerDate = nextFilterDate;
       });
       widgetUpdate(nextWidget);
-      refreshWidgetsByFilter(nextWidget);
+      if (!hasQueryControl) {
+        refreshWidgetsByFilter(nextWidget);
+      }
     },
-    [refreshWidgetsByFilter, widget, widgetUpdate],
+    [hasQueryControl, refreshWidgetsByFilter, widget, widgetUpdate],
   );
 
   const onTimeChange = useCallback(
@@ -174,9 +178,17 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         ).config.controllerDate = nextFilterDate;
       });
       widgetUpdate(nextWidget);
-      refreshWidgetsByFilter(nextWidget);
+      if (!hasQueryControl) {
+        refreshWidgetsByFilter(nextWidget);
+      }
     },
-    [controllerDate, refreshWidgetsByFilter, widget, widgetUpdate],
+    [
+      controllerDate,
+      hasQueryControl,
+      refreshWidgetsByFilter,
+      widget,
+      widgetUpdate,
+    ],
   );
 
   const control = useMemo(() => {

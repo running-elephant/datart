@@ -36,7 +36,7 @@ export const WidgetOfFree: React.FC<BlockItemIProps> = memo(() => {
         <WidgetName config={widget.config} />
         <WidgetCore />
       </ItemContainer>
-      <WidgetToolBar id={widget.id} widgetType={widget.config.type} />
+      <WidgetToolBar />
     </Wrap>
   );
 });

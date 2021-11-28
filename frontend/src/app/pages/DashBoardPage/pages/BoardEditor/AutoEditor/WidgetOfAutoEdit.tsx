@@ -61,7 +61,7 @@ export const WidgetOfAutoEdit: React.FC<GridItemProps> = memo(() => {
         handleClassName={RGL_DRAG_HANDLE}
       />
 
-      <WidgetToolBar id={widget.id} widgetType={widget.config.type} />
+      <WidgetToolBar />
     </Warp>
   );
 });

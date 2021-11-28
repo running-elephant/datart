@@ -64,11 +64,12 @@ export const deleteWidgetsAction = () => (dispatch, getState) => {
   let selectedIds = Object.values(editBoard.widgetInfoRecord)
     .filter(WidgetInfo => WidgetInfo.selected)
     .map(WidgetInfo => WidgetInfo.id);
-  // selectSelectedIds
+  dispatch(editBoardStackActions.deleteWidgets(selectedIds));
   let childWidgetIds: string[] = [];
   const widgetMap = editBoard.stack.present.widgetRecord;
   selectedIds.forEach(id => {
-    if (widgetMap[id].config.type === 'container') {
+    const widgetType = widgetMap[id].config.type;
+    if (widgetType === 'container') {
       const content = widgetMap[id].config.content as ContainerWidgetContent;
       Object.values(content.itemMap).forEach(item => {
         if (item.childWidgetId) {
@@ -76,11 +77,10 @@ export const deleteWidgetsAction = () => (dispatch, getState) => {
         }
       });
     }
+    if (widgetType === 'query') {
+      dispatch(editBoardStackActions.changeBoardHasQueryControl(false));
+    }
   });
-  if (childWidgetIds.length === 0) {
-    dispatch(editBoardStackActions.deleteWidgets(selectedIds));
-    return;
-  }
   if (childWidgetIds.length > 0) {
     confirm({
       // TODO i18n

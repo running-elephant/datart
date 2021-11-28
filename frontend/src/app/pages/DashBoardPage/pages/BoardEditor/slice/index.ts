@@ -288,6 +288,8 @@ const filterActions = [
   editBoardStackActions.tabsWidgetRemoveTab,
   editBoardStackActions.updateWidgetConfig,
   editBoardStackActions.updateWidgetsConfig,
+
+  editBoardStackActions.changeBoardHasQueryControl,
 ].map(ele => ele.toString());
 const editBoardStackReducer = undoable(editBoardStackSlice.reducer, {
   undoType: BOARD_UNDO.undo,

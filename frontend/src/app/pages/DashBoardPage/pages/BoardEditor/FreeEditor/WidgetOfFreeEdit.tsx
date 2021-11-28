@@ -175,7 +175,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
             handleClassName={'display-Draggable'}
           />
 
-          <WidgetToolBar id={widget.id} widgetType={widget.config.type} />
+          <WidgetToolBar />
         </ItemWrap>
       </Resizable>
     </DraggableCore>
