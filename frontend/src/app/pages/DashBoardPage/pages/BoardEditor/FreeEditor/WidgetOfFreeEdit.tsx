@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetCore/WidgetName/WidgetName';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
@@ -159,6 +160,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
       >
         <ItemWrap style={style} onClick={ssp}>
           <ItemContainer>
+            <WidgetName config={widget.config} />
             <WidgetCore />
           </ItemContainer>
           {!widgetInfo.editing && (

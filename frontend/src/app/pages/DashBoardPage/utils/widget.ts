@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
@@ -55,9 +56,9 @@ import {
   WidgetContentChartType,
   WidgetInfo,
   WidgetPadding,
-  WidgetType,
 } from '../pages/Board/slice/types';
 import { ControllerConfig } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { BtnActionParams } from '../pages/BoardEditor/slice/actions/controlActions';
 
 export const VALUE_SPLITTER = '###';
 
@@ -116,6 +117,21 @@ export const createContainerWidget = (opt: {
   });
   const widget: Widget = createWidget({
     dashboardId: opt.dashboardId,
+    config: widgetConf,
+  });
+  return widget;
+};
+
+export const createQueryBtn = (opt: BtnActionParams) => {
+  const content = { type: opt.type };
+  const widgetConf = createInitWidgetConfig({
+    name: 'query',
+    type: opt.type as WidgetType,
+    content: content,
+    boardType: opt.boardType,
+  });
+  const widget: Widget = createWidget({
+    dashboardId: opt.boardId,
     config: widgetConf,
   });
   return widget;
@@ -266,6 +282,7 @@ export const createContainerWidgetContent = (type: ContainerWidgetType) => {
   }
   return content;
 };
+
 export const createChartWidgetContent = (subType: WidgetContentChartType) => {
   let content: ChartWidgetContent = {
     type: subType,
@@ -477,9 +494,10 @@ export const getWidgetMapByServer = (
     // 处理 自有 chart widget
 
     if (widget.config.content.type === 'widgetChart') {
-      widget.datachartId = widget.config.content.dataChart?.id || '';
-      wrappedDataCharts.push(widget.config.content.dataChart!);
-      delete widget.config.content.dataChart;
+      let content = widget.config.content as ChartWidgetContent;
+      widget.datachartId = content.dataChart?.id || '';
+      wrappedDataCharts.push(content.dataChart!);
+      delete content.dataChart;
     }
   });
 

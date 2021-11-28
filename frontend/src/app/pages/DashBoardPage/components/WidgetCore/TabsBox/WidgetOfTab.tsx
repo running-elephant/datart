@@ -25,6 +25,7 @@ import { WidgetCore } from '..';
 import { BoardContext } from '../../../contexts/BoardContext';
 import SubMaskLayer from '../../../pages/BoardEditor/components/SubMaskLayer';
 import WidgetToolBar from '../../WidgetToolBar';
+import { WidgetName } from '../WidgetName/WidgetName';
 export interface IProps {
   tabItem: ContainerItem;
 }
@@ -67,6 +68,7 @@ const TabWidgetContainer: React.FC<IProps> = ({ tabItem }) => {
   return (
     <Wrap border={border}>
       <ItemContainer className="ItemContainer">
+        <WidgetName config={widget.config} />
         <WidgetCore background padding border />;
       </ItemContainer>
       {subMask}

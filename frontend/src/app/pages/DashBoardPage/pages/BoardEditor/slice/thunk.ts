@@ -352,16 +352,14 @@ export const getEditWidgetDataAsync = createAsyncThunk<
     if (!curWidget) return null;
 
     switch (curWidget.config.type) {
+      case 'chart':
+        await dispatch(getEditChartWidgetDataAsync({ widgetId, option }));
+        return null;
       case 'controller':
         await dispatch(getEditFilterDataAsync(curWidget));
         return null;
       case 'media':
-        return null;
       case 'container':
-        return null;
-      case 'chart':
-        await dispatch(getEditChartWidgetDataAsync({ widgetId, option }));
-        return null;
       default:
         return null;
     }

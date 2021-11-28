@@ -17,28 +17,34 @@
  */
 import { ControlOutlined } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
+import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { G60 } from 'styles/StyleConstants';
-import { editDashBoardInfoActions } from '../../../slice';
+import { addControlerAction } from '../../../slice/actions/controlActions';
 import { BoardToolBarContext } from '../context/BoardToolBarContext';
 import { WithTipButton } from '../ToolBarItem';
 export interface AddControlBtnProps {}
+export interface ButtonItemType<T> {
+  name: string;
+  icon: any;
+  type: T;
+  disabled: boolean;
+}
 export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   const { boardId, boardType, showLabel } = useContext(BoardToolBarContext);
   const dispatch = useDispatch();
   const onAddControler = (info: { key: any }) => {
-    const type = info.key as ControllerFacadeTypes;
     dispatch(
-      editDashBoardInfoActions.changeControllerPanel({
-        type: 'add',
-        widgetId: '',
-        controllerType: type as ControllerFacadeTypes,
+      addControlerAction({
+        type: info.key,
+        boardId: boardId,
+        boardType: boardType,
       }),
     );
   };
-  const conventionalControllers = [
+  const conventionalControllers: ButtonItemType<ControllerFacadeTypes>[] = [
     {
       name: '单选下拉菜单',
       icon: '',
@@ -115,18 +121,24 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
       type: ControllerFacadeTypes.Slider,
       disabled: false,
     },
+    // {
+    //   name: '范围滑块',
+    //   icon: '',
+    //   type: ControllerFacadeTypes.RangeSlider,
+    //   disabled: false,
+    // },
   ];
-  const buttonControllers = [
+  const buttonControllers: ButtonItemType<WidgetType>[] = [
     {
       name: '查询按钮',
       icon: '',
-      type: ControllerFacadeTypes.QueryButton,
+      type: 'query',
       disabled: false,
     },
     {
       name: '重置按钮',
       icon: '',
-      type: ControllerFacadeTypes.ResetButton,
+      type: 'reset',
       disabled: false,
     },
   ];

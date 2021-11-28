@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetName/WidgetName';
+import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetCore/WidgetName/WidgetName';
 import { RGL_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
@@ -45,6 +45,7 @@ export const WidgetOfAutoEdit: React.FC<GridItemProps> = memo(() => {
   return (
     <Warp style={widgetStyle} onClick={ssp}>
       <ItemContainer className="ItemContainer">
+        <WidgetName config={widget.config} />
         <WidgetCore />
       </ItemContainer>
 

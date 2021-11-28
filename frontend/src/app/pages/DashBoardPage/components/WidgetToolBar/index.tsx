@@ -46,8 +46,10 @@ const WidgetToolBar: FC<WidgetToolBarProps> = memo(({ widgetType }) => {
     e.stopPropagation();
   };
   const renderedIcon = () => {
+    const widgetType = widget.config.type;
     if (boardType === 'free') return null;
-    if (widget.config.type === 'controller') return null;
+    const showTypes: WidgetType[] = ['chart', 'controller'];
+    if (!showTypes.includes(widgetType)) return null;
     return rendered ? null : (
       <Tooltip title="等待加载">
         <ClockCircleOutlined style={{ color: PRIMARY }} />
@@ -55,6 +57,8 @@ const WidgetToolBar: FC<WidgetToolBarProps> = memo(({ widgetType }) => {
     );
   };
   const loadingIcon = () => {
+    const showTypes: WidgetType[] = ['chart', 'controller'];
+    if (!showTypes.includes(widgetType)) return null;
     return loading ? <SyncOutlined spin style={{ color: PRIMARY }} /> : null;
   };
   const linkageIcon = () => {
@@ -75,13 +79,18 @@ const WidgetToolBar: FC<WidgetToolBarProps> = memo(({ widgetType }) => {
       ) : null;
     }
   };
+  const renderWidgetAction = () => {
+    const hideTypes: WidgetType[] = ['query', 'reset'];
+    if (hideTypes.includes(widgetType)) return null;
+    return <WidgetActionDropdown widget={widget} />;
+  };
   return (
     <StyleWrap onClick={ssp} className="widget-tool-bar">
       <Space>
         {renderedIcon()}
         {loadingIcon()}
         {linkageIcon()}
-        <WidgetActionDropdown widget={widget} />
+        {renderWidgetAction()}
       </Space>
     </StyleWrap>
   );

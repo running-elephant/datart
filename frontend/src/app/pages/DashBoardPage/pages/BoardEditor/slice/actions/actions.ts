@@ -37,11 +37,11 @@ import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import produce from 'immer';
 import { RootState } from 'types';
 import { v4 as uuidv4 } from 'uuid';
-import { editBoardStackActions, editDashBoardInfoActions } from '.';
-import { BoardType } from '../../Board/slice/types';
-import { ControllerConfig } from '../components/ControllerWidgetPanel/types';
-import { addWidgetsToEditBoard, getEditWidgetDataAsync } from './thunk';
-import { HistoryEditBoard } from './types';
+import { editBoardStackActions, editDashBoardInfoActions } from '..';
+import { BoardType } from '../../../Board/slice/types';
+import { ControllerConfig } from '../../components/ControllerWidgetPanel/types';
+import { addWidgetsToEditBoard, getEditWidgetDataAsync } from '../thunk';
+import { HistoryEditBoard } from '../types';
 
 const { confirm } = Modal;
 export const clearEditBoardState =

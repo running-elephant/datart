@@ -48,7 +48,7 @@ import {
   editDashBoardInfoActions,
   editWidgetInfoActions,
 } from '../pages/BoardEditor/slice';
-import { editChartInWidgetAction } from '../pages/BoardEditor/slice/actions';
+import { editChartInWidgetAction } from '../pages/BoardEditor/slice/actions/actions';
 import {
   getEditChartWidgetDataAsync,
   getEditWidgetDataAsync,

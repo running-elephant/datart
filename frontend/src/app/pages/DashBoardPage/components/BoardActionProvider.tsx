@@ -27,7 +27,10 @@ import {
 } from '../contexts/BoardActionContext';
 import { BoardContext } from '../contexts/BoardContext';
 import { boardActions } from '../pages/Board/slice';
-import { boardDownLoadAction } from '../pages/Board/slice/asyncActions';
+import {
+  boardDownLoadAction,
+  widgetsQueryAction,
+} from '../pages/Board/slice/asyncActions';
 import { getWidgetDataAsync } from '../pages/Board/slice/thunk';
 import { Widget } from '../pages/Board/slice/types';
 import { editBoardStackActions } from '../pages/BoardEditor/slice';
@@ -52,6 +55,16 @@ export const BoardActionProvider: FC<{ id: string }> = ({
         dispatch(boardActions.updateWidget(widget));
       }
     },
+
+    onWidgetsQuery: debounce(() => {
+      if (editing) {
+        // dispatch()
+        // dispatch(editBoardStackActions.updateWidget(widget));
+      } else {
+        dispatch(widgetsQueryAction({ boardId, renderMode }));
+        //
+      }
+    }, 500),
 
     refreshWidgetsByFilter: debounce((widget: Widget) => {
       const widgetIds = getNeedRefreshWidgetsByFilter(widget);
@@ -92,6 +105,7 @@ export const BoardActionProvider: FC<{ id: string }> = ({
       );
       return result;
     },
+
     onBoardToDownLoad: () => {
       if (renderMode === 'read') {
         dispatch(boardDownLoadAction({ boardId, renderMode }));

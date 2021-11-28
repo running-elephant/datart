@@ -35,6 +35,8 @@ export const widgetViewActionMap: Record<WidgetType, widgetActionType[]> = {
   media: ['fullScreen'],
   container: ['info'],
   controller: ['refresh'],
+  query: [],
+  reset: [],
 };
 // 编辑 edit
 export const widgetEditActionMap: Record<WidgetType, widgetActionType[]> = {
@@ -42,6 +44,8 @@ export const widgetEditActionMap: Record<WidgetType, widgetActionType[]> = {
   media: ['edit', 'delete'],
   controller: ['refresh', 'edit', 'delete'],
   container: ['edit', 'delete'],
+  query: [],
+  reset: [],
 };
 export const widgetActionMap = {
   view: widgetViewActionMap,

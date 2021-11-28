@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import ChartRequest from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
@@ -33,6 +32,8 @@ import {
   getWidgetInfoMapByServer,
   getWidgetMapByServer,
 } from '../../../utils/widget';
+import { PageInfo } from './../../../../MainPage/pages/ViewPage/slice/types';
+import { getChartWidgetDataAsync } from './thunk';
 import { BoardState, DataChart, ServerDashboard, VizRenderMode } from './types';
 
 export const handleServerBoardAction =
@@ -113,4 +114,27 @@ export const getBoardDownloadParams =
     }) as ChartRequest[];
 
     return { requestParams, fileName };
+  };
+
+export const widgetsQueryAction =
+  ({ boardId, renderMode }) =>
+  (dispatch, getState) => {
+    const pageInfo: Partial<PageInfo> = {
+      pageNo: 1,
+    };
+    const boardState = getState() as { board: BoardState };
+    const boardMapWidgetMap = boardState.board.widgetRecord;
+    const widgetMap = boardMapWidgetMap[boardId];
+    Object.values(widgetMap)
+      .filter(it => it.config.type === 'chart')
+      .forEach(it => {
+        dispatch(
+          getChartWidgetDataAsync({
+            boardId,
+            widgetId: it.id,
+            renderMode,
+            option: { pageInfo },
+          }),
+        );
+      });
   };

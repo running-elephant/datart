@@ -15,33 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export enum ControllerFacadeTypes {
-  DropdownList = 'dropdownList',
-  RadioGroup = 'radioGroup',
-  MultiDropdownList = 'multiDropdownList',
-  RangeTime = 'rangeTime',
-  RangeValue = 'rangeValue',
-  Text = 'text',
-  Tree = 'tree',
-  Value = 'value',
-  Time = 'time',
-  Slider = 'slider',
-  RangeSlider = 'rangeSlider',
-}
-
-export enum ControllerRadioFacadeTypes {
-  Default = 'default',
-  Button = 'button',
-}
-
-export enum RelativeOrExactTime {
-  Relative = 'relative',
-  Exact = 'exact',
-}
-
-export enum ControllerVisibilityTypes {
-  Hide = 'hide',
-  Show = 'show',
-  Condition = 'condition',
-}
+import React from 'react';
+import styled from 'styled-components/macro';
+export interface CompProps {}
+export const ResetWidget: React.FC<CompProps> = () => {
+  return <Wrap>ResetButton </Wrap>;
+};
+const Wrap = styled.div`
+  display: block;
+`;
