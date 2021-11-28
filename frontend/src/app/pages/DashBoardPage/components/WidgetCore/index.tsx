@@ -34,6 +34,7 @@ import { BoardContext } from '../../contexts/BoardContext';
 import { BoardInfoContext } from '../../contexts/BoardInfoContext';
 import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
 import { getWidgetSomeStyle } from '../../utils/widget';
+import { WidgetName } from '../WidgetName/WidgetName';
 import { ControllerWidgetCore } from './ControllerWIdget';
 
 export interface WidgetCoreProps {
@@ -120,13 +121,37 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
   const element = useMemo(() => {
     switch (widget.config.type) {
       case 'chart':
-        return <DataChartWidget />;
+        return (
+          <>
+            <WidgetName config={widget.config} />
+            <DataChartWidget />;
+          </>
+        );
       case 'media':
-        return <>{mediaElement}</>;
+        return (
+          <>
+            <WidgetName config={widget.config} />
+            {mediaElement}
+          </>
+        );
       case 'container':
-        return <>{containerElement}</>;
+        return (
+          <>
+            <WidgetName config={widget.config} />
+            {containerElement}
+          </>
+        );
       case 'controller':
-        return <ControllerWidgetCore id={widget.id} />;
+        return (
+          <>
+            <WidgetName config={widget.config} />
+            <ControllerWidgetCore id={widget.id} />
+          </>
+        );
+      case 'queryButton':
+        return <div>queryButton</div>;
+      case 'resetButton':
+        return <div>resetButton</div>;
       default:
         return <div>default element</div>;
     }

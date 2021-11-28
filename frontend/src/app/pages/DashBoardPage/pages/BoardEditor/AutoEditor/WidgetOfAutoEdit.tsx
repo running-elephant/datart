@@ -44,7 +44,6 @@ export const WidgetOfAutoEdit: React.FC<GridItemProps> = memo(() => {
   const widgetStyle = useMemo(() => getWidgetStyle('auto', widget), [widget]);
   return (
     <Warp style={widgetStyle} onClick={ssp}>
-      <WidgetName config={widget.config} />
       <ItemContainer className="ItemContainer">
         <WidgetCore />
       </ItemContainer>
@@ -77,6 +76,7 @@ const Warp = styled.div<{}>`
 
 const ItemContainer = styled.div`
   z-index: 10;
+  display: flex;
   width: 100%;
   height: 100%;
 `;

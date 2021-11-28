@@ -33,7 +33,7 @@ export const WidgetOfAuto: React.FC = React.memo(() => {
   );
   return (
     <Warp className="widget" style={widgetStyle}>
-      <WidgetName config={widget.config} />
+
       <ItemContainer>
         <WidgetCore />
       </ItemContainer>
