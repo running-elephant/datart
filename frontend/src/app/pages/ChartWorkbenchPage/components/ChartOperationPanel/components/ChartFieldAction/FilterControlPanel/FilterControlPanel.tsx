@@ -19,6 +19,7 @@
 import { Input, Select } from 'antd';
 import { FormItemEx } from 'app/components';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
+import { ConditionBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
 import {
   AggregateFieldActionType,
   ChartDataSectionConfig,
@@ -29,7 +30,6 @@ import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/types/ChartDataView';
-import { ConditionBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
 import { ControllerVisibilityTypes } from 'app/types/FilterControlPanel';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';

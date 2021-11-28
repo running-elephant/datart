@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
   ContainerWidgetContent,
-  FilterWidgetContent,
+  ControllerWidgetContent,
   getDataOption,
   VizRenderMode,
   Widget,
@@ -206,8 +206,8 @@ export const getWidgetDataAsync = createAsyncThunk<
         return null;
       case 'container':
         return null;
-      case 'filter':
-        await dispatch(getFilterDataAsync({ widget: curWidget, renderMode }));
+      case 'controller':
+        await dispatch(getControllerOptions({ widget: curWidget, renderMode }));
 
         return null;
       default:
@@ -290,24 +290,21 @@ export const getChartWidgetDataAsync = createAsyncThunk<
   },
 );
 
-// 根据 字段获取 filter 的options
-export const getFilterDataAsync = createAsyncThunk<
+// 根据 字段获取 Controller 的options
+export const getControllerOptions = createAsyncThunk<
   null,
   { widget: Widget; renderMode: VizRenderMode | undefined },
   { state: RootState }
 >(
-  'board/getFilterDataAsync',
+  'board/getControllerOptions',
   async ({ widget, renderMode }, { getState, dispatch }) => {
-    const content = widget.config.content as FilterWidgetContent;
-    const widgetFilter = content.widgetFilter;
+    const content = widget.config.content as ControllerWidgetContent;
+    const config = content.config;
     const executeTokenMap = (getState() as RootState)?.share?.executeTokenMap;
 
-    if (
-      widgetFilter.assistViewFields &&
-      Array.isArray(widgetFilter.assistViewFields)
-    ) {
+    if (config.assistViewFields && Array.isArray(config.assistViewFields)) {
       // 请求
-      const [viewId, viewField] = widgetFilter.assistViewFields;
+      const [viewId, viewField] = config.assistViewFields;
       const executeToken = executeTokenMap?.[viewId];
       const dataset = await getDistinctFields(
         viewId,

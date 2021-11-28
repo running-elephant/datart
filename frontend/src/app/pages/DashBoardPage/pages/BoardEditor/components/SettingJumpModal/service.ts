@@ -13,7 +13,7 @@ const computedDashboardFilters = (data): FilterOptionItem[] => {
     item.config = item.config ? JSON.parse(item.config) : undefined;
   });
   const filterWidgets = widgets.filter(v => {
-    const _isFilter = v?.config?.type === WidgetTypeMap.filter,
+    const _isFilter = v?.config?.type === WidgetTypeMap.controller,
       isDateOrStr = FILTER_MENU.includes(v?.config?.content?.fieldValueType);
     return _isFilter && isDateOrStr;
   });
