@@ -60,7 +60,7 @@ public class HttpDataProvider extends DefaultDataProvider {
 
     private static final String BODY = "body";
 
-    private static final String HEADER = "header";
+    private static final String HEADER = "headers";
 
     private static final String CONTENT_TYPE = "contentType";
 

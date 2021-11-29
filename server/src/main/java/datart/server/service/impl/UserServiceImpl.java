@@ -19,6 +19,8 @@
 package datart.server.service.impl;
 
 import datart.core.base.consts.UserIdentityType;
+import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.Organization;
 import datart.core.entity.User;
@@ -30,9 +32,8 @@ import datart.security.util.JwtUtils;
 import datart.security.util.SecurityUtils;
 import datart.server.base.dto.OrganizationBaseInfo;
 import datart.server.base.dto.UserProfile;
-import datart.server.base.exception.NotFoundException;
-import datart.server.base.exception.ParamException;
-import datart.server.base.exception.ServerException;
+import datart.core.base.exception.NotFoundException;
+import datart.core.base.exception.ParamException;
 import datart.server.base.params.ChangeUserPasswordParam;
 import datart.server.base.params.UserRegisterParam;
 import datart.server.base.params.UserResetPasswordParam;
@@ -121,11 +122,11 @@ public class UserServiceImpl extends BaseService implements UserService {
     public boolean register(UserRegisterParam userRegisterParam) throws MessagingException, UnsupportedEncodingException {
         if (!checkUserName(userRegisterParam.getUsername())) {
             log.error("The username({}) has been registered", userRegisterParam.getUsername());
-            throw new ParamException(getMessages("error.param.occupied", "resource.user.username"));
+            Exceptions.tr(ParamException.class, "error.param.occupied", "resource.user.username");
         }
         if (!checkEmail(userRegisterParam.getEmail())) {
             log.info("The email({}) has been registered", userRegisterParam.getEmail());
-            throw new ParamException(getMessages("error.param.occupied", "resource.user.email"));
+            Exceptions.tr(ParamException.class, "error.param.occupied", "resource.user.email");
         }
         BCrypt.hashpw(userRegisterParam.getPassword(), BCrypt.gensalt());
         User user = new User();
@@ -150,14 +151,12 @@ public class UserServiceImpl extends BaseService implements UserService {
         PasswordToken passwordToken = JwtUtils.toPasswordToken(activeString);
         User user = userMapper.selectByUsername(passwordToken.getSubject());
         if (user == null) {
-            throw new NotFoundException(getMessages("resource.not-exist", "resource.user"));
+            Exceptions.notFound("resource.not-exist", "resource.user");
         }
         //更新用户激活状态至已激活
         int count = userMapper.updateToActiveById(user.getId());
         if (count != 1) {
-            String msg = getMessageWithParam("message.user.active.fail", user.getUsername());
-            log.warn(msg);
-            throw new ServerException(msg);
+            Exceptions.tr(BaseException.class, "message.user.active.fail", user.getUsername());
         }
         initUser(user);
         log.info("User({}) activation success", user.getUsername());
@@ -171,10 +170,10 @@ public class UserServiceImpl extends BaseService implements UserService {
     public boolean sendActiveMail(String usernameOrEmail) throws UnsupportedEncodingException, MessagingException {
         User user = userMapper.selectByNameOrEmail(usernameOrEmail);
         if (user == null) {
-            throw new NotFoundException("user " + usernameOrEmail + "not exists");
+            Exceptions.notFound("base.not.exists", usernameOrEmail);
         }
         if (user.getActive()) {
-            throw new ServerException("User already activated ");
+            Exceptions.tr(BaseException.class, "message.user.active.fail", usernameOrEmail);
         }
         mailService.sendActiveMail(user);
         return true;
@@ -186,7 +185,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         User user = securityManager.getCurrentUser();
         user = userMapper.selectByPrimaryKey(user.getId());
         if (!BCrypt.checkpw(passwordParam.getOldPassword(), user.getPassword())) {
-            throw new ParamException(getMessages("error.param.invalid", "resource.user.password"));
+            Exceptions.tr(ParamException.class, "error.param.invalid", "resource.user.password");
         }
         User update = new User();
         update.setId(user.getId());
@@ -258,7 +257,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             default:
         }
         if (user == null) {
-            throw new NotFoundException(getMessages("resource.not-exist", "resource.user"));
+            Exceptions.notFound("resource.user");
         }
         try {
             String verifyCode = SecurityUtils.randomPassword();
@@ -267,23 +266,25 @@ public class UserServiceImpl extends BaseService implements UserService {
             return JwtUtils.toJwtString(new PasswordToken(user.getUsername(), verifyCode, System.currentTimeMillis()));
         } catch (Exception e) {
             log.error("Verify Code Mail send error", e);
-            throw new ServerException(getMessage("message.email.send.error"));
+            Exceptions.tr(BaseException.class, "message.email.send.error");
         }
+        return null;
     }
 
     @Override
     public boolean resetPassword(UserResetPasswordParam passwordParam) {
         boolean valid = JwtUtils.validTimeout(passwordParam.getToken());
         if (!valid) {
-            throw new ParamException(getMessage("message.user.verify.code.timeout"));
+            Exceptions.tr(ParamException.class, "message.user.verify.code.timeout");
         }
         PasswordToken passwordToken = JwtUtils.toPasswordToken(passwordParam.getToken());
         if (!passwordToken.getPassword().equals(passwordParam.getVerifyCode())) {
-            throw new ParamException(getMessage("message.user.verify.code.error"));
+            Exceptions.tr(ParamException.class, "message.user.verify.code.error");
+
         }
         User user = userMapper.selectByUsername(passwordToken.getSubject());
         if (user == null) {
-            throw new NotFoundException(getMessages("resource.not-exist", "resource.user"));
+            Exceptions.notFound("resource.not-exist", "resource.user");
         }
         User update = new User();
         update.setId(user.getId());

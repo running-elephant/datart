@@ -20,6 +20,7 @@ package datart.core.common;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
 import lombok.Data;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -42,7 +43,7 @@ public class CSVParse {
     public static final ParseConfig DEFAULT_CONFIG = new ParseConfig();
 
     static {
-        DEFAULT_CONFIG.setDateFormat(Const.DEFAULT_IMG_FORMAT);
+        DEFAULT_CONFIG.setDateFormat(Const.DEFAULT_DATE_FORMAT);
     }
 
     private String path;
@@ -71,7 +72,7 @@ public class CSVParse {
     public List<List<Object>> parse() throws IOException {
         File file = new File(path);
         if (!file.exists()) {
-            throw new BaseException("file " + path + " no exists");
+            Exceptions.tr(BaseException.class, "message.file.notfound", path);
         }
         List<CSVRecord> records = CSVParser.parse(file, StandardCharsets.UTF_8, CSVFormat.DEFAULT).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -105,24 +106,20 @@ public class CSVParse {
     }
 
     private List<Object> extractValues(CSVRecord record) {
-        try {
-            if (record == null || record.size() == 0) {
-                return Collections.emptyList();
-            }
-            LinkedList<Object> values = new LinkedList<>();
-            for (int i = 0; i < record.size(); i++) {
-                Object val;
-                try {
-                    val = parseValue(record.get(i), types[i]);
-                } catch (Exception e) {
-                    val = record.get(i);
-                }
-                values.add(val);
-            }
-            return values;
-        } catch (Exception e) {
-            throw new BaseException(e);
+        if (record == null || record.size() == 0) {
+            return Collections.emptyList();
         }
+        LinkedList<Object> values = new LinkedList<>();
+        for (int i = 0; i < record.size(); i++) {
+            Object val;
+            try {
+                val = parseValue(record.get(i), types[i]);
+            } catch (Exception e) {
+                val = record.get(i);
+            }
+            values.add(val);
+        }
+        return values;
     }
 
     private Object parseValue(String val, ValueType valueType) throws ParseException {
@@ -143,7 +140,6 @@ public class CSVParse {
     @Data
     public static class ParseConfig {
         private String dateFormat;
-
     }
 
 }

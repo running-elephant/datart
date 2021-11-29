@@ -1,5 +1,6 @@
 package datart.data.provider.script;
 
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ScriptVariable;
 import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.SqlNodeUtils;
@@ -160,7 +161,7 @@ public abstract class VariablePlaceholder {
                 }
                 sqlCall.setOperand(i, nodeList);
             } else {
-                throw new RuntimeException("variable parse error,unexpected Sql Node " + sqlNode.toSqlString(sqlDialect));
+                Exceptions.tr(DataProviderException.class, "message.provider.sql.variable", sqlNode.toSqlString(sqlDialect).getSql());
             }
         }
     }

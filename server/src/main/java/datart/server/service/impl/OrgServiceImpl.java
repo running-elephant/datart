@@ -20,6 +20,7 @@ package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.core.entity.ext.RoleBaseInfo;
@@ -31,7 +32,7 @@ import datart.security.util.JwtUtils;
 import datart.security.util.PermissionHelper;
 import datart.server.base.dto.InviteMemberResponse;
 import datart.server.base.dto.OrganizationBaseInfo;
-import datart.server.base.exception.NotAllowedException;
+import datart.core.base.exception.NotAllowedException;
 import datart.server.base.params.OrgCreateParam;
 import datart.server.base.params.OrgUpdateParam;
 import datart.server.service.BaseService;
@@ -272,11 +273,11 @@ public class OrgServiceImpl extends BaseService implements OrgService {
         Organization organization = organizationMapper.selectByPrimaryKey(orgId);
 
         if (organization.getCreateBy().equals(userId)) {
-            throw new NotAllowedException(getMessage("message.org.member.delete-creator"));
+            Exceptions.tr(NotAllowedException.class,"message.org.member.delete-creator");
         }
         //
         if (getCurrentUser().getId().equals(userId)) {
-            throw new NotAllowedException(getMessage("message.org.member.delete-self"));
+            Exceptions.tr(NotAllowedException.class,"message.org.member.delete-self");
         }
         organizationMapper.deleteOrgMember(orgId, userId);
         log.info("User{} deleted by {}", userId, getCurrentUser().getUsername());

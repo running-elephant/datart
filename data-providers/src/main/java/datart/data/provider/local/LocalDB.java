@@ -20,6 +20,7 @@ package datart.data.provider.local;
 import com.google.common.collect.Lists;
 import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
 import datart.core.data.provider.Column;
 import datart.core.data.provider.Dataframe;
@@ -99,7 +100,7 @@ public class LocalDB {
     public static ResultSet dataframeTable(Connection conn, String dataId) throws SQLException {
         Dataframe dataframe = TEMP_RS_CACHE.get(dataId);
         if (dataframe == null) {
-            throw new RuntimeException("The dataframe " + dataId + " does not exist");
+            Exceptions.msg("The dataframe " + dataId + " does not exist");
         }
         SimpleResultSet rs = new SimpleResultSet();
         if (!CollectionUtils.isEmpty(dataframe.getColumns())) {
@@ -127,7 +128,7 @@ public class LocalDB {
      */
     private static void registerDataAsTable(Dataframe dataframe, Connection connection) throws SQLException {
         if (Objects.isNull(dataframe)) {
-            throw new RuntimeException("Empty data cannot be registered as a temporary table");
+            Exceptions.msg("Empty data cannot be registered as a temporary table");
         }
 
         // 处理脏数据
