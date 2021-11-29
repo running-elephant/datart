@@ -47,8 +47,6 @@ const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
   ({ viewMap, form, queryVariables, controllerType, getFormRelatedViews }) => {
-    //renderOptions
-    console.log('queryVariables', queryVariables);
     const filterFieldCategoryChange = useCallback(
       (index: number) => (e: RadioChangeEvent) => {
         const relatedViews = getFormRelatedViews();

@@ -232,7 +232,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           config: postControlConfig(config, controllerType!),
           hasVariable: false,
         });
-
+        debugger;
         dispatch(addWidgetsToEditBoard([widget]));
       } else if (type === 'edit') {
         const sourceId = curFilterWidget.id;
@@ -283,6 +283,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           draft.config.name = name;
           draft.config.content = nextContent;
         });
+        debugger;
         dispatch(editBoardStackActions.updateWidget(newWidget));
       }
       setVisible(false);
@@ -349,7 +350,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
       >
         <Container className="datart-split">
           <div>
-            <WidgetControlForm 
+            <WidgetControlForm
               controllerType={controllerType!}
               otherStrFilterWidgets={otherStrFilterWidgets}
               boardType={boardType}

@@ -65,6 +65,7 @@ export const TimeController: React.FC<SingleTimeSetProps> = memo(
       <>
         {pickerType === 'dateTime' ? (
           <DatePicker
+            style={{ width: '100%' }}
             allowClear={true}
             value={value ? moment(value) : null}
             showTime
@@ -72,6 +73,7 @@ export const TimeController: React.FC<SingleTimeSetProps> = memo(
           />
         ) : (
           <DatePicker
+            style={{ width: '100%' }}
             allowClear={true}
             value={value ? moment(value) : null}
             onChange={_onChange}

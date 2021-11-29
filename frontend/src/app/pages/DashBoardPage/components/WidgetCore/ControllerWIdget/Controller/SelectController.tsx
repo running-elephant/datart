@@ -22,6 +22,7 @@ import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 
 export interface SelectControllerProps {
+  defaultValue?: SelectValue;
   options?: ControlOption[];
   value?: SelectValue;
   placeholder?: string;
@@ -32,46 +33,50 @@ export interface SelectControllerProps {
 }
 const { Option } = Select;
 export const SelectControllerForm: React.FC<SelectControllerProps> = memo(
-  ({ label, name, required, ...rest }) => {
+  ({ label, name, required, value, ...rest }) => {
     return (
       <Form.Item
+        shouldUpdate
         name={name}
         label={label}
         validateTrigger={['onChange', 'onBlur']}
-        rules={[{ required: false }]}
+        rules={[{ required: required }]}
       >
-        <SelectController {...rest} />
+        <SelectController {...rest} value={value} />
       </Form.Item>
     );
   },
 );
-export const SelectController: React.FC<SelectControllerProps> = memo(
-  ({ options, onChange, value, children }) => {
-    const renderOptions = useCallback(() => {
-      return (options || []).map(o => (
-        <Option key={o.value || o.label} value={o.value}>
-          {o.label || o.value}
-        </Option>
-      ));
-    }, [options]);
-    return (
-      <StyledSelect
-        showSearch
-        allowClear
-        value={value}
-        style={{ width: '100%' }}
-        placeholder="请选择"
-        optionFilterProp="children"
-        onChange={onChange}
-        filterOption={(input, option) =>
-          option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
-        }
-      >
-        {children ? children : renderOptions()}
-      </StyledSelect>
-    );
-  },
-);
+export const SelectController: React.FC<SelectControllerProps> = ({
+  options,
+  onChange,
+  value,
+  defaultValue,
+}) => {
+  const renderOptions = useCallback(() => {
+    return (options || []).map(o => (
+      <Option key={o.value || o.label} value={o.value}>
+        {o.label || o.value}
+      </Option>
+    ));
+  }, [options]);
+  return (
+    <StyledSelect
+      showSearch
+      allowClear
+      value={value}
+      style={{ width: '100%' }}
+      placeholder="请选择"
+      optionFilterProp="children"
+      onChange={onChange}
+      filterOption={(input, option) =>
+        option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      }
+    >
+      {renderOptions()}
+    </StyledSelect>
+  );
+};
 const StyledSelect = styled(Select)`
   display: block;
 

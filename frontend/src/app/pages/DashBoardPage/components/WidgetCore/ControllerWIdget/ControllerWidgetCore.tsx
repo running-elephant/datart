@@ -105,7 +105,8 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   const onControllerValuesChange = useCallback(
     values => {
       form.submit();
-      if (typeof values === 'object' && !Array.isArray(values)) {
+
+      if (values && typeof values === 'object' && !Array.isArray(values)) {
         return;
       }
       const _values = values ? (Array.isArray(values) ? values : [values]) : [];
@@ -195,9 +196,9 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
     let selectOptions = optionRows?.map(ele => {
       return { value: ele.key, label: ele.label } as ControlOption;
     });
-
     switch (facadeType) {
       case ControllerFacadeTypes.DropdownList:
+        form.setFieldsValue({ value: controllerValues?.[0] });
         return (
           <SelectControllerForm
             value={controllerValues?.[0]}
@@ -207,6 +208,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
           />
         );
       case ControllerFacadeTypes.MultiDropdownList:
+        form.setFieldsValue({ value: controllerValues });
         return (
           <MultiSelectControllerForm
             value={controllerValues}
@@ -303,7 +305,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   ]);
   return (
     <Wrap>
-      <Form form={form} name="control-Form">
+      <Form form={form} initialValues={{}} name="control-Form">
         {control}
       </Form>
     </Wrap>
