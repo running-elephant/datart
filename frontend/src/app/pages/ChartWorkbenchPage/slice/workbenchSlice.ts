@@ -35,6 +35,7 @@ import { updateCollectionByAction } from 'app/utils/mutation';
 import { RootState } from 'types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
+import { CloneValueDeep } from 'utils/object';
 import { request } from 'utils/request';
 import { listToTree, reduxActionErrorHandler, rejectHandle } from 'utils/utils';
 import ChartRequest, {
@@ -450,7 +451,7 @@ const workbenchSlice = createSlice({
         const backendChartConfig =
           typeof payload.config === 'string'
             ? JSON.parse(payload.config)
-            : payload.config;
+            : CloneValueDeep(payload.config);
         state.backendChart = {
           ...payload,
           config: backendChartConfig,
