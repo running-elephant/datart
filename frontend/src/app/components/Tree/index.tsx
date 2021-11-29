@@ -62,7 +62,7 @@ const StyledDirectoryTree = styled(AntTree)`
 
     .ant-tree-treenode {
       padding: 0 0 ${SPACE} ${SPACE_XS};
-
+      align-items: center;
       .ant-tree-node-content-wrapper {
         display: flex;
         align-items: center;
@@ -134,10 +134,12 @@ const StyledDirectoryTree = styled(AntTree)`
       }
 
       .ant-tree-checkbox {
-        margin: ${SPACE_XS} ${SPACE} 0 0;
+        margin: ${0} ${SPACE} 0 20px;
       }
     }
-
+    .ant-tree-checkbox {
+      margin-top: 0px;
+    }
     &.medium {
       .ant-tree-switcher {
         line-height: 32px;

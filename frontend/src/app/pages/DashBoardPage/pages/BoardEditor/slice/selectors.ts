@@ -128,8 +128,9 @@ export const selectSelectedIds = createSelector(
 export const selectWidgetInfoDatachartId = createSelector(
   [selectWidgetRecord],
   WidgetsInfo =>
-    Object.values(WidgetsInfo)
-      .map(widgetInfo => { return widgetInfo.datachartId  }) || [],
+    Object.values(WidgetsInfo).map(widgetInfo => {
+      return widgetInfo.datachartId || undefined;
+    }) || [],
 );
 
 // boardInfo
