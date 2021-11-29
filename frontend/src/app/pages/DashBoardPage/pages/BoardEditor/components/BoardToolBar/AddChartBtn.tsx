@@ -24,7 +24,13 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 import { addDataChartWidgets, addWrapChartWidget } from '../../slice/thunk';
@@ -33,13 +39,12 @@ import { ChartWidgetDropdown, ToolBtnProps } from './ToolBarItem';
 const AddChartBtn: React.FC<ToolBtnProps> = props => {
   const dispatch = useDispatch();
   const { boardId, boardType } = useContext(BoardContext);
-
   const orgId = useSelector(selectOrgId);
-
   // const chartOptions = useSelector(selectDataChartList);
   const chartOptionsMock = useSelector(selectVizs);
-  const chartOptions = chartOptionsMock.filter(
-    item => item.relType === 'DATACHART',
+  const chartOptions = useMemo(
+    () => chartOptionsMock.filter(item => item.relType !== 'DASHBOARD'),
+    [chartOptionsMock],
   );
 
   useEffect(() => {
