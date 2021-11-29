@@ -122,10 +122,10 @@ export const createContainerWidget = (opt: {
   return widget;
 };
 
-export const createQueryBtn = (opt: BtnActionParams) => {
+export const createControlBtn = (opt: BtnActionParams) => {
   const content = { type: opt.type };
   const widgetConf = createInitWidgetConfig({
-    name: 'query',
+    name: opt.type === 'query' ? '查询' : '重置',
     type: opt.type as WidgetType,
     content: content,
     boardType: opt.boardType,
@@ -169,12 +169,7 @@ export const createInitWidgetConfig = (opt: {
       textAlign: 'left',
       ...fontDefault,
     },
-    padding: {
-      left: 4,
-      right: 4,
-      top: 20,
-      bottom: 4,
-    },
+    padding: createWidgetPadding(opt.type),
   };
 };
 
@@ -221,12 +216,31 @@ export const createWidgetInfo = (id: string): WidgetInfo => {
   };
   return widgetInfo;
 };
+export const createWidgetPadding = (widgetType: WidgetType) => {
+  if (widgetType === 'query' || widgetType === 'reset') {
+    return {
+      left: 4,
+      right: 4,
+      top: 0,
+      bottom: 0,
+    };
+  }
+  return {
+    left: 4,
+    right: 4,
+    top: 20,
+    bottom: 4,
+  };
+};
 export const createWidgetRect = (
   boardType: BoardType,
   widgetType: WidgetType,
 ): RectConfig => {
   if (widgetType === 'controller') {
     return getInitControllerWidgetRect(boardType);
+  }
+  if (widgetType === 'query' || widgetType === 'reset') {
+    return getInitButtonWidgetRect(boardType);
   }
   if (boardType === 'auto') {
     return {
@@ -242,6 +256,25 @@ export const createWidgetRect = (
       y: 0,
       width: 400,
       height: 300,
+    };
+  }
+};
+
+export const getInitButtonWidgetRect = (boardType: BoardType): RectConfig => {
+  if (boardType === 'auto') {
+    return {
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1,
+    };
+  } else {
+    // free
+    return {
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 40,
     };
   }
 };

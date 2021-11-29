@@ -59,6 +59,9 @@ export const editBoardStackSlice = createSlice({
     changeBoardHasQueryControl(state, action: PayloadAction<boolean>) {
       state.dashBoard.config.hasQueryControl = action.payload;
     },
+    changeBoardHasResetControl(state, action: PayloadAction<boolean>) {
+      state.dashBoard.config.hasResetControl = action.payload;
+    },
     // Widget
     addWidgets(state, action: PayloadAction<Widget[]>) {
       const widgets = action.payload;

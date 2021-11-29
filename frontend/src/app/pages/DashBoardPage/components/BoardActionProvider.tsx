@@ -65,7 +65,16 @@ export const BoardActionProvider: FC<{ id: string }> = ({
         //
       }
     }, 500),
-
+    onWidgetsReset: debounce(() => {
+      if (editing) {
+        // dispatch()
+        // dispatch(editBoardStackActions.updateWidget(widget));
+      } else {
+        console.log('--onWidgetsReset');
+        // dispatch(widgetsQueryAction({ boardId, renderMode }));
+        //
+      }
+    }, 500),
     refreshWidgetsByFilter: debounce((widget: Widget) => {
       const widgetIds = getNeedRefreshWidgetsByFilter(widget);
       const pageInfo: Partial<PageInfo> = {

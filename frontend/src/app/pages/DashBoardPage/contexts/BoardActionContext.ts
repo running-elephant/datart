@@ -7,6 +7,7 @@ export interface BoardActionContextProps {
   onGenerateShareLink?: (date, usePwd) => any;
   onBoardToDownLoad: () => any;
   onWidgetsQuery: () => any;
+  onWidgetsReset: () => any;
 }
 export const BoardActionContext = createContext<BoardActionContextProps>(
   {} as BoardActionContextProps,

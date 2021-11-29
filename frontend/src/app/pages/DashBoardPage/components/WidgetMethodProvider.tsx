@@ -84,6 +84,9 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       if (type === 'query') {
         dispatch(editBoardStackActions.changeBoardHasQueryControl(false));
       }
+      if (type === 'reset') {
+        dispatch(editBoardStackActions.changeBoardHasResetControl(false));
+      }
       dispatch(editBoardStackActions.deleteWidgets([wid]));
     },
     [dispatch],

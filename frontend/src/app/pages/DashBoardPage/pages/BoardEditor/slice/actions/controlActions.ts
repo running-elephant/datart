@@ -19,7 +19,7 @@ import {
   BoardType,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { createQueryBtn } from 'app/pages/DashBoardPage/utils/widget';
+import { createControlBtn } from 'app/pages/DashBoardPage/utils/widget';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { addWidgetsToEditBoard } from './../thunk';
@@ -33,15 +33,22 @@ export const addControllerAction =
   (opt: BtnActionParams) => async (dispatch, getState) => {
     switch (opt.type as WidgetType) {
       case 'query':
-        const widget = createQueryBtn({
+        const queryWidget = createControlBtn({
           boardId: opt.boardId,
           boardType: opt.boardType,
           type: opt.type as any,
         });
-        dispatch(addWidgetsToEditBoard([widget]));
+        dispatch(addWidgetsToEditBoard([queryWidget]));
         dispatch(editBoardStackActions.changeBoardHasQueryControl(true));
         break;
       case 'reset':
+        const resetWidget = createControlBtn({
+          boardId: opt.boardId,
+          boardType: opt.boardType,
+          type: opt.type as any,
+        });
+        dispatch(addWidgetsToEditBoard([resetWidget]));
+        dispatch(editBoardStackActions.changeBoardHasResetControl(true));
         break;
       default:
         dispatch(

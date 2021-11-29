@@ -17,6 +17,7 @@
  */
 import { ControlOutlined } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { useContext } from 'react';
@@ -35,6 +36,8 @@ export interface ButtonItemType<T> {
 export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   const { boardId, boardType, showLabel } = useContext(BoardToolBarContext);
   const dispatch = useDispatch();
+  const { config: boardConfig } = useContext(BoardConfigContext);
+  const { hasQueryControl, hasResetControl } = boardConfig;
   const onAddControler = (info: { key: any }) => {
     dispatch(
       addControllerAction({
@@ -133,13 +136,13 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
       name: '查询按钮',
       icon: '',
       type: 'query',
-      disabled: false,
+      disabled: !!hasQueryControl,
     },
     {
       name: '重置按钮',
       icon: '',
       type: 'reset',
-      disabled: false,
+      disabled: !!hasResetControl,
     },
   ];
   const renderTitle = (text: string) => {

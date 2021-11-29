@@ -97,7 +97,8 @@ export interface DashboardConfig {
   gridStep: [number, number];
   scaleMode: ScaleModeType;
   initialQuery: boolean;
-  hasQueryControl?: boolean; // TODO migration del ? -- xld
+  hasQueryControl: boolean; // TODO migration del ? -- xld
+  hasResetControl?: boolean; // TODO migration del ? -- xld
 }
 export const BoardTypeMap = strEnumType(['auto', 'free']);
 export type BoardType = keyof typeof BoardTypeMap;

@@ -80,6 +80,9 @@ export const deleteWidgetsAction = () => (dispatch, getState) => {
     if (widgetType === 'query') {
       dispatch(editBoardStackActions.changeBoardHasQueryControl(false));
     }
+    if (widgetType === 'reset') {
+      dispatch(editBoardStackActions.changeBoardHasResetControl(false));
+    }
   });
   if (childWidgetIds.length > 0) {
     confirm({

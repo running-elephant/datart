@@ -290,6 +290,7 @@ const filterActions = [
   editBoardStackActions.updateWidgetsConfig,
 
   editBoardStackActions.changeBoardHasQueryControl,
+  editBoardStackActions.changeBoardHasResetControl,
 ].map(ele => ele.toString());
 const editBoardStackReducer = undoable(editBoardStackSlice.reducer, {
   undoType: BOARD_UNDO.undo,

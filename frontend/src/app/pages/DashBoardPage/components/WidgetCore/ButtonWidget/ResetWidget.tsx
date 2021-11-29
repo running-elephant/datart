@@ -15,12 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React from 'react';
+import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
+import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
+import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
 export interface CompProps {}
 export const ResetWidget: React.FC<CompProps> = () => {
-  return <Wrap>ResetButton </Wrap>;
+  const widget = useContext(WidgetContext);
+  const { onWidgetsQuery } = useContext(BoardActionContext);
+  const onQuery = e => {
+    e.stopPropagation();
+    // onWidgetsQuery();
+  };
+  return (
+    <Wrap onClick={onQuery}>
+      <span> {widget.config.name}</span>
+    </Wrap>
+  );
 };
 const Wrap = styled.div`
-  display: block;
+  cursor: pointer;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;

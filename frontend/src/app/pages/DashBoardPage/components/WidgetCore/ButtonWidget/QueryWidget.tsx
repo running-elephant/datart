@@ -37,4 +37,6 @@ const Wrap = styled.div`
   cursor: pointer;
   flex: 1;
   display: flex;
+  align-items: center;
+  justify-content: center;
 `;
