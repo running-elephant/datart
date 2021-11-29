@@ -134,7 +134,7 @@ const StyledDirectoryTree = styled(AntTree)`
       }
 
       .ant-tree-checkbox {
-        margin: ${0} ${SPACE} 0 20px;
+        margin: ${SPACE_XS} ${SPACE} 0 0;
       }
     }
     .ant-tree-checkbox {
