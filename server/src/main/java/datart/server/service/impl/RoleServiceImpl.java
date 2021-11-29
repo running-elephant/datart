@@ -19,6 +19,7 @@
 package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.core.entity.ext.UserBaseInfo;
@@ -31,8 +32,6 @@ import datart.security.util.PermissionHelper;
 import datart.server.base.dto.ResourcePermissions;
 import datart.server.base.dto.SubjectPermissions;
 import datart.server.base.dto.ViewPermission;
-import datart.server.base.exception.NotAllowedException;
-import datart.server.base.exception.ParamException;
 import datart.server.base.params.BaseCreateParam;
 import datart.server.base.params.GrantPermissionParam;
 import datart.server.base.params.ViewPermissionParam;
@@ -305,7 +304,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
     public boolean revokeOrgOwner(String orgId, String userId) {
         List<User> users = roleMapper.selectOrgOwners(orgId);
         if (users.size() < 2) {
-            throw new NotAllowedException("At least one organization owner must exist!");
+            Exceptions.msg("");
         }
         securityManager.requireOrgOwner(orgId);
         Role role = roleMapper.selectOrgOwnerRole(orgId);
@@ -335,7 +334,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
             }
         }
         if (orgId.size() > 1) {
-            throw new ParamException("The org id has to be unique");
+            Exceptions.base("The org id has to be unique");
         }
         securityManager.requireOrgOwner(orgId.stream().findFirst().get());
         // delete permission
@@ -510,7 +509,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
             }
         }
         if (orgId.size() != 1) {
-            throw new ParamException("The org id has to be unique");
+            Exceptions.base("The org id has to be unique");
         }
         securityManager.requireOrgOwner(orgId.stream().findAny().get());
         if (!CollectionUtils.isEmpty(viewPermissionParam.getPermissionToCreate())) {

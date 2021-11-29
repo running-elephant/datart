@@ -1,4 +1,4 @@
-package datart.server.base.exception;
+package datart.core.base.exception;
 
 import datart.core.base.exception.BaseException;
 

@@ -18,11 +18,12 @@
 
 package datart.server.config;
 
+import datart.core.common.MessageResolver;
 import datart.security.exception.AuthException;
 import datart.security.exception.PermissionDeniedException;
 import datart.server.base.dto.ResponseData;
-import datart.server.base.exception.NotFoundException;
-import datart.server.base.exception.ParamException;
+import datart.core.base.exception.NotFoundException;
+import datart.core.base.exception.ParamException;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -44,7 +45,7 @@ public class WebExceptionHandler {
     public ResponseData<String> exceptionHandler(ExpiredJwtException e) {
         ResponseData.ResponseDataBuilder<String> builder = ResponseData.builder();
         return builder.success(false)
-                .message(e.getMessage())
+                .message(MessageResolver.getMessage("login.session.timeout"))
                 .exception(e)
                 .build();
     }

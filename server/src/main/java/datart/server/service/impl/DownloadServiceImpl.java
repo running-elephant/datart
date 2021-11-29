@@ -19,6 +19,7 @@ package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.FileUtils;
 import datart.core.common.POIUtils;
 import datart.core.common.TaskExecutor;
@@ -26,7 +27,7 @@ import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.Dataframe;
 import datart.core.entity.Download;
 import datart.core.mappers.ext.DownloadMapperExt;
-import datart.server.base.exception.NotAllowedException;
+import datart.core.base.exception.NotAllowedException;
 import datart.server.base.params.DownloadCreateParam;
 import datart.server.base.params.ViewExecuteParam;
 import datart.server.service.BaseService;
@@ -136,7 +137,7 @@ public class DownloadServiceImpl extends BaseService implements DownloadService 
     public Download downloadFile(String downloadId) {
         Download download = downloadMapper.selectByPrimaryKey(downloadId);
         if (download.getStatus() < 1) {
-            throw new NotAllowedException("下载任务还未完成");
+            Exceptions.tr(NotAllowedException.class, "message.download.not.finished");
         }
         download.setLastDownloadTime(new Date());
         download.setStatus((byte) 2);

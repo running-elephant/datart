@@ -19,6 +19,8 @@ package datart.data.provider;
 
 import datart.core.base.consts.FileFormat;
 import datart.core.base.consts.ValueType;
+import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.CSVParse;
 import datart.core.common.FileUtils;
 import datart.core.common.POIUtils;
@@ -26,13 +28,11 @@ import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.Column;
 import datart.core.data.provider.DataProviderSource;
 import datart.core.data.provider.Dataframe;
-import datart.data.provider.base.DataProviderException;
 import datart.data.provider.jdbc.DataTypeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -72,7 +72,7 @@ public class FileDataProvider extends DefaultDataProvider {
         File file = new File(path);
 
         if (!file.exists()) {
-            throw new FileNotFoundException(path);
+            Exceptions.tr(BaseException.class, "message.file.notfound", file.getPath());
         }
         List<List<Object>> values = new LinkedList<>();
         if (file.isFile()) {
@@ -142,7 +142,8 @@ public class FileDataProvider extends DefaultDataProvider {
             case CSV:
                 return CSVParse.create(path).parse();
             default:
-                throw new DataProviderException("Unsupported file format " + format.getFormat());
+                Exceptions.tr(BaseException.class, "message.unsupported.format", format.getFormat());
+                return null;
         }
 
     }

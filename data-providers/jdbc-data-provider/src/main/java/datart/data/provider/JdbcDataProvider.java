@@ -3,6 +3,7 @@ package datart.data.provider;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.FileUtils;
 import datart.core.data.provider.*;
 import datart.data.provider.base.DataProviderException;
@@ -148,7 +149,7 @@ public class JdbcDataProvider extends DataProvider {
         try {
             SqlParserUtils.parseSnippet(snippet);
         } catch (Exception e) {
-            throw new DataProviderException(e);
+            Exceptions.e(e);
         }
         return true;
     }
@@ -192,10 +193,10 @@ public class JdbcDataProvider extends DataProvider {
                     .collect(Collectors.toList());
 
             if (driverInfos.size() == 0) {
-                throw new DataProviderException("Unsupported dbType " + prop.getDbType());
+                Exceptions.tr(DataProviderException.class, "message.provider.jdbc.dbtype", prop.getDbType());
             }
             if (driverInfos.size() > 1) {
-                throw new DataProviderException("Duplicated dbType " + prop.getDbType());
+                Exceptions.msg("Duplicated dbType " + prop.getDbType());
             }
             JdbcDriverInfo driverInfo = driverInfos.get(0);
             JdbcDataProviderAdapter adapter = null;
@@ -215,7 +216,7 @@ public class JdbcDataProvider extends DataProvider {
                 log.error("Jdbc adapter class load error ", e);
             }
             if (adapter == null) {
-                throw new DataProviderException("Failed to create Data Provider for dbType " + prop.getDbType());
+                Exceptions.tr(DataProviderException.class, "message.provider.jdbc.create.error", prop.getDbType());
             }
             if (init) {
                 adapter.init(prop, driverInfo);
@@ -264,8 +265,9 @@ public class JdbcDataProvider extends DataProvider {
                 Yaml yaml = new Yaml();
                 return yaml.loadAs(inputStream, HashMap.class);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                Exceptions.e(e);
             }
+            return null;
         }
 
         private static Map<String, Map<String, String>> loadYml(File file) {
@@ -273,8 +275,9 @@ public class JdbcDataProvider extends DataProvider {
                 Yaml yaml = new Yaml();
                 return yaml.loadAs(inputStream, HashMap.class);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                Exceptions.e(e);
             }
+            return null;
         }
 
     }
