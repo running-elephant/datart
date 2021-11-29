@@ -17,6 +17,7 @@
  */
 import { DatePicker, Form, FormItemProps } from 'antd';
 import { PickerType } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { formatDateByPickType } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/utils';
 import moment from 'moment';
 import React, { memo, useMemo } from 'react';
 const { RangePicker } = DatePicker;
@@ -58,10 +59,9 @@ export const RangeTimeController: React.FC<TimeSetProps> = memo(
         onChange?.(null);
         return;
       }
-      const formatTemp = 'YYYY-MM-DD HH:mm:ss';
       const newValues = [
-        times?.[0].format(formatTemp),
-        times?.[1].format(formatTemp),
+        formatDateByPickType(pickerType, times?.[0]),
+        formatDateByPickType(pickerType, times?.[1]),
       ];
       onChange?.(newValues);
     };

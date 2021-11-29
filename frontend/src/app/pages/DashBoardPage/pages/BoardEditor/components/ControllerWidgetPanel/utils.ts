@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import {
   ValueOptionType,
   ValueOptionTypes,
@@ -32,7 +33,7 @@ import {
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
 import { DateControllerTypes, NumericalControllerTypes } from './constants';
-import { ControllerConfig } from './types';
+import { ControllerConfig, PickerType } from './types';
 
 export const getStringFacadeOptions = (type: ValueOptionType) => {
   switch (type) {
@@ -278,4 +279,31 @@ export const filterValueTypeByControl = (
     );
   }
   return true;
+};
+
+export const formatDateByPickType = (
+  pickerType: PickerType,
+  momentTime: Moment,
+) => {
+  const formatTemp = 'YYYY-MM-DD HH:mm:ss';
+  if (!momentTime) {
+    return null;
+  }
+
+  switch (pickerType) {
+    case 'dateTime':
+    case 'quarter':
+      return momentTime.format(formatTemp);
+    case 'date':
+    case 'week':
+      return momentTime.set({ h: 0, m: 0, s: 0 }).format(formatTemp);
+    case 'month':
+      return momentTime.set({ date: 1, h: 0, m: 0, s: 0 }).format(formatTemp);
+    case 'year':
+      return momentTime
+        .set({ month: 0, date: 1, h: 0, m: 0, s: 0 })
+        .format(formatTemp);
+    default:
+      return null;
+  }
 };

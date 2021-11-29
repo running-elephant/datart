@@ -17,6 +17,7 @@
  */
 import { DatePicker, Form, FormItemProps } from 'antd';
 import { PickerType } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { formatDateByPickType } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/utils';
 import moment from 'moment';
 import React, { memo } from 'react';
 
@@ -52,12 +53,16 @@ export interface SingleTimeSetProps extends FormItemProps<any> {
 }
 export const TimeController: React.FC<SingleTimeSetProps> = memo(
   ({ pickerType, value, onChange }) => {
-    const _onChange = time => {
+    const _onChange = (time, strTime) => {
       if (!time) {
         return onChange(null);
       }
-      const formatTemp = 'YYYY-MM-DD HH:mm:ss';
-      const newValues = time.format(formatTemp);
+      // console.log('time', time);
+      // console.log('strTime', strTime);
+      // console.log('time-f', time.format('YYYY-MM-DD HH:mm:ss'));
+
+      const newValues = formatDateByPickType(pickerType, time);
+      console.log('newValues', newValues);
       onChange(newValues);
     };
 

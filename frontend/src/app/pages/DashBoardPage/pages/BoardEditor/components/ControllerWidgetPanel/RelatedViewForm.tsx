@@ -136,19 +136,19 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
           rules={[
             {
               validator: async (_, relatedViews: RelatedView[]) => {
-                const trimmedRelatedViews = relatedViews.filter(
-                  item => item.fieldValue && item.fieldValueType,
-                );
-                if (!relatedViews || relatedViews.length < 1) {
-                  return Promise.reject(
-                    new Error('Please Choose at least one widget component'),
-                  );
-                }
-                if (!trimmedRelatedViews || trimmedRelatedViews.length < 1) {
-                  return Promise.reject(
-                    new Error('Please Choose at least one view filed'),
-                  );
-                }
+                // const trimmedRelatedViews = relatedViews.filter(
+                //   item => item.fieldValue && item.fieldValueType,
+                // );
+                // if (!relatedViews || relatedViews.length < 1) {
+                //   return Promise.reject(
+                //     new Error('Please Choose at least one widget component'),
+                //   );
+                // }
+                // if (!trimmedRelatedViews || trimmedRelatedViews.length < 1) {
+                //   return Promise.reject(
+                //     new Error('Please Choose at least one view filed'),
+                //   );
+                // }
                 return Promise.resolve(relatedViews);
               },
             },
