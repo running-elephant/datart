@@ -63,6 +63,7 @@ const StyledDirectoryTree = styled(AntTree)`
     .ant-tree-treenode {
       padding: 0 0 ${SPACE} ${SPACE_XS};
       align-items: center;
+
       .ant-tree-node-content-wrapper {
         display: flex;
         align-items: center;
@@ -117,6 +118,10 @@ const StyledDirectoryTree = styled(AntTree)`
       }
     }
 
+    .ant-tree-checkbox {
+      margin-top: 0;
+    }
+
     &.dropdown {
       min-width: ${SPACE_TIMES(40)};
       padding: ${SPACE};
@@ -132,14 +137,8 @@ const StyledDirectoryTree = styled(AntTree)`
           line-height: 32px;
         }
       }
+    }
 
-      .ant-tree-checkbox {
-        margin: ${SPACE_XS} ${SPACE} 0 0;
-      }
-    }
-    .ant-tree-checkbox {
-      margin-top: 0px;
-    }
     &.medium {
       .ant-tree-switcher {
         line-height: 32px;

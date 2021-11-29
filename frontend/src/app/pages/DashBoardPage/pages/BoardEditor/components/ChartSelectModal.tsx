@@ -22,7 +22,7 @@ import {
   FundFilled,
 } from '@ant-design/icons';
 import { Input, Modal } from 'antd';
-import { Tree } from 'app/components/Tree/index';
+import { Tree } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import { selectWidgetInfoDatachartId } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/selectors';
 import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
