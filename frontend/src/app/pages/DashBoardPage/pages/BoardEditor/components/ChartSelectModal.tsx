@@ -71,7 +71,7 @@ const ChartSelectModalModal: React.FC<IProps> = props => {
         [],
         { getIcon },
       ),
-    [WidgetInfoDatachartIds, dataCharts],
+    [WidgetInfoDatachartIds, dataCharts, getIcon],
   );
 
   const { filteredData: filteredTreeData, debouncedSearch: treeSearch } =
@@ -91,7 +91,7 @@ const ChartSelectModalModal: React.FC<IProps> = props => {
       .filter(
         node => !node.isFolder && !WidgetInfoDatachartIds.includes(node.relId),
       )
-      .map(val => {
+      .forEach(val => {
         RelIds.push(val.relId);
         Ids.push(val.id);
       }); //zh 去除文件类型和已有图表的数据 en: Remove file types and data from existing charts
@@ -102,7 +102,7 @@ const ChartSelectModalModal: React.FC<IProps> = props => {
 
   const setDefaultChartsIds = () => {
     let ChartsIds: any = [];
-    treeData?.map(treenode => {
+    treeData?.forEach(treenode => {
       let checkedlength = 0;
 
       if (treenode.disabled) {
@@ -110,7 +110,7 @@ const ChartSelectModalModal: React.FC<IProps> = props => {
         ChartsIds.push(treenode.id);
       }
 
-      treenode?.children?.map(v => {
+      treenode?.children?.forEach(v => {
         if (v.disabled) {
           //zh dashboard中已经含有该图表 en:The chart is already in the dashboard
           checkedlength = checkedlength + 1;
@@ -127,10 +127,7 @@ const ChartSelectModalModal: React.FC<IProps> = props => {
     return ChartsIds;
   };
 
-  let defaultChartsIds = useMemo(setDefaultChartsIds, [
-    WidgetInfoDatachartIds,
-    treeData,
-  ]);
+  let defaultChartsIds = useMemo(setDefaultChartsIds, [treeData]);
 
   useEffect(() => {
     if (!visible) {
