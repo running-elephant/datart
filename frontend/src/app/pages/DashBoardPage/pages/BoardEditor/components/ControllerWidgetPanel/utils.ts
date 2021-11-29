@@ -19,7 +19,11 @@ import {
   ValueOptionType,
   ValueOptionTypes,
 } from 'app/pages/DashBoardPage/constants';
-import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
+import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+} from 'app/types/ChartDataView';
 import {
   ControllerFacadeTypes,
   ControllerFacadeTypes as Opt,
@@ -27,6 +31,7 @@ import {
 } from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
+import { DateControllerTypes, NumericalControllerTypes } from './constants';
 import { ControllerConfig } from './types';
 
 export const getStringFacadeOptions = (type: ValueOptionType) => {
@@ -256,4 +261,21 @@ export const getRangeValueControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.Between;
   return config;
+};
+
+export const filterValueTypeByControl = (
+  controlType: ControllerFacadeTypes,
+  valueType: any,
+) => {
+  if (NumericalControllerTypes.includes(controlType)) {
+    return [VariableValueTypes.Number, ChartDataViewFieldType.NUMERIC].includes(
+      valueType,
+    );
+  }
+  if (DateControllerTypes.includes(controlType)) {
+    return [VariableValueTypes.Date, ChartDataViewFieldType.DATE].includes(
+      valueType,
+    );
+  }
+  return true;
 };

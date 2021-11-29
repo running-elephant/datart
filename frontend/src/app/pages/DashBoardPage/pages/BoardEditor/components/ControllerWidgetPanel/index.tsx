@@ -349,7 +349,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
       >
         <Container className="datart-split">
           <div>
-            <WidgetControlForm
+            <WidgetControlForm 
               controllerType={controllerType!}
               otherStrFilterWidgets={otherStrFilterWidgets}
               boardType={boardType}
@@ -364,6 +364,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
               onChange={onChangeRelatedWidgets}
             />
             <RelatedViewForm
+              controllerType={controllerType!}
               form={form}
               viewMap={viewMap}
               queryVariables={queryVariables}
