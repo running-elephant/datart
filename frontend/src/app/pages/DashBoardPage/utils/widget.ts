@@ -266,15 +266,15 @@ export const getInitButtonWidgetRect = (boardType: BoardType): RectConfig => {
       x: 0,
       y: 0,
       width: 1,
-      height: 1,
+      height: 2,
     };
   } else {
     // free
     return {
       x: 0,
       y: 0,
-      width: 200,
-      height: 40,
+      width: 150,
+      height: 50,
     };
   }
 };
@@ -724,12 +724,17 @@ export const getOtherStringControlWidgets = (
       return false;
     }
     const content = ele.config.content as ControllerWidgetContent;
-    // return content.fieldValueType === ChartDataViewFieldType.STRING;
-    return true;
+    const strControlTypes = [
+      ControllerFacadeTypes.DropdownList,
+      ControllerFacadeTypes.MultiDropdownList,
+      ControllerFacadeTypes.RadioGroup,
+    ];
+    return strControlTypes.includes(content.type);
   });
   if (!widgetId) {
     return allFilterWidgets;
   } else {
+    // 自己不能关联自己 把自己排除
     return allFilterWidgets.filter(ele => ele.id !== widgetId);
   }
 };
