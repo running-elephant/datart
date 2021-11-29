@@ -18,8 +18,8 @@
 
 package datart.data.provider;
 
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.*;
-import datart.data.provider.base.DataProviderException;
 import datart.data.provider.optimize.DataProviderExecuteOptimizer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -160,7 +160,7 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
         }
         DataProvider dataProvider = cachedDataProviders.get(type);
         if (dataProvider == null) {
-            throw new DataProviderException("No data provider type " + type);
+            Exceptions.msg("No data provider type " + type);
         }
         return dataProvider;
     }

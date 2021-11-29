@@ -16,26 +16,22 @@
  * limitations under the License.
  */
 
-package datart.server.base.exception;
+package datart.core.base.exception;
 
-import datart.core.base.exception.BaseException;
 
-public class ServerException extends BaseException {
+public class NotFoundException extends BaseException {
 
-    public ServerException(String message) {
+    public NotFoundException(String message) {
         super(message);
     }
 
-    public ServerException(String message, int errCode) {
+    public NotFoundException(String message, int errCode) {
         super(message);
-        setErrCode(errCode);
+        this.setErrCode(errCode);
     }
 
-    public ServerException() {
+    public NotFoundException() {
         super();
     }
 
-    public ServerException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

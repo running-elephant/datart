@@ -26,6 +26,8 @@ import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
 import datart.core.base.consts.VariableTypeEnum;
+import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.*;
 import datart.core.entity.RelSubjectColumns;
 import datart.core.entity.Source;
@@ -33,7 +35,6 @@ import datart.core.entity.View;
 import datart.core.mappers.ext.RelSubjectColumnsMapperExt;
 import datart.security.util.AESUtil;
 import datart.server.base.dto.VariableValue;
-import datart.server.base.exception.ServerException;
 import datart.server.base.params.TestExecuteParam;
 import datart.server.base.params.ViewExecuteParam;
 import datart.server.service.BaseService;
@@ -152,8 +153,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
             }
             providerSource.setProperties(properties);
         } catch (Exception e) {
-            log.error("Data Provider configuration resolves error.", e);
-            throw new ServerException("Data Provider configuration resolves error.", e);
+            Exceptions.tr(BaseException.class, "message.provider.config.error");
         }
         return providerSource;
     }
@@ -397,8 +397,9 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
             }
             return columns;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            Exceptions.e(e);
         }
+        return null;
     }
 
     /**

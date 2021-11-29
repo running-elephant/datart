@@ -22,6 +22,7 @@ package datart.server.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import datart.core.base.consts.Const;
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.DataProviderConfigTemplate;
 import datart.core.data.provider.DataProviderSource;
 import datart.core.entity.Source;
@@ -100,7 +101,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         try {
             sourceCreateParam.setConfig(encryptConfig(sourceCreateParam.getType(), sourceCreateParam.getConfig()));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            Exceptions.e(e);
         }
 
         Source source = SourceService.super.create(createParam);
@@ -119,7 +120,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
             String config = encryptConfig(sourceUpdateParam.getType(), sourceUpdateParam.getConfig());
             sourceUpdateParam.setConfig(config);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            Exceptions.e(e);
         }
         DataProviderSource providerSource = new DataProviderSource();
         providerSource.setSourceId(updateParam.getId());

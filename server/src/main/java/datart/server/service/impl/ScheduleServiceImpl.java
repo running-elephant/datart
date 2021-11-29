@@ -19,6 +19,8 @@ package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
 import datart.core.base.consts.JobType;
+import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.Schedule;
 import datart.core.entity.ScheduleLog;
@@ -29,8 +31,6 @@ import datart.security.base.ResourceType;
 import datart.security.base.SubjectType;
 import datart.security.util.PermissionHelper;
 import datart.server.base.dto.ScheduleBaseInfo;
-import datart.server.base.exception.NotAllowedException;
-import datart.server.base.exception.ServerException;
 import datart.server.base.params.BaseCreateParam;
 import datart.server.base.params.BaseUpdateParam;
 import datart.server.base.params.ScheduleCreateParam;
@@ -161,14 +161,14 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     public boolean start(String scheduleId) throws SchedulerException {
         Schedule schedule = retrieve(scheduleId);
         if (schedule.getActive() && scheduler.checkExists(JobKey.jobKey(schedule.getName(), schedule.getOrgId()))) {
-            throw new ServerException("The task is already running");
+            Exceptions.tr(BaseException.class,"message.task.running");
         }
         Date now = new Date();
         if (schedule.getStartDate() != null && now.before(new Date())) {
-            throw new NotAllowedException("任务不在可执行时间内");
+            Exceptions.tr(BaseException.class, "message.task.not.executable");
         }
         if (schedule.getEndDate() != null && now.after(schedule.getEndDate())) {
-            throw new NotAllowedException("任务不在可执行时间内");
+            Exceptions.tr(BaseException.class, "message.task.not.executable");
         }
 
         Trigger trigger = TriggerBuilder.newTrigger()

@@ -19,10 +19,11 @@
 package datart.server.controller;
 
 
+import datart.core.base.exception.Exceptions;
 import datart.core.common.MessageResolver;
 import datart.core.entity.User;
 import datart.security.manager.DatartSecurityManager;
-import datart.server.base.exception.ParamException;
+import datart.core.base.exception.ParamException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -41,7 +42,7 @@ public class BaseController extends MessageResolver {
 
     public void checkBlank(String param, String paramName) {
         if (StringUtils.isBlank(param)) {
-            throw new ParamException(getMessageWithParam("error.param.empty", paramName));
+            Exceptions.tr(ParamException.class, "error.param.empty", paramName);
         }
     }
 

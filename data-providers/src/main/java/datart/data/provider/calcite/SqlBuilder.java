@@ -19,6 +19,7 @@ package datart.data.provider.calcite;
 
 
 import datart.core.base.consts.ValueType;
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.SingleTypedValue;
 import datart.core.data.provider.sql.*;
@@ -283,7 +284,7 @@ public class SqlBuilder {
 
         SqlNode[] sqlNodes = null;
 
-        org.apache.calcite.sql.SqlOperator sqlOp;
+        org.apache.calcite.sql.SqlOperator sqlOp = null;
         switch (operator.getSqlOperator()) {
             case IN:
                 sqlOp = SqlStdOperatorTable.IN;
@@ -370,7 +371,7 @@ public class SqlBuilder {
                 sqlNodes = nodes.toArray(new SqlNode[0]);
                 break;
             default:
-                throw new DataProviderException("Unsupported filtering operation :" + operator);
+                Exceptions.tr(DataProviderException.class, "message.provider.sql.type.unsupported", operator.getSqlOperator().name());
         }
         return new SqlBasicCall(sqlOp, sqlNodes, SqlParserPos.ZERO);
     }
@@ -435,8 +436,9 @@ public class SqlBuilder {
             case COUNT_DISTINCT:
                 return SqlStdOperatorTable.COUNT;
             default:
-                throw new DataProviderException("Unsupported aggregation operation: " + sqlOperator);
+                Exceptions.tr(DataProviderException.class, "message.provider.sql.type.unsupported", sqlOperator.name());
         }
+        return null;
     }
 
 

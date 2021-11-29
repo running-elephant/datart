@@ -2,16 +2,14 @@ package datart.server.service;
 
 import com.google.common.base.CaseFormat;
 import datart.core.base.consts.Const;
+import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
-import datart.core.common.MessageResolver;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.BaseEntity;
 import datart.core.entity.User;
 import datart.core.mappers.ext.CRUDMapper;
 import datart.security.base.ResourceType;
-import datart.server.base.exception.NotFoundException;
-import datart.server.base.exception.ParamException;
-import datart.server.base.exception.ServerException;
 import datart.server.base.params.BaseCreateParam;
 import datart.server.base.params.BaseUpdateParam;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -75,7 +73,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
     @Transactional
     default boolean delete(String id, boolean archive) {
         if (!safeDelete(id)) {
-            throw new RuntimeException("Associated data exists , cannot be deleted!");
+            Exceptions.tr(BaseException.class, "message.delete.error.relation");
         }
         return archive ? archive(id) : delete(id);
     }
@@ -109,7 +107,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
             setStatus.invoke(instance, Const.DATA_STATUS_ARCHIVED);
             getDefaultMapper().updateByPrimaryKeySelective(instance);
         } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            throw new ServerException(String.format("Object %s has no property status", getEntityClz().getSimpleName()));
+            Exceptions.msg(String.format("Object %s has no property status", getEntityClz().getSimpleName()));
         }
         return true;
     }
@@ -125,7 +123,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
             setStatus.invoke(instance, Const.DATA_STATUS_ACTIVE);
             getDefaultMapper().updateByPrimaryKeySelective(instance);
         } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            throw new ServerException(String.format("Object %s has no property status", getEntityClz().getSimpleName()));
+            Exceptions.msg(String.format("Object %s has no property status", getEntityClz().getSimpleName()));
         }
 
         return true;
@@ -156,7 +154,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
 
     default boolean checkUnique(BaseEntity entity) {
         if (!getDefaultMapper().checkUnique(entity)) {
-            throw new ParamException("name already exists!");
+            Exceptions.tr(BaseException.class, "error.param.exists.name");
         }
         return true;
     }
@@ -165,8 +163,9 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
         try {
             return ((Class<E>) getParameterizedType().getActualTypeArguments()[0]).newInstance();
         } catch (Exception e) {
-            throw new ServerException("entity instant exception");
+            Exceptions.msg("entity instant exception");
         }
+        return null;
     }
 
 
@@ -193,8 +192,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
     }
 
     default void notFoundException() {
-        String message = getMessageResolver().getMessages("resource.not-exist", getResourcePropertyName());
-        throw new NotFoundException(message);
+        Exceptions.notFound("resource.not-exist", getResourcePropertyName());
     }
 
 
@@ -219,8 +217,9 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
             }
             return null;
         } catch (Exception e) {
-            throw new ServerException("entity instant exception");
+            Exceptions.msg("entity instant exception");
         }
+        return null;
     }
 
     default boolean safeDelete(String viewId) {
@@ -239,6 +238,4 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
 
     void requirePermission(E entity, int permission);
 
-
-    MessageResolver getMessageResolver();
 }

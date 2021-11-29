@@ -18,6 +18,8 @@
 
 package datart.server.service.impl;
 
+import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
 import datart.core.entity.Organization;
 import datart.core.entity.User;
 import datart.core.common.Application;
@@ -25,7 +27,7 @@ import datart.security.base.InviteToken;
 import datart.security.base.PasswordToken;
 import datart.security.util.JwtUtils;
 import datart.security.util.SecurityUtils;
-import datart.server.base.exception.ServerException;
+import datart.core.base.exception.ServerException;
 import datart.server.service.BaseService;
 import datart.server.service.MailService;
 import lombok.extern.slf4j.Slf4j;
@@ -140,7 +142,7 @@ public class MailServiceImpl extends BaseService implements MailService {
     private MimeMessage createVerifyCodeMimeMessage(User user) throws UnsupportedEncodingException, MessagingException {
         Context context = new Context();
         context.setVariable(VERIFY_CODE, user.getPassword());
-        context.setVariable(MESSAGE, getMessageWithParam("message.user.reset.password.mail.message", user.getUsername(), SecurityUtils.VERIFY_CODE_TIMEOUT_MIN));
+        context.setVariable(MESSAGE, getMessages("message.user.reset.password.mail.message", user.getUsername(), SecurityUtils.VERIFY_CODE_TIMEOUT_MIN));
         String mailContent = templateEngine.process(FIND_PASSWORD_TEMPLATE, context);
         return createMimeMessage(user.getEmail(), getMessage("message.user.reset.password.mail.subject"), mailContent, true);
     }
@@ -196,7 +198,7 @@ public class MailServiceImpl extends BaseService implements MailService {
         if (StringUtils.isBlank(from)) {
             log.error("The mail from address is empty" +
                     ",Please configure spring.mail.username/fromAddress in application properties");
-            throw new ServerException("The mail from address can not be empty");
+            Exceptions.msg("The mail from address can not be empty");
         }
         return from;
     }
@@ -208,7 +210,7 @@ public class MailServiceImpl extends BaseService implements MailService {
 
     public void checkMailSender() {
         if (mailSender == null) {
-            throw new ServerException("Mail Sender not available,check mail config in application-config.yml");
+            Exceptions.tr(BaseException.class, "message.email.sender.error");
         }
     }
 

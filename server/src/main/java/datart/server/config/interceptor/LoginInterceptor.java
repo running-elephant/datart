@@ -20,6 +20,7 @@ package datart.server.config.interceptor;
 
 import datart.core.base.annotations.SkipLogin;
 import datart.core.base.consts.Const;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.MessageResolver;
 import datart.security.exception.AuthException;
 import datart.security.manager.DatartSecurityManager;
@@ -54,7 +55,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
         String token = request.getHeader(Const.TOKEN);
         if (token == null) {
-            throw new AuthException(messageResolver.getMessage("login.not-login"));
+            Exceptions.tr(AuthException.class,"login.not-login");
         }
         token = securityManager.login(token);
         response.setHeader(Const.TOKEN, token);

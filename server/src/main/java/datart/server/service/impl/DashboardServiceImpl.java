@@ -20,6 +20,7 @@ package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.core.mappers.ext.*;
@@ -28,7 +29,7 @@ import datart.security.util.PermissionHelper;
 import datart.server.base.dto.DashboardBaseInfo;
 import datart.server.base.dto.DashboardDetail;
 import datart.server.base.dto.WidgetDetail;
-import datart.server.base.exception.ParamException;
+import datart.core.base.exception.ParamException;
 import datart.server.base.params.*;
 import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -220,7 +221,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     public Folder createWithFolder(BaseCreateParam createParam) {
         DashboardCreateParam param = (DashboardCreateParam) createParam;
         if (!CollectionUtils.isEmpty(folderMapper.checkVizName(param.getOrgId(), param.getParentId(), param.getName()))) {
-            throw new ParamException("name already exists!");
+            Exceptions.tr(ParamException.class,"error.param.exists.name");
         }
         Dashboard dashboard = DashboardService.super.create(createParam);
 

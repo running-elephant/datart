@@ -18,6 +18,8 @@
 
 package datart.server.service.impl;
 
+import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
 import datart.core.data.provider.Dataframe;
 import datart.core.entity.Download;
@@ -27,6 +29,7 @@ import datart.core.entity.View;
 import datart.core.mappers.ext.UserMapperExt;
 import datart.security.base.PasswordToken;
 import datart.security.base.ResourceType;
+import datart.security.exception.PermissionDeniedException;
 import datart.security.util.AESUtil;
 import datart.security.util.SecurityUtils;
 import datart.server.base.dto.DashboardDetail;
@@ -146,7 +149,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
 
         shareVizDetail.setVizType(share.getVizType());
 
-        Object vizDetail;
+        Object vizDetail = null;
 
         Map<String, ShareToken> subVizToken = null;
 
@@ -189,7 +192,8 @@ public class ShareServiceImpl extends BaseService implements ShareService {
                 }
                 break;
             default:
-                throw new RuntimeException("Unsupported share type :" + share.getVizType());
+                Exceptions.tr(BaseException.class, "message.share.unsupported", share.getVizType().name());
+
         }
         shareVizDetail.setVizDetail(vizDetail);
         shareVizDetail.setSubVizToken(subVizToken);
@@ -209,27 +213,27 @@ public class ShareServiceImpl extends BaseService implements ShareService {
     private void validateExecutePermission(ShareToken token, ViewExecuteParam executeParam) {
         Share share = validateBase(token);
         if (!ResourceType.VIEW.equals(share.getVizType()) || !share.getVizId().equals(executeParam.getViewId())) {
-            throw new RuntimeException("execute permission denied");
+            Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.permission.denied");
         }
     }
 
     private void validateVizPermission(ShareToken token, ResourceType vizType, String vizId) {
         Share share = validateBase(token);
         if (!share.getVizType().equals(vizType) || !share.getVizId().equals(vizId)) {
-            throw new RuntimeException("viz permission denied");
+            Exceptions.tr(PermissionDeniedException.class, "message.permission.denied", "viz");
         }
     }
 
     private void validateExpiration(Share share) {
         if (new Date().after(share.getExpiryDate())) {
-            throw new RuntimeException("share has expired");
+            Exceptions.tr(BaseException.class, "message.share.expired");
         }
     }
 
     private void validatePassword(Share share, String password) {
         if (share.isUsePassword()) {
             if (StringUtils.isEmpty(password) || !password.equals(share.getPassword())) {
-                throw new RuntimeException("Incorrect access password");
+                Exceptions.tr(BaseException.class, "message.share.pwd");
             }
         }
     }

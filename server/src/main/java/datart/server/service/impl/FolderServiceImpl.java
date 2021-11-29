@@ -18,14 +18,15 @@
 package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.core.mappers.ext.*;
 import datart.security.base.ResourceType;
 import datart.security.util.PermissionHelper;
-import datart.server.base.exception.NotAllowedException;
-import datart.server.base.exception.NotFoundException;
-import datart.server.base.exception.ParamException;
+import datart.core.base.exception.NotAllowedException;
+import datart.core.base.exception.NotFoundException;
+import datart.core.base.exception.ParamException;
 import datart.server.base.params.*;
 import datart.server.service.BaseService;
 import datart.server.service.FolderService;
@@ -127,7 +128,7 @@ public class FolderServiceImpl extends BaseService implements FolderService {
     public boolean delete(String id) {
         List<Folder> folders = folderMapper.selectByParentId(id);
         if (!CollectionUtils.isEmpty(folders)) {
-            throw new NotAllowedException("folder must be empty");
+            Exceptions.tr(NotAllowedException.class, "resource.folder.delete");
         }
         return FolderService.super.delete(id);
     }
@@ -144,12 +145,13 @@ public class FolderServiceImpl extends BaseService implements FolderService {
             case DASHBOARD:
             case DATACHART:
                 if (!CollectionUtils.isEmpty(folderMapper.checkVizName(orgId, parentId, name))) {
-                    throw new ParamException("name already exists!");
+                    Exceptions.tr(ParamException.class, "error.param.exists.name");
                 }
                 return true;
             default:
-                throw new ParamException("未知的可视化类型" + resourceType);
+                Exceptions.tr(ParamException.class, "error.param.invalid", resourceType.name());
         }
+        return false;
     }
 
     @Override
@@ -160,7 +162,7 @@ public class FolderServiceImpl extends BaseService implements FolderService {
 
         Folder folder = retrieve(updateParam.getId());
         if (folder == null) {
-            throw new NotFoundException("folder not found");
+            Exceptions.notFound("resource.folder");
         }
         // check name
         if (!folder.getName().equals(updateParam.getName())) {
