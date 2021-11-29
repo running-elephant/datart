@@ -197,7 +197,7 @@ export const getInsertedNodeIndex = (
 
   if (treeData?.length) {
     let IndexArr = treeData
-      .filter((v: any) => v.parentId == AddData.parentId)
+      .filter((v: any) => Boolean(v.parentId) === Boolean(AddData.parentId))
       .map(v => Number(v.index) || 0);
     index = IndexArr?.length ? Math.max(...IndexArr) + 1 : 0;
   }
