@@ -252,7 +252,6 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
           config!.controllerDate!,
         );
         let rangePickerType = controllerDate!.pickerType;
-        debugger;
         return (
           <RangeTimeControllerForm
             pickerType={rangePickerType}

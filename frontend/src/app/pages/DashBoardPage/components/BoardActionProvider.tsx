@@ -35,6 +35,7 @@ import {
 import { getWidgetDataAsync } from '../pages/Board/slice/thunk';
 import { Widget } from '../pages/Board/slice/types';
 import { editBoardStackActions } from '../pages/BoardEditor/slice';
+import { editWidgetsQueryAction } from '../pages/BoardEditor/slice/actions/controlActions';
 import {
   getEditWidgetDataAsync,
   toUpdateDashboard,
@@ -60,21 +61,16 @@ export const BoardActionProvider: FC<{ id: string }> = ({
 
     onWidgetsQuery: debounce(() => {
       if (editing) {
-        // dispatch()
-        // dispatch(editBoardStackActions.updateWidget(widget));
+        dispatch(editWidgetsQueryAction({ boardId }));
       } else {
         dispatch(widgetsQueryAction({ boardId, renderMode }));
-        //
       }
     }, 500),
     onWidgetsReset: debounce(() => {
       if (editing) {
-        // dispatch()
-        // dispatch(editBoardStackActions.updateWidget(widget));
+        console.log('--onWidgetsReset');
       } else {
         console.log('--onWidgetsReset');
-        // dispatch(widgetsQueryAction({ boardId, renderMode }));
-        //
       }
     }, 500),
     refreshWidgetsByFilter: debounce((widget: Widget) => {

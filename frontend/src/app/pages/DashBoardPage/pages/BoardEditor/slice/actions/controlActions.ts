@@ -22,7 +22,9 @@ import {
 import { createControlBtn } from 'app/pages/DashBoardPage/utils/widget';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
-import { addWidgetsToEditBoard } from './../thunk';
+import { PageInfo } from './../../../../../MainPage/pages/ViewPage/slice/types';
+import { addWidgetsToEditBoard, getEditWidgetDataAsync } from './../thunk';
+import { HistoryEditBoard } from './../types';
 
 export type BtnActionParams = {
   type: ControllerFacadeTypes | WidgetType;
@@ -59,4 +61,30 @@ export const addControllerAction =
           }),
         );
     }
+  };
+
+export const editWidgetsQueryAction =
+  ({ boardId }) =>
+  async (dispatch, getState) => {
+    const pageInfo: Partial<PageInfo> = {
+      pageNo: 1,
+    };
+
+    const editBoard = getState().editBoard as HistoryEditBoard;
+    const widgetMap = editBoard.stack.present.widgetRecord;
+
+    if (editBoard.boardInfo.id !== boardId) {
+      return;
+    }
+
+    Object.values(widgetMap)
+      .filter(it => it.config.type === 'chart')
+      .forEach(it => {
+        dispatch(
+          getEditWidgetDataAsync({
+            widgetId: it.id,
+            option: { pageInfo },
+          }),
+        );
+      });
   };
