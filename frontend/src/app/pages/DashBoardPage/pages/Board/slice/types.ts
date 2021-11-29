@@ -23,6 +23,7 @@ import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/types/ChartDataView';
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
 import { ChartDataSectionField } from '../../../../../types/ChartConfig';
@@ -33,10 +34,7 @@ import {
   ScaleModeType,
   TextAlignType,
 } from '../../../constants';
-import {
-  ValueTypes,
-  WidgetFilterFormType,
-} from '../../BoardEditor/components/FilterWidgetPanel/types';
+import { ControllerConfig } from '../../BoardEditor/components/ControllerWidgetPanel/types';
 
 export const strEnumType = <T extends string>(o: Array<T>): { [K in T]: K } => {
   return o.reduce((res, key) => {
@@ -125,6 +123,8 @@ export interface WidgetConf {
   index: number;
   tabId?: string; //记录在父容器tab的位置
   name: string;
+  nameConfig: WidgetNameConfig;
+  padding?: WidgetPadding;
   type: WidgetType;
   autoUpdate: boolean;
   frequency: number; // 定时同步频率
@@ -132,8 +132,6 @@ export interface WidgetConf {
   background: BackgroundConfig;
   border: BorderConfig;
   content: WidgetContent;
-  nameConfig: WidgetNameConfig;
-  padding?: WidgetPadding;
   tabIndex?: number; // 在tab 等容器widget里面的排序索引
   linkageConfig?: LinkageConfig; //联动设置
   jumpConfig?: JumpConfig; // 跳转 设置
@@ -208,12 +206,15 @@ export interface Relation {
   sourceId: string;
   id?: string;
 }
-
+/**
+ * @controlToWidget Controller associated widgets
+ * @controlToControl Controller associated Controller visible
+ * @widgetToWidget widget inOther WidgetContainer
+ * */
 export interface RelationConfig {
-  type: 'filterToWidget' | 'filterToFilter' | 'widgetToWidget';
-  filterToWidget?: {
+  type: 'controlToWidget' | 'controlToControl' | 'widgetToWidget';
+  controlToWidget?: {
     widgetRelatedViewIds: string[];
-    widgetFilterCovered: boolean;
   };
   widgetToWidget?: {
     sameView: boolean;
@@ -223,7 +224,7 @@ export interface RelationConfig {
 }
 export interface RelatedView {
   viewId: string;
-  filterFieldCategory: ChartDataViewFieldCategory;
+  relatedCategory: ChartDataViewFieldCategory;
   fieldValue: string | number | Date | undefined;
   fieldValueType: ChartDataViewFieldType | undefined;
 }
@@ -235,11 +236,11 @@ export interface ServerRelation extends Omit<Relation, 'config'> {
  * 通用
  */
 // 组件配置
+// TODO xld migration about filter
 export type WidgetContent =
   | MediaWidgetContent
   | ContainerWidgetContent
-  | FilterWidgetContent
-  | ExplorerWidgetConfig
+  | ControllerWidgetContent
   | ChartWidgetContent;
 
 export interface ChartWidgetContent {
@@ -291,39 +292,28 @@ export interface ContainerItem {
   config?: any;
 }
 // 控制器组件配置
-export interface FilterWidgetContent {
-  type: WidgetFilterTypes;
-  fieldValueType: ValueTypes;
+export interface ControllerWidgetContent {
+  type: ControllerFacadeTypes;
+  name: string;
   relatedViews: RelatedView[];
-  widgetFilter: WidgetFilterFormType;
-  hasVariable: boolean;
-}
-// 分析探索组件配置
-export interface ExplorerWidgetConfig {
-  type: 'string';
+  config: ControllerConfig;
 }
 
 export const WidgetTypeMap = strEnumType([
   'chart',
   'media',
   'container',
-  'filter',
-  'explorer',
+  'controller',
 ]);
 export type WidgetType = keyof typeof WidgetTypeMap;
 export declare const ContainerWidgetTypes: ['tab', 'carousel'];
-export declare const ControlWidgetTypes: ['fixed', 'auto'];
-export enum WidgetFilterTypes {
-  Fixed = 'FIXED',
-  Free = 'FREE',
-}
+
 export type LightWidgetType =
   | ContainerWidgetType
   | MediaWidgetType
-  | WidgetFilterTypes;
+  | ControllerFacadeTypes;
 
 export type ContainerWidgetType = typeof ContainerWidgetTypes[number];
-export type FilterWidgetType = typeof ControlWidgetTypes[number];
 
 /**
  * widgetChart 属于board 内部 配置存在widget 表内,
@@ -415,8 +405,8 @@ export interface BoardInfo {
   clipboardWidgets: Record<string, WidgetOfCopy>;
   layouts: Layout[]; // 删除
   widgetIds: string[]; // board保存的时候 区分那些是删除的，哪些是新增的
-  filterPanel: WidgetPanel; //
-  linkagePanel: WidgetPanel;
+  controllerPanel: WidgetControllerPanelParams; //
+  linkagePanel: WidgetPanelParams;
   linkFilter: BoardLinkFilter[];
   jumpPanel: JumpPanel; //
   chartEditorProps?: ChartEditorProps | undefined;
@@ -434,9 +424,14 @@ export interface BoardLinkFilter {
  * @description 'filter'
  */
 
-export interface WidgetPanel {
+export interface WidgetPanelParams {
   type: 'add' | 'edit' | 'hide';
   widgetId: string;
+}
+export interface WidgetControllerPanelParams {
+  type: 'add' | 'edit' | 'hide';
+  widgetId: string;
+  controllerType?: ControllerFacadeTypes;
 }
 
 export interface JumpPanel {

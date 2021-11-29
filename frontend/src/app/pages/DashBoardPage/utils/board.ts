@@ -112,7 +112,7 @@ export const getInitBoardInfo = (id: string, widgetIds: string[] = []) => {
     isDroppable: false,
     clipboardWidgets: {},
     widgetIds: widgetIds,
-    filterPanel: {
+    controllerPanel: {
       type: 'hide',
       widgetId: '',
     },

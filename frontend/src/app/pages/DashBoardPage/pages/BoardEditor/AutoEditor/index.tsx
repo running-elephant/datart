@@ -33,12 +33,10 @@
  * limitations under the License.
  */
 
-import { useSplitSizes } from 'app/hooks/useSplitSizes';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import { dispatchResize } from 'utils/utils';
-import HeaderBar from '../components/HeaderBar/HeaderBar';
+import BoardToolBar from '../components/BoardToolBar/BoardToolBar';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
 import WorkSpace from './WorkSpace';
@@ -50,21 +48,9 @@ const AutoBoardEditor: React.FC<{}> = () => {
     dispatch(editDashBoardInfoActions.changeShowBlockMask(true));
   };
 
-  const { sizes, setSizes } = useSplitSizes({
-    limitedSide: 0,
-    range: [200, Infinity],
-  });
-  const siderDragEnd = useCallback(
-    sizes => {
-      setSizes(sizes);
-      dispatchResize();
-    },
-
-    [setSizes],
-  );
   return (
     <Wrapper onClick={clearSelectedWidgets}>
-      <HeaderBar />
+      <BoardToolBar />
       <Editor>
         <WorkSpace />
         <SlideSetting />

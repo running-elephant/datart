@@ -20,13 +20,12 @@ import { ChartEditorBaseProps } from 'app/components/ChartEditor';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   ContainerWidgetContent,
+  ControllerWidgetContent,
   Dashboard,
   DataChart,
-  FilterWidgetContent,
   RelatedView,
   Relation,
   Widget,
-  WidgetFilterTypes,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import {
@@ -34,12 +33,13 @@ import {
   createWidget,
 } from 'app/pages/DashBoardPage/utils/widget';
 import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import produce from 'immer';
 import { RootState } from 'types';
 import { v4 as uuidv4 } from 'uuid';
 import { editBoardStackActions, editDashBoardInfoActions } from '.';
 import { BoardType } from '../../Board/slice/types';
-import { WidgetFilterFormType } from './../components/FilterWidgetPanel/types';
+import { ControllerConfig } from '../components/ControllerWidgetPanel/types';
 import { addWidgetsToEditBoard, getEditWidgetDataAsync } from './thunk';
 import { HistoryEditBoard } from './types';
 
@@ -123,16 +123,16 @@ export const widgetToPositionAction =
     dispatch(editBoardStackActions.changeTwoWidgetIndex({ curId, targetId }));
   };
 
-export const updateWidgetFilterAction =
+export const updateWidgetControllerAction =
   (params: {
     boardId: string;
     boardType: BoardType;
     relations: Relation[];
-    filterName?: string;
+    name?: string;
     fieldValueType: ChartDataViewFieldType;
-    filterPositionType: WidgetFilterTypes;
+    controllerFacadeType: ControllerFacadeTypes;
     views: RelatedView[];
-    widgetFilter: WidgetFilterFormType;
+    config: ControllerConfig;
     hasVariable?: boolean;
   }) =>
   async (dispatch, getState) => {
@@ -140,24 +140,23 @@ export const updateWidgetFilterAction =
       boardId,
       boardType,
       views,
-      widgetFilter,
-      filterPositionType,
+      config,
+      controllerFacadeType,
       relations,
       fieldValueType,
-      filterName,
+      name,
       hasVariable,
     } = params;
-    const content: FilterWidgetContent = {
-      type: filterPositionType || WidgetFilterTypes.Free,
+    const content: ControllerWidgetContent = {
+      type: controllerFacadeType,
       relatedViews: views,
-      fieldValueType,
-      widgetFilter: widgetFilter,
-      hasVariable: hasVariable || false,
+      name: name || 'newController',
+      config: config,
     };
 
     const widgetConf = createInitWidgetConfig({
-      name: filterName || 'newFilter',
-      type: 'filter',
+      name: name || 'newController',
+      type: 'controller',
       content: content,
       boardType: boardType,
     });
@@ -171,9 +170,10 @@ export const updateWidgetFilterAction =
     });
     dispatch(addWidgetsToEditBoard([widget]));
     dispatch(
-      editDashBoardInfoActions.changeFilterPanel({
+      editDashBoardInfoActions.changeControllerPanel({
         type: 'hide',
         widgetId: '',
+        controllerType: undefined,
       }),
     );
   };

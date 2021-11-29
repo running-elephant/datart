@@ -25,7 +25,7 @@ import { BoardProvider } from '../../components/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
 import AutoEditor from './AutoEditor/index';
-import FilterWidgetPanel from './components/FilterWidgetPanel';
+import FilterWidgetPanel from './components/ControllerWidgetPanel';
 import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
 import FreeEditor from './FreeEditor/index';
@@ -36,8 +36,6 @@ import {
   selectEditBoard,
 } from './slice/selectors';
 import { fetchEditBoardDetail } from './slice/thunk';
-
-// import { loadEditBoardDetail } from './slice/thunk';
 
 export const BoardEditor: React.FC<{
   dashboardId: string;
@@ -53,7 +51,6 @@ export const BoardEditor: React.FC<{
     allowManage,
     onCloseBoardEditor,
   }) => {
-    // const { boardId } = useParams<{ boardId: string }>();
     const dashboardId = boardId;
     const dispatch = useDispatch();
     const dashboard = useSelector(selectEditBoard);
