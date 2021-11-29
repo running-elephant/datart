@@ -160,7 +160,7 @@ export const getInitWidgetController = (
     case ControllerFacadeTypes.RangeSlider:
       return getRangeSliderControllerConfig();
     case ControllerFacadeTypes.RadioGroup:
-      return getTimeControllerConfig();
+      return getRadioGroupControllerConfig();
     case ControllerFacadeTypes.Slider:
       return getSliderControllerConfig();
     case ControllerFacadeTypes.DropdownList:
@@ -228,7 +228,8 @@ export const getSliderControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.Equal;
   config.minValue = 1;
-  config.maxValue = 200;
+  config.maxValue = 100;
+  config.controllerValues = [1];
   config.sliderConfig = {
     step: 1,
     range: false,
@@ -241,7 +242,7 @@ export const getRangeSliderControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.Between;
   config.minValue = 1;
-  config.maxValue = 200;
+  config.maxValue = 100;
   config.sliderConfig = {
     step: 1,
     range: true,
