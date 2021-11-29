@@ -185,6 +185,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         }
         QueryScript queryScript = QueryScript.builder()
                 .test(true)
+                .sourceId(source.getId())
                 .script(testExecuteParam.getScript())
                 .variables(variables)
                 .build();
@@ -202,7 +203,6 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
     @Override
     public Dataframe execute(ViewExecuteParam viewExecuteParam) throws Exception {
-
         if (viewExecuteParam.isEmpty()) {
             return Dataframe.empty();
         }
@@ -222,6 +222,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
         QueryScript queryScript = QueryScript.builder()
                 .test(false)
+                .sourceId(source.getId())
                 .script(view.getScript())
                 .variables(variables)
                 .schema(parseSchema(view.getModel()))

@@ -36,6 +36,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.SimpleResultSet;
 
 import java.sql.*;
@@ -49,7 +50,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LocalDB {
 
-    private static final String MEM_URL = "jdbc:h2:mem:/LOG=0;MODE=MySQL;DATABASE_TO_UPPER=false;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0";
+    private static final String MEM_URL = "jdbc:h2:mem:/LOG=0;DATABASE_TO_UPPER=false;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0";
 
     private static String fileUrl;
 
@@ -61,19 +62,32 @@ public class LocalDB {
 
     private static final String INSERT_SQL = "INSERT INTO `%s` VALUES %s";
 
-    private static final String CREATE_TEMP_TABLE = "CREATE VIEW `%s` AS (SELECT * FROM FUNCTION_TABLE('%s'))";
+    private static final String CREATE_TEMP_TABLE = "CREATE TABLE IF NOT EXISTS `%s` AS (SELECT * FROM FUNCTION_TABLE('%s'))";
 
     private static final int MAX_INSERT_BATCH = 5_000;
+
+    private static final String CACHE_EXPIRE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS `cache_expire` ( `source_id` VARCHAR(128),`expire_time` DATETIME )";
+
+    private static final String SET_EXPIRE_SQL = "INSERT INTO `cache_expire` VALUES( '%s', PARSEDATETIME('%s','%s')) ";
+
+    private static final String DELETE_EXPIRE_SQL = "DELETE FROM `cache_expire` WHERE `source_id`='%s' ";
 
     private static final Map<String, Dataframe> TEMP_RS_CACHE = new ConcurrentHashMap<>();
 
     static {
+        init();
+    }
+
+    private static void init() {
         try {
             Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException e) {
-            log.error("H2 driver not found", e);
+            try (Connection connection = getConnection(true, null)) {
+                Statement statement = connection.createStatement();
+                statement.execute(CACHE_EXPIRE_TABLE_SQL);
+            }
+        } catch (Exception e) {
+            log.error("H2 init error", e);
         }
-
     }
 
     /**
@@ -126,6 +140,8 @@ public class LocalDB {
             }
         });
 
+        createFunctionTableIfNotExists(connection);
+
         TEMP_RS_CACHE.put(dataframe.getId(), dataframe);
         // register temporary table
         String sql = String.format(CREATE_TEMP_TABLE, dataframe.getName(), dataframe.getId());
@@ -145,11 +161,13 @@ public class LocalDB {
         try {
             Statement statement = connection.createStatement();
             statement.execute("CREATE ALIAS FUNCTION_TABLE  FOR \"datart.data.provider.local.LocalDB.dataframeTable\"");
-        } catch (Exception e) {
-            log.warn(e.getMessage());
+        } catch (SQLException ignored) {
         }
     }
 
+    public static Dataframe executeLocalQuery(QueryScript queryScript, ExecuteParam executeParam, List<Dataframe> srcData) throws Exception {
+        return executeLocalQuery(queryScript, executeParam, srcData, false, null);
+    }
 
     /**
      * 对给定的数据进行本地聚合：将原始数据插入到H2数据库，然后在H2数据库上执行SQL进行数据查询
@@ -160,25 +178,22 @@ public class LocalDB {
      * @param srcData      原始数据
      * @return 查询脚本+执行参数 执行后结果
      */
-    public static Dataframe executeLocalQuery(QueryScript queryScript, ExecuteParam executeParam, boolean persistent, List<Dataframe> srcData) throws Exception {
+    public static Dataframe executeLocalQuery(QueryScript queryScript, ExecuteParam executeParam, List<Dataframe> srcData, boolean persistent, java.util.Date expire) throws Exception {
         if (queryScript == null) {
             // 直接以指定数据源为表进行查询，生成一个默认的SQL查询全部数据
             queryScript = new QueryScript();
             queryScript.setScript(String.format(SELECT_START_SQL, srcData.get(0).getName()));
             queryScript.setVariables(Collections.emptyList());
         }
-        return persistent ? executeInLocalDB(queryScript, executeParam, srcData) : executeInMemDB(queryScript, executeParam, srcData);
+        return persistent ? executeInLocalDB(queryScript, executeParam, srcData, expire) : executeInMemDB(queryScript, executeParam, srcData);
     }
 
     /**
      * 非持久化查询，通过函数表注册数据为临时表，执行一次后丢弃表数据。
      */
     private static Dataframe executeInMemDB(QueryScript queryScript, ExecuteParam executeParam, List<Dataframe> srcData) throws Exception {
-        Connection connection = getConnection(false);
+        Connection connection = getConnection(false, queryScript.getSourceId());
         try {
-
-            createFunctionTableIfNotExists(connection);
-
             for (Dataframe dataframe : srcData) {
                 registerDataAsTable(dataframe, connection);
             }
@@ -199,17 +214,63 @@ public class LocalDB {
     /**
      * 持久化查询，将数据插入到H2表中，再进行查询
      */
-    private static Dataframe executeInLocalDB(QueryScript queryScript, ExecuteParam executeParam, List<Dataframe> srcData) throws Exception {
-        try (Connection connection = getConnection(true)) {
-            try {
+    private static Dataframe executeInLocalDB(QueryScript queryScript, ExecuteParam executeParam, List<Dataframe> srcData, java.util.Date expire) throws Exception {
+        try (Connection connection = getConnection(true, queryScript.getSourceId())) {
+            if (CollectionUtils.isNotEmpty(srcData)) {
+
                 for (Dataframe dataframe : srcData) {
-                    insertTableData(dataframe, connection);
+                    registerDataAsTable(dataframe, connection);
                 }
-            } catch (Exception e) {
+
+                if (expire != null) {
+                    setCacheExpire(queryScript.getSourceId(), expire);
+                }
 
             }
             return execute(connection, queryScript, executeParam);
         }
+    }
+
+    /**
+     * 检查数据源缓存是否过期。如果过期,会删除缓存
+     *
+     * @param sourceId source 唯一标识
+     */
+    public static boolean checkCacheExpired(String sourceId) throws SQLException {
+        try (Connection connection = getConnection(true, null)) {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM `cache_expire` WHERE `source_id`='" + sourceId + "'");
+            if (resultSet.next()) {
+                Timestamp cacheExpire = resultSet.getTimestamp("expire_time");
+                if (cacheExpire.after(new java.util.Date())) {
+                    return false;
+                }
+                clearCache(sourceId);
+            }
+        }
+        return true;
+    }
+
+    private static void setCacheExpire(String sourceId, java.util.Date date) throws SQLException {
+        try (Connection connection = getConnection(true, null)) {
+            Statement statement = connection.createStatement();
+            // delete first
+            statement.execute(String.format(DELETE_EXPIRE_SQL, statement));
+            // insert expire
+            String sql = String.format(SET_EXPIRE_SQL, sourceId, DateFormatUtils.format(date, Const.DEFAULT_DATE_FORMAT), Const.DEFAULT_DATE_FORMAT);
+            statement.execute(sql);
+        }
+    }
+
+    public static void clearCache(String sourceId) throws SQLException {
+        try (Connection connection = getConnection(true, null)) {
+            connection.createStatement().execute(String.format(DELETE_EXPIRE_SQL, sourceId));
+            DeleteDbFiles.execute(getDbFileBasePath(), toDatabase(sourceId), false);
+        }
+    }
+
+    private static String toDatabase(String sourceId) {
+        return "D" + sourceId;
     }
 
     private static Dataframe execute(Connection connection, QueryScript queryScript, ExecuteParam executeParam) throws Exception {
@@ -243,6 +304,7 @@ public class LocalDB {
         if (dataframe == null) {
             return;
         }
+//        DeleteDbFiles.execute();
         createTable(dataframe.getName(), dataframe.getColumns(), connection);
 
         List<String> values = createInsertValues(dataframe.getRows(), dataframe.getColumns());
@@ -254,8 +316,9 @@ public class LocalDB {
         }
     }
 
-    private static Connection getConnection(boolean persistent) throws SQLException {
-        return persistent ? DriverManager.getConnection(getFileUrl()) : DriverManager.getConnection(MEM_URL);
+    private static Connection getConnection(boolean persistent, String database) throws SQLException {
+        String url = persistent ? getDatabaseUrl(database) : MEM_URL;
+        return DriverManager.getConnection(url);
     }
 
     private static String tableCreateSQL(String name, List<Column> columns) {
@@ -305,11 +368,17 @@ public class LocalDB {
         }).collect(Collectors.toList());
     }
 
-    private static String getFileUrl() {
-        if (fileUrl != null) {
-            return fileUrl;
+    private static String getDatabaseUrl(String database) {
+        if (database == null) {
+            database = "datart_meta";
+        } else {
+            database = toDatabase(database);
         }
-        return fileUrl = String.format("jdbc:h2:file:%sh2/datart_temp", Application.getFileBasePath());
+        return fileUrl = String.format("jdbc:h2:file:%s/%s;LOG=0;DATABASE_TO_UPPER=false;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0", getDbFileBasePath(), database);
+    }
+
+    private static String getDbFileBasePath() {
+        return Application.getFileBasePath() + "h2/dbs";
     }
 
 }

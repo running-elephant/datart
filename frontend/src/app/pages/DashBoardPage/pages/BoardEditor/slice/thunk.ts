@@ -4,8 +4,8 @@ import { fetchBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thun
 import {
   BoardState,
   ContainerWidgetContent,
+  ControllerWidgetContent,
   DataChart,
-  FilterWidgetContent,
   getDataOption,
   SaveDashboard,
   ServerDatachart,
@@ -101,16 +101,20 @@ export const fetchEditBoardDetail = createAsyncThunk<
 
     const dashboard = getDashBoardByResBoard(data);
 
-    const { datacharts: serverDataCharts, views: serverViews, widgets } = data;
+    const {
+      datacharts: serverDataCharts,
+      views: serverViews,
+      widgets: serverWidgets,
+    } = data;
     // TODO
-    // const wrapedChart = getWidgetMapByServer(widgets);
     const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
     const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(
-      widgets,
+      serverWidgets,
       dataCharts,
     );
-    const widgetInfoMap = getWidgetInfoMapByServer(widgets);
-    const widgetIds = widgets.map(w => w.id);
+    const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
+    // TODO xld migration about filter
+    const widgetIds = serverWidgets.map(w => w.id);
     const boardInfo = getInitBoardInfo(dashboard.id, widgetIds);
     // datacharts
 
@@ -348,7 +352,7 @@ export const getEditWidgetDataAsync = createAsyncThunk<
     if (!curWidget) return null;
 
     switch (curWidget.config.type) {
-      case 'filter':
+      case 'controller':
         await dispatch(getEditFilterDataAsync(curWidget));
         return null;
       case 'media':
@@ -367,15 +371,12 @@ export const getEditFilterDataAsync = createAsyncThunk<
   null,
   Widget,
   { state: RootState }
->('editBoard/getFilterDataAsync', async (widget, { getState, dispatch }) => {
-  const content = widget.config.content as FilterWidgetContent;
-  const widgetFilter = content.widgetFilter;
-  if (
-    widgetFilter.assistViewFields &&
-    Array.isArray(widgetFilter.assistViewFields)
-  ) {
+>('editBoard/getControllerOptions', async (widget, { getState, dispatch }) => {
+  const content = widget.config.content as ControllerWidgetContent;
+  const config = content.config;
+  if (config.assistViewFields && Array.isArray(config.assistViewFields)) {
     // 请求
-    const [viewId, viewField] = widgetFilter.assistViewFields;
+    const [viewId, viewField] = config.assistViewFields;
     const dataset = await getDistinctFields(
       viewId,
       viewField,

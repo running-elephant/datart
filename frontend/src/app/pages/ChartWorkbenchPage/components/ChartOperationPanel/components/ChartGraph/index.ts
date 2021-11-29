@@ -42,6 +42,7 @@ import ScoreChart from './ScoreChart';
 import StackAreaChart from './StackAreaChart';
 import StackBarChart from './StackBarChart';
 import StackColumnChart from './StackColumnChart';
+import WaterfallChart from './WaterfallChart';
 import WordCloudChart from './WordCloudChart';
 
 const WidgetPlugins = {
@@ -72,5 +73,6 @@ const WidgetPlugins = {
   WordCloudChart,
   NormalOutlineMapChart,
   ScatterOutlineMapChart,
+  WaterfallChart,
 };
 export default WidgetPlugins;

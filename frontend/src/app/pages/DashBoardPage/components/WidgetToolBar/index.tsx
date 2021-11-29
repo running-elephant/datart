@@ -47,7 +47,7 @@ const WidgetToolBar: FC<WidgetToolBarProps> = memo(({ widgetType }) => {
   };
   const renderedIcon = () => {
     if (boardType === 'free') return null;
-    if (widget.config.type === 'filter') return null;
+    if (widget.config.type === 'controller') return null;
     return rendered ? null : (
       <Tooltip title="等待加载">
         <ClockCircleOutlined style={{ color: PRIMARY }} />
