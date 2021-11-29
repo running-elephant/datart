@@ -19,10 +19,10 @@ package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
 import datart.core.common.FileUtils;
 import datart.core.entity.*;
-import datart.server.base.exception.ParamException;
 import datart.server.service.BaseService;
 import datart.server.service.FileService;
 import datart.server.service.OrgService;
@@ -52,8 +52,9 @@ public class FileServiceImpl extends BaseService implements FileService {
             case DATA_SOURCE:
                 return saveAsDatasource(fileOwner, ownerId, file);
             default:
-                throw new ParamException("unknown file type");
+                Exceptions.msg("unknown file type " + fileOwner);
         }
+        return null;
     }
 
 

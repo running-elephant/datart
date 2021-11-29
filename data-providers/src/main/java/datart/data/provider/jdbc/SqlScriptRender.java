@@ -20,6 +20,7 @@ package datart.data.provider.jdbc;
 
 import com.google.common.collect.Iterables;
 import datart.core.base.consts.ValueType;
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.QueryScript;
 import datart.core.data.provider.ScriptVariable;
@@ -90,7 +91,7 @@ public class SqlScriptRender extends ScriptRender {
         try {
             sqlNode = parseSql(srcSql);
         } catch (SqlParseException e) {
-            throw new DataProviderException(e);
+            Exceptions.e(e);
         }
         SqlVariableVisitor visitor = new SqlVariableVisitor(sqlDialect, srcSql, variableQuote, variableMap);
         sqlNode.accept(visitor);
@@ -125,7 +126,7 @@ public class SqlScriptRender extends ScriptRender {
             if (ValueType.FRAGMENT.equals(variable.getValueType())) {
                 int size = Iterables.size(variable.getValues());
                 if (size != 1) {
-                    throw new RuntimeException("size of expression type variable values must be one .got " + size);
+                    Exceptions.tr(DataProviderException.class, "message.provider.variable.expression.size", size + ":" + variable.getValues());
                 }
                 script = script.replace(getVariablePattern(variable.getName()), Iterables.get(variable.getValues(), 0));
             }
@@ -135,7 +136,7 @@ public class SqlScriptRender extends ScriptRender {
         final String selectSql0 = findSelectSql(script);
 
         if (StringUtils.isEmpty(selectSql0)) {
-            throw new DataProviderException("No valid query statement");
+            Exceptions.tr(DataProviderException.class,"message.no.valid.sql");
         }
 
         String selectSql = cleanupSql(selectSql0);
@@ -169,7 +170,7 @@ public class SqlScriptRender extends ScriptRender {
                 continue;
             }
             if (SqlValidateUtils.validateQuery(sqlNode) && selectSql != null) {
-                throw new DataProviderException("There can only be one query statement in the script.");
+                Exceptions.tr(DataProviderException.class, "message.provider.sql.multi.query");
             }
             selectSql = sql;
         }

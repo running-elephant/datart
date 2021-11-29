@@ -21,9 +21,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import datart.core.base.consts.ValueType;
+import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.Column;
 import datart.core.data.provider.Dataframe;
-import datart.data.provider.base.DataProviderException;
 import datart.data.provider.jdbc.DataTypeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -33,7 +34,6 @@ import org.springframework.util.CollectionUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -54,12 +54,12 @@ public class ResponseJsonParser implements HttpResponseParser {
             for (int i = 0; i < split.length - 1; i++) {
                 jsonObject = jsonObject.getJSONObject(split[i]);
                 if (jsonObject == null) {
-                    throw new DataProviderException("property " + targetPropertyName + " not found");
+                    Exceptions.tr(BaseException.class, "message.provider.http.property.miss", targetPropertyName);
                 }
             }
             array = jsonObject.getJSONArray(split[split.length - 1]);
             if (array == null) {
-                throw new DataProviderException("property " + targetPropertyName + " not found");
+                Exceptions.tr(BaseException.class, "message.provider.http.property.miss", targetPropertyName);
             }
         }
         Dataframe dataframe = new Dataframe();

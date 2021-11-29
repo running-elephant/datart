@@ -18,11 +18,11 @@
 package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.security.base.ResourceType;
 import datart.server.base.dto.*;
-import datart.server.base.exception.ParamException;
 import datart.server.base.params.*;
 import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -116,7 +116,8 @@ public class VizServiceImpl extends BaseService implements VizService {
             case STORYBOARD:
                 return storyboardService.updateStatus(vizId, Const.VIZ_PUBLISH);
             default:
-                throw new ParamException("不支持的可视化数据类型:" + resourceType);
+                Exceptions.msg("unknown viz type " + resourceType);
+                return false;
         }
     }
 
@@ -131,7 +132,8 @@ public class VizServiceImpl extends BaseService implements VizService {
             case STORYBOARD:
                 return storyboardService.updateStatus(vizId, Const.DATA_STATUS_ACTIVE);
             default:
-                throw new ParamException("不支持的可视化数据类型:" + resourceType);
+                Exceptions.msg("unknown viz type " + resourceType);
+                return false;
         }
     }
 
@@ -204,7 +206,7 @@ public class VizServiceImpl extends BaseService implements VizService {
             case DATACHART:
                 storypageDetail.setVizDetail(datachartService.getDatachartDetail(storypage.getRelId()));
             default:
-                throw new ParamException("不支持的可视化数据类型:" + storypage.getRelType());
+                Exceptions.msg("unknown viz type " + storypage.getRelType());
         }
         return storypageDetail;
     }
@@ -317,7 +319,8 @@ public class VizServiceImpl extends BaseService implements VizService {
                 storyboard.setStatus(Const.DATA_STATUS_ACTIVE);
                 return 1 == storyboardService.getDefaultMapper().updateByPrimaryKey(storyboard);
             default:
-                throw new ParamException("未知的可视化应用类型");
+                Exceptions.msg("unknown viz type");
+                return false;
         }
 
     }
