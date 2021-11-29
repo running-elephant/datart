@@ -18,7 +18,6 @@
 
 import { Form } from 'antd';
 import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetDataContext } from 'app/pages/DashBoardPage/contexts/WidgetDataContext';
@@ -58,8 +57,6 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   const [form] = Form.useForm();
 
   const { renderedWidgetById } = useContext(BoardContext);
-  const { config: boardConfig } = useContext(BoardConfigContext);
-  const { hasQueryControl } = boardConfig;
 
   const {
     data: { rows },
@@ -116,12 +113,9 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         ).config.controllerValues = _values;
       });
       widgetUpdate(nextWidget);
-
-      if (!hasQueryControl) {
-        refreshWidgetsByFilter(nextWidget);
-      }
+      refreshWidgetsByFilter(nextWidget);
     },
-    [form, hasQueryControl, refreshWidgetsByFilter, widget, widgetUpdate],
+    [form, refreshWidgetsByFilter, widget, widgetUpdate],
   );
 
   // const onSqlOperatorAndValues = useCallback(
@@ -141,7 +135,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   const onRangeTimeChange = useCallback(
     (timeValues: string[] | null) => {
       const nextFilterDate: ControllerDate = {
-        pickerType: 'date',
+        ...controllerDate!,
         startTime: {
           relativeOrExact: RelativeOrExactTime.Exact,
           exactValue: timeValues?.[0],
@@ -157,11 +151,9 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         ).config.controllerDate = nextFilterDate;
       });
       widgetUpdate(nextWidget);
-      if (!hasQueryControl) {
-        refreshWidgetsByFilter(nextWidget);
-      }
+      refreshWidgetsByFilter(nextWidget);
     },
-    [hasQueryControl, refreshWidgetsByFilter, widget, widgetUpdate],
+    [controllerDate, refreshWidgetsByFilter, widget, widgetUpdate],
   );
 
   const onTimeChange = useCallback(
@@ -179,17 +171,9 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         ).config.controllerDate = nextFilterDate;
       });
       widgetUpdate(nextWidget);
-      if (!hasQueryControl) {
-        refreshWidgetsByFilter(nextWidget);
-      }
+      refreshWidgetsByFilter(nextWidget);
     },
-    [
-      controllerDate,
-      hasQueryControl,
-      refreshWidgetsByFilter,
-      widget,
-      widgetUpdate,
-    ],
+    [controllerDate, refreshWidgetsByFilter, widget, widgetUpdate],
   );
 
   const control = useMemo(() => {
@@ -268,6 +252,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
           config!.controllerDate!,
         );
         let rangePickerType = controllerDate!.pickerType;
+        debugger;
         return (
           <RangeTimeControllerForm
             pickerType={rangePickerType}
@@ -294,13 +279,14 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   }, [
     optionRows,
     facadeType,
+    form,
     controllerValues,
     onControllerValuesChange,
     minValue,
     maxValue,
     config,
-    onRangeTimeChange,
     controllerDate,
+    onRangeTimeChange,
     onTimeChange,
   ]);
   return (

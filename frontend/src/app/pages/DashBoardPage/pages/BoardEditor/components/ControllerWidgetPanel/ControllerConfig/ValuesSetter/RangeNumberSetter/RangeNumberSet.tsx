@@ -39,9 +39,6 @@ export const RangeNumberSetForm: React.FC<RangeNumberSetFormProps> = memo(
       if (!values) {
         return Promise.reject();
       }
-      if (!values?.[0] && !values?.[1]) {
-        return Promise.reject();
-      }
       if (values?.[0] && values?.[1]) {
         if (values?.[1] - values?.[0] < 0)
           return Promise.reject(new Error(' err on start > end'));
@@ -74,8 +71,8 @@ export const RangeNumberSet: React.FC<RangeNumberSetProps> = memo(
       onChange?.([startVal, end]);
     };
     useEffect(() => {
-      setStartVal(value?.[0] || null);
-      setEndVal(value?.[1] || null);
+      setStartVal(value?.[0]);
+      setEndVal(value?.[1]);
     }, [value]);
     return (
       <>

@@ -25,6 +25,7 @@ import {
   BoardActionContext,
   BoardActionContextProps,
 } from '../contexts/BoardActionContext';
+import { BoardConfigContext } from '../contexts/BoardConfigContext';
 import { BoardContext } from '../contexts/BoardContext';
 import { boardActions } from '../pages/Board/slice';
 import {
@@ -46,7 +47,8 @@ export const BoardActionProvider: FC<{ id: string }> = ({
 }) => {
   const dispatch = useDispatch();
   const { editing, renderMode } = useContext(BoardContext);
-
+  const { config: boardConfig } = useContext(BoardConfigContext);
+  const { hasQueryControl } = boardConfig;
   const actions: BoardActionContextProps = {
     widgetUpdate: (widget: Widget) => {
       if (editing) {
@@ -76,6 +78,9 @@ export const BoardActionProvider: FC<{ id: string }> = ({
       }
     }, 500),
     refreshWidgetsByFilter: debounce((widget: Widget) => {
+      if (hasQueryControl) {
+        return;
+      }
       const widgetIds = getNeedRefreshWidgetsByFilter(widget);
       const pageInfo: Partial<PageInfo> = {
         pageNo: 1,

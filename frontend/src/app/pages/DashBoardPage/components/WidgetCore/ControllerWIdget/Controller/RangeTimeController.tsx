@@ -95,13 +95,3 @@ export const RangeTimeController: React.FC<TimeSetProps> = memo(
     );
   },
 );
-// const StyledWrap = styled.div`
-//   display: flex;
-
-//   justify-content: space-around;
-//   width: 100%;
-
-//   & .ant-input {
-//     background-color: transparent;
-//   }
-// `;
