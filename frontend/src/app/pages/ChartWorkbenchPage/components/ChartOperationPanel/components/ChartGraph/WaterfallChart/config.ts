@@ -24,12 +24,14 @@ const config: ChartConfig = {
       label: 'dimension',
       key: 'dimension',
       required: true,
+      limit: 1,
       type: 'group',
     },
     {
       label: 'metrics',
       key: 'metrics',
       required: true,
+      limit: 1,
       type: 'aggregate',
       actions: {
         NUMERIC: ['alias', 'sortable', 'format', 'aggregate'],
