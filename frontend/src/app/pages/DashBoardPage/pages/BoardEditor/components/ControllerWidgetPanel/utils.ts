@@ -295,8 +295,12 @@ export const formatDateByPickType = (
     case 'quarter':
       return momentTime.format(formatTemp);
     case 'date':
-    case 'week':
       return momentTime.set({ h: 0, m: 0, s: 0 }).format(formatTemp);
+    case 'week':
+      let yearNo = momentTime.year();
+      let weekNo = momentTime.week() - 1;
+      let yearWeekStr = `${yearNo}-W${weekNo}`;
+      return moment(yearWeekStr).subtract(1, 'days').format(formatTemp);
     case 'month':
       return momentTime.set({ date: 1, h: 0, m: 0, s: 0 }).format(formatTemp);
     case 'year':
