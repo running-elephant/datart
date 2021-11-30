@@ -45,7 +45,7 @@ import { ActionCreators } from 'redux-undo';
 import {
   deleteWidgetsAction,
   widgetToPositionAction,
-} from '../../slice/actions';
+} from '../../slice/actions/actions';
 import {
   selectClipboardWidgets,
   selectFutureState,

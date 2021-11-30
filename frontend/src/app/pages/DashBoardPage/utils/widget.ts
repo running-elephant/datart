@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
@@ -55,9 +56,9 @@ import {
   WidgetContentChartType,
   WidgetInfo,
   WidgetPadding,
-  WidgetType,
 } from '../pages/Board/slice/types';
 import { ControllerConfig } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { BtnActionParams } from '../pages/BoardEditor/slice/actions/controlActions';
 
 export const VALUE_SPLITTER = '###';
 
@@ -121,6 +122,21 @@ export const createContainerWidget = (opt: {
   return widget;
 };
 
+export const createControlBtn = (opt: BtnActionParams) => {
+  const content = { type: opt.type };
+  const widgetConf = createInitWidgetConfig({
+    name: opt.type === 'query' ? '查询' : '重置',
+    type: opt.type as WidgetType,
+    content: content,
+    boardType: opt.boardType,
+  });
+  const widget: Widget = createWidget({
+    dashboardId: opt.boardId,
+    config: widgetConf,
+  });
+  return widget;
+};
+
 export const createInitWidgetConfig = (opt: {
   type: WidgetType;
   content: WidgetContent;
@@ -153,12 +169,7 @@ export const createInitWidgetConfig = (opt: {
       textAlign: 'left',
       ...fontDefault,
     },
-    padding: {
-      left: 4,
-      right: 4,
-      top: 20,
-      bottom: 4,
-    },
+    padding: createWidgetPadding(opt.type),
   };
 };
 
@@ -205,12 +216,31 @@ export const createWidgetInfo = (id: string): WidgetInfo => {
   };
   return widgetInfo;
 };
+export const createWidgetPadding = (widgetType: WidgetType) => {
+  if (widgetType === 'query' || widgetType === 'reset') {
+    return {
+      left: 4,
+      right: 4,
+      top: 0,
+      bottom: 0,
+    };
+  }
+  return {
+    left: 4,
+    right: 4,
+    top: 20,
+    bottom: 4,
+  };
+};
 export const createWidgetRect = (
   boardType: BoardType,
   widgetType: WidgetType,
 ): RectConfig => {
   if (widgetType === 'controller') {
     return getInitControllerWidgetRect(boardType);
+  }
+  if (widgetType === 'query' || widgetType === 'reset') {
+    return getInitButtonWidgetRect(boardType);
   }
   if (boardType === 'auto') {
     return {
@@ -226,6 +256,25 @@ export const createWidgetRect = (
       y: 0,
       width: 400,
       height: 300,
+    };
+  }
+};
+
+export const getInitButtonWidgetRect = (boardType: BoardType): RectConfig => {
+  if (boardType === 'auto') {
+    return {
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 2,
+    };
+  } else {
+    // free
+    return {
+      x: 0,
+      y: 0,
+      width: 150,
+      height: 50,
     };
   }
 };
@@ -266,6 +315,7 @@ export const createContainerWidgetContent = (type: ContainerWidgetType) => {
   }
   return content;
 };
+
 export const createChartWidgetContent = (subType: WidgetContentChartType) => {
   let content: ChartWidgetContent = {
     type: subType,
@@ -477,9 +527,10 @@ export const getWidgetMapByServer = (
     // 处理 自有 chart widget
 
     if (widget.config.content.type === 'widgetChart') {
-      widget.datachartId = widget.config.content.dataChart?.id || '';
-      wrappedDataCharts.push(widget.config.content.dataChart!);
-      delete widget.config.content.dataChart;
+      let content = widget.config.content as ChartWidgetContent;
+      widget.datachartId = content.dataChart?.id || '';
+      wrappedDataCharts.push(content.dataChart!);
+      delete content.dataChart;
     }
   });
 
@@ -673,12 +724,17 @@ export const getOtherStringControlWidgets = (
       return false;
     }
     const content = ele.config.content as ControllerWidgetContent;
-    // return content.fieldValueType === ChartDataViewFieldType.STRING;
-    return true;
+    const strControlTypes = [
+      ControllerFacadeTypes.DropdownList,
+      ControllerFacadeTypes.MultiDropdownList,
+      ControllerFacadeTypes.RadioGroup,
+    ];
+    return strControlTypes.includes(content.type);
   });
   if (!widgetId) {
     return allFilterWidgets;
   } else {
+    // 自己不能关联自己 把自己排除
     return allFilterWidgets.filter(ele => ele.id !== widgetId);
   }
 };

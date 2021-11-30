@@ -30,7 +30,7 @@ export interface SelectControllerProps {
   required?: boolean;
 }
 export const SlideControllerForm: React.FC<SelectControllerProps> = memo(
-  ({ label, name, minValue, maxValue, required, ...rest }) => {
+  ({ label, name, required, ...rest }) => {
     return (
       <Form.Item
         name={name}
@@ -44,16 +44,14 @@ export const SlideControllerForm: React.FC<SelectControllerProps> = memo(
   },
 );
 export const SlideController: React.FC<SelectControllerProps> = memo(
-  ({ onChange, value, minValue, maxValue, ...rest }) => {
+  ({ onChange, value, minValue, maxValue }) => {
     return (
       <StyledWrap>
         <Slider
           value={value}
           onChange={onChange}
-          min={0}
-          max={400}
-          //   {...(minValue && { min: minValue })}
-          //   {...(maxValue && { max: maxValue })}
+          {...(minValue && { min: minValue })}
+          {...(maxValue && { max: maxValue })}
         />
       </StyledWrap>
     );

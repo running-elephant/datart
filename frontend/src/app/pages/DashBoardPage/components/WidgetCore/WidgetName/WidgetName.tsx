@@ -16,19 +16,23 @@
  * limitations under the License.
  */
 
-import React, { FC, memo } from 'react';
+import React, { FC } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetConf, WidgetNameConfig } from '../../pages/Board/slice/types';
+import { WidgetConf, WidgetNameConfig } from '../../../pages/Board/slice/types';
 
-export const WidgetName: FC<{ config: WidgetConf; zIndex?: number }> = memo(
-  ({ config, zIndex }) => {
-    return (
-      <StyledWrap conf={config.nameConfig} zIndex={zIndex}>
-        <div className="widget-name">{config.name}</div>
-      </StyledWrap>
-    );
-  },
-);
+export const WidgetName: FC<{
+  config: WidgetConf;
+  zIndex?: number;
+}> = ({ config, zIndex }) => {
+  if (config.type === 'query' || config.type === 'reset') {
+    return null;
+  }
+  return (
+    <StyledWrap conf={config.nameConfig} zIndex={zIndex}>
+      <div className="widget-name">{config.name}</div>
+    </StyledWrap>
+  );
+};
 
 const StyledWrap = styled.div<{ conf: WidgetNameConfig; zIndex?: number }>`
   position: absolute;

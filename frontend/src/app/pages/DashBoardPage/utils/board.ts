@@ -152,7 +152,9 @@ export const getInitBoardConfig = (boardType: BoardType) => {
     containerPadding: [16, 16], //0-100
     rowHeight: 32, //20-200
     cols: LAYOUT_COLS, //2-48    step 2
-    initialQuery:true,
+    initialQuery: true,
+    hasQueryControl: false,
+    hasResetControl: false,
   };
   return dashboardConfig;
 };

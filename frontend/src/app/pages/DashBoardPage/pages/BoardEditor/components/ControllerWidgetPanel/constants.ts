@@ -15,26 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { DatePicker } from 'antd';
-import React, { memo } from 'react';
-import { PickerType } from '../../../types';
-const { RangePicker } = DatePicker;
-export const RangeTimeSet: React.FC<{
-  pickerType: PickerType;
-  value?: any;
-  onChange?: any;
-}> = memo(({ pickerType }) => {
-  function onChange(date, dateString) {
-    console.log(date, dateString);
-  }
 
-  return (
-    <>
-      {pickerType === 'dateTime' ? (
-        <RangePicker showTime onChange={onChange} />
-      ) : (
-        <RangePicker onChange={onChange} picker={pickerType as any} />
-      )}
-    </>
-  );
-});
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+
+export const ConventionalControllerTypes = [
+  ControllerFacadeTypes.DropdownList,
+  ControllerFacadeTypes.MultiDropdownList,
+  ControllerFacadeTypes.RadioGroup,
+  ControllerFacadeTypes.Text,
+];
+export const NumericalControllerTypes = [
+  ControllerFacadeTypes.RangeValue,
+  ControllerFacadeTypes.Value,
+  ControllerFacadeTypes.Slider,
+  ControllerFacadeTypes.RangeSlider,
+];
+export const DateControllerTypes = [
+  ControllerFacadeTypes.RangeTime,
+  ControllerFacadeTypes.Time,
+];

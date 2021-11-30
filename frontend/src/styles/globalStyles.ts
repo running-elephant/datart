@@ -149,40 +149,7 @@ export const OverriddenStyle = createGlobalStyle`
   .react-grid-item.react-grid-placeholder {
     background-color: ${p => p.theme.textColorDisabled} !important;
   }
-
-  /* modal */
-  .ant-modal-xlarge {
-    padding: 20px;
-  }
-
-  .ant-modal-xlarge > .ant-modal {
-    top: auto;
-    display: flex;
-    flex-direction: column;
-    width: auto !important;
-    height: 100%;
-    padding: 0;
-    margin: 0;
-    
-  }
-
-  .ant-modal-xlarge > .ant-modal > .ant-modal-content {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-
-  }
-  .ant-modal-xlarge > .ant-modal > .ant-modal-content > .ant-modal-body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    min-height: 0;  /* firefox flex overflow issue */
-  }
-  /* .ant-modal-xlarge > .ant-modal > .ant-modal-content >.ant-modal-footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-  } */
+  
 
   /* schema table header action dropdown menu */
   .datart-schema-table-header-menu {

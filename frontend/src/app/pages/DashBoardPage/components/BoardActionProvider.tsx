@@ -25,12 +25,17 @@ import {
   BoardActionContext,
   BoardActionContextProps,
 } from '../contexts/BoardActionContext';
+import { BoardConfigContext } from '../contexts/BoardConfigContext';
 import { BoardContext } from '../contexts/BoardContext';
 import { boardActions } from '../pages/Board/slice';
-import { boardDownLoadAction } from '../pages/Board/slice/asyncActions';
+import {
+  boardDownLoadAction,
+  widgetsQueryAction,
+} from '../pages/Board/slice/asyncActions';
 import { getWidgetDataAsync } from '../pages/Board/slice/thunk';
 import { Widget } from '../pages/Board/slice/types';
 import { editBoardStackActions } from '../pages/BoardEditor/slice';
+import { editWidgetsQueryAction } from '../pages/BoardEditor/slice/actions/controlActions';
 import {
   getEditWidgetDataAsync,
   toUpdateDashboard,
@@ -43,7 +48,8 @@ export const BoardActionProvider: FC<{ id: string }> = ({
 }) => {
   const dispatch = useDispatch();
   const { editing, renderMode } = useContext(BoardContext);
-
+  const { config: boardConfig } = useContext(BoardConfigContext);
+  const { hasQueryControl } = boardConfig;
   const actions: BoardActionContextProps = {
     widgetUpdate: (widget: Widget) => {
       if (editing) {
@@ -53,7 +59,24 @@ export const BoardActionProvider: FC<{ id: string }> = ({
       }
     },
 
+    onWidgetsQuery: debounce(() => {
+      if (editing) {
+        dispatch(editWidgetsQueryAction({ boardId }));
+      } else {
+        dispatch(widgetsQueryAction({ boardId, renderMode }));
+      }
+    }, 500),
+    onWidgetsReset: debounce(() => {
+      if (editing) {
+        console.log('--onWidgetsReset');
+      } else {
+        console.log('--onWidgetsReset');
+      }
+    }, 500),
     refreshWidgetsByFilter: debounce((widget: Widget) => {
+      if (hasQueryControl) {
+        return;
+      }
       const widgetIds = getNeedRefreshWidgetsByFilter(widget);
       const pageInfo: Partial<PageInfo> = {
         pageNo: 1,
@@ -92,6 +115,7 @@ export const BoardActionProvider: FC<{ id: string }> = ({
       );
       return result;
     },
+
     onBoardToDownLoad: () => {
       if (renderMode === 'read') {
         dispatch(boardDownLoadAction({ boardId, renderMode }));

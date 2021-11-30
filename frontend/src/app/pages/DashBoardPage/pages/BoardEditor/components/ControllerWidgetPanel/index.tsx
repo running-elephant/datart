@@ -19,6 +19,7 @@
 import { Form, Modal } from 'antd';
 import { Split } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { selectViewMap } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import {
@@ -71,6 +72,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const { type, widgetId, controllerType } = useSelector(selectControllerPanel);
   const { boardId, boardType, queryVariables } = useContext(BoardContext);
 
+  const { refreshWidgetsByFilter } = useContext(BoardActionContext);
   const allWidgets = useSelector(selectSortAllWidgets);
   const widgets = useMemo(
     () => getCanLinkFilterWidgets(allWidgets),
@@ -232,8 +234,8 @@ const FilterWidgetPanel: React.FC = memo(props => {
           config: postControlConfig(config, controllerType!),
           hasVariable: false,
         });
-
         dispatch(addWidgetsToEditBoard([widget]));
+        refreshWidgetsByFilter(widget);
       } else if (type === 'edit') {
         const sourceId = curFilterWidget.id;
 
@@ -284,6 +286,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           draft.config.content = nextContent;
         });
         dispatch(editBoardStackActions.updateWidget(newWidget));
+        refreshWidgetsByFilter(newWidget);
       }
       setVisible(false);
     },
@@ -293,6 +296,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
       controllerType,
       curFilterWidget,
       dispatch,
+      refreshWidgetsByFilter,
       relatedWidgets,
       type,
       widgetMap,
@@ -330,7 +334,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   };
   return (
     <Modal
-      title={`${type} ${t(controllerType || '')}`}
+      title={`${type === 'add' ? '添加' : '编辑'} ${t(controllerType || '')}`}
       visible={visible}
       onOk={onSubmit}
       centered
@@ -364,6 +368,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
               onChange={onChangeRelatedWidgets}
             />
             <RelatedViewForm
+              controllerType={controllerType!}
               form={form}
               viewMap={viewMap}
               queryVariables={queryVariables}

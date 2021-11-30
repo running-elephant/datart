@@ -28,14 +28,16 @@ import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView, {
   ChartDataViewFieldCategory,
 } from 'app/types/ChartDataView';
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { G90 } from 'styles/StyleConstants';
+import { filterValueTypeByControl } from './utils';
 
 export interface RelatedViewFormProps {
   viewMap: Record<string, ChartDataView>;
   form: FormInstance<any> | undefined;
-
+  controllerType: ControllerFacadeTypes;
   queryVariables: Variable[];
 
   getFormRelatedViews: () => RelatedView[];
@@ -44,14 +46,7 @@ const Option = Select.Option;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
-  ({
-    viewMap,
-    form,
-    queryVariables,
-
-    getFormRelatedViews,
-  }) => {
-    //renderOptions
+  ({ viewMap, form, queryVariables, controllerType, getFormRelatedViews }) => {
     const filterFieldCategoryChange = useCallback(
       (index: number) => (e: RadioChangeEvent) => {
         const relatedViews = getFormRelatedViews();
@@ -86,6 +81,9 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
             .filter(v => {
               return v.viewId === relatedViews[index].viewId || !v.viewId;
             })
+            .filter(v => {
+              return filterValueTypeByControl(controllerType, v.valueType);
+            })
             .map(item => (
               <Option
                 key={item.id}
@@ -102,17 +100,23 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
             ));
         } else {
           // 字段
-          return viewMap?.[relatedViews[index].viewId]?.meta?.map(item => (
-            <Option key={item.id} fieldvaluetype={item.type} value={item.id}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>{item.id}</span>
-                <span style={{ color: G90 }}>{item.type}</span>
-              </div>
-            </Option>
-          ));
+          return viewMap?.[relatedViews[index].viewId]?.meta
+            ?.filter(v => {
+              return filterValueTypeByControl(controllerType, v.type);
+            })
+            .map(item => (
+              <Option key={item.id} fieldvaluetype={item.type} value={item.id}>
+                <div
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
+                  <span>{item.id}</span>
+                  <span style={{ color: G90 }}>{item.type}</span>
+                </div>
+              </Option>
+            ));
         }
       },
-      [getFormRelatedViews, queryVariables, viewMap],
+      [controllerType, getFormRelatedViews, queryVariables, viewMap],
     );
 
     const getViewName = useCallback(
@@ -132,19 +136,19 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
           rules={[
             {
               validator: async (_, relatedViews: RelatedView[]) => {
-                const trimmedRelatedViews = relatedViews.filter(
-                  item => item.fieldValue && item.fieldValueType,
-                );
-                if (!relatedViews || relatedViews.length < 1) {
-                  return Promise.reject(
-                    new Error('Please Choose at least one widget component'),
-                  );
-                }
-                if (!trimmedRelatedViews || trimmedRelatedViews.length < 1) {
-                  return Promise.reject(
-                    new Error('Please Choose at least one view filed'),
-                  );
-                }
+                // const trimmedRelatedViews = relatedViews.filter(
+                //   item => item.fieldValue && item.fieldValueType,
+                // );
+                // if (!relatedViews || relatedViews.length < 1) {
+                //   return Promise.reject(
+                //     new Error('Please Choose at least one widget component'),
+                //   );
+                // }
+                // if (!trimmedRelatedViews || trimmedRelatedViews.length < 1) {
+                //   return Promise.reject(
+                //     new Error('Please Choose at least one view filed'),
+                //   );
+                // }
                 return Promise.resolve(relatedViews);
               },
             },

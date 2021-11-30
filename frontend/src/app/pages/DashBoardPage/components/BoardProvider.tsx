@@ -66,9 +66,9 @@ export const BoardProvider: FC<{
       //
       renderedWidgetById: useCallback(
         wid => {
-          let initialQuery= board.config.initialQuery;
+          let initialQuery = board.config.initialQuery;
 
-          if (initialQuery=== false && renderMode !== 'schedule') {
+          if (initialQuery === false && renderMode !== 'schedule') {
             //zh:如果 initialQuery=== false renderMode !=='schedule' 则不请求数据 en: If initialQuery=== false renderMode !=='schedule' then no data is requested
             return false;
           }
@@ -87,7 +87,7 @@ export const BoardProvider: FC<{
             );
           }
         },
-        [board.id, dispatch, editing, renderMode],
+        [board.config.initialQuery, board.id, dispatch, editing, renderMode],
       ),
     };
     const adaptConfig = useMemo(() => {

@@ -45,9 +45,6 @@ export const TextControllerForm: React.FC<TextControllerProps> = memo(
 export const TextController: React.FC<TextControllerProps> = memo(
   ({ onChange, value }) => {
     const _onChange = e => {
-      if (!e.target.value) {
-        return onChange(null);
-      }
       onChange(e.target.value);
     };
     return (

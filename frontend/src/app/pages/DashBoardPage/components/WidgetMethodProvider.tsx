@@ -48,7 +48,7 @@ import {
   editDashBoardInfoActions,
   editWidgetInfoActions,
 } from '../pages/BoardEditor/slice';
-import { editChartInWidgetAction } from '../pages/BoardEditor/slice/actions';
+import { editChartInWidgetAction } from '../pages/BoardEditor/slice/actions/actions';
 import {
   getEditChartWidgetDataAsync,
   getEditWidgetDataAsync,
@@ -80,6 +80,12 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
           onCancel() {},
         });
         return;
+      }
+      if (type === 'query') {
+        dispatch(editBoardStackActions.changeBoardHasQueryControl(false));
+      }
+      if (type === 'reset') {
+        dispatch(editBoardStackActions.changeBoardHasResetControl(false));
       }
       dispatch(editBoardStackActions.deleteWidgets([wid]));
     },

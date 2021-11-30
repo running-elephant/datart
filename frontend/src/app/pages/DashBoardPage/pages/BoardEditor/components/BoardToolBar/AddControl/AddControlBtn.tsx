@@ -17,27 +17,37 @@
  */
 import { ControlOutlined } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
+import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { G60 } from 'styles/StyleConstants';
-import { editDashBoardInfoActions } from '../../../slice';
+import { addControllerAction } from '../../../slice/actions/controlActions';
 import { BoardToolBarContext } from '../context/BoardToolBarContext';
 import { WithTipButton } from '../ToolBarItem';
-export interface ControlBtnProps {}
-export const ControlBtn: React.FC<ControlBtnProps> = () => {
+export interface AddControlBtnProps {}
+export interface ButtonItemType<T> {
+  name: string;
+  icon: any;
+  type: T;
+  disabled: boolean;
+}
+export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   const { boardId, boardType, showLabel } = useContext(BoardToolBarContext);
   const dispatch = useDispatch();
+  const { config: boardConfig } = useContext(BoardConfigContext);
+  const { hasQueryControl, hasResetControl } = boardConfig;
   const onAddControler = (info: { key: any }) => {
     dispatch(
-      editDashBoardInfoActions.changeControllerPanel({
-        type: 'add',
-        widgetId: '',
-        controllerType: info.key as ControllerFacadeTypes,
+      addControllerAction({
+        type: info.key,
+        boardId: boardId,
+        boardType: boardType,
       }),
     );
   };
-  const conventionalControllers = [
+  const conventionalControllers: ButtonItemType<ControllerFacadeTypes>[] = [
     {
       name: '单选下拉菜单',
       icon: '',
@@ -114,19 +124,25 @@ export const ControlBtn: React.FC<ControlBtnProps> = () => {
       type: ControllerFacadeTypes.Slider,
       disabled: false,
     },
+    // {
+    //   name: '范围滑块',
+    //   icon: '',
+    //   type: ControllerFacadeTypes.RangeSlider,
+    //   disabled: false,
+    // },
   ];
-  const buttonControllers = [
+  const buttonControllers: ButtonItemType<WidgetType>[] = [
     {
       name: '查询按钮',
       icon: '',
-      type: ControllerFacadeTypes.QueryButton,
-      disabled: false,
+      type: 'query',
+      disabled: !!hasQueryControl,
     },
     {
       name: '重置按钮',
       icon: '',
-      type: ControllerFacadeTypes.ResetButton,
-      disabled: false,
+      type: 'reset',
+      disabled: !!hasResetControl,
     },
   ];
   const renderTitle = (text: string) => {
@@ -155,13 +171,13 @@ export const ControlBtn: React.FC<ControlBtnProps> = () => {
           </Menu.Item>
         ))}
       </Menu.ItemGroup>
-      {/* <Menu.ItemGroup key="buttonControllers" title={renderTitle('按钮')}>
+      <Menu.ItemGroup key="buttonControllers" title={renderTitle('按钮')}>
         {buttonControllers.map(({ name, icon, type, disabled }) => (
           <Menu.Item key={type} icon={icon} disabled={disabled}>
             {name}
           </Menu.Item>
         ))}
-      </Menu.ItemGroup> */}
+      </Menu.ItemGroup>
     </Menu>
   );
   return (

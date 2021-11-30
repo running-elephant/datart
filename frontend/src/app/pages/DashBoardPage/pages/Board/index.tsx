@@ -32,7 +32,7 @@ import FullScreenPanel from '../../components/FullScreenPanel';
 import TitleHeader from '../../components/TitleHeader';
 import BoardEditor from '../BoardEditor';
 import { editDashBoardInfoActions } from '../BoardEditor/slice';
-import { clearEditBoardState } from '../BoardEditor/slice/actions';
+import { clearEditBoardState } from '../BoardEditor/slice/actions/actions';
 import AutoBoardCore from './AutoDashboard/AutoBoardCore';
 import FreeBoardCore from './FreeDashboard/FreeBoardCore';
 import { boardActions } from './slice';

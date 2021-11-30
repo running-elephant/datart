@@ -15,11 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import {
   ValueOptionType,
   ValueOptionTypes,
 } from 'app/pages/DashBoardPage/constants';
-import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
+import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+} from 'app/types/ChartDataView';
 import {
   ControllerFacadeTypes,
   ControllerFacadeTypes as Opt,
@@ -27,7 +32,8 @@ import {
 } from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
-import { ControllerConfig } from './types';
+import { DateControllerTypes, NumericalControllerTypes } from './constants';
+import { ControllerConfig, PickerType } from './types';
 
 export const getStringFacadeOptions = (type: ValueOptionType) => {
   switch (type) {
@@ -160,7 +166,9 @@ export const getInitWidgetController = (
     case ControllerFacadeTypes.RangeSlider:
       return getRangeSliderControllerConfig();
     case ControllerFacadeTypes.RadioGroup:
-      return getTimeControllerConfig();
+      return getRadioGroupControllerConfig();
+    case ControllerFacadeTypes.Slider:
+      return getSliderControllerConfig();
     case ControllerFacadeTypes.DropdownList:
     default:
       return getInitControllerConfig();
@@ -226,7 +234,8 @@ export const getSliderControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.Equal;
   config.minValue = 1;
-  config.minValue = 200;
+  config.maxValue = 100;
+  config.controllerValues = [1];
   config.sliderConfig = {
     step: 1,
     range: false,
@@ -239,7 +248,7 @@ export const getRangeSliderControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.Between;
   config.minValue = 1;
-  config.minValue = 200;
+  config.maxValue = 100;
   config.sliderConfig = {
     step: 1,
     range: true,
@@ -253,4 +262,52 @@ export const getRangeValueControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.Between;
   return config;
+};
+
+export const filterValueTypeByControl = (
+  controlType: ControllerFacadeTypes,
+  valueType: any,
+) => {
+  if (NumericalControllerTypes.includes(controlType)) {
+    return [VariableValueTypes.Number, ChartDataViewFieldType.NUMERIC].includes(
+      valueType,
+    );
+  }
+  if (DateControllerTypes.includes(controlType)) {
+    return [VariableValueTypes.Date, ChartDataViewFieldType.DATE].includes(
+      valueType,
+    );
+  }
+  return true;
+};
+
+export const formatDateByPickType = (
+  pickerType: PickerType,
+  momentTime: Moment,
+) => {
+  const formatTemp = 'YYYY-MM-DD HH:mm:ss';
+  if (!momentTime) {
+    return null;
+  }
+
+  switch (pickerType) {
+    case 'dateTime':
+    case 'quarter':
+      return momentTime.format(formatTemp);
+    case 'date':
+      return momentTime.set({ h: 0, m: 0, s: 0 }).format(formatTemp);
+    case 'week':
+      let yearNo = momentTime.year();
+      let weekNo = momentTime.week() - 1;
+      let yearWeekStr = `${yearNo}-W${weekNo}`;
+      return moment(yearWeekStr).subtract(1, 'days').format(formatTemp);
+    case 'month':
+      return momentTime.set({ date: 1, h: 0, m: 0, s: 0 }).format(formatTemp);
+    case 'year':
+      return momentTime
+        .set({ month: 0, date: 1, h: 0, m: 0, s: 0 })
+        .format(formatTemp);
+    default:
+      return null;
+  }
 };

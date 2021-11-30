@@ -28,8 +28,6 @@ export enum ControllerFacadeTypes {
   Time = 'time',
   Slider = 'slider',
   RangeSlider = 'rangeSlider',
-  QueryButton = 'queryButton',
-  ResetButton = 'resetButton',
 }
 
 export enum ControllerRadioFacadeTypes {

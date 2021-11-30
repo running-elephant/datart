@@ -155,6 +155,7 @@ const ValuesOptionsSetter: FC<{
         config: {
           ...getControllerConfig(),
           assistViewFields: value,
+          controllerValues: [],
         },
       });
     },

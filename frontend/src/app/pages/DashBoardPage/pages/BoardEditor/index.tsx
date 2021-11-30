@@ -30,7 +30,7 @@ import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
 import FreeEditor from './FreeEditor/index';
 import { editDashBoardInfoActions } from './slice';
-import { editWrapChartWidget } from './slice/actions';
+import { editWrapChartWidget } from './slice/actions/actions';
 import {
   selectBoardChartEditorProps,
   selectEditBoard,

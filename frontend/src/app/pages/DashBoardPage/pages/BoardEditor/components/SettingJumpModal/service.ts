@@ -1,4 +1,4 @@
-import { WidgetTypeMap } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { VizType } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
@@ -12,10 +12,12 @@ const computedDashboardFilters = (data): FilterOptionItem[] => {
   widgets.forEach(item => {
     item.config = item.config ? JSON.parse(item.config) : undefined;
   });
-  const filterWidgets = widgets.filter(v => {
-    const _isFilter = v?.config?.type === WidgetTypeMap.controller,
-      isDateOrStr = FILTER_MENU.includes(v?.config?.content?.fieldValueType);
-    return _isFilter && isDateOrStr;
+  const filterWidgets = widgets.filter((v: Widget) => {
+    const _isFilter = v?.config?.type === 'controller';
+    // TODO fix about jump xld
+    // isDateOrStr = FILTER_MENU.includes(v?.config?.content?.fieldValueType);
+    // return _isFilter && isDateOrStr;
+    return _isFilter;
   });
   const filterOptions = filterWidgets.map(v => ({
     label: v?.config?.name,
@@ -24,6 +26,7 @@ const computedDashboardFilters = (data): FilterOptionItem[] => {
   }));
   return filterOptions;
 };
+// TODO fix about jump
 export const fetchDashboardFilters = async (id: string) => {
   const { data } = await request<any>(`/viz/dashboards/${id}`);
   return computedDashboardFilters(data);
