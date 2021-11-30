@@ -169,14 +169,13 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     const onDraggableItemMove = (dragIndex: number, hoverIndex: number) => {
       const draggedItem = currentConfig.rows?.[dragIndex];
 
-      if (draggedItem && currentConfig.rows && currentConfig.rows.length > 0) {
+      if (draggedItem && !currentConfig?.rows?.length) {
         const newCurrentConfig = updateBy(currentConfig, draft => {
           const columns = draft.rows || [];
           columns.splice(dragIndex, 1);
           columns.splice(hoverIndex, 0, draggedItem);
         });
         setCurrentConfig(newCurrentConfig);
-        onConfigChanged?.(ancestors, newCurrentConfig, true);
       }
     };
 
