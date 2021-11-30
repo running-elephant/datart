@@ -232,3 +232,27 @@ export const editWrapChartWidget =
     dispatch(boardActions.setViewMap(viewViews));
     dispatch(getEditWidgetDataAsync({ widgetId }));
   };
+
+export const closeJumpAction = (widget: Widget) => (dispatch, getState) => {
+  const nextConf = produce(widget.config, draft => {
+    draft!.jumpConfig!.open = false;
+  });
+  dispatch(
+    editBoardStackActions.updateWidgetConfig({
+      wid: widget.id,
+      config: nextConf,
+    }),
+  );
+};
+
+export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
+  const nextConf = produce(widget.config, draft => {
+    draft!.linkageConfig!.open = false;
+  });
+  dispatch(
+    editBoardStackActions.updateWidgetConfig({
+      wid: widget.id,
+      config: nextConf,
+    }),
+  );
+};

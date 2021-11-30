@@ -48,7 +48,11 @@ import {
   editDashBoardInfoActions,
   editWidgetInfoActions,
 } from '../pages/BoardEditor/slice';
-import { editChartInWidgetAction } from '../pages/BoardEditor/slice/actions/actions';
+import {
+  closeJumpAction,
+  closeLinkageAction,
+  editChartInWidgetAction,
+} from '../pages/BoardEditor/slice/actions/actions';
 import {
   getEditChartWidgetDataAsync,
   getEditWidgetDataAsync,
@@ -358,7 +362,12 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
         case 'makeJump':
           onMakeJump(widgetId);
           break;
-
+        case 'closeJump':
+          dispatch(closeJumpAction(widget));
+          break;
+        case 'closeLinkage':
+          dispatch(closeLinkageAction(widget));
+          break;
         default:
           break;
       }
@@ -373,6 +382,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       onWidgetEdit,
       onMakeLinkage,
       onMakeJump,
+      dispatch,
     ],
   );
 

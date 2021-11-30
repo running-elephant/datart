@@ -46,8 +46,8 @@ import {
   selectSortAllWidgets,
 } from '../../slice/selectors';
 import { diffViewLinkageItem, LinkageFields } from './LinkageFields';
-import { LinkageOpenUse } from './LinkageOpenUse';
 import { LinkageWidgets } from './linkageWidgets';
+
 export interface LinkagePanelProps {}
 export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
   const [form] = Form.useForm();
@@ -145,7 +145,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
       const newWidget = produce(curWidget, draft => {
         draft.relations = newRelations;
         draft.config.linkageConfig = {
-          open: newRelations.length > 0 ? values.open : false,
+          open: newRelations.length > 0 ? true : false,
           chartGroupColumns,
         };
       });
@@ -249,7 +249,6 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
       >
         <h3>{curWidget?.config.name}</h3>
 
-        <LinkageOpenUse />
         <LinkageWidgets
           curWidget={curWidget}
           widgets={widgets}

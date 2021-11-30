@@ -59,7 +59,6 @@ export const TimeController: React.FC<SingleTimeSetProps> = memo(
       }
 
       const newValues = formatDateByPickType(pickerType, time);
-      console.log('newValues', newValues);
       onChange(newValues);
     };
 
