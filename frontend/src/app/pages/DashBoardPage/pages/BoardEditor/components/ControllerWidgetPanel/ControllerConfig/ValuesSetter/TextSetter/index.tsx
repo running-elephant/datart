@@ -17,7 +17,7 @@
  */
 import { FormItemProps } from 'antd';
 import React, { memo } from 'react';
-import { ControllerValuesName } from '../ValuesSetter';
+import { ControllerValuesName } from '../..';
 import { TextSetForm } from './TextSetForm';
 
 export interface TextSetterProps {}

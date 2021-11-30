@@ -73,8 +73,6 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
     valueOptions,
     valueOptionType,
     sqlOperator,
-    minValue,
-    maxValue,
   } = useMemo(() => config as ControllerConfig, [config]);
   const optionRows = useMemo(() => {
     const dataRows = rows?.flat(2) || [];
@@ -202,12 +200,18 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
           />
         );
       case ControllerFacadeTypes.Slider:
+        const step = config.sliderConfig?.step || 1;
+        const showMarks = config.sliderConfig?.showMarks || false;
+        let minValue = config.minValue || 1;
+        let maxValue = config.maxValue || 100;
         return (
           <SlideControllerForm
             value={controllerValues?.[0]}
             onChange={onControllerValuesChange}
             minValue={minValue}
             maxValue={maxValue}
+            step={step}
+            showMarks={showMarks}
           />
         );
 
@@ -281,8 +285,6 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
     form,
     controllerValues,
     onControllerValuesChange,
-    minValue,
-    maxValue,
     config,
     controllerDate,
     onRangeTimeChange,
