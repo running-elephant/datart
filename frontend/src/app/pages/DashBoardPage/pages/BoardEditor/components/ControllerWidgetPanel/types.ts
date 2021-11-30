@@ -58,7 +58,7 @@ export interface ControllerDate {
   endTime?: ControllerDateType;
 }
 export interface SliderConfig {
-  step: 1;
+  step: number;
   range: boolean;
   vertical: boolean;
   showMarks: boolean;

@@ -24,30 +24,27 @@ import {
 import produce from 'immer';
 import React, { useCallback } from 'react';
 import {
+  EndTimeAmountName,
+  EndTimeDirectionName,
+  EndTimeExactName,
+  EndTimeRelativeName,
+  EndTimeROEName,
+  EndTimeUnitName,
+  PickerTypeName,
+  StartTimeAmountName,
+  StartTimeDirectionName,
+  StartTimeExactName,
+  StartTimeRelativeName,
+  StartTimeROEName,
+  StartTimeUnitName,
+} from '../..';
+import {
   ControllerConfig,
   PickerTypeOptions,
   RelativeDate,
 } from '../../../types';
 import { RelativeTimeSet } from './RelativeTimeSet';
 import { SingleTimeSet } from './SingleTimeSet';
-export const DateName = ['config', 'controllerDate'];
-export const sqlOperatorName = ['config', 'sqlOperator'];
-export const PickerTypeName = [...DateName, 'pickerType'];
-export const StartTimeName = [...DateName, 'startTime'];
-export const StartTimeROEName = [...StartTimeName, 'relativeOrExact'];
-export const StartTimeRelativeName = [...StartTimeName, 'relativeValue'];
-export const StartTimeExactName = [...StartTimeName, 'exactValue'];
-export const StartTimeDirectionName = [...StartTimeRelativeName, 'direction'];
-export const StartTimeUnitName = [...StartTimeRelativeName, 'unit'];
-export const StartTimeAmountName = [...StartTimeRelativeName, 'amount'];
-
-export const EndTimeName = [...DateName, 'endTime'];
-export const EndTimeROEName = [...EndTimeName, 'relativeOrExact'];
-export const EndTimeRelativeName = [...EndTimeName, 'relativeValue'];
-export const EndTimeExactName = [...EndTimeName, 'exactValue'];
-export const EndTimeDirectionName = [...EndTimeRelativeName, 'direction'];
-export const EndTimeUnitName = [...EndTimeRelativeName, 'unit'];
-export const EndTimeAmountName = [...EndTimeRelativeName, 'amount'];
 
 export const TimeSetter: React.FC<{
   form: FormInstance<ControllerWidgetContent> | undefined;

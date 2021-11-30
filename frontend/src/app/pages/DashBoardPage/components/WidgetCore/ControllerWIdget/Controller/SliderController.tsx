@@ -20,13 +20,15 @@ import React, { memo } from 'react';
 import styled from 'styled-components/macro';
 
 export interface SelectControllerProps {
+  showMarks: boolean;
+  step: number;
+  minValue: number;
+  maxValue: number;
   value?: any;
   placeholder?: string;
   onChange: (values) => void;
   label?: React.ReactNode;
   name?: string;
-  minValue?: number;
-  maxValue?: number;
   required?: boolean;
 }
 export const SlideControllerForm: React.FC<SelectControllerProps> = memo(
@@ -44,14 +46,21 @@ export const SlideControllerForm: React.FC<SelectControllerProps> = memo(
   },
 );
 export const SlideController: React.FC<SelectControllerProps> = memo(
-  ({ onChange, value, minValue, maxValue }) => {
+  ({ onChange, value, minValue, maxValue, step, showMarks }) => {
+    const marks = {
+      [minValue]: minValue,
+      [maxValue]: maxValue,
+      [value]: value,
+    };
     return (
       <StyledWrap>
         <Slider
           value={value}
           onChange={onChange}
-          {...(minValue && { min: minValue })}
-          {...(maxValue && { max: maxValue })}
+          min={minValue}
+          max={maxValue}
+          step={step}
+          {...(showMarks && { marks: marks })}
         />
       </StyledWrap>
     );

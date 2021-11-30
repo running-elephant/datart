@@ -17,7 +17,7 @@
  */
 import { Form, FormItemProps, Slider } from 'antd';
 import React, { memo, useEffect, useState } from 'react';
-import { ControllerValuesName } from '../ValuesSetter';
+import { ControllerValuesName } from '../..';
 
 export const SliderSetter: React.FC<SliderSetFormProps> = memo(props => {
   const itemProps: FormItemProps<any> = {
@@ -29,14 +29,14 @@ export const SliderSetter: React.FC<SliderSetFormProps> = memo(props => {
   return <SliderSetForm {...props} {...itemProps} />;
 });
 
-export const RangeSliderSetter: React.FC<{}> = memo(() => {
+export const RangeSliderSetter: React.FC<SliderSetFormProps> = memo(props => {
   const itemProps: FormItemProps<any> = {
     preserve: true,
     name: ControllerValuesName,
     label: '默认值',
     required: false,
   };
-  return <RangeSliderSetForm {...itemProps} />;
+  return <RangeSliderSetForm {...itemProps} {...props} />;
 });
 
 export type SliderSetFormProps = {} & FormItemProps<any> & SliderSetProps;
@@ -44,8 +44,8 @@ export type SliderSetFormProps = {} & FormItemProps<any> & SliderSetProps;
 export const RangeSliderSetForm: React.FC<SliderSetFormProps> = memo(
   ({ ...rest }) => {
     return (
-      <Form.Item rules={[{ required: true }]} {...rest}>
-        <SliderSet />
+      <Form.Item rules={[{ required: true }]}>
+        <SliderSet {...rest} />
       </Form.Item>
     );
   },
@@ -64,20 +64,34 @@ export const SliderSetForm: React.FC<SliderSetFormProps> = memo(
 export interface SliderSetProps {
   onChange?: (value) => any;
   value?: any[];
-  maxValue?: number;
-  minValue?: number;
+  maxValue: number;
+  minValue: number;
+  step: number;
+  showMarks: boolean;
 }
 export const SliderSet: React.FC<SliderSetProps> = memo(
-  ({ onChange, value, maxValue, minValue }) => {
-    const [val, setVal] = useState();
+  ({ onChange, value, maxValue, minValue, step, showMarks }) => {
+    const [val, setVal] = useState<any>();
     const _onChange = _val => {
       onChange?.([_val]);
+    };
+    const marks = {
+      [minValue]: minValue,
+      [maxValue]: maxValue,
+      [val]: val,
     };
     useEffect(() => {
       setVal(value?.[0]);
     }, [value]);
     return (
-      <Slider max={maxValue} min={minValue} value={val} onChange={_onChange} />
+      <Slider
+        max={maxValue}
+        min={minValue}
+        step={step}
+        value={val}
+        {...(showMarks && { marks: marks })}
+        onChange={_onChange}
+      />
     );
   },
 );

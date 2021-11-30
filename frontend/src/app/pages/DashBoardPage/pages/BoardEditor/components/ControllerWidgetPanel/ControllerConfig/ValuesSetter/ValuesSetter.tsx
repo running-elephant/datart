@@ -20,6 +20,7 @@ import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/sli
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { useCallback, useMemo } from 'react';
+import { ControllerValuesName, ValueOptionsName } from '..';
 import { ControllerConfig } from '../../types';
 import { MaxAndMinSetter } from './MaxAndMinSetter';
 import { NumberSetter } from './NumberSetter';
@@ -29,10 +30,6 @@ import { TextSetter } from './TextSetter';
 import { TimeSetter } from './TimeSetter/TimeSetter';
 import ValuesOptionsSetter from './ValuesOptionsSetter/ValuesOptionsSetter';
 
-export const ControllerValuesName = ['config', 'controllerValues'];
-export const ValueOptionsName = ['config', 'valueOptions'];
-export const MaxValueName = ['config', 'maxValue'];
-export const MinValueName = ['config', 'minValue'];
 export const NeedOptionsTypes = [
   ControllerFacadeTypes.DropdownList,
   ControllerFacadeTypes.MultiDropdownList,
@@ -77,11 +74,18 @@ export const ValuesSetter: React.FC<{
     return controllerType === ControllerFacadeTypes.Slider;
   }, [controllerType]);
 
-  const getMaxValue = () => {
+  const getMaxAndMin = () => {
     const config = getControllerConfig();
     return {
-      max: config?.maxValue,
-      min: config?.minValue,
+      max: config?.maxValue === 0 ? 0 : config?.maxValue || 100,
+      min: config?.minValue === 0 ? 0 : config?.minValue || 1,
+    };
+  };
+  const getSliderConf = () => {
+    const config = getControllerConfig();
+    return {
+      step: config?.sliderConfig?.step || 1,
+      showMarks: config?.sliderConfig?.showMarks || false,
     };
   };
   return (
@@ -118,8 +122,11 @@ export const ValuesSetter: React.FC<{
                 <>
                   <MaxAndMinSetter />
                   <SliderSetter
-                    maxValue={getMaxValue().max}
-                    minValue={getMaxValue().min}
+                    style={{ paddingRight: '10px' }}
+                    maxValue={getMaxAndMin().max}
+                    minValue={getMaxAndMin().min}
+                    step={getSliderConf().step}
+                    showMarks={getSliderConf().showMarks}
                   />
                 </>
               );

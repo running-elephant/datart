@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Form, FormInstance, Radio, Transfer } from 'antd';
+import { Form, FormInstance, Radio, Select } from 'antd';
 import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
@@ -25,7 +25,7 @@ import { FilterValueOption } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { getDistinctFields } from 'app/utils/fetch';
-import { FC, memo, useCallback, useEffect, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ControllerConfig } from '../../../types';
 import { AssistViewFields } from './AssistViewFields';
@@ -38,10 +38,13 @@ const ValuesOptionsSetter: FC<{
 }> = memo(({ form, viewMap, controllerType }) => {
   const [optionValues, setOptionValues] = useState<FilterValueOption[]>([]);
   const [targetKeys, setTargetKeys] = useState<string[]>([]);
-  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+
   const getControllerConfig = useCallback(() => {
     return form?.getFieldValue('config') as ControllerConfig;
   }, [form]);
+  const isMultiple = useMemo(() => {
+    return controllerType === ControllerFacadeTypes.MultiDropdownList;
+  }, [controllerType]);
   const getControllerValuesByType = (
     values: any[],
     controllerType: ControllerFacadeTypes,
@@ -58,16 +61,9 @@ const ValuesOptionsSetter: FC<{
     }
     return values;
   };
-  const onTransferSelectChange = useCallback(
-    (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
-      const newSelectedKeys = [...sourceSelectedKeys, ...targetSelectedKeys];
-      setSelectedKeys(newSelectedKeys);
-    },
-    [],
-  );
-  //controllerValues
-  const onTransferChange = useCallback(
-    (nextTargetKeys, direction, moveKeys) => {
+
+  const onTargetKeyChange = useCallback(
+    nextTargetKeys => {
       setTargetKeys(nextTargetKeys);
       const nextControllerOpt: ControllerConfig = {
         ...getControllerConfig(),
@@ -97,7 +93,7 @@ const ValuesOptionsSetter: FC<{
     },
     [viewMap],
   );
-  const convertToList = useCallback((collection, selectedKeys) => {
+  const convertToList = useCallback(collection => {
     const items: string[] = (collection || []).flatMap(c => c);
     const uniqueKeys = Array.from(new Set(items));
     return uniqueKeys.map((ele, index) => {
@@ -105,7 +101,7 @@ const ValuesOptionsSetter: FC<{
         index: index,
         key: ele,
         label: ele,
-        isSelected: selectedKeys.includes(ele),
+        isSelected: false,
       };
       return item;
     });
@@ -116,7 +112,7 @@ const ValuesOptionsSetter: FC<{
       const [viewId, viewField] = value;
       const dataset = await fetchNewDataset(viewId, viewField);
       const config: ControllerConfig = getControllerConfig();
-      setOptionValues(convertToList(dataset?.rows, []));
+      setOptionValues(convertToList(dataset?.rows));
       if (config.valueOptionType === 'common') {
         if (config?.controllerValues) {
           setTargetKeys(config?.controllerValues);
@@ -147,10 +143,7 @@ const ValuesOptionsSetter: FC<{
   const onViewFieldChange = useCallback(
     async (value: string[]) => {
       if (!value) return;
-      const [viewId, viewField] = value;
-      const dataset = await fetchNewDataset(viewId, viewField);
-      setTargetKeys([]);
-      setOptionValues(convertToList(dataset?.rows, selectedKeys));
+      setOptionValues([]);
       form?.setFieldsValue({
         config: {
           ...getControllerConfig(),
@@ -158,8 +151,12 @@ const ValuesOptionsSetter: FC<{
           controllerValues: [],
         },
       });
+      setTargetKeys([]);
+      const [viewId, viewField] = value;
+      const dataset = await fetchNewDataset(viewId, viewField);
+      setOptionValues(convertToList(dataset?.rows));
     },
-    [convertToList, fetchNewDataset, form, getControllerConfig, selectedKeys],
+    [convertToList, fetchNewDataset, form, getControllerConfig],
   );
 
   const getOptionType = useCallback(() => {
@@ -199,16 +196,20 @@ const ValuesOptionsSetter: FC<{
                 </Form.Item>
                 {getOptionType() === 'common' && (
                   <div className="transfer">
-                    <Transfer
-                      operations={['增加', '移除']}
-                      dataSource={optionValues}
-                      titles={[`${'可选项'}`, `${'默认选项'}`]}
-                      targetKeys={targetKeys}
-                      selectedKeys={selectedKeys}
-                      onChange={onTransferChange}
-                      onSelectChange={onTransferSelectChange}
-                      render={item => item.label}
-                    />
+                    <Select
+                      placeholder="请选择默认值"
+                      value={targetKeys}
+                      allowClear
+                      {...(isMultiple && { mode: 'multiple' })}
+                      onChange={onTargetKeyChange}
+                      style={{ width: '100%' }}
+                    >
+                      {optionValues.map(item => (
+                        <Select.Option key={item.key} value={item.key}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   </div>
                 )}
                 {getOptionType() === 'custom' && (

@@ -17,8 +17,8 @@
  */
 import { FormItemProps } from 'antd';
 import React, { memo } from 'react';
+import { MaxValueName, MinValueName } from '../..';
 import { NumberSetForm } from '../NumberSetter/NumberSetFrom';
-import { MaxValueName, MinValueName } from '../ValuesSetter';
 
 export interface NumberSetterProps {}
 export const MaxValueSetter: React.FC<NumberSetterProps> = memo(() => {

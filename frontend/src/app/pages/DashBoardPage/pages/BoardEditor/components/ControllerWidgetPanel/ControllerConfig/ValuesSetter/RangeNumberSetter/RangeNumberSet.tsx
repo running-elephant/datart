@@ -18,7 +18,7 @@
 import { Form, FormItemProps, InputNumber } from 'antd';
 import { valueType } from 'antd/lib/statistic/utils';
 import React, { memo, useEffect, useState } from 'react';
-import { ControllerValuesName } from '../ValuesSetter';
+import { ControllerValuesName } from '../..';
 
 export const RangeNumberSetter: React.FC<{}> = memo(() => {
   const itemProps: FormItemProps<any> = {

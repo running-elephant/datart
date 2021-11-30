@@ -15,18 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { FormItemProps } from 'antd';
-import React from 'react';
-import { ControllerValuesName } from '../..';
-import { NumberSetForm } from './NumberSetFrom';
+import { Form, InputNumber } from 'antd';
+import React, { memo } from 'react';
+import { SliderStepName } from '../..';
 
-export interface NumberSetterProps {}
-export const NumberSetter: React.FC<NumberSetterProps> = () => {
-  const itemProps: FormItemProps<any> = {
-    preserve: true,
-    name: ControllerValuesName,
-    label: '默认值',
-    required: false,
-  };
-  return <NumberSetForm {...itemProps} />;
-};
+export const SliderStep: React.FC<{}> = memo(() => {
+  return (
+    <Form.Item
+      name={SliderStepName}
+      label="步长"
+      validateTrigger={['onChange', 'onBlur']}
+      rules={[{ required: true }]}
+    >
+      <InputNumber />
+    </Form.Item>
+  );
+});

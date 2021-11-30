@@ -366,7 +366,7 @@ export const createMediaContent = (type: MediaWidgetType) => {
   return content;
 };
 
-export const createFilterWidget = (params: {
+export const createControllerWidget = (params: {
   boardId: string;
   boardType: BoardType;
   relations: Relation[];
@@ -388,9 +388,7 @@ export const createFilterWidget = (params: {
   const content: ControllerWidgetContent = {
     type: controllerType,
     relatedViews: views,
-
     name: name,
-
     config: config,
   };
 
@@ -401,7 +399,7 @@ export const createFilterWidget = (params: {
     boardType: boardType,
   });
 
-  const widgetId = relations?.[0].sourceId || uuidv4();
+  const widgetId = relations[0]?.sourceId || uuidv4();
   const widget: Widget = createWidget({
     id: widgetId,
     dashboardId: boardId,

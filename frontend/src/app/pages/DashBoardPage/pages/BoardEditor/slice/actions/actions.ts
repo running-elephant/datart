@@ -146,9 +146,7 @@ export const updateWidgetControllerAction =
       config,
       controllerFacadeType,
       relations,
-      fieldValueType,
       name,
-      hasVariable,
     } = params;
     const content: ControllerWidgetContent = {
       type: controllerFacadeType,
@@ -164,7 +162,7 @@ export const updateWidgetControllerAction =
       boardType: boardType,
     });
 
-    const widgetId = relations?.[0].sourceId || uuidv4();
+    const widgetId = relations[0]?.sourceId || uuidv4();
     const widget: Widget = createWidget({
       id: widgetId,
       dashboardId: boardId,

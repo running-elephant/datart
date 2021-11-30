@@ -29,7 +29,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   convertToWidgetMap,
-  createFilterWidget,
+  createControllerWidget,
   getCanLinkFilterWidgets,
   getOtherStringControlWidgets,
 } from 'app/pages/DashBoardPage/utils/widget';
@@ -224,7 +224,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           }
         }
 
-        const widget = createFilterWidget({
+        const widget = createControllerWidget({
           boardId,
           boardType,
           name,
