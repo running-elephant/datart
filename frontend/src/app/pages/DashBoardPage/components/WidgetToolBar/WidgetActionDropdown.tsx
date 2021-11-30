@@ -17,6 +17,7 @@
  */
 import {
   BranchesOutlined,
+  CloseCircleOutlined,
   DeleteOutlined,
   EditOutlined,
   EllipsisOutlined,
@@ -35,62 +36,7 @@ import {
   WidgetActionListItem,
   widgetActionType,
 } from './config';
-export const WidgetActionList: WidgetActionListItem<widgetActionType>[] = [
-  {
-    key: 'refresh',
-    label: '同步数据',
-    icon: <SyncOutlined />,
-    disabled: false,
-  },
-  {
-    key: 'fullScreen',
-    label: '全屏',
-    icon: <FullscreenOutlined />,
-    disabled: false,
-  },
-  {
-    key: 'delete',
-    label: '删除',
-    icon: <DeleteOutlined />,
-    disabled: false,
-  },
-  {
-    key: 'edit',
-    label: '编辑',
-    icon: <EditOutlined />,
-    disabled: false,
-  },
-  {
-    key: 'info',
-    label: '信息',
-    icon: <InfoOutlined />,
-    disabled: false,
-  },
-  {
-    key: 'makeJump',
-    label: '跳转设置',
-    icon: <BranchesOutlined />,
-    disabled: false,
-  },
-  {
-    key: 'closeJump',
-    label: '删除跳转',
-    icon: <DeleteOutlined />,
-    disabled: false,
-  },
-  {
-    key: 'makeLinkage',
-    label: '联动设置',
-    icon: <LinkOutlined />,
-    disabled: false,
-  },
-  {
-    key: 'closeLinkage',
-    label: '删除联动',
-    icon: <DeleteOutlined />,
-    disabled: false,
-  },
-];
+
 export interface WidgetActionDropdownProps {
   widget: Widget;
 }
@@ -146,7 +92,7 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
         {
           key: 'closeJump',
           label: '删除跳转',
-          icon: <DeleteOutlined />,
+          icon: <CloseCircleOutlined />,
           disabled: false,
         },
         {
@@ -158,7 +104,7 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
         {
           key: 'closeLinkage',
           label: '删除联动',
-          icon: <DeleteOutlined />,
+          icon: <CloseCircleOutlined />,
           disabled: false,
         },
       ];
