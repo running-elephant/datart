@@ -76,13 +76,9 @@ export const ValuesSetter: React.FC<{
 
   const getMaxAndMin = () => {
     const config = getControllerConfig();
-    // return {
-    //   max: config?.maxValue === 0 ? 0 : config?.maxValue || 100,
-    //   min: config?.minValue === 0 ? 0 : config?.minValue || 1,
-    // };
     return {
-      max: config?.maxValue || 100,
-      min: config?.minValue || 1,
+      max: config?.maxValue === 0 ? 0 : config?.maxValue || 100,
+      min: config?.minValue === 0 ? 0 : config?.minValue || 1,
     };
   };
   const getSliderConf = () => {

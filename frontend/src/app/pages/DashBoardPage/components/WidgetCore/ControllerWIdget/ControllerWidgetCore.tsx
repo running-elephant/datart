@@ -202,8 +202,8 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
       case ControllerFacadeTypes.Slider:
         const step = config.sliderConfig?.step || 1;
         const showMarks = config.sliderConfig?.showMarks || false;
-        let minValue = config.minValue || 1;
-        let maxValue = config.maxValue || 100;
+        let minValue = config.minValue === 0 ? 0 : config.minValue || 1;
+        let maxValue = config.maxValue === 0 ? 0 : config.maxValue || 100;
         return (
           <SlideControllerForm
             value={controllerValues?.[0]}
