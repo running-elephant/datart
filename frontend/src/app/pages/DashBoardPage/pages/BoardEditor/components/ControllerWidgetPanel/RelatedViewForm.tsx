@@ -64,13 +64,14 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
     );
     const fieldValueValidator = async (opt, fieldValue: string[]) => {
       if (!fieldValue) {
-        return Promise.reject(new Error('请选择一个字段 或 两个变量'));
+        return Promise.reject(new Error('请关联字段 或 变量'));
       }
       if (Array.isArray(fieldValue)) {
         if (fieldValue.length !== 2) {
-          return Promise.reject(new Error('请选择一个字段 或 两个变量'));
+          return Promise.reject(new Error('请选择字段 或 两个变量'));
         }
       }
+
       return Promise.resolve(fieldValue);
     };
     const filterFieldCategoryChange = useCallback(
