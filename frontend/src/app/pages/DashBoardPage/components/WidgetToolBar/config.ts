@@ -21,7 +21,10 @@ export interface WidgetActionListItem<T> {
   key: T;
   label: string;
   icon: React.ReactNode;
-  disabled: boolean;
+  disabled?: boolean;
+  color?: string;
+  danger?: boolean;
+  divider?: boolean;
 }
 
 export const widgetActionTypeMap = strEnumType([
@@ -61,7 +64,7 @@ export const widgetActionMap = {
   edit: widgetEditActionMap,
 };
 
-export const getFilterActionList = (opt: {
+export const getWidgetActionList = (opt: {
   allList: WidgetActionListItem<widgetActionType>[];
   widget: Widget;
   boardEditing: boolean;
@@ -94,18 +97,17 @@ export const getEditChartActionList = (opt: {
   // TODO 判断哪些 chart 可以添加跳转 和联动 暂时用true 代替
   let chartCanMakeJump = true;
   let chartCanMakeLink = true;
-
-  if (chartCanMakeJump) {
-    curChartItems.push('makeJump');
-  }
-  if (widget.config.jumpConfig?.open) {
-    curChartItems.push('closeJump');
-  }
   if (chartCanMakeLink) {
     curChartItems.push('makeLinkage');
   }
   if (widget.config.linkageConfig?.open) {
     curChartItems.push('closeLinkage');
+  }
+  if (chartCanMakeJump) {
+    curChartItems.push('makeJump');
+  }
+  if (widget.config.jumpConfig?.open) {
+    curChartItems.push('closeJump');
   }
 
   return allList
