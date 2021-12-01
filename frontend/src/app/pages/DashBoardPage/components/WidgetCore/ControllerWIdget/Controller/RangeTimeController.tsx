@@ -79,6 +79,7 @@ export const RangeTimeController: React.FC<TimeSetProps> = memo(
         {pickerType === 'dateTime' ? (
           <RangePicker
             showTime
+            style={{ width: '100%' }}
             allowClear={true}
             value={_values as any}
             onChange={_onChange}
@@ -87,6 +88,7 @@ export const RangeTimeController: React.FC<TimeSetProps> = memo(
           <RangePicker
             onChange={_onChange}
             allowClear={true}
+            style={{ width: '100%' }}
             value={_values as any}
             picker={pickerType as any}
           />
