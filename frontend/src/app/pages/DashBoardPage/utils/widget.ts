@@ -26,7 +26,6 @@ import { CSSProperties } from 'react';
 import { G70 } from 'styles/StyleConstants';
 import { v4 as uuidv4 } from 'uuid';
 import { convertImageUrl, fillPx } from '.';
-import { widgetActionTypeMap } from '../components/WidgetToolBar/config';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
@@ -935,53 +934,4 @@ export const getCanLinkFilterWidgets = (widgets: Widget[]) => {
     return true;
   });
   return canLinkWidgets;
-};
-
-export const getWidgetActionList = (widget: Widget) => {
-  const canMakeLinkage = widget.config?.jumpConfig?.open;
-  const canMakeJump = widget.config?.linkageConfig?.open;
-  return [
-    {
-      key: widgetActionTypeMap.refresh,
-      label: '同步数据',
-      icon: '',
-      disabled: false,
-    },
-    {
-      key: widgetActionTypeMap.fullScreen,
-      label: '全屏',
-      icon: '',
-      disabled: false,
-    },
-    {
-      key: widgetActionTypeMap.delete,
-      label: '删除',
-      icon: '',
-      disabled: false,
-    },
-    {
-      key: widgetActionTypeMap.edit,
-      label: '编辑',
-      icon: '',
-      disabled: false,
-    },
-    {
-      key: widgetActionTypeMap.info,
-      label: '信息',
-      icon: '',
-      disabled: false,
-    },
-    {
-      key: widgetActionTypeMap.makeLinkage,
-      label: '设置联动',
-      icon: '',
-      disabled: !!canMakeLinkage,
-    },
-    {
-      key: widgetActionTypeMap.makeJump,
-      label: '设置跳转',
-      icon: '',
-      disabled: !!canMakeJump,
-    },
-  ];
 };

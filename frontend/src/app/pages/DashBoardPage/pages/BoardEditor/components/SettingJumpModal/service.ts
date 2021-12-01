@@ -5,9 +5,9 @@ import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
-import { FilterOptionItem } from './types';
+import { ControlOptionItem } from './types';
 const FILTER_MENU = [ChartDataViewFieldType.STRING];
-const computedDashboardFilters = (data): FilterOptionItem[] => {
+const computedDashboardControllers = (data): ControlOptionItem[] => {
   const widgets = data?.widgets || [];
   widgets.forEach(item => {
     item.config = item.config ? JSON.parse(item.config) : undefined;
@@ -27,9 +27,9 @@ const computedDashboardFilters = (data): FilterOptionItem[] => {
   return filterOptions;
 };
 // TODO fix about jump
-export const fetchDashboardFilters = async (id: string) => {
+export const fetchDashboardControllers = async (id: string) => {
   const { data } = await request<any>(`/viz/dashboards/${id}`);
-  return computedDashboardFilters(data);
+  return computedDashboardControllers(data);
 };
 const computedDataChartFilters = data => {
   if (data?.config) {
@@ -60,12 +60,12 @@ export const fetchDatachartFilters = async (id: string) => {
     throw error;
   }
 };
-export const fetchGlobalFiltersOptions = async (
+export const fetchGlobalControllerOptions = async (
   id: string,
   relType: VizType,
 ) => {
   if (relType === 'DASHBOARD') {
-    const res1 = await fetchDashboardFilters(id);
+    const res1 = await fetchDashboardControllers(id);
     return res1;
   } else if (relType === 'DATACHART') {
     const res2 = await fetchDatachartFilters(id);
