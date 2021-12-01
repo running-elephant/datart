@@ -180,9 +180,9 @@ export default DropTarget(
       endDrag: (props, monitor) => {
         const dropResult = monitor.getDropResult();
         if (!monitor.didDrop() && !dropResult) {
-          props.onDelete && props.onDelete();
+          props?.onDelete();
         } else if (monitor.didDrop() && !!dropResult?.delete) {
-          props.onDelete && props.onDelete();
+          props?.onDelete();
         }
       },
     },
