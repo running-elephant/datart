@@ -32,7 +32,11 @@ import {
 } from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
-import { DateControllerTypes, NumericalControllerTypes } from './constants';
+import {
+  DateControllerTypes,
+  NumericalControllerTypes,
+  RangeControlTypes,
+} from './constants';
 import { ControllerConfig, PickerType } from './types';
 
 export const getStringFacadeOptions = (type: ValueOptionType) => {
@@ -310,4 +314,8 @@ export const formatDateByPickType = (
     default:
       return null;
   }
+};
+
+export const isRangeTypeController = (type: ControllerFacadeTypes) => {
+  return RangeControlTypes.includes(type);
 };

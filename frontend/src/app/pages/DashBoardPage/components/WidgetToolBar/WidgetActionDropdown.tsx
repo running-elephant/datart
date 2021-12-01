@@ -88,7 +88,7 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
         },
         {
           key: 'closeLinkage',
-          label: '删除联动',
+          label: '关闭联动',
           icon: <CloseCircleOutlined />,
           danger: true,
         },
@@ -100,7 +100,7 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
         },
         {
           key: 'closeJump',
-          label: '删除跳转',
+          label: '关闭跳转',
           icon: <CloseCircleOutlined />,
           danger: true,
         },

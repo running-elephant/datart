@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { Form, Input } from 'antd';
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 
 export interface TextControllerProps {
@@ -44,16 +44,31 @@ export const TextControllerForm: React.FC<TextControllerProps> = memo(
 );
 export const TextController: React.FC<TextControllerProps> = memo(
   ({ onChange, value }) => {
+    const [val, setVal] = useState();
     const _onChange = e => {
+      setVal(e.target.value);
+    };
+    const _onChangeEnter = e => {
       onChange(e.target.value);
     };
+    const _onBlur = () => {
+      if (val !== value) {
+        onChange(val);
+      }
+    };
+    useEffect(() => {
+      setVal(value);
+    }, [value]);
     return (
       <StyledWrap>
         <span className="control-input ">
           <Input
-            value={value}
             allowClear={true}
+            value={val}
+            placeholder="按回车确认输入值"
             onChange={_onChange}
+            onPressEnter={_onChangeEnter}
+            onBlur={_onBlur}
             className="control-input-input"
           />
         </span>

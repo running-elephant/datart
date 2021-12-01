@@ -226,7 +226,7 @@ export interface RelationConfig {
 export interface RelatedView {
   viewId: string;
   relatedCategory: ChartDataViewFieldCategory;
-  fieldValue: string | number | Date | undefined;
+  fieldValue: string | number | Date | undefined | string[] | number[] | Date[];
   fieldValueType: ChartDataViewFieldType | undefined;
 }
 export interface ServerRelation extends Omit<Relation, 'config'> {

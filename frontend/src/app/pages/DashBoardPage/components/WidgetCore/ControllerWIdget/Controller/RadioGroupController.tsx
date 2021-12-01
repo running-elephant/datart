@@ -16,22 +16,21 @@
  * limitations under the License.
  */
 import { Form, Radio } from 'antd';
-import { SelectValue } from 'antd/lib/select';
 import { ControlOption } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import React, { memo, useCallback, useMemo } from 'react';
 import styled from 'styled-components/macro';
 
-export interface SelectControllerProps {
+export interface RadioControllerProps {
   radioButtonType?: any;
   options?: ControlOption[];
-  value?: SelectValue;
+  value?: any;
   placeholder?: string;
   onChange: (values) => void;
   label?: React.ReactNode;
   name?: string;
   required?: boolean;
 }
-export const RadioGroupControllerForm: React.FC<SelectControllerProps> = memo(
+export const RadioGroupControllerForm: React.FC<RadioControllerProps> = memo(
   ({ label, name, required, ...rest }) => {
     return (
       <Form.Item
@@ -45,7 +44,7 @@ export const RadioGroupControllerForm: React.FC<SelectControllerProps> = memo(
     );
   },
 );
-export const RadioGroupController: React.FC<SelectControllerProps> = memo(
+export const RadioGroupController: React.FC<RadioControllerProps> = memo(
   ({ options, onChange, value, radioButtonType, ...rest }) => {
     const _onChange = e => {
       onChange([e.target.value]);

@@ -27,6 +27,7 @@ import {
   EndTimeAmountName,
   EndTimeDirectionName,
   EndTimeExactName,
+  EndTimeName,
   EndTimeRelativeName,
   EndTimeROEName,
   EndTimeUnitName,
@@ -40,6 +41,7 @@ import {
 } from '../..';
 import {
   ControllerConfig,
+  ControllerDateType,
   PickerTypeOptions,
   RelativeDate,
 } from '../../../types';
@@ -68,6 +70,37 @@ export const TimeSetter: React.FC<{
     return getControllerConfig()?.controllerDate?.pickerType;
   }, [getControllerConfig]);
 
+  const RangeTimeValidator = async (_, values: any[]) => {
+    const controllerDate = getControllerConfig().controllerDate;
+
+    if (controllerType === ControllerFacadeTypes.Time) {
+      return Promise.resolve();
+    }
+    function hasValue(date: ControllerDateType | undefined) {
+      if (!date) {
+        return false;
+      }
+      if (date.relativeOrExact === RelativeOrExactTime.Exact) {
+        return date.exactValue;
+      } else {
+        return date.relativeValue;
+      }
+    }
+
+    const startHasValue = hasValue(controllerDate?.startTime);
+    const endHasValue = hasValue(controllerDate?.endTime);
+    if (!startHasValue && !endHasValue) {
+      return Promise.resolve(values);
+    }
+
+    if (!startHasValue && endHasValue) {
+      return Promise.reject(new Error('请填写 起始值'));
+    }
+    if (startHasValue && !endHasValue) {
+      return Promise.reject(new Error('请填写 结束值'));
+    }
+    return Promise.resolve(values);
+  };
   const onStartRelativeChange = useCallback(
     value => {
       const valueType: RelativeOrExactTime = value;
@@ -133,7 +166,7 @@ export const TimeSetter: React.FC<{
         name={name}
         noStyle
         shouldUpdate
-        validateTrigger={['onChange', 'onBlur']}
+        validateTrigger={['onBlur']}
         rules={[{ required: true }]}
       >
         <Select style={{ width: '100px' }} onChange={onChange}>
@@ -176,7 +209,7 @@ export const TimeSetter: React.FC<{
               label={'日期类型'}
               shouldUpdate
               validateTrigger={['onChange', 'onBlur']}
-              rules={[{ required: false }]}
+              rules={[{ required: true }]}
             >
               <Select>
                 {PickerTypeOptions.map(item => {
@@ -214,11 +247,7 @@ export const TimeSetter: React.FC<{
             )}
             {controllerType === ControllerFacadeTypes.RangeTime && (
               <>
-                <Form.Item
-                  label={'默认值-起始'}
-                  shouldUpdate
-                  rules={[{ required: false }]}
-                >
+                <Form.Item label={'默认值-起始'} shouldUpdate>
                   {renderROE(StartTimeROEName, onStartRelativeChange)}
                   {getStartRelativeOrExact() === RelativeOrExactTime.Exact &&
                     renderExact(StartTimeExactName, getPickerType)}
@@ -234,8 +263,9 @@ export const TimeSetter: React.FC<{
                 </Form.Item>
                 <Form.Item
                   label={'默认值-结束'}
+                  name={EndTimeName}
                   shouldUpdate
-                  rules={[{ required: false }]}
+                  // rules={[{ required: false, validator: RangeTimeValidator }]}
                 >
                   {renderROE(EndTimeROEName, onEndRelativeChange)}
 

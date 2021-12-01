@@ -125,10 +125,7 @@ export const renderedWidgetAsync = createAsyncThunk<
   { state: { board: BoardState } }
 >(
   'board/renderedWidgetAsync',
-  async (
-    { boardId, widgetId, renderMode },
-    { getState, dispatch, rejectWithValue },
-  ) => {
+  async ({ boardId, widgetId, renderMode }, { getState, dispatch }) => {
     const widgetMapMap = selectBoardWidgetMap(getState());
     const widgetMap = widgetMapMap[boardId];
     const curWidget = widgetMap[widgetId];

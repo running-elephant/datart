@@ -104,9 +104,8 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
   }, [dispatch, form]);
   const onFinish = useCallback(
     (values: { diffLinkages: diffViewLinkageItem[]; open: boolean }) => {
-      // console.log('--0 values', values);
       const diffLinkages = values.diffLinkages;
-      // console.log('-links-', diffLinkages);
+
       const sourceId = curWidget.id;
       const newRelations: Relation[] = [];
       sameViewWidgetIds.current.forEach(targetId => {
