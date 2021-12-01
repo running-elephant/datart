@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { Form, InputNumber } from 'antd';
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 
 export interface TextControllerProps {
@@ -44,13 +44,35 @@ export const NumberControllerForm: React.FC<TextControllerProps> = memo(
 );
 export const NumberController: React.FC<TextControllerProps> = memo(
   ({ onChange, value }) => {
+    const [val, setVal] = useState();
+    const _onChange = numberVal => {
+      setVal(numberVal);
+    };
+    const _onChangeEnter = e => {
+      if (e.target.value) {
+        onChange(e.target.value);
+        return;
+      }
+      onChange(e.target.value);
+    };
+    const _onBlur = () => {
+      if (val !== value) {
+        onChange(val);
+      }
+    };
+    useEffect(() => {
+      setVal(value);
+    }, [value]);
     return (
       <StyledWrap>
         <InputNumber
           style={{ width: '100%' }}
-          value={value}
-          onChange={onChange}
           className="control-number-input"
+          value={val}
+          placeholder="按回车确认输入值"
+          onChange={_onChange}
+          onPressEnter={_onChangeEnter}
+          onBlur={_onBlur}
         />
       </StyledWrap>
     );

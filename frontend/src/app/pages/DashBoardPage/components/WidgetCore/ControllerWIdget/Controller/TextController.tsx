@@ -63,9 +63,9 @@ export const TextController: React.FC<TextControllerProps> = memo(
       <StyledWrap>
         <span className="control-input ">
           <Input
+            allowClear={true}
             value={val}
             placeholder="按回车确认输入值"
-            allowClear={true}
             onChange={_onChange}
             onPressEnter={_onChangeEnter}
             onBlur={_onBlur}
