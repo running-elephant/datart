@@ -49,10 +49,6 @@ export const NumberController: React.FC<TextControllerProps> = memo(
       setVal(numberVal);
     };
     const _onChangeEnter = e => {
-      if (e.target.value) {
-        onChange(e.target.value);
-        return;
-      }
       onChange(e.target.value);
     };
     const _onBlur = () => {

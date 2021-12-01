@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { Form, Slider } from 'antd';
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 
 export interface SelectControllerProps {
@@ -47,16 +47,27 @@ export const SlideControllerForm: React.FC<SelectControllerProps> = memo(
 );
 export const SlideController: React.FC<SelectControllerProps> = memo(
   ({ onChange, value, minValue, maxValue, step, showMarks }) => {
+    const [val, setVal] = useState<any>();
+    const _onChange = _val => {
+      setVal(_val);
+    };
+    const _onChangeEnter = value => {
+      onChange(value);
+    };
+    useEffect(() => {
+      setVal(value);
+    }, [value]);
     const marks = {
       [minValue]: minValue,
       [maxValue]: maxValue,
-      [value]: value,
+      [val]: val,
     };
     return (
       <StyledWrap>
         <Slider
-          value={value}
-          onChange={onChange}
+          value={val}
+          onChange={_onChange}
+          onAfterChange={_onChangeEnter}
           min={minValue}
           max={maxValue}
           step={step}

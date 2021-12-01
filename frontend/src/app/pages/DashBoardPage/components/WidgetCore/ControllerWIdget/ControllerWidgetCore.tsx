@@ -97,25 +97,23 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
     renderedWidgetById(widget.id);
   }, [renderedWidgetById, widget.id]);
 
-  const onControllerValuesChange = useCallback(
-    values => {
-      form.submit();
-
-      if (values && typeof values === 'object' && !Array.isArray(values)) {
-        return;
-      }
-      const _values = values ? (Array.isArray(values) ? values : [values]) : [];
-      const nextWidget = produce(widget, draft => {
-        (
-          draft.config.content as ControllerWidgetContent
-        ).config.controllerValues = _values;
-      });
-      widgetUpdate(nextWidget);
-      refreshWidgetsByFilter(nextWidget);
-    },
-    [form, refreshWidgetsByFilter, widget, widgetUpdate],
-  );
-
+  const onControllerChange = useCallback(() => {
+    form.submit();
+  }, [form]);
+  const onFinish = value => {
+    const values = value.value;
+    if (values && typeof values === 'object' && !Array.isArray(values)) {
+      return;
+    }
+    const _values = values ? (Array.isArray(values) ? values : [values]) : [];
+    const nextWidget = produce(widget, draft => {
+      (
+        draft.config.content as ControllerWidgetContent
+      ).config.controllerValues = _values;
+    });
+    widgetUpdate(nextWidget);
+    refreshWidgetsByFilter(nextWidget);
+  };
   // const onSqlOperatorAndValues = useCallback(
   //   (sql: FilterSqlOperator, values: any[]) => {
   //     const nextWidget = produce(widget, draft => {
@@ -183,61 +181,62 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         form.setFieldsValue({ value: controllerValues?.[0] });
         return (
           <SelectControllerForm
-            value={controllerValues?.[0]}
-            onChange={onControllerValuesChange}
+            onChange={onControllerChange}
             options={selectOptions}
             name={'value'}
           />
         );
+
       case ControllerFacadeTypes.MultiDropdownList:
         form.setFieldsValue({ value: controllerValues });
         return (
           <MultiSelectControllerForm
-            value={controllerValues}
-            onChange={onControllerValuesChange}
+            onChange={onControllerChange}
             options={selectOptions}
             name={'value'}
           />
         );
+
       case ControllerFacadeTypes.Slider:
+        form.setFieldsValue({ value: controllerValues?.[0] });
         const step = config.sliderConfig?.step || 1;
         const showMarks = config.sliderConfig?.showMarks || false;
         let minValue = config.minValue === 0 ? 0 : config.minValue || 1;
         let maxValue = config.maxValue === 0 ? 0 : config.maxValue || 100;
         return (
           <SlideControllerForm
-            value={controllerValues?.[0]}
-            onChange={onControllerValuesChange}
+            onChange={onControllerChange}
             minValue={minValue}
             maxValue={maxValue}
             step={step}
+            name="value"
             showMarks={showMarks}
           />
         );
 
       case ControllerFacadeTypes.Value:
+        form.setFieldsValue({ value: controllerValues?.[0] });
         return (
-          <NumberControllerForm
-            value={controllerValues?.[0]}
-            onChange={onControllerValuesChange}
-          />
+          <NumberControllerForm onChange={onControllerChange} name="value" />
         );
 
       case ControllerFacadeTypes.RangeValue:
+        form.setFieldsValue({ value: controllerValues });
         return (
           <RangeNumberControllerForm
-            value={controllerValues}
-            onChange={onControllerValuesChange}
+            onChange={onControllerChange}
+            name="value"
           />
         );
+
       case ControllerFacadeTypes.Text:
+        form.setFieldsValue({ value: controllerValues?.[0] });
         return (
-          <TextControllerForm
-            value={controllerValues?.[0]}
-            onChange={onControllerValuesChange}
-          />
+          <TextControllerForm onChange={onControllerChange} name="value" />
         );
+
       case ControllerFacadeTypes.RadioGroup:
+        form.setFieldsValue({ value: controllerValues?.[0] });
         let RadioOptions = optionRows?.map(ele => {
           return { value: ele.key, label: ele.label } as ControlOption;
         });
@@ -245,37 +244,43 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
         return (
           <RadioGroupControllerForm
             radioButtonType={radioButtonType}
-            value={controllerValues?.[0]}
-            onChange={onControllerValuesChange}
+            onChange={onControllerChange}
             options={RadioOptions}
+            name="value"
           />
         );
+
       case ControllerFacadeTypes.RangeTime:
         const rangeTimeValues = getControllerDateValues(
           config.valueOptionType,
           config!.controllerDate!,
         );
+
+        form.setFieldsValue({ value: rangeTimeValues });
         let rangePickerType = controllerDate!.pickerType;
         return (
           <RangeTimeControllerForm
             pickerType={rangePickerType}
             onChange={onRangeTimeChange}
-            value={rangeTimeValues}
+            name="value"
           />
         );
+
       case ControllerFacadeTypes.Time:
         const timeValues = getControllerDateValues(
           config.valueOptionType,
           config!.controllerDate!,
         );
         let pickerType = controllerDate!.pickerType;
+        form.setFieldsValue({ value: timeValues[0] });
         return (
           <TimeControllerForm
             onChange={onTimeChange}
-            value={timeValues[0]}
             pickerType={pickerType}
+            name="value"
           />
         );
+
       default:
         break;
     }
@@ -284,7 +289,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
     facadeType,
     form,
     controllerValues,
-    onControllerValuesChange,
+    onControllerChange,
     config,
     controllerDate,
     onRangeTimeChange,
@@ -292,7 +297,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   ]);
   return (
     <Wrap>
-      <Form form={form} initialValues={{}} name="control-Form">
+      <Form form={form} name="control-Form" onFinish={onFinish}>
         {control}
       </Form>
     </Wrap>
