@@ -37,7 +37,7 @@ const ChartDataConfigPanel: FC<{
   ({ dataConfigs, onChange }) => {
     const translate = useI18NPrefix(`viz.palette.data`);
 
-    const getSectionComponent = (index, config) => {
+    const getSectionComponent = (config, index) => {
       const props = {
         key: index,
         ancestors: [index],
@@ -67,11 +67,7 @@ const ChartDataConfigPanel: FC<{
       }
     };
 
-    return (
-      <Wrapper>
-        {(dataConfigs || []).map((c, index) => getSectionComponent(index, c))}
-      </Wrapper>
-    );
+    return <Wrapper>{(dataConfigs || []).map(getSectionComponent)}</Wrapper>;
   },
   (prev, next) => {
     return prev.dataConfigs === next.dataConfigs;

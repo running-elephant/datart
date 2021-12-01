@@ -163,21 +163,18 @@ const ChartDataViewPanel: FC<{
 
   const getSortedFields = (dataView?: ChartDataView) => {
     const stringFields =
-      dataView?.meta?.filter(f => f.type === ChartDataViewFieldType.STRING) ||
-      [];
+      (dataView?.meta || [])
+        .concat(dataView?.computedFields || [])
+        ?.filter(f => f.type === ChartDataViewFieldType.STRING) || [];
     const numericFields =
-      dataView?.meta?.filter(f => f.type === ChartDataViewFieldType.NUMERIC) ||
-      [];
+      (dataView?.meta || [])
+        .concat(dataView?.computedFields || [])
+        ?.filter(f => f.type === ChartDataViewFieldType.NUMERIC) || [];
     const dateFields =
-      dataView?.meta?.filter(f => f.type === ChartDataViewFieldType.DATE) || [];
-    const computedFields = dataView?.computedFields || [];
-
-    return [
-      ...stringFields,
-      ...numericFields,
-      ...dateFields,
-      ...computedFields,
-    ];
+      (dataView?.meta || [])
+        .concat(dataView?.computedFields || [])
+        ?.filter(f => f.type === ChartDataViewFieldType.DATE) || [];
+    return [...dateFields, ...stringFields, ...numericFields];
   };
 
   return (
