@@ -23,7 +23,10 @@ import {
   RadioChangeEvent,
   Select,
 } from 'antd';
-import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import {
+  ControllerWidgetContent,
+  RelatedView,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView, {
   ChartDataViewFieldCategory,
@@ -32,11 +35,11 @@ import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { G90 } from 'styles/StyleConstants';
-import { filterValueTypeByControl } from './utils';
+import { filterValueTypeByControl, isRangeTypeController } from './utils';
 
 export interface RelatedViewFormProps {
   viewMap: Record<string, ChartDataView>;
-  form: FormInstance<any> | undefined;
+  form: FormInstance<ControllerWidgetContent> | undefined;
   controllerType: ControllerFacadeTypes;
   queryVariables: Variable[];
 
@@ -47,6 +50,29 @@ const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
   ({ viewMap, form, queryVariables, controllerType, getFormRelatedViews }) => {
+    const isMultiple = useCallback(
+      index => {
+        const relatedViews = getFormRelatedViews();
+        const isVariable =
+          relatedViews[index].relatedCategory ===
+          ChartDataViewFieldCategory.Variable;
+        const isRange = isRangeTypeController(controllerType);
+        const isMultiple = isVariable && isRange;
+        return isMultiple;
+      },
+      [controllerType, getFormRelatedViews],
+    );
+    const fieldValueValidator = async (opt, fieldValue: string[]) => {
+      if (!fieldValue) {
+        return Promise.reject(new Error('请选择一个字段 或 两个变量'));
+      }
+      if (Array.isArray(fieldValue)) {
+        if (fieldValue.length !== 2) {
+          return Promise.reject(new Error('请选择一个字段 或 两个变量'));
+        }
+      }
+      return Promise.resolve(fieldValue);
+    };
     const filterFieldCategoryChange = useCallback(
       (index: number) => (e: RadioChangeEvent) => {
         const relatedViews = getFormRelatedViews();
@@ -59,8 +85,14 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
     const fieldValueChange = useCallback(
       (index: number) => (value, option) => {
         const relatedViews = getFormRelatedViews();
+
+        const fieldValueType = Array.isArray(option)
+          ? option[0]?.fieldvaluetype
+          : option?.fieldvaluetype;
+
         relatedViews[index].fieldValue = value;
-        relatedViews[index].fieldValueType = option?.fieldvaluetype;
+        relatedViews[index].fieldValueType = fieldValueType;
+
         form?.setFieldsValue({ relatedViews: relatedViews });
       },
       [getFormRelatedViews, form],
@@ -136,19 +168,6 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
           rules={[
             {
               validator: async (_, relatedViews: RelatedView[]) => {
-                // const trimmedRelatedViews = relatedViews.filter(
-                //   item => item.fieldValue && item.fieldValueType,
-                // );
-                // if (!relatedViews || relatedViews.length < 1) {
-                //   return Promise.reject(
-                //     new Error('Please Choose at least one widget component'),
-                //   );
-                // }
-                // if (!trimmedRelatedViews || trimmedRelatedViews.length < 1) {
-                //   return Promise.reject(
-                //     new Error('Please Choose at least one view filed'),
-                //   );
-                // }
                 return Promise.resolve(relatedViews);
               },
             },
@@ -195,11 +214,13 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                       name={[field.name, 'fieldValue']}
                       fieldKey={[field.fieldKey, 'id']}
                       wrapperCol={{ span: 24 }}
+                      rules={[{ validator: fieldValueValidator }]}
                     >
                       <Select
                         showSearch
                         placeholder="请选择"
                         allowClear
+                        {...(isMultiple(index) && { mode: 'multiple' })}
                         onChange={fieldValueChange(index)}
                       >
                         {renderOptions(index)}

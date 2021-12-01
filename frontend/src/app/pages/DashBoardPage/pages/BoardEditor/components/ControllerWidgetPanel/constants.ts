@@ -34,3 +34,15 @@ export const DateControllerTypes = [
   ControllerFacadeTypes.RangeTime,
   ControllerFacadeTypes.Time,
 ];
+
+export const NeedLoadOptionTypes = [
+  ControllerFacadeTypes.DropdownList,
+  ControllerFacadeTypes.MultiDropdownList,
+  ControllerFacadeTypes.RadioGroup,
+  ControllerFacadeTypes.Tree,
+];
+export const RangeControlTypes = [
+  ControllerFacadeTypes.RangeTime,
+  ControllerFacadeTypes.RangeSlider,
+  ControllerFacadeTypes.RangeValue,
+];

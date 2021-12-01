@@ -197,6 +197,7 @@ const ValuesOptionsSetter: FC<{
                 {getOptionType() === 'common' && (
                   <div className="transfer">
                     <Select
+                      showSearch
                       placeholder="请选择默认值"
                       value={targetKeys}
                       allowClear
