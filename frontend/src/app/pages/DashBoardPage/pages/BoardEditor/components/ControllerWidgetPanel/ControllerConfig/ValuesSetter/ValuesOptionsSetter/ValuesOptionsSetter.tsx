@@ -45,38 +45,19 @@ const ValuesOptionsSetter: FC<{
   const isMultiple = useMemo(() => {
     return controllerType === ControllerFacadeTypes.MultiDropdownList;
   }, [controllerType]);
-  const getControllerValuesByType = (
-    values: any[],
-    controllerType: ControllerFacadeTypes,
-  ) => {
-    if (values?.length === 1) {
-      return values;
-    }
-    const singleValueTypes = [
-      ControllerFacadeTypes.DropdownList,
-      ControllerFacadeTypes.RadioGroup,
-    ];
-    if (singleValueTypes.includes(controllerType)) {
-      return [values?.[0]];
-    }
-    return values;
-  };
 
   const onTargetKeyChange = useCallback(
     nextTargetKeys => {
       setTargetKeys(nextTargetKeys);
       const nextControllerOpt: ControllerConfig = {
         ...getControllerConfig(),
-        controllerValues: getControllerValuesByType(
-          nextTargetKeys,
-          controllerType,
-        ),
+        controllerValues: nextTargetKeys,
       };
       form?.setFieldsValue({
         config: nextControllerOpt,
       });
     },
-    [controllerType, form, getControllerConfig],
+    [form, getControllerConfig],
   );
 
   // const
