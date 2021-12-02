@@ -45,6 +45,7 @@ import {
   BasicMarginWidth,
   BasicSlider,
   BasicSwitch,
+  BasicText,
   BasicUnControlledTabPanel,
 } from '../Basic';
 import {
@@ -156,6 +157,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           return <UnControlledTableHeaderPanel {...props} />;
         case ChartStyleSectionComponentType.GROUP:
           return <GroupLayout {...props} />;
+        case ChartStyleSectionComponentType.TEXT:
+          return <BasicText {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

@@ -29,4 +29,5 @@ export { default as BasicLine } from './BasicLine';
 export { default as BasicMarginWidth } from './BasicMarginWidth';
 export { default as BasicSlider } from './BasicSlider';
 export { default as BasicSwitch } from './BasicSwitch';
+export { default as BasicText } from './BasicText';
 export { default as BasicUnControlledTabPanel } from './BasicUnControlledTabPanel';
