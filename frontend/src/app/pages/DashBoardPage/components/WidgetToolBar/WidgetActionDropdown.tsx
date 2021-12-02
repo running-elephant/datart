@@ -18,11 +18,13 @@
 import { EllipsisOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu } from 'antd';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { selectDataChartById } from '../..//pages/Board/slice/selector';
 import { BoardContext } from '../../contexts/BoardContext';
 import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
 import { Widget } from '../../pages/Board/slice/types';
 import { getWidgetActionList } from '../../utils/widget';
-import { widgetActionMap } from './config';
+import { TriggerChartIds, widgetActionMap } from './config';
 
 export interface WidgetActionDropdownProps {
   widget: Widget;
@@ -32,23 +34,32 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
   ({ widget }) => {
     const { editing: boardEditing } = useContext(BoardContext);
     const { onWidgetAction } = useContext(WidgetMethodContext);
-
+    const dataChart = useSelector(state =>
+      selectDataChartById(state, widget?.datachartId),
+    );
+    const IsSupportTrigger = useMemo(
+      () => TriggerChartIds.includes(dataChart?.config.chartGraphId),
+      [dataChart],
+    );
     const widgetActionList = useMemo(
       () => getWidgetActionList(widget),
       [widget],
     );
+
     const menuClick = useCallback(
       ({ key }) => {
         onWidgetAction(key, widget);
       },
       [onWidgetAction, widget],
     );
+
     const actionList = useMemo(() => {
       const actionMap = boardEditing
         ? widgetActionMap.edit
         : widgetActionMap.view;
       const menuItems = actionMap[widget.config.type].map(key => {
         const action = widgetActionList.find(item => item.key === key);
+        if (key === 'makeLinkage' && !IsSupportTrigger) return null;
         if (action) {
           return (
             <Menu.Item disabled={action.disabled} key={action.key}>
@@ -60,7 +71,14 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
         }
       });
       return <Menu onClick={menuClick}>{menuItems}</Menu>;
-    }, [boardEditing, menuClick, widget.config.type, widgetActionList]);
+    }, [
+      boardEditing,
+      menuClick,
+      widget.config.type,
+      widgetActionList,
+      IsSupportTrigger,
+    ]);
+
     return (
       <Dropdown
         className="widget-tool-dropdown"

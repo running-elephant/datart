@@ -253,7 +253,10 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       const boardFilters = linkRelations.map(re => {
         const filter: BoardLinkFilter = {
           triggerWidgetId: widget.id,
-          triggerValue: params.name as string,
+          triggerValue:
+            params.seriesType === 'scatter'
+              ? (params.name as string)
+              : (params?.data?.rowData?.platform as string),
           triggerDataChartId: widget.datachartId,
           linkerWidgetId: re.targetId,
         };
