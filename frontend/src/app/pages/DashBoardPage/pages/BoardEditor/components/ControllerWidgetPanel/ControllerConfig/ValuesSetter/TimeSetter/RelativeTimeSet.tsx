@@ -36,13 +36,13 @@ export const RelativeTimeSet: React.FC<RelativeTimeSetProps> = memo(
           name={relativeName}
           shouldUpdate
           validateTrigger={['onChange', 'onBlur']}
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: '' }]}
         >
           <Form.Item
             name={amountName}
             noStyle
             validateTrigger={['onChange', 'onBlur']}
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: '' }]}
           >
             <InputNumber step={1} min={0} />
           </Form.Item>
@@ -50,7 +50,7 @@ export const RelativeTimeSet: React.FC<RelativeTimeSetProps> = memo(
             name={unitName}
             noStyle
             validateTrigger={['onChange', 'onBlur']}
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: '' }]}
           >
             <Select style={{ width: '80px' }}>
               {TIME_UNIT_OPTIONS.map(item => (
@@ -64,7 +64,7 @@ export const RelativeTimeSet: React.FC<RelativeTimeSetProps> = memo(
             name={directionName}
             noStyle
             validateTrigger={['onChange', 'onBlur']}
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: '' }]}
           >
             <Select style={{ width: '80px' }}>
               {TIME_DIRECTION.map(item => {
