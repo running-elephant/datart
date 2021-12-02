@@ -3,6 +3,10 @@ import {
   transformToViewConfig,
 } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import {
+  ChartDataSectionField,
+  ChartDataSectionType,
+} from 'app/types/ChartConfig';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -87,9 +91,23 @@ export const getChartRequestParams = (dataChart: DataChart) => {
   return requestParams;
 };
 
-export const getChartGroupColumns = dataChart => {
-  const builder = getChartDataRequestBuilder(dataChart);
-  const groupColumns = builder.buildGroupColumns();
+export const getChartGroupColumns = (dataChart: DataChart) => {
+  const chartDataConfigs = dataChart?.config?.chartConfig?.datas;
+  if (!chartDataConfigs) return [] as ChartDataSectionField[];
+  const groupTypes = [ChartDataSectionType.GROUP, ChartDataSectionType.COLOR];
+  //  ChartDataSectionType.MIXED  ??
+  const groupColumns = chartDataConfigs.reduce<ChartDataSectionField[]>(
+    (acc, cur) => {
+      if (!cur.rows) {
+        return acc;
+      }
+      if (groupTypes.includes(cur.type as any)) {
+        return acc.concat(cur.rows);
+      }
+      return acc;
+    },
+    [],
+  );
   return groupColumns;
 };
 

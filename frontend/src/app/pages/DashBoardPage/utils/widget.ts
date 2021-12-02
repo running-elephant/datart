@@ -942,5 +942,9 @@ export const getLinkedColumn = (
 ) => {
   const relations = triggerWidget.relations;
   const relation = relations.find(item => item.targetId === targetWidgetId);
-  return relation?.config?.widgetToWidget?.linkerColumn || '';
+  return (
+    relation?.config?.widgetToWidget?.linkerColumn ||
+    relation?.config?.widgetToWidget?.triggerColumn ||
+    ''
+  );
 };
