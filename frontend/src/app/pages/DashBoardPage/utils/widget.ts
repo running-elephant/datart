@@ -935,3 +935,12 @@ export const getCanLinkFilterWidgets = (widgets: Widget[]) => {
   });
   return canLinkWidgets;
 };
+
+export const getLinkedColumn = (
+  targetWidgetId: string,
+  triggerWidget: Widget,
+) => {
+  const relations = triggerWidget.relations;
+  const relation = relations.find(item => item.targetId === targetWidgetId);
+  return relation?.config?.widgetToWidget?.linkerColumn || '';
+};
