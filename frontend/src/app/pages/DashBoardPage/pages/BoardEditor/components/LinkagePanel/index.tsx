@@ -25,7 +25,7 @@ import {
   BoardState,
   Relation,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { getChartDataRequestBuilder } from 'app/pages/DashBoardPage/utils';
+import { getChartGroupColumns } from 'app/pages/DashBoardPage/utils';
 import {
   convertToWidgetMap,
   getCanLinkFilterWidgets,
@@ -45,7 +45,7 @@ import {
   selectLinkagePanel,
   selectSortAllWidgets,
 } from '../../slice/selectors';
-import { diffViewLinkageItem, LinkageFields } from './LinkageFields';
+import { LinkageFields, ViewLinkageItem } from './LinkageFields';
 import { LinkageWidgets } from './linkageWidgets';
 
 export interface LinkagePanelProps {}
@@ -66,7 +66,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
   const [visible, setVisible] = useState(false);
   // const [sameViewWidgetIds, setSameViewWidgetIds] = useState<string[]>([]);
   const sameViewWidgetIds = useRef<string[]>([]);
-  const linkagesRef = useRef<diffViewLinkageItem[]>([]);
+  const linkagesRef = useRef<ViewLinkageItem[]>([]);
   useEffect(() => {
     const hide = !type || type === 'hide';
     setVisible(!hide);
@@ -75,14 +75,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
   const dataChart = useSelector((state: { board: BoardState }) =>
     selectDataChartById(state, curWidget?.datachartId),
   );
-  const chartGroupColumns = useMemo(() => {
-    if (!dataChart) {
-      return [];
-    }
-    const builder = getChartDataRequestBuilder(dataChart);
-    let groupColumns = builder.buildGroupColumns();
-    return groupColumns;
-  }, [dataChart]);
+  const chartGroupColumns = getChartGroupColumns(dataChart);
 
   const formItemStyles = {
     labelCol: { span: 4 },
@@ -103,7 +96,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
     );
   }, [dispatch, form]);
   const onFinish = useCallback(
-    (values: { diffLinkages: diffViewLinkageItem[]; open: boolean }) => {
+    (values: { diffLinkages: ViewLinkageItem[]; open: boolean }) => {
       const diffLinkages = values.diffLinkages;
 
       const sourceId = curWidget.id;
@@ -166,9 +159,9 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
         }
       });
       sameViewWidgetIds.current = sameIds;
-      const linkages: diffViewLinkageItem[] =
+      const linkages: ViewLinkageItem[] =
         form?.getFieldValue('diffLinkages') || [];
-      const nextDiffLinkages: diffViewLinkageItem[] = [];
+      const nextDiffLinkages: ViewLinkageItem[] = [];
       diffIds.forEach(pickedId => {
         const widget = widgetMap[pickedId];
         if (!widget) return;
@@ -177,7 +170,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
         if (oldItem) {
           nextDiffLinkages.push({ ...oldItem });
         } else {
-          const newItem: diffViewLinkageItem = {
+          const newItem: ViewLinkageItem = {
             triggerViewId: curWidget.viewIds[0],
             triggerColumn: undefined,
             linkerId: pickedId,
@@ -207,14 +200,14 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
         }
         return false;
       });
-    const diffLinkages: diffViewLinkageItem[] = [];
+    const diffLinkages: ViewLinkageItem[] = [];
     relations.forEach(re => {
       const link = re.config.widgetToWidget;
       if (!widgetMap[re.targetId]) {
         return;
       }
       const linkWidget = widgetMap[re.targetId];
-      const item: diffViewLinkageItem = {
+      const item: ViewLinkageItem = {
         triggerViewId: curWidget.viewIds[0],
         triggerColumn: link?.triggerColumn,
         linkerViewId: linkWidget.viewIds[0],

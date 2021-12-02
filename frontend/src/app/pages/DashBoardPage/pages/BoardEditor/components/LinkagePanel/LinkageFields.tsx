@@ -24,7 +24,7 @@ import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { PRIMARY } from 'styles/StyleConstants';
 const { Option } = Select;
-export interface diffViewLinkageItem {
+export interface ViewLinkageItem {
   triggerViewId: string;
   triggerColumn: string | undefined;
   linkerViewId: string;
@@ -43,7 +43,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
     // const dataChart
     const renderOptions = useCallback(
       (index: number, key: 'triggerViewId' | 'linkerViewId') => {
-        const diffLinkages: diffViewLinkageItem[] =
+        const diffLinkages: ViewLinkageItem[] =
           form?.getFieldValue('diffLinkages');
         if (!diffLinkages) {
           return null;
@@ -82,7 +82,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
     );
     const getItem = useCallback(
       (index: number) => {
-        const diffLinkages: diffViewLinkageItem[] =
+        const diffLinkages: ViewLinkageItem[] =
           form?.getFieldValue('diffLinkages');
         return diffLinkages[index];
       },
@@ -90,7 +90,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
     );
     const getLinkerView = useCallback(
       (index: number) => {
-        const diffLinkages: diffViewLinkageItem[] =
+        const diffLinkages: ViewLinkageItem[] =
           form?.getFieldValue('diffLinkages');
         if (!diffLinkages) {
           return null;
