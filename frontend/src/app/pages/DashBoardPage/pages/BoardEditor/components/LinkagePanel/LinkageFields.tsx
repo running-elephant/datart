@@ -43,9 +43,9 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
     // const dataChart
     const renderOptions = useCallback(
       (index: number, key: 'triggerViewId' | 'linkerViewId') => {
-        const diffLinkages: ViewLinkageItem[] =
-          form?.getFieldValue('diffLinkages');
-        if (!diffLinkages) {
+        const viewLinkages: ViewLinkageItem[] =
+          form?.getFieldValue('viewLinkages');
+        if (!viewLinkages) {
           return null;
         }
         if (key === 'triggerViewId') {
@@ -62,7 +62,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
             </Option>
           ));
         } else if (key === 'linkerViewId') {
-          return viewMap[diffLinkages[index][key]].meta
+          return viewMap[viewLinkages[index][key]].meta
             ?.filter(item => {
               return item.type === ChartDataViewFieldType.STRING;
             })
@@ -82,20 +82,20 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
     );
     const getItem = useCallback(
       (index: number) => {
-        const diffLinkages: ViewLinkageItem[] =
-          form?.getFieldValue('diffLinkages');
-        return diffLinkages[index];
+        const viewLinkages: ViewLinkageItem[] =
+          form?.getFieldValue('viewLinkages');
+        return viewLinkages[index];
       },
       [form],
     );
     const getLinkerView = useCallback(
       (index: number) => {
-        const diffLinkages: ViewLinkageItem[] =
-          form?.getFieldValue('diffLinkages');
-        if (!diffLinkages) {
+        const viewLinkages: ViewLinkageItem[] =
+          form?.getFieldValue('viewLinkages');
+        if (!viewLinkages) {
           return null;
         }
-        return viewMap[diffLinkages[index].linkerViewId];
+        return viewMap[viewLinkages[index].linkerViewId];
       },
       [form, viewMap],
     );
@@ -103,8 +103,8 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
       <Wrap>
         <Divider orientation="left">关联字段</Divider>
 
-        <div> 数据源 : {viewMap[curWidget.viewIds[0]]?.name}</div>
-        <Form.List name="diffLinkages">
+        <div> 数据源 : {viewMap[curWidget?.viewIds?.[0]]?.name}</div>
+        <Form.List name="viewLinkages">
           {(fields, _, { errors }) => {
             return (
               <>

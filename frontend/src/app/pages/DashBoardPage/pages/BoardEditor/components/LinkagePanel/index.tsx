@@ -96,38 +96,23 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
     );
   }, [dispatch, form]);
   const onFinish = useCallback(
-    (values: { diffLinkages: ViewLinkageItem[]; open: boolean }) => {
-      const diffLinkages = values.diffLinkages;
+    (values: { viewLinkages: ViewLinkageItem[]; open: boolean }) => {
+      const viewLinkages = values.viewLinkages;
 
       const sourceId = curWidget.id;
       const newRelations: Relation[] = [];
-      sameViewWidgetIds.current.forEach(targetId => {
-        // TODO 暂时选择第一个 后需添加都加入
-        const item: Relation = {
-          sourceId,
-          targetId,
-          config: {
-            type: 'widgetToWidget',
-            widgetToWidget: {
-              sameView: true,
-              triggerColumn: '',
-              linkerColumn: '',
-            },
-          },
-        };
-        newRelations.push(item);
-      });
-      if (diffLinkages) {
-        diffLinkages.forEach(diffLink => {
+
+      if (viewLinkages) {
+        viewLinkages.forEach(linkItem => {
           const item: Relation = {
             sourceId,
-            targetId: diffLink.linkerId,
+            targetId: linkItem.linkerId,
             config: {
               type: 'widgetToWidget',
               widgetToWidget: {
                 sameView: false,
-                triggerColumn: diffLink.triggerColumn!,
-                linkerColumn: diffLink.linkerColumn!,
+                triggerColumn: linkItem.triggerColumn!,
+                linkerColumn: linkItem.linkerColumn!,
               },
             },
           };
@@ -152,7 +137,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
       const diffIds: string[] = [];
 
       pickedIds.forEach(pickedId => {
-        if (curWidget?.viewIds[0] === widgetMap[pickedId]?.viewIds?.[0]) {
+        if (curWidget?.viewIds?.[0] === widgetMap[pickedId]?.viewIds?.[0]) {
           sameIds.push(pickedId);
         } else {
           diffIds.push(pickedId);
@@ -160,31 +145,50 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
       });
       sameViewWidgetIds.current = sameIds;
       const linkages: ViewLinkageItem[] =
-        form?.getFieldValue('diffLinkages') || [];
-      const nextDiffLinkages: ViewLinkageItem[] = [];
+        form?.getFieldValue('viewLinkages') || [];
+      const nextViewLinkages: ViewLinkageItem[] = [];
+      sameIds.forEach(sameId => {
+        const widget = widgetMap[sameId];
+        if (!widget) return;
+        const linkerViewId = widget?.viewIds?.[0];
+        const oldItem = linkages.find(item => item.linkerId === sameId);
+        if (oldItem) {
+          nextViewLinkages.push({ ...oldItem });
+        } else {
+          const newItem: ViewLinkageItem = {
+            triggerViewId: curWidget?.viewIds[0],
+            triggerColumn: chartGroupColumns?.[0]?.colName,
+            linkerId: sameId,
+            linkerName: widgetMap[sameId]?.config.name,
+            linkerViewId: linkerViewId,
+            linkerColumn: chartGroupColumns?.[0]?.colName,
+          };
+          nextViewLinkages.push(newItem);
+        }
+      });
       diffIds.forEach(pickedId => {
         const widget = widgetMap[pickedId];
         if (!widget) return;
-        const linkerViewId = widget.viewIds?.[0];
+        const linkerViewId = widget?.viewIds?.[0];
         const oldItem = linkages.find(item => item.linkerId === pickedId);
         if (oldItem) {
-          nextDiffLinkages.push({ ...oldItem });
+          nextViewLinkages.push({ ...oldItem });
         } else {
           const newItem: ViewLinkageItem = {
-            triggerViewId: curWidget.viewIds[0],
-            triggerColumn: undefined,
+            triggerViewId: curWidget?.viewIds[0],
+            triggerColumn: chartGroupColumns?.[0]?.colName,
             linkerId: pickedId,
             linkerName: widgetMap[pickedId]?.config.name,
             linkerViewId: linkerViewId,
             linkerColumn: undefined,
           };
-          nextDiffLinkages.push(newItem);
+          nextViewLinkages.push(newItem);
         }
       });
-      linkagesRef.current = nextDiffLinkages;
-      form?.setFieldsValue({ diffLinkages: nextDiffLinkages });
+      linkagesRef.current = nextViewLinkages;
+      form?.setFieldsValue({ viewLinkages: nextViewLinkages });
     },
-    [curWidget?.viewIds, form, widgetMap],
+    [chartGroupColumns, curWidget?.viewIds, form, widgetMap],
   );
   useEffect(() => {
     if (!curWidget) {
@@ -192,15 +196,11 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
       return;
     }
 
-    const relations = curWidget.relations
-      .filter(ele => ele.config.type === 'widgetToWidget')
-      .filter(ele => {
-        if (ele.config.widgetToWidget && !ele.config.widgetToWidget.sameView) {
-          return true;
-        }
-        return false;
-      });
-    const diffLinkages: ViewLinkageItem[] = [];
+    const relations = curWidget.relations.filter(
+      ele => ele.config.type === 'widgetToWidget',
+    );
+
+    const viewLinkages: ViewLinkageItem[] = [];
     relations.forEach(re => {
       const link = re.config.widgetToWidget;
       if (!widgetMap[re.targetId]) {
@@ -208,17 +208,17 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
       }
       const linkWidget = widgetMap[re.targetId];
       const item: ViewLinkageItem = {
-        triggerViewId: curWidget.viewIds[0],
+        triggerViewId: curWidget?.viewIds?.[0],
         triggerColumn: link?.triggerColumn,
-        linkerViewId: linkWidget.viewIds[0],
+        linkerViewId: linkWidget?.viewIds?.[0],
         linkerColumn: link?.linkerColumn,
         linkerId: linkWidget.id,
         linkerName: linkWidget.config.name,
       };
-      diffLinkages.push(item);
+      viewLinkages.push(item);
     });
     const open = curWidget.config.linkageConfig?.open;
-    form?.setFieldsValue({ diffLinkages: diffLinkages, open: open });
+    form?.setFieldsValue({ viewLinkages: viewLinkages, open: open });
   }, [curWidget, form, setColNames, widgetMap]);
   return (
     <Modal

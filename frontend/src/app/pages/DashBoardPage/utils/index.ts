@@ -141,7 +141,7 @@ export const getTneWidgetFiltersAndParams = (obj: {
     const { relatedViews, config: controllerConfig, type } = content;
     const relatedViewItem = relatedViews
       .filter(view => view.fieldValue)
-      .find(view => view.viewId === chartWidget.viewIds[0]);
+      .find(view => view.viewId === chartWidget?.viewIds?.[0]);
     if (!relatedViewItem) return;
 
     const values = getWidgetControlValues({
