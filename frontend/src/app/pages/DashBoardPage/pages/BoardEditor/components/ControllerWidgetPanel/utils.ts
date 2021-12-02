@@ -287,3 +287,29 @@ export const formatDateByPickType = (
 export const isRangeTypeController = (type: ControllerFacadeTypes) => {
   return RangeControlTypes.includes(type);
 };
+
+export const rangeNumberValidator = async (_, values: any[]) => {
+  if (!values?.[0] && !values?.[1]) {
+  }
+  function hasValue(value) {
+    if (value === 0) {
+      return true;
+    }
+    return !!value;
+  }
+  const startHasValue = hasValue(values?.[0]);
+  const endHasValue = hasValue(values?.[1]);
+  if (!startHasValue && !endHasValue) {
+    return Promise.resolve(values);
+  }
+  if (!startHasValue && endHasValue) {
+    return Promise.reject(new Error('请填写 起始值'));
+  }
+  if (startHasValue && !endHasValue) {
+    return Promise.reject(new Error('请填写 结束值'));
+  }
+  if (values?.[0] - values?.[1] > 0) {
+    return Promise.reject(new Error(' 起始值 不该小于 结束值'));
+  }
+  return Promise.resolve(values);
+};
