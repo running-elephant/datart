@@ -54,7 +54,11 @@ export const RadioGroupController: React.FC<RadioControllerProps> = memo(
     }, [radioButtonType]);
     const renderOptions = useCallback(() => {
       return (options || []).map(o => (
-        <RadioItem key={o.value || o.label} value={o.value}>
+        <RadioItem
+          className="radio-item"
+          key={o.value || o.label}
+          value={o.value}
+        >
           {o.label || o.value}
         </RadioItem>
       ));
@@ -62,7 +66,12 @@ export const RadioGroupController: React.FC<RadioControllerProps> = memo(
 
     return (
       <StyledWrap>
-        <Radio.Group value={value} optionType={'button'} onChange={_onChange}>
+        <Radio.Group
+          className="control-radio-group"
+          value={value}
+          optionType={'button'}
+          onChange={_onChange}
+        >
           {renderOptions()}
         </Radio.Group>
       </StyledWrap>
@@ -75,7 +84,10 @@ const StyledWrap = styled.div`
   justify-content: space-around;
   width: 100%;
 
-  & .ant-input {
+  .control-radio-group {
     background-color: transparent;
+    .radio-item {
+      background-color: transparent;
+    }
   }
 `;
