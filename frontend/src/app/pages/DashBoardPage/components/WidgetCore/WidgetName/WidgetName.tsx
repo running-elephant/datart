@@ -35,14 +35,10 @@ export const WidgetName: FC<{
 };
 
 const StyledWrap = styled.div<{ conf: WidgetNameConfig; zIndex?: number }>`
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: ${p => p.zIndex || 9};
   display: ${p => (p.conf?.show ? 'block' : 'none')};
   width: 100%;
   line-height: 24px;
-  /* text-align: center; */
+
   cursor: pointer;
 
   .widget-name {

@@ -151,6 +151,5 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
 });
 const WidgetWrap = styled.div`
   display: flex;
-  width: 100%;
-  height: 100%;
+  flex: 1;
 `;

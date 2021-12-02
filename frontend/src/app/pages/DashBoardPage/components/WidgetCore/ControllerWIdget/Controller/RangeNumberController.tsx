@@ -17,6 +17,7 @@
  */
 import { Form, InputNumber } from 'antd';
 import { valueType } from 'antd/lib/statistic/utils';
+import { rangeNumberValidator } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/utils';
 import React, { memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 
@@ -31,37 +32,12 @@ export interface NumberControllerFormProps {
 
 export const RangeNumberControllerForm: React.FC<NumberControllerFormProps> =
   memo(({ label, name, required, ...rest }) => {
-    const RangeNumberValidator = async (_, values: any[]) => {
-      if (!values?.[0] && !values?.[1]) {
-      }
-      function hasValue(value) {
-        if (value === 0) {
-          return true;
-        }
-        return !!value;
-      }
-      const startHasValue = hasValue(values?.[0]);
-      const endHasValue = hasValue(values?.[1]);
-      if (!startHasValue && !endHasValue) {
-        return Promise.resolve(values);
-      }
-      if (!startHasValue && endHasValue) {
-        return Promise.reject(new Error('请填写 起始值'));
-      }
-      if (startHasValue && !endHasValue) {
-        return Promise.reject(new Error('请填写 结束值'));
-      }
-      console.log('-- validator values', values);
-      return Promise.resolve(values);
-    };
-
     return (
       <Form.Item
         name={name}
         label={label}
         validateTrigger={['onBlur', 'onEnter', 'onChange']}
-        // {...rest}
-        rules={[{ validator: RangeNumberValidator }]}
+        rules={[{ validator: rangeNumberValidator }]}
       >
         <RangeNumberController {...rest} />
       </Form.Item>

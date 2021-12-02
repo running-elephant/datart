@@ -52,6 +52,7 @@ const Wrap = styled.div`
   }
 `;
 const ItemContainer = styled.div`
-  width: 100%;
-  height: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
 `;

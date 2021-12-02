@@ -5,6 +5,7 @@ import {
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView, {
   ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
 } from 'app/types/ChartDataView';
 import {
   ControllerFacadeTypes,
@@ -27,6 +28,7 @@ import {
   ControllerDate,
 } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { ChartRequestFilter } from './../../ChartWorkbenchPage/models/ChartHttpRequest';
+import { getLinkedColumn } from './widget';
 
 export const convertImageUrl = (urlKey: string = ''): string => {
   if (urlKey.startsWith(STORAGE_IMAGE_KEY_PREFIX)) {
@@ -337,7 +339,7 @@ export const getChartWidgetRequestParams = (obj: {
 
   const { filterParams, variableParams } = getTneWidgetFiltersAndParams({
     chartWidget: curWidget,
-    widgetMap: widgetMap,
+    widgetMap,
     params: requestParams.params,
   });
 
@@ -353,17 +355,14 @@ export const getChartWidgetRequestParams = (obj: {
     );
     if (links.length) {
       boardLinkFilters.forEach(link => {
-        const { triggerDataChartId, triggerValue } = link;
-        const dataChart = dataChartMap[triggerDataChartId];
-        const builder = getChartDataRequestBuilder(dataChart);
-        let chartGroupColumns = builder.buildGroupColumns();
-        // TODO 需要确认 FilterSqlOperator.In
+        const { triggerValue, triggerWidgetId } = link;
+        const triggerWidget = widgetMap[triggerWidgetId];
         const filter: ChartRequestFilter = {
           aggOperator: null,
-          column: chartGroupColumns[0].colName,
+          column: getLinkedColumn(curWidget.id, triggerWidget),
           sqlOperator: FilterSqlOperator.In,
           values: [
-            { value: triggerValue, valueType: chartGroupColumns[0].type },
+            { value: triggerValue, valueType: ChartDataViewFieldType.STRING },
           ],
         };
         linkFilters.push(filter);
