@@ -81,21 +81,16 @@ const StyledWrap = styled.div`
 
   justify-content: space-around;
   width: 100%;
-
-  & .control-input-input {
-    width: 100%;
-  }
-  .control-select {
-    display: flex;
-    flex: 1;
-    width: 40%;
-  }
   .control-input {
     display: flex;
     flex: 1;
   }
-
-  & .ant-input {
+  & .control-input-input {
+    width: 100%;
     background-color: transparent !important;
+
+    & .ant-input {
+      background-color: transparent !important;
+    }
   }
 `;
