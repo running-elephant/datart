@@ -69,6 +69,7 @@ export const SelectController: React.FC<SelectControllerProps> = memo(
         filterOption={(input, option) =>
           option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
         }
+        bordered={false}
       >
         {children ? children : renderOptions()}
       </StyledSelect>

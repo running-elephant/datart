@@ -297,12 +297,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   ]);
   return (
     <Wrap>
-      <Form
-        form={form}
-        className="control-form"
-        name="control-Form"
-        onFinish={onFinish}
-      >
+      <Form form={form} className="control-form" onFinish={onFinish}>
         {control}
       </Form>
     </Wrap>
@@ -312,7 +307,12 @@ const Wrap = styled.div`
   flex: 1;
   display: flex;
   align-items: center;
+
   .control-form {
     flex: 1;
+  }
+
+  .ant-form-item {
+    margin-bottom: 0;
   }
 `;

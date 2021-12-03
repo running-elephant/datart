@@ -70,6 +70,7 @@ export const TextController: React.FC<TextControllerProps> = memo(
             onPressEnter={_onChangeEnter}
             onBlur={_onBlur}
             className="control-input-input"
+            bordered={false}
           />
         </span>
       </StyledWrap>
