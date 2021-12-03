@@ -42,6 +42,7 @@ import React, {
   useMemo,
 } from 'react';
 import styled from 'styled-components/macro';
+import { LabelName } from '../WidgetName/WidgetName';
 import { MultiSelectControllerForm } from './Controller/MultiSelectController';
 import { NumberControllerForm } from './Controller/NumberController';
 import { RadioGroupControllerForm } from './Controller/RadioGroupController';
@@ -63,10 +64,12 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   } = useContext(WidgetDataContext);
   const { widgetUpdate, refreshWidgetsByFilter } =
     useContext(BoardActionContext);
+
   const { config, type: facadeType } = useMemo(
     () => widget.config.content as ControllerWidgetContent,
     [widget],
   );
+
   const {
     controllerDate,
     controllerValues,
@@ -74,6 +77,28 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     valueOptionType,
     sqlOperator,
   } = useMemo(() => config as ControllerConfig, [config]);
+  const leftControlLabel = useMemo(() => {
+    if (!widget.config.nameConfig.show) {
+      return null;
+    }
+    if (widget.config.nameConfig?.textAlign === 'center') {
+      return null;
+    }
+    return <LabelName config={widget.config} />;
+  }, [widget.config]);
+  const centerControlLabel = useMemo(() => {
+    if (!widget.config.nameConfig.show) {
+      return null;
+    }
+    if (widget.config.nameConfig?.textAlign === 'center') {
+      return (
+        <div style={{ width: '100%', textAlign: 'center' }}>
+          <LabelName config={widget.config} />
+        </div>
+      );
+    }
+    return null;
+  }, [widget.config]);
   const optionRows = useMemo(() => {
     const dataRows = rows?.flat(2) || [];
     if (valueOptionType === 'common') {
@@ -93,13 +118,13 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   }, [valueOptions, valueOptionType, rows]);
 
   useEffect(() => {
-    // 加载数据项
     renderedWidgetById(widget.id);
   }, [renderedWidgetById, widget.id]);
 
   const onControllerChange = useCallback(() => {
     form.submit();
   }, [form]);
+
   const onFinish = value => {
     const values = value.value;
     if (values && typeof values === 'object' && !Array.isArray(values)) {
@@ -184,6 +209,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
             onChange={onControllerChange}
             options={selectOptions}
             name={'value'}
+            label={leftControlLabel}
           />
         );
 
@@ -290,6 +316,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     form,
     controllerValues,
     onControllerChange,
+    leftControlLabel,
     config,
     controllerDate,
     onRangeTimeChange,
@@ -298,6 +325,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   return (
     <Wrap>
       <Form form={form} className="control-form" onFinish={onFinish}>
+        {centerControlLabel}
         {control}
       </Form>
     </Wrap>

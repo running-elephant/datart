@@ -18,37 +18,50 @@
 
 import React, { FC } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetConf, WidgetNameConfig } from '../../../pages/Board/slice/types';
+import {
+  WidgetConf,
+  WidgetNameConfig,
+  WidgetType,
+} from '../../../pages/Board/slice/types';
+export const HideTitleTypes: WidgetType[] = ['query', 'reset', 'controller'];
+
+export const LabelName: FC<{ config: WidgetConf }> = ({ config }) => {
+  return (
+    <NameWrap className="widget-name" conf={config.nameConfig}>
+      {config.name}
+    </NameWrap>
+  );
+};
 
 export const WidgetName: FC<{
   config: WidgetConf;
   zIndex?: number;
 }> = ({ config, zIndex }) => {
-  if (config.type === 'query' || config.type === 'reset') {
+  if (HideTitleTypes.includes(config.type)) {
+    return null;
+  }
+
+  if (!config.nameConfig.show) {
     return null;
   }
   return (
     <StyledWrap conf={config.nameConfig} zIndex={zIndex}>
-      <div className="widget-name">{config.name}</div>
+      <LabelName config={config} />
     </StyledWrap>
   );
 };
 
 const StyledWrap = styled.div<{ conf: WidgetNameConfig; zIndex?: number }>`
-  display: ${p => (p.conf?.show ? 'block' : 'none')};
   width: 100%;
   line-height: 24px;
-
   cursor: pointer;
-
-  .widget-name {
-    font-size: ${p => p.conf.fontSize}px;
-    color: ${p => p.conf.color};
-    text-align: ${p => p.conf.textAlign};
-    font-family: ${p => p.conf.fontFamily};
-    font-weight: ${p => p.conf.fontWeight};
-    font-style: ${p => p.conf.fontStyle};
-  }
+  text-align: ${p => p.conf.textAlign};
 `;
-
-//  position: absolute;
+const NameWrap = styled.span<{ conf: WidgetNameConfig }>`
+  font-size: ${p => p.conf.fontSize}px;
+  color: ${p => p.conf.color};
+  text-align: ${p => p.conf.textAlign};
+  font-family: ${p => p.conf.fontFamily};
+  font-weight: ${p => p.conf.fontWeight};
+  font-style: ${p => p.conf.fontStyle};
+`;
