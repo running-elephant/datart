@@ -30,7 +30,7 @@ import {
 import {
   convertToWidgetMap,
   createControllerWidget,
-  getCanLinkFilterWidgets,
+  getCanLinkControlWidgets,
   getOtherStringControlWidgets,
 } from 'app/pages/DashBoardPage/utils/widget';
 import {
@@ -75,7 +75,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const { refreshWidgetsByFilter } = useContext(BoardActionContext);
   const allWidgets = useSelector(selectSortAllWidgets);
   const widgets = useMemo(
-    () => getCanLinkFilterWidgets(allWidgets),
+    () => getCanLinkControlWidgets(allWidgets),
     [allWidgets],
   );
   const otherStrFilterWidgets = useMemo(

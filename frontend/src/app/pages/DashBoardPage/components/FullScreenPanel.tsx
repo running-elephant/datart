@@ -17,7 +17,7 @@
  */
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button, Layout, Menu } from 'antd';
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetAllProvider';
+import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {

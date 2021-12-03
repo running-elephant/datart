@@ -24,24 +24,24 @@ import { useDispatch } from 'react-redux';
 import {
   BoardActionContext,
   BoardActionContextProps,
-} from '../contexts/BoardActionContext';
-import { BoardConfigContext } from '../contexts/BoardConfigContext';
-import { BoardContext } from '../contexts/BoardContext';
-import { boardActions } from '../pages/Board/slice';
+} from '../../contexts/BoardActionContext';
+import { BoardConfigContext } from '../../contexts/BoardConfigContext';
+import { BoardContext } from '../../contexts/BoardContext';
+import { boardActions } from '../../pages/Board/slice';
 import {
   boardDownLoadAction,
   resetControllerAction,
   widgetsQueryAction,
-} from '../pages/Board/slice/asyncActions';
-import { getWidgetDataAsync } from '../pages/Board/slice/thunk';
-import { Widget } from '../pages/Board/slice/types';
-import { editBoardStackActions } from '../pages/BoardEditor/slice';
-import { editWidgetsQueryAction } from '../pages/BoardEditor/slice/actions/controlActions';
+} from '../../pages/Board/slice/asyncActions';
+import { getWidgetDataAsync } from '../../pages/Board/slice/thunk';
+import { Widget } from '../../pages/Board/slice/types';
+import { editBoardStackActions } from '../../pages/BoardEditor/slice';
+import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
 import {
   getEditWidgetDataAsync,
   toUpdateDashboard,
-} from '../pages/BoardEditor/slice/thunk';
-import { getNeedRefreshWidgetsByFilter } from '../utils/widget';
+} from '../../pages/BoardEditor/slice/thunk';
+import { getNeedRefreshWidgetsByFilter } from '../../utils/widget';
 
 export const BoardActionProvider: FC<{ id: string }> = ({
   id: boardId,

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetAllProvider';
+import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import { Dashboard } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';

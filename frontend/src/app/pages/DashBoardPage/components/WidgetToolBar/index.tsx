@@ -45,7 +45,7 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
   const renderedIcon = () => {
     const widgetType = widget.config.type;
     if (boardType === 'free') return null;
-    const showTypes: WidgetType[] = ['chart', 'controller'];
+    const showTypes: WidgetType[] = ['chart'];
     if (!showTypes.includes(widgetType)) return null;
     return rendered ? null : (
       <Tooltip title="等待加载">
@@ -104,7 +104,6 @@ const StyleWrap = styled.div`
   top: 0;
   right: 0;
   z-index: 30;
-  /* width: 100%; */
   overflow: hidden;
   text-align: right;
   .widget-tool-dropdown {

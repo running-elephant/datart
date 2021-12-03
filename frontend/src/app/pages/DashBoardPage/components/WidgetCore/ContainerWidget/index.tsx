@@ -15,18 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
+import { ContainerWidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { useContext } from 'react';
+import { TabWidget } from './TabWidget';
 
-import { createContext } from 'react';
-import { Widget } from '../pages/Board/slice/types';
-export interface BoardActionContextProps {
-  widgetUpdate: (widget: Widget) => void;
-  refreshWidgetsByFilter: (widget: Widget) => void;
-  updateBoard?: (callback: () => void) => void;
-  onGenerateShareLink?: (date, usePwd) => any;
-  onBoardToDownLoad: () => any;
-  onWidgetsQuery: () => any;
-  onWidgetsReset: () => any;
-}
-export const BoardActionContext = createContext<BoardActionContextProps>(
-  {} as BoardActionContextProps,
-);
+export const ContainerWidget: React.FC<{}> = () => {
+  const widget = useContext(WidgetContext);
+  let type: ContainerWidgetType = widget.config.content.type;
+  switch (type) {
+    case 'tab':
+      return <TabWidget />;
+    case 'carousel':
+      return <div>carousel container</div>;
+    default:
+      return <div>default container</div>;
+  }
+};
