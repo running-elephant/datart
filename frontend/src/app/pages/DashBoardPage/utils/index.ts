@@ -372,22 +372,20 @@ export const getChartWidgetRequestParams = (obj: {
       link => link.linkerWidgetId === curWidget.id,
     );
 
-    if (links.length) {
-      boardLinkFilters.forEach(link => {
-        const { triggerValue, triggerWidgetId } = link;
-        const triggerWidget = widgetMap[triggerWidgetId];
-        const filter: ChartRequestFilter = {
-          aggOperator: null,
-          column: getLinkedColumn(link.linkerWidgetId, triggerWidget),
-          sqlOperator: FilterSqlOperator.In,
-          values: [
-            { value: triggerValue, valueType: ChartDataViewFieldType.STRING },
-          ],
-        };
-        linkFilters.push(filter);
-      });
-      requestParams.filters = requestParams.filters.concat(linkFilters);
-    }
+    links.forEach(link => {
+      const { triggerValue, triggerWidgetId } = link;
+      const triggerWidget = widgetMap[triggerWidgetId];
+      const filter: ChartRequestFilter = {
+        aggOperator: null,
+        column: getLinkedColumn(link.linkerWidgetId, triggerWidget),
+        sqlOperator: FilterSqlOperator.In,
+        values: [
+          { value: triggerValue, valueType: ChartDataViewFieldType.STRING },
+        ],
+      };
+      linkFilters.push(filter);
+    });
+    requestParams.filters = requestParams.filters.concat(linkFilters);
   }
 
   // filter 去重
