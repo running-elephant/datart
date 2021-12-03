@@ -125,6 +125,11 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   }, [dispatch, form]);
   const onFinish = useCallback(
     values => {
+      if (chartGroupColumns?.length === 1) {
+        values = produce(values, draft => {
+          draft.field = { jumpFieldName: chartGroupColumns[0].colName };
+        });
+      }
       const newWidget = produce(curJumpWidget, draft => {
         draft.config.jumpConfig = { ...values };
         draft.config.jumpConfig!.open = true;
@@ -132,7 +137,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
       handleClose();
       dispatch(editBoardStackActions.updateWidget(newWidget));
     },
-    [dispatch, curJumpWidget, handleClose],
+    [dispatch, curJumpWidget, handleClose, chartGroupColumns],
   );
 
   return (

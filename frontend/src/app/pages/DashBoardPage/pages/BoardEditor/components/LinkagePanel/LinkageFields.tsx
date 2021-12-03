@@ -107,7 +107,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
         <Form.List name="viewLinkages">
           {(fields, _, { errors }) => {
             return (
-              <>
+              <FormWrap>
                 {fields.map((field, index) => (
                   <Form.Item noStyle key={index} shouldUpdate>
                     <div className="form-item">
@@ -158,7 +158,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
                             {renderOptions(index, 'linkerViewId')}
                           </Select>
                         </Form.Item>
-                        <span>
+                        <span className="ViewName">
                           {' '}
                           ( {getLinkerView(index)?.name} {' / '}
                           {getItem(index)?.linkerName})
@@ -173,7 +173,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
                 {!fields.length && (
                   <Empty key="empty" description="请选择组件" />
                 )}
-              </>
+              </FormWrap>
             );
           }}
         </Form.List>
@@ -184,34 +184,31 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
 const Wrap = styled.div`
   display: block;
   min-height: 150px;
-
   overflow-y: auto;
 
   .form-item {
     display: flex;
-    align-items: center;
     width: 800px;
-    margin-top: 24px;
     .form-item-start {
       width: 200px;
-    }
-    .ant-form-item {
-      margin-bottom: 0px;
     }
     .form-item-and {
       width: 30px;
       font-size: 1.2rem;
       color: ${PRIMARY};
-
       text-align: center;
     }
     .form-item-endValue {
       flex: 1;
       display: flex;
-      align-items: center;
-      .ant-form-item {
-        margin-right: 5px;
+      .ViewName {
+        margin: 5px 0 0 5px;
       }
     }
+  }
+`;
+const FormWrap = styled.div`
+  .form-item:nth-child(1) {
+    margin-top: 24px;
   }
 `;

@@ -86,6 +86,11 @@ export interface ChartMouseEvent {
   callback: (params?: ChartMouseEventParams) => void;
 }
 
+export interface ChartsEventData extends Object {
+  name: string;
+  value: string;
+  rowData: { [propName: string]: any };
+}
 // Note: `EventParams` type from echarts definition.
 export interface ChartMouseEventParams {
   // 当前点击的图形元素所属的组件名称，
@@ -102,7 +107,7 @@ export interface ChartMouseEventParams {
   // 数据在传入的 data 数组中的 index
   dataIndex?: number;
   // 传入的原始数据项
-  data?: any;
+  data?: ChartsEventData;
   // sankey、graph 等图表同时含有 nodeData 和 edgeData 两种 data，
   // dataType 的值会是 'node' 或者 'edge'，表示当前点击在 node 还是 edge 上。
   // 其他大部分图表中只有一种 data，dataType 无意义。

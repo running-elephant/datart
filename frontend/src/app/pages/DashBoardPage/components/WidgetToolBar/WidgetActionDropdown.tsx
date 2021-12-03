@@ -129,7 +129,12 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
     }, [boardEditing, widget]);
     const dropdownList = useMemo(() => {
       const menuItems = actionList.map(item => {
-        if (item.key === 'makeLinkage' && !IsSupportTrigger) return null;
+        if (
+          (item.key === 'makeLinkage' || item.key === 'makeJump') &&
+          !IsSupportTrigger
+        )
+          return null;
+
         return (
           <>
             {item.divider && <Menu.Divider />}

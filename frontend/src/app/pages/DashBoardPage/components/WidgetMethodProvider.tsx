@@ -253,14 +253,14 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       const linkRelations = widget.relations.filter(
         re => re.config.type === 'widgetToWidget',
       );
-
       const boardFilters = linkRelations.map(re => {
-        let LinkageFieldName: string =
+        let linkageFieldName: string =
           re?.config?.widgetToWidget?.triggerColumn || '';
 
         const filter: BoardLinkFilter = {
           triggerWidgetId: widget.id,
-          triggerValue: params?.data?.rowData?.[LinkageFieldName] as string,
+          triggerValue:
+            (params?.data?.rowData?.[linkageFieldName] as string) || '',
           triggerDataChartId: widget.datachartId,
           linkerWidgetId: re.targetId,
         };
@@ -299,13 +299,12 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       const { widget, params } = values;
       const jumpConfig = widget.config?.jumpConfig;
       const targetId = jumpConfig?.target?.relId;
-      console.log(jumpConfig, widget, params, 'jumpConfig');
       const jumpFieldName: string = jumpConfig?.field?.jumpFieldName || '';
+
       if (typeof jumpConfig?.filter === 'object') {
         const searchParamsStr = urlSearchTransfer.toUrlString({
-          [jumpConfig?.filter?.filterId]: params?.data?.rowData?.[
-            jumpFieldName
-          ] as string,
+          [jumpConfig?.filter?.filterId]:
+            (params?.data?.rowData?.[jumpFieldName] as string) || '',
         });
         if (targetId) {
           history.push(

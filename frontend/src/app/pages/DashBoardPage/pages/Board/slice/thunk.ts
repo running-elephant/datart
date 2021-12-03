@@ -237,6 +237,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
     const dataChartMap = boardState.board.dataChartMap;
     const boardLinkFilters =
       boardState.board.boardInfoRecord?.[boardId]?.linkFilter;
+
     let requestParams = getChartWidgetRequestParams({
       widgetId,
       widgetMap,
