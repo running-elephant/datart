@@ -142,7 +142,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
 
   return (
     <Modal
-      title="设置跳转"
+      title="跳转设置"
       visible={visible}
       width={520}
       {...restProps}

@@ -225,7 +225,8 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
   }, [curWidget, form, setColNames, widgetMap]);
   return (
     <Modal
-      title={`${type} 联动`}
+      // title={`${type} 联动`}
+      title={'联动设置'}
       visible={visible}
       onOk={onSubmit}
       centered
