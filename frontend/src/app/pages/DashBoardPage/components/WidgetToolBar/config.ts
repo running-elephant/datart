@@ -59,10 +59,32 @@ export const widgetEditActionMap: Record<WidgetType, widgetActionType[]> = {
   query: ['delete'],
   reset: ['delete'],
 };
+
 export const widgetActionMap = {
   view: widgetViewActionMap,
   edit: widgetEditActionMap,
 };
+
+// 支持作为触发器的图表ID
+export const TriggerChartIds: string[] = [
+  'cluster-column-chart',
+  'cluster-bar-chart',
+  'stack-column-chart',
+  'stack-bar-chart',
+  'percentage-stack-column-chart',
+  'percentage-stack-bar-chart',
+  'line-chart',
+  'area-chart',
+  'stack-area-chart',
+  'scatter',
+  'pie-chart',
+  'doughnut-chart',
+  'rose-chart',
+  'funnel-chart',
+  'double-y',
+  'normal-outline-map-chart',
+  'scatter-outline-map-chart',
+];
 
 export const getWidgetActionList = (opt: {
   allList: WidgetActionListItem<widgetActionType>[];

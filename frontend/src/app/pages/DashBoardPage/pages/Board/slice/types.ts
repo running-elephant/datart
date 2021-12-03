@@ -156,8 +156,12 @@ export interface JumpConfigFilter {
   filterType: string;
   filterValue?: string;
 }
+export interface JumpConfigField {
+  jumpFieldName: string;
+}
 export interface JumpConfig {
   open: boolean;
+  field: JumpConfigField;
   target: JumpConfigTarget;
   filter: JumpConfigFilter;
 }

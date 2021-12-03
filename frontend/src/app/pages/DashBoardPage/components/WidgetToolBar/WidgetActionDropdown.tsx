@@ -28,11 +28,14 @@ import {
 } from '@ant-design/icons';
 import { Button, Dropdown, Menu } from 'antd';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { selectDataChartById } from '../..//pages/Board/slice/selector';
 import { BoardContext } from '../../contexts/BoardContext';
 import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
 import { Widget } from '../../pages/Board/slice/types';
 import {
   getWidgetActionList,
+  TriggerChartIds,
   WidgetActionListItem,
   widgetActionType,
 } from './config';
@@ -45,6 +48,14 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
   ({ widget }) => {
     const { editing: boardEditing } = useContext(BoardContext);
     const { onWidgetAction } = useContext(WidgetMethodContext);
+    const dataChart = useSelector(state =>
+      selectDataChartById(state, widget?.datachartId),
+    );
+    const IsSupportTrigger = useMemo(
+      () => TriggerChartIds.includes(dataChart?.config.chartGraphId),
+      [dataChart],
+    );
+
     const menuClick = useCallback(
       ({ key }) => {
         onWidgetAction(key, widget);
@@ -118,6 +129,12 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
     }, [boardEditing, widget]);
     const dropdownList = useMemo(() => {
       const menuItems = actionList.map(item => {
+        if (
+          (item.key === 'makeLinkage' || item.key === 'makeJump') &&
+          !IsSupportTrigger
+        )
+          return null;
+
         return (
           <React.Fragment key={item.key}>
             {item.divider && <Menu.Divider />}
@@ -134,7 +151,7 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
       });
 
       return <Menu onClick={menuClick}>{menuItems}</Menu>;
-    }, [actionList, menuClick]);
+    }, [actionList, menuClick, IsSupportTrigger]);
     return (
       <Dropdown
         className="widget-tool-dropdown"

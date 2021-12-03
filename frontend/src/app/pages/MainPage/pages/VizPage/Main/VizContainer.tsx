@@ -23,7 +23,6 @@ interface VizContainerProps {
 export const VizContainer = memo(
   ({ tab, orgId, vizs, selectedId }: VizContainerProps) => {
     const { id, name, type, search, parentId, permissionId } = tab;
-
     const path = useMemo(
       () =>
         ['DATACHART', 'DASHBOARD'].includes(type)

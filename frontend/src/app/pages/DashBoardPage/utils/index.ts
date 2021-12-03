@@ -371,13 +371,14 @@ export const getChartWidgetRequestParams = (obj: {
     const links = boardLinkFilters.filter(
       link => link.linkerWidgetId === curWidget.id,
     );
+
     if (links.length) {
       boardLinkFilters.forEach(link => {
         const { triggerValue, triggerWidgetId } = link;
         const triggerWidget = widgetMap[triggerWidgetId];
         const filter: ChartRequestFilter = {
           aggOperator: null,
-          column: getLinkedColumn(curWidget.id, triggerWidget),
+          column: getLinkedColumn(link.linkerWidgetId, triggerWidget),
           sqlOperator: FilterSqlOperator.In,
           values: [
             { value: triggerValue, valueType: ChartDataViewFieldType.STRING },

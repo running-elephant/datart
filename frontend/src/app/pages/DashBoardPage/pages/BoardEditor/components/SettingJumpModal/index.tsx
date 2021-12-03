@@ -6,6 +6,9 @@ import {
 } from '@ant-design/icons';
 import { Form, Modal, ModalProps } from 'antd';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
+import { selectDataChartById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
+import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { getChartDataRequestBuilder } from 'app/pages/DashBoardPage/utils';
 import { convertToWidgetMap } from 'app/pages/DashBoardPage/utils/widget';
 import { makeSelectVizTree } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
@@ -21,11 +24,11 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { editBoardStackActions, editDashBoardInfoActions } from '../../slice';
 import { selectJumpPanel, selectSortAllWidgets } from '../../slice/selectors';
+import { SelectJumpFields } from './FieldsSelect';
 import { FilterSelect } from './FilterSelect';
 import { fetchGlobalControllerOptions } from './service';
 import { TargetTreeSelect } from './TargetTreeSelect';
 import { ControlOptionItem } from './types';
-
 const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 },
@@ -93,7 +96,17 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   useEffect(() => {
     setWidgetId(jumpWidgetId);
   }, [jumpWidgetId]);
-
+  const dataChart = useSelector((state: { board: BoardState }) =>
+    selectDataChartById(state, curJumpWidget?.datachartId),
+  );
+  const chartGroupColumns = useMemo(() => {
+    if (!dataChart) {
+      return [];
+    }
+    const builder = getChartDataRequestBuilder(dataChart);
+    let groupColumns = builder.buildGroupColumns();
+    return groupColumns;
+  }, [dataChart]);
   const onTargetChange = useCallback(
     value => {
       form.setFieldsValue({ filter: undefined });
@@ -112,6 +125,11 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   }, [dispatch, form]);
   const onFinish = useCallback(
     values => {
+      if (chartGroupColumns?.length === 1) {
+        values = produce(values, draft => {
+          draft.field = { jumpFieldName: chartGroupColumns[0].colName };
+        });
+      }
       const newWidget = produce(curJumpWidget, draft => {
         draft.config.jumpConfig = { ...values };
         draft.config.jumpConfig!.open = true;
@@ -119,8 +137,9 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
       handleClose();
       dispatch(editBoardStackActions.updateWidget(newWidget));
     },
-    [dispatch, curJumpWidget, handleClose],
+    [dispatch, curJumpWidget, handleClose, chartGroupColumns],
   );
+
   return (
     <Modal
       title="设置跳转"
@@ -142,6 +161,18 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
             onChange={onTargetChange}
           />
         </Form.Item>
+        {chartGroupColumns?.length > 1 && (
+          <Form.Item
+            label="关联字段"
+            name="field"
+            rules={[{ required: true, message: '请选择关联字段' }]}
+          >
+            <SelectJumpFields
+              chartGroupColumns={chartGroupColumns}
+            ></SelectJumpFields>
+          </Form.Item>
+        )}
+
         <Form.Item
           label="关联筛选"
           name="filter"

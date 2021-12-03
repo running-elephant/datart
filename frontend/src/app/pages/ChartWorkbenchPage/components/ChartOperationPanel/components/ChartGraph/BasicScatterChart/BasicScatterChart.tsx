@@ -22,6 +22,7 @@ import ChartDataset from 'app/types/ChartDataset';
 import {
   getColumnRenderName,
   getDataColumnMaxAndMin,
+  getExtraSeriesRowData,
   getReference,
   getScatterSymbolSizeFn,
   getSeriesTooltips4Scatter,
@@ -240,6 +241,7 @@ class BasicScatterChart extends Chart {
       const sizeValue =
         dc?.[getValueByColumnKey(sizeConfigs?.[0])] || defaultSizeValue;
       return {
+        ...getExtraSeriesRowData(dc),
         name: groupConfigs?.map(gc => dc?.[getColumnRenderName(gc)]).join('-'),
         value: aggregateConfigs
           ?.map(aggConfig => dc?.[getValueByColumnKey(aggConfig)])
