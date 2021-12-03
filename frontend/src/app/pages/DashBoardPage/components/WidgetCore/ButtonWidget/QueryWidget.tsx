@@ -17,26 +17,44 @@
  */
 import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
+import { FontConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { darken, getLuminance, lighten } from 'polished';
 import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
+
 export interface CompProps {}
 export const QueryWidget: React.FC<CompProps> = () => {
   const widget = useContext(WidgetContext);
   const { onWidgetsQuery } = useContext(BoardActionContext);
+
   const onQuery = e => {
     e.stopPropagation();
     onWidgetsQuery();
   };
+
+  const { name, nameConfig, background } = widget.config;
+
   return (
-    <Wrap onClick={onQuery}>
-      <span> {widget.config.name}</span>
+    <Wrap {...nameConfig} background={background.color} onClick={onQuery}>
+      <span>{name}</span>
     </Wrap>
   );
 };
-const Wrap = styled.div`
+
+const Wrap = styled.div<FontConfig & { background: string }>`
   cursor: pointer;
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  font: ${p =>
+    `${p.fontStyle} ${p.fontWeight} ${p.fontSize}px ${p.fontFamily}`};
+  color: ${p => p.color};
+
+  &:hover {
+    background: ${p =>
+      getLuminance(p.background) > 0.5
+        ? darken(0.05, p.background)
+        : lighten(0.05, p.background)};
+  }
 `;

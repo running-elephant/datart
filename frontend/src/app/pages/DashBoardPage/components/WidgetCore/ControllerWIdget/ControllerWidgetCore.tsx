@@ -52,7 +52,7 @@ import { SlideControllerForm } from './Controller/SliderController';
 import { TextControllerForm } from './Controller/TextController';
 import { TimeControllerForm } from './Controller/TimeController';
 
-export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
+export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const [form] = Form.useForm();
 

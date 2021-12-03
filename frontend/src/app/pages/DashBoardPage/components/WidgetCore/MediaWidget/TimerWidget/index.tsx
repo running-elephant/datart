@@ -59,7 +59,7 @@ const DURATION_DATA = {
   label: '时间间隔',
 };
 export type TimerConfig = NonNullable<MediaWidgetContent['timerConfig']>;
-const TimerBox: React.FC = () => {
+const TimerWidget: React.FC = () => {
   const widget = useContext(WidgetContext);
 
   const { editing } = useContext(WidgetInfoContext);
@@ -154,7 +154,7 @@ const TimerBox: React.FC = () => {
   );
 };
 
-export default TimerBox;
+export default TimerWidget;
 const Wrap = styled.div<TimerConfig>`
   display: flex;
   /* flex-direction: column; */

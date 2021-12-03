@@ -28,7 +28,7 @@ import {
 import { getChartGroupColumns } from 'app/pages/DashBoardPage/utils';
 import {
   convertToWidgetMap,
-  getCanLinkFilterWidgets,
+  getCanLinkControlWidgets,
 } from 'app/pages/DashBoardPage/utils/widget';
 import produce from 'immer';
 import React, {
@@ -56,7 +56,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
   const allWidgets = useSelector(selectSortAllWidgets);
   const viewMap = useSelector(selectViewMap);
   const widgets = useMemo(
-    () => getCanLinkFilterWidgets(allWidgets).filter(w => w.id !== widgetId),
+    () => getCanLinkControlWidgets(allWidgets).filter(w => w.id !== widgetId),
     [allWidgets, widgetId],
   );
 

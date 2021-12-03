@@ -915,26 +915,18 @@ export const getWidgetSomeStyle = (opt: {
 };
 
 // get some css end
-// filter
-export const getCanLinkFilterWidgets = (widgets: Widget[]) => {
-  const CanLinkFilterWidgetTypes: WidgetType[] = ['chart', 'media'];
-  const CanLinkFilterMediaWidgetTypes: MediaWidgetType[] = ['richText']; // 或者考虑加上 image
+// Controller
+export const getCanLinkControlWidgets = (widgets: Widget[]) => {
+  const CanLinkControllerWidgetTypes: WidgetType[] = ['chart'];
+
   const canLinkWidgets = widgets.filter(widget => {
     if (widget.viewIds.length === 0) {
       return false;
     }
-    if (!CanLinkFilterWidgetTypes.includes(widget.config.type)) {
-      return false;
+    if (CanLinkControllerWidgetTypes.includes(widget.config.type)) {
+      return true;
     }
-    if (
-      widget.config.type === 'media' &&
-      !CanLinkFilterMediaWidgetTypes.includes(
-        widget.config.content.type as MediaWidgetType,
-      )
-    ) {
-      return false;
-    }
-    return true;
+    return false;
   });
   return canLinkWidgets;
 };

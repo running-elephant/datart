@@ -21,7 +21,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { BoardProvider } from '../../components/BoardProvider';
+import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
 import AutoEditor from './AutoEditor/index';

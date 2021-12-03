@@ -25,7 +25,7 @@ import { convertImageUrl } from 'app/pages/DashBoardPage/utils';
 import React, { useMemo } from 'react';
 import styled from 'styled-components/macro';
 
-export interface ImageBoxProps {
+export interface ImageWidgetProps {
   widgetConfig: Widget;
   widgetInfo: WidgetInfo;
 }
@@ -33,7 +33,7 @@ const widgetSize: React.CSSProperties = {
   width: '100%',
   height: '100%',
 };
-const ImageBox: React.FC<ImageBoxProps> = ({ widgetConfig }) => {
+const ImageWidget: React.FC<ImageWidgetProps> = ({ widgetConfig }) => {
   const { imageConfig } = widgetConfig.config.content as MediaWidgetContent;
 
   const [rect, refDom] = useClientRect<HTMLDivElement>(32);
@@ -65,7 +65,7 @@ const ImageBox: React.FC<ImageBoxProps> = ({ widgetConfig }) => {
     </Wrap>
   );
 };
-export default ImageBox;
+export default ImageWidget;
 
 const Wrap = styled.div`
   width: 100%;
