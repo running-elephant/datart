@@ -343,7 +343,8 @@ export const getEditWidgetDataAsync = createAsyncThunk<
   { state: RootState }
 >(
   'editBoard/getEditWidgetDataAsync',
-  async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
+  async ({ widgetId, option }, { getState, dispatch }) => {
+    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
     const rootState = getState() as RootState;
     const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
     const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
@@ -390,6 +391,7 @@ export const getEditFilterDataAsync = createAsyncThunk<
   }
   return null;
 });
+
 export const getEditChartWidgetDataAsync = createAsyncThunk<
   null,
   {
@@ -401,6 +403,7 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
   'editBoard/getEditChartWidgetDataAsync',
   async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
     const rootState = getState() as RootState;
+    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
     const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
     const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
     const editBoard = rootState.editBoard;
@@ -434,7 +437,6 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
     });
     widgetData = { ...data, id: widgetId };
     dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
-    // changePageInfo
     dispatch(
       editWidgetInfoActions.changePageInfo({
         widgetId,

@@ -224,6 +224,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
 >(
   'board/getChartWidgetDataAsync',
   async ({ boardId, widgetId, renderMode, option }, { getState, dispatch }) => {
+    dispatch(boardActions.renderedWidgets({ boardId, widgetIds: [widgetId] }));
     const boardState = getState() as { board: BoardState };
 
     const widgetMapMap = boardState.board.widgetRecord;
