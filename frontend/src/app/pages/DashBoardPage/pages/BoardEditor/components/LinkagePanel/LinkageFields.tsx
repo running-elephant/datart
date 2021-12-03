@@ -25,6 +25,7 @@ import styled from 'styled-components/macro';
 import { PRIMARY } from 'styles/StyleConstants';
 const { Option } = Select;
 export interface ViewLinkageItem {
+  sameView?: boolean;
   triggerViewId: string;
   triggerColumn: string | undefined;
   linkerViewId: string;

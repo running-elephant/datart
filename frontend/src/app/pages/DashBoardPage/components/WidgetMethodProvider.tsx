@@ -254,6 +254,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       const linkRelations = widget.relations.filter(
         re => re.config.type === 'widgetToWidget',
       );
+
       const boardFilters = linkRelations.map(re => {
         const filter: BoardLinkFilter = {
           triggerWidgetId: widget.id,

@@ -156,6 +156,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
           nextViewLinkages.push({ ...oldItem });
         } else {
           const newItem: ViewLinkageItem = {
+            sameView: true,
             triggerViewId: curWidget?.viewIds[0],
             triggerColumn: chartGroupColumns?.[0]?.colName,
             linkerId: sameId,
@@ -175,6 +176,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
           nextViewLinkages.push({ ...oldItem });
         } else {
           const newItem: ViewLinkageItem = {
+            sameView: false,
             triggerViewId: curWidget?.viewIds[0],
             triggerColumn: chartGroupColumns?.[0]?.colName,
             linkerId: pickedId,
@@ -208,6 +210,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
       }
       const linkWidget = widgetMap[re.targetId];
       const item: ViewLinkageItem = {
+        sameView: curWidget?.viewIds?.[0] === linkWidget?.viewIds?.[0],
         triggerViewId: curWidget?.viewIds?.[0],
         triggerColumn: link?.triggerColumn,
         linkerViewId: linkWidget?.viewIds?.[0],
