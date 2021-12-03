@@ -413,7 +413,7 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
     if (!curWidget) return null;
     const dataChartMap = boardState.dataChartMap;
     const boardLinkFilters = boardInfo.linkFilter;
-
+ 
     let requestParams = getChartWidgetRequestParams({
       widgetId,
       widgetMap,

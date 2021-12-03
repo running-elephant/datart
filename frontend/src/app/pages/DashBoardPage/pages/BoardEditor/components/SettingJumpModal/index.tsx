@@ -4,8 +4,11 @@ import {
   FolderOpenFilled,
   FundFilled,
 } from '@ant-design/icons';
-import { Form, Modal, ModalProps, Radio } from 'antd';
+import { Form, Modal, ModalProps } from 'antd';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
+import { selectDataChartById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
+import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { getChartDataRequestBuilder } from 'app/pages/DashBoardPage/utils';
 import { convertToWidgetMap } from 'app/pages/DashBoardPage/utils/widget';
 import { makeSelectVizTree } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
@@ -21,14 +24,11 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { editBoardStackActions, editDashBoardInfoActions } from '../../slice';
 import { selectJumpPanel, selectSortAllWidgets } from '../../slice/selectors';
+import { SelectJumpFields } from './FieldsSelect';
 import { FilterSelect } from './FilterSelect';
-import { fetchGlobalFiltersOptions } from './service';
+import { fetchGlobalControllerOptions } from './service';
 import { TargetTreeSelect } from './TargetTreeSelect';
-import { FilterOptionItem } from './types';
-const USE_OPTIONS = [
-  { label: '是', value: true },
-  { label: '否', value: false },
-];
+import { ControlOptionItem } from './types';
 const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 },
@@ -46,9 +46,9 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   const { boardId } = useContext(BoardContext);
 
   const [visible, setVisible] = useState(false);
-  const [filterLoading, setfilterLoading] = useState(false);
+  const [controllerLoading, setControllerLoading] = useState(false);
   const [widgetId, setWidgetId] = useState('');
-  const [filters, setFilters] = useState<FilterOptionItem[]>([]);
+  const [controllers, setControllers] = useState<ControlOptionItem[]>([]);
   const widgetMap = useMemo(() => convertToWidgetMap(allWidgets), [allWidgets]);
   const curJumpWidget = useMemo(() => {
     return widgetMap[widgetId] || undefined;
@@ -59,18 +59,18 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
       jumpWidgetId: currentJumpPanel?.widgetId,
     };
   }, [currentJumpPanel]);
-  const onGetFileters = useCallback(targetValue => {
+  const onGetController = useCallback(targetValue => {
     const relId = targetValue?.relId,
       relType = targetValue?.relType;
     if (relId && relType) {
-      setfilterLoading(true);
-      fetchGlobalFiltersOptions(relId, relType)
-        .then(data => setFilters(data))
+      setControllerLoading(true);
+      fetchGlobalControllerOptions(relId, relType)
+        .then(data => setControllers(data))
         .finally(() => {
-          setfilterLoading(false);
+          setControllerLoading(false);
         });
     } else {
-      setFilters([]);
+      setControllers([]);
     }
   }, []);
 
@@ -89,20 +89,30 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     const _jumpConfig = curJumpWidget?.config?.jumpConfig;
     setVisible(jumpVisible);
     if (jumpVisible && _jumpConfig) {
-      onGetFileters(curJumpWidget?.config?.jumpConfig?.target);
+      onGetController(curJumpWidget?.config?.jumpConfig?.target);
       form.setFieldsValue(_jumpConfig);
     }
-  }, [jumpVisible, curJumpWidget, form, onGetFileters]);
+  }, [jumpVisible, curJumpWidget, form, onGetController]);
   useEffect(() => {
     setWidgetId(jumpWidgetId);
   }, [jumpWidgetId]);
-
+  const dataChart = useSelector((state: { board: BoardState }) =>
+    selectDataChartById(state, curJumpWidget?.datachartId),
+  );
+  const chartGroupColumns = useMemo(() => {
+    if (!dataChart) {
+      return [];
+    }
+    const builder = getChartDataRequestBuilder(dataChart);
+    let groupColumns = builder.buildGroupColumns();
+    return groupColumns;
+  }, [dataChart]);
   const onTargetChange = useCallback(
     value => {
       form.setFieldsValue({ filter: undefined });
-      onGetFileters(value);
+      onGetController(value);
     },
-    [form, onGetFileters],
+    [form, onGetController],
   );
   const handleClose = useCallback(() => {
     dispatch(
@@ -117,12 +127,14 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     values => {
       const newWidget = produce(curJumpWidget, draft => {
         draft.config.jumpConfig = { ...values };
+        draft.config.jumpConfig!.open = true;
       });
       handleClose();
       dispatch(editBoardStackActions.updateWidget(newWidget));
     },
     [dispatch, curJumpWidget, handleClose],
   );
+
   return (
     <Modal
       title="设置跳转"
@@ -134,14 +146,6 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     >
       <Form {...formItemLayout} form={form} onFinish={onFinish}>
         <Form.Item
-          name="open"
-          label="是否启用"
-          initialValue={false}
-          rules={[{ required: true, message: '是否启用不能为空' }]}
-        >
-          <Radio.Group options={USE_OPTIONS} />
-        </Form.Item>
-        <Form.Item
           label="跳转目标"
           name="target"
           rules={[{ required: true, message: '跳转目标不能为空' }]}
@@ -152,14 +156,26 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
             onChange={onTargetChange}
           />
         </Form.Item>
+        {chartGroupColumns?.length > 1 && (
+          <Form.Item
+            label="关联字段"
+            name="field"
+            rules={[{ required: true, message: '请选择关联字段' }]}
+          >
+            <SelectJumpFields
+              chartGroupColumns={chartGroupColumns}
+            ></SelectJumpFields>
+          </Form.Item>
+        )}
+
         <Form.Item
           label="关联筛选"
           name="filter"
           rules={[{ required: true, message: '关联筛选不能为空' }]}
         >
           <FilterSelect
-            loading={filterLoading}
-            options={filters}
+            loading={controllerLoading}
+            options={controllers}
             placeholder="请选择关联筛选"
           />
         </Form.Item>

@@ -23,8 +23,8 @@ import {
   ChartDataSectionField,
   ChartDataSectionFieldActionType,
 } from 'app/types/ChartConfig';
-import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
+import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import { updateBy } from 'app/utils/mutation';
 import { FC } from 'react';
 import AggregationAction from '../ChartFieldAction/AggregationAction';

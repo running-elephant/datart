@@ -189,9 +189,14 @@ const Wrap = styled.div`
 
   .form-item {
     display: flex;
+    align-items: center;
     width: 800px;
+    margin-top: 24px;
     .form-item-start {
       width: 200px;
+    }
+    .ant-form-item {
+      margin-bottom: 0px;
     }
     .form-item-and {
       width: 30px;
@@ -202,6 +207,11 @@ const Wrap = styled.div`
     }
     .form-item-endValue {
       flex: 1;
+      display: flex;
+      align-items: center;
+      .ant-form-item {
+        margin-right: 5px;
+      }
     }
   }
 `;

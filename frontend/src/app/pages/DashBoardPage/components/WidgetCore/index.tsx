@@ -126,9 +126,9 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
       case 'chart':
         return <DataChartWidget />;
       case 'media':
-        return { mediaElement };
+        return mediaElement;
       case 'container':
-        return { containerElement };
+        return containerElement;
       case 'controller':
         return <ControllerWidgetCore id={widget.id} />;
       case 'query':

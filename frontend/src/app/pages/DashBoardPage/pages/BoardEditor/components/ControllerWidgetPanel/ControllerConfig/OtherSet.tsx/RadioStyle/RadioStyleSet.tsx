@@ -24,7 +24,6 @@ export interface RadioStyleSetProps extends FormItemProps<any> {
 export const RadioStyleSet: React.FC<RadioStyleSetProps> = memo(
   ({ value, onChange }) => {
     function _onChange(val) {
-      console.log('val', val);
       onChange?.(val);
     }
     return (

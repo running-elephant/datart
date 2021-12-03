@@ -38,7 +38,6 @@ import {
 } from '../pages/Board/slice/thunk';
 import {
   BoardLinkFilter,
-  JumpConfig,
   Widget,
   WidgetContentChartType,
   WidgetType,
@@ -48,7 +47,11 @@ import {
   editDashBoardInfoActions,
   editWidgetInfoActions,
 } from '../pages/BoardEditor/slice';
-import { editChartInWidgetAction } from '../pages/BoardEditor/slice/actions/actions';
+import {
+  closeJumpAction,
+  closeLinkageAction,
+  editChartInWidgetAction,
+} from '../pages/BoardEditor/slice/actions/actions';
 import {
   getEditChartWidgetDataAsync,
   getEditWidgetDataAsync,
@@ -250,13 +253,14 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       const linkRelations = widget.relations.filter(
         re => re.config.type === 'widgetToWidget',
       );
+
       const boardFilters = linkRelations.map(re => {
+        let LinkageFieldName: string =
+          re?.config?.widgetToWidget?.triggerColumn || '';
+
         const filter: BoardLinkFilter = {
           triggerWidgetId: widget.id,
-          triggerValue:
-            params.seriesType === 'scatter'
-              ? (params.name as string)
-              : (params?.data?.rowData?.platform as string),
+          triggerValue: params?.data?.rowData?.[LinkageFieldName] as string,
           triggerDataChartId: widget.datachartId,
           linkerWidgetId: re.targetId,
         };
@@ -291,13 +295,17 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     [boardId, dispatch, editing, onToggleLinkage, onWidgetGetData, widgetId],
   );
   const clickJump = useCallback(
-    (values: { jumpConfig: JumpConfig; params: ChartMouseEventParams }) => {
-      const { jumpConfig, params } = values;
+    (values: { widget: Widget; params: ChartMouseEventParams }) => {
+      const { widget, params } = values;
+      const jumpConfig = widget.config?.jumpConfig;
       const targetId = jumpConfig?.target?.relId;
-
+      console.log(jumpConfig, widget, params, 'jumpConfig');
+      const jumpFieldName: string = jumpConfig?.field?.jumpFieldName || '';
       if (typeof jumpConfig?.filter === 'object') {
         const searchParamsStr = urlSearchTransfer.toUrlString({
-          [jumpConfig?.filter?.filterId]: params?.name,
+          [jumpConfig?.filter?.filterId]: params?.data?.rowData?.[
+            jumpFieldName
+          ] as string,
         });
         if (targetId) {
           history.push(
@@ -361,7 +369,12 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
         case 'makeJump':
           onMakeJump(widgetId);
           break;
-
+        case 'closeJump':
+          dispatch(closeJumpAction(widget));
+          break;
+        case 'closeLinkage':
+          dispatch(closeLinkageAction(widget));
+          break;
         default:
           break;
       }
@@ -376,6 +389,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       onWidgetEdit,
       onMakeLinkage,
       onMakeJump,
+      dispatch,
     ],
   );
 
@@ -390,7 +404,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       // jump
       const jumpConfig = widget.config?.jumpConfig;
       if (jumpConfig && jumpConfig.open) {
-        clickJump({ jumpConfig, params });
+        clickJump({ widget, params });
         return;
       }
       // linkage

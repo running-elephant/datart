@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const CracoLessPlugin = require('craco-less');
 const WebpackBar = require('webpackbar');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
@@ -129,6 +130,19 @@ module.exports = {
   },
 
   devServer: {
+    before: function (app, server, compiler) {
+      app.get('/api/v1/plugins/custom/charts', function (req, res) {
+        const pluginPath = 'custom-chart-plugins';
+        const dir = fs.readdirSync(`./public/${pluginPath}`);
+        res.json({
+          data: (dir || [])
+            .filter(file => path.extname(file) == '.js')
+            .map(file => `${pluginPath}/${file}`),
+          errCode: 0,
+          success: true,
+        });
+      });
+    },
     hot: true,
     proxy: {
       '/api/v1': {
