@@ -73,6 +73,7 @@ export const TimeController: React.FC<SingleTimeSetProps> = memo(
             showTime
             onChange={_onChange}
             className="control-datePicker"
+            bordered={false}
           />
         ) : (
           <DatePicker
@@ -82,6 +83,7 @@ export const TimeController: React.FC<SingleTimeSetProps> = memo(
             onChange={_onChange}
             picker={pickerType as any}
             className="control-datePicker"
+            bordered={false}
           />
         )}
       </StyledWrap>

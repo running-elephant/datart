@@ -90,6 +90,7 @@ export const RangeNumberController: React.FC<RangeNumberSetProps> = memo(
               onPressEnter={_onStartValEnter}
               onBlur={_onBlur}
               className="control-number-input"
+              bordered={false}
             />
           </div>
           <div className="control-and">-</div>
@@ -102,6 +103,7 @@ export const RangeNumberController: React.FC<RangeNumberSetProps> = memo(
               onPressEnter={_onEndValEnter}
               onBlur={_onBlur}
               className="control-number-input"
+              bordered={false}
             />
           </div>
         </div>
