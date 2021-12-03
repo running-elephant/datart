@@ -431,12 +431,12 @@ export const getWidgetMapByServer = (
         relations: convertWidgetRelationsToObj(cur.relations),
         viewIds,
       };
-      // TODO xld migration about font 5
+      // TODO migration about font 5 --xld
       widget.config.nameConfig = {
         ...fontDefault,
         ...widget.config.nameConfig,
       };
-      // TODO xld migration about filter
+      // TODO migration about filter --xld
       if ((widget.config.type as any) !== 'filter') {
         acc[cur.id] = widget;
       }
@@ -447,6 +447,7 @@ export const getWidgetMapByServer = (
   }, {} as Record<string, Widget>);
 
   const wrappedDataCharts: DataChart[] = [];
+  const controllerWidgets: Widget[] = [];
   Object.values(widgetMap).forEach(widget => {
     // 处理 widget包含关系
     if (widget.parentId) {
@@ -517,8 +518,9 @@ export const getWidgetMapByServer = (
         content.config.assistViewFields = (
           content.config.assistViewFields as string
         ).split(VALUE_SPLITTER);
-        // value.split(VALUE_SPLITTER);
       }
+      // use for reset button
+      controllerWidgets.push(widget);
     }
 
     // 处理 自有 chart widget
@@ -534,6 +536,7 @@ export const getWidgetMapByServer = (
   return {
     widgetMap,
     wrappedDataCharts,
+    controllerWidgets,
   };
 };
 export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {

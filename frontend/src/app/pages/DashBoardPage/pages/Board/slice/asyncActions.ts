@@ -50,14 +50,16 @@ export const handleServerBoardAction =
 
     const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
 
-    const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(
-      serverWidgets,
-      dataCharts,
-      filterSearchMap,
-    );
+    const { widgetMap, wrappedDataCharts, controllerWidgets } =
+      getWidgetMapByServer(serverWidgets, dataCharts, filterSearchMap);
 
     const widgetIds = Object.values(widgetMap).map(w => w.id);
-    let boardInfo = getInitBoardInfo(dashboard.id, widgetIds);
+    //
+    let boardInfo = getInitBoardInfo({
+      id: dashboard.id,
+      widgetIds,
+      controllerWidgets,
+    });
 
     if (renderMode === 'schedule') {
       boardInfo = getScheduleBoardInfo(boardInfo, widgetMap);
@@ -125,6 +127,34 @@ export const widgetsQueryAction =
     const boardState = getState() as { board: BoardState };
     const boardMapWidgetMap = boardState.board.widgetRecord;
     const widgetMap = boardMapWidgetMap[boardId];
+    Object.values(widgetMap)
+      .filter(it => it.config.type === 'chart')
+      .forEach(it => {
+        dispatch(
+          getChartWidgetDataAsync({
+            boardId,
+            widgetId: it.id,
+            renderMode,
+            option: { pageInfo },
+          }),
+        );
+      });
+  };
+
+export const resetControllerAction =
+  ({ boardId, renderMode }) =>
+  async (dispatch, getState) => {
+    const boardState = getState() as { board: BoardState };
+    const boardInfo = boardState.board.boardInfoRecord[boardId];
+    if (!boardInfo) return;
+    dispatch(boardActions.resetControlWidgets({ boardId }));
+    const boardMapWidgetMap = boardState.board.widgetRecord;
+    const widgetMap = boardMapWidgetMap[boardId];
+
+    const pageInfo: Partial<PageInfo> = {
+      pageNo: 1,
+    };
+
     Object.values(widgetMap)
       .filter(it => it.config.type === 'chart')
       .forEach(it => {

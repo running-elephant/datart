@@ -236,6 +236,22 @@ const boardSlice = createSlice({
         pageNo: 1,
       };
     },
+    resetControlWidgets(
+      state,
+      action: PayloadAction<{
+        boardId: string;
+      }>,
+    ) {
+      const { boardId } = action.payload;
+      const originControllerWidgets =
+        state.boardInfoRecord[boardId].originControllerWidgets;
+      if (originControllerWidgets.length === 0) {
+        return;
+      }
+      originControllerWidgets.forEach(widget => {
+        state.widgetRecord[boardId][widget.id] = widget;
+      });
+    },
   },
   extraReducers: builder => {
     // getWidgetDataAsync
