@@ -119,7 +119,7 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
     const dropdownList = useMemo(() => {
       const menuItems = actionList.map(item => {
         return (
-          <>
+          <React.Fragment key={item.key}>
             {item.divider && <Menu.Divider />}
             <Menu.Item
               danger={item.danger}
@@ -129,7 +129,7 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
             >
               {item.label}
             </Menu.Item>
-          </>
+          </React.Fragment>
         );
       });
 
