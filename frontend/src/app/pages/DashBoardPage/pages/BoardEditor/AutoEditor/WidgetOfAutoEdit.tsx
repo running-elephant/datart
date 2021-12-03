@@ -78,6 +78,7 @@ const Warp = styled.div<{}>`
 const ItemContainer = styled.div`
   z-index: 10;
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
 `;

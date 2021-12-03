@@ -218,8 +218,8 @@ export const createWidgetInfo = (id: string): WidgetInfo => {
 export const createWidgetPadding = (widgetType: WidgetType) => {
   if (widgetType === 'query' || widgetType === 'reset') {
     return {
-      left: 4,
-      right: 4,
+      left: 0,
+      right: 0,
       top: 0,
       bottom: 0,
     };
@@ -227,7 +227,7 @@ export const createWidgetPadding = (widgetType: WidgetType) => {
   return {
     left: 4,
     right: 4,
-    top: 20,
+    top: 4,
     bottom: 4,
   };
 };
@@ -934,4 +934,17 @@ export const getCanLinkFilterWidgets = (widgets: Widget[]) => {
     return true;
   });
   return canLinkWidgets;
+};
+
+export const getLinkedColumn = (
+  targetWidgetId: string,
+  triggerWidget: Widget,
+) => {
+  const relations = triggerWidget.relations;
+  const relation = relations.find(item => item.targetId === targetWidgetId);
+  return (
+    relation?.config?.widgetToWidget?.linkerColumn ||
+    relation?.config?.widgetToWidget?.triggerColumn ||
+    ''
+  );
 };

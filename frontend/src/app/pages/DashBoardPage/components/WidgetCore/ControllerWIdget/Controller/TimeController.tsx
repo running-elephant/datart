@@ -20,6 +20,7 @@ import { PickerType } from 'app/pages/DashBoardPage/pages/BoardEditor/components
 import { formatDateByPickType } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/utils';
 import moment from 'moment';
 import React, { memo } from 'react';
+import styled from 'styled-components/macro';
 
 export interface TimeControllerProps {
   value?: any;
@@ -63,7 +64,7 @@ export const TimeController: React.FC<SingleTimeSetProps> = memo(
     };
 
     return (
-      <>
+      <StyledWrap>
         {pickerType === 'dateTime' ? (
           <DatePicker
             style={{ width: '100%' }}
@@ -71,6 +72,7 @@ export const TimeController: React.FC<SingleTimeSetProps> = memo(
             value={value ? moment(value) : null}
             showTime
             onChange={_onChange}
+            className="control-datePicker"
           />
         ) : (
           <DatePicker
@@ -79,9 +81,25 @@ export const TimeController: React.FC<SingleTimeSetProps> = memo(
             value={value ? moment(value) : null}
             onChange={_onChange}
             picker={pickerType as any}
+            className="control-datePicker"
           />
         )}
-      </>
+      </StyledWrap>
     );
   },
 );
+const StyledWrap = styled.div`
+  display: flex;
+
+  justify-content: space-around;
+  width: 100%;
+
+  & .control-datePicker {
+    width: 100%;
+    background-color: transparent !important;
+
+    & .ant-input {
+      background-color: transparent !important;
+    }
+  }
+`;

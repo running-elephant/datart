@@ -80,48 +80,38 @@ export const getDateFacadeOptions = (category: ChartDataViewFieldCategory) => {
 };
 // 展示前处理
 export const preformatWidgetFilter = (
-  oldWidgetFilter: ControllerConfig,
-  type: ControllerFacadeTypes = ControllerFacadeTypes.DropdownList,
+  preConfig: ControllerConfig,
+  controllerType: ControllerFacadeTypes,
 ) => {
-  const config = JSON.parse(
-    JSON.stringify(oldWidgetFilter),
-  ) as ControllerConfig;
-  if (!config.valueOptionType) {
-    config.valueOptionType = ValueOptionTypes.Common;
+  let config = preConfig;
+  if (DateControllerTypes.includes(controllerType)) {
+    config = formatControlDateToMoment(JSON.parse(JSON.stringify(config)));
   }
-  if (!config?.visibility) {
-    config.visibility = {
-      visibilityType: 'show',
-    };
-  }
+  return config;
+};
 
+export const formatControlDateToMoment = (config: ControllerConfig) => {
   if (config.controllerDate) {
-    if (config.controllerDate) {
-      const filterDate = config.controllerDate;
-      if (filterDate.startTime && filterDate.startTime.exactValue) {
-        if (typeof filterDate.startTime.exactValue === 'string') {
-          let exactTime = filterDate.startTime.exactValue;
-          let newExactTime = moment(exactTime, 'YYYY-MM-DD HH:mm:ss');
-          config.controllerDate.startTime.exactValue = newExactTime;
-        }
+    const filterDate = config.controllerDate;
+    if (filterDate.startTime && filterDate.startTime.exactValue) {
+      if (typeof filterDate.startTime.exactValue === 'string') {
+        let exactTime = filterDate.startTime.exactValue;
+        let newExactTime = moment(exactTime, 'YYYY-MM-DD HH:mm:ss');
+        config.controllerDate.startTime.exactValue = newExactTime;
       }
-      if (filterDate.endTime && filterDate.endTime.exactValue) {
-        if (typeof filterDate.endTime.exactValue === 'string') {
-          let exactTime = filterDate.endTime.exactValue;
-          let newExactTime = moment(exactTime, 'YYYY-MM-DD HH:mm:ss');
-          config.controllerDate.endTime!.exactValue = newExactTime;
-        }
+    }
+    if (filterDate.endTime && filterDate.endTime.exactValue) {
+      if (typeof filterDate.endTime.exactValue === 'string') {
+        let exactTime = filterDate.endTime.exactValue;
+        let newExactTime = moment(exactTime, 'YYYY-MM-DD HH:mm:ss');
+        config.controllerDate.endTime!.exactValue = newExactTime;
       }
     }
   }
-
   return config;
 };
 // 设置后处理
-export const postControlConfig = (
-  config: ControllerConfig,
-  type: ControllerFacadeTypes = ControllerFacadeTypes.DropdownList,
-) => {
+export const postControlConfig = (config: ControllerConfig) => {
   if (config.valueOptions.length > 0) {
     config.controllerValues = config.valueOptions
       .filter(ele => ele.isSelected)
@@ -130,28 +120,6 @@ export const postControlConfig = (
   if (!Array.isArray(config.controllerValues)) {
     config.controllerValues = [config.controllerValues];
   }
-  const timeTypes = [
-    ControllerFacadeTypes.Time,
-    ControllerFacadeTypes.RangeTime,
-  ];
-  if (timeTypes.includes(type) && config.controllerDate) {
-    const filterDate = config.controllerDate;
-    if (filterDate.startTime && filterDate.startTime.exactValue) {
-      if (typeof filterDate.startTime.exactValue !== 'string') {
-        filterDate.startTime.exactValue = (
-          filterDate.startTime.exactValue as Moment
-        ).format('YYYY-MM-DD HH:mm:ss');
-      }
-    }
-    if (filterDate.endTime && filterDate.endTime.exactValue) {
-      if (typeof filterDate.endTime.exactValue !== 'string') {
-        filterDate.endTime.exactValue = (
-          filterDate.endTime.exactValue as Moment
-        ).format('YYYY-MM-DD HH:mm:ss');
-      }
-    }
-  }
-
   return config;
 };
 
@@ -318,4 +286,30 @@ export const formatDateByPickType = (
 
 export const isRangeTypeController = (type: ControllerFacadeTypes) => {
   return RangeControlTypes.includes(type);
+};
+
+export const rangeNumberValidator = async (_, values: any[]) => {
+  if (!values?.[0] && !values?.[1]) {
+  }
+  function hasValue(value) {
+    if (value === 0) {
+      return true;
+    }
+    return !!value;
+  }
+  const startHasValue = hasValue(values?.[0]);
+  const endHasValue = hasValue(values?.[1]);
+  if (!startHasValue && !endHasValue) {
+    return Promise.resolve(values);
+  }
+  if (!startHasValue && endHasValue) {
+    return Promise.reject(new Error('请填写 起始值'));
+  }
+  if (startHasValue && !endHasValue) {
+    return Promise.reject(new Error('请填写 结束值'));
+  }
+  if (values?.[0] - values?.[1] > 0) {
+    return Promise.reject(new Error(' 起始值 不该小于 结束值'));
+  }
+  return Promise.resolve(values);
 };
