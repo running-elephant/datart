@@ -25,7 +25,6 @@ import { WidgetCore } from '../..';
 import { BoardContext } from '../../../../contexts/BoardContext';
 import SubMaskLayer from '../../../../pages/BoardEditor/components/SubMaskLayer';
 import WidgetToolBar from '../../../WidgetToolBar';
-import { WidgetName } from '../../WidgetName/WidgetName';
 export interface IProps {
   tabItem: ContainerItem;
 }
@@ -33,7 +32,6 @@ const TabWidgetContainer: React.FC<IProps> = ({ tabItem }) => {
   const { editing: boardEditing } = useContext(BoardContext);
   const widget = useContext(WidgetContext);
   const widgetInfo = useContext(WidgetInfoContext);
-  // const widget = tabItem.widgetConfig as Widget;
   const border = useMemo(() => {
     let border = '';
     if (widgetInfo.selected) {
@@ -68,8 +66,7 @@ const TabWidgetContainer: React.FC<IProps> = ({ tabItem }) => {
   return (
     <Wrap border={border}>
       <ItemContainer className="ItemContainer">
-        <WidgetName config={widget.config} />
-        <WidgetCore background padding border />;
+        <WidgetCore background padding border />
       </ItemContainer>
       {subMask}
       <div className="sub-hoverBar" onClick={ssp}>
@@ -82,12 +79,13 @@ export default TabWidgetContainer;
 interface WrapProps {
   border: string;
 }
-
 const Wrap = styled.div<WrapProps>`
   position: relative;
   box-sizing: border-box;
   width: 100%;
   height: 100%;
+  display: flex;
+  flex: 1;
   border: ${p => p.border};
 
   & .widget-tool-bar {
@@ -104,6 +102,7 @@ const Wrap = styled.div<WrapProps>`
 `;
 const ItemContainer = styled.div`
   position: absolute;
+  display: flex;
   z-index: 10;
   width: 100%;
   height: 100%;
