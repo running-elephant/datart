@@ -22,10 +22,10 @@ import styled from 'styled-components/macro';
 export interface CompProps {}
 export const ResetWidget: React.FC<CompProps> = () => {
   const widget = useContext(WidgetContext);
-  const { onWidgetsQuery } = useContext(BoardActionContext);
+  const { onWidgetsReset } = useContext(BoardActionContext);
   const onQuery = e => {
     e.stopPropagation();
-    // onWidgetsQuery();
+    onWidgetsReset();
   };
   return (
     <Wrap onClick={onQuery}>

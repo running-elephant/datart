@@ -115,7 +115,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
     const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
     // TODO xld migration about filter
     const widgetIds = serverWidgets.map(w => w.id);
-    const boardInfo = getInitBoardInfo(dashboard.id, widgetIds);
+    const boardInfo = getInitBoardInfo({ id: dashboard.id, widgetIds });
     // datacharts
 
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
@@ -413,7 +413,7 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
     if (!curWidget) return null;
     const dataChartMap = boardState.dataChartMap;
     const boardLinkFilters = boardInfo.linkFilter;
- 
+
     let requestParams = getChartWidgetRequestParams({
       widgetId,
       widgetMap,

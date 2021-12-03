@@ -420,6 +420,7 @@ export interface BoardInfo {
   needFetchItems: string[];
   hasFetchItems: string[];
   boardWidthHeight: [number, number];
+  originControllerWidgets: Widget[]; // use for reset button
 }
 export interface BoardLinkFilter {
   triggerWidgetId: string;

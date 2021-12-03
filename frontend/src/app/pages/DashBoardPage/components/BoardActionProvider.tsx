@@ -30,6 +30,7 @@ import { BoardContext } from '../contexts/BoardContext';
 import { boardActions } from '../pages/Board/slice';
 import {
   boardDownLoadAction,
+  resetControllerAction,
   widgetsQueryAction,
 } from '../pages/Board/slice/asyncActions';
 import { getWidgetDataAsync } from '../pages/Board/slice/thunk';
@@ -68,9 +69,10 @@ export const BoardActionProvider: FC<{ id: string }> = ({
     }, 500),
     onWidgetsReset: debounce(() => {
       if (editing) {
-        console.log('--onWidgetsReset');
+        // do nothing in board editing
+        return;
       } else {
-        console.log('--onWidgetsReset');
+        dispatch(resetControllerAction({ boardId, renderMode }));
       }
     }, 500),
     refreshWidgetsByFilter: debounce((widget: Widget) => {
