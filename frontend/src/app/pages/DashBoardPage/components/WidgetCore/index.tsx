@@ -16,18 +16,8 @@
  * limitations under the License.
  */
 import { DataChartWidget } from 'app/pages/DashBoardPage/components/WidgetCore/DataChartWidget';
-import IframeWidget from 'app/pages/DashBoardPage/components/WidgetCore/IframeBox';
-import ImageBox from 'app/pages/DashBoardPage/components/WidgetCore/ImageBox';
-import RichText from 'app/pages/DashBoardPage/components/WidgetCore/RichTextBox';
-import TabsBoxCore from 'app/pages/DashBoardPage/components/WidgetCore/TabsBox';
-import TimerBox from 'app/pages/DashBoardPage/components/WidgetCore/TimeBox';
-import VideoWidget from 'app/pages/DashBoardPage/components/WidgetCore/VideoBox';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
-import {
-  ContainerWidgetType,
-  MediaWidgetType,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { BoardContext } from '../../contexts/BoardContext';
@@ -36,7 +26,9 @@ import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
 import { getWidgetSomeStyle } from '../../utils/widget';
 import { QueryWidget } from './ButtonWidget/QueryWidget';
 import { ResetWidget } from './ButtonWidget/ResetWidget';
+import { ContainerWidget } from './ContainerWidget';
 import { ControllerWidgetCore } from './ControllerWIdget';
+import { MediaWidget } from './MediaWidget';
 
 export interface WidgetCoreProps {
   background?: boolean;
@@ -93,44 +85,17 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
     widgetInfo.loading,
     widgetInfo.rendered,
   ]);
-  const mediaElement = useMemo(() => {
-    let type: MediaWidgetType = widget.config.content.type;
-    switch (type) {
-      case 'richText':
-        return <RichText widgetConfig={widget} widgetInfo={widgetInfo} />;
-      case 'image':
-        return <ImageBox widgetConfig={widget} widgetInfo={widgetInfo} />;
-      case 'video':
-        return <VideoWidget />;
-      case 'iframe':
-        return <IframeWidget />;
-      case 'timer':
-        return <TimerBox />;
-      default:
-        return <div>default media</div>;
-    }
-  }, [widget, widgetInfo]);
-  const containerElement = useMemo(() => {
-    let type: ContainerWidgetType = widget.config.content.type;
-    switch (type) {
-      case 'tab':
-        return <TabsBoxCore />;
-      case 'carousel':
-        return <div>carousel container</div>;
-      default:
-        return <div>default container</div>;
-    }
-  }, [widget]);
+
   const element = useMemo(() => {
     switch (widget.config.type) {
       case 'chart':
         return <DataChartWidget />;
       case 'media':
-        return mediaElement;
+        return <MediaWidget />;
       case 'container':
-        return containerElement;
+        return <ContainerWidget />;
       case 'controller':
-        return <ControllerWidgetCore id={widget.id} />;
+        return <ControllerWidgetCore />;
       case 'query':
         return <QueryWidget />;
       case 'reset':
@@ -138,7 +103,7 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
       default:
         return <div>default widget</div>;
     }
-  }, [containerElement, mediaElement, widget]);
+  }, [widget]);
   const widgetCoreStyle = useMemo(() => {
     return getWidgetSomeStyle({
       config: widget.config,

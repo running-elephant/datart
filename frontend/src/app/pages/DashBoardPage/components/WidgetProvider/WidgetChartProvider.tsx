@@ -18,10 +18,10 @@
 
 import React, { FC, useContext } from 'react';
 import { useSelector } from 'react-redux';
-import { WidgetChartContext } from '../contexts/WidgetChartContext';
-import { WidgetContext } from '../contexts/WidgetContext';
-import { selectDataChartById } from '../pages/Board/slice/selector';
-import { BoardState } from '../pages/Board/slice/types';
+import { WidgetChartContext } from '../../contexts/WidgetChartContext';
+import { WidgetContext } from '../../contexts/WidgetContext';
+import { selectDataChartById } from '../../pages/Board/slice/selector';
+import { BoardState } from '../../pages/Board/slice/types';
 export const WidgetChartProvider: FC = ({ children }) => {
   const { datachartId } = useContext(WidgetContext);
   const dataChart = useSelector((state: { board: BoardState }) =>

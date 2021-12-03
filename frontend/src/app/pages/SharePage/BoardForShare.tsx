@@ -23,7 +23,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
-import { BoardProvider } from '../DashBoardPage/components/BoardProvider';
+import { BoardProvider } from '../DashBoardPage/components/BoardProvider/BoardProvider';
 import FullScreenPanel from '../DashBoardPage/components/FullScreenPanel';
 import TitleHeader from '../DashBoardPage/components/TitleHeader';
 import AutoBoardCore from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';

@@ -37,7 +37,7 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import { editBoardStackActions } from '../../../pages/BoardEditor/slice';
+import { editBoardStackActions } from '../../../../pages/BoardEditor/slice';
 // TODO 计算字段
 // import './CalcField/index';
 import { MarkdownOptions } from './configs/MarkdownOptions';
@@ -49,11 +49,11 @@ import { Options as viewOptions } from './ViewBox/index';
 Quill.register('modules/imageDrop', ImageDrop);
 Quill.register('formats/tag', TagBlot);
 
-type RichTextprops = {
+type RichTextWidgetProps = {
   widgetConfig: Widget;
   widgetInfo: WidgetInfo;
 };
-export const RichText: React.FC<RichTextprops> = ({
+export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   widgetConfig,
   widgetInfo,
 }) => {
@@ -235,7 +235,7 @@ export const RichText: React.FC<RichTextprops> = ({
     </TextWrap>
   );
 };
-export default RichText;
+export default RichTextWidget;
 
 interface TextWrapProps {
   editing: boolean;

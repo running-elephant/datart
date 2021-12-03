@@ -19,11 +19,11 @@
 import produce from 'immer';
 import React, { FC, memo, useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { BoardContext, BoardContextProps } from '../contexts/BoardContext';
-import { renderedWidgetAsync } from '../pages/Board/slice/thunk';
-import { Dashboard, VizRenderMode } from '../pages/Board/slice/types';
-import { renderedEditWidgetAsync } from '../pages/BoardEditor/slice/thunk';
-import { adaptBoardImageUrl } from '../utils';
+import { BoardContext, BoardContextProps } from '../../contexts/BoardContext';
+import { renderedWidgetAsync } from '../../pages/Board/slice/thunk';
+import { Dashboard, VizRenderMode } from '../../pages/Board/slice/types';
+import { renderedEditWidgetAsync } from '../../pages/BoardEditor/slice/thunk';
+import { adaptBoardImageUrl } from '../../utils';
 import { BoardActionProvider } from './BoardActionProvider';
 import { BoardConfigProvider } from './BoardConfigProvider';
 import { BoardInfoProvider } from './BoardInfoProvider';

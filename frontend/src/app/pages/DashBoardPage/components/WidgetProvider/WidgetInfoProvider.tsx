@@ -18,12 +18,12 @@
 
 import React, { FC, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { BoardContext } from '../contexts/BoardContext';
-import { WidgetInfoContext } from '../contexts/WidgetInfoContext';
-import { selectWidgetInfoBy2Id } from '../pages/Board/slice/selector';
-import { BoardState } from '../pages/Board/slice/types';
-import { selectWidgetInfoById } from '../pages/BoardEditor/slice/selectors';
-import { EditBoardState } from '../pages/BoardEditor/slice/types';
+import { BoardContext } from '../../contexts/BoardContext';
+import { WidgetInfoContext } from '../../contexts/WidgetInfoContext';
+import { selectWidgetInfoBy2Id } from '../../pages/Board/slice/selector';
+import { BoardState } from '../../pages/Board/slice/types';
+import { selectWidgetInfoById } from '../../pages/BoardEditor/slice/selectors';
+import { EditBoardState } from '../../pages/BoardEditor/slice/types';
 
 export const WidgetInfoProvider: FC<{ widgetId: string }> = ({
   widgetId,

@@ -21,11 +21,11 @@ import { ContainerItem } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { INFO, SUCCESS } from 'styles/StyleConstants';
-import { WidgetCore } from '..';
-import { BoardContext } from '../../../contexts/BoardContext';
-import SubMaskLayer from '../../../pages/BoardEditor/components/SubMaskLayer';
-import WidgetToolBar from '../../WidgetToolBar';
-import { WidgetName } from '../WidgetName/WidgetName';
+import { WidgetCore } from '../..';
+import { BoardContext } from '../../../../contexts/BoardContext';
+import SubMaskLayer from '../../../../pages/BoardEditor/components/SubMaskLayer';
+import WidgetToolBar from '../../../WidgetToolBar';
+import { WidgetName } from '../../WidgetName/WidgetName';
 export interface IProps {
   tabItem: ContainerItem;
 }

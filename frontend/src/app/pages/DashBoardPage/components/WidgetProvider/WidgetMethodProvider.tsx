@@ -25,38 +25,38 @@ import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { FC, useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
-import { BoardContext } from '../contexts/BoardContext';
-import { WidgetContext } from '../contexts/WidgetContext';
+import { BoardContext } from '../../contexts/BoardContext';
+import { WidgetContext } from '../../contexts/WidgetContext';
 import {
   WidgetMethodContext,
   WidgetMethodContextProps,
-} from '../contexts/WidgetMethodContext';
-import { boardActions } from '../pages/Board/slice';
+} from '../../contexts/WidgetMethodContext';
+import { boardActions } from '../../pages/Board/slice';
 import {
   getChartWidgetDataAsync,
   getWidgetDataAsync,
-} from '../pages/Board/slice/thunk';
+} from '../../pages/Board/slice/thunk';
 import {
   BoardLinkFilter,
   Widget,
   WidgetContentChartType,
   WidgetType,
-} from '../pages/Board/slice/types';
+} from '../../pages/Board/slice/types';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
   editWidgetInfoActions,
-} from '../pages/BoardEditor/slice';
+} from '../../pages/BoardEditor/slice';
 import {
   closeJumpAction,
   closeLinkageAction,
   editChartInWidgetAction,
-} from '../pages/BoardEditor/slice/actions/actions';
+} from '../../pages/BoardEditor/slice/actions/actions';
 import {
   getEditChartWidgetDataAsync,
   getEditWidgetDataAsync,
-} from '../pages/BoardEditor/slice/thunk';
-import { widgetActionType } from './WidgetToolBar/config';
+} from '../../pages/BoardEditor/slice/thunk';
+import { widgetActionType } from '../WidgetToolBar/config';
 
 const { confirm } = Modal;
 export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
