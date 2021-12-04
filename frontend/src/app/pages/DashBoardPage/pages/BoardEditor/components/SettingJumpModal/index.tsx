@@ -151,6 +151,15 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     >
       <Form {...formItemLayout} form={form} onFinish={onFinish}>
         <Form.Item
+          label="跳转类型"
+          name="target"
+          rules={[{ required: true, message: '跳转类型不能为空' }]}
+        >
+          <SelectJumpFields
+            chartGroupColumns={chartGroupColumns}
+          ></SelectJumpFields>
+        </Form.Item>
+        <Form.Item
           label="跳转目标"
           name="target"
           rules={[{ required: true, message: '跳转目标不能为空' }]}

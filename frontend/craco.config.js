@@ -146,10 +146,10 @@ module.exports = {
     hot: true,
     proxy: {
       '/api/v1': {
-        target: 'http://localhost:8080/',
+        target: 'http://192.168.50.29:8083/',
       },
       '/resources': {
-        target: 'http://localhost:8080/',
+        target: 'http://192.168.50.29:8083/',
       },
     },
     historyApiFallback: {
