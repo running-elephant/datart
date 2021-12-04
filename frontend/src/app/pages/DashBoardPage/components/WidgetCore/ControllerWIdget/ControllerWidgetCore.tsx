@@ -220,6 +220,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
             onChange={onControllerChange}
             options={selectOptions}
             name={'value'}
+            label={leftControlLabel}
           />
         );
 
@@ -237,13 +238,18 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
             step={step}
             name="value"
             showMarks={showMarks}
+            label={leftControlLabel}
           />
         );
 
       case ControllerFacadeTypes.Value:
         form.setFieldsValue({ value: controllerValues?.[0] });
         return (
-          <NumberControllerForm onChange={onControllerChange} name="value" />
+          <NumberControllerForm
+            onChange={onControllerChange}
+            name="value"
+            label={leftControlLabel}
+          />
         );
 
       case ControllerFacadeTypes.RangeValue:
@@ -252,13 +258,18 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           <RangeNumberControllerForm
             onChange={onControllerChange}
             name="value"
+            label={leftControlLabel}
           />
         );
 
       case ControllerFacadeTypes.Text:
         form.setFieldsValue({ value: controllerValues?.[0] });
         return (
-          <TextControllerForm onChange={onControllerChange} name="value" />
+          <TextControllerForm
+            onChange={onControllerChange}
+            label={leftControlLabel}
+            name="value"
+          />
         );
 
       case ControllerFacadeTypes.RadioGroup:
@@ -269,6 +280,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         let radioButtonType = config.radioButtonType;
         return (
           <RadioGroupControllerForm
+            label={leftControlLabel}
             radioButtonType={radioButtonType}
             onChange={onControllerChange}
             options={RadioOptions}
@@ -286,6 +298,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         let rangePickerType = controllerDate!.pickerType;
         return (
           <RangeTimeControllerForm
+            label={leftControlLabel}
             pickerType={rangePickerType}
             onChange={onRangeTimeChange}
             name="value"
@@ -301,6 +314,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         form.setFieldsValue({ value: timeValues[0] });
         return (
           <TimeControllerForm
+            label={leftControlLabel}
             onChange={onTimeChange}
             pickerType={pickerType}
             name="value"
