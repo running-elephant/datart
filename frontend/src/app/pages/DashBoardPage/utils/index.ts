@@ -223,7 +223,11 @@ export const getWidgetControlValues = (opt: {
     case ControllerFacadeTypes.Value:
     case ControllerFacadeTypes.RangeValue:
     case ControllerFacadeTypes.Slider:
-      if (!config.controllerValues || config.controllerValues.length === 0)
+      if (
+        !config.controllerValues ||
+        config.controllerValues.length === 0 ||
+        !config.controllerValues?.[0]
+      )
         return false;
       const numericValues = config.controllerValues
         .filter(ele => {
@@ -240,7 +244,11 @@ export const getWidgetControlValues = (opt: {
       return numericValues[0] ? numericValues : false;
 
     default:
-      if (!config.controllerValues || config.controllerValues.length === 0)
+      if (
+        !config.controllerValues ||
+        config.controllerValues.length === 0 ||
+        !config.controllerValues?.[0]
+      )
         return false;
 
       const strValues = config.controllerValues
@@ -340,7 +348,6 @@ export const getChartWidgetRequestParams = (obj: {
   if (curWidget.config.type !== 'chart') return null;
   if (!curWidget.datachartId) return null;
   const dataChart = dataChartMap[curWidget.datachartId];
-  if (!dataChart) return null;
   if (!dataChart) {
     errorHandle(`can\`t find Chart ${curWidget.datachartId}`);
     return null;
