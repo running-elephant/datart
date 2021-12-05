@@ -342,7 +342,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   };
   return (
     <Modal
-      title={`${type === 'add' ? '添加' : '编辑'} ${t(controllerType || '')}`}
+      title={`${type === 'add' ? '添加' : '编辑'}${t(controllerType || '')}`}
       visible={visible}
       onOk={onSubmit}
       centered
