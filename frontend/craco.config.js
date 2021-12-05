@@ -3,6 +3,7 @@ const fs = require('fs');
 const CracoLessPlugin = require('craco-less');
 const WebpackBar = require('webpackbar');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const {
   when,
   whenDev,
@@ -56,7 +57,11 @@ module.exports = {
   ],
   webpack: {
     alias: {},
-    plugins: [new WebpackBar(), new MonacoWebpackPlugin({ languages: [''] })],
+    plugins: [
+      new WebpackBar(),
+      new MonacoWebpackPlugin({ languages: [''] }),
+      // new BundleAnalyzerPlugin(),
+    ],
     configure: (webpackConfig, { env, paths }) => {
       // paths.appPath='public'
       // paths.appBuild = 'dist'; // 配合输出打包修改文件目录
@@ -146,10 +151,10 @@ module.exports = {
     hot: true,
     proxy: {
       '/api/v1': {
-        target: 'http://192.168.50.29:8083/',
+        target: 'http://localhost:8080/',
       },
       '/resources': {
-        target: 'http://192.168.50.29:8083/',
+        target: 'http://localhost:8080/',
       },
     },
     historyApiFallback: {
