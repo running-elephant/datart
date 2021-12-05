@@ -191,16 +191,16 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
           <Form.Item
             label="HTTP URL"
             name="httpUrl"
-            rules={[{ required: true, message: '跳转目标HTTP URL' }]}
+            rules={[{ required: true, message: '跳转目标HTTP URL不能为空' }]}
           >
             <Input placeholder="jump http url" />
           </Form.Item>
         )}
         {targetType === 2 && (
           <Form.Item
-            label="Query Name"
+            label="URL参数"
             name="queryName"
-            rules={[{ required: true, message: '查询参数名称' }]}
+            rules={[{ required: true, message: 'URL参数名称不能为空' }]}
           >
             <Input placeholder="query param name" />
           </Form.Item>
