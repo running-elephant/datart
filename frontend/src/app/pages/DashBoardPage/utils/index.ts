@@ -3,6 +3,7 @@ import {
   transformToViewConfig,
 } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { DEFAULT_VALUE_DATE_FORMAT } from 'app/pages/MainPage/pages/VariablePage/constants';
 import {
   ChartDataSectionField,
   ChartDataSectionType,
@@ -280,7 +281,7 @@ export const getControllerDateValues = (
   } else {
     const { amount, unit, direction } = startTime.relativeValue!;
     const time = getTime(+(direction + amount), unit)(unit, true);
-    timeValues[0] = time.format('YYYY-MM-DD HH:mm:ss');
+    timeValues[0] = time.format(DEFAULT_VALUE_DATE_FORMAT);
   }
   if (endTime) {
     if (endTime.relativeOrExact === RelativeOrExactTime.Exact) {
@@ -288,7 +289,7 @@ export const getControllerDateValues = (
     } else {
       const { amount, unit, direction } = endTime.relativeValue!;
       const time = getTime(+(direction + amount), unit)(unit, false);
-      timeValues[1] = time.format('YYYY-MM-DD HH:mm:ss');
+      timeValues[1] = time.format(DEFAULT_VALUE_DATE_FORMAT);
     }
   }
 

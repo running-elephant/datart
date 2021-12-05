@@ -23,8 +23,9 @@ import {
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import React, { memo } from 'react';
-import { FixedSqlOperatorTypes } from '../../../types';
+import { FixedSqlOperatorTypes } from '../../../constants';
 import { SqlOperatorForm } from './SqlOperatorForm';
+
 export const SqlOperatorName = ['config', 'sqlOperator'];
 
 export interface SqlOperatorProps {
