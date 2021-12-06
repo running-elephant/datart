@@ -55,7 +55,10 @@ import {
   selectControllerPanel,
   selectSortAllWidgets,
 } from '../../slice/selectors';
-import { addWidgetsToEditBoard } from '../../slice/thunk';
+import {
+  addWidgetsToEditBoard,
+  getEditControllerOptionAsync,
+} from '../../slice/thunk';
 import { WidgetControlForm } from './ControllerConfig';
 import { RelatedViewForm } from './RelatedViewForm';
 import { RelatedWidgetItem, RelatedWidgets } from './RelatedWidgets';
@@ -239,6 +242,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           hasVariable: false,
         });
         dispatch(addWidgetsToEditBoard([widget]));
+        dispatch(getEditControllerOptionAsync(widget));
         refreshWidgetsByFilter(widget);
       } else if (type === 'edit') {
         const sourceId = curFilterWidget.id;
@@ -290,6 +294,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           draft.config.content = nextContent;
         });
         dispatch(editBoardStackActions.updateWidget(newWidget));
+        dispatch(getEditControllerOptionAsync(newWidget));
         refreshWidgetsByFilter(newWidget);
       }
     },

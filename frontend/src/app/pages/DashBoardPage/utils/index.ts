@@ -18,8 +18,9 @@ import {
 } from 'app/types/FilterControlPanel';
 import { getTime } from 'app/utils/time';
 import { FilterSqlOperator } from 'globalConstants';
+import moment from 'moment';
 import { errorHandle } from 'utils/utils';
-import { STORAGE_IMAGE_KEY_PREFIX, ValueOptionType } from '../constants';
+import { STORAGE_IMAGE_KEY_PREFIX } from '../constants';
 import {
   BoardLinkFilter,
   ControllerWidgetContent,
@@ -33,6 +34,7 @@ import {
   ControllerDate,
 } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { ChartRequestFilter } from './../../ChartWorkbenchPage/models/ChartHttpRequest';
+import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
 
 export const convertImageUrl = (urlKey: string = ''): string => {
@@ -207,10 +209,11 @@ export const getWidgetControlValues = (opt: {
       if (!config?.controllerDate) {
         return false;
       }
-      const timeValues = getControllerDateValues(
-        config.valueOptionType,
-        config.controllerDate,
-      );
+      const timeValues = getControllerDateValues({
+        controlType: type,
+        filterDate: config.controllerDate,
+        execute: true,
+      });
       const values = timeValues
         .filter(ele => !!ele)
         .map(ele => {
@@ -268,14 +271,13 @@ export const getWidgetControlValues = (opt: {
   }
 };
 
-export const getControllerDateValues = (
-  valueOptionType: ValueOptionType,
-  filterDate: ControllerDate,
-) => {
-  const { endTime, startTime } = filterDate;
-
+export const getControllerDateValues = (obj: {
+  controlType: ControllerFacadeTypes;
+  filterDate: ControllerDate;
+  execute?: boolean;
+}) => {
+  const { endTime, startTime, pickerType } = obj.filterDate;
   let timeValues: [string, string] = ['', ''];
-
   if (startTime.relativeOrExact === RelativeOrExactTime.Exact) {
     timeValues[0] = startTime.exactValue as string;
   } else {
@@ -286,6 +288,14 @@ export const getControllerDateValues = (
   if (endTime) {
     if (endTime.relativeOrExact === RelativeOrExactTime.Exact) {
       timeValues[1] = endTime.exactValue as string;
+      if (obj.execute) {
+        timeValues[1] = adjustRangeDataEndValue(
+          pickerType,
+          endTime.exactValue as string,
+        );
+      } else {
+        timeValues[1] = endTime.exactValue as string;
+      }
     } else {
       const { amount, unit, direction } = endTime.relativeValue!;
       const time = getTime(+(direction + amount), unit)(unit, false);
@@ -295,7 +305,36 @@ export const getControllerDateValues = (
 
   return timeValues;
 };
-
+export const adjustRangeDataEndValue = (
+  pickerType: PickerType,
+  timeValue: string,
+) => {
+  let adjustTime = moment(timeValue);
+  switch (pickerType) {
+    case 'dateTime':
+      // 比较特殊 不做增值处理
+      break;
+    case 'date':
+      adjustTime = adjustTime.add(1, 'days').startOf('days');
+      break;
+    case 'month':
+      adjustTime = adjustTime.add(1, 'months').startOf('months');
+      break;
+    case 'quarter':
+      adjustTime = adjustTime.add(1, 'quarters').startOf('quarters');
+      break;
+    case 'week':
+      adjustTime = adjustTime.add(1, 'weeks').startOf('week');
+      break;
+    case 'year':
+      adjustTime = adjustTime.add(1, 'years').startOf('years');
+      break;
+    default:
+      break;
+  }
+  let end = adjustTime.format(DEFAULT_VALUE_DATE_FORMAT);
+  return end;
+};
 export const getBoardChartRequests = (params: {
   widgetMap: Record<string, Widget>;
   viewMap: Record<string, ChartDataView>;
