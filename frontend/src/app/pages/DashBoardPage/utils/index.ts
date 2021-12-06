@@ -214,6 +214,7 @@ export const getWidgetControlValues = (opt: {
         filterDate: config.controllerDate,
         execute: true,
       });
+
       const values = timeValues
         .filter(ele => !!ele)
         .map(ele => {
@@ -309,6 +310,9 @@ export const adjustRangeDataEndValue = (
   pickerType: PickerType,
   timeValue: string,
 ) => {
+  if (!timeValue) {
+    return timeValue;
+  }
   let adjustTime = moment(timeValue);
   switch (pickerType) {
     case 'dateTime':
