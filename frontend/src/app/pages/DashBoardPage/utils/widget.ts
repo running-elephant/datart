@@ -23,13 +23,15 @@ import { FilterSqlOperator } from 'globalConstants';
 import produce from 'immer';
 import { DeltaStatic } from 'quill';
 import { CSSProperties } from 'react';
-import { G70 } from 'styles/StyleConstants';
+import { FONT_FAMILY, G90, WHITE } from 'styles/StyleConstants';
 import { v4 as uuidv4 } from 'uuid';
 import { convertImageUrl, fillPx } from '.';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
   BorderDefault,
+  ButtonBorderDefault,
+  QueryButtonWidgetBackgroundDefault,
 } from '../constants';
 import {
   BackgroundConfig,
@@ -159,25 +161,30 @@ export const createInitWidgetConfig = (opt: {
     rect: createWidgetRect(opt.boardType, opt.type),
     background:
       opt.boardType === 'auto'
-        ? AutoBoardWidgetBackgroundDefault
+        ? opt.type === 'query'
+          ? QueryButtonWidgetBackgroundDefault
+          : AutoBoardWidgetBackgroundDefault
         : BackgroundDefault,
-    border: BorderDefault,
+    border: ['query', 'reset'].includes(opt.type)
+      ? ButtonBorderDefault
+      : BorderDefault,
     content: opt.content,
     nameConfig: {
       show: true,
       textAlign: 'left',
       ...fontDefault,
+      color: opt.type === 'query' ? WHITE : G90,
     },
     padding: createWidgetPadding(opt.type),
   };
 };
 
 export const fontDefault = {
-  fontFamily: 'PingFang SC',
-  fontSize: '12',
+  fontFamily: FONT_FAMILY,
+  fontSize: '14',
   fontWeight: 'normal',
   fontStyle: 'normal',
-  color: G70,
+  color: G90,
 };
 
 export const createWidget = (option: {
@@ -223,12 +230,19 @@ export const createWidgetPadding = (widgetType: WidgetType) => {
       top: 0,
       bottom: 0,
     };
+  } else if (widgetType === 'controller') {
+    return {
+      left: 8,
+      right: 0,
+      top: 0,
+      bottom: 0,
+    };
   }
   return {
-    left: 4,
-    right: 4,
-    top: 4,
-    bottom: 4,
+    left: 8,
+    right: 8,
+    top: 8,
+    bottom: 8,
   };
 };
 export const createWidgetRect = (
@@ -265,15 +279,15 @@ export const getInitButtonWidgetRect = (boardType: BoardType): RectConfig => {
       x: 0,
       y: 0,
       width: 1,
-      height: 2,
+      height: 1,
     };
   } else {
     // free
     return {
       x: 0,
       y: 0,
-      width: 150,
-      height: 50,
+      width: 128,
+      height: 32,
     };
   }
 };
@@ -285,7 +299,7 @@ export const getInitControllerWidgetRect = (
       x: 0,
       y: 0,
       width: 3,
-      height: 2,
+      height: 1,
     };
   } else {
     // free
@@ -293,7 +307,7 @@ export const getInitControllerWidgetRect = (
       x: 0,
       y: 0,
       width: 300,
-      height: 80,
+      height: 32,
     };
   }
 };

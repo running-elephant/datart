@@ -146,7 +146,7 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
     },
   ];
   const renderTitle = (text: string) => {
-    return <span style={{ color: G60, fontSize: '1.1rem' }}>{text}</span>;
+    return <span style={{ color: G60, fontWeight: 500 }}>{text}</span>;
   };
   const controlerItems = (
     <Menu onClick={onAddControler}>
@@ -183,7 +183,7 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   return (
     <Dropdown
       overlay={controlerItems}
-      placement="bottomCenter"
+      placement="bottomLeft"
       trigger={['click']}
     >
       <WithTipButton
