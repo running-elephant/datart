@@ -343,7 +343,7 @@ class BasicTableChart extends ReactChart {
           width: enableFixedHeader
             ? enableFixedCol
               ? fixedColWidth
-              : 100
+              : null
             : null,
           fixed: _getFixedColumn(getValueByColumnKey(c)),
           align: textAlign,
@@ -453,12 +453,13 @@ class BasicTableChart extends ReactChart {
       scroll: enableFixedHeader
         ? {
             scrollToFirstRowOnChange: true,
+            x: 'max-content',
             y:
               height -
               HEADER_HEIGHT[tableSize] -
               (tablePagination ? PAGINATION_HEIGHT[tableSize] : 0),
           }
-        : { scrollToFirstRowOnChange: true },
+        : { scrollToFirstRowOnChange: true, x: 'max-content' },
       bordered: !!showTableBorder,
       size: tableSize,
     };

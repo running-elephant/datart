@@ -84,7 +84,7 @@ export const LINE_HEIGHT_ICON_XL = `${FONT_SIZE_BASE * 2.5}px`;
 export const LINE_HEIGHT_ICON_XXL = `${FONT_SIZE_BASE * 2.75}px`;
 
 export const FONT_FAMILY =
-  '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
+  '-apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
 export const CODE_FAMILY =
   '"SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace';
 export const FONT_WEIGHT_LIGHT = 300;

@@ -32,7 +32,7 @@ export const DEFAULT_FONT_WEIGHT = 'normal';
 export const DEFAULT_FONT_STYLE = 'normal';
 export const DEFAULT_FONT_SIZE = '14px';
 export const DEFAULT_FONT_FAMILY =
-  '"Chinese Quote", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
+  '"Chinese Quote", -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
 
 class ScoreChart extends Chart {
   chart: any = null;

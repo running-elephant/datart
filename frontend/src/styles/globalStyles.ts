@@ -1,6 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
 import {
   EMPHASIS_LEVEL,
+  FONT_FAMILY,
   FONT_SIZE_BODY,
   MODAL_LEVEL,
   SPACE_SM,
@@ -11,6 +12,7 @@ import {
 export const GlobalStyle = createGlobalStyle`
   body {
     font-size: ${FONT_SIZE_BODY};
+    font-family: ${FONT_FAMILY};
     background-color: ${p => p.theme.bodyBackground};
   }
 
