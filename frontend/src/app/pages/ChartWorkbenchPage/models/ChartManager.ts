@@ -45,6 +45,7 @@ const {
   WordCloudChart,
   ScatterOutlineMapChart,
   WaterfallChart,
+  BasicRichText,
 } = WidgetPlugins;
 
 class ChartManager {
@@ -120,6 +121,7 @@ class ChartManager {
       new WordCloudChart(),
       new NormalOutlineMapChart(),
       new ScatterOutlineMapChart(),
+      new BasicRichText(),
     ];
   }
 }

@@ -25,6 +25,10 @@ import { isEmpty } from 'utils/object';
 import ChartLifecycleAdapter from './ChartLifecycleAdapter';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 const antdStyles = require('!!css-loader!antd/dist/antd.min.css');
+// eslint-disable-next-line import/no-webpack-loader-syntax
+const quillSnow = require('!!css-loader!react-quill/dist/quill.snow.css');
+// eslint-disable-next-line import/no-webpack-loader-syntax
+const quillMarkdown = require('!!css-loader!quilljs-markdown/dist/quilljs-markdown-common-style.css');
 
 const ChartIFrameContainer: React.FC<{
   dataset: any;
@@ -35,6 +39,7 @@ const ChartIFrameContainer: React.FC<{
 }> = props => {
   // Note: manually add table css style in iframe
   const isTable = props.chart?.isISOContainer === 'react-table';
+  const isRichText = props.chart?.isISOContainer === 'react-rich-text';
 
   const transformToSafeCSSProps = style => {
     if (isNaN(style?.width) || isEmpty(style?.width)) {
@@ -45,7 +50,6 @@ const ChartIFrameContainer: React.FC<{
     }
     return style;
   };
-
   return (
     <Frame
       id={`chart-iframe-root-${props.containerId}`}
@@ -60,11 +64,13 @@ const ChartIFrameContainer: React.FC<{
               height: 100%;
               background-color: transparent !important;
               margin: 0;
-              overflow:${isTable ? 'visible' : 'hidden'};
+              overflow:${isTable || isRichText ? 'visible' : 'hidden'};
             }
            `}
           </style>
           <style>{isTable ? antdStyles.default.toString() : ''}</style>
+          <style>{isRichText ? quillSnow.default.toString() : ''}</style>
+          <style>{isRichText ? quillMarkdown.default.toString() : ''}</style>
         </>
       }
     >
