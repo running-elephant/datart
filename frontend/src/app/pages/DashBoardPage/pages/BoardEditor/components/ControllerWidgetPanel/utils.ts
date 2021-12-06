@@ -20,7 +20,10 @@ import {
   ValueOptionType,
   ValueOptionTypes,
 } from 'app/pages/DashBoardPage/constants';
-import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
+import {
+  DEFAULT_VALUE_DATE_FORMAT,
+  VariableValueTypes,
+} from 'app/pages/MainPage/pages/VariablePage/constants';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -96,14 +99,35 @@ export const formatControlDateToMoment = (config: ControllerConfig) => {
     if (filterDate.startTime && filterDate.startTime.exactValue) {
       if (typeof filterDate.startTime.exactValue === 'string') {
         let exactTime = filterDate.startTime.exactValue;
-        let newExactTime = moment(exactTime, 'YYYY-MM-DD HH:mm:ss');
+        let newExactTime = moment(exactTime, DEFAULT_VALUE_DATE_FORMAT);
         config.controllerDate.startTime.exactValue = newExactTime;
       }
     }
     if (filterDate.endTime && filterDate.endTime.exactValue) {
       if (typeof filterDate.endTime.exactValue === 'string') {
         let exactTime = filterDate.endTime.exactValue;
-        let newExactTime = moment(exactTime, 'YYYY-MM-DD HH:mm:ss');
+        let newExactTime = moment(exactTime, DEFAULT_VALUE_DATE_FORMAT);
+        config.controllerDate.endTime!.exactValue = newExactTime;
+      }
+    }
+  }
+  return config;
+};
+
+export const formatControlDateToStr = (config: ControllerConfig) => {
+  if (config.controllerDate) {
+    const filterDate = config.controllerDate;
+    if (filterDate.startTime && filterDate.startTime.exactValue) {
+      if ((filterDate.startTime.exactValue as Moment).format) {
+        let exactTime = filterDate.startTime.exactValue as Moment;
+        let newExactTime = exactTime.format(DEFAULT_VALUE_DATE_FORMAT);
+        config.controllerDate.startTime.exactValue = newExactTime;
+      }
+    }
+    if (filterDate.endTime && filterDate.endTime.exactValue) {
+      if ((filterDate.endTime.exactValue as Moment).format) {
+        let exactTime = filterDate.endTime.exactValue as Moment;
+        let newExactTime = exactTime.format(DEFAULT_VALUE_DATE_FORMAT);
         config.controllerDate.endTime!.exactValue = newExactTime;
       }
     }
@@ -111,15 +135,23 @@ export const formatControlDateToMoment = (config: ControllerConfig) => {
   return config;
 };
 // 设置后处理
-export const postControlConfig = (config: ControllerConfig) => {
+export const postControlConfig = (
+  config: ControllerConfig,
+  controllerType: ControllerFacadeTypes,
+) => {
   if (config.valueOptions.length > 0) {
     config.controllerValues = config.valueOptions
       .filter(ele => ele.isSelected)
       .map(ele => ele.key);
   }
+
+  if (DateControllerTypes.includes(controllerType)) {
+    config = formatControlDateToStr(config);
+  }
   if (!Array.isArray(config.controllerValues)) {
     config.controllerValues = [config.controllerValues];
   }
+
   return config;
 };
 
@@ -257,7 +289,7 @@ export const formatDateByPickType = (
   pickerType: PickerType,
   momentTime: Moment,
 ) => {
-  const formatTemp = 'YYYY-MM-DD HH:mm:ss';
+  const formatTemp = DEFAULT_VALUE_DATE_FORMAT;
   if (!momentTime) {
     return null;
   }
@@ -269,10 +301,11 @@ export const formatDateByPickType = (
     case 'date':
       return momentTime.set({ h: 0, m: 0, s: 0 }).format(formatTemp);
     case 'week':
-      let yearNo = momentTime.year();
-      let weekNo = momentTime.week() - 1;
-      let yearWeekStr = `${yearNo}-W${weekNo}`;
-      return moment(yearWeekStr).subtract(1, 'days').format(formatTemp);
+      let year = String(momentTime.year());
+      let week = String(momentTime.week() - 1);
+      var date = moment(year).add(week, 'weeks').startOf('week');
+      var value = date.format(formatTemp);
+      return value;
     case 'month':
       return momentTime.set({ date: 1, h: 0, m: 0, s: 0 }).format(formatTemp);
     case 'year':

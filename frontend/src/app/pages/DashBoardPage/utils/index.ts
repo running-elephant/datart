@@ -3,6 +3,7 @@ import {
   transformToViewConfig,
 } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { DEFAULT_VALUE_DATE_FORMAT } from 'app/pages/MainPage/pages/VariablePage/constants';
 import {
   ChartDataSectionField,
   ChartDataSectionType,
@@ -223,7 +224,11 @@ export const getWidgetControlValues = (opt: {
     case ControllerFacadeTypes.Value:
     case ControllerFacadeTypes.RangeValue:
     case ControllerFacadeTypes.Slider:
-      if (!config.controllerValues || config.controllerValues.length === 0)
+      if (
+        !config.controllerValues ||
+        config.controllerValues.length === 0 ||
+        !config.controllerValues?.[0]
+      )
         return false;
       const numericValues = config.controllerValues
         .filter(ele => {
@@ -240,7 +245,11 @@ export const getWidgetControlValues = (opt: {
       return numericValues[0] ? numericValues : false;
 
     default:
-      if (!config.controllerValues || config.controllerValues.length === 0)
+      if (
+        !config.controllerValues ||
+        config.controllerValues.length === 0 ||
+        !config.controllerValues?.[0]
+      )
         return false;
 
       const strValues = config.controllerValues
@@ -272,7 +281,7 @@ export const getControllerDateValues = (
   } else {
     const { amount, unit, direction } = startTime.relativeValue!;
     const time = getTime(+(direction + amount), unit)(unit, true);
-    timeValues[0] = time.format('YYYY-MM-DD HH:mm:ss');
+    timeValues[0] = time.format(DEFAULT_VALUE_DATE_FORMAT);
   }
   if (endTime) {
     if (endTime.relativeOrExact === RelativeOrExactTime.Exact) {
@@ -280,7 +289,7 @@ export const getControllerDateValues = (
     } else {
       const { amount, unit, direction } = endTime.relativeValue!;
       const time = getTime(+(direction + amount), unit)(unit, false);
-      timeValues[1] = time.format('YYYY-MM-DD HH:mm:ss');
+      timeValues[1] = time.format(DEFAULT_VALUE_DATE_FORMAT);
     }
   }
 
@@ -340,7 +349,6 @@ export const getChartWidgetRequestParams = (obj: {
   if (curWidget.config.type !== 'chart') return null;
   if (!curWidget.datachartId) return null;
   const dataChart = dataChartMap[curWidget.datachartId];
-  if (!dataChart) return null;
   if (!dataChart) {
     errorHandle(`can\`t find Chart ${curWidget.datachartId}`);
     return null;

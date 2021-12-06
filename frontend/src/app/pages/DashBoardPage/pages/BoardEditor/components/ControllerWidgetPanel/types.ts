@@ -5,10 +5,7 @@ import {
 } from 'app/pages/DashBoardPage/constants';
 import { FilterValueOption } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
-import {
-  ControllerFacadeTypes,
-  RelativeOrExactTime,
-} from 'app/types/FilterControlPanel';
+import { RelativeOrExactTime } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import { Moment, unitOfTime } from 'moment';
 import { VariableValueTypes } from '../../../../../MainPage/pages/VariablePage/constants';
@@ -82,11 +79,6 @@ export const PickerTypeOptions = [
   { name: '周', value: PickerTypes.Week },
 ];
 
-export const FixedSqlOperatorTypes = [
-  ControllerFacadeTypes.RangeTime,
-  ControllerFacadeTypes.RangeSlider,
-  ControllerFacadeTypes.RangeValue,
-];
 export interface ControllerDateType {
   relativeOrExact: RelativeOrExactTime;
   relativeValue?: RelativeDate;
