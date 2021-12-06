@@ -39,7 +39,7 @@ public class JavascriptUtils {
     public static Object invoke(String path, String functionName, Object... args) throws Exception {
         InputStream stream = JavascriptUtils.class.getClassLoader().getResourceAsStream(path);
         if (stream == null) {
-            Exceptions.tr(BaseException.class, "message.file.notfound", path);
+            Exceptions.notFound(path);
         }
         try (InputStreamReader reader = new InputStreamReader(stream)) {
             ScriptEngine engine = engineFactory.getScriptEngine();

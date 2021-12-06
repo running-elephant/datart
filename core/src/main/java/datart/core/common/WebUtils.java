@@ -45,7 +45,7 @@ public class WebUtils {
         String driverPath = Application.getProperty("datart.screenshot.webdriver-path");
 
         if (StringUtils.isEmpty(driverPath)) {
-            Exceptions.tr(BaseException.class, "message.not.found.webdriver");
+            Exceptions.msg("message.not.found.webdriver");
         }
 
         String driverType = Application.getProperty("datart.screenshot.webdriver-type");
@@ -54,7 +54,7 @@ public class WebUtils {
             case "CHROME":
                 return createChromeWebDriver(driverPath);
             default:
-                Exceptions.tr(BaseException.class, "message.unsupported.webdriver", driverType);
+                Exceptions.msg("message.unsupported.webdriver", driverType);
         }
         return null;
     }

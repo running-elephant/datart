@@ -195,7 +195,7 @@ public abstract class DefaultDataProvider extends DataProvider {
             return values;
         }
         if (values.get(0).size() != columns.size()) {
-            Exceptions.tr(DataProviderException.class, "message.provider.default.schema", values.get(0).size() + ":" + columns.size());
+            Exceptions.msg( "message.provider.default.schema", values.get(0).size() + ":" + columns.size());
         }
         values.parallelStream().forEach(vals -> {
             for (int i = 0; i < vals.size(); i++) {
