@@ -357,4 +357,8 @@ const Wrap = styled.div`
   .ant-form-item {
     margin-bottom: 0;
   }
+
+  .ant-input-number-handler {
+    border-left: 0;
+  }
 `;
