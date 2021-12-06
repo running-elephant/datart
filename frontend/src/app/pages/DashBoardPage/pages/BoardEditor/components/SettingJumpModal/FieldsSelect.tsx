@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Select } from 'antd';
+import { FormInstance, Select } from 'antd';
 import { JumpConfigField } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import React, { memo, useCallback, useMemo } from 'react';
@@ -25,19 +25,22 @@ export interface JumpeFieldsProps<T = JumpConfigField> {
   chartGroupColumns?: ChartDataSectionField[];
   onChange?: (value?: T) => void;
   value?: T;
+  form?: FormInstance;
 }
 export const SelectJumpFields: React.FC<JumpeFieldsProps> = memo(
-  ({ chartGroupColumns, onChange, value }) => {
+  ({ chartGroupColumns, onChange, value, form }) => {
     const _value = useMemo(() => {
       return value?.jumpFieldName;
     }, [value]);
     const _onChange = useCallback(
       (_, option) => {
         onChange?.({
-          jumpFieldName: option.value,
+          jumpFieldName: option?.value,
         });
+
+        !option && form?.setFieldsValue({ field: '' });
       },
-      [onChange],
+      [onChange, form],
     );
 
     const renderOptions = useCallback(() => {
