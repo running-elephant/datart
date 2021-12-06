@@ -52,6 +52,7 @@ import {
   closeLinkageAction,
   editChartInWidgetAction,
 } from '../../pages/BoardEditor/slice/actions/actions';
+import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
 import {
   getEditChartWidgetDataAsync,
   getEditWidgetDataAsync,
@@ -91,8 +92,12 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
         dispatch(editBoardStackActions.changeBoardHasResetControl(false));
       }
       dispatch(editBoardStackActions.deleteWidgets([wid]));
+
+      if (type === 'controller') {
+        dispatch(editWidgetsQueryAction({ boardId }));
+      }
     },
-    [dispatch],
+    [dispatch, boardId],
   );
   const onWidgetEdit = useCallback(
     (widget: Widget, wid: string) => {
