@@ -17,7 +17,11 @@
  */
 
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
-
+export const FixedSqlOperatorTypes = [
+  ControllerFacadeTypes.RangeTime,
+  ControllerFacadeTypes.RangeSlider,
+  ControllerFacadeTypes.RangeValue,
+];
 export const ConventionalControllerTypes = [
   ControllerFacadeTypes.DropdownList,
   ControllerFacadeTypes.MultiDropdownList,

@@ -235,7 +235,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           relations: newRelations,
           controllerType: controllerType!,
           views: relatedViews,
-          config: postControlConfig(config),
+          config: postControlConfig(config, controllerType!),
           hasVariable: false,
         });
         dispatch(addWidgetsToEditBoard([widget]));
@@ -281,7 +281,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           ...(curFilterWidget.config.content as ControllerWidgetContent),
           name,
           relatedViews,
-          config: postControlConfig(config),
+          config: postControlConfig(config, controllerType!),
         };
 
         const newWidget = produce(curFilterWidget, draft => {

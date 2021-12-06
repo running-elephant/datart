@@ -53,7 +53,8 @@ export const NumberController: React.FC<TextControllerProps> = memo(
     };
     const _onBlur = () => {
       if (val !== value) {
-        onChange(val);
+        let _val = val === 0 ? '0' : val;
+        onChange(_val);
       }
     };
     useEffect(() => {

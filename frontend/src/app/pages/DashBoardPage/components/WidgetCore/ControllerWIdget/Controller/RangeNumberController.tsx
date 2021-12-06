@@ -88,7 +88,7 @@ export const RangeNumberController: React.FC<RangeNumberSetProps> = memo(
               onChange={onStartChange}
               placeholder="按回车确认"
               onPressEnter={_onStartValEnter}
-              onBlur={_onBlur}
+              // onBlur={_onBlur}
               className="control-number-input"
               bordered={false}
             />
@@ -101,7 +101,7 @@ export const RangeNumberController: React.FC<RangeNumberSetProps> = memo(
               onChange={onEndChange}
               placeholder="按回车确认"
               onPressEnter={_onEndValEnter}
-              onBlur={_onBlur}
+              // onBlur={_onBlur}
               className="control-number-input"
               bordered={false}
             />
