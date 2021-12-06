@@ -19,6 +19,7 @@
 import { Form, Modal } from 'antd';
 import { Split } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { selectViewMap } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import {
@@ -28,8 +29,8 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   convertToWidgetMap,
-  createFilterWidget,
-  getCanLinkFilterWidgets,
+  createControllerWidget,
+  getCanLinkControlWidgets,
   getOtherStringControlWidgets,
 } from 'app/pages/DashBoardPage/utils/widget';
 import {
@@ -71,9 +72,10 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const { type, widgetId, controllerType } = useSelector(selectControllerPanel);
   const { boardId, boardType, queryVariables } = useContext(BoardContext);
 
+  const { refreshWidgetsByFilter } = useContext(BoardActionContext);
   const allWidgets = useSelector(selectSortAllWidgets);
   const widgets = useMemo(
-    () => getCanLinkFilterWidgets(allWidgets),
+    () => getCanLinkControlWidgets(allWidgets),
     [allWidgets],
   );
   const otherStrFilterWidgets = useMemo(
@@ -142,9 +144,13 @@ const FilterWidgetPanel: React.FC = memo(props => {
   useEffect(() => {
     if (!curFilterWidget || !curFilterWidget?.relations) {
       form.setFieldsValue({
-        config: preformatWidgetFilter(getInitWidgetController(controllerType)),
+        config: preformatWidgetFilter(
+          getInitWidgetController(controllerType),
+          controllerType!,
+        ),
         relatedViews: [],
       });
+
       return;
     }
     const confContent = curFilterWidget.config
@@ -161,14 +167,14 @@ const FilterWidgetPanel: React.FC = memo(props => {
       });
     setRelatedWidgets(oldRelatedWidgetIds);
     setFormRelatedViews(setViewsRelatedView(oldRelatedWidgetIds));
-    const oldRelatedViews = confContent.relatedViews.filter(t => t.viewId);
-    form?.setFieldsValue({ relatedViews: oldRelatedViews });
+    const preRelatedViews = confContent.relatedViews.filter(t => t.viewId);
+    form?.setFieldsValue({ relatedViews: preRelatedViews });
 
     const { config } = confContent;
     form.setFieldsValue({
       ...confContent,
-      relatedViews: oldRelatedViews,
-      config: preformatWidgetFilter(config),
+      relatedViews: preRelatedViews,
+      config: preformatWidgetFilter(config, controllerType!),
     });
   }, [
     curFilterWidget,
@@ -182,7 +188,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const onFinish = useCallback(
     (values: ControllerWidgetContent) => {
       console.log('--values', values);
-
+      setVisible(false);
       const { relatedViews, config, name } = values;
       if (type === 'add') {
         const sourceId = uuidv4();
@@ -222,7 +228,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           }
         }
 
-        const widget = createFilterWidget({
+        const widget = createControllerWidget({
           boardId,
           boardType,
           name,
@@ -232,8 +238,8 @@ const FilterWidgetPanel: React.FC = memo(props => {
           config: postControlConfig(config, controllerType!),
           hasVariable: false,
         });
-
         dispatch(addWidgetsToEditBoard([widget]));
+        refreshWidgetsByFilter(widget);
       } else if (type === 'edit') {
         const sourceId = curFilterWidget.id;
 
@@ -275,7 +281,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           ...(curFilterWidget.config.content as ControllerWidgetContent),
           name,
           relatedViews,
-          config: postControlConfig(config, controllerType),
+          config: postControlConfig(config, controllerType!),
         };
 
         const newWidget = produce(curFilterWidget, draft => {
@@ -284,8 +290,8 @@ const FilterWidgetPanel: React.FC = memo(props => {
           draft.config.content = nextContent;
         });
         dispatch(editBoardStackActions.updateWidget(newWidget));
+        refreshWidgetsByFilter(newWidget);
       }
-      setVisible(false);
     },
     [
       boardId,
@@ -293,6 +299,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
       controllerType,
       curFilterWidget,
       dispatch,
+      refreshWidgetsByFilter,
       relatedWidgets,
       type,
       widgetMap,
@@ -330,12 +337,12 @@ const FilterWidgetPanel: React.FC = memo(props => {
   };
   return (
     <Modal
-      title={`${type} ${t(controllerType || '')}`}
+      title={`${type === 'add' ? '添加' : '编辑'} ${t(controllerType || '')}`}
       visible={visible}
       onOk={onSubmit}
       centered
       destroyOnClose
-      width={1100}
+      width={1160}
       afterClose={afterClose}
       onCancel={() => setVisible(false)}
     >
@@ -349,13 +356,15 @@ const FilterWidgetPanel: React.FC = memo(props => {
       >
         <Container className="datart-split">
           <div>
-            <WidgetControlForm
-              controllerType={controllerType!}
-              otherStrFilterWidgets={otherStrFilterWidgets}
-              boardType={boardType}
-              viewMap={viewMap}
-              form={form}
-            />
+            {visible && (
+              <WidgetControlForm
+                controllerType={controllerType!}
+                otherStrFilterWidgets={otherStrFilterWidgets}
+                boardType={boardType}
+                viewMap={viewMap}
+                form={form}
+              />
+            )}
           </div>
           <div className="split-left">
             <RelatedWidgets
@@ -364,6 +373,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
               onChange={onChangeRelatedWidgets}
             />
             <RelatedViewForm
+              controllerType={controllerType!}
               form={form}
               viewMap={viewMap}
               queryVariables={queryVariables}

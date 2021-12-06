@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 import { FormItemProps } from 'antd';
-import React, { memo } from 'react';
-import { ControllerValuesName } from '../ValuesSetter';
+import React from 'react';
+import { ControllerValuesName } from '../..';
 import { NumberSetForm } from './NumberSetFrom';
 
 export interface NumberSetterProps {}
-export const NumberSetter: React.FC<NumberSetterProps> = memo(() => {
+export const NumberSetter: React.FC<NumberSetterProps> = () => {
   const itemProps: FormItemProps<any> = {
     preserve: true,
     name: ControllerValuesName,
@@ -29,4 +29,4 @@ export const NumberSetter: React.FC<NumberSetterProps> = memo(() => {
     required: false,
   };
   return <NumberSetForm {...itemProps} />;
-});
+};

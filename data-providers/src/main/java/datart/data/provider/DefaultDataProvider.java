@@ -19,6 +19,7 @@ package datart.data.provider;
 
 import datart.core.base.PageInfo;
 import datart.core.base.consts.ValueType;
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.*;
 import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.SqlParserUtils;
@@ -174,7 +175,7 @@ public abstract class DefaultDataProvider extends DataProvider {
         try {
             SqlParserUtils.parseSnippet(snippet);
         } catch (Exception e) {
-            throw new DataProviderException(e);
+            Exceptions.e(e);
         }
 
         return true;
@@ -194,7 +195,7 @@ public abstract class DefaultDataProvider extends DataProvider {
             return values;
         }
         if (values.get(0).size() != columns.size()) {
-            throw new RuntimeException("schema has different columns with data");
+            Exceptions.tr(DataProviderException.class, "message.provider.default.schema", values.get(0).size() + ":" + columns.size());
         }
         values.parallelStream().forEach(vals -> {
             for (int i = 0; i < vals.size(); i++) {
@@ -249,7 +250,7 @@ public abstract class DefaultDataProvider extends DataProvider {
     protected Date getExpireTime(DataProviderSource config) {
         Object cacheTimeout = config.getProperties().get("cacheTimeout");
         if (cacheTimeout == null) {
-            throw new DataProviderException("cache timeout can not be empty");
+            Exceptions.msg("cache timeout can not be empty");
         }
         Calendar instance = Calendar.getInstance();
         instance.add(Calendar.MINUTE, Integer.parseInt(cacheTimeout.toString()));

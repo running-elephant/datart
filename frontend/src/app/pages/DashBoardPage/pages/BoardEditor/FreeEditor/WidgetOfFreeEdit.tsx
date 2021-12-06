@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetName/WidgetName';
+import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetCore/WidgetName/WidgetName';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
@@ -159,8 +159,8 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
         resizeHandles={['se']}
       >
         <ItemWrap style={style} onClick={ssp}>
-          <WidgetName config={widget.config} />
           <ItemContainer>
+            <WidgetName config={widget.config} />
             <WidgetCore />
           </ItemContainer>
           {!widgetInfo.editing && (
@@ -175,7 +175,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
             handleClassName={'display-Draggable'}
           />
 
-          <WidgetToolBar id={widget.id} widgetType={widget.config.type} />
+          <WidgetToolBar />
         </ItemWrap>
       </Resizable>
     </DraggableCore>
@@ -185,6 +185,8 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
 export default WidgetOfFreeEdit;
 const ItemContainer = styled.div`
   z-index: 10;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
 `;

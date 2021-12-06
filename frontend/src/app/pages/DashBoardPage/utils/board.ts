@@ -98,9 +98,14 @@ export const getScheduleBoardInfo = (
 
   return newBoardInfo;
 };
-export const getInitBoardInfo = (id: string, widgetIds: string[] = []) => {
+export const getInitBoardInfo = (obj: {
+  id: string;
+  widgetIds?: string[];
+  controllerWidgets?: Widget[];
+}) => {
+  //
   const boardInfo: BoardInfo = {
-    id: id,
+    id: obj.id,
     saving: false,
     loading: false,
     dragging: false,
@@ -111,7 +116,7 @@ export const getInitBoardInfo = (id: string, widgetIds: string[] = []) => {
     layouts: [],
     isDroppable: false,
     clipboardWidgets: {},
-    widgetIds: widgetIds,
+    widgetIds: obj.widgetIds || [],
     controllerPanel: {
       type: 'hide',
       widgetId: '',
@@ -129,6 +134,7 @@ export const getInitBoardInfo = (id: string, widgetIds: string[] = []) => {
     needFetchItems: [],
     hasFetchItems: [],
     boardWidthHeight: [0, 0],
+    originControllerWidgets: obj.controllerWidgets || [],
   };
   return boardInfo;
 };
@@ -152,7 +158,9 @@ export const getInitBoardConfig = (boardType: BoardType) => {
     containerPadding: [16, 16], //0-100
     rowHeight: 32, //20-200
     cols: LAYOUT_COLS, //2-48    step 2
-    initialQuery:true,
+    initialQuery: true,
+    hasQueryControl: false,
+    hasResetControl: false,
   };
   return dashboardConfig;
 };

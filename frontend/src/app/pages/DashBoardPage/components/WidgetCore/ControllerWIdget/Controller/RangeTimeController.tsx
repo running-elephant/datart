@@ -17,8 +17,10 @@
  */
 import { DatePicker, Form, FormItemProps } from 'antd';
 import { PickerType } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { formatDateByPickType } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/utils';
 import moment from 'moment';
 import React, { memo, useMemo } from 'react';
+import styled from 'styled-components/macro';
 const { RangePicker } = DatePicker;
 
 export interface TimeControllerProps {
@@ -58,10 +60,9 @@ export const RangeTimeController: React.FC<TimeSetProps> = memo(
         onChange?.(null);
         return;
       }
-      const formatTemp = 'YYYY-MM-DD HH:mm:ss';
       const newValues = [
-        times?.[0].format(formatTemp),
-        times?.[1].format(formatTemp),
+        formatDateByPickType(pickerType, times?.[0]),
+        formatDateByPickType(pickerType, times?.[1]),
       ];
       onChange?.(newValues);
     };
@@ -75,33 +76,44 @@ export const RangeTimeController: React.FC<TimeSetProps> = memo(
       ];
     }, [value]);
     return (
-      <>
+      <StyledWrap>
         {pickerType === 'dateTime' ? (
           <RangePicker
             showTime
+            style={{ width: '100%' }}
             allowClear={true}
             value={_values as any}
             onChange={_onChange}
+            className="control-datePicker"
+            bordered={false}
           />
         ) : (
           <RangePicker
             onChange={_onChange}
             allowClear={true}
+            style={{ width: '100%' }}
             value={_values as any}
             picker={pickerType as any}
+            className="control-datePicker"
+            bordered={false}
           />
         )}
-      </>
+      </StyledWrap>
     );
   },
 );
-// const StyledWrap = styled.div`
-//   display: flex;
+const StyledWrap = styled.div`
+  display: flex;
 
-//   justify-content: space-around;
-//   width: 100%;
+  justify-content: space-around;
+  width: 100%;
 
-//   & .ant-input {
-//     background-color: transparent;
-//   }
-// `;
+  & .control-datePicker {
+    width: 100%;
+    background-color: transparent !important;
+
+    & .ant-input {
+      background-color: transparent !important;
+    }
+  }
+`;

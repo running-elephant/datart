@@ -17,6 +17,8 @@
  */
 package datart.core.common;
 
+import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
@@ -43,7 +45,7 @@ public class WebUtils {
         String driverPath = Application.getProperty("datart.screenshot.webdriver-path");
 
         if (StringUtils.isEmpty(driverPath)) {
-            throw new RuntimeException("web driver not found");
+            Exceptions.tr(BaseException.class, "message.not.found.webdriver");
         }
 
         String driverType = Application.getProperty("datart.screenshot.webdriver-type");
@@ -52,8 +54,9 @@ public class WebUtils {
             case "CHROME":
                 return createChromeWebDriver(driverPath);
             default:
-                throw new RuntimeException("unsupported web driver type " + driverType);
+                Exceptions.tr(BaseException.class, "message.unsupported.webdriver", driverType);
         }
+        return null;
     }
 
     public static <T> T screenShot(String url, OutputType<T> outputType, int imageWidth) throws Exception {

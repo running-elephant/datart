@@ -115,7 +115,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
     const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
     // TODO xld migration about filter
     const widgetIds = serverWidgets.map(w => w.id);
-    const boardInfo = getInitBoardInfo(dashboard.id, widgetIds);
+    const boardInfo = getInitBoardInfo({ id: dashboard.id, widgetIds });
     // datacharts
 
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
@@ -343,7 +343,8 @@ export const getEditWidgetDataAsync = createAsyncThunk<
   { state: RootState }
 >(
   'editBoard/getEditWidgetDataAsync',
-  async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
+  async ({ widgetId, option }, { getState, dispatch }) => {
+    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
     const rootState = getState() as RootState;
     const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
     const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
@@ -352,16 +353,14 @@ export const getEditWidgetDataAsync = createAsyncThunk<
     if (!curWidget) return null;
 
     switch (curWidget.config.type) {
+      case 'chart':
+        await dispatch(getEditChartWidgetDataAsync({ widgetId, option }));
+        return null;
       case 'controller':
         await dispatch(getEditFilterDataAsync(curWidget));
         return null;
       case 'media':
-        return null;
       case 'container':
-        return null;
-      case 'chart':
-        await dispatch(getEditChartWidgetDataAsync({ widgetId, option }));
-        return null;
       default:
         return null;
     }
@@ -392,6 +391,7 @@ export const getEditFilterDataAsync = createAsyncThunk<
   }
   return null;
 });
+
 export const getEditChartWidgetDataAsync = createAsyncThunk<
   null,
   {
@@ -403,6 +403,7 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
   'editBoard/getEditChartWidgetDataAsync',
   async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
     const rootState = getState() as RootState;
+    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
     const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
     const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
     const editBoard = rootState.editBoard;
@@ -436,7 +437,6 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
     });
     widgetData = { ...data, id: widgetId };
     dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
-    // changePageInfo
     dispatch(
       editWidgetInfoActions.changePageInfo({
         widgetId,

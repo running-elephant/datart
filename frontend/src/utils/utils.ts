@@ -194,14 +194,14 @@ export const getInsertedNodeIndex = (
   treeData: any,
 ) => {
   let index: number = 0;
-
+  /* eslint-disable */
   if (treeData?.length) {
     let IndexArr = treeData
       .filter((v: any) => v.parentId == AddData.parentId)
       .map(v => Number(v.index) || 0);
     index = IndexArr?.length ? Math.max(...IndexArr) + 1 : 0;
   }
-
+  /* eslint-disable */
   return index;
 };
 
@@ -238,13 +238,14 @@ export function filterListOrTree<T extends { children?: T[] }>(
 }
 
 export function getExpandedKeys<T extends TreeDataNode>(nodes: T[]) {
-  return nodes.reduce<string[]>(
-    (keys, { key, children }) =>
-      keys
+  return nodes.reduce<string[]>((keys, { key, children }) => {
+    if (Array.isArray(children) && children.length) {
+      return keys
         .concat(key as string)
-        .concat(children ? getExpandedKeys(children) : []),
-    [],
-  );
+        .concat(children ? getExpandedKeys(children) : []);
+    }
+    return keys;
+  }, []);
 }
 
 let utilCanvas: null | HTMLCanvasElement = null;

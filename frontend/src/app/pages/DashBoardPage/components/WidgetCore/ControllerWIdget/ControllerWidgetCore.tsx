@@ -33,7 +33,6 @@ import {
   ControllerFacadeTypes,
   RelativeOrExactTime,
 } from 'app/types/FilterControlPanel';
-import { FilterSqlOperator } from 'globalConstants';
 import produce from 'immer';
 import React, {
   memo,
@@ -43,40 +42,63 @@ import React, {
   useMemo,
 } from 'react';
 import styled from 'styled-components/macro';
+import { LabelName } from '../WidgetName/WidgetName';
 import { MultiSelectControllerForm } from './Controller/MultiSelectController';
 import { NumberControllerForm } from './Controller/NumberController';
 import { RadioGroupControllerForm } from './Controller/RadioGroupController';
 import { RangeNumberControllerForm } from './Controller/RangeNumberController';
 import { RangeTimeControllerForm } from './Controller/RangeTimeController';
 import { SelectControllerForm } from './Controller/SelectController';
-import { SlideControllerForm } from './Controller/SilderController';
+import { SlideControllerForm } from './Controller/SliderController';
 import { TextControllerForm } from './Controller/TextController';
 import { TimeControllerForm } from './Controller/TimeController';
 
-export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
+export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const [form] = Form.useForm();
 
   const { renderedWidgetById } = useContext(BoardContext);
+
   const {
     data: { rows },
   } = useContext(WidgetDataContext);
   const { widgetUpdate, refreshWidgetsByFilter } =
     useContext(BoardActionContext);
+
   const { config, type: facadeType } = useMemo(
     () => widget.config.content as ControllerWidgetContent,
     [widget],
   );
+
   const {
     controllerDate,
     controllerValues,
     valueOptions,
     valueOptionType,
     sqlOperator,
-    minValue,
-    maxValue,
   } = useMemo(() => config as ControllerConfig, [config]);
-
+  const leftControlLabel = useMemo(() => {
+    if (!widget.config.nameConfig.show) {
+      return null;
+    }
+    if (widget.config.nameConfig?.textAlign === 'center') {
+      return null;
+    }
+    return <LabelName config={widget.config} />;
+  }, [widget.config]);
+  const centerControlLabel = useMemo(() => {
+    if (!widget.config.nameConfig.show) {
+      return null;
+    }
+    if (widget.config.nameConfig?.textAlign === 'center') {
+      return (
+        <div style={{ width: '100%', textAlign: 'center' }}>
+          <LabelName config={widget.config} />
+        </div>
+      );
+    }
+    return null;
+  }, [widget.config]);
   const optionRows = useMemo(() => {
     const dataRows = rows?.flat(2) || [];
     if (valueOptionType === 'common') {
@@ -96,50 +118,45 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
   }, [valueOptions, valueOptionType, rows]);
 
   useEffect(() => {
-    // 加载数据项
     renderedWidgetById(widget.id);
   }, [renderedWidgetById, widget.id]);
 
-  const onControllerValuesChange = useCallback(
-    values => {
-      form.submit();
-      if (typeof values === 'object' && !Array.isArray(values)) {
-        return;
-      }
-      const _values = values ? (Array.isArray(values) ? values : [values]) : [];
-      const nextWidget = produce(widget, draft => {
-        (
-          draft.config.content as ControllerWidgetContent
-        ).config.controllerValues = _values;
-      });
-      widgetUpdate(nextWidget);
-      //
-      if (true) {
-        // console.log('board 属性 自动加载属性');
-        refreshWidgetsByFilter(nextWidget);
-      }
-    },
-    [form, refreshWidgetsByFilter, widget, widgetUpdate],
-  );
+  const onControllerChange = useCallback(() => {
+    form.submit();
+  }, [form]);
 
-  const onSqlOperatorAndValues = useCallback(
-    (sql: FilterSqlOperator, values: any[]) => {
-      const nextWidget = produce(widget, draft => {
-        (draft.config.content as ControllerWidgetContent).config.sqlOperator =
-          sql;
-        (
-          draft.config.content as ControllerWidgetContent
-        ).config.controllerValues = values;
-      });
-      widgetUpdate(nextWidget);
-      refreshWidgetsByFilter(nextWidget);
-    },
-    [refreshWidgetsByFilter, widget, widgetUpdate],
-  );
+  const onFinish = value => {
+    const values = value.value;
+    if (values && typeof values === 'object' && !Array.isArray(values)) {
+      return;
+    }
+    const _values = values ? (Array.isArray(values) ? values : [values]) : [];
+    const nextWidget = produce(widget, draft => {
+      (
+        draft.config.content as ControllerWidgetContent
+      ).config.controllerValues = _values;
+    });
+    widgetUpdate(nextWidget);
+    refreshWidgetsByFilter(nextWidget);
+  };
+  // const onSqlOperatorAndValues = useCallback(
+  //   (sql: FilterSqlOperator, values: any[]) => {
+  //     const nextWidget = produce(widget, draft => {
+  //       (draft.config.content as ControllerWidgetContent).config.sqlOperator =
+  //         sql;
+  //       (
+  //         draft.config.content as ControllerWidgetContent
+  //       ).config.controllerValues = values;
+  //     });
+  //     widgetUpdate(nextWidget);
+  //     refreshWidgetsByFilter(nextWidget);
+  //   },
+  //   [refreshWidgetsByFilter, widget, widgetUpdate],
+  // );
   const onRangeTimeChange = useCallback(
     (timeValues: string[] | null) => {
       const nextFilterDate: ControllerDate = {
-        pickerType: 'date',
+        ...controllerDate!,
         startTime: {
           relativeOrExact: RelativeOrExactTime.Exact,
           exactValue: timeValues?.[0],
@@ -157,7 +174,7 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
       widgetUpdate(nextWidget);
       refreshWidgetsByFilter(nextWidget);
     },
-    [refreshWidgetsByFilter, widget, widgetUpdate],
+    [controllerDate, refreshWidgetsByFilter, widget, widgetUpdate],
   );
 
   const onTimeChange = useCallback(
@@ -184,121 +201,160 @@ export const ControllerWidgetCore: React.FC<{ id: string }> = memo(({ id }) => {
     let selectOptions = optionRows?.map(ele => {
       return { value: ele.key, label: ele.label } as ControlOption;
     });
-
     switch (facadeType) {
       case ControllerFacadeTypes.DropdownList:
+        form.setFieldsValue({ value: controllerValues?.[0] });
         return (
           <SelectControllerForm
-            value={controllerValues?.[0]}
-            onChange={onControllerValuesChange}
+            onChange={onControllerChange}
             options={selectOptions}
             name={'value'}
+            label={leftControlLabel}
           />
         );
+
       case ControllerFacadeTypes.MultiDropdownList:
+        form.setFieldsValue({ value: controllerValues });
         return (
           <MultiSelectControllerForm
-            value={controllerValues}
-            onChange={onControllerValuesChange}
+            onChange={onControllerChange}
             options={selectOptions}
             name={'value'}
+            label={leftControlLabel}
           />
         );
+
       case ControllerFacadeTypes.Slider:
+        form.setFieldsValue({ value: controllerValues?.[0] });
+        const step = config.sliderConfig?.step || 1;
+        const showMarks = config.sliderConfig?.showMarks || false;
+        let minValue = config.minValue === 0 ? 0 : config.minValue || 1;
+        let maxValue = config.maxValue === 0 ? 0 : config.maxValue || 100;
         return (
           <SlideControllerForm
-            value={controllerValues?.[0]}
-            onChange={onControllerValuesChange}
+            onChange={onControllerChange}
             minValue={minValue}
             maxValue={maxValue}
+            step={step}
+            name="value"
+            showMarks={showMarks}
+            label={leftControlLabel}
           />
         );
 
       case ControllerFacadeTypes.Value:
+        form.setFieldsValue({ value: controllerValues?.[0] });
         return (
           <NumberControllerForm
-            value={controllerValues?.[0]}
-            onChange={onControllerValuesChange}
+            onChange={onControllerChange}
+            name="value"
+            label={leftControlLabel}
           />
         );
 
       case ControllerFacadeTypes.RangeValue:
+        form.setFieldsValue({ value: controllerValues });
         return (
           <RangeNumberControllerForm
-            value={controllerValues}
-            onChange={onControllerValuesChange}
+            onChange={onControllerChange}
+            name="value"
+            label={leftControlLabel}
           />
         );
+
       case ControllerFacadeTypes.Text:
+        form.setFieldsValue({ value: controllerValues?.[0] });
         return (
           <TextControllerForm
-            value={controllerValues?.[0]}
-            onChange={onControllerValuesChange}
+            onChange={onControllerChange}
+            label={leftControlLabel}
+            name="value"
           />
         );
+
       case ControllerFacadeTypes.RadioGroup:
+        form.setFieldsValue({ value: controllerValues?.[0] });
         let RadioOptions = optionRows?.map(ele => {
           return { value: ele.key, label: ele.label } as ControlOption;
         });
         let radioButtonType = config.radioButtonType;
         return (
           <RadioGroupControllerForm
+            label={leftControlLabel}
             radioButtonType={radioButtonType}
-            value={controllerValues?.[0]}
-            onChange={onControllerValuesChange}
+            onChange={onControllerChange}
             options={RadioOptions}
+            name="value"
           />
         );
+
       case ControllerFacadeTypes.RangeTime:
         const rangeTimeValues = getControllerDateValues(
           config.valueOptionType,
           config!.controllerDate!,
         );
+
+        form.setFieldsValue({ value: rangeTimeValues });
         let rangePickerType = controllerDate!.pickerType;
         return (
           <RangeTimeControllerForm
+            label={leftControlLabel}
             pickerType={rangePickerType}
             onChange={onRangeTimeChange}
-            value={rangeTimeValues}
+            name="value"
           />
         );
+
       case ControllerFacadeTypes.Time:
         const timeValues = getControllerDateValues(
           config.valueOptionType,
           config!.controllerDate!,
         );
         let pickerType = controllerDate!.pickerType;
+        form.setFieldsValue({ value: timeValues[0] });
         return (
           <TimeControllerForm
+            label={leftControlLabel}
             onChange={onTimeChange}
-            value={timeValues[0]}
             pickerType={pickerType}
+            name="value"
           />
         );
+
       default:
         break;
     }
   }, [
     optionRows,
     facadeType,
+    form,
     controllerValues,
-    onControllerValuesChange,
-    minValue,
-    maxValue,
+    onControllerChange,
+    leftControlLabel,
     config,
-    onRangeTimeChange,
     controllerDate,
+    onRangeTimeChange,
     onTimeChange,
   ]);
   return (
     <Wrap>
-      <Form form={form} name="control-Form">
+      <Form form={form} className="control-form" onFinish={onFinish}>
+        {centerControlLabel}
         {control}
       </Form>
     </Wrap>
   );
 });
 const Wrap = styled.div`
-  display: inline-block;
-  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+
+  .control-form {
+    flex: 1;
+  }
+
+  .ant-form-item {
+    margin-bottom: 0;
+  }
 `;

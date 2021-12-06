@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { DEFAULT_VALUE_DATE_FORMAT } from 'app/pages/MainPage/pages/VariablePage/constants';
 import { RECOMMEND_TIME } from 'globalConstants';
 import moment, { Moment, unitOfTime } from 'moment';
 
@@ -24,8 +25,8 @@ export function getTimeRange(amount?, unit?): (unitTime) => [string, string] {
     const startTime = moment().add(amount, unit).startOf(unitOfTime);
     const endTime = moment().add(amount, unit).endOf(unitOfTime);
     return [
-      startTime.format('YYYY-MM-DD HH:mm:ss'),
-      endTime.format('YYYY-MM-DD HH:mm:ss'),
+      startTime.format(DEFAULT_VALUE_DATE_FORMAT),
+      endTime.format(DEFAULT_VALUE_DATE_FORMAT),
     ];
   };
 }

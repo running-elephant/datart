@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetName/WidgetName';
+import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetCore/WidgetName/WidgetName';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
@@ -33,11 +33,11 @@ export const WidgetOfAuto: React.FC = React.memo(() => {
   );
   return (
     <Warp className="widget" style={widgetStyle}>
-      <WidgetName config={widget.config} />
       <ItemContainer>
+        <WidgetName config={widget.config} />
         <WidgetCore />
       </ItemContainer>
-      <WidgetToolBar id={widget.id} widgetType={widget.config.type} />
+      <WidgetToolBar />
     </Warp>
   );
 });
@@ -50,6 +50,7 @@ const Warp = styled.div<{}>`
 `;
 const ItemContainer = styled.div`
   z-index: 10;
-  width: 100%;
-  height: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
 `;

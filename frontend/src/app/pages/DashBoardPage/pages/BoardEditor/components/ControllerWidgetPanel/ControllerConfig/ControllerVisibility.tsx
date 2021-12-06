@@ -71,7 +71,7 @@ const ControllerVisibility: FC<{
                       'dependentControllerId',
                     ]}
                     noStyle
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: '' }]}
                   >
                     <Select placeholder="过滤器名称" style={{ width: '160px' }}>
                       {otherStrFilterWidgets.map(ele => {
@@ -87,7 +87,7 @@ const ControllerVisibility: FC<{
                   <Form.Item
                     name={['config', 'visibility', 'condition', 'relation']}
                     noStyle
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: '' }]}
                   >
                     <Select placeholder="viewField" style={{ width: '100px' }}>
                       <Select.Option key={1} value={FilterSqlOperator.Equal}>
@@ -102,7 +102,7 @@ const ControllerVisibility: FC<{
                   <Form.Item
                     name={['config', 'visibility', 'condition', 'value']}
                     noStyle
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: '' }]}
                   >
                     <Input style={{ width: '140px' }} />
                   </Form.Item>

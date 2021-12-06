@@ -17,6 +17,7 @@
  */
 import { Form, InputNumber } from 'antd';
 import { valueType } from 'antd/lib/statistic/utils';
+import { rangeNumberValidator } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/utils';
 import React, { memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 
@@ -31,28 +32,12 @@ export interface NumberControllerFormProps {
 
 export const RangeNumberControllerForm: React.FC<NumberControllerFormProps> =
   memo(({ label, name, required, ...rest }) => {
-    const RangeNumberValidator = async (_, values: any[]) => {
-      if (!values) {
-        return Promise.reject();
-      }
-      if (!values?.[0] && !values?.[1]) {
-        return Promise.reject();
-      }
-      if (values?.[0] && values?.[1]) {
-        if (values?.[1] - values?.[0] < 0)
-          return Promise.reject(new Error(' err on start > end'));
-      }
-
-      return Promise.resolve(values);
-    };
-
     return (
       <Form.Item
         name={name}
         label={label}
-        validateTrigger={['onChange', 'onBlur']}
-        {...rest}
-        // rules={[{ required: true, validator: RangeNumberValidator }]}
+        validateTrigger={['onBlur', 'onEnter', 'onChange']}
+        rules={[{ validator: rangeNumberValidator }]}
       >
         <RangeNumberController {...rest} />
       </Form.Item>
@@ -66,15 +51,32 @@ export const RangeNumberController: React.FC<RangeNumberSetProps> = memo(
   ({ onChange, value }) => {
     const [startVal, setStartVal] = useState<valueType | undefined>();
     const [endVal, setEndVal] = useState<valueType | undefined>();
+
+    const _onStartValEnter = e => {
+      onChange?.([e.target.value, endVal]);
+    };
+
+    const _onEndValEnter = e => {
+      onChange?.([startVal, e.target.value]);
+    };
+
     const onStartChange = start => {
-      onChange?.([start, endVal]);
+      setStartVal(start);
     };
+
     const onEndChange = end => {
-      onChange?.([startVal, end]);
+      setEndVal(end);
     };
+
+    const _onBlur = () => {
+      if (startVal !== value?.[0] || endVal !== value?.[1]) {
+        onChange?.([startVal, endVal]);
+      }
+    };
+
     useEffect(() => {
-      setStartVal(value?.[0] || null);
-      setEndVal(value?.[1] || null);
+      setStartVal(value?.[0]);
+      setEndVal(value?.[1]);
     }, [value]);
     return (
       <StyledWrap>
@@ -84,7 +86,11 @@ export const RangeNumberController: React.FC<RangeNumberSetProps> = memo(
               style={{ width: '100%' }}
               value={startVal}
               onChange={onStartChange}
+              placeholder="按回车确认"
+              onPressEnter={_onStartValEnter}
+              // onBlur={_onBlur}
               className="control-number-input"
+              bordered={false}
             />
           </div>
           <div className="control-and">-</div>
@@ -93,7 +99,11 @@ export const RangeNumberController: React.FC<RangeNumberSetProps> = memo(
               style={{ width: '100%' }}
               value={endVal}
               onChange={onEndChange}
+              placeholder="按回车确认"
+              onPressEnter={_onEndValEnter}
+              // onBlur={_onBlur}
               className="control-number-input"
+              bordered={false}
             />
           </div>
         </div>

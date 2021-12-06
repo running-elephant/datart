@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetName/WidgetName';
+import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetCore/WidgetName/WidgetName';
 import { RGL_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
@@ -44,8 +44,8 @@ export const WidgetOfAutoEdit: React.FC<GridItemProps> = memo(() => {
   const widgetStyle = useMemo(() => getWidgetStyle('auto', widget), [widget]);
   return (
     <Warp style={widgetStyle} onClick={ssp}>
-      <WidgetName config={widget.config} />
       <ItemContainer className="ItemContainer">
+        <WidgetName config={widget.config} />
         <WidgetCore />
       </ItemContainer>
 
@@ -61,7 +61,7 @@ export const WidgetOfAutoEdit: React.FC<GridItemProps> = memo(() => {
         handleClassName={RGL_DRAG_HANDLE}
       />
 
-      <WidgetToolBar id={widget.id} widgetType={widget.config.type} />
+      <WidgetToolBar />
     </Warp>
   );
 });
@@ -77,6 +77,8 @@ const Warp = styled.div<{}>`
 
 const ItemContainer = styled.div`
   z-index: 10;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
 `;

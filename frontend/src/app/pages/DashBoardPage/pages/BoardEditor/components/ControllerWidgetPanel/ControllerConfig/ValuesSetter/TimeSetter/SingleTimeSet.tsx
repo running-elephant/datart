@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 import { DatePicker, FormItemProps } from 'antd';
+import moment from 'moment';
 import React, { memo } from 'react';
 import { PickerType } from '../../../types';
+import { formatDateByPickType } from '../../../utils';
 export interface SingleTimeSetProps extends FormItemProps<any> {
   pickerType: PickerType;
   value?: any;
@@ -26,9 +28,14 @@ export interface SingleTimeSetProps extends FormItemProps<any> {
 export const SingleTimeSet: React.FC<SingleTimeSetProps> = memo(
   ({ pickerType, value, onChange }) => {
     function _onChange(date, dateString) {
-      onChange?.(date);
-    }
+      if (!date) {
+        onChange?.(date);
+        return;
+      }
+      const value = formatDateByPickType(pickerType, date);
 
+      onChange?.(moment(value));
+    }
     return (
       <>
         {pickerType === 'dateTime' ? (

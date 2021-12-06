@@ -24,30 +24,30 @@ import {
 import produce from 'immer';
 import React, { useCallback } from 'react';
 import {
+  DateName,
+  EndTimeAmountName,
+  EndTimeDirectionName,
+  EndTimeExactName,
+  EndTimeName,
+  EndTimeRelativeName,
+  EndTimeROEName,
+  EndTimeUnitName,
+  PickerTypeName,
+  StartTimeAmountName,
+  StartTimeDirectionName,
+  StartTimeExactName,
+  StartTimeRelativeName,
+  StartTimeROEName,
+  StartTimeUnitName,
+} from '../..';
+import {
   ControllerConfig,
+  ControllerDateType,
   PickerTypeOptions,
   RelativeDate,
 } from '../../../types';
 import { RelativeTimeSet } from './RelativeTimeSet';
 import { SingleTimeSet } from './SingleTimeSet';
-export const DateName = ['config', 'controllerDate'];
-export const sqlOperatorName = ['config', 'sqlOperator'];
-export const PickerTypeName = [...DateName, 'pickerType'];
-export const StartTimeName = [...DateName, 'startTime'];
-export const StartTimeROEName = [...StartTimeName, 'relativeOrExact'];
-export const StartTimeRelativeName = [...StartTimeName, 'relativeValue'];
-export const StartTimeExactName = [...StartTimeName, 'exactValue'];
-export const StartTimeDirectionName = [...StartTimeRelativeName, 'direction'];
-export const StartTimeUnitName = [...StartTimeRelativeName, 'unit'];
-export const StartTimeAmountName = [...StartTimeRelativeName, 'amount'];
-
-export const EndTimeName = [...DateName, 'endTime'];
-export const EndTimeROEName = [...EndTimeName, 'relativeOrExact'];
-export const EndTimeRelativeName = [...EndTimeName, 'relativeValue'];
-export const EndTimeExactName = [...EndTimeName, 'exactValue'];
-export const EndTimeDirectionName = [...EndTimeRelativeName, 'direction'];
-export const EndTimeUnitName = [...EndTimeRelativeName, 'unit'];
-export const EndTimeAmountName = [...EndTimeRelativeName, 'amount'];
 
 export const TimeSetter: React.FC<{
   form: FormInstance<ControllerWidgetContent> | undefined;
@@ -71,6 +71,36 @@ export const TimeSetter: React.FC<{
     return getControllerConfig()?.controllerDate?.pickerType;
   }, [getControllerConfig]);
 
+  const RangeTimeValidator = async (_, value) => {
+    const controllerDate = getControllerConfig().controllerDate;
+    if (controllerType === ControllerFacadeTypes.Time) {
+      return controllerDate;
+    }
+    function hasValue(date: ControllerDateType | undefined) {
+      if (!date) {
+        return false;
+      }
+      if (date.relativeOrExact === RelativeOrExactTime.Exact) {
+        return date.exactValue;
+      } else {
+        return date.relativeValue;
+      }
+    }
+
+    const startHasValue = hasValue(controllerDate?.startTime);
+    const endHasValue = hasValue(controllerDate?.endTime);
+    if (!startHasValue && !endHasValue) {
+      return Promise.resolve(controllerDate);
+    }
+
+    if (!startHasValue && endHasValue) {
+      return Promise.reject(new Error('请填写 起始值'));
+    }
+    if (startHasValue && !endHasValue) {
+      return Promise.reject(new Error('请填写 结束值'));
+    }
+    return Promise.resolve(value);
+  };
   const onStartRelativeChange = useCallback(
     value => {
       const valueType: RelativeOrExactTime = value;
@@ -97,6 +127,7 @@ export const TimeSetter: React.FC<{
           });
         }
       }
+      form?.validateFields(DateName);
     },
     [form, getControllerConfig],
   );
@@ -127,6 +158,7 @@ export const TimeSetter: React.FC<{
           });
         }
       }
+      form?.validateFields(DateName);
     },
     [form, getControllerConfig],
   );
@@ -136,7 +168,7 @@ export const TimeSetter: React.FC<{
         name={name}
         noStyle
         shouldUpdate
-        validateTrigger={['onChange', 'onBlur']}
+        validateTrigger={['onBlur']}
         rules={[{ required: true }]}
       >
         <Select style={{ width: '100px' }} onChange={onChange}>
@@ -163,7 +195,7 @@ export const TimeSetter: React.FC<{
         name={name}
         shouldUpdate
         validateTrigger={['onChange', 'onBlur']}
-        rules={[{ required: false }]}
+        // rules={[{ required: false, validator: RangeTimeValidator }]}
       >
         <SingleTimeSet pickerType={getPickerType()!} />
       </Form.Item>
@@ -179,7 +211,7 @@ export const TimeSetter: React.FC<{
               label={'日期类型'}
               shouldUpdate
               validateTrigger={['onChange', 'onBlur']}
-              rules={[{ required: false }]}
+              rules={[{ required: true }]}
             >
               <Select>
                 {PickerTypeOptions.map(item => {
@@ -216,12 +248,13 @@ export const TimeSetter: React.FC<{
               </>
             )}
             {controllerType === ControllerFacadeTypes.RangeTime && (
-              <>
-                <Form.Item
-                  label={'默认值-起始'}
-                  shouldUpdate
-                  rules={[{ required: false }]}
-                >
+              <Form.Item
+                name={DateName}
+                validateTrigger={['onChange', 'onBlur']}
+                shouldUpdate
+                rules={[{ required: true, validator: RangeTimeValidator }]}
+              >
+                <Form.Item label={'默认值-起始'} shouldUpdate>
                   {renderROE(StartTimeROEName, onStartRelativeChange)}
                   {getStartRelativeOrExact() === RelativeOrExactTime.Exact &&
                     renderExact(StartTimeExactName, getPickerType)}
@@ -237,8 +270,8 @@ export const TimeSetter: React.FC<{
                 </Form.Item>
                 <Form.Item
                   label={'默认值-结束'}
+                  name={EndTimeName}
                   shouldUpdate
-                  rules={[{ required: false }]}
                 >
                   {renderROE(EndTimeROEName, onEndRelativeChange)}
 
@@ -254,7 +287,7 @@ export const TimeSetter: React.FC<{
                     />
                   )}
                 </Form.Item>
-              </>
+              </Form.Item>
             )}
           </>
         );

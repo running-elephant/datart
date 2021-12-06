@@ -21,10 +21,10 @@ package datart.data.provider.jdbc.adapters;
 import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.BeanUtils;
 import datart.core.data.provider.*;
 import datart.data.provider.JdbcDataProvider;
-import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.dialect.CustomSqlDialect;
 import datart.data.provider.jdbc.JdbcDriverInfo;
 import datart.data.provider.jdbc.JdbcProperties;
@@ -71,7 +71,7 @@ public class JdbcDataProviderAdapter implements Closeable {
             this.dataSource = JdbcDataProvider.getDataSourceFactory().createDataSource(jdbcProperties);
         } catch (Exception e) {
             log.error("data provider init error", e);
-            throw new DataProviderException(e);
+            Exceptions.e(e);
         }
         this.init = true;
     }
@@ -83,12 +83,12 @@ public class JdbcDataProviderAdapter implements Closeable {
         } catch (ClassNotFoundException e) {
             String errMsg = "Driver class not found " + properties.getDriverClass();
             log.error(errMsg, e);
-            throw new DataProviderException(errMsg);
+            Exceptions.e(e);
         }
         try {
             DriverManager.getConnection(properties.getUrl(), properties.getUser(), properties.getPassword());
         } catch (SQLException sqlException) {
-            throw new DataProviderException(sqlException);
+            Exceptions.e(sqlException);
         }
         return true;
     }

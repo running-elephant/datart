@@ -18,11 +18,11 @@
 
 package datart.core.common;
 
+import datart.core.base.exception.Exceptions;
 import org.springframework.util.CollectionUtils;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
-import javax.validation.ValidationException;
 import javax.validation.ValidatorFactory;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -35,7 +35,7 @@ public class BeanUtils {
         for (String field : fields) {
             Object fieldValue = ReflectUtils.getFieldValue(obj, field);
             if (fieldValue == null) {
-                throw new RuntimeException("field " + field + " can not be null");
+                Exceptions.msg("field " + field + " can not be null");
             }
         }
     }
@@ -47,7 +47,7 @@ public class BeanUtils {
             for (ConstraintViolation<Object> v : validate) {
                 message.add(v.getPropertyPath() + ":" + v.getMessage());
             }
-            throw new ValidationException(message.toString());
+            Exceptions.msg(message.toString());
         }
     }
 

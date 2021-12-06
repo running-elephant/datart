@@ -31,7 +31,9 @@ import {
 
 const editDashBoardInfoSlice = createSlice({
   name: 'editBoard',
-  initialState: getInitBoardInfo('default') as EditBoardState['boardInfo'],
+  initialState: getInitBoardInfo({
+    id: 'default',
+  }) as EditBoardState['boardInfo'],
   reducers: {
     initEditBoardInfo(state, action: PayloadAction<BoardInfo>) {
       const boardInfo = action.payload;
@@ -40,7 +42,7 @@ const editDashBoardInfoSlice = createSlice({
       });
     },
     clearEditBoardInfo(state) {
-      const boardInfo = getInitBoardInfo('default');
+      const boardInfo = getInitBoardInfo({ id: 'default' });
       Object.keys(boardInfo).forEach(key => {
         state[key] = boardInfo[key];
       });
@@ -288,6 +290,9 @@ const filterActions = [
   editBoardStackActions.tabsWidgetRemoveTab,
   editBoardStackActions.updateWidgetConfig,
   editBoardStackActions.updateWidgetsConfig,
+
+  editBoardStackActions.changeBoardHasQueryControl,
+  editBoardStackActions.changeBoardHasResetControl,
 ].map(ele => ele.toString());
 const editBoardStackReducer = undoable(editBoardStackSlice.reducer, {
   undoType: BOARD_UNDO.undo,

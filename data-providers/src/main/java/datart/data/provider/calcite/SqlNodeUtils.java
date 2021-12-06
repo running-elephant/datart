@@ -17,6 +17,7 @@
  */
 package datart.data.provider.calcite;
 
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ScriptVariable;
 import datart.core.data.provider.SingleTypedValue;
 import datart.data.provider.base.DataProviderException;
@@ -88,8 +89,9 @@ public class SqlNodeUtils {
             case FRAGMENT:
                 return variable.getValues().stream().map(SqlFragment::new).collect(Collectors.toList());
             default:
-                throw new DataProviderException();
+                Exceptions.msg("error data type " + variable.getValueType());
         }
+        return null;
     }
 
     public static SqlNode createSqlNode(SingleTypedValue value, String... names) {
@@ -107,8 +109,9 @@ public class SqlNodeUtils {
             case IDENTIFIER:
                 return createSqlIdentifier(value.getValue().toString(), names);
             default:
-                throw new DataProviderException();
+                Exceptions.tr(DataProviderException.class, "message.provider.sql.variable", value.getValueType().name());
         }
+        return null;
     }
 
     public static SqlNode createSqlNode(SingleTypedValue value) {

@@ -15,11 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import {
   ValueOptionType,
   ValueOptionTypes,
 } from 'app/pages/DashBoardPage/constants';
-import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
+import {
+  DEFAULT_VALUE_DATE_FORMAT,
+  VariableValueTypes,
+} from 'app/pages/MainPage/pages/VariablePage/constants';
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+} from 'app/types/ChartDataView';
 import {
   ControllerFacadeTypes,
   ControllerFacadeTypes as Opt,
@@ -27,7 +35,12 @@ import {
 } from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
-import { ControllerConfig } from './types';
+import {
+  DateControllerTypes,
+  NumericalControllerTypes,
+  RangeControlTypes,
+} from './constants';
+import { ControllerConfig, PickerType } from './types';
 
 export const getStringFacadeOptions = (type: ValueOptionType) => {
   switch (type) {
@@ -70,76 +83,73 @@ export const getDateFacadeOptions = (category: ChartDataViewFieldCategory) => {
 };
 // 展示前处理
 export const preformatWidgetFilter = (
-  oldWidgetFilter: ControllerConfig,
-  type: ControllerFacadeTypes = ControllerFacadeTypes.DropdownList,
+  preConfig: ControllerConfig,
+  controllerType: ControllerFacadeTypes,
 ) => {
-  const config = JSON.parse(
-    JSON.stringify(oldWidgetFilter),
-  ) as ControllerConfig;
-  if (!config.valueOptionType) {
-    config.valueOptionType = ValueOptionTypes.Common;
+  let config = preConfig;
+  if (DateControllerTypes.includes(controllerType)) {
+    config = formatControlDateToMoment(JSON.parse(JSON.stringify(config)));
   }
-  if (!config?.visibility) {
-    config.visibility = {
-      visibilityType: 'show',
-    };
-  }
+  return config;
+};
 
+export const formatControlDateToMoment = (config: ControllerConfig) => {
   if (config.controllerDate) {
-    if (config.controllerDate) {
-      const filterDate = config.controllerDate;
-      if (filterDate.startTime && filterDate.startTime.exactValue) {
-        if (typeof filterDate.startTime.exactValue === 'string') {
-          let exactTime = filterDate.startTime.exactValue;
-          let newExactTime = moment(exactTime, 'YYYY-MM-DD HH:mm:ss');
-          config.controllerDate.startTime.exactValue = newExactTime;
-        }
+    const filterDate = config.controllerDate;
+    if (filterDate.startTime && filterDate.startTime.exactValue) {
+      if (typeof filterDate.startTime.exactValue === 'string') {
+        let exactTime = filterDate.startTime.exactValue;
+        let newExactTime = moment(exactTime, DEFAULT_VALUE_DATE_FORMAT);
+        config.controllerDate.startTime.exactValue = newExactTime;
       }
-      if (filterDate.endTime && filterDate.endTime.exactValue) {
-        if (typeof filterDate.endTime.exactValue === 'string') {
-          let exactTime = filterDate.endTime.exactValue;
-          let newExactTime = moment(exactTime, 'YYYY-MM-DD HH:mm:ss');
-          config.controllerDate.endTime!.exactValue = newExactTime;
-        }
+    }
+    if (filterDate.endTime && filterDate.endTime.exactValue) {
+      if (typeof filterDate.endTime.exactValue === 'string') {
+        let exactTime = filterDate.endTime.exactValue;
+        let newExactTime = moment(exactTime, DEFAULT_VALUE_DATE_FORMAT);
+        config.controllerDate.endTime!.exactValue = newExactTime;
       }
     }
   }
+  return config;
+};
 
+export const formatControlDateToStr = (config: ControllerConfig) => {
+  if (config.controllerDate) {
+    const filterDate = config.controllerDate;
+    if (filterDate.startTime && filterDate.startTime.exactValue) {
+      if ((filterDate.startTime.exactValue as Moment).format) {
+        let exactTime = filterDate.startTime.exactValue as Moment;
+        let newExactTime = exactTime.format(DEFAULT_VALUE_DATE_FORMAT);
+        config.controllerDate.startTime.exactValue = newExactTime;
+      }
+    }
+    if (filterDate.endTime && filterDate.endTime.exactValue) {
+      if ((filterDate.endTime.exactValue as Moment).format) {
+        let exactTime = filterDate.endTime.exactValue as Moment;
+        let newExactTime = exactTime.format(DEFAULT_VALUE_DATE_FORMAT);
+        config.controllerDate.endTime!.exactValue = newExactTime;
+      }
+    }
+  }
   return config;
 };
 // 设置后处理
 export const postControlConfig = (
   config: ControllerConfig,
-  type: ControllerFacadeTypes = ControllerFacadeTypes.DropdownList,
+  controllerType: ControllerFacadeTypes,
 ) => {
   if (config.valueOptions.length > 0) {
     config.controllerValues = config.valueOptions
       .filter(ele => ele.isSelected)
       .map(ele => ele.key);
   }
+
+  if (DateControllerTypes.includes(controllerType)) {
+    config = formatControlDateToStr(config);
+  }
   if (!Array.isArray(config.controllerValues)) {
     config.controllerValues = [config.controllerValues];
-  }
-  const timeTypes = [
-    ControllerFacadeTypes.Time,
-    ControllerFacadeTypes.RangeTime,
-  ];
-  if (timeTypes.includes(type) && config.controllerDate) {
-    const filterDate = config.controllerDate;
-    if (filterDate.startTime && filterDate.startTime.exactValue) {
-      if (typeof filterDate.startTime.exactValue !== 'string') {
-        filterDate.startTime.exactValue = (
-          filterDate.startTime.exactValue as Moment
-        ).format('YYYY-MM-DD HH:mm:ss');
-      }
-    }
-    if (filterDate.endTime && filterDate.endTime.exactValue) {
-      if (typeof filterDate.endTime.exactValue !== 'string') {
-        filterDate.endTime.exactValue = (
-          filterDate.endTime.exactValue as Moment
-        ).format('YYYY-MM-DD HH:mm:ss');
-      }
-    }
   }
 
   return config;
@@ -160,7 +170,9 @@ export const getInitWidgetController = (
     case ControllerFacadeTypes.RangeSlider:
       return getRangeSliderControllerConfig();
     case ControllerFacadeTypes.RadioGroup:
-      return getTimeControllerConfig();
+      return getRadioGroupControllerConfig();
+    case ControllerFacadeTypes.Slider:
+      return getSliderControllerConfig();
     case ControllerFacadeTypes.DropdownList:
     default:
       return getInitControllerConfig();
@@ -226,7 +238,8 @@ export const getSliderControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.Equal;
   config.minValue = 1;
-  config.minValue = 200;
+  config.maxValue = 100;
+  config.controllerValues = [1];
   config.sliderConfig = {
     step: 1,
     range: false,
@@ -239,7 +252,7 @@ export const getRangeSliderControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.Between;
   config.minValue = 1;
-  config.minValue = 200;
+  config.maxValue = 100;
   config.sliderConfig = {
     step: 1,
     range: true,
@@ -253,4 +266,83 @@ export const getRangeValueControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.Between;
   return config;
+};
+
+export const filterValueTypeByControl = (
+  controlType: ControllerFacadeTypes,
+  valueType: any,
+) => {
+  if (NumericalControllerTypes.includes(controlType)) {
+    return [VariableValueTypes.Number, ChartDataViewFieldType.NUMERIC].includes(
+      valueType,
+    );
+  }
+  if (DateControllerTypes.includes(controlType)) {
+    return [VariableValueTypes.Date, ChartDataViewFieldType.DATE].includes(
+      valueType,
+    );
+  }
+  return true;
+};
+
+export const formatDateByPickType = (
+  pickerType: PickerType,
+  momentTime: Moment,
+) => {
+  const formatTemp = DEFAULT_VALUE_DATE_FORMAT;
+  if (!momentTime) {
+    return null;
+  }
+
+  switch (pickerType) {
+    case 'dateTime':
+    case 'quarter':
+      return momentTime.format(formatTemp);
+    case 'date':
+      return momentTime.set({ h: 0, m: 0, s: 0 }).format(formatTemp);
+    case 'week':
+      let year = String(momentTime.year());
+      let week = String(momentTime.week() - 1);
+      var date = moment(year).add(week, 'weeks').startOf('week');
+      var value = date.format(formatTemp);
+      return value;
+    case 'month':
+      return momentTime.set({ date: 1, h: 0, m: 0, s: 0 }).format(formatTemp);
+    case 'year':
+      return momentTime
+        .set({ month: 0, date: 1, h: 0, m: 0, s: 0 })
+        .format(formatTemp);
+    default:
+      return null;
+  }
+};
+
+export const isRangeTypeController = (type: ControllerFacadeTypes) => {
+  return RangeControlTypes.includes(type);
+};
+
+export const rangeNumberValidator = async (_, values: any[]) => {
+  if (!values?.[0] && !values?.[1]) {
+  }
+  function hasValue(value) {
+    if (value === 0) {
+      return true;
+    }
+    return !!value;
+  }
+  const startHasValue = hasValue(values?.[0]);
+  const endHasValue = hasValue(values?.[1]);
+  if (!startHasValue && !endHasValue) {
+    return Promise.resolve(values);
+  }
+  if (!startHasValue && endHasValue) {
+    return Promise.reject(new Error('请填写 起始值'));
+  }
+  if (startHasValue && !endHasValue) {
+    return Promise.reject(new Error('请填写 结束值'));
+  }
+  if (values?.[0] - values?.[1] > 0) {
+    return Promise.reject(new Error(' 起始值 不该小于 结束值'));
+  }
+  return Promise.resolve(values);
 };

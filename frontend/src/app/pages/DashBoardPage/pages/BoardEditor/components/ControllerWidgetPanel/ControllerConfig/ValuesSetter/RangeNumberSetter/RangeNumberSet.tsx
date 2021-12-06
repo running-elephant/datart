@@ -18,7 +18,8 @@
 import { Form, FormItemProps, InputNumber } from 'antd';
 import { valueType } from 'antd/lib/statistic/utils';
 import React, { memo, useEffect, useState } from 'react';
-import { ControllerValuesName } from '../ValuesSetter';
+import { ControllerValuesName } from '../..';
+import { rangeNumberValidator } from '../../../utils';
 
 export const RangeNumberSetter: React.FC<{}> = memo(() => {
   const itemProps: FormItemProps<any> = {
@@ -35,23 +36,9 @@ export interface RangeNumberSetFormProps {
 }
 export const RangeNumberSetForm: React.FC<RangeNumberSetFormProps> = memo(
   ({ onChange, value, ...rest }) => {
-    const RangeNumberValidator = async (_, values: any[]) => {
-      if (!values) {
-        return Promise.reject();
-      }
-      if (!values?.[0] && !values?.[1]) {
-        return Promise.reject();
-      }
-      if (values?.[0] && values?.[1]) {
-        if (values?.[1] - values?.[0] < 0)
-          return Promise.reject(new Error(' err on start > end'));
-      }
-      return Promise.resolve(values);
-    };
-
     return (
       <Form.Item
-        rules={[{ required: true, validator: RangeNumberValidator }]}
+        rules={[{ required: true, validator: rangeNumberValidator }]}
         {...rest}
       >
         <RangeNumberSet />
@@ -74,8 +61,8 @@ export const RangeNumberSet: React.FC<RangeNumberSetProps> = memo(
       onChange?.([startVal, end]);
     };
     useEffect(() => {
-      setStartVal(value?.[0] || null);
-      setEndVal(value?.[1] || null);
+      setStartVal(value?.[0]);
+      setEndVal(value?.[1]);
     }, [value]);
     return (
       <>

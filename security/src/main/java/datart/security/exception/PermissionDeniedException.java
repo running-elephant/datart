@@ -18,7 +18,9 @@
 
 package datart.security.exception;
 
-public class PermissionDeniedException extends RuntimeException {
+import datart.core.base.exception.BaseException;
+
+public class PermissionDeniedException extends BaseException {
 
     public PermissionDeniedException(String message) {
         super(message);

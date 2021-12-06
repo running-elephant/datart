@@ -97,8 +97,9 @@ export interface DashboardConfig {
   gridStep: [number, number];
   scaleMode: ScaleModeType;
   initialQuery: boolean;
+  hasQueryControl: boolean; // TODO migration del ? -- xld
+  hasResetControl?: boolean; // TODO migration del ? -- xld
 }
-
 export const BoardTypeMap = strEnumType(['auto', 'free']);
 export type BoardType = keyof typeof BoardTypeMap;
 
@@ -155,8 +156,12 @@ export interface JumpConfigFilter {
   filterType: string;
   filterValue?: string;
 }
+export interface JumpConfigField {
+  jumpFieldName: string;
+}
 export interface JumpConfig {
   open: boolean;
+  field: JumpConfigField;
   target: JumpConfigTarget;
   filter: JumpConfigFilter;
 }
@@ -225,7 +230,7 @@ export interface RelationConfig {
 export interface RelatedView {
   viewId: string;
   relatedCategory: ChartDataViewFieldCategory;
-  fieldValue: string | number | Date | undefined;
+  fieldValue: string | number | Date | undefined | string[] | number[] | Date[];
   fieldValueType: ChartDataViewFieldType | undefined;
 }
 export interface ServerRelation extends Omit<Relation, 'config'> {
@@ -236,16 +241,20 @@ export interface ServerRelation extends Omit<Relation, 'config'> {
  * 通用
  */
 // 组件配置
-// TODO xld migration about filter
+// TODO xld migration about filter xld
 export type WidgetContent =
   | MediaWidgetContent
   | ContainerWidgetContent
   | ControllerWidgetContent
-  | ChartWidgetContent;
+  | ChartWidgetContent
+  | BoardBtnContent;
 
 export interface ChartWidgetContent {
   type: WidgetContentChartType;
   dataChart?: DataChart;
+}
+export interface BoardBtnContent {
+  type: any;
 }
 // 媒体组件配置
 export type MediaWidgetContent = {
@@ -299,13 +308,15 @@ export interface ControllerWidgetContent {
   config: ControllerConfig;
 }
 
-export const WidgetTypeMap = strEnumType([
+export const WidgetTypes = strEnumType([
   'chart',
   'media',
   'container',
   'controller',
+  'query',
+  'reset',
 ]);
-export type WidgetType = keyof typeof WidgetTypeMap;
+export type WidgetType = Uncapitalize<keyof typeof WidgetTypes>;
 export declare const ContainerWidgetTypes: ['tab', 'carousel'];
 
 export type LightWidgetType =
@@ -409,10 +420,11 @@ export interface BoardInfo {
   linkagePanel: WidgetPanelParams;
   linkFilter: BoardLinkFilter[];
   jumpPanel: JumpPanel; //
-  chartEditorProps?: ChartEditorProps | undefined;
+  chartEditorProps?: ChartEditorProps;
   needFetchItems: string[];
   hasFetchItems: string[];
   boardWidthHeight: [number, number];
+  originControllerWidgets: Widget[]; // use for reset button
 }
 export interface BoardLinkFilter {
   triggerWidgetId: string;

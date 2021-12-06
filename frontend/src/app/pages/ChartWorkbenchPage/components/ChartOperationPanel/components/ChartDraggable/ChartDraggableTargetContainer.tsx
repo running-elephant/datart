@@ -31,7 +31,6 @@ import useFieldActionModal from 'app/hooks/useFieldActionModal';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import {
-  AggregateFieldActionType,
   AggregateFieldSubAggregateType,
   ChartDataSectionField,
   ChartDataSectionFieldActionType,
@@ -93,22 +92,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN ||
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
           ) {
-            let defaultAggregate: AggregateFieldActionType;
-            if (
-              currentConfig?.type === ChartDataSectionType.AGGREGATE ||
-              currentConfig?.type === ChartDataSectionType.SIZE ||
-              currentConfig?.type === ChartDataSectionType.INFO
-            ) {
-              if (
-                item.category !==
-                (ChartDataViewFieldCategory.AggregateComputedField as string)
-              ) {
-                const aggType = currentConfig?.actions?.[item?.type]?.[0];
-                defaultAggregate =
-                  AggregateFieldSubAggregateType?.[aggType]?.[0];
-              }
-            }
-
             let currentColumns: ChartDataSectionField[] = (
               currentConfig.rows || []
             ).concat(
@@ -117,7 +100,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 colName: i.colName,
                 category: i.category,
                 type: i.type,
-                aggregate: defaultAggregate,
+                aggregate: getDefaultAggregate(item),
               })),
             );
             const newCurrentConfig = updateByKey(
@@ -165,6 +148,37 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     useEffect(() => {
       setCurrentConfig(config);
     }, [config]);
+
+    const getDefaultAggregate = item => {
+      if (
+        currentConfig?.type === ChartDataSectionType.AGGREGATE ||
+        currentConfig?.type === ChartDataSectionType.SIZE ||
+        currentConfig?.type === ChartDataSectionType.INFO
+      ) {
+        if (
+          item.category !==
+          (ChartDataViewFieldCategory.AggregateComputedField as string)
+        ) {
+          let aggType: string = '';
+          if (currentConfig?.actions instanceof Array) {
+            currentConfig?.actions?.find(
+              type =>
+                type === ChartDataSectionFieldActionType.Aggregate ||
+                type === ChartDataSectionFieldActionType.AggregateLimit,
+            );
+          } else if (currentConfig?.actions instanceof Object) {
+            aggType = currentConfig?.actions?.[item?.type]?.find(
+              type =>
+                type === ChartDataSectionFieldActionType.Aggregate ||
+                type === ChartDataSectionFieldActionType.AggregateLimit,
+            );
+          }
+          if (aggType) {
+            return AggregateFieldSubAggregateType?.[aggType]?.[0];
+          }
+        }
+      }
+    };
 
     const onDraggableItemMove = (dragIndex: number, hoverIndex: number) => {
       const draggedItem = currentConfig.rows?.[dragIndex];

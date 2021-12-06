@@ -23,19 +23,24 @@ import {
   RadioChangeEvent,
   Select,
 } from 'antd';
-import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import {
+  ControllerWidgetContent,
+  RelatedView,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView, {
   ChartDataViewFieldCategory,
 } from 'app/types/ChartDataView';
+import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { G90 } from 'styles/StyleConstants';
+import { filterValueTypeByControl, isRangeTypeController } from './utils';
 
 export interface RelatedViewFormProps {
   viewMap: Record<string, ChartDataView>;
-  form: FormInstance<any> | undefined;
-
+  form: FormInstance<ControllerWidgetContent> | undefined;
+  controllerType: ControllerFacadeTypes;
   queryVariables: Variable[];
 
   getFormRelatedViews: () => RelatedView[];
@@ -44,14 +49,31 @@ const Option = Select.Option;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
-  ({
-    viewMap,
-    form,
-    queryVariables,
+  ({ viewMap, form, queryVariables, controllerType, getFormRelatedViews }) => {
+    const isMultiple = useCallback(
+      index => {
+        const relatedViews = getFormRelatedViews();
+        const isVariable =
+          relatedViews[index].relatedCategory ===
+          ChartDataViewFieldCategory.Variable;
+        const isRange = isRangeTypeController(controllerType);
+        const isMultiple = isVariable && isRange;
+        return isMultiple;
+      },
+      [controllerType, getFormRelatedViews],
+    );
+    const fieldValueValidator = async (opt, fieldValue: string[]) => {
+      if (!fieldValue) {
+        return Promise.reject(new Error('请关联字段 或 变量'));
+      }
+      if (Array.isArray(fieldValue)) {
+        if (fieldValue.length !== 2) {
+          return Promise.reject(new Error('请选择字段 或 两个变量'));
+        }
+      }
 
-    getFormRelatedViews,
-  }) => {
-    //renderOptions
+      return Promise.resolve(fieldValue);
+    };
     const filterFieldCategoryChange = useCallback(
       (index: number) => (e: RadioChangeEvent) => {
         const relatedViews = getFormRelatedViews();
@@ -64,8 +86,14 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
     const fieldValueChange = useCallback(
       (index: number) => (value, option) => {
         const relatedViews = getFormRelatedViews();
+
+        const fieldValueType = Array.isArray(option)
+          ? option[0]?.fieldvaluetype
+          : option?.fieldvaluetype;
+
         relatedViews[index].fieldValue = value;
-        relatedViews[index].fieldValueType = option?.fieldvaluetype;
+        relatedViews[index].fieldValueType = fieldValueType;
+
         form?.setFieldsValue({ relatedViews: relatedViews });
       },
       [getFormRelatedViews, form],
@@ -86,6 +114,9 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
             .filter(v => {
               return v.viewId === relatedViews[index].viewId || !v.viewId;
             })
+            .filter(v => {
+              return filterValueTypeByControl(controllerType, v.valueType);
+            })
             .map(item => (
               <Option
                 key={item.id}
@@ -102,17 +133,23 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
             ));
         } else {
           // 字段
-          return viewMap?.[relatedViews[index].viewId]?.meta?.map(item => (
-            <Option key={item.id} fieldvaluetype={item.type} value={item.id}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>{item.id}</span>
-                <span style={{ color: G90 }}>{item.type}</span>
-              </div>
-            </Option>
-          ));
+          return viewMap?.[relatedViews[index].viewId]?.meta
+            ?.filter(v => {
+              return filterValueTypeByControl(controllerType, v.type);
+            })
+            .map(item => (
+              <Option key={item.id} fieldvaluetype={item.type} value={item.id}>
+                <div
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
+                  <span>{item.id}</span>
+                  <span style={{ color: G90 }}>{item.type}</span>
+                </div>
+              </Option>
+            ));
         }
       },
-      [getFormRelatedViews, queryVariables, viewMap],
+      [controllerType, getFormRelatedViews, queryVariables, viewMap],
     );
 
     const getViewName = useCallback(
@@ -132,19 +169,6 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
           rules={[
             {
               validator: async (_, relatedViews: RelatedView[]) => {
-                const trimmedRelatedViews = relatedViews.filter(
-                  item => item.fieldValue && item.fieldValueType,
-                );
-                if (!relatedViews || relatedViews.length < 1) {
-                  return Promise.reject(
-                    new Error('Please Choose at least one widget component'),
-                  );
-                }
-                if (!trimmedRelatedViews || trimmedRelatedViews.length < 1) {
-                  return Promise.reject(
-                    new Error('Please Choose at least one view filed'),
-                  );
-                }
                 return Promise.resolve(relatedViews);
               },
             },
@@ -191,11 +215,13 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                       name={[field.name, 'fieldValue']}
                       fieldKey={[field.fieldKey, 'id']}
                       wrapperCol={{ span: 24 }}
+                      rules={[{ validator: fieldValueValidator }]}
                     >
                       <Select
                         showSearch
                         placeholder="请选择"
                         allowClear
+                        {...(isMultiple(index) && { mode: 'multiple' })}
                         onChange={fieldValueChange(index)}
                       >
                         {renderOptions(index)}

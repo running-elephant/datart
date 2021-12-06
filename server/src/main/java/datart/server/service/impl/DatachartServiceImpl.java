@@ -19,6 +19,7 @@ package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.Datachart;
 import datart.core.entity.Folder;
@@ -29,8 +30,8 @@ import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.security.base.ResourceType;
 import datart.security.util.PermissionHelper;
 import datart.server.base.dto.DatachartDetail;
-import datart.server.base.exception.NotFoundException;
-import datart.server.base.exception.ParamException;
+import datart.core.base.exception.NotFoundException;
+import datart.core.base.exception.ParamException;
 import datart.server.base.params.BaseCreateParam;
 import datart.server.base.params.DatachartCreateParam;
 import datart.server.service.*;
@@ -139,7 +140,7 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
         // check unique
         DatachartCreateParam param = (DatachartCreateParam) createParam;
         if (!CollectionUtils.isEmpty(folderMapper.checkVizName(param.getOrgId(), param.getParentId(), param.getName()))) {
-            throw new ParamException("name already exists!");
+            Exceptions.tr(ParamException.class,"error.param.exists.name");
         }
         Datachart datachart = DatachartService.super.create(createParam);
         // create folder

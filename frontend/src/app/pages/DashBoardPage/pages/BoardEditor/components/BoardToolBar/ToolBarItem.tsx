@@ -45,7 +45,7 @@ import { ActionCreators } from 'redux-undo';
 import {
   deleteWidgetsAction,
   widgetToPositionAction,
-} from '../../slice/actions';
+} from '../../slice/actions/actions';
 import {
   selectClipboardWidgets,
   selectFutureState,
@@ -342,12 +342,12 @@ export const ChartWidgetDropdown: React.FC<ChartWidgetDropdownProps> =
     );
     const addChartTypes = [
       {
-        name: '添加公共数据图表',
+        name: '添加已有数据图表',
         icon: '',
         type: 'select',
       },
       {
-        name: '添加数据图表',
+        name: '新建数据图表',
         icon: '',
         type: 'create',
       },

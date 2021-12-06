@@ -17,8 +17,10 @@
  */
 import { DatePicker, Form, FormItemProps } from 'antd';
 import { PickerType } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { formatDateByPickType } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/utils';
 import moment from 'moment';
 import React, { memo } from 'react';
+import styled from 'styled-components/macro';
 
 export interface TimeControllerProps {
   value?: any;
@@ -52,33 +54,54 @@ export interface SingleTimeSetProps extends FormItemProps<any> {
 }
 export const TimeController: React.FC<SingleTimeSetProps> = memo(
   ({ pickerType, value, onChange }) => {
-    const _onChange = time => {
+    const _onChange = (time, strTime) => {
       if (!time) {
         return onChange(null);
       }
-      const formatTemp = 'YYYY-MM-DD HH:mm:ss';
-      const newValues = time.format(formatTemp);
+
+      const newValues = formatDateByPickType(pickerType, time);
       onChange(newValues);
     };
 
     return (
-      <>
+      <StyledWrap>
         {pickerType === 'dateTime' ? (
           <DatePicker
+            style={{ width: '100%' }}
             allowClear={true}
             value={value ? moment(value) : null}
             showTime
             onChange={_onChange}
+            className="control-datePicker"
+            bordered={false}
           />
         ) : (
           <DatePicker
+            style={{ width: '100%' }}
             allowClear={true}
             value={value ? moment(value) : null}
             onChange={_onChange}
             picker={pickerType as any}
+            className="control-datePicker"
+            bordered={false}
           />
         )}
-      </>
+      </StyledWrap>
     );
   },
 );
+const StyledWrap = styled.div`
+  display: flex;
+
+  justify-content: space-around;
+  width: 100%;
+
+  & .control-datePicker {
+    width: 100%;
+    background-color: transparent !important;
+
+    & .ant-input {
+      background-color: transparent !important;
+    }
+  }
+`;

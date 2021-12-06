@@ -13,7 +13,6 @@ export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
 
   const checkPasswordConfirm = useCallback(
     (_, value, callBack) => {
-      console.log(1);
       if (value && value !== form.getFieldValue('newPassword')) {
         return Promise.reject('两次输入的密码不一致');
       } else {

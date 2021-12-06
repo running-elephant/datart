@@ -111,6 +111,14 @@ export const selectSelectedIds = createSelector(
       .map(widgetInfo => widgetInfo.id) || [],
 );
 
+export const selectWidgetInfoDatachartId = createSelector(
+  [selectWidgetRecord],
+  WidgetsInfo =>
+    Object.values(WidgetsInfo).map(widgetInfo => {
+      return widgetInfo.datachartId || undefined;
+    }) || [],
+);
+
 // boardInfo
 export const boardInfoState = (state: { editBoard: EditBoardState }) =>
   state.editBoard.boardInfo;

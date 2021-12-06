@@ -17,12 +17,13 @@
  */
 import { Form } from 'antd';
 import React, { memo } from 'react';
+import { RadioButtonTypeName } from '../..';
 import { RadioStyleSet } from './RadioStyleSet';
 export interface RadioStyleFormProps {}
 export const RadioStyleForm: React.FC<RadioStyleFormProps> = memo(() => {
   return (
     <Form.Item
-      name={['config', 'radioButtonType']}
+      name={RadioButtonTypeName}
       label="按钮样式"
       validateTrigger={['onChange', 'onBlur']}
       rules={[{ required: true }]}

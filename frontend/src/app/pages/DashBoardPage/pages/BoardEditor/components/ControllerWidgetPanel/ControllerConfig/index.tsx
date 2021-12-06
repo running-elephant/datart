@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Form, FormInstance, Input, Radio } from 'antd';
+import { Form, FormInstance, Input } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   BoardType,
@@ -28,15 +28,44 @@ import React, { memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import ControllerVisibility from './ControllerVisibility';
 import { RadioStyleForm } from './OtherSet.tsx/RadioStyle/RadioStyleForm';
+import { SliderMarks } from './OtherSet.tsx/SliderStyle/SliderMarks';
+import { SliderStep } from './OtherSet.tsx/SliderStyle/SliderStep';
 import { SqlOperator } from './OtherSet.tsx/SqlOperator';
 import { ValuesSetter } from './ValuesSetter/ValuesSetter';
+
+export const ControllerValuesName = ['config', 'controllerValues'];
+export const DateName = ['config', 'controllerDate'];
+export const SqlOperatorName = ['config', 'sqlOperator'];
+export const PickerTypeName = [...DateName, 'pickerType'];
+export const StartTimeName = [...DateName, 'startTime'];
+export const StartTimeROEName = [...StartTimeName, 'relativeOrExact'];
+export const StartTimeRelativeName = [...StartTimeName, 'relativeValue'];
+export const StartTimeExactName = [...StartTimeName, 'exactValue'];
+export const StartTimeDirectionName = [...StartTimeRelativeName, 'direction'];
+export const StartTimeUnitName = [...StartTimeRelativeName, 'unit'];
+export const StartTimeAmountName = [...StartTimeRelativeName, 'amount'];
+
+export const EndTimeName = [...DateName, 'endTime'];
+export const EndTimeROEName = [...EndTimeName, 'relativeOrExact'];
+export const EndTimeRelativeName = [...EndTimeName, 'relativeValue'];
+export const EndTimeExactName = [...EndTimeName, 'exactValue'];
+export const EndTimeDirectionName = [...EndTimeRelativeName, 'direction'];
+export const EndTimeUnitName = [...EndTimeRelativeName, 'unit'];
+export const EndTimeAmountName = [...EndTimeRelativeName, 'amount'];
+
+export const ValueOptionsName = ['config', 'valueOptions'];
+export const MaxValueName = ['config', 'maxValue'];
+export const MinValueName = ['config', 'minValue'];
+
+export const RadioButtonTypeName = ['config', 'radioButtonType'];
+export const SliderStepName = ['config', 'sliderConfig', 'step'];
+export const SliderShowMarksName = ['config', 'sliderConfig', 'showMarks'];
 
 export interface RelatedViewFormProps {
   controllerType: ControllerFacadeTypes;
   form: FormInstance<ControllerWidgetContent> | undefined;
   viewMap: Record<string, ChartDataView>;
   otherStrFilterWidgets: Widget[];
-
   boardType: BoardType;
 }
 
@@ -48,6 +77,13 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
       return controllerType === ControllerFacadeTypes.RadioGroup;
     }, [controllerType]);
 
+    const sliderTypes = useMemo(() => {
+      const sliderTypes = [
+        ControllerFacadeTypes.Slider,
+        ControllerFacadeTypes.RangeSlider,
+      ];
+      return sliderTypes.includes(controllerType);
+    }, [controllerType]);
     return (
       <Wrap>
         <Form.Item
@@ -69,12 +105,19 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
         {/* 按钮样式 */}
         {hasRadio && <RadioStyleForm />}
 
+        {/* slider */}
+        {sliderTypes && (
+          <>
+            <SliderStep />
+            <SliderMarks />
+          </>
+        )}
+
         {/* 是否显示 */}
         <ControllerVisibility
           otherStrFilterWidgets={otherStrFilterWidgets}
           form={form}
         />
-        <Radio.Group options={[]} value={'2'} optionType="button" />
       </Wrap>
     );
   },

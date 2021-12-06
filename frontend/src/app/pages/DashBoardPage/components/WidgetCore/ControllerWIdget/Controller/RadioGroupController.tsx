@@ -16,22 +16,21 @@
  * limitations under the License.
  */
 import { Form, Radio } from 'antd';
-import { SelectValue } from 'antd/lib/select';
 import { ControlOption } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import React, { memo, useCallback, useMemo } from 'react';
 import styled from 'styled-components/macro';
 
-export interface SelectControllerProps {
+export interface RadioControllerProps {
   radioButtonType?: any;
   options?: ControlOption[];
-  value?: SelectValue;
+  value?: any;
   placeholder?: string;
   onChange: (values) => void;
   label?: React.ReactNode;
   name?: string;
   required?: boolean;
 }
-export const RadioGroupControllerForm: React.FC<SelectControllerProps> = memo(
+export const RadioGroupControllerForm: React.FC<RadioControllerProps> = memo(
   ({ label, name, required, ...rest }) => {
     return (
       <Form.Item
@@ -45,7 +44,7 @@ export const RadioGroupControllerForm: React.FC<SelectControllerProps> = memo(
     );
   },
 );
-export const RadioGroupController: React.FC<SelectControllerProps> = memo(
+export const RadioGroupController: React.FC<RadioControllerProps> = memo(
   ({ options, onChange, value, radioButtonType, ...rest }) => {
     const _onChange = e => {
       onChange([e.target.value]);
@@ -55,7 +54,11 @@ export const RadioGroupController: React.FC<SelectControllerProps> = memo(
     }, [radioButtonType]);
     const renderOptions = useCallback(() => {
       return (options || []).map(o => (
-        <RadioItem key={o.value || o.label} value={o.value}>
+        <RadioItem
+          className="radio-item"
+          key={o.value || o.label}
+          value={o.value}
+        >
           {o.label || o.value}
         </RadioItem>
       ));
@@ -63,7 +66,12 @@ export const RadioGroupController: React.FC<SelectControllerProps> = memo(
 
     return (
       <StyledWrap>
-        <Radio.Group value={value} optionType={'button'} onChange={_onChange}>
+        <Radio.Group
+          className="control-radio-group"
+          value={value}
+          optionType={'button'}
+          onChange={_onChange}
+        >
           {renderOptions()}
         </Radio.Group>
       </StyledWrap>
@@ -76,7 +84,10 @@ const StyledWrap = styled.div`
   justify-content: space-around;
   width: 100%;
 
-  & .ant-input {
+  .control-radio-group {
     background-color: transparent;
+    .radio-item {
+      background-color: transparent;
+    }
   }
 `;

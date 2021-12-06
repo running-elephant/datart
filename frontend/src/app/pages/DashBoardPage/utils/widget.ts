@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
@@ -25,7 +26,6 @@ import { CSSProperties } from 'react';
 import { G70 } from 'styles/StyleConstants';
 import { v4 as uuidv4 } from 'uuid';
 import { convertImageUrl, fillPx } from '.';
-import { widgetActionTypeMap } from '../components/WidgetToolBar/config';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
@@ -55,9 +55,9 @@ import {
   WidgetContentChartType,
   WidgetInfo,
   WidgetPadding,
-  WidgetType,
 } from '../pages/Board/slice/types';
 import { ControllerConfig } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { BtnActionParams } from '../pages/BoardEditor/slice/actions/controlActions';
 
 export const VALUE_SPLITTER = '###';
 
@@ -121,6 +121,21 @@ export const createContainerWidget = (opt: {
   return widget;
 };
 
+export const createControlBtn = (opt: BtnActionParams) => {
+  const content = { type: opt.type };
+  const widgetConf = createInitWidgetConfig({
+    name: opt.type === 'query' ? '查询' : '重置',
+    type: opt.type as WidgetType,
+    content: content,
+    boardType: opt.boardType,
+  });
+  const widget: Widget = createWidget({
+    dashboardId: opt.boardId,
+    config: widgetConf,
+  });
+  return widget;
+};
+
 export const createInitWidgetConfig = (opt: {
   type: WidgetType;
   content: WidgetContent;
@@ -153,12 +168,7 @@ export const createInitWidgetConfig = (opt: {
       textAlign: 'left',
       ...fontDefault,
     },
-    padding: {
-      left: 4,
-      right: 4,
-      top: 20,
-      bottom: 4,
-    },
+    padding: createWidgetPadding(opt.type),
   };
 };
 
@@ -205,12 +215,31 @@ export const createWidgetInfo = (id: string): WidgetInfo => {
   };
   return widgetInfo;
 };
+export const createWidgetPadding = (widgetType: WidgetType) => {
+  if (widgetType === 'query' || widgetType === 'reset') {
+    return {
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+    };
+  }
+  return {
+    left: 4,
+    right: 4,
+    top: 4,
+    bottom: 4,
+  };
+};
 export const createWidgetRect = (
   boardType: BoardType,
   widgetType: WidgetType,
 ): RectConfig => {
   if (widgetType === 'controller') {
     return getInitControllerWidgetRect(boardType);
+  }
+  if (widgetType === 'query' || widgetType === 'reset') {
+    return getInitButtonWidgetRect(boardType);
   }
   if (boardType === 'auto') {
     return {
@@ -226,6 +255,25 @@ export const createWidgetRect = (
       y: 0,
       width: 400,
       height: 300,
+    };
+  }
+};
+
+export const getInitButtonWidgetRect = (boardType: BoardType): RectConfig => {
+  if (boardType === 'auto') {
+    return {
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 2,
+    };
+  } else {
+    // free
+    return {
+      x: 0,
+      y: 0,
+      width: 150,
+      height: 50,
     };
   }
 };
@@ -266,6 +314,7 @@ export const createContainerWidgetContent = (type: ContainerWidgetType) => {
   }
   return content;
 };
+
 export const createChartWidgetContent = (subType: WidgetContentChartType) => {
   let content: ChartWidgetContent = {
     type: subType,
@@ -316,7 +365,7 @@ export const createMediaContent = (type: MediaWidgetType) => {
   return content;
 };
 
-export const createFilterWidget = (params: {
+export const createControllerWidget = (params: {
   boardId: string;
   boardType: BoardType;
   relations: Relation[];
@@ -338,9 +387,7 @@ export const createFilterWidget = (params: {
   const content: ControllerWidgetContent = {
     type: controllerType,
     relatedViews: views,
-
     name: name,
-
     config: config,
   };
 
@@ -351,7 +398,7 @@ export const createFilterWidget = (params: {
     boardType: boardType,
   });
 
-  const widgetId = relations?.[0].sourceId || uuidv4();
+  const widgetId = relations[0]?.sourceId || uuidv4();
   const widget: Widget = createWidget({
     id: widgetId,
     dashboardId: boardId,
@@ -384,12 +431,12 @@ export const getWidgetMapByServer = (
         relations: convertWidgetRelationsToObj(cur.relations),
         viewIds,
       };
-      // TODO xld migration about font 5
+      // TODO migration about font 5 --xld
       widget.config.nameConfig = {
         ...fontDefault,
         ...widget.config.nameConfig,
       };
-      // TODO xld migration about filter
+      // TODO migration about filter --xld
       if ((widget.config.type as any) !== 'filter') {
         acc[cur.id] = widget;
       }
@@ -400,6 +447,7 @@ export const getWidgetMapByServer = (
   }, {} as Record<string, Widget>);
 
   const wrappedDataCharts: DataChart[] = [];
+  const controllerWidgets: Widget[] = [];
   Object.values(widgetMap).forEach(widget => {
     // 处理 widget包含关系
     if (widget.parentId) {
@@ -470,22 +518,25 @@ export const getWidgetMapByServer = (
         content.config.assistViewFields = (
           content.config.assistViewFields as string
         ).split(VALUE_SPLITTER);
-        // value.split(VALUE_SPLITTER);
       }
+      // use for reset button
+      controllerWidgets.push(widget);
     }
 
     // 处理 自有 chart widget
 
     if (widget.config.content.type === 'widgetChart') {
-      widget.datachartId = widget.config.content.dataChart?.id || '';
-      wrappedDataCharts.push(widget.config.content.dataChart!);
-      delete widget.config.content.dataChart;
+      let content = widget.config.content as ChartWidgetContent;
+      widget.datachartId = content.dataChart?.id || '';
+      wrappedDataCharts.push(content.dataChart!);
+      delete content.dataChart;
     }
   });
 
   return {
     widgetMap,
     wrappedDataCharts,
+    controllerWidgets,
   };
 };
 export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {
@@ -673,12 +724,17 @@ export const getOtherStringControlWidgets = (
       return false;
     }
     const content = ele.config.content as ControllerWidgetContent;
-    // return content.fieldValueType === ChartDataViewFieldType.STRING;
-    return true;
+    const strControlTypes = [
+      ControllerFacadeTypes.DropdownList,
+      ControllerFacadeTypes.MultiDropdownList,
+      ControllerFacadeTypes.RadioGroup,
+    ];
+    return strControlTypes.includes(content.type);
   });
   if (!widgetId) {
     return allFilterWidgets;
   } else {
+    // 自己不能关联自己 把自己排除
     return allFilterWidgets.filter(ele => ele.id !== widgetId);
   }
 };
@@ -859,75 +915,32 @@ export const getWidgetSomeStyle = (opt: {
 };
 
 // get some css end
-// filter
-export const getCanLinkFilterWidgets = (widgets: Widget[]) => {
-  const CanLinkFilterWidgetTypes: WidgetType[] = ['chart', 'media'];
-  const CanLinkFilterMediaWidgetTypes: MediaWidgetType[] = ['richText']; // 或者考虑加上 image
+// Controller
+export const getCanLinkControlWidgets = (widgets: Widget[]) => {
+  const CanLinkControllerWidgetTypes: WidgetType[] = ['chart'];
+
   const canLinkWidgets = widgets.filter(widget => {
     if (widget.viewIds.length === 0) {
       return false;
     }
-    if (!CanLinkFilterWidgetTypes.includes(widget.config.type)) {
-      return false;
+    if (CanLinkControllerWidgetTypes.includes(widget.config.type)) {
+      return true;
     }
-    if (
-      widget.config.type === 'media' &&
-      !CanLinkFilterMediaWidgetTypes.includes(
-        widget.config.content.type as MediaWidgetType,
-      )
-    ) {
-      return false;
-    }
-    return true;
+    return false;
   });
   return canLinkWidgets;
 };
 
-export const getWidgetActionList = (widget: Widget) => {
-  const canMakeLinkage = widget.config?.jumpConfig?.open;
-  const canMakeJump = widget.config?.linkageConfig?.open;
-  return [
-    {
-      key: widgetActionTypeMap.refresh,
-      label: '同步数据',
-      icon: '',
-      disabled: false,
-    },
-    {
-      key: widgetActionTypeMap.fullScreen,
-      label: '全屏',
-      icon: '',
-      disabled: false,
-    },
-    {
-      key: widgetActionTypeMap.delete,
-      label: '删除',
-      icon: '',
-      disabled: false,
-    },
-    {
-      key: widgetActionTypeMap.edit,
-      label: '编辑',
-      icon: '',
-      disabled: false,
-    },
-    {
-      key: widgetActionTypeMap.info,
-      label: '信息',
-      icon: '',
-      disabled: false,
-    },
-    {
-      key: widgetActionTypeMap.makeLinkage,
-      label: '设置联动',
-      icon: '',
-      disabled: !!canMakeLinkage,
-    },
-    {
-      key: widgetActionTypeMap.makeJump,
-      label: '设置跳转',
-      icon: '',
-      disabled: !!canMakeJump,
-    },
-  ];
+export const getLinkedColumn = (
+  targetWidgetId: string,
+  triggerWidget: Widget,
+) => {
+  const relations = triggerWidget.relations;
+  const relation = relations.find(item => item.targetId === targetWidgetId);
+
+  return (
+    relation?.config?.widgetToWidget?.linkerColumn ||
+    relation?.config?.widgetToWidget?.triggerColumn ||
+    ''
+  );
 };

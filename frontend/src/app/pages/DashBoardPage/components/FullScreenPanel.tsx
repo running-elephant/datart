@@ -17,7 +17,7 @@
  */
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button, Layout, Menu } from 'antd';
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetAllProvider';
+import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
@@ -25,16 +25,17 @@ import {
   selectBoardWidgetMapById,
 } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { G90, WHITE } from 'styles/StyleConstants';
 import { CanFullScreenWidgetTypes } from '../constants';
 import { WidgetCore } from './WidgetCore';
 
 const { Header } = Layout;
 
 export interface FullScreenPanelProps {}
-const FullScreenPanel: React.FC<FullScreenPanelProps> = () => {
+export const FullScreenPanel: React.FC<FullScreenPanelProps> = () => {
   const { boardId } = useContext(BoardContext);
   const dispatch = useDispatch();
 
@@ -81,7 +82,7 @@ const FullScreenPanel: React.FC<FullScreenPanelProps> = () => {
     if (widget) {
       return (
         <WidgetAllProvider id={widget.id}>
-          <WidgetCore background padding border />;
+          <WidgetCore background padding border />
         </WidgetAllProvider>
       );
     }
@@ -122,7 +123,6 @@ const FullScreenPanel: React.FC<FullScreenPanelProps> = () => {
     </>
   );
 };
-export default memo(FullScreenPanel);
 
 const FullScreenWrap = styled.div<{ show: boolean }>`
   position: fixed;
@@ -133,8 +133,9 @@ const FullScreenWrap = styled.div<{ show: boolean }>`
   z-index: 100;
   width: 100%;
   height: 100%;
-
-  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  background-color: ${WHITE};
   transition: all 3s ease-out;
 
   .full-header {
@@ -144,10 +145,11 @@ const FullScreenWrap = styled.div<{ show: boolean }>`
   }
   .close-fullscreen {
     margin-top: 20px;
-    color: #000;
+    color: ${G90};
   }
   .full-container {
-    height: calc(100% - 64px);
+    flex: 1;
+    display: flex;
   }
 
   .full-menu {

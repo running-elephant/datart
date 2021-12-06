@@ -51,9 +51,11 @@ const slice = createSlice({
   initialState,
   reducers: {
     addTab(state, action: PayloadAction<VizTab>) {
-      const tab = state.tabs.find(t => t.id === action.payload.id);
-      if (!tab) {
+      const index = state.tabs.findIndex(t => t.id === action.payload.id);
+      if (index === -1) {
         state.tabs.push(action.payload);
+      } else if (state.tabs[index].search !== action.payload.search) {
+        state.tabs[index] = action.payload;
       }
       state.selectedTab = action.payload.id;
     },
