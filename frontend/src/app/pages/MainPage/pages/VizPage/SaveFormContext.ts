@@ -1,6 +1,6 @@
 import { CommonFormTypes } from 'globalConstants';
 import { createContext, useCallback, useState } from 'react';
-import { BoardType } from './../../../DashBoardPage/slice/types';
+import { BoardType } from '../../../DashBoardPage/pages/Board/slice/types';
 import { VizType } from './slice/types';
 
 export interface SaveFormModel {
@@ -9,7 +9,7 @@ export interface SaveFormModel {
   boardType?: BoardType;
   config?: string;
   description?: string;
-  parentId?: string;
+  parentId?: string | null;
 }
 
 interface SaveFormState {
@@ -34,9 +34,7 @@ const saveFormContextValue: SaveFormContextValue = {
   onCancel: () => {},
   showSaveForm: () => {},
 };
-
 export const SaveFormContext = createContext(saveFormContextValue);
-
 export const useSaveFormContext = (): SaveFormContextValue => {
   const [vizType, setVizType] = useState<VizType>('FOLDER');
   const [type, setType] = useState(CommonFormTypes.Add);
@@ -50,7 +48,6 @@ export const useSaveFormContext = (): SaveFormContextValue => {
   const onCancel = useCallback(() => {
     setVisible(false);
   }, [setVisible]);
-
   const showSaveForm = useCallback(
     ({
       vizType,

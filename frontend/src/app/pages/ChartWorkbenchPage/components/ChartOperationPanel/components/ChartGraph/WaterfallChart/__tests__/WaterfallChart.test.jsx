@@ -16,16 +16,15 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import WaterfallChart from '../WaterfallChart';
 
 describe('<WaterfallChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<WaterfallChart />);
+    component = new WaterfallChart();
   });
+
   test('it should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

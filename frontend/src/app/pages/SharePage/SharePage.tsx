@@ -26,10 +26,10 @@ import { useLocation } from 'react-router-dom';
 import persistence from 'utils/persistence';
 import { v4 as uuidv4 } from 'uuid';
 import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
+import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';
+import { selectShareBoard } from '../DashBoardPage/pages/Board/slice/selector';
+import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
 import { useEditBoardSlice } from '../DashBoardPage/pages/BoardEditor/slice';
-import { useBoardSlice } from '../DashBoardPage/slice';
-import { selectShareBoard } from '../DashBoardPage/slice/selector';
-import { VizRenderMode } from '../DashBoardPage/slice/types';
 import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
 import { urlSearchTransfer } from '../MainPage/pages/VizPage/utils';
 import { useStoryBoardSlice } from '../StoryBoardPage/slice';
@@ -45,6 +45,7 @@ import {
   selectNeedPassword,
   selectShareExecuteTokenMap,
   selectSharePassword,
+  selectShareVizType,
 } from './slice/selectors';
 import { fetchShareVizInfo } from './slice/thunks';
 import { StoryPlayerForShare } from './StoryPlayerForShare';
@@ -65,6 +66,7 @@ export function SharePage() {
   const chartPreview = useSelector(selectChartPreview);
   const shareBoard = useSelector(selectShareBoard);
   const shareStory = useSelector(selectShareStoryBoard);
+  const vizType = useSelector(selectShareVizType);
 
   const shareToken = useRouteQuery({
     key: 'token',
@@ -176,30 +178,32 @@ export function SharePage() {
           fetchShareVizInfoImpl(shareToken, sharePassword);
         }}
       />
-
-      {!Boolean(needPassword) && chartPreview && chartPreview?.backendChart && (
-        <DownloadTaskContainer
-          onLoadTasks={onLoadShareTask}
-          onDownloadFile={onDownloadFile}
-        >
-          <ChartPreviewBoardForShare
-            chartPreview={chartPreview}
-            onCreateDataChartDownloadTask={onMakeShareDownloadDataTask}
-          />
-        </DownloadTaskContainer>
-      )}
-      {!Boolean(needPassword) && shareBoard && !shareStory && (
+      {!Boolean(needPassword) &&
+        vizType === 'DATACHART' &&
+        chartPreview &&
+        chartPreview?.backendChart && (
+          <DownloadTaskContainer
+            onLoadTasks={onLoadShareTask}
+            onDownloadFile={onDownloadFile}
+          >
+            <ChartPreviewBoardForShare
+              chartPreview={chartPreview}
+              onCreateDataChartDownloadTask={onMakeShareDownloadDataTask}
+            />
+          </DownloadTaskContainer>
+        )}
+      {!Boolean(needPassword) && vizType === 'DASHBOARD' && shareBoard && (
         <BoardForShare
           dashboard={shareBoard}
           allowDownload={true}
           onMakeShareDownloadDataTask={onMakeShareDownloadDataTask}
-          renderMode={renderMode} //   TODO and task
+          renderMode={renderMode}
           filterSearchUrl={''}
           onLoadShareTask={onLoadShareTask}
           onDownloadFile={onDownloadFile}
         />
       )}
-      {!Boolean(needPassword) && shareStory && (
+      {!Boolean(needPassword) && vizType === 'STORYBOARD' && shareStory && (
         <StoryPlayerForShare storyBoard={shareStory} />
       )}
     </div>

@@ -20,6 +20,7 @@ package datart.data.provider.jdbc;
 
 import datart.core.base.consts.Const;
 import datart.core.data.provider.ScriptVariable;
+import datart.data.provider.calcite.SqlNodeUtils;
 import datart.data.provider.script.ReplacementPair;
 import datart.data.provider.script.VariablePlaceholder;
 import org.apache.calcite.sql.SqlCall;
@@ -48,14 +49,15 @@ public class PermissionVariablePlaceholder extends VariablePlaceholder {
         }
 
         if (variable.getValues().size() == 1) {
-            replaceOperandWithVariable();
-            return new ReplacementPair(originalSqlFragment, sqlCall.toSqlString(sqlDialect).getSql());
+            replaceVariable(sqlCall);
+
+            return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(sqlCall, sqlDialect));
         }
 
         //权限变量为多值，需要解析SQL条件表达式，根据权限变量值修改关系运算符
-        SqlCall sqlCall = autoFixSqlCall();
+        SqlCall fixSqlCall = autoFixSqlCall();
 
-        return new ReplacementPair(originalSqlFragment, sqlCall.toSqlString(sqlDialect, true).getSql());
+        return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(fixSqlCall, sqlDialect));
 
     }
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 
 const config: ChartConfig = {
   datas: [],
@@ -54,7 +54,7 @@ const config: ChartConfig = {
           options: {
             getItems: cols => {
               const sections = (cols || []).filter(col =>
-                ['metrics', 'deminsion'].includes(col.key),
+                ['metrics', 'dimension'].includes(col.key),
               );
               const columns = sections.reduce(
                 (acc, cur) => acc.concat(cur.rows || []),

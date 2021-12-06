@@ -18,14 +18,15 @@
 
 package datart.data.provider;
 
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.*;
-import datart.data.provider.base.DataProviderException;
 import datart.data.provider.optimize.DataProviderExecuteOptimizer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
@@ -61,17 +62,17 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
     }
 
     @Override
-    public Set<String> readAllDatabases(DataProviderSource source) {
+    public Set<String> readAllDatabases(DataProviderSource source) throws SQLException {
         return getDataProviderService(source.getType()).readAllDatabases(source);
     }
 
     @Override
-    public Set<String> readTables(DataProviderSource source, String database) {
+    public Set<String> readTables(DataProviderSource source, String database) throws SQLException {
         return getDataProviderService(source.getType()).readTables(source, database);
     }
 
     @Override
-    public Set<Column> readTableColumns(DataProviderSource source, String database, String table) {
+    public Set<Column> readTableColumns(DataProviderSource source, String database, String table) throws SQLException {
         return getDataProviderService(source.getType()).readTableColumns(source, database, table);
     }
 
@@ -159,7 +160,7 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
         }
         DataProvider dataProvider = cachedDataProviders.get(type);
         if (dataProvider == null) {
-            throw new DataProviderException("No data provider type " + type);
+            Exceptions.msg("No data provider type " + type);
         }
         return dataProvider;
     }

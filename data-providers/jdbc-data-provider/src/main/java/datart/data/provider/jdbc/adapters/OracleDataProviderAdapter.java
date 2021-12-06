@@ -20,12 +20,10 @@ package datart.data.provider.jdbc.adapters;
 
 
 import datart.core.base.PageInfo;
-import datart.core.base.consts.ValueType;
 import datart.core.data.provider.Column;
 import datart.core.data.provider.Dataframe;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.QueryScript;
-import datart.data.provider.jdbc.DataTypeUtils;
 import datart.data.provider.jdbc.SqlScriptRender;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,12 +44,17 @@ public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
     protected Dataframe parseResultSet(ResultSet rs, long count) throws SQLException {
         Dataframe dataframe = new Dataframe();
         List<Column> columns = getColumns(rs);
+        int start = 1;
+        if ("V_R_N".equals(columns.get(0).getName())) {
+            start = 2;
+            columns.remove(0);
+        }
         ArrayList<List<Object>> rows = new ArrayList<>();
         int c = 0;
         while (rs.next()) {
             ArrayList<Object> row = new ArrayList<>();
             rows.add(row);
-            for (int i = 2; i < columns.size() + 2; i++) {
+            for (int i = start; i < columns.size() + start; i++) {
                 row.add(rs.getObject(i));
             }
             c++;
@@ -96,15 +99,5 @@ public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
                 (pageInfo.getPageNo() - 1) * pageInfo.getPageSize());
     }
 
-    protected List<Column> getColumns(ResultSet rs) throws SQLException {
-        ArrayList<Column> columns = new ArrayList<>();
-        for (int i = 2; i <= rs.getMetaData().getColumnCount(); i++) {
-            String columnTypeName = rs.getMetaData().getColumnTypeName(i);
-            String columnName = rs.getMetaData().getColumnName(i);
-            ValueType valueType = DataTypeUtils.sqlType2DataType(columnTypeName);
-            columns.add(new Column(columnName, valueType));
-        }
-        return columns;
-    }
 
 }

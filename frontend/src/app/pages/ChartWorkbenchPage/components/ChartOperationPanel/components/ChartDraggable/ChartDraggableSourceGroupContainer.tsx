@@ -17,7 +17,7 @@
  */
 
 import { Checkbox, List } from 'antd';
-import { ChartDataViewMeta } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import { ChartDataViewMeta } from 'app/types/ChartDataView';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { FC, memo, useState } from 'react';
 import { DragSourceMonitor, useDrag } from 'react-dnd';

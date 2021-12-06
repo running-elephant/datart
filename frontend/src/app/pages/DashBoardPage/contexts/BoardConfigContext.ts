@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { createContext } from 'react';
-import { DashboardConfig } from './../slice/types';
+import { DashboardConfig } from '../pages/Board/slice/types';
 export interface BoardConfigContextProps {
   config: DashboardConfig;
 }

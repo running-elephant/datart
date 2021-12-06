@@ -17,11 +17,16 @@
  */
 
 import { createContext } from 'react';
-import { BoardType, VizRenderMode } from '../slice/types';
+import {
+  BoardType,
+  Dashboard,
+  VizRenderMode,
+} from '../pages/Board/slice/types';
 export interface BoardContextProps {
   name: string;
   renderMode?: VizRenderMode;
   boardId: string;
+  orgId: string;
   boardType: BoardType;
   status: number;
   editing: boolean;
@@ -31,6 +36,7 @@ export interface BoardContextProps {
   allowDownload?: boolean;
   allowShare?: boolean;
   allowManage?: boolean;
+  queryVariables: Dashboard['queryVariables'];
   // methods
   renderedWidgetById: (wid: string) => void;
 }

@@ -18,10 +18,10 @@
 
 import { DatePicker, Select, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
+import { RelativeOrExactTime } from 'app/types/FilterControlPanel';
 import { Moment } from 'moment';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
-import { RelativeOrExactTime } from '../ChartFieldAction/FilterControlPanel/Constant';
 import RelativeTimeSelector from './RelativeTimeSelector';
 
 const ManualSingleTimeSelector: FC<

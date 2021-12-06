@@ -20,7 +20,7 @@ import {
   ChartStyleSectionComponentType,
   ChartStyleSectionConfig,
   ChartStyleSectionRow,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useEffect } from 'react';
 import styled from 'styled-components/macro';
@@ -40,10 +40,12 @@ import {
   BasicFontSizeSelector,
   BasicInput,
   BasicInputNumber,
+  BasicInputPercentage,
   BasicLine,
   BasicMarginWidth,
   BasicSlider,
   BasicSwitch,
+  BasicText,
   BasicUnControlledTabPanel,
 } from '../Basic';
 import {
@@ -137,6 +139,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           return <BasicColorSelector {...props} />;
         case ChartStyleSectionComponentType.INPUTNUMBER:
           return <BasicInputNumber {...props} />;
+        case ChartStyleSectionComponentType.INPUTPERCENTAGE:
+          return <BasicInputPercentage {...props} />;
         case ChartStyleSectionComponentType.SLIDER:
           return <BasicSlider {...props} />;
         case ChartStyleSectionComponentType.MARGIN_WIDTH:
@@ -153,6 +157,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           return <UnControlledTableHeaderPanel {...props} />;
         case ChartStyleSectionComponentType.GROUP:
           return <GroupLayout {...props} />;
+        case ChartStyleSectionComponentType.TEXT:
+          return <BasicText {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

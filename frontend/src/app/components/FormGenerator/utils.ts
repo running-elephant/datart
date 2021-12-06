@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartStyleSectionRow } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartStyleSectionRow } from 'app/types/ChartConfig';
 import { pickValues } from 'utils/object';
 import { FormGeneratorLayoutProps, ItemLayoutProps } from './types';
 

@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import MultiFilterRow from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterAction/MultiFilterRow';
 import SingleFilterRow from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterAction/SingleFilterRow';
-import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import { FilterConditionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { FilterConditionType } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import ChartFilterCondition, {
   ConditionBuilder,

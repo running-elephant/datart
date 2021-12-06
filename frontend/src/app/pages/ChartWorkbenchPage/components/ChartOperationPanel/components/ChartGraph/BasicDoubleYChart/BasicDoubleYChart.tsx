@@ -17,24 +17,27 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig, {
+import {
+  ChartConfig,
   ChartDataSectionType,
   ChartStyleSectionConfig,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+} from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import {
   getAxisLabel,
   getAxisLine,
   getAxisTick,
   getColumnRenderName,
   getCustomSortableColumns,
+  getExtraSeriesDataFormat,
+  getExtraSeriesRowData,
   getReference,
   getSeriesTooltips4Rectangular,
   getSplitLine,
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
 import Config from './config';
@@ -104,18 +107,20 @@ class BasicDoubleYChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
-    const leftDeminsionConfigs = dataConfigs
+    const leftMetricsConfigs = dataConfigs
       .filter(
-        c =>
-          c.type === ChartDataSectionType.AGGREGATE && c.key === 'deminsionL',
+        c => c.type === ChartDataSectionType.AGGREGATE && c.key === 'metricsL',
       )
       .flatMap(config => config.rows || []);
-    const rightDeminsionConfigs = dataConfigs
+    const rightMetricsConfigs = dataConfigs
       .filter(
-        c =>
-          c.type === ChartDataSectionType.AGGREGATE && c.key === 'deminsionR',
+        c => c.type === ChartDataSectionType.AGGREGATE && c.key === 'metricsR',
       )
       .flatMap(config => config.rows || []);
+
+    if (!leftMetricsConfigs.concat(rightMetricsConfigs)?.length) {
+      return {};
+    }
 
     return {
       tooltip: {
@@ -126,7 +131,7 @@ class BasicDoubleYChart extends Chart {
         formatter: this.getTooltipFormmaterFunc(
           styleConfigs,
           groupConfigs,
-          leftDeminsionConfigs.concat(rightDeminsionConfigs),
+          leftMetricsConfigs.concat(rightMetricsConfigs),
           [],
           infoConfigs,
           dataColumns,
@@ -135,21 +140,19 @@ class BasicDoubleYChart extends Chart {
       grid: this.getGrid(styleConfigs),
       legend: this.getLegend(
         styleConfigs,
-        leftDeminsionConfigs
-          .concat(rightDeminsionConfigs)
-          .map(getColumnRenderName),
+        leftMetricsConfigs.concat(rightMetricsConfigs).map(getColumnRenderName),
       ),
       xAxis: this.getXAxis(styleConfigs, groupConfigs, dataColumns),
       yAxis: this.getYAxis(
         styleConfigs,
-        leftDeminsionConfigs,
-        rightDeminsionConfigs,
+        leftMetricsConfigs,
+        rightMetricsConfigs,
       ),
       series: this.getSeries(
         styleConfigs,
         settingConfigs,
-        leftDeminsionConfigs,
-        rightDeminsionConfigs,
+        leftMetricsConfigs,
+        rightMetricsConfigs,
         dataColumns,
       ),
     };
@@ -190,8 +193,11 @@ class BasicDoubleYChart extends Chart {
           sampling: 'average',
           data: dataColumns.map(dc => ({
             ...config,
+            ...getExtraSeriesRowData(dc),
+            ...getExtraSeriesDataFormat(config?.format),
             value: dc[getValueByColumnKey(config)],
           })),
+          ...this.getItemStyle(config),
           ...this.getGraphStyle(graphType, graphStyle),
           ...this.getLabelStyle(styles, direction),
           ...this.getSeriesStyle(styles),
@@ -227,6 +233,15 @@ class BasicDoubleYChart extends Chart {
         return config;
       });
     return series;
+  }
+
+  getItemStyle(config) {
+    const color = config?.color?.start;
+    return {
+      itemStyle: {
+        color,
+      },
+    };
   }
 
   getGraphStyle(graphType, style) {
@@ -392,10 +407,10 @@ class BasicDoubleYChart extends Chart {
         position,
         ...LabelFont,
         formatter: params => {
-          const { name, value, data } = params;
+          const { value, data } = params;
           const formattedValue = toFormattedValue(value, data.format);
           const labels: string[] = [];
-          labels.push(`${name}: ${formattedValue}`);
+          labels.push(formattedValue);
           return labels.join('\n');
         },
       },

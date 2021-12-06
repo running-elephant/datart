@@ -17,20 +17,19 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig, {
-  ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import {
   getColumnRenderName,
   getDataColumnMaxAndMin,
+  getExtraSeriesRowData,
   getReference,
   getScatterSymbolSizeFn,
   getSeriesTooltips4Scatter,
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Config from './config';
 
@@ -242,6 +241,7 @@ class BasicScatterChart extends Chart {
       const sizeValue =
         dc?.[getValueByColumnKey(sizeConfigs?.[0])] || defaultSizeValue;
       return {
+        ...getExtraSeriesRowData(dc),
         name: groupConfigs?.map(gc => dc?.[getColumnRenderName(gc)]).join('-'),
         value: aggregateConfigs
           ?.map(aggConfig => dc?.[getValueByColumnKey(aggConfig)])

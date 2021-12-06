@@ -52,7 +52,7 @@ public class HttpDataFetcher {
         this.param = param;
     }
 
-    public Dataframe fetchData() throws IOException, URISyntaxException {
+    public Dataframe fetchAndParse() throws IOException, URISyntaxException {
 
         HttpRequestBase httpRequest = createHttpRequest(param);
 
@@ -64,7 +64,8 @@ public class HttpDataFetcher {
         } catch (Exception e) {
             parser = new ResponseJsonParser();
         }
-        return parser.parseResponse(param.getTargetPropertyName(), response);
+        return parser.parseResponse(param.getTargetPropertyName(), response, param.getColumns());
+
     }
 
     private HttpRequestBase createHttpRequest(HttpRequestParam param) throws URISyntaxException {

@@ -1,5 +1,5 @@
-import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-export interface FilterOptionItem {
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
+export interface ControlOptionItem {
   label: string;
   value: string;
   filterType?: ChartDataViewFieldType;

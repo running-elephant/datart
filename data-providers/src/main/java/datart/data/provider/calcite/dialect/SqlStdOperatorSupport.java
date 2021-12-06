@@ -18,8 +18,8 @@
 package datart.data.provider.calcite.dialect;
 
 import com.google.common.collect.ImmutableSet;
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.StdSqlOperator;
-import datart.data.provider.base.DataProviderException;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlOperator;
 import org.apache.calcite.sql.SqlWriter;
@@ -65,7 +65,7 @@ public interface SqlStdOperatorSupport {
             nameField.setAccessible(true);
             nameField.set(call.getOperator(), newName);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new DataProviderException(e);
+            Exceptions.e(e);
         }
     }
 

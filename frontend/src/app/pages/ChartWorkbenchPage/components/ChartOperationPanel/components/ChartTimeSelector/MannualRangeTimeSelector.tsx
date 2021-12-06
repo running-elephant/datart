@@ -17,12 +17,12 @@
  */
 
 import { Row, Space } from 'antd';
-import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
+import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import {
   FilterCondition,
   FilterConditionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import moment from 'moment';
 import { FC, memo, useContext, useState } from 'react';
 import ChartFilterCondition, {

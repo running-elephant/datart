@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import PercentageStackColumnChart from '../PercentageStackColumnChart';
 
 describe('<PercentageStackColumnChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<PercentageStackColumnChart />);
+    component = new PercentageStackColumnChart();
   });
   test('It should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

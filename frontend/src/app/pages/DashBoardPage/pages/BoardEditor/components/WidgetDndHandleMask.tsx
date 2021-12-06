@@ -16,7 +16,10 @@
  * limitations under the License.
  */
 import { CONTAINER_TAB } from 'app/pages/DashBoardPage/constants';
-import { ContainerItem, WidgetType } from 'app/pages/DashBoardPage/slice/types';
+import {
+  ContainerItem,
+  WidgetType,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo } from 'react';
 import { useDrag } from 'react-dnd';
 import { useDispatch } from 'react-redux';

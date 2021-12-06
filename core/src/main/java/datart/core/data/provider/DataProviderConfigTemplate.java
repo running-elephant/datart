@@ -36,6 +36,8 @@ public class DataProviderConfigTemplate implements Serializable {
 
         private String name;
 
+        private String displayName;
+
         private boolean required;
 
         private boolean encrypt;
@@ -51,7 +53,6 @@ public class DataProviderConfigTemplate implements Serializable {
         private List<Object> options;
 
         private Object children;
-
 
     }
 

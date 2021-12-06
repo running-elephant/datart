@@ -16,15 +16,15 @@
  * limitations under the License.
  */
 
-import { Tooltip } from 'antd';
+import { Popconfirm, Tooltip } from 'antd';
 import { IW } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import { ChartDataSectionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
-import ChartMetadata from 'app/pages/ChartWorkbenchPage/models/ChartMetadata';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import { transferChartDataConfig } from 'app/utils/internalChartHelper';
 import classnames from 'classnames';
-import { FC, memo, useCallback, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
@@ -33,16 +33,30 @@ import {
   SPACE_TIMES,
   SPACE_XS,
 } from 'styles/StyleConstants';
+import { CloneValueDeep } from 'utils/object';
 
 const ChartGraphPanel: FC<{
   chart?: Chart;
+  chartConfig?: ChartConfig;
   onChartChange: (c: Chart) => void;
-}> = memo(({ chart, onChartChange }) => {
+}> = memo(({ chart, chartConfig, onChartChange }) => {
   const t = useI18NPrefix(`viz.palette.graph`);
   const chartManager = ChartManager.instance();
-  const [allCharts] = useState<ChartMetadata[]>(
-    chartManager.getAllChartMetas(),
-  );
+  const [allCharts] = useState<Chart[]>(chartManager.getAllCharts());
+  const [requirementsStates, setRequirementStates] = useState<object>({});
+
+  useEffect(() => {
+    const dict = allCharts?.reduce((acc, cur) => {
+      const transferedChartConfig = transferChartDataConfig(
+        CloneValueDeep(cur?.config),
+        chartConfig,
+      ) as ChartConfig;
+      const isMatch = cur?.isMatchRequirement(transferedChartConfig);
+      acc[cur.meta.id] = isMatch;
+      return acc;
+    }, {});
+    setRequirementStates(dict);
+  }, [allCharts, chartConfig]);
 
   const handleChartChange = useCallback(
     chartId => () => {
@@ -59,15 +73,21 @@ const ChartGraphPanel: FC<{
       return [ChartDataSectionType.GROUP, ChartDataSectionType.AGGREGATE].map(
         type => {
           const limit = requirement[type.toLocaleLowerCase()];
+          const getMaxValueStr = limit =>
+            !!limit && +limit >= 999 ? 'N' : limit;
+
           return (
             <li key={type + index}>
               {Number.isInteger(limit)
-                ? t('onlyAllow', undefined, { type: t(type), num: limit })
+                ? t('onlyAllow', undefined, {
+                    type: t(type),
+                    num: getMaxValueStr(limit),
+                  })
                 : Array.isArray(limit) && limit.length === 2
                 ? t('allowRange', undefined, {
                     type: t(type),
                     start: limit?.[0],
-                    end: limit?.[1],
+                    end: getMaxValueStr(limit?.[1]),
                   })
                 : null}
             </li>
@@ -78,32 +98,54 @@ const ChartGraphPanel: FC<{
     return <ul>{lintMessages}</ul>;
   };
 
-  return (
-    <StyledChartGraphPanel>
-      {allCharts.map(meta => (
+  const renderCharts = () => {
+    const _getChartIcon = (c, onChange?) => {
+      return (
         <Tooltip
-          key={meta?.id}
+          key={c?.meta?.id}
           title={
             <>
-              {meta?.name}
-              {renderChartRequirments(meta?.requirements)}
+              {c?.meta?.name}
+              {renderChartRequirments(c?.meta?.requirements)}
             </>
           }
         >
           <IconWrapper>
-            <ChartIcon
+            <StyledChartIcon
+              isMatchRequirement={!!requirementsStates?.[c?.meta?.id]}
               fontSize={FONT_SIZE_ICON_MD}
               size={SPACE_TIMES(9)}
-              className={classnames({ active: meta?.id === chart?.meta?.id })}
-              onClick={handleChartChange(meta?.id)}
+              className={classnames({
+                active: c?.meta?.id === chart?.meta?.id,
+              })}
+              onClick={onChange}
             >
-              <i className={meta?.icon} />
-            </ChartIcon>
+              <i className={c?.meta?.icon} />
+            </StyledChartIcon>
           </IconWrapper>
         </Tooltip>
-      ))}
-    </StyledChartGraphPanel>
-  );
+      );
+    };
+
+    return allCharts.map(c => {
+      if (c?.meta?.id !== 'mingxi-table') {
+        return _getChartIcon(c, handleChartChange(c?.meta?.id));
+      }
+
+      return (
+        <Popconfirm
+          title={t('confirm', undefined, { name: c.meta?.name })}
+          onConfirm={handleChartChange(c?.meta?.id)}
+          okText={t('ok')}
+          cancelText={t('cancel')}
+        >
+          {_getChartIcon(c)}
+        </Popconfirm>
+      );
+    });
+  };
+
+  return <StyledChartGraphPanel>{renderCharts()}</StyledChartGraphPanel>;
 });
 
 export default ChartGraphPanel;
@@ -122,9 +164,10 @@ const IconWrapper = styled.span`
   padding: ${SPACE_TIMES(0.5)};
 `;
 
-const ChartIcon = styled(IW)`
+const StyledChartIcon = styled(IW)<{ isMatchRequirement?: boolean }>`
   cursor: pointer;
   border-radius: ${BORDER_RADIUS};
+  opacity: ${p => (p.isMatchRequirement ? 1 : 0.4)};
 
   &:hover,
   &.active {

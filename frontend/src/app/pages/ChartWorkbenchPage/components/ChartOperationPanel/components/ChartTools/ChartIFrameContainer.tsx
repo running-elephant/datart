@@ -17,10 +17,11 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import React from 'react';
 import Frame, { FrameContextConsumer } from 'react-frame-component';
 import styled, { StyleSheetManager } from 'styled-components/macro';
+import { isEmpty } from 'utils/object';
 import ChartLifecycleAdapter from './ChartLifecycleAdapter';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 const antdStyles = require('!!css-loader!antd/dist/antd.min.css');
@@ -34,6 +35,16 @@ const ChartIFrameContainer: React.FC<{
 }> = props => {
   // Note: manually add table css style in iframe
   const isTable = props.chart?.isISOContainer === 'react-table';
+
+  const transformToSafeCSSProps = style => {
+    if (isNaN(style?.width) || isEmpty(style?.width)) {
+      style.width = 0;
+    }
+    if (isNaN(style?.height) || isEmpty(style?.height)) {
+      style.height = 0;
+    }
+    return style;
+  };
 
   return (
     <Frame
@@ -49,6 +60,7 @@ const ChartIFrameContainer: React.FC<{
               height: 100%;
               background-color: transparent !important;
               margin: 0;
+              overflow:${isTable ? 'visible' : 'hidden'};
             }
            `}
           </style>
@@ -64,7 +76,7 @@ const ChartIFrameContainer: React.FC<{
                 dataset={props.dataset}
                 chart={props.chart}
                 config={props.config}
-                style={props.style}
+                style={transformToSafeCSSProps(props?.style)}
               />
             </StyledChartLifecycleAdapter>
           </StyleSheetManager>

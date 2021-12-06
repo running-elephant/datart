@@ -16,65 +16,20 @@
  * limitations under the License.
  */
 
-import { isEmpty } from 'utils/object';
-import ChartConfig, {
-  ChartDataSectionType,
+import {
+  ChartConfig,
+  ChartDataSectionConfig,
   ChartStyleSectionConfig,
-} from './ChartConfig';
-import ChartDataset from './ChartDataset';
+} from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
+import ChartMetadata from 'app/types/ChartMetadata';
+import DatartChartBase, {
+  ChartMouseEvent,
+  ChartStatus,
+} from 'app/types/DatartChartBase';
+import { isInRange } from 'app/utils/chartHelper';
+import { isEmpty } from 'utils/object';
 import ChartEventBroker from './ChartEventBroker';
-import ChartMetadata from './ChartMetadata';
-import DatartChartBase from './DatartChartBase';
-
-export type ChartStatus =
-  | 'init'
-  | 'depsLoaded'
-  | 'ready'
-  | 'mounting'
-  | 'updating'
-  | 'unmounting'
-  | 'error';
-
-export interface ChartMouseEvent {
-  name:
-    | 'click'
-    | 'dblclick'
-    | 'mousedown'
-    | 'mousemove'
-    | 'mouseup'
-    | 'mouseover'
-    | 'mouseout'
-    | 'globalout'
-    | 'contextmenu';
-  callback: (params?: ChartMouseEventParams) => void;
-}
-
-// Note: `EventParams` type from echarts definition.
-export interface ChartMouseEventParams {
-  // 当前点击的图形元素所属的组件名称，
-  // 其值如 'series'、'markLine'、'markPoint'、'timeLine' 等。
-  componentType?: string;
-  // 系列类型。值可能为：'line'、'bar'、'pie' 等。当 componentType 为 'series' 时有意义。
-  seriesType?: string;
-  // 系列在传入的 option.series 中的 index。当 componentType 为 'series' 时有意义。
-  seriesIndex?: number;
-  // 系列名称。当 componentType 为 'series' 时有意义。
-  seriesName?: string;
-  // 数据名，类目名
-  name?: string;
-  // 数据在传入的 data 数组中的 index
-  dataIndex?: number;
-  // 传入的原始数据项
-  data?: Object;
-  // sankey、graph 等图表同时含有 nodeData 和 edgeData 两种 data，
-  // dataType 的值会是 'node' 或者 'edge'，表示当前点击在 node 还是 edge 上。
-  // 其他大部分图表中只有一种 data，dataType 无意义。
-  dataType?: string;
-  // 传入的数据值
-  value?: number | string | [];
-  // 数据图形的颜色。当 componentType 为 'series' 时有意义。
-  color?: string;
-}
 
 class Chart extends DatartChartBase {
   meta: ChartMetadata;
@@ -120,11 +75,14 @@ class Chart extends DatartChartBase {
     this._mouseEvents = events;
   }
 
-  public isMatchRequirement(config) {
-    if (!config || !this.meta?.requirements) {
+  public isMatchRequirement(targetConfig?: ChartConfig): boolean {
+    if (!targetConfig) {
       return true;
     }
-    return this.isMatchRequirementImpl(config);
+    return this.isMatchRequiredSectionLimition(
+      this.config?.datas,
+      targetConfig?.datas,
+    );
   }
 
   public getStateHistory() {
@@ -136,48 +94,18 @@ class Chart extends DatartChartBase {
   }
 
   public onMount(options, context?): void {
-    throw new Error('Method not implemented.');
+    throw new Error(`${this.meta.name} - Method not implemented.`);
   }
 
   public onUpdated(options, context?): void {
-    throw new Error('Method not implemented.');
+    throw new Error(`${this.meta.name} - Method not implemented.`);
   }
 
   public onUnMount(options, context?): void {
-    throw new Error('Method not implemented.');
+    throw new Error(`${this.meta.name} - Method not implemented.`);
   }
 
   public onResize(options, context?): void {}
-
-  protected isMatchRequirementImpl(config: ChartConfig) {
-    const dataConfig = config.datas || [];
-    const groupConfigs = dataConfig
-      .filter(
-        c =>
-          c.type === ChartDataSectionType.GROUP ||
-          c.type === ChartDataSectionType.COLOR,
-      )
-      .filter(c => !!c.required)
-      .flatMap(config => config.rows || []);
-    const aggregateConfigs = dataConfig
-      .filter(
-        c =>
-          c.type === ChartDataSectionType.AGGREGATE ||
-          c.type === ChartDataSectionType.SIZE,
-      )
-      .filter(c => !!c.required)
-      .flatMap(config => config.rows || []);
-
-    const requirements = this.meta.requirements || [];
-    return requirements.some(r => {
-      const group = (r || {})[ChartDataSectionType.GROUP];
-      const aggregate = (r || {})[ChartDataSectionType.AGGREGATE];
-      return (
-        this.isInRange(group, groupConfigs.length) &&
-        this.isInRange(aggregate, aggregateConfigs.length)
-      );
-    });
-  }
 
   protected getStyleValue(
     styleConfigs: ChartStyleSectionConfig[],
@@ -188,20 +116,6 @@ class Chart extends DatartChartBase {
 
   protected getColNameByValueColName(series) {
     return series?.data?.valueColName || series.seriesName;
-  }
-
-  private isInRange(limit, count) {
-    if (isEmpty(limit)) {
-      return true;
-    }
-    if (Number.isInteger(limit)) {
-      return limit === count;
-    } else if (Array.isArray(limit) && limit.length === 1) {
-      return limit[0] === count;
-    } else if (Array.isArray(limit) && limit.length === 2) {
-      return limit[0] <= count && count <= limit[1];
-    }
-    return false;
   }
 
   private getValue(
@@ -222,6 +136,32 @@ class Chart extends DatartChartBase {
       return isEmpty(group) ? null : group[targetKey];
     }
     return this.getValue(group.rows, paths, targetKey);
+  }
+
+  private isMatchRequiredSectionLimition(
+    current?: ChartDataSectionConfig[],
+    target?: ChartDataSectionConfig[],
+  ) {
+    return (current || [])
+      .filter(cc => Boolean(cc?.required))
+      .every(cc => {
+        // The typed chart config section relation matching logic:
+        // 1. If section type exactly 1:1 match, use it
+        // 2. Else If, section type and key exactly 1:1 match, use it
+        // 3. Else, current section will match all target typed sections
+        const tc = target?.filter(tc => tc.type === cc.type) || [];
+        if (tc?.length > 1) {
+          const subTc = tc?.find(stc => stc.key === cc.key);
+          if (!subTc) {
+            const subTcTotalLength = tc
+              .flatMap(tc => tc.rows)
+              ?.filter(Boolean)?.length;
+            return isInRange(cc?.limit, subTcTotalLength);
+          }
+          return isInRange(cc?.limit, subTc?.rows?.length);
+        }
+        return isInRange(cc?.limit, tc?.[0]?.rows?.length);
+      });
   }
 }
 

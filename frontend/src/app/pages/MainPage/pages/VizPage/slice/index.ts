@@ -1,9 +1,9 @@
 import { createSlice, isRejected, PayloadAction } from '@reduxjs/toolkit';
-import { ChartDataSectionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartDataSectionType } from 'app/types/ChartConfig';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { CloneValueDeep } from 'utils/object';
-import { errorHandle } from 'utils/utils';
+import { reduxActionErrorHandler } from 'utils/utils';
 import { v4 as uuidv4 } from 'uuid';
 import {
   addStoryboard,
@@ -51,9 +51,11 @@ const slice = createSlice({
   initialState,
   reducers: {
     addTab(state, action: PayloadAction<VizTab>) {
-      const tab = state.tabs.find(t => t.id === action.payload.id);
-      if (!tab) {
+      const index = state.tabs.findIndex(t => t.id === action.payload.id);
+      if (index === -1) {
         state.tabs.push(action.payload);
+      } else if (state.tabs[index].search !== action.payload.search) {
+        state.tabs[index] = action.payload;
       }
       state.selectedTab = action.payload.id;
     },
@@ -523,23 +525,22 @@ const slice = createSlice({
         };
       },
     );
-    builder
-      .addCase(updateFilterAndFetchDataset.fulfilled, (state, action) => {
-        const index = state.chartPreviews?.findIndex(
-          c => c.backendChartId === action.payload?.backendChartId,
-        );
-        if (index < 0) {
-          return;
-        }
-        state.chartPreviews[index] = {
-          ...state.chartPreviews[index],
-          version: uuidv4(),
-        };
-      });
+    builder.addCase(updateFilterAndFetchDataset.fulfilled, (state, action) => {
+      const index = state.chartPreviews?.findIndex(
+        c => c.backendChartId === action.payload?.backendChartId,
+      );
+      if (index < 0) {
+        return;
+      }
+      state.chartPreviews[index] = {
+        ...state.chartPreviews[index],
+        version: uuidv4(),
+      };
+    });
 
     builder.addMatcher(isRejected, (_, action) => {
       if (isMySliceAction(action, slice.name)) {
-        errorHandle(action?.error);
+        reduxActionErrorHandler(action);
       }
     });
   },

@@ -21,6 +21,7 @@ import BasicAreaChart from './BasicAreaChart';
 import BasicBarChart from './BasicBarChart';
 import BasicDoubleYChart from './BasicDoubleYChart';
 import BasicFunnelChart from './BasicFunnelChart';
+import BasicGaugeChart from './BasicGaugeChart';
 import BasicLineChart from './BasicLineChart';
 import BasicOutlineMapChart from './BasicOutlineMapChart';
 import BasicPieChart from './BasicPieChart';
@@ -42,6 +43,7 @@ import ScoreChart from './ScoreChart';
 import StackAreaChart from './StackAreaChart';
 import StackBarChart from './StackBarChart';
 import StackColumnChart from './StackColumnChart';
+import WaterfallChart from './WaterfallChart';
 import WordCloudChart from './WordCloudChart';
 
 const WidgetPlugins = {
@@ -72,5 +74,7 @@ const WidgetPlugins = {
   WordCloudChart,
   NormalOutlineMapChart,
   ScatterOutlineMapChart,
+  WaterfallChart,
+  BasicGaugeChart,
 };
 export default WidgetPlugins;

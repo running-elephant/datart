@@ -24,16 +24,17 @@ import {
 import { Tabs } from 'antd';
 import { PaneWrapper } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
+import ChartPaletteContext from 'app/pages/ChartWorkbenchPage/contexts/ChartPaletteContext';
 import {
   ChartConfigPayloadType,
   ChartConfigReducerActionType,
-} from 'app/pages/ChartWorkbenchPage';
-import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
-import ChartPaletteContext from 'app/pages/ChartWorkbenchPage/contexts/ChartPaletteContext';
-import ChartConfig, {
+} from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import {
+  ChartConfig,
   ChartDataSectionConfig,
   ChartStyleSectionConfig,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import { FC, memo, useCallback, useState } from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -41,6 +42,7 @@ import {
   FONT_WEIGHT_MEDIUM,
   SPACE_MD,
 } from 'styles/StyleConstants';
+import { isEmptyArray } from 'utils/object';
 import ChartDataConfigPanel from './ChartDataConfigPanel';
 import ChartSettingConfigPanel from './ChartSettingConfigPanel';
 import ChartStyleConfigPanel from './ChartStyleConfigPanel';
@@ -105,33 +107,39 @@ const ChartConfigPanel: FC<{
                 className="tabs"
                 onChange={tabChange}
               >
-                <TabPane
-                  tab={
-                    <span>
-                      <DatabaseOutlined />
-                      {t('title.content')}
-                    </span>
-                  }
-                  key="data"
-                />
-                <TabPane
-                  tab={
-                    <span>
-                      <DashboardOutlined />
-                      {t('title.design')}
-                    </span>
-                  }
-                  key="style"
-                />
-                <TabPane
-                  tab={
-                    <span>
-                      <SettingOutlined />
-                      {t('title.setting')}
-                    </span>
-                  }
-                  key="setting"
-                />
+                {!isEmptyArray(chartConfig?.datas) && (
+                  <TabPane
+                    tab={
+                      <span>
+                        <DatabaseOutlined />
+                        {t('title.content')}
+                      </span>
+                    }
+                    key="data"
+                  />
+                )}
+                {!isEmptyArray(chartConfig?.styles) && (
+                  <TabPane
+                    tab={
+                      <span>
+                        <DashboardOutlined />
+                        {t('title.design')}
+                      </span>
+                    }
+                    key="style"
+                  />
+                )}
+                {!isEmptyArray(chartConfig?.settings) && (
+                  <TabPane
+                    tab={
+                      <span>
+                        <SettingOutlined />
+                        {t('title.setting')}
+                      </span>
+                    }
+                    key="setting"
+                  />
+                )}
               </Tabs>
               <Pane selected={tabActiveKey === 'data'}>
                 <ChartDataConfigPanel

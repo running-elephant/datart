@@ -19,20 +19,23 @@ package datart.data.provider;
 
 import datart.core.base.PageInfo;
 import datart.core.base.consts.ValueType;
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.*;
 import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.SqlParserUtils;
 import datart.data.provider.local.LocalDB;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
+@Slf4j
 public abstract class DefaultDataProvider extends DataProvider {
 
     public static final String TEST_DATA_SIZE = "size";
@@ -51,16 +54,13 @@ public abstract class DefaultDataProvider extends DataProvider {
 
     @Override
     public Object test(DataProviderSource source) throws Exception {
-
         PageInfo pageInfo = PageInfo.builder()
+                .pageNo(1)
                 .pageSize(Integer.parseInt(source.getProperties().getOrDefault(TEST_DATA_SIZE, "100").toString()))
+                .countTotal(false)
                 .build();
-
-        ExecuteParam executeParam = ExecuteParam.builder()
-                .pageInfo(pageInfo)
-                .cacheEnable(false)
-                .build();
-
+        ExecuteParam executeParam = ExecuteParam.empty();
+        executeParam.setPageInfo(pageInfo);
         return execute(source, null, executeParam);
     }
 
@@ -112,31 +112,82 @@ public abstract class DefaultDataProvider extends DataProvider {
 
     @Override
     public Dataframe execute(DataProviderSource config, QueryScript queryScript, ExecuteParam executeParam) throws Exception {
-        Dataframe dataframe;
 
-        if (queryScript != null) {
-            String queryKey = queryScript.toQueryKey();
-
-            if (executeParam.isCacheEnable()) {
-                dataframe = LocalDB.queryFromLocal(queryKey, executeParam);
-                if (dataframe != null) return dataframe;
-            }
+        List<Dataframe> fullData = null;
+        if (!cacheExists(config)) {
+            fullData = loadFullDataFromSource(config);
         }
-        List<Dataframe> fullData = loadFullDataFromSource(config);
-        return LocalDB.executeLocalQuery(queryScript, executeParam, executeParam.isCacheEnable(), fullData);
+
+        boolean persistent = isCacheEnabled(config);
+        Date expire = null;
+        if (persistent) {
+            expire = getExpireTime(config);
+        }
+
+        // 如果自定义了schema,执行分两部完成。1、执行view sql，取得中间结果。2、使用中间结果，修改schema，加入执行参数，完成执行。
+        if (queryScript != null && !CollectionUtils.isEmpty(queryScript.getSchema())) {
+            Dataframe temp = LocalDB.executeLocalQuery(queryScript, ExecuteParam.empty(), fullData, persistent, expire);
+            for (Column column : temp.getColumns()) {
+                column.setType(queryScript.getSchema().getOrDefault(column.getName(), column).getType());
+            }
+            temp.setRows(parseValues(temp.getRows(), temp.getColumns()));
+            temp.setName(queryScript.toQueryKey());
+            fullData = Collections.singletonList(temp);
+            queryScript = null;
+            persistent = false;
+        }
+        return LocalDB.executeLocalQuery(queryScript, executeParam, fullData, persistent, expire);
+    }
+
+    protected List<Column> parseColumns(Map<String, Object> schema) {
+        List<Column> columns = null;
+        try {
+            List<Map<String, String>> columnConfig = (List<Map<String, String>>) schema.get(COLUMNS);
+            if (!CollectionUtils.isEmpty(columnConfig)) {
+                columns = columnConfig
+                        .stream()
+                        .map(c -> new Column(c.get(COLUMN_NAME), ValueType.valueOf(c.get(COLUMN_TYPE))))
+                        .collect(Collectors.toList());
+            }
+        } catch (ClassCastException ignored) {
+        }
+        return columns;
     }
 
     public abstract List<Dataframe> loadFullDataFromSource(DataProviderSource config) throws Exception;
+
+    /**
+     * 检查该数据源缓存中数据是否存在
+     */
+    public boolean cacheExists(DataProviderSource config) throws SQLException {
+        Object cacheEnable = config.getProperties().get("cacheEnable");
+        if (cacheEnable == null) {
+            return false;
+        }
+        if (!Boolean.parseBoolean(cacheEnable.toString())) {
+            return false;
+        }
+        return !LocalDB.checkCacheExpired(config.getSourceId());
+    }
 
     @Override
     public boolean validateFunction(DataProviderSource source, String snippet) {
         try {
             SqlParserUtils.parseSnippet(snippet);
         } catch (Exception e) {
-            throw new DataProviderException(e);
+            Exceptions.e(e);
         }
 
         return true;
+    }
+
+    @Override
+    public void resetSource(DataProviderSource source) {
+        try {
+            LocalDB.clearCache(source.getSourceId());
+        } catch (Exception e) {
+            log.error("reset datasource error ", e);
+        }
     }
 
     protected List<List<Object>> parseValues(List<List<Object>> values, List<Column> columns) {
@@ -144,7 +195,7 @@ public abstract class DefaultDataProvider extends DataProvider {
             return values;
         }
         if (values.get(0).size() != columns.size()) {
-            throw new RuntimeException("schema has different columns with data");
+            Exceptions.msg( "message.provider.default.schema", values.get(0).size() + ":" + columns.size());
         }
         values.parallelStream().forEach(vals -> {
             for (int i = 0; i < vals.size(); i++) {
@@ -158,7 +209,16 @@ public abstract class DefaultDataProvider extends DataProvider {
                         val = val.toString();
                         break;
                     case NUMERIC:
-                        val = Double.parseDouble(val.toString());
+                        if (val instanceof Number) {
+                            break;
+                        }
+                        if (StringUtils.isBlank(val.toString())) {
+                            val = null;
+                        } else if (NumberUtils.isDigits(val.toString())) {
+                            val = Long.parseLong(val.toString());
+                        } else {
+                            val = Double.parseDouble(val.toString());
+                        }
                         break;
                     default:
                 }
@@ -177,6 +237,24 @@ public abstract class DefaultDataProvider extends DataProvider {
         if (isHeader) {
             values.remove(0);
         }
+    }
+
+    protected boolean isCacheEnabled(DataProviderSource config) {
+        try {
+            return (boolean) config.getProperties().getOrDefault("cacheEnable", false);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    protected Date getExpireTime(DataProviderSource config) {
+        Object cacheTimeout = config.getProperties().get("cacheTimeout");
+        if (cacheTimeout == null) {
+            Exceptions.msg("cache timeout can not be empty");
+        }
+        Calendar instance = Calendar.getInstance();
+        instance.add(Calendar.MINUTE, Integer.parseInt(cacheTimeout.toString()));
+        return instance.getTime();
     }
 
 }

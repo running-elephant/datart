@@ -9,4 +9,6 @@ public interface StorypageService extends BaseCRUDService<Storypage, StorypageMa
 
     List<Storypage> listByStoryboard(String storyboardId);
 
+    boolean deleteByStoryboard(String storyboardId);
+
 }

@@ -17,18 +17,21 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig, {
+import {
+  ChartConfig,
   ChartDataSectionField,
   ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+} from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import {
   getColumnRenderName,
+  getExtraSeriesDataFormat,
+  getExtraSeriesRowData,
   getSeriesTooltips4Scatter,
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
 import { isEmpty } from 'lodash';
@@ -42,11 +45,7 @@ class BasicFunnelChart extends Chart {
     super('funnel-chart', '漏斗图', 'fsux_tubiao_loudoutu');
     this.meta.requirements = [
       {
-        group: [1, 999],
-        aggregate: 1,
-      },
-      {
-        group: 0,
+        group: [0, 1],
         aggregate: [1, 999],
       },
     ];
@@ -96,9 +95,6 @@ class BasicFunnelChart extends Chart {
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
-    const colorConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.COLOR)
-      .flatMap(config => config.rows || []);
     const infoConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
@@ -108,12 +104,11 @@ class BasicFunnelChart extends Chart {
       dataset.columns,
     );
 
-    const seriesColumn = this.getSeriesColumnStyle(
+    const series = this.getSeries(
       styleConfigs,
       aggregateConfigs,
       groupConfigs,
       objDataColumns,
-      colorConfigs,
       infoConfigs,
     );
 
@@ -122,19 +117,19 @@ class BasicFunnelChart extends Chart {
         groupConfigs,
         aggregateConfigs,
         infoConfigs,
-        colorConfigs,
       ),
-      legend: this.getLegendStyle(
-        styleConfigs,
-        seriesColumn.data.map(d => d.name),
-      ),
-      series: [seriesColumn],
+      legend: this.getLegendStyle(styleConfigs),
+      series,
     };
   }
 
-  private getDataItemStyle(colorConfigs: ChartDataSectionField[], dataColumn) {
+  private getDataItemStyle(
+    config,
+    colorConfigs: ChartDataSectionField[],
+    dataColumn,
+  ) {
     const colorColName = colorConfigs?.[0]?.colName;
-
+    const columnColor = config?.color?.start;
     if (colorColName) {
       const colorKey = dataColumn[colorColName];
       const itemStyleColor = colorConfigs[0]?.color?.colors?.find(
@@ -143,6 +138,10 @@ class BasicFunnelChart extends Chart {
 
       return {
         color: itemStyleColor?.value,
+      };
+    } else if (columnColor) {
+      return {
+        color: columnColor,
       };
     }
   }
@@ -161,7 +160,6 @@ class BasicFunnelChart extends Chart {
     const position = getStyleValueByGroup(styles, 'label', 'position');
     const font = getStyleValueByGroup(styles, 'label', 'font');
     const metric = getStyleValueByGroup(styles, 'label', 'metric');
-    const deminsion = getStyleValueByGroup(styles, 'label', 'deminsion');
     const conversion = getStyleValueByGroup(styles, 'label', 'conversion');
     const arrival = getStyleValueByGroup(styles, 'label', 'arrival');
     const percentage = getStyleValueByGroup(styles, 'label', 'percentage');
@@ -174,7 +172,7 @@ class BasicFunnelChart extends Chart {
         const { name, value, percent, data } = params;
         const formattedValue = toFormattedValue(value?.[0], data.format);
         const labels: string[] = [];
-        if (deminsion) {
+        if (metric) {
           labels.push(`${name}: ${formattedValue}`);
         }
         if (conversion && !isEmpty(data.conversion)) {
@@ -192,7 +190,7 @@ class BasicFunnelChart extends Chart {
     };
   }
 
-  getLegendStyle(styles, datas: string[]) {
+  getLegendStyle(styles, datas: string[] = []) {
     const show = getStyleValueByGroup(styles, 'legend', 'showLegend');
     const type = getStyleValueByGroup(styles, 'legend', 'type');
     const font = getStyleValueByGroup(styles, 'legend', 'font');
@@ -224,17 +222,15 @@ class BasicFunnelChart extends Chart {
       show,
       type,
       orient,
-      data: datas,
       textStyle: font,
     };
   }
 
-  getSeriesColumnStyle(
+  getSeries(
     styles,
     aggregateConfigs: ChartDataSectionField[],
     groupConfigs: ChartDataSectionField[],
     objDataColumns,
-    colorConfigs,
     infoConfigs,
   ) {
     const selectAll = getStyleValueByGroup(styles, 'legend', 'selectAll');
@@ -242,42 +238,63 @@ class BasicFunnelChart extends Chart {
     const funnelAlign = getStyleValueByGroup(styles || [], 'funnel', 'align');
     const gap = getStyleValueByGroup(styles || [], 'funnel', 'gap') || 0;
 
-    let normalizeSerieDatas: any[] = [];
-    if (!groupConfigs.concat(colorConfigs).length) {
-      normalizeSerieDatas = aggregateConfigs.map(aggConfig => {
+    if (!groupConfigs.length) {
+      const dc = objDataColumns?.[0];
+      const datas = aggregateConfigs.map(aggConfig => {
         return {
           ...aggConfig,
           select: selectAll,
           value: aggregateConfigs
             .concat(infoConfigs)
-            .map(config => objDataColumns?.[0]?.[getValueByColumnKey(config)]),
+            .map(config => dc?.[getValueByColumnKey(config)]),
           name: getColumnRenderName(aggConfig),
-          itemStyle: {
-            color: aggConfig?.color?.start,
-          },
+          itemStyle: this.getDataItemStyle(aggConfig, groupConfigs, dc),
+          ...getExtraSeriesRowData(dc),
+          ...getExtraSeriesDataFormat(aggConfig?.format),
         };
       });
-    } else if (aggregateConfigs.length === 1) {
-      const aggConfig = aggregateConfigs[0];
-      normalizeSerieDatas = objDataColumns.map(dataColumn => {
+      return {
+        ...this.getGrid(styles),
+        type: 'funnel',
+        funnelAlign,
+        sort,
+        gap,
+        labelLine: {
+          length: 10,
+          lineStyle: {
+            width: 1,
+            type: 'solid',
+          },
+        },
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)',
+        },
+        label: this.getLabelStyle(styles),
+        data: this.getFunnelSeriesData(datas),
+      };
+    }
+
+    const flattenedDatas = aggregateConfigs.flatMap(aggConfig => {
+      const ormalizeSerieDatas = objDataColumns.map(dc => {
         return {
           ...aggConfig,
           select: selectAll,
           value: aggregateConfigs
             .concat(infoConfigs)
-            .map(config => dataColumn?.[getValueByColumnKey(config)]),
+            .map(config => dc?.[getValueByColumnKey(config)]),
           name: groupConfigs
-            .concat(colorConfigs)
             .map(config => config.colName)
-            .map(name => dataColumn[name])
+            .map(name => dc[name])
             .join('-'),
-          itemStyle: {
-            ...this.getDataItemStyle(colorConfigs, dataColumn),
-            color: aggConfig?.color?.start,
-          },
+          itemStyle: this.getDataItemStyle(aggConfig, groupConfigs, dc),
+          ...getExtraSeriesRowData(dc),
+          ...getExtraSeriesDataFormat(aggConfig?.format),
         };
       });
-    }
+      return ormalizeSerieDatas;
+    });
 
     const series = {
       ...this.getGrid(styles),
@@ -298,7 +315,7 @@ class BasicFunnelChart extends Chart {
         shadowColor: 'rgba(0, 0, 0, 0.5)',
       },
       label: this.getLabelStyle(styles),
-      data: this.getFunnelSeriesData(normalizeSerieDatas),
+      data: this.getFunnelSeriesData(flattenedDatas),
     };
     return series;
   }
@@ -326,22 +343,16 @@ class BasicFunnelChart extends Chart {
       : perStr;
   }
 
-  getFunnelChartTooltip(
-    groupConfigs,
-    aggregateConfigs,
-    infoConfigs,
-    colorConfigs,
-  ) {
+  getFunnelChartTooltip(groupConfigs, aggregateConfigs, infoConfigs) {
     return {
       trigger: 'item',
       formatter(params) {
-        const { percent, data } = params;
-        let tooltips: string[] = !!groupConfigs.concat(colorConfigs)?.length
+        const { data } = params;
+        let tooltips: string[] = !!groupConfigs?.length
           ? [
-              `${groupConfigs
-                .concat(colorConfigs)
-                ?.map(gc => getColumnRenderName(gc))
-                .join('-')}: ${params?.name}`,
+              `${groupConfigs?.map(gc => getColumnRenderName(gc)).join('-')}: ${
+                params?.name
+              }`,
             ]
           : [];
         const aggTooltips = getSeriesTooltips4Scatter(

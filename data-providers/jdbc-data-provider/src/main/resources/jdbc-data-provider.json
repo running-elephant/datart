@@ -27,12 +27,11 @@
     {
       "name": "user",
       "type": "string",
-      "required": true,
-      "defaultValue": "root"
+      "required": false
     },
     {
       "name": "password",
-      "required": true,
+      "required": false,
       "encrypt": true,
       "defaultValue": "",
       "type": "password"
@@ -45,16 +44,16 @@
     {
       "name": "serverAggregate",
       "type": "bool",
-      "required": true,
+      "required": false,
       "defaultValue": false,
-      "description": "enable server aggregate"
+      "description": "是否开启服务端聚合"
     },
     {
       "name": "properties",
       "type": "object",
       "required": false,
       "defaultValue": "",
-      "description": "connection params"
+      "description": "Druid连接池其它配置参数"
     }
   ]
 }

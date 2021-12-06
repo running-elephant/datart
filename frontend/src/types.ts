@@ -1,6 +1,6 @@
 import { WorkbenchState } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
-import { BoardState } from 'app/pages/DashBoardPage/slice/types';
 import { MemberState } from 'app/pages/MainPage/pages/MemberPage/slice/types';
 import { PermissionState } from 'app/pages/MainPage/pages/PermissionPage/slice/types';
 import { ScheduleState } from 'app/pages/MainPage/pages/SchedulePage/slice/types';
@@ -39,6 +39,20 @@ export interface APIResponse<T> {
   data: T;
 }
 
-type Nullable<T> = T | null;
+// dinero.js
+export declare type Currency<TAmount> = {
+  /**
+   * The unique code of the currency.
+   */
+  readonly code: string;
+  /**
+   * The base, or radix of the currency.
+   */
+  readonly base: TAmount;
+  /**
+   * The exponent of the currency.
+   */
+  readonly exponent: TAmount;
+};
 
 export type ValueOf<T> = T[keyof T];

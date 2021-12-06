@@ -1,10 +1,10 @@
 package datart.server.service;
 
 import datart.core.base.consts.Const;
+import datart.core.base.exception.Exceptions;
 import datart.core.entity.BaseEntity;
 import datart.core.mappers.ext.CRUDMapper;
 import datart.security.manager.DatartSecurityManager;
-import datart.server.base.exception.ServerException;
 import datart.server.base.params.BaseCreateParam;
 import datart.server.base.params.VizCreateParam;
 import org.springframework.beans.BeanUtils;
@@ -40,8 +40,9 @@ public interface VizCRUDService<E extends BaseEntity, M extends CRUDMapper> exte
             Method listArchived = mapper.getClass().getDeclaredMethod("listArchived", String.class);
             return (List<E>) listArchived.invoke(mapper, orgId);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            throw new ServerException(String.format("Object %s has no property listArchived", getEntityClz().getSimpleName()));
+            Exceptions.msg(String.format("Object %s has no property listArchived", getEntityClz().getSimpleName()));
         }
+        return null;
     }
 
     default boolean updateStatus(String id, byte status) {

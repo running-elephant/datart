@@ -20,7 +20,7 @@ import {
   FilterCondition,
   FilterConditionType,
   FilterRelationType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+} from 'app/types/ChartConfig';
 import { FilterSqlOperator } from 'globalConstants';
 
 class ChartFilterCondition implements FilterCondition {

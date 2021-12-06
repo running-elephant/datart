@@ -1,14 +1,15 @@
 import { combineReducers, PayloadAction } from '@reduxjs/toolkit';
+import { ChartEditorProps } from 'app/components/ChartEditor';
 import { BOARD_UNDO } from 'app/pages/DashBoardPage/constants';
-import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import {
   BoardInfo,
   BoardLinkFilter,
   JumpPanel,
   WidgetData,
   WidgetInfo,
-  WidgetPanel,
-} from 'app/pages/DashBoardPage/slice/types';
+  WidgetPanelParams,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import { getInitBoardInfo } from 'app/pages/DashBoardPage/utils/board';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { Layout } from 'react-grid-layout';
@@ -16,7 +17,7 @@ import { Layout } from 'react-grid-layout';
 import undoable, { includeAction } from 'redux-undo';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
-import { ChartEditorProps } from '../components/ChartEditor';
+import { WidgetControllerPanelParams } from './../../Board/slice/types';
 import { editBoardStackSlice } from './childSlice/stackSlice';
 import {
   getEditBoardDetail,
@@ -30,10 +31,18 @@ import {
 
 const editDashBoardInfoSlice = createSlice({
   name: 'editBoard',
-  initialState: getInitBoardInfo('default') as EditBoardState['boardInfo'],
+  initialState: getInitBoardInfo({
+    id: 'default',
+  }) as EditBoardState['boardInfo'],
   reducers: {
     initEditBoardInfo(state, action: PayloadAction<BoardInfo>) {
       const boardInfo = action.payload;
+      Object.keys(boardInfo).forEach(key => {
+        state[key] = boardInfo[key];
+      });
+    },
+    clearEditBoardInfo(state) {
+      const boardInfo = getInitBoardInfo({ id: 'default' });
       Object.keys(boardInfo).forEach(key => {
         state[key] = boardInfo[key];
       });
@@ -47,10 +56,13 @@ const editDashBoardInfoSlice = createSlice({
     changeFullScreenItem(state, action: PayloadAction<string>) {
       state.fullScreenItemId = action.payload;
     },
-    changeFilterPanel(state, action: PayloadAction<WidgetPanel>) {
-      state.filterPanel = action.payload;
+    changeControllerPanel(
+      state,
+      action: PayloadAction<WidgetControllerPanelParams>,
+    ) {
+      state.controllerPanel = action.payload;
     },
-    changeLinkagePanel(state, action: PayloadAction<WidgetPanel>) {
+    changeLinkagePanel(state, action: PayloadAction<WidgetPanelParams>) {
       state.linkagePanel = action.payload;
     },
     changeJumpPanel(state, action: PayloadAction<JumpPanel>) {
@@ -190,10 +202,10 @@ const widgetInfoRecordSlice = createSlice({
       }
     },
     addWidgetInfos(state, action: PayloadAction<Record<string, WidgetInfo>>) {
-      const widgetInfoRecord = action.payload;
-      const widgetIds = Object.keys(widgetInfoRecord);
+      const widgetInfoMap = action.payload;
+      const widgetIds = Object.keys(widgetInfoMap);
       widgetIds.forEach(id => {
-        state[id] = widgetInfoRecord[id];
+        state[id] = widgetInfoMap[id];
       });
     },
     clearWidgetInfo(state) {
@@ -278,6 +290,9 @@ const filterActions = [
   editBoardStackActions.tabsWidgetRemoveTab,
   editBoardStackActions.updateWidgetConfig,
   editBoardStackActions.updateWidgetsConfig,
+
+  editBoardStackActions.changeBoardHasQueryControl,
+  editBoardStackActions.changeBoardHasResetControl,
 ].map(ele => ele.toString());
 const editBoardStackReducer = undoable(editBoardStackSlice.reducer, {
   undoType: BOARD_UNDO.undo,

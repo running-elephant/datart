@@ -1,12 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import ChartDataView from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-import { boardActions } from 'app/pages/DashBoardPage/slice';
-import { fetchBoardDetail } from 'app/pages/DashBoardPage/slice/thunk';
+import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
+import { fetchBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thunk';
 import {
   BoardState,
   ContainerWidgetContent,
+  ControllerWidgetContent,
   DataChart,
-  FilterWidgetContent,
   getDataOption,
   SaveDashboard,
   ServerDatachart,
@@ -15,7 +14,7 @@ import {
   WidgetData,
   WidgetInfo,
   WidgetOfCopy,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getChartWidgetRequestParams } from 'app/pages/DashBoardPage/utils';
 import {
   getChartDataView,
@@ -31,6 +30,7 @@ import {
   createWidgetInfoMap,
   getWidgetInfoMapByServer,
 } from 'app/pages/DashBoardPage/utils/widget';
+import ChartDataView from 'app/types/ChartDataView';
 import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
 import { CloneValueDeep } from 'utils/object';
@@ -43,9 +43,8 @@ import {
   editWidgetDataActions,
   editWidgetInfoActions,
 } from '.';
-import { VALUE_SPLITER } from '../components/FilterWidgetPanel/WidgetFilterForm/OperatorValues';
+import { BoardInfo, BoardType, ServerDashboard } from '../../Board/slice/types';
 import { getDistinctFields } from './../../../../../utils/fetch';
-import { BoardInfo, BoardType, ServerDashboard } from './../../../slice/types';
 import { getDataChartMap } from './../../../utils/board';
 import {
   getWidgetMapByServer,
@@ -86,6 +85,7 @@ export const getEditBoardDetail = createAsyncThunk<
     return null;
   },
 );
+
 export const fetchEditBoardDetail = createAsyncThunk<
   null,
   string,
@@ -101,15 +101,23 @@ export const fetchEditBoardDetail = createAsyncThunk<
 
     const dashboard = getDashBoardByResBoard(data);
 
-    const { datacharts: serverDataCharts, views: serverViews, widgets } = data;
+    const {
+      datacharts: serverDataCharts,
+      views: serverViews,
+      widgets: serverWidgets,
+    } = data;
     // TODO
-    // const wrapedChart = getWidgetMapByServer(widgets);
-    const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(widgets);
-    const widgetInfoMap = getWidgetInfoMapByServer(widgets);
-    const widgetIds = widgets.map(w => w.id);
-    const boardInfo = getInitBoardInfo(dashboard.id, widgetIds);
-    // datacharts
     const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
+    const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(
+      serverWidgets,
+      dataCharts,
+    );
+    const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
+    // TODO xld migration about filter
+    const widgetIds = serverWidgets.map(w => w.id);
+    const boardInfo = getInitBoardInfo({ id: dashboard.id, widgetIds });
+    // datacharts
+
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
     dispatch(boardActions.updateDataChartMap(allDataCharts));
 
@@ -249,6 +257,7 @@ export const addDataChartWidgets = createAsyncThunk<
         boardType: boardType,
         dataChartId: dcId,
         dataChartConfig: dataChartMap[dcId],
+        viewId: dataChartMap[dcId].viewId,
         subType: 'dataChart',
       });
       return widget;
@@ -283,6 +292,7 @@ export const addWrapChartWidget = createAsyncThunk<
       dashboardId: boardId,
       boardType: boardType,
       dataChartId: chartId,
+      viewId: view.id,
       dataChartConfig: dataChart,
       subType: 'widgetChart',
     });
@@ -333,7 +343,8 @@ export const getEditWidgetDataAsync = createAsyncThunk<
   { state: RootState }
 >(
   'editBoard/getEditWidgetDataAsync',
-  async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
+  async ({ widgetId, option }, { getState, dispatch }) => {
+    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
     const rootState = getState() as RootState;
     const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
     const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
@@ -342,32 +353,29 @@ export const getEditWidgetDataAsync = createAsyncThunk<
     if (!curWidget) return null;
 
     switch (curWidget.config.type) {
-      case 'filter':
-        await dispatch(getEditFilterDataAsync(curWidget));
-        return null;
-      case 'media':
-        return null;
-      case 'container':
-        return null;
       case 'chart':
         await dispatch(getEditChartWidgetDataAsync({ widgetId, option }));
         return null;
+      case 'controller':
+        await dispatch(getEditControllerOptionAsync(curWidget));
+        return null;
+      case 'media':
+      case 'container':
       default:
         return null;
     }
   },
 );
-export const getEditFilterDataAsync = createAsyncThunk<
+export const getEditControllerOptionAsync = createAsyncThunk<
   null,
   Widget,
   { state: RootState }
->('editBoard/getFilterDataAsync', async (widget, { getState, dispatch }) => {
-  const content = widget.config.content as FilterWidgetContent;
-  const widgetFilter = content.widgetFilter;
-  if (widgetFilter.assistViewField) {
+>('editBoard/getControllerOptions', async (widget, { getState, dispatch }) => {
+  const content = widget.config.content as ControllerWidgetContent;
+  const config = content.config;
+  if (config.assistViewFields && Array.isArray(config.assistViewFields)) {
     // 请求
-    const [viewId, viewField] =
-      widgetFilter.assistViewField.split(VALUE_SPLITER);
+    const [viewId, viewField] = config.assistViewFields;
     const dataset = await getDistinctFields(
       viewId,
       viewField,
@@ -383,6 +391,7 @@ export const getEditFilterDataAsync = createAsyncThunk<
   }
   return null;
 });
+
 export const getEditChartWidgetDataAsync = createAsyncThunk<
   null,
   {
@@ -394,6 +403,7 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
   'editBoard/getEditChartWidgetDataAsync',
   async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
     const rootState = getState() as RootState;
+    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
     const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
     const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
     const editBoard = rootState.editBoard;
@@ -427,7 +437,6 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
     });
     widgetData = { ...data, id: widgetId };
     dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
-    // changePageInfo
     dispatch(
       editWidgetInfoActions.changePageInfo({
         widgetId,
@@ -502,7 +511,7 @@ export const pasteWidgets = createAsyncThunk(
       const widgetInfo = createWidgetInfo(widget.id);
       widgetInfoMap[widget.id] = widgetInfo;
     });
-    // dispatch(editWidgetInfoActions.);
+
     dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
     dispatch(editBoardStackActions.addWidgets(newWidgets));
 

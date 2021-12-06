@@ -31,14 +31,17 @@ import useFieldActionModal from 'app/hooks/useFieldActionModal';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import {
-  AggregateFieldActionType,
   AggregateFieldSubAggregateType,
   ChartDataSectionField,
   ChartDataSectionFieldActionType,
   ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import { ChartDataViewFieldCategory } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
-import { getColumnRenderName } from 'app/utils/chart';
+} from 'app/types/ChartConfig';
+import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
+import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
+import {
+  getColumnRenderName,
+  reachLowerBoundCount,
+} from 'app/utils/chartHelper';
 import { updateBy, updateByKey } from 'app/utils/mutation';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { rgba } from 'polished';
@@ -52,7 +55,6 @@ import {
 } from 'styles/StyleConstants';
 import { ValueOf } from 'types';
 import { v4 as uuidv4 } from 'uuid';
-import { ChartDataConfigSectionProps } from '../ChartDataConfigSection';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
 import VizDraggableItem from './ChartDraggableElement';
 
@@ -61,7 +63,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     ancestors,
     modalSize,
     config,
-    translate: t = title => title,
+    translate: t = (...args) => args?.[0],
     onConfigChanged,
   }) {
     const { dataset } = useContext(ChartDatasetContext);
@@ -90,22 +92,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN ||
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
           ) {
-            let defaultAggregate: AggregateFieldActionType;
-            if (
-              currentConfig?.type === ChartDataSectionType.AGGREGATE ||
-              currentConfig?.type === ChartDataSectionType.SIZE ||
-              currentConfig?.type === ChartDataSectionType.INFO
-            ) {
-              if (
-                item.category !==
-                (ChartDataViewFieldCategory.AggregateComputedField as string)
-              ) {
-                const aggType = currentConfig?.actions?.[item?.type]?.[0];
-                defaultAggregate =
-                  AggregateFieldSubAggregateType?.[aggType]?.[0];
-              }
-            }
-
             let currentColumns: ChartDataSectionField[] = (
               currentConfig.rows || []
             ).concat(
@@ -114,20 +100,9 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 colName: i.colName,
                 category: i.category,
                 type: i.type,
-                aggregate: defaultAggregate,
+                aggregate: getDefaultAggregate(item),
               })),
             );
-
-            if (
-              !!currentConfig.maxFieldCount &&
-              currentConfig.maxFieldCount < currentColumns.length
-            ) {
-              currentColumns.splice(
-                0,
-                currentColumns.length - currentConfig.maxFieldCount,
-              );
-            }
-
             const newCurrentConfig = updateByKey(
               currentConfig,
               'rows',
@@ -174,17 +149,47 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       setCurrentConfig(config);
     }, [config]);
 
+    const getDefaultAggregate = item => {
+      if (
+        currentConfig?.type === ChartDataSectionType.AGGREGATE ||
+        currentConfig?.type === ChartDataSectionType.SIZE ||
+        currentConfig?.type === ChartDataSectionType.INFO
+      ) {
+        if (
+          item.category !==
+          (ChartDataViewFieldCategory.AggregateComputedField as string)
+        ) {
+          let aggType: string = '';
+          if (currentConfig?.actions instanceof Array) {
+            currentConfig?.actions?.find(
+              type =>
+                type === ChartDataSectionFieldActionType.Aggregate ||
+                type === ChartDataSectionFieldActionType.AggregateLimit,
+            );
+          } else if (currentConfig?.actions instanceof Object) {
+            aggType = currentConfig?.actions?.[item?.type]?.find(
+              type =>
+                type === ChartDataSectionFieldActionType.Aggregate ||
+                type === ChartDataSectionFieldActionType.AggregateLimit,
+            );
+          }
+          if (aggType) {
+            return AggregateFieldSubAggregateType?.[aggType]?.[0];
+          }
+        }
+      }
+    };
+
     const onDraggableItemMove = (dragIndex: number, hoverIndex: number) => {
       const draggedItem = currentConfig.rows?.[dragIndex];
 
-      if (draggedItem && currentConfig.rows && currentConfig.rows.length > 0) {
+      if (draggedItem && !currentConfig?.rows?.length) {
         const newCurrentConfig = updateBy(currentConfig, draft => {
           const columns = draft.rows || [];
           columns.splice(dragIndex, 1);
           columns.splice(hoverIndex, 0, draggedItem);
         });
         setCurrentConfig(newCurrentConfig);
-        onConfigChanged?.(ancestors, newCurrentConfig, true);
       }
     };
 
@@ -203,6 +208,14 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         !currentConfig.rows ||
         !currentConfig?.rows?.filter(Boolean)?.length
       ) {
+        const fieldCount = reachLowerBoundCount(currentConfig?.limit, 0);
+        if (fieldCount > 0) {
+          return (
+            <DropPlaceholder>
+              {t('dropCount', undefined, { count: fieldCount })}
+            </DropPlaceholder>
+          );
+        }
         return <DropPlaceholder>{t('drop')}</DropPlaceholder>;
       }
 

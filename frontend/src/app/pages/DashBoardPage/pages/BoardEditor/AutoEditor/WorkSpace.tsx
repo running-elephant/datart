@@ -16,13 +16,12 @@
  * limitations under the License.
  */
 
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetAllProvider';
-import { BoardFilterBox } from 'app/pages/DashBoardPage/components/WidgetCore/FilterWIdget/BoardFilterBox';
-import { Dashboard } from 'app/pages/DashBoardPage/slice/types';
+import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
+import { Dashboard } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import StyledBackground from '../../Dashboard/components/StyledBackground';
+import StyledBackground from '../../Board/components/StyledBackground';
 import { selectEditBoard, selectLayoutWidgetMap } from '../slice/selectors';
 import RGridLayout from './RGridLayout';
 import WidgetOfAutoEdit from './WidgetOfAutoEdit';
@@ -43,7 +42,8 @@ const WorkSpace: React.FC<WorkSpaceProps> = memo(() => {
   return (
     <Wrap bg={background}>
       {/* TODO */}
-      <BoardFilterBox />
+
+      {/* <BoardFilterBox /> */}
 
       <RGridLayout>
         {layoutWidgetConfigs.map(widget => {

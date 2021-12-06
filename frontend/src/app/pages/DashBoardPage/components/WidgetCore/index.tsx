@@ -16,25 +16,19 @@
  * limitations under the License.
  */
 import { DataChartWidget } from 'app/pages/DashBoardPage/components/WidgetCore/DataChartWidget';
-import IframeWidget from 'app/pages/DashBoardPage/components/WidgetCore/IframeBox';
-import ImageBox from 'app/pages/DashBoardPage/components/WidgetCore/ImageBox';
-import RichText from 'app/pages/DashBoardPage/components/WidgetCore/RichTextBox';
-import TabsBoxCore from 'app/pages/DashBoardPage/components/WidgetCore/TabsBox';
-import TimerBox from 'app/pages/DashBoardPage/components/WidgetCore/TimeBox';
-import VideoWidget from 'app/pages/DashBoardPage/components/WidgetCore/VideoBox';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
-import {
-  ContainerWidgetContent,
-  MediaWidgetContent,
-} from 'app/pages/DashBoardPage/slice/types';
 import React, { memo, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { BoardContext } from '../../contexts/BoardContext';
 import { BoardInfoContext } from '../../contexts/BoardInfoContext';
 import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
 import { getWidgetSomeStyle } from '../../utils/widget';
-import { WidgetFilterCore } from './FilterWIdget';
+import { QueryWidget } from './ButtonWidget/QueryWidget';
+import { ResetWidget } from './ButtonWidget/ResetWidget';
+import { ContainerWidget } from './ContainerWidget';
+import { ControllerWidgetCore } from './ControllerWIdget';
+import { MediaWidget } from './MediaWidget';
 
 export interface WidgetCoreProps {
   background?: boolean;
@@ -73,7 +67,7 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
       widget.config.autoUpdate
     ) {
       timer = setInterval(() => {
-        onWidgetAction('refresh', widget.config.type);
+        onWidgetAction('refresh', widget);
       }, +widget.config.frequency * 1000);
     }
     return () => {
@@ -84,52 +78,32 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
   }, [
     boardVisible,
     onWidgetAction,
+    widget,
     widget.config.autoUpdate,
     widget.config.frequency,
     widget.config.type,
     widgetInfo.loading,
     widgetInfo.rendered,
   ]);
-  const mediaElement = useMemo(() => {
-    switch ((widget.config.content as MediaWidgetContent)?.type) {
-      case 'richText':
-        return <RichText widgetConfig={widget} widgetInfo={widgetInfo} />;
-      case 'image':
-        return <ImageBox widgetConfig={widget} widgetInfo={widgetInfo} />;
-      case 'video':
-        return <VideoWidget />;
-      case 'iframe':
-        return <IframeWidget />;
-      case 'timer':
-        return <TimerBox />;
-      default:
-        return <div>default media</div>;
-    }
-  }, [widget, widgetInfo]);
-  const containerElement = useMemo(() => {
-    switch ((widget.config.content as ContainerWidgetContent)?.type) {
-      case 'tab':
-        return <TabsBoxCore />;
-      case 'carousel':
-        return <div>carousel container</div>;
-      default:
-        return <div>default container</div>;
-    }
-  }, [widget]);
+
   const element = useMemo(() => {
     switch (widget.config.type) {
       case 'chart':
         return <DataChartWidget />;
       case 'media':
-        return <>{mediaElement}</>;
+        return <MediaWidget />;
       case 'container':
-        return <>{containerElement}</>;
-      case 'filter':
-        return <WidgetFilterCore id={widget.id} />;
+        return <ContainerWidget />;
+      case 'controller':
+        return <ControllerWidgetCore />;
+      case 'query':
+        return <QueryWidget />;
+      case 'reset':
+        return <ResetWidget />;
       default:
-        return <div>default element</div>;
+        return <div>default widget</div>;
     }
-  }, [containerElement, mediaElement, widget]);
+  }, [widget]);
   const widgetCoreStyle = useMemo(() => {
     return getWidgetSomeStyle({
       config: widget.config,
@@ -142,6 +116,5 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
 });
 const WidgetWrap = styled.div`
   display: flex;
-  width: 100%;
-  height: 100%;
+  flex: 1;
 `;

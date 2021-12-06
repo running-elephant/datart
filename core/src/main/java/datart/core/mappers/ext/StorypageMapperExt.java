@@ -2,6 +2,7 @@ package datart.core.mappers.ext;
 
 import datart.core.entity.Storypage;
 import datart.core.mappers.StorypageMapper;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -15,4 +16,9 @@ public interface StorypageMapperExt extends StorypageMapper {
     })
     List<Storypage> listByStoryboardId(String storyboardId);
 
+
+    @Delete({
+            "DELETE FROM storypage WHERE storyboard_id = #{storyboardId}"
+    })
+    int deleteByStoryboard(String storyboardId);
 }

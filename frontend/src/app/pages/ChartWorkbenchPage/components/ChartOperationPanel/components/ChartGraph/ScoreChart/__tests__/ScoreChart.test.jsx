@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import ScoreChart from '../ScoreChart';
 
 describe('<ScoreChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<ScoreChart />);
+    component = new ScoreChart();
   });
   test('it should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

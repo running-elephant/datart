@@ -17,23 +17,25 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig, {
+import {
+  ChartConfig,
   ChartDataSectionType,
   ChartStyleSectionConfig,
   FieldFormatType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+} from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import {
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getCustomSortableColumns,
+  getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getReference,
   getSeriesTooltips4Rectangular2,
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
 import {
   toExponential,
   toFormattedValue,
@@ -216,6 +218,7 @@ class BasicBarChart extends Chart {
           name: getColumnRenderName(aggConfig),
           data: dataColumns.map(dc => ({
             ...getExtraSeriesRowData(dc),
+            ...getExtraSeriesDataFormat(aggConfig?.format),
             name: getColumnRenderName(aggConfig),
             value: dc[getValueByColumnKey(aggConfig)],
           })),
@@ -237,7 +240,7 @@ class BasicBarChart extends Chart {
         const k = Object.keys(sgCol)[0];
         const v = sgCol[k];
 
-        const itemStyleColor = colorConfigs[0]?.color?.colors?.find(
+        const itemStyleColor = colorConfigs?.[0]?.color?.colors?.find(
           c => c.key === k,
         );
 
@@ -249,10 +252,11 @@ class BasicBarChart extends Chart {
             sgCol,
           ),
           name: k,
-          data: xAxisColumns[0].data.map(d => {
+          data: xAxisColumns?.[0]?.data?.map(d => {
             const dc = v.find(col => col[xAxisColumnName] === d);
             return {
               ...getExtraSeriesRowData(dc),
+              ...getExtraSeriesDataFormat(aggConfig?.format),
               name: getColumnRenderName(aggConfig),
               value: dc?.[getValueByColumnKey(aggConfig)] || 0,
             };
@@ -449,7 +453,7 @@ class BasicBarChart extends Chart {
       axisLabel: {
         show: showLabel,
         rotate,
-        interval: showInterval ? interval : null,
+        interval: showInterval ? interval : 'auto',
         ...font,
       },
       axisLine: {
@@ -524,10 +528,10 @@ class BasicBarChart extends Chart {
         position,
         ...font,
         formatter: params => {
-          const { name, value, data } = params;
+          const { value, data } = params;
           const formattedValue = toFormattedValue(value, data.format);
           const labels: string[] = [];
-          labels.push(`${name}: ${formattedValue}`);
+          labels.push(formattedValue);
           return labels.join('\n');
         },
       },

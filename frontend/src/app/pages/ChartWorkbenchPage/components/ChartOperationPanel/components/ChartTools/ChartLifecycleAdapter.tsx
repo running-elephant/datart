@@ -20,10 +20,9 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
 import useMount from 'app/hooks/useMount';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartEventBroker, {
-  ChartLifecycle,
-} from 'app/pages/ChartWorkbenchPage/models/ChartEventBroker';
+import ChartEventBroker from 'app/pages/ChartWorkbenchPage/models/ChartEventBroker';
+import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartLifecycle } from 'app/types/ChartLifecycle';
 import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 import { useFrame } from 'react-frame-component';
 import styled from 'styled-components/macro';
@@ -75,7 +74,12 @@ const ChartLifecycleAdapter: React.FC<{
           newBrokerRef.publish(
             ChartLifecycle.MOUNTED,
             { containerId, dataset, config },
-            { document, window, width: style.width, height: style.height },
+            {
+              document,
+              window,
+              width: style?.width,
+              height: style?.height,
+            },
           );
           eventBrokerRef.current = newBrokerRef;
           setContainerStatus(ContainerStatus.SUCCESS);
@@ -124,8 +128,8 @@ const ChartLifecycleAdapter: React.FC<{
       {
         document,
         window,
-        width: style.width,
-        height: style.height,
+        width: style?.width,
+        height: style?.height,
       },
     );
   }, [style.width, style.height, document, window]);

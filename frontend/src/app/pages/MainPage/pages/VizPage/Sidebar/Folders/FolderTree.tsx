@@ -1,29 +1,30 @@
 import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
-import { Menu, message, Popconfirm, TreeDataNode } from 'antd';
+import { Menu, message, Popconfirm } from 'antd';
 import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
 import { CascadeAccess } from 'app/pages/MainPage/Access';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
+import { LocalTreeDataNode } from 'app/pages/MainPage/slice/types';
 import { CommonFormTypes } from 'globalConstants';
 import React, { useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { stopPPG } from 'utils/utils';
+import { getInsertedNodeIndex, onDropTreeFn, stopPPG } from 'utils/utils';
+import { isParentIdEqual } from '../../../../slice/utils';
 import {
   PermissionLevels,
   ResourceTypes,
 } from '../../../PermissionPage/constants';
 import { SaveFormContext } from '../../SaveFormContext';
-import { selectVizListLoading } from '../../slice/selectors';
+import { selectVizListLoading, selectVizs } from '../../slice/selectors';
 import {
   deleteViz,
   editFolder,
   getFolders,
   removeTab,
 } from '../../slice/thunks';
-
 interface FolderTreeProps {
   selectedId?: string;
-  treeData?: TreeDataNode[];
+  treeData?: LocalTreeDataNode[];
 }
 
 export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
@@ -31,6 +32,7 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
   const history = useHistory();
   const orgId = useSelector(selectOrgId);
   const loading = useSelector(selectVizListLoading);
+  const vizsData = useSelector(selectVizs);
   const { showSaveForm } = useContext(SaveFormContext);
 
   useEffect(() => {
@@ -95,11 +97,17 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
               visible: true,
               initialValues: { ...node, parentId: node.parentId || void 0 },
               onSave: (values, onClose) => {
+                let index = node.index;
+                if (isParentIdEqual(node.parentId, values.parentId)) {
+                  index = getInsertedNodeIndex(values, vizsData);
+                }
+
                 dispatch(
                   editFolder({
                     folder: {
                       ...values,
                       parentId: values.parentId || null,
+                      index,
                     },
                     resolve: onClose,
                   }),
@@ -113,7 +121,7 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
             break;
         }
       },
-    [dispatch, showSaveForm],
+    [dispatch, showSaveForm, vizsData],
   );
 
   const renderTreeTitle = useCallback(
@@ -168,12 +176,31 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
     [moreMenuClick, archiveViz],
   );
 
+  const onDrop = info => {
+    onDropTreeFn({
+      info,
+      treeData,
+      callback: (id, parentId, index) => {
+        dispatch(
+          editFolder({
+            folder: {
+              id,
+              parentId,
+              index: index,
+            },
+            resolve: () => {},
+          }),
+        );
+      },
+    });
+  };
   return (
     <Tree
       loading={loading}
       treeData={treeData}
       titleRender={renderTreeTitle}
       onSelect={menuSelect}
+      onDrop={onDrop}
       {...(selectedId && { selectedKeys: [selectedId] })}
       defaultExpandAll
       draggable

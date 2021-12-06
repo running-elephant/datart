@@ -20,14 +20,12 @@ package datart.data.provider.calcite.dialect;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.dialect.MssqlSqlDialect;
-import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
 
 import static datart.core.data.provider.StdSqlOperator.*;
 import static datart.core.data.provider.StdSqlOperator.COALESCE;
 
-@Component
 public class MsSqlStdOperatorSupport extends MssqlSqlDialect implements SqlStdOperatorSupport {
 
     static {

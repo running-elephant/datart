@@ -17,7 +17,7 @@
  */
 import { Form, InputNumber, Select } from 'antd';
 import { BORDER_STYLE_OPTIONS } from 'app/pages/DashBoardPage/constants';
-import { BorderConfig } from 'app/pages/DashBoardPage/slice/types';
+import { BorderConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { FC, memo } from 'react';
 import ColorSet from './BasicSet/ColorSet';
 export const BorderSet: FC<{

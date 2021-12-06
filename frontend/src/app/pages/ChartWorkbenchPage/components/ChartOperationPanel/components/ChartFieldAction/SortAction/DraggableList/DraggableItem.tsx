@@ -29,7 +29,7 @@ const style = {
   fontSize: 12,
 };
 
-export interface DraggableItemProps {
+interface DraggableItemProps {
   id: any;
   text: string;
   index: number;

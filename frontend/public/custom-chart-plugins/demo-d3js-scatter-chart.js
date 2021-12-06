@@ -21,14 +21,14 @@ function D3JSScatterChart({ dHelper }) {
     config: {
       datas: [
         {
-          label: 'metrics',
-          key: 'metrics',
+          label: 'dimension',
+          key: 'dimension',
           required: true,
           type: 'group',
         },
         {
-          label: 'deminsion',
-          key: 'deminsion',
+          label: 'metrics',
+          key: 'metrics',
           required: true,
           type: 'aggregate',
         },
@@ -154,6 +154,8 @@ function D3JSScatterChart({ dHelper }) {
 
       this.chart.selectAll('whatever').style('color', 'blue');
     },
+
+    onUnMount() {},
 
     getOptions(dataset, config) {
       // 当前服务端返回的数据集

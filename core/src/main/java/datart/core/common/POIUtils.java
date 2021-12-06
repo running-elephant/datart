@@ -19,6 +19,7 @@ package datart.core.common;
 
 import datart.core.base.consts.FileFormat;
 import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.Column;
 import datart.core.data.provider.Dataframe;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,7 @@ public class POIUtils {
             if (cover) {
                 file.delete();
             } else {
-                throw new BaseException("file (" + path + ")  already exists");
+                Exceptions.msg("file (" + path + ")  already exists");
             }
         } else {
             file.getParentFile().mkdirs();
@@ -99,18 +100,19 @@ public class POIUtils {
             } else if (path.toLowerCase().endsWith(FileFormat.XLSX.getFormat())) {
                 workbook = new XSSFWorkbook(inputStream);
             } else {
-                throw new BaseException("Unknown file format :" + path);
+                Exceptions.msg("message.unsupported.format", path);
+                return null;
             }
 
             if (workbook.getNumberOfSheets() < 1) {
-                throw new BaseException("empty excel :" + path);
+                Exceptions.msg("empty excel :" + path);
             }
             // 只处理第一个sheet
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.rowIterator();
             Row row0 = sheet.getRow(0);
             if (row0 == null) {
-                throw new RuntimeException("excel is empty");
+                Exceptions.msg("empty excel :" + path);
             }
             int columns = row0.getPhysicalNumberOfCells();
             while (rowIterator.hasNext()) {

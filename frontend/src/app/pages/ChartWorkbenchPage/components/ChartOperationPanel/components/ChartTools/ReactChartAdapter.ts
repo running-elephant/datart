@@ -60,7 +60,10 @@ export default class ReactChartAdapter implements ReactChartAdapterProps {
   }
 
   public resize(opt: any) {
-    // TODO: to be implement
+    return ReactDom.render(
+      React.createElement(this.getComponent(), opt),
+      this.domContainer,
+    );
   }
 
   private getComponent() {

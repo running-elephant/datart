@@ -215,8 +215,8 @@
         }
       },
       "data": {
+        "dimension": "Dimension",
         "metrics": "Metric",
-        "deminsion": "Deminsion",
         "mixed": "Mixed",
         "filter": "Filter",
         "colorize": "Color",
@@ -224,7 +224,8 @@
         "info": "Info",
         "sort": "Sort",
         "size": "Size",
-        "drop": "Please drag data column here",
+        "drop": "Please drag some data fields here",
+        "dropCount": "Please drag {{count}} fields here at least",
         "actions": {
           "sort": {
             "title": "Sort",
@@ -242,7 +243,9 @@
             "scientific": "Scientific",
             "decimalPlace": "Decimal Places",
             "unit": "Unit",
-            "useSeparator": "Use Separator"
+            "useSeparator": "Use Separator",
+            "prefix": "Prefix",
+            "suffix": "Suffix"
           },
           "aggregation": "Aggregation",
           "aggregationlimit": "Aggregation",
@@ -315,13 +318,17 @@
       "present": {
         "graph": "Graph",
         "raw": "Raw",
-        "sql": "SQL"
+        "sql": "SQL",
+        "needMore": "At least need {{num}} {{type}}(s)"
       },
       "graph": {
         "group": "Dimensions",
         "aggregate": "Measures",
         "onlyAllow": "{{type}} Only Allow {{num}}",
-        "allowRange": "{{type}} Allow Range {{start}} to {{end}}"
+        "allowRange": "{{type}} Allow Range {{start}} to {{end}}",
+        "confirm": "Please confirm switch to {{name}} chart that will clear all data fields",
+        "ok": "OK",
+        "cancel": "Cancel"
       }
     },
     "chartPreview": {

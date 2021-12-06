@@ -17,10 +17,8 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig, {
-  ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import {
   getDataColumnMaxAndMin,
   getExtraSeriesRowData,
@@ -29,7 +27,7 @@ import {
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
 import { init, registerMap } from 'echarts';
 import Config from './config';
 import geoChinaCity from './geo-china-city.map.json';
@@ -106,6 +104,9 @@ class BasicOutlineMapChart extends Chart {
     const sizeConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.SIZE)
       .flatMap(config => config.rows || []);
+    const infoConfigs = dataConfigs
+      .filter(c => c.type === ChartDataSectionType.INFO)
+      .flatMap(config => config.rows || []);
 
     this.registerGeoMap(styleConfigs);
 
@@ -139,11 +140,11 @@ class BasicOutlineMapChart extends Chart {
         ) as any,
       ),
       tooltip: this.getTooltip(
-        objDataColumns,
+        styleConfigs,
         groupConfigs,
         aggregateConfigs,
         sizeConfigs,
-        styleConfigs,
+        infoConfigs,
       ),
     };
   }
@@ -287,11 +288,11 @@ class BasicOutlineMapChart extends Chart {
   }
 
   protected getTooltip(
-    objDataColumns,
+    styleConfigs,
     groupConfigs,
     aggregateConfigs,
     sizeConfigs,
-    styleConfigs,
+    infoConfigs,
   ) {
     return {
       trigger: 'item',
@@ -304,7 +305,7 @@ class BasicOutlineMapChart extends Chart {
           groupConfigs,
           [],
           aggregateConfigs,
-          [],
+          infoConfigs,
           sizeConfigs,
         );
       },
@@ -324,13 +325,6 @@ class BasicOutlineMapChart extends Chart {
     )?.properties;
 
     return (properties?.cp || properties?.center)?.concat(values) || [];
-  }
-
-  protected getLabelStyle(styles) {
-    const show = getStyleValueByGroup(styles, 'label', 'showLabel');
-    const position = getStyleValueByGroup(styles, 'label', 'position');
-    const font = getStyleValueByGroup(styles, 'label', 'font');
-    return { show, position, ...font };
   }
 
   protected getVisualMap(

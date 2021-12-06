@@ -27,7 +27,6 @@ export interface BoardOverLayProps {
 export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
   ({ onOpenShareLink, onBoardToDownLoad, onShareDownloadData }) => {
     const { allowShare, allowDownload, renderMode } = useContext(BoardContext);
-    // debugger;
     const renderList = useMemo(
       () => [
         {

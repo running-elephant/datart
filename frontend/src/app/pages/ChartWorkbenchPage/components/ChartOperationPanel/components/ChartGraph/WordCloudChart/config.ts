@@ -16,21 +16,23 @@
  * limitations under the License.
  */
 
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 
 const config: ChartConfig = {
   datas: [
     {
+      label: 'dimension',
+      key: 'dimension',
+      required: true,
+      type: 'group',
+      limit: 1,
+    },
+    {
       label: 'metrics',
       key: 'metrics',
       required: true,
-      type: 'group',
-    },
-    {
-      label: 'deminsion',
-      key: 'deminsion',
-      required: true,
       type: 'aggregate',
+      limit: 1,
     },
     {
       label: 'filter',
@@ -41,30 +43,196 @@ const config: ChartConfig = {
   ],
   styles: [
     {
-      label: 'label',
+      label: 'wordCloud.title',
+      key: 'wordCloud',
+      comType: 'group',
+      rows: [
+        {
+          label: 'wordCloud.shape',
+          key: 'shape',
+          comType: 'select',
+          default: 'circle',
+          options: {
+            items: [
+              { label: '圆形', value: 'circle' },
+              { label: '心形', value: 'cardioid' },
+              { label: '菱形', value: 'diamond' },
+              { label: '正三角形', value: 'triangle-forward' },
+              { label: '三角形', value: 'triangle' },
+              { label: '五边形', value: 'pentagon' },
+              { label: '星形', value: 'star' },
+            ],
+          },
+        },
+        {
+          label: 'wordCloud.width',
+          key: 'width',
+          default: '80%',
+          comType: 'marginWidth',
+        },
+        {
+          label: 'wordCloud.height',
+          key: 'height',
+          default: '80%',
+          comType: 'marginWidth',
+        },
+        {
+          label: 'wordCloud.drawOutOfBound',
+          key: 'drawOutOfBound',
+          default: true,
+          comType: 'checkbox',
+        },
+      ],
+    },
+    {
+      label: 'label.title',
       key: 'label',
       comType: 'group',
-      rows: [],
+      rows: [
+        {
+          label: 'label.fontFamily',
+          key: 'fontFamily',
+          comType: 'fontFamily',
+          default: 'sans-serif',
+        },
+        {
+          label: 'label.fontWeight',
+          key: 'fontWeight',
+          comType: 'select',
+          default: 'normal',
+          options: {
+            items: [
+              { label: '常规字号', value: 'normal' },
+              { label: '粗体', value: 'bold' },
+              { label: '特粗体', value: 'bolder' },
+              { label: '细体', value: 'lighter' },
+              { label: '100', value: '100' },
+              { label: '200', value: '200' },
+              { label: '300', value: '300' },
+              { label: '400', value: '400' },
+              { label: '500', value: '500' },
+              { label: '600', value: '600' },
+              { label: '700', value: '700' },
+              { label: '800', value: '800' },
+              { label: '900', value: '900' },
+            ],
+          },
+        },
+        {
+          label: 'label.maxFontSize',
+          key: 'maxFontSize',
+          default: 72,
+          options: {
+            min: 0,
+          },
+          comType: 'inputNumber',
+        },
+        {
+          label: 'label.minFontSize',
+          key: 'minFontSize',
+          default: 12,
+          options: {
+            min: 0,
+          },
+          comType: 'inputNumber',
+        },
+        {
+          label: 'label.rotationRangeStart',
+          key: 'rotationRangeStart',
+          default: 0,
+          comType: 'inputNumber',
+        },
+        {
+          label: 'label.rotationRangeEnd',
+          key: 'rotationRangeEnd',
+          default: 0,
+          comType: 'inputNumber',
+        },
+        {
+          label: 'label.rotationStep',
+          key: 'rotationStep',
+          default: 0,
+          options: {
+            min: 0,
+          },
+          comType: 'inputNumber',
+        },
+        {
+          label: 'label.gridSize',
+          key: 'gridSize',
+          default: 8,
+          options: {
+            min: 0,
+          },
+          comType: 'inputNumber',
+        },
+        {
+          label: 'label.focus',
+          key: 'focus',
+          default: true,
+          comType: 'checkbox',
+        },
+        {
+          label: 'label.textShadowBlur',
+          key: 'textShadowBlur',
+          default: 10,
+          options: {
+            min: 0,
+          },
+          comType: 'inputNumber',
+        },
+        {
+          label: 'label.textShadowColor',
+          key: 'textShadowColor',
+          default: '#333',
+          comType: 'fontColor',
+        },
+      ],
+    },
+    {
+      label: 'margin.title',
+      key: 'margin',
+      comType: 'group',
+      rows: [
+        {
+          label: 'margin.left',
+          key: 'marginLeft',
+          default: '10%',
+          comType: 'marginWidth',
+        },
+        {
+          label: 'margin.top',
+          key: 'marginTop',
+          default: '10%',
+          comType: 'marginWidth',
+        },
+      ],
     },
   ],
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
-        label: '标签',
-        showLabel: '显示标签',
-        showLabelBySwitch: '显示标签2',
-        showLabelByInput: '显示标签3',
-        showLabelWithSelect: '显示标签4',
-        fontFamily: '字体',
-        fontSize: '字体大小',
-        fontColor: '字体颜色',
-        rotateLabel: '旋转标签',
-        showDataColumns: '选择数据列',
-        legend: {
-          label: '图例',
-          showLabel: '图例-显示标签',
-          showLabel2: '图例-显示标签2',
+        wordCloud: {
+          title: '词云配置',
+          shape: '词云形状',
+          drawOutOfBound: '限制边界',
+          width: '宽度',
+          height: '高度',
+        },
+        label: {
+          title: '标签',
+          fontFamily: '字体',
+          fontWeight: '字号',
+          maxFontSize: '字体最大值',
+          minFontSize: '字体最小值',
+          rotationRangeStart: '起始旋转角度',
+          rotationRangeEnd: '结束旋转角度',
+          rotationStep: '旋转步长',
+          gridSize: '文字间隔',
+          focus: '是否淡出',
+          textShadowBlur: '阴影长度',
+          textShadowColor: '阴影颜色',
         },
       },
     },

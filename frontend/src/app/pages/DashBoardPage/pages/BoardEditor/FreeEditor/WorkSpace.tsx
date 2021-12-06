@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetAllProvider';
+import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import gridSvg from 'assets/svgs/grid.svg';
@@ -25,7 +25,7 @@ import styled from 'styled-components/macro';
 import SlideBackground from '../../../components/FreeBoardBackground';
 import useClientRect from '../../../hooks/useClientRect';
 import useSlideStyle from '../../../hooks/useSlideStyle';
-import ZoomControl from '../../Dashboard/FreeDashboard/ZoomControl';
+import ZoomControl from '../../Board/FreeDashboard/ZoomControl';
 import { selectLayoutWidgetMap } from '../slice/selectors';
 import { WidgetOfFreeEdit } from './WidgetOfFreeEdit';
 
@@ -37,7 +37,7 @@ const WorkSpace: React.FC<IProps> = () => {
   const { width: boardWidth, height: boardHeight, scaleMode } = config;
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
   const sortedLayoutWidgets = Object.values(layoutWidgetMap).sort(
-    (a, b) => b.config.index - a.config.index,
+    (a, b) => a.config.index - b.config.index,
   );
   const [rect, refGridBackground] = useClientRect<HTMLDivElement>();
   const {
@@ -58,13 +58,11 @@ const WorkSpace: React.FC<IProps> = () => {
         ref={refGridBackground}
       >
         <SlideBackground scale={scale} slideTranslate={slideTranslate}>
-          {sortedLayoutWidgets
-            .sort((a, b) => a.config.index - b.config.index)
-            .map(widgetConfig => (
-              <WidgetAllProvider key={widgetConfig.id} id={widgetConfig.id}>
-                <WidgetOfFreeEdit />
-              </WidgetAllProvider>
-            ))}
+          {sortedLayoutWidgets.map(widgetConfig => (
+            <WidgetAllProvider key={widgetConfig.id} id={widgetConfig.id}>
+              <WidgetOfFreeEdit />
+            </WidgetAllProvider>
+          ))}
         </SlideBackground>
       </div>
 

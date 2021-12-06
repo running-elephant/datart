@@ -226,20 +226,26 @@ public class VizController extends BaseController {
 
     @ApiOperation(value = "unarchive viz")
     @PutMapping(value = "/unarchive/{vizId}")
-    public ResponseData<Boolean> unarchiveViz(@PathVariable String vizId, String vizType, String newName, String parentId) {
-        return ResponseData.success(vizService.unarchiveViz(vizId, ResourceType.valueOf(vizType), newName, parentId));
+    public ResponseData<Boolean> unarchiveViz(@PathVariable String vizId,
+                                              @RequestParam String vizType,
+                                              @RequestParam String newName,
+                                              @RequestParam(required = false) String parentId,
+                                              @RequestParam Double index) {
+        return ResponseData.success(vizService.unarchiveViz(vizId, ResourceType.valueOf(vizType), newName, parentId, index));
     }
 
     @ApiOperation(value = "publish viz")
     @PutMapping(value = "/publish/{vizId}")
-    public ResponseData<Boolean> publishViz(@PathVariable String vizId, String vizType) {
+    public ResponseData<Boolean> publishViz(@PathVariable String vizId,
+                                            @RequestParam String vizType) {
         return ResponseData.success(vizService.publish(ResourceType.valueOf(vizType), vizId));
     }
 
 
     @ApiOperation(value = "unpublish viz")
     @PutMapping(value = "/unpublish/{vizId}")
-    public ResponseData<Boolean> unpublishViz(@PathVariable String vizId, String vizType) {
+    public ResponseData<Boolean> unpublishViz(@PathVariable String vizId,
+                                              @RequestParam String vizType) {
         return ResponseData.success(vizService.unpublish(ResourceType.valueOf(vizType), vizId));
     }
 

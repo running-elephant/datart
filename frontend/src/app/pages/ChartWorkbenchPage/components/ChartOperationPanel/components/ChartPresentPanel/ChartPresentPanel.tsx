@@ -17,17 +17,17 @@
  */
 
 import { Table } from 'antd';
-import useResizeObserver from 'app/hooks/useResizeObserver';
-import ChartTools from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
+import useResizeObserver from 'app/hooks/useResizeObserver';
+import ChartTools from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
-import ChartDataView from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import { ChartConfig } from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import { FC, memo, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG, SPACE_MD } from 'styles/StyleConstants';
+import Chart404Graph from './components/Chart404Graph';
 import ChartTypeSelector, {
   ChartPresentType,
 } from './components/ChartTypeSelector';
@@ -36,10 +36,9 @@ const CHART_TYPE_SELECTOR_HEIGHT_OFFSET = 50;
 
 const ChartPresentPanel: FC<{
   chart?: Chart;
-  dataView?: ChartDataView;
   dataset?: ChartDataset;
   chartConfig?: ChartConfig;
-}> = memo(({ chart, dataView, dataset, chartConfig }) => {
+}> = memo(({ chart, dataset, chartConfig }) => {
   const translate = useI18NPrefix(`viz.palette.present`);
   const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
   const panelRef = useRef<{ offsetWidth; offsetHeight }>(null);
@@ -57,6 +56,22 @@ const ChartPresentPanel: FC<{
     refreshRate: 10,
   });
 
+  const renderGraph = (containerId, chart?: Chart, chartConfig?, style?) => {
+    if (!chart?.isMatchRequirement(chartConfig)) {
+      return <Chart404Graph chart={chart} chartConfig={chartConfig} />;
+    }
+    return (
+      !!chart &&
+      chartDispatcher.getContainers(
+        containerId,
+        chart,
+        dataset,
+        chartConfig!,
+        style,
+      )
+    );
+  };
+
   const renderReusableChartContainer = () => {
     const style = {
       width: panelRef.current?.offsetWidth,
@@ -72,14 +87,7 @@ const ChartPresentPanel: FC<{
       <>
         {ChartPresentType.GRAPH === chartType && (
           <div style={{ height: '100%' }} ref={graphRef}>
-            {!!chart &&
-              chartDispatcher.getContainers(
-                containerId,
-                chart,
-                dataset,
-                chartConfig!,
-                style,
-              )}
+            {renderGraph(containerId, chart, chartConfig, style)}
           </div>
         )}
         {ChartPresentType.RAW === chartType && (
@@ -116,16 +124,16 @@ const ChartPresentPanel: FC<{
   };
 
   return (
-    <StyledVizPresentPanel ref={panelRef}>
+    <StyledChartPresentPanel ref={panelRef}>
       {renderChartTypeSelector()}
       {renderReusableChartContainer()}
-    </StyledVizPresentPanel>
+    </StyledChartPresentPanel>
   );
 });
 
 export default ChartPresentPanel;
 
-const StyledVizPresentPanel = styled.div<{ ref }>`
+const StyledChartPresentPanel = styled.div<{ ref }>`
   display: flex;
   flex: 1;
   flex-direction: column;

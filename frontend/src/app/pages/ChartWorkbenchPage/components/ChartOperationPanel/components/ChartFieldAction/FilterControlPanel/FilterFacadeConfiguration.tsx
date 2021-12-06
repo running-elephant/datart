@@ -21,13 +21,16 @@ import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import {
   FilterConditionType,
   FilterFacade,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import { ChartDataViewFieldCategory } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+} from 'app/types/ChartConfig';
+import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartFilterCondition from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+import {
+  ControllerFacadeTypes,
+  ControllerRadioFacadeTypes,
+} from 'app/types/FilterControlPanel';
 import { FC, memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { IsKeyIn } from 'utils/object';
-import { ControllerFacadeTypes, ControllerRadioFacadeTypes } from './Constant';
 
 const isDisableSingleDropdownListFacade = condition => {
   let isDisableSignleDropdownList = true;

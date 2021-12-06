@@ -19,6 +19,7 @@
 package datart.security.util;
 
 import com.alibaba.fastjson.JSON;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -40,8 +41,9 @@ public class AESUtil {
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
             return Base64.encodeBase64String(cipher.doFinal(src.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            Exceptions.e(e);
         }
+        return null;
     }
 
     public static String decrypt(String src, String securityKey) {
@@ -51,8 +53,9 @@ public class AESUtil {
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
             return new String(cipher.doFinal(Base64.decodeBase64(src)));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            Exceptions.e(e);
         }
+        return null;
     }
 
     public static String encrypt(String src) {

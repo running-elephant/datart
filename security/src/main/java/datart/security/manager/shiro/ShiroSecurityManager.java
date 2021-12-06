@@ -19,6 +19,8 @@
 package datart.security.manager.shiro;
 
 import datart.core.base.consts.Const;
+import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.MessageResolver;
 import datart.core.entity.User;
 import datart.core.mappers.ext.UserMapperExt;
@@ -67,23 +69,22 @@ public class ShiroSecurityManager implements DatartSecurityManager {
     }
 
     @Override
-    public void login(PasswordToken token) throws AuthException {
+    public void login(PasswordToken token) throws RuntimeException {
 
         User user = userMapper.selectByNameOrEmail(token.getSubject());
         if (user == null) {
-            throw new AuthException(messageResolver.getMessage("User not exists"));
+            Exceptions.tr(BaseException.class, "login.fail");
         }
         if (!user.getActive()) {
-            throw new AuthException("User not activated");
+            Exceptions.tr(BaseException.class, "message.user.not.active");
         }
         Subject subject = SecurityUtils.getSubject();
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(token.getSubject(), token.getPassword());
         try {
             subject.login(usernamePasswordToken);
         } catch (Exception e) {
-            e.printStackTrace();
             log.error("Login error ({} {})", token.getSubject(), token.getPassword());
-            throw new AuthException(messageResolver.getMessage("login.fail"));
+            Exceptions.msg("login.fail");
         }
     }
 
@@ -91,14 +92,14 @@ public class ShiroSecurityManager implements DatartSecurityManager {
     public String login(String jwtToken) throws AuthException {
         PasswordToken passwordToken = JwtUtils.toPasswordToken(jwtToken);
         if (!JwtUtils.validTimeout(passwordToken)) {
-            throw new AuthException(messageResolver.getMessage("login.session.timeout"));
+            Exceptions.tr(AuthException.class, "login.session.timeout");
         }
         User user = userMapper.selectByNameOrEmail(passwordToken.getSubject());
         if (user == null) {
-            throw new AuthException(messageResolver.getMessage("login.session.timeout"));
+            Exceptions.tr(AuthException.class, "login.session.timeout");
         }
         if (!user.getActive()) {
-            throw new AuthException("User not activated");
+            Exceptions.tr(BaseException.class, "message.user.not.active");
         }
         passwordToken = new PasswordToken(user.getUsername(), user.getPassword(), System.currentTimeMillis());
         login(passwordToken);
@@ -123,7 +124,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
             Boolean permitted = permissionDataCache.getCachedPermission(permission);
             if (permitted != null) {
                 if (!permitted) {
-                    throw new AuthorizationException();
+                    Exceptions.e(new AuthorizationException());
                 } else {
                     return;
                 }
@@ -141,7 +142,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
                         , getCurrentUser() != null ? getCurrentUser().getUsername() : "none"
                         , permission);
                 permissionDataCache.setPermissionCache(permission, false);
-                throw new PermissionDeniedException(messageResolver.getMessage("message.security.permission-denied"));
+                Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied");
             }
         }
     }
@@ -155,7 +156,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
             log.warn("User permission denied. User-{} Role-{}"
                     , getCurrentUser() != null ? getCurrentUser().getUsername() : "none"
                     , RoleType.ORG_OWNER.name());
-            throw new PermissionDeniedException();
+            Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied");
         }
     }
 

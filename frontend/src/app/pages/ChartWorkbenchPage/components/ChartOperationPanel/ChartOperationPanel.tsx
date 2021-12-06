@@ -17,7 +17,7 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import FlexLayout, { Model } from 'flexlayout-react';
 import 'flexlayout-react/style/light.css';
 import { FC, memo, useContext, useState } from 'react';
@@ -75,7 +75,6 @@ const ChartOperationPanel: FC<{
           <ChartPresentWrapper
             chart={chart}
             dataset={dataset}
-            dataView={dataView}
             chartConfig={chartConfig}
             onChartChange={onChartChange}
           />

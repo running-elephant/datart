@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-import { shallow } from 'enzyme';
-import React from 'react';
 import AreaChart from '../AreaChart';
 
 describe('<AreaChart />', () => {
   let component;
   beforeEach(() => {
-    component = shallow(<AreaChart />);
+    component = new AreaChart();
   });
   test('It should mount', () => {
-    expect(component.length).toBe(1);
+    expect(component).toBeDatartChartModel();
   });
 });

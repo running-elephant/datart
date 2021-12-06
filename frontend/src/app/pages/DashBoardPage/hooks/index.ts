@@ -1,1 +1,1 @@
-export { default as useCreateWidget } from './useCreateWidget';
+export { default as useBoardWidthHeight } from './useBoardWidthHeight';
