@@ -16,14 +16,12 @@
  * limitations under the License.
  */
 
-import ChartConfig, {
-  ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import {
   getCustomSortableColumns,
   transfromToObjectArray,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
 import BasicTableChart from '../BasicTableChart';
 import Config from './config';
 
@@ -61,10 +59,11 @@ class FenZuTableChart extends BasicTableChart {
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
+    const tablePagination = this.getPagingOptions(settingConfigs);
 
     return {
       rowKey: 'uid',
-      pagination: this.getPagingOptions(settingConfigs),
+      pagination: tablePagination,
       dataSource: this.generateTableRowUniqId(dataColumns),
       columns: this.getColumns(
         groupConfigs,
@@ -78,6 +77,7 @@ class FenZuTableChart extends BasicTableChart {
         dataset,
         clientWidth,
         clientHeight,
+        tablePagination,
       ),
     };
   }

@@ -33,7 +33,7 @@
  * limitations under the License.
  */
 
-import { ChartStyleSectionConfig } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { FormGeneratorLayoutProps } from '../types';

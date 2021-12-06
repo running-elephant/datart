@@ -17,7 +17,7 @@
  */
 
 import { createContext } from 'react';
-import { ChartDataSectionConfig } from '../models/ChartConfig';
+import { ChartDataSectionConfig } from '../../../types/ChartConfig';
 
 const ChartPaletteContext = createContext<{ datas?: ChartDataSectionConfig[] }>(
   {

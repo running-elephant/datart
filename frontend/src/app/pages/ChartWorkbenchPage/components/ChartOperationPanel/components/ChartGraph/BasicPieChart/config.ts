@@ -16,27 +16,27 @@
  * limitations under the License.
  */
 
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 
 const config: ChartConfig = {
   datas: [
     {
-      label: 'section.legend',
-      key: 'color',
-      required: true,
-      type: 'color',
-    },
-    {
-      label: 'section.detail',
-      key: 'metrics',
+      label: 'dimension',
+      key: 'dimension',
       required: true,
       type: 'group',
+      limit: [0, 1],
+      actions: {
+        NUMERIC: ['alias', 'colorize', 'sortable'],
+        STRING: ['alias', 'colorize', 'sortable'],
+      },
     },
     {
-      label: 'deminsion',
-      key: 'deminsion',
+      label: 'metrics',
+      key: 'metrics',
       required: true,
       type: 'aggregate',
+      limit: [1, 999],
     },
     {
       label: 'filter',

@@ -19,6 +19,7 @@ package datart.data.provider.calcite;
 
 
 import datart.core.base.consts.ValueType;
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.SingleTypedValue;
 import datart.core.data.provider.sql.*;
@@ -105,7 +106,7 @@ public class SqlBuilder {
         //function columns
         if (!CollectionUtils.isEmpty(executeParam.getFunctionColumns())) {
             for (FunctionColumn functionColumn : executeParam.getFunctionColumns()) {
-                functionColumnMap.put(functionColumn.getAlias(), parseSnippet(functionColumn, T));
+                functionColumnMap.put(functionColumn.getAlias(), parseSnippet(functionColumn, T, true));
             }
         }
 
@@ -113,7 +114,7 @@ public class SqlBuilder {
         if (!CollectionUtils.isEmpty(executeParam.getColumns())) {
             for (String column : executeParam.getColumns()) {
                 if (functionColumnMap.containsKey(column)) {
-                    selectList.add(functionColumnMap.get(column));
+                    selectList.add(SqlNodeUtils.createAliasNode(functionColumnMap.get(column), column));
                 } else {
                     selectList.add(SqlNodeUtils.createAliasNode(SqlNodeUtils.createSqlIdentifier(column, T), column));
                 }
@@ -160,10 +161,11 @@ public class SqlBuilder {
                 SqlNode sqlNode = null;
                 if (functionColumnMap.containsKey(group.getColumn())) {
                     sqlNode = functionColumnMap.get(group.getColumn());
+                    selectList.add(SqlNodeUtils.createAliasNode(sqlNode, group.getColumn()));
                 } else {
                     sqlNode = SqlNodeUtils.createSqlIdentifier(group.getColumn(), T);
+                    selectList.add(sqlNode);
                 }
-                selectList.add(sqlNode);
                 groupBy.add(sqlNode);
             }
         }
@@ -195,8 +197,8 @@ public class SqlBuilder {
         SqlNode fetch = null;
         SqlNode offset = null;
         if (withPage && (dialect instanceof FetchAndOffsetSupport) && executeParam.getPageInfo() != null) {
-            fetch = SqlLiteral.createExactNumeric(executeParam.getPageInfo().getPageSize() + "", SqlParserPos.ZERO);
-            offset = SqlLiteral.createExactNumeric((executeParam.getPageInfo().getPageNo() - 1) * executeParam.getPageInfo().getPageSize() + "", SqlParserPos.ZERO);
+            fetch = SqlLiteral.createExactNumeric(Math.min(executeParam.getPageInfo().getPageSize(), Integer.MAX_VALUE) + "", SqlParserPos.ZERO);
+            offset = SqlLiteral.createExactNumeric(Math.min((executeParam.getPageInfo().getPageNo() - 1) * executeParam.getPageInfo().getPageSize(), Integer.MAX_VALUE) + "", SqlParserPos.ZERO);
         }
 
         SqlSelect sqlSelect = new SqlSelect(SqlParserPos.ZERO,
@@ -211,8 +213,7 @@ public class SqlBuilder {
                 offset,
                 fetch,
                 null);
-
-        return sqlSelect.toSqlString(this.dialect).getSql();
+        return SqlNodeUtils.toSql(sqlSelect, this.dialect);
     }
 
     private SqlNode createAggNode(AggregateOperator.SqlOperator sqlOperator, String column, String alias) {
@@ -248,7 +249,11 @@ public class SqlBuilder {
         if (functionColumnMap.containsKey(operator.getColumn())) {
             sqlNode = functionColumnMap.get(operator.getColumn());
         } else {
-            sqlNode = SqlNodeUtils.createSqlIdentifier(operator.getColumn(), T);
+            if (operator.getColumn() == null) {
+                sqlNode = SqlLiteral.createNull(SqlParserPos.ZERO);
+            } else {
+                sqlNode = SqlNodeUtils.createSqlIdentifier(operator.getColumn(), T);
+            }
         }
         if (operator.getAggOperator() != null) {
             SqlOperator aggOperator = mappingSqlAggFunction(operator.getAggOperator());
@@ -279,7 +284,7 @@ public class SqlBuilder {
 
         SqlNode[] sqlNodes = null;
 
-        org.apache.calcite.sql.SqlOperator sqlOp;
+        org.apache.calcite.sql.SqlOperator sqlOp = null;
         switch (operator.getSqlOperator()) {
             case IN:
                 sqlOp = SqlStdOperatorTable.IN;
@@ -366,18 +371,29 @@ public class SqlBuilder {
                 sqlNodes = nodes.toArray(new SqlNode[0]);
                 break;
             default:
-                throw new DataProviderException("Unsupported filtering operation :" + operator);
+                Exceptions.msg("message.provider.sql.type.unsupported", operator.getSqlOperator().name());
         }
         return new SqlBasicCall(sqlOp, sqlNodes, SqlParserPos.ZERO);
     }
 
-    private SqlNode parseSnippet(FunctionColumn column, String tableName) throws SqlParseException {
+    /**
+     * parse function column ,and register the column functions
+     *
+     * @param column    function column
+     * @param tableName table where function to execute
+     * @param register  whether register this function as build function
+     */
+    private SqlNode parseSnippet(FunctionColumn column, String tableName, boolean register) throws SqlParseException {
         SqlSelect sqlSelect = (SqlSelect) SqlParserUtils.parseSnippet(column.getSnippet());
         SqlNode sqlNode = sqlSelect.getSelectList().get(0);
         if (!(sqlNode instanceof SqlCall)) {
             return sqlNode;
         }
         completionIdentifier((SqlCall) sqlNode, tableName);
+        if (register) {
+            SqlFunctionRegisterVisitor visitor = new SqlFunctionRegisterVisitor();
+            visitor.visit((SqlCall) sqlNode);
+        }
         return sqlNode;
     }
 
@@ -420,8 +436,9 @@ public class SqlBuilder {
             case COUNT_DISTINCT:
                 return SqlStdOperatorTable.COUNT;
             default:
-                throw new DataProviderException("Unsupported aggregation operation: " + sqlOperator);
+                Exceptions.msg( "message.provider.sql.type.unsupported", sqlOperator.name());
         }
+        return null;
     }
 
 

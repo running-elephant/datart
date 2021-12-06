@@ -17,18 +17,14 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 import {
-  EditBoardState,
-  HistoryEditBoard,
-} from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
-import {
   Widget,
   WidgetData,
   WidgetInfo,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
-  getAllFilterWidget,
-  getAllFixedFilterWidgetSortedIds,
-} from 'app/pages/DashBoardPage/utils/widget';
+  EditBoardState,
+  HistoryEditBoard,
+} from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import { StateWithHistory } from 'redux-undo';
 import { getLayoutWidgets } from './../../../utils/widget';
 import { EditBoardStack } from './types';
@@ -75,16 +71,6 @@ export const selectSortAllWidgets = createSelector(
     }),
 );
 
-export const selectEditFixedFilterIds = createSelector(
-  [selectWidgetRecord],
-  widgetMap => {
-    const filterWidgetMap = getAllFilterWidget(widgetMap);
-    const editFixedFilterIds =
-      getAllFixedFilterWidgetSortedIds(filterWidgetMap);
-    return editFixedFilterIds;
-  },
-);
-
 export const selectLayoutWidgetMap = createSelector(
   [selectWidgetRecord],
   allWidgetMap => {
@@ -125,6 +111,14 @@ export const selectSelectedIds = createSelector(
       .map(widgetInfo => widgetInfo.id) || [],
 );
 
+export const selectWidgetInfoDatachartId = createSelector(
+  [selectWidgetRecord],
+  WidgetsInfo =>
+    Object.values(WidgetsInfo).map(widgetInfo => {
+      return widgetInfo.datachartId || undefined;
+    }) || [],
+);
+
 // boardInfo
 export const boardInfoState = (state: { editBoard: EditBoardState }) =>
   state.editBoard.boardInfo;
@@ -142,9 +136,9 @@ export const selectDashDroppable = createSelector(
   [boardInfoState],
   boardInfo => boardInfo.isDroppable,
 );
-export const selectFilterPanel = createSelector(
+export const selectControllerPanel = createSelector(
   [boardInfoState],
-  boardInfo => boardInfo.filterPanel,
+  boardInfo => boardInfo.controllerPanel,
 );
 export const selectLinkagePanel = createSelector(
   [boardInfoState],

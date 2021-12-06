@@ -21,7 +21,6 @@ import ChartTools from 'app/pages/ChartWorkbenchPage/components/ChartOperationPa
 import { getChartPluginPaths } from 'app/utils/fetch';
 import { CloneValueDeep } from 'utils/object';
 import Chart from './Chart';
-import ChartMetadata from './ChartMetadata';
 
 const {
   BasicScatterChart,
@@ -45,6 +44,8 @@ const {
   NormalOutlineMapChart,
   WordCloudChart,
   ScatterOutlineMapChart,
+  BasicGaugeChart,
+  WaterfallChart,
 } = WidgetPlugins;
 
 class ChartManager {
@@ -68,8 +69,8 @@ class ChartManager {
     return await this._loadCustomizeCharts(pluginsPaths);
   }
 
-  public getAllChartMetas(): ChartMetadata[] {
-    return this._charts?.map(c => c.meta) || [];
+  public getAllCharts(): Chart[] {
+    return this._charts || [];
   }
 
   public getById(id?: string) {
@@ -107,6 +108,7 @@ class ChartManager {
       new StackBarChart(),
       new PercentageStackColumnChart(),
       new PercentageStackBarChart(),
+      new WaterfallChart(),
       new LineChart(),
       new AreaChart(),
       new StackAreaChart(),
@@ -119,6 +121,7 @@ class ChartManager {
       new WordCloudChart(),
       new NormalOutlineMapChart(),
       new ScatterOutlineMapChart(),
+      new BasicGaugeChart(),
     ];
   }
 }

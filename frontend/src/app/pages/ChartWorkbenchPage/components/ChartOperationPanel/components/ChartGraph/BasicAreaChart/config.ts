@@ -16,19 +16,20 @@
  * limitations under the License.
  */
 
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 
 const config: ChartConfig = {
   datas: [
     {
-      label: 'metrics',
-      key: 'metrics',
+      label: 'dimension',
+      key: 'dimension',
+      type: 'group',
       actions: ['sortable', 'alias'],
     },
     {
-      label: 'deminsion',
-      key: 'deminsion',
-      rows: [],
+      label: 'metrics',
+      key: 'metrics',
+      type: 'aggregate',
       actions: ['format', 'aggregate'],
     },
   ],
@@ -67,7 +68,7 @@ const config: ChartConfig = {
             {
               getItems: cols => {
                 const sections = (cols || []).filter(col =>
-                  ['metrics', 'deminsion'].includes(col.key),
+                  ['metrics', 'dimension'].includes(col.key),
                 );
                 const columns = sections.reduce(
                   (acc, cur) => acc.concat(cur.rows || []),

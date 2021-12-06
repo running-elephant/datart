@@ -1,7 +1,7 @@
 import { TreeNodeProps } from 'antd';
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartConfig } from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import { ReactElement } from 'react';
 
 export type VizType = [
@@ -95,8 +95,9 @@ export interface VizTab {
 export interface AddVizParams {
   viz: {
     name: string;
+    index:number | null;
     description?: string;
-    parentId?: string;
+    parentId?: string | null;
     orgId: string;
   };
   type: VizType;
@@ -114,6 +115,7 @@ export interface UnarchiveVizParams {
     name: string;
     vizType: VizType;
     parentId: string | null;
+    index:number | null;
   };
   resolve: () => void;
 }

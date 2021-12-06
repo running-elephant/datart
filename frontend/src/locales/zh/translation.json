@@ -216,15 +216,16 @@
         }
       },
       "data": {
-        "metrics": "维度",
-        "deminsion": "指标",
+        "dimension": "维度",
+        "metrics": "指标",
         "mixed": "混合",
         "filter": "筛选",
-        "colorize": "着色",
+        "colorize": "颜色",
         "info": "信息",
         "sort": "排序",
         "size": "大小",
-        "drop": "请拖拽数据列到这里",
+        "drop": "请拖拽数据字段到这里",
+        "dropCount": "请至少拖拽{{count}}个数据字段到这里",
         "actions": {
           "sort": {
             "title": "排序",
@@ -242,7 +243,9 @@
             "scientific": "科学计数型",
             "decimalPlace": "小数位数",
             "unit": "单位",
-            "useSeparator": "启用分隔符"
+            "useSeparator": "启用分隔符",
+            "prefix": "前缀",
+            "suffix": "后缀"
           },
           "aggregation": "聚合",
           "aggregationlimit": "聚合",
@@ -315,13 +318,17 @@
       "present": {
         "graph": "图表",
         "raw": "原始数据",
-        "sql": "SQL"
+        "sql": "SQL",
+        "needMore": "至少还需要 {{num}} 个 {{type}}"
       },
       "graph": {
         "group": "维度",
-        "aggregate": "度量",
+        "aggregate": "指标",
         "onlyAllow": "{{type}} 仅允许数量为 {{num}}",
-        "allowRange": "{{type}} 允许范围为 {{start}} 到 {{end}}"
+        "allowRange": "{{type}} 允许范围为 {{start}} 到 {{end}}",
+        "confirm": "请确认切换到 {{name}} 图表，这将导致数据被清空",
+        "ok": "确认",
+        "cancel": "取消"
       }
     },
     "chartPreview": {

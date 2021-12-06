@@ -281,12 +281,12 @@ export const unarchiveView = createAsyncThunk<
   { state: RootState }
 >(
   'view/unarchiveView',
-  async ({ view: { id, name, parentId }, resolve }, { dispatch }) => {
+  async ({ view: { id, name, parentId, index }, resolve }, { dispatch }) => {
     try {
       await request<null>({
         url: `/views/unarchive/${id}`,
         method: 'PUT',
-        params: { name, parentId },
+        params: { name, parentId, index },
       });
       resolve();
       return id;

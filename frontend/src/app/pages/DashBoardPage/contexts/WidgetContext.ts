@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Widget } from 'app/pages/DashBoardPage/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { createContext } from 'react';
 export interface WidgetContextProps extends Widget {}
 export const WidgetContext = createContext<WidgetContextProps>({} as Widget);

@@ -22,7 +22,7 @@ import {
   Widget,
   WidgetData,
   WidgetInfo,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { StateWithHistory } from 'redux-undo';
 
 // import { Dashboard } from '../../Dashboard/types';

@@ -1,13 +1,13 @@
 import { Select } from 'antd';
-import { JumpConfigFilter } from 'app/pages/DashBoardPage/slice/types';
+import { JumpConfigFilter } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FC, useCallback, useMemo } from 'react';
-import { FilterOptionItem } from './types';
+import { ControlOptionItem } from './types';
 interface FilterSelectProps<T = JumpConfigFilter> {
   value?: T;
   onChange?: (value?: T) => void;
   placeholder?: string;
   loading?: boolean;
-  options?: FilterOptionItem[];
+  options?: ControlOptionItem[];
 }
 export const FilterSelect: FC<FilterSelectProps> = ({
   children,

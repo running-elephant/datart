@@ -25,7 +25,7 @@ import {
   MediaWidgetContent,
   Widget,
   WidgetConf,
-} from 'app/pages/DashBoardPage/slice/types';
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import produce from 'immer';
 import { Layout } from 'react-grid-layout';
 import { createSlice } from 'utils/@reduxjs/toolkit';
@@ -56,7 +56,12 @@ export const editBoardStackSlice = createSlice({
     updateBoardConfig(state, action: PayloadAction<DashboardConfig>) {
       state.dashBoard.config = action.payload;
     },
-
+    changeBoardHasQueryControl(state, action: PayloadAction<boolean>) {
+      state.dashBoard.config.hasQueryControl = action.payload;
+    },
+    changeBoardHasResetControl(state, action: PayloadAction<boolean>) {
+      state.dashBoard.config.hasResetControl = action.payload;
+    },
     // Widget
     addWidgets(state, action: PayloadAction<Widget[]>) {
       const widgets = action.payload;

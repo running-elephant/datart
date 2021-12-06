@@ -51,16 +51,6 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
         this.sqlDialect = sqlDialect;
         this.variableQuote = variableQuote;
         this.variableMap = variableMap;
-        configSqlDialect(sqlDialect);
-    }
-
-    private void configSqlDialect(SqlDialect sqlDialect) {
-        try {
-            ReflectUtils.setFiledValue(sqlDialect, "unquotedCasing", Casing.UNCHANGED);
-            ReflectUtils.setFiledValue(sqlDialect, "quotedCasing", Casing.UNCHANGED);
-        } catch (IllegalAccessException e) {
-            log.error("sql dialect(" + sqlDialect + ") config error", e);
-        }
     }
 
     @Override
@@ -106,7 +96,12 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
         int startIndex = sqlCall.getOperandList().get(0).getParserPosition().getColumnNum();
         int endIndex = sqlCall.getOperandList().get(sqlCall.operandCount() - 1).getParserPosition().getEndColumnNum();
         String originalSqlFragment = srcSql.substring(startIndex - 1, endIndex).trim();
-        ScriptVariable variable = variableMap.get(variableName);
+        ScriptVariable variable = null;
+        for (String key : variableMap.keySet()) {
+            if (key.equalsIgnoreCase(variableName)) {
+                variable = variableMap.get(key);
+            }
+        }
 
         if (variable == null) {
             return new TrueVariablePlaceholder(originalSqlFragment);

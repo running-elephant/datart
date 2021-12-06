@@ -1,4 +1,4 @@
-import { ChartDataSectionConfig } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartDataSectionConfig } from 'app/types/ChartConfig';
 
 export enum GroupLayoutMode {
   INNER = 'inner',

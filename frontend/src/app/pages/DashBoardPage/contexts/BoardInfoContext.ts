@@ -16,6 +16,6 @@
  * limitations under the License.
  */
 import { createContext } from 'react';
-import { BoardInfo } from './../slice/types';
+import { BoardInfo } from '../pages/Board/slice/types';
 
 export const BoardInfoContext = createContext<BoardInfo>({} as BoardInfo);

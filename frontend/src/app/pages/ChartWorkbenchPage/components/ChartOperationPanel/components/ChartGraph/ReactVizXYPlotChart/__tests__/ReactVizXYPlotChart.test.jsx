@@ -24,6 +24,6 @@ describe('<ReactVizXYPlotChart />', () => {
     component = new ReactVizXYPlotChart();
   });
   test('It should mount', () => {
-    expect(component.id).not.toBeNull();
+    expect(component).toBeDatartChartModel();
   });
 });

@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetAllProvider';
-import { WidgetType } from 'app/pages/DashBoardPage/slice/types';
+import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
+import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import produce from 'immer';
 import React, { useCallback, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';

@@ -71,10 +71,6 @@ export const StoryEditor: React.FC<{
     return sortedPages;
   }, [pageMap]);
 
-  useEffect(() => {
-    // dispatch(getStoryDetail(storyId));
-  }, [dispatch, storyId]);
-
   const changePage = useCallback(
     e => {
       const { indexh: slideIdx } = e;
@@ -230,7 +226,11 @@ export const StoryEditor: React.FC<{
               <div id={domId} className="reveal">
                 <div className="slides">
                   {sortedPages.map((page, index) => (
-                    <StoryPageItem key={page.id} page={page} />
+                    <StoryPageItem
+                      key={page.id}
+                      page={page}
+                      renderMode="read"
+                    />
                   ))}
                 </div>
               </div>

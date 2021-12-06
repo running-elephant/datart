@@ -17,7 +17,7 @@
  */
 
 import { createContext } from 'react';
-import { ChartI18NSectionConfig } from '../models/ChartConfig';
+import { ChartI18NSectionConfig } from '../../../types/ChartConfig';
 
 const ChartI18NContext = createContext<{
   i18NConfigs?: ChartI18NSectionConfig[];

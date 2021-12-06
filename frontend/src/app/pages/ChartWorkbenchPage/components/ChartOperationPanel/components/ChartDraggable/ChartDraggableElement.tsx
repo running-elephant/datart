@@ -17,8 +17,8 @@
  */
 
 import { DeleteOutlined } from '@ant-design/icons';
-import { ChartDataSectionField } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import { ChartDataViewFieldType } from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
+import { ChartDataSectionField } from 'app/types/ChartConfig';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { XYCoord } from 'dnd-core';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
@@ -41,12 +41,12 @@ import {
   SPACE_XS,
 } from 'styles/StyleConstants';
 
-export interface ChartDraggableElementObject {
+interface ChartDraggableElementObject {
   id: string;
   index: number;
 }
 
-export interface ChartDraggableElementProps {
+interface ChartDraggableElementProps {
   id: any;
   content: string | Function;
   index: number;
@@ -83,6 +83,7 @@ const ChartDraggableElement = forwardRef<
   useImperativeHandle<any, ChartDraggableElementInstance>(ref, () => ({
     getNode: () => elementRef.current,
   }));
+
   return (
     <StyledChartDraggableElement
       className="draggable-element"
@@ -179,9 +180,9 @@ export default DropTarget(
       endDrag: (props, monitor) => {
         const dropResult = monitor.getDropResult();
         if (!monitor.didDrop() && !dropResult) {
-          props.onDelete && props.onDelete();
+          props?.onDelete();
         } else if (monitor.didDrop() && !!dropResult?.delete) {
-          props.onDelete && props.onDelete();
+          props?.onDelete();
         }
       },
     },

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetType } from 'app/pages/DashBoardPage/slice/types';
+import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { editWidgetInfoActions } from '../slice';
@@ -42,7 +42,8 @@ const SubMaskLayer: React.FC<SubMaskLayerProps> = ({
       }
     },
     [dispatch, selected, widgetId],
-  ); 
+  );
+
   const doubleClick = useCallback(() => {
     // if (widgetType === 'chart') return;
     dispatch(

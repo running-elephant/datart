@@ -3,18 +3,17 @@ package datart.data.provider;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.FileUtils;
 import datart.core.data.provider.*;
 import datart.data.provider.base.DataProviderException;
-import datart.data.provider.base.JdbcDriverInfo;
-import datart.data.provider.base.JdbcProperties;
+import datart.data.provider.jdbc.JdbcDriverInfo;
+import datart.data.provider.jdbc.JdbcProperties;
 import datart.data.provider.calcite.SqlParserUtils;
 import datart.data.provider.calcite.dialect.SqlStdOperatorSupport;
 import datart.data.provider.jdbc.DataSourceFactory;
 import datart.data.provider.jdbc.DataSourceFactoryDruidImpl;
-import datart.data.provider.jdbc.SqlScriptRender;
 import datart.data.provider.jdbc.adapters.JdbcDataProviderAdapter;
-import datart.data.provider.local.LocalDB;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.commons.lang3.StringUtils;
@@ -63,33 +62,21 @@ public class JdbcDataProvider extends DataProvider {
     }
 
     @Override
-    public Set<String> readAllDatabases(DataProviderSource source) {
-        try {
-            JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
-            return adapter.readAllDatabases();
-        } catch (SQLException e) {
-            throw new DataProviderException(e);
-        }
+    public Set<String> readAllDatabases(DataProviderSource source) throws SQLException {
+        JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
+        return adapter.readAllDatabases();
     }
 
     @Override
-    public Set<String> readTables(DataProviderSource source, String database) {
-        try {
-            JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
-            return adapter.readAllTables(database);
-        } catch (SQLException e) {
-            throw new DataProviderException(e);
-        }
+    public Set<String> readTables(DataProviderSource source, String database) throws SQLException {
+        JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
+        return adapter.readAllTables(database);
     }
 
     @Override
-    public Set<Column> readTableColumns(DataProviderSource source, String database, String table) {
-        try {
-            JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
-            return adapter.readTableColumn(database, table);
-        } catch (SQLException e) {
-            throw new DataProviderException(e);
-        }
+    public Set<Column> readTableColumns(DataProviderSource source, String database, String table) throws SQLException {
+        JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
+        return adapter.readTableColumn(database, table);
     }
 
     @Override
@@ -111,10 +98,16 @@ public class JdbcDataProvider extends DataProvider {
         JdbcProperties jdbcProperties = new JdbcProperties();
         jdbcProperties.setDbType(config.getProperties().get(DB_TYPE).toString().toUpperCase());
         jdbcProperties.setUrl(config.getProperties().get(URL).toString());
-        jdbcProperties.setUser(config.getProperties().get(USER).toString());
-        jdbcProperties.setPassword(config.getProperties().get(PASSWORD).toString());
+        Object user = config.getProperties().get(USER);
+        if (user != null && StringUtils.isNotBlank(user.toString())) {
+            jdbcProperties.setUser(user.toString());
+        }
+        Object password = config.getProperties().get(PASSWORD);
+        if (password != null && StringUtils.isNotBlank(password.toString())) {
+            jdbcProperties.setPassword(password.toString());
+        }
         String driverClass = config.getProperties().getOrDefault(DRIVER_CLASS, "").toString();
-        jdbcProperties.setDriverClass(StringUtils.isEmpty(driverClass) ?
+        jdbcProperties.setDriverClass(StringUtils.isBlank(driverClass) ?
                 ProviderFactory.getJdbcDriverInfo(jdbcProperties.getDbType()).getDriverClass() :
                 driverClass);
         Object properties = config.getProperties().get("properties");
@@ -156,7 +149,7 @@ public class JdbcDataProvider extends DataProvider {
         try {
             SqlParserUtils.parseSnippet(snippet);
         } catch (Exception e) {
-            throw new DataProviderException(e);
+            Exceptions.e(e);
         }
         return true;
     }
@@ -200,10 +193,10 @@ public class JdbcDataProvider extends DataProvider {
                     .collect(Collectors.toList());
 
             if (driverInfos.size() == 0) {
-                throw new DataProviderException("Unsupported dbType " + prop.getDbType());
+                Exceptions.tr(DataProviderException.class, "message.provider.jdbc.dbtype", prop.getDbType());
             }
             if (driverInfos.size() > 1) {
-                throw new DataProviderException("Duplicated dbType " + prop.getDbType());
+                Exceptions.msg("Duplicated dbType " + prop.getDbType());
             }
             JdbcDriverInfo driverInfo = driverInfos.get(0);
             JdbcDataProviderAdapter adapter = null;
@@ -223,7 +216,7 @@ public class JdbcDataProvider extends DataProvider {
                 log.error("Jdbc adapter class load error ", e);
             }
             if (adapter == null) {
-                throw new DataProviderException("Failed to create Data Provider for dbType " + prop.getDbType());
+                Exceptions.tr(DataProviderException.class, "message.provider.jdbc.create.error", prop.getDbType());
             }
             if (init) {
                 adapter.init(prop, driverInfo);
@@ -272,8 +265,9 @@ public class JdbcDataProvider extends DataProvider {
                 Yaml yaml = new Yaml();
                 return yaml.loadAs(inputStream, HashMap.class);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                Exceptions.e(e);
             }
+            return null;
         }
 
         private static Map<String, Map<String, String>> loadYml(File file) {
@@ -281,8 +275,9 @@ public class JdbcDataProvider extends DataProvider {
                 Yaml yaml = new Yaml();
                 return yaml.loadAs(inputStream, HashMap.class);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                Exceptions.e(e);
             }
+            return null;
         }
 
     }

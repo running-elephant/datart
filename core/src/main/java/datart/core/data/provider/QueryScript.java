@@ -18,16 +18,21 @@
 
 package datart.core.data.provider;
 
+import com.alibaba.fastjson.JSON;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class QueryScript implements Serializable {
 
     private String sourceId;
@@ -40,10 +45,10 @@ public class QueryScript implements Serializable {
 
     private List<ScriptVariable> variables;
 
+    private Map<String,Column> schema;
+
     public String toQueryKey() {
-        return 'Q' + DigestUtils.md5Hex(viewId
-                + script
-                + (variables == null ? "" : variables.stream().map(ScriptVariable::toString).collect(Collectors.joining(""))));
+        return 'Q' + DigestUtils.md5Hex(JSON.toJSONString(this));
     }
 
 

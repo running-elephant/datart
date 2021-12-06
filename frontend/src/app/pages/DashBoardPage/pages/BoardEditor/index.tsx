@@ -15,28 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import ChartEditor from 'app/components/ChartEditor';
 import React, { memo, useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { BoardProvider } from '../../components/BoardProvider';
+import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
-import { DataChart, WidgetContentChartType } from '../../slice/types';
+import { DataChart, WidgetContentChartType } from '../Board/slice/types';
 import AutoEditor from './AutoEditor/index';
-import ChartEditor from './components/ChartEditor';
-import FilterWidgetPanel from './components/FilterWidgetPanel';
+import FilterWidgetPanel from './components/ControllerWidgetPanel';
 import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
 import FreeEditor from './FreeEditor/index';
 import { editDashBoardInfoActions } from './slice';
-import { editWrapChartWidget } from './slice/actions';
+import { editWrapChartWidget } from './slice/actions/actions';
 import {
   selectBoardChartEditorProps,
   selectEditBoard,
 } from './slice/selectors';
-import { getEditBoardDetail } from './slice/thunk';
-// import { loadEditBoardDetail } from './slice/thunk';
+import { fetchEditBoardDetail } from './slice/thunk';
 
 export const BoardEditor: React.FC<{
   dashboardId: string;
@@ -52,7 +51,6 @@ export const BoardEditor: React.FC<{
     allowManage,
     onCloseBoardEditor,
   }) => {
-    // const { boardId } = useParams<{ boardId: string }>();
     const dashboardId = boardId;
     const dispatch = useDispatch();
     const dashboard = useSelector(selectEditBoard);
@@ -61,7 +59,8 @@ export const BoardEditor: React.FC<{
       dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
     }, [dispatch]);
     useEffect(() => {
-      dispatch(getEditBoardDetail(dashboardId));
+      // dispatch(getEditBoardDetail(dashboardId));
+      dispatch(fetchEditBoardDetail(dashboardId));
     }, [dashboardId, dispatch]);
 
     const onSaveToWidget = useCallback(
@@ -93,6 +92,7 @@ export const BoardEditor: React.FC<{
           allowDownload={allowDownload}
           allowShare={allowShare}
           allowManage={allowManage}
+          renderMode="read"
         >
           <Wrapper>
             <TitleHeader toggleBoardEditor={onCloseBoardEditor} />

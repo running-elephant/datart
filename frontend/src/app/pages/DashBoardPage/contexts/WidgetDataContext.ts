@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetData } from 'app/pages/DashBoardPage/slice/types';
+import { WidgetData } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { createContext } from 'react';
 export const WidgetDataContext = createContext<{ data: WidgetData }>({
   data: { id: '', columns: [], rows: [] } as WidgetData,

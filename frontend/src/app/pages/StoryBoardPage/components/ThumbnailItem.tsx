@@ -15,8 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { makeSelectBoardConfigById } from 'app/pages/DashBoardPage/slice/selector';
-import { BoardState, Dashboard } from 'app/pages/DashBoardPage/slice/types';
+import { makeSelectBoardConfigById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
+import {
+  BoardState,
+  Dashboard,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { XYCoord } from 'dnd-core';
 import React, { useEffect, useRef } from 'react';
 import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd';

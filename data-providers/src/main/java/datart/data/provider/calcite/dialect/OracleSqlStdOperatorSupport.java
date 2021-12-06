@@ -21,13 +21,11 @@ import datart.core.data.provider.StdSqlOperator;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.dialect.OracleSqlDialect;
-import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
 
 import static datart.core.data.provider.StdSqlOperator.*;
 
-@Component
 public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements SqlStdOperatorSupport {
 
     static {
@@ -42,6 +40,11 @@ public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements Sql
 
     private OracleSqlStdOperatorSupport(Context context) {
         super(context);
+    }
+
+    @Override
+    public String quoteIdentifier(String val) {
+        return val;
     }
 
     @Override
@@ -73,4 +76,5 @@ public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements Sql
         buf.append(val.replace(literalEndQuoteString, literalEscapedQuote));
         buf.append(literalEndQuoteString);
     }
+
 }

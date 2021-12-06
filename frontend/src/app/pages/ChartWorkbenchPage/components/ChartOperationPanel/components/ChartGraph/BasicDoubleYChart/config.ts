@@ -16,28 +16,30 @@
  * limitations under the License.
  */
 
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 
 const config: ChartConfig = {
   datas: [
     {
-      label: 'metrics',
-      key: 'metrics',
+      label: 'dimension',
+      key: 'dimension',
       required: true,
       type: 'group',
-      maxFieldCount: 1,
+      limit: 1,
     },
     {
       label: 'axis.y.left',
-      key: 'deminsionL',
+      key: 'metricsL',
       required: true,
       type: 'aggregate',
+      limit: [1, 999],
     },
     {
       label: 'axis.y.right',
-      key: 'deminsionR',
+      key: 'metricsR',
       required: true,
       type: 'aggregate',
+      limit: [1, 999],
     },
     {
       label: 'filter',

@@ -24,6 +24,6 @@ describe('<ChartJSChart />', () => {
     component = new ChartJSChart();
   });
   test('It should mount', () => {
-    expect(component.id).not.toBeNull();
+    expect(component).toBeDatartChartModel();
   });
 });

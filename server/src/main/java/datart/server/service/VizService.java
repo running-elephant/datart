@@ -54,7 +54,7 @@ public interface VizService {
 
     List<Storyboard> listArchivedStoryboard(String orgId);
 
-    boolean unarchiveViz(String vizId, ResourceType vizType, String newName, String parentId);
+    boolean unarchiveViz(String vizId, ResourceType vizType, String newName, String parentId, double index);
 
     List<Folder> listViz(String orgId);
 
@@ -68,6 +68,6 @@ public interface VizService {
 
     boolean publish(ResourceType resourceType, String vizId);
 
-    boolean unpublish(ResourceType resourceType,String vizId);
+    boolean unpublish(ResourceType resourceType, String vizId);
 
 }

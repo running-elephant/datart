@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { Form, FormInstance } from 'antd';
-import { BackgroundConfig } from 'app/pages/DashBoardPage/slice/types';
+import { BackgroundConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { FC, memo } from 'react';
 import ColorSet from './BasicSet/ColorSet';
 import ImageUpload from './BasicSet/ImageUpload';

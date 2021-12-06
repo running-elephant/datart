@@ -48,3 +48,13 @@ export const updateLvoUserSettings = async (
   }
   return [];
 };
+
+export const isParentIdEqual = function (
+  prevParentId: string | null,
+  nextParentId: string | null | undefined,
+) {
+  /* eslint-disable */
+  return prevParentId != nextParentId;
+  /* eslint-disable */
+  //prevParentId有可能是null nextParentId有可能是undefined 所以这里用双等号。 Prevparentid may be null and nextparentid may be undefined, so the double equal sign is used here.
+};

@@ -17,7 +17,7 @@
  */
 
 import { createContext } from 'react';
-import ChartDataView from '../models/ChartDataView';
+import ChartDataView from '../../../types/ChartDataView';
 
 const VizDataViewContext = createContext<{ dataView?: ChartDataView }>({
   dataView: {} as ChartDataView,

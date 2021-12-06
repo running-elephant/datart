@@ -31,7 +31,7 @@ public interface ViewService extends VizCRUDService<View, ViewMapperExt> {
 
     List<View> getViews(String orgId);
 
-    boolean unarchive(String id, String newName, String parentId);
+    boolean unarchive(String id, String newName, String parentId, double index);
 
     boolean updateBase(ViewBaseUpdateParam updateParam);
 

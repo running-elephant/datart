@@ -62,6 +62,7 @@ const StyledDirectoryTree = styled(AntTree)`
 
     .ant-tree-treenode {
       padding: 0 0 ${SPACE} ${SPACE_XS};
+      align-items: center;
 
       .ant-tree-node-content-wrapper {
         display: flex;
@@ -117,6 +118,10 @@ const StyledDirectoryTree = styled(AntTree)`
       }
     }
 
+    .ant-tree-checkbox {
+      margin-top: 0;
+    }
+
     &.dropdown {
       min-width: ${SPACE_TIMES(40)};
       padding: ${SPACE};
@@ -131,10 +136,6 @@ const StyledDirectoryTree = styled(AntTree)`
         .ant-tree-node-content-wrapper {
           line-height: 32px;
         }
-      }
-
-      .ant-tree-checkbox {
-        margin: ${SPACE_XS} ${SPACE} 0 0;
       }
     }
 

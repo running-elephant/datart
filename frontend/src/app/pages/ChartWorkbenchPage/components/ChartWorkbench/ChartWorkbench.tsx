@@ -20,12 +20,12 @@ import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartData
 import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartDataset from '../../models/ChartDataset';
-import ChartDataView from '../../models/ChartDataView';
+import ChartDataset from '../../../../types/ChartDataset';
+import ChartDataView from '../../../../types/ChartDataView';
 import {
   dateFormatSelector,
   languageSelector,
@@ -74,7 +74,7 @@ const ChartWorkbench: FC<{
                   onSaveChart={header?.onSaveChart}
                 />
               )}
-              <ChartOperationPanelWrapper>
+              <StyledChartOperationPanel>
                 <ChartOperationPanel
                   chart={chart}
                   chartConfig={chartConfig}
@@ -82,7 +82,7 @@ const ChartWorkbench: FC<{
                   onChartConfigChange={onChartConfigChange}
                   onDataViewChange={onDataViewChange}
                 />
-              </ChartOperationPanelWrapper>
+              </StyledChartOperationPanel>
             </StyledChartWorkbench>
           </TimeConfigContext.Provider>
         </ChartDataViewContext.Provider>
@@ -123,7 +123,7 @@ const StyledChartWorkbench = styled.div`
   }
 `;
 
-const ChartOperationPanelWrapper = styled.div`
+const StyledChartOperationPanel = styled.div`
   position: relative;
   flex: 1;
 `;

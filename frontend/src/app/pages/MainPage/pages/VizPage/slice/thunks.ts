@@ -1,7 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
-import { Dashboard, DataChart } from 'app/pages/DashBoardPage/slice/types';
+import {
+  Dashboard,
+  DataChart,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { RootState } from 'types';
 import { request } from 'utils/request';
@@ -195,12 +198,12 @@ export const editFolder = createAsyncThunk<
 
 export const unarchiveViz = createAsyncThunk<void, UnarchiveVizParams>(
   'viz/unarchiveViz',
-  async ({ params: { id, name, vizType, parentId }, resolve }) => {
+  async ({ params: { id, name, vizType, parentId, index }, resolve }) => {
     try {
       await request<boolean>({
         url: `/viz/unarchive/${id}`,
         method: 'PUT',
-        params: { vizType, newName: name, parentId },
+        params: { vizType, newName: name, parentId, index },
       });
       resolve();
     } catch (error) {

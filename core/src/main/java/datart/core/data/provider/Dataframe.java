@@ -19,6 +19,7 @@
 package datart.core.data.provider;
 
 import datart.core.base.PageInfo;
+import datart.core.common.UUIDGenerator;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -28,6 +29,8 @@ import java.util.List;
 
 @Data
 public class Dataframe implements Serializable {
+
+    private final String id;
 
     private String name;
 
@@ -42,6 +45,15 @@ public class Dataframe implements Serializable {
     private PageInfo pageInfo;
 
     private String script;
+
+    public Dataframe() {
+        this.id = "DF" + UUIDGenerator.generate();
+
+    }
+
+    public Dataframe(String id) {
+        this.id = id;
+    }
 
     public static Dataframe empty() {
         Dataframe dataframe = new Dataframe();

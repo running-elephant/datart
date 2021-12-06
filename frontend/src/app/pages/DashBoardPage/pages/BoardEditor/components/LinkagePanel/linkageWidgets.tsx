@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { Checkbox, Col, Divider, Row } from 'antd';
-import { Widget } from 'app/pages/DashBoardPage/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 
 export interface RelatedWidgetsProps {

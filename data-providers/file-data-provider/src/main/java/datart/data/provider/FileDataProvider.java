@@ -19,27 +19,25 @@ package datart.data.provider;
 
 import datart.core.base.consts.FileFormat;
 import datart.core.base.consts.ValueType;
-import datart.core.common.CSVParser;
+import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
+import datart.core.common.CSVParse;
 import datart.core.common.FileUtils;
 import datart.core.common.POIUtils;
 import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.Column;
 import datart.core.data.provider.DataProviderSource;
 import datart.core.data.provider.Dataframe;
-import datart.data.provider.base.DataProviderException;
 import datart.data.provider.jdbc.DataTypeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class FileDataProvider extends DefaultDataProvider {
@@ -61,17 +59,7 @@ public class FileDataProvider extends DefaultDataProvider {
         for (Map<String, Object> schema : schemas) {
             String path = schema.get(FILE_PATH).toString();
             FileFormat fileFormat = FileFormat.valueOf(schema.get(FILE_FORMAT).toString().toUpperCase());
-            List<Column> columns = null;
-            try {
-                List<Map<String, String>> columnConfig = (List<Map<String, String>>) schema.get(COLUMNS);
-                if (!CollectionUtils.isEmpty(columnConfig)) {
-                    columns = columnConfig
-                            .stream()
-                            .map(c -> new Column(c.get(COLUMN_NAME), ValueType.valueOf(c.get(COLUMN_TYPE))))
-                            .collect(Collectors.toList());
-                }
-            } catch (ClassCastException ignored) {
-            }
+            List<Column> columns = parseColumns(schema);
             Dataframe dataframe = loadFromPath(FileUtils.withBasePath(path), fileFormat, columns);
             dataframe.setName(StringUtils.isNoneBlank(schema.getOrDefault(TABLE, "").toString()) ? schema.get(TABLE).toString() : "TEST" + UUIDGenerator.generate());
             dataframes.add(dataframe);
@@ -84,7 +72,7 @@ public class FileDataProvider extends DefaultDataProvider {
         File file = new File(path);
 
         if (!file.exists()) {
-            throw new FileNotFoundException(path);
+            Exceptions.tr(BaseException.class, "message.file.notfound", file.getPath());
         }
         List<List<Object>> values = new LinkedList<>();
         if (file.isFile()) {
@@ -152,9 +140,10 @@ public class FileDataProvider extends DefaultDataProvider {
             case XLSX:
                 return POIUtils.loadExcel(path);
             case CSV:
-                return CSVParser.create(path).parse();
+                return CSVParse.create(path).parse();
             default:
-                throw new DataProviderException("Unsupported file format " + format.getFormat());
+                Exceptions.tr(BaseException.class, "message.unsupported.format", format.getFormat());
+                return null;
         }
 
     }

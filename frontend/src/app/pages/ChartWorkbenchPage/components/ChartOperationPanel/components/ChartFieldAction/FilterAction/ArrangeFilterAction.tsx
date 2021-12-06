@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionConfig } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartDataSectionConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import ChartFilterCondition, {
   ConditionBuilder,

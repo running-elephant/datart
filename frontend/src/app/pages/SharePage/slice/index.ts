@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 import { createSlice, isRejected, PayloadAction } from '@reduxjs/toolkit';
-import { ChartDataSectionType } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
   FilterSearchParams,
   VizType,
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transferChartConfig } from 'app/pages/MainPage/pages/VizPage/slice/utils';
+import { ChartDataSectionType } from 'app/types/ChartConfig';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
-import { errorHandle } from 'utils/utils';
+import { reduxActionErrorHandler } from 'utils/utils';
 import { fetchShareDataSetByPreviewChartAction } from './thunks';
 // import { fetchShareDataSetByPreviewChartAction } from './thunk';
 import { ExecuteToken, SharePageState, ShareVizInfo } from './types';
@@ -158,7 +158,7 @@ export const slice = createSlice({
       })
       .addMatcher(isRejected, (_, action) => {
         if (isMySliceAction(action, slice.name)) {
-          errorHandle(action?.error);
+          reduxActionErrorHandler(action);
         }
       });
   },

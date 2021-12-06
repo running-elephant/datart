@@ -8,24 +8,24 @@ spring:
 
 # mail config
 
-  #  mail:
-  #    host: { 邮箱服务地址 }
-  #    port: { 端口号 }
-  #    username: { 邮箱地址 }
-  #    fromAddress:
-  #    password: { 邮箱服务密码 }
-  #    senderName: { 发送者昵称 }
-  #
-  #    properties:
-  #      smtp:
-  #        starttls:
-  #          enable: true
-  #          required: true
-  #        auth: true
-  #      mail:
-  #        smtp:
-  #          ssl:
-  #            enable: true
+# mail:
+#   host: { 邮箱服务地址 }
+#   port: { 端口号 }
+#   username: { 邮箱地址 }
+#   fromAddress:
+#   password: { 邮箱服务密码 }
+#   senderName: { 发送者昵称 }
+#
+#   properties:
+#     smtp:
+#       starttls:
+#         enable: true
+#         required: true
+#       auth: true
+#     mail:
+#       smtp:
+#         ssl:
+#           enable: true
 
 
 # redis config
@@ -38,6 +38,12 @@ spring:
 server:
   port: { PORT }
   address: { IP }
+  
+  # 开启 gzip 压缩，加快请求和响应速度
+  compression:
+    enabled: true 
+    mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
+
 
 datart:
   server:

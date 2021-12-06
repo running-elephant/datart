@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartStyleSectionConfig } from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import camelCase from 'lodash/camelCase';
 import cloneDeep from 'lodash/cloneDeep';
 import isFunction from 'lodash/isFunction';
@@ -26,6 +26,68 @@ import mean from 'lodash/mean';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import uniq from 'lodash/uniq';
+
+type PipeFunction<TA, TO> = (accumulator?: TA, options?: TO) => TA | undefined;
+
+export function pipe<T1, T2>(...fns: PipeFunction<T1, T2>[]) {
+  return (v, o?) => (fns || []).reduce((y, f) => f(y, o), v);
+}
+
+export function curry(fn) {
+  let _args: any[] = [];
+  const collector = (...args) => {
+    _args = _args.concat(args || []);
+    if (_args.length < fn.length) {
+      return collector.bind(null);
+    }
+    return fn.apply(null, _args);
+  };
+  return collector;
+}
+
+export function cond(...predicates) {
+  return (value, defaultValue?) => {
+    for (let i = 0; i < predicates.length; i++) {
+      if (typeof predicates[i] === 'function' && predicates[i](value)) {
+        return predicates[i](value);
+      }
+      if (
+        isPairArray(predicates[i]) &&
+        typeof predicates[i]?.[0] === 'function' &&
+        predicates[i][0].call(null, value)
+      ) {
+        if (typeof predicates[i]?.[1] === 'function') {
+          return predicates[i][1].call(null, value);
+        }
+        return predicates[i][1];
+      }
+    }
+    return defaultValue;
+  };
+}
+
+export function isPairArray(arr?: any[]) {
+  return Array.isArray(arr) && arr?.length === 2;
+}
+
+export function isNumerical(n?: number | string) {
+  return !isEmpty(n) && !isNaN(+n!);
+}
+
+export function isNumericEqual(a?: number | string, b?: number | string) {
+  // eslint-disable-next-line eqeqeq
+  return a == b;
+}
+
+export function isInPairArrayRange(
+  count: number | string,
+  pairArray: number[],
+) {
+  if (!isPairArray(pairArray)) {
+    return false;
+  }
+  return pairArray[0] <= +count && +count <= pairArray[1];
+}
 
 export function PatchUpdate<T1, T2>(
   target: T1,
@@ -112,8 +174,12 @@ export function CloneValueDeep<T>(value: T): T {
   return cloneDeep(value);
 }
 
-export function isEmpty(o) {
-  return o === null || o === undefined;
+export function isUndefined(o) {
+  return o === undefined;
+}
+
+export function isEmpty(o?: null | any) {
+  return o === null || isUndefined(o);
 }
 
 export function isFunc(f) {
@@ -137,7 +203,7 @@ export function StringInsert(source: string, value: string, index: number) {
 }
 
 export function IsKeyIn<T, K extends keyof T>(o: T, key: K): Boolean {
-  return typeof o === 'object' && key in o;
+  return !!o && typeof o === 'object' && key in o;
 }
 
 export function mergeDefaultToValue(
@@ -152,7 +218,9 @@ export function mergeDefaultToValue(
     }
     // const newRows = initChartConfigValueByDefaultValue(c.rows);
     // update(c, 'rows', newRows);
-    c.rows = mergeDefaultToValue(c.rows);
+    if (!!c?.rows?.length) {
+      c.rows = mergeDefaultToValue(c.rows);
+    }
     return c;
   });
 }
@@ -186,6 +254,10 @@ export function isTreeModel(data) {
   return data.some(d => d?.children?.length > 0);
 }
 
-export function isEmptyArray(value) {
+export function isEmptyArray(value?) {
+  if (isEmpty(value)) {
+    return true;
+  }
+
   return Array.isArray(value) && !value?.length;
 }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
-import { ServerDashboard } from 'app/pages/DashBoardPage/slice/types';
+import { ServerDashboard } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ChartPreview,
   VizType,

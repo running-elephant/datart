@@ -22,14 +22,15 @@ import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import useToggle from 'app/hooks/useToggle';
-import ChartDataView, {
-  ChartDataViewFieldCategory,
-  ChartDataViewMeta,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataView';
 import workbenchSlice, {
   fetchViewDetailAction,
   makeDataviewTreeSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import ChartDataView, {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+  ChartDataViewMeta,
+} from 'app/types/ChartDataView';
 import { checkComputedFieldAsync } from 'app/utils/fetch';
 import { updateByKey } from 'app/utils/mutation';
 import { FC, memo, useCallback, useMemo } from 'react';
@@ -160,6 +161,22 @@ const ChartDataViewPanel: FC<{
     });
   };
 
+  const getSortedFields = (dataView?: ChartDataView) => {
+    const stringFields =
+      (dataView?.meta || [])
+        .concat(dataView?.computedFields || [])
+        ?.filter(f => f.type === ChartDataViewFieldType.STRING) || [];
+    const numericFields =
+      (dataView?.meta || [])
+        .concat(dataView?.computedFields || [])
+        ?.filter(f => f.type === ChartDataViewFieldType.NUMERIC) || [];
+    const dateFields =
+      (dataView?.meta || [])
+        .concat(dataView?.computedFields || [])
+        ?.filter(f => f.type === ChartDataViewFieldType.DATE) || [];
+    return [...dateFields, ...stringFields, ...numericFields];
+  };
+
   return (
     <StyledChartDataViewPanel>
       <Header>
@@ -197,7 +214,7 @@ const ChartDataViewPanel: FC<{
         {modalContextHolder}
       </Header>
       <ChartDraggableSourceGroupContainer
-        meta={(dataView?.meta || []).concat(dataView?.computedFields || [])}
+        meta={getSortedFields(dataView)}
         onDeleteComputedField={handleDeleteComputedField}
         onEditComputedField={handleEditComputedField}
       />

@@ -18,12 +18,16 @@
 
 package datart.server.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
 import datart.core.base.consts.VariableTypeEnum;
+import datart.core.base.exception.BaseException;
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.*;
 import datart.core.entity.RelSubjectColumns;
 import datart.core.entity.Source;
@@ -31,7 +35,6 @@ import datart.core.entity.View;
 import datart.core.mappers.ext.RelSubjectColumnsMapperExt;
 import datart.security.util.AESUtil;
 import datart.server.base.dto.VariableValue;
-import datart.server.base.exception.ServerException;
 import datart.server.base.params.TestExecuteParam;
 import datart.server.base.params.ViewExecuteParam;
 import datart.server.service.BaseService;
@@ -45,13 +48,13 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class DataProviderServiceImpl extends BaseService implements DataProviderService {
-
 
     // build in variables
     private static final String VARIABLE_NAME = "DATART.USER.NAME";
@@ -115,19 +118,19 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
     }
 
     @Override
-    public Set<String> readAllDatabases(String sourceId) {
+    public Set<String> readAllDatabases(String sourceId) throws SQLException {
         Source source = retrieve(sourceId, Source.class, false);
         return dataProviderManager.readAllDatabases(toDataProviderConfig(source));
     }
 
     @Override
-    public Set<String> readTables(String sourceId, String database) {
+    public Set<String> readTables(String sourceId, String database) throws SQLException {
         Source source = retrieve(sourceId, Source.class, false);
         return dataProviderManager.readTables(toDataProviderConfig(source), database);
     }
 
     @Override
-    public Set<Column> readTableColumns(String sourceId, String database, String table) {
+    public Set<Column> readTableColumns(String sourceId, String database, String table) throws SQLException {
         Source source = retrieve(sourceId, Source.class, false);
         return dataProviderManager.readTableColumns(toDataProviderConfig(source), database, table);
     }
@@ -150,8 +153,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
             }
             providerSource.setProperties(properties);
         } catch (Exception e) {
-            log.error("Data Provider configuration resolves error.", e);
-            throw new ServerException("Data Provider configuration resolves error.", e);
+            Exceptions.tr(BaseException.class, "message.provider.config.error");
         }
         return providerSource;
     }
@@ -171,6 +173,11 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
         List<ScriptVariable> variables = getOrgVariables(source.getOrgId());
         if (!CollectionUtils.isEmpty(testExecuteParam.getVariables())) {
+            for (ScriptVariable variable : testExecuteParam.getVariables()) {
+                if (variable.isExpression()) {
+                    variable.setValueType(ValueType.FRAGMENT);
+                }
+            }
             variables.addAll(testExecuteParam.getVariables());
         }
         if (securityManager.isOrgOwner(source.getOrgId())) {
@@ -178,6 +185,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         }
         QueryScript queryScript = QueryScript.builder()
                 .test(true)
+                .sourceId(source.getId())
                 .script(testExecuteParam.getScript())
                 .variables(variables)
                 .build();
@@ -185,7 +193,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
         ExecuteParam executeParam = ExecuteParam
                 .builder()
-                .pageInfo(PageInfo.builder().pageNo(1).pageSize(testExecuteParam.getSize()).build())
+                .pageInfo(PageInfo.builder().pageNo(1).pageSize(testExecuteParam.getSize()).countTotal(false).build())
                 .includeColumns(Collections.singleton("*"))
                 .serverAggregate((boolean) providerSource.getProperties().getOrDefault(SERVER_AGGREGATE, false))
                 .cacheEnable(false)
@@ -195,19 +203,17 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
     @Override
     public Dataframe execute(ViewExecuteParam viewExecuteParam) throws Exception {
-
         if (viewExecuteParam.isEmpty()) {
             return Dataframe.empty();
         }
 
+        //datasource and view
         View view = retrieve(viewExecuteParam.getViewId(), View.class, true);
-        //datasource
         Source source = retrieve(view.getSourceId(), Source.class, false);
-
         DataProviderSource providerSource = toDataProviderConfig(source);
 
+        //permission and variables
         Set<String> columns = parseColumnPermission(view);
-
         List<ScriptVariable> variables = parseVariables(view, viewExecuteParam);
 
         if (securityManager.isOrgOwner(view.getOrgId())) {
@@ -216,8 +222,10 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
         QueryScript queryScript = QueryScript.builder()
                 .test(false)
+                .sourceId(source.getId())
                 .script(view.getScript())
                 .variables(variables)
+                .schema(parseSchema(view.getModel()))
                 .build();
 
         if (viewExecuteParam.getPageInfo().getPageNo() < 1) {
@@ -227,6 +235,8 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         if (viewExecuteParam.getPageInfo().getPageSize() == 0) {
             viewExecuteParam.getPageInfo().setPageSize(10_000);
         }
+
+        viewExecuteParam.getPageInfo().setPageSize(Math.min(viewExecuteParam.getPageInfo().getPageSize(), Integer.MAX_VALUE));
 
         viewExecuteParam.getPageInfo().setCountTotal(true);
 
@@ -307,12 +317,17 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         variables.addAll(getOrgVariables(view.getOrgId()));
         // view自定义变量
         variables.addAll(getViewVariables(view.getId()));
-        // 用执行参数替换查询变量
         variables.stream()
                 .filter(v -> v.getType().equals(VariableTypeEnum.QUERY))
                 .forEach(v -> {
+                    //通过参数传值，进行参数替换
                     if (!CollectionUtils.isEmpty(param.getParams()) && param.getParams().containsKey(v.getName())) {
                         v.setValues(param.getParams().get(v.getName()));
+                    } else {
+                        //没有参数传值，如果是表达式类型作为默认值，在没有给定值的情况下，改变变量类型为表达式
+                        if (v.isExpression()) {
+                            v.setValueType(ValueType.FRAGMENT);
+                        }
                     }
                 });
         return variables;
@@ -382,8 +397,28 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
             }
             return columns;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            Exceptions.e(e);
         }
+        return null;
+    }
+
+    /**
+     * 从 view 中解析配置的schema
+     *
+     * @param model view.model
+     */
+    private Map<String, Column> parseSchema(String model) {
+        HashMap<String, Column> schema = new HashMap<>();
+        if (StringUtils.isBlank(model)) {
+            return schema;
+        }
+
+        JSONObject jsonObject = JSON.parseObject(model);
+        for (String key : jsonObject.keySet()) {
+            ValueType type = ValueType.valueOf(jsonObject.getJSONObject(key).getString("type"));
+            schema.put(key, new Column(key, type));
+        }
+        return schema;
     }
 
 }

@@ -14,11 +14,10 @@ public class CacheFactory {
             return cache;
         }
         try {
-//            String className = Application.getProperty(CACHE_IMPL_CLASS_NAME, "datart.server.service.impl.RedisCacheImpl");
             String className = Application.getProperty(CACHE_IMPL_CLASS_NAME);
             cache = (Cache) Application.getBean(Class.forName(className));
             return cache;
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             log.error("get cache instance error", e);
         }
         return null;

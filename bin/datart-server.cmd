@@ -26,4 +26,4 @@ cd /d %~dp0
 
 cd ..
 
-java -server -Xms2G -Xmx2G -Dfile.encoding=UTF-8 -cp ".\lib\*" datart.DatartServerApplication
+java -server -Xms2G -Xmx2G -Dspring.profiles.active=config -Dfile.encoding=UTF-8 -cp ".\lib\*" datart.DatartServerApplication

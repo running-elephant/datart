@@ -20,7 +20,7 @@
           "required": true,
           "defaultValue": "",
           "type": "string",
-          "description": "file format , csv or excel",
+          "description": "文件格式，目前支持excel 和 csv。",
           "options": [
             "XLSX",
             "CSV"
@@ -31,7 +31,7 @@
           "required": true,
           "defaultValue": "",
           "type": "string",
-          "description": "file path"
+          "description": "文件路径，上传后自动生成"
         },
         {
           "name": "columns",
@@ -39,6 +39,20 @@
           "type": "schema"
         }
       ]
+    },
+    {
+      "name": "cacheEnable",
+      "required": false,
+      "defaultValue": true,
+      "type": "bool",
+      "description": "是否开启本地缓存。开启后，文件解析结果将被缓存。"
+    },
+    {
+      "name": "cacheTimeout",
+      "required": false,
+      "type": "string",
+      "defaultValue": "30",
+      "description": "缓存超时时间（分钟）"
     }
   ]
 }

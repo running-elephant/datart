@@ -17,24 +17,22 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig, {
-  ChartDataSectionType,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import {
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
-} from 'app/utils/chart';
+} from 'app/utils/chartHelper';
+import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
-import { isEmpty } from 'utils/object';
 import Config from './config';
 
 export const DEFAULT_FONT_WEIGHT = 'normal';
 export const DEFAULT_FONT_STYLE = 'normal';
 export const DEFAULT_FONT_SIZE = '14px';
 export const DEFAULT_FONT_FAMILY =
-  '"Chinese Quote", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
+  '"Chinese Quote", -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
 
 class ScoreChart extends Chart {
   chart: any = null;
@@ -106,39 +104,16 @@ class ScoreChart extends Chart {
       return objDataColumns[0]?.[getValueByColumnKey(config)];
     });
 
-    const customFormatters = aggConfigValues
-      .map((content, index) => {
-        const typeKey = this.getBoardTypes(aggregateConfigs?.length)[index];
-        const texts = this.getLineContent(styleConfigs, typeKey);
-        if (!texts.show) {
-          return null;
-        }
-        return [
-          texts.prefixText &&
-            `{${typeKey + 'PrefixStyle'}|${texts.prefixText}}`,
-          `{${typeKey + 'ContentStyle'}|${content}}`,
-          texts.suffixText &&
-            `{${typeKey + 'SuffixStyle'}|${texts.suffixText}}`,
-        ]
-          .filter(Boolean)
-          .join('');
-      })
-      .filter(Boolean)
-      .join('\n');
-
-    const allTexts: string[] =
-      this.getBoardTypes(aggregateConfigs?.length).flatMap((bType, index) => {
-        const texts = this.getLineContent(styleConfigs, bType);
-        const content = isEmpty(aggConfigValues?.[index])
-          ? ''
-          : aggConfigValues?.[index];
-        return [texts.prefixText, content, texts.suffixText];
-      }) || [];
+    const measureTexts: string[] = this.getMeasureTexts(
+      aggregateConfigs,
+      aggConfigValues,
+      styleConfigs,
+    );
 
     const { basicFontSize, bodyContentFontSize } = this.computeFontSize(
       context,
       { width: this.chart?.getWidth(), height: this.chart?.getHeight() },
-    ).apply(null, allTexts as any);
+    ).apply(null, measureTexts as any);
 
     const richStyles = aggConfigValues
       .flatMap((_, index) => {
@@ -175,7 +150,11 @@ class ScoreChart extends Chart {
           label: {
             normal: {
               show: true,
-              formatter: customFormatters,
+              formatter: this.customFormatters(
+                aggConfigValues,
+                aggregateConfigs,
+                styleConfigs,
+              ),
               rich: richStyles,
             },
           },
@@ -200,7 +179,65 @@ class ScoreChart extends Chart {
     };
   }
 
-  getLineStyle(styles, typeName, basicFontSize, bodyContentFontSize) {
+  private getMeasureTexts(
+    aggregateConfigs: any[],
+    aggConfigValues: any[],
+    styleConfigs?: any[],
+  ): string[] {
+    return (
+      this.getBoardTypes(aggregateConfigs?.length).flatMap((bType, index) => {
+        const texts = this.getLineContent(styleConfigs, bType);
+        const formattedContent = this.getFormattedContent(
+          aggConfigValues,
+          aggregateConfigs,
+          index,
+        );
+        return [texts.prefixText, formattedContent, texts.suffixText];
+      }) || []
+    );
+  }
+
+  private getFormattedContent(
+    aggConfigValues: any[],
+    aggregateConfigs: any[],
+    index: number,
+  ) {
+    return (
+      toFormattedValue(
+        aggConfigValues?.[index],
+        aggregateConfigs?.[index]?.format,
+      ) || ''
+    );
+  }
+
+  private customFormatters(aggConfigValues, aggregateConfigs, styleConfigs) {
+    return aggConfigValues
+      .map((_, index) => {
+        const typeKey = this.getBoardTypes(aggregateConfigs?.length)[index];
+        const texts = this.getLineContent(styleConfigs, typeKey);
+        const formattedContent = this.getFormattedContent(
+          aggConfigValues,
+          aggregateConfigs,
+          index,
+        );
+        if (!texts.show) {
+          return null;
+        }
+        return [
+          texts.prefixText &&
+            `{${typeKey + 'PrefixStyle'}|${texts.prefixText}}`,
+          `{${typeKey + 'ContentStyle'}|${formattedContent}}`,
+          texts.suffixText &&
+            `{${typeKey + 'SuffixStyle'}|${texts.suffixText}}`,
+        ]
+          .filter(Boolean)
+          .join('');
+      })
+      .filter(Boolean)
+      .join('\n');
+  }
+
+  private getLineStyle(styles, typeName, basicFontSize, bodyContentFontSize) {
     const { show, prefixText, suffixText } = this.getLineContent(
       styles,
       typeName,
@@ -243,7 +280,7 @@ class ScoreChart extends Chart {
     };
   }
 
-  getLineContent(styles, typeName) {
+  private getLineContent(styles, typeName) {
     const show = getStyleValueByGroup(styles, typeName, 'show');
     const prefixText =
       getStyleValueByGroup(styles, typeName, 'prefixText') || '';

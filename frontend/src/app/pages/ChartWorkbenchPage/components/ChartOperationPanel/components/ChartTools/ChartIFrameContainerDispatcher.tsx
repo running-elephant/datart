@@ -17,8 +17,8 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
-import ChartDataset from 'app/pages/ChartWorkbenchPage/models/ChartDataset';
+import { ChartConfig } from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
 import { CSSProperties } from 'styled-components';
 import ChartTools from '.';
 

@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons';
 import { ListNav, ListPane, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
-import { BoardTypeMap } from 'app/pages/DashBoardPage/slice/types';
+import { BoardTypeMap } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getInitBoardConfig } from 'app/pages/DashBoardPage/utils/board';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
@@ -15,6 +15,7 @@ import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
+import { getInsertedNodeIndex } from 'utils/utils';
 import { SaveFormContext, SaveFormModel } from '../../SaveFormContext';
 import {
   makeSelectVizTree,
@@ -22,6 +23,7 @@ import {
   selectArchivedDashboards,
   selectArchivedDatachartLoading,
   selectArchivedDatacharts,
+  selectVizs,
 } from '../../slice/selectors';
 import {
   addViz,
@@ -31,7 +33,6 @@ import {
 import { FolderViewModel, VizType } from '../../slice/types';
 import { Recycle } from '../Recycle';
 import { FolderTree } from './FolderTree';
-
 interface FoldersProps {
   selectedId?: string;
   className?: string;
@@ -42,7 +43,7 @@ export const Folders = memo(({ selectedId, className }: FoldersProps) => {
   const orgId = useSelector(selectOrgId);
   const { showSaveForm } = useContext(SaveFormContext);
   const selectVizTree = useMemo(makeSelectVizTree, []);
-
+  const vizsData = useSelector(selectVizs);
   const getInitValues = useCallback((relType: VizType) => {
     if (relType === 'DASHBOARD') {
       return {
@@ -109,9 +110,12 @@ export const Folders = memo(({ selectedId, className }: FoldersProps) => {
         initialValues: getInitValues(key),
         onSave: (values, onClose) => {
           const dataValues = updateValue(key, values);
+
+          let index = getInsertedNodeIndex(values, vizsData);
+
           dispatch(
             addViz({
-              viz: { ...dataValues, orgId: orgId },
+              viz: { ...dataValues, orgId: orgId, index: index },
               type: key,
               resolve: onClose,
             }),
@@ -119,7 +123,7 @@ export const Folders = memo(({ selectedId, className }: FoldersProps) => {
         },
       });
     },
-    [showSaveForm, getInitValues, updateValue, dispatch, orgId],
+    [showSaveForm, getInitValues, updateValue, dispatch, orgId, vizsData],
   );
 
   const titles = useMemo(

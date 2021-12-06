@@ -21,26 +21,27 @@ package datart.data.provider.jdbc.adapters;
 import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
-import datart.core.common.Application;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.BeanUtils;
 import datart.core.data.provider.*;
 import datart.data.provider.JdbcDataProvider;
-import datart.data.provider.base.DataProviderException;
-import datart.data.provider.base.JdbcDriverInfo;
-import datart.data.provider.base.JdbcProperties;
+import datart.data.provider.calcite.dialect.CustomSqlDialect;
+import datart.data.provider.jdbc.JdbcDriverInfo;
+import datart.data.provider.jdbc.JdbcProperties;
 import datart.data.provider.calcite.dialect.FetchAndOffsetSupport;
 import datart.data.provider.jdbc.DataTypeUtils;
 import datart.data.provider.jdbc.SqlScriptRender;
-import datart.data.provider.jdbc.dialect.CustomSqlDialect;
 import datart.data.provider.local.LocalDB;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
+import java.lang.reflect.Constructor;
 import java.sql.*;
 import java.util.*;
 
@@ -70,7 +71,7 @@ public class JdbcDataProviderAdapter implements Closeable {
             this.dataSource = JdbcDataProvider.getDataSourceFactory().createDataSource(jdbcProperties);
         } catch (Exception e) {
             log.error("data provider init error", e);
-            throw new DataProviderException(e);
+            Exceptions.e(e);
         }
         this.init = true;
     }
@@ -82,12 +83,12 @@ public class JdbcDataProviderAdapter implements Closeable {
         } catch (ClassNotFoundException e) {
             String errMsg = "Driver class not found " + properties.getDriverClass();
             log.error(errMsg, e);
-            throw new DataProviderException(errMsg);
+            Exceptions.e(e);
         }
         try {
             DriverManager.getConnection(properties.getUrl(), properties.getUser(), properties.getPassword());
         } catch (SQLException sqlException) {
-            throw new DataProviderException(sqlException);
+            Exceptions.e(sqlException);
         }
         return true;
     }
@@ -178,7 +179,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         try (Connection conn = getConn()) {
             Statement statement = conn.createStatement();
 
-            statement.setFetchSize((int) Math.min(pageInfo.isCountTotal() ? pageInfo.getPageSize() : 10_000, 10_000));
+            statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
 
             try (ResultSet resultSet = statement.executeQuery(selectSql)) {
                 try {
@@ -239,16 +240,28 @@ public class JdbcDataProviderAdapter implements Closeable {
         if (sqlDialect != null) {
             return sqlDialect;
         }
-        try {
-            sqlDialect = SqlDialect.DatabaseProduct.valueOf(driverInfo.getDbType().toUpperCase()).getDialect();
-        } catch (Exception ignored) {
-            log.warn("DBType " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
-            sqlDialect = CustomSqlDialect.create(driverInfo);
+
+        if (StringUtils.isNotBlank(driverInfo.getSqlDialect())) {
+            try {
+                Class<?> clz = Class.forName(driverInfo.getSqlDialect());
+                Class<?> superclass = clz.getSuperclass();
+                if (superclass.equals(CustomSqlDialect.class)) {
+                    Constructor<?> constructor = clz.getConstructor(JdbcDriverInfo.class);
+                    sqlDialect = (CustomSqlDialect) constructor.newInstance(driverInfo);
+                } else {
+                    sqlDialect = (SqlDialect) clz.newInstance();
+                }
+            } catch (Exception ignored) {
+                log.warn("Sql dialect " + driverInfo.getSqlDialect() + " not found, use default sql dialect");
+            }
         }
-        try {
-            sqlDialect = Application.getBean(sqlDialect.getClass());
-        } catch (Exception e) {
-            log.debug("Custom sql dialect for {} not found. using default", sqlDialect.getClass().getSimpleName());
+        if (sqlDialect == null) {
+            try {
+                sqlDialect = SqlDialect.DatabaseProduct.valueOf(driverInfo.getDbType().toUpperCase()).getDialect();
+            } catch (Exception ignored) {
+                log.warn("DBType " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
+                sqlDialect = new CustomSqlDialect(driverInfo);
+            }
         }
         return sqlDialect;
     }
@@ -282,7 +295,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         ArrayList<Column> columns = new ArrayList<>();
         for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
             String columnTypeName = rs.getMetaData().getColumnTypeName(i);
-            String columnName = rs.getMetaData().getColumnName(i);
+            String columnName = rs.getMetaData().getColumnLabel(i);
             ValueType valueType = DataTypeUtils.sqlType2DataType(columnTypeName);
             columns.add(new Column(columnName, valueType));
         }
@@ -300,9 +313,13 @@ public class JdbcDataProviderAdapter implements Closeable {
 
         String sql = render.render(false, false, false);
         Dataframe data = execute(sql);
+        if (!CollectionUtils.isEmpty(script.getSchema())) {
+            for (Column column : data.getColumns()) {
+                column.setType(script.getSchema().getOrDefault(column.getName(), column).getType());
+            }
+        }
         data.setName(script.toQueryKey());
-
-        return LocalDB.queryFromLocal(data.getName(), executeParam, executeParam.isCacheEnable(), Collections.singletonList(data));
+        return LocalDB.executeLocalQuery(null, executeParam, Collections.singletonList(data));
     }
 
     /**
@@ -318,7 +335,6 @@ public class JdbcDataProviderAdapter implements Closeable {
                 , getSqlDialect()
                 , getVariableQuote());
 
-        //server aggregation is not enabled and SQL is committed to the data source for execution
         if (supportPaging()) {
             sql = render.render(true, true, false);
             log.debug(sql);

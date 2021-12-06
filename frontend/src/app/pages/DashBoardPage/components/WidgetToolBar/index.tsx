@@ -22,23 +22,20 @@ import {
   SyncOutlined,
 } from '@ant-design/icons';
 import { Space, Tooltip } from 'antd';
-import React, { FC, memo, useContext } from 'react';
+import React, { FC, useContext } from 'react';
 import styled from 'styled-components';
 import { PRIMARY } from 'styles/StyleConstants';
 import { BoardContext } from '../../contexts/BoardContext';
 import { WidgetContext } from '../../contexts/WidgetContext';
 import { WidgetInfoContext } from '../../contexts/WidgetInfoContext';
 import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
-import { WidgetType } from '../../slice/types';
+import { WidgetType } from '../../pages/Board/slice/types';
 import { WidgetActionDropdown } from './WidgetActionDropdown';
 
-interface WidgetToolBarProps {
-  id?: string;
-  widgetType: WidgetType;
-}
+interface WidgetToolBarProps {}
 
-const WidgetToolBar: FC<WidgetToolBarProps> = memo(({ widgetType }) => {
-  const { boardType } = useContext(BoardContext);
+const WidgetToolBar: FC<WidgetToolBarProps> = () => {
+  const { boardType, editing: boardEditing } = useContext(BoardContext);
   const { loading, inLinking, rendered } = useContext(WidgetInfoContext);
   const widget = useContext(WidgetContext);
   const { onClearLinkage } = useContext(WidgetMethodContext);
@@ -46,8 +43,10 @@ const WidgetToolBar: FC<WidgetToolBarProps> = memo(({ widgetType }) => {
     e.stopPropagation();
   };
   const renderedIcon = () => {
+    const widgetType = widget.config.type;
     if (boardType === 'free') return null;
-    if (widget.config.type === 'filter') return null;
+    const showTypes: WidgetType[] = ['chart'];
+    if (!showTypes.includes(widgetType)) return null;
     return rendered ? null : (
       <Tooltip title="等待加载">
         <ClockCircleOutlined style={{ color: PRIMARY }} />
@@ -55,6 +54,9 @@ const WidgetToolBar: FC<WidgetToolBarProps> = memo(({ widgetType }) => {
     );
   };
   const loadingIcon = () => {
+    const widgetType = widget.config.type;
+    const showTypes: WidgetType[] = ['chart', 'controller'];
+    if (!showTypes.includes(widgetType)) return null;
     return loading ? <SyncOutlined spin style={{ color: PRIMARY }} /> : null;
   };
   const linkageIcon = () => {
@@ -75,17 +77,25 @@ const WidgetToolBar: FC<WidgetToolBarProps> = memo(({ widgetType }) => {
       ) : null;
     }
   };
+  const renderWidgetAction = () => {
+    const widgetType = widget.config.type;
+    const hideTypes: WidgetType[] = ['query', 'reset', 'controller'];
+    if (hideTypes.includes(widgetType)) {
+      if (!boardEditing) return null;
+    }
+    return <WidgetActionDropdown widget={widget} />;
+  };
   return (
     <StyleWrap onClick={ssp} className="widget-tool-bar">
       <Space>
         {renderedIcon()}
         {loadingIcon()}
         {linkageIcon()}
-        <WidgetActionDropdown widget={widget} />
+        {renderWidgetAction()}
       </Space>
     </StyleWrap>
   );
-});
+};
 
 export default WidgetToolBar;
 
@@ -94,7 +104,6 @@ const StyleWrap = styled.div`
   top: 0;
   right: 0;
   z-index: 30;
-  /* width: 100%; */
   overflow: hidden;
   text-align: right;
   .widget-tool-dropdown {

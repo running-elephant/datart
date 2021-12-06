@@ -22,10 +22,10 @@ export const AutoUpdateSet: FC = () => {
   return (
     <>
       <Form.Item valuePropName="checked" name="autoUpdate">
-        <Checkbox>开启自动刷新</Checkbox>
+        <Checkbox>定时同步数据</Checkbox>
       </Form.Item>
       <Form.Item preserve name="frequency">
-        <NumberSet label={'自动刷新频率(秒)'} name={'frequency'} />
+        <NumberSet label={'定时同步频率(秒)'} name={'frequency'} />
       </Form.Item>
     </>
   );

@@ -139,7 +139,7 @@ export interface SaveFolderParams {
 }
 
 export interface UnarchiveViewParams {
-  view: Pick<ViewSimpleViewModel, 'id' | 'name' | 'parentId'>;
+  view: Pick<ViewSimpleViewModel, 'id' | 'name' | 'parentId' | 'index'>;
   resolve: () => void;
 }
 export interface DeleteViewParams {

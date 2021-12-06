@@ -16,27 +16,27 @@
  * limitations under the License.
  */
 
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 
 const config: ChartConfig = {
   datas: [
     {
-      label: 'section.legend',
-      key: 'color',
-      type: 'color',
-      required: true,
-    },
-    {
-      label: 'section.detail',
-      key: 'metrics',
+      label: 'dimension',
+      key: 'dimension',
       required: true,
       type: 'group',
+      limit: [0, 1],
+      actions: {
+        NUMERIC: ['alias', 'colorize', 'sortable'],
+        STRING: ['alias', 'colorize', 'sortable'],
+      },
     },
     {
-      label: 'deminsion',
-      key: 'deminsion',
+      label: 'metrics',
+      key: 'metrics',
       required: true,
       type: 'aggregate',
+      limit: [1, 999],
     },
     {
       label: 'filter',
@@ -128,12 +128,6 @@ const config: ChartConfig = {
         {
           label: 'label.metric',
           key: 'metric',
-          default: true,
-          comType: 'checkbox',
-        },
-        {
-          label: 'label.deminsion',
-          key: 'deminsion',
           default: true,
           comType: 'checkbox',
         },
@@ -270,8 +264,8 @@ const config: ChartConfig = {
           title: '标签',
           showLabel: '显示标签',
           position: '位置',
-          metric: '维度',
-          deminsion: '指标',
+          metric: '指标',
+          dimension: '维度',
           conversion: '转换率',
           arrival: '到达率',
           percentage: '百分比',

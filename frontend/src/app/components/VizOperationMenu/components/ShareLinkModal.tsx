@@ -95,7 +95,7 @@ const ShareLinkModal: FC<{
         </FormItemEx>
         <FormItemEx label={t('share.enablePassword')}>
           <Checkbox
-            value={enablePassword}
+            checked={enablePassword}
             onChange={e => {
               setEnablePassword(e.target.checked);
             }}

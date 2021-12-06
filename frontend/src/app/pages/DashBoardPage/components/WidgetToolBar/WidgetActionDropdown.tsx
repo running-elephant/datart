@@ -15,14 +15,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { EditFilled } from '@ant-design/icons';
+import {
+  BranchesOutlined,
+  CloseCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EllipsisOutlined,
+  FullscreenOutlined,
+  InfoOutlined,
+  LinkOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
 import { Button, Dropdown, Menu } from 'antd';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { selectDataChartById } from '../..//pages/Board/slice/selector';
 import { BoardContext } from '../../contexts/BoardContext';
 import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
-import { Widget } from '../../slice/types';
-import { getWidgetActionList } from '../../utils/widget';
-import { widgetActionMap } from './config';
+import { Widget } from '../../pages/Board/slice/types';
+import {
+  getWidgetActionList,
+  TriggerChartIds,
+  WidgetActionListItem,
+  widgetActionType,
+} from './config';
 
 export interface WidgetActionDropdownProps {
   widget: Widget;
@@ -32,44 +48,119 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
   ({ widget }) => {
     const { editing: boardEditing } = useContext(BoardContext);
     const { onWidgetAction } = useContext(WidgetMethodContext);
-
-    const widgetActionList = useMemo(
-      () => getWidgetActionList(widget),
-      [widget],
+    const dataChart = useSelector(state =>
+      selectDataChartById(state, widget?.datachartId),
     );
+    const IsSupportTrigger = useMemo(
+      () => TriggerChartIds.includes(dataChart?.config.chartGraphId),
+      [dataChart],
+    );
+
     const menuClick = useCallback(
       ({ key }) => {
-        onWidgetAction(key, widget.config.type);
+        onWidgetAction(key, widget);
       },
-      [onWidgetAction, widget.config.type],
+      [onWidgetAction, widget],
     );
+    const getAllList = () => {
+      const allWidgetActionList: WidgetActionListItem<widgetActionType>[] = [
+        {
+          key: 'refresh',
+          label: '同步数据',
+          icon: <SyncOutlined />,
+        },
+        {
+          key: 'fullScreen',
+          label: '全屏',
+          icon: <FullscreenOutlined />,
+        },
+        {
+          key: 'edit',
+          label: '编辑',
+          icon: <EditOutlined />,
+        },
+        {
+          key: 'delete',
+          label: '删除',
+          icon: <DeleteOutlined />,
+          danger: true,
+        },
+
+        {
+          key: 'info',
+          label: '信息',
+          icon: <InfoOutlined />,
+        },
+        {
+          key: 'makeLinkage',
+          label: '联动设置',
+          icon: <LinkOutlined />,
+          divider: true,
+        },
+        {
+          key: 'closeLinkage',
+          label: '关闭联动',
+          icon: <CloseCircleOutlined />,
+          danger: true,
+        },
+        {
+          key: 'makeJump',
+          label: '跳转设置',
+          icon: <BranchesOutlined />,
+          divider: true,
+        },
+        {
+          key: 'closeJump',
+          label: '关闭跳转',
+          icon: <CloseCircleOutlined />,
+          danger: true,
+        },
+      ];
+      return allWidgetActionList;
+    };
     const actionList = useMemo(() => {
-      const actionMap = boardEditing
-        ? widgetActionMap.edit
-        : widgetActionMap.view;
-      const menuItems = actionMap[widget.config.type].map(key => {
-        const action = widgetActionList.find(item => item.key === key);
-        if (action) {
-          return (
-            <Menu.Item disabled={action.disabled} key={action.key}>
-              {action.label}
-            </Menu.Item>
-          );
-        } else {
+      return (
+        getWidgetActionList({
+          allList: getAllList(),
+          widget,
+          boardEditing,
+        }) || []
+      );
+    }, [boardEditing, widget]);
+    const dropdownList = useMemo(() => {
+      const menuItems = actionList.map(item => {
+        if (
+          (item.key === 'makeLinkage' || item.key === 'makeJump') &&
+          !IsSupportTrigger
+        )
           return null;
-        }
+
+        return (
+          <React.Fragment key={item.key}>
+            {item.divider && <Menu.Divider />}
+            <Menu.Item
+              danger={item.danger}
+              icon={item.icon}
+              disabled={item.disabled}
+              key={item.key}
+            >
+              {item.label}
+            </Menu.Item>
+          </React.Fragment>
+        );
       });
+
       return <Menu onClick={menuClick}>{menuItems}</Menu>;
-    }, [boardEditing, menuClick, widget.config.type, widgetActionList]);
+    }, [actionList, menuClick, IsSupportTrigger]);
     return (
       <Dropdown
         className="widget-tool-dropdown"
-        overlay={actionList}
+        overlay={dropdownList}
         placement="bottomCenter"
         trigger={['click']}
         arrow
       >
-        <Button icon={<EditFilled />} type="link" />
+        <Button icon={<EllipsisOutlined />} type="link" />
       </Dropdown>
     );
   },

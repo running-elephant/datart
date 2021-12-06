@@ -18,7 +18,6 @@
 
 package datart.core.common;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -29,39 +28,27 @@ import java.util.Arrays;
 @Component
 public class MessageResolver {
 
-    private MessageSource messageSource;
+    private static MessageSource messageSource;
 
     public MessageResolver() {
     }
 
     @Autowired
     public void setMessageSource(MessageSource messageSource) {
-        this.messageSource = messageSource;
+        MessageResolver.messageSource = messageSource;
     }
 
-    public String getMessage(String code) {
-        return messageSource.getMessage(code, null, "unknown message", LocaleContextHolder.getLocale());
+    public static String getMessage(Object code) {
+        return messageSource.getMessage(code.toString(), null, code.toString(), LocaleContextHolder.getLocale());
     }
 
-    private String getMessage(String code, Object[] args) {
-        return messageSource.getMessage(code, args, "unknown message", LocaleContextHolder.getLocale());
-    }
+//    public static String getMessage(String code, Object... args) {
+//        return messageSource.getMessage(code, args, code, LocaleContextHolder.getLocale());
+//    }
 
-    public String getMessages(String baseCode, String... paramCode) {
-        Object[] objects = Arrays.stream(paramCode).map(this::getMessage).toArray();
-        return getMessage(baseCode, objects);
+    public static String getMessages(Object code, Object... messageCodes) {
+        Object[] objs = Arrays.stream(messageCodes).map(MessageResolver::getMessage).toArray();
+        return messageSource.getMessage(code.toString(), objs, code.toString(), LocaleContextHolder.getLocale());
+//        return getMessage(code, objs);
     }
-
-    public String getMessageWithParam(String code, Object... param) {
-        return getMessage(code, param);
-    }
-
-    public String successMessage() {
-        return getMessage("response.success");
-    }
-
-    public String failMessage() {
-        return getMessage("response.fail");
-    }
-
 }

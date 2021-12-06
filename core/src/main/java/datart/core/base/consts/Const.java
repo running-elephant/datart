@@ -27,8 +27,6 @@ public class Const {
 
     public static final byte DATA_STATUS_ARCHIVED = 0;
 
-    public static final byte DATA_STATUS_CREATING = 1;
-
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     /**
@@ -45,14 +43,6 @@ public class Const {
     /**
      * 脚本变量
      */
-    //系统变量模板，匹配系统变量的表达式。
-    //public static final String REG_SYS_VAR_TEMPLATE = "[\\u4E00-\\u9FA5A-Za-z0-9._-`\"']+\\s*[!=]{1,2}\\s*[`\"'\\[]*[%s]{1}[`\"']]*";
-    //匹配所有的变量
-//    public static final String REG_VARIABLE_TEMPLATE = "%s[\\u4E00-\\u9FA5A-Za-z0-9._-]+%s";
-    //权限变量表达式模板，匹配权限变量的整个条件表达式
-//    public static final String REG_AUTH_VAR_TEMPLATE = "[\\u4E00-\\u9FA5A-Za-z0-9._-`\"']+\\s*(IN|NOT\\s+IN|IS\\s+NULL|LIKE|EXISTS|>|<|=|!)+\\s*[`\"']*(%s){1}[`\"']*";
-    //查询变量正则模板，匹配查询变量及其左右的引用符、括号等
-//    public static final String REG_QUERY_VAR_TEMPLATE = "[`\"'\\(]*(%s){1}[`\"'\\)]*";
     //默认的变量引用符号
     public static final String DEFAULT_VARIABLE_QUOTE = "$";
 
@@ -68,12 +58,6 @@ public class Const {
     public static final String TOKEN = "Authorization";
 
     public static final String TOKEN_HEADER_PREFIX = "Bearer ";
-
-    /**
-     * 组织头像保存路径
-     */
-
-    public static final String PROTOCOL_HTTP_PRE = "HTTP://";
 
     /**
      * 权限等级定义

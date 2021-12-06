@@ -1,7 +1,7 @@
 import { Split } from 'app/components';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
+import { useBoardSlice } from 'app/pages/DashBoardPage/pages/Board/slice';
 import { useEditBoardSlice } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
-import { useBoardSlice } from 'app/pages/DashBoardPage/slice';
 import { useStoryBoardSlice } from 'app/pages/StoryBoardPage/slice';
 import React, { useCallback } from 'react';
 import { useRouteMatch } from 'react-router-dom';

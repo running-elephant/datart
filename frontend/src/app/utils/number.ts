@@ -16,13 +16,12 @@
  * limitations under the License.
  */
 
-import {
-  FieldFormatType,
-  IFieldFormatConfig,
-  NumericUnit,
-} from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { FieldFormatType, IFieldFormatConfig } from 'app/types/ChartConfig';
+import { dinero } from 'dinero.js';
+import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
 import moment from 'moment';
-import { isEmpty } from 'utils/object';
+import { isEmpty, pipe } from 'utils/object';
+import { getCurrency, intlFormat } from './currency';
 
 export function toPrecision(value: any, precision: number) {
   if (isNaN(+value)) {
@@ -105,62 +104,33 @@ export function toFormattedValue(
     case FieldFormatType.NUMERIC:
       const numericConfig =
         config as IFieldFormatConfig[FieldFormatType.NUMERIC];
-      formattedValue = toUnit(value, numericConfig?.unit);
-      formattedValue = formatByDecimalPlaces(
-        formattedValue,
-        numericConfig?.decimalPlaces,
-      );
-      formattedValue = formatByThousandSeperator(
-        formattedValue,
-        numericConfig?.useThousandSeparator,
-      );
-      if (numericConfig?.unitDesc !== NumericUnit.None) {
-        formattedValue = `${formattedValue}${numericConfig?.unitDesc}`;
-      }
+      formattedValue = pipe(
+        unitFormater,
+        decimalPlacesFormater,
+        numericFormater,
+      )(value, numericConfig);
       break;
     case FieldFormatType.CURRENCY:
       const currencyConfig =
         config as IFieldFormatConfig[FieldFormatType.CURRENCY];
-      formattedValue = toUnit(value, currencyConfig?.unit);
-      formattedValue = formatByDecimalPlaces(
-        formattedValue,
-        currencyConfig?.decimalPlaces,
-      );
-      formattedValue = formatByThousandSeperator(
-        formattedValue,
-        currencyConfig?.useThousandSeparator,
-      );
-      if (currencyConfig?.unitDesc !== NumericUnit.None) {
-        formattedValue = `${formattedValue}${currencyConfig?.unitDesc}`;
-      }
-      formattedValue = [
-        currencyConfig?.prefix || '',
-        formattedValue,
-        currencyConfig?.suffix || '',
-      ].join('');
+      formattedValue = pipe(currencyFormater)(value, currencyConfig);
       break;
     case FieldFormatType.PERCENTAGE:
       const percentageConfig =
         config as IFieldFormatConfig[FieldFormatType.PERCENTAGE];
-      formattedValue = +value * 100;
-      formattedValue = isNaN(formattedValue)
-        ? value
-        : `${formatByDecimalPlaces(
-            formattedValue,
-            percentageConfig?.decimalPlaces,
-          )}%`;
+      formattedValue = pipe(percentageFormater)(value, percentageConfig);
       break;
     case FieldFormatType.SCIENTIFIC:
       const scientificNotationConfig =
         config as IFieldFormatConfig[FieldFormatType.SCIENTIFIC];
-      formattedValue = (+value).toExponential(
-        scientificNotationConfig?.decimalPlaces,
+      formattedValue = pipe(scientificNotationFormater)(
+        value,
+        scientificNotationConfig,
       );
-      formattedValue = isNaN(formattedValue) ? value : formattedValue;
       break;
     case FieldFormatType.DATE:
       const dateConfig = config as IFieldFormatConfig[FieldFormatType.DATE];
-      formattedValue = moment(value).format(dateConfig?.format);
+      formattedValue = pipe(dateFormater)(value, dateConfig);
       break;
     default:
       formattedValue = value;
@@ -170,22 +140,47 @@ export function toFormattedValue(
   return formattedValue;
 }
 
-function formatByDecimalPlaces(value, decimalPlaces?: number) {
-  if (isEmpty(decimalPlaces)) {
+function unitFormater(
+  value: any,
+  config?:
+    | IFieldFormatConfig[FieldFormatType.NUMERIC]
+    | IFieldFormatConfig[FieldFormatType.CURRENCY],
+) {
+  if (isEmpty(config?.unitKey)) {
+    return value;
+  }
+
+  if (isNaN(+value)) {
+    return value;
+  }
+  const realUnit = NumericUnitDescriptions.get(config?.unitKey!)?.[0] || 1;
+  return +value / realUnit;
+}
+
+function decimalPlacesFormater(
+  value,
+  config?:
+    | IFieldFormatConfig[FieldFormatType.NUMERIC]
+    | IFieldFormatConfig[FieldFormatType.CURRENCY],
+) {
+  if (isEmpty(config?.decimalPlaces)) {
     return value;
   }
   if (isNaN(value)) {
     return value;
   }
-  if (decimalPlaces! < 0 || decimalPlaces! > 100) {
+  if (config?.decimalPlaces! < 0 || config?.decimalPlaces! > 100) {
     return value;
   }
 
-  return (+value).toFixed(decimalPlaces);
+  return (+value).toFixed(config?.decimalPlaces);
 }
 
-function formatByThousandSeperator(value, useThousandSeparator?: boolean) {
-  if (isNaN(+value) || !useThousandSeparator) {
+function thousandSeperatorFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.NUMERIC],
+) {
+  if (isNaN(+value) || !config?.useThousandSeparator) {
     return value;
   }
 
@@ -193,4 +188,108 @@ function formatByThousandSeperator(value, useThousandSeparator?: boolean) {
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   const formatted = parts.join('.');
   return formatted;
+}
+
+function numericFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.NUMERIC],
+) {
+  if (isNaN(+value)) {
+    return value;
+  }
+
+  const valueWithPrefixs = [
+    config?.prefix || '',
+    thousandSeperatorFormater(value, config),
+    NumericUnitDescriptions.get(config?.unitKey || NumberUnitKey.None)?.[1],
+    config?.suffix || '',
+  ].join('');
+  return valueWithPrefixs;
+}
+
+function currencyFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.CURRENCY],
+) {
+  if (isNaN(+value)) {
+    return value;
+  }
+
+  try {
+    if (!Number.isInteger(+value)) {
+      return value;
+    }
+    let fractionDigits;
+    if (
+      !isEmpty(config?.decimalPlaces) &&
+      +config?.decimalPlaces! >= 0 &&
+      +config?.decimalPlaces! <= 20
+    ) {
+      fractionDigits = config?.decimalPlaces!;
+    }
+    const realUnit = NumericUnitDescriptions.get(config?.unitKey!)?.[0] || 1;
+    const exponent = Math.log10(realUnit);
+    const dineroValue = dinero({
+      amount: +value,
+      currency: getCurrency(config?.currency),
+      scale: exponent,
+    });
+
+    const valueWithCurrency = [
+      intlFormat(dineroValue, 'zh-CN', { fractionDigits }),
+      NumericUnitDescriptions.get(config?.unitKey || NumberUnitKey.None)?.[1],
+    ].join('');
+    return valueWithCurrency;
+  } catch (error) {
+    console.error('Currency Formater Error: ', error);
+    return value;
+  }
+}
+
+function percentageFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.PERCENTAGE],
+) {
+  if (isNaN(+value)) {
+    return value;
+  }
+
+  let fractionDigits = 0;
+  if (
+    !isEmpty(config?.decimalPlaces) &&
+    +config?.decimalPlaces! >= 0 &&
+    +config?.decimalPlaces! <= 20
+  ) {
+    fractionDigits = +config?.decimalPlaces!;
+  }
+  return `${(+value * 100).toFixed(fractionDigits)}%`;
+}
+
+function scientificNotationFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.SCIENTIFIC],
+) {
+  if (isNaN(+value)) {
+    return value;
+  }
+  let fractionDigits = 0;
+  if (
+    !isEmpty(config?.decimalPlaces) &&
+    +config?.decimalPlaces! >= 0 &&
+    +config?.decimalPlaces! <= 20
+  ) {
+    fractionDigits = +config?.decimalPlaces!;
+  }
+  return (+value).toExponential(fractionDigits);
+}
+
+function dateFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.DATE],
+) {
+  if (isNaN(+value) || isEmpty(config?.format)) {
+    return value;
+  }
+
+  return moment(value).format(config?.format);
 }

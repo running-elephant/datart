@@ -15,10 +15,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
+import { getInsertedNodeIndex } from 'utils/utils';
 import { v4 as uuidv4 } from 'uuid';
 import { UNPERSISTED_ID_PREFIX } from '../constants';
 import { SaveFormContext } from '../SaveFormContext';
-import { makeSelectViewTree, selectArchived } from '../slice/selectors';
+import {
+  makeSelectViewTree,
+  selectArchived,
+  selectViews,
+} from '../slice/selectors';
 import { saveFolder } from '../slice/thunks';
 import { ViewSimpleViewModel } from '../slice/types';
 import { FolderTree } from './FolderTree';
@@ -30,6 +35,7 @@ export const Sidebar = memo(() => {
   const { showSaveForm } = useContext(SaveFormContext);
   const orgId = useSelector(selectOrgId);
   const selectViewTree = useMemo(makeSelectViewTree, []);
+  const viewsData = useSelector(selectViews);
 
   const getIcon = useCallback(
     ({ isFolder }: ViewSimpleViewModel) =>
@@ -48,6 +54,7 @@ export const Sidebar = memo(() => {
   const treeData = useSelector(state =>
     selectViewTree(state, { getIcon, getDisabled }),
   );
+
   const { filteredData: filteredTreeData, debouncedSearch: treeSearch } =
     useDebouncedSearch(treeData, (keywords, d) =>
       d.title.toLowerCase().includes(keywords.toLowerCase()),
@@ -85,11 +92,14 @@ export const Sidebar = memo(() => {
             simple: true,
             parentIdLabel: '所属目录',
             onSave: (values, onClose) => {
+              let index = getInsertedNodeIndex(values, viewsData);
+
               dispatch(
                 saveFolder({
                   folder: {
                     ...values,
                     parentId: values.parentId || null,
+                    index,
                   },
                   resolve: onClose,
                 }),
@@ -101,7 +111,7 @@ export const Sidebar = memo(() => {
           break;
       }
     },
-    [dispatch, history, orgId, showSaveForm],
+    [dispatch, history, orgId, showSaveForm, viewsData],
   );
 
   const titles = useMemo(

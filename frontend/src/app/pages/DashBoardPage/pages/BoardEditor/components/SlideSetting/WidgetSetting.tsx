@@ -18,7 +18,7 @@
 import { Collapse, Form } from 'antd';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
-import { Widget } from 'app/pages/DashBoardPage/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getRGBAColor } from 'app/pages/DashBoardPage/utils';
 import produce from 'immer';
 import { throttle } from 'lodash';
@@ -40,6 +40,7 @@ import NameSet from './SettingItem/NameSet';
 import PaddingSet from './SettingItem/PaddingSet';
 import { Group, SettingPanel } from './SettingPanel';
 import { WidgetNameList } from './WidgetList/WidgetNameList';
+
 const { Panel } = Collapse;
 export const WidgetSetting: FC = memo(() => {
   const dispatch = useDispatch();
@@ -68,7 +69,8 @@ export const WidgetSetting: FC = memo(() => {
       const value = { ...cacheValue.current, ...newValues };
 
       value.border.color = getRGBAColor(value.border.color);
-      value.nameConfig.color = getRGBAColor(value.nameConfig.color);
+      value.nameConfig = {...value.nameConfig,color:getRGBAColor(value.nameConfig.color)};
+      // value.nameConfig.color = getRGBAColor(value.nameConfig.color);
 
       const nextConf = produce(widget.config, draft => {
         draft.name = value.name;
@@ -81,6 +83,7 @@ export const WidgetSetting: FC = memo(() => {
         draft.autoUpdate = value.autoUpdate;
         draft.frequency = value.frequency;
       });
+
       dispatch(
         editBoardStackActions.updateWidgetConfig({
           wid: widget.id,
@@ -103,6 +106,7 @@ export const WidgetSetting: FC = memo(() => {
     const values = form.getFieldsValue();
     onUpdate(values, widget);
   }, [form, onUpdate, widget]);
+
   return (
     <SettingPanel title="组件设计">
       <Form
@@ -118,7 +122,11 @@ export const WidgetSetting: FC = memo(() => {
         >
           <Panel header="名称" key="name" forceRender>
             <Group>
-              <NameSet config={config.nameConfig} />
+              <NameSet
+                form={form}
+                onForceUpdate={onForceUpdate}
+                config={config.nameConfig}
+              />
             </Group>
           </Panel>
           {boardType === 'free' && (
@@ -156,7 +164,7 @@ export const WidgetSetting: FC = memo(() => {
               <BorderSet border={config.border} />
             </Group>
           </Panel>
-          <Panel header="自动刷新" key="autUpdate" forceRender>
+          <Panel header="定时同步数据" key="autUpdate" forceRender>
             <Group>
               <AutoUpdateSet />
             </Group>

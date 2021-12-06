@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
-import ChartConfig from 'app/pages/ChartWorkbenchPage/models/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 
 const config: ChartConfig = {
   datas: [
     {
-      label: 'deminsion',
-      key: 'deminsion',
+      label: 'metrics',
+      key: 'metrics',
       required: true,
       type: 'aggregate',
-      maxFieldCount: 3,
+      limit: [1, 3],
       actions: {
         NUMERIC: ['aggregate', 'format'],
         STRING: ['aggregate', 'format'],

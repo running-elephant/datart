@@ -15,6 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetInfo } from 'app/pages/DashBoardPage/slice/types';
+import { WidgetInfo } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { createContext } from 'react';
 export const WidgetInfoContext = createContext<WidgetInfo>({} as WidgetInfo);

@@ -17,18 +17,30 @@
  */
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import * as datartChartHelper from 'app/utils/chart';
+import * as datartChartHelper from 'app/utils/chartHelper';
 import { fetchPluginChart } from 'app/utils/fetch';
-import { Omit } from 'utils/object';
+import { cond, Omit } from 'utils/object';
+
+const pureFuncLoader = ({ path, result }) => {
+  if (/.js$/.test(path)) {
+    // eslint-disable-next-line no-new-func
+    return Function(`"use strict"; return (${result})`)()({
+      dHelper: { ...datartChartHelper },
+    });
+  }
+};
+
+const iifeFuncLoader = ({ path, result }) => {
+  if (/.iife.js$/.test(path)) {
+    // eslint-disable-next-line no-new-func
+    return Function(`"use strict"; return ${result}`)()({
+      dHelper: { ...datartChartHelper },
+    });
+  }
+};
 
 class ChartPluginLoader {
   async loadPlugins(paths: string[]) {
-    // const customModelPaths = [
-    //   './custom-chart-plugins/demo-custom-line-chart.js',
-    //   // './custom-chart-plugins/demo-echart-3d-bar-chart.js',
-    //   './custom-chart-plugins/demo-d3js-scatter-chart.js',
-    // ];
-
     const loadPluginTasks = (paths || []).map(async (path, index) => {
       try {
         const result = await fetchPluginChart(path);
@@ -40,17 +52,16 @@ class ChartPluginLoader {
          * Git Issue: https://github.com/facebook/create-react-app/issues/5563
          * Suggestions: Use es6 `import` api to load file and compatible with ES Modules
          */
-        // eslint-disable-next-line no-new-func
-        const customPlugin = Function(`"use strict"; return (${result})`)()({
-          dHelper: { ...datartChartHelper },
-        });
+        const customPlugin = cond(
+          iifeFuncLoader,
+          pureFuncLoader,
+        )({ path, result });
         return this.convertToDatartChartModel(customPlugin);
       } catch (e) {
         console.error('ChartPluginLoader | plugin chart error: ', e);
         return null;
       }
     });
-
     return Promise.all(loadPluginTasks);
   }
 

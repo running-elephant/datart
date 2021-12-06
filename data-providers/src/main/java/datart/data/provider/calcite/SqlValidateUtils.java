@@ -17,6 +17,7 @@
  */
 package datart.data.provider.calcite;
 
+import datart.core.base.exception.Exceptions;
 import datart.data.provider.base.DataProviderException;
 import org.apache.calcite.sql.*;
 
@@ -38,7 +39,7 @@ public class SqlValidateUtils {
         }
 
         if (sqlCall instanceof SqlDdl || sqlCall instanceof SqlDelete || sqlCall instanceof SqlUpdate) {
-            throw new DataProviderException("Operation (" + sqlCall.getKind() + ":" + sqlCall + ") is not allowed");
+            Exceptions.tr(DataProviderException.class, "message.sql.op.forbidden", sqlCall.getKind() + ":" + sqlCall);
         }
         return false;
     }

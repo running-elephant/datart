@@ -23,14 +23,17 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
-import { BoardProvider } from '../DashBoardPage/components/BoardProvider';
-import FullScreenPanel from '../DashBoardPage/components/FullScreenPanel';
+import { BoardProvider } from '../DashBoardPage/components/BoardProvider/BoardProvider';
+import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel';
 import TitleHeader from '../DashBoardPage/components/TitleHeader';
-import AutoBoardCore from '../DashBoardPage/pages/Dashboard/AutoDashboard/AutoBoardCore';
-import FreeBoardCore from '../DashBoardPage/pages/Dashboard/FreeDashboard/FreeBoardCore';
-import { getBoardDownloadParams } from '../DashBoardPage/slice/asyncActions';
-import { selectShareBoardInfo } from '../DashBoardPage/slice/selector';
-import { Dashboard, VizRenderMode } from '../DashBoardPage/slice/types';
+import AutoBoardCore from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
+import FreeBoardCore from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
+import { getBoardDownloadParams } from '../DashBoardPage/pages/Board/slice/asyncActions';
+import { selectShareBoardInfo } from '../DashBoardPage/pages/Board/slice/selector';
+import {
+  Dashboard,
+  VizRenderMode,
+} from '../DashBoardPage/pages/Board/slice/types';
 import { OnLoadTasksType } from '../MainPage/Navbar/DownloadListPopup';
 import { DownloadTask } from '../MainPage/slice/types';
 import { DownloadTaskContainer } from './DownloadTaskContainer';
@@ -66,8 +69,6 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
 
     const [allItemFetched, setAllItemFetched] = useState(false);
     useEffect(() => {
-      // console.log('--needFetchItems', needFetchItems);
-      // console.log('--hasFetchItems', hasFetchItems);
       if (needFetchItems.length === hasFetchItems.length) {
         setAllItemFetched(true);
       }
