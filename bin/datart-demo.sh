@@ -26,4 +26,4 @@ CLASS_PATH="${BASE_DIR}/lib/*"
 
 START_CLASS="datart.DatartServerApplication"
 
-java -server -Xms2G -Xmx2G  -Dspring.profiles.active=config -Dfile.encoding=UTF-8 -cp "${CLASS_PATH}" datart.DatartServerApplication
+java -server -Xms2G -Xmx2G -Dspring.profiles.active=demo -Dfile.encoding=UTF-8 -cp "${CLASS_PATH}" datart.DatartServerApplication

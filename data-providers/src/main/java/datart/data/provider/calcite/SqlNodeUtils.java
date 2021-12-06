@@ -109,7 +109,7 @@ public class SqlNodeUtils {
             case IDENTIFIER:
                 return createSqlIdentifier(value.getValue().toString(), names);
             default:
-                Exceptions.tr(DataProviderException.class, "message.provider.sql.variable", value.getValueType().name());
+                Exceptions.msg("message.provider.sql.variable", value.getValueType().name());
         }
         return null;
     }

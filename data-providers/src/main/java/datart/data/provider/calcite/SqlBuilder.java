@@ -371,7 +371,7 @@ public class SqlBuilder {
                 sqlNodes = nodes.toArray(new SqlNode[0]);
                 break;
             default:
-                Exceptions.tr(DataProviderException.class, "message.provider.sql.type.unsupported", operator.getSqlOperator().name());
+                Exceptions.msg("message.provider.sql.type.unsupported", operator.getSqlOperator().name());
         }
         return new SqlBasicCall(sqlOp, sqlNodes, SqlParserPos.ZERO);
     }
@@ -436,7 +436,7 @@ public class SqlBuilder {
             case COUNT_DISTINCT:
                 return SqlStdOperatorTable.COUNT;
             default:
-                Exceptions.tr(DataProviderException.class, "message.provider.sql.type.unsupported", sqlOperator.name());
+                Exceptions.msg( "message.provider.sql.type.unsupported", sqlOperator.name());
         }
         return null;
     }
