@@ -24,12 +24,12 @@ import {
 } from 'app/pages/DashBoardPage/utils/board';
 import {
   convertWrapChartWidget,
-  createDataChartWidget,
   createToSaveWidgetGroup,
   createWidgetInfo,
   createWidgetInfoMap,
   getWidgetInfoMapByServer,
 } from 'app/pages/DashBoardPage/utils/widget';
+import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
 import ChartDataView from 'app/types/ChartDataView';
 import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
@@ -252,7 +252,7 @@ export const addDataChartWidgets = createAsyncThunk<
     dispatch(boardActions.setDataChartMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
     const widgets = chartIds.map(dcId => {
-      let widget = createDataChartWidget({
+      let widget = widgetToolKit.chart.create({
         dashboardId: boardId,
         boardType: boardType,
         dataChartId: dcId,
@@ -288,7 +288,7 @@ export const addWrapChartWidget = createAsyncThunk<
     const viewViews = [view];
     dispatch(boardActions.setDataChartMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-    let widget = createDataChartWidget({
+    let widget = widgetToolKit.chart.create({
       dashboardId: boardId,
       boardType: boardType,
       dataChartId: chartId,

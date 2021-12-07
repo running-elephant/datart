@@ -86,7 +86,48 @@ export const createDataChartWidget = (opt: {
   });
   return widget;
 };
+export const createControllerWidget = (opt: {
+  boardId: string;
+  boardType: BoardType;
+  relations: Relation[];
+  name?: string;
+  controllerType: ControllerFacadeTypes;
+  views: RelatedView[];
+  config: ControllerConfig;
+  hasVariable: boolean;
+}) => {
+  const {
+    boardId,
+    boardType,
+    views,
+    config,
+    controllerType,
+    relations,
+    name = 'newController',
+  } = opt;
+  const content: ControllerWidgetContent = {
+    type: controllerType,
+    relatedViews: views,
+    name: name,
+    config: config,
+  };
 
+  const widgetConf = createInitWidgetConfig({
+    name: name,
+    type: 'controller',
+    content: content,
+    boardType: boardType,
+  });
+
+  const widgetId = relations[0]?.sourceId || uuidv4();
+  const widget: Widget = createWidget({
+    id: widgetId,
+    dashboardId: boardId,
+    config: widgetConf,
+    relations,
+  });
+  return widget;
+};
 export const createMediaWidget = (opt: {
   dashboardId: string;
   boardType: BoardType;
@@ -104,7 +145,6 @@ export const createMediaWidget = (opt: {
   });
   return widget;
 };
-
 export const createContainerWidget = (opt: {
   dashboardId: string;
   boardType: BoardType;
@@ -122,7 +162,6 @@ export const createContainerWidget = (opt: {
   });
   return widget;
 };
-
 export const createControlBtn = (opt: BtnActionParams) => {
   const content = { type: opt.type };
   const widgetConf = createInitWidgetConfig({
@@ -137,7 +176,6 @@ export const createControlBtn = (opt: BtnActionParams) => {
   });
   return widget;
 };
-
 export const createInitWidgetConfig = (opt: {
   type: WidgetType;
   content: WidgetContent;
@@ -178,15 +216,6 @@ export const createInitWidgetConfig = (opt: {
     padding: createWidgetPadding(opt.type),
   };
 };
-
-export const fontDefault = {
-  fontFamily: FONT_FAMILY,
-  fontSize: '14',
-  fontWeight: 'normal',
-  fontStyle: 'normal',
-  color: G90,
-};
-
 export const createWidget = (option: {
   dashboardId: string;
   config: WidgetConf;
@@ -207,6 +236,14 @@ export const createWidget = (option: {
   };
   return widget;
 };
+export const fontDefault = {
+  fontFamily: FONT_FAMILY,
+  fontSize: '14',
+  fontWeight: 'normal',
+  fontStyle: 'normal',
+  color: G90,
+};
+
 export const createWidgetInfo = (id: string): WidgetInfo => {
   const widgetInfo: WidgetInfo = {
     id: id,
@@ -377,49 +414,6 @@ export const createMediaContent = (type: MediaWidgetType) => {
       break;
   }
   return content;
-};
-
-export const createControllerWidget = (params: {
-  boardId: string;
-  boardType: BoardType;
-  relations: Relation[];
-  name?: string;
-  controllerType: ControllerFacadeTypes;
-  views: RelatedView[];
-  config: ControllerConfig;
-  hasVariable: boolean;
-}) => {
-  const {
-    boardId,
-    boardType,
-    views,
-    config,
-    controllerType,
-    relations,
-    name = 'newController',
-  } = params;
-  const content: ControllerWidgetContent = {
-    type: controllerType,
-    relatedViews: views,
-    name: name,
-    config: config,
-  };
-
-  const widgetConf = createInitWidgetConfig({
-    name: name,
-    type: 'controller',
-    content: content,
-    boardType: boardType,
-  });
-
-  const widgetId = relations[0]?.sourceId || uuidv4();
-  const widget: Widget = createWidget({
-    id: widgetId,
-    dashboardId: boardId,
-    config: widgetConf,
-    relations,
-  });
-  return widget;
 };
 
 // TODO chart widget
