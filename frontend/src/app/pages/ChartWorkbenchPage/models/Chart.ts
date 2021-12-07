@@ -38,6 +38,7 @@ class Chart extends DatartChartBase {
   dependency: string[] = [];
   isISOContainer: boolean | string = false;
 
+  _useIFrame: boolean = true;
   _state: ChartStatus = 'init';
   _stateHistory: ChartStatus[] = [];
   _hooks?: ChartEventBroker;

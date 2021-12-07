@@ -17,8 +17,8 @@
  */
 
 import { ChartDataSectionFieldActionType } from 'app/types/ChartConfig';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import BaseDataConfigSection from './BaseDataConfigSection';
 import { dataConfigSectionComparer } from './utils';
@@ -32,12 +32,15 @@ const MixedTypeSection: FC<ChartDataConfigSectionProps> = memo(
           [ChartDataViewFieldType.NUMERIC]: [
             ChartDataSectionFieldActionType.Alias,
             ChartDataSectionFieldActionType.Format,
+            ChartDataSectionFieldActionType.Sortable,
           ],
           [ChartDataViewFieldType.STRING]: [
             ChartDataSectionFieldActionType.Alias,
+            ChartDataSectionFieldActionType.Sortable,
           ],
           [ChartDataViewFieldType.DATE]: [
             ChartDataSectionFieldActionType.Alias,
+            ChartDataSectionFieldActionType.Sortable,
           ],
         },
       },

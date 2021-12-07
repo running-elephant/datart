@@ -26,7 +26,6 @@ import BasicTableChart from '../BasicTableChart';
 import Config from './config';
 
 class FenZuTableChart extends BasicTableChart {
-  chart: any = null;
   config = Config;
 
   isAutoMerge = true;
@@ -44,7 +43,6 @@ class FenZuTableChart extends BasicTableChart {
       return { locale: { emptyText: '  ' } };
     }
 
-    const { clientWidth, clientHeight } = context.document.documentElement;
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
@@ -75,8 +73,8 @@ class FenZuTableChart extends BasicTableChart {
       ...this.getAntdTableStyleOptions(
         styleConfigs,
         dataset,
-        clientWidth,
-        clientHeight,
+        null,
+        context?.height,
         tablePagination,
       ),
     };

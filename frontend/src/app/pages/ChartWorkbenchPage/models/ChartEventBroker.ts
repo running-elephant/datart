@@ -28,7 +28,6 @@ type BrokerContext = {
 
 type HooksEvent = 'mounted' | 'updated' | 'resize' | 'unmount';
 
-// TODO(Stephen): remove to Chart Tool Folder
 class ChartEventBroker {
   private _listeners: Map<HooksEvent, Function> = new Map();
   private _chart?: Chart;
@@ -83,7 +82,7 @@ class ChartEventBroker {
     }
   }
 
-  private safeInvoke(event, options, context) {
+  private safeInvoke(event: HooksEvent, options: any, context?: BrokerContext) {
     try {
       this._listeners.get(event)?.call?.(this._chart, options, context);
     } catch (e) {

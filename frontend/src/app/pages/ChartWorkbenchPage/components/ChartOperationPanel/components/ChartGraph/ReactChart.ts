@@ -17,16 +17,41 @@
  */
 
 import Chart from '../../../../models/Chart';
-import ReactChartAdapter from '../ChartTools/ReactChartAdapter';
+import ReactLifecycleAdapter from '../ChartTools/ReactLifecycleAdapter';
 
 export default class ReactChart extends Chart {
-  adapter = new ReactChartAdapter();
+  private _adapter;
 
-  init(component) {
-    this.adapter.init(component);
+  constructor(wrapper, props) {
+    super(
+      props?.id || 'react-table',
+      props?.name || '表格',
+      props?.icon || 'table',
+    );
+    this._adapter = new ReactLifecycleAdapter(wrapper);
   }
 
-  getInstance() {
-    return this.adapter;
+  get adapter() {
+    if (!this._adapter) {
+      throw new Error(
+        'should be register component by initAdapter before in used',
+      );
+    }
+    return this._adapter;
+  }
+
+  public onMount(options, context?): void {
+    if (options.containerId === undefined || !context.document) {
+      return;
+    }
+    this.adapter?.mounted(
+      context.document.getElementById(options.containerId),
+      options,
+      context,
+    );
+  }
+
+  public onUnMount(options, context?): void {
+    this.adapter?.unmount();
   }
 }

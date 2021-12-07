@@ -19,8 +19,8 @@
 import { Table } from 'antd';
 import { FC, memo } from 'react';
 
-const AntdTableChartAdapter: FC<{ dataSource: []; columns: [] }> = memo(
-  ({ dataSource, columns, ...rest }) => {
+const AntdTableWrapper: FC<{ dataSource: []; columns: [] }> = memo(
+  ({ dataSource, columns, children, ...rest }) => {
     return (
       <Table
         {...rest}
@@ -32,4 +32,4 @@ const AntdTableChartAdapter: FC<{ dataSource: []; columns: [] }> = memo(
   },
 );
 
-export default AntdTableChartAdapter;
+export default AntdTableWrapper;
