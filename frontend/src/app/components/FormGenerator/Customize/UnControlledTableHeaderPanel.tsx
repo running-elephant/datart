@@ -37,7 +37,6 @@ import { DATARTSEPERATOR } from 'globalConstants';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components';
 import { CloneValueDeep } from 'utils/object';
-import { BaiscSelector, BasicColorSelector, BasicFont } from '../Basic';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
@@ -201,7 +200,7 @@ const UnControlledTableHeaderPanel: FC<
       const groupRow = {
         uid: groupRowUid,
         colName: groupRowUid,
-        label: 'Please input header name',
+        label: t('table.header.newName'),
         isGroup: true,
         children: selectedRows,
       };
@@ -295,107 +294,19 @@ const UnControlledTableHeaderPanel: FC<
           const { label, isGroup, uid } = record;
           return isGroup ? (
             <>
+              <DeleteOutlined
+                style={{ marginRight: 10 }}
+                onClick={_ => handleDeleteGroupRow(uid)}
+              />
               <EditableLabel
                 label={label}
                 onChange={value =>
                   handleTableRowChange(uid)(undefined)('label')([], value)
                 }
               />
-              <DeleteOutlined onClick={_ => handleDeleteGroupRow(uid)} />
             </>
           ) : (
             getColumnRenderName(record)
-          );
-        },
-      },
-      {
-        title: t('table.header.backgroundColor'),
-        dataIndex: 'backgroundColor',
-        key: 'backgroundColor',
-        width: 100,
-        render: (_, record) => {
-          const { style, uid } = record;
-          const row = {
-            label: 'column.backgroundColor',
-            key: 'backgroundColor',
-            comType: 'fontColor',
-            value: style?.backgroundColor,
-            options: {
-              hideLabel: true,
-            },
-          };
-          return (
-            <BasicColorSelector
-              ancestors={ancestors}
-              data={row}
-              translate={t}
-              onChange={handleTableRowChange(uid)('style')('backgroundColor')}
-            />
-          );
-        },
-      },
-      {
-        title: t('table.header.font'),
-        dataIndex: 'font',
-        key: 'font',
-        width: 500,
-        render: (_, record) => {
-          const { style, uid } = record;
-          const row = {
-            label: 'column.font',
-            key: 'font',
-            comType: 'font',
-            value: style?.font?.value,
-            options: {
-              hideLabel: true,
-            },
-            default: {
-              fontFamily: 'PingFang SC',
-              fontSize: '12',
-              fontWeight: 'normal',
-              fontStyle: 'normal',
-              color: 'black',
-            },
-          };
-          return (
-            <BasicFont
-              ancestors={ancestors}
-              data={row}
-              translate={t}
-              onChange={handleTableRowChange(uid)('style')('font')}
-            />
-          );
-        },
-      },
-      {
-        title: t('table.header.align.title'),
-        dataIndex: 'align',
-        key: 'align',
-        width: 150,
-        render: (_, record) => {
-          const { style, uid } = record;
-          const row = {
-            label: 'column.align',
-            key: 'align',
-            comType: 'select',
-            default: 'left',
-            value: style?.align,
-            options: {
-              hideLabel: true,
-              items: [
-                { label: t('table.header.align.left'), value: 'left' },
-                { label: t('table.header.align.center'), value: 'center' },
-                { label: t('table.header.align.right'), value: 'right' },
-              ],
-            },
-          };
-          return (
-            <BaiscSelector
-              ancestors={ancestors}
-              data={row}
-              translate={t}
-              onChange={handleTableRowChange(uid)('style')('align')}
-            />
           );
         },
       },
@@ -444,6 +355,7 @@ const UnControlledTableHeaderPanel: FC<
         <Row gutter={24}>
           <Col span={24}>
             <Table
+              size="small"
               bordered={true}
               pagination={false}
               {...myData}
@@ -488,6 +400,7 @@ const EditableLabel: FC<{
         <span>{label}</span>
         <Button
           type="text"
+          size="small"
           icon={<EditOutlined />}
           onClick={() => setIsEditing(true)}
         ></Button>
@@ -495,8 +408,12 @@ const EditableLabel: FC<{
     );
   };
 
-  return render();
+  return <StyledEditableLabel>{render()}</StyledEditableLabel>;
 });
+
+const StyledEditableLabel = styled.div`
+  display: inline-block;
+`;
 
 const StyledUnControlledTableHeaderPanel = styled(Space)`
   width: 100%;

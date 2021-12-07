@@ -181,6 +181,7 @@
         "pleaseSelect": "Please select ...",
         "table": {
           "header": {
+            "newName": "Please input a new header name",
             "merge": "Merge",
             "moveUp": "moveUp",
             "moveDown": "moveDown",

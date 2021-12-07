@@ -182,6 +182,7 @@
         "pleaseSelect": "请选择 ...",
         "table": {
           "header": {
+            "newName": "请输入新名称",
             "merge": "合并",
             "moveUp": "上移",
             "moveDown": "下移",
