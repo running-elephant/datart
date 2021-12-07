@@ -24,6 +24,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { editBoardStackActions, editDashBoardInfoActions } from '../../slice';
 import { selectJumpPanel, selectSortAllWidgets } from '../../slice/selectors';
+import { jumpTypes } from './config';
 import { SelectJumpFields } from './FieldsSelect';
 import { FilterSelect } from './FilterSelect';
 import { fetchGlobalControllerOptions } from './service';
@@ -89,9 +90,11 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   useEffect(() => {
     const _jumpConfig = curJumpWidget?.config?.jumpConfig;
     setVisible(jumpVisible);
-    setTargetType(_jumpConfig?.targetType || 1);
+    setTargetType(_jumpConfig?.targetType || jumpTypes[0].value);
     if (jumpVisible && _jumpConfig) {
-      if (curJumpWidget?.config?.jumpConfig?.targetType === 1) {
+      if (
+        curJumpWidget?.config?.jumpConfig?.targetType === 'DASHBOARD_DATACHART'
+      ) {
         onGetController(curJumpWidget?.config?.jumpConfig?.target);
       }
       form.setFieldsValue(_jumpConfig);
@@ -103,7 +106,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   const dataChart = useSelector((state: { board: BoardState }) =>
     selectDataChartById(state, curJumpWidget?.datachartId),
   );
-  const [targetType, setTargetType] = useState(1);
+  const [targetType, setTargetType] = useState(jumpTypes[0].value);
   const chartGroupColumns = useMemo(() => {
     if (!dataChart) {
       return [];
@@ -119,14 +122,11 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     },
     [form, onGetController],
   );
-  const onTargetTypeChange = useCallback(
-    value => {
-      setTargetType(value);
-      form.setFieldsValue({ filter: undefined });
-      onGetController(value);
-    },
-    [form, onGetController],
-  );
+  const onTargetTypeChange = useCallback(value => {
+    setTargetType(value);
+    // form.setFieldsValue({ filter: undefined });
+    // onGetController(value);
+  }, []);
   const handleClose = useCallback(() => {
     dispatch(
       editDashBoardInfoActions.changeJumpPanel({
@@ -166,14 +166,18 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
         <Form.Item
           label="跳转类型"
           name="targetType"
+          initialValue={'DASHBOARD_DATACHART'}
           rules={[{ required: true, message: '跳转类型不能为空' }]}
         >
-          <Select defaultValue={1} onChange={onTargetTypeChange}>
-            <Option value={1}>仪表盘&amp;数据图表</Option>
-            <Option value={2}>HTTP URL</Option>
+          <Select onChange={onTargetTypeChange}>
+            {jumpTypes.map(({ name, value }) => (
+              <Option key={value} value={value}>
+                {name}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
-        {targetType === 1 && (
+        {targetType === 'DASHBOARD_DATACHART' && (
           <Form.Item
             label="跳转目标"
             name="target"
@@ -187,22 +191,22 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
           </Form.Item>
         )}
 
-        {targetType === 2 && (
+        {targetType === 'HTTP' && (
           <Form.Item
             label="HTTP URL"
             name="httpUrl"
             rules={[{ required: true, message: '跳转目标HTTP URL不能为空' }]}
           >
-            <Input placeholder="jump http url" />
+            <Input placeholder="请输入跳转地址" />
           </Form.Item>
         )}
-        {targetType === 2 && (
+        {targetType === 'HTTP' && (
           <Form.Item
             label="URL参数"
             name="queryName"
             rules={[{ required: true, message: 'URL参数名称不能为空' }]}
           >
-            <Input placeholder="query param name" />
+            <Input placeholder="请输入跳转地址的参数" />
           </Form.Item>
         )}
         {chartGroupColumns?.length > 1 && (
@@ -216,7 +220,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
             ></SelectJumpFields>
           </Form.Item>
         )}
-        {targetType === 1 && (
+        {targetType === 'DASHBOARD_DATACHART' && (
           <Form.Item
             label="关联筛选"
             name="filter"

@@ -314,7 +314,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
             `/organizations/${orgId}/vizs/${targetId}?${searchParamsStr}`,
           );
         }
-      } else if (targetType === 2) {
+      } else if (targetType === 'HTTP') {
         let url;
         if (httpUrl.indexOf('?') > -1) {
           url = `${httpUrl}&${queryName}=${params?.data?.rowData?.[jumpFieldName]}`;
