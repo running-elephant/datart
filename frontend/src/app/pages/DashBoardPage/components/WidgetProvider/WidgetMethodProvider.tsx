@@ -42,6 +42,7 @@ import {
   WidgetContentChartType,
   WidgetType,
 } from '../../pages/Board/slice/types';
+import { jumpTypes } from '../../pages/BoardEditor/components/SettingJumpModal/config';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
@@ -304,12 +305,15 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     (values: { widget: Widget; params: ChartMouseEventParams }) => {
       const { widget, params } = values;
       const jumpConfig = widget.config?.jumpConfig;
-      const targetType = jumpConfig?.targetType || 1;
+      const targetType = jumpConfig?.targetType || jumpTypes[0].value;
       const httpUrl = jumpConfig?.httpUrl || '';
       const queryName = jumpConfig?.queryName || '';
       const targetId = jumpConfig?.target?.relId;
       const jumpFieldName: string = jumpConfig?.field?.jumpFieldName || '';
-      if (typeof jumpConfig?.filter === 'object' && targetType === 1) {
+      if (
+        typeof jumpConfig?.filter === 'object' &&
+        targetType === 'DASHBOARD_DATACHART'
+      ) {
         const searchParamsStr = urlSearchTransfer.toUrlString({
           [jumpConfig?.filter?.filterId]:
             (params?.data?.rowData?.[jumpFieldName] as string) || '',

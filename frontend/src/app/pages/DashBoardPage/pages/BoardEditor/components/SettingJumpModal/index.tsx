@@ -206,7 +206,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
             name="queryName"
             rules={[{ required: true, message: 'URL参数名称不能为空' }]}
           >
-            <Input placeholder="请输入跳转地址的参数" />
+            <Input placeholder="请输入跳转地址携带的参数名称" />
           </Form.Item>
         )}
         {chartGroupColumns?.length > 1 && (
