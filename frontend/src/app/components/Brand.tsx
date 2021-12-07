@@ -12,7 +12,7 @@ export function Brand() {
   return (
     <Wrapper>
       <img src={logo} alt="logo" />
-      <h1>datart</h1>
+      <h1>唯寻BI可视化平台</h1>
     </Wrapper>
   );
 }

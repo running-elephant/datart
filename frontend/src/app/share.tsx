@@ -30,7 +30,7 @@ export function Share() {
   return (
     <BrowserRouter>
       <Helmet
-        title="Datart Share Link"
+        title="唯寻BI可视化平台 Share Link"
         htmlAttributes={{ lang: i18n.language }}
       >
         <meta name="description" content="Data Art" />

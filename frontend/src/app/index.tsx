@@ -52,8 +52,8 @@ export function App() {
   return (
     <BrowserRouter>
       <Helmet
-        titleTemplate="%s - Datart"
-        defaultTitle="Datart"
+        titleTemplate="%s - 唯寻BI可视化平台"
+        defaultTitle="唯寻BI可视化平台"
         htmlAttributes={{ lang: i18n.language }}
       >
         <meta name="description" content="Data Art" />
