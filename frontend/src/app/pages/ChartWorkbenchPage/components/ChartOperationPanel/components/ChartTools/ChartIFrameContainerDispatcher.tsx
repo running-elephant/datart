@@ -79,14 +79,17 @@ class ChartIFrameContainerDispatcher {
     if (!this.chartContainerMap.has(containerId)) {
       const newContainer = style => (chart, dataset, config) => {
         return (
-          <ChartTools.ChartIFrameContainer
-            dataset={dataset}
-            chart={chart}
-            config={config}
-            containerId={containerId}
-            key={containerId}
-            style={style}
-          />
+          <div style={style}>
+            <ChartTools.ChartIFrameContainer
+              dataset={dataset}
+              chart={chart}
+              config={config}
+              containerId={containerId}
+              key={containerId}
+              width={style?.width}
+              height={style?.height}
+            />
+          </div>
         );
       };
       this.chartContainerMap.set(containerId, newContainer);

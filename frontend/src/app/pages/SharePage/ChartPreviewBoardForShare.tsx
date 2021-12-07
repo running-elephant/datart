@@ -66,7 +66,7 @@ const ChartPreviewBoardForShare: FC<{
       width = style?.width,
       height = style?.height,
     } = useResizeObserver<HTMLDivElement>({
-      refreshMode: 'throttle',
+      refreshMode: 'debounce',
       refreshRate: 500,
     });
     const headlessBrowserRenderSign = useSelector(
@@ -125,7 +125,8 @@ const ChartPreviewBoardForShare: FC<{
             dataset={chartPreview?.dataset}
             chart={chart!}
             config={chartPreview?.chartConfig!}
-            style={{ width: width, height: height as number }}
+            width={width}
+            height={height}
           />
         </div>
         <HeadlessBrowserIdentifier
