@@ -216,6 +216,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
             rules={[{ required: true, message: '请选择关联字段' }]}
           >
             <SelectJumpFields
+              form={form}
               chartGroupColumns={chartGroupColumns}
             ></SelectJumpFields>
           </Form.Item>

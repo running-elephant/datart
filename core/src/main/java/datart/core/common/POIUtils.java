@@ -100,7 +100,7 @@ public class POIUtils {
             } else if (path.toLowerCase().endsWith(FileFormat.XLSX.getFormat())) {
                 workbook = new XSSFWorkbook(inputStream);
             } else {
-                Exceptions.tr(BaseException.class, "message.unsupported.format", path);
+                Exceptions.msg("message.unsupported.format", path);
                 return null;
             }
 

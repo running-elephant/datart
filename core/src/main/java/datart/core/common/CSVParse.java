@@ -72,7 +72,7 @@ public class CSVParse {
     public List<List<Object>> parse() throws IOException {
         File file = new File(path);
         if (!file.exists()) {
-            Exceptions.tr(BaseException.class, "message.file.notfound", path);
+            Exceptions.notFound(path);
         }
         List<CSVRecord> records = CSVParser.parse(file, StandardCharsets.UTF_8, CSVFormat.DEFAULT).getRecords();
         if (CollectionUtils.isEmpty(records)) {

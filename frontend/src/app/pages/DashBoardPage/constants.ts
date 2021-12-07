@@ -22,7 +22,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
-import { WHITE } from 'styles/StyleConstants';
+import { PRIMARY, WHITE } from 'styles/StyleConstants';
 import { WidgetType } from './pages/Board/slice/types';
 
 export const RGL_DRAG_HANDLE = 'dashboard-draggableHandle';
@@ -66,12 +66,23 @@ export const AutoBoardWidgetBackgroundDefault: BackgroundConfig = {
   color: WHITE,
 };
 
+export const QueryButtonWidgetBackgroundDefault: BackgroundConfig = {
+  ...BackgroundDefault,
+  color: PRIMARY,
+};
+
 export const BorderDefault: BorderConfig = {
   radius: 1,
   width: 1,
   style: 'solid',
   color: 'transparent',
 };
+
+export const ButtonBorderDefault: BorderConfig = {
+  ...BorderDefault,
+  width: 0,
+};
+
 export const CanDropToWidgetTypes: WidgetType[] = ['chart', 'media'];
 export const CanFullScreenWidgetTypes: WidgetType[] = ['chart', 'media'];
 

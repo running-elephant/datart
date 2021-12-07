@@ -42,6 +42,7 @@ import React, {
   useMemo,
 } from 'react';
 import styled from 'styled-components/macro';
+import { LabelName } from '../WidgetName/WidgetName';
 import { MultiSelectControllerForm } from './Controller/MultiSelectController';
 import { NumberControllerForm } from './Controller/NumberController';
 import { RadioGroupControllerForm } from './Controller/RadioGroupController';
@@ -63,10 +64,12 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   } = useContext(WidgetDataContext);
   const { widgetUpdate, refreshWidgetsByFilter } =
     useContext(BoardActionContext);
+
   const { config, type: facadeType } = useMemo(
     () => widget.config.content as ControllerWidgetContent,
     [widget],
   );
+
   const {
     controllerDate,
     controllerValues,
@@ -74,6 +77,28 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     valueOptionType,
     sqlOperator,
   } = useMemo(() => config as ControllerConfig, [config]);
+  const leftControlLabel = useMemo(() => {
+    if (!widget.config.nameConfig.show) {
+      return null;
+    }
+    if (widget.config.nameConfig?.textAlign === 'center') {
+      return null;
+    }
+    return <LabelName config={widget.config} />;
+  }, [widget.config]);
+  const centerControlLabel = useMemo(() => {
+    if (!widget.config.nameConfig.show) {
+      return null;
+    }
+    if (widget.config.nameConfig?.textAlign === 'center') {
+      return (
+        <div style={{ width: '100%', textAlign: 'center' }}>
+          <LabelName config={widget.config} />
+        </div>
+      );
+    }
+    return null;
+  }, [widget.config]);
   const optionRows = useMemo(() => {
     const dataRows = rows?.flat(2) || [];
     if (valueOptionType === 'common') {
@@ -93,13 +118,13 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   }, [valueOptions, valueOptionType, rows]);
 
   useEffect(() => {
-    // 加载数据项
     renderedWidgetById(widget.id);
   }, [renderedWidgetById, widget.id]);
 
   const onControllerChange = useCallback(() => {
     form.submit();
   }, [form]);
+
   const onFinish = value => {
     const values = value.value;
     if (values && typeof values === 'object' && !Array.isArray(values)) {
@@ -184,6 +209,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
             onChange={onControllerChange}
             options={selectOptions}
             name={'value'}
+            label={leftControlLabel}
           />
         );
 
@@ -194,6 +220,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
             onChange={onControllerChange}
             options={selectOptions}
             name={'value'}
+            label={leftControlLabel}
           />
         );
 
@@ -211,13 +238,18 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
             step={step}
             name="value"
             showMarks={showMarks}
+            label={leftControlLabel}
           />
         );
 
       case ControllerFacadeTypes.Value:
         form.setFieldsValue({ value: controllerValues?.[0] });
         return (
-          <NumberControllerForm onChange={onControllerChange} name="value" />
+          <NumberControllerForm
+            onChange={onControllerChange}
+            name="value"
+            label={leftControlLabel}
+          />
         );
 
       case ControllerFacadeTypes.RangeValue:
@@ -226,13 +258,18 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           <RangeNumberControllerForm
             onChange={onControllerChange}
             name="value"
+            label={leftControlLabel}
           />
         );
 
       case ControllerFacadeTypes.Text:
         form.setFieldsValue({ value: controllerValues?.[0] });
         return (
-          <TextControllerForm onChange={onControllerChange} name="value" />
+          <TextControllerForm
+            onChange={onControllerChange}
+            label={leftControlLabel}
+            name="value"
+          />
         );
 
       case ControllerFacadeTypes.RadioGroup:
@@ -243,6 +280,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         let radioButtonType = config.radioButtonType;
         return (
           <RadioGroupControllerForm
+            label={leftControlLabel}
             radioButtonType={radioButtonType}
             onChange={onControllerChange}
             options={RadioOptions}
@@ -251,15 +289,16 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         );
 
       case ControllerFacadeTypes.RangeTime:
-        const rangeTimeValues = getControllerDateValues(
-          config.valueOptionType,
-          config!.controllerDate!,
-        );
+        const rangeTimeValues = getControllerDateValues({
+          controlType: facadeType,
+          filterDate: config!.controllerDate!,
+        });
 
         form.setFieldsValue({ value: rangeTimeValues });
         let rangePickerType = controllerDate!.pickerType;
         return (
           <RangeTimeControllerForm
+            label={leftControlLabel}
             pickerType={rangePickerType}
             onChange={onRangeTimeChange}
             name="value"
@@ -267,14 +306,15 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         );
 
       case ControllerFacadeTypes.Time:
-        const timeValues = getControllerDateValues(
-          config.valueOptionType,
-          config!.controllerDate!,
-        );
+        const timeValues = getControllerDateValues({
+          controlType: facadeType,
+          filterDate: config!.controllerDate!,
+        });
         let pickerType = controllerDate!.pickerType;
         form.setFieldsValue({ value: timeValues[0] });
         return (
           <TimeControllerForm
+            label={leftControlLabel}
             onChange={onTimeChange}
             pickerType={pickerType}
             name="value"
@@ -290,6 +330,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     form,
     controllerValues,
     onControllerChange,
+    leftControlLabel,
     config,
     controllerDate,
     onRangeTimeChange,
@@ -298,6 +339,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   return (
     <Wrap>
       <Form form={form} className="control-form" onFinish={onFinish}>
+        {centerControlLabel}
         {control}
       </Form>
     </Wrap>
@@ -314,5 +356,9 @@ const Wrap = styled.div`
 
   .ant-form-item {
     margin-bottom: 0;
+  }
+
+  .ant-input-number-handler {
+    border-left: 0;
   }
 `;

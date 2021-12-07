@@ -36,7 +36,6 @@ export const SingleTimeSet: React.FC<SingleTimeSetProps> = memo(
 
       onChange?.(moment(value));
     }
-
     return (
       <>
         {pickerType === 'dateTime' ? (

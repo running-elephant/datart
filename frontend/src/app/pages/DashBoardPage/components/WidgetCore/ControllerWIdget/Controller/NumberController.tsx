@@ -53,7 +53,8 @@ export const NumberController: React.FC<TextControllerProps> = memo(
     };
     const _onBlur = () => {
       if (val !== value) {
-        onChange(val);
+        let _val = val === 0 ? '0' : val;
+        onChange(_val);
       }
     };
     useEffect(() => {
@@ -65,7 +66,7 @@ export const NumberController: React.FC<TextControllerProps> = memo(
           style={{ width: '100%' }}
           className="control-number-input"
           value={val}
-          placeholder="按回车确认输入值"
+          placeholder="请输入数值"
           onChange={_onChange}
           onPressEnter={_onChangeEnter}
           onBlur={_onBlur}

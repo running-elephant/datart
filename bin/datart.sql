@@ -1,17 +1,3 @@
-/*
- Navicat Premium Data Transfer
-
- Source Server Type    : MySQL
- Source Server Version : 50732
- Source Schema         : datart
-
- Target Server Type    : MySQL
- Target Server Version : 50732
- File Encoding         : 65001
-
- Date: 15/10/2021 10:29:53
-*/
-
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -265,13 +251,13 @@ CREATE TABLE `download`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `folder`;
 CREATE TABLE `folder`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `org_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `rel_type` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `rel_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
   `parent_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
-  `index` double(255, 0) NULL DEFAULT NULL,
+  `index` double(16, 8) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `name_unique`(`name`, `org_id`, `parent_id`) USING BTREE,
   INDEX `org_id`(`org_id`) USING BTREE,
@@ -284,7 +270,7 @@ CREATE TABLE `folder`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `link`;
 CREATE TABLE `link`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `rel_type` varchar(128) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `rel_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `url` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
@@ -299,7 +285,7 @@ CREATE TABLE `link`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `org_settings`;
 CREATE TABLE `org_settings`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `org_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
   `type` varchar(128) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
   `config` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL,
@@ -533,7 +519,6 @@ CREATE TABLE `source`  (
   `update_time` timestamp(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0),
   `status` tinyint(6) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `prj_name`(`name`) USING BTREE,
   UNIQUE INDEX `org_name`(`name`, `org_id`) USING BTREE,
   INDEX `org_id`(`org_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
@@ -561,7 +546,7 @@ CREATE TABLE `storyboard`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `storypage`;
 CREATE TABLE `storypage`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `storyboard_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `rel_type` varchar(128) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `rel_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
@@ -599,7 +584,7 @@ CREATE TABLE `user`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `user_settings`;
 CREATE TABLE `user_settings`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `user_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `rel_type` varchar(128) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `rel_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
@@ -653,7 +638,7 @@ CREATE TABLE `view`  (
   `update_time` timestamp(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0),
   `parent_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `is_folder` tinyint(1) NULL DEFAULT NULL,
-  `index` double NULL DEFAULT NULL,
+  `index` double(16, 8) NULL DEFAULT NULL,
   `status` tinyint(6) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `unique_name`(`name`, `org_id`, `parent_id`) USING BTREE,

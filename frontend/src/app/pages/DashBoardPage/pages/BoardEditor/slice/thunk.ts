@@ -357,7 +357,7 @@ export const getEditWidgetDataAsync = createAsyncThunk<
         await dispatch(getEditChartWidgetDataAsync({ widgetId, option }));
         return null;
       case 'controller':
-        await dispatch(getEditFilterDataAsync(curWidget));
+        await dispatch(getEditControllerOptionAsync(curWidget));
         return null;
       case 'media':
       case 'container':
@@ -366,7 +366,7 @@ export const getEditWidgetDataAsync = createAsyncThunk<
     }
   },
 );
-export const getEditFilterDataAsync = createAsyncThunk<
+export const getEditControllerOptionAsync = createAsyncThunk<
   null,
   Widget,
   { state: RootState }

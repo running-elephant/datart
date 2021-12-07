@@ -42,6 +42,7 @@ import { BoardType } from '../../../Board/slice/types';
 import { ControllerConfig } from '../../components/ControllerWidgetPanel/types';
 import { addWidgetsToEditBoard, getEditWidgetDataAsync } from '../thunk';
 import { HistoryEditBoard } from '../types';
+import { editWidgetsQueryAction } from './controlActions';
 
 const { confirm } = Modal;
 export const clearEditBoardState =
@@ -83,7 +84,11 @@ export const deleteWidgetsAction = () => (dispatch, getState) => {
     if (widgetType === 'reset') {
       dispatch(editBoardStackActions.changeBoardHasResetControl(false));
     }
+    if (widgetType === 'controller') {
+      dispatch(editWidgetsQueryAction({ boardId: editBoard.boardInfo.id }));
+    }
   });
+
   if (childWidgetIds.length > 0) {
     confirm({
       // TODO i18n

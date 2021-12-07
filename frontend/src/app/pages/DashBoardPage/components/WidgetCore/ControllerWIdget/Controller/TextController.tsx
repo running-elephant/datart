@@ -65,7 +65,7 @@ export const TextController: React.FC<TextControllerProps> = memo(
           <Input
             allowClear={true}
             value={val}
-            placeholder="按回车确认输入值"
+            placeholder="请输入"
             onChange={_onChange}
             onPressEnter={_onChangeEnter}
             onBlur={_onBlur}

@@ -55,7 +55,10 @@ import {
   selectControllerPanel,
   selectSortAllWidgets,
 } from '../../slice/selectors';
-import { addWidgetsToEditBoard } from '../../slice/thunk';
+import {
+  addWidgetsToEditBoard,
+  getEditControllerOptionAsync,
+} from '../../slice/thunk';
 import { WidgetControlForm } from './ControllerConfig';
 import { RelatedViewForm } from './RelatedViewForm';
 import { RelatedWidgetItem, RelatedWidgets } from './RelatedWidgets';
@@ -235,10 +238,11 @@ const FilterWidgetPanel: React.FC = memo(props => {
           relations: newRelations,
           controllerType: controllerType!,
           views: relatedViews,
-          config: postControlConfig(config),
+          config: postControlConfig(config, controllerType!),
           hasVariable: false,
         });
         dispatch(addWidgetsToEditBoard([widget]));
+        dispatch(getEditControllerOptionAsync(widget));
         refreshWidgetsByFilter(widget);
       } else if (type === 'edit') {
         const sourceId = curFilterWidget.id;
@@ -281,7 +285,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           ...(curFilterWidget.config.content as ControllerWidgetContent),
           name,
           relatedViews,
-          config: postControlConfig(config),
+          config: postControlConfig(config, controllerType!),
         };
 
         const newWidget = produce(curFilterWidget, draft => {
@@ -290,6 +294,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           draft.config.content = nextContent;
         });
         dispatch(editBoardStackActions.updateWidget(newWidget));
+        dispatch(getEditControllerOptionAsync(newWidget));
         refreshWidgetsByFilter(newWidget);
       }
     },
@@ -337,7 +342,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   };
   return (
     <Modal
-      title={`${type === 'add' ? '添加' : '编辑'} ${t(controllerType || '')}`}
+      title={`${type === 'add' ? '添加' : '编辑'}${t(controllerType || '')}`}
       visible={visible}
       onOk={onSubmit}
       centered

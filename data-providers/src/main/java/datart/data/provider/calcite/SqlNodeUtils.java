@@ -20,12 +20,10 @@ package datart.data.provider.calcite;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ScriptVariable;
 import datart.core.data.provider.SingleTypedValue;
-import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParserPos;
-import org.apache.calcite.util.DateString;
 import org.apache.calcite.util.TimestampString;
 
 import java.util.ArrayList;
@@ -85,7 +83,8 @@ public class SqlNodeUtils {
                         SqlLiteral.createBoolean(Boolean.parseBoolean(v), sqlParserPos)).collect(Collectors.toList());
             case DATE:
                 return variable.getValues().stream().map(v ->
-                        SqlLiteral.createDate(new DateString(v), sqlParserPos)).collect(Collectors.toList());
+                        SqlLiteral.createTimestamp(new TimestampString(v), 0, sqlParserPos))
+                        .collect(Collectors.toList());
             case FRAGMENT:
                 return variable.getValues().stream().map(SqlFragment::new).collect(Collectors.toList());
             default:
@@ -109,7 +108,7 @@ public class SqlNodeUtils {
             case IDENTIFIER:
                 return createSqlIdentifier(value.getValue().toString(), names);
             default:
-                Exceptions.tr(DataProviderException.class, "message.provider.sql.variable", value.getValueType().name());
+                Exceptions.msg("message.provider.sql.variable", value.getValueType().name());
         }
         return null;
     }
