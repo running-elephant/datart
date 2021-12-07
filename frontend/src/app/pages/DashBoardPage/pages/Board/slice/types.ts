@@ -161,6 +161,9 @@ export interface JumpConfigField {
 }
 export interface JumpConfig {
   open: boolean;
+  targetType: number;
+  httpUrl: string;
+  queryName: string;
   field: JumpConfigField;
   target: JumpConfigTarget;
   filter: JumpConfigFilter;

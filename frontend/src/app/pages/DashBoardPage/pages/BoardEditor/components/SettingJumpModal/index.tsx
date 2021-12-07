@@ -4,7 +4,7 @@ import {
   FolderOpenFilled,
   FundFilled,
 } from '@ant-design/icons';
-import { Form, Modal, ModalProps } from 'antd';
+import { Form, Input, Modal, ModalProps, Select } from 'antd';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { selectDataChartById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -33,6 +33,7 @@ const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 },
 };
+const { Option } = Select;
 interface SettingJumpModalProps extends ModalProps {}
 export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   children,
@@ -88,8 +89,11 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   useEffect(() => {
     const _jumpConfig = curJumpWidget?.config?.jumpConfig;
     setVisible(jumpVisible);
+    setTargetType(_jumpConfig?.targetType || 1);
     if (jumpVisible && _jumpConfig) {
-      onGetController(curJumpWidget?.config?.jumpConfig?.target);
+      if (curJumpWidget?.config?.jumpConfig?.targetType === 1) {
+        onGetController(curJumpWidget?.config?.jumpConfig?.target);
+      }
       form.setFieldsValue(_jumpConfig);
     }
   }, [jumpVisible, curJumpWidget, form, onGetController]);
@@ -99,6 +103,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   const dataChart = useSelector((state: { board: BoardState }) =>
     selectDataChartById(state, curJumpWidget?.datachartId),
   );
+  const [targetType, setTargetType] = useState(1);
   const chartGroupColumns = useMemo(() => {
     if (!dataChart) {
       return [];
@@ -109,6 +114,14 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   }, [dataChart]);
   const onTargetChange = useCallback(
     value => {
+      form.setFieldsValue({ filter: undefined });
+      onGetController(value);
+    },
+    [form, onGetController],
+  );
+  const onTargetTypeChange = useCallback(
+    value => {
+      setTargetType(value);
       form.setFieldsValue({ filter: undefined });
       onGetController(value);
     },
@@ -151,16 +164,47 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     >
       <Form {...formItemLayout} form={form} onFinish={onFinish}>
         <Form.Item
-          label="跳转目标"
-          name="target"
-          rules={[{ required: true, message: '跳转目标不能为空' }]}
+          label="跳转类型"
+          name="targetType"
+          rules={[{ required: true, message: '跳转类型不能为空' }]}
         >
-          <TargetTreeSelect
-            filterBoardId={boardId}
-            treeData={treeData}
-            onChange={onTargetChange}
-          />
+          <Select defaultValue={1} onChange={onTargetTypeChange}>
+            <Option value={1}>仪表盘&amp;数据图表</Option>
+            <Option value={2}>HTTP URL</Option>
+          </Select>
         </Form.Item>
+        {targetType === 1 && (
+          <Form.Item
+            label="跳转目标"
+            name="target"
+            rules={[{ required: true, message: '跳转目标不能为空' }]}
+          >
+            <TargetTreeSelect
+              filterBoardId={boardId}
+              treeData={treeData}
+              onChange={onTargetChange}
+            />
+          </Form.Item>
+        )}
+
+        {targetType === 2 && (
+          <Form.Item
+            label="HTTP URL"
+            name="httpUrl"
+            rules={[{ required: true, message: '跳转目标HTTP URL不能为空' }]}
+          >
+            <Input placeholder="jump http url" />
+          </Form.Item>
+        )}
+        {targetType === 2 && (
+          <Form.Item
+            label="URL参数"
+            name="queryName"
+            rules={[{ required: true, message: 'URL参数名称不能为空' }]}
+          >
+            <Input placeholder="query param name" />
+          </Form.Item>
+        )}
         {chartGroupColumns?.length > 1 && (
           <Form.Item
             label="关联字段"
@@ -173,18 +217,19 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
             ></SelectJumpFields>
           </Form.Item>
         )}
-
-        <Form.Item
-          label="关联筛选"
-          name="filter"
-          rules={[{ required: true, message: '关联筛选不能为空' }]}
-        >
-          <FilterSelect
-            loading={controllerLoading}
-            options={controllers}
-            placeholder="请选择关联筛选"
-          />
-        </Form.Item>
+        {targetType === 1 && (
+          <Form.Item
+            label="关联筛选"
+            name="filter"
+            rules={[{ required: true, message: '关联筛选不能为空' }]}
+          >
+            <FilterSelect
+              loading={controllerLoading}
+              options={controllers}
+              placeholder="请选择关联筛选"
+            />
+          </Form.Item>
+        )}
       </Form>
     </Modal>
   );
