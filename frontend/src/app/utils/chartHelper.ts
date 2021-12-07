@@ -18,6 +18,7 @@
 
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import {
+  AggregateFieldActionType,
   ChartConfig,
   ChartDataSectionConfig,
   ChartDataSectionField,
@@ -431,10 +432,13 @@ export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
 
 export function getColumnRenderName(c?: ChartDataSectionField) {
   if (!c) {
-    return 'unkonwn name';
+    return '[unkonwn]';
   }
   if (c.alias?.name) {
     return c.alias.name;
+  }
+  if (c.aggregate === AggregateFieldActionType.NONE) {
+    return c.colName;
   }
   if (c.aggregate) {
     return `${c.aggregate}(${c.colName})`;

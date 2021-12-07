@@ -25,11 +25,13 @@ const config: ChartConfig = {
       key: 'mixed',
       required: true,
       type: 'mixed',
+      disableAggregate: true,
     },
     {
       label: 'filter',
       key: 'filter',
       type: 'filter',
+      disableAggregate: true,
     },
   ],
   styles: [

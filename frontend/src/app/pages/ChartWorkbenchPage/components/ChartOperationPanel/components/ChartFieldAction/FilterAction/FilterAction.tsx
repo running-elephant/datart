@@ -39,6 +39,7 @@ const FilterAction: FC<{
     // TODO: tobe implement to get fields
     return await Promise.resolve(['a', 'b', 'c'].map(f => `${fieldId}-${f}`));
   };
+
   return (
     <FilterControllPanel
       config={config}

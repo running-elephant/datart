@@ -155,27 +155,32 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         currentConfig?.type === ChartDataSectionType.SIZE ||
         currentConfig?.type === ChartDataSectionType.INFO
       ) {
+        if (currentConfig.disableAggregate) {
+          return;
+        }
         if (
-          item.category !==
+          item.category ===
           (ChartDataViewFieldCategory.AggregateComputedField as string)
         ) {
-          let aggType: string = '';
-          if (currentConfig?.actions instanceof Array) {
-            currentConfig?.actions?.find(
-              type =>
-                type === ChartDataSectionFieldActionType.Aggregate ||
-                type === ChartDataSectionFieldActionType.AggregateLimit,
-            );
-          } else if (currentConfig?.actions instanceof Object) {
-            aggType = currentConfig?.actions?.[item?.type]?.find(
-              type =>
-                type === ChartDataSectionFieldActionType.Aggregate ||
-                type === ChartDataSectionFieldActionType.AggregateLimit,
-            );
-          }
-          if (aggType) {
-            return AggregateFieldSubAggregateType?.[aggType]?.[0];
-          }
+          return;
+        }
+
+        let aggType: string = '';
+        if (currentConfig?.actions instanceof Array) {
+          currentConfig?.actions?.find(
+            type =>
+              type === ChartDataSectionFieldActionType.Aggregate ||
+              type === ChartDataSectionFieldActionType.AggregateLimit,
+          );
+        } else if (currentConfig?.actions instanceof Object) {
+          aggType = currentConfig?.actions?.[item?.type]?.find(
+            type =>
+              type === ChartDataSectionFieldActionType.Aggregate ||
+              type === ChartDataSectionFieldActionType.AggregateLimit,
+          );
+        }
+        if (aggType) {
+          return AggregateFieldSubAggregateType?.[aggType]?.[0];
         }
       }
     };

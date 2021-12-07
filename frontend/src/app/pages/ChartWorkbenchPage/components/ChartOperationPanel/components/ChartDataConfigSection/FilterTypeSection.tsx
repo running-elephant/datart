@@ -24,8 +24,8 @@ import {
   ChartDataSectionConfig,
   ChartDataSectionFieldActionType,
 } from 'app/types/ChartConfig';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FC, memo, useState } from 'react';
 import { CloneValueDeep } from 'utils/object';
 import BaseDataConfigSection from './BaseDataConfigSection';
@@ -39,6 +39,7 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
     const extendedConfig = Object.assign(
       {
         allowSameField: true,
+        disableAggregate: false,
       },
       {
         actions: {
