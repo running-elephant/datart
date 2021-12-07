@@ -21,6 +21,7 @@ import BasicAreaChart from './BasicAreaChart';
 import BasicBarChart from './BasicBarChart';
 import BasicDoubleYChart from './BasicDoubleYChart';
 import BasicFunnelChart from './BasicFunnelChart';
+import BasicGaugeChart from './BasicGaugeChart';
 import BasicLineChart from './BasicLineChart';
 import BasicOutlineMapChart from './BasicOutlineMapChart';
 import BasicPieChart from './BasicPieChart';
@@ -74,5 +75,6 @@ const WidgetPlugins = {
   NormalOutlineMapChart,
   ScatterOutlineMapChart,
   WaterfallChart,
+  BasicGaugeChart,
 };
 export default WidgetPlugins;

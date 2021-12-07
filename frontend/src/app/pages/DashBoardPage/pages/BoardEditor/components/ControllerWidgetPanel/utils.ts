@@ -297,7 +297,6 @@ export const formatDateByPickType = (
   switch (pickerType) {
     case 'dateTime':
     case 'quarter':
-      return momentTime.format(formatTemp);
     case 'date':
       return momentTime.set({ h: 0, m: 0, s: 0 }).format(formatTemp);
     case 'week':

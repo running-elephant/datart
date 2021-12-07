@@ -44,6 +44,7 @@ const {
   NormalOutlineMapChart,
   WordCloudChart,
   ScatterOutlineMapChart,
+  BasicGaugeChart,
   WaterfallChart,
 } = WidgetPlugins;
 
@@ -120,6 +121,7 @@ class ChartManager {
       new WordCloudChart(),
       new NormalOutlineMapChart(),
       new ScatterOutlineMapChart(),
+      new BasicGaugeChart(),
     ];
   }
 }

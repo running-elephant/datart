@@ -289,10 +289,10 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         );
 
       case ControllerFacadeTypes.RangeTime:
-        const rangeTimeValues = getControllerDateValues(
-          config.valueOptionType,
-          config!.controllerDate!,
-        );
+        const rangeTimeValues = getControllerDateValues({
+          controlType: facadeType,
+          filterDate: config!.controllerDate!,
+        });
 
         form.setFieldsValue({ value: rangeTimeValues });
         let rangePickerType = controllerDate!.pickerType;
@@ -306,10 +306,10 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         );
 
       case ControllerFacadeTypes.Time:
-        const timeValues = getControllerDateValues(
-          config.valueOptionType,
-          config!.controllerDate!,
-        );
+        const timeValues = getControllerDateValues({
+          controlType: facadeType,
+          filterDate: config!.controllerDate!,
+        });
         let pickerType = controllerDate!.pickerType;
         form.setFieldsValue({ value: timeValues[0] });
         return (
@@ -356,5 +356,9 @@ const Wrap = styled.div`
 
   .ant-form-item {
     margin-bottom: 0;
+  }
+
+  .ant-input-number-handler {
+    border-left: 0;
   }
 `;

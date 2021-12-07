@@ -97,18 +97,15 @@ export function getColumnWidthMap(
   const CELL_PADDING = SPACE_UNIT * (2 + 2);
   const ICON_WIDTH = 24;
   const ICON_MARGIN = SPACE_UNIT;
-  const HEADER_BUFFER_RATE = 1.03; // FIXME BlinkMacSystemFont cavans incorrect measure
-  const CELL_BUFFER_RATE = 1.06; // FIXME BlinkMacSystemFont cavans incorrect measure
 
   return Object.keys(model).reduce((map, name) => {
     if (!map[name]) {
       // header width
       map[name] =
-        (getTextWidth(name, `${FONT_WEIGHT_MEDIUM}`) +
-          HEADER_PADDING +
-          ICON_WIDTH * 2 +
-          ICON_MARGIN) *
-        HEADER_BUFFER_RATE;
+        getTextWidth(name, `${FONT_WEIGHT_MEDIUM}`) +
+        HEADER_PADDING +
+        ICON_WIDTH * 2 +
+        ICON_MARGIN;
     }
     if (dataSource.length > 0) {
       map[name] = dataSource.reduce((width, o) => {
@@ -119,7 +116,7 @@ export function getColumnWidthMap(
             width,
             map[name],
             o[name] !== null && o[name] !== undefined
-              ? (getTextWidth(`${o[name]}`) + CELL_PADDING) * CELL_BUFFER_RATE
+              ? getTextWidth(`${o[name]}`) + CELL_PADDING
               : 0,
           ),
         );

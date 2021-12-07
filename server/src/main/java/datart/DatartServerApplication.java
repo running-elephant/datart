@@ -14,16 +14,4 @@ public class DatartServerApplication {
         SpringApplication.run(DatartServerApplication.class, args);
     }
 
-//    @Bean
-//    public ServletRegistrationBean<StatViewServlet> druidStatViewServlet() {
-//        ServletRegistrationBean<StatViewServlet> registrationBean = new ServletRegistrationBean<>(new StatViewServlet(), "/druid/*");
-//        registrationBean.addInitParameter("allow", "127.0.0.1");
-//        registrationBean.addInitParameter("deny", "");
-//        registrationBean.addInitParameter("loginUsername", "root");
-//        registrationBean.addInitParameter("loginPassword", "1234");
-//        registrationBean.addInitParameter("resetEnable", "false");
-//        return registrationBean;
-//    }
-
-
 }

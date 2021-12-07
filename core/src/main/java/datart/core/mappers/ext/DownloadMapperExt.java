@@ -15,7 +15,7 @@ public interface DownloadMapperExt extends DownloadMapper {
                     "FROM " +
                     " download " +
                     "WHERE" +
-                    " create_by = #{userId} and create_time > DATE_FORMAT((NOW() - INTERVAL 7 DAY),'%Y%m%d')  order by create_time desc"
+                    " create_by = #{userId} and create_time > (NOW() - INTERVAL 7 DAY)  order by create_time desc"
     })
     List<Download> selectByCreator(String userId);
 
