@@ -77,7 +77,6 @@ class BasicTableChart extends ReactChart {
       return { locale: { emptyText: '  ' } };
     }
 
-    const { clientWidth, clientHeight } = context.document.documentElement;
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
@@ -121,8 +120,8 @@ class BasicTableChart extends ReactChart {
       ...this.getAntdTableStyleOptions(
         styleConfigs,
         dataset,
-        clientWidth,
-        clientHeight,
+        null,
+        context?.height,
         tablePagination,
       ),
     };

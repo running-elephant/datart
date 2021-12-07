@@ -112,7 +112,7 @@ const ChartLifecycleAdapter: React.FC<{
         dataset,
         config,
       },
-      { document, window },
+      { document, window, width: style?.width, height: style?.height },
     );
   }, [config, dataset, containerStatus, document, window]);
 
