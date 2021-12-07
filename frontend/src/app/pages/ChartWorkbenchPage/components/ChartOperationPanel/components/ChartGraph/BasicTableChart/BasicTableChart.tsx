@@ -87,6 +87,8 @@ class BasicTableChart extends ReactChart {
     );
     const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
 
+    this.isAutoMerge = this.getStyleValue(styleConfigs, ['style', 'autoMerge']);
+
     const mixedSectionConfigRows = dataConfigs
       .filter(c => c.key === 'mixed')
       .flatMap(config => config.rows || []);
@@ -427,7 +429,7 @@ class BasicTableChart extends ReactChart {
       'enableFixedHeader',
     ]);
     const tableSize =
-      this.getStyleValue(styleConfigs, ['data', 'tableSize']) || 'default';
+      this.getStyleValue(styleConfigs, ['style', 'tableSize']) || 'default';
     const HEADER_HEIGHT = { default: 56, middle: 48, small: 40 };
     const PAGINATION_HEIGHT = { default: 64, middle: 56, small: 56 };
 

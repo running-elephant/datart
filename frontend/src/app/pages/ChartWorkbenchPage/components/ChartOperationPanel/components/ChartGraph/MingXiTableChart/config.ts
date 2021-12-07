@@ -237,15 +237,8 @@ const config: ChartConfig = {
             },
           },
         },
-      ],
-    },
-    {
-      label: 'data.title',
-      key: 'data',
-      comType: 'group',
-      rows: [
         {
-          label: 'data.tableSize',
+          label: 'style.tableSize',
           key: 'tableSize',
           default: 'default',
           comType: 'select',
@@ -256,6 +249,12 @@ const config: ChartConfig = {
               { label: '小', value: 'small' },
             ],
           },
+        },
+        {
+          label: 'style.autoMerge',
+          key: 'autoMerge',
+          default: false,
+          comType: 'checkbox',
         },
       ],
     },
@@ -345,12 +344,8 @@ const config: ChartConfig = {
           enableBorder: '显示边框',
           leftFixedColumns: '左侧固定列',
           rightFixedColumns: '右侧固定列',
-        },
-        data: {
-          title: '表格数据控制',
           tableSize: '表格大小',
           autoMerge: '自动合并相同内容',
-          enableRaw: '使用原始数据',
         },
         cache: {
           title: '数据处理',
@@ -390,12 +385,8 @@ const config: ChartConfig = {
           enableBorder: 'Show Border',
           leftFixedColumns: 'Left Fixed Columns',
           rightFixedColumns: 'Right Fixed Columns',
-        },
-        data: {
-          title: 'Table Data Setting',
           tableSize: 'Table Size',
           autoMerge: 'Auto Merge',
-          enableRaw: 'Enable Raw Data',
         },
         cache: {
           title: 'Data Process',
