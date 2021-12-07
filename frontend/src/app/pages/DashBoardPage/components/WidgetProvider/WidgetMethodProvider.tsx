@@ -310,10 +310,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       const queryName = jumpConfig?.queryName || '';
       const targetId = jumpConfig?.target?.relId;
       const jumpFieldName: string = jumpConfig?.field?.jumpFieldName || '';
-      if (
-        typeof jumpConfig?.filter === 'object' &&
-        targetType === 'DASHBOARD_DATACHART'
-      ) {
+      if (typeof jumpConfig?.filter === 'object' && targetType === 'INTERNAL') {
         const searchParamsStr = urlSearchTransfer.toUrlString({
           [jumpConfig?.filter?.filterId]:
             (params?.data?.rowData?.[jumpFieldName] as string) || '',

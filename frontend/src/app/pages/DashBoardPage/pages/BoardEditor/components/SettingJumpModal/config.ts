@@ -17,6 +17,6 @@
  */
 
 export const jumpTypes: { name: string; value: string }[] = [
-  { value: 'DASHBOARD_DATACHART', name: '仪表盘&数据图表' },
-  { value: 'HTTP', name: 'HTTP URL ' },
+  { value: 'INTERNAL', name: '仪表盘 / 数据图表' },
+  { value: 'HTTP', name: 'URL ' },
 ];

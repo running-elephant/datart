@@ -92,9 +92,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     setVisible(jumpVisible);
     setTargetType(_jumpConfig?.targetType || jumpTypes[0].value);
     if (jumpVisible && _jumpConfig) {
-      if (
-        curJumpWidget?.config?.jumpConfig?.targetType === 'DASHBOARD_DATACHART'
-      ) {
+      if (curJumpWidget?.config?.jumpConfig?.targetType === 'INTERNAL') {
         onGetController(curJumpWidget?.config?.jumpConfig?.target);
       }
       form.setFieldsValue(_jumpConfig);
@@ -152,7 +150,6 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     },
     [dispatch, curJumpWidget, handleClose, chartGroupColumns],
   );
-
   return (
     <Modal
       title="跳转设置"
@@ -166,7 +163,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
         <Form.Item
           label="跳转类型"
           name="targetType"
-          initialValue={'DASHBOARD_DATACHART'}
+          initialValue={'INTERNAL'}
           rules={[{ required: true, message: '跳转类型不能为空' }]}
         >
           <Select onChange={onTargetTypeChange}>
@@ -177,7 +174,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
             ))}
           </Select>
         </Form.Item>
-        {targetType === 'DASHBOARD_DATACHART' && (
+        {targetType === 'INTERNAL' && (
           <Form.Item
             label="跳转目标"
             name="target"
@@ -193,9 +190,9 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
 
         {targetType === 'HTTP' && (
           <Form.Item
-            label="HTTP URL"
+            label="URL"
             name="httpUrl"
-            rules={[{ required: true, message: '跳转目标HTTP URL不能为空' }]}
+            rules={[{ required: true, message: '跳转URL不能为空' }]}
           >
             <Input placeholder="请输入跳转地址" />
           </Form.Item>
@@ -206,7 +203,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
             name="queryName"
             rules={[{ required: true, message: 'URL参数名称不能为空' }]}
           >
-            <Input placeholder="请输入跳转地址携带的参数名称" />
+            <Input placeholder="请输入URL中携带的参数名称" />
           </Form.Item>
         )}
         {chartGroupColumns?.length > 1 && (
@@ -221,7 +218,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
             ></SelectJumpFields>
           </Form.Item>
         )}
-        {targetType === 'DASHBOARD_DATACHART' && (
+        {targetType === 'INTERNAL' && (
           <Form.Item
             label="关联筛选"
             name="filter"
