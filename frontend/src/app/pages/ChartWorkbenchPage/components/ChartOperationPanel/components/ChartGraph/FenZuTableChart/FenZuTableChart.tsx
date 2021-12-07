@@ -26,7 +26,6 @@ import BasicTableChart from '../BasicTableChart';
 import Config from './config';
 
 class FenZuTableChart extends BasicTableChart {
-  chart: any = null;
   config = Config;
 
   isAutoMerge = true;

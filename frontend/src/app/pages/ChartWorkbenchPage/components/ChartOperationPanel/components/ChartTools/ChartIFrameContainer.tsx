@@ -23,8 +23,6 @@ import Frame, { FrameContextConsumer } from 'react-frame-component';
 import styled, { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartLifecycleAdapter from './ChartLifecycleAdapter';
-// eslint-disable-next-line import/no-webpack-loader-syntax
-const antdStyles = require('!!css-loader!antd/dist/antd.min.css');
 
 const ChartIFrameContainer: React.FC<{
   dataset: any;
@@ -33,9 +31,6 @@ const ChartIFrameContainer: React.FC<{
   containerId?: string;
   style?;
 }> = props => {
-  // Note: manually add table css style in iframe
-  const isTable = props.chart?.isISOContainer === 'react-table';
-
   const transformToSafeCSSProps = style => {
     if (isNaN(style?.width) || isEmpty(style?.width)) {
       style.width = 0;
@@ -46,44 +41,63 @@ const ChartIFrameContainer: React.FC<{
     return style;
   };
 
-  return (
-    <Frame
-      id={`chart-iframe-root-${props.containerId}`}
-      key={props.containerId}
-      frameBorder={0}
-      style={{ ...props?.style, width: '100%', height: '100%' }}
-      head={
-        <>
-          <style>
-            {`
-            body {
-              height: 100%;
-              background-color: transparent !important;
-              margin: 0;
-              overflow:${isTable ? 'visible' : 'hidden'};
-            }
-           `}
-          </style>
-          <style>{isTable ? antdStyles.default.toString() : ''}</style>
-        </>
-      }
-    >
-      <FrameContextConsumer>
-        {frameContext => (
-          <StyleSheetManager target={frameContext.document.head}>
-            <StyledChartLifecycleAdapter>
-              <ChartLifecycleAdapter
-                dataset={props.dataset}
-                chart={props.chart}
-                config={props.config}
-                style={transformToSafeCSSProps(props?.style)}
-              />
-            </StyledChartLifecycleAdapter>
-          </StyleSheetManager>
-        )}
-      </FrameContextConsumer>
-    </Frame>
-  );
+  const render = () => {
+    if (!props?.chart?._useIFrame) {
+      return (
+        <div
+          id={`chart-root-${props.containerId}`}
+          key={props.containerId}
+          style={{ ...props?.style, width: '100%', height: '100%' }}
+        >
+          <ChartLifecycleAdapter
+            dataset={props.dataset}
+            chart={props.chart}
+            config={props.config}
+            style={transformToSafeCSSProps(props?.style)}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <Frame
+        id={`chart-iframe-root-${props.containerId}`}
+        key={props.containerId}
+        frameBorder={0}
+        style={{ ...props?.style, width: '100%', height: '100%' }}
+        head={
+          <>
+            <style>
+              {`
+           body {
+             height: 100%;
+             background-color: transparent !important;
+             margin: 0;
+           }
+          `}
+            </style>
+          </>
+        }
+      >
+        <FrameContextConsumer>
+          {frameContext => (
+            <StyleSheetManager target={frameContext.document.head}>
+              <StyledChartLifecycleAdapter>
+                <ChartLifecycleAdapter
+                  dataset={props.dataset}
+                  chart={props.chart}
+                  config={props.config}
+                  style={transformToSafeCSSProps(props?.style)}
+                />
+              </StyledChartLifecycleAdapter>
+            </StyleSheetManager>
+          )}
+        </FrameContextConsumer>
+      </Frame>
+    );
+  };
+
+  return render();
 };
 
 export default ChartIFrameContainer;

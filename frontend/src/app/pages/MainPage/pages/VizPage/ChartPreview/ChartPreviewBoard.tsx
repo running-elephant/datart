@@ -258,7 +258,7 @@ const ChartPreviewBoard: FC<{
             onChange={handleFilterChange}
           />
           <ChartWrapper ref={ref}>
-            <ChartTools.ChartIFrame
+            <ChartTools.ChartIFrameContainer
               key={backendChartId}
               containerId={backendChartId}
               dataset={chartPreview?.dataset}

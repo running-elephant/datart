@@ -18,8 +18,8 @@
 
 import BasicTableChart from '../BasicTableChart';
 import Config from './config';
+
 class MingXiTableChart extends BasicTableChart {
-  chart: any = null;
   config = Config;
 
   constructor() {
