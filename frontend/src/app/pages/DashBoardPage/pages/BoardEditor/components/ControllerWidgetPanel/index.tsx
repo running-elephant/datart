@@ -75,7 +75,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const { type, widgetId, controllerType } = useSelector(selectControllerPanel);
   const { boardId, boardType, queryVariables } = useContext(BoardContext);
 
-  const { refreshWidgetsByFilter } = useContext(BoardActionContext);
+  const { refreshWidgetsByController: refreshWidgetsByFilter } = useContext(BoardActionContext);
   const allWidgets = useSelector(selectSortAllWidgets);
   const widgets = useMemo(
     () => getCanLinkControlWidgets(allWidgets),
