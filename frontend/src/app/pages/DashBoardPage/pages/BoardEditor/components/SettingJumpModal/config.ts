@@ -18,5 +18,5 @@
 
 export const jumpTypes: { name: string; value: string }[] = [
   { value: 'INTERNAL', name: '仪表盘 / 数据图表' },
-  { value: 'HTTP', name: 'URL ' },
+  { value: 'URL', name: 'URL' },
 ];

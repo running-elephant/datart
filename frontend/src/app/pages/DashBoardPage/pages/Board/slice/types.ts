@@ -162,7 +162,7 @@ export interface JumpConfigField {
 export interface JumpConfig {
   open: boolean;
   targetType: string;
-  httpUrl: string;
+  URL: string;
   queryName: string;
   field: JumpConfigField;
   target: JumpConfigTarget;

@@ -306,7 +306,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       const { widget, params } = values;
       const jumpConfig = widget.config?.jumpConfig;
       const targetType = jumpConfig?.targetType || jumpTypes[0].value;
-      const httpUrl = jumpConfig?.httpUrl || '';
+      const URL = jumpConfig?.URL || '';
       const queryName = jumpConfig?.queryName || '';
       const targetId = jumpConfig?.target?.relId;
       const jumpFieldName: string = jumpConfig?.field?.jumpFieldName || '';
@@ -320,14 +320,14 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
             `/organizations/${orgId}/vizs/${targetId}?${searchParamsStr}`,
           );
         }
-      } else if (targetType === 'HTTP') {
-        let url;
-        if (httpUrl.indexOf('?') > -1) {
-          url = `${httpUrl}&${queryName}=${params?.data?.rowData?.[jumpFieldName]}`;
+      } else if (targetType === 'URL') {
+        let jumpUrl;
+        if (URL.indexOf('?') > -1) {
+          jumpUrl = `${URL}&${queryName}=${params?.data?.rowData?.[jumpFieldName]}`;
         } else {
-          url = `${httpUrl}?${queryName}=${params?.data?.rowData?.[jumpFieldName]}`;
+          jumpUrl = `${URL}?${queryName}=${params?.data?.rowData?.[jumpFieldName]}`;
         }
-        window.location.href = url;
+        window.location.href = jumpUrl;
       }
     },
     [history, orgId],
