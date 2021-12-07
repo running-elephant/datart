@@ -491,8 +491,8 @@ export const getWidgetMapByServer = (
       // 根据 url参数修改filter 默认值
       if (filterSearchParams) {
         const paramsKey = Object.keys(filterSearchParams);
-        const macthKey = isMatchByName ? widget.config.name : widget.id;
-        if (paramsKey.includes(macthKey)) {
+        const matchKey = isMatchByName ? widget.config.name : widget.id;
+        if (paramsKey.includes(matchKey)) {
           const _value = isMatchByName
             ? filterSearchParams[widget.config.name]
             : filterSearchParams[widget.id];
