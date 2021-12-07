@@ -1847,9 +1847,9 @@ SqlLiteral JoinType() :
     |
         <INNER> <JOIN> { joinType = JoinType.INNER; }
     |
-        <LEFT> [ <OUTER> ] <JOIN> { joinType = JoinType.LEFT; }
+        <LEFT> [ <OUTER>|<ANY>|<SOME> ] <JOIN> { joinType = JoinType.LEFT; }
     |
-        <RIGHT> [ <OUTER> ] <JOIN> { joinType = JoinType.RIGHT; }
+        <RIGHT> [ <OUTER>|<ANY>|<SOME> ] <JOIN> { joinType = JoinType.RIGHT; }
     |
         <FULL> [ <OUTER> ] <JOIN> { joinType = JoinType.FULL; }
     |
