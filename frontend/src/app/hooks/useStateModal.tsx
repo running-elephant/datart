@@ -64,7 +64,7 @@ function useStateModal({
             Object.keys(stateRef.current || {}).length > 0
               ? stateRef.current
               : [];
-          okCallbackRef.current?.call(null, ...spreadParmas);
+          okCallbackRef.current?.call(Object.create(null), ...spreadParmas);
         } catch (e) {
           console.error('useStateModal | exception message ---> ', e);
         }
@@ -76,7 +76,7 @@ function useStateModal({
   };
 
   const handleClickCancelButton = () => {
-    cancelCallbackRef.current?.call(null, null);
+    cancelCallbackRef.current?.call(Object.create(null), null);
   };
 
   const FormWrapper = content => {
@@ -121,7 +121,9 @@ function useStateModal({
       title: props.title,
       width: getModalSize(props?.modalSize),
       bodyStyle: props.bodyStyle || defaultBodyStyle,
-      content: FormWrapper(props?.content?.call(null, handleSaveCacheValue)),
+      content: FormWrapper(
+        props?.content?.call(Object.create(null), handleSaveCacheValue),
+      ),
       onOk: handleClickOKButton,
       onCancel: handleClickCancelButton,
       maskClosable: true,

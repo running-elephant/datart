@@ -56,10 +56,10 @@ class ChartIFrameContainerDispatcher {
       renders.push(
         chartRenderer
           .call(
-            null,
+            Object.create(null),
             this.getVisibilityStyle(key === this.currentContainerId, style),
           )
-          .apply(null, this.chartMetadataMap.get(key)),
+          .apply(Object.create(null), this.chartMetadataMap.get(key)),
       );
     });
     return renders;
