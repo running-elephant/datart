@@ -145,7 +145,7 @@ class BasicTableChart extends ReactChart {
       'modal',
       'tableHeaders',
     ]);
-    const bgColor = this.getStyleValue(styleConfigs, [
+    const headerBgColor = this.getStyleValue(styleConfigs, [
       'tableHeaderStyle',
       'bgColor',
     ]);
@@ -153,8 +153,21 @@ class BasicTableChart extends ReactChart {
       'tableHeaderStyle',
       'font',
     ]);
-    const textAlign = this.getStyleValue(styleConfigs, [
+    const headerTextAlign = this.getStyleValue(styleConfigs, [
       'tableHeaderStyle',
+      'align',
+    ]);
+
+    const bodyBgColor = this.getStyleValue(styleConfigs, [
+      'tableBodyStyle',
+      'bgColor',
+    ]);
+    const bodyFont = this.getStyleValue(styleConfigs, [
+      'tableBodyStyle',
+      'font',
+    ]);
+    const bodyTextAlign = this.getStyleValue(styleConfigs, [
+      'tableBodyStyle',
       'align',
     ]);
 
@@ -180,8 +193,8 @@ class BasicTableChart extends ReactChart {
           const cellCssStyle = Object.assign(
             {},
             {
-              textAlign: textAlign,
-              backgroundColor: bgColor,
+              textAlign: headerTextAlign,
+              backgroundColor: headerBgColor,
               ...headerFont,
             },
           );
@@ -196,39 +209,45 @@ class BasicTableChart extends ReactChart {
               { ...fontStyle },
             );
           }
-          return <th {...props} style={{ ...cellCssStyle }} />;
+          return <th {...props} style={cellCssStyle} />;
         },
       },
       body: {
         cell: props => {
           const uid = props.uid;
-          const backgroundColor = this.getStyleValue(styleConfigs, [
-            'column',
-            'modal',
-            'list',
-            uid,
-            'basicStyle',
-            'backgroundColor',
-          ]);
-          const textAlign = this.getStyleValue(styleConfigs, [
-            'column',
-            'modal',
-            'list',
-            uid,
-            'basicStyle',
-            'align',
-          ]);
-          const font = this.getStyleValue(styleConfigs, [
-            'column',
-            'modal',
-            'list',
-            uid,
-            'basicStyle',
-            'font',
-          ]);
-          return (
-            <td {...props} style={{ backgroundColor, textAlign, ...font }} />
+          // const backgroundColor = this.getStyleValue(styleConfigs, [
+          //   'column',
+          //   'modal',
+          //   'list',
+          //   uid,
+          //   'basicStyle',
+          //   'backgroundColor',
+          // ]);
+          // const textAlign = this.getStyleValue(styleConfigs, [
+          //   'column',
+          //   'modal',
+          //   'list',
+          //   uid,
+          //   'basicStyle',
+          //   'align',
+          // ]);
+          // const font = this.getStyleValue(styleConfigs, [
+          //   'column',
+          //   'modal',
+          //   'list',
+          //   uid,
+          //   'basicStyle',
+          //   'font',
+          // ]);
+          const cellCssStyle = Object.assign(
+            {},
+            {
+              textAlign: bodyTextAlign,
+              backgroundColor: bodyBgColor,
+              ...bodyFont,
+            },
           );
+          return <td {...props} style={cellCssStyle} />;
         },
       },
     };

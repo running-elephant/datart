@@ -296,6 +296,44 @@ const config: ChartConfig = {
         },
       ],
     },
+    {
+      label: 'style.tableBodyStyle',
+      key: 'tableBodyStyle',
+      comType: 'group',
+      rows: [
+        {
+          label: 'style.bgColor',
+          key: 'bgColor',
+          default: '#fafafa',
+          comType: 'fontColor',
+        },
+        {
+          label: 'style.font',
+          key: 'font',
+          comType: 'font',
+          default: {
+            fontFamily: 'PingFang SC',
+            fontSize: '12',
+            fontWeight: 'normal',
+            fontStyle: 'normal',
+            color: '#6c757d',
+          },
+        },
+        {
+          label: 'style.align',
+          key: 'align',
+          default: 'left',
+          comType: 'select',
+          options: {
+            items: [
+              { label: '左对齐', value: 'left' },
+              { label: '居中对齐', value: 'center' },
+              { label: '右对齐', value: 'right' },
+            ],
+          },
+        },
+      ],
+    },
   ],
   settings: [
     {
