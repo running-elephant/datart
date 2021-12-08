@@ -408,8 +408,10 @@ export function transfromToObjectArray(
   if (!columns || !metas) {
     return [];
   }
-  return columns.map(col => {
-    let objCol = {};
+  return columns.map((col, index) => {
+    let objCol = {
+      id: index,
+    };
     for (let i = 0; i < metas.length; i++) {
       const key = metas?.[i]?.name;
       if (!!key) {

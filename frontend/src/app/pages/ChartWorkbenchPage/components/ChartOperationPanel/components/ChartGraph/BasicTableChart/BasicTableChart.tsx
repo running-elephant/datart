@@ -87,23 +87,19 @@ class BasicTableChart extends ReactChart {
       dataset.columns,
     );
     const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
-
     this.isAutoMerge = this.getStyleValue(styleConfigs, ['style', 'autoMerge']);
 
     const mixedSectionConfigRows = dataConfigs
       .filter(c => c.key === 'mixed')
       .flatMap(config => config.rows || []);
-
     const groupConfigs = mixedSectionConfigRows.filter(
       r =>
         r.type === ChartDataViewFieldType.STRING ||
         r.type === ChartDataViewFieldType.DATE,
     );
-
     const aggregateConfigs = mixedSectionConfigRows.filter(
       r => r.type === ChartDataViewFieldType.NUMERIC,
     );
-
     let tablePagination = this.getPagingOptions(
       settingConfigs,
       dataset?.pageInfo,
@@ -254,6 +250,10 @@ class BasicTableChart extends ReactChart {
   }
 
   getColumns(groupConfigs, aggregateConfigs, styleConfigs, dataColumns) {
+    const enableRowNumber = this.getStyleValue(styleConfigs, [
+      'style',
+      'enableRowNumber',
+    ]);
     const enableFixedHeader = this.getStyleValue(styleConfigs, [
       'style',
       'enableFixedHeader',
@@ -416,13 +416,28 @@ class BasicTableChart extends ReactChart {
 
       return groupedHeaderColumns.concat(unusedHeaderRows);
     };
+
+    const rowNumbers = enableRowNumber
+      ? [
+          {
+            key: 'id',
+            title: '',
+            dataIndex: 'id',
+          },
+        ]
+      : [];
+
     return !tableHeaderStyles || tableHeaderStyles.length === 0
-      ? _getFlatColumns(groupConfigs, aggregateConfigs, dataColumns)
-      : _getGroupColumns(
-          groupConfigs,
-          aggregateConfigs,
-          tableHeaderStyles,
-          dataColumns,
+      ? rowNumbers.concat(
+          _getFlatColumns(groupConfigs, aggregateConfigs, dataColumns),
+        )
+      : rowNumbers.concat(
+          _getGroupColumns(
+            groupConfigs,
+            aggregateConfigs,
+            tableHeaderStyles,
+            dataColumns,
+          ),
         );
   }
 
