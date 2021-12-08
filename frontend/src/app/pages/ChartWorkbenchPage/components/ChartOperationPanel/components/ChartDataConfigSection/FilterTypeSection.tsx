@@ -97,7 +97,7 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
     return (
       <BaseDataConfigSection
         ancestors={ancestors}
-        modalSize={StateModalSize.Middle}
+        modalSize={StateModalSize.MIDDLE}
         translate={translate}
         config={extendedConfig}
         onConfigChanged={handleConfigChange}

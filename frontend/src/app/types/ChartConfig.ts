@@ -304,7 +304,7 @@ export type ChartStyleSectionRowOption = {
   step?: number | string;
   type?: string;
   editable?: boolean;
-  modalSize?: string;
+  modalSize?: string | number;
   expand?: boolean;
   items?: Array<ChartStyleSelectorItem> | string[] | number[];
   hideLabel?: boolean;

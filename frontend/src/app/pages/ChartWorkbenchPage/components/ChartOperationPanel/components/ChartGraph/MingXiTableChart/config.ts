@@ -320,9 +320,9 @@ const config: ChartConfig = {
       lang: 'zh-CN',
       translation: {
         header: {
-          title: '表头样式与分组',
-          open: '打开表头样式与分组',
-          styleAndGroup: '表头样式与分组',
+          title: '表头分组',
+          open: '打开',
+          styleAndGroup: '表头分组',
         },
         column: {
           title: '表格数据列',
@@ -361,9 +361,9 @@ const config: ChartConfig = {
       lang: 'en-US',
       translation: {
         header: {
-          title: 'Title',
-          open: 'Open Table Header and Group',
-          styleAndGroup: 'Style and Group',
+          title: 'Table Header Group',
+          open: 'Open',
+          styleAndGroup: 'Header Group',
         },
         column: {
           title: 'Table Data Column',
