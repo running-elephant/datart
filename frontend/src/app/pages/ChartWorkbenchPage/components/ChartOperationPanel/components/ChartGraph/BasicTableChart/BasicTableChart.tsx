@@ -289,7 +289,10 @@ class BasicTableChart extends ReactChart {
     };
 
     const _sortFn = rowKey => (prev, next) => {
-      return prev[rowKey] > next[rowKey];
+      if (isNaN(+prev[rowKey])) {
+        return prev[rowKey] > next[rowKey];
+      }
+      return prev[rowKey] - next[rowKey];
     };
 
     const _getFlatColumns = (groupConfigs, aggregateConfigs, dataColumns) =>
@@ -297,15 +300,6 @@ class BasicTableChart extends ReactChart {
         const colName = c.colName;
         const uid = c.uid;
 
-        // TODO(Stephen): tobe fixed by global setting
-        const enableSort = this.getStyleValue(styleConfigs, [
-          'column',
-          'modal',
-          'list',
-          uid,
-          'sortAndFilter',
-          'enableSort',
-        ]);
         const enableFixedCol = this.getStyleValue(styleConfigs, [
           'column',
           'modal',
@@ -352,7 +346,7 @@ class BasicTableChart extends ReactChart {
           : [];
 
         return {
-          sorter: !!enableSort ? _sortFn(colName) : undefined,
+          sorter: _sortFn(colName),
           title: getColumnRenderName(c),
           dataIndex: getValueByColumnKey(c),
           key: getValueByColumnKey(c),
