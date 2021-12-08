@@ -183,6 +183,7 @@
           "header": {
             "newName": "Please input a new header name",
             "merge": "Merge",
+            "reset": "Reset",
             "moveUp": "moveUp",
             "moveDown": "moveDown",
             "columnName": "Column Name",

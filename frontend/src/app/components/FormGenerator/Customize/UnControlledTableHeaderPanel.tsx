@@ -22,17 +22,15 @@ import {
   CheckOutlined,
   DeleteOutlined,
   EditOutlined,
+  RedoOutlined,
 } from '@ant-design/icons';
 import { Button, Col, Input, Row, Space, Table } from 'antd';
 import {
+  ChartDataSectionConfig,
   ChartDataSectionType,
   ChartStyleSectionConfig,
 } from 'app/types/ChartConfig';
-import {
-  diffHeaderRows,
-  flattenHeaderRowsWithoutGroupRow,
-  getColumnRenderName,
-} from 'app/utils/chartHelper';
+import { getColumnRenderName } from 'app/utils/chartHelper';
 import { DATARTSEPERATOR } from 'globalConstants';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components';
@@ -56,6 +54,18 @@ interface RowValue {
   children?: RowValue[];
 }
 
+const getFlattenHeaders = (dataConfigs: ChartDataSectionConfig[] = []) => {
+  const newDataConfigs = CloneValueDeep(dataConfigs);
+  return newDataConfigs
+    .filter(
+      c =>
+        ChartDataSectionType.AGGREGATE === c.type ||
+        ChartDataSectionType.GROUP === c.type ||
+        ChartDataSectionType.MIXED === c.type,
+    )
+    .flatMap(config => config.rows || []);
+};
+
 const UnControlledTableHeaderPanel: FC<
   ItemLayoutProps<ChartStyleSectionConfig>
 > = memo(
@@ -69,43 +79,7 @@ const UnControlledTableHeaderPanel: FC<
     const [selectedRowUids, setSelectedRowUids] = useState<string[]>([]);
     const [myData, setMyData] = useState(() => CloneValueDeep(data));
     const [tableDataSource, setTableDataSource] = useState<RowValue[]>(() => {
-      const currentHeaderRows = (CloneValueDeep(dataConfigs) || [])
-        .filter(
-          c =>
-            ChartDataSectionType.AGGREGATE === c.type ||
-            ChartDataSectionType.GROUP === c.type ||
-            ChartDataSectionType.MIXED === c.type,
-        )
-        .flatMap(config => config.rows || []);
-
-      const oldGroupedHeaderRows: RowValue[] = myData?.value || [];
-      const oldFlattenedHeaderRows: RowValue[] = oldGroupedHeaderRows.flatMap(
-        row => flattenHeaderRowsWithoutGroupRow(row),
-      );
-      const isChanged = diffHeaderRows(
-        oldFlattenedHeaderRows,
-        currentHeaderRows,
-      );
-      if (!isChanged) {
-        oldFlattenedHeaderRows.forEach(oldRow => {
-          const current = currentHeaderRows?.find(v => v.uid === oldRow.uid);
-          Object.assign(oldRow, current);
-        });
-        return oldGroupedHeaderRows;
-      }
-
-      return (CloneValueDeep(dataConfigs) || [])
-        .filter(
-          c =>
-            ChartDataSectionType.AGGREGATE === c.type ||
-            ChartDataSectionType.GROUP === c.type ||
-            ChartDataSectionType.MIXED === c.type,
-        )
-        .flatMap(config => config.rows || [])
-        .map(r => {
-          const previous = oldFlattenedHeaderRows?.find(v => v.uid === r.uid);
-          return { ...previous, ...r };
-        });
+      return myData?.value || [];
     });
 
     const mergeRowToGroup = () => {
@@ -237,6 +211,11 @@ const UnControlledTableHeaderPanel: FC<
       });
     };
 
+    const handleRollback = () => {
+      const originalFlattenHeaders = getFlattenHeaders(dataConfigs);
+      handleConfigChange?.(originalFlattenHeaders);
+    };
+
     const handleTableRowChange = rowUid => style => prop => (_, value) => {
       const brotherRows = findRowBrothers(rowUid, tableDataSource);
       const row = brotherRows.find(r => r.uid === rowUid);
@@ -321,33 +300,36 @@ const UnControlledTableHeaderPanel: FC<
     return (
       <StyledUnControlledTableHeaderPanel direction="vertical">
         <Row gutter={24}>
-          <Col span={4}>
-            <Button
-              disabled={selectedRowUids.length === 0}
-              type="primary"
-              onClick={mergeRowToGroup}
-            >
-              {t('table.header.merge')}
-            </Button>
-          </Col>
           <Col span={20}>
+            <Space>
+              <Button
+                disabled={selectedRowUids.length === 0}
+                type="primary"
+                onClick={mergeRowToGroup}
+              >
+                {t('table.header.merge')}
+              </Button>
+              <Button
+                disabled={selectedRowUids.length === 0}
+                icon={<ArrowUpOutlined />}
+                onClick={handleRowMoveUp}
+              >
+                {t('table.header.moveUp')}
+              </Button>
+              <Button
+                disabled={selectedRowUids.length === 0}
+                icon={<ArrowDownOutlined />}
+                onClick={handleRowMoveDown}
+              >
+                {t('table.header.moveDown')}
+              </Button>
+            </Space>
+          </Col>
+          <Col span={4}>
             <Row justify="end" align="middle">
-              <Space>
-                <Button
-                  disabled={selectedRowUids.length === 0}
-                  icon={<ArrowUpOutlined />}
-                  onClick={handleRowMoveUp}
-                >
-                  {t('table.header.moveUp')}
-                </Button>
-                <Button
-                  disabled={selectedRowUids.length === 0}
-                  icon={<ArrowDownOutlined />}
-                  onClick={handleRowMoveDown}
-                >
-                  {t('table.header.moveDown')}
-                </Button>
-              </Space>
+              <Button icon={<RedoOutlined />} onClick={handleRollback}>
+                {t('table.header.reset')}
+              </Button>
             </Row>
           </Col>
         </Row>

@@ -184,6 +184,7 @@
           "header": {
             "newName": "请输入新名称",
             "merge": "合并",
+            "reset": "还原初始值",
             "moveUp": "上移",
             "moveDown": "下移",
             "columnName": "表头名称",
