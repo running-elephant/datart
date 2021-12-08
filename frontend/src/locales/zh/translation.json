@@ -198,6 +198,28 @@
             }
           }
         },
+        "conditionStyleTable": {
+          "btn": {
+            "add": "新增",
+            "edit": "编辑",
+            "remove": "删除"
+          },
+          "header": {
+            "operator": "关系",
+            "value": "值",
+            "color": {
+              "title": "颜色",
+              "background": "背景",
+              "text": "文字"
+            },
+            "range": {
+              "title": "应用范围",
+              "cell": "单元格",
+              "row": "整行"
+            },
+            "action": "操作"
+          }
+        },
         "visualMap": {
           "title": "视觉映射",
           "show": "显示视觉映射",

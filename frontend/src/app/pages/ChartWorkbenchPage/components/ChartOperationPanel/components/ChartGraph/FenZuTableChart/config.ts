@@ -70,6 +70,7 @@ const config: ChartConfig = {
                     .map(c => ({
                       key: c.uid,
                       value: c.uid,
+                      type: c.type,
                       label:
                         c.label || c.aggregate
                           ? `${c.aggregate}(${c.colName})`
@@ -139,7 +140,13 @@ const config: ChartConfig = {
                     key: 'conditionStyle',
                     comType: 'group',
                     options: { expand: true },
-                    rows: [],
+                    rows: [
+                      {
+                        label: 'column.conditionStylePanel',
+                        key: 'conditionStylePanel',
+                        comType: 'conditionStylePanel',
+                      },
+                    ],
                   },
                 ],
               },
@@ -267,6 +274,7 @@ const config: ChartConfig = {
           enableSort: '开启列排序',
           basicStyle: '基础样式',
           conditionStyle: '条件样式',
+          conditionStylePanel: '条件样式配置器',
           backgroundColor: '背景颜色',
           align: '对齐方式',
           enableFixedCol: '开启固定列宽',

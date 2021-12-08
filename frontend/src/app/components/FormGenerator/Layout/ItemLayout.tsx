@@ -49,6 +49,7 @@ import {
   BasicUnControlledTabPanel,
 } from '../Basic';
 import {
+  ConditionStylePanel,
   DataCachePanel,
   DataReferencePanel,
   ListTemplatePanel,
@@ -67,6 +68,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
     dependency,
     onChange,
     dataConfigs,
+    currentSelectedItem,
     flatten,
   }) => {
     useEffect(() => {
@@ -115,9 +117,9 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
         data,
         translate,
         onChange: handleDataChange,
+        currentSelectedItem,
         dataConfigs,
       };
-
       switch (data.comType) {
         case ChartStyleSectionComponentType.CHECKBOX:
           return <BasicCheckbox {...props} />;
@@ -155,6 +157,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           return <DataReferencePanel {...props} />;
         case ChartStyleSectionComponentType.TABLEHEADER:
           return <UnControlledTableHeaderPanel {...props} />;
+        case ChartStyleSectionComponentType.CONDITIONSTYLE:
+          return <ConditionStylePanel {...props} />;
         case ChartStyleSectionComponentType.GROUP:
           return <GroupLayout {...props} />;
         case ChartStyleSectionComponentType.TEXT:

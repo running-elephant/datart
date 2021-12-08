@@ -119,7 +119,7 @@ class Chart extends DatartChartBase {
     return series?.data?.valueColName || series.seriesName;
   }
 
-  private getValue(
+  protected getValue(
     configs: ChartStyleSectionConfig[] = [],
     paths?: string[],
     targetKey?,
