@@ -62,7 +62,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   const {
     data: { rows },
   } = useContext(WidgetDataContext);
-  const { widgetUpdate, refreshWidgetsByFilter } =
+  const { widgetUpdate, refreshWidgetsByController: refreshWidgetsByFilter } =
     useContext(BoardActionContext);
 
   const { config, type: facadeType } = useMemo(

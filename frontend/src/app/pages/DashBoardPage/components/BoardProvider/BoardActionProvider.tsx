@@ -75,7 +75,7 @@ export const BoardActionProvider: FC<{ id: string }> = ({
         dispatch(resetControllerAction({ boardId, renderMode }));
       }
     }, 500),
-    refreshWidgetsByFilter: debounce((widget: Widget) => {
+    refreshWidgetsByController: debounce((widget: Widget) => {
       if (hasQueryControl) {
         return;
       }

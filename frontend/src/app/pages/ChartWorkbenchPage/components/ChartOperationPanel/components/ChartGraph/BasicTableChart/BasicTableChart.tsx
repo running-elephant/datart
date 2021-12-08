@@ -29,21 +29,23 @@ import {
 import { toFormattedValue } from 'app/utils/number';
 import { Omit } from 'utils/object';
 import { v4 as uuidv4 } from 'uuid';
-import AntdTableChartAdapter from '../../ChartTools/AntdTableChartAdapter';
+import AntdTableWrapper from '../../ChartTools/AntdTableWrapper';
 import Config from './config';
 
 class BasicTableChart extends ReactChart {
+  _useIFrame = false;
   isISOContainer = 'react-table';
   config = Config;
   protected isAutoMerge = false;
   tableOptions = { dataset: {}, config: {} };
 
   constructor(props?) {
-    super(
-      props?.id || 'react-table',
-      props?.name || '表格',
-      props?.icon || 'table',
-    );
+    super(AntdTableWrapper, {
+      id: props?.id || 'react-table',
+      name: props?.name || '表格',
+      icon: props?.icon || 'table',
+    });
+
     this.meta.requirements = props?.requirements || [
       {
         group: [0, 999],
@@ -52,49 +54,29 @@ class BasicTableChart extends ReactChart {
     ];
   }
 
-  onMount(options, context): void {
-    if (options.containerId === undefined || !context.document) {
-      return;
-    }
-
-    this.getInstance().init(AntdTableChartAdapter);
-    this.getInstance().mounted(
-      context.document.getElementById(options.containerId),
-      options,
-      context,
-    );
-  }
-
   onUpdated(options, context): void {
     this.tableOptions = options;
 
     if (!this.isMatchRequirement(options.config)) {
-      this.getInstance()?.unmount();
+      this.adapter?.unmount();
       return;
     }
 
-    this.getInstance()?.updated(
+    this.adapter?.updated(
       this.getOptions(context, options.dataset, options.config),
       context,
     );
   }
 
-  onUnMount(): void {
-    this.getInstance()?.unmount();
-  }
-
-  onResize(opt: any, context): void {
+  public onResize(options, context?): void {
     this.onUpdated(this.tableOptions, context);
   }
-
-  getTableY() {}
 
   getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
     if (!dataset || !config) {
       return { locale: { emptyText: '  ' } };
     }
 
-    const { clientWidth, clientHeight } = context.document.documentElement;
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
@@ -138,8 +120,8 @@ class BasicTableChart extends ReactChart {
       ...this.getAntdTableStyleOptions(
         styleConfigs,
         dataset,
-        clientWidth,
-        clientHeight,
+        null,
+        context?.height,
         tablePagination,
       ),
     };

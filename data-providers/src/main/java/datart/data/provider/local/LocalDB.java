@@ -51,7 +51,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LocalDB {
 
-    private static final String MEM_URL = "jdbc:h2:mem:/LOG=0;DATABASE_TO_UPPER=false;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0";
+    private static final String MEM_URL = "jdbc:h2:mem:/";
+
+    private static final String H2_PARAM = ";LOG=0;DATABASE_TO_UPPER=false;MODE=MySQL;CASE_INSENSITIVE_IDENTIFIERS=TRUE;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0";
 
     private static String fileUrl;
 
@@ -318,7 +320,7 @@ public class LocalDB {
     }
 
     private static Connection getConnection(boolean persistent, String database) throws SQLException {
-        String url = persistent ? getDatabaseUrl(database) : MEM_URL;
+        String url = persistent ? getDatabaseUrl(database) : MEM_URL + H2_PARAM;
         return DriverManager.getConnection(url);
     }
 
@@ -375,7 +377,7 @@ public class LocalDB {
         } else {
             database = toDatabase(database);
         }
-        return fileUrl = String.format("jdbc:h2:file:%s/%s;LOG=0;DATABASE_TO_UPPER=false;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0", getDbFileBasePath(), database);
+        return fileUrl = String.format("jdbc:h2:file:%s/%s" + H2_PARAM, getDbFileBasePath(), database);
     }
 
     private static String getDbFileBasePath() {

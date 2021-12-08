@@ -119,7 +119,7 @@ const ChartPreviewBoardForShare: FC<{
           onChange={handleFilterChange}
         />
         <div style={{ width: '100%', height: '100%' }} ref={ref}>
-          <ChartTools.ChartIFrame
+          <ChartTools.ChartIFrameContainer
             key={chartPreview?.backendChart?.id!}
             containerId={chartPreview?.backendChart?.id!}
             dataset={chartPreview?.dataset}

@@ -19,7 +19,7 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 
-interface ReactChartAdapterProps {
+interface ReactLifecycleAdapterProps {
   init: (component: React.Component | Function) => void;
   mounted: (container, options?, context?) => any;
   updated: (options: any, context?) => any;
@@ -27,10 +27,16 @@ interface ReactChartAdapterProps {
   resize: (opt: any) => void;
 }
 
-export default class ReactChartAdapter implements ReactChartAdapterProps {
+export default class ReactLifecycleAdapter
+  implements ReactLifecycleAdapterProps
+{
   private domContainer;
   private reactComponent;
   private externalLibs;
+
+  constructor(componentWrapper) {
+    this.reactComponent = componentWrapper;
+  }
 
   public init(component) {
     this.reactComponent = component;
@@ -43,14 +49,14 @@ export default class ReactChartAdapter implements ReactChartAdapterProps {
   public mounted(container, options?, context?) {
     this.domContainer = container;
     return ReactDom.render(
-      React.createElement(this.getComponent(), options),
+      React.createElement(this.getComponent(), options, context),
       this.domContainer,
     );
   }
 
   public updated(options, context?) {
     return ReactDom.render(
-      React.createElement(this.getComponent(), options),
+      React.createElement(this.getComponent(), options, context),
       this.domContainer,
     );
   }
@@ -59,9 +65,9 @@ export default class ReactChartAdapter implements ReactChartAdapterProps {
     ReactDom.unmountComponentAtNode(this.domContainer);
   }
 
-  public resize(opt: any) {
+  public resize(options, context?) {
     return ReactDom.render(
-      React.createElement(this.getComponent(), opt),
+      React.createElement(this.getComponent(), options, context),
       this.domContainer,
     );
   }

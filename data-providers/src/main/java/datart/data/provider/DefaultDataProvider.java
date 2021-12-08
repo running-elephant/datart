@@ -195,7 +195,7 @@ public abstract class DefaultDataProvider extends DataProvider {
             return values;
         }
         if (values.get(0).size() != columns.size()) {
-            Exceptions.msg( "message.provider.default.schema", values.get(0).size() + ":" + columns.size());
+            Exceptions.msg("message.provider.default.schema", values.get(0).size() + ":" + columns.size());
         }
         values.parallelStream().forEach(vals -> {
             for (int i = 0; i < vals.size(); i++) {
@@ -216,8 +216,10 @@ public abstract class DefaultDataProvider extends DataProvider {
                             val = null;
                         } else if (NumberUtils.isDigits(val.toString())) {
                             val = Long.parseLong(val.toString());
-                        } else {
+                        } else if (NumberUtils.isNumber(val.toString())) {
                             val = Double.parseDouble(val.toString());
+                        } else {
+                            val = null;
                         }
                         break;
                     default:
