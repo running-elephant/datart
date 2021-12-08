@@ -40,6 +40,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
     translate: t = title => title,
     dataConfigs,
     flatten,
+    currentSelectedItem,
     onChange,
   }) => {
     const [openStateModal, contextHolder] = useStateModal({});
@@ -113,6 +114,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           translate={t}
           dataConfigs={dataConfigs}
           flatten={flatten}
+          currentSelectedItem={currentSelectedItem}
           onChange={onChangeEvent}
         />
       );

@@ -31,6 +31,10 @@ import { toFormattedValue } from 'app/utils/number';
 import { isEmptyArray, Omit } from 'utils/object';
 import { v4 as uuidv4 } from 'uuid';
 import AntdTableWrapper from '../../ChartTools/AntdTableWrapper';
+import {
+  getCustomBodyCellStyle,
+  getCustomBodyRowStyle,
+} from './conditionStyle';
 import Config from './config';
 
 class BasicTableChart extends ReactChart {
@@ -319,6 +323,22 @@ class BasicTableChart extends ReactChart {
       'align',
     ]);
 
+    const getAllColumnListInfo = this.getValue(
+      styleConfigs,
+      ['column', 'modal', 'list'],
+      'rows',
+    );
+    let allConditionStyle: any[] = [];
+    getAllColumnListInfo?.forEach(info => {
+      const getConditionStyleValue = this.getValue(
+        info.rows,
+        ['conditionStyle', 'conditionStyle'],
+        'value',
+      );
+      if (Array.isArray(getConditionStyleValue)) {
+        allConditionStyle = [...allConditionStyle, ...getConditionStyleValue];
+      }
+    });
     return {
       header: {
         cell: props => {
@@ -347,20 +367,54 @@ class BasicTableChart extends ReactChart {
       },
       body: {
         cell: props => {
-          const { style, ...rest } = props;
-          const cellCssStyle = {
-            textAlign: bodyTextAlign,
-            backgroundColor: bodyBgColor,
-            ...bodyFont,
-            fontSize: +bodyFont?.fontSize,
-          };
+          const uid = props.uid;
+          const backgroundColor = this.getStyleValue(styleConfigs, [
+            'column',
+            'modal',
+            'list',
+            uid,
+            'basicStyle',
+            'backgroundColor',
+          ]);
+          const textAlign = this.getStyleValue(styleConfigs, [
+            'column',
+            'modal',
+            'list',
+            uid,
+            'basicStyle',
+            'align',
+          ]);
+          const font = this.getStyleValue(styleConfigs, [
+            'column',
+            'modal',
+            'list',
+            uid,
+            'basicStyle',
+            'font',
+          ]);
+          const conditionStyle = this.getStyleValue(getAllColumnListInfo, [
+            uid,
+            'conditionStyle',
+            'conditionStyle',
+          ]);
+          const cellStyle = this.getBodyCellStyle(props, conditionStyle);
           return (
-            <td {...rest} style={Object.assign({}, cellCssStyle, style)} />
+            <td
+              {...props}
+              style={{ backgroundColor, textAlign, ...font, ...cellStyle }}
+            />
           );
+        },
+        row: props => {
+          const rowStyle = this.getBodyRowStyle(props, allConditionStyle);
+          return <tr {...props} style={rowStyle} />;
         },
       },
     };
   }
+
+  protected getBodyCellStyle = getCustomBodyCellStyle;
+  protected getBodyRowStyle = getCustomBodyRowStyle;
 
   getColumns(groupConfigs, aggregateConfigs, styleConfigs, dataColumns) {
     const enableRowNumber = this.getStyleValue(styleConfigs, [
@@ -449,12 +503,15 @@ class BasicTableChart extends ReactChart {
             };
           },
           onCell: (record, rowIndex) => {
+            const cellValue = record[getValueByColumnKey(c)];
+
             return {
               uid: c.uid,
+              cellValue,
               ...this.registerTableCellEvents(
                 getValueByColumnKey(c),
                 rowIndex,
-                record[getValueByColumnKey(c)],
+                cellValue,
               ),
             };
           },
@@ -465,7 +522,7 @@ class BasicTableChart extends ReactChart {
             }
             return {
               children: formattedValue,
-              props: { rowSpan: columnRowSpans[rowIndex] },
+              props: { rowSpan: columnRowSpans[rowIndex], cellValue: value },
             };
           },
         };

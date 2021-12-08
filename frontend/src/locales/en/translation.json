@@ -200,6 +200,28 @@
             }
           }
         },
+        "conditionStyleTable": {
+          "btn": {
+            "add": "Add",
+            "edit": "Edit",
+            "remove": "Remove"
+          },
+          "header": {
+            "operator": "Operator",
+            "value": "Value",
+            "color": {
+              "title": "Color",
+              "background": "Background",
+              "text": "Text"
+            },
+            "range": {
+              "title": "Applied range",
+              "cell": "Cell",
+              "row": "Row"
+            },
+            "action": "Action"
+          }
+        },
         "visualMap": {
           "title": "Visual Map",
           "show": "Show Visual Map",
