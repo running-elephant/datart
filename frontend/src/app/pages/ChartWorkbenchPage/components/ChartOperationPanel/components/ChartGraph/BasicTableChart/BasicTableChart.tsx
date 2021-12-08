@@ -145,6 +145,18 @@ class BasicTableChart extends ReactChart {
       'modal',
       'tableHeaders',
     ]);
+    const bgColor = this.getStyleValue(styleConfigs, [
+      'tableHeaderStyle',
+      'bgColor',
+    ]);
+    const headerFont = this.getStyleValue(styleConfigs, [
+      'tableHeaderStyle',
+      'font',
+    ]);
+    const textAlign = this.getStyleValue(styleConfigs, [
+      'tableHeaderStyle',
+      'align',
+    ]);
 
     return {
       header: {
@@ -165,8 +177,14 @@ class BasicTableChart extends ReactChart {
           };
 
           const header = _findRow(uid, tableHeaders || []);
-          const cellCssStyle = {};
-
+          const cellCssStyle = Object.assign(
+            {},
+            {
+              textAlign: textAlign,
+              backgroundColor: bgColor,
+              ...headerFont,
+            },
+          );
           if (header && header.style) {
             const fontStyle = header.style?.font?.value;
             Object.assign(
@@ -259,6 +277,8 @@ class BasicTableChart extends ReactChart {
       [...groupConfigs, ...aggregateConfigs].map(c => {
         const colName = c.colName;
         const uid = c.uid;
+
+        // TODO(Stephen): tobe fixed by global setting
         const enableSort = this.getStyleValue(styleConfigs, [
           'column',
           'modal',
@@ -266,14 +286,6 @@ class BasicTableChart extends ReactChart {
           uid,
           'sortAndFilter',
           'enableSort',
-        ]);
-        const textAlign = this.getStyleValue(styleConfigs, [
-          'column',
-          'modal',
-          'list',
-          uid,
-          'basicStyle',
-          'align',
         ]);
         const enableFixedCol = this.getStyleValue(styleConfigs, [
           'column',
@@ -332,7 +344,6 @@ class BasicTableChart extends ReactChart {
               : null
             : null,
           fixed: _getFixedColumn(getValueByColumnKey(c)),
-          align: textAlign,
           onHeaderCell: record => {
             return {
               ...Omit(record, [

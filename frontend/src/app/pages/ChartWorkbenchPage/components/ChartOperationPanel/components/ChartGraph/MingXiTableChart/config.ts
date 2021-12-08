@@ -258,6 +258,44 @@ const config: ChartConfig = {
         },
       ],
     },
+    {
+      label: 'style.tableHeaderStyle',
+      key: 'tableHeaderStyle',
+      comType: 'group',
+      rows: [
+        {
+          label: 'style.bgColor',
+          key: 'bgColor',
+          default: '#f0f0f0',
+          comType: 'fontColor',
+        },
+        {
+          label: 'style.font',
+          key: 'font',
+          comType: 'font',
+          default: {
+            fontFamily: 'PingFang SC',
+            fontSize: '12',
+            fontWeight: 'normal',
+            fontStyle: 'normal',
+            color: '#6c757d',
+          },
+        },
+        {
+          label: 'style.align',
+          key: 'align',
+          default: 'left',
+          comType: 'select',
+          options: {
+            items: [
+              { label: '左对齐', value: 'left' },
+              { label: '居中对齐', value: 'center' },
+              { label: '右对齐', value: 'right' },
+            ],
+          },
+        },
+      ],
+    },
   ],
   settings: [
     {
@@ -346,6 +384,10 @@ const config: ChartConfig = {
           rightFixedColumns: '右侧固定列',
           tableSize: '表格大小',
           autoMerge: '自动合并相同内容',
+          tableHeaderStyle: '表头样式',
+          bgColor: '背景颜色',
+          font: '字体',
+          align: '对齐方式',
         },
         cache: {
           title: '数据处理',
@@ -387,6 +429,9 @@ const config: ChartConfig = {
           rightFixedColumns: 'Right Fixed Columns',
           tableSize: 'Table Size',
           autoMerge: 'Auto Merge',
+          bgColor: 'Background Color',
+          font: 'Font',
+          align: 'Align',
         },
         cache: {
           title: 'Data Process',
