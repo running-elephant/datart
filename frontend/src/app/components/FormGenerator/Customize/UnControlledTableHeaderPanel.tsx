@@ -119,7 +119,6 @@ const UnControlledTableHeaderPanel: FC<
         mergeSameLineageAncesterRows(lineageRowUids);
       const ancestorsRows = makeSameLinageRows(noDuplicateLineageRows);
       const newDataSource = groupTreeNode(ancestorsRows, tableDataSource);
-
       handleConfigChange([...newDataSource]);
     };
 
@@ -174,7 +173,7 @@ const UnControlledTableHeaderPanel: FC<
     };
 
     const groupTreeNode = (rowAncestors, collection) => {
-      if (rowAncestors && rowAncestors.length <= 1) {
+      if (rowAncestors && rowAncestors.length < 1) {
         return collection;
       }
 
