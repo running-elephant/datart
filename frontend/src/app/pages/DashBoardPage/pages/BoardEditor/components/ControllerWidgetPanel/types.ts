@@ -88,5 +88,5 @@ export interface ControllerDateType {
 export interface RelativeDate {
   amount: number;
   unit: unitOfTime.DurationConstructor;
-  direction: '-' | '+';
+  direction: '-' | '+' | '+0';
 }

@@ -25,20 +25,14 @@ import produce from 'immer';
 import React, { useCallback } from 'react';
 import {
   DateName,
-  EndTimeAmountName,
-  EndTimeDirectionName,
   EndTimeExactName,
   EndTimeName,
   EndTimeRelativeName,
   EndTimeROEName,
-  EndTimeUnitName,
   PickerTypeName,
-  StartTimeAmountName,
-  StartTimeDirectionName,
   StartTimeExactName,
   StartTimeRelativeName,
   StartTimeROEName,
-  StartTimeUnitName,
 } from '../..';
 import {
   ControllerConfig,
@@ -46,7 +40,7 @@ import {
   PickerTypeOptions,
   RelativeDate,
 } from '../../../types';
-import { RelativeTimeSet } from './RelativeTimeSet';
+import { RelativeTimeSetter } from './RelativeTimeSetter';
 import { SingleTimeSet } from './SingleTimeSet';
 
 export const TimeSetter: React.FC<{
@@ -237,12 +231,7 @@ export const TimeSetter: React.FC<{
 
                   {getStartRelativeOrExact() ===
                     RelativeOrExactTime.Relative && (
-                    <RelativeTimeSet
-                      relativeName={StartTimeRelativeName}
-                      amountName={StartTimeAmountName}
-                      unitName={StartTimeUnitName}
-                      directionName={StartTimeDirectionName}
-                    />
+                    <RelativeTimeSetter relativeName={StartTimeRelativeName} />
                   )}
                 </Form.Item>
               </>
@@ -260,12 +249,7 @@ export const TimeSetter: React.FC<{
                     renderExact(StartTimeExactName, getPickerType)}
                   {getStartRelativeOrExact() ===
                     RelativeOrExactTime.Relative && (
-                    <RelativeTimeSet
-                      relativeName={StartTimeRelativeName}
-                      amountName={StartTimeAmountName}
-                      unitName={StartTimeUnitName}
-                      directionName={StartTimeDirectionName}
-                    />
+                    <RelativeTimeSetter relativeName={StartTimeRelativeName} />
                   )}
                 </Form.Item>
                 <Form.Item
@@ -279,12 +263,7 @@ export const TimeSetter: React.FC<{
                     renderExact(EndTimeExactName, getPickerType)}
 
                   {getEndRelativeOrExact() === RelativeOrExactTime.Relative && (
-                    <RelativeTimeSet
-                      relativeName={EndTimeRelativeName}
-                      amountName={EndTimeAmountName}
-                      unitName={EndTimeUnitName}
-                      directionName={EndTimeDirectionName}
-                    />
+                    <RelativeTimeSetter relativeName={EndTimeRelativeName} />
                   )}
                 </Form.Item>
               </Form.Item>
