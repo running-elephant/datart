@@ -23,6 +23,7 @@ import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import {
   getColumnRenderName,
   getCustomSortableColumns,
+  getUnusedHeaderRows,
   getValueByColumnKey,
   transfromToObjectArray,
 } from 'app/utils/chartHelper';
@@ -324,6 +325,7 @@ class BasicTableChart extends ReactChart {
           title: getColumnRenderName(c),
           dataIndex: getValueByColumnKey(c),
           key: getValueByColumnKey(c),
+          colName,
           width: enableFixedHeader
             ? enableFixedCol
               ? fixedColWidth
@@ -371,15 +373,25 @@ class BasicTableChart extends ReactChart {
       aggregateConfigs,
       tableHeaderStyles,
       dataColumns,
-    ) =>
-      tableHeaderStyles
-        ?.map(style =>
-          this.getHeaderColumnGroup(
-            style,
-            _getFlatColumns(groupConfigs, aggregateConfigs, dataColumns),
-          ),
-        )
-        ?.filter(column => !!column) || [];
+    ) => {
+      const flattenedColumns = _getFlatColumns(
+        groupConfigs,
+        aggregateConfigs,
+        dataColumns,
+      );
+
+      const groupedHeaderColumns =
+        tableHeaderStyles
+          ?.map(style => this.getHeaderColumnGroup(style, flattenedColumns))
+          ?.filter(Boolean) || [];
+
+      const unusedHeaderRows = getUnusedHeaderRows(
+        flattenedColumns,
+        groupedHeaderColumns,
+      );
+
+      return groupedHeaderColumns.concat(unusedHeaderRows);
+    };
     return !tableHeaderStyles || tableHeaderStyles.length === 0
       ? _getFlatColumns(groupConfigs, aggregateConfigs, dataColumns)
       : _getGroupColumns(
@@ -399,6 +411,7 @@ class BasicTableChart extends ReactChart {
     }
     return {
       uid: tableHeader?.uid,
+      colName: tableHeader?.colName,
       title: tableHeader.label,
       onHeaderCell: record => {
         return {

@@ -30,7 +30,10 @@ import {
   ChartDataSectionType,
   ChartStyleSectionConfig,
 } from 'app/types/ChartConfig';
-import { getColumnRenderName } from 'app/utils/chartHelper';
+import {
+  getColumnRenderName,
+  getUnusedHeaderRows,
+} from 'app/utils/chartHelper';
 import { DATARTSEPERATOR } from 'globalConstants';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components';
@@ -79,7 +82,13 @@ const UnControlledTableHeaderPanel: FC<
     const [selectedRowUids, setSelectedRowUids] = useState<string[]>([]);
     const [myData, setMyData] = useState(() => CloneValueDeep(data));
     const [tableDataSource, setTableDataSource] = useState<RowValue[]>(() => {
-      return myData?.value || [];
+      const originalFlattenHeaderRows = getFlattenHeaders(dataConfigs);
+      const currentHeaderRows: RowValue[] = myData?.value || [];
+      const unusedHeaderRows = getUnusedHeaderRows(
+        originalFlattenHeaderRows || [],
+        currentHeaderRows,
+      );
+      return currentHeaderRows.concat(unusedHeaderRows);
     });
 
     const mergeRowToGroup = () => {

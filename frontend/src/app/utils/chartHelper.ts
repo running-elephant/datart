@@ -446,6 +446,27 @@ export function getColumnRenderName(c?: ChartDataSectionField) {
   return c.colName;
 }
 
+export function getUnusedHeaderRows(
+  allRows: Array<{
+    colName?: string;
+  }>,
+  originalRows: Array<{
+    colName?: string;
+    isGroup?: boolean;
+    children?: any[];
+  }>,
+): any[] {
+  const oldFlattenedColNames = originalRows
+    .flatMap(row => flattenHeaderRowsWithoutGroupRow(row))
+    .map(r => r.colName);
+  return (allRows || []).reduce<any[]>((acc, cur) => {
+    if (!oldFlattenedColNames.includes(cur.colName)) {
+      acc.push(cur);
+    }
+    return acc;
+  }, []);
+}
+
 export function diffHeaderRows(
   oldRows: Array<{ colName: string }>,
   newRows: Array<{ colName: string }>,
