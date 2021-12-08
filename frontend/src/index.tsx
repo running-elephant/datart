@@ -4,6 +4,7 @@ import zh_CN from 'antd/lib/locale/zh_CN';
 import { App } from 'app';
 import 'app/assets/fonts/iconfont.css';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
+import 'core-js/features/string/replace-all.js';
 import React from 'react';
 import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
