@@ -62,7 +62,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   const {
     data: { rows },
   } = useContext(WidgetDataContext);
-  const { widgetUpdate, refreshWidgetsByController: refreshWidgetsByFilter } =
+  const { widgetUpdate, refreshWidgetsByController } =
     useContext(BoardActionContext);
 
   const { config, type: facadeType } = useMemo(
@@ -137,7 +137,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
       ).config.controllerValues = _values;
     });
     widgetUpdate(nextWidget);
-    refreshWidgetsByFilter(nextWidget);
+    refreshWidgetsByController(nextWidget);
   };
   // const onSqlOperatorAndValues = useCallback(
   //   (sql: FilterSqlOperator, values: any[]) => {
@@ -172,9 +172,9 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         ).config.controllerDate = nextFilterDate;
       });
       widgetUpdate(nextWidget);
-      refreshWidgetsByFilter(nextWidget);
+      refreshWidgetsByController(nextWidget);
     },
-    [controllerDate, refreshWidgetsByFilter, widget, widgetUpdate],
+    [controllerDate, refreshWidgetsByController, widget, widgetUpdate],
   );
 
   const onTimeChange = useCallback(
@@ -192,9 +192,9 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         ).config.controllerDate = nextFilterDate;
       });
       widgetUpdate(nextWidget);
-      refreshWidgetsByFilter(nextWidget);
+      refreshWidgetsByController(nextWidget);
     },
-    [controllerDate, refreshWidgetsByFilter, widget, widgetUpdate],
+    [controllerDate, refreshWidgetsByController, widget, widgetUpdate],
   );
 
   const control = useMemo(() => {

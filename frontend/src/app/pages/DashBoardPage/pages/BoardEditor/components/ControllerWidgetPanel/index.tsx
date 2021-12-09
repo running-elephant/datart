@@ -66,7 +66,7 @@ import { ControllerConfig } from './types';
 import {
   getInitWidgetController,
   postControlConfig,
-  preformatWidgetFilter,
+  preformatControlConfig,
 } from './utils';
 
 const FilterWidgetPanel: React.FC = memo(props => {
@@ -148,7 +148,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   useEffect(() => {
     if (!curFilterWidget || !curFilterWidget?.relations) {
       form.setFieldsValue({
-        config: preformatWidgetFilter(
+        config: preformatControlConfig(
           getInitWidgetController(controllerType),
           controllerType!,
         ),
@@ -178,7 +178,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
     form.setFieldsValue({
       ...confContent,
       relatedViews: preRelatedViews,
-      config: preformatWidgetFilter(config, controllerType!),
+      config: preformatControlConfig(config, controllerType!),
     });
   }, [
     curFilterWidget,

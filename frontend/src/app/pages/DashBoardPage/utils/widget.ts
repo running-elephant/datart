@@ -455,11 +455,14 @@ export const getWidgetMapByServer = (
   }, {} as Record<string, Widget>);
 
   const wrappedDataCharts: DataChart[] = [];
-  const controllerWidgets: Widget[] = [];
-  Object.values(widgetMap).forEach(widget => {
-    // 处理 widget包含关系
-    if (widget.parentId) {
-      const parentWidgetId = widget.parentId;
+  const controllerWidgets: Widget[] = []; // use for reset button
+  const widgetList = Object.values(widgetMap);
+
+  // 处理 widget包含关系 containerWidget 被包含的 widget.parentId 不为空
+  widgetList
+    .filter(w => w.parentId)
+    .forEach(widget => {
+      const parentWidgetId = widget.parentId!;
       const childTabId = widget.config.tabId as string;
       const curItem = (
         widgetMap[parentWidgetId].config.content as ContainerWidgetContent
@@ -477,10 +480,12 @@ export const getWidgetMapByServer = (
           widgetMap[parentWidgetId].config.content as ContainerWidgetContent
         ).itemMap[childTabId] = newItem;
       }
-    }
+    });
 
-    // 处理 controller config visibility依赖关系 id, url参数修改filter
-    if (widget.config.type === 'controller') {
+  // 处理 controller config visibility依赖关系 id, url参数修改filter
+  widgetList
+    .filter(w => w.config.type === 'controller')
+    .forEach(widget => {
       const content = widget.config.content as ControllerWidgetContent;
       // 根据 url参数修改filter 默认值
       if (filterSearchParams) {
@@ -508,7 +513,8 @@ export const getWidgetMapByServer = (
           }
         }
       }
-      // 适配filter 的可见性
+
+      // 通过widget.relation 那里面的 targetId确定 关联controllerWidget 的真实ID
       const { visibilityType: visibility, condition } =
         content.config.visibility;
       const { relations } = widget;
@@ -521,25 +527,27 @@ export const getWidgetMapByServer = (
         }
       }
 
-      //处理 assistViewField
+      //处理 assistViewFields 旧数据 assistViewFields 是 string 类型 alpha.3版本之后 使用数组存储的 后续版本稳定之后 可以移除此逻辑
+      // TODO migration <<
       if (typeof content?.config?.assistViewFields === 'string') {
         content.config.assistViewFields = (
           content.config.assistViewFields as string
         ).split(VALUE_SPLITTER);
       }
-      // use for reset button
+      // TODO migration >> --xld
+
       controllerWidgets.push(widget);
-    }
+    });
 
-    // 处理 自有 chart widget
-
-    if (widget.config.content.type === 'widgetChart') {
+  // 处理 自有 chart widgetControl
+  widgetList
+    .filter(w => w.config.content.type === 'widgetChart')
+    .forEach(widget => {
       let content = widget.config.content as ChartWidgetContent;
       widget.datachartId = content.dataChart?.id || '';
       wrappedDataCharts.push(content.dataChart!);
       delete content.dataChart;
-    }
-  });
+    });
 
   return {
     widgetMap,
@@ -799,9 +807,6 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
         }
         const content = dependWidget.config.content as ControllerWidgetContent;
         const dependWidgetValue = content.config.controllerValues?.[0];
-        // if (!dependWidgetValue) {
-        //   return false;
-        // }
         if (relation === FilterSqlOperator.Equal) {
           return targetValue === dependWidgetValue;
         }
