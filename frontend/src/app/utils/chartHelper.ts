@@ -18,6 +18,7 @@
 
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import {
+  AggregateFieldActionType,
   ChartConfig,
   ChartDataSectionConfig,
   ChartDataSectionField,
@@ -407,8 +408,10 @@ export function transfromToObjectArray(
   if (!columns || !metas) {
     return [];
   }
-  return columns.map(col => {
-    let objCol = {};
+  return columns.map((col, index) => {
+    let objCol = {
+      id: index,
+    };
     for (let i = 0; i < metas.length; i++) {
       const key = metas?.[i]?.name;
       if (!!key) {
@@ -431,15 +434,39 @@ export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
 
 export function getColumnRenderName(c?: ChartDataSectionField) {
   if (!c) {
-    return 'unkonwn name';
+    return '[unkonwn]';
   }
   if (c.alias?.name) {
     return c.alias.name;
+  }
+  if (c.aggregate === AggregateFieldActionType.NONE) {
+    return c.colName;
   }
   if (c.aggregate) {
     return `${c.aggregate}(${c.colName})`;
   }
   return c.colName;
+}
+
+export function getUnusedHeaderRows(
+  allRows: Array<{
+    colName?: string;
+  }>,
+  originalRows: Array<{
+    colName?: string;
+    isGroup?: boolean;
+    children?: any[];
+  }>,
+): any[] {
+  const oldFlattenedColNames = originalRows
+    .flatMap(row => flattenHeaderRowsWithoutGroupRow(row))
+    .map(r => r.colName);
+  return (allRows || []).reduce<any[]>((acc, cur) => {
+    if (!oldFlattenedColNames.includes(cur.colName)) {
+      acc.push(cur);
+    }
+    return acc;
+  }, []);
 }
 
 export function diffHeaderRows(

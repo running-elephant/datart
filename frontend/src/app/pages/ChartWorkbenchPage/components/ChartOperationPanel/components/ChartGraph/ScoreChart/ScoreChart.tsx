@@ -113,7 +113,7 @@ class ScoreChart extends Chart {
     const { basicFontSize, bodyContentFontSize } = this.computeFontSize(
       context,
       { width: this.chart?.getWidth(), height: this.chart?.getHeight() },
-    ).apply(null, measureTexts as any);
+    ).apply(Object.create(null), measureTexts as any);
 
     const richStyles = aggConfigValues
       .flatMap((_, index) => {

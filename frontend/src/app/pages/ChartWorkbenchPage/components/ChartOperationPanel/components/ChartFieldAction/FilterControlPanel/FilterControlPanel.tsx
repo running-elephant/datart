@@ -75,6 +75,9 @@ const FilterControllPanel: FC<
     const t = useI18NPrefix(customizeI18NPrefix);
     const [alias, setAlias] = useState(config.alias);
     const [aggregate, setAggregate] = useState(() => {
+      if (Boolean(dataConfig?.disableAggregate)) {
+        return AggregateFieldActionType.NONE;
+      }
       if (config.aggregate) {
         return config.aggregate;
       } else if (

@@ -18,27 +18,29 @@
 
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
-import React from 'react';
+import { FC, memo } from 'react';
 import Frame, { FrameContextConsumer } from 'react-frame-component';
 import styled, { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartLifecycleAdapter from './ChartLifecycleAdapter';
 
-const ChartIFrameContainer: React.FC<{
+const ChartIFrameContainer: FC<{
   dataset: any;
   chart: Chart;
   config: ChartConfig;
   containerId?: string;
-  style?;
-}> = props => {
-  const transformToSafeCSSProps = style => {
-    if (isNaN(style?.width) || isEmpty(style?.width)) {
-      style.width = 0;
+  width?: any;
+  height?: any;
+}> = memo(props => {
+  const transformToSafeCSSProps = (width, height) => {
+    let newStyle = { width, height };
+    if (isNaN(newStyle?.width) || isEmpty(newStyle?.width)) {
+      newStyle.width = 0;
     }
-    if (isNaN(style?.height) || isEmpty(style?.height)) {
-      style.height = 0;
+    if (isNaN(newStyle?.height) || isEmpty(newStyle?.height)) {
+      newStyle.height = 0;
     }
-    return style;
+    return newStyle;
   };
 
   const render = () => {
@@ -47,13 +49,13 @@ const ChartIFrameContainer: React.FC<{
         <div
           id={`chart-root-${props.containerId}`}
           key={props.containerId}
-          style={{ ...props?.style, width: '100%', height: '100%' }}
+          style={{ width: '100%', height: '100%' }}
         >
           <ChartLifecycleAdapter
             dataset={props.dataset}
             chart={props.chart}
             config={props.config}
-            style={transformToSafeCSSProps(props?.style)}
+            style={transformToSafeCSSProps(props?.width, props?.height)}
           />
         </div>
       );
@@ -64,7 +66,7 @@ const ChartIFrameContainer: React.FC<{
         id={`chart-iframe-root-${props.containerId}`}
         key={props.containerId}
         frameBorder={0}
-        style={{ ...props?.style, width: '100%', height: '100%' }}
+        style={{ width: '100%', height: '100%' }}
         head={
           <>
             <style>
@@ -87,7 +89,7 @@ const ChartIFrameContainer: React.FC<{
                   dataset={props.dataset}
                   chart={props.chart}
                   config={props.config}
-                  style={transformToSafeCSSProps(props?.style)}
+                  style={transformToSafeCSSProps(props?.width, props?.height)}
                 />
               </StyledChartLifecycleAdapter>
             </StyleSheetManager>
@@ -98,7 +100,7 @@ const ChartIFrameContainer: React.FC<{
   };
 
   return render();
-};
+});
 
 export default ChartIFrameContainer;
 

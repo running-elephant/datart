@@ -25,10 +25,10 @@ export interface IStateModalContentProps {
 }
 
 export enum StateModalSize {
-  Small = 600,
-  Middle = 1000,
-  Large = 1600,
-  XLarge = 2000,
+  SMALL = 600,
+  MIDDLE = 1000,
+  LARGE = 1600,
+  XLARGE = 2000,
 }
 
 const defaultBodyStyle: React.CSSProperties = {
@@ -64,7 +64,7 @@ function useStateModal({
             Object.keys(stateRef.current || {}).length > 0
               ? stateRef.current
               : [];
-          okCallbackRef.current?.call(null, ...spreadParmas);
+          okCallbackRef.current?.call(Object.create(null), ...spreadParmas);
         } catch (e) {
           console.error('useStateModal | exception message ---> ', e);
         }
@@ -76,7 +76,7 @@ function useStateModal({
   };
 
   const handleClickCancelButton = () => {
-    cancelCallbackRef.current?.call(null, null);
+    cancelCallbackRef.current?.call(Object.create(null), null);
   };
 
   const FormWrapper = content => {
@@ -87,13 +87,26 @@ function useStateModal({
     );
   };
 
+  const getModalSize = (size?: string | number | StateModalSize): number => {
+    if (!size) {
+      return StateModalSize.MIDDLE;
+    }
+    if (!isNaN(+size)) {
+      return +size;
+    }
+    if (typeof size === 'string' && StateModalSize[size.toUpperCase()]) {
+      return StateModalSize[size.toUpperCase()];
+    }
+    return StateModalSize.MIDDLE;
+  };
+
   const showModal = (props: {
     title: string;
     content: (
       cacheOnChangeValue: typeof handleSaveCacheValue,
     ) => React.ReactElement<IStateModalContentProps>;
     bodyStyle?: React.CSSProperties;
-    modalSize?: StateModalSize;
+    modalSize?: string | number | StateModalSize;
     onOk?: typeof handleClickOKButton;
     onCancel?: typeof handleClickCancelButton;
   }) => {
@@ -106,9 +119,11 @@ function useStateModal({
 
     return modal.confirm({
       title: props.title,
-      width: props.modalSize || StateModalSize.Small,
+      width: getModalSize(props?.modalSize),
       bodyStyle: props.bodyStyle || defaultBodyStyle,
-      content: FormWrapper(props?.content?.call(null, handleSaveCacheValue)),
+      content: FormWrapper(
+        props?.content?.call(Object.create(null), handleSaveCacheValue),
+      ),
       onOk: handleClickOKButton,
       onCancel: handleClickCancelButton,
       maskClosable: true,
