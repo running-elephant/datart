@@ -28,7 +28,7 @@ import {
   transfromToObjectArray,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
-import { Omit } from 'utils/object';
+import { isEmptyArray, Omit } from 'utils/object';
 import { v4 as uuidv4 } from 'uuid';
 import AntdTableWrapper from '../../ChartTools/AntdTableWrapper';
 import Config from './config';
@@ -202,9 +202,7 @@ class BasicTableChart extends ReactChart {
               { ...fontStyle },
             );
           }
-          return (
-            <th {...rest} style={Object.assign({}, cellCssStyle, style)} />
-          );
+          return <th {...rest} style={Object.assign(cellCssStyle, style)} />;
         },
       },
       body: {
@@ -344,11 +342,8 @@ class BasicTableChart extends ReactChart {
           dataIndex: getValueByColumnKey(c),
           key: getValueByColumnKey(c),
           colName,
-          width: enableFixedHeader
-            ? enableFixedCol
-              ? fixedColWidth
-              : null
-            : null,
+          // TODO(Stephen): should be customize column with by use setting, https://github.com/ant-design/ant-design/issues/20397
+          width: 250,
           fixed: _getFixedColumn(c?.uid),
           onHeaderCell: record => {
             return {
@@ -416,7 +411,8 @@ class BasicTableChart extends ReactChart {
             key: 'id',
             title: '',
             dataIndex: 'id',
-          },
+            fixed: leftFixedColumns?.length > 0 ? 'left' : null,
+          } as any,
         ]
       : [];
 
@@ -469,26 +465,40 @@ class BasicTableChart extends ReactChart {
       'style',
       'enableBorder',
     ]);
+    // TODO(Stephen): if it is nessary `enableFixedHeader`
     const enableFixedHeader = this.getStyleValue(styleConfigs, [
       'style',
       'enableFixedHeader',
+    ]);
+    const tableHeaderStyles = this.getStyleValue(styleConfigs, [
+      'header',
+      'modal',
+      'tableHeaders',
     ]);
     const tableSize =
       this.getStyleValue(styleConfigs, ['style', 'tableSize']) || 'default';
     const HEADER_HEIGHT = { default: 56, middle: 48, small: 40 };
     const PAGINATION_HEIGHT = { default: 64, middle: 56, small: 56 };
+    const _getMaxHeaderHierarchy = (headerStyles: Array<{ children: [] }>) => {
+      const _maxDeeps = (arr: Array<{ children: [] }> = [], deeps: number) => {
+        if (!isEmptyArray(arr) && arr?.length > 0) {
+          return Math.max(...arr.map(a => _maxDeeps(a.children, deeps + 1)));
+        }
+        return deeps;
+      };
+      return _maxDeeps(headerStyles, 0) || 1;
+    };
 
     return {
-      scroll: enableFixedHeader
-        ? {
-            scrollToFirstRowOnChange: true,
-            x: 'max-content',
-            y:
-              height -
-              HEADER_HEIGHT[tableSize] -
-              (tablePagination ? PAGINATION_HEIGHT[tableSize] : 0),
-          }
-        : { scrollToFirstRowOnChange: true, x: 'max-content' },
+      scroll: Object.assign({
+        scrollToFirstRowOnChange: true,
+        x: 'max-content',
+        y:
+          height -
+          0 -
+          HEADER_HEIGHT[tableSize] * _getMaxHeaderHierarchy(tableHeaderStyles) -
+          (tablePagination ? PAGINATION_HEIGHT[tableSize] : 0),
+      }),
       bordered: !!showTableBorder,
       size: tableSize,
     };
