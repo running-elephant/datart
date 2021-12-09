@@ -23,6 +23,7 @@ import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import {
   getColumnRenderName,
   getCustomSortableColumns,
+  getUnusedHeaderRows,
   getValueByColumnKey,
   transfromToObjectArray,
 } from 'app/utils/chartHelper';
@@ -90,26 +91,23 @@ class BasicTableChart extends ReactChart {
       dataset.columns,
     );
     const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
+    this.isAutoMerge = this.getStyleValue(styleConfigs, ['style', 'autoMerge']);
 
     const mixedSectionConfigRows = dataConfigs
       .filter(c => c.key === 'mixed')
       .flatMap(config => config.rows || []);
-
     const groupConfigs = mixedSectionConfigRows.filter(
       r =>
         r.type === ChartDataViewFieldType.STRING ||
         r.type === ChartDataViewFieldType.DATE,
     );
-
     const aggregateConfigs = mixedSectionConfigRows.filter(
       r => r.type === ChartDataViewFieldType.NUMERIC,
     );
-
-    let tablePagination = this.getPagingOptions(
+    const tablePagination = this.getPagingOptions(
       settingConfigs,
       dataset?.pageInfo,
     );
-
     return {
       rowKey: 'uid',
       pagination: tablePagination,
@@ -146,6 +144,31 @@ class BasicTableChart extends ReactChart {
       'modal',
       'tableHeaders',
     ]);
+    const headerBgColor = this.getStyleValue(styleConfigs, [
+      'tableHeaderStyle',
+      'bgColor',
+    ]);
+    const headerFont = this.getStyleValue(styleConfigs, [
+      'tableHeaderStyle',
+      'font',
+    ]);
+    const headerTextAlign = this.getStyleValue(styleConfigs, [
+      'tableHeaderStyle',
+      'align',
+    ]);
+
+    const bodyBgColor = this.getStyleValue(styleConfigs, [
+      'tableBodyStyle',
+      'bgColor',
+    ]);
+    const bodyFont = this.getStyleValue(styleConfigs, [
+      'tableBodyStyle',
+      'font',
+    ]);
+    const bodyTextAlign = this.getStyleValue(styleConfigs, [
+      'tableBodyStyle',
+      'align',
+    ]);
 
     const getAllColumnListInfo = this.getValue(
       styleConfigs,
@@ -167,6 +190,7 @@ class BasicTableChart extends ReactChart {
       header: {
         cell: props => {
           const uid = props.uid;
+          const { style, ...rest } = props;
           const _findRow = (uid, headers) => {
             let header = headers.find(h => h.uid === uid);
             if (!!header) {
@@ -182,8 +206,11 @@ class BasicTableChart extends ReactChart {
           };
 
           const header = _findRow(uid, tableHeaders || []);
-          const cellCssStyle = {};
-
+          const cellCssStyle = {
+            textAlign: headerTextAlign,
+            backgroundColor: headerBgColor,
+            ...headerFont,
+          };
           if (header && header.style) {
             const fontStyle = header.style?.font?.value;
             Object.assign(
@@ -195,12 +222,15 @@ class BasicTableChart extends ReactChart {
               { ...fontStyle },
             );
           }
-          return <th {...props} style={{ ...cellCssStyle }} />;
+          return (
+            <th {...rest} style={Object.assign({}, cellCssStyle, style)} />
+          );
         },
       },
       body: {
         cell: props => {
           const uid = props.uid;
+          const { style, ...rest } = props;
           const backgroundColor = this.getStyleValue(styleConfigs, [
             'column',
             'modal',
@@ -231,10 +261,17 @@ class BasicTableChart extends ReactChart {
             'conditionStyle',
           ]);
           const cellStyle = this.getBodyCellStyle(props, conditionStyle);
+
           return (
             <td
-              {...props}
-              style={{ backgroundColor, textAlign, ...font, ...cellStyle }}
+              {...rest}
+              style={{
+                backgroundColor,
+                textAlign,
+                ...font,
+                ...cellStyle,
+                ...style,
+              }}
             />
           );
         },
@@ -250,6 +287,10 @@ class BasicTableChart extends ReactChart {
   protected getBodyRowStyle = getCustomBodyRowStyle;
 
   getColumns(groupConfigs, aggregateConfigs, styleConfigs, dataColumns) {
+    const enableRowNumber = this.getStyleValue(styleConfigs, [
+      'style',
+      'enableRowNumber',
+    ]);
     const enableFixedHeader = this.getStyleValue(styleConfigs, [
       'style',
       'enableFixedHeader',
@@ -268,46 +309,28 @@ class BasicTableChart extends ReactChart {
       'tableHeaders',
     ]);
 
-    const _getFixedColumn = name => {
-      if (
-        leftFixedColumns === name ||
-        (leftFixedColumns && leftFixedColumns.includes(name))
-      ) {
+    const _getFixedColumn = uid => {
+      if (String(leftFixedColumns).includes(uid)) {
         return 'left';
       }
-      if (
-        rightFixedColumns === name ||
-        (rightFixedColumns && rightFixedColumns.includes(name))
-      ) {
+      if (String(rightFixedColumns).includes(uid)) {
         return 'right';
       }
-      return null;
+      return false;
     };
 
     const _sortFn = rowKey => (prev, next) => {
-      return prev[rowKey] > next[rowKey];
+      if (isNaN(+prev[rowKey])) {
+        return prev[rowKey] > next[rowKey];
+      }
+      return prev[rowKey] - next[rowKey];
     };
 
     const _getFlatColumns = (groupConfigs, aggregateConfigs, dataColumns) =>
       [...groupConfigs, ...aggregateConfigs].map(c => {
         const colName = c.colName;
         const uid = c.uid;
-        const enableSort = this.getStyleValue(styleConfigs, [
-          'column',
-          'modal',
-          'list',
-          uid,
-          'sortAndFilter',
-          'enableSort',
-        ]);
-        const textAlign = this.getStyleValue(styleConfigs, [
-          'column',
-          'modal',
-          'list',
-          uid,
-          'basicStyle',
-          'align',
-        ]);
+
         const enableFixedCol = this.getStyleValue(styleConfigs, [
           'column',
           'modal',
@@ -354,17 +377,17 @@ class BasicTableChart extends ReactChart {
           : [];
 
         return {
-          sorter: !!enableSort ? _sortFn(colName) : undefined,
+          sorter: _sortFn(colName),
           title: getColumnRenderName(c),
           dataIndex: getValueByColumnKey(c),
           key: getValueByColumnKey(c),
+          colName,
           width: enableFixedHeader
             ? enableFixedCol
               ? fixedColWidth
               : null
             : null,
-          fixed: _getFixedColumn(getValueByColumnKey(c)),
-          align: textAlign,
+          fixed: _getFixedColumn(c?.uid),
           onHeaderCell: record => {
             return {
               ...Omit(record, [
@@ -408,22 +431,47 @@ class BasicTableChart extends ReactChart {
       aggregateConfigs,
       tableHeaderStyles,
       dataColumns,
-    ) =>
-      tableHeaderStyles
-        ?.map(style =>
-          this.getHeaderColumnGroup(
-            style,
-            _getFlatColumns(groupConfigs, aggregateConfigs, dataColumns),
-          ),
-        )
-        ?.filter(column => !!column) || [];
+    ) => {
+      const flattenedColumns = _getFlatColumns(
+        groupConfigs,
+        aggregateConfigs,
+        dataColumns,
+      );
+
+      const groupedHeaderColumns =
+        tableHeaderStyles
+          ?.map(style => this.getHeaderColumnGroup(style, flattenedColumns))
+          ?.filter(Boolean) || [];
+
+      const unusedHeaderRows = getUnusedHeaderRows(
+        flattenedColumns,
+        groupedHeaderColumns,
+      );
+
+      return groupedHeaderColumns.concat(unusedHeaderRows);
+    };
+
+    const rowNumbers = enableRowNumber
+      ? [
+          {
+            key: 'id',
+            title: '',
+            dataIndex: 'id',
+          },
+        ]
+      : [];
+
     return !tableHeaderStyles || tableHeaderStyles.length === 0
-      ? _getFlatColumns(groupConfigs, aggregateConfigs, dataColumns)
-      : _getGroupColumns(
-          groupConfigs,
-          aggregateConfigs,
-          tableHeaderStyles,
-          dataColumns,
+      ? rowNumbers.concat(
+          _getFlatColumns(groupConfigs, aggregateConfigs, dataColumns),
+        )
+      : rowNumbers.concat(
+          _getGroupColumns(
+            groupConfigs,
+            aggregateConfigs,
+            tableHeaderStyles,
+            dataColumns,
+          ),
         );
   }
 
@@ -436,6 +484,7 @@ class BasicTableChart extends ReactChart {
     }
     return {
       uid: tableHeader?.uid,
+      colName: tableHeader?.colName,
       title: tableHeader.label,
       onHeaderCell: record => {
         return {
@@ -446,7 +495,7 @@ class BasicTableChart extends ReactChart {
         .map(th => {
           return this.getHeaderColumnGroup(th, columns);
         })
-        .filter(column => !!column),
+        .filter(Boolean),
     };
   }
 
@@ -466,7 +515,7 @@ class BasicTableChart extends ReactChart {
       'enableFixedHeader',
     ]);
     const tableSize =
-      this.getStyleValue(styleConfigs, ['data', 'tableSize']) || 'default';
+      this.getStyleValue(styleConfigs, ['style', 'tableSize']) || 'default';
     const HEADER_HEIGHT = { default: 56, middle: 48, small: 40 };
     const PAGINATION_HEIGHT = { default: 64, middle: 56, small: 56 };
 

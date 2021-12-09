@@ -263,6 +263,7 @@ export type ChartDataSectionConfig = ChartConfigBase & {
   rows?: ChartDataSectionField[];
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
   limit?: null | number | string | number[] | string[];
+  disableAggregate?: boolean;
 
   // Question: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
@@ -304,7 +305,7 @@ export type ChartStyleSectionRowOption = {
   step?: number | string;
   type?: string;
   editable?: boolean;
-  modalSize?: string;
+  modalSize?: string | number;
   expand?: boolean;
   items?: Array<ChartStyleSelectorItem> | string[] | number[];
   hideLabel?: boolean;

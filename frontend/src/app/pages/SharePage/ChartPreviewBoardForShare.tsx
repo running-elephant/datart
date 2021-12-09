@@ -57,16 +57,17 @@ const ChartPreviewBoardForShare: FC<{
   }) => {
     const dispatch = useDispatch();
     const [chart] = useState<Chart | undefined>(() => {
-      return ChartManager.instance().getById(
+      const currentChart = ChartManager.instance().getById(
         chartPreview?.backendChart?.config?.chartGraphId,
       );
+      return currentChart;
     });
     const {
       ref,
       width = style?.width,
       height = style?.height,
     } = useResizeObserver<HTMLDivElement>({
-      refreshMode: 'throttle',
+      refreshMode: 'debounce',
       refreshRate: 500,
     });
     const headlessBrowserRenderSign = useSelector(
@@ -77,8 +78,31 @@ const ChartPreviewBoardForShare: FC<{
       if (!chartPreview) {
         return;
       }
-      dispatch(fetchShareDataSetByPreviewChartAction(chartPreview));
+      dispatch(
+        fetchShareDataSetByPreviewChartAction({ preview: chartPreview }),
+      );
+      registerChartEvents(chart);
     });
+
+    const registerChartEvents = chart => {
+      chart?.registerMouseEvents([
+        {
+          name: 'click',
+          callback: param => {
+            if (param.seriesName === 'paging') {
+              const page = param.value?.page;
+              dispatch(
+                fetchShareDataSetByPreviewChartAction({
+                  preview: chartPreview!,
+                  pageInfo: { pageNo: page },
+                }),
+              );
+              return;
+            }
+          },
+        },
+      ]);
+    };
 
     const handleFilterChange = (type, payload) => {
       dispatch(
@@ -125,7 +149,8 @@ const ChartPreviewBoardForShare: FC<{
             dataset={chartPreview?.dataset}
             chart={chart!}
             config={chartPreview?.chartConfig!}
-            style={{ width: width, height: height as number }}
+            width={width}
+            height={height}
           />
         </div>
         <HeadlessBrowserIdentifier

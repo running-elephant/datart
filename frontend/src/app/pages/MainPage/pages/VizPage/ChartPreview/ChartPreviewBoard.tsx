@@ -26,14 +26,7 @@ import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { useMainSlice } from 'app/pages/MainPage/slice';
 // import { makeDownloadDataTask } from 'app/pages/MainPage/slice/thunks';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
-import {
-  CSSProperties,
-  FC,
-  memo,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
@@ -53,7 +46,6 @@ import ControllerPanel from './components/ControllerPanel';
 const ChartPreviewBoard: FC<{
   backendChartId: string;
   orgId: string;
-  style?: CSSProperties;
   filterSearchUrl?: string;
   allowDownload?: boolean;
   allowShare?: boolean;
@@ -62,21 +54,22 @@ const ChartPreviewBoard: FC<{
   ({
     backendChartId,
     orgId,
-    style = { width: 300, height: 300 },
     filterSearchUrl,
     allowDownload,
     allowShare,
     allowManage,
   }) => {
     useVizSlice();
-    const {
-      ref,
-      width = style?.width,
-      height = style?.height,
-    } = useResizeObserver<HTMLDivElement>({
-      refreshMode: 'throttle',
+
+    const previewBlockObserver = useResizeObserver<HTMLDivElement>({
+      refreshMode: 'debounce',
       refreshRate: 500,
     });
+    const controllerObserver = useResizeObserver<HTMLDivElement>({
+      refreshMode: 'debounce',
+      refreshRate: 500,
+    });
+
     const { actions } = useMainSlice();
     const chartManager = ChartManager.instance();
     const dispatch = useDispatch();
@@ -236,6 +229,19 @@ const ChartPreviewBoard: FC<{
       }
     }, [dispatch, chartPreview?.backendChart]);
 
+    const calcuateChartContainerRegion = () => {
+      const region = { width: 300, height: 300 };
+      if (!controllerObserver?.ref || !previewBlockObserver?.ref) {
+        return region;
+      }
+      return {
+        width: previewBlockObserver?.width || region.width,
+        height:
+          (previewBlockObserver?.height || region.height) -
+          (controllerObserver?.height || 0),
+      };
+    };
+
     return (
       <StyledChartPreviewBoard>
         <VizHeader
@@ -250,21 +256,24 @@ const ChartPreviewBoard: FC<{
           allowShare={allowShare}
           allowManage={allowManage}
         />
-        <PreviewBlock>
-          <ControllerPanel
-            viewId={chartPreview?.backendChart?.viewId}
-            view={chartPreview?.backendChart?.view}
-            chartConfig={chartPreview?.chartConfig}
-            onChange={handleFilterChange}
-          />
-          <ChartWrapper ref={ref}>
+        <PreviewBlock ref={previewBlockObserver.ref}>
+          <div ref={controllerObserver.ref}>
+            <ControllerPanel
+              viewId={chartPreview?.backendChart?.viewId}
+              view={chartPreview?.backendChart?.view}
+              chartConfig={chartPreview?.chartConfig}
+              onChange={handleFilterChange}
+            />
+          </div>
+          <ChartWrapper>
             <ChartTools.ChartIFrameContainer
               key={backendChartId}
               containerId={backendChartId}
               dataset={chartPreview?.dataset}
               chart={chart!}
               config={chartPreview?.chartConfig!}
-              style={{ width: width, height: height as number }}
+              width={calcuateChartContainerRegion().width}
+              height={calcuateChartContainerRegion().height}
             />
           </ChartWrapper>
         </PreviewBlock>
@@ -289,6 +298,7 @@ const StyledChartPreviewBoard = styled.div`
   display: flex;
   flex: 1;
   flex-flow: column;
+  height: 100%;
 
   iframe {
     flex-grow: 1000;
@@ -299,8 +309,10 @@ const PreviewBlock = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  height: 100%;
   padding: ${SPACE_LG};
   box-shadow: ${p => p.theme.shadowBlock};
+  overflow: hidden;
 `;
 
 const ChartWrapper = styled.div`

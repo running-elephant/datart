@@ -212,7 +212,8 @@ export class ChartDataRequestBuilder {
         }
         if (
           cur.type === ChartDataSectionType.GROUP ||
-          cur.type === ChartDataSectionType.AGGREGATE
+          cur.type === ChartDataSectionType.AGGREGATE ||
+          cur.type === ChartDataSectionType.MIXED
         ) {
           return acc.concat(cur.rows);
         }
