@@ -343,7 +343,7 @@ class BasicTableChart extends ReactChart {
           key: getValueByColumnKey(c),
           colName,
           // TODO(Stephen): should be customize column with by use setting, https://github.com/ant-design/ant-design/issues/20397
-          width: 250,
+          width: 100,
           fixed: _getFixedColumn(c?.uid),
           onHeaderCell: record => {
             return {
@@ -465,7 +465,6 @@ class BasicTableChart extends ReactChart {
       'style',
       'enableBorder',
     ]);
-    // TODO(Stephen): if it is nessary `enableFixedHeader`
     const enableFixedHeader = this.getStyleValue(styleConfigs, [
       'style',
       'enableFixedHeader',
@@ -493,11 +492,13 @@ class BasicTableChart extends ReactChart {
       scroll: Object.assign({
         scrollToFirstRowOnChange: true,
         x: 'max-content',
-        y:
-          height -
-          0 -
-          HEADER_HEIGHT[tableSize] * _getMaxHeaderHierarchy(tableHeaderStyles) -
-          (tablePagination ? PAGINATION_HEIGHT[tableSize] : 0),
+        y: !enableFixedHeader
+          ? undefined
+          : height -
+            0 -
+            HEADER_HEIGHT[tableSize] *
+              _getMaxHeaderHierarchy(tableHeaderStyles) -
+            (tablePagination ? PAGINATION_HEIGHT[tableSize] : 0),
       }),
       bordered: !!showTableBorder,
       size: tableSize,
