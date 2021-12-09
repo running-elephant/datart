@@ -100,11 +100,10 @@ class BasicTableChart extends ReactChart {
     const aggregateConfigs = mixedSectionConfigRows.filter(
       r => r.type === ChartDataViewFieldType.NUMERIC,
     );
-    let tablePagination = this.getPagingOptions(
+    const tablePagination = this.getPagingOptions(
       settingConfigs,
       dataset?.pageInfo,
     );
-
     return {
       rowKey: 'uid',
       pagination: tablePagination,
@@ -171,6 +170,7 @@ class BasicTableChart extends ReactChart {
       header: {
         cell: props => {
           const uid = props.uid;
+          const { style, ...rest } = props;
           const _findRow = (uid, headers) => {
             let header = headers.find(h => h.uid === uid);
             if (!!header) {
@@ -186,14 +186,11 @@ class BasicTableChart extends ReactChart {
           };
 
           const header = _findRow(uid, tableHeaders || []);
-          const cellCssStyle = Object.assign(
-            {},
-            {
-              textAlign: headerTextAlign,
-              backgroundColor: headerBgColor,
-              ...headerFont,
-            },
-          );
+          const cellCssStyle = {
+            textAlign: headerTextAlign,
+            backgroundColor: headerBgColor,
+            ...headerFont,
+          };
           if (header && header.style) {
             const fontStyle = header.style?.font?.value;
             Object.assign(
@@ -205,12 +202,15 @@ class BasicTableChart extends ReactChart {
               { ...fontStyle },
             );
           }
-          return <th {...props} style={cellCssStyle} />;
+          return (
+            <th {...rest} style={Object.assign({}, cellCssStyle, style)} />
+          );
         },
       },
       body: {
         cell: props => {
           const uid = props.uid;
+          const { style, ...rest } = props;
           // const backgroundColor = this.getStyleValue(styleConfigs, [
           //   'column',
           //   'modal',
@@ -235,15 +235,14 @@ class BasicTableChart extends ReactChart {
           //   'basicStyle',
           //   'font',
           // ]);
-          const cellCssStyle = Object.assign(
-            {},
-            {
-              textAlign: bodyTextAlign,
-              backgroundColor: bodyBgColor,
-              ...bodyFont,
-            },
+          const cellCssStyle = {
+            textAlign: bodyTextAlign,
+            backgroundColor: bodyBgColor,
+            ...bodyFont,
+          };
+          return (
+            <td {...rest} style={Object.assign({}, cellCssStyle, style)} />
           );
-          return <td {...props} style={cellCssStyle} />;
         },
       },
     };
@@ -272,20 +271,14 @@ class BasicTableChart extends ReactChart {
       'tableHeaders',
     ]);
 
-    const _getFixedColumn = name => {
-      if (
-        leftFixedColumns === name ||
-        (leftFixedColumns && leftFixedColumns.includes(name))
-      ) {
+    const _getFixedColumn = uid => {
+      if (String(leftFixedColumns).includes(uid)) {
         return 'left';
       }
-      if (
-        rightFixedColumns === name ||
-        (rightFixedColumns && rightFixedColumns.includes(name))
-      ) {
+      if (String(rightFixedColumns).includes(uid)) {
         return 'right';
       }
-      return null;
+      return false;
     };
 
     const _sortFn = rowKey => (prev, next) => {
@@ -356,7 +349,7 @@ class BasicTableChart extends ReactChart {
               ? fixedColWidth
               : null
             : null,
-          fixed: _getFixedColumn(getValueByColumnKey(c)),
+          fixed: _getFixedColumn(c?.uid),
           onHeaderCell: record => {
             return {
               ...Omit(record, [
@@ -461,7 +454,7 @@ class BasicTableChart extends ReactChart {
         .map(th => {
           return this.getHeaderColumnGroup(th, columns);
         })
-        .filter(column => !!column),
+        .filter(Boolean),
     };
   }
 
