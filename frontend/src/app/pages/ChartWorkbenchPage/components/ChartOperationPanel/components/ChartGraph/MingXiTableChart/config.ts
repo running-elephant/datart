@@ -150,7 +150,7 @@ const config: ChartConfig = {
                         comType: 'font',
                         default: {
                           fontFamily: 'PingFang SC',
-                          fontSize: '12',
+                          fontSize: 12,
                           fontWeight: 'normal',
                           fontStyle: 'normal',
                           color: 'black',
@@ -281,7 +281,7 @@ const config: ChartConfig = {
           comType: 'font',
           default: {
             fontFamily: 'PingFang SC',
-            fontSize: '12',
+            fontSize: 12,
             fontWeight: 'normal',
             fontStyle: 'normal',
             color: '#6c757d',
@@ -319,7 +319,7 @@ const config: ChartConfig = {
           comType: 'font',
           default: {
             fontFamily: 'PingFang SC',
-            fontSize: '12',
+            fontSize: 12,
             fontWeight: 'normal',
             fontStyle: 'normal',
             color: '#6c757d',

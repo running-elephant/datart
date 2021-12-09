@@ -39,6 +39,10 @@ class BasicTableChart extends ReactChart {
   config = Config;
   protected isAutoMerge = false;
   tableOptions = { dataset: {}, config: {} };
+  utilCanvas = null;
+  dataColumnWidths = {};
+  tablePadding = 16;
+  tableCellBorder = 1;
 
   constructor(props?) {
     super(AntdTableWrapper, {
@@ -104,6 +108,14 @@ class BasicTableChart extends ReactChart {
       settingConfigs,
       dataset?.pageInfo,
     );
+
+    this.dataColumnWidths = this.calcuteFieldsMaxWidth(
+      mixedSectionConfigRows,
+      dataColumns,
+      styleConfigs,
+      context,
+    );
+
     return {
       rowKey: 'uid',
       pagination: tablePagination,
@@ -123,6 +135,40 @@ class BasicTableChart extends ReactChart {
         tablePagination,
       ),
     };
+  }
+
+  calcuteFieldsMaxWidth(
+    mixedSectionConfigRows,
+    dataColumns,
+    styleConfigs,
+    context,
+  ) {
+    const bodyFont = this.getStyleValue(styleConfigs, [
+      'tableBodyStyle',
+      'font',
+    ]);
+    const maxContentByFields = mixedSectionConfigRows.map(c => {
+      const rowUniqKey = getValueByColumnKey(c);
+      const datas = dataColumns?.map(dc => {
+        const text = dc[rowUniqKey];
+        const width = this.getTextWidth(
+          context,
+          text,
+          bodyFont.fontWeight,
+          bodyFont.fontSize,
+          bodyFont.fontFamily,
+        );
+        return width;
+      });
+      return {
+        [rowUniqKey]:
+          Math.max(...datas) + this.tablePadding * 2 + this.tableCellBorder * 2,
+      };
+    });
+
+    return maxContentByFields.reduce((acc, cur) => {
+      return Object.assign({}, acc, { ...cur });
+    }, {});
   }
 
   generateTableRowUniqId(dataColumns) {
@@ -190,6 +236,7 @@ class BasicTableChart extends ReactChart {
             textAlign: headerTextAlign,
             backgroundColor: headerBgColor,
             ...headerFont,
+            fontSize: +headerFont?.fontSize,
           };
           if (header && header.style) {
             const fontStyle = header.style?.font?.value;
@@ -237,6 +284,7 @@ class BasicTableChart extends ReactChart {
             textAlign: bodyTextAlign,
             backgroundColor: bodyBgColor,
             ...bodyFont,
+            fontSize: +bodyFont?.fontSize,
           };
           return (
             <td {...rest} style={Object.assign({}, cellCssStyle, style)} />
@@ -336,14 +384,15 @@ class BasicTableChart extends ReactChart {
               .reverse()
           : [];
 
+        const colMaxWidth =
+          this.dataColumnWidths[getValueByColumnKey(c)] || 100;
         return {
           sorter: _sortFn(colName),
           title: getColumnRenderName(c),
           dataIndex: getValueByColumnKey(c),
           key: getValueByColumnKey(c),
           colName,
-          // TODO(Stephen): should be customize column with by use setting, https://github.com/ant-design/ant-design/issues/20397
-          width: 100,
+          width: colMaxWidth,
           fixed: _getFixedColumn(c?.uid),
           onHeaderCell: record => {
             return {
@@ -580,6 +629,23 @@ class BasicTableChart extends ReactChart {
       return acc;
     }, {});
   }
+
+  getTextWidth = (
+    context,
+    text: string,
+    fontWeight: string,
+    fontSize: string,
+    fontFamily: string,
+  ): number => {
+    const canvas =
+      this.utilCanvas ||
+      (this.utilCanvas = context.document.createElement('canvas'));
+    const measureLayer = canvas.getContext('2d');
+    measureLayer.font = `${fontWeight} ${fontSize} ${fontFamily}`;
+    measureLayer.style = { whiteSpace: 'nowrap' };
+    const metrics = measureLayer.measureText(text);
+    return Math.ceil(metrics.width);
+  };
 }
 
 export default BasicTableChart;
