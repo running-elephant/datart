@@ -1,4 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import ChartRequest, {
+  transformToViewConfig,
+} from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import {
   ContainerWidgetContent,
   ControllerWidgetContent,
@@ -9,12 +12,15 @@ import {
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { shareActions } from 'app/pages/SharePage/slice';
 import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';
+import ChartDataset from 'app/types/ChartDataset';
+import ChartDataView from 'app/types/ChartDataView';
 import { RootState } from 'types';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { boardActions } from '.';
-import { getDistinctFields } from '../../../../../utils/fetch';
 import { getChartWidgetRequestParams } from '../../../utils';
+import { DateControllerTypes } from '../../BoardEditor/components/ControllerWidgetPanel/constants';
+import { getControllerDateValues } from './../../../utils/index';
 import { handleServerBoardAction } from './asyncActions';
 import { selectBoardById, selectBoardWidgetMap } from './selector';
 import { BoardState, ServerDashboard, WidgetData } from './types';
@@ -298,25 +304,193 @@ export const getControllerOptions = createAsyncThunk<
   async ({ widget, renderMode }, { getState, dispatch }) => {
     const content = widget.config.content as ControllerWidgetContent;
     const config = content.config;
-    const executeTokenMap = (getState() as RootState)?.share?.executeTokenMap;
+    const boardState = getState() as { board: BoardState };
+    const viewMap = boardState.board.viewMap;
+    const widgetMapMap = boardState.board.widgetRecord;
+    const widgetMap = widgetMapMap[widget.dashboardId];
 
-    if (config.assistViewFields && Array.isArray(config.assistViewFields)) {
-      // 请求
-      const [viewId, viewField] = config.assistViewFields;
-      const executeToken = executeTokenMap?.[viewId];
-      const dataset = await getDistinctFields(
-        viewId,
-        viewField,
-        undefined,
-        executeToken,
-      );
-      dispatch(
-        boardActions.setWidgetData({
-          ...dataset,
-          id: widget.id,
-        } as unknown as WidgetData),
-      );
+    const executeTokenMap = (getState() as RootState)?.share?.executeTokenMap;
+    if (
+      !(
+        Array.isArray(config.assistViewFields) &&
+        config.assistViewFields.length === 2
+      )
+    ) {
+      return null;
     }
+    // get all cascade parent controllers-controllerValues,view.viewId
+    // 请求
+    const [viewId, viewField] = config.assistViewFields;
+    const curView = viewMap[viewId];
+    const executeToken = executeTokenMap?.[viewId];
+    const dataset = await getControlOptions(
+      widget,
+      viewId,
+      viewField,
+      curView,
+      executeToken,
+      widgetMap,
+    );
+    dispatch(
+      boardActions.setWidgetData({
+        ...dataset,
+        id: widget.id,
+      } as unknown as WidgetData),
+    );
     return null;
   },
 );
+
+export const getControlOptions = async (
+  widget: Widget,
+  viewId: string,
+  field: string,
+  view: ChartDataView,
+  executeToken: ExecuteToken | undefined,
+  widgetMap: Record<string, Widget>,
+) => {
+  const requestParams: ChartRequest = getDistinctParams(
+    viewId,
+    field,
+    view.config,
+  );
+  const controllers = Object.values(widgetMap).filter(wItem => {
+    if (wItem.config.type !== 'controller') return false;
+    if (wItem.relations?.length === 0) return false;
+    return false;
+  });
+  controllers.forEach(cItem => {
+    const relations = cItem.relations.filter(
+      rItem =>
+        rItem.targetId === widget.id &&
+        rItem.config.type === 'controlToControlCascade',
+    );
+    if (!relations.length) return;
+
+    const content = cItem.config.content as ControllerWidgetContent;
+    // (property) ControllerWidgetContent.type: ControllerFacadeType
+    const {
+      relatedViews,
+      config: controllerConfig,
+      type: facadeType,
+    } = content;
+
+    const relatedViewItem = relatedViews.filter(view => view.fieldValue);
+    // .find(view => view.viewId === chartWidget?.viewIds?.[0]);
+    if (!relatedViewItem) return;
+    let values;
+    if (DateControllerTypes.includes(facadeType)) {
+      const timeValues = getControllerDateValues({
+        controlType: facadeType,
+        filterDate: controllerConfig.controllerDate!,
+        execute: true,
+      });
+      values = timeValues
+        .filter(ele => !!ele)
+        .map(ele => {
+          const item = {
+            value: ele,
+            valueType: 'DATE',
+          };
+          return item;
+        });
+      return values[0] ? values : null;
+    } else {
+      let controllerValues = controllerConfig.controllerValues
+        .filter(ele => {
+          if (ele.trim && ele.trim() === '') return false;
+          if (ele === 0) return true;
+          return !!ele;
+        })
+        .map(ele => {
+          const item = {
+            value: ele,
+            valueType: '',
+          };
+          return item;
+        });
+      values = controllerValues[0] ? controllerValues : false;
+    }
+    let filterArr;
+    if (values && values.length) {
+      filterArr = values.map(value => {
+        // let item: ChartRequestFilter = {
+        // aggOperator: null,
+        // column: String(relatedViewItem.fieldValue),
+        // sqlOperator: controllerConfig.sqlOperator,
+        // values: values,
+        // };
+        // return item;
+      });
+    }
+  });
+
+  if (executeToken) {
+    const { data } = await request<ChartDataset>({
+      method: 'POST',
+      url: `share/execute`,
+      params: {
+        executeToken: executeToken?.token,
+        password: executeToken?.password,
+      },
+      data: requestParams,
+    });
+    return data;
+  } else {
+    const { data } = await request<ChartDataset>({
+      method: 'POST',
+      url: `data-provider/execute`,
+      data: requestParams,
+    });
+    return data;
+  }
+};
+
+export const getDistinctParams = (
+  viewId: string,
+  field: string,
+  viewConfig: string | undefined,
+) => {
+  const viewConfigs = transformToViewConfig(viewConfig);
+  const requestParams: ChartRequest = {
+    aggregators: [],
+    filters: [],
+    groups: [],
+    columns: [field],
+    pageInfo: {
+      pageNo: 1,
+      pageSize: 99999999,
+      total: 99999999,
+    },
+    orders: [],
+    keywords: ['DISTINCT'],
+    viewId: viewId,
+    ...viewConfigs,
+  };
+  return requestParams;
+};
+export interface controllerMetaItem {
+  id: string;
+  viewId?: string;
+  viewFlied?: string;
+  controllerValues?: any[];
+}
+export const getCascadeParentControllers = (
+  widgetMap: Record<string, Widget>,
+  curWidget: Widget,
+) => {
+  const controllers = Object.values(widgetMap).filter(w => {
+    if (w.config.type !== 'controller') return false;
+
+    if (w.config.type !== 'controller') return false;
+    return true;
+  });
+  const controllerMetaItem = controllers.map(c => {
+    let content = c.config.content as ControllerWidgetContent;
+    let metaItem: controllerMetaItem = {
+      id: c.id,
+      viewId: content.config.assistViewFields?.[0]!,
+      // viewFlied: content.config.assistViewFields?.[1],
+    };
+  });
+};

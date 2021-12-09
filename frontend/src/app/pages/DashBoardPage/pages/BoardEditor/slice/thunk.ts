@@ -357,7 +357,7 @@ export const getEditWidgetDataAsync = createAsyncThunk<
         await dispatch(getEditChartWidgetDataAsync({ widgetId, option }));
         return null;
       case 'controller':
-        await dispatch(getEditControllerOptionAsync(curWidget));
+        await dispatch(getEditControllerOptions(curWidget));
         return null;
       case 'media':
       case 'container':
@@ -366,31 +366,6 @@ export const getEditWidgetDataAsync = createAsyncThunk<
     }
   },
 );
-export const getEditControllerOptionAsync = createAsyncThunk<
-  null,
-  Widget,
-  { state: RootState }
->('editBoard/getControllerOptions', async (widget, { getState, dispatch }) => {
-  const content = widget.config.content as ControllerWidgetContent;
-  const config = content.config;
-  if (config.assistViewFields && Array.isArray(config.assistViewFields)) {
-    // 请求
-    const [viewId, viewField] = config.assistViewFields;
-    const dataset = await getDistinctFields(
-      viewId,
-      viewField,
-      undefined,
-      undefined,
-    );
-    dispatch(
-      editWidgetDataActions.setWidgetData({
-        ...dataset,
-        id: widget.id,
-      } as unknown as WidgetData),
-    );
-  }
-  return null;
-});
 
 export const getEditChartWidgetDataAsync = createAsyncThunk<
   null,
@@ -546,5 +521,37 @@ export const uploadBoardImage = createAsyncThunk<
       errorHandle(error);
       throw error;
     }
+  },
+);
+
+export const getEditControllerOptions = createAsyncThunk<
+  null,
+  Widget,
+  { state: RootState }
+>(
+  'editBoard/getEditControllerOptions',
+  async (widget, { getState, dispatch }) => {
+    const content = widget.config.content as ControllerWidgetContent;
+    const config = content.config;
+    if (
+      Array.isArray(config.assistViewFields) &&
+      config.assistViewFields.length === 2
+    ) {
+      // 请求
+      const [viewId, viewField] = config.assistViewFields;
+      const dataset = await getDistinctFields(
+        viewId,
+        viewField,
+        undefined,
+        undefined,
+      );
+      dispatch(
+        editWidgetDataActions.setWidgetData({
+          ...dataset,
+          id: widget.id,
+        } as unknown as WidgetData),
+      );
+    }
+    return null;
   },
 );

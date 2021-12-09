@@ -216,11 +216,11 @@ export interface Relation {
 }
 /**
  * @controlToWidget Controller associated widgets
- * @controlToControl Controller associated Controller visible
- * @widgetToWidget widget inOther WidgetContainer
+ * @controlToControl Controller associated Controller visible cascade
+ * @widgetToWidget widget inOther WidgetContainer linkage
  * */
 export interface RelationConfig {
-  type: 'controlToWidget' | 'controlToControl' | 'widgetToWidget';
+  type: RelationConfigType;
   controlToWidget?: {
     widgetRelatedViewIds: string[];
   };
@@ -230,6 +230,14 @@ export interface RelationConfig {
     linkerColumn: string;
   };
 }
+export type RelationConfigType =
+  | 'controlToWidget' // control - ChartFetch will del
+  | 'controlToChartFetch' // control - ChartFetch
+  | 'controlToControl' // control - control -visible  will del
+  | 'controlToControlVisible' // control - control -visible
+  | 'controlToControlCascade' // control - control -Cascade
+  | 'widgetToWidget' // linkage will del
+  | 'chartToChartLinkage'; // linkage
 export interface RelatedView {
   viewId: string;
   relatedCategory: ChartDataViewFieldCategory;

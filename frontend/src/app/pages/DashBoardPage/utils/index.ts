@@ -120,7 +120,7 @@ export const getTneWidgetFiltersAndParams = (obj: {
   params: Record<string, string[]> | undefined;
 }) => {
   const { chartWidget, widgetMap, params: chartParams } = obj;
-  const filterWidgets = Object.values(widgetMap).filter(
+  const controllerWidgets = Object.values(widgetMap).filter(
     widget => widget.config.type === 'controller',
   );
 
@@ -134,7 +134,7 @@ export const getTneWidgetFiltersAndParams = (obj: {
   //   });
   // }
 
-  filterWidgets.forEach(filterWidget => {
+  controllerWidgets.forEach(filterWidget => {
     const hasRelation = filterWidget.relations.find(
       re => re.targetId === chartWidget.id,
     );

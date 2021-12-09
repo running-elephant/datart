@@ -41,7 +41,10 @@ import {
   getEditChartWidgetDataAsync,
   toUpdateDashboard,
 } from '../../pages/BoardEditor/slice/thunk';
-import { getNeedRefreshWidgetsByFilter } from '../../utils/widget';
+import {
+  getCascadeControllers,
+  getNeedRefreshWidgetsByController,
+} from '../../utils/widget';
 
 export const BoardActionProvider: FC<{ id: string }> = ({
   id: boardId,
@@ -76,14 +79,32 @@ export const BoardActionProvider: FC<{ id: string }> = ({
       }
     }, 500),
     refreshWidgetsByController: debounce((widget: Widget) => {
-      if (hasQueryControl) {
-        return;
-      }
-      const widgetIds = getNeedRefreshWidgetsByFilter(widget);
       const pageInfo: Partial<PageInfo> = {
         pageNo: 1,
       };
-      widgetIds.forEach(widgetId => {
+      const controllerIds = getCascadeControllers(widget);
+      controllerIds.forEach(widgetId => {
+        if (editing) {
+          dispatch(
+            getEditChartWidgetDataAsync({ widgetId, option: { pageInfo } }),
+          );
+        } else {
+          dispatch(
+            getChartWidgetDataAsync({
+              boardId,
+              widgetId,
+              renderMode,
+              option: { pageInfo },
+            }),
+          );
+        }
+      });
+      if (hasQueryControl) {
+        return;
+      }
+      const chartWidgetIds = getNeedRefreshWidgetsByController(widget);
+
+      chartWidgetIds.forEach(widgetId => {
         if (editing) {
           dispatch(
             getEditChartWidgetDataAsync({ widgetId, option: { pageInfo } }),

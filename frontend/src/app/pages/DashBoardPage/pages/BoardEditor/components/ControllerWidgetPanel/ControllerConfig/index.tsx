@@ -27,6 +27,7 @@ import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import ControllerVisibility from './ControllerVisibility';
+import { CascadesSetForm } from './OtherSet.tsx/Cascades/CascadesSet';
 import { RadioStyleForm } from './OtherSet.tsx/RadioStyle/RadioStyleForm';
 import { SliderMarks } from './OtherSet.tsx/SliderStyle/SliderMarks';
 import { SliderStep } from './OtherSet.tsx/SliderStyle/SliderStep';
@@ -61,16 +62,24 @@ export const RadioButtonTypeName = ['config', 'radioButtonType'];
 export const SliderStepName = ['config', 'sliderConfig', 'step'];
 export const SliderShowMarksName = ['config', 'sliderConfig', 'showMarks'];
 
+export const CascadesName = ['config', 'cascades'];
 export interface RelatedViewFormProps {
   controllerType: ControllerFacadeTypes;
   form: FormInstance<ControllerWidgetContent> | undefined;
   viewMap: Record<string, ChartDataView>;
   otherStrFilterWidgets: Widget[];
+  otherHasOptionControllers: Widget[];
   boardType: BoardType;
 }
 
 export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
-  ({ controllerType, form, viewMap, otherStrFilterWidgets }) => {
+  ({
+    controllerType,
+    form,
+    viewMap,
+    otherStrFilterWidgets,
+    otherHasOptionControllers,
+  }) => {
     const filterT = useI18NPrefix('viz.common.filter');
 
     const hasRadio = useMemo(() => {
@@ -117,6 +126,13 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
         <ControllerVisibility
           otherStrFilterWidgets={otherStrFilterWidgets}
           form={form}
+        />
+        {/* 级联设置 */}
+        <CascadesSetForm
+          name={CascadesName}
+          label={'级联控制'}
+          options={otherHasOptionControllers}
+          tooltip="配置这个控制器的级联下级控制器"
         />
       </Wrap>
     );

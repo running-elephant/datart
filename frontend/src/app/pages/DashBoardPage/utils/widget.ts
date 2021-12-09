@@ -58,34 +58,15 @@ import {
   WidgetInfo,
   WidgetPadding,
 } from '../pages/Board/slice/types';
+import {
+  HasOptionsControlTypes,
+  StrControlTypes,
+} from '../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { ControllerConfig } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { BtnActionParams } from '../pages/BoardEditor/slice/actions/controlActions';
 
 export const VALUE_SPLITTER = '###';
 
-export const createDataChartWidget = (opt: {
-  dashboardId: string;
-  boardType: BoardType;
-  dataChartId: string;
-  dataChartConfig: DataChart;
-  viewId: string;
-  subType: WidgetContentChartType;
-}) => {
-  const content = createChartWidgetContent(opt.subType);
-  const widgetConf = createInitWidgetConfig({
-    type: 'chart',
-    content: content,
-    boardType: opt.boardType,
-    name: opt.dataChartConfig.name,
-  });
-  const widget: Widget = createWidget({
-    dashboardId: opt.dashboardId,
-    datachartId: opt.dataChartId,
-    viewIds: opt.viewId ? [opt.viewId] : [],
-    config: widgetConf,
-  });
-  return widget;
-};
 export const createControllerWidget = (opt: {
   boardId: string;
   boardType: BoardType;
@@ -94,7 +75,7 @@ export const createControllerWidget = (opt: {
   controllerType: ControllerFacadeTypes;
   views: RelatedView[];
   config: ControllerConfig;
-  hasVariable: boolean;
+  viewIds: string[];
 }) => {
   const {
     boardId,
@@ -740,21 +721,31 @@ export const getOtherStringControlWidgets = (
       return false;
     }
     const content = ele.config.content as ControllerWidgetContent;
-    const strControlTypes = [
-      ControllerFacadeTypes.DropdownList,
-      ControllerFacadeTypes.MultiDropdownList,
-      ControllerFacadeTypes.RadioGroup,
-    ];
-    return strControlTypes.includes(content.type);
+    return StrControlTypes.includes(content.type);
   });
   if (!widgetId) {
     return allFilterWidgets;
   } else {
-    // 自己不能关联自己 把自己排除
     return allFilterWidgets.filter(ele => ele.id !== widgetId);
   }
 };
-
+export const getOtherHasOptionControllers = (
+  allWidgets: Widget[],
+  widgetId: string | undefined,
+) => {
+  const allFilterWidgets = allWidgets.filter(ele => {
+    if (ele.config.type !== 'controller') {
+      return false;
+    }
+    const content = ele.config.content as ControllerWidgetContent;
+    return HasOptionsControlTypes.includes(content.type);
+  });
+  if (!widgetId) {
+    return allFilterWidgets;
+  } else {
+    return allFilterWidgets.filter(ele => ele.id !== widgetId);
+  }
+};
 /**
  * @param ''
  * @description 'get showing controller by all filterWidget of board'
@@ -822,14 +813,20 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
   return noHiddenControlWidgets;
 };
 
-export const getNeedRefreshWidgetsByFilter = (filterWidget: Widget) => {
-  const relations = filterWidget.relations;
+export const getNeedRefreshWidgetsByController = (controller: Widget) => {
+  const relations = controller.relations;
   const widgetIds = relations
     .filter(ele => ele.config.type === 'controlToWidget')
     .map(ele => ele.targetId);
   return widgetIds;
 };
-
+export const getCascadeControllers = (controller: Widget) => {
+  const relations = controller.relations;
+  const ids = relations
+    .filter(ele => ele.config.type === 'controlToControlCascade')
+    .map(ele => ele.targetId);
+  return ids;
+};
 // getWidgetStyle start
 export const getWidgetStyle = (boardType: BoardType, widget: Widget) => {
   return boardType === 'auto'
@@ -929,20 +926,7 @@ export const getWidgetSomeStyle = (opt: {
 
 // get some css end
 // Controller
-export const getCanLinkControlWidgets = (widgets: Widget[]) => {
-  const CanLinkControllerWidgetTypes: WidgetType[] = ['chart'];
 
-  const canLinkWidgets = widgets.filter(widget => {
-    if (widget.viewIds.length === 0) {
-      return false;
-    }
-    if (CanLinkControllerWidgetTypes.includes(widget.config.type)) {
-      return true;
-    }
-    return false;
-  });
-  return canLinkWidgets;
-};
 
 export const getLinkedColumn = (
   targetWidgetId: string,
