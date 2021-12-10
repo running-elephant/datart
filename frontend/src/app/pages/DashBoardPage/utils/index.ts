@@ -127,13 +127,6 @@ export const getTneWidgetFiltersAndParams = (obj: {
   let filterParams: ChartRequestFilter[] = [];
   let variableParams: Record<string, any[]> = {};
 
-  // TODO chartParams 实现后添加 --xld
-  // if (chartParams) {
-  //   Object.keys(chartParams).forEach(key => {
-  //     variableParams[key] = chartParams[key];
-  //   });
-  // }
-
   controllerWidgets.forEach(filterWidget => {
     const hasRelation = filterWidget.relations.find(
       re => re.targetId === chartWidget.id,
@@ -472,4 +465,3 @@ export const getDistinctFiltersByColumn = (filter: ChartRequestFilter[]) => {
 
   return Object.values(filterMap);
 };
-

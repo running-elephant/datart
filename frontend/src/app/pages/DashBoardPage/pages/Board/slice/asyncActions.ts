@@ -176,7 +176,9 @@ export const saveToViewMapAction =
   (serverView: View) => (dispatch, getState) => {
     const boardState = getState() as { board: BoardState };
     const viewMap = boardState.board.viewMap;
-    if (serverView.id in viewMap) return;
-    const viewViews = getChartDataView([serverView], []);
-    dispatch(boardActions.setViewMap(viewViews));
+    let existed = serverView.id in viewMap;
+    if (!existed) {
+      const viewViews = getChartDataView([serverView], []);
+      dispatch(boardActions.setViewMap(viewViews));
+    }
   };

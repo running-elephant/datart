@@ -20,9 +20,11 @@ import {
   ControllerWidgetContent,
   RelatedView,
   Relation,
+  RelationConfigType,
   Widget,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { RelatedWidgetItem } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/RelatedWidgets';
 import { ControllerConfig } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { v4 as uuidv4 } from 'uuid';
@@ -96,10 +98,81 @@ export const getCanLinkControlWidgets = (widgets: Widget[]) => {
   });
   return canLinkWidgets;
 };
+
+const makeControlRelations = (obj: {
+  sourceId: string | undefined;
+  relatedWidgets: RelatedWidgetItem[];
+  widgetMap: Record<string, Widget>;
+  config: ControllerConfig;
+}) => {
+  const sourceId = obj.sourceId || uuidv4();
+  const { relatedWidgets, widgetMap, config } = obj;
+  const trimRelatedWidgets = relatedWidgets.filter(relatedWidgetItem => {
+    return widgetMap[relatedWidgetItem.widgetId];
+  });
+  let chartWidgets: Widget[] = [];
+  let controllerWidgets: Widget[] = [];
+  trimRelatedWidgets.forEach(relatedWidgetItem => {
+    let widget = widgetMap[relatedWidgetItem.widgetId];
+    if (!widget) return false;
+    if (widget.config.type === 'chart') {
+      chartWidgets.push(widget);
+    }
+    if (widget.config.type === 'controller') {
+      controllerWidgets.push(widget);
+    }
+  });
+  const controlToChartRelations: Relation[] = chartWidgets.map(widget => {
+    const relationType: RelationConfigType = 'controlToWidget';
+    return {
+      sourceId,
+      targetId: widget.id,
+      config: {
+        type: relationType,
+        controlToWidget: {
+          widgetRelatedViewIds: widget.viewIds,
+        },
+      },
+      id: uuidv4(),
+    };
+  });
+  const controlToCascadeRelations: Relation[] = controllerWidgets.map(
+    widget => {
+      const relationType: RelationConfigType = 'controlToControlCascade';
+      return {
+        sourceId,
+        targetId: widget.id,
+        config: {
+          type: relationType,
+        },
+        id: uuidv4(),
+      };
+    },
+  );
+  let newRelations = [...controlToChartRelations, ...controlToCascadeRelations];
+  const controllerVisible = (config as ControllerConfig).visibility;
+  if (controllerVisible) {
+    const { visibilityType, condition } = controllerVisible;
+    if (visibilityType === 'condition' && condition) {
+      const controlToControlRelation: Relation = {
+        sourceId,
+        targetId: condition.dependentControllerId,
+        config: {
+          type: 'controlToControl',
+        },
+        id: uuidv4(),
+      };
+      newRelations = newRelations.concat([controlToControlRelation]);
+    }
+  }
+  return newRelations;
+};
+
 export const controllerWidgetToolKit = {
   create: createControllerWidget,
   tool: {
     getViewIdsInControlConfig,
     getCanLinkControlWidgets,
+    makeControlRelations,
   },
 };

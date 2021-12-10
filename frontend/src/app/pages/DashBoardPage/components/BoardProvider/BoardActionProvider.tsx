@@ -33,12 +33,16 @@ import {
   resetControllerAction,
   widgetsQueryAction,
 } from '../../pages/Board/slice/asyncActions';
-import { getChartWidgetDataAsync } from '../../pages/Board/slice/thunk';
+import {
+  getChartWidgetDataAsync,
+  getControllerOptions,
+} from '../../pages/Board/slice/thunk';
 import { Widget } from '../../pages/Board/slice/types';
 import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
 import {
   getEditChartWidgetDataAsync,
+  getEditControllerOptions,
   toUpdateDashboard,
 } from '../../pages/BoardEditor/slice/thunk';
 import {
@@ -79,22 +83,16 @@ export const BoardActionProvider: FC<{ id: string }> = ({
       }
     }, 500),
     refreshWidgetsByController: debounce((widget: Widget) => {
-      const pageInfo: Partial<PageInfo> = {
-        pageNo: 1,
-      };
       const controllerIds = getCascadeControllers(widget);
-      controllerIds.forEach(widgetId => {
+      controllerIds.forEach(controlWidgetId => {
         if (editing) {
-          dispatch(
-            getEditChartWidgetDataAsync({ widgetId, option: { pageInfo } }),
-          );
+          dispatch(getEditControllerOptions(controlWidgetId));
         } else {
           dispatch(
-            getChartWidgetDataAsync({
+            getControllerOptions({
               boardId,
-              widgetId,
+              widgetId: controlWidgetId,
               renderMode,
-              option: { pageInfo },
             }),
           );
         }
@@ -102,6 +100,9 @@ export const BoardActionProvider: FC<{ id: string }> = ({
       if (hasQueryControl) {
         return;
       }
+      const pageInfo: Partial<PageInfo> = {
+        pageNo: 1,
+      };
       const chartWidgetIds = getNeedRefreshWidgetsByController(widget);
 
       chartWidgetIds.forEach(widgetId => {

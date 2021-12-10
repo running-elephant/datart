@@ -55,7 +55,10 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
               label: key,
             };
           });
-          dispatch(saveToViewMapAction(data));
+          setTimeout(() => {
+            dispatch(saveToViewMapAction(data));
+          }, 0);
+
           return items;
         } catch (error) {}
       },

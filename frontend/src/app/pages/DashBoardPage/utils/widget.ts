@@ -812,7 +812,7 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
   });
   return noHiddenControlWidgets;
 };
-
+ 
 export const getNeedRefreshWidgetsByController = (controller: Widget) => {
   const relations = controller.relations;
   const widgetIds = relations

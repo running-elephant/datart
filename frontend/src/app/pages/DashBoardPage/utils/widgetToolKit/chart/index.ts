@@ -22,11 +22,16 @@ import {
   WidgetContentChartType,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import ChartDataView from 'app/types/ChartDataView';
+import { getTneWidgetFiltersAndParams } from '../..';
 import {
   createChartWidgetContent,
   createInitWidgetConfig,
   createWidget,
 } from '../../widget';
+import ChartRequest, {
+  transformToViewConfig,
+} from './../../../../ChartWorkbenchPage/models/ChartHttpRequest';
 
 export const createDataChartWidget = (opt: {
   dashboardId: string;
@@ -65,7 +70,38 @@ export const getCanLinkageWidgets = (widgets: Widget[]) => {
   return canLinkWidgets;
 };
 
-
+export const getControlOptionQueryParams = (obj: {
+  view: ChartDataView;
+  field: string;
+  curWidget: Widget;
+  widgetMap: Record<string, Widget>;
+}) => {
+  const viewConfigs = transformToViewConfig(obj.view?.config);
+  const { filterParams, variableParams } = getTneWidgetFiltersAndParams({
+    chartWidget: obj.curWidget,
+    widgetMap: obj.widgetMap,
+    params: undefined,
+  });
+  const requestParams: ChartRequest = {
+    aggregators: [],
+    filters: filterParams,
+    groups: [],
+    columns: [obj.field],
+    pageInfo: {
+      pageNo: 1,
+      pageSize: 99999999,
+      total: 99999999,
+    },
+    orders: [],
+    keywords: ['DISTINCT'],
+    viewId: obj.view.id,
+    ...viewConfigs,
+  };
+  if (variableParams) {
+    requestParams.params = variableParams;
+  }
+  return requestParams;
+};
 
 export const chartWidgetToolKit = {
   create: createDataChartWidget,

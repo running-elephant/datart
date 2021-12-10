@@ -25,7 +25,6 @@ import { selectViewMap } from 'app/pages/DashBoardPage/pages/Board/slice/selecto
 import {
   ControllerWidgetContent,
   RelatedView,
-  Relation,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   convertToWidgetMap,
@@ -49,7 +48,6 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
-import { v4 as uuidv4 } from 'uuid';
 import { editBoardStackActions, editDashBoardInfoActions } from '../../slice';
 import {
   selectControllerPanel,
@@ -62,7 +60,6 @@ import {
 import { WidgetControlForm } from './ControllerConfig';
 import { RelatedViewForm } from './RelatedViewForm';
 import { RelatedWidgetItem, RelatedWidgets } from './RelatedWidgets';
-import { ControllerConfig } from './types';
 import {
   getInitWidgetController,
   postControlConfig,
@@ -202,43 +199,12 @@ const ControllerWidgetPanel: React.FC = memo(props => {
       setVisible(false);
       const { relatedViews, config, name } = values;
       if (type === 'add') {
-        const sourceId = uuidv4();
-        const controlToWidgetRelations: Relation[] = relatedWidgets
-          .filter(relatedWidgetItem => {
-            return widgetMap[relatedWidgetItem.widgetId];
-          })
-          .map(relatedWidgetItem => {
-            const widget = widgetMap[relatedWidgetItem.widgetId];
-            const relation: Relation = {
-              sourceId,
-              targetId: widget.id,
-              config: {
-                type: 'controlToWidget',
-                controlToWidget: {
-                  widgetRelatedViewIds: widget.viewIds,
-                },
-              },
-              id: uuidv4(),
-            };
-            return relation;
-          });
-        let newRelations = [...controlToWidgetRelations];
-        const ControllerVisibility = (config as ControllerConfig).visibility;
-        if (ControllerVisibility) {
-          const { visibilityType, condition } = ControllerVisibility;
-          if (visibilityType === 'condition' && condition) {
-            const controlToControlRelation: Relation = {
-              sourceId,
-              targetId: condition.dependentControllerId,
-              config: {
-                type: 'controlToControl',
-              },
-              id: uuidv4(),
-            };
-            newRelations = newRelations.concat([controlToControlRelation]);
-          }
-        }
-
+        let newRelations = widgetToolKit.controller.tool.makeControlRelations({
+          sourceId: undefined,
+          relatedWidgets: relatedWidgets,
+          widgetMap,
+          config: config,
+        });
         const widget = widgetToolKit.controller.create({
           boardId,
           boardType,
@@ -251,45 +217,16 @@ const ControllerWidgetPanel: React.FC = memo(props => {
             widgetToolKit.controller.tool.getViewIdsInControlConfig(config),
         });
         dispatch(addWidgetsToEditBoard([widget]));
-        dispatch(getEditControllerOptions(widget));
+        dispatch(getEditControllerOptions(widget.id));
         refreshWidgetsByFilter(widget);
       } else if (type === 'edit') {
-        const sourceId = curFilterWidget.id;
+        let newRelations = widgetToolKit.controller.tool.makeControlRelations({
+          sourceId: curFilterWidget.id,
+          relatedWidgets: relatedWidgets,
+          widgetMap,
+          config: config,
+        });
 
-        const controlToWidgetRelations: Relation[] = relatedWidgets
-          .filter(relatedWidgetItem => {
-            return widgetMap[relatedWidgetItem.widgetId];
-          })
-          .map(relatedWidgetItem => {
-            const widget = widgetMap[relatedWidgetItem.widgetId];
-            return {
-              sourceId,
-              targetId: widget.id,
-              config: {
-                type: 'controlToWidget',
-                controlToWidget: {
-                  widgetRelatedViewIds: widget.viewIds,
-                },
-              },
-              id: uuidv4(),
-            };
-          });
-        let newRelations = [...controlToWidgetRelations];
-        const controllerVisible = (config as ControllerConfig).visibility;
-        if (controllerVisible) {
-          const { visibilityType, condition } = controllerVisible;
-          if (visibilityType === 'condition' && condition) {
-            const controlToControlRelation: Relation = {
-              sourceId,
-              targetId: condition.dependentControllerId,
-              config: {
-                type: 'controlToControl',
-              },
-              id: uuidv4(),
-            };
-            newRelations = newRelations.concat([controlToControlRelation]);
-          }
-        }
         const nextContent: ControllerWidgetContent = {
           ...(curFilterWidget.config.content as ControllerWidgetContent),
           name,
@@ -305,7 +242,7 @@ const ControllerWidgetPanel: React.FC = memo(props => {
             widgetToolKit.controller.tool.getViewIdsInControlConfig(config);
         });
         dispatch(editBoardStackActions.updateWidget(newWidget));
-        dispatch(getEditControllerOptions(newWidget));
+        dispatch(getEditControllerOptions(newWidget.id));
         refreshWidgetsByFilter(newWidget);
       }
     },

@@ -28,6 +28,7 @@ import {
   createWidgetInfoMap,
   getWidgetInfoMapByServer,
 } from 'app/pages/DashBoardPage/utils/widget';
+import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
 import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
@@ -44,7 +45,6 @@ import {
   editWidgetInfoActions,
 } from '.';
 import { BoardInfo, BoardType, ServerDashboard } from '../../Board/slice/types';
-import { getDistinctFields } from './../../../../../utils/fetch';
 import { getDataChartMap } from './../../../utils/board';
 import {
   getWidgetMapByServer,
@@ -357,7 +357,7 @@ export const getEditWidgetDataAsync = createAsyncThunk<
         await dispatch(getEditChartWidgetDataAsync({ widgetId, option }));
         return null;
       case 'controller':
-        await dispatch(getEditControllerOptions(curWidget));
+        await dispatch(getEditControllerOptions(curWidget.id));
         return null;
       case 'media':
       case 'container':
@@ -526,32 +526,51 @@ export const uploadBoardImage = createAsyncThunk<
 
 export const getEditControllerOptions = createAsyncThunk<
   null,
-  Widget,
+  string,
   { state: RootState }
 >(
   'editBoard/getEditControllerOptions',
-  async (widget, { getState, dispatch }) => {
+  async (widgetId, { getState, dispatch }) => {
+    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
+    const rootState = getState() as RootState;
+
+    const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
+    const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
+    const widget = widgetMap[widgetId];
+    if (!widget) return null;
     const content = widget.config.content as ControllerWidgetContent;
     const config = content.config;
-    if (
-      Array.isArray(config.assistViewFields) &&
-      config.assistViewFields.length === 2
-    ) {
-      // 请求
-      const [viewId, viewField] = config.assistViewFields;
-      const dataset = await getDistinctFields(
-        viewId,
-        viewField,
-        undefined,
-        undefined,
-      );
-      dispatch(
-        editWidgetDataActions.setWidgetData({
-          ...dataset,
-          id: widget.id,
-        } as unknown as WidgetData),
-      );
+    if (!Array.isArray(config.assistViewFields)) return null;
+    if (config.assistViewFields.length !== 2) return null;
+
+    const boardState = rootState.board as BoardState;
+    const viewMap = boardState.viewMap;
+    const [viewId, viewField] = config.assistViewFields;
+    const view = viewMap[viewId];
+    if (!view) return null;
+    const requestParams = getControlOptionQueryParams({
+      view,
+      field: viewField,
+      curWidget: widget,
+      widgetMap,
+    });
+
+    if (!requestParams) {
+      return null;
     }
+    let widgetData;
+    try {
+      const { data } = await request<WidgetData>({
+        method: 'POST',
+        url: `data-provider/execute`,
+        data: requestParams,
+      });
+      widgetData = { ...data, id: widget.id };
+      dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
+    } catch (error) {
+      errorHandle(error);
+    }
+
     return null;
   },
 );
