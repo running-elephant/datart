@@ -69,7 +69,10 @@ export const WidgetSetting: FC = memo(() => {
       const value = { ...cacheValue.current, ...newValues };
 
       value.border.color = getRGBAColor(value.border.color);
-      value.nameConfig = {...value.nameConfig,color:getRGBAColor(value.nameConfig.color)};
+      value.nameConfig = {
+        ...value.nameConfig,
+        color: getRGBAColor(value.nameConfig.color),
+      };
       // value.nameConfig.color = getRGBAColor(value.nameConfig.color);
 
       const nextConf = produce(widget.config, draft => {
@@ -120,7 +123,7 @@ export const WidgetSetting: FC = memo(() => {
           className="datart-config-panel"
           ghost
         >
-          <Panel header="名称" key="name" forceRender>
+          <Panel header="组件标题" key="name" forceRender>
             <Group>
               <NameSet
                 form={form}

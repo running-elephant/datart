@@ -29,10 +29,10 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   convertToWidgetMap,
-  createControllerWidget,
   getCanLinkControlWidgets,
   getOtherStringControlWidgets,
 } from 'app/pages/DashBoardPage/utils/widget';
+import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -75,7 +75,8 @@ const FilterWidgetPanel: React.FC = memo(props => {
   const { type, widgetId, controllerType } = useSelector(selectControllerPanel);
   const { boardId, boardType, queryVariables } = useContext(BoardContext);
 
-  const { refreshWidgetsByFilter } = useContext(BoardActionContext);
+  const { refreshWidgetsByController: refreshWidgetsByFilter } =
+    useContext(BoardActionContext);
   const allWidgets = useSelector(selectSortAllWidgets);
   const widgets = useMemo(
     () => getCanLinkControlWidgets(allWidgets),
@@ -231,7 +232,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
           }
         }
 
-        const widget = createControllerWidget({
+        const widget = widgetToolKit.controller.create({
           boardId,
           boardType,
           name,

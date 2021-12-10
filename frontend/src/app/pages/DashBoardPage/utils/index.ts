@@ -52,10 +52,10 @@ export const convertImageUrl = (urlKey: string = ''): string => {
  * 将当前前端渲染环境 id 替换掉原有的id ，原来的和当前的相等不受影响
  */
 export const adaptBoardImageUrl = (url: string = '', curBoardId: string) => {
-  // // url=resources/image/dashboard/3062ff86cdcb47b3bba75565b3f2991d/2e1cac3a-600c-4636-b858-cbcb07f4a3b3
-  const spliter = '/image/dashboard/';
-  if (url.includes(spliter)) {
-    const originalBoardId = url.split(spliter)[1].split('/')[0];
+  // // url=resources/image/dashboard/boardIdXXXXXXX/fileIDxxxxxxxxx
+  const splitter = '/image/dashboard/';
+  if (url.includes(splitter)) {
+    const originalBoardId = url.split(splitter)[1].split('/')[0];
     url.replace(originalBoardId, curBoardId);
     return url;
   }

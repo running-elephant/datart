@@ -53,13 +53,13 @@ const RelativeTimeSelector: FC<
     handleTimeChange(unit, newAmount, direction);
   };
 
-  const handleDirecitonChange = newDirection => {
+  const handleDirectionChange = newDirection => {
     setDirection(newDirection);
     handleTimeChange(unit, amount, newDirection);
   };
 
   return (
-    <StyledReativeTimeSelector>
+    <StyledRelativeTimeSelector>
       <InputNumber
         defaultValue={amount}
         step={1}
@@ -71,18 +71,18 @@ const RelativeTimeSelector: FC<
           <Select.Option value={item.value}>{t(item.name)}</Select.Option>
         ))}
       </Select>
-      <Select defaultValue={direction} onChange={handleDirecitonChange}>
+      <Select defaultValue={direction} onChange={handleDirectionChange}>
         {TIME_DIRECTION.map(item => (
           <Select.Option value={item.value}>{t(item.name)}</Select.Option>
         ))}
       </Select>
-    </StyledReativeTimeSelector>
+    </StyledRelativeTimeSelector>
   );
 });
 
 export default RelativeTimeSelector;
 
-const StyledReativeTimeSelector = styled(Space)`
+const StyledRelativeTimeSelector = styled(Space)`
   & .ant-select,
   .ant-input-number {
     max-width: 80px;

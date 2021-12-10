@@ -44,7 +44,7 @@ export const NameSet: FC<{
     return data;
   }, [config]);
 
-  const normfontData = (ancestors, data) => {
+  const normFontData = (ancestors, data) => {
     const nameConfig = { ...config, ...data.value };
     return nameConfig;
   };
@@ -66,7 +66,7 @@ export const NameSet: FC<{
         />
       </Form.Item>
       <Form.Item
-        getValueFromEvent={normfontData}
+        getValueFromEvent={normFontData}
         label=""
         name={['nameConfig']}
         preserve

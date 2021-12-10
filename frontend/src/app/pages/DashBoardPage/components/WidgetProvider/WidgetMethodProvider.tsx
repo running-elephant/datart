@@ -42,6 +42,7 @@ import {
   WidgetContentChartType,
   WidgetType,
 } from '../../pages/Board/slice/types';
+import { jumpTypes } from '../../pages/BoardEditor/components/SettingJumpModal/config';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
@@ -304,12 +305,12 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     (values: { widget: Widget; params: ChartMouseEventParams }) => {
       const { widget, params } = values;
       const jumpConfig = widget.config?.jumpConfig;
-      const targetType = jumpConfig?.targetType || 1;
-      const httpUrl = jumpConfig?.httpUrl || '';
+      const targetType = jumpConfig?.targetType || jumpTypes[0].value;
+      const URL = jumpConfig?.URL || '';
       const queryName = jumpConfig?.queryName || '';
       const targetId = jumpConfig?.target?.relId;
       const jumpFieldName: string = jumpConfig?.field?.jumpFieldName || '';
-      if (typeof jumpConfig?.filter === 'object' && targetType === 1) {
+      if (typeof jumpConfig?.filter === 'object' && targetType === 'INTERNAL') {
         const searchParamsStr = urlSearchTransfer.toUrlString({
           [jumpConfig?.filter?.filterId]:
             (params?.data?.rowData?.[jumpFieldName] as string) || '',
@@ -319,14 +320,14 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
             `/organizations/${orgId}/vizs/${targetId}?${searchParamsStr}`,
           );
         }
-      } else if (targetType === 2) {
-        let url;
-        if (httpUrl.indexOf('?') > -1) {
-          url = `${httpUrl}&${queryName}=${params?.data?.rowData?.[jumpFieldName]}`;
+      } else if (targetType === 'URL') {
+        let jumpUrl;
+        if (URL.indexOf('?') > -1) {
+          jumpUrl = `${URL}&${queryName}=${params?.data?.rowData?.[jumpFieldName]}`;
         } else {
-          url = `${httpUrl}?${queryName}=${params?.data?.rowData?.[jumpFieldName]}`;
+          jumpUrl = `${URL}?${queryName}=${params?.data?.rowData?.[jumpFieldName]}`;
         }
-        window.location.href = url;
+        window.location.href = jumpUrl;
       }
     },
     [history, orgId],

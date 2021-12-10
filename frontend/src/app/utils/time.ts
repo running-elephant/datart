@@ -39,7 +39,7 @@ export function getTime(
     if (!!isStart) {
       return moment().add(amount, unit).startOf(unitOfTime);
     }
-    return moment().add(amount, unit).endOf(unitOfTime);
+    return moment().add(amount, unit).add(1, unit).startOf(unitOfTime);
   };
 }
 

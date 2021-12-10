@@ -35,10 +35,7 @@ import {
   BoardType,
   LightWidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import {
-  createContainerWidget,
-  createMediaWidget,
-} from 'app/pages/DashBoardPage/utils/widget';
+import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ActionCreators } from 'redux-undo';
@@ -199,7 +196,7 @@ export const MediaWidgetDropdown: React.FC<ToolBtnProps> = props => {
   const onSelectMediaWidget = useCallback(
     ({ keyPath }) => {
       const [mediaType] = keyPath;
-      const widget = createMediaWidget({
+      const widget = widgetToolKit.media.create({
         dashboardId: boardId,
         boardType,
         type: mediaType,
@@ -268,7 +265,7 @@ export const ContainerWidgetDropdown: React.FC<ToolBtnProps> = props => {
   const onSelectContainerWidget = useCallback(
     ({ keyPath }) => {
       const [type] = keyPath;
-      const widget = createContainerWidget({
+      const widget = widgetToolKit.container.create({
         dashboardId: boardId,
         boardType: boardType,
         type: type,

@@ -101,9 +101,11 @@ export const TIME_UNIT_OPTIONS = [
   { name: 'weeks', value: 'w' },
   { name: 'months', value: 'M' },
   { name: 'years', value: 'y' },
+  { name: 'quarters', value: 'Q' },
 ];
 export const TIME_DIRECTION = [
   { name: 'ago', value: '-' },
+  { name: 'current', value: '+0' },
   { name: 'fromNow', value: '+' },
 ];
 
@@ -163,7 +165,7 @@ export const CONTROLLER_WIDTH_OPTIONS = [
 
 export enum NumberUnitKey {
   None = 'none',
-  // Engllish Unit
+  // English Unit
   Thousand = 'thousand',
   Million = 'million',
   Billion = 'billion',
