@@ -37,13 +37,12 @@ class BasicTableChart extends ReactChart {
   _useIFrame = false;
   isISOContainer = 'react-table';
   config = Config;
-  protected isAutoMerge = false;
-  tableOptions = { dataset: {}, config: {} };
   utilCanvas = null;
   dataColumnWidths = {};
   tablePadding = 16;
   tableCellBorder = 1;
   rowNumberWidth = this.tablePadding * 2 + 8;
+  tableOptions = { dataset: {}, config: {} };
 
   constructor(props?) {
     super(AntdTableWrapper, {
@@ -92,7 +91,6 @@ class BasicTableChart extends ReactChart {
       dataset.columns,
     );
     const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
-    this.isAutoMerge = this.getStyleValue(styleConfigs, ['style', 'autoMerge']);
 
     const mixedSectionConfigRows = dataConfigs
       .filter(c => c.key === 'mixed')
@@ -311,6 +309,10 @@ class BasicTableChart extends ReactChart {
       'style',
       'rightFixedColumns',
     ]);
+    const autoMergeFields = this.getStyleValue(styleConfigs, [
+      'style',
+      'autoMergeFields',
+    ]);
     const tableHeaderStyles = this.getStyleValue(styleConfigs, [
       'header',
       'modal',
@@ -337,7 +339,7 @@ class BasicTableChart extends ReactChart {
     const _getFlatColumns = (groupConfigs, aggregateConfigs, dataColumns) =>
       [...groupConfigs, ...aggregateConfigs].map(c => {
         const colName = c.colName;
-        const columnRowSpans = this.isAutoMerge
+        const columnRowSpans = (autoMergeFields || []).includes(c.uid)
           ? dataColumns
               ?.map(dc => dc[getValueByColumnKey(c)])
               .reverse()
@@ -398,7 +400,7 @@ class BasicTableChart extends ReactChart {
           },
           render: (value, row, rowIndex) => {
             const formattedValue = toFormattedValue(value, c.format);
-            if (!this.isAutoMerge) {
+            if (!(autoMergeFields || []).includes(c.uid)) {
               return formattedValue;
             }
             return {
