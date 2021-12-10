@@ -95,7 +95,7 @@ const ControllerWidgetPanel: React.FC = memo(props => {
   );
   const widgetMap = useMemo(() => convertToWidgetMap(allWidgets), [allWidgets]);
   const viewMap = useSelector(selectViewMap);
-
+  //
   const [relatedWidgets, setRelatedWidgets] = useState<RelatedWidgetItem[]>([]);
 
   const [visible, setVisible] = useState(false);

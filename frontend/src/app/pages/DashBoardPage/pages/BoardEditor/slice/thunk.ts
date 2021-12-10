@@ -9,7 +9,6 @@ import {
   getDataOption,
   SaveDashboard,
   ServerDatachart,
-  ServerView,
   Widget,
   WidgetData,
   WidgetInfo,
@@ -30,6 +29,7 @@ import {
   getWidgetInfoMapByServer,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
+import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
@@ -241,7 +241,7 @@ export const addDataChartWidgets = createAsyncThunk<
       data: { datacharts, views },
     } = await request<{
       datacharts: ServerDatachart[];
-      views: ServerView[];
+      views: View[];
     }>({
       url: `viz/datacharts?datachartIds=${chartIds.join()}`,
       method: 'get',

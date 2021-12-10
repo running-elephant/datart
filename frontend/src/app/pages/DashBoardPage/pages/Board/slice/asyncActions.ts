@@ -32,7 +32,10 @@ import {
   getWidgetInfoMapByServer,
   getWidgetMapByServer,
 } from '../../../utils/widget';
-import { PageInfo } from './../../../../MainPage/pages/ViewPage/slice/types';
+import {
+  PageInfo,
+  View,
+} from './../../../../MainPage/pages/ViewPage/slice/types';
 import { getChartWidgetDataAsync } from './thunk';
 import { BoardState, DataChart, ServerDashboard, VizRenderMode } from './types';
 
@@ -167,4 +170,13 @@ export const resetControllerAction =
           }),
         );
       });
+  };
+
+export const saveToViewMapAction =
+  (serverView: View) => (dispatch, getState) => {
+    const boardState = getState() as { board: BoardState };
+    const viewMap = boardState.board.viewMap;
+    if (serverView.id in viewMap) return;
+    const viewViews = getChartDataView([serverView], []);
+    dispatch(boardActions.setViewMap(viewViews));
   };

@@ -472,3 +472,4 @@ export const getDistinctFiltersByColumn = (filter: ChartRequestFilter[]) => {
 
   return Object.values(filterMap);
 };
+

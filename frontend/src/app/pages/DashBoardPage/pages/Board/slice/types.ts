@@ -27,7 +27,10 @@ import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
 import { ChartDataSectionField } from '../../../../../types/ChartConfig';
-import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
+import {
+  PageInfo,
+  View,
+} from '../../../../MainPage/pages/ViewPage/slice/types';
 import {
   BorderStyleType,
   LAYOUT_COLS,
@@ -74,7 +77,7 @@ export interface SaveDashboard extends Omit<Dashboard, 'config'> {
 }
 export interface ServerDashboard extends Omit<Dashboard, 'config'> {
   config: string;
-  views: ServerView[];
+  views: View[];
   datacharts: ServerDatachart[];
   widgets: ServerWidget[];
 }
@@ -405,11 +408,6 @@ export interface DataChartConfig {
   chartGraphId: string;
   computedFields: any[];
 }
-
-export interface ServerView extends ChartDataView {
-  model: string;
-}
-// TODO
 
 export type ColsType = typeof LAYOUT_COLS;
 

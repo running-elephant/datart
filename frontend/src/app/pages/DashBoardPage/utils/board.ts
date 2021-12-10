@@ -24,9 +24,9 @@ import {
   DataChart,
   ServerDashboard,
   ServerDatachart,
-  ServerView,
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataView } from 'app/types/ChartDataView';
 // import { dataChartServerModel } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transformMeta } from 'app/utils/chartHelper';
@@ -179,22 +179,17 @@ export const getDataChartMap = (dataCharts: DataChart[]) => {
   }, {} as Record<string, DataChart>);
 };
 
-export const getChartDataView = (
-  views: ServerView[],
-  dataCharts: DataChart[],
-) => {
+export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
   const viewViews: ChartDataView[] = [];
   views.forEach(view => {
     const dataChart = dataCharts.find(dc => dc.viewId === view.id);
-    if (dataChart) {
-      let viewView = {
-        ...view,
-        meta: transformMeta(view.model),
-        model: '',
-        computedFields: dataChart.config.computedFields || [],
-      };
-      viewViews.push(viewView);
-    }
+    let viewView = {
+      ...view,
+      meta: transformMeta(view.model),
+      model: '',
+      computedFields: dataChart?.config.computedFields || [],
+    };
+    viewViews.push(viewView);
   });
   return viewViews;
 };

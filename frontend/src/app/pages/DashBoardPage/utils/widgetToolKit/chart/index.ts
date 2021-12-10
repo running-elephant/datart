@@ -64,6 +64,9 @@ export const getCanLinkageWidgets = (widgets: Widget[]) => {
   });
   return canLinkWidgets;
 };
+
+
+
 export const chartWidgetToolKit = {
   create: createDataChartWidget,
   tool: {
