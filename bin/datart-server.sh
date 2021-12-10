@@ -43,7 +43,7 @@ datart_start(){
     datart_status >/dev/null 2>&1
     if [[ $? -eq 0 ]]; then
 
-        nohup  java -server -Xms2G -Xmx2G -Dfile.encoding=UTF-8 -cp "${CLASS_PATH}" "${START_CLASS}" &
+        nohup  java -server -Xms2G -Xmx2G -Dspring.profiles.active=config -Dfile.encoding=UTF-8 -cp "${CLASS_PATH}" "${START_CLASS}" &
 
     else
         echo ""
