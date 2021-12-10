@@ -26,4 +26,87 @@ CLASS_PATH="${BASE_DIR}/lib/*"
 
 START_CLASS="datart.DatartServerApplication"
 
-java -server -Xms2G -Xmx2G -Dspring.profiles.active=demo -Dfile.encoding=UTF-8 -cp "${CLASS_PATH}" datart.DatartServerApplication
+# java -server -Xms2G -Xmx2G -Dspring.profiles.active=demo -Dfile.encoding=UTF-8 -cp "${CLASS_PATH}" datart.DatartServerApplication
+
+datart_status(){
+    result=`ps -ef | awk '/DatartServerApplication/ && !/awk/{print $2}' | wc -l`
+
+    if [[ $result -eq 0 ]]; then
+        return 0
+    else
+        return 1
+    fi
+    }
+
+datart_start(){
+    source ~/.bashrc
+    datart_status >/dev/null 2>&1
+    if [[ $? -eq 0 ]]; then
+
+        nohup  java -server -Xms2G -Xmx2G -Dspring.profiles.active=demo  -Dfile.encoding=UTF-8 -cp "${CLASS_PATH}" "${START_CLASS}" &
+
+    else
+        echo ""
+        PID=`ps -ef | awk '/DatartServerApplication/ && !/awk/{print $2}'`
+        echo "Datart is Running Now..... PID is ${PID} "
+    fi
+}
+
+
+datart_stop(){
+    datart_status >/dev/null 2>&1
+    if [[ $? -eq 0 ]]; then
+        echo ""
+        echo "Datart is not Running....."
+        echo ""
+    else
+         ps -ef | awk '/DatartServerApplication/ && !/awk/{print $2}'| xargs kill -9
+
+    fi
+}
+
+
+case $1 in
+    start )
+        echo ""
+        echo "Datart Starting........... "
+        echo ""
+        datart_start
+    ;;
+
+    stop )
+        echo ""
+
+        echo "Datart Stoping.......... "
+
+        echo ""
+        datart_stop
+    ;;
+
+    restart )
+        echo "Datart is Restarting.......... "
+        datart_stop
+        echo ""
+        datart_start
+        echo "Datart is Starting.......... "
+
+    ;;
+
+    status )
+        datart_status>/dev/null 2>&1
+        if [[ $? -eq 0 ]]; then
+            echo ""
+            echo "Datart is not Running......"
+            echo ""
+        else
+            echo ""
+            PID=`ps -ef | awk '/DatartServerApplication/ && !/awk/{print $2}'`
+            echo "Datart is Running..... PID is ${PID}"
+            echo ""
+        fi
+     ;;
+
+    * )
+        echo "Usage: datart-demo.sh (start|stop|status|restart)"
+
+esac
