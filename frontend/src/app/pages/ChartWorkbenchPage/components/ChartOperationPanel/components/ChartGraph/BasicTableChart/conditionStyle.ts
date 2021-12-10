@@ -74,7 +74,7 @@ const getRowRecord = row => {
   if (!row?.length) {
     return {};
   }
-  return row[0]?.props?.record || {};
+  return row?.[0]?.props?.record || {};
 };
 
 export const getCustomBodyCellStyle = (
@@ -90,14 +90,22 @@ export const getCustomBodyCellStyle = (
 
   try {
     currentConfig.forEach(
-      ({ operator, value, color: { background, text: color } }) => {
+      ({
+        operator,
+        value,
+        color: {
+          background,
+          text: color /* TODO: rename key to textColor or frontColor? */,
+        },
+      }) => {
         cellStyle = hasMatchedTheCondition(text, operator, value)
-          ? { backgroundColor: background, color: color }
+          ? { backgroundColor: background, color }
           : cellStyle;
       },
     );
-  } catch (error) {}
-
+  } catch (error) {
+    console.error('getCustomBodyCellStyle | error ', error);
+  }
   return cellStyle;
 };
 

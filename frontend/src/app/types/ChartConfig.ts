@@ -187,7 +187,7 @@ export const ChartStyleSectionComponentType = {
   LINE: 'line',
   MARGIN_WIDTH: 'marginWidth',
   TEXT: 'text',
-  CONDITIONSTYLE: 'conditionStyle',
+  CONDITIONSTYLE: 'conditionStylePanel',
 };
 
 type ChartConfigBase = {

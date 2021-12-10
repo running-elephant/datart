@@ -135,7 +135,6 @@ const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           mode={GroupLayoutMode.INNER}
           data={r}
           translate={t}
-          currentSelectedItem={currentSelectedItem}
           onChange={handleChildComponentUpdate(r.key)}
         />
       );

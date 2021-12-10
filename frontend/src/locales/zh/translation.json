@@ -205,7 +205,8 @@
           "btn": {
             "add": "新增",
             "edit": "编辑",
-            "remove": "删除"
+            "remove": "删除",
+            "confirm": "请确认是否删除"
           },
           "header": {
             "operator": "关系",

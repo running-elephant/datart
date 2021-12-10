@@ -204,7 +204,8 @@
           "btn": {
             "add": "Add",
             "edit": "Edit",
-            "remove": "Remove"
+            "remove": "Remove",
+            "confirm": "Please Confirm"
           },
           "header": {
             "operator": "Operator",

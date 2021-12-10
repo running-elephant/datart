@@ -3,6 +3,7 @@ import { ColorPickerPopover } from 'app/components/ReactColorPicker';
 import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
 import React, { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { isPairArray } from 'utils/object';
 import { ConditionStyleFormValues } from '.';
 import {
   ConditionOperatorTypes,
@@ -26,6 +27,7 @@ export default function Add({
   visible,
   onOk,
   onCancel,
+  // this props label and type only need in Add.tsx component?
   currentSelectedItem: { label, type },
 }: AddProps) {
   const [colors] = useState([
@@ -110,6 +112,7 @@ export default function Add({
         return (
           <Select
             mode="tags"
+            // would translate by i18n hook?
             notFoundContent={<>可添加多个值(输入内容后按下回车键完成添加)</>}
           />
         );
@@ -123,6 +126,7 @@ export default function Add({
   return (
     <Modal
       destroyOnClose
+      // would translate by i18n hook?
       title="条件格式"
       visible={visible}
       onOk={modalOk}
@@ -239,7 +243,6 @@ const InputNumberScope = memo(
 
     const inputNumberScopeChange = state => {
       setState(state);
-      console.log(state);
       const result = state.filter(num => typeof num === 'number');
       if (result.length === 2) {
         onChange?.(state);
