@@ -19,9 +19,8 @@
 import { Button, Col, Popconfirm, Row, Space, Table, Tag } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
-import { cloneDeep } from 'lodash';
 import { FC, memo, useState } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { CloneValueDeep } from 'utils/object';
 import { v4 as uuidv4 } from 'uuid';
 import { ItemLayoutProps } from '../../types';
@@ -38,6 +37,7 @@ export interface ConditionStyleFormValues {
   color: { background: string; text: string };
 }
 
+// TODO(TMBigGroup): better to extract component to single file and index will export default with types.
 const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
   ({
     ancestors,
@@ -45,9 +45,8 @@ const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
     data,
     onChange,
     dataConfigs,
-    currentSelectedItem,
   }) => {
-    const [myData] = useState(CloneValueDeep(data));
+    const [myData] = useState(() => CloneValueDeep(data));
     const [visible, setVisible] = useState<boolean>(false);
     const [dataSource, setDataSource] = useState<ConditionStyleFormValues[]>(
       myData.value || [],
@@ -55,9 +54,8 @@ const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
     const [currentItem, setCurrentItem] = useState<ConditionStyleFormValues>(
       {} as ConditionStyleFormValues,
     );
-
     const onEditItem = (values: ConditionStyleFormValues) => {
-      setCurrentItem(cloneDeep(values));
+      setCurrentItem(CloneValueDeep(values));
       openConditionStyle();
     };
     const onRemoveItem = (values: ConditionStyleFormValues) => {
@@ -118,7 +116,7 @@ const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
             <Popconfirm
               key="remove"
               placement="topRight"
-              title="确定要删除吗？"
+              title={t('conditionStyleTable.btn.confirm')}
               onConfirm={() => onRemoveItem(record)}
             >
               <Button type="link" danger>
@@ -177,7 +175,10 @@ const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           </Col>
         </Row>
         <AddModal
-          currentSelectedItem={currentSelectedItem}
+          currentSelectedItem={{
+            label: currentItem?.target?.name,
+            type: currentItem?.target?.type,
+          }}
           visible={visible}
           translate={t}
           values={currentItem}

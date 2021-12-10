@@ -68,7 +68,6 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
     dependency,
     onChange,
     dataConfigs,
-    currentSelectedItem,
     flatten,
   }) => {
     useEffect(() => {
@@ -117,7 +116,6 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
         data,
         translate,
         onChange: handleDataChange,
-        currentSelectedItem,
         dataConfigs,
       };
       switch (data.comType) {
