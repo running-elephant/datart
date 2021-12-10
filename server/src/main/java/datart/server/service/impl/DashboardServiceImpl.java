@@ -100,7 +100,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     public List<DashboardBaseInfo> listDashboard(String orgId) {
         List<Dashboard> dashboards = dashboardMapper.listByOrgId(orgId);
         return dashboards.stream().filter(dashboard -> securityManager
-                .hasPermission(PermissionHelper.vizPermission(dashboard.getOrgId(), dashboard.getId(), Const.READ)))
+                .hasPermission(PermissionHelper.vizPermission(dashboard.getOrgId(), "*", dashboard.getId(), Const.READ)))
                 .map(DashboardBaseInfo::new)
                 .collect(Collectors.toList());
     }
@@ -191,7 +191,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         }
         dashboardDetail.setQueryVariables(variables);
         // download permission
-        dashboardDetail.setDownload(securityManager.hasPermission(PermissionHelper.vizPermission(dashboard.getOrgId(), dashboardId, Const.DOWNLOAD)));
+        dashboardDetail.setDownload(securityManager.hasPermission(PermissionHelper.vizPermission(dashboard.getOrgId(), "*", dashboardId, Const.DOWNLOAD)));
 
         return dashboardDetail;
     }
@@ -211,7 +211,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     public void requirePermission(Dashboard dashboard, int permission) {
         Folder folder = folderMapper.selectByRelTypeAndId(ResourceType.DASHBOARD.name(), dashboard.getId());
         if (folder == null) {
-            securityManager.requirePermissions(PermissionHelper.vizPermission(dashboard.getOrgId(),
+            securityManager.requireAllPermissions(PermissionHelper.vizPermission(dashboard.getOrgId(), "*",
                     ResourceType.FOLDER.name(), permission));
         } else {
             folderService.requirePermission(folder, permission);
@@ -221,7 +221,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     public Folder createWithFolder(BaseCreateParam createParam) {
         DashboardCreateParam param = (DashboardCreateParam) createParam;
         if (!CollectionUtils.isEmpty(folderMapper.checkVizName(param.getOrgId(), param.getParentId(), param.getName()))) {
-            Exceptions.tr(ParamException.class,"error.param.exists.name");
+            Exceptions.tr(ParamException.class, "error.param.exists.name");
         }
         Dashboard dashboard = DashboardService.super.create(createParam);
 

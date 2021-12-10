@@ -86,7 +86,7 @@ public class DatartRealm extends AuthorizingRealm {
         List<RelRoleResource> relRoleResources = rrrMapper.listByOrgAndUser(permissionDataCache.getCurrentOrg(), userId);
         for (RelRoleResource rrr : relRoleResources) {
             authorizationInfo.addStringPermissions(ShiroSecurityManager
-                    .toShiroPermissionString(rrr.getOrgId(), rrr.getResourceType(), rrr.getResourceId(), rrr.getPermission()));
+                    .toShiroPermissionString(rrr.getOrgId(), rrr.getRoleId(), rrr.getResourceType(), rrr.getResourceId(), rrr.getPermission()));
         }
         permissionDataCache.setAuthorizationInfo(authorizationInfo);
 

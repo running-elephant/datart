@@ -40,7 +40,7 @@ public class StorypageServiceImpl extends BaseService implements StorypageServic
     @Override
     public void requirePermission(Storypage entity, int permission) {
         Storyboard sb = retrieve(entity.getStoryboardId(), Storyboard.class);
-        securityManager.requirePermissions(PermissionHelper.vizPermission(sb.getOrgId(), sb.getId(), permission));
+        securityManager.requireAllPermissions(PermissionHelper.vizPermission(sb.getOrgId(), "*", sb.getId(), permission));
     }
 
     @Override
