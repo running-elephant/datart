@@ -150,7 +150,7 @@ const config: ChartConfig = {
                         comType: 'font',
                         default: {
                           fontFamily: 'PingFang SC',
-                          fontSize: '12',
+                          fontSize: 12,
                           fontWeight: 'normal',
                           fontStyle: 'normal',
                           color: 'black',
@@ -250,6 +250,29 @@ const config: ChartConfig = {
           },
         },
         {
+          label: 'style.autoMergeFields',
+          key: 'autoMergeFields',
+          comType: 'select',
+          options: {
+            mode: 'multiple',
+            getItems: cols => {
+              const columns = (cols || [])
+                .filter(col => ['mixed'].includes(col.type))
+                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
+                .filter(c => c.type === 'NUMERIC')
+                .map(c => ({
+                  key: c.uid,
+                  value: c.uid,
+                  label:
+                    c.label || c.aggregate
+                      ? `${c.aggregate}(${c.colName})`
+                      : c.colName,
+                }));
+              return columns;
+            },
+          },
+        },
+        {
           label: 'style.tableSize',
           key: 'tableSize',
           default: 'default',
@@ -281,7 +304,7 @@ const config: ChartConfig = {
           comType: 'font',
           default: {
             fontFamily: 'PingFang SC',
-            fontSize: '12',
+            fontSize: 12,
             fontWeight: 'normal',
             fontStyle: 'normal',
             color: '#6c757d',
@@ -319,7 +342,7 @@ const config: ChartConfig = {
           comType: 'font',
           default: {
             fontFamily: 'PingFang SC',
-            fontSize: '12',
+            fontSize: 12,
             fontWeight: 'normal',
             fontStyle: 'normal',
             color: '#6c757d',
@@ -427,6 +450,7 @@ const config: ChartConfig = {
           enableRowNumber: '启用行号',
           leftFixedColumns: '左侧固定列',
           rightFixedColumns: '右侧固定列',
+          autoMergeFields: '自动合并列内容',
           tableSize: '表格大小',
           autoMerge: '自动合并相同内容',
           tableHeaderStyle: '表头样式',
@@ -474,6 +498,7 @@ const config: ChartConfig = {
           enableRowNumber: 'Enable Row Number',
           leftFixedColumns: 'Left Fixed Columns',
           rightFixedColumns: 'Right Fixed Columns',
+          autoMergeFields: 'Auto Merge Column Content',
           tableSize: 'Table Size',
           autoMerge: 'Auto Merge',
           tableHeaderStyle: 'Table Header Style',

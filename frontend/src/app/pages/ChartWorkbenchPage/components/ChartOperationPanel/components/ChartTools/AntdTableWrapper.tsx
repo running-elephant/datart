@@ -24,7 +24,7 @@ const AntdTableWrapper: FC<{ dataSource: []; columns: [] }> = memo(
     return (
       <Table
         {...rest}
-        style={{ background: 'transparent' }}
+        style={{ background: 'transparent', height: '100%', overflow: 'auto' }}
         dataSource={dataSource}
         columns={columns}
       />

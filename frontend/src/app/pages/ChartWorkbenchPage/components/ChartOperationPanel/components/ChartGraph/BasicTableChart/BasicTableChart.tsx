@@ -28,7 +28,7 @@ import {
   transfromToObjectArray,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
-import { Omit } from 'utils/object';
+import { isEmptyArray, Omit } from 'utils/object';
 import { v4 as uuidv4 } from 'uuid';
 import AntdTableWrapper from '../../ChartTools/AntdTableWrapper';
 import Config from './config';
@@ -37,7 +37,11 @@ class BasicTableChart extends ReactChart {
   _useIFrame = false;
   isISOContainer = 'react-table';
   config = Config;
-  protected isAutoMerge = false;
+  utilCanvas = null;
+  dataColumnWidths = {};
+  tablePadding = 16;
+  tableCellBorder = 1;
+  rowNumberWidth = this.tablePadding * 2 + 8;
   tableOptions = { dataset: {}, config: {} };
 
   constructor(props?) {
@@ -87,7 +91,6 @@ class BasicTableChart extends ReactChart {
       dataset.columns,
     );
     const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
-    this.isAutoMerge = this.getStyleValue(styleConfigs, ['style', 'autoMerge']);
 
     const mixedSectionConfigRows = dataConfigs
       .filter(c => c.key === 'mixed')
@@ -104,6 +107,14 @@ class BasicTableChart extends ReactChart {
       settingConfigs,
       dataset?.pageInfo,
     );
+
+    this.dataColumnWidths = this.calcuteFieldsMaxWidth(
+      mixedSectionConfigRows,
+      dataColumns,
+      styleConfigs,
+      context,
+    );
+
     return {
       rowKey: 'uid',
       pagination: tablePagination,
@@ -123,6 +134,58 @@ class BasicTableChart extends ReactChart {
         tablePagination,
       ),
     };
+  }
+
+  calcuteFieldsMaxWidth(
+    mixedSectionConfigRows,
+    dataColumns,
+    styleConfigs,
+    context,
+  ) {
+    const bodyFont = this.getStyleValue(styleConfigs, [
+      'tableBodyStyle',
+      'font',
+    ]);
+    const headerFont = this.getStyleValue(styleConfigs, [
+      'tableHeaderStyle',
+      'font',
+    ]);
+    const tableHeaders = this.getStyleValue(styleConfigs, [
+      'header',
+      'modal',
+      'tableHeaders',
+    ]);
+    const maxContentByFields = mixedSectionConfigRows.map(c => {
+      const header = this.findHeader(c.uid, tableHeaders);
+      const rowUniqKey = getValueByColumnKey(c);
+      const datas = dataColumns?.map(dc => {
+        const text = dc[rowUniqKey];
+        let width = this.getTextWidth(
+          context,
+          text,
+          bodyFont.fontWeight,
+          bodyFont.fontSize,
+          bodyFont.fontFamily,
+        );
+        const headerWidth = this.getTextWidth(
+          context,
+          header?.label || header.colName,
+          headerFont.fontWeight,
+          headerFont.fontSize,
+          headerFont.fontFamily,
+        );
+        const sorterIconWidth = 12;
+        return Math.max(width, headerWidth + sorterIconWidth);
+      });
+      return {
+        [rowUniqKey]:
+          Math.max(...datas) + this.tablePadding * 2 + this.tableCellBorder * 2,
+      };
+    });
+
+    return maxContentByFields.reduce((acc, cur) => {
+      return Object.assign({}, acc, { ...cur });
+    }, {});
   }
 
   generateTableRowUniqId(dataColumns) {
@@ -152,7 +215,6 @@ class BasicTableChart extends ReactChart {
       'tableHeaderStyle',
       'align',
     ]);
-
     const bodyBgColor = this.getStyleValue(styleConfigs, [
       'tableBodyStyle',
       'bgColor',
@@ -171,25 +233,12 @@ class BasicTableChart extends ReactChart {
         cell: props => {
           const uid = props.uid;
           const { style, ...rest } = props;
-          const _findRow = (uid, headers) => {
-            let header = headers.find(h => h.uid === uid);
-            if (!!header) {
-              return header;
-            }
-            for (let i = 0; i < headers.length; i++) {
-              header = _findRow(uid, headers[i].children || []);
-              if (!!header) {
-                break;
-              }
-            }
-            return header;
-          };
-
-          const header = _findRow(uid, tableHeaders || []);
+          const header = this.findHeader(uid, tableHeaders || []);
           const cellCssStyle = {
             textAlign: headerTextAlign,
             backgroundColor: headerBgColor,
             ...headerFont,
+            fontSize: +headerFont?.fontSize,
           };
           if (header && header.style) {
             const fontStyle = header.style?.font?.value;
@@ -202,9 +251,7 @@ class BasicTableChart extends ReactChart {
               { ...fontStyle },
             );
           }
-          return (
-            <th {...rest} style={Object.assign({}, cellCssStyle, style)} />
-          );
+          return <th {...rest} style={Object.assign(cellCssStyle, style)} />;
         },
       },
       body: {
@@ -239,6 +286,7 @@ class BasicTableChart extends ReactChart {
             textAlign: bodyTextAlign,
             backgroundColor: bodyBgColor,
             ...bodyFont,
+            fontSize: +bodyFont?.fontSize,
           };
           return (
             <td {...rest} style={Object.assign({}, cellCssStyle, style)} />
@@ -253,10 +301,6 @@ class BasicTableChart extends ReactChart {
       'style',
       'enableRowNumber',
     ]);
-    const enableFixedHeader = this.getStyleValue(styleConfigs, [
-      'style',
-      'enableFixedHeader',
-    ]);
     const leftFixedColumns = this.getStyleValue(styleConfigs, [
       'style',
       'leftFixedColumns',
@@ -264,6 +308,10 @@ class BasicTableChart extends ReactChart {
     const rightFixedColumns = this.getStyleValue(styleConfigs, [
       'style',
       'rightFixedColumns',
+    ]);
+    const autoMergeFields = this.getStyleValue(styleConfigs, [
+      'style',
+      'autoMergeFields',
     ]);
     const tableHeaderStyles = this.getStyleValue(styleConfigs, [
       'header',
@@ -278,7 +326,7 @@ class BasicTableChart extends ReactChart {
       if (String(rightFixedColumns).includes(uid)) {
         return 'right';
       }
-      return false;
+      return null;
     };
 
     const _sortFn = rowKey => (prev, next) => {
@@ -291,27 +339,7 @@ class BasicTableChart extends ReactChart {
     const _getFlatColumns = (groupConfigs, aggregateConfigs, dataColumns) =>
       [...groupConfigs, ...aggregateConfigs].map(c => {
         const colName = c.colName;
-        const uid = c.uid;
-
-        const enableFixedCol = this.getStyleValue(styleConfigs, [
-          'column',
-          'modal',
-          'list',
-          uid,
-          'basicStyle',
-          'enableFixedCol',
-        ]);
-        const fixedColWidth = this.getStyleValue(styleConfigs, [
-          'column',
-          'modal',
-          'list',
-          uid,
-          'basicStyle',
-          'enableFixedCol',
-          'fixedColWidth',
-        ]);
-
-        const columnRowSpans = this.isAutoMerge
+        const columnRowSpans = (autoMergeFields || []).includes(c.uid)
           ? dataColumns
               ?.map(dc => dc[getValueByColumnKey(c)])
               .reverse()
@@ -338,17 +366,15 @@ class BasicTableChart extends ReactChart {
               .reverse()
           : [];
 
+        const colMaxWidth =
+          this.dataColumnWidths[getValueByColumnKey(c)] || 100;
         return {
           sorter: _sortFn(colName),
           title: getColumnRenderName(c),
           dataIndex: getValueByColumnKey(c),
           key: getValueByColumnKey(c),
           colName,
-          width: enableFixedHeader
-            ? enableFixedCol
-              ? fixedColWidth
-              : null
-            : null,
+          width: colMaxWidth,
           fixed: _getFixedColumn(c?.uid),
           onHeaderCell: record => {
             return {
@@ -374,7 +400,7 @@ class BasicTableChart extends ReactChart {
           },
           render: (value, row, rowIndex) => {
             const formattedValue = toFormattedValue(value, c.format);
-            if (!this.isAutoMerge) {
+            if (!(autoMergeFields || []).includes(c.uid)) {
               return formattedValue;
             }
             return {
@@ -416,7 +442,9 @@ class BasicTableChart extends ReactChart {
             key: 'id',
             title: '',
             dataIndex: 'id',
-          },
+            width: this.rowNumberWidth,
+            fixed: leftFixedColumns?.length > 0 ? 'left' : null,
+          } as any,
         ]
       : [];
 
@@ -473,22 +501,45 @@ class BasicTableChart extends ReactChart {
       'style',
       'enableFixedHeader',
     ]);
+    const tableHeaderStyles = this.getStyleValue(styleConfigs, [
+      'header',
+      'modal',
+      'tableHeaders',
+    ]);
+    const enableRowNumber = this.getStyleValue(styleConfigs, [
+      'style',
+      'enableRowNumber',
+    ]);
     const tableSize =
       this.getStyleValue(styleConfigs, ['style', 'tableSize']) || 'default';
     const HEADER_HEIGHT = { default: 56, middle: 48, small: 40 };
     const PAGINATION_HEIGHT = { default: 64, middle: 56, small: 56 };
+    const _getMaxHeaderHierarchy = (headerStyles: Array<{ children: [] }>) => {
+      const _maxDeeps = (arr: Array<{ children: [] }> = [], deeps: number) => {
+        if (!isEmptyArray(arr) && arr?.length > 0) {
+          return Math.max(...arr.map(a => _maxDeeps(a.children, deeps + 1)));
+        }
+        return deeps;
+      };
+      return _maxDeeps(headerStyles, 0) || 1;
+    };
 
+    const totalWidth = Object.values<number>(this.dataColumnWidths).reduce(
+      (a, b) => a + b,
+      enableRowNumber ? this.rowNumberWidth : 0,
+    );
     return {
-      scroll: enableFixedHeader
-        ? {
-            scrollToFirstRowOnChange: true,
-            x: 'max-content',
-            y:
-              height -
-              HEADER_HEIGHT[tableSize] -
-              (tablePagination ? PAGINATION_HEIGHT[tableSize] : 0),
-          }
-        : { scrollToFirstRowOnChange: true, x: 'max-content' },
+      scroll: Object.assign({
+        scrollToFirstRowOnChange: true,
+        x: !enableFixedHeader ? 'max-content' : totalWidth,
+        y: !enableFixedHeader
+          ? undefined
+          : height -
+            0 -
+            HEADER_HEIGHT[tableSize] *
+              _getMaxHeaderHierarchy(tableHeaderStyles) -
+            (tablePagination ? PAGINATION_HEIGHT[tableSize] : 0),
+      }),
       bordered: !!showTableBorder,
       size: tableSize,
     };
@@ -569,6 +620,36 @@ class BasicTableChart extends ReactChart {
       return acc;
     }, {});
   }
+
+  getTextWidth = (
+    context,
+    text: string,
+    fontWeight: string,
+    fontSize: string,
+    fontFamily: string,
+  ): number => {
+    const canvas =
+      this.utilCanvas ||
+      (this.utilCanvas = context.document.createElement('canvas'));
+    const measureLayer = canvas.getContext('2d');
+    measureLayer.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+    const metrics = measureLayer.measureText(text);
+    return Math.ceil(metrics.width);
+  };
+
+  findHeader = (uid, headers) => {
+    let header = headers.find(h => h.uid === uid);
+    if (!!header) {
+      return header;
+    }
+    for (let i = 0; i < headers.length; i++) {
+      header = this.findHeader(uid, headers[i].children || []);
+      if (!!header) {
+        break;
+      }
+    }
+    return header;
+  };
 }
 
 export default BasicTableChart;

@@ -56,13 +56,10 @@ class Chart extends DatartChartBase {
   constructor(id: string, name: string, icon?: string, requirements?: []) {
     super();
 
-    const fontIcon = `iconfont icon-${
-      !icon ? 'fsux_tubiao_zhuzhuangtu1' : icon
-    }`;
     this.meta = {
       id,
       name,
-      icon: fontIcon,
+      icon: icon,
       requirements,
     };
     this.state = 'init';
