@@ -102,6 +102,9 @@ const ChartGraphPanel: FC<{
     if (/^<svg/.test(icon) || /^<\?xml/.test(icon)) {
       return <SVGImageRender iconStr={icon} />;
     }
+    if (/svg\+xml;base64/.test(icon)) {
+      return <Base64ImageRender iconStr={icon} />;
+    }
     const _getFontIconClass = icon => `iconfont icon-${!icon ? 'chart' : icon}`;
     return <i className={_getFontIconClass(icon)} />;
   };
@@ -162,6 +165,16 @@ const SVGImageRender = ({ iconStr }) => {
       alt="svg icon"
       style={{ height: FONT_SIZE_ICON_MD, width: FONT_SIZE_ICON_MD }}
       src={`data:image/svg+xml;utf8,${iconStr}`}
+    />
+  );
+};
+
+const Base64ImageRender = ({ iconStr }) => {
+  return (
+    <img
+      alt="svg icon"
+      style={{ height: FONT_SIZE_ICON_MD, width: FONT_SIZE_ICON_MD }}
+      src={iconStr}
     />
   );
 };
