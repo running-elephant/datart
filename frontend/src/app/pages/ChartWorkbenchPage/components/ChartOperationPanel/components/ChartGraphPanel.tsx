@@ -98,6 +98,14 @@ const ChartGraphPanel: FC<{
     return <ul>{lintMessages}</ul>;
   };
 
+  const renderIcon = icon => {
+    if (/^<svg/.test(icon) || /^<\?xml/.test(icon)) {
+      return <SVGImageRender iconStr={icon} />;
+    }
+    const _getFontIconClass = icon => `iconfont icon-${!icon ? 'chart' : icon}`;
+    return <i className={_getFontIconClass(icon)} />;
+  };
+
   const renderCharts = () => {
     const _getChartIcon = (c, onChange?) => {
       return (
@@ -120,7 +128,7 @@ const ChartGraphPanel: FC<{
               })}
               onClick={onChange}
             >
-              <i className={c?.meta?.icon} />
+              {renderIcon(c?.meta?.icon)}
             </StyledChartIcon>
           </IconWrapper>
         </Tooltip>
@@ -147,6 +155,16 @@ const ChartGraphPanel: FC<{
 
   return <StyledChartGraphPanel>{renderCharts()}</StyledChartGraphPanel>;
 });
+
+const SVGImageRender = ({ iconStr }) => {
+  return (
+    <img
+      alt="svg icon"
+      style={{ height: FONT_SIZE_ICON_MD, width: FONT_SIZE_ICON_MD }}
+      src={`data:image/svg+xml;utf8,${iconStr}`}
+    />
+  );
+};
 
 export default ChartGraphPanel;
 
