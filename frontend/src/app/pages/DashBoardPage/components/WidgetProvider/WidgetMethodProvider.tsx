@@ -33,7 +33,7 @@ import {
 import { boardActions } from '../../pages/Board/slice';
 import {
   getChartWidgetDataAsync,
-  getWidgetDataAsync,
+  getWidgetData,
 } from '../../pages/Board/slice/thunk';
 import {
   BoardLinkFilter,
@@ -165,9 +165,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       if (editing) {
         dispatch(getEditWidgetData({ widget }));
       } else {
-        dispatch(
-          getWidgetDataAsync({ boardId, widgetId: widget.id, renderMode }),
-        );
+        dispatch(getWidgetData({ boardId, widget, renderMode }));
       }
     },
     [dispatch, editing, renderMode],
@@ -256,12 +254,29 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
                 },
               }),
             );
+          } else {
+            dispatch(
+              getChartWidgetDataAsync({
+                boardId,
+                widgetId: link.targetId,
+                renderMode,
+                option: {
+                  pageInfo: { pageNo: 1 },
+                },
+              }),
+            );
           }
-          // onWidgetGetData(boardId, link.targetId);
         });
       }, 60);
     },
-    [onToggleLinkage, onChangeBoardFilter, editing, dispatch],
+    [
+      onToggleLinkage,
+      onChangeBoardFilter,
+      editing,
+      dispatch,
+      boardId,
+      renderMode,
+    ],
   );
 
   const toLinkingWidgets = useCallback(
@@ -314,12 +329,22 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
                 },
               }),
             );
+          } else {
+            dispatch(
+              getChartWidgetDataAsync({
+                boardId,
+                widgetId: f.linkerWidgetId,
+                renderMode,
+                option: {
+                  pageInfo: { pageNo: 1 },
+                },
+              }),
+            );
           }
-          // onWidgetGetData(boardId, f.linkerWidgetId);
         });
       }, 60);
     },
-    [boardId, dispatch, editing, onToggleLinkage, widgetId],
+    [boardId, dispatch, editing, onToggleLinkage, renderMode, widgetId],
   );
   const clickJump = useCallback(
     (values: { widget: Widget; params: ChartMouseEventParams }) => {

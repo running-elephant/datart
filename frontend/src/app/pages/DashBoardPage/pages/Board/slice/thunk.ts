@@ -4,6 +4,7 @@ import {
   ControllerWidgetContent,
   getDataOption,
   VizRenderMode,
+  Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
@@ -134,7 +135,7 @@ export const renderedWidgetAsync = createAsyncThunk<
     dispatch(boardActions.renderedWidgets({ boardId, widgetIds: [widgetId] }));
     // 2 widget getData
     dispatch(
-      getWidgetDataAsync({ boardId: boardId, widgetId: widgetId, renderMode }),
+      getWidgetData({ boardId: boardId, widget: curWidget, renderMode }),
     );
     if (curWidget.config.type === 'container') {
       const content = curWidget.config.content as ContainerWidgetContent;
@@ -149,7 +150,11 @@ export const renderedWidgetAsync = createAsyncThunk<
       // 2 widget getData
       subWidgetIds.forEach(wid => {
         dispatch(
-          getWidgetDataAsync({ boardId: boardId, widgetId: wid, renderMode }),
+          getWidgetData({
+            boardId: boardId,
+            widget: widgetMap[wid],
+            renderMode,
+          }),
         );
       });
     }
@@ -158,23 +163,23 @@ export const renderedWidgetAsync = createAsyncThunk<
   },
 );
 
-export const getWidgetDataAsync = createAsyncThunk<
+export const getWidgetData = createAsyncThunk<
   null,
   {
     boardId: string;
-    widgetId: string;
+    widget: Widget;
     renderMode: VizRenderMode | undefined;
     option?: getDataOption;
   },
   { state: RootState }
 >(
-  'board/getWidgetDataAsync',
-  async ({ boardId, widgetId, renderMode, option }, { getState, dispatch }) => {
-    const boardState = getState() as { board: BoardState };
-    const curWidget = boardState.board.widgetRecord?.[boardId]?.[widgetId];
-    if (!curWidget) return null;
-    dispatch(boardActions.renderedWidgets({ boardId, widgetIds: [widgetId] }));
-    switch (curWidget.config.type) {
+  'board/getWidgetData',
+  async ({ widget, renderMode, option }, { getState, dispatch }) => {
+    const boardId = widget.dashboardId;
+    dispatch(boardActions.renderedWidgets({ boardId, widgetIds: [widget.id] }));
+
+    const widgetId = widget.id;
+    switch (widget.config.type) {
       case 'chart':
         try {
           await dispatch(
@@ -183,8 +188,8 @@ export const getWidgetDataAsync = createAsyncThunk<
           if (renderMode === 'schedule') {
             dispatch(
               boardActions.addFetchedItem({
-                boardId: curWidget.dashboardId,
-                widgetId: curWidget.id,
+                boardId,
+                widgetId,
               }),
             );
           }
@@ -192,20 +197,15 @@ export const getWidgetDataAsync = createAsyncThunk<
           if (renderMode === 'schedule') {
             dispatch(
               boardActions.addFetchedItem({
-                boardId: curWidget.dashboardId,
-                widgetId: curWidget.id,
+                boardId,
+                widgetId,
               }),
             );
           }
         }
         return null;
-      case 'media':
-        return null;
-      case 'container':
-        return null;
       case 'controller':
         await dispatch(getControllerOptions({ boardId, widgetId, renderMode }));
-
         return null;
       default:
         return null;

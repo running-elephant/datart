@@ -308,12 +308,12 @@ export const renderedEditWidgetAsync = createAsyncThunk<
 >(
   'editBoard/renderedEditWidgetAsync',
   async ({ boardId, widgetId }, { getState, dispatch, rejectWithValue }) => {
-    const { widgetRecord } = editBoardStackState(
+    const { widgetRecord: WidgetMap } = editBoardStackState(
       getState() as unknown as {
         editBoard: HistoryEditBoard;
       },
     );
-    const curWidget = widgetRecord[widgetId];
+    const curWidget = WidgetMap[widgetId];
     if (!curWidget) return null;
 
     dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
@@ -328,7 +328,7 @@ export const renderedEditWidgetAsync = createAsyncThunk<
       dispatch(editWidgetInfoActions.renderedWidgets(subWidgetIds));
       //  2 widget getData
       subWidgetIds.forEach(wid => {
-        dispatch(getEditWidgetData({ widget: curWidget }));
+        dispatch(getEditWidgetData({ widget: WidgetMap[wid] }));
       });
       return null;
     }
