@@ -19,10 +19,7 @@
 import { Button, Row, Select, Space, Tabs, Transfer, Tree } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
-import {
-  FilterConditionType,
-  FilterValueOption,
-} from 'app/types/ChartConfig';
+import { FilterConditionType, FilterValueOption } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FilterSqlOperator } from 'globalConstants';

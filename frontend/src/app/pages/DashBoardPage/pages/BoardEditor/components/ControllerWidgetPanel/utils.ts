@@ -82,7 +82,7 @@ export const getDateFacadeOptions = (category: ChartDataViewFieldCategory) => {
   }
 };
 // 展示前处理
-export const preformatWidgetFilter = (
+export const preformatControlConfig = (
   preConfig: ControllerConfig,
   controllerType: ControllerFacadeTypes,
 ) => {
@@ -92,7 +92,26 @@ export const preformatWidgetFilter = (
   }
   return config;
 };
+// 设置后处理
+export const postControlConfig = (
+  config: ControllerConfig,
+  controllerType: ControllerFacadeTypes,
+) => {
+  if (config.valueOptions.length > 0) {
+    config.controllerValues = config.valueOptions
+      .filter(ele => ele.isSelected)
+      .map(ele => ele.key);
+  }
 
+  if (DateControllerTypes.includes(controllerType)) {
+    config = formatControlDateToStr(config);
+  }
+  if (!Array.isArray(config.controllerValues)) {
+    config.controllerValues = [config.controllerValues];
+  }
+
+  return config;
+};
 export const formatControlDateToMoment = (config: ControllerConfig) => {
   if (config.controllerDate) {
     const filterDate = config.controllerDate;
@@ -132,26 +151,6 @@ export const formatControlDateToStr = (config: ControllerConfig) => {
       }
     }
   }
-  return config;
-};
-// 设置后处理
-export const postControlConfig = (
-  config: ControllerConfig,
-  controllerType: ControllerFacadeTypes,
-) => {
-  if (config.valueOptions.length > 0) {
-    config.controllerValues = config.valueOptions
-      .filter(ele => ele.isSelected)
-      .map(ele => ele.key);
-  }
-
-  if (DateControllerTypes.includes(controllerType)) {
-    config = formatControlDateToStr(config);
-  }
-  if (!Array.isArray(config.controllerValues)) {
-    config.controllerValues = [config.controllerValues];
-  }
-
   return config;
 };
 
@@ -296,21 +295,18 @@ export const formatDateByPickType = (
 
   switch (pickerType) {
     case 'dateTime':
-    case 'quarter':
+      return momentTime.format(formatTemp);
     case 'date':
-      return momentTime.set({ h: 0, m: 0, s: 0 }).format(formatTemp);
+      return momentTime.startOf('day').format(formatTemp);
     case 'week':
       let year = String(momentTime.year());
       let week = String(momentTime.week() - 1);
-      var date = moment(year).add(week, 'weeks').startOf('week');
-      var value = date.format(formatTemp);
-      return value;
+      return moment(year).add(week, 'weeks').startOf('week').format(formatTemp);
+    case 'quarter':
     case 'month':
-      return momentTime.set({ date: 1, h: 0, m: 0, s: 0 }).format(formatTemp);
+      return momentTime.startOf('month').format(formatTemp);
     case 'year':
-      return momentTime
-        .set({ month: 0, date: 1, h: 0, m: 0, s: 0 })
-        .format(formatTemp);
+      return momentTime.startOf('year').format(formatTemp);
     default:
       return null;
   }

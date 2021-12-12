@@ -141,7 +141,6 @@ export const updateWidgetControllerAction =
     controllerFacadeType: ControllerFacadeTypes;
     views: RelatedView[];
     config: ControllerConfig;
-    hasVariable?: boolean;
   }) =>
   async (dispatch, getState) => {
     const {

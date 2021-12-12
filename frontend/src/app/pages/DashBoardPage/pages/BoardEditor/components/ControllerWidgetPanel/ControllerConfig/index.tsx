@@ -61,16 +61,24 @@ export const RadioButtonTypeName = ['config', 'radioButtonType'];
 export const SliderStepName = ['config', 'sliderConfig', 'step'];
 export const SliderShowMarksName = ['config', 'sliderConfig', 'showMarks'];
 
+export const CascadesName = ['config', 'cascades'];
 export interface RelatedViewFormProps {
   controllerType: ControllerFacadeTypes;
   form: FormInstance<ControllerWidgetContent> | undefined;
   viewMap: Record<string, ChartDataView>;
   otherStrFilterWidgets: Widget[];
+  otherHasOptionControllers: Widget[];
   boardType: BoardType;
 }
 
 export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
-  ({ controllerType, form, viewMap, otherStrFilterWidgets }) => {
+  ({
+    controllerType,
+    form,
+    viewMap,
+    otherStrFilterWidgets,
+    otherHasOptionControllers,
+  }) => {
     const filterT = useI18NPrefix('viz.common.filter');
 
     const hasRadio = useMemo(() => {

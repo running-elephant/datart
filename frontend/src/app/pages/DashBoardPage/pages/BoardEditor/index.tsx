@@ -25,7 +25,7 @@ import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
 import AutoEditor from './AutoEditor/index';
-import FilterWidgetPanel from './components/ControllerWidgetPanel';
+import ControllerWidgetPanel from './components/ControllerWidgetPanel';
 import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
 import FreeEditor from './FreeEditor/index';
@@ -98,7 +98,7 @@ export const BoardEditor: React.FC<{
             <TitleHeader toggleBoardEditor={onCloseBoardEditor} />
             {boardType === 'auto' && <AutoEditor />}
             {boardType === 'free' && <FreeEditor />}
-            <FilterWidgetPanel />
+            <ControllerWidgetPanel />
             <LinkagePanel />
             <SettingJumpModal />
             {boardChartEditorProps && (
