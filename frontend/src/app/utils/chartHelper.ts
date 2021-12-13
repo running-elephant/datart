@@ -687,31 +687,6 @@ export function getSeriesTooltips4Rectangular(
   return [];
 }
 
-export function getSeriesTooltips4Polar(
-  params,
-  groupConfigs,
-  aggConfigs,
-  dataColumns,
-) {
-  if (!aggConfigs?.length) {
-    return [];
-  }
-  if (!groupConfigs?.length) {
-    return aggConfigs.map(config =>
-      valueFormatter(config, dataColumns?.[0]?.[getValueByColumnKey(config)]),
-    );
-  }
-  if (groupConfigs?.[0]) {
-    const rowKeyFn = dc =>
-      groupConfigs?.map(config => dc[config?.colName]).join('-');
-    const dataRow = dataColumns.find(dc => rowKeyFn(dc) === params?.name);
-    return aggConfigs.map(config =>
-      valueFormatter(config, dataRow?.[getValueByColumnKey(config)]),
-    );
-  }
-  return [];
-}
-
 export function valueFormatter(config?: ChartDataSectionField, value?: any) {
   return `${getColumnRenderName(config)}: ${toFormattedValue(
     value,

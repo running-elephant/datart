@@ -18,18 +18,55 @@
 
 import { Table } from 'antd';
 import { FC, memo } from 'react';
+import styled from 'styled-components/macro';
 
-const AntdTableWrapper: FC<{ dataSource: []; columns: [] }> = memo(
-  ({ dataSource, columns, children, ...rest }) => {
+const AntdTableWrapper: FC<{
+  dataSource: [];
+  columns: [];
+  summaryFn?: (data) => { total: number; summarys: [] };
+}> = memo(({ dataSource, columns, children, summaryFn, ...rest }) => {
+  const getTableSummaryRow = pageData => {
+    if (!summaryFn) {
+      return undefined;
+    }
+    const summaryData = summaryFn?.(pageData);
     return (
-      <Table
-        {...rest}
-        style={{ background: 'transparent', height: '100%', overflow: 'auto' }}
-        dataSource={dataSource}
-        columns={columns}
-      />
+      <Table.Summary fixed>
+        <Table.Summary.Row>
+          {(summaryData?.summarys || []).map((data, index) => {
+            return (
+              <Table.Summary.Cell index={index}>{data}</Table.Summary.Cell>
+            );
+          })}
+        </Table.Summary.Row>
+      </Table.Summary>
     );
-  },
-);
+  };
+
+  return (
+    <StyledTable
+      {...rest}
+      dataSource={dataSource}
+      columns={columns}
+      summary={getTableSummaryRow}
+    />
+  );
+});
+
+const StyledTable = styled(Table)`
+  background: 'transparent';
+  height: 100%;
+  overflow: auto;
+
+  .ant-table-summary {
+    background: #fafafa;
+  }
+  .ant-table-cell-fix-left {
+    background: #fafafa;
+  }
+  .ant-table-cell-fix-right {
+    background: #fafafa;
+  }
+`;
 
 export default AntdTableWrapper;

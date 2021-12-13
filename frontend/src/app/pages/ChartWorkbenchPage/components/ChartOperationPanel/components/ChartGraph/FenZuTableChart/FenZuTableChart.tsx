@@ -69,6 +69,7 @@ class FenZuTableChart extends BasicTableChart {
         styleConfigs,
         dataColumns,
       ),
+      summaryFn: undefined as any,
       components: this.getTableComponents(styleConfigs),
       ...this.getAntdTableStyleOptions(
         styleConfigs,
@@ -77,6 +78,7 @@ class FenZuTableChart extends BasicTableChart {
         context?.height,
         tablePagination,
       ),
+      onChange: () => {},
     };
   }
 }

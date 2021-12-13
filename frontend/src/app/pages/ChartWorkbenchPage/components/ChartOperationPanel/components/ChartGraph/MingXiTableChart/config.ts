@@ -95,70 +95,6 @@ const config: ChartConfig = {
                 comType: 'group',
                 rows: [
                   {
-                    label: 'column.sortAndFilter',
-                    key: 'sortAndFilter',
-                    comType: 'group',
-                    options: { expand: true },
-                    rows: [
-                      {
-                        label: 'column.enableSort',
-                        key: 'enableSort',
-                        comType: 'checkbox',
-                      },
-                    ],
-                  },
-                  {
-                    label: 'column.basicStyle',
-                    key: 'basicStyle',
-                    comType: 'group',
-                    options: { expand: true },
-                    rows: [
-                      {
-                        label: 'column.backgroundColor',
-                        key: 'backgroundColor',
-                        comType: 'fontColor',
-                      },
-                      {
-                        label: 'column.align',
-                        key: 'align',
-                        default: 'left',
-                        comType: 'select',
-                        options: {
-                          items: [
-                            { label: '左对齐', value: 'left' },
-                            { label: '居中对齐', value: 'center' },
-                            { label: '右对齐', value: 'right' },
-                          ],
-                        },
-                      },
-                      {
-                        label: 'column.enableFixedCol',
-                        key: 'enableFixedCol',
-                        comType: 'switch',
-                        rows: [
-                          {
-                            label: 'column.fixedColWidth',
-                            key: 'fixedColWidth',
-                            default: 100,
-                            comType: 'inputNumber',
-                          },
-                        ],
-                      },
-                      {
-                        label: 'font',
-                        key: 'font',
-                        comType: 'font',
-                        default: {
-                          fontFamily: 'PingFang SC',
-                          fontSize: 12,
-                          fontWeight: 'normal',
-                          fontStyle: 'normal',
-                          color: 'black',
-                        },
-                      },
-                    ],
-                  },
-                  {
                     label: 'column.conditionStyle',
                     key: 'conditionStyle',
                     comType: 'group',
@@ -192,12 +128,6 @@ const config: ChartConfig = {
         {
           label: 'style.enableRowNumber',
           key: 'enableRowNumber',
-          default: false,
-          comType: 'checkbox',
-        },
-        {
-          label: 'style.autoMerge',
-          key: 'autoMerge',
           default: false,
           comType: 'checkbox',
         },
@@ -259,7 +189,7 @@ const config: ChartConfig = {
               const columns = (cols || [])
                 .filter(col => ['mixed'].includes(col.type))
                 .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-                .filter(c => c.type === 'NUMERIC')
+                .filter(c => c.type === 'STRING')
                 .map(c => ({
                   key: c.uid,
                   value: c.uid,
@@ -366,14 +296,32 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'cache.title',
-      key: 'cache',
+      label: 'summary.title',
+      key: 'summary',
       comType: 'group',
       rows: [
         {
-          label: 'cache.title',
-          key: 'panel',
-          comType: 'cache',
+          label: 'summary.aggregateFields',
+          key: 'aggregateFields',
+          comType: 'select',
+          options: {
+            mode: 'multiple',
+            getItems: cols => {
+              const columns = (cols || [])
+                .filter(col => ['mixed'].includes(col.type))
+                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
+                .filter(c => c.type === 'NUMERIC')
+                .map(c => ({
+                  key: c.uid,
+                  value: c.uid,
+                  label:
+                    c.label || c.aggregate
+                      ? `${c.aggregate}(${c.colName})`
+                      : c.colName,
+                }));
+              return columns;
+            },
+          },
         },
       ],
     },
@@ -391,22 +339,16 @@ const config: ChartConfig = {
             needRefresh: true,
           },
         },
+
         {
           label: 'paging.pageSize',
           key: 'pageSize',
-          default: 10,
-          comType: 'select',
+          default: 20,
+          comType: 'inputNumber',
           options: {
             needRefresh: true,
-            items: [
-              { label: '5', value: 5 },
-              { label: '10', value: 10 },
-              { label: '20', value: 20 },
-              { label: '30', value: 30 },
-              { label: '40', value: 40 },
-              { label: '50', value: 50 },
-              { label: '100', value: 100 },
-            ],
+            step: 1,
+            min: 0,
           },
           watcher: {
             deps: ['enablePaging'],
@@ -430,7 +372,7 @@ const config: ChartConfig = {
           styleAndGroup: '表头分组',
         },
         column: {
-          title: '表格数据列',
+          title: '表格列样式',
           open: '打开列设置',
           list: '字段列表',
           sortAndFilter: '排序与过滤',
@@ -452,15 +394,15 @@ const config: ChartConfig = {
           rightFixedColumns: '右侧固定列',
           autoMergeFields: '自动合并列内容',
           tableSize: '表格大小',
-          autoMerge: '自动合并相同内容',
           tableHeaderStyle: '表头样式',
           tableBodyStyle: '表体样式',
           bgColor: '背景颜色',
           font: '字体',
           align: '对齐方式',
         },
-        cache: {
-          title: '数据处理',
+        summary: {
+          title: '数据汇总',
+          aggregateFields: '汇总列',
         },
         paging: {
           title: '分页设置',
@@ -478,7 +420,7 @@ const config: ChartConfig = {
           styleAndGroup: 'Header Group',
         },
         column: {
-          title: 'Table Data Column',
+          title: 'Table Column Style',
           open: 'Open Column Setting',
           list: 'Field List',
           sortAndFilter: 'Sort and Filter',
@@ -500,15 +442,15 @@ const config: ChartConfig = {
           rightFixedColumns: 'Right Fixed Columns',
           autoMergeFields: 'Auto Merge Column Content',
           tableSize: 'Table Size',
-          autoMerge: 'Auto Merge',
           tableHeaderStyle: 'Table Header Style',
           tableBodyStyle: 'Table Body Style',
           bgColor: 'Background Color',
           font: 'Font',
           align: 'Align',
         },
-        cache: {
-          title: 'Data Process',
+        summary: {
+          title: 'Summary',
+          aggregateFields: 'Summary Fields',
         },
         paging: {
           title: 'Paging',

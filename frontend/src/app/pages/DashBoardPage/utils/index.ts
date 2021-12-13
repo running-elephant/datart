@@ -395,7 +395,9 @@ export const getChartWidgetRequestParams = (obj: {
     return null;
   }
   const builder = getChartDataRequestBuilder(dataChart);
-  let requestParams = builder.build();
+  let requestParams = builder
+    .addExtraSorters((option?.sorters as any) || [])
+    .build();
   const viewConfig = transformToViewConfig(chartDataView?.config);
   requestParams = { ...requestParams, ...viewConfig };
 

@@ -89,12 +89,33 @@ const ChartPreviewBoardForShare: FC<{
         {
           name: 'click',
           callback: param => {
-            if (param.seriesName === 'paging') {
-              const page = param.value?.page;
+            if (
+              param.componentType === 'table' &&
+              param.seriesType === 'header'
+            ) {
               dispatch(
                 fetchShareDataSetByPreviewChartAction({
                   preview: chartPreview!,
-                  pageInfo: { pageNo: page },
+                  sorter: {
+                    column: param?.seriesName!,
+                    operator: param?.value,
+                  },
+                }),
+              );
+              return;
+            }
+            if (
+              param.componentType === 'table' &&
+              param.seriesType === 'paging'
+            ) {
+              if (!chartPreview) {
+                return;
+              }
+              const pageNo = param.value;
+              dispatch(
+                fetchShareDataSetByPreviewChartAction({
+                  preview: chartPreview!,
+                  pageInfo: { pageNo },
                 }),
               );
               return;
