@@ -28,10 +28,10 @@ import {
   getColumnRenderName,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
+  getSeriesTooltips4Polar2,
   getStyleValueByGroup,
   getValueByColumnKey,
   transfromToObjectArray,
-  valueFormatter,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Config from './config';
@@ -131,14 +131,11 @@ class BasicPieChart extends Chart {
         ...this.getBarSeiesImpl(styleConfigs),
         data: aggregateConfigs.map(config => {
           return {
-            ...getExtraSeriesRowData({
-              [getValueByColumnKey(config)]: dc[getValueByColumnKey(config)],
-            }),
+            ...getExtraSeriesRowData(dc),
+            ...getExtraSeriesDataFormat(config?.format),
             name: getColumnRenderName(config),
             value: dc[getValueByColumnKey(config)],
             itemStyle: this.getDataItemStyle(config, groupConfigs, dc),
-            ...getExtraSeriesRowData(dc),
-            ...getExtraSeriesDataFormat(config?.format),
           };
         }),
       };
@@ -152,11 +149,10 @@ class BasicPieChart extends Chart {
         data: dataColumns.map(dc => {
           return {
             ...getExtraSeriesRowData(dc),
+            ...getExtraSeriesDataFormat(config?.format),
             name: groupedConfigNames.map(config => dc[config]).join('-'),
             value: dc[getValueByColumnKey(config)],
             itemStyle: this.getDataItemStyle(config, groupConfigs, dc),
-            ...getExtraSeriesRowData(dc),
-            ...getExtraSeriesDataFormat(config?.format),
           };
         }),
       };
@@ -289,31 +285,17 @@ class BasicPieChart extends Chart {
     dataColumns,
   ) {
     return seriesParams => {
-      let dataRow = dataColumns?.find(
-        dc =>
-          groupConfigs
-            .map(config => dc?.[getValueByColumnKey(config)])
-            .join('-') === seriesParams?.name,
-      );
-      if (dataColumns?.length === 1) {
-        dataRow = dataColumns[0];
+      if (seriesParams.componentType !== 'series') {
+        return seriesParams.name;
       }
-
-      const toolTips = []
-        .concat(groupConfigs)
-        .concat(
-          aggregateConfigs?.filter(
-            aggConfig =>
-              getValueByColumnKey(aggConfig) === seriesParams?.name ||
-              getValueByColumnKey(aggConfig) === seriesParams?.seriesName,
-          ),
-        )
-        .concat(infoConfigs)
-        .map(config =>
-          valueFormatter(config, dataRow?.[getValueByColumnKey(config)]),
-        );
-
-      return toolTips.join('<br />');
+      return getSeriesTooltips4Polar2(
+        seriesParams,
+        groupConfigs,
+        [],
+        aggregateConfigs,
+        infoConfigs,
+        [],
+      );
     };
   }
 }
