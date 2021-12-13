@@ -30,7 +30,7 @@ import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
 import FreeEditor from './FreeEditor/index';
 import { editDashBoardInfoActions } from './slice';
-import { editWrapChartWidget } from './slice/actions/actions';
+import { editHasChartWidget } from './slice/actions/actions';
 import {
   selectBoardChartEditorProps,
   selectEditBoard,
@@ -67,11 +67,11 @@ export const BoardEditor: React.FC<{
       (chartType: WidgetContentChartType, dataChart: DataChart, view) => {
         if (chartType === 'widgetChart') {
           const widgetId = boardChartEditorProps?.widgetId!;
-          dispatch(editWrapChartWidget({ widgetId, dataChart, view }));
+          dispatch(editHasChartWidget({ widgetId, dataChart, view }));
           onCloseChartEditor();
         } else {
           const widgetId = boardChartEditorProps?.widgetId!;
-          dispatch(editWrapChartWidget({ widgetId, dataChart, view }));
+          dispatch(editHasChartWidget({ widgetId, dataChart, view }));
           onCloseChartEditor();
         }
       },

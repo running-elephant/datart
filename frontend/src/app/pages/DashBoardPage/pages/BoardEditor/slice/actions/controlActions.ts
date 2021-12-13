@@ -23,7 +23,7 @@ import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widge
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { PageInfo } from './../../../../../MainPage/pages/ViewPage/slice/types';
-import { addWidgetsToEditBoard, getEditWidgetDataAsync } from './../thunk';
+import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from './../thunk';
 import { HistoryEditBoard } from './../types';
 
 export type BtnActionParams = {
@@ -81,7 +81,7 @@ export const editWidgetsQueryAction =
       .filter(it => it.config.type === 'chart')
       .forEach(it => {
         dispatch(
-          getEditWidgetDataAsync({
+          getEditChartWidgetDataAsync({
             widgetId: it.id,
             option: { pageInfo },
           }),

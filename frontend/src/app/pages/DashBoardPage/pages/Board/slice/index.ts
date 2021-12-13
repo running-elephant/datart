@@ -28,7 +28,7 @@ import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import { createWidgetInfo } from '../../../utils/widget';
-import { getChartWidgetDataAsync, getWidgetDataAsync } from './thunk';
+import { getChartWidgetDataAsync, getControllerOptions } from './thunk';
 import { BoardInfo, BoardState, Widget } from './types';
 
 export const boardInit: BoardState = {
@@ -254,25 +254,6 @@ const boardSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    // getWidgetDataAsync
-    builder.addCase(getWidgetDataAsync.pending, (state, action) => {
-      const { boardId, widgetId } = action.meta.arg;
-      try {
-        state.widgetInfoRecord[boardId][widgetId].loading = true;
-      } catch (error) {}
-    });
-    builder.addCase(getWidgetDataAsync.fulfilled, (state, action) => {
-      const { boardId, widgetId } = action.meta.arg;
-      try {
-        state.widgetInfoRecord[boardId][widgetId].loading = false;
-      } catch (error) {}
-    });
-    builder.addCase(getWidgetDataAsync.rejected, (state, action) => {
-      const { boardId, widgetId } = action.meta.arg;
-      try {
-        state.widgetInfoRecord[boardId][widgetId].loading = false;
-      } catch (error) {}
-    });
     builder.addCase(getChartWidgetDataAsync.pending, (state, action) => {
       const { boardId, widgetId } = action.meta.arg;
       try {
@@ -286,6 +267,24 @@ const boardSlice = createSlice({
       } catch (error) {}
     });
     builder.addCase(getChartWidgetDataAsync.rejected, (state, action) => {
+      const { boardId, widgetId } = action.meta.arg;
+      try {
+        state.widgetInfoRecord[boardId][widgetId].loading = false;
+      } catch (error) {}
+    });
+    builder.addCase(getControllerOptions.pending, (state, action) => {
+      const { boardId, widgetId } = action.meta.arg;
+      try {
+        state.widgetInfoRecord[boardId][widgetId].loading = true;
+      } catch (error) {}
+    });
+    builder.addCase(getControllerOptions.fulfilled, (state, action) => {
+      const { boardId, widgetId } = action.meta.arg;
+      try {
+        state.widgetInfoRecord[boardId][widgetId].loading = false;
+      } catch (error) {}
+    });
+    builder.addCase(getControllerOptions.rejected, (state, action) => {
       const { boardId, widgetId } = action.meta.arg;
       try {
         state.widgetInfoRecord[boardId][widgetId].loading = false;

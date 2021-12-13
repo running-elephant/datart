@@ -308,14 +308,14 @@ export const renderedEditWidgetAsync = createAsyncThunk<
 >(
   'editBoard/renderedEditWidgetAsync',
   async ({ boardId, widgetId }, { getState, dispatch, rejectWithValue }) => {
-    const { widgetRecord } = editBoardStackState(
+    const { widgetRecord: WidgetMap } = editBoardStackState(
       getState() as unknown as {
         editBoard: HistoryEditBoard;
       },
     );
-    const curWidget = widgetRecord[widgetId];
+    const curWidget = WidgetMap[widgetId];
     if (!curWidget) return null;
-    // 1 widget render
+
     dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
 
     if (curWidget.config.type === 'container') {
@@ -328,96 +328,12 @@ export const renderedEditWidgetAsync = createAsyncThunk<
       dispatch(editWidgetInfoActions.renderedWidgets(subWidgetIds));
       //  2 widget getData
       subWidgetIds.forEach(wid => {
-        dispatch(getEditWidgetDataAsync({ widgetId: wid }));
+        dispatch(getEditWidgetData({ widget: WidgetMap[wid] }));
       });
       return null;
     }
     // 2 widget getData
-    dispatch(getEditWidgetDataAsync({ widgetId }));
-    return null;
-  },
-);
-export const getEditWidgetDataAsync = createAsyncThunk<
-  null,
-  { widgetId: string; option?: getDataOption },
-  { state: RootState }
->(
-  'editBoard/getEditWidgetDataAsync',
-  async ({ widgetId, option }, { getState, dispatch }) => {
-    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
-    const rootState = getState() as RootState;
-    const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
-    const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
-
-    const curWidget = widgetMap[widgetId];
-    if (!curWidget) return null;
-
-    switch (curWidget.config.type) {
-      case 'chart':
-        await dispatch(getEditChartWidgetDataAsync({ widgetId, option }));
-        return null;
-      case 'controller':
-        await dispatch(getEditControllerOptions(curWidget.id));
-        return null;
-      case 'media':
-      case 'container':
-      default:
-        return null;
-    }
-  },
-);
-
-export const getEditChartWidgetDataAsync = createAsyncThunk<
-  null,
-  {
-    widgetId: string;
-    option?: getDataOption;
-  },
-  { state: RootState }
->(
-  'editBoard/getEditChartWidgetDataAsync',
-  async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
-    const rootState = getState() as RootState;
-    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
-    const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
-    const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
-    const editBoard = rootState.editBoard;
-    const boardInfo = editBoard?.boardInfo as BoardInfo;
-    const boardState = rootState.board as BoardState;
-    const widgetInfo = editBoard?.widgetInfoRecord[widgetId];
-    const viewMap = boardState.viewMap;
-    const curWidget = widgetMap[widgetId];
-
-    if (!curWidget) return null;
-    const dataChartMap = boardState.dataChartMap;
-    const boardLinkFilters = boardInfo.linkFilter;
-
-    let requestParams = getChartWidgetRequestParams({
-      widgetId,
-      widgetMap,
-      viewMap,
-      option,
-      widgetInfo,
-      dataChartMap,
-      boardLinkFilters,
-    });
-    if (!requestParams) {
-      return null;
-    }
-    let widgetData;
-    const { data } = await request<WidgetData>({
-      method: 'POST',
-      url: `data-provider/execute`,
-      data: requestParams,
-    });
-    widgetData = { ...data, id: widgetId };
-    dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
-    dispatch(
-      editWidgetInfoActions.changePageInfo({
-        widgetId,
-        pageInfo: data.pageInfo,
-      }),
-    );
+    dispatch(getEditWidgetData({ widget: curWidget }));
     return null;
   },
 );
@@ -521,6 +437,79 @@ export const uploadBoardImage = createAsyncThunk<
       errorHandle(error);
       throw error;
     }
+  },
+);
+
+export const getEditWidgetData = createAsyncThunk<
+  null,
+  { widget: Widget; option?: getDataOption },
+  { state: RootState }
+>(
+  'editBoard/getEditWidgetData',
+  ({ widget, option }, { getState, dispatch }) => {
+    dispatch(editWidgetInfoActions.renderedWidgets([widget.id]));
+    if (widget.config.type === 'chart') {
+      dispatch(getEditChartWidgetDataAsync({ widgetId: widget.id, option }));
+    }
+    if (widget.config.type === 'controller') {
+      dispatch(getEditControllerOptions(widget.id));
+    }
+    return null;
+  },
+);
+
+export const getEditChartWidgetDataAsync = createAsyncThunk<
+  null,
+  {
+    widgetId: string;
+    option?: getDataOption;
+  },
+  { state: RootState }
+>(
+  'editBoard/getEditChartWidgetDataAsync',
+  async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
+    const rootState = getState() as RootState;
+    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
+    const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
+    const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
+    const editBoard = rootState.editBoard;
+    const boardInfo = editBoard?.boardInfo as BoardInfo;
+    const boardState = rootState.board as BoardState;
+    const widgetInfo = editBoard?.widgetInfoRecord[widgetId];
+    const viewMap = boardState.viewMap;
+    const curWidget = widgetMap[widgetId];
+
+    if (!curWidget) return null;
+    const dataChartMap = boardState.dataChartMap;
+    const boardLinkFilters = boardInfo.linkFilter;
+
+    let requestParams = getChartWidgetRequestParams({
+      widgetId,
+      widgetMap,
+      viewMap,
+      option,
+      widgetInfo,
+      dataChartMap,
+      boardLinkFilters,
+    });
+    if (!requestParams) {
+      return null;
+    }
+    let widgetData;
+    const { data } = await request<WidgetData>({
+      method: 'POST',
+      url: `data-provider/execute`,
+      data: requestParams,
+    });
+    widgetData = { ...data, id: widgetId };
+    dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
+    dispatch(
+      editWidgetInfoActions.changePageInfo({
+        widgetId,
+        pageInfo: data.pageInfo,
+      }),
+    );
+    return null;
   },
 );
 
