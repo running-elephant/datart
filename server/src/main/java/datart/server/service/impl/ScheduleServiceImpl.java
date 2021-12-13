@@ -74,12 +74,11 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
 
     @Override
     public void requirePermission(Schedule schedule, int permission) {
-
         if ((permission & Const.CREATE) == Const.CREATE) {
-            securityManager.requirePermissions(PermissionHelper.schedulePermission(schedule.getOrgId(), ResourceType.SCHEDULE.name(), permission));
+            securityManager.requireAllPermissions(PermissionHelper.schedulePermission(schedule.getOrgId(), "*", ResourceType.SCHEDULE.name(), permission));
             return;
         }
-        securityManager.requirePermissions(PermissionHelper.schedulePermission(schedule.getOrgId(), schedule.getId(), permission));
+        securityManager.requireAllPermissions(PermissionHelper.schedulePermission(schedule.getOrgId(), "*", schedule.getId(), permission));
     }
 
     @Override
@@ -161,7 +160,7 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     public boolean start(String scheduleId) throws SchedulerException {
         Schedule schedule = retrieve(scheduleId);
         if (schedule.getActive() && scheduler.checkExists(JobKey.jobKey(schedule.getName(), schedule.getOrgId()))) {
-            Exceptions.tr(BaseException.class,"message.task.running");
+            Exceptions.tr(BaseException.class, "message.task.running");
         }
         Date now = new Date();
         if (schedule.getStartDate() != null && now.before(new Date())) {

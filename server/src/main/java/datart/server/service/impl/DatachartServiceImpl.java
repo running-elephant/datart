@@ -105,7 +105,7 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
     public void requirePermission(Datachart datachart, int permission) {
         Folder folder = folderMapper.selectByRelTypeAndId(ResourceType.DATACHART.name(), datachart.getId());
         if (folder == null) {
-            securityManager.requirePermissions(PermissionHelper.vizPermission(datachart.getOrgId(),
+            securityManager.requireAllPermissions(PermissionHelper.vizPermission(datachart.getOrgId(), "*",
                     ResourceType.FOLDER.name(), permission));
         } else {
             folderService.requirePermission(folder, permission);
@@ -117,7 +117,7 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
         DatachartDetail datachartDetail = new DatachartDetail();
         Datachart datachart = retrieve(datachartId);
         //folder index
-        Folder folder = folderMapper.selectByRelTypeAndId(ResourceType.DASHBOARD.name(), datachartId);
+        Folder folder = folderMapper.selectByRelTypeAndId(ResourceType.DATACHART.name(), datachartId);
         if (folder != null) {
             datachartDetail.setParentId(folder.getParentId());
             datachartDetail.setIndex(folder.getIndex());
@@ -130,7 +130,7 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
 
         // download permission
         datachartDetail.setDownload(securityManager
-                .hasPermission(PermissionHelper.vizPermission(datachart.getOrgId(), datachartId, Const.DOWNLOAD)));
+                .hasPermission(PermissionHelper.vizPermission(datachart.getOrgId(), "*", datachartId, Const.DOWNLOAD)));
 
         return datachartDetail;
     }
@@ -140,7 +140,7 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
         // check unique
         DatachartCreateParam param = (DatachartCreateParam) createParam;
         if (!CollectionUtils.isEmpty(folderMapper.checkVizName(param.getOrgId(), param.getParentId(), param.getName()))) {
-            Exceptions.tr(ParamException.class,"error.param.exists.name");
+            Exceptions.tr(ParamException.class, "error.param.exists.name");
         }
         Datachart datachart = DatachartService.super.create(createParam);
         // create folder

@@ -23,6 +23,8 @@ public interface RoleService extends BaseCRUDService<Role, RoleMapperExt> {
 
     Role createPerUserRole(String orgId, String userId);
 
+    List<Role> listUserRoles(String orgId,String userId);
+
     List<UserBaseInfo> listRoleUsers(String roleId);
 
     boolean grantPermission(List<PermissionInfo> permissionInfo);

@@ -86,11 +86,13 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     @Override
     public void requirePermission(Source source, int permission) {
         if ((permission & Const.CREATE) == Const.CREATE) {
-            securityManager.requirePermissions(PermissionHelper.sourcePermission(source.getOrgId(),
-                    ResourceType.SOURCE.name(), permission));
+            securityManager.requireAllPermissions(PermissionHelper.sourcePermission(source.getOrgId(),
+                    null,
+                    ResourceType.SOURCE.name(),
+                    permission));
             return;
         }
-        securityManager.requirePermissions(PermissionHelper.sourcePermission(source.getOrgId(), source.getId(), permission));
+        securityManager.requireAllPermissions(PermissionHelper.sourcePermission(source.getOrgId(), null, source.getId(), permission));
     }
 
     @Override

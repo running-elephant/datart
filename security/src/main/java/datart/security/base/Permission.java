@@ -11,9 +11,11 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Permission{
+public class Permission {
 
     private String orgId;
+
+    private String roleId;
 
     private String resourceType;
 
@@ -31,12 +33,13 @@ public class Permission{
                 '}';
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Permission that = (Permission) o;
-        return permission == that.permission && orgId.equals(that.orgId) && resourceType.equals(that.resourceType) && resourceId.equals(that.resourceId);
+        return permission == that.permission && orgId.equals(that.orgId) && roleId.equals(that.roleId) && resourceType.equals(that.resourceType) && resourceId.equals(that.resourceId);
     }
 
     @Override
