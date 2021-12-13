@@ -41,7 +41,7 @@
           "dropdownList": "Dropdown List",
           "radioGroup": "Radio Group",
           "checkboxGroup" :"Checkbox Group",
-          "multiDropdownList": "Multipile Dropdown List",
+          "multiDropdownList": "multiple Dropdown List",
           "rangeTime": "Range Time",
           "rangeValue": "Range Value",
           "text": "Text",
@@ -78,7 +78,7 @@
         "button": "Button",
         "date": {
           "recommend": "Recommend",
-          "manual": "Mannual",
+          "manual": "Manual",
           "today": "Today",
           "yesterday": "Yesterday",
           "this_week": "This Week",
@@ -132,7 +132,7 @@
       }
     },
     "management": {
-      "title": "widgets manangement",
+      "title": "widgets management",
       "subTitle": "widgets list",
       "table": {
         "header": {
@@ -270,8 +270,8 @@
         },
         "axis": {
           "y": {
-            "left": "left axis demision",
-            "right": "right axis demision"
+            "left": "left axis dimension",
+            "right": "right axis dimension"
           }
         },
         "enum": {
