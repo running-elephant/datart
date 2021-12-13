@@ -170,6 +170,8 @@ export const getInitWidgetController = (
       return getRangeSliderControllerConfig();
     case ControllerFacadeTypes.RadioGroup:
       return getRadioGroupControllerConfig();
+    case ControllerFacadeTypes.CheckboxGroup:
+      return getCheckboxGroupControllerConfig();
     case ControllerFacadeTypes.Slider:
       return getSliderControllerConfig();
     case ControllerFacadeTypes.DropdownList:
@@ -223,6 +225,11 @@ export const getRangeTimeControllerConfig = () => {
   return config;
 };
 export const getMultiDropdownListControllerConfig = () => {
+  const config = getInitControllerConfig();
+  config.sqlOperator = FilterSqlOperator.In;
+  return config;
+};
+export const getCheckboxGroupControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.In;
   return config;

@@ -40,6 +40,7 @@
         "controllerFacadeTypes": {
           "dropdownList": "Dropdown List",
           "radioGroup": "Radio Group",
+          "checkboxGroup" :"Checkbox Group",
           "multiDropdownList": "Multipile Dropdown List",
           "rangeTime": "Range Time",
           "rangeValue": "Range Value",

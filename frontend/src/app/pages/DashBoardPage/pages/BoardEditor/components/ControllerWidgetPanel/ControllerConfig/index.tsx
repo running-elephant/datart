@@ -80,7 +80,7 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
     otherHasOptionControllers,
   }) => {
     const filterT = useI18NPrefix('viz.common.filter');
-
+ 
     const hasRadio = useMemo(() => {
       return controllerType === ControllerFacadeTypes.RadioGroup;
     }, [controllerType]);

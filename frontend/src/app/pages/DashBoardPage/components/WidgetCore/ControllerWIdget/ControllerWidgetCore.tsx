@@ -43,6 +43,7 @@ import React, {
 } from 'react';
 import styled from 'styled-components/macro';
 import { LabelName } from '../WidgetName/WidgetName';
+import { CheckboxGroupControllerForm } from './Controller/CheckboxGroupController';
 import { MultiSelectControllerForm } from './Controller/MultiSelectController';
 import { NumberControllerForm } from './Controller/NumberController';
 import { RadioGroupControllerForm } from './Controller/RadioGroupController';
@@ -223,7 +224,16 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
             label={leftControlLabel}
           />
         );
-
+      case ControllerFacadeTypes.CheckboxGroup:
+        form.setFieldsValue({ value: controllerValues });
+        return (
+          <CheckboxGroupControllerForm
+            onChange={onControllerChange}
+            options={selectOptions}
+            name={'value'}
+            label={leftControlLabel}
+          />
+        );
       case ControllerFacadeTypes.Slider:
         form.setFieldsValue({ value: controllerValues?.[0] });
         const step = config.sliderConfig?.step || 1;
