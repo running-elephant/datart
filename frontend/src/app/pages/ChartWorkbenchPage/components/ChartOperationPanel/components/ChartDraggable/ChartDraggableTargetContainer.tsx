@@ -126,6 +126,12 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             return true;
           }
 
+          if (
+            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
+          ) {
+            return true;
+          }
+
           let items = [item];
           if (
             monitor.getItemType() ===
