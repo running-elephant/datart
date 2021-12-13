@@ -461,4 +461,5 @@ export interface ServerDatachart extends Omit<DataChart, 'config'> {
 
 export interface getDataOption {
   pageInfo?: Partial<PageInfo>;
+  sorters?: Array<{ column: string; operator?: string; aggOperator?: string }>;
 }

@@ -34,7 +34,7 @@ const BasicInputNumber: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
         <InputNumber
           {...rest}
           {...options}
-          onChange={value => onChange?.(ancestors, value)}
+          onChange={value => onChange?.(ancestors, value, options?.needRefresh)}
           defaultValue={rest?.default}
         />
       </Wrapper>

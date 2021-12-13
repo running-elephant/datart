@@ -333,17 +333,21 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     [history, orgId],
   );
   const getTableChartData = useCallback(
-    (options: { widget: Widget; params: any }) => {
+    (options: { widget: Widget; params: any; sorters?: any[] }) => {
       const { params } = options;
-      const pageInfo: Partial<PageInfo> = {
-        pageNo: params.value.page,
-      };
+      const pageInfo: Partial<PageInfo> = options.sorters
+        ? {}
+        : {
+            pageNo: params.value,
+          };
+      const sorters = options.sorters || [];
       if (editing) {
         dispatch(
           getEditChartWidgetDataAsync({
             widgetId,
             option: {
               pageInfo,
+              sorters,
             },
           }),
         );
@@ -355,6 +359,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
             renderMode,
             option: {
               pageInfo,
+              sorters,
             },
           }),
         );
@@ -412,9 +417,23 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   const widgetChartClick = useCallback(
     (widget: Widget, params: ChartMouseEventParams) => {
       // table 分页
-      if (params?.seriesType === 'table' && params?.seriesName === 'paging') {
+      if (params.componentType === 'table' && params.seriesType === 'paging') {
         // table 分页逻辑
         getTableChartData({ widget, params });
+        return;
+      }
+      if (params.componentType === 'table' && params.seriesType === 'header') {
+        // table 分页逻辑
+        getTableChartData({
+          widget,
+          params,
+          sorters: [
+            {
+              column: params?.seriesName!,
+              operator: params?.value,
+            },
+          ],
+        });
         return;
       }
       // jump

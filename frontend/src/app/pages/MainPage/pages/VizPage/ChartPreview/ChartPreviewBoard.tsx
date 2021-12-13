@@ -128,24 +128,38 @@ const ChartPreviewBoard: FC<{
         {
           name: 'click',
           callback: param => {
-            if (param.seriesName === 'paging') {
-              if (!chartPreview) {
-                return;
-              }
-              const page = param.value?.page;
+            if (
+              param.componentType === 'table' &&
+              param.seriesType === 'header'
+            ) {
               dispatch(
                 fetchDataSetByPreviewChartAction({
                   chartPreview: chartPreview!,
-                  pageInfo: { pageNo: page },
+                  sorter: {
+                    column: param?.seriesName!,
+                    operator: param?.value,
+                  },
+                }),
+              );
+              return;
+            }
+            if (
+              param.componentType === 'table' &&
+              param.seriesType === 'paging'
+            ) {
+              if (!chartPreview) {
+                return;
+              }
+              const pageNo = param.value;
+              dispatch(
+                fetchDataSetByPreviewChartAction({
+                  chartPreview: chartPreview!,
+                  pageInfo: { pageNo },
                 }),
               );
               return;
             }
           },
-        },
-        {
-          name: 'dblclick',
-          callback: param => {},
         },
       ]);
     };

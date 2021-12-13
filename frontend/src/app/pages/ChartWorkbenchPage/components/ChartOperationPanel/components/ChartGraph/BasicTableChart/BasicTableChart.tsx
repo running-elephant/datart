@@ -41,8 +41,9 @@ class BasicTableChart extends ReactChart {
   dataColumnWidths = {};
   tablePadding = 16;
   tableCellBorder = 1;
-  rowNumberWidth = this.tablePadding * 2 + 8;
   tableOptions = { dataset: {}, config: {} };
+  showSummaryRow = false;
+  rowNumberUniqKey = `@datart@rowNumberKey`;
 
   constructor(props?) {
     super(AntdTableWrapper, {
@@ -115,15 +116,23 @@ class BasicTableChart extends ReactChart {
       context,
     );
 
+    const tableColumns = this.getColumns(
+      groupConfigs,
+      aggregateConfigs,
+      styleConfigs,
+      dataColumns,
+    );
+
     return {
       rowKey: 'uid',
       pagination: tablePagination,
       dataSource: this.generateTableRowUniqId(dataColumns),
-      columns: this.getColumns(
-        groupConfigs,
-        aggregateConfigs,
-        styleConfigs,
+      columns: tableColumns,
+      summaryFn: this.getTableSummaryFn(
+        settingConfigs,
         dataColumns,
+        tableColumns,
+        aggregateConfigs,
       ),
       components: this.getTableComponents(styleConfigs),
       ...this.getAntdTableStyleOptions(
@@ -133,6 +142,65 @@ class BasicTableChart extends ReactChart {
         context?.height,
         tablePagination,
       ),
+      onChange: (pagination, filters, sorter, extra) => {
+        if (extra?.action === 'sort') {
+          this.invokeHeaderSortEvents(sorter?.field, sorter?.order);
+        }
+        if (extra?.action === 'paginate') {
+          this.invokePagingEvents(pagination?.current);
+        }
+      },
+    };
+  }
+
+  getTableSummaryFn(
+    settingConfigs,
+    dataColumns,
+    tableColumns,
+    aggregateConfigs,
+  ) {
+    const aggregateFields = this.getStyleValue(settingConfigs, [
+      'summary',
+      'aggregateFields',
+    ]);
+    this.showSummaryRow = aggregateFields && aggregateFields.length > 0;
+    if (!this.showSummaryRow) {
+      return;
+    }
+
+    const aggregateFieldConfigs = aggregateConfigs.filter(c =>
+      aggregateFields.includes(c.uid),
+    );
+
+    const _flatChildren = node => {
+      if (Array.isArray(node?.children)) {
+        return (node.children || []).reduce((acc, cur) => {
+          return acc.concat(..._flatChildren(cur));
+        }, []);
+      }
+      return [node];
+    };
+    const flatHeaderColumns = (tableColumns || []).reduce((acc, cur) => {
+      return acc.concat(..._flatChildren(cur));
+    }, []);
+
+    return _ => {
+      return {
+        summarys: flatHeaderColumns
+          .map(c => c.key)
+          .map(k => {
+            const currentSummaryField = aggregateFieldConfigs.find(
+              c => c.colName === k,
+            );
+            if (currentSummaryField) {
+              const total = dataColumns.map(
+                dc => dc?.[getValueByColumnKey(currentSummaryField)],
+              );
+              return total.reduce((acc, cur) => acc + cur, 0);
+            }
+            return null;
+          }),
+      };
     };
   }
 
@@ -155,6 +223,10 @@ class BasicTableChart extends ReactChart {
       'modal',
       'tableHeaders',
     ]);
+    const enableRowNumber = this.getStyleValue(styleConfigs, [
+      'style',
+      'enableRowNumber',
+    ]);
     const maxContentByFields = mixedSectionConfigRows.map(c => {
       const header = this.findHeader(c.uid, tableHeaders);
       const rowUniqKey = getValueByColumnKey(c);
@@ -169,7 +241,7 @@ class BasicTableChart extends ReactChart {
         );
         const headerWidth = this.getTextWidth(
           context,
-          header?.label || header.colName,
+          header?.label || header?.colName,
           headerFont.fontWeight,
           headerFont.fontSize,
           headerFont.fontFamily,
@@ -177,7 +249,26 @@ class BasicTableChart extends ReactChart {
         const sorterIconWidth = 12;
         return Math.max(width, headerWidth + sorterIconWidth);
       });
+
+      const getRowNumberWidth = maxContent => {
+        if (!enableRowNumber) {
+          return 0;
+        }
+
+        return this.getTextWidth(
+          context,
+          maxContent,
+          bodyFont.fontWeight,
+          bodyFont.fontSize,
+          bodyFont.fontFamily,
+        );
+      };
+
       return {
+        [this.rowNumberUniqKey]:
+          getRowNumberWidth(dataColumns?.length) +
+          this.tablePadding * 2 +
+          this.tableCellBorder * 2,
         [rowUniqKey]:
           Math.max(...datas) + this.tablePadding * 2 + this.tableCellBorder * 2,
       };
@@ -256,32 +347,7 @@ class BasicTableChart extends ReactChart {
       },
       body: {
         cell: props => {
-          const uid = props.uid;
           const { style, ...rest } = props;
-          // const backgroundColor = this.getStyleValue(styleConfigs, [
-          //   'column',
-          //   'modal',
-          //   'list',
-          //   uid,
-          //   'basicStyle',
-          //   'backgroundColor',
-          // ]);
-          // const textAlign = this.getStyleValue(styleConfigs, [
-          //   'column',
-          //   'modal',
-          //   'list',
-          //   uid,
-          //   'basicStyle',
-          //   'align',
-          // ]);
-          // const font = this.getStyleValue(styleConfigs, [
-          //   'column',
-          //   'modal',
-          //   'list',
-          //   uid,
-          //   'basicStyle',
-          //   'font',
-          // ]);
           const cellCssStyle = {
             textAlign: bodyTextAlign,
             backgroundColor: bodyBgColor,
@@ -329,13 +395,6 @@ class BasicTableChart extends ReactChart {
       return null;
     };
 
-    const _sortFn = rowKey => (prev, next) => {
-      if (isNaN(+prev[rowKey])) {
-        return prev[rowKey] > next[rowKey];
-      }
-      return prev[rowKey] - next[rowKey];
-    };
-
     const _getFlatColumns = (groupConfigs, aggregateConfigs, dataColumns) =>
       [...groupConfigs, ...aggregateConfigs].map(c => {
         const colName = c.colName;
@@ -367,9 +426,9 @@ class BasicTableChart extends ReactChart {
           : [];
 
         const colMaxWidth =
-          this.dataColumnWidths[getValueByColumnKey(c)] || 100;
+          this.dataColumnWidths?.[getValueByColumnKey(c)] || 100;
         return {
-          sorter: _sortFn(colName),
+          sorter: true,
           title: getColumnRenderName(c),
           dataIndex: getValueByColumnKey(c),
           key: getValueByColumnKey(c),
@@ -384,6 +443,7 @@ class BasicTableChart extends ReactChart {
                 'onCell',
                 'colName',
                 'render',
+                'sorter',
               ]),
               uid: c.uid,
             };
@@ -442,7 +502,7 @@ class BasicTableChart extends ReactChart {
             key: 'id',
             title: '',
             dataIndex: 'id',
-            width: this.rowNumberWidth,
+            width: this.dataColumnWidths?.[this.rowNumberUniqKey] || 0,
             fixed: leftFixedColumns?.length > 0 ? 'left' : null,
           } as any,
         ]
@@ -506,14 +566,11 @@ class BasicTableChart extends ReactChart {
       'modal',
       'tableHeaders',
     ]);
-    const enableRowNumber = this.getStyleValue(styleConfigs, [
-      'style',
-      'enableRowNumber',
-    ]);
     const tableSize =
       this.getStyleValue(styleConfigs, ['style', 'tableSize']) || 'default';
     const HEADER_HEIGHT = { default: 56, middle: 48, small: 40 };
     const PAGINATION_HEIGHT = { default: 64, middle: 56, small: 56 };
+    const SUMMRAY_ROW_HEIGHT = { default: 64, middle: 56, small: 56 };
     const _getMaxHeaderHierarchy = (headerStyles: Array<{ children: [] }>) => {
       const _maxDeeps = (arr: Array<{ children: [] }> = [], deeps: number) => {
         if (!isEmptyArray(arr) && arr?.length > 0) {
@@ -526,7 +583,7 @@ class BasicTableChart extends ReactChart {
 
     const totalWidth = Object.values<number>(this.dataColumnWidths).reduce(
       (a, b) => a + b,
-      enableRowNumber ? this.rowNumberWidth : 0,
+      0,
     );
     return {
       scroll: Object.assign({
@@ -535,7 +592,7 @@ class BasicTableChart extends ReactChart {
         y: !enableFixedHeader
           ? undefined
           : height -
-            0 -
+            (this.showSummaryRow ? SUMMRAY_ROW_HEIGHT[tableSize] : 0) -
             HEADER_HEIGHT[tableSize] *
               _getMaxHeaderHierarchy(tableHeaderStyles) -
             (tablePagination ? PAGINATION_HEIGHT[tableSize] : 0),
@@ -556,36 +613,47 @@ class BasicTableChart extends ReactChart {
           current: pageInfo?.pageNo,
           pageSize: pageInfo?.pageSize,
           total: pageInfo?.total,
-          ...this.registerTablePagingEvents('paging', 0, null),
         })
       : false;
   }
 
-  registerTablePagingEvents(seriesName: string, dataIndex: number, value: any) {
+  invokePagingEvents(current?: number) {
     const eventParams = {
-      componentType: 'series',
-      seriesType: 'table',
-      seriesName, // column name/index
-      dataIndex, // row index
-      value, // cell value
+      componentType: 'table',
+      seriesType: 'paging',
+      name: '',
+      seriesName: '',
+      dataIndex: undefined,
+      value: current,
     };
-    return this._mouseEvents?.reduce((acc, cur) => {
+    this._mouseEvents?.forEach(cur => {
       if (cur.name === 'click') {
-        Object.assign(acc, {
-          onChange: (page, pageSize) =>
-            cur.callback?.(
-              Object.assign({}, eventParams, { value: { page, pageSize } }),
-            ),
-        });
+        cur.callback?.(eventParams);
       }
-      return acc;
-    }, {});
+    });
+  }
+
+  invokeHeaderSortEvents(seriesName: string, value: any) {
+    const eventParams = {
+      componentType: 'table',
+      seriesType: 'header',
+      name: '',
+      seriesName,
+      dataIndex: undefined,
+      value:
+        value === undefined ? undefined : value === 'ascend' ? 'ASC' : 'DESC',
+    };
+    this._mouseEvents?.forEach(cur => {
+      if (cur.name === 'click') {
+        cur.callback?.(eventParams);
+      }
+    });
   }
 
   registerTableCellEvents(seriesName: string, dataIndex: number, value: any) {
     const eventParams = {
-      componentType: 'series',
-      seriesType: 'table',
+      componentType: 'table',
+      seriesType: 'body',
       name: value,
       seriesName, // column name/index
       dataIndex, // row index
@@ -638,11 +706,11 @@ class BasicTableChart extends ReactChart {
   };
 
   findHeader = (uid, headers) => {
-    let header = headers.find(h => h.uid === uid);
+    let header = (headers || []).find(h => h.uid === uid);
     if (!!header) {
       return header;
     }
-    for (let i = 0; i < headers.length; i++) {
+    for (let i = 0; i < (headers || []).length; i++) {
       header = this.findHeader(uid, headers[i].children || []);
       if (!!header) {
         break;
