@@ -193,6 +193,10 @@ export const SQL_OPERATOR_OPTIONS_TYPES = {
     FilterSqlOperator.In,
     FilterSqlOperator.NotIn,
   ],
+  [ControllerFacadeTypes.CheckboxGroup]: [
+    FilterSqlOperator.In,
+    FilterSqlOperator.NotIn,
+  ],
   [ControllerFacadeTypes.RadioGroup]: [
     FilterSqlOperator.Equal,
     FilterSqlOperator.NotEqual,
