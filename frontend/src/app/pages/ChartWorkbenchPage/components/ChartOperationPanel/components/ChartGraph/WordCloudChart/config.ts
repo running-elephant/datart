@@ -26,6 +26,10 @@ const config: ChartConfig = {
       required: true,
       type: 'group',
       limit: 1,
+      actions: {
+        NUMERIC: ['sortable'],
+        STRING: ['sortable'],
+      },
     },
     {
       label: 'metrics',
@@ -33,6 +37,10 @@ const config: ChartConfig = {
       required: true,
       type: 'aggregate',
       limit: 1,
+      actions: {
+        NUMERIC: ['sortable', 'aggregate'],
+        STRING: ['sortable', 'aggregate'],
+      },
     },
     {
       label: 'filter',
