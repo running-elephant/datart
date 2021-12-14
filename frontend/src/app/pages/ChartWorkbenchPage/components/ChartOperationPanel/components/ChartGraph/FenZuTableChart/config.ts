@@ -222,7 +222,7 @@ const config: ChartConfig = {
           sortAndFilter: '排序与过滤',
           enableSort: '开启列排序',
           basicStyle: '基础样式',
-          conditionStyle: '列条件样式',
+          conditionStyle: '条件样式',
           conditionStylePanel: '条件样式配置器',
           backgroundColor: '背景颜色',
           align: '对齐方式',
