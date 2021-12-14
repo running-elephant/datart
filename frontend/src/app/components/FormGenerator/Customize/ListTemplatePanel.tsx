@@ -136,6 +136,7 @@ const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           data={r}
           translate={t}
           onChange={handleChildComponentUpdate(r.key)}
+          context={currentSelectedItem}
         />
       );
     };

@@ -55,7 +55,7 @@ const config: ChartConfig = {
       ],
     },
     {
-      label: 'column.title',
+      label: 'column.conditionStyle',
       key: 'column',
       comType: 'group',
       rows: [
@@ -80,6 +80,7 @@ const config: ChartConfig = {
                     .map(c => ({
                       key: c.uid,
                       value: c.uid,
+                      type: c.type,
                       label:
                         c.label || c.aggregate
                           ? `${c.aggregate}(${c.colName})`
@@ -162,7 +163,13 @@ const config: ChartConfig = {
                     key: 'conditionStyle',
                     comType: 'group',
                     options: { expand: true },
-                    rows: [],
+                    rows: [
+                      {
+                        label: 'column.conditionStylePanel',
+                        key: 'conditionStylePanel',
+                        comType: 'conditionStylePanel',
+                      },
+                    ],
                   },
                 ],
               },
@@ -325,13 +332,13 @@ const config: ChartConfig = {
           styleAndGroup: '表头分组',
         },
         column: {
-          title: '表格数据列',
           open: '打开列设置',
           list: '字段列表',
           sortAndFilter: '排序与过滤',
           enableSort: '开启列排序',
           basicStyle: '基础样式',
           conditionStyle: '条件样式',
+          conditionStylePanel: '条件样式配置器',
           backgroundColor: '背景颜色',
           align: '对齐方式',
           enableFixedCol: '开启固定列宽',
@@ -376,7 +383,8 @@ const config: ChartConfig = {
           sortAndFilter: 'Sort and Filter',
           enableSort: 'Enable Sort',
           basicStyle: 'Baisc Style',
-          conditionStyle: 'Condition Style',
+          conditionStyle: 'Column Condition Style',
+          conditionStylePanel: 'Condition Style Panel',
           backgroundColor: 'Background Color',
           align: 'Align',
           enableFixedCol: 'Enable Fixed Column',

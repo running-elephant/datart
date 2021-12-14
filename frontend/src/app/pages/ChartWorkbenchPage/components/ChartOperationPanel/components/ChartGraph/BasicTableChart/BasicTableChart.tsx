@@ -31,6 +31,10 @@ import { toFormattedValue } from 'app/utils/number';
 import { isEmptyArray, Omit } from 'utils/object';
 import { v4 as uuidv4 } from 'uuid';
 import AntdTableWrapper from '../../ChartTools/AntdTableWrapper';
+import {
+  getCustomBodyCellStyle,
+  getCustomBodyRowStyle,
+} from './conditionStyle';
 import Config from './config';
 
 class BasicTableChart extends ReactChart {
@@ -319,6 +323,22 @@ class BasicTableChart extends ReactChart {
       'align',
     ]);
 
+    const getAllColumnListInfo = this.getValue(
+      styleConfigs,
+      ['column', 'modal', 'list'],
+      'rows',
+    );
+    let allConditionStyle: any[] = [];
+    getAllColumnListInfo?.forEach(info => {
+      const getConditionStyleValue = this.getValue(
+        info.rows,
+        ['conditionStyle', 'conditionStylePanel'],
+        'value',
+      );
+      if (Array.isArray(getConditionStyleValue)) {
+        allConditionStyle = [...allConditionStyle, ...getConditionStyleValue];
+      }
+    });
     return {
       header: {
         cell: props => {
@@ -348,15 +368,32 @@ class BasicTableChart extends ReactChart {
       body: {
         cell: props => {
           const { style, ...rest } = props;
-          const cellCssStyle = {
+          const uid = props.uid;
+          const conditionStyle = this.getStyleValue(getAllColumnListInfo, [
+            uid,
+            'conditionStyle',
+            'conditionStylePanel',
+          ]);
+          const conditionalCellStyle = getCustomBodyCellStyle(
+            props,
+            conditionStyle,
+          );
+          const bodyCellStyle = {
             textAlign: bodyTextAlign,
             backgroundColor: bodyBgColor,
             ...bodyFont,
             fontSize: +bodyFont?.fontSize,
           };
           return (
-            <td {...rest} style={Object.assign({}, cellCssStyle, style)} />
+            <td
+              {...rest}
+              style={Object.assign(style, bodyCellStyle, conditionalCellStyle)}
+            />
           );
+        },
+        row: props => {
+          const rowStyle = getCustomBodyRowStyle(props, allConditionStyle);
+          return <tr {...props} style={rowStyle} />;
         },
       },
     };
@@ -449,12 +486,15 @@ class BasicTableChart extends ReactChart {
             };
           },
           onCell: (record, rowIndex) => {
+            const cellValue = record[getValueByColumnKey(c)];
+
             return {
               uid: c.uid,
+              cellValue,
               ...this.registerTableCellEvents(
                 getValueByColumnKey(c),
                 rowIndex,
-                record[getValueByColumnKey(c)],
+                cellValue,
               ),
             };
           },
@@ -465,7 +505,7 @@ class BasicTableChart extends ReactChart {
             }
             return {
               children: formattedValue,
-              props: { rowSpan: columnRowSpans[rowIndex] },
+              props: { rowSpan: columnRowSpans[rowIndex], cellValue: value },
             };
           },
         };
