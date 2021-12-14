@@ -99,14 +99,19 @@ export const Board: React.FC<BoardProps> = memo(
     }, [boardId, dispatch, fetchData, searchParams]);
 
     const [showBoardEditor, setShowBoardEditor] = useState(false);
-
-    const toggleBoardEditor = (bool: boolean) => {
-      setShowBoardEditor(bool);
-    };
-
     const dashboard = useSelector((state: { board: BoardState }) =>
       makeSelectBoardConfigById()(state, boardId),
     );
+    const toggleBoardEditor = useCallback(
+      (bool: boolean) => {
+        setShowBoardEditor(bool);
+        if (!bool) {
+          dispatch(fetchBoardDetail({ dashboardRelId: dashboard?.id || '' }));
+        }
+      },
+      [dashboard?.id, dispatch],
+    );
+
     const publishLoading = useSelector(selectPublishLoading);
 
     const onPublish = useCallback(() => {
@@ -180,6 +185,7 @@ export const Board: React.FC<BoardProps> = memo(
       allowManage,
       hideTitle,
       publishLoading,
+      toggleBoardEditor,
       onPublish,
       showZoomCtrl,
     ]);
