@@ -15,25 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const Formats = [
-  'header',
-  'bold',
-  'italic',
-  'underline',
-  'strike',
-  'blockquote',
-  'list',
-  'bullet',
-  'indent',
-  'link',
-  'color',
-  'tag',
-  'calcfield',
-  'mention',
-  'image',
-  'size',
-  'background',
-  'font',
-  'align',
-  'code-block',
-];
+
+import BasicRichText from './BasicRichText';
+
+export default BasicRichText;

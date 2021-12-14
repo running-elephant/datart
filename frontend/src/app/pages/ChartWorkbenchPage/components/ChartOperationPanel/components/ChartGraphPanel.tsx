@@ -39,7 +39,8 @@ const ChartGraphPanel: FC<{
   chart?: Chart;
   chartConfig?: ChartConfig;
   onChartChange: (c: Chart) => void;
-}> = memo(({ chart, chartConfig, onChartChange }) => {
+  evn?: string;
+}> = memo(({ chart, chartConfig, onChartChange, evn }) => {
   const t = useI18NPrefix(`viz.palette.graph`);
   const chartManager = ChartManager.instance();
   const [allCharts] = useState<Chart[]>(chartManager.getAllCharts());
@@ -62,7 +63,7 @@ const ChartGraphPanel: FC<{
     chartId => () => {
       const chart = chartManager.getById(chartId);
       if (!!chart) {
-        onChartChange(chart);
+        onChartChange(Object.assign(chart, { _evn: evn }));
       }
     },
     [chartManager, onChartChange],

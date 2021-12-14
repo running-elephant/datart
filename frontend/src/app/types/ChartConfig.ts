@@ -297,6 +297,7 @@ export type ChartStyleSectionRow = {
   watcher?: ChartStyleSectionRowWatcher;
   template?: ChartStyleSectionRow;
   comType: ValueOf<typeof ChartStyleSectionComponentType>;
+  hidden?: boolean;
 };
 
 export type ChartStyleSectionRowOption = {
@@ -335,4 +336,5 @@ export type ChartConfig = {
   styles?: ChartStyleSectionConfig[];
   settings?: ChartStyleSectionConfig[];
   i18ns?: ChartI18NSectionConfig[];
+  _evn?: string;
 };

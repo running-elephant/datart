@@ -43,6 +43,7 @@ class Chart extends DatartChartBase {
   _stateHistory: ChartStatus[] = [];
   _hooks?: ChartEventBroker;
   _mouseEvents?: ChartMouseEvent[] = [];
+  _evn?: string;
 
   set state(state: ChartStatus) {
     this._state = state;
