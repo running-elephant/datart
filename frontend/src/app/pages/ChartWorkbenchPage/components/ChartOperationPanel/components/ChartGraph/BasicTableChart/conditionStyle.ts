@@ -2,7 +2,7 @@ import { ConditionStyleFormValues } from 'app/components/FormGenerator/Customize
 import { OperatorTypes } from 'app/components/FormGenerator/Customize/ConditionStylePanel/type';
 import { CSSProperties } from 'react';
 
-const hasMatchedTheCondition = (
+const isMatchedTheCondition = (
   value: string | number,
   operatorType: OperatorTypes,
   conditionValues: string | number | (string | number)[],
@@ -77,28 +77,37 @@ const getRowRecord = row => {
   return row?.[0]?.props?.record || {};
 };
 
+const deleteUndefinedProps = props => {
+  return Object.keys(props).reduce((acc, cur) => {
+    if (props[cur] !== undefined || props[cur] !== null) {
+      acc[cur] = props[cur];
+    }
+    return acc;
+  }, {});
+};
+
 export const getCustomBodyCellStyle = (
   props: any,
   conditionStyle: ConditionStyleFormValues[],
 ): CSSProperties => {
-  const currentConfig = getTheSameRange(conditionStyle, 'cell');
-  if (!currentConfig || currentConfig?.length === 0) {
+  const currentConfigs = getTheSameRange(conditionStyle, 'cell');
+  if (!currentConfigs?.length) {
     return {};
   }
   const text = props.cellValue;
   let cellStyle: CSSProperties = {};
 
   try {
-    currentConfig.forEach(
+    currentConfigs?.forEach(
       ({
         operator,
         value,
         color: {
           background,
-          text: color /* TODO: rename key to textColor or frontColor? */,
+          text: color /* TODO(TM): rename key to textColor or frontColor? */,
         },
       }) => {
-        cellStyle = hasMatchedTheCondition(text, operator, value)
+        cellStyle = isMatchedTheCondition(text, operator, value)
           ? { backgroundColor: background, color }
           : cellStyle;
       },
@@ -106,18 +115,18 @@ export const getCustomBodyCellStyle = (
   } catch (error) {
     console.error('getCustomBodyCellStyle | error ', error);
   }
-  return cellStyle;
+  return deleteUndefinedProps(cellStyle);
 };
 
 export const getCustomBodyRowStyle = (
   props: any,
   conditionStyle: ConditionStyleFormValues[],
 ): CSSProperties => {
-  const currentConfig: ConditionStyleFormValues[] = getTheSameRange(
+  const currentConfigs: ConditionStyleFormValues[] = getTheSameRange(
     conditionStyle,
     'row',
   );
-  if (!currentConfig || currentConfig?.length === 0) {
+  if (!currentConfigs?.length) {
     return {};
   }
 
@@ -125,19 +134,20 @@ export const getCustomBodyRowStyle = (
   let rowStyle: CSSProperties = {};
 
   try {
-    currentConfig.forEach(
+    currentConfigs?.forEach(
       ({
         operator,
         value,
         color: { background, text: color },
         target: { name },
       }) => {
-        rowStyle = hasMatchedTheCondition(rowRecord[name], operator, value)
+        rowStyle = isMatchedTheCondition(rowRecord[name], operator, value)
           ? { backgroundColor: background, color: color }
           : rowStyle;
       },
     );
-  } catch (error) {}
-
-  return rowStyle;
+  } catch (error) {
+    console.error('getCustomBodyRowStyle | error ', error);
+  }
+  return deleteUndefinedProps(rowStyle);
 };

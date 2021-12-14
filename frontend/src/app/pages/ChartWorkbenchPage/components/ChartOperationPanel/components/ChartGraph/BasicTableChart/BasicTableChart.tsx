@@ -374,8 +374,11 @@ class BasicTableChart extends ReactChart {
             'conditionStyle',
             'conditionStylePanel',
           ]);
-          const cellStyle = this.getBodyCellStyle(props, conditionStyle);
-          const cellCssStyle = {
+          const conditionalCellStyle = getCustomBodyCellStyle(
+            props,
+            conditionStyle,
+          );
+          const bodyCellStyle = {
             textAlign: bodyTextAlign,
             backgroundColor: bodyBgColor,
             ...bodyFont,
@@ -384,24 +387,17 @@ class BasicTableChart extends ReactChart {
           return (
             <td
               {...rest}
-              style={{
-                ...cellCssStyle,
-                ...cellStyle,
-                ...style,
-              }}
+              style={Object.assign(style, bodyCellStyle, conditionalCellStyle)}
             />
           );
         },
         row: props => {
-          const rowStyle = this.getBodyRowStyle(props, allConditionStyle);
+          const rowStyle = getCustomBodyRowStyle(props, allConditionStyle);
           return <tr {...props} style={rowStyle} />;
         },
       },
     };
   }
-
-  protected getBodyCellStyle = getCustomBodyCellStyle;
-  protected getBodyRowStyle = getCustomBodyRowStyle;
 
   getColumns(groupConfigs, aggregateConfigs, styleConfigs, dataColumns) {
     const enableRowNumber = this.getStyleValue(styleConfigs, [
