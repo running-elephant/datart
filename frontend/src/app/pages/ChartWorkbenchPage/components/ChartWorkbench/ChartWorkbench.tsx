@@ -46,7 +46,7 @@ const ChartWorkbench: FC<{
   onChartChange: (c: Chart) => void;
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
-  evn?: string;
+  env?: string;
 }> = memo(
   ({
     dataset,
@@ -57,7 +57,7 @@ const ChartWorkbench: FC<{
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
-    evn,
+    env,
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
@@ -83,7 +83,7 @@ const ChartWorkbench: FC<{
                   onChartChange={onChartChange}
                   onChartConfigChange={onChartConfigChange}
                   onDataViewChange={onDataViewChange}
-                  evn={evn}
+                  env={env}
                 />
               </StyledChartOperationPanel>
             </StyledChartWorkbench>

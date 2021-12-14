@@ -31,7 +31,7 @@ const ChartIFrameContainer: FC<{
   containerId?: string;
   width?: any;
   height?: any;
-  evn?: string;
+  env?: string;
 }> = memo(props => {
   const transformToSafeCSSProps = (width, height) => {
     let newStyle = { width, height };
@@ -57,7 +57,7 @@ const ChartIFrameContainer: FC<{
             chart={props.chart}
             config={props.config}
             style={transformToSafeCSSProps(props?.width, props?.height)}
-            evn={props.evn}
+            env={props.env}
           />
         </div>
       );
