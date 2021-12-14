@@ -277,6 +277,36 @@ export const refreshDatasetAction = createAsyncThunk(
   },
 );
 
+export const updateRichTextAction = createAsyncThunk(
+  'workbench/updateRichTextAction',
+  async (delta: string | undefined, thunkAPI) => {
+    try {
+      const state = thunkAPI.getState() as any;
+      const workbenchState = state.workbench as typeof initState;
+      if (!workbenchState.currentDataView?.id) {
+        return;
+      }
+      await thunkAPI.dispatch(
+        workbenchSlice.actions.updateChartConfig({
+          type: 'style',
+          payload: {
+            ancestors: [0, 0],
+            value: {
+              label: 'delta.richText',
+              key: 'richText',
+              default: '',
+              comType: 'input',
+              value: delta,
+            },
+          },
+        }),
+      );
+    } catch (error) {
+      return rejectHandle(error, thunkAPI.rejectWithValue);
+    }
+  },
+);
+
 export const fetchChartAction = createAsyncThunk(
   'workbench/fetchChartAction',
   async (arg: { chartId?: string; backendChart?: BackendChart }, thunkAPI) => {

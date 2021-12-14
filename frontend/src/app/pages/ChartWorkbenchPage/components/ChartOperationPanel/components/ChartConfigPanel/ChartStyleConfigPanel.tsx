@@ -37,25 +37,26 @@ const ChartStyleConfigPanel: FC<{
 }> = memo(
   ({ configs, dataConfigs, onChange }) => {
     const t = useI18NPrefix(`viz.palette.style`);
-
     return (
       <Collapse className="datart-config-panel" ghost>
-        {configs?.map((c, index) => (
-          <Collapse.Panel header={t(c.label)} key={c.key}>
-            <GroupLayout
-              ancestors={[index]}
-              mode={
-                c.comType === 'group'
-                  ? GroupLayoutMode.INNER
-                  : GroupLayoutMode.OUTTER
-              }
-              data={c}
-              translate={t}
-              dataConfigs={dataConfigs}
-              onChange={onChange}
-            />
-          </Collapse.Panel>
-        ))}
+        {configs?.map((c, index) =>
+          !c.hidden ? (
+            <Collapse.Panel header={t(c.label)} key={c.key}>
+              <GroupLayout
+                ancestors={[index]}
+                mode={
+                  c.comType === 'group'
+                    ? GroupLayoutMode.INNER
+                    : GroupLayoutMode.OUTTER
+                }
+                data={c}
+                translate={t}
+                dataConfigs={dataConfigs}
+                onChange={onChange}
+              />
+            </Collapse.Panel>
+          ) : null,
+        )}
       </Collapse>
     );
   },

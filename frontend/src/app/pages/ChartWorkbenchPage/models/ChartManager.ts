@@ -47,6 +47,7 @@ const {
   BasicGaugeChart,
   WaterfallChart,
   PivotSheetChart,
+  BasicRichText,
 } = WidgetPlugins;
 
 class ChartManager {
@@ -124,6 +125,7 @@ class ChartManager {
       new NormalOutlineMapChart(),
       new ScatterOutlineMapChart(),
       new BasicGaugeChart(),
+      new BasicRichText(),
     ];
   }
 }
