@@ -37,6 +37,7 @@ const ChartOperationPanel: FC<{
   onChartChange: (chart: Chart) => void;
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
+  evn?: string;
 }> = memo(
   ({
     chart,
@@ -44,6 +45,7 @@ const ChartOperationPanel: FC<{
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
+    evn,
   }) => {
     const { dataset } = useContext(ChartDatasetContext);
     const { dataView } = useContext(ChartDataViewContext);
@@ -51,7 +53,6 @@ const ChartOperationPanel: FC<{
     const [layout, setLayout] = useState<Model>(() =>
       Model.fromJson(layoutCnofig),
     );
-
     const layoutFactory = node => {
       var component = node.getComponent();
       if (component === LayoutComponentType.VIEW) {
@@ -77,6 +78,7 @@ const ChartOperationPanel: FC<{
             dataset={dataset}
             chartConfig={chartConfig}
             onChartChange={onChartChange}
+            evn={evn}
           />
         );
       }
