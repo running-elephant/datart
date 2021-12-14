@@ -496,19 +496,23 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
       return null;
     }
     let widgetData;
-    const { data } = await request<WidgetData>({
-      method: 'POST',
-      url: `data-provider/execute`,
-      data: requestParams,
-    });
-    widgetData = { ...data, id: widgetId };
-    dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
-    dispatch(
-      editWidgetInfoActions.changePageInfo({
-        widgetId,
-        pageInfo: data.pageInfo,
-      }),
-    );
+    try {
+      const { data } = await request<WidgetData>({
+        method: 'POST',
+        url: `data-provider/execute`,
+        data: requestParams,
+      });
+      widgetData = { ...data, id: widgetId };
+      dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
+      dispatch(
+        editWidgetInfoActions.changePageInfo({
+          widgetId,
+          pageInfo: data.pageInfo,
+        }),
+      );
+    } catch (error) {
+      errorHandle(error);
+    }
     return null;
   },
 );
