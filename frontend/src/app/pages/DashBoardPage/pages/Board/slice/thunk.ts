@@ -174,38 +174,18 @@ export const getWidgetData = createAsyncThunk<
   { state: RootState }
 >(
   'board/getWidgetData',
-  async ({ widget, renderMode, option }, { getState, dispatch }) => {
+  ({ widget, renderMode, option }, { getState, dispatch }) => {
     const boardId = widget.dashboardId;
     dispatch(boardActions.renderedWidgets({ boardId, widgetIds: [widget.id] }));
-
     const widgetId = widget.id;
     switch (widget.config.type) {
       case 'chart':
-        try {
-          await dispatch(
-            getChartWidgetDataAsync({ boardId, widgetId, renderMode, option }),
-          );
-          if (renderMode === 'schedule') {
-            dispatch(
-              boardActions.addFetchedItem({
-                boardId,
-                widgetId,
-              }),
-            );
-          }
-        } catch (error) {
-          if (renderMode === 'schedule') {
-            dispatch(
-              boardActions.addFetchedItem({
-                boardId,
-                widgetId,
-              }),
-            );
-          }
-        }
+        dispatch(
+          getChartWidgetDataAsync({ boardId, widgetId, renderMode, option }),
+        );
         return null;
       case 'controller':
-        await dispatch(getControllerOptions({ boardId, widgetId, renderMode }));
+        dispatch(getControllerOptions({ boardId, widgetId, renderMode }));
         return null;
       default:
         return null;
@@ -252,36 +232,46 @@ export const getChartWidgetDataAsync = createAsyncThunk<
       return null;
     }
     let widgetData;
-    if (renderMode === 'read') {
-      const { data } = await request<WidgetData>({
-        method: 'POST',
-        url: `data-provider/execute`,
-        data: requestParams,
-      });
-      widgetData = { ...data, id: widgetId };
-    } else {
-      const executeTokenMap = (getState() as RootState)?.share?.executeTokenMap;
-      const dataChart = dataChartMap[curWidget.datachartId];
-      const viewId = viewMap[dataChart.viewId].id;
-      const executeToken = executeTokenMap?.[viewId];
-      const { data } = await request<WidgetData>({
-        method: 'POST',
-        url: `share/execute`,
-        params: {
-          executeToken: executeToken?.token,
-          password: executeToken?.password,
-        },
-        data: requestParams,
-      });
-      widgetData = { ...data, id: widgetId };
+    try {
+      if (renderMode === 'read') {
+        const { data } = await request<WidgetData>({
+          method: 'POST',
+          url: `data-provider/execute`,
+          data: requestParams,
+        });
+        widgetData = { ...data, id: widgetId };
+      } else {
+        const executeTokenMap = (getState() as RootState)?.share
+          ?.executeTokenMap;
+        const dataChart = dataChartMap[curWidget.datachartId];
+        const viewId = viewMap[dataChart.viewId].id;
+        const executeToken = executeTokenMap?.[viewId];
+        const { data } = await request<WidgetData>({
+          method: 'POST',
+          url: `share/execute`,
+          params: {
+            executeToken: executeToken?.token,
+            password: executeToken?.password,
+          },
+          data: requestParams,
+        });
+        widgetData = { ...data, id: widgetId };
+      }
+      dispatch(boardActions.setWidgetData(widgetData as WidgetData));
+      dispatch(
+        boardActions.changePageInfo({
+          boardId,
+          widgetId,
+          pageInfo: widgetData.pageInfo,
+        }),
+      );
+    } catch (error) {
+      errorHandle(error);
     }
-
-    dispatch(boardActions.setWidgetData(widgetData as WidgetData));
     dispatch(
-      boardActions.changePageInfo({
+      boardActions.addFetchedItem({
         boardId,
         widgetId,
-        pageInfo: widgetData.pageInfo,
       }),
     );
     return null;
@@ -332,9 +322,8 @@ export const getControllerOptions = createAsyncThunk<
       return null;
     }
     let widgetData;
-
-    if (executeToken && renderMode !== 'read') {
-      try {
+    try {
+      if (executeToken && renderMode !== 'read') {
         const { data } = await request<ChartDataset>({
           method: 'POST',
           url: `share/execute`,
@@ -346,11 +335,7 @@ export const getControllerOptions = createAsyncThunk<
         });
         widgetData = { ...data, id: widget.id };
         dispatch(boardActions.setWidgetData(widgetData as WidgetData));
-      } catch (error) {
-        errorHandle(error);
-      }
-    } else {
-      try {
+      } else {
         const { data } = await request<WidgetData>({
           method: 'POST',
           url: `data-provider/execute`,
@@ -358,10 +343,16 @@ export const getControllerOptions = createAsyncThunk<
         });
         widgetData = { ...data, id: widget.id };
         dispatch(boardActions.setWidgetData(widgetData as WidgetData));
-      } catch (error) {
-        errorHandle(error);
       }
+    } catch (error) {
+      errorHandle(error);
     }
+    dispatch(
+      boardActions.addFetchedItem({
+        boardId,
+        widgetId,
+      }),
+    );
     return null;
   },
 );

@@ -196,6 +196,7 @@ const boardSlice = createSlice({
       }
       state.widgetInfoRecord[boardId][widgetId].inLinking = toggle;
     },
+
     addFetchedItem(
       state,
       action: PayloadAction<{ boardId: string; widgetId: string }>,
@@ -208,6 +209,7 @@ const boardSlice = createSlice({
         );
       } catch (error) {}
     },
+
     setBoardWidthHeight(
       state,
       action: PayloadAction<{ boardId: string; wh: [number, number] }>,

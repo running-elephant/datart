@@ -67,20 +67,13 @@ export interface RelatedViewFormProps {
   form: FormInstance<ControllerWidgetContent> | undefined;
   viewMap: Record<string, ChartDataView>;
   otherStrFilterWidgets: Widget[];
-  otherHasOptionControllers: Widget[];
   boardType: BoardType;
 }
 
 export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
-  ({
-    controllerType,
-    form,
-    viewMap,
-    otherStrFilterWidgets,
-    otherHasOptionControllers,
-  }) => {
+  ({ controllerType, form, viewMap, otherStrFilterWidgets }) => {
     const filterT = useI18NPrefix('viz.common.filter');
- 
+
     const hasRadio = useMemo(() => {
       return controllerType === ControllerFacadeTypes.RadioGroup;
     }, [controllerType]);
@@ -106,13 +99,6 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
           form={form}
           viewMap={viewMap}
         />
-
-        {/* sql 对应关系 */}
-        <SqlOperator controllerType={controllerType} />
-
-        {/* 按钮样式 */}
-        {hasRadio && <RadioStyleForm />}
-
         {/* slider */}
         {sliderTypes && (
           <>
@@ -120,6 +106,11 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
             <SliderMarks />
           </>
         )}
+        {/* sql 对应关系 */}
+        <SqlOperator controllerType={controllerType} />
+
+        {/* 按钮样式 */}
+        {hasRadio && <RadioStyleForm />}
 
         {/* 是否显示 */}
         <ControllerVisibility

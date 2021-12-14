@@ -34,7 +34,7 @@ import ChartDataView, {
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
-import { G90 } from 'styles/StyleConstants';
+import { G20, G90 } from 'styles/StyleConstants';
 import { filterValueTypeByControl, isRangeTypeController } from './utils';
 
 export interface RelatedViewFormProps {
@@ -143,7 +143,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                   style={{ display: 'flex', justifyContent: 'space-between' }}
                 >
                   <span>{item.id}</span>
-                  <span style={{ color: G90 }}>{item.type}</span>
+                  <span style={{ color: G20 }}>{item.type}</span>
                 </div>
               </Option>
             ));

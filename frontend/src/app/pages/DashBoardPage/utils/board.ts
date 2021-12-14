@@ -34,6 +34,7 @@ import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
   LAYOUT_COLS,
+  NeedFetchWidgetTypes,
 } from '../constants';
 
 export const getDashBoardByResBoard = (data: ServerDashboard): Dashboard => {
@@ -87,7 +88,11 @@ export const getScheduleBoardInfo = (
   let newBoardInfo: BoardInfo = { ...boardInfo };
   const needFetchItems = Object.values(widgetMap)
     .filter(widget => {
-      if (widget.viewIds.length && widget.viewIds.length > 0) {
+      if (
+        widget.viewIds &&
+        widget.viewIds.length > 0 &&
+        NeedFetchWidgetTypes.includes(widget.config.type)
+      ) {
         return true;
       }
       return false;
@@ -98,6 +103,7 @@ export const getScheduleBoardInfo = (
 
   return newBoardInfo;
 };
+
 export const getInitBoardInfo = (obj: {
   id: string;
   widgetIds?: string[];

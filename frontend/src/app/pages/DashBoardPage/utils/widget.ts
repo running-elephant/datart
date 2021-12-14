@@ -58,10 +58,7 @@ import {
   WidgetInfo,
   WidgetPadding,
 } from '../pages/Board/slice/types';
-import {
-  HasOptionsControlTypes,
-  StrControlTypes,
-} from '../pages/BoardEditor/components/ControllerWidgetPanel/constants';
+import { StrControlTypes } from '../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { ControllerConfig } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { BtnActionParams } from '../pages/BoardEditor/slice/actions/controlActions';
 
@@ -729,23 +726,7 @@ export const getOtherStringControlWidgets = (
     return allFilterWidgets.filter(ele => ele.id !== widgetId);
   }
 };
-export const getOtherHasOptionControllers = (
-  allWidgets: Widget[],
-  widgetId: string | undefined,
-) => {
-  const allFilterWidgets = allWidgets.filter(ele => {
-    if (ele.config.type !== 'controller') {
-      return false;
-    }
-    const content = ele.config.content as ControllerWidgetContent;
-    return HasOptionsControlTypes.includes(content.type);
-  });
-  if (!widgetId) {
-    return allFilterWidgets;
-  } else {
-    return allFilterWidgets.filter(ele => ele.id !== widgetId);
-  }
-};
+
 /**
  * @param ''
  * @description 'get showing controller by all filterWidget of board'
@@ -812,7 +793,7 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
   });
   return noHiddenControlWidgets;
 };
- 
+
 export const getNeedRefreshWidgetsByController = (controller: Widget) => {
   const relations = controller.relations;
   const widgetIds = relations
@@ -926,7 +907,6 @@ export const getWidgetSomeStyle = (opt: {
 
 // get some css end
 // Controller
-
 
 export const getLinkedColumn = (
   targetWidgetId: string,
