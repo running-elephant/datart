@@ -240,7 +240,6 @@ public class JdbcDataProviderAdapter implements Closeable {
         if (sqlDialect != null) {
             return sqlDialect;
         }
-
         if (StringUtils.isNotBlank(driverInfo.getSqlDialect())) {
             try {
                 Class<?> clz = Class.forName(driverInfo.getSqlDialect());
