@@ -67,20 +67,13 @@ export interface RelatedViewFormProps {
   form: FormInstance<ControllerWidgetContent> | undefined;
   viewMap: Record<string, ChartDataView>;
   otherStrFilterWidgets: Widget[];
-  otherHasOptionControllers: Widget[];
   boardType: BoardType;
 }
 
 export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
-  ({
-    controllerType,
-    form,
-    viewMap,
-    otherStrFilterWidgets,
-    otherHasOptionControllers,
-  }) => {
+  ({ controllerType, form, viewMap, otherStrFilterWidgets }) => {
     const filterT = useI18NPrefix('viz.common.filter');
- 
+
     const hasRadio = useMemo(() => {
       return controllerType === ControllerFacadeTypes.RadioGroup;
     }, [controllerType]);
