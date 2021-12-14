@@ -120,36 +120,28 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
         providerService.resetSource(source);
     }
 
-    private void excludeColumns(Dataframe data, Set<String> columns) {
+    private void excludeColumns(Dataframe data, Set<String> include) {
         if (data == null
                 || CollectionUtils.isEmpty(data.getColumns())
-                || columns == null
-                || columns.size() == 0
-                || columns.contains("*")) {
+                || include == null
+                || include.size() == 0
+                || include.contains("*")) {
             return;
         }
 
         List<Integer> excludeIndex = new LinkedList<>();
         for (int i = 0; i < data.getColumns().size(); i++) {
             Column column = data.getColumns().get(i);
-            if (!columns.contains(column.getName())) {
+            if (!include.contains(column.getName())) {
                 excludeIndex.add(i);
-                data.getColumns().remove(column);
             }
         }
         if (excludeIndex.size() > 0) {
-            List<List<Object>> rows = data.getRows().parallelStream().map(row -> {
-                List<Object> r = new LinkedList<>();
-                for (int i = 0; i < row.size(); i++) {
-                    if (excludeIndex.size() > 0 && i == excludeIndex.get(0)) {
-                        excludeIndex.remove(0);
-                    } else {
-                        r.add(row.get(i));
-                    }
+            data.getRows().parallelStream().forEach(row -> {
+                for (Integer index : excludeIndex) {
+                    row.set(index, null);
                 }
-                return r;
-            }).collect(Collectors.toList());
-            data.setRows(rows);
+            });
         }
     }
 
