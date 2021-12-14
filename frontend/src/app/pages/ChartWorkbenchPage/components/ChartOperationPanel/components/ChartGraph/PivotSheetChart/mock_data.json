@@ -8,10 +8,6 @@
   },
   "meta": [
     {
-      "field": "number",
-      "name": "数量"
-    },
-    {
       "field": "province",
       "name": "省份"
     },
@@ -26,6 +22,10 @@
     {
       "field": "sub_type",
       "name": "子类别"
+    },
+    {
+      "field": "number",
+      "name": "数量"
     }
   ],
   "data": [
