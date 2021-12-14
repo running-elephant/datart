@@ -1,19 +1,18 @@
 import { Col, Form, Input, InputNumber, Modal, Radio, Row, Select } from 'antd';
 import { ColorPickerPopover } from 'app/components/ReactColorPicker';
 import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
-import React, { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { isPairArray } from 'utils/object';
-import { ConditionStyleFormValues } from '.';
 import {
   ConditionOperatorTypes,
+  ConditionStyleFormValues,
   ConditionStyleRange,
   OperatorTypes,
   OperatorTypesLocale,
-} from './type';
+} from './types';
 
 interface AddProps {
-  currentSelectedItem?: any;
+  context?: any;
   translate?: (title: string, options?: any) => string;
   visible: boolean;
   values: ConditionStyleFormValues;
@@ -27,8 +26,7 @@ export default function Add({
   visible,
   onOk,
   onCancel,
-  // this props label and type only need in Add.tsx component?
-  currentSelectedItem: { label, type },
+  context: { label, type },
 }: AddProps) {
   const [colors] = useState([
     {
@@ -112,7 +110,7 @@ export default function Add({
         return (
           <Select
             mode="tags"
-            // would translate by i18n hook?
+            // TODO(TM) could you translate the message?
             notFoundContent={<>可添加多个值(输入内容后按下回车键完成添加)</>}
           />
         );
@@ -126,7 +124,7 @@ export default function Add({
   return (
     <Modal
       destroyOnClose
-      // would translate by i18n hook?
+      // TODO(TM) could you translate the message?
       title="条件格式"
       visible={visible}
       onOk={modalOk}

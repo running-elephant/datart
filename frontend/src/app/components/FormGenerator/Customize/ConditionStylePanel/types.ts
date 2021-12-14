@@ -1,5 +1,14 @@
 import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
 
+export interface ConditionStyleFormValues {
+  uid: string;
+  target: { name: string; type: any };
+  range: ConditionStyleRange;
+  operator: OperatorTypes;
+  value: string;
+  color: { background: string; text: string };
+}
+
 export enum ConditionStyleRange {
   Cell = 'cell',
   Row = 'row',
