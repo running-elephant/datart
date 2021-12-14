@@ -6,7 +6,7 @@ export interface ConditionStyleFormValues {
   range: ConditionStyleRange;
   operator: OperatorTypes;
   value: string;
-  color: { background: string; text: string };
+  color: { background: string; textColor: string };
 }
 
 export enum ConditionStyleRange {

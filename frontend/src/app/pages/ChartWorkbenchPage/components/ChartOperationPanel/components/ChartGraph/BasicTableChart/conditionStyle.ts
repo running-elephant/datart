@@ -99,14 +99,7 @@ export const getCustomBodyCellStyle = (
 
   try {
     currentConfigs?.forEach(
-      ({
-        operator,
-        value,
-        color: {
-          background,
-          text: color /* TODO(TM): rename key to textColor or frontColor? */,
-        },
-      }) => {
+      ({ operator, value, color: { background, textColor: color } }) => {
         cellStyle = isMatchedTheCondition(text, operator, value)
           ? { backgroundColor: background, color }
           : cellStyle;
@@ -138,11 +131,11 @@ export const getCustomBodyRowStyle = (
       ({
         operator,
         value,
-        color: { background, text: color },
+        color: { background, textColor },
         target: { name },
       }) => {
         rowStyle = isMatchedTheCondition(rowRecord[name], operator, value)
-          ? { backgroundColor: background, color: color }
+          ? { backgroundColor: background, color: textColor }
           : rowStyle;
       },
     );
