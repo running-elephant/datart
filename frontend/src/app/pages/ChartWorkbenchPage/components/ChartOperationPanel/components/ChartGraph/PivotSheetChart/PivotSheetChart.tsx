@@ -16,58 +16,58 @@
  * limitations under the License.
  */
 
+import { PivotSheet } from '@antv/s2';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import { init } from 'echarts';
 import Config from './config';
+import MockData from './mock_data.json';
 
 class PivotSheetChart extends Chart {
-  icon = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z" fill="currentColor"/></svg>`;
+  static icon = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z" fill="currentColor"/></svg>`;
   dependency = [];
   config = Config;
   chart: any = null;
-  option = {
-    xAxis: {
-      type: 'category',
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    },
-    yAxis: {
-      type: 'value',
-    },
-    series: [
-      {
-        data: [820, 932, 901, 934, 1290, 1330, 1320],
-        type: 'line',
-        areaStyle: {},
-      },
-    ],
-  };
 
   constructor() {
-    super('piovt-sheet', '透视表');
-    this.meta.icon = this.icon;
+    super('piovt-sheet', '透视表', PivotSheetChart.icon);
+    this.meta.requirements = [
+      {
+        group: [1, 999],
+        aggregate: [1, 999],
+      },
+    ];
   }
 
   onMount(options, context): void {
     if (options.containerId === undefined || !context.document) {
       return;
     }
-
-    this.chart = init(
-      context.document.getElementById(options.containerId),
-      'default',
-    );
+    const container = context?.document?.getElementById?.(options.containerId);
+    const s2Options = {
+      width: context.width,
+      height: context.height,
+    };
+    this.chart = new PivotSheet(container, {} as any, s2Options);
   }
 
-  onUpdated({ config }: { config: any }): void {
-    this.chart?.setOption(Object.assign({}, config), true);
+  onUpdated(options, context): void {
+    this.chart.setOptions({
+      width: context?.width,
+      height: context?.height,
+    });
+    this.chart.setDataCfg(MockData);
+    this.chart.render();
   }
 
   onUnMount(): void {
-    this.chart?.dispose();
+    this.chart?.destroy?.();
   }
 
-  onResize(opt: any, context): void {
-    this.chart?.resize(context);
+  onResize(options, context) {
+    this.chart.setOptions({
+      width: context?.width,
+      height: context?.height,
+    });
+    this.chart.render();
   }
 }
 
