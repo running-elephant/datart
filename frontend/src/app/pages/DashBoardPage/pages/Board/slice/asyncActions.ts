@@ -32,8 +32,11 @@ import {
   getWidgetInfoMapByServer,
   getWidgetMapByServer,
 } from '../../../utils/widget';
-import { PageInfo } from './../../../../MainPage/pages/ViewPage/slice/types';
-import { getChartWidgetDataAsync } from './thunk';
+import {
+  PageInfo,
+  View,
+} from './../../../../MainPage/pages/ViewPage/slice/types';
+import { getChartWidgetDataAsync, getWidgetData } from './thunk';
 import { BoardState, DataChart, ServerDashboard, VizRenderMode } from './types';
 
 export const handleServerBoardAction =
@@ -155,16 +158,25 @@ export const resetControllerAction =
       pageNo: 1,
     };
 
-    Object.values(widgetMap)
-      .filter(it => it.config.type === 'chart')
-      .forEach(it => {
-        dispatch(
-          getChartWidgetDataAsync({
-            boardId,
-            widgetId: it.id,
-            renderMode,
-            option: { pageInfo },
-          }),
-        );
-      });
+    Object.values(widgetMap).forEach(widget => {
+      dispatch(
+        getWidgetData({
+          boardId,
+          widget: widget,
+          renderMode,
+          option: { pageInfo },
+        }),
+      );
+    });
+  };
+
+export const saveToViewMapAction =
+  (serverView: View) => (dispatch, getState) => {
+    const boardState = getState() as { board: BoardState };
+    const viewMap = boardState.board.viewMap;
+    let existed = serverView.id in viewMap;
+    if (!existed) {
+      const viewViews = getChartDataView([serverView], []);
+      dispatch(boardActions.setViewMap(viewViews));
+    }
   };

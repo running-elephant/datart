@@ -19,15 +19,15 @@
 package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
-import datart.core.entity.BaseEntity;
-import datart.core.entity.Datachart;
-import datart.core.entity.RelSubjectColumns;
-import datart.core.entity.View;
+import datart.core.entity.*;
 import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.RelSubjectColumnsMapperExt;
 import datart.core.mappers.ext.ViewMapperExt;
 import datart.security.base.ResourceType;
+import datart.security.exception.PermissionDeniedException;
+import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.PermissionHelper;
 import datart.server.base.dto.ViewDetailDTO;
 import datart.server.base.params.*;
@@ -169,7 +169,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
             check.setName(newName);
             checkUnique(check);
         }
-        
+
         // update status
         view.setName(newName);
         view.setParentId(parentId);
@@ -251,22 +251,29 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         return ViewService.super.update(updateParam);
     }
 
-
     @Override
     public void requirePermission(View view, int permission) {
-
         if (securityManager.isOrgOwner(view.getOrgId())) {
             return;
         }
-        if (view.getId() == null || rrrMapper.countUserPermission(view.getId(), getCurrentUser().getId()) == 0) {
+        List<Role> roles = roleService.listUserRoles(view.getOrgId(), getCurrentUser().getId());
+        boolean hasPermission = roles.stream().anyMatch(role -> hasPermission(role, view, permission));
+        if (!hasPermission) {
+            Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied",
+                    ResourceType.VIEW +":"+ view.getName() + ":" + ShiroSecurityManager.expand2StringPermissions(permission));
+        }
+    }
+
+    private boolean hasPermission(Role role, View view, int permission) {
+        if (view.getId() == null || rrrMapper.countRolePermission(view.getId(), role.getId()) == 0) {
             View parent = viewMapper.selectByPrimaryKey(view.getParentId());
             if (parent == null) {
-                securityManager.requirePermissions(PermissionHelper.viewPermission(view.getOrgId(), ResourceType.VIEW.name(), permission));
+                return securityManager.hasPermission(PermissionHelper.viewPermission(view.getOrgId(), role.getId(), ResourceType.VIEW.name(), permission));
             } else {
-                requirePermission(parent, permission);
+                return hasPermission(role, parent, permission);
             }
         } else {
-            securityManager.requirePermissions(PermissionHelper.viewPermission(view.getOrgId(), view.getId(), permission));
+            return securityManager.hasPermission(PermissionHelper.viewPermission(view.getOrgId(), role.getId(), view.getId(), permission));
         }
     }
 

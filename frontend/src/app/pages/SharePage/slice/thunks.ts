@@ -123,7 +123,14 @@ export const fetchShareVizInfo = createAsyncThunk(
 
 export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
   'share/fetchDataSetByPreviewChartAction',
-  async (args: { preview: ChartPreview; pageInfo?: any }, thunkAPI) => {
+  async (
+    args: {
+      preview: ChartPreview;
+      pageInfo?: any;
+      sorter?: { column: string; operator: string; aggOperator?: string };
+    },
+    thunkAPI,
+  ) => {
     const state = thunkAPI.getState() as RootState;
     const shareState = state.share;
     const builder = new ChartDataRequestBuilder(
@@ -143,7 +150,9 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
         executeToken: shareState?.executeToken,
         password: shareState?.sharePassword,
       },
-      data: builder.build(),
+      data: builder
+        .addExtraSorters(args?.sorter ? [args?.sorter as any] : [])
+        .build(),
     });
     return response.data;
   },

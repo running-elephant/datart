@@ -180,7 +180,7 @@ public class OrgServiceImpl extends BaseService implements OrgService {
 
     @Override
     public List<UserBaseInfo> listOrgMembers(String orgId) {
-        securityManager.requirePermissions(PermissionHelper.userPermission(orgId, Const.READ));
+        securityManager.requireAllPermissions(PermissionHelper.userPermission(orgId, Const.READ));
         List<User> users = organizationMapper.listOrgMembers(orgId);
         if (users == null || users.size() == 0) {
             return Collections.emptyList();
@@ -286,7 +286,7 @@ public class OrgServiceImpl extends BaseService implements OrgService {
 
     @Override
     public List<RoleBaseInfo> listUserRoles(String orgId, String userId) {
-        securityManager.requirePermissions(PermissionHelper.rolePermission(orgId, Const.READ));
+        securityManager.requireAllPermissions(PermissionHelper.rolePermission(orgId, Const.READ));
         List<Role> roles = roleMapper.listUserGeneralRoles(orgId, userId);
         if (roles == null || roles.size() == 0) {
             return Collections.emptyList();
@@ -299,7 +299,7 @@ public class OrgServiceImpl extends BaseService implements OrgService {
         if ((Const.CREATE | permission) == Const.CREATE) {
             return;
         }
-        securityManager.requirePermissions(PermissionHelper.rolePermission(entity.getId(), permission));
+        securityManager.requireAllPermissions(PermissionHelper.rolePermission(entity.getId(), permission));
     }
 
     @Override

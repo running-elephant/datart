@@ -24,27 +24,30 @@ import datart.security.base.ResourceType;
 public class PermissionHelper {
 
 
-    public static Permission vizPermission(String orgId, String vizId, int permission) {
+    public static Permission vizPermission(String orgId,String roleId, String vizId, int permission) {
         return Permission.builder()
                 .orgId(orgId)
+                .roleId(roleId)
                 .resourceType(ResourceType.VIZ.name())
                 .resourceId(vizId)
                 .permission(permission)
                 .build();
     }
 
-    public static Permission sourcePermission(String orgId, String sourceId, int permission) {
+    public static Permission sourcePermission(String orgId,String roleId, String sourceId, int permission) {
         return Permission.builder()
                 .orgId(orgId)
+                .roleId(roleId)
                 .resourceType(ResourceType.SOURCE.name())
                 .resourceId(sourceId)
                 .permission(permission)
                 .build();
     }
 
-    public static Permission viewPermission(String orgId, String viewId, int permission) {
+    public static Permission viewPermission(String orgId,String roleId, String viewId, int permission) {
         return Permission.builder()
                 .orgId(orgId)
+                .roleId(roleId)
                 .resourceType(ResourceType.VIEW.name())
                 .resourceId(viewId)
                 .permission(permission)
@@ -53,8 +56,9 @@ public class PermissionHelper {
 
     public static Permission rolePermission(String orgId, int permission) {
         return Permission.builder()
-                .resourceType(ResourceType.ROLE.name())
                 .orgId(orgId)
+                .roleId("*")
+                .resourceType(ResourceType.ROLE.name())
                 .resourceId("*")
                 .permission(permission)
                 .build();
@@ -63,15 +67,17 @@ public class PermissionHelper {
     public static Permission userPermission(String orgId, int permission) {
         return Permission.builder()
                 .orgId(orgId)
+                .roleId("*")
                 .resourceType(ResourceType.USER.name())
                 .resourceId("*")
                 .permission(permission)
                 .build();
     }
 
-    public static Permission schedulePermission(String orgId, String scheduleId, int permission) {
+    public static Permission schedulePermission(String orgId,String roleId, String scheduleId, int permission) {
         return Permission.builder()
                 .orgId(orgId)
+                .roleId(roleId)
                 .resourceType(ResourceType.SCHEDULE.name())
                 .resourceId(scheduleId)
                 .permission(permission)

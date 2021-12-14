@@ -49,8 +49,12 @@ export const RelatedWidgets: React.FC<RelatedWidgetsProps> = memo(
     const columns = useMemo(
       () => [
         {
-          title: '',
+          title: '组件名称',
           render: (w: Widget) => <span>{w.config.name}</span>,
+        },
+        {
+          title: '组件类型',
+          render: (w: Widget) => <span>{w.config.type}</span>,
         },
       ],
       [],

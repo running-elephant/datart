@@ -100,7 +100,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
     @Transactional
     public boolean updateUsersForRole(String roleId, Set<String> userIds) {
         Role role = retrieve(roleId);
-        securityManager.requirePermissions(PermissionHelper.rolePermission(role.getOrgId(), Const.READ | Const.MANAGE),
+        securityManager.requireAllPermissions(PermissionHelper.rolePermission(role.getOrgId(), Const.READ | Const.MANAGE),
                 PermissionHelper.userPermission(role.getOrgId(), Const.READ | Const.MANAGE));
         List<User> users = roleMapper.listRoleUsers(roleId);
         List<String> userToDelete = new ArrayList<>();
@@ -126,7 +126,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
         requireExists(userId, User.class);
 
-        securityManager.requirePermissions(
+        securityManager.requireAllPermissions(
                 PermissionHelper.userPermission(orgId, Const.READ | Const.MANAGE));
 
         List<Role> roles = roleMapper.selectUserAllRoles(userId);
@@ -204,9 +204,14 @@ public class RoleServiceImpl extends BaseService implements RoleService {
     }
 
     @Override
+    public List<Role> listUserRoles(String orgId, String userId) {
+        return roleMapper.selectUserRoles(orgId, userId);
+    }
+
+    @Override
     public List<UserBaseInfo> listRoleUsers(String roleId) {
         Role role = retrieve(roleId);
-        securityManager.requirePermissions(PermissionHelper.rolePermission(role.getOrgId(), Const.READ)
+        securityManager.requireAllPermissions(PermissionHelper.rolePermission(role.getOrgId(), Const.READ)
                 , PermissionHelper.userPermission(role.getOrgId(), Const.READ));
         List<User> users = roleMapper.listRoleUsers(roleId);
         return users.stream().map(UserBaseInfo::new).collect(Collectors.toList());
@@ -585,6 +590,6 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
     @Override
     public void requirePermission(Role entity, int permission) {
-        securityManager.requirePermissions(PermissionHelper.rolePermission(entity.getOrgId(), permission));
+        securityManager.requireAllPermissions(PermissionHelper.rolePermission(entity.getOrgId(), permission));
     }
 }

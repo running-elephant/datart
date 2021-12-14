@@ -23,9 +23,10 @@ import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.core.mappers.ext.*;
 import datart.security.base.ResourceType;
+import datart.security.exception.PermissionDeniedException;
+import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.PermissionHelper;
 import datart.core.base.exception.NotAllowedException;
-import datart.core.base.exception.NotFoundException;
 import datart.core.base.exception.ParamException;
 import datart.server.base.params.*;
 import datart.server.service.BaseService;
@@ -73,16 +74,25 @@ public class FolderServiceImpl extends BaseService implements FolderService {
 
     @Override
     public void requirePermission(Folder folder, int permission) {
-        if (folder.getId() == null || rrrMapper.countUserPermission(folder.getId(), getCurrentUser().getId()) == 0) {
+        List<Role> roles = roleService.listUserRoles(folder.getOrgId(), getCurrentUser().getId());
+        boolean hasPermission = roles.stream().anyMatch(role -> hasPermission(role, folder, permission));
+        if (!hasPermission) {
+            Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied",
+                    folder.getRelType() + ":" + folder.getName() + ":" + ShiroSecurityManager.expand2StringPermissions(permission));
+        }
+    }
+
+    private boolean hasPermission(Role role, Folder folder, int permission) {
+        if (folder.getId() == null || rrrMapper.countRolePermission(folder.getId(), role.getId()) == 0) {
             Folder parent = folderMapper.selectByPrimaryKey(folder.getParentId());
             if (parent == null) {
-                securityManager.requirePermissions(PermissionHelper.vizPermission(folder.getOrgId(),
+                return securityManager.hasPermission(PermissionHelper.vizPermission(folder.getOrgId(), role.getId(),
                         ResourceType.FOLDER.name(), permission));
             } else {
-                requirePermission(parent, permission);
+                return hasPermission(role, parent, permission);
             }
         } else {
-            securityManager.requirePermissions(PermissionHelper.vizPermission(folder.getOrgId(), folder.getId(), permission));
+            return securityManager.hasPermission(PermissionHelper.vizPermission(folder.getOrgId(), role.getId(), folder.getId(), permission));
         }
     }
 

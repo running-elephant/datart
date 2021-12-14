@@ -18,6 +18,7 @@
 import { Cascader, CascaderProps } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
+import { saveToViewMapAction } from 'app/pages/DashBoardPage/pages/Board/slice/asyncActions';
 import {
   View,
   ViewSimple,
@@ -29,6 +30,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
+import { useDispatch } from 'react-redux';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 export interface AssistViewFieldsProps
@@ -38,21 +40,30 @@ export interface AssistViewFieldsProps
 }
 export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
   ({ onChange, value }) => {
+    const dispatch = useDispatch();
     const { orgId } = useContext(BoardContext);
     const [options, setOptions] = useState<CascaderOptionType[]>([]);
-    const getChildren = useCallback(async viewId => {
-      const { data } = await request<View>(`/views/${viewId}`);
-      try {
-        const model = JSON.parse(data.model);
-        const items: CascaderOptionType[] = Object.keys(model).map(key => {
-          return {
-            value: key,
-            label: key,
-          };
-        });
-        return items;
-      } catch (error) {}
-    }, []);
+    const getChildren = useCallback(
+      async viewId => {
+        try {
+          const { data } = await request<View>(`/views/${viewId}`);
+
+          const model = JSON.parse(data.model);
+          const items: CascaderOptionType[] = Object.keys(model).map(key => {
+            return {
+              value: key,
+              label: key,
+            };
+          });
+          setTimeout(() => {
+            dispatch(saveToViewMapAction(data));
+          }, 0);
+
+          return items;
+        } catch (error) {}
+      },
+      [dispatch],
+    );
     const setViews = useCallback(
       async orgId => {
         try {
@@ -90,6 +101,7 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
         const targetOption = selectedOptions[selectedOptions.length - 1];
         targetOption.loading = true;
         targetOption.children = await getChildren(targetOption.value);
+        //
         targetOption.loading = false;
         const nextOptions = [...options].map(item => {
           if (item.value === targetOption.value) {
@@ -98,6 +110,7 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
             return item;
           }
         });
+        console.log('__targetOption', targetOption);
         setOptions(nextOptions);
       },
       [options, getChildren],

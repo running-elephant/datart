@@ -84,7 +84,7 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
         storyboardDetail.setStorypages(storypageService.listByStoryboard(storyboardId));
         // download permission
         storyboardDetail.setDownload(securityManager
-                .hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), storyboardId, Const.DOWNLOAD)));
+                .hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), "*", storyboardId, Const.DOWNLOAD)));
 
         return storyboardDetail;
     }
@@ -101,11 +101,11 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
     @Override
     public void requirePermission(Storyboard storyboard, int permission) {
         if ((permission & Const.CREATE) == Const.CREATE) {
-            securityManager.requirePermissions(PermissionHelper.vizPermission(storyboard.getOrgId(),
+            securityManager.requireAllPermissions(PermissionHelper.vizPermission(storyboard.getOrgId(), "*",
                     ResourceType.STORYBOARD.name(), permission));
             return;
         }
-        securityManager.requirePermissions(PermissionHelper.vizPermission(storyboard.getOrgId(), storyboard.getId(), permission));
+        securityManager.requireAllPermissions(PermissionHelper.vizPermission(storyboard.getOrgId(), "*", storyboard.getId(), permission));
     }
 
     @Override

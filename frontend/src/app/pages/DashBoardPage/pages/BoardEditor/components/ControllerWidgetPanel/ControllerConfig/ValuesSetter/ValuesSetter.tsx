@@ -21,6 +21,7 @@ import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { useCallback, useMemo } from 'react';
 import { ControllerValuesName, ValueOptionsName } from '..';
+import { DateControllerTypes, HasOptionsControlTypes } from '../../constants';
 import { ControllerConfig } from '../../types';
 import { MaxAndMinSetter } from './MaxAndMinSetter';
 import { NumberSetter } from './NumberSetter';
@@ -29,17 +30,6 @@ import { SliderSetter } from './SliderSetter/SliderSet';
 import { TextSetter } from './TextSetter';
 import { TimeSetter } from './TimeSetter/TimeSetter';
 import ValuesOptionsSetter from './ValuesOptionsSetter/ValuesOptionsSetter';
-
-export const NeedOptionsTypes = [
-  ControllerFacadeTypes.DropdownList,
-  ControllerFacadeTypes.MultiDropdownList,
-  ControllerFacadeTypes.RadioGroup,
-];
-
-export const TimeTypes = [
-  ControllerFacadeTypes.Time,
-  ControllerFacadeTypes.RangeTime,
-];
 
 export const ValuesSetter: React.FC<{
   controllerType: ControllerFacadeTypes;
@@ -51,11 +41,11 @@ export const ValuesSetter: React.FC<{
   }, [form]);
 
   const hasOption = useMemo(() => {
-    return NeedOptionsTypes.includes(controllerType);
+    return HasOptionsControlTypes.includes(controllerType);
   }, [controllerType]);
 
   const hasTime = useMemo(() => {
-    return TimeTypes.includes(controllerType);
+    return DateControllerTypes.includes(controllerType);
   }, [controllerType]);
 
   const isText = useMemo(() => {

@@ -9,7 +9,6 @@ import {
   getDataOption,
   SaveDashboard,
   ServerDatachart,
-  ServerView,
   Widget,
   WidgetData,
   WidgetInfo,
@@ -29,7 +28,9 @@ import {
   createWidgetInfoMap,
   getWidgetInfoMapByServer,
 } from 'app/pages/DashBoardPage/utils/widget';
+import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
+import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
@@ -44,7 +45,6 @@ import {
   editWidgetInfoActions,
 } from '.';
 import { BoardInfo, BoardType, ServerDashboard } from '../../Board/slice/types';
-import { getDistinctFields } from './../../../../../utils/fetch';
 import { getDataChartMap } from './../../../utils/board';
 import {
   getWidgetMapByServer,
@@ -241,7 +241,7 @@ export const addDataChartWidgets = createAsyncThunk<
       data: { datacharts, views },
     } = await request<{
       datacharts: ServerDatachart[];
-      views: ServerView[];
+      views: View[];
     }>({
       url: `viz/datacharts?datachartIds=${chartIds.join()}`,
       method: 'get',
@@ -308,14 +308,14 @@ export const renderedEditWidgetAsync = createAsyncThunk<
 >(
   'editBoard/renderedEditWidgetAsync',
   async ({ boardId, widgetId }, { getState, dispatch, rejectWithValue }) => {
-    const { widgetRecord } = editBoardStackState(
+    const { widgetRecord: WidgetMap } = editBoardStackState(
       getState() as unknown as {
         editBoard: HistoryEditBoard;
       },
     );
-    const curWidget = widgetRecord[widgetId];
+    const curWidget = WidgetMap[widgetId];
     if (!curWidget) return null;
-    // 1 widget render
+
     dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
 
     if (curWidget.config.type === 'container') {
@@ -328,121 +328,12 @@ export const renderedEditWidgetAsync = createAsyncThunk<
       dispatch(editWidgetInfoActions.renderedWidgets(subWidgetIds));
       //  2 widget getData
       subWidgetIds.forEach(wid => {
-        dispatch(getEditWidgetDataAsync({ widgetId: wid }));
+        dispatch(getEditWidgetData({ widget: WidgetMap[wid] }));
       });
       return null;
     }
     // 2 widget getData
-    dispatch(getEditWidgetDataAsync({ widgetId }));
-    return null;
-  },
-);
-export const getEditWidgetDataAsync = createAsyncThunk<
-  null,
-  { widgetId: string; option?: getDataOption },
-  { state: RootState }
->(
-  'editBoard/getEditWidgetDataAsync',
-  async ({ widgetId, option }, { getState, dispatch }) => {
-    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
-    const rootState = getState() as RootState;
-    const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
-    const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
-
-    const curWidget = widgetMap[widgetId];
-    if (!curWidget) return null;
-
-    switch (curWidget.config.type) {
-      case 'chart':
-        await dispatch(getEditChartWidgetDataAsync({ widgetId, option }));
-        return null;
-      case 'controller':
-        await dispatch(getEditControllerOptionAsync(curWidget));
-        return null;
-      case 'media':
-      case 'container':
-      default:
-        return null;
-    }
-  },
-);
-export const getEditControllerOptionAsync = createAsyncThunk<
-  null,
-  Widget,
-  { state: RootState }
->('editBoard/getControllerOptions', async (widget, { getState, dispatch }) => {
-  const content = widget.config.content as ControllerWidgetContent;
-  const config = content.config;
-  if (config.assistViewFields && Array.isArray(config.assistViewFields)) {
-    // 请求
-    const [viewId, viewField] = config.assistViewFields;
-    const dataset = await getDistinctFields(
-      viewId,
-      viewField,
-      undefined,
-      undefined,
-    );
-    dispatch(
-      editWidgetDataActions.setWidgetData({
-        ...dataset,
-        id: widget.id,
-      } as unknown as WidgetData),
-    );
-  }
-  return null;
-});
-
-export const getEditChartWidgetDataAsync = createAsyncThunk<
-  null,
-  {
-    widgetId: string;
-    option?: getDataOption;
-  },
-  { state: RootState }
->(
-  'editBoard/getEditChartWidgetDataAsync',
-  async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
-    const rootState = getState() as RootState;
-    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
-    const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
-    const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
-    const editBoard = rootState.editBoard;
-    const boardInfo = editBoard?.boardInfo as BoardInfo;
-    const boardState = rootState.board as BoardState;
-    const widgetInfo = editBoard?.widgetInfoRecord[widgetId];
-    const viewMap = boardState.viewMap;
-    const curWidget = widgetMap[widgetId];
-
-    if (!curWidget) return null;
-    const dataChartMap = boardState.dataChartMap;
-    const boardLinkFilters = boardInfo.linkFilter;
-
-    let requestParams = getChartWidgetRequestParams({
-      widgetId,
-      widgetMap,
-      viewMap,
-      option,
-      widgetInfo,
-      dataChartMap,
-      boardLinkFilters,
-    });
-    if (!requestParams) {
-      return null;
-    }
-    let widgetData;
-    const { data } = await request<WidgetData>({
-      method: 'POST',
-      url: `data-provider/execute`,
-      data: requestParams,
-    });
-    widgetData = { ...data, id: widgetId };
-    dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
-    dispatch(
-      editWidgetInfoActions.changePageInfo({
-        widgetId,
-        pageInfo: data.pageInfo,
-      }),
-    );
+    dispatch(getEditWidgetData({ widget: curWidget }));
     return null;
   },
 );
@@ -546,5 +437,129 @@ export const uploadBoardImage = createAsyncThunk<
       errorHandle(error);
       throw error;
     }
+  },
+);
+
+export const getEditWidgetData = createAsyncThunk<
+  null,
+  { widget: Widget; option?: getDataOption },
+  { state: RootState }
+>(
+  'editBoard/getEditWidgetData',
+  ({ widget, option }, { getState, dispatch }) => {
+    dispatch(editWidgetInfoActions.renderedWidgets([widget.id]));
+    if (widget.config.type === 'chart') {
+      dispatch(getEditChartWidgetDataAsync({ widgetId: widget.id, option }));
+    }
+    if (widget.config.type === 'controller') {
+      dispatch(getEditControllerOptions(widget.id));
+    }
+    return null;
+  },
+);
+
+export const getEditChartWidgetDataAsync = createAsyncThunk<
+  null,
+  {
+    widgetId: string;
+    option?: getDataOption;
+  },
+  { state: RootState }
+>(
+  'editBoard/getEditChartWidgetDataAsync',
+  async ({ widgetId, option }, { getState, dispatch, rejectWithValue }) => {
+    const rootState = getState() as RootState;
+    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
+    const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
+    const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
+    const editBoard = rootState.editBoard;
+    const boardInfo = editBoard?.boardInfo as BoardInfo;
+    const boardState = rootState.board as BoardState;
+    const widgetInfo = editBoard?.widgetInfoRecord[widgetId];
+    const viewMap = boardState.viewMap;
+    const curWidget = widgetMap[widgetId];
+
+    if (!curWidget) return null;
+    const dataChartMap = boardState.dataChartMap;
+    const boardLinkFilters = boardInfo.linkFilter;
+
+    let requestParams = getChartWidgetRequestParams({
+      widgetId,
+      widgetMap,
+      viewMap,
+      option,
+      widgetInfo,
+      dataChartMap,
+      boardLinkFilters,
+    });
+    if (!requestParams) {
+      return null;
+    }
+    let widgetData;
+    const { data } = await request<WidgetData>({
+      method: 'POST',
+      url: `data-provider/execute`,
+      data: requestParams,
+    });
+    widgetData = { ...data, id: widgetId };
+    dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
+    dispatch(
+      editWidgetInfoActions.changePageInfo({
+        widgetId,
+        pageInfo: data.pageInfo,
+      }),
+    );
+    return null;
+  },
+);
+
+export const getEditControllerOptions = createAsyncThunk<
+  null,
+  string,
+  { state: RootState }
+>(
+  'editBoard/getEditControllerOptions',
+  async (widgetId, { getState, dispatch }) => {
+    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
+    const rootState = getState() as RootState;
+
+    const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
+    const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
+    const widget = widgetMap[widgetId];
+    if (!widget) return null;
+    const content = widget.config.content as ControllerWidgetContent;
+    const config = content.config;
+    if (!Array.isArray(config.assistViewFields)) return null;
+    if (config.assistViewFields.length !== 2) return null;
+
+    const boardState = rootState.board as BoardState;
+    const viewMap = boardState.viewMap;
+    const [viewId, viewField] = config.assistViewFields;
+    const view = viewMap[viewId];
+    if (!view) return null;
+    const requestParams = getControlOptionQueryParams({
+      view,
+      field: viewField,
+      curWidget: widget,
+      widgetMap,
+    });
+
+    if (!requestParams) {
+      return null;
+    }
+    let widgetData;
+    try {
+      const { data } = await request<WidgetData>({
+        method: 'POST',
+        url: `data-provider/execute`,
+        data: requestParams,
+      });
+      widgetData = { ...data, id: widget.id };
+      dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
+    } catch (error) {
+      errorHandle(error);
+    }
+
+    return null;
   },
 );

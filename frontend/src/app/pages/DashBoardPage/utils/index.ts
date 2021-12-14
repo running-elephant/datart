@@ -120,21 +120,14 @@ export const getTneWidgetFiltersAndParams = (obj: {
   params: Record<string, string[]> | undefined;
 }) => {
   const { chartWidget, widgetMap, params: chartParams } = obj;
-  const filterWidgets = Object.values(widgetMap).filter(
+  const controllerWidgets = Object.values(widgetMap).filter(
     widget => widget.config.type === 'controller',
   );
 
   let filterParams: ChartRequestFilter[] = [];
   let variableParams: Record<string, any[]> = {};
 
-  // TODO chartParams 实现后添加 --xld
-  // if (chartParams) {
-  //   Object.keys(chartParams).forEach(key => {
-  //     variableParams[key] = chartParams[key];
-  //   });
-  // }
-
-  filterWidgets.forEach(filterWidget => {
+  controllerWidgets.forEach(filterWidget => {
     const hasRelation = filterWidget.relations.find(
       re => re.targetId === chartWidget.id,
     );
@@ -402,7 +395,9 @@ export const getChartWidgetRequestParams = (obj: {
     return null;
   }
   const builder = getChartDataRequestBuilder(dataChart);
-  let requestParams = builder.build();
+  let requestParams = builder
+    .addExtraSorters((option?.sorters as any) || [])
+    .build();
   const viewConfig = transformToViewConfig(chartDataView?.config);
   requestParams = { ...requestParams, ...viewConfig };
 

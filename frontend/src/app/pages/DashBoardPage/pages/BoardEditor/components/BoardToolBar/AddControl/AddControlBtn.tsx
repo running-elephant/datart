@@ -31,7 +31,7 @@ export interface ButtonItemType<T> {
   name: string;
   icon: any;
   type: T;
-  disabled: boolean;
+  disabled?: boolean;
 }
 export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   const { boardId, boardType, showLabel } = useContext(BoardToolBarContext);
@@ -52,31 +52,26 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
       name: '单选下拉菜单',
       icon: '',
       type: ControllerFacadeTypes.DropdownList,
-      disabled: false,
     },
     {
       name: '多选下拉菜单',
       icon: '',
       type: ControllerFacadeTypes.MultiDropdownList,
-      disabled: false,
     },
     {
       name: '单选按钮',
       icon: '',
       type: ControllerFacadeTypes.RadioGroup,
-      disabled: false,
     },
-    // {
-    //   name: '复选框',
-    //   icon: '',
-    //   type: ControllerFacadeTypes.RadioGroup,
-    //   disabled: false,
-    // },
+    {
+      name: '多选框',
+      icon: '',
+      type: ControllerFacadeTypes.CheckboxGroup,
+    },
     {
       name: '文本',
       icon: '',
       type: ControllerFacadeTypes.Text,
-      disabled: false,
     },
     // {
     //   name: '单选下拉树',
@@ -96,13 +91,11 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
       name: '日期范围',
       icon: '',
       type: ControllerFacadeTypes.RangeTime,
-      disabled: false,
     },
     {
       name: '日期',
       icon: '',
       type: ControllerFacadeTypes.Time,
-      disabled: false,
     },
   ];
   const numericalControllers = [
@@ -110,19 +103,16 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
       name: '数值范围',
       icon: '',
       type: ControllerFacadeTypes.RangeValue,
-      disabled: false,
     },
     {
       name: '数值',
       icon: '',
       type: ControllerFacadeTypes.Value,
-      disabled: false,
     },
     {
       name: '滑块',
       icon: '',
       type: ControllerFacadeTypes.Slider,
-      disabled: false,
     },
     // {
     //   name: '范围滑块',
@@ -151,22 +141,22 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   const controlerItems = (
     <Menu onClick={onAddControler}>
       <Menu.ItemGroup key="conventionalControllers" title={renderTitle('常规')}>
-        {conventionalControllers.map(({ name, icon, type, disabled }) => (
-          <Menu.Item key={type} icon={icon} disabled={disabled}>
+        {conventionalControllers.map(({ name, icon, type }) => (
+          <Menu.Item key={type} icon={icon}>
             {name}
           </Menu.Item>
         ))}
       </Menu.ItemGroup>
       <Menu.ItemGroup key="dateControllers" title={renderTitle('日期')}>
-        {dateControllers.map(({ name, icon, type, disabled }) => (
-          <Menu.Item key={type} icon={icon} disabled={disabled}>
+        {dateControllers.map(({ name, icon, type }) => (
+          <Menu.Item key={type} icon={icon}>
             {name}
           </Menu.Item>
         ))}
       </Menu.ItemGroup>
       <Menu.ItemGroup key="numericalControllers" title={renderTitle('数值')}>
-        {numericalControllers.map(({ name, icon, type, disabled }) => (
-          <Menu.Item key={type} icon={icon} disabled={disabled}>
+        {numericalControllers.map(({ name, icon, type }) => (
+          <Menu.Item key={type} icon={icon}>
             {name}
           </Menu.Item>
         ))}

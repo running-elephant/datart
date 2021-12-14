@@ -301,7 +301,14 @@ export const fetchVizChartAction = createAsyncThunk(
 
 export const fetchDataSetByPreviewChartAction = createAsyncThunk(
   'viz/fetchDataSetByPreviewChartAction',
-  async (arg: { chartPreview?: ChartPreview; pageInfo? }, thunkAPI) => {
+  async (
+    arg: {
+      chartPreview?: ChartPreview;
+      pageInfo?;
+      sorter?: { column: string; operator: string; aggOperator?: string };
+    },
+    thunkAPI,
+  ) => {
     const builder = new ChartDataRequestBuilder(
       {
         id: arg.chartPreview?.backendChart?.viewId,
@@ -316,7 +323,9 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
     const response = await request({
       method: 'POST',
       url: `data-provider/execute`,
-      data: builder.build(),
+      data: builder
+        .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
+        .build(),
     });
     return {
       backendChartId: arg.chartPreview?.backendChartId,

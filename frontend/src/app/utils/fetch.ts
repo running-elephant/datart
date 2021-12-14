@@ -154,7 +154,7 @@ export async function checkComputedFieldAsync(sourceId, expression) {
   return !!response?.data;
 }
 
-export async function fetchFieldFuncitonsAsync(sourceId) {
+export async function fetchFieldFunctionsAsync(sourceId) {
   const response = await request<string[]>({
     method: 'POST',
     url: `data-provider/function/support/${sourceId}`,
