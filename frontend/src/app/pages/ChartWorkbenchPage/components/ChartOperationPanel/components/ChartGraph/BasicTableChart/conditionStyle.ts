@@ -1,5 +1,5 @@
 import { ConditionStyleFormValues } from 'app/components/FormGenerator/Customize/ConditionStylePanel';
-import { OperatorTypes } from 'app/components/FormGenerator/Customize/ConditionStylePanel/type';
+import { OperatorTypes } from 'app/components/FormGenerator/Customize/ConditionStylePanel/types';
 import { CSSProperties } from 'react';
 
 const isMatchedTheCondition = (

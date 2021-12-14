@@ -69,6 +69,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
     onChange,
     dataConfigs,
     flatten,
+    context,
   }) => {
     useEffect(() => {
       const key = data?.watcher?.deps?.[0] as string;
@@ -117,6 +118,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
         translate,
         onChange: handleDataChange,
         dataConfigs,
+        context,
       };
       switch (data.comType) {
         case ChartStyleSectionComponentType.CHECKBOX:
