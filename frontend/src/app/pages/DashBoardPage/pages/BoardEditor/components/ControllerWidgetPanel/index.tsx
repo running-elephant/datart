@@ -28,7 +28,6 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   convertToWidgetMap,
-  getOtherHasOptionControllers,
   getOtherStringControlWidgets,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
@@ -86,10 +85,7 @@ const ControllerWidgetPanel: React.FC = memo(props => {
     () => getOtherStringControlWidgets(allWidgets, widgetId),
     [allWidgets, widgetId],
   );
-  const otherHasOptionControllers = useMemo(
-    () => getOtherHasOptionControllers(allWidgets, widgetId),
-    [allWidgets, widgetId],
-  );
+
   const widgetMap = useMemo(() => convertToWidgetMap(allWidgets), [allWidgets]);
   const viewMap = useSelector(selectViewMap);
   //
@@ -313,7 +309,6 @@ const ControllerWidgetPanel: React.FC = memo(props => {
               <WidgetControlForm
                 controllerType={controllerType!}
                 otherStrFilterWidgets={otherStrTypeController}
-                otherHasOptionControllers={otherHasOptionControllers}
                 boardType={boardType}
                 viewMap={viewMap}
                 form={form}
