@@ -162,32 +162,27 @@ export const toUpdateDashboard = createAsyncThunk<
       getState() as { editBoard: EditBoardState },
     );
     const boardState = getState() as unknown as { board: BoardState };
-    // const dataChart = boardState.board.dataChartMap[curWidget.datachartId];
-    //     const chartDataView = boardState.board.viewMap[dataChart.viewId];
-    const { dataChartMap, viewMap } = boardState.board;
-    const widgets = convertWrapChartWidget({
-      widgetMap: widgetRecord,
-      dataChartMap,
-      viewMap,
-    });
-    const group = createToSaveWidgetGroup(widgets, boardInfo.widgetIds);
-    const updateData: SaveDashboard = {
-      ...dashBoard,
-      config: JSON.stringify(dashBoard.config),
-      widgetToCreate: group.widgetToCreate,
-      widgetToUpdate: group.widgetToUpdate,
-      widgetToDelete: group.widgetToDelete,
-    };
     try {
-      const { data } = await request<any>({
+      const { dataChartMap, viewMap } = boardState.board;
+      const widgets = convertWrapChartWidget({
+        widgetMap: widgetRecord,
+        dataChartMap,
+        viewMap,
+      });
+      const group = createToSaveWidgetGroup(widgets, boardInfo.widgetIds);
+      const updateData: SaveDashboard = {
+        ...dashBoard,
+        config: JSON.stringify(dashBoard.config),
+        widgetToCreate: group.widgetToCreate,
+        widgetToUpdate: group.widgetToUpdate,
+        widgetToDelete: group.widgetToDelete,
+      };
+
+      await request<any>({
         url: `viz/dashboards/${dashBoard.id}`,
         method: 'put',
         data: updateData,
       });
-      // TODO
-      // 清空历史栈
-      // 更新当前编辑面板的旧数据 widget Id 还都是本地的不对，应该更新成服务端id
-      //
       callback();
       dispatch(ActionCreators.clearHistory());
       // 更新view界面数据
@@ -195,11 +190,8 @@ export const toUpdateDashboard = createAsyncThunk<
 
       dispatch(fetchEditBoardDetail(dashBoard.id));
       // 关闭编辑 界面
-
-      // TODO
     } catch (error) {
       errorHandle(error);
-      throw error;
     }
   },
 );
@@ -371,6 +363,7 @@ export const copyWidgetByIds = createAsyncThunk<
     return null;
   },
 );
+
 // 粘贴
 export const pasteWidgets = createAsyncThunk(
   'editBoard/pasteWidgets',
@@ -419,6 +412,8 @@ export const pasteWidgets = createAsyncThunk(
     return null;
   },
 );
+
+//
 export const uploadBoardImage = createAsyncThunk<
   null,
   { boardId: string; formData: FormData; resolve: (url: string) => void }
