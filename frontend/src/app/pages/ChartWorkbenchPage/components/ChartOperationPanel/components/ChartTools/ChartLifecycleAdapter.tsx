@@ -41,8 +41,8 @@ const ChartLifecycleAdapter: React.FC<{
   chart: Chart;
   config: ChartConfig;
   style: CSSProperties;
-  evn?: string;
-}> = ({ dataset, chart, config, style, evn }) => {
+  env?: string;
+}> = ({ dataset, chart, config, style, env }) => {
   const [chartResourceLoader, setChartResourceLoader] = useState(
     () => new ChartIFrameContainerResourceLoader(),
   );
@@ -64,7 +64,7 @@ const ChartLifecycleAdapter: React.FC<{
       return;
     }
 
-    const nextConfig = { ...config, _evn: evn };
+    const nextConfig = { ...config, _env: env };
 
     setContainerStatus(ContainerStatus.LOADING);
     (async () => {
@@ -109,7 +109,7 @@ const ChartLifecycleAdapter: React.FC<{
     ) {
       return;
     }
-    const nextConfig = { ...config, _evn: evn };
+    const nextConfig = { ...config, _env: env };
     eventBrokerRef.current?.publish(
       ChartLifecycle.UPDATED,
       {

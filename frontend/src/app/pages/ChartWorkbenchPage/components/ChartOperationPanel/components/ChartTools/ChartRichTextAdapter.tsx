@@ -72,6 +72,8 @@ const ChartRichTextAdapter: FC<{
     undefined,
   );
 
+  let timer: any = undefined;
+
   useEffect(() => {
     const value = (initContent && JSON.parse(initContent)) || undefined;
     setQuillValue(value);
@@ -94,11 +96,17 @@ const ChartRichTextAdapter: FC<{
   }, [id, isEditing]);
 
   const quillChange = useCallback(() => {
-    if (quillEditRef.current && quillEditRef.current?.getEditor()) {
-      const contents = quillEditRef.current!.getEditor().getContents();
-      setQuillValue(contents);
-      onChange && onChange((contents && JSON.stringify(contents)) || undefined);
+    if (timer) {
+      clearTimeout(timer);
     }
+    timer = setTimeout(() => {
+      if (quillEditRef.current && quillEditRef.current?.getEditor()) {
+        const contents = quillEditRef.current!.getEditor().getContents();
+        setQuillValue(contents);
+        onChange &&
+          onChange((contents && JSON.stringify(contents)) || undefined);
+      }
+    }, 300);
   }, [onChange]);
 
   useEffect(() => {
@@ -260,7 +268,7 @@ const ChartRichTextAdapter: FC<{
               trigger={['click']}
               key="ql-selectLink"
             >
-              <a onClick={e => e.preventDefault()} className="selectLink">
+              <a className="selectLink">
                 <SelectOutlined />
               </a>
             </Dropdown>
@@ -325,15 +333,6 @@ const ChartRichTextAdapter: FC<{
       isEditing,
     ],
   );
-
-  useEffect(() => {
-    if (reactQuillEdit) {
-      const quill = quillEditRef.current?.getEditor();
-      if (quill && !quill.hasFocus()) {
-        quill.focus();
-      }
-    }
-  }, [reactQuillEdit]);
 
   const ssp = e => {
     e.stopPropagation();

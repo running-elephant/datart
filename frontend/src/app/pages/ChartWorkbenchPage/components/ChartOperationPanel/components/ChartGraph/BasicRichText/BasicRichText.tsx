@@ -83,7 +83,7 @@ class BasicRichText extends ReactChart {
   getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
     const { containerId } = this.richTextOptions;
     if (!dataset || !config || !containerId) {
-      return { dataList: [], id: '', isEditing: !!config?._evn };
+      return { dataList: [], id: '', isEditing: !!config?._env };
     }
     const dataConfigs = config.datas || [];
     const stylesConfigs = config.styles || [];
@@ -115,7 +115,7 @@ class BasicRichText extends ReactChart {
       dataList,
       initContent,
       id: containerId,
-      isEditing: !!config?._evn,
+      isEditing: !!config?._env,
       ...this.getOnChange(),
     };
   }
