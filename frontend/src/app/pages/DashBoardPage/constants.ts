@@ -89,6 +89,7 @@ export const CanFullScreenWidgetTypes: WidgetType[] = ['chart', 'media'];
 export const CONTAINER_TAB = 'containerTab';
 
 //
+export const NeedFetchWidgetTypes: WidgetType[] = ['chart', 'controller'];
 
 // setting
 
