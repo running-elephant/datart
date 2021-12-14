@@ -56,7 +56,7 @@ const config: ChartConfig = {
       ],
     },
     {
-      label: 'column.title',
+      label: 'column.conditionStyle',
       key: 'column',
       comType: 'group',
       rows: [
@@ -379,13 +379,12 @@ const config: ChartConfig = {
           styleAndGroup: '表头分组',
         },
         column: {
-          title: '表格列样式',
-          open: '打开列设置',
+          open: '打开样式设置',
           list: '字段列表',
           sortAndFilter: '排序与过滤',
           enableSort: '开启列排序',
           basicStyle: '基础样式',
-          conditionStyle: '条件样式',
+          conditionStyle: '列条件样式',
           conditionStylePanel: '条件样式配置器',
           backgroundColor: '背景颜色',
           align: '对齐方式',
@@ -428,8 +427,7 @@ const config: ChartConfig = {
           styleAndGroup: 'Header Group',
         },
         column: {
-          title: 'Table Column Style',
-          open: 'Open Column Setting',
+          open: 'Open Style Setting',
           list: 'Field List',
           sortAndFilter: 'Sort and Filter',
           enableSort: 'Enable Sort',
