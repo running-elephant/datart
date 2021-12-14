@@ -35,7 +35,7 @@ export default function Add({
       value: undefined,
     },
     {
-      name: 'text',
+      name: 'textColor',
       label: t('conditionStyleTable.header.color.text'),
       value: undefined,
     },
@@ -110,8 +110,9 @@ export default function Add({
         return (
           <Select
             mode="tags"
-            // TODO(TM) could you translate the message?
-            notFoundContent={<>可添加多个值(输入内容后按下回车键完成添加)</>}
+            notFoundContent={
+              <>{t('conditionStyleTable.modal.notFoundContent')}</>
+            }
           />
         );
       case OperatorTypes.Between:
@@ -124,8 +125,7 @@ export default function Add({
   return (
     <Modal
       destroyOnClose
-      // TODO(TM) could you translate the message?
-      title="条件格式"
+      title={t('conditionStyleTable.modal.title')}
       visible={visible}
       onOk={modalOk}
       onCancel={onCancel}
