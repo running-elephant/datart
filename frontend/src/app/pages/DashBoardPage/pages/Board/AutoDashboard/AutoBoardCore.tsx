@@ -114,10 +114,10 @@ const AutoBoardCore: React.FC<AutoBoardCoreProps> = ({ boardId }) => {
   const scrollThrottle = useRef(false);
   const lazyLoad = useCallback(() => {
     if (!gridWrapRef.current) return;
-
     if (!scrollThrottle.current) {
       requestAnimationFrame(() => {
         const waitingItems = layoutInfos.current.filter(item => !item.rendered);
+
         if (waitingItems.length > 0) {
           const { offsetHeight, scrollTop } = gridWrapRef.current!;
           waitingItems.forEach(item => {
@@ -145,7 +145,14 @@ const AutoBoardCore: React.FC<AutoBoardCoreProps> = ({ boardId }) => {
       lazyLoad();
       gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
       gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
+      // issues#339
+      window.addEventListener('resize', lazyLoad, false);
     }
+
+    return () => {
+      gridWrapRef?.current?.removeEventListener('scroll', lazyLoad, false);
+      window.removeEventListener('resize', lazyLoad, false);
+    };
   }, [boardLoading, WidgetConfigsLen, lazyLoad]);
 
   const onLayoutChange = useCallback((layouts: Layout[]) => {
