@@ -40,6 +40,7 @@ import 'react-quill/dist/quill.bubble.css';
 import 'react-quill/dist/quill.core.css';
 import styled from 'styled-components';
 import './RichTextPluginLoader';
+import debounce from 'lodash/debounce';
 
 Quill.register('modules/imageDrop', ImageDrop);
 Quill.register('formats/tag', TagBlot);
@@ -72,8 +73,6 @@ const ChartRichTextAdapter: FC<{
     undefined,
   );
 
-  let timer: any = undefined;
-
   useEffect(() => {
     const value = (initContent && JSON.parse(initContent)) || undefined;
     setQuillValue(value);
@@ -95,18 +94,20 @@ const ChartRichTextAdapter: FC<{
     }
   }, [id, isEditing]);
 
+  const debouncedDataChange = useMemo(
+    () =>
+      debounce(value => {
+        onChange?.(value);
+      }, 300),
+    [onChange],
+  );
+
   const quillChange = useCallback(() => {
-    if (timer) {
-      clearTimeout(timer);
+    if (quillEditRef.current && quillEditRef.current?.getEditor()) {
+      const contents = quillEditRef.current!.getEditor().getContents();
+      setQuillValue(contents);
+      contents && debouncedDataChange(JSON.stringify(contents));
     }
-    timer = setTimeout(() => {
-      if (quillEditRef.current && quillEditRef.current?.getEditor()) {
-        const contents = quillEditRef.current!.getEditor().getContents();
-        setQuillValue(contents);
-        onChange &&
-          onChange((contents && JSON.stringify(contents)) || undefined);
-      }
-    }, 300);
   }, [onChange]);
 
   useEffect(() => {
