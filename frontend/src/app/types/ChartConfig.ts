@@ -336,5 +336,5 @@ export type ChartConfig = {
   styles?: ChartStyleSectionConfig[];
   settings?: ChartStyleSectionConfig[];
   i18ns?: ChartI18NSectionConfig[];
-  _env?: string;
+  env?: string;
 };

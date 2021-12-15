@@ -22,6 +22,7 @@ import { MarkdownOptions } from 'app/pages/DashBoardPage/components/WidgetCore/M
 import TagBlot from 'app/pages/DashBoardPage/components/WidgetCore/MediaWidget/RichTextWidget/configs/TagBlot';
 import { Formats } from 'app/pages/DashBoardPage/components/WidgetCore/MediaWidget/RichTextWidget/Formats';
 import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
+import debounce from 'lodash/debounce';
 import { DeltaStatic } from 'quill';
 import { ImageDrop } from 'quill-image-drop-module'; // 拖动加载图片组件。
 import QuillMarkdown from 'quilljs-markdown';
@@ -40,7 +41,6 @@ import 'react-quill/dist/quill.bubble.css';
 import 'react-quill/dist/quill.core.css';
 import styled from 'styled-components';
 import './RichTextPluginLoader';
-import debounce from 'lodash/debounce';
 
 Quill.register('modules/imageDrop', ImageDrop);
 Quill.register('formats/tag', TagBlot);
@@ -64,17 +64,13 @@ const ChartRichTextAdapter: FC<{
   const [containerId, setContainerId] = useState<string>();
   const [quillModules, setQuillModules] = useState<any>(null);
   const [visible, setVisible] = useState<boolean>(false);
-  const [quillValue, setQuillValue] = useState<DeltaStatic | undefined>(
-    undefined,
-  );
+  const [quillValue, setQuillValue] = useState<DeltaStatic | string>('');
   const quillRef = useRef<ReactQuill>(null);
   const quillEditRef = useRef<ReactQuill>(null);
-  const [translate, setTranslate] = useState<DeltaStatic | undefined>(
-    undefined,
-  );
+  const [translate, setTranslate] = useState<DeltaStatic | string>('');
 
   useEffect(() => {
-    const value = (initContent && JSON.parse(initContent)) || undefined;
+    const value = (initContent && JSON.parse(initContent)) || '';
     setQuillValue(value);
   }, [initContent]);
 
@@ -111,26 +107,30 @@ const ChartRichTextAdapter: FC<{
   }, [onChange]);
 
   useEffect(() => {
-    const quill = Object.assign({}, quillValue);
-    const ops = quill.ops?.concat().map(item => {
-      let insert = item.insert;
-      if (typeof insert !== 'string') {
-        const name = insert?.calcfield?.name;
-        const config = name
-          ? dataList.find(items => items.name === name)
-          : null;
-        if (config) {
-          insert = config.value;
-        } else {
-          insert = ``;
+    if (typeof quillValue !== 'string') {
+      const quill = Object.assign({}, quillValue);
+      const ops = quill.ops?.concat().map(item => {
+        let insert = item.insert;
+        if (typeof insert !== 'string') {
+          const name = insert?.calcfield?.name;
+          const config = name
+            ? dataList.find(items => items.name === name)
+            : null;
+          if (config) {
+            insert = config.value;
+          } else {
+            insert = ``;
+          }
         }
+        return { ...item, insert };
+      });
+      if (ops?.length) {
+        setTranslate({ ...quill, ops });
+      } else {
+        setTranslate('');
       }
-      return { ...item, insert };
-    });
-    if (ops?.length) {
-      setTranslate({ ...quill, ops } || undefined);
     } else {
-      setTranslate(undefined);
+      setTranslate(quillValue);
     }
   }, [quillValue, dataList, setTranslate]);
 
@@ -172,7 +172,7 @@ const ChartRichTextAdapter: FC<{
           true,
         );
         setImmediate(() => {
-          setQuillValue(quillEditRef.current?.getEditor().getContents());
+          setQuillValue(quillEditRef.current?.getEditor().getContents() || '');
         });
       }
     }

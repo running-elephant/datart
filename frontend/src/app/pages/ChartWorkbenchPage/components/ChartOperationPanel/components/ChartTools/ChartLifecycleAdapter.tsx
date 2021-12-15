@@ -41,8 +41,7 @@ const ChartLifecycleAdapter: React.FC<{
   chart: Chart;
   config: ChartConfig;
   style: CSSProperties;
-  env?: string;
-}> = ({ dataset, chart, config, style, env }) => {
+}> = ({ dataset, chart, config, style }) => {
   const [chartResourceLoader, setChartResourceLoader] = useState(
     () => new ChartIFrameContainerResourceLoader(),
   );
@@ -64,19 +63,17 @@ const ChartLifecycleAdapter: React.FC<{
       return;
     }
 
-    const nextConfig = { ...config, _env: env };
-
     setContainerStatus(ContainerStatus.LOADING);
     (async () => {
       chartResourceLoader
         .laodResource(document, chart?.getDependencies?.())
         .then(_ => {
-          chart.init(nextConfig);
+          chart.init(config);
           const newBrokerRef = new ChartEventBroker();
           newBrokerRef.register(chart);
           newBrokerRef.publish(
             ChartLifecycle.MOUNTED,
-            { containerId, dataset, config: nextConfig },
+            { containerId, dataset, config },
             {
               document,
               window,
@@ -109,12 +106,11 @@ const ChartLifecycleAdapter: React.FC<{
     ) {
       return;
     }
-    const nextConfig = { ...config, _env: env };
     eventBrokerRef.current?.publish(
       ChartLifecycle.UPDATED,
       {
         dataset,
-        config: nextConfig,
+        config,
       },
       { document, window, width: style?.width, height: style?.height },
     );

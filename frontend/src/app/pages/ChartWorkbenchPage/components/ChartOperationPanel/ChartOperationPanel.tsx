@@ -37,7 +37,6 @@ const ChartOperationPanel: FC<{
   onChartChange: (chart: Chart) => void;
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
-  env?: string;
 }> = memo(
   ({
     chart,
@@ -45,7 +44,6 @@ const ChartOperationPanel: FC<{
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
-    env,
   }) => {
     const { dataset } = useContext(ChartDatasetContext);
     const { dataView } = useContext(ChartDataViewContext);
@@ -78,7 +76,6 @@ const ChartOperationPanel: FC<{
             dataset={dataset}
             chartConfig={chartConfig}
             onChartChange={onChartChange}
-            env={env}
           />
         );
       }

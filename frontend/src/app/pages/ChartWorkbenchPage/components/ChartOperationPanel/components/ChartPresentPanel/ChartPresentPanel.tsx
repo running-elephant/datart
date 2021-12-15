@@ -38,8 +38,7 @@ const ChartPresentPanel: FC<{
   chart?: Chart;
   dataset?: ChartDataset;
   chartConfig?: ChartConfig;
-  env?: string;
-}> = memo(({ chart, dataset, chartConfig, env }) => {
+}> = memo(({ chart, dataset, chartConfig }) => {
   const translate = useI18NPrefix(`viz.palette.present`);
   const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
   const panelRef = useRef<{ offsetWidth; offsetHeight }>(null);
@@ -69,7 +68,6 @@ const ChartPresentPanel: FC<{
         dataset,
         chartConfig!,
         style,
-        env,
       )
     );
   };
@@ -78,7 +76,8 @@ const ChartPresentPanel: FC<{
     const style = {
       width: panelRef.current?.offsetWidth,
       height:
-        panelRef.current?.offsetHeight - CHART_TYPE_SELECTOR_HEIGHT_OFFSET, // TODO(Stephen): calculate when change chart
+        (panelRef.current?.offsetHeight || CHART_TYPE_SELECTOR_HEIGHT_OFFSET) -
+        CHART_TYPE_SELECTOR_HEIGHT_OFFSET, // TODO(Stephen): calculate when change chart
     };
 
     const containerId = chart?.isISOContainer
