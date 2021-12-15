@@ -187,6 +187,7 @@ export const ChartStyleSectionComponentType = {
   LINE: 'line',
   MARGIN_WIDTH: 'marginWidth',
   TEXT: 'text',
+  CONDITIONSTYLE: 'conditionStylePanel',
 };
 
 type ChartConfigBase = {
@@ -262,6 +263,7 @@ export type ChartDataSectionConfig = ChartConfigBase & {
   rows?: ChartDataSectionField[];
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
   limit?: null | number | string | number[] | string[];
+  disableAggregate?: boolean;
 
   // Question: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
@@ -295,6 +297,7 @@ export type ChartStyleSectionRow = {
   watcher?: ChartStyleSectionRowWatcher;
   template?: ChartStyleSectionRow;
   comType: ValueOf<typeof ChartStyleSectionComponentType>;
+  hidden?: boolean;
 };
 
 export type ChartStyleSectionRowOption = {
@@ -303,7 +306,7 @@ export type ChartStyleSectionRowOption = {
   step?: number | string;
   type?: string;
   editable?: boolean;
-  modalSize?: string;
+  modalSize?: string | number;
   expand?: boolean;
   items?: Array<ChartStyleSelectorItem> | string[] | number[];
   hideLabel?: boolean;
@@ -333,4 +336,5 @@ export type ChartConfig = {
   styles?: ChartStyleSectionConfig[];
   settings?: ChartStyleSectionConfig[];
   i18ns?: ChartI18NSectionConfig[];
+  env?: string;
 };

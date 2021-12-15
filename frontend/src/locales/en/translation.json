@@ -40,7 +40,8 @@
         "controllerFacadeTypes": {
           "dropdownList": "Dropdown List",
           "radioGroup": "Radio Group",
-          "multiDropdownList": "Multipile Dropdown List",
+          "checkboxGroup" :"Checkbox Group",
+          "multiDropdownList": "multiple Dropdown List",
           "rangeTime": "Range Time",
           "rangeValue": "Range Value",
           "text": "Text",
@@ -77,7 +78,7 @@
         "button": "Button",
         "date": {
           "recommend": "Recommend",
-          "manual": "Mannual",
+          "manual": "Manual",
           "today": "Today",
           "yesterday": "Yesterday",
           "this_week": "This Week",
@@ -131,7 +132,7 @@
       }
     },
     "management": {
-      "title": "widgets manangement",
+      "title": "widgets management",
       "subTitle": "widgets list",
       "table": {
         "header": {
@@ -176,14 +177,16 @@
       "title": {
         "content": "Data",
         "design": "Style",
-        "setting": "Setting"
+        "setting": "Analysis"
       },
       "style": {
         "font": "Font",
         "pleaseSelect": "Please select ...",
         "table": {
           "header": {
+            "newName": "Please input a new header name",
             "merge": "Merge",
+            "reset": "Reset",
             "moveUp": "moveUp",
             "moveDown": "moveDown",
             "columnName": "Column Name",
@@ -195,6 +198,33 @@
               "center": "center",
               "right": "right"
             }
+          }
+        },
+        "conditionStyleTable": {
+          "btn": {
+            "add": "Add",
+            "edit": "Edit",
+            "remove": "Remove",
+            "confirm": "Please Confirm"
+          },
+          "modal": {
+            "title": "Condition Style",
+            "notFoundContent": "Multiple values can be added (enter the content and press enter to complete the addition)"
+          },
+          "header": {
+            "operator": "Operator",
+            "value": "Value",
+            "color": {
+              "title": "Color",
+              "background": "Background",
+              "text": "Text"
+            },
+            "range": {
+              "title": "Applied range",
+              "cell": "Cell",
+              "row": "Row"
+            },
+            "action": "Action"
           }
         },
         "visualMap": {
@@ -267,8 +297,8 @@
         },
         "axis": {
           "y": {
-            "left": "left axis demision",
-            "right": "right axis demision"
+            "left": "left axis dimension",
+            "right": "right axis dimension"
           }
         },
         "enum": {

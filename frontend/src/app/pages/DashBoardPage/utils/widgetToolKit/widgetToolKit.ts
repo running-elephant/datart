@@ -15,26 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
-import { ControllerConfig } from '../../pages/BoardEditor/components/ControllerWidgetPanel/types';
-import {
-  createContainerWidget,
-  createControlBtn,
-  createControllerWidget,
-  createDataChartWidget,
-} from '../widget';
+import { createContainerWidget, createControlBtn } from '../widget';
 import {
   BoardType,
   ContainerWidgetType,
-  DataChart,
   MediaWidgetType,
-  RelatedView,
-  Relation,
   Widget,
-  WidgetContentChartType,
   WidgetType,
 } from './../../pages/Board/slice/types';
 import { createMediaWidget } from './../widget';
+import { chartWidgetToolKit } from './chart/index';
+import { controllerWidgetToolKit } from './controller';
 export interface CreateParamsType {
   boardType: BoardType;
   [key: string]: any;
@@ -43,18 +34,8 @@ export interface WidgetToolKit {
   create: (option) => Widget;
 }
 export const widgetToolKit = {
-  chart: {
-    create: (opt: {
-      boardType: BoardType;
-      dashboardId: string;
-      dataChartId: string;
-      dataChartConfig: DataChart;
-      viewId: string;
-      subType: WidgetContentChartType;
-    }) => {
-      return createDataChartWidget(opt);
-    },
-  },
+  chart: chartWidgetToolKit,
+  controller: controllerWidgetToolKit,
   container: {
     create: (opt: {
       dashboardId: string;
@@ -64,20 +45,7 @@ export const widgetToolKit = {
       return createContainerWidget(opt);
     },
   },
-  controller: {
-    create: (opt: {
-      boardId: string;
-      boardType: BoardType;
-      relations: Relation[];
-      name?: string;
-      controllerType: ControllerFacadeTypes;
-      views: RelatedView[];
-      config: ControllerConfig;
-      hasVariable: boolean;
-    }) => {
-      return createControllerWidget(opt);
-    },
-  },
+
   media: {
     create: (opt: {
       dashboardId: string;

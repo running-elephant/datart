@@ -123,17 +123,25 @@ export const fetchShareVizInfo = createAsyncThunk(
 
 export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
   'share/fetchDataSetByPreviewChartAction',
-  async (chartPreview: ChartPreview, thunkAPI) => {
+  async (
+    args: {
+      preview: ChartPreview;
+      pageInfo?: any;
+      sorter?: { column: string; operator: string; aggOperator?: string };
+    },
+    thunkAPI,
+  ) => {
     const state = thunkAPI.getState() as RootState;
     const shareState = state.share;
     const builder = new ChartDataRequestBuilder(
       {
-        id: chartPreview?.backendChart?.viewId,
+        id: args.preview?.backendChart?.viewId,
         computedFields:
-          chartPreview?.backendChart?.config?.computedFields || [],
+          args.preview?.backendChart?.config?.computedFields || [],
       } as any,
-      chartPreview?.chartConfig?.datas,
-      chartPreview?.chartConfig?.settings,
+      args.preview?.chartConfig?.datas,
+      args.preview?.chartConfig?.settings,
+      args.pageInfo,
     );
     const response = await request({
       method: 'POST',
@@ -142,7 +150,9 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
         executeToken: shareState?.executeToken,
         password: shareState?.sharePassword,
       },
-      data: builder.build(),
+      data: builder
+        .addExtraSorters(args?.sorter ? [args?.sorter as any] : [])
+        .build(),
     });
     return response.data;
   },
@@ -163,7 +173,9 @@ export const updateFilterAndFetchDatasetForShare = createAsyncThunk(
     const state = thunkAPI.getState() as RootState;
     const shareState = state.share;
     await thunkAPI.dispatch(
-      fetchShareDataSetByPreviewChartAction(shareState?.chartPreview!),
+      fetchShareDataSetByPreviewChartAction({
+        preview: shareState?.chartPreview!,
+      }),
     );
     return {
       backendChartId: arg.backendChartId,

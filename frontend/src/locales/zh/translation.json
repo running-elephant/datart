@@ -40,6 +40,7 @@
         "controllerFacadeTypes": {
           "dropdownList": "下拉列表",
           "radioGroup": "单选按钮",
+          "checkboxGroup":"多选框",
           "multiDropdownList": "多选下拉列表",
           "rangeTime": "日期范围",
           "rangeValue": "数值范围",
@@ -177,14 +178,16 @@
       "title": {
         "content": "数据",
         "design": "样式",
-        "setting": "配置"
+        "setting": "分析"
       },
       "style": {
         "font": "字体",
         "pleaseSelect": "请选择 ...",
         "table": {
           "header": {
+            "newName": "请输入新名称",
             "merge": "合并",
+            "reset": "还原初始值",
             "moveUp": "上移",
             "moveDown": "下移",
             "columnName": "表头名称",
@@ -196,6 +199,33 @@
               "center": "居中对齐",
               "right": "右对齐"
             }
+          }
+        },
+        "conditionStyleTable": {
+          "btn": {
+            "add": "新增",
+            "edit": "编辑",
+            "remove": "删除",
+            "confirm": "请确认是否删除"
+          },
+          "modal": {
+            "title": "条件格式",
+            "notFoundContent": "可添加多个值(输入内容后按下回车键完成添加)"
+          },
+          "header": {
+            "operator": "关系",
+            "value": "值",
+            "color": {
+              "title": "颜色",
+              "background": "背景",
+              "text": "文字"
+            },
+            "range": {
+              "title": "应用范围",
+              "cell": "单元格",
+              "row": "整行"
+            },
+            "action": "操作"
           }
         },
         "visualMap": {

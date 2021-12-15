@@ -18,6 +18,7 @@
 
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import {
+  AggregateFieldActionType,
   ChartConfig,
   ChartDataSectionConfig,
   ChartDataSectionField,
@@ -407,8 +408,10 @@ export function transfromToObjectArray(
   if (!columns || !metas) {
     return [];
   }
-  return columns.map(col => {
-    let objCol = {};
+  return columns.map((col, index) => {
+    let objCol = {
+      id: index,
+    };
     for (let i = 0; i < metas.length; i++) {
       const key = metas?.[i]?.name;
       if (!!key) {
@@ -431,15 +434,39 @@ export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
 
 export function getColumnRenderName(c?: ChartDataSectionField) {
   if (!c) {
-    return 'unkonwn name';
+    return '[unkonwn]';
   }
   if (c.alias?.name) {
     return c.alias.name;
+  }
+  if (c.aggregate === AggregateFieldActionType.NONE) {
+    return c.colName;
   }
   if (c.aggregate) {
     return `${c.aggregate}(${c.colName})`;
   }
   return c.colName;
+}
+
+export function getUnusedHeaderRows(
+  allRows: Array<{
+    colName?: string;
+  }>,
+  originalRows: Array<{
+    colName?: string;
+    isGroup?: boolean;
+    children?: any[];
+  }>,
+): any[] {
+  const oldFlattenedColNames = originalRows
+    .flatMap(row => flattenHeaderRowsWithoutGroupRow(row))
+    .map(r => r.colName);
+  return (allRows || []).reduce<any[]>((acc, cur) => {
+    if (!oldFlattenedColNames.includes(cur.colName)) {
+      acc.push(cur);
+    }
+    return acc;
+  }, []);
 }
 
 export function diffHeaderRows(
@@ -653,31 +680,6 @@ export function getSeriesTooltips4Rectangular(
     const dataRow = dataColumns.find(
       dc => dc[getValueByColumnKey(groupConfig)] === params?.[0]?.axisValue,
     );
-    return aggConfigs.map(config =>
-      valueFormatter(config, dataRow?.[getValueByColumnKey(config)]),
-    );
-  }
-  return [];
-}
-
-export function getSeriesTooltips4Polar(
-  params,
-  groupConfigs,
-  aggConfigs,
-  dataColumns,
-) {
-  if (!aggConfigs?.length) {
-    return [];
-  }
-  if (!groupConfigs?.length) {
-    return aggConfigs.map(config =>
-      valueFormatter(config, dataColumns?.[0]?.[getValueByColumnKey(config)]),
-    );
-  }
-  if (groupConfigs?.[0]) {
-    const rowKeyFn = dc =>
-      groupConfigs?.map(config => dc[config?.colName]).join('-');
-    const dataRow = dataColumns.find(dc => rowKeyFn(dc) === params?.name);
     return aggConfigs.map(config =>
       valueFormatter(config, dataRow?.[getValueByColumnKey(config)]),
     );

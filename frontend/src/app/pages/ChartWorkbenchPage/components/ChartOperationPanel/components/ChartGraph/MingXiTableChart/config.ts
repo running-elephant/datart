@@ -25,11 +25,13 @@ const config: ChartConfig = {
       key: 'mixed',
       required: true,
       type: 'mixed',
+      disableAggregate: true,
     },
     {
       label: 'filter',
       key: 'filter',
       type: 'filter',
+      disableAggregate: true,
     },
   ],
   styles: [
@@ -54,7 +56,7 @@ const config: ChartConfig = {
       ],
     },
     {
-      label: 'column.title',
+      label: 'column.conditionStyle',
       key: 'column',
       comType: 'group',
       rows: [
@@ -79,6 +81,7 @@ const config: ChartConfig = {
                     .map(c => ({
                       key: c.uid,
                       value: c.uid,
+                      type: c.type,
                       label:
                         c.label || c.aggregate
                           ? `${c.aggregate}(${c.colName})`
@@ -93,75 +96,17 @@ const config: ChartConfig = {
                 comType: 'group',
                 rows: [
                   {
-                    label: 'column.sortAndFilter',
-                    key: 'sortAndFilter',
-                    comType: 'group',
-                    options: { expand: true },
-                    rows: [
-                      {
-                        label: 'column.enableSort',
-                        key: 'enableSort',
-                        comType: 'checkbox',
-                      },
-                    ],
-                  },
-                  {
-                    label: 'column.basicStyle',
-                    key: 'basicStyle',
-                    comType: 'group',
-                    options: { expand: true },
-                    rows: [
-                      {
-                        label: 'column.backgroundColor',
-                        key: 'backgroundColor',
-                        comType: 'fontColor',
-                      },
-                      {
-                        label: 'column.align',
-                        key: 'align',
-                        default: 'left',
-                        comType: 'select',
-                        options: {
-                          items: [
-                            { label: '左对齐', value: 'left' },
-                            { label: '居中对齐', value: 'center' },
-                            { label: '右对齐', value: 'right' },
-                          ],
-                        },
-                      },
-                      {
-                        label: 'column.enableFixedCol',
-                        key: 'enableFixedCol',
-                        comType: 'switch',
-                        rows: [
-                          {
-                            label: 'column.fixedColWidth',
-                            key: 'fixedColWidth',
-                            default: 100,
-                            comType: 'inputNumber',
-                          },
-                        ],
-                      },
-                      {
-                        label: 'font',
-                        key: 'font',
-                        comType: 'font',
-                        default: {
-                          fontFamily: 'PingFang SC',
-                          fontSize: '12',
-                          fontWeight: 'normal',
-                          fontStyle: 'normal',
-                          color: 'black',
-                        },
-                      },
-                    ],
-                  },
-                  {
                     label: 'column.conditionStyle',
                     key: 'conditionStyle',
                     comType: 'group',
                     options: { expand: true },
-                    rows: [],
+                    rows: [
+                      {
+                        label: 'column.conditionStylePanel',
+                        key: 'conditionStylePanel',
+                        comType: 'conditionStylePanel',
+                      },
+                    ],
                   },
                 ],
               },
@@ -185,6 +130,12 @@ const config: ChartConfig = {
           label: 'style.enableBorder',
           key: 'enableBorder',
           default: true,
+          comType: 'checkbox',
+        },
+        {
+          label: 'style.enableRowNumber',
+          key: 'enableRowNumber',
+          default: false,
           comType: 'checkbox',
         },
         {
@@ -235,15 +186,31 @@ const config: ChartConfig = {
             },
           },
         },
-      ],
-    },
-    {
-      label: 'data.title',
-      key: 'data',
-      comType: 'group',
-      rows: [
         {
-          label: 'data.tableSize',
+          label: 'style.autoMergeFields',
+          key: 'autoMergeFields',
+          comType: 'select',
+          options: {
+            mode: 'multiple',
+            getItems: cols => {
+              const columns = (cols || [])
+                .filter(col => ['mixed'].includes(col.type))
+                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
+                .filter(c => c.type === 'STRING')
+                .map(c => ({
+                  key: c.uid,
+                  value: c.uid,
+                  label:
+                    c.label || c.aggregate
+                      ? `${c.aggregate}(${c.colName})`
+                      : c.colName,
+                }));
+              return columns;
+            },
+          },
+        },
+        {
+          label: 'style.tableSize',
           key: 'tableSize',
           default: 'default',
           comType: 'select',
@@ -257,17 +224,111 @@ const config: ChartConfig = {
         },
       ],
     },
-  ],
-  settings: [
     {
-      label: 'cache.title',
-      key: 'cache',
+      label: 'style.tableHeaderStyle',
+      key: 'tableHeaderStyle',
       comType: 'group',
       rows: [
         {
-          label: 'cache.title',
-          key: 'panel',
-          comType: 'cache',
+          label: 'style.bgColor',
+          key: 'bgColor',
+          default: '#f0f0f0',
+          comType: 'fontColor',
+        },
+        {
+          label: 'style.font',
+          key: 'font',
+          comType: 'font',
+          default: {
+            fontFamily: 'PingFang SC',
+            fontSize: 12,
+            fontWeight: 'normal',
+            fontStyle: 'normal',
+            color: '#6c757d',
+          },
+        },
+        {
+          label: 'style.align',
+          key: 'align',
+          default: 'left',
+          comType: 'select',
+          options: {
+            items: [
+              { label: '左对齐', value: 'left' },
+              { label: '居中对齐', value: 'center' },
+              { label: '右对齐', value: 'right' },
+            ],
+          },
+        },
+      ],
+    },
+    {
+      label: 'style.tableBodyStyle',
+      key: 'tableBodyStyle',
+      comType: 'group',
+      rows: [
+        {
+          label: 'style.bgColor',
+          key: 'bgColor',
+          default: '#fafafa',
+          comType: 'fontColor',
+        },
+        {
+          label: 'style.font',
+          key: 'font',
+          comType: 'font',
+          default: {
+            fontFamily: 'PingFang SC',
+            fontSize: 12,
+            fontWeight: 'normal',
+            fontStyle: 'normal',
+            color: '#6c757d',
+          },
+        },
+        {
+          label: 'style.align',
+          key: 'align',
+          default: 'left',
+          comType: 'select',
+          options: {
+            items: [
+              { label: '左对齐', value: 'left' },
+              { label: '居中对齐', value: 'center' },
+              { label: '右对齐', value: 'right' },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+  settings: [
+    {
+      label: 'summary.title',
+      key: 'summary',
+      comType: 'group',
+      rows: [
+        {
+          label: 'summary.aggregateFields',
+          key: 'aggregateFields',
+          comType: 'select',
+          options: {
+            mode: 'multiple',
+            getItems: cols => {
+              const columns = (cols || [])
+                .filter(col => ['mixed'].includes(col.type))
+                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
+                .filter(c => c.type === 'NUMERIC')
+                .map(c => ({
+                  key: c.uid,
+                  value: c.uid,
+                  label:
+                    c.label || c.aggregate
+                      ? `${c.aggregate}(${c.colName})`
+                      : c.colName,
+                }));
+              return columns;
+            },
+          },
         },
       ],
     },
@@ -285,22 +346,16 @@ const config: ChartConfig = {
             needRefresh: true,
           },
         },
+
         {
           label: 'paging.pageSize',
           key: 'pageSize',
-          default: 10,
-          comType: 'select',
+          default: 20,
+          comType: 'inputNumber',
           options: {
             needRefresh: true,
-            items: [
-              { label: '5', value: 5 },
-              { label: '10', value: 10 },
-              { label: '20', value: 20 },
-              { label: '30', value: 30 },
-              { label: '40', value: 40 },
-              { label: '50', value: 50 },
-              { label: '100', value: 100 },
-            ],
+            step: 1,
+            min: 0,
           },
           watcher: {
             deps: ['enablePaging'],
@@ -319,18 +374,18 @@ const config: ChartConfig = {
       lang: 'zh-CN',
       translation: {
         header: {
-          title: '表头样式与分组',
-          open: '打开表头样式与分组',
-          styleAndGroup: '表头样式与分组',
+          title: '表头分组',
+          open: '打开',
+          styleAndGroup: '表头分组',
         },
         column: {
-          title: '表格数据列',
-          open: '打开列设置',
+          open: '打开样式设置',
           list: '字段列表',
           sortAndFilter: '排序与过滤',
           enableSort: '开启列排序',
           basicStyle: '基础样式',
           conditionStyle: '条件样式',
+          conditionStylePanel: '条件样式配置器',
           backgroundColor: '背景颜色',
           align: '对齐方式',
           enableFixedCol: '开启固定列宽',
@@ -341,17 +396,20 @@ const config: ChartConfig = {
           title: '表格样式',
           enableFixedHeader: '固定表头',
           enableBorder: '显示边框',
+          enableRowNumber: '启用行号',
           leftFixedColumns: '左侧固定列',
           rightFixedColumns: '右侧固定列',
-        },
-        data: {
-          title: '表格数据控制',
+          autoMergeFields: '自动合并列内容',
           tableSize: '表格大小',
-          autoMerge: '自动合并相同内容',
-          enableRaw: '使用原始数据',
+          tableHeaderStyle: '表头样式',
+          tableBodyStyle: '表体样式',
+          bgColor: '背景颜色',
+          font: '字体',
+          align: '对齐方式',
         },
-        cache: {
-          title: '数据处理',
+        summary: {
+          title: '数据汇总',
+          aggregateFields: '汇总列',
         },
         paging: {
           title: '分页设置',
@@ -364,18 +422,18 @@ const config: ChartConfig = {
       lang: 'en-US',
       translation: {
         header: {
-          title: 'Title',
-          open: 'Open Table Header and Group',
-          styleAndGroup: 'Style and Group',
+          title: 'Table Header Group',
+          open: 'Open',
+          styleAndGroup: 'Header Group',
         },
         column: {
-          title: 'Table Data Column',
-          open: 'Open Column Setting',
+          open: 'Open Style Setting',
           list: 'Field List',
           sortAndFilter: 'Sort and Filter',
           enableSort: 'Enable Sort',
           basicStyle: 'Baisc Style',
           conditionStyle: 'Condition Style',
+          conditionStylePanel: 'Condition Style Panel',
           backgroundColor: 'Background Color',
           align: 'Align',
           enableFixedCol: 'Enable Fixed Column',
@@ -386,17 +444,20 @@ const config: ChartConfig = {
           title: 'Table Style',
           enableFixedHeader: 'Enable Fixed Header',
           enableBorder: 'Show Border',
+          enableRowNumber: 'Enable Row Number',
           leftFixedColumns: 'Left Fixed Columns',
           rightFixedColumns: 'Right Fixed Columns',
-        },
-        data: {
-          title: 'Table Data Setting',
+          autoMergeFields: 'Auto Merge Column Content',
           tableSize: 'Table Size',
-          autoMerge: 'Auto Merge',
-          enableRaw: 'Enable Raw Data',
+          tableHeaderStyle: 'Table Header Style',
+          tableBodyStyle: 'Table Body Style',
+          bgColor: 'Background Color',
+          font: 'Font',
+          align: 'Align',
         },
-        cache: {
-          title: 'Data Process',
+        summary: {
+          title: 'Summary',
+          aggregateFields: 'Summary Fields',
         },
         paging: {
           title: 'Paging',

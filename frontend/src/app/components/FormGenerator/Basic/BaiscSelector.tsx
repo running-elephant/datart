@@ -51,7 +51,10 @@ const BaiscSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
       try {
         results =
           typeof row?.options?.getItems === 'function'
-            ? row?.options?.getItems.call(null, getDataConfigs()) || []
+            ? row?.options?.getItems.call(
+                Object.create(null),
+                getDataConfigs(),
+              ) || []
             : row?.options?.items || [];
       } catch (error) {
         console.error(

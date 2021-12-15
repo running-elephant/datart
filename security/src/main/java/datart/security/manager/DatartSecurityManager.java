@@ -17,7 +17,9 @@ public interface DatartSecurityManager {
 
     boolean isAuthenticated();
 
-    void requirePermissions(Permission... permission) throws PermissionDeniedException;
+    void requireAllPermissions(Permission... permission) throws PermissionDeniedException;
+
+    void requireAnyPermission(Permission... permissions) throws PermissionDeniedException;
 
     void requireOrgOwner(String orgId) throws PermissionDeniedException;
 

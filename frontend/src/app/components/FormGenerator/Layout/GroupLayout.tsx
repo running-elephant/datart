@@ -17,7 +17,7 @@
  */
 
 import { Button, Collapse } from 'antd';
-import useStateModal from 'app/hooks/useStateModal';
+import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -41,10 +41,13 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
     dataConfigs,
     flatten,
     onChange,
+    context,
   }) => {
     const [openStateModal, contextHolder] = useStateModal({});
     const [type] = useState(data?.options?.type || 'default');
-    const [modalSize] = useState(data?.options?.modalSize || '');
+    const [modalSize] = useState(
+      data?.options?.modalSize || StateModalSize.SMALL,
+    );
     const [expand] = useState(!!data?.options?.expand);
 
     const handleConfrimModalDialogOrDataUpdate = (
@@ -112,6 +115,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           dataConfigs={dataConfigs}
           flatten={flatten}
           onChange={onChangeEvent}
+          context={context}
         />
       );
     };

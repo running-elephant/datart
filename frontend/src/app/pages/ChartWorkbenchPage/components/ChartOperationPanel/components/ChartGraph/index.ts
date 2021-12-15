@@ -25,6 +25,7 @@ import BasicGaugeChart from './BasicGaugeChart';
 import BasicLineChart from './BasicLineChart';
 import BasicOutlineMapChart from './BasicOutlineMapChart';
 import BasicPieChart from './BasicPieChart';
+import BasicRichText from './BasicRichText';
 import BasicScatterChart from './BasicScatterChart';
 import BasicTableChart from './BasicTableChart';
 import ClusterBarChart from './ClusterBarChart';
@@ -76,5 +77,6 @@ const WidgetPlugins = {
   ScatterOutlineMapChart,
   WaterfallChart,
   BasicGaugeChart,
+  BasicRichText,
 };
 export default WidgetPlugins;

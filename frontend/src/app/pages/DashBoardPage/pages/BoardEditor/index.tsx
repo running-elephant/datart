@@ -25,12 +25,12 @@ import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
 import AutoEditor from './AutoEditor/index';
-import FilterWidgetPanel from './components/ControllerWidgetPanel';
+import ControllerWidgetPanel from './components/ControllerWidgetPanel';
 import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
 import FreeEditor from './FreeEditor/index';
 import { editDashBoardInfoActions } from './slice';
-import { editWrapChartWidget } from './slice/actions/actions';
+import { editHasChartWidget } from './slice/actions/actions';
 import {
   selectBoardChartEditorProps,
   selectEditBoard,
@@ -67,11 +67,11 @@ export const BoardEditor: React.FC<{
       (chartType: WidgetContentChartType, dataChart: DataChart, view) => {
         if (chartType === 'widgetChart') {
           const widgetId = boardChartEditorProps?.widgetId!;
-          dispatch(editWrapChartWidget({ widgetId, dataChart, view }));
+          dispatch(editHasChartWidget({ widgetId, dataChart, view }));
           onCloseChartEditor();
         } else {
           const widgetId = boardChartEditorProps?.widgetId!;
-          dispatch(editWrapChartWidget({ widgetId, dataChart, view }));
+          dispatch(editHasChartWidget({ widgetId, dataChart, view }));
           onCloseChartEditor();
         }
       },
@@ -98,7 +98,7 @@ export const BoardEditor: React.FC<{
             <TitleHeader toggleBoardEditor={onCloseBoardEditor} />
             {boardType === 'auto' && <AutoEditor />}
             {boardType === 'free' && <FreeEditor />}
-            <FilterWidgetPanel />
+            <ControllerWidgetPanel />
             <LinkagePanel />
             <SettingJumpModal />
             {boardChartEditorProps && (

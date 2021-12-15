@@ -40,7 +40,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { BoardType } from '../../../Board/slice/types';
 import { ControllerConfig } from '../../components/ControllerWidgetPanel/types';
-import { addWidgetsToEditBoard, getEditWidgetDataAsync } from '../thunk';
+import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from '../thunk';
 import { HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
 
@@ -141,7 +141,6 @@ export const updateWidgetControllerAction =
     controllerFacadeType: ControllerFacadeTypes;
     views: RelatedView[];
     config: ControllerConfig;
-    hasVariable?: boolean;
   }) =>
   async (dispatch, getState) => {
     const {
@@ -220,7 +219,7 @@ export const editChartInWidgetAction =
     };
     dispatch(editDashBoardInfoActions.changeChartEditorProps(editorProps));
   };
-export const editWrapChartWidget =
+export const editHasChartWidget =
   (props: { widgetId: string; dataChart: DataChart; view: ChartDataView }) =>
   async (dispatch, getState) => {
     const { dataChart, view, widgetId } = props;
@@ -235,7 +234,7 @@ export const editWrapChartWidget =
     const viewViews = [view];
     dispatch(boardActions.setDataChartMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-    dispatch(getEditWidgetDataAsync({ widgetId }));
+    dispatch(getEditChartWidgetDataAsync({ widgetId: curWidget.id }));
   };
 
 export const closeJumpAction = (widget: Widget) => (dispatch, getState) => {

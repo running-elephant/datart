@@ -131,7 +131,8 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
           dataset={dataset}
           chart={chart}
           config={dataChart.config.chartConfig as ChartConfig}
-          style={{ width: cacheW, height: cacheH }}
+          width={cacheW}
+          height={cacheH}
           containerId={widgetId}
         />
       );

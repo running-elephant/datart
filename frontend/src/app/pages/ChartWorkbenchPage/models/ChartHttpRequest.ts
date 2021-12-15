@@ -20,7 +20,7 @@ import { ChartDatasetPageInfo } from 'app/types/ChartDataset';
 import { getStyleValue } from 'app/utils/chartHelper';
 import { formatTime } from 'app/utils/time';
 import { FILTER_TIME_FORMATTER_IN_QUERY } from 'globalConstants';
-import { IsKeyIn } from 'utils/object';
+import { isEmptyArray, IsKeyIn } from 'utils/object';
 import {
   AggregateFieldActionType,
   ChartDataSectionConfig,
@@ -42,7 +42,11 @@ export type ChartRequest = {
   functionColumns?: Array<{ alias: string; snippet: string }>;
   limit?: any;
   nativeQuery?: boolean;
-  orders: Array<{ column: string; operator: SortActionType }>;
+  orders: Array<{
+    column: string;
+    operator: SortActionType;
+    aggOperator?: AggregateFieldActionType;
+  }>;
   pageInfo?: ChartDatasetPageInfo;
   columns?: string[];
   script?: boolean;
@@ -87,6 +91,8 @@ export class ChartDataRequestBuilder {
   pageInfo: ChartDatasetPageInfo;
   dataView: ChartDataView;
   script: boolean;
+
+  private extraSorters: ChartRequest['orders'] = [];
 
   constructor(
     dataView: ChartDataView,
@@ -212,7 +218,8 @@ export class ChartDataRequestBuilder {
         }
         if (
           cur.type === ChartDataSectionType.GROUP ||
-          cur.type === ChartDataSectionType.AGGREGATE
+          cur.type === ChartDataSectionType.AGGREGATE ||
+          cur.type === ChartDataSectionType.MIXED
         ) {
           return acc.concat(cur.rows);
         }
@@ -224,21 +231,28 @@ export class ChartDataRequestBuilder {
           [SortActionType.ASC, SortActionType.DESC].includes(col?.sort?.type),
       );
 
-    return sortColumns.map(aggCol => ({
+    const originalSorters = sortColumns.map(aggCol => ({
       column: aggCol.colName,
       operator: aggCol.sort?.type!,
-      aggOperator: aggCol.aggregate!,
+      aggOperator: aggCol.aggregate,
     }));
-  }
 
-  private buildLimit() {
-    const settingStyles = this.charSettingConfigs;
-    return getStyleValue(settingStyles, ['cache', 'panel', 'displayCount']);
-  }
-
-  private buildNativeQuery() {
-    const settingStyles = this.charSettingConfigs;
-    return getStyleValue(settingStyles, ['cache', 'panel', 'enableRaw']);
+    return originalSorters
+      .reduce<ChartRequest['orders']>((acc, cur) => {
+        const uniqSorter = sorter =>
+          `${sorter.column}-${
+            sorter.aggOperator?.length > 0 ? sorter.aggOperator : ''
+          }`;
+        const newSorter = this.extraSorters?.find(
+          extraSorter => uniqSorter(extraSorter) === uniqSorter(cur),
+        );
+        if (newSorter) {
+          return acc;
+        }
+        return acc.concat([cur]);
+      }, [])
+      .concat(this.extraSorters as [])
+      .filter(sorter => Boolean(sorter?.operator));
   }
 
   private buildPageInfo() {
@@ -289,7 +303,14 @@ export class ChartDataRequestBuilder {
   }
 
   private buildViewConfigs() {
-    return transformToViewConfig(this.dataView?.view?.config);
+    return transformToViewConfig(this.dataView?.config);
+  }
+
+  public addExtraSorters(sorters: ChartRequest['orders']) {
+    if (!isEmptyArray(sorters)) {
+      this.extraSorters = this.extraSorters.concat(sorters!);
+    }
+    return this;
   }
 
   public build(): ChartRequest {
@@ -304,10 +325,6 @@ export class ChartDataRequestBuilder {
       columns: this.buildSelectColumns(),
       script: this.script,
       ...this.buildViewConfigs(),
-      // expired: 0,
-      // flush: false,
-      // limit: this.buildLimit(),
-      // nativeQuery: this.buildNativeQuery(),
     };
   }
 

@@ -257,6 +257,11 @@ public class VariableServiceImpl extends BaseService implements VariableService 
     }
 
     @Override
+    public boolean delViewVariables(String viewId) {
+        return variableMapper.deleteByView(viewId) >= 0;
+    }
+
+    @Override
     @Transactional
     public boolean update(BaseUpdateParam updateParam) {
         VariableUpdateParam param = (VariableUpdateParam) updateParam;

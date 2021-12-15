@@ -39,14 +39,21 @@ export const DateControllerTypes = [
   ControllerFacadeTypes.Time,
 ];
 
-export const NeedLoadOptionTypes = [
-  ControllerFacadeTypes.DropdownList,
-  ControllerFacadeTypes.MultiDropdownList,
-  ControllerFacadeTypes.RadioGroup,
-  ControllerFacadeTypes.Tree,
-];
 export const RangeControlTypes = [
   ControllerFacadeTypes.RangeTime,
   ControllerFacadeTypes.RangeSlider,
   ControllerFacadeTypes.RangeValue,
+];
+export const StrControlTypes = [
+  ControllerFacadeTypes.DropdownList,
+  ControllerFacadeTypes.MultiDropdownList,
+  ControllerFacadeTypes.RadioGroup,
+  ControllerFacadeTypes.Text,
+];
+
+export const HasOptionsControlTypes = [
+  ControllerFacadeTypes.DropdownList,
+  ControllerFacadeTypes.MultiDropdownList,
+  ControllerFacadeTypes.RadioGroup,
+  ControllerFacadeTypes.CheckboxGroup,
 ];

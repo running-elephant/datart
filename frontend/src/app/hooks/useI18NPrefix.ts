@@ -42,9 +42,9 @@ function usePrefixI18N(prefix?: string) {
         return contextTranslation;
       }
       if (disablePrefix) {
-        return t.call(null, `${key}`, options) as string;
+        return t.call(Object.create(null), `${key}`, options) as string;
       }
-      return t.call(null, `${prefix}.${key}`, options) as string;
+      return t.call(Object.create(null), `${prefix}.${key}`, options) as string;
     },
     [i18n.language, prefix, t, vizI18NConfigs],
   );

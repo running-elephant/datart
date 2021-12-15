@@ -89,6 +89,7 @@ export const CanFullScreenWidgetTypes: WidgetType[] = ['chart', 'media'];
 export const CONTAINER_TAB = 'containerTab';
 
 //
+export const NeedFetchWidgetTypes: WidgetType[] = ['chart', 'controller'];
 
 // setting
 
@@ -190,6 +191,10 @@ export const SQL_OPERATOR_OPTIONS_TYPES = {
     FilterSqlOperator.NotEqual,
   ],
   [ControllerFacadeTypes.MultiDropdownList]: [
+    FilterSqlOperator.In,
+    FilterSqlOperator.NotIn,
+  ],
+  [ControllerFacadeTypes.CheckboxGroup]: [
     FilterSqlOperator.In,
     FilterSqlOperator.NotIn,
   ],

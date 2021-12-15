@@ -31,6 +31,7 @@ import workbenchSlice, {
   shadowChartConfigSelector,
   updateChartAction,
   updateChartConfigAndRefreshDatasetAction,
+  updateRichTextAction,
   useWorkbenchSlice,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
@@ -266,20 +267,31 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       {
         name: 'click',
         callback: param => {
-          if (param.seriesName === 'paging') {
-            const page = param.value?.page;
-            dispatch(refreshDatasetAction({ pageInfo: { pageNo: page } }));
+          if (
+            param.componentType === 'table' &&
+            param.seriesType === 'header'
+          ) {
+            dispatch(
+              refreshDatasetAction({
+                sorter: {
+                  column: param?.seriesName!,
+                  operator: param?.value,
+                },
+              }),
+            );
             return;
           }
-        },
-      },
-      {
-        name: 'dblclick',
-        callback: param => {
-          console.log(
-            '//TODO: to be remove | mouse db click event ----> ',
-            param,
-          );
+          if (
+            param.componentType === 'table' &&
+            param.seriesType === 'paging'
+          ) {
+            const pageNo = param.value;
+            dispatch(refreshDatasetAction({ pageInfo: { pageNo } }));
+            return;
+          } else if (param.seriesName === 'richText') {
+            dispatch(updateRichTextAction(param.value));
+            return;
+          }
         },
       },
     ]);

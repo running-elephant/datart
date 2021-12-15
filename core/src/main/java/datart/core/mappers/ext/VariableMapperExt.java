@@ -2,10 +2,7 @@ package datart.core.mappers.ext;
 
 import datart.core.entity.Variable;
 import datart.core.mappers.VariableMapper;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -89,4 +86,9 @@ public interface VariableMapperExt extends VariableMapper {
             "</script>",
     })
     int batchInsert(List<Variable> elements);
+
+    @Delete({
+            "DELETE FROM variable where view_id=#{viewId}"
+    })
+    int deleteByView(String viewId);
 }

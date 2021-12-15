@@ -245,7 +245,13 @@ export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
 
 export const refreshDatasetAction = createAsyncThunk(
   'workbench/refreshDatasetAction',
-  async (arg: { pageInfo? }, thunkAPI) => {
+  async (
+    arg: {
+      pageInfo?;
+      sorter?: { column: string; operator: string; aggOperator?: string };
+    },
+    thunkAPI,
+  ) => {
     try {
       const state = thunkAPI.getState() as any;
       const workbenchState = state.workbench as typeof initState;
@@ -255,15 +261,46 @@ export const refreshDatasetAction = createAsyncThunk(
       const builder = new ChartDataRequestBuilder(
         {
           ...workbenchState.currentDataView,
-          view: workbenchState?.backendChart?.view,
         },
         workbenchState.chartConfig?.datas,
         workbenchState.chartConfig?.settings,
         arg?.pageInfo,
         true,
       );
-      const requestParams = builder.build();
+      const requestParams = builder
+        .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
+        .build();
       thunkAPI.dispatch(fetchDataSetAction(requestParams));
+    } catch (error) {
+      return rejectHandle(error, thunkAPI.rejectWithValue);
+    }
+  },
+);
+
+export const updateRichTextAction = createAsyncThunk(
+  'workbench/updateRichTextAction',
+  async (delta: string | undefined, thunkAPI) => {
+    try {
+      const state = thunkAPI.getState() as any;
+      const workbenchState = state.workbench as typeof initState;
+      if (!workbenchState.currentDataView?.id) {
+        return;
+      }
+      await thunkAPI.dispatch(
+        workbenchSlice.actions.updateChartConfig({
+          type: 'style',
+          payload: {
+            ancestors: [0, 0],
+            value: {
+              label: 'delta.richText',
+              key: 'richText',
+              default: '',
+              comType: 'input',
+              value: delta,
+            },
+          },
+        }),
+      );
     } catch (error) {
       return rejectHandle(error, thunkAPI.rejectWithValue);
     }

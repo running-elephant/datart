@@ -61,6 +61,7 @@ export const RadioButtonTypeName = ['config', 'radioButtonType'];
 export const SliderStepName = ['config', 'sliderConfig', 'step'];
 export const SliderShowMarksName = ['config', 'sliderConfig', 'showMarks'];
 
+export const CascadesName = ['config', 'cascades'];
 export interface RelatedViewFormProps {
   controllerType: ControllerFacadeTypes;
   form: FormInstance<ControllerWidgetContent> | undefined;
@@ -98,13 +99,6 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
           form={form}
           viewMap={viewMap}
         />
-
-        {/* sql 对应关系 */}
-        <SqlOperator controllerType={controllerType} />
-
-        {/* 按钮样式 */}
-        {hasRadio && <RadioStyleForm />}
-
         {/* slider */}
         {sliderTypes && (
           <>
@@ -112,6 +106,11 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
             <SliderMarks />
           </>
         )}
+        {/* sql 对应关系 */}
+        <SqlOperator controllerType={controllerType} />
+
+        {/* 按钮样式 */}
+        {hasRadio && <RadioStyleForm />}
 
         {/* 是否显示 */}
         <ControllerVisibility
