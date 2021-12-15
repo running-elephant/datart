@@ -38,6 +38,8 @@ class ScoreChart extends Chart {
   chart: any = null;
   config = Config;
   utilCanvas = null;
+  scoreChartOptions = { dataset: {}, config: {} };
+
   boardTypes = ['header', 'body', 'footer'];
 
   constructor(props?) {
@@ -76,6 +78,7 @@ class ScoreChart extends Chart {
       this.chart?.clear();
       return;
     }
+    this.scoreChartOptions = props;
     const newOptions = this.getOptions(props.dataset, props.config, context);
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
@@ -85,6 +88,7 @@ class ScoreChart extends Chart {
   }
 
   onResize(opt: any, context): void {
+    this.onUpdated(this.scoreChartOptions, context);
     this.chart?.resize(context);
   }
 
@@ -112,7 +116,6 @@ class ScoreChart extends Chart {
 
     const { basicFontSize, bodyContentFontSize } = this.computeFontSize(
       context,
-      { width: this.chart?.getWidth(), height: this.chart?.getHeight() },
     ).apply(null, measureTexts as any);
 
     const richStyles = aggConfigValues
@@ -295,7 +298,7 @@ class ScoreChart extends Chart {
   }
 
   private computeFontSize =
-    (context, style) =>
+    context =>
     (
       prefixHeader: string,
       headerText: string,
@@ -314,7 +317,7 @@ class ScoreChart extends Chart {
       const hasContent = prefixContent || contentText || suffixContent;
       const hasFooter = prefixFooter || footerText || suffixFooter;
 
-      const { width, height } = style;
+      const { width, height } = context;
 
       const maxPartSize = 16;
       const exactWidth =

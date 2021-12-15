@@ -3,15 +3,9 @@ import {
   FieldStringOutlined,
   NumberOutlined,
 } from '@ant-design/icons';
-import {
-  Dropdown,
-  Menu,
-  Table,
-  TableColumnType,
-  TableProps,
-  Tooltip,
-} from 'antd';
+import { Dropdown, Menu, TableColumnType, TableProps, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
+import { VirtualTable } from 'app/components/VirtualTable';
 import { memo, ReactElement, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -29,7 +23,6 @@ import {
 } from '../constants';
 import { Column, Model } from '../slice/types';
 import { getColumnWidthMap } from '../utils';
-
 const ROW_KEY = 'DATART_ROW_KEY';
 
 interface SchemaTableProps extends TableProps<object> {
@@ -158,10 +151,9 @@ export const SchemaTable = memo(
       getExtraHeaderActions,
       onSchemaTypeChange,
     ]);
-
     return (
       <>
-        <Table
+        <VirtualTable
           {...tableProps}
           rowKey={ROW_KEY}
           size="small"

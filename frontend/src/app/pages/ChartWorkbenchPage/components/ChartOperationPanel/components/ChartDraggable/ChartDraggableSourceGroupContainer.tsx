@@ -16,13 +16,12 @@
  * limitations under the License.
  */
 
-import { Checkbox, List } from 'antd';
+import { List } from 'antd';
 import { ChartDataViewMeta } from 'app/types/ChartDataView';
-import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { FC, memo, useState } from 'react';
-import { DragSourceMonitor, useDrag } from 'react-dnd';
 import styled from 'styled-components/macro';
 import { ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
+import ChartDragLayer from './ChartDragLayer';
 
 export const ChartDraggableSourceGroupContainer: FC<{
   meta?: ChartDataViewMeta[];
@@ -33,79 +32,78 @@ export const ChartDraggableSourceGroupContainer: FC<{
   onDeleteComputedField,
   onEditComputedField,
 }) {
-  const [indeterminate, setIndeterminate] = useState(false);
-  const [checkedList, setCheckedList] = useState<ChartDataViewMeta[]>([]);
-  const [isCheckAll, setIsCheckAll] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<ChartDataViewMeta[]>([]);
+  const [selectedItemsIds, setselectedItemsIds] = useState<Array<string>>([]);
+  const [activeItemId, setActiveItemId] = useState<string>('');
 
-  const [, drag] = useDrag(
-    () => ({
-      type: CHART_DRAG_ELEMENT_TYPE.DATASET_GROUP_COLUMNS,
-      canDrag: true,
-      item: checkedList.map(item => ({
-        colName: item.id,
-        type: item.type,
-        category: item.category,
-      })),
-      collect: (monitor: DragSourceMonitor) => ({
-        isDragging: monitor.isDragging(),
-      }),
-    }),
-    [checkedList],
-  );
+  const onDataItemSelectionChange = (
+    dataItemId: string,
+    cmdKeyActive: boolean,
+    shiftKeyActive: boolean,
+  ) => {
+    let interimSelectedItemsIds: Array<string> = [];
+    let interimActiveItemId = '';
+    const DataViewMeta = meta?.slice() || [];
+    const previousSelectedItemsIds: Array<any> = selectedItemsIds.slice();
+    const previousActiveItemId = activeItemId;
 
-  const handleListItemChecked = item => checked => {
-    if (
-      !!checked &&
-      !checkedList.find(checkedItem => checkedItem.id === item.id)
-    ) {
-      const updatedList = checkedList.concat([item]);
-      setCheckedList(updatedList);
-      setIsCheckAll(meta?.length === updatedList.length);
-      setIndeterminate(
-        !!updatedList.length && (meta || []).length > updatedList.length,
+    if (cmdKeyActive) {
+      if (
+        previousSelectedItemsIds.indexOf(dataItemId) > -1 &&
+        dataItemId !== previousActiveItemId
+      ) {
+        interimSelectedItemsIds = previousSelectedItemsIds.filter(
+          id => id !== dataItemId,
+        );
+      } else {
+        interimSelectedItemsIds = [...previousSelectedItemsIds, dataItemId];
+      }
+    } else if (shiftKeyActive && dataItemId !== previousActiveItemId) {
+      const activeCardIndex: any = DataViewMeta.findIndex(
+        c => c.id === previousActiveItemId,
       );
-    } else if (!checked) {
-      const updatedList = checkedList.filter(
-        checkedItem => checkedItem.id !== item.id,
-      );
-      setCheckedList(updatedList);
-      setIsCheckAll(meta?.length === updatedList.length);
-      setIndeterminate(
-        !!updatedList.length && (meta || []).length > updatedList.length,
-      );
+      const cardIndex = DataViewMeta.findIndex(c => c.id === dataItemId);
+      const lowerIndex = Math.min(activeCardIndex, cardIndex);
+      const upperIndex = Math.max(activeCardIndex, cardIndex);
+      interimSelectedItemsIds = DataViewMeta.slice(
+        lowerIndex,
+        upperIndex + 1,
+      ).map(c => c.id);
+    } else {
+      interimSelectedItemsIds = [dataItemId];
+      interimActiveItemId = dataItemId;
+    }
+
+    const selectedCards = DataViewMeta.filter(c =>
+      interimSelectedItemsIds.includes(c.id),
+    );
+
+    setselectedItemsIds(interimSelectedItemsIds);
+    setActiveItemId(interimActiveItemId);
+    setSelectedItems(selectedCards);
+  };
+
+  const onClearCheckedList = () => {
+    if (selectedItems?.length > 0) {
+      setselectedItemsIds([]);
+      setActiveItemId('');
+      setSelectedItems([]);
     }
   };
 
-  const handleCheckAll = checked => {
-    setCheckedList(checked ? meta || [] : []);
-    setIndeterminate(false);
-    setIsCheckAll(checked);
-  };
-
   return (
-    <Container ref={drag}>
+    <Container onClick={onClearCheckedList}>
+      {/* 拖动层组件 */}
+      <ChartDragLayer />
       <List
         dataSource={meta}
         rowKey={item => item.id}
-        // header={
-        //   <Checkbox
-        //     indeterminate={indeterminate}
-        //     checked={isCheckAll}
-        //     onChange={e => handleCheckAll(e.target?.checked)}
-        //   >
-        //     Allow MultiDraggable (Drag Me)
-        //   </Checkbox>
-        // }
         renderItem={item => (
-          <Item>
-            {(isCheckAll || indeterminate) && (
-              <Checkbox
-                checked={
-                  !!checkedList.find(checkedItem => checkedItem.id === item.id)
-                }
-                onChange={e => handleListItemChecked(item)(e.target?.checked)}
-              />
-            )}
+          <Item
+            onClick={e => {
+              e.stopPropagation();
+            }}
+          >
             <ChartDraggableSourceContainer
               key={item.id}
               id={item.id}
@@ -115,6 +113,10 @@ export const ChartDraggableSourceGroupContainer: FC<{
               type={item.type}
               onDeleteComputedField={onDeleteComputedField}
               onEditComputedField={onEditComputedField}
+              onSelectionChange={onDataItemSelectionChange}
+              onClearCheckedList={onClearCheckedList}
+              isActive={selectedItemsIds.includes(item.id)}
+              selectedItems={selectedItems}
             />
           </Item>
         )}

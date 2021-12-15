@@ -80,8 +80,9 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
           CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN,
         ],
-        drop(item: ChartDataSectionField, monitor) {
-          let items = [item];
+        drop(item: any, monitor) {
+          let items = Array.isArray(item) ? item : [item];
+
           if (
             monitor.getItemType() ===
             CHART_DRAG_ELEMENT_TYPE.DATASET_GROUP_COLUMNS
@@ -115,6 +116,15 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           return { delete: true };
         },
         canDrop: (item: ChartDataSectionField, monitor) => {
+          if (
+            Array.isArray(item) &&
+            typeof currentConfig.actions === 'object' &&
+            item.every(val => val.type in (currentConfig.actions || {}))
+          ) {
+            //zh: 判断是否拖拽多个数据项 en: Determine whether to drag multiple data items
+            return true;
+          }
+
           if (
             typeof currentConfig.actions === 'object' &&
             !(item.type in currentConfig.actions)
