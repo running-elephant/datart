@@ -43,27 +43,14 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
     const dispatch = useDispatch();
     const { orgId } = useContext(BoardContext);
     const [options, setOptions] = useState<CascaderOptionType[]>([]);
-    const getChildren = useCallback(
-      async viewId => {
-        try {
-          const { data } = await request<View>(`/views/${viewId}`);
-
-          const model = JSON.parse(data.model);
-          const items: CascaderOptionType[] = Object.keys(model).map(key => {
-            return {
-              value: key,
-              label: key,
-            };
-          });
-          setTimeout(() => {
-            dispatch(saveToViewMapAction(data));
-          }, 0);
-
-          return items;
-        } catch (error) {}
-      },
-      [dispatch],
-    );
+    const getViewData = useCallback(async viewId => {
+      try {
+        const { data } = await request<View>(`/views/${viewId}`);
+        return data;
+      } catch (error) {
+        errorHandle(error);
+      }
+    }, []);
     const setViews = useCallback(
       async orgId => {
         try {
@@ -76,7 +63,22 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
             };
           });
           if (Array.isArray(value) && value.length === 2) {
-            const children = await getChildren(value[0]);
+            const data = await getViewData(value[0]);
+            if (!data) return;
+
+            const model = JSON.parse(data.model);
+            const children: CascaderOptionType[] = Object.keys(model).map(
+              key => {
+                return {
+                  value: key,
+                  label: key,
+                };
+              },
+            );
+            setTimeout(() => {
+              dispatch(saveToViewMapAction(data));
+            }, 0);
+
             views.forEach(view => {
               if (view.value === value[0]) {
                 view.children = children;
@@ -89,7 +91,7 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
           throw error;
         }
       },
-      [getChildren, value],
+      [dispatch, getViewData, value],
     );
 
     useEffect(() => {
@@ -100,7 +102,17 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
       async (selectedOptions: CascaderOptionType[]) => {
         const targetOption = selectedOptions[selectedOptions.length - 1];
         targetOption.loading = true;
-        targetOption.children = await getChildren(targetOption.value);
+
+        const data = await getViewData(targetOption.value);
+        if (!data) return;
+        const model = JSON.parse(data.model);
+        const children: CascaderOptionType[] = Object.keys(model).map(key => {
+          return {
+            value: key,
+            label: key,
+          };
+        });
+        targetOption.children = children;
         //
         targetOption.loading = false;
         const nextOptions = [...options].map(item => {
@@ -110,10 +122,9 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
             return item;
           }
         });
-        console.log('__targetOption', targetOption);
         setOptions(nextOptions);
       },
-      [options, getChildren],
+      [options, getViewData],
     );
 
     return (
