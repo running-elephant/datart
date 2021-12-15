@@ -52,26 +52,6 @@ const config: ChartConfig = {
   ],
   styles: [
     {
-      label: 'header.title',
-      key: 'header',
-      comType: 'group',
-      rows: [
-        {
-          label: 'header.open',
-          key: 'modal',
-          comType: 'group',
-          options: { type: 'modal', modalSize: 'middle' },
-          rows: [
-            {
-              label: 'header.styleAndGroup',
-              key: 'tableHeaders',
-              comType: 'tableHeader',
-            },
-          ],
-        },
-      ],
-    },
-    {
       label: 'column.title',
       key: 'column',
       comType: 'group',
@@ -130,107 +110,35 @@ const config: ChartConfig = {
       comType: 'group',
       rows: [
         {
-          label: 'style.enableFixedHeader',
-          key: 'enableFixedHeader',
-          default: true,
-          comType: 'checkbox',
-        },
-        {
-          label: 'style.enableBorder',
-          key: 'enableBorder',
-          default: true,
-          comType: 'checkbox',
-        },
-        {
-          label: 'style.enableRowNumber',
-          key: 'enableRowNumber',
+          label: 'style.enableExpandRow',
+          key: 'enableExpandRow',
           default: false,
           comType: 'checkbox',
         },
         {
-          label: 'style.leftFixedColumns',
-          key: 'leftFixedColumns',
-          comType: 'select',
-          options: {
-            mode: 'multiple',
-            getItems: cols => {
-              const columns = (cols || [])
-                .filter(col =>
-                  ['aggregate', 'group', 'mixed'].includes(col.type),
-                )
-                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-                .map(c => ({
-                  key: c.uid,
-                  value: c.uid,
-                  label:
-                    c.label || c.aggregate
-                      ? `${c.aggregate}(${c.colName})`
-                      : c.colName,
-                }));
-              return columns;
-            },
-          },
+          label: 'style.enableHoverHighlight',
+          key: 'enableHoverHighlight',
+          default: true,
+          comType: 'checkbox',
         },
         {
-          label: 'style.rightFixedColumns',
-          key: 'rightFixedColumns',
-          comType: 'select',
-          options: {
-            mode: 'multiple',
-            getItems: cols => {
-              const columns = (cols || [])
-                .filter(col =>
-                  ['aggregate', 'group', 'mixed'].includes(col.type),
-                )
-                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-                .map(c => ({
-                  key: c.uid,
-                  value: c.uid,
-                  label:
-                    c.label || c.aggregate
-                      ? `${c.aggregate}(${c.colName})`
-                      : c.colName,
-                }));
-              return columns;
-            },
-          },
+          label: 'style.enableSelectedHighlight',
+          key: 'enableSelectedHighlight',
+          default: false,
+          comType: 'checkbox',
         },
-        {
-          label: 'style.autoMergeFields',
-          key: 'autoMergeFields',
-          comType: 'select',
-          options: {
-            mode: 'multiple',
-            getItems: cols => {
-              const columns = (cols || [])
-                .filter(col => ['mixed'].includes(col.type))
-                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-                .filter(c => c.type === 'STRING')
-                .map(c => ({
-                  key: c.uid,
-                  value: c.uid,
-                  label:
-                    c.label || c.aggregate
-                      ? `${c.aggregate}(${c.colName})`
-                      : c.colName,
-                }));
-              return columns;
-            },
-          },
-        },
-        {
-          label: 'style.tableSize',
-          key: 'tableSize',
-          default: 'default',
-          comType: 'select',
-          options: {
-            items: [
-              { label: '默认', value: 'default' },
-              { label: '中', value: 'middle' },
-              { label: '小', value: 'small' },
-            ],
-          },
-        },
+        // {
+        //   label: 'style.enableAdjustRowHeight',
+        //   key: 'enableAdjustRowHeight',
+        //   default: false,
+        //   comType: 'checkbox',
+        // },
+        // {
+        //   label: 'style.enableAdjustColumnWidth',
+        //   key: 'enableAdjustColumnWidth',
+        //   default: false,
+        //   comType: 'checkbox',
+        // },
       ],
     },
     {
@@ -386,33 +294,13 @@ const config: ChartConfig = {
           row: '行',
           column: '列',
         },
-        header: {
-          title: '表头分组',
-          open: '打开',
-          styleAndGroup: '表头分组',
-        },
-        column: {
-          title: '表格列样式',
-          open: '打开列设置',
-          list: '字段列表',
-          sortAndFilter: '排序与过滤',
-          enableSort: '开启列排序',
-          basicStyle: '基础样式',
-          conditionStyle: '条件样式',
-          backgroundColor: '背景颜色',
-          align: '对齐方式',
-          enableFixedCol: '开启固定列宽',
-          fixedColWidth: '固定列宽度设置',
-          font: '字体与样式',
-        },
         style: {
           title: '表格样式',
-          enableFixedHeader: '固定表头',
-          enableBorder: '显示边框',
-          enableRowNumber: '启用行号',
-          leftFixedColumns: '左侧固定列',
-          rightFixedColumns: '右侧固定列',
-          autoMergeFields: '自动合并列内容',
+          enableExpandRow: '行表头折叠',
+          enableHoverHighlight: '启用联动高亮',
+          enableSelectedHighlight: '启用选中高亮',
+          enableAdjustRowHeight: '启用调整行高',
+          enableAdjustColumnWidth: '启用调整列宽',
           tableSize: '表格大小',
           tableHeaderStyle: '表头样式',
           tableBodyStyle: '表体样式',
@@ -438,33 +326,13 @@ const config: ChartConfig = {
           row: 'Row',
           column: 'Column',
         },
-        header: {
-          title: 'Table Header Group',
-          open: 'Open',
-          styleAndGroup: 'Header Group',
-        },
-        column: {
-          title: 'Table Column Style',
-          open: 'Open Column Setting',
-          list: 'Field List',
-          sortAndFilter: 'Sort and Filter',
-          enableSort: 'Enable Sort',
-          basicStyle: 'Baisc Style',
-          conditionStyle: 'Condition Style',
-          backgroundColor: 'Background Color',
-          align: 'Align',
-          enableFixedCol: 'Enable Fixed Column',
-          fixedColWidth: 'Fixed Column Width',
-          font: 'Font and Style',
-        },
         style: {
           title: 'Table Style',
-          enableFixedHeader: 'Enable Fixed Header',
-          enableBorder: 'Show Border',
-          enableRowNumber: 'Enable Row Number',
-          leftFixedColumns: 'Left Fixed Columns',
-          rightFixedColumns: 'Right Fixed Columns',
-          autoMergeFields: 'Auto Merge Column Content',
+          enableExpandRow: 'Fold Row',
+          enableHoverHighlight: 'Enable Hover Highlight',
+          enableSelectedHighlight: 'Enable Selected Highlight',
+          enableAdjustRowHeight: 'Enable Adjust Row Height',
+          enableAdjustColumnWidth: 'Enable Adjust Column Width',
           tableSize: 'Table Size',
           tableHeaderStyle: 'Table Header Style',
           tableBodyStyle: 'Table Body Style',

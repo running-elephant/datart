@@ -100,12 +100,32 @@ class PivotSheetChart extends ReactChart {
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
+    const enableExpandRow = this.getStyleValue(styleConfigs, [
+      'style',
+      'enableExpandRow',
+    ]);
+
+    const enableHoverHighlight = this.getStyleValue(styleConfigs, [
+      'style',
+      'enableHoverHighlight',
+    ]);
+
+    const enableSelectedHighlight = this.getStyleValue(styleConfigs, [
+      'style',
+      'enableSelectedHighlight',
+    ]);
+
     return {
       options: {
+        hierarchyType: enableExpandRow ? 'tree' : 'grid',
         width: context?.width,
         height: context?.height,
         tooltip: {
           showTooltip: true,
+        },
+        interaction: {
+          hoverHighlight: !!enableHoverHighlight,
+          selectedCellsSpotlight: !!enableSelectedHighlight,
         },
       },
       dataCfg: {

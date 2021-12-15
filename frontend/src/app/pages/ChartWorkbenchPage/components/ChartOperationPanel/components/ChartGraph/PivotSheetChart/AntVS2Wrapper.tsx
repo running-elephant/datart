@@ -24,7 +24,6 @@ import styled from 'styled-components/macro';
 
 const AntVS2Wrapper: FC<{ dataCfg; options; theme?: S2Theme }> = memo(
   ({ dataCfg, options, theme }) => {
-    console.log(`theme ---> `, theme);
     return (
       <StyledAntVS2Wrapper
         sheetType="pivot"
