@@ -24,6 +24,7 @@ import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.RelSubjectColumnsMapperExt;
+import datart.core.mappers.ext.RelVariableSubjectMapperExt;
 import datart.core.mappers.ext.ViewMapperExt;
 import datart.security.base.ResourceType;
 import datart.security.exception.PermissionDeniedException;
@@ -55,16 +56,19 @@ public class ViewServiceImpl extends BaseService implements ViewService {
 
     private final VariableService variableService;
 
+    private final RelVariableSubjectMapperExt rvsMapper;
+
     public ViewServiceImpl(ViewMapperExt viewMapper,
                            RelSubjectColumnsMapperExt rscMapper,
                            RelRoleResourceMapperExt rrrMapper,
                            RoleService roleService,
-                           VariableService variableService) {
+                           VariableService variableService, RelVariableSubjectMapperExt rvsMapper) {
         this.viewMapper = viewMapper;
         this.rscMapper = rscMapper;
         this.rrrMapper = rrrMapper;
         this.roleService = roleService;
         this.variableService = variableService;
+        this.rvsMapper = rvsMapper;
     }
 
     @Override
@@ -177,6 +181,17 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         view.setIndex(index);
         return 1 == viewMapper.updateByPrimaryKey(view);
 
+    }
+
+    @Override
+    @Transactional
+    public void deleteReference(View view) {
+        List<Variable> variables = variableService.listByView(view.getId());
+        if (variables.size() > 0) {
+            rvsMapper.deleteByVariables(variables.stream().map(Variable::getId).collect(Collectors.toSet()));
+        }
+        rscMapper.deleteByView(view.getId());
+        variableService.delViewVariables(view.getId());
     }
 
     @Override
