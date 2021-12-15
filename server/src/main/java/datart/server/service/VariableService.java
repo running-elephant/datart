@@ -50,6 +50,8 @@ public interface VariableService extends BaseCRUDService<Variable, VariableMappe
 
     boolean deleteRel(Set<String> relIds);
 
+    boolean delViewVariables(String viewId);
+
 
 }
 

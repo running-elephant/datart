@@ -24,6 +24,7 @@ import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.RelSubjectColumnsMapperExt;
+import datart.core.mappers.ext.RelVariableSubjectMapperExt;
 import datart.core.mappers.ext.ViewMapperExt;
 import datart.security.base.ResourceType;
 import datart.security.exception.PermissionDeniedException;
@@ -55,16 +56,19 @@ public class ViewServiceImpl extends BaseService implements ViewService {
 
     private final VariableService variableService;
 
+    private final RelVariableSubjectMapperExt rvsMapper;
+
     public ViewServiceImpl(ViewMapperExt viewMapper,
                            RelSubjectColumnsMapperExt rscMapper,
                            RelRoleResourceMapperExt rrrMapper,
                            RoleService roleService,
-                           VariableService variableService) {
+                           VariableService variableService, RelVariableSubjectMapperExt rvsMapper) {
         this.viewMapper = viewMapper;
         this.rscMapper = rscMapper;
         this.rrrMapper = rrrMapper;
         this.roleService = roleService;
         this.variableService = variableService;
+        this.rvsMapper = rvsMapper;
     }
 
     @Override
@@ -180,6 +184,17 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     }
 
     @Override
+    @Transactional
+    public void deleteReference(View view) {
+        List<Variable> variables = variableService.listByView(view.getId());
+        if (variables.size() > 0) {
+            rvsMapper.deleteByVariables(variables.stream().map(Variable::getId).collect(Collectors.toSet()));
+        }
+        rscMapper.deleteByView(view.getId());
+        variableService.delViewVariables(view.getId());
+    }
+
+    @Override
     public boolean updateBase(ViewBaseUpdateParam updateParam) {
         View view = retrieve(updateParam.getId());
         if (!view.getName().equals(updateParam.getName())) {
@@ -260,7 +275,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         boolean hasPermission = roles.stream().anyMatch(role -> hasPermission(role, view, permission));
         if (!hasPermission) {
             Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied",
-                    ResourceType.VIEW +":"+ view.getName() + ":" + ShiroSecurityManager.expand2StringPermissions(permission));
+                    ResourceType.VIEW + ":" + view.getName() + ":" + ShiroSecurityManager.expand2StringPermissions(permission));
         }
     }
 
@@ -285,7 +300,10 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         // check charts reference
         Datachart datachart = new Datachart();
         datachart.setViewId(viewId);
-        return viewMapper.checkUnique(datachart);
+        //check widget reference
+        RelWidgetElement relWidgetElement = new RelWidgetElement();
+        relWidgetElement.setRelId(viewId);
+        return viewMapper.checkUnique(datachart) && viewMapper.checkUnique(relWidgetElement);
     }
 
 }
