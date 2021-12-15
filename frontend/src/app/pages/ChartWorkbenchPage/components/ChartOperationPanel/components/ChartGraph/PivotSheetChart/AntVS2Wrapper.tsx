@@ -30,6 +30,13 @@ const AntVS2Wrapper: FC<{ dataCfg; options; theme?: S2Theme }> = memo(
         dataCfg={dataCfg}
         options={options}
         themeCfg={{ theme }}
+        getSpreadSheet={instance => {
+          const config = instance.dataCfg;
+          config.totalData = [{ 'AVG(PREPAID_AMOUNT)': 99999 }] as any;
+          console.log(`config ---> `, config);
+          instance.setDataCfg(config);
+          instance.render(true);
+        }}
         // getSpreadSheet={instance => {
         //   instance.showTooltip = tooltipOptions => {
         //     const { position, data = {}, options } = tooltipOptions;

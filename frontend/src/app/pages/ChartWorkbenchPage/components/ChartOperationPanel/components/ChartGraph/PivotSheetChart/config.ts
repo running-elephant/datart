@@ -220,31 +220,44 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'summary.title',
-      key: 'summary',
+      label: 'summary.rowSummary',
+      key: 'rowSummary',
       comType: 'group',
       rows: [
         {
-          label: 'summary.aggregateFields',
-          key: 'aggregateFields',
+          label: 'summary.enableTotal',
+          key: 'enableTotal',
+          default: false,
+          comType: 'checkbox',
+        },
+        {
+          label: 'summary.totalPosition',
+          key: 'totalPosition',
+          default: true,
           comType: 'select',
           options: {
-            mode: 'multiple',
-            getItems: cols => {
-              const columns = (cols || [])
-                .filter(col => ['mixed'].includes(col.type))
-                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-                .filter(c => c.type === 'NUMERIC')
-                .map(c => ({
-                  key: c.uid,
-                  value: c.uid,
-                  label:
-                    c.label || c.aggregate
-                      ? `${c.aggregate}(${c.colName})`
-                      : c.colName,
-                }));
-              return columns;
-            },
+            items: [
+              { label: '顶部', value: true },
+              { label: '底部', value: false },
+            ],
+          },
+        },
+        {
+          label: 'summary.enableSubTotal',
+          key: 'enableSubTotal',
+          default: false,
+          comType: 'checkbox',
+        },
+        {
+          label: 'summary.subTotalPosition',
+          key: 'subTotalPosition',
+          default: true,
+          comType: 'select',
+          options: {
+            items: [
+              { label: '顶部', value: true },
+              { label: '底部', value: false },
+            ],
           },
         },
       ],
@@ -310,6 +323,12 @@ const config: ChartConfig = {
         },
         summary: {
           title: '数据汇总',
+          rowSummary: '行总计',
+          columnSummary: '列总计',
+          enableTotal: '启用总计',
+          enableSubTotal: '启用小计',
+          totalPosition: '总计位置',
+          subTotalPosition: '小计位置',
           aggregateFields: '汇总列',
         },
         paging: {
@@ -342,6 +361,12 @@ const config: ChartConfig = {
         },
         summary: {
           title: 'Summary',
+          rowSummary: 'Row Total',
+          columnSummary: 'Column Total',
+          enableTotal: 'Enable Total',
+          enableSubTotal: 'Enable Sub Total',
+          totalPosition: 'Total Position',
+          subTotalPosition: 'Sub Total Position',
           aggregateFields: 'Summary Fields',
         },
         paging: {

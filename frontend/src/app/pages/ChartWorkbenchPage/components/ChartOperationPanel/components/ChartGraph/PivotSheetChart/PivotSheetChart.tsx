@@ -24,11 +24,11 @@ import {
   getValueByColumnKey,
   transfromToObjectArray,
 } from 'app/utils/chartHelper';
-import { toFormattedValue } from 'app/utils/number';
+import { isNumber, toFormattedValue } from 'app/utils/number';
+import groupBy from 'lodash/groupBy';
 import ReactChart from '../ReactChart';
 import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
-
 class PivotSheetChart extends ReactChart {
   static icon = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z" fill="currentColor"/></svg>`;
 
@@ -104,19 +104,34 @@ class PivotSheetChart extends ReactChart {
       'style',
       'enableExpandRow',
     ]);
-
     const enableHoverHighlight = this.getStyleValue(styleConfigs, [
       'style',
       'enableHoverHighlight',
     ]);
-
     const enableSelectedHighlight = this.getStyleValue(styleConfigs, [
       'style',
       'enableSelectedHighlight',
     ]);
+    const enableTotal = this.getStyleValue(settingConfigs, [
+      'rowSummary',
+      'enableTotal',
+    ]);
+    const totalPosition = this.getStyleValue(settingConfigs, [
+      'rowSummary',
+      'totalPosition',
+    ]);
+    const enableSubTotal = this.getStyleValue(settingConfigs, [
+      'rowSummary',
+      'enableSubTotal',
+    ]);
+    const subTotalPosition = this.getStyleValue(settingConfigs, [
+      'rowSummary',
+      'subTotalPosition',
+    ]);
 
     return {
       options: {
+        debug: true,
         hierarchyType: enableExpandRow ? 'tree' : 'grid',
         width: context?.width,
         height: context?.height,
@@ -124,8 +139,18 @@ class PivotSheetChart extends ReactChart {
           showTooltip: true,
         },
         interaction: {
-          hoverHighlight: !!enableHoverHighlight,
-          selectedCellsSpotlight: !!enableSelectedHighlight,
+          hoverHighlight: Boolean(enableHoverHighlight),
+          selectedCellsSpotlight: Boolean(enableSelectedHighlight),
+        },
+        totals: {
+          row: {
+            showGrandTotals: Boolean(enableTotal),
+            reverseLayout: Boolean(totalPosition),
+            showSubTotals: Boolean(enableSubTotal),
+            reverseSubLayout: Boolean(subTotalPosition),
+            subTotalsDimensions:
+              rowSectionConfigRows.map(getValueByColumnKey)?.[0],
+          },
         },
       },
       dataCfg: {
@@ -146,7 +171,14 @@ class PivotSheetChart extends ReactChart {
             };
           }),
         data: dataColumns,
-        totalData: [],
+        totalData: this.getCalcSummaryValues(
+          dataColumns,
+          rowSectionConfigRows,
+          columnSectionConfigRows,
+          metricsSectionConfigRows,
+          enableTotal,
+          enableSubTotal,
+        ),
       },
       theme: {
         /*
@@ -219,6 +251,83 @@ class PivotSheetChart extends ReactChart {
         textAlign: headerTextAlign,
       },
     };
+  }
+
+  private getCalcSummaryValues(
+    dataColumns,
+    rowSectionConfigRows,
+    columnSectionConfigRows,
+    metricsSectionConfigRows,
+    enableTotal,
+    enableSubTotal,
+  ) {
+    let summarys: any[] = [];
+    if (enableTotal) {
+      if (!columnSectionConfigRows.length) {
+        const rowTotals = metricsSectionConfigRows.map(c => {
+          const values = dataColumns
+            .map(dc => +dc?.[getValueByColumnKey(c)])
+            .filter(isNumber);
+          return {
+            [getValueByColumnKey(c)]: values?.reduce((a, b) => a + b, 0),
+          };
+        });
+        summarys.push(...rowTotals);
+      } else {
+        const rowTotals = this.calculateGroupedColumnTotal(
+          {},
+          columnSectionConfigRows.map(getValueByColumnKey),
+          metricsSectionConfigRows,
+          dataColumns,
+        );
+        summarys.push(...rowTotals);
+      }
+    }
+    if (enableSubTotal) {
+      const rowTotals = this.calculateGroupedColumnTotal(
+        {},
+        [rowSectionConfigRows[0]]
+          .concat(columnSectionConfigRows)
+          .map(getValueByColumnKey),
+        metricsSectionConfigRows,
+        dataColumns,
+      );
+      summarys.push(...rowTotals);
+    }
+
+    return summarys;
+  }
+
+  private calculateGroupedColumnTotal(
+    preObj,
+    groupKeys,
+    metrics: any[],
+    datas,
+  ) {
+    const _groupKeys = [...(groupKeys || [])];
+    const groupKey = _groupKeys.shift();
+    const groupDataSet = groupBy(datas, groupKey);
+
+    return Object.entries(groupDataSet).flatMap(([k, v]) => {
+      if (_groupKeys.length) {
+        return this.calculateGroupedColumnTotal(
+          Object.assign({}, preObj, { [groupKey]: k }),
+          _groupKeys,
+          metrics,
+          v,
+        );
+      }
+      return metrics.map(metric => {
+        const values = (v as any[])
+          .map(dc => +dc?.[getValueByColumnKey(metric)])
+          .filter(isNumber);
+        return {
+          ...preObj,
+          [groupKey]: k,
+          [getValueByColumnKey(metric)]: values?.reduce((a, b) => a + b, 0),
+        };
+      });
+    });
   }
 }
 
