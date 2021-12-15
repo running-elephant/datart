@@ -41,7 +41,7 @@ const ChartPresentWrapper: FC<{
       <ChartPresentPanel
         chart={chart}
         dataset={dataset}
-        chartConfig={chartConfig}
+        chartConfig={{ ...chartConfig, env: 'workbench' }}
       />
     </StyledChartPresentWrapper>
   );

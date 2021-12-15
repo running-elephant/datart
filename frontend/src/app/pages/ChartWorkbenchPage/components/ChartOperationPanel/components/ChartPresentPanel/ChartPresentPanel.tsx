@@ -76,7 +76,8 @@ const ChartPresentPanel: FC<{
     const style = {
       width: panelRef.current?.offsetWidth,
       height:
-        panelRef.current?.offsetHeight - CHART_TYPE_SELECTOR_HEIGHT_OFFSET, // TODO(Stephen): calculate when change chart
+        (panelRef.current?.offsetHeight || CHART_TYPE_SELECTOR_HEIGHT_OFFSET) -
+        CHART_TYPE_SELECTOR_HEIGHT_OFFSET, // TODO(Stephen): calculate when change chart
     };
 
     const containerId = chart?.isISOContainer

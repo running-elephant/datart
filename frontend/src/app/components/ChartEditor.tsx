@@ -31,6 +31,7 @@ import workbenchSlice, {
   shadowChartConfigSelector,
   updateChartAction,
   updateChartConfigAndRefreshDatasetAction,
+  updateRichTextAction,
   useWorkbenchSlice,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
@@ -286,6 +287,9 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           ) {
             const pageNo = param.value;
             dispatch(refreshDatasetAction({ pageInfo: { pageNo } }));
+            return;
+          } else if (param.seriesName === 'richText') {
+            dispatch(updateRichTextAction(param.value));
             return;
           }
         },

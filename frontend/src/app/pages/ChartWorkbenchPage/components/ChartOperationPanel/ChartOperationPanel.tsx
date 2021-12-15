@@ -51,7 +51,6 @@ const ChartOperationPanel: FC<{
     const [layout, setLayout] = useState<Model>(() =>
       Model.fromJson(layoutCnofig),
     );
-
     const layoutFactory = node => {
       var component = node.getComponent();
       if (component === LayoutComponentType.VIEW) {

@@ -25,6 +25,7 @@ import {
   getValueByColumnKey,
   transfromToObjectArray,
 } from 'app/utils/chartHelper';
+import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
 import Config from './config';
 
@@ -90,17 +91,31 @@ class BasicGaugeChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
     const dataColumns = transfromToObjectArray(dataset.rows, dataset.columns);
-    const series = this.getSeries(styleConfigs, dataColumns, aggregateConfigs);
+    const series = this.getSeries(
+      styleConfigs,
+      dataColumns,
+      aggregateConfigs[0],
+    );
+    const [prefix, suffix] = this.getArrStyleValueByGroup(
+      ['prefix', 'suffix'],
+      styleConfigs,
+      'gauge',
+    );
     return {
       tooltip: {
-        formatter: '{b} : {c}%',
+        formatter: ({ data }) => {
+          return `${data.name} : ${prefix}${toFormattedValue(
+            data.value,
+            aggregateConfigs[0].format,
+          )}${suffix}`;
+        },
       },
       series,
     };
   }
 
-  private getSeries(styleConfigs, dataColumns, aggregateConfigs) {
-    const detail = this.getDetail(styleConfigs);
+  private getSeries(styleConfigs, dataColumns, aggConfig) {
+    const detail = this.getDetail(styleConfigs, aggConfig);
     const title = this.getTitle(styleConfigs);
     const pointer = this.getPointer(styleConfigs);
     const axis = this.getAxis(styleConfigs);
@@ -113,30 +128,28 @@ class BasicGaugeChart extends Chart {
       'pointerColor',
     );
 
-    return aggregateConfigs.map(aggConfig => {
-      return {
-        ...this.getGauge(styleConfigs),
-        data: dataColumns.map(dc => {
-          const dataConfig: { name: string; value: string; itemStyle: any } = {
-            name: getColumnRenderName(aggConfig),
-            value: dc[getValueByColumnKey(aggConfig)] || 0,
-            itemStyle: {
-              color: pointerColor,
-            },
-          };
-          if (aggConfig?.color?.start) {
-            dataConfig.itemStyle.color = aggConfig.color.start;
-          }
-          return dataConfig;
-        }),
-        pointer,
-        ...axis,
-        title,
-        splitLine,
-        detail,
-        progress,
-      };
-    });
+    return {
+      ...this.getGauge(styleConfigs),
+      data: dataColumns.map(dc => {
+        const dataConfig: { name: string; value: string; itemStyle: any } = {
+          name: getColumnRenderName(aggConfig),
+          value: dc[getValueByColumnKey(aggConfig)] || 0,
+          itemStyle: {
+            color: pointerColor,
+          },
+        };
+        if (aggConfig?.color?.start) {
+          dataConfig.itemStyle.color = aggConfig.color.start;
+        }
+        return dataConfig;
+      }),
+      pointer,
+      ...axis,
+      title,
+      splitLine,
+      detail,
+      progress,
+    };
   }
 
   private getProgress(styleConfigs) {
@@ -257,7 +270,7 @@ class BasicGaugeChart extends Chart {
     };
   }
 
-  private getDetail(styleConfigs) {
+  private getDetail(styleConfigs, aggConfig) {
     const [show, font, detailOffsetLeft, detailOffsetTop] =
       this.getArrStyleValueByGroup(
         ['showData', 'font', 'detailOffsetLeft', 'detailOffsetTop'],
@@ -277,7 +290,8 @@ class BasicGaugeChart extends Chart {
         detailOffsetLeft ? detailOffsetLeft : 0,
         detailOffsetTop ? detailOffsetTop : 0,
       ],
-      formatter: value => `${prefix}${Number(value) || 0}${suffix}`,
+      formatter: value =>
+        `${prefix}${toFormattedValue(value || 0, aggConfig.format)}${suffix}`,
     };
   }
 
