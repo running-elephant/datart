@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 
-import { PivotSheet } from '@antv/s2';
-import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import {
@@ -26,59 +24,52 @@ import {
   getValueByColumnKey,
   transfromToObjectArray,
 } from 'app/utils/chartHelper';
+import ReactChart from '../ReactChart';
+import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
 
-class PivotSheetChart extends Chart {
+class PivotSheetChart extends ReactChart {
   static icon = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z" fill="currentColor"/></svg>`;
+
+  _useIFrame = false;
+  isISOContainer = 'piovt-sheet';
   config = Config;
   chart: any = null;
+  tableOptions: {
+    dataset?;
+    config?;
+  } = {};
 
   constructor() {
-    super('piovt-sheet', '透视表', PivotSheetChart.icon);
+    super(AntVS2Wrapper, {
+      id: 'piovt-sheet',
+      name: '透视表',
+      icon: PivotSheetChart.icon,
+    });
     this.meta.requirements = [
       {
-        group: [1, 999],
-        aggregate: [1, 999],
+        group: [0, 999],
+        aggregate: [0, 999],
       },
     ];
   }
 
-  onMount(options, context): void {
-    if (options.containerId === undefined || !context.document) {
+  onUpdated(options, context): void {
+    this.tableOptions = options;
+
+    if (!this.isMatchRequirement(options.config)) {
+      this.adapter?.unmount();
       return;
     }
-    const container = context?.document?.getElementById?.(options.containerId);
-    const s2Options = {
-      width: context.width,
-      height: context.height,
-    };
-    this.chart = new PivotSheet(container, {} as any, s2Options);
-  }
 
-  onUpdated(options, context): void {
-    this.chart.setOptions({
-      width: context?.width,
-      height: context?.height,
-    });
-    const dataConfigOptions = this.getOptions(
+    this.adapter?.updated(
+      this.getOptions(context, options.dataset, options.config),
       context,
-      options.dataset,
-      options.config,
     );
-    this.chart?.setDataCfg(dataConfigOptions);
-    this.chart?.render();
   }
 
-  onUnMount(): void {
-    this.chart?.destroy();
-  }
-
-  onResize(options, context) {
-    this.chart?.setOptions({
-      width: context?.width,
-      height: context?.height,
-    });
-    this.chart?.render();
+  onResize(_, context) {
+    this.onUpdated(this.tableOptions, context);
   }
 
   getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
@@ -109,24 +100,37 @@ class PivotSheetChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
 
+    const infoSectionConfigRows = dataConfigs
+      .filter(c => c.type === ChartDataSectionType.INFO)
+      .flatMap(config => config.rows || []);
+
     return {
-      fields: {
-        rows: rowSectionConfigRows.map(getValueByColumnKey),
-        columns: columnSectionConfigRows.map(getValueByColumnKey),
-        values: metricsSectionConfigRows.map(getValueByColumnKey),
-        valueInCols: true,
+      options: {
+        width: context?.width,
+        height: context?.height,
+        tooltip: {
+          showTooltip: true,
+        },
       },
-      meta: rowSectionConfigRows
-        .concat(columnSectionConfigRows)
-        .concat(metricsSectionConfigRows)
-        .map(config => {
-          return {
-            field: getValueByColumnKey(config),
-            name: getColumnRenderName(config),
-          };
-        }),
-      data: dataColumns,
-      totalData: [],
+      dataCfg: {
+        fields: {
+          rows: rowSectionConfigRows.map(getValueByColumnKey),
+          columns: columnSectionConfigRows.map(getValueByColumnKey),
+          values: metricsSectionConfigRows.map(getValueByColumnKey),
+          valueInCols: true,
+        },
+        meta: rowSectionConfigRows
+          .concat(columnSectionConfigRows)
+          .concat(metricsSectionConfigRows)
+          .map(config => {
+            return {
+              field: getValueByColumnKey(config),
+              name: getColumnRenderName(config),
+            };
+          }),
+        data: dataColumns,
+        totalData: [],
+      },
     };
   }
 }
