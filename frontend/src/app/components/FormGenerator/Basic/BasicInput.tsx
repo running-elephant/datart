@@ -37,14 +37,13 @@ const BasicInput: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
         }, 500),
       [ancestors, onChange, options?.needRefresh],
     );
-
     return (
       <Wrapper label={t(cache.label)}>
         <Input
           {...rest}
           {...options}
           onChange={value => {
-            const newCache = Object.assign({}, cache, { value });
+            const newCache = Object.assign({}, cache, { value: value.target?.value });
             setCache(newCache);
             debouncedDataChange(newCache.value);
           }}
