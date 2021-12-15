@@ -260,7 +260,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         boolean hasPermission = roles.stream().anyMatch(role -> hasPermission(role, view, permission));
         if (!hasPermission) {
             Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied",
-                    ResourceType.VIEW +":"+ view.getName() + ":" + ShiroSecurityManager.expand2StringPermissions(permission));
+                    ResourceType.VIEW + ":" + view.getName() + ":" + ShiroSecurityManager.expand2StringPermissions(permission));
         }
     }
 
@@ -285,7 +285,10 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         // check charts reference
         Datachart datachart = new Datachart();
         datachart.setViewId(viewId);
-        return viewMapper.checkUnique(datachart);
+        //check widget reference
+        RelWidgetElement relWidgetElement = new RelWidgetElement();
+        relWidgetElement.setRelId(viewId);
+        return viewMapper.checkUnique(datachart) && viewMapper.checkUnique(relWidgetElement);
     }
 
 }
