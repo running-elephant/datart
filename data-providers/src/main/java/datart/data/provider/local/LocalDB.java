@@ -17,7 +17,6 @@
  */
 package datart.data.provider.local;
 
-import com.google.common.collect.Lists;
 import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
 import datart.core.base.exception.Exceptions;
@@ -34,19 +33,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.h2.jdbc.JdbcSQLNonTransientException;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.SimpleResultSet;
 
 import java.sql.*;
-import java.sql.Date;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class LocalDB {
@@ -63,11 +58,7 @@ public class LocalDB {
 
     private static final String SELECT_START_SQL = "SELECT * FROM `%s` ";
 
-    private static final String INSERT_SQL = "INSERT INTO `%s` VALUES %s";
-
     private static final String CREATE_TEMP_TABLE = "CREATE TABLE IF NOT EXISTS `%s` AS (SELECT * FROM FUNCTION_TABLE('%s'))";
-
-    private static final int MAX_INSERT_BATCH = 5_000;
 
     private static final String CACHE_EXPIRE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS `cache_expire` ( `source_id` VARCHAR(128),`expire_time` DATETIME )";
 
@@ -148,7 +139,11 @@ public class LocalDB {
         TEMP_RS_CACHE.put(dataframe.getId(), dataframe);
         // register temporary table
         String sql = String.format(CREATE_TEMP_TABLE, dataframe.getName(), dataframe.getId());
-        connection.prepareStatement(sql).execute();
+        try {
+            connection.prepareStatement(sql).execute();
+        } catch (JdbcSQLNonTransientException e) {
+            //忽略重复创建表导致的异常
+        }
     }
 
     /**
@@ -187,6 +182,7 @@ public class LocalDB {
             queryScript = new QueryScript();
             queryScript.setScript(String.format(SELECT_START_SQL, srcData.get(0).getName()));
             queryScript.setVariables(Collections.emptyList());
+            queryScript.setSourceId(srcData.get(0).getName());
         }
         return persistent ? executeInLocalDB(queryScript, executeParam, srcData, expire) : executeInMemDB(queryScript, executeParam, srcData);
     }
@@ -317,7 +313,7 @@ public class LocalDB {
 //    }
 
     private static Connection getConnection(boolean persistent, String database) throws SQLException {
-        String url = persistent ? getDatabaseUrl(database) : MEM_URL + H2_PARAM;
+        String url = persistent ? getDatabaseUrl(database) : MEM_URL + "DB" +database + H2_PARAM;
         return DriverManager.getConnection(url);
     }
 
