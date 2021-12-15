@@ -23,19 +23,16 @@ const config: ChartConfig = {
     {
       label: 'datas.row',
       key: 'row',
-      required: true,
       type: 'group',
     },
     {
       label: 'datas.column',
       key: 'column',
-      required: true,
       type: 'group',
     },
     {
       label: 'metrics',
       key: 'metrics',
-      required: true,
       type: 'aggregate',
       actions: {
         NUMERIC: ['aggregate', 'alias', 'format', 'sortable'],

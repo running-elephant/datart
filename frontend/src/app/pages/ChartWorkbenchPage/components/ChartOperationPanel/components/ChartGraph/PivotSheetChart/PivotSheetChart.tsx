@@ -47,12 +47,7 @@ class PivotSheetChart extends ReactChart {
       name: '透视表',
       icon: PivotSheetChart.icon,
     });
-    this.meta.requirements = [
-      {
-        group: [0, 999],
-        aggregate: [0, 999],
-      },
-    ];
+    this.meta.requirements = [{}];
   }
 
   onUpdated(options, context): void {
