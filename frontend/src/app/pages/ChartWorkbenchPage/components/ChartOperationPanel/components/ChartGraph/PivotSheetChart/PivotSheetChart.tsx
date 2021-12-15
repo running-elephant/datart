@@ -24,6 +24,7 @@ import {
   getValueByColumnKey,
   transfromToObjectArray,
 } from 'app/utils/chartHelper';
+import { toFormattedValue } from 'app/utils/number';
 import ReactChart from '../ReactChart';
 import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
@@ -126,6 +127,7 @@ class PivotSheetChart extends ReactChart {
             return {
               field: getValueByColumnKey(config),
               name: getColumnRenderName(config),
+              formatter: value => toFormattedValue(value, config?.format),
             };
           }),
         data: dataColumns,
