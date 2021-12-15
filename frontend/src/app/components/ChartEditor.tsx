@@ -307,7 +307,6 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
             onClose?.();
           },
         }}
-        env="workbench"
         chart={chart}
         dataset={dataset}
         dataview={dataview}

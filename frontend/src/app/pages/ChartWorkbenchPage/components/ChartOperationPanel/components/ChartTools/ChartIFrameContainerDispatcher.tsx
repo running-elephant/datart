@@ -49,9 +49,8 @@ class ChartIFrameContainerDispatcher {
     dataset: any,
     config: ChartConfig,
     style?: CSSProperties,
-    env?: string,
   ): Function[] {
-    this.switchContainer(containerId, chart, dataset, config, env);
+    this.switchContainer(containerId, chart, dataset, config);
     const renders: Function[] = [];
     this.chartContainerMap.forEach((chartRenderer: Function, key) => {
       renders.push(
@@ -71,13 +70,12 @@ class ChartIFrameContainerDispatcher {
     chart: Chart,
     dataset: ChartDataset,
     config: ChartConfig,
-    env?: string,
   ) {
     this.chartMetadataMap.set(containerId, [chart, dataset, config]);
-    this.createNewIfNotExist(containerId, env);
+    this.createNewIfNotExist(containerId);
   }
 
-  private createNewIfNotExist(containerId: string, env?: string) {
+  private createNewIfNotExist(containerId: string) {
     if (!this.chartContainerMap.has(containerId)) {
       const newContainer = style => (chart, dataset, config) => {
         return (
@@ -90,7 +88,6 @@ class ChartIFrameContainerDispatcher {
               key={containerId}
               width={style?.width}
               height={style?.height}
-              env={env}
             />
           </div>
         );

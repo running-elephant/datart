@@ -39,8 +39,9 @@ const ChartStyleConfigPanel: FC<{
     const t = useI18NPrefix(`viz.palette.style`);
     return (
       <Collapse className="datart-config-panel" ghost>
-        {configs?.map((c, index) =>
-          !c.hidden ? (
+        {configs
+          ?.filter(c => !Boolean(c.hidden))
+          .map((c, index) => (
             <Collapse.Panel header={t(c.label)} key={c.key}>
               <GroupLayout
                 ancestors={[index]}
@@ -55,8 +56,7 @@ const ChartStyleConfigPanel: FC<{
                 onChange={onChange}
               />
             </Collapse.Panel>
-          ) : null,
-        )}
+          ))}
       </Collapse>
     );
   },

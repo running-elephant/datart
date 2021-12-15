@@ -30,8 +30,7 @@ const ChartPresentWrapper: FC<{
   dataset?: ChartDataset;
   chartConfig?: ChartConfig;
   onChartChange: (c: Chart) => void;
-  env?: string;
-}> = ({ chart, dataset, chartConfig, onChartChange, env }) => {
+}> = ({ chart, dataset, chartConfig, onChartChange }) => {
   return (
     <StyledChartPresentWrapper>
       <ChartGraphPanel
@@ -42,8 +41,7 @@ const ChartPresentWrapper: FC<{
       <ChartPresentPanel
         chart={chart}
         dataset={dataset}
-        chartConfig={chartConfig}
-        env={env}
+        chartConfig={{ ...chartConfig, env: 'workbench' }}
       />
     </StyledChartPresentWrapper>
   );
