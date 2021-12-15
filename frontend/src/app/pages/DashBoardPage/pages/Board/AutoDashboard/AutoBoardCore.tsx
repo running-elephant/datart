@@ -175,7 +175,6 @@ const AutoBoardCore: React.FC<AutoBoardCoreProps> = ({ boardId }) => {
   return (
     <Wrap>
       <StyledContainer bg={background}>
-        {boardLoading ? <div>loading...</div> : null}
         <div className="grid-wrap" ref={gridWrapRef}>
           <div className="grid-wrap" ref={gridRef}>
             <ResponsiveGridLayout
