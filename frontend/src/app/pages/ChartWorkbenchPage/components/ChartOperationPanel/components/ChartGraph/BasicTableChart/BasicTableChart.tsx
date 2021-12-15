@@ -378,22 +378,31 @@ class BasicTableChart extends ReactChart {
             props,
             conditionStyle,
           );
-          const bodyCellStyle = {
+
+          return (
+            <td
+              {...rest}
+              style={Object.assign(style || {}, conditionalCellStyle)}
+            />
+          );
+        },
+        row: props => {
+          const { style, ...rest } = props;
+          const rowStyle = getCustomBodyRowStyle(props, allConditionStyle);
+
+          return <tr {...rest} style={Object.assign(style || {}, rowStyle)} />;
+        },
+        wrapper: props => {
+          const { style, ...rest } = props;
+          const bodyStyle = {
             textAlign: bodyTextAlign,
             backgroundColor: bodyBgColor,
             ...bodyFont,
             fontSize: +bodyFont?.fontSize,
           };
           return (
-            <td
-              {...rest}
-              style={Object.assign(style, bodyCellStyle, conditionalCellStyle)}
-            />
+            <tbody {...rest} style={Object.assign(style || {}, bodyStyle)} />
           );
-        },
-        row: props => {
-          const rowStyle = getCustomBodyRowStyle(props, allConditionStyle);
-          return <tr {...props} style={rowStyle} />;
         },
       },
     };

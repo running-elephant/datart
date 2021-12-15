@@ -208,6 +208,10 @@
             "remove": "删除",
             "confirm": "请确认是否删除"
           },
+          "modal": {
+            "title": "条件格式",
+            "notFoundContent": "可添加多个值(输入内容后按下回车键完成添加)"
+          },
           "header": {
             "operator": "关系",
             "value": "值",

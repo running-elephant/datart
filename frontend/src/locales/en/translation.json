@@ -207,6 +207,10 @@
             "remove": "Remove",
             "confirm": "Please Confirm"
           },
+          "modal": {
+            "title": "Condition Style",
+            "notFoundContent": "Multiple values can be added (enter the content and press enter to complete the addition)"
+          },
           "header": {
             "operator": "Operator",
             "value": "Value",

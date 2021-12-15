@@ -73,7 +73,6 @@ const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
       },
       {
         title: t('conditionStyleTable.header.operator'),
-        width: 100,
         dataIndex: 'operator',
       },
       {
@@ -84,13 +83,12 @@ const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
       {
         title: t('conditionStyleTable.header.color.title'),
         dataIndex: 'value',
-        width: 200,
         render: (_, { color }) => (
           <>
             <Tag color={color.background}>
               {t('conditionStyleTable.header.color.background')}
             </Tag>
-            <Tag color={color.text}>
+            <Tag color={color.textColor}>
               {t('conditionStyleTable.header.color.text')}
             </Tag>
           </>
