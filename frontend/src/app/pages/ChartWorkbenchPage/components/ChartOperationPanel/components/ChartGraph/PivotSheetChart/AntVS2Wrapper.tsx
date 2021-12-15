@@ -16,70 +16,76 @@
  * limitations under the License.
  */
 
+import { S2Theme } from '@antv/s2';
 import { SheetComponent } from '@antv/s2-react';
 import '@antv/s2-react/dist/style.min.css';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 
-const AntVS2Wrapper: FC<{ dataCfg; options }> = memo(({ dataCfg, options }) => {
-  return (
-    <StyledAntVS2Wrapper
-      dataCfg={dataCfg}
-      options={options}
-      // getSpreadSheet={instance => {
-      //   instance.showTooltip = tooltipOptions => {
-      //     const { position, data = {}, options } = tooltipOptions;
-      //     const name = `${data.name} - 测试`; // 只有单元格中文案被省略才显示
-      //     const infos = '按住 Shift 多选或框选，查看多个数据点';
-      //     const tips = '说明：这是个说明';
-      //     const customSummaries = (data.summaries || []).map(item => {
-      //       return { ...item, name: `${item.name} - 测试` };
-      //     });
-      //     const { cols = [], rows = [] } = data.headInfo || {};
-      //     const customCols = cols.map(item => {
-      //       return { ...item, value: `${item.value} - 测试` };
-      //     });
-      //     const customDetails = (data.details || []).map(item => {
-      //       return {
-      //         name: `${item.name} - 测试`,
-      //         value: `${item.value} - w`,
-      //       };
-      //     });
-      //     const customOperator = {
-      //       onClick: () => {
-      //         console.log('测试');
-      //       },
-      //       menus: [
-      //         {
-      //           id: 'trend',
-      //           icon: 'trend',
-      //           text: '趋势',
-      //         },
-      //       ],
-      //     };
-      //     const customOptions = {
-      //       ...tooltipOptions,
-      //       position: { x: position.x + 1, y: position.y + 1 },
-      //       data: {
-      //         ...data,
-      //         name: data.name ? name : '',
-      //         infos,
-      //         tips,
-      //         summaries: customSummaries,
-      //         headInfo: { rows, cols: customCols },
-      //         details: customDetails,
-      //       },
-      //       options: {
-      //         ...options,
-      //         operator: customOperator,
-      //       },
-      //     };
-      //     instance.tooltip.show(customOptions);
-      //   };
-      // }}
-    />
-  );
-});
+const AntVS2Wrapper: FC<{ dataCfg; options; theme?: S2Theme }> = memo(
+  ({ dataCfg, options, theme }) => {
+    console.log(`theme ---> `, theme);
+    return (
+      <StyledAntVS2Wrapper
+        sheetType="pivot"
+        dataCfg={dataCfg}
+        options={options}
+        themeCfg={{ theme }}
+        // getSpreadSheet={instance => {
+        //   instance.showTooltip = tooltipOptions => {
+        //     const { position, data = {}, options } = tooltipOptions;
+        //     const name = `${data.name} - 测试`; // 只有单元格中文案被省略才显示
+        //     const infos = '按住 Shift 多选或框选，查看多个数据点';
+        //     const tips = '说明：这是个说明';
+        //     const customSummaries = (data.summaries || []).map(item => {
+        //       return { ...item, name: `${item.name} - 测试` };
+        //     });
+        //     const { cols = [], rows = [] } = data.headInfo || {};
+        //     const customCols = cols.map(item => {
+        //       return { ...item, value: `${item.value} - 测试` };
+        //     });
+        //     const customDetails = (data.details || []).map(item => {
+        //       return {
+        //         name: `${item.name} - 测试`,
+        //         value: `${item.value} - w`,
+        //       };
+        //     });
+        //     const customOperator = {
+        //       onClick: () => {
+        //         console.log('测试');
+        //       },
+        //       menus: [
+        //         {
+        //           id: 'trend',
+        //           icon: 'trend',
+        //           text: '趋势',
+        //         },
+        //       ],
+        //     };
+        //     const customOptions = {
+        //       ...tooltipOptions,
+        //       position: { x: position.x + 1, y: position.y + 1 },
+        //       data: {
+        //         ...data,
+        //         name: data.name ? name : '',
+        //         infos,
+        //         tips,
+        //         summaries: customSummaries,
+        //         headInfo: { rows, cols: customCols },
+        //         details: customDetails,
+        //       },
+        //       options: {
+        //         ...options,
+        //         operator: customOperator,
+        //       },
+        //     };
+        //     instance.tooltip.show(customOptions);
+        //   };
+        // }}
+      />
+    );
+  },
+);
 
 const StyledAntVS2Wrapper = styled(SheetComponent)``;
 

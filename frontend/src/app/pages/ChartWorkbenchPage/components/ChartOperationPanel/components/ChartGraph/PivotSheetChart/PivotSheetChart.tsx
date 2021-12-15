@@ -128,6 +128,76 @@ class PivotSheetChart extends ReactChart {
         data: dataColumns,
         totalData: [],
       },
+      theme: {
+        /*
+          DATA_CELL = "dataCell",
+          HEADER_CELL = "headerCell",
+          ROW_CELL = "rowCell",
+          COL_CELL = "colCell",
+          CORNER_CELL = "cornerCell",
+          MERGED_CELL = "mergedCell"
+        */
+        cornerCell: this.getHeaderStyle(styleConfigs),
+        colCell: this.getHeaderStyle(styleConfigs),
+        rowCell: this.getHeaderStyle(styleConfigs),
+        dataCell: this.getBodyStyle(styleConfigs),
+      },
+    };
+  }
+
+  private getBodyStyle(styleConfigs) {
+    const bodyFont = this.getStyleValue(styleConfigs, [
+      'tableBodyStyle',
+      'font',
+    ]);
+    const bodyBgColor = this.getStyleValue(styleConfigs, [
+      'tableBodyStyle',
+      'bgColor',
+    ]);
+    const bodyTextAlign = this.getStyleValue(styleConfigs, [
+      'tableBodyStyle',
+      'align',
+    ]);
+
+    return {
+      cell: {
+        backgroundColor: bodyBgColor,
+      },
+      text: {
+        fill: bodyFont?.color,
+        fontFamily: bodyFont?.fontFamily,
+        fontSize: bodyFont?.fontSize,
+        fontWeight: bodyFont?.fontWeight,
+        textAlign: bodyTextAlign,
+      },
+    };
+  }
+
+  private getHeaderStyle(styleConfigs) {
+    const headerFont = this.getStyleValue(styleConfigs, [
+      'tableHeaderStyle',
+      'font',
+    ]);
+    const headerBgColor = this.getStyleValue(styleConfigs, [
+      'tableHeaderStyle',
+      'bgColor',
+    ]);
+    const headerTextAlign = this.getStyleValue(styleConfigs, [
+      'tableHeaderStyle',
+      'align',
+    ]);
+
+    return {
+      cell: {
+        backgroundColor: headerBgColor,
+      },
+      text: {
+        fill: headerFont?.color,
+        fontFamily: headerFont?.fontFamily,
+        fontSize: headerFont?.fontSize,
+        fontWeight: headerFont?.fontWeight,
+        textAlign: headerTextAlign,
+      },
     };
   }
 }
