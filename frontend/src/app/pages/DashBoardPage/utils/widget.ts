@@ -166,7 +166,7 @@ export const createInitWidgetConfig = (opt: {
   return {
     type: opt.type,
     index: opt.index || 0,
-    name: opt.name || `${opt.type}_${opt.content.type}`,
+    name: opt.name || '',
     linkageConfig: {
       open: false,
       chartGroupColumns: [],

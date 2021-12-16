@@ -70,6 +70,8 @@ export const editBoardStackSlice = createSlice({
         maxWidgetIndex++;
         const widget = produce(ele, draft => {
           draft.config.index = maxWidgetIndex;
+          draft.config.name =
+            ele.config.name || `${ele.config.type}未命名组件_${maxWidgetIndex}`;
         });
         state.widgetRecord[widget.id] = widget;
       });
