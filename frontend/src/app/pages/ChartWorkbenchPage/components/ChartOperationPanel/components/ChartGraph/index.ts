@@ -78,7 +78,7 @@ const WidgetPlugins = {
   ScatterOutlineMapChart,
   WaterfallChart,
   BasicGaugeChart,
-  PivotSheetChart,
   BasicRichText,
+  PivotSheetChart,
 };
 export default WidgetPlugins;
