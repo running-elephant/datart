@@ -119,6 +119,7 @@ export const getTneWidgetFiltersAndParams = (obj: {
   widgetMap: Record<string, Widget>;
   params: Record<string, string[]> | undefined;
 }) => {
+  // TODO chart 本身携带了变量，board没有相关配置的时候要拿到 chart本身的 变量值 Params
   const { chartWidget, widgetMap, params: chartParams } = obj;
   const controllerWidgets = Object.values(widgetMap).filter(
     widget => widget.config.type === 'controller',
@@ -160,14 +161,14 @@ export const getTneWidgetFiltersAndParams = (obj: {
         let key1 = String(relatedViewItem.fieldValue?.[0]);
         let key2 = String(relatedViewItem.fieldValue?.[1]);
 
-        // TODO need confirm 叠加还是替换？ --xld
+        //
         variableParams[key1] = [curValues?.[0]];
         variableParams[key2] = [curValues?.[1]];
       } else {
         const key = String(relatedViewItem.fieldValue);
 
-        // TODO need confirm 叠加还是替换？ --xld
-        variableParams[key] = [curValues?.[0]];
+        //单个变量的取值逻辑 不限制为1个
+        variableParams[key] = curValues;
       }
     }
     // 关联字段 逻辑
