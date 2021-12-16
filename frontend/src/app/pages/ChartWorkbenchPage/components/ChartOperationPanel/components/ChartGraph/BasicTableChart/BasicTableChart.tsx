@@ -367,48 +367,27 @@ class BasicTableChart extends ReactChart {
       },
       body: {
         cell: props => {
+          const { style, ...rest } = props;
           const uid = props.uid;
-          const backgroundColor = this.getStyleValue(styleConfigs, [
-            'column',
-            'modal',
-            'list',
-            uid,
-            'basicStyle',
-            'backgroundColor',
-          ]);
-          const textAlign = this.getStyleValue(styleConfigs, [
-            'column',
-            'modal',
-            'list',
-            uid,
-            'basicStyle',
-            'align',
-          ]);
-          const font = this.getStyleValue(styleConfigs, [
-            'column',
-            'modal',
-            'list',
-            uid,
-            'basicStyle',
-            'font',
-          ]);
           const conditionStyle = this.getStyleValue(getAllColumnListInfo, [
             uid,
             'conditionStyle',
             'conditionStylePanel',
           ]);
-          const cellStyle = getCustomBodyCellStyle(props, conditionStyle);
+          const conditionalCellStyle = getCustomBodyCellStyle(
+            props,
+            conditionStyle,
+          );
           return (
             <td
-              {...props}
-              style={{ backgroundColor, textAlign, ...font, ...cellStyle }}
+              {...rest}
+              style={Object.assign(style || {}, conditionalCellStyle)}
             />
           );
         },
         row: props => {
           const { style, ...rest } = props;
           const rowStyle = getCustomBodyRowStyle(props, allConditionStyle);
-
           return <tr {...rest} style={Object.assign(style || {}, rowStyle)} />;
         },
         wrapper: props => {
