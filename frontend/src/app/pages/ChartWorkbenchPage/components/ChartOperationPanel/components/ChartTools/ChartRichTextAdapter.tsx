@@ -116,19 +116,11 @@ const ChartRichTextAdapter: FC<{
           const config = name
             ? dataList.find(items => items.name === name)
             : null;
-          if (config) {
-            insert = config.value;
-          } else {
-            insert = ``;
-          }
+          insert = config?.value || '';
         }
         return { ...item, insert };
       });
-      if (ops?.length) {
-        setTranslate({ ...quill, ops });
-      } else {
-        setTranslate('');
-      }
+      setTranslate(ops?.length ? { ...quill, ops }: '');
     } else {
       setTranslate(quillValue);
     }
