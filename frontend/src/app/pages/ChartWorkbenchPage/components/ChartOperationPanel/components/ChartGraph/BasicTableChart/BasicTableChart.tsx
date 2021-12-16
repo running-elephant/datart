@@ -753,7 +753,9 @@ class BasicTableChart extends ReactChart {
   };
 
   findHeader = (uid, headers) => {
-    let header = (headers || []).find(h => h.uid === uid);
+    let header = (headers || [])
+      .filter(h => !h.isGroup)
+      .find(h => h.uid === uid);
     if (!!header) {
       return header;
     }
