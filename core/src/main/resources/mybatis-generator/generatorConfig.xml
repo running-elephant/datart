@@ -17,8 +17,8 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://120.133.48.109:3306/datart" userId="root"
-                        password="-pl,.;[=">
+                        connectionURL="jdbc:mysql://127.0.0.1:3306/datart" userId="root"
+                        password="">
             <property name="nullCatalogMeansCurrent" value="true"/>
             <property name="useInformationSchema" value="true"/>
         </jdbcConnection>

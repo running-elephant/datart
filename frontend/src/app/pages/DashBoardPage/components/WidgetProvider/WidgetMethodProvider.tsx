@@ -26,7 +26,6 @@ import React, { FC, useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 import { BoardContext } from '../../contexts/BoardContext';
-import { WidgetContext } from '../../contexts/WidgetContext';
 import {
   WidgetMethodContext,
   WidgetMethodContextProps,
@@ -34,7 +33,7 @@ import {
 import { boardActions } from '../../pages/Board/slice';
 import {
   getChartWidgetDataAsync,
-  getWidgetDataAsync,
+  getWidgetData,
 } from '../../pages/Board/slice/thunk';
 import {
   BoardLinkFilter,
@@ -56,7 +55,7 @@ import {
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
 import {
   getEditChartWidgetDataAsync,
-  getEditWidgetDataAsync,
+  getEditWidgetData,
 } from '../../pages/BoardEditor/slice/thunk';
 import { widgetActionType } from '../WidgetToolBar/config';
 
@@ -66,7 +65,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   children,
 }) => {
   const { boardId, editing, renderMode, orgId } = useContext(BoardContext);
-  const widget = useContext(WidgetContext);
+
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -92,11 +91,10 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       if (type === 'reset') {
         dispatch(editBoardStackActions.changeBoardHasResetControl(false));
       }
-      dispatch(editBoardStackActions.deleteWidgets([wid]));
-
       if (type === 'controller') {
         dispatch(editWidgetsQueryAction({ boardId }));
       }
+      dispatch(editBoardStackActions.deleteWidgets([wid]));
     },
     [dispatch, boardId],
   );
@@ -163,11 +161,11 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     [dispatch],
   );
   const onWidgetGetData = useCallback(
-    (boardId: string, widgetId: string) => {
+    (boardId: string, widget: Widget) => {
       if (editing) {
-        dispatch(getEditWidgetDataAsync({ widgetId }));
+        dispatch(getEditWidgetData({ widget }));
       } else {
-        dispatch(getWidgetDataAsync({ boardId, widgetId, renderMode }));
+        dispatch(getWidgetData({ boardId, widget, renderMode }));
       }
     },
     [dispatch, editing, renderMode],
@@ -247,11 +245,38 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       );
       setTimeout(() => {
         linkRelations.forEach(link => {
-          onWidgetGetData(boardId, link.targetId);
+          if (editing) {
+            dispatch(
+              getEditChartWidgetDataAsync({
+                widgetId: link.targetId,
+                option: {
+                  pageInfo: { pageNo: 1 },
+                },
+              }),
+            );
+          } else {
+            dispatch(
+              getChartWidgetDataAsync({
+                boardId,
+                widgetId: link.targetId,
+                renderMode,
+                option: {
+                  pageInfo: { pageNo: 1 },
+                },
+              }),
+            );
+          }
         });
       }, 60);
     },
-    [onToggleLinkage, onChangeBoardFilter, onWidgetGetData, boardId],
+    [
+      onToggleLinkage,
+      onChangeBoardFilter,
+      editing,
+      dispatch,
+      boardId,
+      renderMode,
+    ],
   );
 
   const toLinkingWidgets = useCallback(
@@ -295,11 +320,31 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       onToggleLinkage(true);
       setTimeout(() => {
         boardFilters.forEach(f => {
-          onWidgetGetData(boardId, f.linkerWidgetId);
+          if (editing) {
+            dispatch(
+              getEditChartWidgetDataAsync({
+                widgetId: f.linkerWidgetId,
+                option: {
+                  pageInfo: { pageNo: 1 },
+                },
+              }),
+            );
+          } else {
+            dispatch(
+              getChartWidgetDataAsync({
+                boardId,
+                widgetId: f.linkerWidgetId,
+                renderMode,
+                option: {
+                  pageInfo: { pageNo: 1 },
+                },
+              }),
+            );
+          }
         });
       }, 60);
     },
-    [boardId, dispatch, editing, onToggleLinkage, onWidgetGetData, widgetId],
+    [boardId, dispatch, editing, onToggleLinkage, renderMode, widgetId],
   );
   const clickJump = useCallback(
     (values: { widget: Widget; params: ChartMouseEventParams }) => {
@@ -376,7 +421,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
         case 'info':
           break;
         case 'refresh':
-          onWidgetGetData(boardId, widgetId);
+          onWidgetGetData(boardId, widget);
           break;
         case 'delete':
           onWidgetDelete(widget.config.type, widgetId);

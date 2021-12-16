@@ -261,7 +261,6 @@ export const refreshDatasetAction = createAsyncThunk(
       const builder = new ChartDataRequestBuilder(
         {
           ...workbenchState.currentDataView,
-          view: workbenchState?.backendChart?.view,
         },
         workbenchState.chartConfig?.datas,
         workbenchState.chartConfig?.settings,

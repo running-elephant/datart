@@ -33,15 +33,22 @@ import {
   resetControllerAction,
   widgetsQueryAction,
 } from '../../pages/Board/slice/asyncActions';
-import { getWidgetDataAsync } from '../../pages/Board/slice/thunk';
+import {
+  getChartWidgetDataAsync,
+  getControllerOptions,
+} from '../../pages/Board/slice/thunk';
 import { Widget } from '../../pages/Board/slice/types';
 import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
 import {
-  getEditWidgetDataAsync,
+  getEditChartWidgetDataAsync,
+  getEditControllerOptions,
   toUpdateDashboard,
 } from '../../pages/BoardEditor/slice/thunk';
-import { getNeedRefreshWidgetsByFilter } from '../../utils/widget';
+import {
+  getCascadeControllers,
+  getNeedRefreshWidgetsByController,
+} from '../../utils/widget';
 
 export const BoardActionProvider: FC<{ id: string }> = ({
   id: boardId,
@@ -76,24 +83,36 @@ export const BoardActionProvider: FC<{ id: string }> = ({
       }
     }, 500),
     refreshWidgetsByController: debounce((widget: Widget) => {
+      const controllerIds = getCascadeControllers(widget);
+      controllerIds.forEach(controlWidgetId => {
+        if (editing) {
+          dispatch(getEditControllerOptions(controlWidgetId));
+        } else {
+          dispatch(
+            getControllerOptions({
+              boardId,
+              widgetId: controlWidgetId,
+              renderMode,
+            }),
+          );
+        }
+      });
       if (hasQueryControl) {
         return;
       }
-      const widgetIds = getNeedRefreshWidgetsByFilter(widget);
       const pageInfo: Partial<PageInfo> = {
         pageNo: 1,
       };
-      widgetIds.forEach(widgetId => {
+      const chartWidgetIds = getNeedRefreshWidgetsByController(widget);
+
+      chartWidgetIds.forEach(widgetId => {
         if (editing) {
           dispatch(
-            getEditWidgetDataAsync({
-              widgetId,
-              option: { pageInfo },
-            }),
+            getEditChartWidgetDataAsync({ widgetId, option: { pageInfo } }),
           );
         } else {
           dispatch(
-            getWidgetDataAsync({
+            getChartWidgetDataAsync({
               boardId,
               widgetId,
               renderMode,

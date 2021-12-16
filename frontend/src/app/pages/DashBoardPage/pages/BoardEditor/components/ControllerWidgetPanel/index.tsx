@@ -25,11 +25,10 @@ import { selectViewMap } from 'app/pages/DashBoardPage/pages/Board/slice/selecto
 import {
   ControllerWidgetContent,
   RelatedView,
-  Relation,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   convertToWidgetMap,
-  getCanLinkControlWidgets,
+  getOtherHasOptionControllers,
   getOtherStringControlWidgets,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
@@ -49,7 +48,6 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
-import { v4 as uuidv4 } from 'uuid';
 import { editBoardStackActions, editDashBoardInfoActions } from '../../slice';
 import {
   selectControllerPanel,
@@ -57,19 +55,18 @@ import {
 } from '../../slice/selectors';
 import {
   addWidgetsToEditBoard,
-  getEditControllerOptionAsync,
+  getEditControllerOptions,
 } from '../../slice/thunk';
 import { WidgetControlForm } from './ControllerConfig';
 import { RelatedViewForm } from './RelatedViewForm';
 import { RelatedWidgetItem, RelatedWidgets } from './RelatedWidgets';
-import { ControllerConfig } from './types';
 import {
   getInitWidgetController,
   postControlConfig,
-  preformatWidgetFilter,
+  preformatControlConfig,
 } from './utils';
 
-const FilterWidgetPanel: React.FC = memo(props => {
+const ControllerWidgetPanel: React.FC = memo(props => {
   const dispatch = useDispatch();
   const t = useI18NPrefix('viz.common.enum.controllerFacadeTypes');
   const { type, widgetId, controllerType } = useSelector(selectControllerPanel);
@@ -79,16 +76,23 @@ const FilterWidgetPanel: React.FC = memo(props => {
     useContext(BoardActionContext);
   const allWidgets = useSelector(selectSortAllWidgets);
   const widgets = useMemo(
-    () => getCanLinkControlWidgets(allWidgets),
-    [allWidgets],
+    () =>
+      widgetToolKit.controller.tool
+        .getCanLinkControlWidgets(allWidgets)
+        .filter(t => t.id !== widgetId),
+    [allWidgets, widgetId],
   );
-  const otherStrFilterWidgets = useMemo(
+  const otherStrTypeController = useMemo(
     () => getOtherStringControlWidgets(allWidgets, widgetId),
+    [allWidgets, widgetId],
+  );
+  const otherHasOptionControllers = useMemo(
+    () => getOtherHasOptionControllers(allWidgets, widgetId),
     [allWidgets, widgetId],
   );
   const widgetMap = useMemo(() => convertToWidgetMap(allWidgets), [allWidgets]);
   const viewMap = useSelector(selectViewMap);
-
+  //
   const [relatedWidgets, setRelatedWidgets] = useState<RelatedWidgetItem[]>([]);
 
   const [visible, setVisible] = useState(false);
@@ -148,7 +152,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   useEffect(() => {
     if (!curFilterWidget || !curFilterWidget?.relations) {
       form.setFieldsValue({
-        config: preformatWidgetFilter(
+        config: preformatControlConfig(
           getInitWidgetController(controllerType),
           controllerType!,
         ),
@@ -178,7 +182,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
     form.setFieldsValue({
       ...confContent,
       relatedViews: preRelatedViews,
-      config: preformatWidgetFilter(config, controllerType!),
+      config: preformatControlConfig(config, controllerType!),
     });
   }, [
     curFilterWidget,
@@ -195,43 +199,12 @@ const FilterWidgetPanel: React.FC = memo(props => {
       setVisible(false);
       const { relatedViews, config, name } = values;
       if (type === 'add') {
-        const sourceId = uuidv4();
-        const controlToWidgetRelations: Relation[] = relatedWidgets
-          .filter(relatedWidgetItem => {
-            return widgetMap[relatedWidgetItem.widgetId];
-          })
-          .map(relatedWidgetItem => {
-            const widget = widgetMap[relatedWidgetItem.widgetId];
-            const relation: Relation = {
-              sourceId,
-              targetId: widget.id,
-              config: {
-                type: 'controlToWidget',
-                controlToWidget: {
-                  widgetRelatedViewIds: widget.viewIds,
-                },
-              },
-              id: uuidv4(),
-            };
-            return relation;
-          });
-        let newRelations = [...controlToWidgetRelations];
-        const ControllerVisibility = (config as ControllerConfig).visibility;
-        if (ControllerVisibility) {
-          const { visibilityType, condition } = ControllerVisibility;
-          if (visibilityType === 'condition' && condition) {
-            const controlToControlRelation: Relation = {
-              sourceId,
-              targetId: condition.dependentControllerId,
-              config: {
-                type: 'controlToControl',
-              },
-              id: uuidv4(),
-            };
-            newRelations = newRelations.concat([controlToControlRelation]);
-          }
-        }
-
+        let newRelations = widgetToolKit.controller.tool.makeControlRelations({
+          sourceId: undefined,
+          relatedWidgets: relatedWidgets,
+          widgetMap,
+          config: config,
+        });
         const widget = widgetToolKit.controller.create({
           boardId,
           boardType,
@@ -240,48 +213,20 @@ const FilterWidgetPanel: React.FC = memo(props => {
           controllerType: controllerType!,
           views: relatedViews,
           config: postControlConfig(config, controllerType!),
-          hasVariable: false,
+          viewIds:
+            widgetToolKit.controller.tool.getViewIdsInControlConfig(config),
         });
         dispatch(addWidgetsToEditBoard([widget]));
-        dispatch(getEditControllerOptionAsync(widget));
+        dispatch(getEditControllerOptions(widget.id));
         refreshWidgetsByFilter(widget);
       } else if (type === 'edit') {
-        const sourceId = curFilterWidget.id;
+        let newRelations = widgetToolKit.controller.tool.makeControlRelations({
+          sourceId: curFilterWidget.id,
+          relatedWidgets: relatedWidgets,
+          widgetMap,
+          config: config,
+        });
 
-        const controlToWidgetRelations: Relation[] = relatedWidgets
-          .filter(relatedWidgetItem => {
-            return widgetMap[relatedWidgetItem.widgetId];
-          })
-          .map(relatedWidgetItem => {
-            const widget = widgetMap[relatedWidgetItem.widgetId];
-            return {
-              sourceId,
-              targetId: widget.id,
-              config: {
-                type: 'controlToWidget',
-                controlToWidget: {
-                  widgetRelatedViewIds: widget.viewIds,
-                },
-              },
-              id: uuidv4(),
-            };
-          });
-        let newRelations = [...controlToWidgetRelations];
-        const controllerVisible = (config as ControllerConfig).visibility;
-        if (controllerVisible) {
-          const { visibilityType, condition } = controllerVisible;
-          if (visibilityType === 'condition' && condition) {
-            const controlToControlRelation: Relation = {
-              sourceId,
-              targetId: condition.dependentControllerId,
-              config: {
-                type: 'controlToControl',
-              },
-              id: uuidv4(),
-            };
-            newRelations = newRelations.concat([controlToControlRelation]);
-          }
-        }
         const nextContent: ControllerWidgetContent = {
           ...(curFilterWidget.config.content as ControllerWidgetContent),
           name,
@@ -293,9 +238,11 @@ const FilterWidgetPanel: React.FC = memo(props => {
           draft.relations = newRelations;
           draft.config.name = name;
           draft.config.content = nextContent;
+          draft.viewIds =
+            widgetToolKit.controller.tool.getViewIdsInControlConfig(config);
         });
         dispatch(editBoardStackActions.updateWidget(newWidget));
-        dispatch(getEditControllerOptionAsync(newWidget));
+        dispatch(getEditControllerOptions(newWidget.id));
         refreshWidgetsByFilter(newWidget);
       }
     },
@@ -365,7 +312,8 @@ const FilterWidgetPanel: React.FC = memo(props => {
             {visible && (
               <WidgetControlForm
                 controllerType={controllerType!}
-                otherStrFilterWidgets={otherStrFilterWidgets}
+                otherStrFilterWidgets={otherStrTypeController}
+                otherHasOptionControllers={otherHasOptionControllers}
                 boardType={boardType}
                 viewMap={viewMap}
                 form={form}
@@ -392,7 +340,7 @@ const FilterWidgetPanel: React.FC = memo(props => {
   );
 });
 
-export default FilterWidgetPanel;
+export default ControllerWidgetPanel;
 const Container = styled(Split)`
   display: flex;
   flex: 1;

@@ -303,7 +303,7 @@ export class ChartDataRequestBuilder {
   }
 
   private buildViewConfigs() {
-    return transformToViewConfig(this.dataView?.view?.config);
+    return transformToViewConfig(this.dataView?.config);
   }
 
   public addExtraSorters(sorters: ChartRequest['orders']) {

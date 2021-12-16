@@ -47,26 +47,6 @@ const ChartHeaderPanel: FC<{
       )}
       <h1>{chartName}</h1>
       <Space>
-        {/* <StyleTimeConfigSelecotr
-              value={language}
-              onChange={handleLocaleChange}
-            >
-              <Select.Option value="zh">{t('lang.zh')}</Select.Option>
-              <Select.Option value="en">{t('lang.en')}</Select.Option>
-            </StyleTimeConfigSelecotr>
-            <StyleTimeConfigSelecotr
-              value={dateFormat}
-              onChange={handleFormatChange}
-            >
-              <Select.Option value={moment.HTML5_FMT.DATETIME_LOCAL_MS}>
-                {t('format.local')}
-              </Select.Option>
-              <Select.Option value={moment.HTML5_FMT.DATE}>
-                {t('format.date')}
-              </Select.Option>
-              <Select.Option value={'LL'}>{t('format.ll')}</Select.Option>
-              <Select.Option value={'LLL'}>{t('format.lll')}</Select.Option>
-            </StyleTimeConfigSelecotr> */}
         <Button type="primary" onClick={onSaveChart}>
           {t('save')}
         </Button>
