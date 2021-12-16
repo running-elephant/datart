@@ -27,6 +27,7 @@ const ROW_KEY = 'DATART_ROW_KEY';
 
 interface SchemaTableProps extends TableProps<object> {
   height: number;
+  width: number;
   model: Model;
   dataSource?: object[];
   hasCategory?: boolean;
@@ -43,6 +44,7 @@ interface SchemaTableProps extends TableProps<object> {
 export const SchemaTable = memo(
   ({
     height,
+    width: propsWidth,
     model,
     dataSource,
     hasCategory,
@@ -161,6 +163,7 @@ export const SchemaTable = memo(
           dataSource={dataSourceWithKey}
           columns={columns}
           scroll={{ x: tableWidth, y: height }}
+          width={propsWidth}
         />
       </>
     );

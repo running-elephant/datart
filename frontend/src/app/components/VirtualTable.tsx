@@ -22,19 +22,23 @@
  * <VirtualTable
     dataSource={dataSourceWithKey}
     columns={columns}
-    ...
+    width={width}
+    ...tableProps
   />
  */
 
-import { Table } from 'antd';
+import { Table, TableProps } from 'antd';
 import classNames from 'classnames';
-import ResizeObserver from 'rc-resize-observer';
 import React, { useEffect, useRef, useState } from 'react';
 import { VariableSizeGrid as Grid } from 'react-window';
 
-export function VirtualTable(props) {
-  const { columns, scroll } = props;
-  const [tableWidth, setTableWidth] = useState(0);
+interface VirtualTableProps extends TableProps<object> {
+  width: number;
+  scroll: { x: number; y: number };
+  columns: any;
+}
+export function VirtualTable(props: VirtualTableProps) {
+  const { columns, scroll, width: tableWidth } = props;
   const widthColumnCount = columns.filter(({ width }) => !width).length;
   const mergedColumns = columns.map(column => {
     if (column.width) {
@@ -116,19 +120,13 @@ export function VirtualTable(props) {
   };
 
   return (
-    <ResizeObserver
-      onResize={({ width }) => {
-        setTableWidth(width);
+    <Table
+      {...props}
+      columns={mergedColumns}
+      components={{
+        body: renderVirtualList,
+        ...props.components,
       }}
-    >
-      <Table
-        {...props}
-        columns={mergedColumns}
-        components={{
-          body: renderVirtualList,
-          ...props.components,
-        }}
-      />
-    </ResizeObserver>
+    />
   );
 }
