@@ -52,9 +52,10 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
 
     const handleRowStateUpdate = useCallback(
       (row: FilterValueOption) => {
-        const oldRowIndex = rows.findIndex(r => r.index === row.index);
-        rows.splice(oldRowIndex, 1, row);
-        onChangeFilterOptions(rows.slice());
+        const newRows = [...rows];
+        const targetIndex = newRows.findIndex(r => r.index === row.index);
+        newRows.splice(targetIndex, 1, row);
+        onChangeFilterOptions(newRows);
       },
       [onChangeFilterOptions, rows],
     );
@@ -107,11 +108,12 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
             <a
               href="#!"
               style={{ color: record.isSelected ? 'red' : '' }}
-              onClick={() =>
-                handleRowStateUpdate(
-                  Object.assign(record, { isSelected: !record.isSelected }),
-                )
-              }
+              onClick={() => {
+                handleRowStateUpdate({
+                  ...record,
+                  isSelected: !record.isSelected,
+                });
+              }}
             >
               {record.isSelected ? '取消默认值' : '设为默认值'}
             </a>
