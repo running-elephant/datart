@@ -233,7 +233,7 @@ class BasicScatterChart extends Chart {
       'scatter',
       'cycleRatio',
     );
-    const defaultSizeValue = max - min;
+    const defaultSizeValue = (max - min) / 2;
     const seriesName = groupConfigs
       ?.map(gc => getColumnRenderName(gc))
       .join('-');
