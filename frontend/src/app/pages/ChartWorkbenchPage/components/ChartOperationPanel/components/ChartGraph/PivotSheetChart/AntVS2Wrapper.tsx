@@ -30,64 +30,6 @@ const AntVS2Wrapper: FC<{ dataCfg; options; theme?: S2Theme }> = memo(
         dataCfg={dataCfg}
         options={options}
         themeCfg={{ theme }}
-        getSpreadSheet={instance => {
-          const config = instance.dataCfg;
-          config.totalData = [{ 'AVG(PREPAID_AMOUNT)': 99999 }] as any;
-          console.log(`config ---> `, config);
-          instance.setDataCfg(config);
-          instance.render(true);
-        }}
-        // getSpreadSheet={instance => {
-        //   instance.showTooltip = tooltipOptions => {
-        //     const { position, data = {}, options } = tooltipOptions;
-        //     const name = `${data.name} - 测试`; // 只有单元格中文案被省略才显示
-        //     const infos = '按住 Shift 多选或框选，查看多个数据点';
-        //     const tips = '说明：这是个说明';
-        //     const customSummaries = (data.summaries || []).map(item => {
-        //       return { ...item, name: `${item.name} - 测试` };
-        //     });
-        //     const { cols = [], rows = [] } = data.headInfo || {};
-        //     const customCols = cols.map(item => {
-        //       return { ...item, value: `${item.value} - 测试` };
-        //     });
-        //     const customDetails = (data.details || []).map(item => {
-        //       return {
-        //         name: `${item.name} - 测试`,
-        //         value: `${item.value} - w`,
-        //       };
-        //     });
-        //     const customOperator = {
-        //       onClick: () => {
-        //         console.log('测试');
-        //       },
-        //       menus: [
-        //         {
-        //           id: 'trend',
-        //           icon: 'trend',
-        //           text: '趋势',
-        //         },
-        //       ],
-        //     };
-        //     const customOptions = {
-        //       ...tooltipOptions,
-        //       position: { x: position.x + 1, y: position.y + 1 },
-        //       data: {
-        //         ...data,
-        //         name: data.name ? name : '',
-        //         infos,
-        //         tips,
-        //         summaries: customSummaries,
-        //         headInfo: { rows, cols: customCols },
-        //         details: customDetails,
-        //       },
-        //       options: {
-        //         ...options,
-        //         operator: customOperator,
-        //       },
-        //     };
-        //     instance.tooltip.show(customOptions);
-        //   };
-        // }}
       />
     );
   },
