@@ -16,8 +16,7 @@
  * limitations under the License.
  */
 
-import { LoadingOutlined } from '@ant-design/icons';
-import { message } from 'antd';
+import { message, Spin } from 'antd';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { publishViz } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
@@ -171,8 +170,8 @@ export const Board: React.FC<BoardProps> = memo(
         );
       } else {
         return (
-          <div>
-            loading <LoadingOutlined />
+          <div className="loading">
+            <Spin size="large" tip="Loading..." />
           </div>
         );
       }
@@ -235,5 +234,11 @@ const Wrapper = styled.div<{}>`
     flex: 1;
     flex-direction: column;
     min-height: 0;
+  }
+  .loading {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
   }
 `;
