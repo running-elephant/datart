@@ -147,11 +147,12 @@ class BasicTableChart extends ReactChart {
         tablePagination,
       ),
       onChange: (pagination, filters, sorter, extra) => {
-        if (extra?.action === 'sort') {
-          this.invokeHeaderSortEvents(sorter?.field, sorter?.order);
-        }
-        if (extra?.action === 'paginate') {
-          this.invokePagingEvents(pagination?.current);
+        if (extra?.action === 'sort' || extra?.action === 'paginate') {
+          this.invokePagingRelatedEvents(
+            sorter?.field,
+            sorter?.order,
+            pagination?.current,
+          );
         }
       },
     };
@@ -664,31 +665,18 @@ class BasicTableChart extends ReactChart {
       : false;
   }
 
-  invokePagingEvents(current?: number) {
+  invokePagingRelatedEvents(seriesName: string, value: any, pageNo: number) {
     const eventParams = {
       componentType: 'table',
-      seriesType: 'paging',
-      name: '',
-      seriesName: '',
-      dataIndex: undefined,
-      value: current,
-    };
-    this._mouseEvents?.forEach(cur => {
-      if (cur.name === 'click') {
-        cur.callback?.(eventParams);
-      }
-    });
-  }
-
-  invokeHeaderSortEvents(seriesName: string, value: any) {
-    const eventParams = {
-      componentType: 'table',
-      seriesType: 'header',
+      seriesType: 'paging-sort-filter',
       name: '',
       seriesName,
       dataIndex: undefined,
-      value:
-        value === undefined ? undefined : value === 'ascend' ? 'ASC' : 'DESC',
+      value: {
+        direction:
+          value === undefined ? undefined : value === 'ascend' ? 'ASC' : 'DESC',
+        pageNo,
+      },
     };
     this._mouseEvents?.forEach(cur => {
       if (cur.name === 'click') {
