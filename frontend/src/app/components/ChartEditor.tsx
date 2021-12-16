@@ -190,7 +190,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 
     const dataChart: DataChart = {
       id: dataChartId,
-      name: backendChart?.name || 'widget_chart',
+      name: backendChart?.name || '',
       viewId: dataview?.id || '',
       orgId: orgId,
       config: dataChartConfig,
