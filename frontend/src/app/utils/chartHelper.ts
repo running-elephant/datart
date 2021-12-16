@@ -700,13 +700,18 @@ export function getScatterSymbolSizeFn(
   min,
   cycleRatio?: number,
 ) {
+  min = Math.min(0, min);
   const scaleRatio = cycleRatio || 1;
   const defaultScatterPointPixelSize = 10;
   const distance = max - min === 0 ? 100 : max - min;
 
   return function (val) {
-    return (
-      (val?.[valueIndex] / distance) * scaleRatio * defaultScatterPointPixelSize
+    return Math.max(
+      3,
+      ((val?.[valueIndex] - min) / distance) *
+        scaleRatio *
+        defaultScatterPointPixelSize *
+        2,
     );
   };
 }
