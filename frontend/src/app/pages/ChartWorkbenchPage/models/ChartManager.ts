@@ -47,6 +47,7 @@ const {
   BasicGaugeChart,
   WaterfallChart,
   BasicRichText,
+  PivotSheetChart,
 } = WidgetPlugins;
 
 class ChartManager {
@@ -102,6 +103,7 @@ class ChartManager {
     return [
       new FenZuTableChart(),
       new MingXiTableChart(),
+      new PivotSheetChart(),
       new ScoreChart(),
       new ClusterColumnChart(),
       new ClusterBarChart(),

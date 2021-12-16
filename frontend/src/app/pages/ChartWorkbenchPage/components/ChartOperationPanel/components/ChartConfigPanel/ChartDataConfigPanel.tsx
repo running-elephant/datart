@@ -39,7 +39,7 @@ const ChartDataConfigPanel: FC<{
 
     const getSectionComponent = (config, index) => {
       const props = {
-        key: index,
+        key: config?.key || index,
         ancestors: [index],
         config,
         translate,
@@ -67,7 +67,11 @@ const ChartDataConfigPanel: FC<{
       }
     };
 
-    return <Wrapper>{(dataConfigs || []).map(getSectionComponent)}</Wrapper>;
+    return (
+      <StyledChartDataConfigPanel>
+        {(dataConfigs || []).map(getSectionComponent)}
+      </StyledChartDataConfigPanel>
+    );
   },
   (prev, next) => {
     return prev.dataConfigs === next.dataConfigs;
@@ -76,7 +80,7 @@ const ChartDataConfigPanel: FC<{
 
 export default ChartDataConfigPanel;
 
-const Wrapper = styled.div`
+const StyledChartDataConfigPanel = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;

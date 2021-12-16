@@ -378,7 +378,6 @@ class BasicTableChart extends ReactChart {
             props,
             conditionStyle,
           );
-
           return (
             <td
               {...rest}
@@ -389,7 +388,6 @@ class BasicTableChart extends ReactChart {
         row: props => {
           const { style, ...rest } = props;
           const rowStyle = getCustomBodyRowStyle(props, allConditionStyle);
-
           return <tr {...rest} style={Object.assign(style || {}, rowStyle)} />;
         },
         wrapper: props => {
