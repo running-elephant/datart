@@ -85,7 +85,7 @@ const PreviewHeader: FC<{
       return <Menu>{menus}</Menu>;
     };
 
-    const hanldeCopyToClipboard = value => {
+    const handleCopyToClipboard = value => {
       const ta = document.createElement('textarea');
       ta.innerText = value;
       document.body.appendChild(ta);
@@ -164,7 +164,7 @@ const PreviewHeader: FC<{
                   addonAfter={
                     <CopyOutlined
                       onClick={() =>
-                        hanldeCopyToClipboard(getFullShareLinkPath(shareLink))
+                        handleCopyToClipboard(getFullShareLinkPath(shareLink))
                       }
                     />
                   }
@@ -177,7 +177,7 @@ const PreviewHeader: FC<{
                     addonAfter={
                       <CopyOutlined
                         onClick={() =>
-                          hanldeCopyToClipboard(shareLink?.password)
+                          handleCopyToClipboard(shareLink?.password)
                         }
                       />
                     }
