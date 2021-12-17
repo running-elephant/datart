@@ -393,7 +393,17 @@
       }
     },
     "board":{
-       
+      "action":{
+        "dataChart":"DataChart",
+        "media":"Media",
+        "container":"Container",
+        "controller":"Controller",
+        "undo":"Undo",
+        "redo":"Redo",
+        "delete":"Delete",
+        "copy":"Copy",
+        "paste":"Paste"
+      }
     }
   },
   "share": {

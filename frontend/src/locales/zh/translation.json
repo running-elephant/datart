@@ -386,6 +386,19 @@
         "shareLink": "分享链接",
         "downloadData": "下载数据"
       }
+    },
+    "board":{
+      "action":{
+        "dataChart":"数据图表",
+        "media":"媒体组件",
+        "container":"容器",
+        "controller":"控制器",
+        "undo":"撤销",
+        "redo":"重做",
+        "delete":"删除",
+        "copy":"复制",
+        "paste":"粘贴"
+      }
     }
   },
   "share": {
