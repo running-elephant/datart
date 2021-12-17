@@ -104,6 +104,7 @@ const ChartDataConfigSectionActionMenu: FC<
 
   const getSubMenuActionComponent = (actionName, uid) => {
     const fieldConfig = config.rows?.find(c => c.uid === uid)!;
+    const options = config?.options?.[actionName];
     if (actionName === ChartDataSectionFieldActionType.Sortable) {
       return (
         <SortAction
@@ -111,6 +112,7 @@ const ChartDataConfigSectionActionMenu: FC<
           onConfigChange={(config, needRefresh) => {
             handleFieldConfigChanged(uid, config, needRefresh);
           }}
+          options={options}
           mode="menu"
         />
       );

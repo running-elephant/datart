@@ -16,7 +16,11 @@
  * limitations under the License.
  */
 
-import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataSectionType,
+  SortActionType,
+} from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import {
   getColumnRenderName,
@@ -179,6 +183,11 @@ class PivotSheetChart extends ReactChart {
           enableTotal,
           enableSubTotal,
         ),
+        sortParams: this.getTableSorters(
+          rowSectionConfigRows
+            .concat(columnSectionConfigRows)
+            .concat(metricsSectionConfigRows),
+        ),
       },
       theme: {
         /*
@@ -195,6 +204,26 @@ class PivotSheetChart extends ReactChart {
         dataCell: this.getBodyStyle(styleConfigs),
       },
     };
+  }
+
+  private getTableSorters(sectionConfigRows) {
+    return sectionConfigRows
+      .map(config => {
+        if (!config?.sort?.type || config?.sort?.type === SortActionType.NONE) {
+          return null;
+        }
+        const isASC = config.sort.type === SortActionType.ASC;
+        return {
+          sortFieldId: getValueByColumnKey(config),
+          sortFunc: params => {
+            const { data } = params;
+            return data?.sort((a, b) =>
+              isASC ? a?.localeCompare(b) : b?.localeCompare(a),
+            );
+          },
+        };
+      })
+      .filter(Boolean);
   }
 
   private getBodyStyle(styleConfigs) {

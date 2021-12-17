@@ -24,11 +24,17 @@ const config: ChartConfig = {
       label: 'datas.row',
       key: 'row',
       type: 'group',
+      options: {
+        sortable: { backendSort: false },
+      },
     },
     {
       label: 'datas.column',
       key: 'column',
       type: 'group',
+      options: {
+        sortable: { backendSort: false },
+      },
     },
     {
       label: 'metrics',
@@ -37,6 +43,9 @@ const config: ChartConfig = {
       actions: {
         NUMERIC: ['aggregate', 'alias', 'format', 'sortable'],
         STRING: ['aggregate', 'alias', 'format', 'sortable'],
+      },
+      options: {
+        sortable: { backendSort: false },
       },
     },
     {
