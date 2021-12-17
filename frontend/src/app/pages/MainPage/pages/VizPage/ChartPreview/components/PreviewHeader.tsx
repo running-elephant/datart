@@ -63,7 +63,7 @@ const PreviewHeader: FC<{
     onGotoEdit,
     onGenerateShareLink,
   }) => {
-    const t = useI18NPrefix(`viz.chartPreview`);
+    const t = useI18NPrefix(`viz.action`);
     const [expireDate, setExpireDate] = useState<string>();
     const [enablePassword, setEnablePassword] = useState(false);
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);

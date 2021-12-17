@@ -35,7 +35,7 @@ const ShareLinkModal: FC<{
   onOk?;
   onCancel?;
 }> = memo(({ visibility, onGenerateShareLink, onOk, onCancel }) => {
-  const t = useI18NPrefix(`viz.chartPreview`);
+  const t = useI18NPrefix(`viz.action`);
   const [expireDate, setExpireDate] = useState<string>();
   const [enablePassword, setEnablePassword] = useState(false);
   const [shareLink, setShareLink] = useState<{

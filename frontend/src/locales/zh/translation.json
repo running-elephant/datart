@@ -363,7 +363,7 @@
         "cancel": "取消"
       }
     },
-    "chartPreview": {
+    "action": {
       "common": {
         "confirm": "请确认",
         "ok": "确认",
@@ -372,7 +372,10 @@
       "edit": "编辑",
       "run": "运行",
       "publish": "发布",
-      "unpublish": "取消发布",
+      "cancelPublish": "取消发布",
+      "published":"已发布",
+      "unpublished":"未发布",
+      "archived":"已归档",
       "share": {
         "link": "链接",
         "password": "密码",

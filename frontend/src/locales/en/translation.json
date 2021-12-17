@@ -363,7 +363,7 @@
         "cancel": "Cancel"
       }
     },
-    "chartPreview": {
+    "action": {
       "common": {
         "confirm": "Please Confirm",
         "ok": "OK",
@@ -372,7 +372,15 @@
       "edit": "Edit",
       "run": "Run",
       "publish": "Publish",
-      "unpublish": "Unpublish",
+      "cancelPublish": "Cancel Publish",
+      "published":"Published",
+      "unpublished":"Unpublished",
+      "archived":"Archived",
+
+
+
+
+
       "share": {
         "link": "Link",
         "password": "Password",
@@ -382,6 +390,9 @@
         "shareLink": "Share Link",
         "downloadData": "Download Data"
       }
+    },
+    "board":{
+       
     }
   },
   "share": {
