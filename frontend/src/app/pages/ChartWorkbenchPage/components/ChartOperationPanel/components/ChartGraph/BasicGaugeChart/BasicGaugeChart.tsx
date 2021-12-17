@@ -128,6 +128,11 @@ class BasicGaugeChart extends Chart {
       'pointerColor',
     );
 
+    const center = this.getArrStyleValueByGroup(
+      ['marginLeft', 'marginTop'],
+      styleConfigs,
+      'center',
+    );
     return {
       ...this.getGauge(styleConfigs),
       data: dataColumns.map(dc => {
@@ -149,6 +154,7 @@ class BasicGaugeChart extends Chart {
       splitLine,
       detail,
       progress,
+      center,
     };
   }
 

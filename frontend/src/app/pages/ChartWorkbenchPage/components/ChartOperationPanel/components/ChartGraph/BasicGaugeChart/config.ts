@@ -343,6 +343,25 @@ const config: ChartConfig = {
         },
       ],
     },
+    {
+      label: 'center.title',
+      key: 'center',
+      comType: 'group',
+      rows: [
+        {
+          label: 'margin.top',
+          key: 'marginTop',
+          default: '50%',
+          comType: 'marginWidth',
+        },
+        {
+          label: 'margin.left',
+          key: 'marginLeft',
+          default: '50%',
+          comType: 'marginWidth',
+        },
+      ],
+    },
   ],
   settings: [],
   i18ns: [
@@ -404,6 +423,9 @@ const config: ChartConfig = {
           title: '分隔线',
           showSplitLine: '显示分隔线',
           splitLineLength: '长度',
+        },
+        center: {
+          title: '中心点',
         },
       },
     },
