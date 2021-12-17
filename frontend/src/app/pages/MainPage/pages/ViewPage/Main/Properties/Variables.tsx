@@ -10,8 +10,10 @@ import { Button, List, Popconfirm } from 'antd';
 import { ListItem, ListTitle } from 'app/components';
 import { getRoles } from 'app/pages/MainPage/pages/MemberPage/slice/thunks';
 import {
+  DEFAULT_VALUE_DATE_FORMAT,
   VariableScopes,
   VariableTypes,
+  VariableValueTypes,
 } from 'app/pages/MainPage/pages/VariablePage/constants';
 import {
   RowPermission,
@@ -22,6 +24,7 @@ import { VariableFormModel } from 'app/pages/MainPage/pages/VariablePage/types';
 import { VariableForm } from 'app/pages/MainPage/pages/VariablePage/VariableForm';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
+import { Moment } from 'moment';
 import {
   memo,
   ReactElement,
@@ -154,35 +157,45 @@ export const Variables = memo(() => {
 
   const save = useCallback(
     (values: VariableFormModel) => {
+      let defaultValue: any = values.defaultValue;
+      if (values.valueType === VariableValueTypes.Date) {
+        defaultValue = values.defaultValue.map(d =>
+          (d as Moment).format(DEFAULT_VALUE_DATE_FORMAT),
+        );
+      }
+
       try {
-        const defaultValue = JSON.stringify(values.defaultValue);
-        if (formType === CommonFormTypes.Add) {
-          dispatch(
-            actions.changeCurrentEditingView({
-              variables: variables.concat({
-                ...values,
-                id: uuidv4(),
-                defaultValue,
-                relVariableSubjects: [],
-              }),
-            }),
-          );
-        } else {
-          dispatch(
-            actions.changeCurrentEditingView({
-              variables: variables.map(v =>
-                v.id === editingVariable!.id
-                  ? { ...editingVariable!, ...values, defaultValue }
-                  : v,
-              ),
-            }),
-          );
+        if (defaultValue !== void 0 && defaultValue !== null) {
+          defaultValue = JSON.stringify(defaultValue);
         }
-        setFormVisible(false);
       } catch (error) {
         errorHandle(error);
         throw error;
       }
+
+      if (formType === CommonFormTypes.Add) {
+        dispatch(
+          actions.changeCurrentEditingView({
+            variables: variables.concat({
+              ...values,
+              id: uuidv4(),
+              defaultValue,
+              relVariableSubjects: [],
+            }),
+          }),
+        );
+      } else {
+        dispatch(
+          actions.changeCurrentEditingView({
+            variables: variables.map(v =>
+              v.id === editingVariable!.id
+                ? { ...editingVariable!, ...values, defaultValue }
+                : v,
+            ),
+          }),
+        );
+      }
+      setFormVisible(false);
     },
     [dispatch, actions, formType, editingVariable, variables],
   );
