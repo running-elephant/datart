@@ -367,8 +367,9 @@
       "common": {
         "confirm": "请确认",
         "ok": "确认",
-        "cancel": "取消"
-      },
+        "cancel": "取消",
+        "save":"保存"
+      },  
       "edit": "编辑",
       "run": "运行",
       "publish": "发布",
