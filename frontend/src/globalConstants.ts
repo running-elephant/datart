@@ -35,6 +35,8 @@ export enum CommonFormTypes {
   Edit = 'edit',
 }
 
+export const TITLE_SUFFIX = ['archived', 'unpublished'];
+
 export const COMMON_FORM_TITLE_PREFIX = {
   [CommonFormTypes.Add]: '新建',
   [CommonFormTypes.Edit]: '编辑',

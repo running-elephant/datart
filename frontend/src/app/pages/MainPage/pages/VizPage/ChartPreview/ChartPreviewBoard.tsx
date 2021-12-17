@@ -164,7 +164,7 @@ const ChartPreviewBoard: FC<{
       ]);
     };
 
-    const hanldeGotoWorkbenchPage = () => {
+    const handleGotoWorkbenchPage = () => {
       setEditChartVisible(true);
     };
     const onSaveInDataChart = useCallback(
@@ -262,7 +262,7 @@ const ChartPreviewBoard: FC<{
           chartName={chartPreview?.backendChart?.name}
           status={chartPreview?.backendChart?.status}
           publishLoading={publishLoading}
-          onGotoEdit={hanldeGotoWorkbenchPage}
+          onGotoEdit={handleGotoWorkbenchPage}
           onPublish={handlePublish}
           onGenerateShareLink={handleGenerateShareLink}
           onDownloadData={handleCreateDownloadDataTask}

@@ -54,7 +54,7 @@ const ColorizeRangeAction: FC<{
     onConfigChange?.(newConfig, actionNeedNewRequest);
   };
 
-  const hanldeEnableColorChecked = checked => {
+  const handleEnableColorChecked = checked => {
     if (Boolean(checked)) {
       handleColorRangeChange('#7567bd', '#7567bd');
     } else {
@@ -67,7 +67,7 @@ const ColorizeRangeAction: FC<{
       <Col span={24}>
         <Checkbox
           checked={!!colorRange?.start || !!colorRange?.end}
-          onChange={e => hanldeEnableColorChecked(e.target?.checked)}
+          onChange={e => handleEnableColorChecked(e.target?.checked)}
         >
           {t('color.enable')}
         </Checkbox>
