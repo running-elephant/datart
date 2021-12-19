@@ -114,7 +114,7 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                 icon={<CloseOutlined />}
                 onClick={closeBoardEditor}
               >
-                取消
+                {t('common.cancel')}
               </Button>
 
               <Button
@@ -124,7 +124,7 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                 icon={<SaveOutlined />}
                 onClick={onUpdateBoard}
               >
-                保存
+                {t('common.save')}
               </Button>
             </>
           ) : (

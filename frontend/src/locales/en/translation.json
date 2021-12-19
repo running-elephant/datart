@@ -367,7 +367,8 @@
       "common": {
         "confirm": "Please Confirm",
         "ok": "OK",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "save":"Save"
       },
       "edit": "Edit",
       "run": "Run",
@@ -392,7 +393,17 @@
       }
     },
     "board":{
-       
+      "action":{
+        "dataChart":"DataChart",
+        "media":"Media",
+        "container":"Container",
+        "controller":"Controller",
+        "undo":"Undo",
+        "redo":"Redo",
+        "delete":"Delete",
+        "copy":"Copy",
+        "paste":"Paste"
+      }
     }
   },
   "share": {

@@ -17,6 +17,7 @@
  */
 import { CloudDownloadOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { Menu, Popconfirm } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useContext, useMemo } from 'react';
 import { BoardContext } from '../contexts/BoardContext';
 export interface BoardOverLayProps {
@@ -24,8 +25,10 @@ export interface BoardOverLayProps {
   onBoardToDownLoad: () => void;
   onShareDownloadData?: () => void;
 }
+
 export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
   ({ onOpenShareLink, onBoardToDownLoad, onShareDownloadData }) => {
+    const t = useI18NPrefix(`viz.action`);
     const { allowShare, allowDownload, renderMode } = useContext(BoardContext);
     const renderList = useMemo(
       () => [
@@ -33,10 +36,9 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
           key: 'shareLink',
           icon: <ShareAltOutlined />,
           onClick: onOpenShareLink,
-
           disabled: false,
           render: allowShare && renderMode === 'read',
-          content: '分享链接',
+          content: t('share.shareLink'),
         },
         {
           key: 'downloadData',
@@ -47,9 +49,9 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
           content: (
             <Popconfirm
               placement="left"
-              title={'确定下载？'}
-              okText={'确定'}
-              cancelText={'取消'}
+              title={t('common.confirm')}
+              okText={t('common.ok')}
+              cancelText={t('common.cancel')}
               onConfirm={() => {
                 if (renderMode === 'read') {
                   onBoardToDownLoad?.();
@@ -58,7 +60,7 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
                 }
               }}
             >
-              下载数据
+              {t('share.downloadData')}
             </Popconfirm>
           ),
         },
@@ -67,6 +69,7 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
         onOpenShareLink,
         allowShare,
         renderMode,
+        t,
         allowDownload,
         onBoardToDownLoad,
         onShareDownloadData,
