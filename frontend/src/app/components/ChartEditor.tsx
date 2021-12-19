@@ -269,26 +269,22 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
         callback: param => {
           if (
             param.componentType === 'table' &&
-            param.seriesType === 'header'
+            param.seriesType === 'paging-sort-filter'
           ) {
             dispatch(
               refreshDatasetAction({
                 sorter: {
                   column: param?.seriesName!,
-                  operator: param?.value,
+                  operator: param?.value?.direction,
+                },
+                pageInfo: {
+                  pageNo: param?.value?.pageNo,
                 },
               }),
             );
             return;
           }
-          if (
-            param.componentType === 'table' &&
-            param.seriesType === 'paging'
-          ) {
-            const pageNo = param.value;
-            dispatch(refreshDatasetAction({ pageInfo: { pageNo } }));
-            return;
-          } else if (param.seriesName === 'richText') {
+          if (param.seriesName === 'richText') {
             dispatch(updateRichTextAction(param.value));
             return;
           }

@@ -91,31 +91,18 @@ const ChartPreviewBoardForShare: FC<{
           callback: param => {
             if (
               param.componentType === 'table' &&
-              param.seriesType === 'header'
+              param.seriesType === 'paging-sort-filter'
             ) {
               dispatch(
                 fetchShareDataSetByPreviewChartAction({
                   preview: chartPreview!,
                   sorter: {
                     column: param?.seriesName!,
-                    operator: param?.value,
+                    operator: param?.value?.direction,
                   },
-                }),
-              );
-              return;
-            }
-            if (
-              param.componentType === 'table' &&
-              param.seriesType === 'paging'
-            ) {
-              if (!chartPreview) {
-                return;
-              }
-              const pageNo = param.value;
-              dispatch(
-                fetchShareDataSetByPreviewChartAction({
-                  preview: chartPreview!,
-                  pageInfo: { pageNo },
+                  pageInfo: {
+                    pageNo: param?.value?.pageNo,
+                  },
                 }),
               );
               return;

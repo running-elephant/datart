@@ -24,11 +24,17 @@ const config: ChartConfig = {
       label: 'datas.row',
       key: 'row',
       type: 'group',
+      options: {
+        sortable: { backendSort: false },
+      },
     },
     {
       label: 'datas.column',
       key: 'column',
       type: 'group',
+      options: {
+        sortable: { backendSort: false },
+      },
     },
     {
       label: 'metrics',
@@ -37,6 +43,9 @@ const config: ChartConfig = {
       actions: {
         NUMERIC: ['aggregate', 'alias', 'format', 'sortable'],
         STRING: ['aggregate', 'alias', 'format', 'sortable'],
+      },
+      options: {
+        sortable: { backendSort: false },
       },
     },
     {
@@ -51,59 +60,59 @@ const config: ChartConfig = {
     },
   ],
   styles: [
-    {
-      label: 'column.title',
-      key: 'column',
-      comType: 'group',
-      rows: [
-        {
-          label: 'column.open',
-          key: 'modal',
-          comType: 'group',
-          options: { type: 'modal', modalSize: 'middle' },
-          rows: [
-            {
-              label: 'column.list',
-              key: 'list',
-              comType: 'listTemplate',
-              rows: [],
-              options: {
-                getItems: cols => {
-                  const columns = (cols || [])
-                    .filter(col =>
-                      ['aggregate', 'group', 'mixed'].includes(col.type),
-                    )
-                    .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-                    .map(c => ({
-                      key: c.uid,
-                      value: c.uid,
-                      label:
-                        c.label || c.aggregate
-                          ? `${c.aggregate}(${c.colName})`
-                          : c.colName,
-                    }));
-                  return columns;
-                },
-              },
-              template: {
-                label: 'column.listItem',
-                key: 'listItem',
-                comType: 'group',
-                rows: [
-                  {
-                    label: 'column.conditionStyle',
-                    key: 'conditionStyle',
-                    comType: 'group',
-                    options: { expand: true },
-                    rows: [],
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      ],
-    },
+    // {
+    //   label: 'column.title',
+    //   key: 'column',
+    //   comType: 'group',
+    //   rows: [
+    //     {
+    //       label: 'column.open',
+    //       key: 'modal',
+    //       comType: 'group',
+    //       options: { type: 'modal', modalSize: 'middle' },
+    //       rows: [
+    //         {
+    //           label: 'column.list',
+    //           key: 'list',
+    //           comType: 'listTemplate',
+    //           rows: [],
+    //           options: {
+    //             getItems: cols => {
+    //               const columns = (cols || [])
+    //                 .filter(col =>
+    //                   ['aggregate', 'group', 'mixed'].includes(col.type),
+    //                 )
+    //                 .reduce((acc, cur) => acc.concat(cur.rows || []), [])
+    //                 .map(c => ({
+    //                   key: c.uid,
+    //                   value: c.uid,
+    //                   label:
+    //                     c.label || c.aggregate
+    //                       ? `${c.aggregate}(${c.colName})`
+    //                       : c.colName,
+    //                 }));
+    //               return columns;
+    //             },
+    //           },
+    //           template: {
+    //             label: 'column.listItem',
+    //             key: 'listItem',
+    //             comType: 'group',
+    //             rows: [
+    //               {
+    //                 label: 'column.conditionStyle',
+    //                 key: 'conditionStyle',
+    //                 comType: 'group',
+    //                 options: { expand: true },
+    //                 rows: [],
+    //               },
+    //             ],
+    //           },
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // },
     {
       label: 'style.title',
       key: 'style',
