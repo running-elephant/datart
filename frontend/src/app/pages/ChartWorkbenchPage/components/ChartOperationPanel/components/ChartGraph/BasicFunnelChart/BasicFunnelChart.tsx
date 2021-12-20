@@ -244,7 +244,7 @@ class BasicFunnelChart extends Chart {
         return {
           ...aggConfig,
           select: selectAll,
-          value: aggregateConfigs
+          value: [aggConfig]
             .concat(infoConfigs)
             .map(config => dc?.[getValueByColumnKey(config)]),
           name: getColumnRenderName(aggConfig),
@@ -355,10 +355,12 @@ class BasicFunnelChart extends Chart {
               }`,
             ]
           : [];
-        const aggTooltips = getSeriesTooltips4Scatter(
-          [params],
-          aggregateConfigs.concat(infoConfigs),
-        );
+        const aggTooltips = !!groupConfigs?.length
+          ? getSeriesTooltips4Scatter(
+              [params],
+              aggregateConfigs.concat(infoConfigs),
+            )
+          : getSeriesTooltips4Scatter([params], [data].concat(infoConfigs));
         tooltips = tooltips.concat(aggTooltips);
         if (data.conversion) {
           tooltips.push(`转化率: ${data.conversion}%`);
