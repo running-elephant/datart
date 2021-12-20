@@ -35,7 +35,9 @@ datart 是新一代数据可视化开放平台，支持各类企业数据可视�
 
 ## Document
 ### 如何部署 Deployment
-参见 [Deployment](https://running-elephant.github.io/datart-docs/docs/)
+1.新手上路 参见 [Deployment](./Deployment.md)
+
+2.老司机 参见 [Deployment](https://running-elephant.github.io/datart-docs/docs/)
 ### 快速开始 Quick Start
 参见 [Quick Start Guide](https://running-elephant.github.io/datart-docs/docs/first-visualization.html)
 ### 用户文档 User Document
