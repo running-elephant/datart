@@ -158,6 +158,16 @@ const config: ChartConfig = {
             fontWeight: 'normal',
             color: '#6c757d',
           },
+          options: {
+            fontFamilies: [
+              'Roboto',
+              'PingFangSC',
+              'BlinkMacSystemFont',
+              'Microsoft YaHei',
+              'Arial',
+              'sans-serif',
+            ],
+          },
         },
         {
           label: 'style.align',
@@ -187,7 +197,6 @@ const config: ChartConfig = {
         {
           label: 'style.evenBgColor',
           key: 'evenBgColor',
-          default: '#fafafa',
           comType: 'fontColor',
         },
         {
@@ -199,6 +208,16 @@ const config: ChartConfig = {
             fontSize: 12,
             fontWeight: 'normal',
             color: '#6c757d',
+          },
+          options: {
+            fontFamilies: [
+              'Roboto',
+              'PingFangSC',
+              'BlinkMacSystemFont',
+              'Microsoft YaHei',
+              'Arial',
+              'sans-serif',
+            ],
           },
         },
         {

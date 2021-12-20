@@ -284,6 +284,13 @@ class PivotSheetChart extends ReactChart {
         fontWeight: headerFont?.fontWeight,
         textAlign: headerTextAlign,
       },
+      bolderText: {
+        fill: headerFont?.color,
+        fontFamily: headerFont?.fontFamily,
+        fontSize: headerFont?.fontSize,
+        fontWeight: headerFont?.fontWeight,
+        textAlign: headerTextAlign,
+      },
     };
   }
 
