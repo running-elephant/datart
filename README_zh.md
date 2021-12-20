@@ -47,19 +47,20 @@ datart 是新一代数据可视化开放平台，支持各类企业数据可视�
 ## Community
 ### 社区支持 Support
 ##### 反馈问题
-平台问题可以查看 [Issue](https://gitee.com/running-elephant/datart/issues)，提交新Issue请参考 [Issue描述规范](https://github.com/running-elephant/datart/tree/master/.github/ISSUE_TEMPLATE)
+平台问题可以查看 [Issue](https://gitee.com/running-elephant/datart/issues)
+
 ##### 交流讨论
 可以加入社区微信群参与讨论
 ![](https://running-elephant.github.io/datart-docs/images/about/wechat-group.jpeg)
 
 #### 插件示例仓库
-[示例仓库 v1.0.0](https://github.com/Cuiyansong/datart-extension-charts)
+[示例仓库 v1.0.0](https://gitee.com/running-elephant/datart-extension-charts)
 
 ### 参与贡献 Contributing
 非常欢迎和感谢参与贡献，如何参与可参见 [Contributing]()
 
 ### 谁在使用 Adopters
-参见 [Adopters](https://github.com/running-elephant/datart/issues/137)
+参见 [Adopters](https://gitee.com/running-elephant/datart/issues/I4NA9R)
 
 ## License
 datart is under the Apache 2.0 license. See the [LICENSE](https://gitee.com/running-elephant/datart/blob/master/LICENSE) file for details.
