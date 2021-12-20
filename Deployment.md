@@ -52,27 +52,21 @@ mysql> source bin/datart.sql
 
 ## 3 修改配置文件
 
-- 配置文件位于 config/application-config.yml.example，先重命名为application-config.yml，需要配置的项为: 数据库连接信息，邮件配置，浏览器截图驱动
-
-### 3.1 截图配置 [ChromeWebDriver]
-
+- 配置文件位于 config/application-config.yml.example，先重命名为application-config.yml
 ```bash
-
-yum -y install docker  # 安装docker  如有docker环境请忽略 
-systemctl start docker.service  # 启动docker
-systemctl enable docker.service # 设置开机自启
-
-docker pull selenium/standalone-chrome  # 拉取docker镜像
-
-docker images # 查看镜像 如下:
-   REPOSITORY                             TAG                 IMAGE ID            CREATED             SIZE
-   docker.io/selenium/standalone-chrome   latest              aa76e50e7db2        2 weeks ago         1.2 GB
-
-docker run -p 4444:4444 -d --name selenium-chrome --shm-size="2g" selenium/standalone-chrome  # run
-
+   mv ${DATART_HOME}/config/application-config.yml.example  ${DATART_HOME}/config/application-config.yml
+   
+   需要修改的配置项:
+      1. 数据库连接信息(必须)
+      2. 邮件配置(注册需邮箱激活时必须)
+      3. 浏览器截图驱动(可选-需要使用定时任务邮件发送图表截图时可配置)
+      4. Redis(可选-需要使用缓存时可配置)
+    具体配置见下述:
+   
 ```
 
-### 3.2 配置文件信息
+
+### 3.1 配置文件信息
 
 ***注：请务必保留连接串中的`allowMultiQueries=true`参数***
 
@@ -139,6 +133,7 @@ datart:
   env:
     file-path: ${user.dir}/files # 服务端文件保存位置
 
+# 可选配置 如需配置请参照 [3.2 截图配置 [ChromeWebDriver]-可选]
   screenshot:
     timeout-seconds: 60
     webdriver-type: CHROME
@@ -147,6 +142,17 @@ datart:
 ```
 
 *注意：加密密钥每个服务端部署前应该进行修改，且部署后不能再次修改。如果是集群部署，同一个集群内的secret要保持统一*
+
+
+### 3.2 截图配置 [ChromeWebDriver]-可选
+
+```bash
+
+docker pull selenium/standalone-chrome  # 拉取docker镜像
+
+docker run -p 4444:4444 -d --name selenium-chrome --shm-size="2g" selenium/standalone-chrome  # run
+
+```
 
 ### 4 启动服务
 
