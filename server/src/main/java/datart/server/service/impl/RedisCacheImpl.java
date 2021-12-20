@@ -24,7 +24,7 @@ public class RedisCacheImpl implements Cache {
 
     @Override
     public void put(String key, Object object, int ttl) {
-        redisTemplate.opsForValue().set(key, object, ttl, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(key, object, ttl, TimeUnit.SECONDS);
     }
 
     @Override
