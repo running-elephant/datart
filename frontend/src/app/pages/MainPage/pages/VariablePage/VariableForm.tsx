@@ -2,6 +2,7 @@ import { Checkbox, Form, FormInstance, Input, Radio } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
 import debounce from 'debounce-promise';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
+import moment from 'moment';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { SPACE_XS } from 'styles/StyleConstants';
 import { request } from 'utils/request';
@@ -49,14 +50,20 @@ export const VariableForm = memo(
 
     useEffect(() => {
       if (visible && editingVariable) {
-        const { defaultValue, ...rest } = editingVariable;
         try {
-          setType(rest.type);
-          setValueType(rest.valueType);
-          setExpression(rest.expression || false);
+          const { type, valueType, expression } = editingVariable;
+          let defaultValue = editingVariable.defaultValue
+            ? JSON.parse(editingVariable.defaultValue)
+            : [];
+          if (valueType === VariableValueTypes.Date) {
+            defaultValue = defaultValue.map(str => moment(str));
+          }
+          setType(type);
+          setValueType(valueType);
+          setExpression(expression || false);
           formRef.current?.setFieldsValue({
-            ...rest,
-            defaultValue: defaultValue ? JSON.parse(defaultValue) : [],
+            ...editingVariable,
+            defaultValue,
           });
         } catch (error) {
           errorHandle(error);
@@ -102,6 +109,7 @@ export const VariableForm = memo(
         }}
         afterClose={onAfterClose}
         ref={formRef}
+        destroyOnClose
       >
         <Form.Item
           name="name"
