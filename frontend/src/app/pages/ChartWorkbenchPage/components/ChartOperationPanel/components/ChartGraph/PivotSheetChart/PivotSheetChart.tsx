@@ -167,6 +167,7 @@ class PivotSheetChart extends ReactChart {
         meta: rowSectionConfigRows
           .concat(columnSectionConfigRows)
           .concat(metricsSectionConfigRows)
+          .concat(infoSectionConfigRows)
           .map(config => {
             return {
               field: getValueByColumnKey(config),
