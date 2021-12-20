@@ -216,7 +216,14 @@ export const Variables = memo(() => {
       try {
         const changedRowPermissionsRaw = changedRowPermissions.map(cr => ({
           ...cr,
-          value: JSON.stringify(cr.value),
+          value: JSON.stringify(
+            cr.value &&
+              (editingVariable?.valueType === VariableValueTypes.Date
+                ? cr.value.map(d =>
+                    (d as Moment).format(DEFAULT_VALUE_DATE_FORMAT),
+                  )
+                : cr.value),
+          ),
         }));
         if (
           !comparePermissionChange(
