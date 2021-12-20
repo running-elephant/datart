@@ -235,6 +235,10 @@ class PivotSheetChart extends ReactChart {
       'tableBodyStyle',
       'bgColor',
     ]);
+    const crossBgColor = this.getStyleValue(styleConfigs, [
+      'tableBodyStyle',
+      'crossBgColor',
+    ]);
     const bodyTextAlign = this.getStyleValue(styleConfigs, [
       'tableBodyStyle',
       'align',
@@ -242,6 +246,7 @@ class PivotSheetChart extends ReactChart {
 
     return {
       cell: {
+        crossBackgroundColor: crossBgColor,
         backgroundColor: bodyBgColor,
       },
       text: {
