@@ -55,7 +55,7 @@ datart 是新一代数据可视化开放平台，支持各类企业数据可视�
 ![](https://running-elephant.github.io/datart-docs/images/about/wechat-group.jpeg)
 
 #### 插件示例仓库
-[示例仓库 v1.0.0](https://github.com/Cuiyansong/datart-extension-charts)
+[示例仓库 v1.0.0](https://github.com/running-elephant/datart-extension-charts)
 
 ### 参与贡献 Contributing
 非常欢迎和感谢参与贡献，如何参与可参见 [Contributing]()
