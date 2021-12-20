@@ -135,7 +135,6 @@ class PivotSheetChart extends ReactChart {
 
     return {
       options: {
-        debug: true,
         hierarchyType: enableExpandRow ? 'tree' : 'grid',
         width: context?.width,
         height: context?.height,
