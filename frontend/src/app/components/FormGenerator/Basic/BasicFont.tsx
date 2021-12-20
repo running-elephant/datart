@@ -36,7 +36,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
     const { comType, options, ...rest } = data;
 
-    const hanldePickerSelect = value => {
+    const handlePickerSelect = value => {
       handleSettingChange('color')(value);
     };
 
@@ -102,7 +102,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
             {...rest}
             {...options}
             defaultValue={data.value?.color}
-            onSubmit={hanldePickerSelect}
+            onSubmit={handlePickerSelect}
           />
         </WithColorPicker>
       </BW>

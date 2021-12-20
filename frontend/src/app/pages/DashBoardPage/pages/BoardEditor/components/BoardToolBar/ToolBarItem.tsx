@@ -30,6 +30,7 @@ import {
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { ButtonType } from 'antd/lib/button';
 import { ToolbarButton } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BOARD_UNDO } from 'app/pages/DashBoardPage/constants';
 import {
   BoardType,
@@ -67,6 +68,7 @@ export interface ToolBtnProps {
   boardType: BoardType;
 }
 export const UndoBtn: React.FC<ToolBtnProps> = props => {
+  const t = useI18NPrefix(`viz.board.action`);
   const pastState = useSelector(selectPastState);
   const dispatch = useDispatch();
   const Undo = useCallback(() => {
@@ -85,12 +87,13 @@ export const UndoBtn: React.FC<ToolBtnProps> = props => {
       disabled={!canUndo}
       onClick={Undo}
       icon={<UndoOutlined />}
-      tip="后退"
+      tip={t('undo')}
       {...props}
     />
   );
 };
 export const RedoBtn: React.FC<ToolBtnProps> = props => {
+  const t = useI18NPrefix(`viz.board.action`);
   const futureState = useSelector(selectFutureState);
   const dispatch = useDispatch();
   const Redo = useCallback(() => {
@@ -102,7 +105,7 @@ export const RedoBtn: React.FC<ToolBtnProps> = props => {
       disabled={!canRedo}
       onClick={Redo}
       icon={<RedoOutlined />}
-      tip="前进"
+      tip={t('redo')}
       {...props}
     />
   );
@@ -110,6 +113,7 @@ export const RedoBtn: React.FC<ToolBtnProps> = props => {
 
 export const DeleteBtn: React.FC<ToolBtnProps> = props => {
   const selectedIds = useSelector(selectSelectedIds);
+  const t = useI18NPrefix(`viz.board.action`);
   const dispatch = useDispatch();
   const onDelete = () => {
     dispatch(deleteWidgetsAction());
@@ -119,13 +123,14 @@ export const DeleteBtn: React.FC<ToolBtnProps> = props => {
       disabled={!selectedIds.length}
       onClick={onDelete}
       icon={<DeleteOutlined />}
-      tip="删除"
+      tip={t('delete')}
       {...props}
     />
   );
 };
 export const CopyBtn: React.FC<ToolBtnProps> = props => {
   const selectedIds = useSelector(selectSelectedIds);
+  const t = useI18NPrefix(`viz.board.action`);
   const dispatch = useDispatch();
   const onCopy = () => {
     dispatch(copyWidgetByIds(selectedIds));
@@ -135,12 +140,13 @@ export const CopyBtn: React.FC<ToolBtnProps> = props => {
       disabled={!selectedIds.length}
       onClick={onCopy}
       icon={<CopyOutlined />}
-      tip="复制"
+      tip={t('copy')}
       {...props}
     />
   );
 };
 export const PasteBtn: React.FC<ToolBtnProps> = props => {
+  const t = useI18NPrefix(`viz.board.action`);
   const clipboardWidgets = useSelector(selectClipboardWidgets);
   const dispatch = useDispatch();
   const onPaste = () => {
@@ -151,13 +157,14 @@ export const PasteBtn: React.FC<ToolBtnProps> = props => {
       disabled={!Object.keys(clipboardWidgets).length}
       onClick={onPaste}
       icon={<SnippetsOutlined />}
-      tip="粘贴"
+      tip={t('paste')}
       {...props}
     />
   );
 };
 
 export const ToTopBtn: React.FC<ToolBtnProps> = props => {
+  const t = useI18NPrefix(`viz.board.action`);
   const selectedIds = useSelector(selectSelectedIds);
   const dispatch = useDispatch();
   const toTop = () => {
@@ -174,6 +181,7 @@ export const ToTopBtn: React.FC<ToolBtnProps> = props => {
   );
 };
 export const ToBottomBtn: React.FC<ToolBtnProps> = props => {
+  const t = useI18NPrefix(`viz.board.action`);
   const selectedIds = useSelector(selectSelectedIds);
   const dispatch = useDispatch();
   const toBottom = () => {
@@ -191,6 +199,7 @@ export const ToBottomBtn: React.FC<ToolBtnProps> = props => {
 };
 
 export const MediaWidgetDropdown: React.FC<ToolBtnProps> = props => {
+  const t = useI18NPrefix(`viz.board.action`);
   const dispatch = useDispatch();
   const { boardId, boardType } = props;
   const onSelectMediaWidget = useCallback(
@@ -246,7 +255,7 @@ export const MediaWidgetDropdown: React.FC<ToolBtnProps> = props => {
       placement="bottomLeft"
       trigger={['click']}
     >
-      <Tooltip title="媒体组件">
+      <Tooltip title={t('media')}>
         <ToolbarButton
           className={props.className}
           type={props.btnType || 'text'}
@@ -260,6 +269,7 @@ export const MediaWidgetDropdown: React.FC<ToolBtnProps> = props => {
 };
 
 export const ContainerWidgetDropdown: React.FC<ToolBtnProps> = props => {
+  const t = useI18NPrefix(`viz.board.action`);
   const dispatch = useDispatch();
   const { boardId, boardType } = props;
   const onSelectContainerWidget = useCallback(
@@ -307,7 +317,7 @@ export const ContainerWidgetDropdown: React.FC<ToolBtnProps> = props => {
       placement="bottomLeft"
       trigger={['click']}
     >
-      <Tooltip title="布局容器">
+      <Tooltip title={t('container')}>
         <ToolbarButton
           className={props.className}
           type={props.btnType || 'text'}
@@ -325,6 +335,7 @@ type ChartWidgetDropdownProps = ToolBtnProps & {
 };
 export const ChartWidgetDropdown: React.FC<ChartWidgetDropdownProps> =
   props => {
+    const t = useI18NPrefix(`viz.board.action`);
     const onChartWidget = useCallback(
       ({ key }) => {
         if (key === 'select') {
@@ -363,7 +374,7 @@ export const ChartWidgetDropdown: React.FC<ChartWidgetDropdownProps> =
         placement="bottomLeft"
         trigger={['click']}
       >
-        <Tooltip title="数据图表">
+        <Tooltip title={t('dataChart')}>
           <ToolbarButton
             className={props.className}
             type={props.btnType || 'text'}

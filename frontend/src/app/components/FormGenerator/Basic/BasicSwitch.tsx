@@ -52,7 +52,7 @@ const BasicSwitch: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
       onChange?.(ancestors, newRow, needRefresh);
     };
 
-    const hanldeSwitchChange = value => {
+    const handleSwitchChange = value => {
       const newRow = updateByKey(row, 'value', value);
       onChange?.(ancestors, newRow);
     };
@@ -74,7 +74,7 @@ const BasicSwitch: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
               {...rest}
               {...options}
               checked={row.value}
-              onChange={hanldeSwitchChange}
+              onChange={handleSwitchChange}
             />
           </Col>
         </StyledVizBasicSwitch>

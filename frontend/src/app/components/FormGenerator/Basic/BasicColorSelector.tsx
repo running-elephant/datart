@@ -46,7 +46,7 @@ const BasicColorSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 
-    const hanldePickerSelect = value => {
+    const handlePickerSelect = value => {
       onChange?.(ancestors, value);
     };
 
@@ -63,7 +63,7 @@ const BasicColorSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
             {...options}
             colors={COLORS}
             defaultValue={getColor()}
-            onSubmit={hanldePickerSelect}
+            onSubmit={handlePickerSelect}
           >
             <StyledColor color={getColor()} />
           </ColorPickerPopover>
