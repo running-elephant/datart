@@ -38,9 +38,7 @@ public class SqlValidateUtils {
             return true;
         }
 
-        if (sqlCall instanceof SqlDdl || sqlCall instanceof SqlDelete || sqlCall instanceof SqlUpdate) {
-            Exceptions.tr(DataProviderException.class, "message.sql.op.forbidden", sqlCall.getKind() + ":" + sqlCall);
-        }
+        Exceptions.tr(DataProviderException.class, "message.sql.op.forbidden", sqlCall.getKind() + ":" + sqlCall);
         return false;
     }
 
