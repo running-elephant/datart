@@ -25,7 +25,6 @@ import ChartEventBroker from 'app/pages/ChartWorkbenchPage/models/ChartEventBrok
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartLifecycle } from 'app/types/ChartLifecycle';
 import React, { CSSProperties, useEffect, useRef, useState } from 'react';
-// import { useFrame } from 'react-frame-component';
 import styled from 'styled-components/macro';
 import { v4 as uuidv4 } from 'uuid';
 import ChartIFrameContainerResourceLoader from './ChartIFrameContainerResourceLoader';

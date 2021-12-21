@@ -23,7 +23,6 @@ import {
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
-// import Frame, { FrameContextConsumer } from 'react-frame-component';
 import styled, { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartLifecycleAdapter from './ChartLifecycleAdapter';
