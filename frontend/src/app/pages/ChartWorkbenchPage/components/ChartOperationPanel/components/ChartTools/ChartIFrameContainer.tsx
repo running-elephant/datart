@@ -16,10 +16,13 @@
  * limitations under the License.
  */
 
+import {
+  Frame,
+  FrameContextConsumer,
+} from 'app/components/ReactFrameComponent';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
-import Frame, { FrameContextConsumer } from 'react-frame-component';
 import styled, { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartLifecycleAdapter from './ChartLifecycleAdapter';
@@ -83,7 +86,7 @@ const ChartIFrameContainer: FC<{
       >
         <FrameContextConsumer>
           {frameContext => (
-            <StyleSheetManager target={frameContext.document.head}>
+            <StyleSheetManager target={frameContext.document?.head}>
               <StyledChartLifecycleAdapter>
                 <ChartLifecycleAdapter
                   dataset={props.dataset}
