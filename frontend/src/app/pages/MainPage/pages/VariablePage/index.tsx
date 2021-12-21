@@ -218,10 +218,19 @@ export function VariablePage() {
 
   const saveRelations = useCallback(
     async (changedRowPermissions: RowPermission[]) => {
+      let changedRowPermissionsRaw = changedRowPermissions.map(cr => ({
+        ...cr,
+        value:
+          cr.value &&
+          (editingVariable?.valueType === VariableValueTypes.Date
+            ? cr.value.map(m => (m as Moment).format(DEFAULT_VALUE_DATE_FORMAT))
+            : cr.value),
+      }));
+
       if (rowPermissions) {
         const { created, updated, deleted } = getDiffParams(
           [...rowPermissions],
-          changedRowPermissions,
+          changedRowPermissionsRaw,
           (oe, ce) =>
             oe.subjectId === ce.subjectId && oe.variableId === ce.variableId,
           (oe, ce) =>
@@ -254,10 +263,12 @@ export function VariablePage() {
           } finally {
             setUpdateRowPermissionLoading(false);
           }
+        } else {
+          setSubjectFormVisible(false);
         }
       }
     },
-    [rowPermissions],
+    [rowPermissions, editingVariable],
   );
 
   const columns: TableColumnProps<VariableViewModel>[] = useMemo(

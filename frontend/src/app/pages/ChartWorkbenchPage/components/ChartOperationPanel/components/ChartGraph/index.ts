@@ -38,6 +38,7 @@ import NormalOutlineMapChart from './NormalOutlineMapChart';
 import PercentageStackBarChart from './PercentageStackBarChart';
 import PercentageStackColumnChart from './PercentageStackColumnChart';
 import PieChart from './PieChart';
+import PivotSheetChart from './PivotSheetChart';
 import RoseChart from './RoseChart';
 import ScatterOutlineMapChart from './ScatterOutlineMapChart';
 import ScoreChart from './ScoreChart';
@@ -78,5 +79,6 @@ const WidgetPlugins = {
   WaterfallChart,
   BasicGaugeChart,
   BasicRichText,
+  PivotSheetChart,
 };
 export default WidgetPlugins;

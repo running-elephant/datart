@@ -1,14 +1,14 @@
-/*
+/**
  * Datart
- * <p>
+ *
  * Copyright 2021
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,27 +16,6 @@
  * limitations under the License.
  */
 
-package datart.core.data.provider;
+import PivotSheetChart from './PivotSheetChart';
 
-import datart.core.base.consts.ValueType;
-import lombok.Data;
-
-import java.io.Serializable;
-
-@Data
-public class Column implements Serializable {
-
-    private String name;
-
-    private ValueType type;
-    
-    private String fmt;
-
-    public Column(String name, ValueType type) {
-        this.name = name;
-        this.type = type;
-    }
-
-    public Column() {
-    }
-}
+export default PivotSheetChart;

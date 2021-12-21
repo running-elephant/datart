@@ -47,8 +47,6 @@ export interface ControllerConfig {
   radioButtonType?: RadioGroupOptionType; //按钮样式
 
   sliderConfig?: SliderConfig;
- 
-  cascades?: string[]; // 级联的children controllerWidgetId[]
 }
 
 export interface ControllerDate {

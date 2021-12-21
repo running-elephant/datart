@@ -363,16 +363,25 @@
         "cancel": "Cancel"
       }
     },
-    "chartPreview": {
+    "action": {
       "common": {
         "confirm": "Please Confirm",
         "ok": "OK",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "save":"Save"
       },
       "edit": "Edit",
       "run": "Run",
       "publish": "Publish",
-      "unpublish": "Unpublish",
+      "cancelPublish": "Cancel Publish",
+      "published":"Published",
+      "unpublished":"Unpublished",
+      "archived":"Archived",
+
+
+
+
+
       "share": {
         "link": "Link",
         "password": "Password",
@@ -381,6 +390,19 @@
         "generateLink": "Generate Link",
         "shareLink": "Share Link",
         "downloadData": "Download Data"
+      }
+    },
+    "board":{
+      "action":{
+        "dataChart":"DataChart",
+        "media":"Media",
+        "container":"Container",
+        "controller":"Controller",
+        "undo":"Undo",
+        "redo":"Redo",
+        "delete":"Delete",
+        "copy":"Copy",
+        "paste":"Paste"
       }
     }
   },

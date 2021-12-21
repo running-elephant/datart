@@ -18,7 +18,6 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
-import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams } from 'app/types/DatartChartBase';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
@@ -380,19 +379,13 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   const getTableChartData = useCallback(
     (options: { widget: Widget; params: any; sorters?: any[] }) => {
       const { params } = options;
-      const pageInfo: Partial<PageInfo> = options.sorters
-        ? {}
-        : {
-            pageNo: params.value,
-          };
-      const sorters = options.sorters || [];
       if (editing) {
         dispatch(
           getEditChartWidgetDataAsync({
             widgetId,
             option: {
-              pageInfo,
-              sorters,
+              pageInfo: params?.pageInfo,
+              sorters: params?.sorters,
             },
           }),
         );
@@ -403,8 +396,8 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
             widgetId,
             renderMode,
             option: {
-              pageInfo,
-              sorters,
+              pageInfo: params?.pageInfo,
+              sorters: params?.sorters,
             },
           }),
         );
@@ -461,23 +454,21 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
 
   const widgetChartClick = useCallback(
     (widget: Widget, params: ChartMouseEventParams) => {
-      // table 分页
-      if (params.componentType === 'table' && params.seriesType === 'paging') {
-        // table 分页逻辑
-        getTableChartData({ widget, params });
-        return;
-      }
-      if (params.componentType === 'table' && params.seriesType === 'header') {
-        // table 分页逻辑
+      if (
+        params.componentType === 'table' &&
+        params.seriesType === 'paging-sort-filter'
+      ) {
         getTableChartData({
           widget,
-          params,
-          sorters: [
-            {
-              column: params?.seriesName!,
-              operator: params?.value,
-            },
-          ],
+          params: {
+            pageInfo: { pageNo: params?.value?.pageNo },
+            sorters: [
+              {
+                column: params?.seriesName!,
+                operator: (params?.value as any)?.direction,
+              },
+            ],
+          },
         });
         return;
       }

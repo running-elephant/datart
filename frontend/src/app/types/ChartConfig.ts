@@ -264,6 +264,11 @@ export type ChartDataSectionConfig = ChartConfigBase & {
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
   limit?: null | number | string | number[] | string[];
   disableAggregate?: boolean;
+  options?: {
+    [key in ValueOf<typeof ChartDataSectionFieldActionType>]: {
+      backendSort?: boolean;
+    };
+  };
 
   // Question: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;

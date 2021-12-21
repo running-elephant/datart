@@ -17,6 +17,7 @@
  */
 import { ControlOutlined } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
@@ -34,6 +35,7 @@ export interface ButtonItemType<T> {
   disabled?: boolean;
 }
 export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
+  const t = useI18NPrefix(`viz.board.action`);
   const { boardId, boardType, showLabel } = useContext(BoardToolBarContext);
   const dispatch = useDispatch();
   const { config: boardConfig } = useContext(BoardConfigContext);
@@ -178,7 +180,7 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
     >
       <WithTipButton
         icon={<ControlOutlined />}
-        tip="添加控制器"
+        tip={t('controller')}
         boardId={boardId}
         boardType={boardType}
         label={showLabel ? '添加控制器' : ''}

@@ -79,7 +79,7 @@ const IframeWidget: React.FC<{}> = () => {
         frameBorder="0"
         allow="autoplay"
         style={{ width: '100%', height: '100%' }}
-      />
+      ></iframe>
     </Wrap>
   );
 };

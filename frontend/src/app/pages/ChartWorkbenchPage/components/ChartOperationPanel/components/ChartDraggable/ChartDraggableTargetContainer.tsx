@@ -58,6 +58,10 @@ import { v4 as uuidv4 } from 'uuid';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
 import VizDraggableItem from './ChartDraggableElement';
 
+type DragItem = {
+  index?: number;
+};
+
 export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
   memo(function ChartDraggableTargetContainer({
     ancestors,
@@ -80,9 +84,9 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
           CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN,
         ],
-        drop(item: any, monitor) {
+        drop(item: ChartDataSectionField & DragItem, monitor) {
           let items = Array.isArray(item) ? item : [item];
-
+          let needDelete = true;
           if (
             monitor.getItemType() ===
             CHART_DRAG_ELEMENT_TYPE.DATASET_GROUP_COLUMNS
@@ -90,10 +94,9 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             items = item as any;
           }
           if (
-            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN ||
-            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
+            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN
           ) {
-            let currentColumns: ChartDataSectionField[] = (
+            const currentColumns: ChartDataSectionField[] = (
               currentConfig.rows || []
             ).concat(
               items.map(i => ({
@@ -111,9 +114,46 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             );
             setCurrentConfig(newCurrentConfig);
             onConfigChanged?.(ancestors, newCurrentConfig, true);
+          } else if (
+            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
+          ) {
+            const originItemIndex = (currentConfig.rows || []).findIndex(
+              r => r.uid === item.uid,
+            );
+            if (originItemIndex > -1) {
+              const currentColumns = updateBy(
+                currentConfig?.rows || [],
+                draft => {
+                  draft.splice(originItemIndex, 1);
+                  return draft.splice(item?.index!, 0, item);
+                },
+              );
+              const newCurrentConfig = updateByKey(
+                currentConfig,
+                'rows',
+                currentColumns,
+              );
+              needDelete = false;
+              setCurrentConfig(newCurrentConfig);
+              onConfigChanged?.(ancestors, newCurrentConfig, false);
+            } else {
+              const currentColumns = updateBy(
+                currentConfig?.rows || [],
+                draft => {
+                  return draft.splice(item?.index!, 0, item);
+                },
+              );
+              const newCurrentConfig = updateByKey(
+                currentConfig,
+                'rows',
+                currentColumns,
+              );
+              setCurrentConfig(newCurrentConfig);
+              onConfigChanged?.(ancestors, newCurrentConfig, false);
+            }
           }
 
-          return { delete: true };
+          return { delete: needDelete };
         },
         canDrop: (item: ChartDataSectionField, monitor) => {
           if (
@@ -133,6 +173,12 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           }
 
           if (currentConfig.allowSameField) {
+            return true;
+          }
+
+          if (
+            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
+          ) {
             return true;
           }
 

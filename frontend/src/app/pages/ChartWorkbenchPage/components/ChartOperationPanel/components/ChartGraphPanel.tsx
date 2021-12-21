@@ -98,17 +98,6 @@ const ChartGraphPanel: FC<{
     return <ul>{lintMessages}</ul>;
   };
 
-  const renderIcon = icon => {
-    if (/^<svg/.test(icon) || /^<\?xml/.test(icon)) {
-      return <SVGImageRender iconStr={icon} />;
-    }
-    if (/svg\+xml;base64/.test(icon)) {
-      return <Base64ImageRender iconStr={icon} />;
-    }
-    const _getFontIconClass = icon => `iconfont icon-${!icon ? 'chart' : icon}`;
-    return <i className={_getFontIconClass(icon)} />;
-  };
-
   const renderCharts = () => {
     const _getChartIcon = (c, onChange?) => {
       return (
@@ -123,7 +112,6 @@ const ChartGraphPanel: FC<{
         >
           <IconWrapper>
             <StyledChartIcon
-              isMatchRequirement={!!requirementsStates?.[c?.meta?.id]}
               fontSize={FONT_SIZE_ICON_MD}
               size={SPACE_TIMES(9)}
               className={classnames({
@@ -131,11 +119,31 @@ const ChartGraphPanel: FC<{
               })}
               onClick={onChange}
             >
-              {renderIcon(c?.meta?.icon)}
+              {renderIcon({
+                iconStr: c?.meta?.icon,
+                isMatchRequirement: !!requirementsStates?.[c?.meta?.id],
+                isActive: c?.meta?.id === chart?.meta?.id,
+              })}
             </StyledChartIcon>
           </IconWrapper>
         </Tooltip>
       );
+    };
+
+    const renderIcon = ({
+      ...args
+    }: {
+      iconStr;
+      isMatchRequirement;
+      isActive;
+    }) => {
+      if (/^<svg/.test(args?.iconStr) || /^<\?xml/.test(args?.iconStr)) {
+        return <SVGImageRender {...args} />;
+      }
+      if (/svg\+xml;base64/.test(args?.iconStr)) {
+        return <Base64ImageRender {...args} />;
+      }
+      return <SVGFontIconRender {...args} />;
     };
 
     return allCharts.map(c => {
@@ -159,9 +167,18 @@ const ChartGraphPanel: FC<{
   return <StyledChartGraphPanel>{renderCharts()}</StyledChartGraphPanel>;
 });
 
-const SVGImageRender = ({ iconStr }) => {
+const SVGFontIconRender = ({ iconStr, isMatchRequirement }) => {
   return (
-    <img
+    <StyledSVGFontIcon
+      isMatchRequirement={isMatchRequirement}
+      className={`iconfont icon-${!iconStr ? 'chart' : iconStr}`}
+    />
+  );
+};
+
+const SVGImageRender = ({ iconStr, isMatchRequirement, isActive }) => {
+  return (
+    <StyledInlineSVGIcon
       alt="svg icon"
       style={{ height: FONT_SIZE_ICON_MD, width: FONT_SIZE_ICON_MD }}
       src={`data:image/svg+xml;utf8,${iconStr}`}
@@ -169,7 +186,7 @@ const SVGImageRender = ({ iconStr }) => {
   );
 };
 
-const Base64ImageRender = ({ iconStr }) => {
+const Base64ImageRender = ({ iconStr, isMatchRequirement, isActive }) => {
   return (
     <img
       alt="svg icon"
@@ -195,10 +212,17 @@ const IconWrapper = styled.span`
   padding: ${SPACE_TIMES(0.5)};
 `;
 
-const StyledChartIcon = styled(IW)<{ isMatchRequirement?: boolean }>`
+const StyledInlineSVGIcon = styled.img<{ isMatchRequirement?: boolean }>`
+  opacity: ${p => (p.isMatchRequirement ? 1 : 0.4)};
+`;
+
+const StyledSVGFontIcon = styled.i<{ isMatchRequirement?: boolean }>`
+  opacity: ${p => (p.isMatchRequirement ? 1 : 0.4)};
+`;
+
+const StyledChartIcon = styled(IW)`
   cursor: pointer;
   border-radius: ${BORDER_RADIUS};
-  opacity: ${p => (p.isMatchRequirement ? 1 : 0.4)};
 
   &:hover,
   &.active {

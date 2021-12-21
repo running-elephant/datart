@@ -147,11 +147,12 @@ class BasicTableChart extends ReactChart {
         tablePagination,
       ),
       onChange: (pagination, filters, sorter, extra) => {
-        if (extra?.action === 'sort') {
-          this.invokeHeaderSortEvents(sorter?.field, sorter?.order);
-        }
-        if (extra?.action === 'paginate') {
-          this.invokePagingEvents(pagination?.current);
+        if (extra?.action === 'sort' || extra?.action === 'paginate') {
+          this.invokePagingRelatedEvents(
+            sorter?.field,
+            sorter?.order,
+            pagination?.current,
+          );
         }
       },
     };
@@ -378,7 +379,6 @@ class BasicTableChart extends ReactChart {
             props,
             conditionStyle,
           );
-
           return (
             <td
               {...rest}
@@ -389,7 +389,6 @@ class BasicTableChart extends ReactChart {
         row: props => {
           const { style, ...rest } = props;
           const rowStyle = getCustomBodyRowStyle(props, allConditionStyle);
-
           return <tr {...rest} style={Object.assign(style || {}, rowStyle)} />;
         },
         wrapper: props => {
@@ -666,31 +665,18 @@ class BasicTableChart extends ReactChart {
       : false;
   }
 
-  invokePagingEvents(current?: number) {
+  invokePagingRelatedEvents(seriesName: string, value: any, pageNo: number) {
     const eventParams = {
       componentType: 'table',
-      seriesType: 'paging',
-      name: '',
-      seriesName: '',
-      dataIndex: undefined,
-      value: current,
-    };
-    this._mouseEvents?.forEach(cur => {
-      if (cur.name === 'click') {
-        cur.callback?.(eventParams);
-      }
-    });
-  }
-
-  invokeHeaderSortEvents(seriesName: string, value: any) {
-    const eventParams = {
-      componentType: 'table',
-      seriesType: 'header',
+      seriesType: 'paging-sort-filter',
       name: '',
       seriesName,
       dataIndex: undefined,
-      value:
-        value === undefined ? undefined : value === 'ascend' ? 'ASC' : 'DESC',
+      value: {
+        direction:
+          value === undefined ? undefined : value === 'ascend' ? 'ASC' : 'DESC',
+        pageNo,
+      },
     };
     this._mouseEvents?.forEach(cur => {
       if (cur.name === 'click') {
@@ -755,7 +741,9 @@ class BasicTableChart extends ReactChart {
   };
 
   findHeader = (uid, headers) => {
-    let header = (headers || []).find(h => h.uid === uid);
+    let header = (headers || [])
+      .filter(h => !h.isGroup)
+      .find(h => h.uid === uid);
     if (!!header) {
       return header;
     }

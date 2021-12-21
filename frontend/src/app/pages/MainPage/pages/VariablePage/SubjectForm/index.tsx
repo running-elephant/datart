@@ -1,4 +1,5 @@
 import { Modal, ModalProps, Tabs } from 'antd';
+import moment from 'moment';
 import { Key, memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -11,7 +12,7 @@ import {
   selectRoles,
 } from '../../MemberPage/slice/selectors';
 import { SubjectTypes } from '../../PermissionPage/constants';
-import { VariableScopes } from '../constants';
+import { VariableScopes, VariableValueTypes } from '../constants';
 import { RowPermission, RowPermissionSubject, Variable } from '../slice/types';
 import { RowPermissionTable } from './RowPermissionTable';
 
@@ -64,7 +65,11 @@ export const SubjectForm = memo(
             name,
             type: SubjectTypes.Role,
             useDefaultValue: permission ? permission.useDefaultValue : true,
-            value: permission ? permission.value : void 0,
+            value: permission?.value
+              ? editingVariable.valueType === VariableValueTypes.Date
+                ? permission.value.map(str => moment(str))
+                : permission.value
+              : void 0,
           });
           if (permission) {
             selectedRowKeys.push(id);
@@ -92,7 +97,11 @@ export const SubjectForm = memo(
             email,
             type: SubjectTypes.User,
             useDefaultValue: permission ? permission.useDefaultValue : true,
-            value: permission ? permission.value : void 0,
+            value: permission?.value
+              ? editingVariable.valueType === VariableValueTypes.Date
+                ? permission.value.map(str => moment(str))
+                : permission.value
+              : void 0,
           });
           if (permission) {
             selectedRowKeys.push(id);
@@ -168,6 +177,7 @@ export const SubjectForm = memo(
         }
         onOk={save}
         afterClose={onAfterClose}
+        destroyOnClose
       >
         <RowPermissionTable
           type="role"
