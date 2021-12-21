@@ -97,7 +97,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
     if (actionType === ChartDataSectionFieldActionType.Colorize) {
       _modalSize = StateModalSize.SMALL;
     } else if (actionType === ChartDataSectionFieldActionType.ColorizeSingle) {
-      _modalSize = StateModalSize.SMALL;
+      _modalSize = 520;
     }
     return (show as Function)({
       title: t(actionType),

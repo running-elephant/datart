@@ -33,7 +33,7 @@ export enum StateModalSize {
 
 const defaultBodyStyle: React.CSSProperties = {
   maxHeight: 1000,
-  overflowY: 'scroll',
+  overflowY: 'auto', // style nice
   overflowX: 'auto',
 };
 

@@ -154,18 +154,16 @@ export const SchemaTable = memo(
       onSchemaTypeChange,
     ]);
     return (
-      <>
-        <VirtualTable
-          {...tableProps}
-          rowKey={ROW_KEY}
-          size="small"
-          components={{ header: { cell: TableHeader } }}
-          dataSource={dataSourceWithKey}
-          columns={columns}
-          scroll={{ x: tableWidth, y: height }}
-          width={propsWidth}
-        />
-      </>
+      <VirtualTable
+        {...tableProps}
+        rowKey={ROW_KEY}
+        size="small"
+        components={{ header: { cell: TableHeader } }}
+        dataSource={dataSourceWithKey}
+        columns={columns}
+        scroll={{ x: tableWidth, y: height }}
+        width={propsWidth}
+      />
     );
   },
 );

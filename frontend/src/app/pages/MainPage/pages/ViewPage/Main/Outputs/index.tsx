@@ -17,7 +17,10 @@ export const Outputs = memo(() => {
     selectCurrentEditingViewAttr(state, { name: 'stage' }),
   ) as ViewViewModelStages;
 
-  const { width, height, ref } = useResizeObserver();
+  const { width, height, ref } = useResizeObserver({
+    refreshMode: 'debounce',
+    refreshRate: 200,
+  });
 
   return (
     <Wrapper ref={ref}>
