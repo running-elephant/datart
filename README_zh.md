@@ -42,7 +42,7 @@ datart 是新一代数据可视化开放平台，支持各类企业数据可视�
 参见 [User Guide](http://running-elephant.gitee.io/datart-docs/docs/source.html)
 
 ### 最新版本 Latest Release
-参见  [Latest Release]()
+参见  [Latest Release](https://gitee.com/running-elephant/datart/releases/1.0.0-alpha.3)
 
 ## Community
 ### 社区支持 Support
