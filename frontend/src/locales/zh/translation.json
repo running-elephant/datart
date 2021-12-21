@@ -199,17 +199,10 @@
         "goBack": "返回",
         "run": "执行",
         "save": "保存",
-        "saveToDashboard": "保存到仪表盘",
-        "login": "登陆",
-        "lang": {
-          "zh": "中文",
-          "en": "英文"
-        },
+
         "format": {
           "local": "本地",
-          "date": "日期",
-          "ll": "LL",
-          "lll": "LLL"
+          "date": "日期"
         }
       },
       "dataview": {
@@ -438,17 +431,47 @@
         "downloadData": "下载数据"
       }
     },
-    "board": {
-      "action": {
-        "dataChart": "数据图表",
-        "media": "媒体组件",
-        "container": "容器",
-        "controller": "控制器",
-        "undo": "撤销",
-        "redo": "重做",
-        "delete": "删除",
-        "copy": "复制",
-        "paste": "粘贴"
+    "board":{
+      "action":{
+        "dataChart":"数据图表", 
+        "addDataChartFormList":"添加已有数据图表",
+        "createDataChartInBoard":"新建数据图表",
+
+        "media":"媒体组件",
+        "image":"图片",
+        "richText":"富文本",
+        "timer":"计时器",
+        "iFrame":"iFrame",
+        "video":"视频",
+
+
+        "container":"容器",
+        "tab":"标签页",
+        "轮播图":"",
+
+        "controller":"控制器",
+
+        "undo":"撤销",
+        "redo":"重做",
+        "delete":"删除",
+        "copy":"复制",
+        "paste":"粘贴"
+      },
+      "controlTypes":{
+        "common":"常规",
+        "date":"日期",
+        "numeric":"数值",
+        "button":"按钮"
+      }
+    },
+    "widget":{
+      "type":{
+        "chart":"数据图表",
+        "media":"媒体",
+        "container":"容器",
+        "controller":"控制器",
+        "query":"查询",
+        "reset":"重置"
       }
     }
   },

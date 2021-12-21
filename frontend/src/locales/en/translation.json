@@ -198,17 +198,11 @@
         "goBack": "Back",
         "run": "Run",
         "save": "Save",
-        "saveToDashboard": "Save to Dashboard",
-        "login": "Login",
-        "lang": {
-          "zh": "ZH",
-          "en": "EN"
-        },
+
+
         "format": {
           "local": "local",
-          "date": "date",
-          "ll": "LL",
-          "lll": "LLL"
+          "date": "date"
         }
       },
       "dataview": {
@@ -438,17 +432,45 @@
         "downloadData": "Download Data"
       }
     },
-    "board": {
-      "action": {
-        "dataChart": "DataChart",
-        "media": "Media",
-        "container": "Container",
-        "controller": "Controller",
-        "undo": "Undo",
-        "redo": "Redo",
-        "delete": "Delete",
-        "copy": "Copy",
-        "paste": "Paste"
+    "board":{
+      "action":{
+        "dataChart":"DataChart",
+        "addDataChartFormList":"Add DataChart Form List",
+        "createDataChartInBoard":"Create DataChart In Board",
+
+        "media":"Media",
+        "image":"Image",
+        "richText":"Rich Text",
+        "timer":"Timer",
+        "iFrame":"iFrame",
+        "video":"Video",
+
+        "container":"Container",
+        "tab":"Tab",
+
+        "controller":"Controller",
+        "undo":"Undo",
+        "redo":"Redo",
+        "delete":"Delete",
+        "copy":"Copy",
+        "paste":"Paste"
+      },
+      "controlTypes":{
+        "common":"Common",
+        "date":"Date",
+        "numeric":"Numeric",
+        "button":"Button"
+      }
+      
+    },
+    "widget":{
+      "type":{
+        "chart":"Chart",
+        "media":"Media",
+        "container":"Container",
+        "controller":"Controller",
+        "query":"Query",
+        "reset":"Reset"
       }
     }
   },
