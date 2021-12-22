@@ -23,16 +23,25 @@
  * @returns 返回一个新的颜色值
  */
 import { Popover } from 'antd';
+import { defaultPalette, defaultThemes } from 'app/assets/theme/colorsConfig';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { useState } from 'react';
 import styled from 'styled-components/macro';
-import { BLUE, BORDER_RADIUS, G40, G80, WHITE } from 'styles/StyleConstants';
+import {
+  BORDER_RADIUS,
+  FONT_SIZE_BODY,
+  G40,
+  G80,
+  SPACE_TIMES,
+  WHITE,
+} from 'styles/StyleConstants';
 import ChromeColorPicker from './ChromeColorPicker';
-import { defaultPalette, defaultThemes } from './constants';
 import { colorSelectionPropTypes } from './slice/types';
 
 function SingleColorSelection({ color, onOk }: colorSelectionPropTypes) {
   const [moreStatus, setMoreStatus] = useState(false);
   const [selectColor, setSelectColor] = useState(color);
+  const t = useI18NPrefix('components.colorPicker');
 
   //更多颜色里的回调函数
   const moreCallBackFn = value => {
@@ -90,7 +99,7 @@ function SingleColorSelection({ color, onOk }: colorSelectionPropTypes) {
             setMoreStatus(true);
           }}
         >
-          更多
+          {t('more')}
         </MoreColor>
       </Popover>
     </ColorWrap>
@@ -108,19 +117,19 @@ const ColorWrap = styled.div`
 
 const ThemeColorWrap = styled.div`
   border-bottom: 1px solid ${G40};
-  padding-bottom: 6px;
-  margin: 10px 0;
+  padding-bottom: ${SPACE_TIMES(1.5)};
+  margin: ${SPACE_TIMES(2.5)} 0;
 `;
 
 const ColorBlock = styled.span<{ color: string }>`
   display: inline-block;
-  min-width: 25px;
-  min-height: 25px;
+  min-width: ${SPACE_TIMES(6)};
+  min-height: ${SPACE_TIMES(6)};
   background-color: ${p => p.color};
   border-radius: ${BORDER_RADIUS};
   cursor: pointer;
   transition: all 0.2s;
-  margin-right: 15px;
+  margin-right: ${SPACE_TIMES(4)};
   border: 1px solid ${G40};
   &:last-child {
     margin-right: 0px;
@@ -129,13 +138,13 @@ const ColorBlock = styled.span<{ color: string }>`
     opacity: 0.7;
   }
   &.active {
-    border: 1px solid ${BLUE};
+    border: 1px solid ${p => p.theme.blue};
   }
 `;
 
 const ColorPalette = styled.div`
   border-bottom: 1px solid ${G40};
-  padding-bottom: 6px;
+  padding-bottom: ${SPACE_TIMES(1.5)};
   > span:nth-child(11n) {
     margin-right: 0px;
   }
@@ -144,10 +153,10 @@ const ColorPalette = styled.div`
 const MoreColor = styled.div`
   text-align: center;
   cursor: pointer;
-  margin-top: 10px;
-  font-size: 14px;
+  margin-top: ${SPACE_TIMES(2.5)};
+  font-size: ${FONT_SIZE_BODY};
   color: ${G80};
   &:hover {
-    color: ${BLUE};
+    color: ${p => p.theme.blue};
   }
 `;

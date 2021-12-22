@@ -20,15 +20,18 @@
  * @param children 点击弹出按钮的文字 支持文字和html类型
  */
 import { List, Popover } from 'antd';
+import { colorThemes } from 'app/assets/theme/colorsConfig';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components/macro';
-import { BLUE, G10 } from 'styles/StyleConstants';
-import { colorThemes } from './constants';
+import { FONT_SIZE_BODY, G10, SPACE_TIMES } from 'styles/StyleConstants';
 import { themeColorPropTypes } from './slice/types';
 
 function ThemeColorSelection({ children, callbackFn }: themeColorPropTypes) {
   const [switchStatus, setSwitchStatus] = useState(false);
   const [colors] = useState(colorThemes);
+  const { i18n } = useTranslation();
+  const { language = 'zh' } = i18n;
 
   return (
     <Popover
@@ -49,7 +52,7 @@ function ThemeColorSelection({ children, callbackFn }: themeColorPropTypes) {
                   setSwitchStatus(false);
                 }}
               >
-                <ColorTitle>{item.zh.title}</ColorTitle>
+                <ColorTitle>{item[language].title}</ColorTitle>
                 <ColorBlockWrap>
                   {item.colors.map((v, i) => {
                     return <ColorBlock color={v} key={i}></ColorBlock>;
@@ -78,15 +81,15 @@ const ChooseTheme = styled.div`
   display: inline-block;
   width: 100%;
   text-align: right;
-  margin-bottom: 5px;
+  margin-bottom: ${SPACE_TIMES(1)};
 `;
 const ChooseThemeSpan = styled.div`
   cursor: pointer;
-  font-size: 14px;
+  font-size: ${FONT_SIZE_BODY};
   display: inline-block;
   width: max-content;
   &:hover {
-    color: ${BLUE};
+    color: ${p => p.theme.blue};
   }
 `;
 const ColorWrapAlert = styled.div`
@@ -98,7 +101,7 @@ const ColorWrapAlert = styled.div`
     flex-direction: column;
     align-items: flex-start;
     cursor: pointer;
-    padding: 10px;
+    padding: ${SPACE_TIMES(2.5)};
     &:hover {
       background-color: ${G10};
     }
@@ -108,11 +111,11 @@ const ColorTitle = styled.span``;
 const ColorBlockWrap = styled.div`
   display: flex;
   flex-wrap: wrap;
-  margin-top: 4px;
+  margin-top: ${SPACE_TIMES(1)};
 `;
 const ColorBlock = styled.span<{ color: string }>`
   display: inline-block;
-  min-width: 25px;
-  min-height: 25px;
+  min-width: ${SPACE_TIMES(6)};
+  min-height: ${SPACE_TIMES(6)};
   background-color: ${p => p.color};
 `;

@@ -17,7 +17,7 @@
  */
 
 import { Checkbox, Col, Row } from 'antd';
-import { SingleColorSelection } from 'app/components/ColorPickerModule';
+import { SingleColorSelection } from 'app/components/ColorPicker';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';

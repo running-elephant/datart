@@ -89,11 +89,11 @@ export const ChartDraggableSourceContainer: FC<
   );
 
   const styleClasses: Array<string> = useMemo(() => {
-    let StyleArr: Array<string> = [];
+    let styleArr: Array<string> = [];
     if (isActive) {
-      StyleArr.push('Container-active');
+      styleArr.push('containerActive');
     }
-    return StyleArr;
+    return styleArr;
   }, [isActive]);
 
   const renderContent = useMemo(() => {
@@ -199,7 +199,7 @@ const Container = styled.div`
   font-weight: ${FONT_WEIGHT_MEDIUM};
   color: ${p => p.theme.textColorSnd};
   cursor: pointer;
-  &.Container-active {
+  &.containerActive {
     background-color: #f8f9fa;
   }
   > p {

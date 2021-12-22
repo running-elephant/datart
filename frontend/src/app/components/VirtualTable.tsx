@@ -16,17 +16,6 @@
  * limitations under the License.
  */
 
-/**
- * Table组件中使用了虚拟滚动条 渲染的速度变快 基于（react-windows）
- * 使用方法：import { VirtualTable } from 'app/components/VirtualTable';
- * <VirtualTable
-    dataSource={dataSourceWithKey}
-    columns={columns}
-    width={width}
-    ...tableProps
-  />
- */
-
 import { Empty, Table, TableProps } from 'antd';
 import classNames from 'classnames';
 import React, {
@@ -38,21 +27,30 @@ import React, {
   useState,
 } from 'react';
 import { VariableSizeGrid as Grid } from 'react-window';
-import { CloneValueDeep } from 'utils/object';
+import { SPACE_TIMES } from 'styles/StyleConstants';
+
 interface VirtualTableProps extends TableProps<object> {
   width: number;
   scroll: { x: number; y: number };
   columns: any;
 }
 
+/**
+ * Table组件中使用了虚拟滚动条 渲染的速度变快 基于（react-windows）
+ * 使用方法：import { VirtualTable } from 'app/components/VirtualTable';
+ * <VirtualTable
+    dataSource={dataSourceWithKey}
+    columns={columns}
+    width={width}
+    ...tableProps
+  />
+ */
 export const VirtualTable = memo((props: VirtualTableProps) => {
-  let firstTime = new Date().getTime();
-  console.log(firstTime, 'firstTime');
-  const { columns: tableColumns, scroll, width: boxWidth, dataSource } = props;
-  const columns = CloneValueDeep(tableColumns);
+  const { columns, scroll, width: boxWidth, dataSource } = props;
+  const widthColumns = columns.map(v => v.width);
   const gridRef: any = useRef();
   const isFull = useRef<boolean>(false);
-  const widthColumnCount = columns.filter(({ width }) => !width).length;
+  const widthColumnCount = widthColumns.filter(width => !width).length;
   const [connectObject] = useState(() => {
     const obj = {};
     Object.defineProperty(obj, 'scrollLeft', {
@@ -70,24 +68,24 @@ export const VirtualTable = memo((props: VirtualTableProps) => {
   isFull.current = boxWidth > scroll.x;
 
   if (isFull.current === true) {
-    columns.forEach((v, i) => {
-      return (columns[i].width =
-        columns[i].width + (boxWidth - scroll.x) / columns.length);
+    widthColumns.forEach((v, i) => {
+      return (widthColumns[i] =
+        widthColumns[i] + (boxWidth - scroll.x) / widthColumns.length);
     });
   }
 
   const mergedColumns = useMemo(() => {
-    return columns.map(column => {
-      if (column.width) {
-        return column;
-      }
-
-      return { ...column, width: Math.floor(boxWidth / widthColumnCount) };
+    return columns.map((column, i) => {
+      return {
+        ...column,
+        width: column.width
+          ? widthColumns[i]
+          : Math.floor(boxWidth / widthColumnCount),
+      };
     });
-  }, [boxWidth, columns, widthColumnCount]);
-  console.log(new Date().getTime() - firstTime);
+  }, [boxWidth, columns, widthColumnCount, widthColumns]);
+
   const resetVirtualGrid = useCallback(() => {
-    console.log('resetVirtualGrid');
     gridRef.current?.resetAfterIndices({
       columnIndex: 0,
       shouldForceUpdate: true,
@@ -129,7 +127,7 @@ export const VirtualTable = memo((props: VirtualTableProps) => {
         >
           {({ rowIndex, columnIndex, style }) => {
             style = {
-              padding: '8px',
+              padding: `${SPACE_TIMES(2)}`,
               textAlign: mergedColumns[columnIndex].align,
               ...style,
               borderBottom: '1px solid #f0f0f0',

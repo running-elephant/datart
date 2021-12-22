@@ -24,6 +24,8 @@ import styled, { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartLifecycleAdapter from './ChartLifecycleAdapter';
 
+const tableId = ['fenzu-table', 'piovt-sheet', 'piovt-sheet'];
+
 const ChartIFrameContainer: FC<{
   dataset: any;
   chart: Chart;
@@ -42,7 +44,7 @@ const ChartIFrameContainer: FC<{
     }
     return newStyle;
   };
-
+  const isTable = tableId.includes(props.chart?.meta.id);
   const render = () => {
     if (!props?.chart?._useIFrame) {
       return (
@@ -75,6 +77,7 @@ const ChartIFrameContainer: FC<{
              height: 100%;
              background-color: transparent !important;
              margin: 0;
+             overflow:${isTable ? 'visible' : 'hidden'};
            }
           `}
             </style>

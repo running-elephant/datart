@@ -21,7 +21,7 @@ import Theme from 'app/assets/theme/echarts_default_theme.json';
 import {
   SingleColorSelection,
   ThemeColorSelection,
-} from 'app/components/ColorPickerModule';
+} from 'app/components/ColorPicker';
 import { ColorTag } from 'app/components/ReactColorPicker';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';

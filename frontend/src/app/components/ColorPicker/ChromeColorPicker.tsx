@@ -16,16 +16,12 @@
  * limitations under the License.
  */
 
-/**
- * 单色选择组件
- * @param onOk
- * @param color
- * @returns 返回一个新的颜色值
- */
 import { Button } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { useState } from 'react';
 import { ChromePicker, ColorResult } from 'react-color';
 import styled from 'styled-components/macro';
+import { SPACE_TIMES } from 'styles/StyleConstants';
 import { colorSelectionPropTypes } from './slice/types';
 
 const toChangeValue = (data: ColorResult) => {
@@ -33,8 +29,16 @@ const toChangeValue = (data: ColorResult) => {
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
 
+/**
+ * 单色选择组件
+ * @param onOk
+ * @param color
+ * @returns 返回一个新的颜色值
+ */
 function ChromeColorPicker({ color, onOk }: colorSelectionPropTypes) {
   const [selectColor, setSelectColor] = useState<any>(color);
+  const t = useI18NPrefix('components.colorPicker');
+
   return (
     <ChromeColorWrap>
       <ChromePicker
@@ -51,7 +55,7 @@ function ChromeColorPicker({ color, onOk }: colorSelectionPropTypes) {
             onOk?.(false);
           }}
         >
-          取消
+          {t('cancel')}
         </Button>
         <Button
           type="primary"
@@ -60,7 +64,7 @@ function ChromeColorPicker({ color, onOk }: colorSelectionPropTypes) {
             onOk?.(selectColor);
           }}
         >
-          确定
+          {t('ok')}
         </Button>
       </BtnWrap>
     </ChromeColorWrap>
@@ -77,8 +81,8 @@ const ChromeColorWrap = styled.div`
 
 const BtnWrap = styled.div`
   text-align: right;
-  margin-top: 10px;
+  margin-top: ${SPACE_TIMES(2.5)};
   > button:first-child {
-    margin-right: 10px;
+    margin-right: ${SPACE_TIMES(2.5)};
   }
 `;

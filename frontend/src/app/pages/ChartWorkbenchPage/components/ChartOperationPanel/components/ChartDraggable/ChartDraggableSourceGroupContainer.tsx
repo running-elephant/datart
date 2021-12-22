@@ -20,6 +20,7 @@ import { List } from 'antd';
 import { ChartDataViewMeta } from 'app/types/ChartDataView';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
+import { stopPPG } from 'utils/utils';
 import { ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
 import ChartDragLayer from './ChartDragLayer';
 
@@ -43,7 +44,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
   ) => {
     let interimSelectedItemsIds: Array<string> = [];
     let interimActiveItemId = '';
-    const DataViewMeta = meta?.slice() || [];
+    const dataViewMeta = meta?.slice() || [];
     const previousSelectedItemsIds: Array<any> = selectedItemsIds.slice();
     const previousActiveItemId = activeItemId;
 
@@ -59,22 +60,21 @@ export const ChartDraggableSourceGroupContainer: FC<{
         interimSelectedItemsIds = [...previousSelectedItemsIds, dataItemId];
       }
     } else if (shiftKeyActive && dataItemId !== previousActiveItemId) {
-      const activeCardIndex: any = DataViewMeta.findIndex(
+      const activeCardIndex: any = dataViewMeta.findIndex(
         c => c.id === previousActiveItemId,
       );
-      const cardIndex = DataViewMeta.findIndex(c => c.id === dataItemId);
+      const cardIndex = dataViewMeta.findIndex(c => c.id === dataItemId);
       const lowerIndex = Math.min(activeCardIndex, cardIndex);
       const upperIndex = Math.max(activeCardIndex, cardIndex);
-      interimSelectedItemsIds = DataViewMeta.slice(
-        lowerIndex,
-        upperIndex + 1,
-      ).map(c => c.id);
+      interimSelectedItemsIds = dataViewMeta
+        .slice(lowerIndex, upperIndex + 1)
+        .map(c => c.id);
     } else {
       interimSelectedItemsIds = [dataItemId];
       interimActiveItemId = dataItemId;
     }
 
-    const selectedCards = DataViewMeta.filter(c =>
+    const selectedCards = dataViewMeta.filter(c =>
       interimSelectedItemsIds.includes(c.id),
     );
 
@@ -99,11 +99,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
         dataSource={meta}
         rowKey={item => item.id}
         renderItem={item => (
-          <Item
-            onClick={e => {
-              e.stopPropagation();
-            }}
-          >
+          <Item onClick={stopPPG}>
             <ChartDraggableSourceContainer
               key={item.id}
               id={item.id}
