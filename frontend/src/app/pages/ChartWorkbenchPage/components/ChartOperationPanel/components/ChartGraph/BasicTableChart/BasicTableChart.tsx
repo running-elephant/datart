@@ -501,8 +501,9 @@ class BasicTableChart extends ReactChart {
               cellValue,
               ...this.registerTableCellEvents(
                 getValueByColumnKey(c),
-                rowIndex,
                 cellValue,
+                rowIndex,
+                record,
               ),
             };
           },
@@ -665,19 +666,29 @@ class BasicTableChart extends ReactChart {
       : false;
   }
 
+  createrEventParams = params => ({
+    type: 'click',
+    componentType: 'table',
+    seriesType: undefined,
+    data: undefined,
+    dataIndex: undefined,
+    event: undefined,
+    name: undefined,
+    seriesName: undefined,
+    value: undefined,
+    ...params,
+  });
+
   invokePagingRelatedEvents(seriesName: string, value: any, pageNo: number) {
-    const eventParams = {
-      componentType: 'table',
+    const eventParams = this.createrEventParams({
       seriesType: 'paging-sort-filter',
-      name: '',
       seriesName,
-      dataIndex: undefined,
       value: {
         direction:
           value === undefined ? undefined : value === 'ascend' ? 'ASC' : 'DESC',
         pageNo,
       },
-    };
+    });
     this._mouseEvents?.forEach(cur => {
       if (cur.name === 'click') {
         cur.callback?.(eventParams);
@@ -685,39 +696,50 @@ class BasicTableChart extends ReactChart {
     });
   }
 
-  registerTableCellEvents(seriesName: string, dataIndex: number, value: any) {
-    const eventParams = {
-      componentType: 'table',
+  registerTableCellEvents(
+    seriesName: string,
+    value: any,
+    dataIndex: number,
+    record: any,
+  ) {
+    const eventParams = this.createrEventParams({
       seriesType: 'body',
-      name: value,
+      name: seriesName,
+      data: {
+        format: undefined,
+        name: seriesName,
+        rowData: record,
+        value: value,
+      },
       seriesName, // column name/index
       dataIndex, // row index
       value, // cell value
-    };
+    });
     return this._mouseEvents?.reduce((acc, cur) => {
+      cur.name && (eventParams.type = cur.name);
       if (cur.name === 'click') {
         Object.assign(acc, {
-          onClick: event => cur.callback?.(eventParams),
+          onClick: event => cur.callback?.({ ...eventParams, event }),
         });
       }
       if (cur.name === 'dblclick') {
         Object.assign(acc, {
-          onDoubleClick: event => cur.callback?.(eventParams),
+          onDoubleClick: event => cur.callback?.({ ...eventParams, event }),
         });
       }
       if (cur.name === 'contextmenu') {
         Object.assign(acc, {
-          onContextMenu: event => cur.callback?.(eventParams),
+          onContextMenu: event => cur.callback?.({ ...eventParams, event }),
         });
       }
       if (cur.name === 'mouseover') {
         Object.assign(acc, {
-          onMouseEnter: event => cur.callback?.(eventParams),
+          onMouseEnter: event => cur.callback?.({ ...eventParams, event }),
         });
       }
       if (cur.name === 'mouseout') {
         Object.assign(acc, {
-          onMouseLeave: event => cur.callback?.(eventParams),
+          onMouseLeave: event => cur.callback?.({ ...eventParams, event }),
         });
       }
       return acc;
