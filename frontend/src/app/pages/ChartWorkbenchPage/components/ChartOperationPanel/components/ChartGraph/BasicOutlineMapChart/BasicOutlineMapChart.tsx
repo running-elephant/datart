@@ -193,6 +193,7 @@ class BasicOutlineMapChart extends Chart {
         position,
         ...font,
       },
+      labelLayout: { hideOverlap: true },
     };
   }
 
