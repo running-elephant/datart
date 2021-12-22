@@ -153,9 +153,6 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
     }
 
     default boolean checkUnique(BaseEntity entity) {
-        if (!getDefaultMapper().checkUnique(entity)) {
-            Exceptions.tr(BaseException.class, "error.param.exists.name");
-        }
         return true;
     }
 
