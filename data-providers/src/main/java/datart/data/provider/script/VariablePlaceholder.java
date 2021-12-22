@@ -141,6 +141,8 @@ public abstract class VariablePlaceholder {
             }
             if (sqlNode instanceof SqlCall) {
                 replaceVariable((SqlCall) sqlNode);
+            } else if (sqlNode instanceof SqlLiteral) {
+                // pass
             } else if (sqlNode instanceof SqlIdentifier) {
                 if (sqlNode.toString().equals(variable.getName())) {
                     sqlCall.setOperand(i, SqlNodeUtils.toSingleSqlLiteral(variable, sqlNode.getParserPosition()));
