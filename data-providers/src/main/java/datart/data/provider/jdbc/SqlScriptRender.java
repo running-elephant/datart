@@ -136,7 +136,7 @@ public class SqlScriptRender extends ScriptRender {
         final String selectSql0 = findSelectSql(script);
 
         if (StringUtils.isEmpty(selectSql0)) {
-            Exceptions.tr(DataProviderException.class,"message.no.valid.sql");
+            Exceptions.tr(DataProviderException.class, "message.no.valid.sql");
         }
 
         String selectSql = cleanupSql(selectSql0);
