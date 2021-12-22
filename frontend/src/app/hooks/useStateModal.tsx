@@ -71,7 +71,7 @@ function useStateModal({
         return closeFn;
       })
       .catch(info => {
-        return Promise.reject();
+        return Promise.reject(info);
       });
   };
 

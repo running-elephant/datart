@@ -40,7 +40,7 @@
         "controllerFacadeTypes": {
           "dropdownList": "Dropdown List",
           "radioGroup": "Radio Group",
-          "checkboxGroup" :"Checkbox Group",
+          "checkboxGroup": "Checkbox Group",
           "multiDropdownList": "multiple Dropdown List",
           "rangeTime": "Range Time",
           "rangeValue": "Range Value",
@@ -97,7 +97,7 @@
           "years": "Years",
           "quarters": "Quarter",
           "ago": "Ago",
-          "current":"Current",
+          "current": "Current",
           "fromNow": "From Now",
           "pleaseSelect": "Please Select",
           "currentTime": "Current Time",
@@ -284,7 +284,8 @@
           "alias": {
             "title": "Field Setting",
             "name": "Alias Name",
-            "description": "Name Description"
+            "description": "Name Description",
+            "fieldName": "Field Name"
           },
           "filter": {
             "title": "Filter"
@@ -368,19 +369,15 @@
         "confirm": "Please Confirm",
         "ok": "OK",
         "cancel": "Cancel",
-        "save":"Save"
+        "save": "Save"
       },
       "edit": "Edit",
       "run": "Run",
       "publish": "Publish",
       "cancelPublish": "Cancel Publish",
-      "published":"Published",
-      "unpublished":"Unpublished",
-      "archived":"Archived",
-
-
-
-
+      "published": "Published",
+      "unpublished": "Unpublished",
+      "archived": "Archived",
 
       "share": {
         "link": "Link",
@@ -392,17 +389,17 @@
         "downloadData": "Download Data"
       }
     },
-    "board":{
-      "action":{
-        "dataChart":"DataChart",
-        "media":"Media",
-        "container":"Container",
-        "controller":"Controller",
-        "undo":"Undo",
-        "redo":"Redo",
-        "delete":"Delete",
-        "copy":"Copy",
-        "paste":"Paste"
+    "board": {
+      "action": {
+        "dataChart": "DataChart",
+        "media": "Media",
+        "container": "Container",
+        "controller": "Controller",
+        "undo": "Undo",
+        "redo": "Redo",
+        "delete": "Delete",
+        "copy": "Copy",
+        "paste": "Paste"
       }
     }
   },
