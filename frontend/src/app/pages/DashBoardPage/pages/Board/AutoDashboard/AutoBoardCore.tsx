@@ -178,7 +178,7 @@ const AutoBoardCore: React.FC<AutoBoardCoreProps> = ({ boardId }) => {
       <StyledContainer bg={background}>
         {layoutWidgetConfigs.length ? (
           <div className="grid-wrap" ref={gridWrapRef}>
-            <div className="grid-wrap" ref={gridRef}>
+            <div className="grid-wrap grid" ref={gridRef}>
               <ResponsiveGridLayout
                 className="layout"
                 layouts={{ lg: lgLayout }}
@@ -222,6 +222,9 @@ const StyledContainer = styled(StyledBackground)`
   flex: 1;
   flex-direction: column;
   min-height: 0;
+  .grid {
+    height: 100%;
+  }
   .grid-wrap {
     flex: 1;
     overflow-y: auto;
@@ -229,7 +232,6 @@ const StyledContainer = styled(StyledBackground)`
 
     .layout {
       flex: 1;
-      overflow-y: auto;
     }
   }
   .grid-wrap::-webkit-scrollbar {

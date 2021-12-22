@@ -67,6 +67,7 @@ export const WidgetOfAutoEdit: React.FC<GridItemProps> = memo(() => {
 });
 export default WidgetOfAutoEdit;
 const Warp = styled.div<{}>`
+  overflow: hidden;
   & .widget-tool-bar {
     z-index: 30;
   }
