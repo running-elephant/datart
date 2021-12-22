@@ -21,6 +21,7 @@ import {
   FrameContextConsumer,
 } from 'app/components/ReactFrameComponent';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
+import { WidgetContextProps } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled, { StyleSheetManager } from 'styled-components/macro';
@@ -34,6 +35,7 @@ const ChartIFrameContainer: FC<{
   containerId?: string;
   width?: any;
   height?: any;
+  content?: WidgetContextProps;
 }> = memo(props => {
   const transformToSafeCSSProps = (width, height) => {
     let newStyle = { width, height };
@@ -59,6 +61,7 @@ const ChartIFrameContainer: FC<{
             chart={props.chart}
             config={props.config}
             style={transformToSafeCSSProps(props?.width, props?.height)}
+            content={props.content}
           />
         </div>
       );
@@ -93,6 +96,7 @@ const ChartIFrameContainer: FC<{
                   chart={props.chart}
                   config={props.config}
                   style={transformToSafeCSSProps(props?.width, props?.height)}
+                  content={props.content}
                 />
               </StyledChartLifecycleAdapter>
             </StyleSheetManager>

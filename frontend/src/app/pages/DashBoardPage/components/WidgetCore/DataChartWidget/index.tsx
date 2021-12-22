@@ -134,6 +134,7 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
           width={cacheW}
           height={cacheH}
           containerId={widgetId}
+          content={widget}
         />
       );
     } catch (error) {
