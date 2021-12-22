@@ -56,17 +56,6 @@ const AggregationColorizeAction: FC<{
   });
   const [selectColor, setSelectColor] = useState(colors[0]);
 
-  // useMount(() => {
-  // if (!config?.color) {
-  //   onConfigChange(
-  //     updateBy(config, draft => {
-  //       draft.color = { colors: colors as any };
-  //     }),
-  //     actionNeedNewRequest,
-  //   );
-  // }
-  // });
-
   const handleColorChange = value => {
     if (selectColor) {
       const currentSelectColor = Object.assign({}, selectColor, {
