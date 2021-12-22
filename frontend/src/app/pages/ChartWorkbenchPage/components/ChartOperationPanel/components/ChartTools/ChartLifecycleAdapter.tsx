@@ -18,13 +18,13 @@
 
 import { LoadingOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
+import { useFrame } from 'app/components/ReactFrameComponent';
 import useMount from 'app/hooks/useMount';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import ChartEventBroker from 'app/pages/ChartWorkbenchPage/models/ChartEventBroker';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartLifecycle } from 'app/types/ChartLifecycle';
 import React, { CSSProperties, useEffect, useRef, useState } from 'react';
-import { useFrame } from 'react-frame-component';
 import styled from 'styled-components/macro';
 import { v4 as uuidv4 } from 'uuid';
 import ChartIFrameContainerResourceLoader from './ChartIFrameContainerResourceLoader';
