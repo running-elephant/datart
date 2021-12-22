@@ -50,6 +50,7 @@ import {
   getWidgetMapByServer,
   updateWidgetsRect,
 } from './../../../utils/widget';
+import { addVariablesToBoard } from './actions/actions';
 import {
   boardInfoState,
   editBoardStackState,
@@ -243,6 +244,7 @@ export const addDataChartWidgets = createAsyncThunk<
     const viewViews = getChartDataView(views, dataCharts);
     dispatch(boardActions.setDataChartMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
+
     const widgets = chartIds.map(dcId => {
       let widget = widgetToolKit.chart.create({
         dashboardId: boardId,
@@ -255,6 +257,10 @@ export const addDataChartWidgets = createAsyncThunk<
       return widget;
     });
     dispatch(addWidgetsToEditBoard(widgets));
+
+    views.forEach(view => {
+      dispatch(addVariablesToBoard(view.variables));
+    });
     return null;
   },
 );
@@ -289,6 +295,7 @@ export const addWrapChartWidget = createAsyncThunk<
       subType: 'widgetChart',
     });
     dispatch(addWidgetsToEditBoard([widget]));
+    dispatch(addVariablesToBoard(view.variables));
     return null;
   },
 );
