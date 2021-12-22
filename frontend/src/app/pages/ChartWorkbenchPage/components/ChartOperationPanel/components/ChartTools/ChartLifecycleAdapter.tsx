@@ -22,6 +22,7 @@ import { useFrame } from 'app/components/ReactFrameComponent';
 import useMount from 'app/hooks/useMount';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import ChartEventBroker from 'app/pages/ChartWorkbenchPage/models/ChartEventBroker';
+import { WidgetContextProps } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartLifecycle } from 'app/types/ChartLifecycle';
 import React, { CSSProperties, useEffect, useRef, useState } from 'react';
@@ -41,7 +42,8 @@ const ChartLifecycleAdapter: React.FC<{
   chart: Chart;
   config: ChartConfig;
   style: CSSProperties;
-}> = ({ dataset, chart, config, style }) => {
+  content?: WidgetContextProps;
+}> = ({ dataset, chart, config, style, content }) => {
   const [chartResourceLoader, setChartResourceLoader] = useState(
     () => new ChartIFrameContainerResourceLoader(),
   );
@@ -73,7 +75,7 @@ const ChartLifecycleAdapter: React.FC<{
           newBrokerRef.register(chart);
           newBrokerRef.publish(
             ChartLifecycle.MOUNTED,
-            { containerId, dataset, config },
+            { containerId, dataset, config, content },
             {
               document,
               window,
@@ -111,10 +113,11 @@ const ChartLifecycleAdapter: React.FC<{
       {
         dataset,
         config,
+        content,
       },
       { document, window, width: style?.width, height: style?.height },
     );
-  }, [config, dataset, containerStatus, document, window]);
+  }, [config, dataset, content, containerStatus, document, window]);
 
   // when chart size change
   useEffect(() => {

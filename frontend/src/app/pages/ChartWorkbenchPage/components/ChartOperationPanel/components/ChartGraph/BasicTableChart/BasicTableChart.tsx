@@ -17,6 +17,7 @@
  */
 
 import ReactChart from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartGraph/ReactChart';
+import { WidgetContextProps } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
@@ -36,6 +37,7 @@ import {
   getCustomBodyRowStyle,
 } from './conditionStyle';
 import Config from './config';
+import { TableComponentsTd } from './TableComponents';
 
 class BasicTableChart extends ReactChart {
   _useIFrame = false;
@@ -73,7 +75,12 @@ class BasicTableChart extends ReactChart {
     }
 
     this.adapter?.updated(
-      this.getOptions(context, options.dataset, options.config),
+      this.getOptions(
+        context,
+        options.dataset,
+        options.config,
+        options.content,
+      ),
       context,
     );
   }
@@ -82,7 +89,12 @@ class BasicTableChart extends ReactChart {
     this.onUpdated(this.tableOptions, context);
   }
 
-  getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
+  getOptions(
+    context,
+    dataset?: ChartDataset,
+    config?: ChartConfig,
+    content?: WidgetContextProps,
+  ) {
     if (!dataset || !config) {
       return { locale: { emptyText: '  ' } };
     }
@@ -138,7 +150,7 @@ class BasicTableChart extends ReactChart {
         tableColumns,
         aggregateConfigs,
       ),
-      components: this.getTableComponents(styleConfigs),
+      components: this.getTableComponents(styleConfigs, content),
       ...this.getAntdTableStyleOptions(
         styleConfigs,
         dataset,
@@ -293,7 +305,12 @@ class BasicTableChart extends ReactChart {
     });
   }
 
-  getTableComponents(styleConfigs) {
+  getTableComponents(styleConfigs, content?: WidgetContextProps) {
+    const linkRelations = content?.relations
+      .filter(re => re.config.type === 'widgetToWidget')
+      .map(item => item.config.widgetToWidget?.triggerColumn);
+    const jumpFieldName = content?.config.jumpConfig?.field?.jumpFieldName;
+
     const tableHeaders = this.getStyleValue(styleConfigs, [
       'header',
       'modal',
@@ -368,7 +385,7 @@ class BasicTableChart extends ReactChart {
       },
       body: {
         cell: props => {
-          const { style, ...rest } = props;
+          const { style, dataIndex, ...rest } = props;
           const uid = props.uid;
           const conditionStyle = this.getStyleValue(getAllColumnListInfo, [
             uid,
@@ -380,9 +397,11 @@ class BasicTableChart extends ReactChart {
             conditionStyle,
           );
           return (
-            <td
+            <TableComponentsTd
               {...rest}
               style={Object.assign(style || {}, conditionalCellStyle)}
+              isLinkCell={linkRelations?.includes(dataIndex)}
+              isJumpCell={jumpFieldName === dataIndex}
             />
           );
         },
@@ -499,6 +518,7 @@ class BasicTableChart extends ReactChart {
             return {
               uid: c.uid,
               cellValue,
+              dataIndex: getValueByColumnKey(c),
               ...this.registerTableCellEvents(
                 getValueByColumnKey(c),
                 cellValue,
