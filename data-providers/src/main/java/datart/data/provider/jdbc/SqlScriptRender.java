@@ -177,14 +177,6 @@ public class SqlScriptRender extends ScriptRender {
         return selectSql;
     }
 
-    private SqlParser sqlParser() {
-        SqlParser.Config config = SqlParser.config()
-                .withLex(Lex.MYSQL)
-                .withParserFactory(SqlParserImpl.FACTORY)
-                .withConformance(SqlConformanceEnum.LENIENT);
-        return SqlParser.create("", config);
-    }
-
     private SqlNode parseSql(String sql) throws SqlParseException {
         return SqlParserUtils.createParser(sql, sqlDialect).parseQuery();
     }
