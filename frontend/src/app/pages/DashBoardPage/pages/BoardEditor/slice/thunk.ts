@@ -30,6 +30,7 @@ import {
 } from 'app/pages/DashBoardPage/utils/widget';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ActionCreators } from 'redux-undo';
@@ -231,10 +232,11 @@ export const addDataChartWidgets = createAsyncThunk<
   'editBoard/addDataChartWidgets',
   async ({ boardId, chartIds, boardType }, { getState, dispatch }) => {
     const {
-      data: { datacharts, views },
+      data: { datacharts, views, viewVariables },
     } = await request<{
       datacharts: ServerDatachart[];
       views: View[];
+      viewVariables: Record<string, Variable[]>;
     }>({
       url: `viz/datacharts?datachartIds=${chartIds.join()}`,
       method: 'get',
@@ -258,8 +260,8 @@ export const addDataChartWidgets = createAsyncThunk<
     });
     dispatch(addWidgetsToEditBoard(widgets));
 
-    views.forEach(view => {
-      dispatch(addVariablesToBoard(view.variables));
+    Object.values(viewVariables).forEach(variables => {
+      dispatch(addVariablesToBoard(variables));
     });
     return null;
   },
