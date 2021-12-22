@@ -344,7 +344,7 @@ class BasicTableChart extends ReactChart {
       header: {
         cell: props => {
           const uid = props.uid;
-          const { style, ...rest } = props;
+          const { style, title, ...rest } = props;
           const header = this.findHeader(uid, tableHeaders || []);
           const cellCssStyle = {
             textAlign: headerTextAlign,
