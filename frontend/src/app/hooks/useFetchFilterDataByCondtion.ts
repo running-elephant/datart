@@ -19,7 +19,7 @@
 import {
   FilterCondition,
   FilterConditionType,
-  FilterValueOption,
+  RelationFilterValue,
 } from 'app/types/ChartConfig';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { getDistinctFields } from 'app/utils/fetch';
@@ -28,7 +28,7 @@ import useMount from './useMount';
 export const useFetchFilterDataByCondtion = (
   viewId?: string,
   condition?: FilterCondition,
-  onFinish?: (datas: FilterValueOption[]) => void,
+  onFinish?: (datas: RelationFilterValue[]) => void,
   view?: BackendChart['view'],
 ) => {
   useMount(() => {

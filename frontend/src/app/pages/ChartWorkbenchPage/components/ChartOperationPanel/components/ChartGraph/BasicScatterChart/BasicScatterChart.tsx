@@ -394,7 +394,10 @@ class BasicScatterChart extends Chart {
     const show = getStyleValueByGroup(styles, 'label', 'showLabel');
     const position = getStyleValueByGroup(styles, 'label', 'position');
     const font = getStyleValueByGroup(styles, 'label', 'font');
-    return { label: { show, position, ...font, formatter: '{b}' } };
+    return {
+      label: { show, position, ...font, formatter: '{b}' },
+      labelLayout: { hideOverlap: true },
+    };
   }
 
   getTooltipFormmaterFunc(

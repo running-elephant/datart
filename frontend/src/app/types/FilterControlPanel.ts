@@ -36,9 +36,14 @@ export enum ControllerRadioFacadeTypes {
   Button = 'button',
 }
 
-export enum RelativeOrExactTime {
+export enum TimeFilterValueCategory {
   Relative = 'relative',
   Exact = 'exact',
+}
+
+export enum TimeFilterSubType {
+  Recommend = 'recommend',
+  Manual = 'manual',
 }
 
 export enum ControllerVisibilityTypes {

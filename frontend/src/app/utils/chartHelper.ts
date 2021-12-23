@@ -432,12 +432,9 @@ export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
   return `${col.aggregate}(${col.colName})`;
 }
 
-export function getColumnRenderName(c?: ChartDataSectionField) {
+export function getColumnRenderOriginName(c?: ChartDataSectionField) {
   if (!c) {
     return '[unkonwn]';
-  }
-  if (c.alias?.name) {
-    return c.alias.name;
   }
   if (c.aggregate === AggregateFieldActionType.NONE) {
     return c.colName;
@@ -446,6 +443,16 @@ export function getColumnRenderName(c?: ChartDataSectionField) {
     return `${c.aggregate}(${c.colName})`;
   }
   return c.colName;
+}
+
+export function getColumnRenderName(c?: ChartDataSectionField) {
+  if (!c) {
+    return '[unkonwn]';
+  }
+  if (c.alias?.name) {
+    return c.alias.name;
+  }
+  return getColumnRenderOriginName(c);
 }
 
 export function getUnusedHeaderRows(

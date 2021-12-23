@@ -284,7 +284,8 @@
           "alias": {
             "title": "字段设置",
             "name": "字段别名",
-            "description": "名称描述"
+            "description": "名称描述",
+            "fieldName": "字段名称"
           },
           "filter": {
             "title": "条件筛选"

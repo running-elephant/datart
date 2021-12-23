@@ -198,6 +198,7 @@ class BasicPieChart extends Chart {
       sampling: 'average',
       avoidLabelOverlap: false,
       label: this.getLabelStyle(styleConfigs),
+      labelLayout: { hideOverlap: true },
       ...this.getSeriesStyle(styleConfigs),
       ...this.getGrid(styleConfigs),
     };

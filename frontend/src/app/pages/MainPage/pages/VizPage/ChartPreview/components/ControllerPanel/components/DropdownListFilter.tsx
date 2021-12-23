@@ -18,7 +18,7 @@
 
 import { Select } from 'antd';
 import useFetchFilterDataByCondtion from 'app/hooks/useFetchFilterDataByCondtion';
-import { FilterValueOption } from 'app/types/ChartConfig';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -27,14 +27,14 @@ import { PresentControllerFilterProps } from '.';
 
 const DropdownListFilter: FC<PresentControllerFilterProps> = memo(
   ({ viewId, view, condition, onConditionChange }) => {
-    const [originalNodes, setOriginalNodes] = useState<FilterValueOption[]>(
-      condition?.value as FilterValueOption[],
+    const [originalNodes, setOriginalNodes] = useState<RelationFilterValue[]>(
+      condition?.value as RelationFilterValue[],
     );
     const [selectedNode, setSelectedNode] = useState<string>(() => {
       if (Array.isArray(condition?.value)) {
         const firstValue = (condition?.value as [])?.find(n => {
-          if (IsKeyIn(n as FilterValueOption, 'key')) {
-            return (n as FilterValueOption).isSelected;
+          if (IsKeyIn(n as RelationFilterValue, 'key')) {
+            return (n as RelationFilterValue).isSelected;
           }
           return false;
         });

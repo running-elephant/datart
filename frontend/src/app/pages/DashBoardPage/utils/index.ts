@@ -14,7 +14,7 @@ import ChartDataView, {
 } from 'app/types/ChartDataView';
 import {
   ControllerFacadeTypes,
-  RelativeOrExactTime,
+  TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
 import { getTime } from 'app/utils/time';
 import { FilterSqlOperator } from 'globalConstants';
@@ -273,7 +273,7 @@ export const getControllerDateValues = (obj: {
 }) => {
   const { endTime, startTime, pickerType } = obj.filterDate;
   let timeValues: [string, string] = ['', ''];
-  if (startTime.relativeOrExact === RelativeOrExactTime.Exact) {
+  if (startTime.relativeOrExact === TimeFilterValueCategory.Exact) {
     timeValues[0] = startTime.exactValue as string;
   } else {
     const { amount, unit, direction } = startTime.relativeValue!;
@@ -281,7 +281,7 @@ export const getControllerDateValues = (obj: {
     timeValues[0] = time.format(DEFAULT_VALUE_DATE_FORMAT);
   }
   if (endTime) {
-    if (endTime.relativeOrExact === RelativeOrExactTime.Exact) {
+    if (endTime.relativeOrExact === TimeFilterValueCategory.Exact) {
       timeValues[1] = endTime.exactValue as string;
       if (obj.execute) {
         timeValues[1] = adjustRangeDataEndValue(

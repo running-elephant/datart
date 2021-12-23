@@ -19,8 +19,13 @@
 import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
+  TimeFilterSubType,
 } from 'app/types/FilterControlPanel';
-import { FilterSqlOperator, NumberUnitKey } from 'globalConstants';
+import {
+  FilterSqlOperator,
+  NumberUnitKey,
+  RECOMMEND_TIME,
+} from 'globalConstants';
 import { ValueOf } from 'types';
 import {
   ChartDataViewFieldCategory,
@@ -86,8 +91,10 @@ export type FilterCondition = {
     | number
     | [number, number]
     | string[]
-    | Array<FilterValueOption>;
+    | Array<RelationFilterValue>
+    | TimeFilterConditionValue;
   visualType: string;
+  subType?: TimeFilterSubType | string;
   operator?:
     | string
     | Lowercase<keyof typeof FilterRelationType>
@@ -95,12 +102,22 @@ export type FilterCondition = {
   children?: FilterCondition[];
 };
 
-export type FilterValueOption = {
+export type TimeFilterConditionValue =
+  | string
+  | string[]
+  | Lowercase<keyof typeof RECOMMEND_TIME>
+  | Array<{
+      unit;
+      amount;
+      direction?: string;
+    }>;
+
+export type RelationFilterValue = {
   key: string;
   label: string;
   index?: number;
   isSelected?: boolean;
-  children?: FilterValueOption[];
+  children?: RelationFilterValue[];
 };
 
 export const FilterRelationType = {
