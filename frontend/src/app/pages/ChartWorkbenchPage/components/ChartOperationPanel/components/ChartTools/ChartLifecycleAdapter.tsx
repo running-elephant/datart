@@ -41,7 +41,8 @@ const ChartLifecycleAdapter: React.FC<{
   chart: Chart;
   config: ChartConfig;
   style: CSSProperties;
-}> = ({ dataset, chart, config, style }) => {
+  widgetSpecialConfig?: any;
+}> = ({ dataset, chart, config, style, widgetSpecialConfig }) => {
   const [chartResourceLoader, setChartResourceLoader] = useState(
     () => new ChartIFrameContainerResourceLoader(),
   );
@@ -73,7 +74,7 @@ const ChartLifecycleAdapter: React.FC<{
           newBrokerRef.register(chart);
           newBrokerRef.publish(
             ChartLifecycle.MOUNTED,
-            { containerId, dataset, config },
+            { containerId, dataset, config, widgetSpecialConfig },
             {
               document,
               window,
@@ -111,10 +112,11 @@ const ChartLifecycleAdapter: React.FC<{
       {
         dataset,
         config,
+        widgetSpecialConfig,
       },
       { document, window, width: style?.width, height: style?.height },
     );
-  }, [config, dataset, containerStatus, document, window]);
+  }, [config, dataset, widgetSpecialConfig, containerStatus, document, window]);
 
   // when chart size change
   useEffect(() => {

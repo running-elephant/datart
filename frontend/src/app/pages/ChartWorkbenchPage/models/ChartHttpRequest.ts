@@ -35,7 +35,9 @@ import {
   RelationFilterValue,
   SortActionType,
 } from '../../../types/ChartConfig';
-import ChartDataView from '../../../types/ChartDataView';
+import ChartDataView, {
+  ChartDataViewFieldType,
+} from '../../../types/ChartDataView';
 
 export type ChartRequest = {
   viewId: string;
@@ -367,6 +369,13 @@ export class ChartDataRequestBuilder {
           cur.type === ChartDataSectionType.COLOR
         ) {
           return acc.concat(cur.rows);
+        }
+        if (cur.type === ChartDataSectionType.MIXED) {
+          return acc.concat(
+            cur.rows.filter(
+              ({ type }) => type === ChartDataViewFieldType.STRING,
+            ),
+          );
         }
         return acc;
       },

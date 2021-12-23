@@ -38,7 +38,12 @@ class FenZuTableChart extends BasicTableChart {
     });
   }
 
-  getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
+  getOptions(
+    context,
+    dataset?: ChartDataset,
+    config?: ChartConfig,
+    widgetSpecialConfig?: any,
+  ) {
     if (!dataset || !config) {
       return { locale: { emptyText: '  ' } };
     }
@@ -70,7 +75,7 @@ class FenZuTableChart extends BasicTableChart {
         dataColumns,
       ),
       summaryFn: undefined as any,
-      components: this.getTableComponents(styleConfigs),
+      components: this.getTableComponents(styleConfigs, widgetSpecialConfig),
       ...this.getAntdTableStyleOptions(
         styleConfigs,
         dataset,
