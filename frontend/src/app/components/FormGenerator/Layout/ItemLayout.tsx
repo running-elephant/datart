@@ -50,7 +50,6 @@ import {
 } from '../Basic';
 import {
   ConditionStylePanel,
-  DataCachePanel,
   DataReferencePanel,
   ListTemplatePanel,
   UnControlledTableHeaderPanel,
@@ -151,8 +150,6 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           return <ListTemplatePanel {...props} />;
         case ChartStyleSectionComponentType.LINE:
           return <BasicLine {...props} />;
-        case ChartStyleSectionComponentType.CACHE:
-          return <DataCachePanel {...props} />;
         case ChartStyleSectionComponentType.REFERENCE:
           return <DataReferencePanel {...props} />;
         case ChartStyleSectionComponentType.TABLEHEADER:

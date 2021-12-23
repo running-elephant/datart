@@ -194,14 +194,20 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'cache.title',
-      key: 'cache',
+      label: 'paging.title',
+      key: 'paging',
       comType: 'group',
       rows: [
         {
-          label: 'cache.title',
-          key: 'panel',
-          comType: 'cache',
+          label: 'paging.pageSize',
+          key: 'pageSize',
+          default: 1000,
+          comType: 'inputNumber',
+          options: {
+            needRefresh: true,
+            step: 1,
+            min: 0,
+          },
         },
       ],
     },
@@ -243,13 +249,9 @@ const config: ChartConfig = {
           autoMerge: '自动合并相同内容',
           enableRaw: '使用原始数据',
         },
-        cache: {
-          title: '数据处理',
-        },
         paging: {
-          title: '分页设置',
-          enablePaging: '启用分页',
-          pageSize: '分页大小',
+          title: '常规',
+          pageSize: '总行数',
         },
       },
     },

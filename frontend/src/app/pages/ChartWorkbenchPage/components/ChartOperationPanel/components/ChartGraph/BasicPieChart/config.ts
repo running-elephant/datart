@@ -199,14 +199,20 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'cache.title',
-      key: 'cache',
+      label: 'paging.title',
+      key: 'paging',
       comType: 'group',
       rows: [
         {
-          label: 'cache.title',
-          key: 'panel',
-          comType: 'cache',
+          label: 'paging.pageSize',
+          key: 'pageSize',
+          default: 1000,
+          comType: 'inputNumber',
+          options: {
+            needRefresh: true,
+            step: 1,
+            min: 0,
+          },
         },
       ],
     },
@@ -244,9 +250,6 @@ const config: ChartConfig = {
         reference: {
           title: '参考线',
           open: '点击参考线配置',
-        },
-        cache: {
-          title: '数据处理',
         },
         tooltip: {
           title: '提示信息',

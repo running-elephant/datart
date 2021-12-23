@@ -430,6 +430,24 @@ const config: ChartConfig = {
   ],
   settings: [
     {
+      label: 'paging.title',
+      key: 'paging',
+      comType: 'group',
+      rows: [
+        {
+          label: 'paging.pageSize',
+          key: 'pageSize',
+          default: 1000,
+          comType: 'inputNumber',
+          options: {
+            needRefresh: true,
+            step: 1,
+            min: 0,
+          },
+        },
+      ],
+    },
+    {
       label: 'reference.title',
       key: 'reference',
       comType: 'group',
@@ -439,18 +457,6 @@ const config: ChartConfig = {
           key: 'panel',
           comType: 'reference',
           options: { type: 'modal' },
-        },
-      ],
-    },
-    {
-      label: 'cache.title',
-      key: 'cache',
-      comType: 'group',
-      rows: [
-        {
-          label: 'cache.title',
-          key: 'panel',
-          comType: 'cache',
         },
       ],
     },
@@ -524,9 +530,6 @@ const config: ChartConfig = {
         reference: {
           title: '参考线',
           open: '点击参考线配置',
-        },
-        cache: {
-          title: '数据处理',
         },
       },
     },

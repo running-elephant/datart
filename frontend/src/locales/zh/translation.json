@@ -389,6 +389,10 @@
           "opacity": "透明度",
           "backgroundColor": "背景颜色",
           "borderStyle": "边框样式"
+        },
+        "paging": {
+          "title": "常规",
+          "pageSize": "总行数"
         }
       },
       "present": {
