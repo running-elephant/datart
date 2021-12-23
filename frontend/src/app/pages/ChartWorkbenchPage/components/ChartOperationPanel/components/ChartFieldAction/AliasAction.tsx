@@ -76,7 +76,4 @@ export default AliasAction;
 
 const StyledAliasAction = styled(Space)`
   width: 100%;
-  .ant-form-item-control-input {
-    width: 100%;
-  }
 `;

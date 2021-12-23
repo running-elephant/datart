@@ -22,6 +22,7 @@ import moment from 'moment';
 import { FC, memo, useState } from 'react';
 import { PresentControllerFilterProps } from '.';
 
+// TODO(Stephen): to be use relative time
 const RangTimeFilter: FC<PresentControllerFilterProps> = memo(
   ({ condition, onConditionChange }) => {
     const [timeRange, setTimeRange] = useState<string[]>(() => {

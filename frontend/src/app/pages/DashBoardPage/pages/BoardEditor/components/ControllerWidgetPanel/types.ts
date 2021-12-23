@@ -5,7 +5,7 @@ import {
 } from 'app/pages/DashBoardPage/constants';
 import { FilterValueOption } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
-import { RelativeOrExactTime } from 'app/types/FilterControlPanel';
+import { TimeFilterValueCategory } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import { Moment, unitOfTime } from 'moment';
 import { VariableValueTypes } from '../../../../../MainPage/pages/VariablePage/constants';
@@ -80,7 +80,7 @@ export const PickerTypeOptions = [
 ];
 
 export interface ControllerDateType {
-  relativeOrExact: RelativeOrExactTime;
+  relativeOrExact: TimeFilterValueCategory;
   relativeValue?: RelativeDate;
   exactValue?: Moment | string | null;
 }

@@ -17,8 +17,13 @@
  */
 
 import { ChartDatasetPageInfo } from 'app/types/ChartDataset';
+import { TimeFilterSubType } from 'app/types/FilterControlPanel';
 import { getStyleValue } from 'app/utils/chartHelper';
-import { formatTime } from 'app/utils/time';
+import {
+  formatTime,
+  getTime,
+  recommendTimeRangeConverter,
+} from 'app/utils/time';
 import { FILTER_TIME_FORMATTER_IN_QUERY } from 'globalConstants';
 import { isEmptyArray, IsKeyIn } from 'utils/object';
 import {
@@ -155,60 +160,83 @@ export class ChartDataRequestBuilder {
       })
       .map(col => col);
 
-    const _transformToRequest = (fields: ChartDataSectionField[]) => {
-      const _convertTime = (visualType, value) => {
-        if (visualType !== 'DATE') {
-          return value;
-        }
-        return formatTime(value, FILTER_TIME_FORMATTER_IN_QUERY);
-      };
+    return this.normalizeFilters(fields);
+  }
 
-      const convertValues = (field: ChartDataSectionField) => {
-        if (Array.isArray(field.filter?.condition?.value)) {
-          return field.filter?.condition?.value
-            .map(v => {
-              if (IsKeyIn(v as FilterValueOption, 'key')) {
-                const listItem = v as FilterValueOption;
-                if (!listItem.isSelected) {
-                  return undefined;
-                }
-                return {
-                  value: listItem.key,
-                  valueType: field.type,
-                };
-              }
-              return {
-                value: _convertTime(field.filter?.condition?.visualType, v),
-                valueType: field.type,
-              };
-            })
-            .filter(Boolean) as any[];
-        }
-        const v = field.filter?.condition?.value;
-        if (!v) {
-          return null;
-        }
-        return [
-          {
-            value: _convertTime(field.filter?.condition?.visualType, v),
-            valueType: field.type,
-          },
-        ];
-      };
-
-      return fields.map(field => ({
-        aggOperator:
-          field.aggregate === AggregateFieldActionType.NONE
-            ? null
-            : field.aggregate,
-        column: field.colName,
-        sqlOperator: field.filter?.condition?.operator!,
-        values: convertValues(field) || [],
-      }));
+  private normalizeFilters = (fields: ChartDataSectionField[]) => {
+    const _timeConverter = (visualType, subType, value) => {
+      if (visualType !== 'DATE') {
+        return value;
+      }
+      if (typeof value === 'object') {
+        const time = getTime(+(value.direction + value.amount), value.unit)(
+          value.unit,
+          value.isStart,
+        );
+        return formatTime(time, FILTER_TIME_FORMATTER_IN_QUERY);
+      }
+      return formatTime(value, FILTER_TIME_FORMATTER_IN_QUERY);
     };
 
-    return _transformToRequest(fields);
-  }
+    const _transformFieldValues = (field: ChartDataSectionField) => {
+      const conditionValue = field.filter?.condition?.value;
+      if (!conditionValue) {
+        return null;
+      }
+      if (Array.isArray(conditionValue)) {
+        return conditionValue
+          .map(v => {
+            if (IsKeyIn(v as FilterValueOption, 'key')) {
+              const listItem = v as FilterValueOption;
+              if (!listItem.isSelected) {
+                return undefined;
+              }
+              return {
+                value: listItem.key,
+                valueType: field.type,
+              };
+            } else {
+              return {
+                value: _timeConverter(
+                  field.filter?.condition?.visualType,
+                  field.filter?.condition?.subType,
+                  v,
+                ),
+                valueType: field.type,
+              };
+            }
+          })
+          .filter(Boolean) as any[];
+      }
+      if (field?.filter?.condition?.subType === TimeFilterSubType.Recommend) {
+        const timeRange = recommendTimeRangeConverter(conditionValue);
+        return (timeRange || []).map(t => ({
+          value: t,
+          valueType: field.type,
+        }));
+      }
+      return [
+        {
+          value: _timeConverter(
+            field.filter?.condition?.visualType,
+            field.filter?.condition?.subType,
+            conditionValue,
+          ),
+          valueType: field.type,
+        },
+      ];
+    };
+
+    return fields.map(field => ({
+      aggOperator:
+        field.aggregate === AggregateFieldActionType.NONE
+          ? null
+          : field.aggregate,
+      column: field.colName,
+      sqlOperator: field.filter?.condition?.operator!,
+      values: _transformFieldValues(field) || [],
+    }));
+  };
 
   private buildOrders() {
     const sortColumns = this.chartDataConfigs

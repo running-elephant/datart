@@ -20,9 +20,9 @@ import { Radio, Row, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import { FilterCondition } from 'app/types/ChartConfig';
-import { convertRelativeTimeRange } from 'app/utils/time';
+import { formatTime, recommendTimeRangeConverter } from 'app/utils/time';
 import { RECOMMEND_TIME } from 'globalConstants';
-import { FC, memo, useContext, useState } from 'react';
+import { FC, memo, useContext, useMemo, useState } from 'react';
 import ChartFilterCondition, {
   ConditionBuilder,
 } from '../../../../models/ChartFilterCondition';
@@ -35,29 +35,31 @@ const RecommendRangeTimeSelector: FC<
 > = memo(({ i18nPrefix, condition, onConditionChange }) => {
   const t = useI18NPrefix(i18nPrefix);
   const { format } = useContext(TimeConfigContext);
-  const [timeRange, setTimeRange] = useState<string[]>([]);
-  const [relativeTime, setRelativeTime] = useState<string | undefined>();
+  const [recommend, setRecommend] = useState<string | undefined>(() =>
+    String(condition?.value),
+  );
 
-  const handleChange = relativeTime => {
-    const timeRange = convertRelativeTimeRange(relativeTime);
-    setTimeRange(timeRange);
-
-    setRelativeTime(relativeTime);
+  const handleChange = recommendTime => {
+    setRecommend(recommendTime);
     const filter = new ConditionBuilder(condition)
-      .setValue(timeRange)
-      .asRangeTime();
+      .setValue(recommendTime)
+      .asRecommendTime();
     onConditionChange?.(filter);
   };
 
+  const rangeTimes = useMemo(() => {
+    return recommendTimeRangeConverter(recommend);
+  }, [recommend]);
+
   return (
-    <div>
+    <>
       <Row>
-        {/* {`${t('currentTime')} : ${timeRange
+        {`${t('currentTime')} : ${rangeTimes
           ?.map(t => formatTime(t, format))
-          .join(' - ')}`} */}
+          .join(' - ')}`}
       </Row>
       <Radio.Group
-        value={relativeTime}
+        value={recommend}
         onChange={e => handleChange(e.target?.value)}
       >
         <Space direction="vertical">
@@ -87,7 +89,7 @@ const RecommendRangeTimeSelector: FC<
           </Radio>
         </Space>
       </Radio.Group>
-    </div>
+    </>
   );
 });
 

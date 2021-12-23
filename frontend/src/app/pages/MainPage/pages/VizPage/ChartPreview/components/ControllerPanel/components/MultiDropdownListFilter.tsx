@@ -64,7 +64,7 @@ const MultiDropdownListFilter: FC<PresentControllerFilterProps> = memo(
         multiple
         treeCheckable
         treeDefaultExpandAll
-        value={selectedNodes}
+        value={selectedNodes as any}
         onChange={handleSelectedChange}
       >
         {originalNodes?.map((n: FilterValueOption) => {

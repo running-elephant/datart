@@ -19,11 +19,7 @@
 import { Row, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
-import {
-  FilterCondition,
-  FilterConditionType,
-} from 'app/types/ChartConfig';
-import moment from 'moment';
+import { FilterCondition, FilterConditionType } from 'app/types/ChartConfig';
 import { FC, memo, useContext, useState } from 'react';
 import ChartFilterCondition, {
   ConditionBuilder,
@@ -40,8 +36,8 @@ const MannualRangeTimeSelector: FC<
   const { format } = useContext(TimeConfigContext);
   const [timeRange, setTimeRange] = useState(() => {
     if (condition?.type === FilterConditionType.RangeTime) {
-      const startTime = moment(condition?.value?.[0]);
-      const endTime = moment(condition?.value?.[1]);
+      const startTime = condition?.value?.[0];
+      const endTime = condition?.value?.[1];
       return [startTime, endTime];
     }
     return [];
@@ -52,7 +48,7 @@ const MannualRangeTimeSelector: FC<
     setTimeRange(timeRange);
 
     const filterRow = new ConditionBuilder(condition)
-      .setValue((timeRange || []).map(d => d.toString()))
+      .setValue(timeRange || [])
       .asRangeTime();
     onFilterChange && onFilterChange(filterRow);
   };
@@ -66,11 +62,13 @@ const MannualRangeTimeSelector: FC<
       </Row>
       <Space direction="vertical" size={12}>
         <ManualSingleTimeSelector
+          time={timeRange?.[0] as any}
           isStart={true}
           i18nPrefix={i18nPrefix}
           onTimeChange={handleTimeChange(0)}
         />
         <ManualSingleTimeSelector
+          time={timeRange?.[1] as any}
           isStart={false}
           i18nPrefix={i18nPrefix}
           onTimeChange={handleTimeChange(1)}

@@ -31,7 +31,7 @@ import {
 import {
   ControllerFacadeTypes,
   ControllerFacadeTypes as Opt,
-  RelativeOrExactTime,
+  TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
@@ -202,7 +202,7 @@ export const getTimeControllerConfig = () => {
   config.controllerDate = {
     pickerType: 'date',
     startTime: {
-      relativeOrExact: RelativeOrExactTime.Exact,
+      relativeOrExact: TimeFilterValueCategory.Exact,
       exactValue: null,
     },
   };
@@ -214,11 +214,11 @@ export const getRangeTimeControllerConfig = () => {
   config.controllerDate = {
     pickerType: 'date',
     startTime: {
-      relativeOrExact: RelativeOrExactTime.Exact,
+      relativeOrExact: TimeFilterValueCategory.Exact,
       exactValue: null,
     },
     endTime: {
-      relativeOrExact: RelativeOrExactTime.Exact,
+      relativeOrExact: TimeFilterValueCategory.Exact,
       exactValue: null,
     },
   };

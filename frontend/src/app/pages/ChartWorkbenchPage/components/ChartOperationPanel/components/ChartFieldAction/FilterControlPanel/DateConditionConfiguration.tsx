@@ -18,7 +18,9 @@
 
 import { Tabs } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import { FC, memo } from 'react';
+import { TimeFilterSubType } from 'app/types/FilterControlPanel';
+import { FC, memo, useState } from 'react';
+import styled from 'styled-components/macro';
 import ChartFilterCondition from '../../../../../models/ChartFilterCondition';
 import TimeSelector from '../../ChartTimeSelector';
 
@@ -29,27 +31,40 @@ const DateConditionConfiguration: FC<
   } & I18NComponentProps
 > = memo(({ i18nPrefix, condition, onChange: onConditionChange }) => {
   const t = useI18NPrefix(i18nPrefix);
+  const [subType, setSubType] = useState(
+    () => condition?.subType || TimeFilterSubType.Recommend,
+  );
+
+  const handleConditionChanged = filter => {
+    onConditionChange?.(Object.assign(filter, { subType }));
+  };
 
   return (
-    <div>
-      <Tabs>
-        <Tabs.TabPane tab={t('recommend')} key="1">
-          <TimeSelector.RecommendRangeTimeSelector
-            i18nPrefix={i18nPrefix}
-            condition={condition}
-            onConditionChange={onConditionChange}
-          />
-        </Tabs.TabPane>
-        <Tabs.TabPane tab={t('manual')} key="2">
-          <TimeSelector.MannualRangeTimeSelector
-            i18nPrefix={i18nPrefix}
-            condition={condition}
-            onFilterChange={onConditionChange}
-          />
-        </Tabs.TabPane>
-      </Tabs>
-    </div>
+    <StyledDateConditionConfiguration activeKey={subType} onChange={setSubType}>
+      <Tabs.TabPane tab={t('recommend')} key={TimeFilterSubType.Recommend}>
+        <TimeSelector.RecommendRangeTimeSelector
+          i18nPrefix={i18nPrefix}
+          condition={condition}
+          onConditionChange={handleConditionChanged}
+        />
+      </Tabs.TabPane>
+      <Tabs.TabPane tab={t('manual')} key={TimeFilterSubType.Manual}>
+        <TimeSelector.MannualRangeTimeSelector
+          i18nPrefix={i18nPrefix}
+          condition={condition}
+          onFilterChange={handleConditionChanged}
+        />
+      </Tabs.TabPane>
+    </StyledDateConditionConfiguration>
   );
 });
 
 export default DateConditionConfiguration;
+
+const StyledDateConditionConfiguration = styled(Tabs)`
+  width: 100%;
+
+  .ant-tabs-content-holder {
+    margin: 10px 0;
+  }
+`;
