@@ -84,9 +84,7 @@ const CategoryConditionEditableTable: FC<
               <a
                 href="#!"
                 onClick={() =>
-                  handleRowStateUpdate(
-                    Object.assign(record, { isSelected: true }),
-                  )
+                  handleRowStateUpdate({ ...record, isSelected: true })
                 }
               >
                 {t('setDefault')}
@@ -96,9 +94,7 @@ const CategoryConditionEditableTable: FC<
               <a
                 href="#!"
                 onClick={() =>
-                  handleRowStateUpdate(
-                    Object.assign(record, { isSelected: false }),
-                  )
+                  handleRowStateUpdate({ ...record, isSelected: false })
                 }
               >
                 {t('setUnDefault')}
@@ -154,9 +150,10 @@ const CategoryConditionEditableTable: FC<
     };
 
     const handleRowStateUpdate = (row: RelationFilterValue) => {
-      const oldRowIndex = rows.findIndex(r => r.index === row.index);
-      rows.splice(oldRowIndex, 1, row);
-      handleFilterConditionChange(rows);
+      const newRows = [...rows];
+      const targetIndex = newRows.findIndex(r => r.index === row.index);
+      newRows.splice(targetIndex, 1, row);
+      handleFilterConditionChange(newRows);
     };
 
     const handleFetchDataFromField = field => async () => {
@@ -181,23 +178,23 @@ const CategoryConditionEditableTable: FC<
     );
 
     const fetchNewDataset = async (viewId, colName) => {
-      const feildDataset = await getDistinctFields(
+      const fieldDataset = await getDistinctFields(
         viewId,
         colName,
         undefined,
         undefined,
       );
-      return feildDataset;
+      return fieldDataset;
     };
 
-    const convertToList = (collection, selecteKeys) => {
+    const convertToList = (collection, selectedKeys) => {
       const items: string[] = (collection || []).flatMap(c => c);
       const uniqueKeys = Array.from(new Set(items));
       return uniqueKeys.map((item, index) => ({
         index: index,
         key: item,
         label: item,
-        isSelected: selecteKeys.includes(item),
+        isSelected: selectedKeys.includes(item),
       }));
     };
 
