@@ -130,7 +130,7 @@ const ControllerPanel: FC<{
       case ControllerFacadeTypes.MultiDropdownList:
         return <Filters.MultiDropdownListFilter {...props} />;
       case ControllerFacadeTypes.RangeTime:
-        return <Filters.RangTimeFilter {...props} />;
+        return <Filters.RangeTimeFilter {...props} />;
       case ControllerFacadeTypes.RangeValue:
         return <Filters.RangValueFilter {...props} />;
       case ControllerFacadeTypes.Text:

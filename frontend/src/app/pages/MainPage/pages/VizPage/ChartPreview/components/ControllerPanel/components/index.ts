@@ -21,7 +21,7 @@ import { FilterCondition } from 'app/types/ChartConfig';
 import DropdownListFilter from './DropdownListFilter';
 import MultiDropdownListFilter from './MultiDropdownListFilter';
 import RadioGroupFilter from './RadioGroupFilter';
-import RangTimeFilter from './RangTimeFilter';
+import RangeTimeFilter from './RangeTimeFilter';
 import RangValueFilter from './RangValueFilter';
 import SliderFilter from './SliderFilter';
 import TextFilter from './TextFilter';
@@ -41,7 +41,7 @@ const Filters = {
   DropdownListFilter,
   MultiDropdownListFilter,
   RadioGroupFilter,
-  RangTimeFilter,
+  RangeTimeFilter,
   RangValueFilter,
   SliderFilter,
   TextFilter,

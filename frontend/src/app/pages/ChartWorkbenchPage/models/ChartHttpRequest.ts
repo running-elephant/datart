@@ -159,7 +159,6 @@ export class ChartDataRequestBuilder {
         return true;
       })
       .map(col => col);
-
     return this.normalizeFilters(fields);
   }
 
