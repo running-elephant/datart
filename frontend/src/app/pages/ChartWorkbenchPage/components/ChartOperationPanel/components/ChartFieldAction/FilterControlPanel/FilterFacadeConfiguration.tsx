@@ -69,9 +69,9 @@ const getFacadeOptions = (condition, category) => {
       case FilterConditionType.Value:
         return [ControllerFacadeTypes.Value];
       case FilterConditionType.RangeTime:
-        return [ControllerFacadeTypes.RangeTime];
+        return [ControllerFacadeTypes.RangeTimePicker];
       case FilterConditionType.RecommendTime:
-        return [ControllerFacadeTypes.RecommendTime];
+        return [ControllerFacadeTypes.RangeTimePicker];
       case FilterConditionType.Tree:
         return [ControllerFacadeTypes.Tree];
     }

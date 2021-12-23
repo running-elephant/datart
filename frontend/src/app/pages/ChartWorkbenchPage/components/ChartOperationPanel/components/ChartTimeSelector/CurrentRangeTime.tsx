@@ -21,14 +21,15 @@ import moment from 'moment';
 import { FC, memo } from 'react';
 const { RangePicker } = DatePicker;
 
-const CurrentRangeTime: FC<{ times?: [string, string] }> = memo(({ times }) => {
-  return (
-    <RangePicker
-      showTime
-      disabled
-      value={[moment(times?.[0]), moment(times?.[1])]}
-    />
-  );
-});
+const CurrentRangeTime: FC<{ times?: [string, string]; disabled?: boolean }> =
+  memo(({ times, disabled = true }) => {
+    return (
+      <RangePicker
+        showTime
+        disabled={disabled}
+        value={[moment(times?.[0]), moment(times?.[1])]}
+      />
+    );
+  });
 
 export default CurrentRangeTime;

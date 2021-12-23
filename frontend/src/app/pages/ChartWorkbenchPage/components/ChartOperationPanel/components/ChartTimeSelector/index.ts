@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import CurrentRangeTime from './CurrentRangeTime';
 import MannualRangeTimeSelector from './MannualRangeTimeSelector';
 import ManualSingleTimeSelector from './ManualSingleTimeSelector';
 import RecommendRangeTimeSelector from './RecommendRangeTimeSelector';
@@ -24,6 +25,7 @@ const TimeSelector = {
   MannualRangeTimeSelector,
   ManualSingleTimeSelector,
   RecommendRangeTimeSelector,
+  CurrentRangeTime,
 };
 
 export default TimeSelector;

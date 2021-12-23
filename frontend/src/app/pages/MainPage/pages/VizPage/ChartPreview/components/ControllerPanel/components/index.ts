@@ -22,6 +22,7 @@ import DropdownListFilter from './DropdownListFilter';
 import MultiDropdownListFilter from './MultiDropdownListFilter';
 import RadioGroupFilter from './RadioGroupFilter';
 import RangeTimeFilter from './RangeTimeFilter';
+import RangeTimePickerFilter from './RangeTimePickerFilter';
 import RangValueFilter from './RangValueFilter';
 import RecommendTimeFilter from './RecommendTimeFilter';
 import SliderFilter from './SliderFilter';
@@ -43,6 +44,7 @@ const Filters = {
   MultiDropdownListFilter,
   RadioGroupFilter,
   RangeTimeFilter,
+  RangeTimePickerFilter,
   RecommendTimeFilter,
   RangValueFilter,
   SliderFilter,

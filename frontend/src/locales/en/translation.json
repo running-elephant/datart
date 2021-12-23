@@ -43,6 +43,7 @@
           "checkboxGroup": "Checkbox Group",
           "multiDropdownList": "multiple Dropdown List",
           "rangeTime": "Range Time",
+          "rangeTimePicker": "Range Time",
           "recommendTime": "Recommend Time",
           "rangeValue": "Range Value",
           "text": "Text",
@@ -415,9 +416,9 @@
       "pleaseInputPassword": "please input password"
     }
   },
-  "components":{
-    "colorPicker":{
-      "more":"More",
+  "components": {
+    "colorPicker": {
+      "more": "More",
       "ok": "OK",
       "cancel": "Cancel"
     }

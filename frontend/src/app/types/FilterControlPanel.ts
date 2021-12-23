@@ -22,6 +22,7 @@ export enum ControllerFacadeTypes {
   CheckboxGroup = 'checkboxGroup',
   MultiDropdownList = 'multiDropdownList',
   RangeTime = 'rangeTime',
+  RangeTimePicker = 'rangeTimePicker',
   RecommendTime = 'recommendTime',
   RangeValue = 'rangeValue',
   Text = 'text',
