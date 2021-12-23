@@ -285,19 +285,10 @@ export class ChartDataRequestBuilder {
 
   private buildPageInfo() {
     const settingStyles = this.charSettingConfigs;
-    const enablePaging = getStyleValue(settingStyles, [
-      'paging',
-      'enablePaging',
-    ]);
     const pageSize = getStyleValue(settingStyles, ['paging', 'pageSize']);
-    if (!enablePaging) {
-      return {
-        pageSize: Number.MAX_SAFE_INTEGER,
-      };
-    }
     return {
       pageNo: this.pageInfo?.pageNo,
-      pageSize: pageSize || 10,
+      pageSize: pageSize || 1000,
     };
   }
 
