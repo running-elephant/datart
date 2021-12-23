@@ -26,6 +26,7 @@ import {
   Widget,
   WidgetConf,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import produce from 'immer';
 import { Layout } from 'react-grid-layout';
 import { createSlice } from 'utils/@reduxjs/toolkit';
@@ -55,6 +56,10 @@ export const editBoardStackSlice = createSlice({
     },
     updateBoardConfig(state, action: PayloadAction<DashboardConfig>) {
       state.dashBoard.config = action.payload;
+    },
+    updateQueryVariables(state, action: PayloadAction<Variable[]>) {
+      const variables = action.payload;
+      state.dashBoard.queryVariables = variables;
     },
     changeBoardHasQueryControl(state, action: PayloadAction<boolean>) {
       state.dashBoard.config.hasQueryControl = action.payload;

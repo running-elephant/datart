@@ -30,7 +30,10 @@ import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
 import FreeEditor from './FreeEditor/index';
 import { editDashBoardInfoActions } from './slice';
-import { editHasChartWidget } from './slice/actions/actions';
+import {
+  addVariablesToBoard,
+  editHasChartWidget,
+} from './slice/actions/actions';
 import {
   selectBoardChartEditorProps,
   selectEditBoard,
@@ -65,15 +68,11 @@ export const BoardEditor: React.FC<{
 
     const onSaveToWidget = useCallback(
       (chartType: WidgetContentChartType, dataChart: DataChart, view) => {
-        if (chartType === 'widgetChart') {
-          const widgetId = boardChartEditorProps?.widgetId!;
-          dispatch(editHasChartWidget({ widgetId, dataChart, view }));
-          onCloseChartEditor();
-        } else {
-          const widgetId = boardChartEditorProps?.widgetId!;
-          dispatch(editHasChartWidget({ widgetId, dataChart, view }));
-          onCloseChartEditor();
-        }
+        const widgetId = boardChartEditorProps?.widgetId!;
+        dispatch(editHasChartWidget({ widgetId, dataChart, view }));
+        onCloseChartEditor();
+        dispatch(addVariablesToBoard(view.variables));
+        // todo view.variables  save  on board
       },
       [boardChartEditorProps?.widgetId, dispatch, onCloseChartEditor],
     );

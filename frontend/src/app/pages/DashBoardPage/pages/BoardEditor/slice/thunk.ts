@@ -30,6 +30,7 @@ import {
 } from 'app/pages/DashBoardPage/utils/widget';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ActionCreators } from 'redux-undo';
@@ -50,6 +51,7 @@ import {
   getWidgetMapByServer,
   updateWidgetsRect,
 } from './../../../utils/widget';
+import { addVariablesToBoard } from './actions/actions';
 import {
   boardInfoState,
   editBoardStackState,
@@ -230,10 +232,11 @@ export const addDataChartWidgets = createAsyncThunk<
   'editBoard/addDataChartWidgets',
   async ({ boardId, chartIds, boardType }, { getState, dispatch }) => {
     const {
-      data: { datacharts, views },
+      data: { datacharts, views, viewVariables },
     } = await request<{
       datacharts: ServerDatachart[];
       views: View[];
+      viewVariables: Record<string, Variable[]>;
     }>({
       url: `viz/datacharts?datachartIds=${chartIds.join()}`,
       method: 'get',
@@ -243,6 +246,7 @@ export const addDataChartWidgets = createAsyncThunk<
     const viewViews = getChartDataView(views, dataCharts);
     dispatch(boardActions.setDataChartMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
+
     const widgets = chartIds.map(dcId => {
       let widget = widgetToolKit.chart.create({
         dashboardId: boardId,
@@ -255,6 +259,10 @@ export const addDataChartWidgets = createAsyncThunk<
       return widget;
     });
     dispatch(addWidgetsToEditBoard(widgets));
+
+    Object.values(viewVariables).forEach(variables => {
+      dispatch(addVariablesToBoard(variables));
+    });
     return null;
   },
 );
@@ -289,6 +297,7 @@ export const addWrapChartWidget = createAsyncThunk<
       subType: 'widgetChart',
     });
     dispatch(addWidgetsToEditBoard([widget]));
+    dispatch(addVariablesToBoard(view.variables));
     return null;
   },
 );
