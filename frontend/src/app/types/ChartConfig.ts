@@ -196,7 +196,6 @@ export const ChartStyleSectionComponentType = {
   INPUTPERCENTAGE: 'inputPercentage',
   SLIDER: 'slider',
   GROUP: 'group',
-  CACHE: 'cache',
   REFERENCE: 'reference',
   TABS: 'tabs',
   LISTTEMPLATE: 'listTemplate',
