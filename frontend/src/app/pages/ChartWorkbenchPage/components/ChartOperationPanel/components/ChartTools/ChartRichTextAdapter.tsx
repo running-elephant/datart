@@ -104,7 +104,7 @@ const ChartRichTextAdapter: FC<{
       setQuillValue(contents);
       contents && debouncedDataChange(JSON.stringify(contents));
     }
-  }, [onChange]);
+  }, [debouncedDataChange]);
 
   useEffect(() => {
     if (typeof quillValue !== 'string') {
@@ -112,15 +112,17 @@ const ChartRichTextAdapter: FC<{
       const ops = quill.ops?.concat().map(item => {
         let insert = item.insert;
         if (typeof insert !== 'string') {
-          const name = insert?.calcfield?.name;
-          const config = name
-            ? dataList.find(items => items.name === name)
-            : null;
-          insert = config?.value || '';
+          if (insert.hasOwnProperty('calcfield')) {
+            const name = insert.calcfield?.name;
+            const config = name
+              ? dataList.find(items => items.name === name)
+              : null;
+            insert = config?.value || '';
+          }
         }
         return { ...item, insert };
       });
-      setTranslate(ops?.length ? { ...quill, ops }: '');
+      setTranslate(ops?.length ? { ...quill, ops } : '');
     } else {
       setTranslate(quillValue);
     }
@@ -137,7 +139,7 @@ const ChartRichTextAdapter: FC<{
       (!isEditing || visible) && (
         <ReactQuill
           ref={quillRef}
-          className="react-quill"
+          className="react-quill-view"
           placeholder=""
           value={translate}
           modules={{ toolbar: null }}
@@ -148,41 +150,48 @@ const ChartRichTextAdapter: FC<{
     [translate, quillRef, isEditing, visible],
   );
 
-  const selectField = (field: any) => () => {
-    if (quillEditRef.current) {
-      const quill = quillEditRef.current.getEditor();
-      if (field) {
-        const text = `[${field.name}]`;
-        quill.getModule('calcfield').insertItem(
-          {
-            denotationChar: '',
-            id: field.id,
-            name: field.name,
-            value: field.value,
-            text,
-          },
-          true,
-        );
-        setImmediate(() => {
-          setQuillValue(quillEditRef.current?.getEditor().getContents() || '');
-        });
+  const selectField = useCallback(
+    (field: any) => () => {
+      if (quillEditRef.current) {
+        const quill = quillEditRef.current.getEditor();
+        if (field) {
+          const text = `[${field.name}]`;
+          quill.getModule('calcfield').insertItem(
+            {
+              denotationChar: '',
+              id: field.id,
+              name: field.name,
+              value: field.value,
+              text,
+            },
+            true,
+          );
+          setImmediate(() => {
+            setQuillValue(
+              quillEditRef.current?.getEditor().getContents() || '',
+            );
+          });
+        }
       }
-    }
-  };
-
-  const fieldItems = dataList?.length ? (
-    <Menu>
-      {dataList.map(fieldName => (
-        <MenuItem key={fieldName.name}>
-          <a onClick={selectField(fieldName)}>{fieldName.name}</a>
-        </MenuItem>
-      ))}
-    </Menu>
-  ) : (
-    <Menu>
-      <MenuItem key="nodata">暂无可用字段</MenuItem>
-    </Menu>
+    },
+    [quillEditRef],
   );
+
+  const fieldItems = useMemo(() => {
+    return dataList?.length ? (
+      <Menu>
+        {dataList.map(fieldName => (
+          <MenuItem key={fieldName.name}>
+            <a onClick={selectField(fieldName)}>{fieldName.name}</a>
+          </MenuItem>
+        ))}
+      </Menu>
+    ) : (
+      <Menu>
+        <MenuItem key="nodata">暂无可用字段</MenuItem>
+      </Menu>
+    );
+  }, [dataList, selectField]);
 
   const toolbar = useMemo(
     () => (
@@ -303,28 +312,9 @@ const ChartRichTextAdapter: FC<{
               预览
             </Button>
           </Row>
-          <Modal
-            title="富文本预览"
-            className="rich-text-modal"
-            visible={visible}
-            footer={null}
-            onCancel={() => {
-              setVisible(false);
-            }}
-          >
-            {reactQuillView}
-          </Modal>
         </>
       ),
-    [
-      visible,
-      setVisible,
-      reactQuillView,
-      quillModules,
-      quillValue,
-      quillChange,
-      isEditing,
-    ],
+    [quillModules, quillValue, isEditing, toolbar, quillChange],
   );
 
   const ssp = e => {
@@ -333,27 +323,44 @@ const ChartRichTextAdapter: FC<{
 
   return (
     <TextWrap onClick={ssp}>
-      {quillModules && reactQuillEdit}
-      {quillModules && reactQuillView}
+      <QuillBox>
+        {quillModules && reactQuillEdit}
+        {quillModules && !isEditing && reactQuillView}
+      </QuillBox>
+      <Modal
+        title="富文本预览"
+        visible={visible}
+        footer={null}
+        width="80%"
+        getContainer={false}
+        onCancel={() => {
+          setVisible(false);
+        }}
+      >
+        {isEditing && reactQuillView}
+      </Modal>
     </TextWrap>
   );
 });
 export default ChartRichTextAdapter;
 
-const TextWrap = styled.div`
-  position: relative;
+const QuillBox = styled.div`
   width: 100%;
   height: 100%;
-  overflow: hidden;
-
+  flex-direction: column;
+  display: flex;
   .react-quill {
-    width: 100%;
-    height: calc(100% - 90px);
+    flex: 1;
+    overflow-y: auto;
   }
-
-  & .rich-text-modal {
-    width: 900px;
+  .react-quill-view {
+    flex: 1;
+    overflow-y: auto;
   }
+`;
+const TextWrap = styled.div`
+  width: 100%;
+  height: 100%;
 
   & .ql-snow {
     border: none;
