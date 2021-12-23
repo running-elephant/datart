@@ -286,7 +286,12 @@ export class ChartDataRequestBuilder {
   private buildPageInfo() {
     const settingStyles = this.charSettingConfigs;
     const pageSize = getStyleValue(settingStyles, ['paging', 'pageSize']);
+    const enablePaging = getStyleValue(settingStyles, [
+      'paging',
+      'enablePaging',
+    ]);
     return {
+      countTotal: !!enablePaging,
       pageNo: this.pageInfo?.pageNo,
       pageSize: pageSize || 1000,
     };
