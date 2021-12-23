@@ -17,7 +17,6 @@
  */
 
 import ReactChart from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartGraph/ReactChart';
-import { WidgetContextProps } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
@@ -79,7 +78,7 @@ class BasicTableChart extends ReactChart {
         context,
         options.dataset,
         options.config,
-        options.content,
+        options.widgetSpecialConfig,
       ),
       context,
     );
@@ -93,7 +92,7 @@ class BasicTableChart extends ReactChart {
     context,
     dataset?: ChartDataset,
     config?: ChartConfig,
-    content?: WidgetContextProps,
+    widgetSpecialConfig?: any,
   ) {
     if (!dataset || !config) {
       return { locale: { emptyText: '  ' } };
@@ -150,7 +149,7 @@ class BasicTableChart extends ReactChart {
         tableColumns,
         aggregateConfigs,
       ),
-      components: this.getTableComponents(styleConfigs, content),
+      components: this.getTableComponents(styleConfigs, widgetSpecialConfig),
       ...this.getAntdTableStyleOptions(
         styleConfigs,
         dataset,
@@ -305,11 +304,8 @@ class BasicTableChart extends ReactChart {
     });
   }
 
-  getTableComponents(styleConfigs, content?: WidgetContextProps) {
-    const linkRelations = content?.relations
-      .filter(re => re.config.type === 'widgetToWidget')
-      .map(item => item.config.widgetToWidget?.triggerColumn);
-    const jumpFieldName = content?.config.jumpConfig?.field?.jumpFieldName;
+  getTableComponents(styleConfigs, widgetSpecialConfig) {
+    const { linkFields, jumpField } = widgetSpecialConfig;
 
     const tableHeaders = this.getStyleValue(styleConfigs, [
       'header',
@@ -400,8 +396,8 @@ class BasicTableChart extends ReactChart {
             <TableComponentsTd
               {...rest}
               style={Object.assign(style || {}, conditionalCellStyle)}
-              isLinkCell={linkRelations?.includes(dataIndex)}
-              isJumpCell={jumpFieldName === dataIndex}
+              isLinkCell={linkFields?.includes(dataIndex)}
+              isJumpCell={jumpField === dataIndex}
             />
           );
         },

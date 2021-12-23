@@ -87,6 +87,18 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
     }
   }, [chartClick, dataChart]);
 
+  const widgetSpecialConfig = useMemo(() => {
+    const linkFields = widget?.relations
+      .filter(re => re.config.type === 'widgetToWidget')
+      .map(item => item.config.widgetToWidget?.triggerColumn);
+    const jumpField = widget?.config.jumpConfig?.field?.jumpFieldName;
+
+    return {
+      linkFields,
+      jumpField,
+    };
+  }, [widget]);
+
   const onResize = useCallback(() => {}, []);
 
   const {
@@ -134,13 +146,21 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
           width={cacheW}
           height={cacheH}
           containerId={widgetId}
-          content={widget}
+          widgetSpecialConfig={widgetSpecialConfig}
         />
       );
     } catch (error) {
       return <span>has err in {`<ChartIFrameContainer>`}</span>;
     }
-  }, [cacheH, cacheW, chart, dataChart, dataset, widgetId]);
+  }, [
+    cacheH,
+    cacheW,
+    chart,
+    dataChart,
+    dataset,
+    widgetSpecialConfig,
+    widgetId,
+  ]);
   return (
     <Wrap className="widget-chart" ref={ref}>
       {chartFrame}

@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import { WidgetContextProps } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import {
@@ -43,7 +42,7 @@ class FenZuTableChart extends BasicTableChart {
     context,
     dataset?: ChartDataset,
     config?: ChartConfig,
-    content?: WidgetContextProps,
+    widgetSpecialConfig?: any,
   ) {
     if (!dataset || !config) {
       return { locale: { emptyText: '  ' } };
@@ -76,7 +75,7 @@ class FenZuTableChart extends BasicTableChart {
         dataColumns,
       ),
       summaryFn: undefined as any,
-      components: this.getTableComponents(styleConfigs, content),
+      components: this.getTableComponents(styleConfigs, widgetSpecialConfig),
       ...this.getAntdTableStyleOptions(
         styleConfigs,
         dataset,
