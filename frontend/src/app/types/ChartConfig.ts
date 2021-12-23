@@ -19,7 +19,6 @@
 import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
-  TimeFilterSubType,
 } from 'app/types/FilterControlPanel';
 import {
   FilterSqlOperator,
@@ -94,7 +93,6 @@ export type FilterCondition = {
     | Array<RelationFilterValue>
     | TimeFilterConditionValue;
   visualType: string;
-  subType?: TimeFilterSubType | string;
   operator?:
     | string
     | Lowercase<keyof typeof FilterRelationType>
@@ -135,7 +133,7 @@ export enum FilterConditionType {
   RangeValue = 1 << 4,
   Value = 1 << 5,
   RangeTime = 1 << 6,
-  RelativeTime = 1 << 7,
+  RecommendTime = 1 << 7,
   Time = 1 << 8,
   Tree = 1 << 9,
 
@@ -146,7 +144,7 @@ export enum FilterConditionType {
     RangeValue |
     Value |
     RangeTime |
-    RelativeTime |
+    RecommendTime |
     Time |
     Tree,
   Relation = 1 << 50,

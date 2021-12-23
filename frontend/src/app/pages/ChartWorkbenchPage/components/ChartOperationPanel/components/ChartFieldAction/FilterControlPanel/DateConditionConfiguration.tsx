@@ -18,10 +18,18 @@
 
 import { Tabs } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import { TimeFilterSubType } from 'app/types/FilterControlPanel';
+import { FilterConditionType } from 'app/types/ChartConfig';
+import { formatTime } from 'app/utils/time';
+import {
+  FILTER_TIME_FORMATTER_IN_QUERY,
+  RECOMMEND_TIME,
+} from 'globalConstants';
+import moment from 'moment';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
-import ChartFilterCondition from '../../../../../models/ChartFilterCondition';
+import ChartFilterCondition, {
+  ConditionBuilder,
+} from '../../../../../models/ChartFilterCondition';
 import TimeSelector from '../../ChartTimeSelector';
 
 const DateConditionConfiguration: FC<
@@ -31,28 +39,52 @@ const DateConditionConfiguration: FC<
   } & I18NComponentProps
 > = memo(({ i18nPrefix, condition, onChange: onConditionChange }) => {
   const t = useI18NPrefix(i18nPrefix);
-  const [subType, setSubType] = useState(
-    () => condition?.subType || TimeFilterSubType.Recommend,
+  const [type, setType] = useState<string>(() =>
+    condition?.type === FilterConditionType.RangeTime
+      ? String(FilterConditionType.RangeTime)
+      : String(FilterConditionType.RecommendTime),
   );
 
-  const handleConditionChanged = filter => {
-    onConditionChange?.(Object.assign(filter, { subType }));
+  const clearFilterWhenTypeChange = (type: string) => {
+    setType(type);
+    const conditionType = Number(type);
+    if (conditionType === FilterConditionType.RecommendTime) {
+      const filter = new ConditionBuilder(condition)
+        .setValue(RECOMMEND_TIME.TODAY)
+        .asRecommendTime();
+      onConditionChange?.(filter);
+    } else if (conditionType === FilterConditionType.RangeTime) {
+      const filterRow = new ConditionBuilder(condition)
+        .setValue([
+          formatTime(moment(), FILTER_TIME_FORMATTER_IN_QUERY),
+          formatTime(moment(), FILTER_TIME_FORMATTER_IN_QUERY),
+        ])
+        .asRangeTime();
+      onConditionChange?.(filterRow);
+    }
   };
 
   return (
-    <StyledDateConditionConfiguration activeKey={subType} onChange={setSubType}>
-      <Tabs.TabPane tab={t('recommend')} key={TimeFilterSubType.Recommend}>
+    <StyledDateConditionConfiguration
+      activeKey={type}
+      onChange={clearFilterWhenTypeChange}
+      destroyInactiveTabPane={true}
+    >
+      <Tabs.TabPane
+        tab={t('recommend')}
+        key={FilterConditionType.RecommendTime}
+      >
         <TimeSelector.RecommendRangeTimeSelector
           i18nPrefix={i18nPrefix}
           condition={condition}
-          onConditionChange={handleConditionChanged}
+          onConditionChange={onConditionChange}
         />
       </Tabs.TabPane>
-      <Tabs.TabPane tab={t('manual')} key={TimeFilterSubType.Manual}>
+      <Tabs.TabPane tab={t('manual')} key={FilterConditionType.RangeTime}>
         <TimeSelector.MannualRangeTimeSelector
           i18nPrefix={i18nPrefix}
           condition={condition}
-          onFilterChange={handleConditionChanged}
+          onConditionChange={onConditionChange}
         />
       </Tabs.TabPane>
     </StyledDateConditionConfiguration>
@@ -63,6 +95,7 @@ export default DateConditionConfiguration;
 
 const StyledDateConditionConfiguration = styled(Tabs)`
   width: 100%;
+  padding: 0 !important;
 
   .ant-tabs-content-holder {
     margin: 10px 0;

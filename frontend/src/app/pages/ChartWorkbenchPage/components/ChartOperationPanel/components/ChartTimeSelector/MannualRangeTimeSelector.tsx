@@ -17,12 +17,11 @@
  */
 
 import { Row, Space } from 'antd';
-import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
+import { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { FilterCondition, FilterConditionType } from 'app/types/ChartConfig';
 import { formatTime, getTime } from 'app/utils/time';
 import { FILTER_TIME_FORMATTER_IN_QUERY } from 'globalConstants';
-import { FC, memo, useContext, useState } from 'react';
+import { FC, memo, useState } from 'react';
 import ChartFilterCondition, {
   ConditionBuilder,
 } from '../../../../models/ChartFilterCondition';
@@ -32,11 +31,9 @@ import ManualSingleTimeSelector from './ManualSingleTimeSelector';
 const MannualRangeTimeSelector: FC<
   {
     condition?: FilterCondition;
-    onFilterChange: (filter: ChartFilterCondition) => void;
+    onConditionChange: (filter: ChartFilterCondition) => void;
   } & I18NComponentProps
-> = memo(({ i18nPrefix, condition, onFilterChange }) => {
-  const t = useI18NPrefix(i18nPrefix);
-  const { format } = useContext(TimeConfigContext);
+> = memo(({ i18nPrefix, condition, onConditionChange }) => {
   const [rangeTimes, setRangeTimes] = useState(() => {
     if (condition?.type === FilterConditionType.RangeTime) {
       const startTime = condition?.value?.[0];
@@ -53,7 +50,7 @@ const MannualRangeTimeSelector: FC<
     const filterRow = new ConditionBuilder(condition)
       .setValue(rangeTimes || [])
       .asRangeTime();
-    onFilterChange && onFilterChange(filterRow);
+    onConditionChange?.(filterRow);
   };
 
   const getRangeStringTimes = () => {

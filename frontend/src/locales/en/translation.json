@@ -43,6 +43,7 @@
           "checkboxGroup": "Checkbox Group",
           "multiDropdownList": "multiple Dropdown List",
           "rangeTime": "Range Time",
+          "recommendTime": "Recommend Time",
           "rangeValue": "Range Value",
           "text": "Text",
           "tree": "Tree",

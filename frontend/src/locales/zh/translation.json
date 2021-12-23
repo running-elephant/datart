@@ -40,9 +40,10 @@
         "controllerFacadeTypes": {
           "dropdownList": "下拉列表",
           "radioGroup": "单选按钮",
-          "checkboxGroup":"多选框",
+          "checkboxGroup": "多选框",
           "multiDropdownList": "多选下拉列表",
           "rangeTime": "日期范围",
+          "recommendTime": "推荐时间",
           "rangeValue": "数值范围",
           "text": "文本",
           "tree": "下拉树列表",
@@ -369,15 +370,15 @@
         "confirm": "请确认",
         "ok": "确认",
         "cancel": "取消",
-        "save":"保存"
-      },  
+        "save": "保存"
+      },
       "edit": "编辑",
       "run": "运行",
       "publish": "发布",
       "cancelPublish": "取消发布",
-      "published":"已发布",
-      "unpublished":"未发布",
-      "archived":"已归档",
+      "published": "已发布",
+      "unpublished": "未发布",
+      "archived": "已归档",
       "share": {
         "link": "链接",
         "password": "密码",
@@ -388,17 +389,17 @@
         "downloadData": "下载数据"
       }
     },
-    "board":{
-      "action":{
-        "dataChart":"数据图表",
-        "media":"媒体组件",
-        "container":"容器",
-        "controller":"控制器",
-        "undo":"撤销",
-        "redo":"重做",
-        "delete":"删除",
-        "copy":"复制",
-        "paste":"粘贴"
+    "board": {
+      "action": {
+        "dataChart": "数据图表",
+        "media": "媒体组件",
+        "container": "容器",
+        "controller": "控制器",
+        "undo": "撤销",
+        "redo": "重做",
+        "delete": "删除",
+        "copy": "复制",
+        "paste": "粘贴"
       }
     }
   },
@@ -413,9 +414,9 @@
       "pleaseInputPassword": "请输入密码"
     }
   },
-  "components":{
-    "colorPicker":{
-      "more":"更多",
+  "components": {
+    "colorPicker": {
+      "more": "更多",
       "ok": "确认",
       "cancel": "取消"
     }
