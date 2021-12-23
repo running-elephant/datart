@@ -142,18 +142,18 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
   }, [cacheH, cacheW, chart, dataChart, dataset, widgetId]);
   return (
     <Wrap className="widget-chart" ref={ref}>
-      {chartFrame}
+      <ChartFrameBox>{chartFrame}</ChartFrameBox>
     </Wrap>
   );
 });
+const ChartFrameBox = styled.div`
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+`;
 const Wrap = styled.div`
   display: flex;
   flex: 1;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  & div {
-    max-width: 100%;
-    max-height: 100%;
-  }
+  position: relative;
 `;
