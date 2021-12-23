@@ -1,4 +1,5 @@
 import { Form, Input, Modal, ModalProps } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import debounce from 'debounce-promise';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import React, { useCallback } from 'react';
@@ -7,7 +8,6 @@ import { useHistory } from 'react-router';
 import { request } from 'utils/request';
 import { selectSaveOrganizationLoading } from './slice/selectors';
 import { addOrganization } from './slice/thunks';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 const FormItem = Form.Item;
 
 interface OrganizationFormProps extends Omit<ModalProps, 'onCancel'> {
