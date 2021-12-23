@@ -421,6 +421,30 @@ export function transformToObjectArray(
     return objCol;
   });
 }
+// TODO delete this function  #migration
+export function transfromToObjectArray(
+  columns?: string[][],
+  metas?: ChartDatasetMeta[],
+) {
+  console.warn(
+    'This method `transfromToObjectArray` will be deprecated and can be replaced by `transformToObjectArray`',
+  );
+  if (!columns || !metas) {
+    return [];
+  }
+  return columns.map((col, index) => {
+    let objCol = {
+      id: index,
+    };
+    for (let i = 0; i < metas.length; i++) {
+      const key = metas?.[i]?.name;
+      if (!!key) {
+        objCol[key] = col[i];
+      }
+    }
+    return objCol;
+  });
+}
 
 export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
   if (!col) {
