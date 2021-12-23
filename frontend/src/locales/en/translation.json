@@ -413,5 +413,12 @@
       "password": "Password",
       "pleaseInputPassword": "please input password"
     }
+  },
+  "components":{
+    "colorPicker":{
+      "more":"More",
+      "ok": "OK",
+      "cancel": "Cancel"
+    }
   }
 }

@@ -28,9 +28,10 @@ const ROW_KEY = 'DATART_ROW_KEY';
 
 interface ResultsProps {
   height?: number;
+  width?: number;
 }
 
-export const Results = memo(({ height = 0 }: ResultsProps) => {
+export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
   const { actions } = useViewSlice();
   const dispatch = useDispatch();
   const viewId = useSelector(state =>
@@ -198,7 +199,10 @@ export const Results = memo(({ height = 0 }: ResultsProps) => {
   );
 
   const pagination = useMemo(
-    () => ({ pageSize: 100, pageSizeOptions: ['100', '200', '500', '1000'] }),
+    () => ({
+      defaultPageSize: 100,
+      pageSizeOptions: ['100', '200', '500', '1000'],
+    }),
     [],
   );
 
@@ -206,6 +210,7 @@ export const Results = memo(({ height = 0 }: ResultsProps) => {
     <TableWrapper>
       <SchemaTable
         height={height ? height - 96 : 0}
+        width={width}
         model={model}
         dataSource={dataSource}
         pagination={pagination}

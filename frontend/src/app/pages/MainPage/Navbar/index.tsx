@@ -7,6 +7,7 @@ import {
   SafetyCertificateFilled,
   SettingFilled,
   SettingOutlined,
+  SwapOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { List, Menu, Tooltip } from 'antd';
@@ -24,6 +25,7 @@ import { logout } from 'app/slice/thunks';
 import { downloadFile } from 'app/utils/fetch';
 import { BASE_RESOURCE_URL } from 'globalConstants';
 import React, { cloneElement, useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
@@ -63,6 +65,7 @@ export function Navbar() {
   const matchModules = useRouteMatch<{ moduleName: string }>(
     '/organizations/:orgId/:moduleName',
   );
+  const { i18n } = useTranslation();
 
   const brandClick = useCallback(() => {
     history.push('/');
@@ -183,11 +186,17 @@ export function Navbar() {
         case 'password':
           setModifyPasswordVisible(true);
           break;
+        case 'zh':
+          i18n.changeLanguage('zh');
+          break;
+        case 'en':
+          i18n.changeLanguage('en');
+          break;
         default:
           break;
       }
     },
-    [dispatch, history],
+    [dispatch, history, i18n],
   );
 
   const onSetPolling = useCallback(
@@ -272,6 +281,15 @@ export function Navbar() {
                 >
                   <p>修改密码</p>
                 </MenuListItem>
+
+                <Menu.SubMenu
+                  icon={<SwapOutlined className="icon" />}
+                  key="language"
+                  title="切换语言"
+                >
+                  <Menu.Item key="zh">中文</Menu.Item>
+                  <Menu.Item key="en">English</Menu.Item>
+                </Menu.SubMenu>
                 <MenuListItem
                   key="logout"
                   prefix={<ExportOutlined className="icon" />}

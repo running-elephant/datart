@@ -111,7 +111,7 @@ export function getColumnWidthMap(
       map[name] = dataSource.reduce((width, o) => {
         // column width
         return Math.min(
-          MAX_RESULT_TABLE_COLUMN_WIDTH,
+          // MAX_RESULT_TABLE_COLUMN_WIDTH,
           Math.max(
             width,
             map[name],

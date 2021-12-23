@@ -412,5 +412,12 @@
       "password": "密码",
       "pleaseInputPassword": "请输入密码"
     }
+  },
+  "components":{
+    "colorPicker":{
+      "more":"更多",
+      "ok": "确认",
+      "cancel": "取消"
+    }
   }
 }

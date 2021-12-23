@@ -95,9 +95,9 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
     const currentConfig = dataConfig.rows?.find(c => c.uid === columnUid);
     let _modalSize = StateModalSize.MIDDLE;
     if (actionType === ChartDataSectionFieldActionType.Colorize) {
-      _modalSize = StateModalSize.SMALL;
+      _modalSize = StateModalSize.XSMALL;
     } else if (actionType === ChartDataSectionFieldActionType.ColorizeSingle) {
-      _modalSize = StateModalSize.SMALL;
+      _modalSize = StateModalSize.XSMALL;
     }
     return (show as Function)({
       title: t(actionType),

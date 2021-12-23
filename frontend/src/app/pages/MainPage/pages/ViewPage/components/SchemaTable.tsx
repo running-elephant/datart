@@ -3,15 +3,9 @@ import {
   FieldStringOutlined,
   NumberOutlined,
 } from '@ant-design/icons';
-import {
-  Dropdown,
-  Menu,
-  Table,
-  TableColumnType,
-  TableProps,
-  Tooltip,
-} from 'antd';
+import { Dropdown, Menu, TableColumnType, TableProps, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
+import { VirtualTable } from 'app/components/VirtualTable';
 import { memo, ReactElement, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -29,11 +23,11 @@ import {
 } from '../constants';
 import { Column, Model } from '../slice/types';
 import { getColumnWidthMap } from '../utils';
-
 const ROW_KEY = 'DATART_ROW_KEY';
 
 interface SchemaTableProps extends TableProps<object> {
   height: number;
+  width: number;
   model: Model;
   dataSource?: object[];
   hasCategory?: boolean;
@@ -50,6 +44,7 @@ interface SchemaTableProps extends TableProps<object> {
 export const SchemaTable = memo(
   ({
     height,
+    width: propsWidth,
     model,
     dataSource,
     hasCategory,
@@ -158,19 +153,17 @@ export const SchemaTable = memo(
       getExtraHeaderActions,
       onSchemaTypeChange,
     ]);
-
     return (
-      <>
-        <Table
-          {...tableProps}
-          rowKey={ROW_KEY}
-          size="small"
-          components={{ header: { cell: TableHeader } }}
-          dataSource={dataSourceWithKey}
-          columns={columns}
-          scroll={{ x: tableWidth, y: height }}
-        />
-      </>
+      <VirtualTable
+        {...tableProps}
+        rowKey={ROW_KEY}
+        size="small"
+        components={{ header: { cell: TableHeader } }}
+        dataSource={dataSourceWithKey}
+        columns={columns}
+        scroll={{ x: tableWidth, y: height }}
+        width={propsWidth}
+      />
     );
   },
 );

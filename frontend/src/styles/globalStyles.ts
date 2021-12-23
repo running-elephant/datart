@@ -187,4 +187,9 @@ export const OverriddenStyle = createGlobalStyle`
   .datart-data-section-dropdown {
     z-index: ${MODAL_LEVEL - 1};
   }
+  .AggregationColorPopover{
+    .ant-popover-arrow{
+      display:none;
+    }
+  }
 `;

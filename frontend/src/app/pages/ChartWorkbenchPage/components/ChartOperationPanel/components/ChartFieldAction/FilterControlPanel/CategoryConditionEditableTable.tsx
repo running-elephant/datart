@@ -19,11 +19,11 @@
 import { Button, Space } from 'antd';
 import DragSortEditTable from 'app/components/DragSortEditTable';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import { RelationFilterValue } from 'app/types/ChartConfig';
-import ChartDataView from 'app/types/ChartDataView';
 import ChartFilterCondition, {
   ConditionBuilder,
 } from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+import { RelationFilterValue } from 'app/types/ChartConfig';
+import ChartDataView from 'app/types/ChartDataView';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useState } from 'react';

@@ -17,11 +17,14 @@ export const Outputs = memo(() => {
     selectCurrentEditingViewAttr(state, { name: 'stage' }),
   ) as ViewViewModelStages;
 
-  const { height, ref } = useResizeObserver();
+  const { width, height, ref } = useResizeObserver({
+    refreshMode: 'debounce',
+    refreshRate: 200,
+  });
 
   return (
     <Wrapper ref={ref}>
-      <Results height={height} />
+      <Results width={width} height={height} />
       {error && <Error />}
       {stage === ViewViewModelStages.Running && (
         <LoadingMask>

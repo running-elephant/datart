@@ -179,7 +179,11 @@ export const onDropTreeFn = ({ info, treeData, callback }) => {
     index = dropArr[dropArr.length - 1].index + 1;
   } else {
     //中间
-    index = (dropArr[dropIndex].index + dropArr[dropIndex + 1].index) / 2;
+    if (!dropArr[dropIndex].index && !dropArr[dropIndex + 1].index) {
+      index = dropArr[dropArr.length-1].index + 1;
+    } else {
+      index = (dropArr[dropIndex].index + dropArr[dropIndex + 1].index) / 2;
+    }
   }
   let { id } = dragObj,
     parentId = !info.dropToGap
@@ -191,12 +195,12 @@ export const onDropTreeFn = ({ info, treeData, callback }) => {
 
 export const getInsertedNodeIndex = (
   AddData: Omit<SaveFormModel, 'config'> & { config?: object | string },
-  treeData: any,
+  viewData: any,
 ) => {
   let index: number = 0;
   /* eslint-disable */
-  if (treeData?.length) {
-    let IndexArr = treeData
+  if (viewData?.length) {
+    let IndexArr = viewData
       .filter((v: any) => v.parentId == AddData.parentId)
       .map(v => Number(v.index) || 0);
     index = IndexArr?.length ? Math.max(...IndexArr) + 1 : 0;
