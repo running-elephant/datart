@@ -93,7 +93,7 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     }
 
     private boolean hasPermission(Role role, Schedule schedule, int permission) {
-        if (schedule.getId() == null || rrrMapper.countRolePermission(schedule.getId(), role.getId()) == 0) {
+        if (schedule.getId() == null || (permission & Const.CREATE) == permission) {
             return securityManager.hasPermission(PermissionHelper.schedulePermission(schedule.getOrgId(), role.getId(), ResourceType.SCHEDULE.name(), permission));
         } else {
             return securityManager.hasPermission(PermissionHelper.schedulePermission(schedule.getOrgId(), role.getId(), schedule.getId(), permission));

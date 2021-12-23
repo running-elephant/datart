@@ -27,7 +27,8 @@ public interface VizCRUDService<E extends BaseEntity, M extends CRUDMapper> exte
 
         requirePermission(instance, Const.CREATE);
 
-        checkUnique(instance);
+//        checkUnique(instance);
+
         E e = BaseCRUDService.super.create(vizCreateParam);
         getRoleService().grantPermission(vizCreateParam.getPermissions());
 
