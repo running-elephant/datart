@@ -173,7 +173,7 @@ function D3JSScatterChart({ dHelper }) {
         .flatMap(config => config.rows || []);
 
       // 数据转换，根据Datart提供了Helper转换工具
-      const objDataColumns = dHelper.transfromToObjectArray(
+      const objDataColumns = dHelper.transformToObjectArray(
         dataset.rows,
         dataset.columns,
       );

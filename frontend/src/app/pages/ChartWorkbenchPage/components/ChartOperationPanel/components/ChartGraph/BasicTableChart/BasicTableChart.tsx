@@ -25,7 +25,7 @@ import {
   getCustomSortableColumns,
   getUnusedHeaderRows,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { isEmptyArray, Omit } from 'utils/object';
@@ -91,7 +91,7 @@ class BasicTableChart extends ReactChart {
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
 
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );

@@ -66,7 +66,7 @@ const ChartLifecycleAdapter: React.FC<{
     setContainerStatus(ContainerStatus.LOADING);
     (async () => {
       chartResourceLoader
-        .laodResource(document, chart?.getDependencies?.())
+        .loadResource(document, chart?.getDependencies?.())
         .then(_ => {
           chart.init(config);
           const newBrokerRef = new ChartEventBroker();

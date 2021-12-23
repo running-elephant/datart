@@ -401,7 +401,7 @@ export function getNameTextStyle(fontFamily, fontSize, color) {
   };
 }
 
-export function transfromToObjectArray(
+export function transformToObjectArray(
   columns?: string[][],
   metas?: ChartDatasetMeta[],
 ) {
@@ -434,7 +434,7 @@ export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
 
 export function getColumnRenderOriginName(c?: ChartDataSectionField) {
   if (!c) {
-    return '[unkonwn]';
+    return '[unknown]';
   }
   if (c.aggregate === AggregateFieldActionType.NONE) {
     return c.colName;
@@ -447,7 +447,7 @@ export function getColumnRenderOriginName(c?: ChartDataSectionField) {
 
 export function getColumnRenderName(c?: ChartDataSectionField) {
   if (!c) {
-    return '[unkonwn]';
+    return '[unknown]';
   }
   if (c.alias?.name) {
     return c.alias.name;

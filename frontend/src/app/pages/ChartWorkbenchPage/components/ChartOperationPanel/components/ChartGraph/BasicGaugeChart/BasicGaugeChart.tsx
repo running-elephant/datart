@@ -23,7 +23,7 @@ import {
   getColumnRenderName,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
@@ -90,7 +90,7 @@ class BasicGaugeChart extends Chart {
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
-    const dataColumns = transfromToObjectArray(dataset.rows, dataset.columns);
+    const dataColumns = transformToObjectArray(dataset.rows, dataset.columns);
     const series = this.getSeries(
       styleConfigs,
       dataColumns,

@@ -31,7 +31,7 @@ import {
   getSeriesTooltips4Polar2,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Config from './config';
@@ -89,7 +89,7 @@ class BasicPieChart extends Chart {
   }
 
   getOptions(dataset: ChartDataset, config: ChartConfig) {
-    const dataColumns = transfromToObjectArray(dataset.rows, dataset.columns);
+    const dataColumns = transformToObjectArray(dataset.rows, dataset.columns);
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs

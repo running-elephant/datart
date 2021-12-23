@@ -32,8 +32,6 @@ import {
 } from 'utils/object';
 import { GroupLayout } from '.';
 import {
-  BaiscSelector,
-  BasicCheckbox,
   BasicColorSelector,
   BasicFont,
   BasicFontFamilySelector,
@@ -43,11 +41,13 @@ import {
   BasicInputPercentage,
   BasicLine,
   BasicMarginWidth,
+  BasicSelector,
   BasicSlider,
   BasicSwitch,
   BasicText,
   BasicUnControlledTabPanel,
 } from '../Basic';
+import BasicCheckbox from '../Basic/BasicCheckbox';
 import {
   ConditionStylePanel,
   DataCachePanel,
@@ -128,7 +128,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
         case ChartStyleSectionComponentType.INPUT:
           return <BasicInput {...props} />;
         case ChartStyleSectionComponentType.SELECT:
-          return <BaiscSelector {...props} />;
+          return <BasicSelector {...props} />;
         case ChartStyleSectionComponentType.TABS:
           return <BasicUnControlledTabPanel {...props} />;
         case ChartStyleSectionComponentType.FONT:
