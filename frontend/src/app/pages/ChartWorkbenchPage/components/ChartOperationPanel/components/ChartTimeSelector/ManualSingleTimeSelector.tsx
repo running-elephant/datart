@@ -16,15 +16,13 @@
  * limitations under the License.
  */
 
-import { DatePicker, Select, Space } from 'antd';
+import { Select, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { TimeFilterConditionValue } from 'app/types/ChartConfig';
 import { TimeFilterValueCategory } from 'app/types/FilterControlPanel';
-import { formatTime } from 'app/utils/time';
-import { FILTER_TIME_FORMATTER_IN_QUERY } from 'globalConstants';
-import moment from 'moment';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
+import ExactTimeSelector from './ExactTimeSelector';
 import RelativeTimeSelector from './RelativeTimeSelector';
 
 const ManualSingleTimeSelector: FC<
@@ -41,24 +39,19 @@ const ManualSingleTimeSelector: FC<
       : TimeFilterValueCategory.Relative;
   });
 
-  const handleTimeChange = time => {
-    onTimeChange?.(time);
-  };
-
-  const handleMomentTimeChange = momentTime => {
-    const timeStr = formatTime(momentTime, FILTER_TIME_FORMATTER_IN_QUERY);
-    onTimeChange?.(timeStr);
+  const handleTimeCategoryChange = type => {
+    setType(type);
+    onTimeChange?.(null);
   };
 
   const renderTimeSelector = type => {
     switch (type) {
       case TimeFilterValueCategory.Exact:
         return (
-          <DatePicker
-            showTime
-            value={moment(time as string)}
-            onChange={handleMomentTimeChange}
-            placeholder={t('pleaseSelect')}
+          <ExactTimeSelector
+            time={time}
+            i18nPrefix={i18nPrefix}
+            onChange={onTimeChange}
           />
         );
       case TimeFilterValueCategory.Relative:
@@ -66,7 +59,7 @@ const ManualSingleTimeSelector: FC<
           <RelativeTimeSelector
             time={time}
             i18nPrefix={i18nPrefix}
-            onChange={handleTimeChange}
+            onChange={onTimeChange}
           />
         );
     }
@@ -74,7 +67,7 @@ const ManualSingleTimeSelector: FC<
 
   return (
     <StyledManualSingleTimeSelector>
-      <Select value={type} onChange={value => setType(value)}>
+      <Select value={type} onChange={handleTimeCategoryChange}>
         <Select.Option value={TimeFilterValueCategory.Exact}>
           {t(TimeFilterValueCategory.Exact)}
         </Select.Option>

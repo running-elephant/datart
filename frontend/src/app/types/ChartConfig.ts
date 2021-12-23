@@ -112,7 +112,6 @@ export type TimeFilterConditionValue =
       direction?: string;
     }>;
 
-// TODO(Stephen): to be rename to `RelationFilterValue`
 export type RelationFilterValue = {
   key: string;
   label: string;
