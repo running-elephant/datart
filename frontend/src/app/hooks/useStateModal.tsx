@@ -25,6 +25,7 @@ export interface IStateModalContentProps {
 }
 
 export enum StateModalSize {
+  XSMALL = 520,
   SMALL = 600,
   MIDDLE = 1000,
   LARGE = 1600,
@@ -33,7 +34,7 @@ export enum StateModalSize {
 
 const defaultBodyStyle: React.CSSProperties = {
   maxHeight: 1000,
-  overflowY: 'scroll',
+  overflowY: 'auto',
   overflowX: 'auto',
 };
 

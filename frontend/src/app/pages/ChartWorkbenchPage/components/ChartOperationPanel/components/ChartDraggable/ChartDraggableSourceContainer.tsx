@@ -50,8 +50,10 @@ import {
 
 export const ChartDraggableSourceContainer: FC<
   {
-    onDeleteComputedField: (fieldName) => void;
-    onEditComputedField: (fieldName) => void;
+    onDeleteComputedField?: (fieldName) => void;
+    onEditComputedField?: (fieldName) => void;
+    onSelectionChange?: (dataItemId, cmdKeyActive, shiftKeyActive) => void;
+    onClearCheckedList?: () => void;
   } & ChartDataViewMeta
 > = memo(function ChartDraggableSourceContainer({
   id,
@@ -61,23 +63,45 @@ export const ChartDraggableSourceContainer: FC<
   expression,
   onDeleteComputedField,
   onEditComputedField,
+  onSelectionChange,
+  selectedItems,
+  isActive,
+  onClearCheckedList,
 }) {
   const t = useI18NPrefix(`viz.workbench.dataview`);
   const [, drag] = useDrag(
     () => ({
       type: CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
       canDrag: true,
-      item: { colName, type, category },
+      item: selectedItems?.length
+        ? selectedItems.map(item => ({
+            colName: item.id,
+            type: item.type,
+            category: item.category,
+          }))
+        : { colName, type, category },
+      collect: monitor => ({
+        isDragging: monitor.isDragging(),
+      }),
+      end: onClearCheckedList,
     }),
-    [],
+    [selectedItems],
   );
+
+  const styleClasses: Array<string> = useMemo(() => {
+    let styleArr: Array<string> = [];
+    if (isActive) {
+      styleArr.push('containerActive');
+    }
+    return styleArr;
+  }, [isActive]);
 
   const renderContent = useMemo(() => {
     const _handleMenuClick = (e, fieldName) => {
       if (e.key === 'delete') {
-        onDeleteComputedField(fieldName);
+        onDeleteComputedField?.(fieldName);
       } else {
-        onEditComputedField(fieldName);
+        onEditComputedField?.(fieldName);
       }
     };
 
@@ -151,7 +175,17 @@ export const ChartDraggableSourceContainer: FC<
     );
   }, [type, colName, onDeleteComputedField, onEditComputedField, category, t]);
 
-  return <Container ref={drag}>{renderContent}</Container>;
+  return (
+    <Container
+      onClick={e => {
+        onSelectionChange?.(colName, e.metaKey, e.shiftKey);
+      }}
+      ref={drag}
+      className={styleClasses.join(' ')}
+    >
+      {renderContent}
+    </Container>
+  );
 });
 
 export default ChartDraggableSourceContainer;
@@ -165,7 +199,9 @@ const Container = styled.div`
   font-weight: ${FONT_WEIGHT_MEDIUM};
   color: ${p => p.theme.textColorSnd};
   cursor: pointer;
-
+  &.containerActive {
+    background-color: #f8f9fa;
+  }
   > p {
     flex: 1;
   }
