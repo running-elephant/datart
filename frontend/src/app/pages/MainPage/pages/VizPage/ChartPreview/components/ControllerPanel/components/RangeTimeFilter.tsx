@@ -25,7 +25,7 @@ import { PresentControllerFilterProps } from '.';
 
 const RangeTimeFilter: FC<PresentControllerFilterProps> = memo(
   ({ condition, onConditionChange }) => {
-    const dateI18NPrefix = 'viz.common.filter.date';
+    const i18NPrefix = 'viz.common.filter.date';
     const [rangeTimes, setRangeTimes] = useState(() => {
       if (condition?.type === FilterConditionType.RangeTime) {
         const startTime = condition?.value?.[0];
@@ -49,13 +49,13 @@ const RangeTimeFilter: FC<PresentControllerFilterProps> = memo(
       <div>
         <Space direction="vertical" size={12}>
           <TimeSelector.ManualSingleTimeSelector
-            i18nPrefix={dateI18NPrefix}
+            i18nPrefix={i18NPrefix}
             time={rangeTimes?.[0] as any}
             isStart={true}
             onTimeChange={handleTimeChange(0)}
           />
           <TimeSelector.ManualSingleTimeSelector
-            i18nPrefix={dateI18NPrefix}
+            i18nPrefix={i18NPrefix}
             time={rangeTimes?.[1] as any}
             isStart={false}
             onTimeChange={handleTimeChange(1)}
