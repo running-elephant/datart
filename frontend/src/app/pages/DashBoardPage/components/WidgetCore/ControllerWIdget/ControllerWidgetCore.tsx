@@ -28,10 +28,10 @@ import {
   ControlOption,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getControllerDateValues } from 'app/pages/DashBoardPage/utils';
-import { FilterValueOption } from 'app/types/ChartConfig';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import {
   ControllerFacadeTypes,
-  RelativeOrExactTime,
+  TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
 import produce from 'immer';
 import React, {
@@ -104,7 +104,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     const dataRows = rows?.flat(2) || [];
     if (valueOptionType === 'common') {
       return dataRows.map(ele => {
-        const item: FilterValueOption = {
+        const item: RelationFilterValue = {
           key: ele,
           label: ele,
           // children?
@@ -159,11 +159,11 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
       const nextFilterDate: ControllerDate = {
         ...controllerDate!,
         startTime: {
-          relativeOrExact: RelativeOrExactTime.Exact,
+          relativeOrExact: TimeFilterValueCategory.Exact,
           exactValue: timeValues?.[0],
         },
         endTime: {
-          relativeOrExact: RelativeOrExactTime.Exact,
+          relativeOrExact: TimeFilterValueCategory.Exact,
           exactValue: timeValues?.[1],
         },
       };
@@ -183,7 +183,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
       const nextFilterDate: ControllerDate = {
         ...controllerDate!,
         startTime: {
-          relativeOrExact: RelativeOrExactTime.Exact,
+          relativeOrExact: TimeFilterValueCategory.Exact,
           exactValue: value,
         },
       };

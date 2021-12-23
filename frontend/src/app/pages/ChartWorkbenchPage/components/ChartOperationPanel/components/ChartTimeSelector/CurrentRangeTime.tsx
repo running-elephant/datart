@@ -16,30 +16,19 @@
  * limitations under the License.
  */
 
-import { Form, FormItemProps } from 'antd';
+import { DatePicker } from 'antd';
+import moment from 'moment';
 import { FC, memo } from 'react';
-import styled from 'styled-components/macro';
+const { RangePicker } = DatePicker;
 
-const FormItemEx: FC<FormItemProps> = memo(({ children, ...rest }) => {
-  return <StyledFromItemEx {...rest}>{children}</StyledFromItemEx>;
+const CurrentRangeTime: FC<{ times?: [string, string] }> = memo(({ times }) => {
+  return (
+    <RangePicker
+      showTime
+      disabled
+      value={[moment(times?.[0]), moment(times?.[1])]}
+    />
+  );
 });
 
-export default FormItemEx;
-
-const StyledFromItemEx = styled(Form.Item)`
-  margin: 0 0 0 0;
-
-  .ant-form-item-control {
-    display: flex;
-    flex-flow: row;
-    align-items: center;
-  }
-
-  .ant-form-item-explain {
-    padding-left: 10px;
-  }
-
-  .ant-form-item-control-input {
-    width: 100%;
-  }
-`;
+export default CurrentRangeTime;

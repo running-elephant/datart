@@ -409,6 +409,7 @@ class BasicLineChart extends Chart {
           return labels.join('\n');
         },
       },
+      labelLayout: { hideOverlap: true },
     };
   }
 

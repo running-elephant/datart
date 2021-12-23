@@ -21,7 +21,7 @@ import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
-import { FilterValueOption } from 'app/types/ChartConfig';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { getDistinctFields } from 'app/utils/fetch';
@@ -36,7 +36,7 @@ const ValuesOptionsSetter: FC<{
   form: FormInstance<{ config: ControllerConfig }> | undefined;
   viewMap: Record<string, ChartDataView>;
 }> = memo(({ form, viewMap, controllerType }) => {
-  const [optionValues, setOptionValues] = useState<FilterValueOption[]>([]);
+  const [optionValues, setOptionValues] = useState<RelationFilterValue[]>([]);
   const [targetKeys, setTargetKeys] = useState<string[]>([]);
 
   const getControllerConfig = useCallback(() => {
@@ -78,7 +78,7 @@ const ValuesOptionsSetter: FC<{
     const items: string[] = (collection || []).flatMap(c => c);
     const uniqueKeys = Array.from(new Set(items));
     return uniqueKeys.map((ele, index) => {
-      const item: FilterValueOption = {
+      const item: RelationFilterValue = {
         index: index,
         key: ele,
         label: ele,

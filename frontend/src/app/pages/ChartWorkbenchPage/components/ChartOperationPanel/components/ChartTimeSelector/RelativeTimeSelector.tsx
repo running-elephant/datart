@@ -18,29 +18,43 @@
 
 import { InputNumber, Select, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import { getTime } from 'app/utils/time';
+import { TimeFilterConditionValue } from 'app/types/ChartConfig';
 import { TIME_DIRECTION, TIME_UNIT_OPTIONS } from 'globalConstants';
 import { unitOfTime } from 'moment';
-import { FC, memo, useState } from 'react';
+import { FC, memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
+
 const RelativeTimeSelector: FC<
   {
-    isStart?: boolean;
+    time?: TimeFilterConditionValue;
     onChange: (time) => void;
   } & I18NComponentProps
-> = memo(({ isStart, i18nPrefix, onChange }) => {
+> = memo(({ time, i18nPrefix, onChange }) => {
   const t = useI18NPrefix(i18nPrefix);
-  const [amount, setAmount] = useState(0);
-  const [unit, setUnit] = useState<unitOfTime.DurationConstructor>('d');
-  const [direction, setDirection] = useState('-');
+  const [amount, setAmount] = useState(() => (time as any)?.amount || 1);
+  const [unit, setUnit] = useState<unitOfTime.DurationConstructor>(
+    () => (time as any)?.unit || 'd',
+  );
+  const [direction, setDirection] = useState(
+    () => (time as any)?.direction || '-',
+  );
+
+  useEffect(() => {
+    if (!time) {
+      handleTimeChange('d', 1, '-');
+    }
+  }, [time]);
 
   const handleTimeChange = (
     unit: unitOfTime.DurationConstructor,
     amount: number,
     direction: string,
   ) => {
-    const time = getTime(+(direction + amount), unit)(unit, isStart);
-    onChange?.(time);
+    onChange?.({
+      unit,
+      amount,
+      direction,
+    });
   };
 
   const handleUnitChange = (newUnit: unitOfTime.DurationConstructor) => {
@@ -60,19 +74,23 @@ const RelativeTimeSelector: FC<
 
   return (
     <StyledRelativeTimeSelector>
-      <InputNumber
-        defaultValue={amount}
-        step={1}
-        min={0}
-        onChange={handleAmountChange}
-      />
-      <Select defaultValue={unit} onChange={handleUnitChange}>
-        {TIME_UNIT_OPTIONS.map(item => (
+      <Select defaultValue={direction} onChange={handleDirectionChange}>
+        {TIME_DIRECTION.map(item => (
           <Select.Option value={item.value}>{t(item.name)}</Select.Option>
         ))}
       </Select>
-      <Select defaultValue={direction} onChange={handleDirectionChange}>
-        {TIME_DIRECTION.map(item => (
+      {TIME_DIRECTION.filter(d => d.name !== 'current').find(
+        d => d.value === direction,
+      ) && (
+        <InputNumber
+          defaultValue={amount}
+          step={1}
+          min={1}
+          onChange={handleAmountChange}
+        />
+      )}
+      <Select defaultValue={unit} onChange={handleUnitChange}>
+        {TIME_UNIT_OPTIONS.map(item => (
           <Select.Option value={item.value}>{t(item.name)}</Select.Option>
         ))}
       </Select>

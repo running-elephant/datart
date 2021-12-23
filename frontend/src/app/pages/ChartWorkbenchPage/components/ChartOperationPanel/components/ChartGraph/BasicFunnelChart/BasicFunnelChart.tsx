@@ -272,6 +272,7 @@ class BasicFunnelChart extends Chart {
           shadowColor: 'rgba(0, 0, 0, 0.5)',
         },
         label: this.getLabelStyle(styles),
+        labelLayout: { hideOverlap: true },
         data: this.getFunnelSeriesData(datas),
       };
     }

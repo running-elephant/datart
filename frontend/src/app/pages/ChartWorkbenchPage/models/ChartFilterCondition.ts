@@ -28,6 +28,7 @@ class ChartFilterCondition implements FilterCondition {
   type = FilterConditionType.Filter;
   value?;
   visualType = '';
+  subType;
   operator?: string;
   children?: ChartFilterCondition[];
 
@@ -37,6 +38,7 @@ class ChartFilterCondition implements FilterCondition {
       this.type = condition.type || this.type;
       this.value = condition.value;
       this.visualType = condition.visualType;
+      this.subType = condition.subType;
       this.operator = condition.operator;
       this.children = (condition.children || []).map(
         child => new ChartFilterCondition(child),
@@ -107,6 +109,7 @@ export class ConditionBuilder {
     if (condition) {
       this.condition.name = condition.name;
       this.condition.visualType = condition.visualType;
+      this.condition.subType = condition.subType;
       this.condition.type = condition.type;
       this.condition.value = condition.value;
       this.condition.operator = condition.operator;
@@ -162,7 +165,7 @@ export class ConditionBuilder {
     return this.condition;
   }
 
-  asRelativeTime(name?, sqlType?) {
+  asRecommendTime(name?, sqlType?) {
     this.condition.type = FilterConditionType.RelativeTime;
     this.condition.operator = FilterSqlOperator.Equal;
     this.condition.name = name || this.condition.name;
