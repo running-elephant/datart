@@ -211,8 +211,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     public void requirePermission(Dashboard dashboard, int permission) {
         Folder folder = folderMapper.selectByRelTypeAndId(ResourceType.DASHBOARD.name(), dashboard.getId());
         if (folder == null) {
-            securityManager.requireAllPermissions(PermissionHelper.vizPermission(dashboard.getOrgId(), "*",
-                    ResourceType.FOLDER.name(), permission));
+            //创建时，不进行权限校验
         } else {
             folderService.requirePermission(folder, permission);
         }
@@ -234,6 +233,9 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         folder.setId(UUIDGenerator.generate());
         folder.setRelType(ResourceType.DASHBOARD.name());
         folder.setRelId(dashboard.getId());
+
+        folderService.requirePermission(folder, Const.CREATE);
+
         folderMapper.insert(folder);
         return folder;
     }

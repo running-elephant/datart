@@ -239,7 +239,7 @@ public class FolderServiceImpl extends BaseService implements FolderService {
         folder.setCreateTime(new Date());
         folder.setId(UUIDGenerator.generate());
         folder.setRelType(ResourceType.FOLDER.name());
-        requirePermission(folder, Const.MANAGE);
+        requirePermission(folder, Const.CREATE);
         // insert permissions
         if (!CollectionUtils.isEmpty(folderCreate.getPermissions())) {
             roleService.grantPermission(folderCreate.getPermissions());

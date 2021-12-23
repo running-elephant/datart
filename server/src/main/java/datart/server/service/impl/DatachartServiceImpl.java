@@ -105,8 +105,7 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
     public void requirePermission(Datachart datachart, int permission) {
         Folder folder = folderMapper.selectByRelTypeAndId(ResourceType.DATACHART.name(), datachart.getId());
         if (folder == null) {
-            securityManager.requireAllPermissions(PermissionHelper.vizPermission(datachart.getOrgId(), "*",
-                    ResourceType.FOLDER.name(), permission));
+            // 在创建时，不进行权限校验
         } else {
             folderService.requirePermission(folder, permission);
         }
@@ -145,11 +144,14 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
         Datachart datachart = DatachartService.super.create(createParam);
         // create folder
         Folder folder = new Folder();
-        BeanUtils.copyProperties(createParam, folder);
         folder.setId(UUIDGenerator.generate());
+        BeanUtils.copyProperties(createParam, folder);
         folder.setRelType(ResourceType.DATACHART.name());
         folder.setRelId(datachart.getId());
+
+        folderService.requirePermission(folder, Const.CREATE);
         folderMapper.insert(folder);
+
         return folder;
     }
 

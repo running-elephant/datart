@@ -32,6 +32,7 @@ import {
   createInitWidgetConfig,
   createWidget,
 } from 'app/pages/DashBoardPage/utils/widget';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import produce from 'immer';
@@ -260,3 +261,17 @@ export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
     }),
   );
 };
+
+export const addVariablesToBoard =
+  (variables: Variable[]) => (dispatch, getState) => {
+    if (!variables.length) return;
+    const addedViewId = variables[0].viewId;
+    if (!addedViewId) return;
+
+    const editBoard = getState().editBoard as HistoryEditBoard;
+    const queryVariables = editBoard.stack.present.dashBoard.queryVariables;
+    const hasAddedViewId = queryVariables.find(v => v.viewId === addedViewId);
+    if (hasAddedViewId) return;
+    let newVariables = queryVariables.concat(variables);
+    dispatch(editBoardStackActions.updateQueryVariables(newVariables));
+  };

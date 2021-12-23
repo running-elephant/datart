@@ -74,12 +74,13 @@ const ChartIFrameContainer: FC<{
           <>
             <style>
               {`
-           body {
-             height: 100%;
-             background-color: transparent !important;
-             margin: 0;
-           }
-          `}
+                body {
+                  height: 100%;
+                  overflow: hidden;
+                  background-color: transparent !important;
+                  margin: 0;
+                }
+              `}
             </style>
           </>
         }
