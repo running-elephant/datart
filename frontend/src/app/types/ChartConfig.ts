@@ -318,6 +318,7 @@ export type ChartStyleSectionRowOption = {
   style?: React.CSSProperties;
   getItems?: (cols) => Array<ChartStyleSelectorItem>;
   needRefresh?: boolean;
+  fontFamilies?: string[];
 };
 
 export type ChartStyleSelectorItem = {

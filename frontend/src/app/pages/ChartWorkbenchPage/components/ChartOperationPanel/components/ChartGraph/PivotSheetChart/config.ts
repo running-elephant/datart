@@ -136,18 +136,6 @@ const config: ChartConfig = {
           default: false,
           comType: 'checkbox',
         },
-        // {
-        //   label: 'style.enableAdjustRowHeight',
-        //   key: 'enableAdjustRowHeight',
-        //   default: false,
-        //   comType: 'checkbox',
-        // },
-        // {
-        //   label: 'style.enableAdjustColumnWidth',
-        //   key: 'enableAdjustColumnWidth',
-        //   default: false,
-        //   comType: 'checkbox',
-        // },
       ],
     },
     {
@@ -158,7 +146,6 @@ const config: ChartConfig = {
         {
           label: 'style.bgColor',
           key: 'bgColor',
-          default: '#f0f0f0',
           comType: 'fontColor',
         },
         {
@@ -169,14 +156,23 @@ const config: ChartConfig = {
             fontFamily: 'PingFang SC',
             fontSize: 12,
             fontWeight: 'normal',
-            fontStyle: 'normal',
             color: '#6c757d',
+          },
+          options: {
+            fontFamilies: [
+              'Roboto',
+              'PingFangSC',
+              'BlinkMacSystemFont',
+              'Microsoft YaHei',
+              'Arial',
+              'sans-serif',
+            ],
           },
         },
         {
           label: 'style.align',
           key: 'align',
-          default: 'left',
+          default: 'right',
           comType: 'select',
           options: {
             items: [
@@ -194,9 +190,13 @@ const config: ChartConfig = {
       comType: 'group',
       rows: [
         {
-          label: 'style.bgColor',
-          key: 'bgColor',
-          default: '#fafafa',
+          label: 'style.oddBgColor',
+          key: 'oddBgColor',
+          comType: 'fontColor',
+        },
+        {
+          label: 'style.evenBgColor',
+          key: 'evenBgColor',
           comType: 'fontColor',
         },
         {
@@ -207,8 +207,17 @@ const config: ChartConfig = {
             fontFamily: 'PingFang SC',
             fontSize: 12,
             fontWeight: 'normal',
-            fontStyle: 'normal',
             color: '#6c757d',
+          },
+          options: {
+            fontFamilies: [
+              'Roboto',
+              'PingFangSC',
+              'BlinkMacSystemFont',
+              'Microsoft YaHei',
+              'Arial',
+              'sans-serif',
+            ],
           },
         },
         {
@@ -327,6 +336,8 @@ const config: ChartConfig = {
           tableHeaderStyle: '表头样式',
           tableBodyStyle: '表体样式',
           bgColor: '背景颜色',
+          evenBgColor: '偶数行背景颜色',
+          oddBgColor: '奇数行背景颜色',
           font: '字体',
           align: '对齐方式',
         },
@@ -365,6 +376,8 @@ const config: ChartConfig = {
           tableHeaderStyle: 'Table Header Style',
           tableBodyStyle: 'Table Body Style',
           bgColor: 'Background Color',
+          evenBgColor: 'Even Row Background Color',
+          oddBgColor: 'Odd Row Background Color',
           font: 'Font',
           align: 'Align',
         },
