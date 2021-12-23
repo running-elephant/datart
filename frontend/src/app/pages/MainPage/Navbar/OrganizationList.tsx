@@ -5,6 +5,7 @@ import {
 } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { Avatar, MenuListItem, ToolbarButton } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   selectOrganizationListLoading,
   selectOrganizations,
@@ -33,6 +34,7 @@ export function OrganizationList() {
   const organizations = useSelector(selectOrganizations);
   const orgId = useSelector(selectOrgId);
   const listLoading = useSelector(selectOrganizationListLoading);
+  const t = useI18NPrefix('main');
 
   const showForm = useCallback(() => {
     setFormVisible(true);
@@ -95,7 +97,7 @@ export function OrganizationList() {
   return (
     <Wrapper>
       <Title>
-        <h2>组织列表</h2>
+        <h2>{t('nav.organization.organizationList')}</h2>
         <ToolbarButton
           size="small"
           icon={<PlusOutlined />}

@@ -138,7 +138,7 @@ const ColorBlock = styled.span<{ color: string }>`
     opacity: 0.7;
   }
   &.active {
-    border: 1px solid ${p => p.theme.blue};
+    border: 1px solid ${p => p.theme.primary};
   }
 `;
 
@@ -157,6 +157,6 @@ const MoreColor = styled.div`
   font-size: ${FONT_SIZE_BODY};
   color: ${G80};
   &:hover {
-    color: ${p => p.theme.blue};
+    color: ${p => p.theme.primary};
   }
 `;
