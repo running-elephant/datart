@@ -54,20 +54,24 @@ public abstract class DataProviderExecuteOptimizer {
         }
     }
 
-
     public Dataframe getFromCache(String queryKey) {
-        Cache cache = CacheFactory.getCache();
-        if (cache != null) {
-            return cache.get(queryKey);
-        } else {
-            return null;
+        try {
+            Cache cache = CacheFactory.getCache();
+            if (cache != null) {
+                return cache.get(queryKey);
+            }
+        } catch (Exception e) {
         }
+        return null;
     }
 
     public void setCache(String queryKey, Dataframe dataframe, int cacheExpires) {
-        Cache cache = CacheFactory.getCache();
-        if (cache != null) {
-            cache.put(queryKey, dataframe, cacheExpires);
+        try {
+            Cache cache = CacheFactory.getCache();
+            if (cache != null) {
+                cache.put(queryKey, dataframe, cacheExpires);
+            }
+        } catch (Exception e) {
         }
     }
 
