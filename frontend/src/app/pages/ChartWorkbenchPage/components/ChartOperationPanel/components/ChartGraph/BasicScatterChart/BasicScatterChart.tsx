@@ -28,7 +28,7 @@ import {
   getSeriesTooltips4Scatter,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Config from './config';
@@ -84,7 +84,7 @@ class BasicScatterChart extends Chart {
   }
 
   getOptions(dataset: ChartDataset, config: ChartConfig) {
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );

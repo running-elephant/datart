@@ -24,7 +24,7 @@ import { ChartDataSectionField, SortActionType } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import {
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
@@ -47,7 +47,7 @@ const SortAction: FC<{
   const t = useI18NPrefix(`viz.palette.data.actions`);
   const [direction, setDirection] = useState(config?.sort?.type);
   const [sortValue, setSortValue] = useState(() => {
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset?.rows,
       dataset?.columns,
     );

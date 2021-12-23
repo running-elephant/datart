@@ -274,19 +274,19 @@ export function Navbar() {
                   key="profile"
                   prefix={<ProfileOutlined className="icon" />}
                 >
-                  <p>{t('nav.accout.accountSettings.title')}</p>
+                  <p>{t('nav.account.accountSettings.title')}</p>
                 </MenuListItem>
                 <MenuListItem
                   key="password"
                   prefix={<FormOutlined className="icon" />}
                 >
-                  <p>{t('nav.accout.changePassword.title')}</p>
+                  <p>{t('nav.account.changePassword.title')}</p>
                 </MenuListItem>
 
                 <Menu.SubMenu
                   icon={<SwapOutlined className="icon" />}
                   key="language"
-                  title={t('nav.accout.switchLanguage.title')}
+                  title={t('nav.account.switchLanguage.title')}
                 >
                   <Menu.Item key="zh">中文</Menu.Item>
                   <Menu.Item key="en">English</Menu.Item>
@@ -295,7 +295,7 @@ export function Navbar() {
                   key="logout"
                   prefix={<ExportOutlined className="icon" />}
                 >
-                  <p>{t('nav.accout.logout.title')}</p>
+                  <p>{t('nav.account.logout.title')}</p>
                 </MenuListItem>
               </Menu>
             }

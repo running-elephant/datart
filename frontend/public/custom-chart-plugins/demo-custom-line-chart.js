@@ -532,7 +532,7 @@ function DemoCustomLineChart({ dHelper }) {
         .filter(c => c.type === 'aggregate')
         .flatMap(config => config.rows || []);
 
-      const objDataColumns = dHelper.transfromToObjectArray(
+      const objDataColumns = dHelper.transformToObjectArray(
         dataset.rows,
         dataset.columns,
       );

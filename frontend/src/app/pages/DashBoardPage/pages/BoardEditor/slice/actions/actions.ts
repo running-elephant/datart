@@ -264,6 +264,7 @@ export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
 
 export const addVariablesToBoard =
   (variables: Variable[]) => (dispatch, getState) => {
+    if (!variables) return;
     if (!variables.length) return;
     const addedViewId = variables[0].viewId;
     if (!addedViewId) return;
