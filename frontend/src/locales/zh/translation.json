@@ -1,8 +1,58 @@
 {
   "main": {
     "nav": {
+      "vizs": "可视化",
+      "views": "数据视图",
+      "sources": "数据源",
+      "schedules": "定时任务",
+      "members": "成员与角色",
+      "permissions": "权限",
+      "settings": "设置",
       "download": {
         "title": "下载列表"
+      },
+      "organization": {
+        "organizationList": "组织列表",
+        "organizationCreate": "创建组织",
+        "organizationName": "名称",
+        "nameIsEmptyPrompt": "名称不能为空",
+        "duplicateNamePrompt": "名称重复",
+        "organizationDescription": "描述",
+        "cancel": "取消",
+        "saveDndEnter": "保存并进入"
+      },
+      "accout": {
+        "accountSettings": {
+          "title": "账号设置",
+          "clickUpload": "点击上传",
+          "userName": "用户名",
+          "email": "邮箱",
+          "name": "姓名",
+          "department": "部门",
+          "save": "保存"
+        },
+        "changePassword": {
+          "title": "修改密码",
+          "oldPassword": "旧密码",
+          "newPassword": "新密码",
+          "confirmPassword": "确定新密码",
+          "success": "修改成功",
+          "save":"保存"
+        },
+        "switchLanguage": {
+          "title": "切换语言"
+        },
+        "logout": {
+          "title": "退出登录"
+        }
+      }
+    },
+    "subNavs": {
+      "variables": {
+        "title": "公共变量设置"
+      },
+      "orgSettings": {
+        "title": "组织设置"
       }
     }
   },
@@ -40,7 +90,7 @@
         "controllerFacadeTypes": {
           "dropdownList": "下拉列表",
           "radioGroup": "单选按钮",
-          "checkboxGroup":"多选框",
+          "checkboxGroup": "多选框",
           "multiDropdownList": "多选下拉列表",
           "rangeTime": "日期范围",
           "rangeValue": "数值范围",
@@ -368,15 +418,15 @@
         "confirm": "请确认",
         "ok": "确认",
         "cancel": "取消",
-        "save":"保存"
-      },  
+        "save": "保存"
+      },
       "edit": "编辑",
       "run": "运行",
       "publish": "发布",
       "cancelPublish": "取消发布",
-      "published":"已发布",
-      "unpublished":"未发布",
-      "archived":"已归档",
+      "published": "已发布",
+      "unpublished": "未发布",
+      "archived": "已归档",
       "share": {
         "link": "链接",
         "password": "密码",
@@ -387,17 +437,17 @@
         "downloadData": "下载数据"
       }
     },
-    "board":{
-      "action":{
-        "dataChart":"数据图表",
-        "media":"媒体组件",
-        "container":"容器",
-        "controller":"控制器",
-        "undo":"撤销",
-        "redo":"重做",
-        "delete":"删除",
-        "copy":"复制",
-        "paste":"粘贴"
+    "board": {
+      "action": {
+        "dataChart": "数据图表",
+        "media": "媒体组件",
+        "container": "容器",
+        "controller": "控制器",
+        "undo": "撤销",
+        "redo": "重做",
+        "delete": "删除",
+        "copy": "复制",
+        "paste": "粘贴"
       }
     }
   },
@@ -412,9 +462,9 @@
       "pleaseInputPassword": "请输入密码"
     }
   },
-  "components":{
-    "colorPicker":{
-      "more":"更多",
+  "components": {
+    "colorPicker": {
+      "more": "更多",
       "ok": "确认",
       "cancel": "取消"
     }

@@ -1,8 +1,58 @@
 {
   "main": {
     "nav": {
+      "vizs": "可视化",
+      "views": "数据视图",
+      "sources": "数据源",
+      "schedules": "定时任务",
+      "members": "成员与角色",
+      "permissions": "权限",
+      "settings": "设置",
       "download": {
         "title": "Download List"
+      },
+      "organization": {
+        "organizationList": "组织列表",
+        "organizationCreate": "创建组织",
+        "organizationName": "名称",
+        "nameIsEmptyPrompt": "名称不能为空",
+        "duplicateNamePrompt": "名称重复",
+        "organizationDescription": "描述",
+        "cancel": "取消",
+        "saveDndEnter": "保存并进入"
+      },
+      "accout": {
+        "accountSettings": {
+          "title": "账号设置",
+          "clickUpload": "点击上传",
+          "userName": "用户名",
+          "email": "邮箱",
+          "name": "姓名",
+          "department": "部门",
+          "save": "保存"
+        },
+        "changePassword": {
+          "title": "修改密码",
+          "oldPassword": "旧密码",
+          "newPassword": "新密码",
+          "confirmPassword": "确定新密码",
+          "success": "修改成功",
+          "save":"保存"
+        },
+        "switchLanguage": {
+          "title": "切换语言"
+        },
+        "logout": {
+          "title": "退出登录"
+        }
+      }
+    },
+    "subNavs": {
+      "variables": {
+        "title": "公共变量设置"
+      },
+      "orgSettings": {
+        "title": "组织设置"
       }
     }
   },
@@ -377,11 +427,6 @@
       "published":"Published",
       "unpublished":"Unpublished",
       "archived":"Archived",
-
-
-
-
-
       "share": {
         "link": "Link",
         "password": "Password",

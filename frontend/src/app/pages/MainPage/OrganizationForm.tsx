@@ -7,6 +7,7 @@ import { useHistory } from 'react-router';
 import { request } from 'utils/request';
 import { selectSaveOrganizationLoading } from './slice/selectors';
 import { addOrganization } from './slice/thunks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 const FormItem = Form.Item;
 
 interface OrganizationFormProps extends Omit<ModalProps, 'onCancel'> {
@@ -18,6 +19,7 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
   const history = useHistory();
   const loading = useSelector(selectSaveOrganizationLoading);
   const [form] = Form.useForm();
+  const t = useI18NPrefix('main.nav.organization');
 
   const formSubmit = useCallback(
     values => {
@@ -44,9 +46,9 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
 
   return (
     <Modal
-      title="创建组织"
+      title={t('organizationCreate')}
       visible={visible}
-      okText="保存并进入"
+      okText={t('saveDndEnter')}
       confirmLoading={loading}
       onOk={save}
       onCancel={onCancel}
@@ -61,9 +63,9 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
       >
         <FormItem
           name="name"
-          label="名称"
+          label={t('organizationName')}
           rules={[
-            { required: true, message: '名称不能为空' },
+            { required: true, message: t('nameIsEmptyPrompt') },
             {
               validator: debounce((_, value) => {
                 return request({
@@ -72,7 +74,7 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
                   params: { name: value },
                 }).then(
                   () => Promise.resolve(),
-                  () => Promise.reject(new Error('名称重复')),
+                  () => Promise.reject(new Error(t('duplicateNamePrompt'))),
                 );
               }, DEFAULT_DEBOUNCE_WAIT),
             },
@@ -80,7 +82,7 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
         >
           <Input />
         </FormItem>
-        <FormItem name="description" label="描述">
+        <FormItem name="description" label={t('organizationDescription')}>
           <Input.TextArea autoSize={{ minRows: 4, maxRows: 8 }} />
         </FormItem>
       </Form>

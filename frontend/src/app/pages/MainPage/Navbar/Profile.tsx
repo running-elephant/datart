@@ -1,5 +1,6 @@
 import { Button, Form, Input, message, Modal, ModalProps, Upload } from 'antd';
 import { Avatar } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   selectLoggedInUser,
   selectSaveProfileLoading,
@@ -21,6 +22,7 @@ export function Profile({ visible, onCancel }: ModalProps) {
   const loading = useSelector(selectSaveProfileLoading);
   const [saveDisabled, setSaveDisabled] = useState(true);
   const [form] = Form.useForm();
+  const t = useI18NPrefix('main.nav');
 
   const reset = useCallback(() => {
     form.resetFields();
