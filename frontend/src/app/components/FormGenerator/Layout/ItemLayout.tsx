@@ -32,6 +32,7 @@ import {
 } from 'utils/object';
 import { GroupLayout } from '.';
 import {
+  BasicCheckbox,
   BasicColorSelector,
   BasicFont,
   BasicFontFamilySelector,
@@ -47,7 +48,6 @@ import {
   BasicText,
   BasicUnControlledTabPanel,
 } from '../Basic';
-import BasicCheckbox from '../Basic/BasicCheckbox';
 import {
   ConditionStylePanel,
   DataCachePanel,
