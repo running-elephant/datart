@@ -135,7 +135,6 @@ class PivotSheetChart extends ReactChart {
 
     return {
       options: {
-        debug: true,
         hierarchyType: enableExpandRow ? 'tree' : 'grid',
         width: context?.width,
         height: context?.height,
@@ -167,6 +166,7 @@ class PivotSheetChart extends ReactChart {
         meta: rowSectionConfigRows
           .concat(columnSectionConfigRows)
           .concat(metricsSectionConfigRows)
+          .concat(infoSectionConfigRows)
           .map(config => {
             return {
               field: getValueByColumnKey(config),
@@ -231,9 +231,13 @@ class PivotSheetChart extends ReactChart {
       'tableBodyStyle',
       'font',
     ]);
-    const bodyBgColor = this.getStyleValue(styleConfigs, [
+    const oddBgColor = this.getStyleValue(styleConfigs, [
       'tableBodyStyle',
-      'bgColor',
+      'oddBgColor',
+    ]);
+    const evenBgColor = this.getStyleValue(styleConfigs, [
+      'tableBodyStyle',
+      'evenBgColor',
     ]);
     const bodyTextAlign = this.getStyleValue(styleConfigs, [
       'tableBodyStyle',
@@ -242,7 +246,8 @@ class PivotSheetChart extends ReactChart {
 
     return {
       cell: {
-        backgroundColor: bodyBgColor,
+        crossBackgroundColor: evenBgColor,
+        backgroundColor: oddBgColor,
       },
       text: {
         fill: bodyFont?.color,
@@ -273,6 +278,13 @@ class PivotSheetChart extends ReactChart {
         backgroundColor: headerBgColor,
       },
       text: {
+        fill: headerFont?.color,
+        fontFamily: headerFont?.fontFamily,
+        fontSize: headerFont?.fontSize,
+        fontWeight: headerFont?.fontWeight,
+        textAlign: headerTextAlign,
+      },
+      bolderText: {
         fill: headerFont?.color,
         fontFamily: headerFont?.fontFamily,
         fontSize: headerFont?.fontSize,

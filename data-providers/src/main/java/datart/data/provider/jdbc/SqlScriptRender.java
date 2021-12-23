@@ -136,7 +136,7 @@ public class SqlScriptRender extends ScriptRender {
         final String selectSql0 = findSelectSql(script);
 
         if (StringUtils.isEmpty(selectSql0)) {
-            Exceptions.tr(DataProviderException.class,"message.no.valid.sql");
+            Exceptions.tr(DataProviderException.class, "message.no.valid.sql");
         }
 
         String selectSql = cleanupSql(selectSql0);
@@ -175,14 +175,6 @@ public class SqlScriptRender extends ScriptRender {
             selectSql = sql;
         }
         return selectSql;
-    }
-
-    private SqlParser sqlParser() {
-        SqlParser.Config config = SqlParser.config()
-                .withLex(Lex.MYSQL)
-                .withParserFactory(SqlParserImpl.FACTORY)
-                .withConformance(SqlConformanceEnum.LENIENT);
-        return SqlParser.create("", config);
     }
 
     private SqlNode parseSql(String sql) throws SqlParseException {

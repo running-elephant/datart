@@ -21,19 +21,67 @@ import { SheetComponent } from '@antv/s2-react';
 import '@antv/s2-react/dist/style.min.css';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
+import { FONT_SIZE_LABEL } from 'styles/StyleConstants';
 
-const AntVS2Wrapper: FC<{ dataCfg; options; theme?: S2Theme }> = memo(
-  ({ dataCfg, options, theme }) => {
-    return (
-      <StyledAntVS2Wrapper
-        sheetType="pivot"
-        dataCfg={dataCfg}
-        options={options}
-        themeCfg={{ theme }}
-      />
-    );
-  },
-);
+const AntVS2Wrapper: FC<{
+  dataCfg;
+  options;
+  theme?: S2Theme;
+}> = memo(({ dataCfg, options, theme }) => {
+  const onDataCellHover = ({ event, viewMeta }) => {
+    viewMeta.spreadsheet.tooltip.show({
+      position: {
+        x: event.clientX,
+        y: event.clientY,
+      },
+      content: (
+        <TableDataCellTooltip
+          datas={viewMeta.data}
+          meta={viewMeta.spreadsheet.dataCfg.meta}
+        />
+      ),
+    });
+  };
+
+  return (
+    <StyledAntVS2Wrapper
+      sheetType="pivot"
+      dataCfg={dataCfg}
+      options={options}
+      themeCfg={{ theme }}
+      onDataCellHover={onDataCellHover}
+    />
+  );
+});
+
+const TableDataCellTooltip: FC<{
+  datas?: object;
+  meta?: Array<{ field: string; name: string; formatter }>;
+}> = ({ datas, meta }) => {
+  if (!datas) {
+    return null;
+  }
+
+  return (
+    <StyledTableDataCellTooltip>
+      {(meta || [])
+        .map(m => {
+          const uniqKey = m?.field;
+          if (uniqKey in datas) {
+            return <li>{`${m?.name}: ${m?.formatter(datas[uniqKey])}`}</li>;
+          }
+          return null;
+        })
+        .filter(Boolean)}
+    </StyledTableDataCellTooltip>
+  );
+};
+
+const StyledTableDataCellTooltip = styled.ul`
+  padding: 4px;
+  font-size: ${FONT_SIZE_LABEL};
+  color: ${p => p.theme.textColorLight};
+`;
 
 const StyledAntVS2Wrapper = styled(SheetComponent)``;
 

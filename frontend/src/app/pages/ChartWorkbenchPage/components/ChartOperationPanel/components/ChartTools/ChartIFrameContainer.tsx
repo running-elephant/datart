@@ -16,15 +16,16 @@
  * limitations under the License.
  */
 
+import {
+  Frame,
+  FrameContextConsumer,
+} from 'app/components/ReactFrameComponent';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
-import Frame, { FrameContextConsumer } from 'react-frame-component';
 import styled, { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartLifecycleAdapter from './ChartLifecycleAdapter';
-
-const tableId = ['fenzu-table', 'piovt-sheet', 'piovt-sheet'];
 
 const ChartIFrameContainer: FC<{
   dataset: any;
@@ -44,7 +45,7 @@ const ChartIFrameContainer: FC<{
     }
     return newStyle;
   };
-  const isTable = tableId.includes(props.chart?.meta.id);
+
   const render = () => {
     if (!props?.chart?._useIFrame) {
       return (
@@ -73,20 +74,20 @@ const ChartIFrameContainer: FC<{
           <>
             <style>
               {`
-           body {
-             height: 100%;
-             background-color: transparent !important;
-             margin: 0;
-             overflow:${isTable ? 'visible' : 'hidden'};
-           }
-          `}
+                body {
+                  height: 100%;
+                  overflow: hidden;
+                  background-color: transparent !important;
+                  margin: 0;
+                }
+              `}
             </style>
           </>
         }
       >
         <FrameContextConsumer>
           {frameContext => (
-            <StyleSheetManager target={frameContext.document.head}>
+            <StyleSheetManager target={frameContext.document?.head}>
               <StyledChartLifecycleAdapter>
                 <ChartLifecycleAdapter
                   dataset={props.dataset}

@@ -55,9 +55,12 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
             dropdownMatchSelectWidth={false}
             onChange={handleSettingChange('fontFamily')}
           >
-            {FONT_FAMILIES.map(o => (
-              <Select.Option key={o.value} value={o.value}>
-                {o.name}
+            {(options?.fontFamilies || FONT_FAMILIES).map(o => (
+              <Select.Option
+                key={typeof o === 'string' ? o : o.value}
+                value={typeof o === 'string' ? o : o.value}
+              >
+                {typeof o === 'string' ? o : o.name}
               </Select.Option>
             ))}
           </Select>
