@@ -32,7 +32,7 @@ import {
   ChartDataSectionField,
   ChartDataSectionType,
   ChartStyleSectionConfig,
-  FilterValueOption,
+  RelationFilterValue,
   SortActionType,
 } from '../../../types/ChartConfig';
 import ChartDataView from '../../../types/ChartDataView';
@@ -186,8 +186,8 @@ export class ChartDataRequestBuilder {
       if (Array.isArray(conditionValue)) {
         return conditionValue
           .map(v => {
-            if (IsKeyIn(v as FilterValueOption, 'key')) {
-              const listItem = v as FilterValueOption;
+            if (IsKeyIn(v as RelationFilterValue, 'key')) {
+              const listItem = v as RelationFilterValue;
               if (!listItem.isSelected) {
                 return undefined;
               }

@@ -18,7 +18,7 @@
 
 import { TreeSelect } from 'antd';
 import useFetchFilterDataByCondtion from 'app/hooks/useFetchFilterDataByCondtion';
-import { FilterValueOption } from 'app/types/ChartConfig';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -27,8 +27,8 @@ import { PresentControllerFilterProps } from '.';
 
 const MultiDropdownListFilter: FC<PresentControllerFilterProps> = memo(
   ({ viewId, view, condition, onConditionChange }) => {
-    const [originalNodes, setOriginalNodes] = useState<FilterValueOption[]>(
-      condition?.value as FilterValueOption[],
+    const [originalNodes, setOriginalNodes] = useState<RelationFilterValue[]>(
+      condition?.value as RelationFilterValue[],
     );
 
     useFetchFilterDataByCondtion(viewId, condition, setOriginalNodes, view);
@@ -45,12 +45,12 @@ const MultiDropdownListFilter: FC<PresentControllerFilterProps> = memo(
         if (typeof item === 'object') {
           const firstValues =
             (condition?.value as [])?.filter(n => {
-              if (IsKeyIn(n as FilterValueOption, 'key')) {
-                return (n as FilterValueOption).isSelected;
+              if (IsKeyIn(n as RelationFilterValue, 'key')) {
+                return (n as RelationFilterValue).isSelected;
               }
               return false;
             }) || [];
-          return firstValues?.map((n: FilterValueOption) => n.key);
+          return firstValues?.map((n: RelationFilterValue) => n.key);
         } else {
           return condition?.value || [];
         }
@@ -67,7 +67,7 @@ const MultiDropdownListFilter: FC<PresentControllerFilterProps> = memo(
         value={selectedNodes as any}
         onChange={handleSelectedChange}
       >
-        {originalNodes?.map((n: FilterValueOption) => {
+        {originalNodes?.map((n: RelationFilterValue) => {
           return (
             <TreeSelect.TreeNode key={n.key} value={n.key} title={n.label} />
           );

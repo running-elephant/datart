@@ -19,7 +19,7 @@
 import { Button, Space } from 'antd';
 import DragSortEditTable from 'app/components/DragSortEditTable';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import { FilterValueOption } from 'app/types/ChartConfig';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import ChartFilterCondition, {
   ConditionBuilder,
@@ -44,12 +44,12 @@ const CategoryConditionEditableTable: FC<
     fetchDataByField,
   }) => {
     const t = useI18NPrefix(i18nPrefix);
-    const [rows, setRows] = useState<FilterValueOption[]>([]);
+    const [rows, setRows] = useState<RelationFilterValue[]>([]);
     const [showPopover, setShowPopover] = useState(false);
 
     useEffect(() => {
       if (Array.isArray(condition?.value)) {
-        setRows(condition?.value as FilterValueOption[]);
+        setRows(condition?.value as RelationFilterValue[]);
       } else {
         setRows([]);
       }
@@ -78,7 +78,7 @@ const CategoryConditionEditableTable: FC<
         title: t('tableHeaderAction'),
         dataIndex: 'action',
         width: 80,
-        render: (_, record: FilterValueOption) => (
+        render: (_, record: RelationFilterValue) => (
           <Space>
             {!record.isSelected && (
               <a
@@ -118,7 +118,7 @@ const CategoryConditionEditableTable: FC<
       }
       return {
         ...col,
-        onCell: (record: FilterValueOption) => ({
+        onCell: (record: RelationFilterValue) => ({
           record,
           editable: col.editable,
           dataIndex: col.dataIndex,
@@ -144,7 +144,7 @@ const CategoryConditionEditableTable: FC<
 
     const handleAdd = () => {
       const newKey = rows?.length + 1;
-      const newRow: FilterValueOption = {
+      const newRow: RelationFilterValue = {
         key: String(newKey),
         label: String(newKey),
         isSelected: false,
@@ -153,7 +153,7 @@ const CategoryConditionEditableTable: FC<
       handleFilterConditionChange(currentRows);
     };
 
-    const handleRowStateUpdate = (row: FilterValueOption) => {
+    const handleRowStateUpdate = (row: RelationFilterValue) => {
       const oldRowIndex = rows.findIndex(r => r.index === row.index);
       rows.splice(oldRowIndex, 1, row);
       handleFilterConditionChange(rows);
@@ -216,7 +216,7 @@ const CategoryConditionEditableTable: FC<
           dataSource={rows}
           size="small"
           bordered
-          rowKey={(r: FilterValueOption) => `${r.key}-${r.label}`}
+          rowKey={(r: RelationFilterValue) => `${r.key}-${r.label}`}
           columns={columnsWithCell}
           pagination={false}
           // onMoveRowEnd={onMoveRowEnd}

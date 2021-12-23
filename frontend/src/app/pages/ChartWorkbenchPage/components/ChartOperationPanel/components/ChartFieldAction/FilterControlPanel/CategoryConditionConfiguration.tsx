@@ -19,7 +19,7 @@
 import { Button, Row, Select, Space, Tabs, Transfer, Tree } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
-import { FilterConditionType, FilterValueOption } from 'app/types/ChartConfig';
+import { FilterConditionType, RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FilterSqlOperator } from 'globalConstants';
@@ -69,12 +69,12 @@ const CategoryConditionConfiguration: FC<
         if (Array.isArray(condition?.value)) {
           const firstValues =
             (condition?.value as [])?.filter(n => {
-              if (IsKeyIn(n as FilterValueOption, 'key')) {
-                return (n as FilterValueOption).isSelected;
+              if (IsKeyIn(n as RelationFilterValue, 'key')) {
+                return (n as RelationFilterValue).isSelected;
               }
               return false;
             }) || [];
-          values = firstValues?.map((n: FilterValueOption) => n.key);
+          values = firstValues?.map((n: RelationFilterValue) => n.key);
         }
       }
       return values || [];
@@ -82,8 +82,8 @@ const CategoryConditionConfiguration: FC<
     const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
     const [isTree, setIsTree] = useState(isTreeModel(condition?.value));
     const [treeOptions, setTreeOptions] = useState<string[]>([]);
-    const [listDatas, setListDatas] = useState<FilterValueOption[]>([]);
-    const [treeDatas, setTreeDatas] = useState<FilterValueOption[]>([]);
+    const [listDatas, setListDatas] = useState<RelationFilterValue[]>([]);
+    const [treeDatas, setTreeDatas] = useState<RelationFilterValue[]>([]);
 
     useMount(() => {
       if (curTab === FilterConditionType.List) {
@@ -109,7 +109,7 @@ const CategoryConditionConfiguration: FC<
     };
 
     const setListSelctedState = (
-      list?: FilterValueOption[],
+      list?: RelationFilterValue[],
       keys?: string[],
     ) => {
       return (list || []).map(c =>
@@ -118,7 +118,7 @@ const CategoryConditionConfiguration: FC<
     };
 
     const setTreeCheckableState = (
-      treeList?: FilterValueOption[],
+      treeList?: RelationFilterValue[],
       keys?: string[],
     ) => {
       return (treeList || []).map(c => {
@@ -230,7 +230,7 @@ const CategoryConditionConfiguration: FC<
             children: assocaiteChildren,
           };
         })
-        .filter(i => Boolean(i)) as FilterValueOption[];
+        .filter(i => Boolean(i)) as RelationFilterValue[];
       return treeNodes;
     };
 

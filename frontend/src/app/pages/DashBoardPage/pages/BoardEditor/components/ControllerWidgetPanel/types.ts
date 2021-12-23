@@ -3,7 +3,7 @@ import {
   ControllerVisibleType,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
-import { FilterValueOption } from 'app/types/ChartConfig';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { TimeFilterValueCategory } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
@@ -34,7 +34,7 @@ export interface ControllerConfig {
   valueOptionType: ValueOptionType; //
   visibility: ControllerVisibility;
   sqlOperator: FilterSqlOperator;
-  valueOptions: FilterValueOption[];
+  valueOptions: RelationFilterValue[];
   controllerValues: any[];
   required: boolean; // 是否允许空值
   canChangeSqlOperator?: boolean; // 是否显示 sqlOperator 切换

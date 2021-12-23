@@ -91,7 +91,7 @@ export type FilterCondition = {
     | number
     | [number, number]
     | string[]
-    | Array<FilterValueOption>
+    | Array<RelationFilterValue>
     | TimeFilterConditionValue;
   visualType: string;
   subType?: TimeFilterSubType | string;
@@ -113,12 +113,12 @@ export type TimeFilterConditionValue =
     }>;
 
 // TODO(Stephen): to be rename to `RelationFilterValue`
-export type FilterValueOption = {
+export type RelationFilterValue = {
   key: string;
   label: string;
   index?: number;
   isSelected?: boolean;
-  children?: FilterValueOption[];
+  children?: RelationFilterValue[];
 };
 
 export const FilterRelationType = {

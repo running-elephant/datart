@@ -28,7 +28,7 @@ import {
   ControlOption,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getControllerDateValues } from 'app/pages/DashBoardPage/utils';
-import { FilterValueOption } from 'app/types/ChartConfig';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import {
   ControllerFacadeTypes,
   TimeFilterValueCategory,
@@ -104,7 +104,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     const dataRows = rows?.flat(2) || [];
     if (valueOptionType === 'common') {
       return dataRows.map(ele => {
-        const item: FilterValueOption = {
+        const item: RelationFilterValue = {
           key: ele,
           label: ele,
           // children?
