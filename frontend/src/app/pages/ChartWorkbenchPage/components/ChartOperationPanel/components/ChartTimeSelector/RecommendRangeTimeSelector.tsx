@@ -16,16 +16,17 @@
  * limitations under the License.
  */
 
-import { Radio, Row, Space } from 'antd';
+import { Radio, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import { FilterCondition } from 'app/types/ChartConfig';
-import { formatTime, recommendTimeRangeConverter } from 'app/utils/time';
+import { recommendTimeRangeConverter } from 'app/utils/time';
 import { RECOMMEND_TIME } from 'globalConstants';
 import { FC, memo, useContext, useMemo, useState } from 'react';
 import ChartFilterCondition, {
   ConditionBuilder,
 } from '../../../../models/ChartFilterCondition';
+import CurrentRangeTime from './CurrentRangeTime';
 
 const RecommendRangeTimeSelector: FC<
   {
@@ -53,42 +54,42 @@ const RecommendRangeTimeSelector: FC<
 
   return (
     <>
-      <Row>
-        {`${t('currentTime')} : ${rangeTimes
-          ?.map(t => formatTime(t, format))
-          .join(' - ')}`}
-      </Row>
-      <Radio.Group
-        value={recommend}
-        onChange={e => handleChange(e.target?.value)}
-      >
-        <Space direction="vertical">
-          <Radio value={RECOMMEND_TIME.TODAY}>{t(RECOMMEND_TIME.TODAY)}</Radio>
-          <Radio value={RECOMMEND_TIME.YESTERDAY}>
-            {t(RECOMMEND_TIME.YESTERDAY)}
-          </Radio>
-          <Radio value={RECOMMEND_TIME.THISWEEK}>
-            {t(RECOMMEND_TIME.THISWEEK)}
-          </Radio>
-        </Space>
-        <Space direction="vertical">
-          <Radio value={RECOMMEND_TIME.LAST_7_DAYS}>
-            {t(RECOMMEND_TIME.LAST_7_DAYS)}
-          </Radio>
-          <Radio value={RECOMMEND_TIME.LAST_30_DAYS}>
-            {t(RECOMMEND_TIME.LAST_30_DAYS)}
-          </Radio>
-          <Radio value={RECOMMEND_TIME.LAST_90_DAYS}>
-            {t(RECOMMEND_TIME.LAST_90_DAYS)}
-          </Radio>
-          <Radio value={RECOMMEND_TIME.LAST_1_MONTH}>
-            {t(RECOMMEND_TIME.LAST_1_MONTH)}
-          </Radio>
-          <Radio value={RECOMMEND_TIME.LAST_1_YEAR}>
-            {t(RECOMMEND_TIME.LAST_1_YEAR)}
-          </Radio>
-        </Space>
-      </Radio.Group>
+      <Space direction="vertical">
+        <CurrentRangeTime times={rangeTimes} />
+        <Radio.Group
+          value={recommend}
+          onChange={e => handleChange(e.target?.value)}
+        >
+          <Space direction="vertical">
+            <Radio value={RECOMMEND_TIME.TODAY}>
+              {t(RECOMMEND_TIME.TODAY)}
+            </Radio>
+            <Radio value={RECOMMEND_TIME.YESTERDAY}>
+              {t(RECOMMEND_TIME.YESTERDAY)}
+            </Radio>
+            <Radio value={RECOMMEND_TIME.THISWEEK}>
+              {t(RECOMMEND_TIME.THISWEEK)}
+            </Radio>
+          </Space>
+          <Space direction="vertical">
+            <Radio value={RECOMMEND_TIME.LAST_7_DAYS}>
+              {t(RECOMMEND_TIME.LAST_7_DAYS)}
+            </Radio>
+            <Radio value={RECOMMEND_TIME.LAST_30_DAYS}>
+              {t(RECOMMEND_TIME.LAST_30_DAYS)}
+            </Radio>
+            <Radio value={RECOMMEND_TIME.LAST_90_DAYS}>
+              {t(RECOMMEND_TIME.LAST_90_DAYS)}
+            </Radio>
+            <Radio value={RECOMMEND_TIME.LAST_1_MONTH}>
+              {t(RECOMMEND_TIME.LAST_1_MONTH)}
+            </Radio>
+            <Radio value={RECOMMEND_TIME.LAST_1_YEAR}>
+              {t(RECOMMEND_TIME.LAST_1_YEAR)}
+            </Radio>
+          </Space>
+        </Radio.Group>
+      </Space>
     </>
   );
 });

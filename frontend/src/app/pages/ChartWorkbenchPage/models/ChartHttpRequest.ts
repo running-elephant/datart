@@ -168,7 +168,7 @@ export class ChartDataRequestBuilder {
       if (visualType !== 'DATE') {
         return value;
       }
-      if (typeof value === 'object') {
+      if (Boolean(value) && typeof value === 'object' && 'unit' in value) {
         const time = getTime(+(value.direction + value.amount), value.unit)(
           value.unit,
           value.isStart,

@@ -20,10 +20,13 @@ import { Row, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import { FilterCondition, FilterConditionType } from 'app/types/ChartConfig';
+import { formatTime, getTime } from 'app/utils/time';
+import { FILTER_TIME_FORMATTER_IN_QUERY } from 'globalConstants';
 import { FC, memo, useContext, useState } from 'react';
 import ChartFilterCondition, {
   ConditionBuilder,
 } from '../../../../models/ChartFilterCondition';
+import CurrentRangeTime from './CurrentRangeTime';
 import ManualSingleTimeSelector from './ManualSingleTimeSelector';
 
 const MannualRangeTimeSelector: FC<
@@ -34,7 +37,7 @@ const MannualRangeTimeSelector: FC<
 > = memo(({ i18nPrefix, condition, onFilterChange }) => {
   const t = useI18NPrefix(i18nPrefix);
   const { format } = useContext(TimeConfigContext);
-  const [timeRange, setTimeRange] = useState(() => {
+  const [rangeTimes, setRangeTimes] = useState(() => {
     if (condition?.type === FilterConditionType.RangeTime) {
       const startTime = condition?.value?.[0];
       const endTime = condition?.value?.[1];
@@ -44,31 +47,42 @@ const MannualRangeTimeSelector: FC<
   });
 
   const handleTimeChange = index => time => {
-    timeRange[index] = time;
-    setTimeRange(timeRange);
+    rangeTimes[index] = time;
+    setRangeTimes(rangeTimes);
 
     const filterRow = new ConditionBuilder(condition)
-      .setValue(timeRange || [])
+      .setValue(rangeTimes || [])
       .asRangeTime();
     onFilterChange && onFilterChange(filterRow);
   };
 
+  const getRangeStringTimes = () => {
+    return (rangeTimes || []).map(t => {
+      if (Boolean(t) && typeof t === 'object' && 'unit' in t) {
+        const time = getTime(+(t.direction + t.amount), t.unit)(
+          t.unit,
+          t.isStart,
+        );
+        return formatTime(time, FILTER_TIME_FORMATTER_IN_QUERY);
+      }
+      return t;
+    });
+  };
+
   return (
     <div>
-      <Row>
-        {/* {`${t('currentTime')} : ${timeRange
-          ?.map(time => formatTime(time, format))
-          ?.join(' - ')}`} */}
-      </Row>
       <Space direction="vertical" size={12}>
+        <Row>
+          <CurrentRangeTime times={getRangeStringTimes() as any} />
+        </Row>
         <ManualSingleTimeSelector
-          time={timeRange?.[0] as any}
+          time={rangeTimes?.[0] as any}
           isStart={true}
           i18nPrefix={i18nPrefix}
           onTimeChange={handleTimeChange(0)}
         />
         <ManualSingleTimeSelector
-          time={timeRange?.[1] as any}
+          time={rangeTimes?.[1] as any}
           isStart={false}
           i18nPrefix={i18nPrefix}
           onTimeChange={handleTimeChange(1)}
