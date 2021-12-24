@@ -114,7 +114,7 @@ export class Frame extends Component {
     /**
      * Because ios wechat browser issue which not support srcDoc props
      * we remove this props and also to avoid performance issue with
-     * document.write function, but still PR will be welcom!
+     * document.write function, but PR is still welcome!
      */
     delete props.srcDoc;
     delete props.mountTarget;
