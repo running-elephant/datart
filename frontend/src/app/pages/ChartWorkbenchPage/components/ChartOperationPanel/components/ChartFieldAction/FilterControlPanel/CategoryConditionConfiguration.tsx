@@ -93,8 +93,6 @@ const CategoryConditionConfiguration: FC<
       }
     });
 
-    console.log(`condition ---> `, condition);
-
     const getDataOptionFields = () => {
       return dataView?.meta || [];
     };
