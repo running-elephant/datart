@@ -21,7 +21,7 @@ import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { TimeFilterConditionValue } from 'app/types/ChartConfig';
 import { TIME_DIRECTION, TIME_UNIT_OPTIONS } from 'globalConstants';
 import { unitOfTime } from 'moment';
-import { FC, memo, useEffect, useState } from 'react';
+import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 
 const RelativeTimeSelector: FC<
@@ -38,12 +38,6 @@ const RelativeTimeSelector: FC<
   const [direction, setDirection] = useState(
     () => (time as any)?.direction || '-',
   );
-
-  useEffect(() => {
-    if (!time) {
-      handleTimeChange('d', 1, '-');
-    }
-  }, [time]);
 
   const handleTimeChange = (
     unit: unitOfTime.DurationConstructor,

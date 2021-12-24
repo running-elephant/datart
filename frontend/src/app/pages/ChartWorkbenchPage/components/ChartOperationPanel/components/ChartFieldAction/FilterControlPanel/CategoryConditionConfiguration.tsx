@@ -177,12 +177,6 @@ const CategoryConditionConfiguration: FC<
           // setListDatas(convertToList(dataset?.columns, selectedKeys));
         } else {
           setListDatas(convertToList(dataset?.rows, selectedKeys));
-          setTargetKeys([]);
-          const filter = new ConditionBuilder(condition)
-            .setOperator(FilterSqlOperator.In)
-            .setValue([])
-            .asGeneral();
-          onConditionChange(filter);
         }
       });
     };

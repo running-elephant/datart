@@ -97,6 +97,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
         });
         onChange?.(ancestors, newData);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dependency]);
 
     const handleDataChange = (

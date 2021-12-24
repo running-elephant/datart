@@ -48,6 +48,7 @@ class ChartEventBroker {
     if (!this._listeners.has(event) || !this._listeners.get(event)) {
       return;
     }
+
     this.invokeEvent(event, options, context);
   }
 

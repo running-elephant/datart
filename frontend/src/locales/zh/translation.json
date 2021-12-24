@@ -93,6 +93,8 @@
           "checkboxGroup": "多选框",
           "multiDropdownList": "多选下拉列表",
           "rangeTime": "日期范围",
+          "rangeTimePicker": "日期范围",
+          "recommendTime": "推荐时间",
           "rangeValue": "数值范围",
           "text": "文本",
           "tree": "下拉树列表",

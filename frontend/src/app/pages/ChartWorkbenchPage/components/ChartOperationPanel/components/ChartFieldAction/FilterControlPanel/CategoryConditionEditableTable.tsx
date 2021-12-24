@@ -45,7 +45,6 @@ const CategoryConditionEditableTable: FC<
   }) => {
     const t = useI18NPrefix(i18nPrefix);
     const [rows, setRows] = useState<RelationFilterValue[]>([]);
-    const [showPopover, setShowPopover] = useState(false);
 
     useEffect(() => {
       if (Array.isArray(condition?.value)) {
@@ -157,7 +156,6 @@ const CategoryConditionEditableTable: FC<
     };
 
     const handleFetchDataFromField = field => async () => {
-      setShowPopover(false);
       if (fetchDataByField) {
         const dataset = await fetchNewDataset(dataView?.id!, field);
         const newRows = convertToList(dataset?.rows, []);
@@ -216,7 +214,6 @@ const CategoryConditionEditableTable: FC<
           rowKey={(r: RelationFilterValue) => `${r.key}-${r.label}`}
           columns={columnsWithCell}
           pagination={false}
-          // onMoveRowEnd={onMoveRowEnd}
           onRow={(_, index) =>
             ({
               index,

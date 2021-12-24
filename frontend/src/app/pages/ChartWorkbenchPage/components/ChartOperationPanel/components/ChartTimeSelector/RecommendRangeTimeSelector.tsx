@@ -18,11 +18,10 @@
 
 import { Radio, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import { FilterCondition } from 'app/types/ChartConfig';
 import { recommendTimeRangeConverter } from 'app/utils/time';
 import { RECOMMEND_TIME } from 'globalConstants';
-import { FC, memo, useContext, useMemo, useState } from 'react';
+import { FC, memo, useMemo, useState } from 'react';
 import ChartFilterCondition, {
   ConditionBuilder,
 } from '../../../../models/ChartFilterCondition';
@@ -35,9 +34,8 @@ const RecommendRangeTimeSelector: FC<
   } & I18NComponentProps
 > = memo(({ i18nPrefix, condition, onConditionChange }) => {
   const t = useI18NPrefix(i18nPrefix);
-  const { format } = useContext(TimeConfigContext);
-  const [recommend, setRecommend] = useState<string | undefined>(() =>
-    String(condition?.value),
+  const [recommend, setRecommend] = useState<string | undefined>(
+    condition?.value as string,
   );
 
   const handleChange = recommendTime => {
@@ -61,32 +59,24 @@ const RecommendRangeTimeSelector: FC<
           onChange={e => handleChange(e.target?.value)}
         >
           <Space direction="vertical">
-            <Radio value={RECOMMEND_TIME.TODAY}>
-              {t(RECOMMEND_TIME.TODAY)}
-            </Radio>
-            <Radio value={RECOMMEND_TIME.YESTERDAY}>
-              {t(RECOMMEND_TIME.YESTERDAY)}
-            </Radio>
-            <Radio value={RECOMMEND_TIME.THISWEEK}>
-              {t(RECOMMEND_TIME.THISWEEK)}
-            </Radio>
+            {[
+              RECOMMEND_TIME.TODAY,
+              RECOMMEND_TIME.YESTERDAY,
+              RECOMMEND_TIME.THISWEEK,
+            ].map(time => (
+              <Radio value={time}>{t(time)}</Radio>
+            ))}
           </Space>
           <Space direction="vertical">
-            <Radio value={RECOMMEND_TIME.LAST_7_DAYS}>
-              {t(RECOMMEND_TIME.LAST_7_DAYS)}
-            </Radio>
-            <Radio value={RECOMMEND_TIME.LAST_30_DAYS}>
-              {t(RECOMMEND_TIME.LAST_30_DAYS)}
-            </Radio>
-            <Radio value={RECOMMEND_TIME.LAST_90_DAYS}>
-              {t(RECOMMEND_TIME.LAST_90_DAYS)}
-            </Radio>
-            <Radio value={RECOMMEND_TIME.LAST_1_MONTH}>
-              {t(RECOMMEND_TIME.LAST_1_MONTH)}
-            </Radio>
-            <Radio value={RECOMMEND_TIME.LAST_1_YEAR}>
-              {t(RECOMMEND_TIME.LAST_1_YEAR)}
-            </Radio>
+            {[
+              RECOMMEND_TIME.LAST_7_DAYS,
+              RECOMMEND_TIME.LAST_30_DAYS,
+              RECOMMEND_TIME.LAST_90_DAYS,
+              RECOMMEND_TIME.LAST_1_MONTH,
+              RECOMMEND_TIME.LAST_1_YEAR,
+            ].map(time => (
+              <Radio value={time}>{t(time)}</Radio>
+            ))}
           </Space>
         </Radio.Group>
       </Space>

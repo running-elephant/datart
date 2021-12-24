@@ -16,16 +16,21 @@
  * limitations under the License.
  */
 
-import { useEffect } from 'react';
+import TimeSelector from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTimeSelector';
+import { FC, memo } from 'react';
+import { PresentControllerFilterProps } from '.';
 
-const useMount = (fn?: () => void, dispose?: () => void) => {
-  useEffect(() => {
-    fn?.();
-    return () => {
-      dispose?.();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-};
+const RecommendTimeFilter: FC<PresentControllerFilterProps> = memo(
+  ({ condition, onConditionChange }) => {
+    const i18NPrefix = 'viz.common.filter.date';
+    return (
+      <TimeSelector.RecommendRangeTimeSelector
+        i18nPrefix={i18NPrefix}
+        condition={condition}
+        onConditionChange={onConditionChange}
+      />
+    );
+  },
+);
 
-export default useMount;
+export default RecommendTimeFilter;

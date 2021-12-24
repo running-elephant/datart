@@ -17,7 +17,6 @@
  */
 
 import { ChartDatasetPageInfo } from 'app/types/ChartDataset';
-import { TimeFilterSubType } from 'app/types/FilterControlPanel';
 import { getStyleValue } from 'app/utils/chartHelper';
 import {
   formatTime,
@@ -32,6 +31,7 @@ import {
   ChartDataSectionField,
   ChartDataSectionType,
   ChartStyleSectionConfig,
+  FilterConditionType,
   RelationFilterValue,
   SortActionType,
 } from '../../../types/ChartConfig';
@@ -161,12 +161,11 @@ export class ChartDataRequestBuilder {
         return true;
       })
       .map(col => col);
-
     return this.normalizeFilters(fields);
   }
 
   private normalizeFilters = (fields: ChartDataSectionField[]) => {
-    const _timeConverter = (visualType, subType, value) => {
+    const _timeConverter = (visualType, value) => {
       if (visualType !== 'DATE') {
         return value;
       }
@@ -199,18 +198,16 @@ export class ChartDataRequestBuilder {
               };
             } else {
               return {
-                value: _timeConverter(
-                  field.filter?.condition?.visualType,
-                  field.filter?.condition?.subType,
-                  v,
-                ),
+                value: _timeConverter(field.filter?.condition?.visualType, v),
                 valueType: field.type,
               };
             }
           })
           .filter(Boolean) as any[];
       }
-      if (field?.filter?.condition?.subType === TimeFilterSubType.Recommend) {
+      if (
+        field?.filter?.condition?.type === FilterConditionType.RecommendTime
+      ) {
         const timeRange = recommendTimeRangeConverter(conditionValue);
         return (timeRange || []).map(t => ({
           value: t,
@@ -221,7 +218,6 @@ export class ChartDataRequestBuilder {
         {
           value: _timeConverter(
             field.filter?.condition?.visualType,
-            field.filter?.condition?.subType,
             conditionValue,
           ),
           valueType: field.type,

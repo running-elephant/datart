@@ -69,8 +69,9 @@ const getFacadeOptions = (condition, category) => {
       case FilterConditionType.Value:
         return [ControllerFacadeTypes.Value];
       case FilterConditionType.RangeTime:
-      case FilterConditionType.RelativeTime: // TODO(Stephen): to be new Range time component for both manual and recomend
-        return [ControllerFacadeTypes.RangeTime];
+        return [ControllerFacadeTypes.RangeTimePicker];
+      case FilterConditionType.RecommendTime:
+        return [ControllerFacadeTypes.RangeTimePicker];
       case FilterConditionType.Tree:
         return [ControllerFacadeTypes.Tree];
     }
@@ -130,6 +131,10 @@ const FilterFacadeConfiguration: FC<
         !facades.includes(currentFacade as ControllerFacadeTypes)
       ) {
         setCurrentFacade(undefined);
+        handleFacadeChange(undefined);
+      } else if (!currentFacade) {
+        setCurrentFacade(facades?.[0]);
+        handleFacadeChange(facades?.[0]);
       }
     }, [condition, category, currentFacade]);
 
