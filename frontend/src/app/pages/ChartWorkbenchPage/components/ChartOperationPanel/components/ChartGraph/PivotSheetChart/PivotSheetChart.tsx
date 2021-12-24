@@ -26,7 +26,7 @@ import {
   getColumnRenderName,
   getCustomSortableColumns,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { isNumber, toFormattedValue } from 'app/utils/number';
 import groupBy from 'lodash/groupBy';
@@ -80,7 +80,7 @@ class PivotSheetChart extends ReactChart {
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );

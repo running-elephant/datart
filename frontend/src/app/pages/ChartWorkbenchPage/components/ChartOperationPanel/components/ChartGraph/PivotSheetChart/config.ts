@@ -238,6 +238,24 @@ const config: ChartConfig = {
   ],
   settings: [
     {
+      label: 'paging.title',
+      key: 'paging',
+      comType: 'group',
+      rows: [
+        {
+          label: 'paging.pageSize',
+          key: 'pageSize',
+          default: 1000,
+          comType: 'inputNumber',
+          options: {
+            needRefresh: true,
+            step: 1,
+            min: 0,
+          },
+        },
+      ],
+    },
+    {
       label: 'summary.rowSummary',
       key: 'rowSummary',
       comType: 'group',
@@ -280,42 +298,6 @@ const config: ChartConfig = {
         },
       ],
     },
-    {
-      label: 'paging.title',
-      key: 'paging',
-      comType: 'group',
-      rows: [
-        {
-          label: 'paging.enablePaging',
-          key: 'enablePaging',
-          default: true,
-          comType: 'checkbox',
-          options: {
-            needRefresh: true,
-          },
-        },
-
-        {
-          label: 'paging.pageSize',
-          key: 'pageSize',
-          default: 2000,
-          comType: 'inputNumber',
-          options: {
-            needRefresh: true,
-            step: 1,
-            min: 0,
-          },
-          watcher: {
-            deps: ['enablePaging'],
-            action: props => {
-              return {
-                disabled: !props.enablePaging,
-              };
-            },
-          },
-        },
-      ],
-    },
   ],
   i18ns: [
     {
@@ -350,11 +332,6 @@ const config: ChartConfig = {
           totalPosition: '总计位置',
           subTotalPosition: '小计位置',
           aggregateFields: '汇总列',
-        },
-        paging: {
-          title: '分页设置',
-          enablePaging: '启用分页',
-          pageSize: '分页大小',
         },
       },
     },
@@ -393,7 +370,6 @@ const config: ChartConfig = {
         },
         paging: {
           title: 'Paging',
-          enablePaging: 'Enable Paging',
           pageSize: 'Page Size',
         },
       },

@@ -1,5 +1,6 @@
 import { Button, Form, Input, message, Modal } from 'antd';
 import { RULES } from 'app/constants';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   selectLoggedInUser,
   selectModifyPasswordLoading,
@@ -21,6 +22,7 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
   const loggedInUser = useSelector(selectLoggedInUser);
   const loading = useSelector(selectModifyPasswordLoading);
   const [form] = Form.useForm();
+  const t = useI18NPrefix('main.nav.account.changePassword');
 
   const reset = useCallback(() => {
     form.resetFields();
@@ -38,7 +40,7 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
         modifyAccountPassword({
           params,
           resolve: () => {
-            message.success('修改成功');
+            message.success(t('success'));
             onCancel();
           },
         }),
@@ -53,7 +55,7 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
 
   return (
     <Modal
-      title="修改密码"
+      title={t('title')}
       footer={false}
       visible={visible}
       onCancel={onCancel}
@@ -66,14 +68,22 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
         wrapperCol={{ span: 12 }}
         onFinish={formSubmit}
       >
-        <FormItem label="旧密码" name="oldPassword" rules={RULES.password}>
-          <Input.Password type="password" />
-        </FormItem>
-        <FormItem label="新密码" name="newPassword" rules={RULES.password}>
+        <FormItem
+          label={t('oldPassword')}
+          name="oldPassword"
+          rules={RULES.password}
+        >
           <Input.Password type="password" />
         </FormItem>
         <FormItem
-          label="确认新密码"
+          label={t('newPassword')}
+          name="newPassword"
+          rules={RULES.password}
+        >
+          <Input.Password type="password" />
+        </FormItem>
+        <FormItem
+          label={t('confirmPassword')}
           name="confirmPassword"
           dependencies={['newPassword']}
           rules={confirmRule}
@@ -82,7 +92,7 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
         </FormItem>
         <Form.Item wrapperCol={{ offset: 7, span: 12 }}>
           <Button type="primary" htmlType="submit" loading={loading} block>
-            保存
+            {t('save')}
           </Button>
         </Form.Item>
       </Form>

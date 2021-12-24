@@ -15,10 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * @param callbackFn 回调函数返回一个颜色数组
- * @param children 点击弹出按钮的文字 支持文字和html类型
- */
+
 import { List, Popover } from 'antd';
 import { colorThemes } from 'app/assets/theme/colorsConfig';
 import React, { useState } from 'react';
@@ -27,6 +24,10 @@ import styled from 'styled-components/macro';
 import { FONT_SIZE_BODY, G10, SPACE_TIMES } from 'styles/StyleConstants';
 import { themeColorPropTypes } from './slice/types';
 
+/**
+ * @param callbackFn 回调函数返回一个颜色数组
+ * @param children 点击弹出按钮的文字 支持文字和html类型
+ */
 function ThemeColorSelection({ children, callbackFn }: themeColorPropTypes) {
   const [switchStatus, setSwitchStatus] = useState(false);
   const [colors] = useState(colorThemes);
@@ -89,7 +90,7 @@ const ChooseThemeSpan = styled.div`
   display: inline-block;
   width: max-content;
   &:hover {
-    color: ${p => p.theme.blue};
+    color: ${p => p.theme.primary};
   }
 `;
 const ColorWrapAlert = styled.div`

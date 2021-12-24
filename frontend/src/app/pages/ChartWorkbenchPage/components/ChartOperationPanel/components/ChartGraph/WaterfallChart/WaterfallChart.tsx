@@ -24,7 +24,7 @@ import {
   getCustomSortableColumns,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
@@ -90,7 +90,7 @@ class WaterfallChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
 
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );

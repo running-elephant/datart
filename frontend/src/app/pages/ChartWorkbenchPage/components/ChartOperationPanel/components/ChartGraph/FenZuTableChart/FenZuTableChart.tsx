@@ -20,7 +20,7 @@ import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import {
   getCustomSortableColumns,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import BasicTableChart from '../BasicTableChart';
 import Config from './config';
@@ -38,7 +38,12 @@ class FenZuTableChart extends BasicTableChart {
     });
   }
 
-  getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
+  getOptions(
+    context,
+    dataset?: ChartDataset,
+    config?: ChartConfig,
+    widgetSpecialConfig?: any,
+  ) {
     if (!dataset || !config) {
       return { locale: { emptyText: '  ' } };
     }
@@ -46,7 +51,7 @@ class FenZuTableChart extends BasicTableChart {
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );
@@ -70,7 +75,7 @@ class FenZuTableChart extends BasicTableChart {
         dataColumns,
       ),
       summaryFn: undefined as any,
-      components: this.getTableComponents(styleConfigs),
+      components: this.getTableComponents(styleConfigs, widgetSpecialConfig),
       ...this.getAntdTableStyleOptions(
         styleConfigs,
         dataset,

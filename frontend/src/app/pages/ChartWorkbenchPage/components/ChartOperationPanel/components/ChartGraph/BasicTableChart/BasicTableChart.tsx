@@ -25,7 +25,7 @@ import {
   getCustomSortableColumns,
   getUnusedHeaderRows,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { isEmptyArray, Omit } from 'utils/object';
@@ -36,6 +36,7 @@ import {
   getCustomBodyRowStyle,
 } from './conditionStyle';
 import Config from './config';
+import { TableComponentsTd } from './TableComponents';
 
 class BasicTableChart extends ReactChart {
   _useIFrame = false;
@@ -73,7 +74,12 @@ class BasicTableChart extends ReactChart {
     }
 
     this.adapter?.updated(
-      this.getOptions(context, options.dataset, options.config),
+      this.getOptions(
+        context,
+        options.dataset,
+        options.config,
+        options.widgetSpecialConfig,
+      ),
       context,
     );
   }
@@ -82,7 +88,12 @@ class BasicTableChart extends ReactChart {
     this.onUpdated(this.tableOptions, context);
   }
 
-  getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
+  getOptions(
+    context,
+    dataset?: ChartDataset,
+    config?: ChartConfig,
+    widgetSpecialConfig?: any,
+  ) {
     if (!dataset || !config) {
       return { locale: { emptyText: '  ' } };
     }
@@ -91,7 +102,7 @@ class BasicTableChart extends ReactChart {
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
 
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );
@@ -138,7 +149,7 @@ class BasicTableChart extends ReactChart {
         tableColumns,
         aggregateConfigs,
       ),
-      components: this.getTableComponents(styleConfigs),
+      components: this.getTableComponents(styleConfigs, widgetSpecialConfig),
       ...this.getAntdTableStyleOptions(
         styleConfigs,
         dataset,
@@ -293,7 +304,9 @@ class BasicTableChart extends ReactChart {
     });
   }
 
-  getTableComponents(styleConfigs) {
+  getTableComponents(styleConfigs, widgetSpecialConfig) {
+    const { linkFields, jumpField } = widgetSpecialConfig;
+
     const tableHeaders = this.getStyleValue(styleConfigs, [
       'header',
       'modal',
@@ -344,7 +357,7 @@ class BasicTableChart extends ReactChart {
       header: {
         cell: props => {
           const uid = props.uid;
-          const { style, ...rest } = props;
+          const { style, title, ...rest } = props;
           const header = this.findHeader(uid, tableHeaders || []);
           const cellCssStyle = {
             textAlign: headerTextAlign,
@@ -368,7 +381,7 @@ class BasicTableChart extends ReactChart {
       },
       body: {
         cell: props => {
-          const { style, ...rest } = props;
+          const { style, dataIndex, ...rest } = props;
           const uid = props.uid;
           const conditionStyle = this.getStyleValue(getAllColumnListInfo, [
             uid,
@@ -380,9 +393,11 @@ class BasicTableChart extends ReactChart {
             conditionStyle,
           );
           return (
-            <td
+            <TableComponentsTd
               {...rest}
               style={Object.assign(style || {}, conditionalCellStyle)}
+              isLinkCell={linkFields?.includes(dataIndex)}
+              isJumpCell={jumpField === dataIndex}
             />
           );
         },
@@ -499,10 +514,12 @@ class BasicTableChart extends ReactChart {
             return {
               uid: c.uid,
               cellValue,
+              dataIndex: getValueByColumnKey(c),
               ...this.registerTableCellEvents(
                 getValueByColumnKey(c),
-                rowIndex,
                 cellValue,
+                rowIndex,
+                record,
               ),
             };
           },
@@ -665,19 +682,29 @@ class BasicTableChart extends ReactChart {
       : false;
   }
 
+  createrEventParams = params => ({
+    type: 'click',
+    componentType: 'table',
+    seriesType: undefined,
+    data: undefined,
+    dataIndex: undefined,
+    event: undefined,
+    name: undefined,
+    seriesName: undefined,
+    value: undefined,
+    ...params,
+  });
+
   invokePagingRelatedEvents(seriesName: string, value: any, pageNo: number) {
-    const eventParams = {
-      componentType: 'table',
+    const eventParams = this.createrEventParams({
       seriesType: 'paging-sort-filter',
-      name: '',
       seriesName,
-      dataIndex: undefined,
       value: {
         direction:
           value === undefined ? undefined : value === 'ascend' ? 'ASC' : 'DESC',
         pageNo,
       },
-    };
+    });
     this._mouseEvents?.forEach(cur => {
       if (cur.name === 'click') {
         cur.callback?.(eventParams);
@@ -685,39 +712,50 @@ class BasicTableChart extends ReactChart {
     });
   }
 
-  registerTableCellEvents(seriesName: string, dataIndex: number, value: any) {
-    const eventParams = {
-      componentType: 'table',
+  registerTableCellEvents(
+    seriesName: string,
+    value: any,
+    dataIndex: number,
+    record: any,
+  ) {
+    const eventParams = this.createrEventParams({
       seriesType: 'body',
-      name: value,
+      name: seriesName,
+      data: {
+        format: undefined,
+        name: seriesName,
+        rowData: record,
+        value: value,
+      },
       seriesName, // column name/index
       dataIndex, // row index
       value, // cell value
-    };
+    });
     return this._mouseEvents?.reduce((acc, cur) => {
+      cur.name && (eventParams.type = cur.name);
       if (cur.name === 'click') {
         Object.assign(acc, {
-          onClick: event => cur.callback?.(eventParams),
+          onClick: event => cur.callback?.({ ...eventParams, event }),
         });
       }
       if (cur.name === 'dblclick') {
         Object.assign(acc, {
-          onDoubleClick: event => cur.callback?.(eventParams),
+          onDoubleClick: event => cur.callback?.({ ...eventParams, event }),
         });
       }
       if (cur.name === 'contextmenu') {
         Object.assign(acc, {
-          onContextMenu: event => cur.callback?.(eventParams),
+          onContextMenu: event => cur.callback?.({ ...eventParams, event }),
         });
       }
       if (cur.name === 'mouseover') {
         Object.assign(acc, {
-          onMouseEnter: event => cur.callback?.(eventParams),
+          onMouseEnter: event => cur.callback?.({ ...eventParams, event }),
         });
       }
       if (cur.name === 'mouseout') {
         Object.assign(acc, {
-          onMouseLeave: event => cur.callback?.(eventParams),
+          onMouseLeave: event => cur.callback?.({ ...eventParams, event }),
         });
       }
       return acc;

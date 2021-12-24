@@ -47,6 +47,26 @@ function D3JSScatterChart({ dHelper }) {
           ],
         },
       ],
+      settings: [
+        {
+          label: 'paging.title',
+          key: 'paging',
+          comType: 'group',
+          rows: [
+            {
+              label: 'paging.pageSize',
+              key: 'pageSize',
+              default: 1000,
+              comType: 'inputNumber',
+              options: {
+                needRefresh: true,
+                step: 1,
+                min: 0,
+              },
+            },
+          ],
+        },
+      ],
       i18ns: [
         {
           lang: 'zh-CN',
@@ -173,7 +193,7 @@ function D3JSScatterChart({ dHelper }) {
         .flatMap(config => config.rows || []);
 
       // 数据转换，根据Datart提供了Helper转换工具
-      const objDataColumns = dHelper.transfromToObjectArray(
+      const objDataColumns = dHelper.transformToObjectArray(
         dataset.rows,
         dataset.columns,
       );

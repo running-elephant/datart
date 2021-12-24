@@ -410,7 +410,26 @@ function DemoCustomLineChart({ dHelper }) {
           ],
         },
       ],
-      settings: [],
+      settings: [
+        {
+          label: 'paging.title',
+          key: 'paging',
+          comType: 'group',
+          rows: [
+            {
+              label: 'paging.pageSize',
+              key: 'pageSize',
+              default: 1000,
+              comType: 'inputNumber',
+              options: {
+                needRefresh: true,
+                step: 1,
+                min: 0,
+              },
+            },
+          ],
+        },
+      ],
       i18ns: [
         {
           lang: 'zh-CN',
@@ -472,9 +491,6 @@ function DemoCustomLineChart({ dHelper }) {
               title: '参考线',
               open: '点击参考线配置',
             },
-            cache: {
-              title: '数据处理',
-            },
           },
         },
       ],
@@ -532,7 +548,7 @@ function DemoCustomLineChart({ dHelper }) {
         .filter(c => c.type === 'aggregate')
         .flatMap(config => config.rows || []);
 
-      const objDataColumns = dHelper.transfromToObjectArray(
+      const objDataColumns = dHelper.transformToObjectArray(
         dataset.rows,
         dataset.columns,
       );

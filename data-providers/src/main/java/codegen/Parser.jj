@@ -2071,6 +2071,10 @@ SqlNode TableRef2(boolean lateral) :
 }
 {
     (
+        // datart: function as table
+        LOOKAHEAD(256,TableFunctionCall(getPos()))
+        tableRef = TableFunctionCall(getPos())
+    |
         LOOKAHEAD(2)
         tableRef = TableRefWithHintsOpt()
         [
@@ -2133,6 +2137,7 @@ SqlNode TableRef2(boolean lateral) :
         }
     |
         tableRef = ExtendedTableRef()
+
     )
     [
         tableRef = Pivot(tableRef)

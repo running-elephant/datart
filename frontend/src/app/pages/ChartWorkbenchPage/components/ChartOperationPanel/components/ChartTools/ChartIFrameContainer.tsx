@@ -34,6 +34,7 @@ const ChartIFrameContainer: FC<{
   containerId?: string;
   width?: any;
   height?: any;
+  widgetSpecialConfig?: any;
 }> = memo(props => {
   const transformToSafeCSSProps = (width, height) => {
     let newStyle = { width, height };
@@ -59,6 +60,7 @@ const ChartIFrameContainer: FC<{
             chart={props.chart}
             config={props.config}
             style={transformToSafeCSSProps(props?.width, props?.height)}
+            widgetSpecialConfig={props.widgetSpecialConfig}
           />
         </div>
       );
@@ -94,6 +96,7 @@ const ChartIFrameContainer: FC<{
                   chart={props.chart}
                   config={props.config}
                   style={transformToSafeCSSProps(props?.width, props?.height)}
+                  widgetSpecialConfig={props.widgetSpecialConfig}
                 />
               </StyledChartLifecycleAdapter>
             </StyleSheetManager>

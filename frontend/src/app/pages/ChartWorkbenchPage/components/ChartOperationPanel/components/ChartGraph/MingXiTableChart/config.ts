@@ -303,36 +303,6 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'summary.title',
-      key: 'summary',
-      comType: 'group',
-      rows: [
-        {
-          label: 'summary.aggregateFields',
-          key: 'aggregateFields',
-          comType: 'select',
-          options: {
-            mode: 'multiple',
-            getItems: cols => {
-              const columns = (cols || [])
-                .filter(col => ['mixed'].includes(col.type))
-                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-                .filter(c => c.type === 'NUMERIC')
-                .map(c => ({
-                  key: c.uid,
-                  value: c.uid,
-                  label:
-                    c.label || c.aggregate
-                      ? `${c.aggregate}(${c.colName})`
-                      : c.colName,
-                }));
-              return columns;
-            },
-          },
-        },
-      ],
-    },
-    {
       label: 'paging.title',
       key: 'paging',
       comType: 'group',
@@ -363,6 +333,36 @@ const config: ChartConfig = {
               return {
                 disabled: !props.enablePaging,
               };
+            },
+          },
+        },
+      ],
+    },
+    {
+      label: 'summary.title',
+      key: 'summary',
+      comType: 'group',
+      rows: [
+        {
+          label: 'summary.aggregateFields',
+          key: 'aggregateFields',
+          comType: 'select',
+          options: {
+            mode: 'multiple',
+            getItems: cols => {
+              const columns = (cols || [])
+                .filter(col => ['mixed'].includes(col.type))
+                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
+                .filter(c => c.type === 'NUMERIC')
+                .map(c => ({
+                  key: c.uid,
+                  value: c.uid,
+                  label:
+                    c.label || c.aggregate
+                      ? `${c.aggregate}(${c.colName})`
+                      : c.colName,
+                }));
+              return columns;
             },
           },
         },
@@ -412,7 +412,7 @@ const config: ChartConfig = {
           aggregateFields: '汇总列',
         },
         paging: {
-          title: '分页设置',
+          title: '常规',
           enablePaging: '启用分页',
           pageSize: '分页大小',
         },

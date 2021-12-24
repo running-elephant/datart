@@ -35,7 +35,9 @@ import {
   RelationFilterValue,
   SortActionType,
 } from '../../../types/ChartConfig';
-import ChartDataView from '../../../types/ChartDataView';
+import ChartDataView, {
+  ChartDataViewFieldType,
+} from '../../../types/ChartDataView';
 
 export type ChartRequest = {
   viewId: string;
@@ -281,19 +283,15 @@ export class ChartDataRequestBuilder {
 
   private buildPageInfo() {
     const settingStyles = this.charSettingConfigs;
+    const pageSize = getStyleValue(settingStyles, ['paging', 'pageSize']);
     const enablePaging = getStyleValue(settingStyles, [
       'paging',
       'enablePaging',
     ]);
-    const pageSize = getStyleValue(settingStyles, ['paging', 'pageSize']);
-    if (!enablePaging) {
-      return {
-        pageSize: Number.MAX_SAFE_INTEGER,
-      };
-    }
     return {
+      countTotal: !!enablePaging,
       pageNo: this.pageInfo?.pageNo,
-      pageSize: pageSize || 10,
+      pageSize: pageSize || 1000,
     };
   }
 
@@ -363,6 +361,13 @@ export class ChartDataRequestBuilder {
           cur.type === ChartDataSectionType.COLOR
         ) {
           return acc.concat(cur.rows);
+        }
+        if (cur.type === ChartDataSectionType.MIXED) {
+          return acc.concat(
+            cur.rows.filter(
+              ({ type }) => type === ChartDataViewFieldType.STRING,
+            ),
+          );
         }
         return acc;
       },

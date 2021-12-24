@@ -29,13 +29,16 @@ import { BoardToolBarContext } from '../context/BoardToolBarContext';
 import { WithTipButton } from '../ToolBarItem';
 export interface AddControlBtnProps {}
 export interface ButtonItemType<T> {
-  name: string;
+  name?: string;
   icon: any;
   type: T;
   disabled?: boolean;
 }
 export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   const t = useI18NPrefix(`viz.board.action`);
+  const tFilterName = useI18NPrefix(`viz.common.enum.controllerFacadeTypes`);
+  const tType = useI18NPrefix(`viz.board.controlTypes`);
+
   const { boardId, boardType, showLabel } = useContext(BoardToolBarContext);
   const dispatch = useDispatch();
   const { config: boardConfig } = useContext(BoardConfigContext);
@@ -51,27 +54,22 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   };
   const conventionalControllers: ButtonItemType<ControllerFacadeTypes>[] = [
     {
-      name: '单选下拉菜单',
       icon: '',
       type: ControllerFacadeTypes.DropdownList,
     },
     {
-      name: '多选下拉菜单',
       icon: '',
       type: ControllerFacadeTypes.MultiDropdownList,
     },
     {
-      name: '单选按钮',
       icon: '',
       type: ControllerFacadeTypes.RadioGroup,
     },
     {
-      name: '多选框',
       icon: '',
       type: ControllerFacadeTypes.CheckboxGroup,
     },
     {
-      name: '文本',
       icon: '',
       type: ControllerFacadeTypes.Text,
     },
@@ -88,31 +86,26 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
     //   disabled: false,
     // },
   ];
-  const dateControllers = [
+  const dateControllers: ButtonItemType<ControllerFacadeTypes>[] = [
     {
-      name: '日期范围',
       icon: '',
       type: ControllerFacadeTypes.RangeTime,
     },
     {
-      name: '日期',
       icon: '',
       type: ControllerFacadeTypes.Time,
     },
   ];
-  const numericalControllers = [
+  const numericalControllers: ButtonItemType<ControllerFacadeTypes>[] = [
     {
-      name: '数值范围',
       icon: '',
       type: ControllerFacadeTypes.RangeValue,
     },
     {
-      name: '数值',
       icon: '',
       type: ControllerFacadeTypes.Value,
     },
     {
-      name: '滑块',
       icon: '',
       type: ControllerFacadeTypes.Slider,
     },
@@ -142,28 +135,37 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   };
   const controlerItems = (
     <Menu onClick={onAddControler}>
-      <Menu.ItemGroup key="conventionalControllers" title={renderTitle('常规')}>
-        {conventionalControllers.map(({ name, icon, type }) => (
+      <Menu.ItemGroup
+        key="conventionalControllers"
+        title={renderTitle(tType('common'))}
+      >
+        {conventionalControllers.map(({ icon, type }) => (
           <Menu.Item key={type} icon={icon}>
-            {name}
+            {tFilterName(type)}
           </Menu.Item>
         ))}
       </Menu.ItemGroup>
-      <Menu.ItemGroup key="dateControllers" title={renderTitle('日期')}>
-        {dateControllers.map(({ name, icon, type }) => (
+      <Menu.ItemGroup key="dateControllers" title={renderTitle(tType('date'))}>
+        {dateControllers.map(({ icon, type }) => (
           <Menu.Item key={type} icon={icon}>
-            {name}
+            {tFilterName(type)}
           </Menu.Item>
         ))}
       </Menu.ItemGroup>
-      <Menu.ItemGroup key="numericalControllers" title={renderTitle('数值')}>
-        {numericalControllers.map(({ name, icon, type }) => (
+      <Menu.ItemGroup
+        key="numericalControllers"
+        title={renderTitle(tType('numeric'))}
+      >
+        {numericalControllers.map(({ icon, type }) => (
           <Menu.Item key={type} icon={icon}>
-            {name}
+            {tFilterName(type)}
           </Menu.Item>
         ))}
       </Menu.ItemGroup>
-      <Menu.ItemGroup key="buttonControllers" title={renderTitle('按钮')}>
+      <Menu.ItemGroup
+        key="buttonControllers"
+        title={renderTitle(tType('button'))}
+      >
         {buttonControllers.map(({ name, icon, type, disabled }) => (
           <Menu.Item key={type} icon={icon} disabled={disabled}>
             {name}

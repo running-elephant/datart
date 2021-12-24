@@ -13,6 +13,7 @@ import {
 import { List, Menu, Tooltip } from 'antd';
 import logo from 'app/assets/images/logo.svg';
 import { Avatar, MenuListItem, Popup } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   selectCurrentOrganization,
   selectDownloadPolling,
@@ -66,7 +67,7 @@ export function Navbar() {
     '/organizations/:orgId/:moduleName',
   );
   const { i18n } = useTranslation();
-
+  const t = useI18NPrefix('main');
   const brandClick = useCallback(() => {
     history.push('/');
   }, [history]);
@@ -91,13 +92,13 @@ export function Navbar() {
     () => [
       {
         name: 'variables',
-        title: '公共变量设置',
+        title: t('subNavs.variables.title'),
         icon: <FunctionOutlined />,
         module: ResourceTypes.Manager,
       },
       {
         name: 'orgSettings',
-        title: '组织设置',
+        title: t('subNavs.orgSettings.title'),
         icon: <SettingOutlined />,
         module: ResourceTypes.Manager,
       },
@@ -109,31 +110,31 @@ export function Navbar() {
     () => [
       {
         name: 'vizs',
-        title: '可视化',
+        title: t('nav.vizs'),
         icon: <i className="iconfont icon-xietongzhihuidaping" />,
         module: ResourceTypes.Viz,
       },
       {
         name: 'views',
-        title: '数据视图',
+        title: t('nav.views'),
         icon: <i className="iconfont icon-24gf-table" />,
         module: ResourceTypes.View,
       },
       {
         name: 'sources',
-        title: '数据源',
+        title: t('nav.sources'),
         icon: <i className="iconfont icon-shujukupeizhi" />,
         module: ResourceTypes.Source,
       },
       {
         name: 'schedules',
-        title: '定时任务',
+        title: t('nav.schedules'),
         icon: <i className="iconfont icon-fasongyoujian" />,
         module: ResourceTypes.Schedule,
       },
       {
         name: 'members',
-        title: '成员与角色',
+        title: t('nav.members'),
         icon: <i className="iconfont icon-users1" />,
         isActive: (_, location) =>
           !!location.pathname.match(
@@ -143,13 +144,13 @@ export function Navbar() {
       },
       {
         name: 'permissions',
-        title: '权限',
+        title: t('nav.permissions'),
         icon: <SafetyCertificateFilled />,
         module: ResourceTypes.Manager,
       },
       {
         name: 'toSub',
-        title: '设置',
+        title: t('nav.settings'),
         icon: <SettingFilled />,
         isActive: (_, location) => {
           const reg = new RegExp(
@@ -273,19 +274,19 @@ export function Navbar() {
                   key="profile"
                   prefix={<ProfileOutlined className="icon" />}
                 >
-                  <p>账号设置</p>
+                  <p>{t('nav.account.accountSettings.title')}</p>
                 </MenuListItem>
                 <MenuListItem
                   key="password"
                   prefix={<FormOutlined className="icon" />}
                 >
-                  <p>修改密码</p>
+                  <p>{t('nav.account.changePassword.title')}</p>
                 </MenuListItem>
 
                 <Menu.SubMenu
                   icon={<SwapOutlined className="icon" />}
                   key="language"
-                  title="切换语言"
+                  title={t('nav.account.switchLanguage.title')}
                 >
                   <Menu.Item key="zh">中文</Menu.Item>
                   <Menu.Item key="en">English</Menu.Item>
@@ -294,7 +295,7 @@ export function Navbar() {
                   key="logout"
                   prefix={<ExportOutlined className="icon" />}
                 >
-                  <p>退出登录</p>
+                  <p>{t('nav.account.logout.title')}</p>
                 </MenuListItem>
               </Menu>
             }

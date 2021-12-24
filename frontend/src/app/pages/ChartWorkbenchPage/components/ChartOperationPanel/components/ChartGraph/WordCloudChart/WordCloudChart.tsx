@@ -23,7 +23,7 @@ import {
   getDefaultThemeColor,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import 'echarts-wordcloud';
@@ -93,7 +93,7 @@ class WordCloudChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
 
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );
