@@ -14,8 +14,10 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Provider } from 'react-redux';
 import { configureAppStore } from 'redux/configureStore';
 import { ThemeProvider } from 'styles/theme/ThemeProvider';
+import { Debugger } from 'utils/debugger';
 import './locales/i18n';
 
+Debugger.instance.setEnable(true);
 export const store = configureAppStore();
 const MOUNT_NODE = document.getElementById('root') as HTMLElement;
 /**
