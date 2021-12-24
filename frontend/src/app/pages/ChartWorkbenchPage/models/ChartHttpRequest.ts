@@ -35,9 +35,7 @@ import {
   RelationFilterValue,
   SortActionType,
 } from '../../../types/ChartConfig';
-import ChartDataView, {
-  ChartDataViewFieldType,
-} from '../../../types/ChartDataView';
+import ChartDataView from '../../../types/ChartDataView';
 
 export type ChartRequest = {
   viewId: string;
@@ -362,13 +360,14 @@ export class ChartDataRequestBuilder {
         ) {
           return acc.concat(cur.rows);
         }
-        if (cur.type === ChartDataSectionType.MIXED) {
-          return acc.concat(
-            cur.rows.filter(
-              ({ type }) => type === ChartDataViewFieldType.STRING,
-            ),
-          );
-        }
+        // TODO(TMBigGroup): Mixed Section类型为什么需要加入到sql请求的group中？
+        // if (cur.type === ChartDataSectionType.MIXED) {
+        //   return acc.concat(
+        //     cur.rows.filter(
+        //       ({ type }) => type === ChartDataViewFieldType.STRING,
+        //     ),
+        //   );
+        // }
         return acc;
       },
       [],

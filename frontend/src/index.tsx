@@ -14,18 +14,17 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Provider } from 'react-redux';
 import { configureAppStore } from 'redux/configureStore';
 import { ThemeProvider } from 'styles/theme/ThemeProvider';
+import { Debugger } from 'utils/debugger';
 import './locales/i18n';
 
-export const store = configureAppStore();
 const MOUNT_NODE = document.getElementById('root') as HTMLElement;
-/**
- *  hot-key [control,shift,command,c]
- */
+const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
+const InspectorWrapper = IS_DEVELOPMENT ? Inspector : React.Fragment;
 
+Debugger.instance.setEnable(IS_DEVELOPMENT);
+export const store = configureAppStore();
 const MainApp = <App />;
 
-const InspectorWrapper =
-  process.env.NODE_ENV === 'development' ? Inspector : React.Fragment;
 ChartManager.instance()
   .load()
   .catch(err => console.error('Fail to load customize charts with ', err))
@@ -52,7 +51,7 @@ ChartManager.instance()
       });
     }
 
-    if (process.env.NODE_ENV === 'production') {
+    if (!IS_DEVELOPMENT) {
       if (typeof (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__ === 'object') {
         (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__.inject = () => void 0;
       }
