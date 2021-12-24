@@ -31,8 +31,12 @@ export class Debugger {
     this._enableDebug = !!enable;
   }
 
-  public async measure(info: string, fn: VoidFunction) {
-    if (!this._enableDebug) {
+  public async measure(
+    info: string,
+    fn: VoidFunction,
+    forceEnable: boolean = true,
+  ) {
+    if (!this._enableDebug || !forceEnable) {
       return await fn();
     }
 
