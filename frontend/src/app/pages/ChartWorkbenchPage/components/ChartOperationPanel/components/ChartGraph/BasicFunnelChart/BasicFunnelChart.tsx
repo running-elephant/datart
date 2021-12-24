@@ -105,19 +105,17 @@ class BasicFunnelChart extends Chart {
     );
     const dataList = !groupConfigs.length
       ? objDataColumns
-      : objDataColumns.sort((a, b) => {
-          return (
-            b[getValueByColumnKey(aggregateConfigs[0])] -
-            a[getValueByColumnKey(aggregateConfigs[0])]
-          );
-        });
+      : objDataColumns?.sort(
+          (a, b) =>
+            b?.[getValueByColumnKey(aggregateConfigs[0])] -
+            a?.[getValueByColumnKey(aggregateConfigs[0])],
+        );
     const aggregateList = !groupConfigs.length
-      ? aggregateConfigs.sort((a, b) => {
-          return (
-            objDataColumns[0][getValueByColumnKey(b)] -
-            objDataColumns[0][getValueByColumnKey(a)]
-          );
-        })
+      ? aggregateConfigs?.sort(
+          (a, b) =>
+            objDataColumns?.[0]?.[getValueByColumnKey(b)] -
+            objDataColumns?.[0]?.[getValueByColumnKey(a)],
+        )
       : aggregateConfigs;
 
     const series = this.getSeries(
