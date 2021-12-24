@@ -1,16 +1,8 @@
 import { LoadingOutlined } from '@ant-design/icons';
-import {
-  Button,
-  Card,
-  Form,
-  Input,
-  message,
-  Popconfirm,
-  Select,
-  Space,
-} from 'antd';
+import { Button, Card, Form, Input, message, Popconfirm, Select } from 'antd';
+import { Authorized, EmptyFiller } from 'app/components';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
-import { Access, useAccess } from 'app/pages/MainPage/Access';
+import { useAccess } from 'app/pages/MainPage/Access';
 import debounce from 'debounce-promise';
 import {
   CommonFormTypes,
@@ -52,7 +44,7 @@ import {
   unarchiveSource,
 } from '../slice/thunks';
 import { Source, SourceFormModel } from '../slice/types';
-import { allowManageSource } from '../utils';
+import { allowCreateSource, allowManageSource } from '../utils';
 import { ConfigComponent } from './ConfigComponent';
 
 export function SourceDetailPage() {
@@ -76,7 +68,10 @@ export function SourceDetailPage() {
   const { sourceId } = params;
   const [form] = Form.useForm<SourceFormModel>();
   const isArchived = editingSource?.status === 0;
-  const allowManage = useAccess(allowManageSource(editingSource?.id));
+  const allowCreate =
+    useAccess(allowCreateSource())(true) && sourceId === 'add';
+  const allowManage =
+    useAccess(allowManageSource(sourceId))(true) && sourceId !== 'add';
 
   const config = useMemo(
     () => dataProviders[providerType]?.config,
@@ -290,13 +285,16 @@ export function SourceDetailPage() {
   );
 
   return (
-    <Wrapper>
-      <DetailPageHeader
-        title={`${titleLabelPrefix}数据源`}
-        actions={
-          <Access {...allowManageSource(editingSource?.id)}>
-            {!isArchived ? (
-              <Space>
+    <Authorized
+      authority={allowCreate || allowManage}
+      denied={<EmptyFiller title="您没有权限访问该页面" />}
+    >
+      <Wrapper>
+        <DetailPageHeader
+          title={`${titleLabelPrefix}数据源`}
+          actions={
+            !isArchived ? (
+              <>
                 <Button
                   type="primary"
                   loading={saveSourceLoading}
@@ -311,9 +309,9 @@ export function SourceDetailPage() {
                     </Button>
                   </Popconfirm>
                 )}
-              </Space>
+              </>
             ) : (
-              <Space>
+              <>
                 <Popconfirm title="确定还原？" onConfirm={unarchive}>
                   <Button loading={unarchiveSourceLoading}>还原</Button>
                 </Popconfirm>
@@ -322,85 +320,85 @@ export function SourceDetailPage() {
                     删除
                   </Button>
                 </Popconfirm>
-              </Space>
-            )}
-          </Access>
-        }
-      />
-      <Content>
-        <Card bordered={false}>
-          <Form
-            name="source_form_"
-            className="detailForm"
-            form={form}
-            labelAlign="left"
-            labelCol={{ offset: 1, span: 5 }}
-            wrapperCol={{ span: 8 }}
-            onFinish={formSubmit}
-          >
-            <Form.Item
-              name="name"
-              label="名称"
-              validateFirst
-              rules={[
-                { required: true, message: '名称不能为空' },
-                {
-                  validator: debounce((_, value) => {
-                    if (value === editingSource?.name) {
-                      return Promise.resolve();
-                    }
-                    return request({
-                      url: `/sources/check/name`,
-                      method: 'POST',
-                      params: { name: value, orgId },
-                    }).then(
-                      () => Promise.resolve(),
-                      () => Promise.reject(new Error('名称重复')),
-                    );
-                  }, DEFAULT_DEBOUNCE_WAIT),
-                },
-              ]}
+              </>
+            )
+          }
+        />
+        <Content>
+          <Card bordered={false}>
+            <Form
+              name="source_form_"
+              className="detailForm"
+              form={form}
+              labelAlign="left"
+              labelCol={{ offset: 1, span: 5 }}
+              wrapperCol={{ span: 8 }}
+              onFinish={formSubmit}
             >
-              <Input disabled={isArchived} />
-            </Form.Item>
-            <Form.Item
-              name="type"
-              label="类型"
-              rules={[{ required: true, message: '类型为必选项' }]}
-            >
-              <Select
-                loading={dataProviderListLoading}
-                disabled={isArchived}
-                onChange={dataProviderChange}
+              <Form.Item
+                name="name"
+                label="名称"
+                validateFirst
+                rules={[
+                  { required: true, message: '名称不能为空' },
+                  {
+                    validator: debounce((_, value) => {
+                      if (value === editingSource?.name) {
+                        return Promise.resolve();
+                      }
+                      return request({
+                        url: `/sources/check/name`,
+                        method: 'POST',
+                        params: { name: value, orgId },
+                      }).then(
+                        () => Promise.resolve(),
+                        () => Promise.reject(new Error('名称重复')),
+                      );
+                    }, DEFAULT_DEBOUNCE_WAIT),
+                  },
+                ]}
               >
-                {Object.keys(dataProviders).map(key => (
-                  <Select.Option key={key} value={key}>
-                    {key}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            {dataProviderConfigTemplateLoading && <LoadingOutlined />}
-
-            {(providerType !== 'FILE' || formType === CommonFormTypes.Edit) &&
-              config?.attributes.map(attr => (
-                <ConfigComponent
-                  key={`${providerType}_${attr.name}`}
-                  attr={attr}
-                  form={form}
-                  sourceId={editingSource?.id}
-                  testLoading={testLoading}
+                <Input disabled={isArchived} />
+              </Form.Item>
+              <Form.Item
+                name="type"
+                label="类型"
+                rules={[{ required: true, message: '类型为必选项' }]}
+              >
+                <Select
+                  loading={dataProviderListLoading}
                   disabled={isArchived}
-                  allowManage={allowManage(true)}
-                  onTest={test}
-                  onSubFormTest={subFormTest}
-                  onDbTypeChange={dbTypeChange}
-                />
-              ))}
-          </Form>
-        </Card>
-      </Content>
-    </Wrapper>
+                  onChange={dataProviderChange}
+                >
+                  {Object.keys(dataProviders).map(key => (
+                    <Select.Option key={key} value={key}>
+                      {key}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              {dataProviderConfigTemplateLoading && <LoadingOutlined />}
+
+              {(providerType !== 'FILE' || formType === CommonFormTypes.Edit) &&
+                config?.attributes.map(attr => (
+                  <ConfigComponent
+                    key={`${providerType}_${attr.name}`}
+                    attr={attr}
+                    form={form}
+                    sourceId={editingSource?.id}
+                    testLoading={testLoading}
+                    disabled={isArchived}
+                    allowManage={allowManage}
+                    onTest={test}
+                    onSubFormTest={subFormTest}
+                    onDbTypeChange={dbTypeChange}
+                  />
+                ))}
+            </Form>
+          </Card>
+        </Content>
+      </Wrapper>
+    </Authorized>
   );
 }
 
