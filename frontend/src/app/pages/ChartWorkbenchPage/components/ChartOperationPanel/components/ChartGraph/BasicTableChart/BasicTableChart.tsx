@@ -305,7 +305,8 @@ class BasicTableChart extends ReactChart {
   }
 
   getTableComponents(styleConfigs, widgetSpecialConfig) {
-    const { linkFields, jumpField } = widgetSpecialConfig;
+    const linkFields = widgetSpecialConfig?.linkFields;
+    const jumpField = widgetSpecialConfig?.jumpField;
 
     const tableHeaders = this.getStyleValue(styleConfigs, [
       'header',
