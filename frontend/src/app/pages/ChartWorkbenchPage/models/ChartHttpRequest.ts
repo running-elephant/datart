@@ -360,7 +360,7 @@ export class ChartDataRequestBuilder {
         ) {
           return acc.concat(cur.rows);
         }
-        // TODO(TMGigGoup): Mixed Section类型为什么需要加入到sql请求的group中？
+        // TODO(TMBigGroup): Mixed Section类型为什么需要加入到sql请求的group中？
         // if (cur.type === ChartDataSectionType.MIXED) {
         //   return acc.concat(
         //     cur.rows.filter(
