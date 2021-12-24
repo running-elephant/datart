@@ -25,39 +25,35 @@ Debugger.instance.setEnable(IS_DEVELOPMENT);
 export const store = configureAppStore();
 const MainApp = <App />;
 
-Debugger.instance.measure('Main App', () => {
-  ChartManager.instance()
-    .load()
-    .catch(err => console.error('Fail to load customize charts with ', err))
-    .finally(() => {
-      ReactDOM.render(
-        <InspectorWrapper>
-          <Provider store={store}>
-            <ThemeProvider>
-              <ConfigProvider locale={zh_CN}>
-                <HelmetProvider>
-                  <React.StrictMode>{MainApp}</React.StrictMode>
-                </HelmetProvider>
-              </ConfigProvider>
-            </ThemeProvider>
-          </Provider>
-        </InspectorWrapper>,
-        MOUNT_NODE,
-      );
+ChartManager.instance()
+  .load()
+  .catch(err => console.error('Fail to load customize charts with ', err))
+  .finally(() => {
+    ReactDOM.render(
+      <InspectorWrapper>
+        <Provider store={store}>
+          <ThemeProvider>
+            <ConfigProvider locale={zh_CN}>
+              <HelmetProvider>
+                <React.StrictMode>{MainApp}</React.StrictMode>
+              </HelmetProvider>
+            </ConfigProvider>
+          </ThemeProvider>
+        </Provider>
+      </InspectorWrapper>,
+      MOUNT_NODE,
+    );
 
-      // Hot reloadable translation json files
-      if (module.hot) {
-        module.hot.accept(['./locales/i18n'], () => {
-          // No need to render the App again because i18next works with the hooks
-        });
-      }
+    // Hot reloadable translation json files
+    if (module.hot) {
+      module.hot.accept(['./locales/i18n'], () => {
+        // No need to render the App again because i18next works with the hooks
+      });
+    }
 
-      if (!IS_DEVELOPMENT) {
-        if (
-          typeof (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__ === 'object'
-        ) {
-          (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__.inject = () => void 0;
-        }
+    if (!IS_DEVELOPMENT) {
+      if (typeof (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__ === 'object') {
+        (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__.inject = () => void 0;
       }
-    });
-});
+    }
+  });
