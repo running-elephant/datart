@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Checkbox, Form, FormInstance, Input } from 'antd';
+import { Checkbox, Form, Input } from 'antd';
 import BasicFont from 'app/components/FormGenerator/Basic/BasicFont';
 import { WIDGET_TITLE_ALIGN_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { WidgetNameConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -33,9 +33,7 @@ const FONT_DATA = {
 
 export const NameSet: FC<{
   config: WidgetNameConfig;
-  form: FormInstance;
-  onForceUpdate: () => void;
-}> = memo(({ config, onForceUpdate, form }) => {
+}> = memo(({ config }) => {
   const fontData = useMemo(() => {
     const data = {
       ...FONT_DATA,
