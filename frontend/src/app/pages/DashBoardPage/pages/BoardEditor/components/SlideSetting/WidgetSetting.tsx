@@ -54,7 +54,7 @@ export const WidgetSetting: FC = memo(() => {
       name: config.name,
       nameConfig: config.nameConfig,
       backgroundColor: config.background.color,
-      backgroundImage: [config.background.image],
+      backgroundImage: config.background.image,
       border: config.border,
       rect: config.rect,
       autoUpdate: config.autoUpdate || false,
@@ -79,7 +79,7 @@ export const WidgetSetting: FC = memo(() => {
         draft.name = value.name;
         draft.nameConfig = value.nameConfig;
         draft.background.color = getRGBAColor(value.backgroundColor);
-        draft.background.image = value.backgroundImage[0];
+        draft.background.image = value.backgroundImage;
         draft.border = value.border;
         draft.rect = value.rect;
         draft.padding = value.padding;
@@ -105,10 +105,6 @@ export const WidgetSetting: FC = memo(() => {
     },
     [throttledUpdate, widget],
   );
-  const onForceUpdate = useCallback(() => {
-    const values = form.getFieldsValue();
-    onUpdate(values, widget);
-  }, [form, onUpdate, widget]);
 
   return (
     <SettingPanel title="组件设计">
@@ -125,11 +121,7 @@ export const WidgetSetting: FC = memo(() => {
         >
           <Panel header="组件标题" key="name" forceRender>
             <Group>
-              <NameSet
-                form={form}
-                onForceUpdate={onForceUpdate}
-                config={config.nameConfig}
-              />
+              <NameSet config={config.nameConfig} />
             </Group>
           </Panel>
           {boardType === 'free' && (
@@ -150,11 +142,7 @@ export const WidgetSetting: FC = memo(() => {
           )}
           <Panel header="背景" key="background" forceRender>
             <Group>
-              <BackgroundSet
-                onForceUpdate={onForceUpdate}
-                background={config.background}
-                form={form}
-              />
+              <BackgroundSet background={config.background} />
             </Group>
           </Panel>
           <Panel header="内边距" key="padding" forceRender>

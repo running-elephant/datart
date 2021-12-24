@@ -15,26 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Form, FormInstance } from 'antd';
+import { Form } from 'antd';
 import { BackgroundConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { FC, memo } from 'react';
 import ColorSet from './BasicSet/ColorSet';
-import ImageUpload from './BasicSet/ImageUpload';
+import { ImageUpload } from './BasicSet/ImageUpload';
 export const BackgroundSet: FC<{
-  form: FormInstance;
-  onForceUpdate: () => void;
   background: BackgroundConfig;
-}> = memo(({ form, background, onForceUpdate }) => {
+}> = memo(({ background }) => {
   return (
     <>
       <Form.Item label="背景颜色">
         <ColorSet filedName={'backgroundColor'} filedValue={background.color} />
       </Form.Item>
       <ImageUpload
-        form={form}
-        onForceUpdate={onForceUpdate}
         filedName={'backgroundImage'}
-        filedValue={background.image as string}
+        value={background.image as string}
       />
     </>
   );
