@@ -53,7 +53,7 @@ export class Frame extends Component {
   }
 
   getDoc() {
-     return this.nodeRef.current ? this.nodeRef.current.contentDocument : null; // eslint-disable-line
+    return this.nodeRef.current ? this.nodeRef.current.contentDocument : null; // eslint-disable-line
   }
 
   getMountTarget() {
@@ -61,7 +61,7 @@ export class Frame extends Component {
     if (this.props.mountTarget) {
       return doc.querySelector(this.props.mountTarget);
     }
-    return doc.body.children[0];
+    return doc.body;
   }
 
   setRef = node => {
@@ -69,9 +69,6 @@ export class Frame extends Component {
     if (!this.nodeRef.current?.contentWindow) {
       return;
     }
-    this.nodeRef.current.contentWindow.document.write(
-      '<!DOCTYPE html><html><head></head><body><div class="frame-root"></div></body></html>',
-    );
   };
 
   handleLoad = () => {
@@ -110,17 +107,22 @@ export class Frame extends Component {
   render() {
     const props = {
       ...this.props,
-      //   srcDoc: this.props.initialContent,
       children: undefined, // The iframe isn't ready so we drop children from props here. #12, #17
     };
 
     delete props.head;
+    /**
+     * Because ios wechat browser issue which not support srcDoc props
+     * we remove this props and also to avoid performance issue with
+     * document.write function, but still PR will be welcom!
+     */
+    delete props.srcDoc;
     delete props.mountTarget;
     delete props.contentDidMount;
     delete props.contentDidUpdate;
     return (
       <iframe
-        title={'title'}
+        title={props?.id}
         {...props}
         ref={this.setRef}
         onLoad={this.handleLoad}

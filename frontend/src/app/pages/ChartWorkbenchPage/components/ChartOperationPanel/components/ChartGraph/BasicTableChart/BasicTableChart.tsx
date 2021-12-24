@@ -251,16 +251,16 @@ class BasicTableChart extends ReactChart {
         let width = this.getTextWidth(
           context,
           text,
-          bodyFont.fontWeight,
-          bodyFont.fontSize,
-          bodyFont.fontFamily,
+          bodyFont?.fontWeight,
+          bodyFont?.fontSize,
+          bodyFont?.fontFamily,
         );
         const headerWidth = this.getTextWidth(
           context,
           header?.label || header?.colName,
-          headerFont.fontWeight,
-          headerFont.fontSize,
-          headerFont.fontFamily,
+          headerFont?.fontWeight,
+          headerFont?.fontSize,
+          headerFont?.fontFamily,
         );
         const sorterIconWidth = 12;
         return Math.max(width, headerWidth + sorterIconWidth);
@@ -274,9 +274,9 @@ class BasicTableChart extends ReactChart {
         return this.getTextWidth(
           context,
           maxContent,
-          bodyFont.fontWeight,
-          bodyFont.fontSize,
-          bodyFont.fontFamily,
+          bodyFont?.fontWeight,
+          bodyFont?.fontSize,
+          bodyFont?.fontFamily,
         );
       };
 
