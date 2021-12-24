@@ -33,7 +33,7 @@ export const MediaWidget: React.FC<{}> = memo(() => {
     case 'richText':
       return <RichTextWidget widgetConfig={widget} widgetInfo={widgetInfo} />;
     case 'image':
-      return <ImageWidget widgetConfig={widget} widgetInfo={widgetInfo} />;
+      return <ImageWidget />;
     case 'video':
       return <VideoWidget />;
     case 'iframe':

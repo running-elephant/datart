@@ -93,10 +93,6 @@ export const UploadDragger: React.FC<{
   );
 };
 const StyleUpload = styled(Upload.Dragger)`
-  .ant-upload-list {
-    display: none;
-  }
-
   .imageUpload {
     display: block;
   }
@@ -127,7 +123,11 @@ const StyleUpload = styled(Upload.Dragger)`
     height: auto;
   }
 `;
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  .ant-upload-list {
+    display: none;
+  }
+`;
 
 const Placeholder = styled.p`
   color: ${p => p.theme.textColorLight};
