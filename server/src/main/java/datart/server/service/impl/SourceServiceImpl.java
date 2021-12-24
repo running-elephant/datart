@@ -159,7 +159,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         permissionInfo.setSubjectId(getCurrentUser().getId());
         permissionInfo.setResourceType(ResourceType.SOURCE);
         permissionInfo.setResourceId(source.getId());
-        permissionInfo.setPermission(Const.MANAGE);
+        permissionInfo.setPermission(Const.CREATE);
         roleService.grantPermission(Collections.singletonList(permissionInfo));
     }
 

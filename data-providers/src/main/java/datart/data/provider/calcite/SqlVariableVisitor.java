@@ -107,7 +107,6 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
             return new TrueVariablePlaceholder(originalSqlFragment);
         }
 
-        variable.setName(variableName);
         if (VariableTypeEnum.PERMISSION.equals(variable.getType())) {
             return new PermissionVariablePlaceholder(variable, sqlDialect, sqlCall, originalSqlFragment);
         } else {

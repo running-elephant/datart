@@ -22,7 +22,9 @@ import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.core.mappers.ext.*;
+import datart.security.base.PermissionInfo;
 import datart.security.base.ResourceType;
+import datart.security.base.SubjectType;
 import datart.security.exception.PermissionDeniedException;
 import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.PermissionHelper;
@@ -37,10 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -244,6 +243,7 @@ public class FolderServiceImpl extends BaseService implements FolderService {
         if (!CollectionUtils.isEmpty(folderCreate.getPermissions())) {
             roleService.grantPermission(folderCreate.getPermissions());
         }
+        grantDefaultPermission(folder);
         folderMapper.insert(folder);
         return folder;
     }
@@ -264,5 +264,21 @@ public class FolderServiceImpl extends BaseService implements FolderService {
         } catch (Exception ignored) {
         }
         return false;
+    }
+
+    @Override
+    @Transactional
+    public void grantDefaultPermission(Folder folder) {
+        if (securityManager.isOrgOwner(folder.getOrgId())) {
+            return;
+        }
+        PermissionInfo permissionInfo = new PermissionInfo();
+        permissionInfo.setOrgId(folder.getOrgId());
+        permissionInfo.setSubjectType(SubjectType.USER);
+        permissionInfo.setSubjectId(getCurrentUser().getId());
+        permissionInfo.setResourceType(ResourceType.FOLDER);
+        permissionInfo.setResourceId(folder.getId());
+        permissionInfo.setPermission(Const.CREATE);
+        roleService.grantPermission(Collections.singletonList(permissionInfo));
     }
 }
