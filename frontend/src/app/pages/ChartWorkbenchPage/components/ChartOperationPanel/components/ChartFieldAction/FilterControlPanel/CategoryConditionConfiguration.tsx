@@ -19,7 +19,10 @@
 import { Button, Row, Select, Space, Tabs, Transfer, Tree } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
-import { FilterConditionType, RelationFilterValue } from 'app/types/ChartConfig';
+import {
+  FilterConditionType,
+  RelationFilterValue,
+} from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FilterSqlOperator } from 'globalConstants';
@@ -30,7 +33,6 @@ import ChartFilterCondition, {
   ConditionBuilder,
 } from '../../../../../models/ChartFilterCondition';
 import CategoryConditionEditableTable from './CategoryConditionEditableTable';
-// import CategoryConditionEditableTable from './CategoryConditionEditableTableBak';
 import CategoryConditionRelationSelector from './CategoryConditionRelationSelector';
 
 const CategoryConditionConfiguration: FC<
@@ -90,6 +92,8 @@ const CategoryConditionConfiguration: FC<
         handleFetchData();
       }
     });
+
+    console.log(`condition ---> `, condition);
 
     const getDataOptionFields = () => {
       return dataView?.meta || [];
@@ -175,12 +179,6 @@ const CategoryConditionConfiguration: FC<
           // setListDatas(convertToList(dataset?.columns, selectedKeys));
         } else {
           setListDatas(convertToList(dataset?.rows, selectedKeys));
-          setTargetKeys([]);
-          const filter = new ConditionBuilder(condition)
-            .setOperator(FilterSqlOperator.In)
-            .setValue([])
-            .asGeneral();
-          onConditionChange(filter);
         }
       });
     };
