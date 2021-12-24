@@ -103,23 +103,22 @@ class BasicFunnelChart extends Chart {
       dataset.rows,
       dataset.columns,
     );
-    let dataList = objDataColumns;
-    let aggregateList = aggregateConfigs;
-    if (!groupConfigs.length) {
-      aggregateList = aggregateConfigs.sort((a, b) => {
-        return (
-          objDataColumns[0][getValueByColumnKey(b)] -
-          objDataColumns[0][getValueByColumnKey(a)]
-        );
-      });
-    } else {
-      dataList = objDataColumns.sort((a, b) => {
-        return (
-          b[getValueByColumnKey(aggregateConfigs[0])] -
-          a[getValueByColumnKey(aggregateConfigs[0])]
-        );
-      });
-    }
+    const dataList = !groupConfigs.length
+      ? objDataColumns
+      : objDataColumns.sort((a, b) => {
+          return (
+            b[getValueByColumnKey(aggregateConfigs[0])] -
+            a[getValueByColumnKey(aggregateConfigs[0])]
+          );
+        });
+    const aggregateList = !groupConfigs.length
+      ? aggregateConfigs.sort((a, b) => {
+          return (
+            objDataColumns[0][getValueByColumnKey(b)] -
+            objDataColumns[0][getValueByColumnKey(a)]
+          );
+        })
+      : aggregateConfigs;
 
     const series = this.getSeries(
       styleConfigs,
@@ -132,7 +131,7 @@ class BasicFunnelChart extends Chart {
     return {
       tooltip: this.getFunnelChartTooltip(
         groupConfigs,
-        aggregateConfigs,
+        aggregateList,
         infoConfigs,
       ),
       legend: this.getLegendStyle(styleConfigs),
