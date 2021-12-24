@@ -18,7 +18,6 @@
 
 import { Form, Modal } from 'antd';
 import { useRef } from 'react';
-import useI18NPrefix from './useI18NPrefix';
 
 export interface IStateModalContentProps {
   onChange: (o: any) => void;
@@ -38,14 +37,7 @@ const defaultBodyStyle: React.CSSProperties = {
   overflowX: 'auto',
 };
 
-function useStateModal({
-  i18nPrefix,
-  initState,
-}: {
-  i18nPrefix?: string;
-  initState?: any;
-}) {
-  const t = useI18NPrefix(i18nPrefix);
+function useStateModal({ initState }: { initState?: any }) {
   const [form] = Form.useForm();
   const [modal, contextHolder] = Modal.useModal();
   const okCallbackRef = useRef<Function>();
