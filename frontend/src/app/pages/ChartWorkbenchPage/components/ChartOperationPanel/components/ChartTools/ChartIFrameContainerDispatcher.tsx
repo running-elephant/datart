@@ -88,6 +88,7 @@ class ChartIFrameContainerDispatcher {
               key={containerId}
               width={style?.width}
               height={style?.height}
+              widgetSpecialConfig={{ env: 'workbench' }}
             />
           </div>
         );
