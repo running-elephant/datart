@@ -688,13 +688,7 @@ export function getSeriesTooltips4Polar2(
     .concat(aggConfigs || [])
     .concat(sizeConfigs || [])
     .concat(infoConfigs || [])
-    .map(config => {
-      const value =
-        row?.[getValueByColumnKey(config)] !== void 0
-          ? row?.[getValueByColumnKey(config)]
-          : '-';
-      return valueFormatter(config, value);
-    });
+    .map(config => valueFormatter(config, row?.[getValueByColumnKey(config)]));
   return tooltips.join('<br />');
 }
 
