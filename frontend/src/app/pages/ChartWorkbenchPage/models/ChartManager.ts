@@ -19,6 +19,7 @@
 import WidgetPlugins from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartGraph';
 import ChartTools from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
 import { getChartPluginPaths } from 'app/utils/fetch';
+import { Debugger } from 'utils/debugger';
 import { CloneValueDeep } from 'utils/object';
 import Chart from './Chart';
 
@@ -68,7 +69,9 @@ class ChartManager {
       return;
     }
     const pluginsPaths = await getChartPluginPaths();
-    return await this._loadCustomizeCharts(pluginsPaths);
+    await Debugger.instance.measure('Plugin Charts | ', async () => {
+      await this._loadCustomizeCharts(pluginsPaths);
+    });
   }
 
   public getAllCharts(): Chart[] {

@@ -31,13 +31,17 @@ export class Debugger {
     this._enableDebug = !!enable;
   }
 
-  public measure(info: string, fn) {
-    if (!this._enableDebug) {
-      return fn();
+  public async measure(
+    info: string,
+    fn: VoidFunction,
+    forceEnable: boolean = true,
+  ) {
+    if (!this._enableDebug || !forceEnable) {
+      return await fn();
     }
 
     const start = performance.now();
-    fn();
+    await fn();
     const end = performance.now();
     console.info(`Performance - ${info} - `, `${end - start} ms`);
   }
