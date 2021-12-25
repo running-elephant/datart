@@ -265,8 +265,28 @@ export const getChartWidgetDataAsync = createAsyncThunk<
           pageInfo: widgetData.pageInfo,
         }),
       );
+      dispatch(
+        boardActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: undefined,
+        }),
+      );
     } catch (error) {
-      errorHandle(error);
+      dispatch(
+        boardActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: (error as any)?.message as any,
+        }),
+      );
+      dispatch(
+        boardActions.setWidgetData({
+          id: widgetId,
+          columns: [],
+          rows: [],
+        } as WidgetData),
+      );
     }
     dispatch(
       boardActions.addFetchedItem({
@@ -344,8 +364,21 @@ export const getControllerOptions = createAsyncThunk<
         widgetData = { ...data, id: widget.id };
         dispatch(boardActions.setWidgetData(widgetData as WidgetData));
       }
+      dispatch(
+        boardActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: undefined,
+        }),
+      );
     } catch (error) {
-      errorHandle(error);
+      dispatch(
+        boardActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: (error as any)?.message as any,
+        }),
+      );
     }
     dispatch(
       boardActions.addFetchedItem({
