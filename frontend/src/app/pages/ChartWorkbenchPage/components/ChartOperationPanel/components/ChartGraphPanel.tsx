@@ -153,6 +153,7 @@ const ChartGraphPanel: FC<{
 
       return (
         <Popconfirm
+          key={c?.meta?.id}
           title={t('confirm', undefined, { name: c.meta?.name })}
           onConfirm={handleChartChange(c?.meta?.id)}
           okText={t('ok')}
