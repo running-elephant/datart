@@ -3,7 +3,7 @@ import { ModalForm, ModalFormProps } from 'app/components';
 import debounce from 'debounce-promise';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import moment from 'moment';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SPACE_XS } from 'styles/StyleConstants';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
@@ -97,6 +97,35 @@ export const VariableForm = memo(
       formRef.current?.setFieldsValue({ defaultValue: [] });
     }, []);
 
+    const nameValidator = useMemo(
+      () =>
+        scope === VariableScopes.Private
+          ? (_, value) => {
+              if (value === editingVariable?.name) {
+                return Promise.resolve();
+              }
+              if (variables?.find(({ name }) => name === value)) {
+                return Promise.reject(new Error('名称重复'));
+              } else {
+                return Promise.resolve();
+              }
+            }
+          : debounce((_, value) => {
+              if (!value || value === editingVariable?.name) {
+                return Promise.resolve();
+              }
+              return request({
+                url: `/variables/check/name`,
+                method: 'POST',
+                params: { name: value, orgId },
+              }).then(
+                () => Promise.resolve(),
+                () => Promise.reject(new Error('名称重复')),
+              );
+            }, DEFAULT_DEBOUNCE_WAIT),
+      [scope, editingVariable?.name, variables, orgId],
+    );
+
     return (
       <ModalForm
         {...modalProps}
@@ -118,31 +147,7 @@ export const VariableForm = memo(
           rules={[
             { required: true, message: '名称不能为空' },
             {
-              validator: debounce((_, value) => {
-                if (!value || value === editingVariable?.name) {
-                  return Promise.resolve();
-                }
-                return request({
-                  url: `/variables/check/name`,
-                  method: 'POST',
-                  params: { name: value, orgId },
-                }).then(
-                  () => Promise.resolve(),
-                  () => Promise.reject(new Error('名称重复')),
-                );
-              }, DEFAULT_DEBOUNCE_WAIT),
-            },
-            {
-              validator: (_, value) => {
-                if (value === editingVariable?.name) {
-                  return Promise.resolve();
-                }
-                if (variables?.find(({ name }) => name === value)) {
-                  return Promise.reject(new Error('名称重复'));
-                } else {
-                  return Promise.resolve();
-                }
-              },
+              validator: nameValidator,
             },
           ]}
         >

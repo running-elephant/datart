@@ -23,6 +23,7 @@ import { SubjectForm } from 'app/pages/MainPage/pages/VariablePage/SubjectForm';
 import { VariableFormModel } from 'app/pages/MainPage/pages/VariablePage/types';
 import { VariableForm } from 'app/pages/MainPage/pages/VariablePage/VariableForm';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
+import classnames from 'classnames';
 import { CommonFormTypes } from 'globalConstants';
 import { Moment } from 'moment';
 import {
@@ -37,7 +38,7 @@ import {
 import { monaco } from 'react-monaco-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { SPACE_MD, SPACE_TIMES } from 'styles/StyleConstants';
+import { SPACE_MD, SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
 import { errorHandle } from 'utils/utils';
 import { v4 as uuidv4 } from 'uuid';
 import { selectVariables } from '../../../VariablePage/slice/selectors';
@@ -256,14 +257,22 @@ export const Variables = memo(() => {
     [dispatch, actions, editingVariable, variables],
   );
 
-  const renderTitleText = useCallback(item => {
-    return (
-      <>
-        {item.relVariableSubjects ? '' : <span>[公共]</span>}
-        {item.name}
-      </>
-    );
-  }, []);
+  const renderTitleText = useCallback(
+    item => {
+      const isPrivate = !!item.relVariableSubjects;
+      const isDuplicate = isPrivate
+        ? publicVariables.some(v => v.name === item.name)
+        : variables.some(v => v.name === item.name);
+      return (
+        <ListItemTitle className={classnames({ duplicate: isDuplicate })}>
+          {!isPrivate && <span className="prefix">[公共]</span>}
+          {item.name}
+          {isDuplicate && <span className="suffix">重复</span>}
+        </ListItemTitle>
+      );
+    },
+    [variables, publicVariables],
+  );
 
   const titleProps = useMemo(
     () => ({
@@ -345,6 +354,7 @@ export const Variables = memo(() => {
         scope={VariableScopes.Private}
         orgId={orgId}
         editingVariable={editingVariable}
+        variables={variables}
         visible={formVisible}
         title="变量"
         type={formType}
@@ -389,5 +399,21 @@ const ListWrapper = styled.div`
 
   .permission {
     color: ${p => p.theme.warning};
+  }
+`;
+
+const ListItemTitle = styled.div`
+  &.duplicate {
+    color: ${p => p.theme.highlight};
+  }
+
+  .prefix {
+    margin-right: ${SPACE_XS};
+    color: ${p => p.theme.textColorDisabled};
+  }
+
+  .suffix {
+    margin-left: ${SPACE_XS};
+    color: ${p => p.theme.highlight};
   }
 `;
