@@ -47,11 +47,6 @@ const StyledItem = styled(Item)`
     color: ${p => p.theme.textColorSnd};
     text-overflow: ellipsis;
     white-space: nowrap;
-
-    > span {
-      margin-right: ${SPACE_XS};
-      color: ${p => p.theme.textColorDisabled};
-    }
   }
 
   &.with-avatar {
