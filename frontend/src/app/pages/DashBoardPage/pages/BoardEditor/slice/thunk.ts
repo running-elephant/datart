@@ -514,8 +514,26 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
           pageInfo: data.pageInfo,
         }),
       );
+      dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          widgetId,
+          errInfo: undefined,
+        }),
+      );
     } catch (error) {
-      errorHandle(error);
+      dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          widgetId,
+          errInfo: (error as any)?.message as any,
+        }),
+      );
+      dispatch(
+        editWidgetDataActions.setWidgetData({
+          id: widgetId,
+          columns: [],
+          rows: [],
+        } as WidgetData),
+      );
     }
     return null;
   },

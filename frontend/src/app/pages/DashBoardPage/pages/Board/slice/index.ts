@@ -238,6 +238,17 @@ const boardSlice = createSlice({
         pageNo: 1,
       };
     },
+    setWidgetErrInfo(
+      state,
+      action: PayloadAction<{
+        boardId: string;
+        widgetId: string;
+        errInfo?: string;
+      }>,
+    ) {
+      const { boardId, widgetId, errInfo } = action.payload;
+      state.widgetInfoRecord[boardId][widgetId].errInfo = errInfo;
+    },
     resetControlWidgets(
       state,
       action: PayloadAction<{

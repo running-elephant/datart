@@ -235,6 +235,17 @@ const widgetInfoRecordSlice = createSlice({
       const { widgetId, pageInfo } = action.payload;
       state[widgetId].pageInfo = pageInfo || { pageNo: 1 };
     },
+    setWidgetErrInfo(
+      state,
+      action: PayloadAction<{
+        boardId?: string;
+        widgetId: string;
+        errInfo?: string;
+      }>,
+    ) {
+      const { widgetId, errInfo } = action.payload;
+      state[widgetId].errInfo = errInfo;
+    },
   },
   extraReducers: builder => {
     builder.addCase(getEditChartWidgetDataAsync.pending, (state, action) => {
