@@ -84,6 +84,8 @@ export const SupportTriggerChartIds: string[] = [
   'double-y',
   'normal-outline-map-chart',
   'scatter-outline-map-chart',
+  'fenzu-table',
+  'mingxi-table',
 ];
 
 export const getWidgetActionList = (opt: {

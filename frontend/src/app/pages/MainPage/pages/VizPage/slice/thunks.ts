@@ -5,6 +5,8 @@ import {
   Dashboard,
   DataChart,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
+import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
 import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { RootState } from 'types';
 import { request } from 'utils/request';
@@ -102,15 +104,24 @@ export const getArchivedStoryboards = createAsyncThunk<StoryBoard[], string>(
   },
 );
 
-export const addStoryboard = createAsyncThunk<Storyboard, AddStoryboardParams>(
+export const addStoryboard = createAsyncThunk<
+  Storyboard,
+  AddStoryboardParams,
+  { state: RootState }
+>(
   'viz/addStoryboard',
-  async ({ storyboard, resolve }) => {
+  async ({ storyboard, resolve }, { getState, dispatch }) => {
     try {
       const { data } = await request<Storyboard>({
         url: `/viz/storyboards`,
         method: 'POST',
         data: storyboard,
       });
+
+      // FIXME 拥有Read权限等级的扁平结构资源新增后需要更新权限字典；后续如改造为目录结构则删除该逻辑
+      const orgId = selectOrgId(getState());
+      await dispatch(getLoggedInUserPermissions(orgId));
+
       resolve();
       return data;
     } catch (error) {

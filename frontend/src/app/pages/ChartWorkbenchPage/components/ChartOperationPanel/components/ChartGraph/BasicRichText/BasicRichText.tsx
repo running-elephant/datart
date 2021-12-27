@@ -25,7 +25,7 @@ import {
   getCustomSortableColumns,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import Config from './config';
@@ -35,7 +35,12 @@ class BasicRichText extends ReactChart {
   isISOContainer = 'react-rich-text';
   config = Config;
   protected isAutoMerge = false;
-  richTextOptions = { dataset: {}, config: {}, containerId: '' };
+  richTextOptions = {
+    dataset: {},
+    config: {},
+    containerId: '',
+    widgetSpecialConfig: { env: '' },
+  };
 
   constructor(props?) {
     super(ChartRichTextAdapter, {
@@ -52,6 +57,7 @@ class BasicRichText extends ReactChart {
   }
 
   onMount(options, context): void {
+    console.log(context);
     if (options.containerId === undefined || !context.document) {
       return;
     }
@@ -81,9 +87,9 @@ class BasicRichText extends ReactChart {
   }
 
   getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
-    const { containerId } = this.richTextOptions;
+    const { containerId, widgetSpecialConfig } = this.richTextOptions;
     if (!dataset || !config || !containerId) {
-      return { dataList: [], id: '', isEditing: !!config?.env };
+      return { dataList: [], id: '', isEditing: !!widgetSpecialConfig?.env };
     }
     const dataConfigs = config.datas || [];
     const stylesConfigs = config.styles || [];
@@ -93,7 +99,7 @@ class BasicRichText extends ReactChart {
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );
@@ -115,7 +121,7 @@ class BasicRichText extends ReactChart {
       dataList,
       initContent,
       id: containerId,
-      isEditing: !!config?.env,
+      isEditing: !!widgetSpecialConfig?.env,
       ...this.getOnChange(),
     };
   }

@@ -22,7 +22,7 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
   const loggedInUser = useSelector(selectLoggedInUser);
   const loading = useSelector(selectModifyPasswordLoading);
   const [form] = Form.useForm();
-  const t = useI18NPrefix('main.nav.accout.changePassword');
+  const t = useI18NPrefix('main.nav.account.changePassword');
 
   const reset = useCallback(() => {
     form.resetFields();

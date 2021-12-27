@@ -401,10 +401,34 @@ export function getNameTextStyle(fontFamily, fontSize, color) {
   };
 }
 
+export function transformToObjectArray(
+  columns?: string[][],
+  metas?: ChartDatasetMeta[],
+) {
+  if (!columns || !metas) {
+    return [];
+  }
+  return columns.map((col, index) => {
+    let objCol = {
+      id: index,
+    };
+    for (let i = 0; i < metas.length; i++) {
+      const key = metas?.[i]?.name;
+      if (!!key) {
+        objCol[key] = col[i];
+      }
+    }
+    return objCol;
+  });
+}
+// TODO delete this function  #migration
 export function transfromToObjectArray(
   columns?: string[][],
   metas?: ChartDatasetMeta[],
 ) {
+  console.warn(
+    'This method `transfromToObjectArray` will be deprecated and can be replaced by `transformToObjectArray`',
+  );
   if (!columns || !metas) {
     return [];
   }
@@ -434,7 +458,7 @@ export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
 
 export function getColumnRenderOriginName(c?: ChartDataSectionField) {
   if (!c) {
-    return '[unkonwn]';
+    return '[unknown]';
   }
   if (c.aggregate === AggregateFieldActionType.NONE) {
     return c.colName;
@@ -447,7 +471,7 @@ export function getColumnRenderOriginName(c?: ChartDataSectionField) {
 
 export function getColumnRenderName(c?: ChartDataSectionField) {
   if (!c) {
-    return '[unkonwn]';
+    return '[unknown]';
   }
   if (c.alias?.name) {
     return c.alias.name;

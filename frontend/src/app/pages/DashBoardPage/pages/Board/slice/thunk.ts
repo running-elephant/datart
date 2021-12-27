@@ -13,7 +13,7 @@ import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';
 import ChartDataset from 'app/types/ChartDataset';
 import { RootState } from 'types';
 import { request } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import { errorHandle, getErrorMessage } from 'utils/utils';
 import { boardActions } from '.';
 import { getChartWidgetRequestParams } from '../../../utils';
 import { handleServerBoardAction } from './asyncActions';
@@ -265,8 +265,29 @@ export const getChartWidgetDataAsync = createAsyncThunk<
           pageInfo: widgetData.pageInfo,
         }),
       );
+      dispatch(
+        boardActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: undefined,
+        }),
+      );
     } catch (error) {
-      errorHandle(error);
+      dispatch(
+        boardActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: getErrorMessage(error),
+        }),
+      );
+
+      dispatch(
+        boardActions.setWidgetData({
+          id: widgetId,
+          columns: [],
+          rows: [],
+        } as WidgetData),
+      );
     }
     dispatch(
       boardActions.addFetchedItem({
@@ -344,8 +365,21 @@ export const getControllerOptions = createAsyncThunk<
         widgetData = { ...data, id: widget.id };
         dispatch(boardActions.setWidgetData(widgetData as WidgetData));
       }
+      dispatch(
+        boardActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: undefined,
+        }),
+      );
     } catch (error) {
-      errorHandle(error);
+      dispatch(
+        boardActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: getErrorMessage(error),
+        }),
+      );
     }
     dispatch(
       boardActions.addFetchedItem({

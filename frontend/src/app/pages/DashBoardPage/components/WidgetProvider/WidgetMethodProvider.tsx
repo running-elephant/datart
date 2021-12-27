@@ -280,9 +280,20 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
 
   const toLinkingWidgets = useCallback(
     (widget: Widget, params: ChartMouseEventParams) => {
-      const linkRelations = widget.relations.filter(
-        re => re.config.type === 'widgetToWidget',
-      );
+      const { componentType, seriesType, seriesName } = params;
+      const isTableHandle = componentType === 'table' && seriesType === 'body';
+
+      const linkRelations = widget.relations.filter(re => {
+        const {
+          config: { type, widgetToWidget },
+        } = re;
+        if (type !== 'widgetToWidget') return false;
+        if (isTableHandle) {
+          if (widgetToWidget?.triggerColumn === seriesName) return true;
+          return false;
+        }
+        return true;
+      });
 
       const boardFilters = linkRelations.map(re => {
         let linkageFieldName: string =
@@ -354,6 +365,12 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       const queryName = jumpConfig?.queryName || '';
       const targetId = jumpConfig?.target?.relId;
       const jumpFieldName: string = jumpConfig?.field?.jumpFieldName || '';
+      if (
+        params.componentType === 'table' &&
+        jumpFieldName !== params.seriesName
+      )
+        return;
+
       if (typeof jumpConfig?.filter === 'object' && targetType === 'INTERNAL') {
         const searchParamsStr = urlSearchTransfer.toUrlString({
           [jumpConfig?.filter?.filterId]:

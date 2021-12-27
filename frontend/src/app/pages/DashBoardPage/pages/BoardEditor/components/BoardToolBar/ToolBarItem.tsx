@@ -217,27 +217,27 @@ export const MediaWidgetDropdown: React.FC<ToolBtnProps> = props => {
   type TinyWidgetItems = { name: string; icon: string; type: LightWidgetType };
   const mediaWidgetTypes: TinyWidgetItems[] = [
     {
-      name: '图片',
+      name: t('image'),
       icon: '',
       type: 'image',
     },
     {
-      name: '富文本',
+      name: t('richText'),
       icon: '',
       type: 'richText',
     },
     {
-      name: '时间器',
+      name: t('timer'),
       icon: '',
       type: 'timer',
     },
     {
-      name: 'iframe',
+      name: t('iFrame'),
       icon: '',
       type: 'iframe',
     },
     {
-      name: '视频',
+      name: t('richText'),
       icon: '',
       type: 'video',
     },
@@ -286,14 +286,12 @@ export const ContainerWidgetDropdown: React.FC<ToolBtnProps> = props => {
   );
   type ContainerWidgetItems = {
     name: string;
-    title: string;
     icon: string;
     type: LightWidgetType;
   };
   const containerWidgetTypes: ContainerWidgetItems[] = [
     {
-      name: 'tabs',
-      title: '标签页',
+      name: t('tab'),
       icon: '',
       type: 'tab',
     },
@@ -306,8 +304,8 @@ export const ContainerWidgetDropdown: React.FC<ToolBtnProps> = props => {
 
   const containerWidgetItems = (
     <Menu onClick={onSelectContainerWidget}>
-      {containerWidgetTypes.map(({ name, title, type }) => (
-        <Menu.Item key={type}>{title}</Menu.Item>
+      {containerWidgetTypes.map(({ name, type }) => (
+        <Menu.Item key={type}>{name}</Menu.Item>
       ))}
     </Menu>
   );
@@ -350,12 +348,12 @@ export const ChartWidgetDropdown: React.FC<ChartWidgetDropdownProps> =
     );
     const addChartTypes = [
       {
-        name: '添加已有数据图表',
+        name: t('addDataChartFormList'),
         icon: '',
         type: 'select',
       },
       {
-        name: '新建数据图表',
+        name: t('createDataChartInBoard'),
         icon: '',
         type: 'create',
       },

@@ -72,7 +72,6 @@ export const BoardEditor: React.FC<{
         dispatch(editHasChartWidget({ widgetId, dataChart, view }));
         onCloseChartEditor();
         dispatch(addVariablesToBoard(view.variables));
-        // todo view.variables  save  on board
       },
       [boardChartEditorProps?.widgetId, dispatch, onCloseChartEditor],
     );

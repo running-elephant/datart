@@ -26,7 +26,7 @@ import {
   getSeriesTooltips4Polar2,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { init, registerMap } from 'echarts';
 import Config from './config';
@@ -110,7 +110,7 @@ class BasicOutlineMapChart extends Chart {
 
     this.registerGeoMap(styleConfigs);
 
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );

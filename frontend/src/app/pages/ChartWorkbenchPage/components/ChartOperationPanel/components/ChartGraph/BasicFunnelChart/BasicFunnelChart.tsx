@@ -30,7 +30,7 @@ import {
   getSeriesTooltips4Scatter,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
@@ -99,23 +99,37 @@ class BasicFunnelChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );
+    const dataList = !groupConfigs.length
+      ? objDataColumns
+      : objDataColumns?.sort(
+          (a, b) =>
+            b?.[getValueByColumnKey(aggregateConfigs[0])] -
+            a?.[getValueByColumnKey(aggregateConfigs[0])],
+        );
+    const aggregateList = !groupConfigs.length
+      ? aggregateConfigs?.sort(
+          (a, b) =>
+            objDataColumns?.[0]?.[getValueByColumnKey(b)] -
+            objDataColumns?.[0]?.[getValueByColumnKey(a)],
+        )
+      : aggregateConfigs;
 
     const series = this.getSeries(
       styleConfigs,
-      aggregateConfigs,
+      aggregateList,
       groupConfigs,
-      objDataColumns,
+      dataList,
       infoConfigs,
     );
 
     return {
       tooltip: this.getFunnelChartTooltip(
         groupConfigs,
-        aggregateConfigs,
+        aggregateList,
         infoConfigs,
       ),
       legend: this.getLegendStyle(styleConfigs),

@@ -22,7 +22,7 @@ import { TimeFilterConditionValue } from 'app/types/ChartConfig';
 import { formatTime } from 'app/utils/time';
 import { FILTER_TIME_FORMATTER_IN_QUERY } from 'globalConstants';
 import moment from 'moment';
-import { FC, memo, useEffect } from 'react';
+import { FC, memo } from 'react';
 
 const ExactTimeSelector: FC<
   {
@@ -31,13 +31,6 @@ const ExactTimeSelector: FC<
   } & I18NComponentProps
 > = memo(({ time, i18nPrefix, onChange }) => {
   const t = useI18NPrefix(i18nPrefix);
-
-  useEffect(() => {
-    if (!time) {
-      console.log(`handleMomentTimeChange ---> `, time);
-      handleMomentTimeChange(moment());
-    }
-  }, [time]);
 
   const handleMomentTimeChange = momentTime => {
     const timeStr = formatTime(momentTime, FILTER_TIME_FORMATTER_IN_QUERY);

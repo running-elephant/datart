@@ -101,7 +101,6 @@ export const getChartGroupColumns = (dataChart: DataChart) => {
   const chartDataConfigs = dataChart?.config?.chartConfig?.datas;
   if (!chartDataConfigs) return [] as ChartDataSectionField[];
   const groupTypes = [ChartDataSectionType.GROUP, ChartDataSectionType.COLOR];
-  //  ChartDataSectionType.MIXED  ??
   const groupColumns = chartDataConfigs.reduce<ChartDataSectionField[]>(
     (acc, cur) => {
       if (!cur.rows) {
@@ -109,6 +108,11 @@ export const getChartGroupColumns = (dataChart: DataChart) => {
       }
       if (groupTypes.includes(cur.type as any)) {
         return acc.concat(cur.rows);
+      }
+      if (cur.type === ChartDataSectionType.MIXED) {
+        return acc.concat(
+          cur.rows.filter(({ type }) => type === ChartDataViewFieldType.STRING),
+        );
       }
       return acc;
     },

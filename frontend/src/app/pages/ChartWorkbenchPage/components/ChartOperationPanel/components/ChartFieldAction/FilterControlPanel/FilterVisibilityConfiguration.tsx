@@ -18,10 +18,7 @@
 
 import { Input, Radio, Row, Select, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import {
-  ChartDataSectionField,
-  FilterVisibility,
-} from 'app/types/ChartConfig';
+import { ChartDataSectionField, FilterVisibility } from 'app/types/ChartConfig';
 import { ControllerVisibilityTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useState } from 'react';

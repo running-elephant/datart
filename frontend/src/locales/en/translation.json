@@ -21,9 +21,9 @@
         "cancel": "取消",
         "saveDndEnter": "保存并进入"
       },
-      "accout": {
+      "account": {
         "accountSettings": {
-          "title": "账号设置",
+          "title": "Profile",
           "clickUpload": "点击上传",
           "userName": "用户名",
           "email": "邮箱",
@@ -32,7 +32,7 @@
           "save": "保存"
         },
         "changePassword": {
-          "title": "修改密码",
+          "title": "Password",
           "oldPassword": "旧密码",
           "newPassword": "新密码",
           "confirmPassword": "确定新密码",
@@ -40,10 +40,10 @@
           "save": "保存"
         },
         "switchLanguage": {
-          "title": "切换语言"
+          "title": "language"
         },
         "logout": {
-          "title": "退出登录"
+          "title": "Logout"
         }
       }
     },
@@ -93,6 +93,8 @@
           "checkboxGroup": "Checkbox Group",
           "multiDropdownList": "multiple Dropdown List",
           "rangeTime": "Range Time",
+          "rangeTimePicker": "Range Time",
+          "recommendTime": "Recommend Time",
           "rangeValue": "Range Value",
           "text": "Text",
           "tree": "Tree",
@@ -194,21 +196,24 @@
       }
     },
     "workbench": {
+      "goBack": "返回管理页面",
       "header": {
         "goBack": "Back",
         "run": "Run",
         "save": "Save",
-        "saveToDashboard": "Save to Dashboard",
-        "login": "Login",
+        "saveToDashboard": "保存到仪表盘",
+        "login": "登陆",
+        "aggregationSwitch": "聚合开关",
+        "aggregationSwitchTip": "开启/关闭聚合会清空全部图表配置，确认开启/关闭？",
+        "open": "开启",
+        "close": "关闭",
         "lang": {
-          "zh": "ZH",
-          "en": "EN"
+          "zh": "中文",
+          "en": "英文"
         },
         "format": {
           "local": "local",
-          "date": "date",
-          "ll": "LL",
-          "lll": "LLL"
+          "date": "date"
         }
       },
       "dataview": {
@@ -396,6 +401,10 @@
           "opacity": "Opacity",
           "backgroundColor": "Background Color",
           "borderStyle": "Border Style"
+        },
+        "paging": {
+          "title": "常规",
+          "pageSize": "总行数"
         }
       },
       "present": {
@@ -441,14 +450,38 @@
     "board": {
       "action": {
         "dataChart": "DataChart",
+        "addDataChartFormList": "Add DataChart Form List",
+        "createDataChartInBoard": "Create DataChart In Board",
         "media": "Media",
+        "image": "Image",
+        "richText": "Rich Text",
+        "timer": "Timer",
+        "iFrame": "iFrame",
+        "video": "Video",
         "container": "Container",
+        "tab": "Tab",
         "controller": "Controller",
         "undo": "Undo",
         "redo": "Redo",
         "delete": "Delete",
         "copy": "Copy",
         "paste": "Paste"
+      },
+      "controlTypes": {
+        "common": "Common",
+        "date": "Date",
+        "numeric": "Numeric",
+        "button": "Button"
+      }
+    },
+    "widget": {
+      "type": {
+        "chart": "Chart",
+        "media": "Media",
+        "container": "Container",
+        "controller": "Controller",
+        "query": "Query",
+        "reset": "Reset"
       }
     }
   },

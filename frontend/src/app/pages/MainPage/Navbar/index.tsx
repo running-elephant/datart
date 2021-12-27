@@ -3,11 +3,11 @@ import {
   ExportOutlined,
   FormOutlined,
   FunctionOutlined,
+  GlobalOutlined,
   ProfileOutlined,
   SafetyCertificateFilled,
   SettingFilled,
   SettingOutlined,
-  SwapOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { List, Menu, Tooltip } from 'antd';
@@ -103,7 +103,7 @@ export function Navbar() {
         module: ResourceTypes.Manager,
       },
     ],
-    [],
+    [t],
   );
 
   const navs = useMemo(
@@ -163,7 +163,7 @@ export function Navbar() {
         module: ResourceTypes.Manager,
       },
     ],
-    [subNavs],
+    [subNavs, t],
   );
 
   const showSubNav = useMemo(
@@ -271,31 +271,32 @@ export function Navbar() {
                 onClick={userMenuSelect}
               >
                 <MenuListItem
+                  key="language"
+                  prefix={<GlobalOutlined className="icon" />}
+                  title={<p>{t('nav.account.switchLanguage.title')}</p>}
+                  sub
+                >
+                  <MenuListItem key="zh">中文</MenuListItem>
+                  <MenuListItem key="en">English</MenuListItem>
+                </MenuListItem>
+                <Menu.Divider />
+                <MenuListItem
                   key="profile"
                   prefix={<ProfileOutlined className="icon" />}
                 >
-                  <p>{t('nav.accout.accountSettings.title')}</p>
+                  <p>{t('nav.account.accountSettings.title')}</p>
                 </MenuListItem>
                 <MenuListItem
                   key="password"
                   prefix={<FormOutlined className="icon" />}
                 >
-                  <p>{t('nav.accout.changePassword.title')}</p>
+                  <p>{t('nav.account.changePassword.title')}</p>
                 </MenuListItem>
-
-                <Menu.SubMenu
-                  icon={<SwapOutlined className="icon" />}
-                  key="language"
-                  title={t('nav.accout.switchLanguage.title')}
-                >
-                  <Menu.Item key="zh">中文</Menu.Item>
-                  <Menu.Item key="en">English</Menu.Item>
-                </Menu.SubMenu>
                 <MenuListItem
                   key="logout"
                   prefix={<ExportOutlined className="icon" />}
                 >
-                  <p>{t('nav.accout.logout.title')}</p>
+                  <p>{t('nav.account.logout.title')}</p>
                 </MenuListItem>
               </Menu>
             }

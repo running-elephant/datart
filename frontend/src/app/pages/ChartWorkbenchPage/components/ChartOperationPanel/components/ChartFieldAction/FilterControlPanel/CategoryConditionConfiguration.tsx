@@ -19,7 +19,10 @@
 import { Button, Row, Select, Space, Tabs, Transfer, Tree } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
-import { FilterConditionType, RelationFilterValue } from 'app/types/ChartConfig';
+import {
+  FilterConditionType,
+  RelationFilterValue,
+} from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FilterSqlOperator } from 'globalConstants';
@@ -30,7 +33,6 @@ import ChartFilterCondition, {
   ConditionBuilder,
 } from '../../../../../models/ChartFilterCondition';
 import CategoryConditionEditableTable from './CategoryConditionEditableTable';
-// import CategoryConditionEditableTable from './CategoryConditionEditableTableBak';
 import CategoryConditionRelationSelector from './CategoryConditionRelationSelector';
 
 const CategoryConditionConfiguration: FC<
@@ -99,16 +101,16 @@ const CategoryConditionConfiguration: FC<
       selectedKeys.indexOf(eventKey) !== -1;
 
     const fetchNewDataset = async (viewId, colName) => {
-      const feildDataset = await getDistinctFields(
+      const fieldDataset = await getDistinctFields(
         viewId,
         colName,
         undefined,
         undefined,
       );
-      return feildDataset;
+      return fieldDataset;
     };
 
-    const setListSelctedState = (
+    const setListSelectedState = (
       list?: RelationFilterValue[],
       keys?: string[],
     ) => {
@@ -129,7 +131,7 @@ const CategoryConditionConfiguration: FC<
     };
 
     const handleGeneralListChange = async selectedKeys => {
-      const items = setListSelctedState(listDatas, selectedKeys);
+      const items = setListSelectedState(listDatas, selectedKeys);
       setTargetKeys(selectedKeys);
       setListDatas(items);
 
@@ -175,27 +177,21 @@ const CategoryConditionConfiguration: FC<
           // setListDatas(convertToList(dataset?.columns, selectedKeys));
         } else {
           setListDatas(convertToList(dataset?.rows, selectedKeys));
-          setTargetKeys([]);
-          const filter = new ConditionBuilder(condition)
-            .setOperator(FilterSqlOperator.In)
-            .setValue([])
-            .asGeneral();
-          onConditionChange(filter);
         }
       });
     };
 
-    const convertToList = (collection, selecteKeys) => {
+    const convertToList = (collection, selectedKeys) => {
       const items: string[] = (collection || []).flatMap(c => c);
       const uniqueKeys = Array.from(new Set(items));
       return uniqueKeys.map(item => ({
         key: item,
         label: item,
-        isSelected: selecteKeys.includes(item),
+        isSelected: selectedKeys.includes(item),
       }));
     };
 
-    const convertToTree = (collection, selecteKeys) => {
+    const convertToTree = (collection, selectedKeys) => {
       const associateField = treeOptions?.[0];
       const labelField = treeOptions?.[1];
 
@@ -212,22 +208,22 @@ const CategoryConditionConfiguration: FC<
           if (!associateItem) {
             return null;
           }
-          const assocaiteChildren = collection
+          const associateChildren = collection
             .filter(c => c[associateField] === key)
             .map(c => {
               const itemKey = c[labelField];
               return {
                 key: itemKey,
                 label: itemKey,
-                isSelected: isChecked(selecteKeys, itemKey),
+                isSelected: isChecked(selectedKeys, itemKey),
               };
             });
           const itemKey = associateItem?.[colName];
           return {
             key: itemKey,
             label: itemKey,
-            isSelected: isChecked(selecteKeys, itemKey),
-            children: assocaiteChildren,
+            isSelected: isChecked(selectedKeys, itemKey),
+            children: associateChildren,
           };
         })
         .filter(i => Boolean(i)) as RelationFilterValue[];

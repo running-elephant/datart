@@ -21,7 +21,7 @@
         "cancel": "取消",
         "saveDndEnter": "保存并进入"
       },
-      "accout": {
+      "account": {
         "accountSettings": {
           "title": "账号设置",
           "clickUpload": "点击上传",
@@ -93,6 +93,8 @@
           "checkboxGroup": "多选框",
           "multiDropdownList": "多选下拉列表",
           "rangeTime": "日期范围",
+          "rangeTimePicker": "日期范围",
+          "recommendTime": "推荐时间",
           "rangeValue": "数值范围",
           "text": "文本",
           "tree": "下拉树列表",
@@ -211,9 +213,7 @@
         },
         "format": {
           "local": "本地",
-          "date": "日期",
-          "ll": "LL",
-          "lll": "LLL"
+          "date": "日期"
         }
       },
       "dataview": {
@@ -307,6 +307,7 @@
         "mixed": "混合",
         "filter": "筛选",
         "colorize": "颜色",
+        "colorRange": "Range Color",
         "info": "信息",
         "sort": "排序",
         "size": "大小",
@@ -400,6 +401,10 @@
           "opacity": "透明度",
           "backgroundColor": "背景颜色",
           "borderStyle": "边框样式"
+        },
+        "paging": {
+          "title": "常规",
+          "pageSize": "总行数"
         }
       },
       "present": {
@@ -445,14 +450,38 @@
     "board": {
       "action": {
         "dataChart": "数据图表",
+        "addDataChartFormList": "添加已有数据图表",
+        "createDataChartInBoard": "新建数据图表",
         "media": "媒体组件",
+        "image": "图片",
+        "richText": "富文本",
+        "timer": "计时器",
+        "iFrame": "iFrame",
+        "video": "视频",
         "container": "容器",
+        "tab": "标签页",
         "controller": "控制器",
         "undo": "撤销",
         "redo": "重做",
         "delete": "删除",
         "copy": "复制",
         "paste": "粘贴"
+      },
+      "controlTypes": {
+        "common": "常规",
+        "date": "日期",
+        "numeric": "数值",
+        "button": "按钮"
+      }
+    },
+    "widget": {
+      "type": {
+        "chart": "数据图表",
+        "media": "媒体",
+        "container": "容器",
+        "controller": "控制器",
+        "query": "查询",
+        "reset": "重置"
       }
     }
   },

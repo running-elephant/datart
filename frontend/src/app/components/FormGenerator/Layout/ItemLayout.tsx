@@ -32,7 +32,6 @@ import {
 } from 'utils/object';
 import { GroupLayout } from '.';
 import {
-  BaiscSelector,
   BasicCheckbox,
   BasicColorSelector,
   BasicFont,
@@ -43,6 +42,7 @@ import {
   BasicInputPercentage,
   BasicLine,
   BasicMarginWidth,
+  BasicSelector,
   BasicSlider,
   BasicSwitch,
   BasicText,
@@ -50,7 +50,6 @@ import {
 } from '../Basic';
 import {
   ConditionStylePanel,
-  DataCachePanel,
   DataReferencePanel,
   ListTemplatePanel,
   UnControlledTableHeaderPanel,
@@ -98,6 +97,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
         });
         onChange?.(ancestors, newData);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dependency]);
 
     const handleDataChange = (
@@ -128,7 +128,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
         case ChartStyleSectionComponentType.INPUT:
           return <BasicInput {...props} />;
         case ChartStyleSectionComponentType.SELECT:
-          return <BaiscSelector {...props} />;
+          return <BasicSelector {...props} />;
         case ChartStyleSectionComponentType.TABS:
           return <BasicUnControlledTabPanel {...props} />;
         case ChartStyleSectionComponentType.FONT:
@@ -151,8 +151,6 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           return <ListTemplatePanel {...props} />;
         case ChartStyleSectionComponentType.LINE:
           return <BasicLine {...props} />;
-        case ChartStyleSectionComponentType.CACHE:
-          return <DataCachePanel {...props} />;
         case ChartStyleSectionComponentType.REFERENCE:
           return <DataReferencePanel {...props} />;
         case ChartStyleSectionComponentType.TABLEHEADER:

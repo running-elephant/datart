@@ -104,7 +104,7 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
         targetOption.loading = true;
 
         const data = await getViewData(targetOption.value);
-        if (!data) return;
+        if (!data || !data.model) return; // make page can edit after click folder
         const model = JSON.parse(data.model);
         const children: CascaderOptionType[] = Object.keys(model).map(key => {
           return {

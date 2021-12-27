@@ -26,7 +26,7 @@ import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
-const BaiscSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
   ({
     ancestors,
     translate: t = title => title,
@@ -93,7 +93,7 @@ const BaiscSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
   itemLayoutComparer,
 );
 
-export default BaiscSelector;
+export default BasicSelector;
 
 const Wrapper = styled(BW)`
   .ant-select {

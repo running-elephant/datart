@@ -52,17 +52,4 @@ public class ScriptRender {
         this.variableQuote = variableQuote;
     }
 
-    protected String getVariablePattern(String variableName) {
-        variableName = StringUtils.prependIfMissing(variableName, variableQuote);
-        variableName = StringUtils.appendIfMissing(variableName, variableQuote);
-        return variableName;
-    }
-
-//    private String variableValueString(ScriptVariable variable) {
-//        if (variable == null || CollectionUtils.isEmpty(variable.getValues())) {
-//            return "";
-//        } else {
-//            return String.join(",", variable.getValues());
-//        }
-//    }
 }

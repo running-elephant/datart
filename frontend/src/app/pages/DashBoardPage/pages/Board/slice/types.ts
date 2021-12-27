@@ -189,6 +189,7 @@ export interface WidgetInfo {
   inLinking: boolean; //是否在触发联动
   selected: boolean;
   pageInfo: Partial<PageInfo>;
+  errInfo?: string;
   selectItems?: string[];
   parameters?: any;
 }

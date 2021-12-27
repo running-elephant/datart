@@ -48,7 +48,7 @@ export const BoardSetting: FC = memo(() => {
   useEffect(() => {
     cacheValue.current = {
       backgroundColor: config.background.color,
-      backgroundImage: [config.background.image],
+      backgroundImage: config.background.image,
       scaleMode: config.scaleMode,
       boardWidth: config.width,
       boardHeight: config.height,
@@ -57,7 +57,7 @@ export const BoardSetting: FC = memo(() => {
       paddingW: config.containerPadding[0],
       paddingH: config.containerPadding[1],
       rowHeight: config.rowHeight,
-      initialQuery: config.initialQuery=== false ? false : true, // TODO migration 如果initialQuery的值为undefined默认为true 兼容旧的仪表盘没有initialQuery参数的问题 
+      initialQuery: config.initialQuery === false ? false : true, // TODO migration 如果initialQuery的值为undefined默认为true 兼容旧的仪表盘没有initialQuery参数的问题
     };
     form.setFieldsValue({ ...cacheValue.current });
   }, [config, form]);
@@ -65,9 +65,10 @@ export const BoardSetting: FC = memo(() => {
   const onUpdate = useCallback(
     (newValues, config: DashboardConfig) => {
       const value = { ...cacheValue.current, ...newValues };
+
       const nextConf = produce(config, draft => {
         draft.background.color = getRGBAColor(value.backgroundColor);
-        draft.background.image = value.backgroundImage[0];
+        draft.background.image = value.backgroundImage;
         draft.scaleMode = value.scaleMode;
         draft.width = value.boardWidth;
         draft.height = value.boardHeight;
@@ -76,16 +77,13 @@ export const BoardSetting: FC = memo(() => {
         draft.containerPadding[0] = value.paddingW;
         draft.containerPadding[1] = value.paddingH;
         draft.rowHeight = value.rowHeight;
-        draft.initialQuery= value.initialQuery;
+        draft.initialQuery = value.initialQuery;
       });
       dispatch(editBoardStackActions.updateBoardConfig(nextConf));
     },
     [dispatch],
   );
-  const onForceUpdate = useCallback(() => {
-    const values = form.getFieldsValue();
-    onUpdate(values, config);
-  }, [config, form, onUpdate]);
+
   const throttledUpdate = useRef(
     throttle((allValue, config) => onUpdate(allValue, config), 1000),
   );
@@ -140,11 +138,7 @@ export const BoardSetting: FC = memo(() => {
           )}
           <Panel header="背景设计" key="background" forceRender>
             <Group>
-              <BackgroundSet
-                onForceUpdate={onForceUpdate}
-                background={config.background}
-                form={form}
-              />
+              <BackgroundSet background={config.background} />
             </Group>
           </Panel>
           <Panel header="查询配置" key="initialQuery" forceRender>

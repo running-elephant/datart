@@ -20,11 +20,12 @@ import {
   ClockCircleOutlined,
   LinkOutlined,
   SyncOutlined,
+  WarningTwoTone,
 } from '@ant-design/icons';
 import { Space, Tooltip } from 'antd';
 import React, { FC, useContext } from 'react';
 import styled from 'styled-components';
-import { PRIMARY } from 'styles/StyleConstants';
+import { ERROR, PRIMARY } from 'styles/StyleConstants';
 import { BoardContext } from '../../contexts/BoardContext';
 import { WidgetContext } from '../../contexts/WidgetContext';
 import { WidgetInfoContext } from '../../contexts/WidgetInfoContext';
@@ -36,7 +37,8 @@ interface WidgetToolBarProps {}
 
 const WidgetToolBar: FC<WidgetToolBarProps> = () => {
   const { boardType, editing: boardEditing } = useContext(BoardContext);
-  const { loading, inLinking, rendered } = useContext(WidgetInfoContext);
+  const { loading, inLinking, rendered, errInfo } =
+    useContext(WidgetInfoContext);
   const widget = useContext(WidgetContext);
   const { onClearLinkage } = useContext(WidgetMethodContext);
   const ssp = e => {
@@ -77,6 +79,24 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
       ) : null;
     }
   };
+  const renderErrorIcon = (errInfo?: string) => {
+    if (!errInfo) return null;
+    const renderTitle = errInfo => {
+      if (typeof errInfo !== 'string') return 'object';
+      return (
+        <div
+          style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}
+        >
+          {errInfo}
+        </div>
+      );
+    };
+    return (
+      <Tooltip title={renderTitle(errInfo)}>
+        <WarningTwoTone twoToneColor={ERROR} />
+      </Tooltip>
+    );
+  };
   const renderWidgetAction = () => {
     const widgetType = widget.config.type;
     const hideTypes: WidgetType[] = ['query', 'reset', 'controller'];
@@ -85,9 +105,11 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
     }
     return <WidgetActionDropdown widget={widget} />;
   };
+
   return (
     <StyleWrap onClick={ssp} className="widget-tool-bar">
       <Space>
+        {renderErrorIcon(errInfo)}
         {renderedIcon()}
         {loadingIcon()}
         {linkageIcon()}
