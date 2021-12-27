@@ -408,19 +408,23 @@ export function transformToObjectArray(
   if (!columns || !metas) {
     return [];
   }
-  return columns.map((col, index) => {
+
+  const result: any[] = Array.apply(null, Array(columns.length));
+  for (let j = 0; j < result.length; j++) {
     let objCol = {
-      id: index,
+      id: j,
     };
     for (let i = 0; i < metas.length; i++) {
       const key = metas?.[i]?.name;
       if (!!key) {
-        objCol[key] = col[i];
+        objCol[key] = columns[j][i];
       }
     }
-    return objCol;
-  });
+    result[j] = objCol;
+  }
+  return result;
 }
+
 // TODO delete this function  #migration
 export function transfromToObjectArray(
   columns?: string[][],
@@ -429,21 +433,7 @@ export function transfromToObjectArray(
   console.warn(
     'This method `transfromToObjectArray` will be deprecated and can be replaced by `transformToObjectArray`',
   );
-  if (!columns || !metas) {
-    return [];
-  }
-  return columns.map((col, index) => {
-    let objCol = {
-      id: index,
-    };
-    for (let i = 0; i < metas.length; i++) {
-      const key = metas?.[i]?.name;
-      if (!!key) {
-        objCol[key] = col[i];
-      }
-    }
-    return objCol;
-  });
+  return transformToObjectArray(columns, metas);
 }
 
 export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
