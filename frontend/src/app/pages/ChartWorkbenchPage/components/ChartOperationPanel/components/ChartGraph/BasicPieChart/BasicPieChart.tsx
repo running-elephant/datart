@@ -112,7 +112,7 @@ class BasicPieChart extends Chart {
 
     return {
       tooltip: {
-        formatter: this.getTooltipFormmaterFunc(
+        formatter: this.getTooltipFormatterFunc(
           styleConfigs,
           groupConfigs,
           aggregateConfigs,
@@ -284,15 +284,22 @@ class BasicPieChart extends Chart {
         return seriesParams.name;
       }
       const data = seriesParams?.data || {};
-      return `${showName ? seriesParams?.name + ': ' : ''}${
-        showValue ? toFormattedValue(seriesParams?.value[0], data?.format) : ''
-      }${
-        showPercent && showValue
-          ? '(' + seriesParams?.percent + '%)'
-          : showPercent
-          ? seriesParams?.percent + '%'
-          : ''
-      }`;
+      let labelValue = '';
+      if (showName) {
+        labelValue = seriesParams?.name;
+      }
+      if (showName && (showValue || showPercent)) {
+        labelValue += ': ';
+      }
+      if (showValue) {
+        labelValue += toFormattedValue(seriesParams?.value[0], data?.format);
+      }
+      if (showPercent && showValue) {
+        labelValue += '(' + seriesParams?.percent + '%)';
+      } else if (showPercent) {
+        labelValue += seriesParams?.percent + '%';
+      }
+      return labelValue;
     };
   }
 
@@ -304,7 +311,7 @@ class BasicPieChart extends Chart {
     return { radius: radiusValue, roseType: this.isRose };
   }
 
-  getTooltipFormmaterFunc(
+  getTooltipFormatterFunc(
     styleConfigs,
     groupConfigs,
     aggregateConfigs,
@@ -315,24 +322,14 @@ class BasicPieChart extends Chart {
       if (seriesParams.componentType !== 'series') {
         return seriesParams.name;
       }
-      const showPercentage = getStyleValueByGroup(
-        styleConfigs,
-        'tooltip',
-        'showPercentage',
-      );
       const { data, value, percent } = seriesParams;
       if (!groupConfigs?.length) {
         const tooltip = [data]
           .concat(infoConfigs)
           .map((config, index) => valueFormatter(config, value?.[index]));
-        if (showPercentage) {
-          tooltip[0] += '(' + percent + '%)';
-        }
+        tooltip[0] += '(' + percent + '%)';
         return tooltip.join('<br />');
       }
-      let tooltip = aggregateConfigs
-        .concat(infoConfigs)
-        .map((config, index) => valueFormatter(config, value?.[index]));
       const infoTotal = infoConfigs.map(info => {
         let total = 0;
         dataColumns.map(dc => {
@@ -340,17 +337,18 @@ class BasicPieChart extends Chart {
         });
         return total;
       });
-      if (showPercentage) {
-        tooltip = tooltip.map((item, index) => {
+      let tooltip = aggregateConfigs
+        .concat(infoConfigs)
+        .map((config, index) => {
+          let tooltipValue = valueFormatter(config, value?.[index]);
           if (!index) {
-            return (item += '(' + percent + '%)');
+            return (tooltipValue += '(' + percent + '%)');
           }
           const percentNum =
             (value?.[aggregateConfigs?.length] / infoTotal?.[index - 1]) *
               100 || 0;
-          return (item += '(' + percentNum.toFixed(2) + '%)');
+          return (tooltipValue += '(' + percentNum.toFixed(2) + '%)');
         });
-      }
       return tooltip.join('<br />');
     };
   }

@@ -201,19 +201,6 @@ const config: ChartConfig = {
         },
       ],
     },
-    {
-      label: 'tooltip.title',
-      key: 'tooltip',
-      comType: 'group',
-      rows: [
-        {
-          label: 'tooltip.showPercentage',
-          key: 'showPercentage',
-          default: false,
-          comType: 'checkbox',
-        },
-      ],
-    },
   ],
   settings: [
     {
