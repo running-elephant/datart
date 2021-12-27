@@ -169,6 +169,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     setChart(currentChart);
     let clonedState = CloneValueDeep(currentChart.config);
 
+    dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
     dispatch(
       workbenchSlice.actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
@@ -186,6 +187,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       chartConfig: chartConfig!,
       chartGraphId: chart?.meta.id!,
       computedFields: dataview?.computedFields || [],
+      aggregation: backendChart?.config?.aggregation,
     };
 
     const dataChart: DataChart = {
@@ -207,6 +209,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     dataview,
     onSaveInWidget,
     orgId,
+    backendChart?.config?.aggregation,
   ]);
 
   const saveChart = useCallback(async () => {
@@ -219,6 +222,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           chartId: dataChartId,
           index: 0,
           parentId: 0,
+          aggregation: backendChart?.config?.aggregation,
         }),
       );
       onSaveInDataChart?.(orgId, dataChartId);
@@ -239,6 +243,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
                 chartId: dataChartId,
                 index: 0,
                 parentId: 0,
+                aggregation: backendChart?.config?.aggregation,
               }),
             );
             saveToWidget();
@@ -260,6 +265,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     orgId,
     chartType,
     saveToWidget,
+    backendChart?.config?.aggregation,
   ]);
 
   const registerChartEvents = chart => {
@@ -293,6 +299,24 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     ]);
   };
 
+  const handleAggregationState = state => {
+    const currentChart = ChartManager.instance().getById(chart?.meta?.id);
+    registerChartEvents(currentChart);
+    let clonedState = CloneValueDeep(currentChart?.config);
+
+    dispatch(actions.updateChartAggregation(state));
+    dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
+    dispatch(
+      workbenchSlice.actions.updateChartConfig({
+        type: ChartConfigReducerActionType.INIT,
+        payload: {
+          init: {
+            ...clonedState,
+          },
+        },
+      }),
+    );
+  };
   return (
     <StyledChartWorkbenchPage>
       <ChartWorkbench
@@ -302,7 +326,9 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           onGoBack: () => {
             onClose?.();
           },
+          onChangeAggregation: handleAggregationState,
         }}
+        aggregation={backendChart?.config?.aggregation}
         chart={chart}
         dataset={dataset}
         dataview={dataview}

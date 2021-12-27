@@ -72,6 +72,7 @@ export type BackendChartConfig = {
   chartConfig: string;
   chartGraphId: string;
   computedFields: ChartDataViewMeta[];
+  aggregation: boolean;
 };
 
 export type WorkbenchState = {
@@ -255,9 +256,11 @@ export const refreshDatasetAction = createAsyncThunk(
     try {
       const state = thunkAPI.getState() as any;
       const workbenchState = state.workbench as typeof initState;
+
       if (!workbenchState.currentDataView?.id) {
         return;
       }
+
       const builder = new ChartDataRequestBuilder(
         {
           ...workbenchState.currentDataView,
@@ -266,6 +269,7 @@ export const refreshDatasetAction = createAsyncThunk(
         workbenchState.chartConfig?.settings,
         arg?.pageInfo,
         true,
+        workbenchState.backendChart?.config?.aggregation,
       );
       const requestParams = builder
         .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
@@ -328,7 +332,7 @@ export const fetchChartAction = createAsyncThunk(
 export const updateChartAction = createAsyncThunk(
   'workbench/updateChartAction',
   async (
-    arg: { name; viewId; graphId; chartId; index; parentId },
+    arg: { name; viewId; graphId; chartId; index; parentId; aggregation },
     thunkAPI,
   ) => {
     try {
@@ -336,6 +340,7 @@ export const updateChartAction = createAsyncThunk(
       const workbenchState = state.workbench as typeof initState;
 
       const stringConfig = JSON.stringify({
+        aggregation: arg.aggregation,
         chartConfig: workbenchState.chartConfig,
         chartGraphId: arg.graphId,
         computedFields: workbenchState.currentDataView?.computedFields || [],
@@ -436,6 +441,7 @@ const workbenchSlice = createSlice({
             return state;
         }
       };
+
       state.chartConfig = chartConfigReducer(state.chartConfig!, {
         type: action.payload.type,
         payload: action.payload.payload,
@@ -449,6 +455,11 @@ const workbenchSlice = createSlice({
         ...state.currentDataView,
         computedFields: action.payload,
       } as ChartDataView;
+    },
+    updateChartAggregation: (state, action: PayloadAction<boolean>) => {
+      if (state.backendChart) {
+        state.backendChart.config.aggregation = action.payload;
+      }
     },
     resetWorkbenchState: (state, action) => {
       return initState;
@@ -485,10 +496,13 @@ const workbenchSlice = createSlice({
           return;
         }
 
-        const backendChartConfig =
+        let backendChartConfig =
           typeof payload.config === 'string'
             ? JSON.parse(payload.config)
             : CloneValueDeep(payload.config);
+        backendChartConfig = backendChartConfig || {};
+        backendChartConfig.aggregation =
+          backendChartConfig?.aggregation === undefined ? true : false;
         state.backendChart = {
           ...payload,
           config: backendChartConfig,

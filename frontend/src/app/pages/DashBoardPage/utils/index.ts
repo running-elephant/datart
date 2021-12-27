@@ -84,6 +84,9 @@ export const getChartDataRequestBuilder = (dataChart: DataChart) => {
     } as any,
     dataChart?.config?.chartConfig?.datas,
     dataChart?.config?.chartConfig?.settings,
+    {},
+    false,
+    dataChart?.config?.aggregation,
   );
   return builder;
 };
@@ -391,10 +394,12 @@ export const getChartWidgetRequestParams = (obj: {
     return null;
   }
   const chartDataView = viewMap[dataChart?.viewId];
+
   if (!chartDataView) {
     errorHandle(`can\`t find View ${dataChart?.viewId}`);
     return null;
   }
+
   const builder = getChartDataRequestBuilder(dataChart);
   let requestParams = builder
     .addExtraSorters((option?.sorters as any) || [])

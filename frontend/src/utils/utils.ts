@@ -180,7 +180,7 @@ export const onDropTreeFn = ({ info, treeData, callback }) => {
   } else {
     //中间
     if (!dropArr[dropIndex].index && !dropArr[dropIndex + 1].index) {
-      index = dropArr[dropArr.length-1].index + 1;
+      index = dropArr[dropArr.length - 1].index + 1;
     } else {
       index = (dropArr[dropIndex].index + dropArr[dropIndex + 1].index) / 2;
     }

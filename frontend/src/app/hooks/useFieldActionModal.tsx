@@ -39,6 +39,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
     dataView?: ChartDataView,
     dataConfig?: ChartDataSectionConfig,
     onChange?,
+    aggregation?: boolean,
   ) => {
     if (!config) {
       return null;
@@ -50,6 +51,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
       dataView,
       dataConfig,
       onConfigChange: onChange,
+      aggregation,
     };
 
     switch (actionType) {
@@ -91,6 +93,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
     dataset?: ChartDataset,
     dataView?: ChartDataView,
     modalSize?: string,
+    aggregation?: boolean,
   ) => {
     const currentConfig = dataConfig.rows?.find(c => c.uid === columnUid);
     let _modalSize = StateModalSize.MIDDLE;
@@ -110,6 +113,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
           dataView,
           dataConfig,
           onChange,
+          aggregation,
         ),
       onOk: handleOk(onConfigChange, columnUid),
       maskClosable: true,

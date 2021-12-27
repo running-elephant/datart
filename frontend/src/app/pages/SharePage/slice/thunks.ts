@@ -142,6 +142,8 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
       args.preview?.chartConfig?.datas,
       args.preview?.chartConfig?.settings,
       args.pageInfo,
+      false,
+      args.preview?.backendChart?.config?.aggregation,
     );
     const response = await request({
       method: 'POST',

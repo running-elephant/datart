@@ -16,7 +16,10 @@
  * limitations under the License.
  */
 
+import { ChartDataSectionFieldActionType } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
+import produce from 'immer';
+import { CloneValueDeep } from 'utils/object';
 
 export function dataConfigSectionComparer(
   prevProps: ChartDataConfigSectionProps,
@@ -24,9 +27,29 @@ export function dataConfigSectionComparer(
 ) {
   if (
     prevProps.translate !== nextProps.translate ||
-    prevProps.config !== nextProps.config
+    prevProps.config !== nextProps.config ||
+    prevProps.aggregation !== nextProps.aggregation
   ) {
     return false;
   }
   return true;
+}
+
+export function handleDefaultConfig(defaultConfig): any {
+  const nextConfig = produce(defaultConfig, draft => {
+    let _actions = {};
+
+    draft.rows?.forEach((row, i) => {
+      draft.rows[i].aggregate = undefined;
+    });
+
+    for (let key in draft.actions) {
+      _actions[key] = draft.actions[key].filter(
+        v => v !== 'aggregate' && v !== 'aggregateLimit',
+      );
+    }
+
+    draft.actions = _actions;
+  });
+  return nextConfig;
 }

@@ -319,6 +319,8 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
       arg.chartPreview?.chartConfig?.datas,
       arg.chartPreview?.chartConfig?.settings,
       arg.pageInfo,
+      false,
+      arg.chartPreview?.backendChart?.config?.aggregation,
     );
     const response = await request({
       method: 'POST',

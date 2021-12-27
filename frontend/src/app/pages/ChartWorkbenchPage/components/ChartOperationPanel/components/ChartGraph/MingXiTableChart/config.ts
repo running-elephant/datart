@@ -25,7 +25,6 @@ const config: ChartConfig = {
       key: 'mixed',
       required: true,
       type: 'mixed',
-      disableAggregate: true,
     },
     {
       label: 'filter',

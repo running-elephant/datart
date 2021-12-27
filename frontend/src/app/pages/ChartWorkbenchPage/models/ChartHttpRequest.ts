@@ -96,7 +96,7 @@ export class ChartDataRequestBuilder {
   pageInfo: ChartDatasetPageInfo;
   dataView: ChartDataView;
   script: boolean;
-
+  aggregation?: boolean;
   private extraSorters: ChartRequest['orders'] = [];
 
   constructor(
@@ -105,18 +105,23 @@ export class ChartDataRequestBuilder {
     settingConfigs?: ChartStyleSectionConfig[],
     pageInfo?: ChartDatasetPageInfo,
     script?: boolean,
+    aggregation?: boolean,
   ) {
     this.dataView = dataView;
     this.chartDataConfigs = dataConfigs || [];
     this.charSettingConfigs = settingConfigs || [];
     this.pageInfo = pageInfo || {};
     this.script = script || false;
+    this.aggregation = aggregation;
   }
 
   private buildAggregators() {
     const aggColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
       (acc, cur) => {
         if (!cur.rows) {
+          return acc;
+        }
+        if (this.aggregation === false) {
           return acc;
         }
         if (
@@ -320,6 +325,20 @@ export class ChartDataRequestBuilder {
         if (!cur.rows) {
           return acc;
         }
+
+        if (this.aggregation === false) {
+          if (
+            cur.type === ChartDataSectionType.GROUP ||
+            cur.type === ChartDataSectionType.COLOR ||
+            cur.type === ChartDataSectionType.AGGREGATE ||
+            cur.type === ChartDataSectionType.SIZE ||
+            cur.type === ChartDataSectionType.INFO ||
+            cur.type === ChartDataSectionType.MIXED
+          ) {
+            return acc.concat(cur.rows);
+          }
+        }
+
         if (cur.type === ChartDataSectionType.MIXED) {
           return acc.concat(cur.rows);
         }
@@ -360,6 +379,9 @@ export class ChartDataRequestBuilder {
     const groupColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
       (acc, cur) => {
         if (!cur.rows) {
+          return acc;
+        }
+        if (this.aggregation === false) {
           return acc;
         }
         if (

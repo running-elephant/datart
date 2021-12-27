@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/ChartAggregationContext';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
@@ -38,10 +39,12 @@ const ChartWorkbench: FC<{
   dataview?: ChartDataView;
   chartConfig?: ChartConfig;
   chart?: Chart;
+  aggregation?: boolean;
   header?: {
     name?: string;
     onSaveChart?: () => void;
     onGoBack?: () => void;
+    onChangeAggregation?: (state: boolean) => void;
   };
   onChartChange: (c: Chart) => void;
   onChartConfigChange: (type, payload) => void;
@@ -52,6 +55,7 @@ const ChartWorkbench: FC<{
     dataview,
     chartConfig,
     chart,
+    aggregation,
     header,
     onChartChange,
     onChartConfigChange,
@@ -59,34 +63,37 @@ const ChartWorkbench: FC<{
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
-
     return (
-      <ChartDatasetContext.Provider value={{ dataset: dataset }}>
-        <ChartDataViewContext.Provider value={{ dataView: dataview }}>
-          <TimeConfigContext.Provider
-            value={{ locale: language, format: dateFormat }}
-          >
-            <StyledChartWorkbench>
-              {header && (
-                <ChartHeaderPanel
-                  chartName={header?.name}
-                  onGoBack={header?.onGoBack}
-                  onSaveChart={header?.onSaveChart}
-                />
-              )}
-              <StyledChartOperationPanel>
-                <ChartOperationPanel
-                  chart={chart}
-                  chartConfig={chartConfig}
-                  onChartChange={onChartChange}
-                  onChartConfigChange={onChartConfigChange}
-                  onDataViewChange={onDataViewChange}
-                />
-              </StyledChartOperationPanel>
-            </StyledChartWorkbench>
-          </TimeConfigContext.Provider>
-        </ChartDataViewContext.Provider>
-      </ChartDatasetContext.Provider>
+      <ChartAggregationContext.Provider value={{ aggregation }}>
+        <ChartDatasetContext.Provider value={{ dataset: dataset }}>
+          <ChartDataViewContext.Provider value={{ dataView: dataview }}>
+            <TimeConfigContext.Provider
+              value={{ locale: language, format: dateFormat }}
+            >
+              <StyledChartWorkbench>
+                {header && (
+                  <ChartHeaderPanel
+                    chartName={header?.name}
+                    onGoBack={header?.onGoBack}
+                    onSaveChart={header?.onSaveChart}
+                    onChangeAggregation={header?.onChangeAggregation}
+                    aggregation={aggregation}
+                  />
+                )}
+                <StyledChartOperationPanel>
+                  <ChartOperationPanel
+                    chart={chart}
+                    chartConfig={chartConfig}
+                    onChartChange={onChartChange}
+                    onChartConfigChange={onChartConfigChange}
+                    onDataViewChange={onDataViewChange}
+                  />
+                </StyledChartOperationPanel>
+              </StyledChartWorkbench>
+            </TimeConfigContext.Provider>
+          </ChartDataViewContext.Provider>
+        </ChartDatasetContext.Provider>
+      </ChartAggregationContext.Provider>
     );
   },
   (prev, next) =>

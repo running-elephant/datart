@@ -191,6 +191,7 @@ const ChartPreviewBoard: FC<{
       if (!chartPreview) {
         return;
       }
+
       const builder = new ChartDataRequestBuilder(
         {
           id: chartPreview?.backendChart?.viewId,
@@ -199,6 +200,9 @@ const ChartPreviewBoard: FC<{
         } as any,
         chartPreview?.chartConfig?.datas,
         chartPreview?.chartConfig?.settings,
+        {},
+        false,
+        chartPreview?.backendChart?.config?.aggregation,
       );
       dispatch(
         makeDownloadDataTask({

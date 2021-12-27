@@ -21,9 +21,10 @@ import {
   ChartDataSectionConfig,
   ChartDataSectionType,
 } from 'app/types/ChartConfig';
-import { FC, memo } from 'react';
+import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
+import ChartAggregationContext from '../../../../contexts/ChartAggregationContext';
 import PaletteDataConfig from '../ChartDataConfigSection';
 
 const ChartDataConfigPanel: FC<{
@@ -36,6 +37,7 @@ const ChartDataConfigPanel: FC<{
 }> = memo(
   ({ dataConfigs, onChange }) => {
     const translate = useI18NPrefix(`viz.palette.data`);
+    const { aggregation } = useContext(ChartAggregationContext);
 
     const getSectionComponent = (config, index) => {
       const props = {
@@ -43,10 +45,12 @@ const ChartDataConfigPanel: FC<{
         ancestors: [index],
         config,
         translate,
+        aggregation,
         onConfigChanged: (ancestors, config, needRefresh?: boolean) => {
           onChange?.(ancestors, config, needRefresh);
         },
       };
+
       switch (props.config?.type) {
         case ChartDataSectionType.GROUP:
           return <PaletteDataConfig.GroupTypeSection {...props} />;

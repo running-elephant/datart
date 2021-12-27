@@ -55,6 +55,7 @@ import {
 } from 'styles/StyleConstants';
 import { ValueOf } from 'types';
 import { v4 as uuidv4 } from 'uuid';
+import ChartAggregationContext from '../../../../contexts/ChartAggregationContext';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
 import VizDraggableItem from './ChartDraggableElement';
 
@@ -76,6 +77,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     const [showModal, contextHolder] = useFieldActionModal({
       i18nPrefix: 'viz.palette.data.enum.actionType',
     });
+    const { aggregation } = useContext(ChartAggregationContext);
 
     const [{ isOver, canDrop }, drop] = useDrop(
       () => ({
@@ -156,6 +158,37 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           return { delete: needDelete };
         },
         canDrop: (item: ChartDataSectionField, monitor) => {
+          let items = Array.isArray(item) ? item : [item];
+
+          if (aggregation === false) {
+            let status = false;
+            let { type } = currentConfig;
+
+            if (
+              (type === 'color' || type === 'group') &&
+              items.every(v => v.type === 'DATA' || v.type === 'STRING')
+            ) {
+              status = true;
+            }
+
+            if (
+              (type === 'aggregate' || type === 'size' || type === 'info') &&
+              items.every(v => v.type === 'NUMERIC')
+            ) {
+              status = true;
+            }
+
+            if (type === 'mixed') {
+              status = true;
+            }
+
+            if (type === 'filter') {
+              status = true;
+            }
+
+            return status;
+          }
+
           if (
             Array.isArray(item) &&
             typeof currentConfig.actions === 'object' &&
@@ -182,7 +215,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             return true;
           }
 
-          let items = [item];
           if (
             monitor.getItemType() ===
             CHART_DRAG_ELEMENT_TYPE.DATASET_GROUP_COLUMNS
@@ -209,7 +241,8 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       if (
         currentConfig?.type === ChartDataSectionType.AGGREGATE ||
         currentConfig?.type === ChartDataSectionType.SIZE ||
-        currentConfig?.type === ChartDataSectionType.INFO
+        currentConfig?.type === ChartDataSectionType.INFO ||
+        currentConfig?.type === ChartDataSectionType.MIXED
       ) {
         if (currentConfig.disableAggregate) {
           return;
@@ -305,7 +338,11 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                     {currentConfig?.actions && (
                       <DownOutlined style={{ marginRight: '10px' }} />
                     )}
-                    <span>{getColumnRenderName(columnConfig)}</span>
+                    <span>
+                      {aggregation
+                        ? getColumnRenderName(columnConfig)
+                        : columnConfig.colName}
+                    </span>
                     <div style={{ display: 'inline-block', marginLeft: '5px' }}>
                       {enableActionsIcons(columnConfig)}
                     </div>
@@ -348,6 +385,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           dataset,
           dataView,
           modalSize,
+          aggregation,
         );
       };
 

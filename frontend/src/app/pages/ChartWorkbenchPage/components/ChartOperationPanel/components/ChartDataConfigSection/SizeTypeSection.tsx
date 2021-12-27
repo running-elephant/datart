@@ -21,11 +21,11 @@ import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import BaseDataConfigSection from './BaseDataConfigSection';
-import { dataConfigSectionComparer } from './utils';
+import { dataConfigSectionComparer, handleDefaultConfig } from './utils';
 
 const SizeTypeSection: FC<ChartDataConfigSectionProps> = memo(
-  ({ config, ...rest }) => {
-    const defaultConfig = Object.assign(
+  ({ config, aggregation, ...rest }) => {
+    let defaultConfig = Object.assign(
       {},
       {
         actions: {
@@ -38,6 +38,11 @@ const SizeTypeSection: FC<ChartDataConfigSectionProps> = memo(
       },
       config,
     );
+
+    if (aggregation === false) {
+      defaultConfig = handleDefaultConfig(defaultConfig);
+    }
+
     return <BaseDataConfigSection {...rest} config={defaultConfig} />;
   },
   dataConfigSectionComparer,

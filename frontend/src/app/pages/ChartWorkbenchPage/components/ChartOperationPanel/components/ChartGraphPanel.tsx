@@ -61,6 +61,7 @@ const ChartGraphPanel: FC<{
   const handleChartChange = useCallback(
     chartId => () => {
       const chart = chartManager.getById(chartId);
+
       if (!!chart) {
         onChartChange(chart);
       }

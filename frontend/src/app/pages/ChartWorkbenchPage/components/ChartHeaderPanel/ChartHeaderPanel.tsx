@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-import { LeftOutlined } from '@ant-design/icons';
-import { Button, Space } from 'antd';
+import { LeftOutlined, MoreOutlined } from '@ant-design/icons';
+import { Button, Dropdown, Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
@@ -30,30 +30,55 @@ import {
   SPACE_TIMES,
   SPACE_XS,
 } from 'styles/StyleConstants';
+import AggregationOperationMenu from './components/AggregationOperationMenu';
 
 const ChartHeaderPanel: FC<{
   chartName?: string;
   onSaveChart?: () => void;
   onGoBack?: () => void;
-}> = memo(({ chartName, onSaveChart, onGoBack }) => {
-  const t = useI18NPrefix(`viz.workbench.header`);
+  onChangeAggregation?: (state: boolean) => void;
+  aggregation?: boolean;
+}> = memo(
+  ({
+    chartName,
+    onSaveChart,
+    onGoBack,
+    onChangeAggregation,
+    aggregation = true,
+  }) => {
+    const t = useI18NPrefix(`viz.workbench.header`);
 
-  return (
-    <Wrapper>
-      {onGoBack && (
-        <GoBack>
-          <LeftOutlined onClick={onGoBack} />
-        </GoBack>
-      )}
-      <h1>{chartName}</h1>
-      <Space>
-        <Button type="primary" onClick={onSaveChart}>
-          {t('save')}
-        </Button>
-      </Space>
-    </Wrapper>
-  );
-});
+    const getOverlays = () => {
+      return (
+        <AggregationOperationMenu
+          defaultValue={aggregation}
+          onChangeAggregation={e => {
+            onChangeAggregation?.(e);
+          }}
+        ></AggregationOperationMenu>
+      );
+    };
+
+    return (
+      <Wrapper>
+        {onGoBack && (
+          <GoBack>
+            <LeftOutlined onClick={onGoBack} />
+          </GoBack>
+        )}
+        <h1>{chartName}</h1>
+        <Space>
+          <Button type="primary" onClick={onSaveChart}>
+            {t('save')}
+          </Button>
+          <Dropdown key="more" trigger={['click']} overlay={getOverlays()}>
+            <Button icon={<MoreOutlined />} />
+          </Dropdown>
+        </Space>
+      </Wrapper>
+    );
+  },
+);
 
 export default ChartHeaderPanel;
 

@@ -37,7 +37,7 @@
           "newPassword": "新密码",
           "confirmPassword": "确定新密码",
           "success": "修改成功",
-          "save":"保存"
+          "save": "保存"
         },
         "switchLanguage": {
           "title": "切换语言"
@@ -201,6 +201,10 @@
         "save": "保存",
         "saveToDashboard": "保存到仪表盘",
         "login": "登陆",
+        "aggregationSwitch": "聚合开关",
+        "aggregationSwitchTip": "开启/关闭聚合会清空全部图表配置，确认开启/关闭？",
+        "open": "开启",
+        "close": "关闭",
         "lang": {
           "zh": "中文",
           "en": "英文"
