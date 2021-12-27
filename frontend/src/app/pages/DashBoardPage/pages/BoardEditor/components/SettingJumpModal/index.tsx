@@ -8,7 +8,7 @@ import { Form, Input, Modal, ModalProps, Select } from 'antd';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { selectDataChartById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { getChartDataRequestBuilder } from 'app/pages/DashBoardPage/utils';
+import { getChartGroupColumns } from 'app/pages/DashBoardPage/utils';
 import { convertToWidgetMap } from 'app/pages/DashBoardPage/utils/widget';
 import { makeSelectVizTree } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
@@ -105,14 +105,10 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     selectDataChartById(state, curJumpWidget?.datachartId),
   );
   const [targetType, setTargetType] = useState(jumpTypes[0].value);
-  const chartGroupColumns = useMemo(() => {
-    if (!dataChart) {
-      return [];
-    }
-    const builder = getChartDataRequestBuilder(dataChart);
-    let groupColumns = builder.buildGroupColumns();
-    return groupColumns;
-  }, [dataChart]);
+  const chartGroupColumns = useMemo(
+    () => getChartGroupColumns(dataChart),
+    [dataChart],
+  );
   const onTargetChange = useCallback(
     value => {
       form.setFieldsValue({ filter: undefined });

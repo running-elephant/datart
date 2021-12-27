@@ -15,9 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Asynchronously loads the component for NotFoundPage
- */
 
 import { defaultLazyLoad } from 'utils/loadable';
 

@@ -45,11 +45,10 @@ public class QueryScript implements Serializable {
 
     private List<ScriptVariable> variables;
 
-    private Map<String,Column> schema;
+    private Map<String, Column> schema;
 
     public String toQueryKey() {
         return 'Q' + DigestUtils.md5Hex(JSON.toJSONString(this));
     }
-
 
 }

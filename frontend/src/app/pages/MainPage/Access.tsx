@@ -31,13 +31,7 @@ export function Access({
     return null;
   }
 
-  const isAuthorized = isOwner
-    ? true
-    : type === 'module'
-    ? permissionMap[module]['*'] >= level
-    : id
-    ? permissionMap[module][id] >= level
-    : false;
+  const isAuthorized = calcAc(isOwner, permissionMap, module, level, id, type);
 
   return (
     <AuthorizedComponent authority={isAuthorized} denied={denied}>

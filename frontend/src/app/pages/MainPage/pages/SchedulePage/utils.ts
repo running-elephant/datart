@@ -143,6 +143,7 @@ export const toEchoFormValues = ({
     cc: configObj?.cc || '',
     bcc: configObj?.bcc || '',
     type: configObj?.attachments || [],
+    webHookUrl: configObj?.webHookUrl || '',
     demoContent,
     folderContent,
     setCronExpressionManually,

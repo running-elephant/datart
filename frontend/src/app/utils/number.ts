@@ -74,7 +74,7 @@ export function toFormattedValue(
   format?: IFieldFormatConfig,
 ) {
   if (value === null || value === undefined) {
-    return value;
+    return '-';
   }
 
   if (!format || format.type === FieldFormatType.DEFAULT) {

@@ -79,15 +79,15 @@ class ChartIFrameContainerDispatcher {
     if (!this.chartContainerMap.has(containerId)) {
       const newContainer = style => (chart, dataset, config) => {
         return (
-          <div style={style}>
+          <div key={containerId} style={style}>
             <ChartTools.ChartIFrameContainer
               dataset={dataset}
               chart={chart}
               config={config}
               containerId={containerId}
-              key={containerId}
               width={style?.width}
               height={style?.height}
+              widgetSpecialConfig={{ env: 'workbench' }}
             />
           </div>
         );
