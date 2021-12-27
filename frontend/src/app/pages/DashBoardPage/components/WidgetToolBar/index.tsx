@@ -81,8 +81,18 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
   };
   const renderErrorIcon = (errInfo?: string) => {
     if (!errInfo) return null;
+    const renderTitle = errInfo => {
+      if (typeof errInfo !== 'string') return 'object';
+      return (
+        <div
+          style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}
+        >
+          {errInfo}
+        </div>
+      );
+    };
     return (
-      <Tooltip title={errInfo}>
+      <Tooltip title={renderTitle(errInfo)}>
         <WarningTwoTone twoToneColor={ERROR} />
       </Tooltip>
     );

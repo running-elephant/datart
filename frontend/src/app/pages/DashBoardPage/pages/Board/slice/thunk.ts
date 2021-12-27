@@ -13,7 +13,7 @@ import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';
 import ChartDataset from 'app/types/ChartDataset';
 import { RootState } from 'types';
 import { request } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import { errorHandle, getErrorMessage } from 'utils/utils';
 import { boardActions } from '.';
 import { getChartWidgetRequestParams } from '../../../utils';
 import { handleServerBoardAction } from './asyncActions';
@@ -277,9 +277,10 @@ export const getChartWidgetDataAsync = createAsyncThunk<
         boardActions.setWidgetErrInfo({
           boardId,
           widgetId,
-          errInfo: (error as any)?.message as any,
+          errInfo: getErrorMessage(error),
         }),
       );
+
       dispatch(
         boardActions.setWidgetData({
           id: widgetId,
@@ -376,7 +377,7 @@ export const getControllerOptions = createAsyncThunk<
         boardActions.setWidgetErrInfo({
           boardId,
           widgetId,
-          errInfo: (error as any)?.message as any,
+          errInfo: getErrorMessage(error),
         }),
       );
     }
