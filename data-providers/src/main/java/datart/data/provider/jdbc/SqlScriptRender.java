@@ -115,7 +115,6 @@ public class SqlScriptRender extends ScriptRender {
                                 return variable.getValues().iterator().next();
                             } else return variable.getValues();
                         }));
-        String script1 = queryScript.getScript();
         script = FreemarkerContext.process(queryScript.getScript(), dataMap);
 
         // 替换脚本中的表达式类型变量
@@ -129,7 +128,6 @@ public class SqlScriptRender extends ScriptRender {
             }
         }
 
-        // find select sql
         final String selectSql0 = findSelectSql(script);
 
         if (StringUtils.isEmpty(selectSql0)) {
