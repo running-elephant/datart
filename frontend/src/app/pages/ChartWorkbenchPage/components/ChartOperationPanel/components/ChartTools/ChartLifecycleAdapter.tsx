@@ -55,7 +55,10 @@ const ChartLifecycleAdapter: React.FC<{
     setChartResourceLoader(new ChartIFrameContainerResourceLoader());
   });
 
-  // when chart change
+  /**
+   * Chart Mount Event
+   * Dependency: 'chart?.meta?.id', 'eventBrokerRef'
+   */
   useEffect(() => {
     if (!chart || !document || !window || !config) {
       return;
@@ -94,9 +97,12 @@ const ChartLifecycleAdapter: React.FC<{
       setContainerStatus(ContainerStatus.INIT);
       eventBrokerRef?.current?.publish(ChartLifecycle.UNMOUNTED, {});
     };
-  }, [chart?.meta?.name, eventBrokerRef]);
+  }, [chart?.meta?.id, eventBrokerRef]);
 
-  // when chart config or dataset change
+  /**
+   * Chart Update Event
+   * Dependency: 'config', 'dataset', 'widgetSpecialConfig', 'containerStatus', 'document', 'window'
+   */
   useEffect(() => {
     if (
       !document ||
@@ -114,19 +120,37 @@ const ChartLifecycleAdapter: React.FC<{
         config,
         widgetSpecialConfig,
       },
-      { document, window, width: style?.width, height: style?.height },
+      {
+        document,
+        window,
+        width: style?.width,
+        height: style?.height,
+      },
     );
   }, [config, dataset, widgetSpecialConfig, containerStatus, document, window]);
 
-  // when chart size change
+  /**
+   * Chart Resize Event
+   * Dependency: 'style.width', 'style.height', 'document', 'window'
+   */
   useEffect(() => {
-    if (!style.width || !style.height) {
+    if (
+      !document ||
+      !window ||
+      !config ||
+      !dataset ||
+      containerStatus !== ContainerStatus.SUCCESS
+    ) {
       return;
     }
 
     eventBrokerRef.current?.publish(
       ChartLifecycle.RESIZE,
-      {},
+      {
+        dataset,
+        config,
+        widgetSpecialConfig,
+      },
       {
         document,
         window,
