@@ -18,10 +18,14 @@
 
 package datart.data.provider;
 
+import datart.core.base.ExtendProcessor;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.*;
+import datart.core.data.provider.processor.DataProviderPostProcessor;
+import datart.core.data.provider.processor.DataProviderPreProcessor;
 import datart.data.provider.optimize.DataProviderExecuteOptimizer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -34,6 +38,9 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class ProviderManager extends DataProviderExecuteOptimizer implements DataProviderManager {
+
+    @Autowired(required=false)
+    private List<ExtendProcessor> extendProcessors = new ArrayList<ExtendProcessor>();
 
     private static final Map<String, DataProvider> cachedDataProviders = new ConcurrentSkipListMap<>();
 
@@ -90,17 +97,51 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
             }
         }
 
-        if (param.isConcurrencyOptimize()) {
-            dataframe = runOptimize(queryKey, source, queryScript, param);
-        } else {
-            dataframe = run(source, queryScript, param);
-        }
+        dataframe = queryScript(source, queryScript, param, queryKey);
 
         if (param.isCacheEnable()) {
             setCache(queryKey, dataframe, param.getCacheExpires());
         }
         return dataframe;
 
+    }
+
+    private Dataframe queryScript(DataProviderSource source, QueryScript queryScript, ExecuteParam param, String queryKey) throws Exception {
+
+        //sql + param preprocessing
+        this.preProcessorQuery(source,queryScript,param);
+
+        Dataframe dataframe;
+        if (param.isConcurrencyOptimize()) {
+            dataframe = runOptimize(queryKey, source, queryScript, param);
+        } else {
+            dataframe = run(source, queryScript, param);
+        }
+
+        //data postprocessing
+        this.postProcessorQuery(dataframe,source,queryScript,param);
+
+        return dataframe;
+    }
+
+    private void preProcessorQuery(DataProviderSource source, QueryScript queryScript, ExecuteParam param){
+        if(!CollectionUtils.isEmpty(extendProcessors)){
+            for(ExtendProcessor processor: extendProcessors){
+                if(processor instanceof DataProviderPreProcessor){
+                    ((DataProviderPreProcessor) processor).preRun(source,queryScript,param);
+                }
+            }
+        }
+    }
+
+    private void postProcessorQuery(Dataframe dataframe,DataProviderSource source, QueryScript queryScript, ExecuteParam param){
+        if(!CollectionUtils.isEmpty(extendProcessors)){
+            for(ExtendProcessor processor: extendProcessors){
+                if(processor instanceof DataProviderPostProcessor){
+                    ((DataProviderPostProcessor) processor).postRun(dataframe,source,queryScript,param);
+                }
+            }
+        }
     }
 
     @Override
