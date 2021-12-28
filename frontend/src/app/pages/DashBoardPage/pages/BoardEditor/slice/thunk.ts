@@ -27,6 +27,7 @@ import {
   createWidgetInfo,
   createWidgetInfoMap,
   getWidgetInfoMapByServer,
+  getWidgetMapByServer,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
@@ -46,10 +47,7 @@ import {
 } from '.';
 import { BoardInfo, BoardType, ServerDashboard } from '../../Board/slice/types';
 import { getDataChartMap } from './../../../utils/board';
-import {
-  getWidgetMapByServer,
-  updateWidgetsRect,
-} from './../../../utils/widget';
+import { updateWidgetsRect } from './../../../utils/widget';
 import { addVariablesToBoard } from './actions/actions';
 import {
   boardInfoState,

@@ -28,7 +28,6 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataView } from 'app/types/ChartDataView';
-// import { dataChartServerModel } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transformMeta } from 'app/utils/chartHelper';
 import {
   AutoBoardWidgetBackgroundDefault,

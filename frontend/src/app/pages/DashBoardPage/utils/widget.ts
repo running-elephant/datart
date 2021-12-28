@@ -15,7 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import {
+  ContainerItem,
+  WidgetType,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
@@ -24,7 +27,6 @@ import produce from 'immer';
 import { DeltaStatic } from 'quill';
 import { CSSProperties } from 'react';
 import { FONT_FAMILY, G90, WHITE } from 'styles/StyleConstants';
-import { uuidv4 } from 'utils/utils';
 import { convertImageUrl, fillPx } from '.';
 import {
   AutoBoardWidgetBackgroundDefault,
@@ -38,7 +40,6 @@ import {
   BoardType,
   BorderConfig,
   ChartWidgetContent,
-  ContainerItem,
   ContainerWidgetContent,
   ContainerWidgetType,
   ControllerWidgetContent,
@@ -97,7 +98,7 @@ export const createControllerWidget = (opt: {
     boardType: boardType,
   });
 
-  const widgetId = relations[0]?.sourceId || uuidv4();
+  const widgetId = relations[0]?.sourceId || String(Math.random());
   const widget: Widget = createWidget({
     id: widgetId,
     dashboardId: boardId,
@@ -204,7 +205,7 @@ export const createWidget = (option: {
   relations?: Relation[];
 }) => {
   const widget: Widget = {
-    id: option.id || uuidv4(),
+    id: option.id || String(Math.random()),
     dashboardId: option.dashboardId,
     config: option.config,
     datachartId: option.datachartId || '',
@@ -394,145 +395,6 @@ export const createMediaContent = (type: MediaWidgetType) => {
   return content;
 };
 
-// TODO chart widget
-export const getWidgetMapByServer = (
-  widgets: ServerWidget[],
-  dataCharts: DataChart[],
-  filterSearchParamsMap?: FilterSearchParamsWithMatch,
-) => {
-  const filterSearchParams = filterSearchParamsMap?.params,
-    isMatchByName = filterSearchParamsMap?.isMatchByName;
-  const dataChartMap = dataCharts.reduce((acc, cur) => {
-    acc[cur.id] = cur;
-    return acc;
-  }, {} as Record<string, DataChart>);
-  const widgetMap = widgets.reduce((acc, cur) => {
-    const viewIds = cur.datachartId
-      ? [dataChartMap[cur.datachartId].viewId]
-      : cur.viewIds;
-    try {
-      let widget: Widget = {
-        ...cur,
-        config: JSON.parse(cur.config),
-        relations: convertWidgetRelationsToObj(cur.relations),
-        viewIds,
-      };
-      // TODO migration about font 5 --xld
-      widget.config.nameConfig = {
-        ...fontDefault,
-        ...widget.config.nameConfig,
-      };
-      // TODO migration about filter --xld
-      if ((widget.config.type as any) !== 'filter') {
-        acc[cur.id] = widget;
-      }
-      return acc;
-    } catch (error) {
-      return acc;
-    }
-  }, {} as Record<string, Widget>);
-
-  const wrappedDataCharts: DataChart[] = [];
-  const controllerWidgets: Widget[] = []; // use for reset button
-  const widgetList = Object.values(widgetMap);
-
-  // 处理 widget包含关系 containerWidget 被包含的 widget.parentId 不为空
-  widgetList
-    .filter(w => w.parentId)
-    .forEach(widget => {
-      const parentWidgetId = widget.parentId!;
-      const childTabId = widget.config.tabId as string;
-      const curItem = (
-        widgetMap[parentWidgetId].config.content as ContainerWidgetContent
-      ).itemMap[childTabId];
-      if (curItem) {
-        curItem.childWidgetId = widget.id;
-        curItem.name = widget.config.name;
-      } else {
-        let newItem: ContainerItem = {
-          tabId: childTabId,
-          name: widget.config.name,
-          childWidgetId: widget.id,
-        };
-        (
-          widgetMap[parentWidgetId].config.content as ContainerWidgetContent
-        ).itemMap[childTabId] = newItem;
-      }
-    });
-
-  // 处理 controller config visibility依赖关系 id, url参数修改filter
-  widgetList
-    .filter(w => w.config.type === 'controller')
-    .forEach(widget => {
-      const content = widget.config.content as ControllerWidgetContent;
-      // 根据 url参数修改filter 默认值
-      if (filterSearchParams) {
-        const paramsKey = Object.keys(filterSearchParams);
-        const matchKey = isMatchByName ? widget.config.name : widget.id;
-        if (paramsKey.includes(matchKey)) {
-          const _value = isMatchByName
-            ? filterSearchParams[widget.config.name]
-            : filterSearchParams[widget.id];
-          switch (content?.type) {
-            case ControllerFacadeTypes.RangeTime:
-              if (
-                content.config.controllerDate &&
-                content.config.controllerDate?.startTime &&
-                content.config.controllerDate?.endTime
-              ) {
-                content.config.controllerDate.startTime.exactValue =
-                  _value?.[0];
-                content.config.controllerDate.endTime.exactValue = _value?.[0];
-              }
-              break;
-            default:
-              content.config.controllerValues = _value || [];
-              break;
-          }
-        }
-      }
-
-      // 通过widget.relation 那里面的 targetId确定 关联controllerWidget 的真实ID
-      const { visibilityType: visibility, condition } =
-        content.config.visibility;
-      const { relations } = widget;
-      if (visibility === 'condition' && condition) {
-        const dependentFilterId = relations
-          .filter(re => re.config.type === 'controlToControl')
-          .map(re => re.targetId)?.[0];
-        if (dependentFilterId) {
-          condition.dependentControllerId = dependentFilterId;
-        }
-      }
-
-      //处理 assistViewFields 旧数据 assistViewFields 是 string 类型 alpha.3版本之后 使用数组存储的 后续版本稳定之后 可以移除此逻辑
-      // TODO migration <<
-      if (typeof content?.config?.assistViewFields === 'string') {
-        content.config.assistViewFields = (
-          content.config.assistViewFields as string
-        ).split(VALUE_SPLITTER);
-      }
-      // TODO migration >> --xld
-
-      controllerWidgets.push(widget);
-    });
-
-  // 处理 自有 chart widgetControl
-  widgetList
-    .filter(w => w.config.content.type === 'widgetChart')
-    .forEach(widget => {
-      let content = widget.config.content as ChartWidgetContent;
-      widget.datachartId = content.dataChart?.id || '';
-      wrappedDataCharts.push(content.dataChart!);
-      delete content.dataChart;
-    });
-
-  return {
-    widgetMap,
-    wrappedDataCharts,
-    controllerWidgets,
-  };
-};
 export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {
   const widgetInfoMap = {};
   Object.values(widgetMap).forEach(item => {
@@ -920,4 +782,144 @@ export const getLinkedColumn = (
     relation?.config?.widgetToWidget?.triggerColumn ||
     ''
   );
+};
+
+// TODO chart widget
+export const getWidgetMapByServer = (
+  widgets: ServerWidget[],
+  dataCharts: DataChart[],
+  filterSearchParamsMap?: FilterSearchParamsWithMatch,
+) => {
+  const filterSearchParams = filterSearchParamsMap?.params,
+    isMatchByName = filterSearchParamsMap?.isMatchByName;
+  const dataChartMap = dataCharts.reduce((acc, cur) => {
+    acc[cur.id] = cur;
+    return acc;
+  }, {} as Record<string, DataChart>);
+  const widgetMap = widgets.reduce((acc, cur) => {
+    const viewIds = cur.datachartId
+      ? [dataChartMap[cur.datachartId].viewId]
+      : cur.viewIds;
+    try {
+      let widget: Widget = {
+        ...cur,
+        config: JSON.parse(cur.config),
+        relations: convertWidgetRelationsToObj(cur.relations),
+        viewIds,
+      };
+      // TODO migration about font 5 --xld
+      widget.config.nameConfig = {
+        ...fontDefault,
+        ...widget.config.nameConfig,
+      };
+      // TODO migration about filter --xld
+      if ((widget.config.type as any) !== 'filter') {
+        acc[cur.id] = widget;
+      }
+      return acc;
+    } catch (error) {
+      return acc;
+    }
+  }, {} as Record<string, Widget>);
+
+  const wrappedDataCharts: DataChart[] = [];
+  const controllerWidgets: Widget[] = []; // use for reset button
+  const widgetList = Object.values(widgetMap);
+
+  // 处理 widget包含关系 containerWidget 被包含的 widget.parentId 不为空
+  widgetList
+    .filter(w => w.parentId)
+    .forEach(widget => {
+      const parentWidgetId = widget.parentId!;
+      const childTabId = widget.config.tabId as string;
+      const curItem = (
+        widgetMap[parentWidgetId].config.content as ContainerWidgetContent
+      ).itemMap[childTabId];
+      if (curItem) {
+        curItem.childWidgetId = widget.id;
+        curItem.name = widget.config.name;
+      } else {
+        let newItem: ContainerItem = {
+          tabId: childTabId,
+          name: widget.config.name,
+          childWidgetId: widget.id,
+        };
+        (
+          widgetMap[parentWidgetId].config.content as ContainerWidgetContent
+        ).itemMap[childTabId] = newItem;
+      }
+    });
+
+  // 处理 controller config visibility依赖关系 id, url参数修改filter
+  widgetList
+    .filter(w => w.config.type === 'controller')
+    .forEach(widget => {
+      const content = widget.config.content as ControllerWidgetContent;
+      // 根据 url参数修改filter 默认值
+      if (filterSearchParams) {
+        const paramsKey = Object.keys(filterSearchParams);
+        const matchKey = isMatchByName ? widget.config.name : widget.id;
+        if (paramsKey.includes(matchKey)) {
+          const _value = isMatchByName
+            ? filterSearchParams[widget.config.name]
+            : filterSearchParams[widget.id];
+          switch (content?.type) {
+            case ControllerFacadeTypes.RangeTime:
+              if (
+                content.config.controllerDate &&
+                content.config.controllerDate?.startTime &&
+                content.config.controllerDate?.endTime
+              ) {
+                content.config.controllerDate.startTime.exactValue =
+                  _value?.[0];
+                content.config.controllerDate.endTime.exactValue = _value?.[0];
+              }
+              break;
+            default:
+              content.config.controllerValues = _value || [];
+              break;
+          }
+        }
+      }
+
+      // 通过widget.relation 那里面的 targetId确定 关联controllerWidget 的真实ID
+      const { visibilityType: visibility, condition } =
+        content.config.visibility;
+      const { relations } = widget;
+      if (visibility === 'condition' && condition) {
+        const dependentFilterId = relations
+          .filter(re => re.config.type === 'controlToControl')
+          .map(re => re.targetId)?.[0];
+        if (dependentFilterId) {
+          condition.dependentControllerId = dependentFilterId;
+        }
+      }
+
+      //处理 assistViewFields 旧数据 assistViewFields 是 string 类型 alpha.3版本之后 使用数组存储的 后续版本稳定之后 可以移除此逻辑
+      // TODO migration <<
+      if (typeof content?.config?.assistViewFields === 'string') {
+        content.config.assistViewFields = (
+          content.config.assistViewFields as string
+        ).split(VALUE_SPLITTER);
+      }
+      // TODO migration >> --xld
+
+      controllerWidgets.push(widget);
+    });
+
+  // 处理 自有 chart widgetControl
+  widgetList
+    .filter(w => w.config.content.type === 'widgetChart')
+    .forEach(widget => {
+      let content = widget.config.content as ChartWidgetContent;
+      widget.datachartId = content.dataChart?.id || '';
+      wrappedDataCharts.push(content.dataChart!);
+      delete content.dataChart;
+    });
+
+  return {
+    widgetMap,
+    wrappedDataCharts,
+    controllerWidgets,
+  };
 };
