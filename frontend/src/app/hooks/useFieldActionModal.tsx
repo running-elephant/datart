@@ -52,8 +52,8 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
       dataConfig,
       onConfigChange: onChange,
       aggregation,
+      i18nPrefix,
     };
-
     switch (actionType) {
       case ChartDataSectionFieldActionType.Sortable:
         return <FieldActions.SortAction {...props} />;

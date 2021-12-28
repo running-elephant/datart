@@ -21,9 +21,9 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo, useMemo } from 'react';
 
 const AggregationOperationMenu: FC<{
-  defaultValue: boolean;
+  defaultValue?: boolean;
   onChangeAggregation: (value: boolean) => void;
-}> = memo(({ defaultValue, onChangeAggregation }) => {
+}> = memo(({ defaultValue = true, onChangeAggregation }) => {
   const checkedValue = useMemo(() => defaultValue, [defaultValue]);
   const t = useI18NPrefix(`viz.workbench.header`);
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Popconfirm, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import { IW } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
@@ -148,21 +148,7 @@ const ChartGraphPanel: FC<{
     };
 
     return allCharts.map(c => {
-      if (c?.meta?.id !== 'mingxi-table') {
-        return _getChartIcon(c, handleChartChange(c?.meta?.id));
-      }
-
-      return (
-        <Popconfirm
-          key={c?.meta?.id}
-          title={t('confirm', undefined, { name: c.meta?.name })}
-          onConfirm={handleChartChange(c?.meta?.id)}
-          okText={t('ok')}
-          cancelText={t('cancel')}
-        >
-          {_getChartIcon(c)}
-        </Popconfirm>
-      );
+      return _getChartIcon(c, handleChartChange(c?.meta?.id));
     });
   };
 

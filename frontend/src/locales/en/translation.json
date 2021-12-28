@@ -369,7 +369,8 @@
             "colorize": "colorize",
             "colorRange": "colorize",
             "colorSingle": "colorize",
-            "size": "size"
+            "size": "size",
+            "chooseTheme": "Choose theme"
           }
         }
       },
@@ -483,6 +484,38 @@
         "query": "Query",
         "reset": "Reset"
       }
+    },
+    "sideBar": {
+      "folder": "目录",
+      "presentation": "演示",
+      "folders": {
+        "folderTitle": "仪表板 & 数据图表",
+        "dashboard": "新建仪表板",
+        "dataChart": "新建数据图表",
+        "folder": "新建目录",
+        "recycle": "回收站",
+        "folderTree": {
+          "successDeleted": "成功删除",
+          "successRecycle": "成功移至回收站",
+          "info": "基本信息",
+          "delete": "删除",
+          "moveToTrash": "移至回收站",
+          "confirmDelete": "确定删除",
+          "sureMoveRecycleBin": "确定移至回收站"
+        }
+      },
+      "storyBoards": {
+        "storyBoardsList": "故事板列表",
+        "newStoryBoards": "新建故事板",
+        "recycle": "回收站"
+      },
+      "recycle": {
+        "successDeleted": "删除成功",
+        "successRestored": "还原成功",
+        "reduction": "还原",
+        "confirmDeletion": "确认删除",
+        "delete": "删除"
+      }
     }
   },
   "share": {
@@ -501,6 +534,10 @@
       "more": "More",
       "ok": "OK",
       "cancel": "Cancel"
+    },
+    "listTitle": {
+      "search": "Search",
+      "searchValue": "Search name keywords"
     }
   }
 }

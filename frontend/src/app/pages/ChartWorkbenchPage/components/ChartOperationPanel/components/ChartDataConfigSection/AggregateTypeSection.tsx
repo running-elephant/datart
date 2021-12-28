@@ -51,7 +51,7 @@ const AggregateTypeSection: FC<ChartDataConfigSectionProps> = memo(
     );
 
     if (aggregation === false) {
-      defaultConfig = handleDefaultConfig(defaultConfig);
+      defaultConfig = handleDefaultConfig(defaultConfig, config.type);
     }
 
     return <BaseDataConfigSection {...rest} config={defaultConfig} />;

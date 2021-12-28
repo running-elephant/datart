@@ -23,6 +23,7 @@ import {
   ThemeColorSelection,
 } from 'app/components/ColorPicker';
 import { ColorTag } from 'app/components/ReactColorPicker';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import { updateBy } from 'app/utils/mutation';
@@ -37,7 +38,8 @@ const AggregationColorizeAction: FC<{
     config: ChartDataSectionField,
     needRefresh?: boolean,
   ) => void;
-}> = memo(({ config, dataset, onConfigChange }) => {
+  i18nPrefix?: string;
+}> = memo(({ config, dataset, onConfigChange, i18nPrefix }) => {
   const actionNeedNewRequest = true;
   const [themeColors, setThemeColors] = useState(Theme.color);
   const [colors, setColors] = useState<{ key: string; value: string }[]>(
@@ -45,6 +47,7 @@ const AggregationColorizeAction: FC<{
   );
   const [selectColor, setSelectColor] = useState(colors[0]);
   const [selColorBoxStatus, setSelColorBoxStatus] = useState(false);
+  const t = useI18NPrefix(i18nPrefix);
 
   const handleColorChange = value => {
     if (selectColor) {
@@ -105,7 +108,7 @@ const AggregationColorizeAction: FC<{
   return (
     <>
       <ThemeColorSelection callbackFn={selectThemeColorFn}>
-        选择主题
+        {t('chooseTheme')}
       </ThemeColorSelection>
       <Row>
         <Col span={24}>

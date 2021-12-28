@@ -160,35 +160,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         canDrop: (item: ChartDataSectionField, monitor) => {
           let items = Array.isArray(item) ? item : [item];
 
-          if (aggregation === false) {
-            let status = false;
-            let { type } = currentConfig;
-
-            if (
-              (type === 'color' || type === 'group') &&
-              items.every(v => v.type === 'DATA' || v.type === 'STRING')
-            ) {
-              status = true;
-            }
-
-            if (
-              (type === 'aggregate' || type === 'size' || type === 'info') &&
-              items.every(v => v.type === 'NUMERIC')
-            ) {
-              status = true;
-            }
-
-            if (type === 'mixed') {
-              status = true;
-            }
-
-            if (type === 'filter') {
-              status = true;
-            }
-
-            return status;
-          }
-
           if (
             Array.isArray(item) &&
             typeof currentConfig.actions === 'object' &&

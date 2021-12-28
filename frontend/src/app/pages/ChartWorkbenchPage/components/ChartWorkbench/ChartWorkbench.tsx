@@ -77,7 +77,6 @@ const ChartWorkbench: FC<{
                     onGoBack={header?.onGoBack}
                     onSaveChart={header?.onSaveChart}
                     onChangeAggregation={header?.onChangeAggregation}
-                    aggregation={aggregation}
                   />
                 )}
                 <StyledChartOperationPanel>
