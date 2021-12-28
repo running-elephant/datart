@@ -23,7 +23,9 @@ import { useTranslation } from 'react-i18next';
 import { BrowserRouter } from 'react-router-dom';
 import { GlobalStyle, OverriddenStyle } from 'styles/globalStyles';
 import { LazySharePage } from './pages/SharePage/Loadable';
+
 registerTheme('default', echartsDefaultTheme);
+
 export function Share() {
   const { i18n } = useTranslation();
 

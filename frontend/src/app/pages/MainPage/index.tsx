@@ -9,6 +9,7 @@ import {
   useRouteMatch,
 } from 'react-router';
 import styled from 'styled-components/macro';
+import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
 import { NotFoundPage } from '../NotFoundPage';
 import { AccessRoute } from './AccessRoute';
 import { Background } from './Background';
@@ -49,6 +50,9 @@ export function MainPage() {
 
   // loaded first time
   useEffect(() => {
+    ChartManager.instance()
+      .load()
+      .catch(err => console.error('Fail to load customize charts with ', err));
     dispatch(getUserSettings(organizationMatch?.params.orgId));
     dispatch(getDataProviders());
     return () => {
