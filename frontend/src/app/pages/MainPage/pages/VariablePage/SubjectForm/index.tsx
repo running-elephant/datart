@@ -4,7 +4,7 @@ import { Key, memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
-import uuidv4 from 'uuid/dist/v4';
+import { uuidv4 } from 'utils/utils';
 import {
   selectMemberListLoading,
   selectMembers,

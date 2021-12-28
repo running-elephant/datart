@@ -14,7 +14,7 @@ import {
   SPACE_XS,
   WARNING,
 } from 'styles/StyleConstants';
-import uuidv4 from 'uuid/dist/v4';
+import { uuidv4 } from 'utils/utils';
 import {
   ColumnCategories,
   ColumnTypes,

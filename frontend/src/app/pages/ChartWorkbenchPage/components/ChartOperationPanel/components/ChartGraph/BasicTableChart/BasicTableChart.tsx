@@ -29,7 +29,7 @@ import {
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { isEmptyArray, Omit } from 'utils/object';
-import uuidv4 from 'uuid/dist/v4';
+import { uuidv4 } from 'utils/utils';
 import AntdTableWrapper from './AntdTableWrapper';
 import {
   getCustomBodyCellStyle,

@@ -37,7 +37,7 @@ import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import produce from 'immer';
 import { RootState } from 'types';
-import uuidv4 from 'uuid/dist/v4';
+import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { BoardType } from '../../../Board/slice/types';
 import { ControllerConfig } from '../../components/ControllerWidgetPanel/types';

@@ -33,7 +33,7 @@ import Reveal from 'reveal.js';
 import 'reveal.js/dist/reveal.css';
 import RevealZoom from 'reveal.js/plugin/zoom/plugin';
 import styled from 'styled-components/macro';
-import uuidv4 from 'uuid/dist/v4';
+import { uuidv4 } from 'utils/utils';
 import { storyActions } from '../../StoryBoardPage/slice';
 import { makeSelectStoryPagesById } from '../../StoryBoardPage/slice/selectors';
 import { getPageContentDetail } from '../../StoryBoardPage/slice/thunks';

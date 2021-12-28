@@ -37,8 +37,7 @@ import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
 import { CloneValueDeep } from 'utils/object';
 import { request } from 'utils/request';
-import { errorHandle } from 'utils/utils';
-import uuidv4 from 'uuid/dist/v4';
+import { errorHandle, uuidv4 } from 'utils/utils';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,

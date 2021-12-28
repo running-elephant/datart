@@ -3,8 +3,7 @@ import { ChartDataSectionType } from 'app/types/ChartConfig';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { CloneValueDeep } from 'utils/object';
-import { reduxActionErrorHandler } from 'utils/utils';
-import uuidv4 from 'uuid/dist/v4';
+import { reduxActionErrorHandler, uuidv4 } from 'utils/utils';
 import {
   addStoryboard,
   addViz,

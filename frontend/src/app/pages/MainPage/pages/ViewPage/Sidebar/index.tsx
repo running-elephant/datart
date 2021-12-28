@@ -15,8 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
-import { getInsertedNodeIndex } from 'utils/utils';
-import uuidv4 from 'uuid/dist/v4';
+import { getInsertedNodeIndex, uuidv4 } from 'utils/utils';
 import { UNPERSISTED_ID_PREFIX } from '../constants';
 import { SaveFormContext } from '../SaveFormContext';
 import {

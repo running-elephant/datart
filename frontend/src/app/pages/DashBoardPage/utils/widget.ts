@@ -24,7 +24,7 @@ import produce from 'immer';
 import { DeltaStatic } from 'quill';
 import { CSSProperties } from 'react';
 import { FONT_FAMILY, G90, WHITE } from 'styles/StyleConstants';
-import uuidv4 from 'uuid/dist/v4';
+import { uuidv4 } from 'utils/utils';
 import { convertImageUrl, fillPx } from '.';
 import {
   AutoBoardWidgetBackgroundDefault,

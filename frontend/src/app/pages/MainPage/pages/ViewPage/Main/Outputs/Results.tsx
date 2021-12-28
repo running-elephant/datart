@@ -10,7 +10,7 @@ import { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { FONT_FAMILY, FONT_SIZE_BASE } from 'styles/StyleConstants';
-import uuidv4 from 'uuid/dist/v4';
+import { uuidv4 } from 'utils/utils';
 import { selectRoles } from '../../../MemberPage/slice/selectors';
 import { SubjectTypes } from '../../../PermissionPage/constants';
 import { SchemaTable } from '../../components/SchemaTable';

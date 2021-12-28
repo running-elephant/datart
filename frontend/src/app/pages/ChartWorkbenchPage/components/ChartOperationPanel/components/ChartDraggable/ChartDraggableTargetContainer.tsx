@@ -54,7 +54,7 @@ import {
   SPACE_SM,
 } from 'styles/StyleConstants';
 import { ValueOf } from 'types';
-import uuidv4 from 'uuid/dist/v4';
+import { uuidv4 } from 'utils/utils';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
 import VizDraggableItem from './ChartDraggableElement';
 

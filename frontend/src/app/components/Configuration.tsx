@@ -1,7 +1,7 @@
 import { EditableProTable, ProColumns } from '@ant-design/pro-table';
 import { useCallback, useMemo, useState } from 'react';
 import { css } from 'styled-components/macro';
-import uuidv4 from 'uuid/dist/v4';
+import { uuidv4 } from 'utils/utils';
 
 const tableStyle = css`
   .ant-card-body {
