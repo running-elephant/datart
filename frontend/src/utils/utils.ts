@@ -10,6 +10,7 @@ import {
 import { APIResponse } from 'types';
 import { SaveFormModel } from '../app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { removeToken } from './auth';
+export { default as uuidv4 } from 'uuid/dist/v4';
 
 export function errorHandle(error) {
   if (error?.response) {

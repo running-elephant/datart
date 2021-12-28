@@ -22,7 +22,7 @@ import {
   SyncOutlined,
   WarningTwoTone,
 } from '@ant-design/icons';
-import { Space, Tooltip } from 'antd';
+import { Button, Space, Tooltip } from 'antd';
 import React, { FC, useContext } from 'react';
 import styled from 'styled-components';
 import { ERROR, PRIMARY } from 'styles/StyleConstants';
@@ -51,7 +51,10 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
     if (!showTypes.includes(widgetType)) return null;
     return rendered ? null : (
       <Tooltip title="等待加载">
-        <ClockCircleOutlined style={{ color: PRIMARY }} />
+        <Button
+          icon={<ClockCircleOutlined style={{ color: PRIMARY }} />}
+          type="link"
+        />
       </Tooltip>
     );
   };
@@ -59,7 +62,12 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
     const widgetType = widget.config.type;
     const showTypes: WidgetType[] = ['chart', 'controller'];
     if (!showTypes.includes(widgetType)) return null;
-    return loading ? <SyncOutlined spin style={{ color: PRIMARY }} /> : null;
+    return loading ? (
+      <Button
+        icon={<SyncOutlined spin style={{ color: PRIMARY }} />}
+        type="link"
+      />
+    ) : null;
   };
   const linkageIcon = () => {
     if (inLinking) {
@@ -74,7 +82,10 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
     } else {
       return widget.config?.linkageConfig?.open ? (
         <Tooltip title="点击图表可联动">
-          <LinkOutlined style={{ color: PRIMARY }} />
+          <Button
+            icon={<LinkOutlined style={{ color: PRIMARY }} />}
+            type="link"
+          />
         </Tooltip>
       ) : null;
     }
@@ -93,7 +104,10 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
     };
     return (
       <Tooltip title={renderTitle(errInfo)}>
-        <WarningTwoTone twoToneColor={ERROR} />
+        <StyledErrorIcon
+          icon={<WarningTwoTone twoToneColor={ERROR} />}
+          type="link"
+        />
       </Tooltip>
     );
   };
@@ -108,7 +122,7 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
 
   return (
     <StyleWrap onClick={ssp} className="widget-tool-bar">
-      <Space>
+      <Space size={0}>
         {renderErrorIcon(errInfo)}
         {renderedIcon()}
         {loadingIcon()}
@@ -130,5 +144,14 @@ const StyleWrap = styled.div`
   text-align: right;
   .widget-tool-dropdown {
     visibility: hidden;
+  }
+`;
+
+const StyledErrorIcon = styled(Button)`
+  background: ${p => p.theme.componentBackground};
+
+  &:hover,
+  &:focus {
+    background: ${p => p.theme.componentBackground};
   }
 `;

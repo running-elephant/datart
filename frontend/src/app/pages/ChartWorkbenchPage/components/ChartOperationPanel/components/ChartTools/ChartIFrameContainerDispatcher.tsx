@@ -29,6 +29,7 @@ class ChartIFrameContainerDispatcher {
   private currentContainerId = DEFAULT_CONTAINER_ID;
   private chartContainerMap = new Map<string, Function>();
   private chartMetadataMap = new Map<string, [Chart, any, any]>();
+  private editorEnv = { env: 'workbench' };
 
   public static instance(): ChartIFrameContainerDispatcher {
     if (!this.dispatcher) {
@@ -87,7 +88,7 @@ class ChartIFrameContainerDispatcher {
               containerId={containerId}
               width={style?.width}
               height={style?.height}
-              widgetSpecialConfig={{ env: 'workbench' }}
+              widgetSpecialConfig={this.editorEnv}
             />
           </div>
         );
@@ -108,7 +109,7 @@ class ChartIFrameContainerDispatcher {
           ...style,
           transform: 'translate(-9999px, -9999px)',
           position: 'absolute',
-        }; /* TODO: visibilty: 'collapse' */
+        };
   }
 }
 

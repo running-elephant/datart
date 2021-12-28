@@ -29,7 +29,7 @@ import {
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { isEmptyArray, Omit } from 'utils/object';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from 'utils/utils';
 import AntdTableWrapper from './AntdTableWrapper';
 import {
   getCustomBodyCellStyle,
@@ -46,7 +46,8 @@ class BasicTableChart extends ReactChart {
   dataColumnWidths = {};
   tablePadding = 16;
   tableCellBorder = 1;
-  tableOptions = { dataset: {}, config: {} };
+  cachedAntTableOptions = {};
+  cachedDatartConfig: ChartConfig = {};
   showSummaryRow = false;
   rowNumberUniqKey = `@datart@rowNumberKey`;
 
@@ -66,26 +67,33 @@ class BasicTableChart extends ReactChart {
   }
 
   onUpdated(options, context): void {
-    this.tableOptions = options;
-
     if (!this.isMatchRequirement(options.config)) {
       this.adapter?.unmount();
       return;
     }
 
-    this.adapter?.updated(
-      this.getOptions(
-        context,
-        options.dataset,
-        options.config,
-        options.widgetSpecialConfig,
-      ),
+    const tableOptions = this.getOptions(
       context,
+      options.dataset,
+      options.config,
+      options.widgetSpecialConfig,
     );
+    this.cachedAntTableOptions = tableOptions;
+    this.cachedDatartConfig = options.config;
+    this.adapter?.updated(tableOptions, context);
   }
 
   public onResize(options, context?): void {
-    this.onUpdated(this.tableOptions, context);
+    this.adapter?.updated(
+      Object.assign(this.cachedAntTableOptions, {
+        ...this.getAntdTableStyleOptions(
+          this.cachedDatartConfig?.styles,
+          this.cachedDatartConfig?.settings!,
+          context?.height,
+        ),
+      }),
+      context,
+    );
   }
 
   getOptions(
@@ -152,10 +160,8 @@ class BasicTableChart extends ReactChart {
       components: this.getTableComponents(styleConfigs, widgetSpecialConfig),
       ...this.getAntdTableStyleOptions(
         styleConfigs,
-        dataset,
-        null,
+        settingConfigs,
         context?.height,
-        tablePagination,
       ),
       onChange: (pagination, filters, sorter, extra) => {
         if (extra?.action === 'sort' || extra?.action === 'paginate') {
@@ -612,13 +618,11 @@ class BasicTableChart extends ReactChart {
     };
   }
 
-  getAntdTableStyleOptions(
-    styleConfigs,
-    dataset: ChartDataset,
-    width,
-    height,
-    tablePagination,
-  ) {
+  getAntdTableStyleOptions(styleConfigs?, settingConfigs?, height?) {
+    const enablePaging = this.getStyleValue(settingConfigs, [
+      'paging',
+      'enablePaging',
+    ]);
     const showTableBorder = this.getStyleValue(styleConfigs, [
       'style',
       'enableBorder',
@@ -661,7 +665,7 @@ class BasicTableChart extends ReactChart {
             (this.showSummaryRow ? SUMMRAY_ROW_HEIGHT[tableSize] : 0) -
             HEADER_HEIGHT[tableSize] *
               _getMaxHeaderHierarchy(tableHeaderStyles) -
-            (tablePagination ? PAGINATION_HEIGHT[tableSize] : 0),
+            (enablePaging ? PAGINATION_HEIGHT[tableSize] : 0),
       }),
       bordered: !!showTableBorder,
       size: tableSize,

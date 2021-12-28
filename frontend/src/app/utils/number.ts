@@ -19,7 +19,7 @@
 import { FieldFormatType, IFieldFormatConfig } from 'app/types/ChartConfig';
 import { dinero } from 'dinero.js';
 import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
-import { isFinite } from 'lodash';
+import isFinite from 'lodash/isFinite';
 import moment from 'moment';
 import { isEmpty, pipe } from 'utils/object';
 import { getCurrency, intlFormat } from './currency';

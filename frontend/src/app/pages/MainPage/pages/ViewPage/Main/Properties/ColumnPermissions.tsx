@@ -12,7 +12,7 @@ import {
   SPACE_XS,
   WARNING,
 } from 'styles/StyleConstants';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from 'utils/utils';
 import { selectRoles } from '../../../MemberPage/slice/selectors';
 import { SubjectTypes } from '../../../PermissionPage/constants';
 import { ViewStatus, ViewViewModelStages } from '../../constants';

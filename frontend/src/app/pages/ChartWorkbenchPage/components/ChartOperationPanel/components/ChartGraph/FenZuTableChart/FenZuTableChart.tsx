@@ -78,10 +78,8 @@ class FenZuTableChart extends BasicTableChart {
       components: this.getTableComponents(styleConfigs, widgetSpecialConfig),
       ...this.getAntdTableStyleOptions(
         styleConfigs,
-        dataset,
-        null,
+        settingConfigs,
         context?.height,
-        tablePagination,
       ),
       onChange: () => {},
     };

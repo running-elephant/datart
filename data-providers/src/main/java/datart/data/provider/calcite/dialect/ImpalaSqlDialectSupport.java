@@ -19,6 +19,7 @@
 package datart.data.provider.calcite.dialect;
 
 import datart.data.provider.jdbc.JdbcDriverInfo;
+import org.apache.calcite.sql.SqlAbstractDateTimeLiteral;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlWriter;
 
@@ -31,5 +32,10 @@ public class ImpalaSqlDialectSupport extends CustomSqlDialect implements FetchAn
     @Override
     public void unparseOffsetFetch(SqlWriter writer, SqlNode offset, SqlNode fetch) {
         super.unparseFetchUsingLimit(writer, offset, fetch);
+    }
+
+    @Override
+    public void unparseDateTimeLiteral(SqlWriter writer, SqlAbstractDateTimeLiteral literal, int leftPrec, int rightPrec) {
+        writer.literal("'" + literal.toFormattedString() + "'");
     }
 }

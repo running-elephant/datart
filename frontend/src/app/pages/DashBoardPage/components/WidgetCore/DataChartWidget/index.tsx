@@ -88,10 +88,17 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
   }, [chartClick, dataChart]);
 
   const widgetSpecialConfig = useMemo(() => {
-    const linkFields = widget?.relations
-      .filter(re => re.config.type === 'widgetToWidget')
-      .map(item => item.config.widgetToWidget?.triggerColumn);
-    const jumpField = widget?.config.jumpConfig?.field?.jumpFieldName;
+    let linkFields: string[] = [];
+    let jumpField: string = '';
+    const { jumpConfig, linkageConfig } = widget.config;
+    if (linkageConfig?.open) {
+      linkFields = widget?.relations
+        .filter(re => re.config.type === 'widgetToWidget')
+        .map(item => item.config.widgetToWidget?.triggerColumn as string);
+    }
+    if (jumpConfig?.open) {
+      jumpField = jumpConfig?.field?.jumpFieldName as string;
+    }
 
     return {
       linkFields,

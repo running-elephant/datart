@@ -27,7 +27,7 @@ import {
 import { RelatedWidgetItem } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/RelatedWidgets';
 import { ControllerConfig } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from 'utils/utils';
 import { createInitWidgetConfig, createWidget } from '../../widget';
 export const createControllerWidget = (opt: {
   boardId: string;

@@ -45,7 +45,8 @@ public class Const {
      */
     //默认的变量引用符号
     public static final String DEFAULT_VARIABLE_QUOTE = "$";
-
+    //变量匹配符
+    public static final String VARIABLE_EXP = "\\$\\w+\\$";
     /**
      * 权限变量
      */
