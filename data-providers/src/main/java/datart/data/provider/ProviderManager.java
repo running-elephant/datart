@@ -97,7 +97,7 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
             }
         }
 
-        dataframe = queryScript(source, queryScript, param, queryKey);
+        dataframe = runScript(source, queryScript, param, queryKey);
 
         if (param.isCacheEnable()) {
             setCache(queryKey, dataframe, param.getCacheExpires());
@@ -106,7 +106,7 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
 
     }
 
-    private Dataframe queryScript(DataProviderSource source, QueryScript queryScript, ExecuteParam param, String queryKey) throws Exception {
+    private Dataframe runScript(DataProviderSource source, QueryScript queryScript, ExecuteParam param, String queryKey) throws Exception {
 
         //sql + param preprocessing
         this.preProcessorQuery(source,queryScript,param);
