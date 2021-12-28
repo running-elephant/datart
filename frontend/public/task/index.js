@@ -23502,66 +23502,16 @@
 	 * See the License for the specific language governing permissions and
 	 * limitations under the License.
 	   */
-	// import 'core-js/modules/es.map';
+	// import 'react-app-polyfill/stable';
+	// import 'core-js/stable/map';
+	// need polyfill [Object.values,Array.prototype.find,new Map]
 	/**
 
 	 * @param ''
 	 * @description 'server task 定时任务 调用'
 	   */
-	var getQueryData = function (dataStr) {
+	var getBoardQueryData = function (dataStr) {
 	    var data = JSON.parse(dataStr);
-	    //polyfill
-	    if (!Object.values)
-	        Object.values = function (obj) {
-	            if (obj !== Object(obj))
-	                throw new TypeError('Object.values called on a non-object');
-	            var val = [], key;
-	            for (key in obj) {
-	                if (Object.prototype.hasOwnProperty.call(obj, key)) {
-	                    //@ts-ignore
-	                    val.push(obj[key]);
-	                }
-	            }
-	            return val;
-	        };
-	    if (!Array.prototype.find) {
-	        // eslint-disable-next-line no-extend-native
-	        Object.defineProperty(Array.prototype, 'find', {
-	            value: function (predicate) {
-	                // 1. Let O be ? ToObject(this value).
-	                if (this == null) {
-	                    throw new TypeError('"this" is null or not defined');
-	                }
-	                var o = Object(this);
-	                // 2. Let len be ? ToLength(? Get(O, "length")).
-	                var len = o.length >>> 0;
-	                // 3. If IsCallable(predicate) is false, throw a TypeError exception.
-	                if (typeof predicate !== 'function') {
-	                    throw new TypeError('predicate must be a function');
-	                }
-	                // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
-	                var thisArg = arguments[1];
-	                // 5. Let k be 0.
-	                var k = 0;
-	                // 6. Repeat, while k < len
-	                while (k < len) {
-	                    // a. Let Pk be ! ToString(k).
-	                    // b. Let kValue be ? Get(O, Pk).
-	                    // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
-	                    // d. If testResult is true, return kValue.
-	                    var kValue = o[k];
-	                    if (predicate.call(thisArg, kValue, k, o)) {
-	                        return kValue;
-	                    }
-	                    // e. Increase k by 1.
-	                    k++;
-	                }
-	                // 7. Return undefined.
-	                return undefined;
-	            },
-	        });
-	    }
-	    //polyfill end
 	    // const renderMode: VizRenderMode = 'schedule';
 	    var dashboard = getDashBoardByResBoard(data);
 	    var datacharts = data.datacharts, serverViews = data.views, serverWidgets = data.widgets;
@@ -23583,7 +23533,28 @@
 	        dataChartMap: dataChartMap,
 	    });
 	    var fileName = dashboard.name;
-	    return { downloadParams: downloadParams, fileName: fileName };
+	    return JSON.stringify({ downloadParams: downloadParams, fileName: fileName });
+	};
+	var getChartQueryData = function (dataStr) {
+	    // see  handleCreateDownloadDataTask
+	    var data = JSON.parse(dataStr);
+	    var dataConfig = JSON.parse(data.config);
+	    var chartConfig = dataConfig.chartConfig;
+	    var builder = new ChartDataRequestBuilder({
+	        id: data.viewId,
+	        computedFields: dataConfig.computedFields || [],
+	    }, chartConfig === null || chartConfig === void 0 ? void 0 : chartConfig.datas, chartConfig === null || chartConfig === void 0 ? void 0 : chartConfig.settings);
+	    var downloadParams = [builder.build()];
+	    var fileName = (data === null || data === void 0 ? void 0 : data.name) || 'chart';
+	    return JSON.stringify({ downloadParams: downloadParams, fileName: fileName });
+	};
+	var getQueryData = function (type, dataStr) {
+	    if (type === 'board') {
+	        return getBoardQueryData(dataStr);
+	    }
+	    else {
+	        return getChartQueryData(dataStr);
+	    }
 	};
 
 	return getQueryData;

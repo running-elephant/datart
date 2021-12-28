@@ -45,7 +45,6 @@ export type ChartDataViewMeta = {
 export type ChartDataView = View & {
   meta?: ChartDataViewMeta[];
   computedFields?: ChartDataViewMeta[];
-  // view?: { config?: string };
 };
 
 export default ChartDataView;

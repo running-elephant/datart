@@ -17,11 +17,14 @@
  * limitations under the License.
    */
 
-// Do not delete this two line
-// eslint-disable-next-line prettier/prettier
-// eslint-disable-next-line prettier/prettier
+/* eslint-disable prettier/prettier */
+
 import 'react-app-polyfill/stable';
-// import 'core-js/modules/es.map';
+import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
+import {
+  BackendChart,
+  BackendChartConfig,
+} from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
   DataChart,
   ServerDashboard,
@@ -33,8 +36,9 @@ import {
   getDataChartsByServer,
 } from 'app/pages/DashBoardPage/utils/board';
 import { getWidgetMapByServer } from 'app/pages/DashBoardPage/utils/widget';
-import 'react-app-polyfill/stable';
-
+import { ChartConfig } from 'app/types/ChartConfig';
+// import 'react-app-polyfill/stable';
+// import 'core-js/stable/map';
 // need polyfill [Object.values,Array.prototype.find,new Map]
 /**
 
@@ -74,7 +78,23 @@ const getBoardQueryData = (dataStr: string) => {
   let fileName = dashboard.name;
   return JSON.stringify({ downloadParams, fileName });
 };
-const getChartQueryData = (dataStr: string) => {};
+const getChartQueryData = (dataStr: string) => {
+  // see  handleCreateDownloadDataTask
+  const data: BackendChart = JSON.parse(dataStr);
+  const dataConfig: BackendChartConfig = JSON.parse(data.config as any);
+  const chartConfig: ChartConfig = dataConfig.chartConfig as ChartConfig;
+  const builder = new ChartDataRequestBuilder(
+    {
+      id: data.viewId,
+      computedFields: dataConfig.computedFields || [],
+    } as any,
+    chartConfig?.datas,
+    chartConfig?.settings,
+  );
+  let downloadParams = [builder.build()];
+  let fileName = data?.name || 'chart';
+  return JSON.stringify({ downloadParams, fileName });
+};
 const getQueryData = (type: 'chart' | 'board', dataStr: string) => {
   if (type === 'board') {
     return getBoardQueryData(dataStr);
