@@ -255,6 +255,41 @@ export function filterListOrTree<T extends { children?: T[] }>(
     : dataSource;
 }
 
+export function filteredResourceTree<T extends { children?: T[]; value?: T[] }>(
+  dataSource: T[],
+  keywords: string,
+  filterFunc: (keywords: string, data: T) => boolean,
+) {
+  return keywords
+    ? dataSource.reduce<T[]>((filtered, d) => {
+        const isMatch = filterFunc(keywords, d);
+        let isChildrenMatch;
+        if (!d.children?.find(v => (v as any).isLeaf) && d.children) {
+          isChildrenMatch = filteredResourceTree(
+            d.children,
+            keywords,
+            filterFunc,
+          );
+        }
+        if (!isChildrenMatch?.length && d.children?.length) {
+          isChildrenMatch =
+            d.children?.find((item: any) => item?.title?.includes(keywords)) &&
+            d.children;
+        }
+        if (isMatch || (isChildrenMatch && isChildrenMatch.length > 0)) {
+          filtered.push({
+            ...d,
+            children:
+              isChildrenMatch && isChildrenMatch.length > 0
+                ? isChildrenMatch
+                : d.children,
+          });
+        }
+        return filtered;
+      }, [])
+    : dataSource;
+}
+
 export function getExpandedKeys<T extends TreeDataNode>(nodes: T[]) {
   return nodes.reduce<string[]>((keys, { key, children }) => {
     if (Array.isArray(children) && children.length) {
