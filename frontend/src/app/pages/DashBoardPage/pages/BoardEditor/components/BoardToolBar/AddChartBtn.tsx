@@ -26,7 +26,7 @@ import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { v4 as uuidv4 } from 'uuid';
+import uuidv4 from 'uuid/dist/v4';
 import { addDataChartWidgets, addWrapChartWidget } from '../../slice/thunk';
 import ChartSelectModalModal from '../ChartSelectModal';
 import { ChartWidgetDropdown, ToolBtnProps } from './ToolBarItem';

@@ -23,7 +23,7 @@ import React, { useCallback, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { PRIMARY } from 'styles/StyleConstants';
-import { v4 as uuidv4 } from 'uuid';
+import uuidv4 from 'uuid/dist/v4';
 import { BoardContext } from '../../../../contexts/BoardContext';
 import { editBoardStackActions } from '../../../../pages/BoardEditor/slice';
 import { WidgetAllProvider } from '../../../WidgetProvider/WidgetAllProvider';

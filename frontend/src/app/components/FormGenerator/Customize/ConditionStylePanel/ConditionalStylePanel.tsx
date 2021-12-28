@@ -22,7 +22,7 @@ import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { CloneValueDeep } from 'utils/object';
-import { v4 as uuidv4 } from 'uuid';
+import uuidv4 from 'uuid/dist/v4';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
 import AddModal from './add';

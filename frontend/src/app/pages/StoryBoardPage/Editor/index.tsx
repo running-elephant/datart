@@ -36,7 +36,7 @@ import RevealZoom from 'reveal.js/plugin/zoom/plugin';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
 import { dispatchResize } from 'utils/utils';
-import { v4 as uuidv4 } from 'uuid';
+import uuidv4 from 'uuid/dist/v4';
 import PageThumbnailList from '../components/PageThumbnailList';
 import StoryPageItem from '../components/StoryPageItem';
 import { storyActions } from '../slice';

@@ -38,7 +38,7 @@ import { RootState } from 'types';
 import { CloneValueDeep } from 'utils/object';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
-import { v4 as uuidv4 } from 'uuid';
+import uuidv4 from 'uuid/dist/v4';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,

@@ -4,7 +4,7 @@ import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { CloneValueDeep } from 'utils/object';
 import { reduxActionErrorHandler } from 'utils/utils';
-import { v4 as uuidv4 } from 'uuid';
+import uuidv4 from 'uuid/dist/v4';
 import {
   addStoryboard,
   addViz,

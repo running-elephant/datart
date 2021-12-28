@@ -40,7 +40,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_MD, SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
 import { errorHandle } from 'utils/utils';
-import { v4 as uuidv4 } from 'uuid';
+import uuidv4 from 'uuid/dist/v4';
 import { selectVariables } from '../../../VariablePage/slice/selectors';
 import { getVariables } from '../../../VariablePage/slice/thunks';
 import { ViewViewModelStages } from '../../constants';

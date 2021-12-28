@@ -26,7 +26,7 @@ import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartLifecycle } from 'app/types/ChartLifecycle';
 import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
-import { v4 as uuidv4 } from 'uuid';
+import uuidv4 from 'uuid/dist/v4';
 import ChartIFrameContainerResourceLoader from './ChartIFrameContainerResourceLoader';
 
 enum ContainerStatus {

@@ -33,7 +33,7 @@ import {
   isEmpty,
   resetValue,
 } from 'utils/object';
-import { v4 as uuidv4 } from 'uuid';
+import uuidv4 from 'uuid/dist/v4';
 import GroupLayout from '../Layout/GroupLayout';
 import { GroupLayoutMode, ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';

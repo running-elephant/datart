@@ -4,7 +4,7 @@ import { Configuration } from 'app/components';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { LINE_HEIGHT_BODY } from 'styles/StyleConstants';
-import { v4 as uuidv4 } from 'uuid';
+import uuidv4 from 'uuid/dist/v4';
 
 interface Property {
   key: string;
