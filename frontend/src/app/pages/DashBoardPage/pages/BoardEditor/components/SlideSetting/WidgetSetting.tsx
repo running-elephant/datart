@@ -21,7 +21,7 @@ import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getRGBAColor } from 'app/pages/DashBoardPage/utils';
 import produce from 'immer';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import React, {
   FC,
   memo,
