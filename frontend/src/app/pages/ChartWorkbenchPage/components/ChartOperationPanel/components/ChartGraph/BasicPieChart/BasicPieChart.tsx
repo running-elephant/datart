@@ -284,22 +284,17 @@ class BasicPieChart extends Chart {
         return seriesParams.name;
       }
       const data = seriesParams?.data || {};
-      let labelValue = '';
-      if (showName) {
-        labelValue = seriesParams?.name;
-      }
-      if (showName && (showValue || showPercent)) {
-        labelValue += ': ';
-      }
-      if (showValue) {
-        labelValue += toFormattedValue(seriesParams?.value[0], data?.format);
-      }
-      if (showPercent && showValue) {
-        labelValue += '(' + seriesParams?.percent + '%)';
-      } else if (showPercent) {
-        labelValue += seriesParams?.percent + '%';
-      }
-      return labelValue;
+      return `${showName ? seriesParams?.name : ''}${
+        showName && (showValue || showPercent) ? ': ' : ''
+      }${
+        showValue ? toFormattedValue(seriesParams?.value[0], data?.format) : ''
+      }${
+        showPercent && showValue
+          ? '(' + seriesParams?.percent + '%)'
+          : showPercent
+          ? seriesParams?.percent + '%'
+          : ''
+      }`;
     };
   }
 
