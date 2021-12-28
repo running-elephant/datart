@@ -34,7 +34,7 @@ import {
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import Config from './config';
 
 class BasicFunnelChart extends Chart {

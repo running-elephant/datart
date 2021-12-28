@@ -24,7 +24,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import persistence from 'utils/persistence';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from 'utils/utils';
 import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
 import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
 import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';

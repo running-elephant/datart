@@ -43,7 +43,9 @@ const BasicInput: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           {...rest}
           {...options}
           onChange={value => {
-            const newCache = Object.assign({}, cache, { value: value.target?.value });
+            const newCache = Object.assign({}, cache, {
+              value: value.target?.value,
+            });
             setCache(newCache);
             debouncedDataChange(newCache.value);
           }}

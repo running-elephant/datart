@@ -10,6 +10,7 @@ import {
 import { APIResponse } from 'types';
 import { SaveFormModel } from '../app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { removeToken } from './auth';
+export { default as uuidv4 } from 'uuid/dist/v4';
 
 export function errorHandle(error) {
   if (error?.response) {
@@ -32,7 +33,20 @@ export function errorHandle(error) {
   }
   return error;
 }
-
+export function getErrorMessage(error) {
+  if (error?.response) {
+    const { response } = error as AxiosError;
+    switch (response?.status) {
+      case 401:
+        message.error({ key: '401', content: '未登录或会话过期，请重新登录' });
+        removeToken();
+        return '401';
+      default:
+        return response?.data.message || error.message;
+    }
+  }
+  return error?.message;
+}
 export function reduxActionErrorHandler(errorAction) {
   if (errorAction?.payload) {
     message.error(errorAction?.payload);
@@ -180,7 +194,7 @@ export const onDropTreeFn = ({ info, treeData, callback }) => {
   } else {
     //中间
     if (!dropArr[dropIndex].index && !dropArr[dropIndex + 1].index) {
-      index = dropArr[dropArr.length-1].index + 1;
+      index = dropArr[dropArr.length - 1].index + 1;
     } else {
       index = (dropArr[dropIndex].index + dropArr[dropIndex + 1].index) / 2;
     }

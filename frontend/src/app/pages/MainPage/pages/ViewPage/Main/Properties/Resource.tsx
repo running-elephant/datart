@@ -98,7 +98,13 @@ export const Resource = memo(() => {
                 actions.addTables({
                   sourceId,
                   databaseName: database,
-                  tables: data,
+                  tables: data.sort((a, b) =>
+                    a.toLowerCase() < b.toLowerCase()
+                      ? -1
+                      : a.toLowerCase() > b.toLowerCase()
+                      ? 1
+                      : 0,
+                  ),
                 }),
               );
               resolve();

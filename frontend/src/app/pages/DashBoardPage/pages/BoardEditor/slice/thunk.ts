@@ -37,8 +37,7 @@ import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
 import { CloneValueDeep } from 'utils/object';
 import { request } from 'utils/request';
-import { errorHandle } from 'utils/utils';
-import { v4 as uuidv4 } from 'uuid';
+import { errorHandle, uuidv4 } from 'utils/utils';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
@@ -514,8 +513,26 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
           pageInfo: data.pageInfo,
         }),
       );
+      dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          widgetId,
+          errInfo: undefined,
+        }),
+      );
     } catch (error) {
-      errorHandle(error);
+      dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          widgetId,
+          errInfo: (error as any)?.message as any,
+        }),
+      );
+      dispatch(
+        editWidgetDataActions.setWidgetData({
+          id: widgetId,
+          columns: [],
+          rows: [],
+        } as WidgetData),
+      );
     }
     return null;
   },
