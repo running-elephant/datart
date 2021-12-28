@@ -16,7 +16,7 @@
   "scripts": {
     "analyze": "craco build && source-map-explorer 'build/static/js/*.js'",
     "start": "craco start",
-    "build": "cross-env GENERATE_SOURCEMAP=false craco build",
+    "build": "cross-env GENERATE_SOURCEMAP=false && npm run rollup && craco build",
     "test": "craco test",
     "test:coverage": "npm run test -- --watchAll=false --coverage",
     "checkTs": "tsc --noEmit",
