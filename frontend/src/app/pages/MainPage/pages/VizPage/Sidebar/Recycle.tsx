@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons';
 import { Button, List, Menu, message, Popconfirm } from 'antd';
 import { ListItem, MenuListItem, Popup } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { calcAc, getCascadeAccess } from 'app/pages/MainPage/Access';
 import {
   selectIsOrgOwner,
@@ -45,6 +46,7 @@ export const Recycle = memo(
     const vizs = useSelector(selectVizs);
     const isOwner = useSelector(selectIsOrgOwner);
     const permissionMap = useSelector(selectPermissionMap);
+    const t = useI18NPrefix('viz.sideBar.recycle');
 
     useEffect(() => {
       onInit();
@@ -69,13 +71,13 @@ export const Recycle = memo(
             params: { id, archive: false },
             type,
             resolve: () => {
-              message.success('删除成功');
+              message.success(t('successDeleted'));
               dispatch(removeTab({ id, resolve: redirect }));
             },
           }),
         );
       },
-      [dispatch, redirect],
+      [dispatch, redirect, t],
     );
 
     const moreMenuClick = useCallback(
@@ -102,7 +104,7 @@ export const Recycle = memo(
                         index,
                       },
                       resolve: () => {
-                        message.success('还原成功');
+                        message.success(t('successRestored'));
                         dispatch(removeTab({ id, resolve: redirect }));
                         onClose();
                       },
@@ -115,7 +117,7 @@ export const Recycle = memo(
               break;
           }
         },
-      [dispatch, showSaveForm, redirect, vizs],
+      [dispatch, showSaveForm, redirect, vizs, t],
     );
 
     const toDetail = useCallback(
@@ -180,17 +182,17 @@ export const Recycle = memo(
                             key="reset"
                             prefix={<ReloadOutlined className="icon" />}
                           >
-                            还原
+                            {t('reduction')}
                           </MenuListItem>
                           <MenuListItem
                             key="delelte"
                             prefix={<DeleteOutlined className="icon" />}
                           >
                             <Popconfirm
-                              title="确认删除？"
+                              title={t('confirmDeletion') + '？'}
                               onConfirm={del(id, vizType)}
                             >
-                              删除
+                              {t('delete')}
                             </Popconfirm>
                           </MenuListItem>
                         </Menu>

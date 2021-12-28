@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-import { LeftOutlined } from '@ant-design/icons';
-import { Button, Space } from 'antd';
+import { LeftOutlined, MoreOutlined } from '@ant-design/icons';
+import { Button, Dropdown, Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { FC, memo } from 'react';
+import { FC, memo, useCallback, useContext } from 'react';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
@@ -30,13 +30,28 @@ import {
   SPACE_TIMES,
   SPACE_XS,
 } from 'styles/StyleConstants';
+import ChartAggregationContext from '../../contexts/ChartAggregationContext';
+import AggregationOperationMenu from './components/AggregationOperationMenu';
 
 const ChartHeaderPanel: FC<{
   chartName?: string;
   onSaveChart?: () => void;
   onGoBack?: () => void;
-}> = memo(({ chartName, onSaveChart, onGoBack }) => {
+  onChangeAggregation?: (state: boolean) => void;
+}> = memo(({ chartName, onSaveChart, onGoBack, onChangeAggregation }) => {
   const t = useI18NPrefix(`viz.workbench.header`);
+  const { aggregation } = useContext(ChartAggregationContext);
+
+  const getOverlays = useCallback(() => {
+    return (
+      <AggregationOperationMenu
+        defaultValue={aggregation}
+        onChangeAggregation={e => {
+          onChangeAggregation?.(e);
+        }}
+      ></AggregationOperationMenu>
+    );
+  }, [aggregation, onChangeAggregation]);
 
   return (
     <Wrapper>
@@ -50,6 +65,9 @@ const ChartHeaderPanel: FC<{
         <Button type="primary" onClick={onSaveChart}>
           {t('save')}
         </Button>
+        <Dropdown key="more" trigger={['click']} overlay={getOverlays()}>
+          <Button icon={<MoreOutlined />} />
+        </Dropdown>
       </Space>
     </Wrapper>
   );

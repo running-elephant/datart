@@ -28,6 +28,7 @@ export interface ChartDataConfigSectionProps {
   category?: Lowercase<keyof typeof ChartDataViewFieldCategory>;
   extra?: () => ReactNode;
   translate?: (title: string) => string;
+  aggregation?: boolean;
   onConfigChanged: (
     ancestors: number[],
     config: ChartDataSectionConfig,

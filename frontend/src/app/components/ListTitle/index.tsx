@@ -1,6 +1,7 @@
 import { LeftOutlined, MoreOutlined, SearchOutlined } from '@ant-design/icons';
 import { Input, Menu, Space, Tooltip } from 'antd';
 import { MenuListItem, Popup, ToolbarButton } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { ReactElement, useCallback, useState } from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -60,7 +61,7 @@ export function ListTitle({
   onNext,
 }: ListTitleProps) {
   const [searchbarVisible, setSearchbarVisible] = useState(false);
-
+  const t = useI18NPrefix('components.listTitle');
   const toggleSearchbar = useCallback(() => {
     setSearchbarVisible(!searchbarVisible);
   }, [searchbarVisible]);
@@ -88,7 +89,7 @@ export function ListTitle({
         {subTitle && <h5>{subTitle}</h5>}
         <Space size={SPACE_UNIT}>
           {search && (
-            <Tooltip title="搜索" placement="bottom">
+            <Tooltip title={t('search')} placement="bottom">
               <ToolbarButton
                 size="small"
                 icon={<SearchOutlined />}
@@ -129,7 +130,7 @@ export function ListTitle({
         <Input
           className="search-input"
           prefix={<SearchOutlined className="icon" />}
-          placeholder="搜索名称关键字"
+          placeholder={t('searchValue')}
           bordered={false}
           onChange={onSearch}
         />

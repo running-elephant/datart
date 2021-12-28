@@ -43,7 +43,7 @@ export function VizPage() {
         onDragEnd={siderDragEnd}
         className="datart-split"
       >
-        <Sidebar />
+        <Sidebar i18nPrefix={'viz.sideBar'} />
         <Main />
         <SaveForm
           width={400}
