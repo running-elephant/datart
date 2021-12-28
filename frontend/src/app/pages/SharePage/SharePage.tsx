@@ -26,6 +26,7 @@ import { useLocation } from 'react-router-dom';
 import persistence from 'utils/persistence';
 import { uuidv4 } from 'utils/utils';
 import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
+import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
 import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';
 import { selectShareBoard } from '../DashBoardPage/pages/Board/slice/selector';
 import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
@@ -85,6 +86,10 @@ export function SharePage() {
   }, [search]);
 
   useMount(() => {
+    ChartManager.instance()
+      .load()
+      .catch(err => console.error('Fail to load customize charts with ', err));
+
     if (Boolean(usePassword)) {
       const previousPassword = persistence.session.get(shareToken);
       if (previousPassword) {
