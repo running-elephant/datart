@@ -56,7 +56,7 @@ import {
 import { ValueOf } from 'types';
 import { v4 as uuidv4 } from 'uuid';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
-import VizDraggableItem from './ChartDraggableElement';
+import ChartDraggableElement from './ChartDraggableElement';
 
 type DragItem = {
   index?: number;
@@ -243,8 +243,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
 
     const onDraggableItemMove = (dragIndex: number, hoverIndex: number) => {
       const draggedItem = currentConfig.rows?.[dragIndex];
-
-      if (draggedItem && !currentConfig?.rows?.length) {
+      if (draggedItem) {
         const newCurrentConfig = updateBy(currentConfig, draft => {
           const columns = draft.rows || [];
           columns.splice(dragIndex, 1);
@@ -282,7 +281,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
 
       return currentConfig.rows?.map((columnConfig, index) => {
         return (
-          <VizDraggableItem
+          <ChartDraggableElement
             key={columnConfig.uid}
             id={columnConfig.uid}
             index={index}
@@ -315,7 +314,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             }}
             moveCard={onDraggableItemMove}
             onDelete={handleOnDeleteItem(columnConfig.uid)}
-          ></VizDraggableItem>
+          ></ChartDraggableElement>
         );
       });
     };
