@@ -27,6 +27,7 @@ import produce from 'immer';
 import { DeltaStatic } from 'quill';
 import { CSSProperties } from 'react';
 import { FONT_FAMILY, G90, WHITE } from 'styles/StyleConstants';
+import { uuidv4 } from 'utils/utils';
 import { convertImageUrl, fillPx } from '.';
 import {
   AutoBoardWidgetBackgroundDefault,
@@ -98,7 +99,7 @@ export const createControllerWidget = (opt: {
     boardType: boardType,
   });
 
-  const widgetId = relations[0]?.sourceId || String(Math.random());
+  const widgetId = relations[0]?.sourceId || uuidv4();
   const widget: Widget = createWidget({
     id: widgetId,
     dashboardId: boardId,
@@ -205,7 +206,7 @@ export const createWidget = (option: {
   relations?: Relation[];
 }) => {
   const widget: Widget = {
-    id: option.id || String(Math.random()),
+    id: option.id || uuidv4(),
     dashboardId: option.dashboardId,
     config: option.config,
     datachartId: option.datachartId || '',
