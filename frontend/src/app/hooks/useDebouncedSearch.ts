@@ -24,11 +24,10 @@ import { filterListOrTree } from 'utils/utils';
 export function useDebouncedSearch<T>(
   dataSource: T[] | undefined,
   filterFunc: (keywords: string, data: T) => boolean,
-  filterLeaf?: boolean,
   wait: number = DEFAULT_DEBOUNCE_WAIT,
+  filterLeaf: boolean = false,
 ) {
   const [keywords, setKeywords] = useState('');
-
   const filteredData = useMemo(
     () =>
       dataSource && keywords.trim()

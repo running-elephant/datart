@@ -11,6 +11,7 @@ import { ListTitle, Tree } from 'app/components';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
 import { selectDataProviderDatabaseListLoading } from 'app/pages/MainPage/slice/selectors';
 import { getDataProviderDatabases } from 'app/pages/MainPage/slice/thunks';
+import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import { memo, useCallback, useContext, useEffect } from 'react';
 import { monaco } from 'react-monaco-editor';
 import { useDispatch, useSelector } from 'react-redux';
@@ -47,6 +48,7 @@ export const Resource = memo(() => {
     useSearchAndExpand(
       databases,
       (keywords, data) => (data.title as string).includes(keywords),
+      DEFAULT_DEBOUNCE_WAIT,
       true,
     );
   useEffect(() => {
