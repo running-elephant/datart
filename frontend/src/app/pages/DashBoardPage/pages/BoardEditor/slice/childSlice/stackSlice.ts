@@ -26,6 +26,7 @@ import {
   Widget,
   WidgetConf,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { getDefaultWidgetName } from 'app/pages/DashBoardPage/utils';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import produce from 'immer';
 import { Layout } from 'react-grid-layout';
@@ -76,7 +77,7 @@ export const editBoardStackSlice = createSlice({
         const widget = produce(ele, draft => {
           draft.config.index = maxWidgetIndex;
           draft.config.name =
-            ele.config.name || `${ele.config.type}未命名组件_${maxWidgetIndex}`;
+            ele.config.name || getDefaultWidgetName(ele, maxWidgetIndex);
         });
         state.widgetRecord[widget.id] = widget;
       });
