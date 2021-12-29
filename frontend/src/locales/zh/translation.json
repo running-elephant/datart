@@ -602,13 +602,22 @@
       }
     },
     "widget": {
+      "widget": "组件",
       "type": {
         "chart": "数据图表",
+        "widgetChart": "私有图表",
+        "dataChart": "公共图表",
         "media": "媒体",
         "container": "容器",
         "controller": "控制器",
         "query": "查询",
-        "reset": "重置"
+        "reset": "重置",
+        "image": "图片",
+        "richText": "富文本",
+        "timer": "时间器",
+        "iFrame": "iFrame",
+        "video": "视频",
+        "tab": "Tab"
       },
       "action": {
         "refresh": "同步数据",
