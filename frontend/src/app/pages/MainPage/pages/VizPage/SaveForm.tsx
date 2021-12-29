@@ -143,7 +143,14 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
       )}
       {vizType !== 'STORYBOARD' && (
         <Form.Item name="parentId" label="所属目录">
-          <TreeSelect placeholder="根目录" treeData={treeData} allowClear />
+          <TreeSelect
+            placeholder="根目录"
+            treeData={treeData}
+            allowClear
+            onChange={() => {
+              formRef.current?.validateFields();
+            }}
+          />
         </Form.Item>
       )}
     </ModalForm>
