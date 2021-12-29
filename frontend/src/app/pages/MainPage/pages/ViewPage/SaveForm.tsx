@@ -152,6 +152,9 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
           placeholder="根目录"
           treeData={folderTree || []}
           allowClear
+          onChange={() => {
+            formRef.current?.validateFields();
+          }}
         />
       </Form.Item>
       {!simple && (
