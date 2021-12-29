@@ -501,8 +501,9 @@ const workbenchSlice = createSlice({
             ? JSON.parse(payload.config)
             : CloneValueDeep(payload.config);
         backendChartConfig = backendChartConfig || {};
-        backendChartConfig.aggregation =
-          backendChartConfig?.aggregation === undefined ? true : false;
+        if (backendChartConfig?.aggregation === undefined) {
+          backendChartConfig.aggregation = true;
+        }
         state.backendChart = {
           ...payload,
           config: backendChartConfig,
