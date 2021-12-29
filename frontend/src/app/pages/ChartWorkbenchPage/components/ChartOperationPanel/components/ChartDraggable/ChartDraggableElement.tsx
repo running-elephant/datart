@@ -21,24 +21,24 @@ import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { XYCoord } from 'dnd-core';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
-import { forwardRef,useImperativeHandle,useRef } from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import {
-ConnectDragSource,
-ConnectDropTarget,
-DragSource,
-DragSourceConnector,
-DragSourceMonitor,
-DropTarget,
-DropTargetConnector,
-DropTargetMonitor
+  ConnectDragSource,
+  ConnectDropTarget,
+  DragSource,
+  DragSourceConnector,
+  DragSourceMonitor,
+  DropTarget,
+  DropTargetConnector,
+  DropTargetMonitor,
 } from 'react-dnd';
 import styled from 'styled-components/macro';
 import {
-BORDER_RADIUS,
-FONT_SIZE_SUBTITLE,
-SPACE,
-SPACE_MD,
-SPACE_XS
+  BORDER_RADIUS,
+  FONT_SIZE_SUBTITLE,
+  SPACE,
+  SPACE_MD,
+  SPACE_XS,
 } from 'styles/StyleConstants';
 
 interface ChartDraggableElementObject {
