@@ -97,12 +97,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
             rscMapper.batchInsert(columnPermission);
         }
 
-        ViewDetailDTO viewDetailDTO = new ViewDetailDTO(view);
-        viewDetailDTO.setRelVariableSubjects(Collections.emptyList());
-        viewDetailDTO.setRelSubjectColumns(Collections.emptyList());
-        viewDetailDTO.setVariables(Collections.emptyList());
-
-        return viewDetailDTO;
+        return getViewDetail(view.getId());
     }
 
     @Override
