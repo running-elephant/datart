@@ -1,5 +1,4 @@
 /* eslint-disable import/no-anonymous-default-export */
-
 import { babel } from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
@@ -7,6 +6,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import typescript from '@rollup/plugin-typescript';
 import path from 'path';
+import cleanup from 'rollup-plugin-cleanup';
 export default {
   input: 'src/task.ts', // 打包入口
   output: {
@@ -33,9 +33,9 @@ export default {
       presets: [['@babel/preset-env', { modules: false }]],
       comments: false,
     }),
+    cleanup(),
     replace({
       'console.log': '//console.log',
-      // 'new Map': '',
     }),
   ],
 };
