@@ -46,7 +46,6 @@ public class DataSourceFactoryDruidImpl implements DataSourceFactory<DruidDataSo
 
     private Properties configDataSource(JdbcProperties properties) {
         Properties pro = new Properties();
-
         //connect params
         pro.setProperty(DruidDataSourceFactory.PROP_DRIVERCLASSNAME, properties.getDriverClass());
         pro.setProperty(DruidDataSourceFactory.PROP_URL, properties.getUrl());
