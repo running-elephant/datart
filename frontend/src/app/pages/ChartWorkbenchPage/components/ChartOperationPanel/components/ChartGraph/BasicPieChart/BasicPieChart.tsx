@@ -284,6 +284,14 @@ class BasicPieChart extends Chart {
         return seriesParams.name;
       }
       const data = seriesParams?.data || {};
+
+      //处理 label 旧数据中没有 showValue, showPercent, showName 数据  alpha.3版本之后是 boolean 类型 后续版本稳定之后 可以移除此逻辑
+      // TODO migration <<
+      if (showName === null || showPercent === null || showValue === null) {
+        return `${seriesParams?.name}: ${seriesParams?.percent + '%'}`;
+      }
+      // TODO migration >> --xld
+
       return `${showName ? seriesParams?.name : ''}${
         showName && (showValue || showPercent) ? ': ' : ''
       }${
