@@ -13,7 +13,7 @@ export const JOB_TYPES_OPTIONS = [
   { label: '微信', value: JobTypes.WeChart },
 ];
 export const FILE_TYPE_OPTIONS = [
-  // { label: 'Excel', value: FileTypes.Excel },
+  { label: 'Excel', value: FileTypes.Excel },
   { label: '图片', value: FileTypes.Image },
 ];
 export const WECHART_FILE_TYPE_OPTIONS = [
