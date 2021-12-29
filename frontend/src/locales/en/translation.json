@@ -603,13 +603,22 @@
       }
     },
     "widget": {
+      "widget": "Widget",
       "type": {
         "chart": "Chart",
+        "widgetChart": "privateChart",
+        "dataChart": "publicChart",
         "media": "Media",
         "container": "Container",
         "controller": "Controller",
         "query": "Query",
-        "reset": "Reset"
+        "reset": "Reset",
+        "image": "Image",
+        "richText": "Rich Text",
+        "timer": "Timer",
+        "iFrame": "iFrame",
+        "video": "Video",
+        "tab": "Tab"
       },
       "action": {
         "refresh": "Refresh",

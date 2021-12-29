@@ -237,7 +237,7 @@ export const MediaWidgetDropdown: React.FC<ToolBtnProps> = props => {
       type: 'iframe',
     },
     {
-      name: t('richText'),
+      name: t('video'),
       icon: '',
       type: 'video',
     },
