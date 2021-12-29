@@ -110,6 +110,7 @@ export const SQLEditor = memo(() => {
       dispatch(
         getEditorProvideCompletionItems({
           resolve: getItems => {
+            editorCompletionItemProviderRef?.current?.dispose();
             const providerRef = editor.languages.registerCompletionItemProvider(
               'sql',
               {
