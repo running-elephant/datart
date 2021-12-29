@@ -1,5 +1,4 @@
 import { Button, Form, Input, message, Modal } from 'antd';
-import { RULES } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   selectLoggedInUser,
@@ -7,8 +6,12 @@ import {
 } from 'app/slice/selectors';
 import { modifyAccountPassword } from 'app/slice/thunks';
 import { ModifyUserPassword } from 'app/slice/types';
-import { FC, useCallback, useEffect, useMemo } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  getConfirmPasswordValidator,
+  getPasswordValidator,
+} from 'utils/validators';
 const FormItem = Form.Item;
 interface ModifyPasswordProps {
   visible: boolean;
@@ -23,6 +26,7 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
   const loading = useSelector(selectModifyPasswordLoading);
   const [form] = Form.useForm();
   const t = useI18NPrefix('main.nav.account.changePassword');
+  const tg = useI18NPrefix('global.validation');
 
   const reset = useCallback(() => {
     form.resetFields();
@@ -46,12 +50,8 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
         }),
       );
     },
-    [dispatch, onCancel],
+    [dispatch, onCancel, t],
   );
-
-  const confirmRule = useMemo(() => {
-    return RULES.getConfirmRule('newPassword');
-  }, []);
 
   return (
     <Modal
@@ -71,14 +71,26 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
         <FormItem
           label={t('oldPassword')}
           name="oldPassword"
-          rules={RULES.password}
+          rules={[
+            {
+              required: true,
+              message: `${t('password')}${tg('required')}`,
+            },
+            { validator: getPasswordValidator(tg('invalidPassword')) },
+          ]}
         >
           <Input.Password type="password" />
         </FormItem>
         <FormItem
           label={t('newPassword')}
           name="newPassword"
-          rules={RULES.password}
+          rules={[
+            {
+              required: true,
+              message: `${t('password')}${tg('required')}`,
+            },
+            { validator: getPasswordValidator(tg('invalidPassword')) },
+          ]}
         >
           <Input.Password type="password" />
         </FormItem>
@@ -86,7 +98,17 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
           label={t('confirmPassword')}
           name="confirmPassword"
           dependencies={['newPassword']}
-          rules={confirmRule}
+          rules={[
+            {
+              required: true,
+              message: `${t('password')}${tg('required')}`,
+            },
+            getConfirmPasswordValidator(
+              'newPassword',
+              tg('invalidPassword'),
+              tg('passwordNotMatch'),
+            ),
+          ]}
         >
           <Input.Password type="password" placeholder="" />
         </FormItem>
