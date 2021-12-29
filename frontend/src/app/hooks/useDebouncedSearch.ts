@@ -19,11 +19,12 @@
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { useMemo, useState } from 'react';
-import { filteredResourceTree, filterListOrTree } from 'utils/utils';
+import { filterListOrTree } from 'utils/utils';
 
 export function useDebouncedSearch<T>(
   dataSource: T[] | undefined,
   filterFunc: (keywords: string, data: T) => boolean,
+  filterLeaf?: boolean,
   wait: number = DEFAULT_DEBOUNCE_WAIT,
 ) {
   const [keywords, setKeywords] = useState('');
@@ -31,18 +32,11 @@ export function useDebouncedSearch<T>(
   const filteredData = useMemo(
     () =>
       dataSource && keywords.trim()
-        ? filterListOrTree(dataSource, keywords, filterFunc)
+        ? filterListOrTree(dataSource, keywords, filterFunc, filterLeaf)
         : dataSource,
-    [dataSource, keywords, filterFunc],
+    [dataSource, keywords, filterFunc, filterLeaf],
   );
 
-  const filteredResource = useMemo(
-    () =>
-      dataSource && keywords.trim()
-        ? filteredResourceTree(dataSource, keywords, filterFunc)
-        : dataSource,
-    [dataSource, keywords, filterFunc],
-  );
   const debouncedSearch = useMemo(() => {
     const search = e => {
       setKeywords(e.target.value);
@@ -54,6 +48,5 @@ export function useDebouncedSearch<T>(
     keywords,
     filteredData,
     debouncedSearch,
-    filteredResource,
   };
 }

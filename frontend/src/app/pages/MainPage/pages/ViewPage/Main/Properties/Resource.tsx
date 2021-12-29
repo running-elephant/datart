@@ -43,11 +43,11 @@ export const Resource = memo(() => {
     selectDataProviderDatabaseListLoading,
   );
 
-  const { filteredResource, onExpand, debouncedSearch, expandedRowKeys } =
-    useSearchAndExpand(databases, (keywords, data) =>
-      !data.children?.find(({ isLeaf }) => isLeaf) || !data.isLeaf
-        ? (data.title as string).includes(keywords)
-        : false,
+  const { filteredData, onExpand, debouncedSearch, expandedRowKeys } =
+    useSearchAndExpand(
+      databases,
+      (keywords, data) => (data.title as string).includes(keywords),
+      true,
     );
   useEffect(() => {
     if (sourceId && !databases) {
@@ -156,7 +156,7 @@ export const Resource = memo(() => {
       <TreeWrapper>
         <Tree
           className="medium"
-          treeData={filteredResource}
+          treeData={filteredData}
           loadData={loadData}
           loading={databaseListLoading}
           icon={renderIcon}

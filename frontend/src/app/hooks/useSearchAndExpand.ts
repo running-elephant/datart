@@ -25,12 +25,17 @@ import { useDebouncedSearch } from './useDebouncedSearch';
 export function useSearchAndExpand<T extends TreeDataNode>(
   dataSource: T[] | undefined,
   filterFunc: (keywords: string, data: T) => boolean,
+  filterLeaf: boolean = false,
   wait: number = DEFAULT_DEBOUNCE_WAIT,
 ) {
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
 
-  const { keywords, filteredData, debouncedSearch, filteredResource } =
-    useDebouncedSearch(dataSource, filterFunc, wait);
+  const { keywords, filteredData, debouncedSearch } = useDebouncedSearch(
+    dataSource,
+    filterFunc,
+    filterLeaf,
+    wait,
+  );
 
   const filteredExpandedRowKeys = useMemo(
     () =>
@@ -52,6 +57,5 @@ export function useSearchAndExpand<T extends TreeDataNode>(
     onExpand,
     debouncedSearch,
     setExpandedRowKeys,
-    filteredResource,
   };
 }
