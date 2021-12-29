@@ -84,9 +84,13 @@ class ChartEventBroker {
     }
   }
 
-  private safeInvoke(event: HooksEvent, options: any, context?: BrokerContext) {
+  private async safeInvoke(
+    event: HooksEvent,
+    options: any,
+    context?: BrokerContext,
+  ) {
     try {
-      Debugger.instance.measure(
+      await Debugger.instance.measure(
         `ChartEventBroker | ${event} `,
         () => {
           this._listeners.get(event)?.call?.(this._chart, options, context);
