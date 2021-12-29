@@ -16,20 +16,22 @@
  * limitations under the License.
  */
 import { Form, InputNumber } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { FC, memo } from 'react';
 export const PaddingSet: FC<{}> = memo(() => {
+  const t = useI18NPrefix(`viz.board.setting`);
   return (
     <>
-      <Form.Item label="上内距" name={['padding', 'top']}>
+      <Form.Item label={t('paddingTop')} name={['padding', 'top']}>
         <InputNumber />
       </Form.Item>
-      <Form.Item label="右内距" name={['padding', 'right']}>
+      <Form.Item label={t('paddingRight')} name={['padding', 'right']}>
         <InputNumber />
       </Form.Item>
-      <Form.Item label="下内距" name={['padding', 'bottom']}>
+      <Form.Item label={t('paddingBottom')} name={['padding', 'bottom']}>
         <InputNumber />
       </Form.Item>
-      <Form.Item label="左内距" name={['padding', 'left']}>
+      <Form.Item label={t('paddingLeft')} name={['padding', 'left']}>
         <InputNumber />
       </Form.Item>
     </>
