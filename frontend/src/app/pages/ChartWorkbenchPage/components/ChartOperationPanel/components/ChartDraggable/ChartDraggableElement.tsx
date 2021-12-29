@@ -54,7 +54,11 @@ interface ChartDraggableElementProps {
   config: ChartDataSectionField;
   connectDragSource: ConnectDragSource;
   connectDropTarget: ConnectDropTarget;
-  moveCard: (dragIndex: number, hoverIndex: number) => void;
+  moveCard: (
+    dragIndex: number,
+    hoverIndex: number,
+    config?: ChartDataSectionField,
+  ) => void;
   onDelete: () => void;
 }
 
@@ -65,7 +69,7 @@ interface ChartDraggableElementInstance {
 const ChartDraggableElement = forwardRef<
   HTMLDivElement,
   ChartDraggableElementProps
->(function Card(
+>(function ChartDraggableElement(
   {
     content,
     isDragging,
@@ -104,7 +108,7 @@ const ChartDraggableElement = forwardRef<
 });
 
 export default DropTarget(
-  CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN,
+  [CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN],
   {
     hover(
       props: ChartDraggableElementProps,
@@ -120,7 +124,9 @@ export default DropTarget(
         return null;
       }
 
-      const dragIndex = monitor.getItem<ChartDraggableElementObject>().index;
+      const dragItem = monitor.getItem<ChartDraggableElementObject>();
+
+      const dragIndex = dragItem.index;
       const hoverIndex = props.index;
 
       // Don't replace items with themselves
@@ -205,7 +211,7 @@ const StyledChartDraggableElement = styled.div<{
   background: ${p =>
     p.type === ChartDataViewFieldType.NUMERIC ? p.theme.success : p.theme.info};
   border-radius: ${BORDER_RADIUS};
-  opacity: ${p => (p.isDragging ? 0 : 1)};
+  opacity: ${p => (p.isDragging ? 0.2 : 1)};
 `;
 
 const Content = styled.div`
