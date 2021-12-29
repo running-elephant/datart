@@ -549,6 +549,17 @@
         "controller": "控制器",
         "query": "查询",
         "reset": "重置"
+      },
+      "action": {
+        "refresh": "同步数据",
+        "fullScreen": "全屏",
+        "edit": "编辑",
+        "delete": "删除",
+        "info": "基本信息",
+        "makeLinkage": "联动设置",
+        "closeLinkage": "关闭联动",
+        "makeJump": "跳转设置",
+        "closeJump": "关闭跳转"
       }
     },
     "sideBar": {

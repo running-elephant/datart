@@ -549,6 +549,17 @@
         "controller": "Controller",
         "query": "Query",
         "reset": "Reset"
+      },
+      "action": {
+        "refresh": "Refresh",
+        "fullScreen": "FullScreen",
+        "edit": "Edit",
+        "delete": "Delete",
+        "info": "Info",
+        "makeLinkage": "Set Linkage",
+        "closeLinkage": "Close Linkage",
+        "makeJump": "Set Jump",
+        "closeJump": "Close Jump"
       }
     },
     "sideBar": {
