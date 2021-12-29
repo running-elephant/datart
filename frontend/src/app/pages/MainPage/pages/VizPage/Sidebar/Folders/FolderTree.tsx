@@ -1,6 +1,7 @@
 import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
 import { Menu, message, Popconfirm } from 'antd';
 import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { CascadeAccess } from 'app/pages/MainPage/Access';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { LocalTreeDataNode } from 'app/pages/MainPage/slice/types';
@@ -22,18 +23,24 @@ import {
   getFolders,
   removeTab,
 } from '../../slice/thunks';
-interface FolderTreeProps {
+
+interface FolderTreeProps extends I18NComponentProps {
   selectedId?: string;
   treeData?: LocalTreeDataNode[];
 }
 
-export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
+export function FolderTree({
+  selectedId,
+  treeData,
+  i18nPrefix,
+}: FolderTreeProps) {
   const dispatch = useDispatch();
   const history = useHistory();
   const orgId = useSelector(selectOrgId);
   const loading = useSelector(selectVizListLoading);
   const vizsData = useSelector(selectVizs);
   const { showSaveForm } = useContext(SaveFormContext);
+  const t = useI18NPrefix(i18nPrefix);
 
   useEffect(() => {
     dispatch(getFolders(orgId));
@@ -64,12 +71,12 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
       () => {
         let id = folderId;
         let archive = false;
-        let msg = '成功删除';
+        let msg = t('folders.folderTree.successDeleted');
 
         if (['DASHBOARD', 'DATACHART'].includes(relType)) {
           id = relId;
           archive = true;
-          msg = '成功移至回收站';
+          msg = t('folders.folderTree.successRecycle');
         }
         dispatch(
           deleteViz({
@@ -82,7 +89,7 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
           }),
         );
       },
-    [dispatch, redirect],
+    [dispatch, redirect, t],
   );
 
   const moreMenuClick = useCallback(
@@ -147,19 +154,23 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
                     key="info"
                     prefix={<EditOutlined className="icon" />}
                   >
-                    基本信息
+                    {t('folders.folderTree.info')}
                   </MenuListItem>
                   <MenuListItem
                     key="delete"
                     prefix={<DeleteOutlined className="icon" />}
                   >
                     <Popconfirm
-                      title={`确定${
-                        node.relType === 'FOLDER' ? '删除' : '移至回收站'
+                      title={`${
+                        node.relType === 'FOLDER'
+                          ? t('folders.folderTree.confirmDelete')
+                          : t('folders.folderTree.sureMoveRecycleBin')
                       }？`}
                       onConfirm={archiveViz(node)}
                     >
-                      {node.relType === 'FOLDER' ? '删除' : '移至回收站'}
+                      {node.relType === 'FOLDER'
+                        ? t('folders.folderTree.delete')
+                        : t('folders.folderTree.moveToTrash')}
                     </Popconfirm>
                   </MenuListItem>
                 </Menu>
@@ -173,7 +184,7 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
         </TreeTitle>
       );
     },
-    [moreMenuClick, archiveViz],
+    [moreMenuClick, archiveViz, t],
   );
 
   const onDrop = info => {

@@ -3,10 +3,10 @@ import { useSplitSizes } from 'app/hooks/useSplitSizes';
 import { useBoardSlice } from 'app/pages/DashBoardPage/pages/Board/slice';
 import { useEditBoardSlice } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import { useStoryBoardSlice } from 'app/pages/StoryBoardPage/slice';
+import { dispatchResize } from 'app/utils/dispatchResize';
 import React, { useCallback } from 'react';
 import { useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { dispatchResize } from 'utils/utils';
 import { Main } from './Main';
 import { SaveForm } from './SaveForm';
 import { SaveFormContext, useSaveFormContext } from './SaveFormContext';
@@ -43,7 +43,7 @@ export function VizPage() {
         onDragEnd={siderDragEnd}
         className="datart-split"
       >
-        <Sidebar />
+        <Sidebar i18nPrefix={'viz.sideBar'} />
         <Main />
         <SaveForm
           width={400}

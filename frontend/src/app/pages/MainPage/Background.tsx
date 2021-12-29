@@ -1,8 +1,27 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   AppstoreAddOutlined,
   ReloadOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled, { keyframes } from 'styled-components/macro';
@@ -26,6 +45,7 @@ export function Background() {
   const organizations = useSelector(selectOrganizations);
   const userSettingLoading = useSelector(selectUserSettingLoading);
   const error = useSelector(selectInitializationError);
+  const t = useI18NPrefix('main.background');
 
   const showForm = useCallback(() => {
     setFormVisible(true);
@@ -42,14 +62,14 @@ export function Background() {
     content = (
       <Hint>
         <SettingOutlined className="img loading" />
-        <p>应用配置加载中…</p>
+        <p>{t('loading')}</p>
       </Hint>
     );
   } else if (error) {
     content = (
       <Hint>
         <ReloadOutlined className="img" />
-        <p>初始化错误，请刷新页面重试</p>
+        <p>{t('initError')}</p>
       </Hint>
     );
   } else if (
@@ -61,7 +81,7 @@ export function Background() {
       <>
         <Hint className="add" onClick={showForm}>
           <AppstoreAddOutlined className="img" />
-          <p>未加入任何组织，点击创建</p>
+          <p>{t('createOrg')}</p>
         </Hint>
         <OrganizationForm visible={formVisible} onCancel={hideForm} />
       </>

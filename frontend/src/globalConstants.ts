@@ -147,11 +147,6 @@ export enum FilterSqlOperator {
   GreaterThanOrEqual = 'GTE',
 }
 
-export const ResizeEvent = new Event('resize', {
-  bubbles: false,
-  cancelable: true,
-});
-
 export const FILTER_TIME_FORMATTER_IN_QUERY = 'yyyy-MM-DD HH:mm:ss';
 
 export const CONTROLLER_WIDTH_OPTIONS = [

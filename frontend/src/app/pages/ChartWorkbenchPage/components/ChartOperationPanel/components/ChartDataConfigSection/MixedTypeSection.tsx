@@ -21,15 +21,16 @@ import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import BaseDataConfigSection from './BaseDataConfigSection';
-import { dataConfigSectionComparer } from './utils';
+import { dataConfigSectionComparer, handleDefaultConfig } from './utils';
 
 const MixedTypeSection: FC<ChartDataConfigSectionProps> = memo(
-  ({ config, ...rest }) => {
-    const defaultConfig = Object.assign(
+  ({ config, aggregation, ...rest }) => {
+    let defaultConfig = Object.assign(
       {},
       {
         actions: {
           [ChartDataViewFieldType.NUMERIC]: [
+            ChartDataSectionFieldActionType.Aggregate,
             ChartDataSectionFieldActionType.Alias,
             ChartDataSectionFieldActionType.Format,
             ChartDataSectionFieldActionType.Sortable,
@@ -46,6 +47,11 @@ const MixedTypeSection: FC<ChartDataConfigSectionProps> = memo(
       },
       config,
     );
+
+    if (aggregation === false) {
+      defaultConfig = handleDefaultConfig(defaultConfig, config.type);
+    }
+
     return <BaseDataConfigSection {...rest} config={defaultConfig} />;
   },
   dataConfigSectionComparer,

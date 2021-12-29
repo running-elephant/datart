@@ -128,7 +128,7 @@ export function OrgSettingPage() {
                     params: { name: value },
                   }).then(
                     () => Promise.resolve(),
-                    () => Promise.reject(new Error('名称重复')),
+                    err => Promise.reject(new Error(err.response.data.message)),
                   );
                 }, DEFAULT_DEBOUNCE_WAIT),
               },

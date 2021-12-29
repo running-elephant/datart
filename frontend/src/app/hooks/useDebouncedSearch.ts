@@ -25,15 +25,15 @@ export function useDebouncedSearch<T>(
   dataSource: T[] | undefined,
   filterFunc: (keywords: string, data: T) => boolean,
   wait: number = DEFAULT_DEBOUNCE_WAIT,
+  filterLeaf: boolean = false,
 ) {
   const [keywords, setKeywords] = useState('');
-
   const filteredData = useMemo(
     () =>
       dataSource && keywords.trim()
-        ? filterListOrTree(dataSource, keywords, filterFunc)
+        ? filterListOrTree(dataSource, keywords, filterFunc, filterLeaf)
         : dataSource,
-    [dataSource, keywords, filterFunc],
+    [dataSource, keywords, filterFunc, filterLeaf],
   );
 
   const debouncedSearch = useMemo(() => {

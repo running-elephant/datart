@@ -55,6 +55,7 @@ import {
 } from 'styles/StyleConstants';
 import { ValueOf } from 'types';
 import { uuidv4 } from 'utils/utils';
+import ChartAggregationContext from '../../../../contexts/ChartAggregationContext';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
 import ChartDraggableElement from './ChartDraggableElement';
 
@@ -76,6 +77,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     const [showModal, contextHolder] = useFieldActionModal({
       i18nPrefix: 'viz.palette.data.enum.actionType',
     });
+    const { aggregation } = useContext(ChartAggregationContext);
 
     const [{ isOver, canDrop }, drop] = useDrop(
       () => ({
@@ -132,6 +134,8 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           return { delete: needDelete };
         },
         canDrop: (item: ChartDataSectionField, monitor) => {
+          let items = Array.isArray(item) ? item : [item];
+
           if (
             Array.isArray(item) &&
             typeof currentConfig.actions === 'object' &&
@@ -157,8 +161,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           ) {
             return true;
           }
-
-          let items = [item];
           const exists = currentConfig.rows?.map(col => col.colName);
           return items.every(i => !exists?.includes(i.colName));
         },
@@ -188,7 +190,8 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       if (
         currentConfig?.type === ChartDataSectionType.AGGREGATE ||
         currentConfig?.type === ChartDataSectionType.SIZE ||
-        currentConfig?.type === ChartDataSectionType.INFO
+        currentConfig?.type === ChartDataSectionType.INFO ||
+        currentConfig?.type === ChartDataSectionType.MIXED
       ) {
         if (currentConfig.disableAggregate) {
           return;
@@ -298,7 +301,11 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                     {currentConfig?.actions && (
                       <DownOutlined style={{ marginRight: '10px' }} />
                     )}
-                    <span>{getColumnRenderName(columnConfig)}</span>
+                    <span>
+                      {aggregation
+                        ? getColumnRenderName(columnConfig)
+                        : columnConfig.colName}
+                    </span>
                     <div style={{ display: 'inline-block', marginLeft: '5px' }}>
                       {enableActionsIcons(columnConfig)}
                     </div>
@@ -341,6 +348,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           dataset,
           dataView,
           modalSize,
+          aggregation,
         );
       };
 

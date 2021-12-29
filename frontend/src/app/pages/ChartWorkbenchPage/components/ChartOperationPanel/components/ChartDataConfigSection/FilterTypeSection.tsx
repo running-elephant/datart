@@ -32,7 +32,13 @@ import BaseDataConfigSection from './BaseDataConfigSection';
 import { dataConfigSectionComparer } from './utils';
 
 const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
-  ({ ancestors, config, translate = title => title, onConfigChanged }) => {
+  ({
+    ancestors,
+    config,
+    translate = title => title,
+    onConfigChanged,
+    aggregation,
+  }) => {
     const [currentConfig, setCurrentConfig] = useState(config);
     const [originalConfig, setOriginalConfig] = useState(config);
     const [enableExtraAction] = useState(false);

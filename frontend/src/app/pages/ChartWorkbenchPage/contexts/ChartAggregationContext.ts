@@ -16,6 +16,12 @@
  * limitations under the License.
  */
 
-export enum UserSettingTypes {
-  LastVisitedOrganization = 'LAST_VISITED_ORGANIZATION',
-}
+import { createContext } from 'react';
+
+const ChartAggregationContext = createContext<{
+  aggregation: boolean | undefined;
+}>({
+  aggregation: true,
+});
+
+export default ChartAggregationContext;

@@ -1,6 +1,4 @@
-import { ConfigProvider } from 'antd';
 import 'antd/dist/antd.less';
-import zh_CN from 'antd/lib/locale/zh_CN';
 import { App } from 'app';
 import 'app/assets/fonts/iconfont.css';
 import 'core-js/features/string/replace-all';
@@ -22,17 +20,16 @@ const InspectorWrapper = IS_DEVELOPMENT ? Inspector : React.Fragment;
 
 Debugger.instance.setEnable(IS_DEVELOPMENT);
 export const store = configureAppStore();
-const MainApp = <App />;
 
 ReactDOM.render(
   <InspectorWrapper>
     <Provider store={store}>
       <ThemeProvider>
-        <ConfigProvider locale={zh_CN}>
-          <HelmetProvider>
-            <React.StrictMode>{MainApp}</React.StrictMode>
-          </HelmetProvider>
-        </ConfigProvider>
+        <HelmetProvider>
+          <React.StrictMode>
+            <App />
+          </React.StrictMode>
+        </HelmetProvider>
       </ThemeProvider>
     </Provider>
   </InspectorWrapper>,

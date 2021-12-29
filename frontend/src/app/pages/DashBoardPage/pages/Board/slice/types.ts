@@ -405,6 +405,7 @@ export interface DataChart {
   status: any;
 }
 export interface DataChartConfig {
+  aggregation: boolean | undefined;
   chartConfig: ChartConfig;
   chartGraphId: string;
   computedFields: any[];

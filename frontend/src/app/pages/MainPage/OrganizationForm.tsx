@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Form, Input, Modal, ModalProps } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import debounce from 'debounce-promise';
@@ -20,6 +38,7 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
   const loading = useSelector(selectSaveOrganizationLoading);
   const [form] = Form.useForm();
   const t = useI18NPrefix('main.nav.organization');
+  const tgv = useI18NPrefix('global.validation');
 
   const formSubmit = useCallback(
     values => {
@@ -46,9 +65,9 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
 
   return (
     <Modal
-      title={t('organizationCreate')}
+      title={t('create')}
       visible={visible}
-      okText={t('saveDndEnter')}
+      okText={t('save')}
       confirmLoading={loading}
       onOk={save}
       onCancel={onCancel}
@@ -56,16 +75,16 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
     >
       <Form
         form={form}
-        labelCol={{ span: 4 }}
+        labelCol={{ span: 6 }}
         labelAlign="left"
-        wrapperCol={{ span: 18 }}
+        wrapperCol={{ span: 16 }}
         onFinish={formSubmit}
       >
         <FormItem
           name="name"
-          label={t('organizationName')}
+          label={t('name')}
           rules={[
-            { required: true, message: t('nameIsEmptyPrompt') },
+            { required: true, message: `${t('name')}${tgv('required')}` },
             {
               validator: debounce((_, value) => {
                 return request({
@@ -74,7 +93,7 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
                   params: { name: value },
                 }).then(
                   () => Promise.resolve(),
-                  () => Promise.reject(new Error(t('duplicateNamePrompt'))),
+                  err => Promise.reject(new Error(err.response.data.message)),
                 );
               }, DEFAULT_DEBOUNCE_WAIT),
             },
@@ -82,7 +101,7 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
         >
           <Input />
         </FormItem>
-        <FormItem name="description" label={t('organizationDescription')}>
+        <FormItem name="description" label={t('desc')}>
           <Input.TextArea autoSize={{ minRows: 4, maxRows: 8 }} />
         </FormItem>
       </Form>

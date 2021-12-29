@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { List, Tag } from 'antd';
 import { ListItem } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -16,16 +34,11 @@ import {
 } from 'styles/StyleConstants';
 import { DownloadTask, DownloadTaskState } from '../../slice/types';
 import { DownloadListProps } from './types';
-const DOWNLOAD_STATUS_TAGS = {
-  [DownloadTaskState.CREATE]: '处理中',
-  [DownloadTaskState.DOWNLOADED]: '已下载',
-  [DownloadTaskState.FINISH]: '完成',
-  [DownloadTaskState.FAILED]: '失败',
-};
+
 const DOWNLOAD_STATUS_COLORS = {
-  [DownloadTaskState.CREATE]: INFO,
+  [DownloadTaskState.CREATED]: INFO,
   [DownloadTaskState.DOWNLOADED]: G50,
-  [DownloadTaskState.FINISH]: SUCCESS,
+  [DownloadTaskState.DONE]: SUCCESS,
   [DownloadTaskState.FAILED]: ERROR,
 };
 
@@ -38,19 +51,20 @@ const DownloadFileItem: FC<DownloadFileItemProps> = ({
   ...restProps
 }) => {
   const { name, status } = restProps;
+  const t = useI18NPrefix('main.nav.download.status');
   const { color, tagName, titleClasses } = useMemo(() => {
     const titleClasses = ['download-file-name'];
     if (status === DownloadTaskState.DOWNLOADED) {
       titleClasses.push('downloaded');
-    } else if (status === DownloadTaskState.FINISH) {
+    } else if (status === DownloadTaskState.DONE) {
       titleClasses.push('finished');
     }
     return {
       color: DOWNLOAD_STATUS_COLORS[status],
-      tagName: DOWNLOAD_STATUS_TAGS[status],
+      tagName: t(DownloadTaskState[status].toLowerCase()),
       titleClasses: titleClasses.join(' '),
     };
-  }, [status]);
+  }, [status, t]);
   return (
     <DownloadFileItemWrapper>
       <span className={titleClasses} onClick={() => onDownloadFile(restProps)}>
@@ -147,7 +161,6 @@ const DownloadFileItemWrapper = styled.div`
     }
   }
   .ant-tag {
-    width: 56px;
     margin: 0;
     text-align: center;
   }

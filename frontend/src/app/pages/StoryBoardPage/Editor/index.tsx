@@ -19,6 +19,7 @@ import { Layout, Modal } from 'antd';
 import { Split } from 'app/components';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
 import { StoryContext } from 'app/pages/StoryBoardPage/contexts/StoryContext';
+import { dispatchResize } from 'app/utils/dispatchResize';
 import React, {
   memo,
   useCallback,
@@ -35,7 +36,7 @@ import 'reveal.js/dist/reveal.css';
 import RevealZoom from 'reveal.js/plugin/zoom/plugin';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
-import { dispatchResize, uuidv4 } from 'utils/utils';
+import { uuidv4 } from 'utils/utils';
 import PageThumbnailList from '../components/PageThumbnailList';
 import StoryPageItem from '../components/StoryPageItem';
 import { storyActions } from '../slice';

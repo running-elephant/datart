@@ -1,4 +1,63 @@
 {
+  "global": {
+    "tokenExpired": "会话过期，请重新登录",
+    "operation": {
+      "updateSuccess": "修改成功",
+      "deleteSuccess": "删除成功"
+    },
+    "validation": {
+      "required": "不能为空",
+      "invalidPassword": "密码长度为6-20位",
+      "passwordNotMatch": "两次输入的密码不一致"
+    }
+  },
+  "login": {
+    "username": "用户名 / 邮箱",
+    "password": "密码",
+    "login": "登录",
+    "register": "注册新账号",
+    "forgotPassword": "忘记密码？",
+    "alreadyLoggedIn": "账号已登录",
+    "enter": "点击进入",
+    "switch": "切换账号"
+  },
+  "register": {
+    "sendSuccess": "发送成功",
+    "username": "用户名",
+    "email": "邮箱",
+    "password": "密码",
+    "register": "注册",
+    "desc1": "已有账号？",
+    "login": "点击登录",
+    "tipTitle": "请查收电子邮件",
+    "tipDesc1": "我们向 ",
+    "tipDesc2": " 发送了一封电子邮件，请",
+    "toMailbox": "前往邮箱",
+    "tipDesc3": "确认与激活账号。",
+    "tipDesc4": "没有收到？",
+    "resend": "重新发送电子邮件",
+    "back": "返回上一步",
+    "registrationSuccess": "注册成功"
+  },
+  "forgotPassword": {
+    "return": "返回登录",
+    "email": "邮箱",
+    "enterEmail": "输入邮箱",
+    "emailInvalid": "邮箱格式不正确",
+    "username": "用户名",
+    "enterUsername": "输入用户名",
+    "nextStep": "下一步",
+    "send": "发送验证码",
+    "desc1": "一封确认信已经发到 ",
+    "desc2": " 所关联的邮箱",
+    "desc3": "，请前往该邮箱获取验证码，然后点击下一步重置密码。",
+    "password": "密码",
+    "enterNewPassword": "输入新密码",
+    "confirmNewPassword": "确认新密码",
+    "verifyCode": "验证码",
+    "reset": "重置密码",
+    "resetSuccess": "重置密码成功"
+  },
   "main": {
     "nav": {
       "vizs": "可视化",
@@ -9,23 +68,26 @@
       "permissions": "权限",
       "settings": "设置",
       "download": {
-        "title": "下载列表"
+        "title": "下载列表",
+        "status": {
+          "created": "处理中",
+          "downloaded": "已下载",
+          "done": "已完成",
+          "failed": "已失败"
+        }
       },
       "organization": {
-        "organizationList": "组织列表",
-        "organizationCreate": "创建组织",
-        "organizationName": "名称",
-        "nameIsEmptyPrompt": "名称不能为空",
-        "duplicateNamePrompt": "名称重复",
-        "organizationDescription": "描述",
-        "cancel": "取消",
-        "saveDndEnter": "保存并进入"
+        "title": "组织列表",
+        "create": "创建组织",
+        "name": "名称",
+        "desc": "描述",
+        "save": "保存并进入"
       },
       "account": {
-        "accountSettings": {
+        "profile": {
           "title": "账号设置",
           "clickUpload": "点击上传",
-          "userName": "用户名",
+          "username": "用户名",
           "email": "邮箱",
           "name": "姓名",
           "department": "部门",
@@ -33,10 +95,9 @@
         },
         "changePassword": {
           "title": "修改密码",
-          "oldPassword": "旧密码",
+          "oldPassword": "密码",
           "newPassword": "新密码",
           "confirmPassword": "确定新密码",
-          "success": "修改成功",
           "save": "保存"
         },
         "switchLanguage": {
@@ -54,6 +115,11 @@
       "orgSettings": {
         "title": "组织设置"
       }
+    },
+    "background": {
+      "loading": "应用配置加载中…",
+      "initError": "初始化错误，请刷新页面重试",
+      "createOrg": "未加入任何组织，点击创建"
     }
   },
   "viz": {
@@ -201,6 +267,16 @@
         "goBack": "返回",
         "run": "执行",
         "save": "保存",
+        "saveToDashboard": "保存到仪表盘",
+        "login": "登陆",
+        "aggregationSwitch": "聚合开关",
+        "aggregationSwitchTip": "开启/关闭聚合会清空全部图表配置，确认开启/关闭？",
+        "open": "开启",
+        "close": "关闭",
+        "lang": {
+          "zh": "中文",
+          "en": "英文"
+        },
         "format": {
           "local": "本地",
           "date": "日期"
@@ -297,6 +373,7 @@
         "mixed": "混合",
         "filter": "筛选",
         "colorize": "颜色",
+        "colorRange": "Range Color",
         "info": "信息",
         "sort": "排序",
         "size": "大小",
@@ -358,7 +435,8 @@
             "colorize": "着色",
             "colorRange": "着色",
             "colorSingle": "着色",
-            "size": "大小"
+            "size": "大小",
+            "chooseTheme": "选择主题"
           }
         }
       },
@@ -449,7 +527,6 @@
         "video": "视频",
         "container": "容器",
         "tab": "标签页",
-        "轮播图": "",
         "controller": "控制器",
         "undo": "撤销",
         "redo": "重做",
@@ -473,6 +550,38 @@
         "query": "查询",
         "reset": "重置"
       }
+    },
+    "sideBar": {
+      "folder": "目录",
+      "presentation": "演示",
+      "folders": {
+        "folderTitle": "仪表板 & 数据图表",
+        "dashboard": "新建仪表板",
+        "dataChart": "新建数据图表",
+        "folder": "新建目录",
+        "recycle": "回收站",
+        "folderTree": {
+          "successDeleted": "成功删除",
+          "successRecycle": "成功移至回收站",
+          "info": "基本信息",
+          "delete": "删除",
+          "moveToTrash": "移至回收站",
+          "confirmDelete": "确定删除",
+          "sureMoveRecycleBin": "确定移至回收站"
+        }
+      },
+      "storyBoards": {
+        "storyBoardsList": "故事板列表",
+        "newStoryBoards": "新建故事板",
+        "recycle": "回收站"
+      },
+      "recycle": {
+        "successDeleted": "删除成功",
+        "successRestored": "还原成功",
+        "reduction": "还原",
+        "confirmDeletion": "确认删除",
+        "delete": "删除"
+      }
     }
   },
   "share": {
@@ -491,6 +600,10 @@
       "more": "更多",
       "ok": "确认",
       "cancel": "取消"
+    },
+    "listTitle": {
+      "search": "搜索",
+      "searchValue": "搜索名称关键字"
     }
   }
 }

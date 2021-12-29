@@ -19,7 +19,6 @@ import {
 import { getTime } from 'app/utils/time';
 import { FilterSqlOperator } from 'globalConstants';
 import moment from 'moment';
-import { errorHandle } from 'utils/utils';
 import { STORAGE_IMAGE_KEY_PREFIX } from '../constants';
 import {
   BoardLinkFilter,
@@ -84,6 +83,9 @@ export const getChartDataRequestBuilder = (dataChart: DataChart) => {
     } as any,
     dataChart?.config?.chartConfig?.datas,
     dataChart?.config?.chartConfig?.settings,
+    {},
+    false,
+    dataChart?.config?.aggregation,
   );
   return builder;
 };
@@ -391,14 +393,16 @@ export const getChartWidgetRequestParams = (obj: {
   if (!curWidget.datachartId) return null;
   const dataChart = dataChartMap[curWidget.datachartId];
   if (!dataChart) {
-    errorHandle(`can\`t find Chart ${curWidget.datachartId}`);
+    // errorHandle(`can\`t find Chart ${curWidget.datachartId}`);
     return null;
   }
   const chartDataView = viewMap[dataChart?.viewId];
+
   if (!chartDataView) {
-    errorHandle(`can\`t find View ${dataChart?.viewId}`);
+    // errorHandle(`can\`t find View ${dataChart?.viewId}`);
     return null;
   }
+
   const builder = getChartDataRequestBuilder(dataChart);
   let requestParams = builder
     .addExtraSorters((option?.sorters as any) || [])

@@ -131,6 +131,9 @@ const ChartPreviewBoardForShare: FC<{
         } as any,
         chartPreview?.chartConfig?.datas,
         chartPreview?.chartConfig?.settings,
+        {},
+        false,
+        chartPreview?.backendChart?.config?.aggregation,
       );
       const downloadParams = [builder.build()];
       const fileName = chartPreview?.backendChart?.name || 'chart';
