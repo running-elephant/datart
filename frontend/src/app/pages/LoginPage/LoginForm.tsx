@@ -1,5 +1,24 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Button, Form, Input } from 'antd';
 import { AuthForm } from 'app/components';
+import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { selectLoggedInUser, selectLoginLoading } from 'app/slice/selectors';
 import { login } from 'app/slice/thunks';
 import React, { useCallback, useState } from 'react';
@@ -21,6 +40,8 @@ export function LoginForm() {
   const loggedInUser = useSelector(selectLoggedInUser);
   const [form] = Form.useForm();
   const logged = !!getToken();
+  const t = usePrefixI18N('login');
+  const tg = usePrefixI18N('global');
 
   const toApp = useCallback(() => {
     history.replace('/');
@@ -48,13 +69,13 @@ export function LoginForm() {
     <AuthForm>
       {logged && !switchUser ? (
         <>
-          <h2>账号已登录</h2>
+          <h2>{t('alreadyLoggedIn')}</h2>
           <UserPanel onClick={toApp}>
             <p>{loggedInUser?.username}</p>
-            <span>点击进入系统</span>
+            <span>{t('enter')}</span>
           </UserPanel>
           <Button type="link" size="large" block onClick={onSwitch}>
-            切换用户
+            {t('switch')}
           </Button>
         </>
       ) : (
@@ -64,22 +85,22 @@ export function LoginForm() {
             rules={[
               {
                 required: true,
-                message: '用户名或邮箱不能为空',
+                message: `${t('username')}${tg('required')}`,
               },
             ]}
           >
-            <Input placeholder="用户名 / 邮箱" size="large" />
+            <Input placeholder={t('username')} size="large" />
           </Form.Item>
           <Form.Item
             name="password"
             rules={[
               {
                 required: true,
-                message: '密码不能为空',
+                message: `${t('password')}${tg('required')}`,
               },
             ]}
           >
-            <Input placeholder="密码" type="password" size="large" />
+            <Input placeholder={t('password')} type="password" size="large" />
           </Form.Item>
           <Form.Item className="last" shouldUpdate>
             {() => (
@@ -96,13 +117,13 @@ export function LoginForm() {
                 }
                 block
               >
-                登录
+                {t('login')}
               </Button>
             )}
           </Form.Item>
           <Links>
-            <LinkButton to="/forgetPassword">忘记密码</LinkButton>
-            <LinkButton to="/register">注册账号</LinkButton>
+            <LinkButton to="/forgetPassword">{t('forgotPassword')}</LinkButton>
+            <LinkButton to="/register">{t('register')}</LinkButton>
           </Links>
         </Form>
       )}

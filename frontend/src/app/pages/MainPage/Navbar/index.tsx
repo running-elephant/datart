@@ -284,7 +284,7 @@ export function Navbar() {
                   key="profile"
                   prefix={<ProfileOutlined className="icon" />}
                 >
-                  <p>{t('nav.account.accountSettings.title')}</p>
+                  <p>{t('nav.account.profile.title')}</p>
                 </MenuListItem>
                 <MenuListItem
                   key="password"

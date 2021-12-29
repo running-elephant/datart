@@ -1,4 +1,59 @@
 {
+  "global": {
+    "tokenExpired": "会话过期，请重新登录",
+    "validation": {
+      "required": "不能为空",
+      "invalidPassword": "密码长度为6-20位",
+      "passwordNotMatch": "两次输入的密码不一致"
+    }
+  },
+  "login": {
+    "username": "用户名 / 邮箱",
+    "password": "密码",
+    "login": "登录",
+    "register": "注册新账号",
+    "forgotPassword": "忘记密码？",
+    "alreadyLoggedIn": "账号已登录",
+    "enter": "点击进入",
+    "switch": "切换账号"
+  },
+  "register": {
+    "sendSuccess": "发送成功",
+    "username": "用户名",
+    "email": "邮箱",
+    "password": "密码",
+    "register": "注册",
+    "desc1": "已有账号？",
+    "login": "点击登录",
+    "tipTitle": "请查收电子邮件",
+    "tipDesc1": "我们向 ",
+    "tipDesc2": " 发送了一封电子邮件，请",
+    "toMailbox": "前往邮箱",
+    "tipDesc3": "确认与激活账号。",
+    "tipDesc4": "没有收到？",
+    "resend": "重新发送电子邮件",
+    "back": "返回上一步",
+    "registrationSuccess": "注册成功"
+  },
+  "forgotPassword": {
+    "return": "返回登录",
+    "email": "邮箱",
+    "enterEmail": "输入邮箱",
+    "emailInvalid": "邮箱格式不正确",
+    "username": "用户名",
+    "enterUsername": "输入用户名",
+    "nextStep": "下一步",
+    "send": "发送验证码",
+    "desc1": "一封确认信已经发到 ",
+    "desc2": " 所关联的邮箱",
+    "desc3": "，请前往该邮箱获取验证码，然后点击下一步重置密码。",
+    "password": "密码",
+    "enterNewPassword": "输入新密码",
+    "confirmNewPassword": "确认新密码",
+    "verifyCode": "验证码",
+    "reset": "重置密码",
+    "resetSuccess": "重置密码成功"
+  },
   "main": {
     "nav": {
       "vizs": "可视化",
@@ -22,10 +77,10 @@
         "saveDndEnter": "保存并进入"
       },
       "account": {
-        "accountSettings": {
+        "profile": {
           "title": "账号设置",
           "clickUpload": "点击上传",
-          "userName": "用户名",
+          "username": "用户名",
           "email": "邮箱",
           "name": "姓名",
           "department": "部门",
