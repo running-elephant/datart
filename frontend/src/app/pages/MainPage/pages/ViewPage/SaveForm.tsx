@@ -139,8 +139,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
                 params: { name: value, orgId, parentId: parentId || null },
               }).then(
                 () => Promise.resolve(),
-                (err: any) =>
-                  Promise.reject(new Error(err.response.data.message)),
+                err => Promise.reject(new Error(err.response.data.message)),
               );
             }, DEFAULT_DEBOUNCE_WAIT),
           },

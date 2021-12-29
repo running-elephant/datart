@@ -352,7 +352,7 @@ export function SourceDetailPage() {
                         params: { name: value, orgId },
                       }).then(
                         () => Promise.resolve(),
-                        (err: any) =>
+                        err =>
                           Promise.reject(new Error(err.response.data.message)),
                       );
                     }, DEFAULT_DEBOUNCE_WAIT),

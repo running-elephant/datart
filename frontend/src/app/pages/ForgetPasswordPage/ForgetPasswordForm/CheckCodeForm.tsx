@@ -35,7 +35,7 @@ export const CheckCodeForm: FC<CheckCodeFormProps> = ({ onNextStep }) => {
   const [ticket, setTicket] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
   const t = useI18NPrefix('forgotPassword');
-  const tg = useI18NPrefix('global.validation');
+  const tgv = useI18NPrefix('global.validation');
 
   const initialValues = useMemo(() => {
     return { type: FindWays.Email };
@@ -84,7 +84,7 @@ export const CheckCodeForm: FC<CheckCodeFormProps> = ({ onNextStep }) => {
         rules={[
           {
             required: true,
-            message: `${t('email')}${tg('required')}`,
+            message: `${t('email')}${tgv('required')}`,
           },
           {
             type: 'email',
@@ -100,14 +100,14 @@ export const CheckCodeForm: FC<CheckCodeFormProps> = ({ onNextStep }) => {
         rules={[
           {
             required: true,
-            message: `${t('username')}${tg('required')}`,
+            message: `${t('username')}${tgv('required')}`,
           },
         ]}
       >
         <Input size="large" placeholder={t('enterUsername')} />
       </Form.Item>
     );
-  }, [isEmail, t, tg]);
+  }, [isEmail, t, tgv]);
 
   const goNext = useCallback(() => {
     onNextStep(token as string);

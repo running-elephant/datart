@@ -41,7 +41,7 @@ export function LoginForm() {
   const [form] = Form.useForm();
   const logged = !!getToken();
   const t = usePrefixI18N('login');
-  const tg = usePrefixI18N('global');
+  const tgv = usePrefixI18N('global.validation');
 
   const toApp = useCallback(() => {
     history.replace('/');
@@ -85,7 +85,7 @@ export function LoginForm() {
             rules={[
               {
                 required: true,
-                message: `${t('username')}${tg('required')}`,
+                message: `${t('username')}${tgv('required')}`,
               },
             ]}
           >
@@ -96,7 +96,7 @@ export function LoginForm() {
             rules={[
               {
                 required: true,
-                message: `${t('password')}${tg('required')}`,
+                message: `${t('password')}${tgv('required')}`,
               },
             ]}
           >

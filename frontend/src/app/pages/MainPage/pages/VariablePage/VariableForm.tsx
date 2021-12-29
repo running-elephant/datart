@@ -120,8 +120,7 @@ export const VariableForm = memo(
                 params: { name: value, orgId },
               }).then(
                 () => Promise.resolve(),
-                (err: any) =>
-                  Promise.reject(new Error(err.response.data.message)),
+                err => Promise.reject(new Error(err.response.data.message)),
               );
             }, DEFAULT_DEBOUNCE_WAIT),
       [scope, editingVariable?.name, variables, orgId],

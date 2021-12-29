@@ -128,8 +128,7 @@ export function OrgSettingPage() {
                     params: { name: value },
                   }).then(
                     () => Promise.resolve(),
-                    (err: any) =>
-                      Promise.reject(new Error(err.response.data.message)),
+                    err => Promise.reject(new Error(err.response.data.message)),
                   );
                 }, DEFAULT_DEBOUNCE_WAIT),
               },
