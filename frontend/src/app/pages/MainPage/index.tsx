@@ -17,7 +17,7 @@
  */
 
 import { useAppSlice } from 'app/slice';
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Redirect,

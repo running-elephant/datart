@@ -38,11 +38,6 @@ export enum CommonFormTypes {
 
 export const TITLE_SUFFIX = ['archived', 'unpublished'];
 
-export const COMMON_FORM_TITLE_PREFIX = {
-  [CommonFormTypes.Add]: '新建',
-  [CommonFormTypes.Edit]: '编辑',
-};
-
 export const DEFAULT_DEBOUNCE_WAIT = 300;
 
 export const FONT_SIZES = [

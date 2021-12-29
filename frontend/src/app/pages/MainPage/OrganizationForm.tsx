@@ -38,7 +38,7 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
   const loading = useSelector(selectSaveOrganizationLoading);
   const [form] = Form.useForm();
   const t = useI18NPrefix('main.nav.organization');
-  const tgv = useI18NPrefix('global.validation');
+  const tg = useI18NPrefix('global');
 
   const formSubmit = useCallback(
     values => {
@@ -84,7 +84,10 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
           name="name"
           label={t('name')}
           rules={[
-            { required: true, message: `${t('name')}${tgv('required')}` },
+            {
+              required: true,
+              message: `${t('name')}${tg('validation.required')}`,
+            },
             {
               validator: debounce((_, value) => {
                 return request({

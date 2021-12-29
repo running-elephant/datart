@@ -1,14 +1,37 @@
 {
   "global": {
     "tokenExpired": "Token expired, please log in",
+    "title": {
+      "action": "Action",
+      "recycle": "Recycle"
+    },
+    "button": {
+      "save": "Save",
+      "edit": "Edit",
+      "archive": "Archive",
+      "restore": "Restore",
+      "delete": "Delete"
+    },
     "operation": {
-      "updateSuccess": "Update Successful",
-      "deleteSuccess": "Delete Successful"
+      "archiveConfirm": "Archive confirm",
+      "restoreConfirm": "Restore confirm",
+      "deleteConfirm": "Delete confirm",
+      "updateSuccess": "Update successful",
+      "deleteSuccess": "Delete successful",
+      "archiveSuccess": "Archive successful",
+      "restoreSuccess": "Restore successful",
+      "parseError": "Configuration parse error"
     },
     "validation": {
       "required": " is required",
       "invalidPassword": "Password must be 6-20 characters",
       "passwordNotMatch": "Password and confirm password does not match"
+    },
+    "modal": {
+      "title": {
+        "add": "Create ",
+        "edit": "Edit "
+      }
     }
   },
   "login": {
@@ -90,15 +113,13 @@
           "username": "Username",
           "email": "Email",
           "name": "Name",
-          "department": "Department",
-          "save": "Save"
+          "department": "Department"
         },
         "changePassword": {
           "title": "Password",
           "oldPassword": "Password",
           "newPassword": "New password",
-          "confirmPassword": "Confirm password",
-          "save": "Save"
+          "confirmPassword": "Confirm password"
         },
         "switchLanguage": {
           "title": "language"
@@ -651,6 +672,30 @@
       "scaleHeight": "scaleHeight",
       "scaleFull": "scaleFull",
       "noScale": "noScale"
+    }
+  },
+  "source": {
+    "source": "Source",
+    "testSuccess": "Test connection succeeded",
+    "createSuccess": "Source created successfully",
+    "archived": "Archived ",
+    "noPermission": "You do not have permission to access this page",
+    "sidebar": {
+      "title": "Source List",
+      "add": "Create source"
+    },
+    "form": {
+      "name": "Name",
+      "type": "Type",
+      "test": "Test connection",
+      "file": "File",
+      "selectFile": "Select file",
+      "addProperty": "Add property",
+      "editProperty": "Edit property",
+      "addConfig": "Add configuration",
+      "editConfig": "Edit configuration",
+      "duplicate": "Duplicate key",
+      "duplicateName": "Duplicate Name"
     }
   },
   "share": {

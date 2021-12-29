@@ -1,5 +1,6 @@
 import { Form, FormProps, Modal, ModalProps } from 'antd';
-import { CommonFormTypes, COMMON_FORM_TITLE_PREFIX } from 'globalConstants';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { CommonFormTypes } from 'globalConstants';
 import { forwardRef, ReactNode, useCallback, useImperativeHandle } from 'react';
 
 export interface ModalFormProps extends ModalProps {
@@ -15,6 +16,7 @@ export const ModalForm = forwardRef(
     ref,
   ) => {
     const [form] = Form.useForm();
+    const tg = useI18NPrefix('global');
     useImperativeHandle(ref, () => form);
 
     const onOk = useCallback(() => {
@@ -29,7 +31,7 @@ export const ModalForm = forwardRef(
     return (
       <Modal
         {...rest}
-        title={`${type ? COMMON_FORM_TITLE_PREFIX[type] : ''}${rest.title}`}
+        title={`${type ? tg(`modal.title.${type}`) : ''}${rest.title}`}
         onOk={onOk}
         afterClose={onAfterClose}
       >

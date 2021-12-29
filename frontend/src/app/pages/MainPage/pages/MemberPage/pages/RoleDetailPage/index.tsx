@@ -2,11 +2,7 @@ import { Button, Card, Form, Input, message, Popconfirm } from 'antd';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
 import { User } from 'app/slice/types';
 import debounce from 'debounce-promise';
-import {
-  CommonFormTypes,
-  COMMON_FORM_TITLE_PREFIX,
-  DEFAULT_DEBOUNCE_WAIT,
-} from 'globalConstants';
+import { CommonFormTypes, DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
@@ -27,6 +23,7 @@ import {
   editRole,
   getRoleMembers,
 } from '../../slice/thunks';
+import useI18NPrefix from 'app/hooks/useI18NPrefix'
 import { Role } from '../../slice/types';
 import { MemberForm } from './MemberForm';
 import { MemberTable } from './MemberTable';
@@ -45,6 +42,7 @@ export function RoleDetailPage() {
   const editingRole = useSelector(selectEditingRole);
   const getRoleMembersLoading = useSelector(selectGetRoleMembersLoading);
   const saveRoleLoading = useSelector(selectSaveRoleLoading);
+  const tg = useI18NPrefix('global');
   const { params } = useRouteMatch<{ roleId: string }>();
   const { roleId } = params;
   const [form] = Form.useForm<Pick<Role, 'name' | 'description'>>();
@@ -135,7 +133,7 @@ export function RoleDetailPage() {
   return (
     <Wrapper>
       <DetailPageHeader
-        title={`${COMMON_FORM_TITLE_PREFIX[formType]}角色`}
+        title={`${tg(`modal.title.${formType}`)}角色`}
         actions={
           <>
             <Button
