@@ -90,13 +90,14 @@ class ChartEventBroker {
     context?: BrokerContext,
   ) {
     try {
-      await Debugger.instance.measure(
-        `ChartEventBroker | ${event} `,
-        () => {
-          this._listeners.get(event)?.call?.(this._chart, options, context);
-        },
-        false,
-      );
+      // await Debugger.instance.measure(
+      //   `ChartEventBroker | ${event} `,
+      //   () => {
+      //     this._listeners.get(event)?.call?.(this._chart, options, context);
+      //   },
+      //   false,
+      // );
+      this._listeners.get(event)?.call?.(this._chart, options, context);
     } catch (e) {
       console.error(`ChartEventBroker | ${event} exception ----> `, e);
     } finally {
