@@ -86,11 +86,11 @@ export function MainPage() {
     }
   }, [dispatch, vizActions, viewActions, orgId]);
 
-  useEffect(() => {
-    if (isExact && orgId) {
-      history.push(`/organizations/${orgId}`);
-    }
-  }, [isExact, orgId, history]);
+  // useEffect(() => {
+  //   if (isExact && orgId) {
+  //     history.push(`/organizations/${orgId}`);
+  //   }
+  // }, [isExact, orgId, history]);
 
   return (
     <AppContainer>
@@ -98,6 +98,11 @@ export function MainPage() {
       <Navbar />
       {orgId && (
         <Switch>
+          {orgId ? (
+            <Route path="/" exact>
+              <Redirect to={`/organizations/${orgId}`} />
+            </Route>
+          ) : null}
           <Route path="/confirminvite" component={ConfirmInvitePage} />
           <Route path="/organizations/:orgId" exact>
             <Redirect
