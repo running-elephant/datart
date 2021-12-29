@@ -90,6 +90,9 @@ const getChartQueryData = (dataStr: string) => {
     } as any,
     chartConfig?.datas,
     chartConfig?.settings,
+    {},
+    false,
+    dataConfig?.aggregation,
   );
   let downloadParams = [builder.build()];
   let fileName = data?.name || 'chart';
