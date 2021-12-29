@@ -2,15 +2,15 @@
   "global": {
     "tokenExpired": "会话过期，请重新登录",
     "title": {
-      "action": "操作",
-      "recycle": "回收站"
+      "action": "操作"
     },
     "button": {
       "save": "保存",
       "edit": "编辑",
       "archive": "移至回收站",
       "restore": "还原",
-      "delete": "删除"
+      "delete": "删除",
+      "info": "基本信息"
     },
     "operation": {
       "archiveConfirm": "确定移至回收站？",
@@ -631,7 +631,7 @@
         "closeJump": "关闭跳转"
       }
     },
-    "sideBar": {
+    "sidebar": {
       "folder": "目录",
       "presentation": "演示",
       "folders": {
@@ -639,28 +639,12 @@
         "dashboard": "新建仪表板",
         "dataChart": "新建数据图表",
         "folder": "新建目录",
-        "recycle": "回收站",
-        "folderTree": {
-          "successDeleted": "成功删除",
-          "successRecycle": "成功移至回收站",
-          "info": "基本信息",
-          "delete": "删除",
-          "moveToTrash": "移至回收站",
-          "confirmDelete": "确定删除",
-          "sureMoveRecycleBin": "确定移至回收站"
-        }
-      },
-      "storyBoards": {
-        "storyBoardsList": "故事板列表",
-        "newStoryBoards": "新建故事板",
         "recycle": "回收站"
       },
-      "recycle": {
-        "successDeleted": "删除成功",
-        "successRestored": "还原成功",
-        "reduction": "还原",
-        "confirmDeletion": "确认删除",
-        "delete": "删除"
+      "storyboards": {
+        "title": "故事板列表",
+        "add": "新建故事板",
+        "recycle": "回收站"
       }
     },
     "lineOptions": {
@@ -690,7 +674,8 @@
     "noPermission": "您没有权限访问该页面",
     "sidebar": {
       "title": "数据源列表",
-      "add": "新建数据源"
+      "add": "新建数据源",
+      "recycle": "回收站"
     },
     "form": {
       "name": "名称",

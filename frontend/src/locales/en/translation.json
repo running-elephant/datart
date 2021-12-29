@@ -2,15 +2,15 @@
   "global": {
     "tokenExpired": "Token expired, please log in",
     "title": {
-      "action": "Action",
-      "recycle": "Recycle"
+      "action": "Action"
     },
     "button": {
       "save": "Save",
       "edit": "Edit",
       "archive": "Archive",
       "restore": "Restore",
-      "delete": "Delete"
+      "delete": "Delete",
+      "info": "Info"
     },
     "operation": {
       "archiveConfirm": "Archive confirm",
@@ -632,36 +632,20 @@
         "closeJump": "Close Jump"
       }
     },
-    "sideBar": {
-      "folder": "目录",
-      "presentation": "演示",
+    "sidebar": {
+      "folder": "Folder",
+      "presentation": "Presentation",
       "folders": {
-        "folderTitle": "仪表板 & 数据图表",
-        "dashboard": "新建仪表板",
-        "dataChart": "新建数据图表",
-        "folder": "新建目录",
-        "recycle": "回收站",
-        "folderTree": {
-          "successDeleted": "成功删除",
-          "successRecycle": "成功移至回收站",
-          "info": "基本信息",
-          "delete": "删除",
-          "moveToTrash": "移至回收站",
-          "confirmDelete": "确定删除",
-          "sureMoveRecycleBin": "确定移至回收站"
-        }
+        "folderTitle": "Dashboards & Datacharts",
+        "dashboard": "Create dashboard",
+        "dataChart": "Create datachart",
+        "folder": "Create folder",
+        "recycle": "Recycle"
       },
-      "storyBoards": {
-        "storyBoardsList": "故事板列表",
-        "newStoryBoards": "新建故事板",
-        "recycle": "回收站"
-      },
-      "recycle": {
-        "successDeleted": "删除成功",
-        "successRestored": "还原成功",
-        "reduction": "还原",
-        "confirmDeletion": "确认删除",
-        "delete": "删除"
+      "storyboards": {
+        "title": "Storyboards",
+        "add": "Create storyboard",
+        "recycle": "Recycle"
       }
     },
     "lineOptions": {
@@ -691,7 +675,8 @@
     "noPermission": "You do not have permission to access this page",
     "sidebar": {
       "title": "Source List",
-      "add": "Create source"
+      "add": "Create source",
+      "recycle": "Recycle"
     },
     "form": {
       "name": "Name",

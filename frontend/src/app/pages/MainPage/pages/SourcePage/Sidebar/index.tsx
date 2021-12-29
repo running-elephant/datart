@@ -53,7 +53,6 @@ export const Sidebar = memo(() => {
   );
   const sourceId = matchSourceDetail?.params.sourceId;
   const t = useI18NPrefix('source.sidebar');
-  const tg = useI18NPrefix('global');
   const allowCreate = useAccess(allowCreateSource());
 
   const { filteredData: sourceList, debouncedSearch: listSearch } =
@@ -91,7 +90,7 @@ export const Sidebar = memo(() => {
           items: [
             {
               key: 'recycle',
-              text: tg('title.recycle'),
+              text: t('recycle'),
               prefix: <DeleteOutlined className="icon" />,
             },
           ],
@@ -100,13 +99,13 @@ export const Sidebar = memo(() => {
       },
       {
         key: 'recycle',
-        title: tg('title.recycle'),
+        title: t('recycle'),
         back: true,
         search: true,
         onSearch: archivedSearch,
       },
     ],
-    [toAdd, moreMenuClick, listSearch, archivedSearch, allowCreate, t, tg],
+    [toAdd, moreMenuClick, listSearch, archivedSearch, allowCreate, t],
   );
 
   return (
