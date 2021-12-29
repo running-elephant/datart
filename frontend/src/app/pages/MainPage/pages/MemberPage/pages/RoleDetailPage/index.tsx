@@ -180,7 +180,8 @@ export function RoleDetailPage() {
                       params: { name: value, orgId },
                     }).then(
                       () => Promise.resolve(),
-                      () => Promise.reject(new Error('名称重复')),
+                      err =>
+                        Promise.reject(new Error(err.response.data.message)),
                     );
                   }, DEFAULT_DEBOUNCE_WAIT),
                 },

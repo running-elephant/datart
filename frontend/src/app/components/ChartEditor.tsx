@@ -87,8 +87,12 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 
   useMount(
     () => {
-      const currentChart = ChartManager.instance().getDefaultChart();
-      handleChartChange(currentChart);
+      if (!dataChartId && !originChart) {
+        // Note: add default chart if new to editor
+        const currentChart = ChartManager.instance().getDefaultChart();
+        handleChartChange(currentChart);
+      }
+
       if (container === 'dataChart') {
         dispatch(
           initWorkbenchAction({

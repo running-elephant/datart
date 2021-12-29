@@ -119,7 +119,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
                 },
               }).then(
                 () => Promise.resolve(),
-                () => Promise.reject(new Error('名称重复')),
+                err => Promise.reject(new Error(err.response.data.message)),
               );
             }, DEFAULT_DEBOUNCE_WAIT),
           },
@@ -142,7 +142,14 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
       )}
       {vizType !== 'STORYBOARD' && (
         <Form.Item name="parentId" label="所属目录">
-          <TreeSelect placeholder="根目录" treeData={treeData} allowClear />
+          <TreeSelect
+            placeholder="根目录"
+            treeData={treeData}
+            allowClear
+            onChange={() => {
+              formRef.current?.validateFields();
+            }}
+          />
         </Form.Item>
       )}
     </ModalForm>

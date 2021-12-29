@@ -139,7 +139,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
                 params: { name: value, orgId, parentId: parentId || null },
               }).then(
                 () => Promise.resolve(),
-                () => Promise.reject(new Error('名称重复')),
+                err => Promise.reject(new Error(err.response.data.message)),
               );
             }, DEFAULT_DEBOUNCE_WAIT),
           },
@@ -152,6 +152,9 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
           placeholder="根目录"
           treeData={folderTree || []}
           allowClear
+          onChange={() => {
+            formRef.current?.validateFields();
+          }}
         />
       </Form.Item>
       {!simple && (

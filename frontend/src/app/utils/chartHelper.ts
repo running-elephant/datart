@@ -410,11 +410,11 @@ export function transformToObjectArray(
   }
 
   const result: any[] = Array.apply(null, Array(columns.length));
-  for (let j = 0; j < result.length; j++) {
+  for (let j = 0, outterLength = result.length; j < outterLength; j++) {
     let objCol = {
       id: j,
     };
-    for (let i = 0; i < metas.length; i++) {
+    for (let i = 0, innerLength = metas.length; i < innerLength; i++) {
       const key = metas?.[i]?.name;
       if (!!key) {
         objCol[key] = columns[j][i];
@@ -426,6 +426,14 @@ export function transformToObjectArray(
 }
 
 // TODO delete this function  #migration
+/**
+ * @deprecated please use new method transformToObjectArray instead
+ * @see transformToObjectArray
+ * @export
+ * @param {string[][]} [columns]
+ * @param {ChartDatasetMeta[]} [metas]
+ * @return {*}
+ */
 export function transfromToObjectArray(
   columns?: string[][],
   metas?: ChartDatasetMeta[],
