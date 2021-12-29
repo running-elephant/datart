@@ -20,7 +20,7 @@ import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import { CSSProperties } from 'styled-components';
-import ChartTools from '.';
+import ChartIFrameContainer from './ChartIFrameContainer';
 
 const DEFAULT_CONTAINER_ID = 'frame-container-1';
 
@@ -54,11 +54,13 @@ class ChartIFrameContainerDispatcher {
     this.switchContainer(containerId, chart, dataset, config);
     const renders: Function[] = [];
     this.chartContainerMap.forEach((chartRenderer: Function, key) => {
+      const isShown = key === this.currentContainerId;
       renders.push(
         chartRenderer
           .call(
             Object.create(null),
-            this.getVisibilityStyle(key === this.currentContainerId, style),
+            this.getVisibilityStyle(isShown, style),
+            isShown,
           )
           .apply(Object.create(null), this.chartMetadataMap.get(key)),
       );
@@ -78,10 +80,10 @@ class ChartIFrameContainerDispatcher {
 
   private createNewIfNotExist(containerId: string) {
     if (!this.chartContainerMap.has(containerId)) {
-      const newContainer = style => (chart, dataset, config) => {
+      const newContainer = (style, isShown) => (chart, dataset, config) => {
         return (
           <div key={containerId} style={style}>
-            <ChartTools.ChartIFrameContainer
+            <ChartIFrameContainer
               dataset={dataset}
               chart={chart}
               config={config}
@@ -89,6 +91,7 @@ class ChartIFrameContainerDispatcher {
               width={style?.width}
               height={style?.height}
               widgetSpecialConfig={this.editorEnv}
+              isShown={isShown}
             />
           </div>
         );
@@ -98,8 +101,8 @@ class ChartIFrameContainerDispatcher {
     this.currentContainerId = containerId;
   }
 
-  private getVisibilityStyle(isShow, style?: CSSProperties) {
-    return isShow
+  private getVisibilityStyle(isShown, style?: CSSProperties) {
+    return isShown
       ? {
           ...style,
           transform: 'none',

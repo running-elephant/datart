@@ -87,6 +87,24 @@ const config: ChartConfig = {
             color: '#495057',
           },
         },
+        {
+          label: 'label.showName',
+          key: 'showName',
+          default: true,
+          comType: 'checkbox',
+        },
+        {
+          label: 'label.showValue',
+          key: 'showValue',
+          default: false,
+          comType: 'checkbox',
+        },
+        {
+          label: 'label.showPercent',
+          key: 'showPercent',
+          default: true,
+          comType: 'checkbox',
+        },
       ],
     },
     {
@@ -183,19 +201,6 @@ const config: ChartConfig = {
         },
       ],
     },
-    {
-      label: 'tooltip.title',
-      key: 'tooltip',
-      comType: 'group',
-      rows: [
-        {
-          label: 'tooltip.showPercentage',
-          key: 'showPercentage',
-          default: false,
-          comType: 'checkbox',
-        },
-      ],
-    },
   ],
   settings: [
     {
@@ -239,6 +244,9 @@ const config: ChartConfig = {
           title: '标签',
           showLabel: '显示标签',
           position: '位置',
+          showName: '维度值',
+          showPercent: '百分比',
+          showValue: '指标值',
         },
         legend: {
           title: '图例',

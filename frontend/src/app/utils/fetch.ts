@@ -230,7 +230,7 @@ export async function loadShareTask(params) {
       params,
     });
     const isNeedStopPolling = !(data || []).some(
-      v => v.status === DownloadTaskState.CREATE,
+      v => v.status === DownloadTaskState.CREATED,
     );
     return {
       isNeedStopPolling,

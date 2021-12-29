@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Button, Form, Input, message, Modal, ModalProps, Upload } from 'antd';
 import { Avatar } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -22,7 +40,8 @@ export function Profile({ visible, onCancel }: ModalProps) {
   const loading = useSelector(selectSaveProfileLoading);
   const [saveDisabled, setSaveDisabled] = useState(true);
   const [form] = Form.useForm();
-  const t = useI18NPrefix('main.nav');
+  const t = useI18NPrefix('main.nav.account.profile');
+  const tgo = useI18NPrefix('global.operation');
 
   const reset = useCallback(() => {
     form.resetFields();
@@ -71,18 +90,18 @@ export function Profile({ visible, onCancel }: ModalProps) {
             email: loggedInUser!.email,
           },
           resolve: () => {
-            message.success('修改成功');
+            message.success(tgo('updateSuccess'));
             onCancel && onCancel(null as any);
           },
         }),
       );
     },
-    [dispatch, loggedInUser, onCancel],
+    [dispatch, loggedInUser, onCancel, tgo],
   );
 
   return (
     <Modal
-      title="账号设置"
+      title={t('title')}
       footer={false}
       visible={visible}
       onCancel={onCancel}
@@ -105,7 +124,7 @@ export function Profile({ visible, onCancel }: ModalProps) {
           onChange={avatarChange}
         >
           <Button type="link" loading={avatarLoading}>
-            点击上传
+            {t('clickUpload')}
           </Button>
         </Upload>
       </AvatarUpload>
@@ -117,12 +136,12 @@ export function Profile({ visible, onCancel }: ModalProps) {
         onValuesChange={formChange}
         onFinish={formSubmit}
       >
-        <FormItem label="用户名">{loggedInUser?.username}</FormItem>
-        <FormItem label="邮箱">{loggedInUser?.email}</FormItem>
-        <FormItem label="姓名" name="name">
-          <Input placeholder="" />
+        <FormItem label={t('username')}>{loggedInUser?.username}</FormItem>
+        <FormItem label={t('email')}>{loggedInUser?.email}</FormItem>
+        <FormItem label={t('name')} name="name">
+          <Input />
         </FormItem>
-        <FormItem label="部门" name="department">
+        <FormItem label={t('department')} name="department">
           <Input />
         </FormItem>
         <Form.Item wrapperCol={{ offset: 7, span: 12 }}>
@@ -133,7 +152,7 @@ export function Profile({ visible, onCancel }: ModalProps) {
             disabled={saveDisabled}
             block
           >
-            保存
+            {t('save')}
           </Button>
         </Form.Item>
       </Form>

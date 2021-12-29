@@ -1,5 +1,22 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Button, Form, Input, message, Modal } from 'antd';
-import { RULES } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   selectLoggedInUser,
@@ -7,8 +24,12 @@ import {
 } from 'app/slice/selectors';
 import { modifyAccountPassword } from 'app/slice/thunks';
 import { ModifyUserPassword } from 'app/slice/types';
-import { FC, useCallback, useEffect, useMemo } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  getConfirmPasswordValidator,
+  getPasswordValidator,
+} from 'utils/validators';
 const FormItem = Form.Item;
 interface ModifyPasswordProps {
   visible: boolean;
@@ -23,6 +44,8 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
   const loading = useSelector(selectModifyPasswordLoading);
   const [form] = Form.useForm();
   const t = useI18NPrefix('main.nav.account.changePassword');
+  const tgo = useI18NPrefix('global.operation');
+  const tgv = useI18NPrefix('global.validation');
 
   const reset = useCallback(() => {
     form.resetFields();
@@ -40,18 +63,14 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
         modifyAccountPassword({
           params,
           resolve: () => {
-            message.success(t('success'));
+            message.success(tgo('updateSuccess'));
             onCancel();
           },
         }),
       );
     },
-    [dispatch, onCancel],
+    [dispatch, onCancel, tgo],
   );
-
-  const confirmRule = useMemo(() => {
-    return RULES.getConfirmRule('newPassword');
-  }, []);
 
   return (
     <Modal
@@ -71,14 +90,26 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
         <FormItem
           label={t('oldPassword')}
           name="oldPassword"
-          rules={RULES.password}
+          rules={[
+            {
+              required: true,
+              message: `${t('oldPassword')}${tgv('required')}`,
+            },
+            { validator: getPasswordValidator(tgv('invalidPassword')) },
+          ]}
         >
           <Input.Password type="password" />
         </FormItem>
         <FormItem
           label={t('newPassword')}
           name="newPassword"
-          rules={RULES.password}
+          rules={[
+            {
+              required: true,
+              message: `${t('newPassword')}${tgv('required')}`,
+            },
+            { validator: getPasswordValidator(tgv('invalidPassword')) },
+          ]}
         >
           <Input.Password type="password" />
         </FormItem>
@@ -86,7 +117,17 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
           label={t('confirmPassword')}
           name="confirmPassword"
           dependencies={['newPassword']}
-          rules={confirmRule}
+          rules={[
+            {
+              required: true,
+              message: `${t('confirmPassword')}${tgv('required')}`,
+            },
+            getConfirmPasswordValidator(
+              'newPassword',
+              tgv('invalidPassword'),
+              tgv('passwordNotMatch'),
+            ),
+          ]}
         >
           <Input.Password type="password" placeholder="" />
         </FormItem>

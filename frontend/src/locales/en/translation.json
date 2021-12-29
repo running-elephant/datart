@@ -1,43 +1,104 @@
 {
+  "global": {
+    "tokenExpired": "Token expired, please log in",
+    "operation": {
+      "updateSuccess": "Update Successful",
+      "deleteSuccess": "Delete Successful"
+    },
+    "validation": {
+      "required": " is required",
+      "invalidPassword": "Password must be 6-20 characters",
+      "passwordNotMatch": "Password and confirm password does not match"
+    }
+  },
+  "login": {
+    "username": "Username / Email",
+    "password": "Password",
+    "login": "Log in",
+    "register": "Sign up for an account",
+    "forgotPassword": "Can't log in?",
+    "alreadyLoggedIn": "Your account is already logged in",
+    "enter": "Click to enter",
+    "switch": "Switch accounts"
+  },
+  "register": {
+    "sendSuccess": "Email sent successfully",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "register": "Register",
+    "desc1": "Already have an account? ",
+    "login": "Log In",
+    "tipTitle": "Check your email",
+    "tipDesc1": "We have sent you email to ",
+    "tipDesc2": ". Please",
+    "toMailbox": "click the link ",
+    "tipDesc3": "to confirm and activate your account.",
+    "tipDesc4": "Didn't receive?",
+    "resend": "Click to resend email",
+    "back": "Go back",
+    "registrationSuccess": "Registration Success"
+  },
+  "forgotPassword": {
+    "return": "Return to log in",
+    "email": "Email",
+    "enterEmail": "Enter email",
+    "emailInvalid": "Invalid email address",
+    "username": "Username",
+    "enterUsername": "Enter username",
+    "nextStep": "Next Step",
+    "send": "Send verification code",
+    "desc1": "A confirmation email has been sent to ",
+    "desc2": "'s mailbox",
+    "desc3": ", please go to the mailbox to get the verification code, and then click next to reset the password.",
+    "password": "Password",
+    "enterNewPassword": "Enter new password",
+    "confirmNewPassword": "Confirm new password",
+    "verifyCode": "Verification code",
+    "reset": "Reset password",
+    "resetSuccess": "Your password has been successfully reset"
+  },
   "main": {
     "nav": {
-      "vizs": "可视化",
-      "views": "数据视图",
-      "sources": "数据源",
-      "schedules": "定时任务",
-      "members": "成员与角色",
-      "permissions": "权限",
-      "settings": "设置",
+      "vizs": "Vizs",
+      "views": "Views",
+      "sources": "Sources",
+      "schedules": "Schedules",
+      "members": "Members",
+      "permissions": "Permissions",
+      "settings": "Settings",
       "download": {
-        "title": "Download List"
+        "title": "Download List",
+        "status": {
+          "created": "Processing",
+          "downloaded": "Downloaded",
+          "done": "Done",
+          "failed": "Failed"
+        }
       },
       "organization": {
-        "organizationList": "组织列表",
-        "organizationCreate": "创建组织",
-        "organizationName": "名称",
-        "nameIsEmptyPrompt": "名称不能为空",
-        "duplicateNamePrompt": "名称重复",
-        "organizationDescription": "描述",
-        "cancel": "取消",
-        "saveDndEnter": "保存并进入"
+        "title": "Organizations",
+        "create": "Create organization",
+        "name": "Name",
+        "desc": "Description",
+        "save": "Save and enter"
       },
       "account": {
-        "accountSettings": {
+        "profile": {
           "title": "Profile",
-          "clickUpload": "点击上传",
-          "userName": "用户名",
-          "email": "邮箱",
-          "name": "姓名",
-          "department": "部门",
-          "save": "保存"
+          "clickUpload": "Click to upload",
+          "username": "Username",
+          "email": "Email",
+          "name": "Name",
+          "department": "Department",
+          "save": "Save"
         },
         "changePassword": {
           "title": "Password",
-          "oldPassword": "旧密码",
-          "newPassword": "新密码",
-          "confirmPassword": "确定新密码",
-          "success": "修改成功",
-          "save": "保存"
+          "oldPassword": "Password",
+          "newPassword": "New password",
+          "confirmPassword": "Confirm password",
+          "save": "Save"
         },
         "switchLanguage": {
           "title": "language"
@@ -54,6 +115,11 @@
       "orgSettings": {
         "title": "组织设置"
       }
+    },
+    "background": {
+      "loading": "Loading...",
+      "initError": "Initialization error, please refresh the page and try again",
+      "createOrg": "You have not joined any organization, click to create"
     }
   },
   "viz": {

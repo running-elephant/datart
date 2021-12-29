@@ -16,6 +16,11 @@
  * limitations under the License.
  */
 
-export enum UserSettingTypes {
-  LastVisitedOrganization = 'LAST_VISITED_ORGANIZATION',
-}
+export const ResizeEvent = new Event('resize', {
+  bubbles: false,
+  cancelable: true,
+});
+
+export const dispatchResize = () => {
+  window.dispatchEvent(ResizeEvent);
+};
