@@ -70,13 +70,11 @@ export const Storyboards = memo(
     const titles = useMemo(
       () => [
         {
-          subTitle: t('storyBoards.storyBoardsList'),
+          subTitle: t('storyboards.title'),
           search: true,
           ...allowCreate({
             add: {
-              items: [
-                { key: 'STORYBOARD', text: t('storyBoards.newStoryBoards') },
-              ],
+              items: [{ key: 'STORYBOARD', text: t('storyboards.add') }],
               icon: <PlusOutlined />,
               callback: add,
             },
@@ -85,7 +83,7 @@ export const Storyboards = memo(
             items: [
               {
                 key: 'recycle',
-                text: t('storyBoards.recycle'),
+                text: t('storyboards.recycle'),
                 prefix: <DeleteOutlined className="icon" />,
               },
             ],
@@ -101,7 +99,7 @@ export const Storyboards = memo(
         },
         {
           key: 'recycle',
-          subTitle: t('storyBoards.recycle'),
+          subTitle: t('storyboards.recycle'),
           back: true,
           search: true,
           onSearch: recycleSearch,
