@@ -134,7 +134,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       setChart(currentChart);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [backendChart?.config.chartGraphId]);
+  }, [backendChart?.config?.chartGraphId]);
 
   const handleChartChange = (c: Chart) => {
     registerChartEvents(c);

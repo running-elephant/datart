@@ -40,12 +40,15 @@ export function handleDefaultConfig(defaultConfig, configType): any {
     draft.rows?.forEach((row, i) => {
       draft.rows[i].aggregate = undefined;
     });
+
     if (configType === ChartDataSectionType.AGGREGATE) {
       delete draft.actions.STRING;
     }
+
     if (configType === ChartDataSectionType.GROUP) {
       delete draft.actions.NUMERIC;
     }
+
     for (let key in draft.actions) {
       _actions[key] = draft.actions[key].filter(
         v => v !== 'aggregate' && v !== 'aggregateLimit',

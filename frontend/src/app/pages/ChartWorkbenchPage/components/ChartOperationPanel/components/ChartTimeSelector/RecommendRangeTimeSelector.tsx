@@ -58,16 +58,18 @@ const RecommendRangeTimeSelector: FC<
           value={recommend}
           onChange={e => handleChange(e.target?.value)}
         >
-          <Space direction="vertical">
+          <Space direction="vertical" key={'smallRange'}>
             {[
               RECOMMEND_TIME.TODAY,
               RECOMMEND_TIME.YESTERDAY,
               RECOMMEND_TIME.THISWEEK,
             ].map(time => (
-              <Radio value={time}>{t(time)}</Radio>
+              <Radio key={time} value={time}>
+                {t(time)}
+              </Radio>
             ))}
           </Space>
-          <Space direction="vertical">
+          <Space direction="vertical" key={'wideRange'}>
             {[
               RECOMMEND_TIME.LAST_7_DAYS,
               RECOMMEND_TIME.LAST_30_DAYS,
@@ -75,7 +77,9 @@ const RecommendRangeTimeSelector: FC<
               RECOMMEND_TIME.LAST_1_MONTH,
               RECOMMEND_TIME.LAST_1_YEAR,
             ].map(time => (
-              <Radio value={time}>{t(time)}</Radio>
+              <Radio key={time} value={time}>
+                {t(time)}
+              </Radio>
             ))}
           </Space>
         </Radio.Group>

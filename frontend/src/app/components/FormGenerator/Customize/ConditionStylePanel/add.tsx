@@ -1,5 +1,5 @@
 import { Col, Form, Input, InputNumber, Modal, Radio, Row, Select } from 'antd';
-import { ColorPickerPopover } from 'app/components/ReactColorPicker';
+import { ColorPickerPopover } from 'app/components/ColorPicker';
 import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
 import { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -279,6 +279,7 @@ const StyledColor = styled.div`
   height: 16px;
   background-color: ${props => props.color};
   position: relative;
+  cursor: pointer;
   ::after {
     position: absolute;
     top: -7px;
