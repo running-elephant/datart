@@ -11,6 +11,7 @@ import { ListTitle, Tree } from 'app/components';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
 import { selectDataProviderDatabaseListLoading } from 'app/pages/MainPage/slice/selectors';
 import { getDataProviderDatabases } from 'app/pages/MainPage/slice/thunks';
+import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import { memo, useCallback, useContext, useEffect } from 'react';
 import { monaco } from 'react-monaco-editor';
 import { useDispatch, useSelector } from 'react-redux';
@@ -43,11 +44,13 @@ export const Resource = memo(() => {
     selectDataProviderDatabaseListLoading,
   );
 
-  const { filteredData, expandedRowKeys, onExpand, debouncedSearch } =
-    useSearchAndExpand(databases, (keywords, data) =>
-      (data.title as string).includes(keywords),
+  const { filteredData, onExpand, debouncedSearch, expandedRowKeys } =
+    useSearchAndExpand(
+      databases,
+      (keywords, data) => (data.title as string).includes(keywords),
+      DEFAULT_DEBOUNCE_WAIT,
+      true,
     );
-
   useEffect(() => {
     if (sourceId && !databases) {
       dispatch(getDataProviderDatabases(sourceId));
@@ -160,7 +163,7 @@ export const Resource = memo(() => {
           loading={databaseListLoading}
           icon={renderIcon}
           selectable={false}
-          expandedKeys={expandedRowKeys}
+          defaultExpandedKeys={expandedRowKeys}
           onExpand={onExpand}
         />
       </TreeWrapper>

@@ -57,7 +57,6 @@ class BasicRichText extends ReactChart {
   }
 
   onMount(options, context): void {
-    console.log(context);
     if (options.containerId === undefined || !context.document) {
       return;
     }

@@ -139,7 +139,8 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
                 params: { name: value, orgId, parentId: parentId || null },
               }).then(
                 () => Promise.resolve(),
-                () => Promise.reject(new Error('名称重复')),
+                (err: any) =>
+                  Promise.reject(new Error(err.response.data.message)),
               );
             }, DEFAULT_DEBOUNCE_WAIT),
           },

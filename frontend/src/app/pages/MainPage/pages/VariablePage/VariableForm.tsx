@@ -120,7 +120,8 @@ export const VariableForm = memo(
                 params: { name: value, orgId },
               }).then(
                 () => Promise.resolve(),
-                () => Promise.reject(new Error('名称重复')),
+                (err: any) =>
+                  Promise.reject(new Error(err.response.data.message)),
               );
             }, DEFAULT_DEBOUNCE_WAIT),
       [scope, editingVariable?.name, variables, orgId],
