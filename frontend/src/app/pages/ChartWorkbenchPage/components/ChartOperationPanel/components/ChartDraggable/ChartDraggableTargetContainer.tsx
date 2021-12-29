@@ -80,19 +80,13 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     const [{ isOver, canDrop }, drop] = useDrop(
       () => ({
         accept: [
-          CHART_DRAG_ELEMENT_TYPE.DATASET_GROUP_COLUMNS,
           CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
           CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN,
         ],
         drop(item: ChartDataSectionField & DragItem, monitor) {
           let items = Array.isArray(item) ? item : [item];
           let needDelete = true;
-          if (
-            monitor.getItemType() ===
-            CHART_DRAG_ELEMENT_TYPE.DATASET_GROUP_COLUMNS
-          ) {
-            items = item as any;
-          }
+
           if (
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN
           ) {
@@ -107,13 +101,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 aggregate: getDefaultAggregate(item),
               })),
             );
-            const newCurrentConfig = updateByKey(
-              currentConfig,
-              'rows',
-              currentColumns,
-            );
-            setCurrentConfig(newCurrentConfig);
-            onConfigChanged?.(ancestors, newCurrentConfig, true);
+            updateCurrentConfigColumns(currentConfig, currentColumns, true);
           } else if (
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
           ) {
@@ -121,6 +109,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               r => r.uid === item.uid,
             );
             if (originItemIndex > -1) {
+              needDelete = false;
               const currentColumns = updateBy(
                 currentConfig?.rows || [],
                 draft => {
@@ -128,14 +117,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                   return draft.splice(item?.index!, 0, item);
                 },
               );
-              const newCurrentConfig = updateByKey(
-                currentConfig,
-                'rows',
-                currentColumns,
-              );
-              needDelete = false;
-              setCurrentConfig(newCurrentConfig);
-              onConfigChanged?.(ancestors, newCurrentConfig, false);
+              updateCurrentConfigColumns(currentConfig, currentColumns);
             } else {
               const currentColumns = updateBy(
                 currentConfig?.rows || [],
@@ -143,13 +125,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                   return draft.splice(item?.index!, 0, item);
                 },
               );
-              const newCurrentConfig = updateByKey(
-                currentConfig,
-                'rows',
-                currentColumns,
-              );
-              setCurrentConfig(newCurrentConfig);
-              onConfigChanged?.(ancestors, newCurrentConfig, false);
+              updateCurrentConfigColumns(currentConfig, currentColumns);
             }
           }
 
@@ -183,13 +159,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           }
 
           let items = [item];
-          if (
-            monitor.getItemType() ===
-            CHART_DRAG_ELEMENT_TYPE.DATASET_GROUP_COLUMNS
-          ) {
-            items = item as any;
-          }
-
           const exists = currentConfig.rows?.map(col => col.colName);
           return items.every(i => !exists?.includes(i.colName));
         },
@@ -204,6 +173,16 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     useEffect(() => {
       setCurrentConfig(config);
     }, [config]);
+
+    const updateCurrentConfigColumns = (
+      currentConfig,
+      newColumns,
+      refreshDataset = false,
+    ) => {
+      const newCurrentConfig = updateByKey(currentConfig, 'rows', newColumns);
+      setCurrentConfig(newCurrentConfig);
+      onConfigChanged?.(ancestors, newCurrentConfig, refreshDataset);
+    };
 
     const getDefaultAggregate = item => {
       if (
@@ -250,6 +229,21 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           columns.splice(hoverIndex, 0, draggedItem);
         });
         setCurrentConfig(newCurrentConfig);
+      } else {
+        // const placeholder = {
+        //   uid: CHARTCONFIG_FIELD_PLACEHOLDER_UID,
+        //   colName: 'Placeholder',
+        //   category: 'field',
+        //   type: 'STRING',
+        // } as any;
+        // const newCurrentConfig = updateBy(currentConfig, draft => {
+        //   const columns = draft.rows || [];
+        //   if (dragIndex) {
+        //     columns.splice(dragIndex, 1);
+        //   }
+        //   columns.splice(hoverIndex, 0, placeholder);
+        // });
+        // setCurrentConfig(newCurrentConfig);
       }
     };
 

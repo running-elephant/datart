@@ -19,6 +19,7 @@
 import { FONT_FAMILY } from 'styles/StyleConstants';
 
 export const DATARTSEPERATOR = '@datart@';
+export const CHARTCONFIG_FIELD_PLACEHOLDER_UID = '@placeholder@';
 
 export enum StorageKeys {
   AuthorizationToken = 'AUTHORIZATION_TOKEN',
@@ -92,7 +93,6 @@ export const CHART_LINE_WIDTH = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 export const CHART_DRAG_ELEMENT_TYPE = {
   DATA_CONFIG_COLUMN: 'data_config_column',
   DATASET_COLUMN: 'dataset_column',
-  DATASET_GROUP_COLUMNS: 'dataset_group_columns',
 };
 
 export const TIME_UNIT_OPTIONS = [

@@ -21,24 +21,24 @@ import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { XYCoord } from 'dnd-core';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
-import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { forwardRef,useImperativeHandle,useRef } from 'react';
 import {
-  ConnectDragSource,
-  ConnectDropTarget,
-  DragSource,
-  DragSourceConnector,
-  DragSourceMonitor,
-  DropTarget,
-  DropTargetConnector,
-  DropTargetMonitor,
+ConnectDragSource,
+ConnectDropTarget,
+DragSource,
+DragSourceConnector,
+DragSourceMonitor,
+DropTarget,
+DropTargetConnector,
+DropTargetMonitor
 } from 'react-dnd';
 import styled from 'styled-components/macro';
 import {
-  BORDER_RADIUS,
-  FONT_SIZE_SUBTITLE,
-  SPACE,
-  SPACE_MD,
-  SPACE_XS,
+BORDER_RADIUS,
+FONT_SIZE_SUBTITLE,
+SPACE,
+SPACE_MD,
+SPACE_XS
 } from 'styles/StyleConstants';
 
 interface ChartDraggableElementObject {
@@ -54,7 +54,11 @@ interface ChartDraggableElementProps {
   config: ChartDataSectionField;
   connectDragSource: ConnectDragSource;
   connectDropTarget: ConnectDropTarget;
-  moveCard: (dragIndex: number, hoverIndex: number) => void;
+  moveCard: (
+    dragIndex: number,
+    hoverIndex: number,
+    config?: ChartDataSectionField,
+  ) => void;
   onDelete: () => void;
 }
 
@@ -65,7 +69,7 @@ interface ChartDraggableElementInstance {
 const ChartDraggableElement = forwardRef<
   HTMLDivElement,
   ChartDraggableElementProps
->(function Card(
+>(function ChartDraggableElement(
   {
     content,
     isDragging,
@@ -104,7 +108,7 @@ const ChartDraggableElement = forwardRef<
 });
 
 export default DropTarget(
-  CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN,
+  [CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN],
   {
     hover(
       props: ChartDraggableElementProps,
@@ -120,7 +124,9 @@ export default DropTarget(
         return null;
       }
 
-      const dragIndex = monitor.getItem<ChartDraggableElementObject>().index;
+      const dragItem = monitor.getItem<ChartDraggableElementObject>();
+
+      const dragIndex = dragItem.index;
       const hoverIndex = props.index;
 
       // Don't replace items with themselves
@@ -179,9 +185,8 @@ export default DropTarget(
       }),
       endDrag: (props, monitor) => {
         const dropResult = monitor.getDropResult();
-        if (!monitor.didDrop() && !dropResult) {
-          props?.onDelete();
-        } else if (monitor.didDrop() && !!dropResult?.delete) {
+        // NOTE: delete item when user did drop, if cancel should not delete anything
+        if (monitor.didDrop() && !!dropResult?.delete) {
           props?.onDelete();
         }
       },
@@ -205,7 +210,7 @@ const StyledChartDraggableElement = styled.div<{
   background: ${p =>
     p.type === ChartDataViewFieldType.NUMERIC ? p.theme.success : p.theme.info};
   border-radius: ${BORDER_RADIUS};
-  opacity: ${p => (p.isDragging ? 0 : 1)};
+  opacity: ${p => (p.isDragging ? 0.2 : 1)};
 `;
 
 const Content = styled.div`
