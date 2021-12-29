@@ -15,7 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ColorPickerPopover } from './ColorPickerPopover';
+import { ColorTag } from './ColorTag';
 import SingleColorSelection from './SingleColorSelection';
 import ThemeColorSelection from './ThemeColorSelection';
 
-export { SingleColorSelection, ThemeColorSelection };
+export {
+  SingleColorSelection,
+  ThemeColorSelection,
+  ColorTag,
+  ColorPickerPopover,
+};

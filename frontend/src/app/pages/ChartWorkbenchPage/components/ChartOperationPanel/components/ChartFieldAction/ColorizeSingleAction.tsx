@@ -77,7 +77,7 @@ const ColorizeSingleAction: FC<{
         <Row align="middle">
           <SingleColorSelection
             color={colorRange?.start}
-            onOk={handleColorChange}
+            onChange={handleColorChange}
           />
         </Row>
       </Col>

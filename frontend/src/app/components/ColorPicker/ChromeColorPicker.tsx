@@ -31,11 +31,11 @@ const toChangeValue = (data: ColorResult) => {
 
 /**
  * 单色选择组件
- * @param onOk
+ * @param onChange
  * @param color
  * @returns 返回一个新的颜色值
  */
-function ChromeColorPicker({ color, onOk }: colorSelectionPropTypes) {
+function ChromeColorPicker({ color, onChange }: colorSelectionPropTypes) {
   const [selectColor, setSelectColor] = useState<any>(color);
   const t = useI18NPrefix('components.colorPicker');
 
@@ -52,7 +52,7 @@ function ChromeColorPicker({ color, onOk }: colorSelectionPropTypes) {
         <Button
           size="middle"
           onClick={() => {
-            onOk?.(false);
+            onChange?.(false);
           }}
         >
           {t('cancel')}
@@ -61,7 +61,7 @@ function ChromeColorPicker({ color, onOk }: colorSelectionPropTypes) {
           type="primary"
           size="middle"
           onClick={() => {
-            onOk?.(selectColor);
+            onChange?.(selectColor);
           }}
         >
           {t('ok')}

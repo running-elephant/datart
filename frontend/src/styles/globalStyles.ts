@@ -187,7 +187,7 @@ export const OverriddenStyle = createGlobalStyle`
   .datart-data-section-dropdown {
     z-index: ${MODAL_LEVEL - 1};
   }
-  .AggregationColorPopover{
+  .aggregation-colorpopover{
     .ant-popover-arrow{
       display:none;
     }

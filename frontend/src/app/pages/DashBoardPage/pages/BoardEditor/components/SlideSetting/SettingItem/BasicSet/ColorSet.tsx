@@ -17,7 +17,7 @@
  */
 import { BgColorsOutlined } from '@ant-design/icons';
 import { Form, Popover } from 'antd';
-import { ReactColorPicker } from 'app/components/ReactColorPicker';
+import { SingleColorSelection } from 'app/components/ColorPicker';
 import { NamePath } from 'rc-field-form/lib/interface';
 import React, { FC, memo } from 'react';
 import styled from 'styled-components/macro';
@@ -27,7 +27,7 @@ export const ColorSet: FC<{
 }> = memo(({ filedValue, filedName }) => {
   const widgetContent = (
     <Form.Item noStyle name={filedName} preserve>
-      <ReactColorPicker value={filedValue} />
+      <SingleColorSelection color={filedValue} />
     </Form.Item>
   );
   return (

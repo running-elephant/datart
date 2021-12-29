@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 
 export interface colorSelectionPropTypes {
   color?: string;
-  onOk?: (color) => void;
+  onChange?: (color) => void;
 }
 export interface themeColorPropTypes {
   children: ReactNode;

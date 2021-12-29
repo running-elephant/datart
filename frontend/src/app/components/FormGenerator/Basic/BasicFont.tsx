@@ -17,7 +17,7 @@
  */
 
 import { Select } from 'antd';
-import { ColorPickerPopover } from 'app/components/ReactColorPicker';
+import { ColorPickerPopover } from 'app/components/ColorPicker';
 import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import {
