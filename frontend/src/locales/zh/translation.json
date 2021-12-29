@@ -1,14 +1,37 @@
 {
   "global": {
     "tokenExpired": "会话过期，请重新登录",
+    "title": {
+      "action": "操作",
+      "recycle": "回收站"
+    },
+    "button": {
+      "save": "保存",
+      "edit": "编辑",
+      "archive": "移至回收站",
+      "restore": "还原",
+      "delete": "删除"
+    },
     "operation": {
+      "archiveConfirm": "确定移至回收站？",
+      "restoreConfirm": "确定还原？",
+      "deleteConfirm": "确定删除？",
       "updateSuccess": "修改成功",
-      "deleteSuccess": "删除成功"
+      "deleteSuccess": "删除成功",
+      "archiveSuccess": "成功移至回收站",
+      "restoreSuccess": "还原成功",
+      "parseError": "配置解析错误"
     },
     "validation": {
       "required": "不能为空",
       "invalidPassword": "密码长度为6-20位",
       "passwordNotMatch": "两次输入的密码不一致"
+    },
+    "modal": {
+      "title": {
+        "add": "新建",
+        "edit": "编辑"
+      }
     }
   },
   "login": {
@@ -78,7 +101,7 @@
       },
       "organization": {
         "title": "组织列表",
-        "create": "创建组织",
+        "create": "新建组织",
         "name": "名称",
         "desc": "描述",
         "save": "保存并进入"
@@ -90,15 +113,13 @@
           "username": "用户名",
           "email": "邮箱",
           "name": "姓名",
-          "department": "部门",
-          "save": "保存"
+          "department": "部门"
         },
         "changePassword": {
           "title": "修改密码",
           "oldPassword": "密码",
           "newPassword": "新密码",
-          "confirmPassword": "确定新密码",
-          "save": "保存"
+          "confirmPassword": "确定新密码"
         },
         "switchLanguage": {
           "title": "切换语言"
@@ -119,7 +140,7 @@
     "background": {
       "loading": "应用配置加载中…",
       "initError": "初始化错误，请刷新页面重试",
-      "createOrg": "未加入任何组织，点击创建"
+      "createOrg": "未加入任何组织，点击新建"
     }
   },
   "viz": {
@@ -283,8 +304,8 @@
         }
       },
       "dataview": {
-        "createComputedFields": "创建计算字段",
-        "createVariableFields": "创建查询变量",
+        "createComputedFields": "新建计算字段",
+        "createVariableFields": "新建查询变量",
         "fieldName": "名称",
         "type": "类型",
         "field": "字段",
@@ -650,6 +671,30 @@
       "scaleHeight": "等比高度缩放",
       "scaleFull": "全屏铺满",
       "noScale": "实际尺寸"
+    }
+  },
+  "source": {
+    "source": "数据源",
+    "testSuccess": "测试连接成功",
+    "createSuccess": "新建数据源成功",
+    "archived": "已归档",
+    "noPermission": "您没有权限访问该页面",
+    "sidebar": {
+      "title": "数据源列表",
+      "add": "新建数据源"
+    },
+    "form": {
+      "name": "名称",
+      "type": "类型",
+      "test": "测试连接",
+      "file": "文件",
+      "selectFile": "选择文件",
+      "addProperty": "新增配置项",
+      "editProperty": "编辑配置项",
+      "addConfig": "新增配置",
+      "editConfig": "编辑配置",
+      "duplicateKey": "Key不能重复",
+      "duplicateName": "名称重复"
     }
   },
   "share": {

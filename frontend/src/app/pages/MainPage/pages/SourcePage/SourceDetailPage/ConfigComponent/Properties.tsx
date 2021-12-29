@@ -1,6 +1,25 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { ProColumnType } from '@ant-design/pro-table';
 import { Button } from 'antd';
 import { Configuration } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { LINE_HEIGHT_BODY } from 'styles/StyleConstants';
@@ -28,6 +47,9 @@ export function Properties({
   allowManage,
   onChange,
 }: PropertiesProps) {
+  const t = useI18NPrefix('source');
+  const tg = useI18NPrefix('global');
+
   const tableDataSource = useMemo(
     () =>
       valueProp
@@ -57,7 +79,7 @@ export function Properties({
         dataIndex: 'key',
         formItemProps: (_, { rowIndex }) => ({
           rules: [
-            { required: true, message: 'Key不能为空' },
+            { required: true, message: `Key${tg('validation.required')}` },
             {
               validator: (_, val) => {
                 if (!valueProp) {
@@ -70,9 +92,8 @@ export function Properties({
                 ) {
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error('Key重复'));
+                return Promise.reject(new Error(t('form.duplicateKey')));
               },
-              message: 'Key不能重复',
             },
           ],
         }),
@@ -82,7 +103,7 @@ export function Properties({
         dataIndex: 'value',
       },
       {
-        title: '操作',
+        title: tg('title.action'),
         valueType: 'option',
         width: 160,
         render: (_, record, __, action) => [
@@ -94,7 +115,7 @@ export function Properties({
               action?.startEditable?.(record.id);
             }}
           >
-            编辑
+            {tg('button.edit')}
           </ActionButton>,
           <ActionButton
             key="delete"
@@ -112,17 +133,17 @@ export function Properties({
                 );
             }}
           >
-            删除
+            {tg('button.delete')}
           </ActionButton>,
         ],
       },
     ],
-    [disabled, allowManage, valueProp, tableDataSource, onChange],
+    [disabled, allowManage, valueProp, tableDataSource, onChange, t, tg],
   );
   return (
     <Configuration
       columns={columns}
-      creatorButtonText="新增配置项"
+      creatorButtonText={t('form.addProperty')}
       value={tableDataSource}
       disabled={disabled || !allowManage}
       onChange={change}

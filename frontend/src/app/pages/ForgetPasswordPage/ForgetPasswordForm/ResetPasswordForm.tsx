@@ -34,7 +34,7 @@ export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
   const history = useHistory();
   const [submiting, setSubmiting] = useState(false);
   const t = useI18NPrefix('forgotPassword');
-  const tgv = useI18NPrefix('global.validation');
+  const tg = useI18NPrefix('global');
 
   const onFinish = useCallback(
     values => {
@@ -65,9 +65,9 @@ export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
         rules={[
           {
             required: true,
-            message: `${t('password')}${tgv('required')}`,
+            message: `${t('password')}${tg('validation.required')}`,
           },
-          { validator: getPasswordValidator(tgv('invalidPassword')) },
+          { validator: getPasswordValidator(tg('validation.invalidPassword')) },
         ]}
       >
         <Input.Password placeholder={t('enterNewPassword')} />
@@ -77,12 +77,12 @@ export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
         rules={[
           {
             required: true,
-            message: `${t('password')}${tgv('required')}`,
+            message: `${t('password')}${tg('validation.required')}`,
           },
           getConfirmPasswordValidator(
             'newPassword',
-            tgv('invalidPassword'),
-            tgv('passwordNotMatch'),
+            tg('validation.invalidPassword'),
+            tg('validation.passwordNotMatch'),
           ),
         ]}
       >
@@ -91,7 +91,10 @@ export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ token }) => {
       <Form.Item
         name="verifyCode"
         rules={[
-          { required: true, message: `${t('verifyCode')}${tgv('required')}` },
+          {
+            required: true,
+            message: `${t('verifyCode')}${tg('validation.required')}`,
+          },
         ]}
       >
         <Input placeholder={t('verifyCode')} />
