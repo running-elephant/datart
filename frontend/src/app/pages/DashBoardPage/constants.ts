@@ -22,9 +22,9 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
+import i18next from 'i18next';
 import { PRIMARY, WHITE } from 'styles/StyleConstants';
 import { WidgetType } from './pages/Board/slice/types';
-
 export const RGL_DRAG_HANDLE = 'dashboard-draggableHandle';
 export const STORAGE_BOARD_KEY_PREFIX = 'DATART_BOARD_DATA_';
 export const STORAGE_IMAGE_KEY_PREFIX = 'DATART_IMAGE_';
@@ -156,33 +156,53 @@ export const enum ControllerVisibleTypes {
 export type ControllerVisibleType = Uncapitalize<
   keyof typeof ControllerVisibleTypes
 >;
+const tfo = (operator: FilterSqlOperator) => {
+  const preStr = 'viz.common.enum.filterOperator.';
+  return i18next.t(preStr + operator);
+};
+const tft = (type: ControllerVisibleTypes) => {
+  const preStr = 'viz.common.enum.controllerVisibilityTypes.';
+  return i18next.t(preStr + type);
+};
+const getVisibleOptionItem = (type: ControllerVisibleTypes) => {
+  return {
+    name: tft(type),
+    value: type,
+  };
+};
+const getOperatorItem = (value: FilterSqlOperator) => {
+  return {
+    name: tfo(value),
+    value: value,
+  };
+};
 export const VISIBILITY_TYPE_OPTION = [
-  { name: '显示', value: ControllerVisibleTypes.Show },
-  { name: '隐藏', value: ControllerVisibleTypes.Hide },
-  { name: '条件', value: ControllerVisibleTypes.Condition },
+  getVisibleOptionItem(ControllerVisibleTypes.Show),
+  getVisibleOptionItem(ControllerVisibleTypes.Hide),
+  getVisibleOptionItem(ControllerVisibleTypes.Condition),
 ];
 export const ALL_SQL_OPERATOR_OPTIONS = [
-  { name: '等于', value: FilterSqlOperator.Equal },
-  { name: '不相等', value: FilterSqlOperator.NotEqual },
+  getOperatorItem(FilterSqlOperator.Equal),
+  getOperatorItem(FilterSqlOperator.NotEqual),
 
-  { name: '包含', value: FilterSqlOperator.In },
-  { name: '不包含', value: FilterSqlOperator.NotIn },
+  getOperatorItem(FilterSqlOperator.In),
+  getOperatorItem(FilterSqlOperator.NotIn),
 
-  { name: '为空', value: FilterSqlOperator.Null },
-  { name: '不为空', value: FilterSqlOperator.NotNull },
+  getOperatorItem(FilterSqlOperator.Null),
+  getOperatorItem(FilterSqlOperator.NotNull),
 
-  { name: '前缀包含', value: FilterSqlOperator.PrefixContain },
-  { name: '前缀不包含', value: FilterSqlOperator.NotPrefixContain },
+  getOperatorItem(FilterSqlOperator.PrefixContain),
+  getOperatorItem(FilterSqlOperator.NotPrefixContain),
 
-  { name: '后缀包含', value: FilterSqlOperator.SuffixContain },
-  { name: '后缀不包含', value: FilterSqlOperator.NotSuffixContain },
+  getOperatorItem(FilterSqlOperator.SuffixContain),
+  getOperatorItem(FilterSqlOperator.NotSuffixContain),
 
-  { name: '区间', value: FilterSqlOperator.Between },
+  getOperatorItem(FilterSqlOperator.Between),
 
-  { name: '大于或等于', value: FilterSqlOperator.GreaterThanOrEqual },
-  { name: '小于或等于', value: FilterSqlOperator.LessThanOrEqual },
-  { name: '大于', value: FilterSqlOperator.GreaterThan },
-  { name: '小于', value: FilterSqlOperator.LessThan },
+  getOperatorItem(FilterSqlOperator.GreaterThanOrEqual),
+  getOperatorItem(FilterSqlOperator.LessThanOrEqual),
+  getOperatorItem(FilterSqlOperator.GreaterThan),
+  getOperatorItem(FilterSqlOperator.LessThan),
 ];
 
 export const SQL_OPERATOR_OPTIONS_TYPES = {

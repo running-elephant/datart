@@ -16,16 +16,18 @@
  * limitations under the License.
  */
 import { FormItemProps } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo } from 'react';
 import { ControllerValuesName } from '../..';
 import { TextSetForm } from './TextSetForm';
 
 export interface TextSetterProps {}
 export const TextSetter: React.FC<TextSetterProps> = memo(() => {
+  const tc = useI18NPrefix(`viz.control`);
   const itemProps: FormItemProps<any> = {
     preserve: true,
     name: ControllerValuesName,
-    label: '默认值',
+    label: tc('defaultValue'),
     required: false,
   };
   return <TextSetForm {...itemProps} />;

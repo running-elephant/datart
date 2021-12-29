@@ -10,7 +10,9 @@
       "archive": "移至回收站",
       "restore": "还原",
       "delete": "删除",
-      "info": "基本信息"
+      "info": "基本信息",
+      "open":"开启",
+      "close":"关闭"
     },
     "operation": {
       "archiveConfirm": "确定移至回收站？",
@@ -214,6 +216,7 @@
         "filterVisibility": "是否可见",
         "aggregates": "聚合方式",
         "filterOption": "筛选方式",
+       
         "visibility": "是否显示",
         "facade": "控制器",
         "widthOption": "宽度",
@@ -258,7 +261,6 @@
           "relative": "相对"
         },
         "category": {
-          "general": "常规",
           "customize": "自定义",
           "condition": "条件",
           "sourceList": "源列表",
@@ -676,6 +678,29 @@
       "scaleHeight": "等比高度缩放",
       "scaleFull": "全屏铺满",
       "noScale": "实际尺寸"
+    },
+    "control": {
+      "title":"控制器标题",
+      "valueConfig": "取值配置",
+      "selectViewField":"选择数据源字段",
+      "selectDefaultValue":"选择默认值",
+      "defaultValue":"默认值",
+      "visibility":"是否显示",
+      "sqlOperator":"对应关系",
+      "dateType":"日期类型",
+      "step":"步长",
+      "showMark":"显示标签",
+      "common": "常规",
+      "custom": "自定义"
+     
+    },
+    "date":{
+      "year":"年",
+      "quarter":"季度",
+      "month":"月",
+      "week":"周",
+      "date":"日期",
+      "dateTime":"日期时间"
     }
   },
   "view": {

@@ -16,19 +16,26 @@
  * limitations under the License.
  */
 import { Form } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo } from 'react';
 import { RadioButtonTypeName } from '../..';
 import { RadioStyleSet } from './RadioStyleSet';
 export interface RadioStyleFormProps {}
 export const RadioStyleForm: React.FC<RadioStyleFormProps> = memo(() => {
+  const filterT = useI18NPrefix('viz.common.filter');
+  const items = ['default', 'button'];
+  const options = items.map(it => ({
+    label: filterT(it),
+    value: it,
+  }));
   return (
     <Form.Item
       name={RadioButtonTypeName}
-      label="按钮样式"
+      label={filterT('radioType')}
       validateTrigger={['onChange', 'onBlur']}
       rules={[{ required: true }]}
     >
-      <RadioStyleSet />
+      <RadioStyleSet options={options} />
     </Form.Item>
   );
 });
