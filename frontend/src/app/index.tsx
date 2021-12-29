@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-import { message } from 'antd';
+import { ConfigProvider, message } from 'antd';
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import { registerTheme } from 'echarts';
 import { StorageKeys } from 'globalConstants';
+import { antdLocales } from 'locales/i18n';
 import { useEffect, useLayoutEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
@@ -62,24 +63,29 @@ export function App() {
   }, [dispatch]);
 
   return (
-    <BrowserRouter>
-      <Helmet
-        titleTemplate="%s - Datart"
-        defaultTitle="Datart"
-        htmlAttributes={{ lang: i18n.language }}
-      >
-        <meta name="description" content="Data Art" />
-      </Helmet>
-      <Switch>
-        <Route path="/login" component={LazyLoginPage} />
-        <Route path="/register" component={LazyRegisterPage} />
-        <Route path="/active" component={LazyActivePage} />
-        <Route path="/forgetPassword" component={LazyForgetPasswordPage} />
-        <Route path="/authorization/:token" component={LazyAuthorizationPage} />
-        <LoginAuthRoute />
-      </Switch>
-      <GlobalStyle />
-      <OverriddenStyle />
-    </BrowserRouter>
+    <ConfigProvider locale={antdLocales[i18n.language]}>
+      <BrowserRouter>
+        <Helmet
+          titleTemplate="%s - Datart"
+          defaultTitle="Datart"
+          htmlAttributes={{ lang: i18n.language }}
+        >
+          <meta name="description" content="Data Art" />
+        </Helmet>
+        <Switch>
+          <Route path="/login" component={LazyLoginPage} />
+          <Route path="/register" component={LazyRegisterPage} />
+          <Route path="/active" component={LazyActivePage} />
+          <Route path="/forgetPassword" component={LazyForgetPasswordPage} />
+          <Route
+            path="/authorization/:token"
+            component={LazyAuthorizationPage}
+          />
+          <LoginAuthRoute />
+        </Switch>
+        <GlobalStyle />
+        <OverriddenStyle />
+      </BrowserRouter>
+    </ConfigProvider>
   );
 }

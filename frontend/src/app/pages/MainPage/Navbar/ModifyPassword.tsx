@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Button, Form, Input, message, Modal } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
@@ -26,7 +44,8 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
   const loading = useSelector(selectModifyPasswordLoading);
   const [form] = Form.useForm();
   const t = useI18NPrefix('main.nav.account.changePassword');
-  const tg = useI18NPrefix('global.validation');
+  const tgo = useI18NPrefix('global.operation');
+  const tgv = useI18NPrefix('global.validation');
 
   const reset = useCallback(() => {
     form.resetFields();
@@ -44,13 +63,13 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
         modifyAccountPassword({
           params,
           resolve: () => {
-            message.success(t('success'));
+            message.success(tgo('updateSuccess'));
             onCancel();
           },
         }),
       );
     },
-    [dispatch, onCancel, t],
+    [dispatch, onCancel, tgo],
   );
 
   return (
@@ -74,9 +93,9 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
           rules={[
             {
               required: true,
-              message: `${t('password')}${tg('required')}`,
+              message: `${t('oldPassword')}${tgv('required')}`,
             },
-            { validator: getPasswordValidator(tg('invalidPassword')) },
+            { validator: getPasswordValidator(tgv('invalidPassword')) },
           ]}
         >
           <Input.Password type="password" />
@@ -87,9 +106,9 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
           rules={[
             {
               required: true,
-              message: `${t('password')}${tg('required')}`,
+              message: `${t('newPassword')}${tgv('required')}`,
             },
-            { validator: getPasswordValidator(tg('invalidPassword')) },
+            { validator: getPasswordValidator(tgv('invalidPassword')) },
           ]}
         >
           <Input.Password type="password" />
@@ -101,12 +120,12 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
           rules={[
             {
               required: true,
-              message: `${t('password')}${tg('required')}`,
+              message: `${t('confirmPassword')}${tgv('required')}`,
             },
             getConfirmPasswordValidator(
               'newPassword',
-              tg('invalidPassword'),
-              tg('passwordNotMatch'),
+              tgv('invalidPassword'),
+              tgv('passwordNotMatch'),
             ),
           ]}
         >

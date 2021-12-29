@@ -1,6 +1,10 @@
 {
   "global": {
     "tokenExpired": "会话过期，请重新登录",
+    "operation": {
+      "updateSuccess": "修改成功",
+      "deleteSuccess": "删除成功"
+    },
     "validation": {
       "required": "不能为空",
       "invalidPassword": "密码长度为6-20位",
@@ -64,17 +68,20 @@
       "permissions": "权限",
       "settings": "设置",
       "download": {
-        "title": "下载列表"
+        "title": "下载列表",
+        "status": {
+          "created": "处理中",
+          "downloaded": "已下载",
+          "done": "已完成",
+          "failed": "已失败"
+        }
       },
       "organization": {
-        "organizationList": "组织列表",
-        "organizationCreate": "创建组织",
-        "organizationName": "名称",
-        "nameIsEmptyPrompt": "名称不能为空",
-        "duplicateNamePrompt": "名称重复",
-        "organizationDescription": "描述",
-        "cancel": "取消",
-        "saveDndEnter": "保存并进入"
+        "title": "组织列表",
+        "create": "创建组织",
+        "name": "名称",
+        "desc": "描述",
+        "save": "保存并进入"
       },
       "account": {
         "profile": {
@@ -88,10 +95,9 @@
         },
         "changePassword": {
           "title": "修改密码",
-          "oldPassword": "旧密码",
+          "oldPassword": "密码",
           "newPassword": "新密码",
           "confirmPassword": "确定新密码",
-          "success": "修改成功",
           "save": "保存"
         },
         "switchLanguage": {
@@ -109,6 +115,11 @@
       "orgSettings": {
         "title": "组织设置"
       }
+    },
+    "background": {
+      "loading": "应用配置加载中…",
+      "initError": "初始化错误，请刷新页面重试",
+      "createOrg": "未加入任何组织，点击创建"
     }
   },
   "viz": {

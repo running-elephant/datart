@@ -37,7 +37,7 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
   const loading = useSelector(selectRegisterLoading);
   const [form] = Form.useForm();
   const t = useI18NPrefix('register');
-  const tg = useI18NPrefix('global.validation');
+  const tgv = useI18NPrefix('global.validation');
 
   const onRegister = useCallback(
     values => {
@@ -67,7 +67,7 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
           rules={[
             {
               required: true,
-              message: `${t('username')}${tg('required')}`,
+              message: `${t('username')}${tgv('required')}`,
             },
           ]}
         >
@@ -78,7 +78,7 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
           rules={[
             {
               required: true,
-              message: `${t('email')}${tg('required')}`,
+              message: `${t('email')}${tgv('required')}`,
             },
           ]}
         >
@@ -89,10 +89,10 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
           rules={[
             {
               required: true,
-              message: `${t('password')}${tg('required')}`,
+              message: `${t('password')}${tgv('required')}`,
             },
             {
-              validator: getPasswordValidator(tg('invalidPassword')),
+              validator: getPasswordValidator(tgv('invalidPassword')),
             },
           ]}
         >
