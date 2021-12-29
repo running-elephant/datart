@@ -185,8 +185,9 @@ export default DropTarget(
       }),
       endDrag: (props, monitor) => {
         const dropResult = monitor.getDropResult();
-        // NOTE: delete item when user did drop, if cancel should not delete anything
-        if (monitor.didDrop() && !!dropResult?.delete) {
+        if (!monitor.didDrop() && !dropResult) {
+          props?.onDelete();
+        } else if (monitor.didDrop() && !!dropResult?.delete) {
           props?.onDelete();
         }
       },
