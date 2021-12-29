@@ -32,6 +32,9 @@ import java.util.Map;
 @Slf4j
 public class WeChartJob extends ScheduleJob {
 
+    public WeChartJob() {
+    }
+
     @Override
     public void doSend() throws Exception {
 
