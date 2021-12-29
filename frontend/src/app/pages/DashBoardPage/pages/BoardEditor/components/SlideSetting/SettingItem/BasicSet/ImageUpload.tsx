@@ -26,17 +26,20 @@ import { uploadBoardImage } from '../../../../slice/thunk';
 
 export interface ImageUploadProps {
   filedName: string;
-
   value: string;
+  label: string;
+  placeholder: string;
 }
 export const ImageUpload: React.FC<ImageUploadProps> = ({
   filedName,
   value,
+  label,
+  placeholder,
 }) => {
   return (
     <Wrapper>
-      <Form.Item name={filedName} label="背景图片" preserve>
-        <UploadDragger value={value} />
+      <Form.Item name={filedName} label={label} preserve>
+        <UploadDragger value={value} placeholder={placeholder} />
       </Form.Item>
     </Wrapper>
   );
@@ -44,7 +47,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 export const UploadDragger: React.FC<{
   value: string;
   onChange?: any;
-}> = ({ value, onChange }) => {
+  placeholder: string;
+}> = ({ value, onChange, placeholder }) => {
   const dispatch = useDispatch();
   const { boardId } = useContext(BoardContext);
 
@@ -87,7 +91,7 @@ export const UploadDragger: React.FC<{
           <DeleteOutlined className="del-button" onClick={delImageUrl} />
         </div>
       ) : (
-        <Placeholder>点击上传</Placeholder>
+        <Placeholder>{placeholder}</Placeholder>
       )}
     </StyleUpload>
   );

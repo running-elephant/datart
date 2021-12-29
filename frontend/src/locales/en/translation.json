@@ -539,6 +539,46 @@
         "date": "Date",
         "numeric": "Numeric",
         "button": "Button"
+      },
+      "setting": {
+        "setting": "Setting",
+        "board": "Board",
+        "widget": "Widget",
+        "widgetList": "Widget List",
+        "title": "Title",
+        "align": "Align",
+        "showTitle": "Show Title",
+        "position": "Position",
+        "xAxis": "xAxis",
+        "yAxis": "yAxis",
+        "size": "Size",
+        "px": "px",
+        "width": "Width",
+        "height": "Height",
+        "background": "Background",
+        "color": "Color",
+        "image": "Image",
+        "uploadTip": "click to Upload",
+        "padding": "padding",
+        "paddingTop": "padding Top",
+        "paddingRight": "padding Right",
+        "paddingBottom": "padding Bottom",
+        "paddingLeft": "padding Left",
+        "border": "Border",
+        "style": "Style",
+        "radius": "Radius",
+        "autoUpdate": "Auto Refresh",
+        "openAutoUpdate": "open Refresh",
+        "frequency": "frequency (s)",
+        "baseProperty": "Base Property",
+        "marginTB": "Margin-TB",
+        "marginLR": "Margin-LR",
+        "paddingTB": "Margin-TB",
+        "paddingLR": "Margin-LR",
+        "rowHeight": "rowHeight",
+        "scaleMode": "scale Mode",
+        "queryMode": "query Mode",
+        "openInitQuery": "open Init Query"
       }
     },
     "widget": {
@@ -593,6 +633,24 @@
         "confirmDeletion": "确认删除",
         "delete": "删除"
       }
+    },
+    "lineOptions": {
+      "none": "none",
+      "solid": "solid",
+      "dashed": "dashed",
+      "dotted": "dotted",
+      "double": "double",
+      "hidden": "hidden",
+      "ridge": "ridge",
+      "groove": "groove",
+      "inset": "inset",
+      "outset": "outset"
+    },
+    "scaleMode": {
+      "scaleWidth": "scaleWidth",
+      "scaleHeight": "scaleHeight",
+      "scaleFull": "scaleFull",
+      "noScale": "noScale"
     }
   },
   "share": {

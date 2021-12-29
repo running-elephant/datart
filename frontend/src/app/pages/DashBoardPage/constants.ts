@@ -97,11 +97,11 @@ export const TEXT_ALIGN_ENUM = strEnumType(['left', 'center', 'right']);
 export type TextAlignType = keyof typeof TEXT_ALIGN_ENUM;
 
 export const BORDER_STYLE_ENUM = strEnumType([
+  'none',
   'solid',
   'dashed',
   'dotted',
   'double',
-  'none',
   'hidden',
   'ridge',
   'groove',
@@ -111,16 +111,16 @@ export const BORDER_STYLE_ENUM = strEnumType([
 export type BorderStyleType = keyof typeof BORDER_STYLE_ENUM;
 
 export const BORDER_STYLE_OPTIONS = [
-  { name: '无', value: BORDER_STYLE_ENUM.none },
-  { name: '实线', value: BORDER_STYLE_ENUM.solid },
-  { name: '虚线', value: BORDER_STYLE_ENUM.dashed },
-  { name: '点线', value: BORDER_STYLE_ENUM.dotted },
-  { name: '双线', value: BORDER_STYLE_ENUM.double },
-  { name: '隐藏', value: BORDER_STYLE_ENUM.hidden },
-  { name: '凹槽', value: BORDER_STYLE_ENUM.groove },
-  { name: '垄状', value: BORDER_STYLE_ENUM.ridge },
-  { name: 'inset', value: BORDER_STYLE_ENUM.inset },
-  { name: 'outset', value: BORDER_STYLE_ENUM.outset },
+  { value: BORDER_STYLE_ENUM.none },
+  { value: BORDER_STYLE_ENUM.solid },
+  { value: BORDER_STYLE_ENUM.dashed },
+  { value: BORDER_STYLE_ENUM.dotted },
+  { value: BORDER_STYLE_ENUM.double },
+  { value: BORDER_STYLE_ENUM.hidden },
+  { value: BORDER_STYLE_ENUM.groove },
+  { value: BORDER_STYLE_ENUM.ridge },
+  { value: BORDER_STYLE_ENUM.inset },
+  { value: BORDER_STYLE_ENUM.outset },
 ];
 
 export const SCALE_MODE_ENUM = strEnumType([
@@ -132,10 +132,10 @@ export const SCALE_MODE_ENUM = strEnumType([
 
 export type ScaleModeType = keyof typeof SCALE_MODE_ENUM;
 export const SCALE_MODE__OPTIONS = [
-  { name: '等比宽度缩放', value: SCALE_MODE_ENUM.scaleWidth },
-  { name: '等比高度缩放', value: SCALE_MODE_ENUM.scaleHeight },
-  { name: '全屏铺满', value: SCALE_MODE_ENUM.scaleFull },
-  { name: '实际尺寸', value: SCALE_MODE_ENUM.noScale },
+  { value: SCALE_MODE_ENUM.scaleWidth },
+  { value: SCALE_MODE_ENUM.scaleHeight },
+  { value: SCALE_MODE_ENUM.scaleFull },
+  { value: SCALE_MODE_ENUM.noScale },
 ];
 
 export const enum ValueOptionTypes {

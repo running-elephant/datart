@@ -16,21 +16,23 @@
  * limitations under the License.
  */
 import { Form, Select } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ScaleModeType,
   SCALE_MODE__OPTIONS,
 } from 'app/pages/DashBoardPage/constants';
 import React, { FC, memo } from 'react';
-import styled from 'styled-components/macro';
 export const ScaleModeSet: FC<{
   scaleMode: ScaleModeType;
 }> = memo(({ scaleMode }) => {
+  const t = useI18NPrefix(`viz.board.setting`);
+  const tScale = useI18NPrefix(`viz.scaleMode`);
   return (
-    <Form.Item label="缩放模式" name="scaleMode">
+    <Form.Item label={t('scaleMode')} name="scaleMode">
       <Select style={{ width: '100%' }}>
         {SCALE_MODE__OPTIONS.map(item => (
           <Select.Option key={item.value} value={item.value}>
-            {item.name}
+            {tScale(item.value)}
           </Select.Option>
         ))}
       </Select>
@@ -39,4 +41,3 @@ export const ScaleModeSet: FC<{
 });
 
 export default ScaleModeSet;
-const StyledWrap = styled.div``;
