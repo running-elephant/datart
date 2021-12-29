@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 public abstract class DataProvider extends AutoCloseBean {
@@ -76,6 +75,9 @@ public abstract class DataProvider extends AutoCloseBean {
         }
     }
 
+    public abstract String getConfigDisplayName(String name);
+
+    public abstract String getConfigDescription(String name);
 
     public abstract Dataframe execute(DataProviderSource config, QueryScript script, ExecuteParam executeParam) throws Exception;
 
@@ -118,5 +120,6 @@ public abstract class DataProvider extends AutoCloseBean {
      */
     public void resetSource(DataProviderSource source) {
     }
+
 
 }

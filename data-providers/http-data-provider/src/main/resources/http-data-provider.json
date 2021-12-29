@@ -29,7 +29,6 @@
         {
           "name": "property",
           "defaultValue": "",
-          "description": "Http返回结果中，JSON数组的属性名称。嵌套结构用 . 隔开。如 data.list",
           "type": "string"
         },
         {
@@ -50,13 +49,11 @@
         {
           "name": "timeout",
           "defaultValue": 0,
-          "description": "请求超时时间",
           "type": "number"
         },
         {
           "name": "responseParser",
           "defaultValue": "",
-          "description": "请求结果解析器，自定义解析器时，指定解析器的全类名",
           "type": "string"
         },
         {
@@ -82,15 +79,13 @@
       "name": "cacheEnable",
       "required": false,
       "defaultValue": true,
-      "type": "bool",
-      "description": "是否开启本地缓存。开启后，HTTP请求结果将会缓存到服务端。"
+      "type": "bool"
     },
     {
       "name": "cacheTimeout",
       "required": false,
       "type": "string",
-      "defaultValue": "5",
-      "description": "缓存超时时间（分钟）"
+      "defaultValue": "5"
     }
   ]
 }
