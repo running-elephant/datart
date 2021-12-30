@@ -5,6 +5,7 @@
       "action": "Action"
     },
     "button": {
+      "create": "Create",
       "save": "Save",
       "edit": "Edit",
       "archive": "Archive",
@@ -162,7 +163,7 @@
     },
     "subNavs": {
       "variables": {
-        "title": "Public variable Settings"
+        "title": "Public variables"
       },
       "orgSettings": {
         "title": "Organization Settings"
@@ -1053,23 +1054,46 @@
       "Disable": "Disable"
     },
     "privilegeLabel": {
-      "viz": [
-        "View",
-        "Download",
-        "Share",
-        "Manage"
-      ],
-      "view": [
-        "Access",
-        "Manage"
-      ],
-      "source": [
-        "Access",
-        "Manage"
-      ],
-      "schedule": [
-        "Manage"
-      ]
+      "viz": ["View", "Download", "Share", "Manage"],
+      "view": ["Access", "Manage"],
+      "source": ["Access", "Manage"],
+      "schedule": ["Manage"]
+    }
+  },
+  "variable": {
+    "title": "Public variables",
+    "public": "Public variables",
+    "name": "Name",
+    "label": "Label",
+    "type": "Type",
+    "valueType": "Value type",
+    "permission": {
+      "label": "Permission",
+      "hidden": "Hidden",
+      "readonly": "Readonly",
+      "editable": "Editable"
+    },
+    "defaultValue": "Default value",
+    "expression": "Use expression default value",
+    "duplicateName": "Duplicate Name",
+    "related": "Related roles & members",
+    "deleteAllConfirm": "Delete confirm",
+    "deleteAll": "Delete all",
+    "enterToAdd": "Enter to add",
+    "enterExpression": "Enter expression",
+    "relatedRole": "Related roles",
+    "relatedMember": "Related members",
+    "useDefaultValue": "Use variable default value",
+    "value": "Value",
+    "variableType": {
+      "query": "Query",
+      "permission": "Permission"
+    },
+    "variableValueType": {
+      "string": "String",
+      "numeric": "Number",
+      "date": "Date",
+      "fragment": "Expression"
     }
   },
   "share": {
