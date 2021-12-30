@@ -17,12 +17,13 @@
  */
 import { LinkOutlined } from '@ant-design/icons';
 import { Divider, Empty, Form, FormInstance, Select } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
-import { PRIMARY } from 'styles/StyleConstants';
+import { G20, PRIMARY } from 'styles/StyleConstants';
 const { Option } = Select;
 export interface ViewLinkageItem {
   sameView?: boolean;
@@ -41,7 +42,7 @@ export interface LinkageFieldsProps {
 }
 export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
   ({ form, viewMap, curWidget, chartGroupColumns }) => {
-    // const dataChart
+    const t = useI18NPrefix(`viz.linkage`);
     const renderOptions = useCallback(
       (index: number, key: 'triggerViewId' | 'linkerViewId') => {
         const viewLinkages: ViewLinkageItem[] =
@@ -58,7 +59,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
             >
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>{item.colName}</span>
-                <span style={{ color: '#ccc' }}>{item.type}</span>
+                <span style={{ color: G20 }}>{item.type}</span>
               </div>
             </Option>
           ));
@@ -73,7 +74,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
                   style={{ display: 'flex', justifyContent: 'space-between' }}
                 >
                   <span>{item.id}</span>
-                  <span style={{ color: '#ccc' }}>{item.type}</span>
+                  <span style={{ color: G20 }}>{item.type}</span>
                 </div>
               </Option>
             ));
@@ -102,9 +103,11 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
     );
     return (
       <Wrap>
-        <Divider orientation="left">关联字段</Divider>
+        <Divider orientation="left">{t('associatedFields')}</Divider>
 
-        <div> 数据源 : {viewMap[curWidget?.viewIds?.[0]]?.name}</div>
+        <div>
+          {t('dataSource')} : {viewMap[curWidget?.viewIds?.[0]]?.name}
+        </div>
         <Form.List name="viewLinkages">
           {(fields, _, { errors }) => {
             return (
@@ -121,13 +124,13 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
                           name={[field.name, 'triggerColumn']}
                           fieldKey={[field.fieldKey, 'id']}
                           rules={[
-                            { required: true, message: '请选择 触发字段' },
+                            { required: true, message: t('selectTriggers') },
                           ]}
                         >
                           <Select
                             style={{ width: 200 }}
                             showSearch
-                            placeholder="请选择 触发字段"
+                            placeholder={t('selectTriggers')}
                             allowClear
                           >
                             {renderOptions(index, 'triggerViewId')}
@@ -146,14 +149,14 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
                           validateTrigger={['onChange', 'onClick', 'onBlur']}
                           name={[field.name, 'linkerColumn']}
                           rules={[
-                            { required: true, message: '请选择 联动字段' },
+                            { required: true, message: t('selectLinker') },
                           ]}
                           fieldKey={[field.fieldKey, 'id']}
                         >
                           <Select
                             style={{ width: 200 }}
                             showSearch
-                            placeholder="请选择 联动字段"
+                            placeholder={t('selectLinker')}
                             allowClear
                           >
                             {renderOptions(index, 'linkerViewId')}
@@ -171,9 +174,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
                 <Form.Item>
                   <Form.ErrorList errors={errors} />
                 </Form.Item>
-                {!fields.length && (
-                  <Empty key="empty" description="请选择组件" />
-                )}
+                {!fields.length && <Empty key="empty" />}
               </FormWrap>
             );
           }}
