@@ -663,6 +663,7 @@
       "unpublished": "Unpublished",
       "archived": "Archived",
       "play": "Play",
+      "playTip":"Press Esc to quit playing",
       "share": {
         "link": "Link",
         "password": "Password",
