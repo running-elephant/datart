@@ -136,7 +136,7 @@ public abstract class ScheduleJob implements Job, Closeable {
                 DashboardDetail dashboard = vizService.getDashboard(folder.getRelId());
                 downloadCreateParam = parseExecuteParam("board", OBJECT_MAPPER.writeValueAsString(dashboard));
             }
-            if (config.getAttachments().contains(AttachmentType.EXCEL) || true) {
+            if (config.getAttachments().contains(AttachmentType.EXCEL)) {
                 downloadExcel(downloadCreateParam);
             }
 
