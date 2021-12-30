@@ -10,7 +10,9 @@
       "archive": "Archive",
       "restore": "Restore",
       "delete": "Delete",
-      "info": "Info"
+      "info": "Info",
+      "open":"Open",
+      "close":"Close"
     },
     "operation": {
       "archiveConfirm": "Archive confirm",
@@ -214,6 +216,7 @@
         "filterVisibility": "Filter Visibility",
         "aggregates": "Aggregates",
         "filterOption": "Filter Option",
+       
         "visibility": "Visibility",
         "facade": "Facade",
         "widthOption": "Width Option",
@@ -677,6 +680,28 @@
       "scaleHeight": "scaleHeight",
       "scaleFull": "scaleFull",
       "noScale": "noScale"
+    },
+    "control": {
+      "title":"Control Title",
+      "valueConfig": "Value Config",
+      "selectViewField":"Select ViewField",
+      "selectDefaultValue":"Select DefaultValue",
+      "defaultValue":"Default Value",
+      "visibility":"Visibility",
+      "sqlOperator":"Sql Operator",
+      "dateType":"Date Type",
+      "step":"Step",
+      "showMark":"Show Mark",
+      "common": "General",
+      "custom": "Customize"
+    },
+    "date":{
+      "year":"Year",
+      "quarter":"Quarter",
+      "month":"Month",
+      "week":"Week",
+      "date":"Date",
+      "dateTime":"Date Time"
     }
   },
   "view": {

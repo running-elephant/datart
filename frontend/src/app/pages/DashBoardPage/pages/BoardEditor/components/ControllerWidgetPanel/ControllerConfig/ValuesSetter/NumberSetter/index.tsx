@@ -20,12 +20,14 @@ import React from 'react';
 import { ControllerValuesName } from '../..';
 import { NumberSetForm } from './NumberSetFrom';
 
-export interface NumberSetterProps {}
-export const NumberSetter: React.FC<NumberSetterProps> = () => {
+export interface NumberSetterProps {
+  label: string;
+}
+export const NumberSetter: React.FC<NumberSetterProps> = ({ label }) => {
   const itemProps: FormItemProps<any> = {
     preserve: true,
     name: ControllerValuesName,
-    label: '默认值',
+    label: label,
     required: false,
   };
   return <NumberSetForm {...itemProps} />;

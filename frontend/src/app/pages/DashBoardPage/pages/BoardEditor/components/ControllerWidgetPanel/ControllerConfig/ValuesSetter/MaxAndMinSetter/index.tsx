@@ -16,35 +16,39 @@
  * limitations under the License.
  */
 import { FormItemProps } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo } from 'react';
 import { MaxValueName, MinValueName } from '../..';
 import { NumberSetForm } from '../NumberSetter/NumberSetFrom';
 
-export interface NumberSetterProps {}
-export const MaxValueSetter: React.FC<NumberSetterProps> = memo(() => {
+export interface NumberSetterProps {
+  label: string;
+}
+export const MaxValueSetter: React.FC<NumberSetterProps> = memo(({ label }) => {
   const itemProps: FormItemProps<any> = {
     preserve: true,
     name: MaxValueName,
-    label: '最大值',
+    label: label,
     required: true,
   };
   return <NumberSetForm {...itemProps} />;
 });
-export const MinValueSetter: React.FC<NumberSetterProps> = memo(() => {
+export const MinValueSetter: React.FC<NumberSetterProps> = memo(({ label }) => {
   const itemProps: FormItemProps<any> = {
     preserve: true,
     name: MinValueName,
-    label: '最小值',
+    label: label,
     required: true,
   };
   return <NumberSetForm {...itemProps} />;
 });
 
-export const MaxAndMinSetter: React.FC<NumberSetterProps> = memo(() => {
+export const MaxAndMinSetter: React.FC<{}> = memo(() => {
+  const filterT = useI18NPrefix('viz.common.filter');
   return (
     <>
-      <MaxValueSetter />
-      <MinValueSetter />
+      <MaxValueSetter label={filterT('max')} />
+      <MinValueSetter label={filterT('min')} />
     </>
   );
 });

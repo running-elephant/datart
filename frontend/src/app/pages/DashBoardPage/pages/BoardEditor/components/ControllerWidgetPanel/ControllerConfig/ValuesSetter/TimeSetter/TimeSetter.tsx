@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Form, FormInstance, Select } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ControllerFacadeTypes,
@@ -47,6 +48,8 @@ export const TimeSetter: React.FC<{
   form: FormInstance<ControllerWidgetContent> | undefined;
   controllerType: ControllerFacadeTypes;
 }> = ({ controllerType, form }) => {
+  const tc = useI18NPrefix(`viz.control`);
+  const filterDataT = useI18NPrefix('viz.common.filter.date');
   const getControllerConfig = useCallback(() => {
     return form?.getFieldValue('config') as ControllerConfig;
   }, [form]);
@@ -170,13 +173,13 @@ export const TimeSetter: React.FC<{
             key={TimeFilterValueCategory.Exact}
             value={TimeFilterValueCategory.Exact}
           >
-            {'固定值'}
+            {filterDataT('exact')}
           </Select.Option>
           <Select.Option
             key={TimeFilterValueCategory.Relative}
             value={TimeFilterValueCategory.Relative}
           >
-            {'相对值'}
+            {filterDataT('relative')}
           </Select.Option>
         </Select>
       </Form.Item>
@@ -202,7 +205,7 @@ export const TimeSetter: React.FC<{
           <>
             <Form.Item
               name={PickerTypeName}
-              label={'日期类型'}
+              label={tc('dateType')}
               shouldUpdate
               validateTrigger={['onChange', 'onBlur']}
               rules={[{ required: true }]}
@@ -220,13 +223,14 @@ export const TimeSetter: React.FC<{
             {controllerType === ControllerFacadeTypes.Time && (
               <>
                 <Form.Item
-                  label={'默认值'}
+                  label={tc('defaultValue')}
                   shouldUpdate
                   rules={[{ required: false }]}
                 >
                   {renderROE(StartTimeROEName, onStartRelativeChange)}
 
-                  {getStartRelativeOrExact() === TimeFilterValueCategory.Exact &&
+                  {getStartRelativeOrExact() ===
+                    TimeFilterValueCategory.Exact &&
                     renderExact(StartTimeExactName, getPickerType)}
 
                   {getStartRelativeOrExact() ===
@@ -243,9 +247,10 @@ export const TimeSetter: React.FC<{
                 shouldUpdate
                 rules={[{ required: true, validator: RangeTimeValidator }]}
               >
-                <Form.Item label={'默认值-起始'} shouldUpdate>
+                <Form.Item label={filterDataT('startTime')} shouldUpdate>
                   {renderROE(StartTimeROEName, onStartRelativeChange)}
-                  {getStartRelativeOrExact() === TimeFilterValueCategory.Exact &&
+                  {getStartRelativeOrExact() ===
+                    TimeFilterValueCategory.Exact &&
                     renderExact(StartTimeExactName, getPickerType)}
                   {getStartRelativeOrExact() ===
                     TimeFilterValueCategory.Relative && (
@@ -253,7 +258,7 @@ export const TimeSetter: React.FC<{
                   )}
                 </Form.Item>
                 <Form.Item
-                  label={'默认值-结束'}
+                  label={filterDataT('endTime')}
                   name={EndTimeName}
                   shouldUpdate
                 >
@@ -262,7 +267,8 @@ export const TimeSetter: React.FC<{
                   {getEndRelativeOrExact() === TimeFilterValueCategory.Exact &&
                     renderExact(EndTimeExactName, getPickerType)}
 
-                  {getEndRelativeOrExact() === TimeFilterValueCategory.Relative && (
+                  {getEndRelativeOrExact() ===
+                    TimeFilterValueCategory.Relative && (
                     <RelativeTimeSetter relativeName={EndTimeRelativeName} />
                   )}
                 </Form.Item>
