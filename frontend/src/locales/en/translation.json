@@ -563,6 +563,8 @@
         "container": "Container",
         "tab": "Tab",
         "controller": "Controller",
+        "toTop": "move To Top",
+        "toBottom": "move To Bottom",
         "undo": "Undo",
         "redo": "Redo",
         "delete": "Delete",
@@ -920,10 +922,23 @@
       "Disable": "Disable"
     },
     "privilegeLabel": {
-      "viz": ["View", "Download", "Share", "Manage"],
-      "view": ["Access", "Manage"],
-      "source": ["Access", "Manage"],
-      "schedule": ["Manage"]
+      "viz": [
+        "View",
+        "Download",
+        "Share",
+        "Manage"
+      ],
+      "view": [
+        "Access",
+        "Manage"
+      ],
+      "source": [
+        "Access",
+        "Manage"
+      ],
+      "schedule": [
+        "Manage"
+      ]
     }
   },
   "share": {
