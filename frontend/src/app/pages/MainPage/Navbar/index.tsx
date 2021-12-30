@@ -43,6 +43,7 @@ import { selectLoggedInUser } from 'app/slice/selectors';
 import { logout } from 'app/slice/thunks';
 import { downloadFile } from 'app/utils/fetch';
 import { BASE_RESOURCE_URL } from 'globalConstants';
+import { changeLang } from 'locales/i18n';
 import React, { cloneElement, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -206,16 +207,14 @@ export function Navbar() {
           setModifyPasswordVisible(true);
           break;
         case 'zh':
-          i18n.changeLanguage('zh');
-          break;
         case 'en':
-          i18n.changeLanguage('en');
+          changeLang(key);
           break;
         default:
           break;
       }
     },
-    [dispatch, history, i18n],
+    [dispatch, history],
   );
 
   const onSetPolling = useCallback(

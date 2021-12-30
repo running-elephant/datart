@@ -1,6 +1,4 @@
-import { ConfigProvider } from 'antd';
 import 'antd/dist/antd.less';
-import zh_CN from 'antd/lib/locale/zh_CN';
 import 'app/assets/fonts/iconfont.css';
 import { Share } from 'app/share';
 import React from 'react';
@@ -20,8 +18,6 @@ const MOUNT_NODE = document.getElementById('root') as HTMLElement;
  *  hot-key [control,shift,command,c]
  */
 
-const MainApp = <Share />;
-
 const InspectorWrapper =
   process.env.NODE_ENV === 'development' ? Inspector : React.Fragment;
 
@@ -29,11 +25,11 @@ ReactDOM.render(
   <InspectorWrapper>
     <Provider store={store}>
       <ThemeProvider>
-        <ConfigProvider locale={zh_CN}>
-          <HelmetProvider>
-            <React.StrictMode>{MainApp}</React.StrictMode>
-          </HelmetProvider>
-        </ConfigProvider>
+        <HelmetProvider>
+          <React.StrictMode>
+            <Share />
+          </React.StrictMode>
+        </HelmetProvider>
       </ThemeProvider>
     </Provider>
   </InspectorWrapper>,
