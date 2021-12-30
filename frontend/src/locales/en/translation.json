@@ -657,6 +657,16 @@
       "selectTriggers": "Select the trigger field",
       "selectLinker": "Select linkage field"
     },
+    "jump": {
+      "title": "Jump Settings",
+      "mode": "Jumping mode",
+      "target": "Target",
+      "INTERNAL": "Dashboard/DataChart",
+      "URL": "URL",
+      "parameters": "Parameters",
+      "controller": "Associated Controllers",
+      "associatedFields": "Associated Fields"
+    },
     "associate": {
       "title": "Please associate fields/variables",
       "field": "Field",
@@ -742,7 +752,7 @@
       "runWinTip": "Win: [Ctrl + Enter]",
       "runMacTip": "Mac: [Command + Enter]",
       "beautify": "Beautify",
-      "save": "保存",
+      "save": "Save",
       "saveWinTip": "Win: [Ctrl + S]",
       "saveMacTip": "Mac: [Command + S]",
       "info": "Info",

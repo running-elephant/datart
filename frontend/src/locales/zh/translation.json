@@ -655,6 +655,16 @@
       "selectTriggers": "选择触发字段",
       "selectLinker": "选择联动字段"
     },
+    "jump": {
+      "title": "跳转设置",
+      "mode": "跳转方式",
+      "target": "跳转目标",
+      "INTERNAL": "仪表盘 / 数据图表",
+      "URL": "URL",
+      "parameters": "Parameters",
+      "controller": "关联控制器",
+      "associatedFields": "关联字段"
+    },
     "associate": {
       "title": "关联字段/变量",
       "field": "字段",
