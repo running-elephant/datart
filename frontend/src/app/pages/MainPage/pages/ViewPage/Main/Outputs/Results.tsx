@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   CaretRightOutlined,
   EyeInvisibleOutlined,
@@ -5,6 +23,7 @@ import {
 } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import { Popup, ToolbarButton, Tree } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
 import { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -50,6 +69,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
     selectCurrentEditingViewAttr(state, { name: 'previewResults' }),
   ) as ViewViewModel['previewResults'];
   const roles = useSelector(selectRoles);
+  const t = useI18NPrefix('view');
 
   const dataSource = useMemo(
     () => previewResults.map(o => ({ ...o, [ROW_KEY]: uuidv4() })),
@@ -175,7 +195,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
             />
           }
         >
-          <Tooltip title="列权限">
+          <Tooltip title={t('columnPermission.title')}>
             <ToolbarButton
               size="small"
               iconSize={FONT_SIZE_BASE}
@@ -195,7 +215,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
         </Popup>,
       ];
     },
-    [columnPermissions, roleDropdownData, checkRoleColumnPermission],
+    [columnPermissions, roleDropdownData, checkRoleColumnPermission, t],
   );
 
   const pagination = useMemo(
@@ -222,7 +242,9 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
   ) : (
     <InitialDesc>
       <p>
-        请点击 <CaretRightOutlined /> 按钮执行，运行结果将在此处展示
+        {t('resultEmpty1')}
+        <CaretRightOutlined />
+        {t('resultEmpty2')}
       </p>
     </InitialDesc>
   );

@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   AlignCenterOutlined,
   CaretRightOutlined,
@@ -9,6 +27,7 @@ import {
 import { Divider, Dropdown, Menu, Select, Space, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import { Chronograph } from 'app/components/Chronograph';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
 import React, { memo, useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -86,6 +105,7 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
     selectCurrentEditingViewAttr(state, { name: 'index' }),
   ) as number;
   const viewsData = useSelector(selectViews);
+  const t = useI18NPrefix('view.editor');
 
   const isArchived = status === ViewStatus.Archived;
 
@@ -106,7 +126,7 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
         parentId,
         config,
       },
-      parentIdLabel: '目录',
+      parentIdLabel: t('folder'),
       onSave: (values, onClose) => {
         let index = ViewIndex;
 
@@ -133,6 +153,7 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
     config,
     viewsData,
     ViewIndex,
+    t,
   ]);
 
   const sourceChange = useCallback(
@@ -155,7 +176,7 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
         <Space split={<Divider type="vertical" className="divider" />}>
           {allowManage && (
             <Select
-              placeholder="请选择数据源"
+              placeholder={t('source')}
               value={sourceId}
               bordered={false}
               disabled={isArchived}
@@ -174,9 +195,9 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
               title={
                 <TipTitle
                   title={[
-                    `${fragment ? '执行片段' : '执行'}`,
-                    'Win: [Ctrl + Enter]',
-                    'Mac: [Command + Enter]',
+                    `${fragment ? t('runSelection') : t('run')}`,
+                    t('runWinTip'),
+                    t('runMacTip'),
                   ]}
                 />
               }
@@ -194,7 +215,7 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
                 onClick={onRun}
               />
             </Tooltip>
-            <Tooltip title="美化" placement="bottom">
+            <Tooltip title={t('beautify')} placement="bottom">
               <ToolbarButton
                 icon={<AlignCenterOutlined />}
                 disabled={isArchived}
@@ -234,7 +255,7 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
             <Tooltip
               title={
                 <TipTitle
-                  title={['保存', 'Win: [Ctrl + S]', 'Mac: [Command + S]']}
+                  title={[t('save'), t('saveWinTip'), t('saveMacTip')]}
                 />
               }
               placement="bottom"
@@ -247,7 +268,7 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
               />
             </Tooltip>
             {!isNewView(id) && (
-              <Tooltip title="详情设置" placement="bottom">
+              <Tooltip title={t('info')} placement="bottom">
                 <ToolbarButton
                   icon={<SettingFilled />}
                   disabled={isArchived}
@@ -256,13 +277,13 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
                 />
               </Tooltip>
             )}
-            <Tooltip title="另存为" placement="bottom">
+            <Tooltip title={t('saveAs')} placement="bottom">
               <ToolbarButton
                 icon={<CopyFilled />}
                 disabled={stage !== ViewViewModelStages.Saveable}
               />
             </Tooltip>
-            {/* <Tooltip title="保存片段" placement="bottom">
+            {/* <Tooltip title={t('saveFragment')} placement="bottom">
             <ToolbarButton icon={<SnippetsFilled />} />
           </Tooltip> */}
           </Space>

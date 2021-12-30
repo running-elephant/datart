@@ -47,7 +47,7 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           <Group>
             <Select
               dropdownMatchSelectWidth
-              placeholder={t('pleaseSelect')}
+              placeholder={t('select')}
               value={data.value?.type}
               onChange={handleSettingChange('type')}
               bordered={false}
@@ -59,7 +59,7 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
               ))}
             </Select>
             <Select
-              placeholder={t('pleaseSelect')}
+              placeholder={t('select')}
               value={data.value?.width}
               onChange={handleSettingChange('width')}
               bordered={false}

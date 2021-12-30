@@ -46,7 +46,7 @@ export const Recycle = memo(
     const vizs = useSelector(selectVizs);
     const isOwner = useSelector(selectIsOrgOwner);
     const permissionMap = useSelector(selectPermissionMap);
-    const t = useI18NPrefix('viz.sideBar.recycle');
+    const tg = useI18NPrefix('global');
 
     useEffect(() => {
       onInit();
@@ -71,13 +71,13 @@ export const Recycle = memo(
             params: { id, archive: false },
             type,
             resolve: () => {
-              message.success(t('successDeleted'));
+              message.success(tg('operation.deleteSuccess'));
               dispatch(removeTab({ id, resolve: redirect }));
             },
           }),
         );
       },
-      [dispatch, redirect, t],
+      [dispatch, redirect, tg],
     );
 
     const moreMenuClick = useCallback(
@@ -104,7 +104,7 @@ export const Recycle = memo(
                         index,
                       },
                       resolve: () => {
-                        message.success(t('successRestored'));
+                        message.success(tg('operation.restoreSuccess'));
                         dispatch(removeTab({ id, resolve: redirect }));
                         onClose();
                       },
@@ -117,7 +117,7 @@ export const Recycle = memo(
               break;
           }
         },
-      [dispatch, showSaveForm, redirect, vizs, t],
+      [dispatch, showSaveForm, redirect, vizs, tg],
     );
 
     const toDetail = useCallback(
@@ -182,17 +182,17 @@ export const Recycle = memo(
                             key="reset"
                             prefix={<ReloadOutlined className="icon" />}
                           >
-                            {t('reduction')}
+                            {tg('button.restore')}
                           </MenuListItem>
                           <MenuListItem
                             key="delelte"
                             prefix={<DeleteOutlined className="icon" />}
                           >
                             <Popconfirm
-                              title={t('confirmDeletion') + '？'}
+                              title={tg('operation.deleteConfirm')}
                               onConfirm={del(id, vizType)}
                             >
-                              {t('delete')}
+                              {tg('button.delete')}
                             </Popconfirm>
                           </MenuListItem>
                         </Menu>

@@ -171,16 +171,19 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     const currentChart = ChartManager.instance().getDefaultChart();
     registerChartEvents(currentChart);
     setChart(currentChart);
-    let clonedState = CloneValueDeep(currentChart.config);
+
+    let targetChartConfig = CloneValueDeep(currentChart.config);
+    const finalChartConfig = transferChartConfigs(
+      targetChartConfig,
+      targetChartConfig,
+    );
 
     dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
     dispatch(
       workbenchSlice.actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
         payload: {
-          init: {
-            ...clonedState,
-          },
+          init: finalChartConfig,
         },
       }),
     );

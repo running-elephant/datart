@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons';
 import { Button, List as ListComponent, Menu, message, Popconfirm } from 'antd';
 import { ListItem, MenuListItem, Popup } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { Access } from 'app/pages/MainPage/Access';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import classNames from 'classnames';
@@ -37,6 +38,7 @@ export const List = memo(({ list, selectedId }: StoryboardListProps) => {
   const listLoading = useSelector(selectStoryboardListLoading);
   const orgId = useSelector(selectOrgId);
   const { showSaveForm } = useContext(SaveFormContext);
+  const tg = useI18NPrefix('global');
 
   useEffect(() => {
     dispatch(getStoryboards(orgId));
@@ -67,13 +69,13 @@ export const List = memo(({ list, selectedId }: StoryboardListProps) => {
           params: { id, archive: true },
           type: 'STORYBOARD',
           resolve: () => {
-            message.success('成功移至回收站');
+            message.success(tg('operation.archiveSuccess'));
             dispatch(removeTab({ id, resolve: redirect }));
           },
         }),
       );
     },
-    [dispatch, redirect],
+    [dispatch, redirect, tg],
   );
 
   const moreMenuClick = useCallback(
@@ -128,17 +130,17 @@ export const List = memo(({ list, selectedId }: StoryboardListProps) => {
                         key="info"
                         prefix={<EditOutlined className="icon" />}
                       >
-                        基本信息
+                        {tg('button.info')}
                       </MenuListItem>
                       <MenuListItem
                         key="delete"
                         prefix={<DeleteOutlined className="icon" />}
                       >
                         <Popconfirm
-                          title={`确定移至回收站？`}
+                          title={tg('operation.archiveConfirm')}
                           onConfirm={archiveStoryboard(s.id)}
                         >
-                          移至回收站
+                          {tg('button.archive')}
                         </Popconfirm>
                       </MenuListItem>
                     </Menu>

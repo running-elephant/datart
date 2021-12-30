@@ -1,4 +1,23 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Split } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
 import React, { useCallback, useContext } from 'react';
 import styled from 'styled-components/macro';
@@ -9,6 +28,8 @@ import { Sidebar } from './Sidebar';
 
 export function Container() {
   const { editorInstance } = useContext(EditorContext);
+  const t = useI18NPrefix('view.saveForm');
+  const tg = useI18NPrefix('global');
 
   const editorResize = useCallback(() => {
     editorInstance?.layout();
@@ -39,13 +60,13 @@ export function Container() {
       <Sidebar />
       <Main />
       <SaveForm
-        title="数据视图"
+        title={t('title')}
         formProps={{
           labelAlign: 'left',
-          labelCol: { offset: 1, span: 6 },
-          wrapperCol: { span: 15 },
+          labelCol: { offset: 1, span: 8 },
+          wrapperCol: { span: 13 },
         }}
-        okText="保存"
+        okText={tg('button.save')}
       />
     </StyledContainer>
   );
