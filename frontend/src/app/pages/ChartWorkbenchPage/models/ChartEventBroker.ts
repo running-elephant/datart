@@ -84,20 +84,15 @@ class ChartEventBroker {
     }
   }
 
-  private async safeInvoke(
-    event: HooksEvent,
-    options: any,
-    context?: BrokerContext,
-  ) {
+  private safeInvoke(event: HooksEvent, options: any, context?: BrokerContext) {
     try {
-      // await Debugger.instance.measure(
-      //   `ChartEventBroker | ${event} `,
-      //   () => {
-      //     this._listeners.get(event)?.call?.(this._chart, options, context);
-      //   },
-      //   false,
-      // );
-      this._listeners.get(event)?.call?.(this._chart, options, context);
+      Debugger.instance.measure(
+        `ChartEventBroker | ${event} `,
+        () => {
+          this._listeners.get(event)?.call?.(this._chart, options, context);
+        },
+        false,
+      );
     } catch (e) {
       console.error(`ChartEventBroker | ${event} exception ----> `, e);
     } finally {
