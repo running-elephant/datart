@@ -59,7 +59,7 @@ export const RelatedWidgets: React.FC<RelatedWidgetsProps> = memo(
           render: (w: Widget) => <span>{w.config.type}</span>,
         },
       ],
-      [],
+      [tw],
     );
     return (
       <>

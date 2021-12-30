@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Checkbox, Col, Divider, Row } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 
@@ -28,7 +29,7 @@ export interface RelatedWidgetsProps {
 export const LinkageWidgets: React.FC<RelatedWidgetsProps> = memo(
   ({ widgets, onChange, curWidget }) => {
     const [selectedWidgetIds, setSelectedWidgetIds] = useState<string[]>([]);
-
+    const t = useI18NPrefix(`viz.linkage`);
     useEffect(() => {
       if (!curWidget) {
         return;
@@ -55,7 +56,7 @@ export const LinkageWidgets: React.FC<RelatedWidgetsProps> = memo(
     );
     return (
       <>
-        <Divider orientation="left">关联组件</Divider>
+        <Divider orientation="left">{t('associatedWidgets')}</Divider>
         <Checkbox.Group
           value={selectedWidgetIds}
           style={{ width: '100%' }}

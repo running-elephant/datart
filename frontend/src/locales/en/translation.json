@@ -11,8 +11,8 @@
       "restore": "Restore",
       "delete": "Delete",
       "info": "Info",
-      "open":"Open",
-      "close":"Close"
+      "open": "Open",
+      "close": "Close"
     },
     "operation": {
       "archiveConfirm": "Archive confirm",
@@ -216,7 +216,6 @@
         "filterVisibility": "Filter Visibility",
         "aggregates": "Aggregates",
         "filterOption": "Filter Option",
-       
         "visibility": "Visibility",
         "facade": "Facade",
         "widthOption": "Width Option",
@@ -619,9 +618,9 @@
     },
     "widget": {
       "widget": "Widget",
-      "associatedWidget":"Associated Widgets",
-      "widgetName":"Widget Name",
-      "widgetType":"Widget Type",
+      "associatedWidget": "Associated Widgets",
+      "widgetName": "Widget Name",
+      "widgetType": "Widget Type",
       "type": {
         "chart": "Chart",
         "widgetChart": "privateChart",
@@ -649,6 +648,21 @@
         "makeJump": "Set Jump",
         "closeJump": "Close Jump"
       }
+    },
+    "linkage": {
+      "title": "Linkage settings",
+      "dataSource": "Data source",
+      "associatedWidgets": "Associated Widgets",
+      "associatedFields": "Associated Fields",
+      "selectTriggers": "Select the trigger field",
+      "selectLinker": "Select linkage field"
+    },
+    "associate": {
+      "title": "Please associate fields/variables",
+      "field": "Field",
+      "variable": "Variable",
+      "noValueErr": "Please associate fields or variables",
+      "valueErr": "Please select a field or two variables"
     },
     "sidebar": {
       "folder": "Folder",
@@ -685,26 +699,26 @@
       "noScale": "noScale"
     },
     "control": {
-      "title":"Control Title",
+      "title": "Control Title",
       "valueConfig": "Value Config",
-      "selectViewField":"Select ViewField",
-      "selectDefaultValue":"Select DefaultValue",
-      "defaultValue":"Default Value",
-      "visibility":"Visibility",
-      "sqlOperator":"Sql Operator",
-      "dateType":"Date Type",
-      "step":"Step",
-      "showMark":"Show Mark",
+      "selectViewField": "Select ViewField",
+      "selectDefaultValue": "Select DefaultValue",
+      "defaultValue": "Default Value",
+      "visibility": "Visibility",
+      "sqlOperator": "Sql Operator",
+      "dateType": "Date Type",
+      "step": "Step",
+      "showMark": "Show Mark",
       "common": "General",
       "custom": "Customize"
     },
-    "date":{
-      "year":"Year",
-      "quarter":"Quarter",
-      "month":"Month",
-      "week":"Week",
-      "date":"Date",
-      "dateTime":"Date Time"
+    "date": {
+      "year": "Year",
+      "quarter": "Quarter",
+      "month": "Month",
+      "week": "Week",
+      "date": "Date",
+      "dateTime": "Date Time"
     }
   },
   "view": {
