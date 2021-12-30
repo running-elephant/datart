@@ -24,13 +24,19 @@ import {
 import { Button, Dropdown } from 'antd';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
 import { ShareLinkModal } from 'app/components/VizOperationMenu';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { generateShareLinkAsync } from 'app/utils/fetch';
-import React, { FC, memo, useCallback, useContext, useState } from 'react';
+import { TITLE_SUFFIX } from 'globalConstants';
+import React, {
+  FC,
+  memo,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import { StoryContext } from '../contexts/StoryContext';
 import { StoryOverLay } from './StoryOverLay';
-// import { useSelector } from 'react-redux';
-
-const TITLE_SUFFIX = ['[已归档]', '[未发布]'];
 
 interface StoryHeaderProps {
   name?: string;
@@ -55,7 +61,14 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
     allowShare,
     allowManage,
   }) => {
-    const title = `${name || ''} ${TITLE_SUFFIX[Number(status)] || ''}`;
+    const t = useI18NPrefix(`viz.action`);
+    const title = useMemo(() => {
+      const base = name || '';
+      const suffix = TITLE_SUFFIX[Number(status)]
+        ? `[${t(TITLE_SUFFIX[Number(status)])}]`
+        : '';
+      return base + suffix;
+    }, [name, status, t]);
     const isArchived = Number(status) === 0;
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
     const { stroyBoardId } = useContext(StoryContext);
@@ -94,16 +107,16 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
                 loading={publishLoading}
                 onClick={onPublish}
               >
-                {status === 1 ? '发布' : '取消发布'}
+                {status === 1 ? t('publish') : t('cancelPublish')}
               </Button>
             )}
             {allowManage && !isArchived && (
               <Button key="edit" onClick={toggleEdit}>
-                编辑
+                {t('edit')}
               </Button>
             )}
             <Button key="run" onClick={playStory}>
-              播放
+              {t('play')}
             </Button>
             <Dropdown
               overlay={

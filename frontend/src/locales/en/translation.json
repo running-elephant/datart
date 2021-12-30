@@ -539,6 +539,7 @@
       "published": "Published",
       "unpublished": "Unpublished",
       "archived": "Archived",
+      "play": "Play",
       "share": {
         "link": "Link",
         "password": "Password",
@@ -613,7 +614,14 @@
         "rowHeight": "rowHeight",
         "scaleMode": "scale Mode",
         "queryMode": "query Mode",
-        "openInitQuery": "open Init Query"
+        "openInitQuery": "open Init Query",
+        "cutIn": "Cut In",
+        "cutOut": "Cut Out",
+        "speed": "Speed",
+        "autoPlay": "Auto Play",
+        "duration": "Duration (s) ",
+        "delPagesTip": "Confirm to delete all selected story pages?",
+        "delPageTip": "Confirm to delete this story page?"
       }
     },
     "widget": {

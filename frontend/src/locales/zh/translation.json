@@ -538,6 +538,7 @@
       "published": "已发布",
       "unpublished": "未发布",
       "archived": "已归档",
+      "play": "播放",
       "share": {
         "link": "链接",
         "password": "密码",
@@ -611,7 +612,14 @@
         "rowHeight": "行高",
         "scaleMode": "缩放模式",
         "queryMode": "查询模式",
-        "openInitQuery": "开启初始化查询"
+        "openInitQuery": "开启初始化查询",
+        "cutIn": "切入",
+        "cutOut": "切出",
+        "speed": "速度",
+        "autoPlay": "自动播放",
+        "duration": "停留时间(秒)",
+        "delPagesTip": "确认删除所有选中的故事页",
+        "delPageTip": "确认删除此故事页？"
       }
     },
     "widget": {
