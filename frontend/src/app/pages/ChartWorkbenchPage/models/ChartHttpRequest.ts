@@ -135,7 +135,9 @@ export class ChartDataRequestBuilder {
 
         if (
           cur.type === ChartDataSectionType.MIXED &&
-          !cur.rows?.every(v => v.type === ChartDataViewFieldType.NUMERIC)
+          cur.rows?.findIndex(
+            v => v.type === ChartDataViewFieldType.NUMERIC,
+          ) !== -1
         ) {
           return acc.concat(
             cur.rows.filter(v => v.type === ChartDataViewFieldType.NUMERIC),
@@ -397,6 +399,7 @@ export class ChartDataRequestBuilder {
               v.type !== ChartDataViewFieldType.STRING,
           )
         ) {
+          //zh: 判断数据中是否含有 DATE 和 STRING 类型 en: Determine whether the data contains DATE and STRING types
           return acc.concat(
             cur.rows.filter(
               v =>
