@@ -18,6 +18,7 @@
 
 import { CheckOutlined } from '@ant-design/icons';
 import { Button, DatePicker, Input, InputNumber, Space, Tag } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import moment from 'moment';
 import { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -35,6 +36,7 @@ interface DefaultValueProps {
 export const DefaultValue = memo(
   ({ type, expression, disabled, value = [], onChange }: DefaultValueProps) => {
     const [inputValue, setInputValue] = useState<any>(void 0);
+    const t = useI18NPrefix('variable');
 
     useEffect(() => {
       setInputValue(void 0);
@@ -103,7 +105,7 @@ export const DefaultValue = memo(
       case VariableValueTypes.Number:
         conditionalInputComponent = (
           <InputNumber
-            placeholder="输入默认值后回车添加"
+            placeholder={t('enterToAdd')}
             value={inputValue}
             className="input"
             disabled={!!disabled}
@@ -127,7 +129,7 @@ export const DefaultValue = memo(
       default:
         conditionalInputComponent = (
           <Input
-            placeholder="输入默认值后回车添加"
+            placeholder={t('enterToAdd')}
             value={inputValue}
             className="input"
             disabled={!!disabled}
@@ -142,7 +144,7 @@ export const DefaultValue = memo(
       <Wrapper direction="vertical" size={0}>
         {expression || type === VariableValueTypes.Expression ? (
           <Input.TextArea
-            placeholder="请输入表达式"
+            placeholder={t('enterExpression')}
             autoSize={{ minRows: 4, maxRows: 8 }}
             value={value ? value[0] : void 0}
             disabled={!!disabled}

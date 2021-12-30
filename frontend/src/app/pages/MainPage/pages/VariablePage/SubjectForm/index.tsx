@@ -17,6 +17,7 @@
  */
 
 import { Modal, ModalProps, Tabs } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import moment from 'moment';
 import { Key, memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -66,6 +67,7 @@ export const SubjectForm = memo(
     const members = useSelector(selectMembers);
     const roleListLoading = useSelector(selectRoleListLoading);
     const memberListLoading = useSelector(selectMemberListLoading);
+    const t = useI18NPrefix('variable');
 
     useEffect(() => {
       if (editingVariable && rowPermissions && roles) {
@@ -185,12 +187,12 @@ export const SubjectForm = memo(
           scope === VariableScopes.Public ? (
             <>
               <StyledTabs defaultActiveKey={tab} onChange={setTab}>
-                <Tabs.TabPane key="role" tab="关联角色" />
-                <Tabs.TabPane key="member" tab="关联成员" />
+                <Tabs.TabPane key="role" tab={t('relatedRole')} />
+                <Tabs.TabPane key="member" tab={t('relatedMember')} />
               </StyledTabs>
             </>
           ) : (
-            '关联角色'
+            t('relatedRole')
           )
         }
         onOk={save}

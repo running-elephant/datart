@@ -18,6 +18,7 @@
 
 import { Checkbox, Table, TableColumnProps } from 'antd';
 import { LoadingMask } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import produce from 'immer';
 import { Key, memo, useCallback, useMemo } from 'react';
 import styled from 'styled-components/macro';
@@ -51,6 +52,8 @@ export const RowPermissionTable = memo(
     onSelectedRowKeyChange,
     onRowPermissionSubjectChange,
   }: SubjectFormProps) => {
+    const t = useI18NPrefix('variable');
+
     const checkUseDefaultValue = useCallback(
       id => e => {
         onRowPermissionSubjectChange(
@@ -77,9 +80,9 @@ export const RowPermissionTable = memo(
 
     const columns: TableColumnProps<RowPermissionSubject>[] = useMemo(
       () => [
-        { dataIndex: 'name', title: '名称' },
+        { dataIndex: 'name', title: t('name') },
         {
-          title: '使用变量默认值',
+          title: t('useDefaultValue'),
           width: SPACE_TIMES(32),
           render: (_, record) => {
             return (
@@ -92,7 +95,7 @@ export const RowPermissionTable = memo(
           },
         },
         {
-          title: '值',
+          title: t('value'),
           width: SPACE_TIMES(72),
           render: (_, record) =>
             editingVariable && (
@@ -108,7 +111,7 @@ export const RowPermissionTable = memo(
             ),
         },
       ],
-      [selectedRowKeys, editingVariable, checkUseDefaultValue, valueChange],
+      [selectedRowKeys, editingVariable, checkUseDefaultValue, valueChange, t],
     );
 
     const rowClassName = useCallback(

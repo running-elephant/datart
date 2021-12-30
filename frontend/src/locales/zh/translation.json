@@ -5,6 +5,7 @@
       "action": "操作"
     },
     "button": {
+      "create": "新建",
       "save": "保存",
       "edit": "编辑",
       "archive": "移至回收站",
@@ -1069,6 +1070,42 @@
       "schedule": {
         "0": "管理"
       }
+    }
+  },
+  "variable": {
+    "title": "公共变量列表",
+    "public": "公共变量",
+    "name": "名称",
+    "label": "标签",
+    "type": "类型",
+    "valueType": "值类型",
+    "permission": {
+      "label": "编辑权限",
+      "hidden": "不可见",
+      "readonly": "只读",
+      "editable": "可编辑"
+    },
+    "defaultValue": "默认值",
+    "expression": "使用表达式作为默认值",
+    "duplicateName": "名称重复",
+    "related": "关联角色或成员",
+    "deleteAllConfirm": "确认删除全部？",
+    "deleteAll": "批量删除",
+    "enterToAdd": "输入默认值后回车添加",
+    "enterExpression": "请输入表达式",
+    "relatedRole": "关联角色",
+    "relatedMember": "关联成员",
+    "useDefaultValue": "使用变量默认值",
+    "value": "值",
+    "variableType": {
+      "query": "查询变量",
+      "permission": "权限变量"
+    },
+    "variableValueType": {
+      "string": "字符",
+      "numeric": "数值",
+      "date": "日期",
+      "fragment": "表达式"
     }
   },
   "share": {

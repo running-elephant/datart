@@ -33,6 +33,7 @@ import {
   Tag,
   Tooltip,
 } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
 import { Moment } from 'moment';
 import { Key, useCallback, useEffect, useMemo, useState } from 'react';
@@ -58,8 +59,6 @@ import {
   VariableScopes,
   VariableTypes,
   VariableValueTypes,
-  VARIABLE_TYPE_LABEL,
-  VARIABLE_VALUE_TYPE_LABEL,
 } from './constants';
 import { useVariableSlice } from './slice';
 import {
@@ -106,6 +105,8 @@ export function VariablePage() {
   const saveLoading = useSelector(selectSaveVariableLoading);
   const deleteVariablesLoading = useSelector(selectDeleteVariablesLoading);
   const orgId = useSelector(selectOrgId);
+  const t = useI18NPrefix('variable');
+  const tg = useI18NPrefix('global');
 
   useEffect(() => {
     dispatch(getVariables(orgId));
@@ -172,12 +173,12 @@ export function VariablePage() {
         deleteVariable({
           ids: [id],
           resolve: () => {
-            message.success('删除成功');
+            message.success(tg('operation.deleteSuccess'));
           },
         }),
       );
     },
-    [dispatch],
+    [dispatch, tg],
   );
 
   const delSelectedVariables = useCallback(() => {
@@ -185,12 +186,12 @@ export function VariablePage() {
       deleteVariable({
         ids: selectedRowKeys as string[],
         resolve: () => {
-          message.success('删除成功');
+          message.success(tg('operation.deleteSuccess'));
           setSelectedRowKeys([]);
         },
       }),
     );
-  }, [dispatch, selectedRowKeys]);
+  }, [dispatch, selectedRowKeys, tg]);
 
   const save = useCallback(
     (values: VariableFormModel) => {
@@ -225,13 +226,13 @@ export function VariablePage() {
             variable: { ...editingVariable!, ...values, defaultValue },
             resolve: () => {
               hideForm();
-              message.success('修改成功');
+              message.success(tg('operation.updateSuccess'));
             },
           }),
         );
       }
     },
-    [dispatch, formType, orgId, editingVariable, hideForm],
+    [dispatch, formType, orgId, editingVariable, hideForm, tg],
   );
 
   const saveRelations = useCallback(
@@ -273,7 +274,7 @@ export function VariablePage() {
                 relToDelete: deleted.map(({ id }) => id),
               },
             });
-            message.success('修改成功');
+            message.success(tg('operation.updateSuccess'));
             setSubjectFormVisible(false);
           } catch (error) {
             errorHandle(error);
@@ -286,37 +287,38 @@ export function VariablePage() {
         }
       }
     },
-    [rowPermissions, editingVariable],
+    [rowPermissions, editingVariable, tg],
   );
 
   const columns: TableColumnProps<VariableViewModel>[] = useMemo(
     () => [
-      { dataIndex: 'name', title: '名称' },
-      { dataIndex: 'label', title: '标签' },
+      { dataIndex: 'name', title: t('name') },
+      { dataIndex: 'label', title: t('label') },
       {
         dataIndex: 'type',
-        title: '类型',
+        title: t('type'),
         render: (_, record) => (
           <Tag
             color={record.type === VariableTypes.Permission ? WARNING : INFO}
           >
-            {VARIABLE_TYPE_LABEL[record.type]}
+            {t(`variableType.${record.type.toLowerCase()}`)}
           </Tag>
         ),
       },
       {
         dataIndex: 'valueType',
-        title: '值类型',
-        render: (_, record) => VARIABLE_VALUE_TYPE_LABEL[record.valueType],
+        title: t('valueType'),
+        render: (_, record) =>
+          t(`variableValueType.${record.valueType.toLowerCase()}`),
       },
       {
-        title: '操作',
+        title: tg('title.action'),
         align: 'center',
         width: 140,
         render: (_, record) => (
           <Actions>
             {record.type === VariableTypes.Permission && (
-              <Tooltip title="关联角色或用户">
+              <Tooltip title={t('related')}>
                 <Button
                   type="link"
                   icon={<TeamOutlined />}
@@ -324,15 +326,18 @@ export function VariablePage() {
                 />
               </Tooltip>
             )}
-            <Tooltip title="编辑">
+            <Tooltip title={tg('button.edit')}>
               <Button
                 type="link"
                 icon={<EditOutlined />}
                 onClick={showEditForm(record.id)}
               />
             </Tooltip>
-            <Tooltip title="删除">
-              <Popconfirm title="确认删除？" onConfirm={del(record.id)}>
+            <Tooltip title={tg('button.delete')}>
+              <Popconfirm
+                title={tg('operation.deleteConfirm')}
+                onConfirm={del(record.id)}
+              >
                 <Button type="link" icon={<DeleteOutlined />} />
               </Popconfirm>
             </Tooltip>
@@ -340,7 +345,7 @@ export function VariablePage() {
         ),
       },
     ],
-    [del, showEditForm, showSubjectForm],
+    [del, showEditForm, showSubjectForm, t, tg],
   );
 
   const pagination = useMemo(
@@ -352,18 +357,18 @@ export function VariablePage() {
     <Wrapper>
       <Card>
         <TableHeader>
-          <h3>公共变量列表</h3>
+          <h3>{t('title')}</h3>
           <Toolbar>
             {selectedRowKeys.length > 0 && (
               <Popconfirm
-                title="确认删除全部？"
+                title={t('deleteAllConfirm')}
                 onConfirm={delSelectedVariables}
               >
                 <Button
                   icon={<DeleteOutlined />}
                   loading={deleteVariablesLoading}
                 >
-                  批量删除
+                  {t('deleteAll')}
                 </Button>
               </Popconfirm>
             )}
@@ -372,7 +377,7 @@ export function VariablePage() {
               type="primary"
               onClick={showAddForm}
             >
-              新建
+              {tg('button.create')}
             </Button>
           </Toolbar>
         </TableHeader>
@@ -390,7 +395,7 @@ export function VariablePage() {
           orgId={orgId}
           editingVariable={editingVariable}
           visible={formVisible}
-          title="公共变量"
+          title={t('public')}
           type={formType}
           confirmLoading={saveLoading}
           onSave={save}
