@@ -1,4 +1,6 @@
+import { prefixI18N } from 'app/hooks/useI18NPrefix';
 import { FormValues } from './types';
+const Prefix = 'main.pages.schedulePage.constants.';
 export enum JobTypes {
   Email = 'EMAIL',
   WeChart = 'WECHART',
@@ -9,15 +11,15 @@ export enum FileTypes {
   Image = 'IMAGE',
 }
 export const JOB_TYPES_OPTIONS = [
-  { label: '邮箱', value: JobTypes.Email },
-  { label: '微信', value: JobTypes.WeChart },
+  { label: prefixI18N(Prefix + 'email'), value: JobTypes.Email },
+  { label: prefixI18N(Prefix + 'weChat'), value: JobTypes.WeChart },
 ];
 export const FILE_TYPE_OPTIONS = [
   // { label: 'Excel', value: FileTypes.Excel },
-  { label: '图片', value: FileTypes.Image },
+  { label: prefixI18N(Prefix + 'picture'), value: FileTypes.Image },
 ];
 export const WECHART_FILE_TYPE_OPTIONS = [
-  { label: '图片', value: FileTypes.Image },
+  { label: prefixI18N(Prefix + 'picture'), value: FileTypes.Image },
 ];
 
 export enum TimeModes {
@@ -79,12 +81,12 @@ export enum LogStatus {
 }
 
 export const LOG_STATUS_TEXT = {
-  [LogStatus.S1]: '任务执行',
-  [LogStatus.S3]: '配置解析',
-  [LogStatus.S7]: '数据获取',
-  [LogStatus.S15]: '发送',
+  [LogStatus.S1]: prefixI18N(Prefix + 'taskExecution'),
+  [LogStatus.S3]: prefixI18N(Prefix + 'configurationAnalysis'),
+  [LogStatus.S7]: prefixI18N(Prefix + 'getData'),
+  [LogStatus.S15]: prefixI18N(Prefix + 'send'),
 };
 export const JOB_TYPE_TEXT = {
-  [JobTypes.Email]: '邮箱',
-  [JobTypes.WeChart]: '微信',
+  [JobTypes.Email]: prefixI18N(Prefix + 'email'),
+  [JobTypes.WeChart]: prefixI18N(Prefix + 'weChat'),
 };

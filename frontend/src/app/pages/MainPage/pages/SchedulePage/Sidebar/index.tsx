@@ -1,6 +1,7 @@
 import { DeleteOutlined } from '@ant-design/icons';
 import { ListNav, ListPane, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useAccess } from 'app/pages/MainPage/Access';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { memo, useCallback, useMemo } from 'react';
@@ -23,7 +24,7 @@ export const Sidebar = memo(() => {
   const list = useSelector(selectSchedules);
   const archived = useSelector(selectArchived);
   const allowCreate = useAccess(allowCreateSchedule());
-
+  const t = useI18NPrefix('main.pages.schedulePage.sidebar.index');
   const { filteredData: scheduleList, debouncedSearch: listSearch } =
     useDebouncedSearch(list, (keywords, d) =>
       d.name.toLowerCase().includes(keywords.toLowerCase()),
@@ -50,12 +51,12 @@ export const Sidebar = memo(() => {
     () => [
       {
         key: 'list',
-        title: '定时任务列表',
+        title: t('scheduledTaskList'),
         search: true,
         onSearch: listSearch,
         ...allowCreate({
           add: {
-            items: [{ key: 'add', text: '新建定时任务' }],
+            items: [{ key: 'add', text: t('newTimedTask') }],
             callback: toAdd,
           },
         }),
@@ -63,7 +64,7 @@ export const Sidebar = memo(() => {
           items: [
             {
               key: 'recycle',
-              text: '回收站',
+              text: t('recycle'),
               prefix: <DeleteOutlined className="icon" />,
             },
           ],
@@ -72,13 +73,13 @@ export const Sidebar = memo(() => {
       },
       {
         key: 'recycle',
-        title: '回收站',
+        title: t('recycle'),
         back: true,
         search: true,
         onSearch: archivedSearch,
       },
     ],
-    [toAdd, moreMenuClick, listSearch, archivedSearch, allowCreate],
+    [toAdd, moreMenuClick, listSearch, archivedSearch, allowCreate, t],
   );
 
   return (
