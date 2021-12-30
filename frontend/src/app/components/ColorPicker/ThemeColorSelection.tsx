@@ -32,7 +32,6 @@ function ThemeColorSelection({ children, callbackFn }: themeColorPropTypes) {
   const [switchStatus, setSwitchStatus] = useState(false);
   const [colors] = useState(colorThemes);
   const { i18n } = useTranslation();
-  const { language = 'zh' } = i18n;
 
   return (
     <Popover
@@ -53,7 +52,7 @@ function ThemeColorSelection({ children, callbackFn }: themeColorPropTypes) {
                   setSwitchStatus(false);
                 }}
               >
-                <ColorTitle>{item[language].title}</ColorTitle>
+                <ColorTitle>{item[i18n.language].title}</ColorTitle>
                 <ColorBlockWrap>
                   {item.colors.map((v, i) => {
                     return <ColorBlock color={v} key={i}></ColorBlock>;

@@ -69,7 +69,7 @@ class ChartManager {
       return;
     }
     const pluginsPaths = await getChartPluginPaths();
-    await Debugger.instance.measure('Plugin Charts | ', async () => {
+    Debugger.instance.measure('Plugin Charts | ', async () => {
       await this._loadCustomizeCharts(pluginsPaths);
     });
   }

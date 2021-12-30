@@ -2,11 +2,6 @@ spring:
   application:
     name: datart-server
 
-  datasource:
-    druid:
-      mysql:
-        usePingMethod: false
-
   main:
     banner-mode: off
 

@@ -40,10 +40,7 @@ class PivotSheetChart extends ReactChart {
   isISOContainer = 'piovt-sheet';
   config = Config;
   chart: any = null;
-  tableOptions: {
-    dataset?;
-    config?;
-  } = {};
+  updateOptions: any = {};
 
   constructor() {
     super(AntVS2Wrapper, {
@@ -55,21 +52,29 @@ class PivotSheetChart extends ReactChart {
   }
 
   onUpdated(options, context): void {
-    this.tableOptions = options;
-
     if (!this.isMatchRequirement(options.config)) {
       this.adapter?.unmount();
       return;
     }
 
-    this.adapter?.updated(
-      this.getOptions(context, options.dataset, options.config),
+    this.updateOptions = this.getOptions(
       context,
+      options.dataset,
+      options.config,
     );
+    this.adapter?.updated(this.updateOptions);
   }
 
   onResize(_, context) {
-    this.onUpdated(this.tableOptions, context);
+    if (this.updateOptions?.options) {
+      this.updateOptions.options = Object.assign(
+        {
+          ...this.updateOptions.options,
+        },
+        { width: context.width, height: context.height },
+      );
+      this.adapter?.updated(this.updateOptions);
+    }
   }
 
   getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
