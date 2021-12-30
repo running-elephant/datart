@@ -384,7 +384,7 @@
           "relative": "相对"
         },
         "category": {
-          "general": "General",
+          "general": "常规",
           "customize": "自定义",
           "condition": "条件",
           "sourceList": "源列表",
@@ -705,7 +705,7 @@
         "widget": "组件",
         "widgetList": "组件列表",
         "title": "标题",
-        "align": "Align",
+        "align": "对齐",
         "showTitle": "显示标题",
         "position": "位置",
         "xAxis": "x轴",

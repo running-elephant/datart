@@ -30,21 +30,21 @@
       "passwordNotMatch": "Password and confirm password does not match"
     },
     "time": {
-      "minute": "分钟",
-      "hour": "小时",
-      "day": "天",
-      "month": "月",
-      "year": "年",
-      "m": "分",
-      "h": "时",
-      "d": "日",
-      "sun": "星期天",
-      "mon": "星期一",
-      "tues": "星期二",
-      "wednes": "星期三",
-      "thurs": "星期四",
-      "fri": "星期五",
-      "satur": "星期六"
+      "minute": "Minute",
+      "hour": "Hours",
+      "day": "Day",
+      "month": "Month",
+      "year": "Years",
+      "m": "Minute",
+      "h": "Hours",
+      "d": "Day",
+      "sun": "Sunday",
+      "mon": "Monday",
+      "tues": "Tuesday",
+      "wednes": "Wednesday",
+      "thurs": "Thursday",
+      "fri": "Friday",
+      "satur": "Saturday"
     },
     "modal": {
       "title": {
@@ -162,10 +162,10 @@
     },
     "subNavs": {
       "variables": {
-        "title": "公共变量设置"
+        "title": "Public variable Settings"
       },
       "orgSettings": {
-        "title": "组织设置"
+        "title": "Organization Settings"
       }
     },
     "background": {
@@ -176,103 +176,103 @@
     "pages": {
       "schedulePage": {
         "constants": {
-          "email": "邮箱",
-          "weChat": "微信",
-          "picture": "图片",
-          "taskExecution": "任务执行",
-          "configurationAnalysis": "配置解析",
-          "getData": "数据获取",
-          "send": "发送"
+          "email": "Email",
+          "weChat": "WeChat",
+          "picture": "Picture",
+          "taskExecution": "Task execution",
+          "configurationAnalysis": "Configure the parsing",
+          "getData": "Data collection",
+          "send": "Send"
         },
         "sidebar": {
           "index": {
-            "scheduledTaskList": "定时任务列表",
-            "newTimedTask": "新建定时任务",
-            "recycle": "回收站"
+            "scheduledTaskList": "Scheduled task list",
+            "newTimedTask": "Create scheduled task",
+            "recycle": "Recycle"
           },
           "scheduleList": {
-            "successStarted": "启动成功",
-            "successStop": "停止成功",
-            "successImmediately": "立即执行成功",
-            "start": "启动",
-            "stop": "停止",
-            "executeItNow": "确定立即执行？",
-            "executeImmediately": "立即执行"
+            "successStarted": "Successfully started",
+            "successStop": "Stopped successfully",
+            "successImmediately": "Executed successfully immediately",
+            "start": "Start",
+            "stop": "Stop",
+            "executeItNow": "Are you sure to execute it now?",
+            "executeImmediately": "Execute immediately"
           },
           "editorPage": {
             "index": {
-              "tickToSendContent": "请勾选发送内容",
-              "addSuccess": "新增成功",
-              "saveSuccess": "保存成功",
-              "restoredSuccess": "还原成功",
-              "success": "成功",
-              "moveToTrash": "移至回收站",
-              "delete": "删除",
-              "newTimedTask": "新建定时任务",
-              "sureToRestore?": "确定还原？",
-              "restore": "还原",
-              "sureToDelete": "确定删除？",
-              "allowModificationAfterStopping": "停止后允许修改",
-              "save": "保存",
-              "allowMoveAfterStopping": "停止后允许移至回收站",
-              "sureMoveRecycleBin": "确定移至回收站？",
-              "basicSettings": "基本设置",
-              "emailSetting": "邮件设置",
-              "enterpriseWeChatSettings": "企业微信设置",
-              "sendContentSettings": "发送内容设置"
+              "tickToSendContent": "Please tick to send content",
+              "addSuccess": "Added successfully",
+              "saveSuccess": "Saved successfully",
+              "restoredSuccess": "Restored successfully",
+              "success": "Success",
+              "moveToTrash": "Move to recycle bin",
+              "delete": "Delete",
+              "newTimedTask": "New timed task",
+              "sureToRestore?": "Are you sure to restore?",
+              "restore": "Reduction",
+              "sureToDelete": "Confirm delete?",
+              "allowModificationAfterStopping": "Allow modification after stopping",
+              "save": "Save",
+              "allowMoveAfterStopping": "Allow moving to the recycle bin after stopping",
+              "sureMoveRecycleBin": "Are you sure to move to the recycle bin?",
+              "basicSettings": "Basic settings",
+              "emailSetting": "Email settings",
+              "enterpriseWeChatSettings": "Enterprise WeChat Settings",
+              "sendContentSettings": "Send content settings"
             },
             "weChartSetttingForm": {
-              "RobotWebhookAddress": "机器人webhook地址",
-              "RobotWebhookAddressIsRequired": "机器人webhook地址为必填项",
-              "fileType": "文件类型",
-              "picWidth": "图片宽度",
-              "px": "像素"
+              "RobotWebhookAddress": "Robot webhook address",
+              "RobotWebhookAddressIsRequired": "Robot webhook address is required",
+              "fileType": "File type",
+              "picWidth": "Width",
+              "px": "px"
             },
             "scheduleErrorLog": {
               "index": {
-                "startTime": "开始时间",
-                "endTime": "结束时间",
-                "logPhase": "日志阶段",
-                "executionInformation": "执行信息",
-                "success": "成功",
-                "log": "日志"
+                "startTime": "Start",
+                "endTime": "End",
+                "logPhase": "Log phase",
+                "executionInformation": "Execution information",
+                "success": "Success",
+                "log": "Log"
               }
             },
             "emailSettingForm": {
               "commonRichText": {
-                "pleaseEnter": "请输入"
+                "pleaseEnter": "Please enter"
               },
               "index": {
-                "CC": "抄送",
-                "theme": "主题",
-                "subjectIsRequired": "主题为必填项",
-                "fileType": "文件类型",
-                "picWidth": "图片宽度",
-                "px": "像素",
-                "recipient": "收件人",
-                "recipientIsRequired": "收件人为必填项",
-                "bcc": "密送",
-                "contentOfEmail": "邮件内容"
+                "CC": "CC",
+                "theme": "Theme",
+                "subjectIsRequired": "Theme is required",
+                "fileType": "File type",
+                "picWidth": "Width",
+                "px": "px",
+                "recipient": "Recipient",
+                "recipientIsRequired": "Recipient is required",
+                "bcc": "BCC",
+                "contentOfEmail": "Content of email"
               },
               "mailTagFormItem": {
-                "placeholder": "输入邮箱或姓名关键字查找..."
+                "placeholder": "Enter email address or name keyword search..."
               }
             },
             "basicBaseForm": {
               "index": {
-                "nameAlreadyExists": "名称已存在",
-                "name": "名称",
-                "nameRequired": "名称为必填项",
-                "type": "类型",
-                "effectiveTimeRange": "有效时间范围"
+                "nameAlreadyExists": "Name already exists",
+                "name": "Name",
+                "nameRequired": "Name is required",
+                "type": "Type",
+                "effectiveTimeRange": "Effective time range"
               },
               "executeFormItem": {
-                "per": "每",
+                "per": "Each",
                 "of": "",
-                "executionTimeSetting": "执行时间设置",
-                "expressionIsRequired": "表达式为必填项",
-                "pleaseEnterCronExpression": "请输入cron表达式",
-                "manualInput": "手动输入"
+                "executionTimeSetting": "Execution time setting",
+                "expressionIsRequired": "Expression is required",
+                "pleaseEnterCronExpression": "Please enter cron expression",
+                "manualInput": "Manual input"
               }
             }
           }
