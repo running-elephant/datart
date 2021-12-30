@@ -18,16 +18,14 @@
 
 import { Form } from 'antd';
 import { LoadingMask } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
 import { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
-  CREATE_PERMISSION_VALUES,
-  MODULE_PERMISSION_VALUES,
   PermissionLevels,
   ResourceTypes,
-  RESOURCE_TYPE_LABEL,
   SubjectTypes,
   Viewpoints,
 } from '../../constants';
@@ -80,6 +78,7 @@ export const PermissionForm = memo(
     const privileges = useSelector(state =>
       selectPrivileges(state, { viewpoint, dataSourceType }),
     );
+    const t = useI18NPrefix('permission');
 
     const { moduleEnabled, createEnabled } = useMemo(() => {
       let moduleEnabled = PermissionLevels.Disable;
@@ -247,20 +246,63 @@ export const PermissionForm = memo(
       ],
     );
 
+    const modulePermissionValues = useMemo(
+      () => [
+        {
+          text: t(
+            `modulePermissionLabel.${
+              PermissionLevels[PermissionLevels.Disable]
+            }`,
+          ),
+          value: PermissionLevels.Disable,
+        },
+        {
+          text: t(
+            `modulePermissionLabel.${
+              PermissionLevels[PermissionLevels.Enable]
+            }`,
+          ),
+          value: PermissionLevels.Enable,
+        },
+      ],
+      [t],
+    );
+    const createPermissionValues = useMemo(
+      () => [
+        {
+          text: t(
+            `createPermissionLabel.${
+              PermissionLevels[PermissionLevels.Disable]
+            }`,
+          ),
+          value: PermissionLevels.Disable,
+        },
+        {
+          text: t(
+            `createPermissionLabel.${
+              PermissionLevels[PermissionLevels.Create]
+            }`,
+          ),
+          value: PermissionLevels.Create,
+        },
+      ],
+      [t],
+    );
+
     return (
       <Wrapper className={classnames({ selected })}>
         <LoadingMask loading={permissionLoading}>
           <FormContent
             labelAlign="left"
-            labelCol={{ span: 3 }}
-            wrapperCol={{ span: 19 }}
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 18 }}
           >
             {viewpoint === Viewpoints.Subject && (
               <IndependentPermissionSetting
                 enabled={moduleEnabled}
-                label="功能权限"
-                extra="开启功能权限之后，用户才能在 Datart 界面上使用该功能"
-                values={MODULE_PERMISSION_VALUES}
+                label={t('modulePermission')}
+                extra={t('modulePermissionDesc')}
+                values={modulePermissionValues}
                 onChange={independentPermissionChange('*')}
               />
             )}
@@ -270,12 +312,14 @@ export const PermissionForm = memo(
               ) && (
                 <IndependentPermissionSetting
                   enabled={createEnabled}
-                  label={`新增${RESOURCE_TYPE_LABEL[dataSourceType]}`}
-                  values={CREATE_PERMISSION_VALUES}
+                  label={`${t('add')}${t(
+                    `module.${dataSourceType.toLowerCase()}`,
+                  )}`}
+                  values={createPermissionValues}
                   onChange={independentPermissionChange(dataSourceType)}
                 />
               )}
-            <Form.Item label="资源明细">
+            <Form.Item label={t('resourceDetail')}>
               <PermissionTable
                 viewpoint={viewpoint}
                 viewpointType={viewpointType}

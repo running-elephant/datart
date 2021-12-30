@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { EmptyFiller, Split } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
 import { useCallback } from 'react';
 import { Route, useRouteMatch } from 'react-router-dom';
@@ -44,6 +45,7 @@ export function PermissionPage() {
     type: ResourceTypes | SubjectTypes;
     id: string;
   }>('/organizations/:orgId/permissions/:viewpoint/:type/:id');
+  const t = useI18NPrefix('permission');
   const { sizes, setSizes } = useSplitSizes({
     limitedSide: 0,
     range: [256, 768],
@@ -77,9 +79,11 @@ export function PermissionPage() {
         />
       ) : (
         <EmptyFiller
-          title={`请在左侧列表选择${
-            viewpoint === Viewpoints.Resource ? '资源项' : '角色或用户'
-          }`}
+          title={`${t('empty1')}${
+            viewpoint === Viewpoints.Resource
+              ? t('emptyResource')
+              : t('emptySubject')
+          }${t('empty2')}`}
         />
       )}
     </Container>

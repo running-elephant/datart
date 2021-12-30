@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import i18n from 'i18next';
 import {
   PermissionLevels,
   ResourceTypes,
@@ -39,7 +40,7 @@ export function generateRootNode(
 ): DataSourceViewModel {
   return {
     id: type === ResourceTypes.Viz ? (vizId as string) : (type as string),
-    name: '所有资源',
+    name: i18n.t('permission.allResources'),
     type,
     parentId: null,
     index: null,

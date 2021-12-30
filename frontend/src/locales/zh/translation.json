@@ -879,6 +879,50 @@
       "addRole": "新建角色"
     }
   },
+  "permission": {
+    "empty1": "请在左侧列表选择",
+    "emptyResource": "资源项",
+    "emptySubject": "角色或用户",
+    "empty2": "",
+    "allResources": "所有资源",
+    "folder": "目录",
+    "presentation": "演示",
+    "search": "搜索关键字",
+    "searchResources": "搜索资源名称关键字",
+    "member": "成员",
+    "role": "角色",
+    "modulePermission": "功能权限",
+    "modulePermissionDesc": "开启功能权限之后，用户才能在 Datart 界面上使用该功能",
+    "resourceDetail": "资源明细",
+    "createStoryboard": "新增故事板",
+    "resourceName": "资源名称",
+    "privileges": "权限详情",
+    "add": "新建",
+    "viewpoint": {
+      "subject": "常规视图",
+      "resource": "资源视图"
+    },
+    "module": {
+      "source": "数据源",
+      "view": "数据视图",
+      "viz": "可视化",
+      "schedule": "定时任务"
+    },
+    "modulePermissionLabel": {
+      "Enable": "启用",
+      "Disable": "禁用"
+    },
+    "createPermissionLabel": {
+      "Create": "启用",
+      "Disable": "禁用"
+    },
+    "privilegeLabel": {
+      "viz": { "0": "查看", "1": "下载", "2": "分享", "3": "管理" },
+      "view": { "0": "使用", "1": "管理" },
+      "source": { "0": "使用", "1": "管理" },
+      "schedule": { "0": "管理" }
+    }
+  },
   "share": {
     "common": {
       "confirm": "请确认",

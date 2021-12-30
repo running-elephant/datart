@@ -17,14 +17,10 @@
  */
 
 import { Card } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  ResourceTypes,
-  RESOURCE_TYPE_LABEL,
-  SubjectTypes,
-  Viewpoints,
-} from '../constants';
+import { ResourceTypes, SubjectTypes, Viewpoints } from '../constants';
 import {
   selectFolderListLoading,
   selectFolders,
@@ -74,6 +70,7 @@ export const ResourcesPermissionSetting = memo(
     const permissionLoading = useSelector(state =>
       selectPermissionLoading(state, { viewpoint }),
     );
+    const t = useI18NPrefix('permission');
 
     useEffect(() => {
       if (viewpointType && viewpointId) {
@@ -137,9 +134,9 @@ export const ResourcesPermissionSetting = memo(
       () =>
         tabSource.map(({ type }) => ({
           key: type,
-          tab: RESOURCE_TYPE_LABEL[type],
+          tab: t(`module.${type.toLowerCase()}`),
         })),
-      [tabSource],
+      [tabSource, t],
     );
 
     return (

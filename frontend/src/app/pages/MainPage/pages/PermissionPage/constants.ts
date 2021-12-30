@@ -55,18 +55,6 @@ export enum PermissionLevels {
   Create = (1 << 7) | Manage,
 }
 
-export const VIEWPOINT_LABEL = {
-  [Viewpoints.Subject]: '常规视图',
-  [Viewpoints.Resource]: '资源视图',
-};
-
-export const RESOURCE_TYPE_LABEL = {
-  [ResourceTypes.Viz]: '可视化',
-  [ResourceTypes.View]: '数据视图',
-  [ResourceTypes.Source]: '数据源',
-  [ResourceTypes.Schedule]: '定时任务',
-};
-
 export const RESOURCE_TYPE_PERMISSION_MAPPING = {
   [ResourceTypes.Viz]: [
     PermissionLevels.Read,
@@ -78,19 +66,3 @@ export const RESOURCE_TYPE_PERMISSION_MAPPING = {
   [ResourceTypes.Source]: [PermissionLevels.Read, PermissionLevels.Create],
   [ResourceTypes.Schedule]: [PermissionLevels.Create],
 };
-
-export const RESOURCE_TYPE_PERMISSION_LABEL = {
-  [ResourceTypes.Viz]: ['查看', '下载', '分享', '管理'],
-  [ResourceTypes.View]: ['使用', '管理'],
-  [ResourceTypes.Source]: ['使用', '管理'],
-  [ResourceTypes.Schedule]: ['管理'],
-};
-
-export const MODULE_PERMISSION_VALUES = [
-  { text: '禁用', value: PermissionLevels.Disable },
-  { text: '启用', value: PermissionLevels.Enable },
-];
-export const CREATE_PERMISSION_VALUES = [
-  { text: '禁用', value: PermissionLevels.Disable },
-  { text: '启用', value: PermissionLevels.Create },
-];

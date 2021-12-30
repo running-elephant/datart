@@ -20,6 +20,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { List } from 'antd';
 import { ListItem } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { memo } from 'react';
 import styled from 'styled-components/macro';
 import { SubjectTypes } from '../constants';
@@ -43,13 +44,15 @@ export const SubjectList = memo(
     loading,
     onToDetail,
   }: SubjectListProps) => {
+    const t = useI18NPrefix('permission');
+
     const { filteredData, debouncedSearch } = useDebouncedSearch(
       dataSource,
       (keywords, d) => d.name.includes(keywords),
     );
     return (
       <>
-        <Searchbar placeholder="搜索关键字" onSearch={debouncedSearch} />
+        <Searchbar placeholder={t('search')} onSearch={debouncedSearch} />
         <List
           loading={{
             spinning: loading,

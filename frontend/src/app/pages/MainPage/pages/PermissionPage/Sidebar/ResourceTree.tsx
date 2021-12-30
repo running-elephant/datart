@@ -17,6 +17,7 @@
  */
 
 import { Tree, TreeTitle } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { listToTree } from 'utils/utils';
@@ -32,6 +33,8 @@ interface ResourceTreeProps {
 
 export const ResourceTree = memo(
   ({ loading, dataSource, onSelect }: ResourceTreeProps) => {
+    const t = useI18NPrefix('permission');
+
     const treeData = useMemo(
       () => listToTree(dataSource, null, []) as DataSourceTreeNode[],
       [dataSource],
@@ -73,7 +76,7 @@ export const ResourceTree = memo(
     return (
       <>
         <Searchbar
-          placeholder="搜索资源名称关键字"
+          placeholder={t('searchResources')}
           onSearch={debouncedSearch}
         />
         <Tree

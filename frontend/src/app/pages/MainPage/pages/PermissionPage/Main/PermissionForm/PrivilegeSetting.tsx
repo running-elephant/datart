@@ -17,11 +17,11 @@
  */
 
 import { Checkbox, Space } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { memo, useCallback, useEffect, useState } from 'react';
 import {
   PermissionLevels,
   ResourceTypes,
-  RESOURCE_TYPE_PERMISSION_LABEL,
   RESOURCE_TYPE_PERMISSION_MAPPING,
   SubjectTypes,
   Viewpoints,
@@ -54,6 +54,7 @@ export const PrivilegeSetting = memo(
     const [values, setValues] = useState<PermissionLevels[]>(
       getDefaultPermissionArray(),
     );
+    const t = useI18NPrefix('permission');
 
     const resourceType = getPrivilegeSettingType(
       viewpoint,
@@ -86,7 +87,7 @@ export const PrivilegeSetting = memo(
             checked={level === values[index]}
             onChange={privilegeChange(index, level)}
           >
-            {RESOURCE_TYPE_PERMISSION_LABEL[resourceType!][index]}
+            {t(`privilegeLabel.${resourceType!.toLowerCase()}.${index}`)}
           </Checkbox>
         ))}
       </Space>

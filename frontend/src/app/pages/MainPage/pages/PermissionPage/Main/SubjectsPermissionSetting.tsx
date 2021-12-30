@@ -17,6 +17,7 @@
  */
 
 import { Card } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ResourceTypes, SubjectTypes, Viewpoints } from '../constants';
@@ -56,6 +57,7 @@ export const SubjectPermissionSetting = memo(
     const permissionLoading = useSelector(state =>
       selectPermissionLoading(state, { viewpoint }),
     );
+    const t = useI18NPrefix('permission');
 
     useEffect(() => {
       if (viewpointType && viewpointId) {
@@ -86,18 +88,18 @@ export const SubjectPermissionSetting = memo(
       () => [
         {
           type: SubjectTypes.Role,
-          label: '角色',
+          label: t('role'),
           dataSource: roles,
           loading: roleListLoading,
         },
         {
           type: SubjectTypes.UserRole,
-          label: '成员',
+          label: t('member'),
           dataSource: members,
           loading: memberListLoading,
         },
       ],
-      [roles, members, roleListLoading, memberListLoading],
+      [roles, members, roleListLoading, memberListLoading, t],
     );
 
     const tabList = useMemo(

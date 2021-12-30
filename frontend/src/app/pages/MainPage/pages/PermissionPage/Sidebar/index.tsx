@@ -18,18 +18,14 @@
 
 import { FileProtectOutlined, TeamOutlined } from '@ant-design/icons';
 import { ListSwitch } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
-import {
-  ResourceTypes,
-  SubjectTypes,
-  Viewpoints,
-  VIEWPOINT_LABEL,
-} from '../constants';
+import { ResourceTypes, SubjectTypes, Viewpoints } from '../constants';
 import { getDataSource } from '../slice/thunks';
 import { ResourcePanels } from './ResourcePanels';
 import { SubjectPanels } from './SubjectPanels';
@@ -45,6 +41,7 @@ export const Sidebar = memo(
     const dispatch = useDispatch();
     const history = useHistory();
     const orgId = useSelector(selectOrgId);
+    const t = useI18NPrefix('permission');
 
     useEffect(() => {
       if (viewpointType) {
@@ -82,15 +79,15 @@ export const Sidebar = memo(
         {
           key: Viewpoints.Subject,
           icon: <TeamOutlined />,
-          text: VIEWPOINT_LABEL[Viewpoints.Subject],
+          text: t(`viewpoint.${Viewpoints.Subject}`),
         },
         {
           key: Viewpoints.Resource,
           icon: <FileProtectOutlined />,
-          text: VIEWPOINT_LABEL[Viewpoints.Resource],
+          text: t(`viewpoint.${Viewpoints.Resource}`),
         },
       ],
-      [],
+      [t],
     );
 
     return (
