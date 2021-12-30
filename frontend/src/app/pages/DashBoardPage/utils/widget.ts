@@ -145,7 +145,7 @@ export const createContainerWidget = (opt: {
 export const createControlBtn = (opt: BtnActionParams) => {
   const content = { type: opt.type };
   const widgetConf = createInitWidgetConfig({
-    name: opt.type === 'query' ? '查询' : '重置',
+    name: '',
     type: opt.type as WidgetType,
     content: content,
     boardType: opt.boardType,

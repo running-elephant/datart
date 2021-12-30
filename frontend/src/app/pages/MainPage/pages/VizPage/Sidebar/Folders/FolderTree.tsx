@@ -41,6 +41,7 @@ export function FolderTree({
   const vizsData = useSelector(selectVizs);
   const { showSaveForm } = useContext(SaveFormContext);
   const t = useI18NPrefix(i18nPrefix);
+  const tg = useI18NPrefix('global');
 
   useEffect(() => {
     dispatch(getFolders(orgId));
@@ -71,12 +72,12 @@ export function FolderTree({
       () => {
         let id = folderId;
         let archive = false;
-        let msg = t('folders.folderTree.successDeleted');
+        let msg = tg('operation.deleteSuccess');
 
         if (['DASHBOARD', 'DATACHART'].includes(relType)) {
           id = relId;
           archive = true;
-          msg = t('folders.folderTree.successRecycle');
+          msg = tg('operation.archiveSuccess');
         }
         dispatch(
           deleteViz({
@@ -89,7 +90,7 @@ export function FolderTree({
           }),
         );
       },
-    [dispatch, redirect, t],
+    [dispatch, redirect, tg],
   );
 
   const moreMenuClick = useCallback(
@@ -154,7 +155,7 @@ export function FolderTree({
                     key="info"
                     prefix={<EditOutlined className="icon" />}
                   >
-                    {t('folders.folderTree.info')}
+                    {tg('button.info')}
                   </MenuListItem>
                   <MenuListItem
                     key="delete"
@@ -163,14 +164,14 @@ export function FolderTree({
                     <Popconfirm
                       title={`${
                         node.relType === 'FOLDER'
-                          ? t('folders.folderTree.confirmDelete')
-                          : t('folders.folderTree.sureMoveRecycleBin')
+                          ? tg('operation.deleteConfirm')
+                          : tg('operation.archiveConfirm')
                       }？`}
                       onConfirm={archiveViz(node)}
                     >
                       {node.relType === 'FOLDER'
-                        ? t('folders.folderTree.delete')
-                        : t('folders.folderTree.moveToTrash')}
+                        ? tg('button.delete')
+                        : tg('button.archive')}
                     </Popconfirm>
                   </MenuListItem>
                 </Menu>
@@ -184,7 +185,7 @@ export function FolderTree({
         </TreeTitle>
       );
     },
-    [moreMenuClick, archiveViz, t],
+    [moreMenuClick, archiveViz, t, tg],
   );
 
   const onDrop = info => {

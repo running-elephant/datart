@@ -23,23 +23,24 @@ export const SliderSetter: React.FC<SliderSetFormProps> = memo(props => {
   const itemProps: FormItemProps<any> = {
     preserve: true,
     name: ControllerValuesName,
-    label: '默认值',
+    label: props.label,
     required: true,
   };
-  return <SliderSetForm {...props} {...itemProps} />;
+  return <SliderSetForm {...itemProps} {...props} />;
 });
 
 export const RangeSliderSetter: React.FC<SliderSetFormProps> = memo(props => {
   const itemProps: FormItemProps<any> = {
     preserve: true,
     name: ControllerValuesName,
-    label: '默认值',
+    label: props.label,
     required: false,
   };
   return <RangeSliderSetForm {...itemProps} {...props} />;
 });
 
-export type SliderSetFormProps = {} & FormItemProps<any> & SliderSetProps;
+export type SliderSetFormProps = { label: string } & FormItemProps<any> &
+  SliderSetProps;
 
 export const RangeSliderSetForm: React.FC<SliderSetFormProps> = memo(
   ({ ...rest }) => {

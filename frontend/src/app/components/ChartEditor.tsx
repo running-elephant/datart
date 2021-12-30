@@ -134,7 +134,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       setChart(currentChart);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [backendChart?.config.chartGraphId]);
+  }, [backendChart?.config?.chartGraphId]);
 
   const handleChartChange = (c: Chart) => {
     registerChartEvents(c);
@@ -308,11 +308,14 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 
   const handleAggregationState = state => {
     const currentChart = ChartManager.instance().getById(chart?.meta?.id);
+    let targetChartConfig = CloneValueDeep(currentChart?.config);
     registerChartEvents(currentChart);
     setChart(currentChart);
 
-    let finalChartConfig = CloneValueDeep(currentChart?.config);
-
+    const finalChartConfig = transferChartConfigs(
+      targetChartConfig,
+      targetChartConfig,
+    );
     dispatch(actions.updateChartAggregation(state));
     dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
     dispatch(

@@ -147,7 +147,7 @@ const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           <Col span={8}>
             <Select
               dropdownMatchSelectWidth
-              placeholder={t('pleaseSelect')}
+              placeholder={t('select')}
               value={currentSelectedItem?.label}
               onChange={handleColumnChange}
             >

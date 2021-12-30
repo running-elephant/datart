@@ -1,13 +1,30 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Form, Radio } from 'antd';
 import { LoadingMask } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { listToTree } from 'utils/utils';
 import {
-  CREATE_PERMISSION_VALUES,
-  MODULE_PERMISSION_VALUES,
   PermissionLevels,
   ResourceTypes,
   SubjectTypes,
@@ -69,6 +86,7 @@ export const VizPermissionForm = memo(
     const privileges = useSelector(state =>
       selectPrivileges(state, { viewpoint, dataSourceType }),
     );
+    const t = useI18NPrefix('permission');
 
     const vizTreeData = useMemo(() => {
       if (folders && storyboards && privileges) {
@@ -267,25 +285,68 @@ export const VizPermissionForm = memo(
       ],
     );
 
+    const modulePermissionValues = useMemo(
+      () => [
+        {
+          text: t(
+            `modulePermissionLabel.${
+              PermissionLevels[PermissionLevels.Disable]
+            }`,
+          ),
+          value: PermissionLevels.Disable,
+        },
+        {
+          text: t(
+            `modulePermissionLabel.${
+              PermissionLevels[PermissionLevels.Enable]
+            }`,
+          ),
+          value: PermissionLevels.Enable,
+        },
+      ],
+      [t],
+    );
+    const createPermissionValues = useMemo(
+      () => [
+        {
+          text: t(
+            `createPermissionLabel.${
+              PermissionLevels[PermissionLevels.Disable]
+            }`,
+          ),
+          value: PermissionLevels.Disable,
+        },
+        {
+          text: t(
+            `createPermissionLabel.${
+              PermissionLevels[PermissionLevels.Create]
+            }`,
+          ),
+          value: PermissionLevels.Create,
+        },
+      ],
+      [t],
+    );
+
     return (
       <Wrapper className={classnames({ selected })}>
         <LoadingMask loading={permissionLoading}>
           <FormContent
             labelAlign="left"
-            labelCol={{ span: 3 }}
-            wrapperCol={{ span: 19 }}
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 18 }}
           >
             <IndependentPermissionSetting
               enabled={moduleEnabled}
-              label="功能权限"
-              extra="开启功能权限之后，用户才能在 Datart 界面上使用该功能"
-              values={MODULE_PERMISSION_VALUES}
+              label={t('modulePermission')}
+              extra={t('modulePermissionDesc')}
+              values={modulePermissionValues}
               onChange={independentPermissionChange('*')}
             />
-            <Form.Item label="资源明细">
+            <Form.Item label={t('resourceDetail')}>
               <Radio.Group value={vizType} onChange={vizTypeChange}>
-                <Radio value="folder">目录</Radio>
-                <Radio value="persentation">演示</Radio>
+                <Radio value="folder">{t('folder')}</Radio>
+                <Radio value="persentation">{t('presentation')}</Radio>
               </Radio.Group>
             </Form.Item>
             <Form.Item
@@ -309,8 +370,8 @@ export const VizPermissionForm = memo(
             {vizType === 'persentation' && (
               <IndependentPermissionSetting
                 enabled={storyboardCreateEnabled}
-                label="新增故事板"
-                values={CREATE_PERMISSION_VALUES}
+                label={t('createStoryboard')}
+                values={createPermissionValues}
                 onChange={independentPermissionChange(
                   VizResourceSubTypes.Storyboard,
                 )}

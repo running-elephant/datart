@@ -19,10 +19,10 @@
 import { Col, Popover, Row } from 'antd';
 import Theme from 'app/assets/theme/echarts_default_theme.json';
 import {
+  ColorTag,
   SingleColorSelection,
   ThemeColorSelection,
 } from 'app/components/ColorPicker';
-import { ColorTag } from 'app/components/ReactColorPicker';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
@@ -120,11 +120,11 @@ const AggregationColorizeAction: FC<{
           visible={selColorBoxStatus}
           trigger="click"
           placement="bottomRight"
-          overlayClassName="AggregationColorPopover"
+          overlayClassName="aggregation-colorpopover"
           content={
             <SingleColorSelection
               color={selectColor.value}
-              onOk={handleColorChange}
+              onChange={handleColorChange}
             />
           }
         ></Popover>

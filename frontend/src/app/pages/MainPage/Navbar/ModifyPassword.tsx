@@ -44,8 +44,7 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
   const loading = useSelector(selectModifyPasswordLoading);
   const [form] = Form.useForm();
   const t = useI18NPrefix('main.nav.account.changePassword');
-  const tgo = useI18NPrefix('global.operation');
-  const tgv = useI18NPrefix('global.validation');
+  const tg = useI18NPrefix('global');
 
   const reset = useCallback(() => {
     form.resetFields();
@@ -63,13 +62,13 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
         modifyAccountPassword({
           params,
           resolve: () => {
-            message.success(tgo('updateSuccess'));
+            message.success(tg('operation.updateSuccess'));
             onCancel();
           },
         }),
       );
     },
-    [dispatch, onCancel, tgo],
+    [dispatch, onCancel, tg],
   );
 
   return (
@@ -93,9 +92,11 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
           rules={[
             {
               required: true,
-              message: `${t('oldPassword')}${tgv('required')}`,
+              message: `${t('oldPassword')}${tg('validation.required')}`,
             },
-            { validator: getPasswordValidator(tgv('invalidPassword')) },
+            {
+              validator: getPasswordValidator(tg('validation.invalidPassword')),
+            },
           ]}
         >
           <Input.Password type="password" />
@@ -106,9 +107,11 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
           rules={[
             {
               required: true,
-              message: `${t('newPassword')}${tgv('required')}`,
+              message: `${t('newPassword')}${tg('validation.required')}`,
             },
-            { validator: getPasswordValidator(tgv('invalidPassword')) },
+            {
+              validator: getPasswordValidator(tg('validation.invalidPassword')),
+            },
           ]}
         >
           <Input.Password type="password" />
@@ -120,12 +123,12 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
           rules={[
             {
               required: true,
-              message: `${t('confirmPassword')}${tgv('required')}`,
+              message: `${t('confirmPassword')}${tg('validation.required')}`,
             },
             getConfirmPasswordValidator(
               'newPassword',
-              tgv('invalidPassword'),
-              tgv('passwordNotMatch'),
+              tg('validation.invalidPassword'),
+              tg('validation.passwordNotMatch'),
             ),
           ]}
         >
@@ -133,7 +136,7 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
         </FormItem>
         <Form.Item wrapperCol={{ offset: 7, span: 12 }}>
           <Button type="primary" htmlType="submit" loading={loading} block>
-            {t('save')}
+            {tg('button.save')}
           </Button>
         </Form.Item>
       </Form>

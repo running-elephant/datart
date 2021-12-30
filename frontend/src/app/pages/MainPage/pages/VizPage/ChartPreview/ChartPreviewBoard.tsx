@@ -24,7 +24,6 @@ import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { useMainSlice } from 'app/pages/MainPage/slice';
-// import { makeDownloadDataTask } from 'app/pages/MainPage/slice/thunks';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

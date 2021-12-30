@@ -120,6 +120,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
         dataConfigs,
         context,
       };
+
       switch (data.comType) {
         case ChartStyleSectionComponentType.CHECKBOX:
           return <BasicCheckbox {...props} />;

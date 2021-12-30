@@ -19,11 +19,11 @@ import { Form, InputNumber } from 'antd';
 import React, { memo } from 'react';
 import { SliderStepName } from '../..';
 
-export const SliderStep: React.FC<{}> = memo(() => {
+export const SliderStep: React.FC<{ label: string }> = memo(({ label }) => {
   return (
     <Form.Item
       name={SliderStepName}
-      label="步长"
+      label={label}
       validateTrigger={['onChange', 'onBlur']}
       rules={[{ required: true }]}
     >

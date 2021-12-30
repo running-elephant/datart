@@ -18,6 +18,7 @@ import {
 } from 'app/types/FilterControlPanel';
 import { getTime } from 'app/utils/time';
 import { FilterSqlOperator } from 'globalConstants';
+import i18next from 'i18next';
 import moment from 'moment';
 import { STORAGE_IMAGE_KEY_PREFIX } from '../constants';
 import {
@@ -35,7 +36,6 @@ import {
 import { ChartRequestFilter } from './../../ChartWorkbenchPage/models/ChartHttpRequest';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
-
 export const convertImageUrl = (urlKey: string = ''): string => {
   if (urlKey.startsWith(STORAGE_IMAGE_KEY_PREFIX)) {
     return localStorage.getItem(urlKey) || '';
@@ -475,4 +475,26 @@ export const getDistinctFiltersByColumn = (filter: ChartRequestFilter[]) => {
   });
 
   return Object.values(filterMap);
+};
+
+export const getDefaultWidgetName = (widget: Widget, index: number) => {
+  const widgetType = widget.config.type;
+  const subWidgetType = widget.config.content.type;
+  const typeTitle = i18next.t(`viz.widget.type.${widgetType}`);
+  const subTypeTitle = i18next.t(`viz.widget.type.${subWidgetType}`);
+  switch (widgetType) {
+    case 'chart':
+      return `${subTypeTitle}_${index}`;
+    case 'container':
+      return `${subTypeTitle}_${index}`;
+    case 'controller':
+      return `${subTypeTitle}_${index}`;
+    case 'media':
+      return `${subTypeTitle}_${index}`;
+    case 'query':
+    case 'reset':
+      return `${typeTitle}`;
+    default:
+      return `xxx${index}`;
+  }
 };

@@ -35,6 +35,7 @@ import {
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+import i18next from 'i18next';
 import produce from 'immer';
 import { RootState } from 'types';
 import { uuidv4 } from 'utils/utils';
@@ -44,7 +45,6 @@ import { ControllerConfig } from '../../components/ControllerWidgetPanel/types';
 import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from '../thunk';
 import { HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
-
 const { confirm } = Modal;
 export const clearEditBoardState =
   (boardId: string) => async (dispatch, getState) => {
@@ -91,11 +91,10 @@ export const deleteWidgetsAction = () => (dispatch, getState) => {
   });
 
   if (childWidgetIds.length > 0) {
+    const perStr = 'viz.widget.action.';
     confirm({
-      // TODO i18n
-      title: '注意',
-      content:
-        '您要删除的组件中 有Container 组件，删除会将容器内的组件一起删除',
+      title: i18next.t(perStr + 'confirmDel'),
+      content: i18next.t(perStr + 'confirmDel1'),
       onOk() {
         dispatch(editBoardStackActions.deleteWidgets(selectedIds));
       },

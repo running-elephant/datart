@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Form, FormInstance, Select } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
@@ -36,6 +37,7 @@ export const ValuesSetter: React.FC<{
   form: FormInstance<ControllerWidgetContent> | undefined;
   viewMap: Record<string, ChartDataView>;
 }> = ({ controllerType, form, viewMap }) => {
+  const tc = useI18NPrefix('viz.control');
   const getControllerConfig = useCallback(() => {
     return form?.getFieldValue('config') as ControllerConfig;
   }, [form]);
@@ -100,7 +102,7 @@ export const ValuesSetter: React.FC<{
 
       {isText && <TextSetter />}
 
-      {isNumberValue && <NumberSetter />}
+      {isNumberValue && <NumberSetter label={tc('defaultValue')} />}
 
       {isRangeNumberValue && <RangeNumberSetter />}
 
@@ -112,6 +114,7 @@ export const ValuesSetter: React.FC<{
                 <>
                   <MaxAndMinSetter />
                   <SliderSetter
+                    label={tc('defaultValue')}
                     style={{ paddingRight: '10px' }}
                     maxValue={getMaxAndMin().max}
                     minValue={getMaxAndMin().min}

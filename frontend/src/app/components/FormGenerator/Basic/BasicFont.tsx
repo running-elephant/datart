@@ -17,7 +17,7 @@
  */
 
 import { Select } from 'antd';
-import { ColorPickerPopover } from 'app/components/ReactColorPicker';
+import { ColorPickerPopover } from 'app/components/ColorPicker';
 import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import {
@@ -50,7 +50,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
       <BW label={!options?.hideLabel ? t(data.label) : ''}>
         <Group>
           <Select
-            placeholder={t('pleaseSelect')}
+            placeholder={t('select')}
             value={data.value?.fontFamily}
             dropdownMatchSelectWidth={false}
             onChange={handleSettingChange('fontFamily')}
@@ -65,7 +65,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
             ))}
           </Select>
           <Select
-            placeholder={t('pleaseSelect')}
+            placeholder={t('select')}
             value={data.value?.fontWeight}
             onChange={handleSettingChange('fontWeight')}
           >
@@ -79,7 +79,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
         <WithColorPicker>
           <Group>
             <Select
-              placeholder={t('pleaseSelect')}
+              placeholder={t('select')}
               value={data.value?.fontSize}
               onChange={handleSettingChange('fontSize')}
             >
@@ -90,7 +90,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
               ))}
             </Select>
             <Select
-              placeholder={t('pleaseSelect')}
+              placeholder={t('select')}
               value={data.value?.fontStyle}
               onChange={handleSettingChange('fontStyle')}
             >

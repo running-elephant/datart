@@ -17,6 +17,7 @@
  */
 import { Cascader, CascaderProps } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { saveToViewMapAction } from 'app/pages/DashBoardPage/pages/Board/slice/asyncActions';
 import {
@@ -40,6 +41,7 @@ export interface AssistViewFieldsProps
 }
 export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
   ({ onChange, value }) => {
+    const tc = useI18NPrefix(`viz.control`);
     const dispatch = useDispatch();
     const { orgId } = useContext(BoardContext);
     const [options, setOptions] = useState<CascaderOptionType[]>([]);
@@ -130,7 +132,7 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
     return (
       <Cascader
         allowClear
-        placeholder="select viewField"
+        placeholder={tc('selectViewField')}
         options={options}
         onChange={onChange as any}
         value={value}

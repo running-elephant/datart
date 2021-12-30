@@ -17,7 +17,6 @@
  */
 
 import { ChartLifecycle } from 'app/types/ChartLifecycle';
-import { Debugger } from 'utils/debugger';
 import Chart from './Chart';
 
 type BrokerContext = {

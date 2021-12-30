@@ -73,7 +73,7 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           {...rest}
           {...options}
           defaultValue={rest.default}
-          placeholder={t('pleaseSelect')}
+          placeholder={t('select')}
           onChange={handleSelectorValueChange}
         >
           {safeInvokeAction()?.map((o, index) => {

@@ -88,19 +88,18 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         drop(item: ChartDataSectionField & DragItem, monitor) {
           let items = Array.isArray(item) ? item : [item];
           let needDelete = true;
-
           if (
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN
           ) {
             const currentColumns: ChartDataSectionField[] = (
               currentConfig.rows || []
             ).concat(
-              items.map(i => ({
+              items.map(val => ({
                 uid: uuidv4(),
-                colName: i.colName,
-                category: i.category,
-                type: i.type,
-                aggregate: getDefaultAggregate(item),
+                colName: val.colName,
+                category: val.category,
+                type: val.type,
+                aggregate: getDefaultAggregate(val),
               })),
             );
             updateCurrentConfigColumns(currentConfig, currentColumns, true);
@@ -137,20 +136,19 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           let items = Array.isArray(item) ? item : [item];
 
           if (
-            Array.isArray(item) &&
             typeof currentConfig.actions === 'object' &&
-            item.every(val => val.type in (currentConfig.actions || {}))
+            !items.every(val => val.type in (currentConfig.actions || {}))
           ) {
-            //zh: 判断是否拖拽多个数据项 en: Determine whether to drag multiple data items
-            return true;
-          }
-
-          if (
-            typeof currentConfig.actions === 'object' &&
-            !(item.type in currentConfig.actions)
-          ) {
+            //zh: 判断现在拖动的数据项是否可以拖动到当前容器中 en: Determine whether the currently dragged data item can be dragged into the current container
             return false;
           }
+
+          // if (
+          //   typeof currentConfig.actions === 'object' &&
+          //   !(item.type in currentConfig.actions)
+          // ) {
+          //   return false;
+          // }
 
           if (currentConfig.allowSameField) {
             return true;

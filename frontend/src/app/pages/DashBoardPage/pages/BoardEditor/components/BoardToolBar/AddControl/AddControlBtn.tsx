@@ -38,7 +38,7 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   const t = useI18NPrefix(`viz.board.action`);
   const tFilterName = useI18NPrefix(`viz.common.enum.controllerFacadeTypes`);
   const tType = useI18NPrefix(`viz.board.controlTypes`);
-
+  const tWt = useI18NPrefix(`viz.widget.type`);
   const { boardId, boardType, showLabel } = useContext(BoardToolBarContext);
   const dispatch = useDispatch();
   const { config: boardConfig } = useContext(BoardConfigContext);
@@ -118,13 +118,11 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   ];
   const buttonControllers: ButtonItemType<WidgetType>[] = [
     {
-      name: '查询按钮',
       icon: '',
       type: 'query',
       disabled: !!hasQueryControl,
     },
     {
-      name: '重置按钮',
       icon: '',
       type: 'reset',
       disabled: !!hasResetControl,
@@ -168,7 +166,7 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
       >
         {buttonControllers.map(({ name, icon, type, disabled }) => (
           <Menu.Item key={type} icon={icon} disabled={disabled}>
-            {name}
+            {tWt(type)}
           </Menu.Item>
         ))}
       </Menu.ItemGroup>

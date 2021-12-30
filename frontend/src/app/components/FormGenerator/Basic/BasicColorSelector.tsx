@@ -17,7 +17,7 @@
  */
 
 import { Col, Row } from 'antd';
-import { ColorPickerPopover } from 'app/components/ReactColorPicker';
+import { ColorPickerPopover } from 'app/components/ColorPicker';
 import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
@@ -85,4 +85,5 @@ const StyledColor = styled.div`
   height: 24px;
   background-color: ${props => props.color};
   border: ${props => (props.color === 'transparent' ? '1px solid red' : '0px')};
+  cursor: pointer;
 `;

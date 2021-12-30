@@ -16,16 +16,18 @@
  * limitations under the License.
  */
 import { Checkbox, Form } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { FC } from 'react';
 import NumberSet from './BasicSet/NumberSet';
 export const AutoUpdateSet: FC = () => {
+  const t = useI18NPrefix(`viz.board.setting`);
   return (
     <>
       <Form.Item valuePropName="checked" name="autoUpdate">
-        <Checkbox>定时同步数据</Checkbox>
+        <Checkbox>{t('openAutoUpdate')}</Checkbox>
       </Form.Item>
       <Form.Item preserve name="frequency">
-        <NumberSet label={'定时同步频率(秒)'} name={'frequency'} />
+        <NumberSet label={t('frequency')} name={'frequency'} />
       </Form.Item>
     </>
   );

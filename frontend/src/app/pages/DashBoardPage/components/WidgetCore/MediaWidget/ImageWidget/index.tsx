@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Empty } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
@@ -37,7 +38,7 @@ const ImageWidget: React.FC<{}> = () => {
   const { imageConfig } = widget.config.content as MediaWidgetContent;
   const widgetBgImage = widget.config.background.image;
   const [rect, refDom] = useClientRect<HTMLDivElement>(32);
-
+  const t = useI18NPrefix(`viz.board.setting`);
   const widthBigger = useMemo(() => {
     return rect.width >= rect.height;
   }, [rect]);
@@ -67,11 +68,15 @@ const ImageWidget: React.FC<{}> = () => {
   }, [imageRatioCss, imageConfig?.type]);
   const renderImage = useMemo(() => {
     return editing ? (
-      <UploadDragger value={widgetBgImage} onChange={onChange} />
+      <UploadDragger
+        value={widgetBgImage}
+        onChange={onChange}
+        placeholder={t('uploadTip')}
+      />
     ) : widgetBgImage ? null : (
       <Empty description="" />
     );
-  }, [editing, onChange, widgetBgImage]);
+  }, [editing, onChange, t, widgetBgImage]);
   return <Wrap ref={refDom}>{renderImage}</Wrap>;
 };
 export default ImageWidget;
