@@ -619,6 +619,9 @@
     },
     "widget": {
       "widget": "Widget",
+      "associatedWidget":"Associated Widgets",
+      "widgetName":"Widget Name",
+      "widgetType":"Widget Type",
       "type": {
         "chart": "Chart",
         "widgetChart": "privateChart",

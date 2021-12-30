@@ -617,6 +617,9 @@
     },
     "widget": {
       "widget": "组件",
+      "associatedWidget":"关联组件",
+      "widgetName":"组件名称",
+      "widgetType":"组件类型",
       "type": {
         "chart": "数据图表",
         "widgetChart": "私有图表",
