@@ -18,6 +18,7 @@
 
 import { Checkbox, Form, FormInstance, Select } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { User } from 'app/slice/types';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import debounce from 'lodash/debounce';
@@ -34,6 +35,7 @@ export const InviteForm = memo(
   ({ formProps, afterClose, ...modalProps }: ModalFormProps) => {
     const [options, setOptions] = useState<ValueType[]>([]);
     const formRef = useRef<FormInstance>();
+    const t = useI18NPrefix('member.form');
 
     const debouncedSearchUser = useMemo(() => {
       const searchUser = async (val: string) => {
@@ -71,13 +73,13 @@ export const InviteForm = memo(
         <Form.Item name="emails">
           <Select<ValueType>
             mode="tags"
-            placeholder="请搜索或粘贴被邀请成员邮箱"
+            placeholder={t('search')}
             options={options}
             onSearch={debouncedSearchUser}
           />
         </Form.Item>
         <Form.Item name="sendMail" valuePropName="checked" initialValue={true}>
-          <Checkbox>需要被邀请成员邮件确认</Checkbox>
+          <Checkbox>{t('needConfirm')}</Checkbox>
         </Form.Item>
       </ModalForm>
     );

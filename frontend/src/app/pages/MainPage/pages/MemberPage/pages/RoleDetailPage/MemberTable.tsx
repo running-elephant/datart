@@ -22,6 +22,7 @@ import {
   SearchOutlined,
 } from '@ant-design/icons';
 import { Button, Col, Input, Row, Table } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { User } from 'app/slice/types';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import debounce from 'lodash/debounce';
@@ -40,6 +41,9 @@ export const MemberTable = memo(
   ({ loading, dataSource, onAdd, onChange }: MemberTableProps) => {
     const [keywords, setKeywords] = useState('');
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+    const t = useI18NPrefix('member.roleDetail');
+    const tg = useI18NPrefix('global');
+
     const filteredSource = useMemo(
       () =>
         dataSource.filter(
@@ -73,19 +77,19 @@ export const MemberTable = memo(
 
     const columns = useMemo(
       () => [
-        { dataIndex: 'username', title: '用户名' },
-        { dataIndex: 'email', title: '邮箱' },
-        { dataIndex: 'name', title: '姓名' },
+        { dataIndex: 'username', title: t('username') },
+        { dataIndex: 'email', title: t('email') },
+        { dataIndex: 'name', title: t('name') },
         {
-          title: '操作',
+          title: tg('title.action'),
           width: 80,
           align: 'center' as const,
           render: (_, record) => (
-            <Action onClick={removeMember(record.id)}>移除</Action>
+            <Action onClick={removeMember(record.id)}>{t('remove')}</Action>
           ),
         },
       ],
-      [removeMember],
+      [removeMember, t, tg],
     );
 
     return (
@@ -98,7 +102,7 @@ export const MemberTable = memo(
               className="btn"
               onClick={onAdd}
             >
-              添加成员
+              {t('addMember')}
             </Button>
           </Col>
           <Col span={14}>
@@ -109,13 +113,13 @@ export const MemberTable = memo(
                 className="btn"
                 onClick={removeSelectedMember}
               >
-                批量删除
+                {t('deleteAll')}
               </Button>
             )}
           </Col>
           <Col span={6}>
             <Input
-              placeholder="搜索成员关键字"
+              placeholder={t('searchMember')}
               prefix={<SearchOutlined className="icon" />}
               bordered={false}
               onChange={debouncedSearch}

@@ -781,6 +781,51 @@
       "duplicateName": "名称重复"
     }
   },
+  "member": {
+    "memberDetail": {
+      "title": "成员详情",
+      "grantOwner": "设为组织拥有者",
+      "revokeOwner": "撤销拥有者",
+      "remove": "移除成员",
+      "removeConfirm": "确定移除该成员？",
+      "removeSuccess": "移除成功",
+      "grantSuccess": "设置成功",
+      "revokeSuccess": "撤销成功",
+      "username": "用户名",
+      "email": "邮箱",
+      "name": "用户姓名",
+      "roles": "角色列表",
+      "assignRole": "为用户指定角色"
+    },
+    "roleDetail": {
+      "role": "角色",
+      "createSuccess": "新建角色成功",
+      "roleName": "名称",
+      "description": "描述",
+      "relatedMember": "关联成员",
+      "addMember": "添加成员",
+      "deleteAll": "批量删除",
+      "searchMember": "搜索成员关键字",
+      "username": "用户名",
+      "email": "邮箱",
+      "name": "用户姓名",
+      "remove": "移除"
+    },
+    "form": {
+      "search": "请搜索或粘贴被邀请成员邮箱",
+      "needConfirm": "需要被邀请成员邮件确认"
+    },
+    "sidebar": {
+      "member": "成员",
+      "role": "角色",
+      "memberTitle": "成员列表",
+      "inviteMember": "邀请成员",
+      "inviteSuccess": "邀请邮件已成功发送",
+      "invalidEmail": "请检查以下无效邮件地址",
+      "roleTitle": "角色列表",
+      "addRole": "新建角色"
+    }
+  },
   "share": {
     "common": {
       "confirm": "请确认",

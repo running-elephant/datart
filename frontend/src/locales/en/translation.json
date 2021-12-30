@@ -782,6 +782,51 @@
       "duplicateName": "Duplicate Name"
     }
   },
+  "member": {
+    "memberDetail": {
+      "title": "Member detail",
+      "grantOwner": "Granted to organization owner",
+      "revokeOwner": "Revoke owner",
+      "remove": "Remove",
+      "removeConfirm": "Remove confirm",
+      "removeSuccess": "Remove successful",
+      "grantSuccess": "Grant successful",
+      "revokeSuccess": "Revoke successful",
+      "username": "Username",
+      "email": "Email",
+      "name": "Name",
+      "roles": "Roles",
+      "assignRole": "Assign roles"
+    },
+    "roleDetail": {
+      "role": "Role",
+      "createSuccess": "Role created successfully",
+      "roleName": "Name",
+      "description": "Description",
+      "relatedMember": "Related member",
+      "addMember": "Add member",
+      "deleteAll": "Delete all",
+      "searchMember": "Search member",
+      "username": "Username",
+      "email": "Email",
+      "name": "Name",
+      "remove": "Remove"
+    },
+    "form": {
+      "search": "Search or paste the emails of invited members",
+      "needConfirm": "Need email confirmation"
+    },
+    "sidebar": {
+      "member": "Members",
+      "role": "Roles",
+      "memberTitle": "Members",
+      "inviteMember": "Invite member",
+      "inviteSuccess": "The invitation email has been sent successfully",
+      "invalidEmail": "Invalid email addresses",
+      "roleTitle": "Roles",
+      "addRole": "Create role"
+    }
+  },
   "share": {
     "common": {
       "confirm": "Confirm",

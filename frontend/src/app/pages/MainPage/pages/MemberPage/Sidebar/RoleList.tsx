@@ -20,6 +20,7 @@ import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { List } from 'antd';
 import { ListItem, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
@@ -38,6 +39,8 @@ export const RoleList = memo(() => {
     '/organizations/:orgId/roles/:roleId',
   );
   const roleId = matchRoleDetail?.params.roleId;
+  const t = useI18NPrefix('member.sidebar');
+
   const { filteredData, debouncedSearch } = useDebouncedSearch(
     list,
     (keywords, d) => d.name.toLowerCase().includes(keywords.toLowerCase()),
@@ -61,16 +64,16 @@ export const RoleList = memo(() => {
   const titleProps = useMemo(
     () => ({
       key: 'list',
-      subTitle: '角色列表',
+      subTitle: t('roleTitle'),
       search: true,
       add: {
-        items: [{ key: 'add', text: '新建角色' }],
+        items: [{ key: 'add', text: t('addRole') }],
         icon: <PlusOutlined />,
         callback: toAdd,
       },
       onSearch: debouncedSearch,
     }),
-    [toAdd, debouncedSearch],
+    [toAdd, debouncedSearch, t],
   );
 
   return (

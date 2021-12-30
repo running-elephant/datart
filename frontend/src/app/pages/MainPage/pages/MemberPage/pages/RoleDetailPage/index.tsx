@@ -18,6 +18,7 @@
 
 import { Button, Card, Form, Input, message, Popconfirm } from 'antd';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { User } from 'app/slice/types';
 import debounce from 'debounce-promise';
 import { CommonFormTypes, DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
@@ -41,7 +42,6 @@ import {
   editRole,
   getRoleMembers,
 } from '../../slice/thunks';
-import useI18NPrefix from 'app/hooks/useI18NPrefix'
 import { Role } from '../../slice/types';
 import { MemberForm } from './MemberForm';
 import { MemberTable } from './MemberTable';
@@ -60,6 +60,7 @@ export function RoleDetailPage() {
   const editingRole = useSelector(selectEditingRole);
   const getRoleMembersLoading = useSelector(selectGetRoleMembersLoading);
   const saveRoleLoading = useSelector(selectSaveRoleLoading);
+  const t = useI18NPrefix('member.roleDetail');
   const tg = useI18NPrefix('global');
   const { params } = useRouteMatch<{ roleId: string }>();
   const { roleId } = params;
@@ -112,7 +113,7 @@ export function RoleDetailPage() {
             addRole({
               role: { ...values, avatar: '', orgId },
               resolve: () => {
-                message.success('新建成功');
+                message.success(t('createSuccess'));
                 resetForm();
               },
             }),
@@ -124,7 +125,7 @@ export function RoleDetailPage() {
               role: { ...values, orgId },
               members: memberTableDataSource,
               resolve: () => {
-                message.success('修改成功');
+                message.success(tg('operation.updateSuccess'));
               },
             }),
           );
@@ -133,7 +134,7 @@ export function RoleDetailPage() {
           break;
       }
     },
-    [dispatch, orgId, formType, memberTableDataSource, resetForm],
+    [dispatch, orgId, formType, memberTableDataSource, resetForm, t, tg],
   );
 
   const del = useCallback(() => {
@@ -141,17 +142,17 @@ export function RoleDetailPage() {
       deleteRole({
         id: editingRole!.info.id,
         resolve: () => {
-          message.success('删除成功');
+          message.success(tg('operation.deleteSuccess'));
           history.replace(`/organizations/${orgId}/roles`);
         },
       }),
     );
-  }, [dispatch, history, orgId, editingRole]);
+  }, [dispatch, history, orgId, editingRole, tg]);
 
   return (
     <Wrapper>
       <DetailPageHeader
-        title={`${tg(`modal.title.${formType}`)}角色`}
+        title={`${tg(`modal.title.${formType}`)}${t('role')}`}
         actions={
           <>
             <Button
@@ -159,11 +160,11 @@ export function RoleDetailPage() {
               loading={saveRoleLoading}
               onClick={form.submit}
             >
-              保存
+              {tg('button.save')}
             </Button>
             {formType === CommonFormTypes.Edit && (
-              <Popconfirm title="确认删除？" onConfirm={del}>
-                <Button danger>删除角色</Button>
+              <Popconfirm title={tg('operation.deleteConfirm')} onConfirm={del}>
+                <Button danger>{`${tg('button.delete')}${t('role')}`}</Button>
               </Popconfirm>
             )}
           </>
@@ -181,10 +182,13 @@ export function RoleDetailPage() {
           >
             <Form.Item
               name="name"
-              label="名称"
+              label={t('roleName')}
               validateFirst
               rules={[
-                { required: true, message: '名称不能为空' },
+                {
+                  required: true,
+                  message: `${t('roleName')}${tg('validation.required')}`,
+                },
                 {
                   validator: debounce((_, value) => {
                     if (value === editingRole?.info.name) {
@@ -205,11 +209,11 @@ export function RoleDetailPage() {
             >
               <Input />
             </Form.Item>
-            <Form.Item name="description" label="描述">
+            <Form.Item name="description" label={t('description')}>
               <Input.TextArea />
             </Form.Item>
             {formType === CommonFormTypes.Edit && (
-              <Form.Item label="关联成员" wrapperCol={{ span: 17 }}>
+              <Form.Item label={t('relatedMember')} wrapperCol={{ span: 17 }}>
                 <MemberTable
                   loading={getRoleMembersLoading}
                   dataSource={memberTableDataSource}
@@ -221,7 +225,7 @@ export function RoleDetailPage() {
           </Form>
         </Card>
         <MemberForm
-          title="添加成员"
+          title={t('addMember')}
           visible={memberFormVisible}
           width={992}
           onCancel={hideMemberForm}

@@ -20,6 +20,7 @@ import { LoadingOutlined, UserAddOutlined } from '@ant-design/icons';
 import { List, Modal } from 'antd';
 import { Avatar, ListItem, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   memo,
   ReactElement,
@@ -53,6 +54,8 @@ export const MemberList = memo(() => {
     '/organizations/:orgId/members/:memberId',
   );
   const memberId = matchRoleDetail?.params.memberId;
+  const t = useI18NPrefix('member.sidebar');
+
   const { filteredData, debouncedSearch } = useDebouncedSearch(
     list,
     (keywords, d) => {
@@ -88,7 +91,7 @@ export const MemberList = memo(() => {
 
             if (values.sendMail) {
               if (success.length > 0) {
-                title.push('邀请邮件已成功发送');
+                title.push(t('inviteSuccess'));
               }
             } else {
               if (success.length > 0) {
@@ -97,7 +100,7 @@ export const MemberList = memo(() => {
             }
 
             if (fail.length > 0) {
-              title.push('请检查以下无效邮件地址');
+              title.push(t('invalidEmail'));
               fail.forEach(e => {
                 content.push(<p>{e}</p>);
               });
@@ -115,7 +118,7 @@ export const MemberList = memo(() => {
         }),
       );
     },
-    [dispatch, orgId],
+    [dispatch, orgId, t],
   );
 
   const toDetail = useCallback(
@@ -128,16 +131,16 @@ export const MemberList = memo(() => {
   const titleProps = useMemo(
     () => ({
       key: 'list',
-      subTitle: '成员列表',
+      subTitle: t('memberTitle'),
       search: true,
       add: {
-        items: [{ key: 'invite', text: '邀请成员' }],
+        items: [{ key: 'invite', text: t('inviteMember') }],
         icon: <UserAddOutlined />,
         callback: showInviteForm,
       },
       onSearch: debouncedSearch,
     }),
-    [showInviteForm, debouncedSearch],
+    [showInviteForm, debouncedSearch, t],
   );
   return (
     <Wrapper>
@@ -166,7 +169,7 @@ export const MemberList = memo(() => {
         />
       </ListWrapper>
       <InviteForm
-        title="邀请成员"
+        title={t('inviteMember')}
         visible={inviteFormVisible}
         confirmLoading={inviteLoading}
         onSave={invite}

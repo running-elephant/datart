@@ -18,6 +18,7 @@
 
 import { TeamOutlined, UserOutlined } from '@ant-design/icons';
 import { ListSwitch } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -32,6 +33,7 @@ export const Sidebar = memo(() => {
   const history = useHistory();
   const orgId = useSelector(selectOrgId);
   const { url } = useRouteMatch();
+  const t = useI18NPrefix('member.sidebar');
 
   useEffect(() => {
     const urlArr = url.split('/');
@@ -40,14 +42,14 @@ export const Sidebar = memo(() => {
 
   const titles = useMemo(
     () => [
-      { key: 'members', icon: <UserOutlined />, text: '成员' },
+      { key: 'members', icon: <UserOutlined />, text: t('member') },
       {
         key: 'roles',
         icon: <TeamOutlined />,
-        text: '角色',
+        text: t('role'),
       },
     ],
-    [],
+    [t],
   );
 
   const switchSelect = useCallback(
