@@ -18,11 +18,12 @@
 
 package datart.data.provider.calcite;
 
-import org.apache.calcite.sql.SqlCall;
-import org.apache.calcite.sql.SqlFunction;
-import org.apache.calcite.sql.SqlOperator;
+import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.util.SqlBasicVisitor;
+import org.apache.calcite.sql.validate.SqlNameMatchers;
+
+import java.util.LinkedList;
 
 public class SqlFunctionRegisterVisitor extends SqlBasicVisitor<Object> {
 
@@ -30,13 +31,20 @@ public class SqlFunctionRegisterVisitor extends SqlBasicVisitor<Object> {
     public Object visit(SqlCall call) {
         SqlOperator operator = call.getOperator();
         if (operator instanceof SqlFunction) {
-            registerIfNotExists(operator);
+            registerIfNotExists((SqlFunction) operator);
         }
         return operator.acceptCall(this, call);
     }
 
-    private void registerIfNotExists(SqlOperator sqlFunction) {
-        SqlStdOperatorTable.instance().register(sqlFunction);
+    private void registerIfNotExists(SqlFunction sqlFunction) {
+        SqlStdOperatorTable opTab = SqlStdOperatorTable.instance();
+        LinkedList<SqlOperator> list = new LinkedList<>();
+        opTab.lookupOperatorOverloads(sqlFunction.getSqlIdentifier(), null, SqlSyntax.FUNCTION, list,
+                SqlNameMatchers.withCaseSensitive(sqlFunction.getSqlIdentifier().isComponentQuoted(0)));
+        if (list.size() > 0) {
+            return;
+        }
+        opTab.register(sqlFunction);
     }
 
 }
