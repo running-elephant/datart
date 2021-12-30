@@ -737,7 +737,7 @@
   "view": {
     "loading": "Loading...",
     "selectSource": "You must select a source",
-    "empty": "Select view in the sidebar",
+    "empty": "Select views in the sidebar",
     "resultEmpty1": "Click ",
     "resultEmpty2": " button to execute, the results will be displayed here",
     "errorTitle": "Error occurred",
@@ -781,7 +781,7 @@
     },
     "columnPermission": {
       "title": "Column permissions",
-      "search": "Search role name",
+      "search": "Search role keywords",
       "partial": "Partial",
       "none": "None",
       "all": "All"
@@ -882,6 +882,50 @@
       "addRole": "Create role"
     }
   },
+  "permission": {
+    "empty1": "Select ",
+    "emptyResource": "resources",
+    "emptySubject": "roles or members",
+    "empty2": " in the sidebar",
+    "allResources": "All resources",
+    "folder": "Folder",
+    "presentation": "Presentation",
+    "search": "Search keywords",
+    "searchResources": "Search resource keywords",
+    "member": "Member",
+    "role": "Role",
+    "modulePermission": "Module Permission",
+    "modulePermissionDesc": "You can only access the module after enabling the module permission",
+    "resourceDetail": "Resource detail",
+    "createStoryboard": "Create storyboard",
+    "resourceName": "Resource name",
+    "privileges": "Privileges",
+    "add": "Create ",
+    "viewpoint": {
+      "subject": "Subject view",
+      "resource": "Resource view"
+    },
+    "module": {
+      "source": "Source",
+      "view": "View",
+      "viz": "Viz",
+      "schedule": "Schedule"
+    },
+    "modulePermissionLabel": {
+      "Enable": "Enable",
+      "Disable": "Disable"
+    },
+    "createPermissionLabel": {
+      "Create": "Enable",
+      "Disable": "Disable"
+    },
+    "privilegeLabel": {
+      "viz": ["View", "Download", "Share", "Manage"],
+      "view": ["Access", "Manage"],
+      "source": ["Access", "Manage"],
+      "schedule": ["Manage"]
+    }
+  },
   "share": {
     "common": {
       "confirm": "Confirm",
@@ -901,7 +945,7 @@
     },
     "listTitle": {
       "search": "Search",
-      "searchValue": "Search name keywords"
+      "searchValue": "Search keywords"
     }
   }
 }
