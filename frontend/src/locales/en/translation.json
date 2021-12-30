@@ -162,7 +162,7 @@
     },
     "subNavs": {
       "variables": {
-        "title": "Public variable Settings"
+        "title": "Public variables"
       },
       "orgSettings": {
         "title": "Organization Settings"
