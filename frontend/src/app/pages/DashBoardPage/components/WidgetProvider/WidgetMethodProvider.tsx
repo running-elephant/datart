@@ -18,6 +18,7 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
+import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams } from 'app/types/DatartChartBase';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
@@ -63,6 +64,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   widgetId,
   children,
 }) => {
+  const t = usePrefixI18N('viz.widget.action');
   const { boardId, editing, renderMode, orgId } = useContext(BoardContext);
 
   const dispatch = useDispatch();
@@ -73,10 +75,9 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     (type: WidgetType, wid: string) => {
       if (type === 'container') {
         confirm({
-          // TODO i18n
-          title: '确认删除',
+          title: t('confirmDel'),
           icon: <ExclamationCircleOutlined />,
-          content: '该组件内的组件也会被删除,确认是否删除？',
+          content: t('ContainerConfirmDel'),
           onOk() {
             dispatch(editBoardStackActions.deleteWidgets([wid]));
           },
@@ -95,7 +96,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       }
       dispatch(editBoardStackActions.deleteWidgets([wid]));
     },
-    [dispatch, boardId],
+    [dispatch, t, boardId],
   );
   const onWidgetEdit = useCallback(
     (widget: Widget, wid: string) => {

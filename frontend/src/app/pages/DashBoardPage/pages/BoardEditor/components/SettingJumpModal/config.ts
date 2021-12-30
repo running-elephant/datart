@@ -17,6 +17,6 @@
  */
 
 export const jumpTypes: { name: string; value: string }[] = [
-  { value: 'INTERNAL', name: '仪表盘 / 数据图表' },
-  { value: 'URL', name: 'URL' },
+  { value: 'INTERNAL', name: '' },
+  { value: 'URL', name: '' },
 ];

@@ -339,7 +339,6 @@
         "filterVisibility": "是否可见",
         "aggregates": "聚合方式",
         "filterOption": "筛选方式",
-
         "visibility": "是否显示",
         "facade": "控制器",
         "widthOption": "宽度",
@@ -742,6 +741,9 @@
     },
     "widget": {
       "widget": "组件",
+      "associatedWidget": "关联组件",
+      "widgetName": "组件名称",
+      "widgetType": "组件类型",
       "type": {
         "chart": "数据图表",
         "widgetChart": "私有图表",
@@ -763,12 +765,39 @@
         "fullScreen": "全屏",
         "edit": "编辑",
         "delete": "删除",
+        "confirmDel": "确认删除",
+        "ContainerConfirmDel": "该组件内的组件也会被删除,确认是否删除？",
         "info": "基本信息",
         "makeLinkage": "联动设置",
         "closeLinkage": "关闭联动",
         "makeJump": "跳转设置",
         "closeJump": "关闭跳转"
       }
+    },
+    "linkage": {
+      "title": "联动设置",
+      "dataSource": "Data source",
+      "associatedWidgets": "关联组件",
+      "associatedFields": "关联字段",
+      "selectTriggers": "选择触发字段",
+      "selectLinker": "选择联动字段"
+    },
+    "jump": {
+      "title": "跳转设置",
+      "mode": "跳转方式",
+      "target": "跳转目标",
+      "INTERNAL": "仪表盘 / 数据图表",
+      "URL": "URL",
+      "parameters": "Parameters",
+      "controller": "关联控制器",
+      "associatedFields": "关联字段"
+    },
+    "associate": {
+      "title": "关联字段/变量",
+      "field": "字段",
+      "variable": "变量",
+      "noValueErr": "请关联字段 或 变量",
+      "valueErr": "请选择字段 或 两个变量"
     },
     "sidebar": {
       "folder": "目录",
@@ -973,6 +1002,50 @@
       "invalidEmail": "请检查以下无效邮件地址",
       "roleTitle": "角色列表",
       "addRole": "新建角色"
+    }
+  },
+  "permission": {
+    "empty1": "请在左侧列表选择",
+    "emptyResource": "资源项",
+    "emptySubject": "角色或用户",
+    "empty2": "",
+    "allResources": "所有资源",
+    "folder": "目录",
+    "presentation": "演示",
+    "search": "搜索关键字",
+    "searchResources": "搜索资源名称关键字",
+    "member": "成员",
+    "role": "角色",
+    "modulePermission": "功能权限",
+    "modulePermissionDesc": "开启功能权限之后，用户才能在 Datart 界面上使用该功能",
+    "resourceDetail": "资源明细",
+    "createStoryboard": "新增故事板",
+    "resourceName": "资源名称",
+    "privileges": "权限详情",
+    "add": "新建",
+    "viewpoint": {
+      "subject": "常规视图",
+      "resource": "资源视图"
+    },
+    "module": {
+      "source": "数据源",
+      "view": "数据视图",
+      "viz": "可视化",
+      "schedule": "定时任务"
+    },
+    "modulePermissionLabel": {
+      "Enable": "启用",
+      "Disable": "禁用"
+    },
+    "createPermissionLabel": {
+      "Create": "启用",
+      "Disable": "禁用"
+    },
+    "privilegeLabel": {
+      "viz": { "0": "查看", "1": "下载", "2": "分享", "3": "管理" },
+      "view": { "0": "使用", "1": "管理" },
+      "source": { "0": "使用", "1": "管理" },
+      "schedule": { "0": "管理" }
     }
   },
   "share": {
