@@ -42,7 +42,7 @@ const ExactTimeSelector: FC<
       showTime
       value={moment(time as string)}
       onChange={handleMomentTimeChange}
-      placeholder={t('pleaseSelect')}
+      placeholder={t('select')}
     />
   );
 });

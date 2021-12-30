@@ -32,6 +32,18 @@
         "add": "Create ",
         "edit": "Edit "
       }
+    },
+    "columnType": {
+      "string": "String",
+      "numeric": "Number",
+      "date": "Date"
+    },
+    "columnCategory": {
+      "uncategorized": "Uncategorized",
+      "country": "Country",
+      "provinceorstate": "ProvinceOrState",
+      "city": "City",
+      "county": "County"
     }
   },
   "login": {
@@ -238,7 +250,7 @@
           "ago": "Ago",
           "current": "Current",
           "fromNow": "From Now",
-          "pleaseSelect": "Please Select",
+          "select": "Select",
           "currentTime": "Current Time",
           "startTime": "Start Time",
           "endTime": "end Time",
@@ -323,10 +335,10 @@
       },
       "style": {
         "font": "Font",
-        "pleaseSelect": "Please select ...",
+        "select": "Select ...",
         "table": {
           "header": {
-            "newName": "Please input a new header name",
+            "newName": "Enter a new header name",
             "merge": "Merge",
             "reset": "Reset",
             "moveUp": "moveUp",
@@ -347,7 +359,7 @@
             "add": "Add",
             "edit": "Edit",
             "remove": "Remove",
-            "confirm": "Please Confirm"
+            "confirm": "Confirm"
           },
           "modal": {
             "title": "Condition Style",
@@ -398,8 +410,8 @@
         "info": "Info",
         "sort": "Sort",
         "size": "Size",
-        "drop": "Please drag some data fields here",
-        "dropCount": "Please drag {{count}} fields here at least",
+        "drop": "Drag some data fields here",
+        "dropCount": "Drag {{count}} fields here at least",
         "actions": {
           "sort": {
             "title": "Sort",
@@ -462,7 +474,7 @@
         }
       },
       "setting": {
-        "pleaseSelect": "Please select ...",
+        "select": "Select ...",
         "displayCount": "Display Count",
         "enableCache": "Enable Cache",
         "cacheExpire": "Cache Expire Time(sec)",
@@ -667,6 +679,84 @@
       "noScale": "noScale"
     }
   },
+  "view": {
+    "loading": "Loading...",
+    "selectSource": "You must select a source",
+    "empty": "Select view in the sidebar",
+    "resultEmpty1": "Click ",
+    "resultEmpty2": " button to execute, the results will be displayed here",
+    "errorTitle": "Error occurred",
+    "tabs": {
+      "discard": "Discard",
+      "cancel": "Cancel",
+      "execute": "Execute",
+      "warning": "There are unexecuted changes, still execute?"
+    },
+    "editor": {
+      "folder": "Folder",
+      "source": "Select source",
+      "run": "Run",
+      "runSelection": "Run selection",
+      "runWinTip": "Win: [Ctrl + Enter]",
+      "runMacTip": "Mac: [Command + Enter]",
+      "beautify": "Beautify",
+      "save": "保存",
+      "saveWinTip": "Win: [Ctrl + S]",
+      "saveMacTip": "Mac: [Command + S]",
+      "info": "Info",
+      "saveAs": "Save as",
+      "saveFragment": "Save Fragment",
+      "readonlyTip": "Not editable in recycle"
+    },
+    "properties": {
+      "reference": "Source reference",
+      "variable": "Variables",
+      "columnPermissions": "Column Permissions"
+    },
+    "resource": {
+      "title": "Source info",
+      "search": "Search database / table / column"
+    },
+    "variable": {
+      "title": "Variables",
+      "formTitle": "variable",
+      "add": "Create variable",
+      "prefix": "[Public]",
+      "suffix": "duplicate"
+    },
+    "columnPermission": {
+      "title": "Column permissions",
+      "search": "Search role name",
+      "partial": "Partial",
+      "none": "None",
+      "all": "All"
+    },
+    "sidebar": {
+      "title": "Views",
+      "addView": "Create view",
+      "addFolder": "Create folder",
+      "parent": "Parent",
+      "recycle": "Recycle"
+    },
+    "saveForm": {
+      "title": "View",
+      "name": "Name",
+      "folder": "Directory",
+      "root": "Root",
+      "advanced": "Advanced",
+      "concurrencyControl": "Concurrency control",
+      "concurrencyControlMode": "Mode",
+      "dirtyread": "Dirty read",
+      "fastfailover": "Fast failover",
+      "cache": "Cache",
+      "cacheExpires": "Expires"
+    },
+    "schemaTable": {
+      "category": "Category",
+      "type": "Type",
+      "typeAndCategory": "Type & Category"
+    }
+  },
   "source": {
     "source": "Source",
     "testSuccess": "Test connection succeeded",
@@ -674,7 +764,7 @@
     "archived": "Archived ",
     "noPermission": "You do not have permission to access this page",
     "sidebar": {
-      "title": "Source List",
+      "title": "Sources",
       "add": "Create source",
       "recycle": "Recycle"
     },
@@ -694,13 +784,13 @@
   },
   "share": {
     "common": {
-      "confirm": "Please Confirm",
+      "confirm": "Confirm",
       "ok": "OK",
       "cancel": "Cancel"
     },
     "modal": {
       "password": "Password",
-      "pleaseInputPassword": "please input password"
+      "enterPassword": "Enter password"
     }
   },
   "components": {

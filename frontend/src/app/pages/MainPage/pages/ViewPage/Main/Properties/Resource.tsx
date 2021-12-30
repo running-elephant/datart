@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   CalendarOutlined,
   DatabaseOutlined,
@@ -8,6 +26,7 @@ import {
 } from '@ant-design/icons';
 import { Col, Input, Row } from 'antd';
 import { ListTitle, Tree } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
 import { selectDataProviderDatabaseListLoading } from 'app/pages/MainPage/slice/selectors';
 import { getDataProviderDatabases } from 'app/pages/MainPage/slice/thunks';
@@ -43,6 +62,7 @@ export const Resource = memo(() => {
   const databaseListLoading = useSelector(
     selectDataProviderDatabaseListLoading,
   );
+  const t = useI18NPrefix('view.resource');
 
   const { filteredData, onExpand, debouncedSearch, expandedRowKeys } =
     useSearchAndExpand(
@@ -143,12 +163,12 @@ export const Resource = memo(() => {
 
   return (
     <Container>
-      <ListTitle title="数据源信息" />
+      <ListTitle title={t('title')} />
       <Searchbar>
         <Col span={24}>
           <Input
             prefix={<SearchOutlined className="icon" />}
-            placeholder="搜索数据库 / 表 / 字段关键字"
+            placeholder={t('search')}
             className="input"
             bordered={false}
             onChange={debouncedSearch}
