@@ -17,6 +17,7 @@
  */
 
 import { ChartDatasetPageInfo } from 'app/types/ChartDataset';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { getStyleValue } from 'app/utils/chartHelper';
 import {
   formatTime,
@@ -114,13 +115,13 @@ export class ChartDataRequestBuilder {
     this.script = script || false;
     this.aggregation = aggregation;
   }
-
   private buildAggregators() {
     const aggColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
       (acc, cur) => {
         if (!cur.rows) {
           return acc;
         }
+
         if (this.aggregation === false) {
           return acc;
         }
@@ -130,6 +131,17 @@ export class ChartDataRequestBuilder {
           cur.type === ChartDataSectionType.INFO
         ) {
           return acc.concat(cur.rows);
+        }
+
+        if (
+          cur.type === ChartDataSectionType.MIXED &&
+          cur.rows?.findIndex(
+            v => v.type === ChartDataViewFieldType.NUMERIC,
+          ) !== -1
+        ) {
+          return acc.concat(
+            cur.rows.filter(v => v.type === ChartDataViewFieldType.NUMERIC),
+          );
         }
         return acc;
       },
@@ -331,9 +343,6 @@ export class ChartDataRequestBuilder {
           }
         }
 
-        if (cur.type === ChartDataSectionType.MIXED) {
-          return acc.concat(cur.rows);
-        }
         return acc;
       },
       [],
@@ -381,6 +390,23 @@ export class ChartDataRequestBuilder {
           cur.type === ChartDataSectionType.COLOR
         ) {
           return acc.concat(cur.rows);
+        }
+        if (
+          cur.type === ChartDataSectionType.MIXED &&
+          !cur.rows?.every(
+            v =>
+              v.type !== ChartDataViewFieldType.DATE &&
+              v.type !== ChartDataViewFieldType.STRING,
+          )
+        ) {
+          //zh: 判断数据中是否含有 DATE 和 STRING 类型 en: Determine whether the data contains DATE and STRING types
+          return acc.concat(
+            cur.rows.filter(
+              v =>
+                v.type === ChartDataViewFieldType.DATE ||
+                v.type === ChartDataViewFieldType.STRING,
+            ),
+          );
         }
         return acc;
       },
