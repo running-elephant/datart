@@ -17,12 +17,17 @@
  */
 
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
+import i18n from 'i18next';
 import get from 'lodash/get';
 import { useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface I18NComponentProps {
   i18nPrefix?: string;
+}
+
+export function prefixI18N(key) {
+  return i18n.t(key);
 }
 
 function usePrefixI18N(prefix?: string) {
