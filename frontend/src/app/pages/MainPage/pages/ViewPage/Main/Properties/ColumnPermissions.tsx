@@ -20,6 +20,7 @@ import { LoadingOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Col, Input, List, Row } from 'antd';
 import { ListItem, ListTitle, Popup, Tree } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
 import { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -57,6 +58,7 @@ export const ColumnPermissions = memo(() => {
     selectCurrentEditingViewAttr(state, { name: 'columnPermissions' }),
   ) as ColumnPermission[];
   const roles = useSelector(selectRoles);
+  const t = useI18NPrefix('view.columnPermission');
 
   const { filteredData, debouncedSearch } = useDebouncedSearch(
     roles,
@@ -153,9 +155,9 @@ export const ColumnPermissions = memo(() => {
               >
                 {permission
                   ? checkedKeys.length > 0
-                    ? '部分字段'
-                    : '不可见'
-                  : '全部字段'}
+                    ? t('partial')
+                    : t('none')
+                  : t('all')}
               </Button>
             </Popup>,
           ]}
@@ -164,17 +166,17 @@ export const ColumnPermissions = memo(() => {
         </ListItem>
       );
     },
-    [columnDropdownData, columnPermissions, checkColumnPermission, status],
+    [columnDropdownData, columnPermissions, checkColumnPermission, status, t],
   );
 
   return (
     <Container>
-      <ListTitle title="列权限" />
+      <ListTitle title={t('title')} />
       <Searchbar>
         <Col span={24}>
           <Input
             prefix={<SearchOutlined className="icon" />}
-            placeholder="搜索角色关键字"
+            placeholder={t('search')}
             className="input"
             bordered={false}
             onChange={debouncedSearch}

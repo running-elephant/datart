@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
 import { CommonFormTypes } from 'globalConstants';
 import debounce from 'lodash/debounce';
@@ -77,6 +78,7 @@ export const SQLEditor = memo(() => {
   ) as ViewStatus;
   const theme = useSelector(selectThemeKey);
   const viewsData = useSelector(selectViews);
+  const t = useI18NPrefix('view.editor');
 
   const run = useCallback(() => {
     const fragment = editorInstance
@@ -101,7 +103,7 @@ export const SQLEditor = memo(() => {
         showSaveForm({
           type: CommonFormTypes.Edit,
           visible: true,
-          parentIdLabel: '目录',
+          parentIdLabel: t('folder'),
           onSave: (values, onClose) => {
             let index = getInsertedNodeIndex(values, viewsData);
 
@@ -119,7 +121,7 @@ export const SQLEditor = memo(() => {
         save();
       }
     }
-  }, [dispatch, actions, stage, status, id, save, showSaveForm, viewsData]);
+  }, [dispatch, actions, stage, status, id, save, showSaveForm, viewsData, t]);
 
   const editorWillMount = useCallback(
     editor => {
@@ -162,12 +164,12 @@ export const SQLEditor = memo(() => {
       });
       editor.onDidAttemptReadOnlyEdit(() => {
         (messageContribution as any).showMessage(
-          '回收站中不可编辑',
+          t('readonlyTip'),
           editor.getPosition(),
         );
       });
     },
-    [setEditor, dispatch, actions],
+    [setEditor, dispatch, actions, t],
   );
 
   useEffect(() => {

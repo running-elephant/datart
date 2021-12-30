@@ -19,12 +19,9 @@
 import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
 import { Menu, message, Popconfirm, TreeDataNode } from 'antd';
 import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CascadeAccess } from 'app/pages/MainPage/Access';
-import {
-  selectIsOrgOwner,
-  selectOrgId,
-  selectPermissionMap,
-} from 'app/pages/MainPage/slice/selectors';
+import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
 import React, { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -36,7 +33,6 @@ import {
   ResourceTypes,
 } from '../../PermissionPage/constants';
 import { SaveFormContext } from '../SaveFormContext';
-import { useViewSlice } from '../slice';
 import {
   selectCurrentEditingViewKey,
   selectViewListLoading,
@@ -60,10 +56,9 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
   const loading = useSelector(selectViewListLoading);
   const currentEditingViewKey = useSelector(selectCurrentEditingViewKey);
   const orgId = useSelector(selectOrgId);
-  const isOwner = useSelector(selectIsOrgOwner);
-  const permissionMap = useSelector(selectPermissionMap);
-  const { actions } = useViewSlice();
   const viewsData = useSelector(selectViews);
+  const t = useI18NPrefix('view.form');
+  const tg = useI18NPrefix('global');
 
   useEffect(() => {
     dispatch(getViews(orgId));
@@ -89,12 +84,16 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
           archive: !isFolder,
           resolve: () => {
             dispatch(removeEditingView({ id, resolve: redirect }));
-            message.success(`成功${isFolder ? '删除' : '移至回收站'}`);
+            message.success(
+              isFolder
+                ? tg('operation.deleteSuccess')
+                : tg('operation.archiveSuccess'),
+            );
           },
         }),
       );
     },
-    [dispatch, redirect],
+    [dispatch, redirect, tg],
   );
 
   const moreMenuClick = useCallback(
@@ -112,7 +111,7 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                 name,
                 parentId,
               },
-              parentIdLabel: '目录',
+              parentIdLabel: t('folder'),
               onSave: (values, onClose) => {
                 if (isParentIdEqual(parentId, values.parentId)) {
                   index = getInsertedNodeIndex(values, viewsData);
@@ -138,7 +137,7 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
             break;
         }
       },
-    [dispatch, showSaveForm, viewsData],
+    [dispatch, showSaveForm, viewsData, t],
   );
 
   const renderTreeTitle = useCallback(
@@ -164,17 +163,23 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                     key="info"
                     prefix={<EditOutlined className="icon" />}
                   >
-                    基本信息
+                    {tg('button.info')}
                   </MenuListItem>
                   <MenuListItem
                     key="delete"
                     prefix={<DeleteOutlined className="icon" />}
                   >
                     <Popconfirm
-                      title={`确定${node.isFolder ? '删除' : '移至回收站'}？`}
+                      title={
+                        node.isFolder
+                          ? tg('operation.deleteConfirm')
+                          : tg('operation.archiveConfirm')
+                      }
                       onConfirm={archive(node.id, node.isFolder)}
                     >
-                      {node.isFolder ? '删除' : '移至回收站'}
+                      {node.isFolder
+                        ? tg('button.delete')
+                        : tg('button.archive')}
                     </Popconfirm>
                   </MenuListItem>
                 </Menu>
@@ -188,7 +193,7 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
         </TreeTitle>
       );
     },
-    [archive, moreMenuClick],
+    [archive, moreMenuClick, tg],
   );
 
   const treeSelect = useCallback(

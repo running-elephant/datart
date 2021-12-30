@@ -32,6 +32,18 @@
         "add": "新建",
         "edit": "编辑"
       }
+    },
+    "columnType": {
+      "string": "字符",
+      "numeric": "数值",
+      "date": "日期"
+    },
+    "columnCategory": {
+      "uncategorized": "未分类",
+      "country": "国家",
+      "provinceorstate": "省份",
+      "city": "城市",
+      "county": "区县"
     }
   },
   "login": {
@@ -238,7 +250,7 @@
           "ago": "前",
           "current": "当前",
           "fromNow": "后",
-          "pleaseSelect": "请选择",
+          "select": "请选择",
           "currentTime": "当前时间",
           "startTime": "开始时间",
           "endTime": "结束时间",
@@ -323,7 +335,7 @@
       },
       "style": {
         "font": "字体",
-        "pleaseSelect": "请选择 ...",
+        "select": "请选择 ...",
         "table": {
           "header": {
             "newName": "请输入新名称",
@@ -462,7 +474,7 @@
         }
       },
       "setting": {
-        "pleaseSelect": "请选择 ...",
+        "select": "请选择 ...",
         "displayCount": "显示数量",
         "enableCache": "启用缓存",
         "cacheExpire": "缓存时长(秒)",
@@ -666,6 +678,84 @@
       "noScale": "实际尺寸"
     }
   },
+  "view": {
+    "loading": "加载中...",
+    "selectSource": "请选择数据源",
+    "empty": "请在左侧列表选择数据视图",
+    "resultEmpty1": "请点击 ",
+    "resultEmpty2": " 按钮执行，运行结果将在此处展示",
+    "errorTitle": "执行错误",
+    "tabs": {
+      "discard": "放弃",
+      "cancel": "取消",
+      "execute": "执行",
+      "warning": "有未执行的修改，是否执行？"
+    },
+    "editor": {
+      "folder": "目录",
+      "source": "请选择数据源",
+      "run": "执行",
+      "runSelection": "执行片段",
+      "runWinTip": "Win: [Ctrl + Enter]",
+      "runMacTip": "Mac: [Command + Enter]",
+      "beautify": "美化",
+      "save": "保存",
+      "saveWinTip": "Win: [Ctrl + S]",
+      "saveMacTip": "Mac: [Command + S]",
+      "info": "详情设置",
+      "saveAs": "另存为",
+      "saveFragment": "保存片段",
+      "readonlyTip": "回收站中不可编辑"
+    },
+    "properties": {
+      "reference": "数据源信息",
+      "variable": "变量配置",
+      "columnPermissions": "列权限"
+    },
+    "resource": {
+      "title": "数据源信息",
+      "search": "搜索数据库 / 表 / 字段关键字"
+    },
+    "variable": {
+      "title": "变量配置",
+      "formTitle": "变量",
+      "add": "新建变量",
+      "prefix": "[公共]",
+      "suffix": "重复"
+    },
+    "columnPermission": {
+      "title": "列权限",
+      "search": "搜索角色关键字",
+      "partial": "部分字段",
+      "none": "不可见",
+      "all": "全部字段"
+    },
+    "sidebar": {
+      "title": "数据视图列表",
+      "addView": "新建数据视图",
+      "addFolder": "新建目录",
+      "parent": "所属目录",
+      "recycle": "回收站"
+    },
+    "saveForm": {
+      "title": "数据视图",
+      "name": "名称",
+      "folder": "目录",
+      "root": "根目录",
+      "advanced": "高级配置",
+      "concurrencyControl": "并发控制",
+      "concurrencyControlMode": "模式",
+      "dirtyread": "延迟更新",
+      "fastfailover": "快速失败",
+      "cache": "缓存",
+      "cacheExpires": "失效时间"
+    },
+    "schemaTable": {
+      "category": "分类",
+      "type": "类型",
+      "typeAndCategory": "类型与分类"
+    }
+  },
   "source": {
     "source": "数据源",
     "testSuccess": "测试连接成功",
@@ -699,7 +789,7 @@
     },
     "modal": {
       "password": "密码",
-      "pleaseInputPassword": "请输入密码"
+      "enterPassword": "请输入密码"
     }
   },
   "components": {

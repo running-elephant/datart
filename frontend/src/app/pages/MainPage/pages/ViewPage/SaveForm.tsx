@@ -28,6 +28,7 @@ import {
   TreeSelect,
 } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import debounce from 'debounce-promise';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import {
@@ -49,11 +50,7 @@ import {
   selectPermissionMap,
 } from '../../slice/selectors';
 import { PermissionLevels, ResourceTypes } from '../PermissionPage/constants';
-import {
-  ConcurrencyControlModes,
-  CONCURRENCY_CONTROL_MODE_LABEL,
-  ViewViewModelStages,
-} from './constants';
+import { ConcurrencyControlModes, ViewViewModelStages } from './constants';
 import { SaveFormContext } from './SaveFormContext';
 import {
   makeSelectViewFolderTree,
@@ -99,6 +96,8 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
   const currentEditingView = useSelector(selectCurrentEditingView);
   const orgId = useSelector(selectOrgId);
   const formRef = useRef<FormInstance>();
+  const t = useI18NPrefix('view.saveForm');
+  const tg = useI18NPrefix('global');
 
   useEffect(() => {
     if (initialValues) {
@@ -142,9 +141,12 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     >
       <Form.Item
         name="name"
-        label="名称"
+        label={t('name')}
         rules={[
-          { required: true, message: '名称不能为空' },
+          {
+            required: true,
+            message: `${t('name')}${tg('validation.required')}`,
+          },
           {
             validator: debounce((_, value) => {
               if (!value || initialValues?.name === value) {
@@ -167,7 +169,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
       </Form.Item>
       <Form.Item name="parentId" label={parentIdLabel}>
         <TreeSelect
-          placeholder="根目录"
+          placeholder={t('root')}
           treeData={folderTree || []}
           allowClear
           onChange={() => {
@@ -182,12 +184,12 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
             icon={<DoubleRightOutlined rotate={advancedVisible ? -90 : 90} />}
             onClick={toggleAdvanced}
           >
-            高级配置
+            {t('advanced')}
           </AdvancedToggle>
           <AdvancedWrapper show={advancedVisible}>
             <Form.Item
               name={['config', 'concurrencyControl']}
-              label="并发控制"
+              label={t('concurrencyControl')}
               valuePropName="checked"
               initialValue={concurrencyControl}
             >
@@ -195,20 +197,20 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
             </Form.Item>
             <Form.Item
               name={['config', 'concurrencyControlMode']}
-              label="模式"
+              label={t('concurrencyControlMode')}
               initialValue={ConcurrencyControlModes.DirtyRead}
             >
               <Radio.Group disabled={!concurrencyControl}>
                 {Object.values(ConcurrencyControlModes).map(value => (
                   <Radio key={value} value={value}>
-                    {CONCURRENCY_CONTROL_MODE_LABEL[value]}
+                    {t(value.toLowerCase())}
                   </Radio>
                 ))}
               </Radio.Group>
             </Form.Item>
             <Form.Item
               name={['config', 'cache']}
-              label="缓存"
+              label={t('cache')}
               valuePropName="checked"
               initialValue={cache}
             >
@@ -216,7 +218,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
             </Form.Item>
             <Form.Item
               name={['config', 'cacheExpires']}
-              label="失效时间"
+              label={t('cacheExpires')}
               initialValue={0}
             >
               <InputNumber disabled={!cache} />

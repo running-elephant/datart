@@ -22,6 +22,7 @@ import {
   SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import { PaneWrapper } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, {
   memo,
   useCallback,
@@ -44,6 +45,7 @@ interface PropertiesProps {
 export const Properties = memo(({ allowManage }: PropertiesProps) => {
   const [selectedTab, setSelectedTab] = useState('');
   const { editorInstance } = useContext(EditorContext);
+  const t = useI18NPrefix('view.properties');
 
   useEffect(() => {
     editorInstance?.layout();
@@ -51,15 +53,15 @@ export const Properties = memo(({ allowManage }: PropertiesProps) => {
 
   const tabTitle = useMemo(
     () => [
-      { name: 'resource', title: '数据源信息', icon: <DatabaseOutlined /> },
-      { name: 'variable', title: '变量配置', icon: <FunctionOutlined /> },
+      { name: 'reference', title: t('reference'), icon: <DatabaseOutlined /> },
+      { name: 'variable', title: t('variable'), icon: <FunctionOutlined /> },
       {
         name: 'columnPermissions',
-        title: '列权限',
+        title: t('columnPermissions'),
         icon: <SafetyCertificateOutlined />,
       },
     ],
-    [],
+    [t],
   );
 
   const tabSelect = useCallback(tab => {
@@ -71,7 +73,7 @@ export const Properties = memo(({ allowManage }: PropertiesProps) => {
       <PaneWrapper selected={selectedTab === 'variable'}>
         <Variables />
       </PaneWrapper>
-      <PaneWrapper selected={selectedTab === 'resource'}>
+      <PaneWrapper selected={selectedTab === 'reference'}>
         <Resource />
       </PaneWrapper>
       <PaneWrapper selected={selectedTab === 'columnPermissions'}>

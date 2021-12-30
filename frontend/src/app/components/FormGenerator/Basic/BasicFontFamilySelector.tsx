@@ -36,7 +36,7 @@ const BasicFontFamilySelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> =
             dropdownMatchSelectWidth
             {...rest}
             {...options}
-            placeholder={t('pleaseSelect')}
+            placeholder={t('select')}
             onChange={value => onChange?.(ancestors, value)}
           >
             {FONT_FAMILIES.map(o => (

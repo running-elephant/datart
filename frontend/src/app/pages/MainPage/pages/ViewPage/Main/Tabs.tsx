@@ -23,6 +23,7 @@ import {
 } from '@ant-design/icons';
 import { Button, Space } from 'antd';
 import { Confirm, TabPane, Tabs as TabsComponent } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import React, { memo, useCallback, useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -55,6 +56,7 @@ export const Tabs = memo(() => {
   const id = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'id' }),
   ) as string;
+  const t = useI18NPrefix('view.tabs');
 
   const redirect = useCallback(
     currentEditingViewKey => {
@@ -134,7 +136,7 @@ export const Tabs = memo(() => {
       </TabsComponent>
       <Confirm
         visible={confirmVisible}
-        title={`${operatingView?.name} 中有未执行的修改，是否执行？`}
+        title={t('warning')}
         icon={
           <InfoCircleOutlined
             css={`
@@ -144,10 +146,10 @@ export const Tabs = memo(() => {
         }
         footer={
           <Space>
-            <Button onClick={removeTab}>放弃</Button>
-            <Button onClick={hideConfirm}>取消</Button>
+            <Button onClick={removeTab}>{t('discard')}</Button>
+            <Button onClick={hideConfirm}>{t('cancel')}</Button>
             <Button onClick={runTab} type="primary">
-              执行
+              {t('execute')}
             </Button>
           </Space>
         }

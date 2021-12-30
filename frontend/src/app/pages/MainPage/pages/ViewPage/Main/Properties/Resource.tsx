@@ -26,6 +26,7 @@ import {
 } from '@ant-design/icons';
 import { Col, Input, Row } from 'antd';
 import { ListTitle, Tree } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
 import { selectDataProviderDatabaseListLoading } from 'app/pages/MainPage/slice/selectors';
 import { getDataProviderDatabases } from 'app/pages/MainPage/slice/thunks';
@@ -61,6 +62,7 @@ export const Resource = memo(() => {
   const databaseListLoading = useSelector(
     selectDataProviderDatabaseListLoading,
   );
+  const t = useI18NPrefix('view.resource');
 
   const { filteredData, onExpand, debouncedSearch, expandedRowKeys } =
     useSearchAndExpand(
@@ -161,12 +163,12 @@ export const Resource = memo(() => {
 
   return (
     <Container>
-      <ListTitle title="数据源信息" />
+      <ListTitle title={t('title')} />
       <Searchbar>
         <Col span={24}>
           <Input
             prefix={<SearchOutlined className="icon" />}
-            placeholder="搜索数据库 / 表 / 字段关键字"
+            placeholder={t('search')}
             className="input"
             bordered={false}
             onChange={debouncedSearch}

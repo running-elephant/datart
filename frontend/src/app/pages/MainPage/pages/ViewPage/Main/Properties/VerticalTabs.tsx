@@ -18,13 +18,16 @@
 
 import classnames from 'classnames';
 import { cloneElement, memo, ReactElement, useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_TITLE,
   FONT_WEIGHT_MEDIUM,
+  FONT_WEIGHT_REGULAR,
   SPACE,
   SPACE_XS,
 } from 'styles/StyleConstants';
+import { getTextWidth } from 'utils/utils';
 
 interface TabProps {
   name: string;
@@ -39,6 +42,7 @@ interface VerticalTabsProps {
 
 export const VerticalTabs = memo(({ tabs, onSelect }: VerticalTabsProps) => {
   const [selectedTab, setSelectedTab] = useState('');
+  const { i18n } = useTranslation();
 
   const selectTab = useCallback(
     name => () => {
@@ -51,18 +55,34 @@ export const VerticalTabs = memo(({ tabs, onSelect }: VerticalTabsProps) => {
 
   return (
     <Wrapper>
-      {tabs.map(({ name, title, icon }) => (
-        <Tab
-          key={name}
-          className={classnames({ selected: selectedTab === name })}
-          onClick={selectTab(name)}
-        >
-          {icon && <Word className="icon">{cloneElement(icon)}</Word>}
-          {title.split('').map((s, index) => (
-            <Word key={index}>{s}</Word>
-          ))}
-        </Tab>
-      ))}
+      {tabs.map(({ name, title, icon }) => {
+        const rotate = ['en'].includes(i18n.language) ? '90deg' : '0';
+        return (
+          <Tab
+            key={name}
+            className={classnames({ selected: selectedTab === name })}
+            onClick={selectTab(name)}
+          >
+            {icon && (
+              <Word rotate={rotate} className="icon">
+                {cloneElement(icon)}
+              </Word>
+            )}
+            {title.split('').map((s, index) => {
+              const wordHeight = getTextWidth(
+                s,
+                String(FONT_WEIGHT_REGULAR),
+                FONT_SIZE_TITLE,
+              );
+              return (
+                <Word key={index} rotate={rotate} height={wordHeight}>
+                  {s}
+                </Word>
+              );
+            })}
+          </Tab>
+        );
+      })}
     </Wrapper>
   );
 });
@@ -97,12 +117,14 @@ const Tab = styled.li`
   }
 `;
 
-const Word = styled.span`
+const Word = styled.span<{ rotate: string; height?: number }>`
   display: block;
   width: ${FONT_SIZE_TITLE};
-  height: ${FONT_SIZE_TITLE};
-  line-height: ${FONT_SIZE_TITLE};
-  /* transform: rotate(90deg); */
+  height: ${p => (p.height ? `${p.height}px` : FONT_SIZE_TITLE)};
+  line-height: ${p => (p.height ? `${p.height}px` : FONT_SIZE_TITLE)};
+  font-size: ${FONT_SIZE_TITLE};
+  text-align: center;
+  transform: ${p => `rotate(${p.rotate})`};
 
   &.icon {
     margin-bottom: ${SPACE};

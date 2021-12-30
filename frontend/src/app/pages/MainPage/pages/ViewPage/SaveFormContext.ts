@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
 import { createContext, useCallback, useMemo, useState } from 'react';
 
@@ -54,13 +55,14 @@ const saveFormContextValue: SaveFormContextValue = {
 export const SaveFormContext = createContext(saveFormContextValue);
 
 export const useSaveFormContext = (): SaveFormContextValue => {
+  const t = useI18NPrefix('view.saveForm');
   const [type, setType] = useState(CommonFormTypes.Add);
   const [visible, setVisible] = useState(false);
   const [simple, setSimple] = useState<boolean | undefined>(false);
   const [initialValues, setInitialValues] = useState<
     undefined | SaveFormModel
   >();
-  const [parentIdLabel, setParentIdLabel] = useState('目录');
+  const [parentIdLabel, setParentIdLabel] = useState(t('folder'));
   const [onSave, setOnSave] = useState(() => () => {});
   const [onAfterClose, setOnAfterClose] = useState(() => () => {});
 

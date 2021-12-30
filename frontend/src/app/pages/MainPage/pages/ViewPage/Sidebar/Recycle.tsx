@@ -23,6 +23,7 @@ import {
 } from '@ant-design/icons';
 import { Menu, message, Popconfirm, TreeDataNode } from 'antd';
 import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getCascadeAccess } from 'app/pages/MainPage/Access';
 import {
   selectIsOrgOwner,
@@ -65,6 +66,8 @@ export const Recycle = memo(({ list }: RecycleProps) => {
   const views = useSelector(selectViews);
   const isOwner = useSelector(selectIsOrgOwner);
   const permissionMap = useSelector(selectPermissionMap);
+  const t = useI18NPrefix('view.form');
+  const tg = useI18NPrefix('global');
 
   useEffect(() => {
     dispatch(getArchivedViews(orgId));
@@ -90,12 +93,12 @@ export const Recycle = memo(({ list }: RecycleProps) => {
           archive: false,
           resolve: () => {
             dispatch(removeEditingView({ id, resolve: redirect }));
-            message.success('删除成功');
+            message.success(tg('operation.deleteSuccess'));
           },
         }),
       );
     },
-    [dispatch, redirect],
+    [dispatch, redirect, tg],
   );
 
   const moreMenuClick = useCallback(
@@ -109,7 +112,7 @@ export const Recycle = memo(({ list }: RecycleProps) => {
               visible: true,
               simple: true,
               initialValues: { name, parentId: null },
-              parentIdLabel: '目录',
+              parentIdLabel: t('folder'),
               onSave: (values, onClose) => {
                 let index = getInsertedNodeIndex(values, views);
 
@@ -118,7 +121,7 @@ export const Recycle = memo(({ list }: RecycleProps) => {
                     view: { ...values, id, index },
                     resolve: () => {
                       dispatch(removeEditingView({ id, resolve: redirect }));
-                      message.success('还原成功');
+                      message.success(tg('operation.restoreSuccess'));
                       onClose();
                     },
                   }),
@@ -130,7 +133,7 @@ export const Recycle = memo(({ list }: RecycleProps) => {
             break;
         }
       },
-    [dispatch, showSaveForm, redirect, views],
+    [dispatch, showSaveForm, redirect, views, t, tg],
   );
 
   const renderTreeTitle = useCallback(
@@ -166,14 +169,17 @@ export const Recycle = memo(({ list }: RecycleProps) => {
                     key="reset"
                     prefix={<ReloadOutlined className="icon" />}
                   >
-                    还原
+                    {tg('button.restore')}
                   </MenuListItem>
                   <MenuListItem
                     key="delelte"
                     prefix={<DeleteOutlined className="icon" />}
                   >
-                    <Popconfirm title="确认删除？" onConfirm={del(key)}>
-                      删除
+                    <Popconfirm
+                      title={tg('operation.deleteConfirm')}
+                      onConfirm={del(key)}
+                    >
+                      {tg('button.delete')}
                     </Popconfirm>
                   </MenuListItem>
                 </Menu>
@@ -187,7 +193,7 @@ export const Recycle = memo(({ list }: RecycleProps) => {
         </TreeTitle>
       );
     },
-    [moreMenuClick, del, views, isOwner, permissionMap],
+    [moreMenuClick, del, views, isOwner, permissionMap, tg],
   );
 
   const treeSelect = useCallback(

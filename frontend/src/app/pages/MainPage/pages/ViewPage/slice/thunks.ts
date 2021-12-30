@@ -19,6 +19,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import sqlReservedWords from 'app/assets/javascripts/sqlReservedWords';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
+import i18n from 'i18next';
 import { monaco } from 'react-monaco-editor';
 import { RootState } from 'types';
 import { request } from 'utils/request';
@@ -111,7 +112,7 @@ export const getViewDetail = createAsyncThunk<
     const viewSimple = views?.find(v => v.id === viewId);
     const tempViewModel = generateEditingView({
       id: viewId,
-      name: viewSimple?.name || '加载中...',
+      name: viewSimple?.name || i18n.t('view.loading'),
       stage: ViewViewModelStages.Loading,
     });
     dispatch(viewActions.addEditingView(tempViewModel));
@@ -159,7 +160,7 @@ export const runSql = createAsyncThunk<
   const { script, sourceId, size, fragment, variables } = currentEditingView;
 
   if (!sourceId) {
-    return rejectWithValue('请选择数据源');
+    return rejectWithValue(i18n.t('view.selectSource'));
   }
 
   if (!script.trim()) {

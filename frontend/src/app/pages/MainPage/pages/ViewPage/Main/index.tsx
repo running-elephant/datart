@@ -17,6 +17,7 @@
  */
 
 import { EmptyFiller } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouteMatch } from 'react-router-dom';
@@ -41,6 +42,7 @@ export const Main = memo(() => {
   } = useRouteMatch<{ viewId: string }>();
   const orgId = useSelector(selectOrgId);
   const editingViews = useSelector(selectEditingViews);
+  const t = useI18NPrefix('view');
 
   useEffect(() => {
     dispatch(getSources(orgId));
@@ -60,7 +62,7 @@ export const Main = memo(() => {
           <Workbench />
         </>
       ) : (
-        <EmptyFiller title="请在左侧列表选择数据视图" />
+        <EmptyFiller title={t('empty')} />
       )}
     </Container>
   );

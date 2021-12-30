@@ -26,6 +26,7 @@ import {
 } from '@ant-design/icons';
 import { Button, List, Popconfirm } from 'antd';
 import { ListItem, ListTitle } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getRoles } from 'app/pages/MainPage/pages/MemberPage/slice/thunks';
 import {
   DEFAULT_VALUE_DATE_FORMAT,
@@ -89,6 +90,8 @@ export const Variables = memo(() => {
   ) as string;
   const orgId = useSelector(selectOrgId);
   const publicVariables = useSelector(selectVariables);
+  const t = useI18NPrefix('view.variable');
+  const tg = useI18NPrefix('global');
 
   useEffect(() => {
     if (editorCompletionItemProviderRef) {
@@ -282,25 +285,25 @@ export const Variables = memo(() => {
         : variables.some(v => v.name === item.name);
       return (
         <ListItemTitle className={classnames({ duplicate: isDuplicate })}>
-          {!isPrivate && <span className="prefix">[公共]</span>}
+          {!isPrivate && <span className="prefix">{t('prefix')}</span>}
           {item.name}
-          {isDuplicate && <span className="suffix">重复</span>}
+          {isDuplicate && <span className="suffix">{t('suffix')}</span>}
         </ListItemTitle>
       );
     },
-    [variables, publicVariables],
+    [variables, publicVariables, t],
   );
 
   const titleProps = useMemo(
     () => ({
-      title: '变量配置',
+      title: t('title'),
       search: true,
       add: {
-        items: [{ key: 'variable', text: '新建变量' }],
+        items: [{ key: 'variable', text: t('add') }],
         callback: showAddForm,
       },
     }),
-    [showAddForm],
+    [showAddForm, t],
   );
 
   return (
@@ -327,7 +330,7 @@ export const Variables = memo(() => {
                 />,
                 <Popconfirm
                   key="del"
-                  title="确认删除？"
+                  title={tg('operation.deleteConfirm')}
                   placement="bottom"
                   onConfirm={del(item.id)}
                 >
@@ -373,7 +376,7 @@ export const Variables = memo(() => {
         editingVariable={editingVariable}
         variables={variables}
         visible={formVisible}
-        title="变量"
+        title={t('formTitle')}
         type={formType}
         onSave={save}
         onCancel={hideForm}

@@ -24,6 +24,7 @@ import {
 import { Dropdown, Menu, TableColumnType, TableProps, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import { VirtualTable } from 'app/components/VirtualTable';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { memo, ReactElement, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -33,12 +34,7 @@ import {
   WARNING,
 } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
-import {
-  ColumnCategories,
-  ColumnTypes,
-  COLUMN_CATEGORY_LABEL,
-  COLUMN_TYPE_LABEL,
-} from '../constants';
+import { ColumnCategories, ColumnTypes } from '../constants';
 import { Column, Model } from '../slice/types';
 import { getColumnWidthMap } from '../utils';
 const ROW_KEY = 'DATART_ROW_KEY';
@@ -78,6 +74,8 @@ export const SchemaTable = memo(
       () => getColumnWidthMap(model, dataSource || []),
       [model, dataSource],
     );
+    const t = useI18NPrefix('view.schemaTable');
+    const tg = useI18NPrefix('global');
 
     const {
       columns,
@@ -119,19 +117,21 @@ export const SchemaTable = memo(
                   onClick={onSchemaTypeChange(name, column)}
                 >
                   {Object.values(ColumnTypes).map(t => (
-                    <Menu.Item key={t}>{COLUMN_TYPE_LABEL[t]}</Menu.Item>
+                    <Menu.Item key={t}>
+                      {tg(`columnType.${t.toLowerCase()}`)}
+                    </Menu.Item>
                   ))}
                   {hasCategory && (
                     <>
                       <Menu.Divider />
                       <Menu.SubMenu
                         key="categories"
-                        title="分类"
+                        title={t('category')}
                         popupClassName="datart-schema-table-header-menu"
                       >
                         {Object.values(ColumnCategories).map(t => (
                           <Menu.Item key={`category-${t}`}>
-                            {COLUMN_CATEGORY_LABEL[t]}
+                            {tg(`columnCategory.${t.toLowerCase()}`)}
                           </Menu.Item>
                         ))}
                       </Menu.SubMenu>
@@ -140,7 +140,7 @@ export const SchemaTable = memo(
                 </Menu>
               }
             >
-              <Tooltip title={`类型${hasCategory ? '与分类' : ''}`}>
+              <Tooltip title={hasCategory ? t('typeAndCategory') : t('type')}>
                 <ToolbarButton
                   size="small"
                   iconSize={FONT_SIZE_BASE}
@@ -170,6 +170,8 @@ export const SchemaTable = memo(
       hasCategory,
       getExtraHeaderActions,
       onSchemaTypeChange,
+      t,
+      tg,
     ]);
     return (
       <VirtualTable

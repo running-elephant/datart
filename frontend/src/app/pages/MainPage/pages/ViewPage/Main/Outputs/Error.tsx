@@ -17,6 +17,7 @@
  */
 
 import { InfoCircleOutlined } from '@ant-design/icons';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -33,12 +34,13 @@ export const Error = memo(() => {
   const error = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'error' }),
   ) as string;
+  const t = useI18NPrefix('view');
 
   return (
     <Wrapper>
       <h3>
         <InfoCircleOutlined className="icon" />
-        执行错误
+        {t('errorTitle')}
       </h3>
       <p>{error}</p>
     </Wrapper>
