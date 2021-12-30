@@ -305,20 +305,21 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 
   const handleAggregationState = state => {
     const currentChart = ChartManager.instance().getById(chart?.meta?.id);
+    let targetChartConfig = CloneValueDeep(currentChart?.config);
     registerChartEvents(currentChart);
     setChart(currentChart);
 
-    let clonedState = CloneValueDeep(currentChart?.config);
-
+    const finalChartConfig = transferChartConfigs(
+      targetChartConfig,
+      targetChartConfig,
+    );
     dispatch(actions.updateChartAggregation(state));
     dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
     dispatch(
       workbenchSlice.actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
         payload: {
-          init: {
-            ...clonedState,
-          },
+          init: finalChartConfig,
         },
       }),
     );
