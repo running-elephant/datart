@@ -85,6 +85,7 @@ export type WorkbenchState = {
   shadowChartConfig?: ChartConfig;
   backendChart?: BackendChart;
   backendChartId?: string;
+  aggregation?: boolean;
 };
 
 const initState: WorkbenchState = {
@@ -136,6 +137,11 @@ export const backendChartSelector = createSelector(
 export const shadowChartConfigSelector = createSelector(
   workbenchSelector,
   wb => wb.shadowChartConfig,
+);
+
+export const aggregationSelector = createSelector(
+  workbenchSelector,
+  wb => wb.aggregation,
 );
 
 // Effects
@@ -269,7 +275,7 @@ export const refreshDatasetAction = createAsyncThunk(
         workbenchState.chartConfig?.settings,
         arg?.pageInfo,
         true,
-        workbenchState.backendChart?.config?.aggregation,
+        workbenchState.aggregation,
       );
       const requestParams = builder
         .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
@@ -457,9 +463,7 @@ const workbenchSlice = createSlice({
       } as ChartDataView;
     },
     updateChartAggregation: (state, action: PayloadAction<boolean>) => {
-      if (state.backendChart) {
-        state.backendChart.config.aggregation = action.payload;
-      }
+      state.aggregation = action.payload;
     },
     resetWorkbenchState: (state, action) => {
       return initState;
@@ -508,6 +512,7 @@ const workbenchSlice = createSlice({
           ...payload,
           config: backendChartConfig,
         };
+        state.aggregation = backendChartConfig.aggregation;
         const currentChart = ChartManager.instance().getById(
           backendChartConfig?.chartGraphId,
         );

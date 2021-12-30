@@ -20,6 +20,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import useMount from 'app/hooks/useMount';
 import workbenchSlice, {
+  aggregationSelector,
   BackendChart,
   backendChartSelector,
   ChartConfigReducerActionType,
@@ -83,6 +84,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const chartConfig = useSelector(chartConfigSelector);
   const shadowChartConfig = useSelector(shadowChartConfigSelector);
   const backendChart = useSelector(backendChartSelector);
+  const aggregation = useSelector(aggregationSelector);
   const [chart, setChart] = useState<Chart>();
 
   useMount(
@@ -109,6 +111,9 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
               backendChart: originChart as BackendChart,
             }),
           );
+          if (!originChart) {
+            dispatch(actions.updateChartAggregation(true));
+          }
         } else {
           // chartType === 'dataChart'
           dispatch(
@@ -194,7 +199,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       chartConfig: chartConfig!,
       chartGraphId: chart?.meta.id!,
       computedFields: dataview?.computedFields || [],
-      aggregation: backendChart?.config?.aggregation,
+      aggregation,
     };
 
     const dataChart: DataChart = {
@@ -216,7 +221,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     dataview,
     onSaveInWidget,
     orgId,
-    backendChart?.config?.aggregation,
+    aggregation,
   ]);
 
   const saveChart = useCallback(async () => {
@@ -229,7 +234,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           chartId: dataChartId,
           index: 0,
           parentId: 0,
-          aggregation: backendChart?.config?.aggregation,
+          aggregation: aggregation,
         }),
       );
       onSaveInDataChart?.(orgId, dataChartId);
@@ -250,7 +255,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
                 chartId: dataChartId,
                 index: 0,
                 parentId: 0,
-                aggregation: backendChart?.config?.aggregation,
+                aggregation,
               }),
             );
             saveToWidget();
@@ -272,7 +277,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     orgId,
     chartType,
     saveToWidget,
-    backendChart?.config?.aggregation,
+    aggregation,
   ]);
 
   const registerChartEvents = chart => {
@@ -316,6 +321,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       targetChartConfig,
       targetChartConfig,
     );
+
     dispatch(actions.updateChartAggregation(state));
     dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
     dispatch(
@@ -327,6 +333,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       }),
     );
   };
+
   return (
     <StyledChartWorkbenchPage>
       <ChartWorkbench
@@ -338,7 +345,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           },
           onChangeAggregation: handleAggregationState,
         }}
-        aggregation={backendChart?.config?.aggregation}
+        aggregation={aggregation}
         chart={chart}
         dataset={dataset}
         dataview={dataview}
