@@ -640,6 +640,8 @@
         "fullScreen": "全屏",
         "edit": "编辑",
         "delete": "删除",
+        "confirmDel": "确认删除",
+        "ContainerConfirmDel": "该组件内的组件也会被删除,确认是否删除？",
         "info": "基本信息",
         "makeLinkage": "联动设置",
         "closeLinkage": "关闭联动",
