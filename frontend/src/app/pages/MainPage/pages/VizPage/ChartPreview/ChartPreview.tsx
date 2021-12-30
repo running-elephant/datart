@@ -59,7 +59,7 @@ const ChartPreviewBoard: FC<{
     allowManage,
   }) => {
     useVizSlice();
-    const { ref, cacheW, cacheH } = useCacheWidthHeight();
+    const { ref, cacheW, cacheH } = useCacheWidthHeight(800, 600);
     const { actions } = useMainSlice();
     const chartManager = ChartManager.instance();
     const dispatch = useDispatch();
