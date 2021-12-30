@@ -17,7 +17,6 @@
  */
 
 import { ChartLifecycle } from 'app/types/ChartLifecycle';
-import { Debugger } from 'utils/debugger';
 import Chart from './Chart';
 
 type BrokerContext = {
@@ -84,15 +83,20 @@ class ChartEventBroker {
     }
   }
 
-  private safeInvoke(event: HooksEvent, options: any, context?: BrokerContext) {
+  private async safeInvoke(
+    event: HooksEvent,
+    options: any,
+    context?: BrokerContext,
+  ) {
     try {
-      Debugger.instance.measure(
-        `ChartEventBroker | ${event} `,
-        () => {
-          this._listeners.get(event)?.call?.(this._chart, options, context);
-        },
-        false,
-      );
+      // await Debugger.instance.measure(
+      //   `ChartEventBroker | ${event} `,
+      //   () => {
+      //     this._listeners.get(event)?.call?.(this._chart, options, context);
+      //   },
+      //   false,
+      // );
+      this._listeners.get(event)?.call?.(this._chart, options, context);
     } catch (e) {
       console.error(`ChartEventBroker | ${event} exception ----> `, e);
     } finally {

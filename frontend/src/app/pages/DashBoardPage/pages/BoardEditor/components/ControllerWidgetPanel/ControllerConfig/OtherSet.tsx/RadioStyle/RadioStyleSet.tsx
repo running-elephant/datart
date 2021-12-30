@@ -20,16 +20,22 @@ import React, { memo } from 'react';
 export interface RadioStyleSetProps extends FormItemProps<any> {
   value?: any;
   onChange?: any;
+  options: { label: string; value: string }[];
 }
 export const RadioStyleSet: React.FC<RadioStyleSetProps> = memo(
-  ({ value, onChange }) => {
+  ({ value, onChange, options }) => {
     function _onChange(val) {
       onChange?.(val);
     }
     return (
       <Radio.Group onChange={_onChange} defaultValue={value}>
-        <Radio.Button value="default">常规</Radio.Button>
-        <Radio.Button value="button">按钮</Radio.Button>
+        {options.map(it => {
+          return (
+            <Radio.Button key={it.value} value={it.value}>
+              {it.label}
+            </Radio.Button>
+          );
+        })}
       </Radio.Group>
     );
   },

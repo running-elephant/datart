@@ -34,12 +34,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.messageresolver.SpringMessageResolver;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -91,7 +94,10 @@ public class MailServiceImpl extends BaseService implements MailService {
     @Value("${spring.mail.senderName:Datart}")
     private String senderName;
 
-    public MailServiceImpl(TemplateEngine templateEngine) {
+    public MailServiceImpl(TemplateEngine templateEngine,MessageSource messageSource) {
+        SpringMessageResolver springMessageResolver = new SpringMessageResolver();
+        springMessageResolver.setMessageSource(messageSource);
+        templateEngine.setMessageResolver(springMessageResolver);
         this.templateEngine = templateEngine;
     }
 
@@ -140,7 +146,7 @@ public class MailServiceImpl extends BaseService implements MailService {
     }
 
     private MimeMessage createVerifyCodeMimeMessage(User user) throws UnsupportedEncodingException, MessagingException {
-        Context context = new Context();
+        Context context = new Context(LocaleContextHolder.getLocale());
         context.setVariable(VERIFY_CODE, user.getPassword());
         context.setVariable(MESSAGE, getMessages("message.user.reset.password.mail.message", user.getUsername(), SecurityUtils.VERIFY_CODE_TIMEOUT_MIN));
         String mailContent = templateEngine.process(FIND_PASSWORD_TEMPLATE, context);
@@ -155,7 +161,7 @@ public class MailServiceImpl extends BaseService implements MailService {
         inviteToken.setInviter(getCurrentUser().getUsername());
         String tokenString = JwtUtils.toJwtString(inviteToken);
 
-        Context context = new Context();
+        Context context = new Context(LocaleContextHolder.getLocale());
         context.setVariable(TOKEN_KEY, tokenString);
         context.setVariable(USERNAME_KEY, user.getUsername());
         context.setVariable(INVITER, inviteToken.getInviter());
@@ -174,7 +180,7 @@ public class MailServiceImpl extends BaseService implements MailService {
         passwordToken.setCreateTime(System.currentTimeMillis());
         String tokenString = JwtUtils.toJwtString(passwordToken);
 
-        Context context = new Context();
+        Context context = new Context(LocaleContextHolder.getLocale());
         context.setVariable(USERNAME_KEY, user.getUsername());
         context.setVariable(TOKEN_KEY, tokenString);
         String activeUrl = Application.getWebRootURL() + "/active";

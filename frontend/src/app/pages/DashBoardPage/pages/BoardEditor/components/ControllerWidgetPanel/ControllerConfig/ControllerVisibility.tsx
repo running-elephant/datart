@@ -17,7 +17,11 @@
  */
 
 import { Form, FormInstance, Input, Radio, Select } from 'antd';
-import { VISIBILITY_TYPE_OPTION } from 'app/pages/DashBoardPage/constants';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import {
+  ALL_SQL_OPERATOR_OPTIONS,
+  VISIBILITY_TYPE_OPTION,
+} from 'app/pages/DashBoardPage/constants';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback } from 'react';
@@ -28,6 +32,7 @@ const ControllerVisibility: FC<{
   form: FormInstance<{ config: ControllerConfig }> | undefined;
   otherStrFilterWidgets: Widget[];
 }> = memo(({ form, otherStrFilterWidgets }) => {
+  const tc = useI18NPrefix('viz.control');
   const showVisibilityCondition = useCallback(() => {
     const visibilityType = form?.getFieldValue([
       'config',
@@ -41,7 +46,11 @@ const ControllerVisibility: FC<{
   }, [form]);
 
   return (
-    <Form.Item label="是否显示" shouldUpdate rules={[{ required: true }]}>
+    <Form.Item
+      label={tc('visibility')}
+      shouldUpdate
+      rules={[{ required: true }]}
+    >
       {() => {
         return (
           <>
@@ -73,7 +82,10 @@ const ControllerVisibility: FC<{
                     noStyle
                     rules={[{ required: true, message: '' }]}
                   >
-                    <Select placeholder="过滤器名称" style={{ width: '160px' }}>
+                    <Select
+                      placeholder={tc('title')}
+                      style={{ width: '160px' }}
+                    >
                       {otherStrFilterWidgets.map(ele => {
                         return (
                           <Select.Option key={ele.id} value={ele.id}>
@@ -89,13 +101,19 @@ const ControllerVisibility: FC<{
                     noStyle
                     rules={[{ required: true, message: '' }]}
                   >
-                    <Select placeholder="viewField" style={{ width: '100px' }}>
-                      <Select.Option key={1} value={FilterSqlOperator.Equal}>
-                        {'等于'}
-                      </Select.Option>
-                      <Select.Option key={2} value={FilterSqlOperator.NotEqual}>
-                        {'不等于'}
-                      </Select.Option>
+                    <Select placeholder="" style={{ width: '100px' }}>
+                      {ALL_SQL_OPERATOR_OPTIONS.filter(it =>
+                        [
+                          FilterSqlOperator.Equal,
+                          FilterSqlOperator.NotEqual,
+                        ].includes(it.value),
+                      ).map(it => {
+                        return (
+                          <Select.Option key={it.value} value={it.value}>
+                            {it.name}
+                          </Select.Option>
+                        );
+                      })}
                     </Select>
                   </Form.Item>
                   {' - '}

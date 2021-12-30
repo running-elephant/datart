@@ -68,6 +68,7 @@ import {
 const ControllerWidgetPanel: React.FC = memo(props => {
   const dispatch = useDispatch();
   const t = useI18NPrefix('viz.common.enum.controllerFacadeTypes');
+  const tGMT = useI18NPrefix(`global.modal.title`);
   const { type, widgetId, controllerType } = useSelector(selectControllerPanel);
   const { boardId, boardType, queryVariables } = useContext(BoardContext);
 
@@ -286,7 +287,7 @@ const ControllerWidgetPanel: React.FC = memo(props => {
   };
   return (
     <Modal
-      title={`${type === 'add' ? '添加' : '编辑'}${t(controllerType || '')}`}
+      title={`${tGMT(type)}${t(controllerType || '')}`}
       visible={visible}
       onOk={onSubmit}
       centered

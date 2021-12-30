@@ -1,9 +1,28 @@
 {
   "global": {
     "tokenExpired": "Token expired, please log in",
+    "title": {
+      "action": "Action"
+    },
+    "button": {
+      "save": "Save",
+      "edit": "Edit",
+      "archive": "Archive",
+      "restore": "Restore",
+      "delete": "Delete",
+      "info": "Info",
+      "open": "Open",
+      "close": "Close"
+    },
     "operation": {
-      "updateSuccess": "Update Successful",
-      "deleteSuccess": "Delete Successful"
+      "archiveConfirm": "Archive confirm",
+      "restoreConfirm": "Restore confirm",
+      "deleteConfirm": "Delete confirm",
+      "updateSuccess": "Update successful",
+      "deleteSuccess": "Delete successful",
+      "archiveSuccess": "Archive successful",
+      "restoreSuccess": "Restore successful",
+      "parseError": "Configuration parse error"
     },
     "validation": {
       "required": " is required",
@@ -26,6 +45,24 @@
       "thurs": "星期四",
       "fri": "星期五",
       "satur": "星期六"
+    },
+    "modal": {
+      "title": {
+        "add": "Create ",
+        "edit": "Edit "
+      }
+    },
+    "columnType": {
+      "string": "String",
+      "numeric": "Number",
+      "date": "Date"
+    },
+    "columnCategory": {
+      "uncategorized": "Uncategorized",
+      "country": "Country",
+      "provinceorstate": "ProvinceOrState",
+      "city": "City",
+      "county": "County"
     }
   },
   "login": {
@@ -107,15 +144,13 @@
           "username": "Username",
           "email": "Email",
           "name": "Name",
-          "department": "Department",
-          "save": "Save"
+          "department": "Department"
         },
         "changePassword": {
           "title": "Password",
           "oldPassword": "Password",
           "newPassword": "New password",
-          "confirmPassword": "Confirm password",
-          "save": "Save"
+          "confirmPassword": "Confirm password"
         },
         "switchLanguage": {
           "title": "language"
@@ -304,6 +339,7 @@
         "filterVisibility": "Filter Visibility",
         "aggregates": "Aggregates",
         "filterOption": "Filter Option",
+
         "visibility": "Visibility",
         "facade": "Facade",
         "widthOption": "Width Option",
@@ -340,7 +376,7 @@
           "ago": "Ago",
           "current": "Current",
           "fromNow": "From Now",
-          "pleaseSelect": "Please Select",
+          "select": "Select",
           "currentTime": "Current Time",
           "startTime": "Start Time",
           "endTime": "end Time",
@@ -425,10 +461,10 @@
       },
       "style": {
         "font": "Font",
-        "pleaseSelect": "Please select ...",
+        "select": "Select ...",
         "table": {
           "header": {
-            "newName": "Please input a new header name",
+            "newName": "Enter a new header name",
             "merge": "Merge",
             "reset": "Reset",
             "moveUp": "moveUp",
@@ -449,7 +485,7 @@
             "add": "Add",
             "edit": "Edit",
             "remove": "Remove",
-            "confirm": "Please Confirm"
+            "confirm": "Confirm"
           },
           "modal": {
             "title": "Condition Style",
@@ -500,8 +536,8 @@
         "info": "Info",
         "sort": "Sort",
         "size": "Size",
-        "drop": "Please drag some data fields here",
-        "dropCount": "Please drag {{count}} fields here at least",
+        "drop": "Drag some data fields here",
+        "dropCount": "Drag {{count}} fields here at least",
         "actions": {
           "sort": {
             "title": "Sort",
@@ -564,7 +600,7 @@
         }
       },
       "setting": {
-        "pleaseSelect": "Please select ...",
+        "select": "Select ...",
         "displayCount": "Display Count",
         "enableCache": "Enable Cache",
         "cacheExpire": "Cache Expire Time(sec)",
@@ -662,60 +698,292 @@
         "date": "Date",
         "numeric": "Numeric",
         "button": "Button"
+      },
+      "setting": {
+        "setting": "Setting",
+        "board": "Board",
+        "widget": "Widget",
+        "widgetList": "Widget List",
+        "title": "Title",
+        "align": "Align",
+        "showTitle": "Show Title",
+        "position": "Position",
+        "xAxis": "xAxis",
+        "yAxis": "yAxis",
+        "size": "Size",
+        "px": "px",
+        "width": "Width",
+        "height": "Height",
+        "background": "Background",
+        "color": "Color",
+        "image": "Image",
+        "uploadTip": "click to Upload",
+        "padding": "padding",
+        "paddingTop": "padding Top",
+        "paddingRight": "padding Right",
+        "paddingBottom": "padding Bottom",
+        "paddingLeft": "padding Left",
+        "border": "Border",
+        "style": "Style",
+        "radius": "Radius",
+        "autoUpdate": "Auto Refresh",
+        "openAutoUpdate": "open Refresh",
+        "frequency": "frequency (s)",
+        "baseProperty": "Base Property",
+        "marginTB": "Margin-TB",
+        "marginLR": "Margin-LR",
+        "paddingTB": "Margin-TB",
+        "paddingLR": "Margin-LR",
+        "rowHeight": "rowHeight",
+        "scaleMode": "scale Mode",
+        "queryMode": "query Mode",
+        "openInitQuery": "open Init Query"
       }
     },
     "widget": {
+      "widget": "Widget",
       "type": {
         "chart": "Chart",
+        "widgetChart": "privateChart",
+        "dataChart": "publicChart",
         "media": "Media",
         "container": "Container",
         "controller": "Controller",
         "query": "Query",
-        "reset": "Reset"
+        "reset": "Reset",
+        "image": "Image",
+        "richText": "Rich Text",
+        "timer": "Timer",
+        "iFrame": "iFrame",
+        "video": "Video",
+        "tab": "Tab"
+      },
+      "action": {
+        "refresh": "Refresh",
+        "fullScreen": "FullScreen",
+        "edit": "Edit",
+        "delete": "Delete",
+        "info": "Info",
+        "makeLinkage": "Set Linkage",
+        "closeLinkage": "Close Linkage",
+        "makeJump": "Set Jump",
+        "closeJump": "Close Jump"
       }
     },
-    "sideBar": {
-      "folder": "目录",
-      "presentation": "演示",
+    "sidebar": {
+      "folder": "Folder",
+      "presentation": "Presentation",
       "folders": {
-        "folderTitle": "仪表板 & 数据图表",
-        "dashboard": "新建仪表板",
-        "dataChart": "新建数据图表",
-        "folder": "新建目录",
-        "recycle": "回收站",
-        "folderTree": {
-          "successDeleted": "成功删除",
-          "successRecycle": "成功移至回收站",
-          "info": "基本信息",
-          "delete": "删除",
-          "moveToTrash": "移至回收站",
-          "confirmDelete": "确定删除",
-          "sureMoveRecycleBin": "确定移至回收站"
-        }
+        "folderTitle": "Dashboards & Datacharts",
+        "dashboard": "Create dashboard",
+        "dataChart": "Create datachart",
+        "folder": "Create folder",
+        "recycle": "Recycle"
       },
-      "storyBoards": {
-        "storyBoardsList": "故事板列表",
-        "newStoryBoards": "新建故事板",
-        "recycle": "回收站"
-      },
-      "recycle": {
-        "successDeleted": "删除成功",
-        "successRestored": "还原成功",
-        "reduction": "还原",
-        "confirmDeletion": "确认删除",
-        "delete": "删除"
+      "storyboards": {
+        "title": "Storyboards",
+        "add": "Create storyboard",
+        "recycle": "Recycle"
       }
+    },
+    "lineOptions": {
+      "none": "none",
+      "solid": "solid",
+      "dashed": "dashed",
+      "dotted": "dotted",
+      "double": "double",
+      "hidden": "hidden",
+      "ridge": "ridge",
+      "groove": "groove",
+      "inset": "inset",
+      "outset": "outset"
+    },
+    "scaleMode": {
+      "scaleWidth": "scaleWidth",
+      "scaleHeight": "scaleHeight",
+      "scaleFull": "scaleFull",
+      "noScale": "noScale"
+    },
+    "control": {
+      "title": "Control Title",
+      "valueConfig": "Value Config",
+      "selectViewField": "Select ViewField",
+      "selectDefaultValue": "Select DefaultValue",
+      "defaultValue": "Default Value",
+      "visibility": "Visibility",
+      "sqlOperator": "Sql Operator",
+      "dateType": "Date Type",
+      "step": "Step",
+      "showMark": "Show Mark",
+      "common": "General",
+      "custom": "Customize"
+    },
+    "date": {
+      "year": "Year",
+      "quarter": "Quarter",
+      "month": "Month",
+      "week": "Week",
+      "date": "Date",
+      "dateTime": "Date Time"
+    }
+  },
+  "view": {
+    "loading": "Loading...",
+    "selectSource": "You must select a source",
+    "empty": "Select view in the sidebar",
+    "resultEmpty1": "Click ",
+    "resultEmpty2": " button to execute, the results will be displayed here",
+    "errorTitle": "Error occurred",
+    "tabs": {
+      "discard": "Discard",
+      "cancel": "Cancel",
+      "execute": "Execute",
+      "warning": "There are unexecuted changes, still execute?"
+    },
+    "editor": {
+      "folder": "Folder",
+      "source": "Select source",
+      "run": "Run",
+      "runSelection": "Run selection",
+      "runWinTip": "Win: [Ctrl + Enter]",
+      "runMacTip": "Mac: [Command + Enter]",
+      "beautify": "Beautify",
+      "save": "保存",
+      "saveWinTip": "Win: [Ctrl + S]",
+      "saveMacTip": "Mac: [Command + S]",
+      "info": "Info",
+      "saveAs": "Save as",
+      "saveFragment": "Save Fragment",
+      "readonlyTip": "Not editable in recycle"
+    },
+    "properties": {
+      "reference": "Source reference",
+      "variable": "Variables",
+      "columnPermissions": "Column Permissions"
+    },
+    "resource": {
+      "title": "Source info",
+      "search": "Search database / table / column"
+    },
+    "variable": {
+      "title": "Variables",
+      "formTitle": "variable",
+      "add": "Create variable",
+      "prefix": "[Public]",
+      "suffix": "duplicate"
+    },
+    "columnPermission": {
+      "title": "Column permissions",
+      "search": "Search role name",
+      "partial": "Partial",
+      "none": "None",
+      "all": "All"
+    },
+    "sidebar": {
+      "title": "Views",
+      "addView": "Create view",
+      "addFolder": "Create folder",
+      "parent": "Parent",
+      "recycle": "Recycle"
+    },
+    "saveForm": {
+      "title": "View",
+      "name": "Name",
+      "folder": "Directory",
+      "root": "Root",
+      "advanced": "Advanced",
+      "concurrencyControl": "Concurrency control",
+      "concurrencyControlMode": "Mode",
+      "dirtyread": "Dirty read",
+      "fastfailover": "Fast failover",
+      "cache": "Cache",
+      "cacheExpires": "Expires"
+    },
+    "schemaTable": {
+      "category": "Category",
+      "type": "Type",
+      "typeAndCategory": "Type & Category"
+    }
+  },
+  "source": {
+    "source": "Source",
+    "testSuccess": "Test connection succeeded",
+    "createSuccess": "Source created successfully",
+    "archived": "Archived ",
+    "noPermission": "You do not have permission to access this page",
+    "sidebar": {
+      "title": "Sources",
+      "add": "Create source",
+      "recycle": "Recycle"
+    },
+    "form": {
+      "name": "Name",
+      "type": "Type",
+      "test": "Test connection",
+      "file": "File",
+      "selectFile": "Select file",
+      "addProperty": "Add property",
+      "editProperty": "Edit property",
+      "addConfig": "Add configuration",
+      "editConfig": "Edit configuration",
+      "duplicate": "Duplicate key",
+      "duplicateName": "Duplicate Name"
+    }
+  },
+  "member": {
+    "memberDetail": {
+      "title": "Member detail",
+      "grantOwner": "Granted to organization owner",
+      "revokeOwner": "Revoke owner",
+      "remove": "Remove",
+      "removeConfirm": "Remove confirm",
+      "removeSuccess": "Remove successful",
+      "grantSuccess": "Grant successful",
+      "revokeSuccess": "Revoke successful",
+      "username": "Username",
+      "email": "Email",
+      "name": "Name",
+      "roles": "Roles",
+      "assignRole": "Assign roles"
+    },
+    "roleDetail": {
+      "role": "Role",
+      "createSuccess": "Role created successfully",
+      "roleName": "Name",
+      "description": "Description",
+      "relatedMember": "Related member",
+      "addMember": "Add member",
+      "deleteAll": "Delete all",
+      "searchMember": "Search member",
+      "username": "Username",
+      "email": "Email",
+      "name": "Name",
+      "remove": "Remove"
+    },
+    "form": {
+      "search": "Search or paste the emails of invited members",
+      "needConfirm": "Need email confirmation"
+    },
+    "sidebar": {
+      "member": "Members",
+      "role": "Roles",
+      "memberTitle": "Members",
+      "inviteMember": "Invite member",
+      "inviteSuccess": "The invitation email has been sent successfully",
+      "invalidEmail": "Invalid email addresses",
+      "roleTitle": "Roles",
+      "addRole": "Create role"
     }
   },
   "share": {
     "common": {
-      "confirm": "Please Confirm",
+      "confirm": "Confirm",
       "ok": "OK",
       "cancel": "Cancel"
     },
     "modal": {
       "password": "Password",
-      "pleaseInputPassword": "please input password"
+      "enterPassword": "Enter password"
     }
   },
   "components": {

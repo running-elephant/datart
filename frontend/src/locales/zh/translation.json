@@ -1,9 +1,28 @@
 {
   "global": {
     "tokenExpired": "会话过期，请重新登录",
+    "title": {
+      "action": "操作"
+    },
+    "button": {
+      "save": "保存",
+      "edit": "编辑",
+      "archive": "移至回收站",
+      "restore": "还原",
+      "delete": "删除",
+      "info": "基本信息",
+      "open": "开启",
+      "close": "关闭"
+    },
     "operation": {
+      "archiveConfirm": "确定移至回收站？",
+      "restoreConfirm": "确定还原？",
+      "deleteConfirm": "确定删除？",
       "updateSuccess": "修改成功",
-      "deleteSuccess": "删除成功"
+      "deleteSuccess": "删除成功",
+      "archiveSuccess": "成功移至回收站",
+      "restoreSuccess": "还原成功",
+      "parseError": "配置解析错误"
     },
     "validation": {
       "required": "不能为空",
@@ -26,6 +45,24 @@
       "thurs": "星期四",
       "fri": "星期五",
       "satur": "星期六"
+    },
+    "modal": {
+      "title": {
+        "add": "新建",
+        "edit": "编辑"
+      }
+    },
+    "columnType": {
+      "string": "字符",
+      "numeric": "数值",
+      "date": "日期"
+    },
+    "columnCategory": {
+      "uncategorized": "未分类",
+      "country": "国家",
+      "provinceorstate": "省份",
+      "city": "城市",
+      "county": "区县"
     }
   },
   "login": {
@@ -95,7 +132,7 @@
       },
       "organization": {
         "title": "组织列表",
-        "create": "创建组织",
+        "create": "新建组织",
         "name": "名称",
         "desc": "描述",
         "save": "保存并进入"
@@ -107,15 +144,13 @@
           "username": "用户名",
           "email": "邮箱",
           "name": "姓名",
-          "department": "部门",
-          "save": "保存"
+          "department": "部门"
         },
         "changePassword": {
           "title": "修改密码",
           "oldPassword": "密码",
           "newPassword": "新密码",
-          "confirmPassword": "确定新密码",
-          "save": "保存"
+          "confirmPassword": "确定新密码"
         },
         "switchLanguage": {
           "title": "切换语言"
@@ -304,6 +339,7 @@
         "filterVisibility": "是否可见",
         "aggregates": "聚合方式",
         "filterOption": "筛选方式",
+
         "visibility": "是否显示",
         "facade": "控制器",
         "widthOption": "宽度",
@@ -340,7 +376,7 @@
           "ago": "前",
           "current": "当前",
           "fromNow": "后",
-          "pleaseSelect": "请选择",
+          "select": "请选择",
           "currentTime": "当前时间",
           "startTime": "开始时间",
           "endTime": "结束时间",
@@ -348,7 +384,7 @@
           "relative": "相对"
         },
         "category": {
-          "general": "常规",
+          "general": "General",
           "customize": "自定义",
           "condition": "条件",
           "sourceList": "源列表",
@@ -406,8 +442,8 @@
         }
       },
       "dataview": {
-        "createComputedFields": "创建计算字段",
-        "createVariableFields": "创建查询变量",
+        "createComputedFields": "新建计算字段",
+        "createVariableFields": "新建查询变量",
         "fieldName": "名称",
         "type": "类型",
         "field": "字段",
@@ -425,7 +461,7 @@
       },
       "style": {
         "font": "字体",
-        "pleaseSelect": "请选择 ...",
+        "select": "请选择 ...",
         "table": {
           "header": {
             "newName": "请输入新名称",
@@ -564,7 +600,7 @@
         }
       },
       "setting": {
-        "pleaseSelect": "请选择 ...",
+        "select": "请选择 ...",
         "displayCount": "显示数量",
         "enableCache": "启用缓存",
         "cacheExpire": "缓存时长(秒)",
@@ -662,19 +698,79 @@
         "date": "日期",
         "numeric": "数值",
         "button": "按钮"
+      },
+      "setting": {
+        "setting": "设置",
+        "board": "面板",
+        "widget": "组件",
+        "widgetList": "组件列表",
+        "title": "标题",
+        "align": "Align",
+        "showTitle": "显示标题",
+        "position": "位置",
+        "xAxis": "x轴",
+        "yAxis": "y轴",
+        "size": "尺寸",
+        "px": "像素",
+        "width": "宽",
+        "height": "高",
+        "background": "背景",
+        "color": "颜色",
+        "image": "图片",
+        "uploadTip": "点击上传",
+        "padding": "内边距",
+        "paddingTop": "上边距",
+        "paddingRight": "右边距",
+        "paddingBottom": "下边距",
+        "paddingLeft": "左边距",
+        "border": "边框",
+        "style": "样式",
+        "radius": "圆角",
+        "autoUpdate": "自动刷新数据",
+        "openAutoUpdate": "开启",
+        "frequency": "定时同步频率(秒)",
+        "baseProperty": "基本属性",
+        "marginTB": "上下外边距",
+        "marginLR": "左右外边距",
+        "paddingTB": "上下内边距",
+        "paddingLR": "左右内边距",
+        "rowHeight": "行高",
+        "scaleMode": "缩放模式",
+        "queryMode": "查询模式",
+        "openInitQuery": "开启初始化查询"
       }
     },
     "widget": {
+      "widget": "组件",
       "type": {
         "chart": "数据图表",
+        "widgetChart": "私有图表",
+        "dataChart": "公共图表",
         "media": "媒体",
         "container": "容器",
         "controller": "控制器",
         "query": "查询",
-        "reset": "重置"
+        "reset": "重置",
+        "image": "图片",
+        "richText": "富文本",
+        "timer": "时间器",
+        "iFrame": "iFrame",
+        "video": "视频",
+        "tab": "Tab"
+      },
+      "action": {
+        "refresh": "同步数据",
+        "fullScreen": "全屏",
+        "edit": "编辑",
+        "delete": "删除",
+        "info": "基本信息",
+        "makeLinkage": "联动设置",
+        "closeLinkage": "关闭联动",
+        "makeJump": "跳转设置",
+        "closeJump": "关闭跳转"
       }
     },
-    "sideBar": {
+    "sidebar": {
       "folder": "目录",
       "presentation": "演示",
       "folders": {
@@ -682,29 +778,201 @@
         "dashboard": "新建仪表板",
         "dataChart": "新建数据图表",
         "folder": "新建目录",
-        "recycle": "回收站",
-        "folderTree": {
-          "successDeleted": "成功删除",
-          "successRecycle": "成功移至回收站",
-          "info": "基本信息",
-          "delete": "删除",
-          "moveToTrash": "移至回收站",
-          "confirmDelete": "确定删除",
-          "sureMoveRecycleBin": "确定移至回收站"
-        }
-      },
-      "storyBoards": {
-        "storyBoardsList": "故事板列表",
-        "newStoryBoards": "新建故事板",
         "recycle": "回收站"
       },
-      "recycle": {
-        "successDeleted": "删除成功",
-        "successRestored": "还原成功",
-        "reduction": "还原",
-        "confirmDeletion": "确认删除",
-        "delete": "删除"
+      "storyboards": {
+        "title": "故事板列表",
+        "add": "新建故事板",
+        "recycle": "回收站"
       }
+    },
+    "lineOptions": {
+      "none": "无",
+      "solid": "实线",
+      "dashed": "虚线",
+      "dotted": "点线",
+      "double": "双线",
+      "hidden": "隐藏",
+      "ridge": "垄状",
+      "groove": "凹槽",
+      "inset": "内凹",
+      "outset": "外凸"
+    },
+    "scaleMode": {
+      "scaleWidth": "等比宽度缩放",
+      "scaleHeight": "等比高度缩放",
+      "scaleFull": "全屏铺满",
+      "noScale": "实际尺寸"
+    },
+    "control": {
+      "title": "控制器标题",
+      "valueConfig": "取值配置",
+      "selectViewField": "选择数据源字段",
+      "selectDefaultValue": "选择默认值",
+      "defaultValue": "默认值",
+      "visibility": "是否显示",
+      "sqlOperator": "对应关系",
+      "dateType": "日期类型",
+      "step": "步长",
+      "showMark": "显示标签",
+      "common": "常规",
+      "custom": "自定义"
+    },
+    "date": {
+      "year": "年",
+      "quarter": "季度",
+      "month": "月",
+      "week": "周",
+      "date": "日期",
+      "dateTime": "日期时间"
+    }
+  },
+  "view": {
+    "loading": "加载中...",
+    "selectSource": "请选择数据源",
+    "empty": "请在左侧列表选择数据视图",
+    "resultEmpty1": "请点击 ",
+    "resultEmpty2": " 按钮执行，运行结果将在此处展示",
+    "errorTitle": "执行错误",
+    "tabs": {
+      "discard": "放弃",
+      "cancel": "取消",
+      "execute": "执行",
+      "warning": "有未执行的修改，是否执行？"
+    },
+    "editor": {
+      "folder": "目录",
+      "source": "请选择数据源",
+      "run": "执行",
+      "runSelection": "执行片段",
+      "runWinTip": "Win: [Ctrl + Enter]",
+      "runMacTip": "Mac: [Command + Enter]",
+      "beautify": "美化",
+      "save": "保存",
+      "saveWinTip": "Win: [Ctrl + S]",
+      "saveMacTip": "Mac: [Command + S]",
+      "info": "详情设置",
+      "saveAs": "另存为",
+      "saveFragment": "保存片段",
+      "readonlyTip": "回收站中不可编辑"
+    },
+    "properties": {
+      "reference": "数据源信息",
+      "variable": "变量配置",
+      "columnPermissions": "列权限"
+    },
+    "resource": {
+      "title": "数据源信息",
+      "search": "搜索数据库 / 表 / 字段关键字"
+    },
+    "variable": {
+      "title": "变量配置",
+      "formTitle": "变量",
+      "add": "新建变量",
+      "prefix": "[公共]",
+      "suffix": "重复"
+    },
+    "columnPermission": {
+      "title": "列权限",
+      "search": "搜索角色关键字",
+      "partial": "部分字段",
+      "none": "不可见",
+      "all": "全部字段"
+    },
+    "sidebar": {
+      "title": "数据视图列表",
+      "addView": "新建数据视图",
+      "addFolder": "新建目录",
+      "parent": "所属目录",
+      "recycle": "回收站"
+    },
+    "saveForm": {
+      "title": "数据视图",
+      "name": "名称",
+      "folder": "目录",
+      "root": "根目录",
+      "advanced": "高级配置",
+      "concurrencyControl": "并发控制",
+      "concurrencyControlMode": "模式",
+      "dirtyread": "延迟更新",
+      "fastfailover": "快速失败",
+      "cache": "缓存",
+      "cacheExpires": "失效时间"
+    },
+    "schemaTable": {
+      "category": "分类",
+      "type": "类型",
+      "typeAndCategory": "类型与分类"
+    }
+  },
+  "source": {
+    "source": "数据源",
+    "testSuccess": "测试连接成功",
+    "createSuccess": "新建数据源成功",
+    "archived": "已归档",
+    "noPermission": "您没有权限访问该页面",
+    "sidebar": {
+      "title": "数据源列表",
+      "add": "新建数据源",
+      "recycle": "回收站"
+    },
+    "form": {
+      "name": "名称",
+      "type": "类型",
+      "test": "测试连接",
+      "file": "文件",
+      "selectFile": "选择文件",
+      "addProperty": "新增配置项",
+      "editProperty": "编辑配置项",
+      "addConfig": "新增配置",
+      "editConfig": "编辑配置",
+      "duplicateKey": "Key不能重复",
+      "duplicateName": "名称重复"
+    }
+  },
+  "member": {
+    "memberDetail": {
+      "title": "成员详情",
+      "grantOwner": "设为组织拥有者",
+      "revokeOwner": "撤销拥有者",
+      "remove": "移除成员",
+      "removeConfirm": "确定移除该成员？",
+      "removeSuccess": "移除成功",
+      "grantSuccess": "设置成功",
+      "revokeSuccess": "撤销成功",
+      "username": "用户名",
+      "email": "邮箱",
+      "name": "用户姓名",
+      "roles": "角色列表",
+      "assignRole": "为用户指定角色"
+    },
+    "roleDetail": {
+      "role": "角色",
+      "createSuccess": "新建角色成功",
+      "roleName": "名称",
+      "description": "描述",
+      "relatedMember": "关联成员",
+      "addMember": "添加成员",
+      "deleteAll": "批量删除",
+      "searchMember": "搜索成员关键字",
+      "username": "用户名",
+      "email": "邮箱",
+      "name": "用户姓名",
+      "remove": "移除"
+    },
+    "form": {
+      "search": "请搜索或粘贴被邀请成员邮箱",
+      "needConfirm": "需要被邀请成员邮件确认"
+    },
+    "sidebar": {
+      "member": "成员",
+      "role": "角色",
+      "memberTitle": "成员列表",
+      "inviteMember": "邀请成员",
+      "inviteSuccess": "邀请邮件已成功发送",
+      "invalidEmail": "请检查以下无效邮件地址",
+      "roleTitle": "角色列表",
+      "addRole": "新建角色"
     }
   },
   "share": {
@@ -715,7 +983,7 @@
     },
     "modal": {
       "password": "密码",
-      "pleaseInputPassword": "请输入密码"
+      "enterPassword": "请输入密码"
     }
   },
   "components": {

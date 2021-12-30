@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { FormItemProps } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ALL_SQL_OPERATOR_OPTIONS,
   SQL_OPERATOR_OPTIONS_TYPES,
@@ -33,11 +34,12 @@ export interface SqlOperatorProps {
 }
 export const SqlOperator: React.FC<SqlOperatorProps> = memo(
   ({ controllerType }) => {
+    const tc = useI18NPrefix(`viz.control`);
     const hideForm = FixedSqlOperatorTypes.includes(controllerType);
     const itemProps: FormItemProps<any> = {
       preserve: true,
       name: SqlOperatorName,
-      label: '对应关系',
+      label: tc('sqlOperator'),
       hidden: hideForm,
     };
     const optionKeys: FilterSqlOperator[] =

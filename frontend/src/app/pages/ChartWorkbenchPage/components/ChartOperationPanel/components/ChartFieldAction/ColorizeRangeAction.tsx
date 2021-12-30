@@ -17,8 +17,9 @@
  */
 
 import { Checkbox, Col, Row } from 'antd';
+import { ColorPickerPopover } from 'app/components/ColorPicker';
+import { ColorPicker } from 'app/components/ColorPicker/ColorTag';
 import { FormItemEx } from 'app/components/From';
-import { ReactColorPicker } from 'app/components/ReactColorPicker';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
@@ -79,13 +80,15 @@ const ColorizeRangeAction: FC<{
             name="StartColor"
             rules={[{ required: true }]}
             initialValue={colorRange?.start}
+            className="form-item-ex"
           >
-            <ReactColorPicker
-              value={colorRange?.start}
+            <ColorPickerPopover
               onChange={v => {
                 handleColorRangeChange(v, colorRange?.end);
               }}
-            />
+            >
+              <ColorPicker className="ColorPicker" color={colorRange?.start} />
+            </ColorPickerPopover>
           </FormItemEx>
         </Row>
       </Col>
@@ -96,13 +99,15 @@ const ColorizeRangeAction: FC<{
             name="EndColor"
             rules={[{ required: true }]}
             initialValue={colorRange?.end}
+            className="form-item-ex"
           >
-            <ReactColorPicker
-              value={colorRange?.end}
+            <ColorPickerPopover
               onChange={v => {
                 handleColorRangeChange(colorRange?.start, v);
               }}
-            />
+            >
+              <ColorPicker className="ColorPicker" color={colorRange?.end} />
+            </ColorPickerPopover>
           </FormItemEx>
         </Row>
       </Col>
@@ -114,4 +119,13 @@ export default ColorizeRangeAction;
 
 const StyledColorizeRangeAction = styled(Row)`
   justify-content: center;
+  .ColorPicker {
+    border: 1px solid ${p => p.theme.borderColorBase};
+  }
+  .form-item-ex {
+    width: 100%;
+    .ant-form-item-control-input {
+      width: auto;
+    }
+  }
 `;

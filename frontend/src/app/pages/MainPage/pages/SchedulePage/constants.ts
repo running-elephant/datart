@@ -15,7 +15,7 @@ export const JOB_TYPES_OPTIONS = [
   { label: prefixI18N(Prefix + 'weChat'), value: JobTypes.WeChart },
 ];
 export const FILE_TYPE_OPTIONS = [
-  // { label: 'Excel', value: FileTypes.Excel },
+  { label: 'Excel', value: FileTypes.Excel },
   { label: prefixI18N(Prefix + 'picture'), value: FileTypes.Image },
 ];
 export const WECHART_FILE_TYPE_OPTIONS = [

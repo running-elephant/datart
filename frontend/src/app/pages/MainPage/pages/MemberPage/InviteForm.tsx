@@ -1,5 +1,24 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Checkbox, Form, FormInstance, Select } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { User } from 'app/slice/types';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import debounce from 'lodash/debounce';
@@ -16,6 +35,7 @@ export const InviteForm = memo(
   ({ formProps, afterClose, ...modalProps }: ModalFormProps) => {
     const [options, setOptions] = useState<ValueType[]>([]);
     const formRef = useRef<FormInstance>();
+    const t = useI18NPrefix('member.form');
 
     const debouncedSearchUser = useMemo(() => {
       const searchUser = async (val: string) => {
@@ -53,13 +73,13 @@ export const InviteForm = memo(
         <Form.Item name="emails">
           <Select<ValueType>
             mode="tags"
-            placeholder="请搜索或粘贴被邀请成员邮箱"
+            placeholder={t('search')}
             options={options}
             onSearch={debouncedSearchUser}
           />
         </Form.Item>
         <Form.Item name="sendMail" valuePropName="checked" initialValue={true}>
-          <Checkbox>需要被邀请成员邮件确认</Checkbox>
+          <Checkbox>{t('needConfirm')}</Checkbox>
         </Form.Item>
       </ModalForm>
     );
