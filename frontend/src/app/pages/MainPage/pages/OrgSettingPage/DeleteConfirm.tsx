@@ -1,4 +1,5 @@
 import { Button, Form, Input, message, Modal, ModalProps } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   selectCurrentOrganization,
   selectDeleteOrganizationLoading,
@@ -15,6 +16,8 @@ export const DeleteConfirm = (props: ModalProps) => {
   const currentOrganization = useSelector(selectCurrentOrganization);
   const loading = useSelector(selectDeleteOrganizationLoading);
   const confirmDisabled = inputValue !== currentOrganization?.name;
+  const t = useI18NPrefix('orgSetting');
+  const tg = useI18NPrefix('global');
 
   const inputChange = useCallback(e => {
     setInputValue(e.target.value);
@@ -24,17 +27,17 @@ export const DeleteConfirm = (props: ModalProps) => {
     dispatch(
       deleteOrganization(() => {
         history.replace('/');
-        message.success('删除成功');
+        message.success(tg('operation.deleteSuccess'));
       }),
     );
-  }, [dispatch, history]);
+  }, [dispatch, history, tg]);
 
   return (
     <Modal
       {...props}
       footer={[
         <Button key="cancel" onClick={props.onCancel}>
-          取消
+          {t('cancel')}
         </Button>,
         <Button
           key="confirm"
@@ -43,13 +46,13 @@ export const DeleteConfirm = (props: ModalProps) => {
           onClick={deleteOrg}
           danger
         >
-          确认删除
+          {t('delete')}
         </Button>,
       ]}
     >
       <Form.Item>
         <Input
-          placeholder="输入组织名称确认删除"
+          placeholder={t('enterOrgName')}
           value={inputValue}
           onChange={inputChange}
         />

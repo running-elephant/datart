@@ -1130,6 +1130,31 @@
       "fragment": "表达式"
     }
   },
+  "orgSetting": {
+    "info": "基本信息",
+    "avatar": "头像",
+    "clickToUpload": "点击上传",
+    "name": "名称",
+    "description": "描述",
+    "deleteOrg": "删除组织",
+    "deleteOrgDesc": "删除组织时，会将组织内所有资源、成员、角色和其他配置信息一并永久删除，请谨慎操作。",
+    "cancel": "取消",
+    "delete": "确定删除",
+    "enterOrgName": "输入组织名称确认删除"
+  },
+  "confirmInvite": {
+    "join": "成功加入组织",
+    "confirming": "确认邀请中"
+  },
+  "active": {
+    "activating": "激活中"
+  },
+  "authorization": {
+    "processing": "处理中"
+  },
+  "notfound": {
+    "title": "没有这个页面"
+  },
   "share": {
     "common": {
       "confirm": "请确认",
