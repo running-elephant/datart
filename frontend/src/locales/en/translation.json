@@ -421,20 +421,20 @@
       }
     },
     "workbench": {
-      "goBack": "返回管理页面",
+      "goBack": "Go back",
       "header": {
         "goBack": "Back",
         "run": "Run",
         "save": "Save",
-        "saveToDashboard": "保存到仪表盘",
-        "login": "登陆",
-        "aggregationSwitch": "聚合开关",
-        "aggregationSwitchTip": "开启/关闭聚合会清空全部图表配置，确认开启/关闭？",
-        "open": "开启",
-        "close": "关闭",
+        "saveToDashboard": "Save to dashboard",
+        "login": "Login",
+        "aggregationSwitch": "Aggregation",
+        "aggregationSwitchTip": "Switching aggregation will clear all configurations. Are you sure to turn it on / off?",
+        "open": "Open",
+        "close": "Close",
         "lang": {
-          "zh": "中文",
-          "en": "英文"
+          "zh": "zh",
+          "en": "en"
         },
         "format": {
           "local": "local",
@@ -629,8 +629,8 @@
           "borderStyle": "Border Style"
         },
         "paging": {
-          "title": "常规",
-          "pageSize": "总行数"
+          "title": "Common",
+          "pageSize": "Limit"
         }
       },
       "present": {
@@ -659,7 +659,7 @@
       "edit": "Edit",
       "run": "Run",
       "publish": "Publish",
-      "cancelPublish": "Cancel Publish",
+      "unpublish": "Unpublish",
       "published": "Published",
       "unpublished": "Unpublished",
       "archived": "Archived",
@@ -669,7 +669,7 @@
         "link": "Link",
         "password": "Password",
         "expireDate": "Expire Date",
-        "enablePassword": "Enable Password",
+        "enablePassword": "Password",
         "generateLink": "Generate Link",
         "shareLink": "Share Link",
         "downloadData": "Download Data"
@@ -866,6 +866,28 @@
       "week": "Week",
       "date": "Date",
       "dateTime": "Date Time"
+    },
+    "saveForm": {
+      "name": "Name",
+      "description": "Description",
+      "boardType": {
+        "label": "Board type",
+        "auto": "Auto",
+        "free": "Free"
+      },
+      "parent": "Parent",
+      "root": "Root",
+      "vizType": {
+        "datachart": "Datachart",
+        "dashboard": "Dashboard",
+        "folder": "Folder",
+        "storyboard": "Storyboard"
+      }
+    },
+    "main": {
+      "publishSuccess": "Publish success",
+      "unpublishSuccess": "Unpublish success",
+      "empty": "Select vizs in the sidebar"
     }
   },
   "view": {
