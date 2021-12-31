@@ -1,5 +1,6 @@
 import { Button, Card, Form, Input, message, Upload } from 'antd';
 import { Avatar } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import debounce from 'debounce-promise';
 import {
   BASE_API_URL,
@@ -34,6 +35,8 @@ export function OrgSettingPage() {
   const currentOrganization = useSelector(selectCurrentOrganization);
   const saveOrganizationLoading = useSelector(selectSaveOrganizationLoading);
   const [form] = Form.useForm();
+  const t = useI18NPrefix('orgSetting');
+  const tg = useI18NPrefix('global');
 
   useEffect(() => {
     if (currentOrganization) {
@@ -62,12 +65,12 @@ export function OrgSettingPage() {
         editOrganization({
           organization: { id: currentOrganization?.id, ...values },
           resolve: () => {
-            message.success('修改成功');
+            message.success(tg('operation.updateSuccess'));
           },
         }),
       );
     },
-    [dispatch, currentOrganization],
+    [dispatch, currentOrganization, tg],
   );
 
   const showDeleteConfirm = useCallback(() => {
@@ -80,7 +83,7 @@ export function OrgSettingPage() {
 
   return (
     <Wrapper>
-      <Card title="基本信息">
+      <Card title={t('info')}>
         <Form
           name="source_form_"
           form={form}
@@ -89,7 +92,7 @@ export function OrgSettingPage() {
           wrapperCol={{ span: 16 }}
           onFinish={save}
         >
-          <Form.Item label="头像" className="avatar">
+          <Form.Item label={t('avatar')} className="avatar">
             <Avatar
               size={SPACE_UNIT * 20}
               src={`${BASE_RESOURCE_URL}${currentOrganization?.avatar}`}
@@ -108,15 +111,18 @@ export function OrgSettingPage() {
               onChange={avatarChange}
             >
               <Button type="link" loading={avatarLoading}>
-                点击上传
+                {t('clickToUpload')}
               </Button>
             </Upload>
           </Form.Item>
           <Form.Item
             name="name"
-            label="名称"
+            label={t('name')}
             rules={[
-              { required: true, message: '名称不能为空' },
+              {
+                required: true,
+                message: `${t('name')}${tg('validation.required')}`,
+              },
               {
                 validator: debounce((_, value) => {
                   if (value === currentOrganization?.name) {
@@ -136,7 +142,7 @@ export function OrgSettingPage() {
           >
             <Input />
           </Form.Item>
-          <Form.Item name="description" label="描述">
+          <Form.Item name="description" label={t('description')}>
             <Input.TextArea autoSize={{ minRows: 4, maxRows: 8 }} />
           </Form.Item>
           <Form.Item label=" " colon={false}>
@@ -145,21 +151,19 @@ export function OrgSettingPage() {
               htmlType="submit"
               loading={saveOrganizationLoading}
             >
-              保存
+              {tg('button.save')}
             </Button>
           </Form.Item>
         </Form>
       </Card>
-      <Card title="删除组织">
-        <h4 className="notice">
-          删除组织时，会将组织内所有资源、成员、角色和其他配置信息一并永久删除，请谨慎操作。
-        </h4>
+      <Card title={t('deleteOrg')}>
+        <h4 className="notice">{t('deleteOrgDesc')}</h4>
         <Button danger onClick={showDeleteConfirm}>
-          删除组织
+          {t('deleteOrg')}
         </Button>
         <DeleteConfirm
           width={480}
-          title="删除组织"
+          title={t('deleteOrg')}
           visible={deleteConfirmVisible}
           onCancel={hideDeleteConfirm}
         />

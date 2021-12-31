@@ -1118,6 +1118,31 @@
       "fragment": "Expression"
     }
   },
+  "orgSetting": {
+    "info": "Info",
+    "avatar": "Avatar",
+    "clickToUpload": "Click to upload",
+    "name": "Name",
+    "description": "Description",
+    "deleteOrg": "Delete Organization",
+    "deleteOrgDesc": "When deleting an organization, all resources, members, roles, and other configurations belonging to the organization will be permanently deleted. Please operate with caution.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "enterOrgName": "Enter organization name to delete"
+  },
+  "confirmInvite": {
+    "join": "Join successful",
+    "confirming": "Confirming"
+  },
+  "active": {
+    "activating": "Activating"
+  },
+  "authorization": {
+    "processing": "Processing"
+  },
+  "notfound": {
+    "title": "Page not found"
+  },
   "share": {
     "common": {
       "confirm": "Confirm",

@@ -1,4 +1,5 @@
 import { EmptyFiller } from 'app/components/EmptyFiller';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getUserInfoByToken } from 'app/slice/thunks';
 import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -9,6 +10,8 @@ import { activeAccount } from './service';
 export const ActivePage = () => {
   const history = useHistory();
   const dispatch = useDispatch();
+  const t = useI18NPrefix('active');
+
   const onActiveUser = useCallback(
     token => {
       activeAccount(token).then(loginToken => {
@@ -37,7 +40,7 @@ export const ActivePage = () => {
   }, []);
   return (
     <Wrapper>
-      <EmptyFiller loading title="激活中" />
+      <EmptyFiller loading title={t('activating')} />
     </Wrapper>
   );
 };
