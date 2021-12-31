@@ -20,6 +20,7 @@ import { message } from 'antd';
 import ChartEditor from 'app/components/ChartEditor';
 import { VizHeader } from 'app/components/VizHeader';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
@@ -69,6 +70,7 @@ const ChartPreviewBoard: FC<{
     const [chartPreview, setChartPreview] = useState<ChartPreview>();
     const [chart, setChart] = useState<Chart>();
     const [editChartVisible, setEditChartVisible] = useState<boolean>(false);
+    const t = useI18NPrefix('viz.main');
 
     useEffect(() => {
       const filterSearchParams = filterSearchUrl
@@ -214,15 +216,15 @@ const ChartPreviewBoard: FC<{
             publish: chartPreview.backendChart.status === 1 ? true : false,
             resolve: () => {
               message.success(
-                `${
-                  chartPreview.backendChart?.status === 2 ? '取消' : ''
-                }发布成功`,
+                chartPreview.backendChart?.status === 2
+                  ? t('unpublishSuccess')
+                  : t('publishSuccess'),
               );
             },
           }),
         );
       }
-    }, [dispatch, chartPreview?.backendChart]);
+    }, [dispatch, chartPreview?.backendChart, t]);
 
     return (
       <StyledChartPreviewBoard>

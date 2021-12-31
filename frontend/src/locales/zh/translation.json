@@ -428,8 +428,8 @@
         "save": "保存",
         "saveToDashboard": "保存到仪表盘",
         "login": "登陆",
-        "aggregationSwitch": "聚合开关",
-        "aggregationSwitchTip": "开启/关闭聚合会清空全部图表配置，确认开启/关闭？",
+        "aggregationSwitch": "数据聚合",
+        "aggregationSwitchTip": "切换数据聚合会清空所有配置，确认开启/关闭？",
         "open": "开启",
         "close": "关闭",
         "lang": {
@@ -659,7 +659,7 @@
       "edit": "编辑",
       "run": "运行",
       "publish": "发布",
-      "cancelPublish": "取消发布",
+      "unpublish": "取消发布",
       "published": "已发布",
       "unpublished": "未发布",
       "archived": "已归档",
@@ -865,6 +865,28 @@
       "week": "周",
       "date": "日期",
       "dateTime": "日期时间"
+    },
+    "saveForm": {
+      "name": "名称",
+      "description": "描述",
+      "boardType": {
+        "label": "布局类型",
+        "auto": "自动",
+        "free": "自由"
+      },
+      "parent": "所属目录",
+      "root": "根目录",
+      "vizType": {
+        "datachart": "数据图表",
+        "dashboard": "仪表板",
+        "folder": "目录",
+        "storyboard": "故事板"
+      }
+    },
+    "main": {
+      "publishSuccess": "发布成功",
+      "unpublishSuccess": "取消发布成功",
+      "empty": "请在左侧列表选择可视化"
     }
   },
   "view": {
