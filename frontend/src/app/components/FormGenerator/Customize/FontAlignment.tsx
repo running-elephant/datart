@@ -23,7 +23,7 @@ import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
 const template = {
-  label: 'style.align',
+  label: '@global@.viz.common.enum.fontAlignment.alignment',
   key: 'align',
   default: 'left',
   comType: 'select',

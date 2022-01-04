@@ -333,6 +333,7 @@
           "condition": "Condition"
         },
         "fontAlignment": {
+          "alignment": "Alignment",
           "left": "Left",
           "center": "Center",
           "right": "right"
