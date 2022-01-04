@@ -119,7 +119,7 @@ const VizHeader: FC<{
                   loading={publishLoading}
                   onClick={onPublish}
                 >
-                  {status === 1 ? t('publish') : t('cancelPublish')}
+                  {status === 1 ? t('publish') : t('unpublish')}
                 </Button>
               )}
               {allowManage && !isArchived && onGotoEdit && (

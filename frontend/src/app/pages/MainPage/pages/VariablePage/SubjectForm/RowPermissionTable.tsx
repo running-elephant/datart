@@ -1,5 +1,24 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Checkbox, Table, TableColumnProps } from 'antd';
 import { LoadingMask } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import produce from 'immer';
 import { Key, memo, useCallback, useMemo } from 'react';
 import styled from 'styled-components/macro';
@@ -33,6 +52,8 @@ export const RowPermissionTable = memo(
     onSelectedRowKeyChange,
     onRowPermissionSubjectChange,
   }: SubjectFormProps) => {
+    const t = useI18NPrefix('variable');
+
     const checkUseDefaultValue = useCallback(
       id => e => {
         onRowPermissionSubjectChange(
@@ -59,9 +80,9 @@ export const RowPermissionTable = memo(
 
     const columns: TableColumnProps<RowPermissionSubject>[] = useMemo(
       () => [
-        { dataIndex: 'name', title: '名称' },
+        { dataIndex: 'name', title: t('name') },
         {
-          title: '使用变量默认值',
+          title: t('useDefaultValue'),
           width: SPACE_TIMES(32),
           render: (_, record) => {
             return (
@@ -74,7 +95,7 @@ export const RowPermissionTable = memo(
           },
         },
         {
-          title: '值',
+          title: t('value'),
           width: SPACE_TIMES(72),
           render: (_, record) =>
             editingVariable && (
@@ -90,7 +111,7 @@ export const RowPermissionTable = memo(
             ),
         },
       ],
-      [selectedRowKeys, editingVariable, checkUseDefaultValue, valueChange],
+      [selectedRowKeys, editingVariable, checkUseDefaultValue, valueChange, t],
     );
 
     const rowClassName = useCallback(

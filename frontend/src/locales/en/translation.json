@@ -5,6 +5,7 @@
       "action": "Action"
     },
     "button": {
+      "create": "Create",
       "save": "Save",
       "edit": "Edit",
       "archive": "Archive",
@@ -28,6 +29,23 @@
       "required": " is required",
       "invalidPassword": "Password must be 6-20 characters",
       "passwordNotMatch": "Password and confirm password does not match"
+    },
+    "time": {
+      "minute": "Minute",
+      "hour": "Hours",
+      "day": "Day",
+      "month": "Month",
+      "year": "Years",
+      "m": "Minute",
+      "h": "Hours",
+      "d": "Day",
+      "sun": "Sunday",
+      "mon": "Monday",
+      "tues": "Tuesday",
+      "wednes": "Wednesday",
+      "thurs": "Thursday",
+      "fri": "Friday",
+      "satur": "Saturday"
     },
     "modal": {
       "title": {
@@ -145,16 +163,122 @@
     },
     "subNavs": {
       "variables": {
-        "title": "公共变量设置"
+        "title": "Public variables"
       },
       "orgSettings": {
-        "title": "组织设置"
+        "title": "Organization Settings"
       }
     },
     "background": {
       "loading": "Loading...",
       "initError": "Initialization error, please refresh the page and try again",
       "createOrg": "You have not joined any organization, click to create"
+    },
+    "pages": {
+      "schedulePage": {
+        "constants": {
+          "email": "Email",
+          "weChat": "WeChat",
+          "picture": "Picture",
+          "taskExecution": "Task execution",
+          "configurationAnalysis": "Configure the parsing",
+          "getData": "Data collection",
+          "send": "Send"
+        },
+        "sidebar": {
+          "index": {
+            "scheduledTaskList": "Scheduled task list",
+            "newTimedTask": "Create scheduled task",
+            "recycle": "Recycle"
+          },
+          "scheduleList": {
+            "successStarted": "Successfully started",
+            "successStop": "Stopped successfully",
+            "successImmediately": "Executed successfully immediately",
+            "start": "Start",
+            "stop": "Stop",
+            "executeItNow": "Are you sure to execute it now?",
+            "executeImmediately": "Execute immediately"
+          },
+          "editorPage": {
+            "index": {
+              "tickToSendContent": "Please tick to send content",
+              "addSuccess": "Added successfully",
+              "saveSuccess": "Saved successfully",
+              "restoredSuccess": "Restored successfully",
+              "success": "Success",
+              "moveToTrash": "Move to recycle bin",
+              "delete": "Delete",
+              "newTimedTask": "New timed task",
+              "sureToRestore?": "Are you sure to restore?",
+              "restore": "Reduction",
+              "sureToDelete": "Confirm delete?",
+              "allowModificationAfterStopping": "Allow modification after stopping",
+              "save": "Save",
+              "allowMoveAfterStopping": "Allow moving to the recycle bin after stopping",
+              "sureMoveRecycleBin": "Are you sure to move to the recycle bin?",
+              "basicSettings": "Basic settings",
+              "emailSetting": "Email settings",
+              "enterpriseWeChatSettings": "Enterprise WeChat Settings",
+              "sendContentSettings": "Send content settings"
+            },
+            "weChartSetttingForm": {
+              "RobotWebhookAddress": "Robot webhook address",
+              "RobotWebhookAddressIsRequired": "Robot webhook address is required",
+              "fileType": "File type",
+              "picWidth": "Width",
+              "px": "px"
+            },
+            "scheduleErrorLog": {
+              "index": {
+                "startTime": "Start",
+                "endTime": "End",
+                "logPhase": "Log phase",
+                "executionInformation": "Execution information",
+                "success": "Success",
+                "log": "Log"
+              }
+            },
+            "emailSettingForm": {
+              "commonRichText": {
+                "pleaseEnter": "Please enter"
+              },
+              "index": {
+                "CC": "CC",
+                "theme": "Theme",
+                "subjectIsRequired": "Theme is required",
+                "fileType": "File type",
+                "picWidth": "Width",
+                "px": "px",
+                "recipient": "Recipient",
+                "recipientIsRequired": "Recipient is required",
+                "bcc": "BCC",
+                "contentOfEmail": "Content of email"
+              },
+              "mailTagFormItem": {
+                "placeholder": "Enter email address or name keyword search..."
+              }
+            },
+            "basicBaseForm": {
+              "index": {
+                "nameAlreadyExists": "Name already exists",
+                "name": "Name",
+                "nameRequired": "Name is required",
+                "type": "Type",
+                "effectiveTimeRange": "Effective time range"
+              },
+              "executeFormItem": {
+                "per": "Each",
+                "of": "",
+                "executionTimeSetting": "Execution time setting",
+                "expressionIsRequired": "Expression is required",
+                "pleaseEnterCronExpression": "Please enter cron expression",
+                "manualInput": "Manual input"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "viz": {
@@ -297,20 +421,20 @@
       }
     },
     "workbench": {
-      "goBack": "返回管理页面",
+      "goBack": "Go back",
       "header": {
         "goBack": "Back",
         "run": "Run",
         "save": "Save",
-        "saveToDashboard": "保存到仪表盘",
-        "login": "登陆",
-        "aggregationSwitch": "聚合开关",
-        "aggregationSwitchTip": "开启/关闭聚合会清空全部图表配置，确认开启/关闭？",
-        "open": "开启",
-        "close": "关闭",
+        "saveToDashboard": "Save to dashboard",
+        "login": "Login",
+        "aggregationSwitch": "Aggregation",
+        "aggregationSwitchTip": "Switching aggregation will clear all configurations. Are you sure to turn it on / off?",
+        "open": "Open",
+        "close": "Close",
         "lang": {
-          "zh": "中文",
-          "en": "英文"
+          "zh": "zh",
+          "en": "en"
         },
         "format": {
           "local": "local",
@@ -505,8 +629,8 @@
           "borderStyle": "Border Style"
         },
         "paging": {
-          "title": "常规",
-          "pageSize": "总行数"
+          "title": "Common",
+          "pageSize": "Limit"
         }
       },
       "present": {
@@ -535,15 +659,17 @@
       "edit": "Edit",
       "run": "Run",
       "publish": "Publish",
-      "cancelPublish": "Cancel Publish",
+      "unpublish": "Unpublish",
       "published": "Published",
       "unpublished": "Unpublished",
       "archived": "Archived",
+      "play": "Play",
+      "playTip":"Press Esc to quit playing",
       "share": {
         "link": "Link",
         "password": "Password",
         "expireDate": "Expire Date",
-        "enablePassword": "Enable Password",
+        "enablePassword": "Password",
         "generateLink": "Generate Link",
         "shareLink": "Share Link",
         "downloadData": "Download Data"
@@ -563,6 +689,8 @@
         "container": "Container",
         "tab": "Tab",
         "controller": "Controller",
+        "toTop": "move To Top",
+        "toBottom": "move To Bottom",
         "undo": "Undo",
         "redo": "Redo",
         "delete": "Delete",
@@ -613,7 +741,14 @@
         "rowHeight": "rowHeight",
         "scaleMode": "scale Mode",
         "queryMode": "query Mode",
-        "openInitQuery": "open Init Query"
+        "openInitQuery": "open Init Query",
+        "cutIn": "Cut In",
+        "cutOut": "Cut Out",
+        "speed": "Speed",
+        "autoPlay": "Auto Play",
+        "duration": "Duration (s) ",
+        "delPagesTip": "Confirm to delete all selected story pages?",
+        "delPageTip": "Confirm to delete this story page?"
       }
     },
     "widget": {
@@ -644,7 +779,6 @@
         "delete": "Delete",
         "confirmDel": "Confirm Delete",
         "ContainerConfirmDel": "The components within this component will also be deleted, confirm whether to delete them or not?",
-        "ContainerConfirmDel1": "The components you want to delete has a Container component, the deletion will remove the components inside the container together",
         "info": "Info",
         "makeLinkage": "Set Linkage",
         "closeLinkage": "Close Linkage",
@@ -732,6 +866,28 @@
       "week": "Week",
       "date": "Date",
       "dateTime": "Date Time"
+    },
+    "saveForm": {
+      "name": "Name",
+      "description": "Description",
+      "boardType": {
+        "label": "Board type",
+        "auto": "Auto",
+        "free": "Free"
+      },
+      "parent": "Parent",
+      "root": "Root",
+      "vizType": {
+        "datachart": "Datachart",
+        "dashboard": "Dashboard",
+        "folder": "Folder",
+        "storyboard": "Storyboard"
+      }
+    },
+    "main": {
+      "publishSuccess": "Publish success",
+      "unpublishSuccess": "Unpublish success",
+      "empty": "Select vizs in the sidebar"
     }
   },
   "view": {
@@ -925,6 +1081,67 @@
       "source": ["Access", "Manage"],
       "schedule": ["Manage"]
     }
+  },
+  "variable": {
+    "title": "Public variables",
+    "public": "Public variables",
+    "name": "Name",
+    "label": "Label",
+    "type": "Type",
+    "valueType": "Value type",
+    "permission": {
+      "label": "Permission",
+      "hidden": "Hidden",
+      "readonly": "Readonly",
+      "editable": "Editable"
+    },
+    "defaultValue": "Default value",
+    "expression": "Use expression default value",
+    "duplicateName": "Duplicate Name",
+    "related": "Related roles & members",
+    "deleteAllConfirm": "Delete confirm",
+    "deleteAll": "Delete all",
+    "enterToAdd": "Enter to add",
+    "enterExpression": "Enter expression",
+    "relatedRole": "Related roles",
+    "relatedMember": "Related members",
+    "useDefaultValue": "Use variable default value",
+    "value": "Value",
+    "variableType": {
+      "query": "Query",
+      "permission": "Permission"
+    },
+    "variableValueType": {
+      "string": "String",
+      "numeric": "Number",
+      "date": "Date",
+      "fragment": "Expression"
+    }
+  },
+  "orgSetting": {
+    "info": "Info",
+    "avatar": "Avatar",
+    "clickToUpload": "Click to upload",
+    "name": "Name",
+    "description": "Description",
+    "deleteOrg": "Delete Organization",
+    "deleteOrgDesc": "When deleting an organization, all resources, members, roles, and other configurations belonging to the organization will be permanently deleted. Please operate with caution.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "enterOrgName": "Enter organization name to delete"
+  },
+  "confirmInvite": {
+    "join": "Join successful",
+    "confirming": "Confirming"
+  },
+  "active": {
+    "activating": "Activating"
+  },
+  "authorization": {
+    "processing": "Processing"
+  },
+  "notfound": {
+    "title": "Page not found"
   },
   "share": {
     "common": {

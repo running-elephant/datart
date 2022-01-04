@@ -40,7 +40,6 @@ export function FolderTree({
   const loading = useSelector(selectVizListLoading);
   const vizsData = useSelector(selectVizs);
   const { showSaveForm } = useContext(SaveFormContext);
-  const t = useI18NPrefix(i18nPrefix);
   const tg = useI18NPrefix('global');
 
   useEffect(() => {
@@ -185,7 +184,7 @@ export function FolderTree({
         </TreeTitle>
       );
     },
-    [moreMenuClick, archiveViz, t, tg],
+    [moreMenuClick, archiveViz, tg],
   );
 
   const onDrop = info => {

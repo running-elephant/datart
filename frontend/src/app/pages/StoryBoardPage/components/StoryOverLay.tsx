@@ -17,6 +17,7 @@
  */
 import { ShareAltOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useMemo } from 'react';
 export interface BoardOverLayProps {
   onOpenShareLink?: () => void;
@@ -26,6 +27,7 @@ export interface BoardOverLayProps {
 }
 export const StoryOverLay: React.FC<BoardOverLayProps> = memo(
   ({ onOpenShareLink, allowShare }) => {
+    const t = useI18NPrefix(`viz.action.share`);
     const renderList = useMemo(
       () => [
         {
@@ -34,10 +36,10 @@ export const StoryOverLay: React.FC<BoardOverLayProps> = memo(
           onClick: onOpenShareLink,
           disabled: false,
           render: allowShare,
-          content: '分享链接',
+          content: t('shareLink'),
         },
       ],
-      [onOpenShareLink, allowShare],
+      [onOpenShareLink, allowShare, t],
     );
     const actionItems = useMemo(
       () =>

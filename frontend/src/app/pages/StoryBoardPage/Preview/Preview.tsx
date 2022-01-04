@@ -17,6 +17,7 @@
  */
 import { Layout, message } from 'antd';
 import { Split } from 'app/components';
+import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
 import { vizActions } from 'app/pages/MainPage/pages/VizPage/slice';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
@@ -50,9 +51,8 @@ export const StoryPagePreview: React.FC<{
   allowManage?: boolean;
 }> = memo(({ storyId, allowShare, allowManage }) => {
   const dispatch = useDispatch();
-
+  const t = usePrefixI18N('viz.action');
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  // const [storyEditing, setStoryEditing] = useState(false);
   const [editorVisible, setEditorVisible] = useState(false);
 
   const storyBoard = useSelector((state: { storyBoard: StoryBoardState }) =>
@@ -82,8 +82,9 @@ export const StoryPagePreview: React.FC<{
     setEditorVisible(c => !c);
   }, []);
   const playStory = useCallback(() => {
+    message.info(t('playTip'));
     dispatch(vizActions.changePlayingStoryId(storyId || ''));
-  }, [dispatch, storyId]);
+  }, [dispatch, storyId, t]);
 
   useEffect(() => {
     if (sortedPages.length === 0) {
