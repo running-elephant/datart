@@ -33,8 +33,6 @@ public class SingleTypedValue extends TypedValue {
         this.valueType = valueType;
     }
 
-
-
     @Override
     public String toString() {
         return "TypedValue{" +
