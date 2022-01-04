@@ -14,6 +14,7 @@
   "author": "",
   "license": "Apache-2.0",
   "scripts": {
+    "bootstrap": "npm install --legacy-peer-deps",
     "analyze": "craco build && source-map-explorer 'build/static/js/*.js'",
     "start": "craco start",
     "build": "cross-env GENERATE_SOURCEMAP=false craco build",
