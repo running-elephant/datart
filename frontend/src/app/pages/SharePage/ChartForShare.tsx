@@ -41,7 +41,8 @@ import {
   updateFilterAndFetchDatasetForShare,
 } from './slice/thunks';
 
-const ChartPreviewBoardForShare: FC<{
+const TitleHeight = 100;
+const ChartForShare: FC<{
   style?: CSSProperties;
   chartPreview?: ChartPreview;
   filterSearchParams?: FilterSearchParams;
@@ -70,10 +71,14 @@ const ChartPreviewBoardForShare: FC<{
       refreshMode: 'debounce',
       refreshRate: 500,
     });
+    const { ref: controlRef, height: controlH = 0 } =
+      useResizeObserver<HTMLDivElement>({
+        refreshMode: 'debounce',
+        refreshRate: 500,
+      });
     const headlessBrowserRenderSign = useSelector(
       selectHeadlessBrowserRenderSign,
     );
-
     useMount(() => {
       if (!chartPreview) {
         return;
@@ -148,11 +153,14 @@ const ChartPreviewBoardForShare: FC<{
           allowShare
           allowDownload
         />
-        <ControllerPanel
-          viewId={chartPreview?.backendChart?.viewId}
-          chartConfig={chartPreview?.chartConfig}
-          onChange={handleFilterChange}
-        />
+        <div ref={controlRef}>
+          <ControllerPanel
+            viewId={chartPreview?.backendChart?.viewId}
+            chartConfig={chartPreview?.chartConfig}
+            onChange={handleFilterChange}
+          />
+        </div>
+
         <div style={{ width: '100%', height: '100%' }} ref={ref}>
           <ChartTools.ChartIFrameContainer
             key={chartPreview?.backendChart?.id!}
@@ -167,14 +175,14 @@ const ChartPreviewBoardForShare: FC<{
         <HeadlessBrowserIdentifier
           renderSign={headlessBrowserRenderSign}
           width={Number(width) || 0}
-          height={Number(height) || 0}
+          height={Number(width) + Number(controlH) + TitleHeight || 0}
         />
       </StyledChartPreviewBoard>
     );
   },
 );
 
-export default ChartPreviewBoardForShare;
+export default ChartForShare;
 
 const StyledChartPreviewBoard = styled.div`
   display: flex;
