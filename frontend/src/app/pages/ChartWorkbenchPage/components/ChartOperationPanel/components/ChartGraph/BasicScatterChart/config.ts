@@ -533,11 +533,6 @@ const config: ChartConfig = {
           color: '颜色',
           colorize: '配色',
         },
-        graph: {
-          title: '折线图',
-          smooth: '平滑',
-          step: '阶梯',
-        },
         xAxis: {
           title: 'X轴',
         },
@@ -556,6 +551,67 @@ const config: ChartConfig = {
         scatter: {
           title: '散点图配置',
           cycleRatio: '气泡大像素比',
+        },
+      },
+    },
+    {
+      lang: 'en-US',
+      translation: {
+        common: {
+          showAxis: 'Show Axis',
+          inverseAxis: 'Inverse Axis',
+          lineStyle: 'Line Style',
+          borderType: 'Border Type',
+          borderWidth: 'Border Width',
+          borderColor: 'Border Color',
+          backgroundColor: 'Background Color',
+          showLabel: 'Show Label',
+          unitFont: 'Unit Font',
+          rotate: 'Rotate',
+          position: 'Position',
+          showInterval: 'Show Interval',
+          interval: 'Interval',
+          showTitleAndUnit: 'Show Title and Unit',
+          nameLocation: 'Name Location',
+          nameRotate: 'Name Rotate',
+          nameGap: 'Name Gap',
+          min: 'Min',
+          max: 'Max',
+        },
+        label: {
+          title: 'Label',
+          showLabel: 'Show Label',
+          position: 'Position',
+        },
+        legend: {
+          title: 'Legend',
+          showLegend: 'Show Legend',
+          type: 'Type',
+          selectAll: 'Select All',
+          position: 'Position',
+        },
+        data: {
+          color: 'Color',
+          colorize: 'Colorize',
+        },
+        xAxis: {
+          title: 'X Axis',
+        },
+        yAxis: {
+          title: 'Y Axis',
+        },
+        splitLine: {
+          title: 'Split Line',
+          showHorizonLine: 'Show Horizontal Line',
+          showVerticalLine: 'Show Vertical Line',
+        },
+        reference: {
+          title: 'Reference',
+          open: 'Open',
+        },
+        scatter: {
+          title: 'Scatter',
+          cycleRatio: 'Cycle Ratio',
         },
       },
     },

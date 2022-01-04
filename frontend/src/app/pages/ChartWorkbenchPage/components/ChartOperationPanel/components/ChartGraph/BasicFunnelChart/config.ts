@@ -295,6 +295,43 @@ const config: ChartConfig = {
         },
       },
     },
+    {
+      lang: 'en-US',
+      translation: {
+        section: {
+          legend: 'Legend',
+          detail: 'Detail',
+          info: 'Info',
+        },
+        label: {
+          title: 'Title',
+          showLabel: 'Show Label',
+          position: 'Position',
+          metric: 'Metric',
+          dimension: 'Dimension',
+          conversion: 'Conversion',
+          arrival: 'Arrival',
+          percentage: 'Percentage',
+        },
+        legend: {
+          title: 'Legend',
+          showLegend: 'Show Legend',
+          type: 'Type',
+          selectAll: 'Select All',
+          position: 'Position',
+        },
+        funnel: {
+          title: 'Funnel',
+          sort: 'Sort',
+          align: 'Alignment',
+          gap: 'Gap',
+        },
+        data: {
+          color: 'Color',
+          colorize: 'Colorize',
+        },
+      },
+    },
   ],
 };
 
