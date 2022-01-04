@@ -211,7 +211,7 @@ const config: ChartConfig = {
         {
           label: 'style.tableSize',
           key: 'tableSize',
-          default: 'default',
+          default: 'small',
           comType: 'select',
           options: {
             items: [
@@ -231,7 +231,7 @@ const config: ChartConfig = {
         {
           label: 'style.bgColor',
           key: 'bgColor',
-          default: '#f0f0f0',
+          default: '#f8f9fa',
           comType: 'fontColor',
         },
         {
@@ -241,9 +241,9 @@ const config: ChartConfig = {
           default: {
             fontFamily: 'PingFang SC',
             fontSize: 12,
-            fontWeight: 'normal',
+            fontWeight: 'bold',
             fontStyle: 'normal',
-            color: '#6c757d',
+            color: '#495057',
           },
         },
         {
@@ -269,7 +269,7 @@ const config: ChartConfig = {
         {
           label: 'style.bgColor',
           key: 'bgColor',
-          default: '#fafafa',
+          default: 'rgba(0,0,0,0)',
           comType: 'fontColor',
         },
         {
@@ -281,7 +281,7 @@ const config: ChartConfig = {
             fontSize: 12,
             fontWeight: 'normal',
             fontStyle: 'normal',
-            color: '#6c757d',
+            color: '#495057',
           },
         },
         {

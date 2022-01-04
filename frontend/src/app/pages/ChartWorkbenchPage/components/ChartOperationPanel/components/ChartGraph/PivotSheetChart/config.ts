@@ -156,7 +156,7 @@ const config: ChartConfig = {
             fontFamily: 'PingFang SC',
             fontSize: 12,
             fontWeight: 'normal',
-            color: '#6c757d',
+            color: '#495057',
           },
           options: {
             fontFamilies: [
@@ -207,7 +207,7 @@ const config: ChartConfig = {
             fontFamily: 'PingFang SC',
             fontSize: 12,
             fontWeight: 'normal',
-            color: '#6c757d',
+            color: '#495057',
           },
           options: {
             fontFamilies: [
