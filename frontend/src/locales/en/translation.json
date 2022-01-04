@@ -331,6 +331,11 @@
           "hide": "Hide",
           "show": "Show",
           "condition": "Condition"
+        },
+        "fontAlignment": {
+          "left": "Left",
+          "center": "Center",
+          "right": "right"
         }
       },
       "filter": {
@@ -664,7 +669,7 @@
       "unpublished": "Unpublished",
       "archived": "Archived",
       "play": "Play",
-      "playTip":"Press Esc to quit playing",
+      "playTip": "Press Esc to quit playing",
       "share": {
         "link": "Link",
         "password": "Password",

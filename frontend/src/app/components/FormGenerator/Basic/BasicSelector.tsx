@@ -78,7 +78,7 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
         >
           {safeInvokeAction()?.map((o, index) => {
             const key = isEmpty(o['key']) ? index : o.key;
-            const label = isEmpty(o['label']) ? o : o.label;
+            const label = isEmpty(o['label']) ? o : t(o.label);
             const value = isEmpty(o['value']) ? o : o.value;
             return (
               <Select.Option key={key} value={value}>

@@ -196,9 +196,18 @@ const config: ChartConfig = {
           comType: 'select',
           options: {
             items: [
-              { label: '左对齐', value: 'left' },
-              { label: '居中对齐', value: 'center' },
-              { label: '右对齐', value: 'right' },
+              {
+                label: '@global@.viz.common.enum.fontAlignment.left',
+                value: 'left',
+              },
+              {
+                label: '@global@.viz.common.enum.fontAlignment.center',
+                value: 'center',
+              },
+              {
+                label: '@global@.viz.common.enum.fontAlignment.right',
+                value: 'right',
+              },
             ],
           },
         },

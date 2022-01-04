@@ -331,6 +331,11 @@
           "hide": "隐藏",
           "show": "显示",
           "condition": "条件"
+        },
+        "fontAlignment": {
+          "left": "左对齐",
+          "center": "居中",
+          "right": "右对齐"
         }
       },
       "filter": {
@@ -664,7 +669,7 @@
       "unpublished": "未发布",
       "archived": "已归档",
       "play": "播放",
-      "playTip":"按 Esc 退出播放",
+      "playTip": "按 Esc 退出播放",
       "share": {
         "link": "链接",
         "password": "密码",
