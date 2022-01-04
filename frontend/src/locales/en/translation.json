@@ -529,7 +529,7 @@
       "data": {
         "dimension": "Dimension",
         "metrics": "Metric",
-        "mixed": "Mixed",
+        "mixed": "Columns",
         "filter": "Filter",
         "colorize": "Color",
         "colorRange": "Range Color",
