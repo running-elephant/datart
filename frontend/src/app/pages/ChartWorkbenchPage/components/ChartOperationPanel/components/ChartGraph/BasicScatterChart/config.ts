@@ -231,7 +231,7 @@ const config: ChartConfig = {
           options: [],
         },
         {
-          label: 'unitFont',
+          label: 'common.unitFont',
           key: 'unitFont',
           comType: 'font',
           default: {
@@ -333,7 +333,7 @@ const config: ChartConfig = {
           options: [],
         },
         {
-          label: 'unitFont',
+          label: 'common.unitFont',
           key: 'unitFont',
           comType: 'font',
           default: {
