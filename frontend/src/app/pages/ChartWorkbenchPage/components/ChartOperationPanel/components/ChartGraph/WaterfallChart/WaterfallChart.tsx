@@ -112,7 +112,7 @@ class WaterfallChart extends Chart {
   }
 
   getSerieBarWidth(styles) {
-    return getStyleValueByGroup(styles, 'bar', 'width');
+    return getStyleValueByGroup(styles, 'waterfall', 'width');
   }
 
   getSeries(styles, dataColumns, aggregateConfigs, group) {
@@ -122,11 +122,11 @@ class WaterfallChart extends Chart {
       data: UniqArray(dataColumns.map(dc => dc[getValueByColumnKey(group[0])])),
     };
     const yAxisNames = aggregateConfigs.map(getColumnRenderName);
-    const [isIncrement, ascendColor, descendColor] =
+    const [formulaMode, ascendColor, descendColor] =
       this.getArrStyleValueByGroup(
-        ['isIncrement', 'ascendColor', 'descendColor'],
+        ['formulaMode', 'ascendColor', 'descendColor'],
         styles,
-        'bar',
+        'waterfall',
       );
     const label = this.getLabel(styles, aggregateConfigs[0].format);
 
@@ -135,7 +135,7 @@ class WaterfallChart extends Chart {
     );
 
     const { baseData, ascendOrder, descendOrder } = this.getDataList(
-      isIncrement,
+      formulaMode,
       dataList,
       xAxisColumns,
       styles,
@@ -221,8 +221,8 @@ class WaterfallChart extends Chart {
   }
 
   private getSeriesItemStyle(styles) {
-    const borderStyle = getStyleValueByGroup(styles, 'bar', 'borderStyle');
-    const borderRadius = getStyleValueByGroup(styles, 'bar', 'radius');
+    const borderStyle = getStyleValueByGroup(styles, 'waterfall', 'borderStyle');
+    const borderRadius = getStyleValueByGroup(styles, 'waterfall', 'radius');
 
     return {
       borderRadius,
@@ -232,15 +232,15 @@ class WaterfallChart extends Chart {
     };
   }
 
-  getDataList(isIncrement, dataList, xAxisColumns, styles) {
-    const totalColor = getStyleValueByGroup(styles, 'bar', 'totalColor');
+  getDataList(formulaMode, dataList, xAxisColumns, styles) {
+    const grandTotalColor = getStyleValueByGroup(styles, 'waterfall', 'grandTotalColor');
     const baseData: any = [];
     const ascendOrder: any = [];
     const descendOrder: any = [];
     dataList.forEach((data, index) => {
       data = parseFloat(data);
       if (index > 0) {
-        if (isIncrement) {
+        if (formulaMode) {
           const result =
             dataList[index - 1] >= 0
               ? parseFloat(dataList[index - 1] + baseData[index - 1])
@@ -278,7 +278,7 @@ class WaterfallChart extends Chart {
         }
       }
     });
-    if (isIncrement && xAxisColumns?.data?.length) {
+    if (formulaMode && xAxisColumns?.data?.length) {
       xAxisColumns.data.push('累计');
       const resultData = parseFloat(
         dataList[dataList.length - 1] + baseData[baseData.length - 1],
@@ -287,7 +287,7 @@ class WaterfallChart extends Chart {
         ascendOrder.push({
           value: resultData,
           itemStyle: {
-            color: totalColor,
+            color: grandTotalColor,
           },
         });
         descendOrder.push('-');
@@ -295,7 +295,7 @@ class WaterfallChart extends Chart {
         descendOrder.push({
           value: Math.abs(resultData),
           itemStyle: {
-            color: totalColor,
+            color: grandTotalColor,
           },
         });
         ascendOrder.push('-');

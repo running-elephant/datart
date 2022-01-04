@@ -47,19 +47,20 @@ const config: ChartConfig = {
   ],
   styles: [
     {
-      label: 'bar.title',
-      key: 'bar',
+      label: 'waterfall.title',
+      key: 'waterfall',
       comType: 'group',
       rows: [
         {
-          label: 'bar.isIncrement',
-          key: 'isIncrement',
+          label: 'waterfall.formulaMode',
+          key: 'formulaMode',
           comType: 'select',
           default: true,
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '累计', value: true },
-              { label: '差异', value: false },
+              { label: 'waterfall.grandTotal', value: true },
+              { label: 'waterfall.difference', value: false },
             ],
           },
         },
@@ -74,31 +75,31 @@ const config: ChartConfig = {
           },
         },
         {
-          label: 'bar.radius',
+          label: 'waterfall.radius',
           key: 'radius',
           comType: 'inputNumber',
         },
         {
-          label: 'bar.width',
+          label: 'waterfall.width',
           key: 'width',
           default: 0,
           comType: 'inputNumber',
         },
         {
-          label: 'bar.ascendColor',
+          label: 'waterfall.ascendColor',
           key: 'ascendColor',
           default: '#298ffe',
           comType: 'fontColor',
         },
         {
-          label: 'bar.descendColor',
+          label: 'waterfall.descendColor',
           key: 'descendColor',
           default: '#15AD31',
           comType: 'fontColor',
         },
         {
-          label: 'bar.totalColor',
-          key: 'totalColor',
+          label: 'waterfall.grandTotalColor',
+          key: 'grandTotalColor',
           default: '#ced4da',
           comType: 'fontColor',
         },
@@ -453,14 +454,16 @@ const config: ChartConfig = {
         label: {
           title: '标签',
         },
-        bar: {
+        waterfall: {
           title: '瀑布图',
-          isIncrement: '计算方式',
+          formulaMode: '计算方式',
           radius: '边框圆角',
           width: '柱条宽度',
           ascendColor: '上升背景色',
           descendColor: '下降背景色',
-          totalColor: '累计背景色',
+          grandTotalColor: '累计背景色',
+          grandTotal: '累计',
+          difference: '差异',
         },
         splitLine: {
           title: '分割线',
@@ -506,43 +509,28 @@ const config: ChartConfig = {
         },
         label: {
           title: 'Label',
-          showLabel: 'Show Label',
-          position: 'Position',
         },
-        legend: {
-          title: 'Legend',
-          showLegend: 'Show Legend',
-          type: 'Type',
-          selectAll: 'Select All',
-          position: 'Position',
+        waterfall: {
+          title: 'Waterfall',
+          formulaMode: 'Formula Mode',
+          radius: 'Radius',
+          width: 'Width',
+          ascendColor: 'Ascend Color',
+          descendColor: 'Descend Color',
+          grandTotalColor: 'Grand Total Color',
+          grandTotal: 'Grand Total',
+          difference: 'Difference',
         },
-        data: {
-          color: 'Color',
-          colorize: 'Colorize',
-        },
-        stack: {
-          title: 'Stack',
-          enable: 'Enable',
-          percentage: 'Percentage',
-          enableTotal: 'Enable Total',
-        },
-        bar: {
-          title: 'Bar Chart',
-          enable: 'Enable Horizon',
-          radius: 'Bar Radius',
-          width: 'Bar Width',
-          gap: 'Bar Gap',
+        splitLine: {
+          title: 'Split Line',
+          showHorizonLine: 'Show Horizon Line',
+          showVerticalLine: 'Show Vertical Line',
         },
         xAxis: {
           title: 'X Axis',
         },
         yAxis: {
           title: 'Y Axis',
-        },
-        splitLine: {
-          title: 'Splite Line',
-          showHorizonLine: 'Show Horizontal Line',
-          showVerticalLine: 'Show Vertical Line',
         },
         reference: {
           title: 'Reference Line',
