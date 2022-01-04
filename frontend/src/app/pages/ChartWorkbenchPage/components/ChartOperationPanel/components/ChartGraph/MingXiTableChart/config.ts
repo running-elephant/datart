@@ -288,14 +288,7 @@ const config: ChartConfig = {
           label: 'style.align',
           key: 'align',
           default: 'left',
-          comType: 'select',
-          options: {
-            items: [
-              { label: '左对齐', value: 'left' },
-              { label: '居中对齐', value: 'center' },
-              { label: '右对齐', value: 'right' },
-            ],
-          },
+          comType: 'fontAlignment',
         },
       ],
     },

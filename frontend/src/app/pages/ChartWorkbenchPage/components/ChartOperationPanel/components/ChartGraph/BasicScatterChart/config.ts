@@ -350,6 +350,7 @@ const config: ChartConfig = {
           default: 'center',
           comType: 'select',
           options: {
+            // TODO(Stephen): to be extract to axis name location component
             items: [
               { label: '开始', value: 'start' },
               { label: '结束', value: 'end' },

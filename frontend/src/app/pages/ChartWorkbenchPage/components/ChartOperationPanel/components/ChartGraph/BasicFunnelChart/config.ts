@@ -71,8 +71,8 @@ const config: ChartConfig = {
         {
           label: 'funnel.align',
           key: 'align',
-          comType: 'select',
           default: 'center',
+          comType: 'select',
           options: {
             items: [
               { label: '居中', value: 'center' },
