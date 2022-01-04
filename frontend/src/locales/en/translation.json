@@ -331,6 +331,12 @@
           "hide": "Hide",
           "show": "Show",
           "condition": "Condition"
+        },
+        "fontAlignment": {
+          "alignment": "Alignment",
+          "left": "Left",
+          "center": "Center",
+          "right": "right"
         }
       },
       "filter": {
@@ -529,7 +535,7 @@
       "data": {
         "dimension": "Dimension",
         "metrics": "Metric",
-        "mixed": "Mixed",
+        "mixed": "Columns",
         "filter": "Filter",
         "colorize": "Color",
         "colorRange": "Range Color",
@@ -664,7 +670,7 @@
       "unpublished": "Unpublished",
       "archived": "Archived",
       "play": "Play",
-      "playTip":"Press Esc to quit playing",
+      "playTip": "Press Esc to quit playing",
       "share": {
         "link": "Link",
         "password": "Password",

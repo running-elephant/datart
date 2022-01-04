@@ -70,7 +70,7 @@ export const VariableForm = memo(
           let defaultValue = editingVariable.defaultValue
             ? JSON.parse(editingVariable.defaultValue)
             : [];
-          if (valueType === VariableValueTypes.Date) {
+          if (valueType === VariableValueTypes.Date && !expression) {
             defaultValue = defaultValue.map(str => moment(str));
           }
           setType(type);

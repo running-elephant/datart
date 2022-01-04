@@ -17,6 +17,7 @@
  */
 
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
+import { DATART_TRANSLATE_HOLDER } from 'globalConstants';
 import i18n from 'i18next';
 import get from 'lodash/get';
 import { useCallback, useContext } from 'react';
@@ -45,6 +46,10 @@ function usePrefixI18N(prefix?: string) {
       const contextTranslation = get(langTrans, key);
       if (contextTranslation) {
         return contextTranslation;
+      }
+      if (key.includes(DATART_TRANSLATE_HOLDER)) {
+        const newKey = key.replace(`${DATART_TRANSLATE_HOLDER}.`, '');
+        return t.call(Object.create(null), `${newKey}`, options) as string;
       }
       if (disablePrefix) {
         return t.call(Object.create(null), `${key}`, options) as string;

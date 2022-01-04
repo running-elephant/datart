@@ -136,7 +136,6 @@ const config: ChartConfig = {
         legend: {
           label: '图例',
           showLabel: '图例-显示标签',
-          showLabel2: '图例-显示标签2',
         },
       },
     },
@@ -148,6 +147,15 @@ const config: ChartConfig = {
         showLabelBySwitch: 'Show Lable Switch',
         showLabelWithInput: 'Show Label Input',
         showLabelWithSelect: 'Show Label Select',
+        fontFamily: 'Font Family',
+        fontSize: 'Font Size',
+        fontColor: 'Font Color',
+        rotateLabel: 'Rotate Label',
+        showDataColumns: 'Show Data Columns',
+        legend: {
+          label: 'Legend',
+          showLabel: 'Show Label',
+        },
       },
     },
   ],

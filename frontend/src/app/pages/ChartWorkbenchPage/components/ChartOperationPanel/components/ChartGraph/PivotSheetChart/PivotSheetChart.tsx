@@ -121,6 +121,10 @@ class PivotSheetChart extends ReactChart {
       'style',
       'enableSelectedHighlight',
     ]);
+    const metricNameShowIn = this.getStyleValue(styleConfigs, [
+      'style',
+      'metricNameShowIn',
+    ]);
     const enableTotal = this.getStyleValue(settingConfigs, [
       'rowSummary',
       'enableTotal',
@@ -166,7 +170,7 @@ class PivotSheetChart extends ReactChart {
           rows: rowSectionConfigRows.map(getValueByColumnKey),
           columns: columnSectionConfigRows.map(getValueByColumnKey),
           values: metricsSectionConfigRows.map(getValueByColumnKey),
-          valueInCols: true,
+          valueInCols: !!metricNameShowIn,
         },
         meta: rowSectionConfigRows
           .concat(columnSectionConfigRows)

@@ -41,7 +41,6 @@ const {
   RoseChart,
   ScoreChart,
   MingXiTableChart,
-  FenZuTableChart,
   NormalOutlineMapChart,
   WordCloudChart,
   ScatterOutlineMapChart,
@@ -104,7 +103,6 @@ class ChartManager {
 
   private _basicCharts(): Chart[] {
     return [
-      new FenZuTableChart(),
       new MingXiTableChart(),
       new PivotSheetChart(),
       new ScoreChart(),

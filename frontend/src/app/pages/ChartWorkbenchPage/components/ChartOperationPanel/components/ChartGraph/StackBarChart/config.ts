@@ -533,6 +533,77 @@ const config: ChartConfig = {
         },
       },
     },
+    {
+      lang: 'en-US',
+      translation: {
+        common: {
+          showAxis: 'Show Axis',
+          inverseAxis: 'Inverse Axis',
+          lineStyle: 'Line Style',
+          borderStyle: 'Border Style',
+          borderType: 'Border Type',
+          borderWidth: 'Border Width',
+          borderColor: 'Border Color',
+          backgroundColor: 'Background Color',
+          showLabel: 'Show Label',
+          unitFont: 'Unit Font',
+          rotate: 'Rotate',
+          position: 'Position',
+          showInterval: 'Show Interval',
+          interval: 'Interval',
+          showTitleAndUnit: 'Show Title and Unit',
+          nameLocation: 'Name Location',
+          nameRotate: 'Name Rotate',
+          nameGap: 'Name Gap',
+          min: 'Min',
+          max: 'Max',
+        },
+        label: {
+          title: 'Label',
+          showLabel: 'Show Label',
+          position: 'Position',
+        },
+        legend: {
+          title: 'Legend',
+          showLegend: 'Show Legend',
+          type: 'Type',
+          selectAll: 'Select All',
+          position: 'Position',
+        },
+        data: {
+          color: 'Color',
+          colorize: 'Colorize',
+        },
+        stack: {
+          title: 'Stack',
+          enable: 'Enable',
+          percentage: 'Percentage',
+          enableTotal: 'Enable Total',
+        },
+        bar: {
+          title: 'Bar Chart',
+          enable: 'Enable Horizon',
+          radius: 'Bar Radius',
+          width: 'Bar Width',
+          gap: 'Bar Gap',
+        },
+        xAxis: {
+          title: 'X Axis',
+        },
+        yAxis: {
+          title: 'Y Axis',
+        },
+        splitLine: {
+          title: 'Splite Line',
+          showHorizonLine: 'Show Horizontal Line',
+          showVerticalLine: 'Show Vertical Line',
+        },
+        reference: {
+          title: 'Reference Line',
+          open: 'Open',
+        },
+      },
+    }
   ],
 };
 

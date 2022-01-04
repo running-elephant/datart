@@ -289,6 +289,26 @@ const config: ChartConfig = {
         },
       },
     },
+    {
+      lang: 'en-US',
+      translation: {
+        score: {
+          headerTitle: 'Header',
+          bodyTitle: 'Body',
+          footerTitle: 'Footer Title',
+          show: 'Show',
+          prefixText: 'Prefix Text',
+          suffixText: 'Suffix Text',
+          prefxFont: 'Prefix Font',
+          suffixFont: 'Suffix Font',
+          common: 'Common',
+          isFixedFontSize: 'Enable Fixed Font Size',
+          headerFontSize: 'Header Font Size',
+          bodyFontSize: 'Body Font Size',
+          footerFontSize: 'Footer Font Size',
+        },
+      },
+    },
   ],
 };
 

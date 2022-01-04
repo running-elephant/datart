@@ -254,7 +254,8 @@
                         <configuration>
                             <executable>npm</executable>
                             <arguments>
-                                <argument>install</argument>
+                                <argument>run</argument>
+                                <argument>bootstrap</argument>
                                 <argument>--registry=https://registry.npm.taobao.org</argument>
                             </arguments>
                             <workingDirectory>${project.parent.basedir}/frontend</workingDirectory>
@@ -271,7 +272,7 @@
                             <executable>npm</executable>
                             <arguments>
                                 <argument>run</argument>
-                                <argument>build</argument>
+                                <argument>build:all</argument>
                             </arguments>
                             <workingDirectory>${project.parent.basedir}/frontend</workingDirectory>
                         </configuration>
