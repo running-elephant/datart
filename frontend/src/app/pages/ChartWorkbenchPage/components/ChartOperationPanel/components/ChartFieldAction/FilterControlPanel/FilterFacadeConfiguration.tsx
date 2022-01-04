@@ -18,12 +18,9 @@
 
 import { InputNumber, Row, Select, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import {
-  FilterConditionType,
-  FilterFacade,
-} from 'app/types/ChartConfig';
-import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartFilterCondition from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+import { FilterConditionType, FilterFacade } from 'app/types/ChartConfig';
+import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import {
   ControllerFacadeTypes,
   ControllerRadioFacadeTypes,
@@ -72,8 +69,9 @@ const getFacadeOptions = (condition, category) => {
       case FilterConditionType.Value:
         return [ControllerFacadeTypes.Value];
       case FilterConditionType.RangeTime:
-      case FilterConditionType.RelativeTime:
-        return [ControllerFacadeTypes.RangeTime];
+        return [ControllerFacadeTypes.RangeTimePicker];
+      case FilterConditionType.RecommendTime:
+        return [ControllerFacadeTypes.RangeTimePicker];
       case FilterConditionType.Tree:
         return [ControllerFacadeTypes.Tree];
     }
@@ -133,6 +131,10 @@ const FilterFacadeConfiguration: FC<
         !facades.includes(currentFacade as ControllerFacadeTypes)
       ) {
         setCurrentFacade(undefined);
+        handleFacadeChange(undefined);
+      } else if (!currentFacade) {
+        setCurrentFacade(facades?.[0]);
+        handleFacadeChange(facades?.[0]);
       }
     }, [condition, category, currentFacade]);
 

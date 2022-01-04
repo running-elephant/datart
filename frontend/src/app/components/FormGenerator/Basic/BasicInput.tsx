@@ -18,23 +18,38 @@
 
 import { Input } from 'antd';
 import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
-import { FC, memo } from 'react';
+import debounce from 'lodash/debounce';
+import { FC, memo, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
 const BasicInput: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
-  ({ ancestors, translate: t = title => title, data: row, onChange }) => {
-    const { comType, options, ...rest } = row;
+  ({ ancestors, translate: t = title => title, data, onChange }) => {
+    const [cache, setCache] = useState(data);
+    const { comType, options, ...rest } = cache;
 
-    const handleChangeByEvent = e => {
-      onChange?.(ancestors, e.target?.value);
-    };
-
+    const debouncedDataChange = useMemo(
+      () =>
+        debounce(value => {
+          onChange?.(ancestors, value, options?.needRefresh);
+        }, 500),
+      [ancestors, onChange, options?.needRefresh],
+    );
     return (
-      <Wrapper label={t(row.label)}>
-        <Input {...rest} {...options} onChange={handleChangeByEvent} />
+      <Wrapper label={t(cache.label)}>
+        <Input
+          {...rest}
+          {...options}
+          onChange={value => {
+            const newCache = Object.assign({}, cache, {
+              value: value.target?.value,
+            });
+            setCache(newCache);
+            debouncedDataChange(newCache.value);
+          }}
+        />
       </Wrapper>
     );
   },

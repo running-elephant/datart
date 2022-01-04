@@ -57,13 +57,13 @@ import java.util.stream.Collectors;
 public class DataProviderServiceImpl extends BaseService implements DataProviderService {
 
     // build in variables
-    private static final String VARIABLE_NAME = "DATART.USER.NAME";
+    private static final String VARIABLE_NAME = "DATART_USER_NAME";
 
-    private static final String VARIABLE_USERNAME = "DATART.USER.USERNAME";
+    private static final String VARIABLE_USERNAME = "DATART_USER_USERNAME";
 
-    private static final String VARIABLE_EMAIL = "DATART.USER.EMAIL";
+    private static final String VARIABLE_EMAIL = "DATART_USER_EMAIL";
 
-    private static final String VARIABLE_ID = "DATART.USER.ID";
+    private static final String VARIABLE_ID = "DATART_USER_ID";
 
     private static final String SERVER_AGGREGATE = "serverAggregate";
 

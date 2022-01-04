@@ -18,15 +18,14 @@
 
 import { LoadingOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
-import useMount from 'app/hooks/useMount';
+import { useFrame } from 'app/components/ReactFrameComponent';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import ChartEventBroker from 'app/pages/ChartWorkbenchPage/models/ChartEventBroker';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartLifecycle } from 'app/types/ChartLifecycle';
 import React, { CSSProperties, useEffect, useRef, useState } from 'react';
-import { useFrame } from 'react-frame-component';
 import styled from 'styled-components/macro';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from 'utils/utils';
 import ChartIFrameContainerResourceLoader from './ChartIFrameContainerResourceLoader';
 
 enum ContainerStatus {
@@ -41,8 +40,17 @@ const ChartLifecycleAdapter: React.FC<{
   chart: Chart;
   config: ChartConfig;
   style: CSSProperties;
-}> = ({ dataset, chart, config, style }) => {
-  const [chartResourceLoader, setChartResourceLoader] = useState(
+  isShown?: boolean;
+  widgetSpecialConfig?: any;
+}> = ({
+  dataset,
+  chart,
+  config,
+  style,
+  isShown = true,
+  widgetSpecialConfig,
+}) => {
+  const [chartResourceLoader] = useState(
     () => new ChartIFrameContainerResourceLoader(),
   );
   const [containerStatus, setContainerStatus] = useState(ContainerStatus.INIT);
@@ -50,30 +58,33 @@ const ChartLifecycleAdapter: React.FC<{
   const [containerId] = useState(() => uuidv4());
   const eventBrokerRef = useRef<ChartEventBroker>();
 
-  useMount(() => {
-    setChartResourceLoader(new ChartIFrameContainerResourceLoader());
-  });
-
-  // when chart change
+  /**
+   * Chart Mount Event
+   * Dependency: 'chart?.meta?.id', 'eventBrokerRef', 'isShown'
+   */
   useEffect(() => {
-    if (!chart || !document || !window || !config) {
-      return;
-    }
-    if (containerStatus === ContainerStatus.LOADING) {
+    if (
+      !isShown ||
+      !chart ||
+      !document ||
+      !window ||
+      !config ||
+      containerStatus === ContainerStatus.LOADING
+    ) {
       return;
     }
 
     setContainerStatus(ContainerStatus.LOADING);
     (async () => {
       chartResourceLoader
-        .laodResource(document, chart?.getDependencies?.())
+        .loadResource(document, chart?.getDependencies?.())
         .then(_ => {
           chart.init(config);
           const newBrokerRef = new ChartEventBroker();
           newBrokerRef.register(chart);
           newBrokerRef.publish(
             ChartLifecycle.MOUNTED,
-            { containerId, dataset, config },
+            { containerId, dataset, config, widgetSpecialConfig },
             {
               document,
               window,
@@ -92,12 +103,17 @@ const ChartLifecycleAdapter: React.FC<{
     return function cleanup() {
       setContainerStatus(ContainerStatus.INIT);
       eventBrokerRef?.current?.publish(ChartLifecycle.UNMOUNTED, {});
+      eventBrokerRef?.current?.dispose();
     };
-  }, [chart?.meta?.name, eventBrokerRef]);
+  }, [chart?.meta?.id, eventBrokerRef, isShown]);
 
-  // when chart config or dataset change
+  /**
+   * Chart Update Event
+   * Dependency: 'config', 'dataset', 'widgetSpecialConfig', 'containerStatus', 'document', 'window', 'isShown'
+   */
   useEffect(() => {
     if (
+      !isShown ||
       !document ||
       !window ||
       !config ||
@@ -111,20 +127,8 @@ const ChartLifecycleAdapter: React.FC<{
       {
         dataset,
         config,
+        widgetSpecialConfig,
       },
-      { document, window },
-    );
-  }, [config, dataset, containerStatus, document, window]);
-
-  // when chart size change
-  useEffect(() => {
-    if (!style.width || !style.height) {
-      return;
-    }
-
-    eventBrokerRef.current?.publish(
-      ChartLifecycle.RESIZE,
-      {},
       {
         document,
         window,
@@ -132,7 +136,47 @@ const ChartLifecycleAdapter: React.FC<{
         height: style?.height,
       },
     );
-  }, [style.width, style.height, document, window]);
+  }, [
+    config,
+    dataset,
+    widgetSpecialConfig,
+    containerStatus,
+    document,
+    window,
+    isShown,
+  ]);
+
+  /**
+   * Chart Resize Event
+   * Dependency: 'style.width', 'style.height', 'document', 'window', 'isShown'
+   */
+  useEffect(() => {
+    if (
+      !isShown ||
+      !document ||
+      !window ||
+      !config ||
+      !dataset ||
+      containerStatus !== ContainerStatus.SUCCESS
+    ) {
+      return;
+    }
+
+    eventBrokerRef.current?.publish(
+      ChartLifecycle.RESIZE,
+      {
+        dataset,
+        config,
+        widgetSpecialConfig,
+      },
+      {
+        document,
+        window,
+        width: style?.width,
+        height: style?.height,
+      },
+    );
+  }, [style.width, style.height, document, window, isShown]);
 
   return (
     <Spin

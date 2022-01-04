@@ -1,5 +1,6 @@
 import { Form, FormInstance, Input, Radio, TreeSelect } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardTypeMap } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import debounce from 'debounce-promise';
 import { CommonFormTypes, DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
@@ -21,13 +22,6 @@ import {
   selectSaveStoryboardLoading,
 } from './slice/selectors';
 
-const VIZ_TYPE_TITLES = {
-  DATACHART: '数据图表',
-  DASHBOARD: '仪表板',
-  FOLDER: '目录',
-  STORYBOARD: '故事板',
-};
-
 type SaveFormProps = Omit<ModalFormProps, 'type' | 'visible' | 'onSave'>;
 
 export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
@@ -47,6 +41,8 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
   const isOwner = useSelector(selectIsOrgOwner);
   const permissionMap = useSelector(selectPermissionMap);
   const formRef = useRef<FormInstance>();
+  const t = useI18NPrefix('viz.saveForm');
+  const tg = useI18NPrefix('global');
 
   const getDisabled = useCallback(
     (_, path: string[]) =>
@@ -85,7 +81,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     <ModalForm
       formProps={formProps}
       {...modalProps}
-      title={VIZ_TYPE_TITLES[vizType]}
+      title={t(`vizType.${vizType.toLowerCase()}`)}
       type={type}
       visible={visible}
       confirmLoading={saveFolderLoading || saveStoryboardLoading}
@@ -99,9 +95,12 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
       </IdField>
       <Form.Item
         name="name"
-        label="名称"
+        label={t('name')}
         rules={[
-          { required: true, message: '名称不能为空' },
+          {
+            required: true,
+            message: `${t('name')}${tg('validation.required')}`,
+          },
           {
             validator: debounce((_, value) => {
               if (!value || initialValues?.name === value) {
@@ -119,7 +118,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
                 },
               }).then(
                 () => Promise.resolve(),
-                () => Promise.reject(new Error('名称重复')),
+                err => Promise.reject(new Error(err.response.data.message)),
               );
             }, DEFAULT_DEBOUNCE_WAIT),
           },
@@ -128,21 +127,32 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
         <Input />
       </Form.Item>
       {vizType === 'DATACHART' && (
-        <Form.Item name="description" label="描述">
+        <Form.Item name="description" label={t('description')}>
           <Input.TextArea />
         </Form.Item>
       )}
       {vizType === 'DASHBOARD' && type === CommonFormTypes.Add && (
-        <Form.Item name="boardType" label="布局类型">
+        <Form.Item name="boardType" label={t('boardType.label')}>
           <Radio.Group>
-            <Radio.Button value={BoardTypeMap.auto}>自动</Radio.Button>
-            <Radio.Button value={BoardTypeMap.free}>自由</Radio.Button>
+            <Radio.Button value={BoardTypeMap.auto}>
+              {t('boardType.auto')}
+            </Radio.Button>
+            <Radio.Button value={BoardTypeMap.free}>
+              {t('boardType.free')}
+            </Radio.Button>
           </Radio.Group>
         </Form.Item>
       )}
       {vizType !== 'STORYBOARD' && (
-        <Form.Item name="parentId" label="所属目录">
-          <TreeSelect placeholder="根目录" treeData={treeData} allowClear />
+        <Form.Item name="parentId" label={t('parent')}>
+          <TreeSelect
+            placeholder={t('root')}
+            treeData={treeData}
+            allowClear
+            onChange={() => {
+              formRef.current?.validateFields();
+            }}
+          />
         </Form.Item>
       )}
     </ModalForm>

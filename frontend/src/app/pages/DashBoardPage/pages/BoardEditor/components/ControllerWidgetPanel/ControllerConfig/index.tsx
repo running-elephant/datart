@@ -61,6 +61,7 @@ export const RadioButtonTypeName = ['config', 'radioButtonType'];
 export const SliderStepName = ['config', 'sliderConfig', 'step'];
 export const SliderShowMarksName = ['config', 'sliderConfig', 'showMarks'];
 
+export const CascadesName = ['config', 'cascades'];
 export interface RelatedViewFormProps {
   controllerType: ControllerFacadeTypes;
   form: FormInstance<ControllerWidgetContent> | undefined;
@@ -71,8 +72,8 @@ export interface RelatedViewFormProps {
 
 export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
   ({ controllerType, form, viewMap, otherStrFilterWidgets }) => {
-    const filterT = useI18NPrefix('viz.common.filter');
-
+    const tc = useI18NPrefix('viz.control');
+    const tgb = useI18NPrefix('global.button');
     const hasRadio = useMemo(() => {
       return controllerType === ControllerFacadeTypes.RadioGroup;
     }, [controllerType]);
@@ -86,11 +87,7 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
     }, [controllerType]);
     return (
       <Wrap>
-        <Form.Item
-          name="name"
-          label={filterT('filterName')}
-          rules={[{ required: true }]}
-        >
+        <Form.Item name="name" label={tc('title')} rules={[{ required: true }]}>
           <Input />
         </Form.Item>
         <ValuesSetter
@@ -98,20 +95,21 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
           form={form}
           viewMap={viewMap}
         />
-
+        {/* slider */}
+        {sliderTypes && (
+          <>
+            <SliderStep label={tc('step')} />
+            <SliderMarks
+              label={tc('showMark')}
+              switchTexts={[tgb('open'), tgb('close')]}
+            />
+          </>
+        )}
         {/* sql 对应关系 */}
         <SqlOperator controllerType={controllerType} />
 
         {/* 按钮样式 */}
         {hasRadio && <RadioStyleForm />}
-
-        {/* slider */}
-        {sliderTypes && (
-          <>
-            <SliderStep />
-            <SliderMarks />
-          </>
-        )}
 
         {/* 是否显示 */}
         <ControllerVisibility

@@ -141,14 +141,16 @@ public abstract class VariablePlaceholder {
             }
             if (sqlNode instanceof SqlCall) {
                 replaceVariable((SqlCall) sqlNode);
+            } else if (sqlNode instanceof SqlLiteral) {
+                // pass
             } else if (sqlNode instanceof SqlIdentifier) {
-                if (sqlNode.toString().equals(variable.getName())) {
+                if (sqlNode.toString().equals(variable.getNameWithQuote())) {
                     sqlCall.setOperand(i, SqlNodeUtils.toSingleSqlLiteral(variable, sqlNode.getParserPosition()));
                 }
             } else if (sqlNode instanceof SqlNodeList) {
                 SqlNodeList nodeList = (SqlNodeList) sqlNode;
                 List<SqlNode> otherNodes = Arrays.stream(nodeList.toArray())
-                        .filter(node -> !node.toString().equals(variable.getName()))
+                        .filter(node -> !node.toString().equals(variable.getNameWithQuote()))
                         .collect(Collectors.toList());
 
                 if (otherNodes.size() == nodeList.size()) {

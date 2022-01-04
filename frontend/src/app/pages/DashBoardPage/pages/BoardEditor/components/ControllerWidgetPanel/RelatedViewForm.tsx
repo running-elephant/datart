@@ -23,6 +23,7 @@ import {
   RadioChangeEvent,
   Select,
 } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ControllerWidgetContent,
   RelatedView,
@@ -34,7 +35,7 @@ import ChartDataView, {
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
-import { G90 } from 'styles/StyleConstants';
+import { G20 } from 'styles/StyleConstants';
 import { filterValueTypeByControl, isRangeTypeController } from './utils';
 
 export interface RelatedViewFormProps {
@@ -50,6 +51,7 @@ const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
   ({ viewMap, form, queryVariables, controllerType, getFormRelatedViews }) => {
+    const t = useI18NPrefix(`viz.associate`);
     const isMultiple = useCallback(
       index => {
         const relatedViews = getFormRelatedViews();
@@ -64,11 +66,11 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
     );
     const fieldValueValidator = async (opt, fieldValue: string[]) => {
       if (!fieldValue) {
-        return Promise.reject(new Error('请关联字段 或 变量'));
+        return Promise.reject(new Error(t('noValueErr')));
       }
       if (Array.isArray(fieldValue)) {
         if (fieldValue.length !== 2) {
-          return Promise.reject(new Error('请选择字段 或 两个变量'));
+          return Promise.reject(new Error(t('valueErr')));
         }
       }
 
@@ -127,7 +129,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                   style={{ display: 'flex', justifyContent: 'space-between' }}
                 >
                   <span>{item.name}</span>
-                  <span style={{ color: G90 }}>{item.valueType}</span>
+                  <span style={{ color: G20 }}>{item.valueType}</span>
                 </div>
               </Option>
             ));
@@ -143,7 +145,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                   style={{ display: 'flex', justifyContent: 'space-between' }}
                 >
                   <span>{item.id}</span>
-                  <span style={{ color: G90 }}>{item.type}</span>
+                  <span style={{ color: G20 }}>{item.type}</span>
                 </div>
               </Option>
             ));
@@ -163,7 +165,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
 
     return (
       <Wrap>
-        <h3>关联字段/变量</h3>
+        <h3>{t('title')}</h3>
         <Form.List
           name="relatedViews"
           rules={[
@@ -181,7 +183,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                   <Form.Item noStyle key={index} shouldUpdate>
                     <div className="relatedView">
                       <h4>{getViewName(index)}</h4>
-                      <div style={{ width: '106px' }}>
+                      <div style={{ width: '140px', textAlign: 'right' }}>
                         <Form.Item
                           {...field}
                           validateTrigger={['onChange', 'onClick', 'onBlur']}
@@ -196,12 +198,12 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                             <RadioButton
                               value={ChartDataViewFieldCategory.Field}
                             >
-                              字段
+                              {t('field')}
                             </RadioButton>
                             <RadioButton
                               value={ChartDataViewFieldCategory.Variable}
                             >
-                              变量
+                              {t('variable')}
                             </RadioButton>
                           </RadioGroup>
                         </Form.Item>
@@ -232,9 +234,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                 <Form.Item>
                   <Form.ErrorList errors={errors} />
                 </Form.Item>
-                {!fields.length && (
-                  <Empty key="empty" description="请选择组件" />
-                )}
+                {!fields.length && <Empty key="empty" />}
               </>
             );
           }}

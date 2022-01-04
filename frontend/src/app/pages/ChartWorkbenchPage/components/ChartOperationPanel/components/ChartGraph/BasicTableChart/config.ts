@@ -55,7 +55,7 @@ const config: ChartConfig = {
       ],
     },
     {
-      label: 'column.title',
+      label: 'column.conditionStyle',
       key: 'column',
       comType: 'group',
       rows: [
@@ -80,6 +80,7 @@ const config: ChartConfig = {
                     .map(c => ({
                       key: c.uid,
                       value: c.uid,
+                      type: c.type,
                       label:
                         c.label || c.aggregate
                           ? `${c.aggregate}(${c.colName})`
@@ -94,75 +95,17 @@ const config: ChartConfig = {
                 comType: 'group',
                 rows: [
                   {
-                    label: 'column.sortAndFilter',
-                    key: 'sortAndFilter',
-                    comType: 'group',
-                    options: { expand: true },
-                    rows: [
-                      {
-                        label: 'column.enableSort',
-                        key: 'enableSort',
-                        comType: 'checkbox',
-                      },
-                    ],
-                  },
-                  {
-                    label: 'column.basicStyle',
-                    key: 'basicStyle',
-                    comType: 'group',
-                    options: { expand: true },
-                    rows: [
-                      {
-                        label: 'column.backgroundColor',
-                        key: 'backgroundColor',
-                        comType: 'fontColor',
-                      },
-                      {
-                        label: 'column.align',
-                        key: 'align',
-                        default: 'left',
-                        comType: 'select',
-                        options: {
-                          items: [
-                            { label: '左对齐', value: 'left' },
-                            { label: '居中对齐', value: 'center' },
-                            { label: '右对齐', value: 'right' },
-                          ],
-                        },
-                      },
-                      {
-                        label: 'column.enableFixedCol',
-                        key: 'enableFixedCol',
-                        comType: 'switch',
-                        rows: [
-                          {
-                            label: 'column.fixedColWidth',
-                            key: 'fixedColWidth',
-                            default: 100,
-                            comType: 'inputNumber',
-                          },
-                        ],
-                      },
-                      {
-                        label: 'font',
-                        key: 'font',
-                        comType: 'font',
-                        default: {
-                          fontFamily: 'PingFang SC',
-                          fontSize: '12',
-                          fontWeight: 'normal',
-                          fontStyle: 'normal',
-                          color: 'black',
-                        },
-                      },
-                    ],
-                  },
-                  {
                     label: 'column.conditionStyle',
                     key: 'conditionStyle',
                     comType: 'group',
                     options: { expand: true },
-                    rows: [],
+                    rows: [
+                      {
+                        label: 'column.conditionStylePanel',
+                        key: 'conditionStylePanel',
+                        comType: 'conditionStylePanel',
+                      },
+                    ],
                   },
                 ],
               },
@@ -261,18 +204,6 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'cache.title',
-      key: 'cache',
-      comType: 'group',
-      rows: [
-        {
-          label: 'cache.title',
-          key: 'panel',
-          comType: 'cache',
-        },
-      ],
-    },
-    {
       label: 'paging.title',
       key: 'paging',
       comType: 'group',
@@ -320,18 +251,18 @@ const config: ChartConfig = {
       lang: 'zh-CN',
       translation: {
         header: {
-          title: '表头样式与分组',
-          open: '打开表头样式与分组',
-          styleAndGroup: '表头样式与分组',
+          title: '表头分组',
+          open: '打开',
+          styleAndGroup: '表头分组',
         },
         column: {
-          title: '表格数据列',
           open: '打开列设置',
           list: '字段列表',
           sortAndFilter: '排序与过滤',
           enableSort: '开启列排序',
           basicStyle: '基础样式',
           conditionStyle: '条件样式',
+          conditionStylePanel: '条件样式配置器',
           backgroundColor: '背景颜色',
           align: '对齐方式',
           enableFixedCol: '开启固定列宽',
@@ -351,9 +282,6 @@ const config: ChartConfig = {
           autoMerge: '自动合并相同内容',
           enableRaw: '使用原始数据',
         },
-        cache: {
-          title: '数据处理',
-        },
         paging: {
           title: '分页设置',
           enablePaging: '启用分页',
@@ -365,9 +293,9 @@ const config: ChartConfig = {
       lang: 'en-US',
       translation: {
         header: {
-          title: 'Title',
-          open: 'Open Table Header and Group',
-          styleAndGroup: 'Style and Group',
+          title: 'Table Header Group',
+          open: 'Open',
+          styleAndGroup: 'Header Group',
         },
         column: {
           title: 'Table Data Column',
@@ -376,7 +304,8 @@ const config: ChartConfig = {
           sortAndFilter: 'Sort and Filter',
           enableSort: 'Enable Sort',
           basicStyle: 'Baisc Style',
-          conditionStyle: 'Condition Style',
+          conditionStyle: 'Column Condition Style',
+          conditionStylePanel: 'Condition Style Panel',
           backgroundColor: 'Background Color',
           align: 'Align',
           enableFixedCol: 'Enable Fixed Column',
@@ -395,9 +324,6 @@ const config: ChartConfig = {
           tableSize: 'Table Size',
           autoMerge: 'Auto Merge',
           enableRaw: 'Enable Raw Data',
-        },
-        cache: {
-          title: 'Data Process',
         },
         paging: {
           title: 'Paging',

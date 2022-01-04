@@ -24,8 +24,9 @@ import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import persistence from 'utils/persistence';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from 'utils/utils';
 import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
+import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
 import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';
 import { selectShareBoard } from '../DashBoardPage/pages/Board/slice/selector';
 import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
@@ -35,7 +36,7 @@ import { urlSearchTransfer } from '../MainPage/pages/VizPage/utils';
 import { useStoryBoardSlice } from '../StoryBoardPage/slice';
 import { selectShareStoryBoard } from '../StoryBoardPage/slice/selectors';
 import BoardForShare from './BoardForShare';
-import ChartPreviewBoardForShare from './ChartPreviewBoardForShare';
+import ChartForShare from './ChartForShare';
 import { DownloadTaskContainer } from './DownloadTaskContainer';
 import PasswordModal from './PasswordModal';
 import { downloadShareDataChartFile } from './sercive';
@@ -85,6 +86,10 @@ export function SharePage() {
   }, [search]);
 
   useMount(() => {
+    ChartManager.instance()
+      .load()
+      .catch(err => console.error('Fail to load customize charts with ', err));
+
     if (Boolean(usePassword)) {
       const previousPassword = persistence.session.get(shareToken);
       if (previousPassword) {
@@ -186,7 +191,7 @@ export function SharePage() {
             onLoadTasks={onLoadShareTask}
             onDownloadFile={onDownloadFile}
           >
-            <ChartPreviewBoardForShare
+            <ChartForShare
               chartPreview={chartPreview}
               onCreateDataChartDownloadTask={onMakeShareDownloadDataTask}
             />

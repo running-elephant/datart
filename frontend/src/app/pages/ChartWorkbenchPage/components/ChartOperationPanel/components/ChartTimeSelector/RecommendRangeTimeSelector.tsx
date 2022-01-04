@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
-import { Radio, Row, Space } from 'antd';
+import { Radio, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import { FilterCondition } from 'app/types/ChartConfig';
-import { convertRelativeTimeRange } from 'app/utils/time';
+import { recommendTimeRangeConverter } from 'app/utils/time';
 import { RECOMMEND_TIME } from 'globalConstants';
-import { FC, memo, useContext, useState } from 'react';
+import { FC, memo, useMemo, useState } from 'react';
 import ChartFilterCondition, {
   ConditionBuilder,
 } from '../../../../models/ChartFilterCondition';
+import CurrentRangeTime from './CurrentRangeTime';
 
 const RecommendRangeTimeSelector: FC<
   {
@@ -34,60 +34,57 @@ const RecommendRangeTimeSelector: FC<
   } & I18NComponentProps
 > = memo(({ i18nPrefix, condition, onConditionChange }) => {
   const t = useI18NPrefix(i18nPrefix);
-  const { format } = useContext(TimeConfigContext);
-  const [timeRange, setTimeRange] = useState<string[]>([]);
-  const [relativeTime, setRelativeTime] = useState<string | undefined>();
+  const [recommend, setRecommend] = useState<string | undefined>(
+    condition?.value as string,
+  );
 
-  const handleChange = relativeTime => {
-    const timeRange = convertRelativeTimeRange(relativeTime);
-    setTimeRange(timeRange);
-
-    setRelativeTime(relativeTime);
+  const handleChange = recommendTime => {
+    setRecommend(recommendTime);
     const filter = new ConditionBuilder(condition)
-      .setValue(timeRange)
-      .asRangeTime();
+      .setValue(recommendTime)
+      .asRecommendTime();
     onConditionChange?.(filter);
   };
 
+  const rangeTimes = useMemo(() => {
+    return recommendTimeRangeConverter(recommend);
+  }, [recommend]);
+
   return (
-    <div>
-      <Row>
-        {/* {`${t('currentTime')} : ${timeRange
-          ?.map(t => formatTime(t, format))
-          .join(' - ')}`} */}
-      </Row>
-      <Radio.Group
-        value={relativeTime}
-        onChange={e => handleChange(e.target?.value)}
-      >
-        <Space direction="vertical">
-          <Radio value={RECOMMEND_TIME.TODAY}>{t(RECOMMEND_TIME.TODAY)}</Radio>
-          <Radio value={RECOMMEND_TIME.YESTERDAY}>
-            {t(RECOMMEND_TIME.YESTERDAY)}
-          </Radio>
-          <Radio value={RECOMMEND_TIME.THISWEEK}>
-            {t(RECOMMEND_TIME.THISWEEK)}
-          </Radio>
-        </Space>
-        <Space direction="vertical">
-          <Radio value={RECOMMEND_TIME.LAST_7_DAYS}>
-            {t(RECOMMEND_TIME.LAST_7_DAYS)}
-          </Radio>
-          <Radio value={RECOMMEND_TIME.LAST_30_DAYS}>
-            {t(RECOMMEND_TIME.LAST_30_DAYS)}
-          </Radio>
-          <Radio value={RECOMMEND_TIME.LAST_90_DAYS}>
-            {t(RECOMMEND_TIME.LAST_90_DAYS)}
-          </Radio>
-          <Radio value={RECOMMEND_TIME.LAST_1_MONTH}>
-            {t(RECOMMEND_TIME.LAST_1_MONTH)}
-          </Radio>
-          <Radio value={RECOMMEND_TIME.LAST_1_YEAR}>
-            {t(RECOMMEND_TIME.LAST_1_YEAR)}
-          </Radio>
-        </Space>
-      </Radio.Group>
-    </div>
+    <>
+      <Space direction="vertical">
+        <CurrentRangeTime times={rangeTimes} />
+        <Radio.Group
+          value={recommend}
+          onChange={e => handleChange(e.target?.value)}
+        >
+          <Space direction="vertical" key={'smallRange'}>
+            {[
+              RECOMMEND_TIME.TODAY,
+              RECOMMEND_TIME.YESTERDAY,
+              RECOMMEND_TIME.THISWEEK,
+            ].map(time => (
+              <Radio key={time} value={time}>
+                {t(time)}
+              </Radio>
+            ))}
+          </Space>
+          <Space direction="vertical" key={'wideRange'}>
+            {[
+              RECOMMEND_TIME.LAST_7_DAYS,
+              RECOMMEND_TIME.LAST_30_DAYS,
+              RECOMMEND_TIME.LAST_90_DAYS,
+              RECOMMEND_TIME.LAST_1_MONTH,
+              RECOMMEND_TIME.LAST_1_YEAR,
+            ].map(time => (
+              <Radio key={time} value={time}>
+                {t(time)}
+              </Radio>
+            ))}
+          </Space>
+        </Radio.Group>
+      </Space>
+    </>
   );
 });
 

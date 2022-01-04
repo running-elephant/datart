@@ -1,6 +1,25 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import sqlReservedWords from 'app/assets/javascripts/sqlReservedWords';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
+import i18n from 'i18next';
 import { monaco } from 'react-monaco-editor';
 import { RootState } from 'types';
 import { request } from 'utils/request';
@@ -93,7 +112,7 @@ export const getViewDetail = createAsyncThunk<
     const viewSimple = views?.find(v => v.id === viewId);
     const tempViewModel = generateEditingView({
       id: viewId,
-      name: viewSimple?.name || '加载中...',
+      name: viewSimple?.name || i18n.t('view.loading'),
       stage: ViewViewModelStages.Loading,
     });
     dispatch(viewActions.addEditingView(tempViewModel));
@@ -141,7 +160,7 @@ export const runSql = createAsyncThunk<
   const { script, sourceId, size, fragment, variables } = currentEditingView;
 
   if (!sourceId) {
-    return rejectWithValue('请选择数据源');
+    return rejectWithValue(i18n.t('view.selectSource'));
   }
 
   if (!script.trim()) {

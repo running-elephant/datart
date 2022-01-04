@@ -23,7 +23,7 @@
         <outputDirectory>./</outputDirectory>
         <includes>
             <include>Dockerfile</include>
-            <include>docker-compose.yml.example</include>
+<!--            <include>docker-compose.yml.example</include>-->
         </includes>
     </fileSet>
     </fileSets>

@@ -35,7 +35,7 @@ const ShareLinkModal: FC<{
   onOk?;
   onCancel?;
 }> = memo(({ visibility, onGenerateShareLink, onOk, onCancel }) => {
-  const t = useI18NPrefix(`viz.chartPreview`);
+  const t = useI18NPrefix(`viz.action`);
   const [expireDate, setExpireDate] = useState<string>();
   const [enablePassword, setEnablePassword] = useState(false);
   const [shareLink, setShareLink] = useState<{
@@ -44,7 +44,7 @@ const ShareLinkModal: FC<{
     usePassword?: boolean;
   }>();
 
-  const hanldeCopyToClipboard = value => {
+  const handleCopyToClipboard = value => {
     const ta = document.createElement('textarea');
     ta.innerText = value;
     document.body.appendChild(ta);
@@ -63,7 +63,7 @@ const ShareLinkModal: FC<{
     }`;
   };
 
-  const hanldeGenerateShareLink = async (expireDate, enablePassword) => {
+  const handleGenerateShareLink = async (expireDate, enablePassword) => {
     const result = await onGenerateShareLink?.(expireDate, enablePassword);
     setShareLink(result);
   };
@@ -106,7 +106,7 @@ const ShareLinkModal: FC<{
             htmlType="button"
             disabled={!expireDate}
             onClick={() =>
-              hanldeGenerateShareLink?.(expireDate, enablePassword)
+              handleGenerateShareLink?.(expireDate, enablePassword)
             }
           >
             {t('share.generateLink')}
@@ -119,7 +119,7 @@ const ShareLinkModal: FC<{
             addonAfter={
               <CopyOutlined
                 onClick={() =>
-                  hanldeCopyToClipboard(getFullShareLinkPath(shareLink))
+                  handleCopyToClipboard(getFullShareLinkPath(shareLink))
                 }
               />
             }
@@ -132,7 +132,7 @@ const ShareLinkModal: FC<{
               value={shareLink?.password}
               addonAfter={
                 <CopyOutlined
-                  onClick={() => hanldeCopyToClipboard(shareLink?.password)}
+                  onClick={() => handleCopyToClipboard(shareLink?.password)}
                 />
               }
             />

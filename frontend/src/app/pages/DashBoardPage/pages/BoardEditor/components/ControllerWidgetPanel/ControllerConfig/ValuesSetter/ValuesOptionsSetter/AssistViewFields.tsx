@@ -17,7 +17,9 @@
  */
 import { Cascader, CascaderProps } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
+import { saveToViewMapAction } from 'app/pages/DashBoardPage/pages/Board/slice/asyncActions';
 import {
   View,
   ViewSimple,
@@ -29,6 +31,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
+import { useDispatch } from 'react-redux';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 export interface AssistViewFieldsProps
@@ -38,20 +41,17 @@ export interface AssistViewFieldsProps
 }
 export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
   ({ onChange, value }) => {
+    const tc = useI18NPrefix(`viz.control`);
+    const dispatch = useDispatch();
     const { orgId } = useContext(BoardContext);
     const [options, setOptions] = useState<CascaderOptionType[]>([]);
-    const getChildren = useCallback(async viewId => {
-      const { data } = await request<View>(`/views/${viewId}`);
+    const getViewData = useCallback(async viewId => {
       try {
-        const model = JSON.parse(data.model);
-        const items: CascaderOptionType[] = Object.keys(model).map(key => {
-          return {
-            value: key,
-            label: key,
-          };
-        });
-        return items;
-      } catch (error) {}
+        const { data } = await request<View>(`/views/${viewId}`);
+        return data;
+      } catch (error) {
+        errorHandle(error);
+      }
     }, []);
     const setViews = useCallback(
       async orgId => {
@@ -65,7 +65,22 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
             };
           });
           if (Array.isArray(value) && value.length === 2) {
-            const children = await getChildren(value[0]);
+            const data = await getViewData(value[0]);
+            if (!data) return;
+
+            const model = JSON.parse(data.model);
+            const children: CascaderOptionType[] = Object.keys(model).map(
+              key => {
+                return {
+                  value: key,
+                  label: key,
+                };
+              },
+            );
+            setTimeout(() => {
+              dispatch(saveToViewMapAction(data));
+            }, 0);
+
             views.forEach(view => {
               if (view.value === value[0]) {
                 view.children = children;
@@ -78,7 +93,7 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
           throw error;
         }
       },
-      [getChildren, value],
+      [dispatch, getViewData, value],
     );
 
     useEffect(() => {
@@ -89,7 +104,18 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
       async (selectedOptions: CascaderOptionType[]) => {
         const targetOption = selectedOptions[selectedOptions.length - 1];
         targetOption.loading = true;
-        targetOption.children = await getChildren(targetOption.value);
+
+        const data = await getViewData(targetOption.value);
+        if (!data || !data.model) return; // make page can edit after click folder
+        const model = JSON.parse(data.model);
+        const children: CascaderOptionType[] = Object.keys(model).map(key => {
+          return {
+            value: key,
+            label: key,
+          };
+        });
+        targetOption.children = children;
+        //
         targetOption.loading = false;
         const nextOptions = [...options].map(item => {
           if (item.value === targetOption.value) {
@@ -100,13 +126,13 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
         });
         setOptions(nextOptions);
       },
-      [options, getChildren],
+      [options, getViewData],
     );
 
     return (
       <Cascader
         allowClear
-        placeholder="select viewField"
+        placeholder={tc('selectViewField')}
         options={options}
         onChange={onChange as any}
         value={value}

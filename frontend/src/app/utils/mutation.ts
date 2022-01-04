@@ -58,7 +58,6 @@ export function updateCollectionByAction<T extends ChartStyleSectionConfig>(
 ) {
   const value = action.value;
   const keys = [...action.ancestors];
-
   const nextState = produce(base, draft => {
     const index = keys.shift() as number;
     if (index !== undefined) {

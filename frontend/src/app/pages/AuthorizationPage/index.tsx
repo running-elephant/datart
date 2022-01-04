@@ -1,4 +1,5 @@
 import { EmptyFiller } from 'app/components/EmptyFiller';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getUserInfoByToken } from 'app/slice/thunks';
 import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -10,9 +11,12 @@ export const AuthorizationPage = () => {
   const history = useHistory();
   const paramsMatch = useRouteMatch<{ token: string }>();
   const token = paramsMatch.params.token;
+  const t = useI18NPrefix('authorization');
+
   const toApp = useCallback(() => {
     history.replace('/');
   }, [history]);
+
   useEffect(() => {
     if (token) {
       dispatch(getUserInfoByToken({ token, resolve: toApp }));
@@ -20,7 +24,7 @@ export const AuthorizationPage = () => {
   }, [token, dispatch, toApp]);
   return (
     <Wrapper>
-      <EmptyFiller loading title="处理中" />
+      <EmptyFiller loading title={t('processing')} />
     </Wrapper>
   );
 };

@@ -29,11 +29,10 @@ import {
   VizOperationMenu,
 } from 'app/components/VizOperationMenu';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { FC, memo, useState } from 'react';
+import { TITLE_SUFFIX } from 'globalConstants';
+import { FC, memo, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { DetailPageHeader } from '../DetailPageHeader';
-
-const TITLE_SUFFIX = ['[已归档]', '[未发布]'];
 
 const VizHeader: FC<{
   chartName?: string;
@@ -63,7 +62,7 @@ const VizHeader: FC<{
     allowShare,
     allowManage,
   }) => {
-    const t = useI18NPrefix(`viz.chartPreview`);
+    const t = useI18NPrefix(`viz.action`);
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
 
     const handleCloseShareLinkModal = () => {
@@ -85,7 +84,13 @@ const VizHeader: FC<{
       );
     };
 
-    const title = `${chartName || ''} ${TITLE_SUFFIX[Number(status)] || ''}`;
+    const title = useMemo(() => {
+      const base = chartName || '';
+      const suffix = TITLE_SUFFIX[Number(status)]
+        ? `[${t(TITLE_SUFFIX[Number(status)])}]`
+        : '';
+      return base + suffix;
+    }, [chartName, status, t]);
     const isArchived = Number(status) === 0;
 
     return (

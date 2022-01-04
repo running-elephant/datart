@@ -17,11 +17,12 @@
  */
 
 import { Form, FormInstance, Radio, Select } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
-import { FilterValueOption } from 'app/types/ChartConfig';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { getDistinctFields } from 'app/utils/fetch';
@@ -36,7 +37,8 @@ const ValuesOptionsSetter: FC<{
   form: FormInstance<{ config: ControllerConfig }> | undefined;
   viewMap: Record<string, ChartDataView>;
 }> = memo(({ form, viewMap, controllerType }) => {
-  const [optionValues, setOptionValues] = useState<FilterValueOption[]>([]);
+  const tc = useI18NPrefix(`viz.control`);
+  const [optionValues, setOptionValues] = useState<RelationFilterValue[]>([]);
   const [targetKeys, setTargetKeys] = useState<string[]>([]);
 
   const getControllerConfig = useCallback(() => {
@@ -78,7 +80,7 @@ const ValuesOptionsSetter: FC<{
     const items: string[] = (collection || []).flatMap(c => c);
     const uniqueKeys = Array.from(new Set(items));
     return uniqueKeys.map((ele, index) => {
-      const item: FilterValueOption = {
+      const item: RelationFilterValue = {
         index: index,
         key: ele,
         label: ele,
@@ -146,7 +148,11 @@ const ValuesOptionsSetter: FC<{
 
   return (
     <Wrap>
-      <Form.Item label="取值配置" shouldUpdate style={{ marginBottom: '0' }}>
+      <Form.Item
+        label={tc('valueConfig')}
+        shouldUpdate
+        style={{ marginBottom: '0' }}
+      >
         <Form.Item
           name={['config', 'valueOptionType']}
           validateTrigger={['onChange', 'onBlur']}
@@ -157,7 +163,7 @@ const ValuesOptionsSetter: FC<{
             {OPERATOR_TYPE_OPTION.map(ele => {
               return (
                 <Radio.Button key={ele.value} value={ele.value}>
-                  {ele.name}
+                  {tc(ele.value)}
                 </Radio.Button>
               );
             })}
@@ -179,7 +185,7 @@ const ValuesOptionsSetter: FC<{
                   <div className="transfer">
                     <Select
                       showSearch
-                      placeholder="请选择默认值"
+                      placeholder={tc('selectDefaultValue')}
                       value={targetKeys}
                       allowClear
                       {...(isMultiple && { mode: 'multiple' })}

@@ -73,6 +73,12 @@ const ChartOperationPanel: FC<{
       if (component === LayoutComponentType.PRESENT) {
         return (
           <ChartPresentWrapper
+            containerHeight={
+              layout.getNodeById('present-wrapper').getRect().height
+            }
+            containerWidth={
+              layout.getNodeById('present-wrapper').getRect().width
+            }
             chart={chart}
             dataset={dataset}
             chartConfig={chartConfig}

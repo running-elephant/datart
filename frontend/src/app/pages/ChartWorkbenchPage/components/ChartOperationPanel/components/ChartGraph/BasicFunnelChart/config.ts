@@ -71,8 +71,8 @@ const config: ChartConfig = {
         {
           label: 'funnel.align',
           key: 'align',
-          comType: 'select',
           default: 'center',
+          comType: 'select',
           options: {
             items: [
               { label: '居中', value: 'center' },
@@ -239,14 +239,20 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'cache.title',
-      key: 'cache',
+      label: 'paging.title',
+      key: 'paging',
       comType: 'group',
       rows: [
         {
-          label: 'cache.title',
-          key: 'panel',
-          comType: 'cache',
+          label: 'paging.pageSize',
+          key: 'pageSize',
+          default: 1000,
+          comType: 'inputNumber',
+          options: {
+            needRefresh: true,
+            step: 1,
+            min: 0,
+          },
         },
       ],
     },
@@ -287,8 +293,42 @@ const config: ChartConfig = {
           color: '颜色',
           colorize: '配色',
         },
-        cache: {
-          title: '数据处理',
+      },
+    },
+    {
+      lang: 'en-US',
+      translation: {
+        section: {
+          legend: 'Legend',
+          detail: 'Detail',
+          info: 'Info',
+        },
+        label: {
+          title: 'Title',
+          showLabel: 'Show Label',
+          position: 'Position',
+          metric: 'Metric',
+          dimension: 'Dimension',
+          conversion: 'Conversion',
+          arrival: 'Arrival',
+          percentage: 'Percentage',
+        },
+        legend: {
+          title: 'Legend',
+          showLegend: 'Show Legend',
+          type: 'Type',
+          selectAll: 'Select All',
+          position: 'Position',
+        },
+        funnel: {
+          title: 'Funnel',
+          sort: 'Sort',
+          align: 'Alignment',
+          gap: 'Gap',
+        },
+        data: {
+          color: 'Color',
+          colorize: 'Colorize',
         },
       },
     },

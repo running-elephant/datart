@@ -34,7 +34,7 @@ import {
   getSeriesTooltips4Rectangular2,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import {
   toExponential,
@@ -120,7 +120,7 @@ class BasicBarChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );
@@ -162,7 +162,7 @@ class BasicBarChart extends Chart {
     return {
       tooltip: {
         trigger: 'item',
-        formatter: this.getTooltipFormmaterFunc(
+        formatter: this.getTooltipFormatterFunc(
           styleConfigs,
           groupConfigs,
           aggregateConfigs,
@@ -535,6 +535,7 @@ class BasicBarChart extends Chart {
           return labels.join('\n');
         },
       },
+      labelLayout: { hideOverlap: true },
     };
   }
 
@@ -579,7 +580,7 @@ class BasicBarChart extends Chart {
     return `${label}: ${value}`;
   }
 
-  getTooltipFormmaterFunc(
+  getTooltipFormatterFunc(
     styleConfigs,
     groupConfigs,
     aggregateConfigs,

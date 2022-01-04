@@ -16,17 +16,46 @@
  * limitations under the License.
  */
 
+import { ChartDataSectionType } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
-
+import produce from 'immer';
 export function dataConfigSectionComparer(
   prevProps: ChartDataConfigSectionProps,
   nextProps: ChartDataConfigSectionProps,
 ) {
   if (
     prevProps.translate !== nextProps.translate ||
-    prevProps.config !== nextProps.config
+    prevProps.config !== nextProps.config ||
+    prevProps.aggregation !== nextProps.aggregation
   ) {
     return false;
   }
   return true;
+}
+
+export function handleDefaultConfig(defaultConfig, configType): any {
+  const nextConfig = produce(defaultConfig, draft => {
+    let _actions = {};
+
+    draft.rows?.forEach((row, i) => {
+      draft.rows[i].aggregate = undefined;
+    });
+
+    if (configType === ChartDataSectionType.AGGREGATE) {
+      delete draft.actions.STRING;
+    }
+
+    if (configType === ChartDataSectionType.GROUP) {
+      delete draft.actions.NUMERIC;
+    }
+
+    for (let key in draft.actions) {
+      _actions[key] = draft.actions[key].filter(
+        v => v !== 'aggregate' && v !== 'aggregateLimit',
+      );
+    }
+
+    draft.actions = _actions;
+  });
+  return nextConfig;
 }

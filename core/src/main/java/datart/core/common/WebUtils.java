@@ -70,19 +70,19 @@ public class WebUtils {
         ExpectedCondition<WebElement> ConditionOfHeight = ExpectedConditions.presenceOfElementLocated(By.id("height"));
         wait.until(ExpectedConditions.and(ConditionOfSign, ConditionOfWidth, ConditionOfHeight));
 
-        int contentWidth = Integer.parseInt(webDriver.findElement(By.id("width")).getAttribute("value"));
+        Double contentWidth = Double.parseDouble(webDriver.findElement(By.id("width")).getAttribute("value"));
 
-        int contentHeight = Integer.parseInt(webDriver.findElement(By.id("height")).getAttribute("value"));
+        Double contentHeight = Double.parseDouble(webDriver.findElement(By.id("height")).getAttribute("value"));
 
         if (imageWidth != contentWidth) {
             // scale the window
-            webDriver.manage().window().setSize(new Dimension(imageWidth, contentHeight));
+            webDriver.manage().window().setSize(new Dimension(imageWidth, contentHeight.intValue()));
             Thread.sleep(1000);
         }
         // scale the window again
-        contentWidth = Integer.parseInt(webDriver.findElement(By.id("width")).getAttribute("value"));
-        contentHeight = Integer.parseInt(webDriver.findElement(By.id("height")).getAttribute("value"));
-        webDriver.manage().window().setSize(new Dimension(contentWidth, contentHeight));
+        contentWidth = Double.parseDouble(webDriver.findElement(By.id("width")).getAttribute("value"));
+        contentHeight = Double.parseDouble(webDriver.findElement(By.id("height")).getAttribute("value"));
+        webDriver.manage().window().setSize(new Dimension(contentWidth.intValue(), contentHeight.intValue()));
         Thread.sleep(1000);
 
         TakesScreenshot screenshot = (TakesScreenshot) webDriver;

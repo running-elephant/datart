@@ -113,7 +113,7 @@ export interface ChartMouseEventParams {
   // 其他大部分图表中只有一种 data，dataType 无意义。
   dataType?: string;
   // 传入的数据值
-  value?: number | string | [];
+  value?: number | string | [] | object | any;
   // 数据图形的颜色。当 componentType 为 'series' 时有意义。
   color?: string;
 }

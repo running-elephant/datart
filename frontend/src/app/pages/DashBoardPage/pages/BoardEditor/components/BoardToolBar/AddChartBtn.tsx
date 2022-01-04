@@ -24,15 +24,9 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from 'utils/utils';
 import { addDataChartWidgets, addWrapChartWidget } from '../../slice/thunk';
 import ChartSelectModalModal from '../ChartSelectModal';
 import { ChartWidgetDropdown, ToolBtnProps } from './ToolBarItem';
@@ -40,16 +34,12 @@ const AddChartBtn: React.FC<ToolBtnProps> = props => {
   const dispatch = useDispatch();
   const { boardId, boardType } = useContext(BoardContext);
   const orgId = useSelector(selectOrgId);
-  // const chartOptions = useSelector(selectDataChartList);
   const chartOptionsMock = useSelector(selectVizs);
   const chartOptions = useMemo(
     () => chartOptionsMock.filter(item => item.relType !== 'DASHBOARD'),
     [chartOptionsMock],
   );
 
-  useEffect(() => {
-    // dispatch(getDataCharts(orgId));
-  }, [dispatch, orgId]);
   const [dataChartVisible, setDataChartVisible] = useState<boolean>(false);
   const [widgetChartVisible, setWidgetChartVisible] = useState<boolean>(false);
 

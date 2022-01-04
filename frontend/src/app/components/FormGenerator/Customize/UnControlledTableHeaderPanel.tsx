@@ -22,22 +22,22 @@ import {
   CheckOutlined,
   DeleteOutlined,
   EditOutlined,
+  RedoOutlined,
 } from '@ant-design/icons';
 import { Button, Col, Input, Row, Space, Table } from 'antd';
 import {
+  ChartDataSectionConfig,
   ChartDataSectionType,
   ChartStyleSectionConfig,
 } from 'app/types/ChartConfig';
 import {
-  diffHeaderRows,
-  flattenHeaderRowsWithoutGroupRow,
   getColumnRenderName,
+  getUnusedHeaderRows,
 } from 'app/utils/chartHelper';
 import { DATARTSEPERATOR } from 'globalConstants';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components';
 import { CloneValueDeep } from 'utils/object';
-import { BaiscSelector, BasicColorSelector, BasicFont } from '../Basic';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
@@ -57,6 +57,18 @@ interface RowValue {
   children?: RowValue[];
 }
 
+const getFlattenHeaders = (dataConfigs: ChartDataSectionConfig[] = []) => {
+  const newDataConfigs = CloneValueDeep(dataConfigs);
+  return newDataConfigs
+    .filter(
+      c =>
+        ChartDataSectionType.AGGREGATE === c.type ||
+        ChartDataSectionType.GROUP === c.type ||
+        ChartDataSectionType.MIXED === c.type,
+    )
+    .flatMap(config => config.rows || []);
+};
+
 const UnControlledTableHeaderPanel: FC<
   ItemLayoutProps<ChartStyleSectionConfig>
 > = memo(
@@ -70,43 +82,13 @@ const UnControlledTableHeaderPanel: FC<
     const [selectedRowUids, setSelectedRowUids] = useState<string[]>([]);
     const [myData, setMyData] = useState(() => CloneValueDeep(data));
     const [tableDataSource, setTableDataSource] = useState<RowValue[]>(() => {
-      const currentHeaderRows = (CloneValueDeep(dataConfigs) || [])
-        .filter(
-          c =>
-            ChartDataSectionType.AGGREGATE === c.type ||
-            ChartDataSectionType.GROUP === c.type ||
-            ChartDataSectionType.MIXED === c.type,
-        )
-        .flatMap(config => config.rows || []);
-
-      const oldGroupedHeaderRows: RowValue[] = myData?.value || [];
-      const oldFlattenedHeaderRows: RowValue[] = oldGroupedHeaderRows.flatMap(
-        row => flattenHeaderRowsWithoutGroupRow(row),
-      );
-      const isChanged = diffHeaderRows(
-        oldFlattenedHeaderRows,
+      const originalFlattenHeaderRows = getFlattenHeaders(dataConfigs);
+      const currentHeaderRows: RowValue[] = myData?.value || [];
+      const unusedHeaderRows = getUnusedHeaderRows(
+        originalFlattenHeaderRows || [],
         currentHeaderRows,
       );
-      if (!isChanged) {
-        oldFlattenedHeaderRows.forEach(oldRow => {
-          const current = currentHeaderRows?.find(v => v.uid === oldRow.uid);
-          Object.assign(oldRow, current);
-        });
-        return oldGroupedHeaderRows;
-      }
-
-      return (CloneValueDeep(dataConfigs) || [])
-        .filter(
-          c =>
-            ChartDataSectionType.AGGREGATE === c.type ||
-            ChartDataSectionType.GROUP === c.type ||
-            ChartDataSectionType.MIXED === c.type,
-        )
-        .flatMap(config => config.rows || [])
-        .map(r => {
-          const previous = oldFlattenedHeaderRows?.find(v => v.uid === r.uid);
-          return { ...previous, ...r };
-        });
+      return currentHeaderRows.concat(unusedHeaderRows);
     });
 
     const mergeRowToGroup = () => {
@@ -120,7 +102,6 @@ const UnControlledTableHeaderPanel: FC<
         mergeSameLineageAncesterRows(lineageRowUids);
       const ancestorsRows = makeSameLinageRows(noDuplicateLineageRows);
       const newDataSource = groupTreeNode(ancestorsRows, tableDataSource);
-
       handleConfigChange([...newDataSource]);
     };
 
@@ -175,7 +156,7 @@ const UnControlledTableHeaderPanel: FC<
     };
 
     const groupTreeNode = (rowAncestors, collection) => {
-      if (rowAncestors && rowAncestors.length <= 1) {
+      if (rowAncestors && rowAncestors.length < 1) {
         return collection;
       }
 
@@ -201,7 +182,7 @@ const UnControlledTableHeaderPanel: FC<
       const groupRow = {
         uid: groupRowUid,
         colName: groupRowUid,
-        label: 'Please input header name',
+        label: t('table.header.newName'),
         isGroup: true,
         children: selectedRows,
       };
@@ -237,6 +218,11 @@ const UnControlledTableHeaderPanel: FC<
         brotherRows[idx + 1] = temp;
         handleConfigChange([...tableDataSource]);
       });
+    };
+
+    const handleRollback = () => {
+      const originalFlattenHeaders = getFlattenHeaders(dataConfigs);
+      handleConfigChange?.(originalFlattenHeaders);
     };
 
     const handleTableRowChange = rowUid => style => prop => (_, value) => {
@@ -295,107 +281,19 @@ const UnControlledTableHeaderPanel: FC<
           const { label, isGroup, uid } = record;
           return isGroup ? (
             <>
+              <DeleteOutlined
+                style={{ marginRight: 10 }}
+                onClick={_ => handleDeleteGroupRow(uid)}
+              />
               <EditableLabel
                 label={label}
                 onChange={value =>
                   handleTableRowChange(uid)(undefined)('label')([], value)
                 }
               />
-              <DeleteOutlined onClick={_ => handleDeleteGroupRow(uid)} />
             </>
           ) : (
             getColumnRenderName(record)
-          );
-        },
-      },
-      {
-        title: t('table.header.backgroundColor'),
-        dataIndex: 'backgroundColor',
-        key: 'backgroundColor',
-        width: 100,
-        render: (_, record) => {
-          const { style, uid } = record;
-          const row = {
-            label: 'column.backgroundColor',
-            key: 'backgroundColor',
-            comType: 'fontColor',
-            value: style?.backgroundColor,
-            options: {
-              hideLabel: true,
-            },
-          };
-          return (
-            <BasicColorSelector
-              ancestors={ancestors}
-              data={row}
-              translate={t}
-              onChange={handleTableRowChange(uid)('style')('backgroundColor')}
-            />
-          );
-        },
-      },
-      {
-        title: t('table.header.font'),
-        dataIndex: 'font',
-        key: 'font',
-        width: 500,
-        render: (_, record) => {
-          const { style, uid } = record;
-          const row = {
-            label: 'column.font',
-            key: 'font',
-            comType: 'font',
-            value: style?.font?.value,
-            options: {
-              hideLabel: true,
-            },
-            default: {
-              fontFamily: 'PingFang SC',
-              fontSize: '12',
-              fontWeight: 'normal',
-              fontStyle: 'normal',
-              color: 'black',
-            },
-          };
-          return (
-            <BasicFont
-              ancestors={ancestors}
-              data={row}
-              translate={t}
-              onChange={handleTableRowChange(uid)('style')('font')}
-            />
-          );
-        },
-      },
-      {
-        title: t('table.header.align.title'),
-        dataIndex: 'align',
-        key: 'align',
-        width: 150,
-        render: (_, record) => {
-          const { style, uid } = record;
-          const row = {
-            label: 'column.align',
-            key: 'align',
-            comType: 'select',
-            default: 'left',
-            value: style?.align,
-            options: {
-              hideLabel: true,
-              items: [
-                { label: t('table.header.align.left'), value: 'left' },
-                { label: t('table.header.align.center'), value: 'center' },
-                { label: t('table.header.align.right'), value: 'right' },
-              ],
-            },
-          };
-          return (
-            <BaiscSelector
-              ancestors={ancestors}
-              data={row}
-              translate={t}
-              onChange={handleTableRowChange(uid)('style')('align')}
-            />
           );
         },
       },
@@ -411,39 +309,43 @@ const UnControlledTableHeaderPanel: FC<
     return (
       <StyledUnControlledTableHeaderPanel direction="vertical">
         <Row gutter={24}>
-          <Col span={4}>
-            <Button
-              disabled={selectedRowUids.length === 0}
-              type="primary"
-              onClick={mergeRowToGroup}
-            >
-              {t('table.header.merge')}
-            </Button>
-          </Col>
           <Col span={20}>
+            <Space>
+              <Button
+                disabled={selectedRowUids.length === 0}
+                type="primary"
+                onClick={mergeRowToGroup}
+              >
+                {t('table.header.merge')}
+              </Button>
+              <Button
+                disabled={selectedRowUids.length === 0}
+                icon={<ArrowUpOutlined />}
+                onClick={handleRowMoveUp}
+              >
+                {t('table.header.moveUp')}
+              </Button>
+              <Button
+                disabled={selectedRowUids.length === 0}
+                icon={<ArrowDownOutlined />}
+                onClick={handleRowMoveDown}
+              >
+                {t('table.header.moveDown')}
+              </Button>
+            </Space>
+          </Col>
+          <Col span={4}>
             <Row justify="end" align="middle">
-              <Space>
-                <Button
-                  disabled={selectedRowUids.length === 0}
-                  icon={<ArrowUpOutlined />}
-                  onClick={handleRowMoveUp}
-                >
-                  {t('table.header.moveUp')}
-                </Button>
-                <Button
-                  disabled={selectedRowUids.length === 0}
-                  icon={<ArrowDownOutlined />}
-                  onClick={handleRowMoveDown}
-                >
-                  {t('table.header.moveDown')}
-                </Button>
-              </Space>
+              <Button icon={<RedoOutlined />} onClick={handleRollback}>
+                {t('table.header.reset')}
+              </Button>
             </Row>
           </Col>
         </Row>
         <Row gutter={24}>
           <Col span={24}>
             <Table
+              size="small"
               bordered={true}
               pagination={false}
               {...myData}
@@ -488,6 +390,7 @@ const EditableLabel: FC<{
         <span>{label}</span>
         <Button
           type="text"
+          size="small"
           icon={<EditOutlined />}
           onClick={() => setIsEditing(true)}
         ></Button>
@@ -495,8 +398,12 @@ const EditableLabel: FC<{
     );
   };
 
-  return render();
+  return <StyledEditableLabel>{render()}</StyledEditableLabel>;
 });
+
+const StyledEditableLabel = styled.div`
+  display: inline-block;
+`;
 
 const StyledUnControlledTableHeaderPanel = styled(Space)`
   width: 100%;

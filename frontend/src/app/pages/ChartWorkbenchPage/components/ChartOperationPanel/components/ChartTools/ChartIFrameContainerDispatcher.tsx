@@ -20,7 +20,7 @@ import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import { CSSProperties } from 'styled-components';
-import ChartTools from '.';
+import ChartIFrameContainer from './ChartIFrameContainer';
 
 const DEFAULT_CONTAINER_ID = 'frame-container-1';
 
@@ -29,6 +29,7 @@ class ChartIFrameContainerDispatcher {
   private currentContainerId = DEFAULT_CONTAINER_ID;
   private chartContainerMap = new Map<string, Function>();
   private chartMetadataMap = new Map<string, [Chart, any, any]>();
+  private editorEnv = { env: 'workbench' };
 
   public static instance(): ChartIFrameContainerDispatcher {
     if (!this.dispatcher) {
@@ -53,13 +54,15 @@ class ChartIFrameContainerDispatcher {
     this.switchContainer(containerId, chart, dataset, config);
     const renders: Function[] = [];
     this.chartContainerMap.forEach((chartRenderer: Function, key) => {
+      const isShown = key === this.currentContainerId;
       renders.push(
         chartRenderer
           .call(
-            null,
-            this.getVisibilityStyle(key === this.currentContainerId, style),
+            Object.create(null),
+            this.getVisibilityStyle(isShown, style),
+            isShown,
           )
-          .apply(null, this.chartMetadataMap.get(key)),
+          .apply(Object.create(null), this.chartMetadataMap.get(key)),
       );
     });
     return renders;
@@ -77,16 +80,20 @@ class ChartIFrameContainerDispatcher {
 
   private createNewIfNotExist(containerId: string) {
     if (!this.chartContainerMap.has(containerId)) {
-      const newContainer = style => (chart, dataset, config) => {
+      const newContainer = (style, isShown) => (chart, dataset, config) => {
         return (
-          <ChartTools.ChartIFrame
-            dataset={dataset}
-            chart={chart}
-            config={config}
-            containerId={containerId}
-            key={containerId}
-            style={style}
-          />
+          <div key={containerId} style={style}>
+            <ChartIFrameContainer
+              dataset={dataset}
+              chart={chart}
+              config={config}
+              containerId={containerId}
+              width={style?.width}
+              height={style?.height}
+              widgetSpecialConfig={this.editorEnv}
+              isShown={isShown}
+            />
+          </div>
         );
       };
       this.chartContainerMap.set(containerId, newContainer);
@@ -94,8 +101,8 @@ class ChartIFrameContainerDispatcher {
     this.currentContainerId = containerId;
   }
 
-  private getVisibilityStyle(isShow, style?: CSSProperties) {
-    return isShow
+  private getVisibilityStyle(isShown, style?: CSSProperties) {
+    return isShown
       ? {
           ...style,
           transform: 'none',
@@ -105,7 +112,7 @@ class ChartIFrameContainerDispatcher {
           ...style,
           transform: 'translate(-9999px, -9999px)',
           position: 'absolute',
-        }; /* TODO: visibilty: 'collapse' */
+        };
   }
 }
 

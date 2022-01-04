@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from 'antd';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getFolders } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -64,6 +65,7 @@ export const EditorPage: FC = () => {
   const deleteLoding = useSelector(selectDeleteLoading);
   const { toDetails } = useToScheduleDetails();
   const isArchived = editingSchedule?.status === 0;
+  const t = useI18NPrefix('main.pages.schedulePage.sidebar.editorPage.index');
 
   const { actions } = useScheduleSlice();
   const { scheduleId, orgId } = params;
@@ -79,7 +81,7 @@ export const EditorPage: FC = () => {
   const onFinish = useCallback(() => {
     form.validateFields().then((values: FormValues) => {
       if (!(values?.folderContent && values?.folderContent?.length > 0)) {
-        message.error('请勾选发送内容');
+        message.error(t('tickToSendContent'));
         return;
       }
       const params = toScheduleSubmitParams(values, orgId);
@@ -88,7 +90,7 @@ export const EditorPage: FC = () => {
           addSchedule({
             params,
             resolve: (id: string) => {
-              message.success('新增成功');
+              message.success(t('addSuccess'));
               toDetails(orgId, id);
               refreshScheduleList();
             },
@@ -100,7 +102,7 @@ export const EditorPage: FC = () => {
             scheduleId: editingSchedule?.id as string,
             params: { ...params, id: editingSchedule?.id as string },
             resolve: () => {
-              message.success('保存成功');
+              message.success(t('saveSuccess'));
               refreshScheduleList();
             },
           }),
@@ -115,6 +117,7 @@ export const EditorPage: FC = () => {
     editingSchedule,
     refreshScheduleList,
     toDetails,
+    t,
   ]);
 
   const onResetForm = useCallback(() => {
@@ -190,12 +193,12 @@ export const EditorPage: FC = () => {
       unarchiveSchedule({
         id: editingSchedule!.id,
         resolve: () => {
-          message.success('还原成功');
+          message.success(t('restoredSuccess'));
           toDetails(orgId);
         },
       }),
     );
-  }, [dispatch, toDetails, orgId, editingSchedule]);
+  }, [dispatch, toDetails, orgId, editingSchedule, t]);
 
   const del = useCallback(
     archive => () => {
@@ -204,13 +207,15 @@ export const EditorPage: FC = () => {
           id: editingSchedule!.id,
           archive,
           resolve: () => {
-            message.success(`成功${archive ? '移至回收站' : '删除'}`);
+            message.success(
+              `${t('success')}${archive ? t('moveToTrash') : t('delete')}`,
+            );
             toDetails(orgId);
           },
         }),
       );
     },
-    [dispatch, toDetails, orgId, editingSchedule],
+    [dispatch, toDetails, orgId, editingSchedule, t],
   );
 
   useEffect(() => {
@@ -234,16 +239,16 @@ export const EditorPage: FC = () => {
     <Container ref={setContainer}>
       <Affix offsetTop={0} target={() => container}>
         <DetailPageHeader
-          title={isAdd ? '新建定时任务' : editingSchedule?.name}
+          title={isAdd ? t('newTimedTask') : editingSchedule?.name}
           actions={
             isArchived ? (
               <>
-                <Popconfirm title="确定还原？" onConfirm={unarchive}>
-                  <Button loading={unarchiveLoading}>还原</Button>
+                <Popconfirm title={t('sureToRestore')} onConfirm={unarchive}>
+                  <Button loading={unarchiveLoading}>{t('restore')}</Button>
                 </Popconfirm>
-                <Popconfirm title="确定删除？" onConfirm={del(false)}>
+                <Popconfirm title={t('sureToDelete')} onConfirm={del(false)}>
                   <Button loading={deleteLoding} danger>
-                    删除
+                    {t('delete')}
                   </Button>
                 </Popconfirm>
               </>
@@ -251,7 +256,7 @@ export const EditorPage: FC = () => {
               <>
                 <Tooltip
                   placement="bottom"
-                  title={active ? '停止后允许修改' : ''}
+                  title={active ? t('allowModificationAfterStopping') : ''}
                 >
                   <Button
                     loading={saveLoding}
@@ -259,17 +264,20 @@ export const EditorPage: FC = () => {
                     onClick={form.submit}
                     disabled={active}
                   >
-                    保存
+                    {t('save')}
                   </Button>
                 </Tooltip>
                 {!isAdd && (
                   <Tooltip
                     placement="bottom"
-                    title={active ? '停止后允许移至回收站' : ''}
+                    title={active ? t('allowMoveAfterStopping') : ''}
                   >
-                    <Popconfirm title="确定移至回收站？" onConfirm={del(true)}>
+                    <Popconfirm
+                      title={t('sureMoveRecycleBin')}
+                      onConfirm={del(true)}
+                    >
                       <Button loading={deleteLoding} disabled={active} danger>
-                        移至回收站
+                        {t('basicSettings')}
                       </Button>
                     </Popconfirm>
                   </Tooltip>
@@ -293,7 +301,7 @@ export const EditorPage: FC = () => {
               {!isAdd && editingSchedule?.id ? (
                 <ScheduleErrorLog scheduleId={editingSchedule?.id} />
               ) : null}
-              <FormCard title="基本设置">
+              <FormCard title={t('basicSettings')}>
                 <FormWrapper>
                   <BasicBaseForm
                     isAdd={isAdd}
@@ -309,7 +317,7 @@ export const EditorPage: FC = () => {
               </FormCard>
 
               {jobType === JobTypes.Email ? (
-                <FormCard title="邮件设置">
+                <FormCard title={t('emailSetting')}>
                   <FormWrapper>
                     <EmailSettingForm
                       fileType={fileType}
@@ -318,13 +326,13 @@ export const EditorPage: FC = () => {
                   </FormWrapper>
                 </FormCard>
               ) : (
-                <FormCard title="企业微信设置">
+                <FormCard title={t('enterpriseWeChatSettings')}>
                   <FormWrapper>
                     <WeChartSetttingForm />
                   </FormWrapper>
                 </FormCard>
               )}
-              <FormCard title="发送内容设置">
+              <FormCard title={t('sendContentSettings')}>
                 <FormWrapper>
                   <SendContentForm />
                 </FormWrapper>

@@ -1,8 +1,10 @@
 import { DatePicker, Form, Input, Radio } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, useCallback } from 'react';
 import { JobTypes, JOB_TYPES_OPTIONS } from '../../constants';
 import { checkScheduleName } from '../../services';
 import { ExecuteFormItem, ExecuteFormItemProps } from './ExecuteFormItem';
+
 const { RangePicker } = DatePicker;
 
 interface BasicBaseFormProps extends ExecuteFormItemProps {
@@ -19,6 +21,9 @@ export const BasicBaseForm: FC<BasicBaseFormProps> = ({
   children,
   ...restProps
 }) => {
+  const t = useI18NPrefix(
+    'main.pages.schedulePage.sidebar.editorPage.basicBaseForm.index',
+  );
   const checkNameUnique = useCallback(
     async (_, name) => {
       if (!isAdd && initialName === name) {
@@ -28,32 +33,32 @@ export const BasicBaseForm: FC<BasicBaseFormProps> = ({
         return Promise.resolve();
       } else {
         const res = await checkScheduleName(orgId, name);
-        return res ? Promise.resolve() : Promise.reject('名称已存在');
+        return res ? Promise.resolve() : Promise.reject(t('nameAlreadyExists'));
       }
     },
-    [orgId, isAdd, initialName],
+    [orgId, isAdd, initialName, t],
   );
   return (
     <>
       <Form.Item
-        label="名称"
+        label={t('name')}
         hasFeedback
         name="name"
         validateTrigger={'onBlur'}
         rules={[
-          { required: true, message: '名称为必填项' },
+          { required: true, message: t('nameRequired') },
           { validator: checkNameUnique },
         ]}
       >
         <Input autoComplete="new-name" />
       </Form.Item>
-      <Form.Item label="类型" name="jobType">
+      <Form.Item label={t('type')} name="jobType">
         <Radio.Group
           options={JOB_TYPES_OPTIONS}
           onChange={e => onJobTypeChange(e.target.value)}
         />
       </Form.Item>
-      <Form.Item label="有效时间范围" name={'dateRange'}>
+      <Form.Item label={t('effectiveTimeRange')} name={'dateRange'}>
         <RangePicker allowClear showTime format="YYYY-MM-DD HH:mm:ss" />
       </Form.Item>
       <ExecuteFormItem {...restProps} />

@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   CloseOutlined,
   InfoCircleOutlined,
@@ -5,6 +23,7 @@ import {
 } from '@ant-design/icons';
 import { Button, Space } from 'antd';
 import { Confirm, TabPane, Tabs as TabsComponent } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import React, { memo, useCallback, useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,6 +56,7 @@ export const Tabs = memo(() => {
   const id = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'id' }),
   ) as string;
+  const t = useI18NPrefix('view.tabs');
 
   const redirect = useCallback(
     currentEditingViewKey => {
@@ -116,7 +136,7 @@ export const Tabs = memo(() => {
       </TabsComponent>
       <Confirm
         visible={confirmVisible}
-        title={`${operatingView?.name} 中有未执行的修改，是否执行？`}
+        title={t('warning')}
         icon={
           <InfoCircleOutlined
             css={`
@@ -126,10 +146,10 @@ export const Tabs = memo(() => {
         }
         footer={
           <Space>
-            <Button onClick={removeTab}>放弃</Button>
-            <Button onClick={hideConfirm}>取消</Button>
+            <Button onClick={removeTab}>{t('discard')}</Button>
+            <Button onClick={hideConfirm}>{t('cancel')}</Button>
             <Button onClick={runTab} type="primary">
-              执行
+              {t('execute')}
             </Button>
           </Space>
         }

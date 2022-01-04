@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Form, Select } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import produce from 'immer';
 import React, {
   memo,
@@ -39,6 +40,7 @@ import { updateStoryPage } from '../slice/thunks';
 import { StoryBoardState, TransitionEffect } from '../slice/types';
 export interface StoryPageSettingProps {}
 export const StoryPageSetting: React.FC<StoryPageSettingProps> = memo(() => {
+  const t = useI18NPrefix(`viz.board.setting`);
   const { stroyBoardId: storyId } = useContext(StoryContext);
   const dispatch = useDispatch();
   const selectedPageIds = useSelector(
@@ -89,7 +91,7 @@ export const StoryPageSetting: React.FC<StoryPageSettingProps> = memo(() => {
       onValuesChange={onValuesChange}
     >
       <>
-        <Form.Item name="in" label="切入">
+        <Form.Item name="in" label={t('cutIn')}>
           <Select style={{ width: '120px' }} placeholder="Select a option">
             {EFFECT_IN_OPTIONS.map(ele => (
               <Select.Option key={ele} value={ele}>
@@ -98,7 +100,7 @@ export const StoryPageSetting: React.FC<StoryPageSettingProps> = memo(() => {
             ))}
           </Select>
         </Form.Item>
-        <Form.Item name="out" label="切出">
+        <Form.Item name="out" label={t('cutOut')}>
           <Select style={{ width: '120px' }} placeholder="Select a option ">
             {EFFECT_OUT_OPTIONS.map(ele => (
               <Select.Option key={ele} value={ele}>
@@ -107,7 +109,7 @@ export const StoryPageSetting: React.FC<StoryPageSettingProps> = memo(() => {
             ))}
           </Select>
         </Form.Item>
-        <Form.Item name="speed" label="速度">
+        <Form.Item name="speed" label={t('speed')}>
           <Select style={{ width: '120px' }} placeholder="Select a option ">
             {EFFECT_SPEED_OPTIONS.map(ele => (
               <Select.Option key={ele} value={ele}>
@@ -117,53 +119,6 @@ export const StoryPageSetting: React.FC<StoryPageSettingProps> = memo(() => {
           </Select>
         </Form.Item>
       </>
-      {/* <Popover
-        content={
-          <>
-            <Form.Item name="in" label="切入">
-              <Select
-                style={{ width: '120px' }}
-                placeholder="Select a option and change input text above"
-              >
-                {EFFECT_IN_OPTIONS.map(ele => (
-                  <Select.Option key={ele} value={ele}>
-                    {ele}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item name="out" label="切出">
-              <Select
-                style={{ width: '120px' }}
-                placeholder="Select a option and change input text above"
-              >
-                {EFFECT_OUT_OPTIONS.map(ele => (
-                  <Select.Option key={ele} value={ele}>
-                    {ele}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item name="speed" label="速度">
-              <Select
-                style={{ width: '120px' }}
-                placeholder="Select a option and change input text above"
-              >
-                {EFFECT_SPEED_OPTIONS.map(ele => (
-                  <Select.Option key={ele} value={ele}>
-                    {ele}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </>
-        }
-        title="切换效果"
-      >
-        <Button>
-          切换效果: [{effect.in}][{effect.out}][{effect.speed}]
-        </Button>
-      </Popover> */}
     </Form>
   );
 });

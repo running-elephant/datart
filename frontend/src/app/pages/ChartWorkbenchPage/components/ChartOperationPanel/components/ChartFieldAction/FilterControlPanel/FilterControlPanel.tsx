@@ -50,6 +50,7 @@ const FilterControllPanel: FC<
     dataset?: ChartDataset;
     dataView?: ChartDataView;
     dataConfig?: ChartDataSectionConfig;
+    aggregation?: boolean;
     onConfigChange: (
       config: ChartDataSectionField,
       needRefresh?: boolean,
@@ -63,6 +64,7 @@ const FilterControllPanel: FC<
     dataView,
     i18nPrefix,
     dataConfig,
+    aggregation,
     onConfigChange,
     fetchDataByField,
   }) => {
@@ -75,6 +77,9 @@ const FilterControllPanel: FC<
     const t = useI18NPrefix(customizeI18NPrefix);
     const [alias, setAlias] = useState(config.alias);
     const [aggregate, setAggregate] = useState(() => {
+      if (Boolean(dataConfig?.disableAggregate) || aggregation === false) {
+        return AggregateFieldActionType.NONE;
+      }
       if (config.aggregate) {
         return config.aggregate;
       } else if (
@@ -217,7 +222,7 @@ const FilterControllPanel: FC<
         >
           <Input onChange={e => handleNameChange(e.target?.value)} />
         </FormItemEx>
-        {config.category === ChartDataViewFieldCategory.Field && (
+        {config.category === ChartDataViewFieldCategory.Field && aggregation && (
           <FormItemEx
             {...formItemStyles}
             label={t('filterAggregate')}

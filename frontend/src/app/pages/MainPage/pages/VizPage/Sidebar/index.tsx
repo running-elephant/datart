@@ -3,6 +3,7 @@ import {
   FundProjectionScreenOutlined,
 } from '@ant-design/icons';
 import { ListSwitch } from 'app/components';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -14,7 +15,7 @@ import { Folder } from '../slice/types';
 import { Folders } from './Folders';
 import { Storyboards } from './Storyboards';
 
-export const Sidebar = memo(() => {
+export const Sidebar = memo(({ i18nPrefix }: I18NComponentProps) => {
   const [selectedKey, setSelectedKey] = useState('folder');
   const vizs = useSelector(selectVizs);
   const storyboards = useSelector(selectStoryboards);
@@ -22,6 +23,7 @@ export const Sidebar = memo(() => {
     '/organizations/:orgId/vizs/:vizId',
   );
   const vizId = matchDetail?.params.vizId;
+  const t = useI18NPrefix(i18nPrefix);
   const selectedFolderId = useMemo(() => {
     if (vizId && vizs) {
       const viz = vizs.find(({ relId }) => relId === vizId);
@@ -42,11 +44,11 @@ export const Sidebar = memo(() => {
 
   const listTitles = useMemo(
     () => [
-      { key: 'folder', icon: <FolderAddFilled />, text: '目录' },
+      { key: 'folder', icon: <FolderAddFilled />, text: t('folder') },
       {
         key: 'presentation',
         icon: <FundProjectionScreenOutlined />,
-        text: '演示',
+        text: t('presentation'),
       },
     ],
     [],
@@ -65,11 +67,13 @@ export const Sidebar = memo(() => {
       />
       <Folders
         selectedId={selectedFolderId}
+        i18nPrefix={i18nPrefix}
         className={classnames({ hidden: selectedKey !== 'folder' })}
       />
       <Storyboards
         selectedId={vizId}
         className={classnames({ hidden: selectedKey !== 'presentation' })}
+        i18nPrefix={i18nPrefix}
       />
     </Wrapper>
   );

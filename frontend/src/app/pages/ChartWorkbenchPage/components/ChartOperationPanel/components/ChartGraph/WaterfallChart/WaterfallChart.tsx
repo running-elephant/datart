@@ -24,8 +24,9 @@ import {
   getCustomSortableColumns,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
+import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
 import Config from './config';
@@ -89,7 +90,7 @@ class WaterfallChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
 
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );
@@ -127,7 +128,7 @@ class WaterfallChart extends Chart {
         styles,
         'bar',
       );
-    const label = this.getLabel(styles);
+    const label = this.getLabel(styles, aggregateConfigs[0].format);
 
     const dataList = dataColumns.map(
       dc => dc[getValueByColumnKey(aggregateConfigs[0])],
@@ -199,7 +200,10 @@ class WaterfallChart extends Chart {
             if (!index && typeof param[1].value === 'number') {
               data += param[1].value;
             }
-            return `${pa.seriesName}: ${data}`;
+            return `${pa.seriesName}: ${toFormattedValue(
+              data,
+              aggregateConfigs[0].format,
+            )}`;
           });
           const xAxis = param[0]['axisValue'];
           if (xAxis === '累计') {
@@ -304,7 +308,7 @@ class WaterfallChart extends Chart {
     };
   }
 
-  getLabel(styles) {
+  getLabel(styles, format) {
     const [show, position, font] = this.getArrStyleValueByGroup(
       ['showLabel', 'position', 'font'],
       styles,
@@ -314,6 +318,7 @@ class WaterfallChart extends Chart {
       show,
       position,
       ...font,
+      formatter: ({ value }) => `${toFormattedValue(value, format)}`,
     };
   }
 

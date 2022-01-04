@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig } from 'app/types/ChartConfig';
-import { isUndefined } from 'lodash';
+import isUndefined from 'lodash/isUndefined';
 
 export const hasWrongDimensionName = (config?: ChartConfig) => {
   if (!config) {

@@ -18,6 +18,7 @@
 package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
+import datart.core.base.consts.VariableTypeEnum;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
@@ -31,9 +32,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -51,18 +54,21 @@ public class VizServiceImpl extends BaseService implements VizService {
 
     private final ViewService viewService;
 
+    private final VariableService variableService;
+
     public VizServiceImpl(DatachartService datachartService,
                           DashboardService dashboardService,
                           StoryboardService storyboardService,
                           StorypageService storypageService,
                           FolderService folderService,
-                          ViewService viewService) {
+                          ViewService viewService, VariableService variableService) {
         this.datachartService = datachartService;
         this.dashboardService = dashboardService;
         this.storyboardService = storyboardService;
         this.storypageService = storypageService;
         this.folderService = folderService;
         this.viewService = viewService;
+        this.variableService = variableService;
     }
 
     @Override
@@ -171,6 +177,7 @@ public class VizServiceImpl extends BaseService implements VizService {
         DatachartDetailList datachartDetailList = new DatachartDetailList();
         datachartDetailList.setDatacharts(new LinkedList<>());
         datachartDetailList.setViews(new LinkedList<>());
+        datachartDetailList.setViewVariables(new HashMap<>());
         if (CollectionUtils.isEmpty(datachartIds)) {
             return datachartDetailList;
         }
@@ -183,9 +190,17 @@ public class VizServiceImpl extends BaseService implements VizService {
         for (Datachart datachart : datachartDetailList.getDatacharts()) {
             try {
                 datachartDetailList.getViews().add(viewService.retrieve(datachart.getViewId()));
+                if (!datachartDetailList.getViewVariables().containsKey(datachart.getViewId())) {
+                    List<Variable> variables = variableService.listByView(datachart.getViewId());
+                    datachartDetailList.getViewVariables().put(datachart.getViewId(), variables);
+                }
             } catch (Exception ignored) {
             }
         }
+        List<Variable> orgVariables = variableService.listOrgVariables(datachartDetailList.getDatacharts().get(0).getOrgId());
+        orgVariables = orgVariables.stream().filter(v -> v.getType().equals(VariableTypeEnum.QUERY.name()))
+                .collect(Collectors.toList());
+        datachartDetailList.setOrgVariables(orgVariables);
         return datachartDetailList;
     }
 
@@ -314,7 +329,10 @@ public class VizServiceImpl extends BaseService implements VizService {
                 Storyboard storyboard = storyboardService.retrieve(vizId);
                 storyboardService.requirePermission(storyboard, Const.MANAGE);
                 // check name
-                folderService.checkUnique(vizType, storyboard.getOrgId(), parentId, newName);
+                Storyboard check = new Storyboard();
+                check.setOrgId(storyboard.getOrgId());
+                check.setName(newName);
+                storyboardService.checkUnique(check);
                 storyboard.setName(newName);
                 storyboard.setStatus(Const.DATA_STATUS_ACTIVE);
                 return 1 == storyboardService.getDefaultMapper().updateByPrimaryKey(storyboard);

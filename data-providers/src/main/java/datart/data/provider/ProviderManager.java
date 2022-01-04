@@ -19,6 +19,7 @@
 package datart.data.provider;
 
 import datart.core.base.exception.Exceptions;
+import datart.core.common.MessageResolver;
 import datart.core.data.provider.*;
 import datart.data.provider.optimize.DataProviderExecuteOptimizer;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,21 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
 
     @Override
     public DataProviderConfigTemplate getSourceConfigTemplate(String type) throws IOException {
-        return getDataProviderService(type).getConfigTemplate();
+        DataProvider providerService = getDataProviderService(type);
+        DataProviderConfigTemplate configTemplate = providerService.getConfigTemplate();
+        if (!CollectionUtils.isEmpty(configTemplate.getAttributes())) {
+            for (DataProviderConfigTemplate.Attribute attribute : configTemplate.getAttributes()) {
+                attribute.setDisplayName(providerService.getConfigDisplayName(attribute.getName()));
+                attribute.setDescription(providerService.getConfigDescription(attribute.getName()));
+                if (!CollectionUtils.isEmpty(attribute.getChildren())) {
+                    for (DataProviderConfigTemplate.Attribute child : attribute.getChildren()) {
+                        child.setDisplayName(providerService.getConfigDisplayName(child.getName()));
+                        child.setDescription(providerService.getConfigDescription(child.getName()));
+                    }
+                }
+            }
+        }
+        return configTemplate;
     }
 
     @Override
@@ -120,36 +135,28 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
         providerService.resetSource(source);
     }
 
-    private void excludeColumns(Dataframe data, Set<String> columns) {
+    private void excludeColumns(Dataframe data, Set<String> include) {
         if (data == null
                 || CollectionUtils.isEmpty(data.getColumns())
-                || columns == null
-                || columns.size() == 0
-                || columns.contains("*")) {
+                || include == null
+                || include.size() == 0
+                || include.contains("*")) {
             return;
         }
 
         List<Integer> excludeIndex = new LinkedList<>();
         for (int i = 0; i < data.getColumns().size(); i++) {
             Column column = data.getColumns().get(i);
-            if (!columns.contains(column.getName())) {
+            if (!include.contains(column.getName())) {
                 excludeIndex.add(i);
-                data.getColumns().remove(column);
             }
         }
         if (excludeIndex.size() > 0) {
-            List<List<Object>> rows = data.getRows().parallelStream().map(row -> {
-                List<Object> r = new LinkedList<>();
-                for (int i = 0; i < row.size(); i++) {
-                    if (excludeIndex.size() > 0 && i == excludeIndex.get(0)) {
-                        excludeIndex.remove(0);
-                    } else {
-                        r.add(row.get(i));
-                    }
+            data.getRows().parallelStream().forEach(row -> {
+                for (Integer index : excludeIndex) {
+                    row.set(index, null);
                 }
-                return r;
-            }).collect(Collectors.toList());
-            data.setRows(rows);
+            });
         }
     }
 

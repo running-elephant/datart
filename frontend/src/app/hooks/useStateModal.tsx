@@ -18,33 +18,26 @@
 
 import { Form, Modal } from 'antd';
 import { useRef } from 'react';
-import useI18NPrefix from './useI18NPrefix';
 
 export interface IStateModalContentProps {
   onChange: (o: any) => void;
 }
 
 export enum StateModalSize {
-  Small = 600,
-  Middle = 1000,
-  Large = 1600,
-  XLarge = 2000,
+  XSMALL = 520,
+  SMALL = 600,
+  MIDDLE = 1000,
+  LARGE = 1600,
+  XLARGE = 2000,
 }
 
 const defaultBodyStyle: React.CSSProperties = {
   maxHeight: 1000,
-  overflowY: 'scroll',
+  overflowY: 'auto',
   overflowX: 'auto',
 };
 
-function useStateModal({
-  i18nPrefix,
-  initState,
-}: {
-  i18nPrefix?: string;
-  initState?: any;
-}) {
-  const t = useI18NPrefix(i18nPrefix);
+function useStateModal({ initState }: { initState?: any }) {
   const [form] = Form.useForm();
   const [modal, contextHolder] = Modal.useModal();
   const okCallbackRef = useRef<Function>();
@@ -64,19 +57,19 @@ function useStateModal({
             Object.keys(stateRef.current || {}).length > 0
               ? stateRef.current
               : [];
-          okCallbackRef.current?.call(null, ...spreadParmas);
+          okCallbackRef.current?.call(Object.create(null), ...spreadParmas);
         } catch (e) {
           console.error('useStateModal | exception message ---> ', e);
         }
         return closeFn;
       })
       .catch(info => {
-        return Promise.reject();
+        return Promise.reject(info);
       });
   };
 
   const handleClickCancelButton = () => {
-    cancelCallbackRef.current?.call(null, null);
+    cancelCallbackRef.current?.call(Object.create(null), null);
   };
 
   const FormWrapper = content => {
@@ -87,13 +80,26 @@ function useStateModal({
     );
   };
 
+  const getModalSize = (size?: string | number | StateModalSize): number => {
+    if (!size) {
+      return StateModalSize.MIDDLE;
+    }
+    if (!isNaN(+size)) {
+      return +size;
+    }
+    if (typeof size === 'string' && StateModalSize[size.toUpperCase()]) {
+      return StateModalSize[size.toUpperCase()];
+    }
+    return StateModalSize.MIDDLE;
+  };
+
   const showModal = (props: {
     title: string;
     content: (
       cacheOnChangeValue: typeof handleSaveCacheValue,
     ) => React.ReactElement<IStateModalContentProps>;
     bodyStyle?: React.CSSProperties;
-    modalSize?: StateModalSize;
+    modalSize?: string | number | StateModalSize;
     onOk?: typeof handleClickOKButton;
     onCancel?: typeof handleClickCancelButton;
   }) => {
@@ -106,9 +112,11 @@ function useStateModal({
 
     return modal.confirm({
       title: props.title,
-      width: props.modalSize || StateModalSize.Small,
+      width: getModalSize(props?.modalSize),
       bodyStyle: props.bodyStyle || defaultBodyStyle,
-      content: FormWrapper(props?.content?.call(null, handleSaveCacheValue)),
+      content: FormWrapper(
+        props?.content?.call(Object.create(null), handleSaveCacheValue),
+      ),
       onOk: handleClickOKButton,
       onCancel: handleClickCancelButton,
       maskClosable: true,

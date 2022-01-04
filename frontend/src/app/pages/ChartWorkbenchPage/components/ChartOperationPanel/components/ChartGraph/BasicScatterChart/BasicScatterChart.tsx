@@ -28,7 +28,7 @@ import {
   getSeriesTooltips4Scatter,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Config from './config';
@@ -84,7 +84,7 @@ class BasicScatterChart extends Chart {
   }
 
   getOptions(dataset: ChartDataset, config: ChartConfig) {
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );
@@ -233,7 +233,7 @@ class BasicScatterChart extends Chart {
       'scatter',
       'cycleRatio',
     );
-    const defaultSizeValue = max - min;
+    const defaultSizeValue = (max - min) / 2;
     const seriesName = groupConfigs
       ?.map(gc => getColumnRenderName(gc))
       .join('-');
@@ -394,7 +394,10 @@ class BasicScatterChart extends Chart {
     const show = getStyleValueByGroup(styles, 'label', 'showLabel');
     const position = getStyleValueByGroup(styles, 'label', 'position');
     const font = getStyleValueByGroup(styles, 'label', 'font');
-    return { label: { show, position, ...font, formatter: '{b}' } };
+    return {
+      label: { show, position, ...font, formatter: '{b}' },
+      labelLayout: { hideOverlap: true },
+    };
   }
 
   getTooltipFormmaterFunc(

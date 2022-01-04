@@ -16,43 +16,73 @@
  * limitations under the License.
  */
 
+import useResizeObserver from 'app/hooks/useResizeObserver';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
-import { FC } from 'react';
+import { FC, memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
 import ChartGraphPanel from './ChartGraphPanel';
 import ChartPresentPanel from './ChartPresentPanel';
 
 const ChartPresentWrapper: FC<{
+  containerHeight?: number;
+  containerWidth?: number;
   chart?: Chart;
   dataset?: ChartDataset;
   chartConfig?: ChartConfig;
   onChartChange: (c: Chart) => void;
-}> = ({ chart, dataset, chartConfig, onChartChange }) => {
-  return (
-    <StyledChartPresentWrapper>
-      <ChartGraphPanel
-        chart={chart}
-        chartConfig={chartConfig}
-        onChartChange={onChartChange}
-      />
-      <ChartPresentPanel
-        chart={chart}
-        dataset={dataset}
-        chartConfig={chartConfig}
-      />
-    </StyledChartPresentWrapper>
-  );
-};
+}> = memo(
+  ({
+    containerHeight,
+    containerWidth,
+    chart,
+    dataset,
+    chartConfig,
+    onChartChange,
+  }) => {
+    const { ref: ChartGraphPanelRef } = useResizeObserver<any>({
+      refreshMode: 'debounce',
+      refreshRate: 500,
+    });
+
+    const borderWidth = useMemo(() => {
+      return +SPACE_MD.replace('px', '');
+    }, []);
+
+    return (
+      <StyledChartPresentWrapper borderWidth={borderWidth}>
+        <div ref={ChartGraphPanelRef}>
+          <ChartGraphPanel
+            chart={chart}
+            chartConfig={chartConfig}
+            onChartChange={onChartChange}
+          />
+        </div>
+        <ChartPresentPanel
+          containerHeight={
+            (containerHeight || 0) -
+            borderWidth -
+            (ChartGraphPanelRef?.current?.offsetHeight || 0)
+          }
+          containerWidth={(containerWidth || 0) - borderWidth}
+          chart={chart}
+          dataset={dataset}
+          chartConfig={chartConfig}
+        />
+      </StyledChartPresentWrapper>
+    );
+  },
+);
 
 export default ChartPresentWrapper;
 
-const StyledChartPresentWrapper = styled.div`
+const StyledChartPresentWrapper = styled.div<{ borderWidth }>`
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: ${SPACE_MD} ${SPACE_MD} ${SPACE_MD} 0;
+  padding: ${p => p.borderWidth}px ${p => p.borderWidth}px
+    ${p => p.borderWidth}px 0;
   background-color: ${p => p.theme.bodyBackground};
 `;

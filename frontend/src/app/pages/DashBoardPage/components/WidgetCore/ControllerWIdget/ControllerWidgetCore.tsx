@@ -28,10 +28,10 @@ import {
   ControlOption,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getControllerDateValues } from 'app/pages/DashBoardPage/utils';
-import { FilterValueOption } from 'app/types/ChartConfig';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import {
   ControllerFacadeTypes,
-  RelativeOrExactTime,
+  TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
 import produce from 'immer';
 import React, {
@@ -43,6 +43,7 @@ import React, {
 } from 'react';
 import styled from 'styled-components/macro';
 import { LabelName } from '../WidgetName/WidgetName';
+import { CheckboxGroupControllerForm } from './Controller/CheckboxGroupController';
 import { MultiSelectControllerForm } from './Controller/MultiSelectController';
 import { NumberControllerForm } from './Controller/NumberController';
 import { RadioGroupControllerForm } from './Controller/RadioGroupController';
@@ -62,7 +63,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   const {
     data: { rows },
   } = useContext(WidgetDataContext);
-  const { widgetUpdate, refreshWidgetsByFilter } =
+  const { widgetUpdate, refreshWidgetsByController } =
     useContext(BoardActionContext);
 
   const { config, type: facadeType } = useMemo(
@@ -103,7 +104,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     const dataRows = rows?.flat(2) || [];
     if (valueOptionType === 'common') {
       return dataRows.map(ele => {
-        const item: FilterValueOption = {
+        const item: RelationFilterValue = {
           key: ele,
           label: ele,
           // children?
@@ -137,7 +138,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
       ).config.controllerValues = _values;
     });
     widgetUpdate(nextWidget);
-    refreshWidgetsByFilter(nextWidget);
+    refreshWidgetsByController(nextWidget);
   };
   // const onSqlOperatorAndValues = useCallback(
   //   (sql: FilterSqlOperator, values: any[]) => {
@@ -158,11 +159,11 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
       const nextFilterDate: ControllerDate = {
         ...controllerDate!,
         startTime: {
-          relativeOrExact: RelativeOrExactTime.Exact,
+          relativeOrExact: TimeFilterValueCategory.Exact,
           exactValue: timeValues?.[0],
         },
         endTime: {
-          relativeOrExact: RelativeOrExactTime.Exact,
+          relativeOrExact: TimeFilterValueCategory.Exact,
           exactValue: timeValues?.[1],
         },
       };
@@ -172,9 +173,9 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         ).config.controllerDate = nextFilterDate;
       });
       widgetUpdate(nextWidget);
-      refreshWidgetsByFilter(nextWidget);
+      refreshWidgetsByController(nextWidget);
     },
-    [controllerDate, refreshWidgetsByFilter, widget, widgetUpdate],
+    [controllerDate, refreshWidgetsByController, widget, widgetUpdate],
   );
 
   const onTimeChange = useCallback(
@@ -182,7 +183,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
       const nextFilterDate: ControllerDate = {
         ...controllerDate!,
         startTime: {
-          relativeOrExact: RelativeOrExactTime.Exact,
+          relativeOrExact: TimeFilterValueCategory.Exact,
           exactValue: value,
         },
       };
@@ -192,9 +193,9 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         ).config.controllerDate = nextFilterDate;
       });
       widgetUpdate(nextWidget);
-      refreshWidgetsByFilter(nextWidget);
+      refreshWidgetsByController(nextWidget);
     },
-    [controllerDate, refreshWidgetsByFilter, widget, widgetUpdate],
+    [controllerDate, refreshWidgetsByController, widget, widgetUpdate],
   );
 
   const control = useMemo(() => {
@@ -223,7 +224,16 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
             label={leftControlLabel}
           />
         );
-
+      case ControllerFacadeTypes.CheckboxGroup:
+        form.setFieldsValue({ value: controllerValues });
+        return (
+          <CheckboxGroupControllerForm
+            onChange={onControllerChange}
+            options={selectOptions}
+            name={'value'}
+            label={leftControlLabel}
+          />
+        );
       case ControllerFacadeTypes.Slider:
         form.setFieldsValue({ value: controllerValues?.[0] });
         const step = config.sliderConfig?.step || 1;

@@ -17,7 +17,7 @@
  */
 
 import { Checkbox, Col, Row } from 'antd';
-import { ReactColorPicker } from 'app/components/ReactColorPicker';
+import { SingleColorSelection } from 'app/components/ColorPicker';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
@@ -55,7 +55,7 @@ const ColorizeSingleAction: FC<{
     onConfigChange?.(newConfig, actionNeedNewRequest);
   };
 
-  const hanldeEnableColorChecked = checked => {
+  const handleEnableColorChecked = checked => {
     if (Boolean(checked)) {
       handleColorChange('#7567bd');
     } else {
@@ -65,19 +65,19 @@ const ColorizeSingleAction: FC<{
 
   return (
     <StyledColorizeRangeAction>
-      <Col span={12}>
+      <Col span={22}>
         <Row>
           <Checkbox
             checked={!!colorRange?.start}
-            onChange={e => hanldeEnableColorChecked(e.target?.checked)}
+            onChange={e => handleEnableColorChecked(e.target?.checked)}
           >
             {t('color.enable')}
           </Checkbox>
         </Row>
         <Row align="middle">
-          <ReactColorPicker
-            value={colorRange?.start}
-            onChange={v => handleColorChange(v)}
+          <SingleColorSelection
+            color={colorRange?.start}
+            onChange={handleColorChange}
           />
         </Row>
       </Col>

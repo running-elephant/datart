@@ -35,6 +35,7 @@ import debounce from 'lodash/debounce';
 import { FC, memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { FONT_SIZE_LABEL, SPACE, SPACE_MD } from 'styles/StyleConstants';
+import { isEmptyArray } from 'utils/object';
 import Filters, { PresentControllerFilterProps } from './components';
 
 const AUTO_CONTROL_PANEL_COLS = {
@@ -128,8 +129,8 @@ const ControllerPanel: FC<{
         return <Filters.DropdownListFilter {...props} />;
       case ControllerFacadeTypes.MultiDropdownList:
         return <Filters.MultiDropdownListFilter {...props} />;
-      case ControllerFacadeTypes.RangeTime:
-        return <Filters.RangTimeFilter {...props} />;
+      case ControllerFacadeTypes.RangeTimePicker:
+        return <Filters.RangeTimePickerFilter {...props} />;
       case ControllerFacadeTypes.RangeValue:
         return <Filters.RangValueFilter {...props} />;
       case ControllerFacadeTypes.Text:
@@ -149,28 +150,36 @@ const ControllerPanel: FC<{
     }
   };
 
-  return filters && filters.length ? (
-    <Wrapper layout="vertical">
-      <ControllerBlock>
-        {filters
-          ?.filter(config => checkFilterVisibility(config.filter))
-          .map((config, index) => {
-            return (
-              <Col
-                key={config.uid}
-                {...(config.filter?.width === 'auto'
-                  ? { ...AUTO_CONTROL_PANEL_COLS }
-                  : { span: config.filter?.width })}
-              >
-                <Form.Item label={getColumnRenderName(config)}>
-                  {renderComponentByFacade(index, config)}
-                </Form.Item>
-              </Col>
-            );
-          })}
-      </ControllerBlock>
-    </Wrapper>
-  ) : null;
+  const renderControls = () => {
+    const validFilters = filters
+      ?.filter(config => checkFilterVisibility(config.filter))
+      .map((config, index) => {
+        return (
+          <Col
+            key={config.uid}
+            {...(config.filter?.width === 'auto'
+              ? { ...AUTO_CONTROL_PANEL_COLS }
+              : { span: config.filter?.width })}
+          >
+            <Form.Item label={getColumnRenderName(config)}>
+              {renderComponentByFacade(index, config)}
+            </Form.Item>
+          </Col>
+        );
+      });
+
+    if (isEmptyArray(validFilters)) {
+      return null;
+    }
+
+    return (
+      <Wrapper layout="vertical">
+        <ControllerBlock>{validFilters}</ControllerBlock>
+      </Wrapper>
+    );
+  };
+
+  return renderControls();
 });
 
 export default ControllerPanel;

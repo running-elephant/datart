@@ -20,6 +20,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import useMount from 'app/hooks/useMount';
 import workbenchSlice, {
+  aggregationSelector,
   BackendChart,
   backendChartSelector,
   ChartConfigReducerActionType,
@@ -31,6 +32,7 @@ import workbenchSlice, {
   shadowChartConfigSelector,
   updateChartAction,
   updateChartConfigAndRefreshDatasetAction,
+  updateRichTextAction,
   useWorkbenchSlice,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
@@ -82,12 +84,17 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const chartConfig = useSelector(chartConfigSelector);
   const shadowChartConfig = useSelector(shadowChartConfigSelector);
   const backendChart = useSelector(backendChartSelector);
+  const aggregation = useSelector(aggregationSelector);
   const [chart, setChart] = useState<Chart>();
 
   useMount(
     () => {
-      const currentChart = ChartManager.instance().getDefaultChart();
-      handleChartChange(currentChart);
+      if (!dataChartId && !originChart) {
+        // Note: add default chart if new to editor
+        const currentChart = ChartManager.instance().getDefaultChart();
+        handleChartChange(currentChart);
+      }
+
       if (container === 'dataChart') {
         dispatch(
           initWorkbenchAction({
@@ -104,6 +111,9 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
               backendChart: originChart as BackendChart,
             }),
           );
+          if (!originChart) {
+            dispatch(actions.updateChartAggregation(true));
+          }
         } else {
           // chartType === 'dataChart'
           dispatch(
@@ -129,7 +139,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       setChart(currentChart);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [backendChart]);
+  }, [backendChart?.config?.chartGraphId]);
 
   const handleChartChange = (c: Chart) => {
     registerChartEvents(c);
@@ -166,15 +176,19 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     const currentChart = ChartManager.instance().getDefaultChart();
     registerChartEvents(currentChart);
     setChart(currentChart);
-    let clonedState = CloneValueDeep(currentChart.config);
 
+    let targetChartConfig = CloneValueDeep(currentChart.config);
+    const finalChartConfig = transferChartConfigs(
+      targetChartConfig,
+      targetChartConfig,
+    );
+
+    dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
     dispatch(
       workbenchSlice.actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
         payload: {
-          init: {
-            ...clonedState,
-          },
+          init: finalChartConfig,
         },
       }),
     );
@@ -185,11 +199,12 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       chartConfig: chartConfig!,
       chartGraphId: chart?.meta.id!,
       computedFields: dataview?.computedFields || [],
+      aggregation,
     };
 
     const dataChart: DataChart = {
       id: dataChartId,
-      name: backendChart?.name || 'widget_chart',
+      name: backendChart?.name || '',
       viewId: dataview?.id || '',
       orgId: orgId,
       config: dataChartConfig,
@@ -206,6 +221,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     dataview,
     onSaveInWidget,
     orgId,
+    aggregation,
   ]);
 
   const saveChart = useCallback(async () => {
@@ -218,6 +234,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           chartId: dataChartId,
           index: 0,
           parentId: 0,
+          aggregation: aggregation,
         }),
       );
       onSaveInDataChart?.(orgId, dataChartId);
@@ -238,6 +255,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
                 chartId: dataChartId,
                 index: 0,
                 parentId: 0,
+                aggregation,
               }),
             );
             saveToWidget();
@@ -259,6 +277,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     orgId,
     chartType,
     saveToWidget,
+    aggregation,
   ]);
 
   const registerChartEvents = chart => {
@@ -266,23 +285,53 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       {
         name: 'click',
         callback: param => {
-          if (param.seriesName === 'paging') {
-            const page = param.value?.page;
-            dispatch(refreshDatasetAction({ pageInfo: { pageNo: page } }));
+          if (
+            param.componentType === 'table' &&
+            param.seriesType === 'paging-sort-filter'
+          ) {
+            dispatch(
+              refreshDatasetAction({
+                sorter: {
+                  column: param?.seriesName!,
+                  operator: param?.value?.direction,
+                },
+                pageInfo: {
+                  pageNo: param?.value?.pageNo,
+                },
+              }),
+            );
+            return;
+          }
+          if (param.seriesName === 'richText') {
+            dispatch(updateRichTextAction(param.value));
             return;
           }
         },
       },
-      {
-        name: 'dblclick',
-        callback: param => {
-          console.log(
-            '//TODO: to be remove | mouse db click event ----> ',
-            param,
-          );
-        },
-      },
     ]);
+  };
+
+  const handleAggregationState = state => {
+    const currentChart = ChartManager.instance().getById(chart?.meta?.id);
+    let targetChartConfig = CloneValueDeep(currentChart?.config);
+    registerChartEvents(currentChart);
+    setChart(currentChart);
+
+    const finalChartConfig = transferChartConfigs(
+      targetChartConfig,
+      targetChartConfig,
+    );
+
+    dispatch(actions.updateChartAggregation(state));
+    dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
+    dispatch(
+      workbenchSlice.actions.updateChartConfig({
+        type: ChartConfigReducerActionType.INIT,
+        payload: {
+          init: finalChartConfig,
+        },
+      }),
+    );
   };
 
   return (
@@ -294,7 +343,9 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           onGoBack: () => {
             onClose?.();
           },
+          onChangeAggregation: handleAggregationState,
         }}
+        aggregation={aggregation}
         chart={chart}
         dataset={dataset}
         dataview={dataview}

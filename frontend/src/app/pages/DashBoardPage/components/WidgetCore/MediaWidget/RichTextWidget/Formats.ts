@@ -31,4 +31,9 @@ export const Formats = [
   'calcfield',
   'mention',
   'image',
+  'size',
+  'background',
+  'font',
+  'align',
+  'code-block',
 ];

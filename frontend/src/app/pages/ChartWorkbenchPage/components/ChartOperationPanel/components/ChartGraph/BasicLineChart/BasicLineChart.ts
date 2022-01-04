@@ -39,7 +39,7 @@ import {
   getSplitLine,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import {
   toExponential,
@@ -124,7 +124,7 @@ class BasicLineChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );
@@ -409,6 +409,7 @@ class BasicLineChart extends Chart {
           return labels.join('\n');
         },
       },
+      labelLayout: { hideOverlap: true },
     };
   }
 

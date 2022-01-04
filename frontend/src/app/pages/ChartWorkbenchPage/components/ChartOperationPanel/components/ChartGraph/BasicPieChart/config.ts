@@ -87,6 +87,24 @@ const config: ChartConfig = {
             color: '#495057',
           },
         },
+        {
+          label: 'label.showName',
+          key: 'showName',
+          default: true,
+          comType: 'checkbox',
+        },
+        {
+          label: 'label.showValue',
+          key: 'showValue',
+          default: false,
+          comType: 'checkbox',
+        },
+        {
+          label: 'label.showPercent',
+          key: 'showPercent',
+          default: true,
+          comType: 'checkbox',
+        },
       ],
     },
     {
@@ -183,30 +201,23 @@ const config: ChartConfig = {
         },
       ],
     },
-    {
-      label: 'tooltip.title',
-      key: 'tooltip',
-      comType: 'group',
-      rows: [
-        {
-          label: 'tooltip.showPercentage',
-          key: 'showPercentage',
-          default: false,
-          comType: 'checkbox',
-        },
-      ],
-    },
   ],
   settings: [
     {
-      label: 'cache.title',
-      key: 'cache',
+      label: 'paging.title',
+      key: 'paging',
       comType: 'group',
       rows: [
         {
-          label: 'cache.title',
-          key: 'panel',
-          comType: 'cache',
+          label: 'paging.pageSize',
+          key: 'pageSize',
+          default: 1000,
+          comType: 'inputNumber',
+          options: {
+            needRefresh: true,
+            step: 1,
+            min: 0,
+          },
         },
       ],
     },
@@ -233,6 +244,9 @@ const config: ChartConfig = {
           title: '标签',
           showLabel: '显示标签',
           position: '位置',
+          showName: '维度值',
+          showPercent: '百分比',
+          showValue: '指标值',
         },
         legend: {
           title: '图例',
@@ -245,12 +259,51 @@ const config: ChartConfig = {
           title: '参考线',
           open: '点击参考线配置',
         },
-        cache: {
-          title: '数据处理',
-        },
         tooltip: {
           title: '提示信息',
           showPercentage: '增加百分比显示',
+        },
+      },
+    },
+    {
+      lang: 'en-US',
+      translation: {
+        section: {
+          legend: 'Legend',
+          detail: 'Detail',
+        },
+        common: {
+          showLabel: 'Show Label',
+          rotate: 'Rotate',
+          position: 'Position',
+        },
+        pie: {
+          title: 'Pie',
+          circle: 'Circle',
+          roseType: 'Rose',
+        },
+        label: {
+          title: 'Label',
+          showLabel: 'Show Label',
+          position: 'Position',
+          showName: 'Show Name',
+          showPercent: 'Show Percentage',
+          showValue: 'Show Value',
+        },
+        legend: {
+          title: 'Legend',
+          showLegend: 'Show Legend',
+          type: 'Type',
+          selectAll: 'Select All',
+          position: 'Position',
+        },
+        reference: {
+          title: 'Reference',
+          open: 'Open',
+        },
+        tooltip: {
+          title: 'Tooltip',
+          showPercentage: 'Show Percentage',
         },
       },
     },

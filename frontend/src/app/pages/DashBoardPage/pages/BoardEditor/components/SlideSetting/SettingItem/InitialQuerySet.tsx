@@ -15,20 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- import { Form, Checkbox } from 'antd';
- import { NamePath } from 'rc-field-form/lib/interface';
- import React, { FC, memo } from 'react';
- export const InitialQuerySet: FC<{
-    name: NamePath;
- }> = memo(({ name}) => {
-   return (
-     <>
-        <Form.Item valuePropName="checked"  name={name}>
-            <Checkbox>初始化自动查询</Checkbox>
-        </Form.Item>
-     </>
-   );
- });
- 
- export default InitialQuerySet;
- 
+import { Checkbox, Form } from 'antd';
+import { NamePath } from 'rc-field-form/lib/interface';
+import React, { FC, memo } from 'react';
+export const InitialQuerySet: FC<{
+  name: NamePath;
+  label: string;
+}> = memo(({ name, label }) => {
+  return (
+    <>
+      <Form.Item valuePropName="checked" name={name}>
+        <Checkbox>{label}</Checkbox>
+      </Form.Item>
+    </>
+  );
+});
+
+export default InitialQuerySet;

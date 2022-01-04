@@ -1,5 +1,24 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Button, Form, Input, message } from 'antd';
 import { AuthForm } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectRegisterLoading } from 'app/slice/selectors';
 import { register } from 'app/slice/thunks';
 import React, { FC, useCallback } from 'react';
@@ -7,6 +26,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { LINE_HEIGHT_ICON_LG } from 'styles/StyleConstants';
+import { getPasswordValidator } from 'utils/validators';
+
 interface RegisterFormProps {
   onRegisterSuccess: (email: string) => void;
 }
@@ -15,6 +36,8 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
   const history = useHistory();
   const loading = useSelector(selectRegisterLoading);
   const [form] = Form.useForm();
+  const t = useI18NPrefix('register');
+  const tg = useI18NPrefix('global');
 
   const onRegister = useCallback(
     values => {
@@ -22,14 +45,14 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
         register({
           data: values,
           resolve: () => {
-            message.success('注册成功');
+            message.success(t('registrationSuccess'));
             form.resetFields();
             onRegisterSuccess(values.email);
           },
         }),
       );
     },
-    [dispatch, form, onRegisterSuccess],
+    [dispatch, form, onRegisterSuccess, t],
   );
 
   const toLogin = useCallback(() => {
@@ -44,44 +67,36 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
           rules={[
             {
               required: true,
-              message: '用户名不能为空',
+              message: `${t('username')}${tg('validation.required')}`,
             },
           ]}
         >
-          <Input placeholder="用户名" size="large" />
+          <Input placeholder={t('username')} size="large" />
         </Form.Item>
         <Form.Item
           name="email"
           rules={[
             {
               required: true,
-              message: '邮箱不能为空',
+              message: `${t('email')}${tg('validation.required')}`,
             },
           ]}
         >
-          <Input placeholder="邮箱" type="email" size="large" />
+          <Input placeholder={t('email')} type="email" size="large" />
         </Form.Item>
         <Form.Item
           name="password"
           rules={[
             {
               required: true,
-              message: '密码不能为空',
+              message: `${t('password')}${tg('validation.required')}`,
             },
             {
-              validator(_, value) {
-                if (
-                  !value ||
-                  (value.trim().length >= 6 && value.trim().length <= 20)
-                ) {
-                  return Promise.resolve();
-                }
-                return Promise.reject(new Error('密码长度为6-20位'));
-              },
+              validator: getPasswordValidator(tg('validation.invalidPassword')),
             },
           ]}
         >
-          <Input.Password placeholder="密码" size="large" />
+          <Input.Password placeholder={t('password')} size="large" />
         </Form.Item>
         <Form.Item className="last" shouldUpdate>
           {() => (
@@ -98,12 +113,13 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
               }
               block
             >
-              注册
+              {t('register')}
             </Button>
           )}
         </Form.Item>
         <Links>
-          已有账号，<LinkButton onClick={toLogin}>点击登录</LinkButton>
+          {t('desc1')}
+          <LinkButton onClick={toLogin}>{t('login')}</LinkButton>
         </Links>
       </Form>
     </AuthForm>

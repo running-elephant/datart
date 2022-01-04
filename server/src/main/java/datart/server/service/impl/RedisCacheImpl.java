@@ -1,6 +1,7 @@
 package datart.server.service.impl;
 
 import datart.core.common.Cache;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,6 @@ public class RedisCacheImpl implements Cache {
         this.redisTemplate = redisTemplate;
     }
 
-
     @Override
     public void put(String key, Object object) {
         redisTemplate.opsForValue().set(key, object);
@@ -24,7 +24,7 @@ public class RedisCacheImpl implements Cache {
 
     @Override
     public void put(String key, Object object, int ttl) {
-        redisTemplate.opsForValue().set(key, object, ttl, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(key, object, ttl, TimeUnit.SECONDS);
     }
 
     @Override

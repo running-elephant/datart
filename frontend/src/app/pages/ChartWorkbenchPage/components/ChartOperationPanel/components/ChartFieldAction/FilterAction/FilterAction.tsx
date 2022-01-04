@@ -30,25 +30,29 @@ const FilterAction: FC<{
   dataset?: ChartDataset;
   dataView?: ChartDataView;
   dataConfig?: ChartDataSectionConfig;
+  aggregation?: boolean;
   onConfigChange: (
     config: ChartDataSectionField,
     needRefresh?: boolean,
   ) => void;
-}> = memo(({ config, dataset, dataView, dataConfig, onConfigChange }) => {
-  const handleFetchDataFromField = async fieldId => {
-    // TODO: tobe implement to get fields
-    return await Promise.resolve(['a', 'b', 'c'].map(f => `${fieldId}-${f}`));
-  };
-  return (
-    <FilterControllPanel
-      config={config}
-      dataset={dataset}
-      dataConfig={dataConfig}
-      dataView={dataView}
-      onConfigChange={onConfigChange}
-      fetchDataByField={handleFetchDataFromField}
-    />
-  );
-});
+}> = memo(
+  ({ config, dataset, dataView, dataConfig, onConfigChange, aggregation }) => {
+    const handleFetchDataFromField = async fieldId => {
+      // TODO: tobe implement to get fields
+      return await Promise.resolve(['a', 'b', 'c'].map(f => `${fieldId}-${f}`));
+    };
+    return (
+      <FilterControllPanel
+        aggregation={aggregation}
+        config={config}
+        dataset={dataset}
+        dataConfig={dataConfig}
+        dataView={dataView}
+        onConfigChange={onConfigChange}
+        fetchDataByField={handleFetchDataFromField}
+      />
+    );
+  },
+);
 
 export default FilterAction;

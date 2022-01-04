@@ -17,6 +17,8 @@
  */
 
 function DemoCustomLineChart({ dHelper }) {
+  const svgIcon = `<svg t="1639279486808" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4028" width="16" height="16"><path d="M25.6 537.1392a25.6 25.6 0 1 1 0-51.2h141.1072a25.6 25.6 0 0 0 24.5248-18.2272l118.1184-393.7792a51.2 51.2 0 0 1 98.0992 0L665.6 934.4l118.1184-393.728a76.8 76.8 0 0 1 73.5744-54.784H998.4a25.6 25.6 0 1 1 0 51.2h-141.1072a25.6 25.6 0 0 0-24.5248 18.2272l-118.1184 393.7792a51.2 51.2 0 0 1-98.0992 0L358.4 88.6272 240.2816 482.4064a76.8 76.8 0 0 1-73.5744 54.784H25.6z"  p-id="4029"></path></svg>`;
+
   return {
     config: {
       datas: [
@@ -408,7 +410,26 @@ function DemoCustomLineChart({ dHelper }) {
           ],
         },
       ],
-      settings: [],
+      settings: [
+        {
+          label: 'paging.title',
+          key: 'paging',
+          comType: 'group',
+          rows: [
+            {
+              label: 'paging.pageSize',
+              key: 'pageSize',
+              default: 1000,
+              comType: 'inputNumber',
+              options: {
+                needRefresh: true,
+                step: 1,
+                min: 0,
+              },
+            },
+          ],
+        },
+      ],
       i18ns: [
         {
           lang: 'zh-CN',
@@ -470,9 +491,6 @@ function DemoCustomLineChart({ dHelper }) {
               title: '参考线',
               open: '点击参考线配置',
             },
-            cache: {
-              title: '数据处理',
-            },
           },
         },
       ],
@@ -482,7 +500,7 @@ function DemoCustomLineChart({ dHelper }) {
     meta: {
       id: 'demo-custom-line-chart',
       name: '[DEMO]用户自定义折线图',
-      icon: 'chart',
+      icon: svgIcon,
       requirements: [
         {
           group: 1,
@@ -530,7 +548,7 @@ function DemoCustomLineChart({ dHelper }) {
         .filter(c => c.type === 'aggregate')
         .flatMap(config => config.rows || []);
 
-      const objDataColumns = dHelper.transfromToObjectArray(
+      const objDataColumns = dHelper.transformToObjectArray(
         dataset.rows,
         dataset.columns,
       );

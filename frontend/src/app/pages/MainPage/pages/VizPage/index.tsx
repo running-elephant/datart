@@ -1,12 +1,13 @@
 import { Split } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
 import { useBoardSlice } from 'app/pages/DashBoardPage/pages/Board/slice';
 import { useEditBoardSlice } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import { useStoryBoardSlice } from 'app/pages/StoryBoardPage/slice';
+import { dispatchResize } from 'app/utils/dispatchResize';
 import React, { useCallback } from 'react';
 import { useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { dispatchResize } from 'utils/utils';
 import { Main } from './Main';
 import { SaveForm } from './SaveForm';
 import { SaveFormContext, useSaveFormContext } from './SaveFormContext';
@@ -24,6 +25,7 @@ export function VizPage() {
     limitedSide: 0,
     range: [256, 768],
   });
+  const tg = useI18NPrefix('global');
 
   const siderDragEnd = useCallback(
     sizes => {
@@ -43,7 +45,7 @@ export function VizPage() {
         onDragEnd={siderDragEnd}
         className="datart-split"
       >
-        <Sidebar />
+        <Sidebar i18nPrefix={'viz.sidebar'} />
         <Main />
         <SaveForm
           width={400}
@@ -52,7 +54,7 @@ export function VizPage() {
             labelCol: { offset: 1, span: 6 },
             wrapperCol: { span: 15 },
           }}
-          okText="保存"
+          okText={tg('button.save')}
         />
       </Container>
     </SaveFormContext.Provider>

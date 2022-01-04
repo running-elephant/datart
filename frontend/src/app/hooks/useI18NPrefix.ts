@@ -17,12 +17,18 @@
  */
 
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
+import { DATART_TRANSLATE_HOLDER } from 'globalConstants';
+import i18n from 'i18next';
 import get from 'lodash/get';
 import { useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface I18NComponentProps {
   i18nPrefix?: string;
+}
+
+export function prefixI18N(key) {
+  return i18n.t(key);
 }
 
 function usePrefixI18N(prefix?: string) {
@@ -41,10 +47,14 @@ function usePrefixI18N(prefix?: string) {
       if (contextTranslation) {
         return contextTranslation;
       }
-      if (disablePrefix) {
-        return t.call(null, `${key}`, options) as string;
+      if (key.includes(DATART_TRANSLATE_HOLDER)) {
+        const newKey = key.replace(`${DATART_TRANSLATE_HOLDER}.`, '');
+        return t.call(Object.create(null), `${newKey}`, options) as string;
       }
-      return t.call(null, `${prefix}.${key}`, options) as string;
+      if (disablePrefix) {
+        return t.call(Object.create(null), `${key}`, options) as string;
+      }
+      return t.call(Object.create(null), `${prefix}.${key}`, options) as string;
     },
     [i18n.language, prefix, t, vizI18NConfigs],
   );
