@@ -179,7 +179,7 @@ export const Variables = memo(() => {
   const save = useCallback(
     (values: VariableFormModel) => {
       let defaultValue: any = values.defaultValue;
-      if (values.valueType === VariableValueTypes.Date) {
+      if (values.valueType === VariableValueTypes.Date && !values.expression) {
         defaultValue = values.defaultValue.map(d =>
           (d as Moment).format(DEFAULT_VALUE_DATE_FORMAT),
         );
