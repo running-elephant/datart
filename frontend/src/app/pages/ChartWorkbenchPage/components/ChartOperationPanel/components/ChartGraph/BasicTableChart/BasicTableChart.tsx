@@ -212,7 +212,7 @@ class BasicTableChart extends ReactChart {
           .map(c => c.key)
           .map(k => {
             const currentSummaryField = aggregateFieldConfigs.find(
-              c => c.colName === k,
+              c => getValueByColumnKey(c) === k,
             );
             if (currentSummaryField) {
               const total = dataColumns.map(
