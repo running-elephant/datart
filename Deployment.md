@@ -12,7 +12,7 @@ title: 部署
 
 - JDK 1.8+
 - MySql5.7+
-- datart安装包（datart-server-1.0.0-alpha.3-install.zip)
+- datart安装包（datart-server-1.0.0-beta.x-install.zip)
 - Mail Server （可选）
 - [ChromeWebDriver](https://chromedriver.chromium.org/) （可选）
 - Redis （可选）
@@ -20,7 +20,7 @@ title: 部署
 方式1 :解压安装包 (官方提供的包)
 
 ```bash
-unzip datart-server-1.0.0-alpha.3-install.zip
+unzip datart-server-1.0.0-beta.x-install.zip
 ```
 
 方式2 :自行编译
@@ -32,11 +32,11 @@ cd datart
 
 mvn clean package -Dmaven.test.skip=true
 
-cp ./datart-server-1.0.0-alpha.3-install.zip  ${deployment_basedir}
+cp ./datart-server-1.0.0-beta.x-install.zip  ${deployment_basedir}
 
 cd ${deployment_basedir}
 
-unzip datart-server-1.0.0-alpha.3-install.zip 
+unzip datart-server-1.0.0-beta.x-install.zip 
 
 ```
 
