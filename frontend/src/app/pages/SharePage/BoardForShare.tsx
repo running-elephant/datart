@@ -77,12 +77,9 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
     // for sever Browser
     const { taskW, taskH } = useMemo(() => {
       const taskWH = {
-        taskW: 0,
-        taskH: 0,
+        taskW: boardWidthHeight[0] || 0,
+        taskH: boardWidthHeight[1] || 0,
       };
-      if (boardWidthHeight) {
-        taskWH.taskW = boardWidthHeight[0] || 0;
-      }
       if (dashboard) {
         if (dashboard?.config?.type === 'free') {
           const { width, height } = dashboard.config;
