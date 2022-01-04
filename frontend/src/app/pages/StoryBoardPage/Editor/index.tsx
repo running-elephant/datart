@@ -17,8 +17,10 @@
  */
 import { Layout, Modal } from 'antd';
 import { Split } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
 import { StoryContext } from 'app/pages/StoryBoardPage/contexts/StoryContext';
+import { dispatchResize } from 'app/utils/dispatchResize';
 import React, {
   memo,
   useCallback,
@@ -35,8 +37,7 @@ import 'reveal.js/dist/reveal.css';
 import RevealZoom from 'reveal.js/plugin/zoom/plugin';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
-import { dispatchResize } from 'utils/utils';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from 'utils/utils';
 import PageThumbnailList from '../components/PageThumbnailList';
 import StoryPageItem from '../components/StoryPageItem';
 import { storyActions } from '../slice';
@@ -53,6 +54,7 @@ export const StoryEditor: React.FC<{
   storyId: string;
   onCloseEditor?: () => void;
 }> = memo(({ storyId, onCloseEditor }) => {
+  const t = useI18NPrefix(`viz.board.setting`);
   const domId = useMemo(() => uuidv4(), []);
   const revealRef = useRef<any>();
   const dispatch = useDispatch();
@@ -181,19 +183,15 @@ export const StoryEditor: React.FC<{
   const onDeletePages = useCallback(
     (pageIds: string[]) => {
       Modal.confirm({
-        title:
-          pageIds.length > 1
-            ? '确认删除所有选中的故事页？'
-            : '确认删除此故事页？',
+        title: pageIds.length > 1 ? t('delPagesTip') : t('delPageTip'),
         onOk: () => {
-          // onDelete(selectedIds);
           pageIds.forEach(pageId => {
             dispatch(deleteStoryPage({ storyId, pageId }));
           });
         },
       });
     },
-    [dispatch, storyId],
+    [dispatch, storyId, t],
   );
   return (
     <DndProvider backend={HTML5Backend}>

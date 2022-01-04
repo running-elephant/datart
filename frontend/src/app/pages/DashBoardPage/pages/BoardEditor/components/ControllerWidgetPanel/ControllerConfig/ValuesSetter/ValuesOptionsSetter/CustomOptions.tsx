@@ -17,21 +17,21 @@
  */
 import { Button, FormInstance, Space } from 'antd';
 import { DragSortEditTable } from 'app/components/DragSortEditTable';
-import { FilterValueOption } from 'app/types/ChartConfig';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ControllerConfig } from '../../../types';
 export interface CustomOptionsProps {
   form: FormInstance<{ config: ControllerConfig }> | undefined;
-  fieldRowData: FilterValueOption[];
+  fieldRowData: RelationFilterValue[];
   getControllerConfig: () => ControllerConfig;
 }
 export const CustomOptions: React.FC<CustomOptionsProps> = memo(
   ({ fieldRowData, form, getControllerConfig }) => {
-    const [rows, setRows] = useState<FilterValueOption[]>([]);
+    const [rows, setRows] = useState<RelationFilterValue[]>([]);
 
     const onChangeFilterOptions = useCallback(
-      (rows: FilterValueOption[]) => {
+      (rows: RelationFilterValue[]) => {
         setRows(rows);
         const config = getControllerConfig();
         const valueOptions = [...rows.slice()];
@@ -51,17 +51,18 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
     }, [form, getControllerConfig]);
 
     const handleRowStateUpdate = useCallback(
-      (row: FilterValueOption) => {
-        const oldRowIndex = rows.findIndex(r => r.index === row.index);
-        rows.splice(oldRowIndex, 1, row);
-        onChangeFilterOptions(rows.slice());
+      (row: RelationFilterValue) => {
+        const newRows = [...rows];
+        const targetIndex = newRows.findIndex(r => r.index === row.index);
+        newRows.splice(targetIndex, 1, row);
+        onChangeFilterOptions(newRows);
       },
       [onChangeFilterOptions, rows],
     );
 
     const handleAdd = useCallback(() => {
       const newKey = rows?.length || 0;
-      const newRow: FilterValueOption = {
+      const newRow: RelationFilterValue = {
         index: newKey,
         key: String(newKey),
         label: String(newKey),
@@ -102,16 +103,17 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
         title: '操作',
         dataIndex: 'action',
         width: '30%',
-        render: (_, record: FilterValueOption) => (
+        render: (_, record: RelationFilterValue) => (
           <Space>
             <a
               href="#!"
               style={{ color: record.isSelected ? 'red' : '' }}
-              onClick={() =>
-                handleRowStateUpdate(
-                  Object.assign(record, { isSelected: !record.isSelected }),
-                )
-              }
+              onClick={() => {
+                handleRowStateUpdate({
+                  ...record,
+                  isSelected: !record.isSelected,
+                });
+              }}
             >
               {record.isSelected ? '取消默认值' : '设为默认值'}
             </a>
@@ -130,7 +132,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
       }
       return {
         ...col,
-        onCell: (record: FilterValueOption) => ({
+        onCell: (record: RelationFilterValue) => ({
           record,
           editable: col.editable,
           dataIndex: col.dataIndex,
@@ -164,7 +166,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
             dataSource={rows}
             size="small"
             bordered
-            rowKey={(r: FilterValueOption) => `${r.key}-${r.label}`}
+            rowKey={(r: RelationFilterValue) => `${r.key}-${r.label}`}
             columns={columnsWithCell}
             pagination={false}
             onRow={(_, index) =>

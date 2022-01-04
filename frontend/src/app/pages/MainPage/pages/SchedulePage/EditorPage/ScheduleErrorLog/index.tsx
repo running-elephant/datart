@@ -1,4 +1,5 @@
 import { Card, Table, TableColumnsType } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -20,6 +21,9 @@ export const ScheduleErrorLog: FC<ScheduleErrorLogProps> = ({ scheduleId }) => {
   const logs = useSelector(selectScheduleLogs),
     loading = useSelector(selectScheduleLogsLoading);
   const { actions } = useScheduleSlice();
+  const t = useI18NPrefix(
+    'main.pages.schedulePage.sidebar.editorPage.scheduleErrorLog.index',
+  );
   useEffect(() => {
     if (scheduleId) {
       dispatch(getScheduleErrorLogs({ scheduleId, count: 100 }));
@@ -31,10 +35,10 @@ export const ScheduleErrorLog: FC<ScheduleErrorLogProps> = ({ scheduleId }) => {
   }, [scheduleId, dispatch]);
   const columns: TableColumnsType<ErrorLog> = useMemo(() => {
     return [
-      { title: '开始时间', dataIndex: 'start', key: 'start' },
-      { title: '结束时间', dataIndex: 'end', key: 'end' },
+      { title: t('startTime'), dataIndex: 'start', key: 'start' },
+      { title: t('endTime'), dataIndex: 'end', key: 'end' },
       {
-        title: '日志阶段',
+        title: t('logPhase'),
         dataIndex: 'status',
         key: 'status',
         render(status: LogStatus) {
@@ -42,19 +46,19 @@ export const ScheduleErrorLog: FC<ScheduleErrorLogProps> = ({ scheduleId }) => {
         },
       },
       {
-        title: '执行信息',
+        title: t('executionInformation'),
         dataIndex: 'message',
         key: 'message',
         render(text, record) {
           const isSuccess = record?.status === LogStatus.S15;
-          return isSuccess ? '成功' : text;
+          return isSuccess ? t('success') : text;
         },
       },
     ];
   }, []);
   if (logs?.length > 0) {
     return (
-      <FormCard title="日志">
+      <FormCard title={t('log')}>
         <FormWrapper>
           <Table
             rowKey="id"

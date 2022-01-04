@@ -16,9 +16,14 @@
  * limitations under the License.
  */
 
-import { Col, Row } from 'antd';
+import { Col, Popover, Row } from 'antd';
 import Theme from 'app/assets/theme/echarts_default_theme.json';
-import { ColorTag, ReactColorPicker } from 'app/components/ReactColorPicker';
+import {
+  ColorTag,
+  SingleColorSelection,
+  ThemeColorSelection,
+} from 'app/components/ColorPicker';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import { updateBy } from 'app/utils/mutation';
@@ -33,39 +38,16 @@ const AggregationColorizeAction: FC<{
     config: ChartDataSectionField,
     needRefresh?: boolean,
   ) => void;
-}> = memo(({ config, dataset, onConfigChange }) => {
+  i18nPrefix?: string;
+}> = memo(({ config, dataset, onConfigChange, i18nPrefix }) => {
   const actionNeedNewRequest = true;
-  const [themeColors] = useState(Theme.color);
-  const [colors, setColors] = useState(() => {
-    const colorizedColumnName = config.colName;
-    const colorizeIndex =
-      dataset?.columns?.findIndex(r => r.name === colorizedColumnName) || 0;
-    const colorizedGroupValues = Array.from(
-      new Set(dataset?.rows?.map(r => r[colorizeIndex])),
-    );
-    const originalColors = config.color?.colors || [];
-    const themeColorTotalCount = themeColors.length;
-    return colorizedGroupValues.filter(Boolean).map((k, index) => {
-      return {
-        key: k!,
-        value:
-          originalColors.find(pc => pc.key === k)?.value ||
-          themeColors[index % themeColorTotalCount],
-      };
-    });
-  });
+  const [themeColors, setThemeColors] = useState(Theme.color);
+  const [colors, setColors] = useState<{ key: string; value: string }[]>(
+    setColorFn(config, dataset, themeColors),
+  );
   const [selectColor, setSelectColor] = useState(colors[0]);
-
-  // useMount(() => {
-  // if (!config?.color) {
-  //   onConfigChange(
-  //     updateBy(config, draft => {
-  //       draft.color = { colors: colors as any };
-  //     }),
-  //     actionNeedNewRequest,
-  //   );
-  // }
-  // });
+  const [selColorBoxStatus, setSelColorBoxStatus] = useState(false);
+  const t = useI18NPrefix(i18nPrefix);
 
   const handleColorChange = value => {
     if (selectColor) {
@@ -79,7 +61,6 @@ const AggregationColorizeAction: FC<{
 
       setColors(newColors);
       setSelectColor(currentSelectColor);
-
       onConfigChange(
         updateBy(config, draft => {
           draft.color = { colors: newColors };
@@ -87,13 +68,21 @@ const AggregationColorizeAction: FC<{
         actionNeedNewRequest,
       );
     }
+
+    setSelColorBoxStatus(false);
   };
 
   const renderGroupColors = () => {
     return (
       <>
         {colors.map(c => (
-          <li key={c.key} onClick={() => setSelectColor(c)}>
+          <li
+            key={c.key}
+            onClick={(e: any) => {
+              setSelColorBoxStatus(true);
+              setSelectColor(c);
+            }}
+          >
             <ColorTag size={16} color={c.value} />{' '}
             <span className="text-span" title={c.key}>
               {c.key}
@@ -104,23 +93,75 @@ const AggregationColorizeAction: FC<{
     );
   };
 
+  const selectThemeColorFn = colorArr => {
+    let selectColor1 = setColorFn(config, dataset, colorArr, true);
+
+    setThemeColors(colorArr);
+    setColors(selectColor1);
+    onConfigChange(
+      updateBy(config, draft => {
+        draft.color = { colors: selectColor1 };
+      }),
+      actionNeedNewRequest,
+    );
+  };
   return (
-    <Row>
-      <Col span={12}>
-        <StyledUL>{renderGroupColors()}</StyledUL>
-      </Col>
-      <Col span={12}>
-        <ReactColorPicker
-          value={selectColor?.value}
-          colors={themeColors}
-          onChange={handleColorChange}
-        />
-      </Col>
-    </Row>
+    <>
+      <ThemeColorSelection callbackFn={selectThemeColorFn}>
+        {t('chooseTheme')}
+      </ThemeColorSelection>
+      <Row>
+        <Col span={24}>
+          <StyledUL>{renderGroupColors()}</StyledUL>
+        </Col>
+        <Popover
+          destroyTooltipOnHide
+          onVisibleChange={setSelColorBoxStatus}
+          visible={selColorBoxStatus}
+          trigger="click"
+          placement="bottomRight"
+          overlayClassName="aggregation-colorpopover"
+          content={
+            <SingleColorSelection
+              color={selectColor.value}
+              onChange={handleColorChange}
+            />
+          }
+        ></Popover>
+      </Row>
+    </>
   );
 });
 
 export default AggregationColorizeAction;
+
+function setColorFn(
+  config,
+  dataset,
+  themeColors,
+  need = false,
+): { key: string; value: string }[] {
+  const colorizedColumnName = config.colName;
+  const colorizeIndex =
+    dataset?.columns?.findIndex(r => r.name === colorizedColumnName) || 0;
+  const colorizedGroupValues = Array.from(
+    new Set(dataset?.rows?.map(r => String(r[colorizeIndex]))),
+  );
+  const originalColors = config.color?.colors || [];
+  const themeColorTotalCount = themeColors.length;
+
+  return colorizedGroupValues
+    .filter(Boolean)
+    .map((k, index): { key: string; value: string } => {
+      return {
+        key: k! as string,
+        value: need
+          ? themeColors[index % themeColorTotalCount]
+          : originalColors.find(pc => pc.key === k)?.value ||
+            themeColors[index % themeColorTotalCount],
+      };
+    });
+}
 
 const StyledUL = styled.ul`
   padding-inline-start: 0;
@@ -132,13 +173,16 @@ const StyledUL = styled.ul`
     flex-wrap: nowrap;
     align-items: center;
     justify-content: flex-start;
-    padding: 0 ${SPACE_MD};
+    padding-right: ${SPACE_MD};
     cursor: pointer;
     .text-span {
       margin-left: ${SPACE_XS};
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+    &:hover {
+      background-color: rgba(27, 154, 238, 0.05);
     }
   }
 `;

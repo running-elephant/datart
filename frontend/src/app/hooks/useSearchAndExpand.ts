@@ -26,6 +26,7 @@ export function useSearchAndExpand<T extends TreeDataNode>(
   dataSource: T[] | undefined,
   filterFunc: (keywords: string, data: T) => boolean,
   wait: number = DEFAULT_DEBOUNCE_WAIT,
+  filterLeaf: boolean = false,
 ) {
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
 
@@ -33,6 +34,7 @@ export function useSearchAndExpand<T extends TreeDataNode>(
     dataSource,
     filterFunc,
     wait,
+    filterLeaf,
   );
 
   const filteredExpandedRowKeys = useMemo(

@@ -15,8 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export { default as BaiscSelector } from './BaiscSelector';
 export { default as BasicCheckbox } from './BasicCheckbox';
 export { default as BasicColorSelector } from './BasicColorSelector';
 export { default as BasicFont } from './BasicFont';
@@ -27,6 +25,8 @@ export { default as BasicInputNumber } from './BasicInputNumber';
 export { default as BasicInputPercentage } from './BasicInputPercentage';
 export { default as BasicLine } from './BasicLine';
 export { default as BasicMarginWidth } from './BasicMarginWidth';
+export { default as BasicRadio } from './BasicRadio';
+export { default as BasicSelector } from './BasicSelector';
 export { default as BasicSlider } from './BasicSlider';
 export { default as BasicSwitch } from './BasicSwitch';
 export { default as BasicText } from './BasicText';

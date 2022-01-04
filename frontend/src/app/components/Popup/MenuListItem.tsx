@@ -1,5 +1,5 @@
 import { Menu, MenuItemProps } from 'antd';
-import React, { cloneElement, ReactElement } from 'react';
+import React, { cloneElement, ReactElement, ReactNode } from 'react';
 import styled, { css } from 'styled-components/macro';
 import { LINE_HEIGHT_HEADING, SPACE, SPACE_XS } from 'styles/StyleConstants';
 import { mergeClassNames } from 'utils/utils';
@@ -10,36 +10,68 @@ const WrapperStyle = css`
   &.selected {
     background-color: ${p => p.theme.emphasisBackground};
   }
+
+  .ant-dropdown-menu-submenu-title {
+    line-height: ${LINE_HEIGHT_HEADING};
+  }
 `;
 
 interface MenuListItemProps extends Omit<MenuItemProps, 'prefix'> {
   prefix?: ReactElement;
   suffix?: ReactElement;
+  sub?: boolean;
 }
 
 export function MenuListItem({
   prefix,
   suffix,
+  sub,
   ...menuProps
 }: MenuListItemProps) {
-  return (
+  return sub ? (
+    <Menu.SubMenu
+      css={WrapperStyle}
+      {...menuProps}
+      title={
+        <ListItem prefix={prefix} suffix={suffix}>
+          {menuProps.title}
+        </ListItem>
+      }
+    >
+      {menuProps.children}
+    </Menu.SubMenu>
+  ) : (
     <Menu.Item css={WrapperStyle} {...menuProps}>
-      <ListItem>
-        {prefix &&
-          cloneElement(prefix, {
-            className: mergeClassNames(prefix.props.className, 'prefix'),
-          })}
+      <ListItem prefix={prefix} suffix={suffix}>
         {menuProps.children}
-        {suffix &&
-          cloneElement(suffix, {
-            className: mergeClassNames(suffix.props.className, 'suffix'),
-          })}
       </ListItem>
     </Menu.Item>
   );
 }
 
-const ListItem = styled.div`
+interface ListItemProps {
+  prefix?: ReactElement;
+  suffix?: ReactElement;
+  children?: ReactNode;
+}
+
+function ListItem({ prefix, suffix, children }: ListItemProps) {
+  return (
+    <StyledListItem>
+      {prefix &&
+        cloneElement(prefix, {
+          className: mergeClassNames(prefix.props.className, 'prefix'),
+        })}
+      {children}
+      {suffix &&
+        cloneElement(suffix, {
+          className: mergeClassNames(suffix.props.className, 'suffix'),
+        })}
+    </StyledListItem>
+  );
+}
+
+const StyledListItem = styled.div`
   display: flex;
   align-items: center;
 

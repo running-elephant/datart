@@ -248,6 +248,26 @@ const config: ChartConfig = {
       ],
     },
   ],
+  settings: [
+    {
+      label: 'paging.title',
+      key: 'paging',
+      comType: 'group',
+      rows: [
+        {
+          label: 'paging.pageSize',
+          key: 'pageSize',
+          default: 1000,
+          comType: 'inputNumber',
+          options: {
+            needRefresh: true,
+            step: 1,
+            min: 0,
+          },
+        },
+      ],
+    },
+  ],
   i18ns: [
     {
       lang: 'zh-CN',
@@ -266,6 +286,26 @@ const config: ChartConfig = {
           headerFontSize: '头部字体大小',
           bodyFontSize: '主体字体大小',
           footerFontSize: '尾部字体大小',
+        },
+      },
+    },
+    {
+      lang: 'en-US',
+      translation: {
+        score: {
+          headerTitle: 'Header',
+          bodyTitle: 'Body',
+          footerTitle: 'Footer Title',
+          show: 'Show',
+          prefixText: 'Prefix Text',
+          suffixText: 'Suffix Text',
+          prefxFont: 'Prefix Font',
+          suffixFont: 'Suffix Font',
+          common: 'Common',
+          isFixedFontSize: 'Enable Fixed Font Size',
+          headerFontSize: 'Header Font Size',
+          bodyFontSize: 'Body Font Size',
+          footerFontSize: 'Footer Font Size',
         },
       },
     },

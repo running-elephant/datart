@@ -1,22 +1,29 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { LoadingOutlined } from '@ant-design/icons';
-import {
-  Button,
-  Card,
-  Form,
-  Input,
-  message,
-  Popconfirm,
-  Select,
-  Space,
-} from 'antd';
+import { Button, Card, Form, Input, message, Popconfirm, Select } from 'antd';
+import { Authorized, EmptyFiller } from 'app/components';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
-import { Access, useAccess } from 'app/pages/MainPage/Access';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { useAccess } from 'app/pages/MainPage/Access';
 import debounce from 'debounce-promise';
-import {
-  CommonFormTypes,
-  COMMON_FORM_TITLE_PREFIX,
-  DEFAULT_DEBOUNCE_WAIT,
-} from 'globalConstants';
+import { CommonFormTypes, DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
@@ -52,7 +59,7 @@ import {
   unarchiveSource,
 } from '../slice/thunks';
 import { Source, SourceFormModel } from '../slice/types';
-import { allowManageSource } from '../utils';
+import { allowCreateSource, allowManageSource } from '../utils';
 import { ConfigComponent } from './ConfigComponent';
 
 export function SourceDetailPage() {
@@ -75,8 +82,13 @@ export function SourceDetailPage() {
   const { params } = useRouteMatch<{ sourceId: string }>();
   const { sourceId } = params;
   const [form] = Form.useForm<SourceFormModel>();
+  const t = useI18NPrefix('source');
+  const tg = useI18NPrefix('global');
   const isArchived = editingSource?.status === 0;
-  const allowManage = useAccess(allowManageSource(editingSource?.id));
+  const allowCreate =
+    useAccess(allowCreateSource())(true) && sourceId === 'add';
+  const allowManage =
+    useAccess(allowManageSource(sourceId))(true) && sourceId !== 'add';
 
   const config = useMemo(
     () => dataProviders[providerType]?.config,
@@ -106,11 +118,11 @@ export function SourceDetailPage() {
         setProviderType(type);
         form.setFieldsValue({ name, type, config: JSON.parse(config) });
       } catch (error) {
-        message.error('配置解析错误');
+        message.error(tg('operation.parseError'));
         throw error;
       }
     }
-  }, [form, editingSource]);
+  }, [form, editingSource, tg]);
 
   useEffect(() => {
     if (
@@ -172,14 +184,14 @@ export function SourceDetailPage() {
         method: 'POST',
         data: { name, type, properties: config },
       });
-      message.success('测试成功');
+      message.success(t('testSuccess'));
     } catch (error) {
       errorHandle(error);
       throw error;
     } finally {
       setTestLoading(false);
     }
-  }, [form, dataProviders]);
+  }, [form, dataProviders, t]);
 
   const subFormTest = useCallback(
     async (config, callback) => {
@@ -228,7 +240,7 @@ export function SourceDetailPage() {
             addSource({
               source: { ...rest, orgId, config: configStr },
               resolve: id => {
-                message.success('新建成功');
+                message.success(t('createSuccess'));
                 history.push(`/organizations/${orgId}/sources/${id}`);
               },
             }),
@@ -244,7 +256,7 @@ export function SourceDetailPage() {
                 config: configStr,
               },
               resolve: () => {
-                message.success('修改成功');
+                message.success(tg('operation.updateSuccess'));
               },
             }),
           );
@@ -253,7 +265,7 @@ export function SourceDetailPage() {
           break;
       }
     },
-    [dispatch, history, orgId, editingSource, formType],
+    [dispatch, history, orgId, editingSource, formType, t, tg],
   );
 
   const del = useCallback(
@@ -263,13 +275,17 @@ export function SourceDetailPage() {
           id: editingSource!.id,
           archive,
           resolve: () => {
-            message.success(`成功${archive ? '移至回收站' : '删除'}`);
+            message.success(
+              archive
+                ? tg('operation.archiveSuccess')
+                : tg('operation.deleteSuccess'),
+            );
             history.replace(`/organizations/${orgId}/sources`);
           },
         }),
       );
     },
-    [dispatch, history, orgId, editingSource],
+    [dispatch, history, orgId, editingSource, tg],
   );
 
   const unarchive = useCallback(() => {
@@ -277,130 +293,153 @@ export function SourceDetailPage() {
       unarchiveSource({
         id: editingSource!.id,
         resolve: () => {
-          message.success('还原成功');
+          message.success(tg('operation.restoreSuccess'));
           history.replace(`/organizations/${orgId}/sources`);
         },
       }),
     );
-  }, [dispatch, history, orgId, editingSource]);
+  }, [dispatch, history, orgId, editingSource, tg]);
 
   const titleLabelPrefix = useMemo(
-    () => (isArchived ? '已归档' : COMMON_FORM_TITLE_PREFIX[formType]),
-    [isArchived, formType],
+    () => (isArchived ? t('archived') : tg(`modal.title.${formType}`)),
+    [isArchived, formType, t, tg],
   );
 
   return (
-    <Wrapper>
-      <DetailPageHeader
-        title={`${titleLabelPrefix}数据源`}
-        actions={
-          <Access {...allowManageSource(editingSource?.id)}>
-            {!isArchived ? (
-              <Space>
+    <Authorized
+      authority={allowCreate || allowManage}
+      denied={<EmptyFiller title={t('noPermission')} />}
+    >
+      <Wrapper>
+        <DetailPageHeader
+          title={`${titleLabelPrefix}${t('source')}`}
+          actions={
+            !isArchived ? (
+              <>
                 <Button
                   type="primary"
                   loading={saveSourceLoading}
                   onClick={form.submit}
                 >
-                  保存
+                  {tg('button.save')}
                 </Button>
                 {formType === CommonFormTypes.Edit && (
-                  <Popconfirm title="确定移至回收站？" onConfirm={del(true)}>
+                  <Popconfirm
+                    title={tg('operation.archiveConfirm')}
+                    onConfirm={del(true)}
+                  >
                     <Button loading={deleteSourceLoading} danger>
-                      移至回收站
+                      {tg('button.archive')}
                     </Button>
                   </Popconfirm>
                 )}
-              </Space>
+              </>
             ) : (
-              <Space>
-                <Popconfirm title="确定还原？" onConfirm={unarchive}>
-                  <Button loading={unarchiveSourceLoading}>还原</Button>
-                </Popconfirm>
-                <Popconfirm title="确认删除？" onConfirm={del(false)}>
-                  <Button loading={deleteSourceLoading} danger>
-                    删除
+              <>
+                <Popconfirm
+                  title={tg('operation.restoreConfirm')}
+                  onConfirm={unarchive}
+                >
+                  <Button loading={unarchiveSourceLoading}>
+                    {tg('button.restore')}
                   </Button>
                 </Popconfirm>
-              </Space>
-            )}
-          </Access>
-        }
-      />
-      <Content>
-        <Card bordered={false}>
-          <Form
-            name="source_form_"
-            className="detailForm"
-            form={form}
-            labelAlign="left"
-            labelCol={{ offset: 1, span: 5 }}
-            wrapperCol={{ span: 8 }}
-            onFinish={formSubmit}
-          >
-            <Form.Item
-              name="name"
-              label="名称"
-              validateFirst
-              rules={[
-                { required: true, message: '名称不能为空' },
-                {
-                  validator: debounce((_, value) => {
-                    if (value === editingSource?.name) {
-                      return Promise.resolve();
-                    }
-                    return request({
-                      url: `/sources/check/name`,
-                      method: 'POST',
-                      params: { name: value, orgId },
-                    }).then(
-                      () => Promise.resolve(),
-                      () => Promise.reject(new Error('名称重复')),
-                    );
-                  }, DEFAULT_DEBOUNCE_WAIT),
-                },
-              ]}
+                <Popconfirm
+                  title={tg('operation.deleteConfirm')}
+                  onConfirm={del(false)}
+                >
+                  <Button loading={deleteSourceLoading} danger>
+                    {tg('button.delete')}
+                  </Button>
+                </Popconfirm>
+              </>
+            )
+          }
+        />
+        <Content>
+          <Card bordered={false}>
+            <Form
+              name="source_form_"
+              className="detailForm"
+              form={form}
+              labelAlign="left"
+              labelCol={{ offset: 1, span: 5 }}
+              wrapperCol={{ span: 8 }}
+              onFinish={formSubmit}
             >
-              <Input disabled={isArchived} />
-            </Form.Item>
-            <Form.Item
-              name="type"
-              label="类型"
-              rules={[{ required: true, message: '类型为必选项' }]}
-            >
-              <Select
-                loading={dataProviderListLoading}
-                disabled={isArchived}
-                onChange={dataProviderChange}
+              <Form.Item
+                name="name"
+                label={t('form.name')}
+                validateFirst
+                rules={[
+                  {
+                    required: true,
+                    message: `${t('form.name')}${tg('validation.required')}`,
+                  },
+                  {
+                    validator: debounce((_, value) => {
+                      if (value === editingSource?.name) {
+                        return Promise.resolve();
+                      }
+                      return request({
+                        url: `/sources/check/name`,
+                        method: 'POST',
+                        params: { name: value, orgId },
+                      }).then(
+                        () => Promise.resolve(),
+                        err =>
+                          Promise.reject(new Error(err.response.data.message)),
+                      );
+                    }, DEFAULT_DEBOUNCE_WAIT),
+                  },
+                ]}
               >
-                {Object.keys(dataProviders).map(key => (
-                  <Select.Option key={key} value={key}>
-                    {key}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            {dataProviderConfigTemplateLoading && <LoadingOutlined />}
-
-            {(providerType !== 'FILE' || formType === CommonFormTypes.Edit) &&
-              config?.attributes.map(attr => (
-                <ConfigComponent
-                  key={`${providerType}_${attr.name}`}
-                  attr={attr}
-                  form={form}
-                  sourceId={editingSource?.id}
-                  testLoading={testLoading}
+                <Input disabled={isArchived} />
+              </Form.Item>
+              <Form.Item
+                name="type"
+                label={t('type')}
+                rules={[
+                  {
+                    required: true,
+                    message: `${t('type')}${tg('validation.required')}`,
+                  },
+                ]}
+              >
+                <Select
+                  loading={dataProviderListLoading}
                   disabled={isArchived}
-                  allowManage={allowManage(true)}
-                  onTest={test}
-                  onSubFormTest={subFormTest}
-                  onDbTypeChange={dbTypeChange}
-                />
-              ))}
-          </Form>
-        </Card>
-      </Content>
-    </Wrapper>
+                  onChange={dataProviderChange}
+                >
+                  {Object.keys(dataProviders).map(key => (
+                    <Select.Option key={key} value={key}>
+                      {key}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              {dataProviderConfigTemplateLoading && <LoadingOutlined />}
+
+              {(providerType !== 'FILE' || formType === CommonFormTypes.Edit) &&
+                config?.attributes.map(attr => (
+                  <ConfigComponent
+                    key={`${providerType}_${attr.name}`}
+                    attr={attr}
+                    form={form}
+                    sourceId={editingSource?.id}
+                    testLoading={testLoading}
+                    disabled={isArchived}
+                    allowManage={allowManage}
+                    onTest={test}
+                    onSubFormTest={subFormTest}
+                    onDbTypeChange={dbTypeChange}
+                  />
+                ))}
+            </Form>
+          </Card>
+        </Content>
+      </Wrapper>
+    </Authorized>
   );
 }
 

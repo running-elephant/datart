@@ -21,7 +21,7 @@ import { loadScript } from '../../../../../../../utils/resource';
 class ChartIFrameContainerResourceLoader {
   private resources: string[] = [];
 
-  laodResource(doc, deps?: string[]): Promise<any[]> {
+  loadResource(doc, deps?: string[]): Promise<any[]> {
     const unloadedDeps = (deps || []).filter(d => !this.resources.includes(d));
     return this.loadDependencies(doc, unloadedDeps);
   }

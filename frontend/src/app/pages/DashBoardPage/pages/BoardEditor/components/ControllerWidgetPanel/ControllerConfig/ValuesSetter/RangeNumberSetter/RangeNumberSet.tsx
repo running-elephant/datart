@@ -17,15 +17,17 @@
  */
 import { Form, FormItemProps, InputNumber } from 'antd';
 import { valueType } from 'antd/lib/statistic/utils';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useEffect, useState } from 'react';
 import { ControllerValuesName } from '../..';
 import { rangeNumberValidator } from '../../../utils';
 
 export const RangeNumberSetter: React.FC<{}> = memo(() => {
+  const tc = useI18NPrefix(`viz.control`);
   const itemProps: FormItemProps<any> = {
     preserve: true,
     name: ControllerValuesName,
-    label: '默认值',
+    label: tc('defaultValue'),
     required: false,
   };
   return <RangeNumberSetForm {...itemProps} />;

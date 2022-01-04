@@ -16,11 +16,13 @@
  * limitations under the License.
  */
 import { Form, FormInstance, Select } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { useCallback, useMemo } from 'react';
 import { ControllerValuesName, ValueOptionsName } from '..';
+import { DateControllerTypes, HasOptionsControlTypes } from '../../constants';
 import { ControllerConfig } from '../../types';
 import { MaxAndMinSetter } from './MaxAndMinSetter';
 import { NumberSetter } from './NumberSetter';
@@ -30,32 +32,22 @@ import { TextSetter } from './TextSetter';
 import { TimeSetter } from './TimeSetter/TimeSetter';
 import ValuesOptionsSetter from './ValuesOptionsSetter/ValuesOptionsSetter';
 
-export const NeedOptionsTypes = [
-  ControllerFacadeTypes.DropdownList,
-  ControllerFacadeTypes.MultiDropdownList,
-  ControllerFacadeTypes.RadioGroup,
-];
-
-export const TimeTypes = [
-  ControllerFacadeTypes.Time,
-  ControllerFacadeTypes.RangeTime,
-];
-
 export const ValuesSetter: React.FC<{
   controllerType: ControllerFacadeTypes;
   form: FormInstance<ControllerWidgetContent> | undefined;
   viewMap: Record<string, ChartDataView>;
 }> = ({ controllerType, form, viewMap }) => {
+  const tc = useI18NPrefix('viz.control');
   const getControllerConfig = useCallback(() => {
     return form?.getFieldValue('config') as ControllerConfig;
   }, [form]);
 
   const hasOption = useMemo(() => {
-    return NeedOptionsTypes.includes(controllerType);
+    return HasOptionsControlTypes.includes(controllerType);
   }, [controllerType]);
 
   const hasTime = useMemo(() => {
-    return TimeTypes.includes(controllerType);
+    return DateControllerTypes.includes(controllerType);
   }, [controllerType]);
 
   const isText = useMemo(() => {
@@ -110,7 +102,7 @@ export const ValuesSetter: React.FC<{
 
       {isText && <TextSetter />}
 
-      {isNumberValue && <NumberSetter />}
+      {isNumberValue && <NumberSetter label={tc('defaultValue')} />}
 
       {isRangeNumberValue && <RangeNumberSetter />}
 
@@ -122,6 +114,7 @@ export const ValuesSetter: React.FC<{
                 <>
                   <MaxAndMinSetter />
                   <SliderSetter
+                    label={tc('defaultValue')}
                     style={{ paddingRight: '10px' }}
                     maxValue={getMaxAndMin().max}
                     minValue={getMaxAndMin().min}

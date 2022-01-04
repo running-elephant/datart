@@ -162,8 +162,8 @@ export class ConditionBuilder {
     return this.condition;
   }
 
-  asRelativeTime(name?, sqlType?) {
-    this.condition.type = FilterConditionType.RelativeTime;
+  asRecommendTime(name?, sqlType?) {
+    this.condition.type = FilterConditionType.RecommendTime;
     this.condition.operator = FilterSqlOperator.Equal;
     this.condition.name = name || this.condition.name;
     this.condition.visualType = sqlType || this.condition.visualType;

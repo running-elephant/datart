@@ -27,8 +27,17 @@ import {
 } from '@ant-design/icons';
 import { Button, Dropdown, Space } from 'antd';
 import { ShareLinkModal } from 'app/components/VizOperationMenu';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
-import React, { FC, memo, useCallback, useContext, useState } from 'react';
+import { TITLE_SUFFIX } from 'globalConstants';
+import React, {
+  FC,
+  memo,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
@@ -41,8 +50,6 @@ import { BoardActionContext } from '../contexts/BoardActionContext';
 import { BoardContext } from '../contexts/BoardContext';
 import { BoardInfoContext } from '../contexts/BoardInfoContext';
 import { BoardOverLay } from './BoardOverLay';
-
-const TITLE_SUFFIX = ['[已归档]', '[未发布]'];
 
 interface TitleHeaderProps {
   name?: string;
@@ -60,6 +67,7 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
     publishLoading,
     onPublish,
   }) => {
+    const t = useI18NPrefix(`viz.action`);
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
     const {
       editing,
@@ -84,7 +92,11 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
       toggleBoardEditor?.(false);
     };
 
-    const title = `${name || boardName} ${TITLE_SUFFIX[status] || ''}`;
+    const title = useMemo(() => {
+      const base = name || boardName;
+      const suffix = TITLE_SUFFIX[status] ? `[${t(TITLE_SUFFIX[status])}]` : '';
+      return base + suffix;
+    }, [boardName, name, status, t]);
     const isArchived = status === 0;
 
     return (
@@ -102,7 +114,7 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                 icon={<CloseOutlined />}
                 onClick={closeBoardEditor}
               >
-                取消
+                {t('common.cancel')}
               </Button>
 
               <Button
@@ -112,7 +124,7 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                 icon={<SaveOutlined />}
                 onClick={onUpdateBoard}
               >
-                保存
+                {t('common.save')}
               </Button>
             </>
           ) : (
@@ -130,7 +142,7 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                   loading={publishLoading}
                   onClick={onPublish}
                 >
-                  {status === 1 ? '发布' : '取消发布'}
+                  {status === 1 ? t('publish') : t('unpublish')}
                 </Button>
               )}
               {allowManage && !isArchived && renderMode === 'read' && (
@@ -139,7 +151,7 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                   icon={<EditOutlined />}
                   onClick={() => toggleBoardEditor?.(true)}
                 >
-                  编辑
+                  {t('edit')}
                 </Button>
               )}
               {

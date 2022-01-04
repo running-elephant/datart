@@ -94,6 +94,26 @@ const config: ChartConfig = {
       ],
     },
   ],
+  settings: [
+    {
+      label: 'paging.title',
+      key: 'paging',
+      comType: 'group',
+      rows: [
+        {
+          label: 'paging.pageSize',
+          key: 'pageSize',
+          default: 1000,
+          comType: 'inputNumber',
+          options: {
+            needRefresh: true,
+            step: 1,
+            min: 0,
+          },
+        },
+      ],
+    },
+  ],
   i18ns: [
     {
       lang: 'zh-CN',
@@ -103,16 +123,7 @@ const config: ChartConfig = {
         showLabelBySwitch: '显示标签2',
         showLabelByInput: '显示标签3',
         showLabelWithSelect: '显示标签4',
-        fontFamily: '字体',
-        fontSize: '字体大小',
-        fontColor: '字体颜色',
-        rotateLabel: '旋转标签',
         showDataColumns: '选择数据列',
-        legend: {
-          label: '图例',
-          showLabel: '图例-显示标签',
-          showLabel2: '图例-显示标签2',
-        },
       },
     },
     {
@@ -123,6 +134,7 @@ const config: ChartConfig = {
         showLabelBySwitch: 'Show Lable Switch',
         showLabelWithInput: 'Show Label Input',
         showLabelWithSelect: 'Show Label Select',
+        showDataColumns: 'Show Data Columns',
       },
     },
   ],

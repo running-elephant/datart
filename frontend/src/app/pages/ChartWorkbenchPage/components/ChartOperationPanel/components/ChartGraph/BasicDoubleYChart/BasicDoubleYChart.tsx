@@ -36,7 +36,7 @@ import {
   getSplitLine,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
@@ -95,7 +95,7 @@ class BasicDoubleYChart extends Chart {
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings;
 
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );

@@ -38,6 +38,7 @@ class Chart extends DatartChartBase {
   dependency: string[] = [];
   isISOContainer: boolean | string = false;
 
+  _useIFrame: boolean = true;
   _state: ChartStatus = 'init';
   _stateHistory: ChartStatus[] = [];
   _hooks?: ChartEventBroker;
@@ -55,13 +56,10 @@ class Chart extends DatartChartBase {
   constructor(id: string, name: string, icon?: string, requirements?: []) {
     super();
 
-    const fontIcon = `iconfont icon-${
-      !icon ? 'fsux_tubiao_zhuzhuangtu1' : icon
-    }`;
     this.meta = {
       id,
       name,
-      icon: fontIcon,
+      icon: icon,
       requirements,
     };
     this.state = 'init';
@@ -118,7 +116,7 @@ class Chart extends DatartChartBase {
     return series?.data?.valueColName || series.seriesName;
   }
 
-  private getValue(
+  protected getValue(
     configs: ChartStyleSectionConfig[] = [],
     paths?: string[],
     targetKey?,

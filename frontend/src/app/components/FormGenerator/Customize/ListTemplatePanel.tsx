@@ -136,6 +136,7 @@ const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           data={r}
           translate={t}
           onChange={handleChildComponentUpdate(r.key)}
+          context={currentSelectedItem}
         />
       );
     };
@@ -146,7 +147,7 @@ const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           <Col span={8}>
             <Select
               dropdownMatchSelectWidth
-              placeholder={t('pleaseSelect')}
+              placeholder={t('select')}
               value={currentSelectedItem?.label}
               onChange={handleColumnChange}
             >

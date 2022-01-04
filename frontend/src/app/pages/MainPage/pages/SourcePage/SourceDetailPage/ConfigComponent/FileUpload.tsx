@@ -1,5 +1,24 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Form, FormInstance, Input, Upload } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BASE_API_URL } from 'globalConstants';
 import { useCallback, useState } from 'react';
 import { APIResponse } from 'types';
@@ -19,6 +38,7 @@ export function FileUpload({
   onTest,
 }: FileUploadProps) {
   const [uploadFileLoading, setUploadFileLoading] = useState(false);
+  const t = useI18NPrefix('source');
 
   const normFile = useCallback(e => {
     if (Array.isArray(e)) {
@@ -50,7 +70,7 @@ export function FileUpload({
   return (
     <>
       <Form.Item
-        label="文件"
+        label={t('form.file')}
         valuePropName="fileList"
         getValueFromEvent={normFile}
       >
@@ -66,7 +86,7 @@ export function FileUpload({
             icon={<UploadOutlined />}
             loading={uploadFileLoading || loading}
           >
-            选择文件
+            {t('form.selectFile')}
           </Button>
         </Upload>
       </Form.Item>

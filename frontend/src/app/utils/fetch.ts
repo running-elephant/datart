@@ -154,7 +154,7 @@ export async function checkComputedFieldAsync(sourceId, expression) {
   return !!response?.data;
 }
 
-export async function fetchFieldFuncitonsAsync(sourceId) {
+export async function fetchFieldFunctionsAsync(sourceId) {
   const response = await request<string[]>({
     method: 'POST',
     url: `data-provider/function/support/${sourceId}`,
@@ -230,7 +230,7 @@ export async function loadShareTask(params) {
       params,
     });
     const isNeedStopPolling = !(data || []).some(
-      v => v.status === DownloadTaskState.CREATE,
+      v => v.status === DownloadTaskState.CREATED,
     );
     return {
       isNeedStopPolling,

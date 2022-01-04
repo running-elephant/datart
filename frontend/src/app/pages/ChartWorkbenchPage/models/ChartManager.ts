@@ -19,6 +19,7 @@
 import WidgetPlugins from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartGraph';
 import ChartTools from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
 import { getChartPluginPaths } from 'app/utils/fetch';
+import { Debugger } from 'utils/debugger';
 import { CloneValueDeep } from 'utils/object';
 import Chart from './Chart';
 
@@ -40,12 +41,13 @@ const {
   RoseChart,
   ScoreChart,
   MingXiTableChart,
-  FenZuTableChart,
   NormalOutlineMapChart,
   WordCloudChart,
   ScatterOutlineMapChart,
   BasicGaugeChart,
   WaterfallChart,
+  BasicRichText,
+  PivotSheetChart,
 } = WidgetPlugins;
 
 class ChartManager {
@@ -66,7 +68,9 @@ class ChartManager {
       return;
     }
     const pluginsPaths = await getChartPluginPaths();
-    return await this._loadCustomizeCharts(pluginsPaths);
+    Debugger.instance.measure('Plugin Charts | ', async () => {
+      await this._loadCustomizeCharts(pluginsPaths);
+    });
   }
 
   public getAllCharts(): Chart[] {
@@ -99,8 +103,8 @@ class ChartManager {
 
   private _basicCharts(): Chart[] {
     return [
-      new FenZuTableChart(),
       new MingXiTableChart(),
+      new PivotSheetChart(),
       new ScoreChart(),
       new ClusterColumnChart(),
       new ClusterBarChart(),
@@ -122,6 +126,7 @@ class ChartManager {
       new NormalOutlineMapChart(),
       new ScatterOutlineMapChart(),
       new BasicGaugeChart(),
+      new BasicRichText(),
     ];
   }
 }

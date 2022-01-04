@@ -17,6 +17,7 @@
  */
 import { ControlOutlined } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
@@ -28,12 +29,16 @@ import { BoardToolBarContext } from '../context/BoardToolBarContext';
 import { WithTipButton } from '../ToolBarItem';
 export interface AddControlBtnProps {}
 export interface ButtonItemType<T> {
-  name: string;
+  name?: string;
   icon: any;
   type: T;
-  disabled: boolean;
+  disabled?: boolean;
 }
 export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
+  const t = useI18NPrefix(`viz.board.action`);
+  const tFilterName = useI18NPrefix(`viz.common.enum.controllerFacadeTypes`);
+  const tType = useI18NPrefix(`viz.board.controlTypes`);
+  const tWt = useI18NPrefix(`viz.widget.type`);
   const { boardId, boardType, showLabel } = useContext(BoardToolBarContext);
   const dispatch = useDispatch();
   const { config: boardConfig } = useContext(BoardConfigContext);
@@ -49,34 +54,24 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   };
   const conventionalControllers: ButtonItemType<ControllerFacadeTypes>[] = [
     {
-      name: '单选下拉菜单',
       icon: '',
       type: ControllerFacadeTypes.DropdownList,
-      disabled: false,
     },
     {
-      name: '多选下拉菜单',
       icon: '',
       type: ControllerFacadeTypes.MultiDropdownList,
-      disabled: false,
     },
     {
-      name: '单选按钮',
       icon: '',
       type: ControllerFacadeTypes.RadioGroup,
-      disabled: false,
     },
-    // {
-    //   name: '复选框',
-    //   icon: '',
-    //   type: ControllerFacadeTypes.RadioGroup,
-    //   disabled: false,
-    // },
     {
-      name: '文本',
+      icon: '',
+      type: ControllerFacadeTypes.CheckboxGroup,
+    },
+    {
       icon: '',
       type: ControllerFacadeTypes.Text,
-      disabled: false,
     },
     // {
     //   name: '单选下拉树',
@@ -91,38 +86,28 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
     //   disabled: false,
     // },
   ];
-  const dateControllers = [
+  const dateControllers: ButtonItemType<ControllerFacadeTypes>[] = [
     {
-      name: '日期范围',
       icon: '',
       type: ControllerFacadeTypes.RangeTime,
-      disabled: false,
     },
     {
-      name: '日期',
       icon: '',
       type: ControllerFacadeTypes.Time,
-      disabled: false,
     },
   ];
-  const numericalControllers = [
+  const numericalControllers: ButtonItemType<ControllerFacadeTypes>[] = [
     {
-      name: '数值范围',
       icon: '',
       type: ControllerFacadeTypes.RangeValue,
-      disabled: false,
     },
     {
-      name: '数值',
       icon: '',
       type: ControllerFacadeTypes.Value,
-      disabled: false,
     },
     {
-      name: '滑块',
       icon: '',
       type: ControllerFacadeTypes.Slider,
-      disabled: false,
     },
     // {
     //   name: '范围滑块',
@@ -133,13 +118,11 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   ];
   const buttonControllers: ButtonItemType<WidgetType>[] = [
     {
-      name: '查询按钮',
       icon: '',
       type: 'query',
       disabled: !!hasQueryControl,
     },
     {
-      name: '重置按钮',
       icon: '',
       type: 'reset',
       disabled: !!hasResetControl,
@@ -150,31 +133,40 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
   };
   const controlerItems = (
     <Menu onClick={onAddControler}>
-      <Menu.ItemGroup key="conventionalControllers" title={renderTitle('常规')}>
-        {conventionalControllers.map(({ name, icon, type, disabled }) => (
-          <Menu.Item key={type} icon={icon} disabled={disabled}>
-            {name}
+      <Menu.ItemGroup
+        key="conventionalControllers"
+        title={renderTitle(tType('common'))}
+      >
+        {conventionalControllers.map(({ icon, type }) => (
+          <Menu.Item key={type} icon={icon}>
+            {tFilterName(type)}
           </Menu.Item>
         ))}
       </Menu.ItemGroup>
-      <Menu.ItemGroup key="dateControllers" title={renderTitle('日期')}>
-        {dateControllers.map(({ name, icon, type, disabled }) => (
-          <Menu.Item key={type} icon={icon} disabled={disabled}>
-            {name}
+      <Menu.ItemGroup key="dateControllers" title={renderTitle(tType('date'))}>
+        {dateControllers.map(({ icon, type }) => (
+          <Menu.Item key={type} icon={icon}>
+            {tFilterName(type)}
           </Menu.Item>
         ))}
       </Menu.ItemGroup>
-      <Menu.ItemGroup key="numericalControllers" title={renderTitle('数值')}>
-        {numericalControllers.map(({ name, icon, type, disabled }) => (
-          <Menu.Item key={type} icon={icon} disabled={disabled}>
-            {name}
+      <Menu.ItemGroup
+        key="numericalControllers"
+        title={renderTitle(tType('numeric'))}
+      >
+        {numericalControllers.map(({ icon, type }) => (
+          <Menu.Item key={type} icon={icon}>
+            {tFilterName(type)}
           </Menu.Item>
         ))}
       </Menu.ItemGroup>
-      <Menu.ItemGroup key="buttonControllers" title={renderTitle('按钮')}>
+      <Menu.ItemGroup
+        key="buttonControllers"
+        title={renderTitle(tType('button'))}
+      >
         {buttonControllers.map(({ name, icon, type, disabled }) => (
           <Menu.Item key={type} icon={icon} disabled={disabled}>
-            {name}
+            {tWt(type)}
           </Menu.Item>
         ))}
       </Menu.ItemGroup>
@@ -188,7 +180,7 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
     >
       <WithTipButton
         icon={<ControlOutlined />}
-        tip="添加控制器"
+        tip={t('controller')}
         boardId={boardId}
         boardType={boardType}
         label={showLabel ? '添加控制器' : ''}

@@ -1,5 +1,6 @@
 import { message } from 'antd';
 import { EmptyFiller } from 'app/components/EmptyFiller';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router';
 import styled from 'styled-components';
@@ -7,14 +8,16 @@ import { confirmInvite } from './service';
 
 export const ConfirmInvitePage = () => {
   const history = useHistory();
+  const t = useI18NPrefix('confirmInvite');
+
   const onConfirm = useCallback(
     token => {
       confirmInvite(token).then(() => {
-        message.success('成功加入组织');
+        message.success(t('join'));
         history.replace('/');
       });
     },
-    [history],
+    [history, t],
   );
   useEffect(() => {
     const search = window.location.search,
@@ -27,7 +30,7 @@ export const ConfirmInvitePage = () => {
   }, []);
   return (
     <Wrapper>
-      <EmptyFiller loading title="确认邀请中" />
+      <EmptyFiller loading title={t('confirming')} />
     </Wrapper>
   );
 };

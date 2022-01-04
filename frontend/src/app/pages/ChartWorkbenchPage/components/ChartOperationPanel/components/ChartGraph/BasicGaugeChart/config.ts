@@ -21,8 +21,8 @@ import { ChartConfig } from 'app/types/ChartConfig';
 const config: ChartConfig = {
   datas: [
     {
-      label: 'dimension',
-      key: 'dimension',
+      label: 'metrics',
+      key: 'metrics',
       required: true,
       type: 'aggregate',
       limit: 1,
@@ -344,7 +344,26 @@ const config: ChartConfig = {
       ],
     },
   ],
-  settings: [],
+  settings: [
+    {
+      label: 'paging.title',
+      key: 'paging',
+      comType: 'group',
+      rows: [
+        {
+          label: 'paging.pageSize',
+          key: 'pageSize',
+          default: 1000,
+          comType: 'inputNumber',
+          options: {
+            needRefresh: true,
+            step: 1,
+            min: 0,
+          },
+        },
+      ],
+    },
+  ],
   i18ns: [
     {
       lang: 'zh-CN',
@@ -404,6 +423,67 @@ const config: ChartConfig = {
           title: '分隔线',
           showSplitLine: '显示分隔线',
           splitLineLength: '长度',
+        },
+      },
+    },
+    {
+      lang: 'en-US',
+      translation: {
+        common: {
+          detailOffsetLeft: 'Offset Left',
+          detailOffsetTop: 'Offset Top',
+          distance: 'Distance',
+          lineStyle: 'Line Style',
+          splitNumber: 'Split Number',
+        },
+        gauge: {
+          title: 'Gauge',
+          max: 'Max',
+          prefix: 'Prefix',
+          suffix: 'Suffix',
+          radius: 'Radius',
+          startAngle: 'Start Angle',
+          endAngle: 'End Angle',
+        },
+        label: {
+          title: 'Label',
+          showLabel: 'Show Label',
+        },
+        data: {
+          title: 'Data',
+          showData: 'Show Data',
+        },
+        pointer: {
+          title: 'Pointer',
+          showPointer: 'Show Pointer',
+          customPointerColor: 'Show Customize Pointer Color',
+          pointerColor: 'Pointer Color',
+          pointerLength: 'Pointer Length',
+          pointerWidth: 'Pointer Width',
+          lineStyle: 'Line Style',
+        },
+        axis: {
+          title: 'Axis',
+          axisLineSize: 'Axis Line Size',
+          axisLineColor: 'Axis Line Color',
+        },
+        axisTick: {
+          title: 'Axis Tick',
+          showAxisTick: 'Show Axis Tick',
+        },
+        axisLabel: {
+          title: 'Axis Label',
+          showAxisLabel: 'Show Axis Label',
+        },
+        progress: {
+          title: 'Progress',
+          showProgress: 'Show Progress',
+          roundCap: 'Round Cap',
+        },
+        splitLine: {
+          title: 'Split Line',
+          showSplitLine: 'Show Split Line',
+          splitLineLength: 'Split Line Length',
         },
       },
     },

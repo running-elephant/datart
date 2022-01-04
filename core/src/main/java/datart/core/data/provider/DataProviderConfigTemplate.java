@@ -29,6 +29,8 @@ public class DataProviderConfigTemplate implements Serializable {
 
     private String name;
 
+    private String displayName;
+
     private List<Attribute> attributes;
 
     @Data
@@ -52,7 +54,7 @@ public class DataProviderConfigTemplate implements Serializable {
 
         private List<Object> options;
 
-        private Object children;
+        private List<Attribute> children;
 
     }
 

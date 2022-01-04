@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Popconfirm, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import { IW } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
@@ -61,6 +61,7 @@ const ChartGraphPanel: FC<{
   const handleChartChange = useCallback(
     chartId => () => {
       const chart = chartManager.getById(chartId);
+
       if (!!chart) {
         onChartChange(chart);
       }
@@ -112,7 +113,6 @@ const ChartGraphPanel: FC<{
         >
           <IconWrapper>
             <StyledChartIcon
-              isMatchRequirement={!!requirementsStates?.[c?.meta?.id]}
               fontSize={FONT_SIZE_ICON_MD}
               size={SPACE_TIMES(9)}
               className={classnames({
@@ -120,33 +120,69 @@ const ChartGraphPanel: FC<{
               })}
               onClick={onChange}
             >
-              <i className={c?.meta?.icon} />
+              {renderIcon({
+                iconStr: c?.meta?.icon,
+                isMatchRequirement: !!requirementsStates?.[c?.meta?.id],
+                isActive: c?.meta?.id === chart?.meta?.id,
+              })}
             </StyledChartIcon>
           </IconWrapper>
         </Tooltip>
       );
     };
 
-    return allCharts.map(c => {
-      if (c?.meta?.id !== 'mingxi-table') {
-        return _getChartIcon(c, handleChartChange(c?.meta?.id));
+    const renderIcon = ({
+      ...args
+    }: {
+      iconStr;
+      isMatchRequirement;
+      isActive;
+    }) => {
+      if (/^<svg/.test(args?.iconStr) || /^<\?xml/.test(args?.iconStr)) {
+        return <SVGImageRender {...args} />;
       }
+      if (/svg\+xml;base64/.test(args?.iconStr)) {
+        return <Base64ImageRender {...args} />;
+      }
+      return <SVGFontIconRender {...args} />;
+    };
 
-      return (
-        <Popconfirm
-          title={t('confirm', undefined, { name: c.meta?.name })}
-          onConfirm={handleChartChange(c?.meta?.id)}
-          okText={t('ok')}
-          cancelText={t('cancel')}
-        >
-          {_getChartIcon(c)}
-        </Popconfirm>
-      );
+    return allCharts.map(c => {
+      return _getChartIcon(c, handleChartChange(c?.meta?.id));
     });
   };
 
   return <StyledChartGraphPanel>{renderCharts()}</StyledChartGraphPanel>;
 });
+
+const SVGFontIconRender = ({ iconStr, isMatchRequirement }) => {
+  return (
+    <StyledSVGFontIcon
+      isMatchRequirement={isMatchRequirement}
+      className={`iconfont icon-${!iconStr ? 'chart' : iconStr}`}
+    />
+  );
+};
+
+const SVGImageRender = ({ iconStr, isMatchRequirement, isActive }) => {
+  return (
+    <StyledInlineSVGIcon
+      alt="svg icon"
+      style={{ height: FONT_SIZE_ICON_MD, width: FONT_SIZE_ICON_MD }}
+      src={`data:image/svg+xml;utf8,${iconStr}`}
+    />
+  );
+};
+
+const Base64ImageRender = ({ iconStr, isMatchRequirement, isActive }) => {
+  return (
+    <img
+      alt="svg icon"
+      style={{ height: FONT_SIZE_ICON_MD, width: FONT_SIZE_ICON_MD }}
+      src={iconStr}
+    />
+  );
+};
 
 export default ChartGraphPanel;
 
@@ -164,10 +200,17 @@ const IconWrapper = styled.span`
   padding: ${SPACE_TIMES(0.5)};
 `;
 
-const StyledChartIcon = styled(IW)<{ isMatchRequirement?: boolean }>`
+const StyledInlineSVGIcon = styled.img<{ isMatchRequirement?: boolean }>`
+  opacity: ${p => (p.isMatchRequirement ? 1 : 0.4)};
+`;
+
+const StyledSVGFontIcon = styled.i<{ isMatchRequirement?: boolean }>`
+  opacity: ${p => (p.isMatchRequirement ? 1 : 0.4)};
+`;
+
+const StyledChartIcon = styled(IW)`
   cursor: pointer;
   border-radius: ${BORDER_RADIUS};
-  opacity: ${p => (p.isMatchRequirement ? 1 : 0.4)};
 
   &:hover,
   &.active {

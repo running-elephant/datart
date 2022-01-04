@@ -26,6 +26,10 @@ const config: ChartConfig = {
       required: true,
       type: 'group',
       limit: 1,
+      actions: {
+        NUMERIC: ['sortable'],
+        STRING: ['sortable'],
+      },
     },
     {
       label: 'metrics',
@@ -33,6 +37,10 @@ const config: ChartConfig = {
       required: true,
       type: 'aggregate',
       limit: 1,
+      actions: {
+        NUMERIC: ['sortable', 'aggregate'],
+        STRING: ['sortable', 'aggregate'],
+      },
     },
     {
       label: 'filter',
@@ -209,6 +217,26 @@ const config: ChartConfig = {
       ],
     },
   ],
+  settings: [
+    {
+      label: 'paging.title',
+      key: 'paging',
+      comType: 'group',
+      rows: [
+        {
+          label: 'paging.pageSize',
+          key: 'pageSize',
+          default: 1000,
+          comType: 'inputNumber',
+          options: {
+            needRefresh: true,
+            step: 1,
+            min: 0,
+          },
+        },
+      ],
+    },
+  ],
   i18ns: [
     {
       lang: 'zh-CN',
@@ -223,7 +251,7 @@ const config: ChartConfig = {
         label: {
           title: '标签',
           fontFamily: '字体',
-          fontWeight: '字号',
+          fontWeight: '字体粗细',
           maxFontSize: '字体最大值',
           minFontSize: '字体最小值',
           rotationRangeStart: '起始旋转角度',
@@ -233,6 +261,32 @@ const config: ChartConfig = {
           focus: '是否淡出',
           textShadowBlur: '阴影长度',
           textShadowColor: '阴影颜色',
+        },
+      },
+    },
+    {
+      lang: 'en-US',
+      translation: {
+        wordCloud: {
+          title: 'Word Cloud',
+          shape: 'Shape',
+          drawOutOfBound: 'Boundary',
+          width: 'Width',
+          height: 'Height',
+        },
+        label: {
+          title: 'Label',
+          fontFamily: 'Font Family',
+          fontWeight: 'Font Weight',
+          maxFontSize: 'Max Font Size',
+          minFontSize: 'Min Font Size',
+          rotationRangeStart: 'Start Rotation Range',
+          rotationRangeEnd: 'End Rotation Range',
+          rotationStep: 'Rotation Step',
+          gridSize: 'Grid Size',
+          focus: 'Focus',
+          textShadowBlur: 'Text Shadow Blur',
+          textShadowColor: 'Text Shadow Color',
         },
       },
     },

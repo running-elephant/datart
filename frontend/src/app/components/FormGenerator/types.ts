@@ -20,6 +20,7 @@ export interface ItemLayoutProps<T> {
   ) => void;
   dataConfigs?: ChartDataSectionConfig[];
   flatten?: boolean;
+  context?: any;
 }
 
 export interface FormGeneratorLayoutProps<T> extends ItemLayoutProps<T> {

@@ -22,7 +22,7 @@ import ChartIFrameContainerResourceLoader from './ChartIFrameContainerResourceLo
 import ChartPluginLoader from './ChartPluginLoader';
 
 const ChartTools = {
-  ChartIFrame: ChartIFrameContainer,
+  ChartIFrameContainer,
   ChartPluginLoader,
   ChartIFrameContainerDispatcher,
   ChartIFrameContainerResourceLoader,

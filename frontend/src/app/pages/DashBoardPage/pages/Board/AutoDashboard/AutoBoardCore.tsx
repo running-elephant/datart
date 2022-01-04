@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Empty } from 'antd';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import { BREAK_POINTS } from 'app/pages/DashBoardPage/constants';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
@@ -114,10 +115,10 @@ const AutoBoardCore: React.FC<AutoBoardCoreProps> = ({ boardId }) => {
   const scrollThrottle = useRef(false);
   const lazyLoad = useCallback(() => {
     if (!gridWrapRef.current) return;
-
     if (!scrollThrottle.current) {
       requestAnimationFrame(() => {
         const waitingItems = layoutInfos.current.filter(item => !item.rendered);
+
         if (waitingItems.length > 0) {
           const { offsetHeight, scrollTop } = gridWrapRef.current!;
           waitingItems.forEach(item => {
@@ -145,7 +146,14 @@ const AutoBoardCore: React.FC<AutoBoardCoreProps> = ({ boardId }) => {
       lazyLoad();
       gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
       gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
+      // issues#339
+      window.addEventListener('resize', lazyLoad, false);
     }
+
+    return () => {
+      gridWrapRef?.current?.removeEventListener('scroll', lazyLoad, false);
+      window.removeEventListener('resize', lazyLoad, false);
+    };
   }, [boardLoading, WidgetConfigsLen, lazyLoad]);
 
   const onLayoutChange = useCallback((layouts: Layout[]) => {
@@ -168,27 +176,32 @@ const AutoBoardCore: React.FC<AutoBoardCoreProps> = ({ boardId }) => {
   return (
     <Wrap>
       <StyledContainer bg={background}>
-        {boardLoading ? <div>loading...</div> : null}
-        <div className="grid-wrap" ref={gridWrapRef}>
-          <div className="grid-wrap" ref={gridRef}>
-            <ResponsiveGridLayout
-              className="layout"
-              layouts={{ lg: lgLayout }}
-              breakpoints={BREAK_POINTS}
-              margin={margin}
-              containerPadding={containerPadding}
-              cols={cols}
-              rowHeight={rowHeight}
-              onLayoutChange={onLayoutChange}
-              isDraggable={false}
-              isResizable={false}
-              measureBeforeMount={false}
-              useCSSTransforms={true}
-            >
-              {boardChildren}
-            </ResponsiveGridLayout>
+        {layoutWidgetConfigs.length ? (
+          <div className="grid-wrap" ref={gridWrapRef}>
+            <div className="grid-wrap" ref={gridRef}>
+              <ResponsiveGridLayout
+                className="layout"
+                layouts={{ lg: lgLayout }}
+                breakpoints={BREAK_POINTS}
+                margin={margin}
+                containerPadding={containerPadding}
+                cols={cols}
+                rowHeight={rowHeight}
+                onLayoutChange={onLayoutChange}
+                isDraggable={false}
+                isResizable={false}
+                measureBeforeMount={false}
+                useCSSTransforms={true}
+              >
+                {boardChildren}
+              </ResponsiveGridLayout>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="empty">
+            <Empty description="" />
+          </div>
+        )}
       </StyledContainer>
     </Wrap>
   );
@@ -221,5 +234,12 @@ const StyledContainer = styled(StyledBackground)`
   }
   .grid-wrap::-webkit-scrollbar {
     width: 0 !important;
+  }
+
+  .empty {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
   }
 `;

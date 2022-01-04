@@ -29,7 +29,6 @@ import datart.data.provider.calcite.SqlBuilder;
 import datart.data.provider.calcite.SqlValidateUtils;
 import datart.data.provider.calcite.SqlParserUtils;
 import datart.data.provider.calcite.SqlVariableVisitor;
-import datart.data.provider.calcite.parser.impl.SqlParserImpl;
 import datart.data.provider.freemarker.FreemarkerContext;
 import datart.data.provider.local.LocalDB;
 import datart.data.provider.script.ReplacementPair;
@@ -37,12 +36,9 @@ import datart.data.provider.script.ScriptRender;
 import datart.data.provider.script.VariablePlaceholder;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.parser.SqlParseException;
-import org.apache.calcite.sql.parser.SqlParser;
-import org.apache.calcite.sql.validate.SqlConformanceEnum;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
@@ -85,7 +81,7 @@ public class SqlScriptRender extends ScriptRender {
 
         Map<String, ScriptVariable> variableMap = queryScript.getVariables()
                 .stream()
-                .collect(Collectors.toMap(v -> getVariablePattern(v.getName()), variable -> variable));
+                .collect(Collectors.toMap(ScriptVariable::getNameWithQuote, variable -> variable));
         String srcSql = selectSql;
         SqlNode sqlNode = null;
         try {
@@ -128,15 +124,14 @@ public class SqlScriptRender extends ScriptRender {
                 if (size != 1) {
                     Exceptions.tr(DataProviderException.class, "message.provider.variable.expression.size", size + ":" + variable.getValues());
                 }
-                script = script.replace(getVariablePattern(variable.getName()), Iterables.get(variable.getValues(), 0));
+                script = script.replace(variable.getNameWithQuote(), Iterables.get(variable.getValues(), 0));
             }
         }
 
-        // find select sql
         final String selectSql0 = findSelectSql(script);
 
         if (StringUtils.isEmpty(selectSql0)) {
-            Exceptions.tr(DataProviderException.class,"message.no.valid.sql");
+            Exceptions.tr(DataProviderException.class, "message.no.valid.sql");
         }
 
         String selectSql = cleanupSql(selectSql0);
@@ -175,14 +170,6 @@ public class SqlScriptRender extends ScriptRender {
             selectSql = sql;
         }
         return selectSql;
-    }
-
-    private SqlParser sqlParser() {
-        SqlParser.Config config = SqlParser.config()
-                .withLex(Lex.MYSQL)
-                .withParserFactory(SqlParserImpl.FACTORY)
-                .withConformance(SqlConformanceEnum.LENIENT);
-        return SqlParser.create("", config);
     }
 
     private SqlNode parseSql(String sql) throws SqlParseException {

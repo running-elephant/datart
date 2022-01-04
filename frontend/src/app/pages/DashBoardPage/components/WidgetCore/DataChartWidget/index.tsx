@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import useResizeObserver from 'app/hooks/useResizeObserver';
+import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import ChartIFrameContainer from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools/ChartIFrameContainer';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
@@ -33,7 +33,6 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from 'react';
 import styled from 'styled-components/macro';
 export interface DataChartWidgetProps {}
@@ -43,8 +42,7 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
   const widget = useContext(WidgetContext);
   const { id: widgetId } = widget;
   const { widgetChartClick } = useContext(WidgetMethodContext);
-  const [cacheW, setCacheW] = useState(200);
-  const [cacheH, setCacheH] = useState(200);
+  const { ref, cacheW, cacheH } = useCacheWidthHeight();
   const widgetRef = useRef<Widget>(widget);
   useEffect(() => {
     widgetRef.current = widget;
@@ -87,23 +85,25 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
     }
   }, [chartClick, dataChart]);
 
-  const onResize = useCallback(() => {}, []);
-
-  const {
-    ref,
-    width = 200,
-    height = 200,
-  } = useResizeObserver<HTMLDivElement>({
-    refreshMode: 'debounce',
-    refreshRate: 120,
-    onResize,
-  });
-  useEffect(() => {
-    if (width !== 0 && height !== 0) {
-      setCacheW(width);
-      setCacheH(height);
+  const widgetSpecialConfig = useMemo(() => {
+    let linkFields: string[] = [];
+    let jumpField: string = '';
+    const { jumpConfig, linkageConfig } = widget.config;
+    if (linkageConfig?.open) {
+      linkFields = widget?.relations
+        .filter(re => re.config.type === 'widgetToWidget')
+        .map(item => item.config.widgetToWidget?.triggerColumn as string);
     }
-  }, [width, height]);
+    if (jumpConfig?.open) {
+      jumpField = jumpConfig?.field?.jumpFieldName as string;
+    }
+
+    return {
+      linkFields,
+      jumpField,
+    };
+  }, [widget]);
+
   const dataset = useMemo(
     () => ({
       columns: data.columns,
@@ -131,28 +131,38 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
           dataset={dataset}
           chart={chart}
           config={dataChart.config.chartConfig as ChartConfig}
-          style={{ width: cacheW, height: cacheH }}
+          width={cacheW}
+          height={cacheH}
           containerId={widgetId}
+          widgetSpecialConfig={widgetSpecialConfig}
         />
       );
     } catch (error) {
       return <span>has err in {`<ChartIFrameContainer>`}</span>;
     }
-  }, [cacheH, cacheW, chart, dataChart, dataset, widgetId]);
+  }, [
+    cacheH,
+    cacheW,
+    chart,
+    dataChart,
+    dataset,
+    widgetSpecialConfig,
+    widgetId,
+  ]);
   return (
     <Wrap className="widget-chart" ref={ref}>
-      {chartFrame}
+      <ChartFrameBox>{chartFrame}</ChartFrameBox>
     </Wrap>
   );
 });
+const ChartFrameBox = styled.div`
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+`;
 const Wrap = styled.div`
   display: flex;
   flex: 1;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  & div {
-    max-width: 100%;
-    max-height: 100%;
-  }
+  position: relative;
 `;

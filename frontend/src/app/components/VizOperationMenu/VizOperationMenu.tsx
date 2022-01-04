@@ -34,7 +34,7 @@ const VizOperationMenu: FC<{
     allowDownload,
     allowShare,
   }) => {
-    const t = useI18NPrefix(`viz.chartPreview`);
+    const t = useI18NPrefix(`viz.action`);
 
     const moreActionMenu = () => {
       const menus: any[] = [];

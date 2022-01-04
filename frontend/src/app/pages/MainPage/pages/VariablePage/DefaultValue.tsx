@@ -1,5 +1,24 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { CheckOutlined } from '@ant-design/icons';
 import { Button, DatePicker, Input, InputNumber, Space, Tag } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import moment from 'moment';
 import { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -17,6 +36,7 @@ interface DefaultValueProps {
 export const DefaultValue = memo(
   ({ type, expression, disabled, value = [], onChange }: DefaultValueProps) => {
     const [inputValue, setInputValue] = useState<any>(void 0);
+    const t = useI18NPrefix('variable');
 
     useEffect(() => {
       setInputValue(void 0);
@@ -85,7 +105,7 @@ export const DefaultValue = memo(
       case VariableValueTypes.Number:
         conditionalInputComponent = (
           <InputNumber
-            placeholder="输入默认值后回车添加"
+            placeholder={t('enterToAdd')}
             value={inputValue}
             className="input"
             disabled={!!disabled}
@@ -109,7 +129,7 @@ export const DefaultValue = memo(
       default:
         conditionalInputComponent = (
           <Input
-            placeholder="输入默认值后回车添加"
+            placeholder={t('enterToAdd')}
             value={inputValue}
             className="input"
             disabled={!!disabled}
@@ -124,7 +144,7 @@ export const DefaultValue = memo(
       <Wrapper direction="vertical" size={0}>
         {expression || type === VariableValueTypes.Expression ? (
           <Input.TextArea
-            placeholder="请输入表达式"
+            placeholder={t('enterExpression')}
             autoSize={{ minRows: 4, maxRows: 8 }}
             value={value ? value[0] : void 0}
             disabled={!!disabled}

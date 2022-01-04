@@ -1,5 +1,6 @@
 import { SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { AutoComplete, Avatar, Input, Space, Tag } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
@@ -25,6 +26,9 @@ export const MailTagFormItem: FC<MailTagFormItemProps> = ({
 }) => {
   const [dataSource, setDataSource] = useState<IUserInfo[]>([]);
   const [keyword, setKeyword] = useState('');
+  const t = useI18NPrefix(
+    'main.pages.schedulePage.sidebar.editorPage.emailSettingForm.mailTagFormItem',
+  );
 
   const emails = useMemo(() => {
     return value ? value.split(';').filter(v => !!v) : [];
@@ -117,10 +121,7 @@ export const MailTagFormItem: FC<MailTagFormItemProps> = ({
         onSelect={onSelectOrRemoveEmail}
         onBlur={() => onSearch('')}
       >
-        <Input
-          suffix={<SearchOutlined />}
-          placeholder="输入邮箱或姓名关键字查找..."
-        />
+        <Input suffix={<SearchOutlined />} placeholder={t('placeholder')} />
       </AutoComplete>
     </>
   );

@@ -1,19 +1,33 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Checkbox, Form, FormInstance, Input, Radio } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import debounce from 'debounce-promise';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import moment from 'moment';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SPACE_XS } from 'styles/StyleConstants';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { VariableHierarchy } from '../ViewPage/slice/types';
-import {
-  VariableScopes,
-  VariableTypes,
-  VariableValueTypes,
-  VARIABLE_TYPE_LABEL,
-  VARIABLE_VALUE_TYPE_LABEL,
-} from './constants';
+import { VariableScopes, VariableTypes, VariableValueTypes } from './constants';
 import { DefaultValue } from './DefaultValue';
 import { Variable } from './slice/types';
 import { VariableFormModel } from './types';
@@ -46,17 +60,25 @@ export const VariableForm = memo(
     );
     const [expression, setExpression] = useState(false);
     const formRef = useRef<FormInstance<VariableFormModel>>();
+    const t = useI18NPrefix('variable');
+    const tg = useI18NPrefix('global');
 
     useEffect(() => {
       if (visible && editingVariable) {
-        const { defaultValue, ...rest } = editingVariable;
         try {
-          setType(rest.type);
-          setValueType(rest.valueType);
-          setExpression(rest.expression || false);
+          const { type, valueType, expression } = editingVariable;
+          let defaultValue = editingVariable.defaultValue
+            ? JSON.parse(editingVariable.defaultValue)
+            : [];
+          if (valueType === VariableValueTypes.Date && !expression) {
+            defaultValue = defaultValue.map(str => moment(str));
+          }
+          setType(type);
+          setValueType(valueType);
+          setExpression(expression || false);
           formRef.current?.setFieldsValue({
-            ...rest,
-            defaultValue: defaultValue ? JSON.parse(defaultValue) : [],
+            ...editingVariable,
+            defaultValue,
           });
         } catch (error) {
           errorHandle(error);
@@ -90,89 +112,106 @@ export const VariableForm = memo(
       formRef.current?.setFieldsValue({ defaultValue: [] });
     }, []);
 
+    const nameValidator = useMemo(
+      () =>
+        scope === VariableScopes.Private
+          ? (_, value) => {
+              if (value === editingVariable?.name) {
+                return Promise.resolve();
+              }
+              if (variables?.find(({ name }) => name === value)) {
+                return Promise.reject(new Error(t('duplicateName')));
+              } else {
+                return Promise.resolve();
+              }
+            }
+          : debounce((_, value) => {
+              if (!value || value === editingVariable?.name) {
+                return Promise.resolve();
+              }
+              return request({
+                url: `/variables/check/name`,
+                method: 'POST',
+                params: { name: value, orgId },
+              }).then(
+                () => Promise.resolve(),
+                err => Promise.reject(new Error(err.response.data.message)),
+              );
+            }, DEFAULT_DEBOUNCE_WAIT),
+      [scope, editingVariable?.name, variables, orgId, t],
+    );
+
     return (
       <ModalForm
         {...modalProps}
         visible={visible}
         formProps={{
           labelAlign: 'left',
-          labelCol: { offset: 1, span: 5 },
+          labelCol: { offset: 1, span: 6 },
           wrapperCol: { span: 16 },
           className: '',
         }}
         afterClose={onAfterClose}
         ref={formRef}
+        destroyOnClose
       >
         <Form.Item
           name="name"
-          label="名称"
+          label={t('name')}
           validateFirst
           rules={[
-            { required: true, message: '名称不能为空' },
             {
-              validator: debounce((_, value) => {
-                if (!value || value === editingVariable?.name) {
-                  return Promise.resolve();
-                }
-                return request({
-                  url: `/variables/check/name`,
-                  method: 'POST',
-                  params: { name: value, orgId },
-                }).then(
-                  () => Promise.resolve(),
-                  () => Promise.reject(new Error('名称重复')),
-                );
-              }, DEFAULT_DEBOUNCE_WAIT),
+              required: true,
+              message: `${t('name')}${tg('validation.required')}`,
             },
             {
-              validator: (_, value) => {
-                if (value === editingVariable?.name) {
-                  return Promise.resolve();
-                }
-                if (variables?.find(({ name }) => name === value)) {
-                  return Promise.reject(new Error('名称重复'));
-                } else {
-                  return Promise.resolve();
-                }
-              },
+              validator: nameValidator,
             },
           ]}
         >
           <Input />
         </Form.Item>
-        <Form.Item name="label" label="标题">
+        <Form.Item name="label" label={t('label')}>
           <Input />
         </Form.Item>
-        <Form.Item name="type" label="类型" initialValue={type}>
+        <Form.Item name="type" label={t('type')} initialValue={type}>
           <Radio.Group onChange={typeChange}>
             {Object.values(VariableTypes).map(value => (
               <Radio.Button key={value} value={value}>
-                {VARIABLE_TYPE_LABEL[value]}
+                {t(`variableType.${value.toLowerCase()}`)}
               </Radio.Button>
             ))}
           </Radio.Group>
         </Form.Item>
-        <Form.Item name="valueType" label="值类型" initialValue={valueType}>
+        <Form.Item
+          name="valueType"
+          label={t('valueType')}
+          initialValue={valueType}
+        >
           <Radio.Group onChange={valueTypeChange}>
             {Object.values(VariableValueTypes).map(value => (
               <Radio.Button key={value} value={value}>
-                {VARIABLE_VALUE_TYPE_LABEL[value]}
+                {t(`variableValueType.${value.toLowerCase()}`)}
               </Radio.Button>
             ))}
           </Radio.Group>
         </Form.Item>
         {scope === VariableScopes.Public && type === VariableTypes.Permission && (
-          <Form.Item name="permission" label="编辑权限" initialValue={0}>
+          <Form.Item
+            name="permission"
+            label={t('permission.label')}
+            initialValue={0}
+          >
             <Radio.Group>
-              <Radio.Button value={0}>不可见</Radio.Button>
-              <Radio.Button value={1}>只读</Radio.Button>
-              <Radio.Button value={2}>可编辑</Radio.Button>
+              <Radio.Button value={0}>{t('permission.hidden')}</Radio.Button>
+              <Radio.Button value={1}>{t('permission.readonly')}</Radio.Button>
+              <Radio.Button value={2}>{t('permission.editable')}</Radio.Button>
             </Radio.Group>
           </Form.Item>
         )}
         <Form.Item
           name="defaultValue"
-          label="默认值"
+          label={t('defaultValue')}
           css={`
             margin-bottom: ${SPACE_XS};
           `}
@@ -187,9 +226,7 @@ export const VariableForm = memo(
             valuePropName="checked"
             initialValue={expression}
           >
-            <Checkbox onChange={expressionChange}>
-              使用表达式作为默认值
-            </Checkbox>
+            <Checkbox onChange={expressionChange}>{t('expression')}</Checkbox>
           </Form.Item>
         )}
       </ModalForm>

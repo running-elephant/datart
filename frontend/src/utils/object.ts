@@ -38,9 +38,9 @@ export function curry(fn) {
   const collector = (...args) => {
     _args = _args.concat(args || []);
     if (_args.length < fn.length) {
-      return collector.bind(null);
+      return collector.bind(Object.create(null));
     }
-    return fn.apply(null, _args);
+    return fn.apply(Object.create(null), _args);
   };
   return collector;
 }
@@ -54,10 +54,10 @@ export function cond(...predicates) {
       if (
         isPairArray(predicates[i]) &&
         typeof predicates[i]?.[0] === 'function' &&
-        predicates[i][0].call(null, value)
+        predicates[i][0].call(Object.create(null), value)
       ) {
         if (typeof predicates[i]?.[1] === 'function') {
-          return predicates[i][1].call(null, value);
+          return predicates[i][1].call(Object.create(null), value);
         }
         return predicates[i][1];
       }

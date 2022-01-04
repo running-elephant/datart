@@ -21,7 +21,6 @@ import {
   ChartConfig,
   ChartDataSectionField,
   ChartDataSectionType,
-  ChartStyleSectionConfig,
 } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import {
@@ -30,9 +29,10 @@ import {
   getExtraSeriesRowData,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
   valueFormatter,
 } from 'app/utils/chartHelper';
+import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
 import Config from './config';
 
@@ -89,7 +89,7 @@ class BasicPieChart extends Chart {
   }
 
   getOptions(dataset: ChartDataset, config: ChartConfig) {
-    const dataColumns = transfromToObjectArray(dataset.rows, dataset.columns);
+    const dataColumns = transformToObjectArray(dataset.rows, dataset.columns);
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
@@ -107,11 +107,12 @@ class BasicPieChart extends Chart {
       dataColumns,
       groupConfigs,
       aggregateConfigs,
+      infoConfigs,
     );
 
     return {
       tooltip: {
-        formatter: this.getTooltipFormmaterFunc(
+        formatter: this.getTooltipFormatterFunc(
           styleConfigs,
           groupConfigs,
           aggregateConfigs,
@@ -124,18 +125,24 @@ class BasicPieChart extends Chart {
     };
   }
 
-  private getSeries(styleConfigs, dataColumns, groupConfigs, aggregateConfigs) {
+  private getSeries(
+    styleConfigs,
+    dataColumns,
+    groupConfigs,
+    aggregateConfigs,
+    infoConfigs,
+  ) {
     if (!groupConfigs?.length) {
       const dc = dataColumns?.[0];
       return {
         ...this.getBarSeiesImpl(styleConfigs),
         data: aggregateConfigs.map(config => {
           return {
-            ...getExtraSeriesRowData({
-              [getValueByColumnKey(config)]: dc[getValueByColumnKey(config)],
-            }),
+            ...config,
             name: getColumnRenderName(config),
-            value: dc[getValueByColumnKey(config)],
+            value: [config]
+              .concat(infoConfigs)
+              .map(config => dc?.[getValueByColumnKey(config)]),
             itemStyle: this.getDataItemStyle(config, groupConfigs, dc),
             ...getExtraSeriesRowData(dc),
             ...getExtraSeriesDataFormat(config?.format),
@@ -151,9 +158,11 @@ class BasicPieChart extends Chart {
         name: getColumnRenderName(config),
         data: dataColumns.map(dc => {
           return {
-            ...getExtraSeriesRowData(dc),
+            ...config,
             name: groupedConfigNames.map(config => dc[config]).join('-'),
-            value: dc[getValueByColumnKey(config)],
+            value: aggregateConfigs
+              .concat(infoConfigs)
+              .map(config => dc?.[getValueByColumnKey(config)]),
             itemStyle: this.getDataItemStyle(config, groupConfigs, dc),
             ...getExtraSeriesRowData(dc),
             ...getExtraSeriesDataFormat(config?.format),
@@ -202,6 +211,7 @@ class BasicPieChart extends Chart {
       sampling: 'average',
       avoidLabelOverlap: false,
       label: this.getLabelStyle(styleConfigs),
+      labelLayout: { hideOverlap: true },
       ...this.getSeriesStyle(styleConfigs),
       ...this.getGrid(styleConfigs),
     };
@@ -261,7 +271,39 @@ class BasicPieChart extends Chart {
     const show = getStyleValueByGroup(styles, 'label', 'showLabel');
     const position = getStyleValueByGroup(styles, 'label', 'position');
     const font = getStyleValueByGroup(styles, 'label', 'font');
-    return { show, position, ...font, formatter: '{b}: {d}%' };
+    const formatter = this.getLabelFormatter(styles);
+    return { show, position, ...font, formatter };
+  }
+
+  getLabelFormatter(styles) {
+    const showValue = getStyleValueByGroup(styles, 'label', 'showValue');
+    const showPercent = getStyleValueByGroup(styles, 'label', 'showPercent');
+    const showName = getStyleValueByGroup(styles, 'label', 'showName');
+    return seriesParams => {
+      if (seriesParams.componentType !== 'series') {
+        return seriesParams.name;
+      }
+      const data = seriesParams?.data || {};
+
+      //处理 label 旧数据中没有 showValue, showPercent, showName 数据  alpha.3版本之后是 boolean 类型 后续版本稳定之后 可以移除此逻辑
+      // TODO migration start
+      if (showName === null || showPercent === null || showValue === null) {
+        return `${seriesParams?.name}: ${seriesParams?.percent + '%'}`;
+      }
+      // TODO migration end --tl
+
+      return `${showName ? seriesParams?.name : ''}${
+        showName && (showValue || showPercent) ? ': ' : ''
+      }${
+        showValue ? toFormattedValue(seriesParams?.value[0], data?.format) : ''
+      }${
+        showPercent && showValue
+          ? '(' + seriesParams?.percent + '%)'
+          : showPercent
+          ? seriesParams?.percent + '%'
+          : ''
+      }`;
+    };
   }
 
   getSeriesStyle(styles) {
@@ -272,16 +314,7 @@ class BasicPieChart extends Chart {
     return { radius: radiusValue, roseType: this.isRose };
   }
 
-  getStyleValueByGroup(
-    styles: ChartStyleSectionConfig[],
-    groupPath: string,
-    childPath: string,
-  ) {
-    const childPaths = childPath.split('.');
-    return this.getStyleValue(styles, [groupPath, ...childPaths]);
-  }
-
-  getTooltipFormmaterFunc(
+  getTooltipFormatterFunc(
     styleConfigs,
     groupConfigs,
     aggregateConfigs,
@@ -289,31 +322,37 @@ class BasicPieChart extends Chart {
     dataColumns,
   ) {
     return seriesParams => {
-      let dataRow = dataColumns?.find(
-        dc =>
-          groupConfigs
-            .map(config => dc?.[getValueByColumnKey(config)])
-            .join('-') === seriesParams?.name,
-      );
-      if (dataColumns?.length === 1) {
-        dataRow = dataColumns[0];
+      if (seriesParams.componentType !== 'series') {
+        return seriesParams.name;
       }
-
-      const toolTips = []
-        .concat(groupConfigs)
-        .concat(
-          aggregateConfigs?.filter(
-            aggConfig =>
-              getValueByColumnKey(aggConfig) === seriesParams?.name ||
-              getValueByColumnKey(aggConfig) === seriesParams?.seriesName,
-          ),
-        )
+      const { data, value, percent } = seriesParams;
+      if (!groupConfigs?.length) {
+        const tooltip = [data]
+          .concat(infoConfigs)
+          .map((config, index) => valueFormatter(config, value?.[index]));
+        tooltip[0] += '(' + percent + '%)';
+        return tooltip.join('<br />');
+      }
+      const infoTotal = infoConfigs.map(info => {
+        let total = 0;
+        dataColumns.map(dc => {
+          total += dc?.[getValueByColumnKey(info)];
+        });
+        return total;
+      });
+      let tooltip = aggregateConfigs
         .concat(infoConfigs)
-        .map(config =>
-          valueFormatter(config, dataRow?.[getValueByColumnKey(config)]),
-        );
-
-      return toolTips.join('<br />');
+        .map((config, index) => {
+          let tooltipValue = valueFormatter(config, value?.[index]);
+          if (!index) {
+            return (tooltipValue += '(' + percent + '%)');
+          }
+          const percentNum =
+            (value?.[aggregateConfigs?.length] / infoTotal?.[index - 1]) *
+              100 || 0;
+          return (tooltipValue += '(' + percentNum.toFixed(2) + '%)');
+        });
+      return tooltip.join('<br />');
     };
   }
 }

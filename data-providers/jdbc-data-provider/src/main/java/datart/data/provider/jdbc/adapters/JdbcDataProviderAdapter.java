@@ -199,7 +199,7 @@ public class JdbcDataProviderAdapter implements Closeable {
     public Dataframe execute(QueryScript script, ExecuteParam executeParam) throws Exception {
         //If server aggregation is enabled, query the full data before performing server aggregation
         if (executeParam.isServerAggregate()) {
-            return executeLocally(script, executeParam);
+            return executeInLocal(script, executeParam);
         } else {
             return executeOnSource(script, executeParam);
         }
@@ -240,7 +240,6 @@ public class JdbcDataProviderAdapter implements Closeable {
         if (sqlDialect != null) {
             return sqlDialect;
         }
-
         if (StringUtils.isNotBlank(driverInfo.getSqlDialect())) {
             try {
                 Class<?> clz = Class.forName(driverInfo.getSqlDialect());
@@ -305,7 +304,7 @@ public class JdbcDataProviderAdapter implements Closeable {
     /**
      * 本地执行，从数据源拉取全量数据，在本地执行聚合操作
      */
-    protected Dataframe executeLocally(QueryScript script, ExecuteParam executeParam) throws Exception {
+    protected Dataframe executeInLocal(QueryScript script, ExecuteParam executeParam) throws Exception {
         SqlScriptRender render = new SqlScriptRender(script
                 , executeParam
                 , getSqlDialect()

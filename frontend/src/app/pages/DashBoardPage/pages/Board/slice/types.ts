@@ -27,7 +27,10 @@ import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
 import { ChartDataSectionField } from '../../../../../types/ChartConfig';
-import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
+import {
+  PageInfo,
+  View,
+} from '../../../../MainPage/pages/ViewPage/slice/types';
 import {
   BorderStyleType,
   LAYOUT_COLS,
@@ -74,7 +77,7 @@ export interface SaveDashboard extends Omit<Dashboard, 'config'> {
 }
 export interface ServerDashboard extends Omit<Dashboard, 'config'> {
   config: string;
-  views: ServerView[];
+  views: View[];
   datacharts: ServerDatachart[];
   widgets: ServerWidget[];
 }
@@ -161,6 +164,9 @@ export interface JumpConfigField {
 }
 export interface JumpConfig {
   open: boolean;
+  targetType: string;
+  URL: string;
+  queryName: string;
   field: JumpConfigField;
   target: JumpConfigTarget;
   filter: JumpConfigFilter;
@@ -183,6 +189,7 @@ export interface WidgetInfo {
   inLinking: boolean; //是否在触发联动
   selected: boolean;
   pageInfo: Partial<PageInfo>;
+  errInfo?: string;
   selectItems?: string[];
   parameters?: any;
 }
@@ -213,11 +220,11 @@ export interface Relation {
 }
 /**
  * @controlToWidget Controller associated widgets
- * @controlToControl Controller associated Controller visible
- * @widgetToWidget widget inOther WidgetContainer
+ * @controlToControl Controller associated Controller visible cascade
+ * @widgetToWidget widget inOther WidgetContainer linkage
  * */
 export interface RelationConfig {
-  type: 'controlToWidget' | 'controlToControl' | 'widgetToWidget';
+  type: RelationConfigType;
   controlToWidget?: {
     widgetRelatedViewIds: string[];
   };
@@ -227,6 +234,14 @@ export interface RelationConfig {
     linkerColumn: string;
   };
 }
+export type RelationConfigType =
+  | 'controlToWidget' // control - ChartFetch will del
+  | 'controlToChartFetch' // control - ChartFetch
+  | 'controlToControl' // control - control -visible  will del
+  | 'controlToControlVisible' // control - control -visible
+  | 'controlToControlCascade' // control - control -Cascade
+  | 'widgetToWidget' // linkage will del
+  | 'chartToChartLinkage'; // linkage
 export interface RelatedView {
   viewId: string;
   relatedCategory: ChartDataViewFieldCategory;
@@ -390,15 +405,11 @@ export interface DataChart {
   status: any;
 }
 export interface DataChartConfig {
+  aggregation: boolean | undefined;
   chartConfig: ChartConfig;
   chartGraphId: string;
   computedFields: any[];
 }
-
-export interface ServerView extends ChartDataView {
-  model: string;
-}
-// TODO
 
 export type ColsType = typeof LAYOUT_COLS;
 
@@ -458,4 +469,5 @@ export interface ServerDatachart extends Omit<DataChart, 'config'> {
 
 export interface getDataOption {
   pageInfo?: Partial<PageInfo>;
+  sorters?: Array<{ column: string; operator?: string; aggOperator?: string }>;
 }

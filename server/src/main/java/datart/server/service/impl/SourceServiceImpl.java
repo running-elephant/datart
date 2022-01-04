@@ -25,12 +25,15 @@ import datart.core.base.consts.Const;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.DataProviderConfigTemplate;
 import datart.core.data.provider.DataProviderSource;
+import datart.core.entity.Role;
 import datart.core.entity.Source;
+import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.SourceMapperExt;
 import datart.security.base.PermissionInfo;
 import datart.security.base.ResourceType;
 import datart.security.base.SubjectType;
 import datart.security.exception.PermissionDeniedException;
+import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.AESUtil;
 import datart.security.util.PermissionHelper;
 import datart.server.base.params.BaseCreateParam;
@@ -61,12 +64,15 @@ public class SourceServiceImpl extends BaseService implements SourceService {
 
     private final RoleService roleService;
 
+    private final RelRoleResourceMapperExt rrrMapper;
+
     public SourceServiceImpl(SourceMapperExt sourceMapper,
                              DataProviderService dataProviderService,
-                             RoleService roleService) {
+                             RoleService roleService, RelRoleResourceMapperExt rrrMapper) {
         this.sourceMapper = sourceMapper;
         this.dataProviderService = dataProviderService;
         this.roleService = roleService;
+        this.rrrMapper = rrrMapper;
     }
 
     @Override
@@ -85,12 +91,23 @@ public class SourceServiceImpl extends BaseService implements SourceService {
 
     @Override
     public void requirePermission(Source source, int permission) {
-        if ((permission & Const.CREATE) == Const.CREATE) {
-            securityManager.requirePermissions(PermissionHelper.sourcePermission(source.getOrgId(),
-                    ResourceType.SOURCE.name(), permission));
+        if (securityManager.isOrgOwner(source.getOrgId())) {
             return;
         }
-        securityManager.requirePermissions(PermissionHelper.sourcePermission(source.getOrgId(), source.getId(), permission));
+        List<Role> roles = roleService.listUserRoles(source.getOrgId(), getCurrentUser().getId());
+        boolean hasPermission = roles.stream().anyMatch(role -> hasPermission(role, source, permission));
+        if (!hasPermission) {
+            Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied",
+                    ResourceType.SOURCE + ":" + source.getName() + ":" + ShiroSecurityManager.expand2StringPermissions(permission));
+        }
+    }
+
+    private boolean hasPermission(Role role, Source source, int permission) {
+        if (source.getId() == null || (permission & Const.CREATE) == permission) {
+            return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), ResourceType.SOURCE.name(), permission));
+        } else {
+            return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), source.getId(), permission));
+        }
     }
 
     @Override
@@ -142,7 +159,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         permissionInfo.setSubjectId(getCurrentUser().getId());
         permissionInfo.setResourceType(ResourceType.SOURCE);
         permissionInfo.setResourceId(source.getId());
-        permissionInfo.setPermission(Const.MANAGE);
+        permissionInfo.setPermission(Const.CREATE);
         roleService.grantPermission(Collections.singletonList(permissionInfo));
     }
 

@@ -10,6 +10,7 @@ import {
 import { APIResponse } from 'types';
 import { SaveFormModel } from '../app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { removeToken } from './auth';
+export { default as uuidv4 } from 'uuid/dist/esm-browser/v4';
 
 export function errorHandle(error) {
   if (error?.response) {
@@ -32,7 +33,20 @@ export function errorHandle(error) {
   }
   return error;
 }
-
+export function getErrorMessage(error) {
+  if (error?.response) {
+    const { response } = error as AxiosError;
+    switch (response?.status) {
+      case 401:
+        message.error({ key: '401', content: '未登录或会话过期，请重新登录' });
+        removeToken();
+        return '401';
+      default:
+        return response?.data.message || error.message;
+    }
+  }
+  return error?.message;
+}
 export function reduxActionErrorHandler(errorAction) {
   if (errorAction?.payload) {
     message.error(errorAction?.payload);
@@ -179,7 +193,11 @@ export const onDropTreeFn = ({ info, treeData, callback }) => {
     index = dropArr[dropArr.length - 1].index + 1;
   } else {
     //中间
-    index = (dropArr[dropIndex].index + dropArr[dropIndex + 1].index) / 2;
+    if (!dropArr[dropIndex].index && !dropArr[dropIndex + 1].index) {
+      index = dropArr[dropArr.length - 1].index + 1;
+    } else {
+      index = (dropArr[dropIndex].index + dropArr[dropIndex + 1].index) / 2;
+    }
   }
   let { id } = dragObj,
     parentId = !info.dropToGap
@@ -191,12 +209,12 @@ export const onDropTreeFn = ({ info, treeData, callback }) => {
 
 export const getInsertedNodeIndex = (
   AddData: Omit<SaveFormModel, 'config'> & { config?: object | string },
-  treeData: any,
+  viewData: any,
 ) => {
   let index: number = 0;
   /* eslint-disable */
-  if (treeData?.length) {
-    let IndexArr = treeData
+  if (viewData?.length) {
+    let IndexArr = viewData
       .filter((v: any) => v.parentId == AddData.parentId)
       .map(v => Number(v.index) || 0);
     index = IndexArr?.length ? Math.max(...IndexArr) + 1 : 0;
@@ -223,12 +241,22 @@ export function filterListOrTree<T extends { children?: T[] }>(
   dataSource: T[],
   keywords: string,
   filterFunc: (keywords: string, data: T) => boolean,
+  filterLeaf?: boolean, // 是否展示所有叶子节点
 ) {
   return keywords
     ? dataSource.reduce<T[]>((filtered, d) => {
         const isMatch = filterFunc(keywords, d);
-        const isChildrenMatch =
-          d.children && filterListOrTree(d.children, keywords, filterFunc);
+        let isChildrenMatch: T[] | undefined;
+        if (filterLeaf && d.children?.every(c => (c as any).isLeaf)) {
+          isChildrenMatch =
+            isMatch || d.children.some(c => filterFunc(keywords, c))
+              ? d.children
+              : void 0;
+        } else {
+          isChildrenMatch =
+            d.children &&
+            filterListOrTree(d.children, keywords, filterFunc, filterLeaf);
+        }
         if (isMatch || (isChildrenMatch && isChildrenMatch.length > 0)) {
           filtered.push({ ...d, children: isChildrenMatch });
         }
@@ -321,11 +349,3 @@ export function fastDeleteArrayElement(arr: any[], index: number) {
   arr.pop();
 }
 
-export const ResizeEvent = new Event('resize', {
-  bubbles: false,
-  cancelable: true,
-});
-
-export const dispatchResize = () => {
-  window.dispatchEvent(ResizeEvent);
-};

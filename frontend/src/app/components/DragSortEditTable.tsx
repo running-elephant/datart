@@ -18,7 +18,7 @@
 
 import { Form, Input, Table, TableProps } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import { FilterValueOption } from 'app/types/ChartConfig';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import {
   createContext,
   useCallback,
@@ -36,9 +36,9 @@ interface EditableCellProps {
   title: React.ReactNode;
   editable: boolean;
   children: React.ReactNode;
-  dataIndex: keyof FilterValueOption;
-  record: FilterValueOption;
-  handleSave: (record: FilterValueOption) => void;
+  dataIndex: keyof RelationFilterValue;
+  record: RelationFilterValue;
+  handleSave: (record: RelationFilterValue) => void;
 }
 
 interface EditableRowProps {

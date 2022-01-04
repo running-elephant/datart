@@ -54,9 +54,14 @@ import {
   SPACE_SM,
 } from 'styles/StyleConstants';
 import { ValueOf } from 'types';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from 'utils/utils';
+import ChartAggregationContext from '../../../../contexts/ChartAggregationContext';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
-import VizDraggableItem from './ChartDraggableElement';
+import ChartDraggableElement from './ChartDraggableElement';
+
+type DragItem = {
+  index?: number;
+};
 
 export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
   memo(function ChartDraggableTargetContainer({
@@ -72,68 +77,88 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     const [showModal, contextHolder] = useFieldActionModal({
       i18nPrefix: 'viz.palette.data.enum.actionType',
     });
+    const { aggregation } = useContext(ChartAggregationContext);
 
     const [{ isOver, canDrop }, drop] = useDrop(
       () => ({
         accept: [
-          CHART_DRAG_ELEMENT_TYPE.DATASET_GROUP_COLUMNS,
           CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
           CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN,
         ],
-        drop(item: ChartDataSectionField, monitor) {
-          let items = [item];
+        drop(item: ChartDataSectionField & DragItem, monitor) {
+          let items = Array.isArray(item) ? item : [item];
+          let needDelete = true;
           if (
-            monitor.getItemType() ===
-            CHART_DRAG_ELEMENT_TYPE.DATASET_GROUP_COLUMNS
+            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN
           ) {
-            items = item as any;
-          }
-          if (
-            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN ||
-            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
-          ) {
-            let currentColumns: ChartDataSectionField[] = (
+            const currentColumns: ChartDataSectionField[] = (
               currentConfig.rows || []
             ).concat(
-              items.map(i => ({
+              items.map(val => ({
                 uid: uuidv4(),
-                colName: i.colName,
-                category: i.category,
-                type: i.type,
-                aggregate: getDefaultAggregate(item),
+                colName: val.colName,
+                category: val.category,
+                type: val.type,
+                aggregate: getDefaultAggregate(val),
               })),
             );
-            const newCurrentConfig = updateByKey(
-              currentConfig,
-              'rows',
-              currentColumns,
+            updateCurrentConfigColumns(currentConfig, currentColumns, true);
+          } else if (
+            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
+          ) {
+            const originItemIndex = (currentConfig.rows || []).findIndex(
+              r => r.uid === item.uid,
             );
-            setCurrentConfig(newCurrentConfig);
-            onConfigChanged?.(ancestors, newCurrentConfig, true);
+            if (originItemIndex > -1) {
+              needDelete = false;
+              const currentColumns = updateBy(
+                currentConfig?.rows || [],
+                draft => {
+                  draft.splice(originItemIndex, 1);
+                  return draft.splice(item?.index!, 0, item);
+                },
+              );
+              updateCurrentConfigColumns(currentConfig, currentColumns);
+            } else {
+              const currentColumns = updateBy(
+                currentConfig?.rows || [],
+                draft => {
+                  return draft.splice(item?.index!, 0, item);
+                },
+              );
+              updateCurrentConfigColumns(currentConfig, currentColumns);
+            }
           }
 
-          return { delete: true };
+          return { delete: needDelete };
         },
         canDrop: (item: ChartDataSectionField, monitor) => {
+          let items = Array.isArray(item) ? item : [item];
+
           if (
             typeof currentConfig.actions === 'object' &&
-            !(item.type in currentConfig.actions)
+            !items.every(val => val.type in (currentConfig.actions || {}))
           ) {
+            //zh: 判断现在拖动的数据项是否可以拖动到当前容器中 en: Determine whether the currently dragged data item can be dragged into the current container
             return false;
           }
+
+          // if (
+          //   typeof currentConfig.actions === 'object' &&
+          //   !(item.type in currentConfig.actions)
+          // ) {
+          //   return false;
+          // }
 
           if (currentConfig.allowSameField) {
             return true;
           }
 
-          let items = [item];
           if (
-            monitor.getItemType() ===
-            CHART_DRAG_ELEMENT_TYPE.DATASET_GROUP_COLUMNS
+            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
           ) {
-            items = item as any;
+            return true;
           }
-
           const exists = currentConfig.rows?.map(col => col.colName);
           return items.every(i => !exists?.includes(i.colName));
         },
@@ -149,47 +174,77 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       setCurrentConfig(config);
     }, [config]);
 
+    const updateCurrentConfigColumns = (
+      currentConfig,
+      newColumns,
+      refreshDataset = false,
+    ) => {
+      const newCurrentConfig = updateByKey(currentConfig, 'rows', newColumns);
+      setCurrentConfig(newCurrentConfig);
+      onConfigChanged?.(ancestors, newCurrentConfig, refreshDataset);
+    };
+
     const getDefaultAggregate = item => {
       if (
         currentConfig?.type === ChartDataSectionType.AGGREGATE ||
         currentConfig?.type === ChartDataSectionType.SIZE ||
-        currentConfig?.type === ChartDataSectionType.INFO
+        currentConfig?.type === ChartDataSectionType.INFO ||
+        currentConfig?.type === ChartDataSectionType.MIXED
       ) {
+        if (currentConfig.disableAggregate) {
+          return;
+        }
         if (
-          item.category !==
+          item.category ===
           (ChartDataViewFieldCategory.AggregateComputedField as string)
         ) {
-          let aggType: string = '';
-          if (currentConfig?.actions instanceof Array) {
-            currentConfig?.actions?.find(
-              type =>
-                type === ChartDataSectionFieldActionType.Aggregate ||
-                type === ChartDataSectionFieldActionType.AggregateLimit,
-            );
-          } else if (currentConfig?.actions instanceof Object) {
-            aggType = currentConfig?.actions?.[item?.type]?.find(
-              type =>
-                type === ChartDataSectionFieldActionType.Aggregate ||
-                type === ChartDataSectionFieldActionType.AggregateLimit,
-            );
-          }
-          if (aggType) {
-            return AggregateFieldSubAggregateType?.[aggType]?.[0];
-          }
+          return;
+        }
+
+        let aggType: string = '';
+        if (currentConfig?.actions instanceof Array) {
+          currentConfig?.actions?.find(
+            type =>
+              type === ChartDataSectionFieldActionType.Aggregate ||
+              type === ChartDataSectionFieldActionType.AggregateLimit,
+          );
+        } else if (currentConfig?.actions instanceof Object) {
+          aggType = currentConfig?.actions?.[item?.type]?.find(
+            type =>
+              type === ChartDataSectionFieldActionType.Aggregate ||
+              type === ChartDataSectionFieldActionType.AggregateLimit,
+          );
+        }
+        if (aggType) {
+          return AggregateFieldSubAggregateType?.[aggType]?.[0];
         }
       }
     };
 
     const onDraggableItemMove = (dragIndex: number, hoverIndex: number) => {
       const draggedItem = currentConfig.rows?.[dragIndex];
-
-      if (draggedItem && !currentConfig?.rows?.length) {
+      if (draggedItem) {
         const newCurrentConfig = updateBy(currentConfig, draft => {
           const columns = draft.rows || [];
           columns.splice(dragIndex, 1);
           columns.splice(hoverIndex, 0, draggedItem);
         });
         setCurrentConfig(newCurrentConfig);
+      } else {
+        // const placeholder = {
+        //   uid: CHARTCONFIG_FIELD_PLACEHOLDER_UID,
+        //   colName: 'Placeholder',
+        //   category: 'field',
+        //   type: 'STRING',
+        // } as any;
+        // const newCurrentConfig = updateBy(currentConfig, draft => {
+        //   const columns = draft.rows || [];
+        //   if (dragIndex) {
+        //     columns.splice(dragIndex, 1);
+        //   }
+        //   columns.splice(hoverIndex, 0, placeholder);
+        // });
+        // setCurrentConfig(newCurrentConfig);
       }
     };
 
@@ -221,7 +276,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
 
       return currentConfig.rows?.map((columnConfig, index) => {
         return (
-          <VizDraggableItem
+          <ChartDraggableElement
             key={columnConfig.uid}
             id={columnConfig.uid}
             index={index}
@@ -244,7 +299,11 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                     {currentConfig?.actions && (
                       <DownOutlined style={{ marginRight: '10px' }} />
                     )}
-                    <span>{getColumnRenderName(columnConfig)}</span>
+                    <span>
+                      {aggregation
+                        ? getColumnRenderName(columnConfig)
+                        : columnConfig.colName}
+                    </span>
                     <div style={{ display: 'inline-block', marginLeft: '5px' }}>
                       {enableActionsIcons(columnConfig)}
                     </div>
@@ -254,7 +313,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             }}
             moveCard={onDraggableItemMove}
             onDelete={handleOnDeleteItem(columnConfig.uid)}
-          ></VizDraggableItem>
+          ></ChartDraggableElement>
         );
       });
     };
@@ -287,6 +346,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           dataset,
           dataView,
           modalSize,
+          aggregation,
         );
       };
 

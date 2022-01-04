@@ -110,7 +110,7 @@ const VideoWidget: React.FC = () => {
             src={srcWithParams}
             frameBorder="0"
             style={{ width: '100%', height: '100%' }}
-          />
+          ></iframe>
         </WrapVideo>
       );
   }

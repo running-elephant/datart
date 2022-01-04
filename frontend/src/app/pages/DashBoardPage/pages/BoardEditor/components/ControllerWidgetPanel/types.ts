@@ -3,10 +3,11 @@ import {
   ControllerVisibleType,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
-import { FilterValueOption } from 'app/types/ChartConfig';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
-import { RelativeOrExactTime } from 'app/types/FilterControlPanel';
+import { TimeFilterValueCategory } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
+import i18next from 'i18next';
 import { Moment, unitOfTime } from 'moment';
 import { VariableValueTypes } from '../../../../../MainPage/pages/VariablePage/constants';
 
@@ -34,7 +35,7 @@ export interface ControllerConfig {
   valueOptionType: ValueOptionType; //
   visibility: ControllerVisibility;
   sqlOperator: FilterSqlOperator;
-  valueOptions: FilterValueOption[];
+  valueOptions: RelationFilterValue[];
   controllerValues: any[];
   required: boolean; // 是否允许空值
   canChangeSqlOperator?: boolean; // 是否显示 sqlOperator 切换
@@ -70,17 +71,27 @@ export const enum PickerTypes {
 }
 export type PickerType = Uncapitalize<keyof typeof PickerTypes>;
 
+const td = (value: PickerTypes) => {
+  const preStr = 'viz.date.';
+  return i18next.t(preStr + value);
+};
+const getPickerTypeItem = (value: PickerTypes) => {
+  return {
+    name: td(value),
+    value: value,
+  };
+};
 export const PickerTypeOptions = [
-  { name: '日期', value: PickerTypes.Date },
-  { name: '日期时间', value: PickerTypes.DateTime },
-  { name: '年', value: PickerTypes.Year },
-  { name: '月', value: PickerTypes.Month },
-  { name: '季度', value: PickerTypes.Quarter },
-  { name: '周', value: PickerTypes.Week },
+  getPickerTypeItem(PickerTypes.Date),
+  getPickerTypeItem(PickerTypes.DateTime),
+  getPickerTypeItem(PickerTypes.Year),
+  getPickerTypeItem(PickerTypes.Quarter),
+  getPickerTypeItem(PickerTypes.Month),
+  getPickerTypeItem(PickerTypes.Week),
 ];
 
 export interface ControllerDateType {
-  relativeOrExact: RelativeOrExactTime;
+  relativeOrExact: TimeFilterValueCategory;
   relativeValue?: RelativeDate;
   exactValue?: Moment | string | null;
 }
@@ -88,5 +99,5 @@ export interface ControllerDateType {
 export interface RelativeDate {
   amount: number;
   unit: unitOfTime.DurationConstructor;
-  direction: '-' | '+';
+  direction: '-' | '+' | '+0';
 }

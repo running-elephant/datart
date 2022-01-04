@@ -32,18 +32,19 @@ import {
   createInitWidgetConfig,
   createWidget,
 } from 'app/pages/DashBoardPage/utils/widget';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+import i18next from 'i18next';
 import produce from 'immer';
 import { RootState } from 'types';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { BoardType } from '../../../Board/slice/types';
 import { ControllerConfig } from '../../components/ControllerWidgetPanel/types';
-import { addWidgetsToEditBoard, getEditWidgetDataAsync } from '../thunk';
+import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from '../thunk';
 import { HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
-
 const { confirm } = Modal;
 export const clearEditBoardState =
   (boardId: string) => async (dispatch, getState) => {
@@ -90,11 +91,10 @@ export const deleteWidgetsAction = () => (dispatch, getState) => {
   });
 
   if (childWidgetIds.length > 0) {
+    const perStr = 'viz.widget.action.';
     confirm({
-      // TODO i18n
-      title: '注意',
-      content:
-        '您要删除的组件中 有Container 组件，删除会将容器内的组件一起删除',
+      title: i18next.t(perStr + 'confirmDel'),
+      content: i18next.t(perStr + 'confirmDel1'),
       onOk() {
         dispatch(editBoardStackActions.deleteWidgets(selectedIds));
       },
@@ -141,7 +141,6 @@ export const updateWidgetControllerAction =
     controllerFacadeType: ControllerFacadeTypes;
     views: RelatedView[];
     config: ControllerConfig;
-    hasVariable?: boolean;
   }) =>
   async (dispatch, getState) => {
     const {
@@ -220,7 +219,7 @@ export const editChartInWidgetAction =
     };
     dispatch(editDashBoardInfoActions.changeChartEditorProps(editorProps));
   };
-export const editWrapChartWidget =
+export const editHasChartWidget =
   (props: { widgetId: string; dataChart: DataChart; view: ChartDataView }) =>
   async (dispatch, getState) => {
     const { dataChart, view, widgetId } = props;
@@ -235,7 +234,7 @@ export const editWrapChartWidget =
     const viewViews = [view];
     dispatch(boardActions.setDataChartMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-    dispatch(getEditWidgetDataAsync({ widgetId }));
+    dispatch(getEditChartWidgetDataAsync({ widgetId: curWidget.id }));
   };
 
 export const closeJumpAction = (widget: Widget) => (dispatch, getState) => {
@@ -261,3 +260,17 @@ export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
     }),
   );
 };
+
+export const addVariablesToBoard =
+  (variables: Variable[]) => (dispatch, getState) => {
+    if (!variables?.length) return;
+    const addedViewId = variables[0].viewId;
+    if (!addedViewId) return;
+
+    const editBoard = getState().editBoard as HistoryEditBoard;
+    const queryVariables = editBoard.stack.present.dashBoard.queryVariables;
+    const hasAddedViewId = queryVariables.find(v => v.viewId === addedViewId);
+    if (hasAddedViewId) return;
+    let newVariables = queryVariables.concat(variables);
+    dispatch(editBoardStackActions.updateQueryVariables(newVariables));
+  };

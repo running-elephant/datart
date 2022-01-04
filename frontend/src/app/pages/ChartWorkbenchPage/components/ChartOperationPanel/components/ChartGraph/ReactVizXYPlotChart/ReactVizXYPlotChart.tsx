@@ -21,10 +21,6 @@ import Config from './config';
 import ReactXYPlot from './ReactVizXYPlot';
 
 class ReactVizXYPlotChart extends ReactChart {
-  constructor() {
-    super('reactviz-xyplot-chart', 'ReactViz XYPlot Chart', 'star');
-  }
-
   isISOContainer = 'reactviz-container';
   config = Config;
   dependency = [
@@ -32,30 +28,34 @@ class ReactVizXYPlotChart extends ReactChart {
     'https://unpkg.com/react-vis/dist/dist.min.js',
   ];
 
+  constructor() {
+    super(ReactXYPlot, {
+      id: 'reactviz-xyplot-chart',
+      name: 'ReactViz XYPlot Chart',
+      icon: 'star',
+    });
+  }
+
   onMount(options, context): void {
     if (!context.window.reactVis) {
       return;
     }
     const { XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries } =
       context.window.reactVis;
-    this.getInstance().init(ReactXYPlot);
-    this.getInstance().registerImportDependenies({
+    this.adapter.init(ReactXYPlot);
+    this.adapter.registerImportDependenies({
       XYPlot,
       XAxis,
       YAxis,
       HorizontalGridLines,
       LineSeries,
     });
-    this.getInstance().mounted(
-      context.document.getElementById(options.containerId),
-    );
+    this.adapter.mounted(context.document.getElementById(options.containerId));
   }
 
   onUpdated(props): void {
-    // this.getWrapper().updated(props);
+    // this.adapter.updated(props);
   }
-
-  onUnMount(): void {}
 }
 
 export default ReactVizXYPlotChart;

@@ -20,17 +20,20 @@ package datart.data.provider;
 import datart.core.base.PageInfo;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.Exceptions;
+import datart.core.common.DateUtils;
 import datart.core.data.provider.*;
-import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.SqlParserUtils;
 import datart.data.provider.local.LocalDB;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateParser;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -195,9 +198,9 @@ public abstract class DefaultDataProvider extends DataProvider {
             return values;
         }
         if (values.get(0).size() != columns.size()) {
-            Exceptions.msg( "message.provider.default.schema", values.get(0).size() + ":" + columns.size());
+            Exceptions.msg("message.provider.default.schema", values.get(0).size() + ":" + columns.size());
         }
-        values.parallelStream().forEach(vals -> {
+        values.stream().forEach(vals -> {
             for (int i = 0; i < vals.size(); i++) {
                 Object val = vals.get(i);
                 if (val == null) {
@@ -216,10 +219,28 @@ public abstract class DefaultDataProvider extends DataProvider {
                             val = null;
                         } else if (NumberUtils.isDigits(val.toString())) {
                             val = Long.parseLong(val.toString());
-                        } else {
+                        } else if (NumberUtils.isNumber(val.toString())) {
                             val = Double.parseDouble(val.toString());
+                        } else {
+                            val = null;
                         }
                         break;
+                    case DATE:
+                        String fmt = columns.get(i).getFmt();
+                        if (StringUtils.isBlank(fmt)) {
+                            fmt = DateUtils.inferDateFormat(val.toString());
+                            columns.get(i).setFmt(fmt);
+                        }
+                        if (StringUtils.isNotBlank(fmt)) {
+                            DateParser parser = FastDateFormat.getInstance(fmt);
+                            try {
+                                val = parser.parse(val.toString());
+                            } catch (ParseException e) {
+                                val = null;
+                            }
+                        } else {
+                            val = null;
+                        }
                     default:
                 }
                 vals.set(i, val);

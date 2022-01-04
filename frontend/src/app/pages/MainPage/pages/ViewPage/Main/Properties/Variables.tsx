@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   DeleteOutlined,
   EditOutlined,
@@ -8,10 +26,13 @@ import {
 } from '@ant-design/icons';
 import { Button, List, Popconfirm } from 'antd';
 import { ListItem, ListTitle } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getRoles } from 'app/pages/MainPage/pages/MemberPage/slice/thunks';
 import {
+  DEFAULT_VALUE_DATE_FORMAT,
   VariableScopes,
   VariableTypes,
+  VariableValueTypes,
 } from 'app/pages/MainPage/pages/VariablePage/constants';
 import {
   RowPermission,
@@ -21,7 +42,9 @@ import { SubjectForm } from 'app/pages/MainPage/pages/VariablePage/SubjectForm';
 import { VariableFormModel } from 'app/pages/MainPage/pages/VariablePage/types';
 import { VariableForm } from 'app/pages/MainPage/pages/VariablePage/VariableForm';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
+import classnames from 'classnames';
 import { CommonFormTypes } from 'globalConstants';
+import { Moment } from 'moment';
 import {
   memo,
   ReactElement,
@@ -34,9 +57,8 @@ import {
 import { monaco } from 'react-monaco-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { SPACE_MD, SPACE_TIMES } from 'styles/StyleConstants';
-import { errorHandle } from 'utils/utils';
-import { v4 as uuidv4 } from 'uuid';
+import { SPACE_MD, SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
+import { errorHandle, uuidv4 } from 'utils/utils';
 import { selectVariables } from '../../../VariablePage/slice/selectors';
 import { getVariables } from '../../../VariablePage/slice/thunks';
 import { ViewViewModelStages } from '../../constants';
@@ -68,6 +90,8 @@ export const Variables = memo(() => {
   ) as string;
   const orgId = useSelector(selectOrgId);
   const publicVariables = useSelector(selectVariables);
+  const t = useI18NPrefix('view.variable');
+  const tg = useI18NPrefix('global');
 
   useEffect(() => {
     if (editorCompletionItemProviderRef) {
@@ -154,35 +178,45 @@ export const Variables = memo(() => {
 
   const save = useCallback(
     (values: VariableFormModel) => {
+      let defaultValue: any = values.defaultValue;
+      if (values.valueType === VariableValueTypes.Date && !values.expression) {
+        defaultValue = values.defaultValue.map(d =>
+          (d as Moment).format(DEFAULT_VALUE_DATE_FORMAT),
+        );
+      }
+
       try {
-        const defaultValue = JSON.stringify(values.defaultValue);
-        if (formType === CommonFormTypes.Add) {
-          dispatch(
-            actions.changeCurrentEditingView({
-              variables: variables.concat({
-                ...values,
-                id: uuidv4(),
-                defaultValue,
-                relVariableSubjects: [],
-              }),
-            }),
-          );
-        } else {
-          dispatch(
-            actions.changeCurrentEditingView({
-              variables: variables.map(v =>
-                v.id === editingVariable!.id
-                  ? { ...editingVariable!, ...values, defaultValue }
-                  : v,
-              ),
-            }),
-          );
+        if (defaultValue !== void 0 && defaultValue !== null) {
+          defaultValue = JSON.stringify(defaultValue);
         }
-        setFormVisible(false);
       } catch (error) {
         errorHandle(error);
         throw error;
       }
+
+      if (formType === CommonFormTypes.Add) {
+        dispatch(
+          actions.changeCurrentEditingView({
+            variables: variables.concat({
+              ...values,
+              id: uuidv4(),
+              defaultValue,
+              relVariableSubjects: [],
+            }),
+          }),
+        );
+      } else {
+        dispatch(
+          actions.changeCurrentEditingView({
+            variables: variables.map(v =>
+              v.id === editingVariable!.id
+                ? { ...editingVariable!, ...values, defaultValue }
+                : v,
+            ),
+          }),
+        );
+      }
+      setFormVisible(false);
     },
     [dispatch, actions, formType, editingVariable, variables],
   );
@@ -203,7 +237,14 @@ export const Variables = memo(() => {
       try {
         const changedRowPermissionsRaw = changedRowPermissions.map(cr => ({
           ...cr,
-          value: JSON.stringify(cr.value),
+          value: JSON.stringify(
+            cr.value &&
+              (editingVariable?.valueType === VariableValueTypes.Date
+                ? cr.value.map(d =>
+                    (d as Moment).format(DEFAULT_VALUE_DATE_FORMAT),
+                  )
+                : cr.value),
+          ),
         }));
         if (
           !comparePermissionChange(
@@ -236,25 +277,33 @@ export const Variables = memo(() => {
     [dispatch, actions, editingVariable, variables],
   );
 
-  const renderTitleText = useCallback(item => {
-    return (
-      <>
-        {item.relVariableSubjects ? '' : <span>[公共]</span>}
-        {item.name}
-      </>
-    );
-  }, []);
+  const renderTitleText = useCallback(
+    item => {
+      const isPrivate = !!item.relVariableSubjects;
+      const isDuplicate = isPrivate
+        ? publicVariables.some(v => v.name === item.name)
+        : variables.some(v => v.name === item.name);
+      return (
+        <ListItemTitle className={classnames({ duplicate: isDuplicate })}>
+          {!isPrivate && <span className="prefix">{t('prefix')}</span>}
+          {item.name}
+          {isDuplicate && <span className="suffix">{t('suffix')}</span>}
+        </ListItemTitle>
+      );
+    },
+    [variables, publicVariables, t],
+  );
 
   const titleProps = useMemo(
     () => ({
-      title: '变量配置',
+      title: t('title'),
       search: true,
       add: {
-        items: [{ key: 'variable', text: '新建变量' }],
+        items: [{ key: 'variable', text: t('add') }],
         callback: showAddForm,
       },
     }),
-    [showAddForm],
+    [showAddForm, t],
   );
 
   return (
@@ -281,7 +330,7 @@ export const Variables = memo(() => {
                 />,
                 <Popconfirm
                   key="del"
-                  title="确认删除？"
+                  title={tg('operation.deleteConfirm')}
                   placement="bottom"
                   onConfirm={del(item.id)}
                 >
@@ -325,8 +374,9 @@ export const Variables = memo(() => {
         scope={VariableScopes.Private}
         orgId={orgId}
         editingVariable={editingVariable}
+        variables={variables}
         visible={formVisible}
-        title="变量"
+        title={t('formTitle')}
         type={formType}
         onSave={save}
         onCancel={hideForm}
@@ -369,5 +419,21 @@ const ListWrapper = styled.div`
 
   .permission {
     color: ${p => p.theme.warning};
+  }
+`;
+
+const ListItemTitle = styled.div`
+  &.duplicate {
+    color: ${p => p.theme.highlight};
+  }
+
+  .prefix {
+    margin-right: ${SPACE_XS};
+    color: ${p => p.theme.textColorDisabled};
+  }
+
+  .suffix {
+    margin-left: ${SPACE_XS};
+    color: ${p => p.theme.highlight};
   }
 `;

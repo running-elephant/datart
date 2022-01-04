@@ -18,6 +18,7 @@
 
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import {
+  AggregateFieldActionType,
   ChartConfig,
   ChartDataSectionConfig,
   ChartDataSectionField,
@@ -400,23 +401,47 @@ export function getNameTextStyle(fontFamily, fontSize, color) {
   };
 }
 
-export function transfromToObjectArray(
+export function transformToObjectArray(
   columns?: string[][],
   metas?: ChartDatasetMeta[],
 ) {
   if (!columns || !metas) {
     return [];
   }
-  return columns.map(col => {
-    let objCol = {};
-    for (let i = 0; i < metas.length; i++) {
+
+  const result: any[] = Array.apply(null, Array(columns.length));
+  for (let j = 0, outterLength = result.length; j < outterLength; j++) {
+    let objCol = {
+      id: j + 1,
+    };
+    for (let i = 0, innerLength = metas.length; i < innerLength; i++) {
       const key = metas?.[i]?.name;
       if (!!key) {
-        objCol[key] = col[i];
+        objCol[key] = columns[j][i];
       }
     }
-    return objCol;
-  });
+    result[j] = objCol;
+  }
+  return result;
+}
+
+// TODO delete this function  #migration
+/**
+ * @deprecated please use new method transformToObjectArray instead
+ * @see transformToObjectArray
+ * @export
+ * @param {string[][]} [columns]
+ * @param {ChartDatasetMeta[]} [metas]
+ * @return {*}
+ */
+export function transfromToObjectArray(
+  columns?: string[][],
+  metas?: ChartDatasetMeta[],
+) {
+  console.warn(
+    'This method `transfromToObjectArray` will be deprecated and can be replaced by `transformToObjectArray`',
+  );
+  return transformToObjectArray(columns, metas);
 }
 
 export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
@@ -429,17 +454,48 @@ export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
   return `${col.aggregate}(${col.colName})`;
 }
 
-export function getColumnRenderName(c?: ChartDataSectionField) {
+export function getColumnRenderOriginName(c?: ChartDataSectionField) {
   if (!c) {
-    return 'unkonwn name';
+    return '[unknown]';
   }
-  if (c.alias?.name) {
-    return c.alias.name;
+  if (c.aggregate === AggregateFieldActionType.NONE) {
+    return c.colName;
   }
   if (c.aggregate) {
     return `${c.aggregate}(${c.colName})`;
   }
   return c.colName;
+}
+
+export function getColumnRenderName(c?: ChartDataSectionField) {
+  if (!c) {
+    return '[unknown]';
+  }
+  if (c.alias?.name) {
+    return c.alias.name;
+  }
+  return getColumnRenderOriginName(c);
+}
+
+export function getUnusedHeaderRows(
+  allRows: Array<{
+    colName?: string;
+  }>,
+  originalRows: Array<{
+    colName?: string;
+    isGroup?: boolean;
+    children?: any[];
+  }>,
+): any[] {
+  const oldFlattenedColNames = originalRows
+    .flatMap(row => flattenHeaderRowsWithoutGroupRow(row))
+    .map(r => r.colName);
+  return (allRows || []).reduce<any[]>((acc, cur) => {
+    if (!oldFlattenedColNames.includes(cur.colName)) {
+      acc.push(cur);
+    }
+    return acc;
+  }, []);
 }
 
 export function diffHeaderRows(
@@ -660,31 +716,6 @@ export function getSeriesTooltips4Rectangular(
   return [];
 }
 
-export function getSeriesTooltips4Polar(
-  params,
-  groupConfigs,
-  aggConfigs,
-  dataColumns,
-) {
-  if (!aggConfigs?.length) {
-    return [];
-  }
-  if (!groupConfigs?.length) {
-    return aggConfigs.map(config =>
-      valueFormatter(config, dataColumns?.[0]?.[getValueByColumnKey(config)]),
-    );
-  }
-  if (groupConfigs?.[0]) {
-    const rowKeyFn = dc =>
-      groupConfigs?.map(config => dc[config?.colName]).join('-');
-    const dataRow = dataColumns.find(dc => rowKeyFn(dc) === params?.name);
-    return aggConfigs.map(config =>
-      valueFormatter(config, dataRow?.[getValueByColumnKey(config)]),
-    );
-  }
-  return [];
-}
-
 export function valueFormatter(config?: ChartDataSectionField, value?: any) {
   return `${getColumnRenderName(config)}: ${toFormattedValue(
     value,
@@ -698,13 +729,18 @@ export function getScatterSymbolSizeFn(
   min,
   cycleRatio?: number,
 ) {
+  min = Math.min(0, min);
   const scaleRatio = cycleRatio || 1;
   const defaultScatterPointPixelSize = 10;
   const distance = max - min === 0 ? 100 : max - min;
 
   return function (val) {
-    return (
-      (val?.[valueIndex] / distance) * scaleRatio * defaultScatterPointPixelSize
+    return Math.max(
+      3,
+      ((val?.[valueIndex] - min) / distance) *
+        scaleRatio *
+        defaultScatterPointPixelSize *
+        2,
     );
   };
 }

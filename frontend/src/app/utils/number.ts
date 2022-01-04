@@ -19,6 +19,7 @@
 import { FieldFormatType, IFieldFormatConfig } from 'app/types/ChartConfig';
 import { dinero } from 'dinero.js';
 import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
+import isFinite from 'lodash/isFinite';
 import moment from 'moment';
 import { isEmpty, pipe } from 'utils/object';
 import { getCurrency, intlFormat } from './currency';
@@ -73,7 +74,7 @@ export function toFormattedValue(
   format?: IFieldFormatConfig,
 ) {
   if (value === null || value === undefined) {
-    return value;
+    return '-';
   }
 
   if (!format || format.type === FieldFormatType.DEFAULT) {
@@ -138,6 +139,10 @@ export function toFormattedValue(
   }
 
   return formattedValue;
+}
+
+export function isNumber(value: any) {
+  return !isEmpty(value) && !isNaN(value) && isFinite(value) && value !== '';
 }
 
 function unitFormater(

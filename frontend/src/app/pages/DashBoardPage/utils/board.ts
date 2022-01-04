@@ -24,16 +24,16 @@ import {
   DataChart,
   ServerDashboard,
   ServerDatachart,
-  ServerView,
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataView } from 'app/types/ChartDataView';
-// import { dataChartServerModel } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transformMeta } from 'app/utils/chartHelper';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
   LAYOUT_COLS,
+  NeedFetchWidgetTypes,
 } from '../constants';
 
 export const getDashBoardByResBoard = (data: ServerDashboard): Dashboard => {
@@ -87,7 +87,11 @@ export const getScheduleBoardInfo = (
   let newBoardInfo: BoardInfo = { ...boardInfo };
   const needFetchItems = Object.values(widgetMap)
     .filter(widget => {
-      if (widget.viewIds.length && widget.viewIds.length > 0) {
+      if (
+        widget.viewIds &&
+        widget.viewIds.length > 0 &&
+        NeedFetchWidgetTypes.includes(widget.config.type)
+      ) {
         return true;
       }
       return false;
@@ -98,6 +102,7 @@ export const getScheduleBoardInfo = (
 
   return newBoardInfo;
 };
+
 export const getInitBoardInfo = (obj: {
   id: string;
   widgetIds?: string[];
@@ -179,22 +184,17 @@ export const getDataChartMap = (dataCharts: DataChart[]) => {
   }, {} as Record<string, DataChart>);
 };
 
-export const getChartDataView = (
-  views: ServerView[],
-  dataCharts: DataChart[],
-) => {
+export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
   const viewViews: ChartDataView[] = [];
   views.forEach(view => {
     const dataChart = dataCharts.find(dc => dc.viewId === view.id);
-    if (dataChart) {
-      let viewView = {
-        ...view,
-        meta: transformMeta(view.model),
-        model: '',
-        computedFields: dataChart.config.computedFields || [],
-      };
-      viewViews.push(viewView);
-    }
+    let viewView = {
+      ...view,
+      meta: transformMeta(view.model),
+      model: '',
+      computedFields: dataChart?.config.computedFields || [],
+    };
+    viewViews.push(viewView);
   });
   return viewViews;
 };

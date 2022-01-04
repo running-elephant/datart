@@ -36,7 +36,7 @@ const BasicFontSizeSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> =
             dropdownMatchSelectWidth
             {...rest}
             {...options}
-            placeholder={t('pleaseSelect')}
+            placeholder={t('select')}
             onChange={value => onChange?.(ancestors, value)}
           >
             {FONT_SIZES.map(o => (

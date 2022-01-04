@@ -17,7 +17,7 @@
  */
 
 import { Select } from 'antd';
-import { ColorPickerPopover } from 'app/components/ReactColorPicker';
+import { ColorPickerPopover } from 'app/components/ColorPicker';
 import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import { CHART_LINE_STYLES, CHART_LINE_WIDTH } from 'globalConstants';
@@ -47,7 +47,7 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           <Group>
             <Select
               dropdownMatchSelectWidth
-              placeholder={t('pleaseSelect')}
+              placeholder={t('select')}
               value={data.value?.type}
               onChange={handleSettingChange('type')}
               bordered={false}
@@ -59,7 +59,7 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
               ))}
             </Select>
             <Select
-              placeholder={t('pleaseSelect')}
+              placeholder={t('select')}
               value={data.value?.width}
               onChange={handleSettingChange('width')}
               bordered={false}

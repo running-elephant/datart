@@ -1,8 +1,27 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   BankFilled,
   ExportOutlined,
   FormOutlined,
   FunctionOutlined,
+  GlobalOutlined,
   ProfileOutlined,
   SafetyCertificateFilled,
   SettingFilled,
@@ -12,6 +31,7 @@ import {
 import { List, Menu, Tooltip } from 'antd';
 import logo from 'app/assets/images/logo.svg';
 import { Avatar, MenuListItem, Popup } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   selectCurrentOrganization,
   selectDownloadPolling,
@@ -23,7 +43,9 @@ import { selectLoggedInUser } from 'app/slice/selectors';
 import { logout } from 'app/slice/thunks';
 import { downloadFile } from 'app/utils/fetch';
 import { BASE_RESOURCE_URL } from 'globalConstants';
+import { changeLang } from 'locales/i18n';
 import React, { cloneElement, useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
@@ -63,7 +85,8 @@ export function Navbar() {
   const matchModules = useRouteMatch<{ moduleName: string }>(
     '/organizations/:orgId/:moduleName',
   );
-
+  const { i18n } = useTranslation();
+  const t = useI18NPrefix('main');
   const brandClick = useCallback(() => {
     history.push('/');
   }, [history]);
@@ -88,49 +111,49 @@ export function Navbar() {
     () => [
       {
         name: 'variables',
-        title: '公共变量设置',
+        title: t('subNavs.variables.title'),
         icon: <FunctionOutlined />,
         module: ResourceTypes.Manager,
       },
       {
         name: 'orgSettings',
-        title: '组织设置',
+        title: t('subNavs.orgSettings.title'),
         icon: <SettingOutlined />,
         module: ResourceTypes.Manager,
       },
     ],
-    [],
+    [t],
   );
 
   const navs = useMemo(
     () => [
       {
         name: 'vizs',
-        title: '可视化',
+        title: t('nav.vizs'),
         icon: <i className="iconfont icon-xietongzhihuidaping" />,
         module: ResourceTypes.Viz,
       },
       {
         name: 'views',
-        title: '数据视图',
+        title: t('nav.views'),
         icon: <i className="iconfont icon-24gf-table" />,
         module: ResourceTypes.View,
       },
       {
         name: 'sources',
-        title: '数据源',
+        title: t('nav.sources'),
         icon: <i className="iconfont icon-shujukupeizhi" />,
         module: ResourceTypes.Source,
       },
       {
         name: 'schedules',
-        title: '定时任务',
+        title: t('nav.schedules'),
         icon: <i className="iconfont icon-fasongyoujian" />,
         module: ResourceTypes.Schedule,
       },
       {
         name: 'members',
-        title: '成员与角色',
+        title: t('nav.members'),
         icon: <i className="iconfont icon-users1" />,
         isActive: (_, location) =>
           !!location.pathname.match(
@@ -140,13 +163,13 @@ export function Navbar() {
       },
       {
         name: 'permissions',
-        title: '权限',
+        title: t('nav.permissions'),
         icon: <SafetyCertificateFilled />,
         module: ResourceTypes.Manager,
       },
       {
         name: 'toSub',
-        title: '设置',
+        title: t('nav.settings'),
         icon: <SettingFilled />,
         isActive: (_, location) => {
           const reg = new RegExp(
@@ -159,7 +182,7 @@ export function Navbar() {
         module: ResourceTypes.Manager,
       },
     ],
-    [subNavs],
+    [subNavs, t],
   );
 
   const showSubNav = useMemo(
@@ -182,6 +205,10 @@ export function Navbar() {
           break;
         case 'password':
           setModifyPasswordVisible(true);
+          break;
+        case 'zh':
+        case 'en':
+          changeLang(key);
           break;
         default:
           break;
@@ -246,11 +273,13 @@ export function Navbar() {
             onVisibleChange={organizationListVisibleChange}
           >
             <li>
-              <Avatar
-                src={`${BASE_RESOURCE_URL}${currentOrganization?.avatar}`}
-              >
-                <BankFilled />
-              </Avatar>
+              <Tooltip title={t('nav.organization.title')} placement="right">
+                <Avatar
+                  src={`${BASE_RESOURCE_URL}${currentOrganization?.avatar}`}
+                >
+                  <BankFilled />
+                </Avatar>
+              </Tooltip>
             </li>
           </Popup>
           <Popup
@@ -261,22 +290,32 @@ export function Navbar() {
                 onClick={userMenuSelect}
               >
                 <MenuListItem
+                  key="language"
+                  prefix={<GlobalOutlined className="icon" />}
+                  title={<p>{t('nav.account.switchLanguage.title')}</p>}
+                  sub
+                >
+                  <MenuListItem key="zh">中文</MenuListItem>
+                  <MenuListItem key="en">English</MenuListItem>
+                </MenuListItem>
+                <Menu.Divider />
+                <MenuListItem
                   key="profile"
                   prefix={<ProfileOutlined className="icon" />}
                 >
-                  <p>账号设置</p>
+                  <p>{t('nav.account.profile.title')}</p>
                 </MenuListItem>
                 <MenuListItem
                   key="password"
                   prefix={<FormOutlined className="icon" />}
                 >
-                  <p>修改密码</p>
+                  <p>{t('nav.account.changePassword.title')}</p>
                 </MenuListItem>
                 <MenuListItem
                   key="logout"
                   prefix={<ExportOutlined className="icon" />}
                 >
-                  <p>退出登录</p>
+                  <p>{t('nav.account.logout.title')}</p>
                 </MenuListItem>
               </Menu>
             }

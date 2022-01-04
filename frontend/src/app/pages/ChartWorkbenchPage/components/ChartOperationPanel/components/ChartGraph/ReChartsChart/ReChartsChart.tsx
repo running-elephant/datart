@@ -21,10 +21,6 @@ import Config from './config';
 import ReChartPie from './ReChartPie';
 
 class ReChartsChart extends ReactChart {
-  constructor() {
-    super('rechart-chart', 'React ReChart Chart', 'preview');
-  }
-
   isISOContainer = 'react-rechart-chart';
   config = Config;
   dependency = [
@@ -34,20 +30,21 @@ class ReChartsChart extends ReactChart {
     'https://unpkg.com/recharts@2.0.8/umd/Recharts.min.js',
   ];
 
+  constructor() {
+    super(ReChartPie, {
+      id: 'rechart-chart',
+      name: 'React ReChart Chart',
+      icon: 'preview',
+    });
+  }
+
   onMount(options, context): void {
     const { Surface, Pie } = context.window.Recharts;
-    this.getInstance().init(ReChartPie);
-    this.getInstance().registerImportDependenies({ Surface, Pie });
-    this.getInstance().mounted(
-      context.document.getElementById(options.containerId),
-    );
+    this.adapter.registerImportDependenies({ Surface, Pie });
+    this.adapter.mounted(context.document.getElementById(options.containerId));
   }
 
   onUpdated({ config }: { config: any }): void {}
-
-  onUnMount(): void {
-    // this.getWrapper().unmount();
-  }
 }
 
 export default ReChartsChart;

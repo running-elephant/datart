@@ -34,6 +34,8 @@ export enum ChartDataViewFieldCategory {
 export type ChartDataViewMeta = {
   id: string;
   name: string;
+  isActive?: boolean;
+  selectedItems?: Array<ChartDataViewMeta>;
   primaryKey?: boolean;
   category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
   type?: ChartDataViewFieldType;
@@ -43,7 +45,6 @@ export type ChartDataViewMeta = {
 export type ChartDataView = View & {
   meta?: ChartDataViewMeta[];
   computedFields?: ChartDataViewMeta[];
-  view?: { config?: string };
 };
 
 export default ChartDataView;

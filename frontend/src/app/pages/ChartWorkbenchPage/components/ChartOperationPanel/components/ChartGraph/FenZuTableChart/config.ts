@@ -45,7 +45,7 @@ const config: ChartConfig = {
   ],
   styles: [
     {
-      label: 'column.title',
+      label: 'column.conditionStyle',
       key: 'column',
       comType: 'group',
       rows: [
@@ -70,6 +70,7 @@ const config: ChartConfig = {
                     .map(c => ({
                       key: c.uid,
                       value: c.uid,
+                      type: c.type,
                       label:
                         c.label || c.aggregate
                           ? `${c.aggregate}(${c.colName})`
@@ -84,62 +85,17 @@ const config: ChartConfig = {
                 comType: 'group',
                 rows: [
                   {
-                    label: 'column.basicStyle',
-                    key: 'basicStyle',
-                    comType: 'group',
-                    options: { expand: true },
-                    rows: [
-                      {
-                        label: 'column.backgroundColor',
-                        key: 'backgroundColor',
-                        comType: 'fontColor',
-                      },
-                      {
-                        label: 'column.align',
-                        key: 'align',
-                        default: 'left',
-                        comType: 'select',
-                        options: {
-                          items: [
-                            { label: '左对齐', value: 'left' },
-                            { label: '居中对齐', value: 'center' },
-                            { label: '右对齐', value: 'right' },
-                          ],
-                        },
-                      },
-                      {
-                        label: 'column.enableFixedCol',
-                        key: 'enableFixedCol',
-                        comType: 'switch',
-                        rows: [
-                          {
-                            label: 'column.fixedColWidth',
-                            key: 'fixedColWidth',
-                            default: 100,
-                            comType: 'inputNumber',
-                          },
-                        ],
-                      },
-                      {
-                        label: 'font',
-                        key: 'font',
-                        comType: 'font',
-                        default: {
-                          fontFamily: 'PingFang SC',
-                          fontSize: '12',
-                          fontWeight: 'normal',
-                          fontStyle: 'normal',
-                          color: 'black',
-                        },
-                      },
-                    ],
-                  },
-                  {
                     label: 'column.conditionStyle',
                     key: 'conditionStyle',
                     comType: 'group',
                     options: { expand: true },
-                    rows: [],
+                    rows: [
+                      {
+                        label: 'column.conditionStylePanel',
+                        key: 'conditionStylePanel',
+                        comType: 'conditionStylePanel',
+                      },
+                    ],
                   },
                 ],
               },
@@ -238,14 +194,20 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'cache.title',
-      key: 'cache',
+      label: 'paging.title',
+      key: 'paging',
       comType: 'group',
       rows: [
         {
-          label: 'cache.title',
-          key: 'panel',
-          comType: 'cache',
+          label: 'paging.pageSize',
+          key: 'pageSize',
+          default: 1000,
+          comType: 'inputNumber',
+          options: {
+            needRefresh: true,
+            step: 1,
+            min: 0,
+          },
         },
       ],
     },
@@ -267,6 +229,7 @@ const config: ChartConfig = {
           enableSort: '开启列排序',
           basicStyle: '基础样式',
           conditionStyle: '条件样式',
+          conditionStylePanel: '条件样式配置器',
           backgroundColor: '背景颜色',
           align: '对齐方式',
           enableFixedCol: '开启固定列宽',
@@ -286,13 +249,9 @@ const config: ChartConfig = {
           autoMerge: '自动合并相同内容',
           enableRaw: '使用原始数据',
         },
-        cache: {
-          title: '数据处理',
-        },
         paging: {
-          title: '分页设置',
-          enablePaging: '启用分页',
-          pageSize: '分页大小',
+          title: '常规',
+          pageSize: '总行数',
         },
       },
     },

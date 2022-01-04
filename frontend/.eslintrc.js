@@ -10,6 +10,21 @@ module.exports = {
   plugins: ['prettier'],
   rules: {
     'prettier/prettier': ['error', prettierOptions],
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: 'lodash',
+            message: 'suggest import xxx from `lodash/xxx`',
+          },
+          {
+            name: 'uuid',
+            message: 'suggest import xxx from `uuid/dist/xxx`',
+          },
+        ],
+      },
+    ],
   },
   parserOptions: {
     ecmaVersion: 2018,

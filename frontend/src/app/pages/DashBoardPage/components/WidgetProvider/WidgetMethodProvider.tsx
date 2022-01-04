@@ -18,7 +18,7 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
-import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams } from 'app/types/DatartChartBase';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
@@ -26,7 +26,6 @@ import React, { FC, useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 import { BoardContext } from '../../contexts/BoardContext';
-import { WidgetContext } from '../../contexts/WidgetContext';
 import {
   WidgetMethodContext,
   WidgetMethodContextProps,
@@ -34,7 +33,7 @@ import {
 import { boardActions } from '../../pages/Board/slice';
 import {
   getChartWidgetDataAsync,
-  getWidgetDataAsync,
+  getWidgetData,
 } from '../../pages/Board/slice/thunk';
 import {
   BoardLinkFilter,
@@ -42,6 +41,7 @@ import {
   WidgetContentChartType,
   WidgetType,
 } from '../../pages/Board/slice/types';
+import { jumpTypes } from '../../pages/BoardEditor/components/SettingJumpModal/config';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
@@ -55,7 +55,7 @@ import {
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
 import {
   getEditChartWidgetDataAsync,
-  getEditWidgetDataAsync,
+  getEditWidgetData,
 } from '../../pages/BoardEditor/slice/thunk';
 import { widgetActionType } from '../WidgetToolBar/config';
 
@@ -64,8 +64,9 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   widgetId,
   children,
 }) => {
+  const t = usePrefixI18N('viz.widget.action');
   const { boardId, editing, renderMode, orgId } = useContext(BoardContext);
-  const widget = useContext(WidgetContext);
+
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -74,10 +75,9 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     (type: WidgetType, wid: string) => {
       if (type === 'container') {
         confirm({
-          // TODO i18n
-          title: '确认删除',
+          title: t('confirmDel'),
           icon: <ExclamationCircleOutlined />,
-          content: '该组件内的组件也会被删除,确认是否删除？',
+          content: t('ContainerConfirmDel'),
           onOk() {
             dispatch(editBoardStackActions.deleteWidgets([wid]));
           },
@@ -91,13 +91,12 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       if (type === 'reset') {
         dispatch(editBoardStackActions.changeBoardHasResetControl(false));
       }
-      dispatch(editBoardStackActions.deleteWidgets([wid]));
-
       if (type === 'controller') {
         dispatch(editWidgetsQueryAction({ boardId }));
       }
+      dispatch(editBoardStackActions.deleteWidgets([wid]));
     },
-    [dispatch, boardId],
+    [dispatch, t, boardId],
   );
   const onWidgetEdit = useCallback(
     (widget: Widget, wid: string) => {
@@ -162,11 +161,11 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     [dispatch],
   );
   const onWidgetGetData = useCallback(
-    (boardId: string, widgetId: string) => {
+    (boardId: string, widget: Widget) => {
       if (editing) {
-        dispatch(getEditWidgetDataAsync({ widgetId }));
+        dispatch(getEditWidgetData({ widget }));
       } else {
-        dispatch(getWidgetDataAsync({ boardId, widgetId, renderMode }));
+        dispatch(getWidgetData({ boardId, widget, renderMode }));
       }
     },
     [dispatch, editing, renderMode],
@@ -246,18 +245,56 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       );
       setTimeout(() => {
         linkRelations.forEach(link => {
-          onWidgetGetData(boardId, link.targetId);
+          if (editing) {
+            dispatch(
+              getEditChartWidgetDataAsync({
+                widgetId: link.targetId,
+                option: {
+                  pageInfo: { pageNo: 1 },
+                },
+              }),
+            );
+          } else {
+            dispatch(
+              getChartWidgetDataAsync({
+                boardId,
+                widgetId: link.targetId,
+                renderMode,
+                option: {
+                  pageInfo: { pageNo: 1 },
+                },
+              }),
+            );
+          }
         });
       }, 60);
     },
-    [onToggleLinkage, onChangeBoardFilter, onWidgetGetData, boardId],
+    [
+      onToggleLinkage,
+      onChangeBoardFilter,
+      editing,
+      dispatch,
+      boardId,
+      renderMode,
+    ],
   );
 
   const toLinkingWidgets = useCallback(
     (widget: Widget, params: ChartMouseEventParams) => {
-      const linkRelations = widget.relations.filter(
-        re => re.config.type === 'widgetToWidget',
-      );
+      const { componentType, seriesType, seriesName } = params;
+      const isTableHandle = componentType === 'table' && seriesType === 'body';
+
+      const linkRelations = widget.relations.filter(re => {
+        const {
+          config: { type, widgetToWidget },
+        } = re;
+        if (type !== 'widgetToWidget') return false;
+        if (isTableHandle) {
+          if (widgetToWidget?.triggerColumn === seriesName) return true;
+          return false;
+        }
+        return true;
+      });
 
       const boardFilters = linkRelations.map(re => {
         let linkageFieldName: string =
@@ -294,20 +331,48 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       onToggleLinkage(true);
       setTimeout(() => {
         boardFilters.forEach(f => {
-          onWidgetGetData(boardId, f.linkerWidgetId);
+          if (editing) {
+            dispatch(
+              getEditChartWidgetDataAsync({
+                widgetId: f.linkerWidgetId,
+                option: {
+                  pageInfo: { pageNo: 1 },
+                },
+              }),
+            );
+          } else {
+            dispatch(
+              getChartWidgetDataAsync({
+                boardId,
+                widgetId: f.linkerWidgetId,
+                renderMode,
+                option: {
+                  pageInfo: { pageNo: 1 },
+                },
+              }),
+            );
+          }
         });
       }, 60);
     },
-    [boardId, dispatch, editing, onToggleLinkage, onWidgetGetData, widgetId],
+    [boardId, dispatch, editing, onToggleLinkage, renderMode, widgetId],
   );
   const clickJump = useCallback(
     (values: { widget: Widget; params: ChartMouseEventParams }) => {
       const { widget, params } = values;
       const jumpConfig = widget.config?.jumpConfig;
+      const targetType = jumpConfig?.targetType || jumpTypes[0].value;
+      const URL = jumpConfig?.URL || '';
+      const queryName = jumpConfig?.queryName || '';
       const targetId = jumpConfig?.target?.relId;
       const jumpFieldName: string = jumpConfig?.field?.jumpFieldName || '';
+      if (
+        params.componentType === 'table' &&
+        jumpFieldName !== params.seriesName
+      )
+        return;
 
-      if (typeof jumpConfig?.filter === 'object') {
+      if (typeof jumpConfig?.filter === 'object' && targetType === 'INTERNAL') {
         const searchParamsStr = urlSearchTransfer.toUrlString({
           [jumpConfig?.filter?.filterId]:
             (params?.data?.rowData?.[jumpFieldName] as string) || '',
@@ -317,22 +382,28 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
             `/organizations/${orgId}/vizs/${targetId}?${searchParamsStr}`,
           );
         }
+      } else if (targetType === 'URL') {
+        let jumpUrl;
+        if (URL.indexOf('?') > -1) {
+          jumpUrl = `${URL}&${queryName}=${params?.data?.rowData?.[jumpFieldName]}`;
+        } else {
+          jumpUrl = `${URL}?${queryName}=${params?.data?.rowData?.[jumpFieldName]}`;
+        }
+        window.location.href = jumpUrl;
       }
     },
     [history, orgId],
   );
   const getTableChartData = useCallback(
-    (options: { widget: Widget; params: any }) => {
+    (options: { widget: Widget; params: any; sorters?: any[] }) => {
       const { params } = options;
-      const pageInfo: Partial<PageInfo> = {
-        pageNo: params.value.page,
-      };
       if (editing) {
         dispatch(
           getEditChartWidgetDataAsync({
             widgetId,
             option: {
-              pageInfo,
+              pageInfo: params?.pageInfo,
+              sorters: params?.sorters,
             },
           }),
         );
@@ -343,7 +414,8 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
             widgetId,
             renderMode,
             option: {
-              pageInfo,
+              pageInfo: params?.pageInfo,
+              sorters: params?.sorters,
             },
           }),
         );
@@ -360,7 +432,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
         case 'info':
           break;
         case 'refresh':
-          onWidgetGetData(boardId, widgetId);
+          onWidgetGetData(boardId, widget);
           break;
         case 'delete':
           onWidgetDelete(widget.config.type, widgetId);
@@ -400,10 +472,22 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
 
   const widgetChartClick = useCallback(
     (widget: Widget, params: ChartMouseEventParams) => {
-      // table 分页
-      if (params?.seriesType === 'table' && params?.seriesName === 'paging') {
-        // table 分页逻辑
-        getTableChartData({ widget, params });
+      if (
+        params.componentType === 'table' &&
+        params.seriesType === 'paging-sort-filter'
+      ) {
+        getTableChartData({
+          widget,
+          params: {
+            pageInfo: { pageNo: params?.value?.pageNo },
+            sorters: [
+              {
+                column: params?.seriesName!,
+                operator: (params?.value as any)?.direction,
+              },
+            ],
+          },
+        });
         return;
       }
       // jump

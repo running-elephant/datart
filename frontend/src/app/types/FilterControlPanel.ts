@@ -19,8 +19,11 @@
 export enum ControllerFacadeTypes {
   DropdownList = 'dropdownList',
   RadioGroup = 'radioGroup',
+  CheckboxGroup = 'checkboxGroup',
   MultiDropdownList = 'multiDropdownList',
   RangeTime = 'rangeTime',
+  RangeTimePicker = 'rangeTimePicker',
+  RecommendTime = 'recommendTime',
   RangeValue = 'rangeValue',
   Text = 'text',
   Tree = 'tree',
@@ -35,7 +38,7 @@ export enum ControllerRadioFacadeTypes {
   Button = 'button',
 }
 
-export enum RelativeOrExactTime {
+export enum TimeFilterValueCategory {
   Relative = 'relative',
   Exact = 'exact',
 }

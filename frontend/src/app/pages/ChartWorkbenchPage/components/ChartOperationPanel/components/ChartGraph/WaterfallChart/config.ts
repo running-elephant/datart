@@ -395,6 +395,24 @@ const config: ChartConfig = {
   ],
   settings: [
     {
+      label: 'paging.title',
+      key: 'paging',
+      comType: 'group',
+      rows: [
+        {
+          label: 'paging.pageSize',
+          key: 'pageSize',
+          default: 1000,
+          comType: 'inputNumber',
+          options: {
+            needRefresh: true,
+            step: 1,
+            min: 0,
+          },
+        },
+      ],
+    },
+    {
       label: 'reference.title',
       key: 'reference',
       comType: 'group',
@@ -404,18 +422,6 @@ const config: ChartConfig = {
           key: 'panel',
           comType: 'reference',
           options: { type: 'modal' },
-        },
-      ],
-    },
-    {
-      label: 'cache.title',
-      key: 'cache',
-      comType: 'group',
-      rows: [
-        {
-          label: 'cache.title',
-          key: 'panel',
-          comType: 'cache',
         },
       ],
     },
@@ -471,8 +477,76 @@ const config: ChartConfig = {
           title: '参考线',
           open: '点击参考线配置',
         },
-        cache: {
-          title: '数据处理',
+      },
+    },
+    {
+      lang: 'en-US',
+      translation: {
+        common: {
+          showAxis: 'Show Axis',
+          inverseAxis: 'Inverse Axis',
+          lineStyle: 'Line Style',
+          borderStyle: 'Border Style',
+          borderType: 'Border Type',
+          borderWidth: 'Border Width',
+          borderColor: 'Border Color',
+          backgroundColor: 'Background Color',
+          showLabel: 'Show Label',
+          unitFont: 'Unit Font',
+          rotate: 'Rotate',
+          position: 'Position',
+          showInterval: 'Show Interval',
+          interval: 'Interval',
+          showTitleAndUnit: 'Show Title and Unit',
+          nameLocation: 'Name Location',
+          nameRotate: 'Name Rotate',
+          nameGap: 'Name Gap',
+          min: 'Min',
+          max: 'Max',
+        },
+        label: {
+          title: 'Label',
+          showLabel: 'Show Label',
+          position: 'Position',
+        },
+        legend: {
+          title: 'Legend',
+          showLegend: 'Show Legend',
+          type: 'Type',
+          selectAll: 'Select All',
+          position: 'Position',
+        },
+        data: {
+          color: 'Color',
+          colorize: 'Colorize',
+        },
+        stack: {
+          title: 'Stack',
+          enable: 'Enable',
+          percentage: 'Percentage',
+          enableTotal: 'Enable Total',
+        },
+        bar: {
+          title: 'Bar Chart',
+          enable: 'Enable Horizon',
+          radius: 'Bar Radius',
+          width: 'Bar Width',
+          gap: 'Bar Gap',
+        },
+        xAxis: {
+          title: 'X Axis',
+        },
+        yAxis: {
+          title: 'Y Axis',
+        },
+        splitLine: {
+          title: 'Splite Line',
+          showHorizonLine: 'Show Horizontal Line',
+          showVerticalLine: 'Show Vertical Line',
+        },
+        reference: {
+          title: 'Reference Line',
+          open: 'Open',
         },
       },
     },

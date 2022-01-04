@@ -32,7 +32,6 @@ import {
 } from 'utils/object';
 import { GroupLayout } from '.';
 import {
-  BaiscSelector,
   BasicCheckbox,
   BasicColorSelector,
   BasicFont,
@@ -43,14 +42,17 @@ import {
   BasicInputPercentage,
   BasicLine,
   BasicMarginWidth,
+  BasicRadio,
+  BasicSelector,
   BasicSlider,
   BasicSwitch,
   BasicText,
   BasicUnControlledTabPanel,
 } from '../Basic';
 import {
-  DataCachePanel,
+  ConditionStylePanel,
   DataReferencePanel,
+  FontAlignment,
   ListTemplatePanel,
   UnControlledTableHeaderPanel,
 } from '../Customize';
@@ -68,6 +70,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
     onChange,
     dataConfigs,
     flatten,
+    context,
   }) => {
     useEffect(() => {
       const key = data?.watcher?.deps?.[0] as string;
@@ -96,6 +99,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
         });
         onChange?.(ancestors, newData);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dependency]);
 
     const handleDataChange = (
@@ -116,6 +120,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
         translate,
         onChange: handleDataChange,
         dataConfigs,
+        context,
       };
 
       switch (data.comType) {
@@ -126,7 +131,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
         case ChartStyleSectionComponentType.INPUT:
           return <BasicInput {...props} />;
         case ChartStyleSectionComponentType.SELECT:
-          return <BaiscSelector {...props} />;
+          return <BasicSelector {...props} />;
         case ChartStyleSectionComponentType.TABS:
           return <BasicUnControlledTabPanel {...props} />;
         case ChartStyleSectionComponentType.FONT:
@@ -149,16 +154,20 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           return <ListTemplatePanel {...props} />;
         case ChartStyleSectionComponentType.LINE:
           return <BasicLine {...props} />;
-        case ChartStyleSectionComponentType.CACHE:
-          return <DataCachePanel {...props} />;
         case ChartStyleSectionComponentType.REFERENCE:
           return <DataReferencePanel {...props} />;
         case ChartStyleSectionComponentType.TABLEHEADER:
           return <UnControlledTableHeaderPanel {...props} />;
+        case ChartStyleSectionComponentType.CONDITIONSTYLE:
+          return <ConditionStylePanel {...props} />;
         case ChartStyleSectionComponentType.GROUP:
           return <GroupLayout {...props} />;
         case ChartStyleSectionComponentType.TEXT:
           return <BasicText {...props} />;
+        case ChartStyleSectionComponentType.RADIO:
+          return <BasicRadio {...props} />;
+        case ChartStyleSectionComponentType.FontAlignment:
+          return <FontAlignment {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

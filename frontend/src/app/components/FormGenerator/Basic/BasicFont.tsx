@@ -17,7 +17,7 @@
  */
 
 import { Select } from 'antd';
-import { ColorPickerPopover } from 'app/components/ReactColorPicker';
+import { ColorPickerPopover } from 'app/components/ColorPicker';
 import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import {
@@ -36,7 +36,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
     const { comType, options, ...rest } = data;
 
-    const hanldePickerSelect = value => {
+    const handlePickerSelect = value => {
       handleSettingChange('color')(value);
     };
 
@@ -50,19 +50,22 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
       <BW label={!options?.hideLabel ? t(data.label) : ''}>
         <Group>
           <Select
-            placeholder={t('pleaseSelect')}
+            placeholder={t('select')}
             value={data.value?.fontFamily}
             dropdownMatchSelectWidth={false}
             onChange={handleSettingChange('fontFamily')}
           >
-            {FONT_FAMILIES.map(o => (
-              <Select.Option key={o.value} value={o.value}>
-                {o.name}
+            {(options?.fontFamilies || FONT_FAMILIES).map(o => (
+              <Select.Option
+                key={typeof o === 'string' ? o : o.value}
+                value={typeof o === 'string' ? o : o.value}
+              >
+                {typeof o === 'string' ? o : o.name}
               </Select.Option>
             ))}
           </Select>
           <Select
-            placeholder={t('pleaseSelect')}
+            placeholder={t('select')}
             value={data.value?.fontWeight}
             onChange={handleSettingChange('fontWeight')}
           >
@@ -76,7 +79,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
         <WithColorPicker>
           <Group>
             <Select
-              placeholder={t('pleaseSelect')}
+              placeholder={t('select')}
               value={data.value?.fontSize}
               onChange={handleSettingChange('fontSize')}
             >
@@ -87,7 +90,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
               ))}
             </Select>
             <Select
-              placeholder={t('pleaseSelect')}
+              placeholder={t('select')}
               value={data.value?.fontStyle}
               onChange={handleSettingChange('fontStyle')}
             >
@@ -102,7 +105,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
             {...rest}
             {...options}
             defaultValue={data.value?.color}
-            onSubmit={hanldePickerSelect}
+            onSubmit={handlePickerSelect}
           />
         </WithColorPicker>
       </BW>

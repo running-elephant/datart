@@ -30,11 +30,11 @@ import {
   getSeriesTooltips4Scatter,
   getStyleValueByGroup,
   getValueByColumnKey,
-  transfromToObjectArray,
+  transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import Config from './config';
 
 class BasicFunnelChart extends Chart {
@@ -99,23 +99,37 @@ class BasicFunnelChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
-    const objDataColumns = transfromToObjectArray(
+    const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
     );
+    const dataList = !groupConfigs.length
+      ? objDataColumns
+      : objDataColumns?.sort(
+          (a, b) =>
+            b?.[getValueByColumnKey(aggregateConfigs[0])] -
+            a?.[getValueByColumnKey(aggregateConfigs[0])],
+        );
+    const aggregateList = !groupConfigs.length
+      ? aggregateConfigs?.sort(
+          (a, b) =>
+            objDataColumns?.[0]?.[getValueByColumnKey(b)] -
+            objDataColumns?.[0]?.[getValueByColumnKey(a)],
+        )
+      : aggregateConfigs;
 
     const series = this.getSeries(
       styleConfigs,
-      aggregateConfigs,
+      aggregateList,
       groupConfigs,
-      objDataColumns,
+      dataList,
       infoConfigs,
     );
 
     return {
       tooltip: this.getFunnelChartTooltip(
         groupConfigs,
-        aggregateConfigs,
+        aggregateList,
         infoConfigs,
       ),
       legend: this.getLegendStyle(styleConfigs),
@@ -244,7 +258,7 @@ class BasicFunnelChart extends Chart {
         return {
           ...aggConfig,
           select: selectAll,
-          value: aggregateConfigs
+          value: [aggConfig]
             .concat(infoConfigs)
             .map(config => dc?.[getValueByColumnKey(config)]),
           name: getColumnRenderName(aggConfig),
@@ -272,6 +286,7 @@ class BasicFunnelChart extends Chart {
           shadowColor: 'rgba(0, 0, 0, 0.5)',
         },
         label: this.getLabelStyle(styles),
+        labelLayout: { hideOverlap: true },
         data: this.getFunnelSeriesData(datas),
       };
     }
@@ -355,10 +370,12 @@ class BasicFunnelChart extends Chart {
               }`,
             ]
           : [];
-        const aggTooltips = getSeriesTooltips4Scatter(
-          [params],
-          aggregateConfigs.concat(infoConfigs),
-        );
+        const aggTooltips = !!groupConfigs?.length
+          ? getSeriesTooltips4Scatter(
+              [params],
+              aggregateConfigs.concat(infoConfigs),
+            )
+          : getSeriesTooltips4Scatter([params], [data].concat(infoConfigs));
         tooltips = tooltips.concat(aggTooltips);
         if (data.conversion) {
           tooltips.push(`转化率: ${data.conversion}%`);
