@@ -202,6 +202,7 @@ export const ChartStyleSectionComponentType = {
   MARGIN_WIDTH: 'marginWidth',
   TEXT: 'text',
   CONDITIONSTYLE: 'conditionStylePanel',
+  RADIO: 'radio',
 };
 
 type ChartConfigBase = {

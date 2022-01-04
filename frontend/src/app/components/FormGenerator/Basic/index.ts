@@ -25,6 +25,7 @@ export { default as BasicInputNumber } from './BasicInputNumber';
 export { default as BasicInputPercentage } from './BasicInputPercentage';
 export { default as BasicLine } from './BasicLine';
 export { default as BasicMarginWidth } from './BasicMarginWidth';
+export { default as BasicRadio } from './BasicRadio';
 export { default as BasicSelector } from './BasicSelector';
 export { default as BasicSlider } from './BasicSlider';
 export { default as BasicSwitch } from './BasicSwitch';

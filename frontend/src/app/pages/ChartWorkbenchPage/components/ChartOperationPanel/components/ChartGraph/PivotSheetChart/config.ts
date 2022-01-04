@@ -136,6 +136,26 @@ const config: ChartConfig = {
           default: false,
           comType: 'checkbox',
         },
+        {
+          label: 'style.metricNameShowIn.label',
+          key: 'metricNameShowIn',
+          default: true,
+          comType: 'radio',
+          options: {
+            items: [
+              {
+                key: 'inCol',
+                label: '列表头',
+                value: true,
+              },
+              {
+                key: 'inRow',
+                label: '行表头',
+                value: false,
+              },
+            ],
+          },
+        },
       ],
     },
     {
@@ -314,6 +334,9 @@ const config: ChartConfig = {
           enableSelectedHighlight: '启用选中高亮',
           enableAdjustRowHeight: '启用调整行高',
           enableAdjustColumnWidth: '启用调整列宽',
+          metricNameShowIn: {
+            label: '指标名称位置',
+          },
           tableSize: '表格大小',
           tableHeaderStyle: '表头样式',
           tableBodyStyle: '表体样式',
@@ -349,6 +372,9 @@ const config: ChartConfig = {
           enableSelectedHighlight: 'Enable Selected Highlight',
           enableAdjustRowHeight: 'Enable Adjust Row Height',
           enableAdjustColumnWidth: 'Enable Adjust Column Width',
+          metricNameShowIn: {
+            label: 'Metric Name Position',
+          },
           tableSize: 'Table Size',
           tableHeaderStyle: 'Table Header Style',
           tableBodyStyle: 'Table Body Style',

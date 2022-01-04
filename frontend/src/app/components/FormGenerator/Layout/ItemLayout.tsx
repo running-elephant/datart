@@ -42,6 +42,7 @@ import {
   BasicInputPercentage,
   BasicLine,
   BasicMarginWidth,
+  BasicRadio,
   BasicSelector,
   BasicSlider,
   BasicSwitch,
@@ -162,6 +163,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           return <GroupLayout {...props} />;
         case ChartStyleSectionComponentType.TEXT:
           return <BasicText {...props} />;
+        case ChartStyleSectionComponentType.RADIO:
+          return <BasicRadio {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }
