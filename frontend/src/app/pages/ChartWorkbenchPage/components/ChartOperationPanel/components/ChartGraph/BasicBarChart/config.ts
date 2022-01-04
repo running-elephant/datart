@@ -171,6 +171,7 @@ const config: ChartConfig = {
           comType: 'select',
           default: 'top',
           options: {
+            // TODO(Stephen): to be extract customize LabelPosition Component
             items: [
               { label: '上', value: 'top' },
               { label: '左', value: 'left' },

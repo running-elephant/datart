@@ -20,6 +20,7 @@ import { FONT_FAMILY } from 'styles/StyleConstants';
 
 export const DATARTSEPERATOR = '@datart@';
 export const CHARTCONFIG_FIELD_PLACEHOLDER_UID = '@placeholder@';
+export const DATART_TRANSLATE_HOLDER = '@global@';
 
 export enum StorageKeys {
   AuthorizationToken = 'AUTHORIZATION_TOKEN',

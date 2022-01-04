@@ -202,6 +202,10 @@ export const ChartStyleSectionComponentType = {
   MARGIN_WIDTH: 'marginWidth',
   TEXT: 'text',
   CONDITIONSTYLE: 'conditionStylePanel',
+  RADIO: 'radio',
+
+  // Customize Component
+  FontAlignment: 'fontAlignment',
 };
 
 type ChartConfigBase = {
@@ -333,6 +337,12 @@ export type ChartStyleSectionRowOption = {
   getItems?: (cols) => Array<ChartStyleSelectorItem>;
   needRefresh?: boolean;
   fontFamilies?: string[];
+
+  /**
+   * Suppport Components: @see BasicRadio, @see BasicSelector and etc
+   * Default is false for now, will be change in futrue version
+   */
+  translateItemLabel?: boolean;
 };
 
 export type ChartStyleSelectorItem = {
