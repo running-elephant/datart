@@ -21,16 +21,16 @@ import { ChartConfig } from 'app/types/ChartConfig';
 const config: ChartConfig = {
   datas: [
     {
-      label: 'datas.row',
-      key: 'row',
+      label: 'datas.column',
+      key: 'column',
       type: 'group',
       options: {
         sortable: { backendSort: false },
       },
     },
     {
-      label: 'datas.column',
-      key: 'column',
+      label: 'datas.row',
+      key: 'row',
       type: 'group',
       options: {
         sortable: { backendSort: false },
