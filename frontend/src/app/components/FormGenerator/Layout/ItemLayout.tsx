@@ -52,6 +52,7 @@ import {
 import {
   ConditionStylePanel,
   DataReferencePanel,
+  FontAlignment,
   ListTemplatePanel,
   UnControlledTableHeaderPanel,
 } from '../Customize';
@@ -165,6 +166,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           return <BasicText {...props} />;
         case ChartStyleSectionComponentType.RADIO:
           return <BasicRadio {...props} />;
+        case ChartStyleSectionComponentType.FontAlignment:
+          return <FontAlignment {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

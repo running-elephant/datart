@@ -203,6 +203,9 @@ export const ChartStyleSectionComponentType = {
   TEXT: 'text',
   CONDITIONSTYLE: 'conditionStylePanel',
   RADIO: 'radio',
+
+  // Customize Component
+  FontAlignment: 'fontAlignment',
 };
 
 type ChartConfigBase = {
