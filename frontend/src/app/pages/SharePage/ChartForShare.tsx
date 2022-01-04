@@ -42,7 +42,7 @@ import {
 } from './slice/thunks';
 
 const TitleHeight = 100;
-const ChartPreviewBoardForShare: FC<{
+const ChartForShare: FC<{
   style?: CSSProperties;
   chartPreview?: ChartPreview;
   filterSearchParams?: FilterSearchParams;
@@ -79,7 +79,6 @@ const ChartPreviewBoardForShare: FC<{
     const headlessBrowserRenderSign = useSelector(
       selectHeadlessBrowserRenderSign,
     );
-    console.log('+controlH', controlH);
     useMount(() => {
       if (!chartPreview) {
         return;
@@ -183,7 +182,7 @@ const ChartPreviewBoardForShare: FC<{
   },
 );
 
-export default ChartPreviewBoardForShare;
+export default ChartForShare;
 
 const StyledChartPreviewBoard = styled.div`
   display: flex;
