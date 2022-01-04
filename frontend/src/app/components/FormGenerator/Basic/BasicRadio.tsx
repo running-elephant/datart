@@ -46,7 +46,7 @@ const BasicRadio: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           {items?.map(o => {
             return (
               <Radio key={o.key} value={o.value}>
-                {o.label}
+                {t(o.label)}
               </Radio>
             );
           })}

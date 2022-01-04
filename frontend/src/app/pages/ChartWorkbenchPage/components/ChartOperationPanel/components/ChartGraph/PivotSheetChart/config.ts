@@ -145,12 +145,12 @@ const config: ChartConfig = {
             items: [
               {
                 key: 'inCol',
-                label: '列表头',
+                label: 'style.metricNameShowIn.inCol',
                 value: true,
               },
               {
                 key: 'inRow',
-                label: '行表头',
+                label: 'style.metricNameShowIn.inRow',
                 value: false,
               },
             ],
@@ -336,6 +336,8 @@ const config: ChartConfig = {
           enableAdjustColumnWidth: '启用调整列宽',
           metricNameShowIn: {
             label: '指标名称位置',
+            inCol: '列表头',
+            inRow: '行表头',
           },
           tableSize: '表格大小',
           tableHeaderStyle: '表头样式',
@@ -374,6 +376,8 @@ const config: ChartConfig = {
           enableAdjustColumnWidth: 'Enable Adjust Column Width',
           metricNameShowIn: {
             label: 'Metric Name Position',
+            inCol: 'Col Header',
+            inRow: 'Row Header',
           },
           tableSize: 'Table Size',
           tableHeaderStyle: 'Table Header Style',
