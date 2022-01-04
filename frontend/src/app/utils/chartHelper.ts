@@ -412,7 +412,7 @@ export function transformToObjectArray(
   const result: any[] = Array.apply(null, Array(columns.length));
   for (let j = 0, outterLength = result.length; j < outterLength; j++) {
     let objCol = {
-      id: j,
+      id: j + 1,
     };
     for (let i = 0, innerLength = metas.length; i < innerLength; i++) {
       const key = metas?.[i]?.name;

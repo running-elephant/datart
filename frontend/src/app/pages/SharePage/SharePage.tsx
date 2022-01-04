@@ -36,7 +36,7 @@ import { urlSearchTransfer } from '../MainPage/pages/VizPage/utils';
 import { useStoryBoardSlice } from '../StoryBoardPage/slice';
 import { selectShareStoryBoard } from '../StoryBoardPage/slice/selectors';
 import BoardForShare from './BoardForShare';
-import ChartPreviewBoardForShare from './ChartPreviewBoardForShare';
+import ChartForShare from './ChartForShare';
 import { DownloadTaskContainer } from './DownloadTaskContainer';
 import PasswordModal from './PasswordModal';
 import { downloadShareDataChartFile } from './sercive';
@@ -191,7 +191,7 @@ export function SharePage() {
             onLoadTasks={onLoadShareTask}
             onDownloadFile={onDownloadFile}
           >
-            <ChartPreviewBoardForShare
+            <ChartForShare
               chartPreview={chartPreview}
               onCreateDataChartDownloadTask={onMakeShareDownloadDataTask}
             />

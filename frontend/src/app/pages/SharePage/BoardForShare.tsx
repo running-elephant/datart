@@ -38,7 +38,7 @@ import { OnLoadTasksType } from '../MainPage/Navbar/DownloadListPopup';
 import { DownloadTask } from '../MainPage/slice/types';
 import { DownloadTaskContainer } from './DownloadTaskContainer';
 import { HeadlessBrowserIdentifier } from './HeadlessBrowserIdentifier';
-
+const TitleHeight = 60;
 export interface ShareBoardProps {
   dashboard: Dashboard;
   renderMode: VizRenderMode;
@@ -75,7 +75,24 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
     }, [hasFetchItems, needFetchItems]);
 
     // for sever Browser
-
+    const { taskW, taskH } = useMemo(() => {
+      const taskWH = {
+        taskW: 0,
+        taskH: 0,
+      };
+      if (boardWidthHeight) {
+        taskWH.taskW = boardWidthHeight[0] || 0;
+      }
+      if (dashboard) {
+        if (dashboard?.config?.type === 'free') {
+          const { width, height } = dashboard.config;
+          const ratio = width / (height || 1) || 1;
+          const targetHeight = taskWH.taskW / ratio;
+          taskWH.taskH = targetHeight;
+        }
+      }
+      return taskWH;
+    }, [boardWidthHeight, dashboard]);
     const boardDownLoadAction = useCallback(
       (params: { boardId: string }) => async dispatch => {
         const { boardId } = params;
@@ -135,8 +152,8 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
         {viewBoard}
         <HeadlessBrowserIdentifier
           renderSign={allItemFetched}
-          width={Number(boardWidthHeight[0]) || 0}
-          height={Number(boardWidthHeight[1]) || 0}
+          width={Number(taskW)}
+          height={Number(taskH) + TitleHeight}
         />
       </DndProvider>
     );

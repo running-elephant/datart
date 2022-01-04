@@ -535,7 +535,7 @@
       "data": {
         "dimension": "维度",
         "metrics": "指标",
-        "mixed": "混合",
+        "mixed": "字段",
         "filter": "筛选",
         "colorize": "颜色",
         "colorRange": "Range Color",
