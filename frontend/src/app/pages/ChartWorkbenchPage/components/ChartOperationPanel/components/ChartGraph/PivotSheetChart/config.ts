@@ -142,6 +142,7 @@ const config: ChartConfig = {
           default: true,
           comType: 'radio',
           options: {
+            translateItemLabel: true,
             items: [
               {
                 key: 'inCol',

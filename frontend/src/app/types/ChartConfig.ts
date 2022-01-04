@@ -337,6 +337,12 @@ export type ChartStyleSectionRowOption = {
   getItems?: (cols) => Array<ChartStyleSelectorItem>;
   needRefresh?: boolean;
   fontFamilies?: string[];
+
+  /**
+   * Suppport Components: @see BasicRadio, @see BasicSelector and etc
+   * Default is false for now, will be change in futrue version
+   */
+  translateItemLabel?: boolean;
 };
 
 export type ChartStyleSelectorItem = {

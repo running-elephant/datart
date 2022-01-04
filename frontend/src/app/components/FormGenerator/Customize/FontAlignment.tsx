@@ -28,6 +28,7 @@ const template = {
   default: 'left',
   comType: 'select',
   options: {
+    translateItemLabel: true,
     items: [
       {
         label: '@global@.viz.common.enum.fontAlignment.left',

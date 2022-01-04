@@ -28,6 +28,7 @@ const BasicRadio: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { value, comType, options, ...rest } = row;
     const items = options?.items || [];
+    const needTranslate = !!options?.translateItemLabel;
 
     const handleValueChange = e => {
       const newValue = e.target.value;
@@ -46,7 +47,7 @@ const BasicRadio: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           {items?.map(o => {
             return (
               <Radio key={o.key} value={o.value}>
-                {t(o.label)}
+                {needTranslate ? t(o.label) : o?.label}
               </Radio>
             );
           })}

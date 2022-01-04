@@ -36,6 +36,7 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
   }) => {
     const { comType, options, ...rest } = row;
     const hideLabel = !!options?.hideLabel;
+    const needTranslate = !!options?.translateItemLabel;
 
     const handleSelectorValueChange = value => {
       onChange?.(ancestors, value, options?.needRefresh);
@@ -78,11 +79,11 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
         >
           {safeInvokeAction()?.map((o, index) => {
             const key = isEmpty(o['key']) ? index : o.key;
-            const label = isEmpty(o['label']) ? o : t(o.label);
+            const label = isEmpty(o['label']) ? o : o.label;
             const value = isEmpty(o['value']) ? o : o.value;
             return (
               <Select.Option key={key} value={value}>
-                {label}
+                {needTranslate ? t(label) : label}
               </Select.Option>
             );
           })}
