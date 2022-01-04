@@ -25,6 +25,11 @@ import {
 import BasicTableChart from '../BasicTableChart';
 import Config from './config';
 
+/**
+ * @deprecated Please use @see PivotSheetChart instead
+ * @class FenZuTableChart
+ * @extends {BasicTableChart}
+ */
 class FenZuTableChart extends BasicTableChart {
   config = Config;
 
