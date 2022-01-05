@@ -57,7 +57,7 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
   const currentEditingViewKey = useSelector(selectCurrentEditingViewKey);
   const orgId = useSelector(selectOrgId);
   const viewsData = useSelector(selectViews);
-  const t = useI18NPrefix('view.form');
+  const t = useI18NPrefix('view.saveForm');
   const tg = useI18NPrefix('global');
 
   useEffect(() => {
