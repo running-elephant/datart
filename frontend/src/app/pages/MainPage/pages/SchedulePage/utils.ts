@@ -1,6 +1,6 @@
+import { TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import { PermissionLevels, ResourceTypes } from '../PermissionPage/constants';
-import { DEFAULT_VALUE_DATE_FORMAT } from '../VariablePage/constants';
 import { JobTypes, TimeModes, VizTypes } from './constants';
 import { AddScheduleParams, Schedule, VizContentsItem } from './slice/types';
 import { FormValues } from './types';
@@ -105,12 +105,8 @@ export const toScheduleSubmitParams = (
       ? cronExpression
       : getCronExpressionByPartition(values),
     type: jobType as JobTypes,
-    startDate: dateRange[0]
-      ? dateRange[0].format(DEFAULT_VALUE_DATE_FORMAT)
-      : undefined,
-    endDate: dateRange[1]
-      ? dateRange[1].format(DEFAULT_VALUE_DATE_FORMAT)
-      : undefined,
+    startDate: dateRange[0] ? dateRange[0].format(TIME_FORMATTER) : undefined,
+    endDate: dateRange[1] ? dateRange[1].format(TIME_FORMATTER) : undefined,
     orgId,
     config: jobConfigStr,
   };

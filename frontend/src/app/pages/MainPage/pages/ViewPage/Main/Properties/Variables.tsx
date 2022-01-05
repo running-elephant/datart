@@ -29,7 +29,6 @@ import { ListItem, ListTitle } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getRoles } from 'app/pages/MainPage/pages/MemberPage/slice/thunks';
 import {
-  DEFAULT_VALUE_DATE_FORMAT,
   VariableScopes,
   VariableTypes,
   VariableValueTypes,
@@ -43,7 +42,7 @@ import { VariableFormModel } from 'app/pages/MainPage/pages/VariablePage/types';
 import { VariableForm } from 'app/pages/MainPage/pages/VariablePage/VariableForm';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import classnames from 'classnames';
-import { CommonFormTypes } from 'globalConstants';
+import { CommonFormTypes, TIME_FORMATTER } from 'globalConstants';
 import { Moment } from 'moment';
 import {
   memo,
@@ -181,7 +180,7 @@ export const Variables = memo(() => {
       let defaultValue: any = values.defaultValue;
       if (values.valueType === VariableValueTypes.Date && !values.expression) {
         defaultValue = values.defaultValue.map(d =>
-          (d as Moment).format(DEFAULT_VALUE_DATE_FORMAT),
+          (d as Moment).format(TIME_FORMATTER),
         );
       }
 
@@ -240,9 +239,7 @@ export const Variables = memo(() => {
           value: JSON.stringify(
             cr.value &&
               (editingVariable?.valueType === VariableValueTypes.Date
-                ? cr.value.map(d =>
-                    (d as Moment).format(DEFAULT_VALUE_DATE_FORMAT),
-                  )
+                ? cr.value.map(d => (d as Moment).format(TIME_FORMATTER))
                 : cr.value),
           ),
         }));

@@ -144,7 +144,7 @@ export enum FilterSqlOperator {
   GreaterThanOrEqual = 'GTE',
 }
 
-export const FILTER_TIME_FORMATTER_IN_QUERY = 'yyyy-MM-DD HH:mm:ss';
+export const TIME_FORMATTER = 'YYYY-MM-DD HH:mm:ss';
 
 export const CONTROLLER_WIDTH_OPTIONS = [
   { label: 'auto', value: 'auto' },

@@ -31,5 +31,3 @@ export enum VariableValueTypes {
   Date = 'DATE',
   Expression = 'FRAGMENT',
 }
-
-export const DEFAULT_VALUE_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
