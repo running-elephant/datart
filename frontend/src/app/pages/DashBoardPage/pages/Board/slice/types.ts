@@ -280,7 +280,7 @@ export type MediaWidgetContent = {
   timerConfig?: {
     time: {
       timeDuration: number; // 定时器刷新时间
-      timeFormat: string; // 'YYYY-MM-DD HH:mm:ss'
+      timeFormat: string; //
     };
     font: {
       color: string;

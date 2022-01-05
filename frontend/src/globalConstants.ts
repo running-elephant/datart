@@ -143,7 +143,7 @@ export enum FilterSqlOperator {
   LessThanOrEqual = 'LTE',
   GreaterThanOrEqual = 'GTE',
 }
-
+export const DATE_FORMATTER = 'YYYY-MM-DD';
 export const TIME_FORMATTER = 'YYYY-MM-DD HH:mm:ss';
 
 export const CONTROLLER_WIDTH_OPTIONS = [
