@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 import { Layout } from 'antd';
-import { vizActions } from 'app/pages/MainPage/pages/VizPage/slice';
 import React, {
   memo,
   RefObject,
@@ -129,7 +128,6 @@ export const StoryPlayer: React.FC<{ storyId: string }> = memo(
           keyboard: {
             27: () => {
               // disabled esc
-              dispatch(vizActions.changePlayingStoryId(''));
             }, // do something custom when ESC is pressed
           },
         });

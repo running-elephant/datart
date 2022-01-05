@@ -19,7 +19,6 @@ import { Layout, message } from 'antd';
 import { Split } from 'app/components';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
-import { vizActions } from 'app/pages/MainPage/pages/VizPage/slice';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { publishViz } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
 import { StoryContext } from 'app/pages/StoryBoardPage/contexts/StoryContext';
@@ -82,9 +81,8 @@ export const StoryPagePreview: React.FC<{
     setEditorVisible(c => !c);
   }, []);
   const playStory = useCallback(() => {
-    message.info(t('playTip'));
-    dispatch(vizActions.changePlayingStoryId(storyId || ''));
-  }, [dispatch, storyId, t]);
+    window.open(`${storyId}/storyPlay`, '_blank');
+  }, [storyId]);
 
   useEffect(() => {
     if (sortedPages.length === 0) {

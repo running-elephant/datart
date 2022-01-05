@@ -28,7 +28,6 @@ export interface VizState {
   tabs: VizTab[];
   selectedTab: string;
   dataChartListLoading: boolean;
-  playingStoryId?: string;
   chartPreviews: ChartPreview[];
 }
 
@@ -95,7 +94,7 @@ export interface VizTab {
 export interface AddVizParams {
   viz: {
     name: string;
-    index:number | null;
+    index: number | null;
     description?: string;
     parentId?: string | null;
     orgId: string;
@@ -115,7 +114,7 @@ export interface UnarchiveVizParams {
     name: string;
     vizType: VizType;
     parentId: string | null;
-    index:number | null;
+    index: number | null;
   };
   resolve: () => void;
 }
