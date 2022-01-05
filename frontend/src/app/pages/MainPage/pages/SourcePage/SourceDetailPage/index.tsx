@@ -402,7 +402,7 @@ export function SourceDetailPage() {
                 rules={[
                   {
                     required: true,
-                    message: `${t('type')}${tg('validation.required')}`,
+                    message: `${t('form.type')}${tg('validation.required')}`,
                   },
                 ]}
               >
