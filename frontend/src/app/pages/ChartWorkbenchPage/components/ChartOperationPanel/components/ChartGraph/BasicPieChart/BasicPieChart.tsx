@@ -272,7 +272,13 @@ class BasicPieChart extends Chart {
     const position = getStyleValueByGroup(styles, 'label', 'position');
     const font = getStyleValueByGroup(styles, 'label', 'font');
     const formatter = this.getLabelFormatter(styles);
-    return { show, position, ...font, formatter };
+
+    return {
+      show: position === 'center' ? false : show,
+      position,
+      ...font,
+      formatter,
+    };
   }
 
   getLabelFormatter(styles) {
