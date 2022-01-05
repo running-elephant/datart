@@ -398,7 +398,7 @@ export function SourceDetailPage() {
               </Form.Item>
               <Form.Item
                 name="type"
-                label={t('type')}
+                label={t('form.type')}
                 rules={[
                   {
                     required: true,
