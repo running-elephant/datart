@@ -19,11 +19,12 @@
 import { CheckOutlined } from '@ant-design/icons';
 import { Button, DatePicker, Input, InputNumber, Space, Tag } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE, SPACE_TIMES } from 'styles/StyleConstants';
-import { DEFAULT_VALUE_DATE_FORMAT, VariableValueTypes } from './constants';
+import { VariableValueTypes } from './constants';
 
 interface DefaultValueProps {
   type: VariableValueTypes;
@@ -117,7 +118,7 @@ export const DefaultValue = memo(
       case VariableValueTypes.Date:
         conditionalInputComponent = (
           <DatePicker
-            format={DEFAULT_VALUE_DATE_FORMAT}
+            format={TIME_FORMATTER}
             className="input"
             disabled={!!disabled}
             onOk={datePickerConfirm}
@@ -158,7 +159,7 @@ export const DefaultValue = memo(
                   const label =
                     type !== VariableValueTypes.Date
                       ? val
-                      : moment(val).format(DEFAULT_VALUE_DATE_FORMAT);
+                      : moment(val).format(TIME_FORMATTER);
                   return (
                     <Tag
                       key={label}

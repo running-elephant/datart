@@ -34,7 +34,7 @@ import {
   Tooltip,
 } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { CommonFormTypes } from 'globalConstants';
+import { CommonFormTypes, TIME_FORMATTER } from 'globalConstants';
 import { Moment } from 'moment';
 import { Key, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -54,12 +54,7 @@ import { errorHandle, getDiffParams } from 'utils/utils';
 import { selectOrgId } from '../../slice/selectors';
 import { useMemberSlice } from '../MemberPage/slice';
 import { getMembers, getRoles } from '../MemberPage/slice/thunks';
-import {
-  DEFAULT_VALUE_DATE_FORMAT,
-  VariableScopes,
-  VariableTypes,
-  VariableValueTypes,
-} from './constants';
+import { VariableScopes, VariableTypes, VariableValueTypes } from './constants';
 import { useVariableSlice } from './slice';
 import {
   selectDeleteVariablesLoading,
@@ -198,7 +193,7 @@ export function VariablePage() {
       let defaultValue: any = values.defaultValue;
       if (values.valueType === VariableValueTypes.Date && !values.expression) {
         defaultValue = values.defaultValue.map(d =>
-          (d as Moment).format(DEFAULT_VALUE_DATE_FORMAT),
+          (d as Moment).format(TIME_FORMATTER),
         );
       }
 
@@ -242,7 +237,7 @@ export function VariablePage() {
         value:
           cr.value &&
           (editingVariable?.valueType === VariableValueTypes.Date
-            ? cr.value.map(m => (m as Moment).format(DEFAULT_VALUE_DATE_FORMAT))
+            ? cr.value.map(m => (m as Moment).format(TIME_FORMATTER))
             : cr.value),
       }));
 
