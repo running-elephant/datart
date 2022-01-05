@@ -505,14 +505,17 @@ const workbenchSlice = createSlice({
             ? JSON.parse(payload.config)
             : CloneValueDeep(payload.config);
         backendChartConfig = backendChartConfig || {};
+
         if (backendChartConfig?.aggregation === undefined) {
           backendChartConfig.aggregation = true;
         }
+
         state.backendChart = {
           ...payload,
           config: backendChartConfig,
         };
         state.aggregation = backendChartConfig.aggregation;
+
         const currentChart = ChartManager.instance().getById(
           backendChartConfig?.chartGraphId,
         );

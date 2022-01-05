@@ -178,7 +178,7 @@ export const ChartDraggableSourceContainer: FC<
   return (
     <Container
       onClick={e => {
-        onSelectionChange?.(colName, e.metaKey, e.shiftKey);
+        onSelectionChange?.(colName, e.metaKey || e.ctrlKey, e.shiftKey);
       }}
       ref={drag}
       className={styleClasses.join(' ')}

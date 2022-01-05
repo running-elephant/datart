@@ -44,6 +44,7 @@ export const ColorSet: FC<{
 export default ColorSet;
 const StyledWrap = styled.div`
   display: inline-block;
+  cursor: pointer;
 `;
 const StyledColorIcon = styled.span<{ color: string }>`
   font-size: 1.4em;
