@@ -142,13 +142,12 @@ public class HttpDataProvider extends DefaultDataProvider {
         if (parser != null && StringUtils.isNotBlank(parser.toString())) {
             parserClass = parser.toString();
         }
-
         Class<? extends HttpResponseParser> aClass = (Class<? extends HttpResponseParser>) Class.forName(parserClass);
-
         httpRequestParam.setResponseParser(aClass);
-
-        httpRequestParam.setBody(schema.getOrDefault(BODY, "").toString());
-
+        Object body = schema.get(BODY);
+        if (body != null) {
+            httpRequestParam.setBody(body.toString());
+        }
         httpRequestParam.setQueryParam((Map<String, String>) schema.get(QUERY_PARAM));
 
         httpRequestParam.setHeaders((Map<String, String>) schema.get(HEADER));
