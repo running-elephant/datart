@@ -68,7 +68,15 @@ export function ConfigComponent({
   onSubFormTest,
   onDbTypeChange,
 }: ConfigComponentProps) {
-  const { name, description, required, defaultValue, type, options } = attr;
+  const {
+    name,
+    displayName,
+    description,
+    required,
+    defaultValue,
+    type,
+    options,
+  } = attr;
   let component: ReactElement | null = null;
   let extraFormItemProps: Partial<FormItemProps> = {};
   const t = useI18NPrefix('source');
@@ -211,7 +219,7 @@ export function ConfigComponent({
   return !['path', 'format'].includes(name) ? (
     <Form.Item
       name={['config', name]}
-      label={name}
+      label={displayName}
       initialValue={defaultValue}
       extra={description}
       rules={rules}

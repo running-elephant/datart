@@ -86,6 +86,7 @@ export interface DataProviderConfigTemplate {
 
 export interface DataProviderAttribute {
   name: string;
+  displayName: string;
   defaultValue: any;
   type:
     | 'string'
