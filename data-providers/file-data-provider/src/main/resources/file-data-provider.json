@@ -26,6 +26,12 @@
           ]
         },
         {
+          "name": "path",
+          "required": true,
+          "defaultValue": "",
+          "type": "string"
+        },
+        {
           "name": "columns",
           "defaultValue": "",
           "type": "schema"
