@@ -50,6 +50,7 @@ export default FreeEditor;
 
 const Wrapper = styled.div`
   display: flex;
+  flex: 1;
   flex-direction: column;
   min-width: 0;
   min-height: 0;
