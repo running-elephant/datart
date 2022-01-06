@@ -6592,11 +6592,44 @@ SqlIdentifier FunctionName() :
         qualifiedName = CompoundIdentifier()
     |
         qualifiedName = ReservedFunctionName()
+
+    |   qualifiedName = FunctionNameSupport()  // [datart]  function name support
+
     )
     {
         return qualifiedName;
     }
 }
+
+// [datart]  function name support
+SqlIdentifier FunctionNameSupport():
+{
+}
+{
+    (
+         NonReservedKeyWord()
+    |    KeywordFunctionNameSupport()
+
+    )
+    {
+        return new SqlIdentifier(unquotedIdentifier(), getPos());
+    }
+}
+// [datart]  function name support
+String KeywordFunctionNameSupport() :
+{
+}
+{
+    (
+        <DATE>
+    |   <TIME>
+    |   <TIMESTAMP>
+    )
+    {
+        return unquotedIdentifier();
+    }
+}
+
 
 /**
  * Parses a reserved word which is used as the name of a function.
@@ -8305,7 +8338,7 @@ MORE :
         "\u3400"-"\u3d2d",
         "\u4e00"-"\u9fff",
         "\uf900"-"\ufaff",
-        "@" //support for sql variable
+        "@" //[datart] support for sql variable
     ]
     >
 |
