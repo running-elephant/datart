@@ -12,6 +12,7 @@ import { RootState } from 'types';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { vizActions } from '.';
+import { filterSqlOperatorName } from '../../../../DashBoardPage/utils';
 import { selectSelectedTab, selectVizs } from './selectors';
 import {
   AddStoryboardParams,
@@ -333,13 +334,15 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
       false,
       arg.chartPreview?.backendChart?.config?.aggregation,
     );
+    const data = builder
+      .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
+      .build();
     const response = await request({
       method: 'POST',
       url: `data-provider/execute`,
-      data: builder
-        .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
-        .build(),
+      data,
     });
+    filterSqlOperatorName(data, response.data);
     return {
       backendChartId: arg.chartPreview?.backendChartId,
       data: response.data || [],

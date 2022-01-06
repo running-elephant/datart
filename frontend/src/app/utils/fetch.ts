@@ -30,6 +30,7 @@ import ChartDataset from 'app/types/ChartDataset';
 import { saveAs } from 'file-saver';
 import { request, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';
+import { filterSqlOperatorName } from '../pages/DashBoardPage/utils';
 
 export const getDistinctFields = async (
   viewId: string,
@@ -63,6 +64,7 @@ export const getDistinctFields = async (
       },
       data: requestParams,
     });
+    filterSqlOperatorName(requestParams, data);
     return data;
   } else {
     const { data } = await request<ChartDataset>({
@@ -70,6 +72,7 @@ export const getDistinctFields = async (
       url: `data-provider/execute`,
       data: requestParams,
     });
+    filterSqlOperatorName(requestParams, data);
     return data;
   }
 };

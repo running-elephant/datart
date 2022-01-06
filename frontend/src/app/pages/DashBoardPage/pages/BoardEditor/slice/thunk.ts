@@ -14,7 +14,10 @@ import {
   WidgetInfo,
   WidgetOfCopy,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { getChartWidgetRequestParams } from 'app/pages/DashBoardPage/utils';
+import {
+  filterSqlOperatorName,
+  getChartWidgetRequestParams,
+} from 'app/pages/DashBoardPage/utils';
 import {
   getChartDataView,
   getDashBoardByResBoard,
@@ -504,6 +507,7 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
         data: requestParams,
       });
       widgetData = { ...data, id: widgetId };
+      filterSqlOperatorName(requestParams, widgetData);
       dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
       dispatch(
         editWidgetInfoActions.changePageInfo({
@@ -578,6 +582,7 @@ export const getEditControllerOptions = createAsyncThunk<
         data: requestParams,
       });
       widgetData = { ...data, id: widget.id };
+      filterSqlOperatorName(requestParams, widgetData);
       dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
     } catch (error) {
       errorHandle(error);
