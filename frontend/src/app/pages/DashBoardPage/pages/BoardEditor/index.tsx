@@ -22,6 +22,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
+import { BoardLoading } from '../../components/BoardLoading';
 import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
@@ -95,21 +96,19 @@ export const BoardEditor: React.FC<{
           allowManage={false}
           renderMode="read"
         >
-          <Wrapper>
-            <TitleHeader toggleBoardEditor={onCloseBoardEditor} />
-            {boardType === 'auto' && <AutoEditor />}
-            {boardType === 'free' && <FreeEditor />}
-            <ControllerWidgetPanel />
-            <LinkagePanel />
-            <SettingJumpModal />
-            {boardChartEditorProps && (
-              <ChartEditor
-                {...boardChartEditorProps}
-                onClose={onCloseChartEditor}
-                onSaveInWidget={onSaveToWidget}
-              />
-            )}
-          </Wrapper>
+          <TitleHeader toggleBoardEditor={onCloseBoardEditor} />
+          {boardType === 'auto' && <AutoEditor />}
+          {boardType === 'free' && <FreeEditor />}
+          <ControllerWidgetPanel />
+          <LinkagePanel />
+          <SettingJumpModal />
+          {boardChartEditorProps && (
+            <ChartEditor
+              {...boardChartEditorProps}
+              onClose={onCloseChartEditor}
+              onSaveInWidget={onSaveToWidget}
+            />
+          )}
         </BoardProvider>
       );
     }, [
@@ -120,7 +119,13 @@ export const BoardEditor: React.FC<{
       onCloseChartEditor,
       onSaveToWidget,
     ]);
-    return <DndProvider backend={HTML5Backend}>{boardEditor}</DndProvider>;
+    return (
+      <Wrapper>
+        <DndProvider backend={HTML5Backend}>
+          {boardEditor || <BoardLoading />}
+        </DndProvider>
+      </Wrapper>
+    );
   },
 );
 export default BoardEditor;
