@@ -1,6 +1,7 @@
 import { CloseOutlined } from '@ant-design/icons';
 import { EmptyFiller, TabPane, Tabs } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import BoardEditor from 'app/pages/DashBoardPage/pages/BoardEditor';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { StoryPlayer } from 'app/pages/StoryBoardPage/Player';
 import { useCallback, useEffect } from 'react';
@@ -186,6 +187,10 @@ export function Main() {
         <Route
           path="/organizations/:orgId/vizs/:vizId?/storyPlay"
           render={() => <StoryPlayer storyId={vizId} />}
+        />
+        <Route
+          path="/organizations/:orgId/vizs/:vizId?/boardEditor"
+          render={() => <BoardEditor dashboardId={vizId} />}
         />
       </Switch>
     </Wrapper>
