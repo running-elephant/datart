@@ -421,7 +421,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         permissions.setResourceId(resourceId);
         permissions.setResourceType(resourceType);
         permissions.setOrgId(orgId);
-        List<RelRoleResource> relRoleResources = rrrMapper.selectByResource(orgId, resourceType.name(), PermissionHelper.getResourceId(resourceType, resourceId));
+        List<RelRoleResource> relRoleResources = rrrMapper.selectByResource(orgId, resourceType.name(), resourceId);
         if (CollectionUtils.isEmpty(relRoleResources)) {
             return permissions;
         }
