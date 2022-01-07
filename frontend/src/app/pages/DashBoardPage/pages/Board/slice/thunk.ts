@@ -15,7 +15,10 @@ import { RootState } from 'types';
 import { request } from 'utils/request';
 import { errorHandle, getErrorMessage } from 'utils/utils';
 import { boardActions } from '.';
-import { getChartWidgetRequestParams } from '../../../utils';
+import {
+  filterSqlOperatorName,
+  getChartWidgetRequestParams,
+} from '../../../utils';
 import { handleServerBoardAction } from './asyncActions';
 import { selectBoardById, selectBoardWidgetMap } from './selector';
 import { BoardState, ServerDashboard, WidgetData } from './types';
@@ -257,7 +260,11 @@ export const getChartWidgetDataAsync = createAsyncThunk<
         });
         widgetData = { ...data, id: widgetId };
       }
-      dispatch(boardActions.setWidgetData(widgetData as WidgetData));
+      dispatch(
+        boardActions.setWidgetData(
+          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        ),
+      );
       dispatch(
         boardActions.changePageInfo({
           boardId,
@@ -355,7 +362,6 @@ export const getControllerOptions = createAsyncThunk<
           data: requestParams,
         });
         widgetData = { ...data, id: widget.id };
-        dispatch(boardActions.setWidgetData(widgetData as WidgetData));
       } else {
         const { data } = await request<WidgetData>({
           method: 'POST',
@@ -363,8 +369,12 @@ export const getControllerOptions = createAsyncThunk<
           data: requestParams,
         });
         widgetData = { ...data, id: widget.id };
-        dispatch(boardActions.setWidgetData(widgetData as WidgetData));
       }
+      dispatch(
+        boardActions.setWidgetData(
+          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        ),
+      );
       dispatch(
         boardActions.setWidgetErrInfo({
           boardId,

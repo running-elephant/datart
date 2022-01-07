@@ -38,6 +38,7 @@ import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { CloneValueDeep } from 'utils/object';
 import { request } from 'utils/request';
 import { listToTree, reduxActionErrorHandler, rejectHandle } from 'utils/utils';
+import { filterSqlOperatorName } from '../../DashBoardPage/utils';
 import ChartRequest, {
   ChartDataRequestBuilder,
 } from '../models/ChartHttpRequest';
@@ -188,7 +189,7 @@ export const fetchDataSetAction = createAsyncThunk(
         url: `data-provider/execute`,
         data: arg,
       });
-      return response.data;
+      return filterSqlOperatorName(arg, response.data);
     } catch (error) {
       return rejectHandle(error, thunkAPI.rejectWithValue);
     }
