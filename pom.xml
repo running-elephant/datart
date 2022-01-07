@@ -13,6 +13,8 @@
 
     <properties>
         <java.version>1.8</java.version>
+
+        <swagger.version>2.10.5</swagger.version>
         <spring.cloud.version>2020.0.1</spring.cloud.version>
     </properties>
 
@@ -39,9 +41,6 @@
         <module>core</module>
         <module>security</module>
         <module>data-providers</module>
-        <module>data-providers/file-data-provider</module>
-        <module>data-providers/http-data-provider</module>
-        <module>data-providers/jdbc-data-provider</module>
         <module>server</module>
     </modules>
 
@@ -78,9 +77,29 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
                         <parameters>true</parameters>
                     </configuration>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.2.1</version>
+                    <configuration>
+                        <attach>true</attach>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
@@ -88,6 +107,7 @@
                         <generateBackupPoms>false</generateBackupPoms>
                     </configuration>
                 </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
@@ -103,6 +123,7 @@
                                 <directory>${project.basedir}</directory>
                                 <includes>
                                     <include>datart-server-*-install.zip</include>
+                                    <include>datart-server-*-install.tar.gz</include>
                                 </includes>
                             </fileset>
                         </filesets>
