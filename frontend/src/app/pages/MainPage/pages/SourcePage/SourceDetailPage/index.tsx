@@ -398,11 +398,11 @@ export function SourceDetailPage() {
               </Form.Item>
               <Form.Item
                 name="type"
-                label={t('type')}
+                label={t('form.type')}
                 rules={[
                   {
                     required: true,
-                    message: `${t('type')}${tg('validation.required')}`,
+                    message: `${t('form.type')}${tg('validation.required')}`,
                   },
                 ]}
               >

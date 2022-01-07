@@ -66,7 +66,7 @@ export const Recycle = memo(({ list }: RecycleProps) => {
   const views = useSelector(selectViews);
   const isOwner = useSelector(selectIsOrgOwner);
   const permissionMap = useSelector(selectPermissionMap);
-  const t = useI18NPrefix('view.form');
+  const t = useI18NPrefix('view.saveForm');
   const tg = useI18NPrefix('global');
 
   useEffect(() => {

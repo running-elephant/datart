@@ -24,7 +24,7 @@ import {
   getTime,
   recommendTimeRangeConverter,
 } from 'app/utils/time';
-import { FILTER_TIME_FORMATTER_IN_QUERY } from 'globalConstants';
+import { TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import { FC, memo, useMemo } from 'react';
 import { PresentControllerFilterProps } from '.';
@@ -36,7 +36,7 @@ const toMoment = t => {
   }
   if (Boolean(t) && typeof t === 'object' && 'unit' in t) {
     const time = getTime(+(t.direction + t.amount), t.unit)(t.unit, t.isStart);
-    return moment(formatTime(time, FILTER_TIME_FORMATTER_IN_QUERY));
+    return moment(formatTime(time, TIME_FORMATTER));
   }
   return moment(t);
 };

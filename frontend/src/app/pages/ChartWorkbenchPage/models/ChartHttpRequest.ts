@@ -24,7 +24,7 @@ import {
   getTime,
   recommendTimeRangeConverter,
 } from 'app/utils/time';
-import { FILTER_TIME_FORMATTER_IN_QUERY } from 'globalConstants';
+import { TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn } from 'utils/object';
 import {
   AggregateFieldActionType,
@@ -189,9 +189,9 @@ export class ChartDataRequestBuilder {
           value.unit,
           value.isStart,
         );
-        return formatTime(time, FILTER_TIME_FORMATTER_IN_QUERY);
+        return formatTime(time, TIME_FORMATTER);
       }
-      return formatTime(value, FILTER_TIME_FORMATTER_IN_QUERY);
+      return formatTime(value, TIME_FORMATTER);
     };
 
     const _transformFieldValues = (field: ChartDataSectionField) => {

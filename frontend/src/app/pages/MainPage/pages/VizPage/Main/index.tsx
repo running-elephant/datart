@@ -1,19 +1,25 @@
 import { CloseOutlined } from '@ant-design/icons';
 import { EmptyFiller, TabPane, Tabs } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import BoardEditor from 'app/pages/DashBoardPage/pages/BoardEditor';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { StoryPlayer } from 'app/pages/StoryBoardPage/Player';
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useLocation, useRouteMatch } from 'react-router-dom';
+import {
+  Route,
+  Switch,
+  useHistory,
+  useLocation,
+  useRouteMatch,
+} from 'react-router-dom';
 import styled from 'styled-components/macro';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { STICKY_LEVEL } from 'styles/StyleConstants';
 import { useVizSlice } from '../slice';
 import {
   selectArchivedDashboards,
   selectArchivedDatacharts,
   selectArchivedStoryboards,
-  selectPlayingStoryId,
   selectSelectedTab,
   selectStoryboards,
   selectTabs,
@@ -39,7 +45,7 @@ export function Main() {
   const tabs = useSelector(selectTabs);
   const selectedTab = useSelector(selectSelectedTab);
   const orgId = useSelector(selectOrgId);
-  const playingStoryId = useSelector(selectPlayingStoryId);
+
   const t = useI18NPrefix('viz.main');
 
   useEffect(() => {
@@ -177,7 +183,16 @@ export function Main() {
       ))}
       {!tabs.length && <EmptyFiller title={t('empty')} />}
 
-      {playingStoryId && <StoryPlayer storyId={playingStoryId} />}
+      <Switch>
+        <Route
+          path="/organizations/:orgId/vizs/:vizId?/storyPlay"
+          render={() => <StoryPlayer storyId={vizId} />}
+        />
+        <Route
+          path="/organizations/:orgId/vizs/:vizId?/boardEditor"
+          render={() => <BoardEditor dashboardId={vizId} />}
+        />
+      </Switch>
     </Wrapper>
   );
 }

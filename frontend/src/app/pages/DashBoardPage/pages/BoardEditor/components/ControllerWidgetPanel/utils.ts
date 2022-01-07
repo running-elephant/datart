@@ -15,15 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   ValueOptionType,
   ValueOptionTypes,
 } from 'app/pages/DashBoardPage/constants';
-import {
-  DEFAULT_VALUE_DATE_FORMAT,
-  VariableValueTypes,
-} from 'app/pages/MainPage/pages/VariablePage/constants';
+import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -35,6 +31,7 @@ import {
 } from 'app/types/FilterControlPanel';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
+import { TIME_FORMATTER } from './../../../../../../../globalConstants';
 import {
   DateControllerTypes,
   NumericalControllerTypes,
@@ -118,14 +115,14 @@ export const formatControlDateToMoment = (config: ControllerConfig) => {
     if (filterDate.startTime && filterDate.startTime.exactValue) {
       if (typeof filterDate.startTime.exactValue === 'string') {
         let exactTime = filterDate.startTime.exactValue;
-        let newExactTime = moment(exactTime, DEFAULT_VALUE_DATE_FORMAT);
+        let newExactTime = moment(exactTime, TIME_FORMATTER);
         config.controllerDate.startTime.exactValue = newExactTime;
       }
     }
     if (filterDate.endTime && filterDate.endTime.exactValue) {
       if (typeof filterDate.endTime.exactValue === 'string') {
         let exactTime = filterDate.endTime.exactValue;
-        let newExactTime = moment(exactTime, DEFAULT_VALUE_DATE_FORMAT);
+        let newExactTime = moment(exactTime, TIME_FORMATTER);
         config.controllerDate.endTime!.exactValue = newExactTime;
       }
     }
@@ -139,14 +136,14 @@ export const formatControlDateToStr = (config: ControllerConfig) => {
     if (filterDate.startTime && filterDate.startTime.exactValue) {
       if ((filterDate.startTime.exactValue as Moment).format) {
         let exactTime = filterDate.startTime.exactValue as Moment;
-        let newExactTime = exactTime.format(DEFAULT_VALUE_DATE_FORMAT);
+        let newExactTime = exactTime.format(TIME_FORMATTER);
         config.controllerDate.startTime.exactValue = newExactTime;
       }
     }
     if (filterDate.endTime && filterDate.endTime.exactValue) {
       if ((filterDate.endTime.exactValue as Moment).format) {
         let exactTime = filterDate.endTime.exactValue as Moment;
-        let newExactTime = exactTime.format(DEFAULT_VALUE_DATE_FORMAT);
+        let newExactTime = exactTime.format(TIME_FORMATTER);
         config.controllerDate.endTime!.exactValue = newExactTime;
       }
     }
@@ -295,7 +292,7 @@ export const formatDateByPickType = (
   pickerType: PickerType,
   momentTime: Moment,
 ) => {
-  const formatTemp = DEFAULT_VALUE_DATE_FORMAT;
+  const formatTemp = TIME_FORMATTER;
   if (!momentTime) {
     return null;
   }
