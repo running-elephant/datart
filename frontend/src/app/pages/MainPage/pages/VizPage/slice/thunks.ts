@@ -342,10 +342,9 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
       url: `data-provider/execute`,
       data,
     });
-    filterSqlOperatorName(data, response.data);
     return {
       backendChartId: arg.chartPreview?.backendChartId,
-      data: response.data || [],
+      data: filterSqlOperatorName(data, response.data) || [],
     };
   },
 );

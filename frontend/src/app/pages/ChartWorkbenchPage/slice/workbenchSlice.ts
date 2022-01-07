@@ -189,8 +189,7 @@ export const fetchDataSetAction = createAsyncThunk(
         url: `data-provider/execute`,
         data: arg,
       });
-      filterSqlOperatorName(arg, response.data);
-      return response.data;
+      return filterSqlOperatorName(arg, response.data);
     } catch (error) {
       return rejectHandle(error, thunkAPI.rejectWithValue);
     }

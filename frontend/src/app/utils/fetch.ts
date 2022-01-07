@@ -64,16 +64,14 @@ export const getDistinctFields = async (
       },
       data: requestParams,
     });
-    filterSqlOperatorName(requestParams, data);
-    return data;
+    return filterSqlOperatorName(requestParams, data);
   } else {
     const { data } = await request<ChartDataset>({
       method: 'POST',
       url: `data-provider/execute`,
       data: requestParams,
     });
-    filterSqlOperatorName(requestParams, data);
-    return data;
+    return filterSqlOperatorName(requestParams, data);
   }
 };
 

@@ -507,8 +507,11 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
         data: requestParams,
       });
       widgetData = { ...data, id: widgetId };
-      filterSqlOperatorName(requestParams, widgetData);
-      dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
+      dispatch(
+        editWidgetDataActions.setWidgetData(
+          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        ),
+      );
       dispatch(
         editWidgetInfoActions.changePageInfo({
           widgetId,
@@ -582,8 +585,11 @@ export const getEditControllerOptions = createAsyncThunk<
         data: requestParams,
       });
       widgetData = { ...data, id: widget.id };
-      filterSqlOperatorName(requestParams, widgetData);
-      dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
+      dispatch(
+        editWidgetDataActions.setWidgetData(
+          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        ),
+      );
     } catch (error) {
       errorHandle(error);
     }

@@ -260,8 +260,11 @@ export const getChartWidgetDataAsync = createAsyncThunk<
         });
         widgetData = { ...data, id: widgetId };
       }
-      filterSqlOperatorName(requestParams, widgetData);
-      dispatch(boardActions.setWidgetData(widgetData as WidgetData));
+      dispatch(
+        boardActions.setWidgetData(
+          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        ),
+      );
       dispatch(
         boardActions.changePageInfo({
           boardId,
@@ -367,8 +370,11 @@ export const getControllerOptions = createAsyncThunk<
         });
         widgetData = { ...data, id: widget.id };
       }
-      filterSqlOperatorName(requestParams, widgetData);
-      dispatch(boardActions.setWidgetData(widgetData as WidgetData));
+      dispatch(
+        boardActions.setWidgetData(
+          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        ),
+      );
       dispatch(
         boardActions.setWidgetErrInfo({
           boardId,
