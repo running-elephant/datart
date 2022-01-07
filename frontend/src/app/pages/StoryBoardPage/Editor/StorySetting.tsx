@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Checkbox, Form, InputNumber } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import produce from 'immer';
 import React, { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,12 +28,12 @@ import { updateStory } from '../slice/thunks';
 import { StoryBoardState } from '../slice/types';
 export interface StorySettingProps {}
 export const StorySetting: React.FC<StorySettingProps> = memo(() => {
+  const t = useI18NPrefix(`viz.board.setting`);
   const dispatch = useDispatch();
   const { stroyBoardId: storyId } = useContext(StoryContext);
   const storyBoard = useSelector((state: { storyBoard: StoryBoardState }) =>
     makeSelectStoryBoardById(state, storyId),
   );
-  // TODO  add isLoop option -xieLiuDuo
   const autoPlay = storyBoard?.config?.autoPlay;
   const [form] = Form.useForm();
   useEffect(() => {
@@ -61,10 +62,10 @@ export const StorySetting: React.FC<StorySettingProps> = memo(() => {
         form={form}
         layout="inline"
       >
-        <Form.Item name="auto" label="自动播放" valuePropName="checked">
+        <Form.Item name="auto" label={t('autoPlay')} valuePropName="checked">
           <Checkbox />
         </Form.Item>
-        <Form.Item name="delay" label="每页时间(秒)">
+        <Form.Item name="delay" label={t('duration')}>
           <InputNumber />
         </Form.Item>
       </Form>

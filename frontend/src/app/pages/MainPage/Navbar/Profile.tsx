@@ -41,7 +41,7 @@ export function Profile({ visible, onCancel }: ModalProps) {
   const [saveDisabled, setSaveDisabled] = useState(true);
   const [form] = Form.useForm();
   const t = useI18NPrefix('main.nav.account.profile');
-  const tgo = useI18NPrefix('global.operation');
+  const tg = useI18NPrefix('global');
 
   const reset = useCallback(() => {
     form.resetFields();
@@ -90,13 +90,13 @@ export function Profile({ visible, onCancel }: ModalProps) {
             email: loggedInUser!.email,
           },
           resolve: () => {
-            message.success(tgo('updateSuccess'));
+            message.success(tg('operation.updateSuccess'));
             onCancel && onCancel(null as any);
           },
         }),
       );
     },
-    [dispatch, loggedInUser, onCancel, tgo],
+    [dispatch, loggedInUser, onCancel, tg],
   );
 
   return (
@@ -152,7 +152,7 @@ export function Profile({ visible, onCancel }: ModalProps) {
             disabled={saveDisabled}
             block
           >
-            {t('save')}
+            {tg('button.save')}
           </Button>
         </Form.Item>
       </Form>

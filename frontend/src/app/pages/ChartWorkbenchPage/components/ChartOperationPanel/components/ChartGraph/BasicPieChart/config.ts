@@ -265,6 +265,48 @@ const config: ChartConfig = {
         },
       },
     },
+    {
+      lang: 'en-US',
+      translation: {
+        section: {
+          legend: 'Legend',
+          detail: 'Detail',
+        },
+        common: {
+          showLabel: 'Show Label',
+          rotate: 'Rotate',
+          position: 'Position',
+        },
+        pie: {
+          title: 'Pie',
+          circle: 'Circle',
+          roseType: 'Rose',
+        },
+        label: {
+          title: 'Label',
+          showLabel: 'Show Label',
+          position: 'Position',
+          showName: 'Show Name',
+          showPercent: 'Show Percentage',
+          showValue: 'Show Value',
+        },
+        legend: {
+          title: 'Legend',
+          showLegend: 'Show Legend',
+          type: 'Type',
+          selectAll: 'Select All',
+          position: 'Position',
+        },
+        reference: {
+          title: 'Reference',
+          open: 'Open',
+        },
+        tooltip: {
+          title: 'Tooltip',
+          showPercentage: 'Show Percentage',
+        },
+      },
+    },
   ],
 };
 

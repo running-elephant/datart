@@ -19,13 +19,7 @@
 import { useAppSlice } from 'app/slice';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  Redirect,
-  Route,
-  Switch,
-  useHistory,
-  useRouteMatch,
-} from 'react-router';
+import { Redirect, Route, Switch, useRouteMatch } from 'react-router';
 import styled from 'styled-components/macro';
 import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
 import { NotFoundPage } from '../NotFoundPage';
@@ -59,11 +53,9 @@ export function MainPage() {
   const { actions: vizActions } = useVizSlice();
   const { actions: viewActions } = useViewSlice();
   const dispatch = useDispatch();
-  const history = useHistory();
   const organizationMatch = useRouteMatch<MainPageRouteParams>(
     '/organizations/:orgId',
   );
-  const { isExact } = useRouteMatch();
   const orgId = useSelector(selectOrgId);
 
   // loaded first time
@@ -86,18 +78,15 @@ export function MainPage() {
     }
   }, [dispatch, vizActions, viewActions, orgId]);
 
-  useEffect(() => {
-    if (isExact && orgId) {
-      history.push(`/organizations/${orgId}`);
-    }
-  }, [isExact, orgId, history]);
-
   return (
     <AppContainer>
       <Background />
       <Navbar />
       {orgId && (
         <Switch>
+          <Route path="/" exact>
+            <Redirect to={`/organizations/${orgId}`} />
+          </Route>
           <Route path="/confirminvite" component={ConfirmInvitePage} />
           <Route path="/organizations/:orgId" exact>
             <Redirect

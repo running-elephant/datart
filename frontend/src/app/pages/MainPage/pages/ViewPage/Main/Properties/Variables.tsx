@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   DeleteOutlined,
   EditOutlined,
@@ -8,9 +26,9 @@ import {
 } from '@ant-design/icons';
 import { Button, List, Popconfirm } from 'antd';
 import { ListItem, ListTitle } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getRoles } from 'app/pages/MainPage/pages/MemberPage/slice/thunks';
 import {
-  DEFAULT_VALUE_DATE_FORMAT,
   VariableScopes,
   VariableTypes,
   VariableValueTypes,
@@ -24,7 +42,7 @@ import { VariableFormModel } from 'app/pages/MainPage/pages/VariablePage/types';
 import { VariableForm } from 'app/pages/MainPage/pages/VariablePage/VariableForm';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import classnames from 'classnames';
-import { CommonFormTypes } from 'globalConstants';
+import { CommonFormTypes, TIME_FORMATTER } from 'globalConstants';
 import { Moment } from 'moment';
 import {
   memo,
@@ -71,6 +89,8 @@ export const Variables = memo(() => {
   ) as string;
   const orgId = useSelector(selectOrgId);
   const publicVariables = useSelector(selectVariables);
+  const t = useI18NPrefix('view.variable');
+  const tg = useI18NPrefix('global');
 
   useEffect(() => {
     if (editorCompletionItemProviderRef) {
@@ -158,9 +178,9 @@ export const Variables = memo(() => {
   const save = useCallback(
     (values: VariableFormModel) => {
       let defaultValue: any = values.defaultValue;
-      if (values.valueType === VariableValueTypes.Date) {
+      if (values.valueType === VariableValueTypes.Date && !values.expression) {
         defaultValue = values.defaultValue.map(d =>
-          (d as Moment).format(DEFAULT_VALUE_DATE_FORMAT),
+          (d as Moment).format(TIME_FORMATTER),
         );
       }
 
@@ -219,9 +239,7 @@ export const Variables = memo(() => {
           value: JSON.stringify(
             cr.value &&
               (editingVariable?.valueType === VariableValueTypes.Date
-                ? cr.value.map(d =>
-                    (d as Moment).format(DEFAULT_VALUE_DATE_FORMAT),
-                  )
+                ? cr.value.map(d => (d as Moment).format(TIME_FORMATTER))
                 : cr.value),
           ),
         }));
@@ -264,25 +282,25 @@ export const Variables = memo(() => {
         : variables.some(v => v.name === item.name);
       return (
         <ListItemTitle className={classnames({ duplicate: isDuplicate })}>
-          {!isPrivate && <span className="prefix">[公共]</span>}
+          {!isPrivate && <span className="prefix">{t('prefix')}</span>}
           {item.name}
-          {isDuplicate && <span className="suffix">重复</span>}
+          {isDuplicate && <span className="suffix">{t('suffix')}</span>}
         </ListItemTitle>
       );
     },
-    [variables, publicVariables],
+    [variables, publicVariables, t],
   );
 
   const titleProps = useMemo(
     () => ({
-      title: '变量配置',
+      title: t('title'),
       search: true,
       add: {
-        items: [{ key: 'variable', text: '新建变量' }],
+        items: [{ key: 'variable', text: t('add') }],
         callback: showAddForm,
       },
     }),
-    [showAddForm],
+    [showAddForm, t],
   );
 
   return (
@@ -309,7 +327,7 @@ export const Variables = memo(() => {
                 />,
                 <Popconfirm
                   key="del"
-                  title="确认删除？"
+                  title={tg('operation.deleteConfirm')}
                   placement="bottom"
                   onConfirm={del(item.id)}
                 >
@@ -355,7 +373,7 @@ export const Variables = memo(() => {
         editingVariable={editingVariable}
         variables={variables}
         visible={formVisible}
-        title="变量"
+        title={t('formTitle')}
         type={formType}
         onSave={save}
         onCancel={hideForm}

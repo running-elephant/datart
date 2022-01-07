@@ -3,7 +3,6 @@ import {
   transformToViewConfig,
 } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { DEFAULT_VALUE_DATE_FORMAT } from 'app/pages/MainPage/pages/VariablePage/constants';
 import {
   ChartDataSectionField,
   ChartDataSectionType,
@@ -17,7 +16,8 @@ import {
   TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
 import { getTime } from 'app/utils/time';
-import { FilterSqlOperator } from 'globalConstants';
+import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
+import i18next from 'i18next';
 import moment from 'moment';
 import { STORAGE_IMAGE_KEY_PREFIX } from '../constants';
 import {
@@ -284,7 +284,7 @@ export const getControllerDateValues = (obj: {
   } else {
     const { amount, unit, direction } = startTime.relativeValue!;
     const time = getTime(+(direction + amount), unit)(unit, true);
-    timeValues[0] = time.format(DEFAULT_VALUE_DATE_FORMAT);
+    timeValues[0] = time.format(TIME_FORMATTER);
   }
   if (endTime) {
     if (endTime.relativeOrExact === TimeFilterValueCategory.Exact) {
@@ -300,7 +300,7 @@ export const getControllerDateValues = (obj: {
     } else {
       const { amount, unit, direction } = endTime.relativeValue!;
       const time = getTime(+(direction + amount), unit)(unit, false);
-      timeValues[1] = time.format(DEFAULT_VALUE_DATE_FORMAT);
+      timeValues[1] = time.format(TIME_FORMATTER);
     }
   }
 
@@ -336,7 +336,7 @@ export const adjustRangeDataEndValue = (
     default:
       break;
   }
-  let end = adjustTime.format(DEFAULT_VALUE_DATE_FORMAT);
+  let end = adjustTime.format(TIME_FORMATTER);
   return end;
 };
 export const getBoardChartRequests = (params: {
@@ -475,4 +475,26 @@ export const getDistinctFiltersByColumn = (filter: ChartRequestFilter[]) => {
   });
 
   return Object.values(filterMap);
+};
+
+export const getDefaultWidgetName = (widget: Widget, index: number) => {
+  const widgetType = widget.config.type;
+  const subWidgetType = widget.config.content.type;
+  const typeTitle = i18next.t(`viz.widget.type.${widgetType}`);
+  const subTypeTitle = i18next.t(`viz.widget.type.${subWidgetType}`);
+  switch (widgetType) {
+    case 'chart':
+      return `${subTypeTitle}_${index}`;
+    case 'container':
+      return `${subTypeTitle}_${index}`;
+    case 'controller':
+      return `${subTypeTitle}_${index}`;
+    case 'media':
+      return `${subTypeTitle}_${index}`;
+    case 'query':
+    case 'reset':
+      return `${typeTitle}`;
+    default:
+      return `xxx${index}`;
+  }
 };

@@ -42,6 +42,7 @@ import {
   BasicInputPercentage,
   BasicLine,
   BasicMarginWidth,
+  BasicRadio,
   BasicSelector,
   BasicSlider,
   BasicSwitch,
@@ -51,6 +52,7 @@ import {
 import {
   ConditionStylePanel,
   DataReferencePanel,
+  FontAlignment,
   ListTemplatePanel,
   UnControlledTableHeaderPanel,
 } from '../Customize';
@@ -120,6 +122,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
         dataConfigs,
         context,
       };
+
       switch (data.comType) {
         case ChartStyleSectionComponentType.CHECKBOX:
           return <BasicCheckbox {...props} />;
@@ -161,6 +164,10 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           return <GroupLayout {...props} />;
         case ChartStyleSectionComponentType.TEXT:
           return <BasicText {...props} />;
+        case ChartStyleSectionComponentType.RADIO:
+          return <BasicRadio {...props} />;
+        case ChartStyleSectionComponentType.FontAlignment:
+          return <FontAlignment {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

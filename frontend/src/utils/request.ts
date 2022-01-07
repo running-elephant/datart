@@ -21,7 +21,7 @@ import { BASE_API_URL } from 'globalConstants';
 import { APIResponse } from 'types';
 import { getToken, setToken } from './auth';
 
-const instance = axios.create({
+export const instance = axios.create({
   baseURL: BASE_API_URL,
   validateStatus(status) {
     return status < 400;

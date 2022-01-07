@@ -20,7 +20,7 @@ import { Row, Space } from 'antd';
 import { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { FilterCondition, FilterConditionType } from 'app/types/ChartConfig';
 import { formatTime, getTime } from 'app/utils/time';
-import { FILTER_TIME_FORMATTER_IN_QUERY } from 'globalConstants';
+import { TIME_FORMATTER } from 'globalConstants';
 import { FC, memo, useState } from 'react';
 import ChartFilterCondition, {
   ConditionBuilder,
@@ -60,7 +60,7 @@ const MannualRangeTimeSelector: FC<
           t.unit,
           t.isStart,
         );
-        return formatTime(time, FILTER_TIME_FORMATTER_IN_QUERY);
+        return formatTime(time, TIME_FORMATTER);
       }
       return t;
     });

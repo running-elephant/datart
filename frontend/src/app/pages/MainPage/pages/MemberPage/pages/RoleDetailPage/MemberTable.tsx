@@ -1,9 +1,28 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   DeleteOutlined,
   PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
 import { Button, Col, Input, Row, Table } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { User } from 'app/slice/types';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import debounce from 'lodash/debounce';
@@ -22,6 +41,9 @@ export const MemberTable = memo(
   ({ loading, dataSource, onAdd, onChange }: MemberTableProps) => {
     const [keywords, setKeywords] = useState('');
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+    const t = useI18NPrefix('member.roleDetail');
+    const tg = useI18NPrefix('global');
+
     const filteredSource = useMemo(
       () =>
         dataSource.filter(
@@ -55,19 +77,19 @@ export const MemberTable = memo(
 
     const columns = useMemo(
       () => [
-        { dataIndex: 'username', title: '用户名' },
-        { dataIndex: 'email', title: '邮箱' },
-        { dataIndex: 'name', title: '姓名' },
+        { dataIndex: 'username', title: t('username') },
+        { dataIndex: 'email', title: t('email') },
+        { dataIndex: 'name', title: t('name') },
         {
-          title: '操作',
+          title: tg('title.action'),
           width: 80,
           align: 'center' as const,
           render: (_, record) => (
-            <Action onClick={removeMember(record.id)}>移除</Action>
+            <Action onClick={removeMember(record.id)}>{t('remove')}</Action>
           ),
         },
       ],
-      [removeMember],
+      [removeMember, t, tg],
     );
 
     return (
@@ -80,7 +102,7 @@ export const MemberTable = memo(
               className="btn"
               onClick={onAdd}
             >
-              添加成员
+              {t('addMember')}
             </Button>
           </Col>
           <Col span={14}>
@@ -91,13 +113,13 @@ export const MemberTable = memo(
                 className="btn"
                 onClick={removeSelectedMember}
               >
-                批量删除
+                {t('deleteAll')}
               </Button>
             )}
           </Col>
           <Col span={6}>
             <Input
-              placeholder="搜索成员关键字"
+              placeholder={t('searchMember')}
               prefix={<SearchOutlined className="icon" />}
               bordered={false}
               onChange={debouncedSearch}

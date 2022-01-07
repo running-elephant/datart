@@ -35,7 +35,11 @@ import {
 } from 'app/types/ChartConfig';
 import { CURRENCIES } from 'app/utils/currency';
 import { updateBy } from 'app/utils/mutation';
-import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
+import {
+  DATE_FORMATTER,
+  NumberUnitKey,
+  NumericUnitDescriptions,
+} from 'globalConstants';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES } from 'styles/StyleConstants';
@@ -62,7 +66,7 @@ const DefaultFormatDetailConfig: IFieldFormatConfig = {
     decimalPlaces: 2,
   },
   [FieldFormatType.DATE]: {
-    format: 'YYYY-MM-DD',
+    format: DATE_FORMATTER,
   },
   [FieldFormatType.CUSTOM]: {
     format: '',

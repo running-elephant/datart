@@ -1,10 +1,29 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Col, Radio, Row } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classNames from 'classnames';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
-import { ResourceTypes, RESOURCE_TYPE_LABEL } from '../constants';
+import { ResourceTypes } from '../constants';
 import {
   selectFolderListLoading,
   selectFolders,
@@ -35,6 +54,7 @@ export const ResourcePanels = memo(
     const viewListLoading = useSelector(selectViewListLoading);
     const sourceListLoading = useSelector(selectSourceListLoading);
     const scheduleListLoading = useSelector(selectScheduleListLoading);
+    const t = useI18NPrefix('permission');
 
     const resourcePanels = useMemo(
       () => [
@@ -79,7 +99,7 @@ export const ResourcePanels = memo(
           <Panel
             key={resourceType}
             id={resourceType}
-            title={RESOURCE_TYPE_LABEL[resourceType]}
+            title={t(`module.${resourceType.toLowerCase()}`)}
             onChange={onToggle}
           >
             {resourceType === ResourceTypes.Viz ? (
@@ -87,8 +107,8 @@ export const ResourcePanels = memo(
                 <VizTypeSwitch key="switch">
                   <Col>
                     <Radio.Group value={vizType} onChange={vizTypeChange}>
-                      <Radio value="folder">目录</Radio>
-                      <Radio value="presentation">演示</Radio>
+                      <Radio value="folder">{t('folder')}</Radio>
+                      <Radio value="presentation">{t('presentation')}</Radio>
                     </Radio.Group>
                   </Col>
                 </VizTypeSwitch>

@@ -20,8 +20,10 @@ package datart.core.data.provider;
 
 import datart.core.base.consts.ValueType;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class SingleTypedValue extends TypedValue {
 
     private Object value;

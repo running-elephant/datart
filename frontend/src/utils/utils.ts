@@ -230,7 +230,10 @@ export function getPath<T extends { id: string; parentId: string | null }>(
   path: string[] = [],
 ) {
   if (!item?.parentId) {
-    return [rootId].concat(item.id).concat(path);
+    if (item) {
+      return [rootId].concat(item.id).concat(path);
+    }
+    return [rootId].concat(path);
   } else {
     const parent = list.find(({ id }) => id === item.parentId)!;
     return getPath(list, parent, rootId, [item.id].concat(path));
@@ -348,4 +351,3 @@ export function fastDeleteArrayElement(arr: any[], index: number) {
   arr[index] = arr[arr.length - 1];
   arr.pop();
 }
-

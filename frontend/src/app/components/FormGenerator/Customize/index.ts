@@ -18,5 +18,6 @@
 
 export { default as ConditionStylePanel } from './ConditionStylePanel';
 export { default as DataReferencePanel } from './DataReferencePanel';
+export { default as FontAlignment } from './FontAlignment';
 export { default as ListTemplatePanel } from './ListTemplatePanel';
 export { default as UnControlledTableHeaderPanel } from './UnControlledTableHeaderPanel';

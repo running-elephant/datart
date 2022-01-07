@@ -145,4 +145,5 @@ public class DownloadServiceImpl extends BaseService implements DownloadService 
         downloadMapper.updateByPrimaryKey(download);
         return download;
     }
+
 }

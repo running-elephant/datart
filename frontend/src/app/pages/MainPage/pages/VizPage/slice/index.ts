@@ -69,9 +69,7 @@ const slice = createSlice({
       }
     },
 
-    changePlayingStoryId(state, action: PayloadAction<string>) {
-      state.playingStoryId = action.payload;
-    },
+
     updateChartPreviewFilter(
       state,
       action: PayloadAction<{ backendChartId: string; payload }>,

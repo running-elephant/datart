@@ -20,7 +20,7 @@ import { DatePicker } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { TimeFilterConditionValue } from 'app/types/ChartConfig';
 import { formatTime } from 'app/utils/time';
-import { FILTER_TIME_FORMATTER_IN_QUERY } from 'globalConstants';
+import { TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import { FC, memo } from 'react';
 
@@ -33,7 +33,7 @@ const ExactTimeSelector: FC<
   const t = useI18NPrefix(i18nPrefix);
 
   const handleMomentTimeChange = momentTime => {
-    const timeStr = formatTime(momentTime, FILTER_TIME_FORMATTER_IN_QUERY);
+    const timeStr = formatTime(momentTime, TIME_FORMATTER);
     onChange?.(timeStr);
   };
 
@@ -42,7 +42,7 @@ const ExactTimeSelector: FC<
       showTime
       value={moment(time as string)}
       onChange={handleMomentTimeChange}
-      placeholder={t('pleaseSelect')}
+      placeholder={t('select')}
     />
   );
 });

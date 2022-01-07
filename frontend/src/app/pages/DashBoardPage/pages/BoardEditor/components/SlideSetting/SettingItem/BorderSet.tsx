@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Form, InputNumber, Select } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BORDER_STYLE_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { BorderConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { FC, memo } from 'react';
@@ -23,26 +24,28 @@ import ColorSet from './BasicSet/ColorSet';
 export const BorderSet: FC<{
   border: BorderConfig;
 }> = memo(({ border }) => {
+  const t = useI18NPrefix(`viz.board.setting`);
+  const tLine = useI18NPrefix(`viz.lineOptions`);
   return (
     <>
       {/* <ItemLabel> 边框颜色: </ItemLabel> */}
-      <Form.Item label="边框颜色" name={['border', 'color']}>
+      <Form.Item label={t('color')} name={['border', 'color']}>
         <ColorSet filedName={['border', 'color']} filedValue={border.color} />
       </Form.Item>
 
-      <Form.Item label="边框粗细" name={['border', 'width']}>
+      <Form.Item label={t('width')} name={['border', 'width']}>
         <InputNumber />
       </Form.Item>
-      <Form.Item label="边框样式" name={['border', 'style']}>
+      <Form.Item label={t('style')} name={['border', 'style']}>
         <Select>
           {BORDER_STYLE_OPTIONS.map(item => (
             <Select.Option key={item.value} value={item.value}>
-              {item.name}
+              {tLine(item.value)}
             </Select.Option>
           ))}
         </Select>
       </Form.Item>
-      <Form.Item label="边框圆角" name={['border', 'radius']}>
+      <Form.Item label={t('radius')} name={['border', 'radius']}>
         <InputNumber />
       </Form.Item>
     </>

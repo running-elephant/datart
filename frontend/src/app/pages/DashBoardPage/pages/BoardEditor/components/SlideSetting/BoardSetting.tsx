@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Collapse, Form } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { DashboardConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -40,6 +41,7 @@ import { Group, SettingPanel } from './SettingPanel';
 
 const { Panel } = Collapse;
 export const BoardSetting: FC = memo(() => {
+  const t = useI18NPrefix(`viz.board.setting`);
   const dispatch = useDispatch();
   const { boardType } = useContext(BoardContext);
   const { config } = useContext(BoardConfigContext);
@@ -95,7 +97,7 @@ export const BoardSetting: FC = memo(() => {
   );
 
   return (
-    <SettingPanel title="面板设计">
+    <SettingPanel title={`${t('board')} ${t('setting')}`}>
       <Form
         form={form}
         name="auto-board-from"
@@ -110,40 +112,64 @@ export const BoardSetting: FC = memo(() => {
         >
           {boardType === 'auto' && (
             <>
-              <Panel header="面板属性" key="autoSize" forceRender>
+              <Panel header={`${t('baseProperty')}`} key="autoSize" forceRender>
                 <Group>
-                  <NumberSet label={'画布边距-上下'} name="paddingH" />
-                  <NumberSet label={'画布边距-左右'} name="paddingW" />
-                  <NumberSet label={'组件间距-上下'} name="marginH" />
-                  <NumberSet label={'组件间距-左右'} name="marginW" />
-                  <NumberSet label={'组件高度'} name="rowHeight" />
+                  <NumberSet
+                    label={`${t('board')} ${t('marginTB')}`}
+                    name="paddingH"
+                  />
+                  <NumberSet
+                    label={`${t('board')} ${t('marginLR')}`}
+                    name="paddingW"
+                  />
+                  <NumberSet
+                    label={`${t('widget')} ${t('paddingTB')}`}
+                    name="marginH"
+                  />
+                  <NumberSet
+                    label={`${t('widget')} ${t('paddingLR')}`}
+                    name="marginW"
+                  />
+                  <NumberSet
+                    label={`${t('widget')} ${t('rowHeight')}`}
+                    name="rowHeight"
+                  />
                 </Group>
               </Panel>
             </>
           )}
           {boardType === 'free' && (
             <>
-              <Panel header="面板尺寸" key="freeSize" forceRender>
+              <Panel header={t('size')} key="freeSize" forceRender>
                 <Group>
-                  <NumberSet label={'宽度(像素)'} name={'boardWidth'} />
-                  <NumberSet label={'高度(像素)'} name={'boardHeight'} />
+                  <NumberSet
+                    label={`${t('width')} ( ${t('px')} )`}
+                    name={'boardWidth'}
+                  />
+                  <NumberSet
+                    label={`${t('height')} ( ${t('px')} )`}
+                    name={'boardHeight'}
+                  />
                 </Group>
               </Panel>
-              <Panel header="缩放模式" key="scale" forceRender>
+              <Panel header={t('scaleMode')} key="scale" forceRender>
                 <Group>
                   <ScaleModeSet scaleMode={config.scaleMode} />
                 </Group>
               </Panel>
             </>
           )}
-          <Panel header="背景设计" key="background" forceRender>
+          <Panel header={t('background')} key="background" forceRender>
             <Group>
               <BackgroundSet background={config.background} />
             </Group>
           </Panel>
-          <Panel header="查询配置" key="initialQuery" forceRender>
+          <Panel header={t('queryMode')} key="initialQuery" forceRender>
             <Group>
-              <InitialQuerySet name="initialQuery"></InitialQuerySet>
+              <InitialQuerySet
+                name="initialQuery"
+                label={t('openInitQuery')}
+              ></InitialQuerySet>
             </Group>
           </Panel>
         </Collapse>

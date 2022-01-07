@@ -26,7 +26,7 @@ import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardAction
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import { MediaWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { DEFAULT_VALUE_DATE_FORMAT } from 'app/pages/MainPage/pages/VariablePage/constants';
+import { TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import moment from 'moment';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
@@ -47,7 +47,7 @@ const FONT_DATA = {
 };
 const FORMAT_DATA = {
   comType: 'input',
-  default: DEFAULT_VALUE_DATE_FORMAT,
+  default: TIME_FORMATTER,
   disabled: undefined,
   key: 'timeFormat',
   label: '格式',
@@ -73,7 +73,7 @@ const TimerWidget: React.FC = () => {
   );
 
   const [currentTime, setCurrentTime] = useState(
-    moment().format(timerConfig?.time?.timeFormat || DEFAULT_VALUE_DATE_FORMAT),
+    moment().format(timerConfig?.time?.timeFormat || TIME_FORMATTER),
   );
   useEffect(() => {
     const timerConfig: TimerConfig = {

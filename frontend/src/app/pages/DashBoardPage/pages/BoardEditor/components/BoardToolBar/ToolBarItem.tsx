@@ -175,7 +175,7 @@ export const ToTopBtn: React.FC<ToolBtnProps> = props => {
       disabled={selectedIds.length !== 1}
       onClick={toTop}
       icon={<VerticalAlignTopOutlined />}
-      tip="置顶"
+      tip={t('toTop')}
       {...props}
     />
   );
@@ -192,7 +192,7 @@ export const ToBottomBtn: React.FC<ToolBtnProps> = props => {
       disabled={selectedIds.length !== 1}
       onClick={toBottom}
       icon={<VerticalAlignBottomOutlined />}
-      tip="置底"
+      tip={t('toBottom')}
       {...props}
     />
   );
@@ -237,7 +237,7 @@ export const MediaWidgetDropdown: React.FC<ToolBtnProps> = props => {
       type: 'iframe',
     },
     {
-      name: t('richText'),
+      name: t('video'),
       icon: '',
       type: 'video',
     },

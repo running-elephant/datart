@@ -17,6 +17,7 @@
  */
 import { Checkbox, Form, Input } from 'antd';
 import BasicFont from 'app/components/FormGenerator/Basic/BasicFont';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { WIDGET_TITLE_ALIGN_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { WidgetNameConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { fontDefault } from 'app/pages/DashBoardPage/utils/widget';
@@ -34,6 +35,7 @@ const FONT_DATA = {
 export const NameSet: FC<{
   config: WidgetNameConfig;
 }> = memo(({ config }) => {
+  const t = useI18NPrefix(`viz.board.setting`);
   const fontData = useMemo(() => {
     const data = {
       ...FONT_DATA,
@@ -49,13 +51,13 @@ export const NameSet: FC<{
 
   return (
     <>
-      <Form.Item label="名称" preserve name="name">
+      <Form.Item label={t('title')} preserve name="name">
         <Input placeholder="fill a name" />
       </Form.Item>
       <Form.Item valuePropName="checked" name={['nameConfig', 'show']}>
-        <Checkbox>显示标题</Checkbox>
+        <Checkbox>{t('showTitle')} </Checkbox>
       </Form.Item>
-      <Form.Item label="对齐方式">
+      <Form.Item label={t('align')}>
         <SelectSet
           name={['nameConfig', 'textAlign']}
           options={WIDGET_TITLE_ALIGN_OPTIONS}

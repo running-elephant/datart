@@ -41,7 +41,6 @@ const {
   RoseChart,
   ScoreChart,
   MingXiTableChart,
-  FenZuTableChart,
   NormalOutlineMapChart,
   WordCloudChart,
   ScatterOutlineMapChart,
@@ -69,7 +68,7 @@ class ChartManager {
       return;
     }
     const pluginsPaths = await getChartPluginPaths();
-    await Debugger.instance.measure('Plugin Charts | ', async () => {
+    Debugger.instance.measure('Plugin Charts | ', async () => {
       await this._loadCustomizeCharts(pluginsPaths);
     });
   }
@@ -104,7 +103,6 @@ class ChartManager {
 
   private _basicCharts(): Chart[] {
     return [
-      new FenZuTableChart(),
       new MingXiTableChart(),
       new PivotSheetChart(),
       new ScoreChart(),

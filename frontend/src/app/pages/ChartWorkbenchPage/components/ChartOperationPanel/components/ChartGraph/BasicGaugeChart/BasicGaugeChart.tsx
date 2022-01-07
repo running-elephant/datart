@@ -128,21 +128,22 @@ class BasicGaugeChart extends Chart {
       'pointerColor',
     );
 
+    const dataConfig: { name: string; value: string; itemStyle: any } = {
+      name: getColumnRenderName(aggConfig),
+      value: dataColumns?.[0]?.[getValueByColumnKey(aggConfig)] || 0,
+      itemStyle: {
+        color: pointerColor,
+      },
+    };
+    if (aggConfig?.color?.start) {
+      dataConfig.itemStyle.color = aggConfig.color.start;
+    }
+
     return {
       ...this.getGauge(styleConfigs),
-      data: dataColumns.map(dc => {
-        const dataConfig: { name: string; value: string; itemStyle: any } = {
-          name: getColumnRenderName(aggConfig),
-          value: dc[getValueByColumnKey(aggConfig)] || 0,
-          itemStyle: {
-            color: pointerColor,
-          },
-        };
-        if (aggConfig?.color?.start) {
-          dataConfig.itemStyle.color = aggConfig.color.start;
-        }
-        return dataConfig;
-      }),
+      data: [
+        dataConfig,
+      ],
       pointer,
       ...axis,
       title,

@@ -16,12 +16,6 @@
  * limitations under the License.
  */
 
-/**
- * 单色选择组件
- * @param onOk
- * @param color
- * @returns 返回一个新的颜色值
- */
 import { Popover } from 'antd';
 import { defaultPalette, defaultThemes } from 'app/assets/theme/colorsConfig';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -38,7 +32,13 @@ import {
 import ChromeColorPicker from './ChromeColorPicker';
 import { colorSelectionPropTypes } from './slice/types';
 
-function SingleColorSelection({ color, onOk }: colorSelectionPropTypes) {
+/**
+ * 单色选择组件
+ * @param onChange
+ * @param color
+ * @returns 返回一个新的颜色值
+ */
+function SingleColorSelection({ color, onChange }: colorSelectionPropTypes) {
   const [moreStatus, setMoreStatus] = useState(false);
   const [selectColor, setSelectColor] = useState(color);
   const t = useI18NPrefix('components.colorPicker');
@@ -47,13 +47,13 @@ function SingleColorSelection({ color, onOk }: colorSelectionPropTypes) {
   const moreCallBackFn = value => {
     if (value) {
       setSelectColor(value);
-      onOk?.(value);
+      onChange?.(value);
     }
     setMoreStatus(false);
   };
   const selectColorFn = (color: string) => {
     setSelectColor(color);
-    onOk?.(color);
+    onChange?.(color);
   };
   return (
     <ColorWrap>
@@ -92,7 +92,7 @@ function SingleColorSelection({ color, onOk }: colorSelectionPropTypes) {
         trigger="click"
         placement="bottom"
         autoAdjustOverflow
-        content={<ChromeColorPicker color={color} onOk={moreCallBackFn} />}
+        content={<ChromeColorPicker color={color} onChange={moreCallBackFn} />}
       >
         <MoreColor
           onClick={() => {

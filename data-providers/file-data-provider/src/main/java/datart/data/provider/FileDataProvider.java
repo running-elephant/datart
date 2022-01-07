@@ -21,10 +21,7 @@ import datart.core.base.consts.FileFormat;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
-import datart.core.common.CSVParse;
-import datart.core.common.FileUtils;
-import datart.core.common.POIUtils;
-import datart.core.common.UUIDGenerator;
+import datart.core.common.*;
 import datart.core.data.provider.Column;
 import datart.core.data.provider.DataProviderSource;
 import datart.core.data.provider.Dataframe;
@@ -45,6 +42,23 @@ public class FileDataProvider extends DefaultDataProvider {
     public static final String FILE_FORMAT = "format";
 
     public static final String FILE_PATH = "path";
+
+    private static final String I18N_PREFIX = "config.template.file.";
+
+    @Override
+    public String getConfigDisplayName(String name) {
+        return MessageResolver.getMessage(I18N_PREFIX + name);
+    }
+
+    @Override
+    public String getConfigDescription(String name) {
+        String message = MessageResolver.getMessage(I18N_PREFIX + name + ".desc");
+        if (message.startsWith(I18N_PREFIX)) {
+            return null;
+        } else {
+            return message;
+        }
+    }
 
     @Override
     public List<Dataframe> loadFullDataFromSource(DataProviderSource config) throws Exception {

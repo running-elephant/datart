@@ -518,6 +518,68 @@ const config: ChartConfig = {
         },
       },
     },
+    {
+      lang: 'en-US',
+      translation: {
+        common: {
+          showAxis: 'Show Axis',
+          inverseAxis: 'Inverse Axis',
+          lineStyle: 'Line Style',
+          borderType: 'Border Type',
+          borderWidth: 'Border Width',
+          borderColor: 'Border Color',
+          backgroundColor: 'Background Color',
+          showLabel: 'Show Label',
+          unitFont: 'Unit Font',
+          rotate: 'Rotate',
+          position: 'Position',
+          showInterval: 'Show Interval',
+          interval: 'Interval',
+          showTitleAndUnit: 'Show Title and Unit',
+          nameLocation: 'Name Location',
+          nameRotate: 'Name Rotate',
+          nameGap: 'Name Gap',
+          min: 'Min',
+          max: 'Max',
+        },
+        label: {
+          title: 'Label',
+          showLabel: 'Show Label',
+          position: 'Position',
+        },
+        legend: {
+          title: 'Legend',
+          showLegend: 'Show Legend',
+          type: 'Type',
+          selectAll: 'Select All',
+          position: 'Position',
+        },
+        data: {
+          color: 'Color',
+          colorize: 'Colorize',
+        },
+        graph: {
+          title: 'Graph',
+          smooth: 'Smooth',
+          step: 'Step',
+        },
+        xAxis: {
+          title: 'X Axis',
+        },
+        yAxis: {
+          title: 'Y Axis',
+        },
+        splitLine: {
+          title: 'Split Line',
+          showHorizonLine: 'Show Horizontal Line',
+          showVerticalLine: 'Show Vertical Line',
+        },
+        reference: {
+          title: 'Reference',
+          open: 'Open',
+        },
+      },
+    },
   ],
 };
 

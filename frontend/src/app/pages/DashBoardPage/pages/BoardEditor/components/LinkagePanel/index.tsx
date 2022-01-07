@@ -17,6 +17,7 @@
  */
 
 import { Form, Modal } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   selectDataChartById,
   selectViewMap,
@@ -48,6 +49,7 @@ import { LinkageWidgets } from './linkageWidgets';
 
 export interface LinkagePanelProps {}
 export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
+  const t = useI18NPrefix(`viz.linkage`);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const { type, widgetId } = useSelector(selectLinkagePanel);
@@ -57,12 +59,10 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
     () => getCanLinkageWidgets(allWidgets).filter(w => w.id !== widgetId),
     [allWidgets, widgetId],
   );
-
-  // selectDataChartById
   const widgetMap = useMemo(() => convertToWidgetMap(allWidgets), [allWidgets]);
 
   const [visible, setVisible] = useState(false);
-  // const [sameViewWidgetIds, setSameViewWidgetIds] = useState<string[]>([]);
+
   const sameViewWidgetIds = useRef<string[]>([]);
   const linkagesRef = useRef<ViewLinkageItem[]>([]);
   useEffect(() => {
@@ -81,7 +81,6 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
   };
 
   const onSubmit = useCallback(() => {
-    // handle onFinish
     form.submit();
   }, [form]);
   const afterClose = useCallback(() => {
@@ -223,8 +222,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
   }, [curWidget, form, setColNames, widgetMap]);
   return (
     <Modal
-      // title={`${type} 联动`}
-      title={'联动设置'}
+      title={t('title')}
       visible={visible}
       onOk={onSubmit}
       centered

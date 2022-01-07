@@ -1,6 +1,25 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { LoadingOutlined } from '@ant-design/icons';
 import { Button, Card, Form, message, Popconfirm, Select } from 'antd';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
@@ -43,6 +62,8 @@ export function MemberDetailPage() {
     params: { memberId },
   } = useRouteMatch<{ memberId: string }>();
   const [form] = Form.useForm();
+  const t = useI18NPrefix('member.memberDetail');
+  const tg = useI18NPrefix('global');
 
   const resetForm = useCallback(() => {
     form.resetFields();
@@ -89,11 +110,11 @@ export function MemberDetailPage() {
         orgId: orgId,
         roles: roleSelectValues.map(id => roles.find(r => r.id === id)!),
         resolve: () => {
-          message.success('修改成功');
+          message.success(tg('operation.updateSuccess'));
         },
       }),
     );
-  }, [dispatch, orgId, roleSelectValues, roles]);
+  }, [dispatch, orgId, roleSelectValues, roles, tg]);
 
   const remove = useCallback(() => {
     dispatch(
@@ -101,12 +122,12 @@ export function MemberDetailPage() {
         id: editingMember!.info.id,
         orgId: orgId,
         resolve: () => {
-          message.success('移除成功');
+          message.success(t('removeSuccess'));
           history.replace(`/organizations/${orgId}/members`);
         },
       }),
     );
-  }, [dispatch, history, orgId, editingMember]);
+  }, [dispatch, history, orgId, editingMember, t]);
 
   const grantOrgOwner = useCallback(
     (grant: boolean) => () => {
@@ -115,23 +136,23 @@ export function MemberDetailPage() {
           userId: editingMember.info.id,
           orgId,
           resolve: () => {
-            message.success(`${grant ? '设置' : '撤销'}成功`);
+            message.success(grant ? t('grantSuccess') : t('revokeSuccess'));
           },
         };
         dispatch(grant ? grantOwner(params) : revokeOwner(params));
       }
     },
-    [dispatch, orgId, editingMember],
+    [dispatch, orgId, editingMember, t],
   );
 
   return (
     <Wrapper>
       <DetailPageHeader
-        title="成员详情"
+        title={t('title')}
         actions={
           <>
             <Button type="primary" loading={saveMemberLoading} onClick={save}>
-              保存
+              {tg('button.save')}
             </Button>
             {editingMember?.info.orgOwner ? (
               <Button
@@ -139,16 +160,16 @@ export function MemberDetailPage() {
                 onClick={grantOrgOwner(false)}
                 danger
               >
-                撤销拥有者
+                {t('revokeOwner')}
               </Button>
             ) : (
               <Button loading={grantLoading} onClick={grantOrgOwner(true)}>
-                设为组织拥有者
+                {t('grantOwner')}
               </Button>
             )}
 
-            <Popconfirm title="确定移除该成员？" onConfirm={remove}>
-              <Button danger>移除成员</Button>
+            <Popconfirm title={t('removeConfirm')} onConfirm={remove}>
+              <Button danger>{t('remove')}</Button>
             </Popconfirm>
           </>
         }
@@ -162,17 +183,21 @@ export function MemberDetailPage() {
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
           >
-            <Form.Item label="用户名">{editingMember?.info.username}</Form.Item>
-            <Form.Item label="邮箱">{editingMember?.info.email}</Form.Item>
-            <Form.Item label="用户姓名">
+            <Form.Item label={t('username')}>
+              {editingMember?.info.username}
+            </Form.Item>
+            <Form.Item label={t('email')}>
+              {editingMember?.info.email}
+            </Form.Item>
+            <Form.Item label={t('name')}>
               {editingMember?.info.name || '-'}
             </Form.Item>
-            <Form.Item label="角色列表">
+            <Form.Item label={t('roles')}>
               {getMemberRolesLoading ? (
                 <LoadingOutlined />
               ) : (
                 <Select
-                  placeholder="为用户指定角色"
+                  placeholder={t('assignRole')}
                   mode="multiple"
                   loading={roleListLoading}
                   onDropdownVisibleChange={roleListVisibleChange}

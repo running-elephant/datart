@@ -20,6 +20,7 @@ package datart.data.provider;
 
 import datart.core.base.ExtendProcessor;
 import datart.core.base.exception.Exceptions;
+import datart.core.common.MessageResolver;
 import datart.core.data.provider.*;
 import datart.core.data.provider.processor.DataProviderPostProcessor;
 import datart.core.data.provider.processor.DataProviderPreProcessor;
@@ -60,7 +61,21 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
 
     @Override
     public DataProviderConfigTemplate getSourceConfigTemplate(String type) throws IOException {
-        return getDataProviderService(type).getConfigTemplate();
+        DataProvider providerService = getDataProviderService(type);
+        DataProviderConfigTemplate configTemplate = providerService.getConfigTemplate();
+        if (!CollectionUtils.isEmpty(configTemplate.getAttributes())) {
+            for (DataProviderConfigTemplate.Attribute attribute : configTemplate.getAttributes()) {
+                attribute.setDisplayName(providerService.getConfigDisplayName(attribute.getName()));
+                attribute.setDescription(providerService.getConfigDescription(attribute.getName()));
+                if (!CollectionUtils.isEmpty(attribute.getChildren())) {
+                    for (DataProviderConfigTemplate.Attribute child : attribute.getChildren()) {
+                        child.setDisplayName(providerService.getConfigDisplayName(child.getName()));
+                        child.setDescription(providerService.getConfigDescription(child.getName()));
+                    }
+                }
+            }
+        }
+        return configTemplate;
     }
 
     @Override

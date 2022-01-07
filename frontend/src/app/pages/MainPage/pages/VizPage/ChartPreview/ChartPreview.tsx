@@ -19,12 +19,12 @@
 import { message } from 'antd';
 import ChartEditor from 'app/components/ChartEditor';
 import { VizHeader } from 'app/components/VizHeader';
-import useResizeObserver from 'app/hooks/useResizeObserver';
+import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { useMainSlice } from 'app/pages/MainPage/slice';
-// import { makeDownloadDataTask } from 'app/pages/MainPage/slice/thunks';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -60,16 +60,7 @@ const ChartPreviewBoard: FC<{
     allowManage,
   }) => {
     useVizSlice();
-
-    const previewBlockObserver = useResizeObserver<HTMLDivElement>({
-      refreshMode: 'debounce',
-      refreshRate: 500,
-    });
-    const controllerObserver = useResizeObserver<HTMLDivElement>({
-      refreshMode: 'debounce',
-      refreshRate: 500,
-    });
-
+    const { ref, cacheW, cacheH } = useCacheWidthHeight(800, 600);
     const { actions } = useMainSlice();
     const chartManager = ChartManager.instance();
     const dispatch = useDispatch();
@@ -79,6 +70,7 @@ const ChartPreviewBoard: FC<{
     const [chartPreview, setChartPreview] = useState<ChartPreview>();
     const [chart, setChart] = useState<Chart>();
     const [editChartVisible, setEditChartVisible] = useState<boolean>(false);
+    const t = useI18NPrefix('viz.main');
 
     useEffect(() => {
       const filterSearchParams = filterSearchUrl
@@ -224,28 +216,15 @@ const ChartPreviewBoard: FC<{
             publish: chartPreview.backendChart.status === 1 ? true : false,
             resolve: () => {
               message.success(
-                `${
-                  chartPreview.backendChart?.status === 2 ? '取消' : ''
-                }发布成功`,
+                chartPreview.backendChart?.status === 2
+                  ? t('unpublishSuccess')
+                  : t('publishSuccess'),
               );
             },
           }),
         );
       }
-    }, [dispatch, chartPreview?.backendChart]);
-
-    const calcuateChartContainerRegion = () => {
-      const region = { width: 300, height: 300 };
-      if (!controllerObserver?.ref || !previewBlockObserver?.ref) {
-        return region;
-      }
-      return {
-        width: previewBlockObserver?.width || region.width,
-        height:
-          (previewBlockObserver?.height || region.height) -
-          (controllerObserver?.height || 0),
-      };
-    };
+    }, [dispatch, chartPreview?.backendChart, t]);
 
     return (
       <StyledChartPreviewBoard>
@@ -261,8 +240,8 @@ const ChartPreviewBoard: FC<{
           allowShare={allowShare}
           allowManage={allowManage}
         />
-        <PreviewBlock ref={previewBlockObserver.ref}>
-          <div ref={controllerObserver.ref}>
+        <PreviewBlock>
+          <div>
             <ControllerPanel
               viewId={chartPreview?.backendChart?.viewId}
               view={chartPreview?.backendChart?.view}
@@ -270,15 +249,15 @@ const ChartPreviewBoard: FC<{
               onChange={handleFilterChange}
             />
           </div>
-          <ChartWrapper>
+          <ChartWrapper ref={ref}>
             <ChartTools.ChartIFrameContainer
               key={backendChartId}
               containerId={backendChartId}
               dataset={chartPreview?.dataset}
               chart={chart!}
               config={chartPreview?.chartConfig!}
-              width={calcuateChartContainerRegion().width}
-              height={calcuateChartContainerRegion().height}
+              width={cacheW}
+              height={cacheH}
             />
           </ChartWrapper>
         </PreviewBlock>
@@ -298,7 +277,6 @@ const ChartPreviewBoard: FC<{
 );
 
 export default ChartPreviewBoard;
-
 const StyledChartPreviewBoard = styled.div`
   display: flex;
   flex: 1;
@@ -309,7 +287,6 @@ const StyledChartPreviewBoard = styled.div`
     flex-grow: 1000;
   }
 `;
-
 const PreviewBlock = styled.div`
   display: flex;
   flex: 1;

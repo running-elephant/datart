@@ -1,4 +1,5 @@
 import { TreeSelect, TreeSelectProps } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, useCallback, useMemo } from 'react';
 import { TargetValueType } from './types';
 
@@ -27,6 +28,7 @@ export const TargetTreeSelect: FC<TargetTreeSelectProps> = ({
   onChange,
   ...restProps
 }) => {
+  const t = useI18NPrefix(`viz.jump`);
   const _treeData = useMemo(() => {
     return disabledTreeData(treeData || [], filterBoardId);
   }, [treeData, filterBoardId]);
@@ -52,7 +54,7 @@ export const TargetTreeSelect: FC<TargetTreeSelectProps> = ({
   }, [value]);
   return (
     <TreeSelect
-      placeholder="请选择跳转目标"
+      placeholder={t('target')}
       treeData={_treeData}
       treeDefaultExpandAll
       treeIcon

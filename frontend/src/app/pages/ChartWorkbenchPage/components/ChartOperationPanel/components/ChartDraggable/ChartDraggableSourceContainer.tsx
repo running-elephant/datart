@@ -91,7 +91,7 @@ export const ChartDraggableSourceContainer: FC<
   const styleClasses: Array<string> = useMemo(() => {
     let styleArr: Array<string> = [];
     if (isActive) {
-      styleArr.push('containerActive');
+      styleArr.push('container-active');
     }
     return styleArr;
   }, [isActive]);
@@ -178,7 +178,7 @@ export const ChartDraggableSourceContainer: FC<
   return (
     <Container
       onClick={e => {
-        onSelectionChange?.(colName, e.metaKey, e.shiftKey);
+        onSelectionChange?.(colName, e.metaKey || e.ctrlKey, e.shiftKey);
       }}
       ref={drag}
       className={styleClasses.join(' ')}
@@ -199,7 +199,7 @@ const Container = styled.div`
   font-weight: ${FONT_WEIGHT_MEDIUM};
   color: ${p => p.theme.textColorSnd};
   cursor: pointer;
-  &.containerActive {
+  &.container-active {
     background-color: #f8f9fa;
   }
   > p {
