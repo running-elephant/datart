@@ -38,6 +38,11 @@ public class SqlValidateUtils {
             return true;
         }
 
+        // check sql with
+        if (sqlCall instanceof SqlWith) {
+            return true;
+        }
+
         Exceptions.tr(DataProviderException.class, "message.sql.op.forbidden", sqlCall.getKind() + ":" + sqlCall);
         return false;
     }
