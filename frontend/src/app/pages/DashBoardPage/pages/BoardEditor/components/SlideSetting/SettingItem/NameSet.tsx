@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { EditTwoTone } from '@ant-design/icons';
 import { Checkbox, Form, Input } from 'antd';
 import BasicFont from 'app/components/FormGenerator/Basic/BasicFont';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -22,6 +23,7 @@ import { WIDGET_TITLE_ALIGN_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { WidgetNameConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { fontDefault } from 'app/pages/DashBoardPage/utils/widget';
 import React, { FC, memo, useMemo } from 'react';
+import { PRIMARY } from 'styles/StyleConstants';
 import SelectSet from './BasicSet/SelectSet';
 
 const FONT_DATA = {
@@ -48,10 +50,16 @@ export const NameSet: FC<{
     const nameConfig = { ...config, ...data.value };
     return nameConfig;
   };
-
+  const titleLabel = useMemo(() => {
+    return (
+      <span>
+        {t('title')} <EditTwoTone twoToneColor={PRIMARY} />
+      </span>
+    );
+  }, [t]);
   return (
     <>
-      <Form.Item label={t('title')} preserve name="name">
+      <Form.Item label={titleLabel} preserve name="name">
         <Input placeholder="fill a name" />
       </Form.Item>
       <Form.Item valuePropName="checked" name={['nameConfig', 'show']}>
