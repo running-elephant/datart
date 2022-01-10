@@ -78,7 +78,7 @@ function useSlideStyle(
     let height: number;
     width = rect.width;
     height = rect.height;
-    return [width, height].map(item => Math.max(zoomRatio, 1) * item);
+    return [width, height];
   }, [rect, zoomRatio]);
   let nextScale = useMemo<[number, number]>(() => {
     if (!containerWidth || !containerHeight) {
@@ -159,8 +159,8 @@ function useSlideStyle(
       return newBackgroundStyle;
     }
     if (
-      boardWidth * nextScale[0] > containerWidth ||
-      boardHeight * nextScale[1] > containerHeight
+      boardWidth * nextScale[0] >= containerWidth ||
+      boardHeight * nextScale[1] >= containerHeight
     ) {
       newBackgroundStyle.overflow = 'auto';
     }
