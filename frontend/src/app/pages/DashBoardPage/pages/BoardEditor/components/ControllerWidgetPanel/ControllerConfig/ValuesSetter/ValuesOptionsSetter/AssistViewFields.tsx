@@ -43,8 +43,16 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
   ({ onChange, value }) => {
     const tc = useI18NPrefix(`viz.control`);
     const dispatch = useDispatch();
+    const [val, setVal] = useState<string[]>([]);
     const { orgId } = useContext(BoardContext);
     const [options, setOptions] = useState<CascaderOptionType[]>([]);
+    useEffect(() => {
+      if (Array.isArray(value) && value.length === 0) {
+        if (val.length) {
+          onChange?.(val);
+        }
+      }
+    }, [onChange, val, value]);
     const getViewData = useCallback(async viewId => {
       try {
         const { data } = await request<View>(`/views/${viewId}`);
@@ -128,14 +136,17 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
       },
       [options, getViewData],
     );
-
+    const optionChange = value => {
+      setVal(value);
+      onChange?.(value);
+    };
     return (
       <Cascader
         allowClear
         placeholder={tc('selectViewField')}
         options={options}
-        onChange={onChange as any}
-        value={value}
+        onChange={optionChange}
+        value={val}
         style={{ margin: '6px 0' }}
         loadData={loadData as any}
       />
