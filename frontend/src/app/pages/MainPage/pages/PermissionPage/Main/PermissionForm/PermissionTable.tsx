@@ -112,7 +112,10 @@ export const PermissionTable = memo(
       const columns: TableColumnProps<DataSourceTreeNode>[] = [
         {
           dataIndex: 'name',
-          title: t('resourceName'),
+          title:
+            viewpoint === Viewpoints.Resource
+              ? t('subjectName')
+              : t('resourceName'),
         },
         {
           title: t('privileges'),

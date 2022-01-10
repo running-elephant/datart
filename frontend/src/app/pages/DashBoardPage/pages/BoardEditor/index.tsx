@@ -20,7 +20,9 @@ import React, { memo, useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
+import { BoardLoading } from '../../components/BoardLoading';
 import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
@@ -45,24 +47,17 @@ export const BoardEditor: React.FC<{
   allowDownload?: boolean;
   allowShare?: boolean;
   allowManage?: boolean;
-  onCloseBoardEditor: (bool: boolean) => void;
 }> = memo(
-  ({
-    dashboardId: boardId,
-    allowDownload,
-    allowShare,
-    allowManage,
-    onCloseBoardEditor,
-  }) => {
+  ({ dashboardId: boardId, allowDownload, allowShare, allowManage }) => {
     const dashboardId = boardId;
     const dispatch = useDispatch();
+    const history = useHistory();
     const dashboard = useSelector(selectEditBoard);
     const boardChartEditorProps = useSelector(selectBoardChartEditorProps);
     const onCloseChartEditor = useCallback(() => {
       dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
     }, [dispatch]);
     useEffect(() => {
-      // dispatch(getEditBoardDetail(dashboardId));
       dispatch(fetchEditBoardDetail(dashboardId));
     }, [dashboardId, dispatch]);
 
@@ -74,6 +69,15 @@ export const BoardEditor: React.FC<{
         dispatch(addVariablesToBoard(view.variables));
       },
       [boardChartEditorProps?.widgetId, dispatch, onCloseChartEditor],
+    );
+    const onCloseBoardEditor = useCallback(
+      (bool: boolean) => {
+        const pathName = history.location.pathname;
+        const prePath = pathName.split('/boardEditor')[0];
+        history.push(`${prePath}`);
+        dispatch(fetchEditBoardDetail(dashboardId));
+      },
+      [dashboardId, dispatch, history],
     );
     const boardEditor = useMemo(() => {
       if (!dashboard.id) return null;
@@ -87,41 +91,41 @@ export const BoardEditor: React.FC<{
           board={dashboard}
           editing={true}
           autoFit={false}
-          allowDownload={allowDownload}
-          allowShare={allowShare}
-          allowManage={allowManage}
+          allowDownload={false}
+          allowShare={false}
+          allowManage={false}
           renderMode="read"
         >
-          <Wrapper>
-            <TitleHeader toggleBoardEditor={onCloseBoardEditor} />
-            {boardType === 'auto' && <AutoEditor />}
-            {boardType === 'free' && <FreeEditor />}
-            <ControllerWidgetPanel />
-            <LinkagePanel />
-            <SettingJumpModal />
-            {boardChartEditorProps && (
-              <ChartEditor
-                {...boardChartEditorProps}
-                onClose={onCloseChartEditor}
-                onSaveInWidget={onSaveToWidget}
-              />
-            )}
-          </Wrapper>
+          <TitleHeader toggleBoardEditor={onCloseBoardEditor} />
+          {boardType === 'auto' && <AutoEditor />}
+          {boardType === 'free' && <FreeEditor />}
+          <ControllerWidgetPanel />
+          <LinkagePanel />
+          <SettingJumpModal />
+          {boardChartEditorProps && (
+            <ChartEditor
+              {...boardChartEditorProps}
+              onClose={onCloseChartEditor}
+              onSaveInWidget={onSaveToWidget}
+            />
+          )}
         </BoardProvider>
       );
-      // return null;
     }, [
       boardChartEditorProps,
       dashboard,
       dashboardId,
-      allowDownload,
-      allowShare,
-      allowManage,
       onCloseBoardEditor,
       onCloseChartEditor,
       onSaveToWidget,
     ]);
-    return <DndProvider backend={HTML5Backend}>{boardEditor}</DndProvider>;
+    return (
+      <Wrapper>
+        <DndProvider backend={HTML5Backend}>
+          {boardEditor || <BoardLoading />}
+        </DndProvider>
+      </Wrapper>
+    );
   },
 );
 export default BoardEditor;
@@ -134,10 +138,6 @@ const Wrapper = styled.div`
   z-index: 50;
   display: flex;
   flex-direction: column;
-
   padding-bottom: 0;
-
   background-color: ${p => p.theme.bodyBackground};
-
-  /* flex-direction: column; */
 `;

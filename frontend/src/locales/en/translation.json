@@ -1059,7 +1059,8 @@
     "modulePermissionDesc": "You can only access the module after enabling the module permission",
     "resourceDetail": "Resource detail",
     "createStoryboard": "Create storyboard",
-    "resourceName": "Resource name",
+    "resourceName": "Resource Name",
+    "subjectName": "Subject Name",
     "privileges": "Privileges",
     "add": "Create ",
     "viewpoint": {

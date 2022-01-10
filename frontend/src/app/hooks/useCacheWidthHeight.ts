@@ -20,8 +20,8 @@ import { useEffect, useState } from 'react';
 import useResizeObserver from './useResizeObserver';
 
 export const useCacheWidthHeight = (
-  initWidth: number = 400,
-  initHeight: number = 300,
+  initWidth: number = 0,
+  initHeight: number = 0,
 ) => {
   const [cacheW, setCacheW] = useState(initWidth);
   const [cacheH, setCacheH] = useState(initHeight);

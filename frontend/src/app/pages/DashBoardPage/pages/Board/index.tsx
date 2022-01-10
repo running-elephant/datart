@@ -16,20 +16,21 @@
  * limitations under the License.
  */
 
-import { message, Spin } from 'antd';
+import { message } from 'antd';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { publishViz } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
+import { BoardLoading } from '../../components/BoardLoading';
 import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import { FullScreenPanel } from '../../components/FullScreenPanel';
 import TitleHeader from '../../components/TitleHeader';
-import BoardEditor from '../BoardEditor';
 import { editDashBoardInfoActions } from '../BoardEditor/slice';
 import { clearEditBoardState } from '../BoardEditor/slice/actions/actions';
 import AutoBoardCore from './AutoDashboard/AutoBoardCore';
@@ -66,6 +67,7 @@ export const Board: React.FC<BoardProps> = memo(
   }) => {
     const boardId = id;
     const dispatch = useDispatch();
+    const history = useHistory();
     const { ref, width, height } = useResizeObserver<HTMLDivElement>({
       refreshMode: 'debounce',
       refreshRate: 2000,
@@ -97,18 +99,21 @@ export const Board: React.FC<BoardProps> = memo(
       };
     }, [boardId, dispatch, fetchData, searchParams]);
 
-    const [showBoardEditor, setShowBoardEditor] = useState(false);
     const dashboard = useSelector((state: { board: BoardState }) =>
       makeSelectBoardConfigById()(state, boardId),
     );
     const toggleBoardEditor = useCallback(
       (bool: boolean) => {
-        setShowBoardEditor(bool);
-        if (!bool) {
-          dispatch(fetchBoardDetail({ dashboardRelId: dashboard?.id || '' }));
+        const pathName = history.location.pathname;
+        if (pathName.includes(boardId)) {
+          history.push(`${pathName.split(boardId)[0]}${boardId}/boardEditor`);
+        } else if (pathName.includes('/vizs')) {
+          history.push(
+            `${pathName.split('/vizs')[0]}${'/vizs/'}${boardId}/boardEditor`,
+          );
         }
       },
-      [dashboard?.id, dispatch],
+      [boardId, history],
     );
 
     const publishLoading = useSelector(selectPublishLoading);
@@ -169,11 +174,7 @@ export const Board: React.FC<BoardProps> = memo(
           </div>
         );
       } else {
-        return (
-          <div className="loading">
-            <Spin size="large" tip="Loading..." />
-          </div>
-        );
+        return <BoardLoading />;
       }
     }, [
       dashboard,
@@ -207,15 +208,6 @@ export const Board: React.FC<BoardProps> = memo(
     return (
       <Wrapper ref={ref} className="dashboard-box">
         <DndProvider backend={HTML5Backend}>{viewBoard}</DndProvider>
-        {showBoardEditor && (
-          <BoardEditor
-            dashboardId={boardId}
-            allowDownload={allowDownload}
-            allowShare={allowShare}
-            allowManage={allowManage}
-            onCloseBoardEditor={toggleBoardEditor}
-          />
-        )}
       </Wrapper>
     );
   },
@@ -234,11 +226,5 @@ const Wrapper = styled.div<{}>`
     flex: 1;
     flex-direction: column;
     min-height: 0;
-  }
-  .loading {
-    display: flex;
-    flex: 1;
-    justify-content: center;
-    align-items: center;
   }
 `;

@@ -1060,6 +1060,7 @@
     "resourceDetail": "资源明细",
     "createStoryboard": "新增故事板",
     "resourceName": "资源名称",
+    "subjectName": "权限主体名称",
     "privileges": "权限详情",
     "add": "新建",
     "viewpoint": {
