@@ -74,12 +74,10 @@ function useSlideStyle(
     if (!rect) {
       return [];
     }
-    let width: number;
-    let height: number;
-    width = rect.width;
-    height = rect.height;
+    const width: number = rect.width;
+    const height: number = rect.height;
     return [width, height];
-  }, [rect, zoomRatio]);
+  }, [rect]);
   let nextScale = useMemo<[number, number]>(() => {
     if (!containerWidth || !containerHeight) {
       return [0, 0];
