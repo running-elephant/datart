@@ -54,9 +54,12 @@ const AntdTableWrapper: FC<{
 });
 
 const StyledTable = styled(Table)`
-  background: 'transparent';
   height: 100%;
   overflow: auto;
+
+  .ant-table {
+    background: transparent;
+  }
 
   .ant-table-summary {
     background: #fafafa;
