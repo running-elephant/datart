@@ -1,4 +1,4 @@
-package datart.core.base;
+package datart.core.base.processor;
 
 public interface ExtendProcessor {
 }

@@ -18,9 +18,9 @@
 
 package datart.data.provider;
 
-import datart.core.base.ExtendProcessor;
+import datart.core.base.processor.ExtendProcessor;
 import datart.core.base.exception.Exceptions;
-import datart.core.common.MessageResolver;
+import datart.core.base.processor.ProcessorResponse;
 import datart.core.data.provider.*;
 import datart.core.data.provider.processor.DataProviderPostProcessor;
 import datart.core.data.provider.processor.DataProviderPreProcessor;
@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -101,6 +100,11 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
     @Override
     public Dataframe execute(DataProviderSource source, QueryScript queryScript, ExecuteParam param) throws Exception {
 
+        //sql + param preprocessing
+        ProcessorResponse preProcessorRes = this.preProcessorQuery(source,queryScript,param);
+        if(!preProcessorRes.isSuccess()){
+            return Dataframe.empty();
+        }
         Dataframe dataframe;
 
         String queryKey = DataProviderUtils.toCacheKey(source, queryScript, param);
@@ -111,52 +115,50 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
                 return dataframe;
             }
         }
-
-        dataframe = runScript(source, queryScript, param, queryKey);
-
-        if (param.isCacheEnable()) {
-            setCache(queryKey, dataframe, param.getCacheExpires());
-        }
-        return dataframe;
-
-    }
-
-    private Dataframe runScript(DataProviderSource source, QueryScript queryScript, ExecuteParam param, String queryKey) throws Exception {
-
-        //sql + param preprocessing
-        this.preProcessorQuery(source,queryScript,param);
-
-        Dataframe dataframe;
         if (param.isConcurrencyOptimize()) {
             dataframe = runOptimize(queryKey, source, queryScript, param);
         } else {
             dataframe = run(source, queryScript, param);
         }
-
+        if (param.isCacheEnable()) {
+            setCache(queryKey, dataframe, param.getCacheExpires());
+        }
         //data postprocessing
-        this.postProcessorQuery(dataframe,source,queryScript,param);
+        ProcessorResponse postProcessorRes = this.postProcessorQuery(dataframe,source,queryScript,param);
+        if(!postProcessorRes.isSuccess()){
+            return Dataframe.empty();
+        }
 
         return dataframe;
+
     }
 
-    private void preProcessorQuery(DataProviderSource source, QueryScript queryScript, ExecuteParam param){
+    private ProcessorResponse preProcessorQuery(DataProviderSource source, QueryScript queryScript, ExecuteParam param){
         if(!CollectionUtils.isEmpty(extendProcessors)){
             for(ExtendProcessor processor: extendProcessors){
                 if(processor instanceof DataProviderPreProcessor){
-                    ((DataProviderPreProcessor) processor).preRun(source,queryScript,param);
+                    ProcessorResponse response = ((DataProviderPreProcessor) processor).preRun(source,queryScript,param);
+                    if(!response.isSuccess()){
+                        return response;
+                    }
                 }
             }
         }
+        return ProcessorResponse.success();
     }
 
-    private void postProcessorQuery(Dataframe dataframe,DataProviderSource source, QueryScript queryScript, ExecuteParam param){
+    private ProcessorResponse postProcessorQuery(Dataframe dataframe,DataProviderSource source, QueryScript queryScript, ExecuteParam param){
         if(!CollectionUtils.isEmpty(extendProcessors)){
             for(ExtendProcessor processor: extendProcessors){
                 if(processor instanceof DataProviderPostProcessor){
-                    ((DataProviderPostProcessor) processor).postRun(dataframe,source,queryScript,param);
+                    ProcessorResponse response = ((DataProviderPostProcessor) processor).postRun(dataframe,source,queryScript,param);
+                    if(!response.isSuccess()){
+                        return response;
+                    }
                 }
             }
         }
+        return ProcessorResponse.success();
     }
 
     @Override
