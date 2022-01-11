@@ -18,19 +18,19 @@
 
 import { message } from 'antd';
 import ChartEditor from 'app/components/ChartEditor';
+import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { VizHeader } from 'app/components/VizHeader';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import { ChartDataRequestBuilder } from "app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder";
+import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { useMainSlice } from 'app/pages/MainPage/slice';
+import { IChart } from 'app/types/Chart';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
-import ChartTools from '../../../../ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
 import { useVizSlice } from '../slice';
 import { selectPreviewCharts, selectPublishLoading } from '../slice/selectors';
 import {
@@ -68,7 +68,7 @@ const ChartPreviewBoard: FC<{
     const previewCharts = useSelector(selectPreviewCharts);
     const publishLoading = useSelector(selectPublishLoading);
     const [chartPreview, setChartPreview] = useState<ChartPreview>();
-    const [chart, setChart] = useState<Chart>();
+    const [chart, setChart] = useState<IChart>();
     const [editChartVisible, setEditChartVisible] = useState<boolean>(false);
     const t = useI18NPrefix('viz.main');
 
@@ -250,7 +250,7 @@ const ChartPreviewBoard: FC<{
             />
           </div>
           <ChartWrapper ref={ref}>
-            <ChartTools.ChartIFrameContainer
+            <ChartIFrameContainer
               key={backendChartId}
               containerId={backendChartId}
               dataset={chartPreview?.dataset}

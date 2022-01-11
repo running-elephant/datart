@@ -17,7 +17,7 @@
  */
 
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
+import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { reachLowerBoundCount } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
@@ -25,7 +25,7 @@ import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_TIMES } from 'styles/StyleConstants';
 
 const Chart404Graph: FC<{
-  chart?: Chart;
+  chart?: IChart;
   chartConfig?: ChartConfig;
 }> = memo(({ chart, chartConfig }) => {
   const t = useI18NPrefix(`viz.palette`);

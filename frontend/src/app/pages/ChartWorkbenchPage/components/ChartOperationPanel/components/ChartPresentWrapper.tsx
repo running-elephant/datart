@@ -17,7 +17,7 @@
  */
 
 import useResizeObserver from 'app/hooks/useResizeObserver';
-import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
+import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import { FC, memo, useMemo } from 'react';
@@ -29,10 +29,10 @@ import ChartPresentPanel from './ChartPresentPanel';
 const ChartPresentWrapper: FC<{
   containerHeight?: number;
   containerWidth?: number;
-  chart?: Chart;
+  chart?: IChart;
   dataset?: ChartDataset;
   chartConfig?: ChartConfig;
-  onChartChange: (c: Chart) => void;
+  onChartChange: (c: IChart) => void;
 }> = memo(
   ({
     containerHeight,

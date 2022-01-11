@@ -16,17 +16,17 @@
  * limitations under the License.
  */
 
+import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { VizHeader } from 'app/components/VizHeader';
 import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
-import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
+import { IChart } from 'app/types/Chart';
 import { FC, memo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartTools from '../ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
 import ChartDataRequest from '../ChartWorkbenchPage/models/ChartDataRequest';
-import { ChartDataRequestBuilder } from "../ChartWorkbenchPage/models/ChartDataRequestBuilder";
+import { ChartDataRequestBuilder } from '../ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import ControllerPanel from '../MainPage/pages/VizPage/ChartPreview/components/ControllerPanel';
 import {
   ChartPreview,
@@ -50,7 +50,7 @@ const ChartForShare: FC<{
   ) => void;
 }> = memo(({ chartPreview, onCreateDataChartDownloadTask }) => {
   const dispatch = useDispatch();
-  const [chart] = useState<Chart | undefined>(() => {
+  const [chart] = useState<IChart | undefined>(() => {
     const currentChart = ChartManager.instance().getById(
       chartPreview?.backendChart?.config?.chartGraphId,
     );
@@ -153,7 +153,7 @@ const ChartForShare: FC<{
       </div>
 
       <div style={{ width: '100%', height: '100%' }} ref={ref}>
-        <ChartTools.ChartIFrameContainer
+        <ChartIFrameContainer
           key={chartPreview?.backendChart?.id!}
           containerId={chartPreview?.backendChart?.id!}
           dataset={chartPreview?.dataset}

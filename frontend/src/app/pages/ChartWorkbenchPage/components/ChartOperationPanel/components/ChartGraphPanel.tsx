@@ -19,8 +19,8 @@
 import { Tooltip } from 'antd';
 import { IW } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
+import { IChart } from 'app/types/Chart';
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import { transferChartDataConfig } from 'app/utils/internalChartHelper';
 import classnames from 'classnames';
@@ -36,13 +36,13 @@ import {
 import { CloneValueDeep } from 'utils/object';
 
 const ChartGraphPanel: FC<{
-  chart?: Chart;
+  chart?: IChart;
   chartConfig?: ChartConfig;
-  onChartChange: (c: Chart) => void;
+  onChartChange: (c: IChart) => void;
 }> = memo(({ chart, chartConfig, onChartChange }) => {
   const t = useI18NPrefix(`viz.palette.graph`);
   const chartManager = ChartManager.instance();
-  const [allCharts] = useState<Chart[]>(chartManager.getAllCharts());
+  const [allCharts] = useState<IChart[]>(chartManager.getAllCharts());
   const [requirementsStates, setRequirementStates] = useState<object>({});
 
   useEffect(() => {

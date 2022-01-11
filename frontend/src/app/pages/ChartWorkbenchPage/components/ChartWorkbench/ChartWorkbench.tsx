@@ -20,7 +20,7 @@ import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/Chart
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
-import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
+import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
@@ -38,7 +38,7 @@ const ChartWorkbench: FC<{
   dataset?: ChartDataset;
   dataview?: ChartDataView;
   chartConfig?: ChartConfig;
-  chart?: Chart;
+  chart?: IChart;
   aggregation?: boolean;
   header?: {
     name?: string;
@@ -46,7 +46,7 @@ const ChartWorkbench: FC<{
     onGoBack?: () => void;
     onChangeAggregation?: (state: boolean) => void;
   };
-  onChartChange: (c: Chart) => void;
+  onChartChange: (c: IChart) => void;
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
 }> = memo(
