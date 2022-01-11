@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { message, Spin } from 'antd';
+import { message } from 'antd';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { publishViz } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
@@ -27,6 +27,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
+import { BoardLoading } from '../../components/BoardLoading';
 import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import { FullScreenPanel } from '../../components/FullScreenPanel';
 import TitleHeader from '../../components/TitleHeader';
@@ -173,11 +174,7 @@ export const Board: React.FC<BoardProps> = memo(
           </div>
         );
       } else {
-        return (
-          <div className="loading">
-            <Spin size="large" tip="Loading..." />
-          </div>
-        );
+        return <BoardLoading />;
       }
     }, [
       dashboard,
@@ -229,11 +226,5 @@ const Wrapper = styled.div<{}>`
     flex: 1;
     flex-direction: column;
     min-height: 0;
-  }
-  .loading {
-    display: flex;
-    flex: 1;
-    justify-content: center;
-    align-items: center;
   }
 `;

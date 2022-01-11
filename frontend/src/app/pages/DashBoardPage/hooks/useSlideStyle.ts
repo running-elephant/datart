@@ -74,12 +74,10 @@ function useSlideStyle(
     if (!rect) {
       return [];
     }
-    let width: number;
-    let height: number;
-    width = rect.width;
-    height = rect.height;
-    return [width, height].map(item => Math.max(zoomRatio, 1) * item);
-  }, [rect, zoomRatio]);
+    const width: number = rect.width;
+    const height: number = rect.height;
+    return [width, height];
+  }, [rect]);
   let nextScale = useMemo<[number, number]>(() => {
     if (!containerWidth || !containerHeight) {
       return [0, 0];
@@ -140,10 +138,14 @@ function useSlideStyle(
       width = rect.width;
       height = rect.height;
     }
-    const translateX =
-      (Math.max(width - boardWidth * nextScale[0]) / (2 * boardWidth)) * 100;
-    const translateY =
-      (Math.max(height - boardHeight * nextScale[1]) / (2 * boardHeight)) * 100;
+    const translateX = Math.max(
+      (Math.max(width - boardWidth * nextScale[0]) / (2 * boardWidth)) * 100,
+      0,
+    );
+    const translateY = Math.max(
+      (Math.max(height - boardHeight * nextScale[1]) / (2 * boardHeight)) * 100,
+      0,
+    );
     return [translateX, translateY];
   }, [rect, boardWidth, nextScale, boardHeight]);
   nextTranslate = nextTranslate || slideTranslate;
@@ -155,8 +157,8 @@ function useSlideStyle(
       return newBackgroundStyle;
     }
     if (
-      boardWidth * nextScale[0] > containerWidth ||
-      boardHeight * nextScale[1] > containerHeight
+      boardWidth * nextScale[0] >= containerWidth ||
+      boardHeight * nextScale[1] >= containerHeight
     ) {
       newBackgroundStyle.overflow = 'auto';
     }

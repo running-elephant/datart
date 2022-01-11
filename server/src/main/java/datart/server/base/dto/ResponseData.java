@@ -27,6 +27,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -42,6 +44,8 @@ public class ResponseData<T> {
 
     @JsonInclude()
     private String message;
+
+    private List<String> warnings;
 
     @JsonInclude()
     private T data;
