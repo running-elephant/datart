@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartMouseEventParams } from 'app/types/DatartChartBase';
+import { ChartMouseEventParams } from 'app/types/Chart';
 import { createContext } from 'react';
 import { widgetActionType } from '../components/WidgetToolBar/config';
 import { Widget } from '../pages/Board/slice/types';

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { IChart } from 'app/types/Chart';
+import { ChartMouseEvent, ChartStatus, IChart } from 'app/types/Chart';
 import {
   ChartConfig,
   ChartDataSectionConfig,
@@ -24,14 +24,10 @@ import {
 } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import ChartMetadata from 'app/types/ChartMetadata';
-import DatartChartBase, {
-  ChartMouseEvent,
-  ChartStatus,
-} from 'app/types/DatartChartBase';
 import { isInRange } from 'app/utils/chartHelper';
 import { isEmpty } from 'utils/object';
 
-class Chart extends DatartChartBase implements IChart {
+class Chart implements IChart {
   meta: ChartMetadata;
   config?: ChartConfig;
   dataset?: ChartDataset;
@@ -53,8 +49,6 @@ class Chart extends DatartChartBase implements IChart {
   }
 
   constructor(id: string, name: string, icon?: string, requirements?: []) {
-    super();
-
     this.meta = {
       id,
       name,

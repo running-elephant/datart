@@ -20,7 +20,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
-import { ChartMouseEventParams } from 'app/types/DatartChartBase';
+import { ChartMouseEventParams } from 'app/types/Chart';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { FC, useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
