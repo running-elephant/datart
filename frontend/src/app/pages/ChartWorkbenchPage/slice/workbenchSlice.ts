@@ -39,9 +39,8 @@ import { CloneValueDeep } from 'utils/object';
 import { request } from 'utils/request';
 import { listToTree, reduxActionErrorHandler, rejectHandle } from 'utils/utils';
 import { filterSqlOperatorName } from '../../DashBoardPage/utils';
-import ChartRequest, {
-  ChartDataRequestBuilder,
-} from '../models/ChartHttpRequest';
+import ChartDataRequest from '../models/ChartDataRequest';
+import { ChartDataRequestBuilder } from "../models/ChartDataRequestBuilder";
 
 export type ChartConfigPayloadType = {
   init?: ChartConfig;
@@ -182,7 +181,7 @@ export const initWorkbenchAction = createAsyncThunk(
 
 export const fetchDataSetAction = createAsyncThunk(
   'workbench/fetchDataSetAction',
-  async (arg: ChartRequest, thunkAPI) => {
+  async (arg: ChartDataRequest, thunkAPI) => {
     try {
       const response = await request({
         method: 'POST',

@@ -26,7 +26,7 @@ import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import persistence from 'utils/persistence';
 import { uuidv4 } from 'utils/utils';
-import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
+import ChartDataRequest from '../ChartWorkbenchPage/models/ChartDataRequest';
 import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
 import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
 import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';
@@ -137,7 +137,7 @@ export function SharePage() {
   }, [shareToken, sharePassword, shareClientId]);
 
   const onMakeShareDownloadDataTask = useCallback(
-    (downloadParams: ChartRequest[], fileName: string) => {
+    (downloadParams: ChartDataRequest[], fileName: string) => {
       if (shareClientId && executeTokenMap) {
         dispatch(
           makeShareDownloadDataTask({

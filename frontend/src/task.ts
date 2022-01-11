@@ -20,7 +20,7 @@
 /* eslint-disable prettier/prettier */
 
 import 'react-app-polyfill/stable';
-import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
+import { ChartDataRequestBuilder } from "app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder";
 import {
   BackendChart,
   BackendChartConfig,

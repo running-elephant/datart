@@ -22,7 +22,7 @@ import { VizHeader } from 'app/components/VizHeader';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
+import { ChartDataRequestBuilder } from "app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder";
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { useMainSlice } from 'app/pages/MainPage/slice';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';

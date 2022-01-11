@@ -1,7 +1,7 @@
 import {
-  ChartDataRequestBuilder,
   transformToViewConfig,
-} from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
+} from 'app/pages/ChartWorkbenchPage/models/ChartDataRequest';
+import { ChartDataRequestBuilder } from "app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder";
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ChartDataSectionField,
@@ -32,7 +32,7 @@ import {
   ControllerConfig,
   ControllerDate,
 } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
-import { ChartRequestFilter } from './../../ChartWorkbenchPage/models/ChartHttpRequest';
+import { ChartDataRequestFilter } from '../../ChartWorkbenchPage/models/ChartDataRequest';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
 
@@ -131,7 +131,7 @@ export const getTneWidgetFiltersAndParams = (obj: {
     widget => widget.config.type === 'controller',
   );
 
-  let filterParams: ChartRequestFilter[] = [];
+  let filterParams: ChartDataRequestFilter[] = [];
   let variableParams: Record<string, any[]> = {};
 
   controllerWidgets.forEach(filterWidget => {
@@ -179,7 +179,7 @@ export const getTneWidgetFiltersAndParams = (obj: {
     }
     // 关联字段 逻辑
     if (relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Field) {
-      const filter: ChartRequestFilter = {
+      const filter: ChartDataRequestFilter = {
         aggOperator: null,
         column: String(relatedViewItem.fieldValue),
         sqlOperator: controllerConfig.sqlOperator,
@@ -422,7 +422,7 @@ export const getChartWidgetRequestParams = (obj: {
 
   // 联动 过滤
   if (boardLinkFilters) {
-    const linkFilters: ChartRequestFilter[] = [];
+    const linkFilters: ChartDataRequestFilter[] = [];
     const links = boardLinkFilters.filter(
       link => link.linkerWidgetId === curWidget.id,
     );
@@ -430,7 +430,7 @@ export const getChartWidgetRequestParams = (obj: {
     links.forEach(link => {
       const { triggerValue, triggerWidgetId } = link;
       const triggerWidget = widgetMap[triggerWidgetId];
-      const filter: ChartRequestFilter = {
+      const filter: ChartDataRequestFilter = {
         aggOperator: null,
         column: getLinkedColumn(link.linkerWidgetId, triggerWidget),
         sqlOperator: FilterSqlOperator.In,
@@ -481,11 +481,11 @@ export const filterSqlOperatorName = (requestParams, widgetData) => {
 };
 
 //  filter 去重
-export const getDistinctFiltersByColumn = (filter: ChartRequestFilter[]) => {
+export const getDistinctFiltersByColumn = (filter: ChartDataRequestFilter[]) => {
   if (!filter) {
-    return [] as ChartRequestFilter[];
+    return [] as ChartDataRequestFilter[];
   }
-  const filterMap: Record<string, ChartRequestFilter> = {};
+  const filterMap: Record<string, ChartDataRequestFilter> = {};
   filter.forEach(item => {
     filterMap[item.column] = item;
   });

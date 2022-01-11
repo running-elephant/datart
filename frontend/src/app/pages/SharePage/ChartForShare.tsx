@@ -25,9 +25,8 @@ import { FC, memo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import ChartTools from '../ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
-import ChartRequest, {
-  ChartDataRequestBuilder,
-} from '../ChartWorkbenchPage/models/ChartHttpRequest';
+import ChartDataRequest from '../ChartWorkbenchPage/models/ChartDataRequest';
+import { ChartDataRequestBuilder } from "../ChartWorkbenchPage/models/ChartDataRequestBuilder";
 import ControllerPanel from '../MainPage/pages/VizPage/ChartPreview/components/ControllerPanel';
 import {
   ChartPreview,
@@ -46,7 +45,7 @@ const ChartForShare: FC<{
   chartPreview?: ChartPreview;
   filterSearchParams?: FilterSearchParams;
   onCreateDataChartDownloadTask: (
-    downloadParams: ChartRequest[],
+    downloadParams: ChartDataRequest[],
     fileName: string,
   ) => void;
 }> = memo(({ chartPreview, onCreateDataChartDownloadTask }) => {

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
+import { ChartDataRequestBuilder } from "app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder";
 import { handleServerBoardAction } from 'app/pages/DashBoardPage/pages/Board/slice/asyncActions';
 import {
   ServerDashboard,

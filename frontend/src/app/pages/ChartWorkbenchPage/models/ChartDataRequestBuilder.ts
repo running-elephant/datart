@@ -16,16 +16,6 @@
  * limitations under the License.
  */
 
-import { ChartDatasetPageInfo } from 'app/types/ChartDataset';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
-import { getStyleValue } from 'app/utils/chartHelper';
-import {
-  formatTime,
-  getTime,
-  recommendTimeRangeConverter,
-} from 'app/utils/time';
-import { TIME_FORMATTER } from 'globalConstants';
-import { isEmptyArray, IsKeyIn } from 'utils/object';
 import {
   AggregateFieldActionType,
   ChartDataSectionConfig,
@@ -35,61 +25,22 @@ import {
   FilterConditionType,
   RelationFilterValue,
   SortActionType,
-} from '../../../types/ChartConfig';
-import ChartDataView from '../../../types/ChartDataView';
-
-export type ChartRequest = {
-  viewId: string;
-  aggregators: Array<{ column: string; sqlOperator: string }>;
-  expired?: number;
-  filters: ChartRequestFilter[];
-  flush?: boolean;
-  groups?: Array<{ column: string }>;
-  functionColumns?: Array<{ alias: string; snippet: string }>;
-  limit?: any;
-  nativeQuery?: boolean;
-  orders: Array<{
-    column: string;
-    operator: SortActionType;
-    aggOperator?: AggregateFieldActionType;
-  }>;
-  pageInfo?: ChartDatasetPageInfo;
-  columns?: string[];
-  script?: boolean;
-  keywords?: string[];
-  cache?: boolean;
-  cacheExpires?: number;
-  concurrencyControl?: boolean;
-  concurrencyControlMode?: string;
-  params?: Record<string, string[]>;
-};
-
-export type ChartRequestFilter = {
-  aggOperator?: AggregateFieldActionType | null;
-  column: string;
-  sqlOperator: string;
-  values?: Array<{
-    value: string;
-    valueType: string;
-  }>;
-};
-
-export const transformToViewConfig = (viewConfig?: string) => {
-  const viewConfigMap = viewConfig ? JSON.parse(viewConfig) : {};
-  const obj = {};
-  if (viewConfig) {
-    const fields = [
-      'cache',
-      'cacheExpires',
-      'concurrencyControl',
-      'concurrencyControlMode',
-    ];
-    fields.forEach(v => {
-      obj[v] = viewConfigMap?.[v];
-    });
-  }
-  return obj;
-};
+} from 'app/types/ChartConfig';
+import { ChartDatasetPageInfo } from 'app/types/ChartDataset';
+import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
+import { getStyleValue } from 'app/utils/chartHelper';
+import {
+  formatTime,
+  getTime,
+  recommendTimeRangeConverter,
+} from 'app/utils/time';
+import { TIME_FORMATTER } from 'globalConstants';
+import { isEmptyArray, IsKeyIn } from 'utils/object';
+import {
+  ChartDataRequest,
+  ChartDataRequestFilter,
+  transformToViewConfig,
+} from './ChartDataRequest';
 
 export class ChartDataRequestBuilder {
   chartDataConfigs: ChartDataSectionConfig[];
@@ -98,7 +49,7 @@ export class ChartDataRequestBuilder {
   dataView: ChartDataView;
   script: boolean;
   aggregation?: boolean;
-  private extraSorters: ChartRequest['orders'] = [];
+  private extraSorters: ChartDataRequest['orders'] = [];
 
   constructor(
     dataView: ChartDataView,
@@ -115,6 +66,7 @@ export class ChartDataRequestBuilder {
     this.script = script || false;
     this.aggregation = aggregation;
   }
+
   private buildAggregators() {
     const aggColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
       (acc, cur) => {
@@ -155,12 +107,45 @@ export class ChartDataRequestBuilder {
   }
 
   private buildGroups() {
-    const groupColumns = this.buildGroupColumns();
-
+    const groupColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
+      (acc, cur) => {
+        if (!cur.rows) {
+          return acc;
+        }
+        if (this.aggregation === false) {
+          return acc;
+        }
+        if (
+          cur.type === ChartDataSectionType.GROUP ||
+          cur.type === ChartDataSectionType.COLOR
+        ) {
+          return acc.concat(cur.rows);
+        }
+        if (
+          cur.type === ChartDataSectionType.MIXED &&
+          !cur.rows?.every(
+            v =>
+              v.type !== ChartDataViewFieldType.DATE &&
+              v.type !== ChartDataViewFieldType.STRING,
+          )
+        ) {
+          //zh: 判断数据中是否含有 DATE 和 STRING 类型 en: Determine whether the data contains DATE and STRING types
+          return acc.concat(
+            cur.rows.filter(
+              v =>
+                v.type === ChartDataViewFieldType.DATE ||
+                v.type === ChartDataViewFieldType.STRING,
+            ),
+          );
+        }
+        return acc;
+      },
+      [],
+    );
     return groupColumns.map(groupCol => ({ column: groupCol.colName }));
   }
 
-  private buildFilters(): ChartRequestFilter[] {
+  private buildFilters(): ChartDataRequestFilter[] {
     const fields: ChartDataSectionField[] = (this.chartDataConfigs || [])
       .reduce<ChartDataSectionField[]>((acc, cur) => {
         if (!cur.rows || cur.type !== ChartDataSectionType.FILTER) {
@@ -279,7 +264,7 @@ export class ChartDataRequestBuilder {
     }));
 
     return originalSorters
-      .reduce<ChartRequest['orders']>((acc, cur) => {
+      .reduce<ChartDataRequest['orders']>((acc, cur) => {
         const uniqSorter = sorter =>
           `${sorter.column}-${
             sorter.aggOperator?.length > 0 ? sorter.aggOperator : ''
@@ -354,14 +339,14 @@ export class ChartDataRequestBuilder {
     return transformToViewConfig(this.dataView?.config);
   }
 
-  public addExtraSorters(sorters: ChartRequest['orders']) {
+  public addExtraSorters(sorters: ChartDataRequest['orders']) {
     if (!isEmptyArray(sorters)) {
       this.extraSorters = this.extraSorters.concat(sorters!);
     }
     return this;
   }
 
-  public build(): ChartRequest {
+  public build(): ChartDataRequest {
     return {
       viewId: this.dataView?.id,
       aggregators: this.buildAggregators(),
@@ -375,45 +360,4 @@ export class ChartDataRequestBuilder {
       ...this.buildViewConfigs(),
     };
   }
-
-  public buildGroupColumns() {
-    const groupColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
-      (acc, cur) => {
-        if (!cur.rows) {
-          return acc;
-        }
-        if (this.aggregation === false) {
-          return acc;
-        }
-        if (
-          cur.type === ChartDataSectionType.GROUP ||
-          cur.type === ChartDataSectionType.COLOR
-        ) {
-          return acc.concat(cur.rows);
-        }
-        if (
-          cur.type === ChartDataSectionType.MIXED &&
-          !cur.rows?.every(
-            v =>
-              v.type !== ChartDataViewFieldType.DATE &&
-              v.type !== ChartDataViewFieldType.STRING,
-          )
-        ) {
-          //zh: 判断数据中是否含有 DATE 和 STRING 类型 en: Determine whether the data contains DATE and STRING types
-          return acc.concat(
-            cur.rows.filter(
-              v =>
-                v.type === ChartDataViewFieldType.DATE ||
-                v.type === ChartDataViewFieldType.STRING,
-            ),
-          );
-        }
-        return acc;
-      },
-      [],
-    );
-    return groupColumns;
-  }
 }
-
-export default ChartRequest;

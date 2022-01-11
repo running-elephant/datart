@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import ChartRequest from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
+import ChartDataRequest from 'app/pages/ChartWorkbenchPage/models/ChartDataRequest';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
 import { makeDownloadDataTask } from 'app/utils/fetch';
@@ -116,7 +116,7 @@ export const getBoardDownloadParams =
       widgetMap,
       viewMap,
       dataChartMap,
-    }) as ChartRequest[];
+    }) as ChartDataRequest[];
 
     return { requestParams, fileName };
   };

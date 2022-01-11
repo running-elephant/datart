@@ -22,7 +22,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
+import ChartDataRequest from '../ChartWorkbenchPage/models/ChartDataRequest';
 import { BoardProvider } from '../DashBoardPage/components/BoardProvider/BoardProvider';
 import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel';
 import TitleHeader from '../DashBoardPage/components/TitleHeader';
@@ -47,7 +47,7 @@ export interface ShareBoardProps {
   onLoadShareTask: OnLoadTasksType;
   onDownloadFile: (item: DownloadTask) => void;
   onMakeShareDownloadDataTask: (
-    downloadParams: ChartRequest[],
+    downloadParams: ChartDataRequest[],
     fileName: string,
   ) => void;
 }
