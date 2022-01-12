@@ -63,6 +63,7 @@ const ChartWorkbench: FC<{
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
+
     return (
       <ChartAggregationContext.Provider value={{ aggregation }}>
         <ChartDatasetContext.Provider value={{ dataset: dataset }}>

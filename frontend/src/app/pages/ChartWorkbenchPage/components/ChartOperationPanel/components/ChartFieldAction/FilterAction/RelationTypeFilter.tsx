@@ -18,6 +18,9 @@
 
 import { BranchesOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { Col, Row, Select, Switch } from 'antd';
+import ChartFilterCondition, {
+  ConditionBuilder,
+} from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
 import {
   ChartDataSectionField,
   FilterConditionType,
@@ -26,9 +29,6 @@ import {
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
-import ChartFilterCondition, {
-  ConditionBuilder,
-} from '../../../../../models/ChartFilterCondition';
 
 const RelationTypeFilter: FC<{
   condition: ChartFilterCondition;

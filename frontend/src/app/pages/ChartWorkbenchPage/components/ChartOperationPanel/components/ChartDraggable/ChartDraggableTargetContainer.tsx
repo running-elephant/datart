@@ -28,6 +28,7 @@ import {
 } from '@ant-design/icons';
 import { Dropdown } from 'antd';
 import useFieldActionModal from 'app/hooks/useFieldActionModal';
+import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/ChartAggregationContext';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import {
@@ -55,7 +56,6 @@ import {
 } from 'styles/StyleConstants';
 import { ValueOf } from 'types';
 import { uuidv4 } from 'utils/utils';
-import ChartAggregationContext from '../../../../contexts/ChartAggregationContext';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
 import ChartDraggableElement from './ChartDraggableElement';
 
