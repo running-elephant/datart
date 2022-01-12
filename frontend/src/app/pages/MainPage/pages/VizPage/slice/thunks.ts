@@ -10,7 +10,7 @@ import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
 import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { RootState } from 'types';
 import { request } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import { errorHandle, rejectHandle } from 'utils/utils';
 import { vizActions } from '.';
 import { filterSqlOperatorName } from '../../../../DashBoardPage/utils';
 import { selectSelectedTab, selectVizs } from './selectors';
@@ -337,15 +337,20 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
     const data = builder
       .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
       .build();
-    const response = await request({
-      method: 'POST',
-      url: `data-provider/execute`,
-      data,
-    });
-    return {
-      backendChartId: arg.chartPreview?.backendChartId,
-      data: filterSqlOperatorName(data, response.data) || [],
-    };
+
+    try {
+      const response = await request({
+        method: 'POST',
+        url: `data-provider/execute`,
+        data,
+      });
+      return {
+        backendChartId: arg.chartPreview?.backendChartId,
+        data: filterSqlOperatorName(data, response.data) || [],
+      };
+    } catch (error) {
+      return rejectHandle(error, thunkAPI.rejectWithValue);
+    }
   },
 );
 

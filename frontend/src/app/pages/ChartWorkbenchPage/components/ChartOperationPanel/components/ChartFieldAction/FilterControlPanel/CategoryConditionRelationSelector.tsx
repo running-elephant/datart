@@ -57,6 +57,7 @@ const CategoryConditionRelationSelector: FC<{
       >
         <Select.OptGroup label={t('include')}>
           {[
+            FilterSqlOperator.Contain,
             FilterSqlOperator.PrefixContain,
             FilterSqlOperator.SuffixContain,
             FilterSqlOperator.Equal,
@@ -69,6 +70,7 @@ const CategoryConditionRelationSelector: FC<{
         </Select.OptGroup>
         <Select.OptGroup label={t('notInclude')}>
           {[
+            FilterSqlOperator.NotContain,
             FilterSqlOperator.NotPrefixContain,
             FilterSqlOperator.NotSuffixContain,
             FilterSqlOperator.NotEqual,
