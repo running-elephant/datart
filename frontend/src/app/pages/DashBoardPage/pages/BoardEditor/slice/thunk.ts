@@ -121,7 +121,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
     // datacharts
 
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
-    dispatch(boardActions.updateDataChartMap(allDataCharts));
+    dispatch(boardActions.setDataChartToMap(allDataCharts));
 
     const viewViews = getChartDataView(serverViews, allDataCharts);
 
@@ -244,7 +244,7 @@ export const addDataChartWidgets = createAsyncThunk<
     const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
     const dataChartMap = getDataChartMap(dataCharts);
     const viewViews = getChartDataView(views, dataCharts);
-    dispatch(boardActions.setDataChartMap(dataCharts));
+    dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
 
     const widgets = chartIds.map(dcId => {
@@ -286,7 +286,7 @@ export const addWrapChartWidget = createAsyncThunk<
   ) => {
     const dataCharts = [dataChart];
     const viewViews = [view];
-    dispatch(boardActions.setDataChartMap(dataCharts));
+    dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
     let widget = widgetToolKit.chart.create({
       dashboardId: boardId,
@@ -352,6 +352,7 @@ export const copyWidgetByIds = createAsyncThunk<
         editBoard: HistoryEditBoard;
       },
     );
+
     // 新复制前先清空
     dispatch(editDashBoardInfoActions.clearClipboardWidgets());
     const newWidgets: Record<string, WidgetOfCopy> = {};
@@ -382,6 +383,8 @@ export const pasteWidgets = createAsyncThunk(
         editBoard: EditBoardState;
       },
     );
+    const boardState = getState() as unknown as { board: BoardState };
+    const dataChartMap = boardState.board.dataChartMap;
     const newWidgets: Widget[] = [];
     Object.values(clipboardWidgets).forEach(widget => {
       if (widget.selectedCopy) {
@@ -396,6 +399,15 @@ export const pasteWidgets = createAsyncThunk(
               newWidgets.push(newSubWidget);
             }
           });
+        } else if (newWidget.config.type === 'chart') {
+          // #issues 588
+          let dataChart = dataChartMap[newWidget.datachartId];
+          const newDataChart: DataChart = CloneValueDeep({
+            ...dataChart,
+            id: dataChart.id + Date.now() + '_copy',
+          });
+          newWidget.datachartId = newDataChart.id;
+          dispatch(boardActions.setDataChartToMap([newDataChart]));
         }
       }
     });
