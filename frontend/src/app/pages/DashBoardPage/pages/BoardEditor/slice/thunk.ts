@@ -400,6 +400,7 @@ export const pasteWidgets = createAsyncThunk(
             }
           });
         } else if (newWidget.config.type === 'chart') {
+          // #issues 588
           let dataChart = dataChartMap[newWidget.datachartId];
           const newDataChart: DataChart = CloneValueDeep({
             ...dataChart,
