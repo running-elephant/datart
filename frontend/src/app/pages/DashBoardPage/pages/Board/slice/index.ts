@@ -101,12 +101,7 @@ const boardSlice = createSlice({
         return obj;
       }, {});
     },
-    updateDataChartMap(state, action: PayloadAction<DataChart[]>) {
-      const charts = action.payload;
-      charts.forEach(chart => {
-        state.dataChartMap[chart.id] = chart;
-      });
-    },
+
     updateWidget(state, action: PayloadAction<Widget>) {
       const widget = action.payload;
       state.widgetRecord[widget.dashboardId][widget.id] = widget;
@@ -138,12 +133,13 @@ const boardSlice = createSlice({
       const { recordId, itemId } = action.payload;
       state.boardInfoRecord[recordId].fullScreenItemId = itemId;
     },
-    setDataChartMap(state, action: PayloadAction<DataChart[]>) {
+    setDataChartToMap(state, action: PayloadAction<DataChart[]>) {
       const dataCharts = action.payload;
       dataCharts.forEach(dc => {
         state.dataChartMap[dc.id] = dc;
       });
     },
+
     setViewMap(state, action: PayloadAction<ChartDataView[]>) {
       const views = action.payload;
       views.forEach(view => {
