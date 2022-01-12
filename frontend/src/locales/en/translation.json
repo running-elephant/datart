@@ -684,7 +684,7 @@
     "board": {
       "action": {
         "dataChart": "DataChart",
-        "addDataChartFormList": "Add DataChart Form List",
+        "importDataChartFormList": "Import DataChart FormList",
         "createDataChartInBoard": "Create DataChart In Board",
         "media": "Media",
         "image": "Image",

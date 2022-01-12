@@ -348,7 +348,7 @@ export const ChartWidgetDropdown: React.FC<ChartWidgetDropdownProps> =
     );
     const addChartTypes = [
       {
-        name: t('addDataChartFormList'),
+        name: t('importDataChartFormList'),
         icon: '',
         type: 'select',
       },
