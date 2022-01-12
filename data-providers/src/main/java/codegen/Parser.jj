@@ -3799,6 +3799,7 @@ SqlNode AtomicRowExpression() :
 }
 {
     (
+        LOOKAHEAD(2)
         e = LiteralOrIntervalExpression()
     |
         e = DynamicParam()

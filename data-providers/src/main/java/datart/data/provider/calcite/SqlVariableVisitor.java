@@ -93,8 +93,8 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
     }
 
     private VariablePlaceholder createVariablePlaceholder(SqlCall sqlCall, String variableName) {
-        int startIndex = sqlCall.getOperandList().get(0).getParserPosition().getColumnNum();
-        int endIndex = sqlCall.getOperandList().get(sqlCall.operandCount() - 1).getParserPosition().getEndColumnNum();
+        int startIndex = sqlCall.getParserPosition().getColumnNum();
+        int endIndex = sqlCall.getParserPosition().getEndColumnNum();
         String originalSqlFragment = srcSql.substring(startIndex - 1, endIndex).trim();
         ScriptVariable variable = null;
         for (String key : variableMap.keySet()) {

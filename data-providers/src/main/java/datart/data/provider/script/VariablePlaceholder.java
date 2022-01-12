@@ -3,6 +3,7 @@ package datart.data.provider.script;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ScriptVariable;
 import datart.data.provider.base.DataProviderException;
+import datart.data.provider.calcite.SqlFunctionRegisterVisitor;
 import datart.data.provider.calcite.SqlNodeUtils;
 import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
 import org.apache.calcite.sql.*;
@@ -134,6 +135,9 @@ public abstract class VariablePlaceholder {
     }
 
     protected void replaceVariable(SqlCall sqlCall) {
+        if (sqlCall.getOperator() instanceof SqlFunction) {
+            new SqlFunctionRegisterVisitor().visit(sqlCall);
+        }
         for (int i = 0; i < sqlCall.operandCount(); i++) {
             SqlNode sqlNode = sqlCall.getOperandList().get(i);
             if (sqlNode == null) {
