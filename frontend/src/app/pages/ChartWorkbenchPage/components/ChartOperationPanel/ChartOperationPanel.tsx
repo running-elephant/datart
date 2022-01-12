@@ -57,14 +57,15 @@ const ChartOperationPanel: FC<{
       if (component === LayoutComponentType.VIEW) {
         return (
           <ChartDataViewPanel
-            onDataViewChange={onDataViewChange}
             dataView={dataView}
+            onDataViewChange={onDataViewChange}
           />
         );
       }
       if (component === LayoutComponentType.CONFIG) {
         return (
           <ChartConfigPanel
+            chartId={chart?.meta?.id}
             chartConfig={chartConfig}
             onChange={onChartConfigChange}
           />

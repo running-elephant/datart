@@ -23,6 +23,7 @@ import {
 } from '@ant-design/icons';
 import { Tabs } from 'antd';
 import { PaneWrapper } from 'app/components';
+import useComputedState from 'app/hooks/useComputedState';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import ChartPaletteContext from 'app/pages/ChartWorkbenchPage/contexts/ChartPaletteContext';
@@ -35,27 +36,47 @@ import {
   ChartDataSectionConfig,
   ChartStyleSectionConfig,
 } from 'app/types/ChartConfig';
-import { FC, memo, useCallback, useState } from 'react';
+import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
   FONT_WEIGHT_MEDIUM,
   SPACE_MD,
 } from 'styles/StyleConstants';
-import { isEmptyArray } from 'utils/object';
+import { cond, isEmptyArray } from 'utils/object';
 import ChartDataConfigPanel from './ChartDataConfigPanel';
 import ChartSettingConfigPanel from './ChartSettingConfigPanel';
 import ChartStyleConfigPanel from './ChartStyleConfigPanel';
 
 const { TabPane } = Tabs;
 
+const CONFIG_PANEL_TABS = {
+  DATA: 'data',
+  STYLE: 'style',
+  SETTING: 'setting',
+};
+
 const ChartConfigPanel: FC<{
+  chartId: string;
   chartConfig?: ChartConfig;
   onChange: (type: string, payload: ChartConfigPayloadType) => void;
 }> = memo(
-  ({ chartConfig, onChange }) => {
-    const [tabActiveKey, setTabActiveKey] = useState('data');
+  ({ chartId, chartConfig, onChange }) => {
     const t = useI18NPrefix(`viz.palette`);
+    const [tabActiveKey, setTabActiveKey] = useComputedState(
+      () => {
+        return cond(
+          [config => !isEmptyArray(config?.datas), CONFIG_PANEL_TABS.DATA],
+          [config => !isEmptyArray(config?.styles), CONFIG_PANEL_TABS.STYLE],
+          [
+            config => !isEmptyArray(config?.settings),
+            CONFIG_PANEL_TABS.SETTING,
+          ],
+        )(chartConfig, CONFIG_PANEL_TABS.DATA);
+      },
+      (prev, next) => prev !== next,
+      chartId,
+    );
 
     const tabChange = useCallback(activeKey => {
       setTabActiveKey(activeKey);
@@ -115,7 +136,7 @@ const ChartConfigPanel: FC<{
                         {t('title.content')}
                       </span>
                     }
-                    key="data"
+                    key={CONFIG_PANEL_TABS.DATA}
                   />
                 )}
                 {!isEmptyArray(chartConfig?.styles) && (
@@ -126,7 +147,7 @@ const ChartConfigPanel: FC<{
                         {t('title.design')}
                       </span>
                     }
-                    key="style"
+                    key={CONFIG_PANEL_TABS.STYLE}
                   />
                 )}
                 {!isEmptyArray(chartConfig?.settings) && (
@@ -137,24 +158,24 @@ const ChartConfigPanel: FC<{
                         {t('title.setting')}
                       </span>
                     }
-                    key="setting"
+                    key={CONFIG_PANEL_TABS.SETTING}
                   />
                 )}
               </Tabs>
-              <Pane selected={tabActiveKey === 'data'}>
+              <Pane selected={tabActiveKey === CONFIG_PANEL_TABS.DATA}>
                 <ChartDataConfigPanel
                   dataConfigs={chartConfig?.datas}
                   onChange={onDataConfigChanged}
                 />
               </Pane>
-              <Pane selected={tabActiveKey === 'style'}>
+              <Pane selected={tabActiveKey === CONFIG_PANEL_TABS.STYLE}>
                 <ChartStyleConfigPanel
                   configs={chartConfig?.styles}
                   dataConfigs={chartConfig?.datas}
                   onChange={onStyleConfigChanged}
                 />
               </Pane>
-              <Pane selected={tabActiveKey === 'setting'}>
+              <Pane selected={tabActiveKey === CONFIG_PANEL_TABS.SETTING}>
                 <ChartSettingConfigPanel
                   configs={chartConfig?.settings}
                   dataConfigs={chartConfig?.datas}
@@ -167,7 +188,8 @@ const ChartConfigPanel: FC<{
       </ChartI18NContext.Provider>
     );
   },
-  (prev, next) => prev.chartConfig === next.chartConfig,
+  (prev, next) =>
+    prev.chartConfig === next.chartConfig && prev.chartId === next.chartId,
 );
 
 export default ChartConfigPanel;
