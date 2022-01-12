@@ -193,7 +193,7 @@ export function ArrayConfig({
 
   const columns: TableColumnProps<object>[] = useMemo(
     () => [
-      { title: attr.key, dataIndex: attr.key },
+      { title: attr.displayName, dataIndex: attr.key },
       {
         title: tg('title.action'),
         align: 'center',
