@@ -206,7 +206,7 @@ export const createWidget = (option: {
   relations?: Relation[];
 }) => {
   const widget: Widget = {
-    id: option.id || uuidv4(),
+    id: option.id || 'newWidget_' + uuidv4(),
     dashboardId: option.dashboardId,
     config: option.config,
     datachartId: option.datachartId || '',
