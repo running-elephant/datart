@@ -26,6 +26,11 @@ import {
   RelationFilterValue,
   SortActionType,
 } from 'app/types/ChartConfig';
+import {
+  ChartDataRequest,
+  ChartDataRequestFilter,
+  transformToViewConfig,
+} from 'app/types/ChartDataRequest';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataset';
 import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { getStyleValue } from 'app/utils/chartHelper';
@@ -36,11 +41,6 @@ import {
 } from 'app/utils/time';
 import { TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn } from 'utils/object';
-import {
-  ChartDataRequest,
-  ChartDataRequestFilter,
-  transformToViewConfig,
-} from './ChartDataRequest';
 
 export class ChartDataRequestBuilder {
   chartDataConfigs: ChartDataSectionConfig[];

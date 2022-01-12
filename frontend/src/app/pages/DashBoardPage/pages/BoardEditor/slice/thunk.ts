@@ -14,10 +14,7 @@ import {
   WidgetInfo,
   WidgetOfCopy,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import {
-  filterSqlOperatorName,
-  getChartWidgetRequestParams,
-} from 'app/pages/DashBoardPage/utils';
+import { getChartWidgetRequestParams } from 'app/pages/DashBoardPage/utils';
 import {
   getChartDataView,
   getDashBoardByResBoard,
@@ -37,6 +34,7 @@ import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widge
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
+import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
 import { CloneValueDeep } from 'utils/object';

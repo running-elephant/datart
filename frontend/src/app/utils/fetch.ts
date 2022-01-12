@@ -17,20 +17,20 @@
  */
 
 import { message } from 'antd';
-import ChartDataRequest, {
-  transformToViewConfig,
-} from 'app/pages/ChartWorkbenchPage/models/ChartDataRequest';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
   DownloadTask,
   DownloadTaskState,
 } from 'app/pages/MainPage/slice/types';
 import { ExecuteToken } from 'app/pages/SharePage/slice/types';
+import ChartDataRequest, {
+  transformToViewConfig,
+} from 'app/types/ChartDataRequest';
 import ChartDataset from 'app/types/ChartDataset';
+import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
 import { request, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';
-import { filterSqlOperatorName } from '../pages/DashBoardPage/utils';
 
 export const getDistinctFields = async (
   viewId: string,

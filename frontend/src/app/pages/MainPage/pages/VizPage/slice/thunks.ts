@@ -1,5 +1,23 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { ChartDataRequestBuilder } from "app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder";
+import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
   Dashboard,
@@ -8,11 +26,11 @@ import {
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
 import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
+import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
 import { request } from 'utils/request';
 import { errorHandle, rejectHandle } from 'utils/utils';
 import { vizActions } from '.';
-import { filterSqlOperatorName } from '../../../../DashBoardPage/utils';
 import { selectSelectedTab, selectVizs } from './selectors';
 import {
   AddStoryboardParams,

@@ -31,7 +31,7 @@ import {
 } from '../../widget';
 import ChartDataRequest, {
   transformToViewConfig,
-} from '../../../../ChartWorkbenchPage/models/ChartDataRequest';
+} from '../../../../../types/ChartDataRequest';
 
 export const createDataChartWidget = (opt: {
   dashboardId: string;

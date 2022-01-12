@@ -25,7 +25,7 @@ import { IChart } from 'app/types/Chart';
 import { FC, memo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartDataRequest from '../ChartWorkbenchPage/models/ChartDataRequest';
+import ChartDataRequest from '../../types/ChartDataRequest';
 import { ChartDataRequestBuilder } from '../ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import ControllerPanel from '../MainPage/pages/VizPage/ChartPreview/components/ControllerPanel';
 import {

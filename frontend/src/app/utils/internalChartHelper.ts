@@ -127,3 +127,19 @@ const transferDataConfigImpl = (
   }
   return targetConfig!;
 };
+
+// 兼容 impala 聚合函数小写问题
+export const filterSqlOperatorName = (requestParams, widgetData) => {
+  const sqlOperatorNameList = requestParams.aggregators.map(({ sqlOperator }) =>
+    sqlOperator.toLocaleLowerCase(),
+  );
+  if (!sqlOperatorNameList.length) return widgetData;
+  widgetData?.columns?.forEach(item => {
+    const index = item.name.indexOf('(');
+    const sqlOperatorName = item.name.slice(0, index);
+    sqlOperatorNameList.includes(sqlOperatorName) &&
+      (item.name =
+        sqlOperatorName.toLocaleUpperCase() + item.name.slice(index));
+  });
+  return widgetData;
+};
