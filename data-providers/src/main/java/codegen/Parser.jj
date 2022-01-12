@@ -6630,6 +6630,7 @@ String KeywordFunctionNameSupport() :
         <DATE>
     |   <TIME>
     |   <TIMESTAMP>
+    |   <INSERT>
     )
     {
         return unquotedIdentifier();
