@@ -78,10 +78,6 @@ const ChartConfigPanel: FC<{
       chartId,
     );
 
-    const tabChange = useCallback(activeKey => {
-      setTabActiveKey(activeKey);
-    }, []);
-
     const onDataConfigChanged = (
       ancestors,
       config: ChartDataSectionConfig,
@@ -126,7 +122,7 @@ const ChartConfigPanel: FC<{
               <Tabs
                 activeKey={tabActiveKey}
                 className="tabs"
-                onChange={tabChange}
+                onChange={setTabActiveKey}
               >
                 {!isEmptyArray(chartConfig?.datas) && (
                   <TabPane
