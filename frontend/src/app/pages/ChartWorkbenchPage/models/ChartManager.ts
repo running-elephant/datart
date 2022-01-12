@@ -16,44 +16,42 @@
  * limitations under the License.
  */
 
-import WidgetPlugins from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartGraph';
-import ChartTools from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
+import {
+  AreaChart,
+  BasicDoubleYChart,
+  BasicFunnelChart,
+  BasicGaugeChart,
+  BasicRichText,
+  BasicScatterChart,
+  ClusterBarChart,
+  ClusterColumnChart,
+  DoughnutChart,
+  LineChart,
+  MingXiTableChart,
+  NormalOutlineMapChart,
+  PercentageStackBarChart,
+  PercentageStackColumnChart,
+  PieChart,
+  PivotSheetChart,
+  RoseChart,
+  ScatterOutlineMapChart,
+  ScoreChart,
+  StackAreaChart,
+  StackBarChart,
+  StackColumnChart,
+  WaterfallChart,
+  WordCloudChart,
+} from 'app/components/ChartGraph';
+import { IChart } from 'app/types/Chart';
 import { getChartPluginPaths } from 'app/utils/fetch';
 import { Debugger } from 'utils/debugger';
 import { CloneValueDeep } from 'utils/object';
-import Chart from './Chart';
-
-const {
-  BasicScatterChart,
-  BasicDoubleYChart,
-  BasicFunnelChart,
-  ClusterColumnChart,
-  ClusterBarChart,
-  StackColumnChart,
-  StackBarChart,
-  PercentageStackColumnChart,
-  PercentageStackBarChart,
-  LineChart,
-  AreaChart,
-  StackAreaChart,
-  PieChart,
-  DoughnutChart,
-  RoseChart,
-  ScoreChart,
-  MingXiTableChart,
-  NormalOutlineMapChart,
-  WordCloudChart,
-  ScatterOutlineMapChart,
-  BasicGaugeChart,
-  WaterfallChart,
-  BasicRichText,
-  PivotSheetChart,
-} = WidgetPlugins;
+import PluginChartLoader from './PluginChartLoader';
 
 class ChartManager {
-  private _loader = new ChartTools.ChartPluginLoader();
+  private _loader = new PluginChartLoader();
   private _isLoaded = false;
-  private _charts: Chart[] = this._basicCharts();
+  private _charts: IChart[] = this._basicCharts();
   private static _manager: ChartManager | null = null;
 
   public static instance() {
@@ -73,7 +71,7 @@ class ChartManager {
     });
   }
 
-  public getAllCharts(): Chart[] {
+  public getAllCharts(): IChart[] {
     return this._charts || [];
   }
 
@@ -95,13 +93,13 @@ class ChartManager {
 
     const customCharts = await this._loader.loadPlugins(paths);
     this._charts = this._charts.concat(
-      customCharts?.filter(Boolean) as Chart[],
+      customCharts?.filter(Boolean) as IChart[],
     );
     this._isLoaded = true;
     return this._charts;
   }
 
-  private _basicCharts(): Chart[] {
+  private _basicCharts(): IChart[] {
     return [
       new MingXiTableChart(),
       new PivotSheetChart(),

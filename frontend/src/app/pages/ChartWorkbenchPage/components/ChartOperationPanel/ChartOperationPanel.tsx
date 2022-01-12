@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
+import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import FlexLayout, { Model } from 'flexlayout-react';
 import 'flexlayout-react/style/light.css';
@@ -32,9 +32,9 @@ import ChartDataViewPanel from './components/ChartDataViewPanel';
 import ChartPresentWrapper from './components/ChartPresentWrapper';
 
 const ChartOperationPanel: FC<{
-  chart?: Chart;
+  chart?: IChart;
   chartConfig?: ChartConfig;
-  onChartChange: (chart: Chart) => void;
+  onChartChange: (chart: IChart) => void;
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
 }> = memo(

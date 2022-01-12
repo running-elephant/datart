@@ -17,9 +17,9 @@
  */
 
 import { message } from 'antd';
-import ChartRequest, {
+import ChartDataRequest, {
   transformToViewConfig,
-} from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
+} from 'app/pages/ChartWorkbenchPage/models/ChartDataRequest';
 import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
   DownloadTask,
@@ -39,7 +39,7 @@ export const getDistinctFields = async (
   executeToken: ExecuteToken | undefined,
 ) => {
   const viewConfigs = transformToViewConfig(view?.config);
-  const requestParams: ChartRequest = {
+  const requestParams: ChartDataRequest = {
     aggregators: [],
     filters: [],
     groups: [],
@@ -77,7 +77,7 @@ export const getDistinctFields = async (
 
 export const makeDownloadDataTask =
   (params: {
-    downloadParams: ChartRequest[];
+    downloadParams: ChartDataRequest[];
     fileName: string;
     resolve: () => void;
   }) =>
@@ -102,7 +102,7 @@ export const makeShareDownloadDataTask =
     resolve: () => void;
     clientId: string;
     fileName: string;
-    downloadParams: ChartRequest[];
+    downloadParams: ChartDataRequest[];
     shareToken: string;
     executeToken?: Record<string, ExecuteToken>;
     password?: string | null;

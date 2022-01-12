@@ -17,10 +17,10 @@
  */
 
 import { Table } from 'antd';
+import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContainer';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
-import ChartTools from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
-import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
+import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import { FC, memo, useState } from 'react';
@@ -37,23 +37,22 @@ const CHART_TYPE_SELECTOR_HEIGHT_OFFSET = 50;
 const ChartPresentPanel: FC<{
   containerHeight?: number;
   containerWidth?: number;
-  chart?: Chart;
+  chart?: IChart;
   dataset?: ChartDataset;
   chartConfig?: ChartConfig;
 }> = memo(
   ({ containerHeight, containerWidth, chart, dataset, chartConfig }) => {
     const translate = useI18NPrefix(`viz.palette.present`);
-    const chartDispatcher =
-      ChartTools.ChartIFrameContainerDispatcher.instance();
+    const chartDispatcher = ChartIFrameContainerDispatcher.instance();
     const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
 
     useMount(undefined, () => {
       Debugger.instance.measure(`ChartPresentPanel | Dispose Event`, () => {
-        ChartTools.ChartIFrameContainerDispatcher.dispose();
+        ChartIFrameContainerDispatcher.dispose();
       });
     });
 
-    const renderGraph = (containerId, chart?: Chart, chartConfig?, style?) => {
+    const renderGraph = (containerId, chart?: IChart, chartConfig?, style?) => {
       if (!chart?.isMatchRequirement(chartConfig)) {
         return <Chart404Graph chart={chart} chartConfig={chartConfig} />;
       }

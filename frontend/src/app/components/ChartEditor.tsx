@@ -35,13 +35,13 @@ import workbenchSlice, {
   updateRichTextAction,
   useWorkbenchSlice,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { IChart } from 'app/types/Chart';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { CloneValueDeep } from 'utils/object';
 import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
-import Chart from '../pages/ChartWorkbenchPage/models/Chart';
 import ChartManager from '../pages/ChartWorkbenchPage/models/ChartManager';
 import {
   DataChart,
@@ -85,7 +85,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const shadowChartConfig = useSelector(shadowChartConfigSelector);
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
-  const [chart, setChart] = useState<Chart>();
+  const [chart, setChart] = useState<IChart>();
 
   useMount(
     () => {
@@ -141,7 +141,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backendChart?.config?.chartGraphId]);
 
-  const handleChartChange = (c: Chart) => {
+  const handleChartChange = (c: IChart) => {
     registerChartEvents(c);
     setChart(c);
     const targetChartConfig = CloneValueDeep(c.config);

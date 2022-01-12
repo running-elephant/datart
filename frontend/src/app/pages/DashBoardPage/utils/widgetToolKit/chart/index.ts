@@ -29,9 +29,9 @@ import {
   createInitWidgetConfig,
   createWidget,
 } from '../../widget';
-import ChartRequest, {
+import ChartDataRequest, {
   transformToViewConfig,
-} from './../../../../ChartWorkbenchPage/models/ChartHttpRequest';
+} from '../../../../ChartWorkbenchPage/models/ChartDataRequest';
 
 export const createDataChartWidget = (opt: {
   dashboardId: string;
@@ -82,7 +82,7 @@ export const getControlOptionQueryParams = (obj: {
     widgetMap: obj.widgetMap,
     params: undefined,
   });
-  const requestParams: ChartRequest = {
+  const requestParams: ChartDataRequest = {
     aggregators: [],
     filters: filterParams,
     groups: [],
