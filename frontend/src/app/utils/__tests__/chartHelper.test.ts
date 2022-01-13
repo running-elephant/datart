@@ -17,6 +17,7 @@
  */
 
 import {
+  getValue,
   isInRange,
   isUnderUpperBound,
   mergeChartDataConfigs,
@@ -336,6 +337,109 @@ describe('Chart Helper ', () => {
   ])('reachLowerBoundCount Test - ', (count, limit, distance) => {
     test(`length ${count} reach ${limit} limit is ${distance}`, () => {
       expect(reachLowerBoundCount(limit, count)).toBe(distance);
+    });
+  });
+
+  describe.each([
+    [
+      [
+        { key: '1', value: 1 },
+        { key: '2', value: 2 },
+      ],
+      ['1'],
+      'value',
+      1,
+    ],
+    [
+      [
+        { key: '1', other: 1 },
+        { key: '2', value: 2 },
+      ],
+      ['1'],
+      'other',
+      1,
+    ],
+    [
+      [
+        { key: '1', other: 1 },
+        { key: '2', value: 2 },
+      ],
+      ['1'],
+      'unknown',
+      undefined,
+    ],
+    [
+      [
+        { key: '1', other: 1, rows: [{ key: '1-1', value: 11 }] },
+        { key: '2', value: 2 },
+      ],
+      ['1', '1-1'],
+      'other',
+      undefined,
+    ],
+    [
+      [
+        { key: '2', value: 2 },
+        {
+          key: '1',
+          value: 1,
+          rows: [
+            {
+              key: '1-1',
+              value: 11,
+              rows: [],
+            },
+          ],
+        },
+      ],
+      ['1', '1-1'],
+      'value',
+      11,
+    ],
+    [
+      [
+        { key: '2', value: 2 },
+        {
+          key: '1',
+          value: 1,
+          rows: [
+            {
+              key: '1-1',
+              value: 11,
+              rows: [
+                {
+                  key: '1-1-1',
+                  value: 111,
+                  rows: [
+                    {
+                      key: '1-1-1-1',
+                      value: 1111,
+                      rows: [],
+                    },
+                    {
+                      key: '1-1-1-2',
+                      value: 1112,
+                      rows: [
+                        {
+                          key: '1-1-1-2-1',
+                          value: 11121,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      ['1', '1-1', '1-1-1', '1-1-1-2', '1-1-1-2-1'],
+      'value',
+      11121,
+    ],
+  ])('getValue Test - ', (configs, paths, targetKey, expected) => {
+    test(`get key of ${targetKey} from configs with path ${paths?.toString()} to be ${expected}`, () => {
+      expect(getValue(configs as any, paths, targetKey)).toBe(expected);
     });
   });
 });
