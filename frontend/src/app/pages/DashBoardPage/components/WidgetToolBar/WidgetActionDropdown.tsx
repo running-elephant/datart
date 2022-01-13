@@ -117,10 +117,10 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
           allList: getAllList(),
           widget,
           boardEditing,
-          chartGraphId: dataChart?.config.chartGraphId,
+          chartGraphId: dataChart?.config?.chartGraphId,
         }) || []
       );
-    }, [boardEditing, dataChart?.config.chartGraphId, getAllList, widget]);
+    }, [boardEditing, dataChart?.config?.chartGraphId, getAllList, widget]);
     const dropdownList = useMemo(() => {
       const menuItems = actionList.map(item => {
         return (
