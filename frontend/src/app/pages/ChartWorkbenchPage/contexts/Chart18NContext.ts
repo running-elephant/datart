@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
+import { ChartI18NSectionConfig } from 'app/types/ChartConfig';
 import { createContext } from 'react';
-import { ChartI18NSectionConfig } from '../../../types/ChartConfig';
 
 const ChartI18NContext = createContext<{
   i18NConfigs?: ChartI18NSectionConfig[];

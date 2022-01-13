@@ -182,7 +182,7 @@ const ChartDataViewPanel: FC<{
       <Header>
         <TreeSelect
           showSearch
-          placeholder="请选择数据视图"
+          placeholder={t('plsSelectDataView')}
           className="view-selector"
           treeData={dataviewTreeData}
           value={dataView?.id}

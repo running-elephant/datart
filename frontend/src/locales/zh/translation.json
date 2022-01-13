@@ -448,6 +448,7 @@
         }
       },
       "dataview": {
+        "plsSelectDataView": "请选择",
         "createComputedFields": "新建计算字段",
         "createVariableFields": "新建查询变量",
         "fieldName": "名称",

@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
+import { ChartDataSectionConfig } from 'app/types/ChartConfig';
 import { createContext } from 'react';
-import { ChartDataSectionConfig } from '../../../types/ChartConfig';
 
 const ChartPaletteContext = createContext<{ datas?: ChartDataSectionConfig[] }>(
   {

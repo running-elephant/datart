@@ -448,6 +448,7 @@
         }
       },
       "dataview": {
+        "plsSelectDataView": "Please Select",
         "createComputedFields": "Create Computed Field",
         "createVariableFields": "Create Variable Field",
         "fieldName": "Name",

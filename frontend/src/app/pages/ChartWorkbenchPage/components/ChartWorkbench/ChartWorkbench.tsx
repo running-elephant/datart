@@ -22,11 +22,11 @@ import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDat
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
+import ChartDataset from 'app/types/ChartDataset';
+import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartDataset from '../../../../types/ChartDataset';
-import ChartDataView from '../../../../types/ChartDataView';
 import {
   dateFormatSelector,
   languageSelector,
@@ -63,6 +63,7 @@ const ChartWorkbench: FC<{
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
+
     return (
       <ChartAggregationContext.Provider value={{ aggregation }}>
         <ChartDatasetContext.Provider value={{ dataset: dataset }}>

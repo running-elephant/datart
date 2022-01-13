@@ -28,9 +28,11 @@ import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { ResourceTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
+import ChartDataRequest from 'app/types/ChartDataRequest';
 import ChartDataset from 'app/types/ChartDataset';
 import ChartDataView, { ChartDataViewMeta } from 'app/types/ChartDataView';
 import { mergeConfig, transformMeta } from 'app/utils/chartHelper';
+import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { RootState } from 'types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
@@ -38,9 +40,7 @@ import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { CloneValueDeep } from 'utils/object';
 import { request } from 'utils/request';
 import { listToTree, reduxActionErrorHandler, rejectHandle } from 'utils/utils';
-import { filterSqlOperatorName } from '../../DashBoardPage/utils';
-import ChartDataRequest from '../models/ChartDataRequest';
-import { ChartDataRequestBuilder } from "../models/ChartDataRequestBuilder";
+import { ChartDataRequestBuilder } from '../models/ChartDataRequestBuilder';
 
 export type ChartConfigPayloadType = {
   init?: ChartConfig;

@@ -83,7 +83,7 @@ const AggregationColorizeAction: FC<{
               setSelectColor(c);
             }}
           >
-            <ColorTag size={16} color={c.value} />{' '}
+            <ColorTag size={16} color={c.value} />
             <span className="text-span" title={c.key}>
               {c.key}
             </span>

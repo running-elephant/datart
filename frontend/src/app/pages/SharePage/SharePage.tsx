@@ -26,7 +26,7 @@ import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import persistence from 'utils/persistence';
 import { uuidv4 } from 'utils/utils';
-import ChartDataRequest from '../ChartWorkbenchPage/models/ChartDataRequest';
+import ChartDataRequest from '../../types/ChartDataRequest';
 import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
 import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
 import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';

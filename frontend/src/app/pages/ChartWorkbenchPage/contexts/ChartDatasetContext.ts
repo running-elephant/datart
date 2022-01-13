@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
+import ChartDataset from 'app/types/ChartDataset';
 import { createContext } from 'react';
-import ChartDataset from '../../../types/ChartDataset';
 
 const ChartDatasetContext = createContext<{ dataset?: ChartDataset }>({
   dataset: {},
