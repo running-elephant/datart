@@ -91,7 +91,7 @@ class BasicBarChart extends Chart {
   }
 
   onResize(opt: any, context): void {
-    this.chart?.resize(context);
+    this.chart?.resize({ width: context?.width, height: context?.height });
   }
 
   getOptions(dataset: ChartDataset, config: ChartConfig) {

@@ -17,8 +17,8 @@
  */
 
 import {
-  getValue,
   getStyles,
+  getValue,
   isInRange,
   isUnderUpperBound,
   mergeChartDataConfigs,
