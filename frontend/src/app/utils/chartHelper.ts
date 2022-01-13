@@ -109,6 +109,47 @@ export function getStyleValueByGroup(
   return getValue(styles, [groupPath, ...childPaths]);
 }
 
+/**
+ * Get config style values, more example please see test cases
+ * @example
+ * const styleConfigs = [
+ *       {
+ *        key: 'label',
+ *        rows: [
+ *           { key: 'color', value: 'red' },
+ *           { key: 'font', value: 'sans-serif' },
+ *         ],
+ *       },
+ *     ];
+ * const [color, font] = getValues(styleConfigs, ['label'], ['color', 'font']);
+ * console.log(color); // red
+ * console.log(font); // sans-serif
+ *
+ * @param {Array<ChartStyleSectionConfig>} configs required
+ * @param {Array<string>} parentKeyPaths required
+ * @param {Array<string>} childTargetKeys required
+ * @return {*} array of child keys with the same order
+ */
+export function getValues(
+  configs: Array<ChartStyleSectionConfig>,
+  parentKeyPaths: Array<string>,
+  childTargetKeys: Array<string>,
+) {
+  const rows = getValue(configs, parentKeyPaths, 'rows');
+  if (!rows) {
+    return Array(childTargetKeys.length).fill(undefined);
+  }
+  return childTargetKeys.map(k => getValue(rows, [k]));
+}
+
+/**
+ * Get style config value base funtion with default target key
+ * @export
+ * @param {Array<ChartStyleSectionConfig>} configs
+ * @param {Array<string>} keyPaths
+ * @param {string} [targetKey='value']
+ * @return {*}
+ */
 export function getValue(
   configs: Array<ChartStyleSectionConfig>,
   keyPaths: Array<string>,

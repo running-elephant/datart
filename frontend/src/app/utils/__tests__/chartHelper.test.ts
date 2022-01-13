@@ -18,6 +18,7 @@
 
 import {
   getValue,
+  getValues,
   isInRange,
   isUnderUpperBound,
   mergeChartDataConfigs,
@@ -458,6 +459,111 @@ describe('Chart Helper ', () => {
   ])('getValue Test - ', (configs, paths, targetKey, expected) => {
     test(`get key of ${targetKey} from configs with path ${paths?.toString()} to be ${expected}`, () => {
       expect(getValue(configs as any, paths, targetKey)).toBe(expected);
+    });
+  });
+
+  describe.each([
+    [
+      [
+        {
+          key: '1',
+          value: 1,
+          rows: [
+            {
+              key: '1-1',
+              value: 11,
+            },
+            {
+              key: '1-2',
+              value: 12,
+            },
+            {
+              key: '1-3',
+              value: 13,
+            },
+          ],
+        },
+        { key: '2', value: 2 },
+      ],
+      ['2'],
+      ['1-1', '1-2'],
+      [undefined, undefined],
+    ],
+    [
+      [
+        {
+          key: '1',
+          value: 1,
+          rows: [
+            {
+              key: '1-1',
+              value: 11,
+            },
+            {
+              key: '1-2',
+              value: 12,
+            },
+            {
+              key: '1-3',
+              value: 13,
+            },
+          ],
+        },
+        { key: '2', value: 2 },
+      ],
+      ['1'],
+      ['1-1', '1-3'],
+      [11, 13],
+    ],
+    [
+      [
+        {
+          key: '1',
+          value: 1,
+          rows: [
+            {
+              key: '1-1',
+              value: 11,
+            },
+            {
+              key: '1-2',
+              value: 12,
+              rows: [
+                {
+                  key: '1-2-1',
+                  value: 121,
+                  rows: [
+                    {
+                      key: '1-2-1-1',
+                      value: 1211,
+                    },
+                  ],
+                },
+                {
+                  key: '1-2-2',
+                  other: 122,
+                },
+                {
+                  key: '1-2-3',
+                  value: 123,
+                },
+              ],
+            },
+            {
+              key: '1-3',
+              value: 13,
+            },
+          ],
+        },
+        { key: '2', value: 2 },
+      ],
+      ['1', '1-2'],
+      ['1-2-1', '1-2-2', '1-2-4'],
+      [121, undefined, undefined],
+    ],
+  ])('getValues Test - ', (configs, paths, targetKeys, expected) => {
+    test(`get keys of ${targetKeys} from configs with path ${paths?.toString()} to be ${expected}`, () => {
+      expect(getValues(configs as any, paths, targetKeys)).toEqual(expected);
     });
   });
 });
