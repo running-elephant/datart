@@ -79,21 +79,17 @@ export function reachLowerBoundCount(
     [isPairArray, limit => +limit[0] - count],
   )(limit, 0);
 }
-
+/**
+ * @deprecated should replace by @see getValue
+ * @param {ChartStyleSectionConfig[]} styleConfigs
+ * @param {string[]} paths
+ * @return {*}  {*}
+ */
 export function getStyleValue(
   styleConfigs: ChartStyleSectionConfig[],
   paths: string[],
 ): any {
-  return getValue(styleConfigs, paths, 'value');
-}
-
-export function getStyleValueByGroup(
-  styles: ChartStyleSectionConfig[],
-  groupPath: string,
-  childPath: string,
-) {
-  const childPaths = childPath.split('.');
-  return getStyleValue(styles, [groupPath, ...childPaths]);
+  return getValue(styleConfigs, paths);
 }
 
 export function getSettingValue(
@@ -104,19 +100,28 @@ export function getSettingValue(
   return getValue(configs, path.split('.'), targetKey);
 }
 
+export function getStyleValueByGroup(
+  styles: ChartStyleSectionConfig[],
+  groupPath: string,
+  childPath: string,
+) {
+  const childPaths = childPath.split('.');
+  return getValue(styles, [groupPath, ...childPaths]);
+}
+
 export function getValue(
-  configs: ChartStyleSectionConfig[],
-  paths: string[],
-  targetKey,
+  configs: Array<ChartStyleSectionConfig>,
+  keyPaths: Array<string>,
+  targetKey = 'value',
 ) {
   let iterators = configs || [];
   while (!isEmptyArray(iterators)) {
-    const key = paths?.shift();
+    const key = keyPaths?.shift();
     const group = iterators?.find(sc => sc.key === key);
     if (!group) {
       return undefined;
     }
-    if (isEmptyArray(paths)) {
+    if (isEmptyArray(keyPaths)) {
       return group[targetKey];
     }
     iterators = group.rows || [];

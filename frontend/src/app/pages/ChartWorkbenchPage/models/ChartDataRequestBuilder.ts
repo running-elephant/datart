@@ -33,7 +33,7 @@ import {
 } from 'app/types/ChartDataRequest';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataset';
 import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
-import { getStyleValue } from 'app/utils/chartHelper';
+import { getValue } from 'app/utils/chartHelper';
 import {
   formatTime,
   getTime,
@@ -283,11 +283,8 @@ export class ChartDataRequestBuilder {
 
   private buildPageInfo() {
     const settingStyles = this.charSettingConfigs;
-    const pageSize = getStyleValue(settingStyles, ['paging', 'pageSize']);
-    const enablePaging = getStyleValue(settingStyles, [
-      'paging',
-      'enablePaging',
-    ]);
+    const pageSize = getValue(settingStyles, ['paging', 'pageSize']);
+    const enablePaging = getValue(settingStyles, ['paging', 'enablePaging']);
     return {
       countTotal: !!enablePaging,
       pageNo: this.pageInfo?.pageNo,
