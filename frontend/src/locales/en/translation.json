@@ -684,7 +684,7 @@
     "board": {
       "action": {
         "dataChart": "DataChart",
-        "addDataChartFormList": "Add DataChart Form List",
+        "ImportExistingDataCharts": "Import Existing DataCharts",
         "createDataChartInBoard": "Create DataChart In Board",
         "media": "Media",
         "image": "Image",
@@ -823,7 +823,7 @@
       "folders": {
         "folderTitle": "Dashboards & Datacharts",
         "dashboard": "Create dashboard",
-        "dataChart": "Create datachart",
+        "dataChart": "Create dataChart",
         "folder": "Create folder",
         "recycle": "Recycle"
       },
