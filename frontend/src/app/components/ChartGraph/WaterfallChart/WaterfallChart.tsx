@@ -21,7 +21,8 @@ import ChartDataset from 'app/types/ChartDataset';
 import {
   getColumnRenderName,
   getCustomSortableColumns,
-  getStyleValueByGroup,
+  getGridStyle,
+  getStyles,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
@@ -77,10 +78,10 @@ class WaterfallChart extends Chart {
   }
 
   onResize(opt: any, context): void {
-    this.chart?.resize(context);
+    this.chart?.resize({ width: context?.width, height: context?.height });
   }
 
-  getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataset, config: ChartConfig) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
@@ -105,29 +106,29 @@ class WaterfallChart extends Chart {
     );
 
     return {
-      grid: this.getGrid(styleConfigs),
+      grid: getGridStyle(styleConfigs),
       barWidth: this.getSerieBarWidth(styleConfigs),
       ...series,
     };
   }
 
-  getSerieBarWidth(styles) {
-    return getStyleValueByGroup(styles, 'bar', 'width');
+  private getSerieBarWidth(styles) {
+    const [width] = getStyles(styles, ['bar'], ['width']);
+    return width;
   }
 
-  getSeries(styles, dataColumns, aggregateConfigs, group) {
+  private getSeries(styles, dataColumns, aggregateConfigs, group) {
     const xAxisColumns = {
       type: 'category',
       tooltip: { show: true },
       data: UniqArray(dataColumns.map(dc => dc[getValueByColumnKey(group[0])])),
     };
     const yAxisNames = aggregateConfigs.map(getColumnRenderName);
-    const [isIncrement, ascendColor, descendColor] =
-      this.getArrStyleValueByGroup(
-        ['isIncrement', 'ascendColor', 'descendColor'],
-        styles,
-        'bar',
-      );
+    const [isIncrement, ascendColor, descendColor] = getStyles(
+      styles,
+      ['bar'],
+      ['isIncrement', 'ascendColor', 'descendColor'],
+    );
     const label = this.getLabel(styles, aggregateConfigs[0].format);
 
     const dataList = dataColumns.map(
@@ -221,9 +222,11 @@ class WaterfallChart extends Chart {
   }
 
   private getSeriesItemStyle(styles) {
-    const borderStyle = getStyleValueByGroup(styles, 'bar', 'borderStyle');
-    const borderRadius = getStyleValueByGroup(styles, 'bar', 'radius');
-
+    const [borderStyle, borderRadius] = getStyles(
+      styles,
+      ['bar'],
+      ['borderStyle', 'radius'],
+    );
     return {
       borderRadius,
       borderType: borderStyle?.type,
@@ -232,8 +235,8 @@ class WaterfallChart extends Chart {
     };
   }
 
-  getDataList(isIncrement, dataList, xAxisColumns, styles) {
-    const totalColor = getStyleValueByGroup(styles, 'bar', 'totalColor');
+  private getDataList(isIncrement, dataList, xAxisColumns, styles) {
+    const [totalColor] = getStyles(styles, ['bar'], ['totalColor']);
     const baseData: any = [];
     const ascendOrder: any = [];
     const descendOrder: any = [];
@@ -308,11 +311,11 @@ class WaterfallChart extends Chart {
     };
   }
 
-  getLabel(styles, format) {
-    const [show, position, font] = this.getArrStyleValueByGroup(
-      ['showLabel', 'position', 'font'],
+  private getLabel(styles, format) {
+    const [show, position, font] = getStyles(
       styles,
-      'label',
+      ['label'],
+      ['showLabel', 'position', 'font'],
     );
     return {
       show,
@@ -322,24 +325,34 @@ class WaterfallChart extends Chart {
     };
   }
 
-  getXAxis(styles, xAxisColumns) {
-    const showAxis = getStyleValueByGroup(styles, 'xAxis', 'showAxis');
-    const inverse = getStyleValueByGroup(styles, 'xAxis', 'inverseAxis');
-    const lineStyle = getStyleValueByGroup(styles, 'xAxis', 'lineStyle');
-    const showLabel = getStyleValueByGroup(styles, 'xAxis', 'showLabel');
-    const font = getStyleValueByGroup(styles, 'xAxis', 'font');
-    const rotate = getStyleValueByGroup(styles, 'xAxis', 'rotate');
-    const showInterval = getStyleValueByGroup(styles, 'xAxis', 'showInterval');
-    const interval = getStyleValueByGroup(styles, 'xAxis', 'interval');
-    const showVerticalLine = getStyleValueByGroup(
+  private getXAxis(styles, xAxisColumns) {
+    const [
+      showAxis,
+      inverse,
+      lineStyle,
+      showLabel,
+      font,
+      rotate,
+      showInterval,
+      interval,
+    ] = getStyles(
       styles,
-      'splitLine',
-      'showVerticalLine',
+      ['xAxis'],
+      [
+        'showAxis',
+        'inverseAxis',
+        'lineStyle',
+        'showLabel',
+        'font',
+        'rotate',
+        'showInterval',
+        'interval',
+      ],
     );
-    const verticalLineStyle = getStyleValueByGroup(
+    const [showVerticalLine, verticalLineStyle] = getStyles(
       styles,
-      'splitLine',
-      'verticalLineStyle',
+      ['splitLine'],
+      ['showVerticalLine', 'verticalLineStyle'],
     );
 
     return {
@@ -366,33 +379,43 @@ class WaterfallChart extends Chart {
     };
   }
 
-  getYAxis(styles, yAxisNames) {
-    const showAxis = getStyleValueByGroup(styles, 'yAxis', 'showAxis');
-    const inverse = getStyleValueByGroup(styles, 'yAxis', 'inverseAxis');
-    const lineStyle = getStyleValueByGroup(styles, 'yAxis', 'lineStyle');
-    const showLabel = getStyleValueByGroup(styles, 'yAxis', 'showLabel');
-    const font = getStyleValueByGroup(styles, 'yAxis', 'font');
-    const showTitleAndUnit = getStyleValueByGroup(
+  private getYAxis(styles, yAxisNames) {
+    const [
+      showAxis,
+      inverse,
+      lineStyle,
+      showLabel,
+      font,
+      showTitleAndUnit,
+      unitFont,
+      nameLocation,
+      nameGap,
+      nameRotate,
+      min,
+      max,
+    ] = getStyles(
       styles,
-      'yAxis',
-      'showTitleAndUnit',
+      ['yAxis'],
+      [
+        'showAxis',
+        'inverseAxis',
+        'lineStyle',
+        'showLabel',
+        'font',
+        'showTitleAndUnit',
+        'unitFont',
+        'nameLocation',
+        'nameGap',
+        'nameRotate',
+        'min',
+        'max',
+      ],
     );
     const name = showTitleAndUnit ? yAxisNames.join(' / ') : null;
-    const unitFont = getStyleValueByGroup(styles, 'yAxis', 'unitFont');
-    const nameLocation = getStyleValueByGroup(styles, 'yAxis', 'nameLocation');
-    const nameGap = getStyleValueByGroup(styles, 'yAxis', 'nameGap');
-    const nameRotate = getStyleValueByGroup(styles, 'yAxis', 'nameRotate');
-    const min = getStyleValueByGroup(styles, 'yAxis', 'min');
-    const max = getStyleValueByGroup(styles, 'yAxis', 'max');
-    const showHorizonLine = getStyleValueByGroup(
+    const [showHorizonLine, horizonLineStyle] = getStyles(
       styles,
-      'splitLine',
-      'showHorizonLine',
-    );
-    const horizonLineStyle = getStyleValueByGroup(
-      styles,
-      'splitLine',
-      'horizonLineStyle',
+      ['splitLine'],
+      ['showHorizonLine', 'horizonLineStyle'],
     );
 
     return {
@@ -422,21 +445,6 @@ class WaterfallChart extends Chart {
         lineStyle: horizonLineStyle,
       },
     };
-  }
-
-  getGrid(styles) {
-    const containLabel = getStyleValueByGroup(styles, 'margin', 'containLabel');
-    const left = getStyleValueByGroup(styles, 'margin', 'marginLeft');
-    const right = getStyleValueByGroup(styles, 'margin', 'marginRight');
-    const bottom = getStyleValueByGroup(styles, 'margin', 'marginBottom');
-    const top = getStyleValueByGroup(styles, 'margin', 'marginTop');
-    return { left, right, bottom, top, containLabel };
-  }
-
-  getArrStyleValueByGroup(childPathList, style, groupPath) {
-    return childPathList.map(child => {
-      return getStyleValueByGroup(style, groupPath, child);
-    });
   }
 }
 

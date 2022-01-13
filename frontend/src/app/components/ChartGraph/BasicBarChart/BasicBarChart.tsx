@@ -28,7 +28,6 @@ import {
   getReference,
   getSeriesTooltips4Rectangular2,
   getStyles,
-  getStyleValueByGroup,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
@@ -346,11 +345,13 @@ class BasicBarChart extends Chart {
   }
 
   private getSerieBarGap(styles) {
-    return getStyleValueByGroup(styles, 'bar', 'gap');
+    const [gap] = getStyles(styles, ['bar'], ['gap']);
+    return gap;
   }
 
   private getSerieBarWidth(styles) {
-    return getStyleValueByGroup(styles, 'bar', 'width');
+    const [width] = getStyles(styles, ['bar'], ['width']);
+    return width;
   }
 
   private getYAxis(styles, yAxisNames) {
