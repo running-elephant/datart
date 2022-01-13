@@ -98,6 +98,15 @@ class Chart implements IChart {
 
   public onResize(options, context?): void {}
 
+  /**
+   * @deprecated
+   *
+   * @protected
+   * @param {ChartStyleSectionConfig[]} styleConfigs
+   * @param {string[]} paths
+   * @return {*}  {*}
+   * @memberof Chart
+   */
   protected getStyleValue(
     styleConfigs: ChartStyleSectionConfig[],
     paths: string[],
@@ -109,6 +118,16 @@ class Chart implements IChart {
     return series?.data?.valueColName || series.seriesName;
   }
 
+  /**
+   * @deprecated should use utils getValue instead
+   *
+   * @protected
+   * @param {ChartStyleSectionConfig[]} [configs=[]]
+   * @param {string[]} [paths]
+   * @param {*} [targetKey]
+   * @return {*}
+   * @memberof Chart
+   */
   protected getValue(
     configs: ChartStyleSectionConfig[] = [],
     paths?: string[],
