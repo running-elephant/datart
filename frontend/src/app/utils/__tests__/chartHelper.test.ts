@@ -370,6 +370,15 @@ describe('Chart Helper ', () => {
     ],
     [
       [
+        { key: '1', other: 1 },
+        { key: '2', value: 2 },
+      ],
+      ['unknown'],
+      'value',
+      undefined,
+    ],
+    [
+      [
         { key: '1', other: 1, rows: [{ key: '1-1', value: 11 }] },
         { key: '2', value: 2 },
       ],

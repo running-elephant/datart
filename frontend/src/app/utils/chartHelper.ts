@@ -112,10 +112,10 @@ export function getValue(
   const key = paths?.shift();
   const group = configs?.find(sc => sc.key === key);
   if (!group) {
-    return null;
+    return undefined;
   }
-  if (paths?.length === 0) {
-    return isEmpty(group) ? null : group[targetKey];
+  if (!paths?.length) {
+    return group[targetKey];
   }
   return getValue(group.rows || [], paths, targetKey);
 }
