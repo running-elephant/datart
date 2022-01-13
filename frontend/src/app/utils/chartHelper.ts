@@ -79,8 +79,10 @@ export function reachLowerBoundCount(
     [isPairArray, limit => +limit[0] - count],
   )(limit, 0);
 }
+
 /**
- * @deprecated should replace by @see getValue
+ * @deprecated This function will be removed in next versiion, please use getStyles instread
+ * @see getValue
  * @param {ChartStyleSectionConfig[]} styleConfigs
  * @param {string[]} paths
  * @return {*}  {*}
@@ -101,7 +103,8 @@ export function getSettingValue(
 }
 
 /**
- * @deprecated use getStyles instread, @see getStyles
+ * @deprecated This function will be removed in next versiion, please use getStyles instread
+ * @see getStyles
  * @export
  * @param {ChartStyleSectionConfig[]} styles
  * @param {string} groupPath

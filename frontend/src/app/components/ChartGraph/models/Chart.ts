@@ -17,15 +17,10 @@
  */
 
 import { ChartMouseEvent, ChartStatus, IChart } from 'app/types/Chart';
-import {
-  ChartConfig,
-  ChartDataSectionConfig,
-  ChartStyleSectionConfig,
-} from 'app/types/ChartConfig';
+import { ChartConfig, ChartDataSectionConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { isInRange } from 'app/utils/chartHelper';
-import { isEmpty } from 'utils/object';
 
 class Chart implements IChart {
   meta: ChartMetadata;
@@ -98,54 +93,8 @@ class Chart implements IChart {
 
   public onResize(options, context?): void {}
 
-  /**
-   * @deprecated
-   *
-   * @protected
-   * @param {ChartStyleSectionConfig[]} styleConfigs
-   * @param {string[]} paths
-   * @return {*}  {*}
-   * @memberof Chart
-   */
-  protected getStyleValue(
-    styleConfigs: ChartStyleSectionConfig[],
-    paths: string[],
-  ): any {
-    return this.getValue(styleConfigs, paths, 'value');
-  }
-
   protected getColNameByValueColName(series) {
     return series?.data?.valueColName || series.seriesName;
-  }
-
-  /**
-   * @deprecated should use utils getValue instead
-   *
-   * @protected
-   * @param {ChartStyleSectionConfig[]} [configs=[]]
-   * @param {string[]} [paths]
-   * @param {*} [targetKey]
-   * @return {*}
-   * @memberof Chart
-   */
-  protected getValue(
-    configs: ChartStyleSectionConfig[] = [],
-    paths?: string[],
-    targetKey?,
-  ) {
-    if (!Array.isArray(configs)) {
-      return null;
-    }
-
-    const key = paths?.shift();
-    const group = configs?.find(sc => sc.key === key);
-    if (!group) {
-      return null;
-    }
-    if (paths?.length === 0) {
-      return isEmpty(group) ? null : group[targetKey];
-    }
-    return this.getValue(group.rows, paths, targetKey);
   }
 
   private isMatchRequiredSectionLimition(
