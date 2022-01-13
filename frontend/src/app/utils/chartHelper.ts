@@ -100,6 +100,14 @@ export function getSettingValue(
   return getValue(configs, path.split('.'), targetKey);
 }
 
+/**
+ * @deprecated use getStyles instread, @see getStyles
+ * @export
+ * @param {ChartStyleSectionConfig[]} styles
+ * @param {string} groupPath
+ * @param {string} childPath
+ * @return {*}
+ */
 export function getStyleValueByGroup(
   styles: ChartStyleSectionConfig[],
   groupPath: string,
