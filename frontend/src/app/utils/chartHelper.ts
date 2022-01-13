@@ -109,15 +109,18 @@ export function getValue(
   paths: string[],
   targetKey,
 ) {
-  const key = paths?.shift();
-  const group = configs?.find(sc => sc.key === key);
-  if (!group) {
-    return undefined;
+  let iterators = configs || [];
+  while (!isEmptyArray(iterators)) {
+    const key = paths?.shift();
+    const group = iterators?.find(sc => sc.key === key);
+    if (!group) {
+      return undefined;
+    }
+    if (isEmptyArray(paths)) {
+      return group[targetKey];
+    }
+    iterators = group.rows || [];
   }
-  if (!paths?.length) {
-    return group[targetKey];
-  }
-  return getValue(group.rows || [], paths, targetKey);
 }
 
 export function getColNameByValueColName(series) {
