@@ -18,7 +18,7 @@
 
 import {
   getValue,
-  getValues,
+  getStyles,
   isInRange,
   isUnderUpperBound,
   mergeChartDataConfigs,
@@ -561,9 +561,9 @@ describe('Chart Helper ', () => {
       ['1-2-1', '1-2-2', '1-2-4'],
       [121, undefined, undefined],
     ],
-  ])('getValues Test - ', (configs, paths, targetKeys, expected) => {
+  ])('getStyles Test - ', (configs, paths, targetKeys, expected) => {
     test(`get keys of ${targetKeys} from configs with path ${paths?.toString()} to be ${expected}`, () => {
-      expect(getValues(configs as any, paths, targetKeys)).toEqual(expected);
+      expect(getStyles(configs as any, paths, targetKeys)).toEqual(expected);
     });
   });
 });

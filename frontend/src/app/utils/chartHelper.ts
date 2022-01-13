@@ -121,7 +121,7 @@ export function getStyleValueByGroup(
  *         ],
  *       },
  *     ];
- * const [color, font] = getValues(styleConfigs, ['label'], ['color', 'font']);
+ * const [color, font] = getStyles(styleConfigs, ['label'], ['color', 'font']);
  * console.log(color); // red
  * console.log(font); // sans-serif
  *
@@ -130,7 +130,7 @@ export function getStyleValueByGroup(
  * @param {Array<string>} childTargetKeys required
  * @return {*} array of child keys with the same order
  */
-export function getValues(
+export function getStyles(
   configs: Array<ChartStyleSectionConfig>,
   parentKeyPaths: Array<string>,
   childTargetKeys: Array<string>,
