@@ -798,9 +798,9 @@ export const getWidgetMapByServer = (
     return acc;
   }, {} as Record<string, DataChart>);
   const widgetMap = widgets.reduce((acc, cur) => {
-    const viewIds = cur.datachartId
-      ? [dataChartMap[cur.datachartId].viewId]
-      : cur.viewIds;
+    // issues 601
+    const chartViewId = dataChartMap[cur.datachartId]?.viewId;
+    const viewIds = chartViewId ? [chartViewId] : cur.viewIds;
     try {
       let widget: Widget = {
         ...cur,
