@@ -23,7 +23,7 @@ import {
   getExtraSeriesRowData,
   getScatterSymbolSizeFn,
   getSeriesTooltips4Polar2,
-  getStyleValueByGroup,
+  getStyles,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
@@ -92,7 +92,7 @@ class BasicOutlineMapChart extends Chart {
     this.chart?.resize(context);
   }
 
-  getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataset, config: ChartConfig) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
@@ -150,27 +150,34 @@ class BasicOutlineMapChart extends Chart {
   }
 
   private registerGeoMap(styleConfigs) {
-    const mapLevelName = getStyleValueByGroup(styleConfigs!, 'map', 'level');
+    const [mapLevelName] = getStyles(styleConfigs, ['map'], ['level']);
     this.geoMap = mapLevelName === 'china' ? geoChina : geoChinaCity;
   }
 
   private getGeoInfo(styleConfigs) {
-    const show = getStyleValueByGroup(styleConfigs, 'label', 'showLabel');
-    const position = getStyleValueByGroup(styleConfigs, 'label', 'position');
-    const font = getStyleValueByGroup(styleConfigs, 'label', 'font');
-    const mapLevelName = getStyleValueByGroup(styleConfigs, 'map', 'level');
-    const enableZoom = getStyleValueByGroup(styleConfigs, 'map', 'enableZoom');
-    const areaColor = getStyleValueByGroup(styleConfigs, 'map', 'areaColor');
-    const areaEmphasisColor = getStyleValueByGroup(
+    const [show, position, font] = getStyles(
       styleConfigs,
-      'map',
-      'areaEmphasisColor',
+      ['label'],
+      ['showLabel', 'position', 'font'],
     );
-    const enableFocus = getStyleValueByGroup(styleConfigs, 'map', 'focusArea');
-    const borderStyle = getStyleValueByGroup(
+    const [
+      mapLevelName,
+      enableZoom,
+      areaColor,
+      areaEmphasisColor,
+      enableFocus,
+      borderStyle,
+    ] = getStyles(
       styleConfigs,
-      'map',
-      'borderStyle',
+      ['map'],
+      [
+        'level',
+        'enableZoom',
+        'areaColor',
+        'areaEmphasisColor',
+        'focusArea',
+        'borderStyle',
+      ],
     );
 
     return {
@@ -204,9 +211,12 @@ class BasicOutlineMapChart extends Chart {
     sizeConfigs,
     styleConfigs,
   ): any[] {
-    const show = getStyleValueByGroup(styleConfigs, 'visualMap', 'show');
-    const mapLevelName = getStyleValueByGroup(styleConfigs, 'map', 'level');
-    const enableZoom = getStyleValueByGroup(styleConfigs, 'map', 'enableZoom');
+    const [show] = getStyles(styleConfigs, ['visualMap'], ['show']);
+    const [mapLevelName, enableZoom] = getStyles(
+      styleConfigs,
+      ['map'],
+      ['level', 'enableZoom'],
+    );
     return [
       {
         type: 'map',
@@ -245,8 +255,8 @@ class BasicOutlineMapChart extends Chart {
       return [];
     }
 
-    const showLabel = getStyleValueByGroup(styleConfigs, 'label', 'showLabel');
-    const cycleRatio = getStyleValueByGroup(styleConfigs, 'map', 'cycleRatio');
+    const [showLabel] = getStyles(styleConfigs, ['label'], ['showLabel']);
+    const [cycleRatio] = getStyles(styleConfigs, ['map'], ['cycleRatio']);
     const { min, max } = getDataColumnMaxAndMin(objDataColumns, sizeConfigs[0]);
     const defaultSizeValue = max - min;
     const defaultColorValue = 1;
@@ -335,20 +345,11 @@ class BasicOutlineMapChart extends Chart {
     sizeConfigs,
     styleConfigs,
   ) {
-    const show = getStyleValueByGroup(styleConfigs, 'visualMap', 'show');
-    const orient = getStyleValueByGroup(styleConfigs, 'visualMap', 'orient');
-    const align = getStyleValueByGroup(styleConfigs, 'visualMap', 'align');
-    const itemWidth = getStyleValueByGroup(
+    const [show, orient, align, itemWidth, itemHeight, font] = getStyles(
       styleConfigs,
-      'visualMap',
-      'itemWidth',
+      ['visualMap'],
+      ['show', 'orient', 'align', 'itemWidth', 'itemHeight', 'font'],
     );
-    const itemHeight = getStyleValueByGroup(
-      styleConfigs,
-      'visualMap',
-      'itemHeight',
-    );
-    const font = getStyleValueByGroup(styleConfigs, 'visualMap', 'font');
     if (!show || !aggregateConfigs?.length) {
       return [];
     }

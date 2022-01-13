@@ -16,11 +16,7 @@
  * limitations under the License.
  */
 
-import {
-  ChartConfig,
-  ChartDataSectionType,
-  ChartStyleSectionConfig,
-} from 'app/types/ChartConfig';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import {
   getAxisLabel,
@@ -30,10 +26,11 @@ import {
   getCustomSortableColumns,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
+  getGridStyle,
   getReference,
   getSeriesTooltips4Rectangular,
   getSplitLine,
-  getStyleValueByGroup,
+  getStyles,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
@@ -90,7 +87,7 @@ class BasicDoubleYChart extends Chart {
     this.chart?.resize(context);
   }
 
-  getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataset, config: ChartConfig) {
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings;
@@ -137,7 +134,7 @@ class BasicDoubleYChart extends Chart {
           dataColumns,
         ),
       },
-      grid: this.getGrid(styleConfigs),
+      grid: getGridStyle(styleConfigs),
       legend: this.getLegend(
         styleConfigs,
         leftMetricsConfigs.concat(rightMetricsConfigs).map(getColumnRenderName),
@@ -158,17 +155,8 @@ class BasicDoubleYChart extends Chart {
     };
   }
 
-  getGrid(styles) {
-    const containLabel = getStyleValueByGroup(styles, 'margin', 'containLabel');
-    const left = getStyleValueByGroup(styles, 'margin', 'marginLeft');
-    const right = getStyleValueByGroup(styles, 'margin', 'marginRight');
-    const bottom = getStyleValueByGroup(styles, 'margin', 'marginBottom');
-    const top = getStyleValueByGroup(styles, 'margin', 'marginTop');
-    return { left, right, bottom, top, containLabel };
-  }
-
-  getSeries(
-    styleConfigs,
+  private getSeries(
+    styles,
     settingConfigs,
     leftDeminsionConfigs,
     rightDeminsionConfigs,
@@ -176,17 +164,11 @@ class BasicDoubleYChart extends Chart {
   ) {
     const _getSeriesByDemisionPostion =
       () => (config, styles, settings, data, direction) => {
-        const graphType = getStyleValueByGroup(
-          styleConfigs,
-          direction,
-          'graphType',
-        );
-        const graphStyle = getStyleValueByGroup(
+        const [graphType, graphStyle] = getStyles(
           styles,
-          direction,
-          'graphStyle',
+          [direction],
+          ['graphType', 'graphStyle'],
         );
-
         return {
           name: getColumnRenderName(config),
           type: graphType || 'line',
@@ -210,7 +192,7 @@ class BasicDoubleYChart extends Chart {
         leftDeminsionConfigs.map(lc =>
           _getSeriesByDemisionPostion()(
             lc,
-            styleConfigs,
+            styles,
             settingConfigs,
             dataColumns,
             'leftY',
@@ -221,7 +203,7 @@ class BasicDoubleYChart extends Chart {
         rightDeminsionConfigs.map(rc =>
           _getSeriesByDemisionPostion()(
             rc,
-            styleConfigs,
+            styles,
             settingConfigs,
             dataColumns,
             'rightY',
@@ -235,7 +217,7 @@ class BasicDoubleYChart extends Chart {
     return series;
   }
 
-  getItemStyle(config) {
+  private getItemStyle(config) {
     const color = config?.color?.start;
     return {
       itemStyle: {
@@ -244,7 +226,7 @@ class BasicDoubleYChart extends Chart {
     };
   }
 
-  getGraphStyle(graphType, style) {
+  private getGraphStyle(graphType, style) {
     if (graphType === 'line') {
       return { lineStyle: style };
     } else {
@@ -255,29 +237,35 @@ class BasicDoubleYChart extends Chart {
     }
   }
 
-  getXAxis(styleConfigs, xAxisConfigs, dataColumns) {
+  private getXAxis(styles, xAxisConfigs, dataColumns) {
     const fisrtXAxisConfig = xAxisConfigs[0];
-    const showAxis = getStyleValueByGroup(styleConfigs, 'xAxis', 'showAxis');
-    const inverse = getStyleValueByGroup(styleConfigs, 'xAxis', 'inverseAxis');
-    const lineStyle = getStyleValueByGroup(styleConfigs, 'xAxis', 'lineStyle');
-    const showLabel = getStyleValueByGroup(styleConfigs, 'xAxis', 'showLabel');
-    const font = getStyleValueByGroup(styleConfigs, 'xAxis', 'font');
-    const rotate = getStyleValueByGroup(styleConfigs, 'xAxis', 'rotate');
-    const showInterval = getStyleValueByGroup(
-      styleConfigs,
-      'xAxis',
-      'showInterval',
+    const [
+      showAxis,
+      inverse,
+      lineStyle,
+      showLabel,
+      font,
+      rotate,
+      showInterval,
+      interval,
+    ] = getStyles(
+      styles,
+      ['xAxis'],
+      [
+        'showAxis',
+        'inverseAxis',
+        'lineStyle',
+        'showLabel',
+        'font',
+        'rotate',
+        'showInterval',
+        'interval',
+      ],
     );
-    const interval = getStyleValueByGroup(styleConfigs, 'xAxis', 'interval');
-    const showVerticalLine = getStyleValueByGroup(
-      styleConfigs,
-      'splitLine',
-      'showVerticalLine',
-    );
-    const verticalLineStyle = getStyleValueByGroup(
-      styleConfigs,
-      'splitLine',
-      'verticalLineStyle',
+    const [showVerticalLine, verticalLineStyle] = getStyles(
+      styles,
+      ['splitLine'],
+      ['showVerticalLine', 'verticalLineStyle'],
     );
 
     return {
@@ -297,20 +285,16 @@ class BasicDoubleYChart extends Chart {
     };
   }
 
-  getYAxis(styles, leftDeminsionConfigs, rightDeminsionConfigs) {
-    const showAxis = getStyleValueByGroup(styles, 'doubleY', 'showAxis');
-    const inverse = getStyleValueByGroup(styles, 'doubleY', 'inverseAxis');
-    const showLabel = getStyleValueByGroup(styles, 'doubleY', 'showLabel');
-    const font = getStyleValueByGroup(styles, 'doubleY', 'font');
-    const showHorizonLine = getStyleValueByGroup(
+  private getYAxis(styles, leftDeminsionConfigs, rightDeminsionConfigs) {
+    const [showAxis, inverse, showLabel, font] = getStyles(
       styles,
-      'splitLine',
-      'showHorizonLine',
+      ['doubleY'],
+      ['showAxis', 'inverseAxis', 'showLabel', 'font'],
     );
-    const horizonLineStyle = getStyleValueByGroup(
+    const [showHorizonLine, horizonLineStyle] = getStyles(
       styles,
-      'splitLine',
-      'horizonLineStyle',
+      ['splitLine'],
+      ['showHorizonLine', 'horizonLineStyle'],
     );
 
     const _yAxisTemplate = (position, index, name) => {
@@ -350,12 +334,12 @@ class BasicDoubleYChart extends Chart {
     return leftYAxis.concat(rightYAxis);
   }
 
-  getLegend(styles, seriesNames) {
-    const show = getStyleValueByGroup(styles, 'legend', 'showLegend');
-    const type = getStyleValueByGroup(styles, 'legend', 'type');
-    const font = getStyleValueByGroup(styles, 'legend', 'font');
-    const legendPos = getStyleValueByGroup(styles, 'legend', 'position');
-    const selectAll = getStyleValueByGroup(styles, 'legend', 'selectAll');
+  private getLegend(styles, seriesNames) {
+    const [show, type, font, legendPos, selectAll] = getStyles(
+      styles,
+      ['legend'],
+      ['showLegend', 'type', 'font', 'position', 'selectAll'],
+    );
     let positions = {};
     let orient = {};
 
@@ -396,10 +380,12 @@ class BasicDoubleYChart extends Chart {
     };
   }
 
-  getLabelStyle(styles, direction) {
-    const position = getStyleValueByGroup(styles, 'label', 'position');
-    const showLabel = getStyleValueByGroup(styles, direction, 'showLabel');
-    const LabelFont = getStyleValueByGroup(styles, direction, 'font');
+  private getLabelStyle(styles, direction) {
+    const [showLabel, position, LabelFont] = getStyles(
+      styles,
+      ['label'],
+      ['showLabel', 'position', 'font'],
+    );
 
     return {
       label: {
@@ -417,7 +403,7 @@ class BasicDoubleYChart extends Chart {
     };
   }
 
-  getTooltipFormmaterFunc(
+  private getTooltipFormmaterFunc(
     styleConfigs,
     groupConfigs,
     aggregateConfigs,
@@ -446,23 +432,13 @@ class BasicDoubleYChart extends Chart {
     };
   }
 
-  getSeriesStyle(styles) {
-    const smooth = getStyleValueByGroup(styles, 'graph', 'smooth');
-    const stack = getStyleValueByGroup(styles, 'graph', 'stack');
-    const step = getStyleValueByGroup(styles, 'graph', 'step');
-    const symbol = getStyleValueByGroup(styles, 'graph', 'symbol')
-      ? 'emptyCircle'
-      : 'none';
-    return { smooth, step, symbol, stack };
-  }
-
-  getStyleValueByGroup(
-    styles: ChartStyleSectionConfig[],
-    groupPath: string,
-    childPath: string,
-  ) {
-    const childPaths = childPath.split('.');
-    return this.getStyleValue(styles, [groupPath, ...childPaths]);
+  private getSeriesStyle(styles) {
+    const [smooth, stack, step, symbol] = getStyles(
+      styles,
+      ['graph'],
+      ['smooth', 'stack', 'step', 'symbol'],
+    );
+    return { smooth, step, symbol: symbol ? 'emptyCircle' : 'none', stack };
   }
 }
 

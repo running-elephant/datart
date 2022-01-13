@@ -170,7 +170,7 @@ const config: ChartConfig = {
           comType: 'line',
           default: {
             type: 'solid',
-            width: 0,
+            width: 1,
             color: null,
           },
         },

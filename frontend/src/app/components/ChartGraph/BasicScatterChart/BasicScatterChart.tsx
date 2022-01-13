@@ -22,10 +22,11 @@ import {
   getColumnRenderName,
   getDataColumnMaxAndMin,
   getExtraSeriesRowData,
+  getGridStyle,
   getReference,
   getScatterSymbolSizeFn,
   getSeriesTooltips4Scatter,
-  getStyleValueByGroup,
+  getStyles,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
@@ -83,7 +84,7 @@ class BasicScatterChart extends Chart {
     this.chart?.resize(opt, context);
   }
 
-  getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataset, config: ChartConfig) {
     const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
@@ -142,7 +143,7 @@ class BasicScatterChart extends Chart {
         styleConfigs,
         series?.map(s => s.name),
       ),
-      grid: this.getGrid(styleConfigs),
+      grid: getGridStyle(styleConfigs),
       xAxis: this.getAxis(styleConfigs, axisColumns[0], 'xAxis'),
       yAxis: this.getAxis(styleConfigs, axisColumns[1], 'yAxis'),
       series,
@@ -228,11 +229,7 @@ class BasicScatterChart extends Chart {
     colorSeriesName?,
     color?,
   ) {
-    const cycleRatio = getStyleValueByGroup(
-      styleConfigs,
-      'scatter',
-      'cycleRatio',
-    );
+    const [cycleRatio] = getStyles(styleConfigs, ['scatter'], ['cycleRatio']);
     const defaultSizeValue = (max - min) / 2;
     const seriesName = groupConfigs
       ?.map(gc => getColumnRenderName(gc))
@@ -276,43 +273,49 @@ class BasicScatterChart extends Chart {
     };
   }
 
-  getGrid(styles) {
-    const containLabel = getStyleValueByGroup(styles, 'margin', 'containLabel');
-    const left = getStyleValueByGroup(styles, 'margin', 'marginLeft');
-    const right = getStyleValueByGroup(styles, 'margin', 'marginRight');
-    const bottom = getStyleValueByGroup(styles, 'margin', 'marginBottom');
-    const top = getStyleValueByGroup(styles, 'margin', 'marginTop');
-    return { left, right, bottom, top, containLabel };
-  }
-
-  getAxis(styles, xAxisColumn, axisKey) {
-    const showAxis = getStyleValueByGroup(styles, axisKey, 'showAxis');
-    const inverse = getStyleValueByGroup(styles, axisKey, 'inverseAxis');
-    const lineStyle = getStyleValueByGroup(styles, axisKey, 'lineStyle');
-    const showLabel = getStyleValueByGroup(styles, axisKey, 'showLabel');
-    const font = getStyleValueByGroup(styles, axisKey, 'font');
-    const unitFont = getStyleValueByGroup(styles, axisKey, 'unitFont');
-    const showTitleAndUnit = getStyleValueByGroup(
+  private getAxis(styles, xAxisColumn, axisKey) {
+    const [
+      showAxis,
+      inverse,
+      lineStyle,
+      showLabel,
+      font,
+      unitFont,
+      showTitleAndUnit,
+      nameLocation,
+      nameGap,
+      nameRotate,
+      min,
+      max,
+    ] = getStyles(
       styles,
-      axisKey,
-      'showTitleAndUnit',
+      [axisKey],
+      [
+        'showAxis',
+        'inverseAxis',
+        'lineStyle',
+        'showLabel',
+        'font',
+        'unitFont',
+        'showTitleAndUnit',
+        'nameLocation',
+        'nameGap',
+        'nameRotate',
+        'min',
+        'max',
+      ],
     );
     const name = showTitleAndUnit
       ? [xAxisColumn].map(c => c.name).join(' / ')
       : null;
-    const nameLocation = getStyleValueByGroup(styles, axisKey, 'nameLocation');
-    const nameGap = getStyleValueByGroup(styles, axisKey, 'nameGap');
-    const nameRotate = getStyleValueByGroup(styles, axisKey, 'nameRotate');
-    const min = getStyleValueByGroup(styles, axisKey, 'min');
-    const max = getStyleValueByGroup(styles, axisKey, 'max');
     const splitLineProps =
       axisKey === 'xAxis'
         ? ['showHorizonLine', 'horizonLineStyle']
         : ['showVerticalLine', 'verticalLineStyle'];
-    const showSplitLine = getStyleValueByGroup(
+    const [showSplitLine, splitLineStyle] = getStyles(
       styles,
-      'splitLine',
-      splitLineProps[0],
+      ['splitLine'],
+      [splitLineProps[0], splitLineProps[1]],
     );
 
     return {
@@ -339,17 +342,17 @@ class BasicScatterChart extends Chart {
       nameTextStyle: unitFont,
       splitLine: {
         show: showSplitLine,
-        lineStyle: getStyleValueByGroup(styles, 'splitLine', splitLineProps[1]),
+        lineStyle: splitLineStyle,
       },
     };
   }
 
-  getLegendStyle(styles, seriesNames) {
-    const show = getStyleValueByGroup(styles, 'legend', 'showLegend');
-    const type = getStyleValueByGroup(styles, 'legend', 'type');
-    const font = getStyleValueByGroup(styles, 'legend', 'font');
-    const legendPos = getStyleValueByGroup(styles, 'legend', 'position');
-    const selectAll = getStyleValueByGroup(styles, 'legend', 'selectAll');
+  private getLegendStyle(styles, seriesNames) {
+    const [show, type, font, legendPos, selectAll] = getStyles(
+      styles,
+      ['legend'],
+      ['showLegend', 'type', 'font', 'position', 'selectAll'],
+    );
     let positions = {};
     let orient = {};
 
@@ -390,17 +393,19 @@ class BasicScatterChart extends Chart {
     };
   }
 
-  getLabelStyle(styles) {
-    const show = getStyleValueByGroup(styles, 'label', 'showLabel');
-    const position = getStyleValueByGroup(styles, 'label', 'position');
-    const font = getStyleValueByGroup(styles, 'label', 'font');
+  private getLabelStyle(styles) {
+    const [show, position, font] = getStyles(
+      styles,
+      ['label'],
+      ['showLabel', 'position', 'font'],
+    );
     return {
       label: { show, position, ...font, formatter: '{b}' },
       labelLayout: { hideOverlap: true },
     };
   }
 
-  getTooltipFormmaterFunc(
+  private getTooltipFormmaterFunc(
     styleConfigs,
     groupConfigs,
     aggregateConfigs,

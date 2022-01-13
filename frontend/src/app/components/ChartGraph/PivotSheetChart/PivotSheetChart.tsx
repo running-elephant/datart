@@ -25,6 +25,7 @@ import ChartDataset from 'app/types/ChartDataset';
 import {
   getColumnRenderName,
   getCustomSortableColumns,
+  getStyles,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
@@ -109,38 +110,32 @@ class PivotSheetChart extends ReactChart {
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
-    const enableExpandRow = this.getStyleValue(styleConfigs, [
-      'style',
-      'enableExpandRow',
-    ]);
-    const enableHoverHighlight = this.getStyleValue(styleConfigs, [
-      'style',
-      'enableHoverHighlight',
-    ]);
-    const enableSelectedHighlight = this.getStyleValue(styleConfigs, [
-      'style',
-      'enableSelectedHighlight',
-    ]);
-    const metricNameShowIn = this.getStyleValue(styleConfigs, [
-      'style',
-      'metricNameShowIn',
-    ]);
-    const enableTotal = this.getStyleValue(settingConfigs, [
-      'rowSummary',
-      'enableTotal',
-    ]);
-    const totalPosition = this.getStyleValue(settingConfigs, [
-      'rowSummary',
-      'totalPosition',
-    ]);
-    const enableSubTotal = this.getStyleValue(settingConfigs, [
-      'rowSummary',
-      'enableSubTotal',
-    ]);
-    const subTotalPosition = this.getStyleValue(settingConfigs, [
-      'rowSummary',
-      'subTotalPosition',
-    ]);
+    const [
+      enableExpandRow,
+      enableHoverHighlight,
+      enableSelectedHighlight,
+      metricNameShowIn,
+    ] = getStyles(
+      styleConfigs,
+      ['style'],
+      [
+        'enableExpandRow',
+        'enableHoverHighlight',
+        'enableSelectedHighlight',
+        'metricNameShowIn',
+      ],
+    );
+    const [enableTotal, totalPosition, enableSubTotal, subTotalPosition] =
+      getStyles(
+        settingConfigs,
+        ['rowSummary'],
+        [
+          'enableTotal',
+          'enableHoverHighlight',
+          'enableSubTotal',
+          'subTotalPosition',
+        ],
+      );
 
     return {
       options: {
@@ -236,23 +231,11 @@ class PivotSheetChart extends ReactChart {
   }
 
   private getBodyStyle(styleConfigs) {
-    const bodyFont = this.getStyleValue(styleConfigs, [
-      'tableBodyStyle',
-      'font',
-    ]);
-    const oddBgColor = this.getStyleValue(styleConfigs, [
-      'tableBodyStyle',
-      'oddBgColor',
-    ]);
-    const evenBgColor = this.getStyleValue(styleConfigs, [
-      'tableBodyStyle',
-      'evenBgColor',
-    ]);
-    const bodyTextAlign = this.getStyleValue(styleConfigs, [
-      'tableBodyStyle',
-      'align',
-    ]);
-
+    const [bodyFont, oddBgColor, evenBgColor, bodyTextAlign] = getStyles(
+      styleConfigs,
+      ['tableBodyStyle'],
+      ['font', 'oddBgColor', 'evenBgColor', 'align'],
+    );
     return {
       cell: {
         crossBackgroundColor: evenBgColor,
@@ -269,19 +252,11 @@ class PivotSheetChart extends ReactChart {
   }
 
   private getHeaderStyle(styleConfigs) {
-    const headerFont = this.getStyleValue(styleConfigs, [
-      'tableHeaderStyle',
-      'font',
-    ]);
-    const headerBgColor = this.getStyleValue(styleConfigs, [
-      'tableHeaderStyle',
-      'bgColor',
-    ]);
-    const headerTextAlign = this.getStyleValue(styleConfigs, [
-      'tableHeaderStyle',
-      'align',
-    ]);
-
+    const [headerFont, headerBgColor, headerTextAlign] = getStyles(
+      styleConfigs,
+      ['tableHeaderStyle'],
+      ['font', 'bgColor', 'align'],
+    );
     return {
       cell: {
         backgroundColor: headerBgColor,

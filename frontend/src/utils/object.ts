@@ -174,11 +174,11 @@ export function CloneValueDeep<T>(value: T): T {
   return cloneDeep(value);
 }
 
-export function isUndefined(o) {
+export function isUndefined(o): boolean {
   return o === undefined;
 }
 
-export function isEmpty(o?: null | any) {
+export function isEmpty(o?: null | any): boolean {
   return o === null || isUndefined(o);
 }
 

@@ -117,11 +117,13 @@ class WordCloudChart extends Chart {
     };
   }
   getWordCloud(style) {
+    // TODO(tianlei): should fix later
     const [drawOutOfBound, shape, width, height] = this.getArrStyleValueByGroup(
       ['drawOutOfBound', 'shape', 'width', 'height'],
       style,
       'wordCloud',
     );
+    // TODO(tianlei): should fix later
     const [left, top] = this.getArrStyleValueByGroup(
       ['marginLeft', 'marginTop'],
       style,
@@ -140,6 +142,7 @@ class WordCloudChart extends Chart {
   }
 
   getLaber(style) {
+    // TODO(tianlei): should fix later
     const [
       fontFamily,
       fontWeight,
@@ -192,6 +195,15 @@ class WordCloudChart extends Chart {
     };
   }
 
+  // TODO(tianlei): should be fix later
+  /**
+   * @deprecated should use getStyles instread in utils function
+   * @param {*} childPathList
+   * @param {*} style
+   * @param {*} groupPath
+   * @return {*}
+   * @memberof WordCloudChart
+   */
   getArrStyleValueByGroup(childPathList, style, groupPath) {
     return childPathList.map(child => {
       return getStyleValueByGroup(style, groupPath, child);

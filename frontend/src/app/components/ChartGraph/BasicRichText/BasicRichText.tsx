@@ -111,6 +111,7 @@ class BasicRichText extends ReactChart {
         value: this.getDataListValue(config, dataColumns),
       };
     });
+    // TODO(tianlei): should be fixed later with getStyles function
     const initContent = getStyleValueByGroup(
       stylesConfigs,
       'delta',

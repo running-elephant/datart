@@ -80,20 +80,18 @@ export function reachLowerBoundCount(
   )(limit, 0);
 }
 
+/**
+ * @deprecated This function will be removed in next versiion, please use getStyles instread
+ * @see getValue
+ * @param {ChartStyleSectionConfig[]} styleConfigs
+ * @param {string[]} paths
+ * @return {*}  {*}
+ */
 export function getStyleValue(
   styleConfigs: ChartStyleSectionConfig[],
   paths: string[],
 ): any {
-  return getValue(styleConfigs, paths, 'value');
-}
-
-export function getStyleValueByGroup(
-  styles: ChartStyleSectionConfig[],
-  groupPath: string,
-  childPath: string,
-) {
-  const childPaths = childPath.split('.');
-  return getStyleValue(styles, [groupPath, ...childPaths]);
+  return getValue(styleConfigs, paths);
 }
 
 export function getSettingValue(
@@ -104,20 +102,82 @@ export function getSettingValue(
   return getValue(configs, path.split('.'), targetKey);
 }
 
-export function getValue(
-  configs: ChartStyleSectionConfig[],
-  paths: string[],
-  targetKey,
+/**
+ * @deprecated This function will be removed in next versiion, please use getStyles instread
+ * @see getStyles
+ * @export
+ * @param {ChartStyleSectionConfig[]} styles
+ * @param {string} groupPath
+ * @param {string} childPath
+ * @return {*}
+ */
+export function getStyleValueByGroup(
+  styles: ChartStyleSectionConfig[],
+  groupPath: string,
+  childPath: string,
 ) {
-  const key = paths?.shift();
-  const group = configs?.find(sc => sc.key === key);
-  if (!group) {
-    return null;
+  const childPaths = childPath.split('.');
+  return getValue(styles, [groupPath, ...childPaths]);
+}
+
+/**
+ * Get config style values, more example please see test cases
+ * @example
+ * const styleConfigs = [
+ *       {
+ *        key: 'label',
+ *        rows: [
+ *           { key: 'color', value: 'red' },
+ *           { key: 'font', value: 'sans-serif' },
+ *         ],
+ *       },
+ *     ];
+ * const [color, font] = getStyles(styleConfigs, ['label'], ['color', 'font']);
+ * console.log(color); // red
+ * console.log(font); // sans-serif
+ *
+ * @param {Array<ChartStyleSectionConfig>} configs required
+ * @param {Array<string>} parentKeyPaths required
+ * @param {Array<string>} childTargetKeys required
+ * @return {*} array of child keys with the same order
+ */
+export function getStyles(
+  configs: Array<ChartStyleSectionConfig>,
+  parentKeyPaths: Array<string>,
+  childTargetKeys: Array<string>,
+) {
+  const rows = getValue(configs, parentKeyPaths, 'rows');
+  if (!rows) {
+    return Array(childTargetKeys.length).fill(undefined);
   }
-  if (paths?.length === 0) {
-    return isEmpty(group) ? null : group[targetKey];
+  return childTargetKeys.map(k => getValue(rows, [k]));
+}
+
+/**
+ * Get style config value base funtion with default target key
+ * @export
+ * @param {Array<ChartStyleSectionConfig>} configs
+ * @param {Array<string>} keyPaths
+ * @param {string} [targetKey='value']
+ * @return {*}
+ */
+export function getValue(
+  configs: Array<ChartStyleSectionConfig>,
+  keyPaths: Array<string>,
+  targetKey = 'value',
+) {
+  let iterators = configs || [];
+  while (!isEmptyArray(iterators)) {
+    const key = keyPaths?.shift();
+    const group = iterators?.find(sc => sc.key === key);
+    if (!group) {
+      return undefined;
+    }
+    if (isEmptyArray(keyPaths)) {
+      return group[targetKey];
+    }
+    iterators = group.rows || [];
   }
-  return getValue(group.rows || [], paths, targetKey);
 }
 
 export function getColNameByValueColName(series) {
@@ -832,4 +892,13 @@ export function isMatchRequirement(meta: ChartMetadata, config: ChartConfig) {
       isInRange(aggregate, aggregateFieldConfigs.length)
     );
   });
+}
+
+export function getGridStyle(styles) {
+  const [containLabel, left, right, bottom, top] = getStyles(
+    styles,
+    ['margin'],
+    ['containLabel', 'marginLeft', 'marginRight', 'marginBottom', 'marginTop'],
+  );
+  return { left, right, bottom, top, containLabel };
 }

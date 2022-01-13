@@ -16,12 +16,7 @@
  * limitations under the License.
  */
 
-import {
-  ChartConfig,
-  ChartDataSectionType,
-  ChartStyleSectionConfig,
-  FieldFormatType,
-} from 'app/types/ChartConfig';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import {
   getColorizeGroupSeriesColumns,
@@ -29,19 +24,14 @@ import {
   getCustomSortableColumns,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
+  getGridStyle,
   getReference,
   getSeriesTooltips4Rectangular2,
-  getStyleValueByGroup,
+  getStyles,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
-import {
-  toExponential,
-  toFormattedValue,
-  toPrecision,
-  toUnit,
-  toUnitDesc,
-} from 'app/utils/number';
+import { toFormattedValue, toPrecision } from 'app/utils/number';
 import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
 import Chart from '../models/Chart';
@@ -100,7 +90,7 @@ class BasicBarChart extends Chart {
   }
 
   onResize(opt: any, context): void {
-    this.chart?.resize(context);
+    this.chart?.resize({ width: context?.width, height: context?.height });
   }
 
   getOptions(dataset: ChartDataset, config: ChartConfig) {
@@ -171,7 +161,7 @@ class BasicBarChart extends Chart {
         ),
       },
       legend: this.getLegendStyle(styleConfigs, series),
-      grid: this.getGrid(styleConfigs),
+      grid: getGridStyle(styleConfigs),
       xAxis: axisInfo.xAxis,
       yAxis: axisInfo.yAxis,
       series,
@@ -339,8 +329,11 @@ class BasicBarChart extends Chart {
   }
 
   private getSerieItemStyle(styles, itemStyle?) {
-    const borderStyle = getStyleValueByGroup(styles, 'bar', 'borderStyle');
-    const borderRadius = getStyleValueByGroup(styles, 'bar', 'radius');
+    const [borderStyle, borderRadius] = getStyles(
+      styles,
+      ['bar'],
+      ['borderStyle', 'radius'],
+    );
 
     return {
       ...itemStyle,
@@ -352,49 +345,52 @@ class BasicBarChart extends Chart {
   }
 
   private getSerieBarGap(styles) {
-    return getStyleValueByGroup(styles, 'bar', 'gap');
+    const [gap] = getStyles(styles, ['bar'], ['gap']);
+    return gap;
   }
 
   private getSerieBarWidth(styles) {
-    return getStyleValueByGroup(styles, 'bar', 'width');
+    const [width] = getStyles(styles, ['bar'], ['width']);
+    return width;
   }
 
-  getGrid(styles) {
-    const containLabel = getStyleValueByGroup(styles, 'margin', 'containLabel');
-    const left = getStyleValueByGroup(styles, 'margin', 'marginLeft');
-    const right = getStyleValueByGroup(styles, 'margin', 'marginRight');
-    const bottom = getStyleValueByGroup(styles, 'margin', 'marginBottom');
-    const top = getStyleValueByGroup(styles, 'margin', 'marginTop');
-    return { left, right, bottom, top, containLabel };
-  }
-
-  getYAxis(styles, yAxisNames) {
-    const showAxis = getStyleValueByGroup(styles, 'yAxis', 'showAxis');
-    const inverse = getStyleValueByGroup(styles, 'yAxis', 'inverseAxis');
-    const lineStyle = getStyleValueByGroup(styles, 'yAxis', 'lineStyle');
-    const showLabel = getStyleValueByGroup(styles, 'yAxis', 'showLabel');
-    const font = getStyleValueByGroup(styles, 'yAxis', 'font');
-    const showTitleAndUnit = getStyleValueByGroup(
+  private getYAxis(styles, yAxisNames) {
+    const [
+      showAxis,
+      inverse,
+      lineStyle,
+      showLabel,
+      font,
+      showTitleAndUnit,
+      unitFont,
+      nameLocation,
+      nameGap,
+      nameRotate,
+      min,
+      max,
+    ] = getStyles(
       styles,
-      'yAxis',
-      'showTitleAndUnit',
+      ['yAxis'],
+      [
+        'showAxis',
+        'inverseAxis',
+        'lineStyle',
+        'showLabel',
+        'font',
+        'showTitleAndUnit',
+        'unitFont',
+        'nameLocation',
+        'nameGap',
+        'nameRotate',
+        'min',
+        'max',
+      ],
     );
     const name = showTitleAndUnit ? yAxisNames.join(' / ') : null;
-    const unitFont = getStyleValueByGroup(styles, 'yAxis', 'unitFont');
-    const nameLocation = getStyleValueByGroup(styles, 'yAxis', 'nameLocation');
-    const nameGap = getStyleValueByGroup(styles, 'yAxis', 'nameGap');
-    const nameRotate = getStyleValueByGroup(styles, 'yAxis', 'nameRotate');
-    const min = getStyleValueByGroup(styles, 'yAxis', 'min');
-    const max = getStyleValueByGroup(styles, 'yAxis', 'max');
-    const showHorizonLine = getStyleValueByGroup(
+    const [showHorizonLine, horizonLineStyle] = getStyles(
       styles,
-      'splitLine',
-      'showHorizonLine',
-    );
-    const horizonLineStyle = getStyleValueByGroup(
-      styles,
-      'splitLine',
-      'horizonLineStyle',
+      ['splitLine'],
+      ['showHorizonLine', 'horizonLineStyle'],
     );
 
     return {
@@ -426,25 +422,35 @@ class BasicBarChart extends Chart {
     };
   }
 
-  getXAxis(styles, xAxisColumns) {
+  private getXAxis(styles, xAxisColumns) {
     const axisColumnInfo = xAxisColumns[0];
-    const showAxis = getStyleValueByGroup(styles, 'xAxis', 'showAxis');
-    const inverse = getStyleValueByGroup(styles, 'xAxis', 'inverseAxis');
-    const lineStyle = getStyleValueByGroup(styles, 'xAxis', 'lineStyle');
-    const showLabel = getStyleValueByGroup(styles, 'xAxis', 'showLabel');
-    const font = getStyleValueByGroup(styles, 'xAxis', 'font');
-    const rotate = getStyleValueByGroup(styles, 'xAxis', 'rotate');
-    const showInterval = getStyleValueByGroup(styles, 'xAxis', 'showInterval');
-    const interval = getStyleValueByGroup(styles, 'xAxis', 'interval');
-    const showVerticalLine = getStyleValueByGroup(
+    const [
+      showAxis,
+      inverse,
+      lineStyle,
+      showLabel,
+      font,
+      rotate,
+      showInterval,
+      interval,
+    ] = getStyles(
       styles,
-      'splitLine',
-      'showVerticalLine',
+      ['xAxis'],
+      [
+        'showAxis',
+        'inverseAxis',
+        'lineStyle',
+        'showLabel',
+        'font',
+        'rotate',
+        'showInterval',
+        'interval',
+      ],
     );
-    const verticalLineStyle = getStyleValueByGroup(
+    const [showVerticalLine, verticalLineStyle] = getStyles(
       styles,
-      'splitLine',
-      'verticalLineStyle',
+      ['splitLine'],
+      ['showVerticalLine', 'verticalLineStyle'],
     );
 
     return {
@@ -471,13 +477,13 @@ class BasicBarChart extends Chart {
     };
   }
 
-  getLegendStyle(styles, series) {
+  private getLegendStyle(styles, series) {
     const seriesNames = (series || []).map((col: any) => col?.name);
-    const show = getStyleValueByGroup(styles, 'legend', 'showLegend');
-    const type = getStyleValueByGroup(styles, 'legend', 'type');
-    const font = getStyleValueByGroup(styles, 'legend', 'font');
-    const legendPos = getStyleValueByGroup(styles, 'legend', 'position');
-    const selectAll = getStyleValueByGroup(styles, 'legend', 'selectAll');
+    const [show, type, font, legendPos, selectAll] = getStyles(
+      styles,
+      ['legend'],
+      ['showLegend', 'type', 'font', 'position', 'selectAll'],
+    );
     let positions = {};
     let orient = {};
 
@@ -518,10 +524,13 @@ class BasicBarChart extends Chart {
     };
   }
 
-  getLabelStyle(styles) {
-    const show = getStyleValueByGroup(styles, 'label', 'showLabel');
-    const position = getStyleValueByGroup(styles, 'label', 'position');
-    const font = getStyleValueByGroup(styles, 'label', 'font');
+  private getLabelStyle(styles) {
+    const [show, position, font] = getStyles(
+      styles,
+      ['label'],
+      ['showLabel', 'position', 'font'],
+    );
+
     return {
       label: {
         show,
@@ -539,48 +548,16 @@ class BasicBarChart extends Chart {
     };
   }
 
-  getSeriesStyle(styles) {
-    const smooth = getStyleValueByGroup(styles, 'graph', 'smooth');
-    const step = getStyleValueByGroup(styles, 'graph', 'step');
+  private getSeriesStyle(styles) {
+    const [smooth, step] = getStyles(styles, ['graph'], ['smooth', 'step']);
     return { smooth, step };
   }
 
-  getStackName(index) {
+  private getStackName(index) {
     return `total`;
   }
 
-  getStyleValueByGroup(
-    styles: ChartStyleSectionConfig[],
-    groupPath: string,
-    childPath: string,
-  ) {
-    const childPaths = childPath.split('.');
-    return this.getStyleValue(styles, [groupPath, ...childPaths]);
-  }
-
-  getGroupedSeriesCol(label, series, format) {
-    let value = `${series.value}`;
-    if (
-      format?.type === FieldFormatType.NUMERIC ||
-      format?.type === FieldFormatType.CURRENCY
-    ) {
-      if (format?.unit === 1) {
-        value = toPrecision(series.value, format.precision);
-      } else if (format?.unit > 1) {
-        value = toUnitDesc(
-          toPrecision(toUnit(series.value, format.unit), format.precision),
-          format.unitDesc,
-        );
-      }
-    } else if (format?.type === FieldFormatType.PERCENTAGE) {
-      value = toExponential(series.value, format);
-    } else if (format?.type === FieldFormatType.SCIENTIFIC) {
-      value = toExponential(series.value, format);
-    }
-    return `${label}: ${value}`;
-  }
-
-  getTooltipFormatterFunc(
+  private getTooltipFormatterFunc(
     styleConfigs,
     groupConfigs,
     aggregateConfigs,
