@@ -26,8 +26,9 @@ import {
   getColumnRenderName,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
+  getGridStyle,
   getSeriesTooltips4Scatter,
-  getStyleValueByGroup,
+  getStyles,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
@@ -83,10 +84,10 @@ class BasicFunnelChart extends Chart {
   }
 
   onResize(opt: any, context): void {
-    this.chart?.resize(context);
+    this.chart?.resize({ width: context?.width, height: context?.height });
   }
 
-  getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataset, config: ChartConfig) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
@@ -160,23 +161,21 @@ class BasicFunnelChart extends Chart {
     }
   }
 
-  getGrid(styles) {
-    const containLabel = getStyleValueByGroup(styles, 'margin', 'containLabel');
-    const left = getStyleValueByGroup(styles, 'margin', 'marginLeft');
-    const right = getStyleValueByGroup(styles, 'margin', 'marginRight');
-    const bottom = getStyleValueByGroup(styles, 'margin', 'marginBottom');
-    const top = getStyleValueByGroup(styles, 'margin', 'marginTop');
-    return { left, right, bottom, top, containLabel };
-  }
-
-  getLabelStyle(styles) {
-    const show = getStyleValueByGroup(styles, 'label', 'showLabel');
-    const position = getStyleValueByGroup(styles, 'label', 'position');
-    const font = getStyleValueByGroup(styles, 'label', 'font');
-    const metric = getStyleValueByGroup(styles, 'label', 'metric');
-    const conversion = getStyleValueByGroup(styles, 'label', 'conversion');
-    const arrival = getStyleValueByGroup(styles, 'label', 'arrival');
-    const percentage = getStyleValueByGroup(styles, 'label', 'percentage');
+  private getLabelStyle(styles) {
+    const [show, position, font, metric, conversion, arrival, percentage] =
+      getStyles(
+        styles,
+        ['label'],
+        [
+          'showLabel',
+          'position',
+          'font',
+          'metric',
+          'conversion',
+          'arrival',
+          'percentage',
+        ],
+      );
 
     return {
       show,
@@ -204,11 +203,12 @@ class BasicFunnelChart extends Chart {
     };
   }
 
-  getLegendStyle(styles, datas: string[] = []) {
-    const show = getStyleValueByGroup(styles, 'legend', 'showLegend');
-    const type = getStyleValueByGroup(styles, 'legend', 'type');
-    const font = getStyleValueByGroup(styles, 'legend', 'font');
-    const legendPos = getStyleValueByGroup(styles, 'legend', 'position');
+  private getLegendStyle(styles) {
+    const [show, type, font, legendPos] = getStyles(
+      styles,
+      ['legend'],
+      ['showLegend', 'type', 'font', 'position'],
+    );
     let positions = {};
     let orient = {};
 
@@ -240,17 +240,19 @@ class BasicFunnelChart extends Chart {
     };
   }
 
-  getSeries(
+  private getSeries(
     styles,
     aggregateConfigs: ChartDataSectionField[],
     groupConfigs: ChartDataSectionField[],
     objDataColumns,
     infoConfigs,
   ) {
-    const selectAll = getStyleValueByGroup(styles, 'legend', 'selectAll');
-    const sort = getStyleValueByGroup(styles || [], 'funnel', 'sort');
-    const funnelAlign = getStyleValueByGroup(styles || [], 'funnel', 'align');
-    const gap = getStyleValueByGroup(styles || [], 'funnel', 'gap') || 0;
+    const [selectAll] = getStyles(styles, ['legend'], ['selectAll']);
+    const [sort, funnelAlign, gap] = getStyles(
+      styles,
+      ['funnel'],
+      ['sort', 'align', 'gap'],
+    );
 
     if (!groupConfigs.length) {
       const dc = objDataColumns?.[0];
@@ -268,7 +270,7 @@ class BasicFunnelChart extends Chart {
         };
       });
       return {
-        ...this.getGrid(styles),
+        ...getGridStyle(styles),
         type: 'funnel',
         funnelAlign,
         sort,
@@ -312,7 +314,7 @@ class BasicFunnelChart extends Chart {
     });
 
     const series = {
-      ...this.getGrid(styles),
+      ...getGridStyle(styles),
       type: 'funnel',
       funnelAlign,
       sort,
@@ -335,7 +337,7 @@ class BasicFunnelChart extends Chart {
     return series;
   }
 
-  getFunnelSeriesData(seriesData) {
+  private getFunnelSeriesData(seriesData) {
     const _calculateConversionAndArrivalRatio = (data, index) => {
       if (index) {
         data.conversion = this.formatPercent(
@@ -351,14 +353,14 @@ class BasicFunnelChart extends Chart {
     return seriesData.map(_calculateConversionAndArrivalRatio);
   }
 
-  formatPercent(per) {
+  private formatPercent(per) {
     const perStr = per + '';
     return perStr.length - (perStr.indexOf('.') + 1) > 2
       ? per.toFixed(2)
       : perStr;
   }
 
-  getFunnelChartTooltip(groupConfigs, aggregateConfigs, infoConfigs) {
+  private getFunnelChartTooltip(groupConfigs, aggregateConfigs, infoConfigs) {
     return {
       trigger: 'item',
       formatter(params) {
