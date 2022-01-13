@@ -882,3 +882,12 @@ export function isMatchRequirement(meta: ChartMetadata, config: ChartConfig) {
     );
   });
 }
+
+export function getGridStyle(styles) {
+  const [containLabel, left, right, bottom, top] = getStyles(
+    styles,
+    ['margin'],
+    ['containLabel', 'marginLeft', 'marginRight', 'marginBottom', 'marginTop'],
+  );
+  return { left, right, bottom, top, containLabel };
+}

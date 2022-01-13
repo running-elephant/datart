@@ -24,6 +24,7 @@ import {
   getCustomSortableColumns,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
+  getGridStyle,
   getReference,
   getSeriesTooltips4Rectangular2,
   getStyles,
@@ -161,7 +162,7 @@ class BasicBarChart extends Chart {
         ),
       },
       legend: this.getLegendStyle(styleConfigs, series),
-      grid: this.getGrid(styleConfigs),
+      grid: getGridStyle(styleConfigs),
       xAxis: axisInfo.xAxis,
       yAxis: axisInfo.yAxis,
       series,
@@ -350,21 +351,6 @@ class BasicBarChart extends Chart {
 
   private getSerieBarWidth(styles) {
     return getStyleValueByGroup(styles, 'bar', 'width');
-  }
-
-  private getGrid(styles) {
-    const [containLabel, left, right, bottom, top] = getStyles(
-      styles,
-      ['margin'],
-      [
-        'containLabel',
-        'marginLeft',
-        'marginRight',
-        'marginBottom',
-        'marginTop',
-      ],
-    );
-    return { left, right, bottom, top, containLabel };
   }
 
   private getYAxis(styles, yAxisNames) {
