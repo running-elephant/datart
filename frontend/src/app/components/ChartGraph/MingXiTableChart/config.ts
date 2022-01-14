@@ -95,6 +95,37 @@ const config: ChartConfig = {
                 comType: 'group',
                 rows: [
                   {
+                    label: 'column.columnStyle',
+                    key: 'columnStyle',
+                    comType: 'group',
+                    options: { expand: true },
+                    rows: [
+                      {
+                        label: 'column.useColumnWidth',
+                        key: 'useColumnWidth',
+                        default: false,
+                        comType: 'checkbox',
+                      },
+                      {
+                        label: 'column.columnWidth',
+                        key: 'columnWidth',
+                        default: 100,
+                        options: {
+                          min: 0,
+                        },
+                        /*watcher: {
+                          deps: ['useColumnWidth'],
+                          action: props => {
+                            return {
+                              disabled: !props.useColumnWidth,
+                            };
+                          },
+                        },*/
+                        comType: 'inputNumber',
+                      },
+                    ],
+                  },
+                  {
                     label: 'column.conditionStyle',
                     key: 'conditionStyle',
                     comType: 'group',
@@ -376,6 +407,10 @@ const config: ChartConfig = {
           sortAndFilter: '排序与过滤',
           enableSort: '开启列排序',
           basicStyle: '基础样式',
+          useColumnWidth: '启用固定列宽',
+          columnWidth: '列宽',
+          columnStyle: '列样式',
+          columnStylePanel: '列样式配置器',
           conditionStyle: '条件样式',
           conditionStylePanel: '条件样式配置器',
           backgroundColor: '背景颜色',
@@ -424,6 +459,10 @@ const config: ChartConfig = {
           sortAndFilter: 'Sort and Filter',
           enableSort: 'Enable Sort',
           basicStyle: 'Baisc Style',
+          useColumnWidth: 'Use Column Width',
+          columnWidth: 'Column Width',
+          columnStyle: 'Column Style',
+          columnStylePanel: 'Column Style Panel',
           conditionStyle: 'Condition Style',
           conditionStylePanel: 'Condition Style Panel',
           backgroundColor: 'Background Color',

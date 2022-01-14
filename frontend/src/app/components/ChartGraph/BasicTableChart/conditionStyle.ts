@@ -68,7 +68,7 @@ const isMatchedTheCondition = (
 };
 
 const getTheSameRange = (list, type) =>
-  list?.filter(({ range }) => range === type);
+  list?.filter(item => item?.range === type);
 
 const getRowRecord = row => {
   if (!row?.length) {
