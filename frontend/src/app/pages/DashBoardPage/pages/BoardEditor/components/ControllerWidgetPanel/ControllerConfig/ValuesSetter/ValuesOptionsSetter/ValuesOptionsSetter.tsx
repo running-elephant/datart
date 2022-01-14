@@ -16,22 +16,24 @@
  * limitations under the License.
  */
 
-import { Form, FormInstance, Radio, Select } from 'antd';
+import { Form, FormInstance, Radio, Select, Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
+import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
+import { request } from 'utils/request';
+import { errorHandle } from 'utils/utils';
 import { ControllerConfig } from '../../../types';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
-
 const ValuesOptionsSetter: FC<{
   controllerType: ControllerFacadeTypes;
   form: FormInstance<{ config: ControllerConfig }> | undefined;
@@ -40,6 +42,7 @@ const ValuesOptionsSetter: FC<{
   const tc = useI18NPrefix(`viz.control`);
   const [optionValues, setOptionValues] = useState<RelationFilterValue[]>([]);
   const [targetKeys, setTargetKeys] = useState<string[]>([]);
+  const [labelKeys, setLabelKeys] = useState<string[]>([]);
 
   const getControllerConfig = useCallback(() => {
     return form?.getFieldValue('config') as ControllerConfig;
@@ -65,10 +68,10 @@ const ValuesOptionsSetter: FC<{
   // const
 
   const fetchNewDataset = useCallback(
-    async (viewId: string, colName) => {
+    async (viewId: string, columns: string[]) => {
       const fieldDataset = await getDistinctFields(
         viewId,
-        colName,
+        columns,
         viewMap[viewId],
         undefined,
       );
@@ -92,8 +95,8 @@ const ValuesOptionsSetter: FC<{
 
   const onInitOptions = useCallback(
     async (value: string[]) => {
-      const [viewId, viewField] = value;
-      const dataset = await fetchNewDataset(viewId, viewField);
+      const [viewId, ...columns] = value;
+      const dataset = await fetchNewDataset(viewId, columns);
       const config: ControllerConfig = getControllerConfig();
       setOptionValues(convertToList(dataset?.rows));
       if (config.valueOptionType === 'common') {
@@ -135,8 +138,16 @@ const ValuesOptionsSetter: FC<{
         },
       });
       setTargetKeys([]);
-      const [viewId, viewField] = value;
-      const dataset = await fetchNewDataset(viewId, viewField);
+      // const viewData = getViewData(async viewId => {
+      //   try {
+      //     const { data } = await request<View>(`/views/${viewId}`);
+      //     return data;
+      //   } catch (error) {
+      //     errorHandle(error);
+      //   }
+      // }, []);
+      const [viewId, ...columns] = value;
+      const dataset = await fetchNewDataset(viewId, columns);
       setOptionValues(convertToList(dataset?.rows));
     },
     [convertToList, fetchNewDataset, form, getControllerConfig],
@@ -145,7 +156,14 @@ const ValuesOptionsSetter: FC<{
   const getOptionType = useCallback(() => {
     return getControllerConfig()?.valueOptionType as ValueOptionType;
   }, [getControllerConfig]);
-
+  const getViewData = useCallback(async viewId => {
+    try {
+      const { data } = await request<View>(`/views/${viewId}`);
+      return data;
+    } catch (error) {
+      errorHandle(error);
+    }
+  }, []);
   return (
     <Wrap>
       <Form.Item
@@ -178,11 +196,26 @@ const ValuesOptionsSetter: FC<{
                     allowClear
                     placeholder="select viewField"
                     onChange={onViewFieldChange}
+                    getViewData={getViewData}
                     style={{ margin: '6px 0' }}
                   />
                 </Form.Item>
                 {getOptionType() === 'common' && (
-                  <div className="transfer">
+                  <Space direction="vertical" style={{ width: '100%' }}>
+                    {/* <Select
+                      showSearch
+                      placeholder={'取值文本字段'}
+                      value={targetKeys}
+                      allowClear
+                      onChange={onTargetKeyChange}
+                      style={{ width: '100%' }}
+                    >
+                      {optionValues.map(item => (
+                        <Select.Option key={item.key} value={item.key}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                    </Select> */}
                     <Select
                       showSearch
                       placeholder={tc('selectDefaultValue')}
@@ -198,7 +231,7 @@ const ValuesOptionsSetter: FC<{
                         </Select.Option>
                       ))}
                     </Select>
-                  </div>
+                  </Space>
                 )}
                 {getOptionType() === 'custom' && (
                   <CustomOptions
