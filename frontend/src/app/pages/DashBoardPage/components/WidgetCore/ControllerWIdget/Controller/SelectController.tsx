@@ -54,9 +54,9 @@ export const SelectController: React.FC<SelectControllerProps> = ({
   defaultValue,
 }) => {
   const renderOptions = useCallback(() => {
-    return (options || []).map(o => (
-      <Option key={o.value || o.label} value={o.value}>
-        {o.label || o.value}
+    return (options || []).map(item => (
+      <Option key={item.value + item.label} value={item.value}>
+        <span>{item.label ?? item.value}</span>
       </Option>
     ));
   }, [options]);
