@@ -488,7 +488,7 @@ export function transformToObjectArray(
       }
       return result;
     },
-    true,
+    false,
   );
 }
 

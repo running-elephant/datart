@@ -88,7 +88,7 @@ class BasicTableChart extends ReactChart {
         this.cachedDatartConfig = options.config;
         this.adapter?.updated(tableOptions, context);
       },
-      true,
+      false,
     );
   }
 

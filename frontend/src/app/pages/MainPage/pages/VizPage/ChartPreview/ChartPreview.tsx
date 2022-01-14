@@ -60,7 +60,7 @@ const ChartPreviewBoard: FC<{
     allowManage,
   }) => {
     useVizSlice();
-    // NOTE: avoid initialize width or height is zero that cause echart sample calculation issue.
+    // NOTE: avoid initialize width or height is zero that cause echart sampling calculation issue.
     const defaultChartContainerWH = 1;
     const { ref, cacheW, cacheH } = useCacheWidthHeight(
       defaultChartContainerWH,
