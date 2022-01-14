@@ -93,15 +93,51 @@ class BasicTableChart extends ReactChart {
   }
 
   public onResize(options, context?): void {
-    this.adapter?.updated(
-      Object.assign(this.cachedAntTableOptions, {
+    const tableOptions = Object.assign(
+      this.cachedAntTableOptions,
+      {
         ...this.getAntdTableStyleOptions(
           this.cachedDatartConfig?.styles,
           this.cachedDatartConfig?.settings!,
           context?.height,
         ),
-      }),
+      },
+      { columns: this.getDataColumnWidths(options, context) },
+    );
+    this.adapter?.updated(tableOptions, context);
+  }
+
+  getDataColumnWidths(options, context) {
+    const dataConfigs = options.config.datas || [];
+    const styleConfigs = options.config.styles || [];
+
+    const objDataColumns = transformToObjectArray(
+      options.dataset.rows,
+      options.dataset.columns,
+    );
+    const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
+    const mixedSectionConfigRows = dataConfigs
+      .filter(c => c.key === 'mixed')
+      .flatMap(config => config.rows || []);
+    const groupConfigs = mixedSectionConfigRows.filter(
+      r =>
+        r.type === ChartDataViewFieldType.STRING ||
+        r.type === ChartDataViewFieldType.DATE,
+    );
+    const aggregateConfigs = mixedSectionConfigRows.filter(
+      r => r.type === ChartDataViewFieldType.NUMERIC,
+    );
+    this.dataColumnWidths = this.calcuteFieldsMaxWidth(
+      mixedSectionConfigRows,
+      dataColumns,
+      styleConfigs,
       context,
+    );
+    return this.getColumns(
+      groupConfigs,
+      aggregateConfigs,
+      styleConfigs,
+      dataColumns,
     );
   }
 
@@ -259,9 +295,22 @@ class BasicTableChart extends ReactChart {
       ['style'],
       ['enableRowNumber'],
     );
+    const getAllColumnListInfo = getValue(
+      styleConfigs,
+      ['column', 'modal', 'list'],
+      'rows',
+    );
+    // todo
+    let widthNumber = 0;
     const maxContentByFields = mixedSectionConfigRows.map(c => {
       const header = this.findHeader(c.uid, tableHeaders);
       const rowUniqKey = getValueByColumnKey(c);
+
+      const [columnWidth, getUseColumnWidth] = getStyles(
+        getAllColumnListInfo,
+        [c.uid, 'columnStyle'],
+        ['columnWidth', 'useColumnWidth'],
+      );
       const datas = dataColumns?.map(dc => {
         const text = dc[rowUniqKey];
         let width = this.getTextWidth(
@@ -281,7 +330,6 @@ class BasicTableChart extends ReactChart {
         const sorterIconWidth = 12;
         return Math.max(width, headerWidth + sorterIconWidth);
       });
-
       const getRowNumberWidth = maxContent => {
         if (!enableRowNumber) {
           return 0;
@@ -295,19 +343,25 @@ class BasicTableChart extends ReactChart {
           bodyFont?.fontFamily,
         );
       };
-
+      const rowUniqKeyValue = getUseColumnWidth
+        ? columnWidth || 100
+        : Math.max(...datas) + this.tablePadding * 2 + this.tableCellBorder * 2;
+      widthNumber += rowUniqKeyValue;
       return {
         [this.rowNumberUniqKey]:
           getRowNumberWidth(dataColumns?.length) +
           this.tablePadding * 2 +
           this.tableCellBorder * 2,
-        [rowUniqKey]:
-          Math.max(...datas) + this.tablePadding * 2 + this.tableCellBorder * 2,
+        [rowUniqKey]: rowUniqKeyValue,
+        getUseColumnWidth,
       };
     });
-
     return maxContentByFields.reduce((acc, cur) => {
-      return Object.assign({}, acc, { ...cur });
+      let config = Object.assign({}, acc, { ...cur });
+      if (context.width > widthNumber && !cur.getUseColumnWidth) {
+        config = acc;
+      }
+      return config;
     }, {});
   }
 
@@ -492,7 +546,7 @@ class BasicTableChart extends ReactChart {
           : [];
 
         const colMaxWidth =
-          this.dataColumnWidths?.[getValueByColumnKey(c)] || 100;
+          this.dataColumnWidths?.[getValueByColumnKey(c)] || '';
         return {
           sorter: true,
           title: getColumnRenderName(c),
