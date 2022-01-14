@@ -29,6 +29,7 @@ import {
   transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
+import { Debugger } from 'utils/debugger';
 import { isEmptyArray, Omit } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import ReactChart from '../models/ReactChart';
@@ -74,15 +75,21 @@ class BasicTableChart extends ReactChart {
       return;
     }
 
-    const tableOptions = this.getOptions(
-      context,
-      options.dataset,
-      options.config,
-      options.widgetSpecialConfig,
+    Debugger.instance.measure(
+      'Table OnUpdate cost ---> ',
+      () => {
+        const tableOptions = this.getOptions(
+          context,
+          options.dataset,
+          options.config,
+          options.widgetSpecialConfig,
+        );
+        this.cachedAntTableOptions = tableOptions;
+        this.cachedDatartConfig = options.config;
+        this.adapter?.updated(tableOptions, context);
+      },
+      true,
     );
-    this.cachedAntTableOptions = tableOptions;
-    this.cachedDatartConfig = options.config;
-    this.adapter?.updated(tableOptions, context);
   }
 
   public onResize(options, context?): void {

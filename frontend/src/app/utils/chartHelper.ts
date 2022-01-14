@@ -30,6 +30,7 @@ import {
 import { ChartDatasetMeta } from 'app/types/ChartDataset';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
+import { Debugger } from 'utils/debugger';
 import {
   cond,
   curry,
@@ -469,20 +470,26 @@ export function transformToObjectArray(
     return [];
   }
 
-  const result: any[] = Array.apply(null, Array(columns.length));
-  for (let j = 0, outterLength = result.length; j < outterLength; j++) {
-    let objCol = {
-      id: j + 1,
-    };
-    for (let i = 0, innerLength = metas.length; i < innerLength; i++) {
-      const key = metas?.[i]?.name;
-      if (!!key) {
-        objCol[key] = columns[j][i];
+  return Debugger.instance.measure(
+    'transformToObjectArray',
+    () => {
+      const result: any[] = Array.apply(null, Array(columns.length));
+      for (let j = 0, outterLength = result.length; j < outterLength; j++) {
+        let objCol = {
+          id: j + 1,
+        };
+        for (let i = 0, innerLength = metas.length; i < innerLength; i++) {
+          const key = metas?.[i]?.name;
+          if (!!key) {
+            objCol[key] = columns[j][i];
+          }
+        }
+        result[j] = objCol;
       }
-    }
-    result[j] = objCol;
-  }
-  return result;
+      return result;
+    },
+    true,
+  );
 }
 
 // TODO delete this function  #migration
