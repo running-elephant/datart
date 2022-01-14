@@ -19,10 +19,7 @@ import { Cascader, CascaderProps } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import {
-  View,
-  ViewSimple,
-} from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { ViewSimple } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import React, {
   memo,
   useCallback,
@@ -35,33 +32,25 @@ import { errorHandle } from 'utils/utils';
 export interface AssistViewFieldsProps
   extends Omit<CascaderProps, 'options' | 'onChange'> {
   onChange?: (value: string[]) => void;
-  getViewData: (viewId: string) => Promise<View | undefined>;
+  getViewOption: (viewId: string) => Promise<CascaderOptionType[] | undefined>;
   value?: string[];
 }
 export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
-  ({ onChange, value }) => {
+  ({ onChange, value: propsValue, getViewOption }) => {
     const tc = useI18NPrefix(`viz.control`);
-
     const [val, setVal] = useState<string[]>([]);
     const { orgId } = useContext(BoardContext);
     const [options, setOptions] = useState<CascaderOptionType[]>([]);
     useEffect(() => {
-      if (Array.isArray(value)) {
-        if (value.length === 0 && val.length) {
+      if (Array.isArray(propsValue)) {
+        if (propsValue.length === 0 && val.length) {
           onChange?.(val);
         } else {
-          setVal(value);
+          setVal(propsValue);
         }
       }
-    }, [onChange, val, value]);
-    const getViewData = useCallback(async viewId => {
-      try {
-        const { data } = await request<View>(`/views/${viewId}`);
-        return data;
-      } catch (error) {
-        errorHandle(error);
-      }
-    }, []);
+    }, [onChange, val, propsValue]);
+
     const setViews = useCallback(
       async orgId => {
         try {
@@ -73,22 +62,11 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
               isLeaf: false,
             };
           });
-          if (Array.isArray(value) && value.length) {
-            const data = await getViewData(value[0]);
-            if (!data) return;
-
-            const model = JSON.parse(data.model);
-            const children: CascaderOptionType[] = Object.keys(model).map(
-              key => {
-                return {
-                  value: key,
-                  label: key,
-                };
-              },
-            );
+          if (Array.isArray(propsValue) && propsValue.length) {
+            const children = await getViewOption(propsValue[0]);
 
             views.forEach(view => {
-              if (view.value === value[0]) {
+              if (view.value === propsValue[0]) {
                 view.children = children;
               }
             });
@@ -99,7 +77,7 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
           throw error;
         }
       },
-      [getViewData, value],
+      [getViewOption, propsValue],
     );
 
     useEffect(() => {
@@ -110,18 +88,8 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
       async (selectedOptions: CascaderOptionType[]) => {
         const targetOption = selectedOptions[selectedOptions.length - 1];
         targetOption.loading = true;
-
-        const data = await getViewData(targetOption.value);
-        if (!data || !data.model) return; // make page can edit after click folder
-        const model = JSON.parse(data.model);
-        const children: CascaderOptionType[] = Object.keys(model).map(key => {
-          return {
-            value: key,
-            label: key,
-          };
-        });
+        const children = await getViewOption(targetOption.value as string);
         targetOption.children = children;
-        //
         targetOption.loading = false;
         const nextOptions = [...options].map(item => {
           if (item.value === targetOption.value) {
@@ -132,11 +100,18 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
         });
         setOptions(nextOptions);
       },
-      [options, getViewData],
+      [options, getViewOption],
     );
     const optionChange = value => {
       setVal(value);
-      onChange?.(value);
+      if (!value || !value.length) {
+        onChange?.([]);
+      }
+      if (value?.[0] === propsValue?.[0]) {
+        onChange?.(value);
+      } else {
+        onChange?.([value?.[0], value?.[1]]);
+      }
     };
     return (
       <Cascader
@@ -144,7 +119,7 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
         placeholder={tc('selectViewField')}
         options={options}
         onChange={optionChange}
-        value={[val?.[0], val?.[1]]}
+        value={[...val]}
         style={{ margin: '6px 0' }}
         loadData={loadData as any}
       />
