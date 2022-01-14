@@ -570,7 +570,7 @@ export const getEditControllerOptions = createAsyncThunk<
     const content = widget.config.content as ControllerWidgetContent;
     const config = content.config;
     if (!Array.isArray(config.assistViewFields)) return null;
-    if (config.assistViewFields.length !== 2) return null;
+    if (config.assistViewFields.length < 2) return null;
 
     const boardState = rootState.board as BoardState;
     const viewMap = boardState.viewMap;
