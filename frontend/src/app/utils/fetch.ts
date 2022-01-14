@@ -43,7 +43,7 @@ export const getDistinctFields = async (
     aggregators: [],
     filters: [],
     groups: [],
-    columns: columns,
+    columns: [...new Set(columns)],
     pageInfo: {
       pageNo: 1,
       pageSize: 99999999,
