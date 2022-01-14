@@ -349,7 +349,7 @@ export const getControllerOptions = createAsyncThunk<
 
     const executeTokenMap = (getState() as RootState)?.share?.executeTokenMap;
 
-    const [viewId, viewField] = config.assistViewFields;
+    const [viewId, ...columns] = config.assistViewFields;
 
     const executeToken = executeTokenMap?.[viewId];
 
@@ -357,7 +357,7 @@ export const getControllerOptions = createAsyncThunk<
     if (!view) return null;
     const requestParams = getControlOptionQueryParams({
       view,
-      field: viewField,
+      columns: columns,
       curWidget: widget,
       widgetMap,
     });

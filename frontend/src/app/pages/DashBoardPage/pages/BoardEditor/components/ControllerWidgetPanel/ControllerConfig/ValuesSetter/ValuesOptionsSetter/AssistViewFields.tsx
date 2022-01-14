@@ -19,7 +19,6 @@ import { Cascader, CascaderProps } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import { saveToViewMapAction } from 'app/pages/DashBoardPage/pages/Board/slice/asyncActions';
 import {
   View,
   ViewSimple,
@@ -31,25 +30,27 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { useDispatch } from 'react-redux';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 export interface AssistViewFieldsProps
   extends Omit<CascaderProps, 'options' | 'onChange'> {
   onChange?: (value: string[]) => void;
+  getViewData: (viewId: string) => Promise<View | undefined>;
   value?: string[];
 }
 export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
   ({ onChange, value }) => {
     const tc = useI18NPrefix(`viz.control`);
-    const dispatch = useDispatch();
+
     const [val, setVal] = useState<string[]>([]);
     const { orgId } = useContext(BoardContext);
     const [options, setOptions] = useState<CascaderOptionType[]>([]);
     useEffect(() => {
-      if (Array.isArray(value) && value.length === 0) {
-        if (val.length) {
+      if (Array.isArray(value)) {
+        if (value.length === 0 && val.length) {
           onChange?.(val);
+        } else {
+          setVal(value);
         }
       }
     }, [onChange, val, value]);
@@ -72,7 +73,7 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
               isLeaf: false,
             };
           });
-          if (Array.isArray(value) && value.length === 2) {
+          if (Array.isArray(value) && value.length) {
             const data = await getViewData(value[0]);
             if (!data) return;
 
@@ -85,9 +86,6 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
                 };
               },
             );
-            setTimeout(() => {
-              dispatch(saveToViewMapAction(data));
-            }, 0);
 
             views.forEach(view => {
               if (view.value === value[0]) {
@@ -101,7 +99,7 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
           throw error;
         }
       },
-      [dispatch, getViewData, value],
+      [getViewData, value],
     );
 
     useEffect(() => {
@@ -146,7 +144,7 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
         placeholder={tc('selectViewField')}
         options={options}
         onChange={optionChange}
-        value={val}
+        value={[val?.[0], val?.[1]]}
         style={{ margin: '6px 0' }}
         loadData={loadData as any}
       />

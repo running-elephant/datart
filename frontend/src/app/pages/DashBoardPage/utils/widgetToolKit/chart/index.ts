@@ -24,14 +24,14 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { getTneWidgetFiltersAndParams } from '../..';
+import ChartDataRequest, {
+  transformToViewConfig,
+} from '../../../../../types/ChartDataRequest';
 import {
   createChartWidgetContent,
   createInitWidgetConfig,
   createWidget,
 } from '../../widget';
-import ChartDataRequest, {
-  transformToViewConfig,
-} from '../../../../../types/ChartDataRequest';
 
 export const createDataChartWidget = (opt: {
   dashboardId: string;
@@ -72,7 +72,7 @@ export const getCanLinkageWidgets = (widgets: Widget[]) => {
 
 export const getControlOptionQueryParams = (obj: {
   view: ChartDataView;
-  field: string;
+  columns: string[];
   curWidget: Widget;
   widgetMap: Record<string, Widget>;
 }) => {
@@ -86,7 +86,7 @@ export const getControlOptionQueryParams = (obj: {
     aggregators: [],
     filters: filterParams,
     groups: [],
-    columns: [obj.field],
+    columns: obj.columns,
     pageInfo: {
       pageNo: 1,
       pageSize: 99999999,
