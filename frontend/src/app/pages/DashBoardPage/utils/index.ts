@@ -258,12 +258,18 @@ export const getWidgetControlValues = (opt: {
 
       const strValues = config.controllerValues
         .filter(ele => {
-          if (ele.trim() === '') return false;
+          if (typeof ele === 'number') {
+            return true;
+          }
+          if (typeof ele === 'string' && ele.trim() === '') {
+            return false;
+          }
+
           return !!ele;
         })
         .map(ele => {
           const item = {
-            value: ele.trim(),
+            value: typeof ele === 'string' ? ele.trim() : ele,
             valueType: valueType || 'STRING',
           };
           return item;
