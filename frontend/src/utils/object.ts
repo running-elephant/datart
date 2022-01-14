@@ -261,3 +261,14 @@ export function isEmptyArray(value?) {
 
   return Array.isArray(value) && !value?.length;
 }
+
+export function isPromise(obj?) {
+  if (isEmpty(obj)) {
+    return false;
+  }
+
+  return (
+    (typeof obj === 'object' || typeof obj === 'function') &&
+    typeof obj.then === 'function'
+  );
+}
