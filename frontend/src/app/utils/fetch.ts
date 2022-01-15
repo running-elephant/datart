@@ -242,3 +242,20 @@ export async function loadShareTask(params) {
     throw error;
   }
 }
+
+interface DownloadShareDashChartFileParams {
+  downloadId: string;
+  shareToken: string;
+  password?: string | null;
+}
+export async function downloadShareDataChartFile(
+  params: DownloadShareDashChartFileParams,
+) {
+  const [data, headers] = (await requestWithHeader({
+    url: `share/download`,
+    method: 'GET',
+    responseType: 'blob',
+    params,
+  })) as any;
+  dealFileSave(data, headers);
+}
