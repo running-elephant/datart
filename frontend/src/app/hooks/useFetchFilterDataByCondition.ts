@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
+import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
   FilterCondition,
   FilterConditionType,
   RelationFilterValue,
 } from 'app/types/ChartConfig';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { getDistinctFields } from 'app/utils/fetch';
 import useMount from './useMount';
 
-export const useFetchFilterDataByCondtion = (
+export const useFetchFilterDataByCondition = (
   viewId?: string,
   condition?: FilterCondition,
   onFinish?: (datas: RelationFilterValue[]) => void,
@@ -51,4 +51,4 @@ export const useFetchFilterDataByCondtion = (
   });
 };
 
-export default useFetchFilterDataByCondtion;
+export default useFetchFilterDataByCondition;

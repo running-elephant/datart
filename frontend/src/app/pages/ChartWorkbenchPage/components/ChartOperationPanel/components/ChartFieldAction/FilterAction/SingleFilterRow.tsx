@@ -29,7 +29,7 @@ const SingleFilter: FC<{
   condition: ChartFilterCondition;
   onAddBrotherFilter?: () => void;
   onDeleteSelfFilter?: () => void;
-  onConditionChange: (condtion: ChartFilterCondition) => void;
+  onConditionChange: (condition: ChartFilterCondition) => void;
 }> = memo(
   ({
     rowName,

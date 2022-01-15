@@ -17,7 +17,7 @@
  */
 
 import { Select } from 'antd';
-import useFetchFilterDataByCondtion from 'app/hooks/useFetchFilterDataByCondtion';
+import useFetchFilterDataByCondition from 'app/hooks/useFetchFilterDataByCondition';
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useState } from 'react';
@@ -42,7 +42,7 @@ const DropdownListFilter: FC<PresentControllerFilterProps> = memo(
       }
     });
 
-    useFetchFilterDataByCondtion(viewId, condition, setOriginalNodes, view);
+    useFetchFilterDataByCondition(viewId, condition, setOriginalNodes, view);
 
     const handleSelectedChange = value => {
       const newCondition = updateBy(condition!, draft => {
