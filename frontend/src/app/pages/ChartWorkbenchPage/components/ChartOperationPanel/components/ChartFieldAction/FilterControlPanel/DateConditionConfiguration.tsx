@@ -78,7 +78,7 @@ const DateConditionConfiguration: FC<
         />
       </Tabs.TabPane>
       <Tabs.TabPane tab={t('manual')} key={FilterConditionType.RangeTime}>
-        <TimeSelector.MannualRangeTimeSelector
+        <TimeSelector.ManualRangeTimeSelector
           i18nPrefix={i18nPrefix}
           condition={condition}
           onConditionChange={onConditionChange}
