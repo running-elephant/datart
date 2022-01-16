@@ -34,7 +34,7 @@ import { errorHandle } from 'utils/utils';
 
 export const getDistinctFields = async (
   viewId: string,
-  field: string,
+  columns: string[],
   view: BackendChart['view'] | undefined,
   executeToken: ExecuteToken | undefined,
 ) => {
@@ -43,7 +43,7 @@ export const getDistinctFields = async (
     aggregators: [],
     filters: [],
     groups: [],
-    columns: [field],
+    columns: [...new Set(columns)],
     pageInfo: {
       pageNo: 1,
       pageSize: 99999999,

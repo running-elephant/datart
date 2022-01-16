@@ -50,6 +50,7 @@ export const CheckboxGroupSetter: React.FC<CheckboxGroupControllerProps> = memo(
       return (options || []).map(o => ({
         label: o.label ?? o.value,
         value: o.value,
+        key: o.label + o.value,
       }));
     }, [options]);
     return (

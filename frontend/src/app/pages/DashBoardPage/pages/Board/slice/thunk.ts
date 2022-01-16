@@ -345,11 +345,11 @@ export const getControllerOptions = createAsyncThunk<
     const content = widget.config.content as ControllerWidgetContent;
     const config = content.config;
     if (!Array.isArray(config.assistViewFields)) return null;
-    if (config.assistViewFields.length !== 2) return null;
+    if (config.assistViewFields.length < 2) return null;
 
     const executeTokenMap = (getState() as RootState)?.share?.executeTokenMap;
 
-    const [viewId, viewField] = config.assistViewFields;
+    const [viewId, ...columns] = config.assistViewFields;
 
     const executeToken = executeTokenMap?.[viewId];
 
@@ -357,7 +357,7 @@ export const getControllerOptions = createAsyncThunk<
     if (!view) return null;
     const requestParams = getControlOptionQueryParams({
       view,
-      field: viewField,
+      columns: columns,
       curWidget: widget,
       widgetMap,
     });

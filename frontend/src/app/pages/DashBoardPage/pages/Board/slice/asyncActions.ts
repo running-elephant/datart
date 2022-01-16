@@ -15,9 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import ChartDataRequest from 'app/types/ChartDataRequest';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
+import ChartDataRequest from 'app/types/ChartDataRequest';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { boardActions } from '.';
 import { getBoardChartRequests } from '../../../utils';
@@ -32,10 +32,7 @@ import {
   getWidgetInfoMapByServer,
   getWidgetMapByServer,
 } from '../../../utils/widget';
-import {
-  PageInfo,
-  View,
-} from './../../../../MainPage/pages/ViewPage/slice/types';
+import { PageInfo } from './../../../../MainPage/pages/ViewPage/slice/types';
 import { getChartWidgetDataAsync, getWidgetData } from './thunk';
 import { BoardState, DataChart, ServerDashboard, VizRenderMode } from './types';
 
@@ -168,15 +165,4 @@ export const resetControllerAction =
         }),
       );
     });
-  };
-
-export const saveToViewMapAction =
-  (serverView: View) => (dispatch, getState) => {
-    const boardState = getState() as { board: BoardState };
-    const viewMap = boardState.board.viewMap;
-    let existed = serverView.id in viewMap;
-    if (!existed) {
-      const viewViews = getChartDataView([serverView], []);
-      dispatch(boardActions.setViewMap(viewViews));
-    }
   };

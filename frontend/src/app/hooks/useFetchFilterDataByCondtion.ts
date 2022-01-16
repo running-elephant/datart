@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
+import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
   FilterCondition,
   FilterConditionType,
   RelationFilterValue,
 } from 'app/types/ChartConfig';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { getDistinctFields } from 'app/utils/fetch';
 import useMount from './useMount';
 
@@ -35,7 +35,7 @@ export const useFetchFilterDataByCondtion = (
     if (!viewId || condition?.type !== FilterConditionType.List) {
       return;
     }
-    getDistinctFields?.(viewId, condition?.name!, view, undefined)?.then(
+    getDistinctFields?.(viewId, [condition?.name!], view, undefined)?.then(
       dataset => {
         const _convertToList = collection => {
           const items: string[] = (collection || []).flatMap(c => c);
