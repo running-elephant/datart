@@ -49,6 +49,7 @@ import {
   ControllerConfig,
   ControllerDate,
 } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { DateControllerTypes } from './../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
 
@@ -136,7 +137,7 @@ export const getChartGroupColumns = (dataChart: DataChart) => {
   return groupColumns;
 };
 
-export const getTneWidgetFiltersAndParams = (obj: {
+export const getTheWidgetFiltersAndParams = (obj: {
   chartWidget: Widget;
   widgetMap: Record<string, Widget>;
   params: Record<string, string[]> | undefined;
@@ -219,78 +220,49 @@ export const getWidgetControlValues = (opt: {
 }) => {
   const { type, relatedViewItem, config } = opt;
   const valueType = relatedViewItem.fieldValueType;
-  switch (type) {
-    case ControllerFacadeTypes.RangeTime:
-    case ControllerFacadeTypes.Time:
-      if (!config?.controllerDate) {
-        return false;
-      }
-      const timeValues = getControllerDateValues({
-        controlType: type,
-        filterDate: config.controllerDate,
-        execute: true,
+  if (DateControllerTypes.includes(type)) {
+    if (config?.controllerDate) {
+      return false;
+    }
+    const timeValues = getControllerDateValues({
+      controlType: type,
+      filterDate: config.controllerDate!,
+      execute: true,
+    });
+
+    const values = timeValues
+      .filter(ele => !!ele)
+      .map(ele => {
+        const item = {
+          value: ele,
+          valueType: valueType || 'DATE',
+        };
+        return item;
       });
+    return values[0] ? values : null;
+  } else {
+    if (!config?.controllerValues?.[0]) {
+      return false;
+    }
 
-      const values = timeValues
-        .filter(ele => !!ele)
-        .map(ele => {
-          const item = {
-            value: ele,
-            valueType: valueType || 'DATE',
-          };
-          return item;
-        });
-      return values[0] ? values : null;
-    case ControllerFacadeTypes.Value:
-    case ControllerFacadeTypes.RangeValue:
-    case ControllerFacadeTypes.Slider:
-      if (
-        !config.controllerValues ||
-        config.controllerValues.length === 0 ||
-        !config.controllerValues?.[0]
-      )
+    const values = config.controllerValues
+      .filter(ele => {
+        if (typeof ele === 'number') {
+          return true;
+        }
+        if (typeof ele === 'string' && ele.trim() !== '') {
+          return true;
+        }
         return false;
-      const numericValues = config.controllerValues
-        .filter(ele => {
-          if (ele === 0) return true;
-          return !!ele;
-        })
-        .map(ele => {
-          const item = {
-            value: ele,
-            valueType: valueType || '',
-          };
-          return item;
-        });
-      return numericValues[0] ? numericValues : false;
-
-    default:
-      if (
-        !config.controllerValues ||
-        config.controllerValues.length === 0 ||
-        !config.controllerValues?.[0]
-      )
-        return false;
-
-      const strValues = config.controllerValues
-        .filter(ele => {
-          if (typeof ele === 'number') {
-            return true;
-          }
-          if (typeof ele === 'string' && ele.trim() === '') {
-            return false;
-          }
-
-          return !!ele;
-        })
-        .map(ele => {
-          const item = {
-            value: typeof ele === 'string' ? ele.trim() : ele,
-            valueType: valueType || 'STRING',
-          };
-          return item;
-        });
-      return strValues[0] ? strValues : false;
+      })
+      .map(ele => {
+        const item = {
+          value: typeof ele === 'string' ? ele.trim() : ele,
+          valueType: valueType || 'STRING',
+        };
+        return item;
+      });
+    return values[0] ? values : false;
   }
 };
 
@@ -432,7 +404,7 @@ export const getChartWidgetRequestParams = (obj: {
   const viewConfig = transformToViewConfig(chartDataView?.config);
   requestParams = { ...requestParams, ...viewConfig };
 
-  const { filterParams, variableParams } = getTneWidgetFiltersAndParams({
+  const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
     chartWidget: curWidget,
     widgetMap,
     params: requestParams.params,

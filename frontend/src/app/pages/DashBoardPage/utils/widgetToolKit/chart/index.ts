@@ -23,7 +23,7 @@ import {
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
-import { getTneWidgetFiltersAndParams } from '../..';
+import { getTheWidgetFiltersAndParams } from '../..';
 import ChartDataRequest, {
   transformToViewConfig,
 } from '../../../../../types/ChartDataRequest';
@@ -77,7 +77,7 @@ export const getControlOptionQueryParams = (obj: {
   widgetMap: Record<string, Widget>;
 }) => {
   const viewConfigs = transformToViewConfig(obj.view?.config);
-  const { filterParams, variableParams } = getTneWidgetFiltersAndParams({
+  const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
     chartWidget: obj.curWidget,
     widgetMap: obj.widgetMap,
     params: undefined,
