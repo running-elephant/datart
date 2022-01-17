@@ -1,12 +1,28 @@
-import {
-  transformToViewConfig,
-} from 'app/types/ChartDataRequest';
-import { ChartDataRequestBuilder } from "app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder";
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ChartDataSectionField,
   ChartDataSectionType,
 } from 'app/types/ChartConfig';
+import { transformToViewConfig } from 'app/types/ChartDataRequest';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -19,6 +35,7 @@ import { getTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
 import moment from 'moment';
+import { ChartDataRequestFilter } from '../../../types/ChartDataRequest';
 import { STORAGE_IMAGE_KEY_PREFIX } from '../constants';
 import {
   BoardLinkFilter,
@@ -32,7 +49,6 @@ import {
   ControllerConfig,
   ControllerDate,
 } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
-import { ChartDataRequestFilter } from '../../../types/ChartDataRequest';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
 
@@ -471,7 +487,9 @@ export const getChartWidgetRequestParams = (obj: {
 };
 
 //  filter 去重
-export const getDistinctFiltersByColumn = (filter: ChartDataRequestFilter[]) => {
+export const getDistinctFiltersByColumn = (
+  filter: ChartDataRequestFilter[],
+) => {
   if (!filter) {
     return [] as ChartDataRequestFilter[];
   }

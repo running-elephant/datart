@@ -851,6 +851,11 @@
       "scaleFull": "scaleFull",
       "noScale": "noScale"
     },
+    "tips":{
+      "noStartValue":"Input Start Value",
+      "noEndValue":"Input End Value",
+      "endGTStartErr":"End Value should GT StartValue "
+    },
     "control": {
       "title": "Control Title",
       "valueConfig": "Value Config",
