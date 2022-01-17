@@ -690,7 +690,7 @@
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
-        "iFrame": "iFrame",
+        "iframe": "iframe",
         "video": "Video",
         "container": "Container",
         "tab": "Tab",
@@ -774,7 +774,7 @@
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
-        "iFrame": "iFrame",
+        "iframe": "iframe",
         "video": "Video",
         "tab": "Tab"
       },
@@ -851,6 +851,11 @@
       "scaleFull": "scaleFull",
       "noScale": "noScale"
     },
+    "tips":{
+      "noStartValue":"Input Start Value",
+      "noEndValue":"Input End Value",
+      "endGTStartErr":"End Value should GT StartValue "
+    },
     "control": {
       "title": "Control Title",
       "valueConfig": "Value Config",
@@ -863,7 +868,8 @@
       "step": "Step",
       "showMark": "Show Mark",
       "common": "General",
-      "custom": "Customize"
+      "custom": "Customize",
+      "optionLabelField":"Option Label Field"
     },
     "date": {
       "year": "Year",

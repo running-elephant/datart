@@ -49,6 +49,7 @@ export const TimeSetter: React.FC<{
   controllerType: ControllerFacadeTypes;
 }> = ({ controllerType, form }) => {
   const tc = useI18NPrefix(`viz.control`);
+  const tvt = useI18NPrefix(`viz.tips`);
   const filterDataT = useI18NPrefix('viz.common.filter.date');
   const getControllerConfig = useCallback(() => {
     return form?.getFieldValue('config') as ControllerConfig;
@@ -91,10 +92,10 @@ export const TimeSetter: React.FC<{
     }
 
     if (!startHasValue && endHasValue) {
-      return Promise.reject(new Error('请填写 起始值'));
+      return Promise.reject(new Error(tvt('noStartValue')));
     }
     if (startHasValue && !endHasValue) {
-      return Promise.reject(new Error('请填写 结束值'));
+      return Promise.reject(new Error(tvt('noEndValue')));
     }
     return Promise.resolve(value);
   };
