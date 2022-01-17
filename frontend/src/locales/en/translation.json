@@ -690,7 +690,7 @@
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
-        "iFrame": "iFrame",
+        "iframe": "iframe",
         "video": "Video",
         "container": "Container",
         "tab": "Tab",
@@ -774,7 +774,7 @@
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
-        "iFrame": "iFrame",
+        "iframe": "iframe",
         "video": "Video",
         "tab": "Tab"
       },

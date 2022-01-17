@@ -690,7 +690,7 @@
         "image": "图片",
         "richText": "富文本",
         "timer": "计时器",
-        "iFrame": "iFrame",
+        "iframe": "iframe",
         "video": "视频",
         "container": "容器",
         "tab": "标签页",
@@ -774,7 +774,7 @@
         "image": "图片",
         "richText": "富文本",
         "timer": "时间器",
-        "iFrame": "iFrame",
+        "iframe": "iframe",
         "video": "视频",
         "tab": "Tab"
       },

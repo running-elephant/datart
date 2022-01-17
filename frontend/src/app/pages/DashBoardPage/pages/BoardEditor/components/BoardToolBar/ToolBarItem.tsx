@@ -232,7 +232,7 @@ export const MediaWidgetDropdown: React.FC<ToolBtnProps> = props => {
       type: 'timer',
     },
     {
-      name: t('iFrame'),
+      name: t('iframe'),
       icon: '',
       type: 'iframe',
     },
