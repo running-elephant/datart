@@ -232,7 +232,7 @@ const ValuesOptionsSetter: FC<{
                   <Space direction="vertical" style={{ width: '100%' }}>
                     <Select
                       showSearch
-                      placeholder={'取值文本字段'}
+                      placeholder={tc('optionLabelField')}
                       value={labelKey}
                       allowClear
                       onChange={onLabelChange}

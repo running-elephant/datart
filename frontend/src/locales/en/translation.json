@@ -868,7 +868,8 @@
       "step": "Step",
       "showMark": "Show Mark",
       "common": "General",
-      "custom": "Customize"
+      "custom": "Customize",
+      "optionLabelField":"Option Label Field"
     },
     "date": {
       "year": "Year",

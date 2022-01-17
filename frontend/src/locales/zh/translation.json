@@ -868,7 +868,8 @@
       "step": "步长",
       "showMark": "显示标签",
       "common": "常规",
-      "custom": "自定义"
+      "custom": "自定义",
+      "optionLabelField":"取值文本字段"
     },
     "date": {
       "year": "年",
