@@ -18,6 +18,7 @@
 
 import { Form, Modal } from 'antd';
 import { useRef } from 'react';
+import { isPromise } from 'utils/object';
 
 export interface IStateModalContentProps {
   onChange: (o: any) => void;
@@ -57,7 +58,11 @@ function useStateModal({ initState }: { initState?: any }) {
             Object.keys(stateRef.current || {}).length > 0
               ? stateRef.current
               : [];
-          okCallbackRef.current?.call(Object.create(null), ...spreadParmas);
+          const okCBResult = okCallbackRef.current?.call(
+            Object.create(null),
+            ...spreadParmas,
+          );
+          if (isPromise(okCBResult)) return okCBResult;
         } catch (e) {
           console.error('useStateModal | exception message ---> ', e);
         }

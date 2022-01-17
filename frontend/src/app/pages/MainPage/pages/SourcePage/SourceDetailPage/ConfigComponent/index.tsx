@@ -158,7 +158,9 @@ export function ConfigComponent({
           }
           break;
         case 'password':
-          component = <Input.Password disabled={disabled} />;
+          component = (
+            <Input.Password disabled={disabled} autoComplete="new-password" />
+          );
           break;
         case 'bool':
           component = <Switch disabled={disabled} />;

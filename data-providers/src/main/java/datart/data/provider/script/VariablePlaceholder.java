@@ -3,6 +3,7 @@ package datart.data.provider.script;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ScriptVariable;
 import datart.data.provider.base.DataProviderException;
+import datart.data.provider.calcite.SqlFunctionRegisterVisitor;
 import datart.data.provider.calcite.SqlNodeUtils;
 import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
 import org.apache.calcite.sql.*;
@@ -134,6 +135,9 @@ public abstract class VariablePlaceholder {
     }
 
     protected void replaceVariable(SqlCall sqlCall) {
+        if (sqlCall.getOperator() instanceof SqlFunction) {
+            new SqlFunctionRegisterVisitor().visit(sqlCall);
+        }
         for (int i = 0; i < sqlCall.operandCount(); i++) {
             SqlNode sqlNode = sqlCall.getOperandList().get(i);
             if (sqlNode == null) {
@@ -144,13 +148,13 @@ public abstract class VariablePlaceholder {
             } else if (sqlNode instanceof SqlLiteral) {
                 // pass
             } else if (sqlNode instanceof SqlIdentifier) {
-                if (sqlNode.toString().equals(variable.getNameWithQuote())) {
+                if (sqlNode.toString().equalsIgnoreCase(variable.getNameWithQuote())) {
                     sqlCall.setOperand(i, SqlNodeUtils.toSingleSqlLiteral(variable, sqlNode.getParserPosition()));
                 }
             } else if (sqlNode instanceof SqlNodeList) {
                 SqlNodeList nodeList = (SqlNodeList) sqlNode;
                 List<SqlNode> otherNodes = Arrays.stream(nodeList.toArray())
-                        .filter(node -> !node.toString().equals(variable.getNameWithQuote()))
+                        .filter(node -> !node.toString().equalsIgnoreCase(variable.getNameWithQuote()))
                         .collect(Collectors.toList());
 
                 if (otherNodes.size() == nodeList.size()) {

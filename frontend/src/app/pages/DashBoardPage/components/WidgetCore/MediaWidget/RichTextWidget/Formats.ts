@@ -28,7 +28,6 @@ export const Formats = [
   'link',
   'color',
   'tag',
-  'calcfield',
   'mention',
   'image',
   'size',

@@ -19,6 +19,7 @@ import { FormInstance, Select } from 'antd';
 import { JumpConfigField } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import React, { memo, useCallback, useMemo } from 'react';
+import { G50 } from 'styles/StyleConstants';
 const { Option } = Select;
 
 export interface JumpeFieldsProps<T = JumpConfigField> {
@@ -48,7 +49,7 @@ export const SelectJumpFields: React.FC<JumpeFieldsProps> = memo(
         <Option key={item.uid} fieldvaluetype={item.type} value={item.colName}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>{item.colName}</span>
-            <span style={{ color: '#ccc' }}>{item.type}</span>
+            <span style={{ color: G50 }}>{item.type}</span>
           </div>
         </Option>
       ));

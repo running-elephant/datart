@@ -272,7 +272,7 @@ const config: ChartConfig = {
           position: '位置',
           metric: '指标',
           dimension: '维度',
-          conversion: '转换率',
+          conversion: '转化率',
           arrival: '到达率',
           percentage: '百分比',
         },

@@ -232,7 +232,7 @@ export const editHasChartWidget =
     dispatch(editBoardStackActions.updateWidget(nextWidget));
     const dataCharts = [dataChart];
     const viewViews = [view];
-    dispatch(boardActions.setDataChartMap(dataCharts));
+    dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
     dispatch(getEditChartWidgetDataAsync({ widgetId: curWidget.id }));
   };

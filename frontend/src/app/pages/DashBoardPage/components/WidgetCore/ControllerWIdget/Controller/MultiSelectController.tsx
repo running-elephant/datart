@@ -48,9 +48,9 @@ export const MultiSelectControllerForm: React.FC<SelectControllerProps> = memo(
 export const SelectController: React.FC<SelectControllerProps> = memo(
   ({ options, onChange, value, children }) => {
     const renderOptions = useCallback(() => {
-      return (options || []).map(o => (
-        <Option key={o.value || o.label} value={o.value}>
-          {o.label || o.value}
+      return (options || []).map(item => (
+        <Option key={item.value + item.label} value={item.value}>
+          <span>{item.label ?? item.value}</span>
         </Option>
       ));
     }, [options]);

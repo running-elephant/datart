@@ -18,10 +18,6 @@
 
 import { SelectOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Modal, Row, Tooltip } from 'antd';
-// TODO(tianlei): extract settings from DashBoardPage to standalone file to avoid cycle reference?
-import { MarkdownOptions } from 'app/pages/DashBoardPage/components/WidgetCore/MediaWidget/RichTextWidget/configs/MarkdownOptions';
-import TagBlot from 'app/pages/DashBoardPage/components/WidgetCore/MediaWidget/RichTextWidget/configs/TagBlot';
-import { Formats } from 'app/pages/DashBoardPage/components/WidgetCore/MediaWidget/RichTextWidget/Formats';
 import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { DeltaStatic } from 'quill';
@@ -42,6 +38,11 @@ import 'react-quill/dist/quill.bubble.css';
 import 'react-quill/dist/quill.core.css';
 import styled from 'styled-components/macro';
 import './RichTextPluginLoader';
+import {
+  Formats,
+  MarkdownOptions,
+} from './RichTextPluginLoader/RichTextConfig';
+import TagBlot from './RichTextPluginLoader/TagBlot';
 
 Quill.register('modules/imageDrop', ImageDrop);
 Quill.register('formats/tag', TagBlot);
@@ -84,6 +85,7 @@ const ChartRichTextAdapter: FC<{
           container: isEditing ? `#${newId}` : null,
           handlers: {},
         },
+
         calcfield: {},
         imageDrop: true,
       };

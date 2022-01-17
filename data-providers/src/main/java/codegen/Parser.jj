@@ -3799,6 +3799,7 @@ SqlNode AtomicRowExpression() :
 }
 {
     (
+        LOOKAHEAD(2)
         e = LiteralOrIntervalExpression()
     |
         e = DynamicParam()
@@ -6629,6 +6630,7 @@ String KeywordFunctionNameSupport() :
         <DATE>
     |   <TIME>
     |   <TIMESTAMP>
+    |   <INSERT>
     )
     {
         return unquotedIdentifier();
