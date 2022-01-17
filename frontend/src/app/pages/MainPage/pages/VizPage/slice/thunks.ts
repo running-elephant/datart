@@ -18,7 +18,7 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartDTO } from "app/types/ChartDTO";
 import {
   Dashboard,
   DataChart,
@@ -321,7 +321,7 @@ export const initChartPreviewData = createAsyncThunk<
 export const fetchVizChartAction = createAsyncThunk(
   'viz/fetchVizChartAction',
   async (arg: { backendChartId; filterSearchParams?: FilterSearchParams }) => {
-    const response = await request<BackendChart>({
+    const response = await request<ChartDTO>({
       method: 'GET',
       url: `viz/datacharts/${arg.backendChartId}`,
     });

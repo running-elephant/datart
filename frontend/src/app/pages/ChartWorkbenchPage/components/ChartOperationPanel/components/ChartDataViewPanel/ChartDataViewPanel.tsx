@@ -29,8 +29,8 @@ import workbenchSlice, {
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-  ChartDataViewMeta,
 } from 'app/types/ChartDataView';
+import { ChartDataViewMeta } from "app/types/ChartDataViewMeta";
 import { checkComputedFieldAsync } from 'app/utils/fetch';
 import { updateByKey } from 'app/utils/mutation';
 import { FC, memo, useCallback, useMemo } from 'react';

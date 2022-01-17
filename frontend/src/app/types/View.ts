@@ -16,25 +16,20 @@
  * limitations under the License.
  */
 
-import { View } from 'app/types/View';
-import { ChartDataViewMeta } from './ChartDataViewMeta';
+import {
+  RowPermissionRaw,
+  Variable,
+} from '../pages/MainPage/pages/VariablePage/slice/types';
+import {
+  ColumnPermissionRaw,
+  ViewSimple,
+} from '../pages/MainPage/pages/ViewPage/slice/types';
 
-export enum ChartDataViewFieldType {
-  STRING = 'STRING',
-  NUMERIC = 'NUMERIC',
-  DATE = 'DATE',
+export interface View extends ViewSimple {
+  config: string;
+  model: string;
+  script: string;
+  variables: Variable[];
+  relVariableSubjects: RowPermissionRaw[];
+  relSubjectColumns: ColumnPermissionRaw[];
 }
-
-export enum ChartDataViewFieldCategory {
-  Field = 'field',
-  Variable = 'variable',
-  ComputedField = 'computedField',
-  AggregateComputedField = 'aggregateComputedField',
-}
-
-export type ChartDataView = View & {
-  meta?: ChartDataViewMeta[];
-  computedFields?: ChartDataViewMeta[];
-};
-
-export default ChartDataView;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { createSlice, isRejected, PayloadAction } from '@reduxjs/toolkit';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartDTO } from "app/types/ChartDTO";
 import {
   FilterSearchParams,
   VizType,
@@ -86,7 +86,7 @@ export const slice = createSlice({
       }>,
     ) => {
       const { data, filterSearchParams } = action.payload;
-      const vizDetail = data.vizDetail as BackendChart;
+      const vizDetail = data.vizDetail as ChartDTO;
       const executeToken = data.executeToken;
       const backendChartConfig =
         typeof vizDetail?.config === 'string'

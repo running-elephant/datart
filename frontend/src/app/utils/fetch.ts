@@ -17,7 +17,7 @@
  */
 
 import { message } from 'antd';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartDTO } from "app/types/ChartDTO";
 import {
   DownloadTask,
   DownloadTaskState,
@@ -35,7 +35,7 @@ import { errorHandle } from 'utils/utils';
 export const getDistinctFields = async (
   viewId: string,
   columns: string[],
-  view: BackendChart['view'] | undefined,
+  view: ChartDTO['view'] | undefined,
   executeToken: ExecuteToken | undefined,
 ) => {
   const viewConfigs = transformToViewConfig(view?.config);

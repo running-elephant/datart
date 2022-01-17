@@ -17,24 +17,15 @@
  */
 
 import { View } from 'app/types/View';
-import { ChartDataViewMeta } from './ChartDataViewMeta';
+import { ChartConfigDTO } from './ChartConfigDTO';
 
-export enum ChartDataViewFieldType {
-  STRING = 'STRING',
-  NUMERIC = 'NUMERIC',
-  DATE = 'DATE',
-}
-
-export enum ChartDataViewFieldCategory {
-  Field = 'field',
-  Variable = 'variable',
-  ComputedField = 'computedField',
-  AggregateComputedField = 'aggregateComputedField',
-}
-
-export type ChartDataView = View & {
-  meta?: ChartDataViewMeta[];
-  computedFields?: ChartDataViewMeta[];
+export type ChartDTO = {
+  config: ChartConfigDTO;
+  id: string;
+  name: string;
+  orgId: string;
+  status: number;
+  updateTime?: string;
+  viewId: string;
+  view: View & { meta?: any[] };
 };
-
-export default ChartDataView;

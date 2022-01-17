@@ -26,11 +26,13 @@ import {
 import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { ResourceTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
-import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfigDTO } from 'app/types/ChartConfigDTO';
 import ChartDataRequest from 'app/types/ChartDataRequest';
 import ChartDataset from 'app/types/ChartDataset';
-import ChartDataView, { ChartDataViewMeta } from 'app/types/ChartDataView';
+import ChartDataView from 'app/types/ChartDataView';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { View } from 'app/types/View';
 import { mergeConfig, transformMeta } from 'app/utils/chartHelper';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { updateCollectionByAction } from 'app/utils/mutation';
@@ -40,6 +42,7 @@ import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { CloneValueDeep } from 'utils/object';
 import { request } from 'utils/request';
 import { listToTree, reduxActionErrorHandler, rejectHandle } from 'utils/utils';
+import { ChartDTO } from '../../../types/ChartDTO';
 import { ChartDataRequestBuilder } from '../models/ChartDataRequestBuilder';
 
 export type ChartConfigPayloadType = {
@@ -57,24 +60,6 @@ export const ChartConfigReducerActionType = {
   I18N: 'i18n',
 };
 
-export type BackendChart = {
-  config: BackendChartConfig;
-  id: string;
-  name: string;
-  orgId: string;
-  status: number;
-  updateTime?: string;
-  viewId: string;
-  view: View & { meta?: any[] };
-};
-
-export type BackendChartConfig = {
-  chartConfig: string;
-  chartGraphId: string;
-  computedFields: ChartDataViewMeta[];
-  aggregation: boolean;
-};
-
 export type WorkbenchState = {
   lang: string;
   dateFormat: string;
@@ -83,7 +68,7 @@ export type WorkbenchState = {
   dataset?: ChartDataset;
   chartConfig?: ChartConfig;
   shadowChartConfig?: ChartConfig;
-  backendChart?: BackendChart;
+  backendChart?: ChartDTO;
   backendChartId?: string;
   aggregation?: boolean;
 };
@@ -150,7 +135,7 @@ export const initWorkbenchAction = createAsyncThunk(
   async (
     arg: {
       backendChartId?: string;
-      backendChart?: BackendChart;
+      backendChart?: ChartDTO;
       orgId?: string;
     },
     thunkAPI,
@@ -319,10 +304,10 @@ export const updateRichTextAction = createAsyncThunk(
 
 export const fetchChartAction = createAsyncThunk(
   'workbench/fetchChartAction',
-  async (arg: { chartId?: string; backendChart?: BackendChart }, thunkAPI) => {
+  async (arg: { chartId?: string; backendChart?: ChartDTO }, thunkAPI) => {
     try {
       if (arg?.chartId) {
-        const response = await request<BackendChart>({
+        const response = await request<ChartDTO>({
           method: 'GET',
           url: `viz/datacharts/${arg.chartId}`,
         });
@@ -350,7 +335,7 @@ export const updateChartAction = createAsyncThunk(
         chartConfig: workbenchState.chartConfig,
         chartGraphId: arg.graphId,
         computedFields: workbenchState.currentDataView?.computedFields || [],
-      } as BackendChartConfig);
+      } as ChartConfigDTO);
 
       const response = await request<{
         data: boolean;

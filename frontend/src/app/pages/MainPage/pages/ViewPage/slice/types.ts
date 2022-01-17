@@ -26,6 +26,7 @@ import {
   ViewStatus,
   ViewViewModelStages,
 } from '../constants';
+import { View } from '../../../../../types/View';
 
 export interface ViewState {
   views: undefined | ViewSimpleViewModel[];
@@ -56,15 +57,6 @@ export interface ViewSimple extends ViewBase {
 
 export interface ViewSimpleViewModel extends ViewSimple {
   deleteLoading: boolean;
-}
-
-export interface View extends ViewSimple {
-  config: string;
-  model: string;
-  script: string;
-  variables: Variable[];
-  relVariableSubjects: RowPermissionRaw[];
-  relSubjectColumns: ColumnPermissionRaw[];
 }
 
 export interface ViewViewModel<T = object>

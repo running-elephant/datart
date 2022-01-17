@@ -1,5 +1,5 @@
 import { TreeNodeProps } from 'antd';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartDTO } from "app/types/ChartDTO";
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import { ReactElement } from 'react';
@@ -77,7 +77,7 @@ export interface ArchivedViz {
 export interface ChartPreview {
   version?: string;
   backendChartId?: string;
-  backendChart?: BackendChart;
+  backendChart?: ChartDTO;
   dataset?: ChartDataset;
   chartConfig?: ChartConfig;
 }

@@ -23,7 +23,7 @@ import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
-import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { View } from "app/types/View";
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';

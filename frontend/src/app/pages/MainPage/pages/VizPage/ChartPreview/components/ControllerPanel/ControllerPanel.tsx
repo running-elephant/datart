@@ -17,7 +17,7 @@
  */
 
 import { Col, Form, Row } from 'antd';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartDTO } from "app/types/ChartDTO";
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -49,7 +49,7 @@ const AUTO_CONTROL_PANEL_COLS = {
 
 const ControllerPanel: FC<{
   viewId?: string;
-  view?: BackendChart['view'];
+  view?: ChartDTO['view'];
   chartConfig?: ChartConfig;
   onChange: (type, payload) => void;
 }> = memo(({ viewId, view, chartConfig, onChange }) => {

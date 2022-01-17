@@ -16,25 +16,18 @@
  * limitations under the License.
  */
 
-import { View } from 'app/types/View';
-import { ChartDataViewMeta } from './ChartDataViewMeta';
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+} from './ChartDataView';
 
-export enum ChartDataViewFieldType {
-  STRING = 'STRING',
-  NUMERIC = 'NUMERIC',
-  DATE = 'DATE',
-}
-
-export enum ChartDataViewFieldCategory {
-  Field = 'field',
-  Variable = 'variable',
-  ComputedField = 'computedField',
-  AggregateComputedField = 'aggregateComputedField',
-}
-
-export type ChartDataView = View & {
-  meta?: ChartDataViewMeta[];
-  computedFields?: ChartDataViewMeta[];
+export type ChartDataViewMeta = {
+  id: string;
+  name: string;
+  isActive?: boolean;
+  selectedItems?: Array<ChartDataViewMeta>;
+  primaryKey?: boolean;
+  category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
+  type?: ChartDataViewFieldType;
+  expression?: string;
 };
-
-export default ChartDataView;
