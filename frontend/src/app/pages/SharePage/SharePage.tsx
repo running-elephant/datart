@@ -185,7 +185,11 @@ export function SharePage() {
           fetchShareVizInfoImpl(shareToken, sharePassword);
         }}
       />
-      {!vizType && !needPassword && <BoardLoading />}
+      {!vizType && !needPassword && (
+        <div className="loading-container">
+          <BoardLoading />
+        </div>
+      )}
       {!Boolean(needPassword) &&
         vizType === 'DATACHART' &&
         chartPreview &&
@@ -218,7 +222,10 @@ export function SharePage() {
   );
 }
 const StyledWrapper = styled.div`
-  display: flex;
   width: 100%;
   height: 100vh;
+  .loading-container {
+    display: flex;
+    height: 100vh;
+  }
 `;
