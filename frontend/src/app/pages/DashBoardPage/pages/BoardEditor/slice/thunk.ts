@@ -1,6 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
-import { fetchBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thunk';
 import {
   BoardState,
   ContainerWidgetContent,
@@ -184,12 +183,6 @@ export const toUpdateDashboard = createAsyncThunk<
         data: updateData,
       });
       callback();
-      dispatch(ActionCreators.clearHistory());
-      // 更新view界面数据
-      await dispatch(fetchBoardDetail({ dashboardRelId: dashBoard.id }));
-
-      dispatch(fetchEditBoardDetail(dashBoard.id));
-      // 关闭编辑 界面
     } catch (error) {
       errorHandle(error);
     }
