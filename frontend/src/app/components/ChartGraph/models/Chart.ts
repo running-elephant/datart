@@ -23,16 +23,16 @@ import ChartMetadata from 'app/types/ChartMetadata';
 import { isInRange } from 'app/utils/chartHelper';
 
 class Chart implements IChart {
-  meta: ChartMetadata;
-  config?: ChartConfig;
-  dataset?: ChartDataset;
-  dependency: string[] = [];
-  isISOContainer: boolean | string = false;
+  private _state: ChartStatus = 'init';
+  private _stateHistory: ChartStatus[] = [];
 
-  _useIFrame: boolean = true;
-  _state: ChartStatus = 'init';
-  _stateHistory: ChartStatus[] = [];
-  _mouseEvents?: ChartMouseEvent[] = [];
+  public meta: ChartMetadata;
+  public config?: ChartConfig;
+  public dataset?: ChartDataset;
+  public dependency: string[] = [];
+  public isISOContainer: boolean | string = false;
+  public useIFrame: boolean = true;
+  public mouseEvents?: ChartMouseEvent[] = [];
 
   set state(state: ChartStatus) {
     this._state = state;
@@ -58,7 +58,7 @@ class Chart implements IChart {
   }
 
   public registerMouseEvents(events: Array<ChartMouseEvent>) {
-    this._mouseEvents = events;
+    this.mouseEvents = events;
   }
 
   public isMatchRequirement(targetConfig?: ChartConfig): boolean {
@@ -92,10 +92,6 @@ class Chart implements IChart {
   }
 
   public onResize(options, context?): void {}
-
-  protected getColNameByValueColName(series) {
-    return series?.data?.valueColName || series.seriesName;
-  }
 
   private isMatchRequiredSectionLimition(
     current?: ChartDataSectionConfig[],

@@ -61,7 +61,7 @@ class BasicFunnelChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
-    this._mouseEvents?.forEach(event => {
+    this.mouseEvents?.forEach(event => {
       this.chart.on(event.name, event.callback);
     });
   }

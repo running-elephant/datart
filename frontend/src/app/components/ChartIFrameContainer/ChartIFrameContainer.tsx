@@ -49,7 +49,7 @@ const ChartIFrameContainer: FC<{
   };
 
   const render = () => {
-    if (!props?.chart?._useIFrame) {
+    if (!props?.chart?.useIFrame) {
       return (
         <div
           id={`chart-root-${props.containerId}`}
