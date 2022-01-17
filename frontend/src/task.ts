@@ -29,7 +29,7 @@ import {
 } from 'app/pages/DashBoardPage/utils/board';
 import { getWidgetMapByServer } from 'app/pages/DashBoardPage/utils/widget';
 import { ChartDTO } from 'app/types/ChartDTO';
-import { ChartConfigDTO } from 'app/types/ChartConfigDTO';
+import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartConfig } from 'app/types/ChartConfig';
 import 'react-app-polyfill/stable';
 // import 'react-app-polyfill/stable';
@@ -76,7 +76,7 @@ const getBoardQueryData = (dataStr: string) => {
 const getChartQueryData = (dataStr: string) => {
   // see  handleCreateDownloadDataTask
   const data: ChartDTO = JSON.parse(dataStr);
-  const dataConfig: ChartConfigDTO = JSON.parse(data.config as any);
+  const dataConfig: ChartDetailConfigDTO = JSON.parse(data.config as any);
   const chartConfig: ChartConfig = dataConfig.chartConfig as ChartConfig;
   const builder = new ChartDataRequestBuilder(
     {

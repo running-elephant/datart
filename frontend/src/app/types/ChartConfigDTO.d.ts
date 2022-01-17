@@ -17,10 +17,25 @@
  */
 
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
-import { ChartConfig } from './ChartConfig';
+import { ChartDataSectionConfig } from './ChartConfig';
+
+export type ChartStyleConfigDTO = {
+  label: string; // TODO(Stephen): to be check if needed
+  key: string;
+  value?: any;
+  rows?: ChartStyleConfigDTO[];
+};
+
+export type ChartDataConfigDTO = ChartDataSectionConfig & {};
 
 export type ChartConfigDTO = {
-  chartConfig: ChartConfig;
+  datas?: ChartDataSectionConfig[];
+  styles?: ChartStyleConfigDTO[];
+  settings?: ChartStyleConfigDTO[];
+};
+
+export type ChartDetailConfigDTO = {
+  chartConfig: ChartConfigDTO;
   chartGraphId: string;
   computedFields: ChartDataViewMeta[];
   aggregation: boolean;

@@ -27,6 +27,7 @@ import {
   IFieldFormatConfig,
   SortActionType,
 } from 'app/types/ChartConfig';
+import { ChartDetailConfigDTO, ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDatasetMeta } from 'app/types/ChartDataset';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
@@ -611,22 +612,11 @@ export function transformMeta(model?: string) {
   }));
 }
 
-export function mergeConfig<T extends ChartConfig>(target?: T, source?: T): T {
-  if (!target) {
-    return source!;
-  }
-  if (!source) {
-    return target;
-  }
-  target.datas = mergeChartDataConfigs(target?.datas, source?.datas);
-  target.styles = mergeChartStyleConfigs(target?.styles, source?.styles);
-  target.settings = mergeChartStyleConfigs(target?.settings, source?.settings);
-  return target;
-}
-
-export function mergeChartStyleConfigs<
-  T extends { key?: string; value?: any; rows?: T[] } | undefined | null,
->(target?: T[], source?: T[], options = { useDefault: true }) {
+export function mergeChartStyleConfigs(
+  target?: ChartStyleSectionConfig[],
+  source?: ChartStyleConfigDTO[],
+  options = { useDefault: true },
+): ChartStyleSectionConfig[] | undefined {
   if (isEmptyArray(target)) {
     return target;
   }

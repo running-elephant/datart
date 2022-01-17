@@ -33,18 +33,20 @@ import ChartDataset from 'app/types/ChartDataset';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { View } from 'app/types/View';
-import { mergeConfig, transformMeta } from 'app/utils/chartHelper';
+import {
+  convertToChartDTO,
+  mergeToChartConfig,
+} from 'app/utils/ChartDtoHelper';
+import { transformMeta } from 'app/utils/chartHelper';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { RootState } from 'types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
-import { Omit } from 'utils/object';
 import { request } from 'utils/request';
 import { listToTree, reduxActionErrorHandler, rejectHandle } from 'utils/utils';
 import { ChartDTO } from '../../../types/ChartDTO';
 import { ChartDataRequestBuilder } from '../models/ChartDataRequestBuilder';
-import { convertToChartDTO } from '../models/ChartDtoNormalizer';
 
 export type ChartConfigPayloadType = {
   init?: ChartConfig;
@@ -493,9 +495,9 @@ const workbenchSlice = createSlice({
           const currentChart = ChartManager.instance().getById(
             chartConfigDTO?.chartGraphId,
           );
-          state.chartConfig = mergeConfig(
+          state.chartConfig = mergeToChartConfig(
             currentChart?.config,
-            migrateChartConfig(chartConfigDTO?.chartConfig),
+            migrateChartConfig(chartConfigDTO),
           );
         }
         if (!state.shadowChartConfig) {

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartConfigDTO } from './ChartConfigDTO';
+import { ChartDetailConfigDTO } from './ChartConfigDTO';
 
 export type ChartDTO = {
   id: string;
@@ -26,5 +26,5 @@ export type ChartDTO = {
   updateTime?: string;
   viewId: string;
   view: ChartDataView;
-  config: ChartConfigDTO;
+  config: ChartDetailConfigDTO;
 };

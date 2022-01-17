@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import {
   getStyles,
   getValue,
@@ -232,7 +234,11 @@ describe('Chart Helper ', () => {
     )} from source: ${JSON.stringify(source)} result is ${JSON.stringify(
       expected,
     )} - options ${options ? JSON.stringify(options) : ''}`, () => {
-      const result = mergeChartStyleConfigs(target, source, options);
+      const result = mergeChartStyleConfigs(
+        target as ChartStyleSectionConfig[],
+        source as ChartStyleConfigDTO[],
+        options,
+      );
       expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
     });
   });

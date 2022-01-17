@@ -208,7 +208,7 @@ export const ChartStyleSectionComponentType = {
   FontAlignment: 'fontAlignment',
 };
 
-type ChartConfigBase = {
+export type ChartConfigBase = {
   label: string;
   key: string;
 };
@@ -288,7 +288,7 @@ export type ChartDataSectionConfig = ChartConfigBase & {
     };
   };
 
-  // Question: keep field's filter relation for filter arrangement feature
+  // NOTE: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
 };
 
