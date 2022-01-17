@@ -39,11 +39,12 @@ import { updateCollectionByAction } from 'app/utils/mutation';
 import { RootState } from 'types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
-import { CloneValueDeep } from 'utils/object';
+import { Omit } from 'utils/object';
 import { request } from 'utils/request';
 import { listToTree, reduxActionErrorHandler, rejectHandle } from 'utils/utils';
 import { ChartDTO } from '../../../types/ChartDTO';
 import { ChartDataRequestBuilder } from '../models/ChartDataRequestBuilder';
+import { convertToChartDTO } from '../models/ChartDtoNormalizer';
 
 export type ChartConfigPayloadType = {
   init?: ChartConfig;
@@ -302,23 +303,26 @@ export const updateRichTextAction = createAsyncThunk(
   },
 );
 
-export const fetchChartAction = createAsyncThunk(
-  'workbench/fetchChartAction',
-  async (arg: { chartId?: string; backendChart?: ChartDTO }, thunkAPI) => {
-    try {
-      if (arg?.chartId) {
-        const response = await request<ChartDTO>({
-          method: 'GET',
-          url: `viz/datacharts/${arg.chartId}`,
-        });
-        return response.data;
-      }
-      return arg.backendChart;
-    } catch (error) {
-      return rejectHandle(error, thunkAPI.rejectWithValue);
+export const fetchChartAction = createAsyncThunk<
+  ChartDTO,
+  { chartId?: string; backendChart?: ChartDTO },
+  any
+>('workbench/fetchChartAction', async (arg, thunkAPI) => {
+  try {
+    if (arg?.chartId) {
+      const response = await request<
+        Omit<ChartDTO, 'config'> & { config: string }
+      >({
+        method: 'GET',
+        url: `viz/datacharts/${arg.chartId}`,
+      });
+      return convertToChartDTO(response?.data);
     }
-  },
-);
+    return arg.backendChart;
+  } catch (error) {
+    return rejectHandle(error, thunkAPI.rejectWithValue);
+  }
+});
 
 export const updateChartAction = createAsyncThunk(
   'workbench/updateChartAction',
@@ -484,45 +488,28 @@ const workbenchSlice = createSlice({
         if (!payload) {
           return;
         }
-
-        let backendChartConfig =
-          typeof payload.config === 'string'
-            ? JSON.parse(payload.config)
-            : CloneValueDeep(payload.config);
-        backendChartConfig = backendChartConfig || {};
-
-        if (backendChartConfig?.aggregation === undefined) {
-          backendChartConfig.aggregation = true;
-        }
-
-        state.backendChart = {
-          ...payload,
-          config: backendChartConfig,
-        };
-        state.aggregation = backendChartConfig.aggregation;
-
-        const currentChart = ChartManager.instance().getById(
-          backendChartConfig?.chartGraphId,
-        );
-
-        if (!!payload) {
-          state.currentDataView = {
-            ...payload.view,
-            meta: payload.view?.meta || transformMeta(payload?.view?.model),
-            computedFields: backendChartConfig?.computedFields || [],
-          };
-        }
-
-        const newChartConfig = backendChartConfig?.chartConfig;
-        if (!!newChartConfig) {
+        let chartConfigDTO = payload.config || {};
+        if (Boolean(chartConfigDTO?.chartConfig)) {
+          const currentChart = ChartManager.instance().getById(
+            chartConfigDTO?.chartGraphId,
+          );
           state.chartConfig = mergeConfig(
             currentChart?.config,
-            migrateChartConfig(newChartConfig),
+            migrateChartConfig(chartConfigDTO?.chartConfig),
           );
         }
         if (!state.shadowChartConfig) {
           state.shadowChartConfig = state.chartConfig;
         }
+        state.currentDataView = {
+          ...payload.view,
+          computedFields: chartConfigDTO?.computedFields || [],
+        };
+        state.backendChart = payload;
+        state.aggregation =
+          chartConfigDTO.aggregation === undefined
+            ? true
+            : chartConfigDTO.aggregation;
       })
       .addMatcher(isRejected, (_, action) => {
         if (isMySliceAction(action, workbenchSlice.name)) {

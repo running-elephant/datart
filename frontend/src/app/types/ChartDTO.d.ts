@@ -16,16 +16,15 @@
  * limitations under the License.
  */
 
-import { View } from 'app/types/View';
 import { ChartConfigDTO } from './ChartConfigDTO';
 
 export type ChartDTO = {
-  config: ChartConfigDTO;
   id: string;
   name: string;
   orgId: string;
   status: number;
   updateTime?: string;
   viewId: string;
-  view: View & { meta?: any[] };
+  view: ChartDataView;
+  config: ChartConfigDTO;
 };

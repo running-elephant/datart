@@ -32,7 +32,7 @@ export enum ChartDataViewFieldCategory {
   AggregateComputedField = 'aggregateComputedField',
 }
 
-export type ChartDataView = View & {
+export type ChartDataView = Omit<View, 'model'> & {
   meta?: ChartDataViewMeta[];
   computedFields?: ChartDataViewMeta[];
 };

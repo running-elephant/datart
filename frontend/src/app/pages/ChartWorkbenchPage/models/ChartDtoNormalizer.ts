@@ -16,12 +16,16 @@
  * limitations under the License.
  */
 
-import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
-import { ChartConfig } from './ChartConfig';
+import { ChartDTO } from 'app/types/ChartDTO';
+import { transformMeta } from 'app/utils/chartHelper';
+import { Omit } from 'utils/object';
 
-export type ChartConfigDTO = {
-  chartConfig: ChartConfig;
-  chartGraphId: string;
-  computedFields: ChartDataViewMeta[];
-  aggregation: boolean;
-};
+export function convertToChartDTO(data): ChartDTO {
+  return Object.assign({}, data, {
+    config: JSON.parse(data?.config),
+    view: {
+      ...Omit(data?.view, ['model']),
+      meta: transformMeta(data?.view?.model),
+    },
+  });
+}
