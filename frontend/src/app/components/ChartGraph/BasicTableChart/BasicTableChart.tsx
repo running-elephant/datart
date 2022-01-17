@@ -217,6 +217,28 @@ class BasicTableChart extends ReactChart {
           );
         }
       },
+      rowClassName: (_, index) => {
+        return index % 2 === 0 ? 'odd' : 'even';
+      },
+      oddAndEven: this.getOddAndEvenStyle(styleConfigs),
+    };
+  }
+
+  getOddAndEvenStyle(styles) {
+    const [oddBgColor, oddFontColor, evenBgColor, evenFontColor] = getStyles(
+      styles,
+      ['tableBodyStyle'],
+      ['oddBgColor', 'oddFontColor', 'evenBgColor', 'evenFontColor'],
+    );
+    return {
+      odd: {
+        backgroundColor: oddBgColor,
+        color: oddFontColor,
+      },
+      even: {
+        backgroundColor: evenBgColor,
+        color: evenFontColor,
+      },
     };
   }
 
@@ -278,7 +300,11 @@ class BasicTableChart extends ReactChart {
     styleConfigs,
     context,
   ) {
-    const [bodyFont] = getStyles(styleConfigs, ['tableBodyStyle'], ['font']);
+    const [fontFamily, fontSize, fontWeight] = getStyles(
+      styleConfigs,
+      ['tableBodyStyle'],
+      ['fontFamily', 'fontSize', 'fontWeight'],
+    );
     const [headerFont] = getStyles(
       styleConfigs,
       ['tableHeaderStyle'],
@@ -315,9 +341,9 @@ class BasicTableChart extends ReactChart {
         let width = this.getTextWidth(
           context,
           text,
-          bodyFont?.fontWeight,
-          bodyFont?.fontSize,
-          bodyFont?.fontFamily,
+          fontWeight,
+          fontSize,
+          fontFamily,
         );
         const headerWidth = this.getTextWidth(
           context,
@@ -337,9 +363,9 @@ class BasicTableChart extends ReactChart {
         return this.getTextWidth(
           context,
           maxContent,
-          bodyFont?.fontWeight,
-          bodyFont?.fontSize,
-          bodyFont?.fontFamily,
+          fontWeight,
+          fontSize,
+          fontFamily,
         );
       };
       const rowUniqKeyValue = getUseColumnWidth
@@ -387,11 +413,12 @@ class BasicTableChart extends ReactChart {
       ['tableHeaderStyle'],
       ['bgColor', 'font', 'align'],
     );
-    const [bodyBgColor, bodyFont, bodyTextAlign] = getStyles(
-      styleConfigs,
-      ['tableBodyStyle'],
-      ['bgColor', 'font', 'align'],
-    );
+    const [fontFamily, fontSize, fontWeight, fontStyle, bodyTextAlign] =
+      getStyles(
+        styleConfigs,
+        ['tableBodyStyle'],
+        ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'align'],
+      );
     const getAllColumnListInfo = getValue(
       styleConfigs,
       ['column', 'modal', 'list'],
@@ -465,9 +492,10 @@ class BasicTableChart extends ReactChart {
           const { style, ...rest } = props;
           const bodyStyle = {
             textAlign: bodyTextAlign,
-            backgroundColor: bodyBgColor,
-            ...bodyFont,
-            fontSize: +bodyFont?.fontSize,
+            fontFamily,
+            fontWeight,
+            fontStyle,
+            fontSize: +fontSize,
           };
           return (
             <tbody {...rest} style={Object.assign(style || {}, bodyStyle)} />

@@ -87,6 +87,8 @@ class FenZuTableChart extends BasicTableChart {
         context?.height,
       ),
       onChange: () => {},
+      rowClassName: undefined as any,
+      oddAndEven: undefined as any,
     };
   }
 }
