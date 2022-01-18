@@ -21,15 +21,29 @@ import datart.core.base.exception.Exceptions;
 import datart.data.provider.base.DataProviderException;
 import org.apache.calcite.sql.*;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public class SqlValidateUtils {
 
+    /**
+     * SQL expressions that return bool values and can be replaced as 1=1 or 1=1 during processing
+     */
+    private static final Set<SqlKind> logicOperator = EnumSet.of(
+            SqlKind.IN, SqlKind.NOT_IN,
+            SqlKind.EQUALS, SqlKind.NOT_EQUALS,
+            SqlKind.LESS_THAN, SqlKind.GREATER_THAN,
+            SqlKind.GREATER_THAN_OR_EQUAL, SqlKind.LESS_THAN_OR_EQUAL,
+            SqlKind.LIKE,
+            SqlKind.BETWEEN);
 
     /**
      * Validate SqlNode. Only query statements can pass validation
      */
     public static boolean validateQuery(SqlNode sqlCall) {
         // check select sql
-        if (sqlCall instanceof SqlSelect || sqlCall instanceof SqlOrderBy) {
+
+        if (sqlCall.getKind().belongsTo(SqlKind.QUERY)) {
             return true;
         }
 
@@ -45,6 +59,10 @@ public class SqlValidateUtils {
 
         Exceptions.tr(DataProviderException.class, "message.sql.op.forbidden", sqlCall.getKind() + ":" + sqlCall);
         return false;
+    }
+
+    public static boolean isLogicExpressionSqlCall(SqlCall sqlCall) {
+        return sqlCall.getOperator().getKind().belongsTo(logicOperator);
     }
 
 }

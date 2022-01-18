@@ -23,6 +23,7 @@ import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.BeanUtils;
+import datart.core.common.ReflectUtils;
 import datart.core.data.provider.*;
 import datart.data.provider.JdbcDataProvider;
 import datart.data.provider.calcite.dialect.CustomSqlDialect;
@@ -35,6 +36,7 @@ import datart.data.provider.local.LocalDB;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
@@ -262,6 +264,14 @@ public class JdbcDataProviderAdapter implements Closeable {
                 sqlDialect = new CustomSqlDialect(driverInfo);
             }
         }
+        // set case not change
+        try {
+            ReflectUtils.setFiledValue(sqlDialect, "unquotedCasing", Casing.UNCHANGED);
+            ReflectUtils.setFiledValue(sqlDialect, "quotedCasing", Casing.UNCHANGED);
+        } catch (Exception e) {
+            log.warn("sql dialect config error for " + driverInfo.getSqlDialect());
+        }
+
         return sqlDialect;
     }
 
@@ -307,8 +317,7 @@ public class JdbcDataProviderAdapter implements Closeable {
     protected Dataframe executeInLocal(QueryScript script, ExecuteParam executeParam) throws Exception {
         SqlScriptRender render = new SqlScriptRender(script
                 , executeParam
-                , getSqlDialect()
-                , getVariableQuote());
+                , getSqlDialect());
 
         String sql = render.render(false, false, false);
         Dataframe data = execute(sql);
@@ -331,8 +340,7 @@ public class JdbcDataProviderAdapter implements Closeable {
 
         SqlScriptRender render = new SqlScriptRender(script
                 , executeParam
-                , getSqlDialect()
-                , getVariableQuote());
+                , getSqlDialect());
 
         if (supportPaging()) {
             sql = render.render(true, true, false);

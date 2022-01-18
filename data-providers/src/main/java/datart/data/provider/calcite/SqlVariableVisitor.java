@@ -18,20 +18,16 @@
 package datart.data.provider.calcite;
 
 import datart.core.base.consts.VariableTypeEnum;
-import datart.core.common.ReflectUtils;
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ScriptVariable;
-import datart.data.provider.jdbc.PermissionVariablePlaceholder;
-import datart.data.provider.jdbc.QueryVariablePlaceholder;
-import datart.data.provider.jdbc.TrueVariablePlaceholder;
+import datart.data.provider.jdbc.SimpleVariablePlaceholder;
 import datart.data.provider.script.VariablePlaceholder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.util.SqlBasicVisitor;
+import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
@@ -46,6 +42,10 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
 
     private final String srcSql;
 
+    private SqlCall currentLogicExpressionCall;
+
+    private Set<SqlNode> parsedVariable = new HashSet<>();
+
     public SqlVariableVisitor(SqlDialect sqlDialect, String srcSql, String variableQuote, Map<String, ScriptVariable> variableMap) {
         this.srcSql = srcSql;
         this.sqlDialect = sqlDialect;
@@ -54,34 +54,41 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
     }
 
     @Override
-    public Object visit(SqlCall call) {
-        SqlOperator operator = call.getOperator();
-        if (findVariableIdentifier(call)) {
-            return null;
+    public Object visit(SqlCall sqlCall) {
+        if (SqlValidateUtils.isLogicExpressionSqlCall(sqlCall)) {
+            currentLogicExpressionCall = sqlCall;
         }
-        return operator.acceptCall(this, call);
+        SqlOperator operator = sqlCall.getOperator();
+        Set<SqlIdentifier> variableIdentifiers = findVariableNode(sqlCall);
+        if (CollectionUtils.isNotEmpty(variableIdentifiers)) {
+            createVariablePlaceholders(currentLogicExpressionCall, variableIdentifiers);
+            currentLogicExpressionCall = null;
+        }
+        return operator.acceptCall(this, sqlCall);
     }
 
+    private Set<SqlIdentifier> findVariableNode(SqlCall sqlCall) {
 
-    private boolean findVariableIdentifier(SqlCall sqlCall) {
+        Set<SqlIdentifier> variables = new HashSet<>();
+
         for (SqlNode sqlNode : sqlCall.getOperandList()) {
             if (sqlNode instanceof SqlIdentifier) {
-                if (isScriptVariable(sqlNode.toString())) {
-                    variablePlaceholders.add(createVariablePlaceholder(sqlCall, sqlNode.toString()));
-                    return true;
+                if (isScriptVariable(sqlNode.toString()) && !parsedVariable.contains(sqlNode)) {
+                    variables.add((SqlIdentifier) sqlNode);
+                    parsedVariable.add(sqlNode);
                 }
             } else if (sqlNode instanceof SqlNodeList) {
                 for (SqlNode node : (SqlNodeList) sqlNode) {
                     if (node instanceof SqlIdentifier) {
-                        if (isScriptVariable(node.toString())) {
-                            variablePlaceholders.add(createVariablePlaceholder(sqlCall, node.toString()));
-                            return true;
+                        if (isScriptVariable(node.toString()) && !parsedVariable.contains(sqlNode)) {
+                            variables.add((SqlIdentifier) node);
+                            parsedVariable.add(node);
                         }
                     }
                 }
             }
         }
-        return false;
+        return variables;
     }
 
     private boolean isScriptVariable(String node) {
@@ -89,29 +96,55 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
     }
 
     public List<VariablePlaceholder> getVariablePlaceholders() {
+
+        if (CollectionUtils.isNotEmpty(variablePlaceholders)) {
+            variablePlaceholders.sort(Comparator.comparingInt(VariablePlaceholder::getStartPos));
+        }
+
         return variablePlaceholders;
     }
 
-    private VariablePlaceholder createVariablePlaceholder(SqlCall sqlCall, String variableName) {
-        int startIndex = sqlCall.getParserPosition().getColumnNum();
-        int endIndex = sqlCall.getParserPosition().getEndColumnNum();
+    private void createVariablePlaceholders(SqlCall logicExpressionCall, Set<SqlIdentifier> variableIdentifier) {
+
+        if (logicExpressionCall == null) {
+            if (CollectionUtils.isEmpty(variableIdentifier)) {
+                return;
+            }
+            for (SqlIdentifier identifier : variableIdentifier) {
+                ScriptVariable variable = null;
+                for (String key : variableMap.keySet()) {
+                    if (key.equalsIgnoreCase(identifier.toString())) {
+                        variable = variableMap.get(key);
+                    }
+                }
+                if (variable != null) {
+                    if (VariableTypeEnum.PERMISSION.equals(variable.getType())) {
+                        Exceptions.msg("message.provider.permission.variable.usage.error", variable.getName());
+                    }
+                    int startIndex = identifier.getParserPosition().getColumnNum();
+                    int endIndex = identifier.getParserPosition().getEndColumnNum();
+                    String originalSqlFragment = srcSql.substring(startIndex - 1, endIndex).trim();
+                    variablePlaceholders.add(new SimpleVariablePlaceholder(variable, sqlDialect, originalSqlFragment));
+                }
+            }
+            return;
+        }
+
+        logicExpressionCall = SpecialSqlCallConverter.convert(logicExpressionCall);
+        int startIndex = logicExpressionCall.getParserPosition().getColumnNum();
+        int endIndex = logicExpressionCall.getParserPosition().getEndColumnNum();
         String originalSqlFragment = srcSql.substring(startIndex - 1, endIndex).trim();
-        ScriptVariable variable = null;
-        for (String key : variableMap.keySet()) {
-            if (key.equalsIgnoreCase(variableName)) {
-                variable = variableMap.get(key);
+
+        List<ScriptVariable> variables = new LinkedList<>();
+        for (SqlIdentifier identifier : variableIdentifier) {
+            for (String key : variableMap.keySet()) {
+                if (key.equalsIgnoreCase(identifier.toString())) {
+                    ScriptVariable variable = variableMap.get(key);
+                    variables.add(variable);
+                }
             }
         }
-
-        if (variable == null) {
-            return new TrueVariablePlaceholder(originalSqlFragment);
-        }
-
-        if (VariableTypeEnum.PERMISSION.equals(variable.getType())) {
-            return new PermissionVariablePlaceholder(variable, sqlDialect, sqlCall, originalSqlFragment);
-        } else {
-            return new QueryVariablePlaceholder(variable, sqlDialect, sqlCall, originalSqlFragment);
-        }
+        variablePlaceholders.add(new VariablePlaceholder(variables, sqlDialect, logicExpressionCall, originalSqlFragment));
     }
 
 }

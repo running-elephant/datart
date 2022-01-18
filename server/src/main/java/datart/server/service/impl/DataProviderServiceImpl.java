@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
@@ -181,7 +182,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
             variables.addAll(testExecuteParam.getVariables());
         }
         if (securityManager.isOrgOwner(source.getOrgId())) {
-            variables = removePermissionVariables(variables);
+            disablePermissionVariables(variables);
         }
         QueryScript queryScript = QueryScript.builder()
                 .test(true)
@@ -217,7 +218,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         List<ScriptVariable> variables = parseVariables(view, viewExecuteParam);
 
         if (securityManager.isOrgOwner(view.getOrgId())) {
-            variables = removePermissionVariables(variables);
+            disablePermissionVariables(variables);
         }
 
         QueryScript queryScript = QueryScript.builder()
@@ -304,11 +305,12 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         dataProviderManager.updateSource(source);
     }
 
-    private List<ScriptVariable> removePermissionVariables(List<ScriptVariable> variables) {
-        return variables
-                .stream()
-                .filter(var -> !VariableTypeEnum.PERMISSION.equals(var.getType()))
-                .collect(Collectors.toList());
+    private void disablePermissionVariables(List<ScriptVariable> variables) {
+        for (ScriptVariable variable : variables) {
+            if(VariableTypeEnum.PERMISSION.equals(variable.getType())){
+                variable.getValues().add(Const.ALL_PERMISSION);
+            }
+        }
     }
 
     private List<ScriptVariable> parseVariables(View view, ViewExecuteParam param) {
@@ -338,22 +340,22 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         variables.add(new ScriptVariable(VARIABLE_NAME,
                 VariableTypeEnum.PERMISSION,
                 ValueType.STRING,
-                Collections.singleton(getCurrentUser().getUsername()),
+                Sets.newHashSet(getCurrentUser().getUsername()),
                 false));
         variables.add(new ScriptVariable(VARIABLE_EMAIL,
                 VariableTypeEnum.PERMISSION,
                 ValueType.STRING,
-                Collections.singleton(getCurrentUser().getEmail()),
+                Sets.newHashSet(getCurrentUser().getEmail()),
                 false));
         variables.add(new ScriptVariable(VARIABLE_ID,
                 VariableTypeEnum.PERMISSION,
                 ValueType.STRING,
-                Collections.singleton(getCurrentUser().getId()),
+                Sets.newHashSet(getCurrentUser().getId()),
                 false));
         variables.add(new ScriptVariable(VARIABLE_USERNAME,
                 VariableTypeEnum.PERMISSION,
                 ValueType.STRING,
-                Collections.singleton(getCurrentUser().getUsername()),
+                Sets.newHashSet(getCurrentUser().getUsername()),
                 false));
         return variables;
     }

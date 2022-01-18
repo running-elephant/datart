@@ -31,7 +31,6 @@ import datart.data.provider.jdbc.ResultSetMapper;
 import datart.data.provider.jdbc.SqlScriptRender;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlDialect;
-import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -44,7 +43,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-public class LocalDB {
+public class
+LocalDB {
 
     private static final String MEM_URL = "jdbc:h2:mem:/";
 
@@ -184,7 +184,11 @@ public class LocalDB {
             queryScript.setVariables(Collections.emptyList());
             queryScript.setSourceId(srcData.get(0).getName());
         }
-        return persistent ? executeInLocalDB(queryScript, executeParam, srcData, expire) : executeInMemDB(queryScript, executeParam, srcData);
+
+        String url = getConnectionUrl(persistent, queryScript.getSourceId());
+        synchronized (url.intern()) {
+            return persistent ? executeInLocalDB(queryScript, executeParam, srcData, expire) : executeInMemDB(queryScript, executeParam, srcData);
+        }
     }
 
     /**
@@ -275,8 +279,7 @@ public class LocalDB {
     private static Dataframe execute(Connection connection, QueryScript queryScript, ExecuteParam executeParam) throws Exception {
         SqlScriptRender render = new SqlScriptRender(queryScript
                 , executeParam
-                , SQL_DIALECT
-                , Const.DEFAULT_VARIABLE_QUOTE);
+                , SQL_DIALECT);
 
         String sql = render.render(true, false, false);
 
@@ -294,75 +297,14 @@ public class LocalDB {
 
     }
 
-//    private static void createTable(String tableName, List<Column> columns, Connection connection) throws SQLException {
-//        String sql = tableCreateSQL(tableName, columns);
-//        connection.createStatement().execute(sql);
-//    }
-
-//    private static void insertTableData(Dataframe dataframe, Connection connection) throws SQLException {
-//        if (dataframe == null) {
-//            return;
-//        }
-//        createTable(dataframe.getName(), dataframe.getColumns(), connection);
-//        List<String> values = createInsertValues(dataframe.getRows(), dataframe.getColumns());
-//        List<List<String>> partition = Lists.partition(values, MAX_INSERT_BATCH);
-//        for (List<String> vals : partition) {
-//            String insertSql = String.format(INSERT_SQL, dataframe.getName(), String.join(",", vals));
-//            connection.createStatement().execute(insertSql);
-//        }
-//    }
-
     private static Connection getConnection(boolean persistent, String database) throws SQLException {
-        String url = persistent ? getDatabaseUrl(database) : MEM_URL + "DB" +database + H2_PARAM;
-        return DriverManager.getConnection(url);
+        return DriverManager.getConnection(getConnectionUrl(persistent, database));
     }
 
-    private static String tableCreateSQL(String name, List<Column> columns) {
-        StringJoiner sj = new StringJoiner(",");
-        for (Column column : columns) {
-            SqlTypeName sqlTypeName = DataTypeUtils.javaType2SqlType(column.getType());
-            sj.add("`" + column.getName() + "`" + " " + sqlTypeName.getName());
-        }
-        return String.format(TABLE_CREATE_SQL_TEMPLATE, name, sj);
-    }
 
-//    private static List<String> createInsertValues(List<List<Object>> data, List<Column> columns) {
-//        return data.parallelStream().map(row -> {
-//            StringJoiner stringJoiner = new StringJoiner(",", "(", ")");
-//            for (int i = 0; i < row.size(); i++) {
-//                Object val = row.get(i);
-//                if (val == null || StringUtils.isBlank(val.toString())) {
-//                    stringJoiner.add(null);
-//                    continue;
-//                }
-//                Column column = columns.get(i);
-//                switch (column.getType()) {
-//                    case NUMERIC:
-//                        stringJoiner.add(val.toString());
-//                        break;
-//                    case DATE:
-//                        String valStr;
-//                        if (val instanceof Timestamp) {
-//                            valStr = DateFormatUtils.format((Timestamp) val, Const.DEFAULT_DATE_FORMAT);
-//                        } else if (val instanceof Date) {
-//                            valStr = DateFormatUtils.format((Date) val, Const.DEFAULT_DATE_FORMAT);
-//                        } else if (val instanceof LocalDateTime) {
-//                            valStr = ((LocalDateTime) val).format(DateTimeFormatter.ofPattern(Const.DEFAULT_DATE_FORMAT));
-//                        } else {
-//                            valStr = null;
-//                        }
-//                        if (valStr != null) {
-//                            valStr = "PARSEDATETIME('" + valStr + "','" + Const.DEFAULT_DATE_FORMAT + "')";
-//                        }
-//                        stringJoiner.add(valStr);
-//                        break;
-//                    default:
-//                        stringJoiner.add("'" + StringEscapeUtils.escapeSql(val.toString()) + "'");
-//                }
-//            }
-//            return stringJoiner.toString();
-//        }).collect(Collectors.toList());
-//    }
+    private static String getConnectionUrl(boolean persistent, String database) {
+        return persistent ? getDatabaseUrl(database) : MEM_URL + "DB" + database + H2_PARAM;
+    }
 
     private static String getDatabaseUrl(String database) {
         if (database == null) {

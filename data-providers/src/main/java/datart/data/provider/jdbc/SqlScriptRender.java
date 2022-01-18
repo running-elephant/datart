@@ -66,13 +66,13 @@ public class SqlScriptRender extends ScriptRender {
 
     private final SqlDialect sqlDialect;
 
-    public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, String variableQuote) {
-        super(queryScript, executeParam, variableQuote);
+    public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam) {
+        super(queryScript, executeParam);
         this.sqlDialect = LocalDB.SQL_DIALECT;
     }
 
-    public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, SqlDialect sqlDialect, String variableQuote) {
-        super(queryScript, executeParam, variableQuote);
+    public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, SqlDialect sqlDialect) {
+        super(queryScript, executeParam);
         this.sqlDialect = sqlDialect;
     }
 
@@ -125,6 +125,7 @@ public class SqlScriptRender extends ScriptRender {
 
 
     public String replaceVariables(String selectSql) throws SqlParseException {
+
         if (StringUtils.isBlank(selectSql)
                 || CollectionUtils.isEmpty(queryScript.getVariables())
                 || !containsVariable(selectSql)) {
@@ -142,7 +143,7 @@ public class SqlScriptRender extends ScriptRender {
             RequestContext.putWarning(MessageResolver.getMessage("message.provider.sql.parse.failed"), e);
             placeholders = RegexVariableResolver.resolve(sqlDialect, selectSql, variableMap);
         }
-        if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(placeholders)) {
+        if (CollectionUtils.isNotEmpty(placeholders)) {
             for (VariablePlaceholder placeholder : placeholders) {
                 ReplacementPair replacementPair = placeholder.replacementPair();
                 selectSql = selectSql.replace(replacementPair.getPattern(), replacementPair.getReplacement());
@@ -160,6 +161,7 @@ public class SqlScriptRender extends ScriptRender {
             try {
                 sqlNode = parseSql(sql);
             } catch (Exception e) {
+                e.printStackTrace();
                 continue;
             }
             if (SqlValidateUtils.validateQuery(sqlNode) && selectSql != null) {
