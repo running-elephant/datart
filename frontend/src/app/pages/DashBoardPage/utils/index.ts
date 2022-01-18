@@ -409,13 +409,12 @@ export const getChartWidgetRequestParams = (obj: {
     // errorHandle(`can\`t find View ${dataChart?.viewId}`);
     return null;
   }
-  console.log(`_Params__${dataChart.name}`, dataChart.config);
   const builder = getChartDataRequestBuilder(dataChart);
   let requestParams = builder
     .addExtraSorters((option?.sorters as any) || [])
     .build();
   const viewConfig = transformToViewConfig(chartDataView?.config);
-  // console.log(`_requestParams${dataChart.name}`, requestParams);
+
   requestParams = { ...requestParams, ...viewConfig };
 
   const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
