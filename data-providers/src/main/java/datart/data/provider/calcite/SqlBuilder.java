@@ -91,6 +91,10 @@ public class SqlBuilder {
      */
     public String build() throws SqlParseException {
 
+        if (executeParam == null) {
+            return srcSql;
+        }
+
         final SqlNodeList selectList = new SqlNodeList(SqlParserPos.ZERO);
 
         final SqlNodeList orderBy = new SqlNodeList(SqlParserPos.ZERO);
@@ -436,7 +440,7 @@ public class SqlBuilder {
             case COUNT_DISTINCT:
                 return SqlStdOperatorTable.COUNT;
             default:
-                Exceptions.msg( "message.provider.sql.type.unsupported", sqlOperator.name());
+                Exceptions.msg("message.provider.sql.type.unsupported", sqlOperator.name());
         }
         return null;
     }

@@ -72,8 +72,7 @@ public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
 
         SqlScriptRender render = new SqlScriptRender(script
                 , executeParam
-                , getSqlDialect()
-                , getVariableQuote());
+                , getSqlDialect());
 
         String sql = render.render(true, false, false);
 

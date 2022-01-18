@@ -38,18 +38,12 @@ public class ScriptRender {
 
     protected ExecuteParam executeParam;
 
-    protected String variableQuote;
+//    protected String variableQuote;
 
     public ScriptRender(QueryScript queryScript, ExecuteParam executeParam) {
         this.queryScript = queryScript;
         this.executeParam = executeParam;
-        this.variableQuote = Const.DEFAULT_VARIABLE_QUOTE;
-    }
-
-    public ScriptRender(QueryScript queryScript, ExecuteParam executeParam, String variableQuote) {
-        this.queryScript = queryScript;
-        this.executeParam = executeParam;
-        this.variableQuote = variableQuote;
+//        this.variableQuote = Const.DEFAULT_VARIABLE_QUOTE;
     }
 
 }
