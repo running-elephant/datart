@@ -18,8 +18,8 @@
 
 import {
   ChartConfig,
-  ChartDataSectionConfig,
-  ChartStyleSectionConfig,
+  ChartDataConfig,
+  ChartStyleConfig,
 } from 'app/types/ChartConfig';
 import { ChartConfigDTO, ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDTO } from 'app/types/ChartDTO';
@@ -80,7 +80,7 @@ export function extractChartConfigValueModel(
   };
 }
 
-function getDataValueModel(datas?: ChartDataSectionConfig[]) {
+function getDataValueModel(datas?: ChartDataConfig[]) {
   return (datas || []).map(d => {
     return {
       key: d.key,
@@ -89,7 +89,7 @@ function getDataValueModel(datas?: ChartDataSectionConfig[]) {
   });
 }
 
-function getStyleValueModel(styles?: ChartStyleSectionConfig[]) {
+function getStyleValueModel(styles?: ChartStyleConfig[]) {
   return (styles || []).map(s => {
     return {
       label: s.label,

@@ -21,7 +21,7 @@ import { Button, Modal } from 'antd';
 import { StateModalSize } from 'app/hooks/useStateModal';
 import FilterActions from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterAction';
 import {
-  ChartDataSectionConfig,
+  ChartDataConfig,
   ChartDataSectionFieldActionType,
 } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
@@ -63,11 +63,11 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
       config,
     );
 
-    const handleExtraConfigChange = (config: ChartDataSectionConfig) => {
+    const handleExtraConfigChange = (config: ChartDataConfig) => {
       setCurrentConfig(CloneValueDeep(config));
     };
 
-    const handleConfigChange = (ancestors, config: ChartDataSectionConfig) => {
+    const handleConfigChange = (ancestors, config: ChartDataConfig) => {
       setOriginalConfig(config);
       setCurrentConfig(config);
       onConfigChanged(ancestors, config, true);

@@ -18,10 +18,10 @@
 
 import {
   AggregateFieldActionType,
-  ChartDataSectionConfig,
+  ChartDataConfig,
   ChartDataSectionField,
   ChartDataSectionType,
-  ChartStyleSectionConfig,
+  ChartStyleConfig,
   FilterConditionType,
   RelationFilterValue,
   SortActionType,
@@ -43,8 +43,8 @@ import { TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn } from 'utils/object';
 
 export class ChartDataRequestBuilder {
-  chartDataConfigs: ChartDataSectionConfig[];
-  charSettingConfigs: ChartStyleSectionConfig[];
+  chartDataConfigs: ChartDataConfig[];
+  charSettingConfigs: ChartStyleConfig[];
   pageInfo: ChartDatasetPageInfo;
   dataView: ChartDataView;
   script: boolean;
@@ -53,8 +53,8 @@ export class ChartDataRequestBuilder {
 
   constructor(
     dataView: ChartDataView,
-    dataConfigs?: ChartDataSectionConfig[],
-    settingConfigs?: ChartStyleSectionConfig[],
+    dataConfigs?: ChartDataConfig[],
+    settingConfigs?: ChartStyleConfig[],
     pageInfo?: ChartDatasetPageInfo,
     script?: boolean,
     aggregation?: boolean,

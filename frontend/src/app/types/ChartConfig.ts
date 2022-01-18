@@ -274,7 +274,7 @@ export type AliasFieldAction = {
   desc?: string;
 };
 
-export type ChartDataSectionConfig = ChartConfigBase & {
+export type ChartDataConfig = ChartConfigBase & {
   type?: Lowercase<keyof typeof ChartDataSectionType>;
   allowSameField?: boolean;
   required?: boolean;
@@ -302,7 +302,7 @@ export enum ChartDataSectionType {
   SIZE = 'size',
 }
 
-export type ChartStyleSectionConfig = ChartConfigBase &
+export type ChartStyleConfig = ChartConfigBase &
   ChartStyleSectionGroup & {};
 
 export type ChartStyleSectionGroup = ChartStyleSectionRow & {
@@ -362,9 +362,9 @@ export type ChartI18NSectionConfig = {
 };
 
 export type ChartConfig = {
-  datas?: ChartDataSectionConfig[];
-  styles?: ChartStyleSectionConfig[];
-  settings?: ChartStyleSectionConfig[];
+  datas?: ChartDataConfig[];
+  styles?: ChartStyleConfig[];
+  settings?: ChartStyleConfig[];
   i18ns?: ChartI18NSectionConfig[];
   env?: string;
 };

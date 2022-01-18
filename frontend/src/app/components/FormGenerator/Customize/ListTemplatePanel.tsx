@@ -19,7 +19,7 @@
 import { DeleteOutlined } from '@ant-design/icons';
 import { Col, Divider, List, Row, Select } from 'antd';
 import {
-  ChartStyleSectionConfig,
+  ChartStyleConfig,
   ChartStyleSelectorItem,
 } from 'app/types/ChartConfig';
 import { updateBy, updateByAction } from 'app/utils/mutation';
@@ -29,7 +29,7 @@ import GroupLayout from '../Layout/GroupLayout';
 import { GroupLayoutMode, ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
-const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({
     ancestors,
     translate: t = title => title,

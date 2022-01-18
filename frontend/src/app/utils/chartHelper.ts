@@ -20,10 +20,10 @@ import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import {
   AggregateFieldActionType,
   ChartConfig,
-  ChartDataSectionConfig,
+  ChartDataConfig,
   ChartDataSectionField,
   ChartDataSectionType,
-  ChartStyleSectionConfig,
+  ChartStyleConfig,
   IFieldFormatConfig,
   SortActionType,
 } from 'app/types/ChartConfig';
@@ -50,7 +50,7 @@ export function getDefaultThemeColor() {
   return echartsDefaultTheme.color;
 }
 export function isInRange(
-  limit?: ChartDataSectionConfig['limit'],
+  limit?: ChartDataConfig['limit'],
   count: number = 0,
 ) {
   return cond(
@@ -61,7 +61,7 @@ export function isInRange(
 }
 
 export function isUnderUpperBound(
-  limit?: ChartDataSectionConfig['limit'],
+  limit?: ChartDataConfig['limit'],
   count: number = 0,
 ) {
   return cond(
@@ -72,7 +72,7 @@ export function isUnderUpperBound(
 }
 
 export function reachLowerBoundCount(
-  limit?: ChartDataSectionConfig['limit'],
+  limit?: ChartDataConfig['limit'],
   count: number = 0,
 ) {
   return cond(
@@ -85,19 +85,19 @@ export function reachLowerBoundCount(
 /**
  * @deprecated This function will be removed in next versiion, please use getStyles instread
  * @see getValue
- * @param {ChartStyleSectionConfig[]} styleConfigs
+ * @param {ChartStyleConfig[]} styleConfigs
  * @param {string[]} paths
  * @return {*}  {*}
  */
 export function getStyleValue(
-  styleConfigs: ChartStyleSectionConfig[],
+  styleConfigs: ChartStyleConfig[],
   paths: string[],
 ): any {
   return getValue(styleConfigs, paths);
 }
 
 export function getSettingValue(
-  configs: ChartStyleSectionConfig[],
+  configs: ChartStyleConfig[],
   path: string,
   targetKey: string,
 ) {
@@ -108,13 +108,13 @@ export function getSettingValue(
  * @deprecated This function will be removed in next versiion, please use getStyles instread
  * @see getStyles
  * @export
- * @param {ChartStyleSectionConfig[]} styles
+ * @param {ChartStyleConfig[]} styles
  * @param {string} groupPath
  * @param {string} childPath
  * @return {*}
  */
 export function getStyleValueByGroup(
-  styles: ChartStyleSectionConfig[],
+  styles: ChartStyleConfig[],
   groupPath: string,
   childPath: string,
 ) {
@@ -138,13 +138,13 @@ export function getStyleValueByGroup(
  * console.log(color); // red
  * console.log(font); // sans-serif
  *
- * @param {Array<ChartStyleSectionConfig>} configs required
+ * @param {Array<ChartStyleConfig>} configs required
  * @param {Array<string>} parentKeyPaths required
  * @param {Array<string>} childTargetKeys required
  * @return {*} array of child keys with the same order
  */
 export function getStyles(
-  configs: Array<ChartStyleSectionConfig>,
+  configs: Array<ChartStyleConfig>,
   parentKeyPaths: Array<string>,
   childTargetKeys: Array<string>,
 ) {
@@ -158,13 +158,13 @@ export function getStyles(
 /**
  * Get style config value base funtion with default target key
  * @export
- * @param {Array<ChartStyleSectionConfig>} configs
+ * @param {Array<ChartStyleConfig>} configs
  * @param {Array<string>} keyPaths
  * @param {string} [targetKey='value']
  * @return {*}
  */
 export function getValue(
-  configs: Array<ChartStyleSectionConfig>,
+  configs: Array<ChartStyleConfig>,
   keyPaths: Array<string>,
   targetKey = 'value',
 ) {
@@ -613,10 +613,10 @@ export function transformMeta(model?: string) {
 }
 
 export function mergeChartStyleConfigs(
-  target?: ChartStyleSectionConfig[],
+  target?: ChartStyleConfig[],
   source?: ChartStyleConfigDTO[],
   options = { useDefault: true },
-): ChartStyleSectionConfig[] | undefined {
+): ChartStyleConfig[] | undefined {
   if (isEmptyArray(target)) {
     return target;
   }

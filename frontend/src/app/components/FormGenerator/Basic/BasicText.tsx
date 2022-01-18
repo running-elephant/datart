@@ -17,14 +17,14 @@
  */
 
 import { Input } from 'antd';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import { FC, memo } from 'react';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 const { TextArea } = Input;
 
-const BasicText: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicText: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, data: row, onChange }) => {
     const { value } = row;
 

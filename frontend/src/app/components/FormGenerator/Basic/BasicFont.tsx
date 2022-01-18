@@ -18,7 +18,7 @@
 
 import { Select } from 'antd';
 import { ColorPickerPopover } from 'app/components/ColorPicker';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import {
   FONT_FAMILIES,
@@ -32,7 +32,7 @@ import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 import { Group, WithColorPicker } from './components/Group';
 
-const BasicFont: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicFont: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
     const { comType, options, ...rest } = data;
 

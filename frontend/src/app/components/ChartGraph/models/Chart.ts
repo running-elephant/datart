@@ -17,7 +17,7 @@
  */
 
 import { ChartMouseEvent, ChartStatus, IChart } from 'app/types/Chart';
-import { ChartConfig, ChartDataSectionConfig } from 'app/types/ChartConfig';
+import { ChartConfig, ChartDataConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { isInRange } from 'app/utils/chartHelper';
@@ -94,8 +94,8 @@ class Chart implements IChart {
   public onResize(options, context?): void {}
 
   private isMatchRequiredSectionLimition(
-    current?: ChartDataSectionConfig[],
-    target?: ChartDataSectionConfig[],
+    current?: ChartDataConfig[],
+    target?: ChartDataConfig[],
   ) {
     return (current || [])
       .filter(cc => Boolean(cc?.required))

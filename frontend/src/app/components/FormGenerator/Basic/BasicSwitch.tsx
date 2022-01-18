@@ -18,7 +18,7 @@
 
 import { Col, Row, Switch } from 'antd';
 import {
-  ChartStyleSectionConfig,
+  ChartStyleConfig,
   ChartStyleSectionRow,
 } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
@@ -28,7 +28,7 @@ import ItemLayout from '../Layout/ItemLayout';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
-const BasicSwitch: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicSwitch: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 

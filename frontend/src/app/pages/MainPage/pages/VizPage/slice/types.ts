@@ -1,7 +1,7 @@
 import { TreeNodeProps } from 'antd';
-import { ChartDTO } from "app/types/ChartDTO";
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
+import { ChartDTO } from 'app/types/ChartDTO';
 import { ReactElement } from 'react';
 
 export type VizType = [

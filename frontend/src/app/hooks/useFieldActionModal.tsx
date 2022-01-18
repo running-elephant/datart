@@ -18,7 +18,7 @@
 
 import FieldActions from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction';
 import {
-  ChartDataSectionConfig,
+  ChartDataConfig,
   ChartDataSectionField,
   ChartDataSectionFieldActionType,
 } from 'app/types/ChartConfig';
@@ -37,7 +37,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
     config?: ChartDataSectionField,
     dataset?: ChartDataset,
     dataView?: ChartDataView,
-    dataConfig?: ChartDataSectionConfig,
+    dataConfig?: ChartDataConfig,
     onChange?,
     aggregation?: boolean,
   ) => {
@@ -88,7 +88,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
   const showModal = (
     columnUid: string,
     actionType: ValueOf<typeof ChartDataSectionFieldActionType>,
-    dataConfig: ChartDataSectionConfig,
+    dataConfig: ChartDataConfig,
     onConfigChange,
     dataset?: ChartDataset,
     dataView?: ChartDataView,

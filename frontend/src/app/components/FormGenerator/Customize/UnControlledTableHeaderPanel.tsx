@@ -26,9 +26,9 @@ import {
 } from '@ant-design/icons';
 import { Button, Col, Input, Row, Space, Table } from 'antd';
 import {
-  ChartDataSectionConfig,
+  ChartDataConfig,
   ChartDataSectionType,
-  ChartStyleSectionConfig,
+  ChartStyleConfig,
 } from 'app/types/ChartConfig';
 import {
   getColumnRenderName,
@@ -57,7 +57,7 @@ interface RowValue {
   children?: RowValue[];
 }
 
-const getFlattenHeaders = (dataConfigs: ChartDataSectionConfig[] = []) => {
+const getFlattenHeaders = (dataConfigs: ChartDataConfig[] = []) => {
   const newDataConfigs = CloneValueDeep(dataConfigs);
   return newDataConfigs
     .filter(
@@ -70,7 +70,7 @@ const getFlattenHeaders = (dataConfigs: ChartDataSectionConfig[] = []) => {
 };
 
 const UnControlledTableHeaderPanel: FC<
-  ItemLayoutProps<ChartStyleSectionConfig>
+  ItemLayoutProps<ChartStyleConfig>
 > = memo(
   ({
     ancestors,

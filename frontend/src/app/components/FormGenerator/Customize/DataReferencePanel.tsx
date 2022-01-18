@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import { FC, memo, useEffect } from 'react';
 import styled from 'styled-components/macro';
@@ -339,7 +339,7 @@ const defaultRows = [
   },
 ];
 
-const DataReferencePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const DataReferencePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t, data, dataConfigs, onChange }) => {
     useEffect(() => {
       // init default component rows

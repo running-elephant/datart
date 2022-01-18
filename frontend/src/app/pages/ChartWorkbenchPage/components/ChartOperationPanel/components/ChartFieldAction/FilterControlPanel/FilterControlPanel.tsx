@@ -22,7 +22,7 @@ import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { ConditionBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
 import {
   AggregateFieldActionType,
-  ChartDataSectionConfig,
+  ChartDataConfig,
   ChartDataSectionField,
 } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
@@ -49,7 +49,7 @@ const FilterControllPanel: FC<
     config: ChartDataSectionField;
     dataset?: ChartDataset;
     dataView?: ChartDataView;
-    dataConfig?: ChartDataSectionConfig;
+    dataConfig?: ChartDataConfig;
     aggregation?: boolean;
     onConfigChange: (
       config: ChartDataSectionField,
