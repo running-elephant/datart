@@ -82,8 +82,10 @@ public class WidgetServiceImpl extends BaseService implements WidgetService {
         ArrayList<RelWidgetElement> elements = new ArrayList<>();
         for (WidgetCreateParam createParam : createParams) {
             Widget widget = new Widget();
-            widget.setId(UUIDGenerator.generate());
             BeanUtils.copyProperties(createParam, widget);
+            if (StringUtils.isBlank(widget.getId())) {
+                widget.setId(UUIDGenerator.generate());
+            }
             widget.setCreateBy(getCurrentUser().getId());
             widget.setCreateTime(new Date());
             widgets.add(widget);
