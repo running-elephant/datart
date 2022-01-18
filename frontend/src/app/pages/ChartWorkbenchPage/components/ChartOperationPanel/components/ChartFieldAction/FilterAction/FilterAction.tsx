@@ -17,7 +17,7 @@
  */
 
 import {
-  ChartDataSectionConfig,
+  ChartDataConfig,
   ChartDataSectionField,
 } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
@@ -29,7 +29,7 @@ const FilterAction: FC<{
   config: ChartDataSectionField;
   dataset?: ChartDataset;
   dataView?: ChartDataView;
-  dataConfig?: ChartDataSectionConfig;
+  dataConfig?: ChartDataConfig;
   aggregation?: boolean;
   onConfigChange: (
     config: ChartDataSectionField,

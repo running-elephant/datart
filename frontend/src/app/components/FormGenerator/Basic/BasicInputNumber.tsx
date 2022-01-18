@@ -17,7 +17,7 @@
  */
 
 import { InputNumber } from 'antd';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import debounce from 'lodash/debounce';
 import { FC, memo, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -26,7 +26,7 @@ import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
-const BasicInputNumber: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicInputNumber: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
     const [cache, setCache] = useState(data);
     const { comType, options, ...rest } = cache;

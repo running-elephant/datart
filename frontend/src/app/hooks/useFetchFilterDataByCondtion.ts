@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartDTO } from "app/types/ChartDTO";
 import {
   FilterCondition,
   FilterConditionType,
@@ -29,7 +29,7 @@ export const useFetchFilterDataByCondtion = (
   viewId?: string,
   condition?: FilterCondition,
   onFinish?: (datas: RelationFilterValue[]) => void,
-  view?: BackendChart['view'],
+  view?: ChartDTO['view'],
 ) => {
   useMount(() => {
     if (!viewId || condition?.type !== FilterConditionType.List) {

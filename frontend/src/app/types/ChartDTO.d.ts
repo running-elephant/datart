@@ -16,13 +16,15 @@
  * limitations under the License.
  */
 
-import { ChartDataConfig } from 'app/types/ChartConfig';
-import { createContext } from 'react';
+import { ChartDetailConfigDTO } from './ChartConfigDTO';
 
-const ChartPaletteContext = createContext<{ datas?: ChartDataConfig[] }>(
-  {
-    datas: [],
-  },
-);
-
-export default ChartPaletteContext;
+export type ChartDTO = {
+  id: string;
+  name: string;
+  orgId: string;
+  status: number;
+  updateTime?: string;
+  viewId: string;
+  view: ChartDataView;
+  config: ChartDetailConfigDTO;
+};

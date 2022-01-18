@@ -17,7 +17,7 @@
  */
 
 import { List } from 'antd';
-import { ChartDataViewMeta } from 'app/types/ChartDataView';
+import { ChartDataViewMeta } from "app/types/ChartDataViewMeta";
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { stopPPG } from 'utils/utils';

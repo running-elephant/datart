@@ -16,13 +16,20 @@
  * limitations under the License.
  */
 
-import { ChartDataConfig } from 'app/types/ChartConfig';
-import { createContext } from 'react';
+import {
+  RowPermissionRaw,
+  Variable,
+} from '../pages/MainPage/pages/VariablePage/slice/types';
+import {
+  ColumnPermissionRaw,
+  ViewSimple,
+} from '../pages/MainPage/pages/ViewPage/slice/types';
 
-const ChartPaletteContext = createContext<{ datas?: ChartDataConfig[] }>(
-  {
-    datas: [],
-  },
-);
-
-export default ChartPaletteContext;
+export interface View extends ViewSimple {
+  config: string;
+  model: string;
+  script: string;
+  variables: Variable[];
+  relVariableSubjects: RowPermissionRaw[];
+  relSubjectColumns: ColumnPermissionRaw[];
+}

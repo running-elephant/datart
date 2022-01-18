@@ -16,13 +16,18 @@
  * limitations under the License.
  */
 
-import { ChartDataConfig } from 'app/types/ChartConfig';
-import { createContext } from 'react';
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+} from './ChartDataView';
 
-const ChartPaletteContext = createContext<{ datas?: ChartDataConfig[] }>(
-  {
-    datas: [],
-  },
-);
-
-export default ChartPaletteContext;
+export type ChartDataViewMeta = {
+  id: string;
+  name: string;
+  isActive?: boolean;
+  selectedItems?: Array<ChartDataViewMeta>;
+  primaryKey?: boolean;
+  category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
+  type?: ChartDataViewFieldType;
+  expression?: string;
+};

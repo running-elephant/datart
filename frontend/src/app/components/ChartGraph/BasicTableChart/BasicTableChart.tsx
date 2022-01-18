@@ -42,7 +42,7 @@ import Config from './config';
 import { TableComponentsTd } from './TableComponents';
 
 class BasicTableChart extends ReactChart {
-  _useIFrame = false;
+  useIFrame = false;
   isISOContainer = 'react-table';
   config = Config;
   utilCanvas = null;
@@ -713,7 +713,7 @@ class BasicTableChart extends ReactChart {
         pageNo,
       },
     });
-    this._mouseEvents?.forEach(cur => {
+    this.mouseEvents?.forEach(cur => {
       if (cur.name === 'click') {
         cur.callback?.(eventParams);
       }
@@ -739,7 +739,7 @@ class BasicTableChart extends ReactChart {
       dataIndex, // row index
       value, // cell value
     });
-    return this._mouseEvents?.reduce((acc, cur) => {
+    return this.mouseEvents?.reduce((acc, cur) => {
       cur.name && (eventParams.type = cur.name);
       if (cur.name === 'click') {
         Object.assign(acc, {

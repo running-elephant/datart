@@ -28,6 +28,7 @@ import {
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { handleServerStoryAction } from 'app/pages/StoryBoardPage/slice/actions';
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
+import { convertToChartDTO } from 'app/utils/ChartDtoHelper';
 import { RootState } from 'types';
 import persistence from 'utils/persistence';
 import { request } from 'utils/request';
@@ -81,8 +82,12 @@ export const fetchShareVizInfo = createAsyncThunk(
 
     switch (data.vizType) {
       case 'DATACHART':
+        const shareVizInfo = {
+          ...data,
+          vizDetail: convertToChartDTO(data.vizDetail),
+        };
         thunkAPI.dispatch(
-          shareActions.setDataChart({ data, filterSearchParams }),
+          shareActions.setDataChart({ data: shareVizInfo, filterSearchParams }),
         );
         break;
       case 'DASHBOARD':

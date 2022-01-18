@@ -17,14 +17,14 @@
  */
 
 import { Radio } from 'antd';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
-const BasicRadio: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicRadio: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { value, comType, options, ...rest } = row;
     const items = options?.items || [];

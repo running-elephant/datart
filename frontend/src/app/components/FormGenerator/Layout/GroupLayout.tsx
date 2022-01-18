@@ -18,7 +18,7 @@
 
 import { Button, Collapse } from 'antd';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_MD } from 'styles/StyleConstants';
@@ -32,7 +32,7 @@ import CollectionLayout from './CollectionLayout';
 
 const { Panel } = Collapse;
 
-const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
+const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
   ({
     ancestors,
     data,

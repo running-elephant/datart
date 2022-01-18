@@ -23,10 +23,10 @@ import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
-import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+import { View } from 'app/types/View';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';

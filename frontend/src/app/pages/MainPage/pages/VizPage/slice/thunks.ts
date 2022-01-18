@@ -18,7 +18,6 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
   Dashboard,
   DataChart,
@@ -26,6 +25,8 @@ import {
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
 import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
+import { ChartDTO } from 'app/types/ChartDTO';
+import { convertToChartDTO } from 'app/utils/ChartDtoHelper';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
 import { request } from 'utils/request';
@@ -321,11 +322,16 @@ export const initChartPreviewData = createAsyncThunk<
 export const fetchVizChartAction = createAsyncThunk(
   'viz/fetchVizChartAction',
   async (arg: { backendChartId; filterSearchParams?: FilterSearchParams }) => {
-    const response = await request<BackendChart>({
+    const response = await request<
+      Omit<ChartDTO, 'config'> & { config: string }
+    >({
       method: 'GET',
       url: `viz/datacharts/${arg.backendChartId}`,
     });
-    return { data: response.data, filterSearchParams: arg.filterSearchParams };
+    return {
+      data: convertToChartDTO(response?.data),
+      filterSearchParams: arg.filterSearchParams,
+    };
   },
 );
 

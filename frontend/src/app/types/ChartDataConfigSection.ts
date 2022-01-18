@@ -17,13 +17,13 @@
  */
 
 import { StateModalSize } from 'app/hooks/useStateModal';
-import { ChartDataSectionConfig } from 'app/types/ChartConfig';
+import { ChartDataConfig } from 'app/types/ChartConfig';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import { ReactNode } from 'react';
 
 export interface ChartDataConfigSectionProps {
   ancestors: number[];
-  config: ChartDataSectionConfig;
+  config: ChartDataConfig;
   modalSize?: StateModalSize;
   category?: Lowercase<keyof typeof ChartDataViewFieldCategory>;
   extra?: () => ReactNode;
@@ -31,7 +31,7 @@ export interface ChartDataConfigSectionProps {
   aggregation?: boolean;
   onConfigChanged: (
     ancestors: number[],
-    config: ChartDataSectionConfig,
+    config: ChartDataConfig,
     needRefresh?: boolean,
   ) => void;
 }

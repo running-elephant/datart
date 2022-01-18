@@ -17,7 +17,7 @@
  */
 
 import { InputNumber } from 'antd';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS } from 'styles/StyleConstants';
@@ -25,7 +25,7 @@ import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
-const BasicInputPercentage: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicInputPercentage: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 

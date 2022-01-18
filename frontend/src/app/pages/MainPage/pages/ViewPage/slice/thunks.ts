@@ -50,11 +50,11 @@ import {
   UnarchiveViewParams,
   UpdateViewBaseParams,
   VariableHierarchy,
-  View,
   ViewBase,
   ViewSimple,
   ViewViewModel,
 } from './types';
+import { View } from "../../../../../types/View";
 
 export const getViews = createAsyncThunk<ViewSimple[], string>(
   'view/getViews',
