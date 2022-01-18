@@ -1,5 +1,8 @@
 import { createSlice, isRejected, PayloadAction } from '@reduxjs/toolkit';
+import { migrateChartConfig } from 'app/migration';
+import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { ChartDataSectionType } from 'app/types/ChartConfig';
+import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { CloneValueDeep } from 'utils/object';
@@ -68,7 +71,6 @@ const slice = createSlice({
             : '';
       }
     },
-
 
     updateChartPreviewFilter(
       state,
@@ -471,36 +473,41 @@ const slice = createSlice({
       };
     });
     builder.addCase(fetchVizChartAction.fulfilled, (state, action) => {
-      const data = action.payload.data,
-        filterSearchParams = action.payload.filterSearchParams;
+      const newChartDto = CloneValueDeep(action.payload.data);
+
+      const filterSearchParams = action.payload.filterSearchParams;
       const index = state.chartPreviews?.findIndex(
-        c => c.backendChartId === data?.id,
+        c => c.backendChartId === newChartDto?.id,
       );
-      let backendChartConfig =
-        typeof data.config === 'string'
-          ? JSON.parse(data.config as any)
-          : CloneValueDeep(data.config);
-      if (backendChartConfig?.chartConfig && filterSearchParams) {
-        backendChartConfig.chartConfig = transferChartConfig(
-          backendChartConfig.chartConfig,
-          filterSearchParams,
-        );
-      }
-      const backendChart = CloneValueDeep(data);
-      backendChart.config = backendChartConfig;
       if (index < 0) {
+        const currentChart = ChartManager.instance().getById(
+          newChartDto?.config?.chartGraphId,
+        );
         state.chartPreviews.push({
-          backendChartId: data?.id,
-          backendChart: backendChart,
-          chartConfig: backendChartConfig?.chartConfig,
+          backendChartId: newChartDto?.id,
+          backendChart: newChartDto,
+          chartConfig: transferChartConfig(
+            mergeToChartConfig(
+              currentChart?.config,
+              migrateChartConfig(newChartDto?.config),
+            ),
+            filterSearchParams,
+          ),
         });
-        return;
+      } else {
+        const prevChartPreview = state.chartPreviews[index];
+        state.chartPreviews[index] = {
+          ...prevChartPreview,
+          backendChart: newChartDto,
+          chartConfig: transferChartConfig(
+            mergeToChartConfig(
+              prevChartPreview?.chartConfig,
+              migrateChartConfig(newChartDto?.config),
+            ),
+            filterSearchParams,
+          ),
+        };
       }
-      state.chartPreviews[index] = {
-        ...state.chartPreviews[index],
-        backendChart: backendChart,
-        chartConfig: backendChartConfig?.chartConfig,
-      };
     });
     builder.addCase(
       fetchDataSetByPreviewChartAction.fulfilled,
