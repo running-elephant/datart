@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -270,6 +271,12 @@ public class VizServiceImpl extends BaseService implements VizService {
     @Transactional
     public boolean deleteDashboard(String dashboardId, boolean archive) {
         return dashboardService.delete(dashboardId, archive);
+    }
+
+    @Override
+    @Transactional
+    public DashboardDetail copyDashboard(DashboardCreateParam createParam) throws IOException {
+        return dashboardService.copyDashboard(createParam);
     }
 
     @Override

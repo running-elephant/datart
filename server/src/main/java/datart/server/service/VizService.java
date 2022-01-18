@@ -5,6 +5,7 @@ import datart.security.base.ResourceType;
 import datart.server.base.dto.*;
 import datart.server.base.params.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -43,6 +44,8 @@ public interface VizService {
     boolean deleteDatachart(String datachartId, boolean archive);
 
     boolean deleteDashboard(String dashboardId, boolean archive);
+
+    DashboardDetail copyDashboard(DashboardCreateParam createParam) throws IOException;
 
     boolean deleteStorypage(String storypageId);
 
