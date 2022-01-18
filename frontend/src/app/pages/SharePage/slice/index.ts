@@ -16,13 +16,16 @@
  * limitations under the License.
  */
 import { createSlice, isRejected, PayloadAction } from '@reduxjs/toolkit';
-import { ChartDTO } from "app/types/ChartDTO";
+import { migrateChartConfig } from 'app/migration';
+import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import {
   FilterSearchParams,
   VizType,
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transferChartConfig } from 'app/pages/MainPage/pages/VizPage/slice/utils';
-import { ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartDTO } from 'app/types/ChartDTO';
+import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceAction } from 'utils/@reduxjs/toolkit';
 import { reduxActionErrorHandler } from 'utils/utils';
@@ -87,30 +90,29 @@ export const slice = createSlice({
     ) => {
       const { data, filterSearchParams } = action.payload;
       const vizDetail = data.vizDetail as ChartDTO;
+      const chartConfigDTO = vizDetail.config;
+      const currentChart = ChartManager.instance().getById(
+        chartConfigDTO?.chartGraphId,
+      );
+      let chartConfig = currentChart?.config as ChartConfig;
+      if (currentChart) {
+        chartConfig = transferChartConfig(
+          mergeToChartConfig(
+            currentChart?.config,
+            migrateChartConfig(chartConfigDTO),
+          ),
+          filterSearchParams,
+        );
+      }
       const executeToken = data.executeToken;
-      const backendChartConfig =
-        typeof vizDetail?.config === 'string'
-          ? JSON.parse(vizDetail?.config)
-          : vizDetail?.config;
       const executeKey = vizDetail?.viewId;
       if (executeKey) {
         state.executeToken = executeToken?.[executeKey]?.token;
       }
-
-      if (backendChartConfig?.chartConfig && filterSearchParams) {
-        backendChartConfig.chartConfig = transferChartConfig(
-          backendChartConfig.chartConfig,
-          filterSearchParams,
-          true,
-        );
-      }
       state.chartPreview = {
         ...state.chartPreview,
-        chartConfig: backendChartConfig?.chartConfig,
-        backendChart: {
-          ...vizDetail,
-          config: backendChartConfig,
-        },
+        chartConfig: chartConfig,
+        backendChart: vizDetail,
       };
     },
     updateChartPreviewFilter(
