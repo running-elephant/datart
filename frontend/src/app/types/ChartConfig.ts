@@ -209,7 +209,7 @@ export const ChartStyleSectionComponentType = {
 };
 
 export type ChartConfigBase = {
-  label: string;
+  label?: string;
   key: string;
 };
 

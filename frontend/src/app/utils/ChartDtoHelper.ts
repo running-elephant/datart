@@ -16,7 +16,11 @@
  * limitations under the License.
  */
 
-import { ChartConfig } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataSectionConfig,
+  ChartStyleSectionConfig,
+} from 'app/types/ChartConfig';
 import { ChartConfigDTO, ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
@@ -36,7 +40,7 @@ export function convertToChartDTO(data): ChartDTO {
   });
 }
 
-export function getUpdateChartDTO({
+export function buildUpdateChartRequest({
   chartId,
   aggregation,
   chartConfig,
@@ -47,10 +51,10 @@ export function getUpdateChartDTO({
   viewId,
   computedFields,
 }) {
-  const chartConfigDtoValueModel = extractChartConfigValueModel(chartConfig);
-  const stringChartConfig = JSON.stringify({
+  const chartConfigValueModel = extractChartConfigValueModel(chartConfig);
+  const stringifyConfig = JSON.stringify({
     aggregation: aggregation,
-    chartConfig: chartConfigDtoValueModel,
+    chartConfig: chartConfigValueModel,
     chartGraphId: graphId,
     computedFields: computedFields || [],
   });
@@ -61,7 +65,7 @@ export function getUpdateChartDTO({
     parent: parentId,
     name: name,
     viewId: viewId,
-    config: stringChartConfig,
+    config: stringifyConfig,
     permissions: [],
   };
 }
@@ -70,10 +74,30 @@ export function extractChartConfigValueModel(
   config: ChartConfig,
 ): ChartConfigDTO {
   return {
-    datas: [], // TODO(Stephen): tobe finish
-    styles: [],
-    settings: [],
+    datas: getDataValueModel(config?.datas),
+    styles: getStyleValueModel(config?.styles),
+    settings: getStyleValueModel(config?.settings),
   };
+}
+
+function getDataValueModel(datas?: ChartDataSectionConfig[]) {
+  return (datas || []).map(d => {
+    return {
+      key: d.key,
+      rows: d.rows,
+    };
+  });
+}
+
+function getStyleValueModel(styles?: ChartStyleSectionConfig[]) {
+  return (styles || []).map(s => {
+    return {
+      label: s.label,
+      key: s.key,
+      value: s.value,
+      rows: getStyleValueModel(s.rows),
+    };
+  });
 }
 
 export function mergeToChartConfig(

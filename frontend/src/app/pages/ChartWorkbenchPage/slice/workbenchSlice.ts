@@ -27,13 +27,13 @@ import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { ResourceTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import { ChartConfig } from 'app/types/ChartConfig';
-import { ChartConfigDTO } from 'app/types/ChartConfigDTO';
 import ChartDataRequest from 'app/types/ChartDataRequest';
 import ChartDataset from 'app/types/ChartDataset';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { View } from 'app/types/View';
 import {
+  buildUpdateChartRequest,
   convertToChartDTO,
   mergeToChartConfig,
 } from 'app/utils/ChartDtoHelper';
@@ -336,27 +336,24 @@ export const updateChartAction = createAsyncThunk(
       const state = thunkAPI.getState() as any;
       const workbenchState = state.workbench as typeof initState;
 
-      const stringConfig = JSON.stringify({
+      const requestBody = buildUpdateChartRequest({
+        chartId: arg.chartId,
         aggregation: arg.aggregation,
         chartConfig: workbenchState.chartConfig,
-        chartGraphId: arg.graphId,
-        computedFields: workbenchState.currentDataView?.computedFields || [],
-      } as ChartConfigDTO);
+        graphId: arg.graphId,
+        index: arg.index,
+        parentId: arg.parentId,
+        name: arg.name,
+        viewId: arg.viewId,
+        computedFields: workbenchState.currentDataView?.computedFields,
+      });
 
       const response = await request<{
         data: boolean;
       }>({
         method: 'PUT',
         url: `viz/datacharts/${arg.chartId}`,
-        data: {
-          id: arg.chartId,
-          index: arg.index,
-          parent: arg.parentId,
-          name: arg.name,
-          viewId: arg.viewId,
-          config: stringConfig,
-          permissions: [],
-        },
+        data: requestBody,
       });
       return response.data;
     } catch (error) {

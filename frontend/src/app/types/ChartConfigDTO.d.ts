@@ -17,19 +17,20 @@
  */
 
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
-import { ChartDataSectionConfig } from './ChartConfig';
 
 export type ChartStyleConfigDTO = {
-  label: string; // TODO(Stephen): to be check if needed
   key: string;
   value?: any;
   rows?: ChartStyleConfigDTO[];
 };
 
-export type ChartDataConfigDTO = ChartDataSectionConfig & {};
+export type ChartDataConfigDTO = {
+  key: string;
+  rows?: ChartDataSectionConfig[];
+};
 
 export type ChartConfigDTO = {
-  datas?: ChartDataSectionConfig[];
+  datas?: ChartDataConfigDTO[];
   styles?: ChartStyleConfigDTO[];
   settings?: ChartStyleConfigDTO[];
 };
