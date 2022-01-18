@@ -25,8 +25,6 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { StateWithHistory } from 'redux-undo';
 
-// import { Dashboard } from '../../Dashboard/types';
-// Dashboard 编辑器 redux 状态
 export interface EditBoardState {
   stack: EditBoardStack;
   boardInfo: BoardInfo;

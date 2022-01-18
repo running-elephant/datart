@@ -192,7 +192,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
     }
 
     default void notFoundException() {
-        Exceptions.notFound("resource.not-exist", getResourcePropertyName());
+        Exceptions.notFound(getResourcePropertyName());
     }
 
 

@@ -29,6 +29,7 @@ import {
   ControllerFacadeTypes as Opt,
   TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
+import i18next from 'i18next';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
 import { TIME_FORMATTER } from './../../../../../../../globalConstants';
@@ -38,7 +39,6 @@ import {
   RangeControlTypes,
 } from './constants';
 import { ControllerConfig, PickerType } from './types';
-
 export const getStringFacadeOptions = (type: ValueOptionType) => {
   switch (type) {
     case 'common':
@@ -335,13 +335,13 @@ export const rangeNumberValidator = async (_, values: any[]) => {
     return Promise.resolve(values);
   }
   if (!startHasValue && endHasValue) {
-    return Promise.reject(new Error('请填写 起始值'));
+    return Promise.reject(new Error(i18next.t('viz.tips.noStartValue')));
   }
   if (startHasValue && !endHasValue) {
-    return Promise.reject(new Error('请填写 结束值'));
+    return Promise.reject(new Error(i18next.t('viz.tips.noEndValue')));
   }
   if (values?.[0] - values?.[1] > 0) {
-    return Promise.reject(new Error(' 起始值 不该小于 结束值'));
+    return Promise.reject(new Error(i18next.t('viz.tips.endGTStartErr')));
   }
   return Promise.resolve(values);
 };

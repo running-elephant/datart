@@ -19,10 +19,6 @@ import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetCore/Widget
 import { RGL_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
-import {
-  Widget,
-  WidgetInfo,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
 import React, { memo, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
@@ -31,11 +27,7 @@ import WidgetToolBar from '../../../components/WidgetToolBar';
 import BlockMaskLayer from '../components/BlockMaskLayer';
 import WidgetDndHandleMask from '../components/WidgetDndHandleMask';
 
-type GridItemProps = {
-  widget?: Widget;
-  widgetInfo?: WidgetInfo;
-};
-export const WidgetOfAutoEdit: React.FC<GridItemProps> = memo(() => {
+export const WidgetOfAutoEdit: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const widgetInfo = useContext(WidgetInfoContext);
   const ssp = e => {

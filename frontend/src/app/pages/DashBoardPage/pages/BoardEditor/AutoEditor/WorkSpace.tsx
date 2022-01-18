@@ -41,10 +41,6 @@ const WorkSpace: React.FC<WorkSpaceProps> = memo(() => {
   } = useSelector(selectEditBoard) as Dashboard;
   return (
     <Wrap bg={background}>
-      {/* TODO */}
-
-      {/* <BoardFilterBox /> */}
-
       <RGridLayout>
         {layoutWidgetConfigs.map(widget => {
           return (

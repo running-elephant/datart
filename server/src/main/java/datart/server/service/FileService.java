@@ -11,4 +11,6 @@ public interface FileService {
 
     boolean deleteFiles(FileOwner fileOwner, String relId);
 
+    String getBasePath(FileOwner owner,String id);
+
 }
