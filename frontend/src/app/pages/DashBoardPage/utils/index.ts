@@ -16,12 +16,16 @@
  * limitations under the License.
  */
 
+import { migrateChartConfig } from 'app/migration';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
+import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { IChart } from 'app/types/Chart';
 import {
   ChartDataSectionField,
   ChartDataSectionType,
 } from 'app/types/ChartConfig';
+import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { transformToViewConfig } from 'app/types/ChartDataRequest';
 import ChartDataView, {
   ChartDataViewFieldCategory,
@@ -31,6 +35,7 @@ import {
   ControllerFacadeTypes,
   TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
+import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { getTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
@@ -93,13 +98,21 @@ export const getRGBAColor = color => {
 };
 
 export const getChartDataRequestBuilder = (dataChart: DataChart) => {
+  const chartInstance = ChartManager.instance().getById(
+    dataChart.config.chartGraphId,
+  ) as IChart;
+
+  const chartConfig = mergeToChartConfig(
+    chartInstance?.config,
+    migrateChartConfig(dataChart?.config as ChartDetailConfigDTO),
+  );
   const builder = new ChartDataRequestBuilder(
     {
       id: dataChart?.viewId,
       computedFields: dataChart?.config?.computedFields || [],
     } as any,
-    dataChart?.config?.chartConfig?.datas,
-    dataChart?.config?.chartConfig?.settings,
+    chartConfig?.datas,
+    chartConfig?.settings,
     {},
     false,
     dataChart?.config?.aggregation,
@@ -396,12 +409,13 @@ export const getChartWidgetRequestParams = (obj: {
     // errorHandle(`can\`t find View ${dataChart?.viewId}`);
     return null;
   }
-
+  console.log(`_Params__${dataChart.name}`, dataChart.config);
   const builder = getChartDataRequestBuilder(dataChart);
   let requestParams = builder
     .addExtraSorters((option?.sorters as any) || [])
     .build();
   const viewConfig = transformToViewConfig(chartDataView?.config);
+  // console.log(`_requestParams${dataChart.name}`, requestParams);
   requestParams = { ...requestParams, ...viewConfig };
 
   const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
