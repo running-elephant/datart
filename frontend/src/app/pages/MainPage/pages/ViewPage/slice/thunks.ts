@@ -32,6 +32,7 @@ import {
   generateEditingView,
   generateNewEditingViewName,
   getSaveParamsFromViewModel,
+  handleViewData,
   isNewView,
 } from '../utils';
 import {
@@ -115,34 +116,12 @@ export const getViewDetail = createAsyncThunk<
       name: viewSimple?.name || i18n.t('view.loading'),
       stage: ViewViewModelStages.Loading,
     });
+
     dispatch(viewActions.addEditingView(tempViewModel));
 
     try {
       const { data } = await request<View>(`/views/${viewId}`);
-      const {
-        config,
-        model,
-        variables,
-        relVariableSubjects,
-        relSubjectColumns,
-        ...rest
-      } = data;
-      return {
-        ...tempViewModel,
-        ...rest,
-        config: JSON.parse(config),
-        model: JSON.parse(model),
-        originVariables: variables.map(v => ({ ...v, relVariableSubjects })),
-        variables: variables.map(v => ({ ...v, relVariableSubjects })),
-        originColumnPermissions: relSubjectColumns.map(r => ({
-          ...r,
-          columnPermission: JSON.parse(r.columnPermission),
-        })),
-        columnPermissions: relSubjectColumns.map(r => ({
-          ...r,
-          columnPermission: JSON.parse(r.columnPermission),
-        })),
-      };
+      return handleViewData(data, tempViewModel);
     } catch (error) {
       return rejectHandle(error, rejectWithValue);
     }
@@ -196,20 +175,21 @@ export const saveView = createAsyncThunk<
   ViewViewModel,
   SaveViewParams,
   { state: RootState }
->('view/saveView', async ({ resolve }, { getState }) => {
-  const currentEditingView = selectCurrentEditingView(
-    getState(),
-  ) as ViewViewModel;
+>('view/saveView', async ({ resolve, isSaveAs, currentView }, { getState }) => {
+  const currentEditingView = isSaveAs
+    ? (currentView as ViewViewModel)
+    : (selectCurrentEditingView(getState()) as ViewViewModel);
   const orgId = selectOrgId(getState());
 
   try {
-    if (isNewView(currentEditingView.id)) {
+    if (isNewView(currentEditingView.id) || isSaveAs) {
       const { data } = await request<View>({
         url: '/views',
         method: 'POST',
         data: getSaveParamsFromViewModel(orgId, currentEditingView),
       });
       resolve && resolve();
+
       return {
         ...currentEditingView,
         ...data,
@@ -219,6 +199,7 @@ export const saveView = createAsyncThunk<
           ...v,
           relVariableSubjects: data.relVariableSubjects,
         })),
+        isSaveAs,
       };
     } else {
       await request<View>({

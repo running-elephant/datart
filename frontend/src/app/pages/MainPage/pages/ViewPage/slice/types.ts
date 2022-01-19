@@ -88,6 +88,7 @@ export interface ViewViewModel<T = object>
   previewResults: T[];
   error: string;
   fragment: string;
+  isSaveAs?: Boolean;
 }
 
 export interface QueryResult {
@@ -139,6 +140,8 @@ export interface VariableHierarchy extends Variable {
 
 export interface SaveViewParams {
   resolve?: () => void;
+  isSaveAs?: Boolean;
+  currentView?: ViewViewModel;
 }
 
 export interface UpdateViewBaseParams {

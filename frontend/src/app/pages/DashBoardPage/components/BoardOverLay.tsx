@@ -15,7 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CloudDownloadOutlined, ShareAltOutlined } from '@ant-design/icons';
+import {
+  CloudDownloadOutlined,
+  CopyFilled,
+  ShareAltOutlined,
+} from '@ant-design/icons';
 import { Menu, Popconfirm } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useContext, useMemo } from 'react';
@@ -24,12 +28,21 @@ export interface BoardOverLayProps {
   onOpenShareLink?: () => void;
   onBoardToDownLoad: () => void;
   onShareDownloadData?: () => void;
+  onSaveAsVizs?: () => void;
 }
 
 export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
-  ({ onOpenShareLink, onBoardToDownLoad, onShareDownloadData }) => {
+  ({
+    onOpenShareLink,
+    onBoardToDownLoad,
+    onShareDownloadData,
+    onSaveAsVizs,
+  }) => {
     const t = useI18NPrefix(`viz.action`);
-    const { allowShare, allowDownload, renderMode } = useContext(BoardContext);
+    const tg = useI18NPrefix(`global`);
+    const { allowShare, allowDownload, renderMode, allowManage } =
+      useContext(BoardContext);
+
     const renderList = useMemo(
       () => [
         {
@@ -64,15 +77,26 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
             </Popconfirm>
           ),
         },
+        {
+          key: 'saveAs',
+          icon: <CopyFilled />,
+          onClick: onSaveAsVizs,
+          disabled: false,
+          render: allowManage,
+          content: tg('button.saveAs'),
+        },
       ],
       [
         onOpenShareLink,
         allowShare,
         renderMode,
-        t,
         allowDownload,
         onBoardToDownLoad,
         onShareDownloadData,
+        allowManage,
+        onSaveAsVizs,
+        tg,
+        t,
       ],
     );
     const actionItems = useMemo(

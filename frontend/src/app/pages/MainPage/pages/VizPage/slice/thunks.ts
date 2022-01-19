@@ -36,6 +36,7 @@ import {
   AddStoryboardParams,
   AddVizParams,
   ChartPreview,
+  CopyDashboardParams,
   DeleteStoryboardParams,
   DeleteVizParams,
   EditFolderParams,
@@ -397,5 +398,23 @@ export const updateFilterAndFetchDataset = createAsyncThunk(
     return {
       backendChartId: arg.backendChartId,
     };
+  },
+);
+
+export const copyDashboard = createAsyncThunk<Folder, CopyDashboardParams>(
+  'viz/copyDashboard',
+  async ({ viz, dashboardId, resolve }) => {
+    try {
+      const { data } = await request<Folder>({
+        url: `/viz/dashboards/${dashboardId}/copy`,
+        method: 'PUT',
+        data: viz,
+      });
+      resolve();
+      return data;
+    } catch (error) {
+      errorHandle(error);
+      throw error;
+    }
   },
 );

@@ -1,3 +1,5 @@
+import { request } from 'utils/request';
+import { errorHandle } from 'utils/utils';
 import {
   PermissionLevels,
   ResourceTypes,
@@ -45,4 +47,17 @@ export function allowManageStoryboard(id?: string) {
     id,
     level: PermissionLevels.Manage,
   };
+}
+
+export async function getVizDetail(backendChartId: string, type: string) {
+  try {
+    const { data } = await request<any>({
+      method: 'GET',
+      url: `viz/${type.toLowerCase()}s/${backendChartId}`,
+    });
+    return data;
+  } catch (error) {
+    errorHandle(error);
+    return {} as any;
+  }
 }

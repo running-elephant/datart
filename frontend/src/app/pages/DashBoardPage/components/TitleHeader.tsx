@@ -76,8 +76,12 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
       renderMode,
       allowManage,
     } = useContext(BoardContext);
-    const { updateBoard, onGenerateShareLink, onBoardToDownLoad } =
-      useContext(BoardActionContext);
+    const {
+      updateBoard,
+      onGenerateShareLink,
+      onBoardToDownLoad,
+      onSaveAsVizs,
+    } = useContext(BoardActionContext);
     const { saving } = useContext(BoardInfoContext);
 
     const onOpenShareLink = useCallback(() => {
@@ -161,6 +165,7 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                       onOpenShareLink={onOpenShareLink}
                       onBoardToDownLoad={onBoardToDownLoad}
                       onShareDownloadData={onShareDownloadData}
+                      onSaveAsVizs={onSaveAsVizs}
                     />
                   }
                   placement="bottomCenter"

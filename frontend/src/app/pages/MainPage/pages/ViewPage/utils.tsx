@@ -17,14 +17,15 @@
  */
 
 import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
-import { getDiffParams, getTextWidth } from 'utils/utils';
+import { request } from 'utils/request';
+import { errorHandle, getDiffParams, getTextWidth } from 'utils/utils';
 import {
   ColumnCategories,
   DEFAULT_PREVIEW_SIZE,
   UNPERSISTED_ID_PREFIX,
   ViewViewModelStages,
 } from './constants';
-import { Column, Model, QueryResult, ViewViewModel } from './slice/types';
+import { Column, Model, QueryResult, View, ViewViewModel } from './slice/types';
 
 export function generateEditingView(
   attrs?: Partial<ViewViewModel>,
@@ -261,4 +262,42 @@ export function getSaveParamsFromViewModel(
       })),
     };
   }
+}
+
+export async function getViewData(viewId): Promise<View> {
+  try {
+    const { data } = await request<View>(`/views/${viewId}`);
+    return data;
+  } catch (error) {
+    errorHandle(error);
+    return {} as View;
+  }
+}
+
+export function handleViewData(data, tempViewModel?: object): ViewViewModel {
+  const {
+    config,
+    model,
+    variables,
+    relVariableSubjects,
+    relSubjectColumns,
+    ...rest
+  } = data;
+
+  return {
+    ...tempViewModel,
+    ...rest,
+    config: JSON.parse(config),
+    model: JSON.parse(model),
+    originVariables: variables.map(v => ({ ...v, relVariableSubjects })),
+    variables: variables.map(v => ({ ...v, relVariableSubjects })),
+    originColumnPermissions: relSubjectColumns.map(r => ({
+      ...r,
+      columnPermission: JSON.parse(r.columnPermission),
+    })),
+    columnPermissions: relSubjectColumns.map(r => ({
+      ...r,
+      columnPermission: JSON.parse(r.columnPermission),
+    })),
+  };
 }

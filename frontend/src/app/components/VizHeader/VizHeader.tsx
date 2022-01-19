@@ -44,6 +44,7 @@ const VizHeader: FC<{
   onPublish?: () => void;
   onGenerateShareLink?: (date, usePwd?) => any;
   onDownloadData?;
+  onSaveAsVizs?;
   allowDownload?: boolean;
   allowShare?: boolean;
   allowManage?: boolean;
@@ -58,6 +59,7 @@ const VizHeader: FC<{
     onGotoEdit,
     onGenerateShareLink,
     onDownloadData,
+    onSaveAsVizs,
     allowDownload,
     allowShare,
     allowManage,
@@ -78,8 +80,10 @@ const VizHeader: FC<{
         <VizOperationMenu
           onShareLinkClick={onGenerateShareLink && handleOpenShareLinkModal}
           onDownloadDataLinkClick={onDownloadData}
+          onSaveAsVizs={onSaveAsVizs}
           allowDownload={allowDownload}
           allowShare={allowShare}
+          allowManage={allowManage}
         />
       );
     };

@@ -7,6 +7,7 @@ import { reduxActionErrorHandler, uuidv4 } from 'utils/utils';
 import {
   addStoryboard,
   addViz,
+  copyDashboard,
   deleteViz,
   editFolder,
   editStoryboard,
@@ -24,7 +25,6 @@ import {
 } from './thunks';
 import { ArchivedViz, VizState, VizTab } from './types';
 import { transferChartConfig } from './utils';
-
 export const initialState: VizState = {
   vizs: [],
   storyboards: [],
@@ -68,7 +68,6 @@ const slice = createSlice({
             : '';
       }
     },
-
 
     updateChartPreviewFilter(
       state,
@@ -429,6 +428,18 @@ const slice = createSlice({
           }
         }
       }
+    });
+
+    // Copy Dashboard
+    builder.addCase(copyDashboard.pending, state => {
+      state.saveFolderLoading = true;
+    });
+    builder.addCase(copyDashboard.fulfilled, (state, action) => {
+      state.saveFolderLoading = false;
+      state.vizs.push({ ...action.payload, deleteLoading: false });
+    });
+    builder.addCase(copyDashboard.rejected, state => {
+      state.saveFolderLoading = false;
     });
 
     // addStoryboard

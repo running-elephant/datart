@@ -16,7 +16,12 @@
  * limitations under the License.
  */
 
-import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
+import {
+  CopyFilled,
+  DeleteOutlined,
+  EditOutlined,
+  MoreOutlined,
+} from '@ant-design/icons';
 import { Menu, message, Popconfirm, TreeDataNode } from 'antd';
 import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -32,6 +37,7 @@ import {
   PermissionLevels,
   ResourceTypes,
 } from '../../PermissionPage/constants';
+import { useSaveAsView } from '../hooks/useSaveAsView';
 import { SaveFormContext } from '../SaveFormContext';
 import {
   selectCurrentEditingViewKey,
@@ -57,8 +63,9 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
   const currentEditingViewKey = useSelector(selectCurrentEditingViewKey);
   const orgId = useSelector(selectOrgId);
   const viewsData = useSelector(selectViews);
-  const t = useI18NPrefix('view.saveForm');
+  const t = useI18NPrefix('view');
   const tg = useI18NPrefix('global');
+  const saveAsView = useSaveAsView();
 
   useEffect(() => {
     dispatch(getViews(orgId));
@@ -111,7 +118,7 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                 name,
                 parentId,
               },
-              parentIdLabel: t('folder'),
+              parentIdLabel: t('saveForm.folder'),
               onSave: (values, onClose) => {
                 if (isParentIdEqual(parentId, values.parentId)) {
                   index = getInsertedNodeIndex(values, viewsData);
@@ -133,21 +140,25 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
             break;
           case 'delete':
             break;
+          case 'saveAs':
+            saveAsView(id);
+            break;
           default:
             break;
         }
       },
-    [dispatch, showSaveForm, viewsData, t],
+    [dispatch, showSaveForm, viewsData, t, saveAsView],
   );
 
   const renderTreeTitle = useCallback(
     node => {
+      const { title, path, isFolder, id } = node;
       return (
         <TreeTitle>
-          <h4>{`${node.title}`}</h4>
+          <h4>{`${title}`}</h4>
           <CascadeAccess
             module={ResourceTypes.View}
-            path={node.path}
+            path={path}
             level={PermissionLevels.Manage}
           >
             <Popup
@@ -165,21 +176,29 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                   >
                     {tg('button.info')}
                   </MenuListItem>
+
+                  {!isFolder && (
+                    <MenuListItem
+                      key="saveAs"
+                      prefix={<CopyFilled className="icon" />}
+                    >
+                      {tg('button.saveAs')}
+                    </MenuListItem>
+                  )}
+
                   <MenuListItem
                     key="delete"
                     prefix={<DeleteOutlined className="icon" />}
                   >
                     <Popconfirm
                       title={
-                        node.isFolder
+                        isFolder
                           ? tg('operation.deleteConfirm')
                           : tg('operation.archiveConfirm')
                       }
-                      onConfirm={archive(node.id, node.isFolder)}
+                      onConfirm={archive(id, isFolder)}
                     >
-                      {node.isFolder
-                        ? tg('button.delete')
-                        : tg('button.archive')}
+                      {isFolder ? tg('button.delete') : tg('button.archive')}
                     </Popconfirm>
                   </MenuListItem>
                 </Menu>

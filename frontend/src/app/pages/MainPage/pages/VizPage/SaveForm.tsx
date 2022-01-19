@@ -126,7 +126,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
       >
         <Input />
       </Form.Item>
-      {vizType === 'DATACHART' && (
+      {vizType === 'DATACHART' && !(type === CommonFormTypes.SaveAs) && (
         <Form.Item name="description" label={t('description')}>
           <Input.TextArea />
         </Form.Item>

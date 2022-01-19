@@ -1,12 +1,10 @@
-import {
-  transformToViewConfig,
-} from 'app/types/ChartDataRequest';
-import { ChartDataRequestBuilder } from "app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder";
+import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ChartDataSectionField,
   ChartDataSectionType,
 } from 'app/types/ChartConfig';
+import { transformToViewConfig } from 'app/types/ChartDataRequest';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -19,6 +17,7 @@ import { getTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
 import moment from 'moment';
+import { ChartDataRequestFilter } from '../../../types/ChartDataRequest';
 import { STORAGE_IMAGE_KEY_PREFIX } from '../constants';
 import {
   BoardLinkFilter,
@@ -32,7 +31,6 @@ import {
   ControllerConfig,
   ControllerDate,
 } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
-import { ChartDataRequestFilter } from '../../../types/ChartDataRequest';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
 
@@ -465,7 +463,9 @@ export const getChartWidgetRequestParams = (obj: {
 };
 
 //  filter 去重
-export const getDistinctFiltersByColumn = (filter: ChartDataRequestFilter[]) => {
+export const getDistinctFiltersByColumn = (
+  filter: ChartDataRequestFilter[],
+) => {
   if (!filter) {
     return [] as ChartDataRequestFilter[];
   }

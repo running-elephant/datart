@@ -1,4 +1,9 @@
-import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
+import {
+  CopyFilled,
+  DeleteOutlined,
+  EditOutlined,
+  MoreOutlined,
+} from '@ant-design/icons';
 import { Menu, message, Popconfirm } from 'antd';
 import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
@@ -15,6 +20,7 @@ import {
   PermissionLevels,
   ResourceTypes,
 } from '../../../PermissionPage/constants';
+import { useSaveAsViz } from '../../hooks/useSaveAsViz';
 import { SaveFormContext } from '../../SaveFormContext';
 import { selectVizListLoading, selectVizs } from '../../slice/selectors';
 import {
@@ -34,13 +40,14 @@ export function FolderTree({
   treeData,
   i18nPrefix,
 }: FolderTreeProps) {
+  const tg = useI18NPrefix('global');
   const dispatch = useDispatch();
   const history = useHistory();
   const orgId = useSelector(selectOrgId);
   const loading = useSelector(selectVizListLoading);
   const vizsData = useSelector(selectVizs);
   const { showSaveForm } = useContext(SaveFormContext);
-  const tg = useI18NPrefix('global');
+  const saveAsViz = useSaveAsViz();
 
   useEffect(() => {
     dispatch(getFolders(orgId));
@@ -124,21 +131,26 @@ export function FolderTree({
             break;
           case 'delete':
             break;
+          case 'saveAs':
+            saveAsViz(node.relId, node.relType);
+            break;
           default:
             break;
         }
       },
-    [dispatch, showSaveForm, vizsData],
+    [dispatch, showSaveForm, vizsData, saveAsViz],
   );
 
   const renderTreeTitle = useCallback(
     node => {
+      const { isFolder, title, path, relType } = node;
+
       return (
         <TreeTitle>
-          <h4>{`${node.title}`}</h4>
+          <h4>{`${title}`}</h4>
           <CascadeAccess
             module={ResourceTypes.Viz}
-            path={node.path}
+            path={path}
             level={PermissionLevels.Manage}
           >
             <Popup
@@ -156,19 +168,29 @@ export function FolderTree({
                   >
                     {tg('button.info')}
                   </MenuListItem>
+
+                  {!isFolder && (
+                    <MenuListItem
+                      key="saveAs"
+                      prefix={<CopyFilled className="icon" />}
+                    >
+                      {tg('button.saveAs')}
+                    </MenuListItem>
+                  )}
+
                   <MenuListItem
                     key="delete"
                     prefix={<DeleteOutlined className="icon" />}
                   >
                     <Popconfirm
                       title={`${
-                        node.relType === 'FOLDER'
+                        relType === 'FOLDER'
                           ? tg('operation.deleteConfirm')
                           : tg('operation.archiveConfirm')
                       }？`}
                       onConfirm={archiveViz(node)}
                     >
-                      {node.relType === 'FOLDER'
+                      {relType === 'FOLDER'
                         ? tg('button.delete')
                         : tg('button.archive')}
                     </Popconfirm>
