@@ -112,7 +112,7 @@ public class VizController extends BaseController {
 
     @ApiOperation(value = "copy a dashboard")
     @PutMapping(value = "/dashboards/{dashboardId}/copy")
-    public ResponseData<DashboardDetail> copyDashboard(@PathVariable String dashboardId, @RequestBody DashboardCreateParam createParam) throws IOException {
+    public ResponseData<Folder> copyDashboard(@PathVariable String dashboardId, @RequestBody DashboardCreateParam createParam) throws IOException {
         return ResponseData.success(vizService.copyDashboard(createParam));
     }
 
