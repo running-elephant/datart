@@ -206,6 +206,8 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
 
         DashboardDetail copy = getDashboardDetail(dashboard.getId());
 
+        BeanUtils.copyProperties(dashboard, copy);
+
         // copy database records
         if (CollectionUtils.isNotEmpty(copy.getWidgets())) {
             HashMap<String, String> widgetIdMapping = new HashMap<>();
