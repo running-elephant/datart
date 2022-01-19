@@ -31,8 +31,8 @@ import {
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
-import { View } from "app/types/View";
 import ChartDataView from 'app/types/ChartDataView';
+import { View } from 'app/types/View';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
