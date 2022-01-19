@@ -799,7 +799,7 @@ export const getWidgetMapByServer = (
     return acc;
   }, {} as Record<string, DataChart>);
   const widgetMap = widgets.reduce((acc, cur) => {
-    // issues 601
+    // issues #601
     const chartViewId = dataChartMap[cur.datachartId]?.viewId;
     const viewIds = chartViewId ? [chartViewId] : cur.viewIds;
     try {
@@ -914,7 +914,9 @@ export const getWidgetMapByServer = (
     .filter(w => w.config.content.type === 'widgetChart')
     .forEach(widget => {
       let content = widget.config.content as ChartWidgetContent;
-      widget.datachartId = content.dataChart?.id || '';
+      const self_dataChartId = `widget_${widget.dashboardId}_${widget.id}`;
+      content.dataChart!.id = self_dataChartId;
+      widget.datachartId = self_dataChartId;
       wrappedDataCharts.push(content.dataChart!);
       delete content.dataChart;
     });
