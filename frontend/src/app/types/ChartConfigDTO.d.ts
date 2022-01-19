@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionField } from 'app/types/ChartConfig';
+import { ChartDataConfig } from 'app/types/ChartConfig';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 
 export type ChartStyleConfigDTO = {
@@ -25,10 +25,7 @@ export type ChartStyleConfigDTO = {
   rows?: ChartStyleConfigDTO[];
 };
 
-export type ChartDataConfigDTO = {
-  key: string;
-  rows?: ChartDataSectionField[];
-};
+export type ChartDataConfigDTO = ChartDataConfig & {};
 
 export type ChartConfigDTO = {
   datas?: ChartDataConfigDTO[];

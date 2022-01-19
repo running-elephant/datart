@@ -16,11 +16,7 @@
  * limitations under the License.
  */
 
-import {
-  ChartConfig,
-  ChartDataConfig,
-  ChartStyleConfig,
-} from 'app/types/ChartConfig';
+import { ChartConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartConfigDTO, ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
@@ -74,19 +70,10 @@ export function extractChartConfigValueModel(
   config: ChartConfig,
 ): ChartConfigDTO {
   return {
-    datas: getDataValueModel(config?.datas),
+    datas: config?.datas,
     styles: getStyleValueModel(config?.styles),
     settings: getStyleValueModel(config?.settings),
   };
-}
-
-function getDataValueModel(datas?: ChartDataConfig[]) {
-  return (datas || []).map(d => {
-    return {
-      key: d.key,
-      rows: d.rows,
-    };
-  });
 }
 
 function getStyleValueModel(styles?: ChartStyleConfig[]) {
@@ -123,4 +110,14 @@ export function mergeToChartConfig(
     source?.chartConfig?.settings,
   );
   return target;
+}
+
+export function convertToChartConfigDTO(
+  source?: ChartDetailConfigDTO,
+): ChartConfigDTO {
+  return {
+    datas: source?.chartConfig?.datas,
+    styles: source?.chartConfig?.styles,
+    settings: source?.chartConfig?.settings,
+  };
 }
