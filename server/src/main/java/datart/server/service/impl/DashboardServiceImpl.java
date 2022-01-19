@@ -200,7 +200,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     }
 
     @Override
-    public DashboardDetail copyDashboard(DashboardCreateParam dashboard) throws IOException {
+    public Folder copyDashboard(DashboardCreateParam dashboard) throws IOException {
 
         Folder folder = createWithFolder(dashboard);
 
@@ -255,7 +255,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         if (src.exists()) {
             FileSystemUtils.copyRecursively(src, new File(distPath));
         }
-        return copy;
+        return folder;
     }
 
 

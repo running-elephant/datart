@@ -275,7 +275,7 @@ public class VizServiceImpl extends BaseService implements VizService {
 
     @Override
     @Transactional
-    public DashboardDetail copyDashboard(DashboardCreateParam createParam) throws IOException {
+    public Folder copyDashboard(DashboardCreateParam createParam) throws IOException {
         return dashboardService.copyDashboard(createParam);
     }
 

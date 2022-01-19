@@ -17,7 +17,7 @@ public class DashboardBaseInfo {
 
     private Boolean isFolder;
 
-    private Integer index;
+    private Double index;
 
     public DashboardBaseInfo(Dashboard dashboard) {
         BeanUtils.copyProperties(dashboard, this);
