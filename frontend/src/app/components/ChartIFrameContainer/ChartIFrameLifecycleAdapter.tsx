@@ -178,7 +178,7 @@ const ChartIFrameLifecycleAdapter: FC<{
 
   return (
     <Spin
-      spinning={containerStatus !== ContainerStatus.SUCCESS}
+      spinning={containerStatus === ContainerStatus.LOADING}
       indicator={<LoadingOutlined spin />}
       delay={500}
     >

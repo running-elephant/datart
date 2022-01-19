@@ -479,20 +479,22 @@ const slice = createSlice({
       const index = state.chartPreviews?.findIndex(
         c => c.backendChartId === newChartDto?.id,
       );
+      const currentChart = ChartManager.instance().getById(
+        newChartDto?.config?.chartGraphId,
+      );
       if (index < 0) {
-        const currentChart = ChartManager.instance().getById(
-          newChartDto?.config?.chartGraphId,
-        );
         state.chartPreviews.push({
           backendChartId: newChartDto?.id,
           backendChart: newChartDto,
-          chartConfig: transferChartConfig(
-            mergeToChartConfig(
-              currentChart?.config,
-              migrateChartConfig(newChartDto?.config),
-            ),
-            filterSearchParams,
-          ),
+          chartConfig: currentChart
+            ? transferChartConfig(
+                mergeToChartConfig(
+                  currentChart?.config,
+                  migrateChartConfig(newChartDto?.config),
+                ),
+                filterSearchParams,
+              )
+            : undefined,
         });
       } else {
         const prevChartPreview = state.chartPreviews[index];
@@ -501,7 +503,7 @@ const slice = createSlice({
           backendChart: newChartDto,
           chartConfig: transferChartConfig(
             mergeToChartConfig(
-              prevChartPreview?.chartConfig,
+              prevChartPreview?.chartConfig || currentChart?.config,
               migrateChartConfig(newChartDto?.config),
             ),
             filterSearchParams,
