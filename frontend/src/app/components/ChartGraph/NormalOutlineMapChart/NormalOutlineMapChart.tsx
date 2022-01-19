@@ -26,7 +26,7 @@ class NormalOutlineMapChart extends BasicOutlineMapChart {
   constructor() {
     super({
       id: 'normal-outline-map-chart',
-      name: '普通轮廓地图',
+      name: 'viz.palette.graph.names.normalOutlineMap',
       icon: 'ditu',
     });
   }

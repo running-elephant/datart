@@ -47,7 +47,7 @@ class BasicPieChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'pie',
-      props?.name || 'Basic Pie Chart',
+      props?.name || 'viz.palette.graph.names.pieChart',
       props?.icon || 'chartpie',
     );
     this.meta.requirements = props?.requirements || [

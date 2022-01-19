@@ -16,23 +16,23 @@
  * limitations under the License.
  */
 
-import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartConfig,ChartDataSectionType } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import {
-  getAxisLabel,
-  getAxisLine,
-  getAxisTick,
-  getColumnRenderName,
-  getCustomSortableColumns,
-  getExtraSeriesDataFormat,
-  getExtraSeriesRowData,
-  getGridStyle,
-  getReference,
-  getSeriesTooltips4Rectangular,
-  getSplitLine,
-  getStyles,
-  getValueByColumnKey,
-  transformToObjectArray,
+getAxisLabel,
+getAxisLine,
+getAxisTick,
+getColumnRenderName,
+getCustomSortableColumns,
+getExtraSeriesDataFormat,
+getExtraSeriesRowData,
+getGridStyle,
+getReference,
+getSeriesTooltips4Rectangular,
+getSplitLine,
+getStyles,
+getValueByColumnKey,
+transformToObjectArray
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
@@ -45,7 +45,11 @@ class BasicDoubleYChart extends Chart {
   chart: any = null;
 
   constructor() {
-    super('double-y', '双Y轴图', 'fsux_tubiao_shuangzhoutu');
+    super(
+      'double-y',
+      'viz.palette.graph.names.doubleYChart',
+      'fsux_tubiao_shuangzhoutu',
+    );
     this.meta.requirements = [
       {
         group: 1,

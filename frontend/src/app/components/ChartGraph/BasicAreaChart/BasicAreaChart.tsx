@@ -42,7 +42,7 @@ class BasicAreaChart extends Chart {
   };
 
   constructor() {
-    super('area', 'Basic Area Chart', 'area-chart');
+    super('area', 'viz.palette.graph.names.areaChart', 'area-chart');
   }
 
   onMount(options, context): void {

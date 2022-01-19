@@ -27,7 +27,7 @@ class ClusterColumnChart extends BasicBarChart {
   constructor() {
     super({
       id: 'cluster-column-chart',
-      name: '柱状图',
+      name: 'viz.palette.graph.names.clusterColumnChart',
       icon: 'fsux_tubiao_zhuzhuangtu1',
     });
   }

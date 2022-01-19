@@ -25,7 +25,7 @@ class MingXiTableChart extends BasicTableChart {
   constructor() {
     super({
       id: 'mingxi-table',
-      name: '@global@.chart.name',
+      name: 'viz.palette.graph.names.table',
       icon: 'mingxibiao',
     });
   }

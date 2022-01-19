@@ -647,6 +647,35 @@
         "needMore": "至少还需要 {{num}} 个 {{type}}"
       },
       "graph": {
+        "names": {
+          "table": "表格",
+          "areaChart": "区域图",
+          "barChart": "条形图",
+          "doubleYChart": "双Y轴图",
+          "funnelChart": "漏斗图",
+          "gaugeChart": "仪表盘",
+          "lineChart": "折线图",
+          "outlineMap": "轮廓地图",
+          "pieChart": "饼图",
+          "radarChart": "雷达图",
+          "richText": "富文本",
+          "scatterChart": "散点图",
+          "clusterBarChart": "条形图",
+          "clusterColumnChart": "柱状图",
+          "doughnutChart": "环形图",
+          "normalOutlineMap": "普通轮廓地图",
+          "percentageStackBarChart": "百分比堆叠条形图",
+          "percentageStackColumnChart": "百分比堆叠柱状图",
+          "pivotSheet": "透视表",
+          "roseChart": "玫瑰图",
+          "scatterOutlineMap": "气泡轮廓地图",
+          "scoreChart": "翻牌器",
+          "stackAreaChart": "堆叠面积图",
+          "stackBarChart": "堆叠条形图",
+          "stackColumnChart": "堆叠柱状图",
+          "waterfallChart": "瀑布图",
+          "wordCloudChart": "词云"
+        },
         "group": "维度",
         "aggregate": "指标",
         "onlyAllow": "{{type}} 仅允许数量为 {{num}}",
@@ -851,10 +880,10 @@
       "scaleFull": "全屏铺满",
       "noScale": "实际尺寸"
     },
-    "tips":{
-      "noStartValue":"请填写 起始值",
-      "noEndValue":"请填写 结束值",
-      "endGTStartErr":"起始值 该小于 结束值"
+    "tips": {
+      "noStartValue": "请填写 起始值",
+      "noEndValue": "请填写 结束值",
+      "endGTStartErr": "起始值 该小于 结束值"
     },
     "control": {
       "title": "控制器标题",
@@ -869,7 +898,7 @@
       "showMark": "显示标签",
       "common": "常规",
       "custom": "自定义",
-      "optionLabelField":"取值文本字段"
+      "optionLabelField": "取值文本字段"
     },
     "date": {
       "year": "年",

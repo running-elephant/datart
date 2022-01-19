@@ -45,7 +45,7 @@ class BasicRichText extends ReactChart {
   constructor(props?) {
     super(ChartRichTextAdapter, {
       id: props?.id || 'react-rich-text',
-      name: props?.name || '富文本',
+      name: props?.name || 'viz.palette.graph.names.richText',
       icon: props?.icon || 'rich-text',
     });
     this.meta.requirements = props?.requirements || [

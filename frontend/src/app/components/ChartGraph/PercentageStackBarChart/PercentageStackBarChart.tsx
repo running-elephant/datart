@@ -29,7 +29,7 @@ class PercentageStackBarChart extends BasicBarChart {
   constructor() {
     super({
       id: 'percentage-stack-bar-chart',
-      name: '百分比堆叠条形图',
+      name: 'viz.palette.graph.names.percentageStackBarChart',
       icon: 'fsux_tubiao_baifenbiduijitiaoxingtu',
     });
   }

@@ -29,7 +29,7 @@ class StackColumnChart extends BasicBarChart {
   constructor() {
     super({
       id: 'stack-column-chart',
-      name: '堆叠柱状图',
+      name: 'viz.palette.graph.names.stackColumnChart',
       icon: 'fsux_tubiao_duijizhuzhuangtu',
     });
   }

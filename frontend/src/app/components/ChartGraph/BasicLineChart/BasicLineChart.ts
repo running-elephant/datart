@@ -52,7 +52,7 @@ class BasicLineChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'line',
-      props?.name || 'Basic Line Chart',
+      props?.name || 'viz.palette.graph.names.lineChart',
       props?.icon || 'chart-line',
     );
     this.meta.requirements = props?.requirements || [

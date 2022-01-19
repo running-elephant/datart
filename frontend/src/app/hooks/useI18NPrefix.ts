@@ -50,18 +50,10 @@ function usePrefixI18N(prefix?: string) {
         );
       }
 
-      console.log(
-        `translationKey ---> `,
-        prefix,
-        disablePrefix,
-        translationKey,
-      );
-
       const langTrans = vizI18NConfigs?.find(c =>
         c.lang.includes(i18n.language),
       )?.translation;
       const contextTranslation = get(langTrans, translationKey);
-      console.log(`contextTranslation ---> `, contextTranslation);
       return (
         contextTranslation ||
         (t.call(Object.create(null), translationKey, options) as string)

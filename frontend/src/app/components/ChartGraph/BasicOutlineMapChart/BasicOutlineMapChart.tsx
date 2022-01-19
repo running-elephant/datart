@@ -47,7 +47,7 @@ class BasicOutlineMapChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'outline-map',
-      props?.name || '轮廓地图',
+      props?.name || 'viz.palette.graph.names.outlineMap',
       props?.icon || 'china',
     );
     this.meta.requirements = props?.requirements || [

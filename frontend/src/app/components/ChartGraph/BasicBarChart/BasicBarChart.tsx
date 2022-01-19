@@ -48,7 +48,7 @@ class BasicBarChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'bar',
-      props?.name || 'Basic Bar Chart',
+      props?.name || 'viz.palette.graph.names.barChart',
       props?.icon || 'chart-bar',
     );
     this.meta.requirements = props?.requirements || [
