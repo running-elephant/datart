@@ -505,12 +505,12 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'paging.title',
+      label: 'viz.palette.setting.paging.title',
       key: 'paging',
       comType: 'group',
       rows: [
         {
-          label: 'paging.pageSize',
+          label: 'viz.palette.setting.paging.pageSize',
           key: 'pageSize',
           default: 1000,
           comType: 'inputNumber',
