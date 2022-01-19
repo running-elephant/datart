@@ -25,9 +25,11 @@ import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.util.TimestampString;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,6 +72,11 @@ public class SqlNodeUtils {
     }
 
     public static List<SqlNode> createSqlNodes(ScriptVariable variable, SqlParserPos sqlParserPos) {
+
+        if (CollectionUtils.isEmpty(variable.getValues())) {
+            return Collections.singletonList(SqlLiteral.createNull(sqlParserPos));
+        }
+
         switch (variable.getValueType()) {
             case STRING:
                 return variable.getValues().stream()

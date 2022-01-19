@@ -19,6 +19,6 @@ public interface DashboardService extends VizCRUDService<Dashboard, DashboardMap
 
     DashboardDetail getDashboardDetail(String dashboardId);
 
-    DashboardDetail copyDashboard(DashboardCreateParam dashboard) throws IOException;
+    Folder copyDashboard(DashboardCreateParam dashboard) throws IOException;
 
 }

@@ -45,7 +45,7 @@ public interface VizService {
 
     boolean deleteDashboard(String dashboardId, boolean archive);
 
-    DashboardDetail copyDashboard(DashboardCreateParam createParam) throws IOException;
+    Folder copyDashboard(DashboardCreateParam createParam) throws IOException;
 
     boolean deleteStorypage(String storypageId);
 

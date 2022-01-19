@@ -19,7 +19,6 @@
 package datart.data.provider.jdbc;
 
 import datart.core.base.consts.Const;
-import datart.core.base.consts.VariableTypeEnum;
 import datart.core.data.provider.ScriptVariable;
 import datart.data.provider.calcite.SqlNodeUtils;
 import datart.data.provider.script.VariablePlaceholder;
@@ -27,7 +26,6 @@ import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.SqlOperator;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -60,27 +58,18 @@ public class RegexVariableResolver {
 
         String variableExpression = tryMatchVariableExpression(sql, variableFragment);
 
-        if (variable == null) {
-            return new TrueVariablePlaceholder(variableExpression);
-        }
-
-
         SqlCall sqlCall = parseAsSqlCall(variableExpression);
-
         if (sqlCall == null) {
-            return new ReplaceVariablePlaceholder(variable, sqlDialect, null, variableFragment);
+            return new SimpleVariablePlaceholder(variable, sqlDialect, variableFragment);
         }
-        if (VariableTypeEnum.PERMISSION.equals(variable.getType())) {
-            return new PermissionVariablePlaceholder(variable, sqlDialect, sqlCall, variableFragment);
-        } else {
-            return new QueryVariablePlaceholder(variable, sqlDialect, sqlCall, variableFragment);
-        }
+        return new VariablePlaceholder(Collections.singletonList(variable), sqlDialect, sqlCall, variableFragment);
+
     }
 
 
     private static String tryMatchVariableExpression(String sql, String variableFragment) {
         String reg = String.format(REG_VARIABLE_EXPRESSION_TEMPLATE, variableFragment.replace("$", "\\$"));
-        Pattern pattern = Pattern.compile(reg,Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile(reg, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(sql);
         if (matcher.find()) {
             return matcher.group();
