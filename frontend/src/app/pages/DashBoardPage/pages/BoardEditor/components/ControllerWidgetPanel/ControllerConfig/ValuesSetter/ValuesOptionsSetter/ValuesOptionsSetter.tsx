@@ -67,6 +67,7 @@ const ValuesOptionsSetter: FC<{
     });
   }, []);
   const getViewOption = useCallback(async (viewId: string) => {
+    if (!viewId) return [];
     try {
       const { data } = await request<View>(`/views/${viewId}`);
       const model = JSON.parse(data.model);
@@ -108,8 +109,20 @@ const ValuesOptionsSetter: FC<{
   );
   const onViewFieldChange = useCallback(
     async (value: string[]) => {
-      if (!value) return;
       setOptionValues([]);
+      setTargetKeys([]);
+      setLabelOptions([]);
+      if (!value || !value?.[0]) {
+        form?.setFieldsValue({
+          config: {
+            ...getControllerConfig(),
+            assistViewFields: [],
+            controllerValues: [],
+          },
+        });
+        return;
+      }
+
       form?.setFieldsValue({
         config: {
           ...getControllerConfig(),
@@ -117,14 +130,12 @@ const ValuesOptionsSetter: FC<{
           controllerValues: [],
         },
       });
-      setTargetKeys([]);
 
       const options = await getViewOption(value[0]);
       setLabelOptions(options);
 
       const [viewId, ...columns] = value;
       const dataset = await fetchNewDataset(viewId, columns);
-
       setOptionValues(convertToList(dataset?.rows));
     },
     [convertToList, fetchNewDataset, form, getControllerConfig, getViewOption],
@@ -154,7 +165,6 @@ const ValuesOptionsSetter: FC<{
     async (value: string[]) => {
       const [viewId, ...columns] = value;
       const dataset = await fetchNewDataset(viewId, columns);
-      console.log();
       const config: ControllerConfig = getControllerConfig();
       setOptionValues(convertToList(dataset?.rows));
       if (config.valueOptionType === 'common') {
@@ -267,7 +277,7 @@ const ValuesOptionsSetter: FC<{
                               justifyContent: 'space-between',
                             }}
                           >
-                            <span>{item.label ?? item.key}</span>
+                            <span>{item.label || item.key}</span>
                             <span style={{ color: G30 }}>{item.key}</span>
                           </div>
                         </Select.Option>

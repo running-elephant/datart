@@ -42,14 +42,8 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
     const { orgId } = useContext(BoardContext);
     const [options, setOptions] = useState<CascaderOptionType[]>([]);
     useEffect(() => {
-      if (Array.isArray(propsValue)) {
-        if (propsValue.length === 0 && val.length) {
-          onChange?.(val);
-        } else {
-          setVal(propsValue);
-        }
-      }
-    }, [onChange, val, propsValue]);
+      setVal(propsValue || []);
+    }, [onChange, propsValue]);
 
     const setViews = useCallback(
       async orgId => {
@@ -104,14 +98,8 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
     );
     const optionChange = value => {
       setVal(value);
-      if (!value || !value.length) {
-        onChange?.([]);
-      }
-      if (value?.[0] === propsValue?.[0]) {
-        onChange?.(value);
-      } else {
-        onChange?.([value?.[0], value?.[1]]);
-      }
+      console.log('_value', value);
+      onChange?.(value || []);
     };
     return (
       <Cascader
