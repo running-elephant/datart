@@ -534,6 +534,8 @@
         }
       },
       "data": {
+        "column": "Column",
+        "row": "Row",
         "dimension": "Dimension",
         "metrics": "Metric",
         "mixed": "Columns",
@@ -585,8 +587,8 @@
         },
         "axis": {
           "y": {
-            "left": "left axis dimension",
-            "right": "right axis dimension"
+            "left": "Left Metric",
+            "right": "Right Metric"
           }
         },
         "enum": {
@@ -851,10 +853,10 @@
       "scaleFull": "scaleFull",
       "noScale": "noScale"
     },
-    "tips":{
-      "noStartValue":"Input Start Value",
-      "noEndValue":"Input End Value",
-      "endGTStartErr":"End Value should GT StartValue "
+    "tips": {
+      "noStartValue": "Input Start Value",
+      "noEndValue": "Input End Value",
+      "endGTStartErr": "End Value should GT StartValue "
     },
     "control": {
       "title": "Control Title",
@@ -869,7 +871,7 @@
       "showMark": "Show Mark",
       "common": "General",
       "custom": "Customize",
-      "optionLabelField":"Option Label Field"
+      "optionLabelField": "Option Label Field"
     },
     "date": {
       "year": "Year",

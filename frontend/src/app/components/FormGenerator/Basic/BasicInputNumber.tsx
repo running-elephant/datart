@@ -40,7 +40,7 @@ const BasicInputNumber: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     );
 
     return (
-      <Wrapper label={t(cache.label)}>
+      <Wrapper label={t(cache.label, true)}>
         <InputNumber
           {...rest}
           {...options}

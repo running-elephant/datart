@@ -57,7 +57,7 @@ class BasicTableChart extends ReactChart {
   constructor(props?) {
     super(AntdTableWrapper, {
       id: props?.id || 'react-table',
-      name: props?.name || '表格',
+      name: props?.name || '@global@.chart.name',
       icon: props?.icon || 'table',
     });
 

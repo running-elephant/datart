@@ -56,7 +56,7 @@ const BasicColorSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
 
     return (
       <StyledVizBasicColorSelector align={'middle'}>
-        {!options?.hideLabel && <Col span={12}>{t(row.label)}</Col>}
+        {!options?.hideLabel && <Col span={12}>{t(row.label, true)}</Col>}
         <Col span={options?.hideLabel ? 24 : 12}>
           <ColorPickerPopover
             {...rest}

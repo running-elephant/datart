@@ -36,7 +36,7 @@ import {
   ChartDataConfig,
   ChartStyleConfig,
 } from 'app/types/ChartConfig';
-import { FC, memo, useCallback } from 'react';
+import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,

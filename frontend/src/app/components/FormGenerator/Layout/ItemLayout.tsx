@@ -17,8 +17,8 @@
  */
 
 import {
-  ChartStyleSectionComponentType,
   ChartStyleConfig,
+  ChartStyleSectionComponentType,
   ChartStyleSectionRow,
 } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';

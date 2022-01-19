@@ -106,7 +106,7 @@ const ChartGraphPanel: FC<{
           key={c?.meta?.id}
           title={
             <>
-              {c?.meta?.name}
+              {t(c?.meta?.name, true)}
               {renderChartRequirments(c?.meta?.requirements)}
             </>
           }

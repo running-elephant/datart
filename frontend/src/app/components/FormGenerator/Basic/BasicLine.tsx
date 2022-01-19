@@ -42,7 +42,7 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     };
 
     return (
-      <BW label={!options?.hideLabel ? t(label) : ''}>
+      <BW label={!options?.hideLabel ? t(label, true) : ''}>
         <WithColorPicker>
           <Group>
             <Select

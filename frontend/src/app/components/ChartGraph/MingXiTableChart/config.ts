@@ -365,6 +365,9 @@ const config: ChartConfig = {
     {
       lang: 'zh-CN',
       translation: {
+        chart: {
+          name: '表格',
+        },
         header: {
           title: '表头分组',
           open: '打开',
@@ -413,6 +416,9 @@ const config: ChartConfig = {
     {
       lang: 'en-US',
       translation: {
+        chart: {
+          name: 'Table',
+        },
         header: {
           title: 'Table Header Group',
           open: 'Open',

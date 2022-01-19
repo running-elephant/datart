@@ -47,7 +47,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     };
 
     return (
-      <BW label={!options?.hideLabel ? t(data.label) : ''}>
+      <BW label={!options?.hideLabel ? t(data.label, true) : ''}>
         <Group>
           <Select
             placeholder={t('select')}

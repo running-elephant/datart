@@ -31,7 +31,7 @@ const BasicInputPercentage: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
 
     // Note: upgrade to antd v4.17.x with input number `addonAfter`
     return (
-      <Wrapper label={t(row.label)}>
+      <Wrapper label={t(row.label, true)}>
         <InputNumber
           {...rest}
           {...options}

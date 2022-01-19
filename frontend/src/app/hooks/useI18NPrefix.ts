@@ -36,25 +36,36 @@ function usePrefixI18N(prefix?: string) {
   const { i18NConfigs: vizI18NConfigs } = useContext(ChartI18NContext);
 
   const cachedTranslateFn = useCallback(
-    (key: string, disablePrefix?: boolean, options?: any) => {
-      if (!prefix) {
-        return key;
+    (key: string, disablePrefix: boolean = false, options?: any) => {
+      let translationKey = key;
+      const usePrefix =
+        !disablePrefix && !translationKey.includes(DATART_TRANSLATE_HOLDER);
+      if (usePrefix) {
+        translationKey = `${prefix}.${translationKey}`;
       }
+      if (translationKey.includes(DATART_TRANSLATE_HOLDER)) {
+        translationKey = translationKey.replace(
+          `${DATART_TRANSLATE_HOLDER}.`,
+          '',
+        );
+      }
+
+      console.log(
+        `translationKey ---> `,
+        prefix,
+        disablePrefix,
+        translationKey,
+      );
+
       const langTrans = vizI18NConfigs?.find(c =>
         c.lang.includes(i18n.language),
       )?.translation;
-      const contextTranslation = get(langTrans, key);
-      if (contextTranslation) {
-        return contextTranslation;
-      }
-      if (key.includes(DATART_TRANSLATE_HOLDER)) {
-        const newKey = key.replace(`${DATART_TRANSLATE_HOLDER}.`, '');
-        return t.call(Object.create(null), `${newKey}`, options) as string;
-      }
-      if (disablePrefix) {
-        return t.call(Object.create(null), `${key}`, options) as string;
-      }
-      return t.call(Object.create(null), `${prefix}.${key}`, options) as string;
+      const contextTranslation = get(langTrans, translationKey);
+      console.log(`contextTranslation ---> `, contextTranslation);
+      return (
+        contextTranslation ||
+        (t.call(Object.create(null), translationKey, options) as string)
+      );
     },
     [i18n.language, prefix, t, vizI18NConfigs],
   );

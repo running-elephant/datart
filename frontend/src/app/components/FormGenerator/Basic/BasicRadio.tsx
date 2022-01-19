@@ -36,7 +36,7 @@ const BasicRadio: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     };
 
     return (
-      <StyledBasicRadio label={t(row.label)}>
+      <StyledBasicRadio label={t(row.label, true)}>
         <Radio.Group
           name={`${row.label}-${ancestors?.toString()}`}
           {...rest}
@@ -47,7 +47,7 @@ const BasicRadio: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           {items?.map(o => {
             return (
               <Radio key={o.key} value={o.value}>
-                {needTranslate ? t(o.label) : o?.label}
+                {needTranslate ? t(o.label, true) : o?.label}
               </Radio>
             );
           })}

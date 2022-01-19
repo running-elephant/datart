@@ -20,10 +20,7 @@ import { Collapse } from 'antd';
 import GroupLayout from 'app/components/FormGenerator/Layout/GroupLayout';
 import { GroupLayoutMode } from 'app/components/FormGenerator/types';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import {
-  ChartDataConfig,
-  ChartStyleConfig,
-} from 'app/types/ChartConfig';
+import { ChartDataConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 
 const ChartStyleConfigPanel: FC<{
@@ -42,7 +39,7 @@ const ChartStyleConfigPanel: FC<{
         {configs
           ?.filter(c => !Boolean(c.hidden))
           .map((c, index) => (
-            <Collapse.Panel header={t(c.label)} key={c.key}>
+            <Collapse.Panel header={t(c.label, true)} key={c.key}>
               <GroupLayout
                 ancestors={[index]}
                 mode={
