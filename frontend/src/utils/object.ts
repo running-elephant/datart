@@ -237,9 +237,7 @@ export function cleanChartConfigValueByDefaultValue(
   });
 }
 
-export function resetValue(
-  config: ChartStyleConfig,
-): ChartStyleConfig {
+export function resetValue(config: ChartStyleConfig): ChartStyleConfig {
   config.value = config.default;
   config.rows = config?.rows?.map(r => {
     return resetValue(r);
