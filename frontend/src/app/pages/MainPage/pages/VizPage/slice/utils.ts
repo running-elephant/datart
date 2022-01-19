@@ -34,10 +34,13 @@ const valueTransder = {
   },
 };
 export const transferChartConfig = (
-  chartConfig: ChartConfig,
+  chartConfig?: ChartConfig,
   params?: FilterSearchParams,
   mactchByName?: boolean,
 ): ChartConfig => {
+  if (!chartConfig) {
+    return {};
+  }
   const datas = chartConfig.datas || [];
   if (datas?.length > 0 && params) {
     const idKeys = Object.keys(params);
