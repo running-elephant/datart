@@ -31,7 +31,7 @@ import ChartRichTextAdapter from './ChartRichTextAdapter';
 import Config from './config';
 
 class BasicRichText extends ReactChart {
-  _useIFrame = false;
+  useIFrame = false;
   isISOContainer = 'react-rich-text';
   config = Config;
   protected isAutoMerge = false;
@@ -111,6 +111,7 @@ class BasicRichText extends ReactChart {
         value: this.getDataListValue(config, dataColumns),
       };
     });
+    // TODO(tianlei): should be fixed later with getStyles function
     const initContent = getStyleValueByGroup(
       stylesConfigs,
       'delta',
@@ -133,7 +134,7 @@ class BasicRichText extends ReactChart {
   }
 
   getOnChange(): any {
-    return this._mouseEvents?.reduce((acc, cur) => {
+    return this.mouseEvents?.reduce((acc, cur) => {
       if (cur.name === 'click') {
         Object.assign(acc, {
           onChange: delta =>

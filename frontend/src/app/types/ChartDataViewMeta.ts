@@ -16,8 +16,18 @@
  * limitations under the License.
  */
 
-import { EffectInMap, EffectOutMap, EffectSpeedMap } from './types';
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+} from './ChartDataView';
 
-export const EFFECT_IN_OPTIONS = Object.values(EffectInMap);
-export const EFFECT_OUT_OPTIONS = Object.values(EffectOutMap);
-export const EFFECT_SPEED_OPTIONS = Object.values(EffectSpeedMap);
+export type ChartDataViewMeta = {
+  id: string;
+  name: string;
+  isActive?: boolean;
+  selectedItems?: Array<ChartDataViewMeta>;
+  primaryKey?: boolean;
+  category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
+  type?: ChartDataViewFieldType;
+  expression?: string;
+};

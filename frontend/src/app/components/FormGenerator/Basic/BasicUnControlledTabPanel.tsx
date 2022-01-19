@@ -20,7 +20,7 @@ import { CheckOutlined, EditOutlined } from '@ant-design/icons';
 import { Button, Input, Space, Tabs } from 'antd';
 import useUpdateEffect from 'app/hooks/useUpdateEffect';
 import {
-  ChartStyleSectionConfig,
+  ChartStyleConfig,
   ChartStyleSectionGroup,
 } from 'app/types/ChartConfig';
 import { addByKey, updateByAction } from 'app/utils/mutation';
@@ -64,7 +64,7 @@ const reducer = (state, action) => {
   }
 };
 
-const BasicUnControlledTabPanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> =
+const BasicUnControlledTabPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
   memo(
     ({
       ancestors,

@@ -33,8 +33,8 @@ import {
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
   ChartConfig,
-  ChartDataSectionConfig,
-  ChartStyleSectionConfig,
+  ChartDataConfig,
+  ChartStyleConfig,
 } from 'app/types/ChartConfig';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
@@ -80,7 +80,7 @@ const ChartConfigPanel: FC<{
 
     const onDataConfigChanged = (
       ancestors,
-      config: ChartDataSectionConfig,
+      config: ChartDataConfig,
       needRefresh?: boolean,
     ) => {
       onChange?.(ChartConfigReducerActionType.DATA, {
@@ -92,7 +92,7 @@ const ChartConfigPanel: FC<{
 
     const onStyleConfigChanged = (
       ancestors: number[],
-      config: ChartStyleSectionConfig,
+      config: ChartStyleConfig,
       needRefresh?: boolean,
     ) => {
       onChange?.(ChartConfigReducerActionType.STYLE, {
@@ -104,7 +104,7 @@ const ChartConfigPanel: FC<{
 
     const onSettingConfigChanged = (
       ancestors: number[],
-      config: ChartStyleSectionConfig,
+      config: ChartStyleConfig,
       needRefresh?: boolean,
     ) => {
       onChange?.(ChartConfigReducerActionType.SETTING, {

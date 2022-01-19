@@ -26,7 +26,8 @@ import {
   getColumnRenderName,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
-  getStyleValueByGroup,
+  getGridStyle,
+  getStyles,
   getValueByColumnKey,
   transformToObjectArray,
   valueFormatter,
@@ -63,7 +64,7 @@ class BasicPieChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
-    this._mouseEvents?.forEach(event => {
+    this.mouseEvents?.forEach(event => {
       this.chart.on(event.name, event.callback);
     });
   }
@@ -88,7 +89,7 @@ class BasicPieChart extends Chart {
     this.chart?.resize(context);
   }
 
-  getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataset, config: ChartConfig) {
     const dataColumns = transformToObjectArray(dataset.rows, dataset.columns);
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
@@ -196,16 +197,7 @@ class BasicPieChart extends Chart {
     }
   }
 
-  getGrid(styles) {
-    const containLabel = getStyleValueByGroup(styles, 'margin', 'containLabel');
-    const left = getStyleValueByGroup(styles, 'margin', 'marginLeft');
-    const right = getStyleValueByGroup(styles, 'margin', 'marginRight');
-    const bottom = getStyleValueByGroup(styles, 'margin', 'marginBottom');
-    const top = getStyleValueByGroup(styles, 'margin', 'marginTop');
-    return { left, right, bottom, top, containLabel };
-  }
-
-  getBarSeiesImpl(styleConfigs) {
+  private getBarSeiesImpl(styleConfigs) {
     return {
       type: 'pie',
       sampling: 'average',
@@ -213,16 +205,16 @@ class BasicPieChart extends Chart {
       label: this.getLabelStyle(styleConfigs),
       labelLayout: { hideOverlap: true },
       ...this.getSeriesStyle(styleConfigs),
-      ...this.getGrid(styleConfigs),
+      ...getGridStyle(styleConfigs),
     };
   }
 
-  getLegendStyle(groupConfigs, styles, series) {
-    const show = getStyleValueByGroup(styles, 'legend', 'showLegend');
-    const type = getStyleValueByGroup(styles, 'legend', 'type');
-    const font = getStyleValueByGroup(styles, 'legend', 'font');
-    const legendPos = getStyleValueByGroup(styles, 'legend', 'position');
-    const selectAll = getStyleValueByGroup(styles, 'legend', 'selectAll');
+  private getLegendStyle(groupConfigs, styles, series) {
+    const [show, type, font, legendPos, selectAll] = getStyles(
+      styles,
+      ['legend'],
+      ['showLegend', 'type', 'font', 'position', 'selectAll'],
+    );
     let positions = {};
     let orient = {};
 
@@ -267,12 +259,13 @@ class BasicPieChart extends Chart {
     };
   }
 
-  getLabelStyle(styles) {
-    const show = getStyleValueByGroup(styles, 'label', 'showLabel');
-    const position = getStyleValueByGroup(styles, 'label', 'position');
-    const font = getStyleValueByGroup(styles, 'label', 'font');
+  private getLabelStyle(styles) {
+    const [show, position, font] = getStyles(
+      styles,
+      ['label'],
+      ['showLabel', 'position', 'font'],
+    );
     const formatter = this.getLabelFormatter(styles);
-
     return {
       show: position === 'center' ? false : show,
       position,
@@ -281,10 +274,12 @@ class BasicPieChart extends Chart {
     };
   }
 
-  getLabelFormatter(styles) {
-    const showValue = getStyleValueByGroup(styles, 'label', 'showValue');
-    const showPercent = getStyleValueByGroup(styles, 'label', 'showPercent');
-    const showName = getStyleValueByGroup(styles, 'label', 'showName');
+  private getLabelFormatter(styles) {
+    const [showValue, showPercent, showName] = getStyles(
+      styles,
+      ['label'],
+      ['showValue', 'showPercent', 'showName'],
+    );
     return seriesParams => {
       if (seriesParams.componentType !== 'series') {
         return seriesParams.name;
@@ -312,7 +307,7 @@ class BasicPieChart extends Chart {
     };
   }
 
-  getSeriesStyle(styles) {
+  private getSeriesStyle(styles) {
     const radiusValue =
       (!this.isCircle && !this.isRose) || (!this.isCircle && this.isRose)
         ? `70%`
@@ -320,7 +315,7 @@ class BasicPieChart extends Chart {
     return { radius: radiusValue, roseType: this.isRose };
   }
 
-  getTooltipFormatterFunc(
+  private getTooltipFormatterFunc(
     styleConfigs,
     groupConfigs,
     aggregateConfigs,

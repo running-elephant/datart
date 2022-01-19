@@ -18,7 +18,11 @@
 
 import useMount from 'app/hooks/useMount';
 import useRouteQuery from 'app/hooks/useRouteQuery';
-import { loadShareTask, makeShareDownloadDataTask } from 'app/utils/fetch';
+import {
+  downloadShareDataChartFile,
+  loadShareTask,
+  makeShareDownloadDataTask,
+} from 'app/utils/fetch';
 import { StorageKeys } from 'globalConstants';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -41,7 +45,6 @@ import BoardForShare from './BoardForShare';
 import ChartForShare from './ChartForShare';
 import { DownloadTaskContainer } from './DownloadTaskContainer';
 import PasswordModal from './PasswordModal';
-import { downloadShareDataChartFile } from './sercive';
 import { useShareSlice } from './slice';
 import {
   selectChartPreview,
@@ -185,7 +188,11 @@ export function SharePage() {
           fetchShareVizInfoImpl(shareToken, sharePassword);
         }}
       />
-      {!vizType && !needPassword && <BoardLoading />}
+      {!vizType && !needPassword && (
+        <div className="loading-container">
+          <BoardLoading />
+        </div>
+      )}
       {!Boolean(needPassword) &&
         vizType === 'DATACHART' &&
         chartPreview &&
@@ -218,7 +225,10 @@ export function SharePage() {
   );
 }
 const StyledWrapper = styled.div`
-  display: flex;
   width: 100%;
   height: 100vh;
+  .loading-container {
+    display: flex;
+    height: 100vh;
+  }
 `;

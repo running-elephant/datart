@@ -20,7 +20,9 @@ import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import {
   getColumnRenderName,
+  getStyles,
   getStyleValueByGroup,
+  getValue,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
@@ -59,7 +61,7 @@ class BasicGaugeChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
-    this._mouseEvents?.forEach(event => {
+    this.mouseEvents?.forEach(event => {
       this.chart.on(event.name, event.callback);
     });
   }
@@ -121,13 +123,7 @@ class BasicGaugeChart extends Chart {
     const axis = this.getAxis(styleConfigs);
     const splitLine = this.getSplitLine(styleConfigs);
     const progress = this.getProgress(styleConfigs);
-
-    const pointerColor = getStyleValueByGroup(
-      styleConfigs,
-      'pointer',
-      'pointerColor',
-    );
-
+    const pointerColor = getValue(styleConfigs, ['pointer', 'pointerColor']);
     const dataConfig: { name: string; value: string; itemStyle: any } = {
       name: getColumnRenderName(aggConfig),
       value: dataColumns?.[0]?.[getValueByColumnKey(aggConfig)] || 0,
@@ -141,9 +137,7 @@ class BasicGaugeChart extends Chart {
 
     return {
       ...this.getGauge(styleConfigs),
-      data: [
-        dataConfig,
-      ],
+      data: [dataConfig],
       pointer,
       ...axis,
       title,
@@ -154,12 +148,12 @@ class BasicGaugeChart extends Chart {
   }
 
   private getProgress(styleConfigs) {
-    const [show, roundCap] = this.getArrStyleValueByGroup(
-      ['showProgress', 'roundCap'],
+    const [show, roundCap] = getStyles(
       styleConfigs,
-      'progress',
+      ['progress'],
+      ['showProgress', 'roundCap'],
     );
-    const width = getStyleValueByGroup(styleConfigs, 'axis', 'axisLineSize');
+    const width = getValue(styleConfigs, ['axis', 'axisLineSize']);
     return {
       show,
       roundCap,
@@ -168,12 +162,11 @@ class BasicGaugeChart extends Chart {
   }
 
   private getSplitLine(styleConfigs) {
-    const [show, lineStyle, distance, length] = this.getArrStyleValueByGroup(
-      ['showSplitLine', 'lineStyle', 'distance', 'splitLineLength'],
+    const [show, lineStyle, distance, length] = getStyles(
       styleConfigs,
-      'splitLine',
+      ['splitLine'],
+      ['showSplitLine', 'lineStyle', 'distance', 'splitLineLength'],
     );
-
     return {
       show,
       length,
@@ -183,13 +176,11 @@ class BasicGaugeChart extends Chart {
   }
 
   private getGauge(styleConfigs) {
-    const [max, radius, startAngle, endAngle, splitNumber] =
-      this.getArrStyleValueByGroup(
-        ['max', 'radius', 'startAngle', 'endAngle', 'splitNumber'],
-        styleConfigs,
-        'gauge',
-      );
-
+    const [max, radius, startAngle, endAngle, splitNumber] = getStyles(
+      styleConfigs,
+      ['gauge'],
+      ['max', 'radius', 'startAngle', 'endAngle', 'splitNumber'],
+    );
     return {
       type: 'gauge',
       max,
@@ -201,24 +192,21 @@ class BasicGaugeChart extends Chart {
   }
 
   private getAxis(styleConfigs) {
-    const [axisWidth, axisLineColor] = this.getArrStyleValueByGroup(
-      ['axisLineSize', 'axisLineColor'],
+    const [axisWidth, axisLineColor] = getStyles(
       styleConfigs,
-      'axis',
+      ['axis'],
+      ['axisLineSize', 'axisLineColor'],
     );
-    const [showAxisTick, lineStyle, distance, splitNumber] =
-      this.getArrStyleValueByGroup(
-        ['showAxisTick', 'lineStyle', 'distance', 'splitNumber'],
-        styleConfigs,
-        'axisTick',
-      );
-    const [showAxisLabel, font, axisLabelDistance] =
-      this.getArrStyleValueByGroup(
-        ['showAxisLabel', 'font', 'distance'],
-        styleConfigs,
-        'axisLabel',
-      );
-
+    const [showAxisTick, lineStyle, distance, splitNumber] = getStyles(
+      styleConfigs,
+      ['axisTick'],
+      ['showAxisTick', 'lineStyle', 'distance', 'splitNumber'],
+    );
+    const [showAxisLabel, font, axisLabelDistance] = getStyles(
+      styleConfigs,
+      ['axisLabel'],
+      ['showAxisLabel', 'font', 'distance'],
+    );
     return {
       axisLine: {
         lineStyle: {
@@ -310,6 +298,15 @@ class BasicGaugeChart extends Chart {
     };
   }
 
+  // TODO(tianlei): should be fix later
+  /**
+   * @deprecated should use getStyles instread in utils function
+   * @param {*} childPathList
+   * @param {*} style
+   * @param {*} groupPath
+   * @return {*}
+   * @memberof WordCloudChart
+   */
   private getArrStyleValueByGroup(childPathList: string[], style, groupPath) {
     return childPathList.map(child => {
       return getStyleValueByGroup(style, groupPath, child);

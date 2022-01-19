@@ -21,17 +21,19 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { ActionCreators } from 'redux-undo';
 import styled from 'styled-components/macro';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
+import { fetchBoardDetail } from '../Board/slice/thunk';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
 import AutoEditor from './AutoEditor/index';
 import ControllerWidgetPanel from './components/ControllerWidgetPanel';
 import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
 import FreeEditor from './FreeEditor/index';
-import { editDashBoardInfoActions } from './slice';
+import { editBoardStackActions, editDashBoardInfoActions } from './slice';
 import {
   addVariablesToBoard,
   editHasChartWidget,
@@ -75,7 +77,10 @@ export const BoardEditor: React.FC<{
         const pathName = history.location.pathname;
         const prePath = pathName.split('/boardEditor')[0];
         history.push(`${prePath}`);
-        dispatch(fetchEditBoardDetail(dashboardId));
+        dispatch(editBoardStackActions.clearEditBoardState());
+        dispatch(ActionCreators.clearHistory());
+        // 更新view界面数据
+        dispatch(fetchBoardDetail({ dashboardRelId: dashboardId }));
       },
       [dashboardId, dispatch, history],
     );

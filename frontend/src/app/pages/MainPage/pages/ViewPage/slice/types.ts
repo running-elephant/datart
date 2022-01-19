@@ -18,6 +18,7 @@
 
 import { TreeDataNode, TreeNodeProps } from 'antd';
 import { ReactElement } from 'react';
+import { View } from '../../../../../types/View';
 import { SubjectTypes } from '../../PermissionPage/constants';
 import { RowPermissionRaw, Variable } from '../../VariablePage/slice/types';
 import {
@@ -56,15 +57,6 @@ export interface ViewSimple extends ViewBase {
 
 export interface ViewSimpleViewModel extends ViewSimple {
   deleteLoading: boolean;
-}
-
-export interface View extends ViewSimple {
-  config: string;
-  model: string;
-  script: string;
-  variables: Variable[];
-  relVariableSubjects: RowPermissionRaw[];
-  relSubjectColumns: ColumnPermissionRaw[];
 }
 
 export interface ViewViewModel<T = object>

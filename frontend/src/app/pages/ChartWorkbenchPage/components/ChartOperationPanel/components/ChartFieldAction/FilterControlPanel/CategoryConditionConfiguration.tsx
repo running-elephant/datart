@@ -100,10 +100,10 @@ const CategoryConditionConfiguration: FC<
     const isChecked = (selectedKeys, eventKey) =>
       selectedKeys.indexOf(eventKey) !== -1;
 
-    const fetchNewDataset = async (viewId, colName) => {
+    const fetchNewDataset = async (viewId, colName: string) => {
       const fieldDataset = await getDistinctFields(
         viewId,
-        colName,
+        [colName],
         undefined,
         undefined,
       );

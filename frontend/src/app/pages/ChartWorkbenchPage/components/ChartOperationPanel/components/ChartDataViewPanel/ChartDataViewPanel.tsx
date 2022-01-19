@@ -29,8 +29,8 @@ import workbenchSlice, {
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-  ChartDataViewMeta,
 } from 'app/types/ChartDataView';
+import { ChartDataViewMeta } from "app/types/ChartDataViewMeta";
 import { checkComputedFieldAsync } from 'app/utils/fetch';
 import { updateByKey } from 'app/utils/mutation';
 import { FC, memo, useCallback, useMemo } from 'react';
@@ -70,7 +70,7 @@ const ChartDataViewPanel: FC<{
     originId?: string,
   ) => {
     if (!field) {
-      return;
+      return Promise.reject('field is empty');
     }
 
     let validComputedField = true;
@@ -85,7 +85,7 @@ const ChartDataViewPanel: FC<{
 
     if (!validComputedField) {
       message.error('validate function computed field failed');
-      return;
+      return Promise.reject('validate function computed field failed');
     }
     const otherComputedFields = dataView?.computedFields?.filter(
       f => f.id !== originId,
@@ -95,7 +95,9 @@ const ChartDataViewPanel: FC<{
       message.error(
         'The computed field has already been exist, please choose anohter one!',
       );
-      return;
+      return Promise.reject(
+        'The computed field has already been exist, please choose anohter one!',
+      );
     }
 
     const currentFieldIndex = (dataView?.computedFields || []).findIndex(

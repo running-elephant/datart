@@ -1,7 +1,7 @@
 import { TreeNodeProps } from 'antd';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
+import { ChartDTO } from 'app/types/ChartDTO';
 import { ReactElement } from 'react';
 
 export type VizType = [
@@ -77,7 +77,7 @@ export interface ArchivedViz {
 export interface ChartPreview {
   version?: string;
   backendChartId?: string;
-  backendChart?: BackendChart;
+  backendChart?: ChartDTO;
   dataset?: ChartDataset;
   chartConfig?: ChartConfig;
 }

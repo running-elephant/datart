@@ -212,11 +212,7 @@ function D3JSScatterChart({ dHelper }) {
       var yMaxValue = Math.max(...data.map(o => o.y));
 
       // 获取用户配置
-      const color = dHelper.getStyleValueByGroup(
-        styleConfigs,
-        'scatter',
-        'color',
-      );
+      const color = dHelper.getValue(styleConfigs, ['scatter', 'color']);
 
       return {
         style: {

@@ -16,8 +16,20 @@
  * limitations under the License.
  */
 
-import { EffectInMap, EffectOutMap, EffectSpeedMap } from './types';
+import {
+  RowPermissionRaw,
+  Variable,
+} from '../pages/MainPage/pages/VariablePage/slice/types';
+import {
+  ColumnPermissionRaw,
+  ViewSimple,
+} from '../pages/MainPage/pages/ViewPage/slice/types';
 
-export const EFFECT_IN_OPTIONS = Object.values(EffectInMap);
-export const EFFECT_OUT_OPTIONS = Object.values(EffectOutMap);
-export const EFFECT_SPEED_OPTIONS = Object.values(EffectSpeedMap);
+export interface View extends ViewSimple {
+  config: string;
+  model: string;
+  script: string;
+  variables: Variable[];
+  relVariableSubjects: RowPermissionRaw[];
+  relSubjectColumns: ColumnPermissionRaw[];
+}

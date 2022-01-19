@@ -1,30 +1,22 @@
 /**
-
  * Datart
-   *
+ *
  * Copyright 2021
-   *
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
-   *
- * http://www.apache.org/licenses/LICENSE-2.0
-    *
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-   */
+ */
 
-/* eslint-disable prettier/prettier */
-
-import 'react-app-polyfill/stable';
-import { ChartDataRequestBuilder } from "app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder";
-import {
-  BackendChart,
-  BackendChartConfig,
-} from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import {
   DataChart,
   ServerDashboard,
@@ -36,15 +28,18 @@ import {
   getDataChartsByServer,
 } from 'app/pages/DashBoardPage/utils/board';
 import { getWidgetMapByServer } from 'app/pages/DashBoardPage/utils/widget';
+import { ChartDTO } from 'app/types/ChartDTO';
+import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartConfig } from 'app/types/ChartConfig';
+import 'react-app-polyfill/stable';
 // import 'react-app-polyfill/stable';
 // import 'core-js/stable/map';
 // need polyfill [Object.values,Array.prototype.find,new Map]
-/**
 
+/**
  * @param ''
  * @description 'server task 定时任务 调用'
-   */
+ */
 const getBoardQueryData = (dataStr: string) => {
   var data = JSON.parse(dataStr) as ServerDashboard;
 
@@ -78,10 +73,11 @@ const getBoardQueryData = (dataStr: string) => {
   let fileName = dashboard.name;
   return JSON.stringify({ downloadParams, fileName });
 };
+
 const getChartQueryData = (dataStr: string) => {
   // see  handleCreateDownloadDataTask
-  const data: BackendChart = JSON.parse(dataStr);
-  const dataConfig: BackendChartConfig = JSON.parse(data.config as any);
+  const data: ChartDTO = JSON.parse(dataStr);
+  const dataConfig: ChartDetailConfigDTO = JSON.parse(data.config as any);
   const chartConfig: ChartConfig = dataConfig.chartConfig as ChartConfig;
   const builder = new ChartDataRequestBuilder(
     {

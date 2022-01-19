@@ -1,9 +1,29 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { migrateChartConfig } from 'app/migration';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ChartDataSectionField,
   ChartDataSectionType,
 } from 'app/types/ChartConfig';
+import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { transformToViewConfig } from 'app/types/ChartDataRequest';
 import ChartDataView, {
   ChartDataViewFieldCategory,
@@ -13,6 +33,7 @@ import {
   ControllerFacadeTypes,
   TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
+import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
 import { getTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
@@ -31,6 +52,7 @@ import {
   ControllerConfig,
   ControllerDate,
 } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { DateControllerTypes } from './../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
 
@@ -74,24 +96,21 @@ export const getRGBAColor = color => {
 };
 
 export const getChartDataRequestBuilder = (dataChart: DataChart) => {
+  const { datas, settings } = convertToChartConfigDTO(
+    migrateChartConfig(dataChart?.config as ChartDetailConfigDTO),
+  );
   const builder = new ChartDataRequestBuilder(
     {
       id: dataChart?.viewId,
       computedFields: dataChart?.config?.computedFields || [],
     } as any,
-    dataChart?.config?.chartConfig?.datas,
-    dataChart?.config?.chartConfig?.settings,
+    datas,
+    settings,
     {},
     false,
     dataChart?.config?.aggregation,
   );
   return builder;
-};
-
-export const getChartRequestParams = (dataChart: DataChart) => {
-  const builder = getChartDataRequestBuilder(dataChart);
-  const requestParams = builder.build();
-  return requestParams;
 };
 
 export const getChartGroupColumns = (dataChart: DataChart) => {
@@ -118,7 +137,7 @@ export const getChartGroupColumns = (dataChart: DataChart) => {
   return groupColumns;
 };
 
-export const getTneWidgetFiltersAndParams = (obj: {
+export const getTheWidgetFiltersAndParams = (obj: {
   chartWidget: Widget;
   widgetMap: Record<string, Widget>;
   params: Record<string, string[]> | undefined;
@@ -201,72 +220,49 @@ export const getWidgetControlValues = (opt: {
 }) => {
   const { type, relatedViewItem, config } = opt;
   const valueType = relatedViewItem.fieldValueType;
-  switch (type) {
-    case ControllerFacadeTypes.RangeTime:
-    case ControllerFacadeTypes.Time:
-      if (!config?.controllerDate) {
-        return false;
-      }
-      const timeValues = getControllerDateValues({
-        controlType: type,
-        filterDate: config.controllerDate,
-        execute: true,
+  if (DateControllerTypes.includes(type)) {
+    if (config?.controllerDate) {
+      return false;
+    }
+    const timeValues = getControllerDateValues({
+      controlType: type,
+      filterDate: config.controllerDate!,
+      execute: true,
+    });
+
+    const values = timeValues
+      .filter(ele => !!ele)
+      .map(ele => {
+        const item = {
+          value: ele,
+          valueType: valueType || 'DATE',
+        };
+        return item;
       });
+    return values[0] ? values : null;
+  } else {
+    if (!config?.controllerValues?.[0]) {
+      return false;
+    }
 
-      const values = timeValues
-        .filter(ele => !!ele)
-        .map(ele => {
-          const item = {
-            value: ele,
-            valueType: valueType || 'DATE',
-          };
-          return item;
-        });
-      return values[0] ? values : null;
-    case ControllerFacadeTypes.Value:
-    case ControllerFacadeTypes.RangeValue:
-    case ControllerFacadeTypes.Slider:
-      if (
-        !config.controllerValues ||
-        config.controllerValues.length === 0 ||
-        !config.controllerValues?.[0]
-      )
+    const values = config.controllerValues
+      .filter(ele => {
+        if (typeof ele === 'number') {
+          return true;
+        }
+        if (typeof ele === 'string' && ele.trim() !== '') {
+          return true;
+        }
         return false;
-      const numericValues = config.controllerValues
-        .filter(ele => {
-          if (ele === 0) return true;
-          return !!ele;
-        })
-        .map(ele => {
-          const item = {
-            value: ele,
-            valueType: valueType || '',
-          };
-          return item;
-        });
-      return numericValues[0] ? numericValues : false;
-
-    default:
-      if (
-        !config.controllerValues ||
-        config.controllerValues.length === 0 ||
-        !config.controllerValues?.[0]
-      )
-        return false;
-
-      const strValues = config.controllerValues
-        .filter(ele => {
-          if (ele.trim() === '') return false;
-          return !!ele;
-        })
-        .map(ele => {
-          const item = {
-            value: ele.trim(),
-            valueType: valueType || 'STRING',
-          };
-          return item;
-        });
-      return strValues[0] ? strValues : false;
+      })
+      .map(ele => {
+        const item = {
+          value: typeof ele === 'string' ? ele.trim() : ele,
+          valueType: valueType || 'STRING',
+        };
+        return item;
+      });
+    return values[0] ? values : false;
   }
 };
 
@@ -400,15 +396,15 @@ export const getChartWidgetRequestParams = (obj: {
     // errorHandle(`can\`t find View ${dataChart?.viewId}`);
     return null;
   }
-
   const builder = getChartDataRequestBuilder(dataChart);
   let requestParams = builder
     .addExtraSorters((option?.sorters as any) || [])
     .build();
   const viewConfig = transformToViewConfig(chartDataView?.config);
+
   requestParams = { ...requestParams, ...viewConfig };
 
-  const { filterParams, variableParams } = getTneWidgetFiltersAndParams({
+  const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
     chartWidget: curWidget,
     widgetMap,
     params: requestParams.params,

@@ -19,7 +19,8 @@
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import ChartDataset from 'app/types/ChartDataset';
 import {
-  getStyleValueByGroup,
+  getStyles,
+  getValue,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
@@ -65,7 +66,7 @@ class ScoreChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
-    this._mouseEvents?.forEach(event => {
+    this.mouseEvents?.forEach(event => {
       this.chart.on(event.name, event.callback);
     });
   }
@@ -245,22 +246,20 @@ class ScoreChart extends Chart {
       styles,
       typeName,
     );
-    let font = getStyleValueByGroup(styles, typeName, 'font');
-    let prefixFont = getStyleValueByGroup(styles, typeName, 'prefxFont');
-    let suffixFont = getStyleValueByGroup(styles, typeName, 'suffixFont');
-
-    const isFixedFontSize = getStyleValueByGroup(
+    let font = getValue(styles, [typeName, 'font']);
+    let prefixFont = getValue(styles, [typeName, 'prefxFont']);
+    let suffixFont = getValue(styles, [typeName, 'suffixFont']);
+    const [isFixedFontSize] = getStyles(
       styles,
-      'common',
-      'isFixedFontSize',
+      ['common'],
+      ['isFixedFontSize'],
     );
     if (isFixedFontSize) {
-      const fixedFontSize = getStyleValueByGroup(
+      const [fixedFontSize] = getStyles(
         styles,
-        'common',
-        `${typeName}FontSize`,
+        ['common'],
+        [`${typeName}FontSize`],
       );
-
       font = Object.assign({}, font, { fontSize: fixedFontSize });
       prefixFont = Object.assign({}, prefixFont, { fontSize: fixedFontSize });
       suffixFont = Object.assign({}, suffixFont, { fontSize: fixedFontSize });
@@ -284,16 +283,15 @@ class ScoreChart extends Chart {
   }
 
   private getLineContent(styles, typeName) {
-    const show = getStyleValueByGroup(styles, typeName, 'show');
-    const prefixText =
-      getStyleValueByGroup(styles, typeName, 'prefixText') || '';
-    const suffixText =
-      getStyleValueByGroup(styles, typeName, 'suffixText') || '';
-
+    const [show, prefixText, suffixText] = getStyles(
+      styles,
+      [typeName],
+      ['show', 'prefixText', 'suffixText'],
+    );
     return {
       show,
-      prefixText,
-      suffixText,
+      prefixText: prefixText || '',
+      suffixText: suffixText || '',
     };
   }
 

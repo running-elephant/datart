@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import camelCase from 'lodash/camelCase';
 import cloneDeep from 'lodash/cloneDeep';
 import isFunction from 'lodash/isFunction';
@@ -174,11 +174,11 @@ export function CloneValueDeep<T>(value: T): T {
   return cloneDeep(value);
 }
 
-export function isUndefined(o) {
+export function isUndefined(o): boolean {
   return o === undefined;
 }
 
-export function isEmpty(o?: null | any) {
+export function isEmpty(o?: null | any): boolean {
   return o === null || isUndefined(o);
 }
 
@@ -207,8 +207,8 @@ export function IsKeyIn<T, K extends keyof T>(o: T, key: K): Boolean {
 }
 
 export function mergeDefaultToValue(
-  configs?: ChartStyleSectionConfig[],
-): ChartStyleSectionConfig[] {
+  configs?: ChartStyleConfig[],
+): ChartStyleConfig[] {
   return (configs || []).map(c => {
     if (c.comType !== 'group') {
       if (isEmpty(c.value) && !isEmpty(c.default)) {
@@ -226,8 +226,8 @@ export function mergeDefaultToValue(
 }
 
 export function cleanChartConfigValueByDefaultValue(
-  configs?: ChartStyleSectionConfig[],
-): ChartStyleSectionConfig[] {
+  configs?: ChartStyleConfig[],
+): ChartStyleConfig[] {
   return (configs || []).map(c => {
     if (c.comType !== 'group') {
       c.value = c.default;
@@ -238,8 +238,8 @@ export function cleanChartConfigValueByDefaultValue(
 }
 
 export function resetValue(
-  config: ChartStyleSectionConfig,
-): ChartStyleSectionConfig {
+  config: ChartStyleConfig,
+): ChartStyleConfig {
   config.value = config.default;
   config.rows = config?.rows?.map(r => {
     return resetValue(r);
@@ -260,4 +260,15 @@ export function isEmptyArray(value?) {
   }
 
   return Array.isArray(value) && !value?.length;
+}
+
+export function isPromise(obj?) {
+  if (isEmpty(obj)) {
+    return false;
+  }
+
+  return (
+    (typeof obj === 'object' || typeof obj === 'function') &&
+    typeof obj.then === 'function'
+  );
 }

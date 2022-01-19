@@ -18,7 +18,7 @@
 
 import { Button, Col, Popconfirm, Row, Space, Table, Tag } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { CloneValueDeep } from 'utils/object';
@@ -28,7 +28,7 @@ import { itemLayoutComparer } from '../../utils';
 import AddModal from './add';
 import { ConditionStyleFormValues } from './types';
 
-const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({
     ancestors,
     translate: t = title => title,

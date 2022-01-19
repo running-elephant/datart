@@ -686,13 +686,13 @@
     "board": {
       "action": {
         "dataChart": "数据图表",
-        "addDataChartFormList": "添加已有数据图表",
+        "ImportExistingDataCharts": "引入已有数据图表",
         "createDataChartInBoard": "新建数据图表",
         "media": "媒体组件",
         "image": "图片",
         "richText": "富文本",
         "timer": "计时器",
-        "iFrame": "iFrame",
+        "iframe": "iframe",
         "video": "视频",
         "container": "容器",
         "tab": "标签页",
@@ -776,7 +776,7 @@
         "image": "图片",
         "richText": "富文本",
         "timer": "时间器",
-        "iFrame": "iFrame",
+        "iframe": "iframe",
         "video": "视频",
         "tab": "Tab"
       },
@@ -853,6 +853,11 @@
       "scaleFull": "全屏铺满",
       "noScale": "实际尺寸"
     },
+    "tips":{
+      "noStartValue":"请填写 起始值",
+      "noEndValue":"请填写 结束值",
+      "endGTStartErr":"起始值 该小于 结束值"
+    },
     "control": {
       "title": "控制器标题",
       "valueConfig": "取值配置",
@@ -865,7 +870,8 @@
       "step": "步长",
       "showMark": "显示标签",
       "common": "常规",
-      "custom": "自定义"
+      "custom": "自定义",
+      "optionLabelField":"取值文本字段"
     },
     "date": {
       "year": "年",

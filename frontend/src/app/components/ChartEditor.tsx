@@ -21,7 +21,6 @@ import { Modal } from 'antd';
 import useMount from 'app/hooks/useMount';
 import workbenchSlice, {
   aggregationSelector,
-  BackendChart,
   backendChartSelector,
   ChartConfigReducerActionType,
   chartConfigSelector,
@@ -35,6 +34,7 @@ import workbenchSlice, {
   updateRichTextAction,
   useWorkbenchSlice,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartDTO } from "app/types/ChartDTO";
 import { IChart } from 'app/types/Chart';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -55,7 +55,7 @@ export interface ChartEditorBaseProps {
   container: 'widget' | 'dataChart';
   chartType: WidgetContentChartType;
   widgetId?: string;
-  originChart?: BackendChart | DataChart;
+  originChart?: ChartDTO | DataChart;
 }
 export interface ChartEditorMethodsProps {
   onClose?: () => void;
@@ -108,7 +108,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           dispatch(
             initWorkbenchAction({
               orgId,
-              backendChart: originChart as BackendChart,
+              backendChart: originChart as ChartDTO,
             }),
           );
           if (!originChart) {

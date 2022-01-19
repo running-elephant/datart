@@ -175,10 +175,10 @@ const CategoryConditionEditableTable: FC<
       [rows],
     );
 
-    const fetchNewDataset = async (viewId, colName) => {
+    const fetchNewDataset = async (viewId, colName: string) => {
       const fieldDataset = await getDistinctFields(
         viewId,
-        colName,
+        [colName],
         undefined,
         undefined,
       );

@@ -63,6 +63,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   const {
     data: { rows },
   } = useContext(WidgetDataContext);
+
   const { widgetUpdate, refreshWidgetsByController } =
     useContext(BoardActionContext);
 
@@ -101,12 +102,12 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     return null;
   }, [widget.config]);
   const optionRows = useMemo(() => {
-    const dataRows = rows?.flat(2) || [];
+    const dataRows = rows || [];
     if (valueOptionType === 'common') {
       return dataRows.map(ele => {
         const item: RelationFilterValue = {
-          key: ele,
-          label: ele,
+          key: ele?.[0],
+          label: ele?.[1] ?? ele?.[0],
           // children?
         };
         return item;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import { ItemLayout } from '../Layout';
 import { ItemLayoutProps } from '../types';
@@ -46,7 +46,7 @@ const template = {
   },
 };
 
-const FontAlignment: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const FontAlignment: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({
     ancestors,
     translate: t = title => title,

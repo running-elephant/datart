@@ -18,7 +18,7 @@
 
 import {
   ChartStyleSectionComponentType,
-  ChartStyleSectionConfig,
+  ChartStyleConfig,
   ChartStyleSectionRow,
 } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
@@ -61,7 +61,7 @@ import { groupLayoutComparer, invokeDependencyWatcher } from '../utils';
 
 const PERMIT_COMPONENT_PROPS = ['disabled'];
 
-const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
+const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
   ({
     ancestors,
     translate,

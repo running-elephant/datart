@@ -17,14 +17,14 @@
  */
 
 import { Col, Row, Select } from 'antd';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FONT_SIZES } from 'globalConstants';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
-const BasicFontSizeSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> =
+const BasicFontSizeSelector: FC<ItemLayoutProps<ChartStyleConfig>> =
   memo(({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 

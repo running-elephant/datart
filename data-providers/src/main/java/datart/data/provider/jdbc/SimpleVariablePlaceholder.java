@@ -23,23 +23,37 @@ import datart.data.provider.script.ReplacementPair;
 import datart.data.provider.script.VariablePlaceholder;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlDialect;
+import org.apache.calcite.sql.SqlIdentifier;
 import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ReplaceVariablePlaceholder extends VariablePlaceholder {
+public class SimpleVariablePlaceholder extends VariablePlaceholder {
 
-    public ReplaceVariablePlaceholder(ScriptVariable variable, SqlDialect sqlDialect, SqlCall sqlCall, String originalSqlFragment) {
-        super(variable, sqlDialect, sqlCall, originalSqlFragment);
+    private ScriptVariable variable;
+
+    private SqlIdentifier identifier;
+
+    private SimpleVariablePlaceholder(List<ScriptVariable> variables, SqlDialect sqlDialect, SqlCall sqlCall, String originalSqlFragment) {
+        super(variables, sqlDialect, sqlCall, originalSqlFragment);
+    }
+
+    public SimpleVariablePlaceholder(ScriptVariable variable, SqlDialect sqlDialect, String originalSqlFragment) {
+        super(null, sqlDialect, null, originalSqlFragment);
+        this.variable = variable;
     }
 
     @Override
     public ReplacementPair replacementPair() {
-        return new ReplacementPair(originalSqlFragment, variable == null ? "" : formatValue());
+        if (variable == null) {
+            return new ReplacementPair(originalSqlFragment, originalSqlFragment);
+        }
+        return new ReplacementPair(originalSqlFragment, formatValue(variable));
     }
 
-    private String formatValue() {
+    private String formatValue(ScriptVariable variable) {
         switch (variable.getValueType()) {
             case NUMERIC:
             case KEYWORD:
@@ -66,4 +80,8 @@ public class ReplaceVariablePlaceholder extends VariablePlaceholder {
         return values.stream().map(sqlDialect::quoteStringLiteral).collect(Collectors.joining(","));
     }
 
+    @Override
+    public int getStartPos() {
+        return Integer.MAX_VALUE;
+    }
 }

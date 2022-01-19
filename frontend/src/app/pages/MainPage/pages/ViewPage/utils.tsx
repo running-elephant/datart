@@ -19,13 +19,14 @@
 import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
 import { request } from 'utils/request';
 import { errorHandle, getDiffParams, getTextWidth } from 'utils/utils';
+import { View } from '../../../../types/View';
 import {
   ColumnCategories,
   DEFAULT_PREVIEW_SIZE,
   UNPERSISTED_ID_PREFIX,
   ViewViewModelStages,
 } from './constants';
-import { Column, Model, QueryResult, View, ViewViewModel } from './slice/types';
+import { Column, Model, QueryResult, ViewViewModel } from './slice/types';
 
 export function generateEditingView(
   attrs?: Partial<ViewViewModel>,

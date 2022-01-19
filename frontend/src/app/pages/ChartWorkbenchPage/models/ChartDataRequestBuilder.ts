@@ -18,14 +18,14 @@
 
 import {
   AggregateFieldActionType,
-  ChartDataSectionConfig,
+  ChartDataConfig,
   ChartDataSectionField,
   ChartDataSectionType,
-  ChartStyleSectionConfig,
   FilterConditionType,
   RelationFilterValue,
   SortActionType,
 } from 'app/types/ChartConfig';
+import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import {
   ChartDataRequest,
   ChartDataRequestFilter,
@@ -33,7 +33,7 @@ import {
 } from 'app/types/ChartDataRequest';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataset';
 import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
-import { getStyleValue } from 'app/utils/chartHelper';
+import { getValue } from 'app/utils/chartHelper';
 import {
   formatTime,
   getTime,
@@ -43,8 +43,8 @@ import { TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn } from 'utils/object';
 
 export class ChartDataRequestBuilder {
-  chartDataConfigs: ChartDataSectionConfig[];
-  charSettingConfigs: ChartStyleSectionConfig[];
+  chartDataConfigs: ChartDataConfig[];
+  charSettingConfigs: ChartStyleConfigDTO[];
   pageInfo: ChartDatasetPageInfo;
   dataView: ChartDataView;
   script: boolean;
@@ -53,8 +53,8 @@ export class ChartDataRequestBuilder {
 
   constructor(
     dataView: ChartDataView,
-    dataConfigs?: ChartDataSectionConfig[],
-    settingConfigs?: ChartStyleSectionConfig[],
+    dataConfigs?: ChartDataConfig[],
+    settingConfigs?: ChartStyleConfigDTO[],
     pageInfo?: ChartDatasetPageInfo,
     script?: boolean,
     aggregation?: boolean,
@@ -283,11 +283,8 @@ export class ChartDataRequestBuilder {
 
   private buildPageInfo() {
     const settingStyles = this.charSettingConfigs;
-    const pageSize = getStyleValue(settingStyles, ['paging', 'pageSize']);
-    const enablePaging = getStyleValue(settingStyles, [
-      'paging',
-      'enablePaging',
-    ]);
+    const pageSize = getValue(settingStyles, ['paging', 'pageSize']);
+    const enablePaging = getValue(settingStyles, ['paging', 'enablePaging']);
     return {
       countTotal: !!enablePaging,
       pageNo: this.pageInfo?.pageNo,

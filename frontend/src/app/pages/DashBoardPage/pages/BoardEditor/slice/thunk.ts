@@ -1,6 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
-import { fetchBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thunk';
 import {
   BoardState,
   ContainerWidgetContent,
@@ -32,7 +31,7 @@ import {
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
-import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { View } from "app/types/View";
 import ChartDataView from 'app/types/ChartDataView';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { ActionCreators } from 'redux-undo';
@@ -184,12 +183,6 @@ export const toUpdateDashboard = createAsyncThunk<
         data: updateData,
       });
       callback();
-      dispatch(ActionCreators.clearHistory());
-      // 更新view界面数据
-      await dispatch(fetchBoardDetail({ dashboardRelId: dashBoard.id }));
-
-      dispatch(fetchEditBoardDetail(dashBoard.id));
-      // 关闭编辑 界面
     } catch (error) {
       errorHandle(error);
     }
@@ -570,16 +563,16 @@ export const getEditControllerOptions = createAsyncThunk<
     const content = widget.config.content as ControllerWidgetContent;
     const config = content.config;
     if (!Array.isArray(config.assistViewFields)) return null;
-    if (config.assistViewFields.length !== 2) return null;
+    if (config.assistViewFields.length < 2) return null;
 
     const boardState = rootState.board as BoardState;
     const viewMap = boardState.viewMap;
-    const [viewId, viewField] = config.assistViewFields;
+    const [viewId, ...columns] = config.assistViewFields;
     const view = viewMap[viewId];
     if (!view) return null;
     const requestParams = getControlOptionQueryParams({
       view,
-      field: viewField,
+      columns: columns,
       curWidget: widget,
       widgetMap,
     });

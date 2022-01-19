@@ -18,7 +18,7 @@
 
 import { Col, Row } from 'antd';
 import { ColorPickerPopover } from 'app/components/ColorPicker';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';
@@ -42,7 +42,7 @@ const COLORS = [
   '#D4C4FB',
   'transparent',
 ];
-const BasicColorSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicColorSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 

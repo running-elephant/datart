@@ -25,6 +25,7 @@ import ChartDataset from 'app/types/ChartDataset';
 import {
   getColumnRenderName,
   getCustomSortableColumns,
+  getStyles,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
@@ -36,7 +37,7 @@ import Config from './config';
 class PivotSheetChart extends ReactChart {
   static icon = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z" fill="currentColor"/></svg>`;
 
-  _useIFrame = false;
+  useIFrame = false;
   isISOContainer = 'piovt-sheet';
   config = Config;
   chart: any = null;
@@ -109,38 +110,32 @@ class PivotSheetChart extends ReactChart {
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
-    const enableExpandRow = this.getStyleValue(styleConfigs, [
-      'style',
-      'enableExpandRow',
-    ]);
-    const enableHoverHighlight = this.getStyleValue(styleConfigs, [
-      'style',
-      'enableHoverHighlight',
-    ]);
-    const enableSelectedHighlight = this.getStyleValue(styleConfigs, [
-      'style',
-      'enableSelectedHighlight',
-    ]);
-    const metricNameShowIn = this.getStyleValue(styleConfigs, [
-      'style',
-      'metricNameShowIn',
-    ]);
-    const enableTotal = this.getStyleValue(settingConfigs, [
-      'rowSummary',
-      'enableTotal',
-    ]);
-    const totalPosition = this.getStyleValue(settingConfigs, [
-      'rowSummary',
-      'totalPosition',
-    ]);
-    const enableSubTotal = this.getStyleValue(settingConfigs, [
-      'rowSummary',
-      'enableSubTotal',
-    ]);
-    const subTotalPosition = this.getStyleValue(settingConfigs, [
-      'rowSummary',
-      'subTotalPosition',
-    ]);
+    const [
+      enableExpandRow,
+      enableHoverHighlight,
+      enableSelectedHighlight,
+      metricNameShowIn,
+    ] = getStyles(
+      styleConfigs,
+      ['style'],
+      [
+        'enableExpandRow',
+        'enableHoverHighlight',
+        'enableSelectedHighlight',
+        'metricNameShowIn',
+      ],
+    );
+    const [enableTotal, totalPosition, enableSubTotal, subTotalPosition] =
+      getStyles(
+        settingConfigs,
+        ['rowSummary'],
+        [
+          'enableTotal',
+          'enableHoverHighlight',
+          'enableSubTotal',
+          'subTotalPosition',
+        ],
+      );
 
     return {
       options: {
@@ -236,23 +231,11 @@ class PivotSheetChart extends ReactChart {
   }
 
   private getBodyStyle(styleConfigs) {
-    const bodyFont = this.getStyleValue(styleConfigs, [
-      'tableBodyStyle',
-      'font',
-    ]);
-    const oddBgColor = this.getStyleValue(styleConfigs, [
-      'tableBodyStyle',
-      'oddBgColor',
-    ]);
-    const evenBgColor = this.getStyleValue(styleConfigs, [
-      'tableBodyStyle',
-      'evenBgColor',
-    ]);
-    const bodyTextAlign = this.getStyleValue(styleConfigs, [
-      'tableBodyStyle',
-      'align',
-    ]);
-
+    const [bodyFont, oddBgColor, evenBgColor, bodyTextAlign] = getStyles(
+      styleConfigs,
+      ['tableBodyStyle'],
+      ['font', 'oddBgColor', 'evenBgColor', 'align'],
+    );
     return {
       cell: {
         crossBackgroundColor: evenBgColor,
@@ -269,19 +252,11 @@ class PivotSheetChart extends ReactChart {
   }
 
   private getHeaderStyle(styleConfigs) {
-    const headerFont = this.getStyleValue(styleConfigs, [
-      'tableHeaderStyle',
-      'font',
-    ]);
-    const headerBgColor = this.getStyleValue(styleConfigs, [
-      'tableHeaderStyle',
-      'bgColor',
-    ]);
-    const headerTextAlign = this.getStyleValue(styleConfigs, [
-      'tableHeaderStyle',
-      'align',
-    ]);
-
+    const [headerFont, headerBgColor, headerTextAlign] = getStyles(
+      styleConfigs,
+      ['tableHeaderStyle'],
+      ['font', 'bgColor', 'align'],
+    );
     return {
       cell: {
         backgroundColor: headerBgColor,

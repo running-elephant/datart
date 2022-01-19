@@ -21,17 +21,17 @@ import { GroupLayout } from 'app/components';
 import { GroupLayoutMode } from 'app/components/FormGenerator/types';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
-  ChartDataSectionConfig,
-  ChartStyleSectionConfig,
+  ChartDataConfig,
+  ChartStyleConfig,
 } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 
 const ChartSettingConfigPanel: FC<{
-  configs?: ChartStyleSectionConfig[];
-  dataConfigs?: ChartDataSectionConfig[];
+  configs?: ChartStyleConfig[];
+  dataConfigs?: ChartDataConfig[];
   onChange: (
     ancestors: number[],
-    config: ChartStyleSectionConfig,
+    config: ChartStyleConfig,
     needRefresh?: boolean,
   ) => void;
 }> = memo(

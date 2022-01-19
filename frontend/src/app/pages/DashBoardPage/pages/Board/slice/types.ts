@@ -29,8 +29,8 @@ import { Layout } from 'react-grid-layout';
 import { ChartDataSectionField } from '../../../../../types/ChartConfig';
 import {
   PageInfo,
-  View,
 } from '../../../../MainPage/pages/ViewPage/slice/types';
+import { View } from "../../../../../types/View";
 import {
   BorderStyleType,
   LAYOUT_COLS,

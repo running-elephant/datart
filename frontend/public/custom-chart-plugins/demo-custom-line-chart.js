@@ -602,83 +602,59 @@ function DemoCustomLineChart({ dHelper }) {
     },
 
     getGrid(styles) {
-      const containLabel = dHelper.getStyleValueByGroup(
+      const [containLabel, left, right, bottom, top] = dHelper.getStyles(
         styles,
-        'margin',
-        'containLabel',
+        ['margin'],
+        [
+          'containLabel',
+          'marginLeft',
+          'marginRight',
+          'marginBottom',
+          'marginTop',
+        ],
       );
-      const left = dHelper.getStyleValueByGroup(styles, 'margin', 'marginLeft');
-      const right = dHelper.getStyleValueByGroup(
-        styles,
-        'margin',
-        'marginRight',
-      );
-      const bottom = dHelper.getStyleValueByGroup(
-        styles,
-        'margin',
-        'marginBottom',
-      );
-      const top = dHelper.getStyleValueByGroup(styles, 'margin', 'marginTop');
       return { left, right, bottom, top, containLabel };
     },
 
     getYAxis(styles, yAxisColumns) {
-      const showAxis = dHelper.getStyleValueByGroup(
+      const [
+        showAxis,
+        inverse,
+        lineStyle,
+        showLabel,
+        font,
+        showTitleAndUnit,
+        unitFont,
+        nameLocation,
+        nameGap,
+        nameRotate,
+        min,
+        max,
+      ] = dHelper.getStyles(
         styles,
-        'yAxis',
-        'showAxis',
-      );
-      const inverse = dHelper.getStyleValueByGroup(
-        styles,
-        'yAxis',
-        'inverseAxis',
-      );
-      const lineStyle = dHelper.getStyleValueByGroup(
-        styles,
-        'yAxis',
-        'lineStyle',
-      );
-      const showLabel = dHelper.getStyleValueByGroup(
-        styles,
-        'yAxis',
-        'showLabel',
-      );
-      const font = dHelper.getStyleValueByGroup(styles, 'yAxis', 'font');
-      const unitFont = dHelper.getStyleValueByGroup(
-        styles,
-        'yAxis',
-        'unitFont',
-      );
-      const showTitleAndUnit = dHelper.getStyleValueByGroup(
-        styles,
-        'yAxis',
-        'showTitleAndUnit',
+        ['yAxis'],
+        [
+          'showAxis',
+          'inverseAxis',
+          'lineStyle',
+          'showLabel',
+          'font',
+          'showTitleAndUnit',
+          'unitFont',
+          'nameLocation',
+          'nameGap',
+          'nameRotate',
+          'min',
+          'max',
+        ],
       );
       const name = showTitleAndUnit
         ? yAxisColumns.map(c => c.name).join(' / ')
         : null;
-      const nameLocation = dHelper.getStyleValueByGroup(
+      const [showHorizonLine, horizonLineStyle] = dHelper.getStyles(
         styles,
-        'yAxis',
-        'nameLocation',
-      );
-      const nameGap = dHelper.getStyleValueByGroup(styles, 'yAxis', 'nameGap');
-      const nameRotate = dHelper.getStyleValueByGroup(
-        styles,
-        'yAxis',
-        'nameRotate',
-      );
-      const min = dHelper.getStyleValueByGroup(styles, 'yAxis', 'min');
-      const max = dHelper.getStyleValueByGroup(styles, 'yAxis', 'max');
-      const showHorizonLine = dHelper.getStyleValueByGroup(
-        styles,
-        'splitLine',
-        'showHorizonLine',
-      );
-      const horizonLineStyle = dHelper.getStyleValueByGroup(
-        styles,
-        'splitLine',
-        'horizonLineStyle',
+        ['splitLine'],
+        ['showHorizonLine', 'horizonLineStyle'],
       );
 
       return {
@@ -704,47 +680,33 @@ function DemoCustomLineChart({ dHelper }) {
 
     getXAxis(styles, xAxisColumns) {
       const axisColumnInfo = xAxisColumns[0];
-      const showAxis = dHelper.getStyleValueByGroup(
+      const [
+        showAxis,
+        inverse,
+        lineStyle,
+        showLabel,
+        font,
+        rotate,
+        showInterval,
+        interval,
+      ] = dHelper.getStyles(
         styles,
-        'xAxis',
-        'showAxis',
+        ['xAxis'],
+        [
+          'showAxis',
+          'inverseAxis',
+          'lineStyle',
+          'showLabel',
+          'font',
+          'rotate',
+          'showInterval',
+          'interval',
+        ],
       );
-      const inverse = dHelper.getStyleValueByGroup(
+      const [showVerticalLine, verticalLineStyle] = dHelper.getStyles(
         styles,
-        'xAxis',
-        'inverseAxis',
-      );
-      const lineStyle = dHelper.getStyleValueByGroup(
-        styles,
-        'xAxis',
-        'lineStyle',
-      );
-      const showLabel = dHelper.getStyleValueByGroup(
-        styles,
-        'xAxis',
-        'showLabel',
-      );
-      const font = dHelper.getStyleValueByGroup(styles, 'xAxis', 'font');
-      const rotate = dHelper.getStyleValueByGroup(styles, 'xAxis', 'rotate');
-      const showInterval = dHelper.getStyleValueByGroup(
-        styles,
-        'xAxis',
-        'showInterval',
-      );
-      const interval = dHelper.getStyleValueByGroup(
-        styles,
-        'xAxis',
-        'interval',
-      );
-      const showVerticalLine = dHelper.getStyleValueByGroup(
-        styles,
-        'splitLine',
-        'showVerticalLine',
-      );
-      const verticalLineStyle = dHelper.getStyleValueByGroup(
-        styles,
-        'splitLine',
-        'verticalLineStyle',
+        ['splitLine'],
+        ['showVerticalLine', 'verticalLineStyle'],
       );
 
       return {
@@ -763,18 +725,10 @@ function DemoCustomLineChart({ dHelper }) {
     },
 
     getLegendStyle(styles, seriesNames) {
-      const show = dHelper.getStyleValueByGroup(styles, 'legend', 'showLegend');
-      const type = dHelper.getStyleValueByGroup(styles, 'legend', 'type');
-      const font = dHelper.getStyleValueByGroup(styles, 'legend', 'font');
-      const legendPos = dHelper.getStyleValueByGroup(
+      const [show, type, font, legendPos, selectAll] = dHelper.getStyles(
         styles,
-        'legend',
-        'position',
-      );
-      const selectAll = dHelper.getStyleValueByGroup(
-        styles,
-        'legend',
-        'selectAll',
+        ['legend'],
+        ['showLegend', 'type', 'font', 'position', 'selectAll'],
       );
       let positions = {};
       let orient = {};
@@ -817,25 +771,21 @@ function DemoCustomLineChart({ dHelper }) {
     },
 
     getLabelStyle(styles) {
-      const show = dHelper.getStyleValueByGroup(styles, 'label', 'showLabel');
-      const position = dHelper.getStyleValueByGroup(
+      const [show, position, font] = dHelper.getStyles(
         styles,
-        'label',
-        'position',
+        ['label'],
+        ['showLabel', 'position', 'font'],
       );
-      const font = dHelper.getStyleValueByGroup(styles, 'label', 'font');
       return { label: { show, position, ...font } };
     },
 
     getSeriesStyle(styles) {
-      const smooth = dHelper.getStyleValueByGroup(styles, 'graph', 'smooth');
-      const step = dHelper.getStyleValueByGroup(styles, 'graph', 'step');
+      const [smooth, step] = dHelper.getStyles(
+        styles,
+        ['graph'],
+        ['smooth', 'step'],
+      );
       return { smooth, step };
-    },
-
-    getStyleValueByGroup(styles, groupPath, childPath) {
-      const childPaths = childPath.split('.');
-      return this.getStyleValue(styles, [groupPath, ...childPaths]);
     },
   };
 }

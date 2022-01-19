@@ -20,16 +20,18 @@ import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import {
   AggregateFieldActionType,
   ChartConfig,
-  ChartDataSectionConfig,
+  ChartDataConfig,
   ChartDataSectionField,
   ChartDataSectionType,
-  ChartStyleSectionConfig,
+  ChartStyleConfig,
   IFieldFormatConfig,
   SortActionType,
 } from 'app/types/ChartConfig';
+import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDatasetMeta } from 'app/types/ChartDataset';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
+import { Debugger } from 'utils/debugger';
 import {
   cond,
   curry,
@@ -47,10 +49,7 @@ import { toFormattedValue } from './number';
 export function getDefaultThemeColor() {
   return echartsDefaultTheme.color;
 }
-export function isInRange(
-  limit?: ChartDataSectionConfig['limit'],
-  count: number = 0,
-) {
+export function isInRange(limit?: ChartDataConfig['limit'], count: number = 0) {
   return cond(
     [isEmpty, true],
     [isNumerical, curry(isNumericEqual)(count)],
@@ -59,7 +58,7 @@ export function isInRange(
 }
 
 export function isUnderUpperBound(
-  limit?: ChartDataSectionConfig['limit'],
+  limit?: ChartDataConfig['limit'],
   count: number = 0,
 ) {
   return cond(
@@ -70,7 +69,7 @@ export function isUnderUpperBound(
 }
 
 export function reachLowerBoundCount(
-  limit?: ChartDataSectionConfig['limit'],
+  limit?: ChartDataConfig['limit'],
   count: number = 0,
 ) {
   return cond(
@@ -80,44 +79,104 @@ export function reachLowerBoundCount(
   )(limit, 0);
 }
 
+/**
+ * @deprecated This function will be removed in next versiion, please use getStyles instread
+ * @see getValue
+ * @param {ChartStyleConfig[]} styleConfigs
+ * @param {string[]} paths
+ * @return {*}  {*}
+ */
 export function getStyleValue(
-  styleConfigs: ChartStyleSectionConfig[],
+  styleConfigs: ChartStyleConfig[],
   paths: string[],
 ): any {
-  return getValue(styleConfigs, paths, 'value');
-}
-
-export function getStyleValueByGroup(
-  styles: ChartStyleSectionConfig[],
-  groupPath: string,
-  childPath: string,
-) {
-  const childPaths = childPath.split('.');
-  return getStyleValue(styles, [groupPath, ...childPaths]);
+  return getValue(styleConfigs, paths);
 }
 
 export function getSettingValue(
-  configs: ChartStyleSectionConfig[],
+  configs: ChartStyleConfig[],
   path: string,
   targetKey: string,
 ) {
   return getValue(configs, path.split('.'), targetKey);
 }
 
-export function getValue(
-  configs: ChartStyleSectionConfig[],
-  paths: string[],
-  targetKey,
+/**
+ * @deprecated This function will be removed in next versiion, please use getStyles instread
+ * @see getStyles
+ * @export
+ * @param {ChartStyleConfig[]} styles
+ * @param {string} groupPath
+ * @param {string} childPath
+ * @return {*}
+ */
+export function getStyleValueByGroup(
+  styles: ChartStyleConfig[],
+  groupPath: string,
+  childPath: string,
 ) {
-  const key = paths?.shift();
-  const group = configs?.find(sc => sc.key === key);
-  if (!group) {
-    return null;
+  const childPaths = childPath.split('.');
+  return getValue(styles, [groupPath, ...childPaths]);
+}
+
+/**
+ * Get config style values, more example please see test cases
+ * @example
+ * const styleConfigs = [
+ *       {
+ *        key: 'label',
+ *        rows: [
+ *           { key: 'color', value: 'red' },
+ *           { key: 'font', value: 'sans-serif' },
+ *         ],
+ *       },
+ *     ];
+ * const [color, font] = getStyles(styleConfigs, ['label'], ['color', 'font']);
+ * console.log(color); // red
+ * console.log(font); // sans-serif
+ *
+ * @param {Array<ChartStyleConfig>} configs required
+ * @param {Array<string>} parentKeyPaths required
+ * @param {Array<string>} childTargetKeys required
+ * @return {*} array of child keys with the same order
+ */
+export function getStyles(
+  configs: Array<ChartStyleConfig>,
+  parentKeyPaths: Array<string>,
+  childTargetKeys: Array<string>,
+) {
+  const rows = getValue(configs, parentKeyPaths, 'rows');
+  if (!rows) {
+    return Array(childTargetKeys.length).fill(undefined);
   }
-  if (paths?.length === 0) {
-    return isEmpty(group) ? null : group[targetKey];
+  return childTargetKeys.map(k => getValue(rows, [k]));
+}
+
+/**
+ * Get style config value base funtion with default target key
+ * @export
+ * @param {Array<ChartStyleConfig>} configs
+ * @param {Array<string>} keyPaths
+ * @param {string} [targetKey='value']
+ * @return {*}
+ */
+export function getValue(
+  configs: Array<ChartStyleConfig | ChartStyleConfigDTO>,
+  keyPaths: Array<string>,
+  targetKey = 'value',
+) {
+  let iterators = configs || [];
+  while (!isEmptyArray(iterators)) {
+    const key = keyPaths?.shift();
+    const group = iterators?.find(sc => sc.key === key);
+    if (!group) {
+      return undefined;
+    }
+    if (isEmptyArray(keyPaths)) {
+      return group[targetKey];
+    }
+    iterators = group.rows || [];
   }
-  return getValue(group.rows || [], paths, targetKey);
 }
 
 export function getColNameByValueColName(series) {
@@ -409,20 +468,26 @@ export function transformToObjectArray(
     return [];
   }
 
-  const result: any[] = Array.apply(null, Array(columns.length));
-  for (let j = 0, outterLength = result.length; j < outterLength; j++) {
-    let objCol = {
-      id: j + 1,
-    };
-    for (let i = 0, innerLength = metas.length; i < innerLength; i++) {
-      const key = metas?.[i]?.name;
-      if (!!key) {
-        objCol[key] = columns[j][i];
+  return Debugger.instance.measure(
+    'transformToObjectArray',
+    () => {
+      const result: any[] = Array.apply(null, Array(columns.length));
+      for (let j = 0, outterLength = result.length; j < outterLength; j++) {
+        let objCol = {
+          id: j + 1,
+        };
+        for (let i = 0, innerLength = metas.length; i < innerLength; i++) {
+          const key = metas?.[i]?.name;
+          if (!!key) {
+            objCol[key] = columns[j][i];
+          }
+        }
+        result[j] = objCol;
       }
-    }
-    result[j] = objCol;
-  }
-  return result;
+      return result;
+    },
+    false,
+  );
 }
 
 // TODO delete this function  #migration
@@ -544,22 +609,11 @@ export function transformMeta(model?: string) {
   }));
 }
 
-export function mergeConfig<T extends ChartConfig>(target?: T, source?: T): T {
-  if (!target) {
-    return source!;
-  }
-  if (!source) {
-    return target;
-  }
-  target.datas = mergeChartDataConfigs(target?.datas, source?.datas);
-  target.styles = mergeChartStyleConfigs(target?.styles, source?.styles);
-  target.settings = mergeChartStyleConfigs(target?.settings, source?.settings);
-  return target;
-}
-
-export function mergeChartStyleConfigs<
-  T extends { key?: string; value?: any; rows?: T[] } | undefined | null,
->(target?: T[], source?: T[], options = { useDefault: true }) {
+export function mergeChartStyleConfigs(
+  target?: ChartStyleConfig[],
+  source?: ChartStyleConfigDTO[],
+  options = { useDefault: true },
+): ChartStyleConfig[] | undefined {
   if (isEmptyArray(target)) {
     return target;
   }
@@ -832,4 +886,13 @@ export function isMatchRequirement(meta: ChartMetadata, config: ChartConfig) {
       isInRange(aggregate, aggregateFieldConfigs.length)
     );
   });
+}
+
+export function getGridStyle(styles) {
+  const [containLabel, left, right, bottom, top] = getStyles(
+    styles,
+    ['margin'],
+    ['containLabel', 'marginLeft', 'marginRight', 'marginBottom', 'marginTop'],
+  );
+  return { left, right, bottom, top, containLabel };
 }

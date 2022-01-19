@@ -16,8 +16,15 @@
  * limitations under the License.
  */
 
-import { EffectInMap, EffectOutMap, EffectSpeedMap } from './types';
+import { ChartDetailConfigDTO } from './ChartConfigDTO';
 
-export const EFFECT_IN_OPTIONS = Object.values(EffectInMap);
-export const EFFECT_OUT_OPTIONS = Object.values(EffectOutMap);
-export const EFFECT_SPEED_OPTIONS = Object.values(EffectSpeedMap);
+export type ChartDTO = {
+  id: string;
+  name: string;
+  orgId: string;
+  status: number;
+  updateTime?: string;
+  viewId: string;
+  view: ChartDataView;
+  config: ChartDetailConfigDTO;
+};

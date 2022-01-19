@@ -1,4 +1,4 @@
-import { ChartDataSectionConfig } from 'app/types/ChartConfig';
+import { ChartDataConfig } from 'app/types/ChartConfig';
 
 export enum GroupLayoutMode {
   INNER = 'inner',
@@ -18,7 +18,7 @@ export interface ItemLayoutProps<T> {
     value: T | any,
     needRefresh?: boolean,
   ) => void;
-  dataConfigs?: ChartDataSectionConfig[];
+  dataConfigs?: ChartDataConfig[];
   flatten?: boolean;
   context?: any;
 }

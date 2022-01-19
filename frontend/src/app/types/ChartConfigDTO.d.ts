@@ -16,8 +16,26 @@
  * limitations under the License.
  */
 
-import { EffectInMap, EffectOutMap, EffectSpeedMap } from './types';
+import { ChartDataConfig } from 'app/types/ChartConfig';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 
-export const EFFECT_IN_OPTIONS = Object.values(EffectInMap);
-export const EFFECT_OUT_OPTIONS = Object.values(EffectOutMap);
-export const EFFECT_SPEED_OPTIONS = Object.values(EffectSpeedMap);
+export type ChartStyleConfigDTO = {
+  key: string;
+  value?: any;
+  rows?: ChartStyleConfigDTO[];
+};
+
+export type ChartDataConfigDTO = ChartDataConfig & {};
+
+export type ChartConfigDTO = {
+  datas?: ChartDataConfigDTO[];
+  styles?: ChartStyleConfigDTO[];
+  settings?: ChartStyleConfigDTO[];
+};
+
+export type ChartDetailConfigDTO = {
+  chartConfig: ChartConfigDTO;
+  chartGraphId: string;
+  computedFields: ChartDataViewMeta[];
+  aggregation: boolean;
+};

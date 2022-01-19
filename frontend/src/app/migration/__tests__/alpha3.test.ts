@@ -56,49 +56,63 @@ describe('alpha3 - ', () => {
 
   test('should not change anything when datas is emtpy', () => {
     const config = {
-      datas: [],
+      chartConfig: {
+        datas: [],
+      },
     };
     expect(alpha3(config as any)).toBe(config);
   });
 
   test('should change key when key name is matched', () => {
     const config = {
-      datas: [{ key: 'deminsion' }],
+      chartConfig: {
+        datas: [{ key: 'deminsion' }],
+      },
     };
     expect(alpha3(config as any)).toMatchObject({
-      datas: [{ key: 'metrics' }],
+      chartConfig: {
+        datas: [{ key: 'metrics' }],
+      },
     });
   });
 
   test('should change key when key name is matched', () => {
     const config = {
-      datas: [
-        { key: 'deminsion', value: 1 },
-        { key: 'metrics', value: 2 },
-      ],
+      chartConfig: {
+        datas: [
+          { key: 'deminsion', value: 1 },
+          { key: 'metrics', value: 2 },
+        ],
+      },
     };
     expect(alpha3(config as any)).toMatchObject({
-      datas: [
-        { key: 'metrics', value: 1 },
-        { key: 'dimension', value: 2 },
-      ],
+      chartConfig: {
+        datas: [
+          { key: 'metrics', value: 1 },
+          { key: 'dimension', value: 2 },
+        ],
+      },
     });
   });
 
   test('should change key when key name is matched', () => {
     const config = {
-      datas: [
-        { key: 'metrics', value: 2 },
-        { key: 'deminsionL', value: 11 },
-        { key: 'deminsionR', value: 12 },
-      ],
+      chartConfig: {
+        datas: [
+          { key: 'metrics', rows: [2] },
+          { key: 'deminsionL', rows: [11] },
+          { key: 'deminsionR', rows: [12] },
+        ],
+      },
     };
     expect(alpha3(config as any)).toMatchObject({
-      datas: [
-        { key: 'dimension', value: 2 },
-        { key: 'metricsL', value: 11 },
-        { key: 'metricsR', value: 12 },
-      ],
+      chartConfig: {
+        datas: [
+          { key: 'dimension', rows: [2] },
+          { key: 'metricsL', rows: [11] },
+          { key: 'metricsR', rows: [12] },
+        ],
+      },
     });
   });
 });

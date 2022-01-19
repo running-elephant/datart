@@ -232,7 +232,7 @@ export const MediaWidgetDropdown: React.FC<ToolBtnProps> = props => {
       type: 'timer',
     },
     {
-      name: t('iFrame'),
+      name: t('iframe'),
       icon: '',
       type: 'iframe',
     },
@@ -348,7 +348,7 @@ export const ChartWidgetDropdown: React.FC<ChartWidgetDropdownProps> =
     );
     const addChartTypes = [
       {
-        name: t('addDataChartFormList'),
+        name: t('ImportExistingDataCharts'),
         icon: '',
         type: 'select',
       },

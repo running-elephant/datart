@@ -29,8 +29,8 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-  ChartDataViewMeta,
 } from 'app/types/ChartDataView';
+import { ChartDataViewMeta } from "app/types/ChartDataViewMeta";
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { FC, memo, useMemo } from 'react';
 import { useDrag } from 'react-dnd';

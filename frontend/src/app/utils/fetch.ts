@@ -17,7 +17,7 @@
  */
 
 import { message } from 'antd';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartDTO } from "app/types/ChartDTO";
 import {
   DownloadTask,
   DownloadTaskState,
@@ -34,8 +34,8 @@ import { errorHandle } from 'utils/utils';
 
 export const getDistinctFields = async (
   viewId: string,
-  field: string,
-  view: BackendChart['view'] | undefined,
+  columns: string[],
+  view: ChartDTO['view'] | undefined,
   executeToken: ExecuteToken | undefined,
 ) => {
   const viewConfigs = transformToViewConfig(view?.config);
@@ -43,7 +43,7 @@ export const getDistinctFields = async (
     aggregators: [],
     filters: [],
     groups: [],
-    columns: [field],
+    columns: [...new Set(columns)],
     pageInfo: {
       pageNo: 1,
       pageSize: 99999999,
@@ -241,4 +241,20 @@ export async function loadShareTask(params) {
     errorHandle(error);
     throw error;
   }
+}
+interface DownloadShareDashChartFileParams {
+  downloadId: string;
+  shareToken: string;
+  password?: string | null;
+}
+export async function downloadShareDataChartFile(
+  params: DownloadShareDashChartFileParams,
+) {
+  const [data, headers] = (await requestWithHeader({
+    url: `share/download`,
+    method: 'GET',
+    responseType: 'blob',
+    params,
+  })) as any;
+  dealFileSave(data, headers);
 }

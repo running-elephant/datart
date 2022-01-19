@@ -26,7 +26,7 @@ import {
   ServerDatachart,
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { View } from "app/types/View";
 import { ChartDataView } from 'app/types/ChartDataView';
 import { transformMeta } from 'app/utils/chartHelper';
 import {

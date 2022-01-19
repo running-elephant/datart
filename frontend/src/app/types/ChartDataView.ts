@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import { View } from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { View } from 'app/types/View';
+import { ChartDataViewMeta } from './ChartDataViewMeta';
 
 export enum ChartDataViewFieldType {
   STRING = 'STRING',
@@ -31,18 +32,7 @@ export enum ChartDataViewFieldCategory {
   AggregateComputedField = 'aggregateComputedField',
 }
 
-export type ChartDataViewMeta = {
-  id: string;
-  name: string;
-  isActive?: boolean;
-  selectedItems?: Array<ChartDataViewMeta>;
-  primaryKey?: boolean;
-  category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
-  type?: ChartDataViewFieldType;
-  expression?: string;
-};
-
-export type ChartDataView = View & {
+export type ChartDataView = Omit<View, 'model'> & {
   meta?: ChartDataViewMeta[];
   computedFields?: ChartDataViewMeta[];
 };

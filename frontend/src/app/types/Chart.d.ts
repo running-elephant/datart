@@ -120,9 +120,7 @@ export interface IChart extends IChartLifecycle {
   dataset?: ChartDataset;
   dependency: string[];
   isISOContainer: boolean | string;
-
-  // Note: application internal symbol `_`
-  _useIFrame?: boolean;
+  useIFrame?: boolean;
 
   set state(state: ChartStatus);
   get state();

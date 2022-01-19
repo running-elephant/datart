@@ -33,14 +33,14 @@
  * limitations under the License.
  */
 
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { FormGeneratorLayoutProps } from '../types';
 import { groupLayoutComparer } from '../utils';
 import ItemLayout from './ItemLayout';
 
-const CollectionLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> =
+const CollectionLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> =
   memo(
     ({
       ancestors,
