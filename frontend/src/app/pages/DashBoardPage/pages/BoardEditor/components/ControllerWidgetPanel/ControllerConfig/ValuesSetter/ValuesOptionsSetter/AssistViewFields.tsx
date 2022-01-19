@@ -98,7 +98,6 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
     );
     const optionChange = value => {
       setVal(value);
-      console.log('_value', value);
       onChange?.(value || []);
     };
     return (
