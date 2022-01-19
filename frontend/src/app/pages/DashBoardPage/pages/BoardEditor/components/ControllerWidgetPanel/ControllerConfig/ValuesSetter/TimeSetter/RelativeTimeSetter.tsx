@@ -69,7 +69,6 @@ export const RelateTimeInput: React.FC<RelativeTimeSetProps> = ({
   };
   const onChangeAmount = _val => {
     onChange?.({ ...dateVal, amount: _val });
-    console.log('_direction', _val);
   };
   const onChangeUnit = _val => {
     onChange?.({ ...dateVal, unit: _val });
