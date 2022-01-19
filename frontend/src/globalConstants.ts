@@ -36,6 +36,7 @@ export const DEFAULT_AUTHORIZATION_TOKEN_EXPIRATION = 1000 * 60 * 60;
 export enum CommonFormTypes {
   Add = 'add',
   Edit = 'edit',
+  SaveAs = 'saveAs',
 }
 
 export const TITLE_SUFFIX = ['archived', 'unpublished'];

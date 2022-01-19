@@ -1,5 +1,6 @@
 {
   "global": {
+    "copy": "copy",
     "tokenExpired": "Token expired, please log in",
     "title": {
       "action": "Action"
@@ -13,7 +14,8 @@
       "delete": "Delete",
       "info": "Info",
       "open": "Open",
-      "close": "Close"
+      "close": "Close",
+      "saveAs": "Save as"
     },
     "operation": {
       "archiveConfirm": "Archive confirm",

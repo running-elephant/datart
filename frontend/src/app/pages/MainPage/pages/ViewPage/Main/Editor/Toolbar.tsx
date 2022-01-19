@@ -50,6 +50,7 @@ import {
   ViewViewModelStages,
 } from '../../constants';
 import { EditorContext } from '../../EditorContext';
+import { useSaveAsView } from '../../hooks/useSaveAsView';
 import { SaveFormContext } from '../../SaveFormContext';
 import { useViewSlice } from '../../slice';
 import {
@@ -106,7 +107,7 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
   ) as number;
   const viewsData = useSelector(selectViews);
   const t = useI18NPrefix('view.editor');
-
+  const saveAsView = useSaveAsView();
   const isArchived = status === ViewStatus.Archived;
 
   const formatSQL = useCallback(() => {
@@ -280,7 +281,7 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
             <Tooltip title={t('saveAs')} placement="bottom">
               <ToolbarButton
                 icon={<CopyFilled />}
-                disabled={stage !== ViewViewModelStages.Saveable}
+                onClick={() => saveAsView(id)}
               />
             </Tooltip>
             {/* <Tooltip title={t('saveFragment')} placement="bottom">

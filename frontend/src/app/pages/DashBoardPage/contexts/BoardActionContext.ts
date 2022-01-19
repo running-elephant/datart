@@ -26,6 +26,7 @@ export interface BoardActionContextProps {
   onBoardToDownLoad: () => any;
   onWidgetsQuery: () => any;
   onWidgetsReset: () => any;
+  onSaveAsVizs: () => any;
 }
 export const BoardActionContext = createContext<BoardActionContextProps>(
   {} as BoardActionContextProps,

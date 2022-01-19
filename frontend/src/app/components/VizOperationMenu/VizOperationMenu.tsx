@@ -16,7 +16,11 @@
  * limitations under the License.
  */
 
-import { UserOutlined } from '@ant-design/icons';
+import {
+  CloudDownloadOutlined,
+  CopyFilled,
+  ShareAltOutlined,
+} from '@ant-design/icons';
 import { Menu, Popconfirm } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo } from 'react';
@@ -25,16 +29,21 @@ import styled from 'styled-components/macro';
 const VizOperationMenu: FC<{
   onShareLinkClick?;
   onDownloadDataLinkClick?;
+  onSaveAsVizs?;
   allowDownload?: boolean;
   allowShare?: boolean;
+  allowManage?: boolean;
 }> = memo(
   ({
     onShareLinkClick,
     onDownloadDataLinkClick,
+    onSaveAsVizs,
     allowDownload,
     allowShare,
+    allowManage,
   }) => {
     const t = useI18NPrefix(`viz.action`);
+    const tg = useI18NPrefix(`global`);
 
     const moreActionMenu = () => {
       const menus: any[] = [];
@@ -42,16 +51,17 @@ const VizOperationMenu: FC<{
         menus.push(
           <Menu.Item
             key="shareLink"
-            icon={<UserOutlined />}
+            icon={<ShareAltOutlined />}
             onClick={onShareLinkClick}
           >
             {t('share.shareLink')}
           </Menu.Item>,
         );
       }
+
       if (allowDownload && onDownloadDataLinkClick) {
         menus.push(
-          <Menu.Item key="downloadData" icon={<UserOutlined />}>
+          <Menu.Item key="downloadData" icon={<CloudDownloadOutlined />}>
             <Popconfirm
               placement="left"
               title={t('common.confirm')}
@@ -65,6 +75,13 @@ const VizOperationMenu: FC<{
         );
       }
 
+      if (allowManage && onSaveAsVizs) {
+        menus.push(
+          <Menu.Item key="saveAs" icon={<CopyFilled />} onClick={onSaveAsVizs}>
+            {tg('button.saveAs')}
+          </Menu.Item>,
+        );
+      }
       return <Menu>{menus}</Menu>;
     };
 

@@ -1,5 +1,6 @@
 {
   "global": {
+    "copy": "副本",
     "tokenExpired": "会话过期，请重新登录",
     "title": {
       "action": "操作"
@@ -13,7 +14,8 @@
       "delete": "删除",
       "info": "基本信息",
       "open": "开启",
-      "close": "关闭"
+      "close": "关闭",
+      "saveAs": "另存为"
     },
     "operation": {
       "archiveConfirm": "确定移至回收站？",

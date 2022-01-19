@@ -243,26 +243,29 @@ const slice = createSlice({
     });
 
     // saveView
-    builder.addCase(saveView.pending, state => {
+    builder.addCase(saveView.pending, (state, action) => {
       const currentEditingView = state.editingViews.find(
         v => v.id === state.currentEditingView,
       );
-      if (currentEditingView) {
+      const isSaveAs = action.meta.arg.isSaveAs;
+      if (currentEditingView && !isSaveAs) {
         currentEditingView.stage = ViewViewModelStages.Saving;
       }
     });
     builder.addCase(saveView.fulfilled, (state, action) => {
-      const editingIndex = state.editingViews.findIndex(
-        v => v.id === state.currentEditingView,
-      );
-      state.editingViews.splice(editingIndex, 1, {
-        ...action.payload,
-        touched: false,
-        stage: ViewViewModelStages.Saved,
-        originVariables: [...action.payload.variables],
-        originColumnPermissions: [...action.payload.columnPermissions],
-      });
-      state.currentEditingView = action.payload.id;
+      if (!action.payload.isSaveAs) {
+        const editingIndex = state.editingViews.findIndex(
+          v => v.id === state.currentEditingView,
+        );
+        state.editingViews.splice(editingIndex, 1, {
+          ...action.payload,
+          touched: false,
+          stage: ViewViewModelStages.Saved,
+          originVariables: [...action.payload.variables],
+          originColumnPermissions: [...action.payload.columnPermissions],
+        });
+        state.currentEditingView = action.payload.id;
+      }
 
       if (state.views) {
         const treeIndex = state.views.findIndex(
