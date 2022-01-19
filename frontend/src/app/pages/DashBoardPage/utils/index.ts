@@ -18,9 +18,7 @@
 
 import { migrateChartConfig } from 'app/migration';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
-import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { IChart } from 'app/types/Chart';
 import {
   ChartDataSectionField,
   ChartDataSectionType,
@@ -35,7 +33,7 @@ import {
   ControllerFacadeTypes,
   TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
-import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
 import { getTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
@@ -98,12 +96,7 @@ export const getRGBAColor = color => {
 };
 
 export const getChartDataRequestBuilder = (dataChart: DataChart) => {
-  const chartInstance = ChartManager.instance().getById(
-    dataChart.config.chartGraphId,
-  ) as IChart;
-
-  const chartConfig = mergeToChartConfig(
-    chartInstance?.config,
+  const { datas, settings } = convertToChartConfigDTO(
     migrateChartConfig(dataChart?.config as ChartDetailConfigDTO),
   );
   const builder = new ChartDataRequestBuilder(
@@ -111,19 +104,13 @@ export const getChartDataRequestBuilder = (dataChart: DataChart) => {
       id: dataChart?.viewId,
       computedFields: dataChart?.config?.computedFields || [],
     } as any,
-    chartConfig?.datas,
-    chartConfig?.settings,
+    datas,
+    settings,
     {},
     false,
     dataChart?.config?.aggregation,
   );
   return builder;
-};
-
-export const getChartRequestParams = (dataChart: DataChart) => {
-  const builder = getChartDataRequestBuilder(dataChart);
-  const requestParams = builder.build();
-  return requestParams;
 };
 
 export const getChartGroupColumns = (dataChart: DataChart) => {

@@ -21,11 +21,11 @@ import {
   ChartDataConfig,
   ChartDataSectionField,
   ChartDataSectionType,
-  ChartStyleConfig,
   FilterConditionType,
   RelationFilterValue,
   SortActionType,
 } from 'app/types/ChartConfig';
+import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import {
   ChartDataRequest,
   ChartDataRequestFilter,
@@ -44,7 +44,7 @@ import { isEmptyArray, IsKeyIn } from 'utils/object';
 
 export class ChartDataRequestBuilder {
   chartDataConfigs: ChartDataConfig[];
-  charSettingConfigs: ChartStyleConfig[];
+  charSettingConfigs: ChartStyleConfigDTO[];
   pageInfo: ChartDatasetPageInfo;
   dataView: ChartDataView;
   script: boolean;
@@ -54,7 +54,7 @@ export class ChartDataRequestBuilder {
   constructor(
     dataView: ChartDataView,
     dataConfigs?: ChartDataConfig[],
-    settingConfigs?: ChartStyleConfig[],
+    settingConfigs?: ChartStyleConfigDTO[],
     pageInfo?: ChartDatasetPageInfo,
     script?: boolean,
     aggregation?: boolean,

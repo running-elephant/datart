@@ -73,6 +73,7 @@ const getBoardQueryData = (dataStr: string) => {
   let fileName = dashboard.name;
   return JSON.stringify({ downloadParams, fileName });
 };
+
 const getChartQueryData = (dataStr: string) => {
   // see  handleCreateDownloadDataTask
   const data: ChartDTO = JSON.parse(dataStr);

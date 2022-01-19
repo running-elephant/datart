@@ -27,7 +27,7 @@ import {
   IFieldFormatConfig,
   SortActionType,
 } from 'app/types/ChartConfig';
-import { ChartDetailConfigDTO, ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
+import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDatasetMeta } from 'app/types/ChartDataset';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
@@ -49,10 +49,7 @@ import { toFormattedValue } from './number';
 export function getDefaultThemeColor() {
   return echartsDefaultTheme.color;
 }
-export function isInRange(
-  limit?: ChartDataConfig['limit'],
-  count: number = 0,
-) {
+export function isInRange(limit?: ChartDataConfig['limit'], count: number = 0) {
   return cond(
     [isEmpty, true],
     [isNumerical, curry(isNumericEqual)(count)],
@@ -164,7 +161,7 @@ export function getStyles(
  * @return {*}
  */
 export function getValue(
-  configs: Array<ChartStyleConfig>,
+  configs: Array<ChartStyleConfig | ChartStyleConfigDTO>,
   keyPaths: Array<string>,
   targetKey = 'value',
 ) {
