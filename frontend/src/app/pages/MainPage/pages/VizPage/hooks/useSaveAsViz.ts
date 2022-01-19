@@ -19,18 +19,36 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
 import { useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getInsertedNodeIndex } from 'utils/utils';
+import { request } from 'utils/request';
+import { errorHandle, getInsertedNodeIndex } from 'utils/utils';
 import { SaveFormContext, SaveFormModel } from '../SaveFormContext';
 import { selectVizs } from '../slice/selectors';
 import { addViz, copyDashboard } from '../slice/thunks';
 import { VizType } from '../slice/types';
-import { getVizDetail } from '../utils';
 
 export function useSaveAsViz() {
   const { showSaveForm } = useContext(SaveFormContext);
   const vizsData = useSelector(selectVizs);
   const dispatch = useDispatch();
   const tg = useI18NPrefix('global');
+
+  const getVizDetail = useCallback(
+    async (backendChartId: string, type: string) => {
+      try {
+        const { data } = await request<any>({
+          method: 'GET',
+          url: `viz/${type.toLowerCase()}s/${backendChartId}`,
+        });
+
+        return data;
+      } catch (error) {
+        errorHandle(error);
+
+        return {} as any;
+      }
+    },
+    [],
+  );
 
   const saveAsViz = useCallback(
     async (vizId: string, type: VizType) => {

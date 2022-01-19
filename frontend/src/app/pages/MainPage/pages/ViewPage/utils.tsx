@@ -17,9 +17,7 @@
  */
 
 import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
-import { request } from 'utils/request';
-import { errorHandle, getDiffParams, getTextWidth } from 'utils/utils';
-import { View } from '../../../../types/View';
+import { getDiffParams, getTextWidth } from 'utils/utils';
 import {
   ColumnCategories,
   DEFAULT_PREVIEW_SIZE,
@@ -265,17 +263,10 @@ export function getSaveParamsFromViewModel(
   }
 }
 
-export async function getViewData(viewId): Promise<View> {
-  try {
-    const { data } = await request<View>(`/views/${viewId}`);
-    return data;
-  } catch (error) {
-    errorHandle(error);
-    return {} as View;
-  }
-}
-
-export function handleViewData(data, tempViewModel?: object): ViewViewModel {
+export function transformModelToViewModel(
+  data,
+  tempViewModel?: object,
+): ViewViewModel {
   const {
     config,
     model,

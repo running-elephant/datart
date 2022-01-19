@@ -25,6 +25,7 @@ import { RootState } from 'types';
 import { request } from 'utils/request';
 import { errorHandle, rejectHandle } from 'utils/utils';
 import { viewActions } from '.';
+import { View } from '../../../../../types/View';
 import { selectVariables } from '../../VariablePage/slice/selectors';
 import { Variable } from '../../VariablePage/slice/types';
 import { ViewViewModelStages } from '../constants';
@@ -32,8 +33,8 @@ import {
   generateEditingView,
   generateNewEditingViewName,
   getSaveParamsFromViewModel,
-  handleViewData,
   isNewView,
+  transformModelToViewModel,
 } from '../utils';
 import {
   selectCurrentEditingView,
@@ -55,7 +56,6 @@ import {
   ViewSimple,
   ViewViewModel,
 } from './types';
-import { View } from "../../../../../types/View";
 
 export const getViews = createAsyncThunk<ViewSimple[], string>(
   'view/getViews',
@@ -121,7 +121,7 @@ export const getViewDetail = createAsyncThunk<
 
     try {
       const { data } = await request<View>(`/views/${viewId}`);
-      return handleViewData(data, tempViewModel);
+      return transformModelToViewModel(data, tempViewModel);
     } catch (error) {
       return rejectHandle(error, rejectWithValue);
     }

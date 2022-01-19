@@ -17,14 +17,16 @@
  */
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
-import { useContext } from 'react';
+import { useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getInsertedNodeIndex } from 'utils/utils';
+import { request } from 'utils/request';
+import { errorHandle, getInsertedNodeIndex } from 'utils/utils';
+import { View } from '../../../../../types/View';
 import { SaveFormContext } from '../SaveFormContext';
 import { selectViews } from '../slice/selectors';
 import { saveView } from '../slice/thunks';
 import { ViewViewModel } from '../slice/types';
-import { getViewData, handleViewData } from '../utils';
+import { transformModelToViewModel } from '../utils';
 
 export function useSaveAsView() {
   const t = useI18NPrefix('view.editor');
@@ -33,37 +35,54 @@ export function useSaveAsView() {
   const viewsData = useSelector(selectViews);
   const dispatch = useDispatch();
 
-  const saveAsView = async (viewId: string) => {
-    let viewData: ViewViewModel = await getViewData(viewId).then(data => {
-      return handleViewData(data);
-    });
-    const { name, parentId, config } = viewData;
+  const getViewData = useCallback(async (viewId): Promise<View> => {
+    try {
+      const { data } = await request<View>(`/views/${viewId}`);
+      return data;
+    } catch (error) {
+      errorHandle(error);
+      return {} as View;
+    }
+  }, []);
 
-    showSaveForm({
-      type: CommonFormTypes.SaveAs,
-      visible: true,
-      initialValues: {
-        name: name + '_' + tg('copy'),
-        parentId,
-        config: config,
-      },
-      parentIdLabel: t('folder'),
-      onSave: (values, onClose) => {
-        let index = getInsertedNodeIndex(values, viewsData);
+  const saveAsView = useCallback(
+    async (viewId: string) => {
+      let viewData: ViewViewModel = await getViewData(viewId).then(data => {
+        return transformModelToViewModel(data);
+      });
 
-        viewData = Object.assign({}, viewData, {
-          ...values,
-          parentId: values.parentId || null,
-          index,
-          previewResults: [],
-        });
+      const { name, parentId, config } = viewData;
 
-        dispatch(
-          saveView({ resolve: onClose, isSaveAs: true, currentView: viewData }),
-        );
-      },
-    });
-  };
+      showSaveForm({
+        type: CommonFormTypes.SaveAs,
+        visible: true,
+        initialValues: {
+          name: name + '_' + tg('copy'),
+          parentId,
+          config: config,
+        },
+        parentIdLabel: t('folder'),
+        onSave: (values, onClose) => {
+          let index = getInsertedNodeIndex(values, viewsData);
 
+          viewData = Object.assign({}, viewData, {
+            ...values,
+            parentId: values.parentId || null,
+            index,
+            previewResults: [],
+          });
+
+          dispatch(
+            saveView({
+              resolve: onClose,
+              isSaveAs: true,
+              currentView: viewData,
+            }),
+          );
+        },
+      });
+    },
+    [dispatch, getViewData, showSaveForm, t, tg, viewsData],
+  );
   return saveAsView;
 }
