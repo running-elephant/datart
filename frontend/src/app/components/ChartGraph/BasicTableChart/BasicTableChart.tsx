@@ -175,9 +175,10 @@ class BasicTableChart extends ReactChart {
       onChange: (pagination, filters, sorter, extra) => {
         if (extra?.action === 'sort' || extra?.action === 'paginate') {
           this.invokePagingRelatedEvents(
-            sorter?.field,
+            sorter?.column?.colName,
             sorter?.order,
             pagination?.current,
+            sorter?.column?.aggregate,
           );
         }
       },
@@ -497,6 +498,7 @@ class BasicTableChart extends ReactChart {
           title: getColumnRenderName(c),
           dataIndex: getValueByColumnKey(c),
           key: getValueByColumnKey(c),
+          aggregate: c?.aggregate,
           colName,
           width: colMaxWidth,
           fixed: _getFixedColumn(c?.uid),
@@ -703,11 +705,13 @@ class BasicTableChart extends ReactChart {
     seriesName: string,
     value: any,
     pageNo: number,
+    aggOperator?: string,
   ) {
     const eventParams = this.createrEventParams({
       seriesType: 'paging-sort-filter',
       seriesName,
       value: {
+        aggOperator: aggOperator,
         direction:
           value === undefined ? undefined : value === 'ascend' ? 'ASC' : 'DESC',
         pageNo,

@@ -484,6 +484,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
               {
                 column: params?.seriesName!,
                 operator: (params?.value as any)?.direction,
+                aggOperator: (params?.value as any)?.aggOperator,
               },
             ],
           },
