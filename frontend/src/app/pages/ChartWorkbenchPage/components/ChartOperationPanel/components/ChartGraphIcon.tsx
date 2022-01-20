@@ -106,22 +106,20 @@ const ChartGraphIcon: FC<{
         </>
       }
     >
-      <IconWrapper>
-        <StyledChartIcon
-          fontSize={FONT_SIZE_ICON_MD}
-          size={SPACE_TIMES(9)}
-          className={classnames({
-            active: isActive,
-          })}
-          onClick={handleChartChange(chart?.meta?.id)}
-        >
-          {renderIcon({
-            iconStr: chart?.meta?.icon,
-            isMatchRequirement,
-            isActive,
-          })}
-        </StyledChartIcon>
-      </IconWrapper>
+      <StyledChartIconWrapper
+        fontSize={FONT_SIZE_ICON_MD}
+        size={SPACE_TIMES(9)}
+        className={classnames({
+          active: isActive,
+        })}
+        onClick={handleChartChange(chart?.meta?.id)}
+      >
+        {renderIcon({
+          iconStr: chart?.meta?.icon,
+          isMatchRequirement,
+          isActive,
+        })}
+      </StyledChartIconWrapper>
     </Tooltip>
   );
 });
@@ -157,13 +155,10 @@ const Base64ImageRender = ({ iconStr, isMatchRequirement, isActive }) => {
   );
 };
 
-const IconWrapper = styled.span`
-  padding: ${SPACE_TIMES(0.5)};
-`;
-
-const StyledChartIcon = styled(IW)`
+const StyledChartIconWrapper = styled(IW)`
   cursor: pointer;
   border-radius: ${BORDER_RADIUS};
+  margin: ${SPACE_TIMES(0.5)};
 
   &:hover,
   &.active {
