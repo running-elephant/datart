@@ -653,7 +653,6 @@
           "table": "Table",
           "areaChart": "Area Chart",
           "barChart": "Bar Chart",
-          "doubleYChart": "Double Y Chart",
           "funnelChart": "Funnel Chart",
           "gaugeChart": "Gauge Chart",
           "lineChart": "Line Chart",

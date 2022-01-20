@@ -71,6 +71,7 @@ function D3JSScatterChart({ dHelper }) {
         {
           lang: 'zh-CN',
           translation: {
+            chartName: '[Experiment] D3JS 散点图',
             common: {
               title: '散点图配置',
               color: '气泡颜色',
@@ -80,6 +81,7 @@ function D3JSScatterChart({ dHelper }) {
         {
           lang: 'en',
           translation: {
+            chartName: '[Experiment] D3JS Scatter Chart',
             common: {
               title: 'Scatter Setting',
               color: 'Bubble Color',
@@ -93,7 +95,7 @@ function D3JSScatterChart({ dHelper }) {
     dependency: ['https://d3js.org/d3.v5.min.js'],
     meta: {
       id: 'demo-d3js-scatter-chart',
-      name: '[Plugin Demo] D3JS 散点图',
+      name: 'chartName',
       icon: 'sandiantu',
       requirements: [
         {

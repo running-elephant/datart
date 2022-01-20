@@ -434,6 +434,7 @@ function DemoCustomLineChart({ dHelper }) {
         {
           lang: 'zh-CN',
           translation: {
+            chartName: '[Experiment] 用户自定义折线图',
             common: {
               showAxis: '显示坐标轴',
               inverseAxis: '反转坐标轴',
@@ -496,6 +497,7 @@ function DemoCustomLineChart({ dHelper }) {
         {
           lang: 'en-US',
           translation: {
+            chartName: '[Experiment] Custom Line Chart',
             common: {
               showAxis: 'Show Axis',
               inverseAxis: 'Inverse Axis',
@@ -561,7 +563,7 @@ function DemoCustomLineChart({ dHelper }) {
     dependency: ['https://lib.baomitu.com/echarts/5.0.2/echarts.min.js'],
     meta: {
       id: 'demo-custom-line-chart',
-      name: '[DEMO]用户自定义折线图',
+      name: 'chartName',
       icon: svgIcon,
       requirements: [
         {

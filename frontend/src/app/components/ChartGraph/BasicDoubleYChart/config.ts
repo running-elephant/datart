@@ -422,6 +422,7 @@ const config: ChartConfig = {
     {
       lang: 'zh-CN',
       translation: {
+        chartName: '双Y轴图',
         common: {
           showAxis: '显示坐标轴',
           inverseAxis: '反转坐标轴',
@@ -486,6 +487,7 @@ const config: ChartConfig = {
     {
       lang: 'en-US',
       translation: {
+        chartName: 'Double Y Chart',
         common: {
           showAxis: 'Show Axis',
           inverseAxis: 'Inverse Axis',
