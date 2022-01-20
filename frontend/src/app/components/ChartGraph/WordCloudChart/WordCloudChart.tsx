@@ -38,7 +38,7 @@ class WordCloudChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'word-cloud',
-      props?.name || '词云',
+      props?.name || 'viz.palette.graph.names.wordCloudChart',
       props?.icon || 'fsux_tubiao_ciyun',
     );
     this.meta.requirements = props?.requirements || [

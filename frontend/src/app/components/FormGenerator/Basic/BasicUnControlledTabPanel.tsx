@@ -64,137 +64,134 @@ const reducer = (state, action) => {
   }
 };
 
-const BasicUnControlledTabPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
-  memo(
-    ({
-      ancestors,
-      translate: t = title => title,
-      data,
-      dataConfigs,
-      onChange,
-    }) => {
-      const [myData, dispatch] = useReducer(reducer, data);
-      const { editable } = myData?.options || { editable: false };
+const BasicUnControlledTabPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+  ({
+    ancestors,
+    translate: t = title => title,
+    data,
+    dataConfigs,
+    onChange,
+  }) => {
+    const [myData, dispatch] = useReducer(reducer, data);
+    const { editable } = myData?.options || { editable: false };
 
-      const [activeTabKey, setActiveTabKey] = useState<string | undefined>();
-      const [paneTemplate] = useState(() => {
-        const firstRow = (myData?.rows || [])[0];
-        return cleanChartConfigValueByDefaultValue([
-          CloneValueDeep(firstRow),
-        ])[0];
-      });
+    const [activeTabKey, setActiveTabKey] = useState<string | undefined>();
+    const [paneTemplate] = useState(() => {
+      const firstRow = (myData?.rows || [])[0];
+      return cleanChartConfigValueByDefaultValue([CloneValueDeep(firstRow)])[0];
+    });
 
-      useUpdateEffect(() => {
-        onChange?.(ancestors, myData);
-      }, [myData]);
+    useUpdateEffect(() => {
+      onChange?.(ancestors, myData);
+    }, [myData]);
 
-      const handleTabChange = key => {
-        setActiveTabKey(key);
-      };
+    const handleTabChange = key => {
+      setActiveTabKey(key);
+    };
 
-      const handleEdit = (tabKey, action) => {
-        const activeKey = uuidv4();
-        const label = 'new tab';
-        if (action === 'remove' && !isEmpty(tabKey)) {
-          const newPanes = myData.rows?.filter(p => p.key !== tabKey) || [];
-          let newRows: ChartStyleSectionGroup[] = [];
+    const handleEdit = (tabKey, action) => {
+      const activeKey = uuidv4();
+      const label = 'new tab';
+      if (action === 'remove' && !isEmpty(tabKey)) {
+        const newPanes = myData.rows?.filter(p => p.key !== tabKey) || [];
+        let newRows: ChartStyleSectionGroup[] = [];
 
-          if (newPanes.length === 0) {
-            newRows = [
-              {
-                ...resetValue(CloneValueDeep(paneTemplate)),
-                label: label,
-                key: activeKey,
-              },
-            ];
-            dispatch({
-              type: 'reset',
-              payload: newRows,
-            });
-          } else {
-            dispatch({
-              type: 'remove',
-              payload: {
-                key: 'rows',
-                value: tabKey,
-              },
-            });
-          }
-        }
-        if (action === 'add') {
+        if (newPanes.length === 0) {
+          newRows = [
+            {
+              ...resetValue(CloneValueDeep(paneTemplate)),
+              label: label,
+              key: activeKey,
+            },
+          ];
           dispatch({
-            type: 'add',
+            type: 'reset',
+            payload: newRows,
+          });
+        } else {
+          dispatch({
+            type: 'remove',
             payload: {
               key: 'rows',
-              value: {
-                ...resetValue(CloneValueDeep(paneTemplate)),
-                label: label,
-                key: activeKey,
-              },
+              value: tabKey,
             },
           });
-          setActiveTabKey(activeKey);
         }
-      };
-
-      const handleDataChange = (subAncestors, config) => {
+      }
+      if (action === 'add') {
         dispatch({
-          type: 'update',
+          type: 'add',
           payload: {
-            ancestors: subAncestors,
-            value: config,
+            key: 'rows',
+            value: {
+              ...resetValue(CloneValueDeep(paneTemplate)),
+              label: label,
+              key: activeKey,
+            },
           },
         });
-      };
+        setActiveTabKey(activeKey);
+      }
+    };
 
-      const renderTabPaneContent = (r, index) => {
-        return (
-          <GroupLayout
-            ancestors={[index]}
-            key={r.key}
-            mode={GroupLayoutMode.INNER}
-            data={r}
-            translate={t}
-            dataConfigs={dataConfigs}
-            onChange={handleDataChange}
-          />
-        );
-      };
+    const handleDataChange = (subAncestors, config) => {
+      dispatch({
+        type: 'update',
+        payload: {
+          ancestors: subAncestors,
+          value: config,
+        },
+      });
+    };
 
+    const renderTabPaneContent = (r, index) => {
       return (
-        <StyledBasicUnControlledTabPanel
-          onChange={handleTabChange}
-          activeKey={activeTabKey}
-          type={editable ? 'editable-card' : undefined}
-          onEdit={handleEdit}
-        >
-          {myData.rows?.map((p, index) => {
-            return (
-              <TabPane
-                key={p.key}
-                tab={
-                  <EditableTabHeader
-                    editable={editable}
-                    label={p.label}
-                    onChange={value => {
-                      const newAncerstors = [index];
-                      handleDataChange(newAncerstors, {
-                        ...p,
-                        ...{ label: value },
-                      });
-                    }}
-                  />
-                }
-              >
-                {renderTabPaneContent(p, index)}
-              </TabPane>
-            );
-          })}
-        </StyledBasicUnControlledTabPanel>
+        <GroupLayout
+          ancestors={[index]}
+          key={r.key}
+          mode={GroupLayoutMode.INNER}
+          data={r}
+          translate={t}
+          dataConfigs={dataConfigs}
+          onChange={handleDataChange}
+        />
       );
-    },
-    itemLayoutComparer,
-  );
+    };
+
+    return (
+      <StyledBasicUnControlledTabPanel
+        onChange={handleTabChange}
+        activeKey={activeTabKey}
+        type={editable ? 'editable-card' : undefined}
+        onEdit={handleEdit}
+      >
+        {myData.rows?.map((p, index) => {
+          return (
+            <TabPane
+              key={p.key}
+              tab={
+                <EditableTabHeader
+                  editable={editable}
+                  label={p.label}
+                  onChange={value => {
+                    const newAncerstors = [index];
+                    handleDataChange(newAncerstors, {
+                      ...p,
+                      ...{ label: value },
+                    });
+                  }}
+                />
+              }
+            >
+              {renderTabPaneContent(p, index)}
+            </TabPane>
+          );
+        })}
+      </StyledBasicUnControlledTabPanel>
+    );
+  },
+  itemLayoutComparer,
+);
 
 const EditableTabHeader: FC<{
   label: string;

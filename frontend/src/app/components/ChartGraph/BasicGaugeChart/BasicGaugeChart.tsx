@@ -41,7 +41,7 @@ class BasicGaugeChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'gauge',
-      props?.name || '仪表盘',
+      props?.name || 'viz.palette.graph.names.gaugeChart',
       props?.icon || 'gauge',
     );
     this.meta.requirements = props?.requirements || [

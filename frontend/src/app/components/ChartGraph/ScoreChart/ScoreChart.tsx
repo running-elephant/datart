@@ -46,7 +46,7 @@ class ScoreChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'score-chart',
-      props?.name || '翻牌器',
+      props?.name || 'viz.palette.graph.names.scoreChart',
       props?.icon || 'fanpaiqi',
     );
     this.meta.requirements = props?.requirements || [

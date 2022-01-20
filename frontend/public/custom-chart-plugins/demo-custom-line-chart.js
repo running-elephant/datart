@@ -373,36 +373,36 @@ function DemoCustomLineChart({ dHelper }) {
           ],
         },
         {
-          label: 'margin.title',
+          label: 'viz.palette.style.margin.title',
           key: 'margin',
           comType: 'group',
           rows: [
             {
-              label: 'margin.containLabel',
+              label: 'viz.palette.style.margin.containLabel',
               key: 'containLabel',
               default: true,
               comType: 'checkbox',
             },
             {
-              label: 'margin.left',
+              label: 'viz.palette.style.margin.left',
               key: 'marginLeft',
               default: '5%',
               comType: 'marginWidth',
             },
             {
-              label: 'margin.right',
+              label: 'viz.palette.style.margin.right',
               key: 'marginRight',
               default: '5%',
               comType: 'marginWidth',
             },
             {
-              label: 'margin.top',
+              label: 'viz.palette.style.margin.top',
               key: 'marginTop',
-              default: '15%',
+              default: '5%',
               comType: 'marginWidth',
             },
             {
-              label: 'margin.bottom',
+              label: 'viz.palette.style.margin.bottom',
               key: 'marginBottom',
               default: '5%',
               comType: 'marginWidth',
@@ -412,12 +412,12 @@ function DemoCustomLineChart({ dHelper }) {
       ],
       settings: [
         {
-          label: 'paging.title',
+          label: 'viz.palette.setting.paging.title',
           key: 'paging',
           comType: 'group',
           rows: [
             {
-              label: 'paging.pageSize',
+              label: 'viz.palette.setting.paging.pageSize',
               key: 'pageSize',
               default: 1000,
               comType: 'inputNumber',
@@ -490,6 +490,68 @@ function DemoCustomLineChart({ dHelper }) {
             reference: {
               title: '参考线',
               open: '点击参考线配置',
+            },
+          },
+        },
+        {
+          lang: 'en-US',
+          translation: {
+            common: {
+              showAxis: 'Show Axis',
+              inverseAxis: 'Inverse Axis',
+              lineStyle: 'Line Style',
+              borderType: 'Border Type',
+              borderWidth: 'Border Width',
+              borderColor: 'Border Color',
+              backgroundColor: 'Background Color',
+              showLabel: 'Show Label',
+              unitFont: 'Unit Font',
+              rotate: 'Rotate',
+              position: 'Position',
+              showInterval: 'Show Interval',
+              interval: 'Interval',
+              showTitleAndUnit: 'Show Title and Unit',
+              nameLocation: 'Name Location',
+              nameRotate: 'Name Rotate',
+              nameGap: 'Name Gap',
+              min: 'Min',
+              max: 'Max',
+            },
+            label: {
+              title: 'Label',
+              showLabel: 'Show Label',
+              position: 'Position',
+            },
+            legend: {
+              title: 'Legend',
+              showLegend: 'Show Legend',
+              type: 'Type',
+              selectAll: 'Select All',
+              position: 'Position',
+            },
+            data: {
+              color: 'Color',
+              colorize: 'Colorize',
+            },
+            graph: {
+              title: 'Graph',
+              smooth: 'Smooth',
+              step: 'Step',
+            },
+            xAxis: {
+              title: 'X Axis',
+            },
+            yAxis: {
+              title: 'Y Axis',
+            },
+            splitLine: {
+              title: 'Split Line',
+              showHorizonLine: 'Show Horizontal Line',
+              showVerticalLine: 'Show Vertical Line',
+            },
+            reference: {
+              title: 'Reference',
+              open: 'Open',
             },
           },
         },

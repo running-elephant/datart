@@ -17,10 +17,7 @@
  */
 
 import { Col, Row, Switch } from 'antd';
-import {
-  ChartStyleConfig,
-  ChartStyleSectionRow,
-} from 'app/types/ChartConfig';
+import { ChartStyleConfig, ChartStyleSectionRow } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';

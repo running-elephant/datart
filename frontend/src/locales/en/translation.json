@@ -536,6 +536,8 @@
         }
       },
       "data": {
+        "column": "Column",
+        "row": "Row",
         "dimension": "Dimension",
         "metrics": "Metric",
         "mixed": "Columns",
@@ -587,8 +589,8 @@
         },
         "axis": {
           "y": {
-            "left": "left axis dimension",
-            "right": "right axis dimension"
+            "left": "Left Metric",
+            "right": "Right Metric"
           }
         },
         "enum": {
@@ -649,6 +651,35 @@
         "needMore": "At least need {{num}} {{type}}(s)"
       },
       "graph": {
+        "names": {
+          "table": "Table",
+          "areaChart": "Area Chart",
+          "barChart": "Bar Chart",
+          "doubleYChart": "Double Y Chart",
+          "funnelChart": "Funnel Chart",
+          "gaugeChart": "Gauge Chart",
+          "lineChart": "Line Chart",
+          "outlineMap": "Outline Map",
+          "pieChart": "Pie Chart",
+          "radarChart": "Radar Chart",
+          "richText": "Rich Text",
+          "scatterChart": "Scatter Chart",
+          "clusterBarChart": "Cluster Bar Chart",
+          "clusterColumnChart": "Cluster Column Chart",
+          "doughnutChart": "Doughnut Chart",
+          "normalOutlineMap": "Normal Outline Map",
+          "percentageStackBarChart": "Percentage Stack Bar Chart",
+          "percentageStackColumnChart": "Percentage Stack Column Chart",
+          "pivotSheet": "Pivot Table",
+          "roseChart": "Rose Chart",
+          "scatterOutlineMap": "Scatter Outline Map",
+          "scoreChart": "Score Chart",
+          "stackAreaChart": "Stack Area Chart",
+          "stackBarChart": "Stack Bar Chart",
+          "stackColumnChart": "Stack Column Chart",
+          "waterfallChart": "Waterfall Chart",
+          "wordCloudChart": "Word Cloud"
+        },
         "group": "Dimensions",
         "aggregate": "Measures",
         "onlyAllow": "{{type}} Only Allow {{num}}",
@@ -853,10 +884,10 @@
       "scaleFull": "scaleFull",
       "noScale": "noScale"
     },
-    "tips":{
-      "noStartValue":"Input Start Value",
-      "noEndValue":"Input End Value",
-      "endGTStartErr":"End Value should GT StartValue "
+    "tips": {
+      "noStartValue": "Input Start Value",
+      "noEndValue": "Input End Value",
+      "endGTStartErr": "End Value should GT StartValue "
     },
     "control": {
       "title": "Control Title",
@@ -871,7 +902,7 @@
       "showMark": "Show Mark",
       "common": "General",
       "custom": "Customize",
-      "optionLabelField":"Option Label Field"
+      "optionLabelField": "Option Label Field"
     },
     "date": {
       "year": "Year",

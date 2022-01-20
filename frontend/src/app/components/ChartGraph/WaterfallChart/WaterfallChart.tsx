@@ -39,7 +39,7 @@ class WaterfallChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'waterfall-chart',
-      props?.name || '瀑布图',
+      props?.name || 'viz.palette.graph.names.waterfallChart',
       props?.icon || 'waterfall',
     );
     this.meta.requirements = props?.requirements || [

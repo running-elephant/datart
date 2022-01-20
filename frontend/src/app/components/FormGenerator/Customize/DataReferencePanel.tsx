@@ -27,7 +27,7 @@ import { itemLayoutComparer } from '../utils';
 
 const defaultRows = [
   {
-    label: 'reference.title',
+    label: 'viz.palette.setting.reference.title',
     key: 'configuration',
     comType: 'tabs',
     options: { editable: true },
@@ -38,18 +38,18 @@ const defaultRows = [
         comType: 'group',
         rows: [
           {
-            label: 'reference.markLine',
+            label: 'viz.palette.setting.reference.markLine',
             key: 'markLine',
             comType: 'group',
             rows: [
               {
-                label: 'reference.enableMarkLine',
+                label: 'viz.palette.setting.reference.enableMarkLine',
                 key: 'enableMarkLine',
                 default: false,
                 comType: 'checkbox',
               },
               {
-                label: 'reference.valueType',
+                label: 'viz.palette.setting.reference.valueType',
                 key: 'valueType',
                 default: 'constant',
                 comType: 'select',
@@ -63,7 +63,7 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.constantValue',
+                label: 'viz.palette.setting.reference.constantValue',
                 key: 'constantValue',
                 default: 0,
                 comType: 'inputNumber',
@@ -77,7 +77,7 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.metric',
+                label: 'viz.palette.setting.reference.metric',
                 key: 'metric',
                 comType: 'select',
                 watcher: {
@@ -109,13 +109,13 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.showLabel',
+                label: 'viz.palette.setting.reference.showLabel',
                 key: 'showLabel',
                 comType: 'checkbox',
                 options: [],
               },
               {
-                label: 'reference.position',
+                label: 'viz.palette.setting.reference.position',
                 key: 'position',
                 comType: 'select',
                 default: 'start',
@@ -128,7 +128,7 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.lineStyle',
+                label: 'viz.palette.setting.reference.lineStyle',
                 key: 'lineStyle',
                 comType: 'line',
                 default: {
@@ -138,7 +138,7 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.font',
+                label: 'viz.palette.setting.reference.font',
                 key: 'font',
                 comType: 'font',
                 default: {
@@ -152,18 +152,18 @@ const defaultRows = [
             ],
           },
           {
-            label: 'reference.markArea',
+            label: 'viz.palette.setting.reference.markArea',
             key: 'markArea',
             comType: 'group',
             rows: [
               {
-                label: 'reference.enableMarkArea',
+                label: 'viz.palette.setting.reference.enableMarkArea',
                 key: 'enableMarkArea',
                 default: false,
                 comType: 'checkbox',
               },
               {
-                label: 'reference.startValueType',
+                label: 'viz.palette.setting.reference.startValueType',
                 key: 'startValueType',
                 default: 'constant',
                 comType: 'select',
@@ -177,7 +177,7 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.startConstantValue',
+                label: 'viz.palette.setting.reference.startConstantValue',
                 key: 'startConstantValue',
                 default: 0,
                 comType: 'inputNumber',
@@ -191,7 +191,7 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.startMetric',
+                label: 'viz.palette.setting.reference.startMetric',
                 key: 'startMetric',
                 comType: 'select',
                 watcher: {
@@ -220,7 +220,7 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.endValueType',
+                label: 'viz.palette.setting.reference.endValueType',
                 key: 'endValueType',
                 default: 'constant',
                 comType: 'select',
@@ -234,7 +234,7 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.endConstantValue',
+                label: 'viz.palette.setting.reference.endConstantValue',
                 key: 'endConstantValue',
                 default: 0,
                 comType: 'inputNumber',
@@ -248,7 +248,7 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.endMetric',
+                label: 'viz.palette.setting.reference.endMetric',
                 key: 'endMetric',
                 comType: 'select',
                 watcher: {
@@ -277,12 +277,12 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.showLabel',
+                label: 'viz.palette.setting.reference.showLabel',
                 key: 'showLabel',
                 comType: 'checkbox',
               },
               {
-                label: 'common.position',
+                label: 'viz.palette.setting.reference.position',
                 key: 'position',
                 comType: 'select',
                 default: 'start',
@@ -295,7 +295,7 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.font',
+                label: 'viz.palette.setting.reference.font',
                 key: 'font',
                 comType: 'font',
                 default: {
@@ -307,13 +307,13 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.backgroundColor',
+                label: 'viz.palette.setting.reference.backgroundColor',
                 key: 'backgroundColor',
                 default: 'grey',
                 comType: 'fontColor',
               },
               {
-                label: 'reference.opacity',
+                label: 'viz.palette.setting.reference.opacity',
                 key: 'opacity',
                 default: 0.6,
                 comType: 'select',
@@ -322,7 +322,7 @@ const defaultRows = [
                 },
               },
               {
-                label: 'reference.borderStyle',
+                label: 'viz.palette.setting.reference.borderStyle',
                 key: 'borderStyle',
                 comType: 'line',
                 default: {

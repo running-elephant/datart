@@ -41,7 +41,7 @@ const BasicCheckbox: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           checked={row.value}
           onChange={handleCheckedChange}
         >
-          {t(row.label)}
+          {t(row.label, true)}
         </Checkbox>
       </StyledVizBasicCheckbox>
     );

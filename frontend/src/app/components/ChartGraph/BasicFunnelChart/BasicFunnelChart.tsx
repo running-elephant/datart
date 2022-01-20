@@ -43,7 +43,11 @@ class BasicFunnelChart extends Chart {
   chart: any = null;
 
   constructor() {
-    super('funnel-chart', '漏斗图', 'fsux_tubiao_loudoutu');
+    super(
+      'funnel-chart',
+      'viz.palette.graph.names.funnelChart',
+      'fsux_tubiao_loudoutu',
+    );
     this.meta.requirements = [
       {
         group: [0, 1],

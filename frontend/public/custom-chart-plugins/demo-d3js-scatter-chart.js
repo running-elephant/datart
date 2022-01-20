@@ -49,12 +49,12 @@ function D3JSScatterChart({ dHelper }) {
       ],
       settings: [
         {
-          label: 'paging.title',
+          label: 'viz.palette.setting.paging.title',
           key: 'paging',
           comType: 'group',
           rows: [
             {
-              label: 'paging.pageSize',
+              label: 'viz.palette.setting.paging.pageSize',
               key: 'pageSize',
               default: 1000,
               comType: 'inputNumber',

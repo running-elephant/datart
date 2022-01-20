@@ -45,8 +45,8 @@ class PivotSheetChart extends ReactChart {
 
   constructor() {
     super(AntVS2Wrapper, {
-      id: 'piovt-sheet',
-      name: '透视表',
+      id: 'piovt-sheet', // TODO(Stephen): should fix typo pivot
+      name: 'viz.palette.graph.names.pivotSheet',
       icon: PivotSheetChart.icon,
     });
     this.meta.requirements = [{}];

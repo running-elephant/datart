@@ -22,7 +22,11 @@ class AreaChart extends BasicLineChart {
   isArea = true;
 
   constructor() {
-    super({ id: 'area-chart', name: '面积图', icon: 'areachart' });
+    super({
+      id: 'area-chart',
+      name: 'viz.palette.graph.names.areaChart',
+      icon: 'areachart',
+    });
   }
 }
 

@@ -17,10 +17,7 @@
  */
 
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import {
-  ChartDataConfig,
-  ChartDataSectionType,
-} from 'app/types/ChartConfig';
+import { ChartDataConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';

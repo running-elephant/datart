@@ -40,7 +40,7 @@ class BasicScatterChart extends Chart {
   chart: any = null;
 
   constructor() {
-    super('scatter', '散点图', 'sandiantu');
+    super('scatter', 'viz.palette.graph.names.scatterChart', 'sandiantu');
     this.meta.requirements = [
       {
         group: [0, 999],

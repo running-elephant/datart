@@ -68,7 +68,7 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     };
 
     return (
-      <Wrapper label={!hideLabel ? t(row.label) : ''}>
+      <Wrapper label={!hideLabel ? t(row.label, true) : ''}>
         <Select
           dropdownMatchSelectWidth
           {...rest}
@@ -83,7 +83,7 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             const value = isEmpty(o['value']) ? o : o.value;
             return (
               <Select.Option key={key} value={value}>
-                {needTranslate ? t(label) : label}
+                {needTranslate ? t(label, true) : label}
               </Select.Option>
             );
           })}

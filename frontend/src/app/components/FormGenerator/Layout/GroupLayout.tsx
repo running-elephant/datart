@@ -81,10 +81,10 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
             <StyledShowModalButton
               type="ghost"
               block={true}
-              title={t(data.label)}
+              title={t(data.label, true)}
               onClick={handleOpenStateModal}
             >
-              {t(data.label)}
+              {t(data.label, true)}
             </StyledShowModalButton>
             {contextHolder}
           </>
@@ -96,7 +96,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           expandIconPosition="right"
           defaultActiveKey={expand ? '1' : undefined}
         >
-          <Panel key="1" header={t(data.label)}>
+          <Panel key="1" header={t(data.label, true)}>
             {renderCollectionComponents(
               data,
               handleConfrimModalDialogOrDataUpdate,
