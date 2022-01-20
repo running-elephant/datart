@@ -101,6 +101,7 @@ const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
           mergeSameLineageAncesterRows(lineageRowUids);
         const ancestorsRows = makeSameLinageRows(noDuplicateLineageRows);
         const newDataSource = groupTreeNode(ancestorsRows, tableDataSource);
+        setSelectedRowUids([]);
         handleConfigChange([...newDataSource]);
       };
 
