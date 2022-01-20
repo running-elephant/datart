@@ -216,7 +216,7 @@ export const getInsertedNodeIndex = (
   if (viewData?.length) {
     let IndexArr = viewData
       .filter((v: any) => v.parentId == AddData.parentId)
-      .map(v => Number(v.index) || 0);
+      .map(val => Number(val.index) || 0);
     index = IndexArr?.length ? Math.max(...IndexArr) + 1 : 0;
   }
   /* eslint-disable */
@@ -350,4 +350,51 @@ export function getDiffParams<T extends { id?: string }>(
 export function fastDeleteArrayElement(arr: any[], index: number) {
   arr[index] = arr[arr.length - 1];
   arr.pop();
+}
+
+export function newGithubIssueUrl({
+  repoUrl = 'https://github.com/running-elephant/datart',
+  ...options
+}) {
+  let issuesUrl = '';
+
+  if (repoUrl) {
+    issuesUrl = repoUrl;
+  } else {
+    throw new Error(
+      'You need to specify either the `repoUrl` option or both the `user` and `repo` options',
+    );
+  }
+
+  const url = new URL(`${issuesUrl}/issues/new`);
+
+  const types = [
+    'body',
+    'title',
+    'labels',
+    'template',
+    'milestone',
+    'assignee',
+    'projects',
+  ];
+
+  for (const type of types) {
+    let value = options[type];
+
+    if (value === undefined) {
+      continue;
+    }
+
+    if (type === 'labels' || type === 'projects') {
+      if (!Array.isArray(value)) {
+        throw new TypeError(`The \`${type}\` option should be an array`);
+      }
+
+      value = value.join(',');
+    }
+
+    url.searchParams.set(type, value);
+  }
+
+  return url.toString();
 }

@@ -18,6 +18,7 @@
 
 import { TreeDataNode, TreeNodeProps } from 'antd';
 import { ReactElement } from 'react';
+import { View } from '../../../../../types/View';
 import { SubjectTypes } from '../../PermissionPage/constants';
 import { RowPermissionRaw, Variable } from '../../VariablePage/slice/types';
 import {
@@ -26,7 +27,6 @@ import {
   ViewStatus,
   ViewViewModelStages,
 } from '../constants';
-import { View } from '../../../../../types/View';
 
 export interface ViewState {
   views: undefined | ViewSimpleViewModel[];
@@ -80,6 +80,7 @@ export interface ViewViewModel<T = object>
   previewResults: T[];
   error: string;
   fragment: string;
+  isSaveAs?: Boolean;
 }
 
 export interface QueryResult {
@@ -131,6 +132,8 @@ export interface VariableHierarchy extends Variable {
 
 export interface SaveViewParams {
   resolve?: () => void;
+  isSaveAs?: Boolean;
+  currentView?: ViewViewModel;
 }
 
 export interface UpdateViewBaseParams {

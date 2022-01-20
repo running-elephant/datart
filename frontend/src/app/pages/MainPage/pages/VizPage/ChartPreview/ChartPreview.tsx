@@ -31,6 +31,7 @@ import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
+import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
 import { selectPreviewCharts, selectPublishLoading } from '../slice/selectors';
 import {
@@ -76,6 +77,7 @@ const ChartPreviewBoard: FC<{
     const [chart, setChart] = useState<IChart>();
     const [editChartVisible, setEditChartVisible] = useState<boolean>(false);
     const t = useI18NPrefix('viz.main');
+    const saveAsViz = useSaveAsViz();
 
     useEffect(() => {
       const filterSearchParams = filterSearchUrl
@@ -232,6 +234,10 @@ const ChartPreviewBoard: FC<{
       }
     }, [dispatch, chartPreview?.backendChart, t]);
 
+    const handleSaveAsVizs = useCallback(() => {
+      saveAsViz(chartPreview?.backendChartId as string, 'DATACHART');
+    }, [saveAsViz, chartPreview?.backendChartId]);
+
     return (
       <StyledChartPreviewBoard>
         <VizHeader
@@ -242,6 +248,7 @@ const ChartPreviewBoard: FC<{
           onPublish={handlePublish}
           onGenerateShareLink={handleGenerateShareLink}
           onDownloadData={handleCreateDownloadDataTask}
+          onSaveAsVizs={handleSaveAsVizs}
           allowDownload={allowDownload}
           allowShare={allowShare}
           allowManage={allowManage}

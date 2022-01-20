@@ -17,6 +17,7 @@
  */
 
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { useSaveAsViz } from 'app/pages/MainPage/pages/VizPage/hooks/useSaveAsViz';
 import { generateShareLinkAsync } from 'app/utils/fetch';
 import debounce from 'lodash/debounce';
 import React, { FC, useContext } from 'react';
@@ -57,6 +58,7 @@ export const BoardActionProvider: FC<{ id: string }> = ({
   const dispatch = useDispatch();
   const { editing, renderMode } = useContext(BoardContext);
   const { config: boardConfig } = useContext(BoardConfigContext);
+  const saveAsViz = useSaveAsViz();
   const { hasQueryControl } = boardConfig;
   const actions: BoardActionContextProps = {
     widgetUpdate: (widget: Widget) => {
@@ -141,6 +143,9 @@ export const BoardActionProvider: FC<{ id: string }> = ({
       if (renderMode === 'read') {
         dispatch(boardDownLoadAction({ boardId, renderMode }));
       }
+    },
+    onSaveAsVizs: () => {
+      saveAsViz(boardId, 'DASHBOARD');
     },
   };
   return (

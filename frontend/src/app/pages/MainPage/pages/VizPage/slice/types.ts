@@ -170,3 +170,15 @@ export interface SelectVizFolderTree {
   id?: string;
   getDisabled: (o: FolderViewModel, path: string[]) => boolean;
 }
+
+export interface CopyDashboardParams {
+  viz: {
+    id: string;
+    name: string;
+    index: number | null;
+    config: string;
+    parentId?: string | null;
+  };
+  dashboardId?: string;
+  resolve: () => void;
+}

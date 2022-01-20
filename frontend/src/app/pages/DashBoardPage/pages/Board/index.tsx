@@ -72,6 +72,11 @@ export const Board: React.FC<BoardProps> = memo(
       refreshMode: 'debounce',
       refreshRate: 2000,
     });
+    const publishLoading = useSelector(selectPublishLoading);
+    const dashboard = useSelector((state: { board: BoardState }) =>
+      makeSelectBoardConfigById()(state, boardId),
+    );
+
     const searchParams = useMemo(() => {
       return filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
@@ -99,9 +104,6 @@ export const Board: React.FC<BoardProps> = memo(
       };
     }, [boardId, dispatch, fetchData, searchParams]);
 
-    const dashboard = useSelector((state: { board: BoardState }) =>
-      makeSelectBoardConfigById()(state, boardId),
-    );
     const toggleBoardEditor = useCallback(
       (bool: boolean) => {
         const pathName = history.location.pathname;
@@ -115,8 +117,6 @@ export const Board: React.FC<BoardProps> = memo(
       },
       [boardId, history],
     );
-
-    const publishLoading = useSelector(selectPublishLoading);
 
     const onPublish = useCallback(() => {
       if (dashboard) {
@@ -143,6 +143,7 @@ export const Board: React.FC<BoardProps> = memo(
 
     const viewBoard = useMemo(() => {
       let boardType = dashboard?.config?.type;
+
       if (dashboard && boardType) {
         return (
           <div className="board-provider">

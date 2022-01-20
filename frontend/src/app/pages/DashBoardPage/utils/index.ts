@@ -217,11 +217,16 @@ export const getWidgetControlValues = (opt: {
   type: ControllerFacadeTypes;
   relatedViewItem: RelatedView;
   config: ControllerConfig;
-}) => {
+}):
+  | false
+  | {
+      value: any;
+      valueType: string;
+    }[] => {
   const { type, relatedViewItem, config } = opt;
   const valueType = relatedViewItem.fieldValueType;
   if (DateControllerTypes.includes(type)) {
-    if (config?.controllerDate) {
+    if (!config?.controllerDate) {
       return false;
     }
     const timeValues = getControllerDateValues({
@@ -239,7 +244,7 @@ export const getWidgetControlValues = (opt: {
         };
         return item;
       });
-    return values[0] ? values : null;
+    return values[0] ? values : false;
   } else {
     if (!config?.controllerValues?.[0]) {
       return false;

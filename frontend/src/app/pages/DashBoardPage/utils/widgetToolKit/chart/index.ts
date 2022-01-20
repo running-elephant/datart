@@ -86,7 +86,7 @@ export const getControlOptionQueryParams = (obj: {
     aggregators: [],
     filters: filterParams,
     groups: [],
-    columns: obj.columns,
+    columns: [...new Set(obj.columns)],
     pageInfo: {
       pageNo: 1,
       pageSize: 99999999,

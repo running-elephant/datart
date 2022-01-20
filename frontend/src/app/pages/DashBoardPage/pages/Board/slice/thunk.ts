@@ -17,13 +17,6 @@
  */
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import {
-  ContainerWidgetContent,
-  ControllerWidgetContent,
-  getDataOption,
-  VizRenderMode,
-  Widget,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { shareActions } from 'app/pages/SharePage/slice';
@@ -37,8 +30,16 @@ import { boardActions } from '.';
 import { getChartWidgetRequestParams } from '../../../utils';
 import { handleServerBoardAction } from './asyncActions';
 import { selectBoardById, selectBoardWidgetMap } from './selector';
-import { BoardState, ServerDashboard, WidgetData } from './types';
-
+import {
+  BoardState,
+  ContainerWidgetContent,
+  ControllerWidgetContent,
+  getDataOption,
+  ServerDashboard,
+  VizRenderMode,
+  Widget,
+  WidgetData,
+} from './types';
 /**
  * @param ''
  * @description '先拿本地缓存，没有缓存再去服务端拉数据'
