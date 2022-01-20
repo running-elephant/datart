@@ -25,6 +25,7 @@ type BrokerContext = {
   document?: any;
   width?: any;
   height?: any;
+  translator?: (key, disablePrefix, options) => string;
 };
 
 type HooksEvent = 'mounted' | 'updated' | 'resize' | 'unmount';
