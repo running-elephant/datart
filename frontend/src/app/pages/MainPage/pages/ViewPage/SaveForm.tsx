@@ -156,7 +156,11 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
               return request({
                 url: `/views/check/name`,
                 method: 'POST',
-                params: { name: value, orgId, parentId: parentId || null },
+                params: {
+                  name: encodeURIComponent(value),
+                  orgId,
+                  parentId: parentId || null,
+                },
               }).then(
                 () => Promise.resolve(),
                 err => Promise.reject(new Error(err.response.data.message)),

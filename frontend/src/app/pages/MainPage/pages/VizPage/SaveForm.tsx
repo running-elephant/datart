@@ -111,7 +111,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
                 url: `/viz/check/name`,
                 method: 'POST',
                 params: {
-                  name: value,
+                  name: encodeURIComponent(value),
                   orgId,
                   vizType,
                   parentId: parentId || null,
