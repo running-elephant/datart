@@ -17,8 +17,11 @@
  */
 
 import { Empty } from 'antd';
+import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
+  BASE_ROW_HEIGHT,
+  BASE_VIEW_WIDTH,
   BREAK_POINTS,
   RGL_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
@@ -67,14 +70,6 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   );
   const layoutWidgetInfoMap = useSelector(selectLayoutWidgetInfoMap);
 
-  const [boardLoading, setBoardLoading] = useState(true);
-
-  useEffect(() => {
-    if (dashBoard?.id) {
-      setBoardLoading(false);
-    }
-  }, [dashBoard]);
-
   useEffect(() => {
     const layout: Layout[] = [];
     layoutWidgets.forEach(widget => {
@@ -98,6 +93,13 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     }
   }, [layoutWidgetInfoMap]);
   const layoutWrap: RefObject<HTMLDivElement> = useRef(null);
+
+  const { ref, cacheW } = useCacheWidthHeight();
+
+  const dynamicRowHeight = useMemo(() => {
+    return (cacheW * BASE_ROW_HEIGHT) / BASE_VIEW_WIDTH;
+  }, [cacheW]);
+
   const calcItemTop = useCallback(
     (id: string) => {
       const curItem = currentLayout.current.find(ele => ele.i === id);
@@ -145,7 +147,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
       layoutWrap?.current?.removeEventListener('scroll', lazyLoad, false);
       window.removeEventListener('resize', lazyLoad, false);
     };
-  }, [layoutWidgets, lazyLoad, boardLoading]);
+  }, [layoutWidgets, lazyLoad]);
   const changeWidgetLayouts = (layouts: Layout[]) => {
     dispatch(editBoardStackActions.changeWidgetsRect(layouts));
   };
@@ -178,6 +180,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   return (
     <Wrap>
       <StyledContainer bg={background}>
+        <div ref={ref}></div>
         {layoutWidgets.length ? (
           <div className="grid-wrap" ref={layoutWrap}>
             <ResponsiveGridLayout
@@ -186,7 +189,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
               margin={margin}
               containerPadding={containerPadding}
               cols={cols}
-              rowHeight={rowHeight}
+              rowHeight={dynamicRowHeight}
               useCSSTransforms={true}
               measureBeforeMount={false}
               onDragStop={changeWidgetLayouts}
