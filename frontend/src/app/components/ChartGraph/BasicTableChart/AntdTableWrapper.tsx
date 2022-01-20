@@ -76,16 +76,6 @@ const StyledTable = styled(Table)<{ oddAndEven?: OddAndEvenProps }>`
     background: transparent;
   }
 
-  .odd {
-    background: ${p => p?.oddAndEven?.odd?.backgroundColor || 'transparent'};
-    color: ${p => p?.oddAndEven?.odd?.color || 'auto'};
-  }
-
-  .even {
-    background: ${p => p?.oddAndEven?.even?.backgroundColor || 'transparent'};
-    color: ${p => p?.oddAndEven?.even?.color || 'auto'};
-  }
-
   .ant-table-summary {
     background: #fafafa;
   }
@@ -94,6 +84,16 @@ const StyledTable = styled(Table)<{ oddAndEven?: OddAndEvenProps }>`
   }
   .ant-table-cell-fix-right {
     background: #fafafa;
+  }
+
+  .odd td {
+    background: ${p => p?.oddAndEven?.odd?.backgroundColor || '#fff'};
+    color: ${p => p?.oddAndEven?.odd?.color || 'auto'};
+  }
+
+  .even td {
+    background: ${p => p?.oddAndEven?.even?.backgroundColor || '#fff'};
+    color: ${p => p?.oddAndEven?.even?.color || 'auto'};
   }
 `;
 

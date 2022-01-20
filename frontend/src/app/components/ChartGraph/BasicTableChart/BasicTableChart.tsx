@@ -29,8 +29,9 @@ import {
   transformToObjectArray,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
+import { DATARTSEPERATOR } from 'globalConstants';
 import { Debugger } from 'utils/debugger';
-import { isEmptyArray, Omit } from 'utils/object';
+import { CloneValueDeep, isEmptyArray, Omit } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import ReactChart from '../models/ReactChart';
 import AntdTableWrapper from './AntdTableWrapper';
@@ -53,6 +54,8 @@ class BasicTableChart extends ReactChart {
   cachedDatartConfig: ChartConfig = {};
   showSummaryRow = false;
   rowNumberUniqKey = `@datart@rowNumberKey`;
+  totalWidth = 0;
+  exceedMaxContent = false;
 
   constructor(props?) {
     super(AntdTableWrapper, {
@@ -99,7 +102,7 @@ class BasicTableChart extends ReactChart {
         ...this.getAntdTableStyleOptions(
           this.cachedDatartConfig?.styles,
           this.cachedDatartConfig?.settings!,
-          context?.height,
+          context,
         ),
       },
       { columns: this.getDataColumnWidths(options, context) },
@@ -119,25 +122,22 @@ class BasicTableChart extends ReactChart {
     const mixedSectionConfigRows = dataConfigs
       .filter(c => c.key === 'mixed')
       .flatMap(config => config.rows || []);
-    const groupConfigs = mixedSectionConfigRows.filter(
-      r =>
-        r.type === ChartDataViewFieldType.STRING ||
-        r.type === ChartDataViewFieldType.DATE,
-    );
-    const aggregateConfigs = mixedSectionConfigRows.filter(
-      r => r.type === ChartDataViewFieldType.NUMERIC,
-    );
     this.dataColumnWidths = this.calcuteFieldsMaxWidth(
       mixedSectionConfigRows,
       dataColumns,
       styleConfigs,
       context,
     );
+    this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
+      (a, b) => a + b.columnWidthValue,
+      0,
+    );
+    this.exceedMaxContent = this.totalWidth >= context.width;
     return this.getColumns(
-      groupConfigs,
-      aggregateConfigs,
+      mixedSectionConfigRows,
       styleConfigs,
       dataColumns,
+      context,
     );
   }
 
@@ -154,7 +154,6 @@ class BasicTableChart extends ReactChart {
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
-
     const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,
@@ -164,31 +163,29 @@ class BasicTableChart extends ReactChart {
     const mixedSectionConfigRows = dataConfigs
       .filter(c => c.key === 'mixed')
       .flatMap(config => config.rows || []);
-    const groupConfigs = mixedSectionConfigRows.filter(
-      r =>
-        r.type === ChartDataViewFieldType.STRING ||
-        r.type === ChartDataViewFieldType.DATE,
-    );
     const aggregateConfigs = mixedSectionConfigRows.filter(
       r => r.type === ChartDataViewFieldType.NUMERIC,
     );
-    const tablePagination = this.getPagingOptions(
-      settingConfigs,
-      dataset?.pageInfo,
-    );
-
     this.dataColumnWidths = this.calcuteFieldsMaxWidth(
       mixedSectionConfigRows,
       dataColumns,
       styleConfigs,
       context,
     );
-
+    this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
+      (a, b) => a + b.columnWidthValue,
+      0,
+    );
+    this.exceedMaxContent = this.totalWidth >= context.width;
+    const tablePagination = this.getPagingOptions(
+      settingConfigs,
+      dataset?.pageInfo,
+    );
     const tableColumns = this.getColumns(
-      groupConfigs,
-      aggregateConfigs,
+      mixedSectionConfigRows,
       styleConfigs,
       dataColumns,
+      context,
     );
 
     return {
@@ -201,13 +198,10 @@ class BasicTableChart extends ReactChart {
         dataColumns,
         tableColumns,
         aggregateConfigs,
+        context,
       ),
       components: this.getTableComponents(styleConfigs, widgetSpecialConfig),
-      ...this.getAntdTableStyleOptions(
-        styleConfigs,
-        settingConfigs,
-        context?.height,
-      ),
+      ...this.getAntdTableStyleOptions(styleConfigs, settingConfigs, context),
       onChange: (pagination, filters, sorter, extra) => {
         if (extra?.action === 'sort' || extra?.action === 'paginate') {
           this.invokePagingRelatedEvents(
@@ -247,6 +241,7 @@ class BasicTableChart extends ReactChart {
     dataColumns,
     tableColumns,
     aggregateConfigs,
+    context,
   ) {
     const [aggregateFields] = getStyles(
       settingConfigs,
@@ -278,7 +273,7 @@ class BasicTableChart extends ReactChart {
       return {
         summarys: flatHeaderColumns
           .map(c => c.key)
-          .map(k => {
+          .map((k, index) => {
             const currentSummaryField = aggregateFieldConfigs.find(
               c => getValueByColumnKey(c) === k,
             );
@@ -286,7 +281,14 @@ class BasicTableChart extends ReactChart {
               const total = dataColumns.map(
                 dc => dc?.[getValueByColumnKey(currentSummaryField)],
               );
-              return total.reduce((acc, cur) => acc + cur, 0);
+              return (
+                (!index
+                  ? context?.translator?.('viz.palette.graph.summary') + ': '
+                  : '') + total.reduce((acc, cur) => acc + cur, 0)
+              );
+            }
+            if (k === `${DATARTSEPERATOR}id` || !index) {
+              return context?.translator?.('viz.palette.graph.summary');
             }
             return null;
           }),
@@ -326,67 +328,73 @@ class BasicTableChart extends ReactChart {
       'rows',
     );
     // todo
-    let widthNumber = 0;
-    const maxContentByFields = mixedSectionConfigRows.map(c => {
-      const header = this.findHeader(c.uid, tableHeaders);
-      const rowUniqKey = getValueByColumnKey(c);
-
-      const [columnWidth, getUseColumnWidth] = getStyles(
-        getAllColumnListInfo,
-        [c.uid, 'columnStyle'],
-        ['columnWidth', 'useColumnWidth'],
-      );
-      const datas = dataColumns?.map(dc => {
-        const text = dc[rowUniqKey];
-        let width = this.getTextWidth(
-          context,
-          text,
-          fontWeight,
-          fontSize,
-          fontFamily,
-        );
-        const headerWidth = this.getTextWidth(
-          context,
-          header?.label || header?.colName,
-          headerFont?.fontWeight,
-          headerFont?.fontSize,
-          headerFont?.fontFamily,
-        );
-        const sorterIconWidth = 12;
-        return Math.max(width, headerWidth + sorterIconWidth);
-      });
-      const getRowNumberWidth = maxContent => {
-        if (!enableRowNumber) {
-          return 0;
-        }
-
-        return this.getTextWidth(
-          context,
-          maxContent,
-          fontWeight,
-          fontSize,
-          fontFamily,
-        );
-      };
-      const rowUniqKeyValue = getUseColumnWidth
-        ? columnWidth || 100
-        : Math.max(...datas) + this.tablePadding * 2 + this.tableCellBorder * 2;
-      widthNumber += rowUniqKeyValue;
-      return {
-        [this.rowNumberUniqKey]:
-          getRowNumberWidth(dataColumns?.length) +
-          this.tablePadding * 2 +
-          this.tableCellBorder * 2,
-        [rowUniqKey]: rowUniqKeyValue,
-        getUseColumnWidth,
-      };
-    });
-    return maxContentByFields.reduce((acc, cur) => {
-      let config = Object.assign({}, acc, { ...cur });
-      if (context.width > widthNumber && !cur.getUseColumnWidth) {
-        config = acc;
+    const getRowNumberWidth = maxContent => {
+      if (!enableRowNumber) {
+        return 0;
       }
-      return config;
+
+      return this.getTextWidth(
+        context,
+        maxContent,
+        fontWeight,
+        fontSize,
+        fontFamily,
+      );
+    };
+    const maxContentByFields = mixedSectionConfigRows
+      .map(c => {
+        const header = this.findHeader(c.uid, tableHeaders);
+        const rowUniqKey = getValueByColumnKey(c);
+
+        const [columnWidth, getUseColumnWidth] = getStyles(
+          getAllColumnListInfo,
+          [c.uid, 'columnStyle'],
+          ['columnWidth', 'useColumnWidth'],
+        );
+        const datas = dataColumns?.map(dc => {
+          const text = dc[rowUniqKey];
+          let width = this.getTextWidth(
+            context,
+            text,
+            fontWeight,
+            fontSize,
+            fontFamily,
+          );
+          const headerWidth = this.getTextWidth(
+            context,
+            header?.label || header?.colName,
+            headerFont?.fontWeight,
+            headerFont?.fontSize,
+            headerFont?.fontFamily,
+          );
+          const sorterIconWidth = 12;
+          return Math.max(width, headerWidth + sorterIconWidth);
+        });
+
+        return {
+          [rowUniqKey]: {
+            columnWidthValue: getUseColumnWidth
+              ? columnWidth || 100
+              : Math.max(...datas) +
+                this.tablePadding * 2 +
+                this.tableCellBorder * 2,
+            getUseColumnWidth,
+          },
+        };
+      })
+      .concat([
+        {
+          [this.rowNumberUniqKey]: {
+            columnWidthValue: enableRowNumber
+              ? getRowNumberWidth(dataColumns?.length) +
+                this.tablePadding * 2 +
+                this.tableCellBorder * 2
+              : 0,
+          },
+        },
+      ]);
+    return maxContentByFields.reduce((acc, cur: any) => {
+      return Object.assign({}, acc, { ...cur });
     }, {});
   }
 
@@ -506,10 +514,10 @@ class BasicTableChart extends ReactChart {
   }
 
   protected getColumns(
-    groupConfigs,
-    aggregateConfigs,
+    mixedSectionConfigRows,
     styleConfigs,
     dataColumns,
+    context,
   ) {
     const [
       enableRowNumber,
@@ -531,19 +539,30 @@ class BasicTableChart extends ReactChart {
       ['header', 'modal'],
       ['tableHeaders'],
     );
-
-    const _getFixedColumn = uid => {
-      if (String(leftFixedColumns).includes(uid)) {
-        return 'left';
-      }
-      if (String(rightFixedColumns).includes(uid)) {
-        return 'right';
-      }
-      return null;
+    const _getFixedColumns = list => {
+      let columnsList = CloneValueDeep(list);
+      leftFixedColumns &&
+        (columnsList = columnsList.map((item, index) => {
+          if (index < Math.min(leftFixedColumns, columnsList.length - 1)) {
+            item.fixed = 'left';
+          }
+          return item;
+        }));
+      rightFixedColumns &&
+        (columnsList = columnsList
+          .reverse()
+          .map((item, index) => {
+            if (index < rightFixedColumns && !item.fixed) {
+              item.fixed = 'right';
+            }
+            return item;
+          })
+          .reverse());
+      return columnsList;
     };
 
-    const _getFlatColumns = (groupConfigs, aggregateConfigs, dataColumns) =>
-      [...groupConfigs, ...aggregateConfigs].map(c => {
+    const _getFlatColumns = (dataConfigs, dataColumns) => {
+      const columnList = dataConfigs.map(c => {
         const colName = c.colName;
         const columnRowSpans = (autoMergeFields || []).includes(c.uid)
           ? dataColumns
@@ -571,9 +590,16 @@ class BasicTableChart extends ReactChart {
               .map(x => x.rowSpan)
               .reverse()
           : [];
-
+        const columnConfig = this.dataColumnWidths?.[getValueByColumnKey(c)];
         const colMaxWidth =
-          this.dataColumnWidths?.[getValueByColumnKey(c)] || '';
+          this.exceedMaxContent &&
+          Object.values<{ getUseColumnWidth: undefined | boolean }>(
+            this.dataColumnWidths,
+          ).some(item => item.getUseColumnWidth)
+            ? columnConfig?.getUseColumnWidth
+              ? columnConfig?.columnWidthValue
+              : ''
+            : columnConfig?.columnWidthValue;
         return {
           sorter: true,
           title: getColumnRenderName(c),
@@ -581,7 +607,7 @@ class BasicTableChart extends ReactChart {
           key: getValueByColumnKey(c),
           colName,
           width: colMaxWidth,
-          fixed: _getFixedColumn(c?.uid),
+          fixed: null,
           onHeaderCell: record => {
             return {
               ...Omit(record, [
@@ -622,21 +648,35 @@ class BasicTableChart extends ReactChart {
           },
         };
       });
+      return _getFixedColumns(columnList);
+    };
 
-    const _getGroupColumns = (
-      groupConfigs,
-      aggregateConfigs,
-      tableHeaderStyles,
-      dataColumns,
-    ) => {
-      const flattenedColumns = _getFlatColumns(
-        groupConfigs,
-        aggregateConfigs,
-        dataColumns,
-      );
+    const _getFlattenedColumns = tableHeader => {
+      const list: any = [];
+      const _getFlattenedChildren = tableHeaderStylesConfig => {
+        if (tableHeaderStylesConfig.children?.length) {
+          tableHeaderStylesConfig.children.map(item =>
+            _getFlattenedChildren(item),
+          );
+        } else {
+          list.push(tableHeaderStylesConfig);
+        }
+      };
+      tableHeader.forEach(item => {
+        if (item.children?.length) {
+          item.children.map(items => _getFlattenedChildren(items));
+        } else {
+          list.push(item);
+        }
+      });
+      return list;
+    };
 
+    const _getGroupColumns = (tableHeader, dataColumns) => {
+      const dataConfigs = _getFlattenedColumns(tableHeader);
+      const flattenedColumns = _getFlatColumns(dataConfigs, dataColumns);
       const groupedHeaderColumns =
-        tableHeaderStyles
+        tableHeader
           ?.map(style => this.getHeaderColumnGroup(style, flattenedColumns))
           ?.filter(Boolean) || [];
 
@@ -647,31 +687,24 @@ class BasicTableChart extends ReactChart {
 
       return groupedHeaderColumns.concat(unusedHeaderRows);
     };
-
+    const columnsList =
+      !tableHeaderStyles || tableHeaderStyles.length === 0
+        ? _getFlatColumns(mixedSectionConfigRows, dataColumns)
+        : _getGroupColumns(tableHeaderStyles, dataColumns);
     const rowNumbers = enableRowNumber
       ? [
           {
-            key: 'id',
-            title: '',
-            dataIndex: 'id',
-            width: this.dataColumnWidths?.[this.rowNumberUniqKey] || 0,
-            fixed: leftFixedColumns?.length > 0 ? 'left' : null,
+            key: `${DATARTSEPERATOR}id`,
+            title: context?.translator?.('viz.palette.graph.number'),
+            dataIndex: `${DATARTSEPERATOR}id`,
+            width:
+              this.dataColumnWidths?.[this.rowNumberUniqKey]
+                ?.columnWidthValue || 0,
+            fixed: leftFixedColumns || rightFixedColumns ? 'left' : null,
           } as any,
         ]
       : [];
-
-    return !tableHeaderStyles || tableHeaderStyles.length === 0
-      ? rowNumbers.concat(
-          _getFlatColumns(groupConfigs, aggregateConfigs, dataColumns),
-        )
-      : rowNumbers.concat(
-          _getGroupColumns(
-            groupConfigs,
-            aggregateConfigs,
-            tableHeaderStyles,
-            dataColumns,
-          ),
-        );
+    return rowNumbers.concat(columnsList);
   }
 
   private getHeaderColumnGroup(tableHeader, columns) {
@@ -698,7 +731,7 @@ class BasicTableChart extends ReactChart {
     };
   }
 
-  protected getAntdTableStyleOptions(styleConfigs?, settingConfigs?, height?) {
+  protected getAntdTableStyleOptions(styleConfigs?, settingConfigs?, context?) {
     const [enablePaging] = getStyles(
       settingConfigs,
       ['paging'],
@@ -728,18 +761,17 @@ class BasicTableChart extends ReactChart {
       };
       return _maxDeeps(headerStyles, 0) || 1;
     };
-
-    const totalWidth = Object.values<number>(this.dataColumnWidths).reduce(
-      (a, b) => a + b,
-      0,
-    );
     return {
       scroll: Object.assign({
         scrollToFirstRowOnChange: true,
-        x: !enableFixedHeader ? 'max-content' : totalWidth,
+        x: !enableFixedHeader
+          ? 'max-content'
+          : this.exceedMaxContent
+          ? this.totalWidth
+          : 'max-content',
         y: !enableFixedHeader
           ? undefined
-          : height -
+          : context?.height -
             (this.showSummaryRow
               ? SUMMRAY_ROW_HEIGHT[tableSize || 'default']
               : 0) -

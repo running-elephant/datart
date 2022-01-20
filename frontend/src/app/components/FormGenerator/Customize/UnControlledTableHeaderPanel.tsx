@@ -223,7 +223,10 @@ const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
 
       const handleRollback = () => {
         const originalFlattenHeaders = getFlattenHeaders(dataConfigs);
-        handleConfigChange?.(originalFlattenHeaders);
+        myData.value = [];
+        setTableDataSource(originalFlattenHeaders);
+        setMyData(myData);
+        onChange?.(ancestors, myData);
       };
 
       const handleTableRowChange = rowUid => style => prop => (_, value) => {
