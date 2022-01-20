@@ -16,31 +16,22 @@
  * limitations under the License.
  */
 
-import { Tooltip } from 'antd';
-import { IW } from 'app/components';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import { transferChartDataConfig } from 'app/utils/internalChartHelper';
-import classnames from 'classnames';
-import { FC, memo, useCallback, useEffect, useState } from 'react';
+import { FC, memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import {
-  BORDER_RADIUS,
-  FONT_SIZE_ICON_MD,
-  SPACE_MD,
-  SPACE_TIMES,
-  SPACE_XS,
-} from 'styles/StyleConstants';
+import { BORDER_RADIUS, SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
 import { CloneValueDeep } from 'utils/object';
+import ChartGraphIcon from './ChartGraphIcon';
 
 const ChartGraphPanel: FC<{
   chart?: IChart;
   chartConfig?: ChartConfig;
-  onChartChange: (c: IChart) => void;
+  onChartChange: (chart: IChart) => void;
 }> = memo(({ chart, chartConfig, onChartChange }) => {
-  const t = useI18NPrefix(`viz.palette.graph`);
   const chartManager = ChartManager.instance();
   const [allCharts] = useState<IChart[]>(chartManager.getAllCharts());
   const [requirementsStates, setRequirementStates] = useState<object>({});
@@ -58,131 +49,23 @@ const ChartGraphPanel: FC<{
     setRequirementStates(dict);
   }, [allCharts, chartConfig]);
 
-  const handleChartChange = useCallback(
-    chartId => () => {
-      const chart = chartManager.getById(chartId);
-
-      if (!!chart) {
-        onChartChange(chart);
-      }
-    },
-    [chartManager, onChartChange],
+  return (
+    <StyledChartGraphPanel>
+      {allCharts?.map(c => {
+        return (
+          <ChartI18NContext.Provider value={{ i18NConfigs: c?.config?.i18ns }}>
+            <ChartGraphIcon
+              chart={c}
+              isActive={c?.meta?.id === chart?.meta?.id}
+              isMatchRequirement={!!requirementsStates?.[chart?.meta?.id]}
+              onChartChange={onChartChange}
+            />
+          </ChartI18NContext.Provider>
+        );
+      })}
+    </StyledChartGraphPanel>
   );
-
-  const renderChartRequirments = requirements => {
-    const lintMessages = requirements?.flatMap((requirement, index) => {
-      return [ChartDataSectionType.GROUP, ChartDataSectionType.AGGREGATE].map(
-        type => {
-          const limit = requirement[type.toLocaleLowerCase()];
-          const getMaxValueStr = limit =>
-            !!limit && +limit >= 999 ? 'N' : limit;
-
-          return (
-            <li key={type + index}>
-              {Number.isInteger(limit)
-                ? t('onlyAllow', undefined, {
-                    type: t(type),
-                    num: getMaxValueStr(limit),
-                  })
-                : Array.isArray(limit) && limit.length === 2
-                ? t('allowRange', undefined, {
-                    type: t(type),
-                    start: limit?.[0],
-                    end: getMaxValueStr(limit?.[1]),
-                  })
-                : null}
-            </li>
-          );
-        },
-      );
-    });
-    return <ul>{lintMessages}</ul>;
-  };
-
-  const renderCharts = () => {
-    const _getChartIcon = (c, onChange?) => {
-      return (
-        <Tooltip
-          key={c?.meta?.id}
-          title={
-            <>
-              {t(c?.meta?.name, true)}
-              {renderChartRequirments(c?.meta?.requirements)}
-            </>
-          }
-        >
-          <IconWrapper>
-            <StyledChartIcon
-              fontSize={FONT_SIZE_ICON_MD}
-              size={SPACE_TIMES(9)}
-              className={classnames({
-                active: c?.meta?.id === chart?.meta?.id,
-              })}
-              onClick={onChange}
-            >
-              {renderIcon({
-                iconStr: c?.meta?.icon,
-                isMatchRequirement: !!requirementsStates?.[c?.meta?.id],
-                isActive: c?.meta?.id === chart?.meta?.id,
-              })}
-            </StyledChartIcon>
-          </IconWrapper>
-        </Tooltip>
-      );
-    };
-
-    const renderIcon = ({
-      ...args
-    }: {
-      iconStr;
-      isMatchRequirement;
-      isActive;
-    }) => {
-      if (/^<svg/.test(args?.iconStr) || /^<\?xml/.test(args?.iconStr)) {
-        return <SVGImageRender {...args} />;
-      }
-      if (/svg\+xml;base64/.test(args?.iconStr)) {
-        return <Base64ImageRender {...args} />;
-      }
-      return <SVGFontIconRender {...args} />;
-    };
-
-    return allCharts.map(c => {
-      return _getChartIcon(c, handleChartChange(c?.meta?.id));
-    });
-  };
-
-  return <StyledChartGraphPanel>{renderCharts()}</StyledChartGraphPanel>;
 });
-
-const SVGFontIconRender = ({ iconStr, isMatchRequirement }) => {
-  return (
-    <StyledSVGFontIcon
-      isMatchRequirement={isMatchRequirement}
-      className={`iconfont icon-${!iconStr ? 'chart' : iconStr}`}
-    />
-  );
-};
-
-const SVGImageRender = ({ iconStr, isMatchRequirement, isActive }) => {
-  return (
-    <StyledInlineSVGIcon
-      alt="svg icon"
-      style={{ height: FONT_SIZE_ICON_MD, width: FONT_SIZE_ICON_MD }}
-      src={`data:image/svg+xml;utf8,${iconStr}`}
-    />
-  );
-};
-
-const Base64ImageRender = ({ iconStr, isMatchRequirement, isActive }) => {
-  return (
-    <img
-      alt="svg icon"
-      style={{ height: FONT_SIZE_ICON_MD, width: FONT_SIZE_ICON_MD }}
-      src={iconStr}
-    />
-  );
-};
 
 export default ChartGraphPanel;
 
@@ -194,27 +77,4 @@ const StyledChartGraphPanel = styled.div`
   color: ${p => p.theme.textColorLight};
   background-color: ${p => p.theme.componentBackground};
   border-radius: ${BORDER_RADIUS};
-`;
-
-const IconWrapper = styled.span`
-  padding: ${SPACE_TIMES(0.5)};
-`;
-
-const StyledInlineSVGIcon = styled.img<{ isMatchRequirement?: boolean }>`
-  opacity: ${p => (p.isMatchRequirement ? 1 : 0.4)};
-`;
-
-const StyledSVGFontIcon = styled.i<{ isMatchRequirement?: boolean }>`
-  opacity: ${p => (p.isMatchRequirement ? 1 : 0.4)};
-`;
-
-const StyledChartIcon = styled(IW)`
-  cursor: pointer;
-  border-radius: ${BORDER_RADIUS};
-
-  &:hover,
-  &.active {
-    color: ${p => p.theme.componentBackground};
-    background-color: ${p => p.theme.primary};
-  }
 `;

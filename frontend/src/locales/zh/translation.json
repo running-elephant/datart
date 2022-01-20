@@ -653,7 +653,6 @@
           "table": "表格",
           "areaChart": "区域图",
           "barChart": "条形图",
-          "doubleYChart": "双Y轴图",
           "funnelChart": "漏斗图",
           "gaugeChart": "仪表盘",
           "lineChart": "折线图",
