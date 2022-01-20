@@ -18,7 +18,6 @@
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import gridSvg from 'assets/svgs/grid.svg';
 import React, { useContext } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -27,11 +26,9 @@ import useClientRect from '../../../hooks/useClientRect';
 import useSlideStyle from '../../../hooks/useSlideStyle';
 import ZoomControl from '../../Board/FreeDashboard/ZoomControl';
 import { selectLayoutWidgetMap } from '../slice/selectors';
-import { WidgetOfFreeEdit } from './WidgetOfFreeEdit';
+import { WidgetOfFreeEdit } from './FreeBoardEditor';
 
-export interface IProps {}
-
-const WorkSpace: React.FC<IProps> = () => {
+export const FreeEditorWrapper: React.FC<{}> = () => {
   const { config } = useContext(BoardConfigContext);
   const { editing, autoFit } = useContext(BoardContext);
   const { width: boardWidth, height: boardHeight, scaleMode } = config;
@@ -76,7 +73,6 @@ const WorkSpace: React.FC<IProps> = () => {
     </Container>
   );
 };
-export default WorkSpace;
 
 const Container = styled.div`
   display: flex;
@@ -87,7 +83,6 @@ const Container = styled.div`
   .grid-background {
     flex: 1;
     -ms-overflow-style: none;
-    /* background-image: url(${gridSvg}); */
   }
 
   .grid-background::-webkit-scrollbar {

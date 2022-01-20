@@ -30,6 +30,7 @@ import {
   Dashboard,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, {
+  memo,
   RefObject,
   useCallback,
   useContext,
@@ -50,163 +51,173 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 export interface AutoBoardCoreProps {
   boardId: string;
 }
-const AutoBoardCore: React.FC<AutoBoardCoreProps> = ({ boardId }) => {
-  const selectBoardConfigById = useMemo(makeSelectBoardConfigById, []);
-  const dashBoard = useSelector((state: { board: BoardState }) =>
-    selectBoardConfigById(state, boardId),
-  );
+export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
+  ({ boardId }) => {
+    const selectBoardConfigById = useMemo(makeSelectBoardConfigById, []);
+    const dashBoard = useSelector((state: { board: BoardState }) =>
+      selectBoardConfigById(state, boardId),
+    );
 
-  const {
-    config: { margin, containerPadding, rowHeight, cols, background },
-  } = useMemo(() => {
-    return dashBoard as Dashboard;
-  }, [dashBoard]);
-  const { renderedWidgetById } = useContext(BoardContext);
-  const selectLayoutWidgetsConfigById = useMemo(selectLayoutWidgetMapById, []);
-  const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
-    selectLayoutWidgetsConfigById(state, boardId),
-  );
-  const layoutWidgetConfigs = useMemo(() => {
-    return Object.values(layoutWidgetMap);
-  }, [layoutWidgetMap]);
+    const {
+      config: { margin, containerPadding, rowHeight, cols, background },
+    } = useMemo(() => {
+      return dashBoard as Dashboard;
+    }, [dashBoard]);
 
-  const layoutWidgetsInfo = useSelector((state: { board: BoardState }) =>
-    selectLayoutWidgetInfoMapById(state, boardId),
-  );
+    const { renderedWidgetById } = useContext(BoardContext);
+    const selectLayoutWidgetsConfigById = useMemo(
+      selectLayoutWidgetMapById,
+      [],
+    );
+    const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
+      selectLayoutWidgetsConfigById(state, boardId),
+    );
+    const layoutWidgets = useMemo(() => {
+      return Object.values(layoutWidgetMap);
+    }, [layoutWidgetMap]);
 
-  const [boardLoading, setBoardLoading] = useState(true);
-  useEffect(() => {
-    if (dashBoard?.id) {
-      setBoardLoading(false);
-    }
-  }, [dashBoard]);
+    const layoutWidgetInfoMap = useSelector((state: { board: BoardState }) =>
+      selectLayoutWidgetInfoMapById(state, boardId),
+    );
 
-  const [lgLayout, setLgLayout] = useState<Layout[]>([]);
-  useEffect(() => {
-    const layout: Layout[] = [];
-    layoutWidgetConfigs.forEach(widget => {
-      const { x, y, width: w, height: h } = widget.config.rect;
-      layout.push({ i: widget.id, x, y, w, h });
-    });
-    setLgLayout(layout);
-  }, [layoutWidgetConfigs]);
+    const [boardLoading, setBoardLoading] = useState(true);
+    useEffect(() => {
+      if (dashBoard?.id) {
+        setBoardLoading(false);
+      }
+    }, [dashBoard]);
 
-  let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
-  useEffect(() => {
-    const layoutWidgetInfos = Object.values(layoutWidgetsInfo);
-    if (layoutWidgetInfos.length) {
-      layoutInfos.current = layoutWidgetInfos.map(WidgetInfo => ({
-        id: WidgetInfo.id,
-        rendered: WidgetInfo.rendered,
-      }));
-    }
-  }, [layoutWidgetsInfo]);
-  const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
-  const currentLayout = useRef<Layout[]>([]);
-
-  const calcItemTop = useCallback(
-    (id: string) => {
-      const curItem = currentLayout.current.find(ele => ele.i === id);
-      if (!curItem) return Infinity;
-      return Math.round((rowHeight + margin[0]) * curItem.y);
-    },
-    [margin, rowHeight],
-  );
-  const scrollThrottle = useRef(false);
-  const lazyLoad = useCallback(() => {
-    if (!gridWrapRef.current) return;
-    if (!scrollThrottle.current) {
-      requestAnimationFrame(() => {
-        const waitingItems = layoutInfos.current.filter(item => !item.rendered);
-
-        if (waitingItems.length > 0) {
-          const { offsetHeight, scrollTop } = gridWrapRef.current!;
-          waitingItems.forEach(item => {
-            const itemTop = calcItemTop(item.id);
-            if (itemTop - scrollTop < offsetHeight) {
-              renderedWidgetById(item.id);
-            }
-          });
-        } else {
-          if (scrollThrottle.current) {
-            gridWrapRef.current?.removeEventListener('scroll', lazyLoad, false);
-          }
-        }
-        scrollThrottle.current = false;
+    const [lgLayout, setLgLayout] = useState<Layout[]>([]);
+    useEffect(() => {
+      const layout: Layout[] = [];
+      layoutWidgets.forEach(widget => {
+        const { x, y, width: w, height: h } = widget.config.rect;
+        layout.push({ i: widget.id, x, y, w, h });
       });
-      scrollThrottle.current = true;
-    }
-  }, [calcItemTop, renderedWidgetById]);
-  const WidgetConfigsLen = useMemo(() => {
-    return layoutWidgetConfigs.length;
-  }, [layoutWidgetConfigs]);
-  // bind lazyLoad();
-  useEffect(() => {
-    if (WidgetConfigsLen && gridWrapRef.current) {
-      lazyLoad();
-      gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
-      gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
-      // issues#339
-      window.addEventListener('resize', lazyLoad, false);
-    }
+      setLgLayout(layout);
+    }, [layoutWidgets]);
 
-    return () => {
-      gridWrapRef?.current?.removeEventListener('scroll', lazyLoad, false);
-      window.removeEventListener('resize', lazyLoad, false);
-    };
-  }, [boardLoading, WidgetConfigsLen, lazyLoad]);
+    let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
+    useEffect(() => {
+      const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
+      if (layoutWidgetInfos.length) {
+        layoutInfos.current = layoutWidgetInfos.map(WidgetInfo => ({
+          id: WidgetInfo.id,
+          rendered: WidgetInfo.rendered,
+        }));
+      }
+    }, [layoutWidgetInfoMap]);
+    const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
+    const currentLayout = useRef<Layout[]>([]);
 
-  const onLayoutChange = useCallback((layouts: Layout[]) => {
-    currentLayout.current = layouts;
-  }, []);
-  const boardChildren = useMemo(() => {
-    return layoutWidgetConfigs.map(item => {
-      return (
-        <div className="block-item" key={item.id}>
-          <WidgetAllProvider id={item.id}>
-            <WidgetOfAuto />
-          </WidgetAllProvider>
-        </div>
-      );
-    });
-  }, [layoutWidgetConfigs]);
+    const calcItemTop = useCallback(
+      (id: string) => {
+        const curItem = currentLayout.current.find(ele => ele.i === id);
+        if (!curItem) return Infinity;
+        return Math.round((rowHeight + margin[0]) * curItem.y);
+      },
+      [margin, rowHeight],
+    );
+    const scrollThrottle = useRef(false);
+    const lazyLoad = useCallback(() => {
+      if (!gridWrapRef.current) return;
+      if (!scrollThrottle.current) {
+        requestAnimationFrame(() => {
+          const waitingItems = layoutInfos.current.filter(
+            item => !item.rendered,
+          );
 
-  const { gridRef } = useBoardWidthHeight();
+          if (waitingItems.length > 0) {
+            const { offsetHeight, scrollTop } = gridWrapRef.current!;
+            waitingItems.forEach(item => {
+              const itemTop = calcItemTop(item.id);
+              if (itemTop - scrollTop < offsetHeight) {
+                renderedWidgetById(item.id);
+              }
+            });
+          } else {
+            if (scrollThrottle.current) {
+              gridWrapRef.current?.removeEventListener(
+                'scroll',
+                lazyLoad,
+                false,
+              );
+            }
+          }
+          scrollThrottle.current = false;
+        });
+        scrollThrottle.current = true;
+      }
+    }, [calcItemTop, renderedWidgetById]);
+    const WidgetConfigsLen = useMemo(() => {
+      return layoutWidgets.length;
+    }, [layoutWidgets]);
+    // bind lazyLoad();
+    useEffect(() => {
+      if (WidgetConfigsLen && gridWrapRef.current) {
+        lazyLoad();
+        gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
+        gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
+        // issues#339
+        window.addEventListener('resize', lazyLoad, false);
+      }
 
-  return (
-    <Wrap>
-      <StyledContainer bg={background}>
-        {layoutWidgetConfigs.length ? (
-          <div className="grid-wrap" ref={gridWrapRef}>
-            <div className="grid-wrap" ref={gridRef}>
-              <ResponsiveGridLayout
-                className="layout"
-                layouts={{ lg: lgLayout }}
-                breakpoints={BREAK_POINTS}
-                margin={margin}
-                containerPadding={containerPadding}
-                cols={cols}
-                rowHeight={rowHeight}
-                onLayoutChange={onLayoutChange}
-                isDraggable={false}
-                isResizable={false}
-                measureBeforeMount={false}
-                useCSSTransforms={true}
-              >
-                {boardChildren}
-              </ResponsiveGridLayout>
+      return () => {
+        gridWrapRef?.current?.removeEventListener('scroll', lazyLoad, false);
+        window.removeEventListener('resize', lazyLoad, false);
+      };
+    }, [boardLoading, WidgetConfigsLen, lazyLoad]);
+
+    const onLayoutChange = useCallback((layouts: Layout[]) => {
+      currentLayout.current = layouts;
+    }, []);
+    const boardChildren = useMemo(() => {
+      return layoutWidgets.map(item => {
+        return (
+          <div className="block-item" key={item.id}>
+            <WidgetAllProvider id={item.id}>
+              <WidgetOfAuto />
+            </WidgetAllProvider>
+          </div>
+        );
+      });
+    }, [layoutWidgets]);
+
+    const { gridRef } = useBoardWidthHeight();
+
+    return (
+      <Wrap>
+        <StyledContainer bg={background}>
+          {layoutWidgets.length ? (
+            <div className="grid-wrap" ref={gridWrapRef}>
+              <div className="grid-wrap" ref={gridRef}>
+                <ResponsiveGridLayout
+                  layouts={{ lg: lgLayout }}
+                  breakpoints={BREAK_POINTS}
+                  margin={margin}
+                  containerPadding={containerPadding}
+                  cols={cols}
+                  rowHeight={rowHeight}
+                  onLayoutChange={onLayoutChange}
+                  isDraggable={false}
+                  isResizable={false}
+                  measureBeforeMount={false}
+                  useCSSTransforms={true}
+                >
+                  {boardChildren}
+                </ResponsiveGridLayout>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="empty">
-            <Empty description="" />
-          </div>
-        )}
-      </StyledContainer>
-    </Wrap>
-  );
-};
-export default React.memo(AutoBoardCore);
+          ) : (
+            <div className="empty">
+              <Empty description="" />
+            </div>
+          )}
+        </StyledContainer>
+      </Wrap>
+    );
+  },
+);
 
 const Wrap = styled.div`
   display: flex;
@@ -226,11 +237,6 @@ const StyledContainer = styled(StyledBackground)`
     flex: 1;
     overflow-y: auto;
     -ms-overflow-style: none;
-
-    .layout {
-      flex: 1;
-      overflow-y: auto;
-    }
   }
   .grid-wrap::-webkit-scrollbar {
     width: 0 !important;
