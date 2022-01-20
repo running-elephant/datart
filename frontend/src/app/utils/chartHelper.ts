@@ -31,6 +31,7 @@ import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDatasetMeta } from 'app/types/ChartDataset';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
+import { DATARTSEPERATOR } from 'globalConstants';
 import { Debugger } from 'utils/debugger';
 import {
   cond,
@@ -473,8 +474,8 @@ export function transformToObjectArray(
     () => {
       const result: any[] = Array.apply(null, Array(columns.length));
       for (let j = 0, outterLength = result.length; j < outterLength; j++) {
-        let objCol = {
-          id: j + 1,
+        let objCol: any = {
+          [`${DATARTSEPERATOR}id`]: j + 1,
         };
         for (let i = 0, innerLength = metas.length; i < innerLength; i++) {
           const key = metas?.[i]?.name;

@@ -171,50 +171,20 @@ const config: ChartConfig = {
         {
           label: 'style.leftFixedColumns',
           key: 'leftFixedColumns',
-          comType: 'select',
+          default: 0,
           options: {
-            mode: 'multiple',
-            getItems: cols => {
-              const columns = (cols || [])
-                .filter(col =>
-                  ['aggregate', 'group', 'mixed'].includes(col.type),
-                )
-                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-                .map(c => ({
-                  key: c.uid,
-                  value: c.uid,
-                  label:
-                    c.label || c.aggregate
-                      ? `${c.aggregate}(${c.colName})`
-                      : c.colName,
-                }));
-              return columns;
-            },
+            min: 0,
           },
+          comType: 'inputNumber',
         },
         {
           label: 'style.rightFixedColumns',
           key: 'rightFixedColumns',
-          comType: 'select',
+          default: 0,
           options: {
-            mode: 'multiple',
-            getItems: cols => {
-              const columns = (cols || [])
-                .filter(col =>
-                  ['aggregate', 'group', 'mixed'].includes(col.type),
-                )
-                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-                .map(c => ({
-                  key: c.uid,
-                  value: c.uid,
-                  label:
-                    c.label || c.aggregate
-                      ? `${c.aggregate}(${c.colName})`
-                      : c.colName,
-                }));
-              return columns;
-            },
+            min: 0,
           },
+          comType: 'inputNumber',
         },
         {
           label: 'style.autoMergeFields',
@@ -300,7 +270,7 @@ const config: ChartConfig = {
         {
           label: 'style.oddBgColor',
           key: 'oddBgColor',
-          default: 'rgba(0,0,0,0)',
+          default: '#fff',
           comType: 'fontColor',
         },
         {
@@ -312,7 +282,7 @@ const config: ChartConfig = {
         {
           label: 'style.evenBgColor',
           key: 'evenBgColor',
-          default: 'rgba(0,0,0,0)',
+          default: '#fff',
           comType: 'fontColor',
         },
         {

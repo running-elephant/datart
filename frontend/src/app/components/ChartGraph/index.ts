@@ -31,7 +31,6 @@ export { default as BasicTableChart } from './BasicTableChart';
 export { default as ClusterBarChart } from './ClusterBarChart';
 export { default as ClusterColumnChart } from './ClusterColumnChart';
 export { default as DoughnutChart } from './DoughnutChart';
-export { default as FenZuTableChart } from './FenZuTableChart';
 export { default as LineChart } from './LineChart';
 export { default as MingXiTableChart } from './MingXiTableChart';
 export { default as NormalOutlineMapChart } from './NormalOutlineMapChart';
