@@ -34,8 +34,8 @@ import workbenchSlice, {
   updateRichTextAction,
   useWorkbenchSlice,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
-import { ChartDTO } from "app/types/ChartDTO";
 import { IChart } from 'app/types/Chart';
+import { ChartDTO } from 'app/types/ChartDTO';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -294,6 +294,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
                 sorter: {
                   column: param?.seriesName!,
                   operator: param?.value?.direction,
+                  aggOperator: param?.value?.aggOperator,
                 },
                 pageInfo: {
                   pageNo: param?.value?.pageNo,

@@ -135,6 +135,7 @@ const ChartPreviewBoard: FC<{
                   sorter: {
                     column: param?.seriesName!,
                     operator: param?.value?.direction,
+                    aggOperator: param?.value?.aggOperator,
                   },
                   pageInfo: {
                     pageNo: param?.value?.pageNo,
