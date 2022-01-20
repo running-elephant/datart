@@ -304,14 +304,10 @@ export const initChartPreviewData = createAsyncThunk<
     await thunkAPI.dispatch(
       fetchVizChartAction({ backendChartId, filterSearchParams }),
     );
-    const vizState = (thunkAPI.getState() as RootState)?.viz as VizState;
-    const currentChartPreview = vizState?.chartPreviews?.find(
-      c => c.backendChartId === backendChartId,
-    );
-    if (currentChartPreview) {
+    if (backendChartId) {
       await thunkAPI.dispatch(
         fetchDataSetByPreviewChartAction({
-          chartPreview: currentChartPreview,
+          backendChartId,
         }),
       );
     }
@@ -339,24 +335,28 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
   'viz/fetchDataSetByPreviewChartAction',
   async (
     arg: {
-      chartPreview?: ChartPreview;
+      backendChartId: string;
       pageInfo?;
       sorter?: { column: string; operator: string; aggOperator?: string };
     },
     thunkAPI,
   ) => {
+    const vizState = (thunkAPI.getState() as RootState)?.viz as VizState;
+    const currentChartPreview = vizState?.chartPreviews?.find(
+      c => c.backendChartId === arg.backendChartId,
+    );
     const builder = new ChartDataRequestBuilder(
       {
-        id: arg.chartPreview?.backendChart?.viewId,
+        id: currentChartPreview?.backendChart?.viewId,
         computedFields:
-          arg.chartPreview?.backendChart?.config?.computedFields || [],
-        view: arg.chartPreview?.backendChart?.view,
+          currentChartPreview?.backendChart?.config?.computedFields || [],
+        view: currentChartPreview?.backendChart?.view,
       } as any,
-      arg.chartPreview?.chartConfig?.datas,
-      arg.chartPreview?.chartConfig?.settings,
+      currentChartPreview?.chartConfig?.datas,
+      currentChartPreview?.chartConfig?.settings,
       arg.pageInfo,
       false,
-      arg.chartPreview?.backendChart?.config?.aggregation,
+      currentChartPreview?.backendChart?.config?.aggregation,
     );
     const data = builder
       .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
@@ -369,7 +369,7 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
         data,
       });
       return {
-        backendChartId: arg.chartPreview?.backendChartId,
+        backendChartId: currentChartPreview?.backendChartId,
         data: filterSqlOperatorName(data, response.data) || [],
       };
     } catch (error) {
@@ -390,13 +390,9 @@ export const updateFilterAndFetchDataset = createAsyncThunk(
         payload: arg.payload,
       }),
     );
-    const vizState = (thunkAPI.getState() as RootState)?.viz as VizState;
-    const currentChartPreview = vizState?.chartPreviews?.find(
-      c => c.backendChartId === arg.backendChartId,
-    );
     await thunkAPI.dispatch(
       fetchDataSetByPreviewChartAction({
-        chartPreview: currentChartPreview!,
+        backendChartId: arg.backendChartId,
       }),
     );
 

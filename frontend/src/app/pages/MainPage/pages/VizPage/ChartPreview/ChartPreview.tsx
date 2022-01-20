@@ -106,7 +106,7 @@ const ChartPreviewBoard: FC<{
           const newChart = chartManager.getById(
             newChartPreview?.backendChart?.config?.chartGraphId,
           );
-          registerChartEvents(newChart, newChartPreview);
+          registerChartEvents(newChart, backendChartId);
           setChart(newChart);
         }
       }
@@ -120,7 +120,7 @@ const ChartPreviewBoard: FC<{
       version,
     ]);
 
-    const registerChartEvents = (chart, chartPreview) => {
+    const registerChartEvents = (chart, backendChartId) => {
       chart?.registerMouseEvents([
         {
           name: 'click',
@@ -131,7 +131,7 @@ const ChartPreviewBoard: FC<{
             ) {
               dispatch(
                 fetchDataSetByPreviewChartAction({
-                  chartPreview: chartPreview!,
+                  backendChartId,
                   sorter: {
                     column: param?.seriesName!,
                     operator: param?.value?.direction,
