@@ -28,7 +28,6 @@ export const BorderSet: FC<{
   const tLine = useI18NPrefix(`viz.lineOptions`);
   return (
     <>
-      {/* <ItemLabel> 边框颜色: </ItemLabel> */}
       <Form.Item label={t('color')} name={['border', 'color']}>
         <ColorSet filedName={['border', 'color']} filedValue={border.color} />
       </Form.Item>

@@ -27,7 +27,7 @@ import WidgetToolBar from '../../../components/WidgetToolBar';
 import BlockMaskLayer from '../components/BlockMaskLayer';
 import WidgetDndHandleMask from '../components/WidgetDndHandleMask';
 
-export const WidgetOfAutoEdit: React.FC<{}> = memo(() => {
+export const WidgetOfAutoEditor: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const widgetInfo = useContext(WidgetInfoContext);
   const ssp = e => {
@@ -57,7 +57,6 @@ export const WidgetOfAutoEdit: React.FC<{}> = memo(() => {
     </Warp>
   );
 });
-export default WidgetOfAutoEdit;
 const Warp = styled.div<{}>`
   & .widget-tool-bar {
     z-index: 30;

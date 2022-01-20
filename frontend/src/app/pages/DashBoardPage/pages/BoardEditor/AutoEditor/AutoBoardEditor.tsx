@@ -16,15 +16,14 @@
  * limitations under the License.
  */
 
+import { Empty } from 'antd';
+import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
   BREAK_POINTS,
   RGL_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import {
-  Dashboard,
-  DashboardConfig,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Dashboard } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, {
   RefObject,
   useCallback,
@@ -32,26 +31,35 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 import { Layout, Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
+import StyledBackground from '../../Board/components/StyledBackground';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
 import {
-  selectDashDroppable,
   selectEditBoard,
   selectLayoutWidgetInfoMap,
   selectLayoutWidgetMap,
 } from '../slice/selectors';
+import { WidgetOfAutoEditor } from './WidgetOfAutoEditor';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
-interface GridLayoutProps {}
-const GridLayout: React.FC<GridLayoutProps> = props => {
-  const { editing, renderedWidgetById } = useContext(BoardContext);
+
+export const AutoBoardEditor: React.FC<{}> = () => {
+  const dashBoard = useSelector(selectEditBoard) as Dashboard;
+  const {
+    config: { margin, containerPadding, rowHeight, cols, background },
+  } = useMemo(() => {
+    return dashBoard as Dashboard;
+  }, [dashBoard]);
+
+  const { renderedWidgetById } = useContext(BoardContext);
   const dispatch = useDispatch();
-  const boardDroppable = useSelector(selectDashDroppable);
+
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
   const layoutWidgets = useMemo(
     () => Object.values(layoutWidgetMap),
@@ -59,14 +67,25 @@ const GridLayout: React.FC<GridLayoutProps> = props => {
   );
   const layoutWidgetInfoMap = useSelector(selectLayoutWidgetInfoMap);
 
-  const boardConfig = useSelector(selectEditBoard) as Dashboard;
-  const { margin, containerPadding, rowHeight, cols } =
-    boardConfig.config as DashboardConfig;
+  const [boardLoading, setBoardLoading] = useState(true);
 
-  // selectDashDroppable
-  const layoutWrap: RefObject<HTMLDivElement> = useRef(null);
+  useEffect(() => {
+    if (dashBoard?.id) {
+      setBoardLoading(false);
+    }
+  }, [dashBoard]);
+
+  useEffect(() => {
+    const layout: Layout[] = [];
+    layoutWidgets.forEach(widget => {
+      const { x, y, width: w, height: h } = widget.config.rect;
+      layout.push({ i: widget.id, x, y, w, h });
+    });
+    setLgLayout(layout);
+  }, [layoutWidgets]);
+
   const currentLayout = useRef<Layout[]>([]);
-  let scrollThrottle = useRef(false);
+  const [lgLayout, setLgLayout] = useState<Layout[]>([]);
   let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
 
   useEffect(() => {
@@ -78,6 +97,7 @@ const GridLayout: React.FC<GridLayoutProps> = props => {
       }));
     }
   }, [layoutWidgetInfoMap]);
+  const layoutWrap: RefObject<HTMLDivElement> = useRef(null);
   const calcItemTop = useCallback(
     (id: string) => {
       const curItem = currentLayout.current.find(ele => ele.i === id);
@@ -86,6 +106,7 @@ const GridLayout: React.FC<GridLayoutProps> = props => {
     },
     [margin, rowHeight],
   );
+  let scrollThrottle = useRef(false);
   const lazyLoad = useCallback(() => {
     if (!layoutWrap.current) return;
     if (!scrollThrottle.current) {
@@ -118,14 +139,17 @@ const GridLayout: React.FC<GridLayoutProps> = props => {
       lazyLoad();
       layoutWrap.current.removeEventListener('scroll', lazyLoad, false);
       layoutWrap.current.addEventListener('scroll', lazyLoad, false);
+      window.addEventListener('resize', lazyLoad, false);
     }
-  }, [layoutWidgets, lazyLoad, layoutWrap]);
+    return () => {
+      layoutWrap?.current?.removeEventListener('scroll', lazyLoad, false);
+      window.removeEventListener('resize', lazyLoad, false);
+    };
+  }, [layoutWidgets, lazyLoad, boardLoading]);
   const changeWidgetLayouts = (layouts: Layout[]) => {
     dispatch(editBoardStackActions.changeWidgetsRect(layouts));
   };
-  const onBreakpointChange = (breakpoints, cols) => {
-    if (!editing) return;
-  };
+  const onBreakpointChange = (breakpoints, cols) => {};
   const onLayoutChange = (layouts: Layout[]) => {
     currentLayout.current = layouts;
 
@@ -135,50 +159,89 @@ const GridLayout: React.FC<GridLayoutProps> = props => {
     }
     dispatch(editDashBoardInfoActions.adjustDashLayouts(layouts));
   };
-  const lgLayout: Layout[] = [];
 
-  layoutWidgets.forEach(widget => {
-    if (widget.id) {
-      const { x, y, width: w, height: h } = widget?.config?.rect;
-      lgLayout.push({ i: widget.id, x, y, w, h });
-    }
-  });
-
+  const boardChildren = useMemo(() => {
+    return layoutWidgets.map(item => {
+      return (
+        <div className="block-item" key={item.id}>
+          <WidgetAllProvider id={item.id}>
+            <WidgetOfAutoEditor />
+          </WidgetAllProvider>
+        </div>
+      );
+    });
+  }, [layoutWidgets]);
   /**
    * measureBeforeMount=true for WidthProvider
    * https://www.npmjs.com/package/react-grid-layout
    */
   return (
-    <RGLWrap ref={layoutWrap}>
-      <ResponsiveGridLayout
-        className="layout"
-        layouts={{ lg: lgLayout }}
-        breakpoints={BREAK_POINTS}
-        margin={margin}
-        containerPadding={containerPadding}
-        cols={cols}
-        rowHeight={rowHeight}
-        onDragStop={changeWidgetLayouts}
-        onResizeStop={changeWidgetLayouts}
-        onBreakpointChange={onBreakpointChange}
-        onLayoutChange={onLayoutChange}
-        isDraggable={editing}
-        isResizable={editing}
-        measureBeforeMount={false}
-        draggableHandle={`.${RGL_DRAG_HANDLE}`}
-        useCSSTransforms={true}
-        droppingItem={{ i: 'www', w: 4, h: 4 }}
-        isDroppable={boardDroppable}
-      >
-        {props.children}
-      </ResponsiveGridLayout>
-    </RGLWrap>
+    <Wrap>
+      <StyledContainer bg={background}>
+        {layoutWidgets.length ? (
+          <div className="grid-wrap" ref={layoutWrap}>
+            <ResponsiveGridLayout
+              layouts={{ lg: lgLayout }}
+              breakpoints={BREAK_POINTS}
+              margin={margin}
+              containerPadding={containerPadding}
+              cols={cols}
+              rowHeight={rowHeight}
+              useCSSTransforms={true}
+              measureBeforeMount={false}
+              onDragStop={changeWidgetLayouts}
+              onResizeStop={changeWidgetLayouts}
+              onBreakpointChange={onBreakpointChange}
+              onLayoutChange={onLayoutChange}
+              isDraggable={true}
+              isResizable={true}
+              draggableHandle={`.${RGL_DRAG_HANDLE}`}
+              droppingItem={{ i: 'www', w: 4, h: 4 }}
+            >
+              {boardChildren}
+            </ResponsiveGridLayout>
+          </div>
+        ) : (
+          <div className="empty">
+            <Empty description="" />
+          </div>
+        )}
+      </StyledContainer>
+    </Wrap>
   );
 };
+const Wrap = styled.div`
+  display: flex;
 
-export default GridLayout;
-
-const RGLWrap = styled.div`
   flex: 1;
-  overflow-y: auto;
+
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+
+  .react-resizable-handle {
+    z-index: 100;
+  }
+`;
+
+const StyledContainer = styled(StyledBackground)`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  .grid-wrap {
+    flex: 1;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+  }
+  .grid-wrap::-webkit-scrollbar {
+    width: 0 !important;
+  }
+
+  .empty {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+  }
 `;

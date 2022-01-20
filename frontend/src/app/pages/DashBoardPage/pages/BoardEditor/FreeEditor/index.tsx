@@ -23,7 +23,7 @@ import styled from 'styled-components/macro';
 import BoardToolBar from '../components/BoardToolBar/BoardToolBar';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
-import WorkSpace from './WorkSpace';
+import { FreeEditorWrapper } from './FreeEditorWrapper';
 
 const FreeEditor: React.FC = () => {
   const dispatch = useDispatch();
@@ -38,7 +38,7 @@ const FreeEditor: React.FC = () => {
       <Wrapper>
         <BoardToolBar />
         <Editor>
-          <WorkSpace />
+          <FreeEditorWrapper />
           <SlideSetting />
         </Editor>
       </Wrapper>

@@ -26,8 +26,8 @@ import ChartDataRequest from '../../types/ChartDataRequest';
 import { BoardProvider } from '../DashBoardPage/components/BoardProvider/BoardProvider';
 import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel';
 import TitleHeader from '../DashBoardPage/components/TitleHeader';
-import AutoBoardCore from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
-import FreeBoardCore from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
+import { AutoBoardCore } from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
+import { FreeBoardCore } from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
 import { getBoardDownloadParams } from '../DashBoardPage/pages/Board/slice/asyncActions';
 import { selectShareBoardInfo } from '../DashBoardPage/pages/Board/slice/selector';
 import {
