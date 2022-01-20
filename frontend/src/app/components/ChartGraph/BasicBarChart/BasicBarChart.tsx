@@ -73,7 +73,7 @@ class BasicBarChart extends Chart {
     });
   }
 
-  onUpdated(options): void {
+  onUpdated(options, context): void {
     if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }

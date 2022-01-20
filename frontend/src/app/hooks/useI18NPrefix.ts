@@ -40,7 +40,7 @@ function usePrefixI18N(prefix?: string) {
       let translationKey = key;
       const usePrefix =
         !disablePrefix && !translationKey.includes(DATART_TRANSLATE_HOLDER);
-      if (usePrefix) {
+      if (usePrefix && prefix) {
         translationKey = `${prefix}.${translationKey}`;
       }
       if (translationKey.includes(DATART_TRANSLATE_HOLDER)) {

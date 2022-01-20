@@ -20,6 +20,7 @@ import {
   Frame,
   FrameContextConsumer,
 } from 'app/components/ReactFrameComponent';
+import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
@@ -109,7 +110,11 @@ const ChartIFrameContainer: FC<{
     );
   };
 
-  return render();
+  return (
+    <ChartI18NContext.Provider value={{ i18NConfigs: props?.config?.i18ns }}>
+      {render()}
+    </ChartI18NContext.Provider>
+  );
 });
 
 export default ChartIFrameContainer;
