@@ -17,7 +17,8 @@
  */
 
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { updateByKey } from 'app/utils/mutation';
+import { mergeChartStyleConfigs } from 'app/utils/chartHelper';
+import { updateBy, updateByKey } from 'app/utils/mutation';
 import { FC, memo, useEffect } from 'react';
 import styled from 'styled-components/macro';
 import { CloneValueDeep, mergeDefaultToValue } from 'utils/object';
@@ -350,6 +351,16 @@ const DataReferencePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           mergeDefaultToValue(CloneValueDeep(defaultRows)),
         );
         onChange?.(ancestors, newData);
+      } else {
+        if (!data.rows[0].comType) {
+          const newData = updateBy(data, draft => {
+            draft['rows'] = mergeChartStyleConfigs(
+              CloneValueDeep(defaultRows),
+              data?.rows,
+            );
+          });
+          onChange?.(ancestors, newData);
+        }
       }
     }, [ancestors, data, onChange]);
 
