@@ -30,7 +30,7 @@ import { convertToChartDTO } from 'app/utils/ChartDtoHelper';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
 import { request } from 'utils/request';
-import { errorHandle, rejectHandle } from 'utils/utils';
+import { rejectHandle } from 'utils/utils';
 import { vizActions } from '.';
 import { selectSelectedTab, selectVizs } from './selectors';
 import {
@@ -54,73 +54,68 @@ import {
 
 export const getFolders = createAsyncThunk<Folder[], string>(
   'viz/getFolders',
-  async orgId => {
+  async (orgId, thunkAPI) => {
     try {
       const { data } = await request<Folder[]>(`/viz/folders?orgId=${orgId}`);
       return data;
     } catch (error) {
-      errorHandle(error);
-      throw error;
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
   },
 );
 
 export const getStoryboards = createAsyncThunk<Storyboard[], string>(
   'viz/getStoryboards',
-  async orgId => {
+  async (orgId, thunkAPI) => {
     try {
       const { data } = await request<Storyboard[]>(
         `viz/storyboards?orgId=${orgId}`,
       );
       return data;
     } catch (error) {
-      errorHandle(error);
-      throw error;
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
   },
 );
 
 export const getArchivedDatacharts = createAsyncThunk<DataChart[], string>(
   'viz/getArchivedDatacharts',
-  async orgId => {
+  async (orgId, thunkAPI) => {
     try {
       const { data } = await request<DataChart[]>(
         `/viz/archived/datachart/${orgId}`,
       );
       return data;
     } catch (error) {
-      errorHandle(error);
-      throw error;
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
   },
 );
 
 export const getArchivedDashboards = createAsyncThunk<Dashboard[], string>(
   'viz/getArchivedDashboards',
-  async orgId => {
+  async (orgId, thunkAPI) => {
     try {
       const { data } = await request<Dashboard[]>(
         `/viz/archived/dashboard/${orgId}`,
       );
       return data;
     } catch (error) {
-      errorHandle(error);
-      throw error;
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
   },
 );
 
 export const getArchivedStoryboards = createAsyncThunk<StoryBoard[], string>(
   'viz/getArchivedStoryboards',
-  async orgId => {
+  async (orgId, thunkAPI) => {
     try {
       const { data } = await request<StoryBoard[]>(
         `/viz/archived/storyboard/${orgId}`,
       );
       return data;
     } catch (error) {
-      errorHandle(error);
-      throw error;
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
   },
 );
@@ -131,7 +126,7 @@ export const addStoryboard = createAsyncThunk<
   { state: RootState }
 >(
   'viz/addStoryboard',
-  async ({ storyboard, resolve }, { getState, dispatch }) => {
+  async ({ storyboard, resolve }, { getState, dispatch, rejectWithValue }) => {
     try {
       const { data } = await request<Storyboard>({
         url: `/viz/storyboards`,
@@ -146,8 +141,7 @@ export const addStoryboard = createAsyncThunk<
       resolve();
       return data;
     } catch (error) {
-      errorHandle(error);
-      throw error;
+      return rejectHandle(error, rejectWithValue);
     }
   },
 );
@@ -155,7 +149,7 @@ export const addStoryboard = createAsyncThunk<
 export const editStoryboard = createAsyncThunk<
   StoryboardViewModel,
   EditStoryboardParams
->('viz/editStoryboard', async ({ storyboard, resolve }) => {
+>('viz/editStoryboard', async ({ storyboard, resolve }, thunkAPI) => {
   try {
     await request<boolean>({
       url: `/viz/storyboards/${storyboard.id}`,
@@ -165,15 +159,14 @@ export const editStoryboard = createAsyncThunk<
     resolve();
     return storyboard;
   } catch (error) {
-    errorHandle(error);
-    throw error;
+    return rejectHandle(error, thunkAPI.rejectWithValue);
   }
 });
 
 export const deleteStoryboard = createAsyncThunk<
   boolean,
   DeleteStoryboardParams
->('viz/deleteStoryboard', async ({ id, archive, resolve }) => {
+>('viz/deleteStoryboard', async ({ id, archive, resolve }, thunkAPI) => {
   try {
     const { data } = await request<boolean>({
       url: `/viz/storyboards/${id}`,
@@ -183,14 +176,13 @@ export const deleteStoryboard = createAsyncThunk<
     resolve();
     return data;
   } catch (error) {
-    errorHandle(error);
-    throw error;
+    return rejectHandle(error, thunkAPI.rejectWithValue);
   }
 });
 
 export const addViz = createAsyncThunk<Folder, AddVizParams>(
   'viz/addViz',
-  async ({ viz, type, resolve }) => {
+  async ({ viz, type, resolve }, thunkAPI) => {
     try {
       const { data } = await request<Folder>({
         url: `/viz/${type.toLowerCase()}s`,
@@ -200,8 +192,7 @@ export const addViz = createAsyncThunk<Folder, AddVizParams>(
       resolve();
       return data;
     } catch (error) {
-      errorHandle(error);
-      throw error;
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
   },
 );
@@ -210,27 +201,32 @@ export const editFolder = createAsyncThunk<
   FolderViewModel,
   EditFolderParams,
   { state: RootState }
->('viz/editFolder', async ({ folder, resolve }, { getState }) => {
-  try {
-    const folders = selectVizs(getState());
-    const origin = folders.find(({ id }) => id === folder.id)!;
-    const merged = { ...origin, ...folder };
-    await request<boolean>({
-      url: `/viz/folders/${folder.id}`,
-      method: 'PUT',
-      data: merged,
-    });
-    resolve();
-    return merged;
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
-});
+>(
+  'viz/editFolder',
+  async ({ folder, resolve }, { getState, rejectWithValue }) => {
+    try {
+      const folders = selectVizs(getState());
+      const origin = folders.find(({ id }) => id === folder.id)!;
+      const merged = { ...origin, ...folder };
+      await request<boolean>({
+        url: `/viz/folders/${folder.id}`,
+        method: 'PUT',
+        data: merged,
+      });
+      resolve();
+      return merged;
+    } catch (error) {
+      return rejectHandle(error, rejectWithValue);
+    }
+  },
+);
 
 export const unarchiveViz = createAsyncThunk<void, UnarchiveVizParams>(
   'viz/unarchiveViz',
-  async ({ params: { id, name, vizType, parentId, index }, resolve }) => {
+  async (
+    { params: { id, name, vizType, parentId, index }, resolve },
+    thunkAPI,
+  ) => {
     try {
       await request<boolean>({
         url: `/viz/unarchive/${id}`,
@@ -239,15 +235,14 @@ export const unarchiveViz = createAsyncThunk<void, UnarchiveVizParams>(
       });
       resolve();
     } catch (error) {
-      errorHandle(error);
-      throw error;
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
   },
 );
 
 export const deleteViz = createAsyncThunk<boolean, DeleteVizParams>(
   'viz/deleteViz',
-  async ({ params: { id, archive }, type, resolve }) => {
+  async ({ params: { id, archive }, type, resolve }, thunkAPI) => {
     try {
       const { data } = await request<boolean>({
         url: `/viz/${type.toLowerCase()}s/${id}`,
@@ -257,15 +252,14 @@ export const deleteViz = createAsyncThunk<boolean, DeleteVizParams>(
       resolve();
       return data;
     } catch (error) {
-      errorHandle(error);
-      throw error;
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
   },
 );
 
 export const publishViz = createAsyncThunk<null, PublishVizParams>(
   'viz/publishViz',
-  async ({ id, vizType, publish, resolve }) => {
+  async ({ id, vizType, publish, resolve }, thunkAPI) => {
     try {
       await request<boolean>({
         url: `/viz/${publish ? 'publish' : 'unpublish'}/${id}`,
@@ -275,8 +269,7 @@ export const publishViz = createAsyncThunk<null, PublishVizParams>(
       resolve();
       return null;
     } catch (error) {
-      errorHandle(error);
-      throw error;
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
   },
 );
@@ -318,17 +311,24 @@ export const initChartPreviewData = createAsyncThunk<
 
 export const fetchVizChartAction = createAsyncThunk(
   'viz/fetchVizChartAction',
-  async (arg: { backendChartId; filterSearchParams?: FilterSearchParams }) => {
-    const response = await request<
-      Omit<ChartDTO, 'config'> & { config: string }
-    >({
-      method: 'GET',
-      url: `viz/datacharts/${arg.backendChartId}`,
-    });
-    return {
-      data: convertToChartDTO(response?.data),
-      filterSearchParams: arg.filterSearchParams,
-    };
+  async (
+    arg: { backendChartId; filterSearchParams?: FilterSearchParams },
+    thunkAPI,
+  ) => {
+    try {
+      const response = await request<
+        Omit<ChartDTO, 'config'> & { config: string }
+      >({
+        method: 'GET',
+        url: `viz/datacharts/${arg.backendChartId}`,
+      });
+      return {
+        data: convertToChartDTO(response?.data),
+        filterSearchParams: arg.filterSearchParams,
+      };
+    } catch (error) {
+      return rejectHandle(error, thunkAPI.rejectWithValue);
+    }
   },
 );
 
@@ -405,7 +405,7 @@ export const updateFilterAndFetchDataset = createAsyncThunk(
 
 export const copyDashboard = createAsyncThunk<Folder, CopyDashboardParams>(
   'viz/copyDashboard',
-  async ({ viz, dashboardId, resolve }) => {
+  async ({ viz, dashboardId, resolve }, thunkAPI) => {
     try {
       const { data } = await request<Folder>({
         url: `/viz/dashboards/${dashboardId}/copy`,
@@ -415,8 +415,7 @@ export const copyDashboard = createAsyncThunk<Folder, CopyDashboardParams>(
       resolve();
       return data;
     } catch (error) {
-      errorHandle(error);
-      throw error;
+      return rejectHandle(error, thunkAPI.rejectWithValue);
     }
   },
 );
