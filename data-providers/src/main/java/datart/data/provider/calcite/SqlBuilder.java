@@ -23,9 +23,9 @@ import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.SingleTypedValue;
 import datart.core.data.provider.sql.*;
-import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.custom.CustomSqlBetweenOperator;
 import datart.data.provider.calcite.dialect.FetchAndOffsetSupport;
+import datart.data.provider.jdbc.SqlSplitter;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlBetweenOperator;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
@@ -61,6 +61,9 @@ public class SqlBuilder {
 
 
     public SqlBuilder withBaseSql(String sql) {
+        if (StringUtils.isNotBlank(sql)) {
+            sql = removeEndDelimiter(sql);
+        }
         this.srcSql = sql;
         return this;
     }
@@ -445,5 +448,18 @@ public class SqlBuilder {
         return null;
     }
 
+    private String removeEndDelimiter(String sql) {
+        if (StringUtils.isBlank(sql)) {
+            return sql;
+        }
+        sql = sql.trim();
+        sql = StringUtils.removeEnd(sql, SqlSplitter.DEFAULT_DELIMITER + "");
+        sql = sql.trim();
+        if (sql.endsWith(SqlSplitter.DEFAULT_DELIMITER + "")) {
+            return removeEndDelimiter(sql);
+        } else {
+            return sql;
+        }
+    }
 
 }
