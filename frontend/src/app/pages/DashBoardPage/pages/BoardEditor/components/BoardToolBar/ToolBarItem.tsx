@@ -16,13 +16,10 @@
  * limitations under the License.
  */
 import {
-  CopyOutlined,
   DeleteOutlined,
-  SnippetsOutlined,
   VerticalAlignBottomOutlined,
   VerticalAlignTopOutlined,
 } from '@ant-design/icons';
-import { Tooltip } from 'antd';
 import { ButtonType } from 'antd/lib/button';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -33,11 +30,7 @@ import {
   deleteWidgetsAction,
   widgetToPositionAction,
 } from '../../slice/actions/actions';
-import {
-  selectClipboardWidgets,
-  selectSelectedIds,
-} from '../../slice/selectors';
-import { copyWidgetByIds, pasteWidgets } from '../../slice/thunk';
+import { selectSelectedIds } from '../../slice/selectors';
 import AddChart from './AddChart/AddChart';
 
 export { AddChart as AddChartBtn };
@@ -64,40 +57,6 @@ export const DeleteBtn: React.FC<ToolBtnProps> = props => {
       onClick={onDelete}
       icon={<DeleteOutlined />}
       tip={t('delete')}
-      {...props}
-    />
-  );
-};
-export const CopyBtn: React.FC<ToolBtnProps> = props => {
-  const selectedIds = useSelector(selectSelectedIds);
-  const t = useI18NPrefix(`viz.board.action`);
-  const dispatch = useDispatch();
-  const onCopy = () => {
-    dispatch(copyWidgetByIds(selectedIds));
-  };
-  return (
-    <TemButton
-      disabled={!selectedIds.length}
-      onClick={onCopy}
-      icon={<CopyOutlined />}
-      tip={t('copy')}
-      {...props}
-    />
-  );
-};
-export const PasteBtn: React.FC<ToolBtnProps> = props => {
-  const t = useI18NPrefix(`viz.board.action`);
-  const clipboardWidgets = useSelector(selectClipboardWidgets);
-  const dispatch = useDispatch();
-  const onPaste = () => {
-    dispatch(pasteWidgets());
-  };
-  return (
-    <TemButton
-      disabled={!Object.keys(clipboardWidgets).length}
-      onClick={onPaste}
-      icon={<SnippetsOutlined />}
-      tip={t('paste')}
       {...props}
     />
   );
@@ -159,25 +118,3 @@ const TemButton: React.FC<TemButtonProps> = props => {
   );
 };
 export default TemButton;
-export interface TipBtnProps extends ToolBtnProps {
-  onClick?: React.MouseEventHandler<HTMLElement>;
-  icon?: React.ReactNode;
-  disabled?: boolean;
-  label?: string;
-  tip?: string;
-}
-export const WithTipButton: React.FC<TipBtnProps> = props => {
-  return (
-    <Tooltip title={props.tip}>
-      <ToolbarButton
-        className={props.className}
-        type={props.btnType || 'text'}
-        disabled={props.disabled || false}
-        onClick={props.onClick}
-        icon={props.icon}
-      >
-        {props.label}
-      </ToolbarButton>
-    </Tooltip>
-  );
-};

@@ -23,13 +23,8 @@ import { AddContainer } from './AddContainer/AddContainer';
 import { AddController } from './AddControler/AddControler';
 import { AddMedia } from './AddMedia/AddMedia';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
-import {
-  CopyBtn,
-  DeleteBtn,
-  PasteBtn,
-  ToBottomBtn,
-  ToTopBtn,
-} from './ToolBarItem';
+import { CopyBtn, PasteBtn } from './CopyPaste/CopyPaste';
+import { DeleteBtn, ToBottomBtn, ToTopBtn } from './ToolBarItem';
 import { RedoBtn, UndoBtn } from './UndoRedo/UndoRedo';
 
 const ToolBar: React.FC<{}> = () => {
