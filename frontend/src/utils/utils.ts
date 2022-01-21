@@ -56,6 +56,9 @@ export function reduxActionErrorHandler(errorAction) {
 }
 
 export function rejectHandle(error, rejectWithValue) {
+  if (error?.response?.status === 401) {
+    removeToken();
+  }
   if ((error as AxiosError).response) {
     return rejectWithValue(
       ((error as AxiosError).response as AxiosResponse<APIResponse<any>>).data
