@@ -17,11 +17,9 @@
  */
 
 import { Empty } from 'antd';
-import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
+import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
-  BASE_ROW_HEIGHT,
-  BASE_VIEW_WIDTH,
   BREAK_POINTS,
   RGL_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
@@ -55,7 +53,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 export const AutoBoardEditor: React.FC<{}> = () => {
   const dashBoard = useSelector(selectEditBoard) as Dashboard;
   const {
-    config: { margin, containerPadding, rowHeight, cols, background },
+    config: { margin, containerPadding, cols, background },
   } = useMemo(() => {
     return dashBoard as Dashboard;
   }, [dashBoard]);
@@ -94,19 +92,14 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   }, [layoutWidgetInfoMap]);
   const layoutWrap: RefObject<HTMLDivElement> = useRef(null);
 
-  const { ref, cacheW } = useCacheWidthHeight();
-
-  const dynamicRowHeight = useMemo(() => {
-    return (cacheW * BASE_ROW_HEIGHT) / BASE_VIEW_WIDTH;
-  }, [cacheW]);
-
+  const { ref, widgetRowHeight } = useWidgetRowHeight();
   const calcItemTop = useCallback(
     (id: string) => {
       const curItem = currentLayout.current.find(ele => ele.i === id);
       if (!curItem) return Infinity;
-      return Math.round((rowHeight + margin[0]) * curItem.y);
+      return Math.round((widgetRowHeight + margin[0]) * curItem.y);
     },
-    [margin, rowHeight],
+    [margin, widgetRowHeight],
   );
   let scrollThrottle = useRef(false);
   const lazyLoad = useCallback(() => {
@@ -179,8 +172,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
    */
   return (
     <Wrap>
-      <StyledContainer bg={background}>
-        <div ref={ref}></div>
+      <StyledContainer bg={background} ref={ref}>
         {layoutWidgets.length ? (
           <div className="grid-wrap" ref={layoutWrap}>
             <ResponsiveGridLayout
@@ -189,7 +181,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
               margin={margin}
               containerPadding={containerPadding}
               cols={cols}
-              rowHeight={dynamicRowHeight}
+              rowHeight={widgetRowHeight}
               useCSSTransforms={true}
               measureBeforeMount={false}
               onDragStop={changeWidgetLayouts}
