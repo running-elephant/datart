@@ -38,8 +38,7 @@ import React, {
   useRef,
 } from 'react';
 import styled from 'styled-components/macro';
-export interface DataChartWidgetProps {}
-export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
+export const DataChartWidget: React.FC<{}> = memo(() => {
   const dataChart = useContext(WidgetChartContext);
   const { data } = useContext(WidgetDataContext);
   const widget = useContext(WidgetContext);

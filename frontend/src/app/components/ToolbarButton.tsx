@@ -4,7 +4,7 @@ import styled from 'styled-components/macro';
 import { FONT_SIZE_BASE } from 'styles/StyleConstants';
 import { mergeClassNames } from 'utils/utils';
 
-interface ToolbarButtonProps extends ButtonProps {
+export interface ToolbarButtonProps extends ButtonProps {
   fontSize?: number;
   iconSize?: number;
   color?: string;

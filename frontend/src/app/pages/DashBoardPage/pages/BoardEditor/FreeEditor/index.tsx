@@ -20,7 +20,7 @@ import { Layout } from 'antd';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import BoardToolBar from '../components/BoardToolBar/BoardToolBar';
+import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
 import { FreeEditorWrapper } from './FreeEditorWrapper';

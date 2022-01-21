@@ -16,58 +16,51 @@
  * limitations under the License.
  */
 import { Divider, Space } from 'antd';
-import React, { memo, useContext } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
-import AddChartBtn from './AddChartBtn';
-import { AddControlBtn } from './AddControl/AddControlBtn';
+import { AddChart } from './AddChart/AddChart';
+import { AddContainer } from './AddContainer/AddContainer';
+import { AddController } from './AddControler/AddControler';
+import { AddMedia } from './AddMedia/AddMedia';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
-import {
-  ContainerWidgetDropdown,
-  CopyBtn,
-  DeleteBtn,
-  MediaWidgetDropdown,
-  PasteBtn,
-  RedoBtn,
-  ToBottomBtn,
-  ToTopBtn,
-  UndoBtn,
-} from './ToolBarItem';
+import { CopyBtn, PasteBtn } from './CopyPaste/CopyPaste';
+import { DeleteWidgetsBtn } from './DeleteWidgetsBtn';
+import { ToBottomBtn, ToTopBtn } from './ToTopToBottom/ToTopToBottom';
+import { RedoBtn, UndoBtn } from './UndoRedo/UndoRedo';
 
-interface ToolBarProps {}
-const ToolBar: React.FC<ToolBarProps> = props => {
-  const { boardId, boardType } = useContext(BoardToolBarContext);
-
+export const ToolBar = () => {
   const ssp = e => {
     e.stopPropagation();
   };
+  const { boardType } = useContext(BoardToolBarContext);
+
   return (
     <Wrapper onClick={ssp}>
       <Space>
         <>
-          <AddChartBtn boardId={boardId} boardType={boardType} />
-          <MediaWidgetDropdown boardId={boardId} boardType={boardType} />
-          <ContainerWidgetDropdown boardId={boardId} boardType={boardType} />
-          <AddControlBtn />
+          <AddChart />
+          <AddMedia />
+          <AddContainer />
+          <AddController />
           {boardType === 'free' && (
             <>
-              <ToTopBtn boardId={boardId} boardType={boardType} />
-              <ToBottomBtn boardId={boardId} boardType={boardType} />
+              <ToTopBtn />
+              <ToBottomBtn />
             </>
           )}
           <Divider type="vertical" />
-          <UndoBtn boardId={boardId} boardType={boardType} />
-          <RedoBtn boardId={boardId} boardType={boardType} />
+          <UndoBtn />
+          <RedoBtn />
           <Divider type="vertical" />
-          <DeleteBtn boardId={boardId} boardType={boardType} />
+          <DeleteWidgetsBtn />
           <Divider type="vertical" />
-          <CopyBtn boardId={boardId} boardType={boardType} />
-          <PasteBtn boardId={boardId} boardType={boardType} />
+          <CopyBtn />
+          <PasteBtn />
         </>
       </Space>
     </Wrapper>
   );
 };
-export default memo(ToolBar);
 const Wrapper = styled.span`
   z-index: 0;
   display: inline-block;
