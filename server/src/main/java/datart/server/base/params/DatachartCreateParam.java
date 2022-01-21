@@ -17,4 +17,6 @@ public class DatachartCreateParam extends VizCreateParam {
 
     private String config;
 
+    private String description;
+
 }

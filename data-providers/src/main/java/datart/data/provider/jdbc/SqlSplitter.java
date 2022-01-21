@@ -136,6 +136,8 @@ public class SqlSplitter {
             if (c == quote) {
                 if (i + 1 < string.length() && string.charAt(i + 1) == quote) {
                     builder.append(c);
+                    builder.append(string.charAt(i + 1));
+                    i += 1;
                 } else {
                     return i + 1;
                 }
