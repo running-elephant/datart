@@ -16,4 +16,9 @@ public interface OrgSettingsMapperExt extends OrgSettingsMapper {
     })
     List<OrgSettings> selectByOrg(String orgId);
 
+    @Select({
+            "SELECT * FROM org_settings t WHERE t.org_id = #{orgId} and `type`=#{type}"
+    })
+    OrgSettings selectByOrgAndType(String orgId, String type);
+
 }

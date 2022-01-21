@@ -1,6 +1,5 @@
 package datart.data.provider.script;
 
-import datart.core.base.consts.Const;
 import datart.core.base.consts.VariableTypeEnum;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ScriptVariable;
@@ -16,7 +15,6 @@ import org.apache.calcite.sql.fun.SqlLikeOperator;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,7 +91,6 @@ public class VariablePlaceholder {
                     }).collect(Collectors.toList());
                 } else {
                     sqlOperator = SqlStdOperatorTable.OR;
-
                     operandList = variable.getValues().stream().map(val -> {
                         ArrayList<SqlNode> operands = new ArrayList<>();
                         operands.add(sqlCall.getOperandList().get(0));
@@ -224,10 +221,8 @@ public class VariablePlaceholder {
             return new ReplacementPair(originalSqlFragment, SqlScriptRender.FALSE_CONDITION);
         }
 
-        for (Serializable value : variable.getValues()) {
-            if (Const.ALL_PERMISSION.equals(value.toString())) {
-                return new ReplacementPair(originalSqlFragment, SqlScriptRender.TRUE_CONDITION);
-            }
+        if (variable.isDisabled()) {
+            return new ReplacementPair(originalSqlFragment, SqlScriptRender.TRUE_CONDITION);
         }
 
         if (variable.getValues().size() == 1) {
