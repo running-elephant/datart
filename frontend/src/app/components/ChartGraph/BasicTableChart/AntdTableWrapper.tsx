@@ -87,12 +87,12 @@ const StyledTable = styled(Table)<{ oddAndEven?: OddAndEvenProps }>`
   }
 
   .odd td {
-    background: ${p => p?.oddAndEven?.odd?.backgroundColor || '#fff'};
+    background: ${p => p?.oddAndEven?.odd?.backgroundColor || 'transparent'};
     color: ${p => p?.oddAndEven?.odd?.color || 'auto'};
   }
 
   .even td {
-    background: ${p => p?.oddAndEven?.even?.backgroundColor || '#fff'};
+    background: ${p => p?.oddAndEven?.even?.backgroundColor || 'transparent'};
     color: ${p => p?.oddAndEven?.even?.color || 'auto'};
   }
 `;

@@ -270,7 +270,7 @@ const config: ChartConfig = {
         {
           label: 'style.oddBgColor',
           key: 'oddBgColor',
-          default: '#fff',
+          default: 'rgba(0,0,0,0)',
           comType: 'fontColor',
         },
         {
@@ -282,7 +282,7 @@ const config: ChartConfig = {
         {
           label: 'style.evenBgColor',
           key: 'evenBgColor',
-          default: '#fff',
+          default: 'rgba(0,0,0,0)',
           comType: 'fontColor',
         },
         {
