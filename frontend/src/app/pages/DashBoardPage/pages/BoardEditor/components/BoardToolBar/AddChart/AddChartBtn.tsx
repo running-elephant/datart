@@ -27,10 +27,11 @@ import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { uuidv4 } from 'utils/utils';
-import { addDataChartWidgets, addWrapChartWidget } from '../../slice/thunk';
-import ChartSelectModalModal from '../ChartSelectModal';
-import { ChartWidgetDropdown, ToolBtnProps } from './ToolBarItem';
-const AddChartBtn: React.FC<ToolBtnProps> = props => {
+import { addDataChartWidgets, addWrapChartWidget } from '../../../slice/thunk';
+import ChartSelectModalModal from '../../ChartSelectModal';
+import { ChartWidgetDropdown } from './ChartWidgetDropdown';
+
+const AddChartBtn: React.FC<{}> = () => {
   const dispatch = useDispatch();
   const { boardId, boardType } = useContext(BoardContext);
   const orgId = useSelector(selectOrgId);
@@ -74,12 +75,7 @@ const AddChartBtn: React.FC<ToolBtnProps> = props => {
   );
   return (
     <>
-      <ChartWidgetDropdown
-        boardId={boardId}
-        boardType={boardType}
-        onSelect={onShowCharts}
-        onCreate={onCreateCharts}
-      />
+      <ChartWidgetDropdown onSelect={onShowCharts} onCreate={onCreateCharts} />
 
       <ChartSelectModalModal
         dataCharts={chartOptions}

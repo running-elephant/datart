@@ -21,8 +21,8 @@ import styled from 'styled-components/macro';
 import { SPACE, SPACE_XL, STICKY_LEVEL } from 'styles/StyleConstants';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
 import ToolBar from './ToolBar';
-export interface BoardToolBarProps {}
-const BoardToolBar: React.FC<BoardToolBarProps> = () => {
+
+const BoardToolBar: React.FC<{}> = () => {
   const { boardId, boardType } = useContext(BoardContext);
   return (
     <Wrapper>

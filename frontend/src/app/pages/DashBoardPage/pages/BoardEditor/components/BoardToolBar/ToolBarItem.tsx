@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 import {
-  AppstoreAddOutlined,
-  BarChartOutlined,
   ContainerOutlined,
   CopyOutlined,
   DeleteOutlined,
@@ -55,7 +53,7 @@ import {
   copyWidgetByIds,
   pasteWidgets,
 } from '../../slice/thunk';
-import AddChartBtn from './AddChartBtn';
+import AddChartBtn from './AddChart/AddChartBtn';
 
 export { AddChartBtn };
 
@@ -198,76 +196,6 @@ export const ToBottomBtn: React.FC<ToolBtnProps> = props => {
   );
 };
 
-export const MediaWidgetDropdown: React.FC<ToolBtnProps> = props => {
-  const t = useI18NPrefix(`viz.board.action`);
-  const dispatch = useDispatch();
-  const { boardId, boardType } = props;
-  const onSelectMediaWidget = useCallback(
-    ({ keyPath }) => {
-      const [mediaType] = keyPath;
-      const widget = widgetToolKit.media.create({
-        dashboardId: boardId,
-        boardType,
-        type: mediaType,
-      });
-      dispatch(addWidgetsToEditBoard([widget]));
-    },
-    [boardId, boardType, dispatch],
-  );
-  type TinyWidgetItems = { name: string; icon: string; type: LightWidgetType };
-  const mediaWidgetTypes: TinyWidgetItems[] = [
-    {
-      name: t('image'),
-      icon: '',
-      type: 'image',
-    },
-    {
-      name: t('richText'),
-      icon: '',
-      type: 'richText',
-    },
-    {
-      name: t('timer'),
-      icon: '',
-      type: 'timer',
-    },
-    {
-      name: t('iframe'),
-      icon: '',
-      type: 'iframe',
-    },
-    {
-      name: t('video'),
-      icon: '',
-      type: 'video',
-    },
-  ];
-  const mediaWidgetItems = (
-    <Menu onClick={onSelectMediaWidget}>
-      {mediaWidgetTypes.map(({ name, icon, type }) => (
-        <Menu.Item key={type}>{name}</Menu.Item>
-      ))}
-    </Menu>
-  );
-  return (
-    <Dropdown
-      overlay={mediaWidgetItems}
-      placement="bottomLeft"
-      trigger={['click']}
-    >
-      <Tooltip title={t('media')}>
-        <ToolbarButton
-          className={props.className}
-          type={props.btnType || 'text'}
-          icon={<AppstoreAddOutlined />}
-        >
-          {props.label}
-        </ToolbarButton>
-      </Tooltip>
-    </Dropdown>
-  );
-};
-
 export const ContainerWidgetDropdown: React.FC<ToolBtnProps> = props => {
   const t = useI18NPrefix(`viz.board.action`);
   const dispatch = useDispatch();
@@ -327,63 +255,7 @@ export const ContainerWidgetDropdown: React.FC<ToolBtnProps> = props => {
     </Dropdown>
   );
 };
-type ChartWidgetDropdownProps = ToolBtnProps & {
-  onSelect: () => void;
-  onCreate: () => void;
-};
-export const ChartWidgetDropdown: React.FC<ChartWidgetDropdownProps> =
-  props => {
-    const t = useI18NPrefix(`viz.board.action`);
-    const onChartWidget = useCallback(
-      ({ key }) => {
-        if (key === 'select') {
-          props.onSelect();
-        }
-        if (key === 'create') {
-          //TODO 跳转链接
-          props.onCreate?.();
-        }
-      },
-      [props],
-    );
-    const addChartTypes = [
-      {
-        name: t('ImportExistingDataCharts'),
-        icon: '',
-        type: 'select',
-      },
-      {
-        name: t('createDataChartInBoard'),
-        icon: '',
-        type: 'create',
-      },
-    ];
 
-    const chartWidgetItems = (
-      <Menu onClick={onChartWidget}>
-        {addChartTypes.map(({ name, icon, type }) => (
-          <Menu.Item key={type}>{name}</Menu.Item>
-        ))}
-      </Menu>
-    );
-    return (
-      <Dropdown
-        overlay={chartWidgetItems}
-        placement="bottomLeft"
-        trigger={['click']}
-      >
-        <Tooltip title={t('dataChart')}>
-          <ToolbarButton
-            className={props.className}
-            type={props.btnType || 'text'}
-            icon={<BarChartOutlined />}
-          >
-            {props.label}
-          </ToolbarButton>
-        </Tooltip>
-      </Dropdown>
-    );
-  };
 export interface TemButtonProps extends ToolBtnProps {
   onClick?: () => void;
   icon?: React.ReactNode;
@@ -393,17 +265,15 @@ export interface TemButtonProps extends ToolBtnProps {
 }
 const TemButton: React.FC<TemButtonProps> = props => {
   return (
-    <Tooltip title={props.tip}>
-      <ToolbarButton
-        className={props.className}
-        type={props.btnType || 'text'}
-        disabled={props.disabled || false}
-        onClick={props.onClick}
-        icon={props.icon}
-      >
-        {props.label}
-      </ToolbarButton>
-    </Tooltip>
+    <ToolbarButton
+      className={props.className}
+      type={props.btnType || 'text'}
+      disabled={props.disabled || false}
+      onClick={props.onClick}
+      icon={props.icon}
+    >
+      {props.label}
+    </ToolbarButton>
   );
 };
 export default TemButton;

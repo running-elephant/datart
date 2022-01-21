@@ -16,16 +16,17 @@
  * limitations under the License.
  */
 import { Divider, Space } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
-import AddChartBtn from './AddChartBtn';
+import AddChartBtn from './AddChart/AddChartBtn';
 import { AddControlBtn } from './AddControl/AddControlBtn';
+import { AddMedia } from './AddMedia/AddMedia';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
 import {
   ContainerWidgetDropdown,
   CopyBtn,
   DeleteBtn,
-  MediaWidgetDropdown,
   PasteBtn,
   RedoBtn,
   ToBottomBtn,
@@ -33,19 +34,19 @@ import {
   UndoBtn,
 } from './ToolBarItem';
 
-interface ToolBarProps {}
-const ToolBar: React.FC<ToolBarProps> = props => {
-  const { boardId, boardType } = useContext(BoardToolBarContext);
-
+const ToolBar: React.FC<{}> = () => {
   const ssp = e => {
     e.stopPropagation();
   };
+  const { boardId, boardType } = useContext(BoardToolBarContext);
+  const t = useI18NPrefix(`viz.board.action`);
   return (
     <Wrapper onClick={ssp}>
       <Space>
         <>
-          <AddChartBtn boardId={boardId} boardType={boardType} />
-          <MediaWidgetDropdown boardId={boardId} boardType={boardType} />
+          <AddChartBtn />
+
+          <AddMedia  />
           <ContainerWidgetDropdown boardId={boardId} boardType={boardType} />
           <AddControlBtn />
           {boardType === 'free' && (
