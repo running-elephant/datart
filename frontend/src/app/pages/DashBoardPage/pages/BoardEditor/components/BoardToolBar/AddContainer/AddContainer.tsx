@@ -15,77 +15,70 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { AppstoreAddOutlined } from '@ant-design/icons';
+import { ContainerOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { LightWidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
-import { useCallback, useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { addWidgetsToEditBoard } from '../../../slice/thunk';
 import { BoardToolBarContext } from '../context/BoardToolBarContext';
 
-export const AddMedia: React.FC<{}> = () => {
+export const AddContainer: React.FC<{}> = () => {
   const t = useI18NPrefix(`viz.board.action`);
   const dispatch = useDispatch();
   const { boardId, boardType } = useContext(BoardToolBarContext);
-  const onSelectMediaWidget = useCallback(
+  const onSelectContainerWidget = useCallback(
     ({ keyPath }) => {
-      const [mediaType] = keyPath;
-      const widget = widgetToolKit.media.create({
+      const [type] = keyPath;
+      const widget = widgetToolKit.container.create({
         dashboardId: boardId,
-        boardType,
-        type: mediaType,
+        boardType: boardType,
+        type: type,
       });
       dispatch(addWidgetsToEditBoard([widget]));
     },
     [boardId, boardType, dispatch],
   );
-  type TinyWidgetItems = { name: string; icon: string; type: LightWidgetType };
-  const mediaWidgetTypes: TinyWidgetItems[] = [
+  type ContainerWidgetItems = {
+    name: string;
+    icon: string;
+    type: LightWidgetType;
+    disabled?: boolean;
+  };
+  const containerWidgetTypes: ContainerWidgetItems[] = [
     {
-      name: t('image'),
+      name: t('tab'),
       icon: '',
-      type: 'image',
+      type: 'tab',
     },
     {
-      name: t('richText'),
+      name: t('carousel'),
       icon: '',
-      type: 'richText',
-    },
-    {
-      name: t('timer'),
-      icon: '',
-      type: 'timer',
-    },
-    {
-      name: t('iframe'),
-      icon: '',
-      type: 'iframe',
-    },
-    {
-      name: t('video'),
-      icon: '',
-      type: 'video',
+      disabled: true,
+      type: 'carousel',
     },
   ];
-  const mediaWidgetItems = (
-    <Menu onClick={onSelectMediaWidget}>
-      {mediaWidgetTypes.map(({ name, icon, type }) => (
-        <Menu.Item key={type}>{name}</Menu.Item>
+
+  const containerWidgetItems = (
+    <Menu onClick={onSelectContainerWidget}>
+      {containerWidgetTypes.map(({ name, type, disabled }) => (
+        <Menu.Item disabled={disabled} key={type}>
+          {name}
+        </Menu.Item>
       ))}
     </Menu>
   );
   return (
     <Dropdown
-      overlay={mediaWidgetItems}
+      overlay={containerWidgetItems}
       placement="bottomLeft"
       trigger={['click']}
     >
-      <Tooltip title={t('media')}>
-        <ToolbarButton icon={<AppstoreAddOutlined />} />
+      <Tooltip title={t('container')}>
+        <ToolbarButton icon={<ContainerOutlined />}></ToolbarButton>
       </Tooltip>
     </Dropdown>
   );

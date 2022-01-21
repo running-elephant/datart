@@ -17,7 +17,6 @@
  */
 
 import ChartEditor from 'app/components/ChartEditor';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import {
   DataChart,
   WidgetContentChartType,
@@ -29,11 +28,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { uuidv4 } from 'utils/utils';
 import { addDataChartWidgets, addWrapChartWidget } from '../../../slice/thunk';
 import ChartSelectModalModal from '../../ChartSelectModal';
+import { BoardToolBarContext } from '../context/BoardToolBarContext';
 import { ChartWidgetDropdown } from './ChartWidgetDropdown';
 
-const AddChartBtn: React.FC<{}> = () => {
+const AddChart: React.FC<{}> = () => {
   const dispatch = useDispatch();
-  const { boardId, boardType } = useContext(BoardContext);
+  const { boardId, boardType } = useContext(BoardToolBarContext);
   const orgId = useSelector(selectOrgId);
   const chartOptionsMock = useSelector(selectVizs);
   const chartOptions = useMemo(
@@ -96,4 +96,4 @@ const AddChartBtn: React.FC<{}> = () => {
     </>
   );
 };
-export default AddChartBtn;
+export default AddChart;

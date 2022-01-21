@@ -16,15 +16,14 @@
  * limitations under the License.
  */
 import { Divider, Space } from 'antd';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
-import AddChartBtn from './AddChart/AddChartBtn';
-import { AddControlBtn } from './AddControl/AddControlBtn';
+import AddChart from './AddChart/AddChart';
+import { AddContainer } from './AddContainer/AddContainer';
+import { AddController } from './AddControler/AddControler';
 import { AddMedia } from './AddMedia/AddMedia';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
 import {
-  ContainerWidgetDropdown,
   CopyBtn,
   DeleteBtn,
   PasteBtn,
@@ -39,16 +38,15 @@ const ToolBar: React.FC<{}> = () => {
     e.stopPropagation();
   };
   const { boardId, boardType } = useContext(BoardToolBarContext);
-  const t = useI18NPrefix(`viz.board.action`);
+
   return (
     <Wrapper onClick={ssp}>
       <Space>
         <>
-          <AddChartBtn />
-
-          <AddMedia  />
-          <ContainerWidgetDropdown boardId={boardId} boardType={boardType} />
-          <AddControlBtn />
+          <AddChart />
+          <AddMedia />
+          <AddContainer />
+          <AddController />
           {boardType === 'free' && (
             <>
               <ToTopBtn boardId={boardId} boardType={boardType} />

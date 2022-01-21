@@ -322,12 +322,13 @@
           "rangeTime": "日期范围",
           "rangeTimePicker": "日期范围",
           "recommendTime": "推荐时间",
-          "rangeValue": "数值范围",
+          "rangeValue": "数值范围", 
           "text": "文本",
           "tree": "下拉树列表",
           "value": "数值",
           "time": "日期",
-          "slider": "滑块"
+          "slider": "滑块",
+          "rangeSlider": "范围滑块"
         },
         "controllerVisibilityTypes": {
           "hide": "隐藏",
@@ -723,7 +724,8 @@
         "iframe": "iframe",
         "video": "视频",
         "container": "容器",
-        "tab": "标签页",
+        "tab": "标签卡",
+        "carousel": "轮播卡",
         "controller": "控制器",
         "toTop": "图层置顶",
         "toBottom": "图层置底",

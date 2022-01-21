@@ -60,14 +60,14 @@ export const ChartWidgetDropdown: React.FC<ChartWidgetDropdownProps> =
       </Menu>
     );
     return (
-      <Tooltip title={t('dataChart')}>
-        <Dropdown
-          overlay={chartWidgetItems}
-          placement="bottomLeft"
-          trigger={['click']}
-        >
-          <ToolbarButton icon={<BarChartOutlined />}></ToolbarButton>
-        </Dropdown>
-      </Tooltip>
+      <Dropdown
+        overlay={chartWidgetItems}
+        placement="bottomLeft"
+        trigger={['click']}
+      >
+        <Tooltip title={t('dataChart')}>
+          <ToolbarButton icon={<BarChartOutlined />} />
+        </Tooltip>
+      </Dropdown>
     );
   };

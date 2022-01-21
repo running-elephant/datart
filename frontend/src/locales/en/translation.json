@@ -327,7 +327,8 @@
           "tree": "Tree",
           "value": "Value",
           "time": "Time",
-          "slider": "Slider"
+          "slider": "Slider",
+          "rangeSlider": "RangeSlider"
         },
         "controllerVisibilityTypes": {
           "hide": "Hide",
@@ -726,6 +727,7 @@
         "video": "Video",
         "container": "Container",
         "tab": "Tab",
+        "carousel": "Carousel",
         "controller": "Controller",
         "toTop": "move To Top",
         "toBottom": "move To Bottom",

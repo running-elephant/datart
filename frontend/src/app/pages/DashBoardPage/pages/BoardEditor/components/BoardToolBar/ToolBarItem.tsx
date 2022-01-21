@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 import {
-  ContainerOutlined,
   CopyOutlined,
   DeleteOutlined,
   RedoOutlined,
@@ -25,16 +24,12 @@ import {
   VerticalAlignBottomOutlined,
   VerticalAlignTopOutlined,
 } from '@ant-design/icons';
-import { Dropdown, Menu, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import { ButtonType } from 'antd/lib/button';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BOARD_UNDO } from 'app/pages/DashBoardPage/constants';
-import {
-  BoardType,
-  LightWidgetType,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
+import { BoardType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ActionCreators } from 'redux-undo';
@@ -48,14 +43,10 @@ import {
   selectPastState,
   selectSelectedIds,
 } from '../../slice/selectors';
-import {
-  addWidgetsToEditBoard,
-  copyWidgetByIds,
-  pasteWidgets,
-} from '../../slice/thunk';
-import AddChartBtn from './AddChart/AddChartBtn';
+import { copyWidgetByIds, pasteWidgets } from '../../slice/thunk';
+import AddChart from './AddChart/AddChart';
 
-export { AddChartBtn };
+export { AddChart as AddChartBtn };
 
 export interface ToolBtnProps {
   className?: string;
@@ -193,66 +184,6 @@ export const ToBottomBtn: React.FC<ToolBtnProps> = props => {
       tip={t('toBottom')}
       {...props}
     />
-  );
-};
-
-export const ContainerWidgetDropdown: React.FC<ToolBtnProps> = props => {
-  const t = useI18NPrefix(`viz.board.action`);
-  const dispatch = useDispatch();
-  const { boardId, boardType } = props;
-  const onSelectContainerWidget = useCallback(
-    ({ keyPath }) => {
-      const [type] = keyPath;
-      const widget = widgetToolKit.container.create({
-        dashboardId: boardId,
-        boardType: boardType,
-        type: type,
-      });
-      dispatch(addWidgetsToEditBoard([widget]));
-    },
-    [boardId, boardType, dispatch],
-  );
-  type ContainerWidgetItems = {
-    name: string;
-    icon: string;
-    type: LightWidgetType;
-  };
-  const containerWidgetTypes: ContainerWidgetItems[] = [
-    {
-      name: t('tab'),
-      icon: '',
-      type: 'tab',
-    },
-    // {
-    //   name: 'carousel',
-    //   icon: '',
-    //   type: 'carousel',
-    // },
-  ];
-
-  const containerWidgetItems = (
-    <Menu onClick={onSelectContainerWidget}>
-      {containerWidgetTypes.map(({ name, type }) => (
-        <Menu.Item key={type}>{name}</Menu.Item>
-      ))}
-    </Menu>
-  );
-  return (
-    <Dropdown
-      overlay={containerWidgetItems}
-      placement="bottomLeft"
-      trigger={['click']}
-    >
-      <Tooltip title={t('container')}>
-        <ToolbarButton
-          className={props.className}
-          type={props.btnType || 'text'}
-          icon={<ContainerOutlined />}
-        >
-          {props.label}
-        </ToolbarButton>
-      </Tooltip>
-    </Dropdown>
   );
 };
 
