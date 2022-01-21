@@ -257,6 +257,9 @@ class BasicTableChart extends ReactChart {
     const aggregateFieldConfigs = aggregateConfigs.filter(c =>
       aggregateFields.includes(c.uid),
     );
+    if (!aggregateFieldConfigs.length) {
+      return;
+    }
 
     const _flatChildren = node => {
       if (Array.isArray(node?.children)) {
@@ -342,58 +345,77 @@ class BasicTableChart extends ReactChart {
         fontFamily,
       );
     };
-    const maxContentByFields = mixedSectionConfigRows
-      .map(c => {
-        const header = this.findHeader(c.uid, tableHeaders);
-        const rowUniqKey = getValueByColumnKey(c);
+    const rowNumberUniqKeyWidth =
+      getRowNumberWidth(dataColumns?.length) +
+      this.tablePadding * 2 +
+      this.tableCellBorder * 2;
+    const rowNumberUniqKeyHeaderWidth = this.getTextWidth(
+      context,
+      context?.translator?.('viz.palette.graph.number'),
+      headerFont?.fontWeight,
+      headerFont?.fontSize,
+      headerFont?.fontFamily,
+    );
+    const rowSummaryWidth = this.getTextWidth(
+      context,
+      context?.translator?.('viz.palette.graph.summary'),
+      'normal',
+      '14',
+      'PingFang SC',
+    );
 
-        const [columnWidth, getUseColumnWidth] = getStyles(
-          getAllColumnListInfo,
-          [c.uid, 'columnStyle'],
-          ['columnWidth', 'useColumnWidth'],
+    const maxContentByFields = mixedSectionConfigRows.map(c => {
+      const header = this.findHeader(c.uid, tableHeaders);
+      const rowUniqKey = getValueByColumnKey(c);
+
+      const [columnWidth, getUseColumnWidth] = getStyles(
+        getAllColumnListInfo,
+        [c.uid, 'columnStyle'],
+        ['columnWidth', 'useColumnWidth'],
+      );
+      const datas = dataColumns?.map(dc => {
+        const text = dc[rowUniqKey];
+        let width = this.getTextWidth(
+          context,
+          text,
+          fontWeight,
+          fontSize,
+          fontFamily,
         );
-        const datas = dataColumns?.map(dc => {
-          const text = dc[rowUniqKey];
-          let width = this.getTextWidth(
-            context,
-            text,
-            fontWeight,
-            fontSize,
-            fontFamily,
-          );
-          const headerWidth = this.getTextWidth(
-            context,
-            header?.label || header?.colName,
-            headerFont?.fontWeight,
-            headerFont?.fontSize,
-            headerFont?.fontFamily,
-          );
-          const sorterIconWidth = 12;
-          return Math.max(width, headerWidth + sorterIconWidth);
-        });
+        const headerWidth = this.getTextWidth(
+          context,
+          header?.label || getValueByColumnKey(header),
+          headerFont?.fontWeight,
+          headerFont?.fontSize,
+          headerFont?.fontFamily,
+        );
+        const sorterIconWidth = 12;
+        return Math.max(width, headerWidth + sorterIconWidth);
+      });
 
-        return {
-          [rowUniqKey]: {
-            columnWidthValue: getUseColumnWidth
-              ? columnWidth || 100
-              : Math.max(...datas) +
-                this.tablePadding * 2 +
-                this.tableCellBorder * 2,
-            getUseColumnWidth,
-          },
-        };
-      })
-      .concat([
-        {
-          [this.rowNumberUniqKey]: {
-            columnWidthValue: enableRowNumber
-              ? getRowNumberWidth(dataColumns?.length) +
-                this.tablePadding * 2 +
-                this.tableCellBorder * 2
-              : 0,
-          },
+      return {
+        [rowUniqKey]: {
+          columnWidthValue: getUseColumnWidth
+            ? columnWidth || 100
+            : Math.max(...datas) +
+              this.tablePadding * 2 +
+              this.tableCellBorder * 2,
+          getUseColumnWidth,
         },
-      ]);
+      };
+    });
+    const rowNumberUniqKeyPaddingWidth = 18;
+    maxContentByFields.push({
+      [this.rowNumberUniqKey]: {
+        columnWidthValue: enableRowNumber
+          ? Math.max(
+              rowNumberUniqKeyWidth,
+              rowNumberUniqKeyHeaderWidth + rowNumberUniqKeyPaddingWidth,
+              rowSummaryWidth + rowNumberUniqKeyPaddingWidth,
+            )
+          : 0,
+      },
+    });
     return maxContentByFields.reduce((acc, cur: any) => {
       return Object.assign({}, acc, { ...cur });
     }, {});
@@ -593,7 +615,7 @@ class BasicTableChart extends ReactChart {
           : [];
         const columnConfig = this.dataColumnWidths?.[getValueByColumnKey(c)];
         const colMaxWidth =
-          this.exceedMaxContent &&
+          !this.exceedMaxContent &&
           Object.values<{ getUseColumnWidth: undefined | boolean }>(
             this.dataColumnWidths,
           ).some(item => item.getUseColumnWidth)
@@ -749,9 +771,14 @@ class BasicTableChart extends ReactChart {
       ['header', 'modal'],
       ['tableHeaders'],
     );
+    const [{ fontSize }] = getStyles(
+      styleConfigs,
+      ['tableHeaderStyle'],
+      ['font'],
+    );
 
     const [tableSize] = getStyles(styleConfigs, ['style'], ['tableSize']);
-    const HEADER_HEIGHT = { default: 56, middle: 48, small: 40 };
+    const HEADER_HEIGHT = { default: 44, middle: 36, small: 28 };
     const PAGINATION_HEIGHT = { default: 64, middle: 56, small: 56 };
     const SUMMRAY_ROW_HEIGHT = { default: 64, middle: 56, small: 56 };
     const _getMaxHeaderHierarchy = (headerStyles: Array<{ children: [] }>) => {
@@ -767,17 +794,17 @@ class BasicTableChart extends ReactChart {
       scroll: Object.assign({
         scrollToFirstRowOnChange: true,
         x: !enableFixedHeader
-          ? 'max-content'
+          ? '100%'
           : this.exceedMaxContent
           ? this.totalWidth
-          : 'max-content',
+          : '100%',
         y: !enableFixedHeader
-          ? undefined
+          ? '100%'
           : context?.height -
             (this.showSummaryRow
               ? SUMMRAY_ROW_HEIGHT[tableSize || 'default']
               : 0) -
-            HEADER_HEIGHT[tableSize || 'default'] *
+            (HEADER_HEIGHT[tableSize || 'default'] + fontSize) *
               _getMaxHeaderHierarchy(tableHeaderStyles) -
             (enablePaging ? PAGINATION_HEIGHT[tableSize || 'default'] : 0),
       }),

@@ -48,7 +48,9 @@ const AntdTableWrapper: FC<{
           <Table.Summary.Row>
             {(summaryData?.summarys || []).map((data, index) => {
               return (
-                <Table.Summary.Cell index={index}>{data}</Table.Summary.Cell>
+                <Table.Summary.Cell key={index} index={index}>
+                  {data}
+                </Table.Summary.Cell>
               );
             })}
           </Table.Summary.Row>
@@ -75,7 +77,9 @@ const StyledTable = styled(Table)<{ oddAndEven?: OddAndEvenProps }>`
   .ant-table {
     background: transparent;
   }
-
+  .ant-table-body {
+    overflow: auto !important;
+  }
   .ant-table-summary {
     background: #fafafa;
   }
