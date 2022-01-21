@@ -36,6 +36,7 @@ import React, {
   useRef,
 } from 'react';
 import styled from 'styled-components/macro';
+import { CloneValueDeep } from 'utils/object';
 export interface DataChartWidgetProps {}
 export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
   const dataChart = useContext(WidgetChartContext);
@@ -126,9 +127,12 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
       }
       return `not found chart by ${dataChart?.config?.chartGraphId}`;
     }
+
     const chartConfig = mergeToChartConfig(
       chart?.config,
-      migrateChartConfig(dataChart?.config as ChartDetailConfigDTO),
+      migrateChartConfig(
+        CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
+      ),
     );
     try {
       return (
