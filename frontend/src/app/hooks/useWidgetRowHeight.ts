@@ -19,6 +19,7 @@
 import {
   BASE_ROW_HEIGHT,
   BASE_VIEW_WIDTH,
+  MIN_ROW_HEIGHT,
 } from 'app/pages/DashBoardPage/constants';
 import { useMemo } from 'react';
 import { useCacheWidthHeight } from './useCacheWidthHeight';
@@ -26,7 +27,8 @@ import { useCacheWidthHeight } from './useCacheWidthHeight';
 export const useWidgetRowHeight = () => {
   const { ref, cacheW } = useCacheWidthHeight();
   const widgetRowHeight = useMemo(() => {
-    return (cacheW * BASE_ROW_HEIGHT) / BASE_VIEW_WIDTH;
+    let dynamicHeight = (cacheW * BASE_ROW_HEIGHT) / BASE_VIEW_WIDTH;
+    return Math.max(dynamicHeight, MIN_ROW_HEIGHT);
   }, [cacheW]);
   return {
     ref,
