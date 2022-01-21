@@ -16,32 +16,22 @@
  * limitations under the License.
  */
 
-import { useEffect, useState } from 'react';
-import useResizeObserver from './useResizeObserver';
+import {
+  BASE_ROW_HEIGHT,
+  BASE_VIEW_WIDTH,
+  MIN_ROW_HEIGHT,
+} from 'app/pages/DashBoardPage/constants';
+import { useMemo } from 'react';
+import { useCacheWidthHeight } from './useCacheWidthHeight';
 
-export const useCacheWidthHeight = (
-  initWidth: number = 1,
-  initHeight: number = 1,
-) => {
-  const [cacheW, setCacheW] = useState(initWidth);
-  const [cacheH, setCacheH] = useState(initHeight);
-  const {
-    ref,
-    width = initWidth,
-    height = initHeight,
-  } = useResizeObserver<HTMLDivElement>({
-    refreshMode: 'debounce',
-    refreshRate: 20,
-  });
-  useEffect(() => {
-    if (width > 0) {
-      setCacheW(width);
-      setCacheH(height);
-    }
-  }, [width, height]);
+export const useWidgetRowHeight = () => {
+  const { ref, cacheW } = useCacheWidthHeight();
+  const widgetRowHeight = useMemo(() => {
+    let dynamicHeight = (cacheW * BASE_ROW_HEIGHT) / BASE_VIEW_WIDTH;
+    return Math.max(dynamicHeight, MIN_ROW_HEIGHT);
+  }, [cacheW]);
   return {
     ref,
-    cacheW,
-    cacheH,
+    widgetRowHeight,
   };
 };

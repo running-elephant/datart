@@ -15,7 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { Empty } from 'antd';
+import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import { BREAK_POINTS } from 'app/pages/DashBoardPage/constants';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
@@ -59,7 +61,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
     );
 
     const {
-      config: { margin, containerPadding, rowHeight, cols, background },
+      config: { margin, containerPadding, cols, background },
     } = useMemo(() => {
       return dashBoard as Dashboard;
     }, [dashBoard]);
@@ -79,13 +81,6 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
     const layoutWidgetInfoMap = useSelector((state: { board: BoardState }) =>
       selectLayoutWidgetInfoMapById(state, boardId),
     );
-
-    const [boardLoading, setBoardLoading] = useState(true);
-    useEffect(() => {
-      if (dashBoard?.id) {
-        setBoardLoading(false);
-      }
-    }, [dashBoard]);
 
     const [lgLayout, setLgLayout] = useState<Layout[]>([]);
     useEffect(() => {
@@ -109,14 +104,15 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
     }, [layoutWidgetInfoMap]);
     const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
     const currentLayout = useRef<Layout[]>([]);
+    const { ref, widgetRowHeight } = useWidgetRowHeight();
 
     const calcItemTop = useCallback(
       (id: string) => {
         const curItem = currentLayout.current.find(ele => ele.i === id);
         if (!curItem) return Infinity;
-        return Math.round((rowHeight + margin[0]) * curItem.y);
+        return Math.round((widgetRowHeight + margin[0]) * curItem.y);
       },
-      [margin, rowHeight],
+      [margin, widgetRowHeight],
     );
     const scrollThrottle = useRef(false);
     const lazyLoad = useCallback(() => {
@@ -152,7 +148,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
     const WidgetConfigsLen = useMemo(() => {
       return layoutWidgets.length;
     }, [layoutWidgets]);
-    // bind lazyLoad();
+
     useEffect(() => {
       if (WidgetConfigsLen && gridWrapRef.current) {
         lazyLoad();
@@ -166,7 +162,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
         gridWrapRef?.current?.removeEventListener('scroll', lazyLoad, false);
         window.removeEventListener('resize', lazyLoad, false);
       };
-    }, [boardLoading, WidgetConfigsLen, lazyLoad]);
+    }, [WidgetConfigsLen, lazyLoad]);
 
     const onLayoutChange = useCallback((layouts: Layout[]) => {
       currentLayout.current = layouts;
@@ -187,7 +183,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
 
     return (
       <Wrap>
-        <StyledContainer bg={background}>
+        <StyledContainer bg={background} ref={ref}>
           {layoutWidgets.length ? (
             <div className="grid-wrap" ref={gridWrapRef}>
               <div className="grid-wrap" ref={gridRef}>
@@ -197,7 +193,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
                   margin={margin}
                   containerPadding={containerPadding}
                   cols={cols}
-                  rowHeight={rowHeight}
+                  rowHeight={widgetRowHeight}
                   onLayoutChange={onLayoutChange}
                   isDraggable={false}
                   isResizable={false}
