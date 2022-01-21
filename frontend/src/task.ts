@@ -28,9 +28,9 @@ import {
   getDataChartsByServer,
 } from 'app/pages/DashBoardPage/utils/board';
 import { getWidgetMapByServer } from 'app/pages/DashBoardPage/utils/widget';
-import { ChartDTO } from 'app/types/ChartDTO';
-import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
+import { ChartDTO } from 'app/types/ChartDTO';
 import 'react-app-polyfill/stable';
 // import 'react-app-polyfill/stable';
 // import 'core-js/stable/map';
