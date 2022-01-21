@@ -31,7 +31,7 @@ import ChartSelectModalModal from '../../ChartSelectModal';
 import { BoardToolBarContext } from '../context/BoardToolBarContext';
 import { ChartWidgetDropdown } from './ChartWidgetDropdown';
 
-const AddChart: React.FC<{}> = () => {
+export const AddChart = () => {
   const dispatch = useDispatch();
   const { boardId, boardType } = useContext(BoardToolBarContext);
   const orgId = useSelector(selectOrgId);
@@ -96,4 +96,3 @@ const AddChart: React.FC<{}> = () => {
     </>
   );
 };
-export default AddChart;

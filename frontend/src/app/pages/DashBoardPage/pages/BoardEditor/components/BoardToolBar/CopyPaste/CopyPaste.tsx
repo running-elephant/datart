@@ -26,8 +26,7 @@ import {
   selectSelectedIds,
 } from '../../../slice/selectors';
 import { copyWidgetByIds, pasteWidgets } from '../../../slice/thunk';
-import { ToolBtnProps } from '../ToolBarItem';
-export const CopyBtn: React.FC<ToolBtnProps> = props => {
+export const CopyBtn = () => {
   const selectedIds = useSelector(selectSelectedIds);
   const t = useI18NPrefix(`viz.board.action`);
   const dispatch = useDispatch();
@@ -44,7 +43,7 @@ export const CopyBtn: React.FC<ToolBtnProps> = props => {
     </Tooltip>
   );
 };
-export const PasteBtn: React.FC<ToolBtnProps> = props => {
+export const PasteBtn = () => {
   const t = useI18NPrefix(`viz.board.action`);
   const clipboardWidgets = useSelector(selectClipboardWidgets);
   const dispatch = useDispatch();

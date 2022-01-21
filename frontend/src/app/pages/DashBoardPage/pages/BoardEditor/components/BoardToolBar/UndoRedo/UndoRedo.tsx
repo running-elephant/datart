@@ -25,7 +25,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ActionCreators } from 'redux-undo';
 import { selectFutureState, selectPastState } from '../../../slice/selectors';
 
-export const UndoBtn: React.FC<{}> = () => {
+export const UndoBtn = () => {
   const t = useI18NPrefix(`viz.board.action`);
 
   const pastState = useSelector(selectPastState);
@@ -51,7 +51,7 @@ export const UndoBtn: React.FC<{}> = () => {
     </Tooltip>
   );
 };
-export const RedoBtn: React.FC<{}> = () => {
+export const RedoBtn = () => {
   const t = useI18NPrefix(`viz.board.action`);
   const futureState = useSelector(selectFutureState);
   const dispatch = useDispatch();
