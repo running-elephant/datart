@@ -18,9 +18,7 @@
 import {
   CopyOutlined,
   DeleteOutlined,
-  RedoOutlined,
   SnippetsOutlined,
-  UndoOutlined,
   VerticalAlignBottomOutlined,
   VerticalAlignTopOutlined,
 } from '@ant-design/icons';
@@ -28,19 +26,15 @@ import { Tooltip } from 'antd';
 import { ButtonType } from 'antd/lib/button';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BOARD_UNDO } from 'app/pages/DashBoardPage/constants';
 import { BoardType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ActionCreators } from 'redux-undo';
 import {
   deleteWidgetsAction,
   widgetToPositionAction,
 } from '../../slice/actions/actions';
 import {
   selectClipboardWidgets,
-  selectFutureState,
-  selectPastState,
   selectSelectedIds,
 } from '../../slice/selectors';
 import { copyWidgetByIds, pasteWidgets } from '../../slice/thunk';
@@ -56,49 +50,6 @@ export interface ToolBtnProps {
   boardId: string;
   boardType: BoardType;
 }
-export const UndoBtn: React.FC<ToolBtnProps> = props => {
-  const t = useI18NPrefix(`viz.board.action`);
-  const pastState = useSelector(selectPastState);
-  const dispatch = useDispatch();
-  const Undo = useCallback(() => {
-    dispatch({ type: BOARD_UNDO.undo });
-  }, [dispatch]);
-  const canUndo = useMemo(() => !!pastState.length, [pastState.length]);
-  useEffect(() => {
-    if (pastState.length === 1) {
-      if (Object.keys(pastState[0]).length === 0) {
-        dispatch(ActionCreators.clearHistory());
-      }
-    }
-  }, [dispatch, pastState]);
-  return (
-    <TemButton
-      disabled={!canUndo}
-      onClick={Undo}
-      icon={<UndoOutlined />}
-      tip={t('undo')}
-      {...props}
-    />
-  );
-};
-export const RedoBtn: React.FC<ToolBtnProps> = props => {
-  const t = useI18NPrefix(`viz.board.action`);
-  const futureState = useSelector(selectFutureState);
-  const dispatch = useDispatch();
-  const Redo = useCallback(() => {
-    dispatch({ type: BOARD_UNDO.redo });
-  }, [dispatch]);
-  const canRedo = useMemo(() => !!futureState.length, [futureState.length]);
-  return (
-    <TemButton
-      disabled={!canRedo}
-      onClick={Redo}
-      icon={<RedoOutlined />}
-      tip={t('redo')}
-      {...props}
-    />
-  );
-};
 
 export const DeleteBtn: React.FC<ToolBtnProps> = props => {
   const selectedIds = useSelector(selectSelectedIds);

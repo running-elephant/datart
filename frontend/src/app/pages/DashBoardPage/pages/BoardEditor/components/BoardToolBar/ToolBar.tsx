@@ -27,11 +27,10 @@ import {
   CopyBtn,
   DeleteBtn,
   PasteBtn,
-  RedoBtn,
   ToBottomBtn,
   ToTopBtn,
-  UndoBtn,
 } from './ToolBarItem';
+import { RedoBtn, UndoBtn } from './UndoRedo/UndoRedo';
 
 const ToolBar: React.FC<{}> = () => {
   const ssp = e => {
@@ -54,8 +53,8 @@ const ToolBar: React.FC<{}> = () => {
             </>
           )}
           <Divider type="vertical" />
-          <UndoBtn boardId={boardId} boardType={boardType} />
-          <RedoBtn boardId={boardId} boardType={boardType} />
+          <UndoBtn />
+          <RedoBtn />
           <Divider type="vertical" />
           <DeleteBtn boardId={boardId} boardType={boardType} />
           <Divider type="vertical" />
