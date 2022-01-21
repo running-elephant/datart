@@ -266,7 +266,7 @@ public class VariableServiceImpl extends BaseService implements VariableService 
     public boolean update(BaseUpdateParam updateParam) {
         VariableUpdateParam param = (VariableUpdateParam) updateParam;
         Variable retrieve = retrieve(updateParam.getId());
-        if (!param.getName().equals(retrieve.getName())) {
+        if (!param.getName().equalsIgnoreCase(retrieve.getName())) {
             checkUnique(retrieve.getOrgId(), null, param.getName());
         }
         if (param.getRelVariableSubjects() != null) {
