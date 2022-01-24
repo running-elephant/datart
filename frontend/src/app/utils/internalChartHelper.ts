@@ -17,6 +17,7 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { curry, pipe } from 'utils/object';
 import {
   isUnderUpperBound,
@@ -80,9 +81,9 @@ export const transferChartDataConfig = (
       ChartDataSectionType.SIZE,
       ChartDataSectionType.FILTER,
     ].map(type => curry(transferDataConfigImpl)(type)),
-    // ...[ChartDataSectionType.MIXED].map(type =>
-    //   curry(transferMixedSectionType)(type),
-    // ),
+    ...[ChartDataSectionType.MIXED].map(type =>
+      curry(transferMixedSectionType)(type),
+    ),
   )(targetConfig, sourceConfig);
 };
 
@@ -99,11 +100,11 @@ const transferDataConfigImpl = (
   const targetSectionConfigs = targetDataConfigs?.filter(
     c => c.type === sectionType,
   );
-  if (!targetSectionConfigs.length) {
-    return targetConfig!;
-  }
 
-  while (Boolean(sourceSectionConfigRows?.length)) {
+  while (
+    Boolean(sourceSectionConfigRows?.length) &&
+    Boolean(targetSectionConfigs?.length)
+  ) {
     const row = sourceSectionConfigRows.shift();
     const minimalRowConfig = [...targetSectionConfigs]
       .filter(section => {
@@ -136,11 +137,92 @@ const transferMixedSectionType = (
   targetConfig?: ChartConfig,
   sourceConfig?: ChartConfig,
 ): ChartConfig => {
-  if (sectionType === ChartDataSectionType.MIXED) {
-    console.count(`sectionType ---> `);
+  const targetDataConfigs = targetConfig?.datas || [];
+  const sourceDataConfigs = sourceConfig?.datas || [];
+  const sourceSectionConfigRows = sourceDataConfigs
+    .filter(c => c.type === sectionType)
+    .flatMap(config => config.rows || []);
+  const targetSectionConfigs = targetDataConfigs?.filter(
+    c => c.type === sectionType,
+  );
+  if (
+    Boolean(sourceSectionConfigRows?.length) &&
+    !Boolean(targetSectionConfigs?.length)
+  ) {
+    const dimensions = sourceSectionConfigRows?.filter(
+      r =>
+        r.type === ChartDataViewFieldType.DATE ||
+        r.type === ChartDataViewFieldType.STRING,
+    );
+    const metrics = sourceSectionConfigRows?.filter(
+      r => r.type === ChartDataViewFieldType.NUMERIC,
+    );
+
+    while (Boolean(dimensions?.length)) {
+      const groupTypeSections = targetDataConfigs?.filter(
+        c => c.type === ChartDataSectionType.GROUP,
+      );
+
+      const row = dimensions.shift();
+      const minimalRowConfig = [...groupTypeSections]
+        .filter(section => {
+          return isUnderUpperBound(
+            section?.limit,
+            (section?.rows || []).length + 1,
+          );
+        })
+        .sort((a, b) => {
+          if (
+            reachLowerBoundCount(a?.limit, a?.rows?.length) !==
+            reachLowerBoundCount(b?.limit, b?.rows?.length)
+          ) {
+            return (
+              reachLowerBoundCount(b?.limit, b?.rows?.length) -
+              reachLowerBoundCount(a?.limit, a?.rows?.length)
+            );
+          }
+          return (a?.rows?.length || 0) - (b?.rows?.length || 0);
+        })?.[0];
+      if (minimalRowConfig && row) {
+        minimalRowConfig.rows = (minimalRowConfig.rows || []).concat([row]);
+      }
+    }
+
+    while (Boolean(metrics?.length)) {
+      const aggTypeSections = targetDataConfigs?.filter(
+        c => c.type === ChartDataSectionType.AGGREGATE,
+      );
+
+      const row = metrics.shift();
+      const minimalRowConfig = [...aggTypeSections]
+        .filter(section => {
+          return isUnderUpperBound(
+            section?.limit,
+            (section?.rows || []).length + 1,
+          );
+        })
+        .sort((a, b) => {
+          if (
+            reachLowerBoundCount(a?.limit, a?.rows?.length) !==
+            reachLowerBoundCount(b?.limit, b?.rows?.length)
+          ) {
+            return (
+              reachLowerBoundCount(b?.limit, b?.rows?.length) -
+              reachLowerBoundCount(a?.limit, a?.rows?.length)
+            );
+          }
+          return (a?.rows?.length || 0) - (b?.rows?.length || 0);
+        })?.[0];
+      if (minimalRowConfig && row) {
+        minimalRowConfig.rows = (minimalRowConfig.rows || []).concat([row]);
+      }
+    }
   }
+
   return targetConfig!;
 };
+
+const balanceAssignConfigRows = sources => {};
 
 // 兼容 impala 聚合函数小写问题
 export const filterSqlOperatorName = (requestParams, widgetData) => {
