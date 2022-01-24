@@ -191,7 +191,10 @@ class BasicTableChart extends ReactChart {
     return {
       rowKey: 'uid',
       pagination: tablePagination,
-      dataSource: this.generateTableRowUniqId(dataColumns),
+      dataSource: this.generateTableRowUniqId(
+        dataColumns,
+        mixedSectionConfigRows,
+      ),
       columns: tableColumns,
       summaryFn: this.getTableSummaryFn(
         settingConfigs,
@@ -288,7 +291,11 @@ class BasicTableChart extends ReactChart {
               return (
                 (!index
                   ? context?.translator?.('viz.palette.graph.summary') + ': '
-                  : '') + total.reduce((acc, cur) => acc + cur, 0)
+                  : '') +
+                toFormattedValue(
+                  total.reduce((acc, cur) => acc + cur, 0),
+                  currentSummaryField.format,
+                )
               );
             }
             if (k === `${DATARTSEPERATOR}id` || !index) {
@@ -424,12 +431,19 @@ class BasicTableChart extends ReactChart {
     }, {});
   }
 
-  protected generateTableRowUniqId(dataColumns) {
+  protected generateTableRowUniqId(dataColumns, mixedSectionConfigRows) {
     return (dataColumns || []).map(dc => {
-      if (dc.uid === null || dc.uid === undefined) {
-        dc.uid = uuidv4();
+      const config = Object.assign({}, dc);
+      if (config.uid === null || config.uid === undefined) {
+        config.uid = uuidv4();
       }
-      return dc;
+      mixedSectionConfigRows.map(mixed => {
+        config[getValueByColumnKey(mixed)] = toFormattedValue(
+          config[getValueByColumnKey(mixed)],
+          mixed.format,
+        );
+      });
+      return config;
     });
   }
 
