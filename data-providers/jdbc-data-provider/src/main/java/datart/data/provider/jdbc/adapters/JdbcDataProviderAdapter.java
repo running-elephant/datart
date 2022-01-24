@@ -142,11 +142,6 @@ public class JdbcDataProviderAdapter implements Closeable {
         }
     }
 
-
-    public final String getVariableQuote() {
-        return Const.DEFAULT_VARIABLE_QUOTE;
-    }
-
     protected Column readTableColumn(ResultSet columnMetadata) throws SQLException {
         Column column = new Column();
         column.setName(columnMetadata.getString(4));
@@ -163,8 +158,11 @@ public class JdbcDataProviderAdapter implements Closeable {
      */
     protected Dataframe execute(String sql) throws SQLException {
         try (Connection conn = getConn()) {
-            Statement statement = conn.createStatement();
-            return parseResultSet(statement.executeQuery(sql));
+            try (Statement statement = conn.createStatement()) {
+                try (ResultSet rs = statement.executeQuery(sql)) {
+                    return parseResultSet(rs);
+                }
+            }
         }
     }
 
@@ -179,21 +177,20 @@ public class JdbcDataProviderAdapter implements Closeable {
     protected Dataframe execute(String selectSql, PageInfo pageInfo) throws SQLException {
         Dataframe dataframe;
         try (Connection conn = getConn()) {
-            Statement statement = conn.createStatement();
-
-            statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
-
-            try (ResultSet resultSet = statement.executeQuery(selectSql)) {
-                try {
-                    resultSet.absolute((int) Math.min(pageInfo.getTotal(), (pageInfo.getPageNo() - 1) * pageInfo.getPageSize()));
-                } catch (Exception e) {
-                    int count = 0;
-                    while (count < (pageInfo.getPageNo() - 1) * pageInfo.getPageSize() && resultSet.next()) {
-                        count++;
+            try (Statement statement = conn.createStatement()) {
+                statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
+                try (ResultSet resultSet = statement.executeQuery(selectSql)) {
+                    try {
+                        resultSet.absolute((int) Math.min(pageInfo.getTotal(), (pageInfo.getPageNo() - 1) * pageInfo.getPageSize()));
+                    } catch (Exception e) {
+                        int count = 0;
+                        while (count < (pageInfo.getPageNo() - 1) * pageInfo.getPageSize() && resultSet.next()) {
+                            count++;
+                        }
                     }
+                    dataframe = parseResultSet(resultSet, pageInfo.getPageSize());
+                    return dataframe;
                 }
-                dataframe = parseResultSet(resultSet, pageInfo.getPageSize());
-                return dataframe;
             }
         }
     }
