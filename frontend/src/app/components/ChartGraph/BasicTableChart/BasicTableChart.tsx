@@ -417,10 +417,10 @@ class BasicTableChart extends ReactChart {
           ? Math.max(
               rowNumberUniqKeyWidth,
               rowNumberUniqKeyHeaderWidth +
-                this.tablePadding * 2 +
+                this.tablePadding +
                 this.tableCellBorder * 2,
               rowSummaryWidth +
-                this.tablePadding * 2 +
+                this.tablePadding +
                 this.tableCellBorder * 2,
             )
           : 0,
@@ -805,7 +805,7 @@ class BasicTableChart extends ReactChart {
       return _maxDeeps(headerStyles, 0) || 1;
     };
     const headerHeight =
-      (font.fontSize * TABLE_LINE_HEIGHT +
+      (Math.max(font.fontSize, 12) * TABLE_LINE_HEIGHT +
         HEADER_PADDING[tableSize || 'default'] +
         (showTableBorder ? this.tableCellBorder : 0)) *
         _getMaxHeaderHierarchy(tableHeaderStyles) +
