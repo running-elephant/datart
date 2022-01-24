@@ -631,7 +631,8 @@ export function mergeChartStyleConfigs(
       tEle['value'] = tEle?.['default'];
     }
 
-    const sEle = source?.find(s => s?.key === tEle.key) || source?.[index];
+    const sEle =
+      'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
 
     if (!isUndefined(sEle?.['value'])) {
       tEle['value'] = sEle?.['value'];
