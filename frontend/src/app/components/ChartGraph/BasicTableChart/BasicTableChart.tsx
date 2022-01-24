@@ -435,7 +435,7 @@ class BasicTableChart extends ReactChart {
       if (config.uid === null || config.uid === undefined) {
         config.uid = uuidv4();
       }
-      mixedSectionConfigRows.map(mixed => {
+      mixedSectionConfigRows.forEach(mixed => {
         config[getValueByColumnKey(mixed)] = toFormattedValue(
           config[getValueByColumnKey(mixed)],
           mixed.format,
