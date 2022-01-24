@@ -404,14 +404,17 @@ class BasicTableChart extends ReactChart {
         },
       };
     });
-    const rowNumberUniqKeyPaddingWidth = 18;
     maxContentByFields.push({
       [this.rowNumberUniqKey]: {
         columnWidthValue: enableRowNumber
           ? Math.max(
               rowNumberUniqKeyWidth,
-              rowNumberUniqKeyHeaderWidth + rowNumberUniqKeyPaddingWidth,
-              rowSummaryWidth + rowNumberUniqKeyPaddingWidth,
+              rowNumberUniqKeyHeaderWidth +
+                this.tablePadding * 2 +
+                this.tableCellBorder * 2,
+              rowSummaryWidth +
+                this.tablePadding * 2 +
+                this.tableCellBorder * 2,
             )
           : 0,
       },
@@ -771,16 +774,13 @@ class BasicTableChart extends ReactChart {
       ['header', 'modal'],
       ['tableHeaders'],
     );
-    const [{ fontSize }] = getStyles(
-      styleConfigs,
-      ['tableHeaderStyle'],
-      ['font'],
-    );
+    const [font] = getStyles(styleConfigs, ['tableHeaderStyle'], ['font']);
 
     const [tableSize] = getStyles(styleConfigs, ['style'], ['tableSize']);
-    const HEADER_HEIGHT = { default: 44, middle: 36, small: 28 };
+    const HEADER_PADDING = { default: 32, middle: 24, small: 16 };
+    const TABLE_LINE_HEIGHT = 1.5715;
     const PAGINATION_HEIGHT = { default: 64, middle: 56, small: 56 };
-    const SUMMRAY_ROW_HEIGHT = { default: 64, middle: 56, small: 56 };
+    const SUMMRAY_ROW_HEIGHT = { default: 56, middle: 48, small: 40 };
     const _getMaxHeaderHierarchy = (headerStyles: Array<{ children: [] }>) => {
       const _maxDeeps = (arr: Array<{ children: [] }> = [], deeps: number) => {
         if (!isEmptyArray(arr) && arr?.length > 0) {
@@ -790,6 +790,12 @@ class BasicTableChart extends ReactChart {
       };
       return _maxDeeps(headerStyles, 0) || 1;
     };
+    const headerHeight =
+      (font.fontSize * TABLE_LINE_HEIGHT +
+        HEADER_PADDING[tableSize || 'default'] +
+        (showTableBorder ? this.tableCellBorder : 0)) *
+        _getMaxHeaderHierarchy(tableHeaderStyles) +
+      this.tableCellBorder;
     return {
       scroll: Object.assign({
         scrollToFirstRowOnChange: true,
@@ -804,8 +810,7 @@ class BasicTableChart extends ReactChart {
             (this.showSummaryRow
               ? SUMMRAY_ROW_HEIGHT[tableSize || 'default']
               : 0) -
-            (HEADER_HEIGHT[tableSize || 'default'] + fontSize) *
-              _getMaxHeaderHierarchy(tableHeaderStyles) -
+            headerHeight -
             (enablePaging ? PAGINATION_HEIGHT[tableSize || 'default'] : 0),
       }),
       bordered: !!showTableBorder,
