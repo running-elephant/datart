@@ -18,7 +18,7 @@
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
-import { curry, pipe } from 'utils/object';
+import { curry, isEmptyArray, pipe } from 'utils/object';
 import {
   isUnderUpperBound,
   mergeChartStyleConfigs,
@@ -82,7 +82,10 @@ export const transferChartDataConfig = (
       ChartDataSectionType.FILTER,
     ].map(type => curry(transferDataConfigImpl)(type)),
     ...[ChartDataSectionType.MIXED].map(type =>
-      curry(transferMixedSectionType)(type),
+      curry(transferMixedToOther)(type),
+    ),
+    ...[ChartDataSectionType.MIXED].map(type =>
+      curry(transferOtherToMixed)(type),
     ),
   )(targetConfig, sourceConfig);
 };
@@ -132,7 +135,62 @@ const transferDataConfigImpl = (
   return targetConfig!;
 };
 
-const transferMixedSectionType = (
+const transferOtherToMixed = (
+  sectionType: ChartDataSectionType,
+  targetConfig?: ChartConfig,
+  sourceConfig?: ChartConfig,
+): ChartConfig => {
+  const targetDataConfigs = targetConfig?.datas || [];
+  const sourceDataConfigs = sourceConfig?.datas || [];
+  const sourceSectionConfigs = sourceDataConfigs.filter(
+    c => c.type === sectionType,
+  );
+  const targetSectionConfigs = targetDataConfigs?.filter(
+    c => c.type === sectionType,
+  );
+
+  if (
+    isEmptyArray(sourceSectionConfigs) &&
+    !isEmptyArray(targetSectionConfigs)
+  ) {
+    const allRows =
+      sourceDataConfigs?.flatMap(config => config.rows || []) || [];
+    const inUsedRows =
+      targetDataConfigs?.flatMap(config => config.rows || []) || [];
+    const notAssignedRows = allRows.filter(
+      r => !inUsedRows.find(ur => ur?.uid === r?.uid),
+    );
+    while (Boolean(notAssignedRows?.length)) {
+      const row = notAssignedRows.shift();
+      const minimalRowConfig = [...targetSectionConfigs]
+        .filter(section => {
+          return isUnderUpperBound(
+            section?.limit,
+            (section?.rows || []).length + 1,
+          );
+        })
+        .sort((a, b) => {
+          if (
+            reachLowerBoundCount(a?.limit, a?.rows?.length) !==
+            reachLowerBoundCount(b?.limit, b?.rows?.length)
+          ) {
+            return (
+              reachLowerBoundCount(b?.limit, b?.rows?.length) -
+              reachLowerBoundCount(a?.limit, a?.rows?.length)
+            );
+          }
+          return (a?.rows?.length || 0) - (b?.rows?.length || 0);
+        })?.[0];
+      if (minimalRowConfig && row) {
+        minimalRowConfig.rows = (minimalRowConfig.rows || []).concat([row]);
+      }
+    }
+  }
+
+  return targetConfig!;
+};
+
+const transferMixedToOther = (
   sectionType: ChartDataSectionType,
   targetConfig?: ChartConfig,
   sourceConfig?: ChartConfig,
@@ -146,8 +204,8 @@ const transferMixedSectionType = (
     c => c.type === sectionType,
   );
   if (
-    Boolean(sourceSectionConfigRows?.length) &&
-    !Boolean(targetSectionConfigs?.length)
+    !isEmptyArray(sourceSectionConfigRows) &&
+    isEmptyArray(targetSectionConfigs)
   ) {
     const dimensions = sourceSectionConfigRows?.filter(
       r =>
