@@ -21,15 +21,15 @@ import {
   Widget,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import classNames from 'classnames';
 import { XYCoord } from 'dnd-core';
 import React, { useCallback, useContext, useRef } from 'react';
 import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
+import { PRIMARY } from 'styles/StyleConstants';
 import { editWidgetInfoActions } from '../../../slice';
 import { NameCard } from './WidgetNameList';
-// import { widgetsInfoActions } from 'app/pages/Application/pages/Display/slice';
-// import { widgetsInfoActions } from '../../../../slice';
 export interface NameItemProps {
   index: number;
   zIndex: number;
@@ -159,10 +159,13 @@ const NameItem: React.FC<NameItemProps> = ({
     },
     [card, dispatch],
   );
+
   return (
     <ItemWrap selected={card.selected} onClick={selectWidget}>
       <div
-        className="name-item"
+        className={classNames('name-item', {
+          'selected-Item': card.selected,
+        })}
         ref={ItemRef}
         data-handler-id={handlerId}
         style={{ opacity }}
@@ -185,11 +188,12 @@ const ItemWrap = styled.div<{ selected: boolean }>`
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: move;
-
-    background-color: ${p =>
-      p.selected ? p.theme.emphasisBackground : p.theme.componentBackground};
+    background-color: ${p => p.theme.componentBackground};
   }
-
+  .selected-Item {
+    background-color: ${p => p.theme.emphasisBackground};
+    border-left: solid 4px ${PRIMARY};
+  }
   .widget-tool-dropdown {
     visibility: hidden;
   }

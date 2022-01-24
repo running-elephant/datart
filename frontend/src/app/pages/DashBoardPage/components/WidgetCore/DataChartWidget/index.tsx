@@ -25,8 +25,10 @@ import { WidgetDataContext } from 'app/pages/DashBoardPage/contexts/WidgetDataCo
 import { WidgetMethodContext } from 'app/pages/DashBoardPage/contexts/WidgetMethodContext';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartMouseEventParams, IChart } from 'app/types/Chart';
+import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import produce from 'immer';
 import React, {
   memo,
   useCallback,
@@ -36,8 +38,7 @@ import React, {
   useRef,
 } from 'react';
 import styled from 'styled-components/macro';
-export interface DataChartWidgetProps {}
-export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
+export const DataChartWidget: React.FC<{}> = memo(() => {
   const dataChart = useContext(WidgetChartContext);
   const { data } = useContext(WidgetDataContext);
   const widget = useContext(WidgetContext);
@@ -115,7 +116,7 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
   );
   const chartFrame = useMemo(() => {
     if (!dataChart) {
-      return;
+      return `not found dataChart`;
     }
     if (!chart) {
       if (!dataChart?.config) {
@@ -126,25 +127,24 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
       }
       return `not found chart by ${dataChart?.config?.chartGraphId}`;
     }
-    const chartConfig = mergeToChartConfig(
-      chart?.config,
-      migrateChartConfig(dataChart?.config as ChartDetailConfigDTO),
-    );
-    try {
-      return (
-        <ChartIFrameContainer
-          dataset={dataset}
-          chart={chart}
-          config={chartConfig}
-          width={cacheW}
-          height={cacheH}
-          containerId={widgetId}
-          widgetSpecialConfig={widgetSpecialConfig}
-        />
+
+    const chartConfig = produce(chart.config, draft => {
+      mergeToChartConfig(
+        draft,
+        migrateChartConfig(dataChart?.config as ChartDetailConfigDTO),
       );
-    } catch (error) {
-      return <span>has err in {`<ChartIFrameContainer>`}</span>;
-    }
+    });
+    return (
+      <ChartIFrameContainer
+        dataset={dataset}
+        chart={chart}
+        config={chartConfig as ChartConfig}
+        width={cacheW}
+        height={cacheH}
+        containerId={widgetId}
+        widgetSpecialConfig={widgetSpecialConfig}
+      />
+    );
   }, [
     cacheH,
     cacheW,

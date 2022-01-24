@@ -20,9 +20,9 @@ import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE, SPACE_XL, STICKY_LEVEL } from 'styles/StyleConstants';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
-import ToolBar from './ToolBar';
-export interface BoardToolBarProps {}
-const BoardToolBar: React.FC<BoardToolBarProps> = () => {
+import { ToolBar } from './ToolBar';
+
+export const BoardToolBar = () => {
   const { boardId, boardType } = useContext(BoardContext);
   return (
     <Wrapper>
@@ -34,7 +34,6 @@ const BoardToolBar: React.FC<BoardToolBarProps> = () => {
     </Wrapper>
   );
 };
-export default BoardToolBar;
 
 const Wrapper = styled.div`
   z-index: ${STICKY_LEVEL};

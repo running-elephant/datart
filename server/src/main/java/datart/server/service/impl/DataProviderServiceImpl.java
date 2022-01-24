@@ -307,8 +307,8 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
     private void disablePermissionVariables(List<ScriptVariable> variables) {
         for (ScriptVariable variable : variables) {
-            if(VariableTypeEnum.PERMISSION.equals(variable.getType())){
-                variable.getValues().add(Const.ALL_PERMISSION);
+            if (VariableTypeEnum.PERMISSION.equals(variable.getType())) {
+                variable.setDisabled(true);
             }
         }
     }

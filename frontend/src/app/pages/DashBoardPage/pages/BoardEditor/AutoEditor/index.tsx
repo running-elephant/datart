@@ -36,11 +36,11 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import BoardToolBar from '../components/BoardToolBar/BoardToolBar';
+import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
-import WorkSpace from './WorkSpace';
-const AutoBoardEditor: React.FC<{}> = () => {
+import { AutoBoardEditor } from './AutoBoardEditor';
+const AutoEditor: React.FC<{}> = () => {
   const dispatch = useDispatch();
   const clearSelectedWidgets = e => {
     e.stopPropagation();
@@ -52,13 +52,13 @@ const AutoBoardEditor: React.FC<{}> = () => {
     <Wrapper onClick={clearSelectedWidgets}>
       <BoardToolBar />
       <Editor>
-        <WorkSpace />
+        <AutoBoardEditor />
         <SlideSetting />
       </Editor>
     </Wrapper>
   );
 };
-export default AutoBoardEditor;
+export default AutoEditor;
 
 const Wrapper = styled.div`
   display: flex;

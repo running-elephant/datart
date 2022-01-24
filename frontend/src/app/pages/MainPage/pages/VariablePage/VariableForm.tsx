@@ -47,6 +47,7 @@ export const VariableForm = memo(
     variables,
     visible,
     formProps,
+    onSave,
     afterClose,
     ...modalProps
   }: VariableFormProps) => {
@@ -112,6 +113,13 @@ export const VariableForm = memo(
       formRef.current?.setFieldsValue({ defaultValue: [] });
     }, []);
 
+    const save = useCallback(
+      values => {
+        onSave({ ...values, name: values.name.toUpperCase() });
+      },
+      [onSave],
+    );
+
     const nameValidator = useMemo(
       () =>
         scope === VariableScopes.Private
@@ -151,6 +159,7 @@ export const VariableForm = memo(
           wrapperCol: { span: 16 },
           className: '',
         }}
+        onSave={save}
         afterClose={onAfterClose}
         ref={formRef}
         destroyOnClose
@@ -215,6 +224,25 @@ export const VariableForm = memo(
           css={`
             margin-bottom: ${SPACE_XS};
           `}
+          rules={[
+            ({ getFieldValue }) => {
+              return {
+                validator(_, value?: any[]) {
+                  if (
+                    getFieldValue('type') === VariableTypes.Query &&
+                    !value?.length
+                  ) {
+                    return Promise.reject(
+                      new Error(
+                        `${t('defaultValue')}${tg('validation.required')}`,
+                      ),
+                    );
+                  }
+                  return Promise.resolve();
+                },
+              };
+            },
+          ]}
         >
           <DefaultValue type={valueType} expression={expression} />
         </Form.Item>

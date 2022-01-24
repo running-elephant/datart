@@ -51,8 +51,8 @@ public class Const {
     /**
      * 权限变量
      */
-    //管理员权限，拥有所有数据的权限
-    public static final String ALL_PERMISSION = "@ALL_PERMISSION@";
+//    //管理员权限，拥有所有数据的权限
+//    public static final String ALL_PERMISSION = "@ALL_PERMISSION@";
 
     /**
      * Token Key
