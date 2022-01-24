@@ -419,9 +419,7 @@ class BasicTableChart extends ReactChart {
               rowNumberUniqKeyHeaderWidth +
                 this.tablePadding +
                 this.tableCellBorder * 2,
-              rowSummaryWidth +
-                this.tablePadding +
-                this.tableCellBorder * 2,
+              rowSummaryWidth + this.tablePadding + this.tableCellBorder * 2,
             )
           : 0,
       },
