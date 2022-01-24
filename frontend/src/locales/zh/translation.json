@@ -537,6 +537,8 @@
         }
       },
       "data": {
+        "column": "列",
+        "row": "行",
         "dimension": "维度",
         "metrics": "指标",
         "mixed": "字段",
