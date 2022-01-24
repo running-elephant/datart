@@ -27,7 +27,7 @@ import { useMemberSlice } from '../../MemberPage/slice';
 import { useSourceSlice } from '../../SourcePage/slice';
 import { getSources } from '../../SourcePage/slice/thunks';
 import { useVariableSlice } from '../../VariablePage/slice';
-import { selectEditingViews } from '../slice/selectors';
+import { selectEditingViews, selectSliderVisible } from '../slice/selectors';
 import { getViewDetail } from '../slice/thunks';
 import { Tabs } from './Tabs';
 import { Workbench } from './Workbench';
@@ -42,6 +42,7 @@ export const Main = memo(() => {
   } = useRouteMatch<{ viewId: string }>();
   const orgId = useSelector(selectOrgId);
   const editingViews = useSelector(selectEditingViews);
+  const sliderVisible = useSelector(selectSliderVisible);
   const t = useI18NPrefix('view');
 
   useEffect(() => {
@@ -55,7 +56,7 @@ export const Main = memo(() => {
   }, [dispatch, viewId, orgId]);
 
   return (
-    <Container>
+    <Container className={sliderVisible ? 'close' : ''}>
       {editingViews.length > 0 ? (
         <>
           <Tabs />
@@ -72,4 +73,9 @@ const Container = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  &.close {
+    width: calc(100% - 30px) !important;
+    min-width: calc(100% - 30px) !important;
+    padding-left: 30px;
+  }
 `;

@@ -18,6 +18,7 @@
 
 import { Split } from 'app/components';
 import { useCascadeAccess } from 'app/pages/MainPage/Access';
+import debounce from 'lodash/debounce';
 import React, {
   memo,
   useCallback,
@@ -48,6 +49,7 @@ export const Workbench = memo(() => {
   const parentId = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'parentId' }),
   ) as string;
+
   const path = useMemo(
     () =>
       views
@@ -69,7 +71,22 @@ export const Workbench = memo(() => {
 
   useEffect(() => {
     editorInstance?.layout();
+    console.log('123123123');
   }, [editorInstance, allowManage]);
+
+  const onResize = useCallback(
+    debounce(() => {
+      editorInstance?.layout();
+    }, 300),
+    [editorInstance],
+  );
+
+  useEffect(() => {
+    window.addEventListener('resize', onResize, false);
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+  }, [onResize]);
 
   const editorResize = useCallback(
     sizes => {

@@ -1,16 +1,22 @@
 import {
   FolderAddFilled,
   FundProjectionScreenOutlined,
+  MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import { ListSwitch } from 'app/components';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useRouteMatch } from 'react-router';
 import styled from 'styled-components/macro';
-import { STICKY_LEVEL } from 'styles/StyleConstants';
-import { selectStoryboards, selectVizs } from '../slice/selectors';
+import { SPACE_TIMES, STICKY_LEVEL } from 'styles/StyleConstants';
+import { useVizSlice } from '../slice';
+import {
+  selectSliderVisible,
+  selectStoryboards,
+  selectVizs,
+} from '../slice/selectors';
 import { Folder } from '../slice/types';
 import { Folders } from './Folders';
 import { Storyboards } from './Storyboards';
@@ -19,6 +25,10 @@ export const Sidebar = memo(({ i18nPrefix }: I18NComponentProps) => {
   const [selectedKey, setSelectedKey] = useState('folder');
   const vizs = useSelector(selectVizs);
   const storyboards = useSelector(selectStoryboards);
+  const sliderVisible = useSelector(selectSliderVisible);
+  const { actions: vizActions } = useVizSlice();
+  const dispatch = useDispatch();
+
   const matchDetail = useRouteMatch<{ vizId: string }>(
     '/organizations/:orgId/vizs/:vizId',
   );
@@ -40,7 +50,7 @@ export const Sidebar = memo(({ i18nPrefix }: I18NComponentProps) => {
         setSelectedKey((viz as Folder).relType ? 'folder' : 'presentation');
       }
     }
-  }, [vizId]); // just switch when vizId changed
+  }, [vizId, storyboards, vizs]); // just switch when vizId changed
 
   const listTitles = useMemo(
     () => [
@@ -51,7 +61,7 @@ export const Sidebar = memo(({ i18nPrefix }: I18NComponentProps) => {
         text: t('presentation'),
       },
     ],
-    [],
+    [t],
   );
 
   const switchSelect = useCallback(key => {
@@ -59,7 +69,22 @@ export const Sidebar = memo(({ i18nPrefix }: I18NComponentProps) => {
   }, []);
 
   return (
-    <Wrapper>
+    <Wrapper
+      sliderVisible={sliderVisible}
+      className={sliderVisible ? 'close' : ''}
+    >
+      {sliderVisible ? (
+        <MenuUnfoldOutlined
+          className="menuUnfoldOutlined"
+          onClick={() => {
+            dispatch(
+              vizActions.changeVisibleStatus({ status: !sliderVisible }),
+            );
+          }}
+        />
+      ) : (
+        ''
+      )}
       <ListSwitch
         titles={listTitles}
         selectedKey={selectedKey}
@@ -79,7 +104,7 @@ export const Sidebar = memo(({ i18nPrefix }: I18NComponentProps) => {
   );
 });
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ sliderVisible: boolean }>`
   z-index: ${STICKY_LEVEL + STICKY_LEVEL};
   display: flex;
   flex-direction: column;
@@ -87,8 +112,40 @@ const Wrapper = styled.div`
   min-height: 0;
   background-color: ${p => p.theme.componentBackground};
   box-shadow: ${p => p.theme.shadowSider};
-
+  transition: width 0.3s ease;
   .hidden {
     display: none;
+  }
+  &.close {
+    width: ${SPACE_TIMES(7.5)} !important;
+    position: absolute;
+    height: 100%;
+    .menuUnfoldOutlined {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    &:hover {
+      width: 14.6789% !important;
+      .menuUnfoldOutlined {
+        display: none;
+      }
+      > ul {
+        display: block;
+      }
+      > div {
+        display: flex;
+        &.hidden {
+          display: none;
+        }
+      }
+    }
+  }
+  > ul {
+    display: ${p => (p.sliderVisible ? 'none' : 'block')};
+  }
+  > div {
+    display: ${p => (p.sliderVisible ? 'none' : 'flex')};
   }
 `;

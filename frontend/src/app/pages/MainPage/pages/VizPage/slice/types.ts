@@ -29,6 +29,7 @@ export interface VizState {
   selectedTab: string;
   dataChartListLoading: boolean;
   chartPreviews: ChartPreview[];
+  isSliderVisible: boolean;
 }
 
 export interface Folder {

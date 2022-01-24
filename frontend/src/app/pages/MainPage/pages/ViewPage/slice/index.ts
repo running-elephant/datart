@@ -44,6 +44,7 @@ export const initialState: ViewState = {
   sourceDatabases: {},
   saveViewLoading: false,
   unarchiveLoading: false,
+  isSliderVisible: false,
 };
 
 const slice = createSlice({
@@ -154,6 +155,9 @@ const slice = createSlice({
       Object.entries(initialState).forEach(([key, value]) => {
         state[key] = value;
       });
+    },
+    changeVisibleStatus(state, action: PayloadAction<{ status: boolean }>) {
+      state.isSliderVisible = action.payload.status;
     },
   },
   extraReducers: builder => {

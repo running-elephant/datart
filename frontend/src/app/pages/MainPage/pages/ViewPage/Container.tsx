@@ -20,14 +20,17 @@ import { Split } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
 import React, { useCallback, useContext } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { EditorContext } from './EditorContext';
 import { Main } from './Main';
 import { SaveForm } from './SaveForm';
 import { Sidebar } from './Sidebar';
+import { selectSliderVisible } from './slice/selectors';
 
 export function Container() {
   const { editorInstance } = useContext(EditorContext);
+  const sliderVisible = useSelector(selectSliderVisible);
   const t = useI18NPrefix('view.saveForm');
   const tg = useI18NPrefix('global');
 
@@ -56,6 +59,7 @@ export function Container() {
       gutterSize={0}
       onDrag={siderDrag}
       className="datart-split"
+      sliderVisible={sliderVisible}
     >
       <Sidebar />
       <Main />
@@ -72,9 +76,12 @@ export function Container() {
   );
 }
 
-const StyledContainer = styled(Split)`
+const StyledContainer = styled(Split)<{ sliderVisible: boolean }>`
   display: flex;
   flex: 1;
   min-width: 0;
   min-height: 0;
+  .gutter-horizontal {
+    display: ${p => (p.sliderVisible ? 'none' : 'block')};
+  }
 `;

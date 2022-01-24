@@ -4,6 +4,8 @@ import {
   FolderFilled,
   FolderOpenFilled,
   FundFilled,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import { ListNav, ListPane, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
@@ -11,6 +13,7 @@ import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { BoardTypeMap } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getInitBoardConfig } from 'app/pages/DashBoardPage/utils/board';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
+import { dispatchResize } from 'app/utils/dispatchResize';
 import { CommonFormTypes } from 'globalConstants';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,12 +21,14 @@ import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
 import { getInsertedNodeIndex } from 'utils/utils';
 import { SaveFormContext, SaveFormModel } from '../../SaveFormContext';
+import { useVizSlice } from '../../slice';
 import {
   makeSelectVizTree,
   selectArchivedDashboardLoading,
   selectArchivedDashboards,
   selectArchivedDatachartLoading,
   selectArchivedDatacharts,
+  selectSliderVisible,
   selectVizs,
 } from '../../slice/selectors';
 import {
@@ -44,10 +49,13 @@ export const Folders = memo(
   ({ selectedId, className, i18nPrefix }: FoldersProps) => {
     const dispatch = useDispatch();
     const orgId = useSelector(selectOrgId);
+    const sliderVisible = useSelector(selectSliderVisible);
     const { showSaveForm } = useContext(SaveFormContext);
     const selectVizTree = useMemo(makeSelectVizTree, []);
     const vizsData = useSelector(selectVizs);
     const t = useI18NPrefix(i18nPrefix);
+    const { actions: vizActions } = useVizSlice();
+
     const getInitValues = useCallback((relType: VizType) => {
       if (relType === 'DASHBOARD') {
         return {
@@ -81,6 +89,7 @@ export const Folders = memo(
           return p => (p.expanded ? <FolderOpenFilled /> : <FolderFilled />);
       }
     }, []);
+
     const getDisabled = useCallback(
       ({ deleteLoading }: FolderViewModel) => deleteLoading,
       [],
@@ -156,11 +165,26 @@ export const Folders = memo(
                 text: t('folders.recycle'),
                 prefix: <DeleteOutlined className="icon" />,
               },
+              {
+                key: 'fold',
+                text: t(sliderVisible ? 'folders.open' : 'folders.close'),
+                prefix: sliderVisible ? (
+                  <MenuUnfoldOutlined className="icon" />
+                ) : (
+                  <MenuFoldOutlined className="icon" />
+                ),
+              },
             ],
             callback: (key, _, onNext) => {
               switch (key) {
                 case 'recycle':
                   onNext();
+                  break;
+                case 'fold':
+                  dispatch(
+                    vizActions.changeVisibleStatus({ status: !sliderVisible }),
+                  );
+                  dispatchResize();
                   break;
               }
             },
@@ -176,7 +200,7 @@ export const Folders = memo(
           onSearch: listSearch,
         },
       ],
-      [add, treeSearch, listSearch, t],
+      [add, treeSearch, listSearch, t, dispatch, sliderVisible, vizActions],
     );
 
     return (

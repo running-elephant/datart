@@ -120,3 +120,8 @@ export const selectPreviewCharts = createSelector(
   [selectDomain],
   vizState => vizState.chartPreviews,
 );
+
+export const selectSliderVisible = createSelector(
+  [selectDomain],
+  vizState => vizState.isSliderVisible,
+);

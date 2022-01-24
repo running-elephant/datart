@@ -40,6 +40,7 @@ export interface ViewState {
   };
   saveViewLoading: boolean;
   unarchiveLoading: boolean;
+  isSliderVisible: boolean;
 }
 
 export interface ViewBase {

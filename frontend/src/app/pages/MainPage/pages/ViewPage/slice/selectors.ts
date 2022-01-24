@@ -108,3 +108,8 @@ export const selectArchivedListLoading = createSelector(
   [selectDomain],
   viewState => viewState.archivedListLoading,
 );
+
+export const selectSliderVisible = createSelector(
+  [selectDomain],
+  vizState => vizState.isSliderVisible,
+);

@@ -21,6 +21,7 @@ import {
   selectArchivedDatacharts,
   selectArchivedStoryboards,
   selectSelectedTab,
+  selectSliderVisible,
   selectStoryboards,
   selectTabs,
   selectVizs,
@@ -45,6 +46,7 @@ export function Main() {
   const tabs = useSelector(selectTabs);
   const selectedTab = useSelector(selectSelectedTab);
   const orgId = useSelector(selectOrgId);
+  const sliderVisible = useSelector(selectSliderVisible);
 
   const t = useI18NPrefix('viz.main');
 
@@ -149,7 +151,7 @@ export function Main() {
   );
 
   return (
-    <Wrapper>
+    <Wrapper className={sliderVisible ? 'close' : ''}>
       <TabsWrapper>
         <Tabs
           hideAdd
@@ -202,8 +204,12 @@ const Wrapper = styled.div`
   flex: 1;
   flex-direction: column;
   min-width: 0;
-
   min-height: 0;
+  &.close {
+    width: calc(100% - 30px) !important;
+    min-width: calc(100% - 30px) !important;
+    padding-left: 30px;
+  }
 `;
 
 const TabsWrapper = styled.div`
