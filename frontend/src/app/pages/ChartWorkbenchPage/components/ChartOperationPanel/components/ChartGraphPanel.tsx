@@ -42,8 +42,7 @@ const ChartGraphPanel: FC<{
         CloneValueDeep(cur?.config),
         chartConfig,
       ) as ChartConfig;
-      const isMatch = cur?.isMatchRequirement(transferedChartConfig);
-      acc[cur.meta.id] = isMatch;
+      acc[cur.meta.id] = cur?.isMatchRequirement(transferedChartConfig);
       return acc;
     }, {});
     setRequirementStates(dict);
