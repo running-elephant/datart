@@ -17,6 +17,7 @@
  */
 
 import { ChartConfig } from 'app/types/ChartConfig';
+import { FONT_FAMILY } from 'styles/StyleConstants';
 
 const config: ChartConfig = {
   datas: [
@@ -241,7 +242,7 @@ const config: ChartConfig = {
           key: 'font',
           comType: 'font',
           default: {
-            fontFamily: 'PingFang SC',
+            fontFamily: FONT_FAMILY,
             fontSize: 12,
             fontWeight: 'bold',
             fontStyle: 'normal',
@@ -295,7 +296,7 @@ const config: ChartConfig = {
           label: 'style.fontFamily',
           key: 'fontFamily',
           comType: 'fontFamily',
-          default: 'PingFang SC',
+          default: FONT_FAMILY,
         },
         {
           label: 'style.fontWeight',
