@@ -22,6 +22,7 @@ import datart.core.entity.RelVariableSubject;
 import datart.core.entity.Variable;
 import datart.security.base.SubjectType;
 import datart.server.base.dto.ResponseData;
+import datart.server.base.params.CheckNameParam;
 import datart.server.base.params.VariableCreateParam;
 import datart.server.base.params.VariableRelUpdateParam;
 import datart.server.base.params.VariableUpdateParam;
@@ -29,6 +30,7 @@ import datart.server.service.VariableService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,9 +51,8 @@ public class VariableController extends BaseController {
 
     @ApiOperation(value = "check variable name")
     @PostMapping(value = "/check/name")
-    public ResponseData<Boolean> checkName(@RequestParam String orgId,
-                                           @RequestParam String name) {
-        return ResponseData.success(variableService.checkUnique(orgId, null, name));
+    public ResponseData<Boolean> checkName(@Validated @RequestBody CheckNameParam param) {
+        return ResponseData.success(variableService.checkUnique(param.getOrgId(), null, param.getName()));
     }
 
     @ApiOperation(value = "list org variables")
