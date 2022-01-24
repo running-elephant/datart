@@ -80,6 +80,9 @@ export const transferChartDataConfig = (
       ChartDataSectionType.SIZE,
       ChartDataSectionType.FILTER,
     ].map(type => curry(transferDataConfigImpl)(type)),
+    // ...[ChartDataSectionType.MIXED].map(type =>
+    //   curry(transferMixedSectionType)(type),
+    // ),
   )(targetConfig, sourceConfig);
 };
 
@@ -124,6 +127,17 @@ const transferDataConfigImpl = (
     if (minimalRowConfig && row) {
       minimalRowConfig.rows = (minimalRowConfig.rows || []).concat([row]);
     }
+  }
+  return targetConfig!;
+};
+
+const transferMixedSectionType = (
+  sectionType: ChartDataSectionType,
+  targetConfig?: ChartConfig,
+  sourceConfig?: ChartConfig,
+): ChartConfig => {
+  if (sectionType === ChartDataSectionType.MIXED) {
+    console.count(`sectionType ---> `);
   }
   return targetConfig!;
 };
