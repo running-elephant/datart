@@ -19,6 +19,8 @@
 package datart.data.provider.jdbc;
 
 import datart.core.data.provider.ScriptVariable;
+import datart.data.provider.calcite.SqlNodeUtils;
+import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
 import datart.data.provider.script.ReplacementPair;
 import datart.data.provider.script.VariablePlaceholder;
 import org.apache.calcite.sql.SqlCall;
@@ -77,7 +79,9 @@ public class SimpleVariablePlaceholder extends VariablePlaceholder {
         if (CollectionUtils.isEmpty(values)) {
             return "";
         }
-        return values.stream().map(sqlDialect::quoteStringLiteral).collect(Collectors.joining(","));
+        return values.stream().map(SqlSimpleStringLiteral::new)
+                .map(node -> SqlNodeUtils.toSql(node, sqlDialect))
+                .collect(Collectors.joining(","));
     }
 
     @Override

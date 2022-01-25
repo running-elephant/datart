@@ -58,11 +58,12 @@ public class RegexVariableResolver {
 
         String variableExpression = tryMatchVariableExpression(sql, variableFragment);
 
-        SqlCall sqlCall = parseAsSqlCall(variableExpression);
+        SqlCall sqlCall = parseAsSqlCall(variableExpression, variableFragment);
         if (sqlCall == null) {
             return new SimpleVariablePlaceholder(variable, sqlDialect, variableFragment);
+        } else {
+            return new VariablePlaceholder(Collections.singletonList(variable), sqlDialect, sqlCall, variableExpression);
         }
-        return new VariablePlaceholder(Collections.singletonList(variable), sqlDialect, sqlCall, variableFragment);
 
     }
 
@@ -78,7 +79,7 @@ public class RegexVariableResolver {
         }
     }
 
-    public static SqlCall parseAsSqlCall(String variableExpression) {
+    public static SqlCall parseAsSqlCall(String variableExpression, String variableFragment) {
         if (StringUtils.isBlank(variableExpression)) {
             return null;
         }
@@ -95,7 +96,7 @@ public class RegexVariableResolver {
                 if (split.length != 2) {
                     break;
                 }
-                if (split[0].contains(Const.DEFAULT_VARIABLE_QUOTE)) {
+                if (!split[0].contains(Const.DEFAULT_VARIABLE_QUOTE)) {
                     val = split[0].trim();
                     arg = split[1].trim();
                 } else {
@@ -105,7 +106,7 @@ public class RegexVariableResolver {
                 opTypes.add(type);
             }
         }
-        if (opTypes.size() != 1) {
+        if (opTypes.size() != 1 || !variableFragment.equalsIgnoreCase(arg)) {
             return null;
         }
         return createSqlCall(opTypes.get(0), val, arg);

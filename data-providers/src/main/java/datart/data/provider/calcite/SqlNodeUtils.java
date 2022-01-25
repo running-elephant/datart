@@ -127,7 +127,7 @@ public class SqlNodeUtils {
     public static String toSql(SqlNode sqlNode, SqlDialect dialect) {
         return sqlNode.toSqlString(
                 config -> config.withDialect(dialect)
-                        .withQuoteAllIdentifiers(true)
+                        .withQuoteAllIdentifiers(false)
                         .withAlwaysUseParentheses(false)
                         .withSelectListItemsOnSeparateLines(false)
                         .withUpdateSetListNewline(false)
