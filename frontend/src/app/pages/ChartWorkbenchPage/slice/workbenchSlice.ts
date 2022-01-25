@@ -20,7 +20,6 @@ import {
   createAsyncThunk,
   createSelector,
   createSlice,
-  isRejected,
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { migrateChartConfig } from 'app/migration';
@@ -42,9 +41,10 @@ import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { RootState } from 'types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { isMySliceAction } from 'utils/@reduxjs/toolkit';
+import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
+import { networkRejectedActionHandler } from 'utils/notification';
 import { request } from 'utils/request';
-import { listToTree, reduxActionErrorHandler, rejectHandle } from 'utils/utils';
+import { listToTree, rejectHandle } from 'utils/utils';
 import { ChartDTO } from '../../../types/ChartDTO';
 import { ChartDataRequestBuilder } from '../models/ChartDataRequestBuilder';
 
@@ -510,11 +510,10 @@ const workbenchSlice = createSlice({
             ? true
             : chartConfigDTO.aggregation;
       })
-      .addMatcher(isRejected, (_, action) => {
-        if (isMySliceAction(action, workbenchSlice.name)) {
-          reduxActionErrorHandler(action);
-        }
-      });
+      .addMatcher(
+        isMySliceRejectedAction(workbenchSlice.name),
+        networkRejectedActionHandler,
+      );
   },
 });
 

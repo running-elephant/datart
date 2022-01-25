@@ -1,6 +1,7 @@
 import {
   createSlice as createSliceOriginal,
   CreateSliceOptions,
+  isRejected,
   SliceCaseReducers,
 } from '@reduxjs/toolkit';
 import { RootStateKeyType } from '../types/injector-typings';
@@ -18,4 +19,9 @@ export const createSlice = <
 
 export function isMySliceAction(action, targetSliceName) {
   return action?.type?.startsWith(targetSliceName);
+}
+
+export function isMySliceRejectedAction(sliceName) {
+  return rejectedAction =>
+    isRejected(rejectedAction) && isMySliceAction(rejectedAction, sliceName);
 }
