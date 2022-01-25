@@ -20,11 +20,15 @@ import { Empty } from 'antd';
 import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
-  BREAK_POINTS,
+  LAYOUT_COLS,
   RGL_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import { Dashboard } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import {
+  Dashboard,
+  DeviceType,
+  RectConfig,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, {
   RefObject,
   useCallback,
@@ -32,34 +36,36 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from 'react';
-import { Layout, Responsive, WidthProvider } from 'react-grid-layout';
+import RGL, { Layout, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
+import { NORMAL } from 'styles/StyleConstants';
 import StyledBackground from '../../Board/components/StyledBackground';
+import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
 import {
+  selectDeviceType,
   selectEditBoard,
   selectLayoutWidgetInfoMap,
   selectLayoutWidgetMap,
 } from '../slice/selectors';
 import { WidgetOfAutoEditor } from './WidgetOfAutoEditor';
 
-const ResponsiveGridLayout = WidthProvider(Responsive);
+const ReactGridLayout = WidthProvider(RGL);
 
 export const AutoBoardEditor: React.FC<{}> = () => {
   const dashBoard = useSelector(selectEditBoard) as Dashboard;
-  const {
-    config: { margin, containerPadding, cols, background },
-  } = useMemo(() => {
-    return dashBoard as Dashboard;
-  }, [dashBoard]);
+  const { margin, containerPadding, background } = useMemo(() => {
+    return dashBoard.config;
+  }, [dashBoard.config]);
 
   const { renderedWidgetById } = useContext(BoardContext);
   const dispatch = useDispatch();
+
+  const curDeviceType = useSelector(selectDeviceType);
 
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
   const layoutWidgets = useMemo(
@@ -68,18 +74,27 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   );
   const layoutWidgetInfoMap = useSelector(selectLayoutWidgetInfoMap);
 
+  const currentLayout = useRef<Layout[]>([]);
+
+  let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
+
+  const { ref, widgetRowHeight } = useWidgetRowHeight();
+
+  let scrollThrottle = useRef(false);
+
   useEffect(() => {
     const layout: Layout[] = [];
     layoutWidgets.forEach(widget => {
-      const { x, y, width: w, height: h } = widget.config.rect;
+      const desktopRect = widget.config.rect;
+      let curRect = desktopRect;
+      if (curDeviceType === DeviceType.Mobile) {
+        curRect = widget.config?.mobileRect || desktopRect;
+      }
+      const { x, y, width: w, height: h } = curRect as RectConfig;
       layout.push({ i: widget.id, x, y, w, h });
     });
-    setLgLayout(layout);
-  }, [layoutWidgets]);
-
-  const currentLayout = useRef<Layout[]>([]);
-  const [lgLayout, setLgLayout] = useState<Layout[]>([]);
-  let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
+    currentLayout.current = layout;
+  }, [layoutWidgets, curDeviceType]);
 
   useEffect(() => {
     const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
@@ -92,7 +107,6 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   }, [layoutWidgetInfoMap]);
   const layoutWrap: RefObject<HTMLDivElement> = useRef(null);
 
-  const { ref, widgetRowHeight } = useWidgetRowHeight();
   const calcItemTop = useCallback(
     (id: string) => {
       const curItem = currentLayout.current.find(ele => ele.i === id);
@@ -101,7 +115,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     },
     [margin, widgetRowHeight],
   );
-  let scrollThrottle = useRef(false);
+
   const lazyLoad = useCallback(() => {
     if (!layoutWrap.current) return;
     if (!scrollThrottle.current) {
@@ -142,9 +156,14 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     };
   }, [layoutWidgets, lazyLoad]);
   const changeWidgetLayouts = (layouts: Layout[]) => {
-    dispatch(editBoardStackActions.changeWidgetsRect(layouts));
+    dispatch(
+      editBoardStackActions.changeAutoBoardWidgetsRect({
+        layouts,
+        deviceType: curDeviceType,
+      }),
+    );
   };
-  const onBreakpointChange = (breakpoints, cols) => {};
+
   const onLayoutChange = (layouts: Layout[]) => {
     currentLayout.current = layouts;
 
@@ -166,35 +185,40 @@ export const AutoBoardEditor: React.FC<{}> = () => {
       );
     });
   }, [layoutWidgets]);
+  const curCols = useMemo(() => {
+    if (curDeviceType === DeviceType.Desktop) {
+      return LAYOUT_COLS.lg;
+    }
+    return LAYOUT_COLS.xs;
+  }, [curDeviceType]);
+
   /**
-   * measureBeforeMount=true for WidthProvider
    * https://www.npmjs.com/package/react-grid-layout
    */
+
   return (
     <Wrap>
-      <StyledContainer bg={background} ref={ref}>
+      {curDeviceType === DeviceType.Mobile && <DeviceList />}
+      <StyledContainer bg={background} className="mobile" ref={ref}>
         {layoutWidgets.length ? (
           <div className="grid-wrap" ref={layoutWrap}>
-            <ResponsiveGridLayout
-              layouts={{ lg: lgLayout }}
-              breakpoints={BREAK_POINTS}
+            <ReactGridLayout
+              layout={currentLayout.current}
               margin={margin}
               containerPadding={containerPadding}
-              cols={cols}
+              cols={curCols}
               rowHeight={widgetRowHeight}
               useCSSTransforms={true}
               measureBeforeMount={false}
               onDragStop={changeWidgetLayouts}
               onResizeStop={changeWidgetLayouts}
-              onBreakpointChange={onBreakpointChange}
               onLayoutChange={onLayoutChange}
               isDraggable={true}
               isResizable={true}
               draggableHandle={`.${RGL_DRAG_HANDLE}`}
-              droppingItem={{ i: 'www', w: 4, h: 4 }}
             >
               {boardChildren}
-            </ResponsiveGridLayout>
+            </ReactGridLayout>
           </div>
         ) : (
           <div className="empty">
@@ -207,13 +231,12 @@ export const AutoBoardEditor: React.FC<{}> = () => {
 };
 const Wrap = styled.div`
   display: flex;
-
   flex: 1;
-
   flex-direction: column;
+  /* align-items: center; */
   width: 100%;
   min-height: 0;
-
+  overflow-y: auto;
   .react-resizable-handle {
     z-index: 100;
   }
@@ -221,14 +244,24 @@ const Wrap = styled.div`
 
 const StyledContainer = styled(StyledBackground)`
   display: flex;
-  flex: 1;
+  /* flex: 1; */
   flex-direction: column;
   min-height: 0;
+  border: 1px solid ${NORMAL};
+  border-top: none;
+  &.desktop {
+    flex: 1;
+  }
+  /* &.mobile {
+    width: 600px;
+    height: 400px;
+  } */
   .grid-wrap {
     flex: 1;
     overflow-y: auto;
     -ms-overflow-style: none;
   }
+
   .grid-wrap::-webkit-scrollbar {
     width: 0 !important;
   }

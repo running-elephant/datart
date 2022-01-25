@@ -22,6 +22,7 @@ import {
   ContainerWidgetContent,
   Dashboard,
   DashboardConfig,
+  DeviceType,
   MediaWidgetContent,
   Widget,
   WidgetConf,
@@ -127,10 +128,20 @@ export const editBoardStackSlice = createSlice({
       });
     },
 
-    changeWidgetsRect(state, action: PayloadAction<Layout[]>) {
-      action.payload.forEach(it => {
+    changeAutoBoardWidgetsRect(
+      state,
+      action: PayloadAction<{ layouts: Layout[]; deviceType: DeviceType }>,
+    ) {
+      const { layouts, deviceType } = action.payload;
+      layouts.forEach(it => {
         const { i, x, y, w, h } = it;
-        state.widgetRecord[i].config.rect = { x, y, width: w, height: h };
+        const rectItem = { x, y, width: w, height: h };
+        if (deviceType === DeviceType.Desktop) {
+          state.widgetRecord[i].config.rect = rectItem;
+        }
+        if (deviceType === DeviceType.Mobile) {
+          state.widgetRecord[i].config.mobileRect = rectItem;
+        }
       });
     },
     // auto
