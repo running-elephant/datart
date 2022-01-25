@@ -194,7 +194,7 @@ public class SqlBuilder {
         }
 
         SqlNode from = new SqlBasicCall(SqlStdOperatorTable.AS
-                , new SqlNode[]{new SqlFragment("(" + srcSql + ")"), new SqlIdentifier(T, SqlParserPos.ZERO)}
+                , new SqlNode[]{new SqlFragment("(" + srcSql + ")"), new SqlIdentifier(T, SqlParserPos.ZERO.withQuoting(true))}
                 , SqlParserPos.ZERO);
 
         if (selectList.size() == 0) {
