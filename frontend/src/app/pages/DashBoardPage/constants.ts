@@ -36,8 +36,8 @@ export const LAYOUT_COLS = {
   lg: 12,
   md: 12,
   sm: 12,
-  xs: 2,
-  xxs: 2,
+  xs: 6,
+  xxs: 6,
 };
 /** lg: 12,md: 10,sm: 6,xs: 4,xxs: 2 */
 

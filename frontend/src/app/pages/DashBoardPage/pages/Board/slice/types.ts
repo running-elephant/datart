@@ -27,10 +27,8 @@ import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
 import { ChartDataSectionField } from '../../../../../types/ChartConfig';
-import {
-  PageInfo,
-} from '../../../../MainPage/pages/ViewPage/slice/types';
-import { View } from "../../../../../types/View";
+import { View } from '../../../../../types/View';
+import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import {
   BorderStyleType,
   LAYOUT_COLS,
@@ -132,7 +130,8 @@ export interface WidgetConf {
   type: WidgetType;
   autoUpdate: boolean;
   frequency: number; // 定时同步频率
-  rect: RectConfig; //
+  rect: RectConfig; //desktop_rect
+  mobileRect?: RectConfig; //mobile_rect 移动端适配
   background: BackgroundConfig;
   border: BorderConfig;
   content: WidgetContent;
@@ -425,7 +424,8 @@ export interface BoardInfo {
   showBlockMask: boolean; //?
   isDroppable: boolean;
   clipboardWidgets: Record<string, WidgetOfCopy>;
-  layouts: Layout[]; // 删除
+  layouts: Layout[];
+  deviceType?: DeviceType; // deviceType for autoBoard defaultValue = desktop
   widgetIds: string[]; // board保存的时候 区分那些是删除的，哪些是新增的
   controllerPanel: WidgetControllerPanelParams; //
   linkagePanel: WidgetPanelParams;
@@ -436,6 +436,10 @@ export interface BoardInfo {
   hasFetchItems: string[];
   boardWidthHeight: [number, number];
   originControllerWidgets: Widget[]; // use for reset button
+}
+export enum DeviceType {
+  Desktop = 'desktop',
+  Mobile = 'mobile',
 }
 export interface BoardLinkFilter {
   triggerWidgetId: string;

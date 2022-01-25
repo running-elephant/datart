@@ -19,30 +19,53 @@ import { DesktopOutlined, MobileOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React from 'react';
-import { useDispatch } from 'react-redux';
+import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import React, { useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { editDashBoardInfoActions } from '../../../slice';
+import { selectDeviceType } from '../../../slice/selectors';
 
 export const DeviceSwitcher = () => {
   const t = useI18NPrefix(`viz.board.action`);
+  const curDeviceType = useSelector(selectDeviceType);
   const dispatch = useDispatch();
-  const onAddController = () => {};
+  const onDeviceSwitch = value => {
+    const deviceType = value.key as DeviceType;
+    dispatch(editDashBoardInfoActions.changeBoardDevice(deviceType));
+  };
+  const curIcon = useMemo(() => {
+    return curDeviceType === DeviceType.Mobile ? (
+      <MobileOutlined />
+    ) : (
+      <DesktopOutlined />
+    );
+  }, [curDeviceType]);
   const deviceItems = (
-    <Menu onClick={onAddController}>
-      <Menu.Item key={'desktop'} icon={<DesktopOutlined />}>
-        {'desktop'}
+    <Menu onClick={onDeviceSwitch}>
+      <Menu.Item
+        disabled={curDeviceType === DeviceType.Desktop}
+        key={DeviceType.Desktop}
+        icon={<DesktopOutlined />}
+      >
+        {DeviceType.Desktop}
       </Menu.Item>
       {/* <Menu.Item key={'tablet'} icon={<TabletOutlined />}>
         {'tablet'}
       </Menu.Item> */}
-      <Menu.Item key={'mobile'} icon={<MobileOutlined />}>
-        {'mobile'}
+      <Menu.Item
+        disabled={curDeviceType === DeviceType.Mobile}
+        key={DeviceType.Mobile}
+        icon={<MobileOutlined />}
+      >
+        {DeviceType.Mobile}
       </Menu.Item>
     </Menu>
   );
+
   return (
     <Dropdown overlay={deviceItems} placement="bottomLeft" trigger={['click']}>
       <Tooltip title={t('deviceSwitch')}>
-        <ToolbarButton icon={<MobileOutlined />} />
+        <ToolbarButton icon={curIcon} />
       </Tooltip>
     </Dropdown>
   );
