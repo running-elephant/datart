@@ -47,13 +47,6 @@ export function getErrorMessage(error) {
   }
   return error?.message;
 }
-export function reduxActionErrorHandler(errorAction) {
-  if (errorAction?.payload) {
-    message.error(errorAction?.payload);
-  } else if (errorAction?.error) {
-    message.error(errorAction?.error.message);
-  }
-}
 
 export function rejectHandle(error, rejectWithValue) {
   if (error?.response?.status === 401) {

@@ -1,12 +1,13 @@
-import { createSlice, isRejected, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { ChartDataSectionType } from 'app/types/ChartConfig';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { isMySliceAction } from 'utils/@reduxjs/toolkit';
+import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
+import { rejectedActionMessageHandler } from 'utils/notification';
 import { CloneValueDeep } from 'utils/object';
-import { reduxActionErrorHandler, uuidv4 } from 'utils/utils';
+import { uuidv4 } from 'utils/utils';
 import {
   addStoryboard,
   addViz,
@@ -555,12 +556,10 @@ const slice = createSlice({
         version: uuidv4(),
       };
     });
-
-    builder.addMatcher(isRejected, (_, action) => {
-      if (isMySliceAction(action, slice.name)) {
-        reduxActionErrorHandler(action);
-      }
-    });
+    builder.addMatcher(
+      isMySliceRejectedAction(slice.name),
+      rejectedActionMessageHandler,
+    );
   },
 });
 
