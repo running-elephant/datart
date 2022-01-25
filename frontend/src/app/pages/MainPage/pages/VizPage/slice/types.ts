@@ -100,7 +100,6 @@ export interface AddVizParams {
     orgId: string;
   };
   type: VizType;
-  resolve: () => void;
 }
 
 export interface EditFolderParams {
