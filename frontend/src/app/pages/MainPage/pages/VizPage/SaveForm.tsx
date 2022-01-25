@@ -113,6 +113,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
                 data: {
                   name: value,
                   orgId,
+                  vizType,
                   parentId: parentId || null,
                 },
               }).then(
