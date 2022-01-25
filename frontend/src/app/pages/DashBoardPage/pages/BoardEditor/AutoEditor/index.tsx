@@ -72,4 +72,5 @@ const Editor = styled.div`
   display: flex;
   flex: 1;
   min-height: 0;
+  overflow-x: auto;
 `;

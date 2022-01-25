@@ -77,6 +77,7 @@ export const getEditBoardDetail = createAsyncThunk<
         editBoard: HistoryEditBoard;
       },
     );
+
     if (editDashboard?.id === dashboardId) {
       return null;
     }
