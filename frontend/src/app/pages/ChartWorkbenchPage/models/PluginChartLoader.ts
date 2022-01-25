@@ -19,13 +19,14 @@
 import Chart from 'app/components/ChartGraph/models/Chart';
 import * as datartChartHelper from 'app/utils/chartHelper';
 import { fetchPluginChart } from 'app/utils/fetch';
+import * as datartChartNumber from 'app/utils/number';
 import { cond, Omit } from 'utils/object';
 
 const pureFuncLoader = ({ path, result }) => {
   if (/.js$/.test(path)) {
     // eslint-disable-next-line no-new-func
     return Function(`"use strict"; return (${result})`)()({
-      dHelper: { ...datartChartHelper },
+      dHelper: { ...datartChartHelper, ...datartChartNumber },
     });
   }
 };
@@ -34,7 +35,7 @@ const iifeFuncLoader = ({ path, result }) => {
   if (/.iife.js$/.test(path)) {
     // eslint-disable-next-line no-new-func
     return Function(`"use strict"; return ${result}`)()({
-      dHelper: { ...datartChartHelper },
+      dHelper: { ...datartChartHelper, ...datartChartNumber },
     });
   }
 };

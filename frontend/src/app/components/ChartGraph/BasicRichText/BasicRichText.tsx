@@ -21,7 +21,7 @@ import ChartDataset from 'app/types/ChartDataset';
 import {
   getColumnRenderName,
   getCustomSortableColumns,
-  getStyleValueByGroup,
+  getStyles,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
@@ -111,12 +111,7 @@ class BasicRichText extends ReactChart {
         value: this.getDataListValue(config, dataColumns),
       };
     });
-    // TODO(tianlei): should be fixed later with getStyles function
-    const initContent = getStyleValueByGroup(
-      stylesConfigs,
-      'delta',
-      'richText',
-    );
+    const [initContent] = getStyles(stylesConfigs, ['delta'], ['richText']);
     return {
       dataList,
       initContent,

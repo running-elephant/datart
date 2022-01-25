@@ -21,7 +21,6 @@ import ChartDataset from 'app/types/ChartDataset';
 import {
   getColumnRenderName,
   getStyles,
-  getStyleValueByGroup,
   getValue,
   getValueByColumnKey,
   transformToObjectArray,
@@ -98,21 +97,22 @@ class BasicGaugeChart extends Chart {
       dataColumns,
       aggregateConfigs[0],
     );
-    const [prefix, suffix] = this.getArrStyleValueByGroup(
-      ['prefix', 'suffix'],
-      styleConfigs,
-      'gauge',
-    );
+    const tooltip = this.getTooltip(styleConfigs, aggregateConfigs);
     return {
-      tooltip: {
-        formatter: ({ data }) => {
-          return `${data.name} : ${prefix}${toFormattedValue(
-            data.value,
-            aggregateConfigs[0].format,
-          )}${suffix}`;
-        },
-      },
+      tooltip,
       series,
+    };
+  }
+
+  private getTooltip(style, aggConfigs) {
+    const [prefix, suffix] = getStyles(style, ['gauge'], ['prefix', 'suffix']);
+    return {
+      formatter: ({ data }) => {
+        return `${data.name} : ${prefix}${toFormattedValue(
+          data.value,
+          aggConfigs[0].format,
+        )}${suffix}`;
+      },
     };
   }
 
@@ -229,14 +229,6 @@ class BasicGaugeChart extends Chart {
   }
 
   private getPointer(styleConfigs) {
-    const list = [
-      'showPointer',
-      'pointerLength',
-      'pointerWidth',
-      'customPointerColor',
-      'pointerColor',
-      'lineStyle',
-    ];
     const [
       show,
       pointerLength,
@@ -244,7 +236,18 @@ class BasicGaugeChart extends Chart {
       customPointerColor,
       pointerColor,
       { type, color, width },
-    ] = this.getArrStyleValueByGroup(list, styleConfigs, 'pointer');
+    ] = getStyles(
+      styleConfigs,
+      ['pointer'],
+      [
+        'showPointer',
+        'pointerLength',
+        'pointerWidth',
+        'customPointerColor',
+        'pointerColor',
+        'lineStyle',
+      ],
+    );
 
     return {
       show,
@@ -260,16 +263,15 @@ class BasicGaugeChart extends Chart {
   }
 
   private getDetail(styleConfigs, aggConfig) {
-    const [show, font, detailOffsetLeft, detailOffsetTop] =
-      this.getArrStyleValueByGroup(
-        ['showData', 'font', 'detailOffsetLeft', 'detailOffsetTop'],
-        styleConfigs,
-        'data',
-      );
-    const [suffix, prefix] = this.getArrStyleValueByGroup(
-      ['suffix', 'prefix'],
+    const [show, font, detailOffsetLeft, detailOffsetTop] = getStyles(
       styleConfigs,
-      'gauge',
+      ['data'],
+      ['showData', 'font', 'detailOffsetLeft', 'detailOffsetTop'],
+    );
+    const [suffix, prefix] = getStyles(
+      styleConfigs,
+      ['gauge'],
+      ['suffix', 'prefix'],
     );
 
     return {
@@ -285,9 +287,11 @@ class BasicGaugeChart extends Chart {
   }
 
   private getTitle(styleConfigs) {
-    const list = ['showLabel', 'font', 'detailOffsetLeft', 'detailOffsetTop'];
-    const [show, font, detailOffsetLeft, detailOffsetTop] =
-      this.getArrStyleValueByGroup(list, styleConfigs, 'label');
+    const [show, font, detailOffsetLeft, detailOffsetTop] = getStyles(
+      styleConfigs,
+      ['label'],
+      ['showLabel', 'font', 'detailOffsetLeft', 'detailOffsetTop'],
+    );
     return {
       show,
       ...font,
@@ -296,21 +300,6 @@ class BasicGaugeChart extends Chart {
         detailOffsetTop ? detailOffsetTop : 0,
       ],
     };
-  }
-
-  // TODO(tianlei): should be fix later
-  /**
-   * @deprecated should use getStyles instread in utils function
-   * @param {*} childPathList
-   * @param {*} style
-   * @param {*} groupPath
-   * @return {*}
-   * @memberof WordCloudChart
-   */
-  private getArrStyleValueByGroup(childPathList: string[], style, groupPath) {
-    return childPathList.map(child => {
-      return getStyleValueByGroup(style, groupPath, child);
-    });
   }
 }
 

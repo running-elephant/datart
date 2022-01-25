@@ -20,47 +20,66 @@ import { Table } from 'antd';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 
+interface OddAndEvenProps {
+  odd?: {
+    backgroundColor: string;
+    color: string;
+  };
+  even?: {
+    backgroundColor: string;
+    color: string;
+  };
+}
+
 const AntdTableWrapper: FC<{
   dataSource: [];
   columns: [];
+  oddAndEven?: OddAndEvenProps | undefined;
   summaryFn?: (data) => { total: number; summarys: [] };
-}> = memo(({ dataSource, columns, children, summaryFn, ...rest }) => {
-  const getTableSummaryRow = pageData => {
-    if (!summaryFn) {
-      return undefined;
-    }
-    const summaryData = summaryFn?.(pageData);
+}> = memo(
+  ({ dataSource, columns, children, summaryFn, oddAndEven, ...rest }) => {
+    const getTableSummaryRow = pageData => {
+      if (!summaryFn) {
+        return undefined;
+      }
+      const summaryData = summaryFn?.(pageData);
+      return (
+        <Table.Summary fixed>
+          <Table.Summary.Row>
+            {(summaryData?.summarys || []).map((data, index) => {
+              return (
+                <Table.Summary.Cell key={index} index={index}>
+                  {data}
+                </Table.Summary.Cell>
+              );
+            })}
+          </Table.Summary.Row>
+        </Table.Summary>
+      );
+    };
+
     return (
-      <Table.Summary fixed>
-        <Table.Summary.Row>
-          {(summaryData?.summarys || []).map((data, index) => {
-            return (
-              <Table.Summary.Cell index={index}>{data}</Table.Summary.Cell>
-            );
-          })}
-        </Table.Summary.Row>
-      </Table.Summary>
+      <StyledTable
+        {...rest}
+        oddAndEven={oddAndEven}
+        dataSource={dataSource}
+        columns={columns}
+        summary={getTableSummaryRow}
+      />
     );
-  };
+  },
+);
 
-  return (
-    <StyledTable
-      {...rest}
-      dataSource={dataSource}
-      columns={columns}
-      summary={getTableSummaryRow}
-    />
-  );
-});
-
-const StyledTable = styled(Table)`
+const StyledTable = styled(Table)<{ oddAndEven?: OddAndEvenProps }>`
   height: 100%;
   overflow: auto;
 
   .ant-table {
     background: transparent;
   }
-
+  .ant-table-body {
+    overflow: auto !important;
+  }
   .ant-table-summary {
     background: #fafafa;
   }
@@ -69,6 +88,18 @@ const StyledTable = styled(Table)`
   }
   .ant-table-cell-fix-right {
     background: #fafafa;
+  }
+
+  .odd td {
+    background: ${p =>
+      (p?.oddAndEven?.odd?.backgroundColor || 'transparent') + '!important'};
+    color: ${p => p?.oddAndEven?.odd?.color || 'auto'};
+  }
+
+  .even td {
+    background: ${p =>
+      (p?.oddAndEven?.even?.backgroundColor || 'transparent') + '!important'};
+    color: ${p => p?.oddAndEven?.even?.color || 'auto'};
   }
 `;
 
