@@ -803,7 +803,7 @@ class BasicTableChart extends ReactChart {
       return _maxDeeps(headerStyles, 0) || 1;
     };
     const headerHeight =
-      (Math.max(font.fontSize, 12) * TABLE_LINE_HEIGHT +
+      (font.fontSize * TABLE_LINE_HEIGHT +
         HEADER_PADDING[tableSize || 'default'] +
         (showTableBorder ? this.tableCellBorder : 0)) *
         _getMaxHeaderHierarchy(tableHeaderStyles) +
