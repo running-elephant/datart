@@ -384,7 +384,7 @@ export function SourceDetailPage() {
                       return request({
                         url: `/sources/check/name`,
                         method: 'POST',
-                        params: { name: value, orgId },
+                        data: { name: value, orgId },
                       }).then(
                         () => Promise.resolve(),
                         err =>
