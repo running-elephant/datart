@@ -119,18 +119,17 @@ export const Folders = memo(
           type: CommonFormTypes.Add,
           visible: true,
           initialValues: getInitValues(key),
-          onSave: (values, onClose) => {
+          onSave: async (values, onClose) => {
             const dataValues = updateValue(key, values);
-
             let index = getInsertedNodeIndex(values, vizsData);
 
-            dispatch(
+            await dispatch(
               addViz({
                 viz: { ...dataValues, orgId: orgId, index: index },
                 type: key,
-                resolve: onClose,
               }),
             );
+            onClose?.();
           },
         });
       },

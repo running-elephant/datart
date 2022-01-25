@@ -149,13 +149,12 @@ export const deleteStoryboard = createAsyncThunk<
 
 export const addViz = createAsyncThunk<Folder, AddVizParams>(
   'viz/addViz',
-  async ({ viz, type, resolve }) => {
+  async ({ viz, type }) => {
     const { data } = await request2<Folder>({
       url: `/viz/${type.toLowerCase()}s`,
       method: 'POST',
       data: viz,
     });
-    resolve();
     return data;
   },
 );

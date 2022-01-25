@@ -29,7 +29,7 @@ import { BW } from './components/BasicWrapper';
 const BasicInputNumber: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
     const [cache, setCache] = useState(data);
-    const { comType, options, ...rest } = cache;
+    const { comType, options, disabled, ...rest } = cache;
 
     const debouncedDataChange = useMemo(
       () =>
@@ -42,6 +42,7 @@ const BasicInputNumber: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     return (
       <Wrapper label={t(cache.label, true)}>
         <InputNumber
+          disabled={data?.disabled}
           {...rest}
           {...options}
           onChange={value => {

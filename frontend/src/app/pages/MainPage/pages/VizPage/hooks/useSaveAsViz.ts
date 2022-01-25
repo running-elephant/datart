@@ -77,13 +77,13 @@ export function useSaveAsViz() {
               index,
             });
 
-            dispatch(
+            await dispatch(
               addViz({
                 viz: requestData,
                 type,
-                resolve: onClose,
               }),
             );
+            onClose?.();
           } else {
             requestData = {
               config: vizData.config,
