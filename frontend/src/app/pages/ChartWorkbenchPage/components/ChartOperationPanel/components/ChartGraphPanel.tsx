@@ -21,7 +21,7 @@ import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { transferChartDataConfig } from 'app/utils/internalChartHelper';
-import { FC, memo, useEffect, useState } from 'react';
+import { FC, memo, useLayoutEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
 import { CloneValueDeep } from 'utils/object';
@@ -36,14 +36,13 @@ const ChartGraphPanel: FC<{
   const [allCharts] = useState<IChart[]>(chartManager.getAllCharts());
   const [requirementsStates, setRequirementStates] = useState<object>({});
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const dict = allCharts?.reduce((acc, cur) => {
       const transferedChartConfig = transferChartDataConfig(
         CloneValueDeep(cur?.config),
         chartConfig,
       ) as ChartConfig;
-      const isMatch = cur?.isMatchRequirement(transferedChartConfig);
-      acc[cur.meta.id] = isMatch;
+      acc[cur.meta.id] = cur?.isMatchRequirement(transferedChartConfig);
       return acc;
     }, {});
     setRequirementStates(dict);
@@ -57,7 +56,7 @@ const ChartGraphPanel: FC<{
             <ChartGraphIcon
               chart={c}
               isActive={c?.meta?.id === chart?.meta?.id}
-              isMatchRequirement={!!requirementsStates?.[chart?.meta?.id]}
+              isMatchRequirement={!!requirementsStates?.[c?.meta?.id]}
               onChartChange={onChartChange}
             />
           </ChartI18NContext.Provider>

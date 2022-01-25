@@ -302,8 +302,7 @@ export enum ChartDataSectionType {
   SIZE = 'size',
 }
 
-export type ChartStyleConfig = ChartConfigBase &
-  ChartStyleSectionGroup & {};
+export type ChartStyleConfig = ChartConfigBase & ChartStyleSectionGroup & {};
 
 export type ChartStyleSectionGroup = ChartStyleSectionRow & {
   rows?: ChartStyleSectionGroup[];

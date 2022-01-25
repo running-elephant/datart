@@ -141,16 +141,18 @@ const SVGImageRender = ({ iconStr, isMatchRequirement, isActive }) => {
       alt="svg icon"
       style={{ height: FONT_SIZE_ICON_MD, width: FONT_SIZE_ICON_MD }}
       src={`data:image/svg+xml;utf8,${iconStr}`}
+      isMatchRequirement={isMatchRequirement}
     />
   );
 };
 
 const Base64ImageRender = ({ iconStr, isMatchRequirement, isActive }) => {
   return (
-    <img
+    <StyledBase64Icon
       alt="svg icon"
       style={{ height: FONT_SIZE_ICON_MD, width: FONT_SIZE_ICON_MD }}
       src={iconStr}
+      isMatchRequirement={isMatchRequirement}
     />
   );
 };
@@ -172,5 +174,13 @@ const StyledInlineSVGIcon = styled.img<{ isMatchRequirement?: boolean }>`
 `;
 
 const StyledSVGFontIcon = styled.i<{ isMatchRequirement?: boolean }>`
+  opacity: ${p => (p.isMatchRequirement ? 1 : 0.4)};
+`;
+
+const StyledBase64Icon = styled.i<{
+  isMatchRequirement?: boolean;
+  alt: any;
+  src: any;
+}>`
   opacity: ${p => (p.isMatchRequirement ? 1 : 0.4)};
 `;
