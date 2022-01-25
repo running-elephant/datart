@@ -292,8 +292,8 @@ export const filterSqlOperatorName = (requestParams, widgetData) => {
     const index = item.name.indexOf('(');
     const sqlOperatorName = item.name.slice(0, index);
     sqlOperatorNameList.includes(sqlOperatorName) &&
-    (item.name =
-      sqlOperatorName.toLocaleUpperCase() + item.name.slice(index));
+      (item.name =
+        sqlOperatorName.toLocaleUpperCase() + item.name.slice(index));
   });
   return widgetData;
 };
