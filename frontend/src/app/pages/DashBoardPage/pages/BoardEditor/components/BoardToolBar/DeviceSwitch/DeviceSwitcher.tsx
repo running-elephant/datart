@@ -20,6 +20,7 @@ import { Dropdown, Menu, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { dispatchResize } from 'app/utils/dispatchResize';
 import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { editDashBoardInfoActions } from '../../../slice';
@@ -29,10 +30,14 @@ export const DeviceSwitcher = () => {
   const t = useI18NPrefix(`viz.board.action`);
   const curDeviceType = useSelector(selectDeviceType);
   const dispatch = useDispatch();
-  const onDeviceSwitch = value => {
+
+  //why use async/await because: Wait until the state changes before triggering resize
+  const onDeviceSwitch = async value => {
     const deviceType = value.key as DeviceType;
-    dispatch(editDashBoardInfoActions.changeBoardDevice(deviceType));
+    await dispatch(editDashBoardInfoActions.changeBoardDevice(deviceType));
+    dispatchResize();
   };
+
   const curIcon = useMemo(() => {
     return curDeviceType === DeviceType.Mobile ? (
       <MobileOutlined />

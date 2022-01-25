@@ -29,6 +29,8 @@ import {
   DeviceType,
   RectConfig,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { dispatchResize } from 'app/utils/dispatchResize';
+import debounce from 'lodash/debounce';
 import React, {
   RefObject,
   useCallback,
@@ -36,6 +38,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 import RGL, { Layout, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
@@ -62,12 +65,20 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     return dashBoard.config;
   }, [dashBoard.config]);
 
+  const [curWH, setCurWH] = useState<number[]>([]);
+  const updateCurWH = useCallback((values: number[]) => {
+    setCurWH(values);
+    setImmediate(() => {
+      dispatchResize();
+    });
+  }, []);
   const { renderedWidgetById } = useContext(BoardContext);
   const dispatch = useDispatch();
 
   const curDeviceType = useSelector(selectDeviceType);
 
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
+
   const layoutWidgets = useMemo(
     () => Object.values(layoutWidgetMap),
     [layoutWidgetMap],
@@ -155,14 +166,15 @@ export const AutoBoardEditor: React.FC<{}> = () => {
       window.removeEventListener('resize', lazyLoad, false);
     };
   }, [layoutWidgets, lazyLoad]);
-  const changeWidgetLayouts = (layouts: Layout[]) => {
+
+  const changeWidgetLayouts = debounce((layouts: Layout[]) => {
     dispatch(
       editBoardStackActions.changeAutoBoardWidgetsRect({
         layouts,
         deviceType: curDeviceType,
       }),
     );
-  };
+  }, 300);
 
   const onLayoutChange = (layouts: Layout[]) => {
     currentLayout.current = layouts;
@@ -185,11 +197,19 @@ export const AutoBoardEditor: React.FC<{}> = () => {
       );
     });
   }, [layoutWidgets]);
-  const curCols = useMemo(() => {
-    if (curDeviceType === DeviceType.Desktop) {
-      return LAYOUT_COLS.lg;
+
+  const { curCols, deviceClassName } = useMemo(() => {
+    let curCols: number = LAYOUT_COLS.lg;
+    let deviceClassName: string = 'desktop';
+
+    if (curDeviceType === DeviceType.Mobile) {
+      curCols = LAYOUT_COLS.xs;
+      deviceClassName = 'mobile';
     }
-    return LAYOUT_COLS.xs;
+    return {
+      curCols,
+      deviceClassName,
+    };
   }, [curDeviceType]);
 
   /**
@@ -198,8 +218,15 @@ export const AutoBoardEditor: React.FC<{}> = () => {
 
   return (
     <Wrap>
-      {curDeviceType === DeviceType.Mobile && <DeviceList />}
-      <StyledContainer bg={background} className="mobile" ref={ref}>
+      {curDeviceType === DeviceType.Mobile && (
+        <DeviceList updateCurWH={updateCurWH} />
+      )}
+      <StyledContainer
+        bg={background}
+        curWH={curWH}
+        className={deviceClassName}
+        ref={ref}
+      >
         {layoutWidgets.length ? (
           <div className="grid-wrap" ref={layoutWrap}>
             <ReactGridLayout
@@ -233,7 +260,7 @@ const Wrap = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-  /* align-items: center; */
+  align-items: center;
   width: 100%;
   min-height: 0;
   overflow-y: auto;
@@ -242,20 +269,22 @@ const Wrap = styled.div`
   }
 `;
 
-const StyledContainer = styled(StyledBackground)`
+const StyledContainer = styled(StyledBackground)<{ curWH: number[] }>`
   display: flex;
-  /* flex: 1; */
   flex-direction: column;
   min-height: 0;
-  border: 1px solid ${NORMAL};
-  border-top: none;
+  box-shadow: 0px 0 32px 0px rgb(73 80 87 / 8%);
   &.desktop {
     flex: 1;
+    width: 100%;
   }
-  /* &.mobile {
-    width: 600px;
-    height: 400px;
-  } */
+  &.mobile {
+    /* border: 1px solid ${NORMAL}; */
+
+    margin-top: 10px;
+    width: ${p => p.curWH[0] + 'px'};
+    height: ${p => p.curWH[1] + 'px'};
+  }
   .grid-wrap {
     flex: 1;
     overflow-y: auto;
