@@ -58,8 +58,11 @@ public class SqlNodeUtils {
     }
 
 
+    /**
+     * create sql alias with quoting
+     */
     public static SqlNode createAliasNode(SqlNode node, String alias) {
-        return createSqlBasicCall(SqlStdOperatorTable.AS, Arrays.asList(node, new SqlIdentifier(alias, SqlParserPos.ZERO)));
+        return createSqlBasicCall(SqlStdOperatorTable.AS, Arrays.asList(node, new SqlIdentifier(alias, SqlParserPos.ZERO.withQuoting(true))));
     }
 
     public static SqlNode toSingleSqlLiteral(ScriptVariable variable, SqlParserPos sqlParserPos) {

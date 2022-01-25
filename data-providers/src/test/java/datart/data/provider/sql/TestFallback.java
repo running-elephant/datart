@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 public class TestFallback {
 
-    @Test
+//    @Test
     void testParamReplace() throws SqlParseException {
         for (QueryScript queryScriptExample : ParamFactory.getErrorQueryScriptExamples()) {
             SqlScriptRender render = new SqlScriptRender(queryScriptExample, null, new MysqlSqlDialect(MysqlSqlDialect.DEFAULT_CONTEXT));
