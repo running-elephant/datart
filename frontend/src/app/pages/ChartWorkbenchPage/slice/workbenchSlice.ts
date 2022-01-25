@@ -235,31 +235,27 @@ export const refreshDatasetAction = createAsyncThunk(
     },
     thunkAPI,
   ) => {
-    try {
-      const state = thunkAPI.getState() as any;
-      const workbenchState = state.workbench as typeof initState;
+    const state = thunkAPI.getState() as any;
+    const workbenchState = state.workbench as typeof initState;
 
-      if (!workbenchState.currentDataView?.id) {
-        return;
-      }
-
-      const builder = new ChartDataRequestBuilder(
-        {
-          ...workbenchState.currentDataView,
-        },
-        workbenchState.chartConfig?.datas,
-        workbenchState.chartConfig?.settings,
-        arg?.pageInfo,
-        true,
-        workbenchState.aggregation,
-      );
-      const requestParams = builder
-        .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
-        .build();
-      thunkAPI.dispatch(fetchDataSetAction(requestParams));
-    } catch (error) {
-      return rejectHandle(error, thunkAPI.rejectWithValue);
+    if (!workbenchState.currentDataView?.id) {
+      return;
     }
+
+    const builder = new ChartDataRequestBuilder(
+      {
+        ...workbenchState.currentDataView,
+      },
+      workbenchState.chartConfig?.datas,
+      workbenchState.chartConfig?.settings,
+      arg?.pageInfo,
+      true,
+      workbenchState.aggregation,
+    );
+    const requestParams = builder
+      .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
+      .build();
+    thunkAPI.dispatch(fetchDataSetAction(requestParams));
   },
 );
 

@@ -19,7 +19,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { BASE_API_URL } from 'globalConstants';
 import { APIResponse } from 'types';
-import { getToken, setToken } from './auth';
+import { getToken, removeToken, setToken } from './auth';
 
 export const instance = axios.create({
   baseURL: BASE_API_URL,
@@ -92,7 +92,9 @@ export function request2<T>(
   const axiosPromise =
     typeof url === 'string' ? instance(url, config) : instance(url);
   return axiosPromise
-    .then(extra?.onFulfilled || defaultFulfilled)
+    .then(extra?.onFulfilled || defaultFulfilled, error => {
+      throw unAuthorizationErrorHanlder(error);
+    })
     .catch(extra?.onRejected || defaultRejected);
 }
 
@@ -110,6 +112,13 @@ export function requestWithHeader(
 export const getServerDomain = () => {
   return `${window.location.protocol}//${window.location.host}`;
 };
+
+function unAuthorizationErrorHanlder(error) {
+  if (error?.response?.status === 401) {
+    removeToken();
+  }
+  return error;
+}
 
 function standardErrorMessageTransformer(error) {
   if (error?.response?.data?.message) {

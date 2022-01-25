@@ -31,7 +31,7 @@ import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { convertToChartDTO } from 'app/utils/ChartDtoHelper';
 import { RootState } from 'types';
 import persistence from 'utils/persistence';
-import { request } from 'utils/request';
+import { request2, request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { shareActions } from '.';
 import { ShareVizInfo } from './types';
@@ -150,7 +150,7 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
       false,
       args.preview?.backendChart?.config?.aggregation,
     );
-    const response = await request({
+    const response = await request2({
       method: 'POST',
       url: `share/execute`,
       params: {
