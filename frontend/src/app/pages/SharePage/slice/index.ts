@@ -28,7 +28,7 @@ import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
-import { networkRejectedActionHandler } from 'utils/notification';
+import { rejectedActionMessageHandler } from 'utils/notification';
 import { fetchShareDataSetByPreviewChartAction } from './thunks';
 // import { fetchShareDataSetByPreviewChartAction } from './thunk';
 import { ExecuteToken, SharePageState, ShareVizInfo } from './types';
@@ -160,7 +160,7 @@ export const slice = createSlice({
       })
       .addMatcher(
         isMySliceRejectedAction(slice.name),
-        networkRejectedActionHandler,
+        rejectedActionMessageHandler,
       );
   },
 });

@@ -18,10 +18,8 @@
 
 import { message } from 'antd';
 
-export function networkRejectedActionHandler(_, action) {
-  if (action?.payload) {
-    message.error(action?.payload);
-  } else if (action?.error) {
+export function rejectedActionMessageHandler(_, action) {
+  if (action?.error) {
     message.error(action?.error.message);
   }
 }

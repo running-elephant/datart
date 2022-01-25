@@ -5,7 +5,7 @@ import { ChartDataSectionType } from 'app/types/ChartConfig';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
-import { networkRejectedActionHandler } from 'utils/notification';
+import { rejectedActionMessageHandler } from 'utils/notification';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import {
@@ -558,7 +558,7 @@ const slice = createSlice({
     });
     builder.addMatcher(
       isMySliceRejectedAction(slice.name),
-      networkRejectedActionHandler,
+      rejectedActionMessageHandler,
     );
   },
 });
