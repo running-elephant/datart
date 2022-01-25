@@ -140,7 +140,7 @@ export const VariableForm = memo(
               return request({
                 url: `/variables/check/name`,
                 method: 'POST',
-                params: { name: value, orgId },
+                data: { name: value, orgId },
               }).then(
                 () => Promise.resolve(),
                 err => Promise.reject(new Error(err.response.data.message)),

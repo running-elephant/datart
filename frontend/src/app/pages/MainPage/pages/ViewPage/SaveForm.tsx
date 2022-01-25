@@ -156,8 +156,8 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
               return request({
                 url: `/views/check/name`,
                 method: 'POST',
-                params: {
-                  name: encodeURIComponent(value),
+                data: {
+                  name: value,
                   orgId,
                   parentId: parentId || null,
                 },
