@@ -686,7 +686,9 @@
         "allowRange": "{{type}} 允许范围为 {{start}} 到 {{end}}",
         "confirm": "请确认切换到 {{name}} 图表，这将导致数据被清空",
         "ok": "确认",
-        "cancel": "取消"
+        "cancel": "取消",
+        "number": "序号",
+        "summary": "汇总"
       }
     },
     "action": {

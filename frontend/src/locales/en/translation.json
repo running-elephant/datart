@@ -686,7 +686,9 @@
         "allowRange": "{{type}} Allow Range {{start}} to {{end}}",
         "confirm": "Please confirm switch to {{name}} chart that will clear all data fields",
         "ok": "OK",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "number": "No.",
+        "summary": "Summary"
       }
     },
     "action": {

@@ -282,15 +282,13 @@ const transferMixedToOther = (
 
 const balanceAssignConfigRows = sources => {};
 
+// TODO(Stephen): tobe delete after use ChartDataSet Model in charts
 // 兼容 impala 聚合函数小写问题
 export const filterSqlOperatorName = (requestParams, widgetData) => {
-  return widgetData;
-
-
-  const sqlOperatorNameList = requestParams.aggregators.map(({ sqlOperator }) =>
-    sqlOperator.toLocaleLowerCase(),
+  const sqlOperatorNameList = requestParams.aggregators.map(aggConfig =>
+    aggConfig.sqlOperator?.toLocaleLowerCase(),
   );
-  if (!sqlOperatorNameList.length) return widgetData;
+  if (!sqlOperatorNameList?.length) return widgetData;
   widgetData?.columns?.forEach(item => {
     const index = item.name.indexOf('(');
     const sqlOperatorName = item.name.slice(0, index);

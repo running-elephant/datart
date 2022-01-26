@@ -17,6 +17,7 @@
  */
 
 import { ChartConfig } from 'app/types/ChartConfig';
+import { FONT_FAMILY } from 'styles/StyleConstants';
 
 const config: ChartConfig = {
   datas: [
@@ -95,6 +96,37 @@ const config: ChartConfig = {
                 comType: 'group',
                 rows: [
                   {
+                    label: 'column.columnStyle',
+                    key: 'columnStyle',
+                    comType: 'group',
+                    options: { expand: true },
+                    rows: [
+                      {
+                        label: 'column.useColumnWidth',
+                        key: 'useColumnWidth',
+                        default: false,
+                        comType: 'checkbox',
+                      },
+                      {
+                        label: 'column.columnWidth',
+                        key: 'columnWidth',
+                        default: 100,
+                        options: {
+                          min: 0,
+                        },
+                        /*watcher: {
+                          deps: ['useColumnWidth'],
+                          action: props => {
+                            return {
+                              disabled: !props.useColumnWidth,
+                            };
+                          },
+                        },*/
+                        comType: 'inputNumber',
+                      },
+                    ],
+                  },
+                  {
                     label: 'column.conditionStyle',
                     key: 'conditionStyle',
                     comType: 'group',
@@ -140,50 +172,20 @@ const config: ChartConfig = {
         {
           label: 'style.leftFixedColumns',
           key: 'leftFixedColumns',
-          comType: 'select',
+          default: 0,
           options: {
-            mode: 'multiple',
-            getItems: cols => {
-              const columns = (cols || [])
-                .filter(col =>
-                  ['aggregate', 'group', 'mixed'].includes(col.type),
-                )
-                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-                .map(c => ({
-                  key: c.uid,
-                  value: c.uid,
-                  label:
-                    c.label || c.aggregate
-                      ? `${c.aggregate}(${c.colName})`
-                      : c.colName,
-                }));
-              return columns;
-            },
+            min: 0,
           },
+          comType: 'inputNumber',
         },
         {
           label: 'style.rightFixedColumns',
           key: 'rightFixedColumns',
-          comType: 'select',
+          default: 0,
           options: {
-            mode: 'multiple',
-            getItems: cols => {
-              const columns = (cols || [])
-                .filter(col =>
-                  ['aggregate', 'group', 'mixed'].includes(col.type),
-                )
-                .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-                .map(c => ({
-                  key: c.uid,
-                  value: c.uid,
-                  label:
-                    c.label || c.aggregate
-                      ? `${c.aggregate}(${c.colName})`
-                      : c.colName,
-                }));
-              return columns;
-            },
+            min: 0,
           },
+          comType: 'inputNumber',
         },
         {
           label: 'style.autoMergeFields',
@@ -214,10 +216,11 @@ const config: ChartConfig = {
           default: 'small',
           comType: 'select',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '默认', value: 'default' },
-              { label: '中', value: 'middle' },
-              { label: '小', value: 'small' },
+              { label: 'tableSize.default', value: 'default' },
+              { label: 'tableSize.middle', value: 'middle' },
+              { label: 'tableSize.small', value: 'small' },
             ],
           },
         },
@@ -239,7 +242,7 @@ const config: ChartConfig = {
           key: 'font',
           comType: 'font',
           default: {
-            fontFamily: 'PingFang SC',
+            fontFamily: FONT_FAMILY,
             fontSize: 12,
             fontWeight: 'bold',
             fontStyle: 'normal',
@@ -250,14 +253,7 @@ const config: ChartConfig = {
           label: 'style.align',
           key: 'align',
           default: 'left',
-          comType: 'select',
-          options: {
-            items: [
-              { label: '左对齐', value: 'left' },
-              { label: '居中对齐', value: 'center' },
-              { label: '右对齐', value: 'right' },
-            ],
-          },
+          comType: 'fontAlignment',
         },
       ],
     },
@@ -267,21 +263,75 @@ const config: ChartConfig = {
       comType: 'group',
       rows: [
         {
-          label: 'style.bgColor',
-          key: 'bgColor',
+          label: 'style.oddFontColor',
+          key: 'oddFontColor',
+          default: '#000',
+          comType: 'fontColor',
+        },
+        {
+          label: 'style.oddBgColor',
+          key: 'oddBgColor',
           default: 'rgba(0,0,0,0)',
           comType: 'fontColor',
         },
         {
-          label: 'style.font',
-          key: 'font',
-          comType: 'font',
-          default: {
-            fontFamily: 'PingFang SC',
-            fontSize: 12,
-            fontWeight: 'normal',
-            fontStyle: 'normal',
-            color: '#495057',
+          label: 'style.evenFontColor',
+          key: 'evenFontColor',
+          default: '#000',
+          comType: 'fontColor',
+        },
+        {
+          label: 'style.evenBgColor',
+          key: 'evenBgColor',
+          default: 'rgba(0,0,0,0)',
+          comType: 'fontColor',
+        },
+        {
+          label: 'style.fontSize',
+          key: 'fontSize',
+          comType: 'fontSize',
+          default: 12,
+        },
+        {
+          label: 'style.fontFamily',
+          key: 'fontFamily',
+          comType: 'fontFamily',
+          default: FONT_FAMILY,
+        },
+        {
+          label: 'style.fontWeight',
+          key: 'fontWeight',
+          comType: 'select',
+          default: 'normal',
+          options: {
+            items: [
+              { label: '常规字号', value: 'normal' },
+              { label: '粗体', value: 'bold' },
+              { label: '特粗体', value: 'bolder' },
+              { label: '细体', value: 'lighter' },
+              { label: '100', value: '100' },
+              { label: '200', value: '200' },
+              { label: '300', value: '300' },
+              { label: '400', value: '400' },
+              { label: '500', value: '500' },
+              { label: '600', value: '600' },
+              { label: '700', value: '700' },
+              { label: '800', value: '800' },
+              { label: '900', value: '900' },
+            ],
+          },
+        },
+        {
+          label: 'style.fontStyle',
+          key: 'fontStyle',
+          comType: 'select',
+          default: 'normal',
+          options: {
+            items: [
+              { label: '常规体', value: 'normal' },
+              { label: '斜体', value: 'italic' },
+              { label: '偏斜体', value: 'oblique' },
+            ],
           },
         },
         {
@@ -308,7 +358,6 @@ const config: ChartConfig = {
             needRefresh: true,
           },
         },
-
         {
           label: 'paging.pageSize',
           key: 'pageSize',
@@ -376,6 +425,10 @@ const config: ChartConfig = {
           sortAndFilter: '排序与过滤',
           enableSort: '开启列排序',
           basicStyle: '基础样式',
+          useColumnWidth: '启用固定列宽',
+          columnWidth: '列宽',
+          columnStyle: '列样式',
+          columnStylePanel: '列样式配置器',
           conditionStyle: '条件样式',
           conditionStylePanel: '条件样式配置器',
           backgroundColor: '背景颜色',
@@ -398,6 +451,19 @@ const config: ChartConfig = {
           bgColor: '背景颜色',
           font: '字体',
           align: '对齐方式',
+          fontWeight: '字体粗细',
+          fontFamily: '字体',
+          oddBgColor: '奇行背景色',
+          oddFontColor: '奇行字体色',
+          evenBgColor: '偶行背景色',
+          evenFontColor: '偶行字体色',
+          fontSize: '字体大小',
+          fontStyle: '字体样式',
+        },
+        tableSize: {
+          default: '默认',
+          middle: '中',
+          small: '小',
         },
         summary: {
           title: '数据汇总',
@@ -424,6 +490,10 @@ const config: ChartConfig = {
           sortAndFilter: 'Sort and Filter',
           enableSort: 'Enable Sort',
           basicStyle: 'Baisc Style',
+          useColumnWidth: 'Use Column Width',
+          columnWidth: 'Column Width',
+          columnStyle: 'Column Style',
+          columnStylePanel: 'Column Style Panel',
           conditionStyle: 'Condition Style',
           conditionStylePanel: 'Condition Style Panel',
           backgroundColor: 'Background Color',
@@ -446,6 +516,19 @@ const config: ChartConfig = {
           bgColor: 'Background Color',
           font: 'Font',
           align: 'Align',
+          fontWeight: 'Font Weight',
+          fontFamily: 'Font Family',
+          oddBgColor: 'Odd Row Background Color',
+          evenBgColor: 'Even Row Background Color',
+          oddFontColor: 'Odd Row Font Color',
+          evenFontColor: 'Even Row Font Color',
+          fontSize: 'Font Size',
+          fontStyle: 'Font Style',
+        },
+        tableSize: {
+          default: 'Default',
+          middle: 'Middle',
+          small: 'Small',
         },
         summary: {
           title: 'Summary',

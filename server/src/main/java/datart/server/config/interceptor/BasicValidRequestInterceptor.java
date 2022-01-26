@@ -46,6 +46,7 @@ public class BasicValidRequestInterceptor implements HandlerInterceptor {
         return requestURI.startsWith(getApiPrePath())
                 || requestURI.equals("/")
                 || requestURI.equals("/index.html")
+                || requestURI.equals("/favicon.ico")
                 || requestURI.startsWith(resourcePath)
                 || requestURI.startsWith("/swagger")
                 || requestURI.startsWith("/webjars")

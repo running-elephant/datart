@@ -21,6 +21,7 @@ package datart.server.controller;
 import datart.core.entity.View;
 import datart.server.base.dto.ResponseData;
 import datart.server.base.dto.ViewDetailDTO;
+import datart.server.base.params.CheckNameParam;
 import datart.server.base.params.ViewBaseUpdateParam;
 import datart.server.base.params.ViewCreateParam;
 import datart.server.base.params.ViewUpdateParam;
@@ -43,15 +44,11 @@ public class ViewController extends BaseController {
 
     @ApiOperation(value = "check view name is unique")
     @PostMapping("/check/name")
-    public ResponseData<Boolean> checkViewName(@RequestParam String orgId,
-                                               @RequestParam String name,
-                                               @RequestParam(required = false) String parentId) {
-        checkBlank(name, "name");
-        checkBlank(orgId, "orgId");
+    public ResponseData<Boolean> checkViewName(@Validated @RequestBody CheckNameParam param) {
         View view = new View();
-        view.setName(name);
-        view.setOrgId(orgId);
-        view.setParentId(parentId);
+        view.setName(param.getName());
+        view.setOrgId(param.getOrgId());
+        view.setParentId(param.getParentId());
         return ResponseData.success(viewService.checkUnique(view));
     }
 

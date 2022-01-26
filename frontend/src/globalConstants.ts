@@ -44,7 +44,7 @@ export const TITLE_SUFFIX = ['archived', 'unpublished'];
 export const DEFAULT_DEBOUNCE_WAIT = 300;
 
 export const FONT_SIZES = [
-  10, 12, 13, 14, 15, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 96, 128,
+  12, 13, 14, 15, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 96, 128,
 ];
 
 export const FONT_FAMILIES = [

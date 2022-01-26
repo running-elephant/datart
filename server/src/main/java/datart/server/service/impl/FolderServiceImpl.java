@@ -276,7 +276,7 @@ public class FolderServiceImpl extends BaseService implements FolderService {
         permissionInfo.setOrgId(folder.getOrgId());
         permissionInfo.setSubjectType(SubjectType.USER);
         permissionInfo.setSubjectId(getCurrentUser().getId());
-        permissionInfo.setResourceType(ResourceType.FOLDER);
+        permissionInfo.setResourceType(ResourceType.VIZ);
         permissionInfo.setResourceId(folder.getId());
         permissionInfo.setPermission(Const.CREATE);
         roleService.grantPermission(Collections.singletonList(permissionInfo));
