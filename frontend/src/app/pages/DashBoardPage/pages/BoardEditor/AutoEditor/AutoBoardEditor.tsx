@@ -45,6 +45,7 @@ import 'react-grid-layout/css/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
+import { G30 } from 'styles/StyleConstants';
 import StyledBackground from '../../Board/components/StyledBackground';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
@@ -216,7 +217,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
    */
 
   return (
-    <Wrap>
+    <Wrap className={deviceClassName}>
       {curDeviceType === DeviceType.Mobile && (
         <DeviceList updateCurWH={updateCurWH} />
       )}
@@ -266,18 +267,23 @@ const Wrap = styled.div`
   .react-resizable-handle {
     z-index: 100;
   }
+  &.desktop {
+    min-width: 768px;
+  }
 `;
 
 const StyledContainer = styled(StyledBackground)<{ curWH: number[] }>`
   display: flex;
   flex-direction: column;
   min-height: 0;
-  box-shadow: 0px 0 32px 0px rgb(73 80 87 / 8%);
+
   &.desktop {
     flex: 1;
     width: 100%;
   }
   &.mobile {
+    box-shadow: 0px 0 32px 0px rgb(73 80 87 / 8%);
+    border: 8px solid ${G30};
     border-radius: 6px;
     margin-top: 30px;
     width: ${p => p.curWH[0] + 'px'};

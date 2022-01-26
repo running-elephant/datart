@@ -17,20 +17,15 @@
  */
 import { CloseOutlined } from '@ant-design/icons';
 import { InputNumber, Select, Space } from 'antd';
+import { DEVICE_LIST } from 'app/pages/DashBoardPage/constants';
 import React, { memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { WHITE } from 'styles/StyleConstants';
 const { Option } = Select;
-const List = {
-  'iPhone 6/7/8': [375, 667],
-  'iPhone X': [375, 812],
-  'iPhone XR': [414, 896],
-  'iPhone 12 Pro': [390, 844],
-  'iPad Mini': [768, 1024],
-  custom: null,
-};
-const ListKeys = Object.keys(List);
-const initValues = List[ListKeys[0]];
+
+const ListKeys = Object.keys(DEVICE_LIST);
+
+const initValues = DEVICE_LIST[ListKeys[0]];
 
 export const DeviceList: React.FC<{
   updateCurWH: (values: number[]) => void;
@@ -54,7 +49,7 @@ export const DeviceList: React.FC<{
     updateCurWH([curW, curH]);
   };
   const changeDeviceKey = deviceKey => {
-    const values = List[deviceKey] || [curW, curH];
+    const values = DEVICE_LIST[deviceKey] || [curW, curH];
 
     const isCustom = deviceKey === 'custom';
     setDisabled(!isCustom);
