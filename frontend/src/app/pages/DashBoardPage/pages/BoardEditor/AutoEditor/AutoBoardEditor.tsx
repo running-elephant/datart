@@ -45,7 +45,6 @@ import 'react-grid-layout/css/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
-import { NORMAL } from 'styles/StyleConstants';
 import StyledBackground from '../../Board/components/StyledBackground';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
@@ -279,9 +278,8 @@ const StyledContainer = styled(StyledBackground)<{ curWH: number[] }>`
     width: 100%;
   }
   &.mobile {
-    /* border: 1px solid ${NORMAL}; */
-
-    margin-top: 10px;
+    border-radius: 6px;
+    margin-top: 30px;
     width: ${p => p.curWH[0] + 'px'};
     height: ${p => p.curWH[1] + 'px'};
   }
