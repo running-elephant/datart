@@ -150,7 +150,7 @@ class ScoreChart extends Chart {
         {
           type: 'scatter',
           data: [[0, 0]],
-          symbolSize: 1,
+          symbolSize: 0,
           label: {
             normal: {
               show: true,
@@ -206,12 +206,12 @@ class ScoreChart extends Chart {
     aggregateConfigs: any[],
     index: number,
   ) {
-    return (
-      toFormattedValue(
-        aggConfigValues?.[index],
-        aggregateConfigs?.[index]?.format,
-      ) || ''
+    const formattedValue = toFormattedValue(
+      aggConfigValues?.[index],
+      aggregateConfigs?.[index]?.format,
     );
+    if (typeof formattedValue === 'number') return formattedValue;
+    return formattedValue || '';
   }
 
   private customFormatters(aggConfigValues, aggregateConfigs, styleConfigs) {
