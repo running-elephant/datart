@@ -120,7 +120,8 @@ const ChartRichTextAdapter: FC<{
             const config = name
               ? dataList.find(items => items.name === name)
               : null;
-            insert = config?.value || '';
+            if (typeof config.value === 'number') insert = String(config.value);
+            else insert = config?.value || '';
           }
         }
         return { ...item, insert };
