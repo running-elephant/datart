@@ -90,7 +90,7 @@ export interface DashboardConfig {
   // auto
   margin: [number, number];
   containerPadding: [number, number];
-  rowHeight: number;
+  rowHeight?: number;
   cols: ColsType;
   // free
   width: number;

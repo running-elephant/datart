@@ -58,7 +58,6 @@ export const BoardSetting: FC = memo(() => {
       marginH: config.margin[1],
       paddingW: config.containerPadding[0],
       paddingH: config.containerPadding[1],
-      rowHeight: config.rowHeight,
       initialQuery: config.initialQuery === false ? false : true, // TODO migration 如果initialQuery的值为undefined默认为true 兼容旧的仪表盘没有initialQuery参数的问题
     };
     form.setFieldsValue({ ...cacheValue.current });
@@ -78,7 +77,6 @@ export const BoardSetting: FC = memo(() => {
         draft.margin[1] = value.marginH;
         draft.containerPadding[0] = value.paddingW;
         draft.containerPadding[1] = value.paddingH;
-        draft.rowHeight = value.rowHeight;
         draft.initialQuery = value.initialQuery;
       });
       dispatch(editBoardStackActions.updateBoardConfig(nextConf));
@@ -129,10 +127,6 @@ export const BoardSetting: FC = memo(() => {
                   <NumberSet
                     label={`${t('widget')} ${t('paddingLR')}`}
                     name="marginW"
-                  />
-                  <NumberSet
-                    label={`${t('widget')} ${t('rowHeight')}`}
-                    name="rowHeight"
                   />
                 </Group>
               </Panel>

@@ -63,7 +63,7 @@ export const DeviceList: React.FC<{
       <Space>
         <Select
           defaultValue={ListKeys[0]}
-          style={{ width: 120 }}
+          style={{ width: 180 }}
           onChange={changeDeviceKey}
           size="small"
         >
