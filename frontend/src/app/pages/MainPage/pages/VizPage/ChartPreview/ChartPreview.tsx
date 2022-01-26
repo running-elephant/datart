@@ -17,7 +17,6 @@
  */
 
 import { message } from 'antd';
-import ChartEditor from 'app/components/ChartEditor';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { VizHeader } from 'app/components/VizHeader';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
@@ -29,6 +28,7 @@ import { IChart } from 'app/types/Chart';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
@@ -75,9 +75,9 @@ const ChartPreviewBoard: FC<{
     const publishLoading = useSelector(selectPublishLoading);
     const [chartPreview, setChartPreview] = useState<ChartPreview>();
     const [chart, setChart] = useState<IChart>();
-    const [editChartVisible, setEditChartVisible] = useState<boolean>(false);
     const t = useI18NPrefix('viz.main');
     const saveAsViz = useSaveAsViz();
+    const history = useHistory();
 
     useEffect(() => {
       const filterSearchParams = filterSearchUrl
@@ -151,20 +151,15 @@ const ChartPreviewBoard: FC<{
     };
 
     const handleGotoWorkbenchPage = () => {
-      setEditChartVisible(true);
+      history.push({
+        pathname: `/organizations/${orgId}/vizs/chartEditor`,
+        state: {
+          dataChartId: backendChartId,
+          chartType: 'dataChart',
+          container: 'dataChart',
+        },
+      });
     };
-    const onSaveInDataChart = useCallback(
-      (orgId: string, backendChartId: string) => {
-        dispatch(
-          initChartPreviewData({
-            backendChartId,
-            orgId,
-          }),
-        );
-        setEditChartVisible(false);
-      },
-      [dispatch],
-    );
 
     const handleFilterChange = (type, payload) => {
       dispatch(
@@ -273,16 +268,6 @@ const ChartPreviewBoard: FC<{
             />
           </ChartWrapper>
         </PreviewBlock>
-        {editChartVisible && (
-          <ChartEditor
-            dataChartId={backendChartId}
-            orgId={orgId}
-            chartType="dataChart"
-            container="dataChart"
-            onClose={() => setEditChartVisible(false)}
-            onSaveInDataChart={onSaveInDataChart}
-          />
-        )}
       </StyledChartPreviewBoard>
     );
   },

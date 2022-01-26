@@ -16,10 +16,17 @@
  * limitations under the License.
  */
 
+import ChartEditor, { ChartEditorBaseProps } from 'app/components/ChartEditor';
 import { useAppSlice } from 'app/slice';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Redirect, Route, Switch, useRouteMatch } from 'react-router';
+import {
+  Redirect,
+  Route,
+  Switch,
+  useHistory,
+  useRouteMatch,
+} from 'react-router';
 import styled from 'styled-components/macro';
 import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
 import { NotFoundPage } from '../NotFoundPage';
@@ -38,6 +45,7 @@ import { ViewPage } from './pages/ViewPage';
 import { useViewSlice } from './pages/ViewPage/slice';
 import { VizPage } from './pages/VizPage';
 import { useVizSlice } from './pages/VizPage/slice';
+import { initChartPreviewData } from './pages/VizPage/slice/thunks';
 import { useMainSlice } from './slice';
 import { selectOrgId } from './slice/selectors';
 import {
@@ -57,7 +65,7 @@ export function MainPage() {
     '/organizations/:orgId',
   );
   const orgId = useSelector(selectOrgId);
-
+  const history = useHistory();
   // loaded first time
   useEffect(() => {
     ChartManager.instance()
@@ -78,6 +86,19 @@ export function MainPage() {
     }
   }, [dispatch, vizActions, viewActions, orgId]);
 
+  const onSaveInDataChart = useCallback(
+    (orgId: string, backendChartId: string) => {
+      dispatch(
+        initChartPreviewData({
+          backendChartId,
+          orgId,
+        }),
+      );
+      history.push(`/organizations/${orgId}/vizs/${backendChartId}`);
+    },
+    [dispatch, history],
+  );
+
   return (
     <AppContainer>
       <Background />
@@ -93,6 +114,25 @@ export function MainPage() {
               to={`/organizations/${organizationMatch?.params.orgId}/vizs`}
             />
           </Route>
+          <Route
+            path="/organizations/:orgId/vizs/chartEditor"
+            render={res => {
+              let histState = res.location.state as ChartEditorBaseProps;
+              return (
+                <AccessRoute module={ResourceTypes.Viz}>
+                  <ChartEditor
+                    dataChartId={histState.dataChartId}
+                    orgId={orgId}
+                    chartType={histState.chartType}
+                    container={histState.container}
+                    defaultViewId={histState.defaultViewId}
+                    onClose={() => history.go(-1)}
+                    onSaveInDataChart={onSaveInDataChart}
+                  />
+                </AccessRoute>
+              );
+            }}
+          />
           <Route
             path="/organizations/:orgId/vizs/:vizId?"
             render={() => (

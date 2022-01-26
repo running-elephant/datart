@@ -40,6 +40,7 @@ const ChartWorkbench: FC<{
   chartConfig?: ChartConfig;
   chart?: IChart;
   aggregation?: boolean;
+  defaultViewId?: string;
   header?: {
     name?: string;
     onSaveChart?: () => void;
@@ -57,15 +58,20 @@ const ChartWorkbench: FC<{
     chart,
     aggregation,
     header,
+    defaultViewId,
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
-
     return (
-      <ChartAggregationContext.Provider value={{ aggregation }}>
+      <ChartAggregationContext.Provider
+        value={{
+          aggregation,
+          onChangeAggregation: header?.onChangeAggregation,
+        }}
+      >
         <ChartDatasetContext.Provider value={{ dataset: dataset }}>
           <ChartDataViewContext.Provider value={{ dataView: dataview }}>
             <TimeConfigContext.Provider
@@ -77,12 +83,12 @@ const ChartWorkbench: FC<{
                     chartName={header?.name}
                     onGoBack={header?.onGoBack}
                     onSaveChart={header?.onSaveChart}
-                    onChangeAggregation={header?.onChangeAggregation}
                   />
                 )}
                 <StyledChartOperationPanel>
                   <ChartOperationPanel
                     chart={chart}
+                    defaultViewId={defaultViewId}
                     chartConfig={chartConfig}
                     onChartChange={onChartChange}
                     onChartConfigChange={onChartConfigChange}
@@ -101,7 +107,8 @@ const ChartWorkbench: FC<{
     prev.dataview === next.dataview &&
     prev.chart === next.chart &&
     prev.chartConfig === next.chartConfig &&
-    prev.dataset === next.dataset,
+    prev.dataset === next.dataset &&
+    prev.defaultViewId === next.defaultViewId,
 );
 
 export default ChartWorkbench;

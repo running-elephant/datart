@@ -19,9 +19,19 @@
 import { Split } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
+import { calcAc } from 'app/pages/MainPage/Access';
+import {
+  PermissionLevels,
+  ResourceTypes,
+} from 'app/pages/MainPage/pages/PermissionPage/constants';
+import {
+  selectIsOrgOwner,
+  selectPermissionMap,
+} from 'app/pages/MainPage/slice/selectors';
 import React, { useCallback, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import AccessContext from './context/AccessContext';
 import { EditorContext } from './EditorContext';
 import { Main } from './Main';
 import { SaveForm } from './SaveForm';
@@ -31,9 +41,19 @@ import { selectSliderVisible } from './slice/selectors';
 export function Container() {
   const { editorInstance } = useContext(EditorContext);
   const sliderVisible = useSelector(selectSliderVisible);
+  const isOwner = useSelector(selectIsOrgOwner);
+  const permissionMap = useSelector(selectPermissionMap);
   const t = useI18NPrefix('view.saveForm');
   const tg = useI18NPrefix('global');
 
+  const allowEnableViz = calcAc(
+    isOwner,
+    permissionMap,
+    ResourceTypes.Viz,
+    PermissionLevels.Enable,
+    '',
+    'module',
+  );
   const editorResize = useCallback(() => {
     editorInstance?.layout();
   }, [editorInstance]);
@@ -52,27 +72,29 @@ export function Container() {
   );
 
   return (
-    <StyledContainer
-      sizes={sizes}
-      minSize={[256, 0]}
-      maxSize={[768, Infinity]}
-      gutterSize={0}
-      onDrag={siderDrag}
-      className="datart-split"
-      sliderVisible={sliderVisible}
-    >
-      <Sidebar />
-      <Main />
-      <SaveForm
-        title={t('title')}
-        formProps={{
-          labelAlign: 'left',
-          labelCol: { offset: 1, span: 8 },
-          wrapperCol: { span: 13 },
-        }}
-        okText={tg('button.save')}
-      />
-    </StyledContainer>
+    <AccessContext.Provider value={{ allowEnableViz }}>
+      <StyledContainer
+        sizes={sizes}
+        minSize={[256, 0]}
+        maxSize={[768, Infinity]}
+        gutterSize={0}
+        onDrag={siderDrag}
+        className="datart-split"
+        sliderVisible={sliderVisible}
+      >
+        <Sidebar />
+        <Main />
+        <SaveForm
+          title={t('title')}
+          formProps={{
+            labelAlign: 'left',
+            labelCol: { offset: 1, span: 8 },
+            wrapperCol: { span: 13 },
+          }}
+          okText={tg('button.save')}
+        />
+      </StyledContainer>
+    </AccessContext.Provider>
   );
 }
 

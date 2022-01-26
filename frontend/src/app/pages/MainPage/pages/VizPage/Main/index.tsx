@@ -109,6 +109,12 @@ export function Main() {
     vizId,
   ]);
 
+  useEffect(() => {
+    if (selectedTab) {
+      history.push(`/organizations/${orgId}/vizs/${selectedTab.id}`);
+    }
+  }, [history, selectedTab, orgId]);
+
   const tabChange = useCallback(
     activeKey => {
       const activeTab = tabs.find(v => v.id === activeKey);

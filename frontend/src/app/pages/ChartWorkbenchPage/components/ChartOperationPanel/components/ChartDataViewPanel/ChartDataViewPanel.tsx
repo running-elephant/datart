@@ -16,25 +16,32 @@
  * limitations under the License.
  */
 
-import { PlusOutlined } from '@ant-design/icons';
+import { FormOutlined, PlusOutlined } from '@ant-design/icons';
 import { message, Popover, TreeSelect } from 'antd';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useMount from 'app/hooks/useMount';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import useToggle from 'app/hooks/useToggle';
 import workbenchSlice, {
   fetchViewDetailAction,
   makeDataviewTreeSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { useAccess, useCascadeAccess } from 'app/pages/MainPage/Access';
+import {
+  PermissionLevels,
+  ResourceTypes,
+} from 'app/pages/MainPage/pages/PermissionPage/constants';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/types/ChartDataView';
-import { ChartDataViewMeta } from "app/types/ChartDataViewMeta";
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { checkComputedFieldAsync } from 'app/utils/fetch';
 import { updateByKey } from 'app/utils/mutation';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { SPACE, SPACE_XS } from 'styles/StyleConstants';
 import { ChartDraggableSourceGroupContainer } from '../ChartDraggable';
@@ -42,8 +49,9 @@ import ChartComputedFieldSettingPanel from './components/ChartComputedFieldSetti
 
 const ChartDataViewPanel: FC<{
   dataView?: ChartDataView;
+  defaultViewId?: string;
   onDataViewChange?: () => void;
-}> = memo(({ dataView, onDataViewChange }) => {
+}> = memo(({ dataView, defaultViewId, onDataViewChange }) => {
   const t = useI18NPrefix(`viz.workbench.dataview`);
   const dispatch = useDispatch();
   const dataviewTreeSelector = useMemo(makeDataviewTreeSelector, []);
@@ -53,6 +61,23 @@ const ChartDataViewPanel: FC<{
   );
   const [showModal, modalContextHolder] = useStateModal({});
   const [isDisplayAddNewModal, setIsDisplayAddNewModal] = useToggle();
+  const viewId = dataView?.id || '';
+  const viewParentId = dataView?.parentId || '';
+  console.log(dataView, 'dataView');
+  const path = [ResourceTypes.View, viewParentId, viewId];
+  const managePermission = useCascadeAccess({
+    module: ResourceTypes.View,
+    path,
+    level: PermissionLevels.Manage,
+  });
+  const allowManage = managePermission(true);
+  const allowEnableView = useAccess({
+    type: 'module',
+    module: ResourceTypes.View,
+    id: '',
+    level: PermissionLevels.Enable,
+  })(true);
+  const history = useHistory();
 
   const handleDataViewChange = value => {
     onDataViewChange?.();
@@ -179,9 +204,27 @@ const ChartDataViewPanel: FC<{
     return [...dateFields, ...stringFields, ...numericFields];
   };
 
+  const editView = () => {
+    let orgId = dataView?.orgId as string;
+    let viewId = dataView?.id as string;
+    history.push(`/organizations/${orgId}/views/${viewId}`);
+  };
+
+  useMount(() => {
+    if (defaultViewId) {
+      handleDataViewChange(defaultViewId);
+    }
+  });
   return (
     <StyledChartDataViewPanel>
       <Header>
+        <ToolbarButton
+          disabled={!(allowEnableView && allowManage && dataView)}
+          iconSize={14}
+          icon={<FormOutlined />}
+          size="small"
+          onClick={editView}
+        />
         <TreeSelect
           showSearch
           placeholder={t('plsSelectDataView')}

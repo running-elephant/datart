@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-import { LeftOutlined, MoreOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Space } from 'antd';
+import { Button, Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { FC, memo, useCallback, useContext } from 'react';
+import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
@@ -30,44 +29,28 @@ import {
   SPACE_TIMES,
   SPACE_XS,
 } from 'styles/StyleConstants';
-import ChartAggregationContext from '../../contexts/ChartAggregationContext';
-import AggregationOperationMenu from './components/AggregationOperationMenu';
 
 const ChartHeaderPanel: FC<{
   chartName?: string;
   onSaveChart?: () => void;
   onGoBack?: () => void;
-  onChangeAggregation?: (state: boolean) => void;
-}> = memo(({ chartName, onSaveChart, onGoBack, onChangeAggregation }) => {
+}> = memo(({ chartName, onSaveChart, onGoBack }) => {
   const t = useI18NPrefix(`viz.workbench.header`);
-  const { aggregation } = useContext(ChartAggregationContext);
-
-  const getOverlays = useCallback(() => {
-    return (
-      <AggregationOperationMenu
-        defaultValue={aggregation}
-        onChangeAggregation={e => {
-          onChangeAggregation?.(e);
-        }}
-      ></AggregationOperationMenu>
-    );
-  }, [aggregation, onChangeAggregation]);
 
   return (
     <Wrapper>
-      {onGoBack && (
-        <GoBack>
-          <LeftOutlined onClick={onGoBack} />
-        </GoBack>
-      )}
       <h1>{chartName}</h1>
       <Space>
+        <Button type="primary" ghost onClick={onGoBack}>
+          取消
+        </Button>
         <Button type="primary" onClick={onSaveChart}>
           {t('save')}
         </Button>
-        <Dropdown key="more" trigger={['click']} overlay={getOverlays()}>
+        <Button type="primary">保存到仪表板</Button>
+        {/* <Dropdown key="more" trigger={['click']} overlay={getOverlays()}>
           <Button icon={<MoreOutlined />} />
-        </Dropdown>
+        </Dropdown> */}
       </Space>
     </Wrapper>
   );

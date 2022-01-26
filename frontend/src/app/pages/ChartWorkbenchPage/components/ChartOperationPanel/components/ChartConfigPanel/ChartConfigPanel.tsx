@@ -36,7 +36,7 @@ import {
   ChartDataConfig,
   ChartStyleConfig,
 } from 'app/types/ChartConfig';
-import { FC, memo, useCallback } from 'react';
+import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
@@ -44,6 +44,7 @@ import {
   SPACE_MD,
 } from 'styles/StyleConstants';
 import { cond, isEmptyArray } from 'utils/object';
+import ChartToolbar from '../ChartToolbar';
 import ChartDataConfigPanel from './ChartDataConfigPanel';
 import ChartSettingConfigPanel from './ChartSettingConfigPanel';
 import ChartStyleConfigPanel from './ChartStyleConfigPanel';
@@ -118,6 +119,7 @@ const ChartConfigPanel: FC<{
       <ChartI18NContext.Provider value={{ i18NConfigs: chartConfig?.i18ns }}>
         <ChartPaletteContext.Provider value={{ datas: chartConfig?.datas }}>
           <StyledChartDataViewPanel>
+            <ChartToolbar />
             <ConfigBlock>
               <Tabs
                 activeKey={tabActiveKey}
@@ -192,6 +194,7 @@ export default ChartConfigPanel;
 
 const StyledChartDataViewPanel = styled.div`
   display: flex;
+  flex-direction: column;
   height: 100%;
   padding: ${SPACE_MD};
   background-color: ${p => p.theme.bodyBackground};

@@ -196,7 +196,7 @@ export const Sidebar = memo(() => {
     ],
     [add, treeSearch, listSearch, t, handleSliderVisible, sliderVisible],
   );
-  console.log(sliderVisible, 'sliderVisible');
+
   return (
     <Wrapper
       sliderVisible={sliderVisible}

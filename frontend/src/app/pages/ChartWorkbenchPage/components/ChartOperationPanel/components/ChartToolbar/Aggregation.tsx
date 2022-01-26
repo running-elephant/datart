@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-import { Menu, Modal, Switch } from 'antd';
+import { Modal, Switch } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo, useMemo } from 'react';
+import styled from 'styled-components/macro';
 
 const AggregationOperationMenu: FC<{
   defaultValue?: boolean;
@@ -32,20 +33,20 @@ const AggregationOperationMenu: FC<{
       icon: <></>,
       content: t('aggregationSwitchTip'),
       okText: checkedValue ? t('close') : t('open'),
-      // cancelText: t('close'),
       onOk() {
         onChangeAggregation(value);
       },
     });
   };
+
   return (
-    <Menu selectedKeys={[]}>
-      <Menu.Item key={0}>
-        {t('aggregationSwitch')}{' '}
-        <Switch checked={checkedValue} onChange={onChange} />
-      </Menu.Item>
-    </Menu>
+    <Aggregation>
+      {t('aggregationSwitch')}{' '}
+      <Switch checked={checkedValue} onChange={onChange} />
+    </Aggregation>
   );
 });
 
 export default AggregationOperationMenu;
+
+const Aggregation = styled.div``;

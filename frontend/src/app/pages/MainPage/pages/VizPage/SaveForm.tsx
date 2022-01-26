@@ -1,11 +1,12 @@
 import { Form, FormInstance, Input, Radio, TreeSelect } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useMount from 'app/hooks/useMount';
 import { BoardTypeMap } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import debounce from 'debounce-promise';
 import { CommonFormTypes, DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { request } from 'utils/request';
 import { getCascadeAccess } from '../../Access';
@@ -21,6 +22,7 @@ import {
   selectSaveFolderLoading,
   selectSaveStoryboardLoading,
 } from './slice/selectors';
+import { getFolders } from './slice/thunks';
 
 type SaveFormProps = Omit<ModalFormProps, 'type' | 'visible' | 'onSave'>;
 
@@ -43,7 +45,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
   const formRef = useRef<FormInstance>();
   const t = useI18NPrefix('viz.saveForm');
   const tg = useI18NPrefix('global');
-
+  const dispatch = useDispatch();
   const getDisabled = useCallback(
     (_, path: string[]) =>
       !getCascadeAccess(
@@ -59,6 +61,13 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
   const treeData = useSelector(state =>
     selectVizFolderTree(state, { id: initialValues?.id, getDisabled }),
   );
+
+  useMount(() => {
+    if (treeData?.length === 0) {
+      dispatch(getFolders(orgId));
+    }
+  });
+
   useEffect(() => {
     if (initialValues) {
       formRef.current?.setFieldsValue(initialValues);
@@ -110,7 +119,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
               return request({
                 url: `/viz/check/name`,
                 method: 'POST',
-                params: {
+                data: {
                   name: value,
                   orgId,
                   vizType,

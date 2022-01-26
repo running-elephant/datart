@@ -20,12 +20,13 @@ import {
   CopyFilled,
   DeleteOutlined,
   EditOutlined,
+  MonitorOutlined,
   MoreOutlined,
 } from '@ant-design/icons';
 import { Menu, message, Popconfirm, TreeDataNode } from 'antd';
 import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { CascadeAccess } from 'app/pages/MainPage/Access';
+import { CascadeAccess, useAccess } from 'app/pages/MainPage/Access';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
 import React, { memo, useCallback, useContext, useEffect } from 'react';
@@ -38,6 +39,7 @@ import {
   ResourceTypes,
 } from '../../PermissionPage/constants';
 import { useSaveAsView } from '../hooks/useSaveAsView';
+import { useStartAnalysis } from '../hooks/useStartAnalysis';
 import { SaveFormContext } from '../SaveFormContext';
 import {
   selectCurrentEditingViewKey,
@@ -66,6 +68,13 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
   const t = useI18NPrefix('view');
   const tg = useI18NPrefix('global');
   const saveAsView = useSaveAsView();
+  const startAnalysis = useStartAnalysis();
+  const allowEnableViz = useAccess({
+    type: 'module',
+    module: ResourceTypes.Viz,
+    id: '',
+    level: PermissionLevels.Enable,
+  })(true);
 
   useEffect(() => {
     dispatch(getViews(orgId));
@@ -143,11 +152,14 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
           case 'saveAs':
             saveAsView(id);
             break;
+          case 'startAnalysis':
+            startAnalysis(id);
+            break;
           default:
             break;
         }
       },
-    [dispatch, showSaveForm, viewsData, t, saveAsView],
+    [dispatch, showSaveForm, viewsData, t, saveAsView, startAnalysis],
   );
 
   const renderTreeTitle = useCallback(
@@ -183,6 +195,15 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                       prefix={<CopyFilled className="icon" />}
                     >
                       {tg('button.saveAs')}
+                    </MenuListItem>
+                  )}
+
+                  {allowEnableViz && (
+                    <MenuListItem
+                      prefix={<MonitorOutlined className="icon" />}
+                      key="startAnalysis"
+                    >
+                      开始分析
                     </MenuListItem>
                   )}
 

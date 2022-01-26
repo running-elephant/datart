@@ -18,6 +18,7 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import workbenchSlice, {
   aggregationSelector,
@@ -34,11 +35,19 @@ import workbenchSlice, {
   updateRichTextAction,
   useWorkbenchSlice,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
-import { ChartDTO } from "app/types/ChartDTO";
+import { useAddViz } from 'app/pages/MainPage/pages/VizPage/hooks/useAddViz';
+import { SaveForm } from 'app/pages/MainPage/pages/VizPage/SaveForm';
+import {
+  SaveFormContext,
+  useSaveFormContext,
+} from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { IChart } from 'app/types/Chart';
+import { ChartDTO } from 'app/types/ChartDTO';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
+import { CommonFormTypes } from 'globalConstants';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { CloneValueDeep } from 'utils/object';
 import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
@@ -55,7 +64,14 @@ export interface ChartEditorBaseProps {
   container: 'widget' | 'dataChart';
   chartType: WidgetContentChartType;
   widgetId?: string;
+  defaultViewId?: string;
   originChart?: ChartDTO | DataChart;
+}
+export interface HistoryState {
+  dataChartId: string;
+  orgId: string;
+  container: 'widget' | 'dataChart';
+  chartType: WidgetContentChartType;
 }
 export interface ChartEditorMethodsProps {
   onClose?: () => void;
@@ -67,16 +83,19 @@ export interface ChartEditorMethodsProps {
   onSaveInDataChart?: (orgId: string, dataChartId: string) => void;
 }
 export type ChartEditorProps = ChartEditorBaseProps & ChartEditorMethodsProps;
+
 export const ChartEditor: React.FC<ChartEditorProps> = ({
   originChart,
   orgId,
   container,
   dataChartId,
   chartType,
+  defaultViewId,
   onClose,
   onSaveInWidget,
   onSaveInDataChart,
 }) => {
+  const saveFormContextValue = useSaveFormContext();
   const { actions } = useWorkbenchSlice();
   const dispatch = useDispatch();
   const dataset = useSelector(datasetsSelector);
@@ -86,6 +105,11 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
   const [chart, setChart] = useState<IChart>();
+  const history = useHistory();
+  const addVizFn = useAddViz({
+    showSaveForm: saveFormContextValue.showSaveForm,
+  });
+  const tg = useI18NPrefix('global');
 
   useMount(
     () => {
@@ -226,18 +250,38 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 
   const saveChart = useCallback(async () => {
     if (container === 'dataChart') {
-      await dispatch(
-        updateChartAction({
-          name: backendChart?.name,
-          viewId: dataview?.id,
-          graphId: chart?.meta?.id,
-          chartId: dataChartId,
-          index: 0,
-          parentId: 0,
-          aggregation: aggregation,
-        }),
-      );
-      onSaveInDataChart?.(orgId, dataChartId);
+      if (dataChartId) {
+        await dispatch(
+          updateChartAction({
+            name: backendChart?.name,
+            viewId: dataview?.id,
+            graphId: chart?.meta?.id,
+            chartId: dataChartId,
+            index: 0,
+            parentId: 0,
+            aggregation: aggregation,
+          }),
+        );
+        onSaveInDataChart?.(orgId, dataChartId);
+      } else {
+        addVizFn({
+          vizType: 'DATACHART',
+          type: CommonFormTypes.Add,
+          visible: true,
+          initialValues: {
+            config: JSON.stringify({
+              aggregation,
+              chartConfig: chartConfig,
+              chartGraphId: chart?.meta?.id,
+              computedFields: dataview?.computedFields,
+            }),
+            viewId: dataview?.id,
+          },
+          callback: folder => {
+            folder && history.go(-1);
+          },
+        });
+      }
     } else if (container === 'widget') {
       if (chartType === 'widgetChart') {
         saveToWidget();
@@ -278,6 +322,10 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     chartType,
     saveToWidget,
     aggregation,
+    addVizFn,
+    chartConfig,
+    dataview?.computedFields,
+    history,
   ]);
 
   const registerChartEvents = chart => {
@@ -333,27 +381,38 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       }),
     );
   };
-
   return (
     <StyledChartWorkbenchPage>
-      <ChartWorkbench
-        header={{
-          name: backendChart?.name || originChart?.name,
-          onSaveChart: saveChart,
-          onGoBack: () => {
-            onClose?.();
-          },
-          onChangeAggregation: handleAggregationState,
-        }}
-        aggregation={aggregation}
-        chart={chart}
-        dataset={dataset}
-        dataview={dataview}
-        chartConfig={chartConfig}
-        onChartChange={handleChartChange}
-        onChartConfigChange={handleChartConfigChange}
-        onDataViewChange={handleDataViewChanged}
-      />
+      <SaveFormContext.Provider value={saveFormContextValue}>
+        <ChartWorkbench
+          header={{
+            name: backendChart?.name || originChart?.name,
+            onSaveChart: saveChart,
+            onGoBack: () => {
+              onClose?.();
+            },
+            onChangeAggregation: handleAggregationState,
+          }}
+          aggregation={aggregation}
+          chart={chart}
+          dataset={dataset}
+          dataview={dataview}
+          chartConfig={chartConfig}
+          defaultViewId={defaultViewId}
+          onChartChange={handleChartChange}
+          onChartConfigChange={handleChartConfigChange}
+          onDataViewChange={handleDataViewChanged}
+        />
+        <SaveForm
+          width={400}
+          formProps={{
+            labelAlign: 'left',
+            labelCol: { offset: 1, span: 6 },
+            wrapperCol: { span: 15 },
+          }}
+          okText={tg('button.save')}
+        />
+      </SaveFormContext.Provider>
     </StyledChartWorkbenchPage>
   );
 };
