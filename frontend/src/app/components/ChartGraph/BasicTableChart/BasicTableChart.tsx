@@ -108,38 +108,6 @@ class BasicTableChart extends ReactChart {
     this.adapter?.updated(tableOptions, context);
   }
 
-  getDataColumnWidths(options, context) {
-    const dataConfigs = options.config.datas || [];
-    const styleConfigs = options.config.styles || [];
-
-    const chartDataSet = transformToDataSet(
-      options.dataset.rows,
-      options.dataset.columns,
-      dataConfigs,
-    );
-
-    const mixedSectionConfigRows = dataConfigs
-      .filter(c => c.key === 'mixed')
-      .flatMap(config => config.rows || []);
-    this.dataColumnWidths = this.calcuteFieldsMaxWidth(
-      mixedSectionConfigRows,
-      chartDataSet as any,
-      chartDataSet,
-      context,
-    );
-    this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
-      (a, b) => a + b.columnWidthValue,
-      0,
-    );
-    this.exceedMaxContent = this.totalWidth >= context.width;
-    return this.getColumns(
-      mixedSectionConfigRows,
-      styleConfigs,
-      chartDataSet,
-      context,
-    );
-  }
-
   protected getOptions(
     context,
     dataset?: ChartDataSetDTO,
@@ -190,10 +158,7 @@ class BasicTableChart extends ReactChart {
     return {
       rowKey: 'id',
       pagination: tablePagination,
-      dataSource: this.generateTableRowUniqId(
-        chartDataSet,
-        mixedSectionConfigRows,
-      ),
+      dataSource: Array.from(chartDataSet),
       columns: tableColumns,
       summaryFn: this.getTableSummaryFn(
         settingConfigs,
@@ -221,7 +186,39 @@ class BasicTableChart extends ReactChart {
     };
   }
 
-  getOddAndEvenStyle(styles) {
+  private getDataColumnWidths(options, context) {
+    const dataConfigs = options.config.datas || [];
+    const styleConfigs = options.config.styles || [];
+
+    const chartDataSet = transformToDataSet(
+      options.dataset.rows,
+      options.dataset.columns,
+      dataConfigs,
+    );
+
+    const mixedSectionConfigRows = dataConfigs
+      .filter(c => c.key === 'mixed')
+      .flatMap(config => config.rows || []);
+    this.dataColumnWidths = this.calcuteFieldsMaxWidth(
+      mixedSectionConfigRows,
+      chartDataSet as any,
+      chartDataSet,
+      context,
+    );
+    this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
+      (a, b) => a + b.columnWidthValue,
+      0,
+    );
+    this.exceedMaxContent = this.totalWidth >= context.width;
+    return this.getColumns(
+      mixedSectionConfigRows,
+      styleConfigs,
+      chartDataSet,
+      context,
+    );
+  }
+
+  private getOddAndEvenStyle(styles) {
     const [oddBgColor, oddFontColor, evenBgColor, evenFontColor] = getStyles(
       styles,
       ['tableBodyStyle'],
@@ -390,7 +387,7 @@ class BasicTableChart extends ReactChart {
         );
         const headerWidth = this.getTextWidth(
           context,
-          header?.label || getValueByColumnKey(header),
+          header?.label || getValueByColumnKey(c),
           headerFont?.fontWeight,
           headerFont?.fontSize,
           headerFont?.fontFamily,
@@ -426,22 +423,6 @@ class BasicTableChart extends ReactChart {
     return maxContentByFields.reduce((acc, cur: any) => {
       return Object.assign({}, acc, { ...cur });
     }, {});
-  }
-
-  protected generateTableRowUniqId(dataColumns, mixedSectionConfigRows) {
-    return (dataColumns || []).map(dc => {
-      const config = Object.assign({}, dc);
-      if (config.uid === null || config.uid === undefined) {
-        // config.uid = uuidv4();
-      }
-      mixedSectionConfigRows.forEach(mixed => {
-        config[getValueByColumnKey(mixed)] = toFormattedValue(
-          config[getValueByColumnKey(mixed)],
-          mixed.format,
-        );
-      });
-      return config;
-    });
   }
 
   protected getTableComponents(styleConfigs, widgetSpecialConfig) {
