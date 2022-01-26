@@ -22,7 +22,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG, SPACE_MD } from 'styles/StyleConstants';
@@ -38,7 +38,7 @@ const ChartPresentPanel: FC<{
   containerHeight?: number;
   containerWidth?: number;
   chart?: IChart;
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
 }> = memo(
   ({ containerHeight, containerWidth, chart, dataset, chartConfig }) => {

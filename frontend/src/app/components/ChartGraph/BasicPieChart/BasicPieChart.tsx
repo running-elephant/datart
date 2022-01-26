@@ -21,7 +21,7 @@ import {
   ChartDataSectionField,
   ChartDataSectionType,
 } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getExtraSeriesDataFormat,
@@ -89,7 +89,7 @@ class BasicPieChart extends Chart {
     this.chart?.resize(context);
   }
 
-  private getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const dataColumns = transformToObjectArray(dataset.rows, dataset.columns);
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];

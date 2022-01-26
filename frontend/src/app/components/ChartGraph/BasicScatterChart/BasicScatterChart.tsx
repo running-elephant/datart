@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getDataColumnMaxAndMin,
@@ -84,7 +84,7 @@ class BasicScatterChart extends Chart {
     this.chart?.resize(opt, context);
   }
 
-  private getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const objDataColumns = transformToObjectArray(
       dataset.rows,
       dataset.columns,

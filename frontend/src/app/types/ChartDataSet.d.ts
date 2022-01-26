@@ -1,4 +1,3 @@
-import { PageInfo } from '../pages/MainPage/pages/ViewPage/slice/types';
 /**
  * Datart
  *
@@ -17,22 +16,31 @@ import { PageInfo } from '../pages/MainPage/pages/ViewPage/slice/types';
  * limitations under the License.
  */
 
-class ChartDataset {
+import { PageInfo } from '../pages/MainPage/pages/ViewPage/slice/types';
+import { ChartDataConfig, ChartDataSectionField } from './ChartConfig';
+
+export interface IChartDataSetRow<T> extends Array<T> {
+  getCell(field: ChartDataSectionField): T;
+
+  getFieldIndex(field: ChartDataSectionField): number;
+}
+
+export interface IChartDataSet<T> extends Array<IChartDataSetRow<T>> {
+  getRow(rowIndex): IChartDataSetRow<T>;
+
+  getFieldIndex(field: ChartDataSectionField): number;
+
+  sortBy(dataConfigs: ChartDataConfig[]): void;
+}
+
+export type ChartDataSetDTO = {
   id?: string;
   name?: string;
   columns?: ChartDatasetMeta[];
   rows?: string[][];
   pageInfo?: ChartDatasetPageInfo;
   script?: string;
-
-  constructor(id, name) {
-    this.id = id;
-    this.name = name;
-    this.columns = [];
-    this.rows = [];
-    this.pageInfo = {};
-  }
-}
+};
 
 export type ChartDatasetPageInfo = Partial<PageInfo>;
 
@@ -42,4 +50,4 @@ export type ChartDatasetMeta = {
   primaryKey?: boolean;
 };
 
-export default ChartDataset;
+export default ChartDataSetDTO;

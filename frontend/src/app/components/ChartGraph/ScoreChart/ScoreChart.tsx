@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getStyles,
   getValue,
@@ -93,7 +93,7 @@ class ScoreChart extends Chart {
     this.chart?.resize(context);
   }
 
-  getOptions(dataset: ChartDataset, config: ChartConfig, context) {
+  getOptions(dataset: ChartDataSetDTO, config: ChartConfig, context) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const aggregateConfigs = dataConfigs

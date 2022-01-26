@@ -21,7 +21,7 @@ import {
   ChartDataSectionType,
   SortActionType,
 } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getCustomSortableColumns,
@@ -78,7 +78,7 @@ class PivotSheetChart extends ReactChart {
     }
   }
 
-  getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
+  getOptions(context, dataset?: ChartDataSetDTO, config?: ChartConfig) {
     if (!dataset || !config) {
       return {};
     }

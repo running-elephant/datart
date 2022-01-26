@@ -17,21 +17,19 @@
  */
 
 import { ChartConfig } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import {
   getColumnRenderName,
-  getCustomSortableColumns,
   getStyles,
   getUnusedHeaderRows,
   getValue,
   getValueByColumnKey,
-  transformToObjectArray,
+  transformToDataSet,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { Debugger } from 'utils/debugger';
 import { isEmptyArray, Omit } from 'utils/object';
-import { uuidv4 } from 'utils/utils';
 import ReactChart from '../models/ReactChart';
 import AntdTableWrapper from './AntdTableWrapper';
 import {
@@ -107,7 +105,7 @@ class BasicTableChart extends ReactChart {
 
   protected getOptions(
     context,
-    dataset?: ChartDataset,
+    dataset?: ChartDataSetDTO,
     config?: ChartConfig,
     widgetSpecialConfig?: any,
   ) {
@@ -118,12 +116,11 @@ class BasicTableChart extends ReactChart {
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
-
-    const objDataColumns = transformToObjectArray(
+    const chartDataSet = transformToDataSet(
       dataset.rows,
       dataset.columns,
+      dataConfigs,
     );
-    const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
 
     const mixedSectionConfigRows = dataConfigs
       .filter(c => c.key === 'mixed')
@@ -143,7 +140,7 @@ class BasicTableChart extends ReactChart {
 
     this.dataColumnWidths = this.calcuteFieldsMaxWidth(
       mixedSectionConfigRows,
-      dataColumns,
+      chartDataSet,
       styleConfigs,
       context,
     );
@@ -152,17 +149,17 @@ class BasicTableChart extends ReactChart {
       groupConfigs,
       aggregateConfigs,
       styleConfigs,
-      dataColumns,
+      chartDataSet,
     );
 
     return {
-      rowKey: 'uid',
+      rowKey: 'id',
       pagination: tablePagination,
-      dataSource: this.generateTableRowUniqId(dataColumns),
+      dataSource: this.generateTableRowUniqId(chartDataSet),
       columns: tableColumns,
       summaryFn: this.getTableSummaryFn(
         settingConfigs,
-        dataColumns,
+        chartDataSet,
         tableColumns,
         aggregateConfigs,
       ),
@@ -187,7 +184,7 @@ class BasicTableChart extends ReactChart {
 
   private getTableSummaryFn(
     settingConfigs,
-    dataColumns,
+    chartDataSet,
     tableColumns,
     aggregateConfigs,
   ) {
@@ -226,8 +223,8 @@ class BasicTableChart extends ReactChart {
               c => getValueByColumnKey(c) === k,
             );
             if (currentSummaryField) {
-              const total = dataColumns.map(
-                dc => dc?.[getValueByColumnKey(currentSummaryField)],
+              const total = Array.from(chartDataSet).map(dc =>
+                (dc as any).getCell(currentSummaryField),
               );
               return total.reduce((acc, cur) => acc + cur, 0);
             }
@@ -239,7 +236,7 @@ class BasicTableChart extends ReactChart {
 
   private calcuteFieldsMaxWidth(
     mixedSectionConfigRows,
-    dataColumns,
+    chartDataSet: IChartDataSet<string>,
     styleConfigs,
     context,
   ) {
@@ -262,8 +259,8 @@ class BasicTableChart extends ReactChart {
     const maxContentByFields = mixedSectionConfigRows.map(c => {
       const header = this.findHeader(c.uid, tableHeaders);
       const rowUniqKey = getValueByColumnKey(c);
-      const datas = dataColumns?.map(dc => {
-        const text = dc[rowUniqKey];
+      const datas = Array.from(chartDataSet)?.map(row => {
+        const text = row.getCell(c);
         let width = this.getTextWidth(
           context,
           text,
@@ -298,7 +295,7 @@ class BasicTableChart extends ReactChart {
 
       return {
         [this.rowNumberUniqKey]:
-          getRowNumberWidth(dataColumns?.length) +
+          getRowNumberWidth(chartDataSet?.length) +
           this.tablePadding * 2 +
           this.tableCellBorder * 2,
         [rowUniqKey]:
@@ -311,10 +308,10 @@ class BasicTableChart extends ReactChart {
     }, {});
   }
 
-  protected generateTableRowUniqId(dataColumns) {
-    return (dataColumns || []).map(dc => {
+  protected generateTableRowUniqId(chartDataSet) {
+    return Array.from(chartDataSet || []).map((dc: any) => {
       if (dc.uid === null || dc.uid === undefined) {
-        dc.uid = uuidv4();
+        // dc.uid = uuidv4();
       }
       return dc;
     });
@@ -428,7 +425,7 @@ class BasicTableChart extends ReactChart {
     groupConfigs,
     aggregateConfigs,
     styleConfigs,
-    dataColumns,
+    chartDataSet: IChartDataSet<string>,
   ) {
     const [
       enableRowNumber,
@@ -461,12 +458,16 @@ class BasicTableChart extends ReactChart {
       return null;
     };
 
-    const _getFlatColumns = (groupConfigs, aggregateConfigs, dataColumns) =>
+    const _getFlatColumns = (
+      groupConfigs,
+      aggregateConfigs,
+      chartDataSet: IChartDataSet<string>,
+    ) =>
       [...groupConfigs, ...aggregateConfigs].map(c => {
         const colName = c.colName;
         const columnRowSpans = (autoMergeFields || []).includes(c.uid)
-          ? dataColumns
-              ?.map(dc => dc[getValueByColumnKey(c)])
+          ? Array.from(chartDataSet)
+              ?.map(dc => dc.getCell(c))
               .reverse()
               .reduce((acc, cur, index, array) => {
                 if (array[index + 1] === cur) {
@@ -486,17 +487,18 @@ class BasicTableChart extends ReactChart {
                     { rowSpan: prevRowSpan + 1, nextRowSpan: 0 },
                   ]);
                 }
-              }, [])
+              }, [] as any[])
               .map(x => x.rowSpan)
               .reverse()
           : [];
 
         const colMaxWidth =
           this.dataColumnWidths?.[getValueByColumnKey(c)] || 100;
+
         return {
           sorter: true,
           title: getColumnRenderName(c),
-          dataIndex: getValueByColumnKey(c),
+          dataIndex: chartDataSet.getFieldIndex(c),
           key: getValueByColumnKey(c),
           aggregate: c?.aggregate,
           colName,
@@ -516,12 +518,11 @@ class BasicTableChart extends ReactChart {
             };
           },
           onCell: (record, rowIndex) => {
-            const cellValue = record[getValueByColumnKey(c)];
-
+            const cellValue = record.getCell(c);
             return {
               uid: c.uid,
               cellValue,
-              dataIndex: getValueByColumnKey(c),
+              dataIndex: record.getFieldIndex(c),
               ...this.registerTableCellEvents(
                 getValueByColumnKey(c),
                 cellValue,
@@ -547,12 +548,12 @@ class BasicTableChart extends ReactChart {
       groupConfigs,
       aggregateConfigs,
       tableHeaderStyles,
-      dataColumns,
+      chartDataSet: IChartDataSet<string>,
     ) => {
       const flattenedColumns = _getFlatColumns(
         groupConfigs,
         aggregateConfigs,
-        dataColumns,
+        chartDataSet,
       );
 
       const groupedHeaderColumns =
@@ -582,14 +583,14 @@ class BasicTableChart extends ReactChart {
 
     return !tableHeaderStyles || tableHeaderStyles.length === 0
       ? rowNumbers.concat(
-          _getFlatColumns(groupConfigs, aggregateConfigs, dataColumns),
+          _getFlatColumns(groupConfigs, aggregateConfigs, chartDataSet),
         )
       : rowNumbers.concat(
           _getGroupColumns(
             groupConfigs,
             aggregateConfigs,
             tableHeaderStyles,
-            dataColumns,
+            chartDataSet,
           ),
         );
   }

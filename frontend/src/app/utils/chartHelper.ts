@@ -17,6 +17,7 @@
  */
 
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
+import { ChartDataSet } from 'app/components/ChartGraph/models/ChartDataSet';
 import {
   AggregateFieldActionType,
   ChartConfig,
@@ -28,7 +29,7 @@ import {
   SortActionType,
 } from 'app/types/ChartConfig';
 import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
-import { ChartDatasetMeta } from 'app/types/ChartDataset';
+import { ChartDatasetMeta, IChartDataSet } from 'app/types/ChartDataSet';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { Debugger } from 'utils/debugger';
@@ -460,6 +461,36 @@ export function getNameTextStyle(fontFamily, fontSize, color) {
   };
 }
 
+/**
+ * Create ChartDataSet Model with sorted values
+ * @export
+ * @template T
+ * @param {T[][]} [datas]
+ * @param {ChartDatasetMeta[]} [metas]
+ * @param {ChartDataConfig[]} [sortedConfigs]
+ * @return {*}  {IChartDataSet<T>}
+ */
+export function transformToDataSet<T>(
+  datas?: T[][],
+  metas?: ChartDatasetMeta[],
+  sortedConfigs?: ChartDataConfig[],
+): IChartDataSet<T> {
+  const ds = new ChartDataSet(datas, metas);
+  ds.sortBy(sortedConfigs || []);
+  return ds;
+}
+
+/**
+ * @deprecated shoule use DataSet model, @see {@link transformToDataSet}
+ * @description
+ * Support:
+ *  1. Case Insensitive to get value
+ *  2. More util helper
+ * @export
+ * @param {string[][]} [columns]
+ * @param {ChartDatasetMeta[]} [metas]
+ * @return {*}
+ */
 export function transformToObjectArray(
   columns?: string[][],
   metas?: ChartDatasetMeta[],

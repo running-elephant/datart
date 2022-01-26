@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
@@ -93,7 +93,7 @@ class BasicBarChart extends Chart {
     this.chart?.resize({ width: context?.width, height: context?.height });
   }
 
-  getOptions(dataset: ChartDataset, config: ChartConfig) {
+  getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const settingConfigs = config.settings;

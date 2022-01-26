@@ -26,7 +26,7 @@ import { ExecuteToken } from 'app/pages/SharePage/slice/types';
 import ChartDataRequest, {
   transformToViewConfig,
 } from 'app/types/ChartDataRequest';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
 import { request, requestWithHeader } from 'utils/request';
@@ -55,7 +55,7 @@ export const getDistinctFields = async (
     ...viewConfigs,
   };
   if (executeToken) {
-    const { data } = await request<ChartDataset>({
+    const { data } = await request<ChartDataSetDTO>({
       method: 'POST',
       url: `share/execute`,
       params: {
@@ -66,7 +66,7 @@ export const getDistinctFields = async (
     });
     return filterSqlOperatorName(requestParams, data);
   } else {
-    const { data } = await request<ChartDataset>({
+    const { data } = await request<ChartDataSetDTO>({
       method: 'POST',
       url: `data-provider/execute`,
       data: requestParams,

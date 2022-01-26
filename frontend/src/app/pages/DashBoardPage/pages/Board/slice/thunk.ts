@@ -21,7 +21,7 @@ import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widge
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { shareActions } from 'app/pages/SharePage/slice';
 import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
 import { request } from 'utils/request';
@@ -369,7 +369,7 @@ export const getControllerOptions = createAsyncThunk<
     let widgetData;
     try {
       if (executeToken && renderMode !== 'read') {
-        const { data } = await request<ChartDataset>({
+        const { data } = await request<ChartDataSetDTO>({
           method: 'POST',
           url: `share/execute`,
           params: {

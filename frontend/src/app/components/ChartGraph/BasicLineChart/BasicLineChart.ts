@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getAxisLabel,
   getAxisLine,
@@ -97,7 +97,7 @@ class BasicLineChart extends Chart {
     this.chart?.dispose();
   }
 
-  private getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const settingConfigs = config.settings;

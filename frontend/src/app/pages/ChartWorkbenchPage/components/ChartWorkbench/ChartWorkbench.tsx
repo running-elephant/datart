@@ -22,7 +22,7 @@ import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDat
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
@@ -35,7 +35,7 @@ import ChartHeaderPanel from '../ChartHeaderPanel';
 import ChartOperationPanel from '../ChartOperationPanel';
 
 const ChartWorkbench: FC<{
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   dataview?: ChartDataView;
   chartConfig?: ChartConfig;
   chart?: IChart;

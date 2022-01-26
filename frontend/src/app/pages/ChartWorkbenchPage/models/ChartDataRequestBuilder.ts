@@ -31,7 +31,7 @@ import {
   ChartDataRequestFilter,
   transformToViewConfig,
 } from 'app/types/ChartDataRequest';
-import { ChartDatasetPageInfo } from 'app/types/ChartDataset';
+import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { getValue } from 'app/utils/chartHelper';
 import {

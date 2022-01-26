@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getAxisLabel,
   getAxisLine,
@@ -87,7 +87,7 @@ class BasicDoubleYChart extends Chart {
     this.chart?.resize(context);
   }
 
-  private getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings;

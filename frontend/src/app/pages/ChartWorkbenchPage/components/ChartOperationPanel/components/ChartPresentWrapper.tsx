@@ -20,7 +20,7 @@ import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { FC, memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
@@ -31,7 +31,7 @@ const ChartPresentWrapper: FC<{
   containerHeight?: number;
   containerWidth?: number;
   chart?: IChart;
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
   onChartChange: (c: IChart) => void;
 }> = memo(

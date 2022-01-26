@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { init } from 'echarts';
 import Chart from '../models/Chart';
 import Config from './config';
@@ -124,7 +124,7 @@ class BasicRadarChart extends Chart {
     this.chart?.resize(context);
   }
 
-  getOptions(dataset: ChartDataset, config: ChartConfig) {
+  getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     return this.option;
   }
 }

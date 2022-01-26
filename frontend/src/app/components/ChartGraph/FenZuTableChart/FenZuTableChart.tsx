@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getCustomSortableColumns,
   transformToObjectArray,
@@ -45,7 +45,7 @@ class FenZuTableChart extends BasicTableChart {
 
   getOptions(
     context,
-    dataset?: ChartDataset,
+    dataset?: ChartDataSetDTO,
     config?: ChartConfig,
     widgetSpecialConfig?: any,
   ) {

@@ -284,6 +284,9 @@ const balanceAssignConfigRows = sources => {};
 
 // 兼容 impala 聚合函数小写问题
 export const filterSqlOperatorName = (requestParams, widgetData) => {
+  return widgetData;
+
+
   const sqlOperatorNameList = requestParams.aggregators.map(({ sqlOperator }) =>
     sqlOperator.toLocaleLowerCase(),
   );

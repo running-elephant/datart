@@ -21,7 +21,7 @@ import { Col, Menu, Radio, Row, Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import DraggableList from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/SortAction/DraggableList';
 import { ChartDataSectionField, SortActionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getValueByColumnKey,
   transformToObjectArray,
@@ -33,7 +33,7 @@ import { isEmpty } from 'utils/object';
 
 const SortAction: FC<{
   config: ChartDataSectionField;
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   onConfigChange: (
     config: ChartDataSectionField,
     needRefresh?: boolean,
