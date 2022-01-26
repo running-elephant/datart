@@ -22,12 +22,13 @@ import {
   Dashboard,
   DashboardConfig,
   DataChart,
+  DeviceType,
   ServerDashboard,
   ServerDatachart,
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { View } from "app/types/View";
 import { ChartDataView } from 'app/types/ChartDataView';
+import { View } from 'app/types/View';
 import { transformMeta } from 'app/utils/chartHelper';
 import {
   AutoBoardWidgetBackgroundDefault,
@@ -136,6 +137,7 @@ export const getInitBoardInfo = (obj: {
       type: 'add',
       widgetId: '',
     },
+    deviceType: DeviceType.Desktop,
     needFetchItems: [],
     hasFetchItems: [],
     boardWidthHeight: [0, 0],

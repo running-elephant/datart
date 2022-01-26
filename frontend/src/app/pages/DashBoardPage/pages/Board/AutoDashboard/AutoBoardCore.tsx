@@ -19,7 +19,7 @@
 import { Empty } from 'antd';
 import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
-import { BREAK_POINTS } from 'app/pages/DashBoardPage/constants';
+import { BREAK_POINTS, LAYOUT_COLS } from 'app/pages/DashBoardPage/constants';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import {
@@ -41,7 +41,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Layout, Responsive, WidthProvider } from 'react-grid-layout';
+import { Layout, Layouts, Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
@@ -61,7 +61,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
     );
 
     const {
-      config: { margin, containerPadding, cols, background },
+      config: { margin, containerPadding, background },
     } = useMemo(() => {
       return dashBoard as Dashboard;
     }, [dashBoard]);
@@ -82,17 +82,46 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
       selectLayoutWidgetInfoMapById(state, boardId),
     );
 
-    const [lgLayout, setLgLayout] = useState<Layout[]>([]);
-    useEffect(() => {
-      const layout: Layout[] = [];
-      layoutWidgets.forEach(widget => {
-        const { x, y, width: w, height: h } = widget.config.rect;
-        layout.push({ i: widget.id, x, y, w, h });
-      });
-      setLgLayout(layout);
-    }, [layoutWidgets]);
+    const [layoutMap, setLayoutMap] = useState<Layouts>({});
 
     let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
+
+    const currentLayout = useRef<Layout[]>([]);
+
+    const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
+
+    const { gridRef } = useBoardWidthHeight();
+
+    const { ref, widgetRowHeight } = useWidgetRowHeight();
+
+    const scrollThrottle = useRef(false);
+
+    useEffect(() => {
+      const layoutMap: Layouts = {
+        lg: [],
+        xs: [],
+      };
+      layoutWidgets.forEach(widget => {
+        const lg = widget.config.rect || widget.config.mobileRect || {};
+        const xs = widget.config.mobileRect || widget.config.rect || {};
+        layoutMap.lg.push({
+          i: widget.id,
+          x: lg.x,
+          y: lg.y,
+          w: lg.width,
+          h: lg.height,
+        });
+        layoutMap.xs.push({
+          i: widget.id,
+          x: xs.x,
+          y: xs.y,
+          w: xs.width,
+          h: xs.height,
+        });
+      });
+      setLayoutMap(layoutMap);
+    }, [layoutWidgets]);
+
     useEffect(() => {
       const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
       if (layoutWidgetInfos.length) {
@@ -102,9 +131,6 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
         }));
       }
     }, [layoutWidgetInfoMap]);
-    const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
-    const currentLayout = useRef<Layout[]>([]);
-    const { ref, widgetRowHeight } = useWidgetRowHeight();
 
     const calcItemTop = useCallback(
       (id: string) => {
@@ -114,7 +140,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
       },
       [margin, widgetRowHeight],
     );
-    const scrollThrottle = useRef(false);
+
     const lazyLoad = useCallback(() => {
       if (!gridWrapRef.current) return;
       if (!scrollThrottle.current) {
@@ -145,12 +171,9 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
         scrollThrottle.current = true;
       }
     }, [calcItemTop, renderedWidgetById]);
-    const WidgetConfigsLen = useMemo(() => {
-      return layoutWidgets.length;
-    }, [layoutWidgets]);
 
     useEffect(() => {
-      if (WidgetConfigsLen && gridWrapRef.current) {
+      if (layoutWidgets.length && gridWrapRef.current) {
         lazyLoad();
         gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
         gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
@@ -162,11 +185,12 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
         gridWrapRef?.current?.removeEventListener('scroll', lazyLoad, false);
         window.removeEventListener('resize', lazyLoad, false);
       };
-    }, [WidgetConfigsLen, lazyLoad]);
+    }, [layoutWidgets.length, lazyLoad]);
 
-    const onLayoutChange = useCallback((layouts: Layout[]) => {
+    const onLayoutChange = useCallback((layouts: Layout[], all) => {
       currentLayout.current = layouts;
     }, []);
+
     const boardChildren = useMemo(() => {
       return layoutWidgets.map(item => {
         return (
@@ -178,8 +202,9 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
         );
       });
     }, [layoutWidgets]);
-
-    const { gridRef } = useBoardWidthHeight();
+    const onBreakpointChange = value => {
+      console.log('_Breakpoint', value);
+    };
 
     return (
       <Wrap>
@@ -188,13 +213,14 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
             <div className="grid-wrap" ref={gridWrapRef}>
               <div className="grid-wrap" ref={gridRef}>
                 <ResponsiveGridLayout
-                  layouts={{ lg: lgLayout }}
+                  layouts={layoutMap}
                   breakpoints={BREAK_POINTS}
                   margin={margin}
                   containerPadding={containerPadding}
-                  cols={cols}
+                  cols={LAYOUT_COLS}
                   rowHeight={widgetRowHeight}
                   onLayoutChange={onLayoutChange}
+                  onBreakpointChange={onBreakpointChange}
                   isDraggable={false}
                   isResizable={false}
                   measureBeforeMount={false}
@@ -217,9 +243,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
 
 const Wrap = styled.div`
   display: flex;
-
   flex: 1;
-
   flex-direction: column;
   width: 100%;
   min-height: 0;

@@ -737,7 +737,8 @@
         "redo": "Redo",
         "delete": "Delete",
         "copy": "Copy",
-        "paste": "Paste"
+        "paste": "Paste",
+        "deviceSwitch": "Device Switch"
       },
       "controlTypes": {
         "common": "Common",

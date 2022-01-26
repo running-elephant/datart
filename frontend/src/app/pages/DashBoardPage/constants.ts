@@ -36,8 +36,8 @@ export const LAYOUT_COLS = {
   lg: 12,
   md: 12,
   sm: 12,
-  xs: 2,
-  xxs: 2,
+  xs: 6,
+  xxs: 6,
 };
 /** lg: 12,md: 10,sm: 6,xs: 4,xxs: 2 */
 
@@ -49,6 +49,19 @@ export const BREAK_POINTS = {
   xxs: 0,
 };
 export const INIT_COLS = 12;
+export const DEVICE_LIST = {
+  '华为 Mate 30': [360, 780],
+  '华为 Mate 30 Pro': [392, 800],
+  '小米 12': [393, 851],
+  'iPhone X': [375, 812],
+  'iPhone XR': [414, 896],
+  'iPhone 12 Pro': [390, 844],
+  'iPhone SE': [375, 667],
+  'Pixel 5': [393, 851],
+  'Samsung Galaxy S8+': [360, 740],
+  'iPad Mini': [768, 1024],
+  custom: null,
+};
 
 // DASH_UNDO
 export const BOARD_UNDO = {

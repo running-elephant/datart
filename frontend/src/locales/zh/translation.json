@@ -737,7 +737,8 @@
         "redo": "重做",
         "delete": "删除",
         "copy": "复制",
-        "paste": "粘贴"
+        "paste": "粘贴",
+        "deviceSwitch": "设备切换"
       },
       "controlTypes": {
         "common": "常规",
