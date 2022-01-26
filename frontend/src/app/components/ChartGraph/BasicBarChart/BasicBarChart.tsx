@@ -17,19 +17,18 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
-  getCustomSortableColumns,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
-  getReference,
+  getReference2,
   getSeriesTooltips4Rectangular2,
   getStyles,
   getValueByColumnKey,
-  transformToObjectArray,
+  transformToDataSet,
 } from 'app/utils/chartHelper';
 import { toFormattedValue, toPrecision } from 'app/utils/number';
 import { init } from 'echarts';
@@ -93,7 +92,7 @@ class BasicBarChart extends Chart {
     this.chart?.resize({ width: context?.width, height: context?.height });
   }
 
-  getOptions(dataset: ChartDataset, config: ChartConfig) {
+  getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const settingConfigs = config.settings;
@@ -110,16 +109,17 @@ class BasicBarChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
-    const objDataColumns = transformToObjectArray(
+    const chartDataSet = transformToDataSet(
       dataset.rows,
       dataset.columns,
+      dataConfigs,
     );
-    const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
+
     const xAxisColumns = (groupConfigs || []).map(config => {
       return {
         type: 'category',
         tooltip: { show: true },
-        data: UniqArray(dataColumns.map(dc => dc[getValueByColumnKey(config)])),
+        data: UniqArray(Array.from(chartDataSet).map(dc => dc.getCell(config))),
       };
     });
     const yAxisNames = aggregateConfigs.map(getColumnRenderName);
@@ -127,7 +127,7 @@ class BasicBarChart extends Chart {
       settingConfigs,
       styleConfigs,
       colorConfigs,
-      dataColumns,
+      chartDataSet,
       groupConfigs,
       aggregateConfigs,
       infoConfigs,
@@ -185,7 +185,7 @@ class BasicBarChart extends Chart {
     settingConfigs,
     styleConfigs,
     colorConfigs,
-    dataColumns,
+    chartDataSet: IChartDataSet<string>,
     groupConfigs,
     aggregateConfigs,
     infoConfigs,
@@ -202,15 +202,15 @@ class BasicBarChart extends Chart {
           ...this.getBarSeiesImpl(
             styleConfigs,
             settingConfigs,
-            dataColumns,
+            chartDataSet,
             aggConfig,
           ),
           name: getColumnRenderName(aggConfig),
-          data: dataColumns.map(dc => ({
+          data: Array.from(chartDataSet).map(dc => ({
             ...getExtraSeriesRowData(dc),
             ...getExtraSeriesDataFormat(aggConfig?.format),
             name: getColumnRenderName(aggConfig),
-            value: dc[getValueByColumnKey(aggConfig)],
+            value: dc.getCell(aggConfig),
           })),
         };
       });
@@ -218,7 +218,7 @@ class BasicBarChart extends Chart {
     }
 
     const secondGroupInfos = getColorizeGroupSeriesColumns(
-      dataColumns,
+      chartDataSet,
       colorColumnName,
       xAxisColumnName,
       yAxisColumnNames,
@@ -238,7 +238,7 @@ class BasicBarChart extends Chart {
           ...this.getBarSeiesImpl(
             styleConfigs,
             settingConfigs,
-            dataColumns,
+            chartDataSet,
             sgCol,
           ),
           name: k,
@@ -263,7 +263,7 @@ class BasicBarChart extends Chart {
   private getBarSeiesImpl(
     styleConfigs,
     settingConfigs,
-    dataColumns,
+    chartDataSet: IChartDataSet<string>,
     dataConfig,
   ) {
     return {
@@ -276,9 +276,9 @@ class BasicBarChart extends Chart {
       }),
       ...this.getLabelStyle(styleConfigs),
       ...this.getSeriesStyle(styleConfigs),
-      ...getReference(
+      ...getReference2(
         settingConfigs,
-        dataColumns,
+        chartDataSet,
         dataConfig,
         this.isHorizionDisplay,
       ),

@@ -18,7 +18,7 @@
 import { ChartEditorProps } from 'app/components/ChartEditor';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
-import { ChartDatasetMeta } from 'app/types/ChartDataset';
+import { ChartDatasetMeta } from 'app/types/ChartDataSet';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,

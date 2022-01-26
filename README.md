@@ -52,7 +52,7 @@ datart 可作为独立平台使用，但不仅限于此，为了更好支持快�
 ![](https://running-elephant.github.io/datart-docs/images/about/wechat-group.jpeg)
 
 #### 插件示例仓库
-[示例仓库 v1.0.0](https://github.com/running-elephan/datart-extension-charts)
+[示例仓库 v1.0.0](https://github.com/running-elephant/datart-extension-charts)
 
 ### 参与贡献 Contributing
 非常欢迎和感谢参与贡献，如何参与可参见 [Contributing]()

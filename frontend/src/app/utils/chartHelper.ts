@@ -17,6 +17,7 @@
  */
 
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
+import { ChartDataSet } from 'app/components/ChartGraph/models/ChartDataSet';
 import {
   AggregateFieldActionType,
   ChartConfig,
@@ -28,7 +29,7 @@ import {
   SortActionType,
 } from 'app/types/ChartConfig';
 import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
-import { ChartDatasetMeta } from 'app/types/ChartDataset';
+import { ChartDatasetMeta, IChartDataSet } from 'app/types/ChartDataSet';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { DATARTSEPERATOR } from 'globalConstants';
@@ -248,6 +249,29 @@ export function getReference(
   };
 }
 
+export function getReference2(
+  settingConfigs,
+  chartDataSet: IChartDataSet<string>,
+  dataConfig,
+  isHorizionDisplay,
+) {
+  const referenceTabs = getSettingValue(
+    settingConfigs,
+    'reference.panel.configuration',
+    'rows',
+  );
+
+  return {
+    markLine: getMarkLine2(
+      referenceTabs,
+      chartDataSet,
+      dataConfig,
+      isHorizionDisplay,
+    ),
+    markArea: getMarkArea2(referenceTabs, chartDataSet, isHorizionDisplay),
+  };
+}
+
 function getMarkLine(refTabs, dataColumns, dataConfig, isHorizionDisplay) {
   const markLineData = refTabs
     ?.reduce((acc, cur) => {
@@ -325,6 +349,157 @@ function getMarkLineData(
       ...font,
     },
     lineStyle,
+  };
+}
+
+function getMarkLine2(
+  refTabs,
+  chartDataSet: IChartDataSet<string>,
+  dataConfig,
+  isHorizionDisplay,
+) {
+  const markLineData = refTabs
+    ?.reduce((acc, cur) => {
+      const markLineConfigs = cur?.rows?.filter(r => r.key === 'markLine');
+      acc.push(...markLineConfigs);
+      return acc;
+    }, [])
+    .map(ml => {
+      return getMarkLineData2(
+        ml,
+        chartDataSet,
+        'valueType',
+        'constantValue',
+        'metric',
+        dataConfig,
+        isHorizionDisplay,
+      );
+    })
+    .filter(Boolean);
+
+  return {
+    data: markLineData,
+  };
+}
+
+function getMarkLineData2(
+  mark,
+  chartDataSet: IChartDataSet<string>,
+  valueTypeKey,
+  constantValueKey,
+  metricKey,
+  dataConfig,
+  isHorizionDisplay,
+) {
+  const name = mark.label;
+  const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
+  const show = getSettingValue(mark.rows, 'showLabel', 'value');
+  const enableMarkLine = getSettingValue(mark.rows, 'enableMarkLine', 'value');
+  const position = getSettingValue(mark.rows, 'position', 'value');
+  const font = getSettingValue(mark.rows, 'font', 'value');
+  const lineStyle = getSettingValue(mark.rows, 'lineStyle', 'value');
+  const valueType = getSettingValue(mark.rows, valueTypeKey, 'value');
+  const metricUid = getSettingValue(mark.rows, metricKey, 'value');
+
+  const metricDatas =
+    dataConfig.uid === metricUid
+      ? Array.from(chartDataSet).map(d => +d.getCell(dataConfig))
+      : [];
+  const constantValue = getSettingValue(mark.rows, constantValueKey, 'value');
+  let yAxis = 0;
+  switch (valueType) {
+    case 'constant':
+      yAxis = constantValue;
+      break;
+    case 'average':
+      yAxis = meanValue(metricDatas);
+      break;
+    case 'max':
+      yAxis = Math.max(...metricDatas);
+      break;
+    case 'min':
+      yAxis = Math.min(...metricDatas);
+      break;
+  }
+
+  if (!enableMarkLine) {
+    return null;
+  }
+
+  return {
+    [valueKey]: yAxis,
+    name,
+    label: {
+      show,
+      position,
+      ...font,
+    },
+    lineStyle,
+  };
+}
+
+function getMarkAreaData2(
+  mark,
+  chartDataSet: IChartDataSet<string>,
+  valueTypeKey,
+  constantValueKey,
+  metricKey,
+  isHorizionDisplay,
+) {
+  const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
+  const show = getSettingValue(mark.rows, 'showLabel', 'value');
+  const enableMarkArea = getSettingValue(mark.rows, 'enableMarkArea', 'value');
+  const position = getSettingValue(mark.rows, 'position', 'value');
+  const font = getSettingValue(mark.rows, 'font', 'value');
+  const borderStyle = getSettingValue(mark.rows, 'borderStyle', 'value');
+  const opacity = getSettingValue(mark.rows, 'opacity', 'value');
+  const backgroundColor = getSettingValue(
+    mark.rows,
+    'backgroundColor',
+    'value',
+  );
+  const name = mark.value;
+  const valueType = getSettingValue(mark.rows, valueTypeKey, 'value');
+  const metric = getSettingValue(mark.rows, metricKey, 'value');
+  const metricDatas = Array.from(chartDataSet).map(
+    d => +d.getCellByKey(metric),
+  );
+  const constantValue = getSettingValue(mark.rows, constantValueKey, 'value');
+  let yAxis = 0;
+  switch (valueType) {
+    case 'constant':
+      yAxis = constantValue;
+      break;
+    case 'average':
+      yAxis = meanValue(metricDatas);
+      break;
+    case 'max':
+      yAxis = Math.max(...metricDatas);
+      break;
+    case 'min':
+      yAxis = Math.min(...metricDatas);
+      break;
+  }
+
+  if (!enableMarkArea) {
+    return null;
+  }
+
+  return {
+    [valueKey]: yAxis,
+    name,
+    label: {
+      show,
+      position,
+      ...font,
+    },
+    itemStyle: {
+      opacity,
+      color: backgroundColor,
+      borderColor: borderStyle.color,
+      borderWidth: borderStyle.width,
+      borderType: borderStyle.type,
+    },
   };
 }
 
@@ -418,6 +593,37 @@ function getMarkArea(refTabs, dataColumns, isHorizionDisplay) {
   };
 }
 
+function getMarkArea2(
+  refTabs,
+  chartDataSet: IChartDataSet<string>,
+  isHorizionDisplay,
+) {
+  const refAreas = refTabs?.reduce((acc, cur) => {
+    const markLineConfigs = cur?.rows?.filter(r => r.key === 'markArea');
+    acc.push(...markLineConfigs);
+    return acc;
+  }, []);
+  return {
+    data: refAreas
+      ?.map(mark => {
+        const markAreaData = ['start', 'end']
+          .map(prefix => {
+            return getMarkAreaData2(
+              mark,
+              chartDataSet,
+              `${prefix}ValueType`,
+              `${prefix}ConstantValue`,
+              `${prefix}Metric`,
+              isHorizionDisplay,
+            );
+          })
+          .filter(Boolean);
+        return markAreaData;
+      })
+      .filter(m => Boolean(m?.length)),
+  };
+}
+
 export function getAxisLine(show, lineStyle) {
   return {
     show,
@@ -461,6 +667,36 @@ export function getNameTextStyle(fontFamily, fontSize, color) {
   };
 }
 
+/**
+ * Create ChartDataSet Model with sorted values
+ * @export
+ * @template T
+ * @param {T[][]} [datas]
+ * @param {ChartDatasetMeta[]} [metas]
+ * @param {ChartDataConfig[]} [sortedConfigs]
+ * @return {*}  {IChartDataSet<T>}
+ */
+export function transformToDataSet<T>(
+  datas?: T[][],
+  metas?: ChartDatasetMeta[],
+  sortedConfigs?: ChartDataConfig[],
+): IChartDataSet<T> {
+  const ds = new ChartDataSet(datas, metas);
+  ds.sortBy(sortedConfigs || []);
+  return ds;
+}
+
+/**
+ * @deprecated shoule use DataSet model, @see {@link transformToDataSet}
+ * @description
+ * Support:
+ *  1. Case Insensitive to get value
+ *  2. More util helper
+ * @export
+ * @param {string[][]} [columns]
+ * @param {ChartDatasetMeta[]} [metas]
+ * @return {*}
+ */
 export function transformToObjectArray(
   columns?: string[][],
   metas?: ChartDatasetMeta[],
@@ -813,29 +1049,32 @@ export function getExtraSeriesDataFormat(format?: IFieldFormatConfig) {
 }
 
 export function getColorizeGroupSeriesColumns(
-  dataColumns: any[],
+  chartDataSet: IChartDataSet<string>,
   groupByKey: string,
   xAxisColumnName: string,
   aggregateKeys: string[],
   infoColumnNames: string[],
 ) {
-  const groupedDataColumnObject = dataColumns.reduce((acc, cur) => {
-    const colKey = cur[groupByKey] || 'defaultGroupKey';
+  const groupedDataColumnObject = Array.from(chartDataSet).reduce(
+    (acc, cur) => {
+      const colKey = cur.getCellByKey(groupByKey) || 'defaultGroupKey';
 
-    if (!acc[colKey]) {
-      acc[colKey] = [];
-    }
-    const value = aggregateKeys
-      .concat([xAxisColumnName])
-      .concat(infoColumnNames || [])
-      .concat([groupByKey])
-      .reduce((a, k) => {
-        a[k] = cur[k];
-        return a;
-      }, {});
-    acc[colKey].push(value);
-    return acc;
-  }, {});
+      if (!acc[colKey]) {
+        acc[colKey] = [];
+      }
+      const value = aggregateKeys
+        .concat([xAxisColumnName])
+        .concat(infoColumnNames || [])
+        .concat([groupByKey])
+        .reduce((a, k) => {
+          a[k] = cur.getCellByKey(k);
+          return a;
+        }, {});
+      acc[colKey].push(value);
+      return acc;
+    },
+    {},
+  );
 
   let collection = [] as any;
   Object.entries(groupedDataColumnObject).forEach(([k, v]) => {

@@ -21,7 +21,7 @@ import {
   ChartDataSectionField,
   ChartDataSectionType,
 } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getExtraSeriesDataFormat,
@@ -91,7 +91,7 @@ class BasicFunnelChart extends Chart {
     this.chart?.resize({ width: context?.width, height: context?.height });
   }
 
-  private getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs

@@ -1,6 +1,6 @@
 import { TreeNodeProps } from 'antd';
 import { ChartConfig } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { ReactElement } from 'react';
 
@@ -78,7 +78,7 @@ export interface ChartPreview {
   version?: string;
   backendChartId?: string;
   backendChart?: ChartDTO;
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
 }
 

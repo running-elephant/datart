@@ -22,7 +22,7 @@ import {
   ChartDataSectionField,
   ChartDataSectionFieldActionType,
 } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { ValueOf } from 'types';
 import useI18NPrefix, { I18NComponentProps } from './useI18NPrefix';
@@ -35,7 +35,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
   const getConent = (
     actionType,
     config?: ChartDataSectionField,
-    dataset?: ChartDataset,
+    dataset?: ChartDataSetDTO,
     dataView?: ChartDataView,
     dataConfig?: ChartDataConfig,
     onChange?,
@@ -90,7 +90,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
     actionType: ValueOf<typeof ChartDataSectionFieldActionType>,
     dataConfig: ChartDataConfig,
     onConfigChange,
-    dataset?: ChartDataset,
+    dataset?: ChartDataSetDTO,
     dataView?: ChartDataView,
     modalSize?: string,
     aggregation?: boolean,

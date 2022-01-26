@@ -22,14 +22,14 @@ import { ColorPicker } from 'app/components/ColorPicker/ColorTag';
 import { FormItemEx } from 'app/components/From';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 
 const ColorizeRangeAction: FC<{
   config: ChartDataSectionField;
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   onConfigChange: (
     config: ChartDataSectionField,
     needRefresh?: boolean,

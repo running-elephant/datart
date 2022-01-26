@@ -27,7 +27,7 @@ import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { ResourceTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataRequest from 'app/types/ChartDataRequest';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { View } from 'app/types/View';
@@ -68,7 +68,7 @@ export type WorkbenchState = {
   dateFormat: string;
   dataviews?: ChartDataView[];
   currentDataView?: ChartDataView;
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
   shadowChartConfig?: ChartConfig;
   backendChart?: ChartDTO;

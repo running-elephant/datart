@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getCustomSortableColumns,
@@ -85,7 +85,7 @@ class BasicRichText extends ReactChart {
     this.onUpdated(this.richTextOptions, context);
   }
 
-  getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
+  getOptions(context, dataset?: ChartDataSetDTO, config?: ChartConfig) {
     const { containerId, widgetSpecialConfig } = this.richTextOptions;
     if (!dataset || !config || !containerId) {
       return { dataList: [], id: '', isEditing: !!widgetSpecialConfig?.env };

@@ -20,7 +20,7 @@ import {
   AggregateFieldActionType,
   SortActionType,
 } from 'app/types/ChartConfig';
-import { ChartDatasetPageInfo } from 'app/types/ChartDataset';
+import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 
 export type ChartDataRequest = {
   viewId: string;
