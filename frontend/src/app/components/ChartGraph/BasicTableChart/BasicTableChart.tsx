@@ -714,11 +714,13 @@ class BasicTableChart extends ReactChart {
           {
             key: `${DATARTSEPERATOR}id`,
             title: context?.translator?.('viz.palette.graph.number'),
-            dataIndex: `${DATARTSEPERATOR}id`,
             width:
               this.dataColumnWidths?.[this.rowNumberUniqKey]
                 ?.columnWidthValue || 0,
             fixed: leftFixedColumns || rightFixedColumns ? 'left' : null,
+            render: (value, row, rowIndex) => {
+              return rowIndex + 1;
+            },
           } as any,
         ]
       : [];
