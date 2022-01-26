@@ -34,6 +34,10 @@ function findIndex(indexes, field: ChartDataSectionField) {
   return indexes?.[toKey(field)];
 }
 
+function findIndexByKey(indexes, key: string) {
+  return indexes?.[toCaseInsensitive(key)];
+}
+
 function toKey(field: ChartDataSectionField) {
   return toCaseInsensitive(getValueByColumnKey(field));
 }
@@ -118,6 +122,10 @@ export class DataSetRow<T> extends Array<T> implements IChartDataSetRow<T> {
 
   public getCell(field: ChartDataSectionField) {
     return this?.[findIndex(this.columnIndexTable, field)] as T;
+  }
+
+  public getCellByKey(key: string) {
+    return this?.[findIndexByKey(this.columnIndexTable, key)] as T;
   }
 
   public getFieldIndex(field: ChartDataSectionField) {
