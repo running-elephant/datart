@@ -160,11 +160,6 @@ class BasicTableChart extends ReactChart {
       context,
     );
 
-    console.log(
-      `chartDataSet.map(row => row.convertToObject()) ---> `,
-      chartDataSet.map(row => row.convertToObject()),
-    );
-
     return {
       rowKey: 'id',
       pagination: tablePagination,
