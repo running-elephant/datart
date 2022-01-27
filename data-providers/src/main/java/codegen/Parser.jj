@@ -3811,6 +3811,7 @@ SqlNode AtomicRowExpression() :
     |
         e = MultisetConstructor()
     |
+        LOOKAHEAD(ArrayConstructor())
         e = ArrayConstructor()
     |
         LOOKAHEAD(3)
@@ -4343,7 +4344,7 @@ SqlNode ArrayConstructor() :
         LOOKAHEAD(1)
         <LPAREN>
         // by sub query "MULTISET(SELECT * FROM T)"
-        e = LeafQueryOrExpr(ExprContext.ACCEPT_QUERY)
+        e = LeafQueryOrExpr(ExprContext.ACCEPT_ALL) // [datart]
         <RPAREN>
         {
             return SqlStdOperatorTable.ARRAY_QUERY.createCall(
@@ -6032,6 +6033,8 @@ List<SqlNode> JsonNameAndValue() :
                 throw SqlUtil.newContextException(getPos(), RESOURCE.illegalColon());
             }
         }
+    // [datart] support   JSON_OBJECT('id', 87, 'name', 'carrot');
+    | <COMMA>
     )
     e = Expression(ExprContext.ACCEPT_NON_QUERY) {
         list.add(e);
@@ -6631,6 +6634,8 @@ String KeywordFunctionNameSupport() :
     |   <TIME>
     |   <TIMESTAMP>
     |   <INSERT>
+    |   <CONVERT>
+    |   <ARRAY>
     )
     {
         return unquotedIdentifier();
