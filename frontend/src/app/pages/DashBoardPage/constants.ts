@@ -31,6 +31,8 @@ export const STORAGE_IMAGE_KEY_PREFIX = 'DATART_IMAGE_';
 export const BASE_VIEW_WIDTH = 1024;
 export const BASE_ROW_HEIGHT = 32;
 export const MIN_ROW_HEIGHT = 24;
+export const MIN_MARGIN = 8;
+export const MIN_PADDING = 8;
 /** lg: 12,md: 12,sm: 8,xs: 2,xxs: 2 */
 export const LAYOUT_COLS_MAP = {
   lg: 12,

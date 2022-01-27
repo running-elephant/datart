@@ -86,20 +86,22 @@ export interface DashboardConfig {
     boxShadow?: boolean;
   };
   maxWidgetIndex: number;
+  initialQuery: boolean; // TODO migration del ? -- xld
+  hasQueryControl: boolean; // TODO migration del ? -- xld
+  hasResetControl?: boolean; // TODO migration del ? -- xld
   type: BoardType; //'auto','free'
+
   // auto
   margin: [number, number];
   containerPadding: [number, number];
-  rowHeight?: number;
-  cols: ColsType;
+  mobileMargin: [number, number]; // TODO migration del ? -- xld
+  mobileContainerPadding: [number, number]; // TODO migration del ? -- xld
+  cols?: ColsType;
   // free
   width: number;
   height: number;
   gridStep: [number, number];
   scaleMode: ScaleModeType;
-  initialQuery: boolean;
-  hasQueryControl: boolean; // TODO migration del ? -- xld
-  hasResetControl?: boolean; // TODO migration del ? -- xld
 }
 export const BoardTypeMap = strEnumType(['auto', 'free']);
 export type BoardType = keyof typeof BoardTypeMap;

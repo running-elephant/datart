@@ -17,6 +17,7 @@
  */
 import { Collapse, Form } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { MIN_MARGIN, MIN_PADDING } from 'app/pages/DashBoardPage/constants';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { DashboardConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -58,6 +59,12 @@ export const BoardSetting: FC = memo(() => {
       marginH: config.margin[1],
       paddingW: config.containerPadding[0],
       paddingH: config.containerPadding[1],
+
+      mobileMarginW: config.mobileMargin?.[0] || MIN_MARGIN,
+      mobileMarginH: config.mobileMargin?.[1] || MIN_MARGIN,
+      mobilePaddingW: config.mobileContainerPadding?.[0] || MIN_PADDING,
+      mobilePaddingH: config.mobileContainerPadding?.[1] || MIN_PADDING,
+
       initialQuery: config.initialQuery === false ? false : true, // TODO migration 如果initialQuery的值为undefined默认为true 兼容旧的仪表盘没有initialQuery参数的问题
     };
     form.setFieldsValue({ ...cacheValue.current });
@@ -77,6 +84,12 @@ export const BoardSetting: FC = memo(() => {
         draft.margin[1] = value.marginH;
         draft.containerPadding[0] = value.paddingW;
         draft.containerPadding[1] = value.paddingH;
+
+        draft.mobileMargin[0] = value.mobileMarginW;
+        draft.mobileMargin[1] = value.mobileMarginH;
+        draft.mobileContainerPadding[0] = value.mobilePaddingW;
+        draft.mobileContainerPadding[1] = value.mobilePaddingH;
+
         draft.initialQuery = value.initialQuery;
       });
       dispatch(editBoardStackActions.updateBoardConfig(nextConf));
