@@ -278,7 +278,7 @@ class BasicBarChart extends Chart {
       ...this.getSeriesStyle(styleConfigs),
       ...getReference2(
         settingConfigs,
-        chartDataSet,
+        Array.from(chartDataSet),
         dataConfig,
         this.isHorizionDisplay,
       ),

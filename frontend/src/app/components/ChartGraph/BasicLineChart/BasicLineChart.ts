@@ -189,7 +189,12 @@ class BasicLineChart extends Chart {
           },
           ...this.getLabelStyle(styleConfigs),
           ...this.getSeriesStyle(styleConfigs),
-          ...getReference2(settingConfigs, chartDataSet, aggConfig, false),
+          ...getReference2(
+            settingConfigs,
+            Array.from(chartDataSet),
+            aggConfig,
+            false,
+          ),
         };
       });
     }
