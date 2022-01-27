@@ -48,7 +48,7 @@ public class Const {
     public static final String DEFAULT_VARIABLE_QUOTE = "$";
     //变量匹配符
     public static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\S+\\$");
-
+    //变量正则模板
     public static final String VARIABLE_PATTERN_TEMPLATE = "\\$%s\\$";
 
     /**

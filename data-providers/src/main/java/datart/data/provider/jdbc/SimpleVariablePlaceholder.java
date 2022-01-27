@@ -55,35 +55,6 @@ public class SimpleVariablePlaceholder extends VariablePlaceholder {
         return new ReplacementPair(originalSqlFragment, formatValue(variable));
     }
 
-    private String formatValue(ScriptVariable variable) {
-        switch (variable.getValueType()) {
-            case NUMERIC:
-            case KEYWORD:
-            case SNIPPET:
-            case FRAGMENT:
-            case IDENTIFIER:
-                return formatWithoutQuote(variable.getValues());
-            default:
-                return formatWithQuote(variable.getValues());
-        }
-    }
-
-    private String formatWithoutQuote(Set<String> values) {
-        if (CollectionUtils.isEmpty(values)) {
-            return "";
-        }
-        return String.join(",", values);
-    }
-
-    private String formatWithQuote(Set<String> values) {
-        if (CollectionUtils.isEmpty(values)) {
-            return "";
-        }
-        return values.stream().map(SqlSimpleStringLiteral::new)
-                .map(node -> SqlNodeUtils.toSql(node, sqlDialect))
-                .collect(Collectors.joining(","));
-    }
-
     @Override
     public int getStartPos() {
         return Integer.MAX_VALUE;
