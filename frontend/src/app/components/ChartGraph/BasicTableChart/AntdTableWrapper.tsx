@@ -20,7 +20,7 @@ import { Table } from 'antd';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 
-interface OddAndEvenProps {
+interface TableStyleConfigProps {
   odd?: {
     backgroundColor: string;
     color: string;
@@ -29,15 +29,16 @@ interface OddAndEvenProps {
     backgroundColor: string;
     color: string;
   };
+  isFixedColumns?: boolean;
 }
 
 const AntdTableWrapper: FC<{
   dataSource: [];
   columns: [];
-  oddAndEven?: OddAndEvenProps | undefined;
+  tableStyleConfig?: TableStyleConfigProps | undefined;
   summaryFn?: (data) => { total: number; summarys: [] };
 }> = memo(
-  ({ dataSource, columns, children, summaryFn, oddAndEven, ...rest }) => {
+  ({ dataSource, columns, children, summaryFn, tableStyleConfig, ...rest }) => {
     const getTableSummaryRow = pageData => {
       if (!summaryFn) {
         return undefined;
@@ -61,7 +62,7 @@ const AntdTableWrapper: FC<{
     return (
       <StyledTable
         {...rest}
-        oddAndEven={oddAndEven}
+        tableStyleConfig={tableStyleConfig}
         dataSource={dataSource}
         columns={columns}
         summary={getTableSummaryRow}
@@ -70,7 +71,7 @@ const AntdTableWrapper: FC<{
   },
 );
 
-const StyledTable = styled(Table)<{ oddAndEven?: OddAndEvenProps }>`
+const StyledTable = styled(Table)<{ tableStyleConfig?: TableStyleConfigProps }>`
   height: 100%;
   overflow: auto;
 
@@ -78,7 +79,8 @@ const StyledTable = styled(Table)<{ oddAndEven?: OddAndEvenProps }>`
     background: transparent;
   }
   .ant-table-body {
-    overflow: auto !important;
+    overflow: ${p =>
+      p?.tableStyleConfig?.isFixedColumns ? 'auto scroll' : 'auto !important'};
   }
   .ant-table-summary {
     background: #fafafa;
@@ -90,22 +92,36 @@ const StyledTable = styled(Table)<{ oddAndEven?: OddAndEvenProps }>`
     background: #fafafa;
   }
 
-  .ant-table .ant-table-container .ant-table-body .ant-table-tbody .odd:hover td{
-    background: ${p => p?.oddAndEven?.odd?.backgroundColor || 'transparent'};
+  .ant-table
+    .ant-table-container
+    .ant-table-body
+    .ant-table-tbody
+    .odd:hover
+    td {
+    background: ${p =>
+      p?.tableStyleConfig?.odd?.backgroundColor || 'transparent'};
   }
 
-  .ant-table .ant-table-container .ant-table-body .ant-table-tbody .even:hover td{
-    background: ${p => p?.oddAndEven?.even?.backgroundColor || 'transparent'};
+  .ant-table
+    .ant-table-container
+    .ant-table-body
+    .ant-table-tbody
+    .even:hover
+    td {
+    background: ${p =>
+      p?.tableStyleConfig?.even?.backgroundColor || 'transparent'};
   }
 
   .odd td {
-    background: ${p => p?.oddAndEven?.odd?.backgroundColor || 'transparent'};
-    color: ${p => p?.oddAndEven?.odd?.color || 'auto'};
+    background: ${p =>
+      p?.tableStyleConfig?.odd?.backgroundColor || 'transparent'};
+    color: ${p => p?.tableStyleConfig?.odd?.color || 'auto'};
   }
 
   .even td {
-    background: ${p => p?.oddAndEven?.even?.backgroundColor || 'transparent'};
-    color: ${p => p?.oddAndEven?.even?.color || 'auto'};
+    background: ${p =>
+      p?.tableStyleConfig?.even?.backgroundColor || 'transparent'};
+    color: ${p => p?.tableStyleConfig?.even?.color || 'auto'};
   }
 `;
 

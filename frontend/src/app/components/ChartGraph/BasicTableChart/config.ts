@@ -285,7 +285,7 @@ const config: ChartConfig = {
         paging: {
           title: '分页设置',
           enablePaging: '启用分页',
-          pageSize: '分页大小',
+          pageSize: '每页行数',
         },
       },
     },
