@@ -59,6 +59,7 @@ public class RegexVariableResolver {
         String variableExpression = tryMatchVariableExpression(sql, variableFragment);
 
         SqlCall sqlCall = parseAsSqlCall(variableExpression, variableFragment);
+
         if (sqlCall == null) {
             return new SimpleVariablePlaceholder(variable, sqlDialect, variableFragment);
         } else {

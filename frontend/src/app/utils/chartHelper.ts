@@ -36,7 +36,6 @@ import {
 } from 'app/types/ChartDataSet';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
-import { DATARTSEPERATOR } from 'globalConstants';
 import { Debugger } from 'utils/debugger';
 import {
   cond,
@@ -712,9 +711,7 @@ export function transformToObjectArray(
     () => {
       const result: any[] = Array.apply(null, Array(columns.length));
       for (let j = 0, outterLength = result.length; j < outterLength; j++) {
-        let objCol: any = {
-          [`${DATARTSEPERATOR}id`]: j + 1,
-        };
+        let objCol: any = {};
         for (let i = 0, innerLength = metas.length; i < innerLength; i++) {
           const key = metas?.[i]?.name;
           if (!!key) {

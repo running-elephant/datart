@@ -25,6 +25,7 @@ import { AddMedia } from './AddMedia/AddMedia';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
 import { CopyBtn, PasteBtn } from './CopyPaste/CopyPaste';
 import { DeleteWidgetsBtn } from './DeleteWidgetsBtn';
+import { DeviceSwitcher } from './DeviceSwitch/DeviceSwitcher';
 import { ToBottomBtn, ToTopBtn } from './ToTopToBottom/ToTopToBottom';
 import { RedoBtn, UndoBtn } from './UndoRedo/UndoRedo';
 
@@ -56,6 +57,12 @@ export const ToolBar = () => {
           <Divider type="vertical" />
           <CopyBtn />
           <PasteBtn />
+          {boardType === 'auto' && (
+            <>
+              <Divider type="vertical" />
+              <DeviceSwitcher />
+            </>
+          )}
         </>
       </Space>
     </Wrapper>

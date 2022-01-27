@@ -54,6 +54,11 @@ class BasicTableChart extends ReactChart {
   rowNumberUniqKey = `@datart@rowNumberKey`;
   totalWidth = 0;
   exceedMaxContent = false;
+  pageInfo = {
+    pageNo: 0,
+    pageSize: 0,
+    total: 0,
+  };
 
   constructor(props?) {
     super(AntdTableWrapper, {
@@ -187,7 +192,7 @@ class BasicTableChart extends ReactChart {
       rowClassName: (_, index) => {
         return index % 2 === 0 ? 'odd' : 'even';
       },
-      oddAndEven: this.getOddAndEvenStyle(styleConfigs),
+      tableStyleConfig: this.getTableStyle(styleConfigs),
     };
   }
 
@@ -206,8 +211,8 @@ class BasicTableChart extends ReactChart {
       .flatMap(config => config.rows || []);
     this.dataColumnWidths = this.calcuteFieldsMaxWidth(
       mixedSectionConfigRows,
-      chartDataSet as any,
-      chartDataSet,
+      chartDataSet as IChartDataSet<string>,
+      styleConfigs,
       context,
     );
     this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
@@ -223,11 +228,16 @@ class BasicTableChart extends ReactChart {
     );
   }
 
-  private getOddAndEvenStyle(styles) {
+  private getTableStyle(styles) {
     const [oddBgColor, oddFontColor, evenBgColor, evenFontColor] = getStyles(
       styles,
       ['tableBodyStyle'],
       ['oddBgColor', 'oddFontColor', 'evenBgColor', 'evenFontColor'],
+    );
+    const [rightFixedColumns] = getStyles(
+      styles,
+      ['style'],
+      ['rightFixedColumns'],
     );
     return {
       odd: {
@@ -238,6 +248,7 @@ class BasicTableChart extends ReactChart {
         backgroundColor: evenBgColor,
         color: evenFontColor,
       },
+      isFixedColumns: rightFixedColumns ? true : false,
     };
   }
 
@@ -286,8 +297,8 @@ class BasicTableChart extends ReactChart {
               c => getValueByColumnKey(c) === k,
             );
             if (currentSummaryField) {
-              const total = chartDataSet.map(dc =>
-                (dc as any).getCell(currentSummaryField),
+              const total = chartDataSet?.map((dc: any) =>
+                dc.getCell(currentSummaryField),
               );
               return (
                 (!index
@@ -339,7 +350,6 @@ class BasicTableChart extends ReactChart {
       ['column', 'modal', 'list'],
       'rows',
     );
-    // todo
     const getRowNumberWidth = maxContent => {
       if (!enableRowNumber) {
         return 0;
@@ -418,9 +428,11 @@ class BasicTableChart extends ReactChart {
           ? Math.max(
               rowNumberUniqKeyWidth,
               rowNumberUniqKeyHeaderWidth +
-                this.tablePadding +
+                this.tablePadding * 2 +
                 this.tableCellBorder * 2,
-              rowSummaryWidth + this.tablePadding + this.tableCellBorder * 2,
+              rowSummaryWidth +
+                this.tablePadding * 2 +
+                this.tableCellBorder * 2,
             )
           : 0,
       },
@@ -589,7 +601,7 @@ class BasicTableChart extends ReactChart {
         const colName = c.colName;
         const columnRowSpans = (autoMergeFields || []).includes(c.uid)
           ? chartDataSet
-              ?.map(dc => (dc as any).getCell(c))
+              ?.map(dc => dc.getCell(c))
               .reverse()
               .reduce((acc, cur, index, array) => {
                 if (array[index + 1] === cur) {
@@ -720,11 +732,17 @@ class BasicTableChart extends ReactChart {
           {
             key: `${DATARTSEPERATOR}id`,
             title: context?.translator?.('viz.palette.graph.number'),
-            dataIndex: `${DATARTSEPERATOR}id`,
             width:
               this.dataColumnWidths?.[this.rowNumberUniqKey]
                 ?.columnWidthValue || 0,
             fixed: leftFixedColumns || rightFixedColumns ? 'left' : null,
+            render: (value, row, rowIndex) => {
+              return (
+                (this.pageInfo.pageNo - 1) * this.pageInfo.pageSize +
+                rowIndex +
+                1
+              );
+            },
           } as any,
         ]
       : [];
@@ -788,7 +806,7 @@ class BasicTableChart extends ReactChart {
       return _maxDeeps(headerStyles, 0) || 1;
     };
     const headerHeight =
-      (font.fontSize * TABLE_LINE_HEIGHT +
+      ((font?.fontSize || 0) * TABLE_LINE_HEIGHT +
         HEADER_PADDING[tableSize || 'default'] +
         (showTableBorder ? this.tableCellBorder : 0)) *
         _getMaxHeaderHierarchy(tableHeaderStyles) +
@@ -821,6 +839,7 @@ class BasicTableChart extends ReactChart {
       ['paging'],
       ['enablePaging'],
     );
+    this.pageInfo = pageInfo;
     return enablePaging
       ? Object.assign({
           showSizeChanger: false,

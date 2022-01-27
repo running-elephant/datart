@@ -16,33 +16,7 @@
  * limitations under the License.
  */
 
-package datart.core.data.provider;
+package datart.data.provider.base;
 
-import datart.core.base.consts.ValueType;
-import lombok.Data;
-
-import java.io.Serializable;
-
-@Data
-public class Column implements Serializable {
-
-    private String name;
-
-    private ValueType type;
-
-    private String fmt;
-
-    private String pkDatabase;
-
-    private String pkTable;
-
-    private String pkColumn;
-
-    public Column(String name, ValueType type) {
-        this.name = name;
-        this.type = type;
-    }
-
-    public Column() {
-    }
+public class ParamReplaceException extends Exception {
 }
