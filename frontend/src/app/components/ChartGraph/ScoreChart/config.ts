@@ -289,7 +289,7 @@ const config: ChartConfig = {
         },
         paging: {
           title: '常规',
-          pageSize: '每页行数',
+          pageSize: '总行数',
         },
       },
     },
