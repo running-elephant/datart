@@ -33,7 +33,7 @@ import { transformMeta } from 'app/utils/chartHelper';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
-  LAYOUT_COLS,
+  LAYOUT_COLS_MAP,
   NeedFetchWidgetTypes,
 } from '../constants';
 
@@ -164,7 +164,7 @@ export const getInitBoardConfig = (boardType: BoardType) => {
     margin: [16, 16], //0-100
     containerPadding: [16, 16], //0-100
     rowHeight: 32, //20-200
-    cols: LAYOUT_COLS, //2-48    step 2
+    cols: LAYOUT_COLS_MAP, //2-48    step 2
     initialQuery: true,
     hasQueryControl: false,
     hasResetControl: false,

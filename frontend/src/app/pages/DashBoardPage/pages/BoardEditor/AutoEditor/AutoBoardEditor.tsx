@@ -20,8 +20,8 @@ import { Empty } from 'antd';
 import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
-  BREAK_POINTS,
-  LAYOUT_COLS,
+  BREAK_POINT_MAP,
+  LAYOUT_COLS_MAP,
   RGL_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
@@ -246,8 +246,8 @@ export const AutoBoardEditor: React.FC<{}> = () => {
               // layout={currentLayout.current}
               // cols={curCols}
               layouts={layoutMap}
-              cols={LAYOUT_COLS}
-              breakpoints={BREAK_POINTS}
+              cols={LAYOUT_COLS_MAP}
+              breakpoints={BREAK_POINT_MAP}
               onBreakpointChange={onBreakpointChange}
               margin={margin}
               containerPadding={containerPadding}

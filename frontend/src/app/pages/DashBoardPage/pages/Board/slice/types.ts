@@ -31,7 +31,7 @@ import { View } from '../../../../../types/View';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import {
   BorderStyleType,
-  LAYOUT_COLS,
+  LAYOUT_COLS_MAP,
   ScaleModeType,
   TextAlignType,
 } from '../../../constants';
@@ -410,7 +410,7 @@ export interface DataChartConfig {
   computedFields: any[];
 }
 
-export type ColsType = typeof LAYOUT_COLS;
+export type ColsType = typeof LAYOUT_COLS_MAP;
 
 // Dashboard view model
 export interface BoardInfo {

@@ -19,7 +19,10 @@
 import { Empty } from 'antd';
 import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
-import { BREAK_POINTS, LAYOUT_COLS } from 'app/pages/DashBoardPage/constants';
+import {
+  BREAK_POINT_MAP,
+  LAYOUT_COLS_MAP,
+} from 'app/pages/DashBoardPage/constants';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import {
@@ -214,10 +217,10 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
               <div className="grid-wrap" ref={gridRef}>
                 <ResponsiveGridLayout
                   layouts={layoutMap}
-                  breakpoints={BREAK_POINTS}
+                  breakpoints={BREAK_POINT_MAP}
                   margin={margin}
                   containerPadding={containerPadding}
-                  cols={LAYOUT_COLS}
+                  cols={LAYOUT_COLS_MAP}
                   rowHeight={widgetRowHeight}
                   onLayoutChange={onLayoutChange}
                   onBreakpointChange={onBreakpointChange}
