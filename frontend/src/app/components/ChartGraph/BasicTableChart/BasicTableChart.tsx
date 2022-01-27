@@ -201,8 +201,8 @@ class BasicTableChart extends ReactChart {
       .flatMap(config => config.rows || []);
     this.dataColumnWidths = this.calcuteFieldsMaxWidth(
       mixedSectionConfigRows,
-      chartDataSet as any,
-      chartDataSet,
+      chartDataSet as IChartDataSet<string>,
+      styleConfigs,
       context,
     );
     this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
@@ -281,8 +281,8 @@ class BasicTableChart extends ReactChart {
               c => getValueByColumnKey(c) === k,
             );
             if (currentSummaryField) {
-              const total = Array.from(chartDataSet).map(dc =>
-                (dc as any).getCell(currentSummaryField),
+              const total = Array.from(chartDataSet).map((dc: any) =>
+                dc.getCell(currentSummaryField),
               );
               return (
                 (!index
@@ -334,7 +334,6 @@ class BasicTableChart extends ReactChart {
       ['column', 'modal', 'list'],
       'rows',
     );
-    // todo
     const getRowNumberWidth = maxContent => {
       if (!enableRowNumber) {
         return 0;
@@ -413,9 +412,11 @@ class BasicTableChart extends ReactChart {
           ? Math.max(
               rowNumberUniqKeyWidth,
               rowNumberUniqKeyHeaderWidth +
-                this.tablePadding +
+                this.tablePadding * 2 +
                 this.tableCellBorder * 2,
-              rowSummaryWidth + this.tablePadding + this.tableCellBorder * 2,
+              rowSummaryWidth +
+                this.tablePadding * 2 +
+                this.tableCellBorder * 2,
             )
           : 0,
       },
@@ -584,7 +585,7 @@ class BasicTableChart extends ReactChart {
         const colName = c.colName;
         const columnRowSpans = (autoMergeFields || []).includes(c.uid)
           ? Array.from(chartDataSet)
-              ?.map(dc => (dc as any).getCell(c))
+              ?.map((dc: any) => dc.getCell(c))
               .reverse()
               .reduce((acc, cur, index, array) => {
                 if (array[index + 1] === cur) {
