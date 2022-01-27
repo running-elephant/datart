@@ -90,15 +90,21 @@ const StyledTable = styled(Table)<{ oddAndEven?: OddAndEvenProps }>`
     background: #fafafa;
   }
 
+  .ant-table .ant-table-container .ant-table-body .ant-table-tbody .odd:hover td{
+    background: ${p => p?.oddAndEven?.odd?.backgroundColor || 'transparent'};
+  }
+
+  .ant-table .ant-table-container .ant-table-body .ant-table-tbody .even:hover td{
+    background: ${p => p?.oddAndEven?.even?.backgroundColor || 'transparent'};
+  }
+
   .odd td {
-    background: ${p =>
-      (p?.oddAndEven?.odd?.backgroundColor || 'transparent') + '!important'};
+    background: ${p => p?.oddAndEven?.odd?.backgroundColor || 'transparent'};
     color: ${p => p?.oddAndEven?.odd?.color || 'auto'};
   }
 
   .even td {
-    background: ${p =>
-      (p?.oddAndEven?.even?.backgroundColor || 'transparent') + '!important'};
+    background: ${p => p?.oddAndEven?.even?.backgroundColor || 'transparent'};
     color: ${p => p?.oddAndEven?.even?.color || 'auto'};
   }
 `;
