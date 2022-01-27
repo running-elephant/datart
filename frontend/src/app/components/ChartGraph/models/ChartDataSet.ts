@@ -70,6 +70,10 @@ export class ChartDataSet<T>
     return Array.from(this)[rowIndex];
   }
 
+  public getFieldKey(field: ChartDataSectionField) {
+    return toKey(field);
+  }
+
   public getFieldIndex(field: ChartDataSectionField) {
     return findIndex(this.columnIndexTable, field);
   }
@@ -128,7 +132,18 @@ export class DataSetRow<T> extends Array<T> implements IChartDataSetRow<T> {
     return this?.[findIndexByKey(this.columnIndexTable, key)] as T;
   }
 
+  public getFieldKey(field: ChartDataSectionField) {
+    return toKey(field);
+  }
+
   public getFieldIndex(field: ChartDataSectionField) {
     return findIndex(this.columnIndexTable, field);
+  }
+
+  public convertToObject(): object {
+    return Object.keys(this.columnIndexTable).reduce((acc, cur) => {
+      acc[cur] = this[this.columnIndexTable[cur]];
+      return acc;
+    }, {});
   }
 }
