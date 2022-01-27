@@ -289,11 +289,40 @@ public class VariablePlaceholder {
             Matcher matcher = variablePattern.matcher(originalSqlFragment);
             if (matcher.find()) {
                 String group = matcher.group();
-                SqlNode sqlNode = SqlNodeUtils.toSingleSqlLiteral(variable, SqlParserPos.ZERO);
-                replacement = replacement.replace(group, sqlNode.toSqlString(sqlDialect).getSql());
+                replacement = replacement.replace(group, formatValue(variable));
             }
         }
         return new ReplacementPair(originalSqlFragment, replacement);
     }
+
+    protected String formatValue(ScriptVariable variable) {
+        switch (variable.getValueType()) {
+            case NUMERIC:
+            case KEYWORD:
+            case SNIPPET:
+            case FRAGMENT:
+            case IDENTIFIER:
+                return formatWithoutQuote(variable.getValues());
+            default:
+                return formatWithQuote(variable.getValues());
+        }
+    }
+
+    protected String formatWithoutQuote(Set<String> values) {
+        if (org.springframework.util.CollectionUtils.isEmpty(values)) {
+            return "";
+        }
+        return String.join(",", values);
+    }
+
+    protected String formatWithQuote(Set<String> values) {
+        if (org.springframework.util.CollectionUtils.isEmpty(values)) {
+            return "";
+        }
+        return values.stream().map(SqlSimpleStringLiteral::new)
+                .map(node -> SqlNodeUtils.toSql(node, sqlDialect))
+                .collect(Collectors.joining(","));
+    }
+
 
 }
