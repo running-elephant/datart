@@ -163,7 +163,7 @@ class BasicTableChart extends ReactChart {
     return {
       rowKey: 'id',
       pagination: tablePagination,
-      dataSource: Array.from(chartDataSet),
+      dataSource: chartDataSet.map(row => row.convertToObject()),
       columns: tableColumns,
       summaryFn: this.getTableSummaryFn(
         settingConfigs,
@@ -292,7 +292,7 @@ class BasicTableChart extends ReactChart {
               c => getValueByColumnKey(c) === k,
             );
             if (currentSummaryField) {
-              const total = Array.from(chartDataSet).map((dc: any) =>
+              const total = chartDataSet?.map((dc: any) =>
                 dc.getCell(currentSummaryField),
               );
               return (
@@ -386,7 +386,7 @@ class BasicTableChart extends ReactChart {
         [c.uid, 'columnStyle'],
         ['columnWidth', 'useColumnWidth'],
       );
-      const datas = Array.from(chartDataSet)?.map(dc => {
+      const datas = chartDataSet?.map(dc => {
         const text = dc.getCell(c);
         let width = this.getTextWidth(
           context,
@@ -595,8 +595,8 @@ class BasicTableChart extends ReactChart {
       const columnList = dataConfigs.map(c => {
         const colName = c.colName;
         const columnRowSpans = (autoMergeFields || []).includes(c.uid)
-          ? Array.from(chartDataSet)
-              ?.map((dc: any) => dc.getCell(c))
+          ? chartDataSet
+              ?.map(dc => dc.getCell(c))
               .reverse()
               .reduce((acc, cur, index, array) => {
                 if (array[index + 1] === cur) {
@@ -633,8 +633,8 @@ class BasicTableChart extends ReactChart {
         return {
           sorter: true,
           title: getColumnRenderName(c),
-          dataIndex: chartDataSet.getFieldIndex(c),
-          key: getValueByColumnKey(c),
+          dataIndex: chartDataSet.getFieldKey(c),
+          key: chartDataSet.getFieldKey(c),
           aggregate: c?.aggregate,
           colName,
           width: colMaxWidth,
@@ -653,11 +653,12 @@ class BasicTableChart extends ReactChart {
             };
           },
           onCell: (record, rowIndex) => {
-            const cellValue = record.getCell(c);
+            const row = chartDataSet[rowIndex];
+            const cellValue = row.getCell(c);
             return {
               uid: c.uid,
               cellValue,
-              dataIndex: record.getFieldIndex(c),
+              dataIndex: row.getFieldKey(c),
               ...this.registerTableCellEvents(
                 getValueByColumnKey(c),
                 cellValue,

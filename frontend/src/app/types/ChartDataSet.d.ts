@@ -24,11 +24,15 @@ export interface IChartDataSetRow<T> extends Array<T> {
 
   getCellByKey(key: string): T;
 
+  getFieldKey(field: ChartDataSectionField): string;
+
   getFieldIndex(field: ChartDataSectionField): number;
+
+  convertToObject(): object;
 }
 
 export interface IChartDataSet<T> extends Array<IChartDataSetRow<T>> {
-  getRow(rowIndex): IChartDataSetRow<T>;
+  getFieldKey(field: ChartDataSectionField): string;
 
   getFieldIndex(field: ChartDataSectionField): number;
 

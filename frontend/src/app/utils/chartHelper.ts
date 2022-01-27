@@ -29,7 +29,11 @@ import {
   SortActionType,
 } from 'app/types/ChartConfig';
 import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
-import { ChartDatasetMeta, IChartDataSet } from 'app/types/ChartDataSet';
+import {
+  ChartDatasetMeta,
+  IChartDataSet,
+  IChartDataSetRow,
+} from 'app/types/ChartDataSet';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { Debugger } from 'utils/debugger';
@@ -250,7 +254,7 @@ export function getReference(
 
 export function getReference2(
   settingConfigs,
-  chartDataSet: IChartDataSet<string>,
+  dataSetRows: IChartDataSetRow<string>[],
   dataConfig,
   isHorizionDisplay,
 ) {
@@ -263,11 +267,11 @@ export function getReference2(
   return {
     markLine: getMarkLine2(
       referenceTabs,
-      chartDataSet,
+      dataSetRows,
       dataConfig,
       isHorizionDisplay,
     ),
-    markArea: getMarkArea2(referenceTabs, chartDataSet, isHorizionDisplay),
+    markArea: getMarkArea2(referenceTabs, dataSetRows, isHorizionDisplay),
   };
 }
 
@@ -353,7 +357,7 @@ function getMarkLineData(
 
 function getMarkLine2(
   refTabs,
-  chartDataSet: IChartDataSet<string>,
+  dataSetRows: IChartDataSetRow<string>[],
   dataConfig,
   isHorizionDisplay,
 ) {
@@ -366,7 +370,7 @@ function getMarkLine2(
     .map(ml => {
       return getMarkLineData2(
         ml,
-        chartDataSet,
+        dataSetRows,
         'valueType',
         'constantValue',
         'metric',
@@ -383,7 +387,7 @@ function getMarkLine2(
 
 function getMarkLineData2(
   mark,
-  chartDataSet: IChartDataSet<string>,
+  dataSetRows: IChartDataSetRow<string>[],
   valueTypeKey,
   constantValueKey,
   metricKey,
@@ -402,7 +406,7 @@ function getMarkLineData2(
 
   const metricDatas =
     dataConfig.uid === metricUid
-      ? Array.from(chartDataSet).map(d => +d.getCell(dataConfig))
+      ? dataSetRows.map(d => +d.getCell(dataConfig))
       : [];
   const constantValue = getSettingValue(mark.rows, constantValueKey, 'value');
   let yAxis = 0;
@@ -439,7 +443,7 @@ function getMarkLineData2(
 
 function getMarkAreaData2(
   mark,
-  chartDataSet: IChartDataSet<string>,
+  dataSetRows: IChartDataSetRow<string>[],
   valueTypeKey,
   constantValueKey,
   metricKey,
@@ -460,9 +464,7 @@ function getMarkAreaData2(
   const name = mark.value;
   const valueType = getSettingValue(mark.rows, valueTypeKey, 'value');
   const metric = getSettingValue(mark.rows, metricKey, 'value');
-  const metricDatas = Array.from(chartDataSet).map(
-    d => +d.getCellByKey(metric),
-  );
+  const metricDatas = dataSetRows.map(d => +d.getCellByKey(metric));
   const constantValue = getSettingValue(mark.rows, constantValueKey, 'value');
   let yAxis = 0;
   switch (valueType) {
@@ -594,7 +596,7 @@ function getMarkArea(refTabs, dataColumns, isHorizionDisplay) {
 
 function getMarkArea2(
   refTabs,
-  chartDataSet: IChartDataSet<string>,
+  dataSetRows: IChartDataSetRow<string>[],
   isHorizionDisplay,
 ) {
   const refAreas = refTabs?.reduce((acc, cur) => {
@@ -609,7 +611,7 @@ function getMarkArea2(
           .map(prefix => {
             return getMarkAreaData2(
               mark,
-              chartDataSet,
+              dataSetRows,
               `${prefix}ValueType`,
               `${prefix}ConstantValue`,
               `${prefix}Metric`,
@@ -680,7 +682,7 @@ export function transformToDataSet<T>(
   metas?: ChartDatasetMeta[],
   sortedConfigs?: ChartDataConfig[],
 ): IChartDataSet<T> {
-  const ds = new ChartDataSet(datas, metas);
+  const ds = new ChartDataSet(datas || [], metas || []);
   ds.sortBy(sortedConfigs || []);
   return ds;
 }
@@ -909,6 +911,21 @@ export function getDataColumnMaxAndMin(
   return { min, max };
 }
 
+export function getDataColumnMaxAndMin2(
+  chartDataSetRows: IChartDataSetRow<string>[],
+  config?: ChartDataSectionField,
+) {
+  if (!config || !chartDataSetRows?.length) {
+    return { min: 0, max: 100 };
+  }
+  const datas = (chartDataSetRows || []).map(row =>
+    Number(row.getCell(config)),
+  );
+  const min = Number.isNaN(Math.min(...datas)) ? 0 : Math.min(...datas);
+  const max = Number.isNaN(Math.max(...datas)) ? 100 : Math.max(...datas);
+  return { min, max };
+}
+
 export function getSeriesTooltips4Scatter(
   params,
   tooltipItemConfigs,
@@ -1052,26 +1069,23 @@ export function getColorizeGroupSeriesColumns(
   aggregateKeys: string[],
   infoColumnNames: string[],
 ) {
-  const groupedDataColumnObject = Array.from(chartDataSet).reduce(
-    (acc, cur) => {
-      const colKey = cur.getCellByKey(groupByKey) || 'defaultGroupKey';
+  const groupedDataColumnObject = chartDataSet?.reduce((acc, cur) => {
+    const colKey = cur.getCellByKey(groupByKey) || 'defaultGroupKey';
 
-      if (!acc[colKey]) {
-        acc[colKey] = [];
-      }
-      const value = aggregateKeys
-        .concat([xAxisColumnName])
-        .concat(infoColumnNames || [])
-        .concat([groupByKey])
-        .reduce((a, k) => {
-          a[k] = cur.getCellByKey(k);
-          return a;
-        }, {});
-      acc[colKey].push(value);
-      return acc;
-    },
-    {},
-  );
+    if (!acc[colKey]) {
+      acc[colKey] = [];
+    }
+    const value = aggregateKeys
+      .concat([xAxisColumnName])
+      .concat(infoColumnNames || [])
+      .concat([groupByKey])
+      .reduce((a, k) => {
+        a[k] = cur.getCellByKey(k);
+        return a;
+      }, {});
+    acc[colKey].push(value);
+    return acc;
+  }, {});
 
   let collection = [] as any;
   Object.entries(groupedDataColumnObject).forEach(([k, v]) => {
