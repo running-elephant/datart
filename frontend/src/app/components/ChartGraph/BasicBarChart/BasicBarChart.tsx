@@ -119,7 +119,7 @@ class BasicBarChart extends Chart {
       return {
         type: 'category',
         tooltip: { show: true },
-        data: UniqArray(Array.from(chartDataSet).map(dc => dc.getCell(config))),
+        data: UniqArray(chartDataSet.map(row => row.getCell(config))),
       };
     });
     const yAxisNames = aggregateConfigs.map(getColumnRenderName);
@@ -206,7 +206,7 @@ class BasicBarChart extends Chart {
             aggConfig,
           ),
           name: getColumnRenderName(aggConfig),
-          data: Array.from(chartDataSet).map(dc => ({
+          data: chartDataSet?.map(dc => ({
             ...getExtraSeriesRowData(dc),
             ...getExtraSeriesDataFormat(aggConfig?.format),
             name: getColumnRenderName(aggConfig),
@@ -278,7 +278,7 @@ class BasicBarChart extends Chart {
       ...this.getSeriesStyle(styleConfigs),
       ...getReference2(
         settingConfigs,
-        Array.from(chartDataSet),
+        chartDataSet,
         dataConfig,
         this.isHorizionDisplay,
       ),

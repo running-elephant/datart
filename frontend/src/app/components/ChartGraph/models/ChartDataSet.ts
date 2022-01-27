@@ -30,52 +30,57 @@ import {
 import { getValueByColumnKey } from 'app/utils/chartHelper';
 import { isEmptyArray } from 'utils/object';
 
-function findIndex(indexes, field: ChartDataSectionField) {
-  return indexes?.[toKey(field)];
-}
+type ColumnIndexTable = { [key: string]: number };
 
-function findIndexByKey(indexes, key: string) {
-  return indexes?.[toCaseInsensitive(key)];
-}
+class ChartDataSetBase extends Array {
+  protected toIndexBy(indexes, field: ChartDataSectionField): number {
+    return indexes?.[this.toKey(field)];
+  }
 
-function toKey(field: ChartDataSectionField) {
-  return toCaseInsensitive(getValueByColumnKey(field));
-}
+  protected toIndex(indexes, key: string): any {
+    return indexes?.[this.toCaseInsensitive(key)];
+  }
 
-function toCaseInsensitive(key) {
-  return String(key).toUpperCase();
+  protected toKey(field: ChartDataSectionField): string {
+    return this.toCaseInsensitive(getValueByColumnKey(field));
+  }
+
+  protected createColumnIndexTable(metas?: ChartDatasetMeta[]): {
+    [key: string]: number;
+  } {
+    return (metas || []).reduce((acc, cur, index) => {
+      acc[this.toCaseInsensitive(cur.name)] = index;
+      return acc;
+    }, {}) as { [key: string]: number };
+  }
+
+  protected toCaseInsensitive(key) {
+    return String(key).toUpperCase();
+  }
 }
 
 export class ChartDataSet<T>
-  extends Array<DataSetRow<T>>
+  extends ChartDataSetBase
   implements IChartDataSet<T>
 {
-  private dataset: T[][];
-  private metas: ChartDatasetMeta[];
-  private columnIndexTable: { [key: string]: number } = {};
+  private columnIndexTable: ColumnIndexTable = {};
 
-  *[Symbol.iterator]() {
-    for (let i = 0; i < this.dataset.length; i++)
-      yield new DataSetRow(this.columnIndexTable, ...this.dataset[i]);
-  }
-
-  constructor(columns?: T[][], metas?: ChartDatasetMeta[]) {
-    super(...[]);
-    this.dataset = columns || [];
-    this.metas = metas || [];
-    this.columnIndexTable = this.createColumnIndexTable(metas);
-  }
-
-  public getRow(rowIndex) {
-    return Array.from(this)[rowIndex];
+  constructor(columns: T[][], metas?: ChartDatasetMeta[]) {
+    super(
+      ...(Array.prototype.map.call(
+        columns,
+        c => new ChartDataSetRow(metas, ...c),
+      ) as any),
+    );
+    this.columnIndexTable = super.createColumnIndexTable(metas);
   }
 
   public getFieldKey(field: ChartDataSectionField) {
-    return toKey(field);
+    return this.toKey(field);
   }
 
   public getFieldIndex(field: ChartDataSectionField) {
-    return findIndex(this.columnIndexTable, field);
+    return this.toIndexBy(this.columnIndexTable, field);
   }
 
   public sortBy(dataConfigs: ChartDataConfig[]): void {
@@ -99,45 +104,39 @@ export class ChartDataSet<T>
       return;
     }
     const sortValues = order.sort.value || [];
-    this.dataset = this.dataset.sort(
+    this.sort(
       (prev, next) =>
-        sortValues.indexOf(prev[toKey(order)]) -
-        sortValues.indexOf(next[toKey(order)]),
+        sortValues.indexOf(prev[this.toKey(order)]) -
+        sortValues.indexOf(next[this.toKey(order)]),
     );
-  }
-
-  private createColumnIndexTable(metas?: ChartDatasetMeta[]): {
-    [key: string]: number;
-  } {
-    return (metas || []).reduce((acc, cur, index) => {
-      acc[toCaseInsensitive(cur.name)] = index;
-      return acc;
-    }, {}) as { [key: string]: number };
   }
 }
 
-export class DataSetRow<T> extends Array<T> implements IChartDataSetRow<T> {
-  private columnIndexTable: { [key: string]: number } = {};
+export class ChartDataSetRow<T>
+  extends ChartDataSetBase
+  implements IChartDataSetRow<T>
+{
+  private columnIndexTable: ColumnIndexTable = {};
 
-  constructor(indexes, ...items: T[]) {
-    super(...items);
-    this.columnIndexTable = indexes;
+  constructor(metas, ...items: T[]) {
+    super(...(items as any));
+    this.columnIndexTable = this.createColumnIndexTable(metas);
   }
 
   public getCell(field: ChartDataSectionField) {
-    return this?.[findIndex(this.columnIndexTable, field)] as T;
+    return this?.[this.toIndexBy(this.columnIndexTable, field)] as T;
   }
 
   public getCellByKey(key: string) {
-    return this?.[findIndexByKey(this.columnIndexTable, key)] as T;
+    return this?.[this.toIndex(this.columnIndexTable, key)] as T;
   }
 
   public getFieldKey(field: ChartDataSectionField) {
-    return toKey(field);
+    return this.toKey(field);
   }
 
   public getFieldIndex(field: ChartDataSectionField) {
-    return findIndex(this.columnIndexTable, field);
+    return this.toIndexBy(this.columnIndexTable, field);
   }
 
   public convertToObject(): object {

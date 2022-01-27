@@ -123,7 +123,7 @@ class BasicLineChart extends Chart {
       return {
         type: 'category',
         tooltip: { show: true },
-        data: UniqArray(Array.from(chartDataSet).map(dc => dc.getCell(config))),
+        data: UniqArray(chartDataSet.map(dc => dc.getCell(config))),
       };
     });
     const series = this.getSeries(
@@ -178,7 +178,7 @@ class BasicLineChart extends Chart {
           sampling: 'average',
           areaStyle: this.isArea ? { color } : undefined,
           stack: this.isStack ? 'total' : undefined,
-          data: Array.from(chartDataSet).map(dc => ({
+          data: chartDataSet?.map(dc => ({
             ...getExtraSeriesRowData(dc),
             ...getExtraSeriesDataFormat(aggConfig?.format),
             name: getColumnRenderName(aggConfig),
@@ -189,12 +189,7 @@ class BasicLineChart extends Chart {
           },
           ...this.getLabelStyle(styleConfigs),
           ...this.getSeriesStyle(styleConfigs),
-          ...getReference2(
-            settingConfigs,
-            Array.from(chartDataSet),
-            aggConfig,
-            false,
-          ),
+          ...getReference2(settingConfigs, chartDataSet, aggConfig, false),
         };
       });
     }

@@ -140,7 +140,7 @@ class BasicPieChart extends Chart {
     infoConfigs,
   ) {
     if (!groupConfigs?.length) {
-      const row = Array.from(chartDataSet)?.[0];
+      const row = chartDataSet?.[0];
       return {
         ...this.getBarSeiesImpl(styleConfigs),
         data: aggregateConfigs.map(config => {
@@ -162,7 +162,7 @@ class BasicPieChart extends Chart {
       return {
         ...this.getBarSeiesImpl(styleConfigs),
         name: getColumnRenderName(config),
-        data: Array.from(chartDataSet).map(row => {
+        data: chartDataSet?.map(row => {
           return {
             ...config,
             name: groupConfigs.map(row.getCell, row).join('-'),
@@ -339,7 +339,7 @@ class BasicPieChart extends Chart {
       }
       const infoTotal = infoConfigs.map(info => {
         let total = 0;
-        Array.from(chartDataSet).forEach(row => {
+        chartDataSet.forEach(row => {
           total += Number((row as IChartDataSetRow<string>).getCell(info));
         });
         return total;

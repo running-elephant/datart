@@ -117,7 +117,7 @@ class BasicScatterChart extends Chart {
     });
 
     const series = this.getSeriesGroupByColorConfig(
-      Array.from(chartDataSet),
+      chartDataSet,
       groupConfigs,
       aggregateConfigs,
       sizeConfigs,

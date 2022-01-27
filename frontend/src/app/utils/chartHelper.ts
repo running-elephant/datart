@@ -683,7 +683,7 @@ export function transformToDataSet<T>(
   metas?: ChartDatasetMeta[],
   sortedConfigs?: ChartDataConfig[],
 ): IChartDataSet<T> {
-  const ds = new ChartDataSet(datas, metas);
+  const ds = new ChartDataSet(datas || [], metas || []);
   ds.sortBy(sortedConfigs || []);
   return ds;
 }
@@ -1072,26 +1072,23 @@ export function getColorizeGroupSeriesColumns(
   aggregateKeys: string[],
   infoColumnNames: string[],
 ) {
-  const groupedDataColumnObject = Array.from(chartDataSet).reduce(
-    (acc, cur) => {
-      const colKey = cur.getCellByKey(groupByKey) || 'defaultGroupKey';
+  const groupedDataColumnObject = chartDataSet?.reduce((acc, cur) => {
+    const colKey = cur.getCellByKey(groupByKey) || 'defaultGroupKey';
 
-      if (!acc[colKey]) {
-        acc[colKey] = [];
-      }
-      const value = aggregateKeys
-        .concat([xAxisColumnName])
-        .concat(infoColumnNames || [])
-        .concat([groupByKey])
-        .reduce((a, k) => {
-          a[k] = cur.getCellByKey(k);
-          return a;
-        }, {});
-      acc[colKey].push(value);
-      return acc;
-    },
-    {},
-  );
+    if (!acc[colKey]) {
+      acc[colKey] = [];
+    }
+    const value = aggregateKeys
+      .concat([xAxisColumnName])
+      .concat(infoColumnNames || [])
+      .concat([groupByKey])
+      .reduce((a, k) => {
+        a[k] = cur.getCellByKey(k);
+        return a;
+      }, {});
+    acc[colKey].push(value);
+    return acc;
+  }, {});
 
   let collection = [] as any;
   Object.entries(groupedDataColumnObject).forEach(([k, v]) => {

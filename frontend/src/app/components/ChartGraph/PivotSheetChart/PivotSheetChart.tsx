@@ -153,15 +153,22 @@ class PivotSheetChart extends ReactChart {
             reverseSubLayout: Boolean(subTotalPosition),
             subTotalsDimensions: rowSectionConfigRows.map(
               chartDataSet.getFieldKey,
+              chartDataSet,
             )?.[0],
           },
         },
       },
       dataCfg: {
         fields: {
-          rows: rowSectionConfigRows.map(chartDataSet.getFieldKey),
-          columns: columnSectionConfigRows.map(chartDataSet.getFieldKey),
-          values: metricsSectionConfigRows.map(chartDataSet.getFieldKey),
+          rows: rowSectionConfigRows.map(config =>
+            chartDataSet.getFieldKey(config),
+          ),
+          columns: columnSectionConfigRows.map(config =>
+            chartDataSet.getFieldKey(config),
+          ),
+          values: metricsSectionConfigRows.map(config =>
+            chartDataSet.getFieldKey(config),
+          ),
           valueInCols: !!metricNameShowIn,
         },
         meta: rowSectionConfigRows
@@ -175,7 +182,7 @@ class PivotSheetChart extends ReactChart {
               formatter: value => toFormattedValue(value, config?.format),
             };
           }),
-        data: Array.from(chartDataSet).map(row => row.convertToObject()),
+        data: chartDataSet?.map(row => row.convertToObject()),
         totalData: this.getCalcSummaryValues(
           chartDataSet,
           rowSectionConfigRows,
@@ -288,7 +295,7 @@ class PivotSheetChart extends ReactChart {
     if (enableTotal) {
       if (!columnSectionConfigRows.length) {
         const rowTotals = metricsSectionConfigRows.map(c => {
-          const values = Array.from(chartDataSet)
+          const values = chartDataSet
             .map(row => +row.getCell(c))
             .filter(isNumber);
           return {
@@ -299,9 +306,11 @@ class PivotSheetChart extends ReactChart {
       } else {
         const rowTotals = this.calculateGroupedColumnTotal(
           {},
-          columnSectionConfigRows.map(chartDataSet.getFieldKey),
+          columnSectionConfigRows.map(config =>
+            chartDataSet.getFieldKey(config),
+          ),
           metricsSectionConfigRows,
-          Array.from(chartDataSet),
+          chartDataSet,
         );
         summarys.push(...rowTotals);
       }
@@ -311,9 +320,9 @@ class PivotSheetChart extends ReactChart {
         {},
         [rowSectionConfigRows[0]]
           .concat(columnSectionConfigRows)
-          .map(chartDataSet.getFieldKey),
+          .map(chartDataSet.getFieldKey, chartDataSet),
         metricsSectionConfigRows,
-        Array.from(chartDataSet),
+        chartDataSet,
       );
       summarys.push(...rowTotals);
     }
