@@ -33,7 +33,7 @@ const useComputedState: <TS>(
   dependency: any,
   defaultState?: TS,
 ) => any = (stateTransformer, shouldUpdate, dependency, defaultState) => {
-  const [prevDep, setPrevDep] = useState(() => dependency);
+  const [prevDep, setPrevDep] = useState();
   const [state, setState] = useState(defaultState);
 
   useEffect(() => {
