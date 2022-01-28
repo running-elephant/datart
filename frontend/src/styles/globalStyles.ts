@@ -217,4 +217,12 @@ export const OverriddenStyle = createGlobalStyle`
       }
     }
   }
+
+  /* 覆盖antd 默认样式 */
+  @media (max-width: 575px) {
+    .datart-viz .ant-form .ant-form-item .ant-form-item-label,
+    .datart-viz .ant-form .ant-form-item .ant-form-item-control {
+      flex: 1;
+    }
+  }
 `;
