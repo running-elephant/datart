@@ -34,10 +34,10 @@ const ColorTagBox = styled.div`
   border-radius: ${BORDER_RADIUS};
 `;
 
-export const ColorPicker = styled.div<{ color?: string }>`
+export const ColorPicker = styled.div<{ color?: string; size?: number }>`
   flex-shrink: 0;
-  width: ${SPACE_TIMES(8)};
-  height: ${SPACE_TIMES(8)};
+  width: ${p => SPACE_TIMES(p.size || 8)};
+  height: ${p => SPACE_TIMES(p.size || 8)};
   cursor: pointer;
   background-color: ${p => p.color || 'transparent'};
   border-radius: ${BORDER_RADIUS};

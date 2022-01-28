@@ -105,6 +105,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             {...rest}
             {...options}
             defaultValue={data.value?.color}
+            size={6}
             onSubmit={handlePickerSelect}
           />
         </WithColorPicker>
