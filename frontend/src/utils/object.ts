@@ -26,6 +26,7 @@ import mean from 'lodash/mean';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import uniq from 'lodash/uniq';
+import uniqWith from 'lodash/uniqWith';
 
 type PipeFunction<TA, TO> = (accumulator?: TA, options?: TO) => TA | undefined;
 
@@ -143,8 +144,12 @@ export function ObjectToArray(o) {
   return Object.values(o);
 }
 
-export function UniqArray(arr: string[]) {
+export function UniqArray<T>(arr: T[]) {
   return uniq(arr);
+}
+
+export function UniqWith<T>(arr: T[], compareFn: (a: T, b: T) => boolean) {
+  return uniqWith(arr, compareFn);
 }
 
 export function Omit(object, keys: string[]) {
