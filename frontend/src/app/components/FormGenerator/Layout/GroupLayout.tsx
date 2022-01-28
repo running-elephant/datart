@@ -22,6 +22,7 @@ import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_MD } from 'styles/StyleConstants';
+import CollapseHeader from '../CollapseHeader';
 import {
   FormGeneratorLayoutProps,
   GroupLayoutMode,
@@ -84,7 +85,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
               title={t(data.label, true)}
               onClick={handleOpenStateModal}
             >
-              {t(data.label, true)}
+              <CollapseHeader title={t(data.label, true)} />
             </StyledShowModalButton>
             {contextHolder}
           </>
@@ -96,7 +97,10 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           expandIconPosition="right"
           defaultActiveKey={expand ? '1' : undefined}
         >
-          <Panel key="1" header={t(data.label, true)}>
+          <Panel
+            key="1"
+            header={<CollapseHeader title={t(data.label, true)} />}
+          >
             {renderCollectionComponents(
               data,
               handleConfrimModalDialogOrDataUpdate,
