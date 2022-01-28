@@ -20,7 +20,11 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { MIN_MARGIN, MIN_PADDING } from 'app/pages/DashBoardPage/constants';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import { DashboardConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { BoardInfoContext } from 'app/pages/DashBoardPage/contexts/BoardInfoContext';
+import {
+  DashboardConfig,
+  DeviceType,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getRGBAColor } from 'app/pages/DashBoardPage/utils';
 import produce from 'immer';
 import throttle from 'lodash/throttle';
@@ -45,25 +49,41 @@ export const BoardSetting: FC = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
   const dispatch = useDispatch();
   const { boardType } = useContext(BoardContext);
+
   const { config } = useContext(BoardConfigContext);
+
+  const { deviceType } = useContext(BoardInfoContext);
+
   const [form] = Form.useForm();
-  const cacheValue = useRef<any>({});
+  const cacheValue = useRef<any>({}); 
   useEffect(() => {
+    const { scaleMode, width: boardWidth, height: boardHeight } = config;
+    const [marginLR, marginTB] = config.margin;
+    const [paddingLR, paddingTB] = config.containerPadding;
+    const [mobileMarginLR, mobileMarginTB] = config.mobileMargin || [
+      MIN_MARGIN,
+      MIN_MARGIN,
+    ]; //TODO mar
+    const [mobilePaddingLR, mobilePaddingTB] =
+      config.mobileContainerPadding || [MIN_PADDING, MIN_PADDING]; //TODO mar
+
     cacheValue.current = {
       backgroundColor: config.background.color,
       backgroundImage: config.background.image,
-      scaleMode: config.scaleMode,
-      boardWidth: config.width,
-      boardHeight: config.height,
-      marginW: config.margin[0],
-      marginH: config.margin[1],
-      paddingW: config.containerPadding[0],
-      paddingH: config.containerPadding[1],
 
-      mobileMarginW: config.mobileMargin?.[0] || MIN_MARGIN,
-      mobileMarginH: config.mobileMargin?.[1] || MIN_MARGIN,
-      mobilePaddingW: config.mobileContainerPadding?.[0] || MIN_PADDING,
-      mobilePaddingH: config.mobileContainerPadding?.[1] || MIN_PADDING,
+      scaleMode,
+      boardWidth,
+      boardHeight,
+
+      marginLR,
+      marginTB,
+      paddingLR,
+      paddingTB,
+
+      mobileMarginLR, //TODO mar
+      mobileMarginTB,
+      mobilePaddingLR,
+      mobilePaddingTB,
 
       initialQuery: config.initialQuery === false ? false : true, // TODO migration 如果initialQuery的值为undefined默认为true 兼容旧的仪表盘没有initialQuery参数的问题
     };
@@ -80,15 +100,21 @@ export const BoardSetting: FC = memo(() => {
         draft.scaleMode = value.scaleMode;
         draft.width = value.boardWidth;
         draft.height = value.boardHeight;
-        draft.margin[0] = value.marginW;
-        draft.margin[1] = value.marginH;
-        draft.containerPadding[0] = value.paddingW;
-        draft.containerPadding[1] = value.paddingH;
+        draft.margin = [value.marginLR, value.marginTB];
+        draft.containerPadding = [value.paddingLR, value.paddingTB];
 
-        draft.mobileMargin[0] = value.mobileMarginW;
-        draft.mobileMargin[1] = value.mobileMarginH;
-        draft.mobileContainerPadding[0] = value.mobilePaddingW;
-        draft.mobileContainerPadding[1] = value.mobilePaddingH;
+        if (!draft.mobileMargin) {
+          draft.mobileMargin = [1, 1];
+        }
+        draft.mobileMargin = [value.mobileMarginLR, value.mobileMarginTB];
+
+        if (!draft.mobileContainerPadding) {
+          draft.mobileContainerPadding = [1, 1];
+        }
+        draft.mobileContainerPadding = [
+          value.mobilePaddingLR,
+          value.mobilePaddingTB,
+        ];
 
         draft.initialQuery = value.initialQuery;
       });
@@ -126,20 +152,36 @@ export const BoardSetting: FC = memo(() => {
               <Panel header={`${t('baseProperty')}`} key="autoSize" forceRender>
                 <Group>
                   <NumberSet
-                    label={`${t('board')} ${t('marginTB')}`}
-                    name="paddingH"
+                    label={`${t('board')} ${t('paddingTB')}`}
+                    name={
+                      deviceType === DeviceType.Mobile
+                        ? 'mobilePaddingTB'
+                        : 'paddingTB'
+                    }
                   />
                   <NumberSet
-                    label={`${t('board')} ${t('marginLR')}`}
-                    name="paddingW"
+                    label={`${t('board')} ${t('paddingLR')}`}
+                    name={
+                      deviceType === DeviceType.Mobile
+                        ? 'mobilePaddingLR'
+                        : 'paddingLR'
+                    }
                   />
                   <NumberSet
-                    label={`${t('widget')} ${t('paddingTB')}`}
-                    name="marginH"
+                    label={`${t('widget')} ${t('marginTB')}`}
+                    name={
+                      deviceType === DeviceType.Mobile
+                        ? 'mobileMarginTB'
+                        : 'marginTB'
+                    }
                   />
                   <NumberSet
-                    label={`${t('widget')} ${t('paddingLR')}`}
-                    name="marginW"
+                    label={`${t('widget')} ${t('marginLR')}`}
+                    name={
+                      deviceType === DeviceType.Mobile
+                        ? 'mobileMarginLR'
+                        : 'marginLR'
+                    }
                   />
                 </Group>
               </Panel>
