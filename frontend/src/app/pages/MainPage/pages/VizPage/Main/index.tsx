@@ -149,7 +149,7 @@ export function Main() {
   );
 
   return (
-    <Wrapper>
+    <Wrapper className="datart-viz">
       <TabsWrapper>
         <Tabs
           hideAdd
