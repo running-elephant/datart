@@ -277,7 +277,7 @@ export const EditorPage: FC = () => {
                       onConfirm={del(true)}
                     >
                       <Button loading={deleteLoding} disabled={active} danger>
-                        {t('basicSettings')}
+                        {t('moveToTrash')}
                       </Button>
                     </Popconfirm>
                   </Tooltip>
