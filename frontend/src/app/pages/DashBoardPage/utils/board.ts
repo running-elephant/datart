@@ -34,6 +34,8 @@ import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
   LAYOUT_COLS_MAP,
+  MIN_MARGIN,
+  MIN_PADDING,
   NeedFetchWidgetTypes,
 } from '../constants';
 
@@ -142,7 +144,7 @@ export const getInitBoardInfo = (obj: {
     hasFetchItems: [],
     boardWidthHeight: [0, 0],
     originControllerWidgets: obj.controllerWidgets || [],
-  };
+  }; 
   return boardInfo;
 };
 
@@ -161,8 +163,8 @@ export const getInitBoardConfig = (boardType: BoardType) => {
     margin: [16, 16], //0-100
     containerPadding: [16, 16], //0-100
     cols: LAYOUT_COLS_MAP, //2-48    step 2
-    mobileMargin: [8, 8],
-    mobileContainerPadding: [8, 8],
+    mobileMargin: [MIN_MARGIN, MIN_MARGIN],
+    mobileContainerPadding: [MIN_PADDING, MIN_PADDING],
     // free
     type: boardType,
     width: 1920,
