@@ -108,7 +108,7 @@ const config: ChartConfig = {
         },
 
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -165,7 +165,7 @@ const config: ChartConfig = {
           },
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -212,7 +212,7 @@ const config: ChartConfig = {
           options: [],
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -278,7 +278,7 @@ const config: ChartConfig = {
           options: [],
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {

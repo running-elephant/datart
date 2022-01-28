@@ -97,7 +97,7 @@ function DemoCustomLineChart({ dHelper }) {
             },
 
             {
-              label: 'font',
+              label: 'viz.palette.style.font',
               key: 'font',
               comType: 'font',
               default: {
@@ -153,7 +153,7 @@ function DemoCustomLineChart({ dHelper }) {
               },
             },
             {
-              label: 'font',
+              label: 'viz.palette.style.font',
               key: 'font',
               comType: 'font',
               default: {
@@ -200,7 +200,7 @@ function DemoCustomLineChart({ dHelper }) {
               options: [],
             },
             {
-              label: 'font',
+              label: 'viz.palette.style.font',
               key: 'font',
               comType: 'font',
               default: {
@@ -266,7 +266,7 @@ function DemoCustomLineChart({ dHelper }) {
               options: [],
             },
             {
-              label: 'font',
+              label: 'viz.palette.style.font',
               key: 'font',
               comType: 'font',
               default: {
