@@ -464,7 +464,7 @@ class BasicTableChart extends ReactChart {
     );
     let allConditionStyle: any[] = [];
     getAllColumnListInfo?.forEach(info => {
-      const getConditionStyleValue = getStyles(
+      const [getConditionStyleValue] = getStyles(
         info.rows,
         ['conditionStyle'],
         ['conditionStylePanel'],
