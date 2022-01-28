@@ -99,6 +99,7 @@ class BasicTableChart extends ReactChart {
   }
 
   public onResize(options, context?): void {
+    const columns = this.getDataColumnWidths(options, context);
     const tableOptions = Object.assign(
       this.cachedAntTableOptions,
       {
@@ -108,7 +109,7 @@ class BasicTableChart extends ReactChart {
           context,
         ),
       },
-      { columns: this.getDataColumnWidths(options, context) },
+      { columns },
     );
     this.adapter?.updated(tableOptions, context);
   }
@@ -145,7 +146,7 @@ class BasicTableChart extends ReactChart {
       context,
     );
     this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
-      (a, b) => a + b.columnWidthValue,
+      (a, b) => a + (b.columnWidthValue || 0),
       0,
     );
     this.exceedMaxContent = this.totalWidth >= context.width;
@@ -211,7 +212,7 @@ class BasicTableChart extends ReactChart {
       context,
     );
     this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
-      (a, b) => a + b.columnWidthValue,
+      (a, b) => a + (b.columnWidthValue || 0),
       0,
     );
     this.exceedMaxContent = this.totalWidth >= context.width;
