@@ -31,7 +31,7 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.bubble.css';
@@ -40,7 +40,7 @@ import styled from 'styled-components/macro';
 import './RichTextPluginLoader';
 import {
   Formats,
-  MarkdownOptions,
+  MarkdownOptions
 } from './RichTextPluginLoader/RichTextConfig';
 import TagBlot from './RichTextPluginLoader/TagBlot';
 
@@ -305,6 +305,7 @@ const ChartRichTextAdapter: FC<{
             modules={quillModules}
             formats={Formats}
             readOnly={false}
+            bounds={'#quill-box'}
           />
           <Row align="middle" justify="end" style={{ paddingTop: 16 }}>
             <Button
@@ -327,7 +328,7 @@ const ChartRichTextAdapter: FC<{
 
   return (
     <TextWrap onClick={ssp}>
-      <QuillBox>
+      <QuillBox id="quill-box">
         {quillModules && reactQuillEdit}
         {quillModules && !isEditing && reactQuillView}
       </QuillBox>
