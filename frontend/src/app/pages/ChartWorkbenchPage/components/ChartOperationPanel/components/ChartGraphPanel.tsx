@@ -52,7 +52,10 @@ const ChartGraphPanel: FC<{
     <StyledChartGraphPanel>
       {allCharts?.map(c => {
         return (
-          <ChartI18NContext.Provider value={{ i18NConfigs: c?.config?.i18ns }}>
+          <ChartI18NContext.Provider
+            key={c?.meta?.id}
+            value={{ i18NConfigs: c?.config?.i18ns }}
+          >
             <ChartGraphIcon
               chart={c}
               isActive={c?.meta?.id === chart?.meta?.id}
