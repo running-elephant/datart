@@ -31,8 +31,10 @@ export const STORAGE_IMAGE_KEY_PREFIX = 'DATART_IMAGE_';
 export const BASE_VIEW_WIDTH = 1024;
 export const BASE_ROW_HEIGHT = 32;
 export const MIN_ROW_HEIGHT = 24;
+export const MIN_MARGIN = 8;
+export const MIN_PADDING = 8;
 /** lg: 12,md: 12,sm: 8,xs: 2,xxs: 2 */
-export const LAYOUT_COLS = {
+export const LAYOUT_COLS_MAP = {
   lg: 12,
   md: 12,
   sm: 12,
@@ -41,7 +43,7 @@ export const LAYOUT_COLS = {
 };
 /** lg: 12,md: 10,sm: 6,xs: 4,xxs: 2 */
 
-export const BREAK_POINTS = {
+export const BREAK_POINT_MAP = {
   lg: 1200,
   md: 996,
   sm: 768,

@@ -128,22 +128,14 @@ export const DataChartWidget: React.FC<{}> = memo(() => {
       return `not found chart by ${dataChart?.config?.chartGraphId}`;
     }
 
-    const sourceConfig = produce(dataChart?.config, draft => {
-      migrateChartConfig(draft as ChartDetailConfigDTO);
+    const chartConfig = produce(chart.config, draft => {
+      mergeToChartConfig(
+        draft,
+        produce(dataChart?.config, draft => {
+          migrateChartConfig(draft as ChartDetailConfigDTO);
+        }) as ChartDetailConfigDTO,
+      );
     });
-
-    const chartConfig = mergeToChartConfig(
-      chart.config,
-      sourceConfig as ChartDetailConfigDTO,
-    );
-    // const chartConfig = produce(chart.config, draft => {
-    //   mergeToChartConfig(
-    //     draft,
-    //     produce(dataChart?.config, draft => {
-    //       migrateChartConfig(draft as ChartDetailConfigDTO);
-    //     }) as ChartDetailConfigDTO,
-    //   );
-    // });
 
     return (
       <ChartIFrameContainer

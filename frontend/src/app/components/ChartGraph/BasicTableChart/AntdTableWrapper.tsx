@@ -92,33 +92,17 @@ const StyledTable = styled(Table)<{ tableStyleConfig?: TableStyleConfigProps }>`
     background: #fafafa;
   }
 
-  .ant-table
-    .ant-table-container
-    .ant-table-body
-    .ant-table-tbody
-    .odd:hover
-    td {
-    background: ${p =>
-      p?.tableStyleConfig?.odd?.backgroundColor || 'transparent'};
+  .ant-table .ant-table-container .ant-table-body .ant-table-tbody td {
+    background: transparent;
   }
 
-  .ant-table
-    .ant-table-container
-    .ant-table-body
-    .ant-table-tbody
-    .even:hover
-    td {
-    background: ${p =>
-      p?.tableStyleConfig?.even?.backgroundColor || 'transparent'};
-  }
-
-  .odd td {
+  .odd {
     background: ${p =>
       p?.tableStyleConfig?.odd?.backgroundColor || 'transparent'};
     color: ${p => p?.tableStyleConfig?.odd?.color || 'auto'};
   }
 
-  .even td {
+  .even {
     background: ${p =>
       p?.tableStyleConfig?.even?.backgroundColor || 'transparent'};
     color: ${p => p?.tableStyleConfig?.even?.color || 'auto'};

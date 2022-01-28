@@ -20,15 +20,16 @@ import { Empty } from 'antd';
 import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
-  LAYOUT_COLS,
+  BREAK_POINT_MAP,
+  LAYOUT_COLS_MAP,
+  MIN_MARGIN,
+  MIN_PADDING,
   RGL_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import {
-  Dashboard,
-  DeviceType,
-  RectConfig,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { BoardInfoContext } from 'app/pages/DashBoardPage/contexts/BoardInfoContext';
+import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import debounce from 'lodash/debounce';
 import React, {
@@ -40,7 +41,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import RGL, { Layout, WidthProvider } from 'react-grid-layout';
+import { Layout, Layouts, Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
@@ -50,20 +51,29 @@ import StyledBackground from '../../Board/components/StyledBackground';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
 import {
-  selectDeviceType,
-  selectEditBoard,
   selectLayoutWidgetInfoMap,
   selectLayoutWidgetMap,
 } from '../slice/selectors';
 import { WidgetOfAutoEditor } from './WidgetOfAutoEditor';
 
-const ReactGridLayout = WidthProvider(RGL);
+// const ReactGridLayout = WidthProvider(RGL);
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
 export const AutoBoardEditor: React.FC<{}> = () => {
-  const dashBoard = useSelector(selectEditBoard) as Dashboard;
-  const { margin, containerPadding, background } = useMemo(() => {
-    return dashBoard.config;
-  }, [dashBoard.config]);
+  const { renderedWidgetById } = useContext(BoardContext);
+  const { config } = useContext(BoardConfigContext);
+  const { deviceType } = useContext(BoardInfoContext);
+
+  const {
+    margin,
+    containerPadding,
+    background,
+    mobileMargin,
+    mobileContainerPadding,
+  } = config;
+
+  const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
+  const layoutWidgetInfoMap = useSelector(selectLayoutWidgetInfoMap);
 
   const [curWH, setCurWH] = useState<number[]>([]);
   const updateCurWH = useCallback((values: number[]) => {
@@ -72,18 +82,15 @@ export const AutoBoardEditor: React.FC<{}> = () => {
       dispatchResize();
     });
   }, []);
-  const { renderedWidgetById } = useContext(BoardContext);
+
   const dispatch = useDispatch();
 
-  const curDeviceType = useSelector(selectDeviceType);
-
-  const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
+  const [layoutMap, setLayoutMap] = useState<Layouts>({});
 
   const layoutWidgets = useMemo(
     () => Object.values(layoutWidgetMap),
     [layoutWidgetMap],
   );
-  const layoutWidgetInfoMap = useSelector(selectLayoutWidgetInfoMap);
 
   const currentLayout = useRef<Layout[]>([]);
 
@@ -93,19 +100,53 @@ export const AutoBoardEditor: React.FC<{}> = () => {
 
   let scrollThrottle = useRef(false);
 
+  const onBreakpointChange = value => {
+    console.log('_Breakpoint', value);
+  };
+
+  const { curMargin, curPadding } = useMemo(() => {
+    return deviceType === DeviceType.Mobile
+      ? {
+          curMargin: mobileMargin || [MIN_MARGIN, MIN_MARGIN],
+          curPadding: mobileContainerPadding || [MIN_PADDING, MIN_PADDING],
+        }
+      : {
+          curMargin: margin,
+          curPadding: containerPadding,
+        };
+  }, [
+    deviceType,
+    mobileMargin,
+    mobileContainerPadding,
+    margin,
+    containerPadding,
+  ]);
+
   useEffect(() => {
-    const layout: Layout[] = [];
+    const layoutMap: Layouts = {
+      lg: [],
+      xs: [],
+    };
     layoutWidgets.forEach(widget => {
-      const desktopRect = widget.config.rect;
-      let curRect = desktopRect;
-      if (curDeviceType === DeviceType.Mobile) {
-        curRect = widget.config?.mobileRect || desktopRect;
-      }
-      const { x, y, width: w, height: h } = curRect as RectConfig;
-      layout.push({ i: widget.id, x, y, w, h });
+      const lg = widget.config.rect || widget.config.mobileRect;
+      const xs = widget.config.mobileRect || widget.config.rect;
+      layoutMap.lg.push({
+        i: widget.id,
+        x: lg.x,
+        y: lg.y,
+        w: lg.width,
+        h: lg.height,
+      });
+      layoutMap.xs.push({
+        i: widget.id,
+        x: xs.x,
+        y: xs.y,
+        w: xs.width,
+        h: xs.height,
+      });
     });
-    currentLayout.current = layout;
-  }, [layoutWidgets, curDeviceType]);
+    setLayoutMap(layoutMap);
+  }, [layoutWidgets]);
 
   useEffect(() => {
     const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
@@ -116,6 +157,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
       }));
     }
   }, [layoutWidgetInfoMap]);
+
   const layoutWrap: RefObject<HTMLDivElement> = useRef(null);
 
   const calcItemTop = useCallback(
@@ -171,7 +213,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     dispatch(
       editBoardStackActions.changeAutoBoardWidgetsRect({
         layouts,
-        deviceType: curDeviceType,
+        deviceType: deviceType,
       }),
     );
   }, 300);
@@ -198,19 +240,15 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     });
   }, [layoutWidgets]);
 
-  const { curCols, deviceClassName } = useMemo(() => {
-    let curCols: number = LAYOUT_COLS.lg;
+  const { deviceClassName } = useMemo(() => {
     let deviceClassName: string = 'desktop';
-
-    if (curDeviceType === DeviceType.Mobile) {
-      curCols = LAYOUT_COLS.xs;
+    if (deviceType === DeviceType.Mobile) {
       deviceClassName = 'mobile';
     }
     return {
-      curCols,
       deviceClassName,
     };
-  }, [curDeviceType]);
+  }, [deviceType]);
 
   /**
    * https://www.npmjs.com/package/react-grid-layout
@@ -218,7 +256,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
 
   return (
     <Wrap className={deviceClassName}>
-      {curDeviceType === DeviceType.Mobile && (
+      {deviceType === DeviceType.Mobile && (
         <DeviceList updateCurWH={updateCurWH} />
       )}
       <StyledContainer
@@ -229,11 +267,15 @@ export const AutoBoardEditor: React.FC<{}> = () => {
       >
         {layoutWidgets.length ? (
           <div className="grid-wrap" ref={layoutWrap}>
-            <ReactGridLayout
-              layout={currentLayout.current}
-              margin={margin}
-              containerPadding={containerPadding}
-              cols={curCols}
+            <ResponsiveGridLayout
+              // layout={currentLayout.current}
+              // cols={curCols}
+              layouts={layoutMap}
+              cols={LAYOUT_COLS_MAP}
+              breakpoints={BREAK_POINT_MAP}
+              onBreakpointChange={onBreakpointChange}
+              margin={curMargin}
+              containerPadding={curPadding}
               rowHeight={widgetRowHeight}
               useCSSTransforms={true}
               measureBeforeMount={false}
@@ -245,7 +287,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
               draggableHandle={`.${RGL_DRAG_HANDLE}`}
             >
               {boardChildren}
-            </ReactGridLayout>
+            </ResponsiveGridLayout>
           </div>
         ) : (
           <div className="empty">
@@ -268,7 +310,7 @@ const Wrap = styled.div`
     z-index: 100;
   }
   &.desktop {
-    min-width: 768px;
+    min-width: 769px;
   }
 `;
 
@@ -285,7 +327,7 @@ const StyledContainer = styled(StyledBackground)<{ curWH: number[] }>`
     box-shadow: 0px 0 32px 0px rgb(73 80 87 / 8%);
     border: 8px solid ${G30};
     border-radius: 6px;
-    margin-top: 30px;
+    margin-top: 16px;
     width: ${p => p.curWH[0] + 'px'};
     height: ${p => p.curWH[1] + 'px'};
   }

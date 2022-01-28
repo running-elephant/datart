@@ -31,7 +31,7 @@ import { View } from '../../../../../types/View';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import {
   BorderStyleType,
-  LAYOUT_COLS,
+  LAYOUT_COLS_MAP,
   ScaleModeType,
   TextAlignType,
 } from '../../../constants';
@@ -86,20 +86,22 @@ export interface DashboardConfig {
     boxShadow?: boolean;
   };
   maxWidgetIndex: number;
+  initialQuery: boolean; // TODO migration del ? -- xld
+  hasQueryControl: boolean; // TODO migration del ? -- xld
+  hasResetControl?: boolean; // TODO migration del ? -- xld
   type: BoardType; //'auto','free'
+
   // auto
   margin: [number, number];
   containerPadding: [number, number];
-  rowHeight?: number;
-  cols: ColsType;
+  mobileMargin: [number, number]; // TODO migration del ? -- xld
+  mobileContainerPadding: [number, number]; // TODO migration del ? -- xld
+  cols?: ColsType;
   // free
   width: number;
   height: number;
   gridStep: [number, number];
   scaleMode: ScaleModeType;
-  initialQuery: boolean;
-  hasQueryControl: boolean; // TODO migration del ? -- xld
-  hasResetControl?: boolean; // TODO migration del ? -- xld
 }
 export const BoardTypeMap = strEnumType(['auto', 'free']);
 export type BoardType = keyof typeof BoardTypeMap;
@@ -410,7 +412,7 @@ export interface DataChartConfig {
   computedFields: any[];
 }
 
-export type ColsType = typeof LAYOUT_COLS;
+export type ColsType = typeof LAYOUT_COLS_MAP;
 
 // Dashboard view model
 export interface BoardInfo {
@@ -425,7 +427,7 @@ export interface BoardInfo {
   isDroppable: boolean;
   clipboardWidgets: Record<string, WidgetOfCopy>;
   layouts: Layout[];
-  deviceType?: DeviceType; // deviceType for autoBoard defaultValue = desktop
+  deviceType: DeviceType; // deviceType for autoBoard defaultValue = desktop
   widgetIds: string[]; // board保存的时候 区分那些是删除的，哪些是新增的
   controllerPanel: WidgetControllerPanelParams; //
   linkagePanel: WidgetPanelParams;

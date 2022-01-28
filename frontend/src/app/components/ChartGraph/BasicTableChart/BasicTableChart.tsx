@@ -99,6 +99,7 @@ class BasicTableChart extends ReactChart {
   }
 
   public onResize(options, context?): void {
+    const columns = this.getDataColumnWidths(options, context);
     const tableOptions = Object.assign(
       this.cachedAntTableOptions,
       {
@@ -108,7 +109,7 @@ class BasicTableChart extends ReactChart {
           context,
         ),
       },
-      { columns: this.getDataColumnWidths(options, context) },
+      { columns },
     );
     this.adapter?.updated(tableOptions, context);
   }
@@ -145,7 +146,7 @@ class BasicTableChart extends ReactChart {
       context,
     );
     this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
-      (a, b) => a + b.columnWidthValue,
+      (a, b) => a + (b.columnWidthValue || 0),
       0,
     );
     this.exceedMaxContent = this.totalWidth >= context.width;
@@ -211,7 +212,7 @@ class BasicTableChart extends ReactChart {
       context,
     );
     this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
-      (a, b) => a + b.columnWidthValue,
+      (a, b) => a + (b.columnWidthValue || 0),
       0,
     );
     this.exceedMaxContent = this.totalWidth >= context.width;
@@ -410,7 +411,7 @@ class BasicTableChart extends ReactChart {
         [rowUniqKey]: {
           columnWidthValue: getUseColumnWidth
             ? columnWidth || 100
-            : Math.max(...datas) +
+            : (datas.length ? Math.max(...datas) : 0) +
               this.tablePadding * 2 +
               this.tableCellBorder * 2,
           getUseColumnWidth,
@@ -464,7 +465,7 @@ class BasicTableChart extends ReactChart {
     );
     let allConditionStyle: any[] = [];
     getAllColumnListInfo?.forEach(info => {
-      const getConditionStyleValue = getStyles(
+      const [getConditionStyleValue] = getStyles(
         info.rows,
         ['conditionStyle'],
         ['conditionStylePanel'],
