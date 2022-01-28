@@ -35,6 +35,7 @@ import {
   BackgroundDefault,
   BorderDefault,
   ButtonBorderDefault,
+  LAYOUT_COLS_MAP,
   QueryButtonWidgetBackgroundDefault,
 } from '../constants';
 import {
@@ -411,7 +412,7 @@ export const updateWidgetsRect = (
   layouts?: ReactGridLayout.Layout[],
 ) => {
   if (boardConfig.type === 'auto') {
-    return updateAutoWidgetsRect(boardConfig, widgets, layouts || []);
+    return updateAutoWidgetsRect(widgets, layouts || []);
   } else if (boardConfig.type === 'free') {
     return updateFreeWidgetsRect(widgets);
   }
@@ -419,7 +420,6 @@ export const updateWidgetsRect = (
 };
 
 export const updateAutoWidgetsRect = (
-  boardConfig: DashboardConfig,
   widgets: Widget[],
   layouts: ReactGridLayout.Layout[],
 ): Widget[] => {
@@ -429,7 +429,7 @@ export const updateAutoWidgetsRect = (
   let itemYs = [...dashWidgetRectYs];
   widgets.forEach(widget => {
     const itemX =
-      (widgetsCount * widget.config.rect.width) % boardConfig.cols.lg;
+      (widgetsCount * widget.config.rect.width) % LAYOUT_COLS_MAP.lg;
     const itemY = Math.max(...itemYs, 0);
     const nextRect = {
       ...widget.config.rect,
