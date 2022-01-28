@@ -411,7 +411,7 @@ class BasicTableChart extends ReactChart {
         [rowUniqKey]: {
           columnWidthValue: getUseColumnWidth
             ? columnWidth || 100
-            : Math.max(...datas) +
+            : (datas.length ? Math.max(...datas) : 0) +
               this.tablePadding * 2 +
               this.tableCellBorder * 2,
           getUseColumnWidth,
