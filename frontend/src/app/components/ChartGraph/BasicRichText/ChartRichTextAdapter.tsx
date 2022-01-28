@@ -306,7 +306,6 @@ const ChartRichTextAdapter: FC<{
             formats={Formats}
             readOnly={false}
             bounds={'#quill-box'}
-            sco
           />
           <Row align="middle" justify="end" style={{ paddingTop: 16 }}>
             <Button
