@@ -22,17 +22,19 @@ import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProv
 import {
   BREAK_POINT_MAP,
   LAYOUT_COLS_MAP,
+  MIN_MARGIN,
+  MIN_PADDING,
 } from 'app/pages/DashBoardPage/constants';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import {
-  makeSelectBoardConfigById,
   selectLayoutWidgetInfoMapById,
   selectLayoutWidgetMapById,
 } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import {
   BoardState,
-  Dashboard,
+  DeviceType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, {
   memo,
@@ -53,23 +55,22 @@ import StyledBackground from '../components/StyledBackground';
 import { WidgetOfAuto } from './WidgetOfAuto';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
+const mobilePoints = Object.keys(BREAK_POINT_MAP).slice(3);
 export interface AutoBoardCoreProps {
   boardId: string;
 }
 export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
   ({ boardId }) => {
-    const selectBoardConfigById = useMemo(makeSelectBoardConfigById, []);
-    const dashBoard = useSelector((state: { board: BoardState }) =>
-      selectBoardConfigById(state, boardId),
-    );
-
-    const {
-      config: { margin, containerPadding, background },
-    } = useMemo(() => {
-      return dashBoard as Dashboard;
-    }, [dashBoard]);
-
     const { renderedWidgetById } = useContext(BoardContext);
+    const { config } = useContext(BoardConfigContext);
+    const {
+      margin,
+      containerPadding,
+      background,
+      mobileMargin,
+      mobileContainerPadding,
+    } = config;
+
     const selectLayoutWidgetsConfigById = useMemo(
       selectLayoutWidgetMapById,
       [],
@@ -77,12 +78,17 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
     const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
       selectLayoutWidgetsConfigById(state, boardId),
     );
+
+    const layoutWidgetInfoMap = useSelector((state: { board: BoardState }) =>
+      selectLayoutWidgetInfoMapById(state, boardId),
+    );
+
     const layoutWidgets = useMemo(() => {
       return Object.values(layoutWidgetMap);
     }, [layoutWidgetMap]);
 
-    const layoutWidgetInfoMap = useSelector((state: { board: BoardState }) =>
-      selectLayoutWidgetInfoMapById(state, boardId),
+    const [deviceType, setDeviceType] = useState<DeviceType>(
+      DeviceType.Desktop,
     );
 
     const [layoutMap, setLayoutMap] = useState<Layouts>({});
@@ -98,6 +104,32 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
     const { ref, widgetRowHeight } = useWidgetRowHeight();
 
     const scrollThrottle = useRef(false);
+
+    const onBreakpointChange = pointKey => {
+      if (mobilePoints.includes(pointKey)) {
+        setDeviceType(DeviceType.Mobile);
+      } else {
+        setDeviceType(DeviceType.Desktop);
+      }
+    };
+
+    const { curMargin, curPadding } = useMemo(() => {
+      return deviceType === DeviceType.Mobile
+        ? {
+            curMargin: mobileMargin || [MIN_MARGIN, MIN_MARGIN],
+            curPadding: mobileContainerPadding || [MIN_PADDING, MIN_PADDING],
+          }
+        : {
+            curMargin: margin,
+            curPadding: containerPadding,
+          };
+    }, [
+      deviceType,
+      mobileMargin,
+      mobileContainerPadding,
+      margin,
+      containerPadding,
+    ]);
 
     useEffect(() => {
       const layoutMap: Layouts = {
@@ -205,9 +237,6 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
         );
       });
     }, [layoutWidgets]);
-    const onBreakpointChange = value => {
-      console.log('_Breakpoint', value);
-    };
 
     return (
       <Wrap>
@@ -218,8 +247,8 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
                 <ResponsiveGridLayout
                   layouts={layoutMap}
                   breakpoints={BREAK_POINT_MAP}
-                  margin={margin}
-                  containerPadding={containerPadding}
+                  margin={curMargin}
+                  containerPadding={curPadding}
                   cols={LAYOUT_COLS_MAP}
                   rowHeight={widgetRowHeight}
                   onLayoutChange={onLayoutChange}

@@ -22,13 +22,14 @@ import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProv
 import {
   BREAK_POINT_MAP,
   LAYOUT_COLS_MAP,
+  MIN_MARGIN,
+  MIN_PADDING,
   RGL_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import {
-  Dashboard,
-  DeviceType,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { BoardInfoContext } from 'app/pages/DashBoardPage/contexts/BoardInfoContext';
+import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import debounce from 'lodash/debounce';
 import React, {
@@ -50,8 +51,6 @@ import StyledBackground from '../../Board/components/StyledBackground';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
 import {
-  selectDeviceType,
-  selectEditBoard,
   selectLayoutWidgetInfoMap,
   selectLayoutWidgetMap,
 } from '../slice/selectors';
@@ -59,11 +58,22 @@ import { WidgetOfAutoEditor } from './WidgetOfAutoEditor';
 
 // const ReactGridLayout = WidthProvider(RGL);
 const ResponsiveGridLayout = WidthProvider(Responsive);
+
 export const AutoBoardEditor: React.FC<{}> = () => {
-  const dashBoard = useSelector(selectEditBoard) as Dashboard;
-  const { margin, containerPadding, background } = useMemo(() => {
-    return dashBoard.config;
-  }, [dashBoard.config]);
+  const { renderedWidgetById } = useContext(BoardContext);
+  const { config } = useContext(BoardConfigContext);
+  const { deviceType } = useContext(BoardInfoContext);
+
+  const {
+    margin,
+    containerPadding,
+    background,
+    mobileMargin,
+    mobileContainerPadding,
+  } = config;
+
+  const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
+  const layoutWidgetInfoMap = useSelector(selectLayoutWidgetInfoMap);
 
   const [curWH, setCurWH] = useState<number[]>([]);
   const updateCurWH = useCallback((values: number[]) => {
@@ -72,20 +82,15 @@ export const AutoBoardEditor: React.FC<{}> = () => {
       dispatchResize();
     });
   }, []);
-  const { renderedWidgetById } = useContext(BoardContext);
+
   const dispatch = useDispatch();
 
   const [layoutMap, setLayoutMap] = useState<Layouts>({});
-
-  const curDeviceType = useSelector(selectDeviceType);
-
-  const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
 
   const layoutWidgets = useMemo(
     () => Object.values(layoutWidgetMap),
     [layoutWidgetMap],
   );
-  const layoutWidgetInfoMap = useSelector(selectLayoutWidgetInfoMap);
 
   const currentLayout = useRef<Layout[]>([]);
 
@@ -98,6 +103,25 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   const onBreakpointChange = value => {
     console.log('_Breakpoint', value);
   };
+
+  const { curMargin, curPadding } = useMemo(() => {
+    return deviceType === DeviceType.Mobile
+      ? {
+          curMargin: mobileMargin || [MIN_MARGIN, MIN_MARGIN],
+          curPadding: mobileContainerPadding || [MIN_PADDING, MIN_PADDING],
+        }
+      : {
+          curMargin: margin,
+          curPadding: containerPadding,
+        };
+  }, [
+    deviceType,
+    mobileMargin,
+    mobileContainerPadding,
+    margin,
+    containerPadding,
+  ]);
+
   useEffect(() => {
     const layoutMap: Layouts = {
       lg: [],
@@ -123,6 +147,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     });
     setLayoutMap(layoutMap);
   }, [layoutWidgets]);
+
   useEffect(() => {
     const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
     if (layoutWidgetInfos.length) {
@@ -188,7 +213,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     dispatch(
       editBoardStackActions.changeAutoBoardWidgetsRect({
         layouts,
-        deviceType: curDeviceType,
+        deviceType: deviceType,
       }),
     );
   }, 300);
@@ -217,13 +242,13 @@ export const AutoBoardEditor: React.FC<{}> = () => {
 
   const { deviceClassName } = useMemo(() => {
     let deviceClassName: string = 'desktop';
-    if (curDeviceType === DeviceType.Mobile) {
+    if (deviceType === DeviceType.Mobile) {
       deviceClassName = 'mobile';
     }
     return {
       deviceClassName,
     };
-  }, [curDeviceType]);
+  }, [deviceType]);
 
   /**
    * https://www.npmjs.com/package/react-grid-layout
@@ -231,7 +256,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
 
   return (
     <Wrap className={deviceClassName}>
-      {curDeviceType === DeviceType.Mobile && (
+      {deviceType === DeviceType.Mobile && (
         <DeviceList updateCurWH={updateCurWH} />
       )}
       <StyledContainer
@@ -249,8 +274,8 @@ export const AutoBoardEditor: React.FC<{}> = () => {
               cols={LAYOUT_COLS_MAP}
               breakpoints={BREAK_POINT_MAP}
               onBreakpointChange={onBreakpointChange}
-              margin={margin}
-              containerPadding={containerPadding}
+              margin={curMargin}
+              containerPadding={curPadding}
               rowHeight={widgetRowHeight}
               useCSSTransforms={true}
               measureBeforeMount={false}
@@ -302,7 +327,7 @@ const StyledContainer = styled(StyledBackground)<{ curWH: number[] }>`
     box-shadow: 0px 0 32px 0px rgb(73 80 87 / 8%);
     border: 8px solid ${G30};
     border-radius: 6px;
-    margin-top: 30px;
+    margin-top: 16px;
     width: ${p => p.curWH[0] + 'px'};
     height: ${p => p.curWH[1] + 'px'};
   }
