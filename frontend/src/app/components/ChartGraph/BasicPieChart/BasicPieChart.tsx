@@ -180,12 +180,12 @@ class BasicPieChart extends Chart {
   private getDataItemStyle(
     config,
     colorConfigs: ChartDataSectionField[],
-    dataColumn,
+    row: IChartDataSetRow<string>,
   ) {
-    const colorColName = colorConfigs?.[0]?.colName;
+    const colorConfig = colorConfigs?.[0];
     const columnColor = config?.color?.start;
-    if (colorColName) {
-      const colorKey = dataColumn[colorColName];
+    if (colorConfig) {
+      const colorKey = row.getCell(colorConfig);
       const itemStyleColor = colorConfigs[0]?.color?.colors?.find(
         c => c.key === colorKey,
       );

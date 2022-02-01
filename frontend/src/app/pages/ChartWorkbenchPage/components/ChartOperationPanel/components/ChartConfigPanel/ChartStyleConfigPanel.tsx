@@ -17,6 +17,7 @@
  */
 
 import { Collapse } from 'antd';
+import CollapseHeader from 'app/components/FormGenerator/CollapseHeader';
 import GroupLayout from 'app/components/FormGenerator/Layout/GroupLayout';
 import { GroupLayoutMode } from 'app/components/FormGenerator/types';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -39,7 +40,10 @@ const ChartStyleConfigPanel: FC<{
         {configs
           ?.filter(c => !Boolean(c.hidden))
           .map((c, index) => (
-            <Collapse.Panel header={t(c.label, true)} key={c.key}>
+            <Collapse.Panel
+              header={<CollapseHeader title={t(c.label, true)} />}
+              key={c.key}
+            >
               <GroupLayout
                 ancestors={[index]}
                 mode={

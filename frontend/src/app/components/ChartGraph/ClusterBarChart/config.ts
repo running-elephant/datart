@@ -123,7 +123,7 @@ const config: ChartConfig = {
           },
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -180,7 +180,7 @@ const config: ChartConfig = {
           },
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -226,7 +226,7 @@ const config: ChartConfig = {
           comType: 'checkbox',
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -291,7 +291,7 @@ const config: ChartConfig = {
           comType: 'checkbox',
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {

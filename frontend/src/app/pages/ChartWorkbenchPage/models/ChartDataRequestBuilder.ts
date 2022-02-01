@@ -40,7 +40,7 @@ import {
   recommendTimeRangeConverter,
 } from 'app/utils/time';
 import { TIME_FORMATTER } from 'globalConstants';
-import { isEmptyArray, IsKeyIn } from 'utils/object';
+import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 
 export class ChartDataRequestBuilder {
   chartDataConfigs: ChartDataConfig[];
@@ -100,10 +100,13 @@ export class ChartDataRequestBuilder {
       [],
     );
 
-    return aggColumns.map(aggCol => ({
-      column: aggCol.colName,
-      sqlOperator: aggCol.aggregate!,
-    }));
+    return UniqWith(
+      aggColumns.map(aggCol => ({
+        column: aggCol.colName,
+        sqlOperator: aggCol.aggregate!,
+      })),
+      (a, b) => a.column === b.column && a.sqlOperator === b.sqlOperator,
+    );
   }
 
   private buildGroups() {

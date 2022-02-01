@@ -32,9 +32,9 @@ const InfoTypeSection: FC<ChartDataConfigSectionProps> = memo(
       {
         actions: {
           [ChartDataViewFieldType.NUMERIC]: [
-            ChartDataSectionFieldActionType.Aggregate,
-            ChartDataSectionFieldActionType.Format,
             ChartDataSectionFieldActionType.Alias,
+            ChartDataSectionFieldActionType.Format,
+            ChartDataSectionFieldActionType.Aggregate,
           ],
         },
       },

@@ -74,6 +74,7 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           <ColorPickerPopover
             {...rest}
             {...options}
+            size={6}
             defaultValue={data.value?.color}
             onSubmit={hanldePickerSelect}
           />
