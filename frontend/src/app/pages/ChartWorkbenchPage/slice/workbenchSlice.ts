@@ -272,12 +272,12 @@ export const updateRichTextAction = createAsyncThunk(
         workbenchSlice.actions.updateChartConfig({
           type: 'style',
           payload: {
-            ancestors: [0, 0],
+            ancestors: [1, 0],
             value: {
               label: 'delta.richText',
               key: 'richText',
               default: '',
-              comType: 'input',
+              comType: 'text',
               value: delta,
             },
           },
