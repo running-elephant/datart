@@ -212,7 +212,7 @@
               "moveToTrash": "Move to recycle bin",
               "delete": "Delete",
               "newTimedTask": "New timed task",
-              "sureToRestore?": "Are you sure to restore?",
+              "sureToRestore": "Are you sure to restore?",
               "restore": "Reduction",
               "sureToDelete": "Confirm delete?",
               "allowModificationAfterStopping": "Allow modification after stopping",
