@@ -153,6 +153,17 @@ const config: ChartConfig = {
       comType: 'group',
       rows: [
         {
+          label: 'common.showAxis',
+          key: 'showAxis',
+          default: true,
+          comType: 'checkbox',
+        },
+        {
+          label: 'common.inverseAxis',
+          key: 'inverseAxis',
+          comType: 'checkbox',
+        },
+        {
           label: 'leftY.title',
           key: 'graphType',
           default: 'bar',
@@ -200,6 +211,17 @@ const config: ChartConfig = {
       key: 'rightY',
       comType: 'group',
       rows: [
+        {
+          label: 'common.showAxis',
+          key: 'showAxis',
+          default: true,
+          comType: 'checkbox',
+        },
+        {
+          label: 'common.inverseAxis',
+          key: 'inverseAxis',
+          comType: 'checkbox',
+        },
         {
           label: 'rightY.title',
           key: 'graphType',
