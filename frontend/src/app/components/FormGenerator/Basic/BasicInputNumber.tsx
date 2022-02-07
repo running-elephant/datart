@@ -76,4 +76,8 @@ const Wrapper = styled(BW)`
   .ant-input-number-handler-wrap {
     background-color: ${p => p.theme.emphasisBackground};
   }
+
+  .ant-input-number-disabled {
+    background-color: ${p => p.theme.textColorDisabled};
+  }
 `;
