@@ -1009,7 +1009,7 @@
       "dirtyread": "Dirty read",
       "fastfailover": "Fast failover",
       "cache": "Cache",
-      "cacheExpires": "Expires"
+      "cacheExpires": "Expires(s)"
     },
     "schemaTable": {
       "category": "Category",
