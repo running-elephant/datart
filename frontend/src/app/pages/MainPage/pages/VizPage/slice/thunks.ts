@@ -37,7 +37,6 @@ import {
   AddStoryboardParams,
   AddVizParams,
   ChartPreview,
-  CopyDashboardParams,
   DeleteStoryboardParams,
   DeleteVizParams,
   EditFolderParams,
@@ -46,6 +45,7 @@ import {
   Folder,
   FolderViewModel,
   PublishVizParams,
+  SaveAsDashboardParams,
   Storyboard,
   StoryboardViewModel,
   UnarchiveVizParams,
@@ -305,6 +305,7 @@ export const initChartPreviewData = createAsyncThunk<
     await thunkAPI.dispatch(
       fetchVizChartAction({ backendChartId, filterSearchParams }),
     );
+
     const vizState = (thunkAPI.getState() as RootState)?.viz as VizState;
     const currentChartPreview = vizState?.chartPreviews?.find(
       c => c.backendChartId === backendChartId,
@@ -407,8 +408,8 @@ export const updateFilterAndFetchDataset = createAsyncThunk(
   },
 );
 
-export const copyDashboard = createAsyncThunk<Folder, CopyDashboardParams>(
-  'viz/copyDashboard',
+export const saveAsDashboard = createAsyncThunk<Folder, SaveAsDashboardParams>(
+  'viz/saveAsDashboard',
   async ({ viz, dashboardId, resolve }) => {
     try {
       const { data } = await request<Folder>({

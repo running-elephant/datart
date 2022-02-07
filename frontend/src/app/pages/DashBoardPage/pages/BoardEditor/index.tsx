@@ -42,7 +42,7 @@ import {
   selectBoardChartEditorProps,
   selectEditBoard,
 } from './slice/selectors';
-import { fetchEditBoardDetail } from './slice/thunk';
+import { addWrapChartWidget, fetchEditBoardDetail } from './slice/thunk';
 
 export const BoardEditor: React.FC<{
   dashboardId: string;
@@ -56,13 +56,38 @@ export const BoardEditor: React.FC<{
     const history = useHistory();
     const dashboard = useSelector(selectEditBoard);
     const boardChartEditorProps = useSelector(selectBoardChartEditorProps);
+    const histState = history.location.state as any;
     const onCloseChartEditor = useCallback(() => {
       dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
     }, [dispatch]);
     useEffect(() => {
-      dispatch(fetchEditBoardDetail(dashboardId));
-    }, [dashboardId, dispatch]);
+      async function initialization() {
+        await dispatch(fetchEditBoardDetail(dashboardId));
 
+        const widgetInfo = histState?.widgetInfo
+          ? JSON.parse(histState?.widgetInfo)
+          : '';
+        const boardType = dashboard.config?.type;
+
+        widgetInfo &&
+          dispatch(
+            addWrapChartWidget({
+              boardId,
+              chartId: widgetInfo?.dataChart.id,
+              boardType,
+              dataChart: widgetInfo?.dataChart,
+              view: widgetInfo?.dataview,
+            }),
+          );
+      }
+      initialization();
+    }, [
+      dashboardId,
+      dispatch,
+      histState?.widgetInfo,
+      boardId,
+      dashboard.config?.type,
+    ]);
     const onSaveToWidget = useCallback(
       (chartType: WidgetContentChartType, dataChart: DataChart, view) => {
         const widgetId = boardChartEditorProps?.widgetId!;

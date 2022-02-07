@@ -23,7 +23,7 @@ import { request } from 'utils/request';
 import { errorHandle, getInsertedNodeIndex } from 'utils/utils';
 import { SaveFormContext, SaveFormModel } from '../SaveFormContext';
 import { selectVizs } from '../slice/selectors';
-import { addViz, copyDashboard } from '../slice/thunks';
+import { addViz, saveAsDashboard } from '../slice/thunks';
 import { VizType } from '../slice/types';
 
 export function useSaveAsViz() {
@@ -96,7 +96,7 @@ export function useSaveAsViz() {
             };
 
             dispatch(
-              copyDashboard({
+              saveAsDashboard({
                 viz: requestData,
                 dashboardId: vizData.id,
                 resolve: onClose,

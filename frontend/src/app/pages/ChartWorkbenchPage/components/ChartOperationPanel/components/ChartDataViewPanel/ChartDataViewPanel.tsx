@@ -63,7 +63,6 @@ const ChartDataViewPanel: FC<{
   const [isDisplayAddNewModal, setIsDisplayAddNewModal] = useToggle();
   const viewId = dataView?.id || '';
   const viewParentId = dataView?.parentId || '';
-  console.log(dataView, 'dataView');
   const path = [ResourceTypes.View, viewParentId, viewId];
   const managePermission = useCascadeAccess({
     module: ResourceTypes.View,
@@ -215,6 +214,7 @@ const ChartDataViewPanel: FC<{
       handleDataViewChange(defaultViewId);
     }
   });
+
   return (
     <StyledChartDataViewPanel>
       <Header>

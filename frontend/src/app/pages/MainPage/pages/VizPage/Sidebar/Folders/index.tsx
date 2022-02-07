@@ -1,14 +1,11 @@
 import {
-  BarChartOutlined,
   DeleteOutlined,
-  FolderFilled,
-  FolderOpenFilled,
-  FundFilled,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import { ListNav, ListPane, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
+import useGetVizIcon from 'app/hooks/useGetVizIcon';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { BoardTypeMap } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
@@ -37,6 +34,7 @@ import {
 import { FolderViewModel, VizType } from '../../slice/types';
 import { Recycle } from '../Recycle';
 import { FolderTree } from './FolderTree';
+
 interface FoldersProps extends I18NComponentProps {
   selectedId?: string;
   className?: string;
@@ -64,16 +62,7 @@ export const Folders = memo(
       return undefined;
     }, []);
 
-    const getIcon = useCallback(({ relType }: FolderViewModel) => {
-      switch (relType) {
-        case 'DASHBOARD':
-          return <FundFilled />;
-        case 'DATACHART':
-          return <BarChartOutlined />;
-        default:
-          return p => (p.expanded ? <FolderOpenFilled /> : <FolderFilled />);
-      }
-    }, []);
+    const getIcon = useGetVizIcon();
 
     const getDisabled = useCallback(
       ({ deleteLoading }: FolderViewModel) => deleteLoading,

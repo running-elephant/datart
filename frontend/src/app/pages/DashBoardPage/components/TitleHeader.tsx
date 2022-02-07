@@ -26,6 +26,9 @@ import {
   VerticalAlignBottomOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown, Space } from 'antd';
+import SaveToDashboardOrStoryboard, {
+  SaveTypes,
+} from 'app/components/SaveToDashboardOrStoryboard';
 import { ShareLinkModal } from 'app/components/VizOperationMenu';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
@@ -54,21 +57,30 @@ import { BoardOverLay } from './BoardOverLay';
 interface TitleHeaderProps {
   name?: string;
   publishLoading?: boolean;
+  orgId?: string;
   onShareDownloadData?: () => void;
   toggleBoardEditor?: (bool: boolean) => void;
   onPublish?: () => void;
+  onRecycleViz?: () => void;
+  onAddToStory?: (id) => void;
+  onSyncData?: () => void;
 }
 const TitleHeader: FC<TitleHeaderProps> = memo(
   ({
     name,
-    onShareDownloadData,
-    toggleBoardEditor,
     children,
     publishLoading,
+    orgId,
     onPublish,
+    onRecycleViz,
+    onShareDownloadData,
+    toggleBoardEditor,
+    onAddToStory,
+    onSyncData,
   }) => {
     const t = useI18NPrefix(`viz.action`);
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const {
       editing,
       name: boardName,
@@ -103,6 +115,18 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
     }, [boardName, name, status, t]);
     const isArchived = status === 0;
 
+    const handleModalOk = useCallback(
+      (storyId: string) => {
+        setIsModalVisible(false);
+        onAddToStory?.(storyId);
+      },
+      [onAddToStory],
+    );
+
+    const handleModalCancel = useCallback(() => {
+      setIsModalVisible(false);
+    }, []);
+
     return (
       <Wrapper>
         <h1 className={classnames({ disabled: status < 2 })}>
@@ -133,22 +157,25 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
             </>
           ) : (
             <>
-              {allowManage && !isArchived && renderMode === 'read' && (
-                <Button
-                  key="publish"
-                  icon={
-                    status === 1 ? (
-                      <SendOutlined />
-                    ) : (
-                      <VerticalAlignBottomOutlined />
-                    )
-                  }
-                  loading={publishLoading}
-                  onClick={onPublish}
-                >
-                  {status === 1 ? t('publish') : t('unpublish')}
-                </Button>
-              )}
+              {allowManage &&
+                !isArchived &&
+                renderMode === 'read' &&
+                Number(status) === 1 && (
+                  <Button
+                    key="publish"
+                    icon={
+                      status === 1 ? (
+                        <SendOutlined />
+                      ) : (
+                        <VerticalAlignBottomOutlined />
+                      )
+                    }
+                    loading={publishLoading}
+                    onClick={onPublish}
+                  >
+                    {status === 1 ? t('publish') : t('unpublish')}
+                  </Button>
+                )}
               {allowManage && !isArchived && renderMode === 'read' && (
                 <Button
                   key="edit"
@@ -166,9 +193,14 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                       onBoardToDownLoad={onBoardToDownLoad}
                       onShareDownloadData={onShareDownloadData}
                       onSaveAsVizs={onSaveAsVizs}
+                      onSyncData={onSyncData}
+                      onRecycleViz={onRecycleViz}
+                      onAddToStory={onAddToStory && setIsModalVisible}
+                      onPublish={Number(status) === 2 ? onPublish : ''}
+                      isArchived={isArchived}
                     />
                   }
-                  placement="bottomCenter"
+                  placement="bottomRight"
                   arrow
                 >
                   <Button icon={<MoreOutlined />} />
@@ -184,6 +216,16 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
             onCancel={() => setShowShareLinkModal(false)}
             onGenerateShareLink={onGenerateShareLink}
           />
+        )}
+        {!!onSaveAsVizs && (
+          <SaveToDashboardOrStoryboard
+            saveType={SaveTypes.Storyboard}
+            title={'保存至故事版'}
+            orgId={orgId as string}
+            isModalVisible={isModalVisible}
+            handleOk={handleModalOk}
+            handleCancel={handleModalCancel}
+          ></SaveToDashboardOrStoryboard>
         )}
       </Wrapper>
     );

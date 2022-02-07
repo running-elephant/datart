@@ -110,10 +110,10 @@ export function Main() {
   ]);
 
   useEffect(() => {
-    if (selectedTab) {
+    if (selectedTab && !vizId) {
       history.push(`/organizations/${orgId}/vizs/${selectedTab.id}`);
     }
-  }, [history, selectedTab, orgId]);
+  }, [history, selectedTab, orgId, vizId]);
 
   const tabChange = useCallback(
     activeKey => {

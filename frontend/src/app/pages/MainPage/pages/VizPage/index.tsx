@@ -14,6 +14,7 @@ import { SaveFormContext, useSaveFormContext } from './SaveFormContext';
 import { Sidebar } from './Sidebar';
 import { useVizSlice } from './slice';
 import { selectSliderVisible } from './slice/selectors';
+
 export function VizPage() {
   useVizSlice();
   useBoardSlice();

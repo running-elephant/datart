@@ -679,8 +679,8 @@
         "expireDate": "截止日期",
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
-        "shareLink": "分享链接",
-        "downloadData": "下载数据"
+        "shareLink": "分享",
+        "downloadData": "下载为 Excel"
       }
     },
     "board": {

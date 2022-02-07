@@ -218,7 +218,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     );
   };
 
-  const saveToWidget = useCallback(() => {
+  const buildDataChart = useCallback(() => {
     const dataChartConfig: DataChartConfig = {
       chartConfig: chartConfig!,
       chartGraphId: chart?.meta.id!,
@@ -235,18 +235,21 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       status: 1,
       description: '',
     };
-    onSaveInWidget?.(chartType, dataChart, dataview);
+    return dataChart;
   }, [
     backendChart?.name,
     chart,
     chartConfig,
-    chartType,
     dataChartId,
     dataview,
-    onSaveInWidget,
     orgId,
     aggregation,
   ]);
+
+  const saveToWidget = useCallback(() => {
+    const dataChart = buildDataChart();
+    onSaveInWidget?.(chartType, dataChart, dataview);
+  }, [buildDataChart, chartType, dataview, onSaveInWidget]);
 
   const saveChart = useCallback(async () => {
     if (container === 'dataChart') {
@@ -278,7 +281,8 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
             viewId: dataview?.id,
           },
           callback: folder => {
-            folder && history.go(-1);
+            folder &&
+              history.push(`/organizations/${orgId}/vizs/${folder.relId}`);
           },
         });
       }
@@ -328,66 +332,90 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     history,
   ]);
 
-  const registerChartEvents = chart => {
-    chart?.registerMouseEvents([
-      {
-        name: 'click',
-        callback: param => {
-          if (
-            param.componentType === 'table' &&
-            param.seriesType === 'paging-sort-filter'
-          ) {
-            dispatch(
-              refreshDatasetAction({
-                sorter: {
-                  column: param?.seriesName!,
-                  operator: param?.value?.direction,
-                },
-                pageInfo: {
-                  pageNo: param?.value?.pageNo,
-                },
-              }),
-            );
-            return;
-          }
-          if (param.seriesName === 'richText') {
-            dispatch(updateRichTextAction(param.value));
-            return;
-          }
+  const registerChartEvents = useCallback(
+    chart => {
+      chart?.registerMouseEvents([
+        {
+          name: 'click',
+          callback: param => {
+            if (
+              param.componentType === 'table' &&
+              param.seriesType === 'paging-sort-filter'
+            ) {
+              dispatch(
+                refreshDatasetAction({
+                  sorter: {
+                    column: param?.seriesName!,
+                    operator: param?.value?.direction,
+                  },
+                  pageInfo: {
+                    pageNo: param?.value?.pageNo,
+                  },
+                }),
+              );
+              return;
+            }
+            if (param.seriesName === 'richText') {
+              dispatch(updateRichTextAction(param.value));
+              return;
+            }
+          },
         },
-      },
-    ]);
-  };
+      ]);
+    },
+    [dispatch],
+  );
 
-  const handleAggregationState = state => {
-    const currentChart = ChartManager.instance().getById(chart?.meta?.id);
-    let targetChartConfig = CloneValueDeep(currentChart?.config);
-    registerChartEvents(currentChart);
-    setChart(currentChart);
+  const handleAggregationState = useCallback(
+    state => {
+      const currentChart = ChartManager.instance().getById(chart?.meta?.id);
+      let targetChartConfig = CloneValueDeep(currentChart?.config);
+      registerChartEvents(currentChart);
+      setChart(currentChart);
 
-    const finalChartConfig = transferChartConfigs(
-      targetChartConfig,
-      targetChartConfig,
-    );
+      const finalChartConfig = transferChartConfigs(
+        targetChartConfig,
+        targetChartConfig,
+      );
 
-    dispatch(actions.updateChartAggregation(state));
-    dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
-    dispatch(
-      workbenchSlice.actions.updateChartConfig({
-        type: ChartConfigReducerActionType.INIT,
-        payload: {
-          init: finalChartConfig,
+      dispatch(actions.updateChartAggregation(state));
+      dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
+      dispatch(
+        workbenchSlice.actions.updateChartConfig({
+          type: ChartConfigReducerActionType.INIT,
+          payload: {
+            init: finalChartConfig,
+          },
+        }),
+      );
+    },
+    [dispatch, actions, chart?.meta?.id, registerChartEvents],
+  );
+
+  const saveChartToDashBoard = useCallback(
+    dashboardId => {
+      const dataChart = buildDataChart();
+
+      history.push({
+        pathname: `/organizations/${orgId}/vizs/${dashboardId}/boardEditor`,
+        state: {
+          widgetInfo: JSON.stringify({ chartType, dataChart, dataview }),
         },
-      }),
-    );
-  };
+      });
+    },
+    [history, buildDataChart, chartType, dataview, orgId],
+  );
+
   return (
     <StyledChartWorkbenchPage>
       <SaveFormContext.Provider value={saveFormContextValue}>
         <ChartWorkbench
           header={{
             name: backendChart?.name || originChart?.name,
+            orgId,
+            chartType,
             onSaveChart: saveChart,
+            onSaveChartToDashBoard: saveChartToDashBoard,
             onGoBack: () => {
               onClose?.();
             },

@@ -24,13 +24,16 @@ import {
   VerticalAlignBottomOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
+import SaveToDashboardOrStoryboard, {
+  SaveTypes,
+} from 'app/components/SaveToDashboardOrStoryboard';
 import {
   ShareLinkModal,
   VizOperationMenu,
 } from 'app/components/VizOperationMenu';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { TITLE_SUFFIX } from 'globalConstants';
-import { FC, memo, useMemo, useState } from 'react';
+import { FC, memo, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { DetailPageHeader } from '../DetailPageHeader';
 
@@ -45,9 +48,13 @@ const VizHeader: FC<{
   onGenerateShareLink?: (date, usePwd?) => any;
   onDownloadData?;
   onSaveAsVizs?;
+  onReloadData?;
+  onAddToDashBoard?;
+  onRecycleViz?;
   allowDownload?: boolean;
   allowShare?: boolean;
   allowManage?: boolean;
+  orgId?: string;
 }> = memo(
   ({
     chartName,
@@ -60,20 +67,38 @@ const VizHeader: FC<{
     onGenerateShareLink,
     onDownloadData,
     onSaveAsVizs,
+    onReloadData,
+    onAddToDashBoard,
+    onRecycleViz,
     allowDownload,
     allowShare,
     allowManage,
+    orgId,
   }) => {
     const t = useI18NPrefix(`viz.action`);
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const isArchived = Number(status) === 0;
 
-    const handleCloseShareLinkModal = () => {
+    const handleCloseShareLinkModal = useCallback(() => {
       setShowShareLinkModal(false);
-    };
+    }, []);
 
-    const handleOpenShareLinkModal = () => {
+    const handleOpenShareLinkModal = useCallback(() => {
       setShowShareLinkModal(true);
-    };
+    }, []);
+
+    const handleModalOk = useCallback(
+      (dashboardId: string) => {
+        setIsModalVisible(false);
+        onAddToDashBoard?.(dashboardId);
+      },
+      [onAddToDashBoard],
+    );
+
+    const handleModalCancel = useCallback(() => {
+      setIsModalVisible(false);
+    }, []);
 
     const getOverlays = () => {
       return (
@@ -81,9 +106,14 @@ const VizHeader: FC<{
           onShareLinkClick={onGenerateShareLink && handleOpenShareLinkModal}
           onDownloadDataLinkClick={onDownloadData}
           onSaveAsVizs={onSaveAsVizs}
+          onReloadData={onReloadData}
+          onAddToDashBoard={onAddToDashBoard && setIsModalVisible}
           allowDownload={allowDownload}
           allowShare={allowShare}
           allowManage={allowManage}
+          isArchived={isArchived}
+          onPublish={Number(status) === 2 ? onPublish : ''}
+          onRecycleViz={onRecycleViz}
         />
       );
     };
@@ -95,7 +125,6 @@ const VizHeader: FC<{
         : '';
       return base + suffix;
     }, [chartName, status, t]);
-    const isArchived = Number(status) === 0;
 
     return (
       <Wrapper>
@@ -110,7 +139,7 @@ const VizHeader: FC<{
                   {t('run')}
                 </Button>
               )}
-              {allowManage && !isArchived && onPublish && (
+              {allowManage && !isArchived && onPublish && Number(status) === 1 && (
                 <Button
                   key="publish"
                   icon={
@@ -131,7 +160,7 @@ const VizHeader: FC<{
                   {t('edit')}
                 </Button>
               )}
-              <Dropdown key="more" trigger={['click']} overlay={getOverlays()}>
+              <Dropdown key="more" arrow overlay={getOverlays()}>
                 <Button icon={<MoreOutlined />} />
               </Dropdown>
             </>
@@ -144,6 +173,16 @@ const VizHeader: FC<{
             onCancel={handleCloseShareLinkModal}
             onGenerateShareLink={onGenerateShareLink}
           />
+        )}
+        {onSaveAsVizs && (
+          <SaveToDashboardOrStoryboard
+            saveType={SaveTypes.Dashboard}
+            title={'保存至仪表板'}
+            orgId={orgId as string}
+            isModalVisible={isModalVisible}
+            handleOk={handleModalOk}
+            handleCancel={handleModalCancel}
+          ></SaveToDashboardOrStoryboard>
         )}
       </Wrapper>
     );

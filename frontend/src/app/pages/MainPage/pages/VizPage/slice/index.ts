@@ -10,7 +10,7 @@ import { reduxActionErrorHandler, uuidv4 } from 'utils/utils';
 import {
   addStoryboard,
   addViz,
-  copyDashboard,
+  saveAsDashboard,
   deleteViz,
   editFolder,
   editStoryboard,
@@ -437,14 +437,14 @@ const slice = createSlice({
     });
 
     // Copy Dashboard
-    builder.addCase(copyDashboard.pending, state => {
+    builder.addCase(saveAsDashboard.pending, state => {
       state.saveFolderLoading = true;
     });
-    builder.addCase(copyDashboard.fulfilled, (state, action) => {
+    builder.addCase(saveAsDashboard.fulfilled, (state, action) => {
       state.saveFolderLoading = false;
       state.vizs.push({ ...action.payload, deleteLoading: false });
     });
-    builder.addCase(copyDashboard.rejected, state => {
+    builder.addCase(saveAsDashboard.rejected, state => {
       state.saveFolderLoading = false;
     });
 

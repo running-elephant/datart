@@ -19,7 +19,11 @@
 import {
   CloudDownloadOutlined,
   CopyFilled,
+  DeleteOutlined,
+  FileAddOutlined,
+  ReloadOutlined,
   ShareAltOutlined,
+  VerticalAlignBottomOutlined,
 } from '@ant-design/icons';
 import { Menu, Popconfirm } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -30,23 +34,68 @@ const VizOperationMenu: FC<{
   onShareLinkClick?;
   onDownloadDataLinkClick?;
   onSaveAsVizs?;
+  onReloadData?;
+  onAddToDashBoard?;
+  onPublish?;
+  onRecycleViz?;
   allowDownload?: boolean;
   allowShare?: boolean;
   allowManage?: boolean;
+  isArchived?: boolean;
 }> = memo(
   ({
     onShareLinkClick,
     onDownloadDataLinkClick,
     onSaveAsVizs,
+    onReloadData,
+    onAddToDashBoard,
+    onPublish,
     allowDownload,
     allowShare,
     allowManage,
+    isArchived,
+    onRecycleViz,
   }) => {
     const t = useI18NPrefix(`viz.action`);
     const tg = useI18NPrefix(`global`);
 
     const moreActionMenu = () => {
       const menus: any[] = [];
+
+      if (onReloadData) {
+        menus.push(
+          <MeunBox
+            className="line"
+            key="reloadData"
+            icon={<ReloadOutlined />}
+            onClick={onReloadData}
+          >
+            同步数据
+          </MeunBox>,
+        );
+      }
+
+      if (allowManage && onSaveAsVizs) {
+        menus.push(
+          <Menu.Item key="saveAs" icon={<CopyFilled />} onClick={onSaveAsVizs}>
+            {tg('button.saveAs')}
+          </Menu.Item>,
+        );
+      }
+
+      if (allowManage && onSaveAsVizs) {
+        menus.push(
+          <MeunBox
+            className="line"
+            key="addToDash"
+            icon={<FileAddOutlined />}
+            onClick={() => onAddToDashBoard(true)}
+          >
+            添加到仪表板
+          </MeunBox>,
+        );
+      }
+
       if (allowShare && onShareLinkClick) {
         menus.push(
           <Menu.Item
@@ -61,7 +110,11 @@ const VizOperationMenu: FC<{
 
       if (allowDownload && onDownloadDataLinkClick) {
         menus.push(
-          <Menu.Item key="downloadData" icon={<CloudDownloadOutlined />}>
+          <MeunBox
+            className="line"
+            key="downloadData"
+            icon={<CloudDownloadOutlined />}
+          >
             <Popconfirm
               placement="left"
               title={t('common.confirm')}
@@ -71,17 +124,36 @@ const VizOperationMenu: FC<{
             >
               {t('share.downloadData')}
             </Popconfirm>
+          </MeunBox>,
+        );
+      }
+
+      if (allowManage && !isArchived && onPublish) {
+        menus.push(
+          <Menu.Item
+            className="line"
+            key="publish"
+            icon={<VerticalAlignBottomOutlined />}
+            onClick={onPublish}
+          >
+            {t('unpublish')}
           </Menu.Item>,
         );
       }
 
-      if (allowManage && onSaveAsVizs) {
+      if (allowManage && onRecycleViz) {
         menus.push(
-          <Menu.Item key="saveAs" icon={<CopyFilled />} onClick={onSaveAsVizs}>
-            {tg('button.saveAs')}
+          <Menu.Item key="delete" icon={<DeleteOutlined />}>
+            <Popconfirm
+              title={tg('operation.archiveConfirm')}
+              onConfirm={onRecycleViz}
+            >
+              {tg('button.archive')}
+            </Popconfirm>
           </Menu.Item>,
         );
       }
+
       return <Menu>{menus}</Menu>;
     };
 
@@ -92,3 +164,9 @@ const VizOperationMenu: FC<{
 export default VizOperationMenu;
 
 const StyleVizOperationMenu = styled.div``;
+
+export const MeunBox = styled(Menu.Item)`
+  &.line {
+    border-bottom: ${p => `1px solid ${p.theme.borderColorSplit}`};
+  }
+`;

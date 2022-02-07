@@ -17,8 +17,11 @@
  */
 
 import { Button, Space } from 'antd';
+import SaveToDashboardOrStoryboard, {
+  SaveTypes,
+} from 'app/components/SaveToDashboardOrStoryboard';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { FC, memo } from 'react';
+import { FC, memo, useCallback, useState } from 'react';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
@@ -32,29 +35,72 @@ import {
 
 const ChartHeaderPanel: FC<{
   chartName?: string;
+  orgId?: string;
+  chartType?: string;
   onSaveChart?: () => void;
   onGoBack?: () => void;
-}> = memo(({ chartName, onSaveChart, onGoBack }) => {
-  const t = useI18NPrefix(`viz.workbench.header`);
+  onSaveChartToDashBoard?: (dashboardId) => void;
+}> = memo(
+  ({
+    chartName,
+    orgId,
+    chartType,
+    onSaveChart,
+    onGoBack,
+    onSaveChartToDashBoard,
+  }) => {
+    const t = useI18NPrefix(`viz.workbench.header`);
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
-  return (
-    <Wrapper>
-      <h1>{chartName}</h1>
-      <Space>
-        <Button type="primary" ghost onClick={onGoBack}>
-          取消
-        </Button>
-        <Button type="primary" onClick={onSaveChart}>
-          {t('save')}
-        </Button>
-        <Button type="primary">保存到仪表板</Button>
-        {/* <Dropdown key="more" trigger={['click']} overlay={getOverlays()}>
+    const handleModalOk = useCallback(
+      (dashboardId: string) => {
+        onSaveChartToDashBoard?.(dashboardId);
+        setIsModalVisible(true);
+      },
+      [onSaveChartToDashBoard],
+    );
+
+    const handleModalCancel = useCallback(() => {
+      setIsModalVisible(false);
+    }, []);
+
+    return (
+      <Wrapper>
+        <h1>{chartName}</h1>
+        <Space>
+          <Button type="primary" ghost onClick={onGoBack}>
+            取消
+          </Button>
+          <Button type="primary" onClick={onSaveChart}>
+            {t('save')}
+          </Button>
+          {!(chartType === 'widgetChart') && (
+            <Button
+              type="primary"
+              onClick={() => {
+                setIsModalVisible(true);
+              }}
+            >
+              保存到仪表板
+            </Button>
+          )}
+
+          {/* <Dropdown key="more" trigger={['click']} overlay={getOverlays()}>
           <Button icon={<MoreOutlined />} />
         </Dropdown> */}
-      </Space>
-    </Wrapper>
-  );
-});
+          <SaveToDashboardOrStoryboard
+            orgId={orgId as string}
+            saveType={SaveTypes.Dashboard}
+            title={'保存至仪表板'}
+            isModalVisible={isModalVisible}
+            handleOk={handleModalOk}
+            handleCancel={handleModalCancel}
+          ></SaveToDashboardOrStoryboard>
+        </Space>
+      </Wrapper>
+    );
+  },
+);
 
 export default ChartHeaderPanel;
 

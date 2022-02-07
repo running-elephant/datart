@@ -43,7 +43,10 @@ const ChartWorkbench: FC<{
   defaultViewId?: string;
   header?: {
     name?: string;
+    orgId?: string;
+    chartType?: string;
     onSaveChart?: () => void;
+    onSaveChartToDashBoard?: (dashboardId) => void;
     onGoBack?: () => void;
     onChangeAggregation?: (state: boolean) => void;
   };
@@ -81,8 +84,11 @@ const ChartWorkbench: FC<{
                 {header && (
                   <ChartHeaderPanel
                     chartName={header?.name}
+                    orgId={header?.orgId}
+                    chartType={header?.chartType}
                     onGoBack={header?.onGoBack}
                     onSaveChart={header?.onSaveChart}
+                    onSaveChartToDashBoard={header?.onSaveChartToDashBoard}
                   />
                 )}
                 <StyledChartOperationPanel>

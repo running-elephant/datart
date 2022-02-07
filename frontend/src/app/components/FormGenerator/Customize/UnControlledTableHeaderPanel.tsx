@@ -69,298 +69,299 @@ const getFlattenHeaders = (dataConfigs: ChartDataConfig[] = []) => {
     .flatMap(config => config.rows || []);
 };
 
-const UnControlledTableHeaderPanel: FC<
-  ItemLayoutProps<ChartStyleConfig>
-> = memo(
-  ({
-    ancestors,
-    translate: t = title => title,
-    data,
-    onChange,
-    dataConfigs,
-  }) => {
-    const [selectedRowUids, setSelectedRowUids] = useState<string[]>([]);
-    const [myData, setMyData] = useState(() => CloneValueDeep(data));
-    const [tableDataSource, setTableDataSource] = useState<RowValue[]>(() => {
-      const originalFlattenHeaderRows = getFlattenHeaders(dataConfigs);
-      const currentHeaderRows: RowValue[] = myData?.value || [];
-      const unusedHeaderRows = getUnusedHeaderRows(
-        originalFlattenHeaderRows || [],
-        currentHeaderRows,
-      );
-      return currentHeaderRows.concat(unusedHeaderRows);
-    });
+const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
+  memo(
+    ({
+      ancestors,
+      translate: t = title => title,
+      data,
+      onChange,
+      dataConfigs,
+    }) => {
+      const [selectedRowUids, setSelectedRowUids] = useState<string[]>([]);
+      const [myData, setMyData] = useState(() => CloneValueDeep(data));
+      const [tableDataSource, setTableDataSource] = useState<RowValue[]>(() => {
+        const originalFlattenHeaderRows = getFlattenHeaders(dataConfigs);
+        const currentHeaderRows: RowValue[] = myData?.value || [];
+        const unusedHeaderRows = getUnusedHeaderRows(
+          originalFlattenHeaderRows || [],
+          currentHeaderRows,
+        );
+        return currentHeaderRows.concat(unusedHeaderRows);
+      });
 
-    const mergeRowToGroup = () => {
-      if (selectedRowUids.length === 0) {
-        return;
-      }
-      const lineageRowUids = selectedRowUids.map(uid =>
-        getAncestorRowUids(undefined, uid, tableDataSource),
-      );
-      const noDuplicateLineageRows =
-        mergeSameLineageAncesterRows(lineageRowUids);
-      const ancestorsRows = makeSameLinageRows(noDuplicateLineageRows);
-      const newDataSource = groupTreeNode(ancestorsRows, tableDataSource);
-      handleConfigChange([...newDataSource]);
-    };
-
-    const mergeSameLineageAncesterRows = lineageRowUids => {
-      const allRowKeys = lineageRowUids.map((lr: string[]) =>
-        lr.join(DATARTSEPERATOR),
-      );
-      return lineageRowUids.reduce((acc, next) => {
-        const key = next.join(DATARTSEPERATOR);
-        if (allRowKeys.some(k => k.includes(key) && k.length !== key.length)) {
-          return acc;
+      const mergeRowToGroup = () => {
+        if (selectedRowUids.length === 0) {
+          return;
         }
-        return acc.concat([next]);
-      }, []);
-    };
+        const lineageRowUids = selectedRowUids.map(uid =>
+          getAncestorRowUids(undefined, uid, tableDataSource),
+        );
+        const noDuplicateLineageRows =
+          mergeSameLineageAncesterRows(lineageRowUids);
+        const ancestorsRows = makeSameLinageRows(noDuplicateLineageRows);
+        const newDataSource = groupTreeNode(ancestorsRows, tableDataSource);
+        handleConfigChange([...newDataSource]);
+      };
 
-    const makeSameLinageRows = rowAncestors => {
-      if (rowAncestors && rowAncestors.length === 0) {
-        return [];
-      }
-      const theSortestLength = Math.min(...rowAncestors.map(ra => ra.length));
-      let ancestorGeneration = 0;
-      for (let i = 0; i < theSortestLength; i++) {
-        const ancestor = rowAncestors[0][i];
-        if (rowAncestors.every(a => a[i] === ancestor)) {
-          ancestorGeneration = i;
-        } else {
-          break;
-        }
-      }
-      return rowAncestors
-        .map(ra => ra.slice(0, ancestorGeneration + 1))
-        .reduce((acc, next) => {
+      const mergeSameLineageAncesterRows = lineageRowUids => {
+        const allRowKeys = lineageRowUids.map((lr: string[]) =>
+          lr.join(DATARTSEPERATOR),
+        );
+        return lineageRowUids.reduce((acc, next) => {
           const key = next.join(DATARTSEPERATOR);
-          const allRowKeys = acc.map(lr => lr.join(DATARTSEPERATOR));
-          if (allRowKeys.includes(key)) {
+          if (
+            allRowKeys.some(k => k.includes(key) && k.length !== key.length)
+          ) {
             return acc;
           }
           return acc.concat([next]);
         }, []);
-    };
-
-    const getAncestorRowUids = (parentUid, rowUid, treeRows) => {
-      if (treeRows.find(tr => tr.uid === rowUid)) {
-        return !!parentUid ? [parentUid, rowUid] : [rowUid];
-      }
-      return treeRows.reduce((acc, next) => {
-        return acc.concat(
-          getAncestorRowUids(next.uid, rowUid, next.children || []),
-        );
-      }, []);
-    };
-
-    const groupTreeNode = (rowAncestors, collection) => {
-      if (rowAncestors && rowAncestors.length < 1) {
-        return collection;
-      }
-
-      const rows = collection || [];
-      const linageGeneration = rowAncestors[0].length - 1;
-      if (linageGeneration === 0) {
-        const mergedKeys = rowAncestors.flatMap(ra => ra);
-        return mergeBrotherRows(mergedKeys, rows);
-      } else {
-        const ancestor = rowAncestors[0][0];
-        const subRowAncestors = rowAncestors.map(ra => ra.slice(1));
-        const childRow = rows.find(c => c.colName === ancestor);
-        childRow.children = groupTreeNode(subRowAncestors, childRow.children);
-        return rows;
-      }
-    };
-
-    const mergeBrotherRows = (mergeKeys: string[], rows: RowValue[]) => {
-      const selectedRows = rows.filter(r => mergeKeys.includes(r.uid!));
-      const restRows = rows.filter(r => !mergeKeys.includes(r.uid!));
-      const insertIndex = rows.findIndex(r => r.uid === mergeKeys[0]);
-      const groupRowUid = selectedRows.map(d => d.uid).join(DATARTSEPERATOR);
-      const groupRow = {
-        uid: groupRowUid,
-        colName: groupRowUid,
-        label: t('table.header.newName'),
-        isGroup: true,
-        children: selectedRows,
       };
-      if (!restRows.find(rr => rr.uid === groupRowUid)) {
-        restRows.splice(insertIndex, 0, groupRow);
-      }
-      return restRows;
-    };
 
-    const handleRowMoveUp = () => {
-      selectedRowUids.forEach(rowUid => {
+      const makeSameLinageRows = rowAncestors => {
+        if (rowAncestors && rowAncestors.length === 0) {
+          return [];
+        }
+        const theSortestLength = Math.min(...rowAncestors.map(ra => ra.length));
+        let ancestorGeneration = 0;
+        for (let i = 0; i < theSortestLength; i++) {
+          const ancestor = rowAncestors[0][i];
+          if (rowAncestors.every(a => a[i] === ancestor)) {
+            ancestorGeneration = i;
+          } else {
+            break;
+          }
+        }
+        return rowAncestors
+          .map(ra => ra.slice(0, ancestorGeneration + 1))
+          .reduce((acc, next) => {
+            const key = next.join(DATARTSEPERATOR);
+            const allRowKeys = acc.map(lr => lr.join(DATARTSEPERATOR));
+            if (allRowKeys.includes(key)) {
+              return acc;
+            }
+            return acc.concat([next]);
+          }, []);
+      };
+
+      const getAncestorRowUids = (parentUid, rowUid, treeRows) => {
+        if (treeRows.find(tr => tr.uid === rowUid)) {
+          return !!parentUid ? [parentUid, rowUid] : [rowUid];
+        }
+        return treeRows.reduce((acc, next) => {
+          return acc.concat(
+            getAncestorRowUids(next.uid, rowUid, next.children || []),
+          );
+        }, []);
+      };
+
+      const groupTreeNode = (rowAncestors, collection) => {
+        if (rowAncestors && rowAncestors.length < 1) {
+          return collection;
+        }
+
+        const rows = collection || [];
+        const linageGeneration = rowAncestors[0].length - 1;
+        if (linageGeneration === 0) {
+          const mergedKeys = rowAncestors.flatMap(ra => ra);
+          return mergeBrotherRows(mergedKeys, rows);
+        } else {
+          const ancestor = rowAncestors[0][0];
+          const subRowAncestors = rowAncestors.map(ra => ra.slice(1));
+          const childRow = rows.find(c => c.colName === ancestor);
+          childRow.children = groupTreeNode(subRowAncestors, childRow.children);
+          return rows;
+        }
+      };
+
+      const mergeBrotherRows = (mergeKeys: string[], rows: RowValue[]) => {
+        const selectedRows = rows.filter(r => mergeKeys.includes(r.uid!));
+        const restRows = rows.filter(r => !mergeKeys.includes(r.uid!));
+        const insertIndex = rows.findIndex(r => r.uid === mergeKeys[0]);
+        const groupRowUid = selectedRows.map(d => d.uid).join(DATARTSEPERATOR);
+        const groupRow = {
+          uid: groupRowUid,
+          colName: groupRowUid,
+          label: t('table.header.newName'),
+          isGroup: true,
+          children: selectedRows,
+        };
+        if (!restRows.find(rr => rr.uid === groupRowUid)) {
+          restRows.splice(insertIndex, 0, groupRow);
+        }
+        return restRows;
+      };
+
+      const handleRowMoveUp = () => {
+        selectedRowUids.forEach(rowUid => {
+          const brotherRows = findRowBrothers(rowUid, tableDataSource);
+          const idx = brotherRows.findIndex(s => s.uid === rowUid);
+          if (idx < 1) {
+            return;
+          }
+          const temp = brotherRows[idx - 1];
+          brotherRows[idx - 1] = brotherRows[idx];
+          brotherRows[idx] = temp;
+        });
+        handleConfigChange([...tableDataSource]);
+      };
+
+      const handleRowMoveDown = () => {
+        selectedRowUids.forEach(uid => {
+          const brotherRows = findRowBrothers(uid, tableDataSource);
+          const idx = brotherRows.findIndex(s => s.uid === uid);
+          if (idx >= brotherRows.length - 1) {
+            return;
+          }
+          const temp = brotherRows[idx];
+          brotherRows[idx] = brotherRows[idx + 1];
+          brotherRows[idx + 1] = temp;
+          handleConfigChange([...tableDataSource]);
+        });
+      };
+
+      const handleRollback = () => {
+        const originalFlattenHeaders = getFlattenHeaders(dataConfigs);
+        handleConfigChange?.(originalFlattenHeaders);
+      };
+
+      const handleTableRowChange = rowUid => style => prop => (_, value) => {
+        const brotherRows = findRowBrothers(rowUid, tableDataSource);
+        const row = brotherRows.find(r => r.uid === rowUid);
+
+        if (!row) {
+          return;
+        }
+        if (style) {
+          row.style = Object.assign({}, row.style, {
+            ...row.style,
+            [prop]: value,
+          });
+        } else {
+          row[prop] = value;
+        }
+        handleConfigChange([...tableDataSource]);
+      };
+
+      const handleDeleteGroupRow = rowUid => {
         const brotherRows = findRowBrothers(rowUid, tableDataSource);
         const idx = brotherRows.findIndex(s => s.uid === rowUid);
-        if (idx < 1) {
-          return;
-        }
-        const temp = brotherRows[idx - 1];
-        brotherRows[idx - 1] = brotherRows[idx];
-        brotherRows[idx] = temp;
-      });
-      handleConfigChange([...tableDataSource]);
-    };
-
-    const handleRowMoveDown = () => {
-      selectedRowUids.forEach(uid => {
-        const brotherRows = findRowBrothers(uid, tableDataSource);
-        const idx = brotherRows.findIndex(s => s.uid === uid);
-        if (idx >= brotherRows.length - 1) {
-          return;
-        }
-        const temp = brotherRows[idx];
-        brotherRows[idx] = brotherRows[idx + 1];
-        brotherRows[idx + 1] = temp;
+        brotherRows.splice(idx, 1, ...(brotherRows[idx].children || []));
         handleConfigChange([...tableDataSource]);
-      });
-    };
+      };
 
-    const handleRollback = () => {
-      const originalFlattenHeaders = getFlattenHeaders(dataConfigs);
-      handleConfigChange?.(originalFlattenHeaders);
-    };
+      const handleConfigChange = (dataSource: RowValue[]) => {
+        myData.value = dataSource;
+        setTableDataSource(dataSource);
+        setMyData(myData);
+        onChange?.(ancestors, myData);
+      };
 
-    const handleTableRowChange = rowUid => style => prop => (_, value) => {
-      const brotherRows = findRowBrothers(rowUid, tableDataSource);
-      const row = brotherRows.find(r => r.uid === rowUid);
-
-      if (!row) {
-        return;
-      }
-      if (style) {
-        row.style = Object.assign({}, row.style, {
-          ...row.style,
-          [prop]: value,
-        });
-      } else {
-        row[prop] = value;
-      }
-      handleConfigChange([...tableDataSource]);
-    };
-
-    const handleDeleteGroupRow = rowUid => {
-      const brotherRows = findRowBrothers(rowUid, tableDataSource);
-      const idx = brotherRows.findIndex(s => s.uid === rowUid);
-      brotherRows.splice(idx, 1, ...(brotherRows[idx].children || []));
-      handleConfigChange([...tableDataSource]);
-    };
-
-    const handleConfigChange = (dataSource: RowValue[]) => {
-      myData.value = dataSource;
-      setTableDataSource(dataSource);
-      setMyData(myData);
-      onChange?.(ancestors, myData);
-    };
-
-    const findRowBrothers = (uid, rows) => {
-      let row = rows.find(r => r.uid === uid);
-      if (!!row) {
-        return rows;
-      }
-      let subRows = [];
-      for (let i = 0; i < rows.length; i++) {
-        subRows = findRowBrothers(uid, rows[i].children || []);
-        if (!!subRows && subRows.length > 0) {
-          break;
+      const findRowBrothers = (uid, rows) => {
+        let row = rows.find(r => r.uid === uid);
+        if (!!row) {
+          return rows;
         }
-      }
-      return subRows;
-    };
+        let subRows = [];
+        for (let i = 0; i < rows.length; i++) {
+          subRows = findRowBrothers(uid, rows[i].children || []);
+          if (!!subRows && subRows.length > 0) {
+            break;
+          }
+        }
+        return subRows;
+      };
 
-    const tableColumnsSettings = [
-      {
-        title: t('table.header.columnName'),
-        dataIndex: 'colName',
-        key: 'colName',
-        render: (_, record) => {
-          const { label, isGroup, uid } = record;
-          return isGroup ? (
-            <>
-              <DeleteOutlined
-                style={{ marginRight: 10 }}
-                onClick={_ => handleDeleteGroupRow(uid)}
-              />
-              <EditableLabel
-                label={label}
-                onChange={value =>
-                  handleTableRowChange(uid)(undefined)('label')([], value)
-                }
-              />
-            </>
-          ) : (
-            getColumnRenderName(record)
-          );
+      const tableColumnsSettings = [
+        {
+          title: t('table.header.columnName'),
+          dataIndex: 'colName',
+          key: 'colName',
+          render: (_, record) => {
+            const { label, isGroup, uid } = record;
+            return isGroup ? (
+              <>
+                <DeleteOutlined
+                  style={{ marginRight: 10 }}
+                  onClick={_ => handleDeleteGroupRow(uid)}
+                />
+                <EditableLabel
+                  label={label}
+                  onChange={value =>
+                    handleTableRowChange(uid)(undefined)('label')([], value)
+                  }
+                />
+              </>
+            ) : (
+              getColumnRenderName(record)
+            );
+          },
         },
-      },
-    ];
+      ];
 
-    const rowSelection = {
-      selectedRowKeys: selectedRowUids,
-      onChange: (selectedRowKeys: any[]) => {
-        setSelectedRowUids(selectedRowKeys);
-      },
-    };
+      const rowSelection = {
+        selectedRowKeys: selectedRowUids,
+        onChange: (selectedRowKeys: any[]) => {
+          setSelectedRowUids(selectedRowKeys);
+        },
+      };
 
-    return (
-      <StyledUnControlledTableHeaderPanel direction="vertical">
-        <Row gutter={24}>
-          <Col span={20}>
-            <Space>
-              <Button
-                disabled={selectedRowUids.length === 0}
-                type="primary"
-                onClick={mergeRowToGroup}
-              >
-                {t('table.header.merge')}
-              </Button>
-              <Button
-                disabled={selectedRowUids.length === 0}
-                icon={<ArrowUpOutlined />}
-                onClick={handleRowMoveUp}
-              >
-                {t('table.header.moveUp')}
-              </Button>
-              <Button
-                disabled={selectedRowUids.length === 0}
-                icon={<ArrowDownOutlined />}
-                onClick={handleRowMoveDown}
-              >
-                {t('table.header.moveDown')}
-              </Button>
-            </Space>
-          </Col>
-          <Col span={4}>
-            <Row justify="end" align="middle">
-              <Button icon={<RedoOutlined />} onClick={handleRollback}>
-                {t('table.header.reset')}
-              </Button>
-            </Row>
-          </Col>
-        </Row>
-        <Row gutter={24}>
-          <Col span={24}>
-            <Table
-              size="small"
-              bordered={true}
-              pagination={false}
-              {...myData}
-              rowKey={record => record.uid!}
-              columns={tableColumnsSettings}
-              dataSource={tableDataSource}
-              rowSelection={rowSelection}
-            />
-          </Col>
-        </Row>
-      </StyledUnControlledTableHeaderPanel>
-    );
-  },
-  itemLayoutComparer,
-);
+      return (
+        <StyledUnControlledTableHeaderPanel direction="vertical">
+          <Row gutter={24}>
+            <Col span={20}>
+              <Space>
+                <Button
+                  disabled={selectedRowUids.length === 0}
+                  type="primary"
+                  onClick={mergeRowToGroup}
+                >
+                  {t('table.header.merge')}
+                </Button>
+                <Button
+                  disabled={selectedRowUids.length === 0}
+                  icon={<ArrowUpOutlined />}
+                  onClick={handleRowMoveUp}
+                >
+                  {t('table.header.moveUp')}
+                </Button>
+                <Button
+                  disabled={selectedRowUids.length === 0}
+                  icon={<ArrowDownOutlined />}
+                  onClick={handleRowMoveDown}
+                >
+                  {t('table.header.moveDown')}
+                </Button>
+              </Space>
+            </Col>
+            <Col span={4}>
+              <Row justify="end" align="middle">
+                <Button icon={<RedoOutlined />} onClick={handleRollback}>
+                  {t('table.header.reset')}
+                </Button>
+              </Row>
+            </Col>
+          </Row>
+          <Row gutter={24}>
+            <Col span={24}>
+              <Table
+                size="small"
+                bordered={true}
+                pagination={false}
+                {...myData}
+                rowKey={record => record.uid!}
+                columns={tableColumnsSettings}
+                dataSource={tableDataSource}
+                rowSelection={rowSelection}
+              />
+            </Col>
+          </Row>
+        </StyledUnControlledTableHeaderPanel>
+      );
+    },
+    itemLayoutComparer,
+  );
 
 const EditableLabel: FC<{
   label: string;

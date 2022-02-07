@@ -33,6 +33,7 @@ export function errorHandle(error) {
   }
   return error;
 }
+
 export function getErrorMessage(error) {
   if (error?.response) {
     const { response } = error as AxiosError;
@@ -47,6 +48,7 @@ export function getErrorMessage(error) {
   }
   return error?.message;
 }
+
 export function reduxActionErrorHandler(errorAction) {
   if (errorAction?.payload) {
     message.error(errorAction?.payload);
