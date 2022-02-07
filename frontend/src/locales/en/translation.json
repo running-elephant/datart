@@ -440,6 +440,7 @@
         "aggregationSwitchTip": "Switching aggregation will clear all configurations. Are you sure to turn it on / off?",
         "open": "Open",
         "close": "Close",
+        "cancel": "Cancel",
         "lang": {
           "zh": "zh",
           "en": "en"
@@ -673,6 +674,9 @@
       "unpublished": "Unpublished",
       "archived": "Archived",
       "play": "Play",
+      "syncData": "Sync Data",
+      "addToDash": "Add To Dashboard",
+      "addToStory": "Add To Storyboard",
       "share": {
         "link": "Link",
         "password": "Password",
@@ -827,7 +831,9 @@
         "dashboard": "Create dashboard",
         "dataChart": "Create dataChart",
         "folder": "Create folder",
-        "recycle": "Recycle"
+        "recycle": "Recycle",
+        "open": "Open",
+        "close": "Close"
       },
       "storyboards": {
         "title": "Storyboards",
@@ -853,10 +859,10 @@
       "scaleFull": "scaleFull",
       "noScale": "noScale"
     },
-    "tips":{
-      "noStartValue":"Input Start Value",
-      "noEndValue":"Input End Value",
-      "endGTStartErr":"End Value should GT StartValue "
+    "tips": {
+      "noStartValue": "Input Start Value",
+      "noEndValue": "Input End Value",
+      "endGTStartErr": "End Value should GT StartValue "
     },
     "control": {
       "title": "Control Title",
@@ -871,7 +877,7 @@
       "showMark": "Show Mark",
       "common": "General",
       "custom": "Customize",
-      "optionLabelField":"Option Label Field"
+      "optionLabelField": "Option Label Field"
     },
     "date": {
       "year": "Year",
@@ -961,7 +967,9 @@
       "addView": "Create view",
       "addFolder": "Create folder",
       "parent": "Parent",
-      "recycle": "Recycle"
+      "recycle": "Recycle",
+      "open": "Open",
+      "close": "Close"
     },
     "saveForm": {
       "title": "View",
@@ -1091,10 +1099,23 @@
       "Disable": "Disable"
     },
     "privilegeLabel": {
-      "viz": ["View", "Download", "Share", "Manage"],
-      "view": ["Access", "Manage"],
-      "source": ["Access", "Manage"],
-      "schedule": ["Manage"]
+      "viz": {
+        "0": "View",
+        "1": "Download",
+        "2": "Share",
+        "3": "Manage"
+      },
+      "view": {
+        "0": "Access",
+        "1": "Manage"
+      },
+      "source": {
+        "0": "Access",
+        "1": "Manage"
+      },
+      "schedule": {
+        "0": "管理"
+      }
     }
   },
   "variable": {
@@ -1177,6 +1198,9 @@
     },
     "listTitle": {
       "search": "Search",
+      "searchValue": "Search keywords"
+    },
+    "saveToDashOrStory": {
       "searchValue": "Search keywords"
     }
   }

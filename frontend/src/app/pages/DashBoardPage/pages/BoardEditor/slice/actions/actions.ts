@@ -226,7 +226,6 @@ export const editHasChartWidget =
     const editBoard = getState().editBoard as HistoryEditBoard;
     const widgetMap = editBoard.stack.present.widgetRecord;
     const curWidget = widgetMap[widgetId];
-    console.log(widgetId, 'widgetId');
     const nextWidget = produce(curWidget, draft => {
       draft.viewIds = [dataChart.viewId];
     });

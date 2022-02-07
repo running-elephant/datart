@@ -23,7 +23,6 @@ import {
   MoreOutlined,
   SaveOutlined,
   SendOutlined,
-  VerticalAlignBottomOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown, Space } from 'antd';
 import SaveToDashboardOrStoryboard, {
@@ -163,17 +162,11 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                 Number(status) === 1 && (
                   <Button
                     key="publish"
-                    icon={
-                      status === 1 ? (
-                        <SendOutlined />
-                      ) : (
-                        <VerticalAlignBottomOutlined />
-                      )
-                    }
+                    icon={<SendOutlined />}
                     loading={publishLoading}
                     onClick={onPublish}
                   >
-                    {status === 1 ? t('publish') : t('unpublish')}
+                    {t('publish')}
                   </Button>
                 )}
               {allowManage && !isArchived && renderMode === 'read' && (
@@ -220,7 +213,7 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
         {!!onSaveAsVizs && (
           <SaveToDashboardOrStoryboard
             saveType={SaveTypes.Storyboard}
-            title={'保存至故事版'}
+            title={t('addToStory')}
             orgId={orgId as string}
             isModalVisible={isModalVisible}
             handleOk={handleModalOk}

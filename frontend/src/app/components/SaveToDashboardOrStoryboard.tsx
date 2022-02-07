@@ -41,6 +41,7 @@ import { useSelector } from 'react-redux';
 import { request } from 'utils/request';
 import { errorHandle, getPath, listToTree } from 'utils/utils';
 import { Tree } from './Tree';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 
 export enum SaveTypes {
   Dashboard = 'DASHBOARD',
@@ -61,6 +62,7 @@ const SaveToDashboardOrStoryboard: FC<SaveToDashboardOrStoryboardTypes> = memo(
     const [storyData, setStoryData] = useState<Storyboard[]>();
     const [vizData, setVizData] = useState<Folder[]>();
     const [selectId, setSelectId] = useState<string>('');
+    const t = useI18NPrefix('components.saveToDashOrStory');
     const getIcon = useGetVizIcon();
     const isOwner = useSelector(selectIsOrgOwner);
     const permissionMap = useSelector(selectPermissionMap);
@@ -179,7 +181,7 @@ const SaveToDashboardOrStoryboard: FC<SaveToDashboardOrStoryboardTypes> = memo(
       >
         {isDashboard && (
           <InputWrap>
-            <Input onChange={treeSearch} placeholder="搜索名称关键字" />
+            <Input onChange={treeSearch} placeholder={t('searchValue')} />
           </InputWrap>
         )}
 

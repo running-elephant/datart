@@ -440,6 +440,7 @@
         "aggregationSwitchTip": "切换数据聚合会清空所有配置，确认开启/关闭？",
         "open": "开启",
         "close": "关闭",
+        "cancel": "取消",
         "lang": {
           "zh": "中文",
           "en": "英文"
@@ -673,6 +674,9 @@
       "unpublished": "未发布",
       "archived": "已归档",
       "play": "播放",
+      "syncData":"同步数据",
+      "addToDash":"添加到仪表板",
+      "addToStory":"添加到故事板",
       "share": {
         "link": "链接",
         "password": "密码",
@@ -1194,6 +1198,9 @@
     },
     "listTitle": {
       "search": "搜索",
+      "searchValue": "搜索名称关键字"
+    },
+    "saveToDashOrStory": {
       "searchValue": "搜索名称关键字"
     }
   }

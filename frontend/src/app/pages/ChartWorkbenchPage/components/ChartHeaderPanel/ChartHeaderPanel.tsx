@@ -69,7 +69,7 @@ const ChartHeaderPanel: FC<{
         <h1>{chartName}</h1>
         <Space>
           <Button type="primary" ghost onClick={onGoBack}>
-            取消
+            {t('cancel')}
           </Button>
           <Button type="primary" onClick={onSaveChart}>
             {t('save')}
@@ -81,7 +81,7 @@ const ChartHeaderPanel: FC<{
                 setIsModalVisible(true);
               }}
             >
-              保存到仪表板
+              {t('saveToDashboard')}
             </Button>
           )}
 
@@ -91,7 +91,7 @@ const ChartHeaderPanel: FC<{
           <SaveToDashboardOrStoryboard
             orgId={orgId as string}
             saveType={SaveTypes.Dashboard}
-            title={'保存至仪表板'}
+            title={t('saveToDashboard')}
             isModalVisible={isModalVisible}
             handleOk={handleModalOk}
             handleCancel={handleModalCancel}

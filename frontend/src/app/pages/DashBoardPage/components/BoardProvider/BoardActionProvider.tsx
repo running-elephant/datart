@@ -70,7 +70,6 @@ export const BoardActionProvider: FC<{ id: string }> = ({
     },
 
     onWidgetsQuery: debounce(() => {
-      console.log({ boardId, renderMode });
       if (editing) {
         dispatch(editWidgetsQueryAction({ boardId }));
       } else {

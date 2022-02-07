@@ -65,7 +65,7 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
           onClick: onSyncData,
           disabled: false,
           render: true,
-          content: '同步数据',
+          content: t('syncData'),
           className: 'line',
         },
         {
@@ -82,7 +82,7 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
           onClick: onAddToStory,
           disabled: false,
           render: allowManage && onAddToStory,
-          content: '添加到故事版',
+          content: t('addToStory'),
           className: 'line',
         },
         {

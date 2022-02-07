@@ -21,7 +21,6 @@ import {
   EditOutlined,
   MoreOutlined,
   SendOutlined,
-  VerticalAlignBottomOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
 import SaveToDashboardOrStoryboard, {
@@ -142,17 +141,11 @@ const VizHeader: FC<{
               {allowManage && !isArchived && onPublish && Number(status) === 1 && (
                 <Button
                   key="publish"
-                  icon={
-                    status === 1 ? (
-                      <SendOutlined />
-                    ) : (
-                      <VerticalAlignBottomOutlined />
-                    )
-                  }
+                  icon={<SendOutlined />}
                   loading={publishLoading}
                   onClick={onPublish}
                 >
-                  {status === 1 ? t('publish') : t('unpublish')}
+                  {t('publish')}
                 </Button>
               )}
               {allowManage && !isArchived && onGotoEdit && (

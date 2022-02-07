@@ -70,7 +70,7 @@ const VizOperationMenu: FC<{
             icon={<ReloadOutlined />}
             onClick={onReloadData}
           >
-            同步数据
+            {t('syncData')}
           </MeunBox>,
         );
       }
@@ -91,7 +91,7 @@ const VizOperationMenu: FC<{
             icon={<FileAddOutlined />}
             onClick={() => onAddToDashBoard(true)}
           >
-            添加到仪表板
+            {t('addToDash')}
           </MeunBox>,
         );
       }

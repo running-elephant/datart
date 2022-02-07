@@ -97,6 +97,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
     const { data } = await request<ServerDashboard>(
       `/viz/dashboards/${dashboardId}`,
     );
+
     const dashboard = getDashBoardByResBoard(data);
 
     const {
