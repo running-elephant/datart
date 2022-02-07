@@ -21,6 +21,7 @@ package datart.data.provider.jdbc;
 import com.google.common.collect.Iterables;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.SqlParseError;
 import datart.core.common.MessageResolver;
 import datart.core.common.RequestContext;
 import datart.core.data.provider.ExecuteParam;
@@ -140,7 +141,9 @@ public class SqlScriptRender extends ScriptRender {
         try {
             placeholders = SqlParserVariableResolver.resolve(sqlDialect, selectSql, variableMap);
         } catch (SqlParseException e) {
-            RequestContext.putWarning(MessageResolver.getMessage("message.provider.sql.parse.failed"), e);
+            SqlParseError sqlParseError = new SqlParseError(e);
+            sqlParseError.setSql(selectSql);
+            RequestContext.putWarning(MessageResolver.getMessage("message.provider.sql.parse.failed"), sqlParseError);
             placeholders = RegexVariableResolver.resolve(sqlDialect, selectSql, variableMap);
         }
         if (CollectionUtils.isNotEmpty(placeholders)) {
@@ -161,7 +164,6 @@ public class SqlScriptRender extends ScriptRender {
             try {
                 sqlNode = parseSql(sql);
             } catch (Exception e) {
-                e.printStackTrace();
                 continue;
             }
             if (SqlValidateUtils.validateQuery(sqlNode) && selectSql != null) {

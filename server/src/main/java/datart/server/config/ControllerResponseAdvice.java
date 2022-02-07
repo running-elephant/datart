@@ -19,8 +19,8 @@ import java.util.Objects;
 public class ControllerResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter methodParameter, Class<? extends HttpMessageConverter<?>> aClass) {
-        Class<?> superclass = Objects.requireNonNull(methodParameter.getMethod()).getDeclaringClass().getSuperclass();
-        return BaseController.class.equals(superclass);
+//        Class<?> superclass = Objects.requireNonNull(methodParameter.getMethod()).getDeclaringClass().getSuperclass();
+        return true;
     }
 
     @Override
@@ -28,7 +28,11 @@ public class ControllerResponseAdvice implements ResponseBodyAdvice<Object> {
         if (o instanceof ResponseData) {
             Map<String, Exception> warnings = RequestContext.getWarnings();
             if (warnings != null && warnings.size() > 0) {
-                ((ResponseData) o).setWarnings(new LinkedList<>(warnings.keySet()));
+                LinkedList<String> msg = new LinkedList<>();
+                for (Exception value : warnings.values()) {
+                    msg.add(value.toString());
+                }
+                ((ResponseData) o).setWarnings(msg);
             }
             return o;
         } else {
