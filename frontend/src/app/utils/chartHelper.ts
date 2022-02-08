@@ -17,7 +17,10 @@
  */
 
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
-import { ChartDataSet } from 'app/components/ChartGraph/models/ChartDataSet';
+import {
+  ChartDataSet,
+  ChartDataSetRow,
+} from 'app/components/ChartGraph/models/ChartDataSet';
 import {
   AggregateFieldActionType,
   ChartConfig,
@@ -938,6 +941,7 @@ export function getSeriesTooltips4Scatter(
 }
 
 export function getSeriesTooltips4Rectangular2(
+  chartDataSet: IChartDataSet<string>,
   tooltipParam: {
     componentType: string;
     data: {
@@ -954,7 +958,6 @@ export function getSeriesTooltips4Rectangular2(
   if (tooltipParam?.componentType !== 'series') {
     return '';
   }
-
   const aggConfigName = tooltipParam?.data?.name;
   const row = tooltipParam?.data?.rowData || {};
 
@@ -967,7 +970,9 @@ export function getSeriesTooltips4Rectangular2(
     )
     .concat(sizeConfigs || [])
     .concat(infoConfigs || [])
-    .map(config => valueFormatter(config, row?.[getValueByColumnKey(config)]));
+    .map(config =>
+      valueFormatter(config, row?.[chartDataSet.getFieldKey(config)]),
+    );
   return tooltips.join('<br />');
 }
 
@@ -1050,7 +1055,14 @@ export function getScatterSymbolSizeFn(
   };
 }
 
+// TODO(Stephen): tobe used chart DataSetRow model for all charts
 export function getExtraSeriesRowData(data) {
+  if (data instanceof ChartDataSetRow) {
+    return {
+      rowData: data?.convertToObject(),
+    };
+  }
+
   return {
     rowData: data,
   };

@@ -27,7 +27,6 @@ import {
   getReference2,
   getSeriesTooltips4Rectangular2,
   getStyles,
-  getValueByColumnKey,
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { toFormattedValue, toPrecision } from 'app/utils/number';
@@ -153,7 +152,7 @@ class BasicBarChart extends Chart {
       tooltip: {
         trigger: 'item',
         formatter: this.getTooltipFormatterFunc(
-          styleConfigs,
+          chartDataSet,
           groupConfigs,
           aggregateConfigs,
           colorConfigs,
@@ -191,10 +190,14 @@ class BasicBarChart extends Chart {
     infoConfigs,
     xAxisColumns,
   ) {
-    const xAxisColumnName = getValueByColumnKey(groupConfigs?.[0]);
-    const yAxisColumnNames = aggregateConfigs.map(getValueByColumnKey);
-    const colorColumnName = getValueByColumnKey(colorConfigs[0]);
-    const infoColumnNames = infoConfigs.map(getValueByColumnKey);
+    const xAxisColumnName = chartDataSet.getFieldKey(groupConfigs?.[0]);
+    const yAxisColumnNames = aggregateConfigs.map(config =>
+      chartDataSet.getFieldKey(config),
+    );
+    const colorColumnName = chartDataSet.getFieldKey(colorConfigs[0]);
+    const infoColumnNames = infoConfigs.map(config =>
+      chartDataSet.getFieldKey(config),
+    );
 
     if (!colorConfigs.length) {
       const flatSeries = aggregateConfigs.map(aggConfig => {
@@ -248,7 +251,7 @@ class BasicBarChart extends Chart {
               ...getExtraSeriesRowData(dc),
               ...getExtraSeriesDataFormat(aggConfig?.format),
               name: getColumnRenderName(aggConfig),
-              value: dc?.[getValueByColumnKey(aggConfig)] || 0,
+              value: dc?.[chartDataSet.getFieldKey(aggConfig)] || 0,
             };
           }),
           itemStyle: this.getSerieItemStyle(styleConfigs, {
@@ -558,7 +561,7 @@ class BasicBarChart extends Chart {
   }
 
   private getTooltipFormatterFunc(
-    styleConfigs,
+    chartDataSet: IChartDataSet<string>,
     groupConfigs,
     aggregateConfigs,
     colorConfigs,
@@ -569,6 +572,7 @@ class BasicBarChart extends Chart {
         ? seriesParams
         : [seriesParams];
       return getSeriesTooltips4Rectangular2(
+        chartDataSet,
         params[0],
         groupConfigs,
         colorConfigs,
