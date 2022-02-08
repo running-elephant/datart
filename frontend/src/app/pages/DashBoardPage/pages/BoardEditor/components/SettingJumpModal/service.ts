@@ -3,7 +3,7 @@ import { VizType } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { getColumnRenderName } from 'app/utils/chartHelper';
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { ControlOptionItem } from './types';
 const FILTER_MENU = [ChartDataViewFieldType.STRING];
@@ -26,10 +26,15 @@ const computedDashboardControllers = (data): ControlOptionItem[] => {
   }));
   return filterOptions;
 };
-// TODO fix about jump
+
 export const fetchDashboardControllers = async (id: string) => {
-  const { data } = await request<any>(`/viz/dashboards/${id}`);
-  return computedDashboardControllers(data);
+  try {
+    const { data } = await request2<any>(`/viz/dashboards/${id}`);
+    return computedDashboardControllers(data);
+  } catch (error) {
+    errorHandle(error);
+    throw error;
+  }
 };
 const computedDataChartFilters = data => {
   if (data?.config) {
@@ -53,7 +58,7 @@ const computedDataChartFilters = data => {
 };
 export const fetchDatachartFilters = async (id: string) => {
   try {
-    const { data } = await request<any>(`/viz/datacharts/${id}`);
+    const { data } = await request2<any>(`/viz/datacharts/${id}`);
     return computedDataChartFilters(data);
   } catch (error) {
     errorHandle(error);

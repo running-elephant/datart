@@ -31,7 +31,7 @@ import { getDistinctFields } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { G30 } from 'styles/StyleConstants';
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { ControllerConfig } from '../../../types';
 import { AssistViewFields } from './AssistViewFields';
@@ -69,7 +69,7 @@ const ValuesOptionsSetter: FC<{
   const getViewOption = useCallback(async (viewId: string) => {
     if (!viewId) return [];
     try {
-      const { data } = await request<View>(`/views/${viewId}`);
+      const { data } = await request2<View>(`/views/${viewId}`);
       const model = JSON.parse(data.model);
       const option: CascaderOptionType[] = Object.keys(model).map(key => {
         return {

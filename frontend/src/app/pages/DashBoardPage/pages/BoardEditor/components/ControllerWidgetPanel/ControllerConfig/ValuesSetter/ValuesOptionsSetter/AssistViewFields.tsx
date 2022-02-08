@@ -27,7 +27,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 export interface AssistViewFieldsProps
   extends Omit<CascaderProps, 'options' | 'onChange'> {
@@ -48,7 +48,9 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
     const setViews = useCallback(
       async orgId => {
         try {
-          const { data } = await request<ViewSimple[]>(`/views?orgId=${orgId}`);
+          const { data } = await request2<ViewSimple[]>(
+            `/views?orgId=${orgId}`,
+          );
           const views: CascaderOptionType[] = data.map(item => {
             return {
               value: item.id,
