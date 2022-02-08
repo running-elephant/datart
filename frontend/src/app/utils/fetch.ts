@@ -15,9 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { message } from 'antd';
-import { ChartDTO } from "app/types/ChartDTO";
 import {
   DownloadTask,
   DownloadTaskState,
@@ -27,9 +25,10 @@ import ChartDataRequest, {
   transformToViewConfig,
 } from 'app/types/ChartDataRequest';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
+import { ChartDTO } from 'app/types/ChartDTO';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
-import { request, requestWithHeader } from 'utils/request';
+import { request, request2, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 
 export const getDistinctFields = async (
@@ -225,7 +224,7 @@ export async function getChartPluginPaths() {
 
 export async function loadShareTask(params) {
   try {
-    const { data } = await request<DownloadTask[]>({
+    const { data } = await request2<DownloadTask[]>({
       url: `/share/download/task`,
       method: 'GET',
       params,

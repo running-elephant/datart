@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
@@ -24,8 +23,8 @@ import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
-import { request } from 'utils/request';
-import { errorHandle, getErrorMessage } from 'utils/utils';
+import { request2 } from 'utils/request';
+import { getErrorMessage } from 'utils/utils';
 import { boardActions } from '.';
 import { getChartWidgetRequestParams } from '../../../utils';
 import { handleServerBoardAction } from './asyncActions';
@@ -77,23 +76,18 @@ export const fetchBoardDetail = createAsyncThunk<
   null,
   { dashboardRelId: string; filterSearchParams?: FilterSearchParams }
 >('board/fetchBoardDetail', async (params, { dispatch, rejectWithValue }) => {
-  try {
-    const { data } = await request<ServerDashboard>(
-      `/viz/dashboards/${params?.dashboardRelId}`,
-    );
+  const { data } = await request2<ServerDashboard>(
+    `/viz/dashboards/${params?.dashboardRelId}`,
+  );
 
-    await dispatch(
-      handleServerBoardAction({
-        data,
-        renderMode: 'read',
-        filterSearchMap: { params: params?.filterSearchParams },
-      }),
-    );
-    return null;
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
+  await dispatch(
+    handleServerBoardAction({
+      data,
+      renderMode: 'read',
+      filterSearchMap: { params: params?.filterSearchParams },
+    }),
+  );
+  return null;
 });
 
 export const fetchBoardDetailInShare = createAsyncThunk<
@@ -106,38 +100,33 @@ export const fetchBoardDetailInShare = createAsyncThunk<
 >(
   'board/fetchBoardDetailInShare',
   async (params, { dispatch, rejectWithValue }) => {
-    try {
-      const { vizToken } = params;
-      const { data } = await request<ShareVizInfo>({
-        url: '/share/viz',
-        method: 'GET',
-        params: {
-          shareToken: vizToken.token,
-          password: vizToken.password,
+    const { vizToken } = params;
+    const { data } = await request2<ShareVizInfo>({
+      url: '/share/viz',
+      method: 'GET',
+      params: {
+        shareToken: vizToken.token,
+        password: vizToken.password,
+      },
+    });
+    dispatch(
+      shareActions.setExecuteTokenMap({
+        executeToken: data.executeToken,
+      }),
+    );
+    const serverBoard = data.vizDetail as ServerDashboard;
+    dispatch(
+      handleServerBoardAction({
+        data: serverBoard,
+        renderMode: 'share',
+        filterSearchMap: {
+          params: params.filterSearchParams,
+          isMatchByName: true,
         },
-      });
-      dispatch(
-        shareActions.setExecuteTokenMap({
-          executeToken: data.executeToken,
-        }),
-      );
-      const serverBoard = data.vizDetail as ServerDashboard;
-      dispatch(
-        handleServerBoardAction({
-          data: serverBoard,
-          renderMode: 'share',
-          filterSearchMap: {
-            params: params.filterSearchParams,
-            isMatchByName: true,
-          },
-        }),
-      );
+      }),
+    );
 
-      return null;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    return null;
   },
 );
 export const renderedWidgetAsync = createAsyncThunk<
@@ -254,7 +243,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
     let widgetData;
     try {
       if (renderMode === 'read') {
-        const { data } = await request<WidgetData>({
+        const { data } = await request2<WidgetData>({
           method: 'POST',
           url: `data-provider/execute`,
           data: requestParams,
@@ -266,7 +255,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
         const dataChart = dataChartMap[curWidget.datachartId];
         const viewId = viewMap[dataChart.viewId].id;
         const executeToken = executeTokenMap?.[viewId];
-        const { data } = await request<WidgetData>({
+        const { data } = await request2<WidgetData>({
           method: 'POST',
           url: `share/execute`,
           params: {
@@ -369,7 +358,7 @@ export const getControllerOptions = createAsyncThunk<
     let widgetData;
     try {
       if (executeToken && renderMode !== 'read') {
-        const { data } = await request<ChartDataSetDTO>({
+        const { data } = await request2<ChartDataSetDTO>({
           method: 'POST',
           url: `share/execute`,
           params: {
@@ -380,7 +369,7 @@ export const getControllerOptions = createAsyncThunk<
         });
         widgetData = { ...data, id: widget.id };
       } else {
-        const { data } = await request<WidgetData>({
+        const { data } = await request2<WidgetData>({
           method: 'POST',
           url: `data-provider/execute`,
           data: requestParams,
