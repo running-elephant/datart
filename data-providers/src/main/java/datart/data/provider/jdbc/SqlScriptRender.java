@@ -42,6 +42,7 @@ import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -133,9 +134,13 @@ public class SqlScriptRender extends ScriptRender {
             return selectSql;
         }
 
-        Map<String, ScriptVariable> variableMap = queryScript.getVariables()
-                .stream()
-                .collect(Collectors.toMap(ScriptVariable::getNameWithQuote, variable -> variable));
+        Map<String, ScriptVariable> variableMap = new CaseInsensitiveMap<>();
+
+        if(CollectionUtils.isNotEmpty(queryScript.getVariables())){
+            for (ScriptVariable variable : queryScript.getVariables()) {
+                variableMap.put(variable.getNameWithQuote(),variable);
+            }
+        }
 
         List<VariablePlaceholder> placeholders = null;
         try {
@@ -143,6 +148,7 @@ public class SqlScriptRender extends ScriptRender {
         } catch (SqlParseException e) {
             SqlParseError sqlParseError = new SqlParseError(e);
             sqlParseError.setSql(selectSql);
+            sqlParseError.setDbType(sqlDialect.getDatabaseProduct().name());
             RequestContext.putWarning(MessageResolver.getMessage("message.provider.sql.parse.failed"), sqlParseError);
             placeholders = RegexVariableResolver.resolve(sqlDialect, selectSql, variableMap);
         }

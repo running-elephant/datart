@@ -64,6 +64,8 @@ public class SqlBuilder {
         if (StringUtils.isNotBlank(sql)) {
             sql = removeEndDelimiter(sql);
         }
+        sql = StringUtils.appendIfMissing(sql," "," ");
+        sql = StringUtils.prependIfMissing(sql," "," ");
         this.srcSql = sql;
         return this;
     }

@@ -25,13 +25,13 @@ public enum SqlOperatorReg {
 
     GT(Pattern.compile("[^\\s<]+(\\s*>\\s*){1}[^\\s=]+"), ">", Pattern.compile("\\s*>\\s*")),
 
-    GTE(Pattern.compile("[^\\s]+(\\s*>\\s*=\\s*){1}[^\\s]+"), ">=", Pattern.compile("\\s*>\\s*=\\s*")),
+    GTE(Pattern.compile("[^\\s]+(\\s*>=\\s*){1}[^\\s]+"), ">=", Pattern.compile("\\s*>=\\s*")),
 
     LT(Pattern.compile("[^\\s]+(\\s*<\\s*){1}[^\\s=>]+"), "<", Pattern.compile("\\s*<\\s*")),
 
-    LTE(Pattern.compile("[^\\s]+(\\s*<\\s*=\\s*){1}[^\\s]+"), "<=", Pattern.compile("\\s*<\\s*=\\s*")),
+    LTE(Pattern.compile("[^\\s]+(\\s*<=\\s*){1}[^\\s]+"), "<=", Pattern.compile("\\s*<=\\s*")),
 
-    EQ(Pattern.compile("[^\\s=<]+(\\s*=\\s*){1}[^\\s]+"), "=", Pattern.compile("\\s*=\\s*")),
+    EQ(Pattern.compile("[^\\s=<>]+(\\s*=\\s*){1}[^\\s]+"), "=", Pattern.compile("\\s*=\\s*")),
 
     NEQ(Pattern.compile("[^\\s]+(\\s*<\\s*>\\s*){1}[^\\s]+"), "<>", Pattern.compile("\\s*<\\s*>\\s*")),
 
