@@ -170,7 +170,7 @@ const VizHeader: FC<{
         {onSaveAsVizs && (
           <SaveToDashboardOrStoryboard
             saveType={SaveTypes.Dashboard}
-            title={'保存至仪表板'}
+            title={t('addToDash')}
             orgId={orgId as string}
             isModalVisible={isModalVisible}
             handleOk={handleModalOk}

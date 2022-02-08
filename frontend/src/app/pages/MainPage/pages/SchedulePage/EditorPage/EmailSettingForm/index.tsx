@@ -28,12 +28,11 @@ export const EmailSettingForm: FC<EmailSettingFormProps> = ({
       <>
         {t('CC') + ' '}
         <span onClick={() => setShowBcc(!showBcc)}>
-          {' '}
           {showBcc ? <UpCircleOutlined /> : <DownCircleOutlined />}
         </span>
       </>
     );
-  }, [showBcc,t]);
+  }, [showBcc, t]);
 
   return (
     <>

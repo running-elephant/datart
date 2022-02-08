@@ -35,7 +35,7 @@ import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
+import { NAV_LEVEL, SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
 import { getInsertedNodeIndex, uuidv4 } from 'utils/utils';
 import { UNPERSISTED_ID_PREFIX } from '../constants';
 import { SaveFormContext } from '../SaveFormContext';
@@ -51,184 +51,191 @@ import { ViewSimpleViewModel } from '../slice/types';
 import { FolderTree } from './FolderTree';
 import { Recycle } from './Recycle';
 
-export const Sidebar = memo(({ isDragging }: { isDragging: boolean }) => {
-  const history = useHistory();
-  const dispatch = useDispatch();
-  const { showSaveForm } = useContext(SaveFormContext);
-  const orgId = useSelector(selectOrgId);
-  const selectViewTree = useMemo(makeSelectViewTree, []);
-  const viewsData = useSelector(selectViews);
-  const t = useI18NPrefix('view.sidebar');
-  const { actions: viewActions } = useViewSlice();
-  const sliderVisible = useSelector(selectSliderVisible);
+export const Sidebar = memo(
+  ({ isDragging, width }: { isDragging: boolean; width: number }) => {
+    const history = useHistory();
+    const dispatch = useDispatch();
+    const { showSaveForm } = useContext(SaveFormContext);
+    const orgId = useSelector(selectOrgId);
+    const selectViewTree = useMemo(makeSelectViewTree, []);
+    const viewsData = useSelector(selectViews);
+    const t = useI18NPrefix('view.sidebar');
+    const { actions: viewActions } = useViewSlice();
+    const sliderVisible = useSelector(selectSliderVisible);
 
-  const getIcon = useCallback(
-    ({ isFolder }: ViewSimpleViewModel) =>
-      isFolder ? (
-        p => (p.expanded ? <FolderOpenFilled /> : <FolderFilled />)
-      ) : (
-        <CodeFilled />
-      ),
-    [],
-  );
-  const getDisabled = useCallback(
-    ({ deleteLoading }: ViewSimpleViewModel) => deleteLoading,
-    [],
-  );
-
-  const treeData = useSelector(state =>
-    selectViewTree(state, { getIcon, getDisabled }),
-  );
-
-  const { filteredData: filteredTreeData, debouncedSearch: treeSearch } =
-    useDebouncedSearch(treeData, (keywords, d) =>
-      d.title.toLowerCase().includes(keywords.toLowerCase()),
+    const getIcon = useCallback(
+      ({ isFolder }: ViewSimpleViewModel) =>
+        isFolder ? (
+          p => (p.expanded ? <FolderOpenFilled /> : <FolderFilled />)
+        ) : (
+          <CodeFilled />
+        ),
+      [],
     );
-  const archived = useSelector(selectArchived);
-  const recycleList = useMemo(
-    () =>
-      archived?.map(({ id, name, parentId, isFolder, deleteLoading }) => ({
-        key: id,
-        title: name,
-        parentId,
-        icon: isFolder ? <FolderOutlined /> : <FileOutlined />,
-        isFolder,
-        disabled: deleteLoading,
-      })),
-    [archived],
-  );
-  const { filteredData: filteredListData, debouncedSearch: listSearch } =
-    useDebouncedSearch(recycleList, (keywords, d) =>
-      d.title.toLowerCase().includes(keywords.toLowerCase()),
+    const getDisabled = useCallback(
+      ({ deleteLoading }: ViewSimpleViewModel) => deleteLoading,
+      [],
     );
 
-  const add = useCallback(
-    ({ key }) => {
-      switch (key) {
-        case 'view':
-          history.push(
-            `/organizations/${orgId}/views/${`${UNPERSISTED_ID_PREFIX}${uuidv4()}`}`,
-          );
-          break;
-        case 'folder':
-          showSaveForm({
-            type: CommonFormTypes.Add,
-            visible: true,
-            simple: true,
-            parentIdLabel: t('parent'),
-            onSave: (values, onClose) => {
-              let index = getInsertedNodeIndex(values, viewsData);
+    const treeData = useSelector(state =>
+      selectViewTree(state, { getIcon, getDisabled }),
+    );
 
-              dispatch(
-                saveFolder({
-                  folder: {
-                    ...values,
-                    parentId: values.parentId || null,
-                    index,
-                  },
-                  resolve: onClose,
-                }),
-              );
-            },
-          });
-          break;
-        default:
-          break;
-      }
-    },
-    [dispatch, history, orgId, showSaveForm, viewsData, t],
-  );
+    const { filteredData: filteredTreeData, debouncedSearch: treeSearch } =
+      useDebouncedSearch(treeData, (keywords, d) =>
+        d.title.toLowerCase().includes(keywords.toLowerCase()),
+      );
+    const archived = useSelector(selectArchived);
+    const recycleList = useMemo(
+      () =>
+        archived?.map(({ id, name, parentId, isFolder, deleteLoading }) => ({
+          key: id,
+          title: name,
+          parentId,
+          icon: isFolder ? <FolderOutlined /> : <FileOutlined />,
+          isFolder,
+          disabled: deleteLoading,
+        })),
+      [archived],
+    );
+    const { filteredData: filteredListData, debouncedSearch: listSearch } =
+      useDebouncedSearch(recycleList, (keywords, d) =>
+        d.title.toLowerCase().includes(keywords.toLowerCase()),
+      );
 
-  const handleSliderVisible = useCallback(() => {
-    dispatch(viewActions.changeVisibleStatus({ status: !sliderVisible }));
-  }, [dispatch, viewActions, sliderVisible]);
-
-  const titles = useMemo(
-    () => [
-      {
-        key: 'list',
-        title: t('title'),
-        search: true,
-        add: {
-          items: [
-            { key: 'view', text: t('addView') },
-            { key: 'folder', text: t('addFolder') },
-          ],
-          callback: add,
-        },
-        more: {
-          items: [
-            {
-              key: 'recycle',
-              text: t('recycle'),
-              prefix: <DeleteOutlined className="icon" />,
-            },
-            {
-              key: 'fold',
-              text: t(sliderVisible ? 'open' : 'close'),
-              prefix: sliderVisible ? (
-                <MenuUnfoldOutlined className="icon" />
-              ) : (
-                <MenuFoldOutlined className="icon" />
-              ),
-            },
-          ],
-          callback: (key, _, onNext) => {
-            switch (key) {
-              case 'recycle':
-                onNext();
-                break;
-              case 'fold':
-                handleSliderVisible();
-                break;
-            }
-          },
-        },
-        onSearch: treeSearch,
-      },
-      {
-        key: 'recycle',
-        title: t('recycle'),
-        back: true,
-        search: true,
-        onSearch: listSearch,
-      },
-    ],
-    [add, treeSearch, listSearch, t, handleSliderVisible, sliderVisible],
-  );
-
-  return (
-    <Wrapper
-      sliderVisible={sliderVisible}
-      className={sliderVisible ? 'close' : ''}
-      isDragging={isDragging}
-    >
-      {sliderVisible ? (
-        <MenuUnfoldOutlined
-          className="menuUnfoldOutlined"
-          onClick={() => {
-            dispatch(
-              viewActions.changeVisibleStatus({ status: !sliderVisible }),
+    const add = useCallback(
+      ({ key }) => {
+        switch (key) {
+          case 'view':
+            history.push(
+              `/organizations/${orgId}/views/${`${UNPERSISTED_ID_PREFIX}${uuidv4()}`}`,
             );
-          }}
-        />
-      ) : (
-        <></>
-      )}
-      <ListNavWrapper defaultActiveKey="list">
-        <ListPane key="list">
-          <ListTitle {...titles[0]} />
-          <FolderTree treeData={filteredTreeData} />
-        </ListPane>
-        <ListPane key="recycle">
-          <ListTitle {...titles[1]} />
-          <Recycle list={filteredListData} />
-        </ListPane>
-      </ListNavWrapper>
-    </Wrapper>
-  );
-});
-const Wrapper = styled.div<{ sliderVisible: boolean; isDragging: boolean }>`
+            break;
+          case 'folder':
+            showSaveForm({
+              type: CommonFormTypes.Add,
+              visible: true,
+              simple: true,
+              parentIdLabel: t('parent'),
+              onSave: (values, onClose) => {
+                let index = getInsertedNodeIndex(values, viewsData);
+
+                dispatch(
+                  saveFolder({
+                    folder: {
+                      ...values,
+                      parentId: values.parentId || null,
+                      index,
+                    },
+                    resolve: onClose,
+                  }),
+                );
+              },
+            });
+            break;
+          default:
+            break;
+        }
+      },
+      [dispatch, history, orgId, showSaveForm, viewsData, t],
+    );
+
+    const handleSliderVisible = useCallback(() => {
+      dispatch(viewActions.changeVisibleStatus({ status: !sliderVisible }));
+    }, [dispatch, viewActions, sliderVisible]);
+
+    const titles = useMemo(
+      () => [
+        {
+          key: 'list',
+          title: t('title'),
+          search: true,
+          add: {
+            items: [
+              { key: 'view', text: t('addView') },
+              { key: 'folder', text: t('addFolder') },
+            ],
+            callback: add,
+          },
+          more: {
+            items: [
+              {
+                key: 'recycle',
+                text: t('recycle'),
+                prefix: <DeleteOutlined className="icon" />,
+              },
+              {
+                key: 'fold',
+                text: t(sliderVisible ? 'open' : 'close'),
+                prefix: sliderVisible ? (
+                  <MenuUnfoldOutlined className="icon" />
+                ) : (
+                  <MenuFoldOutlined className="icon" />
+                ),
+              },
+            ],
+            callback: (key, _, onNext) => {
+              switch (key) {
+                case 'recycle':
+                  onNext();
+                  break;
+                case 'fold':
+                  handleSliderVisible();
+                  break;
+              }
+            },
+          },
+          onSearch: treeSearch,
+        },
+        {
+          key: 'recycle',
+          title: t('recycle'),
+          back: true,
+          search: true,
+          onSearch: listSearch,
+        },
+      ],
+      [add, treeSearch, listSearch, t, handleSliderVisible, sliderVisible],
+    );
+
+    return (
+      <Wrapper
+        sliderVisible={sliderVisible}
+        className={sliderVisible ? 'close' : ''}
+        isDragging={isDragging}
+        width={width}
+      >
+        {sliderVisible ? (
+          <MenuUnfoldOutlined
+            className="menuUnfoldOutlined"
+            onClick={() => {
+              dispatch(
+                viewActions.changeVisibleStatus({ status: !sliderVisible }),
+              );
+            }}
+          />
+        ) : (
+          <></>
+        )}
+        <ListNavWrapper defaultActiveKey="list">
+          <ListPane key="list">
+            <ListTitle {...titles[0]} />
+            <FolderTree treeData={filteredTreeData} />
+          </ListPane>
+          <ListPane key="recycle">
+            <ListTitle {...titles[1]} />
+            <Recycle list={filteredListData} />
+          </ListPane>
+        </ListNavWrapper>
+      </Wrapper>
+    );
+  },
+);
+const Wrapper = styled.div<{
+  sliderVisible: boolean;
+  isDragging: boolean;
+  width: number;
+}>`
   transition: ${p => (!p.isDragging ? 'width 0.3s ease' : 'none')};
   height: 100%;
   &.close {
@@ -244,7 +251,7 @@ const Wrapper = styled.div<{ sliderVisible: boolean; isDragging: boolean }>`
       transform: translate(-50%, -50%);
     }
     &:hover {
-      width: 14.6789% !important;
+      width: ${p => p.width + '%'} !important;
       .menuUnfoldOutlined {
         display: none;
       }
@@ -269,5 +276,5 @@ const ListNavWrapper = styled(ListNav)`
   border-right: 1px solid ${p => p.theme.borderColorSplit};
   height: 100%;
   position: relative;
-  z-index: 111;
+  z-index: ${NAV_LEVEL};
 `;

@@ -56,7 +56,7 @@ export const StoryPagePreview: React.FC<{
   allowShare?: boolean;
   allowManage?: boolean;
 }> = memo(({ orgId, storyId, allowShare, allowManage }) => {
-  const dispatch: any = useDispatch();
+  const dispatch = useDispatch();
   const t = usePrefixI18N('viz.action');
   const tg = usePrefixI18N('global');
   const history = useHistory();

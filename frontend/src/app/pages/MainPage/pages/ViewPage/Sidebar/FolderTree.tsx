@@ -248,7 +248,7 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
         </TreeTitle>
       );
     },
-    [archive, moreMenuClick, tg, allowEnableViz, t],
+    [archive, moreMenuClick, tg, allowEnableViz, t, isOwner, permissionMap],
   );
 
   const treeSelect = useCallback(

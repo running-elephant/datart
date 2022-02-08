@@ -98,7 +98,7 @@ export function Container() {
         className="datart-split"
         sliderVisible={sliderVisible}
       >
-        <Sidebar isDragging={isDragging} />
+        <Sidebar width={sizes[0]} isDragging={isDragging} />
         <Main />
         <SaveForm
           title={t('title')}

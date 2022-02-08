@@ -53,7 +53,11 @@ export function VizPage() {
         className="datart-split"
         sliderVisible={sliderVisible}
       >
-        <Sidebar isDragging={isDragging} i18nPrefix={'viz.sidebar'} />
+        <Sidebar
+          width={sizes[0]}
+          isDragging={isDragging}
+          i18nPrefix={'viz.sidebar'}
+        />
         <Main />
         <SaveForm
           width={400}

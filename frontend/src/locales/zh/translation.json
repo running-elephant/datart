@@ -322,7 +322,7 @@
           "rangeTime": "日期范围",
           "rangeTimePicker": "日期范围",
           "recommendTime": "推荐时间",
-          "rangeValue": "数值范围", 
+          "rangeValue": "数值范围",
           "text": "文本",
           "tree": "下拉树列表",
           "value": "数值",
@@ -707,9 +707,9 @@
       "unpublished": "未发布",
       "archived": "已归档",
       "play": "播放",
-      "syncData":"同步数据",
-      "addToDash":"添加到仪表板",
-      "addToStory":"添加到故事板",
+      "syncData": "同步数据",
+      "addToDash": "添加到仪表板",
+      "addToStory": "添加到故事板",
       "share": {
         "link": "链接",
         "password": "密码",
@@ -869,7 +869,7 @@
         "recycle": "回收站",
         "open": "展开",
         "close": "收起",
-        "startAnalysis":"开始分析"
+        "startAnalysis": "开始分析"
       },
       "storyboards": {
         "title": "故事板列表",
@@ -960,7 +960,7 @@
       "warning": "有未执行的修改，是否执行？"
     },
     "editor": {
-      "startAnalysis":"开始分析",
+      "startAnalysis": "开始分析",
       "folder": "目录",
       "source": "请选择数据源",
       "run": "执行",
@@ -1033,7 +1033,7 @@
     "createSuccess": "新建数据源成功",
     "archived": "已归档",
     "noPermission": "您没有权限访问该页面",
-    "creatView":"去新建视图",
+    "creatView": "去新建视图",
     "sidebar": {
       "title": "数据源列表",
       "add": "新建数据源",

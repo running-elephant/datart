@@ -133,7 +133,7 @@ const SaveToDashboardOrStoryboard: FC<SaveToDashboardOrStoryboardTypes> = memo(
       setSelectId(event.node.relId);
     }, []);
 
-    const SaveToDashboardOrStoryFn = useCallback(
+    const saveToDashboardOrStoryFn = useCallback(
       async selectId => {
         handleOk(selectId);
       },
@@ -151,9 +151,9 @@ const SaveToDashboardOrStoryboard: FC<SaveToDashboardOrStoryboardTypes> = memo(
     });
 
     const treeData = useMemo(() => {
-      let ListData = saveType === 'DASHBOARD' ? vizData : storyData;
+      let listData = saveType === 'DASHBOARD' ? vizData : storyData;
       return listToTree(
-        ListData?.map(v => ({
+        listData?.map(v => ({
           ...v,
           isFolder: v.relType === 'FOLDER',
           selectable: v.relType !== 'FOLDER',
@@ -174,7 +174,7 @@ const SaveToDashboardOrStoryboard: FC<SaveToDashboardOrStoryboardTypes> = memo(
         title={title}
         visible={isModalVisible}
         onOk={() => {
-          SaveToDashboardOrStoryFn(selectId);
+          saveToDashboardOrStoryFn(selectId);
         }}
         onCancel={handleCancel}
         okButtonProps={{ disabled: !selectId }}

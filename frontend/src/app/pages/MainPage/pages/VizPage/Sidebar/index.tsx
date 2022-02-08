@@ -22,84 +22,92 @@ import { Storyboards } from './Storyboards';
 
 interface SidebarProps extends I18NComponentProps {
   isDragging: boolean;
+  width: number;
 }
 
-export const Sidebar = memo(({ isDragging, i18nPrefix }: SidebarProps) => {
-  const [selectedKey, setSelectedKey] = useState('folder');
-  const vizs = useSelector(selectVizs);
-  const storyboards = useSelector(selectStoryboards);
-  const sliderVisible = useSelector(selectSliderVisible);
+export const Sidebar = memo(
+  ({ width, isDragging, i18nPrefix }: SidebarProps) => {
+    const [selectedKey, setSelectedKey] = useState('folder');
+    const vizs = useSelector(selectVizs);
+    const storyboards = useSelector(selectStoryboards);
+    const sliderVisible = useSelector(selectSliderVisible);
 
-  const matchDetail = useRouteMatch<{ vizId: string }>(
-    '/organizations/:orgId/vizs/:vizId',
-  );
-  const vizId = matchDetail?.params.vizId;
-  const t = useI18NPrefix(i18nPrefix);
-  const selectedFolderId = useMemo(() => {
-    if (vizId && vizs) {
-      const viz = vizs.find(({ relId }) => relId === vizId);
-      return viz && viz.id;
-    }
-  }, [vizId, vizs]);
-
-  useEffect(() => {
-    if (vizId) {
-      const viz =
-        vizs.find(({ relId }) => relId === vizId) ||
-        storyboards.find(({ id }) => id === vizId);
-      if (viz) {
-        setSelectedKey((viz as Folder).relType ? 'folder' : 'presentation');
+    const matchDetail = useRouteMatch<{ vizId: string }>(
+      '/organizations/:orgId/vizs/:vizId',
+    );
+    const vizId = matchDetail?.params.vizId;
+    const t = useI18NPrefix(i18nPrefix);
+    const selectedFolderId = useMemo(() => {
+      if (vizId && vizs) {
+        const viz = vizs.find(({ relId }) => relId === vizId);
+        return viz && viz.id;
       }
-    }
-  }, [vizId, storyboards, vizs]); // just switch when vizId changed
+    }, [vizId, vizs]);
 
-  const listTitles = useMemo(
-    () => [
-      { key: 'folder', icon: <FolderAddFilled />, text: t('folder') },
-      {
-        key: 'presentation',
-        icon: <FundProjectionScreenOutlined />,
-        text: t('presentation'),
-      },
-    ],
-    [t],
-  );
+    useEffect(() => {
+      if (vizId) {
+        const viz =
+          vizs.find(({ relId }) => relId === vizId) ||
+          storyboards.find(({ id }) => id === vizId);
+        if (viz) {
+          setSelectedKey((viz as Folder).relType ? 'folder' : 'presentation');
+        }
+      }
+    }, [vizId, storyboards, vizs]); // just switch when vizId changed
 
-  const switchSelect = useCallback(key => {
-    setSelectedKey(key);
-  }, []);
+    const listTitles = useMemo(
+      () => [
+        { key: 'folder', icon: <FolderAddFilled />, text: t('folder') },
+        {
+          key: 'presentation',
+          icon: <FundProjectionScreenOutlined />,
+          text: t('presentation'),
+        },
+      ],
+      [t],
+    );
 
-  return (
-    <Wrapper
-      sliderVisible={sliderVisible}
-      className={sliderVisible ? 'close' : ''}
-      isDragging={isDragging}
-    >
-      {sliderVisible ? (
-        <MenuUnfoldOutlined className="menuUnfoldOutlined" />
-      ) : (
-        ''
-      )}
-      <ListSwitch
-        titles={listTitles}
-        selectedKey={selectedKey}
-        onSelect={switchSelect}
-      />
-      <Folders
-        selectedId={selectedFolderId}
-        i18nPrefix={i18nPrefix}
-        className={classnames({ hidden: selectedKey !== 'folder' })}
-      />
-      <Storyboards
-        selectedId={vizId}
-        className={classnames({ hidden: selectedKey !== 'presentation' })}
-        i18nPrefix={i18nPrefix}
-      />
-    </Wrapper>
-  );
-});
+    const switchSelect = useCallback(key => {
+      setSelectedKey(key);
+    }, []);
 
-const Wrapper = styled.div<{ sliderVisible: boolean; isDragging: boolean }>`
+    return (
+      <Wrapper
+        sliderVisible={sliderVisible}
+        className={sliderVisible ? 'close' : ''}
+        isDragging={isDragging}
+        width={width}
+      >
+        {sliderVisible ? (
+          <MenuUnfoldOutlined className="menuUnfoldOutlined" />
+        ) : (
+          ''
+        )}
+        <ListSwitch
+          titles={listTitles}
+          selectedKey={selectedKey}
+          onSelect={switchSelect}
+        />
+        <Folders
+          selectedId={selectedFolderId}
+          i18nPrefix={i18nPrefix}
+          className={classnames({ hidden: selectedKey !== 'folder' })}
+        />
+        <Storyboards
+          selectedId={vizId}
+          className={classnames({ hidden: selectedKey !== 'presentation' })}
+          i18nPrefix={i18nPrefix}
+        />
+      </Wrapper>
+    );
+  },
+);
+
+const Wrapper = styled.div<{
+  sliderVisible: boolean;
+  isDragging: boolean;
+  width: number;
+}>`
   z-index: ${STICKY_LEVEL + STICKY_LEVEL};
   display: flex;
   flex-direction: column;
@@ -122,7 +130,7 @@ const Wrapper = styled.div<{ sliderVisible: boolean; isDragging: boolean }>`
       transform: translate(-50%, -50%);
     }
     &:hover {
-      width: 14.6789% !important;
+      width: ${p => p.width + '%'} !important;
       .menuUnfoldOutlined {
         display: none;
       }
