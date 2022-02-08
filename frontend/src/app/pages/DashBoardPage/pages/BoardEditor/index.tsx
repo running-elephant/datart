@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { ActionCreators } from 'redux-undo';
 import styled from 'styled-components/macro';
+import { uuidv4 } from 'utils/utils';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
@@ -60,34 +61,7 @@ export const BoardEditor: React.FC<{
     const onCloseChartEditor = useCallback(() => {
       dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
     }, [dispatch]);
-    useEffect(() => {
-      async function initialization() {
-        await dispatch(fetchEditBoardDetail(dashboardId));
 
-        const widgetInfo = histState?.widgetInfo
-          ? JSON.parse(histState?.widgetInfo)
-          : '';
-        const boardType = dashboard.config?.type;
-
-        widgetInfo &&
-          dispatch(
-            addWrapChartWidget({
-              boardId,
-              chartId: widgetInfo?.dataChart.id,
-              boardType,
-              dataChart: widgetInfo?.dataChart,
-              view: widgetInfo?.dataview,
-            }),
-          );
-      }
-      initialization();
-    }, [
-      dashboardId,
-      dispatch,
-      histState?.widgetInfo,
-      boardId,
-      dashboard.config?.type,
-    ]);
     const onSaveToWidget = useCallback(
       (chartType: WidgetContentChartType, dataChart: DataChart, view) => {
         const widgetId = boardChartEditorProps?.widgetId!;
@@ -148,6 +122,33 @@ export const BoardEditor: React.FC<{
       onCloseBoardEditor,
       onCloseChartEditor,
       onSaveToWidget,
+    ]);
+    useEffect(() => {
+      async function initialization() {
+        await dispatch(fetchEditBoardDetail(dashboardId));
+        if (histState?.widgetInfo) {
+          const widgetInfo = JSON.parse(histState.widgetInfo);
+          const boardType = dashboard.config?.type;
+          widgetInfo.dataChart.id = 'widget_' + uuidv4();
+          widgetInfo &&
+            dispatch(
+              addWrapChartWidget({
+                boardId,
+                chartId: widgetInfo.dataChart.id,
+                boardType,
+                dataChart: widgetInfo.dataChart,
+                view: widgetInfo.dataview,
+              }),
+            );
+        }
+      }
+      initialization();
+    }, [
+      dashboardId,
+      dispatch,
+      histState?.widgetInfo,
+      boardId,
+      dashboard.config?.type,
     ]);
     return (
       <Wrapper>

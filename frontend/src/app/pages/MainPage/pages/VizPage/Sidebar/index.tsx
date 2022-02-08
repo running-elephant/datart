@@ -7,11 +7,10 @@ import { ListSwitch } from 'app/components';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useRouteMatch } from 'react-router';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES, STICKY_LEVEL } from 'styles/StyleConstants';
-import { useVizSlice } from '../slice';
 import {
   selectSliderVisible,
   selectStoryboards,
@@ -21,13 +20,15 @@ import { Folder } from '../slice/types';
 import { Folders } from './Folders';
 import { Storyboards } from './Storyboards';
 
-export const Sidebar = memo(({ i18nPrefix }: I18NComponentProps) => {
+interface SidebarProps extends I18NComponentProps {
+  isDragging: boolean;
+}
+
+export const Sidebar = memo(({ isDragging, i18nPrefix }: SidebarProps) => {
   const [selectedKey, setSelectedKey] = useState('folder');
   const vizs = useSelector(selectVizs);
   const storyboards = useSelector(selectStoryboards);
   const sliderVisible = useSelector(selectSliderVisible);
-  const { actions: vizActions } = useVizSlice();
-  const dispatch = useDispatch();
 
   const matchDetail = useRouteMatch<{ vizId: string }>(
     '/organizations/:orgId/vizs/:vizId',
@@ -72,16 +73,10 @@ export const Sidebar = memo(({ i18nPrefix }: I18NComponentProps) => {
     <Wrapper
       sliderVisible={sliderVisible}
       className={sliderVisible ? 'close' : ''}
+      isDragging={isDragging}
     >
       {sliderVisible ? (
-        <MenuUnfoldOutlined
-          className="menuUnfoldOutlined"
-          onClick={() => {
-            dispatch(
-              vizActions.changeVisibleStatus({ status: !sliderVisible }),
-            );
-          }}
-        />
+        <MenuUnfoldOutlined className="menuUnfoldOutlined" />
       ) : (
         ''
       )}
@@ -104,7 +99,7 @@ export const Sidebar = memo(({ i18nPrefix }: I18NComponentProps) => {
   );
 });
 
-const Wrapper = styled.div<{ sliderVisible: boolean }>`
+const Wrapper = styled.div<{ sliderVisible: boolean; isDragging: boolean }>`
   z-index: ${STICKY_LEVEL + STICKY_LEVEL};
   display: flex;
   flex-direction: column;
@@ -112,7 +107,7 @@ const Wrapper = styled.div<{ sliderVisible: boolean }>`
   min-height: 0;
   background-color: ${p => p.theme.componentBackground};
   box-shadow: ${p => p.theme.shadowSider};
-  transition: width 0.3s ease;
+  transition: ${p => (!p.isDragging ? 'width 0.3s ease' : 'none')};
   .hidden {
     display: none;
   }

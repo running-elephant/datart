@@ -833,7 +833,8 @@
         "folder": "Create folder",
         "recycle": "Recycle",
         "open": "Open",
-        "close": "Close"
+        "close": "Close",
+        "startAnalysis":"Start Analysis"
       },
       "storyboards": {
         "title": "Storyboards",
@@ -924,6 +925,7 @@
       "warning": "There are unexecuted changes, still execute?"
     },
     "editor": {
+      "startAnalysis":"Start Analysis",
       "folder": "Folder",
       "source": "Select source",
       "run": "Run",
@@ -996,6 +998,7 @@
     "createSuccess": "Source created successfully",
     "archived": "Archived ",
     "noPermission": "You do not have permission to access this page",
+    "creatView":"Creat View",
     "sidebar": {
       "title": "Sources",
       "add": "Create source",

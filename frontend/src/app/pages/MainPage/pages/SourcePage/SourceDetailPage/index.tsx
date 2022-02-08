@@ -339,7 +339,7 @@ export function SourceDetailPage() {
                   type="primary"
                   onClick={addNewView}
                 >
-                  去新建数据视图
+                  {t('creatView')}
                 </Button>
                 <Button
                   type="primary"

@@ -28,7 +28,7 @@ import {
   selectIsOrgOwner,
   selectPermissionMap,
 } from 'app/pages/MainPage/slice/selectors';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import AccessContext from './context/AccessContext';
@@ -45,6 +45,7 @@ export function Container() {
   const permissionMap = useSelector(selectPermissionMap);
   const t = useI18NPrefix('view.saveForm');
   const tg = useI18NPrefix('global');
+  const [isDragging, setIsDragging] = useState(false);
 
   const allowEnableViz = calcAc(
     isOwner,
@@ -71,6 +72,19 @@ export function Container() {
     [setSizes, editorResize],
   );
 
+  const siderDragEnd = useCallback(
+    sizes => {
+      setSizes(sizes);
+      editorResize();
+      setIsDragging(false);
+    },
+    [setIsDragging, setSizes, editorResize],
+  );
+
+  const siderDragStart = useCallback(() => {
+    if (!isDragging) setIsDragging(true);
+  }, [setIsDragging, isDragging]);
+
   return (
     <AccessContext.Provider value={{ allowEnableViz }}>
       <StyledContainer
@@ -78,11 +92,13 @@ export function Container() {
         minSize={[256, 0]}
         maxSize={[768, Infinity]}
         gutterSize={0}
-        onDrag={siderDrag}
+        // onDrag={siderDrag}
+        onDragStart={siderDragStart}
+        onDragEnd={siderDragEnd}
         className="datart-split"
         sliderVisible={sliderVisible}
       >
-        <Sidebar />
+        <Sidebar isDragging={isDragging} />
         <Main />
         <SaveForm
           title={t('title')}

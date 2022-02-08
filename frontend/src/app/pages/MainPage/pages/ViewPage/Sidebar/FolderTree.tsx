@@ -203,7 +203,7 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                       prefix={<MonitorOutlined className="icon" />}
                       key="startAnalysis"
                     >
-                      开始分析
+                      {t('editor.startAnalysis')}
                     </MenuListItem>
                   )}
 
@@ -233,7 +233,7 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
         </TreeTitle>
       );
     },
-    [archive, moreMenuClick, tg],
+    [archive, moreMenuClick, tg, allowEnableViz, t],
   );
 
   const treeSelect = useCallback(

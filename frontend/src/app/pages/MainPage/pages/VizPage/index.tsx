@@ -5,7 +5,7 @@ import { useBoardSlice } from 'app/pages/DashBoardPage/pages/Board/slice';
 import { useEditBoardSlice } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import { useStoryBoardSlice } from 'app/pages/StoryBoardPage/slice';
 import { dispatchResize } from 'app/utils/dispatchResize';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { Main } from './Main';
@@ -26,14 +26,20 @@ export function VizPage() {
     range: [256, 768],
   });
   const tg = useI18NPrefix('global');
+  const [isDragging, setIsDragging] = useState(false);
 
   const siderDragEnd = useCallback(
     sizes => {
       setSizes(sizes);
       dispatchResize();
+      setIsDragging(false);
     },
-    [setSizes],
+    [setSizes, setIsDragging],
   );
+
+  const siderDragStart = useCallback(() => {
+    if (!isDragging) setIsDragging(true);
+  }, [setIsDragging, isDragging]);
 
   return (
     <SaveFormContext.Provider value={saveFormContextValue}>
@@ -42,11 +48,12 @@ export function VizPage() {
         minSize={[256, 0]}
         maxSize={[768, Infinity]}
         gutterSize={0}
+        onDragStart={siderDragStart}
         onDragEnd={siderDragEnd}
         className="datart-split"
         sliderVisible={sliderVisible}
       >
-        <Sidebar i18nPrefix={'viz.sidebar'} />
+        <Sidebar isDragging={isDragging} i18nPrefix={'viz.sidebar'} />
         <Main />
         <SaveForm
           width={400}

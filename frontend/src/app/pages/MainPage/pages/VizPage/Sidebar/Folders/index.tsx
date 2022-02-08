@@ -51,7 +51,6 @@ export const Folders = memo(
     const history = useHistory();
     const { showSaveForm } = useContext(SaveFormContext);
     const addVizFn = useAddViz({ showSaveForm });
-
     const getInitValues = useCallback((relType: VizType) => {
       if (relType === 'DASHBOARD') {
         return {
@@ -125,7 +124,7 @@ export const Folders = memo(
           subTitle: t('folders.folderTitle'),
           add: {
             items: [
-              { key: 'DATACHART', text: '开始分析' },
+              { key: 'DATACHART', text: t('folders.startAnalysis') },
               { key: 'DASHBOARD', text: t('folders.dashboard') },
               { key: 'FOLDER', text: t('folders.folder') },
             ],

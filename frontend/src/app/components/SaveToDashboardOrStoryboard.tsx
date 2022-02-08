@@ -20,6 +20,7 @@ import { Input, List, Modal } from 'antd';
 import { ListItem } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useGetVizIcon from 'app/hooks/useGetVizIcon';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { InputWrap } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ChartSelectModal';
 import { getCascadeAccess } from 'app/pages/MainPage/Access';
@@ -41,7 +42,6 @@ import { useSelector } from 'react-redux';
 import { request } from 'utils/request';
 import { errorHandle, getPath, listToTree } from 'utils/utils';
 import { Tree } from './Tree';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 
 export enum SaveTypes {
   Dashboard = 'DASHBOARD',
@@ -198,7 +198,10 @@ const SaveToDashboardOrStoryboard: FC<SaveToDashboardOrStoryboardTypes> = memo(
           <List
             dataSource={storyData}
             renderItem={s => (
-              <ListItem onClick={() => selectStoryBoard(s)}>
+              <ListItem
+                onClick={() => selectStoryBoard(s)}
+                selected={selectId === s.id}
+              >
                 <List.Item.Meta title={s.name} />
               </ListItem>
             )}

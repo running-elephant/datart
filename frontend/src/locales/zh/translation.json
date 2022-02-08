@@ -833,7 +833,8 @@
         "folder": "新建目录",
         "recycle": "回收站",
         "open": "展开",
-        "close": "收起"
+        "close": "收起",
+        "startAnalysis":"开始分析"
       },
       "storyboards": {
         "title": "故事板列表",
@@ -924,6 +925,7 @@
       "warning": "有未执行的修改，是否执行？"
     },
     "editor": {
+      "startAnalysis":"开始分析",
       "folder": "目录",
       "source": "请选择数据源",
       "run": "执行",
@@ -996,6 +998,7 @@
     "createSuccess": "新建数据源成功",
     "archived": "已归档",
     "noPermission": "您没有权限访问该页面",
+    "creatView":"去新建视图",
     "sidebar": {
       "title": "数据源列表",
       "add": "新建数据源",

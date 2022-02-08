@@ -51,7 +51,7 @@ import { ViewSimpleViewModel } from '../slice/types';
 import { FolderTree } from './FolderTree';
 import { Recycle } from './Recycle';
 
-export const Sidebar = memo(() => {
+export const Sidebar = memo(({ isDragging }: { isDragging: boolean }) => {
   const history = useHistory();
   const dispatch = useDispatch();
   const { showSaveForm } = useContext(SaveFormContext);
@@ -201,6 +201,7 @@ export const Sidebar = memo(() => {
     <Wrapper
       sliderVisible={sliderVisible}
       className={sliderVisible ? 'close' : ''}
+      isDragging={isDragging}
     >
       {sliderVisible ? (
         <MenuUnfoldOutlined
@@ -227,8 +228,8 @@ export const Sidebar = memo(() => {
     </Wrapper>
   );
 });
-const Wrapper = styled.div<{ sliderVisible: boolean }>`
-  transition: width 0.3s ease;
+const Wrapper = styled.div<{ sliderVisible: boolean; isDragging: boolean }>`
+  transition: ${p => (!p.isDragging ? 'width 0.3s ease' : 'none')};
   height: 100%;
   &.close {
     width: ${SPACE_TIMES(7.5)} !important;

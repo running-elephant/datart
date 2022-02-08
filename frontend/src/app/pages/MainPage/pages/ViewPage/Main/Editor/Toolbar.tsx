@@ -179,12 +179,10 @@ export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
   );
 
   useEffect(() => {
-    if (histState?.sourcesId) {
-      setTimeout(() => {
-        sourceChange(histState.sourcesId);
-      }, 2000);
+    if (histState?.sourcesId && sources) {
+      sourceChange(histState.sourcesId);
     }
-  }, [histState?.sourcesId, sourceChange]);
+  }, [histState?.sourcesId, sourceChange, sources]);
 
   return (
     <Container>
@@ -303,7 +301,7 @@ export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
             </Tooltip>
 
             {allowEnableViz && (
-              <Tooltip title={'开始分析'} placement="bottom">
+              <Tooltip title={t('startAnalysis')} placement="bottom">
                 <ToolbarButton
                   icon={<MonitorOutlined />}
                   onClick={() => {
