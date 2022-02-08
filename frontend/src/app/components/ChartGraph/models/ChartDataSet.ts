@@ -69,7 +69,7 @@ export class ChartDataSet<T>
     super(
       ...(Array.prototype.map.call(
         columns,
-        c => new ChartDataSetRow(metas, ...c),
+        c => new ChartDataSetRow(metas, c),
       ) as any),
     );
     this.columnIndexTable = super.createColumnIndexTable(metas);
@@ -118,8 +118,12 @@ export class ChartDataSetRow<T>
 {
   private columnIndexTable: ColumnIndexTable = {};
 
-  constructor(metas, ...items: T[]) {
-    super(...(items as any));
+  constructor(metas, items: T[]) {
+    super(...(items as any[]));
+    if (items?.length === 1) {
+      this.length = 1;
+      this[0] = items[0];
+    }
     this.columnIndexTable = this.createColumnIndexTable(metas);
   }
 
