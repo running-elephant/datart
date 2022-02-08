@@ -17,13 +17,12 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataSetDTO from 'app/types/ChartDataSet';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getStyles,
   getValue,
-  getValueByColumnKey,
-  transformToObjectArray,
+  transformToDataSet,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
@@ -91,10 +90,14 @@ class BasicGaugeChart extends Chart {
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
-    const dataColumns = transformToObjectArray(dataset.rows, dataset.columns);
+    const chartDataSet = transformToDataSet(
+      dataset.rows,
+      dataset.columns,
+      dataConfigs,
+    );
     const series = this.getSeries(
       styleConfigs,
-      dataColumns,
+      chartDataSet,
       aggregateConfigs[0],
     );
     const tooltip = this.getTooltip(styleConfigs, aggregateConfigs);
@@ -116,7 +119,11 @@ class BasicGaugeChart extends Chart {
     };
   }
 
-  private getSeries(styleConfigs, dataColumns, aggConfig) {
+  private getSeries(
+    styleConfigs,
+    chartDataSet: IChartDataSet<string | number>,
+    aggConfig,
+  ) {
     const detail = this.getDetail(styleConfigs, aggConfig);
     const title = this.getTitle(styleConfigs);
     const pointer = this.getPointer(styleConfigs);
@@ -124,13 +131,14 @@ class BasicGaugeChart extends Chart {
     const splitLine = this.getSplitLine(styleConfigs);
     const progress = this.getProgress(styleConfigs);
     const pointerColor = getValue(styleConfigs, ['pointer', 'pointerColor']);
-    const dataConfig: { name: string; value: string; itemStyle: any } = {
-      name: getColumnRenderName(aggConfig),
-      value: dataColumns?.[0]?.[getValueByColumnKey(aggConfig)] || 0,
-      itemStyle: {
-        color: pointerColor,
-      },
-    };
+    const dataConfig: { name: string; value: string | number; itemStyle: any } =
+      {
+        name: getColumnRenderName(aggConfig),
+        value: chartDataSet?.[0]?.getCell(aggConfig) || 0,
+        itemStyle: {
+          color: pointerColor,
+        },
+      };
     if (aggConfig?.color?.start) {
       dataConfig.itemStyle.color = aggConfig.color.start;
     }

@@ -17,22 +17,20 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataSetDTO from 'app/types/ChartDataSet';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getAxisLabel,
   getAxisLine,
   getAxisTick,
   getColumnRenderName,
-  getCustomSortableColumns,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
-  getReference,
-  getSeriesTooltips4Rectangular,
+  getReference2,
+  getSeriesTooltips4Rectangular2,
   getSplitLine,
   getStyles,
-  getValueByColumnKey,
-  transformToObjectArray,
+  transformToDataSet,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
@@ -92,11 +90,11 @@ class BasicDoubleYChart extends Chart {
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings;
 
-    const objDataColumns = transformToObjectArray(
+    const chartDataSet = transformToDataSet(
       dataset.rows,
       dataset.columns,
+      dataConfigs,
     );
-    const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
     const groupConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.GROUP)
       .flatMap(config => config.rows || []);
@@ -131,7 +129,7 @@ class BasicDoubleYChart extends Chart {
           leftMetricsConfigs.concat(rightMetricsConfigs),
           [],
           infoConfigs,
-          dataColumns,
+          chartDataSet,
         ),
       },
       grid: getGridStyle(styleConfigs),
@@ -139,7 +137,7 @@ class BasicDoubleYChart extends Chart {
         styleConfigs,
         leftMetricsConfigs.concat(rightMetricsConfigs).map(getColumnRenderName),
       ),
-      xAxis: this.getXAxis(styleConfigs, groupConfigs, dataColumns),
+      xAxis: this.getXAxis(styleConfigs, groupConfigs, chartDataSet),
       yAxis: this.getYAxis(
         styleConfigs,
         leftMetricsConfigs,
@@ -150,7 +148,7 @@ class BasicDoubleYChart extends Chart {
         settingConfigs,
         leftMetricsConfigs,
         rightMetricsConfigs,
-        dataColumns,
+        chartDataSet,
       ),
     };
   }
@@ -160,7 +158,7 @@ class BasicDoubleYChart extends Chart {
     settingConfigs,
     leftDeminsionConfigs,
     rightDeminsionConfigs,
-    dataColumns,
+    chartDataSet: IChartDataSet<string>,
   ) {
     const _getSeriesByDemisionPostion =
       () => (config, styles, settings, data, direction) => {
@@ -173,17 +171,17 @@ class BasicDoubleYChart extends Chart {
           name: getColumnRenderName(config),
           type: graphType || 'line',
           sampling: 'average',
-          data: dataColumns.map(dc => ({
+          data: chartDataSet.map(dc => ({
             ...config,
             ...getExtraSeriesRowData(dc),
             ...getExtraSeriesDataFormat(config?.format),
-            value: dc[getValueByColumnKey(config)],
+            value: dc.getCell(config),
           })),
           ...this.getItemStyle(config),
           ...this.getGraphStyle(graphType, graphStyle),
           ...this.getLabelStyle(styles, direction),
           ...this.getSeriesStyle(styles),
-          ...getReference(settings, data, config, false),
+          ...getReference2(settings, data, config, false),
         };
       };
 
@@ -194,7 +192,7 @@ class BasicDoubleYChart extends Chart {
             lc,
             styles,
             settingConfigs,
-            dataColumns,
+            chartDataSet,
             'leftY',
           ),
         ),
@@ -205,7 +203,7 @@ class BasicDoubleYChart extends Chart {
             rc,
             styles,
             settingConfigs,
-            dataColumns,
+            chartDataSet,
             'rightY',
           ),
         ),
@@ -237,7 +235,7 @@ class BasicDoubleYChart extends Chart {
     }
   }
 
-  private getXAxis(styles, xAxisConfigs, dataColumns) {
+  private getXAxis(styles, xAxisConfigs, chartDataSet: IChartDataSet<string>) {
     const fisrtXAxisConfig = xAxisConfigs[0];
     const [
       showAxis,
@@ -281,7 +279,7 @@ class BasicDoubleYChart extends Chart {
       axisLine: getAxisLine(showAxis, lineStyle),
       axisTick: getAxisTick(showLabel, lineStyle),
       splitLine: getSplitLine(showVerticalLine, verticalLineStyle),
-      data: dataColumns.map(d => d[getValueByColumnKey(fisrtXAxisConfig)]),
+      data: chartDataSet.map(d => d.getCell(fisrtXAxisConfig)),
     };
   }
 
@@ -405,26 +403,17 @@ class BasicDoubleYChart extends Chart {
     aggregateConfigs,
     colorConfigs,
     infoConfigs,
-    dataColumns,
+    chartDataSet: IChartDataSet<string>,
   ) {
     return seriesParams => {
-      const tooltips = !!groupConfigs.length
-        ? [`${getColumnRenderName(groupConfigs[0])}: ${seriesParams[0].name}`]
-        : [];
-
-      return tooltips
-        .concat(
-          getSeriesTooltips4Rectangular(
-            seriesParams,
-            groupConfigs,
-            []
-              .concat(aggregateConfigs)
-              .concat(colorConfigs)
-              .concat(infoConfigs),
-            dataColumns,
-          ),
-        )
-        .join('<br />');
+      return getSeriesTooltips4Rectangular2(
+        chartDataSet,
+        seriesParams[0],
+        groupConfigs,
+        aggregateConfigs,
+        colorConfigs,
+        infoConfigs,
+      );
     };
   }
 
