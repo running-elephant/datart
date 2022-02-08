@@ -31,8 +31,11 @@ public class SqlParseError extends BaseException {
 
     private String sql;
 
+    private String dbType;
+
     public String toString() {
         return "SQL:" + sql + " \r\n" +
+                "DB: " + dbType + " \r\n" +
                 "EXCEPTION:" + getMessage();
     }
 

@@ -148,6 +148,7 @@ public class SqlScriptRender extends ScriptRender {
         } catch (SqlParseException e) {
             SqlParseError sqlParseError = new SqlParseError(e);
             sqlParseError.setSql(selectSql);
+            sqlParseError.setDbType(sqlDialect.getDatabaseProduct().name());
             RequestContext.putWarning(MessageResolver.getMessage("message.provider.sql.parse.failed"), sqlParseError);
             placeholders = RegexVariableResolver.resolve(sqlDialect, selectSql, variableMap);
         }
