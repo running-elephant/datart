@@ -29,7 +29,8 @@
     "lint:css": "stylelint src/**/*.{less,css}",
     "prettify": "prettier --write src",
     "prepare": "cd .. && husky install frontend/.husky",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "doc:dHelper": "tsc --project tsconfig.dHelper.json"
   },
   "eslintConfig": {
     "extends": [
