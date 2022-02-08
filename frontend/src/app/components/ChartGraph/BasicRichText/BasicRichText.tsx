@@ -112,8 +112,14 @@ class BasicRichText extends ReactChart {
       };
     });
     const [initContent] = getStyles(stylesConfigs, ['delta'], ['richText']);
+    const [openQuillMarkdown] = getStyles(
+      stylesConfigs,
+      ['richTextMarkdown'],
+      ['openQuillMarkdown'],
+    );
     return {
       dataList,
+      openQuillMarkdown,
       initContent,
       id: containerId,
       isEditing: !!widgetSpecialConfig?.env,
