@@ -20,14 +20,14 @@ import {
   ChartDataConfig,
   ChartDataSectionField,
 } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import FilterControllPanel from '../FilterControlPanel';
 
 const FilterAction: FC<{
   config: ChartDataSectionField;
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   dataView?: ChartDataView;
   dataConfig?: ChartDataConfig;
   aggregation?: boolean;

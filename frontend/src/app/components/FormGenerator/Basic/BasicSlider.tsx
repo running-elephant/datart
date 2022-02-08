@@ -30,7 +30,7 @@ const BasicSlider: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     const { comType, options, ...rest } = row;
 
     return (
-      <Wrapper label={t(row.label)}>
+      <Wrapper label={t(row.label, true)}>
         <Slider
           {...rest}
           {...options}

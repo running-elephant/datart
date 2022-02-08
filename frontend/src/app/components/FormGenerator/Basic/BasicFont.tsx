@@ -47,7 +47,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     };
 
     return (
-      <BW label={!options?.hideLabel ? t(data.label) : ''}>
+      <BW label={!options?.hideLabel ? t(data.label, true) : ''}>
         <Group>
           <Select
             placeholder={t('select')}
@@ -105,6 +105,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             {...rest}
             {...options}
             defaultValue={data.value?.color}
+            size={6}
             onSubmit={handlePickerSelect}
           />
         </WithColorPicker>

@@ -20,47 +20,68 @@ import { Table } from 'antd';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 
+interface TableStyleConfigProps {
+  odd?: {
+    backgroundColor: string;
+    color: string;
+  };
+  even?: {
+    backgroundColor: string;
+    color: string;
+  };
+  isFixedColumns?: boolean;
+}
+
 const AntdTableWrapper: FC<{
   dataSource: [];
   columns: [];
+  tableStyleConfig?: TableStyleConfigProps | undefined;
   summaryFn?: (data) => { total: number; summarys: [] };
-}> = memo(({ dataSource, columns, children, summaryFn, ...rest }) => {
-  const getTableSummaryRow = pageData => {
-    if (!summaryFn) {
-      return undefined;
-    }
-    const summaryData = summaryFn?.(pageData);
+}> = memo(
+  ({ dataSource, columns, children, summaryFn, tableStyleConfig, ...rest }) => {
+    const getTableSummaryRow = pageData => {
+      if (!summaryFn) {
+        return undefined;
+      }
+      const summaryData = summaryFn?.(pageData);
+      return (
+        <Table.Summary fixed>
+          <Table.Summary.Row>
+            {(summaryData?.summarys || []).map((data, index) => {
+              return (
+                <Table.Summary.Cell key={index} index={index}>
+                  {data}
+                </Table.Summary.Cell>
+              );
+            })}
+          </Table.Summary.Row>
+        </Table.Summary>
+      );
+    };
+
     return (
-      <Table.Summary fixed>
-        <Table.Summary.Row>
-          {(summaryData?.summarys || []).map((data, index) => {
-            return (
-              <Table.Summary.Cell index={index}>{data}</Table.Summary.Cell>
-            );
-          })}
-        </Table.Summary.Row>
-      </Table.Summary>
+      <StyledTable
+        {...rest}
+        tableStyleConfig={tableStyleConfig}
+        dataSource={dataSource}
+        columns={columns}
+        summary={getTableSummaryRow}
+      />
     );
-  };
+  },
+);
 
-  return (
-    <StyledTable
-      {...rest}
-      dataSource={dataSource}
-      columns={columns}
-      summary={getTableSummaryRow}
-    />
-  );
-});
-
-const StyledTable = styled(Table)`
+const StyledTable = styled(Table)<{ tableStyleConfig?: TableStyleConfigProps }>`
   height: 100%;
   overflow: auto;
 
   .ant-table {
     background: transparent;
   }
-
+  .ant-table-body {
+    overflow: ${p =>
+      p?.tableStyleConfig?.isFixedColumns ? 'auto scroll' : 'auto !important'};
+  }
   .ant-table-summary {
     background: #fafafa;
   }
@@ -69,6 +90,22 @@ const StyledTable = styled(Table)`
   }
   .ant-table-cell-fix-right {
     background: #fafafa;
+  }
+
+  .ant-table .ant-table-container .ant-table-body .ant-table-tbody td {
+    background: transparent;
+  }
+
+  .odd {
+    background: ${p =>
+      p?.tableStyleConfig?.odd?.backgroundColor || 'transparent'};
+    color: ${p => p?.tableStyleConfig?.odd?.color || 'auto'};
+  }
+
+  .even {
+    background: ${p =>
+      p?.tableStyleConfig?.even?.backgroundColor || 'transparent'};
+    color: ${p => p?.tableStyleConfig?.even?.color || 'auto'};
   }
 `;
 

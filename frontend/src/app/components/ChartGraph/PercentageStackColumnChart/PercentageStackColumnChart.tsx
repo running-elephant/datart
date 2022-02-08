@@ -30,7 +30,7 @@ class PercentageStackColumnChart extends BasicBarChart {
   constructor() {
     super({
       id: 'percentage-stack-column-chart',
-      name: '百分比堆叠柱状图',
+      name: 'viz.palette.graph.names.percentageStackColumnChart',
       icon: 'fsux_tubiao_baifenbiduijizhuzhuangtu',
     });
   }

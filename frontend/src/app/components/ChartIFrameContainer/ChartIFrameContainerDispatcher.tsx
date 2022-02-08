@@ -19,7 +19,7 @@
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { CSSProperties } from 'styled-components';
 
 const DEFAULT_CONTAINER_ID = 'frame-container-1';
@@ -71,7 +71,7 @@ class ChartIFrameContainerDispatcher {
   private switchContainer(
     containerId: string,
     chart: IChart,
-    dataset: ChartDataset,
+    dataset: ChartDataSetDTO,
     config: ChartConfig,
   ) {
     this.chartMetadataMap.set(containerId, [chart, dataset, config]);

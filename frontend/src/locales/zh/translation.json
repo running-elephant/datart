@@ -212,7 +212,7 @@
               "moveToTrash": "移至回收站",
               "delete": "删除",
               "newTimedTask": "新建定时任务",
-              "sureToRestore?": "确定还原？",
+              "sureToRestore": "确定还原？",
               "restore": "还原",
               "sureToDelete": "确定删除？",
               "allowModificationAfterStopping": "停止后允许修改",
@@ -322,12 +322,13 @@
           "rangeTime": "日期范围",
           "rangeTimePicker": "日期范围",
           "recommendTime": "推荐时间",
-          "rangeValue": "数值范围",
+          "rangeValue": "数值范围", 
           "text": "文本",
           "tree": "下拉树列表",
           "value": "数值",
           "time": "日期",
-          "slider": "滑块"
+          "slider": "滑块",
+          "rangeSlider": "范围滑块"
         },
         "controllerVisibilityTypes": {
           "hide": "隐藏",
@@ -537,6 +538,8 @@
         }
       },
       "data": {
+        "column": "列",
+        "row": "行",
         "dimension": "维度",
         "metrics": "指标",
         "mixed": "字段",
@@ -650,13 +653,43 @@
         "needMore": "至少还需要 {{num}} 个 {{type}}"
       },
       "graph": {
+        "names": {
+          "table": "表格",
+          "areaChart": "区域图",
+          "barChart": "条形图",
+          "funnelChart": "漏斗图",
+          "gaugeChart": "仪表盘",
+          "lineChart": "折线图",
+          "outlineMap": "轮廓地图",
+          "pieChart": "饼图",
+          "radarChart": "雷达图",
+          "richText": "富文本",
+          "scatterChart": "散点图",
+          "clusterBarChart": "条形图",
+          "clusterColumnChart": "柱状图",
+          "doughnutChart": "环形图",
+          "normalOutlineMap": "普通轮廓地图",
+          "percentageStackBarChart": "百分比堆叠条形图",
+          "percentageStackColumnChart": "百分比堆叠柱状图",
+          "pivotSheet": "透视表",
+          "roseChart": "玫瑰图",
+          "scatterOutlineMap": "气泡轮廓地图",
+          "scoreChart": "翻牌器",
+          "stackAreaChart": "堆叠面积图",
+          "stackBarChart": "堆叠条形图",
+          "stackColumnChart": "堆叠柱状图",
+          "waterfallChart": "瀑布图",
+          "wordCloudChart": "词云"
+        },
         "group": "维度",
         "aggregate": "指标",
         "onlyAllow": "{{type}} 仅允许数量为 {{num}}",
         "allowRange": "{{type}} 允许范围为 {{start}} 到 {{end}}",
         "confirm": "请确认切换到 {{name}} 图表，这将导致数据被清空",
         "ok": "确认",
-        "cancel": "取消"
+        "cancel": "取消",
+        "number": "序号",
+        "summary": "汇总"
       }
     },
     "action": {
@@ -699,7 +732,8 @@
         "iframe": "iframe",
         "video": "视频",
         "container": "容器",
-        "tab": "标签页",
+        "tab": "标签卡",
+        "carousel": "轮播卡",
         "controller": "控制器",
         "toTop": "图层置顶",
         "toBottom": "图层置底",
@@ -707,7 +741,8 @@
         "redo": "重做",
         "delete": "删除",
         "copy": "复制",
-        "paste": "粘贴"
+        "paste": "粘贴",
+        "deviceSwitch": "设备切换"
       },
       "controlTypes": {
         "common": "常规",
@@ -984,7 +1019,7 @@
       "dirtyread": "延迟更新",
       "fastfailover": "快速失败",
       "cache": "缓存",
-      "cacheExpires": "失效时间"
+      "cacheExpires": "有效期(秒)"
     },
     "schemaTable": {
       "category": "分类",

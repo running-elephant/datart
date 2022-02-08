@@ -21,6 +21,7 @@ package datart.server.controller;
 
 import datart.core.entity.Source;
 import datart.server.base.dto.ResponseData;
+import datart.server.base.params.CheckNameParam;
 import datart.server.base.params.SourceCreateParam;
 import datart.server.base.params.SourceUpdateParam;
 import datart.server.service.SourceService;
@@ -43,12 +44,10 @@ public class SourceController extends BaseController {
 
     @ApiOperation(value = "check source name is unique")
     @PostMapping("/check/name")
-    public ResponseData<Boolean> checkSourceName(@RequestParam String orgId,
-                                                 @RequestParam String name) {
-        checkBlank(name, "sourceName");
+    public ResponseData<Boolean> checkSourceName(@Validated @RequestBody CheckNameParam param) {
         Source source = new Source();
-        source.setName(name);
-        source.setOrgId(orgId);
+        source.setName(param.getName());
+        source.setOrgId(param.getOrgId());
         return ResponseData.success(sourceService.checkUnique(source));
     }
 

@@ -26,7 +26,7 @@ class ScatterOutlineMapChart extends BasicOutlineMapChart {
   constructor() {
     super({
       id: 'scatter-outline-map-chart',
-      name: '气泡轮廓地图',
+      name: 'viz.palette.graph.names.scatterOutlineMap',
       icon: 'fsux_tubiao_ditu',
       requirements: [
         {

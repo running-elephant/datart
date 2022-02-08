@@ -56,6 +56,14 @@ public class JdbcDataProviderAdapter implements Closeable {
 
     protected static final String COUNT_SQL = "SELECT COUNT(*) FROM (%s) V_T";
 
+    protected static final String PKTABLE_CAT = "PKTABLE_CAT";
+
+    protected static final String PKTABLE_NAME = "PKTABLE_NAME";
+
+    protected static final String PKCOLUMN_NAME = "PKCOLUMN_NAME";
+
+    protected static final String FKCOLUMN_NAME = "FKCOLUMN_NAME";
+
     protected DataSource dataSource;
 
     protected JdbcProperties jdbcProperties;
@@ -131,20 +139,22 @@ public class JdbcDataProviderAdapter implements Closeable {
 
     public Set<Column> readTableColumn(String database, String table) throws SQLException {
         try (Connection conn = getConn()) {
-            HashMap<String, Column> columnMap = new HashMap<>();
+            Set<Column> columnSet = new HashSet<>();
             DatabaseMetaData metadata = conn.getMetaData();
+            Map<String, Map<String, String>> importedKeys = getImportedKeys(metadata, database, table);
             ResultSet columns = metadata.getColumns(database, null, table, null);
             while (columns.next()) {
                 Column column = readTableColumn(columns);
-                columnMap.put(column.getName(), column);
+                Map<String, String> pKeys = importedKeys.get(column.getName());
+                if (pKeys != null) {
+                    column.setPkDatabase(pKeys.get(PKTABLE_CAT));
+                    column.setPkTable(pKeys.get(PKTABLE_NAME));
+                    column.setPkColumn(pKeys.get(PKCOLUMN_NAME));
+                }
+                columnSet.add(column);
             }
-            return new HashSet<>(columnMap.values());
+            return columnSet;
         }
-    }
-
-
-    public final String getVariableQuote() {
-        return Const.DEFAULT_VARIABLE_QUOTE;
     }
 
     protected Column readTableColumn(ResultSet columnMetadata) throws SQLException {
@@ -152,6 +162,22 @@ public class JdbcDataProviderAdapter implements Closeable {
         column.setName(columnMetadata.getString(4));
         column.setType(DataTypeUtils.sqlType2DataType(columnMetadata.getString(6)));
         return column;
+    }
+
+    /**
+     * 获取表的外键关系
+     */
+    protected Map<String, Map<String, String>> getImportedKeys(DatabaseMetaData metadata, String database, String table) throws SQLException {
+        HashMap<String, Map<String, String>> keyMap = new HashMap<>();
+        ResultSet importedKeys = metadata.getImportedKeys(database, null, table);
+        while (importedKeys.next()) {
+            HashMap<String, String> keys = new HashMap<>();
+            keys.put(PKTABLE_CAT, importedKeys.getString(PKTABLE_CAT));
+            keys.put(PKTABLE_NAME, importedKeys.getString(PKTABLE_NAME));
+            keys.put(PKCOLUMN_NAME, importedKeys.getString(PKCOLUMN_NAME));
+            keyMap.put(importedKeys.getString(FKCOLUMN_NAME), keys);
+        }
+        return keyMap;
     }
 
     /**
@@ -163,8 +189,11 @@ public class JdbcDataProviderAdapter implements Closeable {
      */
     protected Dataframe execute(String sql) throws SQLException {
         try (Connection conn = getConn()) {
-            Statement statement = conn.createStatement();
-            return parseResultSet(statement.executeQuery(sql));
+            try (Statement statement = conn.createStatement()) {
+                try (ResultSet rs = statement.executeQuery(sql)) {
+                    return parseResultSet(rs);
+                }
+            }
         }
     }
 
@@ -179,21 +208,20 @@ public class JdbcDataProviderAdapter implements Closeable {
     protected Dataframe execute(String selectSql, PageInfo pageInfo) throws SQLException {
         Dataframe dataframe;
         try (Connection conn = getConn()) {
-            Statement statement = conn.createStatement();
-
-            statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
-
-            try (ResultSet resultSet = statement.executeQuery(selectSql)) {
-                try {
-                    resultSet.absolute((int) Math.min(pageInfo.getTotal(), (pageInfo.getPageNo() - 1) * pageInfo.getPageSize()));
-                } catch (Exception e) {
-                    int count = 0;
-                    while (count < (pageInfo.getPageNo() - 1) * pageInfo.getPageSize() && resultSet.next()) {
-                        count++;
+            try (Statement statement = conn.createStatement()) {
+                statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
+                try (ResultSet resultSet = statement.executeQuery(selectSql)) {
+                    try {
+                        resultSet.absolute((int) Math.min(pageInfo.getTotal(), (pageInfo.getPageNo() - 1) * pageInfo.getPageSize()));
+                    } catch (Exception e) {
+                        int count = 0;
+                        while (count < (pageInfo.getPageNo() - 1) * pageInfo.getPageSize() && resultSet.next()) {
+                            count++;
+                        }
                     }
+                    dataframe = parseResultSet(resultSet, pageInfo.getPageSize());
+                    return dataframe;
                 }
-                dataframe = parseResultSet(resultSet, pageInfo.getPageSize());
-                return dataframe;
             }
         }
     }

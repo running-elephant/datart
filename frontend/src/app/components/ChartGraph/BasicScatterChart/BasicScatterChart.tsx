@@ -17,18 +17,17 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO, { IChartDataSetRow } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
-  getDataColumnMaxAndMin,
+  getDataColumnMaxAndMin2,
   getExtraSeriesRowData,
   getGridStyle,
-  getReference,
+  getReference2,
   getScatterSymbolSizeFn,
   getSeriesTooltips4Scatter,
   getStyles,
-  getValueByColumnKey,
-  transformToObjectArray,
+  transformToDataSet,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Chart from '../models/Chart';
@@ -40,7 +39,7 @@ class BasicScatterChart extends Chart {
   chart: any = null;
 
   constructor() {
-    super('scatter', '散点图', 'sandiantu');
+    super('scatter', 'viz.palette.graph.names.scatterChart', 'sandiantu');
     this.meta.requirements = [
       {
         group: [0, 999],
@@ -84,11 +83,7 @@ class BasicScatterChart extends Chart {
     this.chart?.resize(opt, context);
   }
 
-  private getOptions(dataset: ChartDataset, config: ChartConfig) {
-    const objDataColumns = transformToObjectArray(
-      dataset.rows,
-      dataset.columns,
-    );
+  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const settingConfigs = config.settings;
@@ -108,15 +103,21 @@ class BasicScatterChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.COLOR)
       .flatMap(config => config.rows || []);
 
+    const chartDataSet = transformToDataSet(
+      dataset.rows,
+      dataset.columns,
+      dataConfigs,
+    );
+
     const axisColumns = aggregateConfigs.map(config => {
       return {
         type: 'value',
-        name: getValueByColumnKey(config),
+        name: getColumnRenderName(config),
       };
     });
 
     const series = this.getSeriesGroupByColorConfig(
-      objDataColumns,
+      chartDataSet,
       groupConfigs,
       aggregateConfigs,
       sizeConfigs,
@@ -136,7 +137,7 @@ class BasicScatterChart extends Chart {
           colorConfigs,
           sizeConfigs,
           infoConfigs,
-          objDataColumns,
+          chartDataSet,
         ),
       },
       legend: this.getLegendStyle(
@@ -151,7 +152,7 @@ class BasicScatterChart extends Chart {
   }
 
   protected getSeriesGroupByColorConfig(
-    objDataColumns,
+    chartDataSetRows: IChartDataSetRow<string>[],
     groupConfigs,
     aggregateConfigs,
     sizeConfigs,
@@ -160,7 +161,10 @@ class BasicScatterChart extends Chart {
     styleConfigs,
     settingConfigs,
   ) {
-    const { min, max } = getDataColumnMaxAndMin(objDataColumns, sizeConfigs[0]);
+    const { min, max } = getDataColumnMaxAndMin2(
+      chartDataSetRows,
+      sizeConfigs[0],
+    );
     if (!colorConfigs?.length) {
       return [
         this.getMetricAndSizeSerie(
@@ -168,7 +172,7 @@ class BasicScatterChart extends Chart {
             max,
             min,
           },
-          objDataColumns,
+          chartDataSetRows,
           groupConfigs,
           aggregateConfigs,
           sizeConfigs,
@@ -179,14 +183,13 @@ class BasicScatterChart extends Chart {
       ];
     }
 
-    const groupedKey = getValueByColumnKey(colorConfigs?.[0]);
     const colors: Array<{ key; value }> =
       colorConfigs?.[0]?.color?.colors || [];
 
     const groupedObjDataColumns: {
       [key: string]: { color: string; datas: [] };
-    } = objDataColumns?.reduce((acc, cur) => {
-      const key = cur?.[groupedKey];
+    } = chartDataSetRows?.reduce((acc, cur) => {
+      const key = cur.getCell(colorConfigs?.[0]);
       if (acc?.[key]) {
         acc[key].datas.push(cur);
       } else {
@@ -219,7 +222,7 @@ class BasicScatterChart extends Chart {
 
   protected getMetricAndSizeSerie(
     { max, min },
-    objDataColumns,
+    dataSetRows: IChartDataSetRow<string>[],
     groupConfigs,
     aggregateConfigs,
     sizeConfigs,
@@ -234,19 +237,14 @@ class BasicScatterChart extends Chart {
     const seriesName = groupConfigs
       ?.map(gc => getColumnRenderName(gc))
       .join('-');
-    const seriesDatas = objDataColumns?.map(dc => {
-      const sizeValue =
-        dc?.[getValueByColumnKey(sizeConfigs?.[0])] || defaultSizeValue;
+    const seriesDatas = dataSetRows?.map(row => {
+      const sizeValue = row.getCell(sizeConfigs?.[0]) || defaultSizeValue;
       return {
-        ...getExtraSeriesRowData(dc),
-        name: groupConfigs?.map(gc => dc?.[getColumnRenderName(gc)]).join('-'),
+        ...getExtraSeriesRowData(row),
+        name: groupConfigs?.map(row.getCell, row).join('-'),
         value: aggregateConfigs
-          ?.map(aggConfig => dc?.[getValueByColumnKey(aggConfig)])
-          .concat(
-            infoConfigs?.map(
-              infoConfig => dc?.[getValueByColumnKey(infoConfig)],
-            ),
-          )
+          ?.map(row.getCell, row)
+          .concat(infoConfigs?.map(row.getCell, row))
           .concat([sizeValue, colorSeriesName]),
       };
     });
@@ -264,9 +262,9 @@ class BasicScatterChart extends Chart {
         color,
       },
       ...this.getLabelStyle(styleConfigs),
-      ...getReference(
+      ...getReference2(
         settingConfigs,
-        objDataColumns,
+        dataSetRows,
         aggregateConfigs?.[1],
         true,
       ),

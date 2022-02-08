@@ -198,18 +198,18 @@ const config: ChartConfig = {
       ],
     },
     {
-      label: 'margin.title',
+      label: 'viz.palette.style.margin.title',
       key: 'margin',
       comType: 'group',
       rows: [
         {
-          label: 'margin.left',
+          label: 'viz.palette.style.margin.left',
           key: 'marginLeft',
           default: '10%',
           comType: 'marginWidth',
         },
         {
-          label: 'margin.top',
+          label: 'viz.palette.style.margin.top',
           key: 'marginTop',
           default: '10%',
           comType: 'marginWidth',
@@ -219,12 +219,12 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'paging.title',
+      label: 'viz.palette.setting.paging.title',
       key: 'paging',
       comType: 'group',
       rows: [
         {
-          label: 'paging.pageSize',
+          label: 'viz.palette.setting.paging.pageSize',
           key: 'pageSize',
           default: 1000,
           comType: 'inputNumber',

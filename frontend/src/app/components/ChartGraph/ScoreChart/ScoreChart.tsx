@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getStyles,
   getValue,
@@ -46,7 +46,7 @@ class ScoreChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'score-chart',
-      props?.name || '翻牌器',
+      props?.name || 'viz.palette.graph.names.scoreChart',
       props?.icon || 'fanpaiqi',
     );
     this.meta.requirements = props?.requirements || [
@@ -93,7 +93,7 @@ class ScoreChart extends Chart {
     this.chart?.resize(context);
   }
 
-  getOptions(dataset: ChartDataset, config: ChartConfig, context) {
+  getOptions(dataset: ChartDataSetDTO, config: ChartConfig, context) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const aggregateConfigs = dataConfigs
@@ -150,7 +150,7 @@ class ScoreChart extends Chart {
         {
           type: 'scatter',
           data: [[0, 0]],
-          symbolSize: 1,
+          symbolSize: 0,
           label: {
             normal: {
               show: true,
@@ -206,12 +206,12 @@ class ScoreChart extends Chart {
     aggregateConfigs: any[],
     index: number,
   ) {
-    return (
-      toFormattedValue(
-        aggConfigValues?.[index],
-        aggregateConfigs?.[index]?.format,
-      ) || ''
+    const formattedValue = toFormattedValue(
+      aggConfigValues?.[index],
+      aggregateConfigs?.[index]?.format,
     );
+    if (typeof formattedValue === 'number') return formattedValue;
+    return formattedValue || '';
   }
 
   private customFormatters(aggConfigValues, aggregateConfigs, styleConfigs) {

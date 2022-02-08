@@ -212,7 +212,7 @@
               "moveToTrash": "Move to recycle bin",
               "delete": "Delete",
               "newTimedTask": "New timed task",
-              "sureToRestore?": "Are you sure to restore?",
+              "sureToRestore": "Are you sure to restore?",
               "restore": "Reduction",
               "sureToDelete": "Confirm delete?",
               "allowModificationAfterStopping": "Allow modification after stopping",
@@ -327,7 +327,8 @@
           "tree": "Tree",
           "value": "Value",
           "time": "Time",
-          "slider": "Slider"
+          "slider": "Slider",
+          "rangeSlider": "RangeSlider"
         },
         "controllerVisibilityTypes": {
           "hide": "Hide",
@@ -537,6 +538,8 @@
         }
       },
       "data": {
+        "column": "Column",
+        "row": "Row",
         "dimension": "Dimension",
         "metrics": "Metric",
         "mixed": "Columns",
@@ -588,8 +591,8 @@
         },
         "axis": {
           "y": {
-            "left": "left axis dimension",
-            "right": "right axis dimension"
+            "left": "Left Metric",
+            "right": "Right Metric"
           }
         },
         "enum": {
@@ -650,13 +653,43 @@
         "needMore": "At least need {{num}} {{type}}(s)"
       },
       "graph": {
+        "names": {
+          "table": "Table",
+          "areaChart": "Area Chart",
+          "barChart": "Bar Chart",
+          "funnelChart": "Funnel Chart",
+          "gaugeChart": "Gauge Chart",
+          "lineChart": "Line Chart",
+          "outlineMap": "Outline Map",
+          "pieChart": "Pie Chart",
+          "radarChart": "Radar Chart",
+          "richText": "Rich Text",
+          "scatterChart": "Scatter Chart",
+          "clusterBarChart": "Cluster Bar Chart",
+          "clusterColumnChart": "Cluster Column Chart",
+          "doughnutChart": "Doughnut Chart",
+          "normalOutlineMap": "Normal Outline Map",
+          "percentageStackBarChart": "Percentage Stack Bar Chart",
+          "percentageStackColumnChart": "Percentage Stack Column Chart",
+          "pivotSheet": "Pivot Table",
+          "roseChart": "Rose Chart",
+          "scatterOutlineMap": "Scatter Outline Map",
+          "scoreChart": "Score Chart",
+          "stackAreaChart": "Stack Area Chart",
+          "stackBarChart": "Stack Bar Chart",
+          "stackColumnChart": "Stack Column Chart",
+          "waterfallChart": "Waterfall Chart",
+          "wordCloudChart": "Word Cloud"
+        },
         "group": "Dimensions",
         "aggregate": "Measures",
         "onlyAllow": "{{type}} Only Allow {{num}}",
         "allowRange": "{{type}} Allow Range {{start}} to {{end}}",
         "confirm": "Please confirm switch to {{name}} chart that will clear all data fields",
         "ok": "OK",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "number": "No.",
+        "summary": "Summary"
       }
     },
     "action": {
@@ -700,6 +733,7 @@
         "video": "Video",
         "container": "Container",
         "tab": "Tab",
+        "carousel": "Carousel",
         "controller": "Controller",
         "toTop": "move To Top",
         "toBottom": "move To Bottom",
@@ -707,7 +741,8 @@
         "redo": "Redo",
         "delete": "Delete",
         "copy": "Copy",
-        "paste": "Paste"
+        "paste": "Paste",
+        "deviceSwitch": "Device Switch"
       },
       "controlTypes": {
         "common": "Common",
@@ -748,8 +783,8 @@
         "baseProperty": "Base Property",
         "marginTB": "Margin-TB",
         "marginLR": "Margin-LR",
-        "paddingTB": "Margin-TB",
-        "paddingLR": "Margin-LR",
+        "paddingTB": "Padding-TB",
+        "paddingLR": "Padding-LR",
         "rowHeight": "rowHeight",
         "scaleMode": "scale Mode",
         "queryMode": "query Mode",
@@ -984,7 +1019,7 @@
       "dirtyread": "Dirty read",
       "fastfailover": "Fast failover",
       "cache": "Cache",
-      "cacheExpires": "Expires"
+      "cacheExpires": "Expires(s)"
     },
     "schemaTable": {
       "category": "Category",

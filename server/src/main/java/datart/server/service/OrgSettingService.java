@@ -9,4 +9,8 @@ public interface OrgSettingService extends BaseCRUDService<OrgSettings, OrgSetti
 
     List<OrgSettings> listOrgSettings(String orgId);
 
+    Integer getDownloadRecordLimit(String orgId);
+
+    boolean setDownloadRecordLimit(String orgId);
+
 }

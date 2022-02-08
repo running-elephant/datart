@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /**
  * Datart
  *
@@ -16,6 +17,9 @@
  * limitations under the License.
  */
 
+// 这个polyfill 文件 一定要在最前面
+import 'react-app-polyfill/stable';
+ 
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import {
   DataChart,
@@ -28,11 +32,9 @@ import {
   getDataChartsByServer,
 } from 'app/pages/DashBoardPage/utils/board';
 import { getWidgetMapByServer } from 'app/pages/DashBoardPage/utils/widget';
-import { ChartDTO } from 'app/types/ChartDTO';
-import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartConfig } from 'app/types/ChartConfig';
-import 'react-app-polyfill/stable';
-// import 'react-app-polyfill/stable';
+import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
+import { ChartDTO } from 'app/types/ChartDTO';
 // import 'core-js/stable/map';
 // need polyfill [Object.values,Array.prototype.find,new Map]
 

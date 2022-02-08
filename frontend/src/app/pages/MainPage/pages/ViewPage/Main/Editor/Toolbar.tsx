@@ -299,23 +299,21 @@ export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
                 onClick={() => saveAsView(id)}
               />
             </Tooltip>
-
-            {allowEnableViz && (
-              <Tooltip title={t('startAnalysis')} placement="bottom">
-                <ToolbarButton
-                  icon={<MonitorOutlined />}
-                  onClick={() => {
-                    startAnalysis(id);
-                  }}
-                />
-              </Tooltip>
-            )}
-
             {/* <Tooltip title={t('saveFragment')} placement="bottom">
             <ToolbarButton icon={<SnippetsFilled />} />
           </Tooltip> */}
           </Space>
         </Actions>
+      )}
+      {allowEnableViz && (
+        <Tooltip title={t('startAnalysis')} placement="bottom">
+          <ToolbarButton
+            icon={<MonitorOutlined />}
+            onClick={() => {
+              startAnalysis(id);
+            }}
+          />
+        </Tooltip>
       )}
     </Container>
   );

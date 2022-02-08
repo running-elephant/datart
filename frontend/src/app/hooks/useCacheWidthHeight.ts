@@ -31,10 +31,10 @@ export const useCacheWidthHeight = (
     height = initHeight,
   } = useResizeObserver<HTMLDivElement>({
     refreshMode: 'debounce',
-    refreshRate: 500,
+    refreshRate: 20,
   });
   useEffect(() => {
-    if (width > 0 && height > 0) {
+    if (width > 0) {
       setCacheW(width);
       setCacheH(height);
     }

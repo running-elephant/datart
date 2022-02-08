@@ -19,6 +19,8 @@
 package datart.data.provider.jdbc;
 
 import datart.core.data.provider.ScriptVariable;
+import datart.data.provider.calcite.SqlNodeUtils;
+import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
 import datart.data.provider.script.ReplacementPair;
 import datart.data.provider.script.VariablePlaceholder;
 import org.apache.calcite.sql.SqlCall;
@@ -51,33 +53,6 @@ public class SimpleVariablePlaceholder extends VariablePlaceholder {
             return new ReplacementPair(originalSqlFragment, originalSqlFragment);
         }
         return new ReplacementPair(originalSqlFragment, formatValue(variable));
-    }
-
-    private String formatValue(ScriptVariable variable) {
-        switch (variable.getValueType()) {
-            case NUMERIC:
-            case KEYWORD:
-            case SNIPPET:
-            case FRAGMENT:
-            case IDENTIFIER:
-                return formatWithoutQuote(variable.getValues());
-            default:
-                return formatWithQuote(variable.getValues());
-        }
-    }
-
-    private String formatWithoutQuote(Set<String> values) {
-        if (CollectionUtils.isEmpty(values)) {
-            return "";
-        }
-        return String.join(",", values);
-    }
-
-    private String formatWithQuote(Set<String> values) {
-        if (CollectionUtils.isEmpty(values)) {
-            return "";
-        }
-        return values.stream().map(sqlDialect::quoteStringLiteral).collect(Collectors.joining(","));
     }
 
     @Override

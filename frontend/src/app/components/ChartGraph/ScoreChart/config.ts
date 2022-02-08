@@ -51,7 +51,7 @@ const config: ChartConfig = {
           comType: 'checkbox',
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -110,7 +110,7 @@ const config: ChartConfig = {
           comType: 'checkbox',
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -169,7 +169,7 @@ const config: ChartConfig = {
           comType: 'checkbox',
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -287,6 +287,10 @@ const config: ChartConfig = {
           bodyFontSize: '主体字体大小',
           footerFontSize: '尾部字体大小',
         },
+        paging: {
+          title: '常规',
+          pageSize: '总行数',
+        },
       },
     },
     {
@@ -306,6 +310,10 @@ const config: ChartConfig = {
           headerFontSize: 'Header Font Size',
           bodyFontSize: 'Body Font Size',
           footerFontSize: 'Footer Font Size',
+        },
+        paging: {
+          title: 'Paging',
+          pageSize: 'Page Size',
         },
       },
     },

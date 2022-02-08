@@ -20,6 +20,7 @@ import {
   Frame,
   FrameContextConsumer,
 } from 'app/components/ReactFrameComponent';
+import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
@@ -54,16 +55,26 @@ const ChartIFrameContainer: FC<{
         <div
           id={`chart-root-${props.containerId}`}
           key={props.containerId}
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: '100%', height: '100%', position: 'relative' }}
         >
-          <ChartIFrameLifecycleAdapter
-            dataset={props.dataset}
-            chart={props.chart}
-            config={props.config}
-            style={transformToSafeCSSProps(props?.width, props?.height)}
-            widgetSpecialConfig={props.widgetSpecialConfig}
-            isShown={props.isShown}
-          />
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+            }}
+          >
+            <ChartIFrameLifecycleAdapter
+              dataset={props.dataset}
+              chart={props.chart}
+              config={props.config}
+              style={transformToSafeCSSProps(props?.width, props?.height)}
+              widgetSpecialConfig={props.widgetSpecialConfig}
+              isShown={props.isShown}
+            />
+          </div>
         </div>
       );
     }
@@ -109,7 +120,11 @@ const ChartIFrameContainer: FC<{
     );
   };
 
-  return render();
+  return (
+    <ChartI18NContext.Provider value={{ i18NConfigs: props?.config?.i18ns }}>
+      {render()}
+    </ChartI18NContext.Provider>
+  );
 });
 
 export default ChartIFrameContainer;

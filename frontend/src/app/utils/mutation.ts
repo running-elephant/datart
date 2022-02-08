@@ -57,7 +57,7 @@ export function updateCollectionByAction<T extends ChartStyleConfig>(
   action: Action<T>,
 ) {
   const value = action.value;
-  const keys = [...action.ancestors];
+  const keys = (action?.ancestors && [...action.ancestors]) || [];
   const nextState = produce(base, draft => {
     const index = keys.shift() as number;
     if (index !== undefined) {
@@ -77,7 +77,7 @@ export function updateByAction<T extends ChartStyleConfig>(
   action: Action<T>,
 ) {
   const value = action.value;
-  const keys = [...action.ancestors];
+  const keys = (action?.ancestors && [...action.ancestors]) || [];
 
   const nextState = produce(base, draft => {
     recursiveUpdateImpl(draft, keys, value as any);

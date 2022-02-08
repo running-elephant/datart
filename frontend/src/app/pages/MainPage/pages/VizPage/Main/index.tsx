@@ -157,7 +157,7 @@ export function Main() {
   );
 
   return (
-    <Wrapper className={sliderVisible ? 'close' : ''}>
+    <Wrapper className={sliderVisible ? 'close datart-viz' : 'datart-viz'}>
       <TabsWrapper>
         <Tabs
           hideAdd

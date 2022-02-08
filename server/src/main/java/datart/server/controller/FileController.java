@@ -73,5 +73,4 @@ public class FileController extends BaseController {
         return ResponseData.success(fileService.uploadFile(FileOwner.DATA_SOURCE, sourceId, file, null));
     }
 
-
 }

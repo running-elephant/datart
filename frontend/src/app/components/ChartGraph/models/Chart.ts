@@ -18,7 +18,7 @@
 
 import { ChartMouseEvent, ChartStatus, IChart } from 'app/types/Chart';
 import { ChartConfig, ChartDataConfig } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { isInRange } from 'app/utils/chartHelper';
 
@@ -28,7 +28,7 @@ class Chart implements IChart {
 
   public meta: ChartMetadata;
   public config?: ChartConfig;
-  public dataset?: ChartDataset;
+  public dataset?: ChartDataSetDTO;
   public dependency: string[] = [];
   public isISOContainer: boolean | string = false;
   public useIFrame: boolean = true;

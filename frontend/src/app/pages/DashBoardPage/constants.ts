@@ -28,18 +28,22 @@ import { WidgetType } from './pages/Board/slice/types';
 export const RGL_DRAG_HANDLE = 'dashboard-draggableHandle';
 export const STORAGE_BOARD_KEY_PREFIX = 'DATART_BOARD_DATA_';
 export const STORAGE_IMAGE_KEY_PREFIX = 'DATART_IMAGE_';
-
+export const BASE_VIEW_WIDTH = 1024;
+export const BASE_ROW_HEIGHT = 32;
+export const MIN_ROW_HEIGHT = 24;
+export const MIN_MARGIN = 8;
+export const MIN_PADDING = 8;
 /** lg: 12,md: 12,sm: 8,xs: 2,xxs: 2 */
-export const LAYOUT_COLS = {
+export const LAYOUT_COLS_MAP = {
   lg: 12,
   md: 12,
   sm: 12,
-  xs: 2,
-  xxs: 2,
+  xs: 6,
+  xxs: 6,
 };
 /** lg: 12,md: 10,sm: 6,xs: 4,xxs: 2 */
 
-export const BREAK_POINTS = {
+export const BREAK_POINT_MAP = {
   lg: 1200,
   md: 996,
   sm: 768,
@@ -47,6 +51,19 @@ export const BREAK_POINTS = {
   xxs: 0,
 };
 export const INIT_COLS = 12;
+export const DEVICE_LIST = {
+  '华为 Mate 30': [360, 780],
+  '华为 Mate 30 Pro': [392, 800],
+  '小米 12': [393, 851],
+  'iPhone X': [375, 812],
+  'iPhone XR': [414, 896],
+  'iPhone 12 Pro': [390, 844],
+  'iPhone SE': [375, 667],
+  'Pixel 5': [393, 851],
+  'Samsung Galaxy S8+': [360, 740],
+  'iPad Mini': [768, 1024],
+  custom: null,
+};
 
 // DASH_UNDO
 export const BOARD_UNDO = {

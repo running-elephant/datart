@@ -20,7 +20,11 @@ import BasicLineChart from '../BasicLineChart';
 
 class LineChart extends BasicLineChart {
   constructor() {
-    super({ id: 'line-chart', name: '折线图', icon: 'fsux_zhexiantu' });
+    super({
+      id: 'line-chart',
+      name: 'viz.palette.graph.names.lineChart',
+      icon: 'fsux_zhexiantu',
+    });
   }
 }
 

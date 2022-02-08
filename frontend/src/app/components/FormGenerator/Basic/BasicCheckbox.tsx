@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-import { Checkbox, Row } from 'antd';
+import { Checkbox } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
-import { LINE_HEIGHT_ICON_MD } from 'styles/StyleConstants';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
+import { BW } from './components/BasicWrapper';
 
 const BasicCheckbox: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
@@ -34,15 +34,17 @@ const BasicCheckbox: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     };
 
     return (
-      <StyledVizBasicCheckbox align={'middle'}>
+      <StyledVizBasicCheckbox
+        label={!options?.hideLabel ? t(row.label, true) : ''}
+        labelCol={{ span: 12 }}
+        wrapperCol={{ span: 12 }}
+      >
         <Checkbox
           {...rest}
           {...options}
           checked={row.value}
           onChange={handleCheckedChange}
-        >
-          {t(row.label)}
-        </Checkbox>
+        />
       </StyledVizBasicCheckbox>
     );
   },
@@ -51,10 +53,6 @@ const BasicCheckbox: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
 
 export default BasicCheckbox;
 
-const StyledVizBasicCheckbox = styled(Row)`
-  line-height: ${LINE_HEIGHT_ICON_MD};
-
-  .ant-checkbox-wrapper {
-    color: ${p => p.theme.textColorLight};
-  }
+const StyledVizBasicCheckbox = styled(BW)`
+  flex-direction: row;
 `;

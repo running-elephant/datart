@@ -19,6 +19,7 @@
 import { LoadingOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
 import { useFrame } from 'app/components/ReactFrameComponent';
+import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartLifecycle } from 'app/types/ChartLifecycle';
@@ -55,6 +56,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   const { document, window } = useFrame();
   const [containerId] = useState(() => uuidv4());
   const eventBrokerRef = useRef<ChartIFrameEventBroker>();
+  const translator = usePrefixI18N();
 
   /**
    * Chart Mount Event
@@ -88,6 +90,7 @@ const ChartIFrameLifecycleAdapter: FC<{
               window,
               width: style?.width,
               height: style?.height,
+              translator,
             },
           );
           eventBrokerRef.current = newBrokerRef;
@@ -103,7 +106,7 @@ const ChartIFrameLifecycleAdapter: FC<{
       eventBrokerRef?.current?.publish(ChartLifecycle.UNMOUNTED, {});
       eventBrokerRef?.current?.dispose();
     };
-  }, [chart?.meta?.id, eventBrokerRef, isShown]);
+  }, [chart?.meta?.id, eventBrokerRef, isShown, translator]);
 
   /**
    * Chart Update Event
@@ -132,6 +135,7 @@ const ChartIFrameLifecycleAdapter: FC<{
         window,
         width: style?.width,
         height: style?.height,
+        translator,
       },
     );
   }, [
@@ -142,6 +146,7 @@ const ChartIFrameLifecycleAdapter: FC<{
     document,
     window,
     isShown,
+    translator,
   ]);
 
   /**
@@ -172,9 +177,10 @@ const ChartIFrameLifecycleAdapter: FC<{
         window,
         width: style?.width,
         height: style?.height,
+        translator,
       },
     );
-  }, [style.width, style.height, document, window, isShown]);
+  }, [style.width, style.height, document, window, isShown, translator]);
 
   return (
     <Spin

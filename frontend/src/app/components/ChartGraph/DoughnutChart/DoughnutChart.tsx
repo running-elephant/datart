@@ -27,7 +27,7 @@ class DoughnutChart extends BasicPieChart {
   constructor() {
     super({
       id: 'doughnut-chart',
-      name: '环形图',
+      name: 'viz.palette.graph.names.doughnutChart',
       icon: 'fsux_tubiao_bingtu',
     });
   }

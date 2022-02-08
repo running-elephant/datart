@@ -77,13 +77,13 @@ export function useSaveAsViz() {
               index,
             });
 
-            dispatch(
+            await dispatch(
               addViz({
                 viz: requestData,
                 type,
-                resolve: onClose,
               }),
             );
+            onClose?.();
           } else {
             requestData = {
               config: vizData.config,
@@ -95,18 +95,18 @@ export function useSaveAsViz() {
               permissions: vizData.permissions,
             };
 
-            dispatch(
+            await dispatch(
               saveAsDashboard({
                 viz: requestData,
                 dashboardId: vizData.id,
-                resolve: onClose,
               }),
             );
+            onClose?.();
           }
         },
       });
     },
-    [showSaveForm, tg, vizsData, dispatch],
+    [showSaveForm, tg, vizsData, dispatch, getVizDetail],
   );
 
   return saveAsViz;

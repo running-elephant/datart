@@ -139,7 +139,7 @@ const config: ChartConfig = {
           },
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -153,18 +153,18 @@ const config: ChartConfig = {
       ],
     },
     {
-      label: 'visualMap.title',
+      label: 'viz.palette.style.visualMap.title',
       key: 'visualMap',
       comType: 'group',
       rows: [
         {
-          label: 'visualMap.show',
+          label: 'viz.palette.style.visualMap.show',
           key: 'show',
           default: true,
           comType: 'checkbox',
         },
         {
-          label: 'visualMap.orient',
+          label: 'viz.palette.style.visualMap.orient',
           key: 'orient',
           comType: 'select',
           default: 'vertical',
@@ -176,7 +176,7 @@ const config: ChartConfig = {
           },
         },
         {
-          label: 'visualMap.align',
+          label: 'viz.palette.style.visualMap.align',
           key: 'align',
           comType: 'select',
           default: 'auto',
@@ -191,19 +191,19 @@ const config: ChartConfig = {
           },
         },
         {
-          label: 'visualMap.itemWidth',
+          label: 'viz.palette.style.visualMap.itemWidth',
           key: 'itemWidth',
           default: 20,
           comType: 'inputNumber',
         },
         {
-          label: 'visualMap.itemHeight',
+          label: 'viz.palette.style.visualMap.itemHeight',
           key: 'itemHeight',
           default: 140,
           comType: 'inputNumber',
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -219,12 +219,12 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'paging.title',
+      label: 'viz.palette.setting.paging.title',
       key: 'paging',
       comType: 'group',
       rows: [
         {
-          label: 'paging.pageSize',
+          label: 'viz.palette.setting.paging.pageSize',
           key: 'pageSize',
           default: 1000,
           comType: 'inputNumber',

@@ -87,26 +87,26 @@ const ChartSelectModalModal: React.FC<IProps> = props => {
 
   const setDefaultChartsIds = () => {
     let ChartsIds: any = [];
-    treeData?.forEach(treenode => {
-      let checkedlength = 0;
+    treeData?.forEach(treeNode => {
+      let checkedLength = 0;
 
-      if (treenode.disabled) {
+      if (treeNode.disabled) {
         //zh  dashboard中已经含有该图表 en:The chart is already in the dashboard
-        ChartsIds.push(treenode.id);
+        ChartsIds.push(treeNode.id);
       }
 
-      treenode?.children?.forEach(v => {
+      treeNode?.children?.forEach(v => {
         if (v.disabled) {
           //zh dashboard中已经含有该图表 en:The chart is already in the dashboard
-          checkedlength = checkedlength + 1;
+          checkedLength = checkedLength + 1;
           ChartsIds.push(v.id);
         }
       });
 
-      if (checkedlength === treenode?.children?.length) {
+      if (checkedLength === treeNode?.children?.length) {
         // zh:如果该目录里的图表都被选中，那么目录也要被选中并且不可点击 en: If the charts in the catalog are all selected, then the catalog must also be selected and not clickable
-        treenode.disabled = true;
-        ChartsIds.push(treenode.id);
+        treeNode.disabled = true;
+        ChartsIds.push(treeNode.id);
       }
     });
     return ChartsIds;

@@ -25,7 +25,7 @@ class StackAreaChart extends BasicLineChart {
   constructor() {
     super({
       id: 'stack-area-chart',
-      name: '堆叠面积图',
+      name: 'viz.palette.graph.names.stackAreaChart',
       icon: 'area-chart',
     });
   }

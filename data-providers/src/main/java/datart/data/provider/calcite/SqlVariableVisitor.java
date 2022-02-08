@@ -17,8 +17,6 @@
  */
 package datart.data.provider.calcite;
 
-import datart.core.base.consts.VariableTypeEnum;
-import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ScriptVariable;
 import datart.data.provider.jdbc.SimpleVariablePlaceholder;
 import datart.data.provider.script.VariablePlaceholder;
@@ -44,7 +42,7 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
 
     private SqlCall currentLogicExpressionCall;
 
-    private Set<SqlNode> parsedVariable = new HashSet<>();
+    private final Set<SqlNode> parsedVariable = new HashSet<>();
 
     public SqlVariableVisitor(SqlDialect sqlDialect, String srcSql, String variableQuote, Map<String, ScriptVariable> variableMap) {
         this.srcSql = srcSql;
@@ -118,9 +116,9 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
                     }
                 }
                 if (variable != null) {
-                    if (VariableTypeEnum.PERMISSION.equals(variable.getType())) {
-                        Exceptions.msg("message.provider.permission.variable.usage.error", variable.getName());
-                    }
+//                    if (VariableTypeEnum.PERMISSION.equals(variable.getType())) {
+//                        Exceptions.msg("message.provider.permission.variable.usage.error", variable.getName());
+//                    }
                     int startIndex = identifier.getParserPosition().getColumnNum();
                     int endIndex = identifier.getParserPosition().getEndColumnNum();
                     String originalSqlFragment = srcSql.substring(startIndex - 1, endIndex).trim();

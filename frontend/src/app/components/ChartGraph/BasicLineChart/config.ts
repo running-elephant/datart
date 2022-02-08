@@ -108,7 +108,7 @@ const config: ChartConfig = {
         },
 
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -165,7 +165,7 @@ const config: ChartConfig = {
           },
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -212,7 +212,7 @@ const config: ChartConfig = {
           options: [],
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -278,7 +278,7 @@ const config: ChartConfig = {
           options: [],
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -385,36 +385,36 @@ const config: ChartConfig = {
       ],
     },
     {
-      label: 'margin.title',
+      label: 'viz.palette.style.margin.title',
       key: 'margin',
       comType: 'group',
       rows: [
         {
-          label: 'margin.containLabel',
+          label: 'viz.palette.style.margin.containLabel',
           key: 'containLabel',
           default: true,
           comType: 'checkbox',
         },
         {
-          label: 'margin.left',
+          label: 'viz.palette.style.margin.left',
           key: 'marginLeft',
           default: '5%',
           comType: 'marginWidth',
         },
         {
-          label: 'margin.right',
+          label: 'viz.palette.style.margin.right',
           key: 'marginRight',
           default: '5%',
           comType: 'marginWidth',
         },
         {
-          label: 'margin.top',
+          label: 'viz.palette.style.margin.top',
           key: 'marginTop',
           default: '5%',
           comType: 'marginWidth',
         },
         {
-          label: 'margin.bottom',
+          label: 'viz.palette.style.margin.bottom',
           key: 'marginBottom',
           default: '5%',
           comType: 'marginWidth',
@@ -424,12 +424,12 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'paging.title',
+      label: 'viz.palette.setting.paging.title',
       key: 'paging',
       comType: 'group',
       rows: [
         {
-          label: 'paging.pageSize',
+          label: 'viz.palette.setting.paging.pageSize',
           key: 'pageSize',
           default: 1000,
           comType: 'inputNumber',

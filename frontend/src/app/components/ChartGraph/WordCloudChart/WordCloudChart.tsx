@@ -17,10 +17,10 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getDefaultThemeColor,
-  getStyleValueByGroup,
+  getStyles,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
@@ -38,7 +38,7 @@ class WordCloudChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'word-cloud',
-      props?.name || '词云',
+      props?.name || 'viz.palette.graph.names.wordCloudChart',
       props?.icon || 'fsux_tubiao_ciyun',
     );
     this.meta.requirements = props?.requirements || [
@@ -83,7 +83,7 @@ class WordCloudChart extends Chart {
     this.chart?.resize(context);
   }
 
-  getOptions(dataset: ChartDataset, config: ChartConfig) {
+  getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
@@ -106,7 +106,7 @@ class WordCloudChart extends Chart {
           layoutAnimation: true,
           ...wordCloud,
           ...laber,
-          data: objDataColumns.map(dc => {
+          data: objDataColumns?.map(dc => {
             return {
               name: dc[groupConfigs[0].colName],
               value: dc[getValueByColumnKey(aggregateConfigs[0])],
@@ -117,17 +117,15 @@ class WordCloudChart extends Chart {
     };
   }
   getWordCloud(style) {
-    // TODO(tianlei): should fix later
-    const [drawOutOfBound, shape, width, height] = this.getArrStyleValueByGroup(
+    const [drawOutOfBound, shape, width, height] = getStyles(
+      style,
+      ['wordCloud'],
       ['drawOutOfBound', 'shape', 'width', 'height'],
-      style,
-      'wordCloud',
     );
-    // TODO(tianlei): should fix later
-    const [left, top] = this.getArrStyleValueByGroup(
-      ['marginLeft', 'marginTop'],
+    const [left, top] = getStyles(
       style,
-      'margin',
+      ['margin'],
+      ['marginLeft', 'marginTop'],
     );
     return {
       drawOutOfBound: !drawOutOfBound,
@@ -142,7 +140,6 @@ class WordCloudChart extends Chart {
   }
 
   getLaber(style) {
-    // TODO(tianlei): should fix later
     const [
       fontFamily,
       fontWeight,
@@ -155,7 +152,9 @@ class WordCloudChart extends Chart {
       focus,
       textShadowBlur,
       textShadowColor,
-    ] = this.getArrStyleValueByGroup(
+    ] = getStyles(
+      style,
+      ['label'],
       [
         'fontFamily',
         'fontWeight',
@@ -169,8 +168,6 @@ class WordCloudChart extends Chart {
         'textShadowBlur',
         'textShadowColor',
       ],
-      style,
-      'label',
     );
     return {
       sizeRange: [minFontSize, maxFontSize],
@@ -193,21 +190,6 @@ class WordCloudChart extends Chart {
         },
       },
     };
-  }
-
-  // TODO(tianlei): should be fix later
-  /**
-   * @deprecated should use getStyles instread in utils function
-   * @param {*} childPathList
-   * @param {*} style
-   * @param {*} groupPath
-   * @return {*}
-   * @memberof WordCloudChart
-   */
-  getArrStyleValueByGroup(childPathList, style, groupPath) {
-    return childPathList.map(child => {
-      return getStyleValueByGroup(style, groupPath, child);
-    });
   }
 }
 

@@ -97,7 +97,7 @@ function DemoCustomLineChart({ dHelper }) {
             },
 
             {
-              label: 'font',
+              label: 'viz.palette.style.font',
               key: 'font',
               comType: 'font',
               default: {
@@ -153,7 +153,7 @@ function DemoCustomLineChart({ dHelper }) {
               },
             },
             {
-              label: 'font',
+              label: 'viz.palette.style.font',
               key: 'font',
               comType: 'font',
               default: {
@@ -200,7 +200,7 @@ function DemoCustomLineChart({ dHelper }) {
               options: [],
             },
             {
-              label: 'font',
+              label: 'viz.palette.style.font',
               key: 'font',
               comType: 'font',
               default: {
@@ -266,7 +266,7 @@ function DemoCustomLineChart({ dHelper }) {
               options: [],
             },
             {
-              label: 'font',
+              label: 'viz.palette.style.font',
               key: 'font',
               comType: 'font',
               default: {
@@ -373,36 +373,36 @@ function DemoCustomLineChart({ dHelper }) {
           ],
         },
         {
-          label: 'margin.title',
+          label: 'viz.palette.style.margin.title',
           key: 'margin',
           comType: 'group',
           rows: [
             {
-              label: 'margin.containLabel',
+              label: 'viz.palette.style.margin.containLabel',
               key: 'containLabel',
               default: true,
               comType: 'checkbox',
             },
             {
-              label: 'margin.left',
+              label: 'viz.palette.style.margin.left',
               key: 'marginLeft',
               default: '5%',
               comType: 'marginWidth',
             },
             {
-              label: 'margin.right',
+              label: 'viz.palette.style.margin.right',
               key: 'marginRight',
               default: '5%',
               comType: 'marginWidth',
             },
             {
-              label: 'margin.top',
+              label: 'viz.palette.style.margin.top',
               key: 'marginTop',
-              default: '15%',
+              default: '5%',
               comType: 'marginWidth',
             },
             {
-              label: 'margin.bottom',
+              label: 'viz.palette.style.margin.bottom',
               key: 'marginBottom',
               default: '5%',
               comType: 'marginWidth',
@@ -412,12 +412,12 @@ function DemoCustomLineChart({ dHelper }) {
       ],
       settings: [
         {
-          label: 'paging.title',
+          label: 'viz.palette.setting.paging.title',
           key: 'paging',
           comType: 'group',
           rows: [
             {
-              label: 'paging.pageSize',
+              label: 'viz.palette.setting.paging.pageSize',
               key: 'pageSize',
               default: 1000,
               comType: 'inputNumber',
@@ -434,6 +434,7 @@ function DemoCustomLineChart({ dHelper }) {
         {
           lang: 'zh-CN',
           translation: {
+            chartName: '[Experiment] 用户自定义折线图',
             common: {
               showAxis: '显示坐标轴',
               inverseAxis: '反转坐标轴',
@@ -493,13 +494,76 @@ function DemoCustomLineChart({ dHelper }) {
             },
           },
         },
+        {
+          lang: 'en-US',
+          translation: {
+            chartName: '[Experiment] Custom Line Chart',
+            common: {
+              showAxis: 'Show Axis',
+              inverseAxis: 'Inverse Axis',
+              lineStyle: 'Line Style',
+              borderType: 'Border Type',
+              borderWidth: 'Border Width',
+              borderColor: 'Border Color',
+              backgroundColor: 'Background Color',
+              showLabel: 'Show Label',
+              unitFont: 'Unit Font',
+              rotate: 'Rotate',
+              position: 'Position',
+              showInterval: 'Show Interval',
+              interval: 'Interval',
+              showTitleAndUnit: 'Show Title and Unit',
+              nameLocation: 'Name Location',
+              nameRotate: 'Name Rotate',
+              nameGap: 'Name Gap',
+              min: 'Min',
+              max: 'Max',
+            },
+            label: {
+              title: 'Label',
+              showLabel: 'Show Label',
+              position: 'Position',
+            },
+            legend: {
+              title: 'Legend',
+              showLegend: 'Show Legend',
+              type: 'Type',
+              selectAll: 'Select All',
+              position: 'Position',
+            },
+            data: {
+              color: 'Color',
+              colorize: 'Colorize',
+            },
+            graph: {
+              title: 'Graph',
+              smooth: 'Smooth',
+              step: 'Step',
+            },
+            xAxis: {
+              title: 'X Axis',
+            },
+            yAxis: {
+              title: 'Y Axis',
+            },
+            splitLine: {
+              title: 'Split Line',
+              showHorizonLine: 'Show Horizontal Line',
+              showVerticalLine: 'Show Vertical Line',
+            },
+            reference: {
+              title: 'Reference',
+              open: 'Open',
+            },
+          },
+        },
       ],
     },
     isISOContainer: 'demo-customize-line-chart',
     dependency: ['https://lib.baomitu.com/echarts/5.0.2/echarts.min.js'],
     meta: {
       id: 'demo-custom-line-chart',
-      name: '[DEMO]用户自定义折线图',
+      name: 'chartName',
       icon: svgIcon,
       requirements: [
         {
@@ -548,17 +612,18 @@ function DemoCustomLineChart({ dHelper }) {
         .filter(c => c.type === 'aggregate')
         .flatMap(config => config.rows || []);
 
-      const objDataColumns = dHelper.transformToObjectArray(
+      const chartDataSet = dHelper.transformToDataSet(
         dataset.rows,
         dataset.columns,
+        dataConfigs,
       );
-      const dataColumns = objDataColumns;
+
       const xAxisColumns = groupConfigs.map(config => {
         return {
           type: 'category',
           boundaryGap: false,
           tooltip: { show: true },
-          data: dataColumns.map(dc => dc[dHelper.getValueByColumnKey(config)]),
+          data: chartDataSet.map(row => row.getCell(config)),
         };
       });
       const yAxisColumns = aggregateConfigs.map((config, index) => {
@@ -568,14 +633,14 @@ function DemoCustomLineChart({ dHelper }) {
           sampling: 'average',
           areaStyle: this.isArea ? {} : undefined,
           stack: this.isStack ? 'total' : undefined,
-          data: dataColumns.map(dc => dc[dHelper.getValueByColumnKey(config)]),
+          data: chartDataSet.map(row => row.getCell(config)),
           ...this.getLabelStyle(styleConfigs),
           ...this.getSeriesStyle(styleConfigs),
         };
       });
 
-      const { min, max } = dHelper.getDataColumnMaxAndMin(
-        objDataColumns,
+      const { min, max } = dHelper.getDataColumnMaxAndMin2(
+        chartDataSet,
         aggregateConfigs[0],
       );
 
@@ -594,26 +659,11 @@ function DemoCustomLineChart({ dHelper }) {
           styleConfigs,
           yAxisColumns.map(col => col?.name) || [],
         ),
-        grid: this.getGrid(styleConfigs),
+        grid: dHelper.getGridStyle(styleConfigs),
         xAxis: this.getXAxis(styleConfigs, xAxisColumns),
         yAxis: this.getYAxis(styleConfigs, yAxisColumns),
         series: yAxisColumns,
       };
-    },
-
-    getGrid(styles) {
-      const [containLabel, left, right, bottom, top] = dHelper.getStyles(
-        styles,
-        ['margin'],
-        [
-          'containLabel',
-          'marginLeft',
-          'marginRight',
-          'marginBottom',
-          'marginTop',
-        ],
-      );
-      return { left, right, bottom, top, containLabel };
     },
 
     getYAxis(styles, yAxisColumns) {

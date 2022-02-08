@@ -57,10 +57,10 @@ export function useAddViz({ showSaveForm }) {
         type: type,
         visible: visible,
         initialValues: initialValues,
-        onSave: (values: SaveFormModel, onClose) => {
+        onSave: async (values: SaveFormModel, onClose) => {
           const dataValues = updateValue(vizType, values);
           let index = getInsertedNodeIndex(values, vizsData);
-          dispatch(
+          await dispatch(
             addViz({
               viz: {
                 ...initialValues,
@@ -69,11 +69,11 @@ export function useAddViz({ showSaveForm }) {
                 index: index,
               },
               type: vizType,
-              resolve: onClose,
             }),
           ).then(res => {
             callback?.(res.payload);
           });
+          onClose();
         },
       });
     },

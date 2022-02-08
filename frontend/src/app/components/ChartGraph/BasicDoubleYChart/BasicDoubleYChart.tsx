@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getAxisLabel,
   getAxisLine,
@@ -45,7 +45,7 @@ class BasicDoubleYChart extends Chart {
   chart: any = null;
 
   constructor() {
-    super('double-y', '双Y轴图', 'fsux_tubiao_shuangzhoutu');
+    super('double-y', 'chartName', 'fsux_tubiao_shuangzhoutu');
     this.meta.requirements = [
       {
         group: 1,
@@ -87,7 +87,7 @@ class BasicDoubleYChart extends Chart {
     this.chart?.resize(context);
   }
 
-  private getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings;
@@ -286,11 +286,6 @@ class BasicDoubleYChart extends Chart {
   }
 
   private getYAxis(styles, leftDeminsionConfigs, rightDeminsionConfigs) {
-    const [showAxis, inverse, showLabel, font] = getStyles(
-      styles,
-      ['doubleY'],
-      ['showAxis', 'inverseAxis', 'showLabel', 'font'],
-    );
     const [showHorizonLine, horizonLineStyle] = getStyles(
       styles,
       ['splitLine'],
@@ -298,13 +293,14 @@ class BasicDoubleYChart extends Chart {
     );
 
     const _yAxisTemplate = (position, index, name) => {
+      const [showAxis, inverse, font, showLabel] = getStyles(
+        styles,
+        [`${position}Y`],
+        ['showAxis', 'inverseAxis', 'font', 'showLabel'],
+      );
+
       return {
         type: 'value',
-        // min: 0,
-        // max: 250,
-        // min: leftExtentMin,
-        // max: leftExtentMax,
-        // interval: +leftInterval,
         position,
         offset: index * 20,
         showTitleAndUnit: true,

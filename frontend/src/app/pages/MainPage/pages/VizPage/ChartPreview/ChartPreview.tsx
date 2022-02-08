@@ -112,7 +112,7 @@ const ChartPreviewBoard: FC<{
           const newChart = chartManager.getById(
             newChartPreview?.backendChart?.config?.chartGraphId,
           );
-          registerChartEvents(newChart, newChartPreview);
+          registerChartEvents(newChart, backendChartId);
           setChart(newChart);
         }
       }
@@ -126,7 +126,7 @@ const ChartPreviewBoard: FC<{
       version,
     ]);
 
-    const registerChartEvents = (chart, chartPreview) => {
+    const registerChartEvents = (chart, backendChartId) => {
       chart?.registerMouseEvents([
         {
           name: 'click',
@@ -137,10 +137,11 @@ const ChartPreviewBoard: FC<{
             ) {
               dispatch(
                 fetchDataSetByPreviewChartAction({
-                  chartPreview: chartPreview!,
+                  backendChartId,
                   sorter: {
                     column: param?.seriesName!,
                     operator: param?.value?.direction,
+                    aggOperator: param?.value?.aggOperator,
                   },
                   pageInfo: {
                     pageNo: param?.value?.pageNo,
@@ -238,16 +239,13 @@ const ChartPreviewBoard: FC<{
 
     const handleReloadData = useCallback(async () => {
       setLoadingStatus(true);
-      const currentChartPreview = previewCharts.find(
-        c => c.backendChartId === backendChartId,
-      );
       await dispatch(
         fetchDataSetByPreviewChartAction({
-          chartPreview: currentChartPreview!,
+          backendChartId,
         }),
       );
       setLoadingStatus(false);
-    }, [dispatch, previewCharts, backendChartId]);
+    }, [dispatch, backendChartId]);
 
     const handleAddToDashBoard = useCallback(
       async dashboardId => {

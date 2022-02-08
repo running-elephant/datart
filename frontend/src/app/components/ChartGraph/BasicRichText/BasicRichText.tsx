@@ -17,11 +17,11 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getCustomSortableColumns,
-  getStyleValueByGroup,
+  getStyles,
   getValueByColumnKey,
   transformToObjectArray,
 } from 'app/utils/chartHelper';
@@ -45,7 +45,7 @@ class BasicRichText extends ReactChart {
   constructor(props?) {
     super(ChartRichTextAdapter, {
       id: props?.id || 'react-rich-text',
-      name: props?.name || '富文本',
+      name: props?.name || 'viz.palette.graph.names.richText',
       icon: props?.icon || 'rich-text',
     });
     this.meta.requirements = props?.requirements || [
@@ -85,7 +85,7 @@ class BasicRichText extends ReactChart {
     this.onUpdated(this.richTextOptions, context);
   }
 
-  getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
+  getOptions(context, dataset?: ChartDataSetDTO, config?: ChartConfig) {
     const { containerId, widgetSpecialConfig } = this.richTextOptions;
     if (!dataset || !config || !containerId) {
       return { dataList: [], id: '', isEditing: !!widgetSpecialConfig?.env };
@@ -111,14 +111,15 @@ class BasicRichText extends ReactChart {
         value: this.getDataListValue(config, dataColumns),
       };
     });
-    // TODO(tianlei): should be fixed later with getStyles function
-    const initContent = getStyleValueByGroup(
+    const [initContent] = getStyles(stylesConfigs, ['delta'], ['richText']);
+    const [openQuillMarkdown] = getStyles(
       stylesConfigs,
-      'delta',
-      'richText',
+      ['richTextMarkdown'],
+      ['openQuillMarkdown'],
     );
     return {
       dataList,
+      openQuillMarkdown,
       initContent,
       id: containerId,
       isEditing: !!widgetSpecialConfig?.env,

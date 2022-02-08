@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { init } from 'echarts';
 import Chart from '../models/Chart';
 import Config from './config';
@@ -75,7 +75,7 @@ class BasicRadarChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'radar',
-      props?.name || '雷达图',
+      props?.name || 'viz.palette.graph.names.radarChart',
       props?.icon || 'radarchart',
     );
     this.meta.requirements = props?.requirements || [
@@ -124,7 +124,7 @@ class BasicRadarChart extends Chart {
     this.chart?.resize(context);
   }
 
-  getOptions(dataset: ChartDataset, config: ChartConfig) {
+  getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     return this.option;
   }
 }

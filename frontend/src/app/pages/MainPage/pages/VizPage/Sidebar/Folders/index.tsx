@@ -108,6 +108,7 @@ export const Folders = memo(
           });
           return false;
         }
+
         addVizFn({
           vizType: key,
           type: CommonFormTypes.Add,

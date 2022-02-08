@@ -24,13 +24,13 @@ import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
-const BasicFontFamilySelector: FC<ItemLayoutProps<ChartStyleConfig>> =
-  memo(({ ancestors, translate: t = title => title, data: row, onChange }) => {
+const BasicFontFamilySelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+  ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 
     return (
       <StyledVizFontFamilySelector align={'middle'}>
-        <Col span={12}>{t(row.label)}</Col>
+        <Col span={12}>{t(row.label, true)}</Col>
         <Col span={12}>
           <Select
             dropdownMatchSelectWidth
@@ -48,7 +48,9 @@ const BasicFontFamilySelector: FC<ItemLayoutProps<ChartStyleConfig>> =
         </Col>
       </StyledVizFontFamilySelector>
     );
-  }, itemLayoutComparer);
+  },
+  itemLayoutComparer,
+);
 
 export default BasicFontFamilySelector;
 

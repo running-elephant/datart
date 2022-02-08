@@ -181,7 +181,7 @@ export function SharePage() {
   );
 
   return (
-    <StyledWrapper>
+    <StyledWrapper className="datart-viz">
       <PasswordModal
         visible={Boolean(needPassword) && Boolean(usePassword)}
         onChange={sharePassword => {

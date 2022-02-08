@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getDataColumnMaxAndMin,
   getExtraSeriesRowData,
@@ -47,7 +47,7 @@ class BasicOutlineMapChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'outline-map',
-      props?.name || '轮廓地图',
+      props?.name || 'viz.palette.graph.names.outlineMap',
       props?.icon || 'china',
     );
     this.meta.requirements = props?.requirements || [
@@ -92,7 +92,7 @@ class BasicOutlineMapChart extends Chart {
     this.chart?.resize(context);
   }
 
-  private getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs

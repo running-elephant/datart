@@ -134,7 +134,7 @@ const config: ChartConfig = {
           },
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -152,6 +152,17 @@ const config: ChartConfig = {
       key: 'leftY',
       comType: 'group',
       rows: [
+        {
+          label: 'common.showAxis',
+          key: 'showAxis',
+          default: true,
+          comType: 'checkbox',
+        },
+        {
+          label: 'common.inverseAxis',
+          key: 'inverseAxis',
+          comType: 'checkbox',
+        },
         {
           label: 'leftY.title',
           key: 'graphType',
@@ -182,7 +193,7 @@ const config: ChartConfig = {
           options: [],
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -200,6 +211,17 @@ const config: ChartConfig = {
       key: 'rightY',
       comType: 'group',
       rows: [
+        {
+          label: 'common.showAxis',
+          key: 'showAxis',
+          default: true,
+          comType: 'checkbox',
+        },
+        {
+          label: 'common.inverseAxis',
+          key: 'inverseAxis',
+          comType: 'checkbox',
+        },
         {
           label: 'rightY.title',
           key: 'graphType',
@@ -230,7 +252,7 @@ const config: ChartConfig = {
           options: [],
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -277,7 +299,7 @@ const config: ChartConfig = {
           options: [],
         },
         {
-          label: 'font',
+          label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
           default: {
@@ -348,36 +370,36 @@ const config: ChartConfig = {
       ],
     },
     {
-      label: 'margin.title',
+      label: 'viz.palette.style.margin.title',
       key: 'margin',
       comType: 'group',
       rows: [
         {
-          label: 'margin.containLabel',
+          label: 'viz.palette.style.margin.containLabel',
           key: 'containLabel',
           default: true,
           comType: 'checkbox',
         },
         {
-          label: 'margin.left',
+          label: 'viz.palette.style.margin.left',
           key: 'marginLeft',
           default: '5%',
           comType: 'marginWidth',
         },
         {
-          label: 'margin.right',
+          label: 'viz.palette.style.margin.right',
           key: 'marginRight',
           default: '5%',
           comType: 'marginWidth',
         },
         {
-          label: 'margin.top',
+          label: 'viz.palette.style.margin.top',
           key: 'marginTop',
           default: '5%',
           comType: 'marginWidth',
         },
         {
-          label: 'margin.bottom',
+          label: 'viz.palette.style.margin.bottom',
           key: 'marginBottom',
           default: '5%',
           comType: 'marginWidth',
@@ -387,12 +409,12 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'paging.title',
+      label: 'viz.palette.setting.paging.title',
       key: 'paging',
       comType: 'group',
       rows: [
         {
-          label: 'paging.pageSize',
+          label: 'viz.palette.setting.paging.pageSize',
           key: 'pageSize',
           default: 1000,
           comType: 'inputNumber',
@@ -422,6 +444,7 @@ const config: ChartConfig = {
     {
       lang: 'zh-CN',
       translation: {
+        chartName: '双Y轴图',
         common: {
           showAxis: '显示坐标轴',
           inverseAxis: '反转坐标轴',
@@ -480,6 +503,71 @@ const config: ChartConfig = {
         reference: {
           title: '参考线',
           open: '点击参考线配置',
+        },
+      },
+    },
+    {
+      lang: 'en-US',
+      translation: {
+        chartName: 'Double Y Chart',
+        common: {
+          showAxis: 'Show Axis',
+          inverseAxis: 'Inverse Axis',
+          graphStyle: 'Graph Style',
+          lineStyle: 'Line Style',
+          borderType: 'Border Style',
+          borderWidth: 'Border Width',
+          borderColor: 'Border Color',
+          backgroundColor: 'Background Color',
+          showLabel: 'Show Label',
+          fontFamily: 'Font Family',
+          fontSize: 'Font Size',
+          fontColor: 'Font Color',
+          rotate: 'Rotate',
+          position: 'Position',
+          showInterval: 'Show Interval',
+          interval: 'Interval',
+          showTitleAndUnit: 'Show Title and Unit',
+          nameLocation: 'Name Location',
+          nameRotate: 'Name Rotate',
+          nameGap: 'Name Gap',
+          min: 'Min',
+          max: 'Max',
+        },
+        graph: {
+          title: 'Graph Setting',
+          smooth: 'Smooth',
+          step: 'Step',
+          symbol: 'Symbol',
+          label: 'Label',
+          stack: 'Stack',
+        },
+        legend: {
+          title: 'Legend',
+          showLegend: 'Show Legend',
+          type: 'Type',
+          selectAll: 'Select All',
+          position: 'Position',
+        },
+        leftY: {
+          graph: 'Show Graph',
+          title: 'Left Y Axis',
+        },
+        rightY: {
+          graph: 'Show Graph',
+          title: 'Right Y Axis',
+        },
+        xAxis: {
+          title: 'X Axis',
+        },
+        splitLine: {
+          title: 'SplitLine',
+          showHorizonLine: 'Show Horizon Line',
+          showVerticalLine: 'Show Vertical Line',
+        },
+        reference: {
+          title: 'Reference Line',
+          open: 'Open',
         },
       },
     },

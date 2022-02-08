@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 public enum SqlOperatorReg {
 
-    GT(Pattern.compile("[^\\s<]+(\\s*>\\s*){1}[^\\s=]+"), ">", Pattern.compile("\\s>\\s")),
+    GT(Pattern.compile("[^\\s<]+(\\s*>\\s*){1}[^\\s=]+"), ">", Pattern.compile("\\s*>\\s*")),
 
     GTE(Pattern.compile("[^\\s]+(\\s*>\\s*=\\s*){1}[^\\s]+"), ">=", Pattern.compile("\\s*>\\s*=\\s*")),
 

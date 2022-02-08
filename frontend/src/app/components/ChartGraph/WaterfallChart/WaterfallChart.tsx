@@ -17,7 +17,7 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getCustomSortableColumns,
@@ -39,7 +39,7 @@ class WaterfallChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'waterfall-chart',
-      props?.name || '瀑布图',
+      props?.name || 'viz.palette.graph.names.waterfallChart',
       props?.icon || 'waterfall',
     );
     this.meta.requirements = props?.requirements || [
@@ -81,7 +81,7 @@ class WaterfallChart extends Chart {
     this.chart?.resize({ width: context?.width, height: context?.height });
   }
 
-  private getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs

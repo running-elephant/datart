@@ -18,7 +18,7 @@
 import { Form, Select } from 'antd';
 import { SelectValue } from 'antd/lib/select';
 import { ControlOption } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
-import React, { memo, useCallback } from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components/macro';
 
 export interface SelectControllerProps {
@@ -46,14 +46,7 @@ export const MultiSelectControllerForm: React.FC<SelectControllerProps> = memo(
   },
 );
 export const SelectController: React.FC<SelectControllerProps> = memo(
-  ({ options, onChange, value, children }) => {
-    const renderOptions = useCallback(() => {
-      return (options || []).map(item => (
-        <Option key={item.value + item.label} value={item.value}>
-          <span>{item.label ?? item.value}</span>
-        </Option>
-      ));
-    }, [options]);
+  ({ options, onChange, value }) => {
     return (
       <StyledSelect
         showSearch
@@ -63,15 +56,26 @@ export const SelectController: React.FC<SelectControllerProps> = memo(
         placeholder="请选择"
         maxTagTextLength={4}
         maxTagCount={3}
-        optionFilterProp="children"
+        optionFilterProp="label"
         onChange={onChange}
         mode={'multiple'}
-        filterOption={(input, option) =>
-          option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
-        }
         bordered={false}
+        filterOption={(input, option) =>
+          String(option?.label).toLowerCase().indexOf(input.toLowerCase()) >= 0
+        }
       >
-        {children ? children : renderOptions()}
+        {(options || []).map(item => {
+          //  ##659
+          return (
+            <Option
+              key={item.value + item.label}
+              label={item.label ?? item.value ?? 'none'}
+              value={item.value}
+            >
+              <span>{item.label ?? item.value}</span>
+            </Option>
+          );
+        })}
       </StyledSelect>
     );
   },

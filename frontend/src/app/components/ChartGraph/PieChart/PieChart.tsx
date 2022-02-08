@@ -27,7 +27,7 @@ class PieChart extends BasicPieChart {
   constructor() {
     super({
       id: 'pie-chart',
-      name: '饼图',
+      name: 'viz.palette.graph.names.pieChart',
       icon: 'fsux_tubiao_bingtu1',
     });
   }

@@ -49,12 +49,12 @@ function D3JSScatterChart({ dHelper }) {
       ],
       settings: [
         {
-          label: 'paging.title',
+          label: 'viz.palette.setting.paging.title',
           key: 'paging',
           comType: 'group',
           rows: [
             {
-              label: 'paging.pageSize',
+              label: 'viz.palette.setting.paging.pageSize',
               key: 'pageSize',
               default: 1000,
               comType: 'inputNumber',
@@ -71,6 +71,7 @@ function D3JSScatterChart({ dHelper }) {
         {
           lang: 'zh-CN',
           translation: {
+            chartName: '[Experiment] D3JS 散点图',
             common: {
               title: '散点图配置',
               color: '气泡颜色',
@@ -80,6 +81,7 @@ function D3JSScatterChart({ dHelper }) {
         {
           lang: 'en',
           translation: {
+            chartName: '[Experiment] D3JS Scatter Chart',
             common: {
               title: 'Scatter Setting',
               color: 'Bubble Color',
@@ -93,7 +95,7 @@ function D3JSScatterChart({ dHelper }) {
     dependency: ['https://d3js.org/d3.v5.min.js'],
     meta: {
       id: 'demo-d3js-scatter-chart',
-      name: '[Plugin Demo] D3JS 散点图',
+      name: 'chartName',
       icon: 'sandiantu',
       requirements: [
         {
@@ -183,25 +185,23 @@ function D3JSScatterChart({ dHelper }) {
 
       // 获取样式配置信息
       const styleConfigs = config.styles;
-      const groupConfigs = dataConfigs
-        .filter(c => c.type === 'group')
-        .flatMap(config => config.rows || []);
 
       // 获取指标类型配置信息
       const aggregateConfigs = dataConfigs
         .filter(c => c.type === 'aggregate')
         .flatMap(config => config.rows || []);
 
-      // 数据转换，根据Datart提供了Helper转换工具
-      const objDataColumns = dHelper.transformToObjectArray(
+      // 数据转换，根据Datart提供了Helper转换工具, 转换为ChartDataSet模型
+      const chartDataSet = dHelper.transformToDataSet(
         dataset.rows,
         dataset.columns,
+        dataConfigs,
       );
 
-      const data = objDataColumns.map(dc => {
+      const data = chartDataSet.map(row => {
         return {
-          x: dc[dHelper.getValueByColumnKey(aggregateConfigs[0])],
-          y: dc[dHelper.getValueByColumnKey(aggregateConfigs[1])],
+          x: row.getCell(aggregateConfigs[0]),
+          y: row.getCell(aggregateConfigs[1]),
         };
       });
 

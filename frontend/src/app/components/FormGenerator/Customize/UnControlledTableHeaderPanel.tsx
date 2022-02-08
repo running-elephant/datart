@@ -101,6 +101,7 @@ const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
           mergeSameLineageAncesterRows(lineageRowUids);
         const ancestorsRows = makeSameLinageRows(noDuplicateLineageRows);
         const newDataSource = groupTreeNode(ancestorsRows, tableDataSource);
+        setSelectedRowUids([]);
         handleConfigChange([...newDataSource]);
       };
 
@@ -223,7 +224,10 @@ const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
 
       const handleRollback = () => {
         const originalFlattenHeaders = getFlattenHeaders(dataConfigs);
-        handleConfigChange?.(originalFlattenHeaders);
+        myData.value = [];
+        setTableDataSource(originalFlattenHeaders);
+        setMyData(myData);
+        onChange?.(ancestors, myData);
       };
 
       const handleTableRowChange = rowUid => style => prop => (_, value) => {

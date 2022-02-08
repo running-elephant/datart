@@ -17,24 +17,23 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getAxisLabel,
   getAxisLine,
   getAxisTick,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
-  getCustomSortableColumns,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
   getNameTextStyle,
-  getReference,
+  getReference2,
   getSeriesTooltips4Rectangular2,
   getSplitLine,
   getStyles,
   getValueByColumnKey,
-  transformToObjectArray,
+  transformToDataSet,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
@@ -52,7 +51,7 @@ class BasicLineChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'line',
-      props?.name || 'Basic Line Chart',
+      props?.name || 'viz.palette.graph.names.lineChart',
       props?.icon || 'chart-line',
     );
     this.meta.requirements = props?.requirements || [
@@ -97,7 +96,7 @@ class BasicLineChart extends Chart {
     this.chart?.dispose();
   }
 
-  private getOptions(dataset: ChartDataset, config: ChartConfig) {
+  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const settingConfigs = config.settings;
@@ -114,23 +113,24 @@ class BasicLineChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
-    const objDataColumns = transformToObjectArray(
+    const chartDataSet = transformToDataSet(
       dataset.rows,
       dataset.columns,
+      dataConfigs,
     );
-    const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
+
     const xAxisColumns = (groupConfigs || []).map(config => {
       return {
         type: 'category',
         tooltip: { show: true },
-        data: UniqArray(dataColumns.map(dc => dc[getValueByColumnKey(config)])),
+        data: UniqArray(chartDataSet.map(dc => dc.getCell(config))),
       };
     });
     const series = this.getSeries(
       settingConfigs,
       styleConfigs,
       colorConfigs,
-      dataColumns,
+      chartDataSet,
       groupConfigs,
       aggregateConfigs,
       infoConfigs,
@@ -163,7 +163,7 @@ class BasicLineChart extends Chart {
     settingConfigs,
     styleConfigs,
     colorConfigs,
-    dataColumns,
+    chartDataSet: IChartDataSet<string>,
     groupConfigs,
     aggregateConfigs,
     infoConfigs,
@@ -178,18 +178,18 @@ class BasicLineChart extends Chart {
           sampling: 'average',
           areaStyle: this.isArea ? { color } : undefined,
           stack: this.isStack ? 'total' : undefined,
-          data: dataColumns.map(dc => ({
+          data: chartDataSet?.map(dc => ({
             ...getExtraSeriesRowData(dc),
             ...getExtraSeriesDataFormat(aggConfig?.format),
             name: getColumnRenderName(aggConfig),
-            value: dc[getValueByColumnKey(aggConfig)],
+            value: dc.getCell(aggConfig),
           })),
           itemStyle: {
             color,
           },
           ...this.getLabelStyle(styleConfigs),
           ...this.getSeriesStyle(styleConfigs),
-          ...getReference(settingConfigs, dataColumns, aggConfig, false),
+          ...getReference2(settingConfigs, chartDataSet, aggConfig, false),
         };
       });
     }
@@ -200,7 +200,7 @@ class BasicLineChart extends Chart {
     const infoColumnNames = infoConfigs.map(getValueByColumnKey);
 
     const secondGroupInfos = getColorizeGroupSeriesColumns(
-      dataColumns,
+      chartDataSet,
       colorColumnName,
       xAxisColumnName,
       yAxisColumnNames,

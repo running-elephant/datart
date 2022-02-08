@@ -21,13 +21,14 @@ import {
   ChartDataSectionType,
   SortActionType,
 } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO, {
+  IChartDataSet,
+  IChartDataSetRow,
+} from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
-  getCustomSortableColumns,
   getStyles,
-  getValueByColumnKey,
-  transformToObjectArray,
+  transformToDataSet,
 } from 'app/utils/chartHelper';
 import { isNumber, toFormattedValue } from 'app/utils/number';
 import groupBy from 'lodash/groupBy';
@@ -35,7 +36,7 @@ import ReactChart from '../models/ReactChart';
 import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
 class PivotSheetChart extends ReactChart {
-  static icon = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z" fill="currentColor"/></svg>`;
+  static icon = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z" fill="gray"/></svg>`;
 
   useIFrame = false;
   isISOContainer = 'piovt-sheet';
@@ -45,8 +46,8 @@ class PivotSheetChart extends ReactChart {
 
   constructor() {
     super(AntVS2Wrapper, {
-      id: 'piovt-sheet',
-      name: '透视表',
+      id: 'piovt-sheet', // TODO(Stephen): should fix typo pivot
+      name: 'viz.palette.graph.names.pivotSheet',
       icon: PivotSheetChart.icon,
     });
     this.meta.requirements = [{}];
@@ -78,7 +79,7 @@ class PivotSheetChart extends ReactChart {
     }
   }
 
-  getOptions(context, dataset?: ChartDataset, config?: ChartConfig) {
+  getOptions(context, dataset?: ChartDataSetDTO, config?: ChartConfig) {
     if (!dataset || !config) {
       return {};
     }
@@ -86,11 +87,11 @@ class PivotSheetChart extends ReactChart {
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
-    const objDataColumns = transformToObjectArray(
+    const chartDataSet = transformToDataSet(
       dataset.rows,
       dataset.columns,
+      dataConfigs,
     );
-    const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
 
     const rowSectionConfigRows = dataConfigs
       .filter(c => c.type === ChartDataSectionType.GROUP)
@@ -129,12 +130,7 @@ class PivotSheetChart extends ReactChart {
       getStyles(
         settingConfigs,
         ['rowSummary'],
-        [
-          'enableTotal',
-          'enableHoverHighlight',
-          'enableSubTotal',
-          'subTotalPosition',
-        ],
+        ['enableTotal', 'totalPosition', 'enableSubTotal', 'subTotalPosition'],
       );
 
     return {
@@ -155,16 +151,24 @@ class PivotSheetChart extends ReactChart {
             reverseLayout: Boolean(totalPosition),
             showSubTotals: Boolean(enableSubTotal),
             reverseSubLayout: Boolean(subTotalPosition),
-            subTotalsDimensions:
-              rowSectionConfigRows.map(getValueByColumnKey)?.[0],
+            subTotalsDimensions: rowSectionConfigRows.map(
+              chartDataSet.getFieldKey,
+              chartDataSet,
+            )?.[0],
           },
         },
       },
       dataCfg: {
         fields: {
-          rows: rowSectionConfigRows.map(getValueByColumnKey),
-          columns: columnSectionConfigRows.map(getValueByColumnKey),
-          values: metricsSectionConfigRows.map(getValueByColumnKey),
+          rows: rowSectionConfigRows.map(config =>
+            chartDataSet.getFieldKey(config),
+          ),
+          columns: columnSectionConfigRows.map(config =>
+            chartDataSet.getFieldKey(config),
+          ),
+          values: metricsSectionConfigRows.map(config =>
+            chartDataSet.getFieldKey(config),
+          ),
           valueInCols: !!metricNameShowIn,
         },
         meta: rowSectionConfigRows
@@ -173,14 +177,14 @@ class PivotSheetChart extends ReactChart {
           .concat(infoSectionConfigRows)
           .map(config => {
             return {
-              field: getValueByColumnKey(config),
+              field: chartDataSet.getFieldKey(config),
               name: getColumnRenderName(config),
               formatter: value => toFormattedValue(value, config?.format),
             };
           }),
-        data: dataColumns,
+        data: chartDataSet?.map(row => row.convertToObject()),
         totalData: this.getCalcSummaryValues(
-          dataColumns,
+          chartDataSet,
           rowSectionConfigRows,
           columnSectionConfigRows,
           metricsSectionConfigRows,
@@ -191,6 +195,7 @@ class PivotSheetChart extends ReactChart {
           rowSectionConfigRows
             .concat(columnSectionConfigRows)
             .concat(metricsSectionConfigRows),
+          chartDataSet,
         ),
       },
       theme: {
@@ -210,7 +215,7 @@ class PivotSheetChart extends ReactChart {
     };
   }
 
-  private getTableSorters(sectionConfigRows) {
+  private getTableSorters(sectionConfigRows, chartDataSet) {
     return sectionConfigRows
       .map(config => {
         if (!config?.sort?.type || config?.sort?.type === SortActionType.NONE) {
@@ -218,7 +223,7 @@ class PivotSheetChart extends ReactChart {
         }
         const isASC = config.sort.type === SortActionType.ASC;
         return {
-          sortFieldId: getValueByColumnKey(config),
+          sortFieldId: chartDataSet.getFieldKey(config),
           sortFunc: params => {
             const { data } = params;
             return data?.sort((a, b) =>
@@ -279,7 +284,7 @@ class PivotSheetChart extends ReactChart {
   }
 
   private getCalcSummaryValues(
-    dataColumns,
+    chartDataSet: IChartDataSet<string>,
     rowSectionConfigRows,
     columnSectionConfigRows,
     metricsSectionConfigRows,
@@ -290,20 +295,22 @@ class PivotSheetChart extends ReactChart {
     if (enableTotal) {
       if (!columnSectionConfigRows.length) {
         const rowTotals = metricsSectionConfigRows.map(c => {
-          const values = dataColumns
-            .map(dc => +dc?.[getValueByColumnKey(c)])
+          const values = chartDataSet
+            .map(row => +row.getCell(c))
             .filter(isNumber);
           return {
-            [getValueByColumnKey(c)]: values?.reduce((a, b) => a + b, 0),
+            [chartDataSet.getFieldKey(c)]: values?.reduce((a, b) => a + b, 0),
           };
         });
         summarys.push(...rowTotals);
       } else {
         const rowTotals = this.calculateGroupedColumnTotal(
           {},
-          columnSectionConfigRows.map(getValueByColumnKey),
+          columnSectionConfigRows.map(config =>
+            chartDataSet.getFieldKey(config),
+          ),
           metricsSectionConfigRows,
-          dataColumns,
+          chartDataSet,
         );
         summarys.push(...rowTotals);
       }
@@ -313,13 +320,12 @@ class PivotSheetChart extends ReactChart {
         {},
         [rowSectionConfigRows[0]]
           .concat(columnSectionConfigRows)
-          .map(getValueByColumnKey),
+          .map(chartDataSet.getFieldKey, chartDataSet),
         metricsSectionConfigRows,
-        dataColumns,
+        chartDataSet,
       );
       summarys.push(...rowTotals);
     }
-
     return summarys;
   }
 
@@ -327,11 +333,11 @@ class PivotSheetChart extends ReactChart {
     preObj,
     groupKeys,
     metrics: any[],
-    datas,
+    datas: Array<IChartDataSetRow<string>>,
   ) {
     const _groupKeys = [...(groupKeys || [])];
     const groupKey = _groupKeys.shift();
-    const groupDataSet = groupBy(datas, groupKey);
+    const groupDataSet = groupBy(datas, row => row.getCellByKey(groupKey));
 
     return Object.entries(groupDataSet).flatMap(([k, v]) => {
       if (_groupKeys.length) {
@@ -344,12 +350,13 @@ class PivotSheetChart extends ReactChart {
       }
       return metrics.map(metric => {
         const values = (v as any[])
-          .map(dc => +dc?.[getValueByColumnKey(metric)])
+          .map(dc => +dc.getCell(metric))
           .filter(isNumber);
+
         return {
           ...preObj,
           [groupKey]: k,
-          [getValueByColumnKey(metric)]: values?.reduce((a, b) => a + b, 0),
+          [v?.[0]?.getFieldKey(metric)]: values?.reduce((a, b) => a + b, 0),
         };
       });
     });

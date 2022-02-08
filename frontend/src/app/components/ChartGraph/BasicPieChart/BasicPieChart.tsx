@@ -21,15 +21,17 @@ import {
   ChartDataSectionField,
   ChartDataSectionType,
 } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO, {
+  IChartDataSet,
+  IChartDataSetRow,
+} from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
   getStyles,
-  getValueByColumnKey,
-  transformToObjectArray,
+  transformToDataSet,
   valueFormatter,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
@@ -47,7 +49,7 @@ class BasicPieChart extends Chart {
   constructor(props?) {
     super(
       props?.id || 'pie',
-      props?.name || 'Basic Pie Chart',
+      props?.name || 'viz.palette.graph.names.pieChart',
       props?.icon || 'chartpie',
     );
     this.meta.requirements = props?.requirements || [
@@ -89,8 +91,7 @@ class BasicPieChart extends Chart {
     this.chart?.resize(context);
   }
 
-  private getOptions(dataset: ChartDataset, config: ChartConfig) {
-    const dataColumns = transformToObjectArray(dataset.rows, dataset.columns);
+  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
     const styleConfigs = config.styles;
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
@@ -103,9 +104,14 @@ class BasicPieChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
+    const chartDataSet = transformToDataSet(
+      dataset.rows,
+      dataset.columns,
+      dataConfigs,
+    );
     const series = this.getSeries(
       styleConfigs,
-      dataColumns,
+      chartDataSet,
       groupConfigs,
       aggregateConfigs,
       infoConfigs,
@@ -118,7 +124,7 @@ class BasicPieChart extends Chart {
           groupConfigs,
           aggregateConfigs,
           infoConfigs,
-          dataColumns,
+          chartDataSet,
         ),
       },
       legend: this.getLegendStyle(groupConfigs, styleConfigs, series),
@@ -128,13 +134,13 @@ class BasicPieChart extends Chart {
 
   private getSeries(
     styleConfigs,
-    dataColumns,
+    chartDataSet: IChartDataSet<string>,
     groupConfigs,
     aggregateConfigs,
     infoConfigs,
   ) {
     if (!groupConfigs?.length) {
-      const dc = dataColumns?.[0];
+      const row = chartDataSet?.[0];
       return {
         ...this.getBarSeiesImpl(styleConfigs),
         data: aggregateConfigs.map(config => {
@@ -143,29 +149,26 @@ class BasicPieChart extends Chart {
             name: getColumnRenderName(config),
             value: [config]
               .concat(infoConfigs)
-              .map(config => dc?.[getValueByColumnKey(config)]),
-            itemStyle: this.getDataItemStyle(config, groupConfigs, dc),
-            ...getExtraSeriesRowData(dc),
+              .map(config => row.getCell(config)),
+            itemStyle: this.getDataItemStyle(config, groupConfigs, row),
+            ...getExtraSeriesRowData(row),
             ...getExtraSeriesDataFormat(config?.format),
           };
         }),
       };
     }
 
-    const groupedConfigNames = groupConfigs.map(config => config?.colName);
     const flatSeries = aggregateConfigs.map(config => {
       return {
         ...this.getBarSeiesImpl(styleConfigs),
         name: getColumnRenderName(config),
-        data: dataColumns.map(dc => {
+        data: chartDataSet?.map(row => {
           return {
             ...config,
-            name: groupedConfigNames.map(config => dc[config]).join('-'),
-            value: aggregateConfigs
-              .concat(infoConfigs)
-              .map(config => dc?.[getValueByColumnKey(config)]),
-            itemStyle: this.getDataItemStyle(config, groupConfigs, dc),
-            ...getExtraSeriesRowData(dc),
+            name: groupConfigs.map(row.getCell, row).join('-'),
+            value: aggregateConfigs.concat(infoConfigs).map(row.getCell, row),
+            itemStyle: this.getDataItemStyle(config, groupConfigs, row),
+            ...getExtraSeriesRowData(row),
             ...getExtraSeriesDataFormat(config?.format),
           };
         }),
@@ -177,12 +180,12 @@ class BasicPieChart extends Chart {
   private getDataItemStyle(
     config,
     colorConfigs: ChartDataSectionField[],
-    dataColumn,
+    row: IChartDataSetRow<string>,
   ) {
-    const colorColName = colorConfigs?.[0]?.colName;
+    const colorConfig = colorConfigs?.[0];
     const columnColor = config?.color?.start;
-    if (colorColName) {
-      const colorKey = dataColumn[colorColName];
+    if (colorConfig) {
+      const colorKey = row.getCell(colorConfig);
       const itemStyleColor = colorConfigs[0]?.color?.colors?.find(
         c => c.key === colorKey,
       );
@@ -320,7 +323,7 @@ class BasicPieChart extends Chart {
     groupConfigs,
     aggregateConfigs,
     infoConfigs,
-    dataColumns,
+    chartDataSet,
   ) {
     return seriesParams => {
       if (seriesParams.componentType !== 'series') {
@@ -336,8 +339,8 @@ class BasicPieChart extends Chart {
       }
       const infoTotal = infoConfigs.map(info => {
         let total = 0;
-        dataColumns.map(dc => {
-          total += dc?.[getValueByColumnKey(info)];
+        chartDataSet.forEach(row => {
+          total += Number((row as IChartDataSetRow<string>).getCell(info));
         });
         return total;
       });

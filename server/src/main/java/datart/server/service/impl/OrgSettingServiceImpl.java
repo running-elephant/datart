@@ -17,10 +17,12 @@
  */
 package datart.server.service.impl;
 
+import datart.core.base.consts.PlatformSettings;
 import datart.core.entity.OrgSettings;
 import datart.core.mappers.ext.OrgSettingsMapperExt;
 import datart.server.service.BaseService;
 import datart.server.service.OrgSettingService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +30,8 @@ import java.util.List;
 @Service
 public class OrgSettingServiceImpl extends BaseService implements OrgSettingService {
 
+    @Value("${datart.download.limit:1000000}")
+    private Integer defaultLimit;
 
     private final OrgSettingsMapperExt orgSettingsMapper;
 
@@ -44,5 +48,23 @@ public class OrgSettingServiceImpl extends BaseService implements OrgSettingServ
     @Override
     public List<OrgSettings> listOrgSettings(String orgId) {
         return orgSettingsMapper.selectByOrg(orgId);
+    }
+
+    @Override
+    public Integer getDownloadRecordLimit(String orgId) {
+        OrgSettings orgSettings = orgSettingsMapper.selectByOrgAndType(orgId, PlatformSettings.DOWNLOAD_RECORD_LIMIT.name());
+        if (orgSettings == null) {
+            return defaultLimit;
+        }
+        try {
+            return Integer.parseInt(orgSettings.getConfig());
+        } catch (Exception e) {
+            return defaultLimit;
+        }
+    }
+
+    @Override
+    public boolean setDownloadRecordLimit(String orgId) {
+        return false;
     }
 }

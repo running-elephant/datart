@@ -4,6 +4,7 @@ import { BOARD_UNDO } from 'app/pages/DashBoardPage/constants';
 import {
   BoardInfo,
   BoardLinkFilter,
+  DeviceType,
   JumpPanel,
   WidgetData,
   WidgetInfo,
@@ -93,6 +94,7 @@ const editDashBoardInfoSlice = createSlice({
     ) {
       state.chartEditorProps = action.payload;
     },
+
     changeBoardLinkFilter(
       state,
       action: PayloadAction<{
@@ -108,6 +110,9 @@ const editDashBoardInfoSlice = createSlice({
       if (linkFilters) {
         state.linkFilter = state.linkFilter.concat(linkFilters);
       }
+    },
+    changeBoardDevice(state, action: PayloadAction<DeviceType>) {
+      state.deviceType = action.payload;
     },
   },
   extraReducers: builder => {
@@ -294,7 +299,7 @@ const filterActions = [
   editBoardStackActions.updateBoardConfig,
   editBoardStackActions.addWidgets,
   editBoardStackActions.deleteWidgets,
-  editBoardStackActions.changeWidgetsRect,
+  editBoardStackActions.changeAutoBoardWidgetsRect,
   editBoardStackActions.resizeWidgetEnd,
 
   editBoardStackActions.tabsWidgetAddTab,

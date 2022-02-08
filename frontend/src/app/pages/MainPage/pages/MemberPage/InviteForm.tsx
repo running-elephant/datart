@@ -46,8 +46,8 @@ export const InviteForm = memo(
             `/users/search?keyword=${val}`,
           );
           setOptions(
-            data.map(({ email, name }) => ({
-              key: email,
+            data.map(({ email, username, name }) => ({
+              key: username,
               value: email,
               label: `${name ? `[${name}]` : ''}${email}`,
             })),
@@ -55,6 +55,15 @@ export const InviteForm = memo(
         }
       };
       return debounce(searchUser, DEFAULT_DEBOUNCE_WAIT);
+    }, []);
+
+    const filterOption = useCallback((keywords: string, option) => {
+      const { key, value, label } = option;
+      return (
+        key?.includes(keywords) ||
+        value.toString().includes(keywords) ||
+        label?.toString().includes(keywords)
+      );
     }, []);
 
     const onAfterClose = useCallback(() => {
@@ -75,6 +84,7 @@ export const InviteForm = memo(
             mode="tags"
             placeholder={t('search')}
             options={options}
+            filterOption={filterOption}
             onSearch={debouncedSearchUser}
           />
         </Form.Item>

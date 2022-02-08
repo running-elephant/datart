@@ -115,7 +115,7 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
     if (quillRef.current) {
       new QuillMarkdown(quillRef.current.getEditor(), MarkdownOptions);
     }
-  }, []);
+  }, [quillModules]);
 
   const ssp = e => {
     e.stopPropagation();

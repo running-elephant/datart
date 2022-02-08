@@ -12,7 +12,7 @@ export enum ItemComponentType {
 export interface ItemLayoutProps<T> {
   ancestors: number[];
   data: T;
-  translate?: (title: string, options?: any) => string;
+  translate?: (title: string, disablePrefix?: boolean, options?: any) => string;
   onChange?: (
     ancestors: number[],
     value: T | any,

@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 import { ControlOutlined } from '@ant-design/icons';
-import { Dropdown, Menu } from 'antd';
+import { Dropdown, Menu, Tooltip } from 'antd';
+import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -26,7 +27,6 @@ import { useDispatch } from 'react-redux';
 import { G60 } from 'styles/StyleConstants';
 import { addControllerAction } from '../../../slice/actions/controlActions';
 import { BoardToolBarContext } from '../context/BoardToolBarContext';
-import { WithTipButton } from '../ToolBarItem';
 export interface AddControlBtnProps {}
 export interface ButtonItemType<T> {
   name?: string;
@@ -34,16 +34,16 @@ export interface ButtonItemType<T> {
   type: T;
   disabled?: boolean;
 }
-export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
+export const AddController: React.FC<AddControlBtnProps> = () => {
   const t = useI18NPrefix(`viz.board.action`);
   const tFilterName = useI18NPrefix(`viz.common.enum.controllerFacadeTypes`);
   const tType = useI18NPrefix(`viz.board.controlTypes`);
   const tWt = useI18NPrefix(`viz.widget.type`);
-  const { boardId, boardType, showLabel } = useContext(BoardToolBarContext);
+  const { boardId, boardType } = useContext(BoardToolBarContext);
   const dispatch = useDispatch();
   const { config: boardConfig } = useContext(BoardConfigContext);
   const { hasQueryControl, hasResetControl } = boardConfig;
-  const onAddControler = (info: { key: any }) => {
+  const onAddController = (info: { key: any }) => {
     dispatch(
       addControllerAction({
         type: info.key,
@@ -109,12 +109,11 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
       icon: '',
       type: ControllerFacadeTypes.Slider,
     },
-    // {
-    //   name: '范围滑块',
-    //   icon: '',
-    //   type: ControllerFacadeTypes.RangeSlider,
-    //   disabled: false,
-    // },
+    {
+      icon: '',
+      type: ControllerFacadeTypes.RangeSlider,
+      disabled: true,
+    },
   ];
   const buttonControllers: ButtonItemType<WidgetType>[] = [
     {
@@ -132,7 +131,7 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
     return <span style={{ color: G60, fontWeight: 500 }}>{text}</span>;
   };
   const controlerItems = (
-    <Menu onClick={onAddControler}>
+    <Menu onClick={onAddController}>
       <Menu.ItemGroup
         key="conventionalControllers"
         title={renderTitle(tType('common'))}
@@ -154,8 +153,8 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
         key="numericalControllers"
         title={renderTitle(tType('numeric'))}
       >
-        {numericalControllers.map(({ icon, type }) => (
-          <Menu.Item key={type} icon={icon}>
+        {numericalControllers.map(({ icon, type, disabled }) => (
+          <Menu.Item key={type} icon={icon} disabled={disabled}>
             {tFilterName(type)}
           </Menu.Item>
         ))}
@@ -164,7 +163,7 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
         key="buttonControllers"
         title={renderTitle(tType('button'))}
       >
-        {buttonControllers.map(({ name, icon, type, disabled }) => (
+        {buttonControllers.map(({ icon, type, disabled }) => (
           <Menu.Item key={type} icon={icon} disabled={disabled}>
             {tWt(type)}
           </Menu.Item>
@@ -178,13 +177,9 @@ export const AddControlBtn: React.FC<AddControlBtnProps> = () => {
       placement="bottomLeft"
       trigger={['click']}
     >
-      <WithTipButton
-        icon={<ControlOutlined />}
-        tip={t('controller')}
-        boardId={boardId}
-        boardType={boardType}
-        label={showLabel ? '添加控制器' : ''}
-      />
+      <Tooltip title={t('controller')}>
+        <ToolbarButton icon={<ControlOutlined />} />
+      </Tooltip>
     </Dropdown>
   );
 };

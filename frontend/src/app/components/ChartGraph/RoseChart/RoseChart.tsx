@@ -27,7 +27,7 @@ class RoseChart extends BasicPieChart {
   constructor() {
     super({
       id: 'rose-chart',
-      name: '玫瑰图',
+      name: 'viz.palette.graph.names.roseChart',
       icon: 'fsux_tubiao_nandingmeiguitu',
     });
   }

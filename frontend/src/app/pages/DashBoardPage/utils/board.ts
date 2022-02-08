@@ -22,17 +22,20 @@ import {
   Dashboard,
   DashboardConfig,
   DataChart,
+  DeviceType,
   ServerDashboard,
   ServerDatachart,
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { View } from "app/types/View";
 import { ChartDataView } from 'app/types/ChartDataView';
+import { View } from 'app/types/View';
 import { transformMeta } from 'app/utils/chartHelper';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
-  LAYOUT_COLS,
+  LAYOUT_COLS_MAP,
+  MIN_MARGIN,
+  MIN_PADDING,
   NeedFetchWidgetTypes,
 } from '../constants';
 
@@ -136,11 +139,12 @@ export const getInitBoardInfo = (obj: {
       type: 'add',
       widgetId: '',
     },
+    deviceType: DeviceType.Desktop,
     needFetchItems: [],
     hasFetchItems: [],
     boardWidthHeight: [0, 0],
     originControllerWidgets: obj.controllerWidgets || [],
-  };
+  }; 
   return boardInfo;
 };
 
@@ -152,20 +156,21 @@ export const getInitBoardConfig = (boardType: BoardType) => {
       boxShadow: false,
     },
     maxWidgetIndex: 0,
+    initialQuery: true,
+    hasQueryControl: false,
+    hasResetControl: false,
+    // auto
+    margin: [16, 16], //0-100
+    containerPadding: [16, 16], //0-100
+    cols: LAYOUT_COLS_MAP, //2-48    step 2
+    mobileMargin: [MIN_MARGIN, MIN_MARGIN],
+    mobileContainerPadding: [MIN_PADDING, MIN_PADDING],
     // free
     type: boardType,
     width: 1920,
     height: 1080,
     gridStep: [10, 10],
     scaleMode: 'scaleWidth',
-    // auto
-    margin: [16, 16], //0-100
-    containerPadding: [16, 16], //0-100
-    rowHeight: 32, //20-200
-    cols: LAYOUT_COLS, //2-48    step 2
-    initialQuery: true,
-    hasQueryControl: false,
-    hasResetControl: false,
   };
   return dashboardConfig;
 };

@@ -7,6 +7,7 @@ import SingleColorSelection from './SingleColorSelection';
 interface ColorPickerPopoverProps {
   popoverProps?: PopoverProps;
   defaultValue?: string;
+  size?: number;
   onSubmit?: (color) => void;
   onChange?: (color) => void;
   colorPickerClass?: string;
@@ -15,6 +16,7 @@ interface ColorPickerPopoverProps {
 export const ColorPickerPopover: FC<ColorPickerPopoverProps> = ({
   children,
   defaultValue,
+  size,
   popoverProps,
   onSubmit,
   onChange,
@@ -47,7 +49,11 @@ export const ColorPickerPopover: FC<ColorPickerPopoverProps> = ({
       placement="right"
     >
       {children || (
-        <ColorPicker color={defaultValue} className={colorPickerClass} />
+        <ColorPicker
+          color={defaultValue}
+          size={size}
+          className={colorPickerClass}
+        />
       )}
     </Popover>
   );

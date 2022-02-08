@@ -334,13 +334,15 @@ export function SourceDetailPage() {
           actions={
             !isArchived ? (
               <>
-                <Button
-                  disabled={!allowEnableView}
-                  type="primary"
-                  onClick={addNewView}
-                >
-                  {t('creatView')}
-                </Button>
+                {allowEnableView && (
+                  <Button
+                    disabled={!(formType === CommonFormTypes.Edit)}
+                    type="primary"
+                    onClick={addNewView}
+                  >
+                    {t('creatView')}
+                  </Button>
+                )}
                 <Button
                   type="primary"
                   loading={saveSourceLoading}
@@ -409,7 +411,7 @@ export function SourceDetailPage() {
                       return request({
                         url: `/sources/check/name`,
                         method: 'POST',
-                        params: { name: value, orgId },
+                        data: { name: value, orgId },
                       }).then(
                         () => Promise.resolve(),
                         err =>

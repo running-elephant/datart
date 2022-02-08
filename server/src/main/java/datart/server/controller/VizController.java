@@ -47,8 +47,8 @@ public class VizController extends BaseController {
 
     @ApiOperation(value = "list viz folders")
     @PostMapping(value = "/check/name")
-    public ResponseData<Boolean> checkVizName(String orgId, String vizType, String name, String parentId) {
-        return ResponseData.success(vizService.checkName(orgId, name, parentId, ResourceType.valueOf(vizType)));
+    public ResponseData<Boolean> checkVizName(@Validated @RequestBody CheckNameParam param) {
+        return ResponseData.success(vizService.checkName(param.getOrgId(), param.getName(), param.getParentId(), ResourceType.valueOf(param.getVizType())));
     }
 
     @ApiOperation(value = "list viz folders")

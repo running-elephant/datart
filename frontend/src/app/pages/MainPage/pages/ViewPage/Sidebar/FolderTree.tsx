@@ -26,8 +26,12 @@ import {
 import { Menu, message, Popconfirm, TreeDataNode } from 'antd';
 import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { CascadeAccess, useAccess } from 'app/pages/MainPage/Access';
-import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
+import { getCascadeAccess, useAccess } from 'app/pages/MainPage/Access';
+import {
+  selectIsOrgOwner,
+  selectOrgId,
+  selectPermissionMap,
+} from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
 import React, { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -65,6 +69,8 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
   const currentEditingViewKey = useSelector(selectCurrentEditingViewKey);
   const orgId = useSelector(selectOrgId);
   const viewsData = useSelector(selectViews);
+  const isOwner = useSelector(selectIsOrgOwner);
+  const permissionMap = useSelector(selectPermissionMap);
   const t = useI18NPrefix('view');
   const tg = useI18NPrefix('global');
   const saveAsView = useSaveAsView();
@@ -165,14 +171,17 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
   const renderTreeTitle = useCallback(
     node => {
       const { title, path, isFolder, id } = node;
+      const isAuthorized = getCascadeAccess(
+        isOwner,
+        permissionMap,
+        ResourceTypes.View,
+        path,
+        PermissionLevels.Manage,
+      );
       return (
         <TreeTitle>
           <h4>{`${title}`}</h4>
-          <CascadeAccess
-            module={ResourceTypes.View}
-            path={path}
-            level={PermissionLevels.Manage}
-          >
+          {isAuthorized || allowEnableViz ? (
             <Popup
               trigger={['click']}
               placement="bottom"
@@ -182,14 +191,16 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                   selectable={false}
                   onClick={moreMenuClick(node)}
                 >
-                  <MenuListItem
-                    key="info"
-                    prefix={<EditOutlined className="icon" />}
-                  >
-                    {tg('button.info')}
-                  </MenuListItem>
+                  {isAuthorized && (
+                    <MenuListItem
+                      key="info"
+                      prefix={<EditOutlined className="icon" />}
+                    >
+                      {tg('button.info')}
+                    </MenuListItem>
+                  )}
 
-                  {!isFolder && (
+                  {isAuthorized && !isFolder && (
                     <MenuListItem
                       key="saveAs"
                       prefix={<CopyFilled className="icon" />}
@@ -198,7 +209,7 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                     </MenuListItem>
                   )}
 
-                  {allowEnableViz && (
+                  {allowEnableViz && !isFolder && (
                     <MenuListItem
                       prefix={<MonitorOutlined className="icon" />}
                       key="startAnalysis"
@@ -207,21 +218,23 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                     </MenuListItem>
                   )}
 
-                  <MenuListItem
-                    key="delete"
-                    prefix={<DeleteOutlined className="icon" />}
-                  >
-                    <Popconfirm
-                      title={
-                        isFolder
-                          ? tg('operation.deleteConfirm')
-                          : tg('operation.archiveConfirm')
-                      }
-                      onConfirm={archive(id, isFolder)}
+                  {isAuthorized && (
+                    <MenuListItem
+                      key="delete"
+                      prefix={<DeleteOutlined className="icon" />}
                     >
-                      {isFolder ? tg('button.delete') : tg('button.archive')}
-                    </Popconfirm>
-                  </MenuListItem>
+                      <Popconfirm
+                        title={
+                          isFolder
+                            ? tg('operation.deleteConfirm')
+                            : tg('operation.archiveConfirm')
+                        }
+                        onConfirm={archive(id, isFolder)}
+                      >
+                        {isFolder ? tg('button.delete') : tg('button.archive')}
+                      </Popconfirm>
+                    </MenuListItem>
+                  )}
                 </Menu>
               }
             >
@@ -229,7 +242,9 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                 <MoreOutlined />
               </span>
             </Popup>
-          </CascadeAccess>
+          ) : (
+            ''
+          )}
         </TreeTitle>
       );
     },

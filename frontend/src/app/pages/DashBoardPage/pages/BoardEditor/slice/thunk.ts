@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
+  ChartWidgetContent,
   ContainerWidgetContent,
   ControllerWidgetContent,
   DataChart,
@@ -76,6 +77,7 @@ export const getEditBoardDetail = createAsyncThunk<
         editBoard: HistoryEditBoard;
       },
     );
+
     if (editDashboard?.id === dashboardId) {
       return null;
     }
@@ -391,12 +393,13 @@ export const pasteWidgets = createAsyncThunk(
             }
           });
         } else if (newWidget.config.type === 'chart') {
-          // #issues 588
+          // #issue #588
           let dataChart = dataChartMap[newWidget.datachartId];
           const newDataChart: DataChart = CloneValueDeep({
             ...dataChart,
             id: dataChart.id + Date.now() + '_copy',
           });
+          (newWidget.config.content as ChartWidgetContent).type = 'widgetChart';
           newWidget.datachartId = newDataChart.id;
           dispatch(boardActions.setDataChartToMap([newDataChart]));
         }
@@ -418,6 +421,7 @@ export const pasteWidgets = createAsyncThunk(
       newWidget.parentId = pId || '';
       newWidget.relations = [];
       newWidget.config.name += '_copy';
+
       delete newWidget.selectedCopy;
       return newWidget as Widget;
     }

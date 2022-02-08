@@ -1,4 +1,3 @@
-import { PageInfo } from '../pages/MainPage/pages/ViewPage/slice/types';
 /**
  * Datart
  *
@@ -16,30 +15,5 @@ import { PageInfo } from '../pages/MainPage/pages/ViewPage/slice/types';
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-class ChartDataset {
-  id?: string;
-  name?: string;
-  columns?: ChartDatasetMeta[];
-  rows?: string[][];
-  pageInfo?: ChartDatasetPageInfo;
-  script?: string;
-
-  constructor(id, name) {
-    this.id = id;
-    this.name = name;
-    this.columns = [];
-    this.rows = [];
-    this.pageInfo = {};
-  }
-}
-
-export type ChartDatasetPageInfo = Partial<PageInfo>;
-
-export type ChartDatasetMeta = {
-  name?: string;
-  type?: string;
-  primaryKey?: boolean;
-};
-
-export default ChartDataset;
+import DeviceList from './DeviceList';
+export default DeviceList;

@@ -21,7 +21,7 @@ import { ChartConfig } from 'app/types/ChartConfig';
 const config: ChartConfig = {
   datas: [
     {
-      label: 'datas.column',
+      label: 'column',
       key: 'column',
       type: 'group',
       options: {
@@ -29,7 +29,7 @@ const config: ChartConfig = {
       },
     },
     {
-      label: 'datas.row',
+      label: 'row',
       key: 'row',
       type: 'group',
       options: {
@@ -245,12 +245,12 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'paging.title',
+      label: 'viz.palette.setting.paging.title',
       key: 'paging',
       comType: 'group',
       rows: [
         {
-          label: 'paging.pageSize',
+          label: 'viz.palette.setting.paging.pageSize',
           key: 'pageSize',
           default: 1000,
           comType: 'inputNumber',
@@ -310,10 +310,6 @@ const config: ChartConfig = {
     {
       lang: 'zh-CN',
       translation: {
-        datas: {
-          row: '行',
-          column: '列',
-        },
         style: {
           title: '表格样式',
           enableExpandRow: '行表头折叠',
@@ -350,10 +346,6 @@ const config: ChartConfig = {
     {
       lang: 'en-US',
       translation: {
-        datas: {
-          row: 'Row',
-          column: 'Column',
-        },
         style: {
           title: 'Table Style',
           enableExpandRow: 'Fold Row',

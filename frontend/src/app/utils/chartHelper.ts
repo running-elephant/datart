@@ -17,6 +17,7 @@
  */
 
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
+import { ChartDataSet } from 'app/components/ChartGraph/models/ChartDataSet';
 import {
   AggregateFieldActionType,
   ChartConfig,
@@ -28,7 +29,11 @@ import {
   SortActionType,
 } from 'app/types/ChartConfig';
 import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
-import { ChartDatasetMeta } from 'app/types/ChartDataset';
+import {
+  ChartDatasetMeta,
+  IChartDataSet,
+  IChartDataSetRow,
+} from 'app/types/ChartDataSet';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { Debugger } from 'utils/debugger';
@@ -247,6 +252,29 @@ export function getReference(
   };
 }
 
+export function getReference2(
+  settingConfigs,
+  dataSetRows: IChartDataSetRow<string>[],
+  dataConfig,
+  isHorizionDisplay,
+) {
+  const referenceTabs = getSettingValue(
+    settingConfigs,
+    'reference.panel.configuration',
+    'rows',
+  );
+
+  return {
+    markLine: getMarkLine2(
+      referenceTabs,
+      dataSetRows,
+      dataConfig,
+      isHorizionDisplay,
+    ),
+    markArea: getMarkArea2(referenceTabs, dataSetRows, isHorizionDisplay),
+  };
+}
+
 function getMarkLine(refTabs, dataColumns, dataConfig, isHorizionDisplay) {
   const markLineData = refTabs
     ?.reduce((acc, cur) => {
@@ -324,6 +352,155 @@ function getMarkLineData(
       ...font,
     },
     lineStyle,
+  };
+}
+
+function getMarkLine2(
+  refTabs,
+  dataSetRows: IChartDataSetRow<string>[],
+  dataConfig,
+  isHorizionDisplay,
+) {
+  const markLineData = refTabs
+    ?.reduce((acc, cur) => {
+      const markLineConfigs = cur?.rows?.filter(r => r.key === 'markLine');
+      acc.push(...markLineConfigs);
+      return acc;
+    }, [])
+    .map(ml => {
+      return getMarkLineData2(
+        ml,
+        dataSetRows,
+        'valueType',
+        'constantValue',
+        'metric',
+        dataConfig,
+        isHorizionDisplay,
+      );
+    })
+    .filter(Boolean);
+
+  return {
+    data: markLineData,
+  };
+}
+
+function getMarkLineData2(
+  mark,
+  dataSetRows: IChartDataSetRow<string>[],
+  valueTypeKey,
+  constantValueKey,
+  metricKey,
+  dataConfig,
+  isHorizionDisplay,
+) {
+  const name = mark.label;
+  const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
+  const show = getSettingValue(mark.rows, 'showLabel', 'value');
+  const enableMarkLine = getSettingValue(mark.rows, 'enableMarkLine', 'value');
+  const position = getSettingValue(mark.rows, 'position', 'value');
+  const font = getSettingValue(mark.rows, 'font', 'value');
+  const lineStyle = getSettingValue(mark.rows, 'lineStyle', 'value');
+  const valueType = getSettingValue(mark.rows, valueTypeKey, 'value');
+  const metricUid = getSettingValue(mark.rows, metricKey, 'value');
+
+  const metricDatas =
+    dataConfig.uid === metricUid
+      ? dataSetRows.map(d => +d.getCell(dataConfig))
+      : [];
+  const constantValue = getSettingValue(mark.rows, constantValueKey, 'value');
+  let yAxis = 0;
+  switch (valueType) {
+    case 'constant':
+      yAxis = constantValue;
+      break;
+    case 'average':
+      yAxis = meanValue(metricDatas);
+      break;
+    case 'max':
+      yAxis = Math.max(...metricDatas);
+      break;
+    case 'min':
+      yAxis = Math.min(...metricDatas);
+      break;
+  }
+
+  if (!enableMarkLine) {
+    return null;
+  }
+
+  return {
+    [valueKey]: yAxis,
+    name,
+    label: {
+      show,
+      position,
+      ...font,
+    },
+    lineStyle,
+  };
+}
+
+function getMarkAreaData2(
+  mark,
+  dataSetRows: IChartDataSetRow<string>[],
+  valueTypeKey,
+  constantValueKey,
+  metricKey,
+  isHorizionDisplay,
+) {
+  const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
+  const show = getSettingValue(mark.rows, 'showLabel', 'value');
+  const enableMarkArea = getSettingValue(mark.rows, 'enableMarkArea', 'value');
+  const position = getSettingValue(mark.rows, 'position', 'value');
+  const font = getSettingValue(mark.rows, 'font', 'value');
+  const borderStyle = getSettingValue(mark.rows, 'borderStyle', 'value');
+  const opacity = getSettingValue(mark.rows, 'opacity', 'value');
+  const backgroundColor = getSettingValue(
+    mark.rows,
+    'backgroundColor',
+    'value',
+  );
+  const name = mark.value;
+  const valueType = getSettingValue(mark.rows, valueTypeKey, 'value');
+  const metric = getSettingValue(mark.rows, metricKey, 'value');
+  const metricDatas = dataSetRows.map(d => +d.getCellByKey(metric));
+  const constantValue = getSettingValue(mark.rows, constantValueKey, 'value');
+  let yAxis = 0;
+  switch (valueType) {
+    case 'constant':
+      yAxis = constantValue;
+      break;
+    case 'average':
+      yAxis = meanValue(metricDatas);
+      break;
+    case 'max':
+      yAxis = Math.max(...metricDatas);
+      break;
+    case 'min':
+      yAxis = Math.min(...metricDatas);
+      break;
+  }
+
+  if (!enableMarkArea) {
+    return null;
+  }
+
+  return {
+    [valueKey]: yAxis,
+    name,
+    label: {
+      show,
+      position,
+      ...font,
+    },
+    itemStyle: {
+      opacity,
+      color: backgroundColor,
+      borderColor: borderStyle.color,
+      borderWidth: borderStyle.width,
+      borderType: borderStyle.type,
+    },
   };
 }
 
@@ -417,6 +594,37 @@ function getMarkArea(refTabs, dataColumns, isHorizionDisplay) {
   };
 }
 
+function getMarkArea2(
+  refTabs,
+  dataSetRows: IChartDataSetRow<string>[],
+  isHorizionDisplay,
+) {
+  const refAreas = refTabs?.reduce((acc, cur) => {
+    const markLineConfigs = cur?.rows?.filter(r => r.key === 'markArea');
+    acc.push(...markLineConfigs);
+    return acc;
+  }, []);
+  return {
+    data: refAreas
+      ?.map(mark => {
+        const markAreaData = ['start', 'end']
+          .map(prefix => {
+            return getMarkAreaData2(
+              mark,
+              dataSetRows,
+              `${prefix}ValueType`,
+              `${prefix}ConstantValue`,
+              `${prefix}Metric`,
+              isHorizionDisplay,
+            );
+          })
+          .filter(Boolean);
+        return markAreaData;
+      })
+      .filter(m => Boolean(m?.length)),
+  };
+}
+
 export function getAxisLine(show, lineStyle) {
   return {
     show,
@@ -460,6 +668,36 @@ export function getNameTextStyle(fontFamily, fontSize, color) {
   };
 }
 
+/**
+ * Create ChartDataSet Model with sorted values
+ * @export
+ * @template T
+ * @param {T[][]} [datas]
+ * @param {ChartDatasetMeta[]} [metas]
+ * @param {ChartDataConfig[]} [sortedConfigs]
+ * @return {*}  {IChartDataSet<T>}
+ */
+export function transformToDataSet<T>(
+  datas?: T[][],
+  metas?: ChartDatasetMeta[],
+  sortedConfigs?: ChartDataConfig[],
+): IChartDataSet<T> {
+  const ds = new ChartDataSet(datas || [], metas || []);
+  ds.sortBy(sortedConfigs || []);
+  return ds;
+}
+
+/**
+ * @deprecated shoule use DataSet model, @see {@link transformToDataSet}
+ * @description
+ * Support:
+ *  1. Case Insensitive to get value
+ *  2. More util helper
+ * @export
+ * @param {string[][]} [columns]
+ * @param {ChartDatasetMeta[]} [metas]
+ * @return {*}
+ */
 export function transformToObjectArray(
   columns?: string[][],
   metas?: ChartDatasetMeta[],
@@ -473,9 +711,7 @@ export function transformToObjectArray(
     () => {
       const result: any[] = Array.apply(null, Array(columns.length));
       for (let j = 0, outterLength = result.length; j < outterLength; j++) {
-        let objCol = {
-          id: j + 1,
-        };
+        let objCol: any = {};
         for (let i = 0, innerLength = metas.length; i < innerLength; i++) {
           const key = metas?.[i]?.name;
           if (!!key) {
@@ -675,6 +911,21 @@ export function getDataColumnMaxAndMin(
   return { min, max };
 }
 
+export function getDataColumnMaxAndMin2(
+  chartDataSetRows: IChartDataSetRow<string>[],
+  config?: ChartDataSectionField,
+) {
+  if (!config || !chartDataSetRows?.length) {
+    return { min: 0, max: 100 };
+  }
+  const datas = (chartDataSetRows || []).map(row =>
+    Number(row.getCell(config)),
+  );
+  const min = Number.isNaN(Math.min(...datas)) ? 0 : Math.min(...datas);
+  const max = Number.isNaN(Math.max(...datas)) ? 100 : Math.max(...datas);
+  return { min, max };
+}
+
 export function getSeriesTooltips4Scatter(
   params,
   tooltipItemConfigs,
@@ -812,14 +1063,14 @@ export function getExtraSeriesDataFormat(format?: IFieldFormatConfig) {
 }
 
 export function getColorizeGroupSeriesColumns(
-  dataColumns: any[],
+  chartDataSet: IChartDataSet<string>,
   groupByKey: string,
   xAxisColumnName: string,
   aggregateKeys: string[],
   infoColumnNames: string[],
 ) {
-  const groupedDataColumnObject = dataColumns.reduce((acc, cur) => {
-    const colKey = cur[groupByKey] || 'defaultGroupKey';
+  const groupedDataColumnObject = chartDataSet?.reduce((acc, cur) => {
+    const colKey = cur.getCellByKey(groupByKey) || 'defaultGroupKey';
 
     if (!acc[colKey]) {
       acc[colKey] = [];
@@ -829,7 +1080,7 @@ export function getColorizeGroupSeriesColumns(
       .concat(infoColumnNames || [])
       .concat([groupByKey])
       .reduce((a, k) => {
-        a[k] = cur[k];
+        a[k] = cur.getCellByKey(k);
         return a;
       }, {});
     acc[colKey].push(value);
