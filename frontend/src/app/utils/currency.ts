@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 import { AUD, CAD, CNY, EUR, GBP, JPY, USD } from '@dinero.js/currencies';
-import { toFormat } from 'dinero.js';
 import { Currency } from 'types';
 
 export const CURRENCIES: Currency<number>[] = [
@@ -28,37 +27,3 @@ export const CURRENCIES: Currency<number>[] = [
   JPY,
   CAD,
 ];
-
-export function getCurrency(
-  currencyCode?: string,
-  option = {},
-): Currency<number> {
-  if (!currencyCode) {
-    return USD;
-  }
-  return Object.assign(
-    {},
-    CURRENCIES.find(c => c.code === currencyCode) || USD,
-    option,
-  );
-}
-
-export function intlFormat(
-  dineroObject,
-  locale,
-  options = { fractionDigits: null },
-) {
-  function transformer({ amount, currency }) {
-    return amount.toLocaleString(locale, {
-      ...options,
-      ...{
-        maximumFractionDigits: options?.fractionDigits,
-        minimumFractionDigits: options?.fractionDigits,
-      },
-      style: 'currency',
-      currency: currency.code,
-    });
-  }
-
-  return toFormat(dineroObject, transformer);
-}
