@@ -31,7 +31,8 @@ import { getDefaultWidgetName } from 'app/pages/DashBoardPage/utils';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import produce from 'immer';
 import { Layout } from 'react-grid-layout';
-import { createSlice } from 'utils/@reduxjs/toolkit';
+import { createSlice, isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
+import { rejectedActionMessageHandler } from 'utils/notification';
 import { EditBoardStack } from '../types';
 
 export type updateWidgetConf = {
@@ -246,5 +247,11 @@ export const editBoardStackSlice = createSlice({
       const { id, mediaWidgetConfig } = action.payload;
       state.widgetRecord[id].config.content = mediaWidgetConfig;
     },
+  },
+  extraReducers: builder => {
+    builder.addMatcher(
+      isMySliceRejectedAction(editBoardStackSlice.name),
+      rejectedActionMessageHandler,
+    );
   },
 });
