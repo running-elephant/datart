@@ -224,25 +224,6 @@ export const VariableForm = memo(
           css={`
             margin-bottom: ${SPACE_XS};
           `}
-          rules={[
-            ({ getFieldValue }) => {
-              return {
-                validator(_, value?: any[]) {
-                  if (
-                    getFieldValue('type') === VariableTypes.Query &&
-                    !value?.length
-                  ) {
-                    return Promise.reject(
-                      new Error(
-                        `${t('defaultValue')}${tg('validation.required')}`,
-                      ),
-                    );
-                  }
-                  return Promise.resolve();
-                },
-              };
-            },
-          ]}
         >
           <DefaultValue type={valueType} expression={expression} />
         </Form.Item>
