@@ -17,14 +17,12 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataSetDTO from 'app/types/ChartDataSet';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
-  getCustomSortableColumns,
   getGridStyle,
   getStyles,
-  getValueByColumnKey,
-  transformToObjectArray,
+  transformToDataSet,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
@@ -91,16 +89,15 @@ class WaterfallChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
 
-    const objDataColumns = transformToObjectArray(
+    const chartDataSet = transformToDataSet(
       dataset.rows,
       dataset.columns,
+      dataConfigs,
     );
-
-    const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
 
     const series = this.getSeries(
       styleConfigs,
-      dataColumns,
+      chartDataSet,
       aggregateConfigs,
       groupConfigs,
     );
@@ -117,11 +114,16 @@ class WaterfallChart extends Chart {
     return width;
   }
 
-  private getSeries(styles, dataColumns, aggregateConfigs, group) {
+  private getSeries(
+    styles,
+    chartDataSet: IChartDataSet<string>,
+    aggregateConfigs,
+    group,
+  ) {
     const xAxisColumns = {
       type: 'category',
       tooltip: { show: true },
-      data: UniqArray(dataColumns.map(dc => dc[getValueByColumnKey(group[0])])),
+      data: UniqArray(chartDataSet.map(dc => dc.getCell(group[0]))),
     };
     const yAxisNames = aggregateConfigs.map(getColumnRenderName);
     const [isIncrement, ascendColor, descendColor] = getStyles(
@@ -131,9 +133,7 @@ class WaterfallChart extends Chart {
     );
     const label = this.getLabel(styles, aggregateConfigs[0].format);
 
-    const dataList = dataColumns.map(
-      dc => dc[getValueByColumnKey(aggregateConfigs[0])],
-    );
+    const dataList = chartDataSet.map(dc => dc.getCell(aggregateConfigs[0]));
 
     const { baseData, ascendOrder, descendOrder } = this.getDataList(
       isIncrement,
