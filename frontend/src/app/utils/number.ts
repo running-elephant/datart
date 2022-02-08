@@ -17,12 +17,10 @@
  */
 
 import { FieldFormatType, IFieldFormatConfig } from 'app/types/ChartConfig';
-import { dinero } from 'dinero.js';
 import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
 import isFinite from 'lodash/isFinite';
 import moment from 'moment';
 import { isEmpty, pipe } from 'utils/object';
-import { getCurrency, intlFormat } from './currency';
 
 export function toPrecision(value: any, precision: number) {
   if (isNaN(+value)) {
@@ -220,35 +218,16 @@ function currencyFormater(
     return value;
   }
 
-  try {
-    if (!Number.isInteger(+value)) {
-      return value;
-    }
-    let fractionDigits;
-    if (
-      !isEmpty(config?.decimalPlaces) &&
-      +config?.decimalPlaces! >= 0 &&
-      +config?.decimalPlaces! <= 20
-    ) {
-      fractionDigits = config?.decimalPlaces!;
-    }
-    const realUnit = NumericUnitDescriptions.get(config?.unitKey!)?.[0] || 1;
-    const exponent = Math.log10(realUnit);
-    const dineroValue = dinero({
-      amount: +value,
-      currency: getCurrency(config?.currency),
-      scale: exponent,
-    });
+  const realUnit = NumericUnitDescriptions.get(config?.unitKey!)?.[0] || 1;
 
-    const valueWithCurrency = [
-      intlFormat(dineroValue, 'zh-CN', { fractionDigits }),
-      NumericUnitDescriptions.get(config?.unitKey || NumberUnitKey.None)?.[1],
-    ].join('');
-    return valueWithCurrency;
-  } catch (error) {
-    console.error('Currency Formater Error: ', error);
-    return value;
-  }
+  return `${new Intl.NumberFormat('zh-CN', {
+    style: 'currency',
+    currency: config?.currency || 'CNY',
+    minimumFractionDigits: config?.decimalPlaces,
+    useGrouping: config?.useThousandSeparator,
+  }).format(value / realUnit)} ${
+    NumericUnitDescriptions.get(config?.unitKey || NumberUnitKey.None)?.[1]
+  }`;
 }
 
 function percentageFormater(
