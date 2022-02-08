@@ -17,16 +17,16 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataSetDTO from 'app/types/ChartDataSet';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
-  getDataColumnMaxAndMin,
+  getDataColumnMaxAndMin2,
   getExtraSeriesRowData,
   getScatterSymbolSizeFn,
   getSeriesTooltips4Polar2,
   getStyles,
-  getValueByColumnKey,
-  transformToObjectArray,
+  transformToDataSet,
 } from 'app/utils/chartHelper';
+import { toFormattedValue } from 'app/utils/number';
 import { init, registerMap } from 'echarts';
 import Chart from '../models/Chart';
 import Config from './config';
@@ -110,29 +110,30 @@ class BasicOutlineMapChart extends Chart {
 
     this.registerGeoMap(styleConfigs);
 
-    const objDataColumns = transformToObjectArray(
+    const chartDataSet = transformToDataSet(
       dataset.rows,
       dataset.columns,
+      dataConfigs,
     );
 
     return {
       geo: this.getGeoInfo(styleConfigs),
       visualMap: this.getVisualMap(
-        objDataColumns,
+        chartDataSet,
         groupConfigs,
         aggregateConfigs,
         sizeConfigs,
         styleConfigs,
       ),
       series: this.getGeoSeries(
-        objDataColumns,
+        chartDataSet,
         groupConfigs,
         aggregateConfigs,
         sizeConfigs,
         styleConfigs,
       ).concat(
         this.getMetricAndSizeSeries(
-          objDataColumns,
+          chartDataSet,
           groupConfigs,
           aggregateConfigs,
           sizeConfigs,
@@ -140,6 +141,7 @@ class BasicOutlineMapChart extends Chart {
         ) as any,
       ),
       tooltip: this.getTooltip(
+        chartDataSet,
         styleConfigs,
         groupConfigs,
         aggregateConfigs,
@@ -205,7 +207,7 @@ class BasicOutlineMapChart extends Chart {
   }
 
   protected getGeoSeries(
-    objDataColumns,
+    chartDataSet: IChartDataSet<string>,
     groupConfigs,
     aggregateConfigs,
     sizeConfigs,
@@ -228,14 +230,12 @@ class BasicOutlineMapChart extends Chart {
             show: true,
           },
         },
-        data: objDataColumns
+        data: chartDataSet
           ?.map(row => {
             return {
               ...getExtraSeriesRowData(row),
-              name: this.mappingGeoName(
-                row[getValueByColumnKey(groupConfigs[0])],
-              ),
-              value: row[getValueByColumnKey(aggregateConfigs[0])],
+              name: this.mappingGeoName(row.getCell(groupConfigs[0])),
+              value: row.getCell(aggregateConfigs[0]),
               visualMap: show,
             };
           })
@@ -245,7 +245,7 @@ class BasicOutlineMapChart extends Chart {
   }
 
   protected getMetricAndSizeSeries(
-    objDataColumns,
+    chartDataSet,
     groupConfigs,
     aggregateConfigs,
     sizeConfigs,
@@ -257,7 +257,7 @@ class BasicOutlineMapChart extends Chart {
 
     const [showLabel] = getStyles(styleConfigs, ['label'], ['showLabel']);
     const [cycleRatio] = getStyles(styleConfigs, ['map'], ['cycleRatio']);
-    const { min, max } = getDataColumnMaxAndMin(objDataColumns, sizeConfigs[0]);
+    const { min, max } = getDataColumnMaxAndMin2(chartDataSet, sizeConfigs[0]);
     const defaultSizeValue = max - min;
     const defaultColorValue = 1;
 
@@ -267,18 +267,15 @@ class BasicOutlineMapChart extends Chart {
         zlevel: 2,
         coordinateSystem: 'geo',
         symbol: 'circle',
-        data: objDataColumns
+        data: chartDataSet
           ?.map(row => {
             return {
               ...getExtraSeriesRowData(row),
-              name: this.mappingGeoName(
-                row[getValueByColumnKey(groupConfigs[0])],
-              ),
+              name: this.mappingGeoName(row.getCell(groupConfigs[0])),
               value: this.mappingGeoCoordination(
-                row[getValueByColumnKey(groupConfigs[0])],
-                row[getValueByColumnKey(aggregateConfigs[0])] ||
-                  defaultColorValue,
-                row[getValueByColumnKey(sizeConfigs[0])] || defaultSizeValue,
+                row.getCell(groupConfigs[0]),
+                row.getCell(aggregateConfigs[0]) || defaultColorValue,
+                row.getCell(sizeConfigs[0]) || defaultSizeValue,
               ),
             };
           })
@@ -299,6 +296,7 @@ class BasicOutlineMapChart extends Chart {
   }
 
   protected getTooltip(
+    chartDataSet: IChartDataSet<string>,
     styleConfigs,
     groupConfigs,
     aggregateConfigs,
@@ -312,9 +310,9 @@ class BasicOutlineMapChart extends Chart {
           return seriesParams.name;
         }
         return getSeriesTooltips4Polar2(
+          chartDataSet,
           seriesParams,
           groupConfigs,
-          [],
           aggregateConfigs,
           infoConfigs,
           sizeConfigs,
@@ -339,7 +337,7 @@ class BasicOutlineMapChart extends Chart {
   }
 
   protected getVisualMap(
-    objDataColumns,
+    chartDataSet: IChartDataSet<string>,
     groupConfigs,
     aggregateConfigs,
     sizeConfigs,
@@ -354,18 +352,17 @@ class BasicOutlineMapChart extends Chart {
       return [];
     }
 
-    const { min, max } = getDataColumnMaxAndMin(
-      objDataColumns,
+    const { min, max } = getDataColumnMaxAndMin2(
+      chartDataSet,
       aggregateConfigs?.[0],
     );
-
+    const format = aggregateConfigs?.[0]?.format;
     const inRange = {
       color: [
         aggregateConfigs?.[0]?.color?.start || '#1B9AEE',
         aggregateConfigs?.[0]?.color?.end || '#FA8C15',
       ],
     };
-
     return [
       {
         type: 'continuous',
@@ -377,11 +374,14 @@ class BasicOutlineMapChart extends Chart {
         itemWidth,
         itemHeight,
         inRange,
-        text: [max, min],
+        text: [toFormattedValue(max, format), toFormattedValue(min, format)],
         min,
         max,
         textStyle: {
           ...font,
+        },
+        formatter: value => {
+          return toFormattedValue(value, format);
         },
       },
     ];
