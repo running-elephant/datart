@@ -21,7 +21,7 @@ import {
   ChartDataSectionField,
   ChartDataSectionType,
 } from 'app/types/ChartConfig';
-import ChartDataSetDTO from 'app/types/ChartDataSet';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getExtraSeriesDataFormat,
@@ -29,8 +29,7 @@ import {
   getGridStyle,
   getSeriesTooltips4Scatter,
   getStyles,
-  getValueByColumnKey,
-  transformToObjectArray,
+  transformToDataSet,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
@@ -104,22 +103,23 @@ class BasicFunnelChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
-    const objDataColumns = transformToObjectArray(
+    const chartDataSet = transformToDataSet(
       dataset.rows,
       dataset.columns,
+      dataConfigs,
     );
     const dataList = !groupConfigs.length
-      ? objDataColumns
-      : objDataColumns?.sort(
+      ? chartDataSet
+      : chartDataSet?.sort(
           (a, b) =>
-            b?.[getValueByColumnKey(aggregateConfigs[0])] -
-            a?.[getValueByColumnKey(aggregateConfigs[0])],
+            (b?.getCell(aggregateConfigs[0]) as any) -
+            (a?.getCell(aggregateConfigs[0]) as any),
         );
     const aggregateList = !groupConfigs.length
       ? aggregateConfigs?.sort(
           (a, b) =>
-            objDataColumns?.[0]?.[getValueByColumnKey(b)] -
-            objDataColumns?.[0]?.[getValueByColumnKey(a)],
+            (chartDataSet?.[0]?.getCell(b) as any) -
+            (chartDataSet?.[0]?.getCell(a) as any),
         )
       : aggregateConfigs;
 
@@ -145,12 +145,12 @@ class BasicFunnelChart extends Chart {
   private getDataItemStyle(
     config,
     colorConfigs: ChartDataSectionField[],
-    dataColumn,
+    chartDataSetRow,
   ) {
-    const colorColName = colorConfigs?.[0]?.colName;
+    const colorColConfig = colorConfigs?.[0];
     const columnColor = config?.color?.start;
-    if (colorColName) {
-      const colorKey = dataColumn[colorColName];
+    if (colorColConfig) {
+      const colorKey = chartDataSetRow.getCell(colorColConfig);
       const itemStyleColor = colorConfigs[0]?.color?.colors?.find(
         c => c.key === colorKey,
       );
@@ -248,7 +248,7 @@ class BasicFunnelChart extends Chart {
     styles,
     aggregateConfigs: ChartDataSectionField[],
     groupConfigs: ChartDataSectionField[],
-    objDataColumns,
+    dataList: IChartDataSet<string>,
     infoConfigs,
   ) {
     const [selectAll] = getStyles(styles, ['legend'], ['selectAll']);
@@ -259,14 +259,14 @@ class BasicFunnelChart extends Chart {
     );
 
     if (!groupConfigs.length) {
-      const dc = objDataColumns?.[0];
+      const dc = dataList?.[0];
       const datas = aggregateConfigs.map(aggConfig => {
         return {
           ...aggConfig,
           select: selectAll,
           value: [aggConfig]
             .concat(infoConfigs)
-            .map(config => dc?.[getValueByColumnKey(config)]),
+            .map(config => dc?.getCell(config)),
           name: getColumnRenderName(aggConfig),
           itemStyle: this.getDataItemStyle(aggConfig, groupConfigs, dc),
           ...getExtraSeriesRowData(dc),
@@ -298,17 +298,14 @@ class BasicFunnelChart extends Chart {
     }
 
     const flattenedDatas = aggregateConfigs.flatMap(aggConfig => {
-      const ormalizeSerieDatas = objDataColumns.map(dc => {
+      const ormalizeSerieDatas = dataList.map(dc => {
         return {
           ...aggConfig,
           select: selectAll,
           value: aggregateConfigs
             .concat(infoConfigs)
-            .map(config => dc?.[getValueByColumnKey(config)]),
-          name: groupConfigs
-            .map(config => config.colName)
-            .map(name => dc[name])
-            .join('-'),
+            .map(config => dc?.getCell(config)),
+          name: groupConfigs.map(config => dc.getCell(config)).join('-'),
           itemStyle: this.getDataItemStyle(aggConfig, groupConfigs, dc),
           ...getExtraSeriesRowData(dc),
           ...getExtraSeriesDataFormat(aggConfig?.format),

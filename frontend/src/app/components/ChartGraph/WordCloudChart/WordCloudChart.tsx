@@ -21,8 +21,7 @@ import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getDefaultThemeColor,
   getStyles,
-  getValueByColumnKey,
-  transformToObjectArray,
+  transformToDataSet,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import 'echarts-wordcloud';
@@ -93,9 +92,10 @@ class WordCloudChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
 
-    const objDataColumns = transformToObjectArray(
+    const chartDataSet = transformToDataSet(
       dataset.rows,
       dataset.columns,
+      dataConfigs,
     );
     const wordCloud = this.getWordCloud(styleConfigs);
     const laber = this.getLaber(styleConfigs);
@@ -106,10 +106,10 @@ class WordCloudChart extends Chart {
           layoutAnimation: true,
           ...wordCloud,
           ...laber,
-          data: objDataColumns?.map(dc => {
+          data: chartDataSet?.map(dc => {
             return {
-              name: dc[groupConfigs[0].colName],
-              value: dc[getValueByColumnKey(aggregateConfigs[0])],
+              name: dc.getCell(groupConfigs[0]),
+              value: dc.getCell(aggregateConfigs[0]),
             };
           }),
         },
