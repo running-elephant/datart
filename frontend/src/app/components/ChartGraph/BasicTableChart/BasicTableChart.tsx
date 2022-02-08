@@ -24,7 +24,6 @@ import {
   getStyles,
   getUnusedHeaderRows,
   getValue,
-  getValueByColumnKey,
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
@@ -160,7 +159,6 @@ class BasicTableChart extends ReactChart {
       chartDataSet,
       context,
     );
-
     return {
       rowKey: 'id',
       pagination: tablePagination,
@@ -290,7 +288,7 @@ class BasicTableChart extends ReactChart {
           .map(c => c.key)
           .map((k, index) => {
             const currentSummaryField = aggregateFieldConfigs.find(
-              c => getValueByColumnKey(c) === k,
+              c => chartDataSet.getFieldKey(c) === k,
             );
             if (currentSummaryField) {
               const total = chartDataSet?.map((dc: any) =>
@@ -380,7 +378,7 @@ class BasicTableChart extends ReactChart {
 
     const maxContentByFields = mixedSectionConfigRows.map(c => {
       const header = this.findHeader(c.uid, tableHeaders);
-      const rowUniqKey = getValueByColumnKey(c);
+      const rowUniqKey = chartDataSet.getFieldKey(c);
 
       const [columnWidth, getUseColumnWidth] = getStyles(
         getAllColumnListInfo,
@@ -398,7 +396,7 @@ class BasicTableChart extends ReactChart {
         );
         const headerWidth = this.getTextWidth(
           context,
-          header?.label || getValueByColumnKey(c),
+          header?.label || chartDataSet.getFieldKey(c),
           headerFont?.fontWeight,
           headerFont?.fontSize,
           headerFont?.fontFamily,
@@ -621,7 +619,8 @@ class BasicTableChart extends ReactChart {
               .map(x => x.rowSpan)
               .reverse()
           : [];
-        const columnConfig = this.dataColumnWidths?.[getValueByColumnKey(c)];
+        const columnConfig =
+          this.dataColumnWidths?.[chartDataSet.getFieldKey(c)];
         const colMaxWidth =
           !this.exceedMaxContent &&
           Object.values<{ getUseColumnWidth: undefined | boolean }>(
@@ -661,7 +660,7 @@ class BasicTableChart extends ReactChart {
               cellValue,
               dataIndex: row.getFieldKey(c),
               ...this.registerTableCellEvents(
-                getValueByColumnKey(c),
+                row.getFieldKey(c),
                 cellValue,
                 rowIndex,
                 record,
@@ -683,7 +682,7 @@ class BasicTableChart extends ReactChart {
       return _getFixedColumns(columnList);
     };
 
-    const _getFlattenedColumns = tableHeader => {
+    const _getFlattenedColumns = (tableHeader, mixedSectionConfigRows) => {
       const list: any = [];
       const _getFlattenedChildren = tableHeaderStylesConfig => {
         if (tableHeaderStylesConfig.children?.length) {
@@ -691,25 +690,40 @@ class BasicTableChart extends ReactChart {
             _getFlattenedChildren(item),
           );
         } else {
-          list.push(tableHeaderStylesConfig);
+          const currentConfig = mixedSectionConfigRows?.find(
+            c => c.uid === tableHeaderStylesConfig.uid,
+          );
+          list.push(Object.assign({}, tableHeaderStylesConfig, currentConfig));
         }
       };
       tableHeader.forEach(item => {
         if (item.children?.length) {
           item.children.map(items => _getFlattenedChildren(items));
         } else {
-          list.push(item);
+          const currentConfig = mixedSectionConfigRows?.find(
+            c => c.uid === item.uid,
+          );
+          list.push(Object.assign({}, item, currentConfig));
         }
       });
       return list;
     };
 
-    const _getGroupColumns = (tableHeader, chartDataSet) => {
-      const dataConfigs = _getFlattenedColumns(tableHeader);
+    const _getGroupColumns = (
+      mixedSectionConfigRows,
+      tableHeader,
+      chartDataSet,
+    ) => {
+      const dataConfigs = _getFlattenedColumns(
+        tableHeader,
+        mixedSectionConfigRows,
+      );
       const flattenedColumns = _getFlatColumns(dataConfigs, chartDataSet);
       const groupedHeaderColumns =
         tableHeader
-          ?.map(style => this.getHeaderColumnGroup(style, flattenedColumns))
+          ?.map(style =>
+            this.getHeaderColumnGroup(chartDataSet, style, flattenedColumns),
+          )
           ?.filter(Boolean) || [];
 
       const unusedHeaderRows = getUnusedHeaderRows(
@@ -722,7 +736,11 @@ class BasicTableChart extends ReactChart {
     const columnsList =
       !tableHeaderStyles || tableHeaderStyles.length === 0
         ? _getFlatColumns(mixedSectionConfigRows, chartDataSet)
-        : _getGroupColumns(tableHeaderStyles, chartDataSet);
+        : _getGroupColumns(
+            mixedSectionConfigRows,
+            tableHeaderStyles,
+            chartDataSet,
+          );
     const rowNumbers = enableRowNumber
       ? [
           {
@@ -745,10 +763,10 @@ class BasicTableChart extends ReactChart {
     return rowNumbers.concat(columnsList);
   }
 
-  private getHeaderColumnGroup(tableHeader, columns) {
+  private getHeaderColumnGroup(chartDataSet, tableHeader, columns) {
     if (!tableHeader.isGroup) {
       const column = columns.find(
-        c => c.key === getValueByColumnKey(tableHeader),
+        c => c.key === chartDataSet.getFieldKey(tableHeader),
       );
       return column;
     }
@@ -763,7 +781,7 @@ class BasicTableChart extends ReactChart {
       },
       children: (tableHeader.children || [])
         .map(th => {
-          return this.getHeaderColumnGroup(th, columns);
+          return this.getHeaderColumnGroup(chartDataSet, th, columns);
         })
         .filter(Boolean),
     };
