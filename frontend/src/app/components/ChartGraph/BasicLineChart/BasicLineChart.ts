@@ -32,7 +32,6 @@ import {
   getSeriesTooltips4Rectangular2,
   getSplitLine,
   getStyles,
-  getValueByColumnKey,
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
@@ -142,6 +141,7 @@ class BasicLineChart extends Chart {
       tooltip: {
         trigger: 'item',
         formatter: this.getTooltipFormmaterFunc(
+          chartDataSet,
           groupConfigs,
           aggregateConfigs,
           colorConfigs,
@@ -194,10 +194,14 @@ class BasicLineChart extends Chart {
       });
     }
 
-    const xAxisColumnName = getValueByColumnKey(groupConfigs?.[0]);
-    const yAxisColumnNames = aggregateConfigs.map(getValueByColumnKey);
-    const colorColumnName = getValueByColumnKey(colorConfigs[0]);
-    const infoColumnNames = infoConfigs.map(getValueByColumnKey);
+    const xAxisColumnName = chartDataSet.getFieldKey(groupConfigs?.[0]);
+    const yAxisColumnNames = aggregateConfigs.map(config =>
+      chartDataSet.getFieldKey(config),
+    );
+    const colorColumnName = chartDataSet.getFieldKey(colorConfigs[0]);
+    const infoColumnNames = infoConfigs.map(config =>
+      chartDataSet.getFieldKey(config),
+    );
 
     const secondGroupInfos = getColorizeGroupSeriesColumns(
       chartDataSet,
@@ -231,7 +235,7 @@ class BasicLineChart extends Chart {
               ...getExtraSeriesRowData(target),
               ...getExtraSeriesDataFormat(aggConfig?.format),
               name: getColumnRenderName(aggConfig),
-              value: target?.[getValueByColumnKey(aggConfig)] || 0,
+              value: target?.[chartDataSet.getFieldKey(aggConfig)] || 0,
             };
           }),
           ...this.getLabelStyle(styleConfigs),
@@ -422,6 +426,7 @@ class BasicLineChart extends Chart {
   }
 
   private getTooltipFormmaterFunc(
+    chartDataSet,
     groupConfigs,
     aggregateConfigs,
     colorConfigs,
@@ -432,6 +437,7 @@ class BasicLineChart extends Chart {
         ? seriesParams
         : [seriesParams];
       return getSeriesTooltips4Rectangular2(
+        chartDataSet,
         params[0],
         groupConfigs,
         colorConfigs,
