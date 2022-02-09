@@ -16,14 +16,24 @@
  * limitations under the License.
  */
 
-import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
-import { curry, isEmptyArray, pipe } from 'utils/object';
 import {
-  isUnderUpperBound,
-  mergeChartStyleConfigs,
-  reachLowerBoundCount,
-} from './chartHelper';
+  ChartConfig,
+  ChartDataConfig,
+  ChartDataSectionType,
+} from 'app/types/ChartConfig';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
+import {
+  cond,
+  curry,
+  isEmpty,
+  isEmptyArray,
+  isInPairArrayRange,
+  isNumerical,
+  isNumericEqual,
+  isPairArray,
+  pipe,
+} from 'utils/object';
+import { mergeChartStyleConfigs } from './chartHelper';
 
 export const transferChartConfigs = (
   targetConfig?: ChartConfig,
@@ -281,6 +291,36 @@ const transferMixedToOther = (
 };
 
 const balanceAssignConfigRows = sources => {};
+
+export function isInRange(limit?: ChartDataConfig['limit'], count: number = 0) {
+  return cond(
+    [isEmpty, true],
+    [isNumerical, curry(isNumericEqual)(count)],
+    [isPairArray, curry(isInPairArrayRange)(count)],
+  )(limit, true);
+}
+
+export function isUnderUpperBound(
+  limit?: ChartDataConfig['limit'],
+  count: number = 0,
+) {
+  return cond(
+    [isEmpty, true],
+    [isNumerical, limit => limit >= +count],
+    [isPairArray, limit => count <= +limit[1]],
+  )(limit, true);
+}
+
+export function reachLowerBoundCount(
+  limit?: ChartDataConfig['limit'],
+  count: number = 0,
+) {
+  return cond(
+    [isEmpty, 0],
+    [isNumerical, limit => limit - count],
+    [isPairArray, limit => +limit[0] - count],
+  )(limit, 0);
+}
 
 // TODO(Stephen): tobe delete after use ChartDataSet Model in charts
 // 兼容 impala 聚合函数小写问题
