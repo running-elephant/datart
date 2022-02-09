@@ -17,7 +17,7 @@
  */
 
 import { CopyOutlined } from '@ant-design/icons';
-import { Button, Checkbox, DatePicker, Form, Input, Modal } from 'antd';
+import { Button, Checkbox, DatePicker, Form, Input, Modal ,Space} from 'antd';
 import { FormItemEx } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import moment from 'moment';
@@ -139,18 +139,18 @@ const ShareLinkModal: FC<{
           </FormItemEx>
         )}
         {
-          shareLink?.usePassword ? (
+          shareLink?.usePassword && (
             <FormItemEx label={t('share.link_password')}>
-
-              <Input type="textarea"
+              <Input style={{"height": "150px"}}
                 disabled
-                value={t('share.link')+`${getFullShareLinkPath(shareLink)}`+"\n\n"+t('share.password')+`${shareLink?.password}`}
+                value={t('share.link')+`： `+`${getFullShareLinkPath(shareLink)}`+ `         ` +t('share.password')+`： `+`${shareLink?.password}`}
                 addonAfter={
-                  <CopyOutlined onClick={() => handleCopyToClipboard(t('share.link')+": "+`${getFullShareLinkPath(shareLink)}`+"\n\n"+t('share.password')+": "+`${shareLink?.password}`)}/>
+                  <CopyOutlined onClick={() => handleCopyToClipboard(t('share.link')+`： `+`${getFullShareLinkPath(shareLink)}`+ `         ` +t('share.password')+`： `+`${shareLink?.password}`)}/>
                 }
               />
             </FormItemEx>
-          ) : null
+
+          )
         }
       </Form>
     </StyledShareLinkModal>
