@@ -138,6 +138,20 @@ const ShareLinkModal: FC<{
             />
           </FormItemEx>
         )}
+        {
+          shareLink?.usePassword ? (
+            <FormItemEx label={t('share.link_password')}>
+
+              <Input type="textarea"
+                disabled
+                value={t('share.link')+`${getFullShareLinkPath(shareLink)}`+"\n\n"+t('share.password')+`${shareLink?.password}`}
+                addonAfter={
+                  <CopyOutlined onClick={() => handleCopyToClipboard(t('share.link')+": "+`${getFullShareLinkPath(shareLink)}`+"\n\n"+t('share.password')+": "+`${shareLink?.password}`)}/>
+                }
+              />
+            </FormItemEx>
+          ) : null
+        }
       </Form>
     </StyledShareLinkModal>
   );

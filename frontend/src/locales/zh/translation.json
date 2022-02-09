@@ -322,7 +322,7 @@
           "rangeTime": "日期范围",
           "rangeTimePicker": "日期范围",
           "recommendTime": "推荐时间",
-          "rangeValue": "数值范围", 
+          "rangeValue": "数值范围",
           "text": "文本",
           "tree": "下拉树列表",
           "value": "数值",
@@ -709,6 +709,7 @@
       "share": {
         "link": "链接",
         "password": "密码",
+        "link_password": "链接&密码",
         "expireDate": "截止日期",
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
