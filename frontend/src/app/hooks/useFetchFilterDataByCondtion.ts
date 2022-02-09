@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-import { ChartDTO } from "app/types/ChartDTO";
 import {
   FilterCondition,
   FilterConditionType,
   RelationFilterValue,
 } from 'app/types/ChartConfig';
+import { ChartDTO } from 'app/types/ChartDTO';
 import { getDistinctFields } from 'app/utils/fetch';
 import useMount from './useMount';
 

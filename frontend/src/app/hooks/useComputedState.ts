@@ -42,6 +42,7 @@ const useComputedState: <TS>(
       setPrevDep(dependency);
       setState(newState);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dependency]);
 
   return [state, setState];

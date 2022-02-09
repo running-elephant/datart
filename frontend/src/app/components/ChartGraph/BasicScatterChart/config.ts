@@ -457,7 +457,7 @@ const config: ChartConfig = {
           comType: 'marginWidth',
         },
       ],
-    }
+    },
   ],
   settings: [
     {
