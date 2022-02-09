@@ -30,6 +30,7 @@ import {
 import { ChartDataView } from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
 import { transformMeta } from 'app/utils/chartHelper';
+import produce from 'immer';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
@@ -144,7 +145,7 @@ export const getInitBoardInfo = (obj: {
     hasFetchItems: [],
     boardWidthHeight: [0, 0],
     originControllerWidgets: obj.controllerWidgets || [],
-  }; 
+  };
   return boardInfo;
 };
 
@@ -202,4 +203,24 @@ export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
     viewViews.push(viewView);
   });
   return viewViews;
+};
+
+/**
+ * 
+ * @date 2022-02-09
+ * @param {any} widgets:Widget[]
+ * @param {any} opt:{version:string}
+ * @returns {any} Widget[]
+ */
+export const adjustWidgetsBeforeSave = (
+  widgets: Widget[],
+  opt: { version: string },
+): Widget[] => {
+  const nextWidgets = widgets.map(widget => {
+    const nextWidget = produce(widget, curWidget => {
+      curWidget.config.version = opt.version || '1.0.0-beta.0';
+    });
+    return nextWidget;
+  });
+  return nextWidgets;
 };

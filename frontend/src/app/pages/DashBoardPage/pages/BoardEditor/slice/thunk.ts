@@ -16,6 +16,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getChartWidgetRequestParams } from 'app/pages/DashBoardPage/utils';
 import {
+  adjustWidgetsBeforeSave,
   getChartDataView,
   getDashBoardByResBoard,
   getDataChartsByServer,
@@ -161,14 +162,19 @@ export const toUpdateDashboard = createAsyncThunk<
     const boardInfo = boardInfoState(
       getState() as { editBoard: EditBoardState },
     );
+    const curVersion = getState().app?.systemInfo?.version || '';
     const boardState = getState() as unknown as { board: BoardState };
 
     const { dataChartMap, viewMap } = boardState.board;
-    const widgets = convertWrapChartWidget({
-      widgetMap: widgetRecord,
-      dataChartMap,
-      viewMap,
-    });
+    const widgets = adjustWidgetsBeforeSave(
+      convertWrapChartWidget({
+        widgetMap: widgetRecord,
+        dataChartMap,
+        viewMap,
+      }),
+      { version: curVersion },
+    );
+
     const group = createToSaveWidgetGroup(widgets, boardInfo.widgetIds);
     const updateData: SaveDashboard = {
       ...dashBoard,

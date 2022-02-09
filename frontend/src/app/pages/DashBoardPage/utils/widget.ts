@@ -168,6 +168,7 @@ export const createInitWidgetConfig = (opt: {
   frequency?: number;
 }): WidgetConf => {
   return {
+    version: '',
     type: opt.type,
     index: opt.index || 0,
     name: opt.name || '',

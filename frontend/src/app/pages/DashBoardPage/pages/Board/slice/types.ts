@@ -124,6 +124,7 @@ export interface ServerWidget extends Omit<Widget, 'config' | 'relations'> {
   relations: ServerRelation[];
 }
 export interface WidgetConf {
+  version: string;
   index: number;
   tabId?: string; //记录在父容器tab的位置
   name: string;
