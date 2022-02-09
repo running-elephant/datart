@@ -62,6 +62,15 @@ export function getStyleValue(
   return getValue(styleConfigs, paths);
 }
 
+/**
+ * @deprecated This function will be removed in next versiion, please use getStyles instread
+ * @see getValue
+ * @export
+ * @param {ChartStyleConfig[]} configs
+ * @param {string} path
+ * @param {string} targetKey
+ * @return {*}
+ */
 export function getSettingValue(
   configs: ChartStyleConfig[],
   path: string,
@@ -146,23 +155,6 @@ export function getValue(
     }
     iterators = group.rows || [];
   }
-}
-
-export function getColNameByValueColName(series) {
-  return series?.data?.valueColName || series.seriesName;
-}
-
-export function getNumeric(numeric, defaultValue = 0) {
-  if (
-    numeric === null ||
-    numeric === undefined ||
-    numeric === Infinity ||
-    numeric === -Infinity ||
-    Number.isNaN(+numeric)
-  ) {
-    return defaultValue;
-  }
-  return +numeric;
 }
 
 export function getCustomSortableColumns(columns, dataConfigs) {
@@ -690,7 +682,6 @@ export function transformToObjectArray(
   );
 }
 
-// TODO delete this function  #migration
 /**
  * @deprecated please use new method transformToObjectArray instead
  * @see transformToObjectArray
