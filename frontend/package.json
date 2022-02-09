@@ -110,7 +110,7 @@
     "monaco-editor": "0.28.1",
     "polished": "^4.1.1",
     "quill-image-drop-module": "1.0.3",
-    "quilljs-markdown": "1.1.5",
+    "quilljs-markdown": "1.1.10",
     "react": "^17.0.1",
     "react-app-polyfill": "^2.0.0",
     "react-color": "^2.19.3",

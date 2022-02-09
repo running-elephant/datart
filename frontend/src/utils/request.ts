@@ -93,7 +93,7 @@ export function request2<T>(
     typeof url === 'string' ? instance(url, config) : instance(url);
   return axiosPromise
     .then(extra?.onFulfilled || defaultFulfilled, error => {
-      throw unAuthorizationErrorHanlder(error);
+      throw unAuthorizationErrorHandler(error);
     })
     .catch(extra?.onRejected || defaultRejected);
 }
@@ -113,7 +113,7 @@ export const getServerDomain = () => {
   return `${window.location.protocol}//${window.location.host}`;
 };
 
-function unAuthorizationErrorHanlder(error) {
+function unAuthorizationErrorHandler(error) {
   if (error?.response?.status === 401) {
     removeToken();
   }

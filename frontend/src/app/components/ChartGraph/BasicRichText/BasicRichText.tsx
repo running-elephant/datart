@@ -17,13 +17,11 @@
  */
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataSetDTO from 'app/types/ChartDataSet';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
-  getCustomSortableColumns,
   getStyles,
-  getValueByColumnKey,
-  transformToObjectArray,
+  transformToDataSet,
 } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import ReactChart from '../models/ReactChart';
@@ -98,22 +96,28 @@ class BasicRichText extends ReactChart {
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
-    const objDataColumns = transformToObjectArray(
+    const chartDataSet = transformToDataSet(
       dataset.rows,
       dataset.columns,
+      dataConfigs,
     );
-    const dataColumns = getCustomSortableColumns(objDataColumns, dataConfigs);
 
     const dataList = groupConfigs.concat(aggregateConfigs).map(config => {
       return {
         id: config.uid,
         name: getColumnRenderName(config),
-        value: this.getDataListValue(config, dataColumns),
+        value: this.getDataListValue(config, chartDataSet),
       };
     });
     const [initContent] = getStyles(stylesConfigs, ['delta'], ['richText']);
+    const [openQuillMarkdown] = getStyles(
+      stylesConfigs,
+      ['richTextMarkdown'],
+      ['openQuillMarkdown'],
+    );
     return {
       dataList,
+      openQuillMarkdown,
       initContent,
       id: containerId,
       isEditing: !!widgetSpecialConfig?.env,
@@ -121,11 +125,14 @@ class BasicRichText extends ReactChart {
     };
   }
 
-  getDataListValue(config, dataColumns) {
-    const value = dataColumns.map(dc =>
-      toFormattedValue(dc[getValueByColumnKey(config)], config.format),
+  getDataListValue(config, chartDataSet: IChartDataSet<string>) {
+    const value = chartDataSet.map(dc =>
+      toFormattedValue(dc.getCell(config), config.format),
     )[0];
-    return typeof value !== 'string' && value ? value.toString() : value;
+    if (value !== void 0 && value !== null) {
+      return typeof value !== 'string' ? value.toString() : value;
+    }
+    return '';
   }
 
   getOnChange(): any {

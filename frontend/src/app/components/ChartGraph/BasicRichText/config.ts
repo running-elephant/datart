@@ -43,7 +43,20 @@ const config: ChartConfig = {
   ],
   styles: [
     {
-      label: 'delta.title',
+      label: 'common.title',
+      key: 'richTextMarkdown',
+      comType: 'group',
+      rows: [
+        {
+          label: 'richTextMarkdown.openQuillMarkdown',
+          key: 'openQuillMarkdown',
+          default: false,
+          comType: 'checkbox',
+        },
+      ],
+    },
+    {
+      label: 'common.title',
       hidden: true,
       key: 'delta',
       comType: 'group',
@@ -52,7 +65,7 @@ const config: ChartConfig = {
           label: 'delta.richText',
           key: 'richText',
           default: '',
-          comType: 'input',
+          comType: 'text',
         },
       ],
     },
@@ -81,15 +94,30 @@ const config: ChartConfig = {
     {
       lang: 'zh-CN',
       translation: {
-        delta: {
+        common: {
           title: '富文本',
+        },
+        delta: {
           text: '内容',
+        },
+        richTextMarkdown: {
+          openQuillMarkdown: '开启Markdown',
         },
       },
     },
     {
       lang: 'en-US',
-      translation: {},
+      translation: {
+        common: {
+          title: 'Rich Text',
+        },
+        delta: {
+          text: 'Text',
+        },
+        richTextMarkdown: {
+          openQuillMarkdown: 'Open Markdown',
+        },
+      },
     },
   ],
 };

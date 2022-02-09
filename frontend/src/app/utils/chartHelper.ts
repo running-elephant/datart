@@ -977,6 +977,7 @@ export function getSeriesTooltips4Rectangular2(
 }
 
 export function getSeriesTooltips4Polar2(
+  chartDataSet: IChartDataSet<string>,
   tooltipParam: {
     data: {
       name: string;
@@ -996,7 +997,9 @@ export function getSeriesTooltips4Polar2(
     .concat(aggConfigs || [])
     .concat(sizeConfigs || [])
     .concat(infoConfigs || [])
-    .map(config => valueFormatter(config, row?.[getValueByColumnKey(config)]));
+    .map(config =>
+      valueFormatter(config, row?.[chartDataSet.getFieldKey(config)]),
+    );
   return tooltips.join('<br />');
 }
 

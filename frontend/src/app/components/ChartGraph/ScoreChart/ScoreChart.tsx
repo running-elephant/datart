@@ -18,12 +18,7 @@
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import {
-  getStyles,
-  getValue,
-  getValueByColumnKey,
-  transformToObjectArray,
-} from 'app/utils/chartHelper';
+import { getStyles, getValue, transformToDataSet } from 'app/utils/chartHelper';
 import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
 import Chart from '../models/Chart';
@@ -100,13 +95,14 @@ class ScoreChart extends Chart {
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
 
-    const objDataColumns = transformToObjectArray(
+    const chartDataSet = transformToDataSet(
       dataset.rows,
       dataset.columns,
+      dataConfigs,
     );
 
     const aggConfigValues = aggregateConfigs.map(config => {
-      return objDataColumns[0]?.[getValueByColumnKey(config)];
+      return chartDataSet[0]?.getCell(config);
     });
 
     const measureTexts: string[] = this.getMeasureTexts(

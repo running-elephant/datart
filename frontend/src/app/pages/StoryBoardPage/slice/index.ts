@@ -17,7 +17,8 @@
  */
 import { PayloadAction } from '@reduxjs/toolkit';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { createSlice } from 'utils/@reduxjs/toolkit';
+import { createSlice, isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
+import { rejectedActionMessageHandler } from 'utils/notification';
 import { getInitStoryPageInfo } from './../utils';
 import { StoryBoard, StoryBoardState, StoryPage, StoryPageInfo } from './types';
 
@@ -150,16 +151,10 @@ const storyBoardSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    // builder.addCase(loadStoryPagesById.pending, state => {
-    //   // state.userSettingLoading = true;
-    // });
-    // builder.addCase(loadStoryPagesById.fulfilled, (state, action) => {
-    //   // state.organizationListLoading = false;
-    //   // state.organizations = action.payload;
-    // });
-    // builder.addCase(loadStoryPagesById.rejected, state => {
-    //   // state.organizationListLoading = false;
-    // });
+    builder.addMatcher(
+      isMySliceRejectedAction(storyBoardSlice.name),
+      rejectedActionMessageHandler,
+    );
   },
 });
 export const { actions: storyActions } = storyBoardSlice;

@@ -109,16 +109,8 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
                 return;
             }
             for (SqlIdentifier identifier : variableIdentifier) {
-                ScriptVariable variable = null;
-                for (String key : variableMap.keySet()) {
-                    if (key.equalsIgnoreCase(identifier.toString())) {
-                        variable = variableMap.get(key);
-                    }
-                }
+                ScriptVariable variable = variableMap.get(identifier.toString());
                 if (variable != null) {
-//                    if (VariableTypeEnum.PERMISSION.equals(variable.getType())) {
-//                        Exceptions.msg("message.provider.permission.variable.usage.error", variable.getName());
-//                    }
                     int startIndex = identifier.getParserPosition().getColumnNum();
                     int endIndex = identifier.getParserPosition().getEndColumnNum();
                     String originalSqlFragment = srcSql.substring(startIndex - 1, endIndex).trim();
@@ -135,11 +127,9 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
 
         List<ScriptVariable> variables = new LinkedList<>();
         for (SqlIdentifier identifier : variableIdentifier) {
-            for (String key : variableMap.keySet()) {
-                if (key.equalsIgnoreCase(identifier.toString())) {
-                    ScriptVariable variable = variableMap.get(key);
-                    variables.add(variable);
-                }
+            ScriptVariable variable = variableMap.get(identifier.toString());
+            if (variable != null) {
+                variables.add(variable);
             }
         }
         variablePlaceholders.add(new VariablePlaceholder(variables, sqlDialect, logicExpressionCall, originalSqlFragment));

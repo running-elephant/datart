@@ -21,6 +21,7 @@ package datart.data.provider.jdbc;
 import com.google.common.collect.Iterables;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.SqlParseError;
 import datart.core.common.MessageResolver;
 import datart.core.common.RequestContext;
 import datart.core.data.provider.ExecuteParam;
@@ -41,6 +42,7 @@ import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -132,15 +134,22 @@ public class SqlScriptRender extends ScriptRender {
             return selectSql;
         }
 
-        Map<String, ScriptVariable> variableMap = queryScript.getVariables()
-                .stream()
-                .collect(Collectors.toMap(ScriptVariable::getNameWithQuote, variable -> variable));
+        Map<String, ScriptVariable> variableMap = new CaseInsensitiveMap<>();
+
+        if(CollectionUtils.isNotEmpty(queryScript.getVariables())){
+            for (ScriptVariable variable : queryScript.getVariables()) {
+                variableMap.put(variable.getNameWithQuote(),variable);
+            }
+        }
 
         List<VariablePlaceholder> placeholders = null;
         try {
             placeholders = SqlParserVariableResolver.resolve(sqlDialect, selectSql, variableMap);
         } catch (SqlParseException e) {
-            RequestContext.putWarning(MessageResolver.getMessage("message.provider.sql.parse.failed"), e);
+            SqlParseError sqlParseError = new SqlParseError(e);
+            sqlParseError.setSql(selectSql);
+            sqlParseError.setDbType(sqlDialect.getDatabaseProduct().name());
+            RequestContext.putWarning(MessageResolver.getMessage("message.provider.sql.parse.failed"), sqlParseError);
             placeholders = RegexVariableResolver.resolve(sqlDialect, selectSql, variableMap);
         }
         if (CollectionUtils.isNotEmpty(placeholders)) {
@@ -161,7 +170,6 @@ public class SqlScriptRender extends ScriptRender {
             try {
                 sqlNode = parseSql(sql);
             } catch (Exception e) {
-                e.printStackTrace();
                 continue;
             }
             if (SqlValidateUtils.validateQuery(sqlNode) && selectSql != null) {
