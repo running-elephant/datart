@@ -44,6 +44,16 @@ import { isEmptyArray, isUndefined, meanValue } from 'utils/object';
 import { isInRange } from './internalChartHelper';
 import { toFormattedValue } from './number';
 
+/**
+ * Gets an array of default colors
+ *
+ * @example
+ * const colorList = getDefaultThemeColor();
+ * console.log(colorList); // ["#298ffe","#dae9ff","#fe705a","#ffdcdc","#751adb","#8663d7","#15AD31","#FAD414","#E62412"]
+ *
+ * @export
+ * @return {*} default color array
+ */
 export function getDefaultThemeColor() {
   return echartsDefaultTheme.color;
 }
@@ -700,6 +710,13 @@ export function transfromToObjectArray(
   return transformToObjectArray(columns, metas);
 }
 
+/**
+ * Get the data column key
+ *
+ * @export
+ * @param {{ aggregate?; colName: string }} [col]
+ * @return {*} 
+ */
 export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
   if (!col) {
     return '';
@@ -723,6 +740,13 @@ export function getColumnRenderOriginName(c?: ChartDataSectionField) {
   return c.colName;
 }
 
+/**
+ * Get the data column name
+ *
+ * @export
+ * @param {ChartDataSectionField} [c]
+ * @return {*} 
+ */
 export function getColumnRenderName(c?: ChartDataSectionField) {
   if (!c) {
     return '[unknown]';
