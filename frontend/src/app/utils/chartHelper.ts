@@ -40,7 +40,11 @@ import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { Debugger } from 'utils/debugger';
 import { isEmptyArray, isUndefined, meanValue } from 'utils/object';
-import { getColumnRenderOriginName, isInRange } from './internalChartHelper';
+import {
+  flattenHeaderRowsWithoutGroupRow,
+  getColumnRenderOriginName,
+  isInRange,
+} from './internalChartHelper';
 import { toFormattedValue } from './number';
 
 /**
@@ -779,105 +783,6 @@ export function getUnusedHeaderRows(
     }
     return acc;
   }, []);
-}
-
-export function diffHeaderRows(
-  oldRows: Array<{ colName: string }>,
-  newRows: Array<{ colName: string }>,
-) {
-  if (!oldRows?.length) {
-    return true;
-  }
-  if (oldRows?.length !== newRows?.length) {
-    return true;
-  }
-  const oldNames = oldRows.map(r => r.colName).sort();
-  const newNames = newRows.map(r => r.colName).sort();
-  if (oldNames.toString() !== newNames.toString()) {
-    return true;
-  }
-
-  return false;
-}
-
-export function flattenHeaderRowsWithoutGroupRow<
-  T extends {
-    isGroup?: boolean;
-    children?: T[];
-  },
->(groupedHeaderRow: T) {
-  const childRows = (groupedHeaderRow.children || []).flatMap(child =>
-    flattenHeaderRowsWithoutGroupRow(child),
-  );
-  if (groupedHeaderRow.isGroup) {
-    return childRows;
-  }
-  return [groupedHeaderRow].concat(childRows);
-}
-
-export function transformMeta(model?: string) {
-  if (!model) {
-    return undefined;
-  }
-  const jsonObj = JSON.parse(model);
-  return Object.keys(jsonObj).map(colKey => ({
-    ...jsonObj[colKey],
-    id: colKey,
-    category: ChartDataViewFieldCategory.Field,
-  }));
-}
-
-export function mergeChartStyleConfigs(
-  target?: ChartStyleConfig[],
-  source?: ChartStyleConfigDTO[],
-  options = { useDefault: true },
-): ChartStyleConfig[] | undefined {
-  if (isEmptyArray(target)) {
-    return target;
-  }
-  if (isEmptyArray(source) && !options?.useDefault) {
-    return target;
-  }
-  for (let index = 0; index < target?.length!; index++) {
-    const tEle: any = target?.[index];
-    if (!tEle) {
-      continue;
-    }
-
-    // options.useDefault
-    if (isUndefined(tEle['value']) && options?.useDefault) {
-      tEle['value'] = tEle?.['default'];
-    }
-
-    const sEle =
-      'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
-
-    if (!isUndefined(sEle?.['value'])) {
-      tEle['value'] = sEle?.['value'];
-    }
-    if (!isEmptyArray(tEle?.rows)) {
-      tEle['rows'] = mergeChartStyleConfigs(tEle.rows, sEle?.rows, options);
-    } else if (sEle && !isEmptyArray(sEle?.rows)) {
-      // Note: we merge all rows data when target rows is emtpy
-      tEle['rows'] = sEle?.rows;
-    }
-  }
-  return target;
-}
-
-export function mergeChartDataConfigs<
-  T extends { key?: string; rows?: ChartDataSectionField[] } | undefined | null,
->(target?: T[], source?: T[]) {
-  if (isEmptyArray(target) || isEmptyArray(source)) {
-    return target;
-  }
-  return (target || []).map(tEle => {
-    const sEle = (source || []).find(s => s?.key === tEle?.key);
-    if (sEle) {
-      return Object.assign({}, tEle, { rows: sEle?.rows });
-    }
-    return tEle;
-  });
 }
 
 export function getDataColumnMaxAndMin(
