@@ -32,7 +32,7 @@ import { getViewDetail } from '../slice/thunks';
 import { Tabs } from './Tabs';
 import { Workbench } from './Workbench';
 
-export const Main = memo(() => {
+export const Main = memo(({ sliderVisible }: { sliderVisible: boolean }) => {
   useSourceSlice();
   useMemberSlice();
   useVariableSlice();
@@ -55,7 +55,7 @@ export const Main = memo(() => {
   }, [dispatch, viewId, orgId]);
 
   return (
-    <Container>
+    <Container className={sliderVisible ? 'close' : ''}>
       {editingViews.length > 0 ? (
         <>
           <Tabs />
@@ -72,4 +72,9 @@ const Container = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  &.close {
+    width: calc(100% - 30px) !important;
+    min-width: calc(100% - 30px) !important;
+    padding-left: 30px;
+  }
 `;

@@ -15,7 +15,9 @@
       "info": "基本信息",
       "open": "开启",
       "close": "关闭",
-      "saveAs": "另存为"
+      "saveAs": "另存为",
+      "cancel": "取消",
+      "ok": "确定"
     },
     "operation": {
       "archiveConfirm": "确定移至回收站？",
@@ -322,7 +324,7 @@
           "rangeTime": "日期范围",
           "rangeTimePicker": "日期范围",
           "recommendTime": "推荐时间",
-          "rangeValue": "数值范围", 
+          "rangeValue": "数值范围",
           "text": "文本",
           "tree": "下拉树列表",
           "value": "数值",
@@ -435,12 +437,13 @@
         "goBack": "返回",
         "run": "执行",
         "save": "保存",
-        "saveToDashboard": "保存到仪表盘",
+        "saveToDashboard": "保存到仪表板",
         "login": "登陆",
         "aggregationSwitch": "数据聚合",
         "aggregationSwitchTip": "切换数据聚合会清空所有配置，确认开启/关闭？",
         "open": "开启",
         "close": "关闭",
+        "cancel": "取消",
         "lang": {
           "zh": "中文",
           "en": "英文"
@@ -460,7 +463,9 @@
         "variable": "变量",
         "functions": "函数列表",
         "editField": "编辑",
-        "deleteField": "删除"
+        "deleteField": "删除",
+        "editViewTip": "回到数据视图会丢失当前编辑状态，是否继续？",
+        "editView": "编辑数据视图"
       }
     },
     "palette": {
@@ -706,14 +711,17 @@
       "unpublished": "未发布",
       "archived": "已归档",
       "play": "播放",
+      "syncData": "同步数据",
+      "addToDash": "添加到仪表板",
+      "addToStory": "添加到故事板",
       "share": {
         "link": "链接",
         "password": "密码",
         "expireDate": "截止日期",
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
-        "shareLink": "分享链接",
-        "downloadData": "下载数据"
+        "shareLink": "分享",
+        "downloadData": "下载为 Excel"
       }
     },
     "board": {
@@ -862,7 +870,10 @@
         "dashboard": "新建仪表板",
         "dataChart": "新建数据图表",
         "folder": "新建目录",
-        "recycle": "回收站"
+        "recycle": "回收站",
+        "open": "展开",
+        "close": "收起",
+        "startAnalysis": "开始分析"
       },
       "storyboards": {
         "title": "故事板列表",
@@ -946,6 +957,8 @@
     "resultEmpty1": "请点击 ",
     "resultEmpty2": " 按钮执行，运行结果将在此处展示",
     "errorTitle": "执行错误",
+    "sqlRunWraning": "SQL 解析失败，欢迎一键提交 issue 帮助我们优化",
+    "close": "关闭",
     "tabs": {
       "discard": "放弃",
       "cancel": "取消",
@@ -953,6 +966,7 @@
       "warning": "有未执行的修改，是否执行？"
     },
     "editor": {
+      "startAnalysis": "开始分析",
       "folder": "目录",
       "source": "请选择数据源",
       "run": "执行",
@@ -996,7 +1010,9 @@
       "addView": "新建数据视图",
       "addFolder": "新建目录",
       "parent": "所属目录",
-      "recycle": "回收站"
+      "recycle": "回收站",
+      "open": "展开",
+      "close": "收起"
     },
     "saveForm": {
       "title": "数据视图",
@@ -1023,6 +1039,7 @@
     "createSuccess": "新建数据源成功",
     "archived": "已归档",
     "noPermission": "您没有权限访问该页面",
+    "creatView": "去新建数据视图",
     "sidebar": {
       "title": "数据源列表",
       "add": "新建数据源",
@@ -1225,6 +1242,9 @@
     },
     "listTitle": {
       "search": "搜索",
+      "searchValue": "搜索名称关键字"
+    },
+    "saveToDashOrStory": {
       "searchValue": "搜索名称关键字"
     }
   }

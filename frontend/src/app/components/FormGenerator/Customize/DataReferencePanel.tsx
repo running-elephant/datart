@@ -17,7 +17,7 @@
  */
 
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { mergeChartStyleConfigs } from 'app/utils/chartHelper';
+import { mergeChartStyleConfigs } from 'app/utils/internalChartHelper';
 import { updateBy, updateByKey } from 'app/utils/mutation';
 import { FC, memo, useEffect } from 'react';
 import styled from 'styled-components/macro';

@@ -30,7 +30,7 @@ import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/types/ChartDataView';
-import { ChartDataViewMeta } from "app/types/ChartDataViewMeta";
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { FC, memo, useMemo } from 'react';
 import { useDrag } from 'react-dnd';
@@ -194,7 +194,7 @@ const Container = styled.div`
   display: flex;
   flex: 1;
   align-items: center;
-  padding: ${SPACE_TIMES(0.5)} ${SPACE} ${SPACE_TIMES(0.5)} ${SPACE_SM};
+  padding: ${SPACE_TIMES(0.5)} ${SPACE} ${SPACE_TIMES(0.5)} ${SPACE_TIMES(2)};
   font-size: ${FONT_SIZE_SUBTITLE};
   font-weight: ${FONT_WEIGHT_MEDIUM};
   color: ${p => p.theme.textColorSnd};

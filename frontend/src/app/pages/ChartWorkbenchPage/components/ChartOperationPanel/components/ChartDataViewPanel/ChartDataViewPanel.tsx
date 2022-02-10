@@ -16,35 +16,50 @@
  * limitations under the License.
  */
 
-import { PlusOutlined } from '@ant-design/icons';
-import { message, Popover, TreeSelect } from 'antd';
-import { ToolbarButton } from 'app/components';
+import {
+  FormOutlined,
+  InfoCircleOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
+import { Button, message, Popover, Space, Tooltip, TreeSelect } from 'antd';
+import { Confirm, ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useMount from 'app/hooks/useMount';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import useToggle from 'app/hooks/useToggle';
 import workbenchSlice, {
+  dataviewsSelector,
   fetchViewDetailAction,
   makeDataviewTreeSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { useAccess, useCascadeAccess } from 'app/pages/MainPage/Access';
+import {
+  PermissionLevels,
+  ResourceTypes,
+} from 'app/pages/MainPage/pages/PermissionPage/constants';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/types/ChartDataView';
-import { ChartDataViewMeta } from "app/types/ChartDataViewMeta";
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { checkComputedFieldAsync } from 'app/utils/fetch';
 import { updateByKey } from 'app/utils/mutation';
-import { FC, memo, useCallback, useMemo } from 'react';
+import { FC, memo, useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
-import { SPACE, SPACE_XS } from 'styles/StyleConstants';
+import { ORANGE, SPACE, SPACE_XS } from 'styles/StyleConstants';
+import { getPath } from 'utils/utils';
 import { ChartDraggableSourceGroupContainer } from '../ChartDraggable';
 import ChartComputedFieldSettingPanel from './components/ChartComputedFieldSettingPanel';
 
 const ChartDataViewPanel: FC<{
   dataView?: ChartDataView;
+  defaultViewId?: string;
   onDataViewChange?: () => void;
-}> = memo(({ dataView, onDataViewChange }) => {
+}> = memo(({ dataView, defaultViewId, onDataViewChange }) => {
   const t = useI18NPrefix(`viz.workbench.dataview`);
+  const tg = useI18NPrefix(`global`);
   const dispatch = useDispatch();
   const dataviewTreeSelector = useMemo(makeDataviewTreeSelector, []);
   const getSelectable = useCallback(v => !v.isFolder, []);
@@ -53,6 +68,32 @@ const ChartDataViewPanel: FC<{
   );
   const [showModal, modalContextHolder] = useStateModal({});
   const [isDisplayAddNewModal, setIsDisplayAddNewModal] = useToggle();
+  const views = useSelector(dataviewsSelector);
+  const [confirmVisible, setConfirmVisible] = useState(false);
+
+  const path = useMemo(() => {
+    return views?.length && dataView
+      ? getPath(
+          views as Array<{ id: string; parentId: string }>,
+          { id: dataView.id, parentId: dataView.parentId },
+          ResourceTypes.View,
+        )
+      : [];
+  }, [views, dataView]);
+
+  const managePermission = useCascadeAccess({
+    module: ResourceTypes.View,
+    path,
+    level: PermissionLevels.Manage,
+  });
+  const allowManage = managePermission(true);
+  const allowEnableView = useAccess({
+    type: 'module',
+    module: ResourceTypes.View,
+    id: '',
+    level: PermissionLevels.Enable,
+  })(true);
+  const history = useHistory();
 
   const handleDataViewChange = value => {
     onDataViewChange?.();
@@ -179,9 +220,32 @@ const ChartDataViewPanel: FC<{
     return [...dateFields, ...stringFields, ...numericFields];
   };
 
+  const editView = () => {
+    let orgId = dataView?.orgId as string;
+    let viewId = dataView?.id as string;
+    history.push(`/organizations/${orgId}/views/${viewId}`);
+  };
+
+  useMount(() => {
+    if (defaultViewId) {
+      handleDataViewChange(defaultViewId);
+    }
+  });
+
   return (
     <StyledChartDataViewPanel>
       <Header>
+        <Tooltip placement="right" title={t('editView')}>
+          <ToolbarButton
+            disabled={!(allowEnableView && allowManage && dataView)}
+            iconSize={14}
+            icon={<FormOutlined />}
+            size="small"
+            onClick={() => {
+              setConfirmVisible(true);
+            }}
+          />
+        </Tooltip>
         <TreeSelect
           showSearch
           placeholder={t('plsSelectDataView')}
@@ -196,6 +260,7 @@ const ChartDataViewPanel: FC<{
           placement="bottomRight"
           visible={isDisplayAddNewModal}
           onVisibleChange={() => setIsDisplayAddNewModal()}
+          trigger="click"
           content={
             <ul>
               <li
@@ -209,7 +274,6 @@ const ChartDataViewPanel: FC<{
               {/* <li>{t('createVariableFields')}</li> */}
             </ul>
           }
-          trigger="click"
         >
           <ToolbarButton icon={<PlusOutlined />} size="small" />
         </Popover>
@@ -219,6 +283,31 @@ const ChartDataViewPanel: FC<{
         meta={getSortedFields(dataView)}
         onDeleteComputedField={handleDeleteComputedField}
         onEditComputedField={handleEditComputedField}
+      />
+      <Confirm
+        visible={confirmVisible}
+        title={t('editViewTip')}
+        icon={
+          <InfoCircleOutlined
+            css={`
+              color: ${ORANGE};
+            `}
+          />
+        }
+        footer={
+          <Space>
+            <Button
+              type="primary"
+              ghost
+              onClick={() => setConfirmVisible(false)}
+            >
+              {tg('button.cancel')}
+            </Button>
+            <Button type="primary" onClick={editView}>
+              {tg('button.ok')}
+            </Button>
+          </Space>
+        }
       />
     </StyledChartDataViewPanel>
   );

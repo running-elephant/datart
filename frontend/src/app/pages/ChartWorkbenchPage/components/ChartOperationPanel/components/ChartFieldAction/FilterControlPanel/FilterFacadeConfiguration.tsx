@@ -136,6 +136,7 @@ const FilterFacadeConfiguration: FC<
         setCurrentFacade(facades?.[0]);
         handleFacadeChange(facades?.[0]);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [condition, category, currentFacade]);
 
     const handleFacadeChange = facade => {

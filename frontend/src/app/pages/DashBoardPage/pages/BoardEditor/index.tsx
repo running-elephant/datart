@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { ActionCreators } from 'redux-undo';
 import styled from 'styled-components/macro';
+import { uuidv4 } from 'utils/utils';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
@@ -42,7 +43,7 @@ import {
   selectBoardChartEditorProps,
   selectEditBoard,
 } from './slice/selectors';
-import { fetchEditBoardDetail } from './slice/thunk';
+import { addChartWidget, fetchEditBoardDetail } from './slice/thunk';
 
 export const BoardEditor: React.FC<{
   dashboardId: string;
@@ -56,12 +57,10 @@ export const BoardEditor: React.FC<{
     const history = useHistory();
     const dashboard = useSelector(selectEditBoard);
     const boardChartEditorProps = useSelector(selectBoardChartEditorProps);
+    const histState = history.location.state as any;
     const onCloseChartEditor = useCallback(() => {
       dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
     }, [dispatch]);
-    useEffect(() => {
-      dispatch(fetchEditBoardDetail(dashboardId));
-    }, [dashboardId, dispatch]);
 
     const onSaveToWidget = useCallback(
       (chartType: WidgetContentChartType, dataChart: DataChart, view) => {
@@ -124,6 +123,43 @@ export const BoardEditor: React.FC<{
       onCloseChartEditor,
       onSaveToWidget,
     ]);
+    const initialization = useCallback(async () => {
+      await dispatch(fetchEditBoardDetail(dashboardId));
+      if (histState?.widgetInfo) {
+        const widgetInfo = JSON.parse(histState.widgetInfo);
+        const boardType = dashboard.config?.type;
+
+        if (widgetInfo) {
+          let subType: 'widgetChart' | 'dataChart' = 'dataChart';
+          if (!widgetInfo.dataChart.id) {
+            widgetInfo.dataChart.id = 'widget_' + uuidv4();
+            subType = 'widgetChart';
+          }
+
+          dispatch(
+            addChartWidget({
+              boardId,
+              chartId: widgetInfo.dataChart.id,
+              boardType,
+              dataChart: widgetInfo.dataChart,
+              view: widgetInfo.dataview,
+              subType: subType,
+            }),
+          );
+        }
+      }
+    }, [
+      dashboardId,
+      dispatch,
+      histState?.widgetInfo,
+      boardId,
+      dashboard.config?.type,
+    ]);
+
+    useEffect(() => {
+      initialization();
+    }, [initialization]);
+
     return (
       <Wrapper>
         <DndProvider backend={HTML5Backend}>

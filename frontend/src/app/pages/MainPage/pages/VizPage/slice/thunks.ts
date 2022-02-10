@@ -36,7 +36,6 @@ import {
   AddStoryboardParams,
   AddVizParams,
   ChartPreview,
-  CopyDashboardParams,
   DeleteStoryboardParams,
   DeleteVizParams,
   EditFolderParams,
@@ -45,6 +44,7 @@ import {
   Folder,
   FolderViewModel,
   PublishVizParams,
+  SaveAsDashboardParams,
   Storyboard,
   StoryboardViewModel,
   UnarchiveVizParams,
@@ -335,15 +335,14 @@ export const updateFilterAndFetchDataset = createAsyncThunk(
   },
 );
 
-export const copyDashboard = createAsyncThunk<Folder, CopyDashboardParams>(
-  'viz/copyDashboard',
-  async ({ viz, dashboardId, resolve }) => {
+export const saveAsDashboard = createAsyncThunk<Folder, SaveAsDashboardParams>(
+  'viz/saveAsDashboard',
+  async ({ viz, dashboardId }) => {
     const { data } = await request2<Folder>({
       url: `/viz/dashboards/${dashboardId}/copy`,
       method: 'PUT',
       data: viz,
     });
-    resolve();
     return data;
   },
 );

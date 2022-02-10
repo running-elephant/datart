@@ -16,337 +16,17 @@
  * limitations under the License.
  */
 
-import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
+import { ChartDataSetRow } from 'app/components/ChartGraph/models/ChartDataSet';
 import {
+  getColumnRenderName,
   getStyles,
   getValue,
-  isInRange,
-  isUnderUpperBound,
-  mergeChartDataConfigs,
-  mergeChartStyleConfigs,
-  reachLowerBoundCount,
+  isMatchRequirement,
+  transformToDataSet,
+  transformToObjectArray,
 } from '../chartHelper';
 
 describe('Chart Helper ', () => {
-  describe.each([
-    [0, 0, true],
-    [0, 1, false],
-    [1, 1, true],
-    [0, null, true],
-    [1, null, true],
-    [0, undefined, true],
-    [1, undefined, true],
-    [1, '[1, 999]', true],
-    [0, '[1, 999]', true],
-    [0, [1, 999], false],
-    [1, [1, 999], true],
-    [999, [1, 999], true],
-    [1000, [1, 999], false],
-    [1, '1', true],
-    [0, '1', false],
-    [1, ['1', '999'], true],
-    [0, ['1', '999'], false],
-  ])('isInRange Test - ', (count, limit, ifInRange) => {
-    test(`length ${count} in ${limit} limit is ${ifInRange}`, () => {
-      expect(isInRange(limit, count)).toBe(ifInRange);
-    });
-  });
-
-  describe.each([
-    [[{}], [{}], [{}]],
-    [[{}], [null], [{}]],
-    [[{}], [undefined], [{}]],
-    [[{ a: 1 }], [{ a: 2 }], [{ a: 1 }]],
-    [[{ value: 1 }], [{ value: 2 }], [{ value: 2 }]],
-    [[{ value: 1 }], [{ value: 2, b: 1 }], [{ value: 2 }]],
-    [[{ value: 1 }], [{ value: 2, b: 1 }, { value: 3 }], [{ value: 2 }]],
-    [
-      [{ value: 1, default: 'no change' }],
-      [{ value: 2, default: 2 }],
-      [{ value: 2, default: 'no change' }],
-    ],
-    [
-      [{ value: 1 }, { value: 1 }],
-      [{ value: 2, b: 1 }],
-      [{ value: 2 }, { value: 1 }],
-    ],
-    [
-      [{ value: 1 }, { value: 1 }],
-      [{ value: 2 }, { value: 2, b: 1 }],
-      [{ value: 2 }, { value: 2 }],
-    ],
-    [
-      [{ value: 1, rows: [{ value: 1 }] }],
-      [{ value: 2 }, { value: 3, rows: [{ value: 3 }] }],
-      [{ value: 2, rows: [{ value: 1 }] }],
-    ],
-    [
-      [{ value: 1, rows: [{ value: 1 }] }],
-      [
-        { value: 2, rows: [{ value: 2, b: 2 }] },
-        { value: 3, rows: [{ value: 3 }] },
-      ],
-      [{ value: 2, rows: [{ value: 2 }] }],
-    ],
-    [
-      [{ value: 1, rows: null }],
-      [
-        { value: 2, rows: [{ value: 2, b: 2 }] },
-        { value: 3, rows: [{ value: 3 }] },
-      ],
-      [{ value: 2, rows: [{ value: 2, b: 2 }] }],
-    ],
-    [
-      [{ value: 1, rows: [] }],
-      [
-        { value: 2, rows: [{ value: 2, b: 2, c: 2, d: 2 }] },
-        { value: 3, rows: [{ value: 3 }] },
-      ],
-      [{ value: 2, rows: [{ value: 2, b: 2, c: 2, d: 2 }] }],
-    ],
-    [
-      [{ key: 'a', value: 1 }],
-      [{ key: 'a', value: 2 }],
-      [{ key: 'a', value: 2 }],
-    ],
-    [
-      [{ key: 'a', value: 1 }],
-      [{ key: 'b', value: 2 }],
-      [{ key: 'a', value: 1 }],
-    ],
-    [
-      [{ key: 'a', value: 1 }],
-      [
-        { key: 'b', value: 2 },
-        { key: 'a', value: 3 },
-      ],
-      [{ key: 'a', value: 3 }],
-    ],
-    [
-      [{ key: 'a', value: 1 }],
-      [{ value: 2 }, { value: 3 }],
-      [{ key: 'a', value: 1 }],
-    ],
-    [
-      [{ key: 'a', value: 1, rows: [{ key: 'aa', value: 1 }] }],
-      [
-        { key: 'a', value: 2, rows: [{ key: 'aa', value: 2 }] },
-        { value: 3, rows: [{ key: 'aa', value: 3 }] },
-      ],
-      [{ key: 'a', value: 2, rows: [{ key: 'aa', value: 2 }] }],
-    ],
-    [
-      [{ key: 'a', value: 1, rows: [{ key: 'aa', value: 1 }] }],
-      [
-        { key: 'b', value: 2, rows: [{ key: 'aa', value: 2 }] },
-        { key: 'a', value: 3, rows: [{ key: 'aa', value: 3 }] },
-      ],
-      [{ key: 'a', value: 3, rows: [{ key: 'aa', value: 3 }] }],
-    ],
-    [
-      [
-        {
-          key: 'a',
-          value: 1,
-          rows: [{ key: 'aa', value: 1, rows: [{ key: 'aaa', value: 1 }] }],
-        },
-      ],
-      [
-        { key: 'b', value: 2, rows: [{ key: 'aa', value: 2 }] },
-        {
-          key: 'a',
-          value: 3,
-          rows: [{ key: 'aa', value: 3, rows: [{ key: 'aaa', value: 3 }] }],
-        },
-      ],
-      [
-        {
-          key: 'a',
-          value: 3,
-          rows: [{ key: 'aa', value: 3, rows: [{ key: 'aaa', value: 3 }] }],
-        },
-      ],
-    ],
-    [
-      [{ key: 'a', value: null, default: 0 }],
-      [],
-      [{ key: 'a', value: null, default: 0 }],
-      { useDefault: true },
-    ],
-    [
-      [{ key: 'a', value: undefined, default: 0 }],
-      [],
-      [{ key: 'a', value: 0, default: 0 }],
-      { useDefault: true },
-    ],
-    [
-      [{ key: 'a', value: null, default: 0 }],
-      [
-        { key: 'b', value: 2, default: 'n' },
-        { key: 'a', value: 3, default: 'm' },
-      ],
-      [{ key: 'a', value: 3, default: 0 }],
-      { useDefault: true },
-    ],
-    [
-      [
-        {
-          key: 'a',
-          value: undefined,
-          default: 0,
-          rows: [{ value: undefined, default: 0 }],
-        },
-      ],
-      [],
-      [{ key: 'a', value: 0, default: 0, rows: [{ value: 0, default: 0 }] }],
-      { useDefault: true },
-    ],
-    [
-      [{ key: 'a', value: undefined, default: 0 }],
-      [],
-      [{ key: 'a', value: undefined, default: 0 }],
-      { useDefault: false },
-    ],
-    [
-      [
-        {
-          key: 'a',
-          value: undefined,
-          default: 0,
-          rows: [{ value: undefined, default: 0 }],
-        },
-      ],
-      [],
-      [
-        {
-          key: 'a',
-          value: undefined,
-          default: 0,
-          rows: [{ value: undefined, default: 0 }],
-        },
-      ],
-      { useDefault: false },
-    ],
-  ])('mergeChartStyleConfigs Test - ', (target, source, expected, options?) => {
-    test(`deep merge target: ${JSON.stringify(
-      target,
-    )} from source: ${JSON.stringify(source)} result is ${JSON.stringify(
-      expected,
-    )} - options ${options ? JSON.stringify(options) : ''}`, () => {
-      const result = mergeChartStyleConfigs(
-        target as ChartStyleConfig[],
-        source as ChartStyleConfigDTO[],
-        options,
-      );
-      expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-    });
-  });
-
-  describe.each([
-    [
-      [{ key: 'a', type: 't1', rows: [] }],
-      [
-        {
-          key: 'a',
-          type: 't2',
-          rows: [{ colName: 'aa', type: 'STRING', category: 'field' }],
-        },
-      ],
-      [
-        {
-          key: 'a',
-          type: 't1',
-          rows: [{ colName: 'aa', type: 'STRING', category: 'field' }],
-        },
-      ],
-    ],
-    [
-      [{ key: 'a', type: 't1', rows: [] }],
-      [
-        {
-          key: 'b',
-          type: 't2',
-          rows: [{ colName: 'aa', type: 'STRING', category: 'field' }],
-        },
-      ],
-      [
-        {
-          key: 'a',
-          type: 't1',
-          rows: [],
-        },
-      ],
-    ],
-    [
-      [{ key: 'a', rows: [] }],
-      [],
-      [
-        {
-          key: 'a',
-          rows: [],
-        },
-      ],
-    ],
-  ])('mergeChartDataConfigs Test - ', (target, source, expected, options?) => {
-    test(`deep merge target: ${JSON.stringify(
-      target,
-    )} from source: ${JSON.stringify(source)} result is ${JSON.stringify(
-      expected,
-    )} - options ${options ? JSON.stringify(options) : ''}`, () => {
-      const result = mergeChartDataConfigs(target, source as any);
-      expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-    });
-  });
-
-  describe.each([
-    [0, 0, true],
-    [0, 1, true],
-    [1, 1, true],
-    [0, null, true],
-    [1, null, true],
-    [0, undefined, true],
-    [1, undefined, true],
-    [1, '[1, 999]', true],
-    [0, '[1, 999]', true],
-    [0, [1, 999], true],
-    [1, [1, 999], true],
-    [999, [1, 999], true],
-    [1000, [1, 999], false],
-    [1, '1', true],
-    [0, '1', true],
-    [1, ['1', '999'], true],
-    [0, ['1', '999'], true],
-  ])('isUnderUpperBound Test - ', (count, limit, ifInRange) => {
-    test(`length ${count} in ${limit} limit under uppper bound is ${ifInRange}`, () => {
-      expect(isUnderUpperBound(limit, count)).toBe(ifInRange);
-    });
-  });
-
-  describe.each([
-    [0, 0, 0],
-    [0, 1, 1],
-    [1, 1, 0],
-    [0, null, 0],
-    [1, null, 0],
-    [0, undefined, 0],
-    [1, undefined, 0],
-    [1, '[1, 999]', 0],
-    [0, '[1, 999]', 0],
-    [0, [1, 999], 1],
-    [1, [1, 999], 0],
-    [999, [1, 999], -998],
-    [1000, [1, 999], -999],
-    [1, '1', 0],
-    [0, '1', 1],
-    [1, ['1', '999'], 0],
-    [0, ['1', '999'], 1],
-  ])('reachLowerBoundCount Test - ', (count, limit, distance) => {
-    test(`length ${count} reach ${limit} limit is ${distance}`, () => {
-      expect(reachLowerBoundCount(limit, count)).toBe(distance);
-    });
-  });
-
   describe.each([
     [
       [
@@ -570,6 +250,223 @@ describe('Chart Helper ', () => {
   ])('getStyles Test - ', (configs, paths, targetKeys, expected) => {
     test(`get keys of ${targetKeys} from configs with path ${paths?.toString()} to be ${expected}`, () => {
       expect(getStyles(configs as any, paths, targetKeys)).toEqual(expected);
+    });
+  });
+
+  describe('getColumnRenderName Test', () => {
+    test('should get [unknown] string when field has no colName or aggregation', () => {
+      expect(getColumnRenderName(undefined)).toEqual('[unknown]');
+    });
+
+    test('should get column render name by data field when there is no aggregation', () => {
+      const field = {
+        colName: 'a',
+      } as any;
+      expect(getColumnRenderName(field)).toEqual('a');
+    });
+
+    test('should get column render name by data field with aggregation', () => {
+      const field = {
+        colName: 'a',
+        aggregate: 'SUM',
+      } as any;
+      expect(getColumnRenderName(field)).toEqual('SUM(a)');
+    });
+
+    test('should get alias name by data field when there is alias and colName', () => {
+      const field = {
+        alias: {
+          name: 'some alias name',
+        },
+        colName: 'a',
+        aggregate: 'SUM',
+      } as any;
+      expect(getColumnRenderName(field)).toEqual('some alias name');
+    });
+  });
+
+  describe('isMatchRequirement Test', () => {
+    test('should match meta requirement when no limition', () => {
+      const meta = {
+        requirements: [
+          {
+            group: null,
+            aggregate: null,
+          },
+        ],
+      } as any;
+      const config = {
+        datas: [{}],
+      } as any;
+      expect(isMatchRequirement(meta, config)).toBeTruthy();
+    });
+
+    test('should match meta requirement when only group have limition', () => {
+      const meta = {
+        requirements: [
+          {
+            group: 1,
+            aggregate: null,
+          },
+        ],
+      } as any;
+      const config = {
+        datas: [
+          {
+            type: 'group',
+            required: true,
+            rows: [
+              {
+                colName: 'category',
+              },
+            ],
+          },
+        ],
+      } as any;
+      expect(isMatchRequirement(meta, config)).toBeTruthy();
+    });
+
+    test('should match meta requirement when group and aggregate need more than one field', () => {
+      const meta = {
+        requirements: [
+          {
+            group: [1, 999],
+            aggregate: [1, 999],
+          },
+        ],
+      } as any;
+      const config = {
+        datas: [
+          {
+            type: 'group',
+            required: true,
+            rows: [
+              {
+                colName: 'category',
+              },
+            ],
+          },
+          {
+            type: 'aggregate',
+            required: true,
+            rows: [
+              {
+                colName: 'amount',
+              },
+            ],
+          },
+        ],
+      } as any;
+      expect(isMatchRequirement(meta, config)).toBeTruthy();
+    });
+
+    test('should not match meta requirement when not match all requirement of fields', () => {
+      const meta = {
+        requirements: [
+          {
+            group: 1,
+            aggregate: 2,
+          },
+        ],
+      } as any;
+      const config = {
+        datas: [
+          {
+            type: 'group',
+            required: true,
+            rows: [
+              {
+                colName: 'category',
+              },
+            ],
+          },
+          {
+            type: 'aggregate',
+            required: true,
+            rows: [
+              {
+                colName: 'amount',
+              },
+            ],
+          },
+        ],
+      } as any;
+      expect(isMatchRequirement(meta, config)).toBeFalsy();
+    });
+  });
+
+  describe('transformToObjectArray Test', () => {
+    test('should transform data to object array style', () => {
+      const metas = [{ name: 'name' }, { name: 'age' }];
+      const columns = [
+        ['r1-c1-v', 'r1-c2-v'],
+        ['r2-c1-v', 'r2-c2-v'],
+      ];
+      expect(transformToObjectArray(columns, metas)).toEqual([
+        { name: 'r1-c1-v', age: 'r1-c2-v' },
+        { name: 'r2-c1-v', age: 'r2-c2-v' },
+      ]);
+    });
+  });
+
+  describe('transformToDataSet Test', () => {
+    test('should get dataset model with ignore case compare', () => {
+      const columns = [
+        ['r1-c1-v', 'r1-c2-v'],
+        ['r2-c1-v', 'r2-c2-v'],
+      ];
+      const metas = [{ name: 'name' }, { name: 'age' }];
+      const chartDataSet = transformToDataSet(columns, metas);
+
+      expect(chartDataSet?.length).toEqual(2);
+      expect(chartDataSet[0] instanceof ChartDataSetRow).toBeTruthy();
+      expect(chartDataSet[0].convertToObject()).toEqual({
+        NAME: 'r1-c1-v',
+        AGE: 'r1-c2-v',
+      });
+      expect(chartDataSet[1].convertToObject()).toEqual({
+        NAME: 'r2-c1-v',
+        AGE: 'r2-c2-v',
+      });
+      expect(chartDataSet[0].getCell({ colName: 'age' } as any)).toEqual(
+        'r1-c2-v',
+      );
+      expect(chartDataSet[0].getFieldKey({ colName: 'age' } as any)).toEqual(
+        'AGE',
+      );
+      expect(chartDataSet[0].getFieldIndex({ colName: 'age' } as any)).toEqual(
+        1,
+      );
+      expect(chartDataSet[0].getCellByKey('age')).toEqual('r1-c2-v');
+    });
+
+    test('should get dataset model when meta have aggregation', () => {
+      const columns = [['r1-c1-v', 'r1-c2-v']];
+      const metas = [{ name: 'name' }, { name: 'AVG(age)' }];
+      const chartDataSet = transformToDataSet(columns, metas);
+
+      expect(chartDataSet?.length).toEqual(1);
+      expect(chartDataSet[0] instanceof ChartDataSetRow).toBeTruthy();
+      expect(chartDataSet[0].convertToObject()).toEqual({
+        NAME: 'r1-c1-v',
+        'AVG(AGE)': 'r1-c2-v',
+      });
+      expect(
+        chartDataSet[0].getCell({ colName: 'age', aggregate: 'AVG' } as any),
+      ).toEqual('r1-c2-v');
+      expect(
+        chartDataSet[0].getFieldKey({
+          colName: 'age',
+          aggregate: 'AVG',
+        } as any),
+      ).toEqual('AVG(AGE)');
+      expect(
+        chartDataSet[0].getFieldIndex({
+          colName: 'age',
+          aggregate: 'AVG',
+        } as any),
+      ).toEqual(1);
+      expect(chartDataSet[0].getCellByKey('AVG(age)')).toEqual('r1-c2-v');
     });
   });
 });

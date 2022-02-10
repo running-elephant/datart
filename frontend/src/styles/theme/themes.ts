@@ -18,6 +18,7 @@ import {
   NORMAL,
   ORANGE,
   PRIMARY,
+  PRIMARYRGB,
   PROCESSING,
   RED,
   SUCCESS,
@@ -28,6 +29,7 @@ import {
 
 const common = {
   primary: PRIMARY,
+  primaryRgb: PRIMARYRGB,
   info: INFO,
   success: SUCCESS,
   processing: PROCESSING,

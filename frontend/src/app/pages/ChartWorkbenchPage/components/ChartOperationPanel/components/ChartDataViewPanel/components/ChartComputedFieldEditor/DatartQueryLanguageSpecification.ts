@@ -943,7 +943,7 @@ const DatartQueryLanguageSpecification = {
     'count',
   ],
 
-  symbols: /[=><!~?:&|+\-*\/\^%]+/,
+  symbols: /[=><!~?:&|+\-*/^%]+/,
 
   operators: ['+', '-', '*', '/'],
 

@@ -20,7 +20,7 @@ import { Input, Space } from 'antd';
 import { FormItemEx } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
-import { getColumnRenderOriginName } from 'app/utils/chartHelper';
+import { getColumnRenderOriginName } from 'app/utils/internalChartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';

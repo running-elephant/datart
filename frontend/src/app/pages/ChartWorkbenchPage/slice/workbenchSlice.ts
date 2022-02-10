@@ -36,8 +36,10 @@ import {
   convertToChartDTO,
   mergeToChartConfig,
 } from 'app/utils/ChartDtoHelper';
-import { transformMeta } from 'app/utils/chartHelper';
-import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
+import {
+  filterSqlOperatorName,
+  transformMeta,
+} from 'app/utils/internalChartHelper';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { RootState } from 'types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';

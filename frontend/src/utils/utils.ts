@@ -33,6 +33,7 @@ export function errorHandle(error) {
   }
   return error;
 }
+
 export function getErrorMessage(error) {
   if (error?.response) {
     const { response } = error as AxiosError;
@@ -46,6 +47,14 @@ export function getErrorMessage(error) {
     }
   }
   return error?.message;
+}
+
+export function reduxActionErrorHandler(errorAction) {
+  if (errorAction?.payload) {
+    message.error(errorAction?.payload);
+  } else if (errorAction?.error) {
+    message.error(errorAction?.error.message);
+  }
 }
 
 export function rejectHandle(error, rejectWithValue) {
@@ -348,10 +357,8 @@ export function fastDeleteArrayElement(arr: any[], index: number) {
   arr.pop();
 }
 
-export function newGithubIssueUrl({
-  repoUrl = 'https://github.com/running-elephant/datart',
-  ...options
-}) {
+export function newIssueUrl({ type, ...options }) {
+  const repoUrl = `https://${type}.com/running-elephant/datart`;
   let issuesUrl = '';
 
   if (repoUrl) {
@@ -364,15 +371,18 @@ export function newGithubIssueUrl({
 
   const url = new URL(`${issuesUrl}/issues/new`);
 
-  const types = [
-    'body',
-    'title',
-    'labels',
-    'template',
-    'milestone',
-    'assignee',
-    'projects',
-  ];
+  const types =
+    type === 'gitee'
+      ? ['description', 'title']
+      : [
+          'body',
+          'title',
+          'labels',
+          'template',
+          'milestone',
+          'assignee',
+          'projects',
+        ];
 
   for (const type of types) {
     let value = options[type];

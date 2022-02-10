@@ -29,8 +29,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataView } from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
-import { transformMeta } from 'app/utils/chartHelper';
-import produce from 'immer';
+import { transformMeta } from 'app/utils/internalChartHelper';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,

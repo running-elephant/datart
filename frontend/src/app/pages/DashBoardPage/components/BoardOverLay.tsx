@@ -18,6 +18,9 @@
 import {
   CloudDownloadOutlined,
   CopyFilled,
+  DeleteOutlined,
+  FileAddOutlined,
+  ReloadOutlined,
   ShareAltOutlined,
 } from '@ant-design/icons';
 import { Menu, Popconfirm } from 'antd';
@@ -29,6 +32,11 @@ export interface BoardOverLayProps {
   onBoardToDownLoad: () => void;
   onShareDownloadData?: () => void;
   onSaveAsVizs?: () => void;
+  onSyncData?: () => void;
+  onRecycleViz?: () => void;
+  onAddToStory?: () => void;
+  onPublish?: () => void;
+  isArchived?: boolean;
 }
 
 export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
@@ -37,6 +45,11 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
     onBoardToDownLoad,
     onShareDownloadData,
     onSaveAsVizs,
+    onSyncData,
+    onRecycleViz,
+    onAddToStory,
+    onPublish,
+    isArchived,
   }) => {
     const t = useI18NPrefix(`viz.action`);
     const tg = useI18NPrefix(`global`);
@@ -45,6 +58,32 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
 
     const renderList = useMemo(
       () => [
+        {
+          key: 'getData',
+          icon: <ReloadOutlined />,
+          onClick: onSyncData,
+          disabled: false,
+          render: true,
+          content: t('syncData'),
+          className: 'line',
+        },
+        {
+          key: 'saveAs',
+          icon: <CopyFilled />,
+          onClick: onSaveAsVizs,
+          disabled: false,
+          render: allowManage,
+          content: tg('button.saveAs'),
+        },
+        {
+          key: 'addToStory',
+          icon: <FileAddOutlined />,
+          onClick: onAddToStory,
+          disabled: false,
+          render: allowManage && onAddToStory,
+          content: t('addToStory'),
+          className: 'line',
+        },
         {
           key: 'shareLink',
           icon: <ShareAltOutlined />,
@@ -59,6 +98,7 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
           onClick: () => {},
           disabled: false,
           render: allowDownload,
+          className: 'line',
           content: (
             <Popconfirm
               placement="left"
@@ -78,23 +118,42 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
           ),
         },
         {
-          key: 'saveAs',
-          icon: <CopyFilled />,
-          onClick: onSaveAsVizs,
+          key: 'publish',
+          icon: <FileAddOutlined />,
+          onClick: onPublish,
           disabled: false,
-          render: allowManage,
-          content: tg('button.saveAs'),
+          render: allowManage && !isArchived && onPublish,
+          content: t('unpublish'),
+        },
+        {
+          key: 'delete',
+          icon: <DeleteOutlined />,
+          disabled: false,
+          render: allowManage && onRecycleViz,
+          content: (
+            <Popconfirm
+              title={tg('operation.archiveConfirm')}
+              onConfirm={onRecycleViz}
+            >
+              {tg('button.archive')}
+            </Popconfirm>
+          ),
         },
       ],
       [
-        onOpenShareLink,
         allowShare,
         renderMode,
         allowDownload,
+        allowManage,
+        isArchived,
+        onOpenShareLink,
         onBoardToDownLoad,
         onShareDownloadData,
-        allowManage,
         onSaveAsVizs,
+        onSyncData,
+        onPublish,
+        onRecycleViz,
+        onAddToStory,
         tg,
         t,
       ],
@@ -105,9 +164,16 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
           .filter(item => item.render)
           .map(item => {
             return (
-              <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
-                {item.content}
-              </Menu.Item>
+              <>
+                <Menu.Item
+                  key={item.key}
+                  icon={item.icon}
+                  onClick={item.onClick}
+                >
+                  {item.content}
+                </Menu.Item>
+                {item.className && <Menu.Divider />}
+              </>
             );
           }),
       [renderList],
