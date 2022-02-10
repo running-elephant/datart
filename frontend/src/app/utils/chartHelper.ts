@@ -22,7 +22,6 @@ import {
   ChartDataSetRow,
 } from 'app/components/ChartGraph/models/ChartDataSet';
 import {
-  AggregateFieldActionType,
   ChartConfig,
   ChartDataConfig,
   ChartDataSectionField,
@@ -37,15 +36,22 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
-import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { Debugger } from 'utils/debugger';
-import { isEmptyArray, isUndefined, meanValue } from 'utils/object';
-import { isInRange } from './internalChartHelper';
+import { isEmptyArray, meanValue } from 'utils/object';
+import {
+  flattenHeaderRowsWithoutGroupRow,
+  getColumnRenderOriginName,
+  getRequiredAggregatedSections,
+  getRequiredGroupedSections,
+  isInRange,
+} from './internalChartHelper';
 import { toFormattedValue } from './number';
 
 /**
- * Gets an array of default colors
+ * [中文] 获取系统默认颜色
+ * </br>
+ * [EN] Gets an array of default colors
  *
  * @example
  * const colorList = getDefaultThemeColor();
@@ -59,8 +65,11 @@ export function getDefaultThemeColor() {
 }
 
 /**
- * @deprecated This function will be removed in next versiion, please use getStyles instread
- * @see getValue
+ * [中文] 使用路径语法获取配置信息，此方法已过时，请参考方法getStyles
+ * </br>
+ * [EN] Get config info by value path, please use getStyles instread
+ *
+ * @deprecated This function will be removed in next versiion, please use @see {@link getStyles} instread
  * @param {ChartStyleConfig[]} styleConfigs
  * @param {string[]} paths
  * @return {*}  {*}
@@ -73,8 +82,11 @@ export function getStyleValue(
 }
 
 /**
- * @deprecated This function will be removed in next versiion, please use getStyles instread
- * @see getValue
+ * [中文] 使用路径语法获取配置信息，此方法已过时，请参考方法getStyles
+ * </br>
+ * [EN] Get setting config info by value path, please use getStyles instread
+ *
+ * @deprecated This function will be removed in next versiion, please use @see {@link getStyles} instread
  * @export
  * @param {ChartStyleConfig[]} configs
  * @param {string} path
@@ -90,8 +102,11 @@ export function getSettingValue(
 }
 
 /**
- * @deprecated This function will be removed in next versiion, please use getStyles instread
- * @see getStyles
+ * [中文] 使用路径语法获取配置信息，此方法已过时，请参考方法getStyles
+ * </br>
+ * [EN] Get setting config info by value path, please use getStyles instread
+ *
+ * @deprecated This function will be removed in next versiion, please use @see {@link getStyles} instread
  * @export
  * @param {ChartStyleConfig[]} styles
  * @param {string} groupPath
@@ -108,8 +123,12 @@ export function getStyleValueByGroup(
 }
 
 /**
- * Get config style values, more example please see test cases
+ * [中文] 通过数组路径语法，获取对应的配置的值集合
+ * </br>
+ * [EN] Get config style values
+ *
  * @example
+ *
  * const styleConfigs = [
  *       {
  *        key: 'label',
@@ -141,8 +160,24 @@ export function getStyles(
 }
 
 /**
- * Get style config value base funtion with default target key
- * @export
+ * [中文] 通过数组路径语法，获取对应的配置信息
+ * </br>
+ * [EN] Get style config value base funtion with default target key
+ *
+ * @example
+ *
+ * const styleConfigs = [
+ *       {
+ *        key: 'label',
+ *        rows: [
+ *           { key: 'color', value: 'red' },
+ *           { key: 'font', value: 'sans-serif' },
+ *         ],
+ *       },
+ *     ];
+ * const colorValue = getValue(styleConfigs, ['label', 'color']);
+ * console.log(colorValue); // red
+ *
  * @param {Array<ChartStyleConfig>} configs
  * @param {Array<string>} keyPaths
  * @param {string} [targetKey='value']
@@ -635,7 +670,10 @@ export function getNameTextStyle(fontFamily, fontSize, color) {
 }
 
 /**
- * Create ChartDataSet Model with sorted values
+ * [中文] 将服务端返回数据转换为ChartDataSet模型
+ * </br>
+ * [EN] Create ChartDataSet Model with sorted values
+ *
  * @export
  * @template T
  * @param {T[][]} [datas]
@@ -654,11 +692,25 @@ export function transformToDataSet<T>(
 }
 
 /**
+ * [中文] 将服务端返回数据转换为一维对象数组结构, 已过时，请使用transformToDataSet
+ * </br>
+ * [EN] transform dataset to object array, please use transformToDataSet instead
+ *
  * @deprecated shoule use DataSet model, @see {@link transformToDataSet}
  * @description
  * Support:
  *  1. Case Insensitive to get value
  *  2. More util helper
+ * @example
+ *
+ * const columns = [
+ *      ['r1-c1-v', 'r1-c2-v'],
+ *      ['r2-c1-v', 'r2-c2-v'],
+ *    ];
+ * const metas = [{ name: 'name' }, { name: 'age' }];
+ * const datas = transformToObjectArray(columns, metas);
+ * console.log(datas); // [{"name":"r1-c1-v","age":"r1-c2-v2"},{"name":"r2-c1-v","age":"r2-c2-v"}]
+ *
  * @export
  * @param {string[][]} [columns]
  * @param {ChartDatasetMeta[]} [metas]
@@ -692,69 +744,36 @@ export function transformToObjectArray(
   );
 }
 
-/**
- * @deprecated please use new method transformToObjectArray instead
- * @see transformToObjectArray
- * @export
- * @param {string[][]} [columns]
- * @param {ChartDatasetMeta[]} [metas]
- * @return {*}
- */
-export function transfromToObjectArray(
-  columns?: string[][],
-  metas?: ChartDatasetMeta[],
-) {
-  console.warn(
-    'This method `transfromToObjectArray` will be deprecated and can be replaced by `transformToObjectArray`',
-  );
-  return transformToObjectArray(columns, metas);
-}
-
-/**
- * Get the data column key
- *
- * @export
- * @param {{ aggregate?; colName: string }} [col]
- * @return {*} 
- */
-export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
-  if (!col) {
+export function getValueByColumnKey(field?: {
+  aggregate?;
+  colName: string;
+}): string {
+  if (!field) {
     return '';
   }
-  if (!col.aggregate) {
-    return col.colName;
+  if (!field.aggregate) {
+    return field.colName;
   }
-  return `${col.aggregate}(${col.colName})`;
-}
-
-export function getColumnRenderOriginName(c?: ChartDataSectionField) {
-  if (!c) {
-    return '[unknown]';
-  }
-  if (c.aggregate === AggregateFieldActionType.NONE) {
-    return c.colName;
-  }
-  if (c.aggregate) {
-    return `${c.aggregate}(${c.colName})`;
-  }
-  return c.colName;
+  return `${field.aggregate}(${field.colName})`;
 }
 
 /**
- * Get the data column name
+ * [中文] 获取字段的图表显示名称
+ * </br>
+ * [EN] Get data field render name by alias, colName and aggregate
  *
  * @export
- * @param {ChartDataSectionField} [c]
- * @return {*} 
+ * @param {ChartDataSectionField} [field]
+ * @return {string}
  */
-export function getColumnRenderName(c?: ChartDataSectionField) {
-  if (!c) {
+export function getColumnRenderName(field?: ChartDataSectionField): string {
+  if (!field) {
     return '[unknown]';
   }
-  if (c.alias?.name) {
-    return c.alias.name;
+  if (field.alias?.name) {
+    return field.alias.name;
   }
-  return getColumnRenderOriginName(c);
+  return getColumnRenderOriginName(field);
 }
 
 export function getUnusedHeaderRows(
@@ -776,105 +795,6 @@ export function getUnusedHeaderRows(
     }
     return acc;
   }, []);
-}
-
-export function diffHeaderRows(
-  oldRows: Array<{ colName: string }>,
-  newRows: Array<{ colName: string }>,
-) {
-  if (!oldRows?.length) {
-    return true;
-  }
-  if (oldRows?.length !== newRows?.length) {
-    return true;
-  }
-  const oldNames = oldRows.map(r => r.colName).sort();
-  const newNames = newRows.map(r => r.colName).sort();
-  if (oldNames.toString() !== newNames.toString()) {
-    return true;
-  }
-
-  return false;
-}
-
-export function flattenHeaderRowsWithoutGroupRow<
-  T extends {
-    isGroup?: boolean;
-    children?: T[];
-  },
->(groupedHeaderRow: T) {
-  const childRows = (groupedHeaderRow.children || []).flatMap(child =>
-    flattenHeaderRowsWithoutGroupRow(child),
-  );
-  if (groupedHeaderRow.isGroup) {
-    return childRows;
-  }
-  return [groupedHeaderRow].concat(childRows);
-}
-
-export function transformMeta(model?: string) {
-  if (!model) {
-    return undefined;
-  }
-  const jsonObj = JSON.parse(model);
-  return Object.keys(jsonObj).map(colKey => ({
-    ...jsonObj[colKey],
-    id: colKey,
-    category: ChartDataViewFieldCategory.Field,
-  }));
-}
-
-export function mergeChartStyleConfigs(
-  target?: ChartStyleConfig[],
-  source?: ChartStyleConfigDTO[],
-  options = { useDefault: true },
-): ChartStyleConfig[] | undefined {
-  if (isEmptyArray(target)) {
-    return target;
-  }
-  if (isEmptyArray(source) && !options?.useDefault) {
-    return target;
-  }
-  for (let index = 0; index < target?.length!; index++) {
-    const tEle: any = target?.[index];
-    if (!tEle) {
-      continue;
-    }
-
-    // options.useDefault
-    if (isUndefined(tEle['value']) && options?.useDefault) {
-      tEle['value'] = tEle?.['default'];
-    }
-
-    const sEle =
-      'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
-
-    if (!isUndefined(sEle?.['value'])) {
-      tEle['value'] = sEle?.['value'];
-    }
-    if (!isEmptyArray(tEle?.rows)) {
-      tEle['rows'] = mergeChartStyleConfigs(tEle.rows, sEle?.rows, options);
-    } else if (sEle && !isEmptyArray(sEle?.rows)) {
-      // Note: we merge all rows data when target rows is emtpy
-      tEle['rows'] = sEle?.rows;
-    }
-  }
-  return target;
-}
-
-export function mergeChartDataConfigs<
-  T extends { key?: string; rows?: ChartDataSectionField[] } | undefined | null,
->(target?: T[], source?: T[]) {
-  if (isEmptyArray(target) || isEmptyArray(source)) {
-    return target;
-  }
-  return (target || []).map(tEle => {
-    const sEle = (source || []).find(s => s?.key === tEle?.key);
-    if (sEle) {
-      return Object.assign({}, tEle, { rows: sEle?.rows });
-    }
-    return tEle;
-  });
 }
 
 export function getDataColumnMaxAndMin(
@@ -1004,8 +924,20 @@ export function getSeriesTooltips4Rectangular(
   }
   return [];
 }
-
-export function valueFormatter(config?: ChartDataSectionField, value?: any) {
+/**
+ * [中文] 获取字段的Tooltip显示名称和内容
+ * </br>
+ * [EN] Get chart render string with field name and value
+ *
+ * @export
+ * @param {ChartDataSectionField} [config]
+ * @param {number} [value]
+ * @return {string}
+ */
+export function valueFormatter(
+  config?: ChartDataSectionField,
+  value?: number,
+): string {
   return `${getColumnRenderName(config)}: ${toFormattedValue(
     value,
     config?.format,
@@ -1032,6 +964,15 @@ export function getScatterSymbolSizeFn(
         2,
     );
   };
+}
+
+export function getGridStyle(styles) {
+  const [containLabel, left, right, bottom, top] = getStyles(
+    styles,
+    ['margin'],
+    ['containLabel', 'marginLeft', 'marginRight', 'marginBottom', 'marginTop'],
+  );
+  return { left, right, bottom, top, containLabel };
 }
 
 // TODO(Stephen): tobe used chart DataSetRow model for all charts
@@ -1087,31 +1028,55 @@ export function getColorizeGroupSeriesColumns(
   return collection;
 }
 
-export function getRequiredGroupedSections(dataConfig?) {
-  return (
-    dataConfig
-      ?.filter(
-        c =>
-          c.type === ChartDataSectionType.GROUP ||
-          c.type === ChartDataSectionType.COLOR,
-      )
-      .filter(c => !!c.required) || []
-  );
-}
-
-export function getRequiredAggregatedSections(dataConfigs?) {
-  return (
-    dataConfigs
-      ?.filter(
-        c =>
-          c.type === ChartDataSectionType.AGGREGATE ||
-          c.type === ChartDataSectionType.SIZE,
-      )
-      .filter(c => !!c.required) || []
-  );
-}
-
-export function isMatchRequirement(meta: ChartMetadata, config: ChartConfig) {
+/**
+ * [中文] 是否满足当前meta中标识的限制要求，以满足图表绘制
+ * </br>
+ * [EN] Check if current config with requried fields match the chart basic requirement of meta info.
+ *
+ * @example
+ *
+ *  const meta = {
+ *      requirements: [
+ *        {
+ *          group: [1, 999],
+ *          aggregate: [1, 999],
+ *        },
+ *      ],
+ *    };
+ *    const config = {
+ *     datas: [
+ *        {
+ *         type: 'group',
+ *          required: true,
+ *          rows: [
+ *            {
+ *              colName: 'category',
+ *            },
+ *          ],
+ *        },
+ *        {
+ *          type: 'aggregate',
+ *          required: true,
+ *          rows: [
+ *            {
+ *              colName: 'amount',
+ *            },
+ *          ],
+ *        },
+ *      ],
+ *    };
+ *  const isMatch = isMatchRequirement(meta, config);
+ *  console.log(isMatch); // true;
+ *
+ * @export
+ * @param {ChartMetadata} meta
+ * @param {ChartConfig} config
+ * @return {boolean}
+ */
+export function isMatchRequirement(
+  meta: ChartMetadata,
+  config: ChartConfig,
+): boolean {
   const dataConfigs = config.datas || [];
   const groupedFieldConfigs = getRequiredGroupedSections(dataConfigs).flatMap(
     config => config.rows || [],
@@ -1128,13 +1093,4 @@ export function isMatchRequirement(meta: ChartMetadata, config: ChartConfig) {
       isInRange(aggregate, aggregateFieldConfigs.length)
     );
   });
-}
-
-export function getGridStyle(styles) {
-  const [containLabel, left, right, bottom, top] = getStyles(
-    styles,
-    ['margin'],
-    ['containLabel', 'marginLeft', 'marginRight', 'marginBottom', 'marginTop'],
-  );
-  return { left, right, bottom, top, containLabel };
 }

@@ -7,13 +7,14 @@
     "include": ["types/chartHelper.js"],
     "excludePattern": "(^|\\/|\\\\)_"
   },
-  "plugins": ["plugins/markdown", "plugins/summarize"],
+  "plugins": [],
   "templates": {
     "cleverLinks": false,
     "monospaceLinks": false
   },
   "opts": {
     "encoding": "utf8",
-    "destination": "./types/docs"
+    "destination": "./types/docs",
+    "template": "node_modules/docdash"
   }
 }
