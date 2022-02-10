@@ -17,8 +17,10 @@
  */
 
 import {
+  AggregateFieldActionType,
   ChartConfig,
   ChartDataConfig,
+  ChartDataSectionField,
   ChartDataSectionType,
 } from 'app/types/ChartConfig';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
@@ -320,6 +322,19 @@ export function reachLowerBoundCount(
     [isNumerical, limit => limit - count],
     [isPairArray, limit => +limit[0] - count],
   )(limit, 0);
+}
+
+export function getColumnRenderOriginName(c?: ChartDataSectionField) {
+  if (!c) {
+    return '[unknown]';
+  }
+  if (c.aggregate === AggregateFieldActionType.NONE) {
+    return c.colName;
+  }
+  if (c.aggregate) {
+    return `${c.aggregate}(${c.colName})`;
+  }
+  return c.colName;
 }
 
 // TODO(Stephen): tobe delete after use ChartDataSet Model in charts

@@ -22,7 +22,6 @@ import {
   ChartDataSetRow,
 } from 'app/components/ChartGraph/models/ChartDataSet';
 import {
-  AggregateFieldActionType,
   ChartConfig,
   ChartDataConfig,
   ChartDataSectionField,
@@ -41,7 +40,7 @@ import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { Debugger } from 'utils/debugger';
 import { isEmptyArray, isUndefined, meanValue } from 'utils/object';
-import { isInRange } from './internalChartHelper';
+import { getColumnRenderOriginName, isInRange } from './internalChartHelper';
 import { toFormattedValue } from './number';
 
 /**
@@ -110,6 +109,7 @@ export function getStyleValueByGroup(
 /**
  * Get config style values, more example please see test cases
  * @example
+ *
  * const styleConfigs = [
  *       {
  *        key: 'label',
@@ -142,7 +142,20 @@ export function getStyles(
 
 /**
  * Get style config value base funtion with default target key
- * @export
+ * @example
+ *
+ * const styleConfigs = [
+ *       {
+ *        key: 'label',
+ *        rows: [
+ *           { key: 'color', value: 'red' },
+ *           { key: 'font', value: 'sans-serif' },
+ *         ],
+ *       },
+ *     ];
+ * const colorValue = getValue(styleConfigs, ['label', 'color']);
+ * console.log(colorValue); // red
+ *
  * @param {Array<ChartStyleConfig>} configs
  * @param {Array<string>} keyPaths
  * @param {string} [targetKey='value']
@@ -693,12 +706,20 @@ export function transformToObjectArray(
 }
 
 /**
- * @deprecated please use new method transformToObjectArray instead
- * @see transformToObjectArray
+ * [Not Recommended] Get dataset key by field config with case-sensitive, it should only used in internal method.
+ * If you want to find case-insensitive method, please @see {@link ChartDataSet}
+ *
+ * @example
+ * const config = {
+ *    colName: 'amount',
+ *    aggregate: 'AVG'
+ * }
+ * const dataSetKey = getValueByColumnKey(config);
+ * console.log(dataSetKey); // AVG(amount)
+ *
  * @export
- * @param {string[][]} [columns]
- * @param {ChartDatasetMeta[]} [metas]
- * @return {*}
+ * @param {ChartDataSectionField} [field]
+ * @return {string}
  */
 export function transfromToObjectArray(
   columns?: string[][],
@@ -710,51 +731,33 @@ export function transfromToObjectArray(
   return transformToObjectArray(columns, metas);
 }
 
-/**
- * Get the data column key
- *
- * @export
- * @param {{ aggregate?; colName: string }} [col]
- * @return {*} 
- */
-export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
-  if (!col) {
+export function getValueByColumnKey(field?: {
+  aggregate?;
+  colName: string;
+}): string {
+  if (!field) {
     return '';
   }
-  if (!col.aggregate) {
-    return col.colName;
+  if (!field.aggregate) {
+    return field.colName;
   }
-  return `${col.aggregate}(${col.colName})`;
-}
-
-export function getColumnRenderOriginName(c?: ChartDataSectionField) {
-  if (!c) {
-    return '[unknown]';
-  }
-  if (c.aggregate === AggregateFieldActionType.NONE) {
-    return c.colName;
-  }
-  if (c.aggregate) {
-    return `${c.aggregate}(${c.colName})`;
-  }
-  return c.colName;
+  return `${field.aggregate}(${field.colName})`;
 }
 
 /**
- * Get the data column name
- *
+ * Get data field render name by alias, colName and aggregate
  * @export
- * @param {ChartDataSectionField} [c]
- * @return {*} 
+ * @param {ChartDataSectionField} [field]
+ * @return {string}
  */
-export function getColumnRenderName(c?: ChartDataSectionField) {
-  if (!c) {
+export function getColumnRenderName(field?: ChartDataSectionField): string {
+  if (!field) {
     return '[unknown]';
   }
-  if (c.alias?.name) {
-    return c.alias.name;
+  if (field.alias?.name) {
+    return field.alias.name;
   }
-  return getColumnRenderOriginName(c);
+  return getColumnRenderOriginName(field);
 }
 
 export function getUnusedHeaderRows(

@@ -19,6 +19,7 @@
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import {
+  getColumnRenderName,
   getStyles,
   getValue,
   mergeChartDataConfigs,
@@ -26,7 +27,6 @@ import {
 } from '../chartHelper';
 
 describe('Chart Helper ', () => {
-
   describe.each([
     [[{}], [{}], [{}]],
     [[{}], [null], [{}]],
@@ -496,6 +496,38 @@ describe('Chart Helper ', () => {
   ])('getStyles Test - ', (configs, paths, targetKeys, expected) => {
     test(`get keys of ${targetKeys} from configs with path ${paths?.toString()} to be ${expected}`, () => {
       expect(getStyles(configs as any, paths, targetKeys)).toEqual(expected);
+    });
+  });
+
+  describe('getColumnRenderName Test', () => {
+    test('should get [unknown] string when field has no colName or aggregation', () => {
+      expect(getColumnRenderName(undefined)).toEqual('[unknown]');
+    });
+
+    test('should get column render name by data field when there is no aggregation', () => {
+      const field = {
+        colName: 'a',
+      } as any;
+      expect(getColumnRenderName(field)).toEqual('a');
+    });
+
+    test('should get column render name by data field with aggregation', () => {
+      const field = {
+        colName: 'a',
+        aggregate: 'SUM',
+      } as any;
+      expect(getColumnRenderName(field)).toEqual('SUM(a)');
+    });
+
+    test('should get alias name by data field when there is alias and colName', () => {
+      const field = {
+        alias: {
+          name: 'some alias name',
+        },
+        colName: 'a',
+        aggregate: 'SUM',
+      } as any;
+      expect(getColumnRenderName(field)).toEqual('some alias name');
     });
   });
 });
