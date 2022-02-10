@@ -441,6 +441,30 @@ export function mergeChartDataConfigs<
   });
 }
 
+export function getRequiredGroupedSections(dataConfig?) {
+  return (
+    dataConfig
+      ?.filter(
+        c =>
+          c.type === ChartDataSectionType.GROUP ||
+          c.type === ChartDataSectionType.COLOR,
+      )
+      .filter(c => !!c.required) || []
+  );
+}
+
+export function getRequiredAggregatedSections(dataConfigs?) {
+  return (
+    dataConfigs
+      ?.filter(
+        c =>
+          c.type === ChartDataSectionType.AGGREGATE ||
+          c.type === ChartDataSectionType.SIZE,
+      )
+      .filter(c => !!c.required) || []
+  );
+}
+
 // TODO(Stephen): tobe delete after use ChartDataSet Model in charts
 // 兼容 impala 聚合函数小写问题
 export const filterSqlOperatorName = (requestParams, widgetData) => {

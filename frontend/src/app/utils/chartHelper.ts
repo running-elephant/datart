@@ -36,13 +36,14 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
-import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { Debugger } from 'utils/debugger';
-import { isEmptyArray, isUndefined, meanValue } from 'utils/object';
+import { isEmptyArray, meanValue } from 'utils/object';
 import {
   flattenHeaderRowsWithoutGroupRow,
   getColumnRenderOriginName,
+  getRequiredAggregatedSections,
+  getRequiredGroupedSections,
   isInRange,
 } from './internalChartHelper';
 import { toFormattedValue } from './number';
@@ -942,6 +943,15 @@ export function getScatterSymbolSizeFn(
   };
 }
 
+export function getGridStyle(styles) {
+  const [containLabel, left, right, bottom, top] = getStyles(
+    styles,
+    ['margin'],
+    ['containLabel', 'marginLeft', 'marginRight', 'marginBottom', 'marginTop'],
+  );
+  return { left, right, bottom, top, containLabel };
+}
+
 // TODO(Stephen): tobe used chart DataSetRow model for all charts
 export function getExtraSeriesRowData(data) {
   if (data instanceof ChartDataSetRow) {
@@ -995,31 +1005,52 @@ export function getColorizeGroupSeriesColumns(
   return collection;
 }
 
-export function getRequiredGroupedSections(dataConfig?) {
-  return (
-    dataConfig
-      ?.filter(
-        c =>
-          c.type === ChartDataSectionType.GROUP ||
-          c.type === ChartDataSectionType.COLOR,
-      )
-      .filter(c => !!c.required) || []
-  );
-}
-
-export function getRequiredAggregatedSections(dataConfigs?) {
-  return (
-    dataConfigs
-      ?.filter(
-        c =>
-          c.type === ChartDataSectionType.AGGREGATE ||
-          c.type === ChartDataSectionType.SIZE,
-      )
-      .filter(c => !!c.required) || []
-  );
-}
-
-export function isMatchRequirement(meta: ChartMetadata, config: ChartConfig) {
+/**
+ * Check if current config with requried fields match the chart basic requirement of meta info.
+ * @example
+ *
+ *  const meta = {
+ *      requirements: [
+ *        {
+ *          group: [1, 999],
+ *          aggregate: [1, 999],
+ *        },
+ *      ],
+ *    };
+ *    const config = {
+ *     datas: [
+ *        {
+ *         type: 'group',
+ *          required: true,
+ *          rows: [
+ *            {
+ *              colName: 'category',
+ *            },
+ *          ],
+ *        },
+ *        {
+ *          type: 'aggregate',
+ *          required: true,
+ *          rows: [
+ *            {
+ *              colName: 'amount',
+ *            },
+ *          ],
+ *        },
+ *      ],
+ *    };
+ *  const isMatch = isMatchRequirement(meta, config);
+ *  console.log(isMatch); // true;
+ *
+ * @export
+ * @param {ChartMetadata} meta
+ * @param {ChartConfig} config
+ * @return {boolean}
+ */
+export function isMatchRequirement(
+  meta: ChartMetadata,
+  config: ChartConfig,
+): boolean {
   const dataConfigs = config.datas || [];
   const groupedFieldConfigs = getRequiredGroupedSections(dataConfigs).flatMap(
     config => config.rows || [],
@@ -1036,13 +1067,4 @@ export function isMatchRequirement(meta: ChartMetadata, config: ChartConfig) {
       isInRange(aggregate, aggregateFieldConfigs.length)
     );
   });
-}
-
-export function getGridStyle(styles) {
-  const [containLabel, left, right, bottom, top] = getStyles(
-    styles,
-    ['margin'],
-    ['containLabel', 'marginLeft', 'marginRight', 'marginBottom', 'marginTop'],
-  );
-  return { left, right, bottom, top, containLabel };
 }

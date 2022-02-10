@@ -16,10 +16,14 @@
  * limitations under the License.
  */
 
-import { getColumnRenderName, getStyles, getValue } from '../chartHelper';
+import {
+  getColumnRenderName,
+  getStyles,
+  getValue,
+  isMatchRequirement,
+} from '../chartHelper';
 
 describe('Chart Helper ', () => {
-
   describe.each([
     [
       [
@@ -275,6 +279,116 @@ describe('Chart Helper ', () => {
         aggregate: 'SUM',
       } as any;
       expect(getColumnRenderName(field)).toEqual('some alias name');
+    });
+  });
+
+  describe('isMatchRequirement Test', () => {
+    test('should match meta requirement when no limition', () => {
+      const meta = {
+        requirements: [
+          {
+            group: null,
+            aggregate: null,
+          },
+        ],
+      } as any;
+      const config = {
+        datas: [{}],
+      } as any;
+      expect(isMatchRequirement(meta, config)).toBeTruthy();
+    });
+
+    test('should match meta requirement when only group have limition', () => {
+      const meta = {
+        requirements: [
+          {
+            group: 1,
+            aggregate: null,
+          },
+        ],
+      } as any;
+      const config = {
+        datas: [
+          {
+            type: 'group',
+            required: true,
+            rows: [
+              {
+                colName: 'category',
+              },
+            ],
+          },
+        ],
+      } as any;
+      expect(isMatchRequirement(meta, config)).toBeTruthy();
+    });
+
+    test('should match meta requirement when group and aggregate need more than one field', () => {
+      const meta = {
+        requirements: [
+          {
+            group: [1, 999],
+            aggregate: [1, 999],
+          },
+        ],
+      } as any;
+      const config = {
+        datas: [
+          {
+            type: 'group',
+            required: true,
+            rows: [
+              {
+                colName: 'category',
+              },
+            ],
+          },
+          {
+            type: 'aggregate',
+            required: true,
+            rows: [
+              {
+                colName: 'amount',
+              },
+            ],
+          },
+        ],
+      } as any;
+      expect(isMatchRequirement(meta, config)).toBeTruthy();
+    });
+
+    test('should not match meta requirement when not match all requirement of fields', () => {
+      const meta = {
+        requirements: [
+          {
+            group: 1,
+            aggregate: 2,
+          },
+        ],
+      } as any;
+      const config = {
+        datas: [
+          {
+            type: 'group',
+            required: true,
+            rows: [
+              {
+                colName: 'category',
+              },
+            ],
+          },
+          {
+            type: 'aggregate',
+            required: true,
+            rows: [
+              {
+                colName: 'amount',
+              },
+            ],
+          },
+        ],
+      } as any;
+      expect(isMatchRequirement(meta, config)).toBeFalsy();
     });
   });
 });
