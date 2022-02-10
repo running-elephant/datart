@@ -31,10 +31,11 @@ import {
   getDashBoardByResBoard,
   getDataChartsByServer,
 } from 'app/pages/DashBoardPage/utils/board';
-import { getWidgetMapByServer } from 'app/pages/DashBoardPage/utils/widget';
+import { getWidgetMap } from 'app/pages/DashBoardPage/utils/widget';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDTO } from 'app/types/ChartDTO';
+import { migrateWidgets } from 'app/migration/migrateWidgets';
 // import 'core-js/stable/map';
 // need polyfill [Object.values,Array.prototype.find,new Map]
 
@@ -42,7 +43,7 @@ import { ChartDTO } from 'app/types/ChartDTO';
  * @param ''
  * @description 'server task 定时任务 调用'
  */
-const getBoardQueryData = (dataStr: string) => {
+const getBoardQueryData = (dataStr: string,curVersion:string) => {
   var data = JSON.parse(dataStr) as ServerDashboard;
 
   // const renderMode: VizRenderMode = 'schedule';
@@ -50,8 +51,11 @@ const getBoardQueryData = (dataStr: string) => {
   const { datacharts, views: serverViews, widgets: serverWidgets } = data;
 
   const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
-  const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(
-    serverWidgets,
+  const migratedWidgets = migrateWidgets(serverWidgets, {
+    version: curVersion,
+  });
+  const { widgetMap, wrappedDataCharts } = getWidgetMap(
+    migratedWidgets,
     dataCharts,
   );
 
@@ -96,9 +100,9 @@ const getChartQueryData = (dataStr: string) => {
   let fileName = data?.name || 'chart';
   return JSON.stringify({ downloadParams, fileName });
 };
-const getQueryData = (type: 'chart' | 'board', dataStr: string) => {
+const getQueryData = (type: 'chart' | 'board', dataStr: string,version:string='') => {
   if (type === 'board') {
-    return getBoardQueryData(dataStr);
+    return getBoardQueryData(dataStr,version);
   } else {
     return getChartQueryData(dataStr);
   }

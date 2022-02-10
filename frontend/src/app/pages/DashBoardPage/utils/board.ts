@@ -205,21 +205,4 @@ export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
   return viewViews;
 };
 
-/**
- * adjustWidgetsBeforeSave
- * @param {Widget[]} widgets
- * @param {{ version: string }} opt
- * @return {*}  {Widget[]}
- */
-export const adjustWidgetsBeforeSave = (
-  widgets: Widget[],
-  opt: { version: string },
-): Widget[] => {
-  const nextWidgets = widgets.map(widget => {
-    const nextWidget = produce(widget, curWidget => {
-      curWidget.config.version = opt.version || '1.0.0-beta.0';
-    });
-    return nextWidget;
-  });
-  return nextWidgets;
-};
+

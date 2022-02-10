@@ -511,21 +511,6 @@ export const convertWidgetRelationsToSave = (
   });
 };
 
-export const convertWidgetRelationsToObj = (
-  relations: ServerRelation[] = [],
-): Relation[] => {
-  return relations.map(relation => {
-    try {
-      return { ...relation, config: JSON.parse(relation.config) };
-    } catch (error) {
-      return {
-        ...relation,
-        config: { RelatedViewMap: {}, filterCovered: false },
-      };
-    }
-  });
-};
-
 export const convertToWidgetMap = (widgets: Widget[]) => {
   return widgets.reduce((acc, cur) => {
     acc[cur.id] = cur;
@@ -788,8 +773,8 @@ export const getLinkedColumn = (
 };
 
 // TODO chart widget
-export const getWidgetMapByServer = (
-  widgets: ServerWidget[],
+export const getWidgetMap = (
+  widgets: Widget[],
   dataCharts: DataChart[],
   filterSearchParamsMap?: FilterSearchParamsWithMatch,
 ) => {
@@ -806,8 +791,6 @@ export const getWidgetMapByServer = (
     try {
       let widget: Widget = {
         ...cur,
-        config: JSON.parse(cur.config),
-        relations: convertWidgetRelationsToObj(cur.relations),
         viewIds,
       };
       // TODO migration about font 5 --xld
