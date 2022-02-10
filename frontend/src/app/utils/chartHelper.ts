@@ -49,7 +49,9 @@ import {
 import { toFormattedValue } from './number';
 
 /**
- * Gets an array of default colors
+ * [中文] 获取系统默认颜色
+ * </br>
+ * [EN] Gets an array of default colors
  *
  * @example
  * const colorList = getDefaultThemeColor();
@@ -63,8 +65,11 @@ export function getDefaultThemeColor() {
 }
 
 /**
- * @deprecated This function will be removed in next versiion, please use getStyles instread
- * @see getValue
+ * [中文] 使用路径语法获取配置信息，此方法已过时，请参考方法getStyles
+ * </br>
+ * [EN] Get config info by value path, please use getStyles instread
+ *
+ * @deprecated This function will be removed in next versiion, please use @see {@link getStyles} instread
  * @param {ChartStyleConfig[]} styleConfigs
  * @param {string[]} paths
  * @return {*}  {*}
@@ -77,8 +82,11 @@ export function getStyleValue(
 }
 
 /**
- * @deprecated This function will be removed in next versiion, please use getStyles instread
- * @see getValue
+ * [中文] 使用路径语法获取配置信息，此方法已过时，请参考方法getStyles
+ * </br>
+ * [EN] Get setting config info by value path, please use getStyles instread
+ *
+ * @deprecated This function will be removed in next versiion, please use @see {@link getStyles} instread
  * @export
  * @param {ChartStyleConfig[]} configs
  * @param {string} path
@@ -94,8 +102,11 @@ export function getSettingValue(
 }
 
 /**
- * @deprecated This function will be removed in next versiion, please use getStyles instread
- * @see getStyles
+ * [中文] 使用路径语法获取配置信息，此方法已过时，请参考方法getStyles
+ * </br>
+ * [EN] Get setting config info by value path, please use getStyles instread
+ *
+ * @deprecated This function will be removed in next versiion, please use @see {@link getStyles} instread
  * @export
  * @param {ChartStyleConfig[]} styles
  * @param {string} groupPath
@@ -112,7 +123,10 @@ export function getStyleValueByGroup(
 }
 
 /**
- * Get config style values, more example please see test cases
+ * [中文] 通过数组路径语法，获取对应的配置的值集合
+ * </br>
+ * [EN] Get config style values
+ *
  * @example
  *
  * const styleConfigs = [
@@ -146,7 +160,10 @@ export function getStyles(
 }
 
 /**
- * Get style config value base funtion with default target key
+ * [中文] 通过数组路径语法，获取对应的配置信息
+ * </br>
+ * [EN] Get style config value base funtion with default target key
+ *
  * @example
  *
  * const styleConfigs = [
@@ -653,7 +670,10 @@ export function getNameTextStyle(fontFamily, fontSize, color) {
 }
 
 /**
- * Create ChartDataSet Model with sorted values
+ * [中文] 将服务端返回数据转换为ChartDataSet模型
+ * </br>
+ * [EN] Create ChartDataSet Model with sorted values
+ *
  * @export
  * @template T
  * @param {T[][]} [datas]
@@ -672,6 +692,10 @@ export function transformToDataSet<T>(
 }
 
 /**
+ * [中文] 将服务端返回数据转换为一维对象数组结构, 已过时，请使用transformToDataSet
+ * </br>
+ * [EN] transform dataset to object array, please use transformToDataSet instead
+ *
  * @deprecated shoule use DataSet model, @see {@link transformToDataSet}
  * @description
  * Support:
@@ -685,8 +709,8 @@ export function transformToDataSet<T>(
  *    ];
  * const metas = [{ name: 'name' }, { name: 'age' }];
  * const datas = transformToObjectArray(columns, metas);
- * console.log(datas); // [{"name":"r1-c1-v","age":"r1-c2-v2"},{"name":"r2-c1-v","age":"r2-c2-v"}] 
- * 
+ * console.log(datas); // [{"name":"r1-c1-v","age":"r1-c2-v2"},{"name":"r2-c1-v","age":"r2-c2-v"}]
+ *
  * @export
  * @param {string[][]} [columns]
  * @param {ChartDatasetMeta[]} [metas]
@@ -734,7 +758,10 @@ export function getValueByColumnKey(field?: {
 }
 
 /**
- * Get data field render name by alias, colName and aggregate
+ * [中文] 获取字段的图表显示名称
+ * </br>
+ * [EN] Get data field render name by alias, colName and aggregate
+ *
  * @export
  * @param {ChartDataSectionField} [field]
  * @return {string}
@@ -898,7 +925,9 @@ export function getSeriesTooltips4Rectangular(
   return [];
 }
 /**
- * Get chart render string with field name and value
+ * [中文] 获取字段的Tooltip显示名称和内容
+ * </br>
+ * [EN] Get chart render string with field name and value
  *
  * @export
  * @param {ChartDataSectionField} [config]
@@ -1000,7 +1029,10 @@ export function getColorizeGroupSeriesColumns(
 }
 
 /**
- * Check if current config with requried fields match the chart basic requirement of meta info.
+ * [中文] 是否满足当前meta中标识的限制要求，以满足图表绘制
+ * </br>
+ * [EN] Check if current config with requried fields match the chart basic requirement of meta info.
+ *
  * @example
  *
  *  const meta = {
