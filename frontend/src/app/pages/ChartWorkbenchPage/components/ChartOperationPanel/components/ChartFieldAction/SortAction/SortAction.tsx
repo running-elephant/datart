@@ -22,10 +22,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import DraggableList from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/SortAction/DraggableList';
 import { ChartDataSectionField, SortActionType } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import {
-  getValueByColumnKey,
-  transformToObjectArray,
-} from 'app/utils/chartHelper';
+import { transformToDataSet } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -47,15 +44,10 @@ const SortAction: FC<{
   const t = useI18NPrefix(`viz.palette.data.actions`);
   const [direction, setDirection] = useState(config?.sort?.type);
   const [sortValue, setSortValue] = useState(() => {
-    const objDataColumns = transformToObjectArray(
-      dataset?.rows,
-      dataset?.columns,
-    );
+    const objDataColumns = transformToDataSet(dataset?.rows, dataset?.columns);
     return (
       config?.sort?.value ||
-      Array.from(
-        new Set(objDataColumns?.map(c => c[getValueByColumnKey(config)])),
-      )
+      Array.from(new Set(objDataColumns?.map(c => c.getCell(config))))
     );
   });
 

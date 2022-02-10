@@ -21,14 +21,12 @@ import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import {
   getStyles,
   getValue,
-  isInRange,
-  isUnderUpperBound,
   mergeChartDataConfigs,
   mergeChartStyleConfigs,
-  reachLowerBoundCount,
 } from '../chartHelper';
+import { isInRange, isUnderUpperBound, reachLowerBoundCount } from '../internalChartHelper';
 
-describe('Chart Helper ', () => {
+describe('Internal Chart Helper ', () => {
   describe.each([
     [0, 0, true],
     [0, 1, false],

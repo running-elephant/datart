@@ -19,10 +19,8 @@
 import { ChartDataConfig } from 'app/types/ChartConfig';
 import { createContext } from 'react';
 
-const ChartPaletteContext = createContext<{ datas?: ChartDataConfig[] }>(
-  {
-    datas: [],
-  },
-);
+const ChartPaletteContext = createContext<{ datas?: ChartDataConfig[] }>({
+  datas: [],
+});
 
 export default ChartPaletteContext;

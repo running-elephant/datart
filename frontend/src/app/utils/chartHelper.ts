@@ -40,51 +40,12 @@ import {
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { Debugger } from 'utils/debugger';
-import {
-  cond,
-  curry,
-  isEmpty,
-  isEmptyArray,
-  isInPairArrayRange,
-  isNumerical,
-  isNumericEqual,
-  isPairArray,
-  isUndefined,
-  meanValue,
-} from 'utils/object';
+import { isEmptyArray, isUndefined, meanValue } from 'utils/object';
+import { isInRange } from './internalChartHelper';
 import { toFormattedValue } from './number';
 
 export function getDefaultThemeColor() {
   return echartsDefaultTheme.color;
-}
-export function isInRange(limit?: ChartDataConfig['limit'], count: number = 0) {
-  return cond(
-    [isEmpty, true],
-    [isNumerical, curry(isNumericEqual)(count)],
-    [isPairArray, curry(isInPairArrayRange)(count)],
-  )(limit, true);
-}
-
-export function isUnderUpperBound(
-  limit?: ChartDataConfig['limit'],
-  count: number = 0,
-) {
-  return cond(
-    [isEmpty, true],
-    [isNumerical, limit => limit >= +count],
-    [isPairArray, limit => count <= +limit[1]],
-  )(limit, true);
-}
-
-export function reachLowerBoundCount(
-  limit?: ChartDataConfig['limit'],
-  count: number = 0,
-) {
-  return cond(
-    [isEmpty, 0],
-    [isNumerical, limit => limit - count],
-    [isPairArray, limit => +limit[0] - count],
-  )(limit, 0);
 }
 
 /**
@@ -101,6 +62,15 @@ export function getStyleValue(
   return getValue(styleConfigs, paths);
 }
 
+/**
+ * @deprecated This function will be removed in next versiion, please use getStyles instread
+ * @see getValue
+ * @export
+ * @param {ChartStyleConfig[]} configs
+ * @param {string} path
+ * @param {string} targetKey
+ * @return {*}
+ */
 export function getSettingValue(
   configs: ChartStyleConfig[],
   path: string,
@@ -185,23 +155,6 @@ export function getValue(
     }
     iterators = group.rows || [];
   }
-}
-
-export function getColNameByValueColName(series) {
-  return series?.data?.valueColName || series.seriesName;
-}
-
-export function getNumeric(numeric, defaultValue = 0) {
-  if (
-    numeric === null ||
-    numeric === undefined ||
-    numeric === Infinity ||
-    numeric === -Infinity ||
-    Number.isNaN(+numeric)
-  ) {
-    return defaultValue;
-  }
-  return +numeric;
 }
 
 export function getCustomSortableColumns(columns, dataConfigs) {
@@ -729,7 +682,6 @@ export function transformToObjectArray(
   );
 }
 
-// TODO delete this function  #migration
 /**
  * @deprecated please use new method transformToObjectArray instead
  * @see transformToObjectArray

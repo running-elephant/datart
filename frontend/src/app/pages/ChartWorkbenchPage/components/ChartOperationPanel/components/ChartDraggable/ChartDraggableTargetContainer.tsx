@@ -39,10 +39,8 @@ import {
 } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
-import {
-  getColumnRenderName,
-  reachLowerBoundCount,
-} from 'app/utils/chartHelper';
+import { getColumnRenderName } from 'app/utils/chartHelper';
+import { reachLowerBoundCount } from 'app/utils/internalChartHelper';
 import { updateBy, updateByKey } from 'app/utils/mutation';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { rgba } from 'polished';
