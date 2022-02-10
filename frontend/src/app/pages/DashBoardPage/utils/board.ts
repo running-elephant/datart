@@ -206,11 +206,10 @@ export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
 };
 
 /**
- * 
- * @date 2022-02-09
- * @param {any} widgets:Widget[]
- * @param {any} opt:{version:string}
- * @returns {any} Widget[]
+ * adjustWidgetsBeforeSave
+ * @param {Widget[]} widgets
+ * @param {{ version: string }} opt
+ * @return {*}  {Widget[]}
  */
 export const adjustWidgetsBeforeSave = (
   widgets: Widget[],

@@ -20,7 +20,7 @@ import { Widget } from '../../pages/Board/slice/types';
 import { adjustWidgetsBeforeSave } from '../board';
 
 describe('board editor events', () => {
-  test('adjustWidgetsBeforeSave', () => {
+  test('should get new target version after adjust widgets before save', () => {
     const targetVersion = 'test_version';
     const widget1 = {
       config: {},
