@@ -913,8 +913,18 @@ export function getSeriesTooltips4Rectangular(
   }
   return [];
 }
-
-export function valueFormatter(config?: ChartDataSectionField, value?: any) {
+/**
+ * Get chart render string with field name and value
+ *
+ * @export
+ * @param {ChartDataSectionField} [config]
+ * @param {number} [value]
+ * @return {string}
+ */
+export function valueFormatter(
+  config?: ChartDataSectionField,
+  value?: number,
+): string {
   return `${getColumnRenderName(config)}: ${toFormattedValue(
     value,
     config?.format,
