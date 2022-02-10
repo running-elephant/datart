@@ -21,7 +21,6 @@ import {
   selectArchivedDatacharts,
   selectArchivedStoryboards,
   selectSelectedTab,
-  selectSliderVisible,
   selectStoryboards,
   selectTabs,
   selectVizs,
@@ -30,7 +29,7 @@ import { removeTab } from '../slice/thunks';
 import { ArchivedViz, Folder, Storyboard } from '../slice/types';
 import { VizContainer } from './VizContainer';
 
-export function Main() {
+export function Main({ sliderVisible }: { sliderVisible: boolean }) {
   const { actions } = useVizSlice();
   const dispatch = useDispatch();
   const history = useHistory();
@@ -46,7 +45,6 @@ export function Main() {
   const tabs = useSelector(selectTabs);
   const selectedTab = useSelector(selectSelectedTab);
   const orgId = useSelector(selectOrgId);
-  const sliderVisible = useSelector(selectSliderVisible);
 
   const t = useI18NPrefix('viz.main');
 

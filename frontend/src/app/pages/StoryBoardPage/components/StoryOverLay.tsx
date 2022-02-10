@@ -21,7 +21,6 @@ import {
   VerticalAlignBottomOutlined,
 } from '@ant-design/icons';
 import { Menu, Popconfirm } from 'antd';
-import { MeunBox } from 'app/components/VizOperationMenu/VizOperationMenu';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useMemo } from 'react';
 
@@ -98,14 +97,16 @@ export const StoryOverLay: React.FC<BoardOverLayProps> = memo(
           .filter(item => item.render)
           .map(item => {
             return (
-              <MeunBox
-                className={item.className || ''}
-                key={item.key}
-                icon={item.icon}
-                onClick={item.onClick}
-              >
-                {item.content}
-              </MeunBox>
+              <>
+                <Menu.Item
+                  key={item.key}
+                  icon={item.icon}
+                  onClick={item.onClick}
+                >
+                  {item.content}
+                </Menu.Item>
+                {item.className && <Menu.Divider />}
+              </>
             );
           }),
       [renderList],

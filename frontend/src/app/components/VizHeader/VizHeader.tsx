@@ -23,9 +23,7 @@ import {
   SendOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
-import SaveToDashboardOrStoryboard, {
-  SaveTypes,
-} from 'app/components/SaveToDashboardOrStoryboard';
+import SaveToDashboard from 'app/components/SaveToDashboard';
 import {
   ShareLinkModal,
   VizOperationMenu,
@@ -168,14 +166,13 @@ const VizHeader: FC<{
           />
         )}
         {onSaveAsVizs && (
-          <SaveToDashboardOrStoryboard
-            saveType={SaveTypes.Dashboard}
+          <SaveToDashboard
             title={t('addToDash')}
             orgId={orgId as string}
             isModalVisible={isModalVisible}
             handleOk={handleModalOk}
             handleCancel={handleModalCancel}
-          ></SaveToDashboardOrStoryboard>
+          ></SaveToDashboard>
         )}
       </Wrapper>
     );

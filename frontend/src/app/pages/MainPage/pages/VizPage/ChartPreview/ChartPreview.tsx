@@ -248,21 +248,25 @@ const ChartPreviewBoard: FC<{
     }, [dispatch, backendChartId]);
 
     const handleAddToDashBoard = useCallback(
-      async dashboardId => {
+      dashboardId => {
         const currentChartPreview = previewCharts.find(
           c => c.backendChartId === backendChartId,
         );
 
-        history.push({
-          pathname: `/organizations/${orgId}/vizs/${dashboardId}/boardEditor`,
-          state: {
-            widgetInfo: JSON.stringify({
-              chartType: '',
-              dataChart: currentChartPreview?.backendChart,
-              dataview: currentChartPreview?.backendChart?.view,
-            }),
-          },
-        });
+        try {
+          history.push({
+            pathname: `/organizations/${orgId}/vizs/${dashboardId}/boardEditor`,
+            state: {
+              widgetInfo: JSON.stringify({
+                chartType: '',
+                dataChart: currentChartPreview?.backendChart,
+                dataview: currentChartPreview?.backendChart?.view,
+              }),
+            },
+          });
+        } catch (error) {
+          throw error;
+        }
       },
       [previewCharts, history, backendChartId, orgId],
     );

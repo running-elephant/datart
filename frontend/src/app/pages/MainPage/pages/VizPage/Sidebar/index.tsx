@@ -11,11 +11,7 @@ import { useSelector } from 'react-redux';
 import { useRouteMatch } from 'react-router';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES, STICKY_LEVEL } from 'styles/StyleConstants';
-import {
-  selectSliderVisible,
-  selectStoryboards,
-  selectVizs,
-} from '../slice/selectors';
+import { selectStoryboards, selectVizs } from '../slice/selectors';
 import { Folder } from '../slice/types';
 import { Folders } from './Folders';
 import { Storyboards } from './Storyboards';
@@ -23,14 +19,21 @@ import { Storyboards } from './Storyboards';
 interface SidebarProps extends I18NComponentProps {
   isDragging: boolean;
   width: number;
+  sliderVisible: boolean;
+  handleSliderVisible: (status: boolean) => void;
 }
 
 export const Sidebar = memo(
-  ({ width, isDragging, i18nPrefix }: SidebarProps) => {
+  ({
+    width,
+    isDragging,
+    i18nPrefix,
+    sliderVisible,
+    handleSliderVisible,
+  }: SidebarProps) => {
     const [selectedKey, setSelectedKey] = useState('folder');
     const vizs = useSelector(selectVizs);
     const storyboards = useSelector(selectStoryboards);
-    const sliderVisible = useSelector(selectSliderVisible);
 
     const matchDetail = useRouteMatch<{ vizId: string }>(
       '/organizations/:orgId/vizs/:vizId',
@@ -89,11 +92,15 @@ export const Sidebar = memo(
           onSelect={switchSelect}
         />
         <Folders
+          sliderVisible={sliderVisible}
+          handleSliderVisible={handleSliderVisible}
           selectedId={selectedFolderId}
           i18nPrefix={i18nPrefix}
           className={classnames({ hidden: selectedKey !== 'folder' })}
         />
         <Storyboards
+          sliderVisible={sliderVisible}
+          handleSliderVisible={handleSliderVisible}
           selectedId={vizId}
           className={classnames({ hidden: selectedKey !== 'presentation' })}
           i18nPrefix={i18nPrefix}

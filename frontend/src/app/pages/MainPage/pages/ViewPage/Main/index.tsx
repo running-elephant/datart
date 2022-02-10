@@ -27,12 +27,12 @@ import { useMemberSlice } from '../../MemberPage/slice';
 import { useSourceSlice } from '../../SourcePage/slice';
 import { getSources } from '../../SourcePage/slice/thunks';
 import { useVariableSlice } from '../../VariablePage/slice';
-import { selectEditingViews, selectSliderVisible } from '../slice/selectors';
+import { selectEditingViews } from '../slice/selectors';
 import { getViewDetail } from '../slice/thunks';
 import { Tabs } from './Tabs';
 import { Workbench } from './Workbench';
 
-export const Main = memo(() => {
+export const Main = memo(({ sliderVisible }: { sliderVisible: boolean }) => {
   useSourceSlice();
   useMemberSlice();
   useVariableSlice();
@@ -42,7 +42,6 @@ export const Main = memo(() => {
   } = useRouteMatch<{ viewId: string }>();
   const orgId = useSelector(selectOrgId);
   const editingViews = useSelector(selectEditingViews);
-  const sliderVisible = useSelector(selectSliderVisible);
   const t = useI18NPrefix('view');
 
   useEffect(() => {

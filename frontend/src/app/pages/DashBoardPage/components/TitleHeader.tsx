@@ -25,9 +25,6 @@ import {
   SendOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown, Space } from 'antd';
-import SaveToDashboardOrStoryboard, {
-  SaveTypes,
-} from 'app/components/SaveToDashboardOrStoryboard';
 import { ShareLinkModal } from 'app/components/VizOperationMenu';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
@@ -52,6 +49,7 @@ import { BoardActionContext } from '../contexts/BoardActionContext';
 import { BoardContext } from '../contexts/BoardContext';
 import { BoardInfoContext } from '../contexts/BoardInfoContext';
 import { BoardOverLay } from './BoardOverLay';
+import SaveToStoryBoard from './SaveToStoryBoard';
 
 interface TitleHeaderProps {
   name?: string;
@@ -114,17 +112,17 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
     }, [boardName, name, status, t]);
     const isArchived = status === 0;
 
+    const handleModalVisible = useCallback(() => {
+      setIsModalVisible(!isModalVisible);
+    }, [isModalVisible]);
+
     const handleModalOk = useCallback(
       (storyId: string) => {
-        setIsModalVisible(false);
+        handleModalVisible();
         onAddToStory?.(storyId);
       },
-      [onAddToStory],
+      [onAddToStory, handleModalVisible],
     );
-
-    const handleModalCancel = useCallback(() => {
-      setIsModalVisible(false);
-    }, []);
 
     return (
       <Wrapper>
@@ -188,8 +186,8 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                       onSaveAsVizs={onSaveAsVizs}
                       onSyncData={onSyncData}
                       onRecycleViz={onRecycleViz}
-                      onAddToStory={onAddToStory && setIsModalVisible}
-                      onPublish={Number(status) === 2 ? onPublish : ''}
+                      onAddToStory={onAddToStory && handleModalVisible}
+                      onPublish={Number(status) === 2 ? onPublish : undefined}
                       isArchived={isArchived}
                     />
                   }
@@ -211,14 +209,13 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
           />
         )}
         {!!onSaveAsVizs && (
-          <SaveToDashboardOrStoryboard
-            saveType={SaveTypes.Storyboard}
+          <SaveToStoryBoard
             title={t('addToStory')}
             orgId={orgId as string}
             isModalVisible={isModalVisible}
             handleOk={handleModalOk}
-            handleCancel={handleModalCancel}
-          ></SaveToDashboardOrStoryboard>
+            handleCancel={handleModalVisible}
+          ></SaveToStoryBoard>
         )}
       </Wrapper>
     );

@@ -6,21 +6,20 @@ import { useEditBoardSlice } from 'app/pages/DashBoardPage/pages/BoardEditor/sli
 import { useStoryBoardSlice } from 'app/pages/StoryBoardPage/slice';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import React, { useCallback, useState } from 'react';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { Main } from './Main';
 import { SaveForm } from './SaveForm';
 import { SaveFormContext, useSaveFormContext } from './SaveFormContext';
 import { Sidebar } from './Sidebar';
 import { useVizSlice } from './slice';
-import { selectSliderVisible } from './slice/selectors';
 export function VizPage() {
   useVizSlice();
   useBoardSlice();
   useEditBoardSlice();
   useStoryBoardSlice();
   const saveFormContextValue = useSaveFormContext();
-  const sliderVisible = useSelector(selectSliderVisible);
+  const [sliderVisible, setSliderVisible] = useState<boolean>(false);
+
   const { sizes, setSizes } = useSplitSizes({
     limitedSide: 0,
     range: [256, 768],
@@ -41,6 +40,13 @@ export function VizPage() {
     if (!isDragging) setIsDragging(true);
   }, [setIsDragging, isDragging]);
 
+  const handleSliderVisible = useCallback(
+    (status: boolean) => {
+      setSliderVisible(status);
+    },
+    [setSliderVisible],
+  );
+
   return (
     <SaveFormContext.Provider value={saveFormContextValue}>
       <Container
@@ -57,8 +63,10 @@ export function VizPage() {
           width={sizes[0]}
           isDragging={isDragging}
           i18nPrefix={'viz.sidebar'}
+          sliderVisible={sliderVisible}
+          handleSliderVisible={handleSliderVisible}
         />
-        <Main />
+        <Main sliderVisible={sliderVisible} />
         <SaveForm
           width={400}
           formProps={{

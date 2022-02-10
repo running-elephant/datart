@@ -15,7 +15,9 @@
       "info": "Info",
       "open": "Open",
       "close": "Close",
-      "saveAs": "Save as"
+      "saveAs": "Save as",
+      "cancel": "Cancel",
+      "ok": "OK"
     },
     "operation": {
       "archiveConfirm": "Archive confirm",
@@ -461,7 +463,9 @@
         "variable": "Variable",
         "functions": "Function List",
         "editField": "Edit",
-        "deleteField": "Delete"
+        "deleteField": "Delete",
+        "editViewTip": "Going back to the view will lose the current edit state, continue?",
+        "editView": "Edit View"
       }
     },
     "palette": {
@@ -953,6 +957,8 @@
     "resultEmpty1": "Click ",
     "resultEmpty2": " button to execute, the results will be displayed here",
     "errorTitle": "Error occurred",
+    "sqlRunWraning": "SQL parsing failed, welcome to submit an issue to help us improve",
+    "close": "Close",
     "tabs": {
       "discard": "Discard",
       "cancel": "Cancel",

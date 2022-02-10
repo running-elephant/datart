@@ -16,40 +16,30 @@
  * limitations under the License.
  */
 
-import { Input, List, Modal } from 'antd';
-import { ListItem } from 'app/components';
+import { Input, Modal } from 'antd';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useGetVizIcon from 'app/hooks/useGetVizIcon';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
-import { InputWrap } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ChartSelectModal';
 import { getCascadeAccess } from 'app/pages/MainPage/Access';
 import {
   PermissionLevels,
   ResourceTypes,
   VizResourceSubTypes,
 } from 'app/pages/MainPage/pages/PermissionPage/constants';
-import {
-  Folder,
-  Storyboard,
-} from 'app/pages/MainPage/pages/VizPage/slice/types';
+import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import {
   selectIsOrgOwner,
   selectPermissionMap,
 } from 'app/pages/MainPage/slice/selectors';
 import { FC, memo, useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import styled from 'styled-components/macro';
 import { request } from 'utils/request';
 import { errorHandle, getPath, listToTree } from 'utils/utils';
 import { Tree } from './Tree';
 
-export enum SaveTypes {
-  Dashboard = 'DASHBOARD',
-  Storyboard = 'STORYBOARD',
-}
-
-interface SaveToDashboardOrStoryboardTypes {
-  saveType: SaveTypes;
+interface SaveToDashboardTypes {
   isModalVisible: boolean;
   handleOk: (id) => void;
   handleCancel: () => void;
@@ -57,31 +47,14 @@ interface SaveToDashboardOrStoryboardTypes {
   orgId: string;
 }
 
-const SaveToDashboardOrStoryboard: FC<SaveToDashboardOrStoryboardTypes> = memo(
-  ({ isModalVisible, handleOk, handleCancel, title, saveType, orgId }) => {
-    const [storyData, setStoryData] = useState<Storyboard[]>();
+const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
+  ({ isModalVisible, handleOk, handleCancel, title, orgId }) => {
     const [vizData, setVizData] = useState<Folder[]>();
     const [selectId, setSelectId] = useState<string>('');
     const t = useI18NPrefix('components.saveToDashOrStory');
     const getIcon = useGetVizIcon();
     const isOwner = useSelector(selectIsOrgOwner);
     const permissionMap = useSelector(selectPermissionMap);
-    const isDashboard = useMemo(
-      () => saveType === SaveTypes.Dashboard,
-      [saveType],
-    );
-
-    const getStoryData = useCallback(async orgId => {
-      try {
-        const { data } = await request<Storyboard[]>(
-          `/viz/storyboards?orgId=${orgId}`,
-        );
-        return data;
-      } catch (error) {
-        errorHandle(error);
-        throw error;
-      }
-    }, []);
 
     const getDashboardData = useCallback(async orgId => {
       try {
@@ -110,10 +83,10 @@ const SaveToDashboardOrStoryboard: FC<SaveToDashboardOrStoryboardTypes> = memo(
             path,
             PermissionLevels.Manage,
           );
-          if (v.relType === SaveTypes.Dashboard && AllowManage) {
+          if (v.relType === 'DASHBOARD' && AllowManage) {
             dashboardIds.push(v.parentId);
           }
-          return v.relType === SaveTypes.Dashboard && AllowManage;
+          return v.relType === 'DASHBOARD' && AllowManage;
         });
 
         const FileData = vizData?.filter(v => {
@@ -125,15 +98,11 @@ const SaveToDashboardOrStoryboard: FC<SaveToDashboardOrStoryboardTypes> = memo(
       [isOwner, permissionMap],
     );
 
-    const selectStoryBoard = useCallback(storyData => {
-      setSelectId(storyData.id);
-    }, []);
-
     const selectDashboard = useCallback((dashboardData, event) => {
       setSelectId(event.node.relId);
     }, []);
 
-    const saveToDashboardOrStoryFn = useCallback(
+    const saveToDashboard = useCallback(
       async selectId => {
         handleOk(selectId);
       },
@@ -141,19 +110,13 @@ const SaveToDashboardOrStoryboard: FC<SaveToDashboardOrStoryboardTypes> = memo(
     );
 
     useMount(async () => {
-      if (isDashboard) {
-        let _vizData = await getDashboardData(orgId);
-        setVizData(filterDashboardData(_vizData));
-      } else {
-        let _storyData = await getStoryData(orgId);
-        setStoryData(_storyData);
-      }
+      let _vizData = await getDashboardData(orgId);
+      setVizData(filterDashboardData(_vizData));
     });
 
     const treeData = useMemo(() => {
-      let listData = saveType === 'DASHBOARD' ? vizData : storyData;
       return listToTree(
-        listData?.map(v => ({
+        vizData?.map(v => ({
           ...v,
           isFolder: v.relType === 'FOLDER',
           selectable: v.relType !== 'FOLDER',
@@ -162,7 +125,7 @@ const SaveToDashboardOrStoryboard: FC<SaveToDashboardOrStoryboardTypes> = memo(
         [],
         { getIcon },
       );
-    }, [saveType, storyData, vizData, getIcon]);
+    }, [vizData, getIcon]);
 
     const { filteredData: filteredTreeData, debouncedSearch: treeSearch } =
       useDebouncedSearch(treeData, (keywords, d) => {
@@ -174,42 +137,30 @@ const SaveToDashboardOrStoryboard: FC<SaveToDashboardOrStoryboardTypes> = memo(
         title={title}
         visible={isModalVisible}
         onOk={() => {
-          saveToDashboardOrStoryFn(selectId);
+          saveToDashboard(selectId);
         }}
         onCancel={handleCancel}
         okButtonProps={{ disabled: !selectId }}
       >
-        {isDashboard && (
-          <InputWrap>
-            <Input onChange={treeSearch} placeholder={t('searchValue')} />
-          </InputWrap>
-        )}
-
-        {isDashboard ? (
-          <Tree
-            loading={false}
-            showIcon
-            defaultExpandAll={true}
-            treeData={filteredTreeData}
-            height={300}
-            onSelect={selectDashboard}
-          ></Tree>
-        ) : (
-          <List
-            dataSource={storyData}
-            renderItem={s => (
-              <ListItem
-                onClick={() => selectStoryBoard(s)}
-                selected={selectId === s.id}
-              >
-                <List.Item.Meta title={s.name} />
-              </ListItem>
-            )}
-          ></List>
-        )}
+        <InputWrap>
+          <Input onChange={treeSearch} placeholder={t('searchValue')} />
+        </InputWrap>
+        <Tree
+          loading={false}
+          showIcon
+          defaultExpandAll={true}
+          treeData={filteredTreeData}
+          height={300}
+          onSelect={selectDashboard}
+        ></Tree>
       </Modal>
     );
   },
 );
 
-export default SaveToDashboardOrStoryboard;
+export default SaveToDashboard;
+
+const InputWrap = styled.div`
+  padding: 0 20px;
+  margin-bottom: 10px;
+`;

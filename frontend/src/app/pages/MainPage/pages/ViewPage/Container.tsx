@@ -19,42 +19,20 @@
 import { Split } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
-import { calcAc } from 'app/pages/MainPage/Access';
-import {
-  PermissionLevels,
-  ResourceTypes,
-} from 'app/pages/MainPage/pages/PermissionPage/constants';
-import {
-  selectIsOrgOwner,
-  selectPermissionMap,
-} from 'app/pages/MainPage/slice/selectors';
-import React, { useCallback, useContext, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import AccessContext from './context/AccessContext';
 import { EditorContext } from './EditorContext';
 import { Main } from './Main';
 import { SaveForm } from './SaveForm';
 import { Sidebar } from './Sidebar';
-import { selectSliderVisible } from './slice/selectors';
 
 export function Container() {
   const { editorInstance } = useContext(EditorContext);
-  const sliderVisible = useSelector(selectSliderVisible);
-  const isOwner = useSelector(selectIsOrgOwner);
-  const permissionMap = useSelector(selectPermissionMap);
   const t = useI18NPrefix('view.saveForm');
   const tg = useI18NPrefix('global');
   const [isDragging, setIsDragging] = useState(false);
+  const [sliderVisible, setSliderVisible] = useState<boolean>(false);
 
-  const allowEnableViz = calcAc(
-    isOwner,
-    permissionMap,
-    ResourceTypes.Viz,
-    PermissionLevels.Enable,
-    '',
-    'module',
-  );
   const editorResize = useCallback(() => {
     editorInstance?.layout();
   }, [editorInstance]);
@@ -63,14 +41,6 @@ export function Container() {
     limitedSide: 0,
     range: [256, 768],
   });
-
-  const siderDrag = useCallback(
-    sizes => {
-      setSizes(sizes);
-      editorResize();
-    },
-    [setSizes, editorResize],
-  );
 
   const siderDragEnd = useCallback(
     sizes => {
@@ -85,32 +55,45 @@ export function Container() {
     if (!isDragging) setIsDragging(true);
   }, [setIsDragging, isDragging]);
 
+  const handleSliderVisible = useCallback(
+    (status: boolean) => {
+      setSliderVisible(status);
+    },
+    [setSliderVisible],
+  );
+
+  useEffect(() => {
+    editorResize();
+  }, [sliderVisible, editorResize]);
+
   return (
-    <AccessContext.Provider value={{ allowEnableViz }}>
-      <StyledContainer
-        sizes={sizes}
-        minSize={[256, 0]}
-        maxSize={[768, Infinity]}
-        gutterSize={0}
-        // onDrag={siderDrag}
-        onDragStart={siderDragStart}
-        onDragEnd={siderDragEnd}
-        className="datart-split"
+    <StyledContainer
+      sizes={sizes}
+      minSize={[256, 0]}
+      maxSize={[768, Infinity]}
+      gutterSize={0}
+      onDragStart={siderDragStart}
+      onDragEnd={siderDragEnd}
+      className="datart-split"
+      sliderVisible={sliderVisible}
+    >
+      <Sidebar
+        width={sizes[0]}
+        isDragging={isDragging}
         sliderVisible={sliderVisible}
-      >
-        <Sidebar width={sizes[0]} isDragging={isDragging} />
-        <Main />
-        <SaveForm
-          title={t('title')}
-          formProps={{
-            labelAlign: 'left',
-            labelCol: { offset: 1, span: 8 },
-            wrapperCol: { span: 13 },
-          }}
-          okText={tg('button.save')}
-        />
-      </StyledContainer>
-    </AccessContext.Provider>
+        handleSliderVisible={handleSliderVisible}
+      />
+      <Main sliderVisible={sliderVisible} />
+      <SaveForm
+        title={t('title')}
+        formProps={{
+          labelAlign: 'left',
+          labelCol: { offset: 1, span: 8 },
+          wrapperCol: { span: 13 },
+        }}
+        okText={tg('button.save')}
+      />
+    </StyledContainer>
   );
 }
 

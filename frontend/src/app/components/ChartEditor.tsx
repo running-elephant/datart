@@ -267,24 +267,28 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
         );
         onSaveInDataChart?.(orgId, dataChartId);
       } else {
-        addVizFn({
-          vizType: 'DATACHART',
-          type: CommonFormTypes.Add,
-          visible: true,
-          initialValues: {
-            config: JSON.stringify({
-              aggregation,
-              chartConfig: chartConfig,
-              chartGraphId: chart?.meta?.id,
-              computedFields: dataview?.computedFields,
-            }),
-            viewId: dataview?.id,
-          },
-          callback: folder => {
-            folder &&
-              history.push(`/organizations/${orgId}/vizs/${folder.relId}`);
-          },
-        });
+        try {
+          addVizFn({
+            vizType: 'DATACHART',
+            type: CommonFormTypes.Add,
+            visible: true,
+            initialValues: {
+              config: JSON.stringify({
+                aggregation,
+                chartConfig: chartConfig,
+                chartGraphId: chart?.meta?.id,
+                computedFields: dataview?.computedFields,
+              }),
+              viewId: dataview?.id,
+            },
+            callback: folder => {
+              folder &&
+                history.push(`/organizations/${orgId}/vizs/${folder.relId}`);
+            },
+          });
+        } catch (error) {
+          throw error;
+        }
       }
     } else if (container === 'widget') {
       if (chartType === 'widgetChart') {
@@ -396,13 +400,16 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const saveChartToDashBoard = useCallback(
     dashboardId => {
       const dataChart = buildDataChart();
-
-      history.push({
-        pathname: `/organizations/${orgId}/vizs/${dashboardId}/boardEditor`,
-        state: {
-          widgetInfo: JSON.stringify({ chartType, dataChart, dataview }),
-        },
-      });
+      try {
+        history.push({
+          pathname: `/organizations/${orgId}/vizs/${dashboardId}/boardEditor`,
+          state: {
+            widgetInfo: JSON.stringify({ chartType, dataChart, dataview }),
+          },
+        });
+      } catch (error) {
+        throw error;
+      }
     },
     [history, buildDataChart, chartType, dataview, orgId],
   );

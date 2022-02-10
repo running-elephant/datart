@@ -39,11 +39,9 @@ import { NAV_LEVEL, SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
 import { getInsertedNodeIndex, uuidv4 } from 'utils/utils';
 import { UNPERSISTED_ID_PREFIX } from '../constants';
 import { SaveFormContext } from '../SaveFormContext';
-import { useViewSlice } from '../slice';
 import {
   makeSelectViewTree,
   selectArchived,
-  selectSliderVisible,
   selectViews,
 } from '../slice/selectors';
 import { saveFolder } from '../slice/thunks';
@@ -51,8 +49,15 @@ import { ViewSimpleViewModel } from '../slice/types';
 import { FolderTree } from './FolderTree';
 import { Recycle } from './Recycle';
 
+interface SidebarProps {
+  isDragging: boolean;
+  width: number;
+  sliderVisible: boolean;
+  handleSliderVisible: (status: boolean) => void;
+}
+
 export const Sidebar = memo(
-  ({ isDragging, width }: { isDragging: boolean; width: number }) => {
+  ({ isDragging, width, sliderVisible, handleSliderVisible }: SidebarProps) => {
     const history = useHistory();
     const dispatch = useDispatch();
     const { showSaveForm } = useContext(SaveFormContext);
@@ -60,8 +65,6 @@ export const Sidebar = memo(
     const selectViewTree = useMemo(makeSelectViewTree, []);
     const viewsData = useSelector(selectViews);
     const t = useI18NPrefix('view.sidebar');
-    const { actions: viewActions } = useViewSlice();
-    const sliderVisible = useSelector(selectSliderVisible);
 
     const getIcon = useCallback(
       ({ isFolder }: ViewSimpleViewModel) =>
@@ -140,10 +143,6 @@ export const Sidebar = memo(
       [dispatch, history, orgId, showSaveForm, viewsData, t],
     );
 
-    const handleSliderVisible = useCallback(() => {
-      dispatch(viewActions.changeVisibleStatus({ status: !sliderVisible }));
-    }, [dispatch, viewActions, sliderVisible]);
-
     const titles = useMemo(
       () => [
         {
@@ -165,7 +164,7 @@ export const Sidebar = memo(
                 prefix: <DeleteOutlined className="icon" />,
               },
               {
-                key: 'fold',
+                key: 'collapse',
                 text: t(sliderVisible ? 'open' : 'close'),
                 prefix: sliderVisible ? (
                   <MenuUnfoldOutlined className="icon" />
@@ -179,8 +178,8 @@ export const Sidebar = memo(
                 case 'recycle':
                   onNext();
                   break;
-                case 'fold':
-                  handleSliderVisible();
+                case 'collapse':
+                  handleSliderVisible(!sliderVisible);
                   break;
               }
             },
@@ -206,14 +205,7 @@ export const Sidebar = memo(
         width={width}
       >
         {sliderVisible ? (
-          <MenuUnfoldOutlined
-            className="menuUnfoldOutlined"
-            onClick={() => {
-              dispatch(
-                viewActions.changeVisibleStatus({ status: !sliderVisible }),
-              );
-            }}
-          />
+          <MenuUnfoldOutlined className="menuUnfoldOutlined" />
         ) : (
           <></>
         )}

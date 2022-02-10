@@ -149,7 +149,7 @@ const ChartSelectModalModal: React.FC<IProps> = props => {
 
 export default ChartSelectModalModal;
 
-export const InputWrap = styled.div`
+const InputWrap = styled.div`
   padding: 0 20px;
   margin-bottom: 10px;
 `;

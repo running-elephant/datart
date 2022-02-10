@@ -44,7 +44,6 @@ export const initialState: ViewState = {
   sourceDatabases: {},
   saveViewLoading: false,
   unarchiveLoading: false,
-  isSliderVisible: false,
 };
 
 const slice = createSlice({
@@ -156,9 +155,6 @@ const slice = createSlice({
         state[key] = value;
       });
     },
-    changeVisibleStatus(state, action: PayloadAction<{ status: boolean }>) {
-      state.isSliderVisible = action.payload.status;
-    },
   },
   extraReducers: builder => {
     // getViews
@@ -222,7 +218,7 @@ const slice = createSlice({
       const currentEditingView = state.editingViews.find(
         v => v.id === action.meta.arg.id,
       );
-      console.log(action.payload, 'action.payload');
+
       if (currentEditingView) {
         const { model, dataSource } = transformQueryResultToModelAndDataSource(
           action.payload,

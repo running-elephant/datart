@@ -18,14 +18,12 @@ import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
 import { useAddViz } from '../../hooks/useAddViz';
 import { SaveFormContext, SaveFormModel } from '../../SaveFormContext';
-import { useVizSlice } from '../../slice';
 import {
   makeSelectVizTree,
   selectArchivedDashboardLoading,
   selectArchivedDashboards,
   selectArchivedDatachartLoading,
   selectArchivedDatacharts,
-  selectSliderVisible,
 } from '../../slice/selectors';
 import {
   getArchivedDashboards,
@@ -36,18 +34,24 @@ import { Recycle } from '../Recycle';
 import { FolderTree } from './FolderTree';
 
 interface FoldersProps extends I18NComponentProps {
+  sliderVisible: boolean;
+  handleSliderVisible: (status: boolean) => void;
   selectedId?: string;
   className?: string;
 }
 
 export const Folders = memo(
-  ({ selectedId, className, i18nPrefix }: FoldersProps) => {
+  ({
+    selectedId,
+    className,
+    i18nPrefix,
+    sliderVisible,
+    handleSliderVisible,
+  }: FoldersProps) => {
     const dispatch = useDispatch();
     const orgId = useSelector(selectOrgId);
-    const sliderVisible = useSelector(selectSliderVisible);
     const selectVizTree = useMemo(makeSelectVizTree, []);
     const t = useI18NPrefix(i18nPrefix);
-    const { actions: vizActions } = useVizSlice();
     const history = useHistory();
     const { showSaveForm } = useContext(SaveFormContext);
     const addVizFn = useAddViz({ showSaveForm });
@@ -139,7 +143,7 @@ export const Folders = memo(
                 prefix: <DeleteOutlined className="icon" />,
               },
               {
-                key: 'fold',
+                key: 'collapse',
                 text: t(sliderVisible ? 'folders.open' : 'folders.close'),
                 prefix: sliderVisible ? (
                   <MenuUnfoldOutlined className="icon" />
@@ -153,10 +157,8 @@ export const Folders = memo(
                 case 'recycle':
                   onNext();
                   break;
-                case 'fold':
-                  dispatch(
-                    vizActions.changeVisibleStatus({ status: !sliderVisible }),
-                  );
+                case 'collapse':
+                  handleSliderVisible(!sliderVisible);
                   dispatchResize();
                   break;
               }
@@ -173,7 +175,7 @@ export const Folders = memo(
           onSearch: listSearch,
         },
       ],
-      [add, treeSearch, listSearch, t, dispatch, sliderVisible, vizActions],
+      [add, treeSearch, listSearch, t, sliderVisible, handleSliderVisible],
     );
 
     return (

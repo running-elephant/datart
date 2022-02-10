@@ -15,7 +15,9 @@
       "info": "基本信息",
       "open": "开启",
       "close": "关闭",
-      "saveAs": "另存为"
+      "saveAs": "另存为",
+      "cancel": "取消",
+      "ok": "确定"
     },
     "operation": {
       "archiveConfirm": "确定移至回收站？",
@@ -435,7 +437,7 @@
         "goBack": "返回",
         "run": "执行",
         "save": "保存",
-        "saveToDashboard": "保存到仪表盘",
+        "saveToDashboard": "保存到仪表板",
         "login": "登陆",
         "aggregationSwitch": "数据聚合",
         "aggregationSwitchTip": "切换数据聚合会清空所有配置，确认开启/关闭？",
@@ -461,7 +463,9 @@
         "variable": "变量",
         "functions": "函数列表",
         "editField": "编辑",
-        "deleteField": "删除"
+        "deleteField": "删除",
+        "editViewTip": "回到数据视图会丢失当前编辑状态，是否继续？",
+        "editView": "编辑数据视图"
       }
     },
     "palette": {
@@ -953,6 +957,8 @@
     "resultEmpty1": "请点击 ",
     "resultEmpty2": " 按钮执行，运行结果将在此处展示",
     "errorTitle": "执行错误",
+    "sqlRunWraning": "SQL 解析失败，欢迎一键提交 issue 帮助我们优化",
+    "close": "关闭",
     "tabs": {
       "discard": "放弃",
       "cancel": "取消",
@@ -1033,7 +1039,7 @@
     "createSuccess": "新建数据源成功",
     "archived": "已归档",
     "noPermission": "您没有权限访问该页面",
-    "creatView": "去新建视图",
+    "creatView": "去新建数据视图",
     "sidebar": {
       "title": "数据源列表",
       "add": "新建数据源",

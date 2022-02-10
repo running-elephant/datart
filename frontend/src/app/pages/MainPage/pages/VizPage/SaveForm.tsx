@@ -63,9 +63,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
   );
 
   useMount(() => {
-    if (treeData?.length === 0) {
-      dispatch(getFolders(orgId));
-    }
+    dispatch(getFolders(orgId));
   });
 
   useEffect(() => {

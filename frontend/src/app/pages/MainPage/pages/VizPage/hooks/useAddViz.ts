@@ -35,6 +35,11 @@ export interface addVizParams {
   callback?: (folder?: Folder) => void;
 }
 
+/**
+ * 新建视图组件
+ *
+ */
+
 export function useAddViz({ showSaveForm }) {
   const vizsData = useSelector(selectVizs);
   const dispatch: (any) => Promise<any> = useDispatch();
@@ -43,9 +48,13 @@ export function useAddViz({ showSaveForm }) {
   const updateValue = useCallback((relType: VizType, values: SaveFormModel) => {
     const dataValues = values;
     if (relType === 'DASHBOARD') {
-      dataValues.config = JSON.stringify(
-        getInitBoardConfig(values.boardType || BoardTypeMap.auto),
-      );
+      try {
+        dataValues.config = JSON.stringify(
+          getInitBoardConfig(values.boardType || BoardTypeMap.auto),
+        );
+      } catch (error) {
+        throw error;
+      }
     }
     return dataValues;
   }, []);
@@ -60,7 +69,7 @@ export function useAddViz({ showSaveForm }) {
         onSave: async (values: SaveFormModel, onClose) => {
           const dataValues = updateValue(vizType, values);
           let index = getInsertedNodeIndex(values, vizsData);
-          await dispatch(
+          let vizData = await dispatch(
             addViz({
               viz: {
                 ...initialValues,
@@ -70,9 +79,8 @@ export function useAddViz({ showSaveForm }) {
               },
               type: vizType,
             }),
-          ).then(res => {
-            callback?.(res.payload);
-          });
+          );
+          callback?.(vizData.payload);
           onClose();
         },
       });

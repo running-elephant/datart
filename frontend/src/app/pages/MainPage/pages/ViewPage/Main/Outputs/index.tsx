@@ -17,6 +17,7 @@
  */
 
 import { Alert, Button, Space, Spin } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import { selectVersion } from 'app/slice/selectors';
 import { transparentize } from 'polished';
@@ -35,6 +36,7 @@ export const Outputs = memo(() => {
   const { actions } = useViewSlice();
   const dispatch = useDispatch();
   const version = useSelector(selectVersion);
+  const t = useI18NPrefix('view');
 
   const error = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'error' }),
@@ -81,18 +83,18 @@ export const Outputs = memo(() => {
         <Alert
           className="warningBox"
           message=""
-          description="Info Description Info Description Info Description Info Description"
+          description={t('sqlRunWraning')}
           type="warning"
           closable={false}
           action={
             <Space>
               <Button type="primary" onClick={() => submitIssue('github')}>
-                issues（github）
+                Issues（github）
               </Button>
               <Button type="primary" onClick={() => submitIssue('gitee')}>
-                issues（gitee）
+                Issues（gitee）
               </Button>
-              <Button onClick={removeViewWarnings}>关闭</Button>
+              <Button onClick={removeViewWarnings}>{t('close')}</Button>
             </Space>
           }
         />

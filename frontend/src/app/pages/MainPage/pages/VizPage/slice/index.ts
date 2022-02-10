@@ -47,7 +47,6 @@ export const initialState: VizState = {
   selectedTab: '',
   dataChartListLoading: false,
   chartPreviews: [],
-  isSliderVisible: false,
 };
 
 const slice = createSlice({
@@ -106,9 +105,6 @@ const slice = createSlice({
       Object.entries(initialState).forEach(([key, value]) => {
         state[key] = value;
       });
-    },
-    changeVisibleStatus(state, action: PayloadAction<{ status: boolean }>) {
-      state.isSliderVisible = action.payload.status;
     },
   },
   extraReducers: builder => {

@@ -95,13 +95,11 @@ const ChartOperationPanel: FC<{
 
     return (
       <StyledChartOperationPanel backend={HTML5Backend}>
-        {
-          <FlexLayout.Layout
-            model={layout}
-            onModelChange={setLayout}
-            factory={layoutFactory}
-          />
-        }
+        <FlexLayout.Layout
+          model={layout}
+          onModelChange={setLayout}
+          factory={layoutFactory}
+        />
       </StyledChartOperationPanel>
     );
   },

@@ -64,14 +64,14 @@ const VizOperationMenu: FC<{
 
       if (onReloadData) {
         menus.push(
-          <MeunBox
-            className="line"
+          <Menu.Item
             key="reloadData"
             icon={<ReloadOutlined />}
             onClick={onReloadData}
           >
             {t('syncData')}
-          </MeunBox>,
+          </Menu.Item>,
+          <Menu.Divider />,
         );
       }
 
@@ -85,14 +85,14 @@ const VizOperationMenu: FC<{
 
       if (allowManage && onSaveAsVizs) {
         menus.push(
-          <MeunBox
-            className="line"
+          <Menu.Item
             key="addToDash"
             icon={<FileAddOutlined />}
             onClick={() => onAddToDashBoard(true)}
           >
             {t('addToDash')}
-          </MeunBox>,
+          </Menu.Item>,
+          <Menu.Divider />,
         );
       }
 
@@ -110,7 +110,7 @@ const VizOperationMenu: FC<{
 
       if (allowDownload && onDownloadDataLinkClick) {
         menus.push(
-          <MeunBox
+          <Menu.Item
             className="line"
             key="downloadData"
             icon={<CloudDownloadOutlined />}
@@ -124,7 +124,8 @@ const VizOperationMenu: FC<{
             >
               {t('share.downloadData')}
             </Popconfirm>
-          </MeunBox>,
+          </Menu.Item>,
+          <Menu.Divider />,
         );
       }
 
@@ -164,9 +165,3 @@ const VizOperationMenu: FC<{
 export default VizOperationMenu;
 
 const StyleVizOperationMenu = styled.div``;
-
-export const MeunBox = styled(Menu.Item)`
-  &.line {
-    border-bottom: ${p => `1px solid ${p.theme.borderColorSplit}`};
-  }
-`;

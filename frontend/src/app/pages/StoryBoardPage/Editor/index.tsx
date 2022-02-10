@@ -205,23 +205,24 @@ export const StoryEditor: React.FC<{
     dispatch(getPageContentDetail({ relId, relType }));
   }, [currentPageIndex, dispatch, sortedPages]);
 
-  useEffect(() => {
-    async function addPages() {
-      if (histState && histState.addDashboardId) {
-        await dispatch(
-          addStoryPages({ storyId, relIds: [histState.addDashboardId] }),
-        );
+  const addPages = useCallback(async () => {
+    if (histState && histState.addDashboardId) {
+      await dispatch(
+        addStoryPages({ storyId, relIds: [histState.addDashboardId] }),
+      );
 
-        //react router remove location state
-        if (history.location.state && histState.transaction) {
-          let state = { ...histState };
-          delete state.transaction;
-          history.replace({ ...history.location, state });
-        }
+      //react router remove location state
+      if (history.location.state && histState.transaction) {
+        let state = { ...histState };
+        delete state.transaction;
+        history.replace({ ...history.location, state });
       }
     }
-    addPages();
   }, [dispatch, histState, storyId, history]);
+
+  useEffect(() => {
+    addPages();
+  }, [addPages]);
 
   return (
     <DndProvider backend={HTML5Backend}>

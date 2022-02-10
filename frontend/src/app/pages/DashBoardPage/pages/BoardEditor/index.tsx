@@ -43,7 +43,7 @@ import {
   selectBoardChartEditorProps,
   selectEditBoard,
 } from './slice/selectors';
-import { addWrapChartWidget, fetchEditBoardDetail } from './slice/thunk';
+import { addChartWidget, fetchEditBoardDetail } from './slice/thunk';
 
 export const BoardEditor: React.FC<{
   dashboardId: string;
@@ -123,26 +123,31 @@ export const BoardEditor: React.FC<{
       onCloseChartEditor,
       onSaveToWidget,
     ]);
-    useEffect(() => {
-      async function initialization() {
-        await dispatch(fetchEditBoardDetail(dashboardId));
-        if (histState?.widgetInfo) {
-          const widgetInfo = JSON.parse(histState.widgetInfo);
-          const boardType = dashboard.config?.type;
-          widgetInfo.dataChart.id = 'widget_' + uuidv4();
-          widgetInfo &&
-            dispatch(
-              addWrapChartWidget({
-                boardId,
-                chartId: widgetInfo.dataChart.id,
-                boardType,
-                dataChart: widgetInfo.dataChart,
-                view: widgetInfo.dataview,
-              }),
-            );
+    const initialization = useCallback(async () => {
+      await dispatch(fetchEditBoardDetail(dashboardId));
+      if (histState?.widgetInfo) {
+        const widgetInfo = JSON.parse(histState.widgetInfo);
+        const boardType = dashboard.config?.type;
+
+        if (widgetInfo) {
+          let subType: 'widgetChart' | 'dataChart' = 'dataChart';
+          if (!widgetInfo.dataChart.id) {
+            widgetInfo.dataChart.id = 'widget_' + uuidv4();
+            subType = 'widgetChart';
+          }
+
+          dispatch(
+            addChartWidget({
+              boardId,
+              chartId: widgetInfo.dataChart.id,
+              boardType,
+              dataChart: widgetInfo.dataChart,
+              view: widgetInfo.dataview,
+              subType: subType,
+            }),
+          );
         }
       }
-      initialization();
     }, [
       dashboardId,
       dispatch,
@@ -150,6 +155,11 @@ export const BoardEditor: React.FC<{
       boardId,
       dashboard.config?.type,
     ]);
+
+    useEffect(() => {
+      initialization();
+    }, [initialization]);
+
     return (
       <Wrapper>
         <DndProvider backend={HTML5Backend}>

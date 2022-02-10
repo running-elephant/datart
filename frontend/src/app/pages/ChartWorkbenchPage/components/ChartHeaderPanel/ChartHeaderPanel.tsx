@@ -17,9 +17,7 @@
  */
 
 import { Button, Space } from 'antd';
-import SaveToDashboardOrStoryboard, {
-  SaveTypes,
-} from 'app/components/SaveToDashboardOrStoryboard';
+import SaveToDashboard from 'app/components/SaveToDashboard';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo, useCallback, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -84,18 +82,13 @@ const ChartHeaderPanel: FC<{
               {t('saveToDashboard')}
             </Button>
           )}
-
-          {/* <Dropdown key="more" trigger={['click']} overlay={getOverlays()}>
-          <Button icon={<MoreOutlined />} />
-        </Dropdown> */}
-          <SaveToDashboardOrStoryboard
+          <SaveToDashboard
             orgId={orgId as string}
-            saveType={SaveTypes.Dashboard}
             title={t('saveToDashboard')}
             isModalVisible={isModalVisible}
             handleOk={handleModalOk}
             handleCancel={handleModalCancel}
-          ></SaveToDashboardOrStoryboard>
+          ></SaveToDashboard>
         </Space>
       </Wrapper>
     );
