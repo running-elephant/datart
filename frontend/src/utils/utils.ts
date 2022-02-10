@@ -357,10 +357,8 @@ export function fastDeleteArrayElement(arr: any[], index: number) {
   arr.pop();
 }
 
-export function newGithubIssueUrl({
-  repoUrl = 'https://github.com/running-elephant/datart',
-  ...options
-}) {
+export function newIssueUrl({ type, ...options }) {
+  const repoUrl = `https://${type}.com/running-elephant/datart`;
   let issuesUrl = '';
 
   if (repoUrl) {
@@ -373,15 +371,18 @@ export function newGithubIssueUrl({
 
   const url = new URL(`${issuesUrl}/issues/new`);
 
-  const types = [
-    'body',
-    'title',
-    'labels',
-    'template',
-    'milestone',
-    'assignee',
-    'projects',
-  ];
+  const types =
+    type === 'gitee'
+      ? ['description', 'title']
+      : [
+          'body',
+          'title',
+          'labels',
+          'template',
+          'milestone',
+          'assignee',
+          'projects',
+        ];
 
   for (const type of types) {
     let value = options[type];

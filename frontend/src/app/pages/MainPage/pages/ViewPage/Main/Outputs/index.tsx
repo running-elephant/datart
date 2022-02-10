@@ -16,32 +16,88 @@
  * limitations under the License.
  */
 
-import { Spin } from 'antd';
+import { Alert, Button, Space, Spin } from 'antd';
 import useResizeObserver from 'app/hooks/useResizeObserver';
+import { selectVersion } from 'app/slice/selectors';
 import { transparentize } from 'polished';
-import React, { memo } from 'react';
-import { useSelector } from 'react-redux';
+import React, { memo, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { SPACE_TIMES } from 'styles/StyleConstants';
+import { newIssueUrl } from 'utils/utils';
 import { ViewViewModelStages } from '../../constants';
+import { useViewSlice } from '../../slice';
 import { selectCurrentEditingViewAttr } from '../../slice/selectors';
 import { Error } from './Error';
 import { Results } from './Results';
 
 export const Outputs = memo(() => {
+  const { actions } = useViewSlice();
+  const dispatch = useDispatch();
+  const version = useSelector(selectVersion);
+
   const error = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'error' }),
   ) as string;
   const stage = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'stage' }),
   ) as ViewViewModelStages;
-
+  const warnings = useSelector(state =>
+    selectCurrentEditingViewAttr(state, { name: 'warnings' }),
+  ) as string[];
   const { width, height, ref } = useResizeObserver({
     refreshMode: 'debounce',
     refreshRate: 200,
   });
 
+  const removeViewWarnings = useCallback(() => {
+    dispatch(
+      actions.changeCurrentEditingView({
+        warnings: null,
+      }),
+    );
+  }, [dispatch, actions]);
+
+  const submitIssue = useCallback(
+    type => {
+      let params: any = {
+        type: type,
+        title: 'Sql parse bug',
+      };
+      if (type === 'github') {
+        params.body = `version: ${version}\n` + warnings.join('');
+      } else {
+        params.description = `version: ${version}\n` + warnings.join('');
+      }
+      let url = newIssueUrl(params);
+      window.open(url);
+    },
+    [warnings, version],
+  );
+
   return (
     <Wrapper ref={ref}>
+      {warnings && (
+        <Alert
+          className="warningBox"
+          message=""
+          description="Info Description Info Description Info Description Info Description"
+          type="warning"
+          closable={false}
+          action={
+            <Space>
+              <Button type="primary" onClick={() => submitIssue('github')}>
+                issues（github）
+              </Button>
+              <Button type="primary" onClick={() => submitIssue('gitee')}>
+                issues（gitee）
+              </Button>
+              <Button onClick={removeViewWarnings}>关闭</Button>
+            </Space>
+          }
+        />
+      )}
+
       <Results width={width} height={height} />
       {error && <Error />}
       {stage === ViewViewModelStages.Running && (
@@ -56,7 +112,11 @@ export const Outputs = memo(() => {
 const Wrapper = styled.div`
   position: relative;
   display: flex;
+  flex-direction: column;
   border-top: 1px solid ${p => p.theme.borderColorSplit};
+  .warningBox {
+    padding: ${SPACE_TIMES(2)};
+  }
 `;
 
 const LoadingMask = styled.div`

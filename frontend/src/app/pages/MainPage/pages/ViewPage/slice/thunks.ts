@@ -147,7 +147,7 @@ export const runSql = createAsyncThunk<
   }
 
   try {
-    const { data } = await request<QueryResult>({
+    const { data, warnings } = await request<QueryResult>({
       url: '/data-provider/execute/test',
       method: 'POST',
       data: {
@@ -165,7 +165,7 @@ export const runSql = createAsyncThunk<
         ),
       },
     });
-    return data;
+    return { ...data, warnings };
   } catch (error) {
     return rejectHandle(error, rejectWithValue);
   }

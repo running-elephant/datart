@@ -222,6 +222,7 @@ const slice = createSlice({
       const currentEditingView = state.editingViews.find(
         v => v.id === action.meta.arg.id,
       );
+      console.log(action.payload, 'action.payload');
       if (currentEditingView) {
         const { model, dataSource } = transformQueryResultToModelAndDataSource(
           action.payload,
@@ -233,6 +234,10 @@ const slice = createSlice({
           currentEditingView.stage = ViewViewModelStages.Saveable;
         } else {
           currentEditingView.stage = ViewViewModelStages.Initialized;
+        }
+
+        if (action.payload.warnings) {
+          currentEditingView.warnings = action.payload.warnings;
         }
       }
     });
