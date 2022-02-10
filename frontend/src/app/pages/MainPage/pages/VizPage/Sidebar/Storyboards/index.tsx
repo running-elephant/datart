@@ -1,4 +1,9 @@
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import { ListNav, ListPane, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
@@ -21,12 +26,20 @@ import { Recycle } from '../Recycle';
 import { List } from './List';
 
 interface FoldersProps extends I18NComponentProps {
+  sliderVisible: boolean;
+  handleSliderVisible: (status: boolean) => void;
   selectedId?: string;
   className?: string;
 }
 
 export const Storyboards = memo(
-  ({ selectedId, className, i18nPrefix }: FoldersProps) => {
+  ({
+    selectedId,
+    className,
+    i18nPrefix,
+    sliderVisible,
+    handleSliderVisible,
+  }: FoldersProps) => {
     const dispatch = useDispatch();
     const orgId = useSelector(selectOrgId);
     const { showSaveForm } = useContext(SaveFormContext);
@@ -86,11 +99,23 @@ export const Storyboards = memo(
                 text: t('storyboards.recycle'),
                 prefix: <DeleteOutlined className="icon" />,
               },
+              {
+                key: 'collapse',
+                text: t(sliderVisible ? 'folders.open' : 'folders.close'),
+                prefix: sliderVisible ? (
+                  <MenuUnfoldOutlined className="icon" />
+                ) : (
+                  <MenuFoldOutlined className="icon" />
+                ),
+              },
             ],
             callback: (key, _, onNext) => {
               switch (key) {
                 case 'recycle':
                   onNext();
+                  break;
+                case 'collapse':
+                  handleSliderVisible(!sliderVisible);
                   break;
               }
             },
@@ -105,7 +130,15 @@ export const Storyboards = memo(
           onSearch: recycleSearch,
         },
       ],
-      [add, allowCreate, listSearch, recycleSearch, t],
+      [
+        add,
+        allowCreate,
+        listSearch,
+        recycleSearch,
+        t,
+        handleSliderVisible,
+        sliderVisible,
+      ],
     );
 
     return (

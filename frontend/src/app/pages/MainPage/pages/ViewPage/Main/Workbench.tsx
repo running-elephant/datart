@@ -17,7 +17,8 @@
  */
 
 import { Split } from 'app/components';
-import { useCascadeAccess } from 'app/pages/MainPage/Access';
+import { useAccess, useCascadeAccess } from 'app/pages/MainPage/Access';
+import debounce from 'lodash/debounce';
 import React, {
   memo,
   useCallback,
@@ -48,6 +49,7 @@ export const Workbench = memo(() => {
   const parentId = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'parentId' }),
   ) as string;
+
   const path = useMemo(
     () =>
       views
@@ -66,10 +68,30 @@ export const Workbench = memo(() => {
   });
   const unpersistedNewView = id.includes(UNPERSISTED_ID_PREFIX);
   const allowManage = managePermission(true) || unpersistedNewView;
+  const allowEnableViz = useAccess({
+    type: 'module',
+    module: ResourceTypes.Viz,
+    id: '',
+    level: PermissionLevels.Enable,
+  })(true);
 
   useEffect(() => {
     editorInstance?.layout();
   }, [editorInstance, allowManage]);
+
+  const onResize = useCallback(
+    debounce(() => {
+      editorInstance?.layout();
+    }, 300),
+    [editorInstance],
+  );
+
+  useEffect(() => {
+    window.addEventListener('resize', onResize, false);
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+  }, [onResize]);
 
   const editorResize = useCallback(
     sizes => {
@@ -86,7 +108,7 @@ export const Workbench = memo(() => {
         className="datart-split"
         onDrag={editorResize}
       >
-        <Editor allowManage={allowManage} />
+        <Editor allowManage={allowManage} allowEnableViz={allowEnableViz} />
         <Outputs />
       </Development>
       <Properties allowManage={allowManage} />

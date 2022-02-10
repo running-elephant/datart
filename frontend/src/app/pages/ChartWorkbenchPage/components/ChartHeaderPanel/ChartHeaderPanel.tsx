@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-import { LeftOutlined, MoreOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Space } from 'antd';
+import { Button, Space } from 'antd';
+import SaveToDashboard from 'app/components/SaveToDashboard';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { FC, memo, useCallback, useContext } from 'react';
+import { FC, memo, useCallback, useState } from 'react';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
@@ -30,48 +30,70 @@ import {
   SPACE_TIMES,
   SPACE_XS,
 } from 'styles/StyleConstants';
-import ChartAggregationContext from '../../contexts/ChartAggregationContext';
-import AggregationOperationMenu from './components/AggregationOperationMenu';
 
 const ChartHeaderPanel: FC<{
   chartName?: string;
+  orgId?: string;
+  chartType?: string;
   onSaveChart?: () => void;
   onGoBack?: () => void;
-  onChangeAggregation?: (state: boolean) => void;
-}> = memo(({ chartName, onSaveChart, onGoBack, onChangeAggregation }) => {
-  const t = useI18NPrefix(`viz.workbench.header`);
-  const { aggregation } = useContext(ChartAggregationContext);
+  onSaveChartToDashBoard?: (dashboardId) => void;
+}> = memo(
+  ({
+    chartName,
+    orgId,
+    chartType,
+    onSaveChart,
+    onGoBack,
+    onSaveChartToDashBoard,
+  }) => {
+    const t = useI18NPrefix(`viz.workbench.header`);
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
-  const getOverlays = useCallback(() => {
-    return (
-      <AggregationOperationMenu
-        defaultValue={aggregation}
-        onChangeAggregation={e => {
-          onChangeAggregation?.(e);
-        }}
-      ></AggregationOperationMenu>
+    const handleModalOk = useCallback(
+      (dashboardId: string) => {
+        onSaveChartToDashBoard?.(dashboardId);
+        setIsModalVisible(true);
+      },
+      [onSaveChartToDashBoard],
     );
-  }, [aggregation, onChangeAggregation]);
 
-  return (
-    <Wrapper>
-      {onGoBack && (
-        <GoBack>
-          <LeftOutlined onClick={onGoBack} />
-        </GoBack>
-      )}
-      <h1>{chartName}</h1>
-      <Space>
-        <Button type="primary" onClick={onSaveChart}>
-          {t('save')}
-        </Button>
-        <Dropdown key="more" trigger={['click']} overlay={getOverlays()}>
-          <Button icon={<MoreOutlined />} />
-        </Dropdown>
-      </Space>
-    </Wrapper>
-  );
-});
+    const handleModalCancel = useCallback(() => {
+      setIsModalVisible(false);
+    }, []);
+
+    return (
+      <Wrapper>
+        <h1>{chartName}</h1>
+        <Space>
+          <Button type="primary" ghost onClick={onGoBack}>
+            {t('cancel')}
+          </Button>
+          <Button type="primary" onClick={onSaveChart}>
+            {t('save')}
+          </Button>
+          {!(chartType === 'widgetChart') && (
+            <Button
+              type="primary"
+              onClick={() => {
+                setIsModalVisible(true);
+              }}
+            >
+              {t('saveToDashboard')}
+            </Button>
+          )}
+          <SaveToDashboard
+            orgId={orgId as string}
+            title={t('saveToDashboard')}
+            isModalVisible={isModalVisible}
+            handleOk={handleModalOk}
+            handleCancel={handleModalCancel}
+          ></SaveToDashboard>
+        </Space>
+      </Wrapper>
+    );
+  },
+);
 
 export default ChartHeaderPanel;
 

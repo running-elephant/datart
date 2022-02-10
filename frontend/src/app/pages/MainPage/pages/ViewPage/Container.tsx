@@ -19,7 +19,7 @@
 import { Split } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { EditorContext } from './EditorContext';
 import { Main } from './Main';
@@ -30,6 +30,8 @@ export function Container() {
   const { editorInstance } = useContext(EditorContext);
   const t = useI18NPrefix('view.saveForm');
   const tg = useI18NPrefix('global');
+  const [isDragging, setIsDragging] = useState(false);
+  const [sliderVisible, setSliderVisible] = useState<boolean>(false);
 
   const editorResize = useCallback(() => {
     editorInstance?.layout();
@@ -40,13 +42,29 @@ export function Container() {
     range: [256, 768],
   });
 
-  const siderDrag = useCallback(
+  const siderDragEnd = useCallback(
     sizes => {
       setSizes(sizes);
       editorResize();
+      setIsDragging(false);
     },
-    [setSizes, editorResize],
+    [setIsDragging, setSizes, editorResize],
   );
+
+  const siderDragStart = useCallback(() => {
+    if (!isDragging) setIsDragging(true);
+  }, [setIsDragging, isDragging]);
+
+  const handleSliderVisible = useCallback(
+    (status: boolean) => {
+      setSliderVisible(status);
+    },
+    [setSliderVisible],
+  );
+
+  useEffect(() => {
+    editorResize();
+  }, [sliderVisible, editorResize]);
 
   return (
     <StyledContainer
@@ -54,11 +72,18 @@ export function Container() {
       minSize={[256, 0]}
       maxSize={[768, Infinity]}
       gutterSize={0}
-      onDrag={siderDrag}
+      onDragStart={siderDragStart}
+      onDragEnd={siderDragEnd}
       className="datart-split"
+      sliderVisible={sliderVisible}
     >
-      <Sidebar />
-      <Main />
+      <Sidebar
+        width={sizes[0]}
+        isDragging={isDragging}
+        sliderVisible={sliderVisible}
+        handleSliderVisible={handleSliderVisible}
+      />
+      <Main sliderVisible={sliderVisible} />
       <SaveForm
         title={t('title')}
         formProps={{
@@ -72,9 +97,12 @@ export function Container() {
   );
 }
 
-const StyledContainer = styled(Split)`
+const StyledContainer = styled(Split)<{ sliderVisible: boolean }>`
   display: flex;
   flex: 1;
   min-width: 0;
   min-height: 0;
+  .gutter-horizontal {
+    display: ${p => (p.sliderVisible ? 'none' : 'block')};
+  }
 `;

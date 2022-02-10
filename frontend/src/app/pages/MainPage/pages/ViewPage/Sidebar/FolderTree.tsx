@@ -20,13 +20,18 @@ import {
   CopyFilled,
   DeleteOutlined,
   EditOutlined,
+  MonitorOutlined,
   MoreOutlined,
 } from '@ant-design/icons';
 import { Menu, message, Popconfirm, TreeDataNode } from 'antd';
 import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { CascadeAccess } from 'app/pages/MainPage/Access';
-import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
+import { getCascadeAccess, useAccess } from 'app/pages/MainPage/Access';
+import {
+  selectIsOrgOwner,
+  selectOrgId,
+  selectPermissionMap,
+} from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
 import React, { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -38,6 +43,7 @@ import {
   ResourceTypes,
 } from '../../PermissionPage/constants';
 import { useSaveAsView } from '../hooks/useSaveAsView';
+import { useStartAnalysis } from '../hooks/useStartAnalysis';
 import { SaveFormContext } from '../SaveFormContext';
 import {
   selectCurrentEditingViewKey,
@@ -63,9 +69,18 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
   const currentEditingViewKey = useSelector(selectCurrentEditingViewKey);
   const orgId = useSelector(selectOrgId);
   const viewsData = useSelector(selectViews);
+  const isOwner = useSelector(selectIsOrgOwner);
+  const permissionMap = useSelector(selectPermissionMap);
   const t = useI18NPrefix('view');
   const tg = useI18NPrefix('global');
   const saveAsView = useSaveAsView();
+  const startAnalysis = useStartAnalysis();
+  const allowEnableViz = useAccess({
+    type: 'module',
+    module: ResourceTypes.Viz,
+    id: '',
+    level: PermissionLevels.Enable,
+  })(true);
 
   useEffect(() => {
     dispatch(getViews(orgId));
@@ -143,24 +158,30 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
           case 'saveAs':
             saveAsView(id);
             break;
+          case 'startAnalysis':
+            startAnalysis(id);
+            break;
           default:
             break;
         }
       },
-    [dispatch, showSaveForm, viewsData, t, saveAsView],
+    [dispatch, showSaveForm, viewsData, t, saveAsView, startAnalysis],
   );
 
   const renderTreeTitle = useCallback(
     node => {
       const { title, path, isFolder, id } = node;
+      const isAuthorized = getCascadeAccess(
+        isOwner,
+        permissionMap,
+        ResourceTypes.View,
+        path,
+        PermissionLevels.Manage,
+      );
       return (
         <TreeTitle>
           <h4>{`${title}`}</h4>
-          <CascadeAccess
-            module={ResourceTypes.View}
-            path={path}
-            level={PermissionLevels.Manage}
-          >
+          {isAuthorized || allowEnableViz ? (
             <Popup
               trigger={['click']}
               placement="bottom"
@@ -170,14 +191,16 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                   selectable={false}
                   onClick={moreMenuClick(node)}
                 >
-                  <MenuListItem
-                    key="info"
-                    prefix={<EditOutlined className="icon" />}
-                  >
-                    {tg('button.info')}
-                  </MenuListItem>
+                  {isAuthorized && (
+                    <MenuListItem
+                      key="info"
+                      prefix={<EditOutlined className="icon" />}
+                    >
+                      {tg('button.info')}
+                    </MenuListItem>
+                  )}
 
-                  {!isFolder && (
+                  {isAuthorized && !isFolder && (
                     <MenuListItem
                       key="saveAs"
                       prefix={<CopyFilled className="icon" />}
@@ -186,21 +209,32 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                     </MenuListItem>
                   )}
 
-                  <MenuListItem
-                    key="delete"
-                    prefix={<DeleteOutlined className="icon" />}
-                  >
-                    <Popconfirm
-                      title={
-                        isFolder
-                          ? tg('operation.deleteConfirm')
-                          : tg('operation.archiveConfirm')
-                      }
-                      onConfirm={archive(id, isFolder)}
+                  {allowEnableViz && !isFolder && (
+                    <MenuListItem
+                      prefix={<MonitorOutlined className="icon" />}
+                      key="startAnalysis"
                     >
-                      {isFolder ? tg('button.delete') : tg('button.archive')}
-                    </Popconfirm>
-                  </MenuListItem>
+                      {t('editor.startAnalysis')}
+                    </MenuListItem>
+                  )}
+
+                  {isAuthorized && (
+                    <MenuListItem
+                      key="delete"
+                      prefix={<DeleteOutlined className="icon" />}
+                    >
+                      <Popconfirm
+                        title={
+                          isFolder
+                            ? tg('operation.deleteConfirm')
+                            : tg('operation.archiveConfirm')
+                        }
+                        onConfirm={archive(id, isFolder)}
+                      >
+                        {isFolder ? tg('button.delete') : tg('button.archive')}
+                      </Popconfirm>
+                    </MenuListItem>
+                  )}
                 </Menu>
               }
             >
@@ -208,11 +242,13 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
                 <MoreOutlined />
               </span>
             </Popup>
-          </CascadeAccess>
+          ) : (
+            ''
+          )}
         </TreeTitle>
       );
     },
-    [archive, moreMenuClick, tg],
+    [archive, moreMenuClick, tg, allowEnableViz, t, isOwner, permissionMap],
   );
 
   const treeSelect = useCallback(

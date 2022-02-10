@@ -1,10 +1,5 @@
-import {
-  BarChartOutlined,
-  FolderFilled,
-  FolderOpenFilled,
-  FundFilled,
-} from '@ant-design/icons';
 import { Form, Input, Modal, ModalProps, Select } from 'antd';
+import useGetVizIcon from 'app/hooks/useGetVizIcon';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { selectDataChartById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
@@ -12,7 +7,6 @@ import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getChartGroupColumns } from 'app/pages/DashBoardPage/utils';
 import { convertToWidgetMap } from 'app/pages/DashBoardPage/utils/widget';
 import { makeSelectVizTree } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
-import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import produce from 'immer';
 import {
   FC,
@@ -31,6 +25,7 @@ import { FilterSelect } from './FilterSelect';
 import { fetchGlobalControllerOptions } from './service';
 import { TargetTreeSelect } from './TargetTreeSelect';
 import { ControlOptionItem } from './types';
+
 const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 },
@@ -79,16 +74,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     }
   }, []);
 
-  const getIcon = useCallback(({ relType }: Folder) => {
-    switch (relType) {
-      case 'DASHBOARD':
-        return <FundFilled />;
-      case 'DATACHART':
-        return <BarChartOutlined />;
-      default:
-        return p => (p.expanded ? <FolderOpenFilled /> : <FolderFilled />);
-    }
-  }, []);
+  const getIcon = useGetVizIcon();
   const treeData = useSelector(state => selectVizTree(state, { getIcon }));
   useEffect(() => {
     const _jumpConfig = curJumpWidget?.config?.jumpConfig;
