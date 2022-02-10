@@ -16,11 +16,13 @@
  * limitations under the License.
  */
 
+import { ChartDataSetRow } from 'app/components/ChartGraph/models/ChartDataSet';
 import {
   getColumnRenderName,
   getStyles,
   getValue,
   isMatchRequirement,
+  transformToDataSet,
   transformToObjectArray,
 } from '../chartHelper';
 
@@ -402,8 +404,69 @@ describe('Chart Helper ', () => {
       ];
       expect(transformToObjectArray(columns, metas)).toEqual([
         { name: 'r1-c1-v', age: 'r1-c2-v' },
-        { name: 'r2-c1-v', age: 'r2-c2-v' }
+        { name: 'r2-c1-v', age: 'r2-c2-v' },
       ]);
+    });
+  });
+
+  describe('transformToDataSet Test', () => {
+    test('should get dataset model with ignore case compare', () => {
+      const columns = [
+        ['r1-c1-v', 'r1-c2-v'],
+        ['r2-c1-v', 'r2-c2-v'],
+      ];
+      const metas = [{ name: 'name' }, { name: 'age' }];
+      const chartDataSet = transformToDataSet(columns, metas);
+
+      expect(chartDataSet?.length).toEqual(2);
+      expect(chartDataSet[0] instanceof ChartDataSetRow).toBeTruthy();
+      expect(chartDataSet[0].convertToObject()).toEqual({
+        NAME: 'r1-c1-v',
+        AGE: 'r1-c2-v',
+      });
+      expect(chartDataSet[1].convertToObject()).toEqual({
+        NAME: 'r2-c1-v',
+        AGE: 'r2-c2-v',
+      });
+      expect(chartDataSet[0].getCell({ colName: 'age' } as any)).toEqual(
+        'r1-c2-v',
+      );
+      expect(chartDataSet[0].getFieldKey({ colName: 'age' } as any)).toEqual(
+        'AGE',
+      );
+      expect(chartDataSet[0].getFieldIndex({ colName: 'age' } as any)).toEqual(
+        1,
+      );
+      expect(chartDataSet[0].getCellByKey('age')).toEqual('r1-c2-v');
+    });
+
+    test('should get dataset model when meta have aggregation', () => {
+      const columns = [['r1-c1-v', 'r1-c2-v']];
+      const metas = [{ name: 'name' }, { name: 'AVG(age)' }];
+      const chartDataSet = transformToDataSet(columns, metas);
+
+      expect(chartDataSet?.length).toEqual(1);
+      expect(chartDataSet[0] instanceof ChartDataSetRow).toBeTruthy();
+      expect(chartDataSet[0].convertToObject()).toEqual({
+        NAME: 'r1-c1-v',
+        'AVG(AGE)': 'r1-c2-v',
+      });
+      expect(
+        chartDataSet[0].getCell({ colName: 'age', aggregate: 'AVG' } as any),
+      ).toEqual('r1-c2-v');
+      expect(
+        chartDataSet[0].getFieldKey({
+          colName: 'age',
+          aggregate: 'AVG',
+        } as any),
+      ).toEqual('AVG(AGE)');
+      expect(
+        chartDataSet[0].getFieldIndex({
+          colName: 'age',
+          aggregate: 'AVG',
+        } as any),
+      ).toEqual(1);
+      expect(chartDataSet[0].getCellByKey('AVG(age)')).toEqual('r1-c2-v');
     });
   });
 });
