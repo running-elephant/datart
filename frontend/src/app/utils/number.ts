@@ -67,6 +67,22 @@ export function toExponential(value: any, precision: number) {
   return (+value).toExponential(precision);
 }
 
+/**
+ * Format aggregate data
+ * @example
+ * const format = {
+ *   percentage: {
+ *     decimalPlaces: 2,
+ *   },
+ *   type: "percentage",
+ * }
+ * const formattedData = toFormattedValue('1', format);
+ * console.log(formattedData); // '100.00%';
+ * @export
+ * @param {(number | string)} [value]
+ * @param {IFieldFormatConfig} [format]
+ * @return {*}
+ */
 export function toFormattedValue(
   value?: number | string,
   format?: IFieldFormatConfig,
