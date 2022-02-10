@@ -710,32 +710,6 @@ export function transformToObjectArray(
   );
 }
 
-/**
- * [Not Recommended] Get dataset key by field config with case-sensitive, it should only used in internal method.
- * If you want to find case-insensitive method, please @see {@link ChartDataSet}
- *
- * @example
- * const config = {
- *    colName: 'amount',
- *    aggregate: 'AVG'
- * }
- * const dataSetKey = getValueByColumnKey(config);
- * console.log(dataSetKey); // AVG(amount)
- *
- * @export
- * @param {ChartDataSectionField} [field]
- * @return {string}
- */
-export function transfromToObjectArray(
-  columns?: string[][],
-  metas?: ChartDatasetMeta[],
-) {
-  console.warn(
-    'This method `transfromToObjectArray` will be deprecated and can be replaced by `transformToObjectArray`',
-  );
-  return transformToObjectArray(columns, metas);
-}
-
 export function getValueByColumnKey(field?: {
   aggregate?;
   colName: string;
