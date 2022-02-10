@@ -677,6 +677,16 @@ export function transformToDataSet<T>(
  * Support:
  *  1. Case Insensitive to get value
  *  2. More util helper
+ * @example
+ *
+ * const columns = [
+ *      ['r1-c1-v', 'r1-c2-v'],
+ *      ['r2-c1-v', 'r2-c2-v'],
+ *    ];
+ * const metas = [{ name: 'name' }, { name: 'age' }];
+ * const datas = transformToObjectArray(columns, metas);
+ * console.log(datas); // [{"name":"r1-c1-v","age":"r1-c2-v2"},{"name":"r2-c1-v","age":"r2-c2-v"}] 
+ * 
  * @export
  * @param {string[][]} [columns]
  * @param {ChartDatasetMeta[]} [metas]

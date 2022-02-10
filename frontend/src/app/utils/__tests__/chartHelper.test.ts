@@ -21,6 +21,7 @@ import {
   getStyles,
   getValue,
   isMatchRequirement,
+  transformToObjectArray,
 } from '../chartHelper';
 
 describe('Chart Helper ', () => {
@@ -389,6 +390,20 @@ describe('Chart Helper ', () => {
         ],
       } as any;
       expect(isMatchRequirement(meta, config)).toBeFalsy();
+    });
+  });
+
+  describe('transformToObjectArray Test', () => {
+    test('should transform data to object array style', () => {
+      const metas = [{ name: 'name' }, { name: 'age' }];
+      const columns = [
+        ['r1-c1-v', 'r1-c2-v'],
+        ['r2-c1-v', 'r2-c2-v'],
+      ];
+      expect(transformToObjectArray(columns, metas)).toEqual([
+        { name: 'r1-c1-v', age: 'r1-c2-v' },
+        { name: 'r2-c1-v', age: 'r2-c2-v' }
+      ]);
     });
   });
 });
