@@ -26,7 +26,7 @@
     "eslint": "eslint --ext js,ts,tsx",
     "lint": "npm run eslint src",
     "lint:fix": "npm run eslint --fix src",
-    "lint:css": "stylelint src/**/*.{less,css,jsx,tsx}",
+    "lint:css": "stylelint src/**/*.{css,jsx,tsx}",
     "prettify": "prettier --write src",
     "prepare": "cd .. && husky install frontend/.husky",
     "eject": "react-scripts eject",
@@ -56,7 +56,7 @@
       "npm run eslint --fix",
       "prettier --write"
     ],
-    "*.{less,css,md,json}": [
+    "*.{css,md,json}": [
       "prettier --write"
     ]
   },
