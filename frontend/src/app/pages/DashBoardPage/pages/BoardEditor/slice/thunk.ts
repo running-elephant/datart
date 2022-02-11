@@ -1,4 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { migrateWidgets } from 'app/migration/migrateWidgets';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
@@ -27,7 +28,7 @@ import {
   createWidgetInfo,
   createWidgetInfoMap,
   getWidgetInfoMapByServer,
-  getWidgetMapByServer,
+  getWidgetMap,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
@@ -91,56 +92,62 @@ export const fetchEditBoardDetail = createAsyncThunk<
   null,
   string,
   { state: RootState }
->('editBoard/fetchEditBoardDetail', async (dashboardId, { dispatch }) => {
-  if (!dashboardId) {
+>(
+  'editBoard/fetchEditBoardDetail',
+  async (dashboardId, { getState, dispatch }) => {
+    if (!dashboardId) {
+      return null;
+    }
+    const curVersion = getState().app?.systemInfo?.version || '';
+    const { data } = await request2<ServerDashboard>(
+      `/viz/dashboards/${dashboardId}`,
+    );
+
+    const dashboard = getDashBoardByResBoard(data);
+
+    const {
+      datacharts: serverDataCharts,
+      views: serverViews,
+      widgets: serverWidgets,
+    } = data;
+    // TODO
+    const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
+    const migratedWidgets = migrateWidgets(serverWidgets, {
+      version: curVersion,
+    });
+    const { widgetMap, wrappedDataCharts } = getWidgetMap(
+      migratedWidgets,
+      dataCharts,
+    );
+    const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
+    // TODO xld migration about filter
+
+    const widgetIds = serverWidgets.map(w => w.id);
+    // const boardInfo = getInitBoardInfo({ id: dashboard.id, widgetIds });
+
+    const boardInfo = getInitBoardInfo({ id: dashboard.id, widgetIds });
+    // datacharts
+
+    const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
+    dispatch(boardActions.setDataChartToMap(allDataCharts));
+
+    const viewViews = getChartDataView(serverViews, allDataCharts);
+
+    dispatch(boardActions.updateViewMap(viewViews));
+    // BoardInfo
+    dispatch(editDashBoardInfoActions.initEditBoardInfo(boardInfo));
+    // widgetInfoRecord
+    dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+    //dashBoard,widgetRecord
+    dispatch(
+      editBoardStackActions.setBoardToEditStack({
+        dashBoard: dashboard,
+        widgetRecord: widgetMap,
+      }),
+    );
     return null;
-  }
-
-  const { data } = await request2<ServerDashboard>(
-    `/viz/dashboards/${dashboardId}`,
-  );
-
-  const dashboard = getDashBoardByResBoard(data);
-
-  const {
-    datacharts: serverDataCharts,
-    views: serverViews,
-    widgets: serverWidgets,
-  } = data;
-  // TODO
-  const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
-  const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(
-    serverWidgets,
-    dataCharts,
-  );
-  const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
-  // TODO xld migration about filter
-
-  const widgetIds = serverWidgets.map(w => w.id);
-  // const boardInfo = getInitBoardInfo({ id: dashboard.id, widgetIds });
-
-  const boardInfo = getInitBoardInfo({ id: dashboard.id, widgetIds });
-  // datacharts
-
-  const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
-  dispatch(boardActions.setDataChartToMap(allDataCharts));
-
-  const viewViews = getChartDataView(serverViews, allDataCharts);
-
-  dispatch(boardActions.updateViewMap(viewViews));
-  // BoardInfo
-  dispatch(editDashBoardInfoActions.initEditBoardInfo(boardInfo));
-  // widgetInfoRecord
-  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
-  //dashBoard,widgetRecord
-  dispatch(
-    editBoardStackActions.setBoardToEditStack({
-      dashBoard: dashboard,
-      widgetRecord: widgetMap,
-    }),
-  );
-  return null;
-});
+  },
+);
 
 /**
  * @param boardId string
@@ -169,6 +176,7 @@ export const toUpdateDashboard = createAsyncThunk<
       dataChartMap,
       viewMap,
     });
+
     const group = createToSaveWidgetGroup(widgets, boardInfo.widgetIds);
     const updateData: SaveDashboard = {
       ...dashBoard,

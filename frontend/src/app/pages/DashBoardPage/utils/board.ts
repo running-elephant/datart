@@ -203,3 +203,5 @@ export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
   });
   return viewViews;
 };
+
+
