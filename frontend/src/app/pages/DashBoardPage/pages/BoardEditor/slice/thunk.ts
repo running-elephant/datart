@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { migrateWidgets } from 'app/migration/migrateWidgets';
+import { migrateWidgets } from 'app/migration/WidgetConfig/migrateWidgets';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
@@ -98,7 +98,6 @@ export const fetchEditBoardDetail = createAsyncThunk<
     if (!dashboardId) {
       return null;
     }
-    const curVersion = getState().app?.systemInfo?.version || '';
     const { data } = await request2<ServerDashboard>(
       `/viz/dashboards/${dashboardId}`,
     );
@@ -112,9 +111,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
     } = data;
     // TODO
     const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
-    const migratedWidgets = migrateWidgets(serverWidgets, {
-      version: curVersion,
-    });
+    const migratedWidgets = migrateWidgets(serverWidgets);
     const { widgetMap, wrappedDataCharts } = getWidgetMap(
       migratedWidgets,
       dataCharts,
