@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { migrateWidgets } from 'app/migration/migrateWidgets';
+import { migrateWidgets } from 'app/migration/WidgetConfig/migrateWidgets';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
 import ChartDataRequest from 'app/types/ChartDataRequest';
@@ -42,7 +42,7 @@ export const handleServerBoardAction =
   }) =>
   async (dispatch, getState) => {
     const { data, renderMode, filterSearchMap } = params;
-    
+
     const dashboard = getDashBoardByResBoard(data);
     const { datacharts, views: serverViews, widgets: serverWidgets } = data;
 

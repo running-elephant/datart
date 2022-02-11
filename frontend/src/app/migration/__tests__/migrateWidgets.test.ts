@@ -27,7 +27,7 @@ import {
   beta0,
   convertWidgetRelationsToObj,
   migrateWidgets,
-} from '../migrateWidgets';
+} from '../WidgetConfig/migrateWidgets';
 
 describe('test migrateWidgets ', () => {
   test('should return undefined  when widget.config.type === filter', () => {
@@ -49,13 +49,12 @@ describe('test migrateWidgets ', () => {
 
   test('should return widget.config.nameConfig', () => {
     const widget1 = {
-      config: {
-      },
+      config: {},
     } as Widget;
     const widget2 = {
       config: {
-        nameConfig:fontDefault,
-        version: "1.0.0-beta.0"
+        nameConfig: fontDefault,
+        version: '1.0.0-beta.0',
       },
     } as Widget;
     expect(beta0(widget1 as Widget)).toMatchObject(widget2);
@@ -64,29 +63,26 @@ describe('test migrateWidgets ', () => {
   test('should return Array Type about assistViewFields', () => {
     const widget1 = {
       config: {
-        type:'controller',
-        content:{
-          config:{
-            assistViewFields:'id1###id2'
-          }
-        } 
+        type: 'controller',
+        content: {
+          config: {
+            assistViewFields: 'id1###id2',
+          },
+        },
       },
-    } 
+    };
     const widget2 = {
       config: {
-        type:'controller',
-        content:{
-          config:{
-            assistViewFields:["id1","id2"]
-          }
-        }
+        type: 'controller',
+        content: {
+          config: {
+            assistViewFields: ['id1', 'id2'],
+          },
+        },
       },
-    } 
-    expect(beta0(widget1 as unknown as  Widget)).toMatchObject(widget2);
+    };
+    expect(beta0(widget1 as unknown as Widget)).toMatchObject(widget2);
   });
-
-
-  
 
   test('convertWidgetRelationsToObj parse Relation.config', () => {
     const relations1 = [
@@ -105,7 +101,7 @@ describe('test migrateWidgets ', () => {
     ] as ServerRelation[];
     expect(convertWidgetRelationsToObj(relations1)).toMatchObject(relations2);
   });
-  
+
   test('should get new target version after adjust widgets before save', () => {
     const widget1 = {
       config: '{}',
@@ -121,23 +117,23 @@ describe('test migrateWidgets ', () => {
     } as ServerWidget;
     const resWidget = {
       config: {
-        version: "1.0.0-beta.0",
+        version: '1.0.0-beta.0',
       },
       relations: [] as Relation[],
     } as Widget;
     const resWidget2 = {
       config: {
-        version: "1.0.0-beta.1",
+        version: '1.0.0-beta.1',
       },
       relations: [] as Relation[],
     } as Widget;
-    const widgets: ServerWidget[] = [widget1, widget2,widget3,widget4];
+    const widgets: ServerWidget[] = [widget1, widget2, widget3, widget4];
 
     expect(migrateWidgets(widgets)).toMatchObject([
       resWidget,
       resWidget,
       resWidget,
-      resWidget2
+      resWidget2,
     ]);
   });
 });

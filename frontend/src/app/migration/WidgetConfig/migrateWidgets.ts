@@ -27,9 +27,14 @@ import {
   fontDefault,
   VALUE_SPLITTER,
 } from 'app/pages/DashBoardPage/utils/widget';
-const versionBeta0 = '1.0.0-beta.0';
-const versionBeta1 = '1.0.0-beta.1';
-const versionList = [versionBeta0, versionBeta1];
+import { VERSION_BETA_0, VERSION_LIST } from '../constants';
+
+/**
+ *
+ * JSON.parse(relation.config)
+ * @param {ServerRelation[]} [relations=[]]
+ * @return {*}  {Relation[]}
+ */
 export const convertWidgetRelationsToObj = (
   relations: ServerRelation[] = [],
 ): Relation[] => {
@@ -46,14 +51,21 @@ export const convertWidgetRelationsToObj = (
     })
     .filter(re => !!re) as Relation[];
 };
+
+/**
+ *
+ * migrate beta0
+ * @param {Widget} [widget]
+ * @return {*}
+ */
 export const beta0 = (widget?: Widget) => {
   if (!widget) return undefined;
   const canHandleVersions = ['', undefined, null].concat(
-    versionList.slice(0, 1),
+    VERSION_LIST.slice(0, 1),
   );
   // 此函数只能处理 beta0以及 beta0之前的版本
   if (!canHandleVersions.includes(widget.config.version)) return widget;
-  
+
   // 1.放弃了 filter type 新的是 controller
   if ((widget.config.type as any) === 'filter') {
     return undefined;
@@ -73,15 +85,26 @@ export const beta0 = (widget?: Widget) => {
       ).split(VALUE_SPLITTER);
     }
   }
-  widget.config.version = versionBeta0;
+  widget.config.version = VERSION_BETA_0;
   return widget;
 };
-// TODO
+
+/**
+ *
+ * TODO beta1
+ * @param {Widget} [widget]
+ * @return {*}
+ */
 export const beta1 = (widget?: Widget) => {
   if (!widget) return undefined;
   return widget;
 };
-
+/**
+ *
+ * parseServerWidget JSON.parse(widget.config)
+ * @param {ServerWidget} sWidget
+ * @return {*}
+ */
 export const parseServerWidget = (sWidget: ServerWidget) => {
   try {
     sWidget.config = JSON.parse(sWidget.config);
@@ -93,6 +116,12 @@ export const parseServerWidget = (sWidget: ServerWidget) => {
   ) as unknown as ServerRelation[];
   return sWidget as unknown as Widget;
 };
+/**
+ *
+ * migrateWidgets
+ * @param {ServerWidget[]} widgets
+ * @return {*}
+ */
 export const migrateWidgets = (widgets: ServerWidget[]) => {
   if (!Array.isArray(widgets)) {
     return [];
@@ -104,9 +133,9 @@ export const migrateWidgets = (widgets: ServerWidget[]) => {
     })
     .filter(widget => !!widget)
     .map(widget => {
-      let sourceVersion = widget?.config.version || versionBeta0;
-      if (!versionList.includes(sourceVersion)) {
-        widget!.config.version = versionBeta0;
+      let sourceVersion = widget?.config.version || VERSION_BETA_0;
+      if (!VERSION_LIST.includes(sourceVersion)) {
+        widget!.config.version = VERSION_BETA_0;
       }
       let resWidget: Widget | undefined;
       resWidget = beta1(beta0(widget));
