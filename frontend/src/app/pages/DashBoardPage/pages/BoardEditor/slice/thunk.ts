@@ -98,7 +98,6 @@ export const fetchEditBoardDetail = createAsyncThunk<
     if (!dashboardId) {
       return null;
     }
-    const curVersion = getState().app?.systemInfo?.version || '';
     const { data } = await request2<ServerDashboard>(
       `/viz/dashboards/${dashboardId}`,
     );
@@ -112,9 +111,8 @@ export const fetchEditBoardDetail = createAsyncThunk<
     } = data;
     // TODO
     const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
-    const migratedWidgets = migrateWidgets(serverWidgets, {
-      version: curVersion,
-    });
+    const migratedWidgets = migrateWidgets(serverWidgets);
+    console.log("_migratedWidgets",migratedWidgets)
     const { widgetMap, wrappedDataCharts } = getWidgetMap(
       migratedWidgets,
       dataCharts,

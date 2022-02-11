@@ -42,14 +42,12 @@ export const handleServerBoardAction =
   }) =>
   async (dispatch, getState) => {
     const { data, renderMode, filterSearchMap } = params;
-    const curVersion = getState().app?.systemInfo?.version || '';
+    
     const dashboard = getDashBoardByResBoard(data);
     const { datacharts, views: serverViews, widgets: serverWidgets } = data;
 
     const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
-    const migratedWidgets = migrateWidgets(serverWidgets, {
-      version: curVersion,
-    });
+    const migratedWidgets = migrateWidgets(serverWidgets);
     const { widgetMap, wrappedDataCharts, controllerWidgets } = getWidgetMap(
       migratedWidgets,
       dataCharts,
