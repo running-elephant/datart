@@ -368,7 +368,8 @@ public class JdbcDataProviderAdapter implements Closeable {
 
         SqlScriptRender render = new SqlScriptRender(script
                 , executeParam
-                , getSqlDialect());
+                , getSqlDialect()
+                , jdbcProperties.isEnableSpecialSql());
 
         if (supportPaging()) {
             sql = render.render(true, true, false);
