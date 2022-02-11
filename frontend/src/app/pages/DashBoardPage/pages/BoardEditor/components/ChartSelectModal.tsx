@@ -19,12 +19,14 @@ import { Input, Modal } from 'antd';
 import { Tree } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useGetVizIcon from 'app/hooks/useGetVizIcon';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectWidgetInfoDatachartId } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/selectors';
 import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { listToTree } from 'utils/utils';
+
 export interface IProps {
   // dataCharts: DataChart[];
   dataCharts: Folder[];
@@ -34,6 +36,7 @@ export interface IProps {
 }
 
 const ChartSelectModalModal: React.FC<IProps> = props => {
+  const t = useI18NPrefix(`viz.board.action`);
   const { visible, onSelectedCharts, onCancel, dataCharts } = props;
   const [selectedDataChartIds, setSelectedDataChartIds] = useState<string[]>(
     [],
@@ -122,7 +125,7 @@ const ChartSelectModalModal: React.FC<IProps> = props => {
 
   return (
     <Modal
-      title="添加已有数据图表"
+      title={t('ImportExistingDataCharts')}
       visible={visible}
       onOk={onOk}
       centered
@@ -131,7 +134,7 @@ const ChartSelectModalModal: React.FC<IProps> = props => {
       cancelButtonProps={{ disabled: false }}
     >
       <InputWrap>
-        <Input onChange={treeSearch} placeholder="搜索名称关键字" />
+        <Input onChange={treeSearch} placeholder={t('searchValue')} />
       </InputWrap>
       <Tree
         loading={false}

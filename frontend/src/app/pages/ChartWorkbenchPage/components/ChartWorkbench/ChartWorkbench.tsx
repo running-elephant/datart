@@ -44,7 +44,7 @@ const ChartWorkbench: FC<{
   header?: {
     name?: string;
     orgId?: string;
-    chartType?: string;
+    container?: string;
     onSaveChart?: () => void;
     onSaveChartToDashBoard?: (dashboardId) => void;
     onGoBack?: () => void;
@@ -85,7 +85,7 @@ const ChartWorkbench: FC<{
                   <ChartHeaderPanel
                     chartName={header?.name}
                     orgId={header?.orgId}
-                    chartType={header?.chartType}
+                    container={header?.container}
                     onGoBack={header?.onGoBack}
                     onSaveChart={header?.onSaveChart}
                     onSaveChartToDashBoard={header?.onSaveChartToDashBoard}

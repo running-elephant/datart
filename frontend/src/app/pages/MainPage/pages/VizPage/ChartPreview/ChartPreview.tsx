@@ -313,6 +313,7 @@ const ChartPreviewBoard: FC<{
           allowShare={allowShare}
           allowManage={allowManage}
           orgId={orgId}
+          backendChartId={backendChartId}
         />
         <PreviewBlock>
           <div>
