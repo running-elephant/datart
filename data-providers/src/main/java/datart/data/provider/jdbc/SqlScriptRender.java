@@ -136,9 +136,9 @@ public class SqlScriptRender extends ScriptRender {
 
         Map<String, ScriptVariable> variableMap = new CaseInsensitiveMap<>();
 
-        if(CollectionUtils.isNotEmpty(queryScript.getVariables())){
+        if (CollectionUtils.isNotEmpty(queryScript.getVariables())) {
             for (ScriptVariable variable : queryScript.getVariables()) {
-                variableMap.put(variable.getNameWithQuote(),variable);
+                variableMap.put(variable.getNameWithQuote(), variable);
             }
         }
 
@@ -170,6 +170,7 @@ public class SqlScriptRender extends ScriptRender {
             try {
                 sqlNode = parseSql(sql);
             } catch (Exception e) {
+                SqlValidateUtils.checkDMSql(sql);
                 continue;
             }
             if (SqlValidateUtils.validateQuery(sqlNode) && selectSql != null) {
