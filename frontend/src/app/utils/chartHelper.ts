@@ -27,6 +27,7 @@ import {
   ChartDataSectionField,
   ChartDataSectionType,
   ChartStyleConfig,
+  FieldFormatType,
   IFieldFormatConfig,
   SortActionType,
 } from 'app/types/ChartConfig';
@@ -37,8 +38,14 @@ import {
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
 import ChartMetadata from 'app/types/ChartMetadata';
+import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
+import moment from 'moment';
 import { Debugger } from 'utils/debugger';
-import { isEmptyArray, meanValue } from 'utils/object';
+import { isEmpty,
+  isEmptyArray,
+  isUndefined,
+  meanValue,
+  pipe,} from 'utils/object';
 import {
   flattenHeaderRowsWithoutGroupRow,
   getColumnRenderOriginName,
@@ -46,7 +53,232 @@ import {
   getRequiredGroupedSections,
   isInRange,
 } from './internalChartHelper';
-import { toFormattedValue } from './number';
+
+/**
+ * [中文] 获取格式聚合数据
+ * </br>
+ * [EN] Gets format aggregate data
+ * 
+ * @example
+ * const format = {
+ *   percentage: {
+ *     decimalPlaces: 2,
+ *   },
+ *   type: "percentage",
+ * }
+ * const formattedData = toFormattedValue('1', format);
+ * console.log(formattedData); // '100.00%';
+ * @export
+ * @param {(number | string)} [value]
+ * @param {IFieldFormatConfig} [format]
+ * @return {*}
+ */
+ export function toFormattedValue(
+  value?: number | string,
+  format?: IFieldFormatConfig,
+) {
+  if (value === null || value === undefined) {
+    return '-';
+  }
+
+  if (!format || format.type === FieldFormatType.DEFAULT) {
+    return value;
+  }
+
+  if (!format.type) {
+    return value;
+  }
+
+  const { type: formatType } = format;
+
+  if (
+    typeof value === 'string' &&
+    formatType !== FieldFormatType.DATE &&
+    (!value || isNaN(+value))
+  ) {
+    return value;
+  }
+
+  const config = format[formatType];
+  if (!config) {
+    return value;
+  }
+
+  let formattedValue;
+  switch (formatType) {
+    case FieldFormatType.NUMERIC:
+      const numericConfig =
+        config as IFieldFormatConfig[FieldFormatType.NUMERIC];
+      formattedValue = pipe(
+        unitFormater,
+        decimalPlacesFormater,
+        numericFormater,
+      )(value, numericConfig);
+      break;
+    case FieldFormatType.CURRENCY:
+      const currencyConfig =
+        config as IFieldFormatConfig[FieldFormatType.CURRENCY];
+      formattedValue = pipe(currencyFormater)(value, currencyConfig);
+      break;
+    case FieldFormatType.PERCENTAGE:
+      const percentageConfig =
+        config as IFieldFormatConfig[FieldFormatType.PERCENTAGE];
+      formattedValue = pipe(percentageFormater)(value, percentageConfig);
+      break;
+    case FieldFormatType.SCIENTIFIC:
+      const scientificNotationConfig =
+        config as IFieldFormatConfig[FieldFormatType.SCIENTIFIC];
+      formattedValue = pipe(scientificNotationFormater)(
+        value,
+        scientificNotationConfig,
+      );
+      break;
+    case FieldFormatType.DATE:
+      const dateConfig = config as IFieldFormatConfig[FieldFormatType.DATE];
+      formattedValue = pipe(dateFormater)(value, dateConfig);
+      break;
+    default:
+      formattedValue = value;
+      break;
+  }
+
+  return formattedValue;
+}
+
+function decimalPlacesFormater(
+  value,
+  config?:
+    | IFieldFormatConfig[FieldFormatType.NUMERIC]
+    | IFieldFormatConfig[FieldFormatType.CURRENCY],
+) {
+  if (isEmpty(config?.decimalPlaces)) {
+    return value;
+  }
+  if (isNaN(value)) {
+    return value;
+  }
+  if (config?.decimalPlaces! < 0 || config?.decimalPlaces! > 100) {
+    return value;
+  }
+
+  return (+value).toFixed(config?.decimalPlaces);
+}
+
+function unitFormater(
+  value: any,
+  config?:
+    | IFieldFormatConfig[FieldFormatType.NUMERIC]
+    | IFieldFormatConfig[FieldFormatType.CURRENCY],
+) {
+  if (isEmpty(config?.unitKey)) {
+    return value;
+  }
+
+  if (isNaN(+value)) {
+    return value;
+  }
+  const realUnit = NumericUnitDescriptions.get(config?.unitKey!)?.[0] || 1;
+  return +value / realUnit;
+}
+
+function numericFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.NUMERIC],
+) {
+  if (isNaN(+value)) {
+    return value;
+  }
+
+  const valueWithPrefixs = [
+    config?.prefix || '',
+    thousandSeperatorFormater(value, config),
+    NumericUnitDescriptions.get(config?.unitKey || NumberUnitKey.None)?.[1],
+    config?.suffix || '',
+  ].join('');
+  return valueWithPrefixs;
+}
+
+function thousandSeperatorFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.NUMERIC],
+) {
+  if (isNaN(+value) || !config?.useThousandSeparator) {
+    return value;
+  }
+
+  const parts = value.toString().split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const formatted = parts.join('.');
+  return formatted;
+}
+
+function currencyFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.CURRENCY],
+) {
+  if (isNaN(+value)) {
+    return value;
+  }
+
+  const realUnit = NumericUnitDescriptions.get(config?.unitKey!)?.[0] || 1;
+
+  return `${new Intl.NumberFormat('zh-CN', {
+    style: 'currency',
+    currency: config?.currency || 'CNY',
+    minimumFractionDigits: config?.decimalPlaces,
+    useGrouping: config?.useThousandSeparator,
+  }).format(value / realUnit)} ${
+    NumericUnitDescriptions.get(config?.unitKey || NumberUnitKey.None)?.[1]
+  }`;
+}
+
+function percentageFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.PERCENTAGE],
+) {
+  if (isNaN(+value)) {
+    return value;
+  }
+
+  let fractionDigits = 0;
+  if (
+    !isEmpty(config?.decimalPlaces) &&
+    +config?.decimalPlaces! >= 0 &&
+    +config?.decimalPlaces! <= 20
+  ) {
+    fractionDigits = +config?.decimalPlaces!;
+  }
+  return `${(+value * 100).toFixed(fractionDigits)}%`;
+}
+
+function scientificNotationFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.SCIENTIFIC],
+) {
+  if (isNaN(+value)) {
+    return value;
+  }
+  let fractionDigits = 0;
+  if (
+    !isEmpty(config?.decimalPlaces) &&
+    +config?.decimalPlaces! >= 0 &&
+    +config?.decimalPlaces! <= 20
+  ) {
+    fractionDigits = +config?.decimalPlaces!;
+  }
+  return (+value).toExponential(fractionDigits);
+}
+
+function dateFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.DATE],
+) {
+  if (isNaN(+value) || isEmpty(config?.format)) {
+    return value;
+  }
+
+  return moment(value).format(config?.format);
+}
 
 /**
  * [中文] 获取系统默认颜色
@@ -928,7 +1160,16 @@ export function getSeriesTooltips4Rectangular(
  * [中文] 获取字段的Tooltip显示名称和内容
  * </br>
  * [EN] Get chart render string with field name and value
- *
+ * @example
+ * const config = {
+ *   aggregate: "SUM"
+ *   colName: 'name',
+ *   type: 'STRING',
+ *   category: 'field',
+ *   uid: '123456',
+ * }
+ * const formatValue = valueFormatter(config, '示例')；
+ * console.log(formatValue) // SUM(name): 示例
  * @export
  * @param {ChartDataSectionField} [config]
  * @param {number} [value]
