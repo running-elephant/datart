@@ -18,15 +18,19 @@
 
 import { Modal, Switch } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { FC, memo, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 
 const AggregationOperationMenu: FC<{
   defaultValue?: boolean;
-  onChangeAggregation: (value: boolean) => void;
+  onChangeAggregation: () => void;
 }> = memo(({ defaultValue = true, onChangeAggregation }) => {
   const checkedValue = useMemo(() => defaultValue, [defaultValue]);
   const t = useI18NPrefix(`viz.workbench.header`);
+  const { actions } = useWorkbenchSlice();
+  const dispatch = useDispatch();
 
   const onChange = value => {
     Modal.confirm({
@@ -34,7 +38,8 @@ const AggregationOperationMenu: FC<{
       content: t('aggregationSwitchTip'),
       okText: checkedValue ? t('close') : t('open'),
       onOk() {
-        onChangeAggregation(value);
+        onChangeAggregation();
+        dispatch(actions.updateChartAggregation(value));
       },
     });
   };

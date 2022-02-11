@@ -20,7 +20,7 @@ import { createContext } from 'react';
 
 const ChartAggregationContext = createContext<{
   aggregation: boolean | undefined;
-  onChangeAggregation?: (value: boolean) => void;
+  onChangeAggregation?: () => void;
 }>({
   aggregation: true,
   onChangeAggregation: () => {},

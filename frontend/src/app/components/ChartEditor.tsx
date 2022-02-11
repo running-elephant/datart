@@ -165,6 +165,63 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backendChart?.config?.chartGraphId]);
 
+  const registerChartEvents = useCallback(
+    chart => {
+      chart?.registerMouseEvents([
+        {
+          name: 'click',
+          callback: param => {
+            if (
+              param.componentType === 'table' &&
+              param.seriesType === 'paging-sort-filter'
+            ) {
+              dispatch(
+                refreshDatasetAction({
+                  sorter: {
+                    column: param?.seriesName!,
+                    operator: param?.value?.direction,
+                    aggOperator: param?.value?.aggOperator,
+                  },
+                  pageInfo: {
+                    pageNo: param?.value?.pageNo,
+                  },
+                }),
+              );
+              return;
+            }
+            if (param.seriesName === 'richText') {
+              dispatch(updateRichTextAction(param.value));
+              return;
+            }
+          },
+        },
+      ]);
+    },
+    [dispatch],
+  );
+
+  const clearDataConfig = useCallback(() => {
+    const currentChart = ChartManager.instance().getById(chart?.meta?.id);
+    let targetChartConfig = CloneValueDeep(currentChart?.config);
+    registerChartEvents(currentChart);
+    setChart(currentChart);
+
+    const finalChartConfig = transferChartConfigs(
+      targetChartConfig,
+      targetChartConfig,
+    );
+
+    dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
+    dispatch(
+      workbenchSlice.actions.updateChartConfig({
+        type: ChartConfigReducerActionType.INIT,
+        payload: {
+          init: finalChartConfig,
+        },
+      }),
+    );
+  }, [dispatch, chart?.meta?.id, registerChartEvents]);
+
   const handleChartChange = (c: IChart) => {
     registerChartEvents(c);
     setChart(c);
@@ -196,27 +253,13 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     );
   };
 
-  const handleDataViewChanged = () => {
-    const currentChart = ChartManager.instance().getDefaultChart();
-    registerChartEvents(currentChart);
-    setChart(currentChart);
+  const handleDataViewChanged = useCallback(() => {
+    clearDataConfig();
+  }, [clearDataConfig]);
 
-    let targetChartConfig = CloneValueDeep(currentChart.config);
-    const finalChartConfig = transferChartConfigs(
-      targetChartConfig,
-      targetChartConfig,
-    );
-
-    dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
-    dispatch(
-      workbenchSlice.actions.updateChartConfig({
-        type: ChartConfigReducerActionType.INIT,
-        payload: {
-          init: finalChartConfig,
-        },
-      }),
-    );
-  };
+  const handleAggregationState = useCallback(() => {
+    clearDataConfig();
+  }, [clearDataConfig]);
 
   const buildDataChart = useCallback(() => {
     const dataChartConfig: DataChartConfig = {
@@ -335,67 +378,6 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     dataview?.computedFields,
     history,
   ]);
-
-  const registerChartEvents = useCallback(
-    chart => {
-      chart?.registerMouseEvents([
-        {
-          name: 'click',
-          callback: param => {
-            if (
-              param.componentType === 'table' &&
-              param.seriesType === 'paging-sort-filter'
-            ) {
-              dispatch(
-                refreshDatasetAction({
-                  sorter: {
-                    column: param?.seriesName!,
-                    operator: param?.value?.direction,
-                    aggOperator: param?.value?.aggOperator,
-                  },
-                  pageInfo: {
-                    pageNo: param?.value?.pageNo,
-                  },
-                }),
-              );
-              return;
-            }
-            if (param.seriesName === 'richText') {
-              dispatch(updateRichTextAction(param.value));
-              return;
-            }
-          },
-        },
-      ]);
-    },
-    [dispatch],
-  );
-
-  const handleAggregationState = useCallback(
-    state => {
-      const currentChart = ChartManager.instance().getById(chart?.meta?.id);
-      let targetChartConfig = CloneValueDeep(currentChart?.config);
-      registerChartEvents(currentChart);
-      setChart(currentChart);
-
-      const finalChartConfig = transferChartConfigs(
-        targetChartConfig,
-        targetChartConfig,
-      );
-
-      dispatch(actions.updateChartAggregation(state));
-      dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
-      dispatch(
-        workbenchSlice.actions.updateChartConfig({
-          type: ChartConfigReducerActionType.INIT,
-          payload: {
-            init: finalChartConfig,
-          },
-        }),
-      );
-    },
-    [dispatch, actions, chart?.meta?.id, registerChartEvents],
-  );
 
   const saveChartToDashBoard = useCallback(
     dashboardId => {

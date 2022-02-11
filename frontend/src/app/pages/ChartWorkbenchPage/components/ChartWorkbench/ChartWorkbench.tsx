@@ -48,7 +48,7 @@ const ChartWorkbench: FC<{
     onSaveChart?: () => void;
     onSaveChartToDashBoard?: (dashboardId) => void;
     onGoBack?: () => void;
-    onChangeAggregation?: (state: boolean) => void;
+    onChangeAggregation?: () => void;
   };
   onChartChange: (c: IChart) => void;
   onChartConfigChange: (type, payload) => void;

@@ -33,6 +33,7 @@ import {
   PermissionLevels,
   ResourceTypes,
 } from 'app/pages/MainPage/pages/PermissionPage/constants';
+import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -52,8 +53,9 @@ import ChartComputedFieldSettingPanel from './components/ChartComputedFieldSetti
 const ChartDataViewPanel: FC<{
   dataView?: ChartDataView;
   defaultViewId?: string;
+  chartConfig?: ChartConfig;
   onDataViewChange?: () => void;
-}> = memo(({ dataView, defaultViewId, onDataViewChange }) => {
+}> = memo(({ dataView, defaultViewId, chartConfig, onDataViewChange }) => {
   const t = useI18NPrefix(`viz.workbench.dataview`);
   const dispatch = useDispatch();
   const dataviewTreeSelector = useMemo(makeDataviewTreeSelector, []);
@@ -89,10 +91,38 @@ const ChartDataViewPanel: FC<{
   })(true);
   const history = useHistory();
 
-  const handleDataViewChange = value => {
-    onDataViewChange?.();
-    dispatch(fetchViewDetailAction(value));
-  };
+  const handleDataViewChange = useCallback(
+    value => {
+      if (dataView?.id === value) {
+        return false;
+      }
+
+      let Data = chartConfig?.datas?.filter(v => v.rows && v.rows.length);
+
+      if (Data?.length) {
+        (showModal as Function)({
+          title: '',
+          modalSize: StateModalSize.XSMALL,
+          content: () => t('toggleViewTip'),
+          onOk: () => {
+            onDataViewChange?.();
+            dispatch(fetchViewDetailAction(value));
+          },
+        });
+      } else {
+        onDataViewChange?.();
+        dispatch(fetchViewDetailAction(value));
+      }
+    },
+    [
+      chartConfig?.datas,
+      dataView?.id,
+      dispatch,
+      onDataViewChange,
+      showModal,
+      t,
+    ],
+  );
 
   const filterDateViewTreeNode = useCallback(
     (inputValue, node) =>

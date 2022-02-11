@@ -118,7 +118,7 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
         const { data } = await request2<ServerDashboard>(
           `/viz/dashboards/${selectId}`,
         );
-        const chartIndex = data.datacharts?.findIndex(
+        const chartIndex = data?.datacharts?.findIndex(
           v => v.id === backendChartId,
         );
 
