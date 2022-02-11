@@ -80,22 +80,23 @@ export interface ServerDashboard extends Omit<Dashboard, 'config'> {
   widgets: ServerWidget[];
 }
 export interface DashboardConfig {
+  version: string;
   background: BackgroundConfig;
   widgetDefaultSettings: {
     background: BackgroundConfig;
     boxShadow?: boolean;
   };
   maxWidgetIndex: number;
-  initialQuery: boolean; // TODO migration del ? -- xld
-  hasQueryControl: boolean; // TODO migration del ? -- xld
-  hasResetControl?: boolean; // TODO migration del ? -- xld
+  initialQuery: boolean;
+  hasQueryControl: boolean;
+  hasResetControl: boolean;
   type: BoardType; //'auto','free'
 
   // auto
   margin: [number, number];
   containerPadding: [number, number];
-  mobileMargin: [number, number]; // TODO migration del ? -- xld
-  mobileContainerPadding: [number, number]; // TODO migration del ? -- xld
+  mobileMargin: [number, number];
+  mobileContainerPadding: [number, number];
   cols?: ColsType;
   // free
   width: number;
