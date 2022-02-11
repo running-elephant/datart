@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /**
  * Datart
  *
@@ -17,9 +16,10 @@
  * limitations under the License.
  */
 
-// 这个polyfill 文件 一定要在最前面
+// organize-imports-ignore  polyfill/stable must in the first
 import 'react-app-polyfill/stable';
- 
+
+import { migrateWidgets } from 'app/migration/WidgetConfig/migrateWidgets';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import {
   DataChart,
@@ -35,7 +35,7 @@ import { getWidgetMap } from 'app/pages/DashBoardPage/utils/widget';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDTO } from 'app/types/ChartDTO';
-import { migrateWidgets } from 'app/migration/migrateWidgets';
+
 // import 'core-js/stable/map';
 // need polyfill [Object.values,Array.prototype.find,new Map]
 
@@ -43,7 +43,7 @@ import { migrateWidgets } from 'app/migration/migrateWidgets';
  * @param ''
  * @description 'server task 定时任务 调用'
  */
-const getBoardQueryData = (dataStr: string,curVersion:string) => {
+const getBoardQueryData = (dataStr: string) => {
   var data = JSON.parse(dataStr) as ServerDashboard;
 
   // const renderMode: VizRenderMode = 'schedule';
@@ -98,9 +98,9 @@ const getChartQueryData = (dataStr: string) => {
   let fileName = data?.name || 'chart';
   return JSON.stringify({ downloadParams, fileName });
 };
-const getQueryData = (type: 'chart' | 'board', dataStr: string,version:string='') => {
+const getQueryData = (type: 'chart' | 'board', dataStr: string) => {
   if (type === 'board') {
-    return getBoardQueryData(dataStr,version);
+    return getBoardQueryData(dataStr);
   } else {
     return getChartQueryData(dataStr);
   }
