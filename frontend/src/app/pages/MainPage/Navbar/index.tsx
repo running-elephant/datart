@@ -223,6 +223,7 @@ export function Navbar() {
     },
     [dispatch, actions],
   );
+
   return (
     <>
       <MainNav>

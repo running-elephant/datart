@@ -256,7 +256,7 @@ export const addDataChartWidgets = createAsyncThunk<
   },
 );
 
-// addDataChartWidgets
+// addWrapChartWidget
 export const addWrapChartWidget = createAsyncThunk<
   null,
   {
@@ -284,6 +284,41 @@ export const addWrapChartWidget = createAsyncThunk<
       viewId: view.id,
       dataChartConfig: dataChart,
       subType: 'widgetChart',
+    });
+    dispatch(addWidgetsToEditBoard([widget]));
+    dispatch(addVariablesToBoard(view.variables));
+    return null;
+  },
+);
+
+export const addChartWidget = createAsyncThunk<
+  null,
+  {
+    boardId: string;
+    chartId: string;
+    boardType: BoardType;
+    dataChart: DataChart;
+    view: ChartDataView;
+    subType: 'widgetChart' | 'dataChart';
+  },
+  { state: RootState }
+>(
+  'editBoard/addChartWidget',
+  async (
+    { boardId, chartId, boardType, dataChart, view, subType },
+    { getState, dispatch },
+  ) => {
+    const dataCharts = [dataChart];
+    const viewViews = [view];
+    dispatch(boardActions.setDataChartToMap(dataCharts));
+    dispatch(boardActions.setViewMap(viewViews));
+    let widget = widgetToolKit.chart.create({
+      dashboardId: boardId,
+      boardType: boardType,
+      dataChartId: chartId,
+      viewId: view.id,
+      dataChartConfig: dataChart,
+      subType,
     });
     dispatch(addWidgetsToEditBoard([widget]));
     dispatch(addVariablesToBoard(view.variables));

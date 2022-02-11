@@ -23,7 +23,6 @@ import {
   MoreOutlined,
   SaveOutlined,
   SendOutlined,
-  VerticalAlignBottomOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown, Space } from 'antd';
 import { ShareLinkModal } from 'app/components/VizOperationMenu';
@@ -50,25 +49,35 @@ import { BoardActionContext } from '../contexts/BoardActionContext';
 import { BoardContext } from '../contexts/BoardContext';
 import { BoardInfoContext } from '../contexts/BoardInfoContext';
 import { BoardOverLay } from './BoardOverLay';
+import SaveToStoryBoard from './SaveToStoryBoard';
 
 interface TitleHeaderProps {
   name?: string;
   publishLoading?: boolean;
+  orgId?: string;
   onShareDownloadData?: () => void;
   toggleBoardEditor?: (bool: boolean) => void;
   onPublish?: () => void;
+  onRecycleViz?: () => void;
+  onAddToStory?: (id) => void;
+  onSyncData?: () => void;
 }
 const TitleHeader: FC<TitleHeaderProps> = memo(
   ({
     name,
-    onShareDownloadData,
-    toggleBoardEditor,
     children,
     publishLoading,
+    orgId,
     onPublish,
+    onRecycleViz,
+    onShareDownloadData,
+    toggleBoardEditor,
+    onAddToStory,
+    onSyncData,
   }) => {
     const t = useI18NPrefix(`viz.action`);
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const {
       editing,
       name: boardName,
@@ -103,6 +112,18 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
     }, [boardName, name, status, t]);
     const isArchived = status === 0;
 
+    const handleModalVisible = useCallback(() => {
+      setIsModalVisible(!isModalVisible);
+    }, [isModalVisible]);
+
+    const handleModalOk = useCallback(
+      (storyId: string) => {
+        handleModalVisible();
+        onAddToStory?.(storyId);
+      },
+      [onAddToStory, handleModalVisible],
+    );
+
     return (
       <Wrapper>
         <h1 className={classnames({ disabled: status < 2 })}>
@@ -133,22 +154,19 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
             </>
           ) : (
             <>
-              {allowManage && !isArchived && renderMode === 'read' && (
-                <Button
-                  key="publish"
-                  icon={
-                    status === 1 ? (
-                      <SendOutlined />
-                    ) : (
-                      <VerticalAlignBottomOutlined />
-                    )
-                  }
-                  loading={publishLoading}
-                  onClick={onPublish}
-                >
-                  {status === 1 ? t('publish') : t('unpublish')}
-                </Button>
-              )}
+              {allowManage &&
+                !isArchived &&
+                renderMode === 'read' &&
+                Number(status) === 1 && (
+                  <Button
+                    key="publish"
+                    icon={<SendOutlined />}
+                    loading={publishLoading}
+                    onClick={onPublish}
+                  >
+                    {t('publish')}
+                  </Button>
+                )}
               {allowManage && !isArchived && renderMode === 'read' && (
                 <Button
                   key="edit"
@@ -166,9 +184,14 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                       onBoardToDownLoad={onBoardToDownLoad}
                       onShareDownloadData={onShareDownloadData}
                       onSaveAsVizs={onSaveAsVizs}
+                      onSyncData={onSyncData}
+                      onRecycleViz={onRecycleViz}
+                      onAddToStory={onAddToStory && handleModalVisible}
+                      onPublish={Number(status) === 2 ? onPublish : undefined}
+                      isArchived={isArchived}
                     />
                   }
-                  placement="bottomCenter"
+                  placement="bottomRight"
                   arrow
                 >
                   <Button icon={<MoreOutlined />} />
@@ -184,6 +207,15 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
             onCancel={() => setShowShareLinkModal(false)}
             onGenerateShareLink={onGenerateShareLink}
           />
+        )}
+        {!!onSaveAsVizs && (
+          <SaveToStoryBoard
+            title={t('addToStory')}
+            orgId={orgId as string}
+            isModalVisible={isModalVisible}
+            handleOk={handleModalOk}
+            handleCancel={handleModalVisible}
+          ></SaveToStoryBoard>
         )}
       </Wrapper>
     );

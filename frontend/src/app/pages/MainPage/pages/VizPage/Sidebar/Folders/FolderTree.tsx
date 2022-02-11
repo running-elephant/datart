@@ -187,7 +187,7 @@ export function FolderTree({
                         relType === 'FOLDER'
                           ? tg('operation.deleteConfirm')
                           : tg('operation.archiveConfirm')
-                      }？`}
+                      }`}
                       onConfirm={archiveViz(node)}
                     >
                       {relType === 'FOLDER'

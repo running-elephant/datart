@@ -32,6 +32,7 @@ import React, {
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
 import Reveal from 'reveal.js';
 import 'reveal.js/dist/reveal.css';
 import RevealZoom from 'reveal.js/plugin/zoom/plugin';
@@ -45,7 +46,11 @@ import {
   makeSelectStoryBoardById,
   makeSelectStoryPagesById,
 } from '../slice/selectors';
-import { deleteStoryPage, getPageContentDetail } from '../slice/thunks';
+import {
+  addStoryPages,
+  deleteStoryPage,
+  getPageContentDetail,
+} from '../slice/thunks';
 import { StoryBoardState } from '../slice/types';
 import { StoryToolBar } from './StoryToolBar';
 
@@ -55,6 +60,8 @@ export const StoryEditor: React.FC<{
   onCloseEditor?: () => void;
 }> = memo(({ storyId, onCloseEditor }) => {
   const t = useI18NPrefix(`viz.board.setting`);
+  const history = useHistory();
+  const histState = history.location.state as any;
   const domId = useMemo(() => uuidv4(), []);
   const revealRef = useRef<any>();
   const dispatch = useDispatch();
@@ -89,6 +96,51 @@ export const StoryEditor: React.FC<{
     [dispatch, sortedPages, storyId],
   );
 
+  const onPageClick = useCallback(
+    (index: number, pageId: string, multiple: boolean) => {
+      if (!multiple) {
+        revealRef.current.slide(index);
+      } else {
+        dispatch(
+          storyActions.changePageSelected({
+            storyId,
+            pageId,
+            multiple: true,
+          }),
+        );
+      }
+    },
+    [dispatch, storyId],
+  );
+
+  const { sizes, setSizes } = useSplitSizes({
+    limitedSide: 0,
+    range: [150, 768],
+  });
+
+  const siderDragEnd = useCallback(
+    sizes => {
+      setSizes(sizes);
+      dispatchResize();
+    },
+
+    [setSizes],
+  );
+
+  const onDeletePages = useCallback(
+    (pageIds: string[]) => {
+      Modal.confirm({
+        title: pageIds.length > 1 ? t('delPagesTip') : t('delPageTip'),
+        onOk: () => {
+          pageIds.forEach(pageId => {
+            dispatch(deleteStoryPage({ storyId, pageId }));
+          });
+        },
+      });
+    },
+    [dispatch, storyId, t],
+  );
+
   useEffect(() => {
     if (sortedPages.length === 0) {
       return;
@@ -105,6 +157,7 @@ export const StoryEditor: React.FC<{
       }),
     );
   }, [dispatch, currentPageIndex, sortedPages, storyId]);
+
   useEffect(() => {
     if (sortedPages.length > 0) {
       revealRef.current = new Reveal(document.getElementById(domId), {
@@ -152,47 +205,25 @@ export const StoryEditor: React.FC<{
     dispatch(getPageContentDetail({ relId, relType }));
   }, [currentPageIndex, dispatch, sortedPages]);
 
-  const onPageClick = useCallback(
-    (index: number, pageId: string, multiple: boolean) => {
-      if (!multiple) {
-        revealRef.current.slide(index);
-      } else {
-        dispatch(
-          storyActions.changePageSelected({
-            storyId,
-            pageId,
-            multiple: true,
-          }),
-        );
-      }
-    },
-    [dispatch, storyId],
-  );
-  const { sizes, setSizes } = useSplitSizes({
-    limitedSide: 0,
-    range: [150, 768],
-  });
-  const siderDragEnd = useCallback(
-    sizes => {
-      setSizes(sizes);
-      dispatchResize();
-    },
+  const addPages = useCallback(async () => {
+    if (histState && histState.addDashboardId) {
+      await dispatch(
+        addStoryPages({ storyId, relIds: [histState.addDashboardId] }),
+      );
 
-    [setSizes],
-  );
-  const onDeletePages = useCallback(
-    (pageIds: string[]) => {
-      Modal.confirm({
-        title: pageIds.length > 1 ? t('delPagesTip') : t('delPageTip'),
-        onOk: () => {
-          pageIds.forEach(pageId => {
-            dispatch(deleteStoryPage({ storyId, pageId }));
-          });
-        },
-      });
-    },
-    [dispatch, storyId, t],
-  );
+      //react router remove location state
+      if (history.location.state && histState.transaction) {
+        let state = { ...histState };
+        delete state.transaction;
+        history.replace({ ...history.location, state });
+      }
+    }
+  }, [dispatch, histState, storyId, history]);
+
+  useEffect(() => {
+    addPages();
+  }, [addPages]);
+
   return (
     <DndProvider backend={HTML5Backend}>
       <StoryContext.Provider

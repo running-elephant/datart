@@ -16,8 +16,7 @@
  * limitations under the License.
  */
 
-import { message } from 'antd';
-import ChartEditor from 'app/components/ChartEditor';
+import { message, Spin } from 'antd';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { VizHeader } from 'app/components/VizHeader';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
@@ -29,15 +28,18 @@ import { IChart } from 'app/types/Chart';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
 import { selectPreviewCharts, selectPublishLoading } from '../slice/selectors';
 import {
+  deleteViz,
   fetchDataSetByPreviewChartAction,
   initChartPreviewData,
   publishViz,
+  removeTab,
   updateFilterAndFetchDataset,
 } from '../slice/thunks';
 import { ChartPreview } from '../slice/types';
@@ -75,9 +77,11 @@ const ChartPreviewBoard: FC<{
     const publishLoading = useSelector(selectPublishLoading);
     const [chartPreview, setChartPreview] = useState<ChartPreview>();
     const [chart, setChart] = useState<IChart>();
-    const [editChartVisible, setEditChartVisible] = useState<boolean>(false);
+    const [loadingStatus, setLoadingStatus] = useState<boolean>(false);
     const t = useI18NPrefix('viz.main');
+    const tg = useI18NPrefix('global');
     const saveAsViz = useSaveAsViz();
+    const history = useHistory();
 
     useEffect(() => {
       const filterSearchParams = filterSearchUrl
@@ -152,20 +156,15 @@ const ChartPreviewBoard: FC<{
     };
 
     const handleGotoWorkbenchPage = () => {
-      setEditChartVisible(true);
+      history.push({
+        pathname: `/organizations/${orgId}/vizs/chartEditor`,
+        state: {
+          dataChartId: backendChartId,
+          chartType: 'dataChart',
+          container: 'dataChart',
+        },
+      });
     };
-    const onSaveInDataChart = useCallback(
-      (orgId: string, backendChartId: string) => {
-        dispatch(
-          initChartPreviewData({
-            backendChartId,
-            orgId,
-          }),
-        );
-        setEditChartVisible(false);
-      },
-      [dispatch],
-    );
 
     const handleFilterChange = (type, payload) => {
       dispatch(
@@ -238,6 +237,64 @@ const ChartPreviewBoard: FC<{
       saveAsViz(chartPreview?.backendChartId as string, 'DATACHART');
     }, [saveAsViz, chartPreview?.backendChartId]);
 
+    const handleReloadData = useCallback(async () => {
+      setLoadingStatus(true);
+      await dispatch(
+        fetchDataSetByPreviewChartAction({
+          backendChartId,
+        }),
+      );
+      setLoadingStatus(false);
+    }, [dispatch, backendChartId]);
+
+    const handleAddToDashBoard = useCallback(
+      dashboardId => {
+        const currentChartPreview = previewCharts.find(
+          c => c.backendChartId === backendChartId,
+        );
+
+        try {
+          history.push({
+            pathname: `/organizations/${orgId}/vizs/${dashboardId}/boardEditor`,
+            state: {
+              widgetInfo: JSON.stringify({
+                chartType: '',
+                dataChart: currentChartPreview?.backendChart,
+                dataview: currentChartPreview?.backendChart?.view,
+              }),
+            },
+          });
+        } catch (error) {
+          throw error;
+        }
+      },
+      [previewCharts, history, backendChartId, orgId],
+    );
+
+    const redirect = useCallback(
+      tabKey => {
+        if (tabKey) {
+          history.push(`/organizations/${orgId}/vizs/${tabKey}`);
+        } else {
+          history.push(`/organizations/${orgId}/vizs`);
+        }
+      },
+      [history, orgId],
+    );
+
+    const handleRecycleViz = useCallback(() => {
+      dispatch(
+        deleteViz({
+          params: { id: backendChartId, archive: true },
+          type: 'DATACHART',
+          resolve: () => {
+            message.success(tg('operation.archiveSuccess'));
+            dispatch(removeTab({ id: backendChartId, resolve: redirect }));
+          },
+        }),
+      );
+    }, [backendChartId, dispatch, redirect, tg]);
+
     return (
       <StyledChartPreviewBoard>
         <VizHeader
@@ -249,9 +306,13 @@ const ChartPreviewBoard: FC<{
           onGenerateShareLink={handleGenerateShareLink}
           onDownloadData={handleCreateDownloadDataTask}
           onSaveAsVizs={handleSaveAsVizs}
+          onReloadData={handleReloadData}
+          onAddToDashBoard={handleAddToDashBoard}
+          onRecycleViz={handleRecycleViz}
           allowDownload={allowDownload}
           allowShare={allowShare}
           allowManage={allowManage}
+          orgId={orgId}
         />
         <PreviewBlock>
           <div>
@@ -263,27 +324,19 @@ const ChartPreviewBoard: FC<{
             />
           </div>
           <ChartWrapper ref={ref}>
-            <ChartIFrameContainer
-              key={backendChartId}
-              containerId={backendChartId}
-              dataset={chartPreview?.dataset}
-              chart={chart!}
-              config={chartPreview?.chartConfig!}
-              width={cacheW}
-              height={cacheH}
-            />
+            <Spin wrapperClassName="spinWrapper" spinning={loadingStatus}>
+              <ChartIFrameContainer
+                key={backendChartId}
+                containerId={backendChartId}
+                dataset={chartPreview?.dataset}
+                chart={chart!}
+                config={chartPreview?.chartConfig!}
+                width={cacheW}
+                height={cacheH}
+              />
+            </Spin>
           </ChartWrapper>
         </PreviewBlock>
-        {editChartVisible && (
-          <ChartEditor
-            dataChartId={backendChartId}
-            orgId={orgId}
-            chartType="dataChart"
-            container="dataChart"
-            onClose={() => setEditChartVisible(false)}
-            onSaveInDataChart={onSaveInDataChart}
-          />
-        )}
       </StyledChartPreviewBoard>
     );
   },
@@ -315,4 +368,13 @@ const ChartWrapper = styled.div`
   flex: 1;
   background-color: ${p => p.theme.componentBackground};
   border-radius: ${BORDER_RADIUS};
+  position: relative;
+  .spinWrapper {
+    width: 100%;
+    height: 100%;
+    .ant-spin-container {
+      width: 100%;
+      height: 100%;
+    }
+  }
 `;

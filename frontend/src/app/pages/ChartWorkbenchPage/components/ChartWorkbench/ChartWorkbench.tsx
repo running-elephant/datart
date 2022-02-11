@@ -40,9 +40,13 @@ const ChartWorkbench: FC<{
   chartConfig?: ChartConfig;
   chart?: IChart;
   aggregation?: boolean;
+  defaultViewId?: string;
   header?: {
     name?: string;
+    orgId?: string;
+    chartType?: string;
     onSaveChart?: () => void;
+    onSaveChartToDashBoard?: (dashboardId) => void;
     onGoBack?: () => void;
     onChangeAggregation?: (state: boolean) => void;
   };
@@ -57,15 +61,20 @@ const ChartWorkbench: FC<{
     chart,
     aggregation,
     header,
+    defaultViewId,
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
-
     return (
-      <ChartAggregationContext.Provider value={{ aggregation }}>
+      <ChartAggregationContext.Provider
+        value={{
+          aggregation,
+          onChangeAggregation: header?.onChangeAggregation,
+        }}
+      >
         <ChartDatasetContext.Provider value={{ dataset: dataset }}>
           <ChartDataViewContext.Provider value={{ dataView: dataview }}>
             <TimeConfigContext.Provider
@@ -75,14 +84,17 @@ const ChartWorkbench: FC<{
                 {header && (
                   <ChartHeaderPanel
                     chartName={header?.name}
+                    orgId={header?.orgId}
+                    chartType={header?.chartType}
                     onGoBack={header?.onGoBack}
                     onSaveChart={header?.onSaveChart}
-                    onChangeAggregation={header?.onChangeAggregation}
+                    onSaveChartToDashBoard={header?.onSaveChartToDashBoard}
                   />
                 )}
                 <StyledChartOperationPanel>
                   <ChartOperationPanel
                     chart={chart}
+                    defaultViewId={defaultViewId}
                     chartConfig={chartConfig}
                     onChartChange={onChartChange}
                     onChartConfigChange={onChartConfigChange}
@@ -101,7 +113,8 @@ const ChartWorkbench: FC<{
     prev.dataview === next.dataview &&
     prev.chart === next.chart &&
     prev.chartConfig === next.chartConfig &&
-    prev.dataset === next.dataset,
+    prev.dataset === next.dataset &&
+    prev.defaultViewId === next.defaultViewId,
 );
 
 export default ChartWorkbench;
