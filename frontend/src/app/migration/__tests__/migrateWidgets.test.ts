@@ -61,6 +61,33 @@ describe('test migrateWidgets ', () => {
     expect(beta0(widget1 as Widget)).toMatchObject(widget2);
   });
 
+  test('should return Array Type about assistViewFields', () => {
+    const widget1 = {
+      config: {
+        type:'controller',
+        content:{
+          config:{
+            assistViewFields:'id1###id2'
+          }
+        } 
+      },
+    } 
+    const widget2 = {
+      config: {
+        type:'controller',
+        content:{
+          config:{
+            assistViewFields:["id1","id2"]
+          }
+        }
+      },
+    } 
+    expect(beta0(widget1 as unknown as  Widget)).toMatchObject(widget2);
+  });
+
+
+  
+
   test('convertWidgetRelationsToObj parse Relation.config', () => {
     const relations1 = [
       {
