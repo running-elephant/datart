@@ -17,9 +17,11 @@
  */
 package datart.data.provider.calcite;
 
+import com.google.common.collect.Sets;
 import datart.core.base.exception.Exceptions;
 import datart.data.provider.base.DataProviderException;
 import org.apache.calcite.sql.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -36,6 +38,10 @@ public class SqlValidateUtils {
             SqlKind.GREATER_THAN_OR_EQUAL, SqlKind.LESS_THAN_OR_EQUAL,
             SqlKind.LIKE,
             SqlKind.BETWEEN);
+
+    private static final Set<String> DDML = Sets.newHashSet(
+            "CREATE", "DROP", "ALTER", "COMMIT", "ROLLBACK", "INSERT", "DELETE", "UPDATE", "MERGE"
+    );
 
     /**
      * Validate SqlNode. Only query statements can pass validation
@@ -59,6 +65,21 @@ public class SqlValidateUtils {
 
         Exceptions.tr(DataProviderException.class, "message.sql.op.forbidden", sqlCall.getKind() + ":" + sqlCall);
         return false;
+    }
+
+    /**
+     * filter DDL and DML sql operators
+     * <p>
+     * throw sql exception if sql is one kind of dml or ddl
+     */
+    public static void checkDMSql(String sql) {
+        if (StringUtils.isBlank(sql)) {
+            return;
+        }
+        String trim = sql.toUpperCase().trim();
+        if (DDML.stream().anyMatch(trim::startsWith)) {
+            Exceptions.tr(DataProviderException.class, "message.sql.op.forbidden", sql);
+        }
     }
 
     public static boolean isLogicExpressionSqlCall(SqlCall sqlCall) {
