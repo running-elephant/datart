@@ -27,9 +27,10 @@ import {
   getReference2,
   getSeriesTooltips4Rectangular2,
   getStyles,
+  toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { toFormattedValue, toPrecision } from 'app/utils/number';
+import { toPrecision } from 'app/utils/number';
 import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
 import Chart from '../models/Chart';

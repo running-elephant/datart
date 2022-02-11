@@ -32,9 +32,9 @@ import {
   getSeriesTooltips4Rectangular2,
   getSplitLine,
   getStyles,
+  toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
 import Chart from '../models/Chart';
