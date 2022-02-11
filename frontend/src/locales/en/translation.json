@@ -729,6 +729,7 @@
         "dataChart": "DataChart",
         "ImportExistingDataCharts": "Import Existing DataCharts",
         "createDataChartInBoard": "Create DataChart In Board",
+        "searchValue": "Search keywords",
         "media": "Media",
         "image": "Image",
         "richText": "Rich Text",
@@ -1245,7 +1246,8 @@
       "searchValue": "Search keywords"
     },
     "saveToDashOrStory": {
-      "searchValue": "Search keywords"
+      "searchValue": "Search keywords",
+      "haveCharts": "The chart already exists in the dashboard and cannot be added repeatedly"
     }
   }
 }

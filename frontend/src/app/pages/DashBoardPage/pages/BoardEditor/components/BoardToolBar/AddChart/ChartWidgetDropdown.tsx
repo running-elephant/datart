@@ -25,49 +25,50 @@ type ChartWidgetDropdownProps = {
   onSelect: () => void;
   onCreate: () => void;
 };
-export const ChartWidgetDropdown: React.FC<ChartWidgetDropdownProps> =
-  props => {
-    const t = useI18NPrefix(`viz.board.action`);
-    const onChartWidget = useCallback(
-      ({ key }) => {
-        if (key === 'select') {
-          props.onSelect();
-        }
-        if (key === 'create') {
-          props.onCreate?.();
-        }
-      },
-      [props],
-    );
-    const addChartTypes = [
-      {
-        name: t('ImportExistingDataCharts'),
-        icon: '',
-        type: 'select',
-      },
-      {
-        name: t('createDataChartInBoard'),
-        icon: '',
-        type: 'create',
-      },
-    ];
+export const ChartWidgetDropdown: React.FC<
+  ChartWidgetDropdownProps
+> = props => {
+  const t = useI18NPrefix(`viz.board.action`);
+  const onChartWidget = useCallback(
+    ({ key }) => {
+      if (key === 'select') {
+        props.onSelect();
+      }
+      if (key === 'create') {
+        props.onCreate?.();
+      }
+    },
+    [props],
+  );
+  const addChartTypes = [
+    {
+      name: t('ImportExistingDataCharts'),
+      icon: '',
+      type: 'select',
+    },
+    {
+      name: t('createDataChartInBoard'),
+      icon: '',
+      type: 'create',
+    },
+  ];
 
-    const chartWidgetItems = (
-      <Menu onClick={onChartWidget}>
-        {addChartTypes.map(({ name, icon, type }) => (
-          <Menu.Item key={type}>{name}</Menu.Item>
-        ))}
-      </Menu>
-    );
-    return (
-      <Dropdown
-        overlay={chartWidgetItems}
-        placement="bottomLeft"
-        trigger={['click']}
-      >
-        <Tooltip title={t('dataChart')}>
-          <ToolbarButton icon={<BarChartOutlined />} />
-        </Tooltip>
-      </Dropdown>
-    );
-  };
+  const chartWidgetItems = (
+    <Menu onClick={onChartWidget}>
+      {addChartTypes.map(({ name, icon, type }) => (
+        <Menu.Item key={type}>{name}</Menu.Item>
+      ))}
+    </Menu>
+  );
+  return (
+    <Dropdown
+      overlay={chartWidgetItems}
+      placement="bottomLeft"
+      trigger={['click']}
+    >
+      <Tooltip title={t('dataChart')}>
+        <ToolbarButton icon={<BarChartOutlined />} />
+      </Tooltip>
+    </Dropdown>
+  );
+};

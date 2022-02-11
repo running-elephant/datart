@@ -421,7 +421,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           header={{
             name: backendChart?.name || originChart?.name,
             orgId,
-            chartType,
+            container,
             onSaveChart: saveChart,
             onSaveChartToDashBoard: saveChartToDashBoard,
             onGoBack: () => {
