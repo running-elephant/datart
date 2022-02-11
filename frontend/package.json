@@ -9,7 +9,7 @@
   },
   "engines": {
     "npm": ">=6.4.1",
-    "node": ">=10.13.0"
+    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   },
   "author": "",
   "license": "Apache-2.0",
@@ -26,7 +26,7 @@
     "eslint": "eslint --ext js,ts,tsx",
     "lint": "npm run eslint src",
     "lint:fix": "npm run eslint --fix src",
-    "lint:css": "stylelint src/**/*.{less,css}",
+    "lint:css": "stylelint src/**/*.{less,css,jsx,tsx}",
     "prettify": "prettier --write src",
     "prepare": "cd .. && husky install frontend/.husky",
     "eject": "react-scripts eject",
@@ -183,6 +183,7 @@
     "jsdoc": "^3.6.10",
     "lint-staged": "^10.5.4",
     "monaco-editor-webpack-plugin": "4.2.0",
+    "postcss": "^8.4.6",
     "prettier": "^2.2.1",
     "prettier-plugin-organize-imports": "^2.3.3",
     "react-scripts": "4.0.3",
@@ -192,9 +193,9 @@
     "serve": "^11.3.2",
     "source-map-explorer": "^2.5.2",
     "styled-components": "^5.3.0",
-    "stylelint": "^13.11.0",
-    "stylelint-config-recess-order": "^2.3.0",
-    "stylelint-config-recommended": "^4.0.0",
+    "stylelint": "^14.3.0",
+    "stylelint-config-recess-order": "^3.0.0",
+    "stylelint-config-recommended": "^6.0.0",
     "stylelint-config-styled-components": "^0.1.1",
     "stylelint-processor-styled-components": "^1.10.0",
     "typescript": "^4.2.2",
