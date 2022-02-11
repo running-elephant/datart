@@ -21,9 +21,9 @@ import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getStyles,
+  toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { toFormattedValue } from 'app/utils/number';
 import ReactChart from '../models/ReactChart';
 import ChartRichTextAdapter from './ChartRichTextAdapter';
 import Config from './config';

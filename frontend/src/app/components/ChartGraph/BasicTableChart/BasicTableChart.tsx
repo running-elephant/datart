@@ -24,9 +24,9 @@ import {
   getStyles,
   getUnusedHeaderRows,
   getValue,
+  toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { toFormattedValue } from 'app/utils/number';
 import { DATARTSEPERATOR } from 'globalConstants';
 import { Debugger } from 'utils/debugger';
 import { CloneValueDeep, isEmptyArray, Omit } from 'utils/object';

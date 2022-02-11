@@ -24,9 +24,9 @@ import {
   getScatterSymbolSizeFn,
   getSeriesTooltips4Polar2,
   getStyles,
+  toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { toFormattedValue } from 'app/utils/number';
 import { init, registerMap } from 'echarts';
 import Chart from '../models/Chart';
 import Config from './config';

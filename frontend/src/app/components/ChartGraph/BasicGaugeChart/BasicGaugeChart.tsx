@@ -22,9 +22,9 @@ import {
   getColumnRenderName,
   getStyles,
   getValue,
+  toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
 import Chart from '../models/Chart';
 import Config from './config';
