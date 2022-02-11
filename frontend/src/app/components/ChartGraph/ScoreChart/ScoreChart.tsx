@@ -18,8 +18,12 @@
 
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { getStyles, getValue, transformToDataSet } from 'app/utils/chartHelper';
-import { toFormattedValue } from 'app/utils/number';
+import {
+  getStyles,
+  getValue,
+  toFormattedValue,
+  transformToDataSet,
+} from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Chart from '../models/Chart';
 import Config from './config';

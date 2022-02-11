@@ -49,6 +49,8 @@ public class JdbcDataProvider extends DataProvider {
 
     public static final String DRIVER_CLASS = "driverClass";
 
+    public static final String ENABLE_SPECIAL_SQL = "enableSpecialSQL";
+
     private static final String I18N_PREFIX = "config.template.jdbc.";
 
     /**
@@ -113,6 +115,13 @@ public class JdbcDataProvider extends DataProvider {
         jdbcProperties.setDriverClass(StringUtils.isBlank(driverClass) ?
                 ProviderFactory.getJdbcDriverInfo(jdbcProperties.getDbType()).getDriverClass() :
                 driverClass);
+
+        Object enableSpecialSQL = config.getProperties().get(ENABLE_SPECIAL_SQL);
+
+        if ("true".equals(enableSpecialSQL.toString())) {
+            jdbcProperties.setEnableSpecialSql(true);
+        }
+
         Object properties = config.getProperties().get("properties");
         if (properties != null) {
             if (properties instanceof Map) {

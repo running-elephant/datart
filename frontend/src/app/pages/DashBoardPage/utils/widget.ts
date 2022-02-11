@@ -788,24 +788,11 @@ export const getWidgetMap = (
     // issues #601
     const chartViewId = dataChartMap[cur.datachartId]?.viewId;
     const viewIds = chartViewId ? [chartViewId] : cur.viewIds;
-    try {
-      let widget: Widget = {
-        ...cur,
-        viewIds,
-      };
-      // TODO migration about font 5 --xld
-      widget.config.nameConfig = {
-        ...fontDefault,
-        ...widget.config.nameConfig,
-      };
-      // TODO migration about filter --xld
-      if ((widget.config.type as any) !== 'filter') {
-        acc[cur.id] = widget;
-      }
-      return acc;
-    } catch (error) {
-      return acc;
-    }
+    acc[cur.id] = {
+      ...cur,
+      viewIds,
+    };
+    return acc;
   }, {} as Record<string, Widget>);
 
   const wrappedDataCharts: DataChart[] = [];
@@ -880,16 +867,6 @@ export const getWidgetMap = (
           condition.dependentControllerId = dependentFilterId;
         }
       }
-
-      //处理 assistViewFields 旧数据 assistViewFields 是 string 类型 alpha.3版本之后 使用数组存储的 后续版本稳定之后 可以移除此逻辑
-      // TODO migration <<
-      if (typeof content?.config?.assistViewFields === 'string') {
-        content.config.assistViewFields = (
-          content.config.assistViewFields as string
-        ).split(VALUE_SPLITTER);
-      }
-      // TODO migration >> --xld
-
       controllerWidgets.push(widget);
     });
 

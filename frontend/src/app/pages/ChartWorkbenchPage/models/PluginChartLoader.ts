@@ -26,7 +26,7 @@ const pureFuncLoader = ({ path, result }) => {
   if (/.js$/.test(path)) {
     // eslint-disable-next-line no-new-func
     return Function(`"use strict"; return (${result})`)()({
-      dHelper: { ...datartChartHelper, ...datartChartNumber },
+      dHelper: { ...datartChartHelper },
     });
   }
 };
@@ -35,7 +35,7 @@ const iifeFuncLoader = ({ path, result }) => {
   if (/.iife.js$/.test(path)) {
     // eslint-disable-next-line no-new-func
     return Function(`"use strict"; return ${result}`)()({
-      dHelper: { ...datartChartHelper, ...datartChartNumber },
+      dHelper: { ...datartChartHelper },
     });
   }
 };
