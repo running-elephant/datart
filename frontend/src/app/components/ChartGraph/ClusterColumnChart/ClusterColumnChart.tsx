@@ -22,7 +22,7 @@ import Config from './config';
 class ClusterColumnChart extends BasicBarChart {
   chart: any = null;
   config = Config;
-  isHorizionDisplay = false;
+  isHorizonDisplay = false;
 
   constructor() {
     super({

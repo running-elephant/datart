@@ -58,7 +58,7 @@ import {
  * [中文] 获取格式聚合数据
  * </br>
  * [EN] Gets format aggregate data
- * 
+ *
  * @example
  * const format = {
  *   percentage: {
@@ -466,7 +466,7 @@ export function getReference(
   settingConfigs,
   dataColumns,
   dataConfig,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
   const referenceTabs = getSettingValue(
     settingConfigs,
@@ -479,9 +479,9 @@ export function getReference(
       referenceTabs,
       dataColumns,
       dataConfig,
-      isHorizionDisplay,
+      isHorizonDisplay,
     ),
-    markArea: getMarkArea(referenceTabs, dataColumns, isHorizionDisplay),
+    markArea: getMarkArea(referenceTabs, dataColumns, isHorizonDisplay),
   };
 }
 
@@ -489,7 +489,7 @@ export function getReference2(
   settingConfigs,
   dataSetRows: IChartDataSetRow<string>[],
   dataConfig,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
   const referenceTabs = getSettingValue(
     settingConfigs,
@@ -502,13 +502,13 @@ export function getReference2(
       referenceTabs,
       dataSetRows,
       dataConfig,
-      isHorizionDisplay,
+      isHorizonDisplay,
     ),
-    markArea: getMarkArea2(referenceTabs, dataSetRows, isHorizionDisplay),
+    markArea: getMarkArea2(referenceTabs, dataSetRows, isHorizonDisplay),
   };
 }
 
-function getMarkLine(refTabs, dataColumns, dataConfig, isHorizionDisplay) {
+function getMarkLine(refTabs, dataColumns, dataConfig, isHorizonDisplay) {
   const markLineData = refTabs
     ?.reduce((acc, cur) => {
       const markLineConfigs = cur?.rows?.filter(r => r.key === 'markLine');
@@ -523,7 +523,7 @@ function getMarkLine(refTabs, dataColumns, dataConfig, isHorizionDisplay) {
         'constantValue',
         'metric',
         dataConfig,
-        isHorizionDisplay,
+        isHorizonDisplay,
       );
     })
     .filter(Boolean);
@@ -540,10 +540,10 @@ function getMarkLineData(
   constantValueKey,
   metricKey,
   dataConfig,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
   const name = mark.label;
-  const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
+  const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
   const show = getSettingValue(mark.rows, 'showLabel', 'value');
   const enableMarkLine = getSettingValue(mark.rows, 'enableMarkLine', 'value');
   const position = getSettingValue(mark.rows, 'position', 'value');
@@ -592,7 +592,7 @@ function getMarkLine2(
   refTabs,
   dataSetRows: IChartDataSetRow<string>[],
   dataConfig,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
   const markLineData = refTabs
     ?.reduce((acc, cur) => {
@@ -608,7 +608,7 @@ function getMarkLine2(
         'constantValue',
         'metric',
         dataConfig,
-        isHorizionDisplay,
+        isHorizonDisplay,
       );
     })
     .filter(Boolean);
@@ -625,10 +625,10 @@ function getMarkLineData2(
   constantValueKey,
   metricKey,
   dataConfig,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
   const name = mark.label;
-  const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
+  const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
   const show = getSettingValue(mark.rows, 'showLabel', 'value');
   const enableMarkLine = getSettingValue(mark.rows, 'enableMarkLine', 'value');
   const position = getSettingValue(mark.rows, 'position', 'value');
@@ -680,9 +680,9 @@ function getMarkAreaData2(
   valueTypeKey,
   constantValueKey,
   metricKey,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
-  const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
+  const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
   const show = getSettingValue(mark.rows, 'showLabel', 'value');
   const enableMarkArea = getSettingValue(mark.rows, 'enableMarkArea', 'value');
   const position = getSettingValue(mark.rows, 'position', 'value');
@@ -743,9 +743,9 @@ function getMarkAreaData(
   valueTypeKey,
   constantValueKey,
   metricKey,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
-  const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
+  const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
   const show = getSettingValue(mark.rows, 'showLabel', 'value');
   const enableMarkArea = getSettingValue(mark.rows, 'enableMarkArea', 'value');
   const position = getSettingValue(mark.rows, 'position', 'value');
@@ -800,7 +800,7 @@ function getMarkAreaData(
   };
 }
 
-function getMarkArea(refTabs, dataColumns, isHorizionDisplay) {
+function getMarkArea(refTabs, dataColumns, isHorizonDisplay) {
   const refAreas = refTabs?.reduce((acc, cur) => {
     const markLineConfigs = cur?.rows?.filter(r => r.key === 'markArea');
     acc.push(...markLineConfigs);
@@ -817,7 +817,7 @@ function getMarkArea(refTabs, dataColumns, isHorizionDisplay) {
               `${prefix}ValueType`,
               `${prefix}ConstantValue`,
               `${prefix}Metric`,
-              isHorizionDisplay,
+              isHorizonDisplay,
             );
           })
           .filter(Boolean);
@@ -830,7 +830,7 @@ function getMarkArea(refTabs, dataColumns, isHorizionDisplay) {
 function getMarkArea2(
   refTabs,
   dataSetRows: IChartDataSetRow<string>[],
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
   const refAreas = refTabs?.reduce((acc, cur) => {
     const markLineConfigs = cur?.rows?.filter(r => r.key === 'markArea');
@@ -848,7 +848,7 @@ function getMarkArea2(
               `${prefix}ValueType`,
               `${prefix}ConstantValue`,
               `${prefix}Metric`,
-              isHorizionDisplay,
+              isHorizonDisplay,
             );
           })
           .filter(Boolean);

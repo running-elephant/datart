@@ -40,7 +40,7 @@ class BasicBarChart extends Chart {
   config = Config;
   chart: any = null;
 
-  protected isHorizionDisplay = false;
+  protected isHorizonDisplay = false;
   protected isStackMode = false;
   protected isPercentageYAxis = false;
 
@@ -115,6 +115,9 @@ class BasicBarChart extends Chart {
       dataConfigs,
     );
 
+    if (this.isHorizonDisplay) {
+      chartDataSet.reverse();
+    }
     const xAxisColumns = (groupConfigs || []).map(config => {
       return {
         type: 'category',
@@ -145,7 +148,7 @@ class BasicBarChart extends Chart {
       this.makePercentageSeries(styleConfigs, series);
       this.makePercentageYAxis(axisInfo);
     }
-    if (this.isHorizionDisplay) {
+    if (this.isHorizonDisplay) {
       this.makeTransposeAxis(axisInfo);
     }
 
@@ -284,7 +287,7 @@ class BasicBarChart extends Chart {
         settingConfigs,
         chartDataSet,
         dataConfig,
-        this.isHorizionDisplay,
+        this.isHorizonDisplay,
       ),
     };
   }
