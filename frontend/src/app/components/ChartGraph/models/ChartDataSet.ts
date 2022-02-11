@@ -119,11 +119,7 @@ export class ChartDataSetRow<T>
   private columnIndexTable: ColumnIndexTable = {};
 
   constructor(metas, items: T[]) {
-    super(...(items as any[]));
-    if (items?.length === 1) {
-      this.length = 1;
-      this[0] = items[0];
-    }
+    super(items as any);
     this.columnIndexTable = this.createColumnIndexTable(metas);
   }
 
