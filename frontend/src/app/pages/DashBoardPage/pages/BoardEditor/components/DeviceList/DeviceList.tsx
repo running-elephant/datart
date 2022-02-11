@@ -68,7 +68,11 @@ export const DeviceList: React.FC<{
           size="small"
         >
           {ListKeys.map(item => {
-            return <Option value={item}>{item}</Option>;
+            return (
+              <Option key={item} value={item}>
+                {item}
+              </Option>
+            );
           })}
         </Select>
         <div>
