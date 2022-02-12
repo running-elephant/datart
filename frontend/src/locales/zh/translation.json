@@ -465,7 +465,8 @@
         "editField": "编辑",
         "deleteField": "删除",
         "editViewTip": "回到数据视图会丢失当前编辑状态，是否继续？",
-        "editView": "编辑数据视图"
+        "editView": "编辑数据视图",
+        "toggleViewTip": "切换数据视图会清空所有配置，确认切换？"
       }
     },
     "palette": {

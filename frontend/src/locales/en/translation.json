@@ -465,7 +465,8 @@
         "editField": "Edit",
         "deleteField": "Delete",
         "editViewTip": "Going back to the view will lose the current edit state, continue?",
-        "editView": "Edit View"
+        "editView": "Edit View",
+        "toggleViewTip": "Switching data views clears all configurations, confirm switch?"
       }
     },
     "palette": {

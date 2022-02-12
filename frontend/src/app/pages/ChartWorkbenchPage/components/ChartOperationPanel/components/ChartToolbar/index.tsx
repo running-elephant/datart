@@ -31,8 +31,8 @@ const ChartToolbar: FC<{}> = memo(() => {
     <Toolbar>
       <Aggregation
         defaultValue={aggregation}
-        onChangeAggregation={e => {
-          onChangeAggregation?.(e);
+        onChangeAggregation={() => {
+          onChangeAggregation?.();
         }}
       ></Aggregation>
     </Toolbar>
