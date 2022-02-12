@@ -56,3 +56,8 @@ export const selectModifyPasswordLoading = createSelector(
   [selectDomain],
   appState => appState.modifyPasswordLoading,
 );
+
+export const selectOauth2Clients = createSelector(
+  [selectDomain],
+  appState => appState.oauth2Clients,
+);
