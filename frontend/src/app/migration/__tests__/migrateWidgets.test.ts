@@ -22,20 +22,21 @@ import {
   ServerWidget,
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { fontDefault } from 'app/pages/DashBoardPage/utils/widget';
 import {
   beta0,
   convertWidgetRelationsToObj,
   migrateWidgets,
-} from '../migrateWidgets';
+} from '../WidgetConfig/migrateWidgets';
 
 describe('test migrateWidgets ', () => {
-  test('should return null  when widget.config.type === filter', () => {
+  test('should return undefined  when widget.config.type === filter', () => {
     const widget1 = {
       config: {
         type: 'filter',
       },
     };
-    expect(beta0(widget1 as Widget)).toBeNull();
+    expect(beta0(widget1 as Widget)).toBeUndefined();
   });
   test('should return self  when widget.config.type !== filter', () => {
     const widget2 = {
@@ -44,6 +45,43 @@ describe('test migrateWidgets ', () => {
       },
     } as Widget;
     expect(beta0(widget2 as Widget)).toEqual(widget2);
+  });
+
+  test('should return widget.config.nameConfig', () => {
+    const widget1 = {
+      config: {},
+    } as Widget;
+    const widget2 = {
+      config: {
+        nameConfig: fontDefault,
+        version: '1.0.0-beta.0',
+      },
+    } as Widget;
+    expect(beta0(widget1 as Widget)).toMatchObject(widget2);
+  });
+
+  test('should return Array Type about assistViewFields', () => {
+    const widget1 = {
+      config: {
+        type: 'controller',
+        content: {
+          config: {
+            assistViewFields: 'id1###id2',
+          },
+        },
+      },
+    };
+    const widget2 = {
+      config: {
+        type: 'controller',
+        content: {
+          config: {
+            assistViewFields: ['id1', 'id2'],
+          },
+        },
+      },
+    };
+    expect(beta0(widget1 as unknown as Widget)).toMatchObject(widget2);
   });
 
   test('convertWidgetRelationsToObj parse Relation.config', () => {
@@ -65,25 +103,37 @@ describe('test migrateWidgets ', () => {
   });
 
   test('should get new target version after adjust widgets before save', () => {
-    const targetVersion = 'test_version';
     const widget1 = {
       config: '{}',
     } as ServerWidget;
     const widget2 = {
+      config: '{"version":"1.0.0-beta.0"}',
+    } as ServerWidget;
+    const widget3 = {
       config: '{"version":"rrr"}',
     } as ServerWidget;
-    const tWidget = {
+    const widget4 = {
+      config: '{"version":"1.0.0-beta.1"}',
+    } as ServerWidget;
+    const resWidget = {
       config: {
-        version: targetVersion,
+        version: '1.0.0-beta.0',
       },
       relations: [] as Relation[],
     } as Widget;
+    const resWidget2 = {
+      config: {
+        version: '1.0.0-beta.1',
+      },
+      relations: [] as Relation[],
+    } as Widget;
+    const widgets: ServerWidget[] = [widget1, widget2, widget3, widget4];
 
-    const widgets: ServerWidget[] = [widget1, widget2];
-
-    expect(migrateWidgets(widgets, { version: targetVersion })).toMatchObject([
-      tWidget,
-      tWidget,
+    expect(migrateWidgets(widgets)).toMatchObject([
+      resWidget,
+      resWidget,
+      resWidget,
+      resWidget2,
     ]);
   });
 });

@@ -29,9 +29,9 @@ import {
   getGridStyle,
   getSeriesTooltips4Scatter,
   getStyles,
+  toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
 import isEmpty from 'lodash/isEmpty';
 import Chart from '../models/Chart';

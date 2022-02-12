@@ -28,9 +28,10 @@ import ChartDataSetDTO, {
 import {
   getColumnRenderName,
   getStyles,
+  toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { isNumber, toFormattedValue } from 'app/utils/number';
+import { isNumber } from 'app/utils/number';
 import groupBy from 'lodash/groupBy';
 import ReactChart from '../models/ReactChart';
 import AntVS2Wrapper from './AntVS2Wrapper';

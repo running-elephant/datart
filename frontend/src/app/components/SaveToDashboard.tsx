@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-import { Input, Modal } from 'antd';
+import { Input, message, Modal } from 'antd';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useGetVizIcon from 'app/hooks/useGetVizIcon';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
+import { ServerDashboard } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getCascadeAccess } from 'app/pages/MainPage/Access';
 import {
   PermissionLevels,
@@ -35,7 +36,7 @@ import {
 import { FC, memo, useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle, getPath, listToTree } from 'utils/utils';
 import { Tree } from './Tree';
 
@@ -45,10 +46,18 @@ interface SaveToDashboardTypes {
   handleCancel: () => void;
   title: string;
   orgId: string;
+  backendChartId?: string;
 }
 
 const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
-  ({ isModalVisible, handleOk, handleCancel, title, orgId }) => {
+  ({
+    isModalVisible,
+    handleOk,
+    handleCancel,
+    title,
+    orgId,
+    backendChartId,
+  }) => {
     const [vizData, setVizData] = useState<Folder[]>();
     const [selectId, setSelectId] = useState<string>('');
     const t = useI18NPrefix('components.saveToDashOrStory');
@@ -58,7 +67,9 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
 
     const getDashboardData = useCallback(async orgId => {
       try {
-        const { data } = await request<Folder[]>(`/viz/folders?orgId=${orgId}`);
+        const { data } = await request2<Folder[]>(
+          `/viz/folders?orgId=${orgId}`,
+        );
         return data;
       } catch (error) {
         errorHandle(error);
@@ -104,9 +115,20 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
 
     const saveToDashboard = useCallback(
       async selectId => {
+        const { data } = await request2<ServerDashboard>(
+          `/viz/dashboards/${selectId}`,
+        );
+        const chartIndex = data?.datacharts?.findIndex(
+          v => v.id === backendChartId,
+        );
+
+        if (chartIndex !== -1) {
+          message.error(t('haveCharts'));
+          return false;
+        }
         handleOk(selectId);
       },
-      [handleOk],
+      [handleOk, backendChartId, t],
     );
 
     useMount(async () => {

@@ -63,6 +63,7 @@ const ChartOperationPanel: FC<{
             dataView={dataView}
             defaultViewId={defaultViewId}
             onDataViewChange={onDataViewChange}
+            chartConfig={chartConfig}
           />
         );
       }

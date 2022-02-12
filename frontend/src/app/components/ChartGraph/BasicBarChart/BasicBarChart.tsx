@@ -27,9 +27,10 @@ import {
   getReference2,
   getSeriesTooltips4Rectangular2,
   getStyles,
+  toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { toFormattedValue, toPrecision } from 'app/utils/number';
+import { toPrecision } from 'app/utils/number';
 import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
 import Chart from '../models/Chart';
@@ -39,7 +40,7 @@ class BasicBarChart extends Chart {
   config = Config;
   chart: any = null;
 
-  protected isHorizionDisplay = false;
+  protected isHorizonDisplay = false;
   protected isStackMode = false;
   protected isPercentageYAxis = false;
 
@@ -114,6 +115,9 @@ class BasicBarChart extends Chart {
       dataConfigs,
     );
 
+    if (this.isHorizonDisplay) {
+      chartDataSet.reverse();
+    }
     const xAxisColumns = (groupConfigs || []).map(config => {
       return {
         type: 'category',
@@ -144,7 +148,7 @@ class BasicBarChart extends Chart {
       this.makePercentageSeries(styleConfigs, series);
       this.makePercentageYAxis(axisInfo);
     }
-    if (this.isHorizionDisplay) {
+    if (this.isHorizonDisplay) {
       this.makeTransposeAxis(axisInfo);
     }
 
@@ -283,7 +287,7 @@ class BasicBarChart extends Chart {
         settingConfigs,
         chartDataSet,
         dataConfig,
-        this.isHorizionDisplay,
+        this.isHorizonDisplay,
       ),
     };
   }

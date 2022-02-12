@@ -465,7 +465,8 @@
         "editField": "Edit",
         "deleteField": "Delete",
         "editViewTip": "Going back to the view will lose the current edit state, continue?",
-        "editView": "Edit View"
+        "editView": "Edit View",
+        "toggleViewTip": "Switching data views clears all configurations, confirm switch?"
       }
     },
     "palette": {
@@ -729,6 +730,7 @@
         "dataChart": "DataChart",
         "ImportExistingDataCharts": "Import Existing DataCharts",
         "createDataChartInBoard": "Create DataChart In Board",
+        "searchValue": "Search keywords",
         "media": "Media",
         "image": "Image",
         "richText": "Rich Text",
@@ -1158,7 +1160,7 @@
         "1": "Manage"
       },
       "schedule": {
-        "0": "管理"
+        "0": "Manage"
       }
     }
   },
@@ -1245,7 +1247,8 @@
       "searchValue": "Search keywords"
     },
     "saveToDashOrStory": {
-      "searchValue": "Search keywords"
+      "searchValue": "Search keywords",
+      "haveCharts": "The chart already exists in the dashboard and cannot be added repeatedly"
     }
   }
 }
