@@ -202,6 +202,9 @@
     "webpack-cli": "^4.7.2",
     "webpackbar": "^5.0.0-3"
   },
+  "resolutions": {
+    "react-error-overlay": "6.0.9"
+  },
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
