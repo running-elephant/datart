@@ -46,7 +46,7 @@ import 'react-grid-layout/css/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
-import { G30 } from 'styles/StyleConstants';
+import { BORDER_RADIUS, SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
 import StyledBackground from '../../Board/components/StyledBackground';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
@@ -306,9 +306,11 @@ const Wrap = styled.div`
   width: 100%;
   min-height: 0;
   overflow-y: auto;
+
   .react-resizable-handle {
     z-index: 100;
   }
+
   &.desktop {
     min-width: 769px;
   }
@@ -323,14 +325,16 @@ const StyledContainer = styled(StyledBackground)<{ curWH: number[] }>`
     flex: 1;
     width: 100%;
   }
+
   &.mobile {
-    box-shadow: 0px 0 32px 0px rgb(73 80 87 / 8%);
-    border: 8px solid ${G30};
-    border-radius: 6px;
-    margin-top: 16px;
-    width: ${p => p.curWH[0] + 'px'};
-    height: ${p => p.curWH[1] + 'px'};
+    width: ${p => `${p.curWH[0]}px`};
+    height: ${p => `${p.curWH[1]}px`};
+    margin-top: ${SPACE_MD};
+    border: ${SPACE_XS} solid ${p => p.theme.borderColorEmphasis};
+    border-radius: ${BORDER_RADIUS};
+    box-shadow: ${p => p.theme.shadowBlock};
   }
+
   .grid-wrap {
     flex: 1;
     overflow-y: auto;
@@ -344,7 +348,7 @@ const StyledContainer = styled(StyledBackground)<{ curWH: number[] }>`
   .empty {
     display: flex;
     flex: 1;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
   }
 `;
