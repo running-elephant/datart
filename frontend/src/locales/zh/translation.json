@@ -440,7 +440,7 @@
         "saveToDashboard": "保存到仪表板",
         "login": "登陆",
         "aggregationSwitch": "数据聚合",
-        "aggregationSwitchTip": "切换数据聚合会清空所有配置，确认开启/关闭？",
+        "aggregationSwitchTip": "开启/关闭数据聚合之前将会清空所有图表配置，确认继续？",
         "open": "开启",
         "close": "关闭",
         "cancel": "取消",
@@ -466,7 +466,7 @@
         "deleteField": "删除",
         "editViewTip": "回到数据视图会丢失当前编辑状态，是否继续？",
         "editView": "编辑数据视图",
-        "toggleViewTip": "切换数据视图会清空所有配置，确认切换？"
+        "toggleViewTip": "切换数据视图将会清空所有图表配置，确认继续？"
       }
     },
     "palette": {

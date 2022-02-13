@@ -440,7 +440,7 @@
         "saveToDashboard": "Save to dashboard",
         "login": "Login",
         "aggregationSwitch": "Aggregation",
-        "aggregationSwitchTip": "Switching aggregation will clear all configurations. Are you sure to turn it on / off?",
+        "aggregationSwitchTip": "All chart configurations will be cleared before enabling/disabling data aggregation, continue?",
         "open": "Open",
         "close": "Close",
         "cancel": "Cancel",
@@ -466,7 +466,7 @@
         "deleteField": "Delete",
         "editViewTip": "Going back to the view will lose the current edit state, continue?",
         "editView": "Edit View",
-        "toggleViewTip": "Switching data views clears all configurations, confirm switch?"
+        "toggleViewTip": "Switching view will clear all chart configurations, continue?"
       }
     },
     "palette": {
