@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-/* eslint-disable prettier/prettier */
+import 'antd/dist/antd.less';
 import 'app/assets/fonts/iconfont.css';
 import { Share } from 'app/share';
 import React from 'react';
@@ -29,7 +29,6 @@ import { Provider } from 'react-redux';
 import { configureAppStore } from 'redux/configureStore';
 import { ThemeProvider } from 'styles/theme/ThemeProvider';
 import './locales/i18n';
-import 'antd/dist/antd.less'; // Must be at the end, override styles
 
 export const store = configureAppStore();
 const MOUNT_NODE = document.getElementById('root') as HTMLElement;
