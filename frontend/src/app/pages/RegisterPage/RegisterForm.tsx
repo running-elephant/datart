@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Button, Form, Input, message } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { AuthForm } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectRegisterLoading } from 'app/slice/selectors';
@@ -45,14 +45,13 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
         register({
           data: values,
           resolve: () => {
-            message.success(t('registrationSuccess'));
             form.resetFields();
             onRegisterSuccess(values.email);
           },
         }),
       );
     },
-    [dispatch, form, onRegisterSuccess, t],
+    [dispatch, form, onRegisterSuccess],
   );
 
   const toLogin = useCallback(() => {

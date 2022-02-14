@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-/* eslint-disable prettier/prettier */
+import 'antd/dist/antd.less';
 import { App } from 'app';
 import 'app/assets/fonts/iconfont.css';
 import 'core-js/features/string/replace-all';
@@ -31,7 +31,6 @@ import { configureAppStore } from 'redux/configureStore';
 import { ThemeProvider } from 'styles/theme/ThemeProvider';
 import { Debugger } from 'utils/debugger';
 import './locales/i18n';
-import 'antd/dist/antd.less';  // Must be at the end, override styles
 
 const MOUNT_NODE = document.getElementById('root') as HTMLElement;
 const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
