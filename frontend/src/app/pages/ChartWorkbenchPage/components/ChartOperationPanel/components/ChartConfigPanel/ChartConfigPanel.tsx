@@ -202,10 +202,11 @@ const StyledChartDataViewPanel = styled.div`
 
 const ConfigBlock = styled.div`
   display: flex;
-  flex: 1;
   flex-direction: column;
-  background-color: ${p => p.theme.componentBackground};
+  height: 0;
+  flex: 1;
   border-radius: ${BORDER_RADIUS};
+  background-color: ${p => p.theme.componentBackground};
 
   .tabs {
     flex-shrink: 0;
