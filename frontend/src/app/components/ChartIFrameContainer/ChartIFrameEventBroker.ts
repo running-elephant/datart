@@ -18,6 +18,7 @@
 
 import { IChart } from 'app/types/Chart';
 import { ChartLifecycle } from 'app/types/ChartLifecycle';
+import { ValueOf } from 'types';
 import { Debugger } from 'utils/debugger';
 
 type BrokerContext = {
@@ -28,7 +29,7 @@ type BrokerContext = {
   translator?: (key, disablePrefix, options) => string;
 };
 
-type HooksEvent = 'mounted' | 'updated' | 'resize' | 'unmount';
+type HooksEvent = ValueOf<typeof ChartLifecycle>;
 
 class ChartIFrameEventBroker {
   private _listeners: Map<HooksEvent, Function> = new Map();
@@ -60,23 +61,23 @@ class ChartIFrameEventBroker {
     }
 
     switch (event) {
-      case 'mounted':
+      case ChartLifecycle.MOUNTED:
         this._chart.state = 'mounting';
         this.safeInvoke(event, options, context);
         break;
-      case 'updated':
+      case ChartLifecycle.UPDATED:
         if (this._chart.state === 'ready') {
           this._chart.state = 'updating';
           this.safeInvoke(event, options, context);
         }
         break;
-      case 'resize':
+      case ChartLifecycle.RESIZE:
         if (this._chart.state === 'ready') {
           this._chart.state = 'updating';
           this.safeInvoke(event, options, context);
         }
         break;
-      case 'unmount':
+      case ChartLifecycle.UNMOUNTED:
         if (this._chart.state === 'ready') {
           this._chart.state = 'unmounting';
           this.safeInvoke(event, options, context);
