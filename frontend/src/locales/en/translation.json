@@ -963,7 +963,9 @@
     "resultEmpty1": "Click ",
     "resultEmpty2": " button to execute, the results will be displayed here",
     "errorTitle": "Error occurred",
-    "sqlRunWraning": "SQL parsing failed, welcome to submit an issue to help us improve",
+    "sqlRunWraning": "SQL parsing failed, welcome to submit an issue to help us improve. ",
+    "detail": "Click here for details",
+    "warningDescription": "Datart uses calcite to parse SQL statements by default; calcite has a awesome parser, but it still can't parse all the grammars of all databases. When a parsing exception occurs, datart will still send the SQL statement to the database for execution after necessary processing. If the execution is successful, we will think that the parser needs to be improved for the syntax of the SQL statement. In this case, datart will show this warning message, which is convenient for users to submit the exceptional parsing statements to github or gitee issue, and help us improve the parser.",
     "close": "Close",
     "tabs": {
       "discard": "Discard",
