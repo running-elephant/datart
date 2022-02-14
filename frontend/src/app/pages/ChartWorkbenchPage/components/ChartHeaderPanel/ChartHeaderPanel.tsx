@@ -19,7 +19,9 @@
 import { Button, Space } from 'antd';
 import SaveToDashboard from 'app/components/SaveToDashboard';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { backendChartSelector } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { FC, memo, useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
@@ -34,7 +36,7 @@ import {
 const ChartHeaderPanel: FC<{
   chartName?: string;
   orgId?: string;
-  chartType?: string;
+  container?: string;
   onSaveChart?: () => void;
   onGoBack?: () => void;
   onSaveChartToDashBoard?: (dashboardId) => void;
@@ -42,13 +44,14 @@ const ChartHeaderPanel: FC<{
   ({
     chartName,
     orgId,
-    chartType,
+    container,
     onSaveChart,
     onGoBack,
     onSaveChartToDashBoard,
   }) => {
     const t = useI18NPrefix(`viz.workbench.header`);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const backendChart = useSelector(backendChartSelector);
 
     const handleModalOk = useCallback(
       (dashboardId: string) => {
@@ -72,7 +75,7 @@ const ChartHeaderPanel: FC<{
           <Button type="primary" onClick={onSaveChart}>
             {t('save')}
           </Button>
-          {!(chartType === 'widgetChart') && (
+          {!(container === 'widget') && (
             <Button
               type="primary"
               onClick={() => {
@@ -88,6 +91,7 @@ const ChartHeaderPanel: FC<{
             isModalVisible={isModalVisible}
             handleOk={handleModalOk}
             handleCancel={handleModalCancel}
+            backendChartId={backendChart?.id}
           ></SaveToDashboard>
         </Space>
       </Wrapper>

@@ -168,6 +168,7 @@ export const createInitWidgetConfig = (opt: {
   frequency?: number;
 }): WidgetConf => {
   return {
+    version: '',
     type: opt.type,
     index: opt.index || 0,
     name: opt.name || '',
@@ -510,21 +511,6 @@ export const convertWidgetRelationsToSave = (
   });
 };
 
-export const convertWidgetRelationsToObj = (
-  relations: ServerRelation[] = [],
-): Relation[] => {
-  return relations.map(relation => {
-    try {
-      return { ...relation, config: JSON.parse(relation.config) };
-    } catch (error) {
-      return {
-        ...relation,
-        config: { RelatedViewMap: {}, filterCovered: false },
-      };
-    }
-  });
-};
-
 export const convertToWidgetMap = (widgets: Widget[]) => {
   return widgets.reduce((acc, cur) => {
     acc[cur.id] = cur;
@@ -787,8 +773,8 @@ export const getLinkedColumn = (
 };
 
 // TODO chart widget
-export const getWidgetMapByServer = (
-  widgets: ServerWidget[],
+export const getWidgetMap = (
+  widgets: Widget[],
   dataCharts: DataChart[],
   filterSearchParamsMap?: FilterSearchParamsWithMatch,
 ) => {
@@ -802,26 +788,11 @@ export const getWidgetMapByServer = (
     // issues #601
     const chartViewId = dataChartMap[cur.datachartId]?.viewId;
     const viewIds = chartViewId ? [chartViewId] : cur.viewIds;
-    try {
-      let widget: Widget = {
-        ...cur,
-        config: JSON.parse(cur.config),
-        relations: convertWidgetRelationsToObj(cur.relations),
-        viewIds,
-      };
-      // TODO migration about font 5 --xld
-      widget.config.nameConfig = {
-        ...fontDefault,
-        ...widget.config.nameConfig,
-      };
-      // TODO migration about filter --xld
-      if ((widget.config.type as any) !== 'filter') {
-        acc[cur.id] = widget;
-      }
-      return acc;
-    } catch (error) {
-      return acc;
-    }
+    acc[cur.id] = {
+      ...cur,
+      viewIds,
+    };
+    return acc;
   }, {} as Record<string, Widget>);
 
   const wrappedDataCharts: DataChart[] = [];
@@ -896,16 +867,6 @@ export const getWidgetMapByServer = (
           condition.dependentControllerId = dependentFilterId;
         }
       }
-
-      //处理 assistViewFields 旧数据 assistViewFields 是 string 类型 alpha.3版本之后 使用数组存储的 后续版本稳定之后 可以移除此逻辑
-      // TODO migration <<
-      if (typeof content?.config?.assistViewFields === 'string') {
-        content.config.assistViewFields = (
-          content.config.assistViewFields as string
-        ).split(VALUE_SPLITTER);
-      }
-      // TODO migration >> --xld
-
       controllerWidgets.push(widget);
     });
 

@@ -68,6 +68,9 @@ public class SqlScriptRender extends ScriptRender {
 
     private final SqlDialect sqlDialect;
 
+    // special sql execute permission config from datasource
+    private boolean enableSpecialSQL;
+
     public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam) {
         super(queryScript, executeParam);
         this.sqlDialect = LocalDB.SQL_DIALECT;
@@ -76,6 +79,11 @@ public class SqlScriptRender extends ScriptRender {
     public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, SqlDialect sqlDialect) {
         super(queryScript, executeParam);
         this.sqlDialect = sqlDialect;
+    }
+
+    public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, SqlDialect sqlDialect, boolean enableSpecialSQL) {
+        this(queryScript, executeParam, sqlDialect);
+        this.enableSpecialSQL = enableSpecialSQL;
     }
 
 
@@ -136,9 +144,9 @@ public class SqlScriptRender extends ScriptRender {
 
         Map<String, ScriptVariable> variableMap = new CaseInsensitiveMap<>();
 
-        if(CollectionUtils.isNotEmpty(queryScript.getVariables())){
+        if (CollectionUtils.isNotEmpty(queryScript.getVariables())) {
             for (ScriptVariable variable : queryScript.getVariables()) {
-                variableMap.put(variable.getNameWithQuote(),variable);
+                variableMap.put(variable.getNameWithQuote(), variable);
             }
         }
 
@@ -170,12 +178,20 @@ public class SqlScriptRender extends ScriptRender {
             try {
                 sqlNode = parseSql(sql);
             } catch (Exception e) {
+                if (SqlValidateUtils.validateQuery(sql, enableSpecialSQL)) {
+                    if (selectSql != null) {
+                        Exceptions.tr(DataProviderException.class, "message.provider.sql.multi.query");
+                    }
+                    selectSql = sql;
+                }
                 continue;
             }
-            if (SqlValidateUtils.validateQuery(sqlNode) && selectSql != null) {
-                Exceptions.tr(DataProviderException.class, "message.provider.sql.multi.query");
+            if (SqlValidateUtils.validateQuery(sqlNode, enableSpecialSQL)) {
+                if (selectSql != null) {
+                    Exceptions.tr(DataProviderException.class, "message.provider.sql.multi.query");
+                }
+                selectSql = sql;
             }
-            selectSql = sql;
         }
 
         if (selectSql == null) {

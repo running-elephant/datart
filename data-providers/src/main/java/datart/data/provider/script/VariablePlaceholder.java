@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlLikeOperator;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
-import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
@@ -275,7 +274,6 @@ public class VariablePlaceholder {
             return replaceAsSting();
         }
     }
-
 
     public int getStartPos() {
         return sqlCall.getParserPosition().getColumnNum();

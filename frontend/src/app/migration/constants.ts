@@ -16,24 +16,6 @@
  * limitations under the License.
  */
 
-import BasicBarChart from '../BasicBarChart';
-import Config from './config';
-
-class PercentageStackColumnChart extends BasicBarChart {
-  chart: any = null;
-  config = Config;
-
-  isHorizonDisplay = false;
-  isStackMode = true;
-  isPercentageYAxis = true;
-
-  constructor() {
-    super({
-      id: 'percentage-stack-column-chart',
-      name: 'viz.palette.graph.names.percentageStackColumnChart',
-      icon: 'fsux_tubiao_baifenbiduijizhuzhuangtu',
-    });
-  }
-}
-
-export default PercentageStackColumnChart;
+export const VERSION_BETA_0 = '1.0.0-beta.0';
+export const VERSION_BETA_1 = '1.0.0-beta.1';
+export const VERSION_LIST = [VERSION_BETA_0, VERSION_BETA_1];

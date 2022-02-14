@@ -22,7 +22,7 @@ import Config from './config';
 class PercentageStackBarChart extends BasicBarChart {
   config = Config;
 
-  isHorizionDisplay = true;
+  isHorizonDisplay = true;
   isStackMode = true;
   isPercentageYAxis = true;
 

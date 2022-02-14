@@ -39,6 +39,7 @@ const VizHeader: FC<{
   status?: number;
   publishLoading?: boolean;
   chartDescription?: string;
+  backendChartId?: string;
   onRun?;
   onGotoEdit?;
   onPublish?: () => void;
@@ -71,6 +72,7 @@ const VizHeader: FC<{
     allowShare,
     allowManage,
     orgId,
+    backendChartId,
   }) => {
     const t = useI18NPrefix(`viz.action`);
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
@@ -167,6 +169,7 @@ const VizHeader: FC<{
         )}
         {onSaveAsVizs && (
           <SaveToDashboard
+            backendChartId={backendChartId}
             title={t('addToDash')}
             orgId={orgId as string}
             isModalVisible={isModalVisible}

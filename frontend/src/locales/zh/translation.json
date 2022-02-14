@@ -440,7 +440,7 @@
         "saveToDashboard": "保存到仪表板",
         "login": "登陆",
         "aggregationSwitch": "数据聚合",
-        "aggregationSwitchTip": "切换数据聚合会清空所有配置，确认开启/关闭？",
+        "aggregationSwitchTip": "开启/关闭数据聚合之前将会清空所有图表配置，确认继续？",
         "open": "开启",
         "close": "关闭",
         "cancel": "取消",
@@ -465,7 +465,8 @@
         "editField": "编辑",
         "deleteField": "删除",
         "editViewTip": "回到数据视图会丢失当前编辑状态，是否继续？",
-        "editView": "编辑数据视图"
+        "editView": "编辑数据视图",
+        "toggleViewTip": "切换数据视图将会清空所有图表配置，确认继续？"
       }
     },
     "palette": {
@@ -729,6 +730,7 @@
         "dataChart": "数据图表",
         "ImportExistingDataCharts": "引入已有数据图表",
         "createDataChartInBoard": "新建数据图表",
+        "searchValue": "搜索名称关键字",
         "media": "媒体组件",
         "image": "图片",
         "richText": "富文本",
@@ -1245,7 +1247,8 @@
       "searchValue": "搜索名称关键字"
     },
     "saveToDashOrStory": {
-      "searchValue": "搜索名称关键字"
+      "searchValue": "搜索名称关键字",
+      "haveCharts": "仪表板中已有该图表，不能重复添加"
     }
   }
 }

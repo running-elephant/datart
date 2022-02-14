@@ -17,7 +17,6 @@
  */
 import { Collapse, Form } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { MIN_MARGIN, MIN_PADDING } from 'app/pages/DashBoardPage/constants';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/contexts/BoardInfoContext';
@@ -55,37 +54,29 @@ export const BoardSetting: FC = memo(() => {
   const { deviceType } = useContext(BoardInfoContext);
 
   const [form] = Form.useForm();
-  const cacheValue = useRef<any>({}); 
+  const cacheValue = useRef<any>({});
   useEffect(() => {
     const { scaleMode, width: boardWidth, height: boardHeight } = config;
     const [marginLR, marginTB] = config.margin;
     const [paddingLR, paddingTB] = config.containerPadding;
-    const [mobileMarginLR, mobileMarginTB] = config.mobileMargin || [
-      MIN_MARGIN,
-      MIN_MARGIN,
-    ]; //TODO mar
-    const [mobilePaddingLR, mobilePaddingTB] =
-      config.mobileContainerPadding || [MIN_PADDING, MIN_PADDING]; //TODO mar
+    const [mobileMarginLR, mobileMarginTB] = config.mobileMargin;
+    const [mobilePaddingLR, mobilePaddingTB] = config.mobileContainerPadding;
 
     cacheValue.current = {
       backgroundColor: config.background.color,
       backgroundImage: config.background.image,
-
       scaleMode,
       boardWidth,
       boardHeight,
-
       marginLR,
       marginTB,
       paddingLR,
       paddingTB,
-
-      mobileMarginLR, //TODO mar
+      mobileMarginLR,
       mobileMarginTB,
       mobilePaddingLR,
       mobilePaddingTB,
-
-      initialQuery: config.initialQuery === false ? false : true, // TODO migration 如果initialQuery的值为undefined默认为true 兼容旧的仪表盘没有initialQuery参数的问题
+      initialQuery: config.initialQuery,
     };
     form.setFieldsValue({ ...cacheValue.current });
   }, [config, form]);
@@ -102,15 +93,7 @@ export const BoardSetting: FC = memo(() => {
         draft.height = value.boardHeight;
         draft.margin = [value.marginLR, value.marginTB];
         draft.containerPadding = [value.paddingLR, value.paddingTB];
-
-        if (!draft.mobileMargin) {
-          draft.mobileMargin = [1, 1];
-        }
         draft.mobileMargin = [value.mobileMarginLR, value.mobileMarginTB];
-
-        if (!draft.mobileContainerPadding) {
-          draft.mobileContainerPadding = [1, 1];
-        }
         draft.mobileContainerPadding = [
           value.mobilePaddingLR,
           value.mobilePaddingTB,
