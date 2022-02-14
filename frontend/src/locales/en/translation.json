@@ -96,7 +96,11 @@
     "tipDesc4": "Didn't receive?",
     "resend": "Click to resend email",
     "back": "Go back",
-    "registrationSuccess": "Registration Success"
+    "registerSuccess": "Success",
+    "tipDesc5": "Click here to",
+    "tipDesc6": ", or continue to",
+    "goLogin": "Log In",
+    "continue": "Register"
   },
   "forgotPassword": {
     "return": "Return to log in",

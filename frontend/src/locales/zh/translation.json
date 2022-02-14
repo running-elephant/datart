@@ -96,7 +96,11 @@
     "tipDesc4": "没有收到？",
     "resend": "重新发送电子邮件",
     "back": "返回上一步",
-    "registrationSuccess": "注册成功"
+    "registerSuccess": "注册成功",
+    "tipDesc5": "点击这里",
+    "tipDesc6": "，或",
+    "goLogin": "去登录",
+    "continue": "继续注册"
   },
   "forgotPassword": {
     "return": "返回登录",

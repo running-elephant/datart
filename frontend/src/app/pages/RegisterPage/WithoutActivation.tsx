@@ -16,67 +16,43 @@
  * limitations under the License.
  */
 
-import { CheckCircleOutlined, LeftCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { AuthForm } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { SPACE_MD, SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
 
-interface SendEmailTipsProps {
-  email: string;
-  loading: boolean;
-  onBack: () => void;
-  onSendEmailAgain: () => void;
+interface WithoutActivationProps {
+  onContinue: () => void;
 }
-export const SendEmailTips: FC<SendEmailTipsProps> = ({
-  email,
-  loading,
-  onBack,
-  onSendEmailAgain,
+
+export const WithoutActivation: FC<WithoutActivationProps> = ({
+  onContinue,
 }) => {
+  const history = useHistory();
   const t = useI18NPrefix('register');
-  const toEmailWebsite = useCallback(() => {
-    if (email) {
-      const suffix = email.split('@')[1];
-      const website = `https://mail.${suffix}`;
-      window.open(website);
-    }
-  }, [email]);
+
+  const toLogin = useCallback(() => {
+    history.push('/login');
+  }, [history]);
 
   return (
     <AuthForm>
       <Success />
-      <Title>{t('tipTitle')}</Title>
+      <Title>{t('registerSuccess')}</Title>
       <Content>
-        {t('tipDesc1')}
-        <b>{email}</b>
-        {t('tipDesc2')}
-        <Button type="link" size="small" onClick={toEmailWebsite}>
-          {t('toMailbox')}
+        {t('tipDesc5')}
+        <Button type="link" size="small" onClick={toLogin}>
+          {t('goLogin')}
         </Button>
-        {t('tipDesc3')}
-      </Content>
-      <Content>
-        {t('tipDesc4')}
-        <Button
-          type="link"
-          size="small"
-          loading={loading}
-          onClick={onSendEmailAgain}
-        >
-          {t('resend')}
+        {t('tipDesc6')}
+        <Button type="link" size="small" onClick={onContinue}>
+          {t('continue')}
         </Button>
       </Content>
-      <Button
-        size="large"
-        style={{ width: '100%' }}
-        type="primary"
-        onClick={onBack}
-      >
-        <LeftCircleOutlined /> {t('back')}
-      </Button>
     </AuthForm>
   );
 };
@@ -96,4 +72,5 @@ const Title = styled.h1`
 
 const Content = styled.p`
   margin: ${SPACE_XS} 0;
+  text-align: center;
 `;

@@ -35,6 +35,7 @@ export interface User {
 }
 
 export interface SystemInfo {
+  mailEnable: boolean;
   tokenTimeout: string;
   version: string;
 }
