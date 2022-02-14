@@ -210,7 +210,7 @@ export const tryOauth = createAsyncThunk<User>(
       });
       localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(data));
       setTimeout(() => {
-        location.href = '/';
+        window.location.href = '/';
       });
       return data;
     } catch (error) {
