@@ -135,7 +135,6 @@
     "reveal.js": "^4.1.0",
     "split.js": "^1.6.4",
     "sql-formatter": "^4.0.2",
-    "styled-components": "5.3.3",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
@@ -193,6 +192,7 @@
     "rollup-plugin-cleanup": "^3.2.1",
     "serve": "^11.3.2",
     "source-map-explorer": "^2.5.2",
+    "styled-components": "5.3.3",
     "stylelint": "14.3.0",
     "stylelint-config-recess-order": "3.0.0",
     "stylelint-config-recommended": "6.0.0",
