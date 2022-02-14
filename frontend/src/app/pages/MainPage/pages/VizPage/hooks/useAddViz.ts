@@ -36,7 +36,7 @@ export interface addVizParams {
 }
 
 /**
- * 新建视图组件
+ * Creat vizs
  *
  */
 
@@ -80,8 +80,10 @@ export function useAddViz({ showSaveForm }) {
               type: vizType,
             }),
           );
-          callback?.(vizData.payload);
-          onClose();
+          if (!vizData.error) {
+            callback?.(vizData.payload);
+            onClose();
+          }
         },
       });
     },

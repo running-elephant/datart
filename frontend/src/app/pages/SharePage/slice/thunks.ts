@@ -31,7 +31,7 @@ import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { convertToChartDTO } from 'app/utils/ChartDtoHelper';
 import { RootState } from 'types';
 import persistence from 'utils/persistence';
-import { request2, request } from 'utils/request';
+import { request, request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { shareActions } from '.';
 import { ShareVizInfo } from './types';
