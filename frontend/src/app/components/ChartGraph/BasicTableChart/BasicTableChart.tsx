@@ -654,13 +654,13 @@ class BasicTableChart extends ReactChart {
           },
           onCell: (record, rowIndex) => {
             const row = chartDataSet[rowIndex];
-            const cellValue = row.getCell(c);
+            const cellValue = row?.getCell(c);
             return {
               uid: c.uid,
               cellValue,
-              dataIndex: row.getFieldKey(c),
+              dataIndex: row?.getFieldKey(c),
               ...this.registerTableCellEvents(
-                row.getFieldKey(c),
+                row?.getFieldKey(c),
                 cellValue,
                 rowIndex,
                 record,

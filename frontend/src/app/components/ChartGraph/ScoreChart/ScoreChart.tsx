@@ -106,7 +106,7 @@ class ScoreChart extends Chart {
     );
 
     const aggConfigValues = aggregateConfigs.map(config => {
-      return chartDataSet[0]?.getCell(config);
+      return chartDataSet?.[0]?.getCell(config);
     });
 
     const measureTexts: string[] = this.getMeasureTexts(

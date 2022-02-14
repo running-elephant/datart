@@ -150,7 +150,7 @@ class BasicFunnelChart extends Chart {
     const colorColConfig = colorConfigs?.[0];
     const columnColor = config?.color?.start;
     if (colorColConfig) {
-      const colorKey = chartDataSetRow.getCell(colorColConfig);
+      const colorKey = chartDataSetRow?.getCell(colorColConfig);
       const itemStyleColor = colorConfigs[0]?.color?.colors?.find(
         c => c.key === colorKey,
       );

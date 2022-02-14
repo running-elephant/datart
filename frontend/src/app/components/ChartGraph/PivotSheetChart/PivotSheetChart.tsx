@@ -338,7 +338,7 @@ class PivotSheetChart extends ReactChart {
   ) {
     const _groupKeys = [...(groupKeys || [])];
     const groupKey = _groupKeys.shift();
-    const groupDataSet = groupBy(datas, row => row.getCellByKey(groupKey));
+    const groupDataSet = groupBy(datas, row => row?.getCellByKey(groupKey));
 
     return Object.entries(groupDataSet).flatMap(([k, v]) => {
       if (_groupKeys.length) {
