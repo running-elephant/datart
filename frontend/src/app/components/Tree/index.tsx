@@ -61,8 +61,8 @@ const StyledDirectoryTree = styled(AntTree)`
     }
 
     .ant-tree-treenode {
-      padding: 0 0 ${SPACE} ${SPACE_XS};
       align-items: center;
+      padding: 0 0 ${SPACE} ${SPACE_XS};
 
       .ant-tree-node-content-wrapper {
         display: flex;

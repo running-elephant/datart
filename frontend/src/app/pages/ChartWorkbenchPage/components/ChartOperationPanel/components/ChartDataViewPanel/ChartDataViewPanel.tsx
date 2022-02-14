@@ -268,7 +268,7 @@ const ChartDataViewPanel: FC<{
   return (
     <StyledChartDataViewPanel>
       <Header>
-        <Tooltip placement="right" title={t('editView')}>
+        <Tooltip placement="topLeft" title={t('editView')}>
           <ToolbarButton
             disabled={!(allowEnableView && allowManage && dataView)}
             iconSize={14}
