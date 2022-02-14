@@ -1,14 +1,24 @@
 import { Avatar as AntdAvatar, AvatarProps } from 'antd';
-import React, { CSSProperties } from 'react';
+import { CSSProperties, useState } from 'react';
 import styled from 'styled-components/macro';
 
 export function Avatar(props: AvatarProps) {
   let style: CSSProperties = {};
-  if (typeof props.size === 'number') {
-    style.fontSize = `${props.size * 0.375}px`;
+  let { src, size, ...rest } = props;
+  const [safeSrc, setSafeSrc] = useState<any>(src);
+
+  if (typeof size === 'number') {
+    style.fontSize = `${size * 0.375}px`;
   }
+  if (
+    typeof safeSrc === 'string' &&
+    (safeSrc.endsWith('null') || safeSrc.endsWith('undefined'))
+  ) {
+    setSafeSrc('');
+  }
+
   return (
-    <StyledAvatar {...props} style={style}>
+    <StyledAvatar {...rest} src={safeSrc} style={style}>
       {props.children}
     </StyledAvatar>
   );
