@@ -20,7 +20,7 @@ import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { CSSProperties } from 'styled-components';
+import { CSSProperties } from 'react';
 
 const DEFAULT_CONTAINER_ID = 'frame-container-1';
 
