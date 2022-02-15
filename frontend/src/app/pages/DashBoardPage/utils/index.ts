@@ -37,8 +37,8 @@ import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
 import { getTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
-import produce from 'immer';
 import moment from 'moment';
+import { CloneValueDeep } from 'utils/object';
 import { ChartDataRequestFilter } from '../../../types/ChartDataRequest';
 import { STORAGE_IMAGE_KEY_PREFIX } from '../constants';
 import {
@@ -97,9 +97,13 @@ export const getRGBAColor = color => {
 };
 
 export const getChartDataRequestBuilder = (dataChart: DataChart) => {
-  const migratedChartConfig = produce(dataChart?.config, draft => {
-    migrateChartConfig(draft as ChartDetailConfigDTO);
-  });
+  // const migratedChartConfig = (dataChart?.config, draft => {
+  //   migrateChartConfig(draft as ChartDetailConfigDTO);
+  // });
+  // TODO
+  const migratedChartConfig = migrateChartConfig(
+    CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
+  );
   const { datas, settings } = convertToChartConfigDTO(
     migratedChartConfig as ChartDetailConfigDTO,
   );
