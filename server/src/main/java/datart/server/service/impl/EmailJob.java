@@ -51,10 +51,10 @@ public class EmailJob extends ScheduleJob {
         MimeMessage mimeMessage = mailService.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, !CollectionUtils.isEmpty(attachments));
         helper.setSubject(config.getSubject());
-        helper.addTo(config.getTo());
+        helper.setTo(config.getTo().split(";"));
         helper.setText(config.getTextContent(), true);
         if (StringUtils.isNotBlank(config.getCc())) {
-            helper.addCc(config.getCc());
+            helper.setCc(config.getCc().split(";"));
         }
         if (!CollectionUtils.isEmpty(attachments)) {
             for (File file : attachments) {
