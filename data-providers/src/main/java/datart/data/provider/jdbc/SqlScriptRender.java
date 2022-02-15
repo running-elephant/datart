@@ -169,9 +169,10 @@ public class SqlScriptRender extends ScriptRender {
         if (CollectionUtils.isNotEmpty(placeholders)) {
             for (VariablePlaceholder placeholder : placeholders) {
                 ReplacementPair replacementPair = placeholder.replacementPair();
-                selectSql = selectSql.replace(replacementPair.getPattern(), replacementPair.getReplacement());
+                selectSql = StringUtils.replaceIgnoreCase(selectSql,replacementPair.getPattern(),replacementPair.getReplacement());
             }
         }
+
         return selectSql;
     }
 
