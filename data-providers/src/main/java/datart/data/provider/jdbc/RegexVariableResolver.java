@@ -43,41 +43,57 @@ public class RegexVariableResolver {
             return Collections.emptyList();
         }
 
-        List<VariablePlaceholder> placeholders = new LinkedList<>();
         Matcher matcher = Const.VARIABLE_PATTERN.matcher(srcSql);
+        Map<String, ScriptVariable> variablePlaceholderMap = new HashMap<>();
         while (matcher.find()) {
             String group = matcher.group();
             ScriptVariable scriptVariable = variableMap.get(group);
-            placeholders.add(createPlaceholder(sqlDialect, srcSql, group, scriptVariable));
+            variablePlaceholderMap.put(group, scriptVariable);
+        }
+        if (variablePlaceholderMap.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+
+        List<VariablePlaceholder> placeholders = new LinkedList<>();
+        for (Map.Entry<String, ScriptVariable> entry : variablePlaceholderMap.entrySet()) {
+            placeholders.addAll(createPlaceholder(sqlDialect, srcSql, entry.getKey(), entry.getValue()));
         }
         return placeholders;
 
     }
 
-    private static VariablePlaceholder createPlaceholder(SqlDialect sqlDialect, String sql, String variableFragment, ScriptVariable variable) {
+    private static List<VariablePlaceholder> createPlaceholder(SqlDialect sqlDialect, String sql, String variableFragment, ScriptVariable variable) {
 
-        String variableExpression = tryMatchVariableExpression(sql, variableFragment);
+        List<VariablePlaceholder> placeholders = new LinkedList<>();
 
-        SqlCall sqlCall = parseAsSqlCall(variableExpression, variableFragment);
+        List<String> variableExpressions = tryMatchVariableExpression(sql, variableFragment);
 
-        if (sqlCall == null) {
-            return new SimpleVariablePlaceholder(variable, sqlDialect, variableFragment);
-        } else {
-            return new VariablePlaceholder(Collections.singletonList(variable), sqlDialect, sqlCall, variableExpression);
+        if (!CollectionUtils.isEmpty(variableExpressions)) {
+            for (String expression : variableExpressions) {
+                SqlCall sqlCall = parseAsSqlCall(expression, variableFragment);
+                if (sqlCall != null) {
+                    placeholders.add(new VariablePlaceholder(Collections.singletonList(variable), sqlDialect, sqlCall, expression));
+                } else {
+                    placeholders.add(new SimpleVariablePlaceholder(variable, sqlDialect, variableFragment));
+                }
+            }
         }
-
+        return placeholders;
     }
 
 
-    private static String tryMatchVariableExpression(String sql, String variableFragment) {
+    private static List<String> tryMatchVariableExpression(String sql, String variableFragment) {
         String reg = String.format(REG_VARIABLE_EXPRESSION_TEMPLATE, variableFragment.replace("$", "\\$"));
         Pattern pattern = Pattern.compile(reg, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(sql);
-        if (matcher.find()) {
-            return matcher.group();
-        } else {
-            return null;
+
+        List<String> expressions = new LinkedList<>();
+
+        while (matcher.find()) {
+            expressions.add(matcher.group());
         }
+        return expressions;
     }
 
     public static SqlCall parseAsSqlCall(String variableExpression, String variableFragment) {
