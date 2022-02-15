@@ -1,10 +1,5 @@
-import {
-  BarChartOutlined,
-  FolderFilled,
-  FolderOpenFilled,
-  FundFilled,
-} from '@ant-design/icons';
 import { Tree, TreeTitle } from 'app/components';
+import useGetVizIcon from 'app/hooks/useGetVizIcon';
 import {
   makeSelectVizTree,
   selectVizListLoading,
@@ -20,16 +15,7 @@ interface VizFolderTreeProps {
 }
 export const VizFolderTree: FC<VizFolderTreeProps> = ({ value, onChange }) => {
   const selectVizTree = useMemo(makeSelectVizTree, []);
-  const getIcon = useCallback(({ relType }: Folder) => {
-    switch (relType) {
-      case 'DASHBOARD':
-        return <FundFilled />;
-      case 'DATACHART':
-        return <BarChartOutlined />;
-      default:
-        return p => (p.expanded ? <FolderOpenFilled /> : <FolderFilled />);
-    }
-  }, []);
+  const getIcon = useGetVizIcon();
   const renderTreeTitle = useCallback(node => {
     return (
       <TreeTitle>

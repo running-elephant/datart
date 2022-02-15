@@ -16,10 +16,7 @@
  * limitations under the License.
  */
 
-import {
-  ChartDataConfig,
-  ChartDataSectionField,
-} from 'app/types/ChartConfig';
+import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo } from 'react';

@@ -46,6 +46,7 @@ import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -68,6 +69,9 @@ public class SqlScriptRender extends ScriptRender {
 
     private final SqlDialect sqlDialect;
 
+    // special sql execute permission config from datasource
+    private boolean enableSpecialSQL;
+
     public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam) {
         super(queryScript, executeParam);
         this.sqlDialect = LocalDB.SQL_DIALECT;
@@ -76,6 +80,11 @@ public class SqlScriptRender extends ScriptRender {
     public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, SqlDialect sqlDialect) {
         super(queryScript, executeParam);
         this.sqlDialect = sqlDialect;
+    }
+
+    public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, SqlDialect sqlDialect, boolean enableSpecialSQL) {
+        this(queryScript, executeParam, sqlDialect);
+        this.enableSpecialSQL = enableSpecialSQL;
     }
 
 
@@ -136,9 +145,9 @@ public class SqlScriptRender extends ScriptRender {
 
         Map<String, ScriptVariable> variableMap = new CaseInsensitiveMap<>();
 
-        if(CollectionUtils.isNotEmpty(queryScript.getVariables())){
+        if (CollectionUtils.isNotEmpty(queryScript.getVariables())) {
             for (ScriptVariable variable : queryScript.getVariables()) {
-                variableMap.put(variable.getNameWithQuote(),variable);
+                variableMap.put(variable.getNameWithQuote(), variable);
             }
         }
 
@@ -152,12 +161,18 @@ public class SqlScriptRender extends ScriptRender {
             RequestContext.putWarning(MessageResolver.getMessage("message.provider.sql.parse.failed"), sqlParseError);
             placeholders = RegexVariableResolver.resolve(sqlDialect, selectSql, variableMap);
         }
+
+        placeholders = placeholders.stream()
+                .sorted(Comparator.comparingDouble(holder -> (holder instanceof SimpleVariablePlaceholder) ? 1000 + holder.getOriginalSqlFragment().length() : -holder.getOriginalSqlFragment().length()))
+                .collect(Collectors.toList());
+
         if (CollectionUtils.isNotEmpty(placeholders)) {
             for (VariablePlaceholder placeholder : placeholders) {
                 ReplacementPair replacementPair = placeholder.replacementPair();
-                selectSql = selectSql.replace(replacementPair.getPattern(), replacementPair.getReplacement());
+                selectSql = StringUtils.replaceIgnoreCase(selectSql,replacementPair.getPattern(),replacementPair.getReplacement());
             }
         }
+
         return selectSql;
     }
 
@@ -170,12 +185,20 @@ public class SqlScriptRender extends ScriptRender {
             try {
                 sqlNode = parseSql(sql);
             } catch (Exception e) {
+                if (SqlValidateUtils.validateQuery(sql, enableSpecialSQL)) {
+                    if (selectSql != null) {
+                        Exceptions.tr(DataProviderException.class, "message.provider.sql.multi.query");
+                    }
+                    selectSql = sql;
+                }
                 continue;
             }
-            if (SqlValidateUtils.validateQuery(sqlNode) && selectSql != null) {
-                Exceptions.tr(DataProviderException.class, "message.provider.sql.multi.query");
+            if (SqlValidateUtils.validateQuery(sqlNode, enableSpecialSQL)) {
+                if (selectSql != null) {
+                    Exceptions.tr(DataProviderException.class, "message.provider.sql.multi.query");
+                }
+                selectSql = sql;
             }
-            selectSql = sql;
         }
 
         if (selectSql == null) {
@@ -217,5 +240,6 @@ public class SqlScriptRender extends ScriptRender {
         sql = sql.replace(CharUtils.LF, CharUtils.toChar(" "));
         return sql.trim();
     }
+
 
 }

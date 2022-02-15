@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 @Slf4j
 public class ProviderManager extends DataProviderExecuteOptimizer implements DataProviderManager {
 
-    @Autowired(required=false)
+    @Autowired(required = false)
     private List<ExtendProcessor> extendProcessors = new ArrayList<ExtendProcessor>();
 
     private static final Map<String, DataProvider> cachedDataProviders = new ConcurrentSkipListMap<>();
@@ -101,8 +101,8 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
     public Dataframe execute(DataProviderSource source, QueryScript queryScript, ExecuteParam param) throws Exception {
 
         //sql + param preprocessing
-        ProcessorResponse preProcessorRes = this.preProcessorQuery(source,queryScript,param);
-        if(!preProcessorRes.isSuccess()){
+        ProcessorResponse preProcessorRes = this.preProcessorQuery(source, queryScript, param);
+        if (!preProcessorRes.isSuccess()) {
             return Dataframe.empty();
         }
         Dataframe dataframe;
@@ -124,8 +124,8 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
             setCache(queryKey, dataframe, param.getCacheExpires());
         }
         //data postprocessing
-        ProcessorResponse postProcessorRes = this.postProcessorQuery(dataframe,source,queryScript,param);
-        if(!postProcessorRes.isSuccess()){
+        ProcessorResponse postProcessorRes = this.postProcessorQuery(dataframe, source, queryScript, param);
+        if (!postProcessorRes.isSuccess()) {
             return Dataframe.empty();
         }
 
@@ -133,12 +133,12 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
 
     }
 
-    private ProcessorResponse preProcessorQuery(DataProviderSource source, QueryScript queryScript, ExecuteParam param){
-        if(!CollectionUtils.isEmpty(extendProcessors)){
-            for(ExtendProcessor processor: extendProcessors){
-                if(processor instanceof DataProviderPreProcessor){
-                    ProcessorResponse response = ((DataProviderPreProcessor) processor).preRun(source,queryScript,param);
-                    if(!response.isSuccess()){
+    private ProcessorResponse preProcessorQuery(DataProviderSource source, QueryScript queryScript, ExecuteParam param) {
+        if (!CollectionUtils.isEmpty(extendProcessors)) {
+            for (ExtendProcessor processor : extendProcessors) {
+                if (processor instanceof DataProviderPreProcessor) {
+                    ProcessorResponse response = ((DataProviderPreProcessor) processor).preRun(source, queryScript, param);
+                    if (!response.isSuccess()) {
                         return response;
                     }
                 }
@@ -147,12 +147,12 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
         return ProcessorResponse.success();
     }
 
-    private ProcessorResponse postProcessorQuery(Dataframe dataframe,DataProviderSource source, QueryScript queryScript, ExecuteParam param){
-        if(!CollectionUtils.isEmpty(extendProcessors)){
-            for(ExtendProcessor processor: extendProcessors){
-                if(processor instanceof DataProviderPostProcessor){
-                    ProcessorResponse response = ((DataProviderPostProcessor) processor).postRun(dataframe,source,queryScript,param);
-                    if(!response.isSuccess()){
+    private ProcessorResponse postProcessorQuery(Dataframe dataframe, DataProviderSource source, QueryScript queryScript, ExecuteParam param) {
+        if (!CollectionUtils.isEmpty(extendProcessors)) {
+            for (ExtendProcessor processor : extendProcessors) {
+                if (processor instanceof DataProviderPostProcessor) {
+                    ProcessorResponse response = ((DataProviderPostProcessor) processor).postRun(dataframe, source, queryScript, param);
+                    if (!response.isSuccess()) {
                         return response;
                     }
                 }

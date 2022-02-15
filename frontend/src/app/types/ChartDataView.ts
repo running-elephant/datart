@@ -35,6 +35,7 @@ export enum ChartDataViewFieldCategory {
 export type ChartDataView = Omit<View, 'model'> & {
   meta?: ChartDataViewMeta[];
   computedFields?: ChartDataViewMeta[];
+  orgId?: string;
 };
 
 export default ChartDataView;

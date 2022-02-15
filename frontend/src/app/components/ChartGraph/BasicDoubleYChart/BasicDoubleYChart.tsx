@@ -30,9 +30,9 @@ import {
   getSeriesTooltips4Rectangular2,
   getSplitLine,
   getStyles,
+  toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
 import Chart from '../models/Chart';
 import Config from './config';

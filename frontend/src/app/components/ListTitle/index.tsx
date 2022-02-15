@@ -1,6 +1,11 @@
 import { LeftOutlined, MoreOutlined, SearchOutlined } from '@ant-design/icons';
-import { Input, Menu, Space, Tooltip } from 'antd';
-import { MenuListItem, Popup, ToolbarButton } from 'app/components';
+import { Input, Space, Tooltip } from 'antd';
+import {
+  MenuListItem,
+  MenuWrapper,
+  Popup,
+  ToolbarButton,
+} from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { ReactElement, useCallback, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -101,10 +106,13 @@ export function ListTitle({
           {add && <AddButton dataSource={add} />}
           {more && (
             <Popup
+              getPopupContainer={triggerNode =>
+                triggerNode.parentElement as HTMLElement
+              }
               trigger={['click']}
               placement="bottomRight"
               content={
-                <Menu
+                <MenuWrapper
                   prefixCls="ant-dropdown-menu"
                   selectable={false}
                   onClick={moreMenuClick}
@@ -118,7 +126,7 @@ export function ListTitle({
                       {text}
                     </MenuListItem>
                   ))}
-                </Menu>
+                </MenuWrapper>
               }
             >
               <ToolbarButton size="small" icon={<MoreOutlined />} />

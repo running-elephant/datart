@@ -15,7 +15,9 @@
       "info": "Info",
       "open": "Open",
       "close": "Close",
-      "saveAs": "Save as"
+      "saveAs": "Save as",
+      "cancel": "Cancel",
+      "ok": "OK"
     },
     "operation": {
       "archiveConfirm": "Archive confirm",
@@ -94,7 +96,11 @@
     "tipDesc4": "Didn't receive?",
     "resend": "Click to resend email",
     "back": "Go back",
-    "registrationSuccess": "Registration Success"
+    "registerSuccess": "Success",
+    "tipDesc5": "Click here to",
+    "tipDesc6": ", or continue to",
+    "goLogin": "Log In",
+    "continue": "Register"
   },
   "forgotPassword": {
     "return": "Return to log in",
@@ -438,9 +444,10 @@
         "saveToDashboard": "Save to dashboard",
         "login": "Login",
         "aggregationSwitch": "Aggregation",
-        "aggregationSwitchTip": "Switching aggregation will clear all configurations. Are you sure to turn it on / off?",
+        "aggregationSwitchTip": "All chart configurations will be cleared before enabling/disabling data aggregation, continue?",
         "open": "Open",
         "close": "Close",
+        "cancel": "Cancel",
         "lang": {
           "zh": "zh",
           "en": "en"
@@ -460,7 +467,10 @@
         "variable": "Variable",
         "functions": "Function List",
         "editField": "Edit",
-        "deleteField": "Delete"
+        "deleteField": "Delete",
+        "editViewTip": "Going back to the view will lose the current edit state, continue?",
+        "editView": "Edit View",
+        "toggleViewTip": "Switching view will clear all chart configurations, continue?"
       }
     },
     "palette": {
@@ -706,6 +716,9 @@
       "unpublished": "Unpublished",
       "archived": "Archived",
       "play": "Play",
+      "syncData": "Sync Data",
+      "addToDash": "Add To Dashboard",
+      "addToStory": "Add To Storyboard",
       "share": {
         "link": "Link",
         "password": "Password",
@@ -714,7 +727,7 @@
         "enablePassword": "Password",
         "generateLink": "Generate Link",
         "shareLink": "Share Link",
-        "downloadData": "Download Data"
+        "downloadData": "Download Excel"
       }
     },
     "board": {
@@ -722,6 +735,7 @@
         "dataChart": "DataChart",
         "ImportExistingDataCharts": "Import Existing DataCharts",
         "createDataChartInBoard": "Create DataChart In Board",
+        "searchValue": "Search keywords",
         "media": "Media",
         "image": "Image",
         "richText": "Rich Text",
@@ -863,7 +877,10 @@
         "dashboard": "Create dashboard",
         "dataChart": "Create dataChart",
         "folder": "Create folder",
-        "recycle": "Recycle"
+        "recycle": "Recycle",
+        "open": "Open",
+        "close": "Close",
+        "startAnalysis": "Start Analysis"
       },
       "storyboards": {
         "title": "Storyboards",
@@ -947,6 +964,10 @@
     "resultEmpty1": "Click ",
     "resultEmpty2": " button to execute, the results will be displayed here",
     "errorTitle": "Error occurred",
+    "sqlRunWraning": "SQL parsing failed, welcome to submit an issue to help us improve. ",
+    "detail": "Click here for details",
+    "warningDescription": "Datart uses calcite to parse SQL statements by default; calcite has a awesome parser, but it still can't parse all the grammars of all databases. When a parsing exception occurs, datart will still send the SQL statement to the database for execution after necessary processing. If the execution is successful, we will think that the parser needs to be improved for the syntax of the SQL statement. In this case, datart will show this warning message, which is convenient for users to submit the exceptional parsing statements to github or gitee issue, and help us improve the parser.",
+    "close": "Close",
     "tabs": {
       "discard": "Discard",
       "cancel": "Cancel",
@@ -954,6 +975,7 @@
       "warning": "There are unexecuted changes, still execute?"
     },
     "editor": {
+      "startAnalysis": "Start Analysis",
       "folder": "Folder",
       "source": "Select source",
       "run": "Run",
@@ -997,7 +1019,9 @@
       "addView": "Create view",
       "addFolder": "Create folder",
       "parent": "Parent",
-      "recycle": "Recycle"
+      "recycle": "Recycle",
+      "open": "Open",
+      "close": "Close"
     },
     "saveForm": {
       "title": "View",
@@ -1024,6 +1048,7 @@
     "createSuccess": "Source created successfully",
     "archived": "Archived ",
     "noPermission": "You do not have permission to access this page",
+    "creatView": "Creat View",
     "sidebar": {
       "title": "Sources",
       "add": "Create source",
@@ -1127,10 +1152,23 @@
       "Disable": "Disable"
     },
     "privilegeLabel": {
-      "viz": ["View", "Download", "Share", "Manage"],
-      "view": ["Access", "Manage"],
-      "source": ["Access", "Manage"],
-      "schedule": ["Manage"]
+      "viz": {
+        "0": "View",
+        "1": "Download",
+        "2": "Share",
+        "3": "Manage"
+      },
+      "view": {
+        "0": "Access",
+        "1": "Manage"
+      },
+      "source": {
+        "0": "Access",
+        "1": "Manage"
+      },
+      "schedule": {
+        "0": "Manage"
+      }
     }
   },
   "variable": {
@@ -1214,6 +1252,10 @@
     "listTitle": {
       "search": "Search",
       "searchValue": "Search keywords"
+    },
+    "saveToDashOrStory": {
+      "searchValue": "Search keywords",
+      "haveCharts": "The chart already exists in the dashboard and cannot be added repeatedly"
     }
   }
 }

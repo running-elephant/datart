@@ -9,11 +9,11 @@ import datart.data.provider.calcite.SqlNodeUtils;
 import datart.data.provider.calcite.SqlValidateUtils;
 import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
 import datart.data.provider.jdbc.SqlScriptRender;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlLikeOperator;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
-import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
@@ -30,6 +30,7 @@ public class VariablePlaceholder {
 
     protected final SqlCall sqlCall;
 
+    @Getter
     protected final String originalSqlFragment;
 
     public ReplacementPair replacementPair() {
@@ -275,7 +276,6 @@ public class VariablePlaceholder {
             return replaceAsSting();
         }
     }
-
 
     public int getStartPos() {
         return sqlCall.getParserPosition().getColumnNum();

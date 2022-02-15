@@ -15,19 +15,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ShareAltOutlined } from '@ant-design/icons';
-import { Menu } from 'antd';
+import {
+  DeleteOutlined,
+  ShareAltOutlined,
+  VerticalAlignBottomOutlined,
+} from '@ant-design/icons';
+import { Menu, Popconfirm } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useMemo } from 'react';
+
 export interface BoardOverLayProps {
   onOpenShareLink?: () => void;
   onBoardToDownLoad?: () => void;
   onShareDownloadData?: () => void;
+  onRecycleStory?: () => void;
+  onPublish?;
   allowShare?: boolean;
+  allowManage?: boolean;
+  isArchived?: boolean;
 }
 export const StoryOverLay: React.FC<BoardOverLayProps> = memo(
-  ({ onOpenShareLink, allowShare }) => {
-    const t = useI18NPrefix(`viz.action.share`);
+  ({
+    onOpenShareLink,
+    allowShare,
+    allowManage,
+    onPublish,
+    isArchived,
+    onRecycleStory,
+  }) => {
+    const t = useI18NPrefix(`viz.action`);
+    const tg = useI18NPrefix(`global`);
+
     const renderList = useMemo(
       () => [
         {
@@ -36,10 +54,42 @@ export const StoryOverLay: React.FC<BoardOverLayProps> = memo(
           onClick: onOpenShareLink,
           disabled: false,
           render: allowShare,
-          content: t('shareLink'),
+          content: t('share.shareLink'),
+          className: 'line',
+        },
+        {
+          key: 'publish',
+          icon: <VerticalAlignBottomOutlined />,
+          onClick: onPublish,
+          disabled: false,
+          render: allowManage && !isArchived && onPublish,
+          content: t('unpublish'),
+        },
+        {
+          key: 'delete',
+          icon: <DeleteOutlined />,
+          disabled: false,
+          render: allowManage,
+          content: (
+            <Popconfirm
+              title={tg('operation.archiveConfirm')}
+              onConfirm={onRecycleStory}
+            >
+              {tg('button.archive')}
+            </Popconfirm>
+          ),
         },
       ],
-      [onOpenShareLink, allowShare, t],
+      [
+        t,
+        tg,
+        onOpenShareLink,
+        onRecycleStory,
+        allowShare,
+        allowManage,
+        isArchived,
+        onPublish,
+      ],
     );
     const actionItems = useMemo(
       () =>
@@ -47,9 +97,16 @@ export const StoryOverLay: React.FC<BoardOverLayProps> = memo(
           .filter(item => item.render)
           .map(item => {
             return (
-              <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
-                {item.content}
-              </Menu.Item>
+              <>
+                <Menu.Item
+                  key={item.key}
+                  icon={item.icon}
+                  onClick={item.onClick}
+                >
+                  {item.content}
+                </Menu.Item>
+                {item.className && <Menu.Divider />}
+              </>
             );
           }),
       [renderList],

@@ -19,7 +19,7 @@
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
-import { reachLowerBoundCount } from 'app/utils/chartHelper';
+import { reachLowerBoundCount } from 'app/utils/internalChartHelper';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_TIMES } from 'styles/StyleConstants';

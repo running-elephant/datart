@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { migrateBoardConfig } from 'app/migration/BoardConfig/migrateBoardConfig';
 import {
   BoardInfo,
   BoardType,
-  BoardTypeMap,
   Dashboard,
   DashboardConfig,
   DataChart,
@@ -29,7 +29,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataView } from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
-import { transformMeta } from 'app/utils/chartHelper';
+import { transformMeta } from 'app/utils/internalChartHelper';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
@@ -61,28 +61,11 @@ export const getDashBoardByResBoard = (data: ServerDashboard): Dashboard => {
     status,
     thumbnail,
     index,
-    config: getBoardConfigByResBoard(config),
+    config: migrateBoardConfig(config),
     permissions,
   };
 };
-export const getBoardConfigByResBoard = (config: string) => {
-  // let nextConfig={} as DashboardConfig;
-  let borderTypes = Object.values(BoardTypeMap);
-  try {
-    let nextConfig: DashboardConfig = JSON.parse(config);
-    if (typeof nextConfig === 'string') {
-      nextConfig = JSON.parse(nextConfig);
-    }
-    if (!borderTypes.includes(nextConfig?.type)) {
-      return getInitBoardConfig('auto');
-    }
-    return nextConfig;
-  } catch (error) {
-    console.log('解析 config 出错');
-    let nextConfig = getInitBoardConfig('auto');
-    return nextConfig;
-  }
-};
+
 export const getScheduleBoardInfo = (
   boardInfo: BoardInfo,
   widgetMap: Record<string, Widget>,
@@ -144,12 +127,13 @@ export const getInitBoardInfo = (obj: {
     hasFetchItems: [],
     boardWidthHeight: [0, 0],
     originControllerWidgets: obj.controllerWidgets || [],
-  }; 
+  };
   return boardInfo;
 };
 
 export const getInitBoardConfig = (boardType: BoardType) => {
   const dashboardConfig: DashboardConfig = {
+    version: '',
     background: BackgroundDefault,
     widgetDefaultSettings: {
       background: AutoBoardWidgetBackgroundDefault,

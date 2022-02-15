@@ -31,10 +31,10 @@ import {
   getExtraSeriesRowData,
   getGridStyle,
   getStyles,
+  toFormattedValue,
   transformToDataSet,
   valueFormatter,
 } from 'app/utils/chartHelper';
-import { toFormattedValue } from 'app/utils/number';
 import { init } from 'echarts';
 import Chart from '../models/Chart';
 import Config from './config';
@@ -149,7 +149,7 @@ class BasicPieChart extends Chart {
             name: getColumnRenderName(config),
             value: [config]
               .concat(infoConfigs)
-              .map(config => row.getCell(config)),
+              .map(config => row?.getCell(config)),
             itemStyle: this.getDataItemStyle(config, groupConfigs, row),
             ...getExtraSeriesRowData(row),
             ...getExtraSeriesDataFormat(config?.format),
@@ -185,7 +185,7 @@ class BasicPieChart extends Chart {
     const colorConfig = colorConfigs?.[0];
     const columnColor = config?.color?.start;
     if (colorConfig) {
-      const colorKey = row.getCell(colorConfig);
+      const colorKey = row?.getCell(colorConfig);
       const itemStyleColor = colorConfigs[0]?.color?.colors?.find(
         c => c.key === colorKey,
       );

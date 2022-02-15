@@ -23,7 +23,7 @@ class StackColumnChart extends BasicBarChart {
   chart: any = null;
   config = Config;
 
-  isHorizionDisplay = false;
+  isHorizonDisplay = false;
   isStackMode = true;
 
   constructor() {

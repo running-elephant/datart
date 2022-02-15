@@ -44,6 +44,7 @@ import {
   SPACE_MD,
 } from 'styles/StyleConstants';
 import { cond, isEmptyArray } from 'utils/object';
+import ChartToolbar from '../ChartToolbar';
 import ChartDataConfigPanel from './ChartDataConfigPanel';
 import ChartSettingConfigPanel from './ChartSettingConfigPanel';
 import ChartStyleConfigPanel from './ChartStyleConfigPanel';
@@ -118,6 +119,7 @@ const ChartConfigPanel: FC<{
       <ChartI18NContext.Provider value={{ i18NConfigs: chartConfig?.i18ns }}>
         <ChartPaletteContext.Provider value={{ datas: chartConfig?.datas }}>
           <StyledChartDataViewPanel>
+            <ChartToolbar />
             <ConfigBlock>
               <Tabs
                 activeKey={tabActiveKey}
@@ -192,6 +194,7 @@ export default ChartConfigPanel;
 
 const StyledChartDataViewPanel = styled.div`
   display: flex;
+  flex-direction: column;
   height: 100%;
   padding: ${SPACE_MD};
   background-color: ${p => p.theme.bodyBackground};
@@ -199,10 +202,11 @@ const StyledChartDataViewPanel = styled.div`
 
 const ConfigBlock = styled.div`
   display: flex;
-  flex: 1;
   flex-direction: column;
-  background-color: ${p => p.theme.componentBackground};
+  min-height: 0;
+  flex: 1;
   border-radius: ${BORDER_RADIUS};
+  background-color: ${p => p.theme.componentBackground};
 
   .tabs {
     flex-shrink: 0;

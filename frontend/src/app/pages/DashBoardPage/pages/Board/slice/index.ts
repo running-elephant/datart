@@ -156,7 +156,7 @@ const boardSlice = createSlice({
       action: PayloadAction<{ id: string; visible: boolean }>,
     ) {
       const { id, visible } = action.payload;
-      if (!id) return;
+      if (!id || !state.boardInfoRecord[id]) return;
       state.boardInfoRecord[id].visible = visible;
     },
     changeBoardLinkFilter(

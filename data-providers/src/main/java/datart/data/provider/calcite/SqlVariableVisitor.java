@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.util.SqlBasicVisitor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -130,6 +131,9 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
             ScriptVariable variable = variableMap.get(identifier.toString());
             if (variable != null) {
                 variables.add(variable);
+            }
+            if (!StringUtils.containsIgnoreCase(originalSqlFragment, identifier.toString())) {
+                variablePlaceholders.add(new SimpleVariablePlaceholder(variable, sqlDialect, identifier.toString()));
             }
         }
         variablePlaceholders.add(new VariablePlaceholder(variables, sqlDialect, logicExpressionCall, originalSqlFragment));

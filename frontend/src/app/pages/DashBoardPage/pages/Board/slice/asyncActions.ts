@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { migrateWidgets } from 'app/migration/WidgetConfig/migrateWidgets';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
 import ChartDataRequest from 'app/types/ChartDataRequest';
@@ -28,10 +29,7 @@ import {
   getInitBoardInfo,
   getScheduleBoardInfo,
 } from '../../../utils/board';
-import {
-  getWidgetInfoMapByServer,
-  getWidgetMapByServer,
-} from '../../../utils/widget';
+import { getWidgetInfoMapByServer, getWidgetMap } from '../../../utils/widget';
 import { PageInfo } from './../../../../MainPage/pages/ViewPage/slice/types';
 import { getChartWidgetDataAsync, getWidgetData } from './thunk';
 import { BoardState, DataChart, ServerDashboard, VizRenderMode } from './types';
@@ -49,9 +47,12 @@ export const handleServerBoardAction =
     const { datacharts, views: serverViews, widgets: serverWidgets } = data;
 
     const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
-
-    const { widgetMap, wrappedDataCharts, controllerWidgets } =
-      getWidgetMapByServer(serverWidgets, dataCharts, filterSearchMap);
+    const migratedWidgets = migrateWidgets(serverWidgets);
+    const { widgetMap, wrappedDataCharts, controllerWidgets } = getWidgetMap(
+      migratedWidgets,
+      dataCharts,
+      filterSearchMap,
+    );
 
     const widgetIds = Object.values(widgetMap).map(w => w.id);
     //

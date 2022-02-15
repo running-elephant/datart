@@ -34,6 +34,7 @@ import ChartPresentWrapper from './components/ChartPresentWrapper';
 const ChartOperationPanel: FC<{
   chart?: IChart;
   chartConfig?: ChartConfig;
+  defaultViewId?: string;
   onChartChange: (chart: IChart) => void;
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
@@ -41,6 +42,7 @@ const ChartOperationPanel: FC<{
   ({
     chart,
     chartConfig,
+    defaultViewId,
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
@@ -54,11 +56,14 @@ const ChartOperationPanel: FC<{
 
     const layoutFactory = node => {
       var component = node.getComponent();
+
       if (component === LayoutComponentType.VIEW) {
         return (
           <ChartDataViewPanel
             dataView={dataView}
+            defaultViewId={defaultViewId}
             onDataViewChange={onDataViewChange}
+            chartConfig={chartConfig}
           />
         );
       }

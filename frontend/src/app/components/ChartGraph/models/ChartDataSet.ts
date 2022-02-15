@@ -67,10 +67,14 @@ export class ChartDataSet<T>
 
   constructor(columns: T[][], metas?: ChartDatasetMeta[]) {
     super(
-      ...(Array.prototype.map.call(
-        columns,
-        c => new ChartDataSetRow(metas, c),
-      ) as any),
+      ...(Array.prototype.map.call(columns, c => {
+        if (c?.length === 1) {
+          const row = new ChartDataSetRow(metas, []);
+          row.push(c[0]);
+          return row;
+        }
+        return new ChartDataSetRow(metas, c);
+      }) as any),
     );
     this.columnIndexTable = super.createColumnIndexTable(metas);
   }
@@ -119,11 +123,7 @@ export class ChartDataSetRow<T>
   private columnIndexTable: ColumnIndexTable = {};
 
   constructor(metas, items: T[]) {
-    super(...(items as any[]));
-    if (items?.length === 1) {
-      this.length = 1;
-      this[0] = items[0];
-    }
+    super(...(items as any));
     this.columnIndexTable = this.createColumnIndexTable(metas);
   }
 

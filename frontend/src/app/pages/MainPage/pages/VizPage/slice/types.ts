@@ -170,7 +170,7 @@ export interface SelectVizFolderTree {
   getDisabled: (o: FolderViewModel, path: string[]) => boolean;
 }
 
-export interface CopyDashboardParams {
+export interface SaveAsDashboardParams {
   viz: {
     id: string;
     name: string;
@@ -179,5 +179,4 @@ export interface CopyDashboardParams {
     parentId?: string | null;
   };
   dashboardId?: string;
-  resolve: () => void;
 }

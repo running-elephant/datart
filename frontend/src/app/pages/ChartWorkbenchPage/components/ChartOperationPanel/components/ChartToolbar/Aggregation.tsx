@@ -16,36 +16,42 @@
  * limitations under the License.
  */
 
-import { Menu, Modal, Switch } from 'antd';
+import { Modal, Switch } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { FC, memo, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
+import styled from 'styled-components/macro';
 
 const AggregationOperationMenu: FC<{
   defaultValue?: boolean;
-  onChangeAggregation: (value: boolean) => void;
+  onChangeAggregation: () => void;
 }> = memo(({ defaultValue = true, onChangeAggregation }) => {
   const checkedValue = useMemo(() => defaultValue, [defaultValue]);
   const t = useI18NPrefix(`viz.workbench.header`);
+  const { actions } = useWorkbenchSlice();
+  const dispatch = useDispatch();
 
   const onChange = value => {
     Modal.confirm({
       icon: <></>,
       content: t('aggregationSwitchTip'),
       okText: checkedValue ? t('close') : t('open'),
-      // cancelText: t('close'),
       onOk() {
-        onChangeAggregation(value);
+        onChangeAggregation();
+        dispatch(actions.updateChartAggregation(value));
       },
     });
   };
+
   return (
-    <Menu selectedKeys={[]}>
-      <Menu.Item key={0}>
-        {t('aggregationSwitch')}{' '}
-        <Switch checked={checkedValue} onChange={onChange} />
-      </Menu.Item>
-    </Menu>
+    <Aggregation>
+      {t('aggregationSwitch')}{' '}
+      <Switch checked={checkedValue} onChange={onChange} />
+    </Aggregation>
   );
 });
 
 export default AggregationOperationMenu;
+
+const Aggregation = styled.div``;

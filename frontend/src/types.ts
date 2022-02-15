@@ -37,6 +37,7 @@ export interface APIResponse<T> {
   message: string;
   exception: string;
   data: T;
+  warnings: string[];
 }
 
 // dinero.js

@@ -1,22 +1,22 @@
 import {
-  BarChartOutlined,
   DeleteOutlined,
-  FolderFilled,
-  FolderOpenFilled,
-  FundFilled,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import { ListNav, ListPane, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
+import useGetVizIcon from 'app/hooks/useGetVizIcon';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { BoardTypeMap } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { getInitBoardConfig } from 'app/pages/DashBoardPage/utils/board';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
+import { dispatchResize } from 'app/utils/dispatchResize';
 import { CommonFormTypes } from 'globalConstants';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
-import { getInsertedNodeIndex } from 'utils/utils';
+import { useAddViz } from '../../hooks/useAddViz';
 import { SaveFormContext, SaveFormModel } from '../../SaveFormContext';
 import {
   makeSelectVizTree,
@@ -24,10 +24,8 @@ import {
   selectArchivedDashboards,
   selectArchivedDatachartLoading,
   selectArchivedDatacharts,
-  selectVizs,
 } from '../../slice/selectors';
 import {
-  addViz,
   getArchivedDashboards,
   getArchivedDatacharts,
 } from '../../slice/thunks';
@@ -36,18 +34,27 @@ import { Recycle } from '../Recycle';
 import { FolderTree } from './FolderTree';
 
 interface FoldersProps extends I18NComponentProps {
+  sliderVisible: boolean;
+  handleSliderVisible: (status: boolean) => void;
   selectedId?: string;
   className?: string;
 }
 
 export const Folders = memo(
-  ({ selectedId, className, i18nPrefix }: FoldersProps) => {
+  ({
+    selectedId,
+    className,
+    i18nPrefix,
+    sliderVisible,
+    handleSliderVisible,
+  }: FoldersProps) => {
     const dispatch = useDispatch();
     const orgId = useSelector(selectOrgId);
-    const { showSaveForm } = useContext(SaveFormContext);
     const selectVizTree = useMemo(makeSelectVizTree, []);
-    const vizsData = useSelector(selectVizs);
     const t = useI18NPrefix(i18nPrefix);
+    const history = useHistory();
+    const { showSaveForm } = useContext(SaveFormContext);
+    const addVizFn = useAddViz({ showSaveForm });
     const getInitValues = useCallback((relType: VizType) => {
       if (relType === 'DASHBOARD') {
         return {
@@ -58,29 +65,8 @@ export const Folders = memo(
       return undefined;
     }, []);
 
-    const updateValue = useCallback(
-      (relType: VizType, values: SaveFormModel) => {
-        const dataValues = values;
-        if (relType === 'DASHBOARD') {
-          dataValues.config = JSON.stringify(
-            getInitBoardConfig(values.boardType || BoardTypeMap.auto),
-          );
-        }
-        return dataValues;
-      },
-      [],
-    );
+    const getIcon = useGetVizIcon();
 
-    const getIcon = useCallback(({ relType }: FolderViewModel) => {
-      switch (relType) {
-        case 'DASHBOARD':
-          return <FundFilled />;
-        case 'DATACHART':
-          return <BarChartOutlined />;
-        default:
-          return p => (p.expanded ? <FolderOpenFilled /> : <FolderFilled />);
-      }
-    }, []);
     const getDisabled = useCallback(
       ({ deleteLoading }: FolderViewModel) => deleteLoading,
       [],
@@ -89,6 +75,7 @@ export const Folders = memo(
     const treeData = useSelector(state =>
       selectVizTree(state, { getIcon, getDisabled }),
     );
+
     const { filteredData: filteredTreeData, debouncedSearch: treeSearch } =
       useDebouncedSearch(treeData, (keywords, d) =>
         d.title.toLowerCase().includes(keywords.toLowerCase()),
@@ -114,26 +101,26 @@ export const Folders = memo(
 
     const add = useCallback(
       ({ key }) => {
-        showSaveForm({
+        if (key === 'DATACHART') {
+          history.push({
+            pathname: `/organizations/${orgId}/vizs/chartEditor`,
+            state: {
+              dataChartId: '',
+              chartType: 'dataChart',
+              container: 'dataChart',
+            },
+          });
+          return false;
+        }
+
+        addVizFn({
           vizType: key,
           type: CommonFormTypes.Add,
           visible: true,
           initialValues: getInitValues(key),
-          onSave: async (values, onClose) => {
-            const dataValues = updateValue(key, values);
-            let index = getInsertedNodeIndex(values, vizsData);
-
-            await dispatch(
-              addViz({
-                viz: { ...dataValues, orgId: orgId, index: index },
-                type: key,
-              }),
-            );
-            onClose?.();
-          },
         });
       },
-      [showSaveForm, getInitValues, updateValue, dispatch, orgId, vizsData],
+      [getInitValues, orgId, history, addVizFn],
     );
 
     const titles = useMemo(
@@ -142,8 +129,8 @@ export const Folders = memo(
           subTitle: t('folders.folderTitle'),
           add: {
             items: [
+              { key: 'DATACHART', text: t('folders.startAnalysis') },
               { key: 'DASHBOARD', text: t('folders.dashboard') },
-              { key: 'DATACHART', text: t('folders.dataChart') },
               { key: 'FOLDER', text: t('folders.folder') },
             ],
             callback: add,
@@ -155,11 +142,24 @@ export const Folders = memo(
                 text: t('folders.recycle'),
                 prefix: <DeleteOutlined className="icon" />,
               },
+              {
+                key: 'collapse',
+                text: t(sliderVisible ? 'folders.open' : 'folders.close'),
+                prefix: sliderVisible ? (
+                  <MenuUnfoldOutlined className="icon" />
+                ) : (
+                  <MenuFoldOutlined className="icon" />
+                ),
+              },
             ],
             callback: (key, _, onNext) => {
               switch (key) {
                 case 'recycle':
                   onNext();
+                  break;
+                case 'collapse':
+                  handleSliderVisible(!sliderVisible);
+                  dispatchResize();
                   break;
               }
             },
@@ -175,7 +175,7 @@ export const Folders = memo(
           onSearch: listSearch,
         },
       ],
-      [add, treeSearch, listSearch, t],
+      [add, treeSearch, listSearch, t, sliderVisible, handleSliderVisible],
     );
 
     return (

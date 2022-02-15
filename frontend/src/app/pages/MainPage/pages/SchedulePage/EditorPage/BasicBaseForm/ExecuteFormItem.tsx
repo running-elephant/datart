@@ -122,7 +122,7 @@ export const ExecuteFormItem: FC<ExecuteFormItemProps> = ({
       case TimeModes.Week:
         return (
           <>
-            {t('per')} {modeSelect} {t('of')}{' '}
+            {t('per')} {modeSelect} {t('of')}
             <Form.Item name="weekDay">
               <Select options={weekOptions} style={{ width: 80 }} />
             </Form.Item>

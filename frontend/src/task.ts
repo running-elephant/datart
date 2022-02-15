@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /**
  * Datart
  *
@@ -17,9 +16,10 @@
  * limitations under the License.
  */
 
-// 这个polyfill 文件 一定要在最前面
+// organize-imports-ignore  polyfill/stable must in the first
 import 'react-app-polyfill/stable';
- 
+
+import { migrateWidgets } from 'app/migration/WidgetConfig/migrateWidgets';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import {
   DataChart,
@@ -31,10 +31,11 @@ import {
   getDashBoardByResBoard,
   getDataChartsByServer,
 } from 'app/pages/DashBoardPage/utils/board';
-import { getWidgetMapByServer } from 'app/pages/DashBoardPage/utils/widget';
+import { getWidgetMap } from 'app/pages/DashBoardPage/utils/widget';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDTO } from 'app/types/ChartDTO';
+
 // import 'core-js/stable/map';
 // need polyfill [Object.values,Array.prototype.find,new Map]
 
@@ -50,8 +51,9 @@ const getBoardQueryData = (dataStr: string) => {
   const { datacharts, views: serverViews, widgets: serverWidgets } = data;
 
   const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
-  const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(
-    serverWidgets,
+  const migratedWidgets = migrateWidgets(serverWidgets);
+  const { widgetMap, wrappedDataCharts } = getWidgetMap(
+    migratedWidgets,
     dataCharts,
   );
 

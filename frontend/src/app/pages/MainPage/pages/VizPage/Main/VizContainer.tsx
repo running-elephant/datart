@@ -58,6 +58,7 @@ export const VizContainer = memo(
           <Board
             key={id}
             id={id}
+            orgId={orgId}
             autoFit={true}
             filterSearchUrl={search}
             allowDownload={allowDownload}
@@ -84,6 +85,7 @@ export const VizContainer = memo(
       case 'STORYBOARD':
         content = (
           <StoryPagePreview
+            orgId={orgId}
             storyId={id}
             allowShare={allowShare}
             allowManage={allowManage}

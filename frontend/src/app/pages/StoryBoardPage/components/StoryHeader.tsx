@@ -16,11 +16,7 @@
  * limitations under the License.
  */
 
-import {
-  MoreOutlined,
-  SendOutlined,
-  VerticalAlignBottomOutlined,
-} from '@ant-design/icons';
+import { MoreOutlined, SendOutlined } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
 import { ShareLinkModal } from 'app/components/VizOperationMenu';
@@ -40,7 +36,6 @@ import { StoryOverLay } from './StoryOverLay';
 
 interface StoryHeaderProps {
   name?: string;
-
   status?: number;
   publishLoading?: boolean;
   onPublish?: () => void;
@@ -48,6 +43,7 @@ interface StoryHeaderProps {
   playStory: () => void;
   allowShare?: boolean;
   allowManage?: boolean;
+  onRecycleStory?: () => void;
 }
 export const StoryHeader: FC<StoryHeaderProps> = memo(
   ({
@@ -57,9 +53,9 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
     publishLoading,
     playStory,
     onPublish,
-
     allowShare,
     allowManage,
+    onRecycleStory,
   }) => {
     const t = useI18NPrefix(`viz.action`);
     const title = useMemo(() => {
@@ -94,20 +90,14 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
         disabled={Number(status) < 2}
         actions={
           <>
-            {allowManage && !isArchived && (
+            {allowManage && !isArchived && Number(status) === 1 && (
               <Button
                 key="publish"
-                icon={
-                  status === 1 ? (
-                    <SendOutlined />
-                  ) : (
-                    <VerticalAlignBottomOutlined />
-                  )
-                }
+                icon={<SendOutlined />}
                 loading={publishLoading}
                 onClick={onPublish}
               >
-                {status === 1 ? t('publish') : t('unpublish')}
+                {t('publish')}
               </Button>
             )}
             {allowManage && !isArchived && (
@@ -118,18 +108,24 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
             <Button key="run" onClick={playStory}>
               {t('play')}
             </Button>
-            <Dropdown
-              overlay={
-                <StoryOverLay
-                  allowShare={true}
-                  onOpenShareLink={onOpenShareLink}
-                />
-              }
-              placement="bottomCenter"
-              arrow
-            >
-              <Button icon={<MoreOutlined />} />
-            </Dropdown>
+            {(allowManage || allowShare) && (
+              <Dropdown
+                overlay={
+                  <StoryOverLay
+                    allowShare={allowShare}
+                    allowManage={allowManage}
+                    onOpenShareLink={onOpenShareLink}
+                    isArchived={isArchived}
+                    onPublish={Number(status) === 2 ? onPublish : ''}
+                    onRecycleStory={onRecycleStory}
+                  />
+                }
+                arrow
+              >
+                <Button icon={<MoreOutlined />} />
+              </Dropdown>
+            )}
+
             {showShareLinkModal && (
               <ShareLinkModal
                 visibility={showShareLinkModal}

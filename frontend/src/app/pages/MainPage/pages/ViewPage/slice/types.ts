@@ -81,6 +81,7 @@ export interface ViewViewModel<T = object>
   error: string;
   fragment: string;
   isSaveAs?: Boolean;
+  warnings?: string[] | null;
 }
 
 export interface QueryResult {
@@ -88,6 +89,7 @@ export interface QueryResult {
   rows: any[][];
   pageInfo: PageInfo;
   script?: string;
+  warnings?: string[] | null;
 }
 export interface PageInfo {
   pageNo: number;

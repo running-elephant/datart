@@ -22,12 +22,12 @@ import {
   ChartDataSetRow,
 } from 'app/components/ChartGraph/models/ChartDataSet';
 import {
-  AggregateFieldActionType,
   ChartConfig,
   ChartDataConfig,
   ChartDataSectionField,
   ChartDataSectionType,
   ChartStyleConfig,
+  FieldFormatType,
   IFieldFormatConfig,
   SortActionType,
 } from 'app/types/ChartConfig';
@@ -37,59 +37,271 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
-import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import ChartMetadata from 'app/types/ChartMetadata';
+import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
+import moment from 'moment';
 import { Debugger } from 'utils/debugger';
-import {
-  cond,
-  curry,
-  isEmpty,
+import { isEmpty,
   isEmptyArray,
-  isInPairArrayRange,
-  isNumerical,
-  isNumericEqual,
-  isPairArray,
   isUndefined,
   meanValue,
-} from 'utils/object';
-import { toFormattedValue } from './number';
+  pipe,} from 'utils/object';
+import {
+  flattenHeaderRowsWithoutGroupRow,
+  getColumnRenderOriginName,
+  getRequiredAggregatedSections,
+  getRequiredGroupedSections,
+  isInRange,
+} from './internalChartHelper';
 
-export function getDefaultThemeColor() {
-  return echartsDefaultTheme.color;
-}
-export function isInRange(limit?: ChartDataConfig['limit'], count: number = 0) {
-  return cond(
-    [isEmpty, true],
-    [isNumerical, curry(isNumericEqual)(count)],
-    [isPairArray, curry(isInPairArrayRange)(count)],
-  )(limit, true);
-}
-
-export function isUnderUpperBound(
-  limit?: ChartDataConfig['limit'],
-  count: number = 0,
+/**
+ * [中文] 获取格式聚合数据
+ * </br>
+ * [EN] Gets format aggregate data
+ *
+ * @example
+ * const format = {
+ *   percentage: {
+ *     decimalPlaces: 2,
+ *   },
+ *   type: "percentage",
+ * }
+ * const formattedData = toFormattedValue('1', format);
+ * console.log(formattedData); // '100.00%';
+ * @export
+ * @param {(number | string)} [value]
+ * @param {IFieldFormatConfig} [format]
+ * @return {*}
+ */
+ export function toFormattedValue(
+  value?: number | string,
+  format?: IFieldFormatConfig,
 ) {
-  return cond(
-    [isEmpty, true],
-    [isNumerical, limit => limit >= +count],
-    [isPairArray, limit => count <= +limit[1]],
-  )(limit, true);
+  if (value === null || value === undefined) {
+    return '-';
+  }
+
+  if (!format || format.type === FieldFormatType.DEFAULT) {
+    return value;
+  }
+
+  if (!format.type) {
+    return value;
+  }
+
+  const { type: formatType } = format;
+
+  if (
+    typeof value === 'string' &&
+    formatType !== FieldFormatType.DATE &&
+    (!value || isNaN(+value))
+  ) {
+    return value;
+  }
+
+  const config = format[formatType];
+  if (!config) {
+    return value;
+  }
+
+  let formattedValue;
+  switch (formatType) {
+    case FieldFormatType.NUMERIC:
+      const numericConfig =
+        config as IFieldFormatConfig[FieldFormatType.NUMERIC];
+      formattedValue = pipe(
+        unitFormater,
+        decimalPlacesFormater,
+        numericFormater,
+      )(value, numericConfig);
+      break;
+    case FieldFormatType.CURRENCY:
+      const currencyConfig =
+        config as IFieldFormatConfig[FieldFormatType.CURRENCY];
+      formattedValue = pipe(currencyFormater)(value, currencyConfig);
+      break;
+    case FieldFormatType.PERCENTAGE:
+      const percentageConfig =
+        config as IFieldFormatConfig[FieldFormatType.PERCENTAGE];
+      formattedValue = pipe(percentageFormater)(value, percentageConfig);
+      break;
+    case FieldFormatType.SCIENTIFIC:
+      const scientificNotationConfig =
+        config as IFieldFormatConfig[FieldFormatType.SCIENTIFIC];
+      formattedValue = pipe(scientificNotationFormater)(
+        value,
+        scientificNotationConfig,
+      );
+      break;
+    case FieldFormatType.DATE:
+      const dateConfig = config as IFieldFormatConfig[FieldFormatType.DATE];
+      formattedValue = pipe(dateFormater)(value, dateConfig);
+      break;
+    default:
+      formattedValue = value;
+      break;
+  }
+
+  return formattedValue;
 }
 
-export function reachLowerBoundCount(
-  limit?: ChartDataConfig['limit'],
-  count: number = 0,
+function decimalPlacesFormater(
+  value,
+  config?:
+    | IFieldFormatConfig[FieldFormatType.NUMERIC]
+    | IFieldFormatConfig[FieldFormatType.CURRENCY],
 ) {
-  return cond(
-    [isEmpty, 0],
-    [isNumerical, limit => limit - count],
-    [isPairArray, limit => +limit[0] - count],
-  )(limit, 0);
+  if (isEmpty(config?.decimalPlaces)) {
+    return value;
+  }
+  if (isNaN(value)) {
+    return value;
+  }
+  if (config?.decimalPlaces! < 0 || config?.decimalPlaces! > 100) {
+    return value;
+  }
+
+  return (+value).toFixed(config?.decimalPlaces);
+}
+
+function unitFormater(
+  value: any,
+  config?:
+    | IFieldFormatConfig[FieldFormatType.NUMERIC]
+    | IFieldFormatConfig[FieldFormatType.CURRENCY],
+) {
+  if (isEmpty(config?.unitKey)) {
+    return value;
+  }
+
+  if (isNaN(+value)) {
+    return value;
+  }
+  const realUnit = NumericUnitDescriptions.get(config?.unitKey!)?.[0] || 1;
+  return +value / realUnit;
+}
+
+function numericFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.NUMERIC],
+) {
+  if (isNaN(+value)) {
+    return value;
+  }
+
+  const valueWithPrefixs = [
+    config?.prefix || '',
+    thousandSeperatorFormater(value, config),
+    NumericUnitDescriptions.get(config?.unitKey || NumberUnitKey.None)?.[1],
+    config?.suffix || '',
+  ].join('');
+  return valueWithPrefixs;
+}
+
+function thousandSeperatorFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.NUMERIC],
+) {
+  if (isNaN(+value) || !config?.useThousandSeparator) {
+    return value;
+  }
+
+  const parts = value.toString().split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const formatted = parts.join('.');
+  return formatted;
+}
+
+function currencyFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.CURRENCY],
+) {
+  if (isNaN(+value)) {
+    return value;
+  }
+
+  const realUnit = NumericUnitDescriptions.get(config?.unitKey!)?.[0] || 1;
+
+  return `${new Intl.NumberFormat('zh-CN', {
+    style: 'currency',
+    currency: config?.currency || 'CNY',
+    minimumFractionDigits: config?.decimalPlaces,
+    useGrouping: config?.useThousandSeparator,
+  }).format(value / realUnit)} ${
+    NumericUnitDescriptions.get(config?.unitKey || NumberUnitKey.None)?.[1]
+  }`;
+}
+
+function percentageFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.PERCENTAGE],
+) {
+  if (isNaN(+value)) {
+    return value;
+  }
+
+  let fractionDigits = 0;
+  if (
+    !isEmpty(config?.decimalPlaces) &&
+    +config?.decimalPlaces! >= 0 &&
+    +config?.decimalPlaces! <= 20
+  ) {
+    fractionDigits = +config?.decimalPlaces!;
+  }
+  return `${(+value * 100).toFixed(fractionDigits)}%`;
+}
+
+function scientificNotationFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.SCIENTIFIC],
+) {
+  if (isNaN(+value)) {
+    return value;
+  }
+  let fractionDigits = 0;
+  if (
+    !isEmpty(config?.decimalPlaces) &&
+    +config?.decimalPlaces! >= 0 &&
+    +config?.decimalPlaces! <= 20
+  ) {
+    fractionDigits = +config?.decimalPlaces!;
+  }
+  return (+value).toExponential(fractionDigits);
+}
+
+function dateFormater(
+  value,
+  config?: IFieldFormatConfig[FieldFormatType.DATE],
+) {
+  if (isNaN(+value) || isEmpty(config?.format)) {
+    return value;
+  }
+
+  return moment(value).format(config?.format);
 }
 
 /**
- * @deprecated This function will be removed in next versiion, please use getStyles instread
- * @see getValue
+ * [中文] 获取系统默认颜色
+ * </br>
+ * [EN] Gets an array of default colors
+ *
+ * @example
+ * const colorList = getDefaultThemeColor();
+ * console.log(colorList); // ["#298ffe","#dae9ff","#fe705a","#ffdcdc","#751adb","#8663d7","#15AD31","#FAD414","#E62412"]
+ *
+ * @export
+ * @return {*} default color array
+ */
+export function getDefaultThemeColor() {
+  return echartsDefaultTheme.color;
+}
+
+/**
+ * [中文] 使用路径语法获取配置信息，此方法已过时，请参考方法getStyles
+ * </br>
+ * [EN] Get config info by value path, please use getStyles instread
+ *
+ * @deprecated This function will be removed in next versiion, please use @see {@link getStyles} instread
  * @param {ChartStyleConfig[]} styleConfigs
  * @param {string[]} paths
  * @return {*}  {*}
@@ -101,6 +313,18 @@ export function getStyleValue(
   return getValue(styleConfigs, paths);
 }
 
+/**
+ * [中文] 使用路径语法获取配置信息，此方法已过时，请参考方法getStyles
+ * </br>
+ * [EN] Get setting config info by value path, please use getStyles instread
+ *
+ * @deprecated This function will be removed in next versiion, please use @see {@link getStyles} instread
+ * @export
+ * @param {ChartStyleConfig[]} configs
+ * @param {string} path
+ * @param {string} targetKey
+ * @return {*}
+ */
 export function getSettingValue(
   configs: ChartStyleConfig[],
   path: string,
@@ -110,8 +334,11 @@ export function getSettingValue(
 }
 
 /**
- * @deprecated This function will be removed in next versiion, please use getStyles instread
- * @see getStyles
+ * [中文] 使用路径语法获取配置信息，此方法已过时，请参考方法getStyles
+ * </br>
+ * [EN] Get setting config info by value path, please use getStyles instread
+ *
+ * @deprecated This function will be removed in next versiion, please use @see {@link getStyles} instread
  * @export
  * @param {ChartStyleConfig[]} styles
  * @param {string} groupPath
@@ -128,8 +355,12 @@ export function getStyleValueByGroup(
 }
 
 /**
- * Get config style values, more example please see test cases
+ * [中文] 通过数组路径语法，获取对应的配置的值集合
+ * </br>
+ * [EN] Get config style values
+ *
  * @example
+ *
  * const styleConfigs = [
  *       {
  *        key: 'label',
@@ -161,8 +392,24 @@ export function getStyles(
 }
 
 /**
- * Get style config value base funtion with default target key
- * @export
+ * [中文] 通过数组路径语法，获取对应的配置信息
+ * </br>
+ * [EN] Get style config value base funtion with default target key
+ *
+ * @example
+ *
+ * const styleConfigs = [
+ *       {
+ *        key: 'label',
+ *        rows: [
+ *           { key: 'color', value: 'red' },
+ *           { key: 'font', value: 'sans-serif' },
+ *         ],
+ *       },
+ *     ];
+ * const colorValue = getValue(styleConfigs, ['label', 'color']);
+ * console.log(colorValue); // red
+ *
  * @param {Array<ChartStyleConfig>} configs
  * @param {Array<string>} keyPaths
  * @param {string} [targetKey='value']
@@ -185,23 +432,6 @@ export function getValue(
     }
     iterators = group.rows || [];
   }
-}
-
-export function getColNameByValueColName(series) {
-  return series?.data?.valueColName || series.seriesName;
-}
-
-export function getNumeric(numeric, defaultValue = 0) {
-  if (
-    numeric === null ||
-    numeric === undefined ||
-    numeric === Infinity ||
-    numeric === -Infinity ||
-    Number.isNaN(+numeric)
-  ) {
-    return defaultValue;
-  }
-  return +numeric;
 }
 
 export function getCustomSortableColumns(columns, dataConfigs) {
@@ -236,7 +466,7 @@ export function getReference(
   settingConfigs,
   dataColumns,
   dataConfig,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
   const referenceTabs = getSettingValue(
     settingConfigs,
@@ -249,9 +479,9 @@ export function getReference(
       referenceTabs,
       dataColumns,
       dataConfig,
-      isHorizionDisplay,
+      isHorizonDisplay,
     ),
-    markArea: getMarkArea(referenceTabs, dataColumns, isHorizionDisplay),
+    markArea: getMarkArea(referenceTabs, dataColumns, isHorizonDisplay),
   };
 }
 
@@ -259,7 +489,7 @@ export function getReference2(
   settingConfigs,
   dataSetRows: IChartDataSetRow<string>[],
   dataConfig,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
   const referenceTabs = getSettingValue(
     settingConfigs,
@@ -272,13 +502,13 @@ export function getReference2(
       referenceTabs,
       dataSetRows,
       dataConfig,
-      isHorizionDisplay,
+      isHorizonDisplay,
     ),
-    markArea: getMarkArea2(referenceTabs, dataSetRows, isHorizionDisplay),
+    markArea: getMarkArea2(referenceTabs, dataSetRows, isHorizonDisplay),
   };
 }
 
-function getMarkLine(refTabs, dataColumns, dataConfig, isHorizionDisplay) {
+function getMarkLine(refTabs, dataColumns, dataConfig, isHorizonDisplay) {
   const markLineData = refTabs
     ?.reduce((acc, cur) => {
       const markLineConfigs = cur?.rows?.filter(r => r.key === 'markLine');
@@ -293,7 +523,7 @@ function getMarkLine(refTabs, dataColumns, dataConfig, isHorizionDisplay) {
         'constantValue',
         'metric',
         dataConfig,
-        isHorizionDisplay,
+        isHorizonDisplay,
       );
     })
     .filter(Boolean);
@@ -310,10 +540,10 @@ function getMarkLineData(
   constantValueKey,
   metricKey,
   dataConfig,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
   const name = mark.label;
-  const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
+  const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
   const show = getSettingValue(mark.rows, 'showLabel', 'value');
   const enableMarkLine = getSettingValue(mark.rows, 'enableMarkLine', 'value');
   const position = getSettingValue(mark.rows, 'position', 'value');
@@ -362,7 +592,7 @@ function getMarkLine2(
   refTabs,
   dataSetRows: IChartDataSetRow<string>[],
   dataConfig,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
   const markLineData = refTabs
     ?.reduce((acc, cur) => {
@@ -378,7 +608,7 @@ function getMarkLine2(
         'constantValue',
         'metric',
         dataConfig,
-        isHorizionDisplay,
+        isHorizonDisplay,
       );
     })
     .filter(Boolean);
@@ -395,10 +625,10 @@ function getMarkLineData2(
   constantValueKey,
   metricKey,
   dataConfig,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
   const name = mark.label;
-  const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
+  const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
   const show = getSettingValue(mark.rows, 'showLabel', 'value');
   const enableMarkLine = getSettingValue(mark.rows, 'enableMarkLine', 'value');
   const position = getSettingValue(mark.rows, 'position', 'value');
@@ -450,9 +680,9 @@ function getMarkAreaData2(
   valueTypeKey,
   constantValueKey,
   metricKey,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
-  const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
+  const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
   const show = getSettingValue(mark.rows, 'showLabel', 'value');
   const enableMarkArea = getSettingValue(mark.rows, 'enableMarkArea', 'value');
   const position = getSettingValue(mark.rows, 'position', 'value');
@@ -513,9 +743,9 @@ function getMarkAreaData(
   valueTypeKey,
   constantValueKey,
   metricKey,
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
-  const valueKey = isHorizionDisplay ? 'xAxis' : 'yAxis';
+  const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
   const show = getSettingValue(mark.rows, 'showLabel', 'value');
   const enableMarkArea = getSettingValue(mark.rows, 'enableMarkArea', 'value');
   const position = getSettingValue(mark.rows, 'position', 'value');
@@ -570,7 +800,7 @@ function getMarkAreaData(
   };
 }
 
-function getMarkArea(refTabs, dataColumns, isHorizionDisplay) {
+function getMarkArea(refTabs, dataColumns, isHorizonDisplay) {
   const refAreas = refTabs?.reduce((acc, cur) => {
     const markLineConfigs = cur?.rows?.filter(r => r.key === 'markArea');
     acc.push(...markLineConfigs);
@@ -587,7 +817,7 @@ function getMarkArea(refTabs, dataColumns, isHorizionDisplay) {
               `${prefix}ValueType`,
               `${prefix}ConstantValue`,
               `${prefix}Metric`,
-              isHorizionDisplay,
+              isHorizonDisplay,
             );
           })
           .filter(Boolean);
@@ -600,7 +830,7 @@ function getMarkArea(refTabs, dataColumns, isHorizionDisplay) {
 function getMarkArea2(
   refTabs,
   dataSetRows: IChartDataSetRow<string>[],
-  isHorizionDisplay,
+  isHorizonDisplay,
 ) {
   const refAreas = refTabs?.reduce((acc, cur) => {
     const markLineConfigs = cur?.rows?.filter(r => r.key === 'markArea');
@@ -618,7 +848,7 @@ function getMarkArea2(
               `${prefix}ValueType`,
               `${prefix}ConstantValue`,
               `${prefix}Metric`,
-              isHorizionDisplay,
+              isHorizonDisplay,
             );
           })
           .filter(Boolean);
@@ -672,7 +902,10 @@ export function getNameTextStyle(fontFamily, fontSize, color) {
 }
 
 /**
- * Create ChartDataSet Model with sorted values
+ * [中文] 将服务端返回数据转换为ChartDataSet模型
+ * </br>
+ * [EN] Create ChartDataSet Model with sorted values
+ *
  * @export
  * @template T
  * @param {T[][]} [datas]
@@ -691,11 +924,25 @@ export function transformToDataSet<T>(
 }
 
 /**
+ * [中文] 将服务端返回数据转换为一维对象数组结构, 已过时，请使用transformToDataSet
+ * </br>
+ * [EN] transform dataset to object array, please use transformToDataSet instead
+ *
  * @deprecated shoule use DataSet model, @see {@link transformToDataSet}
  * @description
  * Support:
  *  1. Case Insensitive to get value
  *  2. More util helper
+ * @example
+ *
+ * const columns = [
+ *      ['r1-c1-v', 'r1-c2-v'],
+ *      ['r2-c1-v', 'r2-c2-v'],
+ *    ];
+ * const metas = [{ name: 'name' }, { name: 'age' }];
+ * const datas = transformToObjectArray(columns, metas);
+ * console.log(datas); // [{"name":"r1-c1-v","age":"r1-c2-v2"},{"name":"r2-c1-v","age":"r2-c2-v"}]
+ *
  * @export
  * @param {string[][]} [columns]
  * @param {ChartDatasetMeta[]} [metas]
@@ -729,56 +976,36 @@ export function transformToObjectArray(
   );
 }
 
-// TODO delete this function  #migration
-/**
- * @deprecated please use new method transformToObjectArray instead
- * @see transformToObjectArray
- * @export
- * @param {string[][]} [columns]
- * @param {ChartDatasetMeta[]} [metas]
- * @return {*}
- */
-export function transfromToObjectArray(
-  columns?: string[][],
-  metas?: ChartDatasetMeta[],
-) {
-  console.warn(
-    'This method `transfromToObjectArray` will be deprecated and can be replaced by `transformToObjectArray`',
-  );
-  return transformToObjectArray(columns, metas);
-}
-
-export function getValueByColumnKey(col?: { aggregate?; colName: string }) {
-  if (!col) {
+export function getValueByColumnKey(field?: {
+  aggregate?;
+  colName: string;
+}): string {
+  if (!field) {
     return '';
   }
-  if (!col.aggregate) {
-    return col.colName;
+  if (!field.aggregate) {
+    return field.colName;
   }
-  return `${col.aggregate}(${col.colName})`;
+  return `${field.aggregate}(${field.colName})`;
 }
 
-export function getColumnRenderOriginName(c?: ChartDataSectionField) {
-  if (!c) {
+/**
+ * [中文] 获取字段的图表显示名称
+ * </br>
+ * [EN] Get data field render name by alias, colName and aggregate
+ *
+ * @export
+ * @param {ChartDataSectionField} [field]
+ * @return {string}
+ */
+export function getColumnRenderName(field?: ChartDataSectionField): string {
+  if (!field) {
     return '[unknown]';
   }
-  if (c.aggregate === AggregateFieldActionType.NONE) {
-    return c.colName;
+  if (field.alias?.name) {
+    return field.alias.name;
   }
-  if (c.aggregate) {
-    return `${c.aggregate}(${c.colName})`;
-  }
-  return c.colName;
-}
-
-export function getColumnRenderName(c?: ChartDataSectionField) {
-  if (!c) {
-    return '[unknown]';
-  }
-  if (c.alias?.name) {
-    return c.alias.name;
-  }
-  return getColumnRenderOriginName(c);
+  return getColumnRenderOriginName(field);
 }
 
 export function getUnusedHeaderRows(
@@ -800,105 +1027,6 @@ export function getUnusedHeaderRows(
     }
     return acc;
   }, []);
-}
-
-export function diffHeaderRows(
-  oldRows: Array<{ colName: string }>,
-  newRows: Array<{ colName: string }>,
-) {
-  if (!oldRows?.length) {
-    return true;
-  }
-  if (oldRows?.length !== newRows?.length) {
-    return true;
-  }
-  const oldNames = oldRows.map(r => r.colName).sort();
-  const newNames = newRows.map(r => r.colName).sort();
-  if (oldNames.toString() !== newNames.toString()) {
-    return true;
-  }
-
-  return false;
-}
-
-export function flattenHeaderRowsWithoutGroupRow<
-  T extends {
-    isGroup?: boolean;
-    children?: T[];
-  },
->(groupedHeaderRow: T) {
-  const childRows = (groupedHeaderRow.children || []).flatMap(child =>
-    flattenHeaderRowsWithoutGroupRow(child),
-  );
-  if (groupedHeaderRow.isGroup) {
-    return childRows;
-  }
-  return [groupedHeaderRow].concat(childRows);
-}
-
-export function transformMeta(model?: string) {
-  if (!model) {
-    return undefined;
-  }
-  const jsonObj = JSON.parse(model);
-  return Object.keys(jsonObj).map(colKey => ({
-    ...jsonObj[colKey],
-    id: colKey,
-    category: ChartDataViewFieldCategory.Field,
-  }));
-}
-
-export function mergeChartStyleConfigs(
-  target?: ChartStyleConfig[],
-  source?: ChartStyleConfigDTO[],
-  options = { useDefault: true },
-): ChartStyleConfig[] | undefined {
-  if (isEmptyArray(target)) {
-    return target;
-  }
-  if (isEmptyArray(source) && !options?.useDefault) {
-    return target;
-  }
-  for (let index = 0; index < target?.length!; index++) {
-    const tEle: any = target?.[index];
-    if (!tEle) {
-      continue;
-    }
-
-    // options.useDefault
-    if (isUndefined(tEle['value']) && options?.useDefault) {
-      tEle['value'] = tEle?.['default'];
-    }
-
-    const sEle =
-      'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
-
-    if (!isUndefined(sEle?.['value'])) {
-      tEle['value'] = sEle?.['value'];
-    }
-    if (!isEmptyArray(tEle?.rows)) {
-      tEle['rows'] = mergeChartStyleConfigs(tEle.rows, sEle?.rows, options);
-    } else if (sEle && !isEmptyArray(sEle?.rows)) {
-      // Note: we merge all rows data when target rows is emtpy
-      tEle['rows'] = sEle?.rows;
-    }
-  }
-  return target;
-}
-
-export function mergeChartDataConfigs<
-  T extends { key?: string; rows?: ChartDataSectionField[] } | undefined | null,
->(target?: T[], source?: T[]) {
-  if (isEmptyArray(target) || isEmptyArray(source)) {
-    return target;
-  }
-  return (target || []).map(tEle => {
-    const sEle = (source || []).find(s => s?.key === tEle?.key);
-    if (sEle) {
-      return Object.assign({}, tEle, { rows: sEle?.rows });
-    }
-    return tEle;
-  });
 }
 
 export function getDataColumnMaxAndMin(
@@ -1028,8 +1156,29 @@ export function getSeriesTooltips4Rectangular(
   }
   return [];
 }
-
-export function valueFormatter(config?: ChartDataSectionField, value?: any) {
+/**
+ * [中文] 获取字段的Tooltip显示名称和内容
+ * </br>
+ * [EN] Get chart render string with field name and value
+ * @example
+ * const config = {
+ *   aggregate: "SUM"
+ *   colName: 'name',
+ *   type: 'STRING',
+ *   category: 'field',
+ *   uid: '123456',
+ * }
+ * const formatValue = valueFormatter(config, '示例')；
+ * console.log(formatValue) // SUM(name): 示例
+ * @export
+ * @param {ChartDataSectionField} [config]
+ * @param {number} [value]
+ * @return {string}
+ */
+export function valueFormatter(
+  config?: ChartDataSectionField,
+  value?: number,
+): string {
   return `${getColumnRenderName(config)}: ${toFormattedValue(
     value,
     config?.format,
@@ -1056,6 +1205,15 @@ export function getScatterSymbolSizeFn(
         2,
     );
   };
+}
+
+export function getGridStyle(styles) {
+  const [containLabel, left, right, bottom, top] = getStyles(
+    styles,
+    ['margin'],
+    ['containLabel', 'marginLeft', 'marginRight', 'marginBottom', 'marginTop'],
+  );
+  return { left, right, bottom, top, containLabel };
 }
 
 // TODO(Stephen): tobe used chart DataSetRow model for all charts
@@ -1111,31 +1269,55 @@ export function getColorizeGroupSeriesColumns(
   return collection;
 }
 
-export function getRequiredGroupedSections(dataConfig?) {
-  return (
-    dataConfig
-      ?.filter(
-        c =>
-          c.type === ChartDataSectionType.GROUP ||
-          c.type === ChartDataSectionType.COLOR,
-      )
-      .filter(c => !!c.required) || []
-  );
-}
-
-export function getRequiredAggregatedSections(dataConfigs?) {
-  return (
-    dataConfigs
-      ?.filter(
-        c =>
-          c.type === ChartDataSectionType.AGGREGATE ||
-          c.type === ChartDataSectionType.SIZE,
-      )
-      .filter(c => !!c.required) || []
-  );
-}
-
-export function isMatchRequirement(meta: ChartMetadata, config: ChartConfig) {
+/**
+ * [中文] 是否满足当前meta中标识的限制要求，以满足图表绘制
+ * </br>
+ * [EN] Check if current config with requried fields match the chart basic requirement of meta info.
+ *
+ * @example
+ *
+ *  const meta = {
+ *      requirements: [
+ *        {
+ *          group: [1, 999],
+ *          aggregate: [1, 999],
+ *        },
+ *      ],
+ *    };
+ *    const config = {
+ *     datas: [
+ *        {
+ *         type: 'group',
+ *          required: true,
+ *          rows: [
+ *            {
+ *              colName: 'category',
+ *            },
+ *          ],
+ *        },
+ *        {
+ *          type: 'aggregate',
+ *          required: true,
+ *          rows: [
+ *            {
+ *              colName: 'amount',
+ *            },
+ *          ],
+ *        },
+ *      ],
+ *    };
+ *  const isMatch = isMatchRequirement(meta, config);
+ *  console.log(isMatch); // true;
+ *
+ * @export
+ * @param {ChartMetadata} meta
+ * @param {ChartConfig} config
+ * @return {boolean}
+ */
+export function isMatchRequirement(
+  meta: ChartMetadata,
+  config: ChartConfig,
+): boolean {
   const dataConfigs = config.datas || [];
   const groupedFieldConfigs = getRequiredGroupedSections(dataConfigs).flatMap(
     config => config.rows || [],
@@ -1152,13 +1334,4 @@ export function isMatchRequirement(meta: ChartMetadata, config: ChartConfig) {
       isInRange(aggregate, aggregateFieldConfigs.length)
     );
   });
-}
-
-export function getGridStyle(styles) {
-  const [containLabel, left, right, bottom, top] = getStyles(
-    styles,
-    ['margin'],
-    ['containLabel', 'marginLeft', 'marginRight', 'marginBottom', 'marginTop'],
-  );
-  return { left, right, bottom, top, containLabel };
 }

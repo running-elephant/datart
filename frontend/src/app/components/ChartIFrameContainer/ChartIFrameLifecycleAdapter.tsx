@@ -106,6 +106,7 @@ const ChartIFrameLifecycleAdapter: FC<{
       eventBrokerRef?.current?.publish(ChartLifecycle.UNMOUNTED, {});
       eventBrokerRef?.current?.dispose();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chart?.meta?.id, eventBrokerRef, isShown, translator]);
 
   /**
@@ -138,6 +139,7 @@ const ChartIFrameLifecycleAdapter: FC<{
         translator,
       },
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     config,
     dataset,
@@ -180,6 +182,7 @@ const ChartIFrameLifecycleAdapter: FC<{
         translator,
       },
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [style.width, style.height, document, window, isShown, translator]);
 
   return (

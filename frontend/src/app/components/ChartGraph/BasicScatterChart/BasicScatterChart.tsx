@@ -25,7 +25,7 @@ import {
   getGridStyle,
   getReference2,
   getScatterSymbolSizeFn,
-  getSeriesTooltips4Scatter,
+  getSeriesTooltips4Polar2,
   getStyles,
   transformToDataSet,
 } from 'app/utils/chartHelper';
@@ -129,9 +129,7 @@ class BasicScatterChart extends Chart {
 
     return {
       tooltip: {
-        trigger: 'axis',
         formatter: this.getTooltipFormmaterFunc(
-          styleConfigs,
           groupConfigs,
           aggregateConfigs,
           colorConfigs,
@@ -233,12 +231,11 @@ class BasicScatterChart extends Chart {
     color?,
   ) {
     const [cycleRatio] = getStyles(styleConfigs, ['scatter'], ['cycleRatio']);
-    const defaultSizeValue = (max - min) / 2;
     const seriesName = groupConfigs
       ?.map(gc => getColumnRenderName(gc))
       .join('-');
     const seriesDatas = dataSetRows?.map(row => {
-      const sizeValue = row.getCell(sizeConfigs?.[0]) || defaultSizeValue;
+      const sizeValue = row.getCell(sizeConfigs?.[0]) || min;
       return {
         ...getExtraSeriesRowData(row),
         name: groupConfigs?.map(row.getCell, row).join('-'),
@@ -404,35 +401,23 @@ class BasicScatterChart extends Chart {
   }
 
   private getTooltipFormmaterFunc(
-    styleConfigs,
     groupConfigs,
     aggregateConfigs,
     colorConfigs,
     sizeConfigs,
     infoConfigs,
-    dataColumns,
+    chartDataSet,
   ) {
     return seriesParams => {
-      const tooltips = !!groupConfigs.length
-        ? [
-            `${groupConfigs?.map(gc => getColumnRenderName(gc)).join('-')}: ${
-              seriesParams[0].name
-            }`,
-          ]
-        : [];
-
-      return tooltips
-        .concat(
-          getSeriesTooltips4Scatter(
-            seriesParams,
-            []
-              .concat(aggregateConfigs)
-              .concat(infoConfigs)
-              .concat(sizeConfigs)
-              .concat(colorConfigs),
-          ),
-        )
-        .join('<br />');
+      return getSeriesTooltips4Polar2(
+        chartDataSet,
+        seriesParams,
+        groupConfigs,
+        colorConfigs,
+        aggregateConfigs,
+        infoConfigs,
+        sizeConfigs,
+      );
     };
   }
 }

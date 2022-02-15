@@ -29,7 +29,7 @@ import { removeTab } from '../slice/thunks';
 import { ArchivedViz, Folder, Storyboard } from '../slice/types';
 import { VizContainer } from './VizContainer';
 
-export function Main() {
+export function Main({ sliderVisible }: { sliderVisible: boolean }) {
   const { actions } = useVizSlice();
   const dispatch = useDispatch();
   const history = useHistory();
@@ -107,6 +107,12 @@ export function Main() {
     vizId,
   ]);
 
+  useEffect(() => {
+    if (selectedTab && !vizId) {
+      history.push(`/organizations/${orgId}/vizs/${selectedTab.id}`);
+    }
+  }, [history, selectedTab, orgId, vizId]);
+
   const tabChange = useCallback(
     activeKey => {
       const activeTab = tabs.find(v => v.id === activeKey);
@@ -149,7 +155,7 @@ export function Main() {
   );
 
   return (
-    <Wrapper className="datart-viz">
+    <Wrapper className={sliderVisible ? 'close datart-viz' : 'datart-viz'}>
       <TabsWrapper>
         <Tabs
           hideAdd
@@ -202,8 +208,12 @@ const Wrapper = styled.div`
   flex: 1;
   flex-direction: column;
   min-width: 0;
-
   min-height: 0;
+  &.close {
+    width: calc(100% - 30px) !important;
+    min-width: calc(100% - 30px) !important;
+    padding-left: 30px;
+  }
 `;
 
 const TabsWrapper = styled.div`
