@@ -20,7 +20,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
-import { ChartMouseEventParams } from 'app/types/Chart';
+import { ChartMouseEventParams, ChartsEventData } from 'app/types/Chart';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { FC, useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
@@ -278,7 +278,13 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       renderMode,
     ],
   );
-
+  const getValueByRowData = (
+    data: ChartsEventData | undefined,
+    fieldName: string,
+  ) => {
+    let toCaseField = fieldName.toUpperCase();
+    return data?.rowData[toCaseField];
+  };
   const toLinkingWidgets = useCallback(
     (widget: Widget, params: ChartMouseEventParams) => {
       const { componentType, seriesType, seriesName } = params;
@@ -302,8 +308,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
 
         const filter: BoardLinkFilter = {
           triggerWidgetId: widget.id,
-          triggerValue:
-            (params?.data?.rowData?.[linkageFieldName] as string) || '',
+          triggerValue: getValueByRowData(params.data, linkageFieldName),
           triggerDataChartId: widget.datachartId,
           linkerWidgetId: re.targetId,
         };
@@ -369,13 +374,13 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       if (
         params.componentType === 'table' &&
         jumpFieldName !== params.seriesName
-      )
+      ) {
         return;
-
+      }
+      const rowDataValue = getValueByRowData(params.data, jumpFieldName);
       if (typeof jumpConfig?.filter === 'object' && targetType === 'INTERNAL') {
         const searchParamsStr = urlSearchTransfer.toUrlString({
-          [jumpConfig?.filter?.filterId]:
-            (params?.data?.rowData?.[jumpFieldName] as string) || '',
+          [jumpConfig?.filter?.filterId]: rowDataValue,
         });
         if (targetId) {
           history.push(
@@ -385,9 +390,9 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       } else if (targetType === 'URL') {
         let jumpUrl;
         if (URL.indexOf('?') > -1) {
-          jumpUrl = `${URL}&${queryName}=${params?.data?.rowData?.[jumpFieldName]}`;
+          jumpUrl = `${URL}&${queryName}=${rowDataValue}`;
         } else {
-          jumpUrl = `${URL}?${queryName}=${params?.data?.rowData?.[jumpFieldName]}`;
+          jumpUrl = `${URL}?${queryName}=${rowDataValue}`;
         }
         window.location.href = jumpUrl;
       }
