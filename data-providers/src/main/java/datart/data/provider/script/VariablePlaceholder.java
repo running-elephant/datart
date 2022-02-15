@@ -9,6 +9,7 @@ import datart.data.provider.calcite.SqlNodeUtils;
 import datart.data.provider.calcite.SqlValidateUtils;
 import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
 import datart.data.provider.jdbc.SqlScriptRender;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlLikeOperator;
@@ -29,6 +30,7 @@ public class VariablePlaceholder {
 
     protected final SqlCall sqlCall;
 
+    @Getter
     protected final String originalSqlFragment;
 
     public ReplacementPair replacementPair() {

@@ -19,7 +19,7 @@
     <groupId>datart</groupId>
     <artifactId>datart-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0-beta.0</version>
+    <version>1.0.0-beta.1</version>
 
     <dependencies>
         <dependency>
@@ -32,6 +32,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

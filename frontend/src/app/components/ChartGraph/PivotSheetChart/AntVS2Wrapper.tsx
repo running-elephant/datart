@@ -28,6 +28,10 @@ const AntVS2Wrapper: FC<{
   options;
   theme?: S2Theme;
 }> = memo(({ dataCfg, options, theme }) => {
+  if (!dataCfg) {
+    return <div></div>;
+  }
+
   const onDataCellHover = ({ event, viewMeta }) => {
     viewMeta.spreadsheet.tooltip.show({
       position: {
