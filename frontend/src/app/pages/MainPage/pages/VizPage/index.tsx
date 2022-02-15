@@ -43,6 +43,9 @@ export function VizPage() {
   const handleSliderVisible = useCallback(
     (status: boolean) => {
       setSliderVisible(status);
+      setTimeout(() => {
+        dispatchResize();
+      }, 300);
     },
     [setSliderVisible],
   );
