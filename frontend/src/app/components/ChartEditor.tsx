@@ -201,7 +201,9 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   );
 
   const clearDataConfig = useCallback(() => {
-    const currentChart = ChartManager.instance().getById(chart?.meta?.id);
+    const currentChart = chart?.meta?.id
+      ? ChartManager.instance().getById(chart?.meta?.id)
+      : ChartManager.instance().getDefaultChart();
     let targetChartConfig = CloneValueDeep(currentChart?.config);
     registerChartEvents(currentChart);
     setChart(currentChart);
