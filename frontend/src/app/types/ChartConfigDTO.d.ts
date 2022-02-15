@@ -23,6 +23,7 @@ export type ChartStyleConfigDTO = {
   key: string;
   value?: any;
   rows?: ChartStyleConfigDTO[];
+  comType?: string;
 };
 
 export type ChartDataConfigDTO = ChartDataConfig & {};
