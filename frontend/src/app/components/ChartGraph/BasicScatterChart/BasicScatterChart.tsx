@@ -231,12 +231,11 @@ class BasicScatterChart extends Chart {
     color?,
   ) {
     const [cycleRatio] = getStyles(styleConfigs, ['scatter'], ['cycleRatio']);
-    const defaultSizeValue = (max - min) / 2;
     const seriesName = groupConfigs
       ?.map(gc => getColumnRenderName(gc))
       .join('-');
     const seriesDatas = dataSetRows?.map(row => {
-      const sizeValue = row.getCell(sizeConfigs?.[0]) || defaultSizeValue;
+      const sizeValue = row.getCell(sizeConfigs?.[0]) || min;
       return {
         ...getExtraSeriesRowData(row),
         name: groupConfigs?.map(row.getCell, row).join('-'),
