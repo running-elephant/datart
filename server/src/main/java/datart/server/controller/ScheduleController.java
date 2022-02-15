@@ -22,6 +22,7 @@ import datart.core.entity.Schedule;
 import datart.core.entity.ScheduleLog;
 import datart.server.base.dto.ResponseData;
 import datart.server.base.dto.ScheduleBaseInfo;
+import datart.server.base.params.CheckNameParam;
 import datart.server.base.params.ScheduleCreateParam;
 import datart.server.base.params.ScheduleUpdateParam;
 import datart.server.service.ScheduleService;
@@ -44,10 +45,10 @@ public class ScheduleController extends BaseController {
 
     @ApiOperation(value = "check schedule name")
     @PostMapping(value = "/check/name")
-    public ResponseData<Boolean> checkName(@RequestParam String orgId, @RequestParam String name) {
+    public ResponseData<Boolean> checkName(@Validated @RequestBody CheckNameParam param) {
         Schedule schedule = new Schedule();
-        schedule.setOrgId(orgId);
-        schedule.setName(name);
+        schedule.setOrgId(param.getOrgId());
+        schedule.setName(param.getName());
         return ResponseData.success(scheduleService.checkUnique(schedule));
     }
 

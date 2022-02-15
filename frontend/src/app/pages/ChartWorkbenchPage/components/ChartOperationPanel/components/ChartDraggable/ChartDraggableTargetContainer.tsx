@@ -28,6 +28,7 @@ import {
 } from '@ant-design/icons';
 import { Dropdown } from 'antd';
 import useFieldActionModal from 'app/hooks/useFieldActionModal';
+import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/ChartAggregationContext';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import {
@@ -38,10 +39,8 @@ import {
 } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
-import {
-  getColumnRenderName,
-  reachLowerBoundCount,
-} from 'app/utils/chartHelper';
+import { getColumnRenderName } from 'app/utils/chartHelper';
+import { reachLowerBoundCount } from 'app/utils/internalChartHelper';
 import { updateBy, updateByKey } from 'app/utils/mutation';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { rgba } from 'polished';
@@ -55,7 +54,6 @@ import {
 } from 'styles/StyleConstants';
 import { ValueOf } from 'types';
 import { uuidv4 } from 'utils/utils';
-import ChartAggregationContext from '../../../../contexts/ChartAggregationContext';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
 import ChartDraggableElement from './ChartDraggableElement';
 
@@ -273,7 +271,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         }
         return <DropPlaceholder>{t('drop')}</DropPlaceholder>;
       }
-
       return currentConfig.rows?.map((columnConfig, index) => {
         return (
           <ChartDraggableElement

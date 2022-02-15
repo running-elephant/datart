@@ -15,13 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { ServerDashboard } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ChartPreview,
   VizType,
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
+import { ChartDTO } from 'app/types/ChartDTO';
 
 export interface SharePageState {
   needPassword?: boolean;
@@ -38,7 +38,7 @@ export interface SharePageState {
 }
 export interface ShareVizInfo {
   vizType: VizType | undefined;
-  vizDetail: BackendChart | ServerDashboard | ServerStoryBoard;
+  vizDetail: ChartDTO | ServerDashboard | ServerStoryBoard;
   download: boolean;
   executeToken: Record<string, ExecuteToken>;
   subVizToken: null | Record<string, ExecuteToken>;

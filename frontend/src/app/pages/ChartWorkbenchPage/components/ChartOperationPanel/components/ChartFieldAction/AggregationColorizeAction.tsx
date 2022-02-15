@@ -25,7 +25,7 @@ import {
 } from 'app/components/ColorPicker';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -33,7 +33,7 @@ import { SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
 
 const AggregationColorizeAction: FC<{
   config: ChartDataSectionField;
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   onConfigChange: (
     config: ChartDataSectionField,
     needRefresh?: boolean,
@@ -83,7 +83,7 @@ const AggregationColorizeAction: FC<{
               setSelectColor(c);
             }}
           >
-            <ColorTag size={16} color={c.value} />{' '}
+            <ColorTag size={16} color={c.value} />
             <span className="text-span" title={c.key}>
               {c.key}
             </span>

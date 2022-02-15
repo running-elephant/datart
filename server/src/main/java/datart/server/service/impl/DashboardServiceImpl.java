@@ -33,11 +33,14 @@ import datart.core.base.exception.ParamException;
 import datart.server.base.params.*;
 import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
+import org.springframework.util.FileSystemUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -196,6 +199,65 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         return dashboardDetail;
     }
 
+    @Override
+    public Folder copyDashboard(DashboardCreateParam dashboard) throws IOException {
+
+        Folder folder = createWithFolder(dashboard);
+
+        DashboardDetail copy = getDashboardDetail(dashboard.getId());
+
+        BeanUtils.copyProperties(dashboard, copy);
+
+        // copy database records
+        if (CollectionUtils.isNotEmpty(copy.getWidgets())) {
+            HashMap<String, String> widgetIdMapping = new HashMap<>();
+
+            List<WidgetCreateParam> widgetCreateParams = copy.getWidgets().stream()
+                    .map(widget -> {
+                        String uuid = UUIDGenerator.generate();
+                        widgetIdMapping.put(widget.getId(), uuid);
+                        WidgetCreateParam createParam = new WidgetCreateParam();
+                        BeanUtils.copyProperties(widget, createParam);
+                        createParam.setId(uuid);
+                        createParam.setDashboardId(folder.getRelId());
+
+                        List<WidgetRelParam> widgetRelParams = widget.getRelations().stream().map(relWidgetWidget -> {
+                            WidgetRelParam widgetRelParam = new WidgetRelParam();
+                            BeanUtils.copyProperties(relWidgetWidget, widgetRelParam);
+                            return widgetRelParam;
+                        }).collect(Collectors.toList());
+
+                        createParam.setRelations(widgetRelParams);
+                        return createParam;
+                    }).collect(Collectors.toList());
+
+            // replace ids
+            for (WidgetCreateParam createParam : widgetCreateParams) {
+                if (widgetIdMapping.containsKey(createParam.getParentId())) {
+                    createParam.setParentId(widgetIdMapping.get(createParam.getParentId()));
+                }
+                if (CollectionUtils.isNotEmpty(createParam.getRelations())) {
+                    for (WidgetRelParam relation : createParam.getRelations()) {
+                        relation.setSourceId(createParam.getId());
+                        if (widgetIdMapping.containsKey(relation.getTargetId())) {
+                            relation.setTargetId(widgetIdMapping.get(relation.getTargetId()));
+                        }
+                    }
+                }
+            }
+            widgetService.createWidgets(widgetCreateParams);
+        }
+
+        // copy static files
+        String basePath = fileService.getBasePath(FileOwner.DASHBOARD, dashboard.getId());
+        String distPath = fileService.getBasePath(FileOwner.DASHBOARD, copy.getId());
+        File src = new File(basePath);
+        if (src.exists()) {
+            FileSystemUtils.copyRecursively(src, new File(distPath));
+        }
+        return folder;
+    }
+
 
     @Override
     public RoleService getRoleService() {
@@ -217,15 +279,11 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         }
     }
 
-    public Folder createWithFolder(BaseCreateParam createParam) {
-        DashboardCreateParam param = (DashboardCreateParam) createParam;
-        if (!CollectionUtils.isEmpty(folderMapper.checkVizName(param.getOrgId(), param.getParentId(), param.getName()))) {
+    public Folder createWithFolder(DashboardCreateParam createParam) {
+        if (!CollectionUtils.isEmpty(folderMapper.checkVizName(createParam.getOrgId(), createParam.getParentId(), createParam.getName()))) {
             Exceptions.tr(ParamException.class, "error.param.exists.name");
         }
         Dashboard dashboard = DashboardService.super.create(createParam);
-
-        List<WidgetCreateParam> widgetCreateParams = ((DashboardCreateParam) createParam).getWidgetToCreate();
-        widgetService.createWidgets(widgetCreateParams);
 
         // create folder
         Folder folder = new Folder();
@@ -296,4 +354,5 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         storypage.setRelId(id);
         return folderMapper.checkUnique(storypage);
     }
+
 }

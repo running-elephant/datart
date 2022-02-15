@@ -84,14 +84,4 @@ public class PermissionHelper {
                 .build();
     }
 
-    public static String getResourceId(ResourceType resourceType, String resourceId) {
-        switch (resourceType) {
-            case SOURCE:
-            case ROLE:
-            case USER:
-                return "*";
-            default:
-                return resourceId;
-        }
-    }
 }

@@ -17,6 +17,7 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 import {
+  DeviceType,
   Widget,
   WidgetData,
   WidgetInfo,
@@ -122,19 +123,10 @@ export const selectWidgetInfoDatachartId = createSelector(
 // boardInfo
 export const boardInfoState = (state: { editBoard: EditBoardState }) =>
   state.editBoard.boardInfo;
-// TODO 加载等待
-export const selectDashLoading = createSelector(
+
+export const selectDeviceType = createSelector(
   [boardInfoState],
-  boardInfo => boardInfo.loading,
-);
-//
-export const selectBoardSaving = createSelector(
-  [boardInfoState],
-  boardInfo => boardInfo.saving,
-);
-export const selectDashDroppable = createSelector(
-  [boardInfoState],
-  boardInfo => boardInfo.isDroppable,
+  boardInfo => boardInfo.deviceType || DeviceType.Desktop,
 );
 export const selectControllerPanel = createSelector(
   [boardInfoState],

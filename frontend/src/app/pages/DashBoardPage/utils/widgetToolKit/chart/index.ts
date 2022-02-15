@@ -23,15 +23,15 @@ import {
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
-import { getTneWidgetFiltersAndParams } from '../..';
+import { getTheWidgetFiltersAndParams } from '../..';
+import ChartDataRequest, {
+  transformToViewConfig,
+} from '../../../../../types/ChartDataRequest';
 import {
   createChartWidgetContent,
   createInitWidgetConfig,
   createWidget,
 } from '../../widget';
-import ChartRequest, {
-  transformToViewConfig,
-} from './../../../../ChartWorkbenchPage/models/ChartHttpRequest';
 
 export const createDataChartWidget = (opt: {
   dashboardId: string;
@@ -72,21 +72,21 @@ export const getCanLinkageWidgets = (widgets: Widget[]) => {
 
 export const getControlOptionQueryParams = (obj: {
   view: ChartDataView;
-  field: string;
+  columns: string[];
   curWidget: Widget;
   widgetMap: Record<string, Widget>;
 }) => {
   const viewConfigs = transformToViewConfig(obj.view?.config);
-  const { filterParams, variableParams } = getTneWidgetFiltersAndParams({
+  const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
     chartWidget: obj.curWidget,
     widgetMap: obj.widgetMap,
     params: undefined,
   });
-  const requestParams: ChartRequest = {
+  const requestParams: ChartDataRequest = {
     aggregators: [],
     filters: filterParams,
     groups: [],
-    columns: [obj.field],
+    columns: [...new Set(obj.columns)],
     pageInfo: {
       pageNo: 1,
       pageSize: 99999999,

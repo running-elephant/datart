@@ -39,6 +39,12 @@
       "defaultValue": false
     },
     {
+      "name": "enableSpecialSQL",
+      "type": "bool",
+      "required": false,
+      "defaultValue": false
+    },
+    {
       "name": "properties",
       "type": "object",
       "required": false,

@@ -39,6 +39,8 @@ public class JdbcProperties {
 
     private Properties properties;
 
+    private boolean enableSpecialSql;
+
     @Override
     public String toString() {
         return "JdbcConnectionProperties{" +

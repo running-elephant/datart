@@ -20,13 +20,13 @@ import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/Chart
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
-import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
+import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
+import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartDataset from '../../../../types/ChartDataset';
-import ChartDataView from '../../../../types/ChartDataView';
 import {
   dateFormatSelector,
   languageSelector,
@@ -35,18 +35,22 @@ import ChartHeaderPanel from '../ChartHeaderPanel';
 import ChartOperationPanel from '../ChartOperationPanel';
 
 const ChartWorkbench: FC<{
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   dataview?: ChartDataView;
   chartConfig?: ChartConfig;
-  chart?: Chart;
+  chart?: IChart;
   aggregation?: boolean;
+  defaultViewId?: string;
   header?: {
     name?: string;
+    orgId?: string;
+    container?: string;
     onSaveChart?: () => void;
+    onSaveChartToDashBoard?: (dashboardId) => void;
     onGoBack?: () => void;
-    onChangeAggregation?: (state: boolean) => void;
+    onChangeAggregation?: () => void;
   };
-  onChartChange: (c: Chart) => void;
+  onChartChange: (c: IChart) => void;
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
 }> = memo(
@@ -57,6 +61,7 @@ const ChartWorkbench: FC<{
     chart,
     aggregation,
     header,
+    defaultViewId,
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
@@ -64,7 +69,12 @@ const ChartWorkbench: FC<{
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
     return (
-      <ChartAggregationContext.Provider value={{ aggregation }}>
+      <ChartAggregationContext.Provider
+        value={{
+          aggregation,
+          onChangeAggregation: header?.onChangeAggregation,
+        }}
+      >
         <ChartDatasetContext.Provider value={{ dataset: dataset }}>
           <ChartDataViewContext.Provider value={{ dataView: dataview }}>
             <TimeConfigContext.Provider
@@ -74,14 +84,17 @@ const ChartWorkbench: FC<{
                 {header && (
                   <ChartHeaderPanel
                     chartName={header?.name}
+                    orgId={header?.orgId}
+                    container={header?.container}
                     onGoBack={header?.onGoBack}
                     onSaveChart={header?.onSaveChart}
-                    onChangeAggregation={header?.onChangeAggregation}
+                    onSaveChartToDashBoard={header?.onSaveChartToDashBoard}
                   />
                 )}
                 <StyledChartOperationPanel>
                   <ChartOperationPanel
                     chart={chart}
+                    defaultViewId={defaultViewId}
                     chartConfig={chartConfig}
                     onChartChange={onChartChange}
                     onChartConfigChange={onChartConfigChange}
@@ -100,7 +113,8 @@ const ChartWorkbench: FC<{
     prev.dataview === next.dataview &&
     prev.chart === next.chart &&
     prev.chartConfig === next.chartConfig &&
-    prev.dataset === next.dataset,
+    prev.dataset === next.dataset &&
+    prev.defaultViewId === next.defaultViewId,
 );
 
 export default ChartWorkbench;

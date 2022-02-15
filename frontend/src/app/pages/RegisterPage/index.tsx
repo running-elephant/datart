@@ -19,25 +19,32 @@
 import { message } from 'antd';
 import { Brand } from 'app/components/Brand';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { selectSystemInfo } from 'app/slice/selectors';
 import React, { useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { RegisterForm } from './RegisterForm';
 import { SendEmailTips } from './SendEmailTips';
 import { sendEmail } from './service';
+import { WithoutActivation } from './WithoutActivation';
 
 export function RegisterPage() {
   const [isRegister, setIsRegister] = useState(true);
   const [email, setEmail] = useState<string>('');
   const [sendEmailLoading, setSendEmailLoading] = useState(false);
+  const systemInfo = useSelector(selectSystemInfo);
+  const mailEnable = systemInfo?.mailEnable ?? true;
   const t = useI18NPrefix('register');
 
   const onRegisterSuccess = useCallback((email: string) => {
     setEmail(email);
     setIsRegister(false);
   }, []);
+
   const goBack = useCallback(() => {
     setIsRegister(true);
   }, []);
+
   const onSendEmail = useCallback(() => {
     setSendEmailLoading(true);
     sendEmail(email)
@@ -55,13 +62,15 @@ export function RegisterPage() {
       <Brand />
       {isRegister ? (
         <RegisterForm onRegisterSuccess={onRegisterSuccess} />
-      ) : (
+      ) : mailEnable ? (
         <SendEmailTips
           email={email}
           loading={sendEmailLoading}
           onBack={goBack}
           onSendEmailAgain={onSendEmail}
         />
+      ) : (
+        <WithoutActivation onContinue={goBack} />
       )}
     </Wrapper>
   );

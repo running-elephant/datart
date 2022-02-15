@@ -22,6 +22,7 @@ import {
   ContainerWidgetContent,
   Dashboard,
   DashboardConfig,
+  DeviceType,
   MediaWidgetContent,
   Widget,
   WidgetConf,
@@ -30,7 +31,8 @@ import { getDefaultWidgetName } from 'app/pages/DashBoardPage/utils';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import produce from 'immer';
 import { Layout } from 'react-grid-layout';
-import { createSlice } from 'utils/@reduxjs/toolkit';
+import { createSlice, isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
+import { rejectedActionMessageHandler } from 'utils/notification';
 import { EditBoardStack } from '../types';
 
 export type updateWidgetConf = {
@@ -46,6 +48,10 @@ export const editBoardStackSlice = createSlice({
   name: 'editBoard',
   initialState: initEditBoardState,
   reducers: {
+    clearEditBoardState(state) {
+      state.dashBoard = {} as Dashboard;
+      state.widgetRecord = {};
+    },
     setBoardToEditStack(state, action: PayloadAction<EditBoardStack>) {
       const record = action.payload;
       Object.keys(record).forEach(key => {
@@ -123,10 +129,20 @@ export const editBoardStackSlice = createSlice({
       });
     },
 
-    changeWidgetsRect(state, action: PayloadAction<Layout[]>) {
-      action.payload.forEach(it => {
+    changeAutoBoardWidgetsRect(
+      state,
+      action: PayloadAction<{ layouts: Layout[]; deviceType: DeviceType }>,
+    ) {
+      const { layouts, deviceType } = action.payload;
+      layouts.forEach(it => {
         const { i, x, y, w, h } = it;
-        state.widgetRecord[i].config.rect = { x, y, width: w, height: h };
+        const rectItem = { x, y, width: w, height: h };
+        if (deviceType === DeviceType.Desktop) {
+          state.widgetRecord[i].config.rect = rectItem;
+        }
+        if (deviceType === DeviceType.Mobile) {
+          state.widgetRecord[i].config.mobileRect = rectItem;
+        }
       });
     },
     // auto
@@ -231,5 +247,11 @@ export const editBoardStackSlice = createSlice({
       const { id, mediaWidgetConfig } = action.payload;
       state.widgetRecord[id].config.content = mediaWidgetConfig;
     },
+  },
+  extraReducers: builder => {
+    builder.addMatcher(
+      isMySliceRejectedAction(editBoardStackSlice.name),
+      rejectedActionMessageHandler,
+    );
   },
 });

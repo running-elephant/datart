@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import { ItemLayout } from '../Layout';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
 const template = {
-  label: '@global@.viz.common.enum.fontAlignment.alignment',
+  label: `viz.common.enum.fontAlignment.alignment`,
   key: 'align',
   default: 'left',
   comType: 'select',
@@ -31,22 +31,22 @@ const template = {
     translateItemLabel: true,
     items: [
       {
-        label: '@global@.viz.common.enum.fontAlignment.left',
+        label: `viz.common.enum.fontAlignment.left`,
         value: 'left',
       },
       {
-        label: '@global@.viz.common.enum.fontAlignment.center',
+        label: `viz.common.enum.fontAlignment.center`,
         value: 'center',
       },
       {
-        label: '@global@.viz.common.enum.fontAlignment.right',
+        label: `viz.common.enum.fontAlignment.right`,
         value: 'right',
       },
     ],
   },
 };
 
-const FontAlignment: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const FontAlignment: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({
     ancestors,
     translate: t = title => title,

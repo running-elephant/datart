@@ -16,20 +16,17 @@
  * limitations under the License.
  */
 
-import {
-  ChartDataSectionConfig,
-  ChartDataSectionField,
-} from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import FilterControllPanel from '../FilterControlPanel';
 
 const FilterAction: FC<{
   config: ChartDataSectionField;
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   dataView?: ChartDataView;
-  dataConfig?: ChartDataSectionConfig;
+  dataConfig?: ChartDataConfig;
   aggregation?: boolean;
   onConfigChange: (
     config: ChartDataSectionField,

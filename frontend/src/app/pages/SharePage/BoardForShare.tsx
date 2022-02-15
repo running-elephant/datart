@@ -22,12 +22,12 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
+import ChartDataRequest from '../../types/ChartDataRequest';
 import { BoardProvider } from '../DashBoardPage/components/BoardProvider/BoardProvider';
 import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel';
 import TitleHeader from '../DashBoardPage/components/TitleHeader';
-import AutoBoardCore from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
-import FreeBoardCore from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
+import { AutoBoardCore } from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
+import { FreeBoardCore } from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
 import { getBoardDownloadParams } from '../DashBoardPage/pages/Board/slice/asyncActions';
 import { selectShareBoardInfo } from '../DashBoardPage/pages/Board/slice/selector';
 import {
@@ -47,7 +47,7 @@ export interface ShareBoardProps {
   onLoadShareTask: OnLoadTasksType;
   onDownloadFile: (item: DownloadTask) => void;
   onMakeShareDownloadDataTask: (
-    downloadParams: ChartRequest[],
+    downloadParams: ChartDataRequest[],
     fileName: string,
   ) => void;
 }

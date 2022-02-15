@@ -15,34 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { message } from 'antd';
-import ChartRequest, {
-  transformToViewConfig,
-} from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import {
   DownloadTask,
   DownloadTaskState,
 } from 'app/pages/MainPage/slice/types';
 import { ExecuteToken } from 'app/pages/SharePage/slice/types';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataRequest, {
+  transformToViewConfig,
+} from 'app/types/ChartDataRequest';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
+import { ChartDTO } from 'app/types/ChartDTO';
+import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
-import { request, requestWithHeader } from 'utils/request';
+import { request, request2, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 
 export const getDistinctFields = async (
   viewId: string,
-  field: string,
-  view: BackendChart['view'] | undefined,
+  columns: string[],
+  view: ChartDTO['view'] | undefined,
   executeToken: ExecuteToken | undefined,
 ) => {
   const viewConfigs = transformToViewConfig(view?.config);
-  const requestParams: ChartRequest = {
+  const requestParams: ChartDataRequest = {
     aggregators: [],
     filters: [],
     groups: [],
-    columns: [field],
+    columns: [...new Set(columns)],
     pageInfo: {
       pageNo: 1,
       pageSize: 99999999,
@@ -54,7 +54,7 @@ export const getDistinctFields = async (
     ...viewConfigs,
   };
   if (executeToken) {
-    const { data } = await request<ChartDataset>({
+    const { data } = await request<ChartDataSetDTO>({
       method: 'POST',
       url: `share/execute`,
       params: {
@@ -63,20 +63,20 @@ export const getDistinctFields = async (
       },
       data: requestParams,
     });
-    return data;
+    return filterSqlOperatorName(requestParams, data);
   } else {
-    const { data } = await request<ChartDataset>({
+    const { data } = await request<ChartDataSetDTO>({
       method: 'POST',
       url: `data-provider/execute`,
       data: requestParams,
     });
-    return data;
+    return filterSqlOperatorName(requestParams, data);
   }
 };
 
 export const makeDownloadDataTask =
   (params: {
-    downloadParams: ChartRequest[];
+    downloadParams: ChartDataRequest[];
     fileName: string;
     resolve: () => void;
   }) =>
@@ -101,7 +101,7 @@ export const makeShareDownloadDataTask =
     resolve: () => void;
     clientId: string;
     fileName: string;
-    downloadParams: ChartRequest[];
+    downloadParams: ChartDataRequest[];
     shareToken: string;
     executeToken?: Record<string, ExecuteToken>;
     password?: string | null;
@@ -224,7 +224,7 @@ export async function getChartPluginPaths() {
 
 export async function loadShareTask(params) {
   try {
-    const { data } = await request<DownloadTask[]>({
+    const { data } = await request2<DownloadTask[]>({
       url: `/share/download/task`,
       method: 'GET',
       params,
@@ -240,4 +240,20 @@ export async function loadShareTask(params) {
     errorHandle(error);
     throw error;
   }
+}
+interface DownloadShareDashChartFileParams {
+  downloadId: string;
+  shareToken: string;
+  password?: string | null;
+}
+export async function downloadShareDataChartFile(
+  params: DownloadShareDashChartFileParams,
+) {
+  const [data, headers] = (await requestWithHeader({
+    url: `share/download`,
+    method: 'GET',
+    responseType: 'blob',
+    params,
+  })) as any;
+  dealFileSave(data, headers);
 }

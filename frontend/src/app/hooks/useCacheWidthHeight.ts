@@ -20,8 +20,8 @@ import { useEffect, useState } from 'react';
 import useResizeObserver from './useResizeObserver';
 
 export const useCacheWidthHeight = (
-  initWidth: number = 400,
-  initHeight: number = 300,
+  initWidth: number = 1,
+  initHeight: number = 1,
 ) => {
   const [cacheW, setCacheW] = useState(initWidth);
   const [cacheH, setCacheH] = useState(initHeight);
@@ -31,10 +31,10 @@ export const useCacheWidthHeight = (
     height = initHeight,
   } = useResizeObserver<HTMLDivElement>({
     refreshMode: 'debounce',
-    refreshRate: 500,
+    refreshRate: 20,
   });
   useEffect(() => {
-    if (width !== 0 && height !== 0) {
+    if (width > 0) {
       setCacheW(width);
       setCacheH(height);
     }

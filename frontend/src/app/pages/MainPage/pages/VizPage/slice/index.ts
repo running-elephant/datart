@@ -1,9 +1,13 @@
-import { createSlice, isRejected, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { migrateChartConfig } from 'app/migration';
+import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { ChartDataSectionType } from 'app/types/ChartConfig';
+import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { isMySliceAction } from 'utils/@reduxjs/toolkit';
+import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
+import { rejectedActionMessageHandler } from 'utils/notification';
 import { CloneValueDeep } from 'utils/object';
-import { reduxActionErrorHandler, uuidv4 } from 'utils/utils';
+import { uuidv4 } from 'utils/utils';
 import {
   addStoryboard,
   addViz,
@@ -19,12 +23,12 @@ import {
   getStoryboards,
   initChartPreviewData,
   publishViz,
+  saveAsDashboard,
   unarchiveViz,
   updateFilterAndFetchDataset,
 } from './thunks';
 import { ArchivedViz, VizState, VizTab } from './types';
 import { transferChartConfig } from './utils';
-
 export const initialState: VizState = {
   vizs: [],
   storyboards: [],
@@ -67,10 +71,6 @@ const slice = createSlice({
             ? state.tabs[index]?.id || state.tabs[state.tabs.length - 1].id
             : '';
       }
-    },
-
-    changePlayingStoryId(state, action: PayloadAction<string>) {
-      state.playingStoryId = action.payload;
     },
     updateChartPreviewFilter(
       state,
@@ -433,6 +433,18 @@ const slice = createSlice({
       }
     });
 
+    // Copy Dashboard
+    builder.addCase(saveAsDashboard.pending, state => {
+      state.saveFolderLoading = true;
+    });
+    builder.addCase(saveAsDashboard.fulfilled, (state, action) => {
+      state.saveFolderLoading = false;
+      state.vizs.push({ ...action.payload, deleteLoading: false });
+    });
+    builder.addCase(saveAsDashboard.rejected, state => {
+      state.saveFolderLoading = false;
+    });
+
     // addStoryboard
     builder.addCase(addStoryboard.pending, state => {
       state.saveStoryboardLoading = true;
@@ -473,36 +485,43 @@ const slice = createSlice({
       };
     });
     builder.addCase(fetchVizChartAction.fulfilled, (state, action) => {
-      const data = action.payload.data,
-        filterSearchParams = action.payload.filterSearchParams;
+      const newChartDto = CloneValueDeep(action.payload.data);
+
+      const filterSearchParams = action.payload.filterSearchParams;
       const index = state.chartPreviews?.findIndex(
-        c => c.backendChartId === data?.id,
+        c => c.backendChartId === newChartDto?.id,
       );
-      let backendChartConfig =
-        typeof data.config === 'string'
-          ? JSON.parse(data.config as any)
-          : CloneValueDeep(data.config);
-      if (backendChartConfig?.chartConfig && filterSearchParams) {
-        backendChartConfig.chartConfig = transferChartConfig(
-          backendChartConfig.chartConfig,
-          filterSearchParams,
-        );
-      }
-      const backendChart = CloneValueDeep(data);
-      backendChart.config = backendChartConfig;
+      const currentChart = ChartManager.instance().getById(
+        newChartDto?.config?.chartGraphId,
+      );
       if (index < 0) {
         state.chartPreviews.push({
-          backendChartId: data?.id,
-          backendChart: backendChart,
-          chartConfig: backendChartConfig?.chartConfig,
+          backendChartId: newChartDto?.id,
+          backendChart: newChartDto,
+          chartConfig: currentChart
+            ? transferChartConfig(
+                mergeToChartConfig(
+                  currentChart?.config,
+                  migrateChartConfig(newChartDto?.config),
+                ),
+                filterSearchParams,
+              )
+            : undefined,
         });
-        return;
+      } else {
+        const prevChartPreview = state.chartPreviews[index];
+        state.chartPreviews[index] = {
+          ...prevChartPreview,
+          backendChart: newChartDto,
+          chartConfig: transferChartConfig(
+            mergeToChartConfig(
+              prevChartPreview?.chartConfig || currentChart?.config,
+              migrateChartConfig(newChartDto?.config),
+            ),
+            filterSearchParams,
+          ),
+        };
       }
-      state.chartPreviews[index] = {
-        ...state.chartPreviews[index],
-        backendChart: backendChart,
-        chartConfig: backendChartConfig?.chartConfig,
-      };
     });
     builder.addCase(
       fetchDataSetByPreviewChartAction.fulfilled,
@@ -536,12 +555,10 @@ const slice = createSlice({
         version: uuidv4(),
       };
     });
-
-    builder.addMatcher(isRejected, (_, action) => {
-      if (isMySliceAction(action, slice.name)) {
-        reduxActionErrorHandler(action);
-      }
-    });
+    builder.addMatcher(
+      isMySliceRejectedAction(slice.name),
+      rejectedActionMessageHandler,
+    );
   },
 });
 

@@ -70,8 +70,14 @@ public class CSVParse {
         } else {
             types = inferDataType(records.get(1));
         }
-        return records.parallelStream().map(this::extractValues)
+        List<List<Object>> values = records.parallelStream().map(this::extractValues)
                 .collect(Collectors.toList());
+        // remove utf-8-with-bom char
+        String start = values.get(0).get(0).toString();
+        if (start.charAt(0) == '\uFEFF') {
+            values.get(0).set(0, start.substring(1));
+        }
+        return values;
     }
 
     private ValueType[] inferDataType(CSVRecord record) {

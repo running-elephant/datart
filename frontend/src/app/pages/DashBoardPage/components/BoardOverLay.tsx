@@ -15,7 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CloudDownloadOutlined, ShareAltOutlined } from '@ant-design/icons';
+import {
+  CloudDownloadOutlined,
+  CopyFilled,
+  DeleteOutlined,
+  FileAddOutlined,
+  ReloadOutlined,
+  ShareAltOutlined,
+} from '@ant-design/icons';
 import { Menu, Popconfirm } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useContext, useMemo } from 'react';
@@ -24,14 +31,59 @@ export interface BoardOverLayProps {
   onOpenShareLink?: () => void;
   onBoardToDownLoad: () => void;
   onShareDownloadData?: () => void;
+  onSaveAsVizs?: () => void;
+  onSyncData?: () => void;
+  onRecycleViz?: () => void;
+  onAddToStory?: () => void;
+  onPublish?: () => void;
+  isArchived?: boolean;
 }
 
 export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
-  ({ onOpenShareLink, onBoardToDownLoad, onShareDownloadData }) => {
+  ({
+    onOpenShareLink,
+    onBoardToDownLoad,
+    onShareDownloadData,
+    onSaveAsVizs,
+    onSyncData,
+    onRecycleViz,
+    onAddToStory,
+    onPublish,
+    isArchived,
+  }) => {
     const t = useI18NPrefix(`viz.action`);
-    const { allowShare, allowDownload, renderMode } = useContext(BoardContext);
+    const tg = useI18NPrefix(`global`);
+    const { allowShare, allowDownload, renderMode, allowManage } =
+      useContext(BoardContext);
+
     const renderList = useMemo(
       () => [
+        {
+          key: 'getData',
+          icon: <ReloadOutlined />,
+          onClick: onSyncData,
+          disabled: false,
+          render: true,
+          content: t('syncData'),
+          className: 'line',
+        },
+        {
+          key: 'saveAs',
+          icon: <CopyFilled />,
+          onClick: onSaveAsVizs,
+          disabled: false,
+          render: allowManage,
+          content: tg('button.saveAs'),
+        },
+        {
+          key: 'addToStory',
+          icon: <FileAddOutlined />,
+          onClick: onAddToStory,
+          disabled: false,
+          render: allowManage && onAddToStory,
+          content: t('addToStory'),
+          className: 'line',
+        },
         {
           key: 'shareLink',
           icon: <ShareAltOutlined />,
@@ -46,6 +98,7 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
           onClick: () => {},
           disabled: false,
           render: allowDownload,
+          className: 'line',
           content: (
             <Popconfirm
               placement="left"
@@ -64,15 +117,45 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
             </Popconfirm>
           ),
         },
+        {
+          key: 'publish',
+          icon: <FileAddOutlined />,
+          onClick: onPublish,
+          disabled: false,
+          render: allowManage && !isArchived && onPublish,
+          content: t('unpublish'),
+        },
+        {
+          key: 'delete',
+          icon: <DeleteOutlined />,
+          disabled: false,
+          render: allowManage && onRecycleViz,
+          content: (
+            <Popconfirm
+              title={tg('operation.archiveConfirm')}
+              onConfirm={onRecycleViz}
+            >
+              {tg('button.archive')}
+            </Popconfirm>
+          ),
+        },
       ],
       [
-        onOpenShareLink,
         allowShare,
         renderMode,
-        t,
         allowDownload,
+        allowManage,
+        isArchived,
+        onOpenShareLink,
         onBoardToDownLoad,
         onShareDownloadData,
+        onSaveAsVizs,
+        onSyncData,
+        onPublish,
+        onRecycleViz,
+        onAddToStory,
+        tg,
+        t,
       ],
     );
     const actionItems = useMemo(
@@ -81,9 +164,16 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
           .filter(item => item.render)
           .map(item => {
             return (
-              <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
-                {item.content}
-              </Menu.Item>
+              <>
+                <Menu.Item
+                  key={item.key}
+                  icon={item.icon}
+                  onClick={item.onClick}
+                >
+                  {item.content}
+                </Menu.Item>
+                {item.className && <Menu.Divider />}
+              </>
             );
           }),
       [renderList],

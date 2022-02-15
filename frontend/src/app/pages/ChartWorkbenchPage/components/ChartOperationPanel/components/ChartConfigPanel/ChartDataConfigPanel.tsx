@@ -17,10 +17,7 @@
  */
 
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import {
-  ChartDataSectionConfig,
-  ChartDataSectionType,
-} from 'app/types/ChartConfig';
+import { ChartDataConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
@@ -28,10 +25,10 @@ import ChartAggregationContext from '../../../../contexts/ChartAggregationContex
 import PaletteDataConfig from '../ChartDataConfigSection';
 
 const ChartDataConfigPanel: FC<{
-  dataConfigs?: ChartDataSectionConfig[];
+  dataConfigs?: ChartDataConfig[];
   onChange: (
     ancestors: number[],
-    config: ChartDataSectionConfig,
+    config: ChartDataConfig,
     needRefresh?: boolean,
   ) => void;
 }> = memo(

@@ -33,54 +33,45 @@
  * limitations under the License.
  */
 
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { FormGeneratorLayoutProps } from '../types';
 import { groupLayoutComparer } from '../utils';
 import ItemLayout from './ItemLayout';
 
-const CollectionLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> =
-  memo(
-    ({
-      ancestors,
-      translate,
-      data,
-      dataConfigs,
-      flatten,
-      onChange,
-      context,
-    }) => {
-      const getDependencyValue = useCallback((watcher, children) => {
-        if (watcher?.deps) {
-          // Note: only support depend on one property for now.
-          const dependencyKey = watcher?.deps?.[0];
-          return children?.find(r => r.key === dependencyKey)?.value;
-        }
-      }, []);
+const CollectionLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
+  ({ ancestors, translate, data, dataConfigs, flatten, onChange, context }) => {
+    const getDependencyValue = useCallback((watcher, children) => {
+      if (watcher?.deps) {
+        // Note: only support depend on one property for now.
+        const dependencyKey = watcher?.deps?.[0];
+        return children?.find(r => r.key === dependencyKey)?.value;
+      }
+    }, []);
 
-      return (
-        <StyledCollectionLayout>
-          {data?.rows
-            ?.filter(r => Boolean(!r.hide))
-            .map((r, index) => (
-              <ItemLayout
-                ancestors={ancestors.concat([index])}
-                key={r.key}
-                data={r}
-                translate={translate}
-                dependency={getDependencyValue(r.watcher, data?.rows)}
-                dataConfigs={dataConfigs}
-                flatten={flatten}
-                onChange={onChange}
-                context={context}
-              />
-            ))}
-        </StyledCollectionLayout>
-      );
-    },
-    groupLayoutComparer,
-  );
+    return (
+      <StyledCollectionLayout>
+        {data?.rows
+          ?.filter(r => Boolean(!r.hide))
+          .map((r, index) => (
+            <ItemLayout
+              ancestors={ancestors.concat([index])}
+              key={r.key}
+              data={r}
+              translate={translate}
+              dependency={getDependencyValue(r.watcher, data?.rows)}
+              dataConfigs={dataConfigs}
+              flatten={flatten}
+              onChange={onChange}
+              context={context}
+            />
+          ))}
+      </StyledCollectionLayout>
+    );
+  },
+  groupLayoutComparer,
+);
 
 export default CollectionLayout;
 

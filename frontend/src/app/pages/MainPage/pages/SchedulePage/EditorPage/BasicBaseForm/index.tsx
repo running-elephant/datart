@@ -1,5 +1,6 @@
 import { DatePicker, Form, Input, Radio } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { TIME_FORMATTER } from 'globalConstants';
 import { FC, useCallback } from 'react';
 import { JobTypes, JOB_TYPES_OPTIONS } from '../../constants';
 import { checkScheduleName } from '../../services';
@@ -59,7 +60,7 @@ export const BasicBaseForm: FC<BasicBaseFormProps> = ({
         />
       </Form.Item>
       <Form.Item label={t('effectiveTimeRange')} name={'dateRange'}>
-        <RangePicker allowClear showTime format="YYYY-MM-DD HH:mm:ss" />
+        <RangePicker allowClear showTime format={TIME_FORMATTER} />
       </Form.Item>
       <ExecuteFormItem {...restProps} />
     </>

@@ -17,7 +17,7 @@
  */
 
 import { Select } from 'antd';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS } from 'styles/StyleConstants';
@@ -26,7 +26,7 @@ import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
-const BasicSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({
     ancestors,
     translate: t = title => title,
@@ -68,7 +68,7 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
     };
 
     return (
-      <Wrapper label={!hideLabel ? t(row.label) : ''}>
+      <Wrapper label={!hideLabel ? t(row.label, true) : ''}>
         <Select
           dropdownMatchSelectWidth
           {...rest}
@@ -83,7 +83,7 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
             const value = isEmpty(o['value']) ? o : o.value;
             return (
               <Select.Option key={key} value={value}>
-                {needTranslate ? t(label) : label}
+                {needTranslate ? t(label, true) : label}
               </Select.Option>
             );
           })}

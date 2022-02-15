@@ -17,7 +17,7 @@
  */
 
 import { Slider } from 'antd';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS } from 'styles/StyleConstants';
@@ -25,12 +25,12 @@ import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
-const BasicSlider: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicSlider: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 
     return (
-      <Wrapper label={t(row.label)}>
+      <Wrapper label={t(row.label, true)}>
         <Slider
           {...rest}
           {...options}

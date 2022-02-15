@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfigDTO, ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import isUndefined from 'lodash/isUndefined';
 
-export const hasWrongDimensionName = (config?: ChartConfig) => {
+export const hasWrongDimensionName = (config?: ChartConfigDTO) => {
   if (!config) {
     return false;
   }
@@ -30,28 +30,32 @@ export const hasWrongDimensionName = (config?: ChartConfig) => {
   );
 };
 
-export function alpha3(config?: ChartConfig): ChartConfig | undefined {
+export function alpha3(
+  config?: ChartDetailConfigDTO,
+): ChartDetailConfigDTO | undefined {
   try {
-    if (hasWrongDimensionName(config)) {
-      const metricSection = config?.datas?.find(d => d.key === 'metrics');
+    if (hasWrongDimensionName(config?.chartConfig)) {
+      const metricSection = config?.chartConfig?.datas?.find(
+        d => d.key === 'metrics',
+      );
       if (!isUndefined(metricSection)) {
         metricSection.key = 'dimension';
       }
-      const wrongNameOfDimension = config?.datas?.find(
+      const wrongNameOfDimension = config?.chartConfig?.datas?.find(
         d => d.key === 'deminsion',
       );
       if (!isUndefined(wrongNameOfDimension)) {
         wrongNameOfDimension!.key = 'metrics';
       }
 
-      const wrongNameOfDimensionL = config?.datas?.find(
+      const wrongNameOfDimensionL = config?.chartConfig?.datas?.find(
         d => d.key === 'deminsionL',
       );
       if (!isUndefined(wrongNameOfDimensionL)) {
         wrongNameOfDimensionL!.key = 'metricsL';
       }
 
-      const wrongNameOfDimensionR = config?.datas?.find(
+      const wrongNameOfDimensionR = config?.chartConfig?.datas?.find(
         d => d.key === 'deminsionR',
       );
       if (!isUndefined(wrongNameOfDimensionR)) {

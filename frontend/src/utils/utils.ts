@@ -10,7 +10,7 @@ import {
 import { APIResponse } from 'types';
 import { SaveFormModel } from '../app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { removeToken } from './auth';
-export { default as uuidv4 } from 'uuid/dist/esm-browser/v4';
+export { default as uuidv4 } from 'uuid/dist/umd/uuidv4.min';
 
 export function errorHandle(error) {
   if (error?.response) {
@@ -33,6 +33,7 @@ export function errorHandle(error) {
   }
   return error;
 }
+
 export function getErrorMessage(error) {
   if (error?.response) {
     const { response } = error as AxiosError;
@@ -47,6 +48,7 @@ export function getErrorMessage(error) {
   }
   return error?.message;
 }
+
 export function reduxActionErrorHandler(errorAction) {
   if (errorAction?.payload) {
     message.error(errorAction?.payload);
@@ -56,6 +58,9 @@ export function reduxActionErrorHandler(errorAction) {
 }
 
 export function rejectHandle(error, rejectWithValue) {
+  if (error?.response?.status === 401) {
+    removeToken();
+  }
   if ((error as AxiosError).response) {
     return rejectWithValue(
       ((error as AxiosError).response as AxiosResponse<APIResponse<any>>).data
@@ -216,7 +221,7 @@ export const getInsertedNodeIndex = (
   if (viewData?.length) {
     let IndexArr = viewData
       .filter((v: any) => v.parentId == AddData.parentId)
-      .map(v => Number(v.index) || 0);
+      .map(val => Number(val.index) || 0);
     index = IndexArr?.length ? Math.max(...IndexArr) + 1 : 0;
   }
   /* eslint-disable */
@@ -230,7 +235,10 @@ export function getPath<T extends { id: string; parentId: string | null }>(
   path: string[] = [],
 ) {
   if (!item?.parentId) {
-    return [rootId].concat(item.id).concat(path);
+    if (item) {
+      return [rootId].concat(item.id).concat(path);
+    }
+    return [rootId].concat(path);
   } else {
     const parent = list.find(({ id }) => id === item.parentId)!;
     return getPath(list, parent, rootId, [item.id].concat(path));
@@ -349,3 +357,50 @@ export function fastDeleteArrayElement(arr: any[], index: number) {
   arr.pop();
 }
 
+export function newIssueUrl({ type, ...options }) {
+  const repoUrl = `https://${type}.com/running-elephant/datart`;
+  let issuesUrl = '';
+
+  if (repoUrl) {
+    issuesUrl = repoUrl;
+  } else {
+    throw new Error(
+      'You need to specify either the `repoUrl` option or both the `user` and `repo` options',
+    );
+  }
+
+  const url = new URL(`${issuesUrl}/issues/new`);
+
+  const types =
+    type === 'gitee'
+      ? ['description', 'title']
+      : [
+          'body',
+          'title',
+          'labels',
+          'template',
+          'milestone',
+          'assignee',
+          'projects',
+        ];
+
+  for (const type of types) {
+    let value = options[type];
+
+    if (value === undefined) {
+      continue;
+    }
+
+    if (type === 'labels' || type === 'projects') {
+      if (!Array.isArray(value)) {
+        throw new TypeError(`The \`${type}\` option should be an array`);
+      }
+
+      value = value.join(',');
+    }
+
+    url.searchParams.set(type, value);
+  }
+
+  return url.toString();
+}

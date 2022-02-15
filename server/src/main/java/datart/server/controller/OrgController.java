@@ -24,6 +24,7 @@ import datart.core.entity.ext.RoleBaseInfo;
 import datart.core.entity.ext.UserBaseInfo;
 import datart.server.base.dto.InviteMemberResponse;
 import datart.server.base.dto.OrganizationBaseInfo;
+import datart.server.base.params.CheckNameParam;
 import datart.server.base.params.OrgCreateParam;
 import datart.server.base.params.OrgUpdateParam;
 import datart.server.base.dto.ResponseData;
@@ -136,9 +137,9 @@ public class OrgController extends BaseController {
 
     @ApiOperation(value = "Check organization name")
     @PostMapping("/check/name")
-    public ResponseData<Boolean> checkOrgName(@RequestParam String name) {
+    public ResponseData<Boolean> checkOrgName(@Validated @RequestBody CheckNameParam param) {
         Organization organization = new Organization();
-        organization.setName(name);
+        organization.setName(param.getName());
         return ResponseData.success(orgService.checkUnique(organization));
     }
 

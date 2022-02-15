@@ -15,15 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   ValueOptionType,
   ValueOptionTypes,
 } from 'app/pages/DashBoardPage/constants';
-import {
-  DEFAULT_VALUE_DATE_FORMAT,
-  VariableValueTypes,
-} from 'app/pages/MainPage/pages/VariablePage/constants';
+import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -33,15 +29,16 @@ import {
   ControllerFacadeTypes as Opt,
   TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
+import i18next from 'i18next';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
+import { TIME_FORMATTER } from './../../../../../../../globalConstants';
 import {
   DateControllerTypes,
   NumericalControllerTypes,
   RangeControlTypes,
 } from './constants';
 import { ControllerConfig, PickerType } from './types';
-
 export const getStringFacadeOptions = (type: ValueOptionType) => {
   switch (type) {
     case 'common':
@@ -118,14 +115,14 @@ export const formatControlDateToMoment = (config: ControllerConfig) => {
     if (filterDate.startTime && filterDate.startTime.exactValue) {
       if (typeof filterDate.startTime.exactValue === 'string') {
         let exactTime = filterDate.startTime.exactValue;
-        let newExactTime = moment(exactTime, DEFAULT_VALUE_DATE_FORMAT);
+        let newExactTime = moment(exactTime, TIME_FORMATTER);
         config.controllerDate.startTime.exactValue = newExactTime;
       }
     }
     if (filterDate.endTime && filterDate.endTime.exactValue) {
       if (typeof filterDate.endTime.exactValue === 'string') {
         let exactTime = filterDate.endTime.exactValue;
-        let newExactTime = moment(exactTime, DEFAULT_VALUE_DATE_FORMAT);
+        let newExactTime = moment(exactTime, TIME_FORMATTER);
         config.controllerDate.endTime!.exactValue = newExactTime;
       }
     }
@@ -139,14 +136,14 @@ export const formatControlDateToStr = (config: ControllerConfig) => {
     if (filterDate.startTime && filterDate.startTime.exactValue) {
       if ((filterDate.startTime.exactValue as Moment).format) {
         let exactTime = filterDate.startTime.exactValue as Moment;
-        let newExactTime = exactTime.format(DEFAULT_VALUE_DATE_FORMAT);
+        let newExactTime = exactTime.format(TIME_FORMATTER);
         config.controllerDate.startTime.exactValue = newExactTime;
       }
     }
     if (filterDate.endTime && filterDate.endTime.exactValue) {
       if ((filterDate.endTime.exactValue as Moment).format) {
         let exactTime = filterDate.endTime.exactValue as Moment;
-        let newExactTime = exactTime.format(DEFAULT_VALUE_DATE_FORMAT);
+        let newExactTime = exactTime.format(TIME_FORMATTER);
         config.controllerDate.endTime!.exactValue = newExactTime;
       }
     }
@@ -295,7 +292,7 @@ export const formatDateByPickType = (
   pickerType: PickerType,
   momentTime: Moment,
 ) => {
-  const formatTemp = DEFAULT_VALUE_DATE_FORMAT;
+  const formatTemp = TIME_FORMATTER;
   if (!momentTime) {
     return null;
   }
@@ -338,13 +335,13 @@ export const rangeNumberValidator = async (_, values: any[]) => {
     return Promise.resolve(values);
   }
   if (!startHasValue && endHasValue) {
-    return Promise.reject(new Error('请填写 起始值'));
+    return Promise.reject(new Error(i18next.t('viz.tips.noStartValue')));
   }
   if (startHasValue && !endHasValue) {
-    return Promise.reject(new Error('请填写 结束值'));
+    return Promise.reject(new Error(i18next.t('viz.tips.noEndValue')));
   }
   if (values?.[0] - values?.[1] > 0) {
-    return Promise.reject(new Error(' 起始值 不该小于 结束值'));
+    return Promise.reject(new Error(i18next.t('viz.tips.endGTStartErr')));
   }
   return Promise.resolve(values);
 };

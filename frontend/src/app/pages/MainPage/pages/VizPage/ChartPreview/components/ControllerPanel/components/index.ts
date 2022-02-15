@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartDTO } from "app/types/ChartDTO";
 import { FilterCondition } from 'app/types/ChartConfig';
 import DropdownListFilter from './DropdownListFilter';
 import MultiDropdownListFilter from './MultiDropdownListFilter';
@@ -33,7 +33,7 @@ import ValueFilter from './ValueFilter';
 
 export type PresentControllerFilterProps = {
   viewId?: string;
-  view?: BackendChart['view'];
+  view?: ChartDTO['view'];
   condition?: FilterCondition;
   onConditionChange: (condition: FilterCondition) => void;
   options: any;

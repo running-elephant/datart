@@ -37,6 +37,7 @@ const SlideBackground: React.FC<IProps> = props => {
       width: `${slideWidth}px`,
       height: `${slideHeight}px`,
       transform: `translate(${translateX}%, ${translateY}%) scale(${scale[0]}, ${scale[1]})`,
+      overflow: editing ? '' : 'hidden',
     };
 
     const backgroundStyle: React.CSSProperties = {};
@@ -50,7 +51,7 @@ const SlideBackground: React.FC<IProps> = props => {
     });
 
     return cssStyle;
-  }, [slideTranslate, slideWidth, slideHeight, scale, scaleMode]);
+  }, [slideTranslate, slideWidth, slideHeight, scale, scaleMode, editing]);
 
   return (
     <Warp

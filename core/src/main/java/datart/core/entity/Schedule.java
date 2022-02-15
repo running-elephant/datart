@@ -1,9 +1,8 @@
 package datart.core.entity;
 
+import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.Date;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

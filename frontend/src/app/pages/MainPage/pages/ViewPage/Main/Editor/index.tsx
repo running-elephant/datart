@@ -23,12 +23,13 @@ import { Toolbar } from './Toolbar';
 
 interface EditorProps {
   allowManage: boolean;
+  allowEnableViz: boolean | undefined;
 }
 
-export const Editor = memo(({ allowManage }: EditorProps) => {
+export const Editor = memo(({ allowManage, allowEnableViz }: EditorProps) => {
   return (
     <Wrapper>
-      <Toolbar allowManage={allowManage} />
+      <Toolbar allowManage={allowManage} allowEnableViz={allowEnableViz} />
       <SQLEditor />
     </Wrapper>
   );

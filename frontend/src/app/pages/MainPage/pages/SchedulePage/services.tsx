@@ -7,7 +7,7 @@ export const checkScheduleName = async (orgId: string, name: string) => {
     const { data } = await request<boolean>({
       url: '/schedules/check/name',
       method: 'POST',
-      params: { orgId, name },
+      data: { orgId, name },
     });
     return data;
   } catch (error) {

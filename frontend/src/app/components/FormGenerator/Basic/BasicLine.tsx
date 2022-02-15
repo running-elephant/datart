@@ -18,7 +18,7 @@
 
 import { Select } from 'antd';
 import { ColorPickerPopover } from 'app/components/ColorPicker';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import { CHART_LINE_STYLES, CHART_LINE_WIDTH } from 'globalConstants';
 import { FC, memo } from 'react';
@@ -27,7 +27,7 @@ import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 import { Group, WithColorPicker } from './components/Group';
 
-const BasicLine: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicLine: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
     const { label, comType, options, ...rest } = data;
 
@@ -42,7 +42,7 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
     };
 
     return (
-      <BW label={!options?.hideLabel ? t(label) : ''}>
+      <BW label={!options?.hideLabel ? t(label, true) : ''}>
         <WithColorPicker>
           <Group>
             <Select
@@ -74,6 +74,7 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           <ColorPickerPopover
             {...rest}
             {...options}
+            size={6}
             defaultValue={data.value?.color}
             onSubmit={hanldePickerSelect}
           />

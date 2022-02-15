@@ -16,25 +16,32 @@
  * limitations under the License.
  */
 
-import { message, Spin } from 'antd';
+import { message } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
-import { publishViz } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
+import {
+  deleteViz,
+  publishViz,
+  removeTab,
+} from 'app/pages/MainPage/pages/VizPage/slice/thunks';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
+import { BoardLoading } from '../../components/BoardLoading';
 import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import { FullScreenPanel } from '../../components/FullScreenPanel';
 import TitleHeader from '../../components/TitleHeader';
-import BoardEditor from '../BoardEditor';
 import { editDashBoardInfoActions } from '../BoardEditor/slice';
 import { clearEditBoardState } from '../BoardEditor/slice/actions/actions';
-import AutoBoardCore from './AutoDashboard/AutoBoardCore';
-import FreeBoardCore from './FreeDashboard/FreeBoardCore';
+import { AutoBoardCore } from './AutoDashboard/AutoBoardCore';
+import { FreeBoardCore } from './FreeDashboard/FreeBoardCore';
 import { boardActions } from './slice';
+import { widgetsQueryAction } from './slice/asyncActions';
 import { makeSelectBoardConfigById } from './slice/selector';
 import { fetchBoardDetail } from './slice/thunk';
 import { BoardState, VizRenderMode } from './slice/types';
@@ -49,12 +56,14 @@ export interface BoardProps {
   allowManage?: boolean;
   autoFit?: boolean;
   showZoomCtrl?: boolean;
+  orgId?: string;
 }
 
 export const Board: React.FC<BoardProps> = memo(
   ({
     id,
     hideTitle,
+    orgId,
     fetchData = true,
     renderMode,
     filterSearchUrl,
@@ -66,10 +75,17 @@ export const Board: React.FC<BoardProps> = memo(
   }) => {
     const boardId = id;
     const dispatch = useDispatch();
+    const history = useHistory();
+    const tg = useI18NPrefix('global');
     const { ref, width, height } = useResizeObserver<HTMLDivElement>({
       refreshMode: 'debounce',
       refreshRate: 2000,
     });
+    const publishLoading = useSelector(selectPublishLoading);
+    const dashboard = useSelector((state: { board: BoardState }) =>
+      makeSelectBoardConfigById()(state, boardId),
+    );
+
     const searchParams = useMemo(() => {
       return filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
@@ -97,23 +113,21 @@ export const Board: React.FC<BoardProps> = memo(
       };
     }, [boardId, dispatch, fetchData, searchParams]);
 
-    const [showBoardEditor, setShowBoardEditor] = useState(false);
-    const dashboard = useSelector((state: { board: BoardState }) =>
-      makeSelectBoardConfigById()(state, boardId),
-    );
     const toggleBoardEditor = useCallback(
       (bool: boolean) => {
-        setShowBoardEditor(bool);
-        if (!bool) {
-          dispatch(fetchBoardDetail({ dashboardRelId: dashboard?.id || '' }));
+        const pathName = history.location.pathname;
+        if (pathName.includes(boardId)) {
+          history.push(`${pathName.split(boardId)[0]}${boardId}/boardEditor`);
+        } else if (pathName.includes('/vizs')) {
+          history.push(
+            `${pathName.split('/vizs')[0]}${'/vizs/'}${boardId}/boardEditor`,
+          );
         }
       },
-      [dashboard?.id, dispatch],
+      [boardId, history],
     );
 
-    const publishLoading = useSelector(selectPublishLoading);
-
-    const onPublish = useCallback(() => {
+    const handlePublish = useCallback(() => {
       if (dashboard) {
         dispatch(
           publishViz({
@@ -136,8 +150,49 @@ export const Board: React.FC<BoardProps> = memo(
       }
     }, [dashboard, dispatch, boardId]);
 
+    const redirect = useCallback(
+      tabKey => {
+        if (tabKey) {
+          history.push(`/organizations/${orgId}/vizs/${tabKey}`);
+        } else {
+          history.push(`/organizations/${orgId}/vizs`);
+        }
+      },
+      [history, orgId],
+    );
+
+    const handleRecycleViz = useCallback(() => {
+      dispatch(
+        deleteViz({
+          params: { id: boardId, archive: true },
+          type: 'DASHBOARD',
+          resolve: () => {
+            message.success(tg('operation.archiveSuccess'));
+            dispatch(removeTab({ id: boardId, resolve: redirect }));
+          },
+        }),
+      );
+    }, [boardId, dispatch, redirect, tg]);
+
+    const handleAddToStory = useCallback(
+      storyId => {
+        history.push({
+          pathname: `/organizations/${orgId}/vizs/${storyId}/storyEditor`,
+          state: {
+            addDashboardId: boardId,
+          },
+        });
+      },
+      [history, orgId, boardId],
+    );
+
+    const handleSyncData = useCallback(() => {
+      dispatch(widgetsQueryAction({ boardId, renderMode }));
+    }, [dispatch, boardId, renderMode]);
+
     const viewBoard = useMemo(() => {
       let boardType = dashboard?.config?.type;
+
       if (dashboard && boardType) {
         return (
           <div className="board-provider">
@@ -152,9 +207,13 @@ export const Board: React.FC<BoardProps> = memo(
             >
               {!hideTitle && (
                 <TitleHeader
+                  orgId={orgId}
                   publishLoading={publishLoading}
                   toggleBoardEditor={toggleBoardEditor}
-                  onPublish={onPublish}
+                  onPublish={handlePublish}
+                  onRecycleViz={handleRecycleViz}
+                  onAddToStory={handleAddToStory}
+                  onSyncData={handleSyncData}
                 />
               )}
               {boardType === 'auto' && <AutoBoardCore boardId={dashboard.id} />}
@@ -169,13 +228,10 @@ export const Board: React.FC<BoardProps> = memo(
           </div>
         );
       } else {
-        return (
-          <div className="loading">
-            <Spin size="large" tip="Loading..." />
-          </div>
-        );
+        return <BoardLoading />;
       }
     }, [
+      orgId,
       dashboard,
       autoFit,
       renderMode,
@@ -185,7 +241,10 @@ export const Board: React.FC<BoardProps> = memo(
       hideTitle,
       publishLoading,
       toggleBoardEditor,
-      onPublish,
+      handlePublish,
+      handleRecycleViz,
+      handleAddToStory,
+      handleSyncData,
       showZoomCtrl,
     ]);
 
@@ -207,15 +266,6 @@ export const Board: React.FC<BoardProps> = memo(
     return (
       <Wrapper ref={ref} className="dashboard-box">
         <DndProvider backend={HTML5Backend}>{viewBoard}</DndProvider>
-        {showBoardEditor && (
-          <BoardEditor
-            dashboardId={boardId}
-            allowDownload={allowDownload}
-            allowShare={allowShare}
-            allowManage={allowManage}
-            onCloseBoardEditor={toggleBoardEditor}
-          />
-        )}
       </Wrapper>
     );
   },
@@ -234,11 +284,5 @@ const Wrapper = styled.div<{}>`
     flex: 1;
     flex-direction: column;
     min-height: 0;
-  }
-  .loading {
-    display: flex;
-    flex: 1;
-    justify-content: center;
-    align-items: center;
   }
 `;

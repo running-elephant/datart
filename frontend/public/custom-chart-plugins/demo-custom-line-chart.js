@@ -97,7 +97,7 @@ function DemoCustomLineChart({ dHelper }) {
             },
 
             {
-              label: 'font',
+              label: 'viz.palette.style.font',
               key: 'font',
               comType: 'font',
               default: {
@@ -153,7 +153,7 @@ function DemoCustomLineChart({ dHelper }) {
               },
             },
             {
-              label: 'font',
+              label: 'viz.palette.style.font',
               key: 'font',
               comType: 'font',
               default: {
@@ -200,7 +200,7 @@ function DemoCustomLineChart({ dHelper }) {
               options: [],
             },
             {
-              label: 'font',
+              label: 'viz.palette.style.font',
               key: 'font',
               comType: 'font',
               default: {
@@ -266,7 +266,7 @@ function DemoCustomLineChart({ dHelper }) {
               options: [],
             },
             {
-              label: 'font',
+              label: 'viz.palette.style.font',
               key: 'font',
               comType: 'font',
               default: {
@@ -373,36 +373,36 @@ function DemoCustomLineChart({ dHelper }) {
           ],
         },
         {
-          label: 'margin.title',
+          label: 'viz.palette.style.margin.title',
           key: 'margin',
           comType: 'group',
           rows: [
             {
-              label: 'margin.containLabel',
+              label: 'viz.palette.style.margin.containLabel',
               key: 'containLabel',
               default: true,
               comType: 'checkbox',
             },
             {
-              label: 'margin.left',
+              label: 'viz.palette.style.margin.left',
               key: 'marginLeft',
               default: '5%',
               comType: 'marginWidth',
             },
             {
-              label: 'margin.right',
+              label: 'viz.palette.style.margin.right',
               key: 'marginRight',
               default: '5%',
               comType: 'marginWidth',
             },
             {
-              label: 'margin.top',
+              label: 'viz.palette.style.margin.top',
               key: 'marginTop',
-              default: '15%',
+              default: '5%',
               comType: 'marginWidth',
             },
             {
-              label: 'margin.bottom',
+              label: 'viz.palette.style.margin.bottom',
               key: 'marginBottom',
               default: '5%',
               comType: 'marginWidth',
@@ -412,12 +412,12 @@ function DemoCustomLineChart({ dHelper }) {
       ],
       settings: [
         {
-          label: 'paging.title',
+          label: 'viz.palette.setting.paging.title',
           key: 'paging',
           comType: 'group',
           rows: [
             {
-              label: 'paging.pageSize',
+              label: 'viz.palette.setting.paging.pageSize',
               key: 'pageSize',
               default: 1000,
               comType: 'inputNumber',
@@ -434,6 +434,7 @@ function DemoCustomLineChart({ dHelper }) {
         {
           lang: 'zh-CN',
           translation: {
+            chartName: '[Experiment] 用户自定义折线图',
             common: {
               showAxis: '显示坐标轴',
               inverseAxis: '反转坐标轴',
@@ -493,13 +494,76 @@ function DemoCustomLineChart({ dHelper }) {
             },
           },
         },
+        {
+          lang: 'en-US',
+          translation: {
+            chartName: '[Experiment] Custom Line Chart',
+            common: {
+              showAxis: 'Show Axis',
+              inverseAxis: 'Inverse Axis',
+              lineStyle: 'Line Style',
+              borderType: 'Border Type',
+              borderWidth: 'Border Width',
+              borderColor: 'Border Color',
+              backgroundColor: 'Background Color',
+              showLabel: 'Show Label',
+              unitFont: 'Unit Font',
+              rotate: 'Rotate',
+              position: 'Position',
+              showInterval: 'Show Interval',
+              interval: 'Interval',
+              showTitleAndUnit: 'Show Title and Unit',
+              nameLocation: 'Name Location',
+              nameRotate: 'Name Rotate',
+              nameGap: 'Name Gap',
+              min: 'Min',
+              max: 'Max',
+            },
+            label: {
+              title: 'Label',
+              showLabel: 'Show Label',
+              position: 'Position',
+            },
+            legend: {
+              title: 'Legend',
+              showLegend: 'Show Legend',
+              type: 'Type',
+              selectAll: 'Select All',
+              position: 'Position',
+            },
+            data: {
+              color: 'Color',
+              colorize: 'Colorize',
+            },
+            graph: {
+              title: 'Graph',
+              smooth: 'Smooth',
+              step: 'Step',
+            },
+            xAxis: {
+              title: 'X Axis',
+            },
+            yAxis: {
+              title: 'Y Axis',
+            },
+            splitLine: {
+              title: 'Split Line',
+              showHorizonLine: 'Show Horizontal Line',
+              showVerticalLine: 'Show Vertical Line',
+            },
+            reference: {
+              title: 'Reference',
+              open: 'Open',
+            },
+          },
+        },
       ],
     },
     isISOContainer: 'demo-customize-line-chart',
     dependency: ['https://lib.baomitu.com/echarts/5.0.2/echarts.min.js'],
     meta: {
       id: 'demo-custom-line-chart',
-      name: '[DEMO]用户自定义折线图',
+      name: 'chartName',
       icon: svgIcon,
       requirements: [
         {
@@ -548,17 +612,18 @@ function DemoCustomLineChart({ dHelper }) {
         .filter(c => c.type === 'aggregate')
         .flatMap(config => config.rows || []);
 
-      const objDataColumns = dHelper.transformToObjectArray(
+      const chartDataSet = dHelper.transformToDataSet(
         dataset.rows,
         dataset.columns,
+        dataConfigs,
       );
-      const dataColumns = objDataColumns;
+
       const xAxisColumns = groupConfigs.map(config => {
         return {
           type: 'category',
           boundaryGap: false,
           tooltip: { show: true },
-          data: dataColumns.map(dc => dc[dHelper.getValueByColumnKey(config)]),
+          data: chartDataSet.map(row => row.getCell(config)),
         };
       });
       const yAxisColumns = aggregateConfigs.map((config, index) => {
@@ -568,14 +633,14 @@ function DemoCustomLineChart({ dHelper }) {
           sampling: 'average',
           areaStyle: this.isArea ? {} : undefined,
           stack: this.isStack ? 'total' : undefined,
-          data: dataColumns.map(dc => dc[dHelper.getValueByColumnKey(config)]),
+          data: chartDataSet.map(row => row.getCell(config)),
           ...this.getLabelStyle(styleConfigs),
           ...this.getSeriesStyle(styleConfigs),
         };
       });
 
-      const { min, max } = dHelper.getDataColumnMaxAndMin(
-        objDataColumns,
+      const { min, max } = dHelper.getDataColumnMaxAndMin2(
+        chartDataSet,
         aggregateConfigs[0],
       );
 
@@ -594,91 +659,52 @@ function DemoCustomLineChart({ dHelper }) {
           styleConfigs,
           yAxisColumns.map(col => col?.name) || [],
         ),
-        grid: this.getGrid(styleConfigs),
+        grid: dHelper.getGridStyle(styleConfigs),
         xAxis: this.getXAxis(styleConfigs, xAxisColumns),
         yAxis: this.getYAxis(styleConfigs, yAxisColumns),
         series: yAxisColumns,
       };
     },
 
-    getGrid(styles) {
-      const containLabel = dHelper.getStyleValueByGroup(
-        styles,
-        'margin',
-        'containLabel',
-      );
-      const left = dHelper.getStyleValueByGroup(styles, 'margin', 'marginLeft');
-      const right = dHelper.getStyleValueByGroup(
-        styles,
-        'margin',
-        'marginRight',
-      );
-      const bottom = dHelper.getStyleValueByGroup(
-        styles,
-        'margin',
-        'marginBottom',
-      );
-      const top = dHelper.getStyleValueByGroup(styles, 'margin', 'marginTop');
-      return { left, right, bottom, top, containLabel };
-    },
-
     getYAxis(styles, yAxisColumns) {
-      const showAxis = dHelper.getStyleValueByGroup(
+      const [
+        showAxis,
+        inverse,
+        lineStyle,
+        showLabel,
+        font,
+        showTitleAndUnit,
+        unitFont,
+        nameLocation,
+        nameGap,
+        nameRotate,
+        min,
+        max,
+      ] = dHelper.getStyles(
         styles,
-        'yAxis',
-        'showAxis',
-      );
-      const inverse = dHelper.getStyleValueByGroup(
-        styles,
-        'yAxis',
-        'inverseAxis',
-      );
-      const lineStyle = dHelper.getStyleValueByGroup(
-        styles,
-        'yAxis',
-        'lineStyle',
-      );
-      const showLabel = dHelper.getStyleValueByGroup(
-        styles,
-        'yAxis',
-        'showLabel',
-      );
-      const font = dHelper.getStyleValueByGroup(styles, 'yAxis', 'font');
-      const unitFont = dHelper.getStyleValueByGroup(
-        styles,
-        'yAxis',
-        'unitFont',
-      );
-      const showTitleAndUnit = dHelper.getStyleValueByGroup(
-        styles,
-        'yAxis',
-        'showTitleAndUnit',
+        ['yAxis'],
+        [
+          'showAxis',
+          'inverseAxis',
+          'lineStyle',
+          'showLabel',
+          'font',
+          'showTitleAndUnit',
+          'unitFont',
+          'nameLocation',
+          'nameGap',
+          'nameRotate',
+          'min',
+          'max',
+        ],
       );
       const name = showTitleAndUnit
         ? yAxisColumns.map(c => c.name).join(' / ')
         : null;
-      const nameLocation = dHelper.getStyleValueByGroup(
+      const [showHorizonLine, horizonLineStyle] = dHelper.getStyles(
         styles,
-        'yAxis',
-        'nameLocation',
-      );
-      const nameGap = dHelper.getStyleValueByGroup(styles, 'yAxis', 'nameGap');
-      const nameRotate = dHelper.getStyleValueByGroup(
-        styles,
-        'yAxis',
-        'nameRotate',
-      );
-      const min = dHelper.getStyleValueByGroup(styles, 'yAxis', 'min');
-      const max = dHelper.getStyleValueByGroup(styles, 'yAxis', 'max');
-      const showHorizonLine = dHelper.getStyleValueByGroup(
-        styles,
-        'splitLine',
-        'showHorizonLine',
-      );
-      const horizonLineStyle = dHelper.getStyleValueByGroup(
-        styles,
-        'splitLine',
-        'horizonLineStyle',
+        ['splitLine'],
+        ['showHorizonLine', 'horizonLineStyle'],
       );
 
       return {
@@ -704,47 +730,33 @@ function DemoCustomLineChart({ dHelper }) {
 
     getXAxis(styles, xAxisColumns) {
       const axisColumnInfo = xAxisColumns[0];
-      const showAxis = dHelper.getStyleValueByGroup(
+      const [
+        showAxis,
+        inverse,
+        lineStyle,
+        showLabel,
+        font,
+        rotate,
+        showInterval,
+        interval,
+      ] = dHelper.getStyles(
         styles,
-        'xAxis',
-        'showAxis',
+        ['xAxis'],
+        [
+          'showAxis',
+          'inverseAxis',
+          'lineStyle',
+          'showLabel',
+          'font',
+          'rotate',
+          'showInterval',
+          'interval',
+        ],
       );
-      const inverse = dHelper.getStyleValueByGroup(
+      const [showVerticalLine, verticalLineStyle] = dHelper.getStyles(
         styles,
-        'xAxis',
-        'inverseAxis',
-      );
-      const lineStyle = dHelper.getStyleValueByGroup(
-        styles,
-        'xAxis',
-        'lineStyle',
-      );
-      const showLabel = dHelper.getStyleValueByGroup(
-        styles,
-        'xAxis',
-        'showLabel',
-      );
-      const font = dHelper.getStyleValueByGroup(styles, 'xAxis', 'font');
-      const rotate = dHelper.getStyleValueByGroup(styles, 'xAxis', 'rotate');
-      const showInterval = dHelper.getStyleValueByGroup(
-        styles,
-        'xAxis',
-        'showInterval',
-      );
-      const interval = dHelper.getStyleValueByGroup(
-        styles,
-        'xAxis',
-        'interval',
-      );
-      const showVerticalLine = dHelper.getStyleValueByGroup(
-        styles,
-        'splitLine',
-        'showVerticalLine',
-      );
-      const verticalLineStyle = dHelper.getStyleValueByGroup(
-        styles,
-        'splitLine',
-        'verticalLineStyle',
+        ['splitLine'],
+        ['showVerticalLine', 'verticalLineStyle'],
       );
 
       return {
@@ -763,18 +775,10 @@ function DemoCustomLineChart({ dHelper }) {
     },
 
     getLegendStyle(styles, seriesNames) {
-      const show = dHelper.getStyleValueByGroup(styles, 'legend', 'showLegend');
-      const type = dHelper.getStyleValueByGroup(styles, 'legend', 'type');
-      const font = dHelper.getStyleValueByGroup(styles, 'legend', 'font');
-      const legendPos = dHelper.getStyleValueByGroup(
+      const [show, type, font, legendPos, selectAll] = dHelper.getStyles(
         styles,
-        'legend',
-        'position',
-      );
-      const selectAll = dHelper.getStyleValueByGroup(
-        styles,
-        'legend',
-        'selectAll',
+        ['legend'],
+        ['showLegend', 'type', 'font', 'position', 'selectAll'],
       );
       let positions = {};
       let orient = {};
@@ -817,25 +821,21 @@ function DemoCustomLineChart({ dHelper }) {
     },
 
     getLabelStyle(styles) {
-      const show = dHelper.getStyleValueByGroup(styles, 'label', 'showLabel');
-      const position = dHelper.getStyleValueByGroup(
+      const [show, position, font] = dHelper.getStyles(
         styles,
-        'label',
-        'position',
+        ['label'],
+        ['showLabel', 'position', 'font'],
       );
-      const font = dHelper.getStyleValueByGroup(styles, 'label', 'font');
       return { label: { show, position, ...font } };
     },
 
     getSeriesStyle(styles) {
-      const smooth = dHelper.getStyleValueByGroup(styles, 'graph', 'smooth');
-      const step = dHelper.getStyleValueByGroup(styles, 'graph', 'step');
+      const [smooth, step] = dHelper.getStyles(
+        styles,
+        ['graph'],
+        ['smooth', 'step'],
+      );
       return { smooth, step };
-    },
-
-    getStyleValueByGroup(styles, groupPath, childPath) {
-      const childPaths = childPath.split('.');
-      return this.getStyleValue(styles, [groupPath, ...childPaths]);
     },
   };
 }

@@ -1,25 +1,44 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import {
-  ContainerWidgetContent,
-  ControllerWidgetContent,
-  getDataOption,
-  VizRenderMode,
-  Widget,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { shareActions } from 'app/pages/SharePage/slice';
 import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
+import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
-import { request } from 'utils/request';
-import { errorHandle, getErrorMessage } from 'utils/utils';
+import { request2 } from 'utils/request';
+import { getErrorMessage } from 'utils/utils';
 import { boardActions } from '.';
 import { getChartWidgetRequestParams } from '../../../utils';
 import { handleServerBoardAction } from './asyncActions';
 import { selectBoardById, selectBoardWidgetMap } from './selector';
-import { BoardState, ServerDashboard, WidgetData } from './types';
-
+import {
+  BoardState,
+  ContainerWidgetContent,
+  ControllerWidgetContent,
+  getDataOption,
+  ServerDashboard,
+  VizRenderMode,
+  Widget,
+  WidgetData,
+} from './types';
 /**
  * @param ''
  * @description '先拿本地缓存，没有缓存再去服务端拉数据'
@@ -57,23 +76,18 @@ export const fetchBoardDetail = createAsyncThunk<
   null,
   { dashboardRelId: string; filterSearchParams?: FilterSearchParams }
 >('board/fetchBoardDetail', async (params, { dispatch, rejectWithValue }) => {
-  try {
-    const { data } = await request<ServerDashboard>(
-      `/viz/dashboards/${params?.dashboardRelId}`,
-    );
+  const { data } = await request2<ServerDashboard>(
+    `/viz/dashboards/${params?.dashboardRelId}`,
+  );
 
-    await dispatch(
-      handleServerBoardAction({
-        data,
-        renderMode: 'read',
-        filterSearchMap: { params: params?.filterSearchParams },
-      }),
-    );
-    return null;
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
+  await dispatch(
+    handleServerBoardAction({
+      data,
+      renderMode: 'read',
+      filterSearchMap: { params: params?.filterSearchParams },
+    }),
+  );
+  return null;
 });
 
 export const fetchBoardDetailInShare = createAsyncThunk<
@@ -86,38 +100,33 @@ export const fetchBoardDetailInShare = createAsyncThunk<
 >(
   'board/fetchBoardDetailInShare',
   async (params, { dispatch, rejectWithValue }) => {
-    try {
-      const { vizToken } = params;
-      const { data } = await request<ShareVizInfo>({
-        url: '/share/viz',
-        method: 'GET',
-        params: {
-          shareToken: vizToken.token,
-          password: vizToken.password,
+    const { vizToken } = params;
+    const { data } = await request2<ShareVizInfo>({
+      url: '/share/viz',
+      method: 'GET',
+      params: {
+        shareToken: vizToken.token,
+        password: vizToken.password,
+      },
+    });
+    dispatch(
+      shareActions.setExecuteTokenMap({
+        executeToken: data.executeToken,
+      }),
+    );
+    const serverBoard = data.vizDetail as ServerDashboard;
+    dispatch(
+      handleServerBoardAction({
+        data: serverBoard,
+        renderMode: 'share',
+        filterSearchMap: {
+          params: params.filterSearchParams,
+          isMatchByName: true,
         },
-      });
-      dispatch(
-        shareActions.setExecuteTokenMap({
-          executeToken: data.executeToken,
-        }),
-      );
-      const serverBoard = data.vizDetail as ServerDashboard;
-      dispatch(
-        handleServerBoardAction({
-          data: serverBoard,
-          renderMode: 'share',
-          filterSearchMap: {
-            params: params.filterSearchParams,
-            isMatchByName: true,
-          },
-        }),
-      );
+      }),
+    );
 
-      return null;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    return null;
   },
 );
 export const renderedWidgetAsync = createAsyncThunk<
@@ -234,7 +243,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
     let widgetData;
     try {
       if (renderMode === 'read') {
-        const { data } = await request<WidgetData>({
+        const { data } = await request2<WidgetData>({
           method: 'POST',
           url: `data-provider/execute`,
           data: requestParams,
@@ -246,7 +255,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
         const dataChart = dataChartMap[curWidget.datachartId];
         const viewId = viewMap[dataChart.viewId].id;
         const executeToken = executeTokenMap?.[viewId];
-        const { data } = await request<WidgetData>({
+        const { data } = await request2<WidgetData>({
           method: 'POST',
           url: `share/execute`,
           params: {
@@ -257,7 +266,11 @@ export const getChartWidgetDataAsync = createAsyncThunk<
         });
         widgetData = { ...data, id: widgetId };
       }
-      dispatch(boardActions.setWidgetData(widgetData as WidgetData));
+      dispatch(
+        boardActions.setWidgetData(
+          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        ),
+      );
       dispatch(
         boardActions.changePageInfo({
           boardId,
@@ -322,11 +335,11 @@ export const getControllerOptions = createAsyncThunk<
     const content = widget.config.content as ControllerWidgetContent;
     const config = content.config;
     if (!Array.isArray(config.assistViewFields)) return null;
-    if (config.assistViewFields.length !== 2) return null;
+    if (config.assistViewFields.length < 2) return null;
 
     const executeTokenMap = (getState() as RootState)?.share?.executeTokenMap;
 
-    const [viewId, viewField] = config.assistViewFields;
+    const [viewId, ...columns] = config.assistViewFields;
 
     const executeToken = executeTokenMap?.[viewId];
 
@@ -334,7 +347,7 @@ export const getControllerOptions = createAsyncThunk<
     if (!view) return null;
     const requestParams = getControlOptionQueryParams({
       view,
-      field: viewField,
+      columns: columns,
       curWidget: widget,
       widgetMap,
     });
@@ -345,7 +358,7 @@ export const getControllerOptions = createAsyncThunk<
     let widgetData;
     try {
       if (executeToken && renderMode !== 'read') {
-        const { data } = await request<ChartDataset>({
+        const { data } = await request2<ChartDataSetDTO>({
           method: 'POST',
           url: `share/execute`,
           params: {
@@ -355,16 +368,19 @@ export const getControllerOptions = createAsyncThunk<
           data: requestParams,
         });
         widgetData = { ...data, id: widget.id };
-        dispatch(boardActions.setWidgetData(widgetData as WidgetData));
       } else {
-        const { data } = await request<WidgetData>({
+        const { data } = await request2<WidgetData>({
           method: 'POST',
           url: `data-provider/execute`,
           data: requestParams,
         });
         widgetData = { ...data, id: widget.id };
-        dispatch(boardActions.setWidgetData(widgetData as WidgetData));
       }
+      dispatch(
+        boardActions.setWidgetData(
+          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        ),
+      );
       dispatch(
         boardActions.setWidgetErrInfo({
           boardId,

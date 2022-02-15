@@ -18,7 +18,7 @@
 import { ChartEditorProps } from 'app/components/ChartEditor';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
-import { ChartDatasetMeta } from 'app/types/ChartDataset';
+import { ChartDatasetMeta } from 'app/types/ChartDataSet';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -27,13 +27,11 @@ import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
 import { ChartDataSectionField } from '../../../../../types/ChartConfig';
-import {
-  PageInfo,
-  View,
-} from '../../../../MainPage/pages/ViewPage/slice/types';
+import { View } from '../../../../../types/View';
+import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import {
   BorderStyleType,
-  LAYOUT_COLS,
+  LAYOUT_COLS_MAP,
   ScaleModeType,
   TextAlignType,
 } from '../../../constants';
@@ -82,26 +80,29 @@ export interface ServerDashboard extends Omit<Dashboard, 'config'> {
   widgets: ServerWidget[];
 }
 export interface DashboardConfig {
+  version: string;
   background: BackgroundConfig;
   widgetDefaultSettings: {
     background: BackgroundConfig;
     boxShadow?: boolean;
   };
   maxWidgetIndex: number;
+  initialQuery: boolean;
+  hasQueryControl: boolean;
+  hasResetControl: boolean;
   type: BoardType; //'auto','free'
+
   // auto
   margin: [number, number];
   containerPadding: [number, number];
-  rowHeight: number;
-  cols: ColsType;
+  mobileMargin: [number, number];
+  mobileContainerPadding: [number, number];
+  cols?: ColsType;
   // free
   width: number;
   height: number;
   gridStep: [number, number];
   scaleMode: ScaleModeType;
-  initialQuery: boolean;
-  hasQueryControl: boolean; // TODO migration del ? -- xld
-  hasResetControl?: boolean; // TODO migration del ? -- xld
 }
 export const BoardTypeMap = strEnumType(['auto', 'free']);
 export type BoardType = keyof typeof BoardTypeMap;
@@ -124,6 +125,7 @@ export interface ServerWidget extends Omit<Widget, 'config' | 'relations'> {
   relations: ServerRelation[];
 }
 export interface WidgetConf {
+  version: string;
   index: number;
   tabId?: string; //记录在父容器tab的位置
   name: string;
@@ -132,7 +134,8 @@ export interface WidgetConf {
   type: WidgetType;
   autoUpdate: boolean;
   frequency: number; // 定时同步频率
-  rect: RectConfig; //
+  rect: RectConfig; //desktop_rect
+  mobileRect?: RectConfig; //mobile_rect 移动端适配
   background: BackgroundConfig;
   border: BorderConfig;
   content: WidgetContent;
@@ -280,7 +283,7 @@ export type MediaWidgetContent = {
   timerConfig?: {
     time: {
       timeDuration: number; // 定时器刷新时间
-      timeFormat: string; // 'YYYY-MM-DD HH:mm:ss'
+      timeFormat: string; //
     };
     font: {
       color: string;
@@ -411,7 +414,7 @@ export interface DataChartConfig {
   computedFields: any[];
 }
 
-export type ColsType = typeof LAYOUT_COLS;
+export type ColsType = typeof LAYOUT_COLS_MAP;
 
 // Dashboard view model
 export interface BoardInfo {
@@ -425,7 +428,8 @@ export interface BoardInfo {
   showBlockMask: boolean; //?
   isDroppable: boolean;
   clipboardWidgets: Record<string, WidgetOfCopy>;
-  layouts: Layout[]; // 删除
+  layouts: Layout[];
+  deviceType: DeviceType; // deviceType for autoBoard defaultValue = desktop
   widgetIds: string[]; // board保存的时候 区分那些是删除的，哪些是新增的
   controllerPanel: WidgetControllerPanelParams; //
   linkagePanel: WidgetPanelParams;
@@ -436,6 +440,10 @@ export interface BoardInfo {
   hasFetchItems: string[];
   boardWidthHeight: [number, number];
   originControllerWidgets: Widget[]; // use for reset button
+}
+export enum DeviceType {
+  Desktop = 'desktop',
+  Mobile = 'mobile',
 }
 export interface BoardLinkFilter {
   triggerWidgetId: string;

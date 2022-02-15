@@ -19,6 +19,9 @@
 import { Button, Row, Select, Space, Tabs, Transfer, Tree } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
+import ChartFilterCondition, {
+  ConditionBuilder,
+} from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
 import {
   FilterConditionType,
   RelationFilterValue,
@@ -26,12 +29,10 @@ import {
 import ChartDataView from 'app/types/ChartDataView';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FilterSqlOperator } from 'globalConstants';
-import { FC, memo, useState } from 'react';
+import { FC, memo, useCallback, useState } from 'react';
 import styled from 'styled-components/macro';
+import { SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
 import { IsKeyIn, isTreeModel } from 'utils/object';
-import ChartFilterCondition, {
-  ConditionBuilder,
-} from '../../../../../models/ChartFilterCondition';
 import CategoryConditionEditableTable from './CategoryConditionEditableTable';
 import CategoryConditionRelationSelector from './CategoryConditionRelationSelector';
 
@@ -100,10 +101,10 @@ const CategoryConditionConfiguration: FC<
     const isChecked = (selectedKeys, eventKey) =>
       selectedKeys.indexOf(eventKey) !== -1;
 
-    const fetchNewDataset = async (viewId, colName) => {
+    const fetchNewDataset = async (viewId, colName: string) => {
       const fieldDataset = await getDistinctFields(
         viewId,
-        colName,
+        [colName],
         undefined,
         undefined,
       );
@@ -142,6 +143,11 @@ const CategoryConditionConfiguration: FC<
         .asGeneral();
       onConditionChange(filter);
     };
+
+    const filterGeneralListOptions = useCallback(
+      (inputValue, option) => option.label.includes(inputValue),
+      [],
+    );
 
     const handleGeneralTreeChange = async treeSelectedKeys => {
       const selectedKeys = treeSelectedKeys.checked;
@@ -307,7 +313,6 @@ const CategoryConditionConfiguration: FC<
           )}
           {!isTree && (
             <Transfer
-              style={{ marginTop: 10 }}
               operations={[t('moveToRight'), t('moveToLeft')]}
               dataSource={listDatas}
               titles={[`${t('sourceList')}`, `${t('targetList')}`]}
@@ -316,6 +321,8 @@ const CategoryConditionConfiguration: FC<
               onChange={handleGeneralListChange}
               onSelectChange={onSelectChange}
               render={item => item.label}
+              showSearch
+              filterOption={filterGeneralListOptions}
             />
           )}
         </Tabs.TabPane>
@@ -359,12 +366,17 @@ const StyledTabs = styled(Tabs)`
     align-self: end;
   }
 
-  .ant-transfer .ant-transfer-list {
-    width: 40%;
-  }
+  .ant-transfer {
+    margin: ${SPACE_XS} 0;
 
-  .ant-transfer .ant-transfer-operation {
-    width: 100px;
+    /* 
+     * will be solved by upgrading antd to version a 4.17.x+
+     * https://github.com/ant-design/ant-design/pull/31809 
+     */
+    .ant-transfer-list {
+      width: ${SPACE_TIMES(56)};
+      height: ${SPACE_TIMES(64)};
+    }
   }
 
   .ant-select {

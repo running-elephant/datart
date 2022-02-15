@@ -262,3 +262,34 @@ export function getSaveParamsFromViewModel(
     };
   }
 }
+
+export function transformModelToViewModel(
+  data,
+  tempViewModel?: object,
+): ViewViewModel {
+  const {
+    config,
+    model,
+    variables,
+    relVariableSubjects,
+    relSubjectColumns,
+    ...rest
+  } = data;
+
+  return {
+    ...tempViewModel,
+    ...rest,
+    config: JSON.parse(config),
+    model: JSON.parse(model),
+    originVariables: variables.map(v => ({ ...v, relVariableSubjects })),
+    variables: variables.map(v => ({ ...v, relVariableSubjects })),
+    originColumnPermissions: relSubjectColumns.map(r => ({
+      ...r,
+      columnPermission: JSON.parse(r.columnPermission),
+    })),
+    columnPermissions: relSubjectColumns.map(r => ({
+      ...r,
+      columnPermission: JSON.parse(r.columnPermission),
+    })),
+  };
+}

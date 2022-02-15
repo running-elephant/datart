@@ -1,5 +1,6 @@
 {
   "global": {
+    "copy": "副本",
     "tokenExpired": "会话过期，请重新登录",
     "title": {
       "action": "操作"
@@ -13,7 +14,10 @@
       "delete": "删除",
       "info": "基本信息",
       "open": "开启",
-      "close": "关闭"
+      "close": "关闭",
+      "saveAs": "另存为",
+      "cancel": "取消",
+      "ok": "确定"
     },
     "operation": {
       "archiveConfirm": "确定移至回收站？",
@@ -92,7 +96,11 @@
     "tipDesc4": "没有收到？",
     "resend": "重新发送电子邮件",
     "back": "返回上一步",
-    "registrationSuccess": "注册成功"
+    "registerSuccess": "注册成功",
+    "tipDesc5": "点击这里",
+    "tipDesc6": "，或",
+    "goLogin": "去登录",
+    "continue": "继续注册"
   },
   "forgotPassword": {
     "return": "返回登录",
@@ -210,7 +218,7 @@
               "moveToTrash": "移至回收站",
               "delete": "删除",
               "newTimedTask": "新建定时任务",
-              "sureToRestore?": "确定还原？",
+              "sureToRestore": "确定还原？",
               "restore": "还原",
               "sureToDelete": "确定删除？",
               "allowModificationAfterStopping": "停止后允许修改",
@@ -325,7 +333,8 @@
           "tree": "下拉树列表",
           "value": "数值",
           "time": "日期",
-          "slider": "滑块"
+          "slider": "滑块",
+          "rangeSlider": "范围滑块"
         },
         "controllerVisibilityTypes": {
           "hide": "隐藏",
@@ -432,12 +441,13 @@
         "goBack": "返回",
         "run": "执行",
         "save": "保存",
-        "saveToDashboard": "保存到仪表盘",
+        "saveToDashboard": "保存到仪表板",
         "login": "登陆",
         "aggregationSwitch": "数据聚合",
-        "aggregationSwitchTip": "切换数据聚合会清空所有配置，确认开启/关闭？",
+        "aggregationSwitchTip": "开启/关闭数据聚合之前将会清空所有图表配置，确认继续？",
         "open": "开启",
         "close": "关闭",
+        "cancel": "取消",
         "lang": {
           "zh": "中文",
           "en": "英文"
@@ -448,6 +458,7 @@
         }
       },
       "dataview": {
+        "plsSelectDataView": "请选择",
         "createComputedFields": "新建计算字段",
         "createVariableFields": "新建查询变量",
         "fieldName": "名称",
@@ -456,7 +467,10 @@
         "variable": "变量",
         "functions": "函数列表",
         "editField": "编辑",
-        "deleteField": "删除"
+        "deleteField": "删除",
+        "editViewTip": "回到数据视图会丢失当前编辑状态，是否继续？",
+        "editView": "编辑数据视图",
+        "toggleViewTip": "切换数据视图将会清空所有图表配置，确认继续？"
       }
     },
     "palette": {
@@ -533,6 +547,8 @@
         }
       },
       "data": {
+        "column": "列",
+        "row": "行",
         "dimension": "维度",
         "metrics": "指标",
         "mixed": "字段",
@@ -646,13 +662,43 @@
         "needMore": "至少还需要 {{num}} 个 {{type}}"
       },
       "graph": {
+        "names": {
+          "table": "表格",
+          "areaChart": "区域图",
+          "barChart": "条形图",
+          "funnelChart": "漏斗图",
+          "gaugeChart": "仪表盘",
+          "lineChart": "折线图",
+          "outlineMap": "轮廓地图",
+          "pieChart": "饼图",
+          "radarChart": "雷达图",
+          "richText": "富文本",
+          "scatterChart": "散点图",
+          "clusterBarChart": "条形图",
+          "clusterColumnChart": "柱状图",
+          "doughnutChart": "环形图",
+          "normalOutlineMap": "普通轮廓地图",
+          "percentageStackBarChart": "百分比堆叠条形图",
+          "percentageStackColumnChart": "百分比堆叠柱状图",
+          "pivotSheet": "透视表",
+          "roseChart": "玫瑰图",
+          "scatterOutlineMap": "气泡轮廓地图",
+          "scoreChart": "翻牌器",
+          "stackAreaChart": "堆叠面积图",
+          "stackBarChart": "堆叠条形图",
+          "stackColumnChart": "堆叠柱状图",
+          "waterfallChart": "瀑布图",
+          "wordCloudChart": "词云"
+        },
         "group": "维度",
         "aggregate": "指标",
         "onlyAllow": "{{type}} 仅允许数量为 {{num}}",
         "allowRange": "{{type}} 允许范围为 {{start}} 到 {{end}}",
         "confirm": "请确认切换到 {{name}} 图表，这将导致数据被清空",
         "ok": "确认",
-        "cancel": "取消"
+        "cancel": "取消",
+        "number": "序号",
+        "summary": "汇总"
       }
     },
     "action": {
@@ -670,30 +716,34 @@
       "unpublished": "未发布",
       "archived": "已归档",
       "play": "播放",
-      "playTip": "按 Esc 退出播放",
+      "syncData": "同步数据",
+      "addToDash": "添加到仪表板",
+      "addToStory": "添加到故事板",
       "share": {
         "link": "链接",
         "password": "密码",
         "expireDate": "截止日期",
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
-        "shareLink": "分享链接",
-        "downloadData": "下载数据"
+        "shareLink": "分享",
+        "downloadData": "下载为 Excel"
       }
     },
     "board": {
       "action": {
         "dataChart": "数据图表",
-        "addDataChartFormList": "添加已有数据图表",
+        "ImportExistingDataCharts": "引入已有数据图表",
         "createDataChartInBoard": "新建数据图表",
+        "searchValue": "搜索名称关键字",
         "media": "媒体组件",
         "image": "图片",
         "richText": "富文本",
         "timer": "计时器",
-        "iFrame": "iFrame",
+        "iframe": "iframe",
         "video": "视频",
         "container": "容器",
-        "tab": "标签页",
+        "tab": "标签卡",
+        "carousel": "轮播卡",
         "controller": "控制器",
         "toTop": "图层置顶",
         "toBottom": "图层置底",
@@ -701,7 +751,8 @@
         "redo": "重做",
         "delete": "删除",
         "copy": "复制",
-        "paste": "粘贴"
+        "paste": "粘贴",
+        "deviceSwitch": "设备切换"
       },
       "controlTypes": {
         "common": "常规",
@@ -774,7 +825,7 @@
         "image": "图片",
         "richText": "富文本",
         "timer": "时间器",
-        "iFrame": "iFrame",
+        "iframe": "iframe",
         "video": "视频",
         "tab": "Tab"
       },
@@ -825,7 +876,10 @@
         "dashboard": "新建仪表板",
         "dataChart": "新建数据图表",
         "folder": "新建目录",
-        "recycle": "回收站"
+        "recycle": "回收站",
+        "open": "展开",
+        "close": "收起",
+        "startAnalysis": "开始分析"
       },
       "storyboards": {
         "title": "故事板列表",
@@ -851,6 +905,11 @@
       "scaleFull": "全屏铺满",
       "noScale": "实际尺寸"
     },
+    "tips": {
+      "noStartValue": "请填写 起始值",
+      "noEndValue": "请填写 结束值",
+      "endGTStartErr": "起始值 该小于 结束值"
+    },
     "control": {
       "title": "控制器标题",
       "valueConfig": "取值配置",
@@ -863,7 +922,8 @@
       "step": "步长",
       "showMark": "显示标签",
       "common": "常规",
-      "custom": "自定义"
+      "custom": "自定义",
+      "optionLabelField": "取值文本字段"
     },
     "date": {
       "year": "年",
@@ -903,6 +963,10 @@
     "resultEmpty1": "请点击 ",
     "resultEmpty2": " 按钮执行，运行结果将在此处展示",
     "errorTitle": "执行错误",
+    "sqlRunWraning": "SQL 解析失败，欢迎一键提交 issue 帮助我们优化。",
+    "detail": "查看详情",
+    "warningDescription": "Datart 默认使用 calcite 解析 SQL 语句；calcite 拥有的非常棒的语法解析器，但依然做不到解析所有数据库的所有语法。当发生解析异常时，datart 对 SQL 语句进行必要的处理之后仍然会发送到数据库执行，如果可以执行成功，我们会认为解析器需要针对该条 SQL 语句的语法进行优化。在这种情况下，datart 会显示该警告信息，方便用户将解析异常的语句提交到 github 或 gitee issue，帮助我们优化解析器。",
+    "close": "关闭",
     "tabs": {
       "discard": "放弃",
       "cancel": "取消",
@@ -910,6 +974,7 @@
       "warning": "有未执行的修改，是否执行？"
     },
     "editor": {
+      "startAnalysis": "开始分析",
       "folder": "目录",
       "source": "请选择数据源",
       "run": "执行",
@@ -953,7 +1018,9 @@
       "addView": "新建数据视图",
       "addFolder": "新建目录",
       "parent": "所属目录",
-      "recycle": "回收站"
+      "recycle": "回收站",
+      "open": "展开",
+      "close": "收起"
     },
     "saveForm": {
       "title": "数据视图",
@@ -966,7 +1033,7 @@
       "dirtyread": "延迟更新",
       "fastfailover": "快速失败",
       "cache": "缓存",
-      "cacheExpires": "失效时间"
+      "cacheExpires": "有效期(秒)"
     },
     "schemaTable": {
       "category": "分类",
@@ -980,6 +1047,7 @@
     "createSuccess": "新建数据源成功",
     "archived": "已归档",
     "noPermission": "您没有权限访问该页面",
+    "creatView": "去新建数据视图",
     "sidebar": {
       "title": "数据源列表",
       "add": "新建数据源",
@@ -1061,6 +1129,7 @@
     "resourceDetail": "资源明细",
     "createStoryboard": "新增故事板",
     "resourceName": "资源名称",
+    "subjectName": "权限主体名称",
     "privileges": "权限详情",
     "add": "新建",
     "viewpoint": {
@@ -1182,6 +1251,10 @@
     "listTitle": {
       "search": "搜索",
       "searchValue": "搜索名称关键字"
+    },
+    "saveToDashOrStory": {
+      "searchValue": "搜索名称关键字",
+      "haveCharts": "仪表板中已有该图表，不能重复添加"
     }
   }
 }

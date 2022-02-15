@@ -56,10 +56,10 @@ export const RadioGroupController: React.FC<RadioControllerProps> = memo(
       return (options || []).map(o => (
         <RadioItem
           className="radio-item"
-          key={o.value || o.label}
+          key={o.value + o.label}
           value={o.value}
         >
-          {o.label || o.value}
+          {o.label ?? o.value}
         </RadioItem>
       ));
     }, [RadioItem, options]);

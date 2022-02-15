@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
+import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import { handleServerBoardAction } from 'app/pages/DashBoardPage/pages/Board/slice/asyncActions';
 import {
   ServerDashboard,
@@ -28,9 +28,10 @@ import {
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { handleServerStoryAction } from 'app/pages/StoryBoardPage/slice/actions';
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
+import { convertToChartDTO } from 'app/utils/ChartDtoHelper';
 import { RootState } from 'types';
 import persistence from 'utils/persistence';
-import { request } from 'utils/request';
+import { request, request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { shareActions } from '.';
 import { ShareVizInfo } from './types';
@@ -81,8 +82,12 @@ export const fetchShareVizInfo = createAsyncThunk(
 
     switch (data.vizType) {
       case 'DATACHART':
+        const shareVizInfo = {
+          ...data,
+          vizDetail: convertToChartDTO(data.vizDetail),
+        };
         thunkAPI.dispatch(
-          shareActions.setDataChart({ data, filterSearchParams }),
+          shareActions.setDataChart({ data: shareVizInfo, filterSearchParams }),
         );
         break;
       case 'DASHBOARD':
@@ -145,7 +150,7 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
       false,
       args.preview?.backendChart?.config?.aggregation,
     );
-    const response = await request({
+    const response = await request2({
       method: 'POST',
       url: `share/execute`,
       params: {

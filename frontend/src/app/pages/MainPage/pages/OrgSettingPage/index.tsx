@@ -131,7 +131,7 @@ export function OrgSettingPage() {
                   return request({
                     url: `/orgs/check/name`,
                     method: 'POST',
-                    params: { name: value },
+                    data: { name: value },
                   }).then(
                     () => Promise.resolve(),
                     err => Promise.reject(new Error(err.response.data.message)),

@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-import { LeftCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, LeftCircleOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { AuthForm } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, useCallback } from 'react';
 import styled from 'styled-components/macro';
-import { SPACE_XS } from 'styles/StyleConstants';
+import { SPACE_MD, SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
 
 interface SendEmailTipsProps {
   email: string;
@@ -47,7 +47,8 @@ export const SendEmailTips: FC<SendEmailTipsProps> = ({
 
   return (
     <AuthForm>
-      <h1>{t('tipTitle')}</h1>
+      <Success />
+      <Title>{t('tipTitle')}</Title>
       <Content>
         {t('tipDesc1')}
         <b>{email}</b>
@@ -79,6 +80,19 @@ export const SendEmailTips: FC<SendEmailTipsProps> = ({
     </AuthForm>
   );
 };
+
+const Success = styled(CheckCircleOutlined)`
+  display: block;
+  padding-bottom: ${SPACE_MD};
+  font-size: ${SPACE_TIMES(12)};
+  color: ${p => p.theme.success};
+  text-align: center;
+`;
+
+const Title = styled.h1`
+  padding-bottom: ${SPACE_XS};
+  text-align: center;
+`;
 
 const Content = styled.p`
   margin: ${SPACE_XS} 0;

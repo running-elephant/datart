@@ -19,7 +19,11 @@ import { Collapse, Form } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import { DashboardConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { BoardInfoContext } from 'app/pages/DashBoardPage/contexts/BoardInfoContext';
+import {
+  DashboardConfig,
+  DeviceType,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getRGBAColor } from 'app/pages/DashBoardPage/utils';
 import produce from 'immer';
 import throttle from 'lodash/throttle';
@@ -44,22 +48,35 @@ export const BoardSetting: FC = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
   const dispatch = useDispatch();
   const { boardType } = useContext(BoardContext);
+
   const { config } = useContext(BoardConfigContext);
+
+  const { deviceType } = useContext(BoardInfoContext);
+
   const [form] = Form.useForm();
   const cacheValue = useRef<any>({});
   useEffect(() => {
+    const { scaleMode, width: boardWidth, height: boardHeight } = config;
+    const [marginLR, marginTB] = config.margin;
+    const [paddingLR, paddingTB] = config.containerPadding;
+    const [mobileMarginLR, mobileMarginTB] = config.mobileMargin;
+    const [mobilePaddingLR, mobilePaddingTB] = config.mobileContainerPadding;
+
     cacheValue.current = {
       backgroundColor: config.background.color,
       backgroundImage: config.background.image,
-      scaleMode: config.scaleMode,
-      boardWidth: config.width,
-      boardHeight: config.height,
-      marginW: config.margin[0],
-      marginH: config.margin[1],
-      paddingW: config.containerPadding[0],
-      paddingH: config.containerPadding[1],
-      rowHeight: config.rowHeight,
-      initialQuery: config.initialQuery === false ? false : true, // TODO migration 如果initialQuery的值为undefined默认为true 兼容旧的仪表盘没有initialQuery参数的问题
+      scaleMode,
+      boardWidth,
+      boardHeight,
+      marginLR,
+      marginTB,
+      paddingLR,
+      paddingTB,
+      mobileMarginLR,
+      mobileMarginTB,
+      mobilePaddingLR,
+      mobilePaddingTB,
+      initialQuery: config.initialQuery,
     };
     form.setFieldsValue({ ...cacheValue.current });
   }, [config, form]);
@@ -74,11 +91,14 @@ export const BoardSetting: FC = memo(() => {
         draft.scaleMode = value.scaleMode;
         draft.width = value.boardWidth;
         draft.height = value.boardHeight;
-        draft.margin[0] = value.marginW;
-        draft.margin[1] = value.marginH;
-        draft.containerPadding[0] = value.paddingW;
-        draft.containerPadding[1] = value.paddingH;
-        draft.rowHeight = value.rowHeight;
+        draft.margin = [value.marginLR, value.marginTB];
+        draft.containerPadding = [value.paddingLR, value.paddingTB];
+        draft.mobileMargin = [value.mobileMarginLR, value.mobileMarginTB];
+        draft.mobileContainerPadding = [
+          value.mobilePaddingLR,
+          value.mobilePaddingTB,
+        ];
+
         draft.initialQuery = value.initialQuery;
       });
       dispatch(editBoardStackActions.updateBoardConfig(nextConf));
@@ -115,24 +135,36 @@ export const BoardSetting: FC = memo(() => {
               <Panel header={`${t('baseProperty')}`} key="autoSize" forceRender>
                 <Group>
                   <NumberSet
-                    label={`${t('board')} ${t('marginTB')}`}
-                    name="paddingH"
+                    label={`${t('board')} ${t('paddingTB')}`}
+                    name={
+                      deviceType === DeviceType.Mobile
+                        ? 'mobilePaddingTB'
+                        : 'paddingTB'
+                    }
                   />
                   <NumberSet
-                    label={`${t('board')} ${t('marginLR')}`}
-                    name="paddingW"
+                    label={`${t('board')} ${t('paddingLR')}`}
+                    name={
+                      deviceType === DeviceType.Mobile
+                        ? 'mobilePaddingLR'
+                        : 'paddingLR'
+                    }
                   />
                   <NumberSet
-                    label={`${t('widget')} ${t('paddingTB')}`}
-                    name="marginH"
+                    label={`${t('widget')} ${t('marginTB')}`}
+                    name={
+                      deviceType === DeviceType.Mobile
+                        ? 'mobileMarginTB'
+                        : 'marginTB'
+                    }
                   />
                   <NumberSet
-                    label={`${t('widget')} ${t('paddingLR')}`}
-                    name="marginW"
-                  />
-                  <NumberSet
-                    label={`${t('widget')} ${t('rowHeight')}`}
-                    name="rowHeight"
+                    label={`${t('widget')} ${t('marginLR')}`}
+                    name={
+                      deviceType === DeviceType.Mobile
+                        ? 'mobileMarginLR'
+                        : 'marginLR'
+                    }
                   />
                 </Group>
               </Panel>

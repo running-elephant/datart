@@ -21,7 +21,7 @@ import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { TimeFilterConditionValue } from 'app/types/ChartConfig';
 import { TimeFilterValueCategory } from 'app/types/FilterControlPanel';
 import { formatTime } from 'app/utils/time';
-import { FILTER_TIME_FORMATTER_IN_QUERY } from 'globalConstants';
+import { TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -45,7 +45,7 @@ const ManualSingleTimeSelector: FC<
   const handleTimeCategoryChange = type => {
     setType(type);
     if (type === TimeFilterValueCategory.Exact) {
-      onTimeChange?.(formatTime(moment(), FILTER_TIME_FORMATTER_IN_QUERY));
+      onTimeChange?.(formatTime(moment(), TIME_FORMATTER));
     } else if (type === TimeFilterValueCategory.Relative) {
       onTimeChange?.({ unit: 'd', amount: 1, direction: '-' });
     } else {

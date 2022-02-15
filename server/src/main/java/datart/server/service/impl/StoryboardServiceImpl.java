@@ -120,7 +120,7 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
     }
 
     private boolean hasPermission(Role role, Storyboard storyboard, int permission) {
-        if (storyboard.getId() == null || (permission & Const.CREATE) == permission) {
+        if (storyboard.getId() == null || (permission & Const.CREATE) == Const.CREATE) {
             return securityManager.hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), role.getId(), ResourceType.STORYBOARD.name(), permission));
         } else {
             return securityManager.hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), role.getId(), storyboard.getId(), permission));

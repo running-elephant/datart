@@ -1,7 +1,7 @@
 import { TreeNodeProps } from 'antd';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { ChartConfig } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
+import { ChartDTO } from 'app/types/ChartDTO';
 import { ReactElement } from 'react';
 
 export type VizType = [
@@ -28,7 +28,6 @@ export interface VizState {
   tabs: VizTab[];
   selectedTab: string;
   dataChartListLoading: boolean;
-  playingStoryId?: string;
   chartPreviews: ChartPreview[];
 }
 
@@ -78,8 +77,8 @@ export interface ArchivedViz {
 export interface ChartPreview {
   version?: string;
   backendChartId?: string;
-  backendChart?: BackendChart;
-  dataset?: ChartDataset;
+  backendChart?: ChartDTO;
+  dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
 }
 
@@ -95,13 +94,12 @@ export interface VizTab {
 export interface AddVizParams {
   viz: {
     name: string;
-    index:number | null;
+    index: number | null;
     description?: string;
     parentId?: string | null;
     orgId: string;
   };
   type: VizType;
-  resolve: () => void;
 }
 
 export interface EditFolderParams {
@@ -115,7 +113,7 @@ export interface UnarchiveVizParams {
     name: string;
     vizType: VizType;
     parentId: string | null;
-    index:number | null;
+    index: number | null;
   };
   resolve: () => void;
 }
@@ -170,4 +168,15 @@ export interface SelectVizTree {
 export interface SelectVizFolderTree {
   id?: string;
   getDisabled: (o: FolderViewModel, path: string[]) => boolean;
+}
+
+export interface SaveAsDashboardParams {
+  viz: {
+    id: string;
+    name: string;
+    index: number | null;
+    config: string;
+    parentId?: string | null;
+  };
+  dashboardId?: string;
 }

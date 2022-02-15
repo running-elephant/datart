@@ -18,8 +18,8 @@
 import { LoadingOutlined } from '@ant-design/icons';
 import { BoardProvider } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { FullScreenPanel } from 'app/pages/DashBoardPage/components/FullScreenPanel';
-import AutoBoardCore from 'app/pages/DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
-import FreeBoardCore from 'app/pages/DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
+import { AutoBoardCore } from 'app/pages/DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
+import { FreeBoardCore } from 'app/pages/DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
 import { makeSelectBoardConfigById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo } from 'react';

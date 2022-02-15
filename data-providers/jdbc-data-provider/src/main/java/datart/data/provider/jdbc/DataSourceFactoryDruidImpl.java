@@ -57,7 +57,7 @@ public class DataSourceFactoryDruidImpl implements DataSourceFactory<DruidDataSo
         }
         pro.setProperty(DruidDataSourceFactory.PROP_MAXWAIT, JdbcDataProvider.DEFAULT_MAX_WAIT.toString());
 
-        pro.setProperty("druid.mysql.usePingMethod", "false");
+        System.setProperty("druid.mysql.usePingMethod", "false");
 
         // url properties
 //        pro.setProperty(DruidDataSourceFactory.PROP_CONNECTIONPROPERTIES, "useUnicode=true;characterEncoding=utf8;characterSetResults=utf8");

@@ -18,6 +18,7 @@
 
 import { TreeDataNode, TreeNodeProps } from 'antd';
 import { ReactElement } from 'react';
+import { View } from '../../../../../types/View';
 import { SubjectTypes } from '../../PermissionPage/constants';
 import { RowPermissionRaw, Variable } from '../../VariablePage/slice/types';
 import {
@@ -58,15 +59,6 @@ export interface ViewSimpleViewModel extends ViewSimple {
   deleteLoading: boolean;
 }
 
-export interface View extends ViewSimple {
-  config: string;
-  model: string;
-  script: string;
-  variables: Variable[];
-  relVariableSubjects: RowPermissionRaw[];
-  relSubjectColumns: ColumnPermissionRaw[];
-}
-
 export interface ViewViewModel<T = object>
   extends Pick<View, 'name' | 'script'> {
   id: string;
@@ -88,6 +80,8 @@ export interface ViewViewModel<T = object>
   previewResults: T[];
   error: string;
   fragment: string;
+  isSaveAs?: Boolean;
+  warnings?: string[] | null;
 }
 
 export interface QueryResult {
@@ -95,6 +89,7 @@ export interface QueryResult {
   rows: any[][];
   pageInfo: PageInfo;
   script?: string;
+  warnings?: string[] | null;
 }
 export interface PageInfo {
   pageNo: number;
@@ -139,6 +134,8 @@ export interface VariableHierarchy extends Variable {
 
 export interface SaveViewParams {
   resolve?: () => void;
+  isSaveAs?: Boolean;
+  currentView?: ViewViewModel;
 }
 
 export interface UpdateViewBaseParams {

@@ -192,4 +192,37 @@ export const OverriddenStyle = createGlobalStyle`
       display:none;
     }
   }
+
+  /* fix antd bugs #32919 */
+  .ant-tabs-dropdown-menu-item {
+    display: flex;
+    align-items: center;
+
+    > span {
+      flex: 1;
+      white-space: nowrap;
+    }
+
+    &-remove {
+      flex: none;
+      margin-left: 12px;
+      color: #00000073;
+      font-size: 12px;
+      background: 0 0;
+      border: 0;
+      cursor: pointer;
+
+      &:hover {
+        color: #1B9AEE;
+      }
+    }
+  }
+
+  /* 覆盖antd 默认样式 */
+  @media (max-width: 575px) {
+    .datart-viz .ant-form .ant-form-item .ant-form-item-label,
+    .datart-viz .ant-form .ant-form-item .ant-form-item-control {
+      flex: 1;
+    }
+  }
 `;

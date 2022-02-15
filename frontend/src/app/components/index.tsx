@@ -14,7 +14,7 @@ export { ListTitle } from './ListTitle';
 export { LoadingMask } from './LoadingMask';
 export { ModalForm } from './ModalForm';
 export type { ModalFormProps } from './ModalForm';
-export { MenuListItem, Popup } from './Popup';
+export { MenuListItem, MenuWrapper, Popup } from './Popup';
 export { default as Split } from './Split';
 export { PaneWrapper, TabPane, Tabs } from './Tabs';
 export { ToolbarButton } from './ToolbarButton';

@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import {
   ContainerItem,
   WidgetType,
@@ -34,6 +35,7 @@ import {
   BackgroundDefault,
   BorderDefault,
   ButtonBorderDefault,
+  LAYOUT_COLS_MAP,
   QueryButtonWidgetBackgroundDefault,
 } from '../constants';
 import {
@@ -166,6 +168,7 @@ export const createInitWidgetConfig = (opt: {
   frequency?: number;
 }): WidgetConf => {
   return {
+    version: '',
     type: opt.type,
     index: opt.index || 0,
     name: opt.name || '',
@@ -206,7 +209,7 @@ export const createWidget = (option: {
   relations?: Relation[];
 }) => {
   const widget: Widget = {
-    id: option.id || uuidv4(),
+    id: option.id || 'newWidget_' + uuidv4(),
     dashboardId: option.dashboardId,
     config: option.config,
     datachartId: option.datachartId || '',
@@ -410,7 +413,7 @@ export const updateWidgetsRect = (
   layouts?: ReactGridLayout.Layout[],
 ) => {
   if (boardConfig.type === 'auto') {
-    return updateAutoWidgetsRect(boardConfig, widgets, layouts || []);
+    return updateAutoWidgetsRect(widgets, layouts || []);
   } else if (boardConfig.type === 'free') {
     return updateFreeWidgetsRect(widgets);
   }
@@ -418,7 +421,6 @@ export const updateWidgetsRect = (
 };
 
 export const updateAutoWidgetsRect = (
-  boardConfig: DashboardConfig,
   widgets: Widget[],
   layouts: ReactGridLayout.Layout[],
 ): Widget[] => {
@@ -428,7 +430,7 @@ export const updateAutoWidgetsRect = (
   let itemYs = [...dashWidgetRectYs];
   widgets.forEach(widget => {
     const itemX =
-      (widgetsCount * widget.config.rect.width) % boardConfig.cols.lg;
+      (widgetsCount * widget.config.rect.width) % LAYOUT_COLS_MAP.lg;
     const itemY = Math.max(...itemYs, 0);
     const nextRect = {
       ...widget.config.rect,
@@ -506,21 +508,6 @@ export const convertWidgetRelationsToSave = (
 ): ServerRelation[] => {
   return relations.map(relation => {
     return { ...relation, config: JSON.stringify(relation.config) };
-  });
-};
-
-export const convertWidgetRelationsToObj = (
-  relations: ServerRelation[] = [],
-): Relation[] => {
-  return relations.map(relation => {
-    try {
-      return { ...relation, config: JSON.parse(relation.config) };
-    } catch (error) {
-      return {
-        ...relation,
-        config: { RelatedViewMap: {}, filterCovered: false },
-      };
-    }
   });
 };
 
@@ -786,8 +773,8 @@ export const getLinkedColumn = (
 };
 
 // TODO chart widget
-export const getWidgetMapByServer = (
-  widgets: ServerWidget[],
+export const getWidgetMap = (
+  widgets: Widget[],
   dataCharts: DataChart[],
   filterSearchParamsMap?: FilterSearchParamsWithMatch,
 ) => {
@@ -798,29 +785,14 @@ export const getWidgetMapByServer = (
     return acc;
   }, {} as Record<string, DataChart>);
   const widgetMap = widgets.reduce((acc, cur) => {
-    const viewIds = cur.datachartId
-      ? [dataChartMap[cur.datachartId].viewId]
-      : cur.viewIds;
-    try {
-      let widget: Widget = {
-        ...cur,
-        config: JSON.parse(cur.config),
-        relations: convertWidgetRelationsToObj(cur.relations),
-        viewIds,
-      };
-      // TODO migration about font 5 --xld
-      widget.config.nameConfig = {
-        ...fontDefault,
-        ...widget.config.nameConfig,
-      };
-      // TODO migration about filter --xld
-      if ((widget.config.type as any) !== 'filter') {
-        acc[cur.id] = widget;
-      }
-      return acc;
-    } catch (error) {
-      return acc;
-    }
+    // issues #601
+    const chartViewId = dataChartMap[cur.datachartId]?.viewId;
+    const viewIds = chartViewId ? [chartViewId] : cur.viewIds;
+    acc[cur.id] = {
+      ...cur,
+      viewIds,
+    };
+    return acc;
   }, {} as Record<string, Widget>);
 
   const wrappedDataCharts: DataChart[] = [];
@@ -895,16 +867,6 @@ export const getWidgetMapByServer = (
           condition.dependentControllerId = dependentFilterId;
         }
       }
-
-      //处理 assistViewFields 旧数据 assistViewFields 是 string 类型 alpha.3版本之后 使用数组存储的 后续版本稳定之后 可以移除此逻辑
-      // TODO migration <<
-      if (typeof content?.config?.assistViewFields === 'string') {
-        content.config.assistViewFields = (
-          content.config.assistViewFields as string
-        ).split(VALUE_SPLITTER);
-      }
-      // TODO migration >> --xld
-
       controllerWidgets.push(widget);
     });
 
@@ -913,7 +875,9 @@ export const getWidgetMapByServer = (
     .filter(w => w.config.content.type === 'widgetChart')
     .forEach(widget => {
       let content = widget.config.content as ChartWidgetContent;
-      widget.datachartId = content.dataChart?.id || '';
+      const self_dataChartId = `widget_${widget.dashboardId}_${widget.id}`;
+      content.dataChart!.id = self_dataChartId;
+      widget.datachartId = self_dataChartId;
       wrappedDataCharts.push(content.dataChart!);
       delete content.dataChart;
     });

@@ -18,18 +18,15 @@
 
 import { Tabs } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
+import ChartFilterCondition, {
+  ConditionBuilder,
+} from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
 import { FilterConditionType } from 'app/types/ChartConfig';
 import { formatTime } from 'app/utils/time';
-import {
-  FILTER_TIME_FORMATTER_IN_QUERY,
-  RECOMMEND_TIME,
-} from 'globalConstants';
+import { RECOMMEND_TIME, TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
-import ChartFilterCondition, {
-  ConditionBuilder,
-} from '../../../../../models/ChartFilterCondition';
 import TimeSelector from '../../ChartTimeSelector';
 
 const DateConditionConfiguration: FC<
@@ -56,8 +53,8 @@ const DateConditionConfiguration: FC<
     } else if (conditionType === FilterConditionType.RangeTime) {
       const filterRow = new ConditionBuilder(condition)
         .setValue([
-          formatTime(moment(), FILTER_TIME_FORMATTER_IN_QUERY),
-          formatTime(moment(), FILTER_TIME_FORMATTER_IN_QUERY),
+          formatTime(moment(), TIME_FORMATTER),
+          formatTime(moment(), TIME_FORMATTER),
         ])
         .asRangeTime();
       onConditionChange?.(filterRow);

@@ -17,14 +17,14 @@
  */
 
 import { Radio } from 'antd';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
-const BasicRadio: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicRadio: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { value, comType, options, ...rest } = row;
     const items = options?.items || [];
@@ -36,7 +36,7 @@ const BasicRadio: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
     };
 
     return (
-      <StyledBasicRadio label={t(row.label)}>
+      <StyledBasicRadio label={t(row.label, true)}>
         <Radio.Group
           name={`${row.label}-${ancestors?.toString()}`}
           {...rest}
@@ -47,7 +47,7 @@ const BasicRadio: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
           {items?.map(o => {
             return (
               <Radio key={o.key} value={o.value}>
-                {needTranslate ? t(o.label) : o?.label}
+                {needTranslate ? t(o.label, true) : o?.label}
               </Radio>
             );
           })}

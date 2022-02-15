@@ -22,6 +22,7 @@ package datart.server.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import datart.core.base.consts.Const;
+import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.DataProviderConfigTemplate;
 import datart.core.data.provider.DataProviderSource;
@@ -40,10 +41,7 @@ import datart.server.base.params.BaseCreateParam;
 import datart.server.base.params.BaseUpdateParam;
 import datart.server.base.params.SourceCreateParam;
 import datart.server.base.params.SourceUpdateParam;
-import datart.server.service.BaseService;
-import datart.server.service.DataProviderService;
-import datart.server.service.RoleService;
-import datart.server.service.SourceService;
+import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -64,14 +62,19 @@ public class SourceServiceImpl extends BaseService implements SourceService {
 
     private final RoleService roleService;
 
+    private final FileService fileService;
+
     private final RelRoleResourceMapperExt rrrMapper;
 
     public SourceServiceImpl(SourceMapperExt sourceMapper,
                              DataProviderService dataProviderService,
-                             RoleService roleService, RelRoleResourceMapperExt rrrMapper) {
+                             RoleService roleService,
+                             FileService fileService,
+                             RelRoleResourceMapperExt rrrMapper) {
         this.sourceMapper = sourceMapper;
         this.dataProviderService = dataProviderService;
         this.roleService = roleService;
+        this.fileService = fileService;
         this.rrrMapper = rrrMapper;
     }
 
@@ -103,7 +106,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     private boolean hasPermission(Role role, Source source, int permission) {
-        if (source.getId() == null || (permission & Const.CREATE) == permission) {
+        if (source.getId() == null || (permission & Const.CREATE) == Const.CREATE) {
             return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), ResourceType.SOURCE.name(), permission));
         } else {
             return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), source.getId(), permission));
@@ -185,5 +188,10 @@ public class SourceServiceImpl extends BaseService implements SourceService {
             return jsonObject.toJSONString();
         }
         return config;
+    }
+
+    @Override
+    public void deleteStaticFiles(Source source) {
+        fileService.deleteFiles(FileOwner.DATA_SOURCE, source.getId());
     }
 }

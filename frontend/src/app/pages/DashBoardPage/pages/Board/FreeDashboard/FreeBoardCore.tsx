@@ -35,7 +35,7 @@ export interface FreeBoardCoreProps {
   boardId: string;
   showZoomCtrl?: boolean;
 }
-const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
+export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
   ({ boardId, showZoomCtrl }) => {
     const { config } = useContext(BoardConfigContext);
     const { editing, autoFit } = useContext(BoardContext);
@@ -108,7 +108,7 @@ const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
     );
   },
 );
-export default FreeBoardCore;
+
 const Wrap = styled.div`
   display: flex;
   flex: 1;

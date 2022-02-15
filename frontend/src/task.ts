@@ -1,30 +1,26 @@
 /**
-
  * Datart
-   *
+ *
  * Copyright 2021
-   *
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
-   *
- * http://www.apache.org/licenses/LICENSE-2.0
-    *
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-   */
+ */
 
-/* eslint-disable prettier/prettier */
-
+// organize-imports-ignore  polyfill/stable must in the first
 import 'react-app-polyfill/stable';
-import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
-import {
-  BackendChart,
-  BackendChartConfig,
-} from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+
+import { migrateWidgets } from 'app/migration/WidgetConfig/migrateWidgets';
+import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import {
   DataChart,
   ServerDashboard,
@@ -35,16 +31,18 @@ import {
   getDashBoardByResBoard,
   getDataChartsByServer,
 } from 'app/pages/DashBoardPage/utils/board';
-import { getWidgetMapByServer } from 'app/pages/DashBoardPage/utils/widget';
+import { getWidgetMap } from 'app/pages/DashBoardPage/utils/widget';
 import { ChartConfig } from 'app/types/ChartConfig';
-// import 'react-app-polyfill/stable';
+import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
+import { ChartDTO } from 'app/types/ChartDTO';
+
 // import 'core-js/stable/map';
 // need polyfill [Object.values,Array.prototype.find,new Map]
-/**
 
+/**
  * @param ''
  * @description 'server task 定时任务 调用'
-   */
+ */
 const getBoardQueryData = (dataStr: string) => {
   var data = JSON.parse(dataStr) as ServerDashboard;
 
@@ -53,8 +51,9 @@ const getBoardQueryData = (dataStr: string) => {
   const { datacharts, views: serverViews, widgets: serverWidgets } = data;
 
   const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
-  const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(
-    serverWidgets,
+  const migratedWidgets = migrateWidgets(serverWidgets);
+  const { widgetMap, wrappedDataCharts } = getWidgetMap(
+    migratedWidgets,
     dataCharts,
   );
 
@@ -78,10 +77,11 @@ const getBoardQueryData = (dataStr: string) => {
   let fileName = dashboard.name;
   return JSON.stringify({ downloadParams, fileName });
 };
+
 const getChartQueryData = (dataStr: string) => {
   // see  handleCreateDownloadDataTask
-  const data: BackendChart = JSON.parse(dataStr);
-  const dataConfig: BackendChartConfig = JSON.parse(data.config as any);
+  const data: ChartDTO = JSON.parse(dataStr);
+  const dataConfig: ChartDetailConfigDTO = JSON.parse(data.config as any);
   const chartConfig: ChartConfig = dataConfig.chartConfig as ChartConfig;
   const builder = new ChartDataRequestBuilder(
     {

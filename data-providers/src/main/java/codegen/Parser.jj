@@ -93,6 +93,7 @@ import org.apache.calcite.sql.parser.SqlParser;
 import org.apache.calcite.sql.parser.SqlParserImplFactory;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.parser.SqlParserUtil;
+import org.apache.calcite.sql.type.OperandTypes;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.sql.validate.SqlConformance;
 import org.apache.calcite.util.Glossary;
@@ -102,6 +103,10 @@ import org.apache.calcite.util.SourceStringReader;
 import org.apache.calcite.util.Util;
 import org.apache.calcite.util.trace.CalciteTrace;
 import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
+import org.apache.calcite.sql.fun.SqlMonotonicBinaryOperator;
+import org.apache.calcite.sql.type.OperandTypes;
+import org.apache.calcite.sql.type.ReturnTypes;
+import org.apache.calcite.sql.type.InferTypes;
 
 import org.slf4j.Logger;
 
@@ -3794,6 +3799,7 @@ SqlNode AtomicRowExpression() :
 }
 {
     (
+        LOOKAHEAD(2)
         e = LiteralOrIntervalExpression()
     |
         e = DynamicParam()
@@ -3805,6 +3811,7 @@ SqlNode AtomicRowExpression() :
     |
         e = MultisetConstructor()
     |
+        LOOKAHEAD(ArrayConstructor())
         e = ArrayConstructor()
     |
         LOOKAHEAD(3)
@@ -4337,7 +4344,7 @@ SqlNode ArrayConstructor() :
         LOOKAHEAD(1)
         <LPAREN>
         // by sub query "MULTISET(SELECT * FROM T)"
-        e = LeafQueryOrExpr(ExprContext.ACCEPT_QUERY)
+        e = LeafQueryOrExpr(ExprContext.ACCEPT_ALL) // [datart]
         <RPAREN>
         {
             return SqlStdOperatorTable.ARRAY_QUERY.createCall(
@@ -6026,6 +6033,8 @@ List<SqlNode> JsonNameAndValue() :
                 throw SqlUtil.newContextException(getPos(), RESOURCE.illegalColon());
             }
         }
+    // [datart] support   JSON_OBJECT('id', 87, 'name', 'carrot');
+    | <COMMA>
     )
     e = Expression(ExprContext.ACCEPT_NON_QUERY) {
         list.add(e);
@@ -6592,11 +6601,47 @@ SqlIdentifier FunctionName() :
         qualifiedName = CompoundIdentifier()
     |
         qualifiedName = ReservedFunctionName()
+
+    |   qualifiedName = FunctionNameSupport()  // [datart]  function name support
+
     )
     {
         return qualifiedName;
     }
 }
+
+// [datart]  function name support
+SqlIdentifier FunctionNameSupport():
+{
+}
+{
+    (
+         NonReservedKeyWord()
+    |    KeywordFunctionNameSupport()
+
+    )
+    {
+        return new SqlIdentifier(unquotedIdentifier(), getPos());
+    }
+}
+// [datart]  function name support
+String KeywordFunctionNameSupport() :
+{
+}
+{
+    (
+        <DATE>
+    |   <TIME>
+    |   <TIMESTAMP>
+    |   <INSERT>
+    |   <CONVERT>
+    |   <ARRAY>
+    )
+    {
+        return unquotedIdentifier();
+    }
+}
+
 
 /**
  * Parses a reserved word which is used as the name of a function.
@@ -6891,6 +6936,15 @@ SqlBinaryOperator BinaryRowOperator() :
 |   LOOKAHEAD(2) <IMMEDIATELY> <PRECEDES> { return SqlStdOperatorTable.IMMEDIATELY_PRECEDES; }
 |   <IMMEDIATELY> <SUCCEEDS> { return SqlStdOperatorTable.IMMEDIATELY_SUCCEEDS; }
 |   op = BinaryMultisetOperator() { return op; }
+//[datart] support sql &
+|  <BIT_AND> {   return  new SqlMonotonicBinaryOperator(
+         "&",
+         SqlKind.BIT_AND,
+         40,
+         true,
+         ReturnTypes.NULLABLE_SUM,
+         InferTypes.FIRST_KNOWN,
+         OperandTypes.BINARY);}
 }
 
 /**
@@ -8112,6 +8166,7 @@ void NonReservedKeyWord2of3() :
 |   < VERTICAL_BAR: "|" >
 |   < CARET: "^" >
 |   < DOLLAR: "$" >
+|   < BIT_AND: "&" > // [datart]
 }
 
 
@@ -8305,7 +8360,7 @@ MORE :
         "\u3400"-"\u3d2d",
         "\u4e00"-"\u9fff",
         "\uf900"-"\ufaff",
-        "@" //support for sql variable
+        "@" //[datart] support for sql variable
     ]
     >
 |

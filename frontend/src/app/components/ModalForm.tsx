@@ -31,7 +31,11 @@ export const ModalForm = forwardRef(
     return (
       <Modal
         {...rest}
-        title={`${type ? tg(`modal.title.${type}`) : ''}${rest.title}`}
+        title={
+          type === CommonFormTypes.SaveAs
+            ? tg('button.saveAs')
+            : `${type ? tg(`modal.title.${type}`) : ''}${rest.title}`
+        }
         onOk={onOk}
         afterClose={onAfterClose}
       >

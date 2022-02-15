@@ -197,7 +197,7 @@ export function RoleDetailPage() {
                     return request({
                       url: '/roles/check/name',
                       method: 'POST',
-                      params: { name: value, orgId },
+                      data: { name: value, orgId },
                     }).then(
                       () => Promise.resolve(),
                       err =>

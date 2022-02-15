@@ -17,7 +17,7 @@
  */
 
 import { InputNumber } from 'antd';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import debounce from 'lodash/debounce';
 import { FC, memo, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -26,10 +26,10 @@ import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
-const BasicInputNumber: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicInputNumber: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
     const [cache, setCache] = useState(data);
-    const { comType, options, ...rest } = cache;
+    const { comType, options, disabled, ...rest } = cache;
 
     const debouncedDataChange = useMemo(
       () =>
@@ -40,8 +40,9 @@ const BasicInputNumber: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
     );
 
     return (
-      <Wrapper label={t(cache.label)}>
+      <Wrapper label={t(cache.label, true)}>
         <InputNumber
+          disabled={data?.disabled}
           {...rest}
           {...options}
           onChange={value => {
@@ -74,5 +75,9 @@ const Wrapper = styled(BW)`
 
   .ant-input-number-handler-wrap {
     background-color: ${p => p.theme.emphasisBackground};
+  }
+
+  .ant-input-number-disabled {
+    background-color: ${p => p.theme.textColorDisabled};
   }
 `;

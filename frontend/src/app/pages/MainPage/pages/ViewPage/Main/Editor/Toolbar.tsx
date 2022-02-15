@@ -20,6 +20,7 @@ import {
   AlignCenterOutlined,
   CaretRightOutlined,
   CopyFilled,
+  MonitorOutlined,
   PauseOutlined,
   SaveFilled,
   SettingFilled,
@@ -29,8 +30,9 @@ import { ToolbarButton } from 'app/components';
 import { Chronograph } from 'app/components/Chronograph';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
-import React, { memo, useCallback, useContext } from 'react';
+import React, { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
 import { format } from 'sql-formatter';
 import styled from 'styled-components/macro';
 import {
@@ -50,6 +52,8 @@ import {
   ViewViewModelStages,
 } from '../../constants';
 import { EditorContext } from '../../EditorContext';
+import { useSaveAsView } from '../../hooks/useSaveAsView';
+import { useStartAnalysis } from '../../hooks/useStartAnalysis';
 import { SaveFormContext } from '../../SaveFormContext';
 import { useViewSlice } from '../../slice';
 import {
@@ -60,14 +64,21 @@ import { saveView } from '../../slice/thunks';
 import { isNewView } from '../../utils';
 interface ToolbarProps {
   allowManage: boolean;
+  allowEnableViz: boolean | undefined;
 }
 
-export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
+export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
   const { actions } = useViewSlice();
   const dispatch = useDispatch();
   const { onRun, onSave } = useContext(EditorContext);
   const { showSaveForm } = useContext(SaveFormContext);
   const sources = useSelector(selectSources);
+  const history = useHistory();
+  const histState = history.location.state as any;
+  const viewsData = useSelector(selectViews);
+  const t = useI18NPrefix('view.editor');
+  const saveAsView = useSaveAsView();
+  const startAnalysis = useStartAnalysis();
   const id = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'id' }),
   ) as string;
@@ -104,9 +115,6 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
   const ViewIndex = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'index' }),
   ) as number;
-  const viewsData = useSelector(selectViews);
-  const t = useI18NPrefix('view.editor');
-
   const isArchived = status === ViewStatus.Archived;
 
   const formatSQL = useCallback(() => {
@@ -169,6 +177,12 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
     },
     [dispatch, actions],
   );
+
+  useEffect(() => {
+    if (histState?.sourcesId && sources) {
+      sourceChange(histState.sourcesId);
+    }
+  }, [histState?.sourcesId, sourceChange, sources]);
 
   return (
     <Container>
@@ -267,6 +281,7 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
                 onClick={onSave}
               />
             </Tooltip>
+
             {!isNewView(id) && (
               <Tooltip title={t('info')} placement="bottom">
                 <ToolbarButton
@@ -277,10 +292,11 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
                 />
               </Tooltip>
             )}
+
             <Tooltip title={t('saveAs')} placement="bottom">
               <ToolbarButton
                 icon={<CopyFilled />}
-                disabled={stage !== ViewViewModelStages.Saveable}
+                onClick={() => saveAsView(id)}
               />
             </Tooltip>
             {/* <Tooltip title={t('saveFragment')} placement="bottom">
@@ -288,6 +304,16 @@ export const Toolbar = memo(({ allowManage }: ToolbarProps) => {
           </Tooltip> */}
           </Space>
         </Actions>
+      )}
+      {allowEnableViz && (
+        <Tooltip title={t('startAnalysis')} placement="bottom">
+          <ToolbarButton
+            icon={<MonitorOutlined />}
+            onClick={() => {
+              startAnalysis(id);
+            }}
+          />
+        </Tooltip>
       )}
     </Container>
   );

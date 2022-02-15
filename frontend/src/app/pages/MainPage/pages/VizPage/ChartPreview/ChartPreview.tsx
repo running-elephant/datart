@@ -16,27 +16,30 @@
  * limitations under the License.
  */
 
-import { message } from 'antd';
-import ChartEditor from 'app/components/ChartEditor';
+import { message, Spin } from 'antd';
+import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { VizHeader } from 'app/components/VizHeader';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
-import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
+import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { useMainSlice } from 'app/pages/MainPage/slice';
+import { IChart } from 'app/types/Chart';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
-import ChartTools from '../../../../ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
+import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
 import { selectPreviewCharts, selectPublishLoading } from '../slice/selectors';
 import {
+  deleteViz,
   fetchDataSetByPreviewChartAction,
   initChartPreviewData,
   publishViz,
+  removeTab,
   updateFilterAndFetchDataset,
 } from '../slice/thunks';
 import { ChartPreview } from '../slice/types';
@@ -60,7 +63,12 @@ const ChartPreviewBoard: FC<{
     allowManage,
   }) => {
     useVizSlice();
-    const { ref, cacheW, cacheH } = useCacheWidthHeight(800, 600);
+    // NOTE: avoid initialize width or height is zero that cause echart sampling calculation issue.
+    const defaultChartContainerWH = 1;
+    const { ref, cacheW, cacheH } = useCacheWidthHeight(
+      defaultChartContainerWH,
+      defaultChartContainerWH,
+    );
     const { actions } = useMainSlice();
     const chartManager = ChartManager.instance();
     const dispatch = useDispatch();
@@ -68,9 +76,12 @@ const ChartPreviewBoard: FC<{
     const previewCharts = useSelector(selectPreviewCharts);
     const publishLoading = useSelector(selectPublishLoading);
     const [chartPreview, setChartPreview] = useState<ChartPreview>();
-    const [chart, setChart] = useState<Chart>();
-    const [editChartVisible, setEditChartVisible] = useState<boolean>(false);
+    const [chart, setChart] = useState<IChart>();
+    const [loadingStatus, setLoadingStatus] = useState<boolean>(false);
     const t = useI18NPrefix('viz.main');
+    const tg = useI18NPrefix('global');
+    const saveAsViz = useSaveAsViz();
+    const history = useHistory();
 
     useEffect(() => {
       const filterSearchParams = filterSearchUrl
@@ -101,7 +112,7 @@ const ChartPreviewBoard: FC<{
           const newChart = chartManager.getById(
             newChartPreview?.backendChart?.config?.chartGraphId,
           );
-          registerChartEvents(newChart, newChartPreview);
+          registerChartEvents(newChart, backendChartId);
           setChart(newChart);
         }
       }
@@ -115,7 +126,7 @@ const ChartPreviewBoard: FC<{
       version,
     ]);
 
-    const registerChartEvents = (chart, chartPreview) => {
+    const registerChartEvents = (chart, backendChartId) => {
       chart?.registerMouseEvents([
         {
           name: 'click',
@@ -126,10 +137,11 @@ const ChartPreviewBoard: FC<{
             ) {
               dispatch(
                 fetchDataSetByPreviewChartAction({
-                  chartPreview: chartPreview!,
+                  backendChartId,
                   sorter: {
                     column: param?.seriesName!,
                     operator: param?.value?.direction,
+                    aggOperator: param?.value?.aggOperator,
                   },
                   pageInfo: {
                     pageNo: param?.value?.pageNo,
@@ -144,20 +156,15 @@ const ChartPreviewBoard: FC<{
     };
 
     const handleGotoWorkbenchPage = () => {
-      setEditChartVisible(true);
+      history.push({
+        pathname: `/organizations/${orgId}/vizs/chartEditor`,
+        state: {
+          dataChartId: backendChartId,
+          chartType: 'dataChart',
+          container: 'dataChart',
+        },
+      });
     };
-    const onSaveInDataChart = useCallback(
-      (orgId: string, backendChartId: string) => {
-        dispatch(
-          initChartPreviewData({
-            backendChartId,
-            orgId,
-          }),
-        );
-        setEditChartVisible(false);
-      },
-      [dispatch],
-    );
 
     const handleFilterChange = (type, payload) => {
       dispatch(
@@ -226,6 +233,68 @@ const ChartPreviewBoard: FC<{
       }
     }, [dispatch, chartPreview?.backendChart, t]);
 
+    const handleSaveAsVizs = useCallback(() => {
+      saveAsViz(chartPreview?.backendChartId as string, 'DATACHART');
+    }, [saveAsViz, chartPreview?.backendChartId]);
+
+    const handleReloadData = useCallback(async () => {
+      setLoadingStatus(true);
+      await dispatch(
+        fetchDataSetByPreviewChartAction({
+          backendChartId,
+        }),
+      );
+      setLoadingStatus(false);
+    }, [dispatch, backendChartId]);
+
+    const handleAddToDashBoard = useCallback(
+      dashboardId => {
+        const currentChartPreview = previewCharts.find(
+          c => c.backendChartId === backendChartId,
+        );
+
+        try {
+          history.push({
+            pathname: `/organizations/${orgId}/vizs/${dashboardId}/boardEditor`,
+            state: {
+              widgetInfo: JSON.stringify({
+                chartType: '',
+                dataChart: currentChartPreview?.backendChart,
+                dataview: currentChartPreview?.backendChart?.view,
+              }),
+            },
+          });
+        } catch (error) {
+          throw error;
+        }
+      },
+      [previewCharts, history, backendChartId, orgId],
+    );
+
+    const redirect = useCallback(
+      tabKey => {
+        if (tabKey) {
+          history.push(`/organizations/${orgId}/vizs/${tabKey}`);
+        } else {
+          history.push(`/organizations/${orgId}/vizs`);
+        }
+      },
+      [history, orgId],
+    );
+
+    const handleRecycleViz = useCallback(() => {
+      dispatch(
+        deleteViz({
+          params: { id: backendChartId, archive: true },
+          type: 'DATACHART',
+          resolve: () => {
+            message.success(tg('operation.archiveSuccess'));
+            dispatch(removeTab({ id: backendChartId, resolve: redirect }));
+          },
+        }),
+      );
+    }, [backendChartId, dispatch, redirect, tg]);
+
     return (
       <StyledChartPreviewBoard>
         <VizHeader
@@ -236,9 +305,15 @@ const ChartPreviewBoard: FC<{
           onPublish={handlePublish}
           onGenerateShareLink={handleGenerateShareLink}
           onDownloadData={handleCreateDownloadDataTask}
+          onSaveAsVizs={handleSaveAsVizs}
+          onReloadData={handleReloadData}
+          onAddToDashBoard={handleAddToDashBoard}
+          onRecycleViz={handleRecycleViz}
           allowDownload={allowDownload}
           allowShare={allowShare}
           allowManage={allowManage}
+          orgId={orgId}
+          backendChartId={backendChartId}
         />
         <PreviewBlock>
           <div>
@@ -250,27 +325,19 @@ const ChartPreviewBoard: FC<{
             />
           </div>
           <ChartWrapper ref={ref}>
-            <ChartTools.ChartIFrameContainer
-              key={backendChartId}
-              containerId={backendChartId}
-              dataset={chartPreview?.dataset}
-              chart={chart!}
-              config={chartPreview?.chartConfig!}
-              width={cacheW}
-              height={cacheH}
-            />
+            <Spin wrapperClassName="spinWrapper" spinning={loadingStatus}>
+              <ChartIFrameContainer
+                key={backendChartId}
+                containerId={backendChartId}
+                dataset={chartPreview?.dataset}
+                chart={chart!}
+                config={chartPreview?.chartConfig!}
+                width={cacheW}
+                height={cacheH}
+              />
+            </Spin>
           </ChartWrapper>
         </PreviewBlock>
-        {editChartVisible && (
-          <ChartEditor
-            dataChartId={backendChartId}
-            orgId={orgId}
-            chartType="dataChart"
-            container="dataChart"
-            onClose={() => setEditChartVisible(false)}
-            onSaveInDataChart={onSaveInDataChart}
-          />
-        )}
       </StyledChartPreviewBoard>
     );
   },
@@ -302,4 +369,13 @@ const ChartWrapper = styled.div`
   flex: 1;
   background-color: ${p => p.theme.componentBackground};
   border-radius: ${BORDER_RADIUS};
+  position: relative;
+  .spinWrapper {
+    width: 100%;
+    height: 100%;
+    .ant-spin-container {
+      width: 100%;
+      height: 100%;
+    }
+  }
 `;

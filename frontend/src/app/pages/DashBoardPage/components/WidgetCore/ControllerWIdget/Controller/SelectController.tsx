@@ -18,7 +18,7 @@
 import { Form, Select } from 'antd';
 import { SelectValue } from 'antd/lib/select';
 import { ControlOption } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
-import React, { memo, useCallback } from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components/macro';
 
 export interface SelectControllerProps {
@@ -53,13 +53,6 @@ export const SelectController: React.FC<SelectControllerProps> = ({
   value,
   defaultValue,
 }) => {
-  const renderOptions = useCallback(() => {
-    return (options || []).map(o => (
-      <Option key={o.value || o.label} value={o.value}>
-        {o.label || o.value}
-      </Option>
-    ));
-  }, [options]);
   return (
     <StyledSelect
       showSearch
@@ -67,14 +60,25 @@ export const SelectController: React.FC<SelectControllerProps> = ({
       value={value}
       style={{ width: '100%' }}
       placeholder="请选择"
-      optionFilterProp="children"
       onChange={onChange}
-      filterOption={(input, option) =>
-        option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      }
+      optionFilterProp="label"
       bordered={false}
+      filterOption={(input, option) =>
+        String(option?.label).toLowerCase().indexOf(input.toLowerCase()) >= 0
+      }
     >
-      {renderOptions()}
+      {(options || []).map(item => {
+        //  ##659
+        return (
+          <Option
+            key={item.value + item.label}
+            label={item.label ?? item.value ?? 'none'}
+            value={item.value}
+          >
+            <span>{item.label ?? item.value}</span>
+          </Option>
+        );
+      })}
     </StyledSelect>
   );
 };
@@ -83,6 +87,5 @@ const StyledSelect = styled(Select)`
 
   &.ant-select .ant-select-selector {
     background-color: transparent !important;
-    /* border: none; */
   }
 `;

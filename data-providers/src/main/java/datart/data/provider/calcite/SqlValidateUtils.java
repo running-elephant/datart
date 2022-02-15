@@ -17,29 +17,105 @@
  */
 package datart.data.provider.calcite;
 
+import com.google.common.collect.Sets;
 import datart.core.base.exception.Exceptions;
 import datart.data.provider.base.DataProviderException;
 import org.apache.calcite.sql.*;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 public class SqlValidateUtils {
 
+    /**
+     * SQL expressions that return bool values and can be replaced as 1=1 or 1=1 during processing
+     */
+    private static final Set<SqlKind> logicOperator = EnumSet.of(
+            SqlKind.IN, SqlKind.NOT_IN,
+            SqlKind.EQUALS, SqlKind.NOT_EQUALS,
+            SqlKind.LESS_THAN, SqlKind.GREATER_THAN,
+            SqlKind.GREATER_THAN_OR_EQUAL, SqlKind.LESS_THAN_OR_EQUAL,
+            SqlKind.LIKE,
+            SqlKind.BETWEEN);
+
+    private static final Set<SqlKind> disabledSqlKind = EnumSet.of(
+            SqlKind.INSERT, SqlKind.DELETE, SqlKind.UPDATE, SqlKind.MERGE,
+            SqlKind.COMMIT, SqlKind.ROLLBACK, SqlKind.ALTER_SESSION,
+            SqlKind.CREATE_SCHEMA, SqlKind.CREATE_FOREIGN_SCHEMA, SqlKind.DROP_SCHEMA,
+            SqlKind.CREATE_TABLE, SqlKind.ALTER_TABLE, SqlKind.DROP_TABLE,
+            SqlKind.CREATE_FUNCTION, SqlKind.DROP_FUNCTION,
+            SqlKind.CREATE_VIEW, SqlKind.ALTER_VIEW, SqlKind.DROP_VIEW,
+            SqlKind.CREATE_MATERIALIZED_VIEW, SqlKind.ALTER_MATERIALIZED_VIEW,
+            SqlKind.DROP_MATERIALIZED_VIEW,
+            SqlKind.CREATE_SEQUENCE, SqlKind.ALTER_SEQUENCE, SqlKind.DROP_SEQUENCE,
+            SqlKind.CREATE_INDEX, SqlKind.ALTER_INDEX, SqlKind.DROP_INDEX,
+            SqlKind.CREATE_TYPE, SqlKind.DROP_TYPE,
+            SqlKind.SET_OPTION, SqlKind.OTHER_DDL
+    );
+
+    private static final Set<String> QUERY_SQL = Sets.newHashSet(
+            "SELECT", "WITH"
+    );
+
+    private static final Set<String> DISABLED_SQL = Sets.newHashSet(
+            "CREATE", "DROP", "ALTER", "COMMIT", "ROLLBACK", "INSERT", "DELETE", "UPDATE", "MERGE"
+    );
 
     /**
      * Validate SqlNode. Only query statements can pass validation
      */
-    public static boolean validateQuery(SqlNode sqlCall) {
+    public static boolean validateQuery(SqlNode sqlCall, boolean enableSpecialSQL) {
         // check select sql
-        if (sqlCall instanceof SqlSelect || sqlCall instanceof SqlOrderBy) {
+        if (sqlCall.getKind().belongsTo(SqlKind.QUERY)) {
             return true;
         }
-
-        // check union
-        if (sqlCall instanceof SqlBasicCall && SqlKind.UNION.equals(sqlCall.getKind())) {
-            return true;
+        // check dml or ddl
+        if (sqlCall.getKind().belongsTo(disabledSqlKind)) {
+            Exceptions.tr(DataProviderException.class, "message.sql.op.forbidden", sqlCall.getKind() + ":" + sqlCall);
         }
-
-        Exceptions.tr(DataProviderException.class, "message.sql.op.forbidden", sqlCall.getKind() + ":" + sqlCall);
+        // special sql
+        if (!enableSpecialSQL) {
+            Exceptions.tr(DataProviderException.class, "message.sql.op.forbidden", sqlCall.getKind() + ":" + sqlCall);
+        }
         return false;
+    }
+
+    /**
+     * filter DDL and DML sql operators
+     * <p>
+     * throw sql exception if sql is one kind of dml or ddl
+     */
+    public static boolean validateQuery(String sql, boolean enableSpecialSQL) {
+        if (StringUtils.isBlank(sql)) {
+            return false;
+        }
+        String firstWord = firstWord(sql);
+        // check select sql
+        if (QUERY_SQL.stream().anyMatch(item -> item.equalsIgnoreCase(firstWord))) {
+            return true;
+        }
+        // check dml or ddl
+        if (DISABLED_SQL.stream().anyMatch(item -> item.equalsIgnoreCase(firstWord))) {
+            Exceptions.tr(DataProviderException.class, "message.sql.op.forbidden", sql);
+        }
+        // special sql
+        if (!enableSpecialSQL) {
+            Exceptions.tr(DataProviderException.class, "message.sql.op.forbidden", sql);
+        }
+        return false;
+
+    }
+
+    public static boolean isLogicExpressionSqlCall(SqlCall sqlCall) {
+        return sqlCall.getOperator().getKind().belongsTo(logicOperator);
+    }
+
+    private static String firstWord(String src) {
+        if (src == null) {
+            return null;
+        }
+        return src.trim().split(" ", 2)[0];
     }
 
 }

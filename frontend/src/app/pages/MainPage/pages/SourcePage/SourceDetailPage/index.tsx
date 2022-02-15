@@ -22,6 +22,10 @@ import { Authorized, EmptyFiller } from 'app/components';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useAccess } from 'app/pages/MainPage/Access';
+import {
+  PermissionLevels,
+  ResourceTypes,
+} from 'app/pages/MainPage/pages/PermissionPage/constants';
 import debounce from 'debounce-promise';
 import { CommonFormTypes, DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -35,7 +39,7 @@ import {
   SPACE_TIMES,
 } from 'styles/StyleConstants';
 import { request } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import { errorHandle, uuidv4 } from 'utils/utils';
 import {
   selectDataProviderConfigTemplateLoading,
   selectDataProviderListLoading,
@@ -43,6 +47,7 @@ import {
   selectOrgId,
 } from '../../../slice/selectors';
 import { getDataProviderConfigTemplate } from '../../../slice/thunks';
+import { UNPERSISTED_ID_PREFIX } from '../../ViewPage/constants';
 import { QueryResult } from '../../ViewPage/slice/types';
 import { useSourceSlice } from '../slice';
 import {
@@ -61,7 +66,6 @@ import {
 import { Source, SourceFormModel } from '../slice/types';
 import { allowCreateSource, allowManageSource } from '../utils';
 import { ConfigComponent } from './ConfigComponent';
-
 export function SourceDetailPage() {
   const [formType, setFormType] = useState(CommonFormTypes.Add);
   const [providerType, setProviderType] = useState('');
@@ -89,6 +93,12 @@ export function SourceDetailPage() {
     useAccess(allowCreateSource())(true) && sourceId === 'add';
   const allowManage =
     useAccess(allowManageSource(sourceId))(true) && sourceId !== 'add';
+  const allowEnableView = useAccess({
+    type: 'module',
+    module: ResourceTypes.View,
+    id: '',
+    level: PermissionLevels.Enable,
+  })(true);
 
   const config = useMemo(
     () => dataProviders[providerType]?.config,
@@ -305,6 +315,14 @@ export function SourceDetailPage() {
     [isArchived, formType, t, tg],
   );
 
+  const addNewView = useCallback(() => {
+    history.push({
+      pathname: `/organizations/${orgId}/views/${`${UNPERSISTED_ID_PREFIX}${uuidv4()}`}`,
+      state: {
+        sourcesId: editingSource?.id,
+      },
+    });
+  }, [history, orgId, editingSource]);
   return (
     <Authorized
       authority={allowCreate || allowManage}
@@ -316,6 +334,15 @@ export function SourceDetailPage() {
           actions={
             !isArchived ? (
               <>
+                {allowEnableView && (
+                  <Button
+                    disabled={!(formType === CommonFormTypes.Edit)}
+                    type="primary"
+                    onClick={addNewView}
+                  >
+                    {t('creatView')}
+                  </Button>
+                )}
                 <Button
                   type="primary"
                   loading={saveSourceLoading}
@@ -384,7 +411,7 @@ export function SourceDetailPage() {
                       return request({
                         url: `/sources/check/name`,
                         method: 'POST',
-                        params: { name: value, orgId },
+                        data: { name: value, orgId },
                       }).then(
                         () => Promise.resolve(),
                         err =>
