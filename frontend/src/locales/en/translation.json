@@ -1203,6 +1203,7 @@
       "string": "String",
       "numeric": "Number",
       "date": "Date",
+      "date_time": "DateTime",
       "fragment": "Expression"
     }
   },

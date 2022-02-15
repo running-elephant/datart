@@ -24,6 +24,7 @@ import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParserPos;
+import org.apache.calcite.util.DateString;
 import org.apache.calcite.util.TimestampString;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -93,6 +94,10 @@ public class SqlNodeUtils {
                         SqlLiteral.createBoolean(Boolean.parseBoolean(v), sqlParserPos)).collect(Collectors.toList());
             case DATE:
                 return variable.getValues().stream().map(v ->
+                        SqlLiteral.createDate(new DateString(v), sqlParserPos))
+                        .collect(Collectors.toList());
+            case DATE_TIME:
+                return variable.getValues().stream().map(v ->
                         SqlLiteral.createTimestamp(new TimestampString(v), 0, sqlParserPos))
                         .collect(Collectors.toList());
             case FRAGMENT:
@@ -111,8 +116,10 @@ public class SqlNodeUtils {
                 return SqlLiteral.createExactNumeric(value.getValue().toString(), SqlParserPos.ZERO);
             case BOOLEAN:
                 return SqlLiteral.createBoolean(Boolean.parseBoolean(value.getValue().toString()), SqlParserPos.ZERO);
-            case DATE:
+            case DATE_TIME:
                 return SqlLiteral.createTimestamp(new TimestampString(value.getValue().toString()), 0, SqlParserPos.ZERO);
+            case DATE:
+                return SqlLiteral.createDate(new DateString(value.getValue().toString()), SqlParserPos.ZERO);
             case FRAGMENT:
                 return new SqlFragment(value.getValue().toString());
             case IDENTIFIER:

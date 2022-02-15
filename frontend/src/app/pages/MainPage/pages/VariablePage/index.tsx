@@ -398,6 +398,7 @@ export function VariablePage() {
           afterClose={afterFormClose}
           keyboard={false}
           maskClosable={false}
+          width={600}
         />
         <SubjectForm
           scope={VariableScopes.Public}

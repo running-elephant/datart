@@ -35,7 +35,7 @@ import {
 } from 'app/types/FilterControlPanel';
 import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
 import { getTime } from 'app/utils/time';
-import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
+import {DATE_FORMATTER, FilterSqlOperator, TIME_FORMATTER} from 'globalConstants';
 import i18next from 'i18next';
 import moment from 'moment';
 import { CloneValueDeep } from 'utils/object';
@@ -51,7 +51,7 @@ import {
 } from '../pages/Board/slice/types';
 import {
   ControllerConfig,
-  ControllerDate,
+  ControllerDate, PickerTypes,
 } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { DateControllerTypes } from './../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
@@ -311,7 +311,10 @@ export const getControllerDateValues = (obj: {
       timeValues[1] = time.format(TIME_FORMATTER);
     }
   }
-
+  if (pickerType == PickerTypes.Date) {
+    timeValues[0] = moment(timeValues[0]).format(DATE_FORMATTER);
+    timeValues[1] = moment(timeValues[1]).format(DATE_FORMATTER);
+  }
   return timeValues;
 };
 export const adjustRangeDataEndValue = (

@@ -1203,6 +1203,7 @@
       "string": "字符",
       "numeric": "数值",
       "date": "日期",
+      "date_time": "日期时间",
       "fragment": "表达式"
     }
   },

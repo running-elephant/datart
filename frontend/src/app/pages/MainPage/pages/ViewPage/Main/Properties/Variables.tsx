@@ -380,6 +380,7 @@ export const Variables = memo(() => {
         afterClose={afterFormClose}
         keyboard={false}
         maskClosable={false}
+        width={600}
       />
       <SubjectForm
         scope={VariableScopes.Private}

@@ -8,6 +8,8 @@ public enum ValueType {
 
     DATE,
 
+    DATE_TIME,
+
     BOOLEAN,
 
     IDENTIFIER,

@@ -29,5 +29,6 @@ export enum VariableValueTypes {
   String = 'STRING',
   Number = 'NUMERIC',
   Date = 'DATE',
+  DateTime = 'DATE_TIME',
   Expression = 'FRAGMENT',
 }
