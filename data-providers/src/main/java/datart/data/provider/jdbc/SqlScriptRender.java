@@ -46,6 +46,7 @@ import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -160,6 +161,11 @@ public class SqlScriptRender extends ScriptRender {
             RequestContext.putWarning(MessageResolver.getMessage("message.provider.sql.parse.failed"), sqlParseError);
             placeholders = RegexVariableResolver.resolve(sqlDialect, selectSql, variableMap);
         }
+
+        placeholders = placeholders.stream()
+                .sorted(Comparator.comparingDouble(holder -> (holder instanceof SimpleVariablePlaceholder) ? 1000 + holder.getOriginalSqlFragment().length() : -holder.getOriginalSqlFragment().length()))
+                .collect(Collectors.toList());
+
         if (CollectionUtils.isNotEmpty(placeholders)) {
             for (VariablePlaceholder placeholder : placeholders) {
                 ReplacementPair replacementPair = placeholder.replacementPair();
@@ -233,5 +239,6 @@ public class SqlScriptRender extends ScriptRender {
         sql = sql.replace(CharUtils.LF, CharUtils.toChar(" "));
         return sql.trim();
     }
+
 
 }
