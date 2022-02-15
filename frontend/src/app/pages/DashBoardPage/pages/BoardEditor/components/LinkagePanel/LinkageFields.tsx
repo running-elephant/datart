@@ -66,7 +66,11 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
         } else if (key === 'linkerViewId') {
           return viewMap[viewLinkages[index][key]].meta
             ?.filter(item => {
-              return item.type === ChartDataViewFieldType.STRING;
+              const enableTypes = [
+                ChartDataViewFieldType.STRING,
+                ChartDataViewFieldType.DATE,
+              ];
+              return item.type && enableTypes.includes(item.type);
             })
             .map(item => (
               <Option key={item.id} fieldvaluetype={item.type} value={item.id}>
