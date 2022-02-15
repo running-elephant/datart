@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import { Alert, Button, Space, Spin } from 'antd';
+import { GithubOutlined } from '@ant-design/icons';
+import { Alert, Button, Popover, Space, Spin } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import { selectVersion } from 'app/slice/selectors';
@@ -24,7 +25,7 @@ import { transparentize } from 'polished';
 import React, { memo, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { SPACE_TIMES } from 'styles/StyleConstants';
+import { SPACE_MD, SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
 import { newIssueUrl } from 'utils/utils';
 import { ViewViewModelStages } from '../../constants';
 import { useViewSlice } from '../../slice';
@@ -83,16 +84,34 @@ export const Outputs = memo(() => {
         <Alert
           className="warningBox"
           message=""
-          description={t('sqlRunWraning')}
+          description={
+            <p>
+              {t('sqlRunWraning')}
+              <Popover
+                trigger={['click']}
+                placement="top"
+                overlayStyle={{ width: SPACE_TIMES(96) }}
+                content={t('warningDescription')}
+              >
+                <Button className="detail" type="link" size="small">
+                  {t('detail')}
+                </Button>
+              </Popover>
+            </p>
+          }
           type="warning"
           closable={false}
           action={
             <Space>
-              <Button type="primary" onClick={() => submitIssue('github')}>
-                Issues（github）
+              <Button
+                type="primary"
+                icon={<GithubOutlined />}
+                onClick={() => submitIssue('github')}
+              >
+                Github
               </Button>
               <Button type="primary" onClick={() => submitIssue('gitee')}>
-                Issues（gitee）
+                Gitee
               </Button>
               <Button onClick={removeViewWarnings}>{t('close')}</Button>
             </Space>
@@ -116,8 +135,13 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   border-top: 1px solid ${p => p.theme.borderColorSplit};
+
   .warningBox {
-    padding: ${SPACE_TIMES(2)};
+    padding: ${SPACE_XS} ${SPACE_MD};
+
+    .detail {
+      padding: 0;
+    }
   }
 `;
 
