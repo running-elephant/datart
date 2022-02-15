@@ -113,7 +113,10 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 
   useMount(
     () => {
-      if (!dataChartId && !originChart) {
+      if (
+        (container === 'dataChart' && !dataChartId) ||
+        (container === 'widget' && !originChart)
+      ) {
         // Note: add default chart if new to editor
         const currentChart = ChartManager.instance().getDefaultChart();
         handleChartChange(currentChart);
@@ -135,6 +138,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
               backendChart: originChart as ChartDTO,
             }),
           );
+
           if (!originChart) {
             dispatch(actions.updateChartAggregation(true));
           }
