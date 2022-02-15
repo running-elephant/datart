@@ -27,7 +27,7 @@ import {
   fontDefault,
   VALUE_SPLITTER,
 } from 'app/pages/DashBoardPage/utils/widget';
-import { VERSION_BETA_0, VERSION_LIST } from '../constants';
+import { VERSION_BETA_0, VERSION_BETA_1, VERSION_LIST } from '../constants';
 
 /**
  *
@@ -97,6 +97,7 @@ export const beta0 = (widget?: Widget) => {
  */
 export const beta1 = (widget?: Widget) => {
   if (!widget) return undefined;
+  widget.config.version = VERSION_BETA_1;
   return widget;
 };
 /**

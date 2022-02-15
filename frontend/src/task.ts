@@ -19,7 +19,7 @@
 // organize-imports-ignore  polyfill/stable must in the first
 import 'react-app-polyfill/stable';
 
-import { migrateWidgets } from 'app/migration/WidgetConfig/migrateWidgets';
+import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import {
   DataChart,

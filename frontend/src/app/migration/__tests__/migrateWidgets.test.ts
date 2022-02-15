@@ -27,7 +27,7 @@ import {
   beta0,
   convertWidgetRelationsToObj,
   migrateWidgets,
-} from '../WidgetConfig/migrateWidgets';
+} from '../BoardConfig/migrateWidgets';
 
 describe('test migrateWidgets ', () => {
   test('should return undefined  when widget.config.type === filter', () => {
