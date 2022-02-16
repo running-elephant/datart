@@ -572,7 +572,7 @@ describe('Chart Helper ', () => {
     [
       undefined,
       undefined,
-      `[unknown]: ''`,
+      `[unknown]: -`,
     ],
     [
       {
