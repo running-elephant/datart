@@ -87,6 +87,16 @@ const StyledTable = styled(Table)<{ tableStyleConfig?: TableStyleConfigProps }>`
     background: inherit;
   }
 
+  .ant-table-summary {
+    background: #fafafa;
+  }
+  .ant-table-cell-fix-left {
+    background: #fafafa;
+  }
+  .ant-table-cell-fix-right {
+    background: #fafafa;
+  }
+
   .ant-table .ant-table-container .ant-table-body .datart-basic-table-odd {
     background: ${p =>
       p?.tableStyleConfig?.odd?.backgroundColor || 'transparent'};
