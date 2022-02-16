@@ -28,12 +28,7 @@ export function useStartAnalysis() {
     viewId => {
       history.push({
         pathname: `/organizations/${orgId}/vizs/chartEditor`,
-        state: {
-          dataChartId: '',
-          chartType: 'dataChart',
-          container: 'dataChart',
-          defaultViewId: viewId,
-        },
+        search: `dataChartId=&chartType=dataChart&container=dataChart&defaultViewId=${viewId}`,
       });
     },
     [history, orgId],
