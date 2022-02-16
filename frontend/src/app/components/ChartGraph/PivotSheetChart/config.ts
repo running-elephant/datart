@@ -377,10 +377,6 @@ const config: ChartConfig = {
           subTotalPosition: 'Sub Total Position',
           aggregateFields: 'Summary Fields',
         },
-        paging: {
-          title: 'Paging',
-          pageSize: 'Page Size',
-        },
       },
     },
   ],

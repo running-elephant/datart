@@ -250,12 +250,12 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'paging.title',
+      label: 'viz.palette.setting.paging.title',
       key: 'paging',
       comType: 'group',
       rows: [
         {
-          label: 'paging.pageSize',
+          label: 'viz.palette.setting.paging.pageSize',
           key: 'pageSize',
           default: 1000,
           comType: 'inputNumber',
@@ -287,10 +287,6 @@ const config: ChartConfig = {
           bodyFontSize: '主体字体大小',
           footerFontSize: '尾部字体大小',
         },
-        paging: {
-          title: '常规',
-          pageSize: '总行数',
-        },
       },
     },
     {
@@ -310,10 +306,6 @@ const config: ChartConfig = {
           headerFontSize: 'Header Font Size',
           bodyFontSize: 'Body Font Size',
           footerFontSize: 'Footer Font Size',
-        },
-        paging: {
-          title: 'Paging',
-          pageSize: 'Page Size',
         },
       },
     },
