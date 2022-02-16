@@ -436,12 +436,12 @@ const config: ChartConfig = {
   ],
   settings: [
     {
-      label: 'paging.title',
+      label: 'viz.palette.setting.paging.title',
       key: 'paging',
       comType: 'group',
       rows: [
         {
-          label: 'paging.pageSize',
+          label: 'viz.palette.setting.paging.pageSize',
           key: 'pageSize',
           default: 1000,
           comType: 'inputNumber',
@@ -537,10 +537,6 @@ const config: ChartConfig = {
           title: '参考线',
           open: '点击参考线配置',
         },
-        paging: {
-          title: '常规',
-          pageSize: '总行数',
-        },
       },
     },
     {
@@ -611,10 +607,6 @@ const config: ChartConfig = {
         reference: {
           title: 'Reference Line',
           open: 'Open',
-        },
-        paging: {
-          title: 'Paging',
-          pageSize: 'Page Size',
         },
       },
     },
