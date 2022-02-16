@@ -17,20 +17,22 @@ const isMatchedTheCondition = (
       matchTheCondition = value !== conditionValues;
       break;
     case OperatorTypes.Contain:
-      matchTheCondition = (value as string).includes(conditionValues as string);
+      matchTheCondition = (value as string)?.includes(
+        conditionValues as string,
+      );
       break;
     case OperatorTypes.NotContain:
-      matchTheCondition = !(value as string).includes(
+      matchTheCondition = !(value as string)?.includes(
         conditionValues as string,
       );
       break;
     case OperatorTypes.In:
-      matchTheCondition = (conditionValues as (string | number)[]).includes(
+      matchTheCondition = (conditionValues as (string | number)[])?.includes(
         value,
       );
       break;
     case OperatorTypes.NotIn:
-      matchTheCondition = !(conditionValues as (string | number)[]).includes(
+      matchTheCondition = !(conditionValues as (string | number)[])?.includes(
         value,
       );
       break;
