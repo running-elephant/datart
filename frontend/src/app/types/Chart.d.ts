@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 
+import ChartConfig from './ChartConfig';
+import ChartDataset from './ChartDataset';
+import ChartMetadata from './ChartMetadata';
+
 export type ChartStatus =
   | 'init'
   | 'depsLoaded'

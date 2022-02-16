@@ -17,12 +17,14 @@
  */
 
 import { expect } from '@jest/globals';
+import { IChart } from 'app/types/Chart';
 import { isFunc } from 'utils/object';
 
-const isChartModelImpl = chart => {
+const isChartModelImpl = (chart: IChart) => {
   return (
     Boolean(chart) &&
-    Boolean(chart.meta) &&
+    Boolean(chart?.meta?.id) &&
+    Boolean(chart?.meta?.name) &&
     isFunc(chart.onMount) &&
     isFunc(chart.onUpdated) &&
     isFunc(chart.onResize) &&

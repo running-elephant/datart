@@ -184,7 +184,9 @@ class BasicTableChart extends ReactChart {
         }
       },
       rowClassName: (_, index) => {
-        return index % 2 === 0 ? 'odd' : 'even';
+        return index % 2 === 0
+          ? 'datart-basic-table-odd'
+          : 'datart-basic-table-even';
       },
       tableStyleConfig: this.getTableStyle(styleConfigs),
     };

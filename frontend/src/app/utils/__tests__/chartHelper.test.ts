@@ -18,12 +18,18 @@
 
 import { ChartDataSetRow } from 'app/components/ChartGraph/models/ChartDataSet';
 import {
+  ChartDataSectionField,
+  IFieldFormatConfig,
+} from '../../types/ChartConfig';
+import {
   getColumnRenderName,
   getStyles,
   getValue,
   isMatchRequirement,
+  toFormattedValue,
   transformToDataSet,
   transformToObjectArray,
+  valueFormatter,
 } from '../chartHelper';
 
 describe('Chart Helper ', () => {
@@ -467,6 +473,173 @@ describe('Chart Helper ', () => {
         } as any),
       ).toEqual(1);
       expect(chartDataSet[0].getCellByKey('AVG(age)')).toEqual('r1-c2-v');
+    });
+  });
+
+  describe.each([
+    [1, undefined, 1],
+    [
+      2,
+      {
+        type: 'numeric',
+        numeric: {
+          decimalPlaces: 3,
+          unitKey: 'thousand',
+          useThousandSeparator: true,
+          prefix: 'a',
+          suffix: 'b',
+        },
+      },
+      'a0.002Kb',
+    ],
+    [
+      111,
+      {
+        type: 'numeric',
+        numeric: {
+          decimalPlaces: 3,
+          unitKey: 'thousand',
+          useThousandSeparator: true,
+          prefix: '',
+          suffix: 'b',
+        },
+      },
+      '0.111Kb',
+    ],
+    [
+      333,
+      {
+        type: 'numeric',
+        numeric: {
+          decimalPlaces: 3,
+          unitKey: '',
+          useThousandSeparator: true,
+          prefix: '',
+          suffix: 'b',
+        },
+      },
+      '333.000b',
+    ],
+    [
+      3,
+      {
+        type: 'currency',
+        currency: {
+          decimalPlaces: 3,
+          unitKey: 'thousand',
+          useThousandSeparator: true,
+          currency: 'CNY',
+        },
+      },
+      '¥0.003 K',
+    ],
+    [
+      4,
+      {
+        type: 'percentage',
+        percentage: {
+          decimalPlaces: 2,
+        },
+      },
+      '400.00%',
+    ],
+    [
+      50,
+      {
+        type: 'scientificNotation',
+        scientificNotation: {
+          decimalPlaces: 2,
+        },
+      },
+      `5.00e+1`,
+    ],
+    [
+      55,
+      {
+        type: 'scientificNotation',
+        scientificNotation: {
+          decimalPlaces: 3,
+        },
+      },
+      `5.500e+1`,
+    ],
+  ])('toFormattedValue Test - ', (value, format, expected) => {
+    test(`format aggregate data`, () => {
+      expect(toFormattedValue(value, format as IFieldFormatConfig)).toEqual(
+        expected,
+      );
+    });
+  });
+
+  describe.each([
+    [undefined, undefined, `[unknown]: -`],
+    [
+      {
+        alias: {
+          name: 'aa',
+        },
+        aggregate: 'SUM',
+        colName: 'name',
+        type: 'STRING',
+        category: 'field',
+      },
+      undefined,
+      `aa: -`,
+    ],
+    [
+      {
+        alias: {
+          name: 'bb',
+        },
+        aggregate: '',
+        colName: 'name',
+        type: 'STRING',
+        category: 'field',
+      },
+      undefined,
+      `bb: -`,
+    ],
+    [
+      {
+        aggregate: '',
+        colName: 'name',
+        type: 'STRING',
+        category: 'field',
+      },
+      55,
+      `name: 55`,
+    ],
+    [
+      {
+        aggregate: 'SUM',
+        colName: 'name',
+        type: 'STRING',
+        category: 'field',
+      },
+      55,
+      `SUM(name): 55`,
+    ],
+    [
+      {
+        format: {
+          type: 'scientificNotation',
+          scientificNotation: {
+            decimalPlaces: 3,
+          },
+        },
+        aggregate: 'SUM',
+        colName: 'name',
+        type: 'STRING',
+        category: 'field',
+      },
+      55,
+      `SUM(name): 5.500e+1`,
+    ],
+  ])('valueFormatter Test - ', (config, value, expected) => {
+    test(`Get chart render string with field name and value`, () => {
+      expect(valueFormatter(config as ChartDataSectionField, value)).toEqual(
+        expected,
+      );
     });
   });
 });
