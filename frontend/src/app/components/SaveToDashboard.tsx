@@ -20,7 +20,6 @@ import { Input, message, Modal } from 'antd';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useGetVizIcon from 'app/hooks/useGetVizIcon';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import useMount from 'app/hooks/useMount';
 import { ServerDashboard } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getCascadeAccess } from 'app/pages/MainPage/Access';
 import {
@@ -28,16 +27,17 @@ import {
   ResourceTypes,
   VizResourceSubTypes,
 } from 'app/pages/MainPage/pages/PermissionPage/constants';
+import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import {
   selectIsOrgOwner,
   selectPermissionMap,
 } from 'app/pages/MainPage/slice/selectors';
-import { FC, memo, useCallback, useMemo, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { request2 } from 'utils/request';
-import { errorHandle, getPath, listToTree } from 'utils/utils';
+import { getPath, listToTree } from 'utils/utils';
 import { Tree } from './Tree';
 
 interface SaveToDashboardTypes {
@@ -58,24 +58,13 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
     orgId,
     backendChartId,
   }) => {
-    const [vizData, setVizData] = useState<Folder[]>();
+    const vizs = useSelector(selectVizs);
+    const [vizData, setVizData] = useState<Folder[]>(vizs);
     const [selectId, setSelectId] = useState<string>('');
     const t = useI18NPrefix('components.saveToDashOrStory');
     const getIcon = useGetVizIcon();
     const isOwner = useSelector(selectIsOrgOwner);
     const permissionMap = useSelector(selectPermissionMap);
-
-    const getDashboardData = useCallback(async orgId => {
-      try {
-        const { data } = await request2<Folder[]>(
-          `/viz/folders?orgId=${orgId}`,
-        );
-        return data;
-      } catch (error) {
-        errorHandle(error);
-        throw error;
-      }
-    }, []);
 
     const filterDashboardData = useCallback(
       vizData => {
@@ -131,10 +120,9 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
       [handleOk, backendChartId, t],
     );
 
-    useMount(async () => {
-      let _vizData = await getDashboardData(orgId);
-      setVizData(filterDashboardData(_vizData));
-    });
+    useEffect(() => {
+      setVizData(filterDashboardData(vizs));
+    }, [filterDashboardData, vizs]);
 
     const treeData = useMemo(() => {
       return listToTree(

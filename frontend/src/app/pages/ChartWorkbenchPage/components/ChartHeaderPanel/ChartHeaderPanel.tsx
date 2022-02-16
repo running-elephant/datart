@@ -19,9 +19,12 @@
 import { Button, Space } from 'antd';
 import SaveToDashboard from 'app/components/SaveToDashboard';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useMount from 'app/hooks/useMount';
 import { backendChartSelector } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { selectHasVizFetched } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
+import { getFolders } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
 import { FC, memo, useCallback, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
@@ -50,8 +53,10 @@ const ChartHeaderPanel: FC<{
     onSaveChartToDashBoard,
   }) => {
     const t = useI18NPrefix(`viz.workbench.header`);
+    const hasVizFetched = useSelector(selectHasVizFetched);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const backendChart = useSelector(backendChartSelector);
+    const dispatch = useDispatch();
 
     const handleModalOk = useCallback(
       (dashboardId: string) => {
@@ -65,6 +70,12 @@ const ChartHeaderPanel: FC<{
       setIsModalVisible(false);
     }, []);
 
+    useMount(() => {
+      if (!hasVizFetched) {
+        // Request data when there is no data
+        dispatch(getFolders(orgId as string));
+      }
+    });
     return (
       <Wrapper>
         <h1>{chartName}</h1>

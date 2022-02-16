@@ -158,11 +158,7 @@ const ChartPreviewBoard: FC<{
     const handleGotoWorkbenchPage = () => {
       history.push({
         pathname: `/organizations/${orgId}/vizs/chartEditor`,
-        state: {
-          dataChartId: backendChartId,
-          chartType: 'dataChart',
-          container: 'dataChart',
-        },
+        search: `dataChartId=${backendChartId}&chartType=dataChart&container=dataChart`,
       });
     };
 

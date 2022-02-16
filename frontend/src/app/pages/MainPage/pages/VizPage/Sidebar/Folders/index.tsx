@@ -104,11 +104,7 @@ export const Folders = memo(
         if (key === 'DATACHART') {
           history.push({
             pathname: `/organizations/${orgId}/vizs/chartEditor`,
-            state: {
-              dataChartId: '',
-              chartType: 'dataChart',
-              container: 'dataChart',
-            },
+            search: `dataChartId=&chartType=dataChart&container=dataChart`,
           });
           return false;
         }
