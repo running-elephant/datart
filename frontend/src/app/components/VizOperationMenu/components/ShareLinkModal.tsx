@@ -17,7 +17,7 @@
  */
 
 import { CopyOutlined } from '@ant-design/icons';
-import { Button, Checkbox, DatePicker, Form, Input, Modal ,Space} from 'antd';
+import { Button, Checkbox, DatePicker, Form, Input, Modal ,Space,Tooltip} from 'antd';
 import { FormItemEx } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import moment from 'moment';
@@ -112,45 +112,40 @@ const ShareLinkModal: FC<{
             {t('share.generateLink')}
           </Button>
         </FormItemEx>
-        <FormItemEx label={t('share.link')} rules={[{ required: true }]}>
-          <Input
-            disabled
-            value={getFullShareLinkPath(shareLink)}
-            addonAfter={
-              <CopyOutlined
-                onClick={() =>
-                  handleCopyToClipboard(getFullShareLinkPath(shareLink))
-                }
-              />
-            }
-          />
-        </FormItemEx>
-        {shareLink?.usePassword && (
-          <FormItemEx label={t('share.password')}>
-            <Input
-              disabled
-              value={shareLink?.password}
-              addonAfter={
-                <CopyOutlined
-                  onClick={() => handleCopyToClipboard(shareLink?.password)}
-                />
-              }
-            />
-          </FormItemEx>
-        )}
         {
-          shareLink?.usePassword && (
+          shareLink?.usePassword ? (
             <FormItemEx label={t('share.link_password')}>
-              <Input style={{"height": "150px"}}
+              <Tooltip title={t('share.link')+`： `+`${getFullShareLinkPath(shareLink)}`+ `         ` +t('share.password')+`： `+`${shareLink?.password}`}>
+              <Input
                 disabled
                 value={t('share.link')+`： `+`${getFullShareLinkPath(shareLink)}`+ `         ` +t('share.password')+`： `+`${shareLink?.password}`}
+                title={t('share.link')+`： `+`${getFullShareLinkPath(shareLink)}`+ `         ` +t('share.password')+`： `+`${shareLink?.password}`}
                 addonAfter={
                   <CopyOutlined onClick={() => handleCopyToClipboard(t('share.link')+`： `+`${getFullShareLinkPath(shareLink)}`+ `         ` +t('share.password')+`： `+`${shareLink?.password}`)}/>
                 }
               />
+              </Tooltip>
             </FormItemEx>
 
-          )
+          ):
+            (
+              <FormItemEx label={t('share.link')} rules={[{ required: true }]}>
+                <Tooltip title={getFullShareLinkPath(shareLink)}>
+                <Input
+                  disabled
+                  value={getFullShareLinkPath(shareLink)}
+                  title={getFullShareLinkPath(shareLink)}
+                  addonAfter={
+                    <CopyOutlined
+                      onClick={() =>
+                        handleCopyToClipboard(getFullShareLinkPath(shareLink))
+                      }
+                    />
+                  }
+                />
+                </Tooltip>
+              </FormItemEx>
+            )
         }
       </Form>
     </StyledShareLinkModal>
