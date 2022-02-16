@@ -16,9 +16,14 @@
  * limitations under the License.
  */
 
-const { createJestConfig } = require('@craco/craco');
+import PivotSheetChart from '../PivotSheetChart';
 
-const cracoConfig = require('./craco.config.js');
-const jestConfig = createJestConfig(cracoConfig, {});
-
-module.exports = jestConfig;
+describe('<PivotSheetChart />', () => {
+  let component;
+  beforeEach(() => {
+    component = new PivotSheetChart();
+  });
+  test('It should mount', () => {
+    expect(component).toBeDatartChartModel();
+  });
+});

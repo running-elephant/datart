@@ -133,6 +133,13 @@ module.exports = {
       return webpackConfig;
     },
   },
+  jest: {
+    configure: (jestConfig, { env, paths, resolve, rootDir }) => {
+      return Object.assign(jestConfig, {
+        setupFiles: ['jest-canvas-mock'],
+      });
+    },
+  },
 
   devServer: {
     before: function (app, server, compiler) {
