@@ -17,16 +17,19 @@
  */
 
 import { ChartDataSetRow } from 'app/components/ChartGraph/models/ChartDataSet';
-import { ChartDataSectionField, IFieldFormatConfig } from '../../types/ChartConfig';
+import {
+  ChartDataSectionField,
+  IFieldFormatConfig,
+} from '../../types/ChartConfig';
 import {
   getColumnRenderName,
   getStyles,
   getValue,
   isMatchRequirement,
   toFormattedValue,
-  valueFormatter,
   transformToDataSet,
   transformToObjectArray,
+  valueFormatter,
 } from '../chartHelper';
 
 describe('Chart Helper ', () => {
@@ -569,14 +572,36 @@ describe('Chart Helper ', () => {
   });
 
   describe.each([
+    [undefined, undefined, `[unknown]: -`],
     [
+      {
+        alias: {
+          name: 'aa',
+        },
+        aggregate: 'SUM',
+        colName: 'name',
+        type: 'STRING',
+        category: 'field',
+      },
       undefined,
-      undefined,
-      `[unknown]: -`,
+      `aa: -`,
     ],
     [
       {
-        aggregate: "",
+        alias: {
+          name: 'bb',
+        },
+        aggregate: '',
+        colName: 'name',
+        type: 'STRING',
+        category: 'field',
+      },
+      undefined,
+      `bb: -`,
+    ],
+    [
+      {
+        aggregate: '',
         colName: 'name',
         type: 'STRING',
         category: 'field',
@@ -586,7 +611,7 @@ describe('Chart Helper ', () => {
     ],
     [
       {
-        aggregate: "SUM",
+        aggregate: 'SUM',
         colName: 'name',
         type: 'STRING',
         category: 'field',
@@ -602,7 +627,7 @@ describe('Chart Helper ', () => {
             decimalPlaces: 3,
           },
         },
-        aggregate: "SUM",
+        aggregate: 'SUM',
         colName: 'name',
         type: 'STRING',
         category: 'field',
