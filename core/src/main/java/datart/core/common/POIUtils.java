@@ -18,7 +18,6 @@
 package datart.core.common;
 
 import datart.core.base.consts.FileFormat;
-import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.Column;
 import datart.core.data.provider.Dataframe;
@@ -29,6 +28,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -132,6 +132,9 @@ public class POIUtils {
         }
         switch (cell.getCellType()) {
             case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)){
+                    return cell.getLocalDateTimeCellValue().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                }
                 return cell.getNumericCellValue();
             case BOOLEAN:
                 return cell.getBooleanCellValue();
