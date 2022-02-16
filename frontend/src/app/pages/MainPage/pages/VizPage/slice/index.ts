@@ -31,7 +31,7 @@ import { ArchivedViz, VizState, VizTab } from './types';
 import { transferChartConfig } from './utils';
 export const initialState: VizState = {
   vizs: [],
-  isFetchVizs: false,
+  hasVizFetched: false,
   storyboards: [],
   vizListLoading: false,
   storyboardListLoading: false,
@@ -115,12 +115,12 @@ const slice = createSlice({
     });
     builder.addCase(getFolders.fulfilled, (state, action) => {
       state.vizListLoading = false;
-      state.isFetchVizs = true;
+      state.hasVizFetched = true;
       state.vizs = action.payload.map(f => ({ ...f, deleteLoading: false }));
     });
     builder.addCase(getFolders.rejected, state => {
       state.vizListLoading = false;
-      state.isFetchVizs = true;
+      state.hasVizFetched = true;
     });
 
     // getStoryboards

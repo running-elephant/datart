@@ -121,7 +121,7 @@ export const selectPreviewCharts = createSelector(
   vizState => vizState.chartPreviews,
 );
 
-export const selectIsFetchVizs = createSelector(
+export const selectHasVizFetched = createSelector(
   [selectDomain],
-  vizState => vizState.isFetchVizs,
+  vizState => vizState.hasVizFetched,
 );
