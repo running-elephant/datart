@@ -117,21 +117,21 @@ export function MainPage() {
           <Route
             path="/organizations/:orgId/vizs/chartEditor"
             render={res => {
-              const hisQuery = new URLSearchParams(res.location.search);
-              const histState = {
-                dataChartId: hisQuery.get('dataChartId'),
-                chartType: hisQuery.get('chartType'),
-                container: hisQuery.get('container'),
-                defaultViewId: hisQuery.get('defaultViewId'),
+              const hisSearch = new URLSearchParams(res.location.search);
+              const hisState = {
+                dataChartId: hisSearch.get('dataChartId') || '',
+                chartType: hisSearch.get('chartType') || 'dataChart',
+                container: hisSearch.get('container') || 'dataChart',
+                defaultViewId: hisSearch.get('defaultViewId') || '',
               } as ChartEditorBaseProps;
               return (
                 <AccessRoute module={ResourceTypes.Viz}>
                   <ChartEditor
-                    dataChartId={histState.dataChartId}
+                    dataChartId={hisState.dataChartId}
                     orgId={orgId}
-                    chartType={histState.chartType}
-                    container={histState.container}
-                    defaultViewId={histState.defaultViewId}
+                    chartType={hisState.chartType}
+                    container={hisState.container}
+                    defaultViewId={hisState.defaultViewId}
                     onClose={() => history.go(-1)}
                     onSaveInDataChart={onSaveInDataChart}
                   />
