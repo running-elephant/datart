@@ -117,7 +117,13 @@ export function MainPage() {
           <Route
             path="/organizations/:orgId/vizs/chartEditor"
             render={res => {
-              let histState = res.location.state as ChartEditorBaseProps;
+              const hisQuery = new URLSearchParams(res.location.search);
+              const histState = {
+                dataChartId: hisQuery.get('dataChartId'),
+                chartType: hisQuery.get('chartType'),
+                container: hisQuery.get('container'),
+                defaultViewId: hisQuery.get('defaultViewId'),
+              } as ChartEditorBaseProps;
               return (
                 <AccessRoute module={ResourceTypes.Viz}>
                   <ChartEditor
