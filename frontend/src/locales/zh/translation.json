@@ -96,7 +96,11 @@
     "tipDesc4": "没有收到？",
     "resend": "重新发送电子邮件",
     "back": "返回上一步",
-    "registrationSuccess": "注册成功"
+    "registerSuccess": "注册成功",
+    "tipDesc5": "点击这里",
+    "tipDesc6": "，或",
+    "goLogin": "去登录",
+    "continue": "继续注册"
   },
   "forgotPassword": {
     "return": "返回登录",
@@ -959,7 +963,9 @@
     "resultEmpty1": "请点击 ",
     "resultEmpty2": " 按钮执行，运行结果将在此处展示",
     "errorTitle": "执行错误",
-    "sqlRunWraning": "SQL 解析失败，欢迎一键提交 issue 帮助我们优化",
+    "sqlRunWraning": "SQL 解析失败，欢迎一键提交 issue 帮助我们优化。",
+    "detail": "查看详情",
+    "warningDescription": "Datart 默认使用 calcite 解析 SQL 语句；calcite 拥有的非常棒的语法解析器，但依然做不到解析所有数据库的所有语法。当发生解析异常时，datart 对 SQL 语句进行必要的处理之后仍然会发送到数据库执行，如果可以执行成功，我们会认为解析器需要针对该条 SQL 语句的语法进行优化。在这种情况下，datart 会显示该警告信息，方便用户将解析异常的语句提交到 github 或 gitee issue，帮助我们优化解析器。",
     "close": "关闭",
     "tabs": {
       "discard": "放弃",

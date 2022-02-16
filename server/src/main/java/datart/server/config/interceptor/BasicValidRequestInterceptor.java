@@ -47,6 +47,8 @@ public class BasicValidRequestInterceptor implements HandlerInterceptor {
                 || requestURI.equals("/")
                 || requestURI.equals("/index.html")
                 || requestURI.equals("/favicon.ico")
+                || requestURI.equals("/manifest.json")
+                || requestURI.equals("editor.worker.js")
                 || requestURI.startsWith(resourcePath)
                 || requestURI.startsWith("/swagger")
                 || requestURI.startsWith("/webjars")

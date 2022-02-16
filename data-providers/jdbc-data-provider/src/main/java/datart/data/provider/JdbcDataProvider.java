@@ -118,7 +118,7 @@ public class JdbcDataProvider extends DataProvider {
 
         Object enableSpecialSQL = config.getProperties().get(ENABLE_SPECIAL_SQL);
 
-        if ("true".equals(enableSpecialSQL.toString())) {
+        if (enableSpecialSQL != null && "true".equals(enableSpecialSQL.toString())) {
             jdbcProperties.setEnableSpecialSql(true);
         }
 
