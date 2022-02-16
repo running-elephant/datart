@@ -120,3 +120,8 @@ export const selectPreviewCharts = createSelector(
   [selectDomain],
   vizState => vizState.chartPreviews,
 );
+
+export const selectHasVizFetched = createSelector(
+  [selectDomain],
+  vizState => vizState.hasVizFetched,
+);

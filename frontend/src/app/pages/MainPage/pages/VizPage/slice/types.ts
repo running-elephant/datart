@@ -13,6 +13,7 @@ export type VizType = [
 
 export interface VizState {
   vizs: FolderViewModel[];
+  hasVizFetched: boolean;
   storyboards: StoryboardViewModel[];
   vizListLoading: boolean;
   storyboardListLoading: boolean;
