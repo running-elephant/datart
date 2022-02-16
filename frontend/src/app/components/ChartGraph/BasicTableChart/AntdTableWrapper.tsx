@@ -82,23 +82,18 @@ const StyledTable = styled(Table)<{ tableStyleConfig?: TableStyleConfigProps }>`
     overflow: ${p =>
       p?.tableStyleConfig?.isFixedColumns ? 'auto scroll' : 'auto !important'};
   }
-  .ant-table-summary {
-    background: #fafafa;
-  }
-  .ant-table-cell-fix-left {
-    background: #fafafa;
-  }
-  .ant-table-cell-fix-right {
-    background: #fafafa;
+
+  .ant-table .ant-table-container .ant-table-body .ant-table-tbody td {
+    background: inherit;
   }
 
-  .ant-table .ant-table-container .ant-table-body .odd td{
+  .ant-table .ant-table-container .ant-table-body .datart-basic-table-odd {
     background: ${p =>
       p?.tableStyleConfig?.odd?.backgroundColor || 'transparent'};
     color: ${p => p?.tableStyleConfig?.odd?.color || 'auto'};
   }
 
-  .ant-table .ant-table-container .ant-table-body .even td{
+  .ant-table .ant-table-container .ant-table-body .datart-basic-table-even {
     background: ${p =>
       p?.tableStyleConfig?.even?.backgroundColor || 'transparent'};
     color: ${p => p?.tableStyleConfig?.even?.color || 'auto'};

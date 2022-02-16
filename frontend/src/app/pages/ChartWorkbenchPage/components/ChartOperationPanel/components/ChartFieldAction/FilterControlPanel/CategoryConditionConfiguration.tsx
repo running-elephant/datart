@@ -145,7 +145,7 @@ const CategoryConditionConfiguration: FC<
     };
 
     const filterGeneralListOptions = useCallback(
-      (inputValue, option) => option.label.includes(inputValue),
+      (inputValue, option) => option.label?.includes(inputValue) || false,
       [],
     );
 

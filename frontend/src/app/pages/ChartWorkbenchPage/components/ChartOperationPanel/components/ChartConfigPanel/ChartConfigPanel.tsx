@@ -58,7 +58,7 @@ const CONFIG_PANEL_TABS = {
 };
 
 const ChartConfigPanel: FC<{
-  chartId: string;
+  chartId?: string;
   chartConfig?: ChartConfig;
   onChange: (type: string, payload: ChartConfigPayloadType) => void;
 }> = memo(
