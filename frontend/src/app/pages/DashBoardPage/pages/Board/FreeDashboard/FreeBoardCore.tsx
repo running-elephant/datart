@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Empty } from 'antd';
+import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
@@ -43,6 +44,7 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
     const widgetConfigRecords = useSelector((state: { board: BoardState }) =>
       selectLayoutWidgetMapById()(state, boardId),
     );
+    const visible = useVisibleHidden();
     const widgetConfigs = useMemo(() => {
       return Object.values(widgetConfigRecords).sort((w1, w2) => {
         return w1.config.index - w2.config.index;
@@ -78,7 +80,11 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
     const { gridRef } = useBoardWidthHeight();
     return (
       <Wrap>
-        <div className="container" ref={gridRef}>
+        <div
+          className="container"
+          ref={gridRef}
+          style={{ visibility: visible }}
+        >
           <div
             className="grid-background"
             style={nextBackgroundStyle}
