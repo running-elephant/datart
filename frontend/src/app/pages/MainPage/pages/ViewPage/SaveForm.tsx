@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { DoubleRightOutlined } from '@ant-design/icons';
 import {
   Button,
@@ -10,6 +28,7 @@ import {
   TreeSelect,
 } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import debounce from 'debounce-promise';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import {
@@ -31,11 +50,7 @@ import {
   selectPermissionMap,
 } from '../../slice/selectors';
 import { PermissionLevels, ResourceTypes } from '../PermissionPage/constants';
-import {
-  ConcurrencyControlModes,
-  CONCURRENCY_CONTROL_MODE_LABEL,
-  ViewViewModelStages,
-} from './constants';
+import { ConcurrencyControlModes, ViewViewModelStages } from './constants';
 import { SaveFormContext } from './SaveFormContext';
 import {
   makeSelectViewFolderTree,
@@ -81,6 +96,8 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
   const currentEditingView = useSelector(selectCurrentEditingView);
   const orgId = useSelector(selectOrgId);
   const formRef = useRef<FormInstance>();
+  const t = useI18NPrefix('view.saveForm');
+  const tg = useI18NPrefix('global');
 
   useEffect(() => {
     if (initialValues) {
@@ -124,9 +141,12 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     >
       <Form.Item
         name="name"
-        label="名称"
+        label={t('name')}
         rules={[
-          { required: true, message: '名称不能为空' },
+          {
+            required: true,
+            message: `${t('name')}${tg('validation.required')}`,
+          },
           {
             validator: debounce((_, value) => {
               if (!value || initialValues?.name === value) {
@@ -136,10 +156,14 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
               return request({
                 url: `/views/check/name`,
                 method: 'POST',
-                params: { name: value, orgId, parentId: parentId || null },
+                data: {
+                  name: value,
+                  orgId,
+                  parentId: parentId || null,
+                },
               }).then(
                 () => Promise.resolve(),
-                () => Promise.reject(new Error('名称重复')),
+                err => Promise.reject(new Error(err.response.data.message)),
               );
             }, DEFAULT_DEBOUNCE_WAIT),
           },
@@ -149,9 +173,12 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
       </Form.Item>
       <Form.Item name="parentId" label={parentIdLabel}>
         <TreeSelect
-          placeholder="根目录"
+          placeholder={t('root')}
           treeData={folderTree || []}
           allowClear
+          onChange={() => {
+            formRef.current?.validateFields();
+          }}
         />
       </Form.Item>
       {!simple && (
@@ -161,12 +188,12 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
             icon={<DoubleRightOutlined rotate={advancedVisible ? -90 : 90} />}
             onClick={toggleAdvanced}
           >
-            高级配置
+            {t('advanced')}
           </AdvancedToggle>
           <AdvancedWrapper show={advancedVisible}>
             <Form.Item
               name={['config', 'concurrencyControl']}
-              label="并发控制"
+              label={t('concurrencyControl')}
               valuePropName="checked"
               initialValue={concurrencyControl}
             >
@@ -174,20 +201,20 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
             </Form.Item>
             <Form.Item
               name={['config', 'concurrencyControlMode']}
-              label="模式"
+              label={t('concurrencyControlMode')}
               initialValue={ConcurrencyControlModes.DirtyRead}
             >
               <Radio.Group disabled={!concurrencyControl}>
                 {Object.values(ConcurrencyControlModes).map(value => (
                   <Radio key={value} value={value}>
-                    {CONCURRENCY_CONTROL_MODE_LABEL[value]}
+                    {t(value.toLowerCase())}
                   </Radio>
                 ))}
               </Radio.Group>
             </Form.Item>
             <Form.Item
               name={['config', 'cache']}
-              label="缓存"
+              label={t('cache')}
               valuePropName="checked"
               initialValue={cache}
             >
@@ -195,7 +222,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
             </Form.Item>
             <Form.Item
               name={['config', 'cacheExpires']}
-              label="失效时间"
+              label={t('cacheExpires')}
               initialValue={0}
             >
               <InputNumber disabled={!cache} />

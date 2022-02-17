@@ -1,5 +1,24 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import ChartEditor, { ChartEditorBaseProps } from 'app/components/ChartEditor';
 import { useAppSlice } from 'app/slice';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Redirect,
@@ -9,6 +28,7 @@ import {
   useRouteMatch,
 } from 'react-router';
 import styled from 'styled-components/macro';
+import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
 import { NotFoundPage } from '../NotFoundPage';
 import { AccessRoute } from './AccessRoute';
 import { Background } from './Background';
@@ -25,6 +45,7 @@ import { ViewPage } from './pages/ViewPage';
 import { useViewSlice } from './pages/ViewPage/slice';
 import { VizPage } from './pages/VizPage';
 import { useVizSlice } from './pages/VizPage/slice';
+import { initChartPreviewData } from './pages/VizPage/slice/thunks';
 import { useMainSlice } from './slice';
 import { selectOrgId } from './slice/selectors';
 import {
@@ -40,15 +61,16 @@ export function MainPage() {
   const { actions: vizActions } = useVizSlice();
   const { actions: viewActions } = useViewSlice();
   const dispatch = useDispatch();
-  const history = useHistory();
   const organizationMatch = useRouteMatch<MainPageRouteParams>(
     '/organizations/:orgId',
   );
-  const { isExact } = useRouteMatch();
   const orgId = useSelector(selectOrgId);
-
+  const history = useHistory();
   // loaded first time
   useEffect(() => {
+    ChartManager.instance()
+      .load()
+      .catch(err => console.error('Fail to load customize charts with ', err));
     dispatch(getUserSettings(organizationMatch?.params.orgId));
     dispatch(getDataProviders());
     return () => {
@@ -64,11 +86,18 @@ export function MainPage() {
     }
   }, [dispatch, vizActions, viewActions, orgId]);
 
-  useEffect(() => {
-    if (isExact && orgId) {
-      history.push(`/organizations/${orgId}`);
-    }
-  }, [isExact, orgId, history]);
+  const onSaveInDataChart = useCallback(
+    (orgId: string, backendChartId: string) => {
+      dispatch(
+        initChartPreviewData({
+          backendChartId,
+          orgId,
+        }),
+      );
+      history.push(`/organizations/${orgId}/vizs/${backendChartId}`);
+    },
+    [dispatch, history],
+  );
 
   return (
     <AppContainer>
@@ -76,12 +105,34 @@ export function MainPage() {
       <Navbar />
       {orgId && (
         <Switch>
+          <Route path="/" exact>
+            <Redirect to={`/organizations/${orgId}`} />
+          </Route>
           <Route path="/confirminvite" component={ConfirmInvitePage} />
           <Route path="/organizations/:orgId" exact>
             <Redirect
               to={`/organizations/${organizationMatch?.params.orgId}/vizs`}
             />
           </Route>
+          <Route
+            path="/organizations/:orgId/vizs/chartEditor"
+            render={res => {
+              let histState = res.location.state as ChartEditorBaseProps;
+              return (
+                <AccessRoute module={ResourceTypes.Viz}>
+                  <ChartEditor
+                    dataChartId={histState.dataChartId}
+                    orgId={orgId}
+                    chartType={histState.chartType}
+                    container={histState.container}
+                    defaultViewId={histState.defaultViewId}
+                    onClose={() => history.go(-1)}
+                    onSaveInDataChart={onSaveInDataChart}
+                  />
+                </AccessRoute>
+              );
+            }}
+          />
           <Route
             path="/organizations/:orgId/vizs/:vizId?"
             render={() => (

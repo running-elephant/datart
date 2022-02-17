@@ -68,6 +68,11 @@ public class FileServiceImpl extends BaseService implements FileService {
         }
     }
 
+    @Override
+    public String getBasePath(FileOwner owner, String id) {
+        return FileUtils.concatPath(Application.getFileBasePath(), owner.getPath(), id);
+    }
+
     private String saveVizImage(FileOwner fileOwner, String ownerId, MultipartFile file, String fileName) throws IOException {
         switch (fileOwner) {
             case DASHBOARD:

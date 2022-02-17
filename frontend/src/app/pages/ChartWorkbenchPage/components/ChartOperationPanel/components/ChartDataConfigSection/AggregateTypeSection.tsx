@@ -17,15 +17,15 @@
  */
 
 import { ChartDataSectionFieldActionType } from 'app/types/ChartConfig';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import BaseDataConfigSection from './BaseDataConfigSection';
-import { dataConfigSectionComparer } from './utils';
+import { dataConfigSectionComparer, handleDefaultConfig } from './utils';
 
 const AggregateTypeSection: FC<ChartDataConfigSectionProps> = memo(
-  ({ config, ...rest }) => {
-    const defaultConfig = Object.assign(
+  ({ config, aggregation, ...rest }) => {
+    let defaultConfig = Object.assign(
       {
         allowSameField: true,
       },
@@ -49,6 +49,10 @@ const AggregateTypeSection: FC<ChartDataConfigSectionProps> = memo(
       },
       config,
     );
+
+    if (aggregation === false) {
+      defaultConfig = handleDefaultConfig(defaultConfig, config.type);
+    }
     return <BaseDataConfigSection {...rest} config={defaultConfig} />;
   },
   dataConfigSectionComparer,

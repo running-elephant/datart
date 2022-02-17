@@ -1,25 +1,45 @@
-import {
-  ChartDataRequestBuilder,
-  transformToViewConfig,
-} from 'app/pages/ChartWorkbenchPage/models/ChartHttpRequest';
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { migrateChartConfig } from 'app/migration';
+import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { DEFAULT_VALUE_DATE_FORMAT } from 'app/pages/MainPage/pages/VariablePage/constants';
 import {
   ChartDataSectionField,
   ChartDataSectionType,
 } from 'app/types/ChartConfig';
+import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
+import { transformToViewConfig } from 'app/types/ChartDataRequest';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from 'app/types/ChartDataView';
 import {
   ControllerFacadeTypes,
-  RelativeOrExactTime,
+  TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
+import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
 import { getTime } from 'app/utils/time';
-import { FilterSqlOperator } from 'globalConstants';
+import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
+import i18next from 'i18next';
 import moment from 'moment';
-import { errorHandle } from 'utils/utils';
+import { CloneValueDeep } from 'utils/object';
+import { ChartDataRequestFilter } from '../../../types/ChartDataRequest';
 import { STORAGE_IMAGE_KEY_PREFIX } from '../constants';
 import {
   BoardLinkFilter,
@@ -33,7 +53,7 @@ import {
   ControllerConfig,
   ControllerDate,
 } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
-import { ChartRequestFilter } from './../../ChartWorkbenchPage/models/ChartHttpRequest';
+import { DateControllerTypes } from './../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
 
@@ -52,10 +72,10 @@ export const convertImageUrl = (urlKey: string = ''): string => {
  * 将当前前端渲染环境 id 替换掉原有的id ，原来的和当前的相等不受影响
  */
 export const adaptBoardImageUrl = (url: string = '', curBoardId: string) => {
-  // // url=resources/image/dashboard/3062ff86cdcb47b3bba75565b3f2991d/2e1cac3a-600c-4636-b858-cbcb07f4a3b3
-  const spliter = '/image/dashboard/';
-  if (url.includes(spliter)) {
-    const originalBoardId = url.split(spliter)[1].split('/')[0];
+  // // url=resources/image/dashboard/boardIdXXXXXXX/fileIDxxxxxxxxx
+  const splitter = '/image/dashboard/';
+  if (url.includes(splitter)) {
+    const originalBoardId = url.split(splitter)[1].split('/')[0];
     url.replace(originalBoardId, curBoardId);
     return url;
   }
@@ -77,28 +97,35 @@ export const getRGBAColor = color => {
 };
 
 export const getChartDataRequestBuilder = (dataChart: DataChart) => {
+  // const migratedChartConfig = (dataChart?.config, draft => {
+  //   migrateChartConfig(draft as ChartDetailConfigDTO);
+  // });
+  // TODO
+  const migratedChartConfig = migrateChartConfig(
+    CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
+  );
+  const { datas, settings } = convertToChartConfigDTO(
+    migratedChartConfig as ChartDetailConfigDTO,
+  );
+
   const builder = new ChartDataRequestBuilder(
     {
       id: dataChart?.viewId,
       computedFields: dataChart?.config?.computedFields || [],
     } as any,
-    dataChart?.config?.chartConfig?.datas,
-    dataChart?.config?.chartConfig?.settings,
+    datas,
+    settings,
+    {},
+    false,
+    dataChart?.config?.aggregation,
   );
   return builder;
-};
-
-export const getChartRequestParams = (dataChart: DataChart) => {
-  const builder = getChartDataRequestBuilder(dataChart);
-  const requestParams = builder.build();
-  return requestParams;
 };
 
 export const getChartGroupColumns = (dataChart: DataChart) => {
   const chartDataConfigs = dataChart?.config?.chartConfig?.datas;
   if (!chartDataConfigs) return [] as ChartDataSectionField[];
   const groupTypes = [ChartDataSectionType.GROUP, ChartDataSectionType.COLOR];
-  //  ChartDataSectionType.MIXED  ??
   const groupColumns = chartDataConfigs.reduce<ChartDataSectionField[]>(
     (acc, cur) => {
       if (!cur.rows) {
@@ -107,6 +134,11 @@ export const getChartGroupColumns = (dataChart: DataChart) => {
       if (groupTypes.includes(cur.type as any)) {
         return acc.concat(cur.rows);
       }
+      if (cur.type === ChartDataSectionType.MIXED) {
+        return acc.concat(
+          cur.rows.filter(({ type }) => type === ChartDataViewFieldType.STRING),
+        );
+      }
       return acc;
     },
     [],
@@ -114,27 +146,21 @@ export const getChartGroupColumns = (dataChart: DataChart) => {
   return groupColumns;
 };
 
-export const getTneWidgetFiltersAndParams = (obj: {
+export const getTheWidgetFiltersAndParams = (obj: {
   chartWidget: Widget;
   widgetMap: Record<string, Widget>;
   params: Record<string, string[]> | undefined;
 }) => {
+  // TODO chart 本身携带了变量，board没有相关配置的时候要拿到 chart本身的 变量值 Params
   const { chartWidget, widgetMap, params: chartParams } = obj;
-  const filterWidgets = Object.values(widgetMap).filter(
+  const controllerWidgets = Object.values(widgetMap).filter(
     widget => widget.config.type === 'controller',
   );
 
-  let filterParams: ChartRequestFilter[] = [];
+  let filterParams: ChartDataRequestFilter[] = [];
   let variableParams: Record<string, any[]> = {};
 
-  // TODO chartParams 实现后添加 --xld
-  // if (chartParams) {
-  //   Object.keys(chartParams).forEach(key => {
-  //     variableParams[key] = chartParams[key];
-  //   });
-  // }
-
-  filterWidgets.forEach(filterWidget => {
+  controllerWidgets.forEach(filterWidget => {
     const hasRelation = filterWidget.relations.find(
       re => re.targetId === chartWidget.id,
     );
@@ -167,19 +193,19 @@ export const getTneWidgetFiltersAndParams = (obj: {
         let key1 = String(relatedViewItem.fieldValue?.[0]);
         let key2 = String(relatedViewItem.fieldValue?.[1]);
 
-        // TODO need confirm 叠加还是替换？ --xld
+        //
         variableParams[key1] = [curValues?.[0]];
         variableParams[key2] = [curValues?.[1]];
       } else {
         const key = String(relatedViewItem.fieldValue);
 
-        // TODO need confirm 叠加还是替换？ --xld
-        variableParams[key] = [curValues?.[0]];
+        //单个变量的取值逻辑 不限制为1个
+        variableParams[key] = curValues;
       }
     }
     // 关联字段 逻辑
     if (relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Field) {
-      const filter: ChartRequestFilter = {
+      const filter: ChartDataRequestFilter = {
         aggOperator: null,
         column: String(relatedViewItem.fieldValue),
         sqlOperator: controllerConfig.sqlOperator,
@@ -200,75 +226,57 @@ export const getWidgetControlValues = (opt: {
   type: ControllerFacadeTypes;
   relatedViewItem: RelatedView;
   config: ControllerConfig;
-}) => {
+}):
+  | false
+  | {
+      value: any;
+      valueType: string;
+    }[] => {
   const { type, relatedViewItem, config } = opt;
   const valueType = relatedViewItem.fieldValueType;
-  switch (type) {
-    case ControllerFacadeTypes.RangeTime:
-    case ControllerFacadeTypes.Time:
-      if (!config?.controllerDate) {
-        return false;
-      }
-      const timeValues = getControllerDateValues({
-        controlType: type,
-        filterDate: config.controllerDate,
-        execute: true,
+  if (DateControllerTypes.includes(type)) {
+    if (!config?.controllerDate) {
+      return false;
+    }
+    const timeValues = getControllerDateValues({
+      controlType: type,
+      filterDate: config.controllerDate!,
+      execute: true,
+    });
+
+    const values = timeValues
+      .filter(ele => !!ele)
+      .map(ele => {
+        const item = {
+          value: ele,
+          valueType: valueType || 'DATE',
+        };
+        return item;
       });
+    return values[0] ? values : false;
+  } else {
+    if (!config?.controllerValues?.[0]) {
+      return false;
+    }
 
-      const values = timeValues
-        .filter(ele => !!ele)
-        .map(ele => {
-          const item = {
-            value: ele,
-            valueType: valueType || 'DATE',
-          };
-          return item;
-        });
-      return values[0] ? values : null;
-    case ControllerFacadeTypes.Value:
-    case ControllerFacadeTypes.RangeValue:
-    case ControllerFacadeTypes.Slider:
-      if (
-        !config.controllerValues ||
-        config.controllerValues.length === 0 ||
-        !config.controllerValues?.[0]
-      )
+    const values = config.controllerValues
+      .filter(ele => {
+        if (typeof ele === 'number') {
+          return true;
+        }
+        if (typeof ele === 'string' && ele.trim() !== '') {
+          return true;
+        }
         return false;
-      const numericValues = config.controllerValues
-        .filter(ele => {
-          if (ele === 0) return true;
-          return !!ele;
-        })
-        .map(ele => {
-          const item = {
-            value: ele,
-            valueType: valueType || '',
-          };
-          return item;
-        });
-      return numericValues[0] ? numericValues : false;
-
-    default:
-      if (
-        !config.controllerValues ||
-        config.controllerValues.length === 0 ||
-        !config.controllerValues?.[0]
-      )
-        return false;
-
-      const strValues = config.controllerValues
-        .filter(ele => {
-          if (ele.trim() === '') return false;
-          return !!ele;
-        })
-        .map(ele => {
-          const item = {
-            value: ele.trim(),
-            valueType: valueType || 'STRING',
-          };
-          return item;
-        });
-      return strValues[0] ? strValues : false;
+      })
+      .map(ele => {
+        const item = {
+          value: typeof ele === 'string' ? ele.trim() : ele,
+          valueType: valueType || 'STRING',
+        };
+        return item;
+      });
+    return values[0] ? values : false;
   }
 };
 
@@ -279,15 +287,15 @@ export const getControllerDateValues = (obj: {
 }) => {
   const { endTime, startTime, pickerType } = obj.filterDate;
   let timeValues: [string, string] = ['', ''];
-  if (startTime.relativeOrExact === RelativeOrExactTime.Exact) {
+  if (startTime.relativeOrExact === TimeFilterValueCategory.Exact) {
     timeValues[0] = startTime.exactValue as string;
   } else {
     const { amount, unit, direction } = startTime.relativeValue!;
     const time = getTime(+(direction + amount), unit)(unit, true);
-    timeValues[0] = time.format(DEFAULT_VALUE_DATE_FORMAT);
+    timeValues[0] = time.format(TIME_FORMATTER);
   }
   if (endTime) {
-    if (endTime.relativeOrExact === RelativeOrExactTime.Exact) {
+    if (endTime.relativeOrExact === TimeFilterValueCategory.Exact) {
       timeValues[1] = endTime.exactValue as string;
       if (obj.execute) {
         timeValues[1] = adjustRangeDataEndValue(
@@ -300,7 +308,7 @@ export const getControllerDateValues = (obj: {
     } else {
       const { amount, unit, direction } = endTime.relativeValue!;
       const time = getTime(+(direction + amount), unit)(unit, false);
-      timeValues[1] = time.format(DEFAULT_VALUE_DATE_FORMAT);
+      timeValues[1] = time.format(TIME_FORMATTER);
     }
   }
 
@@ -336,7 +344,7 @@ export const adjustRangeDataEndValue = (
     default:
       break;
   }
-  let end = adjustTime.format(DEFAULT_VALUE_DATE_FORMAT);
+  let end = adjustTime.format(TIME_FORMATTER);
   return end;
 };
 export const getBoardChartRequests = (params: {
@@ -393,20 +401,24 @@ export const getChartWidgetRequestParams = (obj: {
   if (!curWidget.datachartId) return null;
   const dataChart = dataChartMap[curWidget.datachartId];
   if (!dataChart) {
-    errorHandle(`can\`t find Chart ${curWidget.datachartId}`);
+    // errorHandle(`can\`t find Chart ${curWidget.datachartId}`);
     return null;
   }
   const chartDataView = viewMap[dataChart?.viewId];
+
   if (!chartDataView) {
-    errorHandle(`can\`t find View ${dataChart?.viewId}`);
+    // errorHandle(`can\`t find View ${dataChart?.viewId}`);
     return null;
   }
   const builder = getChartDataRequestBuilder(dataChart);
-  let requestParams = builder.build();
+  let requestParams = builder
+    .addExtraSorters((option?.sorters as any) || [])
+    .build();
   const viewConfig = transformToViewConfig(chartDataView?.config);
+
   requestParams = { ...requestParams, ...viewConfig };
 
-  const { filterParams, variableParams } = getTneWidgetFiltersAndParams({
+  const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
     chartWidget: curWidget,
     widgetMap,
     params: requestParams.params,
@@ -418,7 +430,7 @@ export const getChartWidgetRequestParams = (obj: {
 
   // 联动 过滤
   if (boardLinkFilters) {
-    const linkFilters: ChartRequestFilter[] = [];
+    const linkFilters: ChartDataRequestFilter[] = [];
     const links = boardLinkFilters.filter(
       link => link.linkerWidgetId === curWidget.id,
     );
@@ -426,7 +438,7 @@ export const getChartWidgetRequestParams = (obj: {
     links.forEach(link => {
       const { triggerValue, triggerWidgetId } = link;
       const triggerWidget = widgetMap[triggerWidgetId];
-      const filter: ChartRequestFilter = {
+      const filter: ChartDataRequestFilter = {
         aggOperator: null,
         column: getLinkedColumn(link.linkerWidgetId, triggerWidget),
         sqlOperator: FilterSqlOperator.In,
@@ -461,14 +473,38 @@ export const getChartWidgetRequestParams = (obj: {
 };
 
 //  filter 去重
-export const getDistinctFiltersByColumn = (filter: ChartRequestFilter[]) => {
+export const getDistinctFiltersByColumn = (
+  filter: ChartDataRequestFilter[],
+) => {
   if (!filter) {
-    return [] as ChartRequestFilter[];
+    return [] as ChartDataRequestFilter[];
   }
-  const filterMap: Record<string, ChartRequestFilter> = {};
+  const filterMap: Record<string, ChartDataRequestFilter> = {};
   filter.forEach(item => {
     filterMap[item.column] = item;
   });
 
   return Object.values(filterMap);
+};
+
+export const getDefaultWidgetName = (widget: Widget, index: number) => {
+  const widgetType = widget.config.type;
+  const subWidgetType = widget.config.content.type;
+  const typeTitle = i18next.t(`viz.widget.type.${widgetType}`);
+  const subTypeTitle = i18next.t(`viz.widget.type.${subWidgetType}`);
+  switch (widgetType) {
+    case 'chart':
+      return `${subTypeTitle}_${index}`;
+    case 'container':
+      return `${subTypeTitle}_${index}`;
+    case 'controller':
+      return `${subTypeTitle}_${index}`;
+    case 'media':
+      return `${subTypeTitle}_${index}`;
+    case 'query':
+    case 'reset':
+      return `${typeTitle}`;
+    default:
+      return `xxx${index}`;
+  }
 };

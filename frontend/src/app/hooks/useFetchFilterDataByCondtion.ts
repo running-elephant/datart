@@ -19,23 +19,23 @@
 import {
   FilterCondition,
   FilterConditionType,
-  FilterValueOption,
+  RelationFilterValue,
 } from 'app/types/ChartConfig';
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartDTO } from 'app/types/ChartDTO';
 import { getDistinctFields } from 'app/utils/fetch';
 import useMount from './useMount';
 
 export const useFetchFilterDataByCondtion = (
   viewId?: string,
   condition?: FilterCondition,
-  onFinish?: (datas: FilterValueOption[]) => void,
-  view?: BackendChart['view'],
+  onFinish?: (datas: RelationFilterValue[]) => void,
+  view?: ChartDTO['view'],
 ) => {
   useMount(() => {
     if (!viewId || condition?.type !== FilterConditionType.List) {
       return;
     }
-    getDistinctFields?.(viewId, condition?.name!, view, undefined)?.then(
+    getDistinctFields?.(viewId, [condition?.name!], view, undefined)?.then(
       dataset => {
         const _convertToList = collection => {
           const items: string[] = (collection || []).flatMap(c => c);

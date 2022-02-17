@@ -16,6 +16,7 @@ interface SaveFormState {
   vizType: VizType;
   type: CommonFormTypes;
   visible: boolean;
+  isSaveAs?: boolean;
   initialValues?: SaveFormModel;
   onSave: (values: SaveFormModel, onClose: () => void) => void;
   onAfterClose?: () => void;
@@ -30,6 +31,7 @@ const saveFormContextValue: SaveFormContextValue = {
   vizType: 'FOLDER',
   type: CommonFormTypes.Add,
   visible: false,
+  isSaveAs: false,
   onSave: () => {},
   onCancel: () => {},
   showSaveForm: () => {},
@@ -48,6 +50,7 @@ export const useSaveFormContext = (): SaveFormContextValue => {
   const onCancel = useCallback(() => {
     setVisible(false);
   }, [setVisible]);
+
   const showSaveForm = useCallback(
     ({
       vizType,

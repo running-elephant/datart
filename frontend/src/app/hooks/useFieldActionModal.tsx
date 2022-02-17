@@ -18,11 +18,11 @@
 
 import FieldActions from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction';
 import {
-  ChartDataSectionConfig,
+  ChartDataConfig,
   ChartDataSectionField,
   ChartDataSectionFieldActionType,
 } from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { ValueOf } from 'types';
 import useI18NPrefix, { I18NComponentProps } from './useI18NPrefix';
@@ -35,10 +35,11 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
   const getConent = (
     actionType,
     config?: ChartDataSectionField,
-    dataset?: ChartDataset,
+    dataset?: ChartDataSetDTO,
     dataView?: ChartDataView,
-    dataConfig?: ChartDataSectionConfig,
+    dataConfig?: ChartDataConfig,
     onChange?,
+    aggregation?: boolean,
   ) => {
     if (!config) {
       return null;
@@ -50,8 +51,9 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
       dataView,
       dataConfig,
       onConfigChange: onChange,
+      aggregation,
+      i18nPrefix,
     };
-
     switch (actionType) {
       case ChartDataSectionFieldActionType.Sortable:
         return <FieldActions.SortAction {...props} />;
@@ -86,18 +88,19 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
   const showModal = (
     columnUid: string,
     actionType: ValueOf<typeof ChartDataSectionFieldActionType>,
-    dataConfig: ChartDataSectionConfig,
+    dataConfig: ChartDataConfig,
     onConfigChange,
-    dataset?: ChartDataset,
+    dataset?: ChartDataSetDTO,
     dataView?: ChartDataView,
     modalSize?: string,
+    aggregation?: boolean,
   ) => {
     const currentConfig = dataConfig.rows?.find(c => c.uid === columnUid);
-    let _modalSize = StateModalSize.Middle;
+    let _modalSize = StateModalSize.MIDDLE;
     if (actionType === ChartDataSectionFieldActionType.Colorize) {
-      _modalSize = StateModalSize.Small;
+      _modalSize = StateModalSize.XSMALL;
     } else if (actionType === ChartDataSectionFieldActionType.ColorizeSingle) {
-      _modalSize = StateModalSize.Small;
+      _modalSize = StateModalSize.XSMALL;
     }
     return (show as Function)({
       title: t(actionType),
@@ -110,6 +113,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
           dataView,
           dataConfig,
           onChange,
+          aggregation,
         ),
       onOk: handleOk(onConfigChange, columnUid),
       maskClosable: true,

@@ -20,10 +20,10 @@ import { Layout } from 'antd';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import BoardToolBar from '../components/BoardToolBar/BoardToolBar';
+import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
-import WorkSpace from './WorkSpace';
+import { FreeEditorWrapper } from './FreeEditorWrapper';
 
 const FreeEditor: React.FC = () => {
   const dispatch = useDispatch();
@@ -38,7 +38,7 @@ const FreeEditor: React.FC = () => {
       <Wrapper>
         <BoardToolBar />
         <Editor>
-          <WorkSpace />
+          <FreeEditorWrapper />
           <SlideSetting />
         </Editor>
       </Wrapper>
@@ -50,6 +50,7 @@ export default FreeEditor;
 
 const Wrapper = styled.div`
   display: flex;
+  flex: 1;
   flex-direction: column;
   min-width: 0;
   min-height: 0;

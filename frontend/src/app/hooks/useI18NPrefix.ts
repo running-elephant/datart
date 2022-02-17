@@ -17,6 +17,8 @@
  */
 
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
+import { DATART_TRANSLATE_HOLDER } from 'globalConstants';
+import i18n from 'i18next';
 import get from 'lodash/get';
 import { useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,26 +27,37 @@ export interface I18NComponentProps {
   i18nPrefix?: string;
 }
 
+export function prefixI18N(key) {
+  return i18n.t(key);
+}
+
 function usePrefixI18N(prefix?: string) {
   const { t, i18n } = useTranslation();
   const { i18NConfigs: vizI18NConfigs } = useContext(ChartI18NContext);
 
   const cachedTranslateFn = useCallback(
-    (key: string, disablePrefix?: boolean, options?: any) => {
-      if (!prefix) {
-        return key;
+    (key: string, disablePrefix: boolean = false, options?: any) => {
+      let translationKey = key;
+      const usePrefix =
+        !disablePrefix && !translationKey.includes(DATART_TRANSLATE_HOLDER);
+      if (usePrefix && prefix) {
+        translationKey = `${prefix}.${translationKey}`;
       }
+      if (translationKey.includes(DATART_TRANSLATE_HOLDER)) {
+        translationKey = translationKey.replace(
+          `${DATART_TRANSLATE_HOLDER}.`,
+          '',
+        );
+      }
+
       const langTrans = vizI18NConfigs?.find(c =>
         c.lang.includes(i18n.language),
       )?.translation;
-      const contextTranslation = get(langTrans, key);
-      if (contextTranslation) {
-        return contextTranslation;
-      }
-      if (disablePrefix) {
-        return t.call(null, `${key}`, options) as string;
-      }
-      return t.call(null, `${prefix}.${key}`, options) as string;
+      const contextTranslation = get(langTrans, translationKey);
+      return (
+        contextTranslation ||
+        (t.call(Object.create(null), translationKey, options) as string)
+      );
     },
     [i18n.language, prefix, t, vizI18NConfigs],
   );

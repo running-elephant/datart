@@ -53,7 +53,7 @@ const PasswordModal: FC<{
           name={INPUT_PASSWORD_KEY}
           rules={[{ required: true }]}
         >
-          <Input.Password placeholder={t('pleaseInputPassword')} />
+          <Input.Password placeholder={t('enterPassword')} />
         </Form.Item>
       </Form>
     </Modal>

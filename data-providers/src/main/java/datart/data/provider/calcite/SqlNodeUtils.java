@@ -25,9 +25,11 @@ import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.util.TimestampString;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,8 +58,11 @@ public class SqlNodeUtils {
     }
 
 
+    /**
+     * create sql alias with quoting
+     */
     public static SqlNode createAliasNode(SqlNode node, String alias) {
-        return createSqlBasicCall(SqlStdOperatorTable.AS, Arrays.asList(node, new SqlIdentifier(alias, SqlParserPos.ZERO)));
+        return createSqlBasicCall(SqlStdOperatorTable.AS, Arrays.asList(node, new SqlIdentifier(alias, SqlParserPos.ZERO.withQuoting(true))));
     }
 
     public static SqlNode toSingleSqlLiteral(ScriptVariable variable, SqlParserPos sqlParserPos) {
@@ -70,6 +75,11 @@ public class SqlNodeUtils {
     }
 
     public static List<SqlNode> createSqlNodes(ScriptVariable variable, SqlParserPos sqlParserPos) {
+
+        if (CollectionUtils.isEmpty(variable.getValues())) {
+            return Collections.singletonList(SqlLiteral.createNull(sqlParserPos));
+        }
+
         switch (variable.getValueType()) {
             case STRING:
                 return variable.getValues().stream()
@@ -120,7 +130,7 @@ public class SqlNodeUtils {
     public static String toSql(SqlNode sqlNode, SqlDialect dialect) {
         return sqlNode.toSqlString(
                 config -> config.withDialect(dialect)
-                        .withQuoteAllIdentifiers(true)
+                        .withQuoteAllIdentifiers(false)
                         .withAlwaysUseParentheses(false)
                         .withSelectListItemsOnSeparateLines(false)
                         .withUpdateSetListNewline(false)

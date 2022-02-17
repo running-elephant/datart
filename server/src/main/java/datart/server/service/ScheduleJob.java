@@ -3,8 +3,10 @@ package datart.server.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import datart.core.base.PageInfo;
 import datart.core.base.consts.AttachmentType;
 import datart.core.base.consts.FileOwner;
+import datart.core.base.exception.Exceptions;
 import datart.core.common.*;
 import datart.core.data.provider.Dataframe;
 import datart.core.entity.Folder;
@@ -17,7 +19,10 @@ import datart.core.mappers.ext.UserMapperExt;
 import datart.security.base.PasswordToken;
 import datart.security.base.ResourceType;
 import datart.security.manager.DatartSecurityManager;
+import datart.server.base.dto.DashboardDetail;
+import datart.server.base.dto.DatachartDetail;
 import datart.server.base.dto.ScheduleJobConfig;
+import datart.server.base.params.DownloadCreateParam;
 import datart.server.base.params.ShareCreateParam;
 import datart.server.base.params.ShareToken;
 import datart.server.base.params.ViewExecuteParam;
@@ -29,6 +34,8 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.util.CollectionUtils;
 
+import javax.script.Invocable;
+import javax.script.ScriptException;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +51,8 @@ public abstract class ScheduleJob implements Job, Closeable {
     public static final String SCHEDULE_KEY = "SCHEDULE_KEY";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    public Invocable parser;
 
     static {
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -61,6 +70,8 @@ public abstract class ScheduleJob implements Job, Closeable {
 
     protected final List<File> attachments = new LinkedList<>();
 
+    protected final VizService vizService;
+
     public ScheduleJob() {
 
         scheduleLogMapper = Application.getBean(ScheduleLogMapperExt.class);
@@ -68,6 +79,8 @@ public abstract class ScheduleJob implements Job, Closeable {
         shareService = Application.getBean(ShareService.class);
 
         securityManager = Application.getBean(DatartSecurityManager.class);
+
+        vizService = Application.getBean(VizService.class);
 
     }
 
@@ -115,10 +128,16 @@ public abstract class ScheduleJob implements Job, Closeable {
 
         for (ScheduleJobConfig.VizContent vizContent : config.getVizContents()) {
             Folder folder = folderService.retrieve(vizContent.getVizId());
-
+            DownloadCreateParam downloadCreateParam;
+            if (ResourceType.DATACHART.name().equals(folder.getRelType())) {
+                DatachartDetail datachart = vizService.getDatachart(folder.getRelId());
+                downloadCreateParam = parseExecuteParam("chart", OBJECT_MAPPER.writeValueAsString(datachart));
+            } else {
+                DashboardDetail dashboard = vizService.getDashboard(folder.getRelId());
+                downloadCreateParam = parseExecuteParam("board", OBJECT_MAPPER.writeValueAsString(dashboard));
+            }
             if (config.getAttachments().contains(AttachmentType.EXCEL)) {
-                ViewExecuteParam viewExecuteParam = parseExecuteParam();
-                downloadExcel(viewExecuteParam);
+                downloadExcel(downloadCreateParam);
             }
 
             if (config.getAttachments().contains(AttachmentType.IMAGE)) {
@@ -148,11 +167,17 @@ public abstract class ScheduleJob implements Job, Closeable {
         scheduleLogMapper.insert(scheduleLog);
     }
 
-    private void downloadExcel(ViewExecuteParam viewExecuteParam) throws Exception {
+    private void downloadExcel(DownloadCreateParam downloadParams) throws Exception {
         DataProviderService dataProviderService = Application.getBean(DataProviderService.class);
-        Dataframe dataframe = dataProviderService.execute(viewExecuteParam);
         Workbook workbook = POIUtils.createEmpty();
-        POIUtils.withSheet(workbook, "sheet0", dataframe);
+        for (int i = 0; i < downloadParams.getDownloadParams().size(); i++) {
+            ViewExecuteParam viewExecuteParam = downloadParams.getDownloadParams().get(i);
+            viewExecuteParam.setPageInfo(PageInfo.builder().pageNo(1)
+                    .pageSize(Integer.MAX_VALUE).build());
+            String vizName = viewExecuteParam.getVizName();
+            Dataframe dataframe = dataProviderService.execute(downloadParams.getDownloadParams().get(i));
+            POIUtils.withSheet(workbook, StringUtils.isEmpty(vizName) ? "Sheet" + i : vizName, dataframe);
+        }
         File tempFile = File.createTempFile(UUIDGenerator.generate(), ".xlsx");
         POIUtils.save(workbook, tempFile.getPath(), true);
         attachments.add(tempFile);
@@ -173,21 +198,34 @@ public abstract class ScheduleJob implements Job, Closeable {
 
         String path = FileUtils.concatPath(Application.getFileBasePath(), FileOwner.SCHEDULE.getPath(), schedule.getId());
 
-        File file = WebUtils.screenShot2File(url, path,imageWidth);
-
-//        ImageUtils.resize(file.getPath(), imageWidth * 1.0, null);
+        File file = WebUtils.screenShot2File(url, path, imageWidth);
 
         attachments.add(file);
 
     }
 
-    private ViewExecuteParam parseExecuteParam() {
-        return new ViewExecuteParam();
+    private DownloadCreateParam parseExecuteParam(String type, String json) throws ScriptException, NoSuchMethodException, JsonProcessingException {
+        Invocable parser = getParser();
+        if (parser == null) {
+            Exceptions.msg("param parser load error");
+        }
+        Object result = parser.invokeFunction("getQueryData", type, json);
+        return OBJECT_MAPPER.readValue(result.toString(), DownloadCreateParam.class);
+    }
+
+    private synchronized Invocable getParser() {
+        if (parser == null) {
+            try {
+                parser = JavascriptUtils.load("javascript/parser.js");
+            } catch (Exception e) {
+                Exceptions.e(e);
+            }
+        }
+        return parser;
     }
 
     @Override
     public void close() throws IOException {
-
         try {
             securityManager.logoutCurrent();
         } catch (Exception e) {

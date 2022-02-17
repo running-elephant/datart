@@ -1,8 +1,27 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Button, Form, Input, Radio } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { SPACE_LG } from 'styles/StyleConstants';
-import { FindWays, FIND_WAY_OPTIONS } from '../constants';
+import { FindWays } from '../constants';
 import { captchaforResetPassword } from '../service';
 import { CaptchaParams } from '../types';
 
@@ -15,9 +34,13 @@ export const CheckCodeForm: FC<CheckCodeFormProps> = ({ onNextStep }) => {
   const [token, setToken] = useState<string>();
   const [ticket, setTicket] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
+  const t = useI18NPrefix('forgotPassword');
+  const tg = useI18NPrefix('global');
+
   const initialValues = useMemo(() => {
     return { type: FindWays.Email };
   }, []);
+
   const onFinish = useCallback((values: CaptchaParams) => {
     setSubmitLoading(true);
     captchaforResetPassword(values)
@@ -28,9 +51,8 @@ export const CheckCodeForm: FC<CheckCodeFormProps> = ({ onNextStep }) => {
       .finally(() => {
         setSubmitLoading(false);
       });
-    // setToken('token-----------');
-    // setTicket(values?.principal);
   }, []);
+
   const isEmail = useMemo(() => {
     return type === FindWays.Email;
   }, [type]);
@@ -45,6 +67,16 @@ export const CheckCodeForm: FC<CheckCodeFormProps> = ({ onNextStep }) => {
     },
     [form],
   );
+
+  const typeOptions = useMemo(
+    () =>
+      Object.values(FindWays).map(w => ({
+        label: t(w.toLowerCase()),
+        value: w,
+      })),
+    [t],
+  );
+
   const ticketFormItem = useMemo(() => {
     return isEmail ? (
       <Form.Item
@@ -52,15 +84,15 @@ export const CheckCodeForm: FC<CheckCodeFormProps> = ({ onNextStep }) => {
         rules={[
           {
             required: true,
-            message: '请输入邮箱',
+            message: `${t('email')}${tg('validation.required')}`,
           },
           {
             type: 'email',
-            message: '邮箱格式不正确',
+            message: t('emailInvalid'),
           },
         ]}
       >
-        <Input size="large" placeholder="请输入邮箱" />
+        <Input size="large" placeholder={t('enterEmail')} />
       </Form.Item>
     ) : (
       <Form.Item
@@ -68,14 +100,15 @@ export const CheckCodeForm: FC<CheckCodeFormProps> = ({ onNextStep }) => {
         rules={[
           {
             required: true,
-            message: '请输入用户名',
+            message: `${t('username')}${tg('validation.required')}`,
           },
         ]}
       >
-        <Input size="large" placeholder="请输入用户名" />
+        <Input size="large" placeholder={t('enterUsername')} />
       </Form.Item>
     );
-  }, [isEmail]);
+  }, [isEmail, t, tg]);
+
   const goNext = useCallback(() => {
     onNextStep(token as string);
   }, [onNextStep, token]);
@@ -84,31 +117,29 @@ export const CheckCodeForm: FC<CheckCodeFormProps> = ({ onNextStep }) => {
     () =>
       token && token.length ? (
         <TipsWrapper>
-          一封确认信已经发到
+          {t('desc1')}
           {type === FindWays.UserName ? (
             <>
               <b>{ticket}</b>
-              <span> 所关联的邮箱</span>
+              <span>{t('desc2')}</span>
             </>
           ) : (
             <b>{ticket}</b>
           )}
-          ，请前往该邮箱获取验证码，然后点击下一步重置密码。
+          {t('desc3')}
         </TipsWrapper>
       ) : (
         <></>
       ),
-    [ticket, type, token],
+    [ticket, type, token, t],
   );
+
   return (
     <Form initialValues={initialValues} onFinish={onFinish} form={form}>
-      <Form.Item
-        name="type"
-        rules={[{ required: true, message: '找回方式不能为空' }]}
-      >
+      <Form.Item name="type">
         <Radio.Group
           size="large"
-          options={FIND_WAY_OPTIONS}
+          options={typeOptions}
           onChange={onTypeChange}
         />
       </Form.Item>
@@ -118,7 +149,7 @@ export const CheckCodeForm: FC<CheckCodeFormProps> = ({ onNextStep }) => {
           <>
             {tips}
             <BigButton type="primary" onClick={goNext} size="large">
-              下一步
+              {t('nextStep')}
             </BigButton>
           </>
         ) : (
@@ -128,7 +159,7 @@ export const CheckCodeForm: FC<CheckCodeFormProps> = ({ onNextStep }) => {
             htmlType="submit"
             size="large"
           >
-            确定
+            {t('send')}
           </BigButton>
         )}
       </Form.Item>

@@ -18,14 +18,21 @@
 
 import useMount from 'app/hooks/useMount';
 import useRouteQuery from 'app/hooks/useRouteQuery';
-import { loadShareTask, makeShareDownloadDataTask } from 'app/utils/fetch';
+import {
+  downloadShareDataChartFile,
+  loadShareTask,
+  makeShareDownloadDataTask,
+} from 'app/utils/fetch';
 import { StorageKeys } from 'globalConstants';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
+import styled from 'styled-components';
 import persistence from 'utils/persistence';
-import { v4 as uuidv4 } from 'uuid';
-import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
+import { uuidv4 } from 'utils/utils';
+import ChartDataRequest from '../../types/ChartDataRequest';
+import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
+import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
 import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';
 import { selectShareBoard } from '../DashBoardPage/pages/Board/slice/selector';
 import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
@@ -35,10 +42,9 @@ import { urlSearchTransfer } from '../MainPage/pages/VizPage/utils';
 import { useStoryBoardSlice } from '../StoryBoardPage/slice';
 import { selectShareStoryBoard } from '../StoryBoardPage/slice/selectors';
 import BoardForShare from './BoardForShare';
-import ChartPreviewBoardForShare from './ChartPreviewBoardForShare';
+import ChartForShare from './ChartForShare';
 import { DownloadTaskContainer } from './DownloadTaskContainer';
 import PasswordModal from './PasswordModal';
-import { downloadShareDataChartFile } from './sercive';
 import { useShareSlice } from './slice';
 import {
   selectChartPreview,
@@ -85,6 +91,10 @@ export function SharePage() {
   }, [search]);
 
   useMount(() => {
+    ChartManager.instance()
+      .load()
+      .catch(err => console.error('Fail to load customize charts with ', err));
+
     if (Boolean(usePassword)) {
       const previousPassword = persistence.session.get(shareToken);
       if (previousPassword) {
@@ -130,7 +140,7 @@ export function SharePage() {
   }, [shareToken, sharePassword, shareClientId]);
 
   const onMakeShareDownloadDataTask = useCallback(
-    (downloadParams: ChartRequest[], fileName: string) => {
+    (downloadParams: ChartDataRequest[], fileName: string) => {
       if (shareClientId && executeTokenMap) {
         dispatch(
           makeShareDownloadDataTask({
@@ -171,13 +181,18 @@ export function SharePage() {
   );
 
   return (
-    <div style={{ width: '100%', height: '100vh' }}>
+    <StyledWrapper className="datart-viz">
       <PasswordModal
         visible={Boolean(needPassword) && Boolean(usePassword)}
         onChange={sharePassword => {
           fetchShareVizInfoImpl(shareToken, sharePassword);
         }}
       />
+      {!vizType && !needPassword && (
+        <div className="loading-container">
+          <BoardLoading />
+        </div>
+      )}
       {!Boolean(needPassword) &&
         vizType === 'DATACHART' &&
         chartPreview &&
@@ -186,7 +201,7 @@ export function SharePage() {
             onLoadTasks={onLoadShareTask}
             onDownloadFile={onDownloadFile}
           >
-            <ChartPreviewBoardForShare
+            <ChartForShare
               chartPreview={chartPreview}
               onCreateDataChartDownloadTask={onMakeShareDownloadDataTask}
             />
@@ -206,6 +221,14 @@ export function SharePage() {
       {!Boolean(needPassword) && vizType === 'STORYBOARD' && shareStory && (
         <StoryPlayerForShare storyBoard={shareStory} />
       )}
-    </div>
+    </StyledWrapper>
   );
 }
+const StyledWrapper = styled.div`
+  width: 100%;
+  height: 100vh;
+  .loading-container {
+    display: flex;
+    height: 100vh;
+  }
+`;

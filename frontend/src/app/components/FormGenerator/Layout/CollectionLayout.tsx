@@ -33,15 +33,15 @@
  * limitations under the License.
  */
 
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { FormGeneratorLayoutProps } from '../types';
 import { groupLayoutComparer } from '../utils';
 import ItemLayout from './ItemLayout';
 
-const CollectionLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> =
-  memo(({ ancestors, translate, data, dataConfigs, flatten, onChange }) => {
+const CollectionLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
+  ({ ancestors, translate, data, dataConfigs, flatten, onChange, context }) => {
     const getDependencyValue = useCallback((watcher, children) => {
       if (watcher?.deps) {
         // Note: only support depend on one property for now.
@@ -64,11 +64,14 @@ const CollectionLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> =
               dataConfigs={dataConfigs}
               flatten={flatten}
               onChange={onChange}
+              context={context}
             />
           ))}
       </StyledCollectionLayout>
     );
-  }, groupLayoutComparer);
+  },
+  groupLayoutComparer,
+);
 
 export default CollectionLayout;
 

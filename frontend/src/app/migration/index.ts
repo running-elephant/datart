@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { pipe } from 'utils/object';
 import { alpha3 } from './alpha3';
 
@@ -26,12 +26,12 @@ import { alpha3 } from './alpha3';
  *  transforms:
  *      0. alpha3 - 2021.11.18, issue #228
  *      1. .....
- * @param {ChartConfig} config, which is going to merge
- * @returns {ChartConfig} merged results and mark the version to latest
+ * @param {ChartDetailConfigDTO} config, which is going to merge
+ * @returns {ChartDetailConfigDTO} merged results and mark the version to latest
  *  */
 export function migrateChartConfig(
-  config?: ChartConfig,
-): ChartConfig | undefined {
+  config?: ChartDetailConfigDTO,
+): ChartDetailConfigDTO | undefined {
   if (!config) {
     return config;
   }

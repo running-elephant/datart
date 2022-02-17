@@ -17,6 +17,7 @@
  */
 package datart.server.service.impl;
 
+import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
@@ -26,6 +27,7 @@ import datart.core.common.TaskExecutor;
 import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.Dataframe;
 import datart.core.entity.Download;
+import datart.core.entity.View;
 import datart.core.mappers.ext.DownloadMapperExt;
 import datart.core.base.exception.NotAllowedException;
 import datart.server.base.params.DownloadCreateParam;
@@ -33,6 +35,7 @@ import datart.server.base.params.ViewExecuteParam;
 import datart.server.service.BaseService;
 import datart.server.service.DataProviderService;
 import datart.server.service.DownloadService;
+import datart.server.service.OrgSettingService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -54,14 +57,18 @@ public class DownloadServiceImpl extends BaseService implements DownloadService 
 
     private final DataProviderService dataProviderService;
 
-    public DownloadServiceImpl(DownloadMapperExt downloadMapper, DataProviderService dataProviderService) {
+    private final OrgSettingService orgSettingService;
+
+    public DownloadServiceImpl(DownloadMapperExt downloadMapper,
+                               DataProviderService dataProviderService,
+                               OrgSettingService orgSettingService) {
         this.downloadMapper = downloadMapper;
         this.dataProviderService = dataProviderService;
+        this.orgSettingService = orgSettingService;
     }
 
     @Override
     public void requirePermission(Download entity, int permission) {
-
 
     }
 
@@ -99,7 +106,9 @@ public class DownloadServiceImpl extends BaseService implements DownloadService 
                 try {
                     Workbook workbook = POIUtils.createEmpty();
                     for (int i = 0; i < downloadParams.getDownloadParams().size(); i++) {
-                        ViewExecuteParam viewExecuteParam = downloadParams.getDownloadParams().get(0);
+                        ViewExecuteParam viewExecuteParam = downloadParams.getDownloadParams().get(i);
+                        View view = retrieve(viewExecuteParam.getViewId(), View.class, false);
+                        viewExecuteParam.setPageInfo(PageInfo.builder().pageNo(1).pageSize(orgSettingService.getDownloadRecordLimit(view.getOrgId())).build());
                         String vizName = viewExecuteParam.getVizName();
                         Dataframe dataframe = dataProviderService.execute(downloadParams.getDownloadParams().get(i));
                         POIUtils.withSheet(workbook, StringUtils.isEmpty(vizName) ? "Sheet" + i : vizName, dataframe);
@@ -144,4 +153,5 @@ public class DownloadServiceImpl extends BaseService implements DownloadService 
         downloadMapper.updateByPrimaryKey(download);
         return download;
     }
+
 }

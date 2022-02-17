@@ -63,7 +63,7 @@ public interface RelRoleResourceMapperExt extends RelRoleResourceMapper {
     @Select({
             "<script>",
             "SELECT COUNT(*) FROM rel_role_resource rrr WHERE ",
-            " role_id IN (SELECT role_id FROM rel_role_user rru WHERE rru.user_id=#{userId}) ",
+            " role_id=#{roleId} ",
             "<if test=\"resourceId==null\">",
             " AND resource_id IS NULL ",
             "</if>",
@@ -72,7 +72,7 @@ public interface RelRoleResourceMapperExt extends RelRoleResourceMapper {
             "</if>",
             "</script>"
     })
-    int countUserPermission(String resourceId, String userId);
+    int countRolePermission(String resourceId, String roleId);
 
     @Select({
             "<script>",

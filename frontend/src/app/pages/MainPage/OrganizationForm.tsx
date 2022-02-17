@@ -1,4 +1,23 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Form, Input, Modal, ModalProps } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import debounce from 'debounce-promise';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import React, { useCallback } from 'react';
@@ -18,6 +37,8 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
   const history = useHistory();
   const loading = useSelector(selectSaveOrganizationLoading);
   const [form] = Form.useForm();
+  const t = useI18NPrefix('main.nav.organization');
+  const tg = useI18NPrefix('global');
 
   const formSubmit = useCallback(
     values => {
@@ -44,9 +65,9 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
 
   return (
     <Modal
-      title="创建组织"
+      title={t('create')}
       visible={visible}
-      okText="保存并进入"
+      okText={t('save')}
       confirmLoading={loading}
       onOk={save}
       onCancel={onCancel}
@@ -54,25 +75,28 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
     >
       <Form
         form={form}
-        labelCol={{ span: 4 }}
+        labelCol={{ span: 6 }}
         labelAlign="left"
-        wrapperCol={{ span: 18 }}
+        wrapperCol={{ span: 16 }}
         onFinish={formSubmit}
       >
         <FormItem
           name="name"
-          label="名称"
+          label={t('name')}
           rules={[
-            { required: true, message: '名称不能为空' },
+            {
+              required: true,
+              message: `${t('name')}${tg('validation.required')}`,
+            },
             {
               validator: debounce((_, value) => {
                 return request({
                   url: `/orgs/check/name`,
                   method: 'POST',
-                  params: { name: value },
+                  data: { name: value },
                 }).then(
                   () => Promise.resolve(),
-                  () => Promise.reject(new Error('名称重复')),
+                  err => Promise.reject(new Error(err.response.data.message)),
                 );
               }, DEFAULT_DEBOUNCE_WAIT),
             },
@@ -80,7 +104,7 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
         >
           <Input />
         </FormItem>
-        <FormItem name="description" label="描述">
+        <FormItem name="description" label={t('desc')}>
           <Input.TextArea autoSize={{ minRows: 4, maxRows: 8 }} />
         </FormItem>
       </Form>

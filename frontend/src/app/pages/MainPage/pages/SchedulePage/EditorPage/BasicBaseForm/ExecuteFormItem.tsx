@@ -1,13 +1,14 @@
 import { Checkbox, Form, Input, Select, Space } from 'antd';
+import useI18NPrefix, { prefixI18N } from 'app/hooks/useI18NPrefix';
 import { FC, useMemo } from 'react';
 import { TimeModes } from '../../constants';
 
 const timeModeOptions = [
-  { label: '分钟', value: TimeModes.Minute },
-  { label: '小时', value: TimeModes.Hour },
-  { label: '天', value: TimeModes.Day },
-  { label: '月', value: TimeModes.Month },
-  { label: '年', value: TimeModes.Year },
+  { label: prefixI18N('global.time.minute'), value: TimeModes.Minute },
+  { label: prefixI18N('global.time.hour'), value: TimeModes.Hour },
+  { label: prefixI18N('global.time.day'), value: TimeModes.Day },
+  { label: prefixI18N('global.time.month'), value: TimeModes.Month },
+  { label: prefixI18N('global.time.year'), value: TimeModes.Year },
 ];
 const minutePeriodOptions = Array.from({ length: 50 }, (_, i) => {
   const n = i + 10;
@@ -15,32 +16,32 @@ const minutePeriodOptions = Array.from({ length: 50 }, (_, i) => {
 });
 
 const minuteOptions = Array.from({ length: 60 }, (_, i) => {
-  const n = `${`0${i}`.slice(-2)} 分`;
+  const n = `${`0${i}`.slice(-2)} ${prefixI18N('global.time.m')}`;
   return { label: n, value: i };
 });
 
 const hourOptions = Array.from({ length: 24 }, (_, i) => {
-  const n = `${`0${i}`.slice(-2)} 时`;
+  const n = `${`0${i}`.slice(-2)} ${prefixI18N('global.time.h')}`;
   return { label: n, value: i };
 });
 
 const dayOptions = Array.from({ length: 31 }, (_, i) => {
-  const n = `${`0${i + 1}`.slice(-2)} 日`;
+  const n = `${`0${i + 1}`.slice(-2)} ${prefixI18N('global.time.d')}`;
   return { label: n, value: i + 1 };
 });
 const monthOptions = Array.from({ length: 12 }, (_, i) => {
-  const n = `${`0${i + 1}`.slice(-2)} 月`;
+  const n = `${`0${i + 1}`.slice(-2)} ${prefixI18N('global.time.month')}`;
   return { label: n, value: i + 1 };
 });
 
 const weekOptions = [
-  { label: '星期天', value: 1 },
-  { label: '星期一', value: 2 },
-  { label: '星期二', value: 3 },
-  { label: '星期三', value: 4 },
-  { label: '星期四', value: 5 },
-  { label: '星期五', value: 6 },
-  { label: '星期六', value: 7 },
+  { label: prefixI18N('global.time.sun'), value: 1 },
+  { label: prefixI18N('global.time.mon'), value: 2 },
+  { label: prefixI18N('global.time.tues'), value: 3 },
+  { label: prefixI18N('global.time.wednes'), value: 4 },
+  { label: prefixI18N('global.time.thurs'), value: 5 },
+  { label: prefixI18N('global.time.fri'), value: 6 },
+  { label: prefixI18N('global.time.satur'), value: 7 },
 ];
 
 export interface ExecuteFormItemProps {
@@ -55,6 +56,10 @@ export const ExecuteFormItem: FC<ExecuteFormItemProps> = ({
   periodInput: isInput,
   onPeriodInputChange,
 }) => {
+  const t = useI18NPrefix(
+    'main.pages.schedulePage.sidebar.editorPage.basicBaseForm.executeFormItem',
+  );
+
   const modeSelect = useMemo(() => {
     return (
       <Form.Item name="periodUnit">
@@ -92,7 +97,7 @@ export const ExecuteFormItem: FC<ExecuteFormItemProps> = ({
       case TimeModes.Minute:
         return (
           <>
-            每
+            {t('per')}
             <Form.Item name="minute">
               <Select options={minutePeriodOptions} style={{ width: 80 }} />
             </Form.Item>
@@ -102,20 +107,22 @@ export const ExecuteFormItem: FC<ExecuteFormItemProps> = ({
       case TimeModes.Hour:
         return (
           <>
-            每 {modeSelect} 的{minuteSelect}
+            {t('per')} {modeSelect} {t('of')}
+            {minuteSelect}
           </>
         );
       case TimeModes.Day:
         return (
           <>
-            每 {modeSelect} 的{hourSelect}
+            {t('per')} {modeSelect} {t('of')}
+            {hourSelect}
             {minuteSelect}
           </>
         );
       case TimeModes.Week:
         return (
           <>
-            每 {modeSelect} 的{' '}
+            {t('per')} {modeSelect} {t('of')}
             <Form.Item name="weekDay">
               <Select options={weekOptions} style={{ width: 80 }} />
             </Form.Item>
@@ -124,7 +131,7 @@ export const ExecuteFormItem: FC<ExecuteFormItemProps> = ({
       case TimeModes.Month:
         return (
           <>
-            每 {modeSelect} 的 {daySelect}
+            {t('per')} {modeSelect} {t('of')} {daySelect}
             {hourSelect}
             {minuteSelect}
           </>
@@ -132,7 +139,8 @@ export const ExecuteFormItem: FC<ExecuteFormItemProps> = ({
       case TimeModes.Year:
         return (
           <>
-            每 {modeSelect}的
+            {t('per')} {modeSelect}
+            {t('of')}
             <Form.Item name="month">
               <Select options={monthOptions} style={{ width: 80 }} />
             </Form.Item>
@@ -144,23 +152,26 @@ export const ExecuteFormItem: FC<ExecuteFormItemProps> = ({
       default:
         return;
     }
-  }, [timeMode, modeSelect, daySelect, minuteSelect, hourSelect]);
+  }, [timeMode, modeSelect, daySelect, minuteSelect, hourSelect, t]);
   return (
-    <Form.Item label="执行时间设置" required>
+    <Form.Item label={t('executionTimeSetting')} required>
       <Space align="baseline">
         {isInput ? (
           <Form.Item
             name="cronExpression"
-            rules={[{ required: true, message: '表达式为必填项' }]}
+            rules={[{ required: true, message: t('expressionIsRequired') }]}
           >
-            <Input placeholder="请输入cron表达式" style={{ width: 300 }} />
+            <Input
+              placeholder={t('pleaseEnterCronExpression')}
+              style={{ width: 300 }}
+            />
           </Form.Item>
         ) : (
           timeContent
         )}
         <Form.Item name="setCronExpressionManually" valuePropName="checked">
           <Checkbox onChange={e => onPeriodInputChange(e.target.checked)}>
-            手动输入
+            {t('manualInput')}
           </Checkbox>
         </Form.Item>
       </Space>

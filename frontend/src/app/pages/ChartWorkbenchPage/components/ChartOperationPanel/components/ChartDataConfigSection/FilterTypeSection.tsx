@@ -21,24 +21,31 @@ import { Button, Modal } from 'antd';
 import { StateModalSize } from 'app/hooks/useStateModal';
 import FilterActions from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterAction';
 import {
-  ChartDataSectionConfig,
+  ChartDataConfig,
   ChartDataSectionFieldActionType,
 } from 'app/types/ChartConfig';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
+import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FC, memo, useState } from 'react';
 import { CloneValueDeep } from 'utils/object';
 import BaseDataConfigSection from './BaseDataConfigSection';
 import { dataConfigSectionComparer } from './utils';
 
 const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
-  ({ ancestors, config, translate = title => title, onConfigChanged }) => {
+  ({
+    ancestors,
+    config,
+    translate = title => title,
+    onConfigChanged,
+    aggregation,
+  }) => {
     const [currentConfig, setCurrentConfig] = useState(config);
     const [originalConfig, setOriginalConfig] = useState(config);
     const [enableExtraAction] = useState(false);
     const extendedConfig = Object.assign(
       {
         allowSameField: true,
+        disableAggregate: false,
       },
       {
         actions: {
@@ -56,11 +63,11 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
       config,
     );
 
-    const handleExtraConfigChange = (config: ChartDataSectionConfig) => {
+    const handleExtraConfigChange = (config: ChartDataConfig) => {
       setCurrentConfig(CloneValueDeep(config));
     };
 
-    const handleConfigChange = (ancestors, config: ChartDataSectionConfig) => {
+    const handleConfigChange = (ancestors, config: ChartDataConfig) => {
       setOriginalConfig(config);
       setCurrentConfig(config);
       onConfigChanged(ancestors, config, true);
@@ -96,7 +103,7 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
     return (
       <BaseDataConfigSection
         ancestors={ancestors}
-        modalSize={StateModalSize.Middle}
+        modalSize={StateModalSize.MIDDLE}
         translate={translate}
         config={extendedConfig}
         onConfigChanged={handleConfigChange}

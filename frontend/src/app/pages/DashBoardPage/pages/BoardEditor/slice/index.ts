@@ -4,6 +4,7 @@ import { BOARD_UNDO } from 'app/pages/DashBoardPage/constants';
 import {
   BoardInfo,
   BoardLinkFilter,
+  DeviceType,
   JumpPanel,
   WidgetData,
   WidgetInfo,
@@ -22,7 +23,7 @@ import { editBoardStackSlice } from './childSlice/stackSlice';
 import {
   getEditBoardDetail,
   getEditChartWidgetDataAsync,
-  getEditWidgetDataAsync,
+  getEditControllerOptions,
   toUpdateDashboard,
 } from './thunk';
 
@@ -93,6 +94,7 @@ const editDashBoardInfoSlice = createSlice({
     ) {
       state.chartEditorProps = action.payload;
     },
+
     changeBoardLinkFilter(
       state,
       action: PayloadAction<{
@@ -108,6 +110,9 @@ const editDashBoardInfoSlice = createSlice({
       if (linkFilters) {
         state.linkFilter = state.linkFilter.concat(linkFilters);
       }
+    },
+    changeBoardDevice(state, action: PayloadAction<DeviceType>) {
+      state.deviceType = action.payload;
     },
   },
   extraReducers: builder => {
@@ -235,20 +240,19 @@ const widgetInfoRecordSlice = createSlice({
       const { widgetId, pageInfo } = action.payload;
       state[widgetId].pageInfo = pageInfo || { pageNo: 1 };
     },
+    setWidgetErrInfo(
+      state,
+      action: PayloadAction<{
+        boardId?: string;
+        widgetId: string;
+        errInfo?: string;
+      }>,
+    ) {
+      const { widgetId, errInfo } = action.payload;
+      state[widgetId].errInfo = errInfo;
+    },
   },
   extraReducers: builder => {
-    builder.addCase(getEditWidgetDataAsync.pending, (state, action) => {
-      const { widgetId } = action.meta.arg;
-      state[widgetId].loading = true;
-    });
-    builder.addCase(getEditWidgetDataAsync.fulfilled, (state, action) => {
-      const { widgetId } = action.meta.arg;
-      state[widgetId].loading = false;
-    });
-    builder.addCase(getEditWidgetDataAsync.rejected, (state, action) => {
-      const { widgetId } = action.meta.arg;
-      state[widgetId].loading = false;
-    });
     builder.addCase(getEditChartWidgetDataAsync.pending, (state, action) => {
       const { widgetId } = action.meta.arg;
       state[widgetId].loading = true;
@@ -259,6 +263,18 @@ const widgetInfoRecordSlice = createSlice({
     });
     builder.addCase(getEditChartWidgetDataAsync.rejected, (state, action) => {
       const { widgetId } = action.meta.arg;
+      state[widgetId].loading = false;
+    });
+    builder.addCase(getEditControllerOptions.pending, (state, action) => {
+      const widgetId = action.meta.arg;
+      state[widgetId].loading = true;
+    });
+    builder.addCase(getEditControllerOptions.fulfilled, (state, action) => {
+      const widgetId = action.meta.arg;
+      state[widgetId].loading = false;
+    });
+    builder.addCase(getEditControllerOptions.rejected, (state, action) => {
+      const widgetId = action.meta.arg;
       state[widgetId].loading = false;
     });
   },
@@ -283,7 +299,7 @@ const filterActions = [
   editBoardStackActions.updateBoardConfig,
   editBoardStackActions.addWidgets,
   editBoardStackActions.deleteWidgets,
-  editBoardStackActions.changeWidgetsRect,
+  editBoardStackActions.changeAutoBoardWidgetsRect,
   editBoardStackActions.resizeWidgetEnd,
 
   editBoardStackActions.tabsWidgetAddTab,

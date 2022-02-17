@@ -16,13 +16,14 @@
  * limitations under the License.
  */
 
-import { Col, Row } from 'antd';
-import { ColorPickerPopover } from 'app/components/ReactColorPicker';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ColorPickerPopover } from 'app/components/ColorPicker';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
+import { BW } from './components/BasicWrapper';
+
 const COLORS = [
   '#B80000',
   '#DB3E00',
@@ -42,11 +43,11 @@ const COLORS = [
   '#D4C4FB',
   'transparent',
 ];
-const BasicColorSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicColorSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 
-    const hanldePickerSelect = value => {
+    const handlePickerSelect = value => {
       onChange?.(ancestors, value);
     };
 
@@ -55,19 +56,19 @@ const BasicColorSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
     };
 
     return (
-      <StyledVizBasicColorSelector align={'middle'}>
-        {!options?.hideLabel && <Col span={12}>{t(row.label)}</Col>}
-        <Col span={options?.hideLabel ? 24 : 12}>
-          <ColorPickerPopover
-            {...rest}
-            {...options}
-            colors={COLORS}
-            defaultValue={getColor()}
-            onSubmit={hanldePickerSelect}
-          >
-            <StyledColor color={getColor()} />
-          </ColorPickerPopover>
-        </Col>
+      <StyledVizBasicColorSelector
+        label={!options?.hideLabel ? t(row.label, true) : ''}
+        labelCol={{ span: 12 }}
+        wrapperCol={{ span: 12 }}
+      >
+        <ColorPickerPopover
+          {...rest}
+          {...options}
+          colors={COLORS}
+          size={6}
+          defaultValue={getColor()}
+          onSubmit={handlePickerSelect}
+        ></ColorPickerPopover>
       </StyledVizBasicColorSelector>
     );
   },
@@ -76,13 +77,6 @@ const BasicColorSelector: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
 
 export default BasicColorSelector;
 
-const StyledVizBasicColorSelector = styled(Row)`
-  line-height: 32px;
-`;
-
-const StyledColor = styled.div`
-  width: 24px;
-  height: 24px;
-  background-color: ${props => props.color};
-  border: ${props => (props.color === 'transparent' ? '1px solid red' : '0px')};
+const StyledVizBasicColorSelector = styled(BW)`
+  flex-direction: row;
 `;

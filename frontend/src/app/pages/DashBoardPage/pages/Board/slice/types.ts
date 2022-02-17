@@ -18,7 +18,7 @@
 import { ChartEditorProps } from 'app/components/ChartEditor';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
-import { ChartDatasetMeta } from 'app/types/ChartDataset';
+import { ChartDatasetMeta } from 'app/types/ChartDataSet';
 import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -27,10 +27,11 @@ import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
 import { ChartDataSectionField } from '../../../../../types/ChartConfig';
+import { View } from '../../../../../types/View';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import {
   BorderStyleType,
-  LAYOUT_COLS,
+  LAYOUT_COLS_MAP,
   ScaleModeType,
   TextAlignType,
 } from '../../../constants';
@@ -74,31 +75,34 @@ export interface SaveDashboard extends Omit<Dashboard, 'config'> {
 }
 export interface ServerDashboard extends Omit<Dashboard, 'config'> {
   config: string;
-  views: ServerView[];
+  views: View[];
   datacharts: ServerDatachart[];
   widgets: ServerWidget[];
 }
 export interface DashboardConfig {
+  version: string;
   background: BackgroundConfig;
   widgetDefaultSettings: {
     background: BackgroundConfig;
     boxShadow?: boolean;
   };
   maxWidgetIndex: number;
+  initialQuery: boolean;
+  hasQueryControl: boolean;
+  hasResetControl: boolean;
   type: BoardType; //'auto','free'
+
   // auto
   margin: [number, number];
   containerPadding: [number, number];
-  rowHeight: number;
-  cols: ColsType;
+  mobileMargin: [number, number];
+  mobileContainerPadding: [number, number];
+  cols?: ColsType;
   // free
   width: number;
   height: number;
   gridStep: [number, number];
   scaleMode: ScaleModeType;
-  initialQuery: boolean;
-  hasQueryControl: boolean; // TODO migration del ? -- xld
-  hasResetControl?: boolean; // TODO migration del ? -- xld
 }
 export const BoardTypeMap = strEnumType(['auto', 'free']);
 export type BoardType = keyof typeof BoardTypeMap;
@@ -121,6 +125,7 @@ export interface ServerWidget extends Omit<Widget, 'config' | 'relations'> {
   relations: ServerRelation[];
 }
 export interface WidgetConf {
+  version: string;
   index: number;
   tabId?: string; //记录在父容器tab的位置
   name: string;
@@ -129,7 +134,8 @@ export interface WidgetConf {
   type: WidgetType;
   autoUpdate: boolean;
   frequency: number; // 定时同步频率
-  rect: RectConfig; //
+  rect: RectConfig; //desktop_rect
+  mobileRect?: RectConfig; //mobile_rect 移动端适配
   background: BackgroundConfig;
   border: BorderConfig;
   content: WidgetContent;
@@ -161,6 +167,9 @@ export interface JumpConfigField {
 }
 export interface JumpConfig {
   open: boolean;
+  targetType: string;
+  URL: string;
+  queryName: string;
   field: JumpConfigField;
   target: JumpConfigTarget;
   filter: JumpConfigFilter;
@@ -183,6 +192,7 @@ export interface WidgetInfo {
   inLinking: boolean; //是否在触发联动
   selected: boolean;
   pageInfo: Partial<PageInfo>;
+  errInfo?: string;
   selectItems?: string[];
   parameters?: any;
 }
@@ -213,11 +223,11 @@ export interface Relation {
 }
 /**
  * @controlToWidget Controller associated widgets
- * @controlToControl Controller associated Controller visible
- * @widgetToWidget widget inOther WidgetContainer
+ * @controlToControl Controller associated Controller visible cascade
+ * @widgetToWidget widget inOther WidgetContainer linkage
  * */
 export interface RelationConfig {
-  type: 'controlToWidget' | 'controlToControl' | 'widgetToWidget';
+  type: RelationConfigType;
   controlToWidget?: {
     widgetRelatedViewIds: string[];
   };
@@ -227,6 +237,14 @@ export interface RelationConfig {
     linkerColumn: string;
   };
 }
+export type RelationConfigType =
+  | 'controlToWidget' // control - ChartFetch will del
+  | 'controlToChartFetch' // control - ChartFetch
+  | 'controlToControl' // control - control -visible  will del
+  | 'controlToControlVisible' // control - control -visible
+  | 'controlToControlCascade' // control - control -Cascade
+  | 'widgetToWidget' // linkage will del
+  | 'chartToChartLinkage'; // linkage
 export interface RelatedView {
   viewId: string;
   relatedCategory: ChartDataViewFieldCategory;
@@ -265,7 +283,7 @@ export type MediaWidgetContent = {
   timerConfig?: {
     time: {
       timeDuration: number; // 定时器刷新时间
-      timeFormat: string; // 'YYYY-MM-DD HH:mm:ss'
+      timeFormat: string; //
     };
     font: {
       color: string;
@@ -390,17 +408,13 @@ export interface DataChart {
   status: any;
 }
 export interface DataChartConfig {
+  aggregation: boolean | undefined;
   chartConfig: ChartConfig;
   chartGraphId: string;
   computedFields: any[];
 }
 
-export interface ServerView extends ChartDataView {
-  model: string;
-}
-// TODO
-
-export type ColsType = typeof LAYOUT_COLS;
+export type ColsType = typeof LAYOUT_COLS_MAP;
 
 // Dashboard view model
 export interface BoardInfo {
@@ -414,7 +428,8 @@ export interface BoardInfo {
   showBlockMask: boolean; //?
   isDroppable: boolean;
   clipboardWidgets: Record<string, WidgetOfCopy>;
-  layouts: Layout[]; // 删除
+  layouts: Layout[];
+  deviceType: DeviceType; // deviceType for autoBoard defaultValue = desktop
   widgetIds: string[]; // board保存的时候 区分那些是删除的，哪些是新增的
   controllerPanel: WidgetControllerPanelParams; //
   linkagePanel: WidgetPanelParams;
@@ -425,6 +440,10 @@ export interface BoardInfo {
   hasFetchItems: string[];
   boardWidthHeight: [number, number];
   originControllerWidgets: Widget[]; // use for reset button
+}
+export enum DeviceType {
+  Desktop = 'desktop',
+  Mobile = 'mobile',
 }
 export interface BoardLinkFilter {
   triggerWidgetId: string;
@@ -458,4 +477,5 @@ export interface ServerDatachart extends Omit<DataChart, 'config'> {
 
 export interface getDataOption {
   pageInfo?: Partial<PageInfo>;
+  sorters?: Array<{ column: string; operator?: string; aggOperator?: string }>;
 }

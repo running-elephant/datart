@@ -38,31 +38,12 @@ public class ScriptRender {
 
     protected ExecuteParam executeParam;
 
-    protected String variableQuote;
+//    protected String variableQuote;
 
     public ScriptRender(QueryScript queryScript, ExecuteParam executeParam) {
         this.queryScript = queryScript;
         this.executeParam = executeParam;
-        this.variableQuote = Const.DEFAULT_VARIABLE_QUOTE;
+//        this.variableQuote = Const.DEFAULT_VARIABLE_QUOTE;
     }
 
-    public ScriptRender(QueryScript queryScript, ExecuteParam executeParam, String variableQuote) {
-        this.queryScript = queryScript;
-        this.executeParam = executeParam;
-        this.variableQuote = variableQuote;
-    }
-
-    protected String getVariablePattern(String variableName) {
-        variableName = StringUtils.prependIfMissing(variableName, variableQuote);
-        variableName = StringUtils.appendIfMissing(variableName, variableQuote);
-        return variableName;
-    }
-
-//    private String variableValueString(ScriptVariable variable) {
-//        if (variable == null || CollectionUtils.isEmpty(variable.getValues())) {
-//            return "";
-//        } else {
-//            return String.join(",", variable.getValues());
-//        }
-//    }
 }

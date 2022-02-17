@@ -18,12 +18,17 @@
 package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
+import datart.core.base.exception.Exceptions;
 import datart.core.entity.BaseEntity;
+import datart.core.entity.Role;
 import datart.core.entity.Storyboard;
+import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.StoryboardMapperExt;
 import datart.security.base.PermissionInfo;
 import datart.security.base.ResourceType;
 import datart.security.base.SubjectType;
+import datart.security.exception.PermissionDeniedException;
+import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.PermissionHelper;
 import datart.server.base.dto.StoryboardDetail;
 import datart.server.base.params.BaseCreateParam;
@@ -48,12 +53,15 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
 
     private final StorypageService storypageService;
 
+    private final RelRoleResourceMapperExt rrrMapper;
+
     public StoryboardServiceImpl(RoleService roleService,
                                  StoryboardMapperExt storyboardMapper,
-                                 StorypageService storypageService) {
+                                 StorypageService storypageService, RelRoleResourceMapperExt rrrMapper) {
         this.roleService = roleService;
         this.storyboardMapper = storyboardMapper;
         this.storypageService = storypageService;
+        this.rrrMapper = rrrMapper;
     }
 
     @Override
@@ -84,7 +92,7 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
         storyboardDetail.setStorypages(storypageService.listByStoryboard(storyboardId));
         // download permission
         storyboardDetail.setDownload(securityManager
-                .hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), storyboardId, Const.DOWNLOAD)));
+                .hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), "*", storyboardId, Const.DOWNLOAD)));
 
         return storyboardDetail;
     }
@@ -100,12 +108,23 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
 
     @Override
     public void requirePermission(Storyboard storyboard, int permission) {
-        if ((permission & Const.CREATE) == Const.CREATE) {
-            securityManager.requirePermissions(PermissionHelper.vizPermission(storyboard.getOrgId(),
-                    ResourceType.STORYBOARD.name(), permission));
+        if (securityManager.isOrgOwner(storyboard.getOrgId())) {
             return;
         }
-        securityManager.requirePermissions(PermissionHelper.vizPermission(storyboard.getOrgId(), storyboard.getId(), permission));
+        List<Role> roles = roleService.listUserRoles(storyboard.getOrgId(), getCurrentUser().getId());
+        boolean hasPermission = roles.stream().anyMatch(role -> hasPermission(role, storyboard, permission));
+        if (!hasPermission) {
+            Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied",
+                    ResourceType.STORYBOARD + ":" + storyboard.getName() + ":" + ShiroSecurityManager.expand2StringPermissions(permission));
+        }
+    }
+
+    private boolean hasPermission(Role role, Storyboard storyboard, int permission) {
+        if (storyboard.getId() == null || (permission & Const.CREATE) == Const.CREATE) {
+            return securityManager.hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), role.getId(), ResourceType.STORYBOARD.name(), permission));
+        } else {
+            return securityManager.hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), role.getId(), storyboard.getId(), permission));
+        }
     }
 
     @Override

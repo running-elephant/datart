@@ -22,12 +22,12 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartRequest from '../ChartWorkbenchPage/models/ChartHttpRequest';
+import ChartDataRequest from '../../types/ChartDataRequest';
 import { BoardProvider } from '../DashBoardPage/components/BoardProvider/BoardProvider';
 import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel';
 import TitleHeader from '../DashBoardPage/components/TitleHeader';
-import AutoBoardCore from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
-import FreeBoardCore from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
+import { AutoBoardCore } from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
+import { FreeBoardCore } from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
 import { getBoardDownloadParams } from '../DashBoardPage/pages/Board/slice/asyncActions';
 import { selectShareBoardInfo } from '../DashBoardPage/pages/Board/slice/selector';
 import {
@@ -38,7 +38,7 @@ import { OnLoadTasksType } from '../MainPage/Navbar/DownloadListPopup';
 import { DownloadTask } from '../MainPage/slice/types';
 import { DownloadTaskContainer } from './DownloadTaskContainer';
 import { HeadlessBrowserIdentifier } from './HeadlessBrowserIdentifier';
-
+const TitleHeight = 60;
 export interface ShareBoardProps {
   dashboard: Dashboard;
   renderMode: VizRenderMode;
@@ -47,7 +47,7 @@ export interface ShareBoardProps {
   onLoadShareTask: OnLoadTasksType;
   onDownloadFile: (item: DownloadTask) => void;
   onMakeShareDownloadDataTask: (
-    downloadParams: ChartRequest[],
+    downloadParams: ChartDataRequest[],
     fileName: string,
   ) => void;
 }
@@ -75,7 +75,21 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
     }, [hasFetchItems, needFetchItems]);
 
     // for sever Browser
-
+    const { taskW, taskH } = useMemo(() => {
+      const taskWH = {
+        taskW: boardWidthHeight[0] || 0,
+        taskH: boardWidthHeight[1] || 0,
+      };
+      if (dashboard) {
+        if (dashboard?.config?.type === 'free') {
+          const { width, height } = dashboard.config;
+          const ratio = width / (height || 1) || 1;
+          const targetHeight = taskWH.taskW / ratio;
+          taskWH.taskH = targetHeight;
+        }
+      }
+      return taskWH;
+    }, [boardWidthHeight, dashboard]);
     const boardDownLoadAction = useCallback(
       (params: { boardId: string }) => async dispatch => {
         const { boardId } = params;
@@ -135,8 +149,8 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
         {viewBoard}
         <HeadlessBrowserIdentifier
           renderSign={allItemFetched}
-          width={Number(boardWidthHeight[0]) || 0}
-          height={Number(boardWidthHeight[1]) || 0}
+          width={Number(taskW)}
+          height={Number(taskH) + TitleHeight}
         />
       </DndProvider>
     );

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { DeleteOutlined } from '@ant-design/icons';
-import { Form, FormInstance, Upload } from 'antd';
+import { Form, Upload } from 'antd';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { convertImageUrl } from 'app/pages/DashBoardPage/utils';
 import React, { useCallback, useContext } from 'react';
@@ -25,49 +25,47 @@ import styled from 'styled-components/macro';
 import { uploadBoardImage } from '../../../../slice/thunk';
 
 export interface ImageUploadProps {
-  form: FormInstance;
   filedName: string;
-  onForceUpdate: () => void;
-  filedValue: string;
+  value: string;
+  label: string;
+  placeholder: string;
 }
-const ImageUpload: React.FC<ImageUploadProps> = ({
-  form,
+export const ImageUpload: React.FC<ImageUploadProps> = ({
   filedName,
-  filedValue,
-  onForceUpdate,
+  value,
+  label,
+  placeholder,
 }) => {
+  return (
+    <Wrapper>
+      <Form.Item name={filedName} label={label} preserve>
+        <UploadDragger value={value} placeholder={placeholder} />
+      </Form.Item>
+    </Wrapper>
+  );
+};
+export const UploadDragger: React.FC<{
+  value: string;
+  onChange?: any;
+  placeholder: string;
+}> = ({ value, onChange, placeholder }) => {
   const dispatch = useDispatch();
   const { boardId } = useContext(BoardContext);
-  const onChange = useCallback(
-    value => {
-      form.setFieldsValue({
-        [filedName]: [value],
-      });
-      onForceUpdate();
-    },
-    [filedName, form, onForceUpdate],
-  );
 
   const beforeUpload = useCallback(
     async info => {
-      // const reader = new FileReader();
-      // reader.readAsDataURL(info);
-      // reader.onload = () => {
-      //   const urlIndex = `${STORAGE_IMAGE_KEY_PREFIX}${info.name || info.uid}`;
-      //   if (reader.result) {
-      //     localStorage.setItem(urlIndex, reader.result as string);
-      //     onChange(urlIndex);
-      //   }
-      // };
       const formData = new FormData();
       formData.append('file', info);
-      dispatch(
+      await dispatch(
         uploadBoardImage({ boardId, formData: formData, resolve: onChange }),
       );
       return false;
     },
     [boardId, dispatch, onChange],
   );
+  const getImageError = useCallback(() => {
+    onChange('');
+  }, [onChange]);
   const delImageUrl = useCallback(
     e => {
       e.stopPropagation();
@@ -75,56 +73,30 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     },
     [onChange],
   );
-  const normFile = (e: any) => {
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e && e.fileList;
-  };
-  const getImageError = useCallback(() => {
-    onChange('');
-  }, [onChange]);
   return (
-    <Wrapper>
-      <Form.Item
-        name={filedName}
-        label="背景图片"
-        valuePropName="fileList"
-        getValueFromEvent={normFile}
-        preserve
-      >
-        <Upload.Dragger
-          name={'upload-image'}
-          className="imageUpload"
-          beforeUpload={beforeUpload}
-          multiple={false}
-        >
-          {filedValue ? (
-            <div className="image-box">
-              <img
-                className="image"
-                src={convertImageUrl(filedValue)}
-                alt=""
-                onError={getImageError}
-              />
-              <DeleteOutlined className="del-button" onClick={delImageUrl} />
-            </div>
-          ) : (
-            <Placeholder>点击上传</Placeholder>
-          )}
-        </Upload.Dragger>
-      </Form.Item>
-    </Wrapper>
+    <StyleUpload
+      name={'upload-image'}
+      className="imageUpload"
+      beforeUpload={beforeUpload}
+      multiple={false}
+    >
+      {value ? (
+        <div className="image-box">
+          <img
+            className="image"
+            src={convertImageUrl(value)}
+            alt=""
+            onError={getImageError}
+          />
+          <DeleteOutlined className="del-button" onClick={delImageUrl} />
+        </div>
+      ) : (
+        <Placeholder>{placeholder}</Placeholder>
+      )}
+    </StyleUpload>
   );
 };
-
-export default ImageUpload;
-
-const Wrapper = styled.div`
-  .ant-upload-list {
-    display: none;
-  }
-
+const StyleUpload = styled(Upload.Dragger)`
   .imageUpload {
     display: block;
   }
@@ -153,6 +125,11 @@ const Wrapper = styled.div`
   .image {
     width: 100%;
     height: auto;
+  }
+`;
+const Wrapper = styled.div`
+  .ant-upload-list {
+    display: none;
   }
 `;
 

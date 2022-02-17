@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Empty } from 'antd';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
@@ -34,7 +35,7 @@ export interface FreeBoardCoreProps {
   boardId: string;
   showZoomCtrl?: boolean;
 }
-const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
+export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
   ({ boardId, showZoomCtrl }) => {
     const { config } = useContext(BoardConfigContext);
     const { editing, autoFit } = useContext(BoardContext);
@@ -84,7 +85,13 @@ const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
             ref={refGridBackground}
           >
             <SlideBackground scale={scale} slideTranslate={slideTranslate}>
-              {boardChildren}
+              {widgetConfigs.length ? (
+                boardChildren
+              ) : (
+                <div className="empty">
+                  <Empty description="" />
+                </div>
+              )}
             </SlideBackground>
           </div>
           {showZoomCtrl && (
@@ -101,7 +108,7 @@ const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
     );
   },
 );
-export default FreeBoardCore;
+
 const Wrap = styled.div`
   display: flex;
   flex: 1;
@@ -115,6 +122,14 @@ const Wrap = styled.div`
       flex: 1;
       -ms-overflow-style: none;
       overflow-y: hidden;
+
+      .empty {
+        height: 100%;
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+      }
     }
     .grid-background::-webkit-scrollbar {
       width: 0 !important;

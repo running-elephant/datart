@@ -17,11 +17,12 @@
  */
 
 import { Button, Collapse } from 'antd';
-import useStateModal from 'app/hooks/useStateModal';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_MD } from 'styles/StyleConstants';
+import CollapseHeader from '../CollapseHeader';
 import {
   FormGeneratorLayoutProps,
   GroupLayoutMode,
@@ -32,7 +33,7 @@ import CollectionLayout from './CollectionLayout';
 
 const { Panel } = Collapse;
 
-const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
+const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
   ({
     ancestors,
     data,
@@ -41,10 +42,13 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
     dataConfigs,
     flatten,
     onChange,
+    context,
   }) => {
     const [openStateModal, contextHolder] = useStateModal({});
     const [type] = useState(data?.options?.type || 'default');
-    const [modalSize] = useState(data?.options?.modalSize || '');
+    const [modalSize] = useState(
+      data?.options?.modalSize || StateModalSize.SMALL,
+    );
     const [expand] = useState(!!data?.options?.expand);
 
     const handleConfrimModalDialogOrDataUpdate = (
@@ -78,10 +82,10 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
             <StyledShowModalButton
               type="ghost"
               block={true}
-              title={t(data.label)}
+              title={t(data.label, true)}
               onClick={handleOpenStateModal}
             >
-              {t(data.label)}
+              <CollapseHeader title={t(data.label, true)} />
             </StyledShowModalButton>
             {contextHolder}
           </>
@@ -93,7 +97,10 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           expandIconPosition="right"
           defaultActiveKey={expand ? '1' : undefined}
         >
-          <Panel key="1" header={t(data.label)}>
+          <Panel
+            key="1"
+            header={<CollapseHeader title={t(data.label, true)} />}
+          >
             {renderCollectionComponents(
               data,
               handleConfrimModalDialogOrDataUpdate,
@@ -112,6 +119,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleSectionConfig>> = memo(
           dataConfigs={dataConfigs}
           flatten={flatten}
           onChange={onChangeEvent}
+          context={context}
         />
       );
     };

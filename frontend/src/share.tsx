@@ -1,8 +1,23 @@
-import { ConfigProvider } from 'antd';
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import 'antd/dist/antd.less';
-import zh_CN from 'antd/lib/locale/zh_CN';
 import 'app/assets/fonts/iconfont.css';
-import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { Share } from 'app/share';
 import React from 'react';
 import 'react-app-polyfill/ie11';
@@ -21,39 +36,33 @@ const MOUNT_NODE = document.getElementById('root') as HTMLElement;
  *  hot-key [control,shift,command,c]
  */
 
-const MainApp = <Share />;
-
 const InspectorWrapper =
   process.env.NODE_ENV === 'development' ? Inspector : React.Fragment;
-ChartManager.instance()
-  .load()
-  .catch(err => console.error('Fail to load customize charts with ', err))
-  .finally(() => {
-    ReactDOM.render(
-      <InspectorWrapper>
-        <Provider store={store}>
-          <ThemeProvider>
-            <ConfigProvider locale={zh_CN}>
-              <HelmetProvider>
-                <React.StrictMode>{MainApp}</React.StrictMode>
-              </HelmetProvider>
-            </ConfigProvider>
-          </ThemeProvider>
-        </Provider>
-      </InspectorWrapper>,
-      MOUNT_NODE,
-    );
 
-    // Hot reloadable translation json files
-    if (module.hot) {
-      module.hot.accept(['./locales/i18n'], () => {
-        // No need to render the App again because i18next works with the hooks
-      });
-    }
+ReactDOM.render(
+  <InspectorWrapper>
+    <Provider store={store}>
+      <ThemeProvider>
+        <HelmetProvider>
+          <React.StrictMode>
+            <Share />
+          </React.StrictMode>
+        </HelmetProvider>
+      </ThemeProvider>
+    </Provider>
+  </InspectorWrapper>,
+  MOUNT_NODE,
+);
 
-    if (process.env.NODE_ENV === 'production') {
-      if (typeof (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__ === 'object') {
-        (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__.inject = () => void 0;
-      }
-    }
+// Hot reloadable translation json files
+if (module.hot) {
+  module.hot.accept(['./locales/i18n'], () => {
+    // No need to render the App again because i18next works with the hooks
   });
+}
+
+if (process.env.NODE_ENV === 'production') {
+  if (typeof (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__ === 'object') {
+    (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__.inject = () => void 0;
+  }
+}

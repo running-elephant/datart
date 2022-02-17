@@ -17,19 +17,25 @@
  */
 import { Layout, message } from 'antd';
 import { Split } from 'app/components';
+import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
-import { vizActions } from 'app/pages/MainPage/pages/VizPage/slice';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
-import { publishViz } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
+import {
+  deleteViz,
+  publishViz,
+  removeTab,
+} from 'app/pages/MainPage/pages/VizPage/slice/thunks';
 import { StoryContext } from 'app/pages/StoryBoardPage/contexts/StoryContext';
+import { dispatchResize } from 'app/utils/dispatchResize';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
+import { Route, Switch } from 'react-router-dom';
 import 'reveal.js/dist/reveal.css';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
-import { dispatchResize } from 'utils/utils';
 import PageThumbnailList from '../components/PageThumbnailList';
 import StoryHeader from '../components/StoryHeader';
 import StoryPageItem from '../components/StoryPageItem';
@@ -45,26 +51,27 @@ import { StoryBoardState } from '../slice/types';
 const { Content } = Layout;
 
 export const StoryPagePreview: React.FC<{
+  orgId: string;
   storyId: string;
   allowShare?: boolean;
   allowManage?: boolean;
-}> = memo(({ storyId, allowShare, allowManage }) => {
+}> = memo(({ orgId, storyId, allowShare, allowManage }) => {
   const dispatch = useDispatch();
-
+  const t = usePrefixI18N('viz.action');
+  const tg = usePrefixI18N('global');
+  const history = useHistory();
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  // const [storyEditing, setStoryEditing] = useState(false);
-  const [editorVisible, setEditorVisible] = useState(false);
-
+  const publishLoading = useSelector(selectPublishLoading);
   const storyBoard = useSelector((state: { storyBoard: StoryBoardState }) =>
     makeSelectStoryBoardById(state, storyId),
   );
   const pageMap = useSelector((state: { storyBoard: StoryBoardState }) =>
     makeSelectStoryPagesById(state, storyId),
   );
+
   const onCloseEditor = useCallback(() => {
-    setEditorVisible(false);
-  }, []);
-  const publishLoading = useSelector(selectPublishLoading);
+    history.push(`/organizations/${orgId}/vizs/${storyId}`);
+  }, [history, orgId, storyId]);
 
   const sortedPages = useMemo(() => {
     const sortedPages = Object.values(pageMap).sort(
@@ -72,51 +79,19 @@ export const StoryPagePreview: React.FC<{
     );
     return sortedPages;
   }, [pageMap]);
+
   const curPageId = useMemo(() => {
     return sortedPages[currentPageIndex]?.id || '';
   }, [currentPageIndex, sortedPages]);
-  useEffect(() => {
-    dispatch(getStoryDetail(storyId));
-  }, [dispatch, storyId]);
+
   const toggleEdit = useCallback(() => {
-    setEditorVisible(c => !c);
-  }, []);
+    history.push(`/organizations/${orgId}/vizs/${storyId}/storyEditor`);
+  }, [history, orgId, storyId]);
+
   const playStory = useCallback(() => {
-    dispatch(vizActions.changePlayingStoryId(storyId || ''));
-  }, [dispatch, storyId]);
+    window.open(`${storyId}/storyPlay`, '_blank');
+  }, [storyId]);
 
-  useEffect(() => {
-    if (sortedPages.length === 0) {
-      return;
-    }
-    const pageId = sortedPages[currentPageIndex].id;
-    dispatch(
-      storyActions.changePageSelected({
-        storyId,
-        pageId,
-        multiple: false,
-      }),
-    );
-  }, [dispatch, currentPageIndex, sortedPages, storyId]);
-  // 点击在加载
-  useEffect(() => {
-    const curPage = sortedPages[currentPageIndex];
-    if (!curPage || !curPage.relId || !curPage.relType) {
-      return;
-    }
-    const { relId, relType } = curPage;
-    dispatch(getPageContentDetail({ relId, relType }));
-  }, [currentPageIndex, dispatch, sortedPages, pageMap]);
-
-  // 自动加载所有
-  // useEffect(() => {
-  //   sortedPages.forEach(page => {
-  //     try {
-  //       const { relId, relType } = page;
-  //       dispatch(getPageContentDetail({ relId, relType }));
-  //     } catch (error) {}
-  //   });
-  // }, [dispatch, sortedPages]);
   const onPageClick = useCallback(
     (index: number, pageId: string, multiple: boolean) => {
       setCurrentPageIndex(index);
@@ -156,6 +131,7 @@ export const StoryPagePreview: React.FC<{
     limitedSide: 0,
     range: [150, 768],
   });
+
   const siderDragEnd = useCallback(
     sizes => {
       setSizes(sizes);
@@ -164,6 +140,68 @@ export const StoryPagePreview: React.FC<{
 
     [setSizes],
   );
+
+  const redirect = useCallback(
+    tabKey => {
+      if (tabKey) {
+        history.push(`/organizations/${orgId}/vizs/${tabKey}`);
+      } else {
+        history.push(`/organizations/${orgId}/vizs`);
+      }
+    },
+    [history, orgId],
+  );
+
+  const handleRecycleStory = useCallback(() => {
+    dispatch(
+      deleteViz({
+        params: { id: storyId, archive: true },
+        type: 'STORYBOARD',
+        resolve: () => {
+          message.success(tg('operation.archiveSuccess'));
+          dispatch(removeTab({ id: storyId, resolve: redirect }));
+        },
+      }),
+    );
+  }, [dispatch, redirect, storyId, tg]);
+
+  // 点击在加载
+  useEffect(() => {
+    const curPage = sortedPages[currentPageIndex];
+    if (!curPage || !curPage.relId || !curPage.relType) {
+      return;
+    }
+    const { relId, relType } = curPage;
+    dispatch(getPageContentDetail({ relId, relType }));
+  }, [currentPageIndex, dispatch, sortedPages, pageMap]);
+
+  useEffect(() => {
+    dispatch(getStoryDetail(storyId));
+  }, [dispatch, storyId]);
+
+  useEffect(() => {
+    if (sortedPages.length === 0) {
+      return;
+    }
+    const pageId = sortedPages[currentPageIndex].id;
+    dispatch(
+      storyActions.changePageSelected({
+        storyId,
+        pageId,
+        multiple: false,
+      }),
+    );
+  }, [dispatch, currentPageIndex, sortedPages, storyId]);
+
+  // 自动加载所有
+  // useEffect(() => {
+  //   sortedPages.forEach(page => {
+  //     try {
+  //       const { relId, relType } = page;
+  //       dispatch(getPageContentDetail({ relId, relType }));
+  //     } catch (error) {}
+  //   });
+  // }, [dispatch, sortedPages]);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -184,6 +222,7 @@ export const StoryPagePreview: React.FC<{
             onPublish={onPublish}
             allowShare={allowShare}
             allowManage={allowManage}
+            onRecycleStory={handleRecycleStory}
           />
           <Container
             sizes={sizes}
@@ -212,9 +251,14 @@ export const StoryPagePreview: React.FC<{
               ))}
             </Content>
           </Container>
-          {editorVisible && (
-            <StoryEditor storyId={storyId} onCloseEditor={onCloseEditor} />
-          )}
+          <Switch>
+            <Route
+              path="/organizations/:orgId/vizs/:vizId?/storyEditor"
+              render={() => (
+                <StoryEditor storyId={storyId} onCloseEditor={onCloseEditor} />
+              )}
+            />
+          </Switch>
         </Wrapper>
       </StoryContext.Provider>
     </DndProvider>

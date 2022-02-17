@@ -16,12 +16,17 @@
  * limitations under the License.
  */
 import { Collapse, Form } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import { DashboardConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { BoardInfoContext } from 'app/pages/DashBoardPage/contexts/BoardInfoContext';
+import {
+  DashboardConfig,
+  DeviceType,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getRGBAColor } from 'app/pages/DashBoardPage/utils';
 import produce from 'immer';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import React, {
   FC,
   memo,
@@ -40,24 +45,38 @@ import { Group, SettingPanel } from './SettingPanel';
 
 const { Panel } = Collapse;
 export const BoardSetting: FC = memo(() => {
+  const t = useI18NPrefix(`viz.board.setting`);
   const dispatch = useDispatch();
   const { boardType } = useContext(BoardContext);
+
   const { config } = useContext(BoardConfigContext);
+
+  const { deviceType } = useContext(BoardInfoContext);
+
   const [form] = Form.useForm();
   const cacheValue = useRef<any>({});
   useEffect(() => {
+    const { scaleMode, width: boardWidth, height: boardHeight } = config;
+    const [marginLR, marginTB] = config.margin;
+    const [paddingLR, paddingTB] = config.containerPadding;
+    const [mobileMarginLR, mobileMarginTB] = config.mobileMargin;
+    const [mobilePaddingLR, mobilePaddingTB] = config.mobileContainerPadding;
+
     cacheValue.current = {
       backgroundColor: config.background.color,
-      backgroundImage: [config.background.image],
-      scaleMode: config.scaleMode,
-      boardWidth: config.width,
-      boardHeight: config.height,
-      marginW: config.margin[0],
-      marginH: config.margin[1],
-      paddingW: config.containerPadding[0],
-      paddingH: config.containerPadding[1],
-      rowHeight: config.rowHeight,
-      initialQuery: config.initialQuery=== false ? false : true, // TODO migration 如果initialQuery的值为undefined默认为true 兼容旧的仪表盘没有initialQuery参数的问题 
+      backgroundImage: config.background.image,
+      scaleMode,
+      boardWidth,
+      boardHeight,
+      marginLR,
+      marginTB,
+      paddingLR,
+      paddingTB,
+      mobileMarginLR,
+      mobileMarginTB,
+      mobilePaddingLR,
+      mobilePaddingTB,
+      initialQuery: config.initialQuery,
     };
     form.setFieldsValue({ ...cacheValue.current });
   }, [config, form]);
@@ -65,27 +84,28 @@ export const BoardSetting: FC = memo(() => {
   const onUpdate = useCallback(
     (newValues, config: DashboardConfig) => {
       const value = { ...cacheValue.current, ...newValues };
+
       const nextConf = produce(config, draft => {
         draft.background.color = getRGBAColor(value.backgroundColor);
-        draft.background.image = value.backgroundImage[0];
+        draft.background.image = value.backgroundImage;
         draft.scaleMode = value.scaleMode;
         draft.width = value.boardWidth;
         draft.height = value.boardHeight;
-        draft.margin[0] = value.marginW;
-        draft.margin[1] = value.marginH;
-        draft.containerPadding[0] = value.paddingW;
-        draft.containerPadding[1] = value.paddingH;
-        draft.rowHeight = value.rowHeight;
-        draft.initialQuery= value.initialQuery;
+        draft.margin = [value.marginLR, value.marginTB];
+        draft.containerPadding = [value.paddingLR, value.paddingTB];
+        draft.mobileMargin = [value.mobileMarginLR, value.mobileMarginTB];
+        draft.mobileContainerPadding = [
+          value.mobilePaddingLR,
+          value.mobilePaddingTB,
+        ];
+
+        draft.initialQuery = value.initialQuery;
       });
       dispatch(editBoardStackActions.updateBoardConfig(nextConf));
     },
     [dispatch],
   );
-  const onForceUpdate = useCallback(() => {
-    const values = form.getFieldsValue();
-    onUpdate(values, config);
-  }, [config, form, onUpdate]);
+
   const throttledUpdate = useRef(
     throttle((allValue, config) => onUpdate(allValue, config), 1000),
   );
@@ -97,7 +117,7 @@ export const BoardSetting: FC = memo(() => {
   );
 
   return (
-    <SettingPanel title="面板设计">
+    <SettingPanel title={`${t('board')} ${t('setting')}`}>
       <Form
         form={form}
         name="auto-board-from"
@@ -112,44 +132,76 @@ export const BoardSetting: FC = memo(() => {
         >
           {boardType === 'auto' && (
             <>
-              <Panel header="面板属性" key="autoSize" forceRender>
+              <Panel header={`${t('baseProperty')}`} key="autoSize" forceRender>
                 <Group>
-                  <NumberSet label={'画布边距-上下'} name="paddingH" />
-                  <NumberSet label={'画布边距-左右'} name="paddingW" />
-                  <NumberSet label={'组件间距-上下'} name="marginH" />
-                  <NumberSet label={'组件间距-左右'} name="marginW" />
-                  <NumberSet label={'组件高度'} name="rowHeight" />
+                  <NumberSet
+                    label={`${t('board')} ${t('paddingTB')}`}
+                    name={
+                      deviceType === DeviceType.Mobile
+                        ? 'mobilePaddingTB'
+                        : 'paddingTB'
+                    }
+                  />
+                  <NumberSet
+                    label={`${t('board')} ${t('paddingLR')}`}
+                    name={
+                      deviceType === DeviceType.Mobile
+                        ? 'mobilePaddingLR'
+                        : 'paddingLR'
+                    }
+                  />
+                  <NumberSet
+                    label={`${t('widget')} ${t('marginTB')}`}
+                    name={
+                      deviceType === DeviceType.Mobile
+                        ? 'mobileMarginTB'
+                        : 'marginTB'
+                    }
+                  />
+                  <NumberSet
+                    label={`${t('widget')} ${t('marginLR')}`}
+                    name={
+                      deviceType === DeviceType.Mobile
+                        ? 'mobileMarginLR'
+                        : 'marginLR'
+                    }
+                  />
                 </Group>
               </Panel>
             </>
           )}
           {boardType === 'free' && (
             <>
-              <Panel header="面板尺寸" key="freeSize" forceRender>
+              <Panel header={t('size')} key="freeSize" forceRender>
                 <Group>
-                  <NumberSet label={'宽度(像素)'} name={'boardWidth'} />
-                  <NumberSet label={'高度(像素)'} name={'boardHeight'} />
+                  <NumberSet
+                    label={`${t('width')} ( ${t('px')} )`}
+                    name={'boardWidth'}
+                  />
+                  <NumberSet
+                    label={`${t('height')} ( ${t('px')} )`}
+                    name={'boardHeight'}
+                  />
                 </Group>
               </Panel>
-              <Panel header="缩放模式" key="scale" forceRender>
+              <Panel header={t('scaleMode')} key="scale" forceRender>
                 <Group>
                   <ScaleModeSet scaleMode={config.scaleMode} />
                 </Group>
               </Panel>
             </>
           )}
-          <Panel header="背景设计" key="background" forceRender>
+          <Panel header={t('background')} key="background" forceRender>
             <Group>
-              <BackgroundSet
-                onForceUpdate={onForceUpdate}
-                background={config.background}
-                form={form}
-              />
+              <BackgroundSet background={config.background} />
             </Group>
           </Panel>
-          <Panel header="查询配置" key="initialQuery" forceRender>
+          <Panel header={t('queryMode')} key="initialQuery" forceRender>
             <Group>
-              <InitialQuerySet name="initialQuery"></InitialQuerySet>
+              <InitialQuerySet
+                name="initialQuery"
+                label={t('openInitQuery')}
+              ></InitialQuerySet>
             </Group>
           </Panel>
         </Collapse>

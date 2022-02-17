@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getDataProviderDatabases } from 'app/pages/MainPage/slice/thunks';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
@@ -200,6 +218,7 @@ const slice = createSlice({
       const currentEditingView = state.editingViews.find(
         v => v.id === action.meta.arg.id,
       );
+
       if (currentEditingView) {
         const { model, dataSource } = transformQueryResultToModelAndDataSource(
           action.payload,
@@ -211,6 +230,10 @@ const slice = createSlice({
           currentEditingView.stage = ViewViewModelStages.Saveable;
         } else {
           currentEditingView.stage = ViewViewModelStages.Initialized;
+        }
+
+        if (action.payload.warnings) {
+          currentEditingView.warnings = action.payload.warnings;
         }
       }
     });
@@ -225,26 +248,29 @@ const slice = createSlice({
     });
 
     // saveView
-    builder.addCase(saveView.pending, state => {
+    builder.addCase(saveView.pending, (state, action) => {
       const currentEditingView = state.editingViews.find(
         v => v.id === state.currentEditingView,
       );
-      if (currentEditingView) {
+      const isSaveAs = action.meta.arg.isSaveAs;
+      if (currentEditingView && !isSaveAs) {
         currentEditingView.stage = ViewViewModelStages.Saving;
       }
     });
     builder.addCase(saveView.fulfilled, (state, action) => {
-      const editingIndex = state.editingViews.findIndex(
-        v => v.id === state.currentEditingView,
-      );
-      state.editingViews.splice(editingIndex, 1, {
-        ...action.payload,
-        touched: false,
-        stage: ViewViewModelStages.Saved,
-        originVariables: [...action.payload.variables],
-        originColumnPermissions: [...action.payload.columnPermissions],
-      });
-      state.currentEditingView = action.payload.id;
+      if (!action.payload.isSaveAs) {
+        const editingIndex = state.editingViews.findIndex(
+          v => v.id === state.currentEditingView,
+        );
+        state.editingViews.splice(editingIndex, 1, {
+          ...action.payload,
+          touched: false,
+          stage: ViewViewModelStages.Saved,
+          originVariables: [...action.payload.variables],
+          originColumnPermissions: [...action.payload.columnPermissions],
+        });
+        state.currentEditingView = action.payload.id;
+      }
 
       if (state.views) {
         const treeIndex = state.views.findIndex(

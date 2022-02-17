@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.FileUtils;
+import datart.core.common.MessageResolver;
 import datart.core.data.provider.*;
 import datart.data.provider.base.DataProviderException;
 import datart.data.provider.jdbc.JdbcDriverInfo;
@@ -47,6 +48,10 @@ public class JdbcDataProvider extends DataProvider {
     public static final String URL = "url";
 
     public static final String DRIVER_CLASS = "driverClass";
+
+    public static final String ENABLE_SPECIAL_SQL = "enableSpecialSQL";
+
+    private static final String I18N_PREFIX = "config.template.jdbc.";
 
     /**
      * 获取连接时最大等待时间（毫秒）
@@ -110,6 +115,13 @@ public class JdbcDataProvider extends DataProvider {
         jdbcProperties.setDriverClass(StringUtils.isBlank(driverClass) ?
                 ProviderFactory.getJdbcDriverInfo(jdbcProperties.getDbType()).getDriverClass() :
                 driverClass);
+
+        Object enableSpecialSQL = config.getProperties().get(ENABLE_SPECIAL_SQL);
+
+        if (enableSpecialSQL != null && "true".equals(enableSpecialSQL.toString())) {
+            jdbcProperties.setEnableSpecialSql(true);
+        }
+
         Object properties = config.getProperties().get("properties");
         if (properties != null) {
             if (properties instanceof Map) {
@@ -157,6 +169,7 @@ public class JdbcDataProvider extends DataProvider {
     public DataProviderConfigTemplate getConfigTemplate() throws IOException {
         DataProviderConfigTemplate configTemplate = super.getConfigTemplate();
         for (DataProviderConfigTemplate.Attribute attribute : configTemplate.getAttributes()) {
+            attribute.setDisplayName(MessageResolver.getMessage("config.template.jdbc." + attribute.getName()));
             if (attribute.getName().equals("dbType")) {
                 List<JdbcDriverInfo> jdbcDriverInfos = ProviderFactory.loadDriverInfoFromResource();
                 List<Object> dbInfos = jdbcDriverInfos.stream().map(info -> {
@@ -170,6 +183,21 @@ public class JdbcDataProvider extends DataProvider {
             }
         }
         return configTemplate;
+    }
+
+    @Override
+    public String getConfigDisplayName(String name) {
+        return MessageResolver.getMessage(I18N_PREFIX + name);
+    }
+
+    @Override
+    public String getConfigDescription(String name) {
+        String message = MessageResolver.getMessage(I18N_PREFIX + name + ".desc");
+        if (message.startsWith(I18N_PREFIX)) {
+            return null;
+        } else {
+            return message;
+        }
     }
 
     @Override

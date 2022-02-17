@@ -16,13 +16,15 @@
  * limitations under the License.
  */
 
-import { BackendChart } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartDTO } from "app/types/ChartDTO";
 import { FilterCondition } from 'app/types/ChartConfig';
 import DropdownListFilter from './DropdownListFilter';
 import MultiDropdownListFilter from './MultiDropdownListFilter';
 import RadioGroupFilter from './RadioGroupFilter';
-import RangTimeFilter from './RangTimeFilter';
+import RangeTimeFilter from './RangeTimeFilter';
+import RangeTimePickerFilter from './RangeTimePickerFilter';
 import RangValueFilter from './RangValueFilter';
+import RecommendTimeFilter from './RecommendTimeFilter';
 import SliderFilter from './SliderFilter';
 import TextFilter from './TextFilter';
 import TimeFilter from './TimeFilter';
@@ -31,7 +33,7 @@ import ValueFilter from './ValueFilter';
 
 export type PresentControllerFilterProps = {
   viewId?: string;
-  view?: BackendChart['view'];
+  view?: ChartDTO['view'];
   condition?: FilterCondition;
   onConditionChange: (condition: FilterCondition) => void;
   options: any;
@@ -41,7 +43,9 @@ const Filters = {
   DropdownListFilter,
   MultiDropdownListFilter,
   RadioGroupFilter,
-  RangTimeFilter,
+  RangeTimeFilter,
+  RangeTimePickerFilter,
+  RecommendTimeFilter,
   RangValueFilter,
   SliderFilter,
   TextFilter,

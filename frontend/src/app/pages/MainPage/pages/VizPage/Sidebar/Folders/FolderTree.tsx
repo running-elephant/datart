@@ -1,6 +1,12 @@
-import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
+import {
+  CopyFilled,
+  DeleteOutlined,
+  EditOutlined,
+  MoreOutlined,
+} from '@ant-design/icons';
 import { Menu, message, Popconfirm } from 'antd';
 import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { CascadeAccess } from 'app/pages/MainPage/Access';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { LocalTreeDataNode } from 'app/pages/MainPage/slice/types';
@@ -14,6 +20,7 @@ import {
   PermissionLevels,
   ResourceTypes,
 } from '../../../PermissionPage/constants';
+import { useSaveAsViz } from '../../hooks/useSaveAsViz';
 import { SaveFormContext } from '../../SaveFormContext';
 import { selectVizListLoading, selectVizs } from '../../slice/selectors';
 import {
@@ -22,18 +29,25 @@ import {
   getFolders,
   removeTab,
 } from '../../slice/thunks';
-interface FolderTreeProps {
+
+interface FolderTreeProps extends I18NComponentProps {
   selectedId?: string;
   treeData?: LocalTreeDataNode[];
 }
 
-export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
+export function FolderTree({
+  selectedId,
+  treeData,
+  i18nPrefix,
+}: FolderTreeProps) {
+  const tg = useI18NPrefix('global');
   const dispatch = useDispatch();
   const history = useHistory();
   const orgId = useSelector(selectOrgId);
   const loading = useSelector(selectVizListLoading);
   const vizsData = useSelector(selectVizs);
   const { showSaveForm } = useContext(SaveFormContext);
+  const saveAsViz = useSaveAsViz();
 
   useEffect(() => {
     dispatch(getFolders(orgId));
@@ -64,12 +78,12 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
       () => {
         let id = folderId;
         let archive = false;
-        let msg = '成功删除';
+        let msg = tg('operation.deleteSuccess');
 
         if (['DASHBOARD', 'DATACHART'].includes(relType)) {
           id = relId;
           archive = true;
-          msg = '成功移至回收站';
+          msg = tg('operation.archiveSuccess');
         }
         dispatch(
           deleteViz({
@@ -82,7 +96,7 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
           }),
         );
       },
-    [dispatch, redirect],
+    [dispatch, redirect, tg],
   );
 
   const moreMenuClick = useCallback(
@@ -117,21 +131,26 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
             break;
           case 'delete':
             break;
+          case 'saveAs':
+            saveAsViz(node.relId, node.relType);
+            break;
           default:
             break;
         }
       },
-    [dispatch, showSaveForm, vizsData],
+    [dispatch, showSaveForm, vizsData, saveAsViz],
   );
 
   const renderTreeTitle = useCallback(
     node => {
+      const { isFolder, title, path, relType } = node;
+
       return (
         <TreeTitle>
-          <h4>{`${node.title}`}</h4>
+          <h4>{`${title}`}</h4>
           <CascadeAccess
             module={ResourceTypes.Viz}
-            path={node.path}
+            path={path}
             level={PermissionLevels.Manage}
           >
             <Popup
@@ -147,19 +166,33 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
                     key="info"
                     prefix={<EditOutlined className="icon" />}
                   >
-                    基本信息
+                    {tg('button.info')}
                   </MenuListItem>
+
+                  {!isFolder && (
+                    <MenuListItem
+                      key="saveAs"
+                      prefix={<CopyFilled className="icon" />}
+                    >
+                      {tg('button.saveAs')}
+                    </MenuListItem>
+                  )}
+
                   <MenuListItem
                     key="delete"
                     prefix={<DeleteOutlined className="icon" />}
                   >
                     <Popconfirm
-                      title={`确定${
-                        node.relType === 'FOLDER' ? '删除' : '移至回收站'
-                      }？`}
+                      title={`${
+                        relType === 'FOLDER'
+                          ? tg('operation.deleteConfirm')
+                          : tg('operation.archiveConfirm')
+                      }`}
                       onConfirm={archiveViz(node)}
                     >
-                      {node.relType === 'FOLDER' ? '删除' : '移至回收站'}
+                      {relType === 'FOLDER'
+                        ? tg('button.delete')
+                        : tg('button.archive')}
                     </Popconfirm>
                   </MenuListItem>
                 </Menu>
@@ -173,7 +206,7 @@ export function FolderTree({ selectedId, treeData }: FolderTreeProps) {
         </TreeTitle>
       );
     },
-    [moreMenuClick, archiveViz],
+    [moreMenuClick, archiveViz, tg],
   );
 
   const onDrop = info => {

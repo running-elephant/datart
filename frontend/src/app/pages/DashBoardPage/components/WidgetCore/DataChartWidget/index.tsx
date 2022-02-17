@@ -15,17 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import useResizeObserver from 'app/hooks/useResizeObserver';
-import ChartIFrameContainer from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools/ChartIFrameContainer';
-import Chart from 'app/pages/ChartWorkbenchPage/models/Chart';
+import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
+import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
+import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { WidgetChartContext } from 'app/pages/DashBoardPage/contexts/WidgetChartContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetDataContext } from 'app/pages/DashBoardPage/contexts/WidgetDataContext';
 import { WidgetMethodContext } from 'app/pages/DashBoardPage/contexts/WidgetMethodContext';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { ChartMouseEventParams, IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
-import { ChartMouseEventParams } from 'app/types/DatartChartBase';
+import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
+import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import produce from 'immer';
 import React, {
   memo,
   useCallback,
@@ -33,18 +36,15 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from 'react';
 import styled from 'styled-components/macro';
-export interface DataChartWidgetProps {}
-export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
+export const DataChartWidget: React.FC<{}> = memo(() => {
   const dataChart = useContext(WidgetChartContext);
   const { data } = useContext(WidgetDataContext);
   const widget = useContext(WidgetContext);
   const { id: widgetId } = widget;
   const { widgetChartClick } = useContext(WidgetMethodContext);
-  const [cacheW, setCacheW] = useState(200);
-  const [cacheH, setCacheH] = useState(200);
+  const { ref, cacheW, cacheH } = useCacheWidthHeight();
   const widgetRef = useRef<Widget>(widget);
   useEffect(() => {
     widgetRef.current = widget;
@@ -68,7 +68,7 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
       try {
         const chartInstance = ChartManager.instance().getById(
           dataChart.config.chartGraphId,
-        ) as Chart;
+        ) as IChart;
 
         if (chartInstance) {
           chartInstance.registerMouseEvents([
@@ -87,23 +87,25 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
     }
   }, [chartClick, dataChart]);
 
-  const onResize = useCallback(() => {}, []);
-
-  const {
-    ref,
-    width = 200,
-    height = 200,
-  } = useResizeObserver<HTMLDivElement>({
-    refreshMode: 'debounce',
-    refreshRate: 120,
-    onResize,
-  });
-  useEffect(() => {
-    if (width !== 0 && height !== 0) {
-      setCacheW(width);
-      setCacheH(height);
+  const widgetSpecialConfig = useMemo(() => {
+    let linkFields: string[] = [];
+    let jumpField: string = '';
+    const { jumpConfig, linkageConfig } = widget.config;
+    if (linkageConfig?.open) {
+      linkFields = widget?.relations
+        .filter(re => re.config.type === 'widgetToWidget')
+        .map(item => item.config.widgetToWidget?.triggerColumn as string);
     }
-  }, [width, height]);
+    if (jumpConfig?.open) {
+      jumpField = jumpConfig?.field?.jumpFieldName as string;
+    }
+
+    return {
+      linkFields,
+      jumpField,
+    };
+  }, [widget]);
+
   const dataset = useMemo(
     () => ({
       columns: data.columns,
@@ -114,7 +116,7 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
   );
   const chartFrame = useMemo(() => {
     if (!dataChart) {
-      return;
+      return `not found dataChart`;
     }
     if (!chart) {
       if (!dataChart?.config) {
@@ -125,34 +127,50 @@ export const DataChartWidget: React.FC<DataChartWidgetProps> = memo(() => {
       }
       return `not found chart by ${dataChart?.config?.chartGraphId}`;
     }
-    try {
-      return (
-        <ChartIFrameContainer
-          dataset={dataset}
-          chart={chart}
-          config={dataChart.config.chartConfig as ChartConfig}
-          style={{ width: cacheW, height: cacheH }}
-          containerId={widgetId}
-        />
+
+    const chartConfig = produce(chart.config, draft => {
+      mergeToChartConfig(
+        draft,
+        produce(dataChart?.config, draft => {
+          migrateChartConfig(draft as ChartDetailConfigDTO);
+        }) as ChartDetailConfigDTO,
       );
-    } catch (error) {
-      return <span>has err in {`<ChartIFrameContainer>`}</span>;
-    }
-  }, [cacheH, cacheW, chart, dataChart, dataset, widgetId]);
+    });
+
+    return (
+      <ChartIFrameContainer
+        dataset={dataset}
+        chart={chart}
+        config={chartConfig as ChartConfig}
+        width={cacheW}
+        height={cacheH}
+        containerId={widgetId}
+        widgetSpecialConfig={widgetSpecialConfig}
+      />
+    );
+  }, [
+    cacheH,
+    cacheW,
+    chart,
+    dataChart,
+    dataset,
+    widgetSpecialConfig,
+    widgetId,
+  ]);
   return (
     <Wrap className="widget-chart" ref={ref}>
-      {chartFrame}
+      <ChartFrameBox>{chartFrame}</ChartFrameBox>
     </Wrap>
   );
 });
+const ChartFrameBox = styled.div`
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+`;
 const Wrap = styled.div`
   display: flex;
   flex: 1;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  & div {
-    max-width: 100%;
-    max-height: 100%;
-  }
+  position: relative;
 `;

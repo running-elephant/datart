@@ -26,18 +26,18 @@ import { dataConfigSectionComparer } from './utils';
 const BaseDataConfigSection: FC<ChartDataConfigSectionProps> = memo(
   ({ modalSize, config, extra, translate = title => title, ...rest }) => {
     return (
-      <Container>
-        <Title>
-          {translate(config.label)}
+      <StyledBaseDataConfigSection>
+        <StyledBaseDataConfigSectionTitle>
+          {translate(config.label || '')}
           {extra?.()}
-        </Title>
+        </StyledBaseDataConfigSectionTitle>
         <ChartDraggableTargetContainer
           {...rest}
           translate={translate}
           modalSize={modalSize}
           config={config}
         />
-      </Container>
+      </StyledBaseDataConfigSection>
     );
   },
   dataConfigSectionComparer,
@@ -45,10 +45,10 @@ const BaseDataConfigSection: FC<ChartDataConfigSectionProps> = memo(
 
 export default BaseDataConfigSection;
 
-const Container = styled.div`
+const StyledBaseDataConfigSection = styled.div`
   padding: ${SPACE} 0;
 `;
 
-const Title = styled.div`
+const StyledBaseDataConfigSectionTitle = styled.div`
   color: ${p => p.theme.textColor};
 `;

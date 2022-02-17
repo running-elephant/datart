@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import produce, { Draft } from 'immer';
 
 export interface Action<T> {
@@ -52,13 +52,12 @@ export function updateByKey<T1, T2>(
   });
 }
 
-export function updateCollectionByAction<T extends ChartStyleSectionConfig>(
+export function updateCollectionByAction<T extends ChartStyleConfig>(
   base: T[],
   action: Action<T>,
 ) {
   const value = action.value;
-  const keys = [...action.ancestors];
-
+  const keys = (action?.ancestors && [...action.ancestors]) || [];
   const nextState = produce(base, draft => {
     const index = keys.shift() as number;
     if (index !== undefined) {
@@ -73,12 +72,12 @@ export function updateCollectionByAction<T extends ChartStyleSectionConfig>(
   return nextState;
 }
 
-export function updateByAction<T extends ChartStyleSectionConfig>(
+export function updateByAction<T extends ChartStyleConfig>(
   base: T,
   action: Action<T>,
 ) {
   const value = action.value;
-  const keys = [...action.ancestors];
+  const keys = (action?.ancestors && [...action.ancestors]) || [];
 
   const nextState = produce(base, draft => {
     recursiveUpdateImpl(draft, keys, value as any);
@@ -86,7 +85,7 @@ export function updateByAction<T extends ChartStyleSectionConfig>(
   return nextState;
 }
 
-export function recursiveUpdateImpl<T extends ChartStyleSectionConfig>(
+export function recursiveUpdateImpl<T extends ChartStyleConfig>(
   draft: T,
   keys: number[],
   value: T,

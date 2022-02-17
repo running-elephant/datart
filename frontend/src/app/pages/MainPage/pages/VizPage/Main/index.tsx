@@ -1,10 +1,18 @@
 import { CloseOutlined } from '@ant-design/icons';
 import { EmptyFiller, TabPane, Tabs } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import BoardEditor from 'app/pages/DashBoardPage/pages/BoardEditor';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { StoryPlayer } from 'app/pages/StoryBoardPage/Player';
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useLocation, useRouteMatch } from 'react-router-dom';
+import {
+  Route,
+  Switch,
+  useHistory,
+  useLocation,
+  useRouteMatch,
+} from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { STICKY_LEVEL } from 'styles/StyleConstants';
 import { useVizSlice } from '../slice';
@@ -12,7 +20,6 @@ import {
   selectArchivedDashboards,
   selectArchivedDatacharts,
   selectArchivedStoryboards,
-  selectPlayingStoryId,
   selectSelectedTab,
   selectStoryboards,
   selectTabs,
@@ -22,7 +29,7 @@ import { removeTab } from '../slice/thunks';
 import { ArchivedViz, Folder, Storyboard } from '../slice/types';
 import { VizContainer } from './VizContainer';
 
-export function Main() {
+export function Main({ sliderVisible }: { sliderVisible: boolean }) {
   const { actions } = useVizSlice();
   const dispatch = useDispatch();
   const history = useHistory();
@@ -38,7 +45,8 @@ export function Main() {
   const tabs = useSelector(selectTabs);
   const selectedTab = useSelector(selectSelectedTab);
   const orgId = useSelector(selectOrgId);
-  const playingStoryId = useSelector(selectPlayingStoryId);
+
+  const t = useI18NPrefix('viz.main');
 
   useEffect(() => {
     if (vizId) {
@@ -99,6 +107,12 @@ export function Main() {
     vizId,
   ]);
 
+  useEffect(() => {
+    if (selectedTab && !vizId) {
+      history.push(`/organizations/${orgId}/vizs/${selectedTab.id}`);
+    }
+  }, [history, selectedTab, orgId, vizId]);
+
   const tabChange = useCallback(
     activeKey => {
       const activeTab = tabs.find(v => v.id === activeKey);
@@ -141,7 +155,7 @@ export function Main() {
   );
 
   return (
-    <Wrapper>
+    <Wrapper className={sliderVisible ? 'close datart-viz' : 'datart-viz'}>
       <TabsWrapper>
         <Tabs
           hideAdd
@@ -173,9 +187,18 @@ export function Main() {
           selectedId={selectedTab?.id}
         />
       ))}
-      {!tabs.length && <EmptyFiller title="请在左侧列表选择可视化" />}
+      {!tabs.length && <EmptyFiller title={t('empty')} />}
 
-      {playingStoryId && <StoryPlayer storyId={playingStoryId} />}
+      <Switch>
+        <Route
+          path="/organizations/:orgId/vizs/:vizId?/storyPlay"
+          render={() => <StoryPlayer storyId={vizId} />}
+        />
+        <Route
+          path="/organizations/:orgId/vizs/:vizId?/boardEditor"
+          render={() => <BoardEditor dashboardId={vizId} />}
+        />
+      </Switch>
     </Wrapper>
   );
 }
@@ -185,8 +208,12 @@ const Wrapper = styled.div`
   flex: 1;
   flex-direction: column;
   min-width: 0;
-
   min-height: 0;
+  &.close {
+    width: calc(100% - 30px) !important;
+    min-width: calc(100% - 30px) !important;
+    padding-left: 30px;
+  }
 `;
 
 const TabsWrapper = styled.div`

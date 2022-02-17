@@ -257,11 +257,16 @@ public class VariableServiceImpl extends BaseService implements VariableService 
     }
 
     @Override
+    public boolean delViewVariables(String viewId) {
+        return variableMapper.deleteByView(viewId) >= 0;
+    }
+
+    @Override
     @Transactional
     public boolean update(BaseUpdateParam updateParam) {
         VariableUpdateParam param = (VariableUpdateParam) updateParam;
         Variable retrieve = retrieve(updateParam.getId());
-        if (!param.getName().equals(retrieve.getName())) {
+        if (!param.getName().equalsIgnoreCase(retrieve.getName())) {
             checkUnique(retrieve.getOrgId(), null, param.getName());
         }
         if (param.getRelVariableSubjects() != null) {

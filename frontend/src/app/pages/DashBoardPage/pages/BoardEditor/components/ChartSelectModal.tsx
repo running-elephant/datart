@@ -15,21 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  BarChartOutlined,
-  FolderFilled,
-  FolderOpenFilled,
-  FundFilled,
-} from '@ant-design/icons';
 import { Input, Modal } from 'antd';
 import { Tree } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
+import useGetVizIcon from 'app/hooks/useGetVizIcon';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectWidgetInfoDatachartId } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/selectors';
 import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { listToTree } from 'utils/utils';
+
 export interface IProps {
   // dataCharts: DataChart[];
   dataCharts: Folder[];
@@ -39,25 +36,16 @@ export interface IProps {
 }
 
 const ChartSelectModalModal: React.FC<IProps> = props => {
+  const t = useI18NPrefix(`viz.board.action`);
   const { visible, onSelectedCharts, onCancel, dataCharts } = props;
   const [selectedDataChartIds, setSelectedDataChartIds] = useState<string[]>(
     [],
-  ); //zh 存储id的数组 en: Array of IDs
+  );
   const [selectedDataChartRelIds, setSelectedDataChartRelIds] = useState<
     string[]
-  >([]); //zh 存储RelId的数组 en: Array to store RelId
+  >([]);
   const WidgetInfoDatachartIds = useSelector(selectWidgetInfoDatachartId); //zh dashboard中已存在图表的datachartId en: The datachartId of the existing chart in the dashboard
-
-  const getIcon = useCallback(({ relType }: Folder) => {
-    switch (relType) {
-      case 'DASHBOARD':
-        return <FundFilled />;
-      case 'DATACHART':
-        return <BarChartOutlined />;
-      default:
-        return p => (p.expanded ? <FolderOpenFilled /> : <FolderFilled />);
-    }
-  }, []);
+  const getIcon = useGetVizIcon();
 
   const treeData = useMemo(
     () =>
@@ -102,26 +90,26 @@ const ChartSelectModalModal: React.FC<IProps> = props => {
 
   const setDefaultChartsIds = () => {
     let ChartsIds: any = [];
-    treeData?.forEach(treenode => {
-      let checkedlength = 0;
+    treeData?.forEach(treeNode => {
+      let checkedLength = 0;
 
-      if (treenode.disabled) {
+      if (treeNode.disabled) {
         //zh  dashboard中已经含有该图表 en:The chart is already in the dashboard
-        ChartsIds.push(treenode.id);
+        ChartsIds.push(treeNode.id);
       }
 
-      treenode?.children?.forEach(v => {
+      treeNode?.children?.forEach(v => {
         if (v.disabled) {
           //zh dashboard中已经含有该图表 en:The chart is already in the dashboard
-          checkedlength = checkedlength + 1;
+          checkedLength = checkedLength + 1;
           ChartsIds.push(v.id);
         }
       });
 
-      if (checkedlength === treenode?.children?.length) {
+      if (checkedLength === treeNode?.children?.length) {
         // zh:如果该目录里的图表都被选中，那么目录也要被选中并且不可点击 en: If the charts in the catalog are all selected, then the catalog must also be selected and not clickable
-        treenode.disabled = true;
-        ChartsIds.push(treenode.id);
+        treeNode.disabled = true;
+        ChartsIds.push(treeNode.id);
       }
     });
     return ChartsIds;
@@ -137,7 +125,7 @@ const ChartSelectModalModal: React.FC<IProps> = props => {
 
   return (
     <Modal
-      title="添加已有数据图表"
+      title={t('ImportExistingDataCharts')}
       visible={visible}
       onOk={onOk}
       centered
@@ -146,7 +134,7 @@ const ChartSelectModalModal: React.FC<IProps> = props => {
       cancelButtonProps={{ disabled: false }}
     >
       <InputWrap>
-        <Input onChange={treeSearch} placeholder="搜索名称关键字" />
+        <Input onChange={treeSearch} placeholder={t('searchValue')} />
       </InputWrap>
       <Tree
         loading={false}

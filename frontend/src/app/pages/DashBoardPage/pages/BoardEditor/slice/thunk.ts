@@ -1,15 +1,15 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { migrateWidgets } from 'app/migration/WidgetConfig/migrateWidgets';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
-import { fetchBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thunk';
 import {
   BoardState,
+  ChartWidgetContent,
   ContainerWidgetContent,
   ControllerWidgetContent,
   DataChart,
   getDataOption,
   SaveDashboard,
   ServerDatachart,
-  ServerView,
   Widget,
   WidgetData,
   WidgetInfo,
@@ -24,19 +24,23 @@ import {
 } from 'app/pages/DashBoardPage/utils/board';
 import {
   convertWrapChartWidget,
-  createDataChartWidget,
   createToSaveWidgetGroup,
   createWidgetInfo,
   createWidgetInfoMap,
   getWidgetInfoMapByServer,
+  getWidgetMap,
 } from 'app/pages/DashBoardPage/utils/widget';
+import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
+import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
+import { View } from 'app/types/View';
+import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
 import { CloneValueDeep } from 'utils/object';
-import { request } from 'utils/request';
-import { errorHandle } from 'utils/utils';
-import { v4 as uuidv4 } from 'uuid';
+import { request2 } from 'utils/request';
+import { uuidv4 } from 'utils/utils';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
@@ -44,12 +48,9 @@ import {
   editWidgetInfoActions,
 } from '.';
 import { BoardInfo, BoardType, ServerDashboard } from '../../Board/slice/types';
-import { getDistinctFields } from './../../../../../utils/fetch';
 import { getDataChartMap } from './../../../utils/board';
-import {
-  getWidgetMapByServer,
-  updateWidgetsRect,
-} from './../../../utils/widget';
+import { updateWidgetsRect } from './../../../utils/widget';
+import { addVariablesToBoard } from './actions/actions';
 import {
   boardInfoState,
   editBoardStackState,
@@ -77,6 +78,7 @@ export const getEditBoardDetail = createAsyncThunk<
         editBoard: HistoryEditBoard;
       },
     );
+
     if (editDashboard?.id === dashboardId) {
       return null;
     }
@@ -90,12 +92,13 @@ export const fetchEditBoardDetail = createAsyncThunk<
   null,
   string,
   { state: RootState }
->('editBoard/fetchEditBoardDetail', async (dashboardId, { dispatch }) => {
-  if (!dashboardId) {
-    return null;
-  }
-  try {
-    const { data } = await request<ServerDashboard>(
+>(
+  'editBoard/fetchEditBoardDetail',
+  async (dashboardId, { getState, dispatch }) => {
+    if (!dashboardId) {
+      return null;
+    }
+    const { data } = await request2<ServerDashboard>(
       `/viz/dashboards/${dashboardId}`,
     );
 
@@ -108,18 +111,22 @@ export const fetchEditBoardDetail = createAsyncThunk<
     } = data;
     // TODO
     const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
-    const { widgetMap, wrappedDataCharts } = getWidgetMapByServer(
-      serverWidgets,
+    const migratedWidgets = migrateWidgets(serverWidgets);
+    const { widgetMap, wrappedDataCharts } = getWidgetMap(
+      migratedWidgets,
       dataCharts,
     );
     const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
     // TODO xld migration about filter
+
     const widgetIds = serverWidgets.map(w => w.id);
+    // const boardInfo = getInitBoardInfo({ id: dashboard.id, widgetIds });
+
     const boardInfo = getInitBoardInfo({ id: dashboard.id, widgetIds });
     // datacharts
 
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
-    dispatch(boardActions.updateDataChartMap(allDataCharts));
+    dispatch(boardActions.setDataChartToMap(allDataCharts));
 
     const viewViews = getChartDataView(serverViews, allDataCharts);
 
@@ -136,11 +143,8 @@ export const fetchEditBoardDetail = createAsyncThunk<
       }),
     );
     return null;
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
-});
+  },
+);
 
 /**
  * @param boardId string
@@ -162,14 +166,14 @@ export const toUpdateDashboard = createAsyncThunk<
       getState() as { editBoard: EditBoardState },
     );
     const boardState = getState() as unknown as { board: BoardState };
-    // const dataChart = boardState.board.dataChartMap[curWidget.datachartId];
-    //     const chartDataView = boardState.board.viewMap[dataChart.viewId];
+
     const { dataChartMap, viewMap } = boardState.board;
     const widgets = convertWrapChartWidget({
       widgetMap: widgetRecord,
       dataChartMap,
       viewMap,
     });
+
     const group = createToSaveWidgetGroup(widgets, boardInfo.widgetIds);
     const updateData: SaveDashboard = {
       ...dashBoard,
@@ -178,29 +182,13 @@ export const toUpdateDashboard = createAsyncThunk<
       widgetToUpdate: group.widgetToUpdate,
       widgetToDelete: group.widgetToDelete,
     };
-    try {
-      const { data } = await request<any>({
-        url: `viz/dashboards/${dashBoard.id}`,
-        method: 'put',
-        data: updateData,
-      });
-      // TODO
-      // 清空历史栈
-      // 更新当前编辑面板的旧数据 widget Id 还都是本地的不对，应该更新成服务端id
-      //
-      callback();
-      dispatch(ActionCreators.clearHistory());
-      // 更新view界面数据
-      await dispatch(fetchBoardDetail({ dashboardRelId: dashBoard.id }));
 
-      dispatch(fetchEditBoardDetail(dashBoard.id));
-      // 关闭编辑 界面
-
-      // TODO
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    await request2<any>({
+      url: `viz/dashboards/${dashBoard.id}`,
+      method: 'put',
+      data: updateData,
+    });
+    callback();
   },
 );
 /**
@@ -238,10 +226,11 @@ export const addDataChartWidgets = createAsyncThunk<
   'editBoard/addDataChartWidgets',
   async ({ boardId, chartIds, boardType }, { getState, dispatch }) => {
     const {
-      data: { datacharts, views },
-    } = await request<{
+      data: { datacharts, views, viewVariables },
+    } = await request2<{
       datacharts: ServerDatachart[];
-      views: ServerView[];
+      views: View[];
+      viewVariables: Record<string, Variable[]>;
     }>({
       url: `viz/datacharts?datachartIds=${chartIds.join()}`,
       method: 'get',
@@ -249,10 +238,11 @@ export const addDataChartWidgets = createAsyncThunk<
     const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
     const dataChartMap = getDataChartMap(dataCharts);
     const viewViews = getChartDataView(views, dataCharts);
-    dispatch(boardActions.setDataChartMap(dataCharts));
+    dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
+
     const widgets = chartIds.map(dcId => {
-      let widget = createDataChartWidget({
+      let widget = widgetToolKit.chart.create({
         dashboardId: boardId,
         boardType: boardType,
         dataChartId: dcId,
@@ -263,11 +253,15 @@ export const addDataChartWidgets = createAsyncThunk<
       return widget;
     });
     dispatch(addWidgetsToEditBoard(widgets));
+
+    Object.values(viewVariables).forEach(variables => {
+      dispatch(addVariablesToBoard(variables));
+    });
     return null;
   },
 );
 
-// addDataChartWidgets
+// addWrapChartWidget
 export const addWrapChartWidget = createAsyncThunk<
   null,
   {
@@ -286,9 +280,9 @@ export const addWrapChartWidget = createAsyncThunk<
   ) => {
     const dataCharts = [dataChart];
     const viewViews = [view];
-    dispatch(boardActions.setDataChartMap(dataCharts));
+    dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-    let widget = createDataChartWidget({
+    let widget = widgetToolKit.chart.create({
       dashboardId: boardId,
       boardType: boardType,
       dataChartId: chartId,
@@ -297,6 +291,42 @@ export const addWrapChartWidget = createAsyncThunk<
       subType: 'widgetChart',
     });
     dispatch(addWidgetsToEditBoard([widget]));
+    dispatch(addVariablesToBoard(view.variables));
+    return null;
+  },
+);
+
+export const addChartWidget = createAsyncThunk<
+  null,
+  {
+    boardId: string;
+    chartId: string;
+    boardType: BoardType;
+    dataChart: DataChart;
+    view: ChartDataView;
+    subType: 'widgetChart' | 'dataChart';
+  },
+  { state: RootState }
+>(
+  'editBoard/addChartWidget',
+  async (
+    { boardId, chartId, boardType, dataChart, view, subType },
+    { getState, dispatch },
+  ) => {
+    const dataCharts = [dataChart];
+    const viewViews = [view];
+    dispatch(boardActions.setDataChartToMap(dataCharts));
+    dispatch(boardActions.setViewMap(viewViews));
+    let widget = widgetToolKit.chart.create({
+      dashboardId: boardId,
+      boardType: boardType,
+      dataChartId: chartId,
+      viewId: view.id,
+      dataChartConfig: dataChart,
+      subType,
+    });
+    dispatch(addWidgetsToEditBoard([widget]));
+    dispatch(addVariablesToBoard(view.variables));
     return null;
   },
 );
@@ -308,14 +338,14 @@ export const renderedEditWidgetAsync = createAsyncThunk<
 >(
   'editBoard/renderedEditWidgetAsync',
   async ({ boardId, widgetId }, { getState, dispatch, rejectWithValue }) => {
-    const { widgetRecord } = editBoardStackState(
+    const { widgetRecord: WidgetMap } = editBoardStackState(
       getState() as unknown as {
         editBoard: HistoryEditBoard;
       },
     );
-    const curWidget = widgetRecord[widgetId];
+    const curWidget = WidgetMap[widgetId];
     if (!curWidget) return null;
-    // 1 widget render
+
     dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
 
     if (curWidget.config.type === 'container') {
@@ -328,69 +358,147 @@ export const renderedEditWidgetAsync = createAsyncThunk<
       dispatch(editWidgetInfoActions.renderedWidgets(subWidgetIds));
       //  2 widget getData
       subWidgetIds.forEach(wid => {
-        dispatch(getEditWidgetDataAsync({ widgetId: wid }));
+        dispatch(getEditWidgetData({ widget: WidgetMap[wid] }));
       });
       return null;
     }
     // 2 widget getData
-    dispatch(getEditWidgetDataAsync({ widgetId }));
+    dispatch(getEditWidgetData({ widget: curWidget }));
     return null;
   },
 );
-export const getEditWidgetDataAsync = createAsyncThunk<
+
+// 复制 copy
+export const copyWidgetByIds = createAsyncThunk<
   null,
-  { widgetId: string; option?: getDataOption },
+  string[],
   { state: RootState }
 >(
-  'editBoard/getEditWidgetDataAsync',
-  async ({ widgetId, option }, { getState, dispatch }) => {
-    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
-    const rootState = getState() as RootState;
-    const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
-    const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
+  'editBoard/copyWidgets',
+  async (wIds, { getState, dispatch, rejectWithValue }) => {
+    const { widgetRecord } = editBoardStackState(
+      getState() as unknown as {
+        editBoard: HistoryEditBoard;
+      },
+    );
 
-    const curWidget = widgetMap[widgetId];
-    if (!curWidget) return null;
-
-    switch (curWidget.config.type) {
-      case 'chart':
-        await dispatch(getEditChartWidgetDataAsync({ widgetId, option }));
-        return null;
-      case 'controller':
-        await dispatch(getEditControllerOptionAsync(curWidget));
-        return null;
-      case 'media':
-      case 'container':
-      default:
-        return null;
-    }
+    // 新复制前先清空
+    dispatch(editDashBoardInfoActions.clearClipboardWidgets());
+    const newWidgets: Record<string, WidgetOfCopy> = {};
+    wIds.forEach(wid => {
+      const widget = widgetRecord[wid];
+      newWidgets[wid] = { ...widget, selectedCopy: true };
+      if (widget.config.type === 'container') {
+        const content = widget.config.content as ContainerWidgetContent;
+        Object.values(content.itemMap).forEach(item => {
+          if (item.childWidgetId) {
+            const subWidget = widgetRecord[item.childWidgetId];
+            newWidgets[subWidget.id] = subWidget;
+          }
+        });
+      }
+    });
+    dispatch(editDashBoardInfoActions.addClipboardWidgets(newWidgets));
+    return null;
   },
 );
-export const getEditControllerOptionAsync = createAsyncThunk<
+
+// 粘贴
+export const pasteWidgets = createAsyncThunk(
+  'editBoard/pasteWidgets',
+  async (_, { getState, dispatch, rejectWithValue }) => {
+    const { clipboardWidgets } = boardInfoState(
+      getState() as {
+        editBoard: EditBoardState;
+      },
+    );
+    const boardState = getState() as unknown as { board: BoardState };
+    const dataChartMap = boardState.board.dataChartMap;
+    const newWidgets: Widget[] = [];
+    Object.values(clipboardWidgets).forEach(widget => {
+      if (widget.selectedCopy) {
+        const newWidget = cloneWidget(widget);
+        newWidgets.push(newWidget);
+        if (newWidget.config.type === 'container') {
+          const content = newWidget.config.content as ContainerWidgetContent;
+          Object.values(content.itemMap).forEach(item => {
+            if (item.childWidgetId) {
+              const subWidget = clipboardWidgets[item.childWidgetId];
+              const newSubWidget = cloneWidget(subWidget, newWidget.id);
+              newWidgets.push(newSubWidget);
+            }
+          });
+        } else if (newWidget.config.type === 'chart') {
+          // #issue #588
+          let dataChart = dataChartMap[newWidget.datachartId];
+          const newDataChart: DataChart = CloneValueDeep({
+            ...dataChart,
+            id: dataChart.id + Date.now() + '_copy',
+          });
+          (newWidget.config.content as ChartWidgetContent).type = 'widgetChart';
+          newWidget.datachartId = newDataChart.id;
+          dispatch(boardActions.setDataChartToMap([newDataChart]));
+        }
+      }
+    });
+    const widgetInfoMap: Record<string, WidgetInfo> = {};
+    newWidgets.forEach(widget => {
+      const widgetInfo = createWidgetInfo(widget.id);
+      widgetInfoMap[widget.id] = widgetInfo;
+    });
+
+    dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+    dispatch(editBoardStackActions.addWidgets(newWidgets));
+
+    //
+    function cloneWidget(widget: WidgetOfCopy, pId?: string) {
+      const newWidget = CloneValueDeep(widget);
+      newWidget.id = uuidv4();
+      newWidget.parentId = pId || '';
+      newWidget.relations = [];
+      newWidget.config.name += '_copy';
+
+      delete newWidget.selectedCopy;
+      return newWidget as Widget;
+    }
+    return null;
+  },
+);
+
+//
+export const uploadBoardImage = createAsyncThunk<
   null,
-  Widget,
+  { boardId: string; formData: FormData; resolve: (url: string) => void }
+>(
+  'editBoard/uploadBoardImage',
+  async ({ boardId, formData, resolve }, { getState, dispatch }) => {
+    const { data } = await request2<string>({
+      url: `files/viz/image?ownerType=${'DASHBOARD'}&ownerId=${boardId}&fileName=${uuidv4()}`,
+      method: 'POST',
+      data: formData,
+    });
+    resolve(data);
+    return null;
+  },
+);
+
+export const getEditWidgetData = createAsyncThunk<
+  null,
+  { widget: Widget; option?: getDataOption },
   { state: RootState }
->('editBoard/getControllerOptions', async (widget, { getState, dispatch }) => {
-  const content = widget.config.content as ControllerWidgetContent;
-  const config = content.config;
-  if (config.assistViewFields && Array.isArray(config.assistViewFields)) {
-    // 请求
-    const [viewId, viewField] = config.assistViewFields;
-    const dataset = await getDistinctFields(
-      viewId,
-      viewField,
-      undefined,
-      undefined,
-    );
-    dispatch(
-      editWidgetDataActions.setWidgetData({
-        ...dataset,
-        id: widget.id,
-      } as unknown as WidgetData),
-    );
-  }
-  return null;
-});
+>(
+  'editBoard/getEditWidgetData',
+  ({ widget, option }, { getState, dispatch }) => {
+    dispatch(editWidgetInfoActions.renderedWidgets([widget.id]));
+    if (widget.config.type === 'chart') {
+      dispatch(getEditChartWidgetDataAsync({ widgetId: widget.id, option }));
+    }
+    if (widget.config.type === 'controller') {
+      dispatch(getEditControllerOptions(widget.id));
+    }
+    return null;
+  },
+);
 
 export const getEditChartWidgetDataAsync = createAsyncThunk<
   null,
@@ -430,121 +538,96 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
       return null;
     }
     let widgetData;
-    const { data } = await request<WidgetData>({
+    try {
+      const { data } = await request2<WidgetData>({
+        method: 'POST',
+        url: `data-provider/execute`,
+        data: requestParams,
+      });
+      widgetData = { ...data, id: widgetId };
+      dispatch(
+        editWidgetDataActions.setWidgetData(
+          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        ),
+      );
+      dispatch(
+        editWidgetInfoActions.changePageInfo({
+          widgetId,
+          pageInfo: data.pageInfo,
+        }),
+      );
+      dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          widgetId,
+          errInfo: undefined,
+        }),
+      );
+    } catch (error) {
+      dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          widgetId,
+          errInfo: (error as any)?.message as any,
+        }),
+      );
+      dispatch(
+        editWidgetDataActions.setWidgetData({
+          id: widgetId,
+          columns: [],
+          rows: [],
+        } as WidgetData),
+      );
+    }
+    return null;
+  },
+);
+
+export const getEditControllerOptions = createAsyncThunk<
+  null,
+  string,
+  { state: RootState }
+>(
+  'editBoard/getEditControllerOptions',
+  async (widgetId, { getState, dispatch }) => {
+    dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
+    const rootState = getState() as RootState;
+
+    const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
+    const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
+    const widget = widgetMap[widgetId];
+    if (!widget) return null;
+    const content = widget.config.content as ControllerWidgetContent;
+    const config = content.config;
+    if (!Array.isArray(config.assistViewFields)) return null;
+    if (config.assistViewFields.length < 2) return null;
+
+    const boardState = rootState.board as BoardState;
+    const viewMap = boardState.viewMap;
+    const [viewId, ...columns] = config.assistViewFields;
+    const view = viewMap[viewId];
+    if (!view) return null;
+    const requestParams = getControlOptionQueryParams({
+      view,
+      columns: columns,
+      curWidget: widget,
+      widgetMap,
+    });
+
+    if (!requestParams) {
+      return null;
+    }
+    let widgetData;
+    const { data } = await request2<WidgetData>({
       method: 'POST',
       url: `data-provider/execute`,
       data: requestParams,
     });
-    widgetData = { ...data, id: widgetId };
-    dispatch(editWidgetDataActions.setWidgetData(widgetData as WidgetData));
+    widgetData = { ...data, id: widget.id };
     dispatch(
-      editWidgetInfoActions.changePageInfo({
-        widgetId,
-        pageInfo: data.pageInfo,
-      }),
+      editWidgetDataActions.setWidgetData(
+        filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+      ),
     );
-    return null;
-  },
-);
 
-// 复制 copy
-export const copyWidgetByIds = createAsyncThunk<
-  null,
-  string[],
-  { state: RootState }
->(
-  'editBoard/copyWidgets',
-  async (wIds, { getState, dispatch, rejectWithValue }) => {
-    const { widgetRecord } = editBoardStackState(
-      getState() as unknown as {
-        editBoard: HistoryEditBoard;
-      },
-    );
-    // 新复制前先清空
-    dispatch(editDashBoardInfoActions.clearClipboardWidgets());
-    const newWidgets: Record<string, WidgetOfCopy> = {};
-    wIds.forEach(wid => {
-      const widget = widgetRecord[wid];
-      newWidgets[wid] = { ...widget, selectedCopy: true };
-      if (widget.config.type === 'container') {
-        const content = widget.config.content as ContainerWidgetContent;
-        Object.values(content.itemMap).forEach(item => {
-          if (item.childWidgetId) {
-            const subWidget = widgetRecord[item.childWidgetId];
-            newWidgets[subWidget.id] = subWidget;
-          }
-        });
-      }
-    });
-    dispatch(editDashBoardInfoActions.addClipboardWidgets(newWidgets));
     return null;
-  },
-);
-// 粘贴
-export const pasteWidgets = createAsyncThunk(
-  'editBoard/pasteWidgets',
-  async (_, { getState, dispatch, rejectWithValue }) => {
-    const { clipboardWidgets } = boardInfoState(
-      getState() as {
-        editBoard: EditBoardState;
-      },
-    );
-    const newWidgets: Widget[] = [];
-    Object.values(clipboardWidgets).forEach(widget => {
-      if (widget.selectedCopy) {
-        const newWidget = cloneWidget(widget);
-        newWidgets.push(newWidget);
-        if (newWidget.config.type === 'container') {
-          const content = newWidget.config.content as ContainerWidgetContent;
-          Object.values(content.itemMap).forEach(item => {
-            if (item.childWidgetId) {
-              const subWidget = clipboardWidgets[item.childWidgetId];
-              const newSubWidget = cloneWidget(subWidget, newWidget.id);
-              newWidgets.push(newSubWidget);
-            }
-          });
-        }
-      }
-    });
-    const widgetInfoMap: Record<string, WidgetInfo> = {};
-    newWidgets.forEach(widget => {
-      const widgetInfo = createWidgetInfo(widget.id);
-      widgetInfoMap[widget.id] = widgetInfo;
-    });
-
-    dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
-    dispatch(editBoardStackActions.addWidgets(newWidgets));
-
-    //
-    function cloneWidget(widget: WidgetOfCopy, pId?: string) {
-      const newWidget = CloneValueDeep(widget);
-      newWidget.id = uuidv4();
-      newWidget.parentId = pId || '';
-      newWidget.relations = [];
-      newWidget.config.name += '_copy';
-      delete newWidget.selectedCopy;
-      return newWidget as Widget;
-    }
-    return null;
-  },
-);
-export const uploadBoardImage = createAsyncThunk<
-  null,
-  { boardId: string; formData: FormData; resolve: (url: string) => void }
->(
-  'editBoard/uploadBoardImage',
-  async ({ boardId, formData, resolve }, { getState, dispatch }) => {
-    try {
-      const { data } = await request<string>({
-        url: `files/viz/image?ownerType=${'DASHBOARD'}&ownerId=${boardId}&fileName=${uuidv4()}`,
-        method: 'POST',
-        data: formData,
-      });
-      resolve(data);
-      return null;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
   },
 );

@@ -1,9 +1,27 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thunk';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ExecuteToken } from 'app/pages/SharePage/slice/types';
 import { RootState } from 'types';
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { storyActions } from '.';
 import { getInitStoryPageConfig, getStoryPageConfig } from '../utils';
 import { handleServerStoryAction } from './actions';
@@ -26,26 +44,24 @@ export const getStoryDetail = createAsyncThunk<null, string>(
     return null;
   },
 );
-export const fetchStoryDetail = createAsyncThunk<null, string>(
+export const fetchStoryDetail = createAsyncThunk<undefined, string>(
   'storyBoard/fetchStoryDetail',
   async (storyId, { getState, dispatch }) => {
     if (!storyId) {
-      return null;
+      return;
     }
-    try {
-      const { data } = await request<ServerStoryBoard>({
-        url: `viz/storyboards/${storyId}`,
-        method: 'get',
-      });
-      dispatch(
-        handleServerStoryAction({
-          data,
-          renderMode: 'read',
-          storyId,
-        }),
-      );
-    } catch (error) {}
-    return null;
+    const { data } = await request2<ServerStoryBoard>({
+      url: `viz/storyboards/${storyId}`,
+      method: 'get',
+    });
+    dispatch(
+      handleServerStoryAction({
+        data,
+        renderMode: 'read',
+        storyId,
+      }),
+    );
+    return undefined;
   },
 );
 export const getPageContentDetail = createAsyncThunk<
@@ -116,7 +132,7 @@ export const addStoryPage = createAsyncThunk<
   StoryPageOfServer,
   { state: RootState }
 >('storyBoard/addStoryPage', async (pageOfServer, { getState, dispatch }) => {
-  const { data } = await request<StoryPageOfServer>({
+  const { data } = await request2<StoryPageOfServer>({
     url: `viz/storypages`,
     method: 'post',
     data: pageOfServer,
@@ -136,7 +152,7 @@ export const deleteStoryPage = createAsyncThunk<
 >(
   'storyBoard/deleteStoryPage',
   async ({ storyId, pageId }, { getState, dispatch }) => {
-    const { data } = await request<boolean>({
+    const { data } = await request2<boolean>({
       url: `viz/storypages/${pageId}`,
       method: 'delete',
     });
@@ -153,7 +169,7 @@ export const updateStoryPage = createAsyncThunk<
 >(
   'storyBoard/updateStoryPage',
   async ({ storyId, storyPage }, { getState, dispatch }) => {
-    const { data } = await request<boolean>({
+    const { data } = await request2<boolean>({
       url: `/viz/storypages/${storyId}`,
       method: 'put',
       data: { ...storyPage, config: JSON.stringify(storyPage.config) },
@@ -169,7 +185,7 @@ export const updateStory = createAsyncThunk<
   { story: StoryBoard },
   { state: RootState }
 >('storyBoard/updateStory', async ({ story }, { getState, dispatch }) => {
-  const { data } = await request<boolean>({
+  const { data } = await request2<boolean>({
     url: `/viz/storyboards/${story.id}`,
     method: 'put',
     data: { ...story, config: JSON.stringify(story.config) },

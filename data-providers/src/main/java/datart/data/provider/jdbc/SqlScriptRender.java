@@ -21,6 +21,9 @@ package datart.data.provider.jdbc;
 import com.google.common.collect.Iterables;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.SqlParseError;
+import datart.core.common.MessageResolver;
+import datart.core.common.RequestContext;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.QueryScript;
 import datart.core.data.provider.ScriptVariable;
@@ -28,8 +31,6 @@ import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.SqlBuilder;
 import datart.data.provider.calcite.SqlValidateUtils;
 import datart.data.provider.calcite.SqlParserUtils;
-import datart.data.provider.calcite.SqlVariableVisitor;
-import datart.data.provider.calcite.parser.impl.SqlParserImpl;
 import datart.data.provider.freemarker.FreemarkerContext;
 import datart.data.provider.local.LocalDB;
 import datart.data.provider.script.ReplacementPair;
@@ -37,19 +38,20 @@ import datart.data.provider.script.ScriptRender;
 import datart.data.provider.script.VariablePlaceholder;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.parser.SqlParseException;
-import org.apache.calcite.sql.parser.SqlParser;
-import org.apache.calcite.sql.validate.SqlConformanceEnum;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static datart.core.base.consts.Const.VARIABLE_PATTERN;
 
 @EqualsAndHashCode(callSuper = true)
 @Slf4j
@@ -67,40 +69,22 @@ public class SqlScriptRender extends ScriptRender {
 
     private final SqlDialect sqlDialect;
 
-    public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, String variableQuote) {
-        super(queryScript, executeParam, variableQuote);
+    // special sql execute permission config from datasource
+    private boolean enableSpecialSQL;
+
+    public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam) {
+        super(queryScript, executeParam);
         this.sqlDialect = LocalDB.SQL_DIALECT;
     }
 
-    public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, SqlDialect sqlDialect, String variableQuote) {
-        super(queryScript, executeParam, variableQuote);
+    public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, SqlDialect sqlDialect) {
+        super(queryScript, executeParam);
         this.sqlDialect = sqlDialect;
     }
 
-    public String replaceVariables(String selectSql) {
-
-        if (StringUtils.isBlank(selectSql)) {
-            return selectSql;
-        }
-
-        Map<String, ScriptVariable> variableMap = queryScript.getVariables()
-                .stream()
-                .collect(Collectors.toMap(v -> getVariablePattern(v.getName()), variable -> variable));
-        String srcSql = selectSql;
-        SqlNode sqlNode = null;
-        try {
-            sqlNode = parseSql(srcSql);
-        } catch (SqlParseException e) {
-            Exceptions.e(e);
-        }
-        SqlVariableVisitor visitor = new SqlVariableVisitor(sqlDialect, srcSql, variableQuote, variableMap);
-        sqlNode.accept(visitor);
-        List<VariablePlaceholder> placeholders = visitor.getVariablePlaceholders();
-        for (VariablePlaceholder placeholder : placeholders) {
-            ReplacementPair replacementPair = placeholder.replacementPair();
-            srcSql = srcSql.replace(replacementPair.getPattern(), replacementPair.getReplacement());
-        }
-        return srcSql;
+    public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, SqlDialect sqlDialect, boolean enableSpecialSQL) {
+        this(queryScript, executeParam, sqlDialect);
+        this.enableSpecialSQL = enableSpecialSQL;
     }
 
 
@@ -121,22 +105,12 @@ public class SqlScriptRender extends ScriptRender {
                         }));
         script = FreemarkerContext.process(queryScript.getScript(), dataMap);
 
-        // 替换脚本中的表达式类型变量
-        for (ScriptVariable variable : queryScript.getVariables()) {
-            if (ValueType.FRAGMENT.equals(variable.getValueType())) {
-                int size = Iterables.size(variable.getValues());
-                if (size != 1) {
-                    Exceptions.tr(DataProviderException.class, "message.provider.variable.expression.size", size + ":" + variable.getValues());
-                }
-                script = script.replace(getVariablePattern(variable.getName()), Iterables.get(variable.getValues(), 0));
-            }
-        }
+        script = replaceFragmentVariables(script);
 
-        // find select sql
-        final String selectSql0 = findSelectSql(script);
+        final String selectSql0 = parseSelectSql(script);
 
         if (StringUtils.isEmpty(selectSql0)) {
-            Exceptions.tr(DataProviderException.class,"message.no.valid.sql");
+            Exceptions.tr(DataProviderException.class, "message.no.valid.sql");
         }
 
         String selectSql = cleanupSql(selectSql0);
@@ -153,13 +127,57 @@ public class SqlScriptRender extends ScriptRender {
 
         selectSql = cleanupSql(selectSql);
 
-        //replace variables
+        selectSql = replaceFragmentVariables(selectSql);
+
         selectSql = replaceVariables(selectSql);
 
         return onlySelectStatement ? selectSql : script.replace(selectSql0, selectSql);
     }
 
-    private String findSelectSql(String script) {
+
+    public String replaceVariables(String selectSql) throws SqlParseException {
+
+        if (StringUtils.isBlank(selectSql)
+                || CollectionUtils.isEmpty(queryScript.getVariables())
+                || !containsVariable(selectSql)) {
+            return selectSql;
+        }
+
+        Map<String, ScriptVariable> variableMap = new CaseInsensitiveMap<>();
+
+        if (CollectionUtils.isNotEmpty(queryScript.getVariables())) {
+            for (ScriptVariable variable : queryScript.getVariables()) {
+                variableMap.put(variable.getNameWithQuote(), variable);
+            }
+        }
+
+        List<VariablePlaceholder> placeholders = null;
+        try {
+            placeholders = SqlParserVariableResolver.resolve(sqlDialect, selectSql, variableMap);
+        } catch (SqlParseException e) {
+            SqlParseError sqlParseError = new SqlParseError(e);
+            sqlParseError.setSql(selectSql);
+            sqlParseError.setDbType(sqlDialect.getDatabaseProduct().name());
+            RequestContext.putWarning(MessageResolver.getMessage("message.provider.sql.parse.failed"), sqlParseError);
+            placeholders = RegexVariableResolver.resolve(sqlDialect, selectSql, variableMap);
+        }
+
+        placeholders = placeholders.stream()
+                .sorted(Comparator.comparingDouble(holder -> (holder instanceof SimpleVariablePlaceholder) ? 1000 + holder.getOriginalSqlFragment().length() : -holder.getOriginalSqlFragment().length()))
+                .collect(Collectors.toList());
+
+        if (CollectionUtils.isNotEmpty(placeholders)) {
+            for (VariablePlaceholder placeholder : placeholders) {
+                ReplacementPair replacementPair = placeholder.replacementPair();
+                selectSql = StringUtils.replaceIgnoreCase(selectSql,replacementPair.getPattern(),replacementPair.getReplacement());
+            }
+        }
+
+        return selectSql;
+    }
+
+
+    private String parseSelectSql(String script) {
         String selectSql = null;
         List<String> sqls = SqlSplitter.splitEscaped(script, SQL_SEP);
         for (String sql : sqls) {
@@ -167,26 +185,52 @@ public class SqlScriptRender extends ScriptRender {
             try {
                 sqlNode = parseSql(sql);
             } catch (Exception e) {
+                if (SqlValidateUtils.validateQuery(sql, enableSpecialSQL)) {
+                    if (selectSql != null) {
+                        Exceptions.tr(DataProviderException.class, "message.provider.sql.multi.query");
+                    }
+                    selectSql = sql;
+                }
                 continue;
             }
-            if (SqlValidateUtils.validateQuery(sqlNode) && selectSql != null) {
-                Exceptions.tr(DataProviderException.class, "message.provider.sql.multi.query");
+            if (SqlValidateUtils.validateQuery(sqlNode, enableSpecialSQL)) {
+                if (selectSql != null) {
+                    Exceptions.tr(DataProviderException.class, "message.provider.sql.multi.query");
+                }
+                selectSql = sql;
             }
-            selectSql = sql;
         }
+
+        if (selectSql == null) {
+            selectSql = sqls.get(sqls.size() - 1);
+        }
+
         return selectSql;
     }
 
-    private SqlParser sqlParser() {
-        SqlParser.Config config = SqlParser.config()
-                .withLex(Lex.MYSQL)
-                .withParserFactory(SqlParserImpl.FACTORY)
-                .withConformance(SqlConformanceEnum.LENIENT);
-        return SqlParser.create("", config);
+    private String replaceFragmentVariables(String sql) {
+        // 替换脚本中的表达式类型变量
+        for (ScriptVariable variable : queryScript.getVariables()) {
+            if (ValueType.FRAGMENT.equals(variable.getValueType())) {
+                int size = Iterables.size(variable.getValues());
+                if (size != 1) {
+                    Exceptions.tr(DataProviderException.class, "message.provider.variable.expression.size", size + ":" + variable.getValues());
+                }
+                sql = sql.replace(variable.getNameWithQuote(), Iterables.get(variable.getValues(), 0));
+            }
+        }
+        return sql;
     }
 
     private SqlNode parseSql(String sql) throws SqlParseException {
         return SqlParserUtils.createParser(sql, sqlDialect).parseQuery();
+    }
+
+    private boolean containsVariable(String sql) {
+        if (StringUtils.isBlank(sql)) {
+            return false;
+        }
+        return VARIABLE_PATTERN.matcher(sql).find();
     }
 
     private String cleanupSql(String sql) {
@@ -196,5 +240,6 @@ public class SqlScriptRender extends ScriptRender {
         sql = sql.replace(CharUtils.LF, CharUtils.toChar(" "));
         return sql.trim();
     }
+
 
 }

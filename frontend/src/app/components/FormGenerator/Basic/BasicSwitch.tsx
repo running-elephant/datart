@@ -16,73 +16,38 @@
  * limitations under the License.
  */
 
-import { Col, Row, Switch } from 'antd';
-import {
-  ChartStyleSectionConfig,
-  ChartStyleSectionRow,
-} from 'app/types/ChartConfig';
+import { Switch } from 'antd';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
-import ItemLayout from '../Layout/ItemLayout';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
+import { BW } from './components/BasicWrapper';
 
-const BasicSwitch: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
-  ({ ancestors, translate = title => title, data: row, onChange }) => {
+const BasicSwitch: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+  ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 
-    const renderChildrenRow = (r, index) => {
-      return (
-        <ItemLayout
-          ancestors={ancestors.concat([index])}
-          key={r.key}
-          data={r}
-          translate={translate}
-          onChange={handleChildChange}
-        />
-      );
-    };
-
-    const handleChildChange = (
-      ancestors: number[],
-      newRow: ChartStyleSectionRow,
-      needRefresh?: boolean,
-    ) => {
-      onChange?.(ancestors, newRow, needRefresh);
-    };
-
-    const hanldeSwitchChange = value => {
+    const handleSwitchChange = value => {
       const newRow = updateByKey(row, 'value', value);
       onChange?.(ancestors, newRow);
     };
 
-    const renderChildren = () => {
-      if (!row.value) {
-        return;
-      }
-      const rows = row?.rows || [];
-      return rows.map(renderChildrenRow);
-    };
-
     return (
-      <>
-        <StyledVizBasicSwitch align={'middle'}>
-          <Col span={12}>{translate(row.label)}</Col>
-          <Col span={12}>
-            <Switch
-              {...rest}
-              {...options}
-              checked={row.value}
-              onChange={hanldeSwitchChange}
-            />
-          </Col>
-        </StyledVizBasicSwitch>
-        <StyledVizBasicSwitch align={'middle'}>
-          <Col span={12}></Col>
-          <Col span={12}>{renderChildren()}</Col>
-        </StyledVizBasicSwitch>
-      </>
+      <StyledBasicSwitch
+        label={!options?.hideLabel ? t(row.label, true) : ''}
+        labelCol={{ span: 12 }}
+        wrapperCol={{ span: 12 }}
+      >
+        <Switch
+          size="small"
+          {...rest}
+          {...options}
+          checked={row.value}
+          onChange={handleSwitchChange}
+        />
+      </StyledBasicSwitch>
     );
   },
   itemLayoutComparer,
@@ -90,6 +55,6 @@ const BasicSwitch: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
 
 export default BasicSwitch;
 
-const StyledVizBasicSwitch = styled(Row)`
-  line-height: 32px;
+const StyledBasicSwitch = styled(BW)`
+  flex-direction: row;
 `;

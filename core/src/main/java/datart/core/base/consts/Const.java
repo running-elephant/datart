@@ -19,6 +19,8 @@
 package datart.core.base.consts;
 
 
+import java.util.regex.Pattern;
+
 public class Const {
 
     public static final byte VIZ_PUBLISH = 2;
@@ -32,8 +34,7 @@ public class Const {
     /**
      * 正则表达式
      */
-
-    public static final String REG_EMAIL = "^[a-z_0-9.-]{1,64}@([a-z0-9-]{1,200}.){1,5}[a-z]{1,6}$";
+    public static final String REG_EMAIL = "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
 
     public static final String REG_USER_PASSWORD = ".{6,20}";
 
@@ -45,12 +46,16 @@ public class Const {
      */
     //默认的变量引用符号
     public static final String DEFAULT_VARIABLE_QUOTE = "$";
+    //变量匹配符
+    public static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\S+\\$");
+    //变量正则模板
+    public static final String VARIABLE_PATTERN_TEMPLATE = "\\$%s\\$";
 
     /**
      * 权限变量
      */
-    //管理员权限，拥有所有数据的权限
-    public static final String ALL_PERMISSION = "@ALL_PERMISSION@";
+//    //管理员权限，拥有所有数据的权限
+//    public static final String ALL_PERMISSION = "@ALL_PERMISSION@";
 
     /**
      * Token Key

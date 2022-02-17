@@ -16,28 +16,38 @@
  * limitations under the License.
  */
 
-import { Form, FormInstance, Radio, Select } from 'antd';
+import { Form, FormInstance, Radio, Select, Space } from 'antd';
+import { CascaderOptionType } from 'antd/lib/cascader';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
-import { FilterValueOption } from 'app/types/ChartConfig';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+import { View } from 'app/types/View';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
+import { G30 } from 'styles/StyleConstants';
+import { request2 } from 'utils/request';
+import { errorHandle } from 'utils/utils';
 import { ControllerConfig } from '../../../types';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
-
 const ValuesOptionsSetter: FC<{
   controllerType: ControllerFacadeTypes;
   form: FormInstance<{ config: ControllerConfig }> | undefined;
   viewMap: Record<string, ChartDataView>;
 }> = memo(({ form, viewMap, controllerType }) => {
-  const [optionValues, setOptionValues] = useState<FilterValueOption[]>([]);
+  const tc = useI18NPrefix(`viz.control`);
+  const [optionValues, setOptionValues] = useState<RelationFilterValue[]>([]);
   const [targetKeys, setTargetKeys] = useState<string[]>([]);
+  const [labelOptions, setLabelOptions] = useState<
+    CascaderOptionType[] | undefined
+  >([]);
+  const [labelKey, setLabelKey] = useState<string | undefined>();
 
   const getControllerConfig = useCallback(() => {
     return form?.getFieldValue('config') as ControllerConfig;
@@ -45,7 +55,33 @@ const ValuesOptionsSetter: FC<{
   const isMultiple = useMemo(() => {
     return controllerType === ControllerFacadeTypes.MultiDropdownList;
   }, [controllerType]);
-
+  const convertToList = useCallback(collection => {
+    return collection.map((ele, index) => {
+      const item: RelationFilterValue = {
+        index: index,
+        key: ele?.[0],
+        label: ele?.[1],
+        isSelected: false,
+      };
+      return item;
+    });
+  }, []);
+  const getViewOption = useCallback(async (viewId: string) => {
+    if (!viewId) return [];
+    try {
+      const { data } = await request2<View>(`/views/${viewId}`);
+      const model = JSON.parse(data.model);
+      const option: CascaderOptionType[] = Object.keys(model).map(key => {
+        return {
+          value: key,
+          label: key,
+        };
+      });
+      return option;
+    } catch (error) {
+      errorHandle(error);
+    }
+  }, []);
   const onTargetKeyChange = useCallback(
     nextTargetKeys => {
       setTargetKeys(nextTargetKeys);
@@ -59,14 +95,11 @@ const ValuesOptionsSetter: FC<{
     },
     [form, getControllerConfig],
   );
-
-  // const
-
   const fetchNewDataset = useCallback(
-    async (viewId: string, colName) => {
+    async (viewId: string, columns: string[]) => {
       const fieldDataset = await getDistinctFields(
         viewId,
-        colName,
+        columns,
         viewMap[viewId],
         undefined,
       );
@@ -74,33 +107,76 @@ const ValuesOptionsSetter: FC<{
     },
     [viewMap],
   );
-  const convertToList = useCallback(collection => {
-    const items: string[] = (collection || []).flatMap(c => c);
-    const uniqueKeys = Array.from(new Set(items));
-    return uniqueKeys.map((ele, index) => {
-      const item: FilterValueOption = {
-        index: index,
-        key: ele,
-        label: ele,
-        isSelected: false,
+  const onViewFieldChange = useCallback(
+    async (value: string[]) => {
+      setOptionValues([]);
+      setTargetKeys([]);
+      setLabelOptions([]);
+      if (!value || !value?.[0]) {
+        form?.setFieldsValue({
+          config: {
+            ...getControllerConfig(),
+            assistViewFields: [],
+            controllerValues: [],
+          },
+        });
+        return;
+      }
+
+      form?.setFieldsValue({
+        config: {
+          ...getControllerConfig(),
+          assistViewFields: value,
+          controllerValues: [],
+        },
+      });
+
+      const options = await getViewOption(value[0]);
+      setLabelOptions(options);
+
+      const [viewId, ...columns] = value;
+      const dataset = await fetchNewDataset(viewId, columns);
+      setOptionValues(convertToList(dataset?.rows));
+    },
+    [convertToList, fetchNewDataset, form, getControllerConfig, getViewOption],
+  );
+  const onLabelChange = useCallback(
+    (labelKey: string | undefined) => {
+      const controllerConfig = getControllerConfig();
+      const [viewId, valueId] = controllerConfig.assistViewFields || [];
+      setLabelKey(labelKey);
+      const nextAssistViewFields = labelKey
+        ? [viewId, valueId, labelKey]
+        : [viewId, valueId];
+      const nextControllerOpt: ControllerConfig = {
+        ...controllerConfig,
+        assistViewFields: nextAssistViewFields,
       };
-      return item;
-    });
-  }, []);
+      form?.setFieldsValue({
+        config: nextControllerOpt,
+      });
+      onViewFieldChange(nextAssistViewFields);
+    },
+    [form, getControllerConfig, onViewFieldChange],
+  );
+  // const
 
   const onInitOptions = useCallback(
     async (value: string[]) => {
-      const [viewId, viewField] = value;
-      const dataset = await fetchNewDataset(viewId, viewField);
+      const [viewId, ...columns] = value;
+      const dataset = await fetchNewDataset(viewId, columns);
       const config: ControllerConfig = getControllerConfig();
       setOptionValues(convertToList(dataset?.rows));
       if (config.valueOptionType === 'common') {
+        const options = await getViewOption(value[0]);
+        setLabelOptions(options);
+        setLabelKey(config.assistViewFields?.[2]);
         if (config?.controllerValues) {
           setTargetKeys(config?.controllerValues);
         }
       }
     },
-    [convertToList, fetchNewDataset, getControllerConfig],
+    [convertToList, fetchNewDataset, getControllerConfig, getViewOption],
   );
   const updateOptions = useCallback(() => {
     const config = getControllerConfig();
@@ -121,24 +197,6 @@ const ValuesOptionsSetter: FC<{
       updateOptions();
     }, 500);
   }, [updateOptions]);
-  const onViewFieldChange = useCallback(
-    async (value: string[]) => {
-      if (!value) return;
-      setOptionValues([]);
-      form?.setFieldsValue({
-        config: {
-          ...getControllerConfig(),
-          assistViewFields: value,
-          controllerValues: [],
-        },
-      });
-      setTargetKeys([]);
-      const [viewId, viewField] = value;
-      const dataset = await fetchNewDataset(viewId, viewField);
-      setOptionValues(convertToList(dataset?.rows));
-    },
-    [convertToList, fetchNewDataset, form, getControllerConfig],
-  );
 
   const getOptionType = useCallback(() => {
     return getControllerConfig()?.valueOptionType as ValueOptionType;
@@ -146,7 +204,11 @@ const ValuesOptionsSetter: FC<{
 
   return (
     <Wrap>
-      <Form.Item label="取值配置" shouldUpdate style={{ marginBottom: '0' }}>
+      <Form.Item
+        label={tc('valueConfig')}
+        shouldUpdate
+        style={{ marginBottom: '0' }}
+      >
         <Form.Item
           name={['config', 'valueOptionType']}
           validateTrigger={['onChange', 'onBlur']}
@@ -157,7 +219,7 @@ const ValuesOptionsSetter: FC<{
             {OPERATOR_TYPE_OPTION.map(ele => {
               return (
                 <Radio.Button key={ele.value} value={ele.value}>
-                  {ele.name}
+                  {tc(ele.value)}
                 </Radio.Button>
               );
             })}
@@ -172,14 +234,32 @@ const ValuesOptionsSetter: FC<{
                     allowClear
                     placeholder="select viewField"
                     onChange={onViewFieldChange}
+                    getViewOption={getViewOption}
                     style={{ margin: '6px 0' }}
                   />
                 </Form.Item>
                 {getOptionType() === 'common' && (
-                  <div className="transfer">
+                  <Space direction="vertical" style={{ width: '100%' }}>
                     <Select
                       showSearch
-                      placeholder="请选择默认值"
+                      placeholder={tc('optionLabelField')}
+                      value={labelKey}
+                      allowClear
+                      onChange={onLabelChange}
+                      style={{ width: '100%' }}
+                    >
+                      {labelOptions?.map(item => (
+                        <Select.Option
+                          key={item.value}
+                          value={item.value as string}
+                        >
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                    <Select
+                      showSearch
+                      placeholder={tc('selectDefaultValue')}
                       value={targetKeys}
                       allowClear
                       {...(isMultiple && { mode: 'multiple' })}
@@ -187,12 +267,23 @@ const ValuesOptionsSetter: FC<{
                       style={{ width: '100%' }}
                     >
                       {optionValues.map(item => (
-                        <Select.Option key={item.key} value={item.key}>
-                          {item.label}
+                        <Select.Option
+                          key={item.key + item.label}
+                          value={item.key}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <span>{item.label || item.key}</span>
+                            <span style={{ color: G30 }}>{item.key}</span>
+                          </div>
                         </Select.Option>
                       ))}
                     </Select>
-                  </div>
+                  </Space>
                 )}
                 {getOptionType() === 'custom' && (
                   <CustomOptions

@@ -16,28 +16,34 @@
  * limitations under the License.
  */
 
+import { ConfigProvider } from 'antd';
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import { registerTheme } from 'echarts';
+import { antdLocales } from 'locales/i18n';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter } from 'react-router-dom';
 import { GlobalStyle, OverriddenStyle } from 'styles/globalStyles';
 import { LazySharePage } from './pages/SharePage/Loadable';
+
 registerTheme('default', echartsDefaultTheme);
+
 export function Share() {
   const { i18n } = useTranslation();
 
   return (
-    <BrowserRouter>
-      <Helmet
-        title="Datart Share Link"
-        htmlAttributes={{ lang: i18n.language }}
-      >
-        <meta name="description" content="Data Art" />
-      </Helmet>
-      <LazySharePage />
-      <GlobalStyle />
-      <OverriddenStyle />
-    </BrowserRouter>
+    <ConfigProvider locale={antdLocales[i18n.language]}>
+      <BrowserRouter>
+        <Helmet
+          title="Datart Share Link"
+          htmlAttributes={{ lang: i18n.language }}
+        >
+          <meta name="description" content="Data Art" />
+        </Helmet>
+        <LazySharePage />
+        <GlobalStyle />
+        <OverriddenStyle />
+      </BrowserRouter>
+    </ConfigProvider>
   );
 }

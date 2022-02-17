@@ -17,13 +17,13 @@
  */
 
 import { Col, InputNumber, Row, Select, Space } from 'antd';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
-const BasicMarginWidth: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
+const BasicMarginWidth: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
     const { value: mixedValue, label } = data;
     const widthModeTypes = ['px', '%'];
@@ -64,7 +64,7 @@ const BasicMarginWidth: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
 
     return (
       <StyledBasicMarginWidth align={'middle'}>
-        <Col span={12}>{t(label)}</Col>
+        <Col span={12}>{t(label, true)}</Col>
         <Col span={12}>
           <Space>
             <InputNumber

@@ -24,6 +24,7 @@ const useMount = (fn?: () => void, dispose?: () => void) => {
     return () => {
       dispose?.();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };
 

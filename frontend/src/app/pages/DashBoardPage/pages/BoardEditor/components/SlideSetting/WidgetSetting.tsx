@@ -16,12 +16,13 @@
  * limitations under the License.
  */
 import { Collapse, Form } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getRGBAColor } from 'app/pages/DashBoardPage/utils';
 import produce from 'immer';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import React, {
   FC,
   memo,
@@ -43,6 +44,7 @@ import { WidgetNameList } from './WidgetList/WidgetNameList';
 
 const { Panel } = Collapse;
 export const WidgetSetting: FC = memo(() => {
+  const t = useI18NPrefix(`viz.board.setting`);
   const dispatch = useDispatch();
   const { boardType } = useContext(BoardContext);
   const widget = useContext(WidgetContext);
@@ -54,7 +56,7 @@ export const WidgetSetting: FC = memo(() => {
       name: config.name,
       nameConfig: config.nameConfig,
       backgroundColor: config.background.color,
-      backgroundImage: [config.background.image],
+      backgroundImage: config.background.image,
       border: config.border,
       rect: config.rect,
       autoUpdate: config.autoUpdate || false,
@@ -69,14 +71,17 @@ export const WidgetSetting: FC = memo(() => {
       const value = { ...cacheValue.current, ...newValues };
 
       value.border.color = getRGBAColor(value.border.color);
-      value.nameConfig = {...value.nameConfig,color:getRGBAColor(value.nameConfig.color)};
+      value.nameConfig = {
+        ...value.nameConfig,
+        color: getRGBAColor(value.nameConfig.color),
+      };
       // value.nameConfig.color = getRGBAColor(value.nameConfig.color);
 
       const nextConf = produce(widget.config, draft => {
         draft.name = value.name;
         draft.nameConfig = value.nameConfig;
         draft.background.color = getRGBAColor(value.backgroundColor);
-        draft.background.image = value.backgroundImage[0];
+        draft.background.image = value.backgroundImage;
         draft.border = value.border;
         draft.rect = value.rect;
         draft.padding = value.padding;
@@ -102,13 +107,9 @@ export const WidgetSetting: FC = memo(() => {
     },
     [throttledUpdate, widget],
   );
-  const onForceUpdate = useCallback(() => {
-    const values = form.getFieldsValue();
-    onUpdate(values, widget);
-  }, [form, onUpdate, widget]);
 
   return (
-    <SettingPanel title="组件设计">
+    <SettingPanel title={`${t('widget')} ${t('setting')}`}>
       <Form
         form={form}
         layout="vertical"
@@ -120,56 +121,60 @@ export const WidgetSetting: FC = memo(() => {
           className="datart-config-panel"
           ghost
         >
-          <Panel header="名称" key="name" forceRender>
+          <Panel header={t('title')} key="name" forceRender>
             <Group>
-              <NameSet
-                form={form}
-                onForceUpdate={onForceUpdate}
-                config={config.nameConfig}
-              />
+              <NameSet config={config.nameConfig} />
             </Group>
           </Panel>
           {boardType === 'free' && (
             <>
-              <Panel header="组件位置" key="position" forceRender>
+              <Panel header={t('position')} key="position" forceRender>
                 <Group>
-                  <NumberSet label={'x轴位置（像素）'} name={['rect', 'x']} />
-                  <NumberSet label={'y轴位置（像素）'} name={['rect', 'y']} />
+                  <NumberSet
+                    label={t('xAxis') + ` (${t('px')})`}
+                    name={['rect', 'x']}
+                  />
+                  <NumberSet
+                    label={t('yAxis') + ` (${t('px')})`}
+                    name={['rect', 'y']}
+                  />
                 </Group>
               </Panel>
-              <Panel header="组件尺寸" key="size" forceRender>
+              <Panel header={t('size')} key="size" forceRender>
                 <Group>
-                  <NumberSet label={'宽度(像素)'} name={['rect', 'width']} />
-                  <NumberSet label={'高度(像素)'} name={['rect', 'height']} />
+                  <NumberSet
+                    label={t('width') + ` (${t('px')})`}
+                    name={['rect', 'width']}
+                  />
+                  <NumberSet
+                    label={t('height') + ` (${t('px')})`}
+                    name={['rect', 'height']}
+                  />
                 </Group>
               </Panel>
             </>
           )}
-          <Panel header="背景" key="background" forceRender>
+          <Panel header={t('background')} key="background" forceRender>
             <Group>
-              <BackgroundSet
-                onForceUpdate={onForceUpdate}
-                background={config.background}
-                form={form}
-              />
+              <BackgroundSet background={config.background} />
             </Group>
           </Panel>
-          <Panel header="内边距" key="padding" forceRender>
+          <Panel header={t('padding')} key="padding" forceRender>
             <Group>
               <PaddingSet />
             </Group>
           </Panel>
-          <Panel header="边框" key="border" forceRender>
+          <Panel header={t('border')} key="border" forceRender>
             <Group>
               <BorderSet border={config.border} />
             </Group>
           </Panel>
-          <Panel header="定时同步数据" key="autUpdate" forceRender>
+          <Panel header={t('autoUpdate')} key="autoUpdate" forceRender>
             <Group>
               <AutoUpdateSet />
             </Group>
           </Panel>
-          <Panel header="所有组件" key="widgetList">
+          <Panel header={t('widgetList')} key="widgetList">
             <Group>
               <WidgetNameList />
             </Group>

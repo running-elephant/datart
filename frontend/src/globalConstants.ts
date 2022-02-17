@@ -19,11 +19,14 @@
 import { FONT_FAMILY } from 'styles/StyleConstants';
 
 export const DATARTSEPERATOR = '@datart@';
+export const CHARTCONFIG_FIELD_PLACEHOLDER_UID = '@placeholder@';
+export const DATART_TRANSLATE_HOLDER = '@global@';
 
 export enum StorageKeys {
   AuthorizationToken = 'AUTHORIZATION_TOKEN',
   LoggedInUser = 'LOGGED_IN_USER',
   ShareClientId = 'SHARE_CLIENT_ID',
+  Locale = 'LOCALE',
 }
 export const BASE_API_URL = '/api/v1';
 export const BASE_RESOURCE_URL = '/';
@@ -33,17 +36,15 @@ export const DEFAULT_AUTHORIZATION_TOKEN_EXPIRATION = 1000 * 60 * 60;
 export enum CommonFormTypes {
   Add = 'add',
   Edit = 'edit',
+  SaveAs = 'saveAs',
 }
 
-export const COMMON_FORM_TITLE_PREFIX = {
-  [CommonFormTypes.Add]: '新建',
-  [CommonFormTypes.Edit]: '编辑',
-};
+export const TITLE_SUFFIX = ['archived', 'unpublished'];
 
 export const DEFAULT_DEBOUNCE_WAIT = 300;
 
 export const FONT_SIZES = [
-  10, 12, 13, 14, 15, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 96, 128,
+  12, 13, 14, 15, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 96, 128,
 ];
 
 export const FONT_FAMILIES = [
@@ -90,7 +91,6 @@ export const CHART_LINE_WIDTH = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 export const CHART_DRAG_ELEMENT_TYPE = {
   DATA_CONFIG_COLUMN: 'data_config_column',
   DATASET_COLUMN: 'dataset_column',
-  DATASET_GROUP_COLUMNS: 'dataset_group_columns',
 };
 
 export const TIME_UNIT_OPTIONS = [
@@ -101,9 +101,11 @@ export const TIME_UNIT_OPTIONS = [
   { name: 'weeks', value: 'w' },
   { name: 'months', value: 'M' },
   { name: 'years', value: 'y' },
+  { name: 'quarters', value: 'Q' },
 ];
 export const TIME_DIRECTION = [
   { name: 'ago', value: '-' },
+  { name: 'current', value: '+0' },
   { name: 'fromNow', value: '+' },
 ];
 
@@ -142,13 +144,8 @@ export enum FilterSqlOperator {
   LessThanOrEqual = 'LTE',
   GreaterThanOrEqual = 'GTE',
 }
-
-export const ResizeEvent = new Event('resize', {
-  bubbles: false,
-  cancelable: true,
-});
-
-export const FILTER_TIME_FORMATTER_IN_QUERY = 'yyyy-MM-DD HH:mm:ss';
+export const DATE_FORMATTER = 'YYYY-MM-DD';
+export const TIME_FORMATTER = 'YYYY-MM-DD HH:mm:ss';
 
 export const CONTROLLER_WIDTH_OPTIONS = [
   { label: 'auto', value: 'auto' },
@@ -163,7 +160,7 @@ export const CONTROLLER_WIDTH_OPTIONS = [
 
 export enum NumberUnitKey {
   None = 'none',
-  // Engllish Unit
+  // English Unit
   Thousand = 'thousand',
   Million = 'million',
   Billion = 'billion',

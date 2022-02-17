@@ -10,7 +10,7 @@ import {
   ResourceTypes,
   VizResourceSubTypes,
 } from '../../PermissionPage/constants';
-import { ChartPreviewBoard } from '../ChartPreview';
+import { ChartPreview } from '../ChartPreview';
 import { FolderViewModel, VizTab } from '../slice/types';
 
 interface VizContainerProps {
@@ -58,6 +58,7 @@ export const VizContainer = memo(
           <Board
             key={id}
             id={id}
+            orgId={orgId}
             autoFit={true}
             filterSearchUrl={search}
             allowDownload={allowDownload}
@@ -70,7 +71,7 @@ export const VizContainer = memo(
         break;
       case 'DATACHART':
         content = (
-          <ChartPreviewBoard
+          <ChartPreview
             key={id}
             backendChartId={id}
             orgId={orgId}
@@ -84,6 +85,7 @@ export const VizContainer = memo(
       case 'STORYBOARD':
         content = (
           <StoryPagePreview
+            orgId={orgId}
             storyId={id}
             allowShare={allowShare}
             allowManage={allowManage}

@@ -16,42 +16,42 @@
  * limitations under the License.
  */
 
-import WidgetPlugins from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartGraph';
-import ChartTools from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTools';
-import { getChartPluginPaths } from 'app/utils/fetch';
-import { CloneValueDeep } from 'utils/object';
-import Chart from './Chart';
-
-const {
-  BasicScatterChart,
+import {
+  AreaChart,
   BasicDoubleYChart,
   BasicFunnelChart,
-  ClusterColumnChart,
-  ClusterBarChart,
-  StackColumnChart,
-  StackBarChart,
-  PercentageStackColumnChart,
-  PercentageStackBarChart,
-  LineChart,
-  AreaChart,
-  StackAreaChart,
-  PieChart,
-  DoughnutChart,
-  RoseChart,
-  ScoreChart,
-  MingXiTableChart,
-  FenZuTableChart,
-  NormalOutlineMapChart,
-  WordCloudChart,
-  ScatterOutlineMapChart,
   BasicGaugeChart,
+  BasicRichText,
+  BasicScatterChart,
+  ClusterBarChart,
+  ClusterColumnChart,
+  DoughnutChart,
+  LineChart,
+  MingXiTableChart,
+  NormalOutlineMapChart,
+  PercentageStackBarChart,
+  PercentageStackColumnChart,
+  PieChart,
+  PivotSheetChart,
+  RoseChart,
+  ScatterOutlineMapChart,
+  ScoreChart,
+  StackAreaChart,
+  StackBarChart,
+  StackColumnChart,
   WaterfallChart,
-} = WidgetPlugins;
+  WordCloudChart,
+} from 'app/components/ChartGraph';
+import { IChart } from 'app/types/Chart';
+import { getChartPluginPaths } from 'app/utils/fetch';
+import { Debugger } from 'utils/debugger';
+import { CloneValueDeep } from 'utils/object';
+import PluginChartLoader from './PluginChartLoader';
 
 class ChartManager {
-  private _loader = new ChartTools.ChartPluginLoader();
+  private _loader = new PluginChartLoader();
   private _isLoaded = false;
-  private _charts: Chart[] = this._basicCharts();
+  private _charts: IChart[] = this._basicCharts();
   private static _manager: ChartManager | null = null;
 
   public static instance() {
@@ -66,10 +66,12 @@ class ChartManager {
       return;
     }
     const pluginsPaths = await getChartPluginPaths();
-    return await this._loadCustomizeCharts(pluginsPaths);
+    Debugger.instance.measure('Plugin Charts | ', async () => {
+      await this._loadCustomizeCharts(pluginsPaths);
+    });
   }
 
-  public getAllCharts(): Chart[] {
+  public getAllCharts(): IChart[] {
     return this._charts || [];
   }
 
@@ -91,16 +93,16 @@ class ChartManager {
 
     const customCharts = await this._loader.loadPlugins(paths);
     this._charts = this._charts.concat(
-      customCharts?.filter(Boolean) as Chart[],
+      customCharts?.filter(Boolean) as IChart[],
     );
     this._isLoaded = true;
     return this._charts;
   }
 
-  private _basicCharts(): Chart[] {
+  private _basicCharts(): IChart[] {
     return [
-      new FenZuTableChart(),
       new MingXiTableChart(),
+      new PivotSheetChart(),
       new ScoreChart(),
       new ClusterColumnChart(),
       new ClusterBarChart(),
@@ -122,6 +124,7 @@ class ChartManager {
       new NormalOutlineMapChart(),
       new ScatterOutlineMapChart(),
       new BasicGaugeChart(),
+      new BasicRichText(),
     ];
   }
 }

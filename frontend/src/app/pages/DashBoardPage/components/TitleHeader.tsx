@@ -23,12 +23,20 @@ import {
   MoreOutlined,
   SaveOutlined,
   SendOutlined,
-  VerticalAlignBottomOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown, Space } from 'antd';
 import { ShareLinkModal } from 'app/components/VizOperationMenu';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
-import React, { FC, memo, useCallback, useContext, useState } from 'react';
+import { TITLE_SUFFIX } from 'globalConstants';
+import React, {
+  FC,
+  memo,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
@@ -41,26 +49,35 @@ import { BoardActionContext } from '../contexts/BoardActionContext';
 import { BoardContext } from '../contexts/BoardContext';
 import { BoardInfoContext } from '../contexts/BoardInfoContext';
 import { BoardOverLay } from './BoardOverLay';
-
-const TITLE_SUFFIX = ['[已归档]', '[未发布]'];
+import SaveToStoryBoard from './SaveToStoryBoard';
 
 interface TitleHeaderProps {
   name?: string;
   publishLoading?: boolean;
+  orgId?: string;
   onShareDownloadData?: () => void;
   toggleBoardEditor?: (bool: boolean) => void;
   onPublish?: () => void;
+  onRecycleViz?: () => void;
+  onAddToStory?: (id) => void;
+  onSyncData?: () => void;
 }
 const TitleHeader: FC<TitleHeaderProps> = memo(
   ({
     name,
-    onShareDownloadData,
-    toggleBoardEditor,
     children,
     publishLoading,
+    orgId,
     onPublish,
+    onRecycleViz,
+    onShareDownloadData,
+    toggleBoardEditor,
+    onAddToStory,
+    onSyncData,
   }) => {
+    const t = useI18NPrefix(`viz.action`);
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const {
       editing,
       name: boardName,
@@ -68,8 +85,12 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
       renderMode,
       allowManage,
     } = useContext(BoardContext);
-    const { updateBoard, onGenerateShareLink, onBoardToDownLoad } =
-      useContext(BoardActionContext);
+    const {
+      updateBoard,
+      onGenerateShareLink,
+      onBoardToDownLoad,
+      onSaveAsVizs,
+    } = useContext(BoardActionContext);
     const { saving } = useContext(BoardInfoContext);
 
     const onOpenShareLink = useCallback(() => {
@@ -84,8 +105,24 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
       toggleBoardEditor?.(false);
     };
 
-    const title = `${name || boardName} ${TITLE_SUFFIX[status] || ''}`;
+    const title = useMemo(() => {
+      const base = name || boardName;
+      const suffix = TITLE_SUFFIX[status] ? `[${t(TITLE_SUFFIX[status])}]` : '';
+      return base + suffix;
+    }, [boardName, name, status, t]);
     const isArchived = status === 0;
+
+    const handleModalVisible = useCallback(() => {
+      setIsModalVisible(!isModalVisible);
+    }, [isModalVisible]);
+
+    const handleModalOk = useCallback(
+      (storyId: string) => {
+        handleModalVisible();
+        onAddToStory?.(storyId);
+      },
+      [onAddToStory, handleModalVisible],
+    );
 
     return (
       <Wrapper>
@@ -102,7 +139,7 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                 icon={<CloseOutlined />}
                 onClick={closeBoardEditor}
               >
-                取消
+                {t('common.cancel')}
               </Button>
 
               <Button
@@ -112,34 +149,31 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                 icon={<SaveOutlined />}
                 onClick={onUpdateBoard}
               >
-                保存
+                {t('common.save')}
               </Button>
             </>
           ) : (
             <>
-              {allowManage && !isArchived && renderMode === 'read' && (
-                <Button
-                  key="publish"
-                  icon={
-                    status === 1 ? (
-                      <SendOutlined />
-                    ) : (
-                      <VerticalAlignBottomOutlined />
-                    )
-                  }
-                  loading={publishLoading}
-                  onClick={onPublish}
-                >
-                  {status === 1 ? '发布' : '取消发布'}
-                </Button>
-              )}
+              {allowManage &&
+                !isArchived &&
+                renderMode === 'read' &&
+                Number(status) === 1 && (
+                  <Button
+                    key="publish"
+                    icon={<SendOutlined />}
+                    loading={publishLoading}
+                    onClick={onPublish}
+                  >
+                    {t('publish')}
+                  </Button>
+                )}
               {allowManage && !isArchived && renderMode === 'read' && (
                 <Button
                   key="edit"
                   icon={<EditOutlined />}
                   onClick={() => toggleBoardEditor?.(true)}
                 >
-                  编辑
+                  {t('edit')}
                 </Button>
               )}
               {
@@ -149,9 +183,15 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
                       onOpenShareLink={onOpenShareLink}
                       onBoardToDownLoad={onBoardToDownLoad}
                       onShareDownloadData={onShareDownloadData}
+                      onSaveAsVizs={onSaveAsVizs}
+                      onSyncData={onSyncData}
+                      onRecycleViz={onRecycleViz}
+                      onAddToStory={onAddToStory && handleModalVisible}
+                      onPublish={Number(status) === 2 ? onPublish : undefined}
+                      isArchived={isArchived}
                     />
                   }
-                  placement="bottomCenter"
+                  placement="bottomRight"
                   arrow
                 >
                   <Button icon={<MoreOutlined />} />
@@ -167,6 +207,15 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
             onCancel={() => setShowShareLinkModal(false)}
             onGenerateShareLink={onGenerateShareLink}
           />
+        )}
+        {!!onSaveAsVizs && (
+          <SaveToStoryBoard
+            title={t('addToStory')}
+            orgId={orgId as string}
+            isModalVisible={isModalVisible}
+            handleOk={handleModalOk}
+            handleCancel={handleModalVisible}
+          ></SaveToStoryBoard>
         )}
       </Wrapper>
     );

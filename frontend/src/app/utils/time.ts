@@ -16,18 +16,17 @@
  * limitations under the License.
  */
 
-import { DEFAULT_VALUE_DATE_FORMAT } from 'app/pages/MainPage/pages/VariablePage/constants';
-import { RECOMMEND_TIME } from 'globalConstants';
+import { RECOMMEND_TIME, TIME_FORMATTER } from 'globalConstants';
 import moment, { Moment, unitOfTime } from 'moment';
 
-export function getTimeRange(amount?, unit?): (unitTime) => [string, string] {
+export function getTimeRange(
+  amount?: [number, number],
+  unit?,
+): (unitTime) => [string, string] {
   return unitOfTime => {
-    const startTime = moment().add(amount, unit).startOf(unitOfTime);
-    const endTime = moment().add(amount, unit).endOf(unitOfTime);
-    return [
-      startTime.format(DEFAULT_VALUE_DATE_FORMAT),
-      endTime.format(DEFAULT_VALUE_DATE_FORMAT),
-    ];
+    const startTime = moment().add(amount?.[0], unit).startOf(unitOfTime);
+    const endTime = moment().add(amount?.[1], unit).endOf(unitOfTime);
+    return [startTime.format(TIME_FORMATTER), endTime.format(TIME_FORMATTER)];
   };
 }
 
@@ -39,7 +38,7 @@ export function getTime(
     if (!!isStart) {
       return moment().add(amount, unit).startOf(unitOfTime);
     }
-    return moment().add(amount, unit).endOf(unitOfTime);
+    return moment().add(amount, unit).add(1, unit).startOf(unitOfTime);
   };
 }
 
@@ -47,25 +46,25 @@ export function formatTime(time: string | Moment, format): string {
   return moment(time).format(format);
 }
 
-export function convertRelativeTimeRange(relativeTimeRange) {
+export function recommendTimeRangeConverter(relativeTimeRange) {
   let timeRange = getTimeRange()('d');
   switch (relativeTimeRange) {
     case RECOMMEND_TIME.TODAY:
       break;
     case RECOMMEND_TIME.YESTERDAY:
-      timeRange = getTimeRange(-1, 'd')('d');
+      timeRange = getTimeRange([-1, 0], 'd')('d');
       break;
     case RECOMMEND_TIME.THISWEEK:
       timeRange = getTimeRange()('w');
       break;
     case RECOMMEND_TIME.LAST_7_DAYS:
-      timeRange = getTimeRange(-7, 'd')('d');
+      timeRange = getTimeRange([-7, 0], 'd')('d');
       break;
     case RECOMMEND_TIME.LAST_30_DAYS:
-      timeRange = getTimeRange(-30, 'd')('d');
+      timeRange = getTimeRange([-30, 0], 'd')('d');
       break;
     case RECOMMEND_TIME.LAST_90_DAYS:
-      timeRange = getTimeRange(-90, 'd')('d');
+      timeRange = getTimeRange([-90, 0], 'd')('d');
       break;
     case RECOMMEND_TIME.LAST_1_MONTH:
       timeRange = getTimeRange()('M');

@@ -17,11 +17,9 @@
  */
 import { Cascader, CascaderProps } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import {
-  View,
-  ViewSimple,
-} from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { ViewSimple } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import React, {
   memo,
   useCallback,
@@ -29,34 +27,30 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 export interface AssistViewFieldsProps
   extends Omit<CascaderProps, 'options' | 'onChange'> {
   onChange?: (value: string[]) => void;
+  getViewOption: (viewId: string) => Promise<CascaderOptionType[] | undefined>;
   value?: string[];
 }
 export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
-  ({ onChange, value }) => {
+  ({ onChange, value: propsValue, getViewOption }) => {
+    const tc = useI18NPrefix(`viz.control`);
+    const [val, setVal] = useState<string[]>([]);
     const { orgId } = useContext(BoardContext);
     const [options, setOptions] = useState<CascaderOptionType[]>([]);
-    const getChildren = useCallback(async viewId => {
-      const { data } = await request<View>(`/views/${viewId}`);
-      try {
-        const model = JSON.parse(data.model);
-        const items: CascaderOptionType[] = Object.keys(model).map(key => {
-          return {
-            value: key,
-            label: key,
-          };
-        });
-        return items;
-      } catch (error) {}
-    }, []);
+    useEffect(() => {
+      setVal(propsValue || []);
+    }, [onChange, propsValue]);
+
     const setViews = useCallback(
       async orgId => {
         try {
-          const { data } = await request<ViewSimple[]>(`/views?orgId=${orgId}`);
+          const { data } = await request2<ViewSimple[]>(
+            `/views?orgId=${orgId}`,
+          );
           const views: CascaderOptionType[] = data.map(item => {
             return {
               value: item.id,
@@ -64,10 +58,11 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
               isLeaf: false,
             };
           });
-          if (Array.isArray(value) && value.length === 2) {
-            const children = await getChildren(value[0]);
+          if (Array.isArray(propsValue) && propsValue.length) {
+            const children = await getViewOption(propsValue[0]);
+
             views.forEach(view => {
-              if (view.value === value[0]) {
+              if (view.value === propsValue[0]) {
                 view.children = children;
               }
             });
@@ -78,7 +73,7 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
           throw error;
         }
       },
-      [getChildren, value],
+      [getViewOption, propsValue],
     );
 
     useEffect(() => {
@@ -89,7 +84,8 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
       async (selectedOptions: CascaderOptionType[]) => {
         const targetOption = selectedOptions[selectedOptions.length - 1];
         targetOption.loading = true;
-        targetOption.children = await getChildren(targetOption.value);
+        const children = await getViewOption(targetOption.value as string);
+        targetOption.children = children;
         targetOption.loading = false;
         const nextOptions = [...options].map(item => {
           if (item.value === targetOption.value) {
@@ -100,16 +96,19 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
         });
         setOptions(nextOptions);
       },
-      [options, getChildren],
+      [options, getViewOption],
     );
-
+    const optionChange = value => {
+      setVal(value);
+      onChange?.(value || []);
+    };
     return (
       <Cascader
         allowClear
-        placeholder="select viewField"
+        placeholder={tc('selectViewField')}
         options={options}
-        onChange={onChange as any}
-        value={value}
+        onChange={optionChange}
+        value={[...val]}
         style={{ margin: '6px 0' }}
         loadData={loadData as any}
       />

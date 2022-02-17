@@ -28,10 +28,7 @@ import datart.server.base.dto.ResourcePermissions;
 import datart.server.base.dto.ResponseData;
 import datart.server.base.dto.SubjectPermissions;
 import datart.server.base.dto.ViewPermission;
-import datart.server.base.params.GrantPermissionParam;
-import datart.server.base.params.RoleCreateParam;
-import datart.server.base.params.RoleUpdateParam;
-import datart.server.base.params.ViewPermissionParam;
+import datart.server.base.params.*;
 import datart.server.service.RoleService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
@@ -54,13 +51,10 @@ public class RoleController extends BaseController {
 
     @ApiOperation(value = "check role name")
     @PostMapping(value = "/check/name")
-    public ResponseData<Boolean> checkRoleName(@RequestParam String name,
-                                               @RequestParam String orgId) {
-        checkBlank(name, "name");
-        checkBlank(orgId, "orgId");
+    public ResponseData<Boolean> checkRoleName(@Validated @RequestBody CheckNameParam param) {
         Role role = new Role();
-        role.setName(name);
-        role.setOrgId(orgId);
+        role.setName(param.getName());
+        role.setOrgId(param.getOrgId());
         boolean success = roleService.checkUnique(role);
         return ResponseData.success(success);
     }

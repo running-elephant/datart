@@ -20,7 +20,11 @@ import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
 } from 'app/types/FilterControlPanel';
-import { FilterSqlOperator, NumberUnitKey } from 'globalConstants';
+import {
+  FilterSqlOperator,
+  NumberUnitKey,
+  RECOMMEND_TIME,
+} from 'globalConstants';
 import { ValueOf } from 'types';
 import {
   ChartDataViewFieldCategory,
@@ -86,7 +90,8 @@ export type FilterCondition = {
     | number
     | [number, number]
     | string[]
-    | Array<FilterValueOption>;
+    | Array<RelationFilterValue>
+    | TimeFilterConditionValue;
   visualType: string;
   operator?:
     | string
@@ -95,12 +100,22 @@ export type FilterCondition = {
   children?: FilterCondition[];
 };
 
-export type FilterValueOption = {
+export type TimeFilterConditionValue =
+  | string
+  | string[]
+  | Lowercase<keyof typeof RECOMMEND_TIME>
+  | Array<{
+      unit;
+      amount;
+      direction?: string;
+    }>;
+
+export type RelationFilterValue = {
   key: string;
   label: string;
   index?: number;
   isSelected?: boolean;
-  children?: FilterValueOption[];
+  children?: RelationFilterValue[];
 };
 
 export const FilterRelationType = {
@@ -118,7 +133,7 @@ export enum FilterConditionType {
   RangeValue = 1 << 4,
   Value = 1 << 5,
   RangeTime = 1 << 6,
-  RelativeTime = 1 << 7,
+  RecommendTime = 1 << 7,
   Time = 1 << 8,
   Tree = 1 << 9,
 
@@ -129,7 +144,7 @@ export enum FilterConditionType {
     RangeValue |
     Value |
     RangeTime |
-    RelativeTime |
+    RecommendTime |
     Time |
     Tree,
   Relation = 1 << 50,
@@ -179,7 +194,6 @@ export const ChartStyleSectionComponentType = {
   INPUTPERCENTAGE: 'inputPercentage',
   SLIDER: 'slider',
   GROUP: 'group',
-  CACHE: 'cache',
   REFERENCE: 'reference',
   TABS: 'tabs',
   LISTTEMPLATE: 'listTemplate',
@@ -187,10 +201,15 @@ export const ChartStyleSectionComponentType = {
   LINE: 'line',
   MARGIN_WIDTH: 'marginWidth',
   TEXT: 'text',
+  CONDITIONSTYLE: 'conditionStylePanel',
+  RADIO: 'radio',
+
+  // Customize Component
+  FontAlignment: 'fontAlignment',
 };
 
-type ChartConfigBase = {
-  label: string;
+export type ChartConfigBase = {
+  label?: string;
   key: string;
 };
 
@@ -255,15 +274,21 @@ export type AliasFieldAction = {
   desc?: string;
 };
 
-export type ChartDataSectionConfig = ChartConfigBase & {
+export type ChartDataConfig = ChartConfigBase & {
   type?: Lowercase<keyof typeof ChartDataSectionType>;
   allowSameField?: boolean;
   required?: boolean;
   rows?: ChartDataSectionField[];
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
   limit?: null | number | string | number[] | string[];
+  disableAggregate?: boolean;
+  options?: {
+    [key in ValueOf<typeof ChartDataSectionFieldActionType>]: {
+      backendSort?: boolean;
+    };
+  };
 
-  // Question: keep field's filter relation for filter arrangement feature
+  // NOTE: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
 };
 
@@ -277,8 +302,7 @@ export enum ChartDataSectionType {
   SIZE = 'size',
 }
 
-export type ChartStyleSectionConfig = ChartConfigBase &
-  ChartStyleSectionGroup & {};
+export type ChartStyleConfig = ChartConfigBase & ChartStyleSectionGroup & {};
 
 export type ChartStyleSectionGroup = ChartStyleSectionRow & {
   rows?: ChartStyleSectionGroup[];
@@ -295,6 +319,7 @@ export type ChartStyleSectionRow = {
   watcher?: ChartStyleSectionRowWatcher;
   template?: ChartStyleSectionRow;
   comType: ValueOf<typeof ChartStyleSectionComponentType>;
+  hidden?: boolean;
 };
 
 export type ChartStyleSectionRowOption = {
@@ -303,13 +328,20 @@ export type ChartStyleSectionRowOption = {
   step?: number | string;
   type?: string;
   editable?: boolean;
-  modalSize?: string;
+  modalSize?: string | number;
   expand?: boolean;
   items?: Array<ChartStyleSelectorItem> | string[] | number[];
   hideLabel?: boolean;
   style?: React.CSSProperties;
   getItems?: (cols) => Array<ChartStyleSelectorItem>;
   needRefresh?: boolean;
+  fontFamilies?: string[];
+
+  /**
+   * Suppport Components: @see BasicRadio, @see BasicSelector and etc
+   * Default is false for now, will be change in futrue version
+   */
+  translateItemLabel?: boolean;
 };
 
 export type ChartStyleSelectorItem = {
@@ -329,8 +361,9 @@ export type ChartI18NSectionConfig = {
 };
 
 export type ChartConfig = {
-  datas?: ChartDataSectionConfig[];
-  styles?: ChartStyleSectionConfig[];
-  settings?: ChartStyleSectionConfig[];
+  datas?: ChartDataConfig[];
+  styles?: ChartStyleConfig[];
+  settings?: ChartStyleConfig[];
   i18ns?: ChartI18NSectionConfig[];
+  env?: string;
 };

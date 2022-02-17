@@ -19,11 +19,11 @@
 import { Button, Space } from 'antd';
 import DragSortEditTable from 'app/components/DragSortEditTable';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import { FilterValueOption } from 'app/types/ChartConfig';
-import ChartDataView from 'app/types/ChartDataView';
 import ChartFilterCondition, {
   ConditionBuilder,
 } from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+import { RelationFilterValue } from 'app/types/ChartConfig';
+import ChartDataView from 'app/types/ChartDataView';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
@@ -44,12 +44,11 @@ const CategoryConditionEditableTable: FC<
     fetchDataByField,
   }) => {
     const t = useI18NPrefix(i18nPrefix);
-    const [rows, setRows] = useState<FilterValueOption[]>([]);
-    const [showPopover, setShowPopover] = useState(false);
+    const [rows, setRows] = useState<RelationFilterValue[]>([]);
 
     useEffect(() => {
       if (Array.isArray(condition?.value)) {
-        setRows(condition?.value as FilterValueOption[]);
+        setRows(condition?.value as RelationFilterValue[]);
       } else {
         setRows([]);
       }
@@ -78,15 +77,13 @@ const CategoryConditionEditableTable: FC<
         title: t('tableHeaderAction'),
         dataIndex: 'action',
         width: 80,
-        render: (_, record: FilterValueOption) => (
+        render: (_, record: RelationFilterValue) => (
           <Space>
             {!record.isSelected && (
               <a
                 href="#!"
                 onClick={() =>
-                  handleRowStateUpdate(
-                    Object.assign(record, { isSelected: true }),
-                  )
+                  handleRowStateUpdate({ ...record, isSelected: true })
                 }
               >
                 {t('setDefault')}
@@ -96,9 +93,7 @@ const CategoryConditionEditableTable: FC<
               <a
                 href="#!"
                 onClick={() =>
-                  handleRowStateUpdate(
-                    Object.assign(record, { isSelected: false }),
-                  )
+                  handleRowStateUpdate({ ...record, isSelected: false })
                 }
               >
                 {t('setUnDefault')}
@@ -118,7 +113,7 @@ const CategoryConditionEditableTable: FC<
       }
       return {
         ...col,
-        onCell: (record: FilterValueOption) => ({
+        onCell: (record: RelationFilterValue) => ({
           record,
           editable: col.editable,
           dataIndex: col.dataIndex,
@@ -144,7 +139,7 @@ const CategoryConditionEditableTable: FC<
 
     const handleAdd = () => {
       const newKey = rows?.length + 1;
-      const newRow: FilterValueOption = {
+      const newRow: RelationFilterValue = {
         key: String(newKey),
         label: String(newKey),
         isSelected: false,
@@ -153,14 +148,14 @@ const CategoryConditionEditableTable: FC<
       handleFilterConditionChange(currentRows);
     };
 
-    const handleRowStateUpdate = (row: FilterValueOption) => {
-      const oldRowIndex = rows.findIndex(r => r.index === row.index);
-      rows.splice(oldRowIndex, 1, row);
-      handleFilterConditionChange(rows);
+    const handleRowStateUpdate = (row: RelationFilterValue) => {
+      const newRows = [...rows];
+      const targetIndex = newRows.findIndex(r => r.index === row.index);
+      newRows.splice(targetIndex, 1, row);
+      handleFilterConditionChange(newRows);
     };
 
     const handleFetchDataFromField = field => async () => {
-      setShowPopover(false);
       if (fetchDataByField) {
         const dataset = await fetchNewDataset(dataView?.id!, field);
         const newRows = convertToList(dataset?.rows, []);
@@ -180,24 +175,24 @@ const CategoryConditionEditableTable: FC<
       [rows],
     );
 
-    const fetchNewDataset = async (viewId, colName) => {
-      const feildDataset = await getDistinctFields(
+    const fetchNewDataset = async (viewId, colName: string) => {
+      const fieldDataset = await getDistinctFields(
         viewId,
-        colName,
+        [colName],
         undefined,
         undefined,
       );
-      return feildDataset;
+      return fieldDataset;
     };
 
-    const convertToList = (collection, selecteKeys) => {
+    const convertToList = (collection, selectedKeys) => {
       const items: string[] = (collection || []).flatMap(c => c);
       const uniqueKeys = Array.from(new Set(items));
       return uniqueKeys.map((item, index) => ({
         index: index,
         key: item,
         label: item,
-        isSelected: selecteKeys.includes(item),
+        isSelected: selectedKeys.includes(item),
       }));
     };
 
@@ -216,10 +211,9 @@ const CategoryConditionEditableTable: FC<
           dataSource={rows}
           size="small"
           bordered
-          rowKey={(r: FilterValueOption) => `${r.key}-${r.label}`}
+          rowKey={(r: RelationFilterValue) => `${r.key}-${r.label}`}
           columns={columnsWithCell}
           pagination={false}
-          // onMoveRowEnd={onMoveRowEnd}
           onRow={(_, index) =>
             ({
               index,

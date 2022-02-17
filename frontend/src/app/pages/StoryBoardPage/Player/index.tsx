@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 import { Layout } from 'antd';
-import { vizActions } from 'app/pages/MainPage/pages/VizPage/slice';
 import React, {
   memo,
   RefObject,
@@ -33,7 +32,7 @@ import Reveal from 'reveal.js';
 import 'reveal.js/dist/reveal.css';
 import RevealZoom from 'reveal.js/plugin/zoom/plugin';
 import styled from 'styled-components/macro';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from 'utils/utils';
 import StoryPageItem from '../components/StoryPageItem';
 import { storyActions } from '../slice';
 import {
@@ -129,7 +128,6 @@ export const StoryPlayer: React.FC<{ storyId: string }> = memo(
           keyboard: {
             27: () => {
               // disabled esc
-              dispatch(vizActions.changePlayingStoryId(''));
             }, // do something custom when ESC is pressed
           },
         });

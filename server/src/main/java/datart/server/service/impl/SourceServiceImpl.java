@@ -22,25 +22,26 @@ package datart.server.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import datart.core.base.consts.Const;
+import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.DataProviderConfigTemplate;
 import datart.core.data.provider.DataProviderSource;
+import datart.core.entity.Role;
 import datart.core.entity.Source;
+import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.SourceMapperExt;
 import datart.security.base.PermissionInfo;
 import datart.security.base.ResourceType;
 import datart.security.base.SubjectType;
 import datart.security.exception.PermissionDeniedException;
+import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.AESUtil;
 import datart.security.util.PermissionHelper;
 import datart.server.base.params.BaseCreateParam;
 import datart.server.base.params.BaseUpdateParam;
 import datart.server.base.params.SourceCreateParam;
 import datart.server.base.params.SourceUpdateParam;
-import datart.server.service.BaseService;
-import datart.server.service.DataProviderService;
-import datart.server.service.RoleService;
-import datart.server.service.SourceService;
+import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -61,12 +62,20 @@ public class SourceServiceImpl extends BaseService implements SourceService {
 
     private final RoleService roleService;
 
+    private final FileService fileService;
+
+    private final RelRoleResourceMapperExt rrrMapper;
+
     public SourceServiceImpl(SourceMapperExt sourceMapper,
                              DataProviderService dataProviderService,
-                             RoleService roleService) {
+                             RoleService roleService,
+                             FileService fileService,
+                             RelRoleResourceMapperExt rrrMapper) {
         this.sourceMapper = sourceMapper;
         this.dataProviderService = dataProviderService;
         this.roleService = roleService;
+        this.fileService = fileService;
+        this.rrrMapper = rrrMapper;
     }
 
     @Override
@@ -85,12 +94,23 @@ public class SourceServiceImpl extends BaseService implements SourceService {
 
     @Override
     public void requirePermission(Source source, int permission) {
-        if ((permission & Const.CREATE) == Const.CREATE) {
-            securityManager.requirePermissions(PermissionHelper.sourcePermission(source.getOrgId(),
-                    ResourceType.SOURCE.name(), permission));
+        if (securityManager.isOrgOwner(source.getOrgId())) {
             return;
         }
-        securityManager.requirePermissions(PermissionHelper.sourcePermission(source.getOrgId(), source.getId(), permission));
+        List<Role> roles = roleService.listUserRoles(source.getOrgId(), getCurrentUser().getId());
+        boolean hasPermission = roles.stream().anyMatch(role -> hasPermission(role, source, permission));
+        if (!hasPermission) {
+            Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied",
+                    ResourceType.SOURCE + ":" + source.getName() + ":" + ShiroSecurityManager.expand2StringPermissions(permission));
+        }
+    }
+
+    private boolean hasPermission(Role role, Source source, int permission) {
+        if (source.getId() == null || (permission & Const.CREATE) == Const.CREATE) {
+            return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), ResourceType.SOURCE.name(), permission));
+        } else {
+            return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), source.getId(), permission));
+        }
     }
 
     @Override
@@ -142,7 +162,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         permissionInfo.setSubjectId(getCurrentUser().getId());
         permissionInfo.setResourceType(ResourceType.SOURCE);
         permissionInfo.setResourceId(source.getId());
-        permissionInfo.setPermission(Const.MANAGE);
+        permissionInfo.setPermission(Const.CREATE);
         roleService.grantPermission(Collections.singletonList(permissionInfo));
     }
 
@@ -168,5 +188,10 @@ public class SourceServiceImpl extends BaseService implements SourceService {
             return jsonObject.toJSONString();
         }
         return config;
+    }
+
+    @Override
+    public void deleteStaticFiles(Source source) {
+        fileService.deleteFiles(FileOwner.DATA_SOURCE, source.getId());
     }
 }

@@ -23,8 +23,8 @@ import { AggregateFieldActionType } from 'app/types/ChartConfig';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-  ChartDataViewMeta,
 } from 'app/types/ChartDataView';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ChartCompoutedFieldHandle } from 'app/types/CompoutedFieldEditor';
 import { FC, useRef, useState } from 'react';
 import styled from 'styled-components/macro';

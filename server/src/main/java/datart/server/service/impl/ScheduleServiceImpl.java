@@ -22,13 +22,17 @@ import datart.core.base.consts.JobType;
 import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
+import datart.core.entity.Role;
 import datart.core.entity.Schedule;
 import datart.core.entity.ScheduleLog;
+import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.ScheduleLogMapperExt;
 import datart.core.mappers.ext.ScheduleMapperExt;
 import datart.security.base.PermissionInfo;
 import datart.security.base.ResourceType;
 import datart.security.base.SubjectType;
+import datart.security.exception.PermissionDeniedException;
+import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.PermissionHelper;
 import datart.server.base.dto.ScheduleBaseInfo;
 import datart.server.base.params.BaseCreateParam;
@@ -62,24 +66,38 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
 
     private final Scheduler scheduler;
 
+    private final RelRoleResourceMapperExt rrrMapper;
+
     public ScheduleServiceImpl(ScheduleMapperExt scheduleMapper,
                                RoleService roleService,
                                ScheduleLogMapperExt scheduleLogMapper,
-                               Scheduler scheduler) {
+                               Scheduler scheduler, RelRoleResourceMapperExt rrrMapper) {
         this.scheduleMapper = scheduleMapper;
         this.roleService = roleService;
         this.scheduleLogMapper = scheduleLogMapper;
         this.scheduler = scheduler;
+        this.rrrMapper = rrrMapper;
     }
 
     @Override
     public void requirePermission(Schedule schedule, int permission) {
-
-        if ((permission & Const.CREATE) == Const.CREATE) {
-            securityManager.requirePermissions(PermissionHelper.schedulePermission(schedule.getOrgId(), ResourceType.SCHEDULE.name(), permission));
+        if (securityManager.isOrgOwner(schedule.getOrgId())) {
             return;
         }
-        securityManager.requirePermissions(PermissionHelper.schedulePermission(schedule.getOrgId(), schedule.getId(), permission));
+        List<Role> roles = roleService.listUserRoles(schedule.getOrgId(), getCurrentUser().getId());
+        boolean hasPermission = roles.stream().anyMatch(role -> hasPermission(role, schedule, permission));
+        if (!hasPermission) {
+            Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied",
+                    ResourceType.SCHEDULE + ":" + schedule.getName() + ":" + ShiroSecurityManager.expand2StringPermissions(permission));
+        }
+    }
+
+    private boolean hasPermission(Role role, Schedule schedule, int permission) {
+        if (schedule.getId() == null || (permission & Const.CREATE) == permission) {
+            return securityManager.hasPermission(PermissionHelper.schedulePermission(schedule.getOrgId(), role.getId(), ResourceType.SCHEDULE.name(), permission));
+        } else {
+            return securityManager.hasPermission(PermissionHelper.schedulePermission(schedule.getOrgId(), role.getId(), schedule.getId(), permission));
+        }
     }
 
     @Override
@@ -161,7 +179,7 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     public boolean start(String scheduleId) throws SchedulerException {
         Schedule schedule = retrieve(scheduleId);
         if (schedule.getActive() && scheduler.checkExists(JobKey.jobKey(schedule.getName(), schedule.getOrgId()))) {
-            Exceptions.tr(BaseException.class,"message.task.running");
+            Exceptions.tr(BaseException.class, "message.task.running");
         }
         Date now = new Date();
         if (schedule.getStartDate() != null && now.before(new Date())) {

@@ -16,29 +16,24 @@
  * limitations under the License.
  */
 import { Form, FormInstance, Select } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ControllerFacadeTypes,
-  RelativeOrExactTime,
+  TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
 import produce from 'immer';
 import React, { useCallback } from 'react';
 import {
   DateName,
-  EndTimeAmountName,
-  EndTimeDirectionName,
   EndTimeExactName,
   EndTimeName,
   EndTimeRelativeName,
   EndTimeROEName,
-  EndTimeUnitName,
   PickerTypeName,
-  StartTimeAmountName,
-  StartTimeDirectionName,
   StartTimeExactName,
   StartTimeRelativeName,
   StartTimeROEName,
-  StartTimeUnitName,
 } from '../..';
 import {
   ControllerConfig,
@@ -46,13 +41,16 @@ import {
   PickerTypeOptions,
   RelativeDate,
 } from '../../../types';
-import { RelativeTimeSet } from './RelativeTimeSet';
+import { RelativeTimeSetter } from './RelativeTimeSetter';
 import { SingleTimeSet } from './SingleTimeSet';
 
 export const TimeSetter: React.FC<{
   form: FormInstance<ControllerWidgetContent> | undefined;
   controllerType: ControllerFacadeTypes;
 }> = ({ controllerType, form }) => {
+  const tc = useI18NPrefix(`viz.control`);
+  const tvt = useI18NPrefix(`viz.tips`);
+  const filterDataT = useI18NPrefix('viz.common.filter.date');
   const getControllerConfig = useCallback(() => {
     return form?.getFieldValue('config') as ControllerConfig;
   }, [form]);
@@ -80,7 +78,7 @@ export const TimeSetter: React.FC<{
       if (!date) {
         return false;
       }
-      if (date.relativeOrExact === RelativeOrExactTime.Exact) {
+      if (date.relativeOrExact === TimeFilterValueCategory.Exact) {
         return date.exactValue;
       } else {
         return date.relativeValue;
@@ -94,17 +92,17 @@ export const TimeSetter: React.FC<{
     }
 
     if (!startHasValue && endHasValue) {
-      return Promise.reject(new Error('请填写 起始值'));
+      return Promise.reject(new Error(tvt('noStartValue')));
     }
     if (startHasValue && !endHasValue) {
-      return Promise.reject(new Error('请填写 结束值'));
+      return Promise.reject(new Error(tvt('noEndValue')));
     }
     return Promise.resolve(value);
   };
   const onStartRelativeChange = useCallback(
     value => {
-      const valueType: RelativeOrExactTime = value;
-      if (valueType === RelativeOrExactTime.Relative) {
+      const valueType: TimeFilterValueCategory = value;
+      if (valueType === TimeFilterValueCategory.Relative) {
         const startTime = getControllerConfig()?.controllerDate?.startTime;
         if (startTime?.relativeValue) {
         } else {
@@ -134,8 +132,8 @@ export const TimeSetter: React.FC<{
 
   const onEndRelativeChange = useCallback(
     value => {
-      const valueType: RelativeOrExactTime = value;
-      if (valueType === RelativeOrExactTime.Relative) {
+      const valueType: TimeFilterValueCategory = value;
+      if (valueType === TimeFilterValueCategory.Relative) {
         const endTime = getControllerConfig()?.controllerDate?.endTime;
         if (endTime?.relativeValue) {
         } else {
@@ -173,16 +171,16 @@ export const TimeSetter: React.FC<{
       >
         <Select style={{ width: '100px' }} onChange={onChange}>
           <Select.Option
-            key={RelativeOrExactTime.Exact}
-            value={RelativeOrExactTime.Exact}
+            key={TimeFilterValueCategory.Exact}
+            value={TimeFilterValueCategory.Exact}
           >
-            {'固定值'}
+            {filterDataT('exact')}
           </Select.Option>
           <Select.Option
-            key={RelativeOrExactTime.Relative}
-            value={RelativeOrExactTime.Relative}
+            key={TimeFilterValueCategory.Relative}
+            value={TimeFilterValueCategory.Relative}
           >
-            {'相对值'}
+            {filterDataT('relative')}
           </Select.Option>
         </Select>
       </Form.Item>
@@ -208,7 +206,7 @@ export const TimeSetter: React.FC<{
           <>
             <Form.Item
               name={PickerTypeName}
-              label={'日期类型'}
+              label={tc('dateType')}
               shouldUpdate
               validateTrigger={['onChange', 'onBlur']}
               rules={[{ required: true }]}
@@ -226,23 +224,19 @@ export const TimeSetter: React.FC<{
             {controllerType === ControllerFacadeTypes.Time && (
               <>
                 <Form.Item
-                  label={'默认值'}
+                  label={tc('defaultValue')}
                   shouldUpdate
                   rules={[{ required: false }]}
                 >
                   {renderROE(StartTimeROEName, onStartRelativeChange)}
 
-                  {getStartRelativeOrExact() === RelativeOrExactTime.Exact &&
+                  {getStartRelativeOrExact() ===
+                    TimeFilterValueCategory.Exact &&
                     renderExact(StartTimeExactName, getPickerType)}
 
                   {getStartRelativeOrExact() ===
-                    RelativeOrExactTime.Relative && (
-                    <RelativeTimeSet
-                      relativeName={StartTimeRelativeName}
-                      amountName={StartTimeAmountName}
-                      unitName={StartTimeUnitName}
-                      directionName={StartTimeDirectionName}
-                    />
+                    TimeFilterValueCategory.Relative && (
+                    <RelativeTimeSetter relativeName={StartTimeRelativeName} />
                   )}
                 </Form.Item>
               </>
@@ -254,37 +248,29 @@ export const TimeSetter: React.FC<{
                 shouldUpdate
                 rules={[{ required: true, validator: RangeTimeValidator }]}
               >
-                <Form.Item label={'默认值-起始'} shouldUpdate>
+                <Form.Item label={filterDataT('startTime')} shouldUpdate>
                   {renderROE(StartTimeROEName, onStartRelativeChange)}
-                  {getStartRelativeOrExact() === RelativeOrExactTime.Exact &&
+                  {getStartRelativeOrExact() ===
+                    TimeFilterValueCategory.Exact &&
                     renderExact(StartTimeExactName, getPickerType)}
                   {getStartRelativeOrExact() ===
-                    RelativeOrExactTime.Relative && (
-                    <RelativeTimeSet
-                      relativeName={StartTimeRelativeName}
-                      amountName={StartTimeAmountName}
-                      unitName={StartTimeUnitName}
-                      directionName={StartTimeDirectionName}
-                    />
+                    TimeFilterValueCategory.Relative && (
+                    <RelativeTimeSetter relativeName={StartTimeRelativeName} />
                   )}
                 </Form.Item>
                 <Form.Item
-                  label={'默认值-结束'}
+                  label={filterDataT('endTime')}
                   name={EndTimeName}
                   shouldUpdate
                 >
                   {renderROE(EndTimeROEName, onEndRelativeChange)}
 
-                  {getEndRelativeOrExact() === RelativeOrExactTime.Exact &&
+                  {getEndRelativeOrExact() === TimeFilterValueCategory.Exact &&
                     renderExact(EndTimeExactName, getPickerType)}
 
-                  {getEndRelativeOrExact() === RelativeOrExactTime.Relative && (
-                    <RelativeTimeSet
-                      relativeName={EndTimeRelativeName}
-                      amountName={EndTimeAmountName}
-                      unitName={EndTimeUnitName}
-                      directionName={EndTimeDirectionName}
-                    />
+                  {getEndRelativeOrExact() ===
+                    TimeFilterValueCategory.Relative && (
+                    <RelativeTimeSetter relativeName={EndTimeRelativeName} />
                   )}
                 </Form.Item>
               </Form.Item>

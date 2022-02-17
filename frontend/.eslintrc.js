@@ -7,9 +7,24 @@ const prettierOptions = JSON.parse(
 
 module.exports = {
   extends: ['react-app', 'prettier'],
-  plugins: ['prettier'],
+  plugins: ['prettier', 'jsdoc'],
   rules: {
     'prettier/prettier': ['error', prettierOptions],
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: 'lodash',
+            message: 'suggest import xxx from `lodash/xxx`',
+          },
+          {
+            name: 'uuid',
+            message: 'suggest import xxx from `uuid/dist/xxx`',
+          },
+        ],
+      },
+    ],
   },
   parserOptions: {
     ecmaVersion: 2018,

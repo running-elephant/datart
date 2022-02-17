@@ -59,16 +59,12 @@ public class ShareServiceImpl extends BaseService implements ShareService {
 
     private final DownloadService downloadService;
 
-    private final UserMapperExt userMapper;
-
     public ShareServiceImpl(DataProviderService dataProviderService,
                             VizService vizService,
-                            DownloadService downloadService,
-                            UserMapperExt userMapper) {
+                            DownloadService downloadService) {
         this.dataProviderService = dataProviderService;
         this.vizService = vizService;
         this.downloadService = downloadService;
-        this.userMapper = userMapper;
     }
 
     @Override
@@ -220,7 +216,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
     private void validateVizPermission(ShareToken token, ResourceType vizType, String vizId) {
         Share share = validateBase(token);
         if (!share.getVizType().equals(vizType) || !share.getVizId().equals(vizId)) {
-            Exceptions.tr(PermissionDeniedException.class, "message.permission.denied", "viz");
+            Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied", "viz");
         }
     }
 

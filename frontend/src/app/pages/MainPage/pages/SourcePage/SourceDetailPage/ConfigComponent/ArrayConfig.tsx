@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { PlusOutlined } from '@ant-design/icons';
 import {
   Button,
@@ -7,6 +25,7 @@ import {
   Table,
   TableColumnProps,
 } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ModalForm } from 'app/components';
 import {
   Model,
@@ -54,6 +73,8 @@ export function ArrayConfig({
   const [editingRowKey, setEditingRowKey] = useState('');
   const [schemaDataSource, setSchemaDataSource] = useState<object[]>([]);
   const formRef = useRef<FormInstance<SourceFormModel>>();
+  const t = useI18NPrefix('source');
+  const tg = useI18NPrefix('global');
 
   const showForm = useCallback(() => {
     setFormVisible(true);
@@ -172,41 +193,41 @@ export function ArrayConfig({
 
   const columns: TableColumnProps<object>[] = useMemo(
     () => [
-      { title: attr.key, dataIndex: attr.key },
+      { title: attr.displayName, dataIndex: attr.key },
       {
-        title: '操作',
+        title: tg('title.action'),
         align: 'center',
         width: 120,
         render: (_, record) => (
           <Space>
             <ActionButton
-              key="view"
+              key="edit"
               type="link"
               onClick={editConfig(record[attr.key!])}
             >
-              查看
+              {tg('button.edit')}
             </ActionButton>
             {allowManage && (
               <Popconfirm
                 key="del"
-                title="确认删除？"
+                title={tg('operation.deleteConfirm')}
                 onConfirm={delConfig(record[attr.key!])}
               >
-                <ActionButton type="link">删除</ActionButton>
+                <ActionButton type="link">{tg('button.delete')}</ActionButton>
               </Popconfirm>
             )}
           </Space>
         ),
       },
     ],
-    [attr, editConfig, delConfig, allowManage],
+    [attr, editConfig, delConfig, allowManage, tg],
   );
 
   return (
     <Wrapper>
       {allowManage && !disabled && (
         <AddButton type="link" icon={<PlusOutlined />} onClick={showForm}>
-          新增配置
+          {t('form.addConfig')}
         </AddButton>
       )}
       <Table
@@ -218,7 +239,7 @@ export function ArrayConfig({
         bordered
       />
       <ModalForm
-        title={`${attr.name}配置编辑`}
+        title={t('form.editConfig')}
         visible={formVisible}
         width={SPACE_TIMES(240)}
         formProps={{

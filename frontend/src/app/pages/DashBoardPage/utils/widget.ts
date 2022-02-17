@@ -15,7 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+
+import {
+  ContainerItem,
+  WidgetType,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
@@ -24,13 +28,14 @@ import produce from 'immer';
 import { DeltaStatic } from 'quill';
 import { CSSProperties } from 'react';
 import { FONT_FAMILY, G90, WHITE } from 'styles/StyleConstants';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from 'utils/utils';
 import { convertImageUrl, fillPx } from '.';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
   BorderDefault,
   ButtonBorderDefault,
+  LAYOUT_COLS_MAP,
   QueryButtonWidgetBackgroundDefault,
 } from '../constants';
 import {
@@ -38,7 +43,6 @@ import {
   BoardType,
   BorderConfig,
   ChartWidgetContent,
-  ContainerItem,
   ContainerWidgetContent,
   ContainerWidgetType,
   ControllerWidgetContent,
@@ -58,35 +62,54 @@ import {
   WidgetInfo,
   WidgetPadding,
 } from '../pages/Board/slice/types';
+import { StrControlTypes } from '../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { ControllerConfig } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { BtnActionParams } from '../pages/BoardEditor/slice/actions/controlActions';
 
 export const VALUE_SPLITTER = '###';
 
-export const createDataChartWidget = (opt: {
-  dashboardId: string;
+export const createControllerWidget = (opt: {
+  boardId: string;
   boardType: BoardType;
-  dataChartId: string;
-  dataChartConfig: DataChart;
-  viewId: string;
-  subType: WidgetContentChartType;
+  relations: Relation[];
+  name?: string;
+  controllerType: ControllerFacadeTypes;
+  views: RelatedView[];
+  config: ControllerConfig;
+  viewIds: string[];
 }) => {
-  const content = createChartWidgetContent(opt.subType);
+  const {
+    boardId,
+    boardType,
+    views,
+    config,
+    controllerType,
+    relations,
+    name = 'newController',
+  } = opt;
+  const content: ControllerWidgetContent = {
+    type: controllerType,
+    relatedViews: views,
+    name: name,
+    config: config,
+  };
+
   const widgetConf = createInitWidgetConfig({
-    type: 'chart',
+    name: name,
+    type: 'controller',
     content: content,
-    boardType: opt.boardType,
-    name: opt.dataChartConfig.name,
+    boardType: boardType,
   });
+
+  const widgetId = relations[0]?.sourceId || uuidv4();
   const widget: Widget = createWidget({
-    dashboardId: opt.dashboardId,
-    datachartId: opt.dataChartId,
-    viewIds: opt.viewId ? [opt.viewId] : [],
+    id: widgetId,
+    dashboardId: boardId,
     config: widgetConf,
+    relations,
   });
   return widget;
 };
-
 export const createMediaWidget = (opt: {
   dashboardId: string;
   boardType: BoardType;
@@ -104,7 +127,6 @@ export const createMediaWidget = (opt: {
   });
   return widget;
 };
-
 export const createContainerWidget = (opt: {
   dashboardId: string;
   boardType: BoardType;
@@ -122,11 +144,10 @@ export const createContainerWidget = (opt: {
   });
   return widget;
 };
-
 export const createControlBtn = (opt: BtnActionParams) => {
   const content = { type: opt.type };
   const widgetConf = createInitWidgetConfig({
-    name: opt.type === 'query' ? '查询' : '重置',
+    name: '',
     type: opt.type as WidgetType,
     content: content,
     boardType: opt.boardType,
@@ -137,7 +158,6 @@ export const createControlBtn = (opt: BtnActionParams) => {
   });
   return widget;
 };
-
 export const createInitWidgetConfig = (opt: {
   type: WidgetType;
   content: WidgetContent;
@@ -148,9 +168,10 @@ export const createInitWidgetConfig = (opt: {
   frequency?: number;
 }): WidgetConf => {
   return {
+    version: '',
     type: opt.type,
     index: opt.index || 0,
-    name: opt.name || `${opt.type}_${opt.content.type}`,
+    name: opt.name || '',
     linkageConfig: {
       open: false,
       chartGroupColumns: [],
@@ -178,15 +199,6 @@ export const createInitWidgetConfig = (opt: {
     padding: createWidgetPadding(opt.type),
   };
 };
-
-export const fontDefault = {
-  fontFamily: FONT_FAMILY,
-  fontSize: '14',
-  fontWeight: 'normal',
-  fontStyle: 'normal',
-  color: G90,
-};
-
 export const createWidget = (option: {
   dashboardId: string;
   config: WidgetConf;
@@ -197,7 +209,7 @@ export const createWidget = (option: {
   relations?: Relation[];
 }) => {
   const widget: Widget = {
-    id: option.id || uuidv4(),
+    id: option.id || 'newWidget_' + uuidv4(),
     dashboardId: option.dashboardId,
     config: option.config,
     datachartId: option.datachartId || '',
@@ -207,6 +219,14 @@ export const createWidget = (option: {
   };
   return widget;
 };
+export const fontDefault = {
+  fontFamily: FONT_FAMILY,
+  fontSize: '14',
+  fontWeight: 'normal',
+  fontStyle: 'normal',
+  color: G90,
+};
+
 export const createWidgetInfo = (id: string): WidgetInfo => {
   const widgetInfo: WidgetInfo = {
     id: id,
@@ -379,180 +399,6 @@ export const createMediaContent = (type: MediaWidgetType) => {
   return content;
 };
 
-export const createControllerWidget = (params: {
-  boardId: string;
-  boardType: BoardType;
-  relations: Relation[];
-  name?: string;
-  controllerType: ControllerFacadeTypes;
-  views: RelatedView[];
-  config: ControllerConfig;
-  hasVariable: boolean;
-}) => {
-  const {
-    boardId,
-    boardType,
-    views,
-    config,
-    controllerType,
-    relations,
-    name = 'newController',
-  } = params;
-  const content: ControllerWidgetContent = {
-    type: controllerType,
-    relatedViews: views,
-    name: name,
-    config: config,
-  };
-
-  const widgetConf = createInitWidgetConfig({
-    name: name,
-    type: 'controller',
-    content: content,
-    boardType: boardType,
-  });
-
-  const widgetId = relations[0]?.sourceId || uuidv4();
-  const widget: Widget = createWidget({
-    id: widgetId,
-    dashboardId: boardId,
-    config: widgetConf,
-    relations,
-  });
-  return widget;
-};
-
-// TODO chart widget
-export const getWidgetMapByServer = (
-  widgets: ServerWidget[],
-  dataCharts: DataChart[],
-  filterSearchParamsMap?: FilterSearchParamsWithMatch,
-) => {
-  const filterSearchParams = filterSearchParamsMap?.params,
-    isMatchByName = filterSearchParamsMap?.isMatchByName;
-  const dataChartMap = dataCharts.reduce((acc, cur) => {
-    acc[cur.id] = cur;
-    return acc;
-  }, {} as Record<string, DataChart>);
-  const widgetMap = widgets.reduce((acc, cur) => {
-    const viewIds = cur.datachartId
-      ? [dataChartMap[cur.datachartId].viewId]
-      : cur.viewIds;
-    try {
-      let widget: Widget = {
-        ...cur,
-        config: JSON.parse(cur.config),
-        relations: convertWidgetRelationsToObj(cur.relations),
-        viewIds,
-      };
-      // TODO migration about font 5 --xld
-      widget.config.nameConfig = {
-        ...fontDefault,
-        ...widget.config.nameConfig,
-      };
-      // TODO migration about filter --xld
-      if ((widget.config.type as any) !== 'filter') {
-        acc[cur.id] = widget;
-      }
-      return acc;
-    } catch (error) {
-      return acc;
-    }
-  }, {} as Record<string, Widget>);
-
-  const wrappedDataCharts: DataChart[] = [];
-  const controllerWidgets: Widget[] = [];
-  Object.values(widgetMap).forEach(widget => {
-    // 处理 widget包含关系
-    if (widget.parentId) {
-      const parentWidgetId = widget.parentId;
-      const childTabId = widget.config.tabId as string;
-      const curItem = (
-        widgetMap[parentWidgetId].config.content as ContainerWidgetContent
-      ).itemMap[childTabId];
-      if (curItem) {
-        curItem.childWidgetId = widget.id;
-        curItem.name = widget.config.name;
-      } else {
-        let newItem: ContainerItem = {
-          tabId: childTabId,
-          name: widget.config.name,
-          childWidgetId: widget.id,
-        };
-        (
-          widgetMap[parentWidgetId].config.content as ContainerWidgetContent
-        ).itemMap[childTabId] = newItem;
-      }
-    }
-
-    // 处理 controller config visibility依赖关系 id, url参数修改filter
-    if (widget.config.type === 'controller') {
-      const content = widget.config.content as ControllerWidgetContent;
-      // 根据 url参数修改filter 默认值
-      if (filterSearchParams) {
-        const paramsKey = Object.keys(filterSearchParams);
-        const macthKey = isMatchByName ? widget.config.name : widget.id;
-        if (paramsKey.includes(macthKey)) {
-          const _value = isMatchByName
-            ? filterSearchParams[widget.config.name]
-            : filterSearchParams[widget.id];
-          switch (content?.type) {
-            case ControllerFacadeTypes.RangeTime:
-              if (
-                content.config.controllerDate &&
-                content.config.controllerDate?.startTime &&
-                content.config.controllerDate?.endTime
-              ) {
-                content.config.controllerDate.startTime.exactValue =
-                  _value?.[0];
-                content.config.controllerDate.endTime.exactValue = _value?.[0];
-              }
-              break;
-            default:
-              content.config.controllerValues = _value || [];
-              break;
-          }
-        }
-      }
-      // 适配filter 的可见性
-      const { visibilityType: visibility, condition } =
-        content.config.visibility;
-      const { relations } = widget;
-      if (visibility === 'condition' && condition) {
-        const dependentFilterId = relations
-          .filter(re => re.config.type === 'controlToControl')
-          .map(re => re.targetId)?.[0];
-        if (dependentFilterId) {
-          condition.dependentControllerId = dependentFilterId;
-        }
-      }
-
-      //处理 assistViewField
-      if (typeof content?.config?.assistViewFields === 'string') {
-        content.config.assistViewFields = (
-          content.config.assistViewFields as string
-        ).split(VALUE_SPLITTER);
-      }
-      // use for reset button
-      controllerWidgets.push(widget);
-    }
-
-    // 处理 自有 chart widget
-
-    if (widget.config.content.type === 'widgetChart') {
-      let content = widget.config.content as ChartWidgetContent;
-      widget.datachartId = content.dataChart?.id || '';
-      wrappedDataCharts.push(content.dataChart!);
-      delete content.dataChart;
-    }
-  });
-
-  return {
-    widgetMap,
-    wrappedDataCharts,
-    controllerWidgets,
-  };
-};
 export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {
   const widgetInfoMap = {};
   Object.values(widgetMap).forEach(item => {
@@ -567,7 +413,7 @@ export const updateWidgetsRect = (
   layouts?: ReactGridLayout.Layout[],
 ) => {
   if (boardConfig.type === 'auto') {
-    return updateAutoWidgetsRect(boardConfig, widgets, layouts || []);
+    return updateAutoWidgetsRect(widgets, layouts || []);
   } else if (boardConfig.type === 'free') {
     return updateFreeWidgetsRect(widgets);
   }
@@ -575,7 +421,6 @@ export const updateWidgetsRect = (
 };
 
 export const updateAutoWidgetsRect = (
-  boardConfig: DashboardConfig,
   widgets: Widget[],
   layouts: ReactGridLayout.Layout[],
 ): Widget[] => {
@@ -585,7 +430,7 @@ export const updateAutoWidgetsRect = (
   let itemYs = [...dashWidgetRectYs];
   widgets.forEach(widget => {
     const itemX =
-      (widgetsCount * widget.config.rect.width) % boardConfig.cols.lg;
+      (widgetsCount * widget.config.rect.width) % LAYOUT_COLS_MAP.lg;
     const itemY = Math.max(...itemYs, 0);
     const nextRect = {
       ...widget.config.rect,
@@ -666,21 +511,6 @@ export const convertWidgetRelationsToSave = (
   });
 };
 
-export const convertWidgetRelationsToObj = (
-  relations: ServerRelation[] = [],
-): Relation[] => {
-  return relations.map(relation => {
-    try {
-      return { ...relation, config: JSON.parse(relation.config) };
-    } catch (error) {
-      return {
-        ...relation,
-        config: { RelatedViewMap: {}, filterCovered: false },
-      };
-    }
-  });
-};
-
 export const convertToWidgetMap = (widgets: Widget[]) => {
   return widgets.reduce((acc, cur) => {
     acc[cur.id] = cur;
@@ -738,17 +568,11 @@ export const getOtherStringControlWidgets = (
       return false;
     }
     const content = ele.config.content as ControllerWidgetContent;
-    const strControlTypes = [
-      ControllerFacadeTypes.DropdownList,
-      ControllerFacadeTypes.MultiDropdownList,
-      ControllerFacadeTypes.RadioGroup,
-    ];
-    return strControlTypes.includes(content.type);
+    return StrControlTypes.includes(content.type);
   });
   if (!widgetId) {
     return allFilterWidgets;
   } else {
-    // 自己不能关联自己 把自己排除
     return allFilterWidgets.filter(ele => ele.id !== widgetId);
   }
 };
@@ -805,9 +629,6 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
         }
         const content = dependWidget.config.content as ControllerWidgetContent;
         const dependWidgetValue = content.config.controllerValues?.[0];
-        // if (!dependWidgetValue) {
-        //   return false;
-        // }
         if (relation === FilterSqlOperator.Equal) {
           return targetValue === dependWidgetValue;
         }
@@ -823,14 +644,20 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
   return noHiddenControlWidgets;
 };
 
-export const getNeedRefreshWidgetsByFilter = (filterWidget: Widget) => {
-  const relations = filterWidget.relations;
+export const getNeedRefreshWidgetsByController = (controller: Widget) => {
+  const relations = controller.relations;
   const widgetIds = relations
     .filter(ele => ele.config.type === 'controlToWidget')
     .map(ele => ele.targetId);
   return widgetIds;
 };
-
+export const getCascadeControllers = (controller: Widget) => {
+  const relations = controller.relations;
+  const ids = relations
+    .filter(ele => ele.config.type === 'controlToControlCascade')
+    .map(ele => ele.targetId);
+  return ids;
+};
 // getWidgetStyle start
 export const getWidgetStyle = (boardType: BoardType, widget: Widget) => {
   return boardType === 'auto'
@@ -930,20 +757,6 @@ export const getWidgetSomeStyle = (opt: {
 
 // get some css end
 // Controller
-export const getCanLinkControlWidgets = (widgets: Widget[]) => {
-  const CanLinkControllerWidgetTypes: WidgetType[] = ['chart'];
-
-  const canLinkWidgets = widgets.filter(widget => {
-    if (widget.viewIds.length === 0) {
-      return false;
-    }
-    if (CanLinkControllerWidgetTypes.includes(widget.config.type)) {
-      return true;
-    }
-    return false;
-  });
-  return canLinkWidgets;
-};
 
 export const getLinkedColumn = (
   targetWidgetId: string,
@@ -957,4 +770,121 @@ export const getLinkedColumn = (
     relation?.config?.widgetToWidget?.triggerColumn ||
     ''
   );
+};
+
+// TODO chart widget
+export const getWidgetMap = (
+  widgets: Widget[],
+  dataCharts: DataChart[],
+  filterSearchParamsMap?: FilterSearchParamsWithMatch,
+) => {
+  const filterSearchParams = filterSearchParamsMap?.params,
+    isMatchByName = filterSearchParamsMap?.isMatchByName;
+  const dataChartMap = dataCharts.reduce((acc, cur) => {
+    acc[cur.id] = cur;
+    return acc;
+  }, {} as Record<string, DataChart>);
+  const widgetMap = widgets.reduce((acc, cur) => {
+    // issues #601
+    const chartViewId = dataChartMap[cur.datachartId]?.viewId;
+    const viewIds = chartViewId ? [chartViewId] : cur.viewIds;
+    acc[cur.id] = {
+      ...cur,
+      viewIds,
+    };
+    return acc;
+  }, {} as Record<string, Widget>);
+
+  const wrappedDataCharts: DataChart[] = [];
+  const controllerWidgets: Widget[] = []; // use for reset button
+  const widgetList = Object.values(widgetMap);
+
+  // 处理 widget包含关系 containerWidget 被包含的 widget.parentId 不为空
+  widgetList
+    .filter(w => w.parentId)
+    .forEach(widget => {
+      const parentWidgetId = widget.parentId!;
+      const childTabId = widget.config.tabId as string;
+      const curItem = (
+        widgetMap[parentWidgetId].config.content as ContainerWidgetContent
+      ).itemMap[childTabId];
+      if (curItem) {
+        curItem.childWidgetId = widget.id;
+        curItem.name = widget.config.name;
+      } else {
+        let newItem: ContainerItem = {
+          tabId: childTabId,
+          name: widget.config.name,
+          childWidgetId: widget.id,
+        };
+        (
+          widgetMap[parentWidgetId].config.content as ContainerWidgetContent
+        ).itemMap[childTabId] = newItem;
+      }
+    });
+
+  // 处理 controller config visibility依赖关系 id, url参数修改filter
+  widgetList
+    .filter(w => w.config.type === 'controller')
+    .forEach(widget => {
+      const content = widget.config.content as ControllerWidgetContent;
+      // 根据 url参数修改filter 默认值
+      if (filterSearchParams) {
+        const paramsKey = Object.keys(filterSearchParams);
+        const matchKey = isMatchByName ? widget.config.name : widget.id;
+        if (paramsKey.includes(matchKey)) {
+          const _value = isMatchByName
+            ? filterSearchParams[widget.config.name]
+            : filterSearchParams[widget.id];
+          switch (content?.type) {
+            case ControllerFacadeTypes.RangeTime:
+              if (
+                content.config.controllerDate &&
+                content.config.controllerDate?.startTime &&
+                content.config.controllerDate?.endTime
+              ) {
+                content.config.controllerDate.startTime.exactValue =
+                  _value?.[0];
+                content.config.controllerDate.endTime.exactValue = _value?.[0];
+              }
+              break;
+            default:
+              content.config.controllerValues = _value || [];
+              break;
+          }
+        }
+      }
+
+      // 通过widget.relation 那里面的 targetId确定 关联controllerWidget 的真实ID
+      const { visibilityType: visibility, condition } =
+        content.config.visibility;
+      const { relations } = widget;
+      if (visibility === 'condition' && condition) {
+        const dependentFilterId = relations
+          .filter(re => re.config.type === 'controlToControl')
+          .map(re => re.targetId)?.[0];
+        if (dependentFilterId) {
+          condition.dependentControllerId = dependentFilterId;
+        }
+      }
+      controllerWidgets.push(widget);
+    });
+
+  // 处理 自有 chart widgetControl
+  widgetList
+    .filter(w => w.config.content.type === 'widgetChart')
+    .forEach(widget => {
+      let content = widget.config.content as ChartWidgetContent;
+      const self_dataChartId = `widget_${widget.dashboardId}_${widget.id}`;
+      content.dataChart!.id = self_dataChartId;
+      widget.datachartId = self_dataChartId;
+      wrappedDataCharts.push(content.dataChart!);
+      delete content.dataChart;
+    });
+
+  return {
+    widgetMap,
+    wrappedDataCharts,
+    controllerWidgets,
+  };
 };

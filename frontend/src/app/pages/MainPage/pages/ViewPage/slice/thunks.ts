@@ -1,11 +1,31 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import sqlReservedWords from 'app/assets/javascripts/sqlReservedWords';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
+import i18n from 'i18next';
 import { monaco } from 'react-monaco-editor';
 import { RootState } from 'types';
 import { request } from 'utils/request';
 import { errorHandle, rejectHandle } from 'utils/utils';
 import { viewActions } from '.';
+import { View } from '../../../../../types/View';
 import { selectVariables } from '../../VariablePage/slice/selectors';
 import { Variable } from '../../VariablePage/slice/types';
 import { ViewViewModelStages } from '../constants';
@@ -14,6 +34,7 @@ import {
   generateNewEditingViewName,
   getSaveParamsFromViewModel,
   isNewView,
+  transformModelToViewModel,
 } from '../utils';
 import {
   selectCurrentEditingView,
@@ -31,7 +52,6 @@ import {
   UnarchiveViewParams,
   UpdateViewBaseParams,
   VariableHierarchy,
-  View,
   ViewBase,
   ViewSimple,
   ViewViewModel,
@@ -93,37 +113,15 @@ export const getViewDetail = createAsyncThunk<
     const viewSimple = views?.find(v => v.id === viewId);
     const tempViewModel = generateEditingView({
       id: viewId,
-      name: viewSimple?.name || '加载中...',
+      name: viewSimple?.name || i18n.t('view.loading'),
       stage: ViewViewModelStages.Loading,
     });
+
     dispatch(viewActions.addEditingView(tempViewModel));
 
     try {
       const { data } = await request<View>(`/views/${viewId}`);
-      const {
-        config,
-        model,
-        variables,
-        relVariableSubjects,
-        relSubjectColumns,
-        ...rest
-      } = data;
-      return {
-        ...tempViewModel,
-        ...rest,
-        config: JSON.parse(config),
-        model: JSON.parse(model),
-        originVariables: variables.map(v => ({ ...v, relVariableSubjects })),
-        variables: variables.map(v => ({ ...v, relVariableSubjects })),
-        originColumnPermissions: relSubjectColumns.map(r => ({
-          ...r,
-          columnPermission: JSON.parse(r.columnPermission),
-        })),
-        columnPermissions: relSubjectColumns.map(r => ({
-          ...r,
-          columnPermission: JSON.parse(r.columnPermission),
-        })),
-      };
+      return transformModelToViewModel(data, tempViewModel);
     } catch (error) {
       return rejectHandle(error, rejectWithValue);
     }
@@ -141,7 +139,7 @@ export const runSql = createAsyncThunk<
   const { script, sourceId, size, fragment, variables } = currentEditingView;
 
   if (!sourceId) {
-    return rejectWithValue('请选择数据源');
+    return rejectWithValue(i18n.t('view.selectSource'));
   }
 
   if (!script.trim()) {
@@ -149,7 +147,7 @@ export const runSql = createAsyncThunk<
   }
 
   try {
-    const { data } = await request<QueryResult>({
+    const { data, warnings } = await request<QueryResult>({
       url: '/data-provider/execute/test',
       method: 'POST',
       data: {
@@ -167,7 +165,7 @@ export const runSql = createAsyncThunk<
         ),
       },
     });
-    return data;
+    return { ...data, warnings };
   } catch (error) {
     return rejectHandle(error, rejectWithValue);
   }
@@ -177,20 +175,21 @@ export const saveView = createAsyncThunk<
   ViewViewModel,
   SaveViewParams,
   { state: RootState }
->('view/saveView', async ({ resolve }, { getState }) => {
-  const currentEditingView = selectCurrentEditingView(
-    getState(),
-  ) as ViewViewModel;
+>('view/saveView', async ({ resolve, isSaveAs, currentView }, { getState }) => {
+  const currentEditingView = isSaveAs
+    ? (currentView as ViewViewModel)
+    : (selectCurrentEditingView(getState()) as ViewViewModel);
   const orgId = selectOrgId(getState());
 
   try {
-    if (isNewView(currentEditingView.id)) {
+    if (isNewView(currentEditingView.id) || isSaveAs) {
       const { data } = await request<View>({
         url: '/views',
         method: 'POST',
         data: getSaveParamsFromViewModel(orgId, currentEditingView),
       });
       resolve && resolve();
+
       return {
         ...currentEditingView,
         ...data,
@@ -200,6 +199,7 @@ export const saveView = createAsyncThunk<
           ...v,
           relVariableSubjects: data.relVariableSubjects,
         })),
+        isSaveAs,
       };
     } else {
       await request<View>({

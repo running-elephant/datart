@@ -38,4 +38,8 @@ const StyledFromItemEx = styled(Form.Item)`
   .ant-form-item-explain {
     padding-left: 10px;
   }
+
+  .ant-form-item-control-input {
+    width: 100%;
+  }
 `;

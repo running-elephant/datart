@@ -17,25 +17,40 @@
  */
 
 import { InputNumber } from 'antd';
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
-import { FC, memo } from 'react';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
+import debounce from 'lodash/debounce';
+import { FC, memo, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS } from 'styles/StyleConstants';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
-const BasicInputNumber: FC<ItemLayoutProps<ChartStyleSectionConfig>> = memo(
-  ({ ancestors, translate: t = title => title, data: row, onChange }) => {
-    const { comType, options, ...rest } = row;
+const BasicInputNumber: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+  ({ ancestors, translate: t = title => title, data, onChange }) => {
+    const [cache, setCache] = useState(data);
+    const { comType, options, disabled, label, ...rest } = cache;
+
+    const debouncedDataChange = useMemo(
+      () =>
+        debounce(value => {
+          onChange?.(ancestors, value, options?.needRefresh);
+        }, 500),
+      [ancestors, onChange, options?.needRefresh],
+    );
 
     return (
-      <Wrapper label={t(row.label)}>
+      <Wrapper label={t(data?.label, true)}>
         <InputNumber
+          disabled={data?.disabled}
           {...rest}
           {...options}
-          onChange={value => onChange?.(ancestors, value)}
-          defaultValue={rest?.default}
+          onChange={value => {
+            const newCache = Object.assign({}, cache, { value });
+            setCache(newCache);
+            debouncedDataChange(newCache.value);
+          }}
+          defaultValue={cache?.default}
         />
       </Wrapper>
     );
@@ -60,5 +75,9 @@ const Wrapper = styled(BW)`
 
   .ant-input-number-handler-wrap {
     background-color: ${p => p.theme.emphasisBackground};
+  }
+
+  .ant-input-number-disabled {
+    background-color: ${p => p.theme.textColorDisabled};
   }
 `;

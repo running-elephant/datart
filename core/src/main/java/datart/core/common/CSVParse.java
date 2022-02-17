@@ -17,9 +17,7 @@
  */
 package datart.core.common;
 
-import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
-import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
 import lombok.Data;
 import org.apache.commons.csv.CSVFormat;
@@ -31,7 +29,6 @@ import org.springframework.util.CollectionUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -40,15 +37,7 @@ import java.util.stream.Collectors;
 
 public class CSVParse {
 
-    public static final ParseConfig DEFAULT_CONFIG = new ParseConfig();
-
-    static {
-        DEFAULT_CONFIG.setDateFormat(Const.DEFAULT_DATE_FORMAT);
-    }
-
     private String path;
-
-    private ParseConfig parseConfig;
 
     private ValueType[] types;
 
@@ -57,7 +46,6 @@ public class CSVParse {
     public static CSVParse create(String path, ParseConfig parseConfig) {
         CSVParse csvParse = new CSVParse();
         csvParse.path = path;
-        csvParse.parseConfig = parseConfig;
         csvParse.simpleDateFormat = new SimpleDateFormat(parseConfig.getDateFormat());
         return csvParse;
     }
@@ -65,7 +53,6 @@ public class CSVParse {
     public static CSVParse create(String path) {
         CSVParse csvParse = new CSVParse();
         csvParse.path = path;
-        csvParse.parseConfig = DEFAULT_CONFIG;
         return csvParse;
     }
 
@@ -83,8 +70,14 @@ public class CSVParse {
         } else {
             types = inferDataType(records.get(1));
         }
-        return records.parallelStream().map(this::extractValues)
+        List<List<Object>> values = records.parallelStream().map(this::extractValues)
                 .collect(Collectors.toList());
+        // remove utf-8-with-bom char
+        String start = values.get(0).get(0).toString();
+        if (start.charAt(0) == '\uFEFF') {
+            values.get(0).set(0, start.substring(1));
+        }
+        return values;
     }
 
     private ValueType[] inferDataType(CSVRecord record) {
@@ -111,30 +104,9 @@ public class CSVParse {
         }
         LinkedList<Object> values = new LinkedList<>();
         for (int i = 0; i < record.size(); i++) {
-            Object val;
-            try {
-                val = parseValue(record.get(i), types[i]);
-            } catch (Exception e) {
-                val = record.get(i);
-            }
-            values.add(val);
+            values.add(record.get(i));
         }
         return values;
-    }
-
-    private Object parseValue(String val, ValueType valueType) throws ParseException {
-        switch (valueType) {
-            case DATE:
-                return simpleDateFormat.parse(val);
-            case NUMERIC:
-                if (NumberUtils.isDigits(val)) {
-                    return Long.parseLong(val);
-                } else {
-                    return Double.parseDouble(val);
-                }
-            default:
-                return val;
-        }
     }
 
     @Data

@@ -31,3 +31,8 @@ yarn-error.log*
 
 # vscode
 .vscode
+
+# docs
+/types
+
+/public/task

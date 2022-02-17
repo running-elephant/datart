@@ -23,9 +23,9 @@ import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.SingleTypedValue;
 import datart.core.data.provider.sql.*;
-import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.custom.CustomSqlBetweenOperator;
 import datart.data.provider.calcite.dialect.FetchAndOffsetSupport;
+import datart.data.provider.jdbc.SqlSplitter;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlBetweenOperator;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
@@ -61,6 +61,11 @@ public class SqlBuilder {
 
 
     public SqlBuilder withBaseSql(String sql) {
+        if (StringUtils.isNotBlank(sql)) {
+            sql = removeEndDelimiter(sql);
+        }
+        sql = StringUtils.appendIfMissing(sql," "," ");
+        sql = StringUtils.prependIfMissing(sql," "," ");
         this.srcSql = sql;
         return this;
     }
@@ -90,6 +95,10 @@ public class SqlBuilder {
      * SELECT [[group columns],[agg columns]] FROM (SQL) T <filters> <groups> <orders>
      */
     public String build() throws SqlParseException {
+
+        if (executeParam == null) {
+            return srcSql;
+        }
 
         final SqlNodeList selectList = new SqlNodeList(SqlParserPos.ZERO);
 
@@ -187,7 +196,7 @@ public class SqlBuilder {
         }
 
         SqlNode from = new SqlBasicCall(SqlStdOperatorTable.AS
-                , new SqlNode[]{new SqlFragment("(" + srcSql + ")"), new SqlIdentifier(T, SqlParserPos.ZERO)}
+                , new SqlNode[]{new SqlFragment("(" + srcSql + ")"), new SqlIdentifier(T, SqlParserPos.ZERO.withQuoting(true))}
                 , SqlParserPos.ZERO);
 
         if (selectList.size() == 0) {
@@ -436,10 +445,23 @@ public class SqlBuilder {
             case COUNT_DISTINCT:
                 return SqlStdOperatorTable.COUNT;
             default:
-                Exceptions.msg( "message.provider.sql.type.unsupported", sqlOperator.name());
+                Exceptions.msg("message.provider.sql.type.unsupported", sqlOperator.name());
         }
         return null;
     }
 
+    private String removeEndDelimiter(String sql) {
+        if (StringUtils.isBlank(sql)) {
+            return sql;
+        }
+        sql = sql.trim();
+        sql = StringUtils.removeEnd(sql, SqlSplitter.DEFAULT_DELIMITER + "");
+        sql = sql.trim();
+        if (sql.endsWith(SqlSplitter.DEFAULT_DELIMITER + "")) {
+            return removeEndDelimiter(sql);
+        } else {
+            return sql;
+        }
+    }
 
 }

@@ -28,7 +28,11 @@ export const Formats = [
   'link',
   'color',
   'tag',
-  'calcfield',
   'mention',
   'image',
+  'size',
+  'background',
+  'font',
+  'align',
+  'code-block',
 ];

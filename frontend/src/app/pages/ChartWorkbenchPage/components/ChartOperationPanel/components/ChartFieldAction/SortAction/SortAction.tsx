@@ -20,38 +20,34 @@ import { CheckOutlined } from '@ant-design/icons';
 import { Col, Menu, Radio, Row, Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import DraggableList from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/SortAction/DraggableList';
-import {
-  ChartDataSectionField,
-  SortActionType,
-} from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
-import { getValueByColumnKey, transfromToObjectArray } from 'app/utils/chartHelper';
+import { ChartDataSectionField, SortActionType } from 'app/types/ChartConfig';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
+import { transformToDataSet } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
+import { isEmpty } from 'utils/object';
 
 const SortAction: FC<{
   config: ChartDataSectionField;
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   onConfigChange: (
     config: ChartDataSectionField,
     needRefresh?: boolean,
   ) => void;
   mode?: 'menu';
-}> = ({ config, dataset, mode, onConfigChange }) => {
-  const actionNeedNewRequest = true;
+  options?;
+}> = ({ config, dataset, mode, options, onConfigChange }) => {
+  const actionNeedNewRequest = isEmpty(options?.backendSort)
+    ? true
+    : Boolean(options?.backendSort);
   const t = useI18NPrefix(`viz.palette.data.actions`);
   const [direction, setDirection] = useState(config?.sort?.type);
   const [sortValue, setSortValue] = useState(() => {
-    const objDataColumns = transfromToObjectArray(
-      dataset?.rows,
-      dataset?.columns,
-    );
+    const objDataColumns = transformToDataSet(dataset?.rows, dataset?.columns);
     return (
       config?.sort?.value ||
-      Array.from(
-        new Set(objDataColumns?.map(c => c[getValueByColumnKey(config)])),
-      )
+      Array.from(new Set(objDataColumns?.map(c => c.getCell(config))))
     );
   });
 

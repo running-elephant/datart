@@ -16,39 +16,40 @@
  * limitations under the License.
  */
 
-import {
-  ChartDataSectionConfig,
-  ChartDataSectionField,
-} from 'app/types/ChartConfig';
-import ChartDataset from 'app/types/ChartDataset';
+import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import FilterControllPanel from '../FilterControlPanel';
 
 const FilterAction: FC<{
   config: ChartDataSectionField;
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   dataView?: ChartDataView;
-  dataConfig?: ChartDataSectionConfig;
+  dataConfig?: ChartDataConfig;
+  aggregation?: boolean;
   onConfigChange: (
     config: ChartDataSectionField,
     needRefresh?: boolean,
   ) => void;
-}> = memo(({ config, dataset, dataView, dataConfig, onConfigChange }) => {
-  const handleFetchDataFromField = async fieldId => {
-    // TODO: tobe implement to get fields
-    return await Promise.resolve(['a', 'b', 'c'].map(f => `${fieldId}-${f}`));
-  };
-  return (
-    <FilterControllPanel
-      config={config}
-      dataset={dataset}
-      dataConfig={dataConfig}
-      dataView={dataView}
-      onConfigChange={onConfigChange}
-      fetchDataByField={handleFetchDataFromField}
-    />
-  );
-});
+}> = memo(
+  ({ config, dataset, dataView, dataConfig, onConfigChange, aggregation }) => {
+    const handleFetchDataFromField = async fieldId => {
+      // TODO: tobe implement to get fields
+      return await Promise.resolve(['a', 'b', 'c'].map(f => `${fieldId}-${f}`));
+    };
+    return (
+      <FilterControllPanel
+        aggregation={aggregation}
+        config={config}
+        dataset={dataset}
+        dataConfig={dataConfig}
+        dataView={dataView}
+        onConfigChange={onConfigChange}
+        fetchDataByField={handleFetchDataFromField}
+      />
+    );
+  },
+);
 
 export default FilterAction;

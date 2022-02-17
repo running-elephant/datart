@@ -18,9 +18,10 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import workbenchSlice, {
-  BackendChart,
+  aggregationSelector,
   backendChartSelector,
   ChartConfigReducerActionType,
   chartConfigSelector,
@@ -31,15 +32,25 @@ import workbenchSlice, {
   shadowChartConfigSelector,
   updateChartAction,
   updateChartConfigAndRefreshDatasetAction,
+  updateRichTextAction,
   useWorkbenchSlice,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { useAddViz } from 'app/pages/MainPage/pages/VizPage/hooks/useAddViz';
+import { SaveForm } from 'app/pages/MainPage/pages/VizPage/SaveForm';
+import {
+  SaveFormContext,
+  useSaveFormContext,
+} from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
+import { IChart } from 'app/types/Chart';
+import { ChartDTO } from 'app/types/ChartDTO';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
+import { CommonFormTypes } from 'globalConstants';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { CloneValueDeep } from 'utils/object';
 import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
-import Chart from '../pages/ChartWorkbenchPage/models/Chart';
 import ChartManager from '../pages/ChartWorkbenchPage/models/ChartManager';
 import {
   DataChart,
@@ -53,7 +64,14 @@ export interface ChartEditorBaseProps {
   container: 'widget' | 'dataChart';
   chartType: WidgetContentChartType;
   widgetId?: string;
-  originChart?: BackendChart | DataChart;
+  defaultViewId?: string;
+  originChart?: ChartDTO | DataChart;
+}
+export interface HistoryState {
+  dataChartId: string;
+  orgId: string;
+  container: 'widget' | 'dataChart';
+  chartType: WidgetContentChartType;
 }
 export interface ChartEditorMethodsProps {
   onClose?: () => void;
@@ -65,16 +83,19 @@ export interface ChartEditorMethodsProps {
   onSaveInDataChart?: (orgId: string, dataChartId: string) => void;
 }
 export type ChartEditorProps = ChartEditorBaseProps & ChartEditorMethodsProps;
+
 export const ChartEditor: React.FC<ChartEditorProps> = ({
   originChart,
   orgId,
   container,
   dataChartId,
   chartType,
+  defaultViewId,
   onClose,
   onSaveInWidget,
   onSaveInDataChart,
 }) => {
+  const saveFormContextValue = useSaveFormContext();
   const { actions } = useWorkbenchSlice();
   const dispatch = useDispatch();
   const dataset = useSelector(datasetsSelector);
@@ -82,12 +103,25 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const chartConfig = useSelector(chartConfigSelector);
   const shadowChartConfig = useSelector(shadowChartConfigSelector);
   const backendChart = useSelector(backendChartSelector);
-  const [chart, setChart] = useState<Chart>();
+  const aggregation = useSelector(aggregationSelector);
+  const [chart, setChart] = useState<IChart>();
+  const history = useHistory();
+  const addVizFn = useAddViz({
+    showSaveForm: saveFormContextValue.showSaveForm,
+  });
+  const tg = useI18NPrefix('global');
 
   useMount(
     () => {
-      const currentChart = ChartManager.instance().getDefaultChart();
-      handleChartChange(currentChart);
+      if (
+        (container === 'dataChart' && !dataChartId) ||
+        (container === 'widget' && !originChart)
+      ) {
+        // Note: add default chart if new to editor
+        const currentChart = ChartManager.instance().getDefaultChart();
+        handleChartChange(currentChart);
+      }
+
       if (container === 'dataChart') {
         dispatch(
           initWorkbenchAction({
@@ -101,9 +135,13 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           dispatch(
             initWorkbenchAction({
               orgId,
-              backendChart: originChart as BackendChart,
+              backendChart: originChart as ChartDTO,
             }),
           );
+
+          if (!originChart) {
+            dispatch(actions.updateChartAggregation(true));
+          }
         } else {
           // chartType === 'dataChart'
           dispatch(
@@ -129,9 +167,68 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       setChart(currentChart);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [backendChart]);
+  }, [backendChart?.config?.chartGraphId]);
 
-  const handleChartChange = (c: Chart) => {
+  const registerChartEvents = useCallback(
+    chart => {
+      chart?.registerMouseEvents([
+        {
+          name: 'click',
+          callback: param => {
+            if (
+              param.componentType === 'table' &&
+              param.seriesType === 'paging-sort-filter'
+            ) {
+              dispatch(
+                refreshDatasetAction({
+                  sorter: {
+                    column: param?.seriesName!,
+                    operator: param?.value?.direction,
+                    aggOperator: param?.value?.aggOperator,
+                  },
+                  pageInfo: {
+                    pageNo: param?.value?.pageNo,
+                  },
+                }),
+              );
+              return;
+            }
+            if (param.seriesName === 'richText') {
+              dispatch(updateRichTextAction(param.value));
+              return;
+            }
+          },
+        },
+      ]);
+    },
+    [dispatch],
+  );
+
+  const clearDataConfig = useCallback(() => {
+    const currentChart = chart?.meta?.id
+      ? ChartManager.instance().getById(chart?.meta?.id)
+      : ChartManager.instance().getDefaultChart();
+    let targetChartConfig = CloneValueDeep(currentChart?.config);
+    registerChartEvents(currentChart);
+    setChart(currentChart);
+
+    const finalChartConfig = transferChartConfigs(
+      targetChartConfig,
+      targetChartConfig,
+    );
+
+    dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
+    dispatch(
+      workbenchSlice.actions.updateChartConfig({
+        type: ChartConfigReducerActionType.INIT,
+        payload: {
+          init: finalChartConfig,
+        },
+      }),
+    );
+  }, [dispatch, chart?.meta?.id, registerChartEvents]);
+
+  const handleChartChange = (c: IChart) => {
     registerChartEvents(c);
     setChart(c);
     const targetChartConfig = CloneValueDeep(c.config);
@@ -162,65 +259,86 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     );
   };
 
-  const handleDataViewChanged = () => {
-    const currentChart = ChartManager.instance().getDefaultChart();
-    registerChartEvents(currentChart);
-    setChart(currentChart);
-    let clonedState = CloneValueDeep(currentChart.config);
+  const handleDataViewChanged = useCallback(() => {
+    clearDataConfig();
+  }, [clearDataConfig]);
 
-    dispatch(
-      workbenchSlice.actions.updateChartConfig({
-        type: ChartConfigReducerActionType.INIT,
-        payload: {
-          init: {
-            ...clonedState,
-          },
-        },
-      }),
-    );
-  };
+  const handleAggregationState = useCallback(() => {
+    clearDataConfig();
+  }, [clearDataConfig]);
 
-  const saveToWidget = useCallback(() => {
+  const buildDataChart = useCallback(() => {
     const dataChartConfig: DataChartConfig = {
       chartConfig: chartConfig!,
       chartGraphId: chart?.meta.id!,
       computedFields: dataview?.computedFields || [],
+      aggregation,
     };
 
     const dataChart: DataChart = {
       id: dataChartId,
-      name: backendChart?.name || 'widget_chart',
+      name: backendChart?.name || '',
       viewId: dataview?.id || '',
       orgId: orgId,
       config: dataChartConfig,
       status: 1,
       description: '',
     };
-    onSaveInWidget?.(chartType, dataChart, dataview);
+    return dataChart;
   }, [
     backendChart?.name,
     chart,
     chartConfig,
-    chartType,
     dataChartId,
     dataview,
-    onSaveInWidget,
     orgId,
+    aggregation,
   ]);
+
+  const saveToWidget = useCallback(() => {
+    const dataChart = buildDataChart();
+    onSaveInWidget?.(chartType, dataChart, dataview);
+  }, [buildDataChart, chartType, dataview, onSaveInWidget]);
 
   const saveChart = useCallback(async () => {
     if (container === 'dataChart') {
-      await dispatch(
-        updateChartAction({
-          name: backendChart?.name,
-          viewId: dataview?.id,
-          graphId: chart?.meta?.id,
-          chartId: dataChartId,
-          index: 0,
-          parentId: 0,
-        }),
-      );
-      onSaveInDataChart?.(orgId, dataChartId);
+      if (dataChartId) {
+        await dispatch(
+          updateChartAction({
+            name: backendChart?.name,
+            viewId: dataview?.id,
+            graphId: chart?.meta?.id,
+            chartId: dataChartId,
+            index: 0,
+            parentId: 0,
+            aggregation: aggregation,
+          }),
+        );
+        onSaveInDataChart?.(orgId, dataChartId);
+      } else {
+        try {
+          addVizFn({
+            vizType: 'DATACHART',
+            type: CommonFormTypes.Add,
+            visible: true,
+            initialValues: {
+              config: JSON.stringify({
+                aggregation,
+                chartConfig: chartConfig,
+                chartGraphId: chart?.meta?.id,
+                computedFields: dataview?.computedFields,
+              }),
+              viewId: dataview?.id,
+            },
+            callback: folder => {
+              folder &&
+                history.push(`/organizations/${orgId}/vizs/${folder.relId}`);
+            },
+          });
+        } catch (error) {
+          throw error;
+        }
+      }
     } else if (container === 'widget') {
       if (chartType === 'widgetChart') {
         saveToWidget();
@@ -238,6 +356,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
                 chartId: dataChartId,
                 index: 0,
                 parentId: 0,
+                aggregation,
               }),
             );
             saveToWidget();
@@ -259,50 +378,65 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     orgId,
     chartType,
     saveToWidget,
+    aggregation,
+    addVizFn,
+    chartConfig,
+    dataview?.computedFields,
+    history,
   ]);
 
-  const registerChartEvents = chart => {
-    chart?.registerMouseEvents([
-      {
-        name: 'click',
-        callback: param => {
-          if (param.seriesName === 'paging') {
-            const page = param.value?.page;
-            dispatch(refreshDatasetAction({ pageInfo: { pageNo: page } }));
-            return;
-          }
-        },
-      },
-      {
-        name: 'dblclick',
-        callback: param => {
-          console.log(
-            '//TODO: to be remove | mouse db click event ----> ',
-            param,
-          );
-        },
-      },
-    ]);
-  };
+  const saveChartToDashBoard = useCallback(
+    dashboardId => {
+      const dataChart = buildDataChart();
+      try {
+        history.push({
+          pathname: `/organizations/${orgId}/vizs/${dashboardId}/boardEditor`,
+          state: {
+            widgetInfo: JSON.stringify({ chartType, dataChart, dataview }),
+          },
+        });
+      } catch (error) {
+        throw error;
+      }
+    },
+    [history, buildDataChart, chartType, dataview, orgId],
+  );
 
   return (
     <StyledChartWorkbenchPage>
-      <ChartWorkbench
-        header={{
-          name: backendChart?.name || originChart?.name,
-          onSaveChart: saveChart,
-          onGoBack: () => {
-            onClose?.();
-          },
-        }}
-        chart={chart}
-        dataset={dataset}
-        dataview={dataview}
-        chartConfig={chartConfig}
-        onChartChange={handleChartChange}
-        onChartConfigChange={handleChartConfigChange}
-        onDataViewChange={handleDataViewChanged}
-      />
+      <SaveFormContext.Provider value={saveFormContextValue}>
+        <ChartWorkbench
+          header={{
+            name: backendChart?.name || originChart?.name,
+            orgId,
+            container,
+            onSaveChart: saveChart,
+            onSaveChartToDashBoard: saveChartToDashBoard,
+            onGoBack: () => {
+              onClose?.();
+            },
+            onChangeAggregation: handleAggregationState,
+          }}
+          aggregation={aggregation}
+          chart={chart}
+          dataset={dataset}
+          dataview={dataview}
+          chartConfig={chartConfig}
+          defaultViewId={defaultViewId}
+          onChartChange={handleChartChange}
+          onChartConfigChange={handleChartConfigChange}
+          onDataViewChange={handleDataViewChanged}
+        />
+        <SaveForm
+          width={400}
+          formProps={{
+            labelAlign: 'left',
+            labelCol: { offset: 1, span: 6 },
+            wrapperCol: { span: 15 },
+          }}
+          okText={tg('button.save')}
+        />
+      </SaveFormContext.Provider>
     </StyledChartWorkbenchPage>
   );
 };

@@ -18,10 +18,12 @@
 
 package datart.core.data.provider;
 
+import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
 import datart.core.base.consts.VariableTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
 
@@ -35,7 +37,12 @@ public class ScriptVariable extends TypedValue {
 
     private Set<String> values;
 
+    private String nameWithQuote;
+
     private boolean expression;
+
+    // Permission variable valid flag, which is false when executed by the organization owner
+    private boolean disabled;
 
     @Override
     public String toString() {
@@ -56,4 +63,12 @@ public class ScriptVariable extends TypedValue {
         this.expression = expression;
     }
 
+    public String getNameWithQuote() {
+        if (nameWithQuote != null) {
+            return nameWithQuote;
+        }
+        nameWithQuote = StringUtils.prependIfMissing(name, Const.DEFAULT_VARIABLE_QUOTE);
+        nameWithQuote = StringUtils.appendIfMissing(nameWithQuote, Const.DEFAULT_VARIABLE_QUOTE);
+        return nameWithQuote;
+    }
 }

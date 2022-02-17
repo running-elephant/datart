@@ -20,7 +20,9 @@ package datart.data.provider;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import datart.core.common.MessageResolver;
 import datart.core.common.UUIDGenerator;
+import datart.core.data.provider.DataProviderConfigTemplate;
 import datart.core.data.provider.DataProviderSource;
 import datart.core.data.provider.Dataframe;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +31,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class HttpDataProvider extends DefaultDataProvider {
@@ -63,6 +63,8 @@ public class HttpDataProvider extends DefaultDataProvider {
     private static final String HEADER = "headers";
 
     private static final String CONTENT_TYPE = "contentType";
+
+    private static final String I18N_PREFIX = "config.template.http.";
 
     private final static ObjectMapper MAPPER;
 
@@ -102,6 +104,21 @@ public class HttpDataProvider extends DefaultDataProvider {
         return "http-data-provider.json";
     }
 
+    @Override
+    public String getConfigDisplayName(String name) {
+        return MessageResolver.getMessage(I18N_PREFIX + name);
+    }
+
+    @Override
+    public String getConfigDescription(String name) {
+        String message = MessageResolver.getMessage(I18N_PREFIX + name + ".desc");
+        if (message.startsWith(I18N_PREFIX)) {
+            return null;
+        } else {
+            return message;
+        }
+    }
+
     private HttpRequestParam convert2RequestParam(Map<String, Object> schema) throws ClassNotFoundException {
 
         HttpRequestParam httpRequestParam = new HttpRequestParam();
@@ -125,13 +142,12 @@ public class HttpDataProvider extends DefaultDataProvider {
         if (parser != null && StringUtils.isNotBlank(parser.toString())) {
             parserClass = parser.toString();
         }
-
         Class<? extends HttpResponseParser> aClass = (Class<? extends HttpResponseParser>) Class.forName(parserClass);
-
         httpRequestParam.setResponseParser(aClass);
-
-        httpRequestParam.setBody(schema.getOrDefault(BODY, "").toString());
-
+        Object body = schema.get(BODY);
+        if (body != null) {
+            httpRequestParam.setBody(body.toString());
+        }
         httpRequestParam.setQueryParam((Map<String, String>) schema.get(QUERY_PARAM));
 
         httpRequestParam.setHeaders((Map<String, String>) schema.get(HEADER));

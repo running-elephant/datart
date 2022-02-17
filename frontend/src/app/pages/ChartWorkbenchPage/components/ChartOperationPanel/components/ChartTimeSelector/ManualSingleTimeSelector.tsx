@@ -16,45 +16,59 @@
  * limitations under the License.
  */
 
-import { DatePicker, Select, Space } from 'antd';
+import { Select, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import { RelativeOrExactTime } from 'app/types/FilterControlPanel';
-import { Moment } from 'moment';
+import { TimeFilterConditionValue } from 'app/types/ChartConfig';
+import { TimeFilterValueCategory } from 'app/types/FilterControlPanel';
+import { formatTime } from 'app/utils/time';
+import { TIME_FORMATTER } from 'globalConstants';
+import moment from 'moment';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
+import ExactTimeSelector from './ExactTimeSelector';
 import RelativeTimeSelector from './RelativeTimeSelector';
 
 const ManualSingleTimeSelector: FC<
   {
-    isStart?: boolean;
-    time?: Moment;
-    onTimeChange: (time: Moment) => void;
+    time?: TimeFilterConditionValue;
+    isStart: boolean;
+    onTimeChange: (time) => void;
   } & I18NComponentProps
-> = memo(({ isStart, i18nPrefix, time, onTimeChange }) => {
+> = memo(({ time, isStart, i18nPrefix, onTimeChange }) => {
   const t = useI18NPrefix(i18nPrefix);
-  const [type, setType] = useState(RelativeOrExactTime.Exact);
+  const [type, setType] = useState(() => {
+    return typeof time === 'string'
+      ? TimeFilterValueCategory.Exact
+      : TimeFilterValueCategory.Relative;
+  });
 
-  const handleTimeChange = time => {
-    onTimeChange?.(time);
+  const handleTimeCategoryChange = type => {
+    setType(type);
+    if (type === TimeFilterValueCategory.Exact) {
+      onTimeChange?.(formatTime(moment(), TIME_FORMATTER));
+    } else if (type === TimeFilterValueCategory.Relative) {
+      onTimeChange?.({ unit: 'd', amount: 1, direction: '-' });
+    } else {
+      onTimeChange?.(null);
+    }
   };
 
   const renderTimeSelector = type => {
     switch (type) {
-      case RelativeOrExactTime.Exact:
+      case TimeFilterValueCategory.Exact:
         return (
-          <DatePicker
-            showTime
-            value={time}
-            onChange={handleTimeChange}
-            placeholder={t('pleaseSelect')}
+          <ExactTimeSelector
+            time={time}
+            i18nPrefix={i18nPrefix}
+            onChange={onTimeChange}
           />
         );
-      case RelativeOrExactTime.Relative:
+      case TimeFilterValueCategory.Relative:
         return (
           <RelativeTimeSelector
-            isStart={isStart}
+            time={time}
             i18nPrefix={i18nPrefix}
-            onChange={handleTimeChange}
+            onChange={onTimeChange}
           />
         );
     }
@@ -62,12 +76,12 @@ const ManualSingleTimeSelector: FC<
 
   return (
     <StyledManualSingleTimeSelector>
-      <Select value={type} onChange={value => setType(value)}>
-        <Select.Option value={RelativeOrExactTime.Exact}>
-          {t(RelativeOrExactTime.Exact)}
+      <Select value={type} onChange={handleTimeCategoryChange}>
+        <Select.Option value={TimeFilterValueCategory.Exact}>
+          {t(TimeFilterValueCategory.Exact)}
         </Select.Option>
-        <Select.Option value={RelativeOrExactTime.Relative}>
-          {t(RelativeOrExactTime.Relative)}
+        <Select.Option value={TimeFilterValueCategory.Relative}>
+          {t(TimeFilterValueCategory.Relative)}
         </Select.Option>
       </Select>
       {isStart ? `${t('startTime')} : ` : `${t('endTime')} : `}
@@ -79,7 +93,7 @@ const ManualSingleTimeSelector: FC<
 export default ManualSingleTimeSelector;
 
 const StyledManualSingleTimeSelector = styled(Space)`
-  & .ant-select {
+  & > .ant-select {
     width: 80px;
   }
 `;

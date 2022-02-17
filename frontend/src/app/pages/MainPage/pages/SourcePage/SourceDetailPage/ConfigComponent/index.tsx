@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   Button,
   Form,
@@ -8,6 +26,7 @@ import {
   Select,
   Switch,
 } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { QueryResult } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { DataProviderAttribute } from 'app/pages/MainPage/slice/types';
 import { Rule } from 'rc-field-form/lib/interface';
@@ -49,9 +68,19 @@ export function ConfigComponent({
   onSubFormTest,
   onDbTypeChange,
 }: ConfigComponentProps) {
-  const { name, description, required, defaultValue, type, options } = attr;
+  const {
+    name,
+    displayName,
+    description,
+    required,
+    defaultValue,
+    type,
+    options,
+  } = attr;
   let component: ReactElement | null = null;
   let extraFormItemProps: Partial<FormItemProps> = {};
+  const t = useI18NPrefix('source');
+  const tg = useI18NPrefix('global');
 
   switch (name) {
     case 'url':
@@ -64,7 +93,7 @@ export function ConfigComponent({
               loading={testLoading}
               onClick={onTest}
             >
-              测试连接
+              {t('form.test')}
             </Button>
           }
           disabled={disabled}
@@ -129,7 +158,9 @@ export function ConfigComponent({
           }
           break;
         case 'password':
-          component = <Input.Password disabled={disabled} />;
+          component = (
+            <Input.Password disabled={disabled} autoComplete="new-password" />
+          );
           break;
         case 'bool':
           component = <Switch disabled={disabled} />;
@@ -170,7 +201,10 @@ export function ConfigComponent({
   let rules: Rule[] = [];
 
   if (required) {
-    rules.push({ required: true, message: `${name}不能为空` });
+    rules.push({
+      required: true,
+      message: `${name}${tg('validation.required')}`,
+    });
   }
 
   if (subFormRowKey === name) {
@@ -179,7 +213,7 @@ export function ConfigComponent({
         const valid = subFormRowKeyValidator && subFormRowKeyValidator(value);
         return valid
           ? Promise.resolve()
-          : Promise.reject(new Error('名称重复'));
+          : Promise.reject(new Error(t('form.duplicateName')));
       },
     });
   }
@@ -187,7 +221,7 @@ export function ConfigComponent({
   return !['path', 'format'].includes(name) ? (
     <Form.Item
       name={['config', name]}
-      label={name}
+      label={displayName}
       initialValue={defaultValue}
       extra={description}
       rules={rules}

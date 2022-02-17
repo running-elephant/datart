@@ -1,12 +1,27 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Button, Card, Form, Input, message, Popconfirm } from 'antd';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { User } from 'app/slice/types';
 import debounce from 'debounce-promise';
-import {
-  CommonFormTypes,
-  COMMON_FORM_TITLE_PREFIX,
-  DEFAULT_DEBOUNCE_WAIT,
-} from 'globalConstants';
+import { CommonFormTypes, DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
@@ -45,6 +60,8 @@ export function RoleDetailPage() {
   const editingRole = useSelector(selectEditingRole);
   const getRoleMembersLoading = useSelector(selectGetRoleMembersLoading);
   const saveRoleLoading = useSelector(selectSaveRoleLoading);
+  const t = useI18NPrefix('member.roleDetail');
+  const tg = useI18NPrefix('global');
   const { params } = useRouteMatch<{ roleId: string }>();
   const { roleId } = params;
   const [form] = Form.useForm<Pick<Role, 'name' | 'description'>>();
@@ -96,7 +113,7 @@ export function RoleDetailPage() {
             addRole({
               role: { ...values, avatar: '', orgId },
               resolve: () => {
-                message.success('新建成功');
+                message.success(t('createSuccess'));
                 resetForm();
               },
             }),
@@ -108,7 +125,7 @@ export function RoleDetailPage() {
               role: { ...values, orgId },
               members: memberTableDataSource,
               resolve: () => {
-                message.success('修改成功');
+                message.success(tg('operation.updateSuccess'));
               },
             }),
           );
@@ -117,7 +134,7 @@ export function RoleDetailPage() {
           break;
       }
     },
-    [dispatch, orgId, formType, memberTableDataSource, resetForm],
+    [dispatch, orgId, formType, memberTableDataSource, resetForm, t, tg],
   );
 
   const del = useCallback(() => {
@@ -125,17 +142,17 @@ export function RoleDetailPage() {
       deleteRole({
         id: editingRole!.info.id,
         resolve: () => {
-          message.success('删除成功');
+          message.success(tg('operation.deleteSuccess'));
           history.replace(`/organizations/${orgId}/roles`);
         },
       }),
     );
-  }, [dispatch, history, orgId, editingRole]);
+  }, [dispatch, history, orgId, editingRole, tg]);
 
   return (
     <Wrapper>
       <DetailPageHeader
-        title={`${COMMON_FORM_TITLE_PREFIX[formType]}角色`}
+        title={`${tg(`modal.title.${formType}`)}${t('role')}`}
         actions={
           <>
             <Button
@@ -143,11 +160,11 @@ export function RoleDetailPage() {
               loading={saveRoleLoading}
               onClick={form.submit}
             >
-              保存
+              {tg('button.save')}
             </Button>
             {formType === CommonFormTypes.Edit && (
-              <Popconfirm title="确认删除？" onConfirm={del}>
-                <Button danger>删除角色</Button>
+              <Popconfirm title={tg('operation.deleteConfirm')} onConfirm={del}>
+                <Button danger>{`${tg('button.delete')}${t('role')}`}</Button>
               </Popconfirm>
             )}
           </>
@@ -165,10 +182,13 @@ export function RoleDetailPage() {
           >
             <Form.Item
               name="name"
-              label="名称"
+              label={t('roleName')}
               validateFirst
               rules={[
-                { required: true, message: '名称不能为空' },
+                {
+                  required: true,
+                  message: `${t('roleName')}${tg('validation.required')}`,
+                },
                 {
                   validator: debounce((_, value) => {
                     if (value === editingRole?.info.name) {
@@ -177,10 +197,11 @@ export function RoleDetailPage() {
                     return request({
                       url: '/roles/check/name',
                       method: 'POST',
-                      params: { name: value, orgId },
+                      data: { name: value, orgId },
                     }).then(
                       () => Promise.resolve(),
-                      () => Promise.reject(new Error('名称重复')),
+                      err =>
+                        Promise.reject(new Error(err.response.data.message)),
                     );
                   }, DEFAULT_DEBOUNCE_WAIT),
                 },
@@ -188,11 +209,11 @@ export function RoleDetailPage() {
             >
               <Input />
             </Form.Item>
-            <Form.Item name="description" label="描述">
+            <Form.Item name="description" label={t('description')}>
               <Input.TextArea />
             </Form.Item>
             {formType === CommonFormTypes.Edit && (
-              <Form.Item label="关联成员" wrapperCol={{ span: 17 }}>
+              <Form.Item label={t('relatedMember')} wrapperCol={{ span: 17 }}>
                 <MemberTable
                   loading={getRoleMembersLoading}
                   dataSource={memberTableDataSource}
@@ -204,7 +225,7 @@ export function RoleDetailPage() {
           </Form>
         </Card>
         <MemberForm
-          title="添加成员"
+          title={t('addMember')}
           visible={memberFormVisible}
           width={992}
           onCancel={hideMemberForm}

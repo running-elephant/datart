@@ -16,16 +16,24 @@
  * limitations under the License.
  */
 
-import { Input } from 'antd';
+import { Input, Space } from 'antd';
+import { FormItemEx } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
+import { getColumnRenderOriginName } from 'app/utils/internalChartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
+import styled from 'styled-components/macro';
 
 const AliasAction: FC<{
   config: ChartDataSectionField;
   onConfigChange: (config: ChartDataSectionField) => void;
 }> = ({ config, onConfigChange }) => {
+  const formItemLayout = {
+    labelAlign: 'right' as any,
+    labelCol: { span: 8 },
+    wrapperCol: { span: 8 },
+  };
   const t = useI18NPrefix(`viz.palette.data.actions`);
   const [aliasName, setAliasName] = useState(config?.alias?.name);
   const [nameDesc, setNameDesc] = useState(config?.alias?.desc);
@@ -40,23 +48,32 @@ const AliasAction: FC<{
   };
 
   return (
-    <div>
-      {t('alias.name')}
-      <Input
-        value={aliasName}
-        onChange={({ target: { value } }) => {
-          onChange(value, nameDesc);
-        }}
-      />
-      {t('alias.description')}
-      <Input
-        value={nameDesc}
-        onChange={({ target: { value } }) => {
-          onChange(aliasName, value);
-        }}
-      />
-    </div>
+    <StyledAliasAction direction="vertical">
+      <FormItemEx {...formItemLayout} label={t('alias.fieldName')}>
+        {getColumnRenderOriginName(config)}
+      </FormItemEx>
+      <FormItemEx {...formItemLayout} label={t('alias.name')}>
+        <Input
+          value={aliasName}
+          onChange={({ target: { value } }) => {
+            onChange(value, nameDesc);
+          }}
+        />
+      </FormItemEx>
+      <FormItemEx {...formItemLayout} label={t('alias.description')}>
+        <Input
+          value={nameDesc}
+          onChange={({ target: { value } }) => {
+            onChange(aliasName, value);
+          }}
+        />
+      </FormItemEx>
+    </StyledAliasAction>
   );
 };
 
 export default AliasAction;
+
+const StyledAliasAction = styled(Space)`
+  width: 100%;
+`;

@@ -23,6 +23,7 @@ import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.BeanUtils;
+import datart.core.common.ReflectUtils;
 import datart.core.data.provider.*;
 import datart.data.provider.JdbcDataProvider;
 import datart.data.provider.calcite.dialect.CustomSqlDialect;
@@ -35,6 +36,7 @@ import datart.data.provider.local.LocalDB;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
@@ -53,6 +55,14 @@ public class JdbcDataProviderAdapter implements Closeable {
     private static final String SQL_DIALECT_PACKAGE = "datart.data.provider.calcite.dialect";
 
     protected static final String COUNT_SQL = "SELECT COUNT(*) FROM (%s) V_T";
+
+    protected static final String PKTABLE_CAT = "PKTABLE_CAT";
+
+    protected static final String PKTABLE_NAME = "PKTABLE_NAME";
+
+    protected static final String PKCOLUMN_NAME = "PKCOLUMN_NAME";
+
+    protected static final String FKCOLUMN_NAME = "FKCOLUMN_NAME";
 
     protected DataSource dataSource;
 
@@ -129,20 +139,22 @@ public class JdbcDataProviderAdapter implements Closeable {
 
     public Set<Column> readTableColumn(String database, String table) throws SQLException {
         try (Connection conn = getConn()) {
-            HashMap<String, Column> columnMap = new HashMap<>();
+            Set<Column> columnSet = new HashSet<>();
             DatabaseMetaData metadata = conn.getMetaData();
+            Map<String, Map<String, String>> importedKeys = getImportedKeys(metadata, database, table);
             ResultSet columns = metadata.getColumns(database, null, table, null);
             while (columns.next()) {
                 Column column = readTableColumn(columns);
-                columnMap.put(column.getName(), column);
+                Map<String, String> pKeys = importedKeys.get(column.getName());
+                if (pKeys != null) {
+                    column.setPkDatabase(pKeys.get(PKTABLE_CAT));
+                    column.setPkTable(pKeys.get(PKTABLE_NAME));
+                    column.setPkColumn(pKeys.get(PKCOLUMN_NAME));
+                }
+                columnSet.add(column);
             }
-            return new HashSet<>(columnMap.values());
+            return columnSet;
         }
-    }
-
-
-    public final String getVariableQuote() {
-        return Const.DEFAULT_VARIABLE_QUOTE;
     }
 
     protected Column readTableColumn(ResultSet columnMetadata) throws SQLException {
@@ -150,6 +162,22 @@ public class JdbcDataProviderAdapter implements Closeable {
         column.setName(columnMetadata.getString(4));
         column.setType(DataTypeUtils.sqlType2DataType(columnMetadata.getString(6)));
         return column;
+    }
+
+    /**
+     * 获取表的外键关系
+     */
+    protected Map<String, Map<String, String>> getImportedKeys(DatabaseMetaData metadata, String database, String table) throws SQLException {
+        HashMap<String, Map<String, String>> keyMap = new HashMap<>();
+        ResultSet importedKeys = metadata.getImportedKeys(database, null, table);
+        while (importedKeys.next()) {
+            HashMap<String, String> keys = new HashMap<>();
+            keys.put(PKTABLE_CAT, importedKeys.getString(PKTABLE_CAT));
+            keys.put(PKTABLE_NAME, importedKeys.getString(PKTABLE_NAME));
+            keys.put(PKCOLUMN_NAME, importedKeys.getString(PKCOLUMN_NAME));
+            keyMap.put(importedKeys.getString(FKCOLUMN_NAME), keys);
+        }
+        return keyMap;
     }
 
     /**
@@ -161,8 +189,11 @@ public class JdbcDataProviderAdapter implements Closeable {
      */
     protected Dataframe execute(String sql) throws SQLException {
         try (Connection conn = getConn()) {
-            Statement statement = conn.createStatement();
-            return parseResultSet(statement.executeQuery(sql));
+            try (Statement statement = conn.createStatement()) {
+                try (ResultSet rs = statement.executeQuery(sql)) {
+                    return parseResultSet(rs);
+                }
+            }
         }
     }
 
@@ -177,21 +208,20 @@ public class JdbcDataProviderAdapter implements Closeable {
     protected Dataframe execute(String selectSql, PageInfo pageInfo) throws SQLException {
         Dataframe dataframe;
         try (Connection conn = getConn()) {
-            Statement statement = conn.createStatement();
-
-            statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
-
-            try (ResultSet resultSet = statement.executeQuery(selectSql)) {
-                try {
-                    resultSet.absolute((int) Math.min(pageInfo.getTotal(), (pageInfo.getPageNo() - 1) * pageInfo.getPageSize()));
-                } catch (Exception e) {
-                    int count = 0;
-                    while (count < (pageInfo.getPageNo() - 1) * pageInfo.getPageSize() && resultSet.next()) {
-                        count++;
+            try (Statement statement = conn.createStatement()) {
+                statement.setFetchSize((int) Math.min(pageInfo.getPageSize(), 10_000));
+                try (ResultSet resultSet = statement.executeQuery(selectSql)) {
+                    try {
+                        resultSet.absolute((int) Math.min(pageInfo.getTotal(), (pageInfo.getPageNo() - 1) * pageInfo.getPageSize()));
+                    } catch (Exception e) {
+                        int count = 0;
+                        while (count < (pageInfo.getPageNo() - 1) * pageInfo.getPageSize() && resultSet.next()) {
+                            count++;
+                        }
                     }
+                    dataframe = parseResultSet(resultSet, pageInfo.getPageSize());
+                    return dataframe;
                 }
-                dataframe = parseResultSet(resultSet, pageInfo.getPageSize());
-                return dataframe;
             }
         }
     }
@@ -199,7 +229,7 @@ public class JdbcDataProviderAdapter implements Closeable {
     public Dataframe execute(QueryScript script, ExecuteParam executeParam) throws Exception {
         //If server aggregation is enabled, query the full data before performing server aggregation
         if (executeParam.isServerAggregate()) {
-            return executeLocally(script, executeParam);
+            return executeInLocal(script, executeParam);
         } else {
             return executeOnSource(script, executeParam);
         }
@@ -240,7 +270,6 @@ public class JdbcDataProviderAdapter implements Closeable {
         if (sqlDialect != null) {
             return sqlDialect;
         }
-
         if (StringUtils.isNotBlank(driverInfo.getSqlDialect())) {
             try {
                 Class<?> clz = Class.forName(driverInfo.getSqlDialect());
@@ -263,6 +292,14 @@ public class JdbcDataProviderAdapter implements Closeable {
                 sqlDialect = new CustomSqlDialect(driverInfo);
             }
         }
+        // set case not change
+        try {
+            ReflectUtils.setFiledValue(sqlDialect, "unquotedCasing", Casing.UNCHANGED);
+            ReflectUtils.setFiledValue(sqlDialect, "quotedCasing", Casing.UNCHANGED);
+        } catch (Exception e) {
+            log.warn("sql dialect config error for " + driverInfo.getSqlDialect());
+        }
+
         return sqlDialect;
     }
 
@@ -305,11 +342,10 @@ public class JdbcDataProviderAdapter implements Closeable {
     /**
      * 本地执行，从数据源拉取全量数据，在本地执行聚合操作
      */
-    protected Dataframe executeLocally(QueryScript script, ExecuteParam executeParam) throws Exception {
+    protected Dataframe executeInLocal(QueryScript script, ExecuteParam executeParam) throws Exception {
         SqlScriptRender render = new SqlScriptRender(script
                 , executeParam
-                , getSqlDialect()
-                , getVariableQuote());
+                , getSqlDialect());
 
         String sql = render.render(false, false, false);
         Dataframe data = execute(sql);
@@ -333,7 +369,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         SqlScriptRender render = new SqlScriptRender(script
                 , executeParam
                 , getSqlDialect()
-                , getVariableQuote());
+                , jdbcProperties.isEnableSpecialSql());
 
         if (supportPaging()) {
             sql = render.render(true, true, false);

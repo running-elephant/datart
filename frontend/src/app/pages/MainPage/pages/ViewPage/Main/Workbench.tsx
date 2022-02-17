@@ -1,5 +1,24 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Split } from 'app/components';
-import { useCascadeAccess } from 'app/pages/MainPage/Access';
+import { useAccess, useCascadeAccess } from 'app/pages/MainPage/Access';
+import debounce from 'lodash/debounce';
 import React, {
   memo,
   useCallback,
@@ -30,6 +49,7 @@ export const Workbench = memo(() => {
   const parentId = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'parentId' }),
   ) as string;
+
   const path = useMemo(
     () =>
       views
@@ -48,10 +68,30 @@ export const Workbench = memo(() => {
   });
   const unpersistedNewView = id.includes(UNPERSISTED_ID_PREFIX);
   const allowManage = managePermission(true) || unpersistedNewView;
+  const allowEnableViz = useAccess({
+    type: 'module',
+    module: ResourceTypes.Viz,
+    id: '',
+    level: PermissionLevels.Enable,
+  })(true);
 
   useEffect(() => {
     editorInstance?.layout();
   }, [editorInstance, allowManage]);
+
+  const onResize = useCallback(
+    debounce(() => {
+      editorInstance?.layout();
+    }, 300),
+    [editorInstance],
+  );
+
+  useEffect(() => {
+    window.addEventListener('resize', onResize, false);
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+  }, [onResize]);
 
   const editorResize = useCallback(
     sizes => {
@@ -68,7 +108,7 @@ export const Workbench = memo(() => {
         className="datart-split"
         onDrag={editorResize}
       >
-        <Editor allowManage={allowManage} />
+        <Editor allowManage={allowManage} allowEnableViz={allowEnableViz} />
         <Outputs />
       </Development>
       <Properties allowManage={allowManage} />

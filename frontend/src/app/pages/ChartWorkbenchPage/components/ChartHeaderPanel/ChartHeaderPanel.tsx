@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-import { LeftOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
+import SaveToDashboard from 'app/components/SaveToDashboard';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { FC, memo } from 'react';
+import { backendChartSelector } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { FC, memo, useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
@@ -33,47 +35,69 @@ import {
 
 const ChartHeaderPanel: FC<{
   chartName?: string;
+  orgId?: string;
+  container?: string;
   onSaveChart?: () => void;
   onGoBack?: () => void;
-}> = memo(({ chartName, onSaveChart, onGoBack }) => {
-  const t = useI18NPrefix(`viz.workbench.header`);
+  onSaveChartToDashBoard?: (dashboardId) => void;
+}> = memo(
+  ({
+    chartName,
+    orgId,
+    container,
+    onSaveChart,
+    onGoBack,
+    onSaveChartToDashBoard,
+  }) => {
+    const t = useI18NPrefix(`viz.workbench.header`);
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const backendChart = useSelector(backendChartSelector);
 
-  return (
-    <Wrapper>
-      {onGoBack && (
-        <GoBack>
-          <LeftOutlined onClick={onGoBack} />
-        </GoBack>
-      )}
-      <h1>{chartName}</h1>
-      <Space>
-        {/* <StyleTimeConfigSelecotr
-              value={language}
-              onChange={handleLocaleChange}
+    const handleModalOk = useCallback(
+      (dashboardId: string) => {
+        onSaveChartToDashBoard?.(dashboardId);
+        setIsModalVisible(true);
+      },
+      [onSaveChartToDashBoard],
+    );
+
+    const handleModalCancel = useCallback(() => {
+      setIsModalVisible(false);
+    }, []);
+
+    return (
+      <Wrapper>
+        <h1>{chartName}</h1>
+        <Space>
+          <Button type="primary" ghost onClick={onGoBack}>
+            {t('cancel')}
+          </Button>
+          <Button type="primary" onClick={onSaveChart}>
+            {t('save')}
+          </Button>
+          {!(container === 'widget') && (
+            <Button
+              type="primary"
+              onClick={() => {
+                setIsModalVisible(true);
+              }}
             >
-              <Select.Option value="zh">{t('lang.zh')}</Select.Option>
-              <Select.Option value="en">{t('lang.en')}</Select.Option>
-            </StyleTimeConfigSelecotr>
-            <StyleTimeConfigSelecotr
-              value={dateFormat}
-              onChange={handleFormatChange}
-            >
-              <Select.Option value={moment.HTML5_FMT.DATETIME_LOCAL_MS}>
-                {t('format.local')}
-              </Select.Option>
-              <Select.Option value={moment.HTML5_FMT.DATE}>
-                {t('format.date')}
-              </Select.Option>
-              <Select.Option value={'LL'}>{t('format.ll')}</Select.Option>
-              <Select.Option value={'LLL'}>{t('format.lll')}</Select.Option>
-            </StyleTimeConfigSelecotr> */}
-        <Button type="primary" onClick={onSaveChart}>
-          {t('save')}
-        </Button>
-      </Space>
-    </Wrapper>
-  );
-});
+              {t('saveToDashboard')}
+            </Button>
+          )}
+          <SaveToDashboard
+            orgId={orgId as string}
+            title={t('saveToDashboard')}
+            isModalVisible={isModalVisible}
+            handleOk={handleModalOk}
+            handleCancel={handleModalCancel}
+            backendChartId={backendChart?.id}
+          ></SaveToDashboard>
+        </Space>
+      </Wrapper>
+    );
+  },
+);
 
 export default ChartHeaderPanel;
 

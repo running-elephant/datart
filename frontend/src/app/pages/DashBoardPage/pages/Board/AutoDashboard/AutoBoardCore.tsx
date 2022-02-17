@@ -15,20 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { Empty } from 'antd';
+import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
-import { BREAK_POINTS } from 'app/pages/DashBoardPage/constants';
+import {
+  BREAK_POINT_MAP,
+  LAYOUT_COLS_MAP,
+  MIN_MARGIN,
+  MIN_PADDING,
+} from 'app/pages/DashBoardPage/constants';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import {
-  makeSelectBoardConfigById,
   selectLayoutWidgetInfoMapById,
   selectLayoutWidgetMapById,
 } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import {
   BoardState,
-  Dashboard,
+  DeviceType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, {
+  memo,
   RefObject,
   useCallback,
   useContext,
@@ -37,7 +46,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Layout, Responsive, WidthProvider } from 'react-grid-layout';
+import { Layout, Layouts, Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
@@ -46,160 +55,227 @@ import StyledBackground from '../components/StyledBackground';
 import { WidgetOfAuto } from './WidgetOfAuto';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
+const mobilePoints = Object.keys(BREAK_POINT_MAP).slice(3);
 export interface AutoBoardCoreProps {
   boardId: string;
 }
-const AutoBoardCore: React.FC<AutoBoardCoreProps> = ({ boardId }) => {
-  const selectBoardConfigById = useMemo(makeSelectBoardConfigById, []);
-  const dashBoard = useSelector((state: { board: BoardState }) =>
-    selectBoardConfigById(state, boardId),
-  );
+export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
+  ({ boardId }) => {
+    const { renderedWidgetById } = useContext(BoardContext);
+    const { config } = useContext(BoardConfigContext);
+    const {
+      margin,
+      containerPadding,
+      background,
+      mobileMargin,
+      mobileContainerPadding,
+    } = config;
 
-  const {
-    config: { margin, containerPadding, rowHeight, cols, background },
-  } = useMemo(() => {
-    return dashBoard as Dashboard;
-  }, [dashBoard]);
-  const { renderedWidgetById } = useContext(BoardContext);
-  const selectLayoutWidgetsConfigById = useMemo(selectLayoutWidgetMapById, []);
-  const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
-    selectLayoutWidgetsConfigById(state, boardId),
-  );
-  const layoutWidgetConfigs = useMemo(() => {
-    return Object.values(layoutWidgetMap);
-  }, [layoutWidgetMap]);
+    const selectLayoutWidgetsConfigById = useMemo(
+      selectLayoutWidgetMapById,
+      [],
+    );
+    const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
+      selectLayoutWidgetsConfigById(state, boardId),
+    );
 
-  const layoutWidgetsInfo = useSelector((state: { board: BoardState }) =>
-    selectLayoutWidgetInfoMapById(state, boardId),
-  );
+    const layoutWidgetInfoMap = useSelector((state: { board: BoardState }) =>
+      selectLayoutWidgetInfoMapById(state, boardId),
+    );
 
-  const [boardLoading, setBoardLoading] = useState(true);
-  useEffect(() => {
-    if (dashBoard?.id) {
-      setBoardLoading(false);
-    }
-  }, [dashBoard]);
+    const layoutWidgets = useMemo(() => {
+      return Object.values(layoutWidgetMap);
+    }, [layoutWidgetMap]);
 
-  const [lgLayout, setLgLayout] = useState<Layout[]>([]);
-  useEffect(() => {
-    const layout: Layout[] = [];
-    layoutWidgetConfigs.forEach(widget => {
-      const { x, y, width: w, height: h } = widget.config.rect;
-      layout.push({ i: widget.id, x, y, w, h });
-    });
-    setLgLayout(layout);
-  }, [layoutWidgetConfigs]);
+    const [deviceType, setDeviceType] = useState<DeviceType>(
+      DeviceType.Desktop,
+    );
 
-  let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
-  useEffect(() => {
-    const layoutWidgetInfos = Object.values(layoutWidgetsInfo);
-    if (layoutWidgetInfos.length) {
-      layoutInfos.current = layoutWidgetInfos.map(WidgetInfo => ({
-        id: WidgetInfo.id,
-        rendered: WidgetInfo.rendered,
-      }));
-    }
-  }, [layoutWidgetsInfo]);
-  const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
-  const currentLayout = useRef<Layout[]>([]);
+    const [layoutMap, setLayoutMap] = useState<Layouts>({});
 
-  const calcItemTop = useCallback(
-    (id: string) => {
-      const curItem = currentLayout.current.find(ele => ele.i === id);
-      if (!curItem) return Infinity;
-      return Math.round((rowHeight + margin[0]) * curItem.y);
-    },
-    [margin, rowHeight],
-  );
-  const scrollThrottle = useRef(false);
-  const lazyLoad = useCallback(() => {
-    if (!gridWrapRef.current) return;
+    let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
 
-    if (!scrollThrottle.current) {
-      requestAnimationFrame(() => {
-        const waitingItems = layoutInfos.current.filter(item => !item.rendered);
-        if (waitingItems.length > 0) {
-          const { offsetHeight, scrollTop } = gridWrapRef.current!;
-          waitingItems.forEach(item => {
-            const itemTop = calcItemTop(item.id);
-            if (itemTop - scrollTop < offsetHeight) {
-              renderedWidgetById(item.id);
-            }
-          });
-        } else {
-          if (scrollThrottle.current) {
-            gridWrapRef.current?.removeEventListener('scroll', lazyLoad, false);
+    const currentLayout = useRef<Layout[]>([]);
+
+    const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
+
+    const { gridRef } = useBoardWidthHeight();
+
+    const { ref, widgetRowHeight } = useWidgetRowHeight();
+
+    const scrollThrottle = useRef(false);
+
+    const onBreakpointChange = pointKey => {
+      if (mobilePoints.includes(pointKey)) {
+        setDeviceType(DeviceType.Mobile);
+      } else {
+        setDeviceType(DeviceType.Desktop);
+      }
+    };
+
+    const { curMargin, curPadding } = useMemo(() => {
+      return deviceType === DeviceType.Mobile
+        ? {
+            curMargin: mobileMargin || [MIN_MARGIN, MIN_MARGIN],
+            curPadding: mobileContainerPadding || [MIN_PADDING, MIN_PADDING],
           }
-        }
-        scrollThrottle.current = false;
+        : {
+            curMargin: margin,
+            curPadding: containerPadding,
+          };
+    }, [
+      deviceType,
+      mobileMargin,
+      mobileContainerPadding,
+      margin,
+      containerPadding,
+    ]);
+
+    useEffect(() => {
+      const layoutMap: Layouts = {
+        lg: [],
+        xs: [],
+      };
+      layoutWidgets.forEach(widget => {
+        const lg = widget.config.rect || widget.config.mobileRect || {};
+        const xs = widget.config.mobileRect || widget.config.rect || {};
+        layoutMap.lg.push({
+          i: widget.id,
+          x: lg.x,
+          y: lg.y,
+          w: lg.width,
+          h: lg.height,
+        });
+        layoutMap.xs.push({
+          i: widget.id,
+          x: xs.x,
+          y: xs.y,
+          w: xs.width,
+          h: xs.height,
+        });
       });
-      scrollThrottle.current = true;
-    }
-  }, [calcItemTop, renderedWidgetById]);
-  const WidgetConfigsLen = useMemo(() => {
-    return layoutWidgetConfigs.length;
-  }, [layoutWidgetConfigs]);
-  // bind lazyLoad();
-  useEffect(() => {
-    if (WidgetConfigsLen && gridWrapRef.current) {
-      lazyLoad();
-      gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
-      gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
-    }
-  }, [boardLoading, WidgetConfigsLen, lazyLoad]);
+      setLayoutMap(layoutMap);
+    }, [layoutWidgets]);
 
-  const onLayoutChange = useCallback((layouts: Layout[]) => {
-    currentLayout.current = layouts;
-  }, []);
-  const boardChildren = useMemo(() => {
-    return layoutWidgetConfigs.map(item => {
-      return (
-        <div className="block-item" key={item.id}>
-          <WidgetAllProvider id={item.id}>
-            <WidgetOfAuto />
-          </WidgetAllProvider>
-        </div>
-      );
-    });
-  }, [layoutWidgetConfigs]);
+    useEffect(() => {
+      const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
+      if (layoutWidgetInfos.length) {
+        layoutInfos.current = layoutWidgetInfos.map(WidgetInfo => ({
+          id: WidgetInfo.id,
+          rendered: WidgetInfo.rendered,
+        }));
+      }
+    }, [layoutWidgetInfoMap]);
 
-  const { gridRef } = useBoardWidthHeight();
+    const calcItemTop = useCallback(
+      (id: string) => {
+        const curItem = currentLayout.current.find(ele => ele.i === id);
+        if (!curItem) return Infinity;
+        return Math.round((widgetRowHeight + margin[0]) * curItem.y);
+      },
+      [margin, widgetRowHeight],
+    );
 
-  return (
-    <Wrap>
-      <StyledContainer bg={background}>
-        {boardLoading ? <div>loading...</div> : null}
-        <div className="grid-wrap" ref={gridWrapRef}>
-          <div className="grid-wrap" ref={gridRef}>
-            <ResponsiveGridLayout
-              className="layout"
-              layouts={{ lg: lgLayout }}
-              breakpoints={BREAK_POINTS}
-              margin={margin}
-              containerPadding={containerPadding}
-              cols={cols}
-              rowHeight={rowHeight}
-              onLayoutChange={onLayoutChange}
-              isDraggable={false}
-              isResizable={false}
-              measureBeforeMount={false}
-              useCSSTransforms={true}
-            >
-              {boardChildren}
-            </ResponsiveGridLayout>
+    const lazyLoad = useCallback(() => {
+      if (!gridWrapRef.current) return;
+      if (!scrollThrottle.current) {
+        requestAnimationFrame(() => {
+          const waitingItems = layoutInfos.current.filter(
+            item => !item.rendered,
+          );
+
+          if (waitingItems.length > 0) {
+            const { offsetHeight, scrollTop } = gridWrapRef.current!;
+            waitingItems.forEach(item => {
+              const itemTop = calcItemTop(item.id);
+              if (itemTop - scrollTop < offsetHeight) {
+                renderedWidgetById(item.id);
+              }
+            });
+          } else {
+            if (scrollThrottle.current) {
+              gridWrapRef.current?.removeEventListener(
+                'scroll',
+                lazyLoad,
+                false,
+              );
+            }
+          }
+          scrollThrottle.current = false;
+        });
+        scrollThrottle.current = true;
+      }
+    }, [calcItemTop, renderedWidgetById]);
+
+    useEffect(() => {
+      if (layoutWidgets.length && gridWrapRef.current) {
+        lazyLoad();
+        gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
+        gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
+        // issues#339
+        window.addEventListener('resize', lazyLoad, false);
+      }
+
+      return () => {
+        gridWrapRef?.current?.removeEventListener('scroll', lazyLoad, false);
+        window.removeEventListener('resize', lazyLoad, false);
+      };
+    }, [layoutWidgets.length, lazyLoad]);
+
+    const onLayoutChange = useCallback((layouts: Layout[], all) => {
+      currentLayout.current = layouts;
+    }, []);
+
+    const boardChildren = useMemo(() => {
+      return layoutWidgets.map(item => {
+        return (
+          <div className="block-item" key={item.id}>
+            <WidgetAllProvider id={item.id}>
+              <WidgetOfAuto />
+            </WidgetAllProvider>
           </div>
-        </div>
-      </StyledContainer>
-    </Wrap>
-  );
-};
-export default React.memo(AutoBoardCore);
+        );
+      });
+    }, [layoutWidgets]);
+
+    return (
+      <Wrap>
+        <StyledContainer bg={background} ref={ref}>
+          {layoutWidgets.length ? (
+            <div className="grid-wrap" ref={gridWrapRef}>
+              <div className="grid-wrap" ref={gridRef}>
+                <ResponsiveGridLayout
+                  layouts={layoutMap}
+                  breakpoints={BREAK_POINT_MAP}
+                  margin={curMargin}
+                  containerPadding={curPadding}
+                  cols={LAYOUT_COLS_MAP}
+                  rowHeight={widgetRowHeight}
+                  onLayoutChange={onLayoutChange}
+                  onBreakpointChange={onBreakpointChange}
+                  isDraggable={false}
+                  isResizable={false}
+                  measureBeforeMount={false}
+                  useCSSTransforms={true}
+                >
+                  {boardChildren}
+                </ResponsiveGridLayout>
+              </div>
+            </div>
+          ) : (
+            <div className="empty">
+              <Empty description="" />
+            </div>
+          )}
+        </StyledContainer>
+      </Wrap>
+    );
+  },
+);
 
 const Wrap = styled.div`
   display: flex;
-
   flex: 1;
-
   flex-direction: column;
   width: 100%;
   min-height: 0;
@@ -213,13 +289,15 @@ const StyledContainer = styled(StyledBackground)`
     flex: 1;
     overflow-y: auto;
     -ms-overflow-style: none;
-
-    .layout {
-      flex: 1;
-      overflow-y: auto;
-    }
   }
   .grid-wrap::-webkit-scrollbar {
     width: 0 !important;
+  }
+
+  .empty {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
   }
 `;

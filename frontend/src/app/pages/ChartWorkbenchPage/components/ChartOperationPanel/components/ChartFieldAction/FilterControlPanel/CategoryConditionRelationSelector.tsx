@@ -18,12 +18,12 @@
 
 import { Input, Select, Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import ChartFilterCondition, {
+  ConditionBuilder,
+} from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
 import { FilterSqlOperator } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { FC, memo, useCallback, useState } from 'react';
-import ChartFilterCondition, {
-  ConditionBuilder,
-} from '../../../../../models/ChartFilterCondition';
 
 const CategoryConditionRelationSelector: FC<{
   condition?: ChartFilterCondition;
@@ -57,6 +57,7 @@ const CategoryConditionRelationSelector: FC<{
       >
         <Select.OptGroup label={t('include')}>
           {[
+            FilterSqlOperator.Contain,
             FilterSqlOperator.PrefixContain,
             FilterSqlOperator.SuffixContain,
             FilterSqlOperator.Equal,
@@ -69,6 +70,7 @@ const CategoryConditionRelationSelector: FC<{
         </Select.OptGroup>
         <Select.OptGroup label={t('notInclude')}>
           {[
+            FilterSqlOperator.NotContain,
             FilterSqlOperator.NotPrefixContain,
             FilterSqlOperator.NotSuffixContain,
             FilterSqlOperator.NotEqual,

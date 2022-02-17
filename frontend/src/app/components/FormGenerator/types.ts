@@ -1,4 +1,4 @@
-import { ChartDataSectionConfig } from 'app/types/ChartConfig';
+import { ChartDataConfig } from 'app/types/ChartConfig';
 
 export enum GroupLayoutMode {
   INNER = 'inner',
@@ -12,14 +12,15 @@ export enum ItemComponentType {
 export interface ItemLayoutProps<T> {
   ancestors: number[];
   data: T;
-  translate?: (title: string, options?: any) => string;
+  translate?: (title: string, disablePrefix?: boolean, options?: any) => string;
   onChange?: (
     ancestors: number[],
     value: T | any,
     needRefresh?: boolean,
   ) => void;
-  dataConfigs?: ChartDataSectionConfig[];
+  dataConfigs?: ChartDataConfig[];
   flatten?: boolean;
+  context?: any;
 }
 
 export interface FormGeneratorLayoutProps<T> extends ItemLayoutProps<T> {

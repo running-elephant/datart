@@ -1,28 +1,19 @@
 {
   "type": "JDBC",
   "name": "jdbc-data-provider",
-  "syntax": {
-    "name": "SQL",
-    "keywords": [
-      "SELECT",
-      "FROM",
-      "JOIN"
-    ]
-  },
   "attributes": [
     {
+      "code": "dbType",
       "name": "dbType",
       "type": "string",
       "required": true,
-      "defaultValue": "",
-      "description": "database type"
+      "defaultValue": ""
     },
     {
       "name": "url",
       "type": "string",
       "required": true,
-      "defaultValue": "",
-      "description": "connect url"
+      "defaultValue": ""
     },
     {
       "name": "user",
@@ -45,15 +36,19 @@
       "name": "serverAggregate",
       "type": "bool",
       "required": false,
-      "defaultValue": false,
-      "description": "是否开启服务端聚合"
+      "defaultValue": false
+    },
+    {
+      "name": "enableSpecialSQL",
+      "type": "bool",
+      "required": false,
+      "defaultValue": false
     },
     {
       "name": "properties",
       "type": "object",
       "required": false,
-      "defaultValue": "",
-      "description": "Druid连接池其它配置参数"
+      "defaultValue": ""
     }
   ]
 }

@@ -19,16 +19,22 @@ import { Form, Switch } from 'antd';
 import React, { memo } from 'react';
 import { SliderShowMarksName } from '../..';
 
-export const SliderMarks: React.FC<{}> = memo(() => {
+export const SliderMarks: React.FC<{
+  label: string;
+  switchTexts: [string, string];
+}> = memo(({ label, switchTexts }) => {
   return (
     <Form.Item
       name={SliderShowMarksName}
-      label="显示标签"
+      label={label}
       valuePropName="checked"
       validateTrigger={['onChange', 'onBlur']}
       rules={[{ required: true }]}
     >
-      <Switch checkedChildren="开启" unCheckedChildren="关闭" />
+      <Switch
+        checkedChildren={switchTexts[0]}
+        unCheckedChildren={switchTexts[1]}
+      />
     </Form.Item>
   );
 });

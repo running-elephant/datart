@@ -19,15 +19,15 @@ import {
   BoardType,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { createControlBtn } from 'app/pages/DashBoardPage/utils/widget';
+import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { PageInfo } from './../../../../../MainPage/pages/ViewPage/slice/types';
-import { addWidgetsToEditBoard, getEditWidgetDataAsync } from './../thunk';
+import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from './../thunk';
 import { HistoryEditBoard } from './../types';
 
 export type BtnActionParams = {
-  type: ControllerFacadeTypes | WidgetType;
+  type: WidgetType;
   boardId: string;
   boardType: BoardType;
 };
@@ -35,7 +35,7 @@ export const addControllerAction =
   (opt: BtnActionParams) => async (dispatch, getState) => {
     switch (opt.type as WidgetType) {
       case 'query':
-        const queryWidget = createControlBtn({
+        const queryWidget = widgetToolKit.query.create({
           boardId: opt.boardId,
           boardType: opt.boardType,
           type: opt.type as any,
@@ -44,7 +44,7 @@ export const addControllerAction =
         dispatch(editBoardStackActions.changeBoardHasQueryControl(true));
         break;
       case 'reset':
-        const resetWidget = createControlBtn({
+        const resetWidget = widgetToolKit.query.create({
           boardId: opt.boardId,
           boardType: opt.boardType,
           type: opt.type as any,
@@ -81,7 +81,7 @@ export const editWidgetsQueryAction =
       .filter(it => it.config.type === 'chart')
       .forEach(it => {
         dispatch(
-          getEditWidgetDataAsync({
+          getEditChartWidgetDataAsync({
             widgetId: it.id,
             option: { pageInfo },
           }),

@@ -1,10 +1,10 @@
+import { prefixI18N } from 'app/hooks/useI18NPrefix';
 import Quill from 'quill';
 import { ImageDrop } from 'quill-image-drop-module';
 import { FC } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import styled from 'styled-components/macro';
-
 Quill.register('modules/imageDrop', ImageDrop);
 
 export const Formats = [
@@ -31,7 +31,9 @@ interface CommonRichTextProps {
 }
 export const CommonRichText: FC<CommonRichTextProps> = ({
   children,
-  placeholder = '请输入',
+  placeholder = prefixI18N(
+    'main.pages.schedulePage.sidebar.editorPage.emailSettingForm.commonRichText.pleaseEnter',
+  ),
   ...restProps
 }) => {
   return (

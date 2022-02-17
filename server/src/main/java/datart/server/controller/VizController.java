@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -46,8 +47,8 @@ public class VizController extends BaseController {
 
     @ApiOperation(value = "list viz folders")
     @PostMapping(value = "/check/name")
-    public ResponseData<Boolean> checkVizName(String orgId, String vizType, String name, String parentId) {
-        return ResponseData.success(vizService.checkName(orgId, name, parentId, ResourceType.valueOf(vizType)));
+    public ResponseData<Boolean> checkVizName(@Validated @RequestBody CheckNameParam param) {
+        return ResponseData.success(vizService.checkName(param.getOrgId(), param.getName(), param.getParentId(), ResourceType.valueOf(param.getVizType())));
     }
 
     @ApiOperation(value = "list viz folders")
@@ -107,6 +108,12 @@ public class VizController extends BaseController {
     @PutMapping(value = "/dashboards/{dashboardId}")
     public ResponseData<Boolean> updateDashboard(@PathVariable String dashboardId, @RequestBody DashboardUpdateParam updateParam) {
         return ResponseData.success(vizService.updateDashboard(updateParam));
+    }
+
+    @ApiOperation(value = "copy a dashboard")
+    @PutMapping(value = "/dashboards/{dashboardId}/copy")
+    public ResponseData<Folder> copyDashboard(@PathVariable String dashboardId, @RequestBody DashboardCreateParam createParam) throws IOException {
+        return ResponseData.success(vizService.copyDashboard(createParam));
     }
 
     @ApiOperation(value = "delete a dashboard")

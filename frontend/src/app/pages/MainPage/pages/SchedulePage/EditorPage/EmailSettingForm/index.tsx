@@ -1,5 +1,6 @@
 import { DownCircleOutlined, UpCircleOutlined } from '@ant-design/icons';
 import { Checkbox, Col, Form, Input, InputNumber, Row } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, useMemo, useState } from 'react';
 import { FileTypes, FILE_TYPE_OPTIONS } from '../../constants';
 import { CommonRichText } from './CommonRichText';
@@ -14,7 +15,9 @@ export const EmailSettingForm: FC<EmailSettingFormProps> = ({
   onFileTypeChange,
 }) => {
   const [showBcc, setShowBcc] = useState(false);
-
+  const t = useI18NPrefix(
+    'main.pages.schedulePage.sidebar.editorPage.emailSettingForm.index',
+  );
   const hasImgeWidth = useMemo(() => {
     return fileType && fileType?.length > 0
       ? fileType?.includes(FileTypes.Image)
@@ -23,21 +26,20 @@ export const EmailSettingForm: FC<EmailSettingFormProps> = ({
   const ccLabel = useMemo(() => {
     return (
       <>
-        抄送{' '}
+        {t('CC') + ' '}
         <span onClick={() => setShowBcc(!showBcc)}>
-          {' '}
           {showBcc ? <UpCircleOutlined /> : <DownCircleOutlined />}
         </span>
       </>
     );
-  }, [showBcc]);
+  }, [showBcc, t]);
 
   return (
     <>
       <Form.Item
-        label="主题"
+        label={t('theme')}
         name="subject"
-        rules={[{ required: true, message: '主题为必填项' }]}
+        rules={[{ required: true, message: t('subjectIsRequired') }]}
       >
         <Input />
       </Form.Item>
@@ -45,7 +47,7 @@ export const EmailSettingForm: FC<EmailSettingFormProps> = ({
         <Col span={15}>
           <Form.Item
             labelCol={{ span: 8 }}
-            label="文件类型"
+            label={t('fileType')}
             name="type"
             rules={[{ required: true }]}
           >
@@ -59,22 +61,22 @@ export const EmailSettingForm: FC<EmailSettingFormProps> = ({
           {hasImgeWidth ? (
             <div className="image_width_form_item_wrapper">
               <Form.Item
-                label="图片宽度"
+                label={t('picWidth')}
                 labelCol={{ span: 10 }}
                 name="imageWidth"
                 rules={[{ required: true }]}
               >
                 <InputNumber min={100} />
               </Form.Item>
-              <span className="image_width_unit">像素</span>
+              <span className="image_width_unit">{t('px')}</span>
             </div>
           ) : null}
         </Col>
       </Row>
       <Form.Item
-        label="收件人"
+        label={t('recipient')}
         name="to"
-        rules={[{ required: true, message: '收件人为必填项' }]}
+        rules={[{ required: true, message: t('recipientIsRequired') }]}
       >
         <MailTagFormItem />
       </Form.Item>
@@ -82,11 +84,11 @@ export const EmailSettingForm: FC<EmailSettingFormProps> = ({
         <MailTagFormItem />
       </Form.Item>
       {showBcc ? (
-        <Form.Item label="密送" name="bcc">
+        <Form.Item label={t('bcc')} name="bcc">
           <MailTagFormItem />
         </Form.Item>
       ) : null}
-      <Form.Item label="邮件内容" validateFirst name="textContent">
+      <Form.Item label={t('contentOfEmail')} validateFirst name="textContent">
         <CommonRichText placeholder="This email comes from cron job on the datart." />
       </Form.Item>
     </>

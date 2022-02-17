@@ -15,15 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   ValueOptionType,
   ValueOptionTypes,
 } from 'app/pages/DashBoardPage/constants';
-import {
-  DEFAULT_VALUE_DATE_FORMAT,
-  VariableValueTypes,
-} from 'app/pages/MainPage/pages/VariablePage/constants';
+import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -31,17 +27,18 @@ import {
 import {
   ControllerFacadeTypes,
   ControllerFacadeTypes as Opt,
-  RelativeOrExactTime,
+  TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
+import i18next from 'i18next';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
+import { TIME_FORMATTER } from './../../../../../../../globalConstants';
 import {
   DateControllerTypes,
   NumericalControllerTypes,
   RangeControlTypes,
 } from './constants';
 import { ControllerConfig, PickerType } from './types';
-
 export const getStringFacadeOptions = (type: ValueOptionType) => {
   switch (type) {
     case 'common':
@@ -82,55 +79,13 @@ export const getDateFacadeOptions = (category: ChartDataViewFieldCategory) => {
   }
 };
 // 展示前处理
-export const preformatWidgetFilter = (
+export const preformatControlConfig = (
   preConfig: ControllerConfig,
   controllerType: ControllerFacadeTypes,
 ) => {
   let config = preConfig;
   if (DateControllerTypes.includes(controllerType)) {
     config = formatControlDateToMoment(JSON.parse(JSON.stringify(config)));
-  }
-  return config;
-};
-
-export const formatControlDateToMoment = (config: ControllerConfig) => {
-  if (config.controllerDate) {
-    const filterDate = config.controllerDate;
-    if (filterDate.startTime && filterDate.startTime.exactValue) {
-      if (typeof filterDate.startTime.exactValue === 'string') {
-        let exactTime = filterDate.startTime.exactValue;
-        let newExactTime = moment(exactTime, DEFAULT_VALUE_DATE_FORMAT);
-        config.controllerDate.startTime.exactValue = newExactTime;
-      }
-    }
-    if (filterDate.endTime && filterDate.endTime.exactValue) {
-      if (typeof filterDate.endTime.exactValue === 'string') {
-        let exactTime = filterDate.endTime.exactValue;
-        let newExactTime = moment(exactTime, DEFAULT_VALUE_DATE_FORMAT);
-        config.controllerDate.endTime!.exactValue = newExactTime;
-      }
-    }
-  }
-  return config;
-};
-
-export const formatControlDateToStr = (config: ControllerConfig) => {
-  if (config.controllerDate) {
-    const filterDate = config.controllerDate;
-    if (filterDate.startTime && filterDate.startTime.exactValue) {
-      if ((filterDate.startTime.exactValue as Moment).format) {
-        let exactTime = filterDate.startTime.exactValue as Moment;
-        let newExactTime = exactTime.format(DEFAULT_VALUE_DATE_FORMAT);
-        config.controllerDate.startTime.exactValue = newExactTime;
-      }
-    }
-    if (filterDate.endTime && filterDate.endTime.exactValue) {
-      if ((filterDate.endTime.exactValue as Moment).format) {
-        let exactTime = filterDate.endTime.exactValue as Moment;
-        let newExactTime = exactTime.format(DEFAULT_VALUE_DATE_FORMAT);
-        config.controllerDate.endTime!.exactValue = newExactTime;
-      }
-    }
   }
   return config;
 };
@@ -154,6 +109,47 @@ export const postControlConfig = (
 
   return config;
 };
+export const formatControlDateToMoment = (config: ControllerConfig) => {
+  if (config.controllerDate) {
+    const filterDate = config.controllerDate;
+    if (filterDate.startTime && filterDate.startTime.exactValue) {
+      if (typeof filterDate.startTime.exactValue === 'string') {
+        let exactTime = filterDate.startTime.exactValue;
+        let newExactTime = moment(exactTime, TIME_FORMATTER);
+        config.controllerDate.startTime.exactValue = newExactTime;
+      }
+    }
+    if (filterDate.endTime && filterDate.endTime.exactValue) {
+      if (typeof filterDate.endTime.exactValue === 'string') {
+        let exactTime = filterDate.endTime.exactValue;
+        let newExactTime = moment(exactTime, TIME_FORMATTER);
+        config.controllerDate.endTime!.exactValue = newExactTime;
+      }
+    }
+  }
+  return config;
+};
+
+export const formatControlDateToStr = (config: ControllerConfig) => {
+  if (config.controllerDate) {
+    const filterDate = config.controllerDate;
+    if (filterDate.startTime && filterDate.startTime.exactValue) {
+      if ((filterDate.startTime.exactValue as Moment).format) {
+        let exactTime = filterDate.startTime.exactValue as Moment;
+        let newExactTime = exactTime.format(TIME_FORMATTER);
+        config.controllerDate.startTime.exactValue = newExactTime;
+      }
+    }
+    if (filterDate.endTime && filterDate.endTime.exactValue) {
+      if ((filterDate.endTime.exactValue as Moment).format) {
+        let exactTime = filterDate.endTime.exactValue as Moment;
+        let newExactTime = exactTime.format(TIME_FORMATTER);
+        config.controllerDate.endTime!.exactValue = newExactTime;
+      }
+    }
+  }
+  return config;
+};
 
 export const getInitWidgetController = (
   type: ControllerFacadeTypes = ControllerFacadeTypes.DropdownList,
@@ -171,6 +167,8 @@ export const getInitWidgetController = (
       return getRangeSliderControllerConfig();
     case ControllerFacadeTypes.RadioGroup:
       return getRadioGroupControllerConfig();
+    case ControllerFacadeTypes.CheckboxGroup:
+      return getCheckboxGroupControllerConfig();
     case ControllerFacadeTypes.Slider:
       return getSliderControllerConfig();
     case ControllerFacadeTypes.DropdownList:
@@ -201,7 +199,7 @@ export const getTimeControllerConfig = () => {
   config.controllerDate = {
     pickerType: 'date',
     startTime: {
-      relativeOrExact: RelativeOrExactTime.Exact,
+      relativeOrExact: TimeFilterValueCategory.Exact,
       exactValue: null,
     },
   };
@@ -213,17 +211,22 @@ export const getRangeTimeControllerConfig = () => {
   config.controllerDate = {
     pickerType: 'date',
     startTime: {
-      relativeOrExact: RelativeOrExactTime.Exact,
+      relativeOrExact: TimeFilterValueCategory.Exact,
       exactValue: null,
     },
     endTime: {
-      relativeOrExact: RelativeOrExactTime.Exact,
+      relativeOrExact: TimeFilterValueCategory.Exact,
       exactValue: null,
     },
   };
   return config;
 };
 export const getMultiDropdownListControllerConfig = () => {
+  const config = getInitControllerConfig();
+  config.sqlOperator = FilterSqlOperator.In;
+  return config;
+};
+export const getCheckboxGroupControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.In;
   return config;
@@ -289,28 +292,25 @@ export const formatDateByPickType = (
   pickerType: PickerType,
   momentTime: Moment,
 ) => {
-  const formatTemp = DEFAULT_VALUE_DATE_FORMAT;
+  const formatTemp = TIME_FORMATTER;
   if (!momentTime) {
     return null;
   }
 
   switch (pickerType) {
     case 'dateTime':
-    case 'quarter':
+      return momentTime.format(formatTemp);
     case 'date':
-      return momentTime.set({ h: 0, m: 0, s: 0 }).format(formatTemp);
+      return momentTime.startOf('day').format(formatTemp);
     case 'week':
       let year = String(momentTime.year());
       let week = String(momentTime.week() - 1);
-      var date = moment(year).add(week, 'weeks').startOf('week');
-      var value = date.format(formatTemp);
-      return value;
+      return moment(year).add(week, 'weeks').startOf('week').format(formatTemp);
+    case 'quarter':
     case 'month':
-      return momentTime.set({ date: 1, h: 0, m: 0, s: 0 }).format(formatTemp);
+      return momentTime.startOf('month').format(formatTemp);
     case 'year':
-      return momentTime
-        .set({ month: 0, date: 1, h: 0, m: 0, s: 0 })
-        .format(formatTemp);
+      return momentTime.startOf('year').format(formatTemp);
     default:
       return null;
   }
@@ -335,13 +335,13 @@ export const rangeNumberValidator = async (_, values: any[]) => {
     return Promise.resolve(values);
   }
   if (!startHasValue && endHasValue) {
-    return Promise.reject(new Error('请填写 起始值'));
+    return Promise.reject(new Error(i18next.t('viz.tips.noStartValue')));
   }
   if (startHasValue && !endHasValue) {
-    return Promise.reject(new Error('请填写 结束值'));
+    return Promise.reject(new Error(i18next.t('viz.tips.noEndValue')));
   }
   if (values?.[0] - values?.[1] > 0) {
-    return Promise.reject(new Error(' 起始值 不该小于 结束值'));
+    return Promise.reject(new Error(i18next.t('viz.tips.endGTStartErr')));
   }
   return Promise.resolve(values);
 };

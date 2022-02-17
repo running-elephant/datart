@@ -17,45 +17,47 @@
  */
 
 import { Collapse } from 'antd';
+import CollapseHeader from 'app/components/FormGenerator/CollapseHeader';
 import GroupLayout from 'app/components/FormGenerator/Layout/GroupLayout';
 import { GroupLayoutMode } from 'app/components/FormGenerator/types';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import {
-  ChartDataSectionConfig,
-  ChartStyleSectionConfig,
-} from 'app/types/ChartConfig';
+import { ChartDataConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 
 const ChartStyleConfigPanel: FC<{
-  configs?: ChartStyleSectionConfig[];
-  dataConfigs?: ChartDataSectionConfig[];
+  configs?: ChartStyleConfig[];
+  dataConfigs?: ChartDataConfig[];
   onChange: (
     ancestors: number[],
-    config: ChartStyleSectionConfig,
+    config: ChartStyleConfig,
     needRefresh?: boolean,
   ) => void;
 }> = memo(
   ({ configs, dataConfigs, onChange }) => {
     const t = useI18NPrefix(`viz.palette.style`);
-
     return (
       <Collapse className="datart-config-panel" ghost>
-        {configs?.map((c, index) => (
-          <Collapse.Panel header={t(c.label)} key={c.key}>
-            <GroupLayout
-              ancestors={[index]}
-              mode={
-                c.comType === 'group'
-                  ? GroupLayoutMode.INNER
-                  : GroupLayoutMode.OUTTER
-              }
-              data={c}
-              translate={t}
-              dataConfigs={dataConfigs}
-              onChange={onChange}
-            />
-          </Collapse.Panel>
-        ))}
+        {configs
+          ?.filter(c => !Boolean(c.hidden))
+          .map((c, index) => (
+            <Collapse.Panel
+              header={<CollapseHeader title={t(c.label, true)} />}
+              key={c.key}
+            >
+              <GroupLayout
+                ancestors={[index]}
+                mode={
+                  c.comType === 'group'
+                    ? GroupLayoutMode.INNER
+                    : GroupLayoutMode.OUTTER
+                }
+                data={c}
+                translate={t}
+                dataConfigs={dataConfigs}
+                onChange={onChange}
+              />
+            </Collapse.Panel>
+          ))}
       </Collapse>
     );
   },

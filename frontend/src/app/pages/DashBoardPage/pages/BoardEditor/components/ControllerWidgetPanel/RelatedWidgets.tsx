@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Table } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useEffect, useMemo, useState } from 'react';
 
@@ -31,6 +32,7 @@ export interface RelatedWidgetsProps {
 
 export const RelatedWidgets: React.FC<RelatedWidgetsProps> = memo(
   ({ widgets, relatedWidgets, onChange }) => {
+    const tw = useI18NPrefix(`viz.widget`);
     const [selectedWidgetIds, setSelectedWidgetIds] = useState<string[]>([]);
 
     const rowSelection = keys => {
@@ -49,15 +51,19 @@ export const RelatedWidgets: React.FC<RelatedWidgetsProps> = memo(
     const columns = useMemo(
       () => [
         {
-          title: '',
+          title: tw('widgetName'),
           render: (w: Widget) => <span>{w.config.name}</span>,
         },
+        {
+          title: tw('widgetType'),
+          render: (w: Widget) => <span>{w.config.type}</span>,
+        },
       ],
-      [],
+      [tw],
     );
     return (
       <>
-        <h3>关联组件</h3>
+        <h3>{tw('associatedWidget')}</h3>
         <Table
           rowKey={record => record.id}
           rowSelection={{

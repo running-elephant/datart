@@ -20,18 +20,15 @@ import { Collapse } from 'antd';
 import { GroupLayout } from 'app/components';
 import { GroupLayoutMode } from 'app/components/FormGenerator/types';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import {
-  ChartDataSectionConfig,
-  ChartStyleSectionConfig,
-} from 'app/types/ChartConfig';
+import { ChartDataConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 
 const ChartSettingConfigPanel: FC<{
-  configs?: ChartStyleSectionConfig[];
-  dataConfigs?: ChartDataSectionConfig[];
+  configs?: ChartStyleConfig[];
+  dataConfigs?: ChartDataConfig[];
   onChange: (
     ancestors: number[],
-    config: ChartStyleSectionConfig,
+    config: ChartStyleConfig,
     needRefresh?: boolean,
   ) => void;
 }> = memo(
@@ -41,7 +38,7 @@ const ChartSettingConfigPanel: FC<{
     return (
       <Collapse className="datart-config-panel" ghost>
         {configs?.map((c, index) => (
-          <Collapse.Panel header={t(c.label)} key={c.key}>
+          <Collapse.Panel header={t(c.label, true)} key={c.key}>
             <GroupLayout
               ancestors={[index]}
               mode={

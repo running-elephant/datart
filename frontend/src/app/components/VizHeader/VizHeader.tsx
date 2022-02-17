@@ -21,33 +21,38 @@ import {
   EditOutlined,
   MoreOutlined,
   SendOutlined,
-  VerticalAlignBottomOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
+import SaveToDashboard from 'app/components/SaveToDashboard';
 import {
   ShareLinkModal,
   VizOperationMenu,
 } from 'app/components/VizOperationMenu';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { FC, memo, useState } from 'react';
+import { TITLE_SUFFIX } from 'globalConstants';
+import { FC, memo, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { DetailPageHeader } from '../DetailPageHeader';
-
-const TITLE_SUFFIX = ['[已归档]', '[未发布]'];
 
 const VizHeader: FC<{
   chartName?: string;
   status?: number;
   publishLoading?: boolean;
   chartDescription?: string;
+  backendChartId?: string;
   onRun?;
   onGotoEdit?;
   onPublish?: () => void;
   onGenerateShareLink?: (date, usePwd?) => any;
   onDownloadData?;
+  onSaveAsVizs?;
+  onReloadData?;
+  onAddToDashBoard?;
+  onRecycleViz?;
   allowDownload?: boolean;
   allowShare?: boolean;
   allowManage?: boolean;
+  orgId?: string;
 }> = memo(
   ({
     chartName,
@@ -59,34 +64,66 @@ const VizHeader: FC<{
     onGotoEdit,
     onGenerateShareLink,
     onDownloadData,
+    onSaveAsVizs,
+    onReloadData,
+    onAddToDashBoard,
+    onRecycleViz,
     allowDownload,
     allowShare,
     allowManage,
+    orgId,
+    backendChartId,
   }) => {
-    const t = useI18NPrefix(`viz.chartPreview`);
+    const t = useI18NPrefix(`viz.action`);
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const isArchived = Number(status) === 0;
 
-    const handleCloseShareLinkModal = () => {
+    const handleCloseShareLinkModal = useCallback(() => {
       setShowShareLinkModal(false);
-    };
+    }, []);
 
-    const handleOpenShareLinkModal = () => {
+    const handleOpenShareLinkModal = useCallback(() => {
       setShowShareLinkModal(true);
-    };
+    }, []);
+
+    const handleModalOk = useCallback(
+      (dashboardId: string) => {
+        setIsModalVisible(false);
+        onAddToDashBoard?.(dashboardId);
+      },
+      [onAddToDashBoard],
+    );
+
+    const handleModalCancel = useCallback(() => {
+      setIsModalVisible(false);
+    }, []);
 
     const getOverlays = () => {
       return (
         <VizOperationMenu
           onShareLinkClick={onGenerateShareLink && handleOpenShareLinkModal}
           onDownloadDataLinkClick={onDownloadData}
+          onSaveAsVizs={onSaveAsVizs}
+          onReloadData={onReloadData}
+          onAddToDashBoard={onAddToDashBoard && setIsModalVisible}
           allowDownload={allowDownload}
           allowShare={allowShare}
+          allowManage={allowManage}
+          isArchived={isArchived}
+          onPublish={Number(status) === 2 ? onPublish : ''}
+          onRecycleViz={onRecycleViz}
         />
       );
     };
 
-    const title = `${chartName || ''} ${TITLE_SUFFIX[Number(status)] || ''}`;
-    const isArchived = Number(status) === 0;
+    const title = useMemo(() => {
+      const base = chartName || '';
+      const suffix = TITLE_SUFFIX[Number(status)]
+        ? `[${t(TITLE_SUFFIX[Number(status)])}]`
+        : '';
+      return base + suffix;
+    }, [chartName, status, t]);
 
     return (
       <Wrapper>
@@ -101,20 +138,14 @@ const VizHeader: FC<{
                   {t('run')}
                 </Button>
               )}
-              {allowManage && !isArchived && onPublish && (
+              {allowManage && !isArchived && onPublish && Number(status) === 1 && (
                 <Button
                   key="publish"
-                  icon={
-                    status === 1 ? (
-                      <SendOutlined />
-                    ) : (
-                      <VerticalAlignBottomOutlined />
-                    )
-                  }
+                  icon={<SendOutlined />}
                   loading={publishLoading}
                   onClick={onPublish}
                 >
-                  {status === 1 ? t('publish') : t('unpublish')}
+                  {t('publish')}
                 </Button>
               )}
               {allowManage && !isArchived && onGotoEdit && (
@@ -122,7 +153,7 @@ const VizHeader: FC<{
                   {t('edit')}
                 </Button>
               )}
-              <Dropdown key="more" trigger={['click']} overlay={getOverlays()}>
+              <Dropdown key="more" arrow overlay={getOverlays()}>
                 <Button icon={<MoreOutlined />} />
               </Dropdown>
             </>
@@ -135,6 +166,16 @@ const VizHeader: FC<{
             onCancel={handleCloseShareLinkModal}
             onGenerateShareLink={onGenerateShareLink}
           />
+        )}
+        {onSaveAsVizs && (
+          <SaveToDashboard
+            backendChartId={backendChartId}
+            title={t('addToDash')}
+            orgId={orgId as string}
+            isModalVisible={isModalVisible}
+            handleOk={handleModalOk}
+            handleCancel={handleModalCancel}
+          ></SaveToDashboard>
         )}
       </Wrapper>
     );

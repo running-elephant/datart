@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionConfig } from 'app/types/ChartConfig';
+import { ChartDataConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import ChartFilterCondition, {
   ConditionBuilder,
@@ -24,8 +24,8 @@ import ChartFilterCondition, {
 import RelationTypeFilter from './RelationTypeFilter';
 
 const ArrangeFilterAcion: FC<{
-  config: ChartDataSectionConfig;
-  onConfigChange: (config: ChartDataSectionConfig) => void;
+  config: ChartDataConfig;
+  onConfigChange: (config: ChartDataConfig) => void;
 }> = memo(({ config, onConfigChange }) => {
   const [fields] = useState(config?.rows?.filter(c => Boolean(c.filter)) || []);
   const [relation, setRelation] = useState<ChartFilterCondition>(() => {

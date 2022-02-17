@@ -29,8 +29,8 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-  ChartDataViewMeta,
 } from 'app/types/ChartDataView';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { FC, memo, useMemo } from 'react';
 import { useDrag } from 'react-dnd';
@@ -50,8 +50,10 @@ import {
 
 export const ChartDraggableSourceContainer: FC<
   {
-    onDeleteComputedField: (fieldName) => void;
-    onEditComputedField: (fieldName) => void;
+    onDeleteComputedField?: (fieldName) => void;
+    onEditComputedField?: (fieldName) => void;
+    onSelectionChange?: (dataItemId, cmdKeyActive, shiftKeyActive) => void;
+    onClearCheckedList?: () => void;
   } & ChartDataViewMeta
 > = memo(function ChartDraggableSourceContainer({
   id,
@@ -61,23 +63,45 @@ export const ChartDraggableSourceContainer: FC<
   expression,
   onDeleteComputedField,
   onEditComputedField,
+  onSelectionChange,
+  selectedItems,
+  isActive,
+  onClearCheckedList,
 }) {
   const t = useI18NPrefix(`viz.workbench.dataview`);
   const [, drag] = useDrag(
     () => ({
       type: CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
       canDrag: true,
-      item: { colName, type, category },
+      item: selectedItems?.length
+        ? selectedItems.map(item => ({
+            colName: item.id,
+            type: item.type,
+            category: item.category,
+          }))
+        : { colName, type, category },
+      collect: monitor => ({
+        isDragging: monitor.isDragging(),
+      }),
+      end: onClearCheckedList,
     }),
-    [],
+    [selectedItems],
   );
+
+  const styleClasses: Array<string> = useMemo(() => {
+    let styleArr: Array<string> = [];
+    if (isActive) {
+      styleArr.push('container-active');
+    }
+    return styleArr;
+  }, [isActive]);
 
   const renderContent = useMemo(() => {
     const _handleMenuClick = (e, fieldName) => {
       if (e.key === 'delete') {
-        onDeleteComputedField(fieldName);
+        onDeleteComputedField?.(fieldName);
       } else {
-        onEditComputedField(fieldName);
+        onEditComputedField?.(fieldName);
       }
     };
 
@@ -151,7 +175,17 @@ export const ChartDraggableSourceContainer: FC<
     );
   }, [type, colName, onDeleteComputedField, onEditComputedField, category, t]);
 
-  return <Container ref={drag}>{renderContent}</Container>;
+  return (
+    <Container
+      onClick={e => {
+        onSelectionChange?.(colName, e.metaKey || e.ctrlKey, e.shiftKey);
+      }}
+      ref={drag}
+      className={styleClasses.join(' ')}
+    >
+      {renderContent}
+    </Container>
+  );
 });
 
 export default ChartDraggableSourceContainer;
@@ -160,12 +194,14 @@ const Container = styled.div`
   display: flex;
   flex: 1;
   align-items: center;
-  padding: ${SPACE_TIMES(0.5)} ${SPACE} ${SPACE_TIMES(0.5)} ${SPACE_SM};
+  padding: ${SPACE_TIMES(0.5)} ${SPACE} ${SPACE_TIMES(0.5)} ${SPACE_TIMES(2)};
   font-size: ${FONT_SIZE_SUBTITLE};
   font-weight: ${FONT_WEIGHT_MEDIUM};
   color: ${p => p.theme.textColorSnd};
   cursor: pointer;
-
+  &.container-active {
+    background-color: #f8f9fa;
+  }
   > p {
     flex: 1;
   }

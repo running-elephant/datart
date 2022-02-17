@@ -17,8 +17,9 @@
  */
 
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { useSaveAsViz } from 'app/pages/MainPage/pages/VizPage/hooks/useSaveAsViz';
 import { generateShareLinkAsync } from 'app/utils/fetch';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import React, { FC, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import {
@@ -33,15 +34,22 @@ import {
   resetControllerAction,
   widgetsQueryAction,
 } from '../../pages/Board/slice/asyncActions';
-import { getWidgetDataAsync } from '../../pages/Board/slice/thunk';
+import {
+  getChartWidgetDataAsync,
+  getControllerOptions,
+} from '../../pages/Board/slice/thunk';
 import { Widget } from '../../pages/Board/slice/types';
 import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
 import {
-  getEditWidgetDataAsync,
+  getEditChartWidgetDataAsync,
+  getEditControllerOptions,
   toUpdateDashboard,
 } from '../../pages/BoardEditor/slice/thunk';
-import { getNeedRefreshWidgetsByFilter } from '../../utils/widget';
+import {
+  getCascadeControllers,
+  getNeedRefreshWidgetsByController,
+} from '../../utils/widget';
 
 export const BoardActionProvider: FC<{ id: string }> = ({
   id: boardId,
@@ -50,6 +58,7 @@ export const BoardActionProvider: FC<{ id: string }> = ({
   const dispatch = useDispatch();
   const { editing, renderMode } = useContext(BoardContext);
   const { config: boardConfig } = useContext(BoardConfigContext);
+  const saveAsViz = useSaveAsViz();
   const { hasQueryControl } = boardConfig;
   const actions: BoardActionContextProps = {
     widgetUpdate: (widget: Widget) => {
@@ -75,25 +84,37 @@ export const BoardActionProvider: FC<{ id: string }> = ({
         dispatch(resetControllerAction({ boardId, renderMode }));
       }
     }, 500),
-    refreshWidgetsByFilter: debounce((widget: Widget) => {
+    refreshWidgetsByController: debounce((widget: Widget) => {
+      const controllerIds = getCascadeControllers(widget);
+      controllerIds.forEach(controlWidgetId => {
+        if (editing) {
+          dispatch(getEditControllerOptions(controlWidgetId));
+        } else {
+          dispatch(
+            getControllerOptions({
+              boardId,
+              widgetId: controlWidgetId,
+              renderMode,
+            }),
+          );
+        }
+      });
       if (hasQueryControl) {
         return;
       }
-      const widgetIds = getNeedRefreshWidgetsByFilter(widget);
       const pageInfo: Partial<PageInfo> = {
         pageNo: 1,
       };
-      widgetIds.forEach(widgetId => {
+      const chartWidgetIds = getNeedRefreshWidgetsByController(widget);
+
+      chartWidgetIds.forEach(widgetId => {
         if (editing) {
           dispatch(
-            getEditWidgetDataAsync({
-              widgetId,
-              option: { pageInfo },
-            }),
+            getEditChartWidgetDataAsync({ widgetId, option: { pageInfo } }),
           );
         } else {
           dispatch(
-            getWidgetDataAsync({
+            getChartWidgetDataAsync({
               boardId,
               widgetId,
               renderMode,
@@ -122,6 +143,9 @@ export const BoardActionProvider: FC<{ id: string }> = ({
       if (renderMode === 'read') {
         dispatch(boardDownLoadAction({ boardId, renderMode }));
       }
+    },
+    onSaveAsVizs: () => {
+      saveAsViz(boardId, 'DASHBOARD');
     },
   };
   return (

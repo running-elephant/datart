@@ -22,24 +22,28 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
+import i18next from 'i18next';
 import { PRIMARY, WHITE } from 'styles/StyleConstants';
 import { WidgetType } from './pages/Board/slice/types';
-
 export const RGL_DRAG_HANDLE = 'dashboard-draggableHandle';
 export const STORAGE_BOARD_KEY_PREFIX = 'DATART_BOARD_DATA_';
 export const STORAGE_IMAGE_KEY_PREFIX = 'DATART_IMAGE_';
-
+export const BASE_VIEW_WIDTH = 1024;
+export const BASE_ROW_HEIGHT = 32;
+export const MIN_ROW_HEIGHT = 24;
+export const MIN_MARGIN = 8;
+export const MIN_PADDING = 8;
 /** lg: 12,md: 12,sm: 8,xs: 2,xxs: 2 */
-export const LAYOUT_COLS = {
+export const LAYOUT_COLS_MAP = {
   lg: 12,
   md: 12,
   sm: 12,
-  xs: 2,
-  xxs: 2,
+  xs: 6,
+  xxs: 6,
 };
 /** lg: 12,md: 10,sm: 6,xs: 4,xxs: 2 */
 
-export const BREAK_POINTS = {
+export const BREAK_POINT_MAP = {
   lg: 1200,
   md: 996,
   sm: 768,
@@ -47,6 +51,19 @@ export const BREAK_POINTS = {
   xxs: 0,
 };
 export const INIT_COLS = 12;
+export const DEVICE_LIST = {
+  '华为 Mate 30': [360, 780],
+  '华为 Mate 30 Pro': [392, 800],
+  '小米 12': [393, 851],
+  'iPhone X': [375, 812],
+  'iPhone XR': [414, 896],
+  'iPhone 12 Pro': [390, 844],
+  'iPhone SE': [375, 667],
+  'Pixel 5': [393, 851],
+  'Samsung Galaxy S8+': [360, 740],
+  'iPad Mini': [768, 1024],
+  custom: null,
+};
 
 // DASH_UNDO
 export const BOARD_UNDO = {
@@ -89,6 +106,7 @@ export const CanFullScreenWidgetTypes: WidgetType[] = ['chart', 'media'];
 export const CONTAINER_TAB = 'containerTab';
 
 //
+export const NeedFetchWidgetTypes: WidgetType[] = ['chart', 'controller'];
 
 // setting
 
@@ -96,11 +114,11 @@ export const TEXT_ALIGN_ENUM = strEnumType(['left', 'center', 'right']);
 export type TextAlignType = keyof typeof TEXT_ALIGN_ENUM;
 
 export const BORDER_STYLE_ENUM = strEnumType([
+  'none',
   'solid',
   'dashed',
   'dotted',
   'double',
-  'none',
   'hidden',
   'ridge',
   'groove',
@@ -110,16 +128,16 @@ export const BORDER_STYLE_ENUM = strEnumType([
 export type BorderStyleType = keyof typeof BORDER_STYLE_ENUM;
 
 export const BORDER_STYLE_OPTIONS = [
-  { name: '无', value: BORDER_STYLE_ENUM.none },
-  { name: '实线', value: BORDER_STYLE_ENUM.solid },
-  { name: '虚线', value: BORDER_STYLE_ENUM.dashed },
-  { name: '点线', value: BORDER_STYLE_ENUM.dotted },
-  { name: '双线', value: BORDER_STYLE_ENUM.double },
-  { name: '隐藏', value: BORDER_STYLE_ENUM.hidden },
-  { name: '凹槽', value: BORDER_STYLE_ENUM.groove },
-  { name: '垄状', value: BORDER_STYLE_ENUM.ridge },
-  { name: 'inset', value: BORDER_STYLE_ENUM.inset },
-  { name: 'outset', value: BORDER_STYLE_ENUM.outset },
+  { value: BORDER_STYLE_ENUM.none },
+  { value: BORDER_STYLE_ENUM.solid },
+  { value: BORDER_STYLE_ENUM.dashed },
+  { value: BORDER_STYLE_ENUM.dotted },
+  { value: BORDER_STYLE_ENUM.double },
+  { value: BORDER_STYLE_ENUM.hidden },
+  { value: BORDER_STYLE_ENUM.groove },
+  { value: BORDER_STYLE_ENUM.ridge },
+  { value: BORDER_STYLE_ENUM.inset },
+  { value: BORDER_STYLE_ENUM.outset },
 ];
 
 export const SCALE_MODE_ENUM = strEnumType([
@@ -131,10 +149,10 @@ export const SCALE_MODE_ENUM = strEnumType([
 
 export type ScaleModeType = keyof typeof SCALE_MODE_ENUM;
 export const SCALE_MODE__OPTIONS = [
-  { name: '等比宽度缩放', value: SCALE_MODE_ENUM.scaleWidth },
-  { name: '等比高度缩放', value: SCALE_MODE_ENUM.scaleHeight },
-  { name: '全屏铺满', value: SCALE_MODE_ENUM.scaleFull },
-  { name: '实际尺寸', value: SCALE_MODE_ENUM.noScale },
+  { value: SCALE_MODE_ENUM.scaleWidth },
+  { value: SCALE_MODE_ENUM.scaleHeight },
+  { value: SCALE_MODE_ENUM.scaleFull },
+  { value: SCALE_MODE_ENUM.noScale },
 ];
 
 export const enum ValueOptionTypes {
@@ -155,33 +173,53 @@ export const enum ControllerVisibleTypes {
 export type ControllerVisibleType = Uncapitalize<
   keyof typeof ControllerVisibleTypes
 >;
+const tfo = (operator: FilterSqlOperator) => {
+  const preStr = 'viz.common.enum.filterOperator.';
+  return i18next.t(preStr + operator);
+};
+const tft = (type: ControllerVisibleTypes) => {
+  const preStr = 'viz.common.enum.controllerVisibilityTypes.';
+  return i18next.t(preStr + type);
+};
+const getVisibleOptionItem = (type: ControllerVisibleTypes) => {
+  return {
+    name: tft(type),
+    value: type,
+  };
+};
+const getOperatorItem = (value: FilterSqlOperator) => {
+  return {
+    name: tfo(value),
+    value: value,
+  };
+};
 export const VISIBILITY_TYPE_OPTION = [
-  { name: '显示', value: ControllerVisibleTypes.Show },
-  { name: '隐藏', value: ControllerVisibleTypes.Hide },
-  { name: '条件', value: ControllerVisibleTypes.Condition },
+  getVisibleOptionItem(ControllerVisibleTypes.Show),
+  getVisibleOptionItem(ControllerVisibleTypes.Hide),
+  getVisibleOptionItem(ControllerVisibleTypes.Condition),
 ];
 export const ALL_SQL_OPERATOR_OPTIONS = [
-  { name: '等于', value: FilterSqlOperator.Equal },
-  { name: '不相等', value: FilterSqlOperator.NotEqual },
+  getOperatorItem(FilterSqlOperator.Equal),
+  getOperatorItem(FilterSqlOperator.NotEqual),
 
-  { name: '包含', value: FilterSqlOperator.In },
-  { name: '不包含', value: FilterSqlOperator.NotIn },
+  getOperatorItem(FilterSqlOperator.In),
+  getOperatorItem(FilterSqlOperator.NotIn),
 
-  { name: '为空', value: FilterSqlOperator.Null },
-  { name: '不为空', value: FilterSqlOperator.NotNull },
+  getOperatorItem(FilterSqlOperator.Null),
+  getOperatorItem(FilterSqlOperator.NotNull),
 
-  { name: '前缀包含', value: FilterSqlOperator.PrefixContain },
-  { name: '前缀不包含', value: FilterSqlOperator.NotPrefixContain },
+  getOperatorItem(FilterSqlOperator.PrefixContain),
+  getOperatorItem(FilterSqlOperator.NotPrefixContain),
 
-  { name: '后缀包含', value: FilterSqlOperator.SuffixContain },
-  { name: '后缀不包含', value: FilterSqlOperator.NotSuffixContain },
+  getOperatorItem(FilterSqlOperator.SuffixContain),
+  getOperatorItem(FilterSqlOperator.NotSuffixContain),
 
-  { name: '区间', value: FilterSqlOperator.Between },
+  getOperatorItem(FilterSqlOperator.Between),
 
-  { name: '大于或等于', value: FilterSqlOperator.GreaterThanOrEqual },
-  { name: '小于或等于', value: FilterSqlOperator.LessThanOrEqual },
-  { name: '大于', value: FilterSqlOperator.GreaterThan },
-  { name: '小于', value: FilterSqlOperator.LessThan },
+  getOperatorItem(FilterSqlOperator.GreaterThanOrEqual),
+  getOperatorItem(FilterSqlOperator.LessThanOrEqual),
+  getOperatorItem(FilterSqlOperator.GreaterThan),
+  getOperatorItem(FilterSqlOperator.LessThan),
 ];
 
 export const SQL_OPERATOR_OPTIONS_TYPES = {
@@ -190,6 +228,10 @@ export const SQL_OPERATOR_OPTIONS_TYPES = {
     FilterSqlOperator.NotEqual,
   ],
   [ControllerFacadeTypes.MultiDropdownList]: [
+    FilterSqlOperator.In,
+    FilterSqlOperator.NotIn,
+  ],
+  [ControllerFacadeTypes.CheckboxGroup]: [
     FilterSqlOperator.In,
     FilterSqlOperator.NotIn,
   ],

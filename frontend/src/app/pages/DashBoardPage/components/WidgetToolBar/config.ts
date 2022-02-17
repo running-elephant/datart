@@ -65,8 +65,8 @@ export const widgetActionMap = {
   edit: widgetEditActionMap,
 };
 
-// 支持作为触发器的图表ID
-export const TriggerChartIds: string[] = [
+// 支持作为 点击事件的 触发器的图表ID
+export const SupportTriggerChartIds: string[] = [
   'cluster-column-chart',
   'cluster-bar-chart',
   'stack-column-chart',
@@ -84,18 +84,21 @@ export const TriggerChartIds: string[] = [
   'double-y',
   'normal-outline-map-chart',
   'scatter-outline-map-chart',
+  'fenzu-table',
+  'mingxi-table',
 ];
 
 export const getWidgetActionList = (opt: {
   allList: WidgetActionListItem<widgetActionType>[];
   widget: Widget;
   boardEditing: boolean;
+  chartGraphId?: string;
 }) => {
-  const { widget, allList, boardEditing } = opt;
+  const { widget, allList, boardEditing, chartGraphId } = opt;
   const widgetType = widget.config.type;
   if (boardEditing) {
     if (widget.config.type === 'chart') {
-      return getEditChartActionList({ allList, widget });
+      return getEditChartActionList({ allList, widget, chartGraphId });
     } else {
       return allList.filter(item =>
         widgetActionMap.edit[widgetType].includes(item.key),
@@ -110,26 +113,26 @@ export const getWidgetActionList = (opt: {
 export const getEditChartActionList = (opt: {
   allList: WidgetActionListItem<widgetActionType>[];
   widget: Widget;
+  chartGraphId?: string;
 }) => {
-  const { widget, allList } = opt;
+  const { widget, allList, chartGraphId } = opt;
   const widgetType = widget.config.type;
   const curChartItems: widgetActionType[] =
     widgetActionMap.edit[widgetType].slice();
 
-  // TODO 判断哪些 chart 可以添加跳转 和联动 暂时用true 代替
-  let chartCanMakeJump = true;
-  let chartCanMakeLink = true;
-  if (chartCanMakeLink) {
+  const isTrigger = SupportTriggerChartIds.includes(chartGraphId as string);
+
+  if (isTrigger) {
+    //  Linkage
     curChartItems.push('makeLinkage');
-  }
-  if (widget.config.linkageConfig?.open) {
-    curChartItems.push('closeLinkage');
-  }
-  if (chartCanMakeJump) {
+    if (widget.config.linkageConfig?.open) {
+      curChartItems.push('closeLinkage');
+    }
+    //  Jump
     curChartItems.push('makeJump');
-  }
-  if (widget.config.jumpConfig?.open) {
-    curChartItems.push('closeJump');
+    if (widget.config.jumpConfig?.open) {
+      curChartItems.push('closeJump');
+    }
   }
 
   return allList

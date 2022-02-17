@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons';
 import { ButtonProps, List, message, Popconfirm, Space, Tooltip } from 'antd';
 import { IW, ListItem, ToolbarButton } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
 import { FC, memo, ReactNode, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -55,6 +56,8 @@ const Operations: FC<OperationsProps> = ({
   const [executeLoading, setExecuteLoading] = useState(false);
   const { actions } = useScheduleSlice();
   const dispatch = useDispatch();
+  const t = useI18NPrefix('main.pages.schedulePage.sidebar.scheduleList');
+
   const updateScheduleActive = useCallback(
     (active: boolean) => {
       dispatch(actions.setEditingScheduleActive(active));
@@ -66,7 +69,7 @@ const Operations: FC<OperationsProps> = ({
     startSchedule(scheduleId)
       .then(res => {
         if (!!res) {
-          message.success('启动成功');
+          message.success(t('successStarted'));
           onUpdateScheduleList();
           if (editingId === scheduleId) {
             updateScheduleActive(true);
@@ -76,13 +79,13 @@ const Operations: FC<OperationsProps> = ({
       .finally(() => {
         setStartLoading(false);
       });
-  }, [scheduleId, editingId, onUpdateScheduleList, updateScheduleActive]);
+  }, [scheduleId, editingId, onUpdateScheduleList, updateScheduleActive, t]);
   const handleStopSchedule = useCallback(() => {
     setStopLoading(true);
     stopSchedule(scheduleId)
       .then(res => {
         if (!!res) {
-          message.success('停止成功');
+          message.success(t('successStop'));
           onUpdateScheduleList();
           if (editingId === scheduleId) {
             updateScheduleActive(false);
@@ -92,26 +95,26 @@ const Operations: FC<OperationsProps> = ({
       .finally(() => {
         setStopLoading(false);
       });
-  }, [scheduleId, onUpdateScheduleList, editingId, updateScheduleActive]);
+  }, [scheduleId, onUpdateScheduleList, editingId, updateScheduleActive, t]);
   const handleExecuteSchedule = useCallback(() => {
     setExecuteLoading(true);
     executeSchedule(scheduleId)
       .then(res => {
         if (!!res) {
-          message.success('立即执行成功');
+          message.success(t('successImmediately'));
           onUpdateScheduleList();
         }
       })
       .finally(() => {
         setExecuteLoading(false);
       });
-  }, [scheduleId, onUpdateScheduleList]);
+  }, [scheduleId, onUpdateScheduleList, t]);
 
   return (
     <Space onClick={stopPPG}>
       {!active ? (
         <OperationButton
-          tooltipTitle="启动"
+          tooltipTitle={t('start')}
           loading={startLoading}
           icon={<CaretRightOutlined />}
           onClick={handleStartSchedule}
@@ -119,7 +122,7 @@ const Operations: FC<OperationsProps> = ({
       ) : null}
       {active ? (
         <OperationButton
-          tooltipTitle="停止"
+          tooltipTitle={t('stop')}
           loading={stopLoading}
           icon={<PauseOutlined />}
           onClick={handleStopSchedule}
@@ -127,13 +130,13 @@ const Operations: FC<OperationsProps> = ({
       ) : null}
 
       <Popconfirm
-        title="确定立即执行？"
+        title={t('executeItNow')}
         okButtonProps={{ loading: executeLoading }}
         onConfirm={handleExecuteSchedule}
       >
         <OperationButton
           loading={executeLoading}
-          tooltipTitle="立即执行"
+          tooltipTitle={t('executeImmediately')}
           icon={
             <SendOutlined
               rotate={-45}

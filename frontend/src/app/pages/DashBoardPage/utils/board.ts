@@ -15,25 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { migrateBoardConfig } from 'app/migration/BoardConfig/migrateBoardConfig';
 import {
   BoardInfo,
   BoardType,
-  BoardTypeMap,
   Dashboard,
   DashboardConfig,
   DataChart,
+  DeviceType,
   ServerDashboard,
   ServerDatachart,
-  ServerView,
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataView } from 'app/types/ChartDataView';
-// import { dataChartServerModel } from 'app/pages/MainPage/pages/VizPage/slice/types';
-import { transformMeta } from 'app/utils/chartHelper';
+import { View } from 'app/types/View';
+import { transformMeta } from 'app/utils/internalChartHelper';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
-  LAYOUT_COLS,
+  LAYOUT_COLS_MAP,
+  MIN_MARGIN,
+  MIN_PADDING,
+  NeedFetchWidgetTypes,
 } from '../constants';
 
 export const getDashBoardByResBoard = (data: ServerDashboard): Dashboard => {
@@ -58,28 +61,11 @@ export const getDashBoardByResBoard = (data: ServerDashboard): Dashboard => {
     status,
     thumbnail,
     index,
-    config: getBoardConfigByResBoard(config),
+    config: migrateBoardConfig(config),
     permissions,
   };
 };
-export const getBoardConfigByResBoard = (config: string) => {
-  // let nextConfig={} as DashboardConfig;
-  let borderTypes = Object.values(BoardTypeMap);
-  try {
-    let nextConfig: DashboardConfig = JSON.parse(config);
-    if (typeof nextConfig === 'string') {
-      nextConfig = JSON.parse(nextConfig);
-    }
-    if (!borderTypes.includes(nextConfig?.type)) {
-      return getInitBoardConfig('auto');
-    }
-    return nextConfig;
-  } catch (error) {
-    console.log('解析 config 出错');
-    let nextConfig = getInitBoardConfig('auto');
-    return nextConfig;
-  }
-};
+
 export const getScheduleBoardInfo = (
   boardInfo: BoardInfo,
   widgetMap: Record<string, Widget>,
@@ -87,7 +73,11 @@ export const getScheduleBoardInfo = (
   let newBoardInfo: BoardInfo = { ...boardInfo };
   const needFetchItems = Object.values(widgetMap)
     .filter(widget => {
-      if (widget.viewIds.length && widget.viewIds.length > 0) {
+      if (
+        widget.viewIds &&
+        widget.viewIds.length > 0 &&
+        NeedFetchWidgetTypes.includes(widget.config.type)
+      ) {
         return true;
       }
       return false;
@@ -98,6 +88,7 @@ export const getScheduleBoardInfo = (
 
   return newBoardInfo;
 };
+
 export const getInitBoardInfo = (obj: {
   id: string;
   widgetIds?: string[];
@@ -131,6 +122,7 @@ export const getInitBoardInfo = (obj: {
       type: 'add',
       widgetId: '',
     },
+    deviceType: DeviceType.Desktop,
     needFetchItems: [],
     hasFetchItems: [],
     boardWidthHeight: [0, 0],
@@ -141,26 +133,28 @@ export const getInitBoardInfo = (obj: {
 
 export const getInitBoardConfig = (boardType: BoardType) => {
   const dashboardConfig: DashboardConfig = {
+    version: '',
     background: BackgroundDefault,
     widgetDefaultSettings: {
       background: AutoBoardWidgetBackgroundDefault,
       boxShadow: false,
     },
     maxWidgetIndex: 0,
+    initialQuery: true,
+    hasQueryControl: false,
+    hasResetControl: false,
+    // auto
+    margin: [16, 16], //0-100
+    containerPadding: [16, 16], //0-100
+    cols: LAYOUT_COLS_MAP, //2-48    step 2
+    mobileMargin: [MIN_MARGIN, MIN_MARGIN],
+    mobileContainerPadding: [MIN_PADDING, MIN_PADDING],
     // free
     type: boardType,
     width: 1920,
     height: 1080,
     gridStep: [10, 10],
     scaleMode: 'scaleWidth',
-    // auto
-    margin: [16, 16], //0-100
-    containerPadding: [16, 16], //0-100
-    rowHeight: 32, //20-200
-    cols: LAYOUT_COLS, //2-48    step 2
-    initialQuery: true,
-    hasQueryControl: false,
-    hasResetControl: false,
   };
   return dashboardConfig;
 };
@@ -179,22 +173,17 @@ export const getDataChartMap = (dataCharts: DataChart[]) => {
   }, {} as Record<string, DataChart>);
 };
 
-export const getChartDataView = (
-  views: ServerView[],
-  dataCharts: DataChart[],
-) => {
+export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
   const viewViews: ChartDataView[] = [];
   views.forEach(view => {
     const dataChart = dataCharts.find(dc => dc.viewId === view.id);
-    if (dataChart) {
-      let viewView = {
-        ...view,
-        meta: transformMeta(view.model),
-        model: '',
-        computedFields: dataChart.config.computedFields || [],
-      };
-      viewViews.push(viewView);
-    }
+    let viewView = {
+      ...view,
+      meta: transformMeta(view.model),
+      model: '',
+      computedFields: dataChart?.config.computedFields || [],
+    };
+    viewViews.push(viewView);
   });
   return viewViews;
 };

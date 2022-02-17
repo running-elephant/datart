@@ -16,25 +16,26 @@
  * limitations under the License.
  */
 
-import {
-  MoreOutlined,
-  SendOutlined,
-  VerticalAlignBottomOutlined,
-} from '@ant-design/icons';
+import { MoreOutlined, SendOutlined } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
 import { ShareLinkModal } from 'app/components/VizOperationMenu';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { generateShareLinkAsync } from 'app/utils/fetch';
-import React, { FC, memo, useCallback, useContext, useState } from 'react';
+import { TITLE_SUFFIX } from 'globalConstants';
+import React, {
+  FC,
+  memo,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import { StoryContext } from '../contexts/StoryContext';
 import { StoryOverLay } from './StoryOverLay';
-// import { useSelector } from 'react-redux';
-
-const TITLE_SUFFIX = ['[已归档]', '[未发布]'];
 
 interface StoryHeaderProps {
   name?: string;
-
   status?: number;
   publishLoading?: boolean;
   onPublish?: () => void;
@@ -42,6 +43,7 @@ interface StoryHeaderProps {
   playStory: () => void;
   allowShare?: boolean;
   allowManage?: boolean;
+  onRecycleStory?: () => void;
 }
 export const StoryHeader: FC<StoryHeaderProps> = memo(
   ({
@@ -51,11 +53,18 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
     publishLoading,
     playStory,
     onPublish,
-
     allowShare,
     allowManage,
+    onRecycleStory,
   }) => {
-    const title = `${name || ''} ${TITLE_SUFFIX[Number(status)] || ''}`;
+    const t = useI18NPrefix(`viz.action`);
+    const title = useMemo(() => {
+      const base = name || '';
+      const suffix = TITLE_SUFFIX[Number(status)]
+        ? `[${t(TITLE_SUFFIX[Number(status)])}]`
+        : '';
+      return base + suffix;
+    }, [name, status, t]);
     const isArchived = Number(status) === 0;
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
     const { stroyBoardId } = useContext(StoryContext);
@@ -81,42 +90,42 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
         disabled={Number(status) < 2}
         actions={
           <>
-            {allowManage && !isArchived && (
+            {allowManage && !isArchived && Number(status) === 1 && (
               <Button
                 key="publish"
-                icon={
-                  status === 1 ? (
-                    <SendOutlined />
-                  ) : (
-                    <VerticalAlignBottomOutlined />
-                  )
-                }
+                icon={<SendOutlined />}
                 loading={publishLoading}
                 onClick={onPublish}
               >
-                {status === 1 ? '发布' : '取消发布'}
+                {t('publish')}
               </Button>
             )}
             {allowManage && !isArchived && (
               <Button key="edit" onClick={toggleEdit}>
-                编辑
+                {t('edit')}
               </Button>
             )}
             <Button key="run" onClick={playStory}>
-              播放
+              {t('play')}
             </Button>
-            <Dropdown
-              overlay={
-                <StoryOverLay
-                  allowShare={true}
-                  onOpenShareLink={onOpenShareLink}
-                />
-              }
-              placement="bottomCenter"
-              arrow
-            >
-              <Button icon={<MoreOutlined />} />
-            </Dropdown>
+            {(allowManage || allowShare) && (
+              <Dropdown
+                overlay={
+                  <StoryOverLay
+                    allowShare={allowShare}
+                    allowManage={allowManage}
+                    onOpenShareLink={onOpenShareLink}
+                    isArchived={isArchived}
+                    onPublish={Number(status) === 2 ? onPublish : ''}
+                    onRecycleStory={onRecycleStory}
+                  />
+                }
+                arrow
+              >
+                <Button icon={<MoreOutlined />} />
+              </Dropdown>
+            )}
+
             {showShareLinkModal && (
               <ShareLinkModal
                 visibility={showShareLinkModal}

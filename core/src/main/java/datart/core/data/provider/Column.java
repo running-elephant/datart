@@ -30,6 +30,14 @@ public class Column implements Serializable {
 
     private ValueType type;
 
+    private String fmt;
+
+    private String pkDatabase;
+
+    private String pkTable;
+
+    private String pkColumn;
+
     public Column(String name, ValueType type) {
         this.name = name;
         this.type = type;

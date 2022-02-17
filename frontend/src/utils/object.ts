@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartStyleSectionConfig } from 'app/types/ChartConfig';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import camelCase from 'lodash/camelCase';
 import cloneDeep from 'lodash/cloneDeep';
 import isFunction from 'lodash/isFunction';
@@ -26,6 +26,7 @@ import mean from 'lodash/mean';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import uniq from 'lodash/uniq';
+import uniqWith from 'lodash/uniqWith';
 
 type PipeFunction<TA, TO> = (accumulator?: TA, options?: TO) => TA | undefined;
 
@@ -38,9 +39,9 @@ export function curry(fn) {
   const collector = (...args) => {
     _args = _args.concat(args || []);
     if (_args.length < fn.length) {
-      return collector.bind(null);
+      return collector.bind(Object.create(null));
     }
-    return fn.apply(null, _args);
+    return fn.apply(Object.create(null), _args);
   };
   return collector;
 }
@@ -54,10 +55,10 @@ export function cond(...predicates) {
       if (
         isPairArray(predicates[i]) &&
         typeof predicates[i]?.[0] === 'function' &&
-        predicates[i][0].call(null, value)
+        predicates[i][0].call(Object.create(null), value)
       ) {
         if (typeof predicates[i]?.[1] === 'function') {
-          return predicates[i][1].call(null, value);
+          return predicates[i][1].call(Object.create(null), value);
         }
         return predicates[i][1];
       }
@@ -143,8 +144,12 @@ export function ObjectToArray(o) {
   return Object.values(o);
 }
 
-export function UniqArray(arr: string[]) {
+export function UniqArray<T>(arr: T[]) {
   return uniq(arr);
+}
+
+export function UniqWith<T>(arr: T[], compareFn: (a: T, b: T) => boolean) {
+  return uniqWith(arr, compareFn);
 }
 
 export function Omit(object, keys: string[]) {
@@ -174,11 +179,11 @@ export function CloneValueDeep<T>(value: T): T {
   return cloneDeep(value);
 }
 
-export function isUndefined(o) {
+export function isUndefined(o): boolean {
   return o === undefined;
 }
 
-export function isEmpty(o?: null | any) {
+export function isEmpty(o?: null | any): boolean {
   return o === null || isUndefined(o);
 }
 
@@ -207,8 +212,8 @@ export function IsKeyIn<T, K extends keyof T>(o: T, key: K): Boolean {
 }
 
 export function mergeDefaultToValue(
-  configs?: ChartStyleSectionConfig[],
-): ChartStyleSectionConfig[] {
+  configs?: ChartStyleConfig[],
+): ChartStyleConfig[] {
   return (configs || []).map(c => {
     if (c.comType !== 'group') {
       if (isEmpty(c.value) && !isEmpty(c.default)) {
@@ -226,8 +231,8 @@ export function mergeDefaultToValue(
 }
 
 export function cleanChartConfigValueByDefaultValue(
-  configs?: ChartStyleSectionConfig[],
-): ChartStyleSectionConfig[] {
+  configs?: ChartStyleConfig[],
+): ChartStyleConfig[] {
   return (configs || []).map(c => {
     if (c.comType !== 'group') {
       c.value = c.default;
@@ -237,9 +242,7 @@ export function cleanChartConfigValueByDefaultValue(
   });
 }
 
-export function resetValue(
-  config: ChartStyleSectionConfig,
-): ChartStyleSectionConfig {
+export function resetValue(config: ChartStyleConfig): ChartStyleConfig {
   config.value = config.default;
   config.rows = config?.rows?.map(r => {
     return resetValue(r);
@@ -260,4 +263,15 @@ export function isEmptyArray(value?) {
   }
 
   return Array.isArray(value) && !value?.length;
+}
+
+export function isPromise(obj?) {
+  if (isEmpty(obj)) {
+    return false;
+  }
+
+  return (
+    (typeof obj === 'object' || typeof obj === 'function') &&
+    typeof obj.then === 'function'
+  );
 }

@@ -18,11 +18,11 @@
 
 import { InputNumber, Select, Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { FilterSqlOperator } from 'globalConstants';
-import { FC, memo, useState } from 'react';
 import ChartFilterCondition, {
   ConditionBuilder,
-} from '../../../../../models/ChartFilterCondition';
+} from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+import { FilterSqlOperator } from 'globalConstants';
+import { FC, memo, useState } from 'react';
 
 const SingleFilter: FC<{
   rowName: string;

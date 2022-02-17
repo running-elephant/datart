@@ -1,17 +1,12 @@
-import {
-  BarChartOutlined,
-  FolderFilled,
-  FolderOpenFilled,
-  FundFilled,
-} from '@ant-design/icons';
-import { Form, Modal, ModalProps } from 'antd';
+import { Form, Input, Modal, ModalProps, Select } from 'antd';
+import useGetVizIcon from 'app/hooks/useGetVizIcon';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { selectDataChartById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { getChartDataRequestBuilder } from 'app/pages/DashBoardPage/utils';
+import { getChartGroupColumns } from 'app/pages/DashBoardPage/utils';
 import { convertToWidgetMap } from 'app/pages/DashBoardPage/utils/widget';
 import { makeSelectVizTree } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
-import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import produce from 'immer';
 import {
   FC,
@@ -24,20 +19,25 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { editBoardStackActions, editDashBoardInfoActions } from '../../slice';
 import { selectJumpPanel, selectSortAllWidgets } from '../../slice/selectors';
+import { jumpTypes } from './config';
 import { SelectJumpFields } from './FieldsSelect';
 import { FilterSelect } from './FilterSelect';
 import { fetchGlobalControllerOptions } from './service';
 import { TargetTreeSelect } from './TargetTreeSelect';
 import { ControlOptionItem } from './types';
+
 const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 },
 };
+const { Option } = Select;
 interface SettingJumpModalProps extends ModalProps {}
 export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   children,
   ...restProps
 }) => {
+  const t = useI18NPrefix(`viz.jump`);
+  const tv = useI18NPrefix(`global.validation`);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const selectVizTree = useMemo(makeSelectVizTree, []);
@@ -74,22 +74,16 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     }
   }, []);
 
-  const getIcon = useCallback(({ relType }: Folder) => {
-    switch (relType) {
-      case 'DASHBOARD':
-        return <FundFilled />;
-      case 'DATACHART':
-        return <BarChartOutlined />;
-      default:
-        return p => (p.expanded ? <FolderOpenFilled /> : <FolderFilled />);
-    }
-  }, []);
+  const getIcon = useGetVizIcon();
   const treeData = useSelector(state => selectVizTree(state, { getIcon }));
   useEffect(() => {
     const _jumpConfig = curJumpWidget?.config?.jumpConfig;
     setVisible(jumpVisible);
+    setTargetType(_jumpConfig?.targetType || jumpTypes[0].value);
     if (jumpVisible && _jumpConfig) {
-      onGetController(curJumpWidget?.config?.jumpConfig?.target);
+      if (curJumpWidget?.config?.jumpConfig?.targetType === 'INTERNAL') {
+        onGetController(curJumpWidget?.config?.jumpConfig?.target);
+      }
       form.setFieldsValue(_jumpConfig);
     }
   }, [jumpVisible, curJumpWidget, form, onGetController]);
@@ -99,14 +93,11 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   const dataChart = useSelector((state: { board: BoardState }) =>
     selectDataChartById(state, curJumpWidget?.datachartId),
   );
-  const chartGroupColumns = useMemo(() => {
-    if (!dataChart) {
-      return [];
-    }
-    const builder = getChartDataRequestBuilder(dataChart);
-    let groupColumns = builder.buildGroupColumns();
-    return groupColumns;
-  }, [dataChart]);
+  const [targetType, setTargetType] = useState(jumpTypes[0].value);
+  const chartGroupColumns = useMemo(
+    () => getChartGroupColumns(dataChart),
+    [dataChart],
+  );
   const onTargetChange = useCallback(
     value => {
       form.setFieldsValue({ filter: undefined });
@@ -114,6 +105,9 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     },
     [form, onGetController],
   );
+  const onTargetTypeChange = useCallback(value => {
+    setTargetType(value);
+  }, []);
   const handleClose = useCallback(() => {
     dispatch(
       editDashBoardInfoActions.changeJumpPanel({
@@ -139,10 +133,9 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     },
     [dispatch, curJumpWidget, handleClose, chartGroupColumns],
   );
-
   return (
     <Modal
-      title="跳转设置"
+      title={t('title')}
       visible={visible}
       width={520}
       {...restProps}
@@ -151,21 +144,70 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
     >
       <Form {...formItemLayout} form={form} onFinish={onFinish}>
         <Form.Item
-          label="跳转目标"
-          name="target"
-          rules={[{ required: true, message: '跳转目标不能为空' }]}
+          label={t('mode')}
+          name="targetType"
+          initialValue={'INTERNAL'}
+          rules={[{ required: true, message: `${t('mode')}${tv('required')}` }]}
         >
-          <TargetTreeSelect
-            filterBoardId={boardId}
-            treeData={treeData}
-            onChange={onTargetChange}
-          />
+          <Select onChange={onTargetTypeChange}>
+            {jumpTypes.map(({ name, value }) => (
+              <Option key={value} value={value}>
+                {t(value)}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
+        {targetType === 'INTERNAL' && (
+          <Form.Item
+            label={t('target')}
+            name="target"
+            rules={[
+              { required: true, message: `${t('target')}${tv('required')}` },
+            ]}
+          >
+            <TargetTreeSelect
+              filterBoardId={boardId}
+              treeData={treeData}
+              onChange={onTargetChange}
+            />
+          </Form.Item>
+        )}
+
+        {targetType === 'URL' && (
+          <Form.Item
+            label="URL"
+            name="URL"
+            rules={[
+              { required: true, message: `${t('target')}${tv('required')}` },
+            ]}
+          >
+            <Input placeholder="URL" />
+          </Form.Item>
+        )}
+        {targetType === 'URL' && (
+          <Form.Item
+            label={`URL ${t('parameters')}`}
+            name="queryName"
+            rules={[
+              {
+                required: true,
+                message: `URL ${t('parameters')}${tv('required')}`,
+              },
+            ]}
+          >
+            <Input placeholder={`URL${t('parameters')}`} />
+          </Form.Item>
+        )}
         {chartGroupColumns?.length > 1 && (
           <Form.Item
-            label="关联字段"
+            label={t('associatedFields')}
             name="field"
-            rules={[{ required: true, message: '请选择关联字段' }]}
+            rules={[
+              {
+                required: true,
+                message: `${t('associatedFields')}${tv('required')}`,
+              },
+            ]}
           >
             <SelectJumpFields
               form={form}
@@ -173,18 +215,24 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
             ></SelectJumpFields>
           </Form.Item>
         )}
-
-        <Form.Item
-          label="关联筛选"
-          name="filter"
-          rules={[{ required: true, message: '关联筛选不能为空' }]}
-        >
-          <FilterSelect
-            loading={controllerLoading}
-            options={controllers}
-            placeholder="请选择关联筛选"
-          />
-        </Form.Item>
+        {targetType === 'INTERNAL' && (
+          <Form.Item
+            label={t('controller')}
+            name="filter"
+            rules={[
+              {
+                required: true,
+                message: `${t('controller')}${tv('required')}`,
+              },
+            ]}
+          >
+            <FilterSelect
+              loading={controllerLoading}
+              options={controllers}
+              placeholder={t('controller')}
+            />
+          </Form.Item>
+        )}
       </Form>
     </Modal>
   );

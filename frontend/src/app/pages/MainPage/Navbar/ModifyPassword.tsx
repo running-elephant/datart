@@ -1,13 +1,35 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Button, Form, Input, message, Modal } from 'antd';
-import { RULES } from 'app/constants';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   selectLoggedInUser,
   selectModifyPasswordLoading,
 } from 'app/slice/selectors';
 import { modifyAccountPassword } from 'app/slice/thunks';
 import { ModifyUserPassword } from 'app/slice/types';
-import { FC, useCallback, useEffect, useMemo } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  getConfirmPasswordValidator,
+  getPasswordValidator,
+} from 'utils/validators';
 const FormItem = Form.Item;
 interface ModifyPasswordProps {
   visible: boolean;
@@ -21,6 +43,8 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
   const loggedInUser = useSelector(selectLoggedInUser);
   const loading = useSelector(selectModifyPasswordLoading);
   const [form] = Form.useForm();
+  const t = useI18NPrefix('main.nav.account.changePassword');
+  const tg = useI18NPrefix('global');
 
   const reset = useCallback(() => {
     form.resetFields();
@@ -38,22 +62,18 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
         modifyAccountPassword({
           params,
           resolve: () => {
-            message.success('修改成功');
+            message.success(tg('operation.updateSuccess'));
             onCancel();
           },
         }),
       );
     },
-    [dispatch, onCancel],
+    [dispatch, onCancel, tg],
   );
-
-  const confirmRule = useMemo(() => {
-    return RULES.getConfirmRule('newPassword');
-  }, []);
 
   return (
     <Modal
-      title="修改密码"
+      title={t('title')}
       footer={false}
       visible={visible}
       onCancel={onCancel}
@@ -66,23 +86,57 @@ export const ModifyPassword: FC<ModifyPasswordProps> = ({
         wrapperCol={{ span: 12 }}
         onFinish={formSubmit}
       >
-        <FormItem label="旧密码" name="oldPassword" rules={RULES.password}>
-          <Input.Password type="password" />
-        </FormItem>
-        <FormItem label="新密码" name="newPassword" rules={RULES.password}>
+        <FormItem
+          label={t('oldPassword')}
+          name="oldPassword"
+          rules={[
+            {
+              required: true,
+              message: `${t('oldPassword')}${tg('validation.required')}`,
+            },
+            {
+              validator: getPasswordValidator(tg('validation.invalidPassword')),
+            },
+          ]}
+        >
           <Input.Password type="password" />
         </FormItem>
         <FormItem
-          label="确认新密码"
+          label={t('newPassword')}
+          name="newPassword"
+          rules={[
+            {
+              required: true,
+              message: `${t('newPassword')}${tg('validation.required')}`,
+            },
+            {
+              validator: getPasswordValidator(tg('validation.invalidPassword')),
+            },
+          ]}
+        >
+          <Input.Password type="password" />
+        </FormItem>
+        <FormItem
+          label={t('confirmPassword')}
           name="confirmPassword"
           dependencies={['newPassword']}
-          rules={confirmRule}
+          rules={[
+            {
+              required: true,
+              message: `${t('confirmPassword')}${tg('validation.required')}`,
+            },
+            getConfirmPasswordValidator(
+              'newPassword',
+              tg('validation.invalidPassword'),
+              tg('validation.passwordNotMatch'),
+            ),
+          ]}
         >
           <Input.Password type="password" placeholder="" />
         </FormItem>
         <Form.Item wrapperCol={{ offset: 7, span: 12 }}>
           <Button type="primary" htmlType="submit" loading={loading} block>
-            保存
+            {tg('button.save')}
           </Button>
         </Form.Item>
       </Form>

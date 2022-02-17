@@ -41,6 +41,7 @@ import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -119,7 +120,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
     }
 
     @Override
-    public void requirePermissions(Permission... permissions) throws PermissionDeniedException {
+    public void requireAllPermissions(Permission... permissions) throws PermissionDeniedException {
         for (Permission permission : permissions) {
             Boolean permitted = permissionDataCache.getCachedPermission(permission);
             if (permitted != null) {
@@ -130,6 +131,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
                 }
             }
             Set<String> permissionString = toShiroPermissionString(permission.getOrgId()
+                    , permission.getRoleId()
                     , permission.getResourceType()
                     , permission.getResourceId()
                     , permission.getPermission());
@@ -144,6 +146,43 @@ public class ShiroSecurityManager implements DatartSecurityManager {
                 permissionDataCache.setPermissionCache(permission, false);
                 Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied");
             }
+        }
+    }
+
+    @Override
+    public void requireAnyPermission(Permission... permissions) throws PermissionDeniedException {
+        boolean anyMatch = Arrays.stream(permissions).anyMatch(permission -> {
+            if (permission == null) {
+                return false;
+            }
+            Boolean permitted = permissionDataCache.getCachedPermission(permission);
+            if (permitted != null) {
+                if (!permitted) {
+                    Exceptions.e(new AuthorizationException());
+                } else {
+                    return true;
+                }
+            }
+            Set<String> permissionString = toShiroPermissionString(permission.getOrgId()
+                    , permission.getRoleId()
+                    , permission.getResourceType()
+                    , permission.getResourceId()
+                    , permission.getPermission());
+            try {
+                permissionDataCache.setCurrentOrg(permission.getOrgId());
+                SecurityUtils.getSubject().checkPermissions(permissionString.toArray(new String[0]));
+                permissionDataCache.setPermissionCache(permission, true);
+                return true;
+            } catch (AuthorizationException e) {
+                log.warn("User permission denied. User-{} Permission-{}"
+                        , getCurrentUser() != null ? getCurrentUser().getUsername() : "none"
+                        , permission);
+                permissionDataCache.setPermissionCache(permission, false);
+                return false;
+            }
+        });
+        if (!anyMatch) {
+            Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied");
         }
     }
 
@@ -177,6 +216,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
             }
 
             Set<String> strings = toShiroPermissionString(permission.getOrgId()
+                    , permission.getRoleId()
                     , permission.getResourceType()
                     , permission.getResourceId()
                     , permission.getPermission());
@@ -185,7 +225,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
                 SecurityUtils.getSubject().checkPermissions(strings.toArray(new String[0]));
                 permissionDataCache.setPermissionCache(permission, true);
             } catch (AuthorizationException e) {
-                log.warn("User permission denied. User-{} Permission-{}"
+                log.debug("User permission denied. User-{} Permission-{}"
                         , getCurrentUser() != null ? getCurrentUser().getUsername() : "none"
                         , permission);
                 permissionDataCache.setPermissionCache(permission, false);
@@ -217,12 +257,13 @@ public class ShiroSecurityManager implements DatartSecurityManager {
         return roleType + "." + orgId;
     }
 
-    public static Set<String> toShiroPermissionString(String orgId, String resourceType, String resourceId, int permission) {
+    public static Set<String> toShiroPermissionString(String orgId, String roleId, String resourceType, String resourceId, int permission) {
         Set<String> shiroPermissionStrings = new HashSet<>();
         Set<String> permissions = expand2StringPermissions(permission);
         for (String p : permissions) {
             StringJoiner stringJoiner = new StringJoiner(":");
             stringJoiner.add(orgId)
+                    .add(roleId != null ? roleId : "*")
                     .add(resourceType)
                     .add(p)
                     .add(resourceId);
@@ -241,7 +282,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
         return stringJoiner.toString();
     }
 
-    private static Set<String> expand2StringPermissions(int permission) {
+    public static Set<String> expand2StringPermissions(int permission) {
         Set<String> permissions = new HashSet<>();
         if (permission == Const.DISABLE) {
             permissions.add("DISABLE");
