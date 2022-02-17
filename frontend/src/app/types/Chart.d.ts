@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import ChartDataSetDTO from 'app/types/ChartDataSet';
+
 export type ChartStatus =
   | 'init'
   | 'depsLoaded'
@@ -117,7 +119,7 @@ export interface IChartLifecycle {
 export interface IChart extends IChartLifecycle {
   meta: ChartMetadata;
   config?: ChartConfig;
-  dataset?: ChartDataset;
+  dataset?: ChartDataSetDTO;
   dependency: string[];
   isISOContainer: boolean | string;
   useIFrame?: boolean;
