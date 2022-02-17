@@ -297,9 +297,9 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                       <DownOutlined style={{ marginRight: '10px' }} />
                     )}
                     <span>
-                      {aggregation
-                        ? getColumnRenderName(columnConfig)
-                        : columnConfig.colName}
+                      {aggregation === false
+                        ? columnConfig.colName
+                        : getColumnRenderName(columnConfig)}
                     </span>
                     <div style={{ display: 'inline-block', marginLeft: '5px' }}>
                       {enableActionsIcons(columnConfig)}
