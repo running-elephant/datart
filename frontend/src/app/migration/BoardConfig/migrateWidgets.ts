@@ -27,7 +27,7 @@ import {
   fontDefault,
   VALUE_SPLITTER,
 } from 'app/pages/DashBoardPage/utils/widget';
-import { VERSION_BETA_0, VERSION_LIST } from '../constants';
+import { VERSION_BETA_0, VERSION_BETA_1, VERSION_LIST } from '../constants';
 
 /**
  *
@@ -60,9 +60,8 @@ export const convertWidgetRelationsToObj = (
  */
 export const beta0 = (widget?: Widget) => {
   if (!widget) return undefined;
-  const canHandleVersions = ['', undefined, null].concat(
-    VERSION_LIST.slice(0, 1),
-  );
+  widget.config.version = widget?.config.version || VERSION_BETA_0;
+  const canHandleVersions = VERSION_LIST.slice(0, 1);
   // 此函数只能处理 beta0以及 beta0之前的版本
   if (!canHandleVersions.includes(widget.config.version)) return widget;
 
@@ -97,6 +96,7 @@ export const beta0 = (widget?: Widget) => {
  */
 export const beta1 = (widget?: Widget) => {
   if (!widget) return undefined;
+  widget.config.version = VERSION_BETA_1;
   return widget;
 };
 /**
@@ -133,13 +133,7 @@ export const migrateWidgets = (widgets: ServerWidget[]) => {
     })
     .filter(widget => !!widget)
     .map(widget => {
-      let sourceVersion = widget?.config.version || VERSION_BETA_0;
-      if (!VERSION_LIST.includes(sourceVersion)) {
-        widget!.config.version = VERSION_BETA_0;
-      }
-      let resWidget: Widget | undefined;
-      resWidget = beta1(beta0(widget));
-      if (!resWidget) return null;
+      let resWidget = beta1(beta0(widget));
       return resWidget;
     })
     .filter(widget => !!widget);
