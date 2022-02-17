@@ -18,7 +18,6 @@
 package datart.core.common;
 
 import datart.core.base.consts.FileFormat;
-import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.Column;
 import datart.core.data.provider.Dataframe;
@@ -132,6 +131,9 @@ public class POIUtils {
         }
         switch (cell.getCellType()) {
             case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)){
+                    return cell.getDateCellValue();
+                }
                 return cell.getNumericCellValue();
             case BOOLEAN:
                 return cell.getBooleanCellValue();

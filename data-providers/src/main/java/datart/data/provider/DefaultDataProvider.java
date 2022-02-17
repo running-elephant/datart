@@ -226,6 +226,9 @@ public abstract class DefaultDataProvider extends DataProvider {
                         }
                         break;
                     case DATE:
+                        if (val instanceof Date){
+                            break;
+                        }
                         String fmt = columns.get(i).getFmt();
                         if (StringUtils.isBlank(fmt)) {
                             fmt = DateUtils.inferDateFormat(val.toString());
