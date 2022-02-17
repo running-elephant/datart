@@ -217,7 +217,7 @@ public class VariablePlaceholder {
                 for (ScriptVariable variable : variables) {
                     replaceVariable(sqlCall, variable);
                 }
-                return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(sqlCall, sqlDialect));
+                return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(sqlCall, sqlDialect, false));
             }
 
             ScriptVariable variable = variables.get(0);
@@ -231,11 +231,11 @@ public class VariablePlaceholder {
 
             if (variable.getValues().size() == 1) {
                 replaceVariable(sqlCall, variable);
-                return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(sqlCall, sqlDialect));
+                return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(sqlCall, sqlDialect, false));
             }
 
             SqlCall fixSqlCall = autoFixSqlCall(variable);
-            return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(fixSqlCall, sqlDialect));
+            return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(fixSqlCall, sqlDialect, false));
         } catch (ParamReplaceException e) {
             return replaceAsSting();
         }
@@ -257,20 +257,20 @@ public class VariablePlaceholder {
                 for (ScriptVariable variable : variables) {
                     replaceVariable(sqlCall, variable);
                 }
-                return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(sqlCall, sqlDialect));
+                return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(sqlCall, sqlDialect, false));
             }
             ScriptVariable variable = variables.get(0);
             if (CollectionUtils.isEmpty(variable.getValues())) {
                 log.warn("The query variable [" + variable.getName() + "] do not have default values, which may cause SQL syntax errors");
                 SqlCall isNullSqlCall = createIsNullSqlCall(sqlCall.getOperandList().get(0));
-                return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(isNullSqlCall, sqlDialect));
+                return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(isNullSqlCall, sqlDialect, false));
             }
             if (variable.getValues().size() > 1 && SqlValidateUtils.isLogicExpressionSqlCall(sqlCall)) {
                 SqlCall fixedCall = autoFixSqlCall(variable);
-                return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(fixedCall, sqlDialect));
+                return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(fixedCall, sqlDialect, false));
             } else {
                 replaceVariable(sqlCall, variable);
-                return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(sqlCall, sqlDialect));
+                return new ReplacementPair(originalSqlFragment, SqlNodeUtils.toSql(sqlCall, sqlDialect, false));
             }
         } catch (ParamReplaceException e) {
             return replaceAsSting();
@@ -309,20 +309,19 @@ public class VariablePlaceholder {
     }
 
     protected String formatWithoutQuote(Set<String> values) {
-        if (org.springframework.util.CollectionUtils.isEmpty(values)) {
+        if (CollectionUtils.isEmpty(values)) {
             return "";
         }
         return String.join(",", values);
     }
 
     protected String formatWithQuote(Set<String> values) {
-        if (org.springframework.util.CollectionUtils.isEmpty(values)) {
+        if (CollectionUtils.isEmpty(values)) {
             return "";
         }
         return values.stream().map(SqlSimpleStringLiteral::new)
-                .map(node -> SqlNodeUtils.toSql(node, sqlDialect))
+                .map(node -> SqlNodeUtils.toSql(node, sqlDialect, false))
                 .collect(Collectors.joining(","));
     }
-
 
 }

@@ -127,13 +127,20 @@ public class SqlNodeUtils {
         return createSqlNode(value, null);
     }
 
-    public static String toSql(SqlNode sqlNode, SqlDialect dialect) {
+
+    /**
+     * SQL 输出时，字段名称要默认加上引号，否则对于特殊字段名称无法处理，以及pg数据库无法正常执行等问题。
+     * 但是在oracle数据库中，加上引号的字段小写会导致列名无法识别的问题，此时需要用户SQL中使用大写列名，或者可在jdbc-driver文件中配置为默认不加引号。
+     */
+    public static String toSql(SqlNode sqlNode, SqlDialect dialect, boolean quoteIdentifiers) {
         return sqlNode.toSqlString(
                 config -> config.withDialect(dialect)
-                        .withQuoteAllIdentifiers(false)
+                        .withQuoteAllIdentifiers(quoteIdentifiers)
                         .withAlwaysUseParentheses(false)
                         .withSelectListItemsOnSeparateLines(false)
                         .withUpdateSetListNewline(false)
                         .withIndentation(0)).getSql();
     }
+
+
 }

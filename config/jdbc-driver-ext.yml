@@ -15,3 +15,7 @@ IMPALA:
   adapter-class: "datart.data.provider.jdbc.adapters.ImpalaDataProviderAdapter"
   url-prefix: "jdbc:impala://"
   sql-dialect: "datart.data.provider.calcite.dialect.ImpalaSqlDialectSupport"
+
+
+ORACLE:
+  quote-identifiers: false

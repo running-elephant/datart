@@ -52,6 +52,8 @@ public class SqlBuilder {
 
     private boolean withPage;
 
+    private boolean quoteIdentifiers;
+
     private SqlBuilder() {
     }
 
@@ -64,8 +66,8 @@ public class SqlBuilder {
         if (StringUtils.isNotBlank(sql)) {
             sql = removeEndDelimiter(sql);
         }
-        sql = StringUtils.appendIfMissing(sql," "," ");
-        sql = StringUtils.prependIfMissing(sql," "," ");
+        sql = StringUtils.appendIfMissing(sql, " ", " ");
+        sql = StringUtils.prependIfMissing(sql, " ", " ");
         this.srcSql = sql;
         return this;
     }
@@ -85,6 +87,11 @@ public class SqlBuilder {
 
     public SqlBuilder withPage(boolean withPage) {
         this.withPage = withPage;
+        return this;
+    }
+
+    public SqlBuilder withQuoteIdentifiers(boolean quoteIdentifiers) {
+        this.quoteIdentifiers = quoteIdentifiers;
         return this;
     }
 
@@ -222,7 +229,7 @@ public class SqlBuilder {
                 offset,
                 fetch,
                 null);
-        return SqlNodeUtils.toSql(sqlSelect, this.dialect);
+        return SqlNodeUtils.toSql(sqlSelect, this.dialect, quoteIdentifiers);
     }
 
     private SqlNode createAggNode(AggregateOperator.SqlOperator sqlOperator, String column, String alias) {

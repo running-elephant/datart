@@ -18,6 +18,7 @@ import datart.data.provider.jdbc.adapters.JdbcDataProviderAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.sql.DataSource;
@@ -270,14 +271,27 @@ public class JdbcDataProvider extends DataProvider {
             //Build in database types
             Map<String, Map<String, String>> buildIn = loadYml(JDBC_DRIVER_BUILD_IN);
             // user ext database types
-
-            buildIn.putAll(loadYml(new File(FileUtils.concatPath(System.getProperty("user.dir"), JDBC_DRIVER_EXT))));
+            Map<String, Map<String, String>> extDrivers = loadYml(new File(FileUtils.concatPath(System.getProperty("user.dir"), JDBC_DRIVER_EXT)));
+            if (!CollectionUtils.isEmpty(extDrivers)) {
+                for (String key : extDrivers.keySet()) {
+                    Map<String, String> driver = buildIn.get(key);
+                    if (driver == null) {
+                        buildIn.put(key, extDrivers.get(key));
+                    } else {
+                        driver.putAll(extDrivers.get(key));
+                    }
+                }
+            }
 
             return buildIn.entrySet().stream().map(entry -> {
                 try {
                     JdbcDriverInfo jdbcDriverInfo = objectMapper.convertValue(entry.getValue(), JdbcDriverInfo.class);
                     if (StringUtils.isBlank(jdbcDriverInfo.getAdapterClass())) {
                         jdbcDriverInfo.setAdapterClass(DEFAULT_ADAPTER);
+                    }
+                    // default to quote all identifiers ,  for support special column names and most databases
+                    if (jdbcDriverInfo.getQuoteIdentifiers() == null) {
+                        jdbcDriverInfo.setQuoteIdentifiers(true);
                     }
                     jdbcDriverInfo.setDbType(jdbcDriverInfo.getDbType().toUpperCase());
                     return jdbcDriverInfo;
