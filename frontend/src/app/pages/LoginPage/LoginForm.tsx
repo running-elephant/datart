@@ -16,21 +16,22 @@
  * limitations under the License.
  */
 
-import { Button, Form, Input } from 'antd';
-import { AuthForm } from 'app/components';
+import {Button, Form, Input} from 'antd';
+import {AuthForm} from 'app/components';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
-import { selectLoggedInUser, selectLoginLoading } from 'app/slice/selectors';
-import { login } from 'app/slice/thunks';
-import React, { useCallback, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, useHistory } from 'react-router-dom';
+import {selectLoggedInUser, selectLoginLoading, selectOauth2Clients, selectVersion} from 'app/slice/selectors';
+import {getOauth2Clients, login, tryOauth} from 'app/slice/thunks';
+import React, {useCallback, useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {Link, useHistory} from 'react-router-dom';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
   LINE_HEIGHT_ICON_LG,
   SPACE_MD,
 } from 'styles/StyleConstants';
-import { getToken } from 'utils/auth';
+import {getToken} from 'utils/auth';
+import {editDashBoardInfoActions} from "../DashBoardPage/pages/BoardEditor/slice";
 
 export function LoginForm() {
   const [switchUser, setSwitchUser] = useState(false);
@@ -42,10 +43,23 @@ export function LoginForm() {
   const logged = !!getToken();
   const t = usePrefixI18N('login');
   const tg = usePrefixI18N('global');
+  const oauth2Clients = useSelector(selectOauth2Clients);
 
   const toApp = useCallback(() => {
     history.replace('/');
   }, [history]);
+
+  useEffect(() => {
+    dispatch(
+      getOauth2Clients(),
+    );
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(
+      tryOauth(),
+    );
+  }, [dispatch]);
 
   const onLogin = useCallback(
     values => {
@@ -64,6 +78,10 @@ export function LoginForm() {
   const onSwitch = useCallback(() => {
     setSwitchUser(true);
   }, []);
+
+  let Oauth2BtnList = oauth2Clients.map((client) => {
+    return (<Oauth2Button key={client.value} href={client.value}>{client.name}</Oauth2Button>)
+  });
 
   return (
     <AuthForm>
@@ -89,7 +107,7 @@ export function LoginForm() {
               },
             ]}
           >
-            <Input placeholder={t('username')} size="large" />
+            <Input placeholder={t('username')} size="large"/>
           </Form.Item>
           <Form.Item
             name="password"
@@ -100,7 +118,7 @@ export function LoginForm() {
               },
             ]}
           >
-            <Input placeholder={t('password')} type="password" size="large" />
+            <Input placeholder={t('password')} type="password" size="large"/>
           </Form.Item>
           <Form.Item className="last" shouldUpdate>
             {() => (
@@ -112,7 +130,7 @@ export function LoginForm() {
                 disabled={
                   loading ||
                   // !form.isFieldsTouched(true) ||
-                  !!form.getFieldsError().filter(({ errors }) => errors.length)
+                  !!form.getFieldsError().filter(({errors}) => errors.length)
                     .length
                 }
                 block
@@ -125,6 +143,7 @@ export function LoginForm() {
             <LinkButton to="/forgetPassword">{t('forgotPassword')}</LinkButton>
             <LinkButton to="/register">{t('register')}</LinkButton>
           </Links>
+          {Oauth2BtnList}
         </Form>
       )}
     </AuthForm>
@@ -133,6 +152,16 @@ export function LoginForm() {
 
 const Links = styled.div`
   display: flex;
+`;
+
+const Oauth2Button = styled.a`
+display: block;
+background-color: blue;
+text-align: center;
+color: #fff;
+font-weight: bold;
+line-height: 36px;
+height: 36px;
 `;
 
 const LinkButton = styled(Link)`

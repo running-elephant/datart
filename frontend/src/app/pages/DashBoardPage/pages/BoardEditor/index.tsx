@@ -158,7 +158,11 @@ export const BoardEditor: React.FC<{
 
     useEffect(() => {
       initialization();
-    }, [initialization]);
+      return () => {
+        // fix issue: #800
+        onCloseChartEditor();
+      };
+    }, [initialization, onCloseChartEditor]);
 
     return (
       <Wrapper>

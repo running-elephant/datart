@@ -19,7 +19,7 @@ import {
   ApiOutlined,
   ClockCircleOutlined,
   LinkOutlined,
-  SyncOutlined,
+  Loading3QuartersOutlined,
   WarningTwoTone,
 } from '@ant-design/icons';
 import { Button, Space, Tooltip } from 'antd';
@@ -64,7 +64,12 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
     if (!showTypes.includes(widgetType)) return null;
     return loading ? (
       <Button
-        icon={<SyncOutlined spin style={{ color: PRIMARY }} />}
+        icon={
+          <Loading3QuartersOutlined
+            spin
+            style={{ color: PRIMARY, opacity: 0.4 }}
+          />
+        }
         type="link"
       />
     ) : null;

@@ -6,6 +6,31 @@ spring:
     username: { USERNAME }
     password: { PASSWORD }
 
+# security:
+#   oauth2:
+#     enable: true
+#     client:
+#       registration:
+#         cas:
+#           provider: cas
+#           client-id: "xxxxx"
+#           client-name: "Sign in with CAS"
+#           client-secret: "xxx"
+#           authorization-grant-type: authorization_code
+#           client-authentication-method: post
+#           redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+#           scope: userinfo
+#       provider:
+#         cas:
+#           authorization-uri: https://cas.xxx.com/cas/oauth2.0/authorize
+#           token-uri: https://cas.xxx.com/cas/oauth2.0/accessToken
+#           user-info-uri: https://cas.xxx.com/cas/oauth2.0/profile
+#           user-name-attribute: id
+#           userMapping:
+#             email: "attributes.email"
+#             name: "attributes.name"
+#             avatar: "attributes.avatar"
+
 # mail config
 
 # mail:
@@ -38,10 +63,10 @@ spring:
 server:
   port: { PORT }
   address: { IP }
-  
+
   # 开启 gzip 压缩，加快请求和响应速度
   compression:
-    enabled: true 
+    enabled: true
     mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
 
 

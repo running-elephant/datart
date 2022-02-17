@@ -71,7 +71,7 @@ public class Application implements ApplicationContextAware {
     }
 
     public static String getApiPrefix() {
-        return getProperty("datart.path-prefix");
+        return getProperty("datart.server.path-prefix");
     }
 
     public static String getTokenSecret() {

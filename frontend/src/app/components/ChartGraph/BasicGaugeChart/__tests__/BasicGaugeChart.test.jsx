@@ -16,9 +16,14 @@
  * limitations under the License.
  */
 
-const { createJestConfig } = require('@craco/craco');
+import BasicGaugeChart from '../BasicGaugeChart';
 
-const cracoConfig = require('./craco.config.js');
-const jestConfig = createJestConfig(cracoConfig, {});
-
-module.exports = jestConfig;
+describe('<BasicGaugeChart />', () => {
+  let component;
+  beforeEach(() => {
+    component = new BasicGaugeChart();
+  });
+  test('It should mount', () => {
+    expect(component).toBeDatartChartModel();
+  });
+});
