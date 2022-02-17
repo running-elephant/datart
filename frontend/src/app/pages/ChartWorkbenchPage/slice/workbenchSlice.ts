@@ -83,6 +83,7 @@ const initState: WorkbenchState = {
   dateFormat: 'LLL',
   dataviews: [],
   dataset: {},
+  aggregation: true,
 };
 
 // Selectors
