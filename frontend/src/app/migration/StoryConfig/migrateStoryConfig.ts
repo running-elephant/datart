@@ -18,7 +18,7 @@
 
 import { StoryConfig } from 'app/pages/StoryBoardPage/slice/types';
 import { getInitStoryConfig } from 'app/pages/StoryBoardPage/utils';
-import { VERSION_BETA_0, VERSION_BETA_1 } from '../constants';
+import { VERSION_BETA_0, VERSION_BETA_1, VERSION_LIST } from '../constants';
 
 export const parseStoryConfig = (storyConfig: string) => {
   try {
@@ -33,9 +33,13 @@ export const parseStoryConfig = (storyConfig: string) => {
 
 export const beta0 = (config: StoryConfig) => {
   config.version = config.version || VERSION_BETA_0;
+  const canHandleVersions = VERSION_LIST.slice(0, 1);
+  if (!canHandleVersions.includes(config.version)) return config;
   return config;
 };
 export const beta1 = (config: StoryConfig) => {
+  const canHandleVersions = VERSION_LIST.slice(0, 2);
+  if (!canHandleVersions.includes(config.version)) return config;
   config.version = VERSION_BETA_1;
   return config;
 };
