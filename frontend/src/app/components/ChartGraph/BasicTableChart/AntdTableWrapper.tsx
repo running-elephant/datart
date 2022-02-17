@@ -30,6 +30,14 @@ interface TableStyleConfigProps {
     color: string;
   };
   isFixedColumns?: boolean;
+  summaryStyle?: {
+    backgroundColor?: string;
+    fontFamily?: string;
+    fontSize?: string;
+    fontWeight?: string;
+    fontStyle?: string;
+    color?: string;
+  };
 }
 
 const AntdTableWrapper: FC<{
@@ -87,14 +95,14 @@ const StyledTable = styled(Table)<{ tableStyleConfig?: TableStyleConfigProps }>`
     background: inherit;
   }
 
-  .ant-table-summary {
-    background: #fafafa;
-  }
-  .ant-table-cell-fix-left {
-    background: #fafafa;
-  }
-  .ant-table-cell-fix-right {
-    background: #fafafa;
+  .ant-table-summary .ant-table-cell {
+    background-color: ${p =>
+      p?.tableStyleConfig?.summaryStyle?.backgroundColor};
+    font-family: ${p => p?.tableStyleConfig?.summaryStyle?.fontFamily};
+    font-size: ${p => p?.tableStyleConfig?.summaryStyle?.fontSize + 'px'};
+    font-weight: ${p => p?.tableStyleConfig?.summaryStyle?.fontWeight};
+    font-style: ${p => p?.tableStyleConfig?.summaryStyle?.fontStyle};
+    color: ${p => p?.tableStyleConfig?.summaryStyle?.color};
   }
 
   .ant-table .ant-table-container .ant-table-body .datart-basic-table-odd {
