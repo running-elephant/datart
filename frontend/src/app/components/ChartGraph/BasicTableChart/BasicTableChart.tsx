@@ -144,7 +144,6 @@ class BasicTableChart extends ReactChart {
       styleConfigs,
       context,
       settingConfigs,
-      aggregateConfigs,
     );
     this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
       (a, b) => a + (b.columnWidthValue || 0),
@@ -216,7 +215,6 @@ class BasicTableChart extends ReactChart {
       styleConfigs,
       context,
       settingConfigs,
-      aggregateConfigs,
     );
     this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
       (a, b) => a + (b.columnWidthValue || 0),
@@ -334,7 +332,6 @@ class BasicTableChart extends ReactChart {
     styleConfigs,
     context,
     settingConfigs,
-    aggregateFieldConfigs,
   ) {
     const [fontFamily, fontSize, fontWeight] = getStyles(
       styleConfigs,
@@ -397,7 +394,9 @@ class BasicTableChart extends ReactChart {
       summaryFont?.fontSize,
       summaryFont?.fontFamily,
     );
-
+    const aggregateConfigs = mixedSectionConfigRows.filter(
+      r => r.type === ChartDataViewFieldType.NUMERIC,
+    );
     const maxContentByFields = mixedSectionConfigRows.map(c => {
       const header = this.findHeader(c.uid, tableHeaders);
       const rowUniqKey = chartDataSet.getFieldKey(c);
@@ -423,7 +422,7 @@ class BasicTableChart extends ReactChart {
           headerFont?.fontSize,
           headerFont?.fontFamily,
         );
-        const currentSummaryField = aggregateFieldConfigs.find(
+        const currentSummaryField = aggregateConfigs.find(
           ac => ac.uid === c.uid,
         );
         const total = chartDataSet?.map((dc: any) =>
