@@ -181,7 +181,6 @@ class BasicLineChart extends Chart {
           data: chartDataSet?.map(dc => ({
             ...getExtraSeriesRowData(dc),
             ...getExtraSeriesDataFormat(aggConfig?.format),
-            name: getColumnRenderName(aggConfig),
             value: dc.getCell(aggConfig),
           })),
           itemStyle: {
@@ -234,7 +233,6 @@ class BasicLineChart extends Chart {
             return {
               ...getExtraSeriesRowData(target),
               ...getExtraSeriesDataFormat(aggConfig?.format),
-              name: getColumnRenderName(aggConfig),
               value: target?.[chartDataSet.getFieldKey(aggConfig)] || 0,
             };
           }),
