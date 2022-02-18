@@ -117,4 +117,5 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
 const WidgetWrap = styled.div`
   display: flex;
   flex: 1;
+  min-height: 0;
 `;

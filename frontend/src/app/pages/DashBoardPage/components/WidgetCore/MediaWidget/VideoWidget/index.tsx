@@ -27,8 +27,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { G20 } from 'styles/StyleConstants';
-import { IFRAME_REG, MEDIA_SRC_REG, VIDEO_REG } from './constants';
-
+import { Player } from 'video-react';
+import 'video-react/dist/video-react.css';
 const VideoWidget: React.FC = () => {
   const widget = useContext(WidgetContext);
   const dispatch = useDispatch();
@@ -39,22 +39,7 @@ const VideoWidget: React.FC = () => {
   useEffect(() => {
     setCurSrc(src);
   }, [src]);
-  // const src=
   let srcWithParams = curSrc;
-
-  const videoRegExp = curSrc && VIDEO_REG.test(curSrc);
-  const iframeRegExp = curSrc && IFRAME_REG.test(curSrc);
-
-  if (curSrc && iframeRegExp) {
-    const iframeSrc = curSrc.match(MEDIA_SRC_REG) || [''];
-    srcWithParams = iframeRegExp ? iframeSrc[0] : curSrc;
-  }
-
-  const mediaType = videoRegExp ? 'video' : 'iframe';
-  // editBoardStackActions.updateWidgetConfig({
-  // wid: widget.id,
-  // config: nextConf,
-  // }),
   const onFinish = () => {
     const nextWidget = produce(widget, draft => {
       (draft.config.content as MediaWidgetContent).videoConfig = {
@@ -88,40 +73,22 @@ const VideoWidget: React.FC = () => {
       </Form>
     </div>
   );
+  return (
+    <WrapVideo className="WrapVideo">
+      {editing && setter}
 
-  switch (mediaType) {
-    case 'video':
-      return (
-        <video
-          src={srcWithParams}
-          preload="auto"
-          loop
-          style={{ width: '100%', height: '100%' }}
-        >
-          你的浏览器不支持 <code>video</code> 标签.
-        </video>
-      );
-    default:
-      return (
-        <WrapVideo>
-          {editing && setter}
-          <iframe
-            title=" "
-            src={srcWithParams}
-            frameBorder="0"
-            style={{ width: '100%', height: '100%' }}
-          ></iframe>
-        </WrapVideo>
-      );
-  }
+      <Player>
+        <source src={srcWithParams} />
+      </Player>
+    </WrapVideo>
+  );
 };
 
 export default VideoWidget;
 const WrapVideo = styled.div`
-  display: flex;
-  flex-direction: column;
   width: 100%;
-
+  height: 100%;
+  overflow-y: auto;
   .wrap-form {
     padding: 6px;
     margin-bottom: 4px;
