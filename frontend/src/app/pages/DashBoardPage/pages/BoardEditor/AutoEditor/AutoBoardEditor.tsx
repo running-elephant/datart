@@ -17,6 +17,7 @@
  */
 
 import { Empty } from 'antd';
+import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
 import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
@@ -84,7 +85,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   }, []);
 
   const dispatch = useDispatch();
-
+  const visible = useVisibleHidden();
   const [layoutMap, setLayoutMap] = useState<Layouts>({});
 
   const layoutWidgets = useMemo(
@@ -264,12 +265,14 @@ export const AutoBoardEditor: React.FC<{}> = () => {
         curWH={curWH}
         className={deviceClassName}
         ref={ref}
+        style={{ visibility: visible }}
       >
         {layoutWidgets.length ? (
           <div className="grid-wrap" ref={layoutWrap}>
             <ResponsiveGridLayout
               // layout={currentLayout.current}
               // cols={curCols}
+              style={{ visibility: visible }}
               layouts={layoutMap}
               cols={LAYOUT_COLS_MAP}
               breakpoints={BREAK_POINT_MAP}

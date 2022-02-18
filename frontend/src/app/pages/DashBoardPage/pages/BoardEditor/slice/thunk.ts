@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { migrateWidgets } from 'app/migration/WidgetConfig/migrateWidgets';
+import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
