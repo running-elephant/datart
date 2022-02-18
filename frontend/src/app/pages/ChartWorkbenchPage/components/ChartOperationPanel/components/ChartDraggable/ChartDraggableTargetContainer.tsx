@@ -113,6 +113,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 currentConfig?.rows || [],
                 draft => {
                   draft.splice(originItemIndex, 1);
+                  item.aggregate = getDefaultAggregate(item);
                   return draft.splice(item?.index!, 0, item);
                 },
               );
@@ -121,6 +122,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               const currentColumns = updateBy(
                 currentConfig?.rows || [],
                 draft => {
+                  item.aggregate = getDefaultAggregate(item);
                   return draft.splice(item?.index!, 0, item);
                 },
               );
