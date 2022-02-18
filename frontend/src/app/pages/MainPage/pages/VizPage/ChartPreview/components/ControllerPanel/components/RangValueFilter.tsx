@@ -68,6 +68,7 @@ export default RangValueFilter;
 
 const StyledRangeValueFilter = styled(Row)`
   .text-center {
+    line-height: 32px;
     text-align: center;
   }
 
