@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
@@ -36,6 +37,7 @@ export const FreeEditorWrapper: React.FC<{}> = () => {
   const sortedLayoutWidgets = Object.values(layoutWidgetMap).sort(
     (a, b) => a.config.index - b.config.index,
   );
+  const visible = useVisibleHidden();
   const [rect, refGridBackground] = useClientRect<HTMLDivElement>();
   const {
     zoomIn,
@@ -51,7 +53,7 @@ export const FreeEditorWrapper: React.FC<{}> = () => {
     <Container>
       <div
         className="grid-background"
-        style={nextBackgroundStyle}
+        style={{ ...nextBackgroundStyle, visibility: visible }}
         ref={refGridBackground}
       >
         <SlideBackground scale={scale} slideTranslate={slideTranslate}>

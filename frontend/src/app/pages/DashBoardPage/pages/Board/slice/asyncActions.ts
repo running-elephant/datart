@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { migrateWidgets } from 'app/migration/WidgetConfig/migrateWidgets';
+import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
 import ChartDataRequest from 'app/types/ChartDataRequest';

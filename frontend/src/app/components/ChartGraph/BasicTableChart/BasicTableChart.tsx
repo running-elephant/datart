@@ -143,6 +143,7 @@ class BasicTableChart extends ReactChart {
       chartDataSet,
       styleConfigs,
       context,
+      settingConfigs,
     );
     this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
       (a, b) => a + (b.columnWidthValue || 0),
@@ -188,14 +189,14 @@ class BasicTableChart extends ReactChart {
           ? 'datart-basic-table-odd'
           : 'datart-basic-table-even';
       },
-      tableStyleConfig: this.getTableStyle(styleConfigs),
+      tableStyleConfig: this.getTableStyle(styleConfigs, settingConfigs),
     };
   }
 
   private getDataColumnWidths(options, context) {
     const dataConfigs = options.config.datas || [];
     const styleConfigs = options.config.styles || [];
-
+    const settingConfigs = options.config.settings || [];
     const chartDataSet = transformToDataSet(
       options.dataset.rows,
       options.dataset.columns,
@@ -205,11 +206,15 @@ class BasicTableChart extends ReactChart {
     const mixedSectionConfigRows = dataConfigs
       .filter(c => c.key === 'mixed')
       .flatMap(config => config.rows || []);
+    const aggregateConfigs = mixedSectionConfigRows.filter(
+      r => r.type === ChartDataViewFieldType.NUMERIC,
+    );
     this.dataColumnWidths = this.calcuteFieldsMaxWidth(
       mixedSectionConfigRows,
       chartDataSet as IChartDataSet<string>,
       styleConfigs,
       context,
+      settingConfigs,
     );
     this.totalWidth = Object.values<any>(this.dataColumnWidths).reduce(
       (a, b) => a + (b.columnWidthValue || 0),
@@ -224,7 +229,7 @@ class BasicTableChart extends ReactChart {
     );
   }
 
-  private getTableStyle(styles) {
+  private getTableStyle(styles, settingConfigs) {
     const [oddBgColor, oddFontColor, evenBgColor, evenFontColor] = getStyles(
       styles,
       ['tableBodyStyle'],
@@ -234,6 +239,11 @@ class BasicTableChart extends ReactChart {
       styles,
       ['style'],
       ['rightFixedColumns'],
+    );
+    const [backgroundColor, summaryFont] = getStyles(
+      settingConfigs,
+      ['summary'],
+      ['summaryBcColor', 'summaryFont'],
     );
     return {
       odd: {
@@ -245,6 +255,7 @@ class BasicTableChart extends ReactChart {
         color: evenFontColor,
       },
       isFixedColumns: rightFixedColumns ? true : false,
+      summaryStyle: Object.assign({ backgroundColor }, summaryFont),
     };
   }
 
@@ -320,6 +331,7 @@ class BasicTableChart extends ReactChart {
     chartDataSet: IChartDataSet<string>,
     styleConfigs,
     context,
+    settingConfigs,
   ) {
     const [fontFamily, fontSize, fontWeight] = getStyles(
       styleConfigs,
@@ -345,6 +357,11 @@ class BasicTableChart extends ReactChart {
       styleConfigs,
       ['column', 'modal', 'list'],
       'rows',
+    );
+    const [summaryFont] = getStyles(
+      settingConfigs,
+      ['summary'],
+      ['summaryFont'],
     );
     const getRowNumberWidth = maxContent => {
       if (!enableRowNumber) {
@@ -373,11 +390,13 @@ class BasicTableChart extends ReactChart {
     const rowSummaryWidth = this.getTextWidth(
       context,
       context?.translator?.('viz.palette.graph.summary'),
-      'normal',
-      '14',
-      'PingFang SC',
+      summaryFont?.fontWeight,
+      summaryFont?.fontSize,
+      summaryFont?.fontFamily,
     );
-
+    const aggregateConfigs = mixedSectionConfigRows.filter(
+      r => r.type === ChartDataViewFieldType.NUMERIC,
+    );
     const maxContentByFields = mixedSectionConfigRows.map(c => {
       const header = this.findHeader(c.uid, tableHeaders);
       const rowUniqKey = chartDataSet.getFieldKey(c);
@@ -389,9 +408,9 @@ class BasicTableChart extends ReactChart {
       );
       const datas = chartDataSet?.map(dc => {
         const text = dc.getCell(c);
-        let width = this.getTextWidth(
+        const width = this.getTextWidth(
           context,
-          text,
+          toFormattedValue(text, c.format),
           fontWeight,
           fontSize,
           fontFamily,
@@ -403,8 +422,26 @@ class BasicTableChart extends ReactChart {
           headerFont?.fontSize,
           headerFont?.fontFamily,
         );
+        const currentSummaryField = aggregateConfigs.find(
+          ac => ac.uid === c.uid,
+        );
+        const total = chartDataSet?.map((dc: any) =>
+          dc.getCell(currentSummaryField),
+        );
+        const summaryText = total.reduce((acc, cur) => acc + cur, 0);
+        const summaryWidth = this.getTextWidth(
+          context,
+          toFormattedValue(summaryText, c.format),
+          summaryFont?.fontWeight,
+          summaryFont?.fontSize,
+          summaryFont?.fontFamily,
+        );
         const sorterIconWidth = 12;
-        return Math.max(width, headerWidth + sorterIconWidth);
+        return Math.max(
+          width,
+          headerWidth + sorterIconWidth,
+          summaryWidth + sorterIconWidth,
+        );
       });
 
       return {
@@ -806,12 +843,16 @@ class BasicTableChart extends ReactChart {
       ['tableHeaders'],
     );
     const [font] = getStyles(styleConfigs, ['tableHeaderStyle'], ['font']);
-
+    const [summaryFont] = getStyles(
+      settingConfigs,
+      ['summary'],
+      ['summaryFont'],
+    );
     const [tableSize] = getStyles(styleConfigs, ['style'], ['tableSize']);
     const HEADER_PADDING = { default: 32, middle: 24, small: 16 };
     const TABLE_LINE_HEIGHT = 1.5715;
     const PAGINATION_HEIGHT = { default: 64, middle: 56, small: 56 };
-    const SUMMRAY_ROW_HEIGHT = { default: 56, middle: 48, small: 40 };
+    const SUMMRAY_ROW_HEIGHT = { default: 34, middle: 26, small: 18 };
     const _getMaxHeaderHierarchy = (headerStyles: Array<{ children: [] }>) => {
       const _maxDeeps = (arr: Array<{ children: [] }> = [], deeps: number) => {
         if (!isEmptyArray(arr) && arr?.length > 0) {
@@ -839,7 +880,8 @@ class BasicTableChart extends ReactChart {
           ? '100%'
           : context?.height -
             (this.showSummaryRow
-              ? SUMMRAY_ROW_HEIGHT[tableSize || 'default']
+              ? SUMMRAY_ROW_HEIGHT[tableSize || 'default'] +
+                (summaryFont?.fontSize || 0) * TABLE_LINE_HEIGHT
               : 0) -
             headerHeight -
             (enablePaging ? PAGINATION_HEIGHT[tableSize || 'default'] : 0),

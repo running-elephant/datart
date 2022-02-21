@@ -33,8 +33,8 @@ export const handleServerStoryAction =
   }) =>
   async dispatch => {
     const { data, storyId } = params;
-    const pages = getStoryPage(data.storypages || []);
     let story = formatStory(data);
+    const pages = getStoryPage(data.storypages || []);
     const storyPageMap = getStoryPageMap(pages);
     const storyPageInfoMap = getInitStoryPageInfoMap(pages);
     dispatch(storyActions.setStoryBoard(story));

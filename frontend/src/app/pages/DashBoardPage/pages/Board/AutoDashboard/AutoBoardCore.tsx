@@ -17,6 +17,7 @@
  */
 
 import { Empty } from 'antd';
+import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
 import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
@@ -71,6 +72,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
       mobileContainerPadding,
     } = config;
 
+    const visible = useVisibleHidden();
     const selectLayoutWidgetsConfigById = useMemo(
       selectLayoutWidgetMapById,
       [],
@@ -240,7 +242,11 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
 
     return (
       <Wrap>
-        <StyledContainer bg={background} ref={ref}>
+        <StyledContainer
+          bg={background}
+          ref={ref}
+          style={{ visibility: visible }}
+        >
           {layoutWidgets.length ? (
             <div className="grid-wrap" ref={gridWrapRef}>
               <div className="grid-wrap" ref={gridRef}>
