@@ -19,8 +19,12 @@
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { createContext } from 'react';
 
-const ChartDatasetContext = createContext<{ dataset?: ChartDataSetDTO }>({
+const ChartDatasetContext = createContext<{
+  dataset?: ChartDataSetDTO;
+  handleRefreshDataset?: () => void;
+}>({
   dataset: {},
+  handleRefreshDataset: undefined,
 });
 
 export default ChartDatasetContext;

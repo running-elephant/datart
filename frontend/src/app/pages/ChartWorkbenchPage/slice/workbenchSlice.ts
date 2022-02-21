@@ -76,6 +76,7 @@ export type WorkbenchState = {
   backendChart?: ChartDTO;
   backendChartId?: string;
   aggregation?: boolean;
+  datasetLoading: boolean;
 };
 
 const initState: WorkbenchState = {
@@ -84,6 +85,7 @@ const initState: WorkbenchState = {
   dataviews: [],
   dataset: {},
   aggregation: true,
+  datasetLoading: false,
 };
 
 // Selectors
@@ -135,6 +137,10 @@ export const aggregationSelector = createSelector(
   wb => wb.aggregation,
 );
 
+export const datasetLoadingSelector = createSelector(
+  workbenchSelector,
+  wb => wb.datasetLoading,
+);
 // Effects
 export const initWorkbenchAction = createAsyncThunk(
   'workbench/initWorkbenchAction',
@@ -461,6 +467,7 @@ const workbenchSlice = createSlice({
       })
       .addCase(fetchDataSetAction.fulfilled, (state, { payload }) => {
         state.dataset = payload as any;
+        state.datasetLoading = false;
       })
       .addCase(fetchChartAction.fulfilled, (state, { payload }) => {
         if (!payload) {
@@ -488,11 +495,22 @@ const workbenchSlice = createSlice({
           chartConfigDTO.aggregation === undefined
             ? true
             : chartConfigDTO.aggregation;
-      })
-      .addMatcher(
-        isMySliceRejectedAction(workbenchSlice.name),
-        rejectedActionMessageHandler,
-      );
+      });
+
+    builder.addCase(fetchDataSetAction.pending, (state, action) => {
+      console.log('123123 pending');
+      state.datasetLoading = true;
+    });
+
+    builder.addCase(fetchDataSetAction.rejected, (state, action) => {
+      console.log('123123 fulfilled');
+      state.datasetLoading = false;
+    });
+
+    builder.addMatcher(
+      isMySliceRejectedAction(workbenchSlice.name),
+      rejectedActionMessageHandler,
+    );
   },
 });
 

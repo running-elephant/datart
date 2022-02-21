@@ -41,6 +41,7 @@ const ChartWorkbench: FC<{
   chart?: IChart;
   aggregation?: boolean;
   defaultViewId?: string;
+  slowQuery: boolean;
   header?: {
     name?: string;
     orgId?: string;
@@ -53,6 +54,7 @@ const ChartWorkbench: FC<{
   onChartChange: (c: IChart) => void;
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
+  handleRefreshDataset?: () => void;
 }> = memo(
   ({
     dataset,
@@ -65,6 +67,8 @@ const ChartWorkbench: FC<{
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
+    handleRefreshDataset,
+    slowQuery,
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
@@ -75,8 +79,15 @@ const ChartWorkbench: FC<{
           onChangeAggregation: header?.onChangeAggregation,
         }}
       >
-        <ChartDatasetContext.Provider value={{ dataset: dataset }}>
-          <ChartDataViewContext.Provider value={{ dataView: dataview }}>
+        <ChartDatasetContext.Provider
+          value={{
+            dataset: dataset,
+            handleRefreshDataset: handleRefreshDataset,
+          }}
+        >
+          <ChartDataViewContext.Provider
+            value={{ dataView: dataview, slowQuery: slowQuery }}
+          >
             <TimeConfigContext.Provider
               value={{ locale: language, format: dateFormat }}
             >

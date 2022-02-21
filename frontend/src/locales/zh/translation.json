@@ -1033,7 +1033,8 @@
       "dirtyread": "延迟更新",
       "fastfailover": "快速失败",
       "cache": "缓存",
-      "cacheExpires": "有效期(秒)"
+      "cacheExpires": "有效期(秒)",
+      "slowQuery": "开启慢查询"
     },
     "schemaTable": {
       "category": "分类",

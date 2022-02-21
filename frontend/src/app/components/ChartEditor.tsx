@@ -45,7 +45,7 @@ import { IChart } from 'app/types/Chart';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import { CommonFormTypes } from 'globalConstants';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
@@ -110,6 +110,14 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     showSaveForm: saveFormContextValue.showSaveForm,
   });
   const tg = useI18NPrefix('global');
+
+  const slowQuery = useMemo(() => {
+    try {
+      return dataview ? JSON.parse(dataview.config).slowQuery || false : false;
+    } catch (error) {
+      throw error;
+    }
+  }, [dataview]);
 
   useMount(
     () => {
@@ -250,6 +258,16 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   };
 
   const handleChartConfigChange = (type, payload) => {
+    if (slowQuery) {
+      dispatch(
+        workbenchSlice.actions.updateChartConfig({
+          type,
+          payload: payload,
+        }),
+      );
+      return true;
+    }
+
     dispatch(
       updateChartConfigAndRefreshDatasetAction({
         type,
@@ -402,6 +420,9 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     [history, buildDataChart, chartType, dataview, orgId],
   );
 
+  const handleRefreshDataset = useCallback(() => {
+    dispatch(refreshDatasetAction({}));
+  }, [dispatch]);
   return (
     <StyledChartWorkbenchPage>
       <SaveFormContext.Provider value={saveFormContextValue}>
@@ -421,8 +442,10 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           chart={chart}
           dataset={dataset}
           dataview={dataview}
+          handleRefreshDataset={handleRefreshDataset}
           chartConfig={chartConfig}
           defaultViewId={defaultViewId}
+          slowQuery={slowQuery}
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}
           onDataViewChange={handleDataViewChanged}

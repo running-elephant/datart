@@ -19,8 +19,12 @@
 import ChartDataView from 'app/types/ChartDataView';
 import { createContext } from 'react';
 
-const VizDataViewContext = createContext<{ dataView?: ChartDataView }>({
+const ChartDataViewContext = createContext<{
+  dataView?: ChartDataView;
+  slowQuery: boolean;
+}>({
   dataView: {} as ChartDataView,
+  slowQuery: false,
 });
 
-export default VizDataViewContext;
+export default ChartDataViewContext;

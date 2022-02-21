@@ -47,9 +47,8 @@ const ChartOperationPanel: FC<{
     onChartConfigChange,
     onDataViewChange,
   }) => {
-    const { dataset } = useContext(ChartDatasetContext);
-    const { dataView } = useContext(ChartDataViewContext);
-
+    const { dataset, handleRefreshDataset } = useContext(ChartDatasetContext);
+    const { dataView, slowQuery } = useContext(ChartDataViewContext);
     const [layout, setLayout] = useState<Model>(() =>
       Model.fromJson(layoutCnofig),
     );
@@ -87,8 +86,10 @@ const ChartOperationPanel: FC<{
             }
             chart={chart}
             dataset={dataset}
+            slowQuery={slowQuery}
             chartConfig={chartConfig}
             onChartChange={onChartChange}
+            onRefreshDataset={handleRefreshDataset}
           />
         );
       }

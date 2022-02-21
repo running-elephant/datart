@@ -64,7 +64,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
   const [concurrencyControl, setConcurrencyControl] = useState(true);
   const [cache, setCache] = useState(false);
   const selectViewFolderTree = useMemo(makeSelectViewFolderTree, []);
-
+  const [slowQuery, setSlowQuery] = useState(false);
   const {
     type,
     visible,
@@ -125,6 +125,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     setConcurrencyControl(true);
     setCache(false);
     onAfterClose && onAfterClose();
+    setSlowQuery(false);
   }, [onAfterClose]);
 
   return (
@@ -180,6 +181,14 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
             formRef.current?.validateFields();
           }}
         />
+      </Form.Item>
+      <Form.Item
+        label={t('slowQuery')}
+        name={['config', 'slowQuery']}
+        initialValue={slowQuery}
+        valuePropName="checked"
+      >
+        <Switch onChange={setSlowQuery} />
       </Form.Item>
       {!simple && (
         <>
