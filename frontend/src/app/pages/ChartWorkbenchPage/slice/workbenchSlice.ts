@@ -23,6 +23,7 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { migrateChartConfig } from 'app/migration';
+import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { ResourceTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import { ChartConfig } from 'app/types/ChartConfig';
@@ -207,7 +208,7 @@ export const fetchViewDetailAction = createAsyncThunk(
       method: 'GET',
       url: `views/${arg}`,
     });
-    return response.data;
+    return migrateViewConfig(response.data);
   },
 );
 
