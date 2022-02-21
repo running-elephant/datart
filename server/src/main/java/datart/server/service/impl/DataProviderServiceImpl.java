@@ -121,23 +121,23 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
     @Override
     public Set<String> readAllDatabases(String sourceId) throws SQLException {
         Source source = retrieve(sourceId, Source.class, false);
-        return dataProviderManager.readAllDatabases(toDataProviderConfig(source));
+        return dataProviderManager.readAllDatabases(parseDataProviderConfig(source));
     }
 
     @Override
     public Set<String> readTables(String sourceId, String database) throws SQLException {
         Source source = retrieve(sourceId, Source.class, false);
-        return dataProviderManager.readTables(toDataProviderConfig(source), database);
+        return dataProviderManager.readTables(parseDataProviderConfig(source), database);
     }
 
     @Override
     public Set<Column> readTableColumns(String sourceId, String database, String table) throws SQLException {
         Source source = retrieve(sourceId, Source.class, false);
-        return dataProviderManager.readTableColumns(toDataProviderConfig(source), database, table);
+        return dataProviderManager.readTableColumns(parseDataProviderConfig(source), database, table);
     }
 
 
-    private DataProviderSource toDataProviderConfig(Source source) {
+    public DataProviderSource parseDataProviderConfig(Source source) {
         DataProviderSource providerSource = new DataProviderSource();
         try {
             providerSource.setSourceId(source.getId());
@@ -190,7 +190,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                 .script(testExecuteParam.getScript())
                 .variables(variables)
                 .build();
-        DataProviderSource providerSource = toDataProviderConfig(source);
+        DataProviderSource providerSource = parseDataProviderConfig(source);
 
         ExecuteParam executeParam = ExecuteParam
                 .builder()
@@ -211,7 +211,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         //datasource and view
         View view = retrieve(viewExecuteParam.getViewId(), View.class, true);
         Source source = retrieve(view.getSourceId(), Source.class, false);
-        DataProviderSource providerSource = toDataProviderConfig(source);
+        DataProviderSource providerSource = parseDataProviderConfig(source);
 
         //permission and variables
         Set<String> columns = parseColumnPermission(view);
@@ -274,7 +274,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
         Source source = retrieve(sourceId, Source.class, false);
 
-        DataProviderSource dataProviderSource = toDataProviderConfig(source);
+        DataProviderSource dataProviderSource = parseDataProviderConfig(source);
 
         return dataProviderManager.supportedStdFunctions(dataProviderSource);
     }
@@ -282,7 +282,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
     @Override
     public boolean validateFunction(String sourceId, String snippet) {
         Source source = retrieve(sourceId, Source.class);
-        DataProviderSource dataProviderSource = toDataProviderConfig(source);
+        DataProviderSource dataProviderSource = parseDataProviderConfig(source);
         return dataProviderManager.validateFunction(dataProviderSource, snippet);
     }
 

@@ -16,20 +16,17 @@
  * limitations under the License.
  */
 
-package datart.server.service;
+package datart.core.data.provider;
 
-import datart.core.data.provider.SchemaInfo;
-import datart.core.entity.Source;
-import datart.core.mappers.ext.SourceMapperExt;
+import lombok.Data;
 
 import java.util.List;
 
-public interface SourceService extends BaseCRUDService<Source, SourceMapperExt> {
+@Data
+public class SchemaInfo {
 
-    List<Source> listSources(String orgId,boolean active);
+    private String dbName;
 
-    List<SchemaInfo> getSourceSchemaInfo(String sourceId);
-
-    List<SchemaInfo> syncSourceSchema(String sourceId) throws Exception;
+    private List<TableInfo> tables;
 
 }

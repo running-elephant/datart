@@ -23,13 +23,16 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
+import datart.core.base.consts.JobType;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.DataProviderConfigTemplate;
 import datart.core.data.provider.DataProviderSource;
+import datart.core.data.provider.SchemaInfo;
 import datart.core.entity.Role;
 import datart.core.entity.Source;
-import datart.core.mappers.ext.RelRoleResourceMapperExt;
+import datart.core.entity.SourceSchemas;
 import datart.core.mappers.ext.SourceMapperExt;
+import datart.core.mappers.ext.SourceSchemasMapperExt;
 import datart.security.base.PermissionInfo;
 import datart.security.base.ResourceType;
 import datart.security.base.SubjectType;
@@ -41,9 +44,15 @@ import datart.server.base.params.BaseCreateParam;
 import datart.server.base.params.BaseUpdateParam;
 import datart.server.base.params.SourceCreateParam;
 import datart.server.base.params.SourceUpdateParam;
+import datart.server.job.EmailJob;
+import datart.server.job.ScheduleJob;
+import datart.server.job.SchemaSyncJob;
+import datart.server.job.WeChartJob;
 import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.quartz.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -56,6 +65,10 @@ import java.util.stream.Collectors;
 @Service
 public class SourceServiceImpl extends BaseService implements SourceService {
 
+    private static final String ENABLE_SYNC_SCHEMAS = "enableSyncSchemas";
+
+    private static final String SYNC_INTERVAL = "syncInterval";
+
     private final SourceMapperExt sourceMapper;
 
     private final DataProviderService dataProviderService;
@@ -64,18 +77,21 @@ public class SourceServiceImpl extends BaseService implements SourceService {
 
     private final FileService fileService;
 
-    private final RelRoleResourceMapperExt rrrMapper;
+    private final Scheduler scheduler;
+
+    private final SourceSchemasMapperExt sourceSchemasMapper;
 
     public SourceServiceImpl(SourceMapperExt sourceMapper,
                              DataProviderService dataProviderService,
                              RoleService roleService,
                              FileService fileService,
-                             RelRoleResourceMapperExt rrrMapper) {
+                             Scheduler scheduler, SourceSchemasMapperExt sourceSchemasMapper) {
         this.sourceMapper = sourceMapper;
         this.dataProviderService = dataProviderService;
         this.roleService = roleService;
         this.fileService = fileService;
-        this.rrrMapper = rrrMapper;
+        this.scheduler = scheduler;
+        this.sourceSchemasMapper = sourceSchemasMapper;
     }
 
     @Override
@@ -90,6 +106,27 @@ public class SourceServiceImpl extends BaseService implements SourceService {
                     }
                     return true;
                 }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SchemaInfo> getSourceSchemaInfo(String sourceId) {
+        SourceSchemas sourceSchemas = sourceSchemasMapper.selectBySource(sourceId);
+        if (sourceSchemas == null || StringUtils.isBlank(sourceSchemas.getSchemas())) {
+            return Collections.emptyList();
+        }
+        try {
+            return OBJECT_MAPPER.readerForListOf(SchemaInfo.class).readValue(sourceSchemas.getSchemas());
+        } catch (Exception e) {
+            log.error("source schema parse error ", e);
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<SchemaInfo> syncSourceSchema(String sourceId) throws Exception {
+        SchemaSyncJob schemaSyncJob = new SchemaSyncJob();
+        schemaSyncJob.execute(sourceId);
+        return getSourceSchemaInfo(sourceId);
     }
 
     @Override
@@ -127,7 +164,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         Source source = SourceService.super.create(createParam);
 
         grantDefaultPermission(source);
-
+        updateJdbcSourceSyncJob(source);
         return source;
 
     }
@@ -147,7 +184,9 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         providerSource.setType(sourceUpdateParam.getType());
         providerSource.setName(sourceUpdateParam.getName());
         dataProviderService.updateSource(providerSource);
-        return SourceService.super.update(updateParam);
+        boolean success = SourceService.super.update(updateParam);
+        updateJdbcSourceSyncJob(retrieve(updateParam.getId()));
+        return success;
     }
 
     @Override
@@ -194,4 +233,42 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     public void deleteStaticFiles(Source source) {
         fileService.deleteFiles(FileOwner.DATA_SOURCE, source.getId());
     }
+
+    private void updateJdbcSourceSyncJob(Source source) {
+        try {
+            DataProviderSource dataProviderSource = dataProviderService.parseDataProviderConfig(source);
+
+            JobKey jobKey = new JobKey(source.getName(), source.getId());
+
+            Object enable = dataProviderSource.getProperties().get(ENABLE_SYNC_SCHEMAS);
+            if (enable != null && "true".equals(enable.toString())) {
+                Object interval = dataProviderSource.getProperties().get(SYNC_INTERVAL);
+                if (interval == null || !NumberUtils.isDigits(interval.toString())) {
+                    Exceptions.msg("sync interval must be a number");
+                }
+                int intervalMin = Math.max(Integer.parseInt(interval.toString()), Const.MINIMUM_SYNC_INTERVAL);
+
+                scheduler.deleteJob(jobKey);
+                Trigger trigger = TriggerBuilder.newTrigger()
+                        .withIdentity(source.getId())
+                        .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(intervalMin))
+                        .startNow()
+                        .build();
+                JobDetail jobDetail = JobBuilder.newJob()
+                        .withIdentity(jobKey)
+                        .ofType(SchemaSyncJob.class)
+                        .build();
+                jobDetail.getJobDataMap().put(SchemaSyncJob.SOURCE_ID, source.getId());
+                scheduler.scheduleJob(jobDetail, trigger);
+                log.info("jdbc source schema job has been created {} - {} - interval {} ", source.getId(), source.getName(), intervalMin);
+            } else {
+                scheduler.deleteJob(jobKey);
+                log.info("jdbc source schema job has been deleted {} - {}", source.getId(), source.getName());
+            }
+        } catch (Exception e) {
+            log.error("schema sync job update error ", e);
+        }
+    }
+
+
 }

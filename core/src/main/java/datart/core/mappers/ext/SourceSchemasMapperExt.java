@@ -15,21 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package datart.core.mappers.ext;
 
-package datart.server.service;
+import datart.core.entity.SourceSchemas;
+import datart.core.mappers.SourceSchemasMapper;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
-import datart.core.data.provider.SchemaInfo;
-import datart.core.entity.Source;
-import datart.core.mappers.ext.SourceMapperExt;
+@Mapper
+public interface SourceSchemasMapperExt extends SourceSchemasMapper {
 
-import java.util.List;
-
-public interface SourceService extends BaseCRUDService<Source, SourceMapperExt> {
-
-    List<Source> listSources(String orgId,boolean active);
-
-    List<SchemaInfo> getSourceSchemaInfo(String sourceId);
-
-    List<SchemaInfo> syncSourceSchema(String sourceId) throws Exception;
+    @Select("SELECT * FROM source_schemas where source_id = #{sourceId}")
+    SourceSchemas selectBySource(String sourceId);
 
 }

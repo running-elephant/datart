@@ -31,6 +31,9 @@ public class Const {
 
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
+    // 数据库schema最短同步时间间隔
+    public static final Integer MINIMUM_SYNC_INTERVAL = 1;
+
     /**
      * 正则表达式
      */

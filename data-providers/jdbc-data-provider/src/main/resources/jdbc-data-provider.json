@@ -45,6 +45,18 @@
       "defaultValue": false
     },
     {
+      "name": "enableSyncSchemas",
+      "type": "bool",
+      "required": false,
+      "defaultValue": true
+    },
+    {
+      "name": "syncInterval",
+      "type": "string",
+      "required": false,
+      "defaultValue": "60"
+    },
+    {
       "name": "properties",
       "type": "object",
       "required": false,
