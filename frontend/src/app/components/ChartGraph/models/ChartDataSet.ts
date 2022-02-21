@@ -66,17 +66,20 @@ export class ChartDataSet<T>
   private columnIndexTable: ColumnIndexTable = {};
 
   constructor(columns: T[][], metas?: ChartDatasetMeta[]) {
-    super(
-      ...(Array.prototype.map.call(columns, c => {
-        if (c?.length === 1) {
-          const row = new ChartDataSetRow(metas, []);
-          row.push(c[0]);
-          return row;
-        }
-        return new ChartDataSetRow(metas, c);
-      }) as any),
-    );
+    super();
+
+    this.length = columns?.length || 0;
     this.columnIndexTable = super.createColumnIndexTable(metas);
+
+    for (let i = 0; i < this.length; i++) {
+      if (columns[i]?.length === 1) {
+        const row = new ChartDataSetRow(this.columnIndexTable, []);
+        row.push(columns[i][0]);
+        this[i] = row;
+      } else {
+        this[i] = new ChartDataSetRow(this.columnIndexTable, columns[i]);
+      }
+    }
   }
 
   public getFieldKey(field: ChartDataSectionField) {
@@ -122,9 +125,9 @@ export class ChartDataSetRow<T>
 {
   private columnIndexTable: ColumnIndexTable = {};
 
-  constructor(metas, items: T[]) {
+  constructor(indexes, items: T[]) {
     super(...(items as any));
-    this.columnIndexTable = this.createColumnIndexTable(metas);
+    this.columnIndexTable = indexes;
   }
 
   public getCell(field: ChartDataSectionField) {
