@@ -2,6 +2,10 @@ spring:
   application:
     name: datart-server
 
+  flyway:
+    locations: bin/migrations
+    enabled: false
+
   main:
     banner-mode: off
 
