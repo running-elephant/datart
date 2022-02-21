@@ -18,7 +18,6 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
-import useAppDispatch from 'app/hooks/useAppDispatch';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import workbenchSlice, {
@@ -47,7 +46,7 @@ import { ChartDTO } from 'app/types/ChartDTO';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import { CommonFormTypes } from 'globalConstants';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { CloneValueDeep } from 'utils/object';
@@ -100,7 +99,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 }) => {
   const saveFormContextValue = useSaveFormContext();
   const { actions } = useWorkbenchSlice();
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const dataset = useSelector(datasetsSelector);
   const dataview = useSelector(currentDataViewSelector);
   const chartConfig = useSelector(chartConfigSelector);
@@ -429,10 +428,9 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     [history, buildDataChart, chartType, dataview, orgId],
   );
 
-  const handleRefreshDataset = useCallback(() => {
-    dispatch(refreshDatasetAction({})).then(res => {
-      setIsNeedRequest(false);
-    });
+  const handleRefreshDataset = useCallback(async () => {
+    await dispatch(refreshDatasetAction({}));
+    setIsNeedRequest(false);
   }, [dispatch]);
   return (
     <StyledChartWorkbenchPage>
