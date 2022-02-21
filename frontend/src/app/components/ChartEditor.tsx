@@ -238,9 +238,6 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       shadowChartConfig || chartConfig,
     );
 
-    console.log(`targetChartConfig ---> `, targetChartConfig);
-    console.log(`finalChartConfig ---> `, finalChartConfig);
-
     dispatch(
       workbenchSlice.actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,

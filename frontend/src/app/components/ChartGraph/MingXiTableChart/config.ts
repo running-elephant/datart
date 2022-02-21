@@ -367,7 +367,6 @@ const config: ChartConfig = {
             needRefresh: true,
             step: 1,
             min: 0,
-            max: 100,
           },
           watcher: {
             deps: ['enablePaging'],
