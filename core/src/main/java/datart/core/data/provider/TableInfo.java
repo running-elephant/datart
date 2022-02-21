@@ -1,19 +1,19 @@
-package datart.server.base.dto;
+package datart.core.data.provider;
 
-import datart.core.data.provider.Column;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class TableInfo {
 
-    private String dbName;
+//    private String dbName;
 
     private String tableName;
 
     private List<String> primaryKeys;
 
-    private List<Column> columns;
+    private Set<Column> columns;
 
 }

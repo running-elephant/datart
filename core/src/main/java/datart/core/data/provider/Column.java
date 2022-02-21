@@ -22,6 +22,7 @@ import datart.core.base.consts.ValueType;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 public class Column implements Serializable {
@@ -32,11 +33,7 @@ public class Column implements Serializable {
 
     private String fmt;
 
-    private String pkDatabase;
-
-    private String pkTable;
-
-    private String pkColumn;
+    private List<ForeignKey> foreignKeys;
 
     public Column(String name, ValueType type) {
         this.name = name;
