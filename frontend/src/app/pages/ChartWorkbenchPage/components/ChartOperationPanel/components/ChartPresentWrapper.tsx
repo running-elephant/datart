@@ -33,8 +33,9 @@ const ChartPresentWrapper: FC<{
   chart?: IChart;
   dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
-  onChartChange: (c: IChart) => void;
   slowQuery: boolean;
+  isNeedRequest: boolean;
+  onChartChange: (c: IChart) => void;
   onRefreshDataset?: () => void;
 }> = memo(
   ({
@@ -44,6 +45,7 @@ const ChartPresentWrapper: FC<{
     dataset,
     slowQuery,
     chartConfig,
+    isNeedRequest,
     onChartChange,
     onRefreshDataset,
   }) => {
@@ -76,6 +78,7 @@ const ChartPresentWrapper: FC<{
             chart={chart}
             dataset={dataset}
             slowQuery={slowQuery}
+            isNeedRequest={isNeedRequest}
             chartConfig={chartConfig}
             onRefreshDataset={onRefreshDataset}
           />

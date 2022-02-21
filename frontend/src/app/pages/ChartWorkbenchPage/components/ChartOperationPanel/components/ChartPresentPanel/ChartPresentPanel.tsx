@@ -22,9 +22,9 @@ import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContai
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { FC, memo, useEffect, useState } from 'react';
+import { FC, memo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
@@ -49,6 +49,7 @@ const ChartPresentPanel: FC<{
   dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
   slowQuery: boolean;
+  isNeedRequest: boolean;
   onRefreshDataset?: () => void;
 }> = memo(
   ({
@@ -59,32 +60,12 @@ const ChartPresentPanel: FC<{
     chartConfig,
     slowQuery,
     onRefreshDataset,
+    isNeedRequest,
   }) => {
     const translate = useI18NPrefix(`viz.palette.present`);
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
     const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
-    const [spinStatus, setSpinStatus] = useState<boolean>(false);
-    const datasetLoading = useSelector(datasetLoadingSelector);
-
-    useEffect(() => {
-      if (slowQuery && dataset?.columns) {
-        let chartDataRows: ChartDataSectionField[] = [];
-        chartConfig?.datas?.forEach((v, i) => {
-          if (v?.rows && v.rows.length) {
-            chartDataRows.push(...v.rows);
-          }
-        });
-
-        if (
-          dataset?.columns &&
-          chartDataRows.length === dataset?.columns.length
-        ) {
-          setSpinStatus(false);
-        } else {
-          setSpinStatus(true);
-        }
-      }
-    }, [dataset?.columns, chartConfig?.datas, slowQuery]);
+    const datasetLoadingStatus = useSelector(datasetLoadingSelector);
 
     useMount(undefined, () => {
       Debugger.instance.measure(`ChartPresentPanel | Dispose Event`, () => {
@@ -162,11 +143,11 @@ const ChartPresentPanel: FC<{
 
     return (
       <StyledChartPresentPanel>
-        {slowQuery && spinStatus ? (
+        {slowQuery && isNeedRequest ? (
           <FetchDataWrapper>
             <ReloadOutlined
               onClick={onRefreshDataset}
-              spin={datasetLoading}
+              spin={datasetLoadingStatus}
               className="fetchDataIcon"
             />
           </FetchDataWrapper>

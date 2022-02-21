@@ -26,9 +26,10 @@ export interface ChartDataConfigSectionProps {
   config: ChartDataConfig;
   modalSize?: StateModalSize;
   category?: Lowercase<keyof typeof ChartDataViewFieldCategory>;
+  aggregation?: boolean;
+  slowQuery?: boolean;
   extra?: () => ReactNode;
   translate?: (title: string) => string;
-  aggregation?: boolean;
   onConfigChanged: (
     ancestors: number[],
     config: ChartDataConfig,

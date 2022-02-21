@@ -18,6 +18,7 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
+import useAppDispatch from 'app/hooks/useAppDispatch';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import workbenchSlice, {
@@ -46,7 +47,7 @@ import { ChartDTO } from 'app/types/ChartDTO';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import { CommonFormTypes } from 'globalConstants';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { CloneValueDeep } from 'utils/object';
@@ -57,7 +58,9 @@ import {
   DataChartConfig,
   WidgetContentChartType,
 } from '../pages/DashBoardPage/pages/Board/slice/types';
+
 const { confirm } = Modal;
+
 export interface ChartEditorBaseProps {
   dataChartId: string;
   orgId: string;
@@ -97,7 +100,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 }) => {
   const saveFormContextValue = useSaveFormContext();
   const { actions } = useWorkbenchSlice();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const dataset = useSelector(datasetsSelector);
   const dataview = useSelector(currentDataViewSelector);
   const chartConfig = useSelector(chartConfigSelector);
@@ -105,6 +108,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
   const [chart, setChart] = useState<IChart>();
+  const [isNeedRequest, setIsNeedRequest] = useState<boolean>(false);
   const history = useHistory();
   const addVizFn = useAddViz({
     showSaveForm: saveFormContextValue.showSaveForm,
@@ -113,7 +117,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 
   const slowQuery = useMemo(() => {
     try {
-      return dataview ? JSON.parse(dataview.config).slowQuery || false : false;
+      return dataview ? Boolean(JSON.parse(dataview.config).slowQuery) : false;
     } catch (error) {
       throw error;
     }
@@ -245,7 +249,6 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       targetChartConfig,
       shadowChartConfig || chartConfig,
     );
-
     dispatch(
       workbenchSlice.actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
@@ -254,7 +257,11 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
         },
       }),
     );
-    dispatch(refreshDatasetAction({}));
+    if (!slowQuery) {
+      dispatch(refreshDatasetAction({}));
+    } else {
+      setIsNeedRequest(true);
+    }
   };
 
   const handleChartConfigChange = (type, payload) => {
@@ -265,6 +272,8 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           payload: payload,
         }),
       );
+      dispatch(workbenchSlice.actions.updateShadowChartConfig(null));
+      setIsNeedRequest(payload.needRefresh);
       return true;
     }
 
@@ -421,7 +430,9 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   );
 
   const handleRefreshDataset = useCallback(() => {
-    dispatch(refreshDatasetAction({}));
+    dispatch(refreshDatasetAction({})).then(res => {
+      setIsNeedRequest(false);
+    });
   }, [dispatch]);
   return (
     <StyledChartWorkbenchPage>
@@ -446,6 +457,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           chartConfig={chartConfig}
           defaultViewId={defaultViewId}
           slowQuery={slowQuery}
+          isNeedRequest={isNeedRequest}
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}
           onDataViewChange={handleDataViewChanged}

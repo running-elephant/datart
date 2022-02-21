@@ -26,13 +26,14 @@ import PaletteDataConfig from '../ChartDataConfigSection';
 
 const ChartDataConfigPanel: FC<{
   dataConfigs?: ChartDataConfig[];
+  slowQuery?: boolean;
   onChange: (
     ancestors: number[],
     config: ChartDataConfig,
     needRefresh?: boolean,
   ) => void;
 }> = memo(
-  ({ dataConfigs, onChange }) => {
+  ({ dataConfigs, slowQuery, onChange }) => {
     const translate = useI18NPrefix(`viz.palette.data`);
     const { aggregation } = useContext(ChartAggregationContext);
 
@@ -43,6 +44,7 @@ const ChartDataConfigPanel: FC<{
         config,
         translate,
         aggregation,
+        slowQuery,
         onConfigChanged: (ancestors, config, needRefresh?: boolean) => {
           onChange?.(ancestors, config, needRefresh);
         },
@@ -75,7 +77,9 @@ const ChartDataConfigPanel: FC<{
     );
   },
   (prev, next) => {
-    return prev.dataConfigs === next.dataConfigs;
+    return (
+      prev.dataConfigs === next.dataConfigs && prev.slowQuery === next.slowQuery
+    );
   },
 );
 

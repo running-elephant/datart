@@ -42,6 +42,7 @@ const ChartWorkbench: FC<{
   aggregation?: boolean;
   defaultViewId?: string;
   slowQuery: boolean;
+  isNeedRequest: boolean;
   header?: {
     name?: string;
     orgId?: string;
@@ -64,11 +65,12 @@ const ChartWorkbench: FC<{
     aggregation,
     header,
     defaultViewId,
+    slowQuery,
+    isNeedRequest,
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
     handleRefreshDataset,
-    slowQuery,
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
@@ -107,6 +109,7 @@ const ChartWorkbench: FC<{
                     chart={chart}
                     defaultViewId={defaultViewId}
                     chartConfig={chartConfig}
+                    isNeedRequest={isNeedRequest}
                     onChartChange={onChartChange}
                     onChartConfigChange={onChartConfigChange}
                     onDataViewChange={onDataViewChange}

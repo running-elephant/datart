@@ -264,7 +264,7 @@ export const refreshDatasetAction = createAsyncThunk(
     const requestParams = builder
       .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
       .build();
-    thunkAPI.dispatch(fetchDataSetAction(requestParams));
+    return thunkAPI.dispatch(fetchDataSetAction(requestParams));
   },
 );
 
@@ -498,12 +498,10 @@ const workbenchSlice = createSlice({
       });
 
     builder.addCase(fetchDataSetAction.pending, (state, action) => {
-      console.log('123123 pending');
       state.datasetLoading = true;
     });
 
     builder.addCase(fetchDataSetAction.rejected, (state, action) => {
-      console.log('123123 fulfilled');
       state.datasetLoading = false;
     });
 

@@ -64,7 +64,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
   const [concurrencyControl, setConcurrencyControl] = useState(true);
   const [cache, setCache] = useState(false);
   const selectViewFolderTree = useMemo(makeSelectViewFolderTree, []);
-  const [slowQuery, setSlowQuery] = useState(false);
+  const [slowQuery, setSlowQuery] = useState(false); // beta.2 add slowQuery
   const {
     type,
     visible,
