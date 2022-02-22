@@ -40,8 +40,10 @@ import {
   BasicInput,
   BasicInputNumber,
   BasicInputPercentage,
+  BasicLegendType,
   BasicLine,
   BasicMarginWidth,
+  BasicNameLocation,
   BasicRadio,
   BasicSelector,
   BasicSlider,
@@ -168,6 +170,10 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <BasicRadio {...props} />;
         case ChartStyleSectionComponentType.FontAlignment:
           return <FontAlignment {...props} />;
+        case ChartStyleSectionComponentType.NameLocation:
+          return <BasicNameLocation {...props} />;
+        case ChartStyleSectionComponentType.LegendType:
+          return <BasicLegendType {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

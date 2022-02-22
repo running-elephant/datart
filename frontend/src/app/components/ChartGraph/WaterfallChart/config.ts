@@ -57,9 +57,10 @@ const config: ChartConfig = {
           comType: 'select',
           default: true,
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '累计', value: true },
-              { label: '差异', value: false },
+              { label: '@global@.bar.accumulative', value: true },
+              { label: '@global@.bar.difference', value: false },
             ],
           },
         },
@@ -283,14 +284,7 @@ const config: ChartConfig = {
           label: 'common.nameLocation',
           key: 'nameLocation',
           default: 'center',
-          comType: 'select',
-          options: {
-            items: [
-              { label: '开始', value: 'start' },
-              { label: '结束', value: 'end' },
-              { label: '中间', value: 'center' },
-            ],
-          },
+          comType: 'nameLocation',
         },
         {
           label: 'common.nameRotate',
@@ -461,6 +455,8 @@ const config: ChartConfig = {
           ascendColor: '上升背景色',
           descendColor: '下降背景色',
           totalColor: '累计背景色',
+          accumulative: '累计',
+          difference: '差异',
         },
         splitLine: {
           title: '分割线',
@@ -506,32 +502,17 @@ const config: ChartConfig = {
         },
         label: {
           title: 'Label',
-          showLabel: 'Show Label',
-          position: 'Position',
-        },
-        legend: {
-          title: 'Legend',
-          showLegend: 'Show Legend',
-          type: 'Type',
-          selectAll: 'Select All',
-          position: 'Position',
-        },
-        data: {
-          color: 'Color',
-          colorize: 'Colorize',
-        },
-        stack: {
-          title: 'Stack',
-          enable: 'Enable',
-          percentage: 'Percentage',
-          enableTotal: 'Enable Total',
         },
         bar: {
-          title: 'Bar Chart',
-          enable: 'Enable Horizon',
+          title: 'Waterfall Chart',
           radius: 'Bar Radius',
           width: 'Bar Width',
-          gap: 'Bar Gap',
+          ascendColor: 'Ascend Color',
+          descendColor: 'Descend Color',
+          totalColor: 'Total Color',
+          isIncrement: 'Formula Mode',
+          accumulative: 'Accumulative',
+          difference: 'Difference',
         },
         xAxis: {
           title: 'X Axis',

@@ -206,6 +206,8 @@ export const ChartStyleSectionComponentType = {
 
   // Customize Component
   FontAlignment: 'fontAlignment',
+  NameLocation: 'nameLocation',
+  LegendType: 'legendType',
 };
 
 export type ChartConfigBase = {

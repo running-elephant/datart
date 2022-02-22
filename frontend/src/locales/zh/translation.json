@@ -544,6 +544,20 @@
           "bottom": "底边距",
           "top": "上边距",
           "containLabel": "包含标题"
+        },
+        "lineStyles": {
+          "solid": "实线",
+          "dashed": "虚线",
+          "dotted": "点"
+        },
+        "nameLocation": {
+          "start": "开始",
+          "center": "中间",
+          "end": "结束"
+        },
+        "legendType": {
+          "plain": "普通",
+          "scroll": "滚动"
         }
       },
       "data": {

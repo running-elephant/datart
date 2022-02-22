@@ -16,43 +16,44 @@
  * limitations under the License.
  */
 
-import { Checkbox } from 'antd';
-import { CheckboxChangeEvent } from 'antd/lib/checkbox';
+import { Col, Row, Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
+import { CHART_LEGEND_TYPE } from 'globalConstants';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
-import { BW } from './components/BasicWrapper';
 
-const BasicCheckbox: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+const BasicLegendType: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 
-    const handleCheckedChange = (e: CheckboxChangeEvent) => {
-      onChange?.(ancestors, e.target?.checked, options?.needRefresh);
-    };
-
     return (
-      <StyledVizBasicCheckbox
-        label={!options?.hideLabel ? t(row.label, true) : ''}
-        labelCol={{ span: 20 }}
-        wrapperCol={{ span: 4 }}
-      >
-        <Checkbox
-          {...rest}
-          {...options}
-          checked={row.value}
-          onChange={handleCheckedChange}
-        />
-      </StyledVizBasicCheckbox>
+      <StyledVizLegendType align={'middle'}>
+        <Col span={12}>{t(row.label, true)}</Col>
+        <Col span={12}>
+          <Select
+            dropdownMatchSelectWidth
+            {...rest}
+            {...options}
+            placeholder={t('select')}
+            onChange={value => onChange?.(ancestors, value)}
+          >
+            {CHART_LEGEND_TYPE.map(o => (
+              <Select.Option key={o.value} value={o.value}>
+                {t(o.name)}
+              </Select.Option>
+            ))}
+          </Select>
+        </Col>
+      </StyledVizLegendType>
     );
   },
   itemLayoutComparer,
 );
 
-export default BasicCheckbox;
+export default BasicLegendType;
 
-const StyledVizBasicCheckbox = styled(BW)`
-  flex-direction: row;
+const StyledVizLegendType = styled(Row)`
+  line-height: 32px;
 `;
