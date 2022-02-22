@@ -283,6 +283,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
             measureBeforeMount={false}
             onDragStop={changeWidgetLayouts}
             onResizeStop={changeWidgetLayouts}
+            isBounded={false}
             onLayoutChange={onLayoutChange}
             isDraggable={true}
             isResizable={true}
