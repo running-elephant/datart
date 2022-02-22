@@ -86,7 +86,6 @@ export const AutoBoardEditor: React.FC<{}> = () => {
 
   const dispatch = useDispatch();
   const visible = useVisibleHidden();
-  const [layoutMap, setLayoutMap] = useState<Layouts>({});
 
   const layoutWidgets = useMemo(
     () => Object.values(layoutWidgetMap),
@@ -122,8 +121,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     margin,
     containerPadding,
   ]);
-
-  useEffect(() => {
+  const generateLayout = () => {
     const layoutMap: Layouts = {
       lg: [],
       xs: [],
@@ -131,12 +129,14 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     layoutWidgets.forEach(widget => {
       const lg = widget.config.rect || widget.config.mobileRect;
       const xs = widget.config.mobileRect || widget.config.rect;
+      const lock = widget.config.lock;
       layoutMap.lg.push({
         i: widget.id,
         x: lg.x,
         y: lg.y,
         w: lg.width,
         h: lg.height,
+        static: lock,
       });
       layoutMap.xs.push({
         i: widget.id,
@@ -144,10 +144,12 @@ export const AutoBoardEditor: React.FC<{}> = () => {
         y: xs.y,
         w: xs.width,
         h: xs.height,
+        static: lock,
       });
     });
-    setLayoutMap(layoutMap);
-  }, [layoutWidgets]);
+    return layoutMap;
+  };
+  const layoutMap = generateLayout();
 
   useEffect(() => {
     const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);

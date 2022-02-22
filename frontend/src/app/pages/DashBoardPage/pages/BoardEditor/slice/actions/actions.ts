@@ -261,6 +261,19 @@ export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
   );
 };
 
+export const toggleLockWidgetAction =
+  (widget: Widget, bool: boolean) => dispatch => {
+    const nextConf = produce(widget.config, draft => {
+      draft.lock = bool;
+    });
+    dispatch(
+      editBoardStackActions.updateWidgetConfig({
+        wid: widget.id,
+        config: nextConf,
+      }),
+    );
+  };
+
 export const addVariablesToBoard =
   (variables: Variable[]) => (dispatch, getState) => {
     if (!variables?.length) return;
