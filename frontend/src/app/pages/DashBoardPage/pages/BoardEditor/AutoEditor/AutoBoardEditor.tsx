@@ -71,8 +71,9 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     background,
     mobileMargin,
     mobileContainerPadding,
+    allowOverlap,
   } = config;
-
+  console.log('_ edit allowOverlap ', allowOverlap);
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
   const layoutWidgetInfoMap = useSelector(selectLayoutWidgetInfoMap);
 
@@ -87,8 +88,12 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   const dispatch = useDispatch();
   const visible = useVisibleHidden();
 
-  const layoutWidgets = useMemo(
-    () => Object.values(layoutWidgetMap),
+  const sortedLayoutWidgets = useMemo(
+    () =>
+      Object.values(layoutWidgetMap).sort(
+        (a, b) => a.config.index - b.config.index,
+      ),
+
     [layoutWidgetMap],
   );
 
@@ -124,7 +129,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
       lg: [],
       xs: [],
     };
-    layoutWidgets.forEach(widget => {
+    sortedLayoutWidgets.forEach(widget => {
       const lg = widget.config.rect || widget.config.mobileRect;
       const xs = widget.config.mobileRect || widget.config.rect;
       const lock = widget.config.lock;
@@ -208,7 +213,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
       gridWrapRef.current?.removeEventListener('scroll', lazyLoad, false);
       window.removeEventListener('resize', lazyLoad, false);
     };
-  }, [layoutWidgets, lazyLoad]);
+  }, [sortedLayoutWidgets, lazyLoad]);
 
   const changeWidgetLayouts = debounce((layouts: Layout[]) => {
     dispatch(
@@ -230,7 +235,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   };
 
   const boardChildren = useMemo(() => {
-    return layoutWidgets.map(item => {
+    return sortedLayoutWidgets.map(item => {
       return (
         <div className="block-item" key={item.id}>
           <WidgetAllProvider id={item.id}>
@@ -239,7 +244,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
         </div>
       );
     });
-  }, [layoutWidgets]);
+  }, [sortedLayoutWidgets]);
 
   const { deviceClassName } = useMemo(() => {
     let deviceClassName: string = 'desktop';

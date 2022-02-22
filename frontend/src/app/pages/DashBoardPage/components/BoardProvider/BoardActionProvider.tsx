@@ -68,7 +68,9 @@ export const BoardActionProvider: FC<{ id: string }> = ({
         dispatch(boardActions.updateWidget(widget));
       }
     },
-
+    boardToggleAllowOverlap: (allow: boolean) => {
+      dispatch(editBoardStackActions.toggleAllowOverlap(allow));
+    },
     onWidgetsQuery: debounce(() => {
       if (editing) {
         dispatch(editWidgetsQueryAction({ boardId }));
