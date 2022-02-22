@@ -67,9 +67,10 @@ const config: ChartConfig = {
           comType: 'select',
           default: 'china',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '中国-省级地图', value: 'china' },
-              { label: '中国-地市级地图', value: 'china-city' },
+              { label: '@global@.levelType.china', value: 'china' },
+              { label: '@global@.levelType.chinaCity', value: 'china-city' },
             ],
           },
         },
@@ -180,9 +181,10 @@ const config: ChartConfig = {
           comType: 'select',
           default: 'vertical',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '竖直', value: 'vertical' },
-              { label: '水平', value: 'horizontal' },
+              { label: '@global@.orientType.vertical', value: 'vertical' },
+              { label: '@global@.orientType.horizontal', value: 'horizontal' },
             ],
           },
         },
@@ -290,6 +292,14 @@ const config: ChartConfig = {
           areaColor: '区域颜色',
           areaEmphasisColor: '选中区域高亮颜色',
         },
+        levelType: {
+          china: '中国-省级地图',
+          chinaCity: '中国-地市级地图',
+        },
+        orientType: {
+          horizontal: '水平',
+          vertical: '竖直',
+        },
         background: { title: '背景设置' },
       },
     },
@@ -332,6 +342,14 @@ const config: ChartConfig = {
           focusArea: 'Focus Area',
           areaColor: 'Area Color',
           areaEmphasisColor: 'Area Emphasis Color',
+        },
+        levelType: {
+          china: 'China',
+          chinaCity: 'China City',
+        },
+        orientType: {
+          horizontal: 'Horizontal',
+          vertical: 'Vertical',
         },
         background: { title: 'Background' },
       },

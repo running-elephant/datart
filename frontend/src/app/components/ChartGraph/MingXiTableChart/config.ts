@@ -304,11 +304,12 @@ const config: ChartConfig = {
           comType: 'select',
           default: 'normal',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '常规字号', value: 'normal' },
-              { label: '粗体', value: 'bold' },
-              { label: '特粗体', value: 'bolder' },
-              { label: '细体', value: 'lighter' },
+              { label: '@global@.fontWeight.normal', value: 'normal' },
+              { label: '@global@.fontWeight.bold', value: 'bold' },
+              { label: '@global@.fontWeight.bolder', value: 'bolder' },
+              { label: '@global@.fontWeight.lighter', value: 'lighter' },
               { label: '100', value: '100' },
               { label: '200', value: '200' },
               { label: '300', value: '300' },
@@ -327,10 +328,11 @@ const config: ChartConfig = {
           comType: 'select',
           default: 'normal',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '常规体', value: 'normal' },
-              { label: '斜体', value: 'italic' },
-              { label: '偏斜体', value: 'oblique' },
+              { label: '@global@.fontStyle.normal', value: 'normal' },
+              { label: '@global@.fontStyle.italic', value: 'italic' },
+              { label: '@global@.fontStyle.oblique', value: 'oblique' },
             ],
           },
         },
@@ -478,6 +480,17 @@ const config: ChartConfig = {
           fontSize: '字体大小',
           fontStyle: '字体样式',
         },
+        fontStyle: {
+          normal: '常规体',
+          italic: '斜体',
+          oblique: '偏斜体',
+        },
+        fontWeight: {
+          normal: '常规字号',
+          bold: '粗体',
+          bolder: '特粗体',
+          lighter: '细体',
+        },
         tableSize: {
           default: '默认',
           middle: '中',
@@ -543,6 +556,17 @@ const config: ChartConfig = {
           evenFontColor: 'Even Row Font Color',
           fontSize: 'Font Size',
           fontStyle: 'Font Style',
+        },
+        fontWeight: {
+          bolder: 'Bolder',
+          normal: 'Normal',
+          bold: 'Bold',
+          lighter: 'Lighter',
+        },
+        fontStyle: {
+          normal: 'Normal',
+          italic: 'Italic',
+          oblique: 'Oblique',
         },
         tableSize: {
           default: 'Default',

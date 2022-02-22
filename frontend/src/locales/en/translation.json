@@ -549,6 +549,15 @@
           "solid": "Solid",
           "dashed": "Dashed",
           "dotted": "Dotted"
+        },
+        "nameLocation": {
+          "start": "Start",
+          "center": "Center",
+          "end": "End"
+        },
+        "legendType": {
+          "plain": "Plain",
+          "scroll": "Scroll"
         }
       },
       "data": {

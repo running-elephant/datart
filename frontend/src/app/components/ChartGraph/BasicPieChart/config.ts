@@ -121,14 +121,8 @@ const config: ChartConfig = {
         {
           label: 'legend.type',
           key: 'type',
-          comType: 'select',
+          comType: 'legendType',
           default: 'scroll',
-          options: {
-            items: [
-              { label: '普通', value: 'plain' },
-              { label: '滚动', value: 'scroll' },
-            ],
-          },
         },
         {
           label: 'legend.selectAll',
