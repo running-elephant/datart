@@ -16,12 +16,17 @@
  * limitations under the License.
  */
 
-package datart.server.config;
+package datart.core.data.provider;
 
-//import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
-//import org.springframework.context.annotation.Configuration;
+import lombok.Data;
 
-//@Configuration
-//@EnableDubbo
-public class DubboConfig {
+@Data
+public class ForeignKey {
+
+    private String database;
+
+    private String table;
+
+    private String column;
+
 }

@@ -16,12 +16,12 @@ public class SourceSchemasSqlProvider {
             sql.VALUES("source_id", "#{sourceId,jdbcType=VARCHAR}");
         }
         
-        if (record.getUpdateTime() != null) {
-            sql.VALUES("update_time", "#{updateTime,jdbcType=TIMESTAMP}");
+        if (record.getSchemas() != null) {
+            sql.VALUES("`schemas`", "#{schemas,jdbcType=VARCHAR}");
         }
         
-        if (record.getSchemas() != null) {
-            sql.VALUES("`schemas`", "#{schemas,jdbcType=LONGVARCHAR}");
+        if (record.getUpdateTime() != null) {
+            sql.VALUES("update_time", "#{updateTime,jdbcType=TIMESTAMP}");
         }
         
         return sql.toString();
@@ -35,12 +35,12 @@ public class SourceSchemasSqlProvider {
             sql.SET("source_id = #{sourceId,jdbcType=VARCHAR}");
         }
         
-        if (record.getUpdateTime() != null) {
-            sql.SET("update_time = #{updateTime,jdbcType=TIMESTAMP}");
+        if (record.getSchemas() != null) {
+            sql.SET("`schemas` = #{schemas,jdbcType=VARCHAR}");
         }
         
-        if (record.getSchemas() != null) {
-            sql.SET("`schemas` = #{schemas,jdbcType=LONGVARCHAR}");
+        if (record.getUpdateTime() != null) {
+            sql.SET("update_time = #{updateTime,jdbcType=TIMESTAMP}");
         }
         
         sql.WHERE("id = #{id,jdbcType=VARCHAR}");

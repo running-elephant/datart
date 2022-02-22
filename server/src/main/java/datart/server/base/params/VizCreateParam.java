@@ -34,6 +34,10 @@ public class VizCreateParam extends BaseCreateParam {
 
     private Short status;
 
+    private String subType;
+
+    private String avatar;
+
     private List<PermissionInfo> permissions;
 
 }
