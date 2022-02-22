@@ -45,12 +45,8 @@ export const ToolBar = () => {
           <AddContainer />
           <Divider type="vertical" />
           <AddController />
-          {boardType === 'free' && (
-            <>
-              <ToTopBtn />
-              <ToBottomBtn />
-            </>
-          )}
+          <ToTopBtn />
+          <ToBottomBtn />
           <Divider type="vertical" />
           <UndoBtn />
           <RedoBtn />
@@ -63,6 +59,7 @@ export const ToolBar = () => {
             <>
               <Divider type="vertical" />
               <DeviceSwitcher />
+              <Divider type="vertical" />
             </>
           )}
         </>
