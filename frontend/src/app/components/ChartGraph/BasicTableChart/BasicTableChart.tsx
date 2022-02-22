@@ -37,7 +37,7 @@ import {
   getCustomBodyRowStyle,
 } from './conditionStyle';
 import Config from './config';
-import { TableComponentsTd } from './TableComponents';
+import { ResizableTitle, TableComponentsTd } from './TableComponents';
 
 class BasicTableChart extends ReactChart {
   useIFrame = false;
@@ -47,8 +47,9 @@ class BasicTableChart extends ReactChart {
   dataColumnWidths = {};
   tablePadding = 16;
   tableCellBorder = 1;
-  cachedAntTableOptions = {};
+  cachedAntTableOptions: any = {};
   cachedDatartConfig: ChartConfig = {};
+  cacheContext: any = null;
   showSummaryRow = false;
   rowNumberUniqKey = `@datart@rowNumberKey`;
   totalWidth = 0;
@@ -91,10 +92,17 @@ class BasicTableChart extends ReactChart {
         );
         this.cachedAntTableOptions = tableOptions;
         this.cachedDatartConfig = options.config;
+        this.cacheContext = context;
         this.adapter?.updated(tableOptions, context);
       },
       false,
     );
+  }
+
+  public onUnMount(options: any, context?: any): void {
+    this.cachedAntTableOptions = {};
+    this.cachedDatartConfig = {};
+    this.cacheContext = null;
   }
 
   public onResize(options, context?): void {
@@ -534,7 +542,12 @@ class BasicTableChart extends ReactChart {
               { ...fontStyle },
             );
           }
-          return <th {...rest} style={Object.assign(cellCssStyle, style)} />;
+          return (
+            <ResizableTitle
+              {...rest}
+              style={Object.assign(cellCssStyle, style)}
+            />
+          );
         },
       },
       body: {
@@ -579,6 +592,19 @@ class BasicTableChart extends ReactChart {
         },
       },
     };
+  }
+
+  private updateTableColumns(e, { size }, index) {
+    const { columns } = this.cachedAntTableOptions;
+    const nextColumns = [...columns];
+    nextColumns[index] = {
+      ...nextColumns[index],
+      width: size.width,
+    };
+    const tableOptions = Object.assign(this.cachedAntTableOptions, {
+      columns: nextColumns,
+    });
+    this.adapter?.updated(tableOptions, this.cacheContext);
   }
 
   protected getColumns(
@@ -630,7 +656,7 @@ class BasicTableChart extends ReactChart {
     };
 
     const _getFlatColumns = (dataConfigs, chartDataSet) => {
-      const columnList = dataConfigs.map(c => {
+      const columnList = dataConfigs.map((c, cIndex) => {
         const colName = c.colName;
         const columnRowSpans = (autoMergeFields || []).includes(c.uid)
           ? chartDataSet
@@ -678,6 +704,9 @@ class BasicTableChart extends ReactChart {
           colName,
           width: colMaxWidth,
           fixed: null,
+          ellipsis: {
+            showTitle: false,
+          },
           onHeaderCell: record => {
             return {
               ...Omit(record, [
@@ -689,6 +718,9 @@ class BasicTableChart extends ReactChart {
                 'sorter',
               ]),
               uid: c.uid,
+              onResize: (e, node) => {
+                this.updateTableColumns(e, node, cIndex);
+              },
             };
           },
           onCell: (record, rowIndex) => {
