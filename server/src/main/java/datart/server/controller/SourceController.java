@@ -100,13 +100,13 @@ public class SourceController extends BaseController {
     }
 
     @ApiOperation(value = "get source schemas ")
-    @GetMapping(value = "/schemas/{sourceId}/")
+    @GetMapping(value = "/schemas/{sourceId}")
     public ResponseData<List<SchemaInfo>> getSourceSchemas(@PathVariable String sourceId) {
         return ResponseData.success(sourceService.getSourceSchemaInfo(sourceId));
     }
 
     @ApiOperation(value = "sync source schemas ")
-    @GetMapping(value = "/sync/schemas/{sourceId}/")
+    @GetMapping(value = "/sync/schemas/{sourceId}")
     public ResponseData<List<SchemaInfo>> syncSourceSchemas(@PathVariable String sourceId) throws Exception{
         return ResponseData.success(sourceService.syncSourceSchema(sourceId));
     }
