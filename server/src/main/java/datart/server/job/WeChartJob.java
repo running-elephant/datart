@@ -15,9 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package datart.server.service.impl;
+package datart.server.job;
 
-import datart.server.service.ScheduleJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.CollectionUtils;

@@ -21,9 +21,9 @@ public interface SourceSchemasMapper extends CRUDMapper {
 
     @Insert({
         "insert into source_schemas (id, source_id, ",
-        "update_time, `schemas`)",
+        "`schemas`, update_time)",
         "values (#{id,jdbcType=VARCHAR}, #{sourceId,jdbcType=VARCHAR}, ",
-        "#{updateTime,jdbcType=TIMESTAMP}, #{schemas,jdbcType=LONGVARCHAR})"
+        "#{schemas,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})"
     })
     int insert(SourceSchemas record);
 
@@ -32,15 +32,15 @@ public interface SourceSchemasMapper extends CRUDMapper {
 
     @Select({
         "select",
-        "id, source_id, update_time, `schemas`",
+        "id, source_id, `schemas`, update_time",
         "from source_schemas",
         "where id = #{id,jdbcType=VARCHAR}"
     })
     @Results({
         @Result(column="id", property="id", jdbcType=JdbcType.VARCHAR, id=true),
         @Result(column="source_id", property="sourceId", jdbcType=JdbcType.VARCHAR),
-        @Result(column="update_time", property="updateTime", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="schemas", property="schemas", jdbcType=JdbcType.LONGVARCHAR)
+        @Result(column="schemas", property="schemas", jdbcType=JdbcType.VARCHAR),
+        @Result(column="update_time", property="updateTime", jdbcType=JdbcType.TIMESTAMP)
     })
     SourceSchemas selectByPrimaryKey(String id);
 
@@ -50,15 +50,7 @@ public interface SourceSchemasMapper extends CRUDMapper {
     @Update({
         "update source_schemas",
         "set source_id = #{sourceId,jdbcType=VARCHAR},",
-          "update_time = #{updateTime,jdbcType=TIMESTAMP},",
-          "`schemas` = #{schemas,jdbcType=LONGVARCHAR}",
-        "where id = #{id,jdbcType=VARCHAR}"
-    })
-    int updateByPrimaryKeyWithBLOBs(SourceSchemas record);
-
-    @Update({
-        "update source_schemas",
-        "set source_id = #{sourceId,jdbcType=VARCHAR},",
+          "`schemas` = #{schemas,jdbcType=VARCHAR},",
           "update_time = #{updateTime,jdbcType=TIMESTAMP}",
         "where id = #{id,jdbcType=VARCHAR}"
     })
