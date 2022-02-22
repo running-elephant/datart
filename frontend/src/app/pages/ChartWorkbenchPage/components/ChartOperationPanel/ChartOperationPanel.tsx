@@ -35,7 +35,7 @@ const ChartOperationPanel: FC<{
   chart?: IChart;
   chartConfig?: ChartConfig;
   defaultViewId?: string;
-  isNeedRequest: boolean;
+  allowQuery: boolean;
   onChartChange: (chart: IChart) => void;
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
@@ -44,13 +44,13 @@ const ChartOperationPanel: FC<{
     chart,
     chartConfig,
     defaultViewId,
-    isNeedRequest,
+    allowQuery,
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
   }) => {
-    const { dataset, handleRefreshDataset } = useContext(ChartDatasetContext);
-    const { dataView, slowQuery } = useContext(ChartDataViewContext);
+    const { dataset, onRefreshDataset } = useContext(ChartDatasetContext);
+    const { dataView, expensiveQuery } = useContext(ChartDataViewContext);
     const [layout, setLayout] = useState<Model>(() =>
       Model.fromJson(layoutCnofig),
     );
@@ -73,7 +73,7 @@ const ChartOperationPanel: FC<{
           <ChartConfigPanel
             chartId={chart?.meta?.id}
             chartConfig={chartConfig}
-            slowQuery={slowQuery}
+            expensiveQuery={expensiveQuery}
             onChange={onChartConfigChange}
           />
         );
@@ -89,11 +89,11 @@ const ChartOperationPanel: FC<{
             }
             chart={chart}
             dataset={dataset}
-            slowQuery={slowQuery}
-            isNeedRequest={isNeedRequest}
+            expensiveQuery={expensiveQuery}
+            allowQuery={allowQuery}
             chartConfig={chartConfig}
             onChartChange={onChartChange}
-            onRefreshDataset={handleRefreshDataset}
+            onRefreshDataset={onRefreshDataset}
           />
         );
       }

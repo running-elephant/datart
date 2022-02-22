@@ -107,16 +107,18 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
   const [chart, setChart] = useState<IChart>();
-  const [isNeedRequest, setIsNeedRequest] = useState<boolean>(false);
+  const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
   const addVizFn = useAddViz({
     showSaveForm: saveFormContextValue.showSaveForm,
   });
   const tg = useI18NPrefix('global');
 
-  const slowQuery = useMemo(() => {
+  const expensiveQuery = useMemo(() => {
     try {
-      return dataview ? Boolean(JSON.parse(dataview.config).slowQuery) : false;
+      return dataview
+        ? Boolean(JSON.parse(dataview.config).expensiveQuery)
+        : false;
     } catch (error) {
       throw error;
     }
@@ -256,15 +258,15 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
         },
       }),
     );
-    if (!slowQuery) {
+    if (!expensiveQuery) {
       dispatch(refreshDatasetAction({}));
     } else {
-      setIsNeedRequest(true);
+      setAllowQuery(true);
     }
   };
 
   const handleChartConfigChange = (type, payload) => {
-    if (slowQuery) {
+    if (expensiveQuery) {
       dispatch(
         workbenchSlice.actions.updateChartConfig({
           type,
@@ -272,7 +274,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
         }),
       );
       dispatch(workbenchSlice.actions.updateShadowChartConfig(null));
-      setIsNeedRequest(payload.needRefresh);
+      setAllowQuery(payload.needRefresh);
       return true;
     }
 
@@ -430,7 +432,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 
   const handleRefreshDataset = useCallback(async () => {
     await dispatch(refreshDatasetAction({}));
-    setIsNeedRequest(false);
+    setAllowQuery(false);
   }, [dispatch]);
   return (
     <StyledChartWorkbenchPage>
@@ -451,14 +453,14 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           chart={chart}
           dataset={dataset}
           dataview={dataview}
-          handleRefreshDataset={handleRefreshDataset}
           chartConfig={chartConfig}
           defaultViewId={defaultViewId}
-          slowQuery={slowQuery}
-          isNeedRequest={isNeedRequest}
+          expensiveQuery={expensiveQuery}
+          allowQuery={allowQuery}
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}
           onDataViewChange={handleDataViewChanged}
+          onRefreshDataset={handleRefreshDataset}
         />
         <SaveForm
           width={400}

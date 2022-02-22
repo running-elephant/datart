@@ -48,8 +48,8 @@ const ChartPresentPanel: FC<{
   chart?: IChart;
   dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
-  slowQuery: boolean;
-  isNeedRequest: boolean;
+  expensiveQuery: boolean;
+  allowQuery: boolean;
   onRefreshDataset?: () => void;
 }> = memo(
   ({
@@ -58,9 +58,9 @@ const ChartPresentPanel: FC<{
     chart,
     dataset,
     chartConfig,
-    slowQuery,
+    expensiveQuery,
     onRefreshDataset,
-    isNeedRequest,
+    allowQuery,
   }) => {
     const translate = useI18NPrefix(`viz.palette.present`);
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
@@ -143,16 +143,14 @@ const ChartPresentPanel: FC<{
 
     return (
       <StyledChartPresentPanel>
-        {slowQuery && isNeedRequest ? (
-          <FetchDataWrapper>
+        {expensiveQuery && allowQuery && (
+          <ReloadMask>
             <ReloadOutlined
               onClick={onRefreshDataset}
               spin={datasetLoadingStatus}
               className="fetchDataIcon"
             />
-          </FetchDataWrapper>
-        ) : (
-          ''
+          </ReloadMask>
         )}
 
         {renderChartTypeSelector()}
@@ -189,7 +187,7 @@ const SqlWrapper = styled.div`
   }
 `;
 
-const FetchDataWrapper = styled.div`
+const ReloadMask = styled.div`
   position: absolute;
   top: 0;
   left: 0;
