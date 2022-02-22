@@ -39,6 +39,7 @@ const ChartOperationPanel: FC<{
   onChartChange: (chart: IChart) => void;
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
+  onCreateDownloadDataTask?: () => void;
 }> = memo(
   ({
     chart,
@@ -48,8 +49,9 @@ const ChartOperationPanel: FC<{
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
+    onCreateDownloadDataTask,
   }) => {
-    const { dataset, handleRefreshDataset } = useContext(ChartDatasetContext);
+    const { dataset, onRefreshDataset } = useContext(ChartDatasetContext);
     const { dataView, slowQuery } = useContext(ChartDataViewContext);
     const [layout, setLayout] = useState<Model>(() =>
       Model.fromJson(layoutCnofig),
@@ -93,7 +95,8 @@ const ChartOperationPanel: FC<{
             isNeedRequest={isNeedRequest}
             chartConfig={chartConfig}
             onChartChange={onChartChange}
-            onRefreshDataset={handleRefreshDataset}
+            onRefreshDataset={onRefreshDataset}
+            onCreateDownloadDataTask={onCreateDownloadDataTask}
           />
         );
       }

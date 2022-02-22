@@ -21,10 +21,10 @@ import { createContext } from 'react';
 
 const ChartDatasetContext = createContext<{
   dataset?: ChartDataSetDTO;
-  handleRefreshDataset?: () => void;
+  onRefreshDataset?: () => void;
 }>({
   dataset: {},
-  handleRefreshDataset: undefined,
+  onRefreshDataset: undefined,
 });
 
 export default ChartDatasetContext;

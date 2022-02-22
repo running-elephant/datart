@@ -20,6 +20,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
+import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import workbenchSlice, {
   aggregationSelector,
   backendChartSelector,
@@ -43,6 +44,7 @@ import {
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { IChart } from 'app/types/Chart';
 import { ChartDTO } from 'app/types/ChartDTO';
+import { makeDownloadDataTask } from 'app/utils/fetch';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import { CommonFormTypes } from 'globalConstants';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -432,6 +434,31 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     await dispatch(refreshDatasetAction({}));
     setIsNeedRequest(false);
   }, [dispatch]);
+
+  const handleCreateDownloadDataTask = async () => {
+    if (!dataview?.id) {
+      return;
+    }
+
+    const builder = new ChartDataRequestBuilder(
+      {
+        ...dataview,
+      },
+      chartConfig?.datas,
+      chartConfig?.settings,
+      {},
+      true,
+      aggregation,
+    );
+    dispatch(
+      makeDownloadDataTask({
+        downloadParams: [builder.build()],
+        fileName: backendChart?.name || 'chart',
+        resolve: () => {},
+      }),
+    );
+  };
+
   return (
     <StyledChartWorkbenchPage>
       <SaveFormContext.Provider value={saveFormContextValue}>
@@ -451,7 +478,6 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           chart={chart}
           dataset={dataset}
           dataview={dataview}
-          handleRefreshDataset={handleRefreshDataset}
           chartConfig={chartConfig}
           defaultViewId={defaultViewId}
           slowQuery={slowQuery}
@@ -459,6 +485,8 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}
           onDataViewChange={handleDataViewChanged}
+          onRefreshDataset={handleRefreshDataset}
+          onCreateDownloadDataTask={handleCreateDownloadDataTask}
         />
         <SaveForm
           width={400}

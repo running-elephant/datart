@@ -55,7 +55,8 @@ const ChartWorkbench: FC<{
   onChartChange: (c: IChart) => void;
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
-  handleRefreshDataset?: () => void;
+  onRefreshDataset?: () => void;
+  onCreateDownloadDataTask?: () => void;
 }> = memo(
   ({
     dataset,
@@ -70,7 +71,8 @@ const ChartWorkbench: FC<{
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
-    handleRefreshDataset,
+    onRefreshDataset,
+    onCreateDownloadDataTask,
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
@@ -84,7 +86,7 @@ const ChartWorkbench: FC<{
         <ChartDatasetContext.Provider
           value={{
             dataset: dataset,
-            handleRefreshDataset: handleRefreshDataset,
+            onRefreshDataset: onRefreshDataset,
           }}
         >
           <ChartDataViewContext.Provider
@@ -113,6 +115,7 @@ const ChartWorkbench: FC<{
                     onChartChange={onChartChange}
                     onChartConfigChange={onChartConfigChange}
                     onDataViewChange={onDataViewChange}
+                    onCreateDownloadDataTask={onCreateDownloadDataTask}
                   />
                 </StyledChartOperationPanel>
               </StyledChartWorkbench>

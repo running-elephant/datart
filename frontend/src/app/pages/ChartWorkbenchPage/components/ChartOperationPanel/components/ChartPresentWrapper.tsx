@@ -37,6 +37,7 @@ const ChartPresentWrapper: FC<{
   isNeedRequest: boolean;
   onChartChange: (c: IChart) => void;
   onRefreshDataset?: () => void;
+  onCreateDownloadDataTask?: () => void;
 }> = memo(
   ({
     containerHeight,
@@ -48,6 +49,7 @@ const ChartPresentWrapper: FC<{
     isNeedRequest,
     onChartChange,
     onRefreshDataset,
+    onCreateDownloadDataTask,
   }) => {
     const { ref: ChartGraphPanelRef } = useResizeObserver<any>({
       refreshMode: 'debounce',
@@ -81,6 +83,7 @@ const ChartPresentWrapper: FC<{
             isNeedRequest={isNeedRequest}
             chartConfig={chartConfig}
             onRefreshDataset={onRefreshDataset}
+            onCreateDownloadDataTask={onCreateDownloadDataTask}
           />
         </ChartI18NContext.Provider>
       </StyledChartPresentWrapper>

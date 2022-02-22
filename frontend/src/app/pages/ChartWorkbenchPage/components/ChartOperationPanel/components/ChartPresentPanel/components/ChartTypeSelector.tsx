@@ -18,10 +18,13 @@
 
 import {
   AreaChartOutlined,
+  CloudDownloadOutlined,
   ConsoleSqlOutlined,
   TableOutlined,
 } from '@ant-design/icons';
+import { Popconfirm } from 'antd';
 import { IW } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
@@ -31,46 +34,68 @@ export enum ChartPresentType {
   GRAPH = 'graph',
   RAW = 'raw',
   SQL = 'sql',
+  DOWNLOAD = 'download',
 }
 
 const ChartTypeSelector: FC<{
   type;
-  onChange: (value) => void;
   translate: (title: string) => string;
-}> = memo(({ type, onChange, translate = title => title }) => {
-  const typeChange = useCallback(
-    type => () => {
-      onChange(type);
-    },
-    [onChange],
-  );
+  onChange: (value) => void;
+  onCreateDownloadDataTask?: () => void;
+}> = memo(
+  ({
+    type,
+    onChange,
+    translate = title => title,
+    onCreateDownloadDataTask,
+  }) => {
+    const t = useI18NPrefix(`viz.action.common`);
+    const typeChange = useCallback(
+      type => () => {
+        onChange(type);
+      },
+      [onChange],
+    );
 
-  return (
-    <StyledChartTypeSelector>
-      <TypeSelector
-        fontSize={FONT_SIZE_HEADING}
-        className={classnames({ active: type === ChartPresentType.GRAPH })}
-        onClick={typeChange(ChartPresentType.GRAPH)}
-      >
-        <AreaChartOutlined />
-      </TypeSelector>
-      <TypeSelector
-        fontSize={FONT_SIZE_HEADING}
-        className={classnames({ active: type === ChartPresentType.RAW })}
-        onClick={typeChange(ChartPresentType.RAW)}
-      >
-        <TableOutlined />
-      </TypeSelector>
-      <TypeSelector
-        fontSize={FONT_SIZE_HEADING}
-        className={classnames({ active: type === ChartPresentType.SQL })}
-        onClick={typeChange(ChartPresentType.SQL)}
-      >
-        <ConsoleSqlOutlined />
-      </TypeSelector>
-    </StyledChartTypeSelector>
-  );
-});
+    return (
+      <StyledChartTypeSelector>
+        <TypeSelector
+          fontSize={FONT_SIZE_HEADING}
+          className={classnames({ active: type === ChartPresentType.GRAPH })}
+          onClick={typeChange(ChartPresentType.GRAPH)}
+        >
+          <AreaChartOutlined />
+        </TypeSelector>
+        <TypeSelector
+          fontSize={FONT_SIZE_HEADING}
+          className={classnames({ active: type === ChartPresentType.RAW })}
+          onClick={typeChange(ChartPresentType.RAW)}
+        >
+          <TableOutlined />
+        </TypeSelector>
+        <TypeSelector
+          fontSize={FONT_SIZE_HEADING}
+          className={classnames({ active: type === ChartPresentType.SQL })}
+          onClick={typeChange(ChartPresentType.SQL)}
+        >
+          <ConsoleSqlOutlined />
+        </TypeSelector>
+        <TypeSelector
+          fontSize={FONT_SIZE_HEADING}
+          className={classnames({ active: type === ChartPresentType.DOWNLOAD })}
+        >
+          <Popconfirm
+            placement="left"
+            title={t('confirm')}
+            onConfirm={onCreateDownloadDataTask}
+          >
+            <CloudDownloadOutlined />
+          </Popconfirm>
+        </TypeSelector>
+      </StyledChartTypeSelector>
+    );
+  },
+);
 
 export default ChartTypeSelector;
 
