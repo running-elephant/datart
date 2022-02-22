@@ -722,6 +722,7 @@
       "share": {
         "link": "Link",
         "password": "Password",
+        "link_password": "Link Password",
         "expireDate": "Expire Date",
         "enablePassword": "Password",
         "generateLink": "Generate Link",

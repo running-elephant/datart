@@ -722,6 +722,7 @@
       "share": {
         "link": "链接",
         "password": "密码",
+        "link_password": "链接&密码",
         "expireDate": "截止日期",
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
