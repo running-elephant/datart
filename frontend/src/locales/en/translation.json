@@ -1034,7 +1034,7 @@
       "fastfailover": "Fast failover",
       "cache": "Cache",
       "cacheExpires": "Expires(s)",
-      "slowQuery": "Enable slow query"
+      "expensiveQuery": "This is an expensive query"
     },
     "schemaTable": {
       "category": "Category",

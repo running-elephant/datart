@@ -52,7 +52,7 @@ const ChartOperationPanel: FC<{
     onCreateDownloadDataTask,
   }) => {
     const { dataset, onRefreshDataset } = useContext(ChartDatasetContext);
-    const { dataView, slowQuery } = useContext(ChartDataViewContext);
+    const { dataView, expensiveQuery } = useContext(ChartDataViewContext);
     const [layout, setLayout] = useState<Model>(() =>
       Model.fromJson(layoutCnofig),
     );
@@ -75,7 +75,7 @@ const ChartOperationPanel: FC<{
           <ChartConfigPanel
             chartId={chart?.meta?.id}
             chartConfig={chartConfig}
-            slowQuery={slowQuery}
+            expensiveQuery={expensiveQuery}
             onChange={onChartConfigChange}
           />
         );
@@ -91,7 +91,7 @@ const ChartOperationPanel: FC<{
             }
             chart={chart}
             dataset={dataset}
-            slowQuery={slowQuery}
+            expensiveQuery={expensiveQuery}
             isNeedRequest={isNeedRequest}
             chartConfig={chartConfig}
             onChartChange={onChartChange}

@@ -9,8 +9,8 @@ export const beta2 = viewDetailData => {
   try {
     let viewConfig = JSON.parse(viewDetailData.config);
 
-    if (isUndefined(viewConfig.slowQuery)) {
-      viewConfig.slowQuery = false;
+    if (isUndefined(viewConfig.expensiveQuery)) {
+      viewConfig.expensiveQuery = false;
     }
     viewDetailData.config = JSON.stringify(viewConfig);
 

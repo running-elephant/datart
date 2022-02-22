@@ -41,7 +41,7 @@ const ChartWorkbench: FC<{
   chart?: IChart;
   aggregation?: boolean;
   defaultViewId?: string;
-  slowQuery: boolean;
+  expensiveQuery: boolean;
   isNeedRequest: boolean;
   header?: {
     name?: string;
@@ -66,7 +66,7 @@ const ChartWorkbench: FC<{
     aggregation,
     header,
     defaultViewId,
-    slowQuery,
+    expensiveQuery,
     isNeedRequest,
     onChartChange,
     onChartConfigChange,
@@ -90,7 +90,7 @@ const ChartWorkbench: FC<{
           }}
         >
           <ChartDataViewContext.Provider
-            value={{ dataView: dataview, slowQuery: slowQuery }}
+            value={{ dataView: dataview, expensiveQuery: expensiveQuery }}
           >
             <TimeConfigContext.Provider
               value={{ locale: language, format: dateFormat }}

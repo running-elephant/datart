@@ -116,9 +116,9 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   });
   const tg = useI18NPrefix('global');
 
-  const slowQuery = useMemo(() => {
+  const expensiveQuery = useMemo(() => {
     try {
-      return dataview ? Boolean(JSON.parse(dataview.config).slowQuery) : false;
+      return dataview ? Boolean(JSON.parse(dataview.config).expensiveQuery) : false;
     } catch (error) {
       throw error;
     }
@@ -258,7 +258,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
         },
       }),
     );
-    if (!slowQuery) {
+    if (!expensiveQuery) {
       dispatch(refreshDatasetAction({}));
     } else {
       setIsNeedRequest(true);
@@ -266,7 +266,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   };
 
   const handleChartConfigChange = (type, payload) => {
-    if (slowQuery) {
+    if (expensiveQuery) {
       dispatch(
         workbenchSlice.actions.updateChartConfig({
           type,
@@ -480,7 +480,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           dataview={dataview}
           chartConfig={chartConfig}
           defaultViewId={defaultViewId}
-          slowQuery={slowQuery}
+          expensiveQuery={expensiveQuery}
           isNeedRequest={isNeedRequest}
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}

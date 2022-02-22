@@ -21,10 +21,10 @@ import { createContext } from 'react';
 
 const ChartDataViewContext = createContext<{
   dataView?: ChartDataView;
-  slowQuery: boolean;
+  expensiveQuery: boolean;
 }>({
   dataView: {} as ChartDataView,
-  slowQuery: false,
+  expensiveQuery: false,
 });
 
 export default ChartDataViewContext;
