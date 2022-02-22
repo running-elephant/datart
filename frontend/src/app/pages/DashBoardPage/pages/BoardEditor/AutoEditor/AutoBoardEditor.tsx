@@ -86,7 +86,6 @@ export const AutoBoardEditor: React.FC<{}> = () => {
 
   const dispatch = useDispatch();
   const visible = useVisibleHidden();
-  const [layoutMap, setLayoutMap] = useState<Layouts>({});
 
   const layoutWidgets = useMemo(
     () => Object.values(layoutWidgetMap),
@@ -122,8 +121,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     margin,
     containerPadding,
   ]);
-
-  useEffect(() => {
+  const generateLayout = () => {
     const layoutMap: Layouts = {
       lg: [],
       xs: [],
@@ -149,8 +147,9 @@ export const AutoBoardEditor: React.FC<{}> = () => {
         static: lock,
       });
     });
-    setLayoutMap(layoutMap);
-  }, [layoutWidgets]);
+    return layoutMap;
+  };
+  const layoutMap = generateLayout();
 
   useEffect(() => {
     const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
@@ -253,7 +252,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
       deviceClassName,
     };
   }, [deviceType]);
-  const lock = useMemo(() => {}, []);
+
   /**
    * https://www.npmjs.com/package/react-grid-layout
    */
