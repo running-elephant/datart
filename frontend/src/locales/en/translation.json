@@ -1048,7 +1048,8 @@
       "dirtyread": "Dirty read",
       "fastfailover": "Fast failover",
       "cache": "Cache",
-      "cacheExpires": "Expires(s)"
+      "cacheExpires": "Expires(s)",
+      "expensiveQuery": "This is an expensive query"
     },
     "schemaTable": {
       "category": "Category",
