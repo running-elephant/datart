@@ -38,9 +38,26 @@ export interface ViewState {
   sourceDatabases: {
     [name: string]: TreeDataNode[];
   };
+  sourceDatabaseSchema: {
+    [name: string]: DatabaseSchema[];
+  };
   saveViewLoading: boolean;
   unarchiveLoading: boolean;
 }
+
+export type DatabaseSchema = {
+  dbName: string;
+  tables: Array<{
+    primaryKeys: string[];
+    tableName: string;
+    columns: Array<{
+      fmt: string;
+      foreignKeys: Array<{ column: string; database: string; table: string }>;
+      name: string;
+      type: string;
+    }>;
+  }>;
+};
 
 export interface ViewBase {
   id: string;
