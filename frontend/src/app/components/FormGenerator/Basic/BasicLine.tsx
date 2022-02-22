@@ -54,7 +54,7 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             >
               {CHART_LINE_STYLES.map(o => (
                 <Select.Option key={o.value} value={o.value}>
-                  {o.name}
+                  {t(o.name)}
                 </Select.Option>
               ))}
             </Select>

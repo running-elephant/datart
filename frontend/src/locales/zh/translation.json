@@ -544,6 +544,11 @@
           "bottom": "底边距",
           "top": "上边距",
           "containLabel": "包含标题"
+        },
+        "lineStyles": {
+          "solid": "实线",
+          "dashed": "虚线",
+          "dotted": "点"
         }
       },
       "data": {

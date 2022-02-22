@@ -544,6 +544,11 @@
           "bottom": "Bottom Margin",
           "top": "Top Margin",
           "containLabel": "Contain Label"
+        },
+        "lineStyles": {
+          "solid": "Solid",
+          "dashed": "Dashed",
+          "dotted": "Dotted"
         }
       },
       "data": {
