@@ -993,6 +993,7 @@
     "properties": {
       "reference": "数据源信息",
       "variable": "变量配置",
+      "model": "数据模型",
       "columnPermissions": "列权限"
     },
     "resource": {

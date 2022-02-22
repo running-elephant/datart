@@ -18,19 +18,14 @@
 
 import { LoadingOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Col, Input, List, Row } from 'antd';
-import { ListItem, ListTitle, Popup, Tree } from 'app/components';
+import { ListItem, Popup, Tree } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
 import { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import {
-  SPACE_MD,
-  SPACE_TIMES,
-  SPACE_XS,
-  WARNING,
-} from 'styles/StyleConstants';
+import { SPACE_MD, SPACE_XS, WARNING } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import { selectRoles } from '../../../MemberPage/slice/selectors';
 import { SubjectTypes } from '../../../PermissionPage/constants';
@@ -38,6 +33,7 @@ import { ViewStatus, ViewViewModelStages } from '../../constants';
 import { useViewSlice } from '../../slice';
 import { selectCurrentEditingViewAttr } from '../../slice/selectors';
 import { ColumnPermission, Model } from '../../slice/types';
+import Container from './Container';
 
 export const ColumnPermissions = memo(() => {
   const { actions } = useViewSlice();
@@ -170,8 +166,7 @@ export const ColumnPermissions = memo(() => {
   );
 
   return (
-    <Container>
-      <ListTitle title={t('title')} />
+    <Container title="columnPermissions">
       <Searchbar>
         <Col span={24}>
           <Input
@@ -197,15 +192,6 @@ export const ColumnPermissions = memo(() => {
     </Container>
   );
 });
-
-const Container = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: ${SPACE_TIMES(100)};
-  min-height: 0;
-  border-left: 1px solid ${p => p.theme.borderColorSplit};
-`;
 
 const Searchbar = styled(Row)`
   .input {

@@ -993,6 +993,7 @@
     "properties": {
       "reference": "Source reference",
       "variable": "Variables",
+      "model": "Data Model",
       "columnPermissions": "Column Permissions"
     },
     "resource": {

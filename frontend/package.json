@@ -114,6 +114,7 @@
     "quilljs-markdown": "1.1.10",
     "react": "^17.0.1",
     "react-app-polyfill": "^2.0.0",
+    "react-beautiful-dnd": "^13.1.0",
     "react-color": "^2.19.3",
     "react-dev-inspector": "^1.6.0",
     "react-dnd": "^14.0.2",
