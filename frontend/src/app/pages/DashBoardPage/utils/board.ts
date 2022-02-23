@@ -19,6 +19,7 @@ import { migrateBoardConfig } from 'app/migration/BoardConfig/migrateBoardConfig
 import {
   BoardInfo,
   BoardType,
+  BoardTypeMap,
   Dashboard,
   DashboardConfig,
   DataChart,
@@ -131,8 +132,9 @@ export const getInitBoardInfo = (obj: {
   return boardInfo;
 };
 
-export const getInitBoardConfig = (boardType: BoardType) => {
+export const getInitBoardConfig = (boardType?: BoardType) => {
   const dashboardConfig: DashboardConfig = {
+    type: boardType || BoardTypeMap.auto,
     version: '',
     background: BackgroundDefault,
     widgetDefaultSettings: {
@@ -143,6 +145,7 @@ export const getInitBoardConfig = (boardType: BoardType) => {
     initialQuery: true,
     hasQueryControl: false,
     hasResetControl: false,
+
     // auto
     margin: [16, 16], //0-100
     containerPadding: [16, 16], //0-100
@@ -150,7 +153,6 @@ export const getInitBoardConfig = (boardType: BoardType) => {
     mobileMargin: [MIN_MARGIN, MIN_MARGIN],
     mobileContainerPadding: [MIN_PADDING, MIN_PADDING],
     // free
-    type: boardType,
     width: 1920,
     height: 1080,
     gridStep: [10, 10],
