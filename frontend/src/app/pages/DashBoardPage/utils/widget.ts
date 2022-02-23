@@ -177,7 +177,7 @@ export const createInitWidgetConfig = (opt: {
       chartGroupColumns: [],
     },
     autoUpdate: opt.autoUpdate || false,
-
+    lock: false,
     frequency: opt.frequency || 60, // 60秒
     rect: createWidgetRect(opt.boardType, opt.type),
     background:

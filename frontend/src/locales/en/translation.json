@@ -544,6 +544,41 @@
           "bottom": "Bottom Margin",
           "top": "Top Margin",
           "containLabel": "Contain Label"
+        },
+        "lineStyles": {
+          "solid": "Solid",
+          "dashed": "Dashed",
+          "dotted": "Dotted"
+        },
+        "nameLocation": {
+          "start": "Start",
+          "center": "Center",
+          "end": "End"
+        },
+        "legendType": {
+          "plain": "Plain",
+          "scroll": "Scroll"
+        },
+        "fontFamily": {
+          "default": "Default",
+          "microsoftYaHei": "Microsoft YaHei",
+          "simSun": "SimSun",
+          "simHei": "SimHei",
+          "helveticaNeue": "Helvetica Neue",
+          "helvetica": "Helvetica",
+          "arial": "Arial",
+          "sansSerif": "sans-serif"
+        },
+        "fontWeight": {
+          "normal": "Normal",
+          "bold": "Bold",
+          "bolder": "Bolder",
+          "lighter": "Lighter"
+        },
+        "fontStyle": {
+          "normal": "Normal",
+          "italic": "Italic",
+          "oblique": "Oblique"
         }
       },
       "data": {
@@ -938,9 +973,11 @@
       "name": "Name",
       "description": "Description",
       "boardType": {
-        "label": "Board type",
+        "label": "Layout",
         "auto": "Auto",
-        "free": "Free"
+        "free": "Free",
+        "tips": "Auto : create responsive dashboard  Free : create ensure size dashboard",
+        "requiredMessage": "Select a Layout Type"
       },
       "parent": "Parent",
       "root": "Root",
@@ -1034,7 +1071,8 @@
       "dirtyread": "Dirty read",
       "fastfailover": "Fast failover",
       "cache": "Cache",
-      "cacheExpires": "Expires(s)"
+      "cacheExpires": "Expires(s)",
+      "expensiveQuery": "This is an expensive query"
     },
     "schemaTable": {
       "category": "Category",

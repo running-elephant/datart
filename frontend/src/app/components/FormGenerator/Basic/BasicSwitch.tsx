@@ -37,8 +37,8 @@ const BasicSwitch: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     return (
       <StyledBasicSwitch
         label={!options?.hideLabel ? t(row.label, true) : ''}
-        labelCol={{ span: 12 }}
-        wrapperCol={{ span: 12 }}
+        labelCol={{ span: 20 }}
+        wrapperCol={{ span: 4 }}
       >
         <Switch
           size="small"

@@ -18,6 +18,7 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import sqlReservedWords from 'app/assets/javascripts/sqlReservedWords';
+import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import i18n from 'i18next';
 import { monaco } from 'react-monaco-editor';
@@ -121,7 +122,8 @@ export const getViewDetail = createAsyncThunk<
 
     try {
       const { data } = await request<View>(`/views/${viewId}`);
-      return transformModelToViewModel(data, tempViewModel);
+      const migrateData = migrateViewConfig(data);
+      return transformModelToViewModel(migrateData, tempViewModel);
     } catch (error) {
       return rejectHandle(error, rejectWithValue);
     }

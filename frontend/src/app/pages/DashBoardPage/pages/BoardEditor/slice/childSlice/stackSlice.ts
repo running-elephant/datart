@@ -149,7 +149,8 @@ export const editBoardStackSlice = createSlice({
     adjustWidgetsRect(state, action: PayloadAction<Layout[]>) {
       action.payload.forEach(it => {
         const { i, x, y, w, h } = it;
-        state.widgetRecord[i].config.rect = { x, y, width: w, height: h };
+        const rectItem = { x, y, width: w, height: h };
+        state.widgetRecord[i].config.rect = rectItem;
       });
     },
     // free

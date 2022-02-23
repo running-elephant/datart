@@ -19,6 +19,7 @@
 import { DoubleRightOutlined } from '@ant-design/icons';
 import {
   Button,
+  Checkbox,
   Form,
   FormInstance,
   Input,
@@ -64,7 +65,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
   const [concurrencyControl, setConcurrencyControl] = useState(true);
   const [cache, setCache] = useState(false);
   const selectViewFolderTree = useMemo(makeSelectViewFolderTree, []);
-
+  const [expensiveQuery, setExpensiveQuery] = useState(false); // beta.2 add expensiveQuery
   const {
     type,
     visible,
@@ -125,6 +126,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     setConcurrencyControl(true);
     setCache(false);
     onAfterClose && onAfterClose();
+    setExpensiveQuery(false);
   }, [onAfterClose]);
 
   return (
@@ -180,6 +182,14 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
             formRef.current?.validateFields();
           }}
         />
+      </Form.Item>
+      <Form.Item
+        wrapperCol={{ span: 13, offset: 9 }}
+        name={['config', 'expensiveQuery']}
+        initialValue={expensiveQuery}
+        valuePropName="checked"
+      >
+        <Checkbox>{t('expensiveQuery')}</Checkbox>
       </Form.Item>
       {!simple && (
         <>

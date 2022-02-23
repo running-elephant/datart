@@ -123,7 +123,8 @@ export const selectWidgetInfoDatachartId = createSelector(
 // boardInfo
 export const boardInfoState = (state: { editBoard: EditBoardState }) =>
   state.editBoard.boardInfo;
-
+export const selectEditBoardLoading = (state: { editBoard: EditBoardState }) =>
+  state.editBoard.boardInfo.loading;
 export const selectDeviceType = createSelector(
   [boardInfoState],
   boardInfo => boardInfo.deviceType || DeviceType.Desktop,

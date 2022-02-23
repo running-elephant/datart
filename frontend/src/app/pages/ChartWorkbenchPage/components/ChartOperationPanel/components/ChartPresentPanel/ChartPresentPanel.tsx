@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { ReloadOutlined } from '@ant-design/icons';
 import { Table } from 'antd';
 import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContainer';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -24,9 +25,16 @@ import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { FC, memo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { BORDER_RADIUS, SPACE_LG, SPACE_MD } from 'styles/StyleConstants';
+import {
+  BORDER_RADIUS,
+  LINE_HEIGHT_ICON_XXL,
+  SPACE_LG,
+  SPACE_MD,
+} from 'styles/StyleConstants';
 import { Debugger } from 'utils/debugger';
+import { datasetLoadingSelector } from '../../../../slice/workbenchSlice';
 import Chart404Graph from './components/Chart404Graph';
 import ChartTypeSelector, {
   ChartPresentType,
@@ -40,11 +48,24 @@ const ChartPresentPanel: FC<{
   chart?: IChart;
   dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
+  expensiveQuery: boolean;
+  allowQuery: boolean;
+  onRefreshDataset?: () => void;
 }> = memo(
-  ({ containerHeight, containerWidth, chart, dataset, chartConfig }) => {
+  ({
+    containerHeight,
+    containerWidth,
+    chart,
+    dataset,
+    chartConfig,
+    expensiveQuery,
+    onRefreshDataset,
+    allowQuery,
+  }) => {
     const translate = useI18NPrefix(`viz.palette.present`);
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
     const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
+    const datasetLoadingStatus = useSelector(datasetLoadingSelector);
 
     useMount(undefined, () => {
       Debugger.instance.measure(`ChartPresentPanel | Dispose Event`, () => {
@@ -122,6 +143,16 @@ const ChartPresentPanel: FC<{
 
     return (
       <StyledChartPresentPanel>
+        {expensiveQuery && allowQuery && (
+          <ReloadMask>
+            <ReloadOutlined
+              onClick={onRefreshDataset}
+              spin={datasetLoadingStatus}
+              className="fetchDataIcon"
+            />
+          </ReloadMask>
+        )}
+
         {renderChartTypeSelector()}
         {renderReusableChartContainer()}
       </StyledChartPresentPanel>
@@ -137,6 +168,7 @@ const StyledChartPresentPanel = styled.div`
   flex-direction: column;
   background-color: ${p => p.theme.componentBackground};
   border-radius: ${BORDER_RADIUS};
+  position: relative;
 `;
 
 const TableWrapper = styled.div`
@@ -150,8 +182,25 @@ const SqlWrapper = styled.div`
   overflow-y: auto;
   background-color: ${p => p.theme.emphasisBackground};
   border-radius: ${BORDER_RADIUS};
-
   > code {
     color: ${p => p.theme.textColorSnd};
+  }
+`;
+
+const ReloadMask = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  .fetchDataIcon {
+    cursor: pointer;
+    color: ${p => p.theme.primary};
+    font-size: ${LINE_HEIGHT_ICON_XXL};
   }
 `;
