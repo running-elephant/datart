@@ -48,21 +48,21 @@ export const FONT_SIZES = [
 ];
 
 export const FONT_FAMILIES = [
-  { name: '默认字体', value: FONT_FAMILY },
-  { name: '微软雅黑', value: 'Microsoft YaHei' },
-  { name: '宋体', value: 'SimSun' },
-  { name: '黑体', value: 'SimHei' },
-  { name: 'Helvetica Neue', value: '"Helvetica Neue"' },
-  { name: 'Helvetica', value: 'Helvetica' },
-  { name: 'Arial', value: 'Arial' },
-  { name: 'sans-serif', value: 'sans-serif' },
+  { name: 'fontFamily.default', value: FONT_FAMILY },
+  { name: 'fontFamily.microsoftYaHei', value: 'Microsoft YaHei' },
+  { name: 'fontFamily.simSun', value: 'SimSun' },
+  { name: 'fontFamily.simHei', value: 'SimHei' },
+  { name: 'fontFamily.helveticaNeue', value: '"Helvetica Neue"' },
+  { name: 'fontFamily.helvetica', value: 'Helvetica' },
+  { name: 'fontFamily.arial', value: 'Arial' },
+  { name: 'fontFamily.sansSerif', value: 'sans-serif' },
 ];
 
 export const FONT_WEIGHT = [
-  { name: '常规字号', value: 'normal' },
-  { name: '粗体', value: 'bold' },
-  { name: '特粗体', value: 'bolder' },
-  { name: '细体', value: 'lighter' },
+  { name: 'viz.palette.style.fontWeight.normal', value: 'normal' },
+  { name: 'viz.palette.style.fontWeight.bold', value: 'bold' },
+  { name: 'viz.palette.style.fontWeight.bolder', value: 'bolder' },
+  { name: 'viz.palette.style.fontWeight.lighter', value: 'lighter' },
   { name: '100', value: '100' },
   { name: '200', value: '200' },
   { name: '300', value: '300' },
@@ -75,15 +75,26 @@ export const FONT_WEIGHT = [
 ];
 
 export const FONT_STYLE = [
-  { name: '常规体', value: 'normal' },
-  { name: '斜体', value: 'italic' },
-  { name: '偏斜体', value: 'oblique' },
+  { name: 'fontStyle.normal', value: 'normal' },
+  { name: 'fontStyle.italic', value: 'italic' },
+  { name: 'fontStyle.oblique', value: 'oblique' },
 ];
 
 export const CHART_LINE_STYLES = [
-  { name: '实线', value: 'solid' },
-  { name: '虚线', value: 'dashed' },
-  { name: '点', value: 'dotted' },
+  { name: 'lineStyles.solid', value: 'solid' },
+  { name: 'lineStyles.dashed', value: 'dashed' },
+  { name: 'lineStyles.dotted', value: 'dotted' },
+];
+
+export const CHART_NAME_LOCATION = [
+  { name: 'nameLocation.start', value: 'start' },
+  { name: 'nameLocation.center', value: 'center' },
+  { name: 'nameLocation.end', value: 'end' },
+];
+
+export const CHART_LEGEND_TYPE = [
+  { name: 'legendType.plain', value: 'plain' },
+  { name: 'legendType.scroll', value: 'scroll' },
 ];
 
 export const CHART_LINE_WIDTH = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];

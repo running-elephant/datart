@@ -150,7 +150,7 @@ const CategoryConditionEditableTable: FC<
 
     const handleRowStateUpdate = (row: RelationFilterValue) => {
       const newRows = [...rows];
-      const targetIndex = newRows.findIndex(r => r.index === row.index);
+      const targetIndex = newRows.findIndex(r => r.key === row.key);
       newRows.splice(targetIndex, 1, row);
       handleFilterConditionChange(newRows);
     };
@@ -188,8 +188,7 @@ const CategoryConditionEditableTable: FC<
     const convertToList = (collection, selectedKeys) => {
       const items: string[] = (collection || []).flatMap(c => c);
       const uniqueKeys = Array.from(new Set(items));
-      return uniqueKeys.map((item, index) => ({
-        index: index,
+      return uniqueKeys.map(item => ({
         key: item,
         label: item,
         isSelected: selectedKeys.includes(item),

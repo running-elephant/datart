@@ -18,9 +18,10 @@
 
 package datart.server.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.jayway.jsonpath.JsonPath;
 import datart.core.base.consts.UserIdentityType;
-import datart.core.base.exception.BaseException;
-import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.*;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.Organization;
 import datart.core.entity.User;
@@ -32,8 +33,6 @@ import datart.security.util.JwtUtils;
 import datart.security.util.SecurityUtils;
 import datart.server.base.dto.OrganizationBaseInfo;
 import datart.server.base.dto.UserProfile;
-import datart.core.base.exception.NotFoundException;
-import datart.core.base.exception.ParamException;
 import datart.server.base.params.ChangeUserPasswordParam;
 import datart.server.base.params.UserRegisterParam;
 import datart.server.base.params.UserResetPasswordParam;
@@ -46,6 +45,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +56,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static datart.core.common.Application.getProperty;
 
 @Service
 @Slf4j
@@ -292,6 +295,40 @@ public class UserServiceImpl extends BaseService implements UserService {
         update.setUpdateTime(new Date());
         update.setPassword(BCrypt.hashpw(passwordParam.getNewPassword(), BCrypt.gensalt()));
         return userMapper.updateByPrimaryKeySelective(update) == 1;
+    }
+
+    @Override
+    public User externalRegist(OAuth2AuthenticationToken oauthAuthToken) throws ServerException {
+        OAuth2User oauthUser = oauthAuthToken.getPrincipal();
+
+        User user = getUserByName(oauthUser.getName());
+        if (user != null) {
+            return user;
+        }
+        user = new User();
+
+        String  emailMapping= getProperty(String.format("spring.security.oauth2.client.provider.%s.userMapping.email", oauthAuthToken.getAuthorizedClientRegistrationId()));
+        String  nameMapping= getProperty(String.format("spring.security.oauth2.client.provider.%s.userMapping.name", oauthAuthToken.getAuthorizedClientRegistrationId()));
+        String  avatarMapping= getProperty(String.format("spring.security.oauth2.client.provider.%s.userMapping.avatar", oauthAuthToken.getAuthorizedClientRegistrationId()));
+        JSONObject jsonObj=new JSONObject(oauthUser.getAttributes());
+
+        user.setId(UUIDGenerator.generate());
+        user.setCreateBy(user.getId());
+        user.setCreateTime(new Date());
+        user.setName(JsonPath.read(jsonObj,nameMapping));
+        user.setUsername(oauthUser.getName());
+        user.setActive(true);
+        //todo: oauth2登录后需要设置随机密码，此字段作为密文，显然无法对应原文，即不会有任何密码对应以下值
+        user.setPassword(BCrypt.hashpw("xxx", BCrypt.gensalt()));
+        user.setEmail(JsonPath.read(jsonObj,emailMapping));
+        user.setAvatar(JsonPath.read(jsonObj,avatarMapping));
+        int insert = userMapper.insert(user);
+        if (insert > 0) {
+            return user;
+        } else {
+            log.info("regist fail: {}", oauthUser.getName());
+            throw new ServerException("regist fail: unspecified error");
+        }
     }
 
     @Override

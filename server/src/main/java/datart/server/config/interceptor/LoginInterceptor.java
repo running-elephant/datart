@@ -38,11 +38,9 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     private final DatartSecurityManager securityManager;
 
-    private final MessageResolver messageResolver;
 
-    public LoginInterceptor(DatartSecurityManager securityManager, MessageResolver messageResolver) {
+    public LoginInterceptor(DatartSecurityManager securityManager) {
         this.securityManager = securityManager;
-        this.messageResolver = messageResolver;
     }
 
     @Override

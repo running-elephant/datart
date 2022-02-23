@@ -41,11 +41,7 @@ import ChartMetadata from 'app/types/ChartMetadata';
 import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
 import moment from 'moment';
 import { Debugger } from 'utils/debugger';
-import { isEmpty,
-  isEmptyArray,
-  isUndefined,
-  meanValue,
-  pipe,} from 'utils/object';
+import { isEmpty, isEmptyArray, meanValue, pipe } from 'utils/object';
 import {
   flattenHeaderRowsWithoutGroupRow,
   getColumnRenderOriginName,
@@ -73,7 +69,7 @@ import {
  * @param {IFieldFormatConfig} [format]
  * @return {*}
  */
- export function toFormattedValue(
+export function toFormattedValue(
   value?: number | string,
   format?: IFieldFormatConfig,
 ) {
@@ -1072,6 +1068,7 @@ export function getSeriesTooltips4Rectangular2(
   chartDataSet: IChartDataSet<string>,
   tooltipParam: {
     componentType: string;
+    seriesName?: string;
     data: {
       name: string;
       rowData: { [key: string]: any };
@@ -1086,7 +1083,7 @@ export function getSeriesTooltips4Rectangular2(
   if (tooltipParam?.componentType !== 'series') {
     return '';
   }
-  const aggConfigName = tooltipParam?.data?.name;
+  const aggConfigName = tooltipParam?.data?.name || tooltipParam?.seriesName;
   const row = tooltipParam?.data?.rowData || {};
 
   const tooltips: string[] = ([] as any[])

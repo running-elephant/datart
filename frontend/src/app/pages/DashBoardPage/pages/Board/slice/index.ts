@@ -231,6 +231,7 @@ const boardSlice = createSlice({
       }>,
     ) {
       const { boardId, widgetId, pageInfo } = action.payload;
+      if (!state.widgetInfoRecord?.[boardId]?.[widgetId]) return;
       state.widgetInfoRecord[boardId][widgetId].pageInfo = pageInfo || {
         pageNo: 1,
       };
@@ -244,6 +245,7 @@ const boardSlice = createSlice({
       }>,
     ) {
       const { boardId, widgetId, errInfo } = action.payload;
+      if (!state.widgetInfoRecord?.[boardId]?.[widgetId]) return;
       state.widgetInfoRecord[boardId][widgetId].errInfo = errInfo;
     },
     resetControlWidgets(

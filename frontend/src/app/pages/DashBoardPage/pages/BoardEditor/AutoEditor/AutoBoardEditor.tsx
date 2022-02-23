@@ -17,6 +17,7 @@
  */
 
 import { Empty } from 'antd';
+import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
 import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
@@ -84,8 +85,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   }, []);
 
   const dispatch = useDispatch();
-
-  const [layoutMap, setLayoutMap] = useState<Layouts>({});
+  const visible = useVisibleHidden();
 
   const layoutWidgets = useMemo(
     () => Object.values(layoutWidgetMap),
@@ -100,9 +100,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
 
   let scrollThrottle = useRef(false);
 
-  const onBreakpointChange = value => {
-    console.log('_Breakpoint', value);
-  };
+  const onBreakpointChange = value => {};
 
   const { curMargin, curPadding } = useMemo(() => {
     return deviceType === DeviceType.Mobile
@@ -121,8 +119,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     margin,
     containerPadding,
   ]);
-
-  useEffect(() => {
+  const generateLayout = () => {
     const layoutMap: Layouts = {
       lg: [],
       xs: [],
@@ -130,12 +127,14 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     layoutWidgets.forEach(widget => {
       const lg = widget.config.rect || widget.config.mobileRect;
       const xs = widget.config.mobileRect || widget.config.rect;
+      const lock = widget.config.lock;
       layoutMap.lg.push({
         i: widget.id,
         x: lg.x,
         y: lg.y,
         w: lg.width,
         h: lg.height,
+        static: lock,
       });
       layoutMap.xs.push({
         i: widget.id,
@@ -143,10 +142,12 @@ export const AutoBoardEditor: React.FC<{}> = () => {
         y: xs.y,
         w: xs.width,
         h: xs.height,
+        static: lock,
       });
     });
-    setLayoutMap(layoutMap);
-  }, [layoutWidgets]);
+    return layoutMap;
+  };
+  const layoutMap = generateLayout();
 
   useEffect(() => {
     const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
@@ -158,7 +159,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     }
   }, [layoutWidgetInfoMap]);
 
-  const layoutWrap: RefObject<HTMLDivElement> = useRef(null);
+  const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
 
   const calcItemTop = useCallback(
     (id: string) => {
@@ -170,12 +171,12 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   );
 
   const lazyLoad = useCallback(() => {
-    if (!layoutWrap.current) return;
+    if (!gridWrapRef.current) return;
     if (!scrollThrottle.current) {
       requestAnimationFrame(() => {
         const waitingItems = layoutInfos.current.filter(item => !item.rendered);
         if (waitingItems.length > 0) {
-          const { offsetHeight, scrollTop } = layoutWrap.current || {
+          const { offsetHeight, scrollTop } = gridWrapRef.current || {
             offsetHeight: 0,
             scrollTop: 0,
           };
@@ -187,7 +188,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
           });
         } else {
           if (scrollThrottle.current) {
-            layoutWrap.current?.removeEventListener('scroll', lazyLoad, false);
+            gridWrapRef.current?.removeEventListener('scroll', lazyLoad, false);
           }
         }
         scrollThrottle.current = false;
@@ -197,14 +198,14 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   }, [calcItemTop, renderedWidgetById]);
 
   useEffect(() => {
-    if (layoutWidgets.length && layoutWrap.current) {
+    if (layoutWidgets.length && gridWrapRef.current) {
       lazyLoad();
-      layoutWrap.current.removeEventListener('scroll', lazyLoad, false);
-      layoutWrap.current.addEventListener('scroll', lazyLoad, false);
+      gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
+      gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
       window.addEventListener('resize', lazyLoad, false);
     }
     return () => {
-      layoutWrap?.current?.removeEventListener('scroll', lazyLoad, false);
+      gridWrapRef.current?.removeEventListener('scroll', lazyLoad, false);
       window.removeEventListener('resize', lazyLoad, false);
     };
   }, [layoutWidgets, lazyLoad]);
@@ -264,32 +265,34 @@ export const AutoBoardEditor: React.FC<{}> = () => {
         curWH={curWH}
         className={deviceClassName}
         ref={ref}
+        style={{ visibility: visible }}
       >
-        {layoutWidgets.length ? (
-          <div className="grid-wrap" ref={layoutWrap}>
-            <ResponsiveGridLayout
-              // layout={currentLayout.current}
-              // cols={curCols}
-              layouts={layoutMap}
-              cols={LAYOUT_COLS_MAP}
-              breakpoints={BREAK_POINT_MAP}
-              onBreakpointChange={onBreakpointChange}
-              margin={curMargin}
-              containerPadding={curPadding}
-              rowHeight={widgetRowHeight}
-              useCSSTransforms={true}
-              measureBeforeMount={false}
-              onDragStop={changeWidgetLayouts}
-              onResizeStop={changeWidgetLayouts}
-              onLayoutChange={onLayoutChange}
-              isDraggable={true}
-              isResizable={true}
-              draggableHandle={`.${RGL_DRAG_HANDLE}`}
-            >
-              {boardChildren}
-            </ResponsiveGridLayout>
-          </div>
-        ) : (
+        <div className="grid-wrap" ref={gridWrapRef}>
+          <ResponsiveGridLayout
+            // layout={currentLayout.current}
+            // cols={curCols}
+            style={{ visibility: visible }}
+            layouts={layoutMap}
+            cols={LAYOUT_COLS_MAP}
+            breakpoints={BREAK_POINT_MAP}
+            onBreakpointChange={onBreakpointChange}
+            margin={curMargin}
+            containerPadding={curPadding}
+            rowHeight={widgetRowHeight}
+            useCSSTransforms={true}
+            measureBeforeMount={false}
+            onDragStop={changeWidgetLayouts}
+            onResizeStop={changeWidgetLayouts}
+            isBounded={false}
+            onLayoutChange={onLayoutChange}
+            isDraggable={true}
+            isResizable={true}
+            draggableHandle={`.${RGL_DRAG_HANDLE}`}
+          >
+            {boardChildren}
+          </ResponsiveGridLayout>
+        </div>
+        {layoutWidgets.length ? null : (
           <div className="empty">
             <Empty description="" />
           </div>

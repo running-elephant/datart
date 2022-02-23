@@ -150,14 +150,8 @@ const config: ChartConfig = {
         {
           label: 'legend.type',
           key: 'type',
-          comType: 'select',
+          comType: 'legendType',
           default: 'scroll',
-          options: {
-            items: [
-              { label: '普通', value: 'plain' },
-              { label: '滚动', value: 'scroll' },
-            ],
-          },
         },
         {
           label: 'legend.selectAll',
@@ -324,14 +318,7 @@ const config: ChartConfig = {
           label: 'common.nameLocation',
           key: 'nameLocation',
           default: 'center',
-          comType: 'select',
-          options: {
-            items: [
-              { label: '开始', value: 'start' },
-              { label: '结束', value: 'end' },
-              { label: '中间', value: 'center' },
-            ],
-          },
+          comType: 'nameLocation',
         },
         {
           label: 'common.nameRotate',

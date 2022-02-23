@@ -45,7 +45,7 @@ import { IChart } from 'app/types/Chart';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import { CommonFormTypes } from 'globalConstants';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
@@ -57,7 +57,9 @@ import {
   DataChartConfig,
   WidgetContentChartType,
 } from '../pages/DashBoardPage/pages/Board/slice/types';
+
 const { confirm } = Modal;
+
 export interface ChartEditorBaseProps {
   dataChartId: string;
   orgId: string;
@@ -105,11 +107,22 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
   const [chart, setChart] = useState<IChart>();
+  const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
   const addVizFn = useAddViz({
     showSaveForm: saveFormContextValue.showSaveForm,
   });
   const tg = useI18NPrefix('global');
+
+  const expensiveQuery = useMemo(() => {
+    try {
+      return dataview
+        ? Boolean(JSON.parse(dataview.config).expensiveQuery)
+        : false;
+    } catch (error) {
+      throw error;
+    }
+  }, [dataview]);
 
   useMount(
     () => {
@@ -237,7 +250,6 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       targetChartConfig,
       shadowChartConfig || chartConfig,
     );
-
     dispatch(
       workbenchSlice.actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
@@ -246,10 +258,26 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
         },
       }),
     );
-    dispatch(refreshDatasetAction({}));
+    if (!expensiveQuery) {
+      dispatch(refreshDatasetAction({}));
+    } else {
+      setAllowQuery(true);
+    }
   };
 
   const handleChartConfigChange = (type, payload) => {
+    if (expensiveQuery) {
+      dispatch(
+        workbenchSlice.actions.updateChartConfig({
+          type,
+          payload: payload,
+        }),
+      );
+      dispatch(workbenchSlice.actions.updateShadowChartConfig(null));
+      setAllowQuery(payload.needRefresh);
+      return true;
+    }
+
     dispatch(
       updateChartConfigAndRefreshDatasetAction({
         type,
@@ -402,6 +430,10 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     [history, buildDataChart, chartType, dataview, orgId],
   );
 
+  const handleRefreshDataset = useCallback(async () => {
+    await dispatch(refreshDatasetAction({}));
+    setAllowQuery(false);
+  }, [dispatch]);
   return (
     <StyledChartWorkbenchPage>
       <SaveFormContext.Provider value={saveFormContextValue}>
@@ -423,9 +455,12 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           dataview={dataview}
           chartConfig={chartConfig}
           defaultViewId={defaultViewId}
+          expensiveQuery={expensiveQuery}
+          allowQuery={allowQuery}
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}
           onDataViewChange={handleDataViewChanged}
+          onRefreshDataset={handleRefreshDataset}
         />
         <SaveForm
           width={400}

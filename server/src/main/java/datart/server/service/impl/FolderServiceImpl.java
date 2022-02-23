@@ -164,6 +164,11 @@ public class FolderServiceImpl extends BaseService implements FolderService {
     }
 
     @Override
+    public Folder getVizFolder(String vizId, String relType) {
+        return folderMapper.selectByRelTypeAndId(relType, vizId);
+    }
+
+    @Override
     @Transactional
     public boolean update(BaseUpdateParam baseUpdateParam) {
 

@@ -38,6 +38,8 @@ export const widgetActionTypeMap = strEnumType([
   'closeLinkage',
   'makeJump',
   'closeJump',
+  'lock',
+  'unlock',
 ]);
 export type widgetActionType = keyof typeof widgetActionTypeMap;
 
@@ -52,12 +54,12 @@ export const widgetViewActionMap: Record<WidgetType, widgetActionType[]> = {
 };
 // 编辑 edit
 export const widgetEditActionMap: Record<WidgetType, widgetActionType[]> = {
-  chart: ['refresh', 'edit', 'delete'],
-  media: ['edit', 'delete'],
-  controller: ['refresh', 'edit', 'delete'],
-  container: ['edit', 'delete'],
-  query: ['delete'],
-  reset: ['delete'],
+  chart: ['refresh', 'lock', 'edit', 'delete'],
+  media: ['edit', 'lock', 'delete'],
+  controller: ['refresh', 'edit', 'lock', 'delete'],
+  container: ['edit', 'lock', 'delete'],
+  query: ['lock', 'delete'],
+  reset: ['lock', 'delete'],
 };
 
 export const widgetActionMap = {
@@ -97,6 +99,7 @@ export const getWidgetActionList = (opt: {
   const { widget, allList, boardEditing, chartGraphId } = opt;
   const widgetType = widget.config.type;
   if (boardEditing) {
+    // 编辑模式
     if (widget.config.type === 'chart') {
       return getEditChartActionList({ allList, widget, chartGraphId });
     } else {
@@ -105,6 +108,7 @@ export const getWidgetActionList = (opt: {
       );
     }
   } else {
+    // 浏览模式
     return allList.filter(item =>
       widgetActionMap.view[widgetType].includes(item.key),
     );

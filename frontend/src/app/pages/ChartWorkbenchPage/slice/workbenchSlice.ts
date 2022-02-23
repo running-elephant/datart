@@ -23,6 +23,7 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { migrateChartConfig } from 'app/migration';
+import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { ResourceTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import { ChartConfig } from 'app/types/ChartConfig';
@@ -76,6 +77,7 @@ export type WorkbenchState = {
   backendChart?: ChartDTO;
   backendChartId?: string;
   aggregation?: boolean;
+  datasetLoading: boolean;
 };
 
 const initState: WorkbenchState = {
@@ -83,6 +85,8 @@ const initState: WorkbenchState = {
   dateFormat: 'LLL',
   dataviews: [],
   dataset: {},
+  aggregation: true,
+  datasetLoading: false,
 };
 
 // Selectors
@@ -134,6 +138,10 @@ export const aggregationSelector = createSelector(
   wb => wb.aggregation,
 );
 
+export const datasetLoadingSelector = createSelector(
+  workbenchSelector,
+  wb => wb.datasetLoading,
+);
 // Effects
 export const initWorkbenchAction = createAsyncThunk(
   'workbench/initWorkbenchAction',
@@ -200,7 +208,7 @@ export const fetchViewDetailAction = createAsyncThunk(
       method: 'GET',
       url: `views/${arg}`,
     });
-    return response.data;
+    return migrateViewConfig(response.data);
   },
 );
 
@@ -257,7 +265,7 @@ export const refreshDatasetAction = createAsyncThunk(
     const requestParams = builder
       .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
       .build();
-    thunkAPI.dispatch(fetchDataSetAction(requestParams));
+    return thunkAPI.dispatch(fetchDataSetAction(requestParams));
   },
 );
 
@@ -460,6 +468,7 @@ const workbenchSlice = createSlice({
       })
       .addCase(fetchDataSetAction.fulfilled, (state, { payload }) => {
         state.dataset = payload as any;
+        state.datasetLoading = false;
       })
       .addCase(fetchChartAction.fulfilled, (state, { payload }) => {
         if (!payload) {
@@ -487,11 +496,20 @@ const workbenchSlice = createSlice({
           chartConfigDTO.aggregation === undefined
             ? true
             : chartConfigDTO.aggregation;
-      })
-      .addMatcher(
-        isMySliceRejectedAction(workbenchSlice.name),
-        rejectedActionMessageHandler,
-      );
+      });
+
+    builder.addCase(fetchDataSetAction.pending, (state, action) => {
+      state.datasetLoading = true;
+    });
+
+    builder.addCase(fetchDataSetAction.rejected, (state, action) => {
+      state.datasetLoading = false;
+    });
+
+    builder.addMatcher(
+      isMySliceRejectedAction(workbenchSlice.name),
+      rejectedActionMessageHandler,
+    );
   },
 });
 

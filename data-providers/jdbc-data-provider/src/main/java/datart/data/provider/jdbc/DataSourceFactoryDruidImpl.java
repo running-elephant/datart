@@ -59,16 +59,6 @@ public class DataSourceFactoryDruidImpl implements DataSourceFactory<DruidDataSo
 
         System.setProperty("druid.mysql.usePingMethod", "false");
 
-        // url properties
-//        pro.setProperty(DruidDataSourceFactory.PROP_CONNECTIONPROPERTIES, "useUnicode=true;characterEncoding=utf8;characterSetResults=utf8");
-
-        // wall config
-//        pro.setProperty("druid.wall.updateAllow", "false");
-//        pro.setProperty("druid.wall.deleteAllow", "false");
-//        pro.setProperty("druid.wall.insertAllow", "false");
-//        pro.setProperty("druid.wall.multiStatementAllow", "true");
-//        pro.setProperty("druid.failFast", "true");
-
         //opt config
         pro.putAll(properties.getProperties());
         return pro;

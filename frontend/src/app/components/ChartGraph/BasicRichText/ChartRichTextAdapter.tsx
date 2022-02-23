@@ -17,7 +17,7 @@
  */
 
 import { SelectOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Menu, Modal, Row, Tooltip } from 'antd';
+import { Button, Dropdown, Menu, Modal, Row } from 'antd';
 import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { DeltaStatic } from 'quill';
@@ -238,18 +238,14 @@ const ChartRichTextAdapter: FC<{
                 <option value={`${size}px`} key={size}>{`${size}px`}</option>
               ))}
             </select>
-            <Tooltip title="加粗" key="ql-bold-tooltip">
-              <button className="ql-bold" key="ql-bold" />
-            </Tooltip>
-            <Tooltip title="斜体" key="ql-italic-tooltip">
-              <button className="ql-italic" key="ql-italic" />
-            </Tooltip>
-            <Tooltip title="下划线" key="ql-underline-tooltip">
-              <button className="ql-underline" key="ql-underline" />
-            </Tooltip>
-            <Tooltip title="删除线" key="ql-strike-tooltip">
-              <button className="ql-strike" key="ql-strike" />
-            </Tooltip>
+            <button className="ql-bold" key="ql-bold" title="加粗" />
+            <button className="ql-italic" key="ql-italic" title="斜体" />
+            <button
+              className="ql-underline"
+              key="ql-underline"
+              title="下划线"
+            />
+            <button className="ql-strike" key="ql-strike" title="删除线" />
           </span>
 
           <span className="ql-formats">
@@ -259,53 +255,61 @@ const ChartRichTextAdapter: FC<{
 
           <span className="ql-formats">
             <select className="ql-align" key="ql-align" />
-            <Tooltip title="减少缩进" key="ql-indent-tooltip">
-              <button className="ql-indent" value="-1" key="ql-indent" />
-            </Tooltip>
-            <Tooltip title="增加缩进" key="ql-indent-tooltip-up">
-              <button className="ql-indent" value="+1" key="ql-indent-up" />
-            </Tooltip>
+            <button
+              className="ql-indent"
+              value="-1"
+              key="ql-indent"
+              title="减少缩进"
+            />
+            <button
+              className="ql-indent"
+              value="+1"
+              key="ql-indent-up"
+              title="增加缩进"
+            />
           </span>
 
           <span className="ql-formats">
-            <Tooltip title="有序列表" key="ql-ordered-tooltip">
-              <button className="ql-list" value="ordered" key="ql-ordered" />
-            </Tooltip>
-            <Tooltip title="无序列表" key="ql-bullet-tooltip">
-              <button className="ql-list" value="bullet" key="ql-list" />
-            </Tooltip>
-            <Tooltip title="引用" key="ql-blockquote-tooltip">
-              <button className="ql-blockquote" key="ql-blockquote" />
-            </Tooltip>
-            <Tooltip title="代码" key="ql-code-block-tooltip">
-              <button className="ql-code-block" key="ql-code-block" />
-            </Tooltip>
+            <button
+              className="ql-list"
+              value="ordered"
+              key="ql-ordered"
+              title="有序列表"
+            />
+            <button
+              className="ql-list"
+              value="bullet"
+              key="ql-list"
+              title="无序列表"
+            />
+            <button
+              className="ql-blockquote"
+              key="ql-blockquote"
+              title="引用"
+            />
+            <button
+              className="ql-code-block"
+              key="ql-code-block"
+              title="代码"
+            />
           </span>
 
           <span className="ql-formats">
-            <Tooltip title="超链接" key="ql-link-tooltip">
-              <button className="ql-link" key="ql-link" />
-            </Tooltip>
-            <Tooltip title="图片" key="ql-image-tooltip">
-              <button className="ql-image" key="ql-image" />
-            </Tooltip>
-            <Tooltip title="引用字段" key="ql-selectLink-tooltip">
-              <Dropdown
-                overlay={fieldItems}
-                trigger={['click']}
-                key="ql-selectLink"
-              >
-                <a className="selectLink">
-                  <SelectOutlined />
-                </a>
-              </Dropdown>
-            </Tooltip>
+            <button className="ql-link" key="ql-link" title="超链接" />
+            <button className="ql-image" key="ql-image" title="图片" />
+            <Dropdown
+              overlay={fieldItems}
+              trigger={['click']}
+              key="ql-selectLink"
+            >
+              <a className="selectLink" title="引用字段">
+                <SelectOutlined />
+              </a>
+            </Dropdown>
           </span>
 
           <span className="ql-formats">
-            <Tooltip title="清除样式" key="ql-clean-tooltip">
-              <button className="ql-clean" key="ql-clean" />
-            </Tooltip>
+            <button className="ql-clean" key="ql-clean" title="清除样式" />
           </span>
         </div>
       ),

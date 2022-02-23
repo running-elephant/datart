@@ -12,4 +12,6 @@ public interface FolderService extends BaseCRUDService<Folder, FolderMapper> {
 
     boolean checkUnique(ResourceType type, String orgId, String parentId, String name);
 
+    Folder getVizFolder(String vizId,String relType);
+
 }
