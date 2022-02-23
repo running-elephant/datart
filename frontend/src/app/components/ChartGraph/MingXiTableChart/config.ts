@@ -301,40 +301,14 @@ const config: ChartConfig = {
         {
           label: 'style.fontWeight',
           key: 'fontWeight',
-          comType: 'select',
+          comType: 'fontWeight',
           default: 'normal',
-          options: {
-            translateItemLabel: true,
-            items: [
-              { label: '@global@.fontWeight.normal', value: 'normal' },
-              { label: '@global@.fontWeight.bold', value: 'bold' },
-              { label: '@global@.fontWeight.bolder', value: 'bolder' },
-              { label: '@global@.fontWeight.lighter', value: 'lighter' },
-              { label: '100', value: '100' },
-              { label: '200', value: '200' },
-              { label: '300', value: '300' },
-              { label: '400', value: '400' },
-              { label: '500', value: '500' },
-              { label: '600', value: '600' },
-              { label: '700', value: '700' },
-              { label: '800', value: '800' },
-              { label: '900', value: '900' },
-            ],
-          },
         },
         {
           label: 'style.fontStyle',
           key: 'fontStyle',
-          comType: 'select',
+          comType: 'fontStyle',
           default: 'normal',
-          options: {
-            translateItemLabel: true,
-            items: [
-              { label: '@global@.fontStyle.normal', value: 'normal' },
-              { label: '@global@.fontStyle.italic', value: 'italic' },
-              { label: '@global@.fontStyle.oblique', value: 'oblique' },
-            ],
-          },
         },
         {
           label: 'style.align',
@@ -480,17 +454,6 @@ const config: ChartConfig = {
           fontSize: '字体大小',
           fontStyle: '字体样式',
         },
-        fontStyle: {
-          normal: '常规体',
-          italic: '斜体',
-          oblique: '偏斜体',
-        },
-        fontWeight: {
-          normal: '常规字号',
-          bold: '粗体',
-          bolder: '特粗体',
-          lighter: '细体',
-        },
         tableSize: {
           default: '默认',
           middle: '中',
@@ -556,17 +519,6 @@ const config: ChartConfig = {
           evenFontColor: 'Even Row Font Color',
           fontSize: 'Font Size',
           fontStyle: 'Font Style',
-        },
-        fontWeight: {
-          bolder: 'Bolder',
-          normal: 'Normal',
-          bold: 'Bold',
-          lighter: 'Lighter',
-        },
-        fontStyle: {
-          normal: 'Normal',
-          italic: 'Italic',
-          oblique: 'Oblique',
         },
         tableSize: {
           default: 'Default',

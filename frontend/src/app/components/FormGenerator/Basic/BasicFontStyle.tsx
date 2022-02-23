@@ -18,7 +18,7 @@
 
 import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { FONT_FAMILIES } from 'globalConstants';
+import { FONT_STYLE } from 'globalConstants';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS } from 'styles/StyleConstants';
@@ -26,14 +26,12 @@ import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
-const BasicFontFamilySelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+const BasicFontStyle: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 
     return (
-      <StyledVizFontFamilySelector
-        label={!options?.hideLabel ? t(row.label, true) : ''}
-      >
+      <StyledVizFontStyle label={!options?.hideLabel ? t(row.label, true) : ''}>
         <Select
           dropdownMatchSelectWidth
           {...rest}
@@ -41,21 +39,21 @@ const BasicFontFamilySelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           placeholder={t('select')}
           onChange={value => onChange?.(ancestors, value)}
         >
-          {FONT_FAMILIES.map(o => (
+          {FONT_STYLE.map(o => (
             <Select.Option key={o.value} value={o.value}>
               {t(o.name)}
             </Select.Option>
           ))}
         </Select>
-      </StyledVizFontFamilySelector>
+      </StyledVizFontStyle>
     );
   },
   itemLayoutComparer,
 );
 
-export default BasicFontFamilySelector;
+export default BasicFontStyle;
 
-const StyledVizFontFamilySelector = styled(BW)`
+const StyledVizFontStyle = styled(BW)`
   .ant-select {
     color: ${p => p.theme.textColorSnd};
   }

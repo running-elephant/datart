@@ -558,6 +558,27 @@
         "legendType": {
           "plain": "普通",
           "scroll": "滚动"
+        },
+        "fontFamily": {
+          "default": "默认字体",
+          "microsoftYaHei": "微软雅黑",
+          "simSun": "宋体",
+          "simHei": "黑体",
+          "helveticaNeue": "Helvetica Neue",
+          "helvetica": "Helvetica",
+          "arial": "Arial",
+          "sansSerif": "sans-serif"
+        },
+        "fontWeight": {
+          "normal": "常规字号",
+          "bold": "粗体",
+          "bolder": "特粗体",
+          "lighter": "细体"
+        },
+        "fontStyle": {
+          "normal": "常规体",
+          "italic": "斜体",
+          "oblique": "偏斜体"
         }
       },
       "data": {

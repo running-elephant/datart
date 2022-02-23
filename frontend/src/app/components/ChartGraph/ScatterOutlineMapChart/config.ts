@@ -342,6 +342,7 @@ const config: ChartConfig = {
           focusArea: 'Focus Area',
           areaColor: 'Area Color',
           areaEmphasisColor: 'Area Emphasis Color',
+          cycleRatio: 'Cycle Ratio',
         },
         levelType: {
           china: 'China',

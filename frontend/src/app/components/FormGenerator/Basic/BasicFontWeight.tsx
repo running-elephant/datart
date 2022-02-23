@@ -18,7 +18,7 @@
 
 import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { FONT_FAMILIES } from 'globalConstants';
+import { FONT_WEIGHT } from 'globalConstants';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS } from 'styles/StyleConstants';
@@ -26,12 +26,12 @@ import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
-const BasicFontFamilySelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+const BasicFontWeight: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 
     return (
-      <StyledVizFontFamilySelector
+      <StyledVizFontWeight
         label={!options?.hideLabel ? t(row.label, true) : ''}
       >
         <Select
@@ -41,21 +41,21 @@ const BasicFontFamilySelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           placeholder={t('select')}
           onChange={value => onChange?.(ancestors, value)}
         >
-          {FONT_FAMILIES.map(o => (
+          {FONT_WEIGHT.map(o => (
             <Select.Option key={o.value} value={o.value}>
-              {t(o.name)}
+              {t(o.name, true)}
             </Select.Option>
           ))}
         </Select>
-      </StyledVizFontFamilySelector>
+      </StyledVizFontWeight>
     );
   },
   itemLayoutComparer,
 );
 
-export default BasicFontFamilySelector;
+export default BasicFontWeight;
 
-const StyledVizFontFamilySelector = styled(BW)`
+const StyledVizFontWeight = styled(BW)`
   .ant-select {
     color: ${p => p.theme.textColorSnd};
   }
