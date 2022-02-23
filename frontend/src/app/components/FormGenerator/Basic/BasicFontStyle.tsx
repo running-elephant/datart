@@ -41,7 +41,7 @@ const BasicFontStyle: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         >
           {FONT_STYLE.map(o => (
             <Select.Option key={o.value} value={o.value}>
-              {t(o.name)}
+              {t(o.name, true)}
             </Select.Option>
           ))}
         </Select>

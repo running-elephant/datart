@@ -63,6 +63,7 @@ const ChartRichTextAdapter: FC<{
   initContent: string | undefined;
   onChange: (delta: string | undefined) => void;
   openQuillMarkdown?: boolean;
+  t?: (key: string) => string;
 }> = memo(
   ({
     dataList,
@@ -71,6 +72,7 @@ const ChartRichTextAdapter: FC<{
     initContent,
     onChange,
     openQuillMarkdown = false,
+    t,
   }) => {
     const [containerId, setContainerId] = useState<string>();
     const [quillModules, setQuillModules] = useState<any>(null);
@@ -226,10 +228,14 @@ const ChartRichTextAdapter: FC<{
               className="ql-font"
               key="ql-font"
               defaultValue={FONT_FAMILIES[0].value}
+              style={{
+                whiteSpace: 'nowrap',
+                width: '130px',
+              }}
             >
               {FONT_FAMILIES.map(font => (
                 <option value={font.value} key={font.name}>
-                  {font.name}
+                  {t?.(font.name)}
                 </option>
               ))}
             </select>
