@@ -190,6 +190,8 @@ export const ChartStyleSectionComponentType = {
   FONTFAMILY: 'fontFamily',
   FONTSIZE: 'fontSize',
   FONTCOLOR: 'fontColor',
+  FONTSTYLE: 'fontStyle',
+  FONTWEIGHT: 'fontWeight',
   INPUTNUMBER: 'inputNumber',
   INPUTPERCENTAGE: 'inputPercentage',
   SLIDER: 'slider',

@@ -558,6 +558,27 @@
         "legendType": {
           "plain": "Plain",
           "scroll": "Scroll"
+        },
+        "fontFamily": {
+          "default": "Default",
+          "microsoftYaHei": "Microsoft YaHei",
+          "simSun": "SimSun",
+          "simHei": "SimHei",
+          "helveticaNeue": "Helvetica Neue",
+          "helvetica": "Helvetica",
+          "arial": "Arial",
+          "sansSerif": "sans-serif"
+        },
+        "fontWeight": {
+          "normal": "Normal",
+          "bold": "Bold",
+          "bolder": "Bolder",
+          "lighter": "Lighter"
+        },
+        "fontStyle": {
+          "normal": "Normal",
+          "italic": "Italic",
+          "oblique": "Oblique"
         }
       },
       "data": {

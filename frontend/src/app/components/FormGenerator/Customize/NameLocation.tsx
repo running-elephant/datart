@@ -16,44 +16,54 @@
  * limitations under the License.
  */
 
-import { Col, Row, Select } from 'antd';
+import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { CHART_NAME_LOCATION } from 'globalConstants';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
+import { BORDER_RADIUS } from 'styles/StyleConstants';
+import { BW } from '../Basic/components/BasicWrapper';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
-const BasicNameLocation: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+const NameLocation: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 
     return (
-      <StyledVizNameLocation align={'middle'}>
-        <Col span={12}>{t(row.label, true)}</Col>
-        <Col span={12}>
-          <Select
-            dropdownMatchSelectWidth
-            {...rest}
-            {...options}
-            placeholder={t('select')}
-            onChange={value => onChange?.(ancestors, value)}
-          >
-            {CHART_NAME_LOCATION.map(o => (
-              <Select.Option key={o.value} value={o.value}>
-                {t(o.name)}
-              </Select.Option>
-            ))}
-          </Select>
-        </Col>
+      <StyledVizNameLocation
+        label={!options?.hideLabel ? t(row.label, true) : ''}
+      >
+        <Select
+          dropdownMatchSelectWidth
+          {...rest}
+          {...options}
+          placeholder={t('select')}
+          onChange={value => onChange?.(ancestors, value)}
+        >
+          {CHART_NAME_LOCATION.map(o => (
+            <Select.Option key={o.value} value={o.value}>
+              {t(o.name)}
+            </Select.Option>
+          ))}
+        </Select>
       </StyledVizNameLocation>
     );
   },
   itemLayoutComparer,
 );
 
-export default BasicNameLocation;
+export default NameLocation;
 
-const StyledVizNameLocation = styled(Row)`
-  line-height: 32px;
+const StyledVizNameLocation = styled(BW)`
+  .ant-select {
+    color: ${p => p.theme.textColorSnd};
+  }
+
+  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    background-color: ${p => p.theme.emphasisBackground};
+    border-color: ${p => p.theme.emphasisBackground} !important;
+    border-radius: ${BORDER_RADIUS};
+    box-shadow: none !important;
+  }
 `;

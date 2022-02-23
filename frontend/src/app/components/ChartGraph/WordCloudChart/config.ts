@@ -17,6 +17,7 @@
  */
 
 import { ChartConfig } from 'app/types/ChartConfig';
+import { FONT_FAMILY } from 'styles/StyleConstants';
 
 const config: ChartConfig = {
   datas: [
@@ -105,31 +106,13 @@ const config: ChartConfig = {
           label: 'label.fontFamily',
           key: 'fontFamily',
           comType: 'fontFamily',
-          default: 'sans-serif',
+          default: FONT_FAMILY,
         },
         {
           label: 'label.fontWeight',
           key: 'fontWeight',
-          comType: 'select',
+          comType: 'fontWeight',
           default: 'normal',
-          options: {
-            translateItemLabel: true,
-            items: [
-              { label: '@global@.fontWeight.normal', value: 'normal' },
-              { label: '@global@.fontWeight.bold', value: 'bold' },
-              { label: '@global@.fontWeight.bolder', value: 'bolder' },
-              { label: '@global@.fontWeight.lighter', value: 'lighter' },
-              { label: '100', value: '100' },
-              { label: '200', value: '200' },
-              { label: '300', value: '300' },
-              { label: '400', value: '400' },
-              { label: '500', value: '500' },
-              { label: '600', value: '600' },
-              { label: '700', value: '700' },
-              { label: '800', value: '800' },
-              { label: '900', value: '900' },
-            ],
-          },
         },
         {
           label: 'label.maxFontSize',
@@ -276,12 +259,6 @@ const config: ChartConfig = {
           pentagon: '五边形',
           star: '星形',
         },
-        fontWeight: {
-          normal: '常规字号',
-          bold: '粗体',
-          bolder: '特粗体',
-          lighter: '细体',
-        },
       },
     },
     {
@@ -316,12 +293,6 @@ const config: ChartConfig = {
           triangle: 'Triangle',
           pentagon: 'Pentagon',
           star: 'Star',
-        },
-        fontWeight: {
-          normal: 'Normal',
-          bold: 'Bold',
-          bolder: 'Bolder',
-          lighter: 'Lighter',
         },
       },
     },
