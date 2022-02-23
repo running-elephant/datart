@@ -17,6 +17,7 @@
  */
 
 import {
+  ApartmentOutlined,
   DatabaseOutlined,
   FunctionOutlined,
   SafetyCertificateOutlined,
@@ -57,7 +58,7 @@ export const Properties = memo(({ allowManage }: PropertiesProps) => {
     () => [
       { name: 'reference', title: t('reference'), icon: <DatabaseOutlined /> },
       { name: 'variable', title: t('variable'), icon: <FunctionOutlined /> },
-      { name: 'model', title: t('model'), icon: <SafetyCertificateOutlined /> },
+      { name: 'model', title: t('model'), icon: <ApartmentOutlined /> },
       {
         name: 'columnPermissions',
         title: t('columnPermissions'),

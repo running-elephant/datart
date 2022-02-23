@@ -1007,6 +1007,12 @@
       "prefix": "[Public]",
       "suffix": "duplicate"
     },
+    "model": {
+      "type": "Type",
+      "permission": "Column Permissions",
+      "newHierarchy": "New Hierarchy",
+      "addToHierarchy": "Add To Hierarchy"
+    },
     "columnPermission": {
       "title": "Column permissions",
       "search": "Search role keywords",
