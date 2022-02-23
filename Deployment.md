@@ -42,12 +42,16 @@ unzip datart-server-1.0.0-beta.x-install.zip
 
 ## 2 初始化数据库
 
-- 创建数据库，并将bin/datart.sql导入到数据库中
+- 创建数据库，并将bin/datart.sql导入到数据库中 注意: 版本更新的历史SQL文件也要执行!!!
 
 ```bash
 mysql> CREATE DATABASE `datart` CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';
 mysql> use datart;
 mysql> source bin/datart.sql
+mysql> source bin/source.1.0.0-alpha.2.sql # 这个不需要执行 
+mysql> source bin/migration.1.0.0-alpha.3.sql
+mysql> source bin/migration.1.0.0-beta.0.sql
+
 ```
 
 ## 3 修改配置文件
