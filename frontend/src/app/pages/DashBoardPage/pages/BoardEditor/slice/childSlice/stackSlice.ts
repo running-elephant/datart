@@ -242,11 +242,11 @@ export const editBoardStackSlice = createSlice({
       state,
       action: PayloadAction<{
         id: string;
-        mediaWidgetConfig: MediaWidgetContent;
+        mediaWidgetContent: MediaWidgetContent;
       }>,
     ) {
-      const { id, mediaWidgetConfig } = action.payload;
-      state.widgetRecord[id].config.content = mediaWidgetConfig;
+      const { id, mediaWidgetContent } = action.payload;
+      state.widgetRecord[id].config.content = mediaWidgetContent;
     },
   },
   extraReducers: builder => {
