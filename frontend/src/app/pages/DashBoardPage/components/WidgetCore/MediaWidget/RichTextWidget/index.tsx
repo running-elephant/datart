@@ -17,11 +17,13 @@
  */
 
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import {
   MediaWidgetContent,
   Widget,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { editBoardStackActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
 import { DeltaStatic } from 'quill';
 import { ImageDrop } from 'quill-image-drop-module'; // 拖动加载图片组件。
@@ -29,6 +31,7 @@ import QuillMarkdown from 'quilljs-markdown';
 import 'quilljs-markdown/dist/quilljs-markdown-common-style.css';
 import React, {
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -39,7 +42,6 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import { editBoardStackActions } from '../../../../pages/BoardEditor/slice';
 import { MarkdownOptions } from './configs/MarkdownOptions';
 import TagBlot from './configs/TagBlot';
 import { Formats } from './Formats';
@@ -57,6 +59,7 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
 }) => {
   const t = useI18NPrefix();
   const dispatch = useDispatch();
+  const { editing: boardEditing } = useContext(BoardContext);
   const initContent = useMemo(() => {
     return (widgetConfig.config.content as MediaWidgetContent).richTextConfig
       ?.content;
@@ -92,6 +95,7 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
       }
     }
   }, [
+    boardEditing,
     dispatch,
     initContent,
     widgetConfig.config.content,
