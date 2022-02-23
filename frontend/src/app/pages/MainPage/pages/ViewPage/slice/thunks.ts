@@ -40,7 +40,6 @@ import {
   selectCurrentEditingView,
   selectCurrentEditingViewAttr,
   selectCurrentEditingViewKey,
-  selectDatabases,
   selectEditingViews,
   selectSourceDatabaseSchemas,
   selectViews,
@@ -355,33 +354,20 @@ export const getEditorProvideCompletionItems = createAsyncThunk<
     const schemaKeywords = new Set<string>();
     const variableKeywords = new Set<string>();
 
-    // if (sourceId) {
-    //   const databases = selectDatabases(getState(), { name: sourceId });
-    //   databases?.forEach(db => {
-    //     dbKeywords.add(db.title as string);
-    //     db.children?.forEach(table => {
-    //       tableKeywords.add(table.title as string);
-    //       table.children?.forEach(column => {
-    //         schemaKeywords.add(column.title as string);
-    //       });
-    //     });
-    //   });
-    // }
-
-    // if (sourceId) {
-    //   const databaseSchemas = selectSourceDatabaseSchemas(getState(), {
-    //     id: sourceId,
-    //   });
-    //   databaseSchemas?.forEach(db => {
-    //     dbKeywords.add(db.title as string);
-    //     db.children?.forEach(table => {
-    //       tableKeywords.add(table.title as string);
-    //       table.children?.forEach(column => {
-    //         schemaKeywords.add(column.title as string);
-    //       });
-    //     });
-    //   });
-    // }
+    if (sourceId) {
+      const databaseSchemas = selectSourceDatabaseSchemas(getState(), {
+        id: sourceId,
+      });
+      databaseSchemas?.forEach(db => {
+        dbKeywords.add(db.dbName);
+        db.tables?.forEach(table => {
+          tableKeywords.add(table.tableName);
+          table.columns?.forEach(column => {
+            schemaKeywords.add(column.name as string);
+          });
+        });
+      });
+    }
 
     ([] as Array<VariableHierarchy | Variable>)
       .concat(variables)
