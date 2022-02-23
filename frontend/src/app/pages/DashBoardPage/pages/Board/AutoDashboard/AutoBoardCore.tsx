@@ -68,7 +68,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       background,
       mobileMargin,
       mobileContainerPadding,
-      // allowOverlap,
+      allowOverlap,
     } = useContext(BoardConfigContext);
 
     // console.log('_ core allowOverlap ', allowOverlap);
@@ -267,7 +267,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
                   onBreakpointChange={onBreakpointChange}
                   isDraggable={false}
                   isResizable={false}
-                  // allowOverlap={allowOverlap}
+                  allowOverlap={allowOverlap}
                   measureBeforeMount={false}
                   useCSSTransforms={true}
                 >

@@ -47,11 +47,11 @@ import { Layout, Layouts, Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
-import styled, { keyframes } from 'styled-components/macro';
+import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
 import StyledBackground from '../../Board/components/StyledBackground';
 import DeviceList from '../components/DeviceList';
-import { editBoardStackActions } from '../slice';
+import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
 import {
   selectLayoutWidgetInfoMap,
   selectLayoutWidgetMap,
@@ -104,9 +104,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
 
   let scrollThrottle = useRef(false);
 
-  const onBreakpointChange = value => {
-    debugger;
-  };
+  const onBreakpointChange = value => {};
 
   const { curMargin, curPadding } = useMemo(() => {
     return deviceType === DeviceType.Mobile
@@ -126,48 +124,18 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     containerPadding,
   ]);
 
-  const [layoutMap, setLayoutMap] = useState<Layouts>({});
-  try {
-    console.log('129 layoutMap', layoutMap.lg[0].x, layoutMap.lg[0].y);
-    console.log('130 layoutMap', layoutMap.lg[1].x, layoutMap.lg[1].y);
-  } catch (error) {}
+  // const [layoutMap, setLayoutMap] = useState<Layouts>({});
+  // try {
+  //   console.log('129 layoutMap', layoutMap.lg[0].x, layoutMap.lg[0].y);
+  //   console.log('130 layoutMap', layoutMap.lg[1].x, layoutMap.lg[1].y);
+  // } catch (error) {}
 
-  useEffect(() => {
-    const layoutMap: Layouts = {
-      lg: [],
-      xs: [],
-    };
-    // console.log('_ layoutWidgetMap 139', layoutWidgetMap);
-    Object.values(layoutWidgetMap).forEach(widget => {
-      const lg = widget.config.rect || widget.config.mobileRect || {};
-      const xs = widget.config.mobileRect || widget.config.rect || {};
-      const lock = widget.config.lock;
-      layoutMap.lg.push({
-        i: widget.id,
-        x: lg.x,
-        y: lg.y,
-        w: lg.width,
-        h: lg.height,
-        static: lock,
-      });
-      layoutMap.xs.push({
-        i: widget.id,
-        x: xs.x,
-        y: xs.y,
-        w: xs.width,
-        h: xs.height,
-        static: lock,
-      });
-    });
-    setLayoutMap(layoutMap);
-  }, [layoutWidgetMap]);
-  // const layoutMap = useMemo(() => {
+  // useEffect(() => {
   //   const layoutMap: Layouts = {
   //     lg: [],
   //     xs: [],
   //   };
-  //   console.log('_ layoutWidgetMap', layoutWidgetMap);
-
+  //   // console.log('_ layoutWidgetMap 139', layoutWidgetMap);
   //   Object.values(layoutWidgetMap).forEach(widget => {
   //     const lg = widget.config.rect || widget.config.mobileRect || {};
   //     const xs = widget.config.mobileRect || widget.config.rect || {};
@@ -189,9 +157,42 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
   //       static: lock,
   //     });
   //   });
-  //   return layoutMap;
+  //   setLayoutMap(layoutMap);
   // }, [layoutWidgetMap]);
-  // console.log('_ layoutMap', layoutMap);
+
+  const layoutMap = useMemo(() => {
+    const layoutMap: Layouts = {
+      lg: [],
+      xs: [],
+    };
+
+    Object.values(layoutWidgetMap).forEach(widget => {
+      const lg = widget.config.rect || widget.config.mobileRect || {};
+      const xs = widget.config.mobileRect || widget.config.rect || {};
+      const lock = widget.config.lock;
+      layoutMap.lg.push({
+        i: widget.id,
+        x: lg.x,
+        y: lg.y,
+        w: lg.width,
+        h: lg.height,
+        static: lock,
+      });
+      layoutMap.xs.push({
+        i: widget.id,
+        x: xs.x,
+        y: xs.y,
+        w: xs.width,
+        h: xs.height,
+        static: lock,
+      });
+    });
+    return layoutMap;
+  }, [layoutWidgetMap]);
+
+  useEffect(() => {
+    currentLayout.current = layoutMap.lg;
+  }, [layoutMap.lg]);
   useEffect(() => {
     const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
     if (layoutWidgetInfos.length) {
@@ -241,12 +242,15 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
   }, [calcItemTop, renderedWidgetById]);
 
   useEffect(() => {
-    if (sortedLayoutWidgets.length && gridWrapRef.current) {
-      lazyLoad();
-      gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
-      gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
-      window.addEventListener('resize', lazyLoad, false);
-    }
+    setImmediate(() => {
+      if (sortedLayoutWidgets.length && gridWrapRef.current) {
+        lazyLoad();
+        gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
+        gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
+        window.addEventListener('resize', lazyLoad, false);
+      }
+    });
+
     return () => {
       gridWrapRef.current?.removeEventListener('scroll', lazyLoad, false);
       window.removeEventListener('resize', lazyLoad, false);
@@ -264,11 +268,12 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
 
   const onLayoutChange = (layouts: Layout[]) => {
     currentLayout.current = layouts;
+
     // ignore isDraggable item from out
     if (layouts.find(item => item.isDraggable === true)) {
       return;
     }
-    // dispatch(editDashBoardInfoActions.adjustDashLayouts(layouts));
+    dispatch(editDashBoardInfoActions.adjustDashLayouts(layouts));
   };
 
   const boardChildren = useMemo(() => {
@@ -329,7 +334,6 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
               onLayoutChange={onLayoutChange}
               isDraggable={true}
               isResizable={true}
-              verticalCompact={!allowOverlap}
               allowOverlap={allowOverlap}
               draggableHandle={`.${RGL_DRAG_HANDLE}`}
             >
@@ -345,15 +349,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     </Wrap>
   );
 });
-const initKeyFrame = keyframes`
-  from {
-    display: none;
-  }
 
-  to {
-    display: flex;
-  }
-`;
 const Wrap = styled.div<{}>`
   display: flex;
   flex: 1;
@@ -362,8 +358,7 @@ const Wrap = styled.div<{}>`
   width: 100px;
   min-height: 0;
   overflow-y: auto;
-  /* animation: ${initKeyFrame} 1s;
-  -webkit-animation: ${initKeyFrame} 1s; */
+
   .react-resizable-handle {
     z-index: 100;
   }
