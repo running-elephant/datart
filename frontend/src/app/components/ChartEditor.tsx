@@ -118,7 +118,9 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 
   const expensiveQuery = useMemo(() => {
     try {
-      return dataview ? Boolean(JSON.parse(dataview.config).expensiveQuery) : false;
+      return dataview
+        ? Boolean(JSON.parse(dataview.config).expensiveQuery)
+        : false;
     } catch (error) {
       throw error;
     }
@@ -357,6 +359,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
                 computedFields: dataview?.computedFields,
               }),
               viewId: dataview?.id,
+              avatar: chart?.meta?.id,
             },
             callback: folder => {
               folder &&
