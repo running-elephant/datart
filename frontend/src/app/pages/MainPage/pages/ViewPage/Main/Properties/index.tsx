@@ -23,7 +23,7 @@ import {
 } from '@ant-design/icons';
 import { PaneWrapper } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React, {
+import {
   memo,
   useCallback,
   useContext,
@@ -35,7 +35,7 @@ import styled from 'styled-components/macro';
 import { STICKY_LEVEL } from 'styles/StyleConstants';
 import { EditorContext } from '../../EditorContext';
 import { ColumnPermissions } from './ColumnPermissions';
-import DataModelTree from './DataModelTree';
+import DataModelTree from './DataModelTree/DataModelTree';
 import { Resource } from './Resource';
 import { Variables } from './Variables';
 import { VerticalTabs } from './VerticalTabs';

@@ -16,23 +16,6 @@
  * limitations under the License.
  */
 
-import { FC, memo } from 'react';
-import { useSelector } from 'react-redux';
-import {
-  selectCurrentEditingViewAttr,
-  selectSourceDatabaseSchemas,
-} from '../../slice/selectors';
-import Container from './Container';
-
-const DataModelTree: FC = memo(() => {
-  const sourceId = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'sourceId' }),
-  ) as string;
-  const databaseSchemas = useSelector(state =>
-    selectSourceDatabaseSchemas(state, { id: sourceId }),
-  );
-
-  return <Container title="model">{sourceId}</Container>;
-});
+import DataModelTree from './DataModelTree';
 
 export default DataModelTree;

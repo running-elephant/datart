@@ -121,6 +121,7 @@ export interface Schema {
 
 export interface Column extends Schema {
   category: ColumnCategories;
+  index?: number;
 }
 
 export interface Model {
