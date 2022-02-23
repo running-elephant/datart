@@ -190,7 +190,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
           );
 
           if (waitingItems.length > 0) {
-            const { offsetHeight, scrollTop } = gridWrapRef.current!;
+            const { offsetHeight, scrollTop } = gridWrapRef.current! || {};
             waitingItems.forEach(item => {
               const itemTop = calcItemTop(item.id);
               if (itemTop - scrollTop < offsetHeight) {

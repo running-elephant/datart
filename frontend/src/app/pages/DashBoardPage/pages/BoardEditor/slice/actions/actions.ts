@@ -46,21 +46,16 @@ import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from '../thunk';
 import { HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
 const { confirm } = Modal;
-export const clearEditBoardState =
-  (boardId: string) => async (dispatch, getState) => {
-    const editBoard = getState().editBoard as HistoryEditBoard;
-    if (editBoard.boardInfo.id !== boardId) {
-      return;
-    }
-    await dispatch(
-      editBoardStackActions.setBoardToEditStack({
-        dashBoard: {} as Dashboard,
-        widgetRecord: {},
-      }),
-    );
-    await dispatch(editDashBoardInfoActions.clearEditBoardInfo());
-    await dispatch(editWidgetInfoActions.clearWidgetInfo());
-  };
+export const clearEditBoardState = () => async (dispatch, getState) => {
+  await dispatch(
+    editBoardStackActions.setBoardToEditStack({
+      dashBoard: {} as Dashboard,
+      widgetRecord: {},
+    }),
+  );
+  await dispatch(editDashBoardInfoActions.clearEditBoardInfo());
+  await dispatch(editWidgetInfoActions.clearWidgetInfo());
+};
 export const deleteWidgetsAction = () => (dispatch, getState) => {
   const editBoard = getState().editBoard as HistoryEditBoard;
   let selectedIds = Object.values(editBoard.widgetInfoRecord)
