@@ -17,6 +17,7 @@
  */
 
 import { ChartConfig } from 'app/types/ChartConfig';
+import { FONT_FAMILY } from 'styles/StyleConstants';
 
 const config: ChartConfig = {
   datas: [
@@ -61,14 +62,18 @@ const config: ChartConfig = {
           comType: 'select',
           default: 'circle',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '圆形', value: 'circle' },
-              { label: '心形', value: 'cardioid' },
-              { label: '菱形', value: 'diamond' },
-              { label: '正三角形', value: 'triangle-forward' },
-              { label: '三角形', value: 'triangle' },
-              { label: '五边形', value: 'pentagon' },
-              { label: '星形', value: 'star' },
+              { label: '@global@.shapeType.circle', value: 'circle' },
+              { label: '@global@.shapeType.cardioid', value: 'cardioid' },
+              { label: '@global@.shapeType.diamond', value: 'diamond' },
+              {
+                label: '@global@.shapeType.triangleForward',
+                value: 'triangle-forward',
+              },
+              { label: '@global@.shapeType.triangle', value: 'triangle' },
+              { label: '@global@.shapeType.pentagon', value: 'pentagon' },
+              { label: '@global@.shapeType.star', value: 'star' },
             ],
           },
         },
@@ -101,30 +106,13 @@ const config: ChartConfig = {
           label: 'label.fontFamily',
           key: 'fontFamily',
           comType: 'fontFamily',
-          default: 'sans-serif',
+          default: FONT_FAMILY,
         },
         {
           label: 'label.fontWeight',
           key: 'fontWeight',
-          comType: 'select',
+          comType: 'fontWeight',
           default: 'normal',
-          options: {
-            items: [
-              { label: '常规字号', value: 'normal' },
-              { label: '粗体', value: 'bold' },
-              { label: '特粗体', value: 'bolder' },
-              { label: '细体', value: 'lighter' },
-              { label: '100', value: '100' },
-              { label: '200', value: '200' },
-              { label: '300', value: '300' },
-              { label: '400', value: '400' },
-              { label: '500', value: '500' },
-              { label: '600', value: '600' },
-              { label: '700', value: '700' },
-              { label: '800', value: '800' },
-              { label: '900', value: '900' },
-            ],
-          },
         },
         {
           label: 'label.maxFontSize',
@@ -262,6 +250,15 @@ const config: ChartConfig = {
           textShadowBlur: '阴影长度',
           textShadowColor: '阴影颜色',
         },
+        shapeType: {
+          circle: '圆形',
+          cardioid: '心形',
+          diamond: '菱形',
+          triangleForward: '正三角形',
+          triangle: '三角形',
+          pentagon: '五边形',
+          star: '星形',
+        },
       },
     },
     {
@@ -287,6 +284,15 @@ const config: ChartConfig = {
           focus: 'Focus',
           textShadowBlur: 'Text Shadow Blur',
           textShadowColor: 'Text Shadow Color',
+        },
+        shapeType: {
+          circle: 'Circle',
+          cardioid: 'Cardioid',
+          diamond: 'Diamond',
+          triangleForward: 'Triangle Forward',
+          triangle: 'Triangle',
+          pentagon: 'Pentagon',
+          star: 'Star',
         },
       },
     },

@@ -1,3 +1,4 @@
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { Form, FormInstance, Input, Radio, TreeSelect } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -133,7 +134,20 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
         </Form.Item>
       )}
       {vizType === 'DASHBOARD' && type === CommonFormTypes.Add && (
-        <Form.Item name="boardType" label={t('boardType.label')}>
+        <Form.Item
+          rules={[
+            {
+              required: true,
+              message: t('boardType.requiredMessage'),
+            },
+          ]}
+          name="boardType"
+          label={t('boardType.label')}
+          tooltip={{
+            title: t('boardType.tips'),
+            icon: <InfoCircleOutlined />,
+          }}
+        >
           <Radio.Group>
             <Radio.Button value={BoardTypeMap.auto}>
               {t('boardType.auto')}

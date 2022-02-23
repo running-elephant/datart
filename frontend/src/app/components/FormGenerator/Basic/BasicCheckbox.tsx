@@ -36,8 +36,8 @@ const BasicCheckbox: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     return (
       <StyledVizBasicCheckbox
         label={!options?.hideLabel ? t(row.label, true) : ''}
-        labelCol={{ span: 12 }}
-        wrapperCol={{ span: 12 }}
+        labelCol={{ span: 20 }}
+        wrapperCol={{ span: 4 }}
       >
         <Checkbox
           {...rest}

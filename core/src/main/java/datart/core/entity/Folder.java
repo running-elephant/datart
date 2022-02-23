@@ -12,7 +12,11 @@ public class Folder extends BaseEntity {
 
     private String relType;
 
+    private String subType;
+
     private String relId;
+
+    private String avatar;
 
     private String parentId;
 

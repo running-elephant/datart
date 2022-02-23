@@ -240,12 +240,23 @@ public class VizServiceImpl extends BaseService implements VizService {
     @Override
     @Transactional
     public boolean updateDatachart(DatachartUpdateParam updateParam) {
+        // update folder
+        Folder vizFolder = folderService.getVizFolder(updateParam.getId(), ResourceType.DATACHART.name());
+        vizFolder.setAvatar(updateParam.getAvatar());
+        vizFolder.setSubType(updateParam.getSubType());
+        folderService.getDefaultMapper().updateByPrimaryKey(vizFolder);
+
         return datachartService.update(updateParam);
     }
 
     @Override
     @Transactional
     public boolean updateDashboard(DashboardUpdateParam updateParam) {
+        // update folder
+        Folder vizFolder = folderService.getVizFolder(updateParam.getId(), ResourceType.DASHBOARD.name());
+        vizFolder.setAvatar(updateParam.getAvatar());
+        vizFolder.setSubType(updateParam.getSubType());
+        folderService.getDefaultMapper().updateByPrimaryKey(vizFolder);
         return dashboardService.update(updateParam);
     }
 

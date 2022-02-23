@@ -26,7 +26,8 @@ export function dataConfigSectionComparer(
   if (
     prevProps.translate !== nextProps.translate ||
     prevProps.config !== nextProps.config ||
-    prevProps.aggregation !== nextProps.aggregation
+    prevProps.aggregation !== nextProps.aggregation ||
+    prevProps.expensiveQuery !== nextProps.expensiveQuery
   ) {
     return false;
   }

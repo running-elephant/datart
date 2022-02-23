@@ -24,6 +24,7 @@ import {
   FullscreenOutlined,
   InfoOutlined,
   LinkOutlined,
+  LockOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown, Menu } from 'antd';
@@ -84,6 +85,12 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
           label: t('info'),
           icon: <InfoOutlined />,
         },
+        {
+          key: 'lock',
+          label: 'lock',
+          icon: <LockOutlined />,
+        },
+
         {
           key: 'makeLinkage',
           label: t('makeLinkage'),

@@ -25,7 +25,6 @@ export const parseStoryPageConfig = (storyConfig: string) => {
     let nextConfig: StoryPageConfig = JSON.parse(storyConfig);
     return nextConfig;
   } catch (error) {
-    console.log('解析 story.page.config 出错');
     let nextConfig = getInitStoryPageConfig();
     return nextConfig;
   }

@@ -15,12 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package datart.server.service.impl;
+package datart.server.job;
 
 import datart.core.common.Application;
 import datart.server.base.dto.ScheduleJobConfig;
 import datart.server.service.MailService;
-import datart.server.service.ScheduleJob;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.mail.javamail.MimeMessageHelper;

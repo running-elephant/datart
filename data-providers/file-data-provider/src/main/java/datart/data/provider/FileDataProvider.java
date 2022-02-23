@@ -128,12 +128,13 @@ public class FileDataProvider extends DefaultDataProvider {
         boolean isHeader = typedValues.stream()
                 .allMatch(typedValue -> typedValue instanceof String);
         if (isHeader) {
-            typedValues = values.size()>1 ? values.get(1) : typedValues;
+            typedValues = values.size() > 1 ? values.get(1) : typedValues;
             for (int i = 0; i < typedValues.size(); i++) {
                 Column column = new Column();
                 ValueType valueType = DataTypeUtils.javaType2DataType(typedValues.get(i));
                 column.setType(valueType);
-                column.setName(values.get(0).get(i).toString());
+                String name = values.get(0).get(i).toString();
+                column.setName(StringUtils.isBlank(values.get(0).get(i).toString()) ? "col" + i : name);
                 columns.add(column);
             }
             values.remove(0);

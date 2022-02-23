@@ -544,6 +544,41 @@
           "bottom": "底边距",
           "top": "上边距",
           "containLabel": "包含标题"
+        },
+        "lineStyles": {
+          "solid": "实线",
+          "dashed": "虚线",
+          "dotted": "点"
+        },
+        "nameLocation": {
+          "start": "开始",
+          "center": "中间",
+          "end": "结束"
+        },
+        "legendType": {
+          "plain": "普通",
+          "scroll": "滚动"
+        },
+        "fontFamily": {
+          "default": "默认字体",
+          "microsoftYaHei": "微软雅黑",
+          "simSun": "宋体",
+          "simHei": "黑体",
+          "helveticaNeue": "Helvetica Neue",
+          "helvetica": "Helvetica",
+          "arial": "Arial",
+          "sansSerif": "sans-serif"
+        },
+        "fontWeight": {
+          "normal": "常规字号",
+          "bold": "粗体",
+          "bolder": "特粗体",
+          "lighter": "细体"
+        },
+        "fontStyle": {
+          "normal": "常规体",
+          "italic": "斜体",
+          "oblique": "偏斜体"
         }
       },
       "data": {
@@ -722,6 +757,7 @@
       "share": {
         "link": "链接",
         "password": "密码",
+        "link_password": "链接&密码",
         "expireDate": "截止日期",
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
@@ -939,7 +975,9 @@
       "boardType": {
         "label": "布局类型",
         "auto": "自动",
-        "free": "自由"
+        "free": "自由",
+        "tips": "自动布局 :方便快速创建响应式仪表板  自由布局 :创建精美大屏类数字应用",
+        "requiredMessage": "请选择一种布局方式"
       },
       "parent": "所属目录",
       "root": "根目录",
@@ -1040,7 +1078,8 @@
       "dirtyread": "延迟更新",
       "fastfailover": "快速失败",
       "cache": "缓存",
-      "cacheExpires": "有效期(秒)"
+      "cacheExpires": "有效期(秒)",
+      "expensiveQuery": "这是一个消耗资源的查询"
     },
     "schemaTable": {
       "category": "分类",

@@ -40,8 +40,10 @@ export const ToolBar = () => {
       <Space>
         <>
           <AddChart />
+          <Divider type="vertical" />
           <AddMedia />
           <AddContainer />
+          <Divider type="vertical" />
           <AddController />
           {boardType === 'free' && (
             <>
