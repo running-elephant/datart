@@ -7,7 +7,6 @@ import { ListNav, ListPane, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useGetVizIcon from 'app/hooks/useGetVizIcon';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import { BoardTypeMap } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import { CommonFormTypes } from 'globalConstants';
@@ -17,7 +16,7 @@ import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
 import { useAddViz } from '../../hooks/useAddViz';
-import { SaveFormContext, SaveFormModel } from '../../SaveFormContext';
+import { SaveFormContext } from '../../SaveFormContext';
 import {
   makeSelectVizTree,
   selectArchivedDashboardLoading,
@@ -29,7 +28,7 @@ import {
   getArchivedDashboards,
   getArchivedDatacharts,
 } from '../../slice/thunks';
-import { FolderViewModel, VizType } from '../../slice/types';
+import { FolderViewModel } from '../../slice/types';
 import { Recycle } from '../Recycle';
 import { FolderTree } from './FolderTree';
 
@@ -55,15 +54,6 @@ export const Folders = memo(
     const history = useHistory();
     const { showSaveForm } = useContext(SaveFormContext);
     const addVizFn = useAddViz({ showSaveForm });
-    const getInitValues = useCallback((relType: VizType) => {
-      if (relType === 'DASHBOARD') {
-        return {
-          name: '',
-          boardType: BoardTypeMap.auto,
-        } as SaveFormModel;
-      }
-      return undefined;
-    }, []);
 
     const getIcon = useGetVizIcon();
 
@@ -82,10 +72,10 @@ export const Folders = memo(
       );
     const archivedDatacharts = useSelector(selectArchivedDatacharts);
     const archivedDashboards = useSelector(selectArchivedDashboards);
-    const archivedDatachartloading = useSelector(
+    const archivedDataChartLoading = useSelector(
       selectArchivedDatachartLoading,
     );
-    const archivedDashboardloading = useSelector(
+    const archivedDashboardLoading = useSelector(
       selectArchivedDashboardLoading,
     );
     const { filteredData: filteredListData, debouncedSearch: listSearch } =
@@ -113,10 +103,10 @@ export const Folders = memo(
           vizType: key,
           type: CommonFormTypes.Add,
           visible: true,
-          initialValues: getInitValues(key),
+          initialValues: undefined,
         });
       },
-      [getInitValues, orgId, history, addVizFn],
+      [orgId, history, addVizFn],
     );
 
     const titles = useMemo(
@@ -190,7 +180,7 @@ export const Folders = memo(
             type="viz"
             orgId={orgId}
             list={filteredListData}
-            listLoading={archivedDashboardloading || archivedDatachartloading}
+            listLoading={archivedDashboardLoading || archivedDataChartLoading}
             selectedId={selectedId}
             onInit={recycleInit}
           />
