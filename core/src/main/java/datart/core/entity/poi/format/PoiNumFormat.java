@@ -27,7 +27,7 @@ public class PoiNumFormat {
 
     public String getUnitKey() {
         if (StringUtils.isNotBlank(this.unitKey)){
-            UnitKey unitKey = UnitKey.valueOf(this.unitKey);
+            UnitKey unitKey = UnitKey.getUnitKeyByValue(this.unitKey);
             return unitKey.getFmt();
         }
         return unitKey;
@@ -44,7 +44,7 @@ public class PoiNumFormat {
 
     public Object parseValue(Object obj){
         if (StringUtils.isNotBlank(this.unitKey)){
-            UnitKey unitKey = UnitKey.valueOf(this.unitKey);
+            UnitKey unitKey = UnitKey.getUnitKeyByValue(this.unitKey);
             BigDecimal val = new BigDecimal(obj.toString()).divide(new BigDecimal(unitKey.getUnit()));
             obj = val.setScale(getDecimalPlacesNum(), BigDecimal.ROUND_HALF_UP);
         }

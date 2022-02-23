@@ -134,7 +134,6 @@ public class PoiConvertUtils {
             rowMap.put(key, new ArrayList<>());
         }
         Column column = new Column();
-        column.setPkColumn(val.getUid());
         column.setName(val.getColName());
         column.setType(ValueType.STRING);
         rowMap.get(key).add(column);
