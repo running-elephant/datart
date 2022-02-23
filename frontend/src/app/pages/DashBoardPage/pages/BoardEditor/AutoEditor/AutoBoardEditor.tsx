@@ -34,6 +34,7 @@ import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import debounce from 'lodash/debounce';
 import React, {
+  memo,
   RefObject,
   useCallback,
   useContext,
@@ -46,11 +47,11 @@ import { Layout, Layouts, Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
-import styled from 'styled-components/macro';
+import styled, { keyframes } from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
 import StyledBackground from '../../Board/components/StyledBackground';
 import DeviceList from '../components/DeviceList';
-import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
+import { editBoardStackActions } from '../slice';
 import {
   selectLayoutWidgetInfoMap,
   selectLayoutWidgetMap,
@@ -60,7 +61,9 @@ import { WidgetOfAutoEditor } from './WidgetOfAutoEditor';
 // const ReactGridLayout = WidthProvider(RGL);
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-export const AutoBoardEditor: React.FC<{}> = () => {
+export const AutoBoardEditor: React.FC<{}> = memo(() => {
+  const dispatch = useDispatch();
+  const visible = useVisibleHidden();
   const { renderedWidgetById } = useContext(BoardContext);
   const {
     margin,
@@ -68,11 +71,12 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     background,
     mobileMargin,
     mobileContainerPadding,
+    allowOverlap,
   } = useContext(BoardConfigContext);
   const { deviceType } = useContext(BoardInfoContext);
-
   // console.log('_ edit allowOverlap ', allowOverlap);
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
+
   const layoutWidgetInfoMap = useSelector(selectLayoutWidgetInfoMap);
 
   const [curWH, setCurWH] = useState<number[]>([]);
@@ -83,9 +87,6 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     });
   }, []);
 
-  const dispatch = useDispatch();
-  const visible = useVisibleHidden();
-
   const sortedLayoutWidgets = useMemo(
     () =>
       Object.values(layoutWidgetMap).sort(
@@ -95,15 +96,17 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     [layoutWidgetMap],
   );
 
-  const currentLayout = useRef<Layout[]>([]);
-
   let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
+
+  const currentLayout = useRef<Layout[]>([]);
 
   const { ref, widgetRowHeight } = useWidgetRowHeight();
 
   let scrollThrottle = useRef(false);
 
-  const onBreakpointChange = value => {};
+  const onBreakpointChange = value => {
+    debugger;
+  };
 
   const { curMargin, curPadding } = useMemo(() => {
     return deviceType === DeviceType.Mobile
@@ -122,14 +125,22 @@ export const AutoBoardEditor: React.FC<{}> = () => {
     margin,
     containerPadding,
   ]);
-  const generateLayout = () => {
+
+  const [layoutMap, setLayoutMap] = useState<Layouts>({});
+  try {
+    console.log('129 layoutMap', layoutMap.lg[0].x, layoutMap.lg[0].y);
+    console.log('130 layoutMap', layoutMap.lg[1].x, layoutMap.lg[1].y);
+  } catch (error) {}
+
+  useEffect(() => {
     const layoutMap: Layouts = {
       lg: [],
       xs: [],
     };
-    sortedLayoutWidgets.forEach(widget => {
-      const lg = widget.config.rect || widget.config.mobileRect;
-      const xs = widget.config.mobileRect || widget.config.rect;
+    // console.log('_ layoutWidgetMap 139', layoutWidgetMap);
+    Object.values(layoutWidgetMap).forEach(widget => {
+      const lg = widget.config.rect || widget.config.mobileRect || {};
+      const xs = widget.config.mobileRect || widget.config.rect || {};
       const lock = widget.config.lock;
       layoutMap.lg.push({
         i: widget.id,
@@ -148,10 +159,39 @@ export const AutoBoardEditor: React.FC<{}> = () => {
         static: lock,
       });
     });
-    return layoutMap;
-  };
-  const layoutMap = generateLayout();
+    setLayoutMap(layoutMap);
+  }, [layoutWidgetMap]);
+  // const layoutMap = useMemo(() => {
+  //   const layoutMap: Layouts = {
+  //     lg: [],
+  //     xs: [],
+  //   };
+  //   console.log('_ layoutWidgetMap', layoutWidgetMap);
 
+  //   Object.values(layoutWidgetMap).forEach(widget => {
+  //     const lg = widget.config.rect || widget.config.mobileRect || {};
+  //     const xs = widget.config.mobileRect || widget.config.rect || {};
+  //     const lock = widget.config.lock;
+  //     layoutMap.lg.push({
+  //       i: widget.id,
+  //       x: lg.x,
+  //       y: lg.y,
+  //       w: lg.width,
+  //       h: lg.height,
+  //       static: lock,
+  //     });
+  //     layoutMap.xs.push({
+  //       i: widget.id,
+  //       x: xs.x,
+  //       y: xs.y,
+  //       w: xs.width,
+  //       h: xs.height,
+  //       static: lock,
+  //     });
+  //   });
+  //   return layoutMap;
+  // }, [layoutWidgetMap]);
+  // console.log('_ layoutMap', layoutMap);
   useEffect(() => {
     const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
     if (layoutWidgetInfos.length) {
@@ -211,7 +251,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
       gridWrapRef.current?.removeEventListener('scroll', lazyLoad, false);
       window.removeEventListener('resize', lazyLoad, false);
     };
-  }, [sortedLayoutWidgets, lazyLoad]);
+  }, [sortedLayoutWidgets.length, lazyLoad]);
 
   const changeWidgetLayouts = debounce((layouts: Layout[]) => {
     dispatch(
@@ -224,12 +264,11 @@ export const AutoBoardEditor: React.FC<{}> = () => {
 
   const onLayoutChange = (layouts: Layout[]) => {
     currentLayout.current = layouts;
-
     // ignore isDraggable item from out
     if (layouts.find(item => item.isDraggable === true)) {
       return;
     }
-    dispatch(editDashBoardInfoActions.adjustDashLayouts(layouts));
+    // dispatch(editDashBoardInfoActions.adjustDashLayouts(layouts));
   };
 
   const boardChildren = useMemo(() => {
@@ -257,7 +296,6 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   /**
    * https://www.npmjs.com/package/react-grid-layout
    */
-
   return (
     <Wrap className={deviceClassName}>
       {deviceType === DeviceType.Mobile && (
@@ -270,32 +308,35 @@ export const AutoBoardEditor: React.FC<{}> = () => {
         ref={ref}
         style={{ visibility: visible }}
       >
-        <div className="grid-wrap" ref={gridWrapRef}>
-          <ResponsiveGridLayout
-            // layout={currentLayout.current}
-            // cols={curCols}
-            style={{ visibility: visible }}
-            layouts={layoutMap}
-            cols={LAYOUT_COLS_MAP}
-            breakpoints={BREAK_POINT_MAP}
-            onBreakpointChange={onBreakpointChange}
-            margin={curMargin}
-            containerPadding={curPadding}
-            rowHeight={widgetRowHeight}
-            useCSSTransforms={true}
-            measureBeforeMount={false}
-            onDragStop={changeWidgetLayouts}
-            onResizeStop={changeWidgetLayouts}
-            isBounded={false}
-            onLayoutChange={onLayoutChange}
-            isDraggable={true}
-            isResizable={true}
-            draggableHandle={`.${RGL_DRAG_HANDLE}`}
-          >
-            {boardChildren}
-          </ResponsiveGridLayout>
-        </div>
-        {sortedLayoutWidgets.length ? null : (
+        {sortedLayoutWidgets.length ? (
+          <div className="grid-wrap" ref={gridWrapRef}>
+            <ResponsiveGridLayout
+              // layout={currentLayout.current}
+              // cols={curCols}
+
+              layouts={layoutMap}
+              cols={LAYOUT_COLS_MAP}
+              breakpoints={BREAK_POINT_MAP}
+              onBreakpointChange={onBreakpointChange}
+              margin={curMargin}
+              containerPadding={curPadding}
+              rowHeight={widgetRowHeight}
+              useCSSTransforms={true}
+              measureBeforeMount={false}
+              onDragStop={changeWidgetLayouts}
+              onResizeStop={changeWidgetLayouts}
+              isBounded={false}
+              onLayoutChange={onLayoutChange}
+              isDraggable={true}
+              isResizable={true}
+              verticalCompact={!allowOverlap}
+              allowOverlap={allowOverlap}
+              draggableHandle={`.${RGL_DRAG_HANDLE}`}
+            >
+              {boardChildren}
+            </ResponsiveGridLayout>
+          </div>
+        ) : (
           <div className="empty">
             <Empty description="" />
           </div>
@@ -303,16 +344,26 @@ export const AutoBoardEditor: React.FC<{}> = () => {
       </StyledContainer>
     </Wrap>
   );
-};
-const Wrap = styled.div`
+});
+const initKeyFrame = keyframes`
+  from {
+    display: none;
+  }
+
+  to {
+    display: flex;
+  }
+`;
+const Wrap = styled.div<{}>`
   display: flex;
   flex: 1;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  width: 100px;
   min-height: 0;
   overflow-y: auto;
-
+  /* animation: ${initKeyFrame} 1s;
+  -webkit-animation: ${initKeyFrame} 1s; */
   .react-resizable-handle {
     z-index: 100;
   }

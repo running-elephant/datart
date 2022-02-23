@@ -57,11 +57,10 @@ import { WidgetOfAuto } from './WidgetOfAuto';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const mobilePoints = Object.keys(BREAK_POINT_MAP).slice(3);
-export interface AutoBoardCoreProps {
-  boardId: string;
-}
-export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
+
+export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
+    const visible = useVisibleHidden();
     const { renderedWidgetById } = useContext(BoardContext);
     const {
       margin,
@@ -73,7 +72,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
     } = useContext(BoardConfigContext);
 
     // console.log('_ core allowOverlap ', allowOverlap);
-    const visible = useVisibleHidden();
+
     const selectLayoutWidgetsConfigById = useMemo(
       selectLayoutWidgetMapById,
       [],
@@ -98,8 +97,6 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
     const [deviceType, setDeviceType] = useState<DeviceType>(
       DeviceType.Desktop,
     );
-
-    const [layoutMap, setLayoutMap] = useState<Layouts>({});
 
     let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
 
@@ -138,13 +135,13 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
       margin,
       containerPadding,
     ]);
-
+    const [layoutMap, setLayoutMap] = useState<Layouts>({});
     useEffect(() => {
       const layoutMap: Layouts = {
         lg: [],
         xs: [],
       };
-      sortedLayoutWidgets.forEach(widget => {
+      Object.values(layoutWidgetMap).forEach(widget => {
         const lg = widget.config.rect || widget.config.mobileRect || {};
         const xs = widget.config.mobileRect || widget.config.rect || {};
         const lock = widget.config.lock;
@@ -166,7 +163,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
         });
       });
       setLayoutMap(layoutMap);
-    }, [sortedLayoutWidgets]);
+    }, [layoutWidgetMap]);
 
     useEffect(() => {
       const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
