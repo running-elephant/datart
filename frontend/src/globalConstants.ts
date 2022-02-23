@@ -48,14 +48,20 @@ export const FONT_SIZES = [
 ];
 
 export const FONT_FAMILIES = [
-  { name: 'fontFamily.default', value: FONT_FAMILY },
-  { name: 'fontFamily.microsoftYaHei', value: 'Microsoft YaHei' },
-  { name: 'fontFamily.simSun', value: 'SimSun' },
-  { name: 'fontFamily.simHei', value: 'SimHei' },
-  { name: 'fontFamily.helveticaNeue', value: '"Helvetica Neue"' },
-  { name: 'fontFamily.helvetica', value: 'Helvetica' },
-  { name: 'fontFamily.arial', value: 'Arial' },
-  { name: 'fontFamily.sansSerif', value: 'sans-serif' },
+  { name: 'viz.palette.style.fontFamily.default', value: FONT_FAMILY },
+  {
+    name: 'viz.palette.style.fontFamily.microsoftYaHei',
+    value: 'Microsoft YaHei',
+  },
+  { name: 'viz.palette.style.fontFamily.simSun', value: 'SimSun' },
+  { name: 'viz.palette.style.fontFamily.simHei', value: 'SimHei' },
+  {
+    name: 'viz.palette.style.fontFamily.helveticaNeue',
+    value: 'Helvetica Neue',
+  },
+  { name: 'viz.palette.style.fontFamily.helvetica', value: 'Helvetica' },
+  { name: 'viz.palette.style.fontFamily.arial', value: 'Arial' },
+  { name: 'viz.palette.style.fontFamily.sansSerif', value: 'sans-serif' },
 ];
 
 export const FONT_WEIGHT = [
@@ -75,15 +81,15 @@ export const FONT_WEIGHT = [
 ];
 
 export const FONT_STYLE = [
-  { name: 'fontStyle.normal', value: 'normal' },
-  { name: 'fontStyle.italic', value: 'italic' },
-  { name: 'fontStyle.oblique', value: 'oblique' },
+  { name: 'viz.palette.style.fontStyle.normal', value: 'normal' },
+  { name: 'viz.palette.style.fontStyle.italic', value: 'italic' },
+  { name: 'viz.palette.style.fontStyle.oblique', value: 'oblique' },
 ];
 
 export const CHART_LINE_STYLES = [
-  { name: 'lineStyles.solid', value: 'solid' },
-  { name: 'lineStyles.dashed', value: 'dashed' },
-  { name: 'lineStyles.dotted', value: 'dotted' },
+  { name: 'viz.palette.style.lineStyles.solid', value: 'solid' },
+  { name: 'viz.palette.style.lineStyles.dashed', value: 'dashed' },
+  { name: 'viz.palette.style.lineStyles.dotted', value: 'dotted' },
 ];
 
 export const CHART_NAME_LOCATION = [

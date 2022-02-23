@@ -43,7 +43,7 @@ const BasicFontFamilySelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         >
           {FONT_FAMILIES.map(o => (
             <Select.Option key={o.value} value={o.value}>
-              {t(o.name)}
+              {t(o.name, true)}
             </Select.Option>
           ))}
         </Select>
