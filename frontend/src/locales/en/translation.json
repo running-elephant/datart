@@ -952,9 +952,11 @@
       "name": "Name",
       "description": "Description",
       "boardType": {
-        "label": "Board type",
+        "label": "Layout",
         "auto": "Auto",
-        "free": "Free"
+        "free": "Free",
+        "tips": "Auto : create responsive dashboard  Free : create ensure size dashboard",
+        "requiredMessage": "Select a Layout Type"
       },
       "parent": "Parent",
       "root": "Root",
