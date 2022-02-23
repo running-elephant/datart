@@ -221,6 +221,12 @@ const config: ChartConfig = {
           default: '#ddd',
           comType: 'fontColor',
         },
+        {
+          label: 'axis.axisRoundCap',
+          key: 'axisRoundCap',
+          default: true,
+          comType: 'checkbox',
+        },
       ],
     },
     {
@@ -405,6 +411,7 @@ const config: ChartConfig = {
           title: '轴',
           axisLineSize: '粗细',
           axisLineColor: '颜色',
+          axisRoundCap: '两端显示圆形',
         },
         axisTick: {
           title: '刻度',
@@ -466,6 +473,7 @@ const config: ChartConfig = {
           title: 'Axis',
           axisLineSize: 'Axis Line Size',
           axisLineColor: 'Axis Line Color',
+          axisRoundCap: 'Axis Round Cap',
         },
         axisTick: {
           title: 'Axis Tick',
