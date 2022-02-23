@@ -44,16 +44,14 @@ const DataModelNode: FC<{ node: Column }> = memo(({ node }) => {
           <NumberOutlined style={{ alignSelf: 'center', color: SUCCESS }} />
         );
         break;
-      case ColumnTypes.Date:
+      case ColumnTypes.String:
         icon = (
-          <CalendarOutlined style={{ alignSelf: 'center', color: INFO }} />
+          <FieldStringOutlined style={{ alignSelf: 'center', color: INFO }} />
         );
         break;
       default:
         icon = (
-          <FieldStringOutlined
-            style={{ alignSelf: 'center', color: WARNING }}
-          />
+          <CalendarOutlined style={{ alignSelf: 'center', color: WARNING }} />
         );
         break;
     }

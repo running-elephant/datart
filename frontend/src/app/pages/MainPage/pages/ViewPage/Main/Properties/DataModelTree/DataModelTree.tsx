@@ -18,14 +18,17 @@
 
 import { FC, memo, useEffect, useMemo, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { useViewSlice } from '../../../slice';
 import { selectCurrentEditingView } from '../../../slice/selectors';
 import { Column, Model } from '../../../slice/types';
 import Container from '../Container';
 import DataModelNode from './DataModelNode';
 
 const DataModelTree: FC = memo(() => {
+  const { actions } = useViewSlice();
+  const dispatch = useDispatch();
   const currentEditingView = useSelector(selectCurrentEditingView);
   const [model, setModel] = useState<Model | undefined>(
     currentEditingView?.model,
@@ -35,13 +38,42 @@ const DataModelTree: FC = memo(() => {
     setModel(currentEditingView?.model);
   }, [currentEditingView?.model]);
 
+  // const handleColumnTypeChange =
+  //   (columnName: string, column: Omit<Column, 'name'>) =>
+  //   ({ key }) => {
+  //     let value;
+  //     if (key.includes('category')) {
+  //       const category = key.split('-')[1];
+  //       value = { ...column, category };
+  //     } else {
+  //       value = { ...column, type: key };
+  //     }
+  //     dispatch(
+  //       actions.changeCurrentEditingView({
+  //         model: { ...model, [columnName]: value },
+  //       }),
+  //     );
+  //   };
+
+  const handleDataModelChange = model => {
+    setModel(model);
+    dispatch(
+      actions.changeCurrentEditingView({
+        model: model,
+      }),
+    );
+  };
+
   const handleDragEnd = result => {
     if (!result.destination) {
       return;
     }
-    setModel(
-      reorder(tableColumns, result.source.index, result.destination.index),
+    const newModel = reorder(
+      tableColumns,
+      result.source.index,
+      result.destination.index,
     );
+    handleDataModelChange(newModel);
   };
 
   const reorder = (columns, startIndex, endIndex) => {
@@ -84,5 +116,6 @@ const DataModelTree: FC = memo(() => {
 export default DataModelTree;
 
 const StyledDroppableContainer = styled.div<{ isDraggingOver }>`
+  user-select: 'none';
   background: ${p => (p.isDraggingOver ? 'lightblue' : 'transparent')};
 `;
