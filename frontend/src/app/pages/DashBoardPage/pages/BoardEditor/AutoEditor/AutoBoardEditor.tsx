@@ -62,18 +62,16 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 
 export const AutoBoardEditor: React.FC<{}> = () => {
   const { renderedWidgetById } = useContext(BoardContext);
-  const { config } = useContext(BoardConfigContext);
-  const { deviceType } = useContext(BoardInfoContext);
-
   const {
     margin,
     containerPadding,
     background,
     mobileMargin,
     mobileContainerPadding,
-    allowOverlap,
-  } = config;
-  console.log('_ edit allowOverlap ', allowOverlap);
+  } = useContext(BoardConfigContext);
+  const { deviceType } = useContext(BoardInfoContext);
+
+  // console.log('_ edit allowOverlap ', allowOverlap);
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
   const layoutWidgetInfoMap = useSelector(selectLayoutWidgetInfoMap);
 
@@ -203,7 +201,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
   }, [calcItemTop, renderedWidgetById]);
 
   useEffect(() => {
-    if (layoutWidgets.length && gridWrapRef.current) {
+    if (sortedLayoutWidgets.length && gridWrapRef.current) {
       lazyLoad();
       gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
       gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
@@ -297,7 +295,7 @@ export const AutoBoardEditor: React.FC<{}> = () => {
             {boardChildren}
           </ResponsiveGridLayout>
         </div>
-        {layoutWidgets.length ? null : (
+        {sortedLayoutWidgets.length ? null : (
           <div className="empty">
             <Empty description="" />
           </div>

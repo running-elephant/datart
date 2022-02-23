@@ -63,16 +63,16 @@ export interface AutoBoardCoreProps {
 export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
   ({ boardId }) => {
     const { renderedWidgetById } = useContext(BoardContext);
-    const { config } = useContext(BoardConfigContext);
     const {
       margin,
       containerPadding,
       background,
       mobileMargin,
       mobileContainerPadding,
-      allowOverlap,
-    } = config;
-    console.log('_ core allowOverlap ', allowOverlap);
+      // allowOverlap,
+    } = useContext(BoardConfigContext);
+
+    // console.log('_ core allowOverlap ', allowOverlap);
     const visible = useVisibleHidden();
     const selectLayoutWidgetsConfigById = useMemo(
       selectLayoutWidgetMapById,
@@ -270,7 +270,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
                   onBreakpointChange={onBreakpointChange}
                   isDraggable={false}
                   isResizable={false}
-                  allowOverlap={allowOverlap}
+                  // allowOverlap={allowOverlap}
                   measureBeforeMount={false}
                   useCSSTransforms={true}
                 >

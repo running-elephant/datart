@@ -30,9 +30,9 @@ import { selectLayoutWidgetMap } from '../slice/selectors';
 import { WidgetOfFreeEdit } from './FreeBoardEditor';
 
 export const FreeEditorWrapper: React.FC<{}> = () => {
-  const { config } = useContext(BoardConfigContext);
+  const boardConfig = useContext(BoardConfigContext);
   const { editing, autoFit } = useContext(BoardContext);
-  const { width: boardWidth, height: boardHeight, scaleMode } = config;
+  const { width: boardWidth, height: boardHeight, scaleMode } = boardConfig;
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
   const sortedLayoutWidgets = Object.values(layoutWidgetMap).sort(
     (a, b) => a.config.index - b.config.index,

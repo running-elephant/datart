@@ -25,9 +25,7 @@ import React, { useContext } from 'react';
 
 export const AllowOverlapBtn = () => {
   const { boardToggleAllowOverlap } = useContext(BoardActionContext);
-  const {
-    config: { allowOverlap },
-  } = useContext(BoardConfigContext);
+  const { allowOverlap } = useContext(BoardConfigContext);
   const t = useI18NPrefix(`viz.board.action`);
 
   const onClick = () => {

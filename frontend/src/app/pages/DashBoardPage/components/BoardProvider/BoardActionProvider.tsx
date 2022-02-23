@@ -57,9 +57,9 @@ export const BoardActionProvider: FC<{ id: string }> = ({
 }) => {
   const dispatch = useDispatch();
   const { editing, renderMode } = useContext(BoardContext);
-  const { config: boardConfig } = useContext(BoardConfigContext);
+  const { hasQueryControl } = useContext(BoardConfigContext);
   const saveAsViz = useSaveAsViz();
-  const { hasQueryControl } = boardConfig;
+
   const actions: BoardActionContextProps = {
     widgetUpdate: (widget: Widget) => {
       if (editing) {

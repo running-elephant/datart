@@ -17,9 +17,7 @@
  */
 import { createContext } from 'react';
 import { DashboardConfig } from '../pages/Board/slice/types';
-export interface BoardConfigContextProps {
-  config: DashboardConfig;
-}
-export const BoardConfigContext = createContext<BoardConfigContextProps>(
-  {} as BoardConfigContextProps,
+
+export const BoardConfigContext = createContext<DashboardConfig>(
+  {} as DashboardConfig,
 );

@@ -17,20 +17,13 @@
  */
 
 import React, { FC, memo } from 'react';
-import {
-  BoardConfigContext,
-  BoardConfigContextProps,
-} from '../../contexts/BoardConfigContext';
+import { BoardConfigContext } from '../../contexts/BoardConfigContext';
 import { DashboardConfig } from '../../pages/Board/slice/types';
 
 export const BoardConfigProvider: FC<{ config: DashboardConfig }> = memo(
   ({ config, children }) => {
-    const boardConfigValue: BoardConfigContextProps = {
-      config: config,
-    };
-
     return (
-      <BoardConfigContext.Provider value={boardConfigValue}>
+      <BoardConfigContext.Provider value={config}>
         {children}
       </BoardConfigContext.Provider>
     );
