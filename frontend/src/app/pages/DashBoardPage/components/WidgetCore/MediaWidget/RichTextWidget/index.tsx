@@ -17,18 +17,21 @@
  */
 
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import {
   MediaWidgetContent,
   Widget,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
+import { editBoardStackActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
+import produce from 'immer';
 import { DeltaStatic } from 'quill';
 import { ImageDrop } from 'quill-image-drop-module'; // 拖动加载图片组件。
 import QuillMarkdown from 'quilljs-markdown';
 import 'quilljs-markdown/dist/quilljs-markdown-common-style.css';
 import React, {
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -39,11 +42,11 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import { editBoardStackActions } from '../../../../pages/BoardEditor/slice';
 import { MarkdownOptions } from './configs/MarkdownOptions';
 import TagBlot from './configs/TagBlot';
 import { Formats } from './Formats';
-
+import { useQuillBar } from './useQuillBar';
+// import produce from 'immer';
 Quill.register('modules/imageDrop', ImageDrop);
 Quill.register('formats/tag', TagBlot);
 
@@ -57,6 +60,7 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
 }) => {
   const t = useI18NPrefix();
   const dispatch = useDispatch();
+  const { editing: boardEditing } = useContext(BoardContext);
   const initContent = useMemo(() => {
     return (widgetConfig.config.content as MediaWidgetContent).richTextConfig
       ?.content;
@@ -72,26 +76,31 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   }, [initContent]);
 
   useEffect(() => {
-    if (widgetInfo.editing === false) {
+    if (widgetInfo.editing === false && boardEditing) {
       if (quillRef.current) {
         let contents = quillRef.current?.getEditor().getContents();
         const strContents = JSON.stringify(contents);
         if (strContents !== JSON.stringify(initContent)) {
+          const nextMediaWidgetContent = produce(
+            widgetConfig.config.content,
+            draft => {
+              (draft as MediaWidgetContent).richTextConfig = {
+                content: JSON.parse(strContents),
+              };
+            },
+          ) as MediaWidgetContent;
+
           dispatch(
             editBoardStackActions.changeMediaWidgetConfig({
               id: widgetConfig.id,
-              mediaWidgetConfig: {
-                ...(widgetConfig.config.content as MediaWidgetContent),
-                richTextConfig: {
-                  content: JSON.parse(strContents),
-                },
-              },
+              mediaWidgetContent: nextMediaWidgetContent,
             }),
           );
         }
       }
     }
   }, [
+    boardEditing,
     dispatch,
     initContent,
     widgetConfig.config.content,
@@ -129,87 +138,7 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
       setQuillValue(contents);
     }
   }, []);
-
-  const toolbar = useMemo(
-    () => (
-      <div id={containerId}>
-        <span className="ql-formats">
-          <select
-            className="ql-font"
-            key="ql-font"
-            defaultValue={FONT_FAMILIES[0].value}
-            style={{
-              whiteSpace: 'nowrap',
-              width: '130px',
-            }}
-          >
-            {FONT_FAMILIES.map(font => (
-              <option value={font.value} key={font.name}>
-                {t?.(font.name)}
-              </option>
-            ))}
-          </select>
-          <select className="ql-size" key="ql-size" defaultValue="13px">
-            {FONT_SIZES.map(size => (
-              <option value={`${size}px`} key={size}>{`${size}px`}</option>
-            ))}
-          </select>
-          <button className="ql-bold" key="ql-bold" title="加粗" />
-          <button className="ql-italic" key="ql-italic" title="斜体" />
-          <button className="ql-underline" key="ql-underline" title="下划线" />
-          <button className="ql-strike" key="ql-strike" title="删除线" />
-        </span>
-
-        <span className="ql-formats">
-          <select className="ql-color" key="ql-color" />
-          <select className="ql-background" key="ql-background" />
-        </span>
-
-        <span className="ql-formats">
-          <select className="ql-align" key="ql-align" />
-          <button
-            className="ql-indent"
-            value="-1"
-            key="ql-indent"
-            title="减少缩进"
-          />
-          <button
-            className="ql-indent"
-            value="+1"
-            key="ql-indent-up"
-            title="增加缩进"
-          />
-        </span>
-
-        <span className="ql-formats">
-          <button
-            className="ql-list"
-            value="ordered"
-            key="ql-ordered"
-            title="有序列表"
-          />
-          <button
-            className="ql-list"
-            value="bullet"
-            key="ql-list"
-            title="无序列表"
-          />
-          <button className="ql-blockquote" key="ql-blockquote" title="引用" />
-          <button className="ql-code-block" key="ql-code-block" title="代码" />
-        </span>
-
-        <span className="ql-formats">
-          <button className="ql-link" key="ql-link" title="超链接" />
-          <button className="ql-image" key="ql-image" title="图片" />
-        </span>
-
-        <span className="ql-formats">
-          <button className="ql-clean" key="ql-clean" title="清除样式" />
-        </span>
-      </div>
-    ),
-    [containerId, t],
-  );
+  const toolbar = useQuillBar(containerId, t);
 
   return (
     <TextWrap onClick={ssp} editing={widgetInfo.editing}>
