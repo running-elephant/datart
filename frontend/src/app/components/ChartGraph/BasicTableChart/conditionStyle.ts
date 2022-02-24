@@ -136,7 +136,11 @@ export const getCustomBodyRowStyle = (
         color: { background, textColor },
         target: { name },
       }) => {
-        rowStyle = isMatchedTheCondition(rowRecord[name], operator, value)
+        rowStyle = isMatchedTheCondition(
+          rowRecord[name.toUpperCase()],
+          operator,
+          value,
+        )
           ? { backgroundColor: background, color: textColor }
           : rowStyle;
       },
