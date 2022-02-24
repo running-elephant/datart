@@ -255,9 +255,9 @@ const widgetInfoRecordSlice = createSlice({
   extraReducers: builder => {
     builder.addCase(getEditChartWidgetDataAsync.pending, (state, action) => {
       const { widgetId } = action.meta.arg;
-      try {
+      if (state[widgetId]) {
         state[widgetId].loading = true;
-      } catch (error) {}
+      }
     });
     builder.addCase(getEditChartWidgetDataAsync.fulfilled, (state, action) => {
       const { widgetId } = action.meta.arg;
