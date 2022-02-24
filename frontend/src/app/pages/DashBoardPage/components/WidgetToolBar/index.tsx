@@ -98,9 +98,9 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
     <StyleWrap onClick={ssp} className="widget-tool-bar">
       <Space size={0}>
         {renderErrorInfo(errInfo)}
-        {renderLocking()}
         {renderWaiting()}
         {renderLoading()}
+        {renderLocking()}
         {renderLinkage()}
         {renderWidgetAction()}
       </Space>
