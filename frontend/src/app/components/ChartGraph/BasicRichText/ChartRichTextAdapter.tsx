@@ -18,7 +18,8 @@
 
 import { SelectOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Modal, Row } from 'antd';
-import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
+import ChromeColorPicker from 'app/components/ColorPicker/ChromeColorPicker';
+import { FONT_COLORS, FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { DeltaStatic } from 'quill';
 import { ImageDrop } from 'quill-image-drop-module'; // 拖动加载图片组件。
@@ -56,6 +57,12 @@ Quill.register(font, true);
 
 const MenuItem = Menu.Item;
 
+const CUSTOM_COLOR = 'custom-color';
+const CUSTOM_COLOR_INIT = {
+  background: 'transparent',
+  color: '#000',
+};
+
 const ChartRichTextAdapter: FC<{
   dataList: any[];
   id: string;
@@ -84,6 +91,16 @@ const ChartRichTextAdapter: FC<{
     const quillRef = useRef<ReactQuill>(null);
     const quillEditRef = useRef<ReactQuill>(null);
 
+    const [customColorVisible, setCustomColorVisible] =
+      useState<boolean>(false);
+    const [customColor, setCustomColor] = useState<{
+      background: string;
+      color: string;
+    }>({ ...CUSTOM_COLOR_INIT });
+    const [customColorType, setCustomColorType] = useState<
+      'color' | 'background'
+    >('color');
+
     useEffect(() => {
       const value = (initContent && JSON.parse(initContent)) || '';
       setQuillValue(value);
@@ -96,7 +113,22 @@ const ChartRichTextAdapter: FC<{
         const modules = {
           toolbar: {
             container: isEditing ? `#${newId}` : null,
-            handlers: {},
+            handlers: {
+              color: function (value) {
+                if (value === CUSTOM_COLOR) {
+                  setCustomColorType('color');
+                  setCustomColorVisible(true);
+                }
+                quillEditRef.current!.getEditor().format('color', value);
+              },
+              background: function (value) {
+                if (value === CUSTOM_COLOR) {
+                  setCustomColorType('background');
+                  setCustomColorVisible(true);
+                }
+                quillEditRef.current!.getEditor().format('background', value);
+              },
+            },
           },
 
           calcfield: {},
@@ -148,6 +180,43 @@ const ChartRichTextAdapter: FC<{
 
     useLayoutEffect(() => {
       if (quillEditRef.current) {
+        quillEditRef.current
+          .getEditor()
+          .on('selection-change', (r: { index: number; length: number }) => {
+            if (!r?.index) return;
+            try {
+              const index = r.length === 0 ? r.index - 1 : r.index;
+              const length = r.length === 0 ? 1 : r.length;
+              const delta = quillEditRef
+                .current!.getEditor()
+                .getContents(index, length);
+
+              if (delta.ops?.length === 1 && delta.ops[0]?.attributes) {
+                const { background, color } = delta.ops[0].attributes;
+                setCustomColor({
+                  background: background || CUSTOM_COLOR_INIT.background,
+                  color: color || CUSTOM_COLOR_INIT.color,
+                });
+
+                const colorNode = document.querySelector(
+                  '.ql-color .ql-color-label',
+                );
+                const backgroundNode = document.querySelector(
+                  '.ql-background .ql-color-label',
+                );
+                if (color && !colorNode?.getAttribute('style')) {
+                  colorNode!.setAttribute('style', `stroke: ${color}`);
+                }
+                if (background && !backgroundNode?.getAttribute('style')) {
+                  backgroundNode!.setAttribute('style', `fill: ${background}`);
+                }
+              } else {
+                setCustomColor({ ...CUSTOM_COLOR_INIT });
+              }
+            } catch (error) {
+              console.error('selection-change callback | error', error);
+            }
+          });
         if (openQuillMarkdown) {
           quillMarkdownConfigRef.current = new QuillMarkdown(
             quillEditRef.current.getEditor(),
@@ -160,6 +229,13 @@ const ChartRichTextAdapter: FC<{
         }
       }
     }, [openQuillMarkdown, quillModules]);
+
+    const customColorChange = color => {
+      if (color) {
+        quillEditRef.current!.getEditor().format(customColorType, color);
+      }
+      setCustomColorVisible(false);
+    };
 
     const reactQuillView = useMemo(
       () =>
@@ -255,8 +331,18 @@ const ChartRichTextAdapter: FC<{
           </span>
 
           <span className="ql-formats">
-            <select className="ql-color" key="ql-color" />
-            <select className="ql-background" key="ql-background" />
+            <select className="ql-color" key="ql-color">
+              {FONT_COLORS.map(color => (
+                <option value={color} key={color} />
+              ))}
+              <option value={CUSTOM_COLOR} key={CUSTOM_COLOR} />
+            </select>
+            <select className="ql-background" key="ql-background">
+              {FONT_COLORS.map(color => (
+                <option value={color} key={color} />
+              ))}
+              <option value={CUSTOM_COLOR} key={CUSTOM_COLOR} />
+            </select>
           </span>
 
           <span className="ql-formats">
@@ -376,6 +462,22 @@ const ChartRichTextAdapter: FC<{
         >
           {isEditing && reactQuillView}
         </Modal>
+        <Modal
+          title="更多配色"
+          width={273}
+          mask={false}
+          visible={customColorVisible}
+          footer={null}
+          closable={false}
+          onCancel={() => setCustomColorVisible(false)}
+        >
+          <ChromeColorPicker
+            // @TM 该组件无法更新color 暂时用key解决
+            key={customColor?.[customColorType]}
+            color={customColor?.[customColorType]}
+            onChange={customColorChange}
+          />
+        </Modal>
       </TextWrap>
     );
   },
@@ -394,6 +496,22 @@ const QuillBox = styled.div`
   .react-quill-view {
     flex: 1;
     overflow-y: auto;
+  }
+  // @TM 自定义色块
+  .ql-picker-options [data-value=${CUSTOM_COLOR}] {
+    position: relative;
+    width: calc(100% - 4px);
+    background-color: transparent !important;
+    color: #343a40;
+    font-weight: 400;
+    font-size: 12px;
+    &::after {
+      content: '更多';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
   }
 `;
 const TextWrap = styled.div`
