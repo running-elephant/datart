@@ -16,10 +16,18 @@
  * limitations under the License.
  */
 
+import { SelectOutlined } from '@ant-design/icons';
+import { Dropdown } from 'antd';
+import { defaultPalette, defaultThemes } from 'app/assets/theme/colorsConfig';
 import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
 import { useMemo } from 'react';
-
-export const useQuillBar = (containerId: string | undefined, t) => {
+// todo (tianlei) Need to nationalize
+export const useQuillBar = (
+  containerId: string | undefined,
+  t,
+  CUSTOM_COLOR: string,
+  fieldItems?: any,
+) => {
   const toolbar = useMemo(
     () => (
       <div id={containerId}>
@@ -51,8 +59,18 @@ export const useQuillBar = (containerId: string | undefined, t) => {
         </span>
 
         <span className="ql-formats">
-          <select className="ql-color" key="ql-color" />
-          <select className="ql-background" key="ql-background" />
+          <select className="ql-color" key="ql-color">
+            {defaultThemes.concat(defaultPalette).map(color => (
+              <option value={color} key={color} />
+            ))}
+            <option value={CUSTOM_COLOR} key={CUSTOM_COLOR} />
+          </select>
+          <select className="ql-background" key="ql-background">
+            {defaultThemes.concat(defaultPalette).map(color => (
+              <option value={color} key={color} />
+            ))}
+            <option value={CUSTOM_COLOR} key={CUSTOM_COLOR} />
+          </select>
         </span>
 
         <span className="ql-formats">
@@ -91,6 +109,17 @@ export const useQuillBar = (containerId: string | undefined, t) => {
         <span className="ql-formats">
           <button className="ql-link" key="ql-link" title="超链接" />
           <button className="ql-image" key="ql-image" title="图片" />
+          {fieldItems && (
+            <Dropdown
+              overlay={fieldItems}
+              trigger={['click']}
+              key="ql-selectLink"
+            >
+              <a className="selectLink" title="引用字段">
+                <SelectOutlined />
+              </a>
+            </Dropdown>
+          )}
         </span>
 
         <span className="ql-formats">
@@ -98,7 +127,7 @@ export const useQuillBar = (containerId: string | undefined, t) => {
         </span>
       </div>
     ),
-    [containerId, t],
+    [containerId, t, CUSTOM_COLOR, fieldItems],
   );
   return toolbar;
 };
