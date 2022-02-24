@@ -41,12 +41,14 @@ import datart.server.service.OrgSettingService;
 import datart.server.service.common.PoiConvertUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -105,7 +107,8 @@ public class DownloadServiceImpl extends BaseService implements DownloadService 
                 securityManager.runAs(downloadUser);
 
                 String fileName = downloadParams.getFileName();
-                String path = FileUtils.concatPath(FileOwner.DOWNLOAD.getPath(), StringUtils.isEmpty(fileName) ? "download" : fileName + "-" + System.currentTimeMillis() + XLSX);
+                String fileSuffix = DateFormatUtils.format(Calendar.getInstance(), Const.FILE_SUFFIX_DATE_FORMAT);
+                String path = FileUtils.concatPath(FileOwner.DOWNLOAD.getPath(), StringUtils.isEmpty(fileName) ? "download" : fileName + "_" + fileSuffix + XLSX);
                 try {
                     Workbook workbook = POIUtils.createEmpty();
                     for (int i = 0; i < downloadParams.getDownloadParams().size(); i++) {
