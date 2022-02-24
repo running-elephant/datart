@@ -124,42 +124,6 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     containerPadding,
   ]);
 
-  // const [layoutMap, setLayoutMap] = useState<Layouts>({});
-  // try {
-  //   console.log('129 layoutMap', layoutMap.lg[0].x, layoutMap.lg[0].y);
-  //   console.log('130 layoutMap', layoutMap.lg[1].x, layoutMap.lg[1].y);
-  // } catch (error) {}
-
-  // useEffect(() => {
-  //   const layoutMap: Layouts = {
-  //     lg: [],
-  //     xs: [],
-  //   };
-  //   // console.log('_ layoutWidgetMap 139', layoutWidgetMap);
-  //   Object.values(layoutWidgetMap).forEach(widget => {
-  //     const lg = widget.config.rect || widget.config.mobileRect || {};
-  //     const xs = widget.config.mobileRect || widget.config.rect || {};
-  //     const lock = widget.config.lock;
-  //     layoutMap.lg.push({
-  //       i: widget.id,
-  //       x: lg.x,
-  //       y: lg.y,
-  //       w: lg.width,
-  //       h: lg.height,
-  //       static: lock,
-  //     });
-  //     layoutMap.xs.push({
-  //       i: widget.id,
-  //       x: xs.x,
-  //       y: xs.y,
-  //       w: xs.width,
-  //       h: xs.height,
-  //       static: lock,
-  //     });
-  //   });
-  //   setLayoutMap(layoutMap);
-  // }, [layoutWidgetMap]);
-
   const layoutMap = useMemo(() => {
     const layoutMap: Layouts = {
       lg: [],
