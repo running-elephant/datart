@@ -22,6 +22,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import React, { useContext } from 'react';
+import { PRIMARY } from 'styles/StyleConstants';
 
 export const AllowOverlapBtn = () => {
   const { boardToggleAllowOverlap } = useContext(BoardActionContext);
@@ -31,9 +32,16 @@ export const AllowOverlapBtn = () => {
   const onClick = () => {
     boardToggleAllowOverlap(!allowOverlap);
   };
+  const renderTitle = () => {
+    return allowOverlap ? t('forbidOverlap') : t('allowOverlap');
+  };
   return (
-    <Tooltip title={t('allowOverlap')}>
-      <ToolbarButton onClick={onClick} icon={<BlockOutlined />} />
+    <Tooltip title={renderTitle()}>
+      <ToolbarButton
+        color={allowOverlap ? PRIMARY : ''}
+        onClick={onClick}
+        icon={<BlockOutlined />}
+      />
     </Tooltip>
   );
 };
