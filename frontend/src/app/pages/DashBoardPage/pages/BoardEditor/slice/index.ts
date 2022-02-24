@@ -298,6 +298,7 @@ export const { actions: editWidgetDataActions } = editWidgetDataSlice;
 const filterActions = [
   editBoardStackActions.setBoardToEditStack,
   editBoardStackActions.updateBoard,
+  editBoardStackActions.toggleAllowOverlap,
   editBoardStackActions.updateBoardConfig,
   editBoardStackActions.addWidgets,
   editBoardStackActions.deleteWidgets,

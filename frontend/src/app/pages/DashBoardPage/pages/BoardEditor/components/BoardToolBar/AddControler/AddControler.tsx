@@ -41,8 +41,8 @@ export const AddController: React.FC<AddControlBtnProps> = () => {
   const tWt = useI18NPrefix(`viz.widget.type`);
   const { boardId, boardType } = useContext(BoardToolBarContext);
   const dispatch = useDispatch();
-  const { config: boardConfig } = useContext(BoardConfigContext);
-  const { hasQueryControl, hasResetControl } = boardConfig;
+  const { hasQueryControl, hasResetControl } = useContext(BoardConfigContext);
+
   const onAddController = (info: { key: any }) => {
     dispatch(
       addControllerAction({

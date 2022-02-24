@@ -27,7 +27,10 @@ export interface IProps {
 }
 const SlideBackground: React.FC<IProps> = props => {
   const {
-    config: { width: slideWidth, height: slideHeight, scaleMode, background },
+    width: slideWidth,
+    height: slideHeight,
+    scaleMode,
+    background,
   } = useContext(BoardConfigContext);
   const { editing } = useContext(BoardContext);
   const { scale, slideTranslate } = props;

@@ -61,6 +61,9 @@ export const editBoardStackSlice = createSlice({
     updateBoard(state, action: PayloadAction<Dashboard>) {
       state.dashBoard = action.payload;
     },
+    toggleAllowOverlap(state, action: PayloadAction<boolean>) {
+      state.dashBoard.config.allowOverlap = action.payload;
+    },
     updateBoardConfig(state, action: PayloadAction<DashboardConfig>) {
       state.dashBoard.config = action.payload;
     },

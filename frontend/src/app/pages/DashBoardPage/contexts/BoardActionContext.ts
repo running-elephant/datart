@@ -27,6 +27,7 @@ export interface BoardActionContextProps {
   onWidgetsQuery: () => any;
   onWidgetsReset: () => any;
   onSaveAsVizs: () => any;
+  boardToggleAllowOverlap: (allow: boolean) => void;
 }
 export const BoardActionContext = createContext<BoardActionContextProps>(
   {} as BoardActionContextProps,

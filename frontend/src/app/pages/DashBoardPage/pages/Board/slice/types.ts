@@ -93,6 +93,7 @@ export interface DashboardConfig {
   type: BoardType; //'auto','free'
 
   // auto
+  allowOverlap: boolean;
   margin: [number, number];
   containerPadding: [number, number];
   mobileMargin: [number, number];

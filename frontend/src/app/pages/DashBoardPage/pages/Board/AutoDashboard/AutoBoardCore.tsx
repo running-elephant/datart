@@ -57,22 +57,22 @@ import { WidgetOfAuto } from './WidgetOfAuto';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const mobilePoints = Object.keys(BREAK_POINT_MAP).slice(3);
-export interface AutoBoardCoreProps {
-  boardId: string;
-}
-export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
+
+export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
+    const visible = useVisibleHidden();
     const { renderedWidgetById } = useContext(BoardContext);
-    const { config } = useContext(BoardConfigContext);
     const {
       margin,
       containerPadding,
       background,
       mobileMargin,
       mobileContainerPadding,
-    } = config;
+      allowOverlap,
+    } = useContext(BoardConfigContext);
 
-    const visible = useVisibleHidden();
+    // console.log('_ core allowOverlap ', allowOverlap);
+
     const selectLayoutWidgetsConfigById = useMemo(
       selectLayoutWidgetMapById,
       [],
@@ -85,15 +85,18 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
       selectLayoutWidgetInfoMapById(state, boardId),
     );
 
-    const layoutWidgets = useMemo(() => {
-      return Object.values(layoutWidgetMap);
-    }, [layoutWidgetMap]);
+    const sortedLayoutWidgets = useMemo(
+      () =>
+        Object.values(layoutWidgetMap).sort(
+          (a, b) => a.config.index - b.config.index,
+        ),
+
+      [layoutWidgetMap],
+    );
 
     const [deviceType, setDeviceType] = useState<DeviceType>(
       DeviceType.Desktop,
     );
-
-    const [layoutMap, setLayoutMap] = useState<Layouts>({});
 
     let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
 
@@ -132,13 +135,13 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
       margin,
       containerPadding,
     ]);
-
+    const [layoutMap, setLayoutMap] = useState<Layouts>({});
     useEffect(() => {
       const layoutMap: Layouts = {
         lg: [],
         xs: [],
       };
-      layoutWidgets.forEach(widget => {
+      Object.values(layoutWidgetMap).forEach(widget => {
         const lg = widget.config.rect || widget.config.mobileRect || {};
         const xs = widget.config.mobileRect || widget.config.rect || {};
         const lock = widget.config.lock;
@@ -160,7 +163,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
         });
       });
       setLayoutMap(layoutMap);
-    }, [layoutWidgets]);
+    }, [layoutWidgetMap]);
 
     useEffect(() => {
       const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
@@ -213,7 +216,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
     }, [calcItemTop, renderedWidgetById]);
 
     useEffect(() => {
-      if (layoutWidgets.length && gridWrapRef.current) {
+      if (sortedLayoutWidgets.length && gridWrapRef.current) {
         lazyLoad();
         gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
         gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
@@ -225,14 +228,14 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
         gridWrapRef?.current?.removeEventListener('scroll', lazyLoad, false);
         window.removeEventListener('resize', lazyLoad, false);
       };
-    }, [layoutWidgets.length, lazyLoad]);
+    }, [sortedLayoutWidgets.length, lazyLoad]);
 
     const onLayoutChange = useCallback((layouts: Layout[], all) => {
       currentLayout.current = layouts;
     }, []);
 
     const boardChildren = useMemo(() => {
-      return layoutWidgets.map(item => {
+      return sortedLayoutWidgets.map(item => {
         return (
           <div className="block-item" key={item.id}>
             <WidgetAllProvider id={item.id}>
@@ -241,7 +244,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
           </div>
         );
       });
-    }, [layoutWidgets]);
+    }, [sortedLayoutWidgets]);
 
     return (
       <Wrap>
@@ -250,7 +253,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
           ref={ref}
           style={{ visibility: visible }}
         >
-          {layoutWidgets.length ? (
+          {sortedLayoutWidgets.length ? (
             <div className="grid-wrap" ref={gridWrapRef}>
               <div className="grid-wrap" ref={gridRef}>
                 <ResponsiveGridLayout
@@ -264,6 +267,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
                   onBreakpointChange={onBreakpointChange}
                   isDraggable={false}
                   isResizable={false}
+                  allowOverlap={allowOverlap}
                   measureBeforeMount={false}
                   useCSSTransforms={true}
                 >

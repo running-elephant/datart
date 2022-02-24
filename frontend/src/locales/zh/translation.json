@@ -788,7 +788,9 @@
         "delete": "删除",
         "copy": "复制",
         "paste": "粘贴",
-        "deviceSwitch": "设备切换"
+        "deviceSwitch": "设备切换",
+        "allowOverlap": "允许组件重叠",
+        "forbidOverlap": "禁止组件重叠"
       },
       "controlTypes": {
         "common": "常规",

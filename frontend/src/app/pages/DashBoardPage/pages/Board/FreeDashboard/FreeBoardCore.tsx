@@ -38,9 +38,13 @@ export interface FreeBoardCoreProps {
 }
 export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
   ({ boardId, showZoomCtrl }) => {
-    const { config } = useContext(BoardConfigContext);
+    const {
+      width: slideWidth,
+      height: slideHeight,
+      scaleMode,
+    } = useContext(BoardConfigContext);
     const { editing, autoFit } = useContext(BoardContext);
-    const { width: slideWidth, height: slideHeight, scaleMode } = config;
+
     const widgetConfigRecords = useSelector((state: { board: BoardState }) =>
       selectLayoutWidgetMapById()(state, boardId),
     );

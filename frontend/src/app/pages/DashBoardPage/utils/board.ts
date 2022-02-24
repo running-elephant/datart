@@ -147,6 +147,7 @@ export const getInitBoardConfig = (boardType?: BoardType) => {
     hasResetControl: false,
 
     // auto
+    allowOverlap: false,
     margin: [16, 16], //0-100
     containerPadding: [16, 16], //0-100
     cols: LAYOUT_COLS_MAP, //2-48    step 2
