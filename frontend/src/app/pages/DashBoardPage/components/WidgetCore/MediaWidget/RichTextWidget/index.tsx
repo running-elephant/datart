@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 
+import { Modal } from 'antd';
+import { useQuillBar } from 'app/components/ChartGraph/BasicRichText/useQuillBar';
+import ChromeColorPicker from 'app/components/ColorPicker/ChromeColorPicker';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import {
@@ -33,6 +36,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -45,10 +49,16 @@ import styled from 'styled-components/macro';
 import { MarkdownOptions } from './configs/MarkdownOptions';
 import TagBlot from './configs/TagBlot';
 import { Formats } from './Formats';
-import { useQuillBar } from './useQuillBar';
+
 // import produce from 'immer';
 Quill.register('modules/imageDrop', ImageDrop);
 Quill.register('formats/tag', TagBlot);
+
+const CUSTOM_COLOR = 'custom-color';
+const CUSTOM_COLOR_INIT = {
+  background: 'transparent',
+  color: '#000',
+};
 
 type RichTextWidgetProps = {
   widgetConfig: Widget;
@@ -70,6 +80,16 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   );
   const [containerId, setContainerId] = useState<string>();
   const [quillModules, setQuillModules] = useState<any>(null);
+
+  const [customColor, setCustomColor] = useState<{
+    background: string;
+    color: string;
+  }>({ ...CUSTOM_COLOR_INIT });
+  const [customColorType, setCustomColorType] = useState<
+    'color' | 'background'
+  >('color');
+
+  const [customColorVisible, setCustomColorVisible] = useState<boolean>(false);
 
   useEffect(() => {
     setQuillValue(initContent);
@@ -114,6 +134,22 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
     const modules = {
       toolbar: {
         container: `#${newId}`,
+        handlers: {
+          color: function (value) {
+            if (value === CUSTOM_COLOR) {
+              setCustomColorType('color');
+              setCustomColorVisible(true);
+            }
+            quillRef.current!.getEditor().format('color', value);
+          },
+          background: function (value) {
+            if (value === CUSTOM_COLOR) {
+              setCustomColorType('background');
+              setCustomColorVisible(true);
+            }
+            quillRef.current!.getEditor().format('background', value);
+          },
+        },
       },
       imageDrop: true,
     };
@@ -122,8 +158,45 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
 
   const quillRef = useRef<ReactQuill>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (quillRef.current) {
+      quillRef.current
+        .getEditor()
+        .on('selection-change', (r: { index: number; length: number }) => {
+          if (!r?.index) return;
+          try {
+            const index = r.length === 0 ? r.index - 1 : r.index;
+            const length = r.length === 0 ? 1 : r.length;
+            const delta = quillRef
+              .current!.getEditor()
+              .getContents(index, length);
+
+            if (delta.ops?.length === 1 && delta.ops[0]?.attributes) {
+              const { background, color } = delta.ops[0].attributes;
+              setCustomColor({
+                background: background || CUSTOM_COLOR_INIT.background,
+                color: color || CUSTOM_COLOR_INIT.color,
+              });
+
+              const colorNode = document.querySelector(
+                '.ql-color .ql-color-label',
+              );
+              const backgroundNode = document.querySelector(
+                '.ql-background .ql-color-label',
+              );
+              if (color && !colorNode?.getAttribute('style')) {
+                colorNode!.setAttribute('style', `stroke: ${color}`);
+              }
+              if (background && !backgroundNode?.getAttribute('style')) {
+                backgroundNode!.setAttribute('style', `fill: ${background}`);
+              }
+            } else {
+              setCustomColor({ ...CUSTOM_COLOR_INIT });
+            }
+          } catch (error) {
+            console.error('selection-change callback | error', error);
+          }
+        });
       new QuillMarkdown(quillRef.current.getEditor(), MarkdownOptions);
     }
   }, [quillModules]);
@@ -138,7 +211,14 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
       setQuillValue(contents);
     }
   }, []);
-  const toolbar = useQuillBar(containerId, t);
+  const toolbar = useQuillBar(containerId, t, CUSTOM_COLOR);
+
+  const customColorChange = color => {
+    if (color) {
+      quillRef.current!.getEditor().format(customColorType, color);
+    }
+    setCustomColorVisible(false);
+  };
 
   return (
     <TextWrap onClick={ssp} editing={widgetInfo.editing}>
@@ -170,6 +250,20 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
           readOnly={true}
         />
       </div>
+      <Modal
+        width={273}
+        mask={false}
+        visible={customColorVisible}
+        footer={null}
+        closable={false}
+        onCancel={() => setCustomColorVisible(false)}
+      >
+        <ChromeColorPicker
+          key={customColor?.[customColorType]}
+          color={customColor?.[customColorType]}
+          onChange={customColorChange}
+        />
+      </Modal>
     </TextWrap>
   );
 };
@@ -178,6 +272,7 @@ export default RichTextWidget;
 interface TextWrapProps {
   editing: boolean;
 }
+// todo (tianlei) Need to nationalize
 const TextWrap = styled.div<TextWrapProps>`
   position: relative;
   width: 100%;
@@ -202,5 +297,29 @@ const TextWrap = styled.div<TextWrapProps>`
   }
   & .ql-container.ql-snow {
     border: none;
+  }
+
+  .ql-picker-options [data-value=${CUSTOM_COLOR}] {
+    position: relative;
+    width: calc(100% - 4px);
+    background-color: transparent !important;
+    color: #343a40;
+    font-weight: 400;
+    font-size: 12px;
+    &::after {
+      content: '更多';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      color: #fff;
+      transform: translate(-50%, -50%);
+    }
+    &:hover {
+      border: none;
+    }
+  }
+  .ql-bubble .ql-color .ql-picker-options,
+  .ql-bubble .ql-background .ql-picker-options {
+    width: 232px;
   }
 `;
