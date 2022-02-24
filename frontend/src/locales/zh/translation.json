@@ -1046,7 +1046,8 @@
       "suffix": "重复"
     },
     "model": {
-      "type": "改变类型与分类",
+      "category": "分类",
+      "typeAndCategory": "类型与分类",
       "permission": "列权限",
       "newHierarchy": "新建层次结构",
       "addToHierarchy": "添加到层次结构"

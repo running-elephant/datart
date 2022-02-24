@@ -1047,6 +1047,7 @@
     },
     "model": {
       "type": "Type",
+      "typeAndCategory": "Type & Category",
       "permission": "Column Permissions",
       "newHierarchy": "New Hierarchy",
       "addToHierarchy": "Add To Hierarchy"

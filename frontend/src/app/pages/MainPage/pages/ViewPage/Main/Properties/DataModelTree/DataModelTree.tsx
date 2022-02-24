@@ -38,22 +38,22 @@ const DataModelTree: FC = memo(() => {
     setModel(currentEditingView?.model);
   }, [currentEditingView?.model]);
 
-  // const handleColumnTypeChange =
-  //   (columnName: string, column: Omit<Column, 'name'>) =>
-  //   ({ key }) => {
-  //     let value;
-  //     if (key.includes('category')) {
-  //       const category = key.split('-')[1];
-  //       value = { ...column, category };
-  //     } else {
-  //       value = { ...column, type: key };
-  //     }
-  //     dispatch(
-  //       actions.changeCurrentEditingView({
-  //         model: { ...model, [columnName]: value },
-  //       }),
-  //     );
-  //   };
+  const handleNodeTypeChange =
+    (columnName: string, column: Omit<Column, 'name'>) =>
+    ({ key }) => {
+      let value;
+      if (key.includes('category')) {
+        const category = key.split('-')[1];
+        value = { ...column, category };
+      } else {
+        value = { ...column, type: key };
+      }
+      dispatch(
+        actions.changeCurrentEditingView({
+          model: { ...model, [columnName]: value },
+        }),
+      );
+    };
 
   const handleDataModelChange = model => {
     setModel(model);
@@ -102,7 +102,7 @@ const DataModelTree: FC = memo(() => {
               isDraggingOver={droppableSnapshot.isDraggingOver}
             >
               {tableColumns.map(col => (
-                <DataModelNode node={col} />
+                <DataModelNode node={col} onNodeTypeChange={handleNodeTypeChange} />
               ))}
               {droppableProvided.placeholder}
             </StyledDroppableContainer>
