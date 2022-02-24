@@ -1,4 +1,3 @@
-import { InfoCircleOutlined } from '@ant-design/icons';
 import { Form, FormInstance, Input, Radio, TreeSelect } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -79,6 +78,16 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     }
   }, [initialValues]);
 
+  const boardTips = () => {
+    return (
+      <>
+        <span>{t('boardType.autoTips')}</span>
+        <br />
+        <span>{t('boardType.freeTips')}</span>
+      </>
+    );
+  };
+
   return (
     <ModalForm
       formProps={formProps}
@@ -143,10 +152,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
           ]}
           name="boardType"
           label={t('boardType.label')}
-          tooltip={{
-            title: t('boardType.tips'),
-            icon: <InfoCircleOutlined />,
-          }}
+          tooltip={boardTips()}
         >
           <Radio.Group>
             <Radio.Button value={BoardTypeMap.auto}>

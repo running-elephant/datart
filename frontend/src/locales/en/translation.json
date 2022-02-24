@@ -976,7 +976,8 @@
         "label": "Layout",
         "auto": "Auto",
         "free": "Free",
-        "tips": "Auto : create responsive dashboard  Free : create ensure size dashboard",
+        "autoTips": "Auto: Responsive, fluid layout",
+        "freeTips": "Free: Precise, fixed layout",
         "requiredMessage": "Select a Layout Type"
       },
       "parent": "Parent",
