@@ -223,6 +223,9 @@ const DataModelTree: FC = memo(() => {
       title: t('model.newHierarchy'),
       modalSize: StateModalSize.XSMALL,
       onOk: hierarchyName => {
+        if (!hierarchyName) {
+          return;
+        }
         const hierarchyNode: Column = {
           name: hierarchyName,
           type: ColumnTypes.String,
@@ -233,11 +236,27 @@ const DataModelTree: FC = memo(() => {
         handleDataModelChange(newModel);
       },
       content: onChangeEvent => {
+        const allNodeNames = tableColumns?.flatMap(c => {
+          if (!isEmptyArray(c.children)) {
+            return c.children?.map(cc => cc.name);
+          }
+          return c.name;
+        });
         return (
           <Form.Item
             label={t('model.hierarchyName')}
             name="hierarchyName"
-            rules={[{ required: true }]}
+            rules={[
+              { required: true },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!allNodeNames.includes(getFieldValue('hierarchyName'))) {
+                    return Promise.resolve(value);
+                  }
+                  return Promise.reject(new Error('名称重复，请检查!'));
+                },
+              }),
+            ]}
           >
             <Input onChange={e => onChangeEvent(e.target?.value)} />
           </Form.Item>
@@ -286,10 +305,22 @@ const DataModelTree: FC = memo(() => {
   };
 
   const openEditBranchModal = (node: Column) => {
+    const allNodeNames = tableColumns
+      ?.flatMap(c => {
+        if (!isEmptyArray(c.children)) {
+          return c.children?.map(cc => cc.name);
+        }
+        return c.name;
+      })
+      .filter(n => n !== node.name);
+
     return (openStateModal as Function)({
       title: t('model.rename'),
       modalSize: StateModalSize.XSMALL,
       onOk: newName => {
+        if (!newName) {
+          return;
+        }
         const newModel = updateNode(
           tableColumns,
           { ...node, name: newName },
@@ -303,9 +334,23 @@ const DataModelTree: FC = memo(() => {
             label={t('model.rename')}
             initialValue={node?.name}
             name="rename"
-            rules={[{ required: true }]}
+            rules={[
+              { required: true },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!allNodeNames.includes(getFieldValue('rename'))) {
+                    return Promise.resolve(value);
+                  }
+                  return Promise.reject(new Error('名称重复，请检查!'));
+                },
+              }),
+            ]}
           >
-            <Input onChange={e => onChangeEvent(e.target?.value)} />
+            <Input
+              onChange={e => {
+                onChangeEvent(e.target?.value);
+              }}
+            />
           </Form.Item>
         );
       },
