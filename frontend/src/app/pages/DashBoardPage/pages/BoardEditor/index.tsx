@@ -160,7 +160,6 @@ export const BoardEditor: React.FC<{
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onCloseChartEditor]);
 
-  useEffect(() => {});
   return (
     <Wrapper>
       <DndProvider backend={HTML5Backend}>
