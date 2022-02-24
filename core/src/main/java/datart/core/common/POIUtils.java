@@ -130,8 +130,10 @@ public class POIUtils {
                     columnIndex = setting.getIndex();
                     PoiNumFormat numFormat = setting.getNumFormat();
                     fmt = numFormat.getFormat();
-                    setting.setLength(Math.max(val.toString().length(), setting.getLength()));
-                    val = numFormat.parseValue(val);
+                    if (val != null) {
+                        setting.setLength(Math.max(val.toString().length(), setting.getLength()));
+                        val = numFormat.parseValue(val);
+                    }
                     cellStyle = setting.getCellStyle()==null ? getCellStyle(sheet, val, fmt) : setting.getCellStyle();
                 }
                 Cell cell = row.createCell(columnIndex);
