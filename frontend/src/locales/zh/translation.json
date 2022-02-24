@@ -1031,6 +1031,7 @@
     "properties": {
       "reference": "数据源信息",
       "variable": "变量配置",
+      "model": "数据模型",
       "columnPermissions": "列权限"
     },
     "resource": {
@@ -1043,6 +1044,13 @@
       "add": "新建变量",
       "prefix": "[公共]",
       "suffix": "重复"
+    },
+    "model": {
+      "category": "分类",
+      "typeAndCategory": "类型与分类",
+      "permission": "列权限",
+      "newHierarchy": "新建层次结构",
+      "addToHierarchy": "添加到层次结构"
     },
     "columnPermission": {
       "title": "列权限",

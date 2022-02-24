@@ -25,7 +25,7 @@ import {
   TableOutlined,
 } from '@ant-design/icons';
 import { Col, Input, Row } from 'antd';
-import { ListTitle, Tree } from 'app/components';
+import { Tree } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
 import { selectDataProviderDatabaseListLoading } from 'app/pages/MainPage/slice/selectors';
@@ -35,7 +35,7 @@ import { memo, useCallback, useContext, useEffect } from 'react';
 import { monaco } from 'react-monaco-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { SPACE_MD, SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
+import { SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
 import { RootState } from 'types';
 import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
@@ -48,6 +48,7 @@ import {
 } from '../../slice/selectors';
 import { getEditorProvideCompletionItems } from '../../slice/thunks';
 import { Schema } from '../../slice/types';
+import Container from './Container';
 
 export const Resource = memo(() => {
   const { actions } = useViewSlice();
@@ -162,8 +163,7 @@ export const Resource = memo(() => {
   }, []);
 
   return (
-    <Container>
-      <ListTitle title={t('title')} />
+    <Container title="reference">
       <Searchbar>
         <Col span={24}>
           <Input
@@ -190,15 +190,6 @@ export const Resource = memo(() => {
     </Container>
   );
 });
-
-const Container = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: ${SPACE_TIMES(100)};
-  min-height: 0;
-  border-left: 1px solid ${p => p.theme.borderColorSplit};
-`;
 
 const Searchbar = styled(Row)`
   .input {

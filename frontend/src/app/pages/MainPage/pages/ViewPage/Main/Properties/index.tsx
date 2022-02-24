@@ -17,13 +17,14 @@
  */
 
 import {
+  ApartmentOutlined,
   DatabaseOutlined,
   FunctionOutlined,
   SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import { PaneWrapper } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React, {
+import {
   memo,
   useCallback,
   useContext,
@@ -32,8 +33,10 @@ import React, {
   useState,
 } from 'react';
 import styled from 'styled-components/macro';
+import { STICKY_LEVEL } from 'styles/StyleConstants';
 import { EditorContext } from '../../EditorContext';
 import { ColumnPermissions } from './ColumnPermissions';
+import DataModelTree from './DataModelTree/DataModelTree';
 import { Resource } from './Resource';
 import { Variables } from './Variables';
 import { VerticalTabs } from './VerticalTabs';
@@ -55,6 +58,7 @@ export const Properties = memo(({ allowManage }: PropertiesProps) => {
     () => [
       { name: 'reference', title: t('reference'), icon: <DatabaseOutlined /> },
       { name: 'variable', title: t('variable'), icon: <FunctionOutlined /> },
+      { name: 'model', title: t('model'), icon: <ApartmentOutlined /> },
       {
         name: 'columnPermissions',
         title: t('columnPermissions'),
@@ -76,6 +80,9 @@ export const Properties = memo(({ allowManage }: PropertiesProps) => {
       <PaneWrapper selected={selectedTab === 'reference'}>
         <Resource />
       </PaneWrapper>
+      <PaneWrapper selected={selectedTab === 'model'}>
+        <DataModelTree />
+      </PaneWrapper>
       <PaneWrapper selected={selectedTab === 'columnPermissions'}>
         <ColumnPermissions />
       </PaneWrapper>
@@ -88,4 +95,5 @@ const Container = styled.div`
   display: flex;
   flex-shrink: 0;
   background-color: ${p => p.theme.componentBackground};
+  z-index: ${STICKY_LEVEL};
 `;
