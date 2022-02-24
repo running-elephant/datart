@@ -44,146 +44,147 @@ import { Column } from '../../../slice/types';
 const DataModelNode: FC<{
   node: Column;
   getPermissionButton: (name) => JSX.Element;
-  onNodeTypeChange;
-}> = memo(({ node, getPermissionButton, onNodeTypeChange }) => {
-  const t = useI18NPrefix('view.model');
-  const tg = useI18NPrefix('global');
-  const [isHover, setIsHover] = useState(false);
-  const hasCategory = true;
+  onNodeTypeChange: (node: Column) => void;
+  onMoveToHierarchy: (node: Column) => void;
+  onCreateHierarchy?: (node: Column) => void;
+}> = memo(
+  ({
+    node,
+    getPermissionButton,
+    onCreateHierarchy,
+    onMoveToHierarchy,
+    onNodeTypeChange,
+  }) => {
+    const t = useI18NPrefix('view.model');
+    const tg = useI18NPrefix('global');
+    const [isHover, setIsHover] = useState(false);
+    const hasCategory = true;
 
-  const renderNode = (node, isDragging) => {
-    let icon;
-    switch (node.type) {
-      case ColumnTypes.Number:
-        icon = (
-          <NumberOutlined style={{ alignSelf: 'center', color: SUCCESS }} />
-        );
-        break;
-      case ColumnTypes.String:
-        icon = (
-          <FieldStringOutlined style={{ alignSelf: 'center', color: INFO }} />
-        );
-        break;
-      default:
-        icon = (
-          <CalendarOutlined style={{ alignSelf: 'center', color: WARNING }} />
-        );
-        break;
-    }
+    const renderNode = (node, isDragging) => {
+      let icon;
+      switch (node.type) {
+        case ColumnTypes.Number:
+          icon = (
+            <NumberOutlined style={{ alignSelf: 'center', color: SUCCESS }} />
+          );
+          break;
+        case ColumnTypes.String:
+          icon = (
+            <FieldStringOutlined style={{ alignSelf: 'center', color: INFO }} />
+          );
+          break;
+        default:
+          icon = (
+            <CalendarOutlined style={{ alignSelf: 'center', color: WARNING }} />
+          );
+          break;
+      }
 
-    return (
-      <div
-        className="content"
-        onMouseEnter={() => {
-          setIsHover(true);
-        }}
-        onMouseLeave={() => {
-          setIsHover(false);
-        }}
-      >
-        <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
-        <span>{node.name}</span>
-        <div className="action">
-          {isHover && !isDragging && (
-            <Dropdown
-              trigger={['click']}
-              overlay={
-                <Menu
-                  selectedKeys={[node.type, `category-${node.category}`]}
-                  className="datart-schema-table-header-menu"
-                  onClick={onNodeTypeChange(node.name, node)}
-                >
-                  {Object.values(ColumnTypes).map(t => (
-                    <Menu.Item key={t}>
-                      {tg(`columnType.${t.toLowerCase()}`)}
-                    </Menu.Item>
-                  ))}
-                  {hasCategory && (
-                    <>
-                      <Menu.Divider />
-                      <Menu.SubMenu
-                        key="categories"
-                        title={t('category')}
-                        popupClassName="datart-schema-table-header-menu"
-                      >
-                        {Object.values(ColumnCategories).map(t => (
-                          <Menu.Item key={`category-${t}`}>
-                            {tg(`columnCategory.${t.toLowerCase()}`)}
-                          </Menu.Item>
-                        ))}
-                      </Menu.SubMenu>
-                    </>
-                  )}
-                </Menu>
-              }
-            >
-              <Tooltip
-                title={hasCategory ? t('typeAndCategory') : t('category')}
+      return (
+        <div
+          className="content"
+          onMouseEnter={() => {
+            setIsHover(true);
+          }}
+          onMouseLeave={() => {
+            setIsHover(false);
+          }}
+        >
+          <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
+          <span>{node.name}</span>
+          <div className="action">
+            {isHover && !isDragging && (
+              <Dropdown
+                trigger={['click']}
+                overlay={
+                  <Menu
+                    selectedKeys={[node.type, `category-${node.category}`]}
+                    className="datart-schema-table-header-menu"
+                    onClick={() => onNodeTypeChange(node)}
+                  >
+                    {Object.values(ColumnTypes).map(t => (
+                      <Menu.Item key={t}>
+                        {tg(`columnType.${t.toLowerCase()}`)}
+                      </Menu.Item>
+                    ))}
+                    {hasCategory && (
+                      <>
+                        <Menu.Divider />
+                        <Menu.SubMenu
+                          key="categories"
+                          title={t('category')}
+                          popupClassName="datart-schema-table-header-menu"
+                        >
+                          {Object.values(ColumnCategories).map(t => (
+                            <Menu.Item key={`category-${t}`}>
+                              {tg(`columnCategory.${t.toLowerCase()}`)}
+                            </Menu.Item>
+                          ))}
+                        </Menu.SubMenu>
+                      </>
+                    )}
+                  </Menu>
+                }
               >
+                <Tooltip
+                  title={hasCategory ? t('typeAndCategory') : t('category')}
+                >
+                  <ToolbarButton
+                    size="small"
+                    iconSize={FONT_SIZE_BASE}
+                    className="suffix"
+                    icon={<SwapOutlined style={{ color: INFO }} />}
+                  />
+                </Tooltip>
+              </Dropdown>
+            )}
+            {isHover && !isDragging && getPermissionButton(node?.name)}
+            {isHover && !isDragging && onCreateHierarchy && (
+              <Tooltip title={t('newHierarchy')}>
                 <ToolbarButton
                   size="small"
                   iconSize={FONT_SIZE_BASE}
                   className="suffix"
-                  icon={<SwapOutlined style={{ color: INFO }} />}
+                  onClick={() => onCreateHierarchy(node)}
+                  icon={<BranchesOutlined style={{ color: INFO }} />}
                 />
               </Tooltip>
-            </Dropdown>
-          )}
-          {
-            isHover && !isDragging && getPermissionButton(node?.name)
-
-            // <Tooltip title={t('permission')}>
-            //   <ToolbarButton
-            //     size="small"
-            //     iconSize={FONT_SIZE_BASE}
-            //     className="suffix"
-            //     icon={<EyeOutlined style={{ color: INFO }} />}
-            //   />
-            // </Tooltip>
-          }
-          {isHover && !isDragging && (
-            <Tooltip title={t('newHierarchy')}>
-              <ToolbarButton
-                size="small"
-                iconSize={FONT_SIZE_BASE}
-                className="suffix"
-                icon={<BranchesOutlined style={{ color: INFO }} />}
-              />
-            </Tooltip>
-          )}
-          {isHover && !isDragging && (
-            <Tooltip title={t('addToHierarchy')}>
-              <ToolbarButton
-                size="small"
-                iconSize={FONT_SIZE_BASE}
-                className="suffix"
-                icon={<SisternodeOutlined style={{ color: INFO }} />}
-              />
-            </Tooltip>
-          )}
+            )}
+            {isHover && !isDragging && (
+              <Tooltip title={t('addToHierarchy')}>
+                <ToolbarButton
+                  size="small"
+                  iconSize={FONT_SIZE_BASE}
+                  className="suffix"
+                  onClick={() => onMoveToHierarchy(node)}
+                  icon={<SisternodeOutlined style={{ color: INFO }} />}
+                />
+              </Tooltip>
+            )}
+          </div>
         </div>
-      </div>
-    );
-  };
+      );
+    };
 
-  return (
-    <Draggable key={node?.name} draggableId={node?.name} index={node?.index}>
-      {(draggableProvided, draggableSnapshot) => {
-        return (
-          <StyledDataModelNode
-            isDragging={draggableSnapshot.isDragging}
-            style={draggableProvided.draggableProps.style}
-            ref={draggableProvided.innerRef}
-            {...draggableProvided.draggableProps}
-            {...draggableProvided.dragHandleProps}
-          >
-            {renderNode(node, draggableSnapshot.isDragging)}
-          </StyledDataModelNode>
-        );
-      }}
-    </Draggable>
-  );
-});
+    return (
+      <Draggable key={node?.name} draggableId={node?.name} index={node?.index}>
+        {(draggableProvided, draggableSnapshot) => {
+          return (
+            <StyledDataModelNode
+              isDragging={draggableSnapshot.isDragging}
+              style={draggableProvided.draggableProps.style}
+              ref={draggableProvided.innerRef}
+              {...draggableProvided.draggableProps}
+              {...draggableProvided.dragHandleProps}
+            >
+              {renderNode(node, draggableSnapshot.isDragging)}
+            </StyledDataModelNode>
+          );
+        }}
+      </Draggable>
+    );
+  },
+);
 
 export default DataModelNode;
 

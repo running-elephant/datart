@@ -119,9 +119,17 @@ export interface Schema {
   type: ColumnTypes;
 }
 
+export enum ColumnRole {
+  Role = 'role',
+  Hierarchy = 'hierachy',
+}
+
 export interface Column extends Schema {
-  category: ColumnCategories;
+  category?: ColumnCategories;
   index?: number;
+
+  role?: ColumnRole;
+  children?: Column[];
 }
 
 export interface Model {
