@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { prefixI18N } from 'app/hooks/useI18NPrefix';
 import { migrateChartConfig } from 'app/migration';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -507,4 +508,27 @@ export const getDefaultWidgetName = (widget: Widget, index: number) => {
     default:
       return `xxx${index}`;
   }
+};
+export const checkLinkAndJumpErr = (
+  widgetData: Widget,
+  folderListIds?: string[],
+): string => {
+  let error: string = '';
+
+  if (
+    widgetData?.config?.linkageConfig?.open &&
+    widgetData?.relations.length === 0
+  ) {
+    error = prefixI18N('viz.linkage.linkageError');
+  }
+
+  if (
+    widgetData?.config?.jumpConfig &&
+    widgetData?.config?.jumpConfig.open &&
+    folderListIds?.indexOf(widgetData.config.jumpConfig.target.relId) === -1
+  ) {
+    error = prefixI18N('viz.jump.jumpError');
+  }
+
+  return error;
 };

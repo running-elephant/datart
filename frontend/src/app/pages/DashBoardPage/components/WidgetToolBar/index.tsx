@@ -95,20 +95,31 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
       ) : null;
     }
   };
-  const renderErrorIcon = (errInfo?: string) => {
+  const renderErrorIcon = (errInfo?: { [propName: string]: string }) => {
     if (!errInfo) return null;
-    const renderTitle = errInfo => {
-      if (typeof errInfo !== 'string') return 'object';
+
+    const errInfoValue = Object.values(errInfo);
+
+    if (!errInfoValue.length) return null;
+
+    const renderTitle = errInfoArr => {
+      let errHtml = ``;
+
+      errInfoArr.forEach(info => {
+        info = typeof info !== 'string' ? 'object' : info;
+        errHtml += info + '<br/>';
+      });
+
       return (
         <div
           style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}
-        >
-          {errInfo}
-        </div>
+          dangerouslySetInnerHTML={{ __html: errHtml }}
+        ></div>
       );
     };
+
     return (
-      <Tooltip title={renderTitle(errInfo)}>
+      <Tooltip title={renderTitle(errInfoValue)}>
         <StyledErrorIcon
           icon={<WarningTwoTone twoToneColor={ERROR} />}
           type="link"

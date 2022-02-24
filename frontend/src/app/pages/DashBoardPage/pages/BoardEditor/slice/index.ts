@@ -246,10 +246,17 @@ const widgetInfoRecordSlice = createSlice({
         boardId?: string;
         widgetId: string;
         errInfo?: string;
+        errorType: 'interFaceError' | 'linkJumpError';
       }>,
     ) {
-      const { widgetId, errInfo } = action.payload;
-      state[widgetId].errInfo = errInfo;
+      const { widgetId, errInfo, errorType } = action.payload;
+      let errorObj = state[widgetId].errInfo || {};
+      if (errInfo) {
+        errorObj[errorType] = errInfo;
+      } else {
+        delete errorObj[errorType];
+      }
+      state[widgetId].errInfo = errorObj;
     },
   },
   extraReducers: builder => {

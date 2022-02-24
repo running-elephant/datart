@@ -849,7 +849,8 @@
       "associatedWidgets": "Associated Widgets",
       "associatedFields": "Associated Fields",
       "selectTriggers": "Select the trigger field",
-      "selectLinker": "Select linkage field"
+      "selectLinker": "Select linkage field",
+      "linkageError": "The linkage chart has been deleted, please reconfigure"
     },
     "jump": {
       "title": "Jump Settings",
@@ -859,7 +860,8 @@
       "URL": "URL",
       "parameters": "Parameters",
       "controller": "Associated Controllers",
-      "associatedFields": "Associated Fields"
+      "associatedFields": "Associated Fields",
+      "jumpError": "The jump target has been invalidated or deleted, please reconfigure"
     },
     "associate": {
       "title": "Please associate fields/variables",
