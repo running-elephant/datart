@@ -5,11 +5,14 @@ import styled from 'styled-components/macro';
 import { BLUE } from 'styles/StyleConstants';
 
 export const TableComponentsTd = ({ children, ...rest }: any) => {
-  return (
-    <Tooltip placement="topLeft" title={children}>
-      <Td {...rest}>{children}</Td>
-    </Tooltip>
-  );
+  if (rest.className.includes('ellipsis')) {
+    return (
+      <Tooltip placement="topLeft" title={children}>
+        <Td {...rest}>{children}</Td>
+      </Tooltip>
+    );
+  }
+  return <Td {...rest}>{children}</Td>;
 };
 
 export const ResizableTitle = props => {
