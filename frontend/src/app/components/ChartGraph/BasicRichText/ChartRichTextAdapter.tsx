@@ -18,8 +18,7 @@
 
 import { SelectOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Modal, Row } from 'antd';
-import ChromeColorPicker from 'app/components/ColorPicker/ChromeColorPicker';
-import { FONT_COLORS, FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
+import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { DeltaStatic } from 'quill';
 import { ImageDrop } from 'quill-image-drop-module'; // 拖动加载图片组件。
@@ -39,6 +38,7 @@ import 'react-quill/dist/quill.bubble.css';
 import 'react-quill/dist/quill.core.css';
 import styled from 'styled-components/macro';
 import './RichTextPluginLoader';
+import { CustomColor, QuillPalette } from './RichTextPluginLoader/CustomColor';
 import {
   Formats,
   MarkdownOptions,
@@ -56,12 +56,6 @@ font.whitelist = FONT_FAMILIES.map(font => font.value);
 Quill.register(font, true);
 
 const MenuItem = Menu.Item;
-
-const CUSTOM_COLOR = 'custom-color';
-const CUSTOM_COLOR_INIT = {
-  background: 'transparent',
-  color: '#000',
-};
 
 const ChartRichTextAdapter: FC<{
   dataList: any[];
@@ -96,7 +90,7 @@ const ChartRichTextAdapter: FC<{
     const [customColor, setCustomColor] = useState<{
       background: string;
       color: string;
-    }>({ ...CUSTOM_COLOR_INIT });
+    }>({ ...QuillPalette.RICH_TEXT_CUSTOM_COLOR_INIT });
     const [customColorType, setCustomColorType] = useState<
       'color' | 'background'
     >('color');
@@ -115,14 +109,14 @@ const ChartRichTextAdapter: FC<{
             container: isEditing ? `#${newId}` : null,
             handlers: {
               color: function (value) {
-                if (value === CUSTOM_COLOR) {
+                if (value === QuillPalette.RICH_TEXT_CUSTOM_COLOR) {
                   setCustomColorType('color');
                   setCustomColorVisible(true);
                 }
                 quillEditRef.current!.getEditor().format('color', value);
               },
               background: function (value) {
-                if (value === CUSTOM_COLOR) {
+                if (value === QuillPalette.RICH_TEXT_CUSTOM_COLOR) {
                   setCustomColorType('background');
                   setCustomColorVisible(true);
                 }
@@ -178,45 +172,22 @@ const ChartRichTextAdapter: FC<{
       }
     }, [quillValue, dataList, setTranslate]);
 
+    useEffect(() => {
+      let palette: QuillPalette | null = null;
+      if (quillEditRef.current && containerId) {
+        palette = new QuillPalette(quillEditRef.current, {
+          toolbarId: containerId,
+          onChange: setCustomColor,
+        });
+      }
+
+      return () => {
+        palette?.destroy();
+      };
+    }, [containerId]);
+
     useLayoutEffect(() => {
       if (quillEditRef.current) {
-        quillEditRef.current
-          .getEditor()
-          .on('selection-change', (r: { index: number; length: number }) => {
-            if (!r?.index) return;
-            try {
-              const index = r.length === 0 ? r.index - 1 : r.index;
-              const length = r.length === 0 ? 1 : r.length;
-              const delta = quillEditRef
-                .current!.getEditor()
-                .getContents(index, length);
-
-              if (delta.ops?.length === 1 && delta.ops[0]?.attributes) {
-                const { background, color } = delta.ops[0].attributes;
-                setCustomColor({
-                  background: background || CUSTOM_COLOR_INIT.background,
-                  color: color || CUSTOM_COLOR_INIT.color,
-                });
-
-                const colorNode = document.querySelector(
-                  '.ql-color .ql-color-label',
-                );
-                const backgroundNode = document.querySelector(
-                  '.ql-background .ql-color-label',
-                );
-                if (color && !colorNode?.getAttribute('style')) {
-                  colorNode!.setAttribute('style', `stroke: ${color}`);
-                }
-                if (background && !backgroundNode?.getAttribute('style')) {
-                  backgroundNode!.setAttribute('style', `fill: ${background}`);
-                }
-              } else {
-                setCustomColor({ ...CUSTOM_COLOR_INIT });
-              }
-            } catch (error) {
-              console.error('selection-change callback | error', error);
-            }
-          });
         if (openQuillMarkdown) {
           quillMarkdownConfigRef.current = new QuillMarkdown(
             quillEditRef.current.getEditor(),
@@ -297,114 +268,23 @@ const ChartRichTextAdapter: FC<{
     }, [dataList, selectField]);
 
     const toolbar = useMemo(
-      () => (
-        <div id={containerId}>
-          <span className="ql-formats">
-            <select
-              className="ql-font"
-              key="ql-font"
-              defaultValue={FONT_FAMILIES[0].value}
-              style={{
-                whiteSpace: 'nowrap',
-                width: '130px',
-              }}
-            >
-              {FONT_FAMILIES.map(font => (
-                <option value={font.value} key={font.name}>
-                  {t?.(font.name)}
-                </option>
-              ))}
-            </select>
-            <select className="ql-size" key="ql-size" defaultValue="13px">
-              {FONT_SIZES.map(size => (
-                <option value={`${size}px`} key={size}>{`${size}px`}</option>
-              ))}
-            </select>
-            <button className="ql-bold" key="ql-bold" title="加粗" />
-            <button className="ql-italic" key="ql-italic" title="斜体" />
-            <button
-              className="ql-underline"
-              key="ql-underline"
-              title="下划线"
-            />
-            <button className="ql-strike" key="ql-strike" title="删除线" />
-          </span>
-
-          <span className="ql-formats">
-            <select className="ql-color" key="ql-color">
-              {FONT_COLORS.map(color => (
-                <option value={color} key={color} />
-              ))}
-              <option value={CUSTOM_COLOR} key={CUSTOM_COLOR} />
-            </select>
-            <select className="ql-background" key="ql-background">
-              {FONT_COLORS.map(color => (
-                <option value={color} key={color} />
-              ))}
-              <option value={CUSTOM_COLOR} key={CUSTOM_COLOR} />
-            </select>
-          </span>
-
-          <span className="ql-formats">
-            <select className="ql-align" key="ql-align" />
-            <button
-              className="ql-indent"
-              value="-1"
-              key="ql-indent"
-              title="减少缩进"
-            />
-            <button
-              className="ql-indent"
-              value="+1"
-              key="ql-indent-up"
-              title="增加缩进"
-            />
-          </span>
-
-          <span className="ql-formats">
-            <button
-              className="ql-list"
-              value="ordered"
-              key="ql-ordered"
-              title="有序列表"
-            />
-            <button
-              className="ql-list"
-              value="bullet"
-              key="ql-list"
-              title="无序列表"
-            />
-            <button
-              className="ql-blockquote"
-              key="ql-blockquote"
-              title="引用"
-            />
-            <button
-              className="ql-code-block"
-              key="ql-code-block"
-              title="代码"
-            />
-          </span>
-
-          <span className="ql-formats">
-            <button className="ql-link" key="ql-link" title="超链接" />
-            <button className="ql-image" key="ql-image" title="图片" />
-            <Dropdown
-              overlay={fieldItems}
-              trigger={['click']}
-              key="ql-selectLink"
-            >
-              <a className="selectLink" title="引用字段">
-                <SelectOutlined />
-              </a>
-            </Dropdown>
-          </span>
-
-          <span className="ql-formats">
-            <button className="ql-clean" key="ql-clean" title="清除样式" />
-          </span>
-        </div>
-      ),
+      () =>
+        QuillPalette.getToolbar({
+          id: containerId as string,
+          extendNodes: {
+            4: (
+              <Dropdown
+                overlay={fieldItems}
+                trigger={['click']}
+                key="ql-selectLink"
+              >
+                <a className="selectLink" title="引用字段">
+                  <SelectOutlined />
+                </a>
+              </Dropdown>
+            ),
+          },
+        }),
       [containerId, fieldItems],
     );
 
@@ -462,22 +342,12 @@ const ChartRichTextAdapter: FC<{
         >
           {isEditing && reactQuillView}
         </Modal>
-        <Modal
-          title="更多配色"
-          width={273}
-          mask={false}
+        <CustomColor
           visible={customColorVisible}
-          footer={null}
-          closable={false}
           onCancel={() => setCustomColorVisible(false)}
-        >
-          <ChromeColorPicker
-            // @TM 该组件无法更新color 暂时用key解决
-            key={customColor?.[customColorType]}
-            color={customColor?.[customColorType]}
-            onChange={customColorChange}
-          />
-        </Modal>
+          color={customColor?.[customColorType]}
+          colorChange={customColorChange}
+        />
       </TextWrap>
     );
   },
@@ -496,22 +366,6 @@ const QuillBox = styled.div`
   .react-quill-view {
     flex: 1;
     overflow-y: auto;
-  }
-  // @TM 自定义色块
-  .ql-picker-options [data-value=${CUSTOM_COLOR}] {
-    position: relative;
-    width: calc(100% - 4px);
-    background-color: transparent !important;
-    color: #343a40;
-    font-weight: 400;
-    font-size: 12px;
-    &::after {
-      content: '更多';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
   }
 `;
 const TextWrap = styled.div`

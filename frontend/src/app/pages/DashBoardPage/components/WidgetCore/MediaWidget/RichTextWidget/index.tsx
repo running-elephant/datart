@@ -15,7 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import {
+  CustomColor,
+  QuillPalette,
+} from 'app/components/ChartGraph/BasicRichText/RichTextPluginLoader/CustomColor';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import {
@@ -45,7 +48,6 @@ import styled from 'styled-components/macro';
 import { MarkdownOptions } from './configs/MarkdownOptions';
 import TagBlot from './configs/TagBlot';
 import { Formats } from './Formats';
-import { useQuillBar } from './useQuillBar';
 // import produce from 'immer';
 Quill.register('modules/imageDrop', ImageDrop);
 Quill.register('formats/tag', TagBlot);
@@ -70,6 +72,15 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   );
   const [containerId, setContainerId] = useState<string>();
   const [quillModules, setQuillModules] = useState<any>(null);
+
+  const [customColorVisible, setCustomColorVisible] = useState<boolean>(false);
+  const [customColor, setCustomColor] = useState<{
+    background: string;
+    color: string;
+  }>({ ...QuillPalette.RICH_TEXT_CUSTOM_COLOR_INIT });
+  const [customColorType, setCustomColorType] = useState<
+    'color' | 'background'
+  >('color');
 
   useEffect(() => {
     setQuillValue(initContent);
@@ -114,6 +125,22 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
     const modules = {
       toolbar: {
         container: `#${newId}`,
+        handlers: {
+          color: function (value) {
+            if (value === QuillPalette.RICH_TEXT_CUSTOM_COLOR) {
+              setCustomColorType('color');
+              setCustomColorVisible(true);
+            }
+            quillRef.current!.getEditor().format('color', value);
+          },
+          background: function (value) {
+            if (value === QuillPalette.RICH_TEXT_CUSTOM_COLOR) {
+              setCustomColorType('background');
+              setCustomColorVisible(true);
+            }
+            quillRef.current!.getEditor().format('background', value);
+          },
+        },
       },
       imageDrop: true,
     };
@@ -128,6 +155,20 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
     }
   }, [quillModules]);
 
+  useEffect(() => {
+    let palette: QuillPalette | null = null;
+    if (quillRef.current && containerId) {
+      palette = new QuillPalette(quillRef.current, {
+        toolbarId: containerId,
+        onChange: setCustomColor,
+      });
+    }
+
+    return () => {
+      palette?.destroy();
+    };
+  }, [containerId]);
+
   const ssp = e => {
     e.stopPropagation();
   };
@@ -138,7 +179,18 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
       setQuillValue(contents);
     }
   }, []);
-  const toolbar = useQuillBar(containerId, t);
+
+  const toolbar = useMemo(
+    () => QuillPalette.getToolbar({ id: containerId as string }),
+    [containerId],
+  );
+
+  const customColorChange = color => {
+    if (color) {
+      quillRef.current!.getEditor().format(customColorType, color);
+    }
+    setCustomColorVisible(false);
+  };
 
   return (
     <TextWrap onClick={ssp} editing={widgetInfo.editing}>
@@ -170,6 +222,12 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
           readOnly={true}
         />
       </div>
+      <CustomColor
+        visible={customColorVisible}
+        onCancel={() => setCustomColorVisible(false)}
+        color={customColor?.[customColorType]}
+        colorChange={customColorChange}
+      />
     </TextWrap>
   );
 };
