@@ -69,8 +69,6 @@ public abstract class ScheduleJob implements Job, Closeable {
 
     protected final ShareService shareService;
 
-    protected final DatachartService datachartService;
-
     protected final DatartSecurityManager securityManager;
 
     protected final List<File> attachments = new LinkedList<>();
@@ -86,8 +84,6 @@ public abstract class ScheduleJob implements Job, Closeable {
         securityManager = Application.getBean(DatartSecurityManager.class);
 
         vizService = Application.getBean(VizService.class);
-
-        datachartService = Application.getBean(DatachartService.class);
 
     }
 
@@ -181,12 +177,11 @@ public abstract class ScheduleJob implements Job, Closeable {
             ViewExecuteParam viewExecuteParam = downloadParams.getDownloadParams().get(i);
             viewExecuteParam.setPageInfo(PageInfo.builder().pageNo(1)
                     .pageSize(Integer.MAX_VALUE).build());
-            String vizName = viewExecuteParam.getVizName();
             Dataframe dataframe = dataProviderService.execute(downloadParams.getDownloadParams().get(i));
-            String chartConfigStr = StringUtils.isNotBlank(viewExecuteParam.getVizId()) ?
-                    datachartService.retrieve(viewExecuteParam.getVizId()).getConfig() : "";
+            String chartConfigStr = vizService.getChartConfigByVizId(viewExecuteParam.getVizId(), viewExecuteParam.getVizType());
             POISettings poiSettings = PoiConvertUtils.covertToPoiSetting(chartConfigStr, dataframe);
-            POIUtils.withSheet(workbook, StringUtils.isEmpty(vizName) ? "Sheet" + i : vizName, dataframe, poiSettings);
+            String sheetName = StringUtils.isNotBlank(viewExecuteParam.getVizName()) ? viewExecuteParam.getVizName() : "Sheet"+i;
+            POIUtils.withSheet(workbook, sheetName, dataframe, poiSettings);
         }
         File tempFile = File.createTempFile(UUIDGenerator.generate(), ".xlsx");
         POIUtils.save(workbook, tempFile.getPath(), true);

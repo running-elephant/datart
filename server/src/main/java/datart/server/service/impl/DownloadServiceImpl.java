@@ -27,17 +27,13 @@ import datart.core.common.POIUtils;
 import datart.core.common.TaskExecutor;
 import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.Dataframe;
-import datart.core.entity.Datachart;
 import datart.core.entity.Download;
 import datart.core.entity.View;
 import datart.core.entity.poi.POISettings;
 import datart.core.mappers.ext.DownloadMapperExt;
 import datart.server.base.params.DownloadCreateParam;
 import datart.server.base.params.ViewExecuteParam;
-import datart.server.service.BaseService;
-import datart.server.service.DataProviderService;
-import datart.server.service.DownloadService;
-import datart.server.service.OrgSettingService;
+import datart.server.service.*;
 import datart.server.service.common.PoiConvertUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -64,12 +60,16 @@ public class DownloadServiceImpl extends BaseService implements DownloadService 
 
     private final OrgSettingService orgSettingService;
 
+    private final VizService vizService;
+
     public DownloadServiceImpl(DownloadMapperExt downloadMapper,
                                DataProviderService dataProviderService,
-                               OrgSettingService orgSettingService) {
+                               OrgSettingService orgSettingService,
+                               VizService vizService) {
         this.downloadMapper = downloadMapper;
         this.dataProviderService = dataProviderService;
         this.orgSettingService = orgSettingService;
+        this.vizService = vizService;
     }
 
     @Override
@@ -115,12 +115,11 @@ public class DownloadServiceImpl extends BaseService implements DownloadService 
                         ViewExecuteParam viewExecuteParam = downloadParams.getDownloadParams().get(i);
                         View view = retrieve(viewExecuteParam.getViewId(), View.class, false);
                         viewExecuteParam.setPageInfo(PageInfo.builder().pageNo(1).pageSize(orgSettingService.getDownloadRecordLimit(view.getOrgId())).build());
-                        String vizName = viewExecuteParam.getVizName();
                         Dataframe dataframe = dataProviderService.execute(downloadParams.getDownloadParams().get(i));
-                        String chartConfigStr = StringUtils.isNotBlank(viewExecuteParam.getVizId()) ?
-                                retrieve(viewExecuteParam.getVizId(), Datachart.class).getConfig() : "";
+                        String chartConfigStr = vizService.getChartConfigByVizId(viewExecuteParam.getVizId(), viewExecuteParam.getVizType());
                         POISettings poiSettings = PoiConvertUtils.covertToPoiSetting(chartConfigStr, dataframe);
-                        POIUtils.withSheet(workbook, StringUtils.isEmpty(vizName) ? "Sheet" + i : vizName, dataframe, poiSettings);
+                        String sheetName = StringUtils.isNotBlank(viewExecuteParam.getVizName()) ? viewExecuteParam.getVizName() : "Sheet"+i;
+                        POIUtils.withSheet(workbook, sheetName, dataframe, poiSettings);
                     }
                     try {
                         POIUtils.save(workbook, FileUtils.withBasePath(path), true);
