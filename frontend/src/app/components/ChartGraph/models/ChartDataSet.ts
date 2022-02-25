@@ -86,11 +86,15 @@ export class ChartDataSet<T>
 
     for (let i = 0; i < this.length; i++) {
       if (columns[i]?.length === 1) {
-        const row = new ChartDataSetRow(this.columnIndexTable, []);
+        const row = new ChartDataSetRow(this.columnIndexTable, [], fields);
         row.push(columns[i][0]);
         this[i] = row;
       } else {
-        this[i] = new ChartDataSetRow(this.columnIndexTable, columns[i]);
+        this[i] = new ChartDataSetRow(
+          this.columnIndexTable,
+          columns[i],
+          fields,
+        );
       }
     }
   }
