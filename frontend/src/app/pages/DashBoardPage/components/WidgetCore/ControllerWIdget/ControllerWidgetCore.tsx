@@ -17,7 +17,6 @@
  */
 
 import { Form } from 'antd';
-import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetDataContext } from 'app/pages/DashBoardPage/contexts/WidgetDataContext';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -41,6 +40,7 @@ import React, {
   useMemo,
 } from 'react';
 import styled from 'styled-components/macro';
+import { BoardActionContext } from '../../BoardProvider/BoardActionProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { LabelName } from '../WidgetName/WidgetName';
 import { CheckboxGroupControllerForm } from './Controller/CheckboxGroupController';

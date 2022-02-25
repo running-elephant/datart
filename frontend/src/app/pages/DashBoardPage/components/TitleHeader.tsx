@@ -45,8 +45,8 @@ import {
   SPACE_LG,
   SPACE_SM,
 } from 'styles/StyleConstants';
-import { BoardActionContext } from '../contexts/BoardActionContext';
 import { BoardOverLay } from './BoardOverLay';
+import { BoardActionContext } from './BoardProvider/BoardActionProvider';
 import { BoardInfoContext } from './BoardProvider/BoardInfoProvider';
 import { BoardContext } from './BoardProvider/BoardProvider';
 import SaveToStoryBoard from './SaveToStoryBoard';
