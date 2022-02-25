@@ -34,6 +34,8 @@ export interface IChartDataSetRow<T> extends Array<T> {
 export interface IChartDataSet<T> extends Array<IChartDataSetRow<T>> {
   getFieldKey(field: ChartDataSectionField): string;
 
+  getFieldOriginKey(field: ChartDataSectionField): string;
+
   getFieldIndex(field: ChartDataSectionField): number;
 
   sortBy(dataConfigs: ChartDataConfig[]): void;
