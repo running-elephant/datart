@@ -19,6 +19,7 @@
 import { Empty } from 'antd';
 import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
 import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
@@ -27,7 +28,6 @@ import {
   MIN_MARGIN,
   MIN_PADDING,
 } from 'app/pages/DashBoardPage/constants';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import {
   selectLayoutWidgetInfoMapById,

@@ -19,6 +19,7 @@
 import { Empty } from 'antd';
 import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
 import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
@@ -29,7 +30,6 @@ import {
   MIN_PADDING,
   RGL_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
 import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import debounce from 'lodash/debounce';
