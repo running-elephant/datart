@@ -174,13 +174,7 @@ class BasicTableChart extends ReactChart {
       ),
       onRow: (_, index) => {
         const row = chartDataSet?.[index];
-        const rowData = mixedSectionConfigRows?.reduce(
-          (acc, cur, sectionIndex) => {
-            acc[chartDataSet.getFieldOriginKey(cur)] = row?.[sectionIndex];
-            return acc;
-          },
-          {},
-        );
+        const rowData = row?.convertToCaseSensitiveObject();
         return { index, rowData };
       },
       components: this.getTableComponents(styleConfigs, widgetSpecialConfig),
@@ -696,8 +690,7 @@ class BasicTableChart extends ReactChart {
       return {
         sorter: true,
         title: getColumnRenderName(c),
-        dataIndex: chartDataSet.getFieldKey(c),
-        key: chartDataSet.getFieldKey(c),
+        dataIndex: chartDataSet.getFieldIndex(c),
         aggregate: c?.aggregate,
         colName,
         width: colMaxWidth,
@@ -718,15 +711,18 @@ class BasicTableChart extends ReactChart {
         onCell: (record, rowIndex) => {
           const row = chartDataSet[rowIndex];
           const cellValue = row.getCell(c);
+          const rowData = { [chartDataSet.getFieldOriginKey(c)]: cellValue };
           return {
             uid: c.uid,
             cellValue,
             dataIndex: row.getFieldKey(c),
+            rowData,
             ...this.registerTableCellEvents(
-              row.getFieldKey(c),
+              colName,
               cellValue,
               rowIndex,
-              record,
+              rowData,
+              c.aggregate,
             ),
           };
         },
