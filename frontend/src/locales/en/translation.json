@@ -569,6 +569,9 @@
           "arial": "Arial",
           "sansSerif": "sans-serif"
         },
+        "lineHeight": {
+          "default": "Default Line Height"
+        },
         "fontWeight": {
           "normal": "Normal",
           "bold": "Bold",

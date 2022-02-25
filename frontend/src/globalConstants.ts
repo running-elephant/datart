@@ -46,6 +46,30 @@ export const DEFAULT_DEBOUNCE_WAIT = 300;
 export const FONT_SIZES = [
   12, 13, 14, 15, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 96, 128,
 ];
+export const FONT_LINE_HEIGHT = [
+  {
+    name: 'viz.palette.style.lineHeight.default',
+    value: 1,
+  },
+  1.5,
+  2,
+  2.5,
+  3,
+  3.5,
+  4,
+  4.5,
+  5,
+  5.5,
+  6,
+  6.5,
+  7,
+  7.5,
+  8,
+  8.5,
+  9,
+  9.5,
+  10,
+];
 
 export const FONT_FAMILIES = [
   { name: 'viz.palette.style.fontFamily.default', value: FONT_FAMILY },
