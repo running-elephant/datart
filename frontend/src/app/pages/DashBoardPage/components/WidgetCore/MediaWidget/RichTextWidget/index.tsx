@@ -20,7 +20,6 @@ import { Modal } from 'antd';
 import { useQuillBar } from 'app/components/ChartGraph/BasicRichText/useQuillBar';
 import ChromeColorPicker from 'app/components/ColorPicker/ChromeColorPicker';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import {
   MediaWidgetContent,
   Widget,
@@ -46,6 +45,7 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
+import { BoardContext } from '../../../BoardProvider/BoardProvider';
 import { MarkdownOptions } from './configs/MarkdownOptions';
 import TagBlot from './configs/TagBlot';
 import { Formats } from './Formats';
