@@ -19,7 +19,7 @@
 import { InputNumber } from 'antd';
 import useDebouncedFormValue from 'app/hooks/useDebouncedFormValue';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { FC,memo } from 'react';
+import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS } from 'styles/StyleConstants';
 import { ItemLayoutProps } from '../types';
