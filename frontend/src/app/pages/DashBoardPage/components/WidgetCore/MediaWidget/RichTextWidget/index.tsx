@@ -225,8 +225,8 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   }, []);
 
   const toolbar = useMemo(
-    () => QuillPalette.getToolbar({ id: containerId as string }),
-    [containerId],
+    () => QuillPalette.getToolbar({ id: containerId as string, t }),
+    [containerId, t],
   );
 
   const customColorChange = color => {
@@ -280,7 +280,7 @@ export default RichTextWidget;
 interface TextWrapProps {
   editing: boolean;
 }
-// todo (tianlei) Need to nationalize
+
 const TextWrap = styled.div<TextWrapProps>`
   position: relative;
   width: 100%;
@@ -305,29 +305,5 @@ const TextWrap = styled.div<TextWrapProps>`
   }
   & .ql-container.ql-snow {
     border: none;
-  }
-
-  .ql-picker-options [data-value=${CUSTOM_COLOR}] {
-    position: relative;
-    width: calc(100% - 4px);
-    background-color: transparent !important;
-    color: #343a40;
-    font-weight: 400;
-    font-size: 12px;
-    &::after {
-      content: '更多';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      color: #fff;
-      transform: translate(-50%, -50%);
-    }
-    &:hover {
-      border: none;
-    }
-  }
-  .ql-bubble .ql-color .ql-picker-options,
-  .ql-bubble .ql-background .ql-picker-options {
-    width: 232px;
   }
 `;
