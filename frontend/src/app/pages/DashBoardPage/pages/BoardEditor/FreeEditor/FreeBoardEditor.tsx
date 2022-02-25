@@ -150,7 +150,6 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
         axis={'both'}
         width={curW}
         height={curH}
-        scale={scale[0]}
         onResize={resize}
         onResizeStop={resizeStop}
         draggableOpts={{ grid: [1, 1], scale: scale[0] }}
