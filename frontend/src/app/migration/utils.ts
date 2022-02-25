@@ -16,8 +16,11 @@
  * limitations under the License.
  */
 
-export const VERSION_BETA_0 = '1.0.0-beta.0';
-export const VERSION_BETA_1 = '1.0.0-beta.1';
-export const VERSION_BETA_2 = '1.0.0-beta.2';
-export const VERSION_LIST = [VERSION_BETA_0, VERSION_BETA_1, VERSION_BETA_2];
-export const CURRENT_VERSION = VERSION_BETA_2;
+import { VERSION_LIST } from './constants';
+
+export const versionCanDo = (curVersion: string, testVersion?: string) => {
+  let testVersionIndex = VERSION_LIST.indexOf(testVersion || '');
+  if (testVersionIndex === -1) return true;
+  let curVersionIndex = VERSION_LIST.indexOf(curVersion);
+  return curVersionIndex >= testVersionIndex;
+};

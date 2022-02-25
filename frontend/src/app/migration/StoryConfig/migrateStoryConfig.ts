@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { StoryConfig } from 'app/pages/StoryBoardPage/slice/types';
 import { getInitStoryConfig } from 'app/pages/StoryBoardPage/utils';
-import { VERSION_BETA_0, VERSION_BETA_1, VERSION_LIST } from '../constants';
+import { versionCanDo } from '../utils';
+import { VERSION_BETA_0, VERSION_BETA_1, VERSION_BETA_2 } from './../constants';
 
 export const parseStoryConfig = (storyConfig: string) => {
   if (!storyConfig) {
@@ -34,18 +34,24 @@ export const parseStoryConfig = (storyConfig: string) => {
 };
 
 export const beta0 = (config: StoryConfig) => {
-  config.version = config?.version || VERSION_BETA_0;
-  const canHandleVersions = VERSION_LIST.slice(0, 1);
-  if (!canHandleVersions.includes(config.version)) return config;
+  if (!versionCanDo(VERSION_BETA_0, config.version)) return config;
+  config.version = VERSION_BETA_0;
   return config;
 };
 export const beta1 = (config: StoryConfig) => {
-  const canHandleVersions = VERSION_LIST.slice(0, 2);
-  if (!canHandleVersions.includes(config.version)) return config;
+  if (!versionCanDo(VERSION_BETA_1, config.version)) return config;
   config.version = VERSION_BETA_1;
+  return config;
+};
+export const beta2 = (config: StoryConfig) => {
+  if (!versionCanDo(VERSION_BETA_2, config.version)) return config;
+  config.version = VERSION_BETA_2;
   return config;
 };
 export const migrateStoryConfig = (boardConfig: string) => {
   let config = parseStoryConfig(boardConfig);
-  return beta0(config);
+  config = beta0(config);
+  config = beta1(config);
+  config = beta2(config);
+  return config;
 };

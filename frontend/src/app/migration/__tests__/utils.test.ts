@@ -15,9 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export const VERSION_BETA_0 = '1.0.0-beta.0';
-export const VERSION_BETA_1 = '1.0.0-beta.1';
-export const VERSION_BETA_2 = '1.0.0-beta.2';
-export const VERSION_LIST = [VERSION_BETA_0, VERSION_BETA_1, VERSION_BETA_2];
-export const CURRENT_VERSION = VERSION_BETA_2;
+import { VERSION_LIST } from '../constants';
+import { versionCanDo } from '../utils';
+describe('test versionCanDo ', () => {
+  test(`no testVersion `, () => {
+    expect(versionCanDo('v1', undefined)).toBe(true);
+  });
+  const v1 = VERSION_LIST[0];
+  const v2 = VERSION_LIST[1];
+  test(`v2 canDo v1 `, () => {
+    expect(versionCanDo(v2, v1)).toBe(true);
+  });
+  test(`v1 not canDo v2 `, () => {
+    expect(versionCanDo(v1, v2)).toBe(false);
+  });
+  test(`v2 canDo v2 `, () => {
+    expect(versionCanDo(v2, v2)).toBe(true);
+  });
+});
