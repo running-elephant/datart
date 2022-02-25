@@ -21,7 +21,6 @@ import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { WidgetChartContext } from 'app/pages/DashBoardPage/contexts/WidgetChartContext';
 import { WidgetDataContext } from 'app/pages/DashBoardPage/contexts/WidgetDataContext';
-import { WidgetMethodContext } from 'app/pages/DashBoardPage/contexts/WidgetMethodContext';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartMouseEventParams, IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
@@ -37,6 +36,7 @@ import React, {
   useRef,
 } from 'react';
 import styled from 'styled-components/macro';
+import { WidgetMethodContext } from '../../WidgetProvider/WidgetMethodProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
 export const DataChartWidget: React.FC<{}> = memo(() => {

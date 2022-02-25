@@ -19,10 +19,10 @@ import { DataChartWidget } from 'app/pages/DashBoardPage/components/WidgetCore/D
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import React, { memo, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
 import { getWidgetSomeStyle } from '../../utils/widget';
 import { BoardInfoContext } from '../BoardProvider/BoardInfoProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
+import { WidgetMethodContext } from '../WidgetProvider/WidgetMethodProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import { QueryWidget } from './ButtonWidget/QueryWidget';
 import { ResetWidget } from './ButtonWidget/ResetWidget';
