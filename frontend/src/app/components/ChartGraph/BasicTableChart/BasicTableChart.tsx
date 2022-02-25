@@ -652,18 +652,20 @@ class BasicTableChart extends ReactChart {
               uid: c.uid,
             };
           },
-          onCell: (record, rowIndex) => {
+          onCell: (_, rowIndex) => {
             const row = chartDataSet[rowIndex];
             const cellValue = row.getCell(c);
+            const rawData = { [chartDataSet.getFieldOriginKey(c)]: cellValue };
             return {
               uid: c.uid,
               cellValue,
               dataIndex: row.getFieldKey(c),
               ...this.registerTableCellEvents(
-                row.getFieldKey(c),
+                colName,
                 cellValue,
                 rowIndex,
-                record,
+                rawData,
+                c.aggregate,
               ),
             };
           },
@@ -905,6 +907,7 @@ class BasicTableChart extends ReactChart {
     value: any,
     dataIndex: number,
     record: any,
+    aggOperator?: string,
   ) {
     const eventParams = this.createrEventParams({
       seriesType: 'body',
@@ -912,6 +915,7 @@ class BasicTableChart extends ReactChart {
       data: {
         format: undefined,
         name: seriesName,
+        aggOperator,
         rowData: record,
         value: value,
       },

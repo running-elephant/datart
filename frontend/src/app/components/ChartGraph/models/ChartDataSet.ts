@@ -45,6 +45,10 @@ class ChartDataSetBase extends Array {
     return this.toCaseInsensitive(getValueByColumnKey(field));
   }
 
+  protected toOriginKey(field: ChartDataSectionField): string {
+    return getValueByColumnKey(field);
+  }
+
   protected createColumnIndexTable(metas?: ChartDatasetMeta[]): {
     [key: string]: number;
   } {
@@ -81,6 +85,10 @@ export class ChartDataSet<T>
 
   public getFieldKey(field: ChartDataSectionField) {
     return this.toKey(field);
+  }
+
+  public getFieldOriginKey(field: ChartDataSectionField) {
+    return this.toOriginKey(field);
   }
 
   public getFieldIndex(field: ChartDataSectionField) {
