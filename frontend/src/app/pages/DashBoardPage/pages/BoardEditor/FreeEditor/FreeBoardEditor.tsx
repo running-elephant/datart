@@ -17,8 +17,8 @@
  */
 
 import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetCore/WidgetName/WidgetName';
+import { WidgetInfoContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
 import produce from 'immer';
 import React, {

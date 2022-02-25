@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import { MediaWidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useContext } from 'react';
+import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import IframeWidget from './IframeWidget';
 import ImageWidget from './ImageWidget';

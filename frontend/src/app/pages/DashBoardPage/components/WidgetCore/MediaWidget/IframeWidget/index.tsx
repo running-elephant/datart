@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 import { Button, Form, Input } from 'antd';
-import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import produce from 'immer';
 import React, { useContext, useEffect, useState } from 'react';
@@ -25,6 +24,7 @@ import styled from 'styled-components/macro';
 import { G20 } from 'styles/StyleConstants';
 import { MediaWidgetContent } from '../../../../pages/Board/slice/types';
 import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
+import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 
 const IframeWidget: React.FC<{}> = () => {

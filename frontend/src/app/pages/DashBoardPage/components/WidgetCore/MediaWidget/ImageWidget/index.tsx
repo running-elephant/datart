@@ -17,7 +17,6 @@
  */
 import { Empty } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import useClientRect from 'app/pages/DashBoardPage/hooks/useClientRect';
 import { MediaWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { UploadDragger } from 'app/pages/DashBoardPage/pages/BoardEditor/components/SlideSetting/SettingItem/BasicSet/ImageUpload';
@@ -25,6 +24,7 @@ import produce from 'immer';
 import React, { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
+import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 
 const widgetSize: React.CSSProperties = {

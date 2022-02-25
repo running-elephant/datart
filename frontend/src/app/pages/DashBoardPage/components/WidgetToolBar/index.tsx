@@ -18,9 +18,9 @@
 import { Space } from 'antd';
 import React, { FC, useContext } from 'react';
 import styled from 'styled-components';
-import { WidgetInfoContext } from '../../contexts/WidgetInfoContext';
 import { WidgetType } from '../../pages/Board/slice/types';
 import { BoardContext } from '../BoardProvider/BoardProvider';
+import { WidgetInfoContext } from '../WidgetProvider/WidgetInfoProvider';
 import { WidgetMethodContext } from '../WidgetProvider/WidgetMethodProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import {
