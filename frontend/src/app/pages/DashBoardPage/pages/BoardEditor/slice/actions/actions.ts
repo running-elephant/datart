@@ -191,6 +191,7 @@ export const editChartInWidgetAction =
     chartName?: string;
     dataChartId: string;
     chartType: 'dataChart' | 'widgetChart';
+    chartId: string;
   }) =>
   async (dispatch, getState) => {
     const {
@@ -199,6 +200,7 @@ export const editChartInWidgetAction =
       dataChartId,
       chartType,
       chartName = 'widget_chart',
+      chartId,
     } = props;
     const board = (getState() as RootState).board!;
 
@@ -216,6 +218,7 @@ export const editChartInWidgetAction =
       chartType: chartType,
       container: 'widget',
       originChart: withViewDataChart,
+      chartId,
     };
     dispatch(editDashBoardInfoActions.changeChartEditorProps(editorProps));
   };

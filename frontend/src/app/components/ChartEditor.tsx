@@ -42,6 +42,7 @@ import {
   SaveFormContext,
   useSaveFormContext,
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
+import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { makeDownloadDataTask } from 'app/utils/fetch';
@@ -67,6 +68,7 @@ export interface ChartEditorBaseProps {
   orgId: string;
   container: 'widget' | 'dataChart';
   chartType: WidgetContentChartType;
+  chartId?: string;
   widgetId?: string;
   defaultViewId?: string;
   originChart?: ChartDTO | DataChart;
@@ -95,12 +97,14 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   dataChartId,
   chartType,
   defaultViewId,
+  chartId,
   onClose,
   onSaveInWidget,
   onSaveInDataChart,
 }) => {
   const saveFormContextValue = useSaveFormContext();
   const { actions } = useWorkbenchSlice();
+  const { actions: mainActions } = useMainSlice();
   const dispatch = useDispatch();
   const dataset = useSelector(datasetsSelector);
   const dataview = useSelector(currentDataViewSelector);
@@ -438,7 +442,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     setIsNeedRequest(false);
   }, [dispatch]);
 
-  const handleCreateDownloadDataTask = async () => {
+  const handleCreateDownloadDataTask = useCallback(async () => {
     if (!dataview?.id) {
       return;
     }
@@ -455,12 +459,35 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     );
     dispatch(
       makeDownloadDataTask({
-        downloadParams: [builder.build()],
+        downloadParams: [
+          {
+            ...builder.build(),
+            ...{
+              analytics: dataChartId ? false : true,
+              vizName: backendChart?.name || 'chart',
+              vizId: container === 'widget' ? chartId : dataChartId,
+              vizType: container,
+            },
+          },
+        ],
         fileName: backendChart?.name || 'chart',
-        resolve: () => {},
+        resolve: () => {
+          dispatch(mainActions.setDownloadPolling(true));
+        },
       }),
     );
-  };
+  }, [
+    aggregation,
+    backendChart?.name,
+    chartConfig?.datas,
+    chartConfig?.settings,
+    dataChartId,
+    dataview,
+    dispatch,
+    mainActions,
+    chartId,
+    container,
+  ]);
 
   return (
     <StyledChartWorkbenchPage>

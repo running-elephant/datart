@@ -122,6 +122,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
               chartName: widget.config.name,
               dataChartId: widget.datachartId,
               chartType: chartType as WidgetContentChartType,
+              chartId: widget.id,
             }),
           );
           break;

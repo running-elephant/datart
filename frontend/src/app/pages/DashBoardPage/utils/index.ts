@@ -360,15 +360,27 @@ export const getBoardChartRequests = (params: {
 
   const chartRequest = chartWidgetIds
     .map(widgetId => {
-      return getChartWidgetRequestParams({
-        widgetId,
-        widgetMap,
-        viewMap,
-        option: undefined,
-        widgetInfo: undefined,
-        dataChartMap,
-      });
+      const isWidget = widgetMap[widgetId].datachartId.indexOf('widget') !== -1;
+      return {
+        ...getChartWidgetRequestParams({
+          widgetId,
+          widgetMap,
+          viewMap,
+          option: undefined,
+          widgetInfo: undefined,
+          dataChartMap,
+        }),
+        ...{
+          vizName: widgetMap[widgetId].config.name,
+          vizId: isWidget
+            ? widgetMap[widgetId].id
+            : widgetMap[widgetId].datachartId,
+          analytics: false,
+          vizType: isWidget ? 'widget' : 'dataChart',
+        },
+      };
     })
+
     .filter(res => {
       if (res) {
         return true;

@@ -60,6 +60,7 @@ export const BoardActionProvider: FC<{ id: string }> = ({
   const { config: boardConfig } = useContext(BoardConfigContext);
   const saveAsViz = useSaveAsViz();
   const { hasQueryControl } = boardConfig;
+
   const actions: BoardActionContextProps = {
     widgetUpdate: (widget: Widget) => {
       if (editing) {

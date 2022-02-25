@@ -199,9 +199,20 @@ const ChartPreviewBoard: FC<{
         false,
         chartPreview?.backendChart?.config?.aggregation,
       );
+
       dispatch(
         makeDownloadDataTask({
-          downloadParams: [builder.build()],
+          downloadParams: [
+            {
+              ...builder.build(),
+              ...{
+                vizId: chartPreview?.backendChart?.id,
+                vizName: chartPreview?.backendChart?.name,
+                analytics: false,
+                vizType: 'dataChart',
+              },
+            },
+          ],
           fileName: chartPreview?.backendChart?.name || 'chart',
           resolve: () => {
             dispatch(actions.setDownloadPolling(true));

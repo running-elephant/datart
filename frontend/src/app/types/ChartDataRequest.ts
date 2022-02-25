@@ -46,6 +46,9 @@ export type ChartDataRequest = {
   concurrencyControl?: boolean;
   concurrencyControlMode?: string;
   params?: Record<string, string[]>;
+  vizId?: string;
+  vizName?: string;
+  analytics?: Boolean;
 };
 
 export type ChartDataRequestFilter = {
