@@ -29,6 +29,8 @@ export interface IChartDataSetRow<T> extends Array<T> {
   getFieldIndex(field: ChartDataSectionField): number;
 
   convertToObject(): object;
+
+  convertToCaseSensitiveObject(): object;
 }
 
 export interface IChartDataSet<T> extends Array<IChartDataSetRow<T>> {

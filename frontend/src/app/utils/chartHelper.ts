@@ -41,11 +41,7 @@ import ChartMetadata from 'app/types/ChartMetadata';
 import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
 import moment from 'moment';
 import { Debugger } from 'utils/debugger';
-import { isEmpty,
-  isEmptyArray,
-  isUndefined,
-  meanValue,
-  pipe,} from 'utils/object';
+import { isEmpty, isEmptyArray, meanValue, pipe } from 'utils/object';
 import {
   flattenHeaderRowsWithoutGroupRow,
   getColumnRenderOriginName,
@@ -73,7 +69,7 @@ import {
  * @param {IFieldFormatConfig} [format]
  * @return {*}
  */
- export function toFormattedValue(
+export function toFormattedValue(
   value?: number | string,
   format?: IFieldFormatConfig,
 ) {
@@ -910,16 +906,17 @@ export function getNameTextStyle(fontFamily, fontSize, color) {
  * @template T
  * @param {T[][]} [datas]
  * @param {ChartDatasetMeta[]} [metas]
- * @param {ChartDataConfig[]} [sortedConfigs]
+ * @param {ChartDataConfig[]} [dataConfigs]
  * @return {*}  {IChartDataSet<T>}
  */
 export function transformToDataSet<T>(
   datas?: T[][],
   metas?: ChartDatasetMeta[],
-  sortedConfigs?: ChartDataConfig[],
+  dataConfigs?: ChartDataConfig[],
 ): IChartDataSet<T> {
-  const ds = new ChartDataSet(datas || [], metas || []);
-  ds.sortBy(sortedConfigs || []);
+  const fields = (dataConfigs || []).flatMap(config => config.rows || []);
+  const ds = new ChartDataSet(datas || [], metas || [], fields || []);
+  ds.sortBy(dataConfigs || []);
   return ds;
 }
 
@@ -1220,7 +1217,8 @@ export function getGridStyle(styles) {
 export function getExtraSeriesRowData(data) {
   if (data instanceof ChartDataSetRow) {
     return {
-      rowData: data?.convertToObject(),
+      // NOTE: row data should be case sensitive except for data chart
+      rowData: data?.convertToCaseSensitiveObject(),
     };
   }
 
