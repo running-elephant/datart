@@ -788,7 +788,9 @@
         "delete": "Delete",
         "copy": "Copy",
         "paste": "Paste",
-        "deviceSwitch": "Device Switch"
+        "deviceSwitch": "Device Switch",
+        "allowOverlap": "Allow Overlap",
+        "forbidOverlap": "Forbid Overlap"
       },
       "controlTypes": {
         "common": "Common",
@@ -976,7 +978,8 @@
         "label": "Layout",
         "auto": "Auto",
         "free": "Free",
-        "tips": "Auto : create responsive dashboard  Free : create ensure size dashboard",
+        "autoTips": "Auto: Responsive, fluid layout",
+        "freeTips": "Free: Precise, fixed layout",
         "requiredMessage": "Select a Layout Type"
       },
       "parent": "Parent",

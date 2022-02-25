@@ -15,6 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetInfo } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { createContext } from 'react';
-export const WidgetInfoContext = createContext<WidgetInfo>({} as WidgetInfo);
+import { VERSION_LIST } from '../constants';
+import { versionCanDo } from '../utils';
+describe('test versionCanDo ', () => {
+  test(`no testVersion `, () => {
+    expect(versionCanDo('v1', undefined)).toBe(true);
+  });
+  const v1 = VERSION_LIST[0];
+  const v2 = VERSION_LIST[1];
+  test(`v2 canDo v1 `, () => {
+    expect(versionCanDo(v2, v1)).toBe(true);
+  });
+  test(`v1 not canDo v2 `, () => {
+    expect(versionCanDo(v1, v2)).toBe(false);
+  });
+  test(`v2 canDo v2 `, () => {
+    expect(versionCanDo(v2, v2)).toBe(true);
+  });
+});

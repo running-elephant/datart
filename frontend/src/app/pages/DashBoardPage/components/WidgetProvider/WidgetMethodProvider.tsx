@@ -22,14 +22,9 @@ import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams, ChartsEventData } from 'app/types/Chart';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
-import { FC, useCallback, useContext } from 'react';
+import { createContext, FC, useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
-import { BoardContext } from '../../contexts/BoardContext';
-import {
-  WidgetMethodContext,
-  WidgetMethodContextProps,
-} from '../../contexts/WidgetMethodContext';
 import { boardActions } from '../../pages/Board/slice';
 import {
   getChartWidgetDataAsync,
@@ -58,9 +53,19 @@ import {
   getEditChartWidgetDataAsync,
   getEditWidgetData,
 } from '../../pages/BoardEditor/slice/thunk';
+import { BoardContext } from '../BoardProvider/BoardProvider';
 import { widgetActionType } from '../WidgetToolBar/config';
 
 const { confirm } = Modal;
+
+export interface WidgetMethodContextProps {
+  onWidgetAction: (action: widgetActionType, widget: Widget) => void;
+  widgetChartClick: (widget: Widget, params: ChartMouseEventParams) => void;
+  onClearLinkage: (widget: Widget) => void;
+}
+export const WidgetMethodContext = createContext<WidgetMethodContextProps>(
+  {} as WidgetMethodContextProps,
+);
 export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   widgetId,
   children,

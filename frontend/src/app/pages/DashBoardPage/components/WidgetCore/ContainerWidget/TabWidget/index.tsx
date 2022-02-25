@@ -16,17 +16,17 @@
  * limitations under the License.
  */
 import { Tabs } from 'antd';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
-import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import { ContainerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useCallback, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { PRIMARY } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
-import { BoardContext } from '../../../../contexts/BoardContext';
 import { editBoardStackActions } from '../../../../pages/BoardEditor/slice';
+import { BoardContext } from '../../../BoardProvider/BoardProvider';
 import { WidgetAllProvider } from '../../../WidgetProvider/WidgetAllProvider';
+import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
+import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 import DropHolder from './DropHolder';
 import TabWidgetContainer from './WidgetOfTab';
 

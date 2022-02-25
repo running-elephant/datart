@@ -22,6 +22,7 @@ import { AddChart } from './AddChart/AddChart';
 import { AddContainer } from './AddContainer/AddContainer';
 import { AddController } from './AddControler/AddControler';
 import { AddMedia } from './AddMedia/AddMedia';
+import { AllowOverlapBtn } from './AllowOverlap';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
 import { CopyBtn, PasteBtn } from './CopyPaste/CopyPaste';
 import { DeleteWidgetsBtn } from './DeleteWidgetsBtn';
@@ -45,12 +46,8 @@ export const ToolBar = () => {
           <AddContainer />
           <Divider type="vertical" />
           <AddController />
-          {boardType === 'free' && (
-            <>
-              <ToTopBtn />
-              <ToBottomBtn />
-            </>
-          )}
+          <ToTopBtn />
+          <ToBottomBtn />
           <Divider type="vertical" />
           <UndoBtn />
           <RedoBtn />
@@ -63,6 +60,8 @@ export const ToolBar = () => {
             <>
               <Divider type="vertical" />
               <DeviceSwitcher />
+              <Divider type="vertical" />
+              <AllowOverlapBtn />
             </>
           )}
         </>

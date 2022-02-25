@@ -61,6 +61,9 @@ export const editBoardStackSlice = createSlice({
     updateBoard(state, action: PayloadAction<Dashboard>) {
       state.dashBoard = action.payload;
     },
+    toggleAllowOverlap(state, action: PayloadAction<boolean>) {
+      state.dashBoard.config.allowOverlap = action.payload;
+    },
     updateBoardConfig(state, action: PayloadAction<DashboardConfig>) {
       state.dashBoard.config = action.payload;
     },
@@ -242,11 +245,13 @@ export const editBoardStackSlice = createSlice({
       state,
       action: PayloadAction<{
         id: string;
-        mediaWidgetConfig: MediaWidgetContent;
+        mediaWidgetContent: MediaWidgetContent;
       }>,
     ) {
-      const { id, mediaWidgetConfig } = action.payload;
-      state.widgetRecord[id].config.content = mediaWidgetConfig;
+      const { id, mediaWidgetContent } = action.payload;
+      if (state.widgetRecord[id]) {
+        state.widgetRecord[id].config.content = mediaWidgetContent;
+      }
     },
   },
   extraReducers: builder => {

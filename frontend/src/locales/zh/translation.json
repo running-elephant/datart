@@ -788,7 +788,9 @@
         "delete": "删除",
         "copy": "复制",
         "paste": "粘贴",
-        "deviceSwitch": "设备切换"
+        "deviceSwitch": "设备切换",
+        "allowOverlap": "允许组件重叠",
+        "forbidOverlap": "禁止组件重叠"
       },
       "controlTypes": {
         "common": "常规",
@@ -974,9 +976,10 @@
       "description": "描述",
       "boardType": {
         "label": "布局类型",
-        "auto": "自动",
-        "free": "自由",
-        "tips": "自动布局 :方便快速创建响应式仪表板  自由布局 :创建精美大屏类数字应用",
+        "auto": "自动布局",
+        "free": "自由布局",
+        "autoTips": "自动布局：流式布局，可适配多终端",
+        "freeTips": "自由布局：固定布局，用于制作大屏",
         "requiredMessage": "请选择一种布局方式"
       },
       "parent": "所属目录",

@@ -19,8 +19,8 @@
 import { Form, Modal } from 'antd';
 import { Split } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
+import { BoardActionContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardActionProvider';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { selectViewMap } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import {
   ControllerWidgetContent,

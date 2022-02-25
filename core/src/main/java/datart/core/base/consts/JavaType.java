@@ -18,8 +18,14 @@ public enum JavaType {
 
     DOUBLE,
 
+    BIGDECIMAL,
+
     STRING,
 
     DATE,
+
+    LOCALDATE,
+
+    LOCALDATETIME
 
 }

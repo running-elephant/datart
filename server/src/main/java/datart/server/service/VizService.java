@@ -73,4 +73,6 @@ public interface VizService {
 
     boolean unpublish(ResourceType resourceType, String vizId);
 
+    String getChartConfigByVizId(String vizId, String vizType);
+
 }

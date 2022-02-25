@@ -26,7 +26,8 @@ import {
 import { Menu, Popconfirm } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useContext, useMemo } from 'react';
-import { BoardContext } from '../contexts/BoardContext';
+import { BoardContext } from './BoardProvider/BoardProvider';
+
 export interface BoardOverLayProps {
   onOpenShareLink?: () => void;
   onBoardToDownLoad: () => void;

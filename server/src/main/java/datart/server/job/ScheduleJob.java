@@ -13,6 +13,7 @@ import datart.core.entity.Folder;
 import datart.core.entity.Schedule;
 import datart.core.entity.ScheduleLog;
 import datart.core.entity.User;
+import datart.core.entity.poi.POISettings;
 import datart.core.mappers.ext.ScheduleLogMapperExt;
 import datart.core.mappers.ext.ScheduleMapperExt;
 import datart.core.mappers.ext.UserMapperExt;
@@ -26,10 +27,8 @@ import datart.server.base.params.DownloadCreateParam;
 import datart.server.base.params.ShareCreateParam;
 import datart.server.base.params.ShareToken;
 import datart.server.base.params.ViewExecuteParam;
-import datart.server.service.DataProviderService;
-import datart.server.service.FolderService;
-import datart.server.service.ShareService;
-import datart.server.service.VizService;
+import datart.server.service.*;
+import datart.server.service.common.PoiConvertUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -178,9 +177,11 @@ public abstract class ScheduleJob implements Job, Closeable {
             ViewExecuteParam viewExecuteParam = downloadParams.getDownloadParams().get(i);
             viewExecuteParam.setPageInfo(PageInfo.builder().pageNo(1)
                     .pageSize(Integer.MAX_VALUE).build());
-            String vizName = viewExecuteParam.getVizName();
             Dataframe dataframe = dataProviderService.execute(downloadParams.getDownloadParams().get(i));
-            POIUtils.withSheet(workbook, StringUtils.isEmpty(vizName) ? "Sheet" + i : vizName, dataframe);
+            String chartConfigStr = vizService.getChartConfigByVizId(viewExecuteParam.getVizId(), viewExecuteParam.getVizType());
+            POISettings poiSettings = PoiConvertUtils.covertToPoiSetting(chartConfigStr, dataframe);
+            String sheetName = StringUtils.isNotBlank(viewExecuteParam.getVizName()) ? viewExecuteParam.getVizName() : "Sheet"+i;
+            POIUtils.withSheet(workbook, sheetName, dataframe, poiSettings);
         }
         File tempFile = File.createTempFile(UUIDGenerator.generate(), ".xlsx");
         POIUtils.save(workbook, tempFile.getPath(), true);

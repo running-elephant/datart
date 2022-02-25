@@ -37,6 +37,7 @@ import FreeEditor from './FreeEditor/index';
 import { editBoardStackActions, editDashBoardInfoActions } from './slice';
 import {
   addVariablesToBoard,
+  clearEditBoardState,
   editHasChartWidget,
 } from './slice/actions/actions';
 import {
@@ -154,11 +155,11 @@ export const BoardEditor: React.FC<{
     return () => {
       // fix issue: #800
       onCloseChartEditor();
+      dispatch(clearEditBoardState());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onCloseChartEditor]);
 
-  useEffect(() => {});
   return (
     <Wrapper>
       <DndProvider backend={HTML5Backend}>

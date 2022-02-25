@@ -15,7 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { createContext } from 'react';
-export interface WidgetContextProps extends Widget {}
-export const WidgetContext = createContext<WidgetContextProps>({} as Widget);
+
+import { VERSION_LIST } from './constants';
+
+export const versionCanDo = (curVersion: string, testVersion?: string) => {
+  let testVersionIndex = VERSION_LIST.indexOf(testVersion || '');
+  if (testVersionIndex === -1) return true;
+  let curVersionIndex = VERSION_LIST.indexOf(curVersion);
+  return curVersionIndex >= testVersionIndex;
+};

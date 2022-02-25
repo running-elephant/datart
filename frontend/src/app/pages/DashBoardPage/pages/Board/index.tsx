@@ -109,7 +109,7 @@ export const Board: React.FC<BoardProps> = memo(
       // 销毁组件 清除该对象缓存
       return () => {
         dispatch(boardActions.clearBoardStateById(boardId));
-        dispatch(clearEditBoardState(boardId));
+        dispatch(clearEditBoardState());
       };
     }, [boardId, dispatch, fetchData, searchParams]);
 

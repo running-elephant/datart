@@ -255,7 +255,9 @@ const widgetInfoRecordSlice = createSlice({
   extraReducers: builder => {
     builder.addCase(getEditChartWidgetDataAsync.pending, (state, action) => {
       const { widgetId } = action.meta.arg;
-      state[widgetId].loading = true;
+      if (state[widgetId]) {
+        state[widgetId].loading = true;
+      }
     });
     builder.addCase(getEditChartWidgetDataAsync.fulfilled, (state, action) => {
       const { widgetId } = action.meta.arg;
@@ -296,6 +298,7 @@ export const { actions: editWidgetDataActions } = editWidgetDataSlice;
 const filterActions = [
   editBoardStackActions.setBoardToEditStack,
   editBoardStackActions.updateBoard,
+  editBoardStackActions.toggleAllowOverlap,
   editBoardStackActions.updateBoardConfig,
   editBoardStackActions.addWidgets,
   editBoardStackActions.deleteWidgets,

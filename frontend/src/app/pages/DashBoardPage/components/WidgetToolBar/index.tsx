@@ -18,11 +18,11 @@
 import { Space } from 'antd';
 import React, { FC, useContext } from 'react';
 import styled from 'styled-components';
-import { BoardContext } from '../../contexts/BoardContext';
-import { WidgetContext } from '../../contexts/WidgetContext';
-import { WidgetInfoContext } from '../../contexts/WidgetInfoContext';
-import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
 import { WidgetType } from '../../pages/Board/slice/types';
+import { BoardContext } from '../BoardProvider/BoardProvider';
+import { WidgetInfoContext } from '../WidgetProvider/WidgetInfoProvider';
+import { WidgetMethodContext } from '../WidgetProvider/WidgetMethodProvider';
+import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import {
   CancelLinkageIcon,
   CanLinkageIcon,
@@ -98,9 +98,9 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
     <StyleWrap onClick={ssp} className="widget-tool-bar">
       <Space size={0}>
         {renderErrorInfo(errInfo)}
-        {renderLocking()}
         {renderWaiting()}
         {renderLoading()}
+        {renderLocking()}
         {renderLinkage()}
         {renderWidgetAction()}
       </Space>

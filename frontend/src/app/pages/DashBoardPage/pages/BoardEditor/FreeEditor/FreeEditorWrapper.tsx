@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import React, { useContext } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -30,9 +30,13 @@ import { selectLayoutWidgetMap } from '../slice/selectors';
 import { WidgetOfFreeEdit } from './FreeBoardEditor';
 
 export const FreeEditorWrapper: React.FC<{}> = () => {
-  const { config } = useContext(BoardConfigContext);
+  const {
+    width: boardWidth,
+    height: boardHeight,
+    scaleMode,
+  } = useContext(BoardConfigContext);
   const { editing, autoFit } = useContext(BoardContext);
-  const { width: boardWidth, height: boardHeight, scaleMode } = config;
+
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
   const sortedLayoutWidgets = Object.values(layoutWidgetMap).sort(
     (a, b) => a.config.index - b.config.index,

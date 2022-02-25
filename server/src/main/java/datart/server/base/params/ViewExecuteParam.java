@@ -34,6 +34,8 @@ public class ViewExecuteParam {
 
     private String vizName;
 
+    private String vizType;
+
     private String viewId;
 
     private List<SelectKeyword> keywords;
@@ -63,6 +65,8 @@ public class ViewExecuteParam {
     private int cacheExpires;
 
     private boolean script;
+
+    private boolean analytics;
 
     public boolean isEmpty() {
         return CollectionUtils.isEmpty(columns)
