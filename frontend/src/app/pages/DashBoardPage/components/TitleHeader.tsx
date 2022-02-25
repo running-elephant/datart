@@ -46,8 +46,8 @@ import {
   SPACE_SM,
 } from 'styles/StyleConstants';
 import { BoardActionContext } from '../contexts/BoardActionContext';
-import { BoardInfoContext } from '../contexts/BoardInfoContext';
 import { BoardOverLay } from './BoardOverLay';
+import { BoardInfoContext } from './BoardProvider/BoardInfoProvider';
 import { BoardContext } from './BoardProvider/BoardProvider';
 import SaveToStoryBoard from './SaveToStoryBoard';
 
