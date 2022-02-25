@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-import { SelectOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Menu, Modal, Row, Tooltip } from 'antd';
+import { Button, Menu, Modal, Row } from 'antd';
+import ChromeColorPicker from 'app/components/ColorPicker/ChromeColorPicker';
 import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { DeltaStatic } from 'quill';
@@ -43,6 +43,7 @@ import {
   MarkdownOptions,
 } from './RichTextPluginLoader/RichTextConfig';
 import TagBlot from './RichTextPluginLoader/TagBlot';
+import { useQuillBar } from './useQuillBar';
 
 Quill.register('modules/imageDrop', ImageDrop);
 Quill.register('formats/tag', TagBlot);
@@ -56,6 +57,12 @@ Quill.register(font, true);
 
 const MenuItem = Menu.Item;
 
+const CUSTOM_COLOR = 'custom-color';
+const CUSTOM_COLOR_INIT = {
+  background: 'transparent',
+  color: '#000',
+};
+
 const ChartRichTextAdapter: FC<{
   dataList: any[];
   id: string;
@@ -63,6 +70,7 @@ const ChartRichTextAdapter: FC<{
   initContent: string | undefined;
   onChange: (delta: string | undefined) => void;
   openQuillMarkdown?: boolean;
+  t?: (key: string) => string;
 }> = memo(
   ({
     dataList,
@@ -71,6 +79,7 @@ const ChartRichTextAdapter: FC<{
     initContent,
     onChange,
     openQuillMarkdown = false,
+    t,
   }) => {
     const [containerId, setContainerId] = useState<string>();
     const [quillModules, setQuillModules] = useState<any>(null);
@@ -81,6 +90,16 @@ const ChartRichTextAdapter: FC<{
     const quillMarkdownConfigRef = useRef<any>(null);
     const quillRef = useRef<ReactQuill>(null);
     const quillEditRef = useRef<ReactQuill>(null);
+
+    const [customColorVisible, setCustomColorVisible] =
+      useState<boolean>(false);
+    const [customColor, setCustomColor] = useState<{
+      background: string;
+      color: string;
+    }>({ ...CUSTOM_COLOR_INIT });
+    const [customColorType, setCustomColorType] = useState<
+      'color' | 'background'
+    >('color');
 
     useEffect(() => {
       const value = (initContent && JSON.parse(initContent)) || '';
@@ -94,9 +113,23 @@ const ChartRichTextAdapter: FC<{
         const modules = {
           toolbar: {
             container: isEditing ? `#${newId}` : null,
-            handlers: {},
+            handlers: {
+              color: function (value) {
+                if (value === CUSTOM_COLOR) {
+                  setCustomColorType('color');
+                  setCustomColorVisible(true);
+                }
+                quillEditRef.current!.getEditor().format('color', value);
+              },
+              background: function (value) {
+                if (value === CUSTOM_COLOR) {
+                  setCustomColorType('background');
+                  setCustomColorVisible(true);
+                }
+                quillEditRef.current!.getEditor().format('background', value);
+              },
+            },
           },
-
           calcfield: {},
           imageDrop: true,
         };
@@ -146,6 +179,43 @@ const ChartRichTextAdapter: FC<{
 
     useLayoutEffect(() => {
       if (quillEditRef.current) {
+        quillEditRef.current
+          .getEditor()
+          .on('selection-change', (r: { index: number; length: number }) => {
+            if (!r?.index) return;
+            try {
+              const index = r.length === 0 ? r.index - 1 : r.index;
+              const length = r.length === 0 ? 1 : r.length;
+              const delta = quillEditRef
+                .current!.getEditor()
+                .getContents(index, length);
+
+              if (delta.ops?.length === 1 && delta.ops[0]?.attributes) {
+                const { background, color } = delta.ops[0].attributes;
+                setCustomColor({
+                  background: background || CUSTOM_COLOR_INIT.background,
+                  color: color || CUSTOM_COLOR_INIT.color,
+                });
+
+                const colorNode = document.querySelector(
+                  '.ql-color .ql-color-label',
+                );
+                const backgroundNode = document.querySelector(
+                  '.ql-background .ql-color-label',
+                );
+                if (color && !colorNode?.getAttribute('style')) {
+                  colorNode!.setAttribute('style', `stroke: ${color}`);
+                }
+                if (background && !backgroundNode?.getAttribute('style')) {
+                  backgroundNode!.setAttribute('style', `fill: ${background}`);
+                }
+              } else {
+                setCustomColor({ ...CUSTOM_COLOR_INIT });
+              }
+            } catch (error) {
+              console.error('selection-change callback | error', error);
+            }
+          });
         if (openQuillMarkdown) {
           quillMarkdownConfigRef.current = new QuillMarkdown(
             quillEditRef.current.getEditor(),
@@ -158,6 +228,13 @@ const ChartRichTextAdapter: FC<{
         }
       }
     }, [openQuillMarkdown, quillModules]);
+
+    const customColorChange = color => {
+      if (color) {
+        quillEditRef.current!.getEditor().format(customColorType, color);
+      }
+      setCustomColorVisible(false);
+    };
 
     const reactQuillView = useMemo(
       () =>
@@ -218,99 +295,7 @@ const ChartRichTextAdapter: FC<{
       );
     }, [dataList, selectField]);
 
-    const toolbar = useMemo(
-      () => (
-        <div id={containerId}>
-          <span className="ql-formats">
-            <select
-              className="ql-font"
-              key="ql-font"
-              defaultValue={FONT_FAMILIES[0].value}
-            >
-              {FONT_FAMILIES.map(font => (
-                <option value={font.value} key={font.name}>
-                  {font.name}
-                </option>
-              ))}
-            </select>
-            <select className="ql-size" key="ql-size" defaultValue="13px">
-              {FONT_SIZES.map(size => (
-                <option value={`${size}px`} key={size}>{`${size}px`}</option>
-              ))}
-            </select>
-            <Tooltip title="加粗" key="ql-bold-tooltip">
-              <button className="ql-bold" key="ql-bold" />
-            </Tooltip>
-            <Tooltip title="斜体" key="ql-italic-tooltip">
-              <button className="ql-italic" key="ql-italic" />
-            </Tooltip>
-            <Tooltip title="下划线" key="ql-underline-tooltip">
-              <button className="ql-underline" key="ql-underline" />
-            </Tooltip>
-            <Tooltip title="删除线" key="ql-strike-tooltip">
-              <button className="ql-strike" key="ql-strike" />
-            </Tooltip>
-          </span>
-
-          <span className="ql-formats">
-            <select className="ql-color" key="ql-color" />
-            <select className="ql-background" key="ql-background" />
-          </span>
-
-          <span className="ql-formats">
-            <select className="ql-align" key="ql-align" />
-            <Tooltip title="减少缩进" key="ql-indent-tooltip">
-              <button className="ql-indent" value="-1" key="ql-indent" />
-            </Tooltip>
-            <Tooltip title="增加缩进" key="ql-indent-tooltip-up">
-              <button className="ql-indent" value="+1" key="ql-indent-up" />
-            </Tooltip>
-          </span>
-
-          <span className="ql-formats">
-            <Tooltip title="有序列表" key="ql-ordered-tooltip">
-              <button className="ql-list" value="ordered" key="ql-ordered" />
-            </Tooltip>
-            <Tooltip title="无序列表" key="ql-bullet-tooltip">
-              <button className="ql-list" value="bullet" key="ql-list" />
-            </Tooltip>
-            <Tooltip title="引用" key="ql-blockquote-tooltip">
-              <button className="ql-blockquote" key="ql-blockquote" />
-            </Tooltip>
-            <Tooltip title="代码" key="ql-code-block-tooltip">
-              <button className="ql-code-block" key="ql-code-block" />
-            </Tooltip>
-          </span>
-
-          <span className="ql-formats">
-            <Tooltip title="超链接" key="ql-link-tooltip">
-              <button className="ql-link" key="ql-link" />
-            </Tooltip>
-            <Tooltip title="图片" key="ql-image-tooltip">
-              <button className="ql-image" key="ql-image" />
-            </Tooltip>
-            <Tooltip title="引用字段" key="ql-selectLink-tooltip">
-              <Dropdown
-                overlay={fieldItems}
-                trigger={['click']}
-                key="ql-selectLink"
-              >
-                <a className="selectLink">
-                  <SelectOutlined />
-                </a>
-              </Dropdown>
-            </Tooltip>
-          </span>
-
-          <span className="ql-formats">
-            <Tooltip title="清除样式" key="ql-clean-tooltip">
-              <button className="ql-clean" key="ql-clean" />
-            </Tooltip>
-          </span>
-        </div>
-      ),
-      [containerId, fieldItems],
-    );
+    const toolbar = useQuillBar(containerId, t, CUSTOM_COLOR, fieldItems);
 
     const reactQuillEdit = useMemo(
       () =>
@@ -349,7 +334,6 @@ const ChartRichTextAdapter: FC<{
 
     return (
       <TextWrap onClick={ssp}>
-        <div id="editor"></div>
         <QuillBox id="quill-box">
           {quillModules && reactQuillEdit}
           {quillModules && !isEditing && reactQuillView}
@@ -366,11 +350,30 @@ const ChartRichTextAdapter: FC<{
         >
           {isEditing && reactQuillView}
         </Modal>
+        <Modal
+          width={273}
+          mask={false}
+          visible={customColorVisible}
+          footer={null}
+          closable={false}
+          onCancel={() => setCustomColorVisible(false)}
+        >
+          <ChromeColorPicker
+            // @TM 该组件无法更新color 暂时用key解决
+            key={customColor?.[customColorType]}
+            color={customColor?.[customColorType]}
+            onChange={customColorChange}
+          />
+        </Modal>
       </TextWrap>
     );
   },
 );
 export default ChartRichTextAdapter;
+
+interface IQuillProp {
+  moreBtnText: string;
+}
 
 const QuillBox = styled.div`
   width: 100%;
@@ -384,6 +387,30 @@ const QuillBox = styled.div`
   .react-quill-view {
     flex: 1;
     overflow-y: auto;
+  }
+  // @TM 自定义色块
+  .ql-picker-options [data-value=${CUSTOM_COLOR}] {
+    position: relative;
+    width: calc(100% - 4px);
+    background-color: transparent !important;
+    color: #343a40;
+    font-weight: 400;
+    font-size: 12px;
+    // todo (tianlei) Need to nationalize
+    &::after {
+      content: '更多';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    &:hover {
+      border: none;
+    }
+  }
+  .ql-snow .ql-color .ql-picker-options,
+  .ql-snow .ql-background .ql-picker-options {
+    width: 232px;
   }
 `;
 const TextWrap = styled.div`

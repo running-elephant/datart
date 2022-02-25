@@ -59,6 +59,7 @@ import {
   closeJumpAction,
   closeLinkageAction,
   editChartInWidgetAction,
+  toggleLockWidgetAction,
 } from '../../pages/BoardEditor/slice/actions/actions';
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
 import {
@@ -464,6 +465,12 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
           break;
         case 'closeJump':
           dispatch(closeJumpAction(widget));
+          break;
+        case 'lock':
+          dispatch(toggleLockWidgetAction(widget, true));
+          break;
+        case 'unlock':
+          dispatch(toggleLockWidgetAction(widget, false));
           break;
         case 'closeLinkage':
           dispatch(closeLinkageAction(widget));

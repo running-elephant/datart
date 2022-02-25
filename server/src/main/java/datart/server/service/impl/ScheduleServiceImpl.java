@@ -41,8 +41,10 @@ import datart.server.base.params.ScheduleCreateParam;
 import datart.server.base.params.ScheduleUpdateParam;
 import datart.server.service.BaseService;
 import datart.server.service.RoleService;
-import datart.server.service.ScheduleJob;
+import datart.server.job.EmailJob;
+import datart.server.job.ScheduleJob;
 import datart.server.service.ScheduleService;
+import datart.server.job.WeChartJob;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.BeanUtils;
@@ -195,6 +197,7 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
                 .startAt(schedule.getStartDate())
                 .endAt(schedule.getEndDate())
                 .build();
+
         scheduler.scheduleJob(createJobDetail(schedule), trigger);
         schedule.setActive(true);
         scheduleMapper.updateByPrimaryKey(schedule);

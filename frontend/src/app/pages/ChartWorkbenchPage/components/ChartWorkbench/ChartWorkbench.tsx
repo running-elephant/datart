@@ -42,7 +42,7 @@ const ChartWorkbench: FC<{
   aggregation?: boolean;
   defaultViewId?: string;
   expensiveQuery: boolean;
-  isNeedRequest: boolean;
+  allowQuery: boolean;
   header?: {
     name?: string;
     orgId?: string;
@@ -67,7 +67,7 @@ const ChartWorkbench: FC<{
     header,
     defaultViewId,
     expensiveQuery,
-    isNeedRequest,
+    allowQuery,
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
@@ -111,7 +111,7 @@ const ChartWorkbench: FC<{
                     chart={chart}
                     defaultViewId={defaultViewId}
                     chartConfig={chartConfig}
-                    isNeedRequest={isNeedRequest}
+                    allowQuery={allowQuery}
                     onChartChange={onChartChange}
                     onChartConfigChange={onChartConfigChange}
                     onDataViewChange={onDataViewChange}

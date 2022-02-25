@@ -20,11 +20,9 @@
 package datart.server.config;
 
 import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.TypeResolver;
-import com.fasterxml.classmate.types.ResolvedObjectType;
+import com.google.common.collect.Lists;
 import datart.server.base.dto.ResponseData;
 import org.apache.commons.lang3.reflect.TypeUtils;
-import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,13 +30,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.schema.ModelReference;
 import springfox.documentation.schema.ResolvedTypes;
 import springfox.documentation.schema.TypeNameExtractor;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ApiKey;
 import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
+
 import springfox.documentation.spi.schema.contexts.ModelContext;
 import springfox.documentation.spi.service.OperationBuilderPlugin;
 import springfox.documentation.spi.service.contexts.OperationContext;
@@ -46,7 +44,6 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,22 +51,16 @@ import java.util.List;
 @EnableSwagger2
 public class SwaggerConfiguration {
 
-    @Autowired
-    private TypeNameExtractor nameExtractor;
+//    @Autowired
+//    private TypeNameExtractor nameExtractor;
 
-    @Autowired
-    private TypeResolver typeResolver;
+//    @Autowired
+//    private TypeResolver typeResolver;
 
     @Bean
     public Docket createRestApi() {
 
         List<ResponseMessage> responseMessageList = new ArrayList<>();
-//        responseMessageList.add(new ResponseMessageBuilder().code(HttpCodeEnum.OK.getCode()).message(HttpCodeEnum.OK.getMessage()).build());
-//        responseMessageList.add(new ResponseMessageBuilder().code(HttpCodeEnum.FAIL.getCode()).message(HttpCodeEnum.FAIL.getMessage()).build());
-//        responseMessageList.add(new ResponseMessageBuilder().code(HttpCodeEnum.UNAUTHORIZED.getCode()).message(HttpCodeEnum.UNAUTHORIZED.getMessage()).build());
-//        responseMessageList.add(new ResponseMessageBuilder().code(HttpCodeEnum.FORBIDDEN.getCode()).message(HttpCodeEnum.FORBIDDEN.getMessage()).build());
-//        responseMessageList.add(new ResponseMessageBuilder().code(HttpCodeEnum.SERVER_ERROR.getCode()).message(HttpCodeEnum.SERVER_ERROR.getMessage()).build());
-
         return new Docket(DocumentationType.SWAGGER_2)
                 .globalResponseMessage(RequestMethod.GET, responseMessageList)
                 .globalResponseMessage(RequestMethod.POST, responseMessageList)
@@ -82,42 +73,28 @@ public class SwaggerConfiguration {
                 .build()
                 .securitySchemes(Lists.newArrayList(apiKey()));
     }
-//
+
+
 //    @Bean
-//    public OperationModelsProviderPlugin operationModelsProviderPlugin() {
-//        return new OperationModelsProviderPlugin() {
+//    public OperationBuilderPlugin operationBuilderPlugin() {
+//        return new OperationBuilderPlugin() {
+//
+//            @Override
+//            public void apply(OperationContext context) {
+//                ResolvedType returnType = context.getReturnType();
+//                returnType = context.alternateFor(returnType);
+//                ParameterizedType parameterize = TypeUtils.parameterize(ResponseData.class, returnType);
+//                returnType = typeResolver.resolve(parameterize);
+//                ModelContext modelContext = ModelContext.returnValue(returnType, context.getDocumentationType(), context.getAlternateTypeProvider(), context.getGenericsNamingStrategy(), context.getIgnorableParameterTypes());
+//                context.operationBuilder().responseModel(ResolvedTypes.modelRefFactory(modelContext, SwaggerConfiguration.this.nameExtractor).apply(returnType));
+//            }
+//
 //            @Override
 //            public boolean supports(DocumentationType documentationType) {
 //                return true;
 //            }
-//
-//            @Override
-//            public void apply(RequestMappingContext context) {
-//                System.out.println(context);
-//            }
 //        };
 //    }
-
-    @Bean
-    public OperationBuilderPlugin operationBuilderPlugin() {
-        return new OperationBuilderPlugin() {
-
-            @Override
-            public void apply(OperationContext context) {
-                ResolvedType returnType = context.getReturnType();
-                returnType = context.alternateFor(returnType);
-                ParameterizedType parameterize = TypeUtils.parameterize(ResponseData.class, returnType);
-                returnType = typeResolver.resolve(parameterize);
-                ModelContext modelContext = ModelContext.returnValue(returnType, context.getDocumentationType(), context.getAlternateTypeProvider(), context.getGenericsNamingStrategy(), context.getIgnorableParameterTypes());
-                context.operationBuilder().responseModel(ResolvedTypes.modelRefFactory(modelContext, SwaggerConfiguration.this.nameExtractor).apply(returnType));
-            }
-
-            @Override
-            public boolean supports(DocumentationType documentationType) {
-                return true;
-            }
-        };
-    }
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()

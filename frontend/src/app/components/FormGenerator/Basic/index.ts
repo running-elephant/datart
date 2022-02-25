@@ -20,6 +20,8 @@ export { default as BasicColorSelector } from './BasicColorSelector';
 export { default as BasicFont } from './BasicFont';
 export { default as BasicFontFamilySelector } from './BasicFontFamilySelector';
 export { default as BasicFontSizeSelector } from './BasicFontSizeSelector';
+export { default as BasicFontStyle } from './BasicFontStyle';
+export { default as BasicFontWeight } from './BasicFontWeight';
 export { default as BasicInput } from './BasicInput';
 export { default as BasicInputNumber } from './BasicInputNumber';
 export { default as BasicInputPercentage } from './BasicInputPercentage';

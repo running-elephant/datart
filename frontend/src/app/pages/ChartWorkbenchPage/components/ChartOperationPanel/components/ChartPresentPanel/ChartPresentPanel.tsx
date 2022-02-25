@@ -49,7 +49,7 @@ const ChartPresentPanel: FC<{
   dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
   expensiveQuery: boolean;
-  isNeedRequest: boolean;
+  allowQuery: boolean;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
 }> = memo(
@@ -60,7 +60,7 @@ const ChartPresentPanel: FC<{
     dataset,
     chartConfig,
     expensiveQuery,
-    isNeedRequest,
+    allowQuery,
     onRefreshDataset,
     onCreateDownloadDataTask,
   }) => {
@@ -146,7 +146,7 @@ const ChartPresentPanel: FC<{
 
     return (
       <StyledChartPresentPanel>
-        {expensiveQuery && isNeedRequest && (
+        {expensiveQuery && allowQuery && (
           <ReloadMask>
             <ReloadOutlined
               onClick={onRefreshDataset}

@@ -93,6 +93,7 @@ export interface DashboardConfig {
   type: BoardType; //'auto','free'
 
   // auto
+  allowOverlap: boolean;
   margin: [number, number];
   containerPadding: [number, number];
   mobileMargin: [number, number];
@@ -135,6 +136,7 @@ export interface WidgetConf {
   autoUpdate: boolean;
   frequency: number; // 定时同步频率
   rect: RectConfig; //desktop_rect
+  lock: boolean; //Locking forbids dragging resizing
   mobileRect?: RectConfig; //mobile_rect 移动端适配
   background: BackgroundConfig;
   border: BorderConfig;

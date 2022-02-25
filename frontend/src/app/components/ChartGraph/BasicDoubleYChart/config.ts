@@ -104,14 +104,8 @@ const config: ChartConfig = {
         {
           label: 'legend.type',
           key: 'type',
-          comType: 'select',
+          comType: 'legendType',
           default: 'scroll',
-          options: {
-            items: [
-              { label: '普通', value: 'plain' },
-              { label: '滚动', value: 'scroll' },
-            ],
-          },
         },
         {
           label: 'legend.selectAll',
@@ -169,9 +163,10 @@ const config: ChartConfig = {
           default: 'bar',
           comType: 'select',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '折线图', value: 'line' },
-              { label: '柱状图', value: 'bar' },
+              { label: '@global@.graphType.line', value: 'line' },
+              { label: '@global@.graphType.bar', value: 'bar' },
             ],
           },
         },
@@ -228,9 +223,10 @@ const config: ChartConfig = {
           default: 'line',
           comType: 'select',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '折线图', value: 'line' },
-              { label: '柱状图', value: 'bar' },
+              { label: '@global@.graphType.line', value: 'line' },
+              { label: '@global@.graphType.bar', value: 'bar' },
             ],
           },
         },
@@ -484,6 +480,10 @@ const config: ChartConfig = {
           selectAll: '图例全选',
           position: '图例位置',
         },
+        graphType: {
+          line: '折线图',
+          bar: '柱状图',
+        },
         leftY: {
           graph: '显示图形',
           title: '左Y轴',
@@ -556,6 +556,10 @@ const config: ChartConfig = {
         rightY: {
           graph: 'Show Graph',
           title: 'Right Y Axis',
+        },
+        graphType: {
+          line: 'Line',
+          bar: 'Bar',
         },
         xAxis: {
           title: 'X Axis',

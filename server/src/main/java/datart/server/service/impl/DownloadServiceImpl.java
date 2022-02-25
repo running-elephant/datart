@@ -21,29 +21,34 @@ import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.NotAllowedException;
 import datart.core.common.FileUtils;
 import datart.core.common.POIUtils;
 import datart.core.common.TaskExecutor;
 import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.Dataframe;
+import datart.core.entity.Datachart;
 import datart.core.entity.Download;
 import datart.core.entity.View;
+import datart.core.entity.poi.POISettings;
 import datart.core.mappers.ext.DownloadMapperExt;
-import datart.core.base.exception.NotAllowedException;
 import datart.server.base.params.DownloadCreateParam;
 import datart.server.base.params.ViewExecuteParam;
 import datart.server.service.BaseService;
 import datart.server.service.DataProviderService;
 import datart.server.service.DownloadService;
 import datart.server.service.OrgSettingService;
+import datart.server.service.common.PoiConvertUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -102,7 +107,8 @@ public class DownloadServiceImpl extends BaseService implements DownloadService 
                 securityManager.runAs(downloadUser);
 
                 String fileName = downloadParams.getFileName();
-                String path = FileUtils.concatPath(FileOwner.DOWNLOAD.getPath(), StringUtils.isEmpty(fileName) ? "download" : fileName + "-" + System.currentTimeMillis() + XLSX);
+                String fileSuffix = DateFormatUtils.format(Calendar.getInstance(), Const.FILE_SUFFIX_DATE_FORMAT);
+                String path = FileUtils.concatPath(FileOwner.DOWNLOAD.getPath(), StringUtils.isEmpty(fileName) ? "download" : fileName + "_" + fileSuffix + XLSX);
                 try {
                     Workbook workbook = POIUtils.createEmpty();
                     for (int i = 0; i < downloadParams.getDownloadParams().size(); i++) {
@@ -111,7 +117,10 @@ public class DownloadServiceImpl extends BaseService implements DownloadService 
                         viewExecuteParam.setPageInfo(PageInfo.builder().pageNo(1).pageSize(orgSettingService.getDownloadRecordLimit(view.getOrgId())).build());
                         String vizName = viewExecuteParam.getVizName();
                         Dataframe dataframe = dataProviderService.execute(downloadParams.getDownloadParams().get(i));
-                        POIUtils.withSheet(workbook, StringUtils.isEmpty(vizName) ? "Sheet" + i : vizName, dataframe);
+                        String chartConfigStr = StringUtils.isNotBlank(viewExecuteParam.getVizId()) ?
+                                retrieve(viewExecuteParam.getVizId(), Datachart.class).getConfig() : "";
+                        POISettings poiSettings = PoiConvertUtils.covertToPoiSetting(chartConfigStr, dataframe);
+                        POIUtils.withSheet(workbook, StringUtils.isEmpty(vizName) ? "Sheet" + i : vizName, dataframe, poiSettings);
                     }
                     try {
                         POIUtils.save(workbook, FileUtils.withBasePath(path), true);

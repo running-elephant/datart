@@ -27,4 +27,8 @@ public class VizUpdateParam extends BaseUpdateParam {
 
     private Short status;
 
+    private String subType;
+
+    private String avatar;
+
 }

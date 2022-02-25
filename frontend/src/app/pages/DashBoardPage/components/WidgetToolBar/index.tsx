@@ -15,28 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  ApiOutlined,
-  ClockCircleOutlined,
-  LinkOutlined,
-  Loading3QuartersOutlined,
-  WarningTwoTone,
-} from '@ant-design/icons';
-import { Button, Space, Tooltip } from 'antd';
+import { Space } from 'antd';
 import React, { FC, useContext } from 'react';
 import styled from 'styled-components';
-import { ERROR, PRIMARY } from 'styles/StyleConstants';
 import { BoardContext } from '../../contexts/BoardContext';
 import { WidgetContext } from '../../contexts/WidgetContext';
 import { WidgetInfoContext } from '../../contexts/WidgetInfoContext';
 import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
 import { WidgetType } from '../../pages/Board/slice/types';
+import {
+  CancelLinkageIcon,
+  CanLinkageIcon,
+  ErrorIcon,
+  LoadingIcon,
+  LockIcon,
+  WaitingIcon,
+} from './StatusIcon';
 import { WidgetActionDropdown } from './WidgetActionDropdown';
 
 interface WidgetToolBarProps {}
 
 const WidgetToolBar: FC<WidgetToolBarProps> = () => {
   const { boardType, editing: boardEditing } = useContext(BoardContext);
+  const { onWidgetAction } = useContext(WidgetMethodContext);
   const { loading, inLinking, rendered, errInfo } =
     useContext(WidgetInfoContext);
   const widget = useContext(WidgetContext);
@@ -44,88 +45,55 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
   const ssp = e => {
     e.stopPropagation();
   };
-  const renderedIcon = () => {
-    const widgetType = widget.config.type;
-    if (boardType === 'free') return null;
-    const showTypes: WidgetType[] = ['chart'];
-    if (!showTypes.includes(widgetType)) return null;
-    return rendered ? null : (
-      <Tooltip title="等待加载">
-        <Button
-          icon={<ClockCircleOutlined style={{ color: PRIMARY }} />}
-          type="link"
-        />
-      </Tooltip>
+  const renderLocking = () => {
+    if (!boardEditing) return null;
+    if (!widget.config?.lock) return null;
+    return (
+      <LockIcon
+        title="已锁定拖拽,点击解锁"
+        onClick={() => onWidgetAction('unlock', widget)}
+      />
     );
   };
-  const loadingIcon = () => {
-    const widgetType = widget.config.type;
-    const showTypes: WidgetType[] = ['chart', 'controller'];
-    if (!showTypes.includes(widgetType)) return null;
-    return loading ? (
-      <Button
-        icon={
-          <Loading3QuartersOutlined
-            spin
-            style={{ color: PRIMARY, opacity: 0.4 }}
-          />
-        }
-        type="link"
-      />
-    ) : null;
+  const renderWaiting = () => {
+    if (boardType === 'free') return null;
+    const showTypes: WidgetType[] = ['chart'];
+    if (!showTypes.includes(widget.config.type)) return null;
+    if (rendered) return null;
+    return <WaitingIcon title="等待加载" />;
   };
-  const linkageIcon = () => {
+  const renderLoading = () => {
+    const showTypes: WidgetType[] = ['chart', 'controller'];
+    if (!showTypes.includes(widget.config.type)) return null;
+    return <LoadingIcon loading={loading} />;
+  };
+  const renderLinkage = () => {
     if (inLinking) {
       return (
-        <Tooltip title="取消联动">
-          <ApiOutlined
-            style={{ color: PRIMARY }}
-            onClick={() => onClearLinkage(widget)}
-          />
-        </Tooltip>
+        <CancelLinkageIcon
+          title="取消联动"
+          onClick={() => onClearLinkage(widget)}
+        />
       );
     } else {
       return widget.config?.linkageConfig?.open ? (
-        <Tooltip title="点击图表可联动">
-          <Button
-            icon={<LinkOutlined style={{ color: PRIMARY }} />}
-            type="link"
-          />
-        </Tooltip>
+        <CanLinkageIcon title="点击图表可联动" />
       ) : null;
     }
   };
-  const renderErrorIcon = (errInfo?: { [propName: string]: string }) => {
+  const renderErrorInfo = (errInfo?: { [propName: string]: string }) => {
     if (!errInfo) return null;
 
     const errInfoValue = Object.values(errInfo);
 
     if (!errInfoValue.length) return null;
 
-    const renderTitle = errInfoArr => {
-      let errHtml = ``;
+    let errHtml = ``;
 
-      errInfoArr.forEach(info => {
-        info = typeof info !== 'string' ? 'object' : info;
-        errHtml += info + '<br/>';
-      });
-
-      return (
-        <div
-          style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}
-          dangerouslySetInnerHTML={{ __html: errHtml }}
-        ></div>
-      );
-    };
-
-    return (
-      <Tooltip title={renderTitle(errInfoValue)}>
-        <StyledErrorIcon
-          icon={<WarningTwoTone twoToneColor={ERROR} />}
-          type="link"
-        />
-      </Tooltip>
-    );
+    errInfoValue.forEach(info => {
+      errHtml += String(info) + '<br/>';
+    });
+    return <ErrorIcon errInfo={errHtml} />;
   };
   const renderWidgetAction = () => {
     const widgetType = widget.config.type;
@@ -139,10 +107,11 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
   return (
     <StyleWrap onClick={ssp} className="widget-tool-bar">
       <Space size={0}>
-        {renderErrorIcon(errInfo)}
-        {renderedIcon()}
-        {loadingIcon()}
-        {linkageIcon()}
+        {renderErrorInfo(errInfo)}
+        {renderWaiting()}
+        {renderLoading()}
+        {renderLocking()}
+        {renderLinkage()}
         {renderWidgetAction()}
       </Space>
     </StyleWrap>
@@ -160,14 +129,5 @@ const StyleWrap = styled.div`
   text-align: right;
   .widget-tool-dropdown {
     visibility: hidden;
-  }
-`;
-
-const StyledErrorIcon = styled(Button)`
-  background: ${p => p.theme.componentBackground};
-
-  &:hover,
-  &:focus {
-    background: ${p => p.theme.componentBackground};
   }
 `;

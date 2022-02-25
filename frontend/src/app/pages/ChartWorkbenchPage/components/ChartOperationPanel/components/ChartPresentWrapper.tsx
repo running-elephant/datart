@@ -34,7 +34,7 @@ const ChartPresentWrapper: FC<{
   dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
   expensiveQuery: boolean;
-  isNeedRequest: boolean;
+  allowQuery: boolean;
   onChartChange: (c: IChart) => void;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
@@ -46,7 +46,7 @@ const ChartPresentWrapper: FC<{
     dataset,
     expensiveQuery,
     chartConfig,
-    isNeedRequest,
+    allowQuery,
     onChartChange,
     onRefreshDataset,
     onCreateDownloadDataTask,
@@ -80,7 +80,7 @@ const ChartPresentWrapper: FC<{
             chart={chart}
             dataset={dataset}
             expensiveQuery={expensiveQuery}
-            isNeedRequest={isNeedRequest}
+            allowQuery={allowQuery}
             chartConfig={chartConfig}
             onRefreshDataset={onRefreshDataset}
             onCreateDownloadDataTask={onCreateDownloadDataTask}

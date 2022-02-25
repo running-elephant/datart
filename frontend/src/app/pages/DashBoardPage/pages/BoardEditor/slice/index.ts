@@ -21,7 +21,7 @@ import { createSlice } from 'utils/@reduxjs/toolkit';
 import { WidgetControllerPanelParams } from './../../Board/slice/types';
 import { editBoardStackSlice } from './childSlice/stackSlice';
 import {
-  getEditBoardDetail,
+  fetchEditBoardDetail,
   getEditChartWidgetDataAsync,
   getEditControllerOptions,
   toUpdateDashboard,
@@ -127,13 +127,13 @@ const editDashBoardInfoSlice = createSlice({
       state.saving = false;
     });
     //loadEditBoardDetail
-    builder.addCase(getEditBoardDetail.pending, state => {
+    builder.addCase(fetchEditBoardDetail.pending, state => {
       state.loading = true;
     });
-    builder.addCase(getEditBoardDetail.fulfilled, (state, action) => {
+    builder.addCase(fetchEditBoardDetail.fulfilled, (state, action) => {
       state.loading = false;
     });
-    builder.addCase(getEditBoardDetail.rejected, state => {
+    builder.addCase(fetchEditBoardDetail.rejected, state => {
       state.loading = false;
     });
   },
@@ -262,7 +262,9 @@ const widgetInfoRecordSlice = createSlice({
   extraReducers: builder => {
     builder.addCase(getEditChartWidgetDataAsync.pending, (state, action) => {
       const { widgetId } = action.meta.arg;
-      state[widgetId].loading = true;
+      if (state[widgetId]) {
+        state[widgetId].loading = true;
+      }
     });
     builder.addCase(getEditChartWidgetDataAsync.fulfilled, (state, action) => {
       const { widgetId } = action.meta.arg;
@@ -303,6 +305,7 @@ export const { actions: editWidgetDataActions } = editWidgetDataSlice;
 const filterActions = [
   editBoardStackActions.setBoardToEditStack,
   editBoardStackActions.updateBoard,
+  editBoardStackActions.toggleAllowOverlap,
   editBoardStackActions.updateBoardConfig,
   editBoardStackActions.addWidgets,
   editBoardStackActions.deleteWidgets,

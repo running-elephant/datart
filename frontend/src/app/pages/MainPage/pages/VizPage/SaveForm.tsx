@@ -78,6 +78,16 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     }
   }, [initialValues]);
 
+  const boardTips = () => {
+    return (
+      <>
+        <span>{t('boardType.autoTips')}</span>
+        <br />
+        <span>{t('boardType.freeTips')}</span>
+      </>
+    );
+  };
+
   return (
     <ModalForm
       formProps={formProps}
@@ -133,7 +143,17 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
         </Form.Item>
       )}
       {vizType === 'DASHBOARD' && type === CommonFormTypes.Add && (
-        <Form.Item name="boardType" label={t('boardType.label')}>
+        <Form.Item
+          rules={[
+            {
+              required: true,
+              message: t('boardType.requiredMessage'),
+            },
+          ]}
+          name="boardType"
+          label={t('boardType.label')}
+          tooltip={boardTips()}
+        >
           <Radio.Group>
             <Radio.Button value={BoardTypeMap.auto}>
               {t('boardType.auto')}

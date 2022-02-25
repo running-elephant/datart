@@ -94,6 +94,11 @@ export const selectSourceDatabases = createSelector(
   viewState => viewState.sourceDatabases,
 );
 
+export const selectSourceDatabaseSchemas = createSelector(
+  [selectDomain, (_, props: { id: string }) => props.id],
+  (viewState, id) => viewState.sourceDatabaseSchema?.[id],
+);
+
 export const selectDatabases = createSelector(
   [selectSourceDatabases, (_, props: { name?: string }) => props.name],
   (sourceDatabases, name) => (name ? sourceDatabases[name] : void 0),

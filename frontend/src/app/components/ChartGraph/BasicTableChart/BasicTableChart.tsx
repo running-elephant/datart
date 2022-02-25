@@ -37,7 +37,7 @@ import {
   getCustomBodyRowStyle,
 } from './conditionStyle';
 import Config from './config';
-import { TableComponentsTd } from './TableComponents';
+import { ResizableTitle, TableComponentsTd } from './TableComponents';
 
 class BasicTableChart extends ReactChart {
   useIFrame = false;
@@ -47,8 +47,9 @@ class BasicTableChart extends ReactChart {
   dataColumnWidths = {};
   tablePadding = 16;
   tableCellBorder = 1;
-  cachedAntTableOptions = {};
+  cachedAntTableOptions: any = {};
   cachedDatartConfig: ChartConfig = {};
+  cacheContext: any = null;
   showSummaryRow = false;
   rowNumberUniqKey = `@datart@rowNumberKey`;
   totalWidth = 0;
@@ -91,10 +92,17 @@ class BasicTableChart extends ReactChart {
         );
         this.cachedAntTableOptions = tableOptions;
         this.cachedDatartConfig = options.config;
+        this.cacheContext = context;
         this.adapter?.updated(tableOptions, context);
       },
       false,
     );
+  }
+
+  public onUnMount(options: any, context?: any): void {
+    this.cachedAntTableOptions = {};
+    this.cachedDatartConfig = {};
+    this.cacheContext = null;
   }
 
   public onResize(options, context?): void {
@@ -206,9 +214,7 @@ class BasicTableChart extends ReactChart {
     const mixedSectionConfigRows = dataConfigs
       .filter(c => c.key === 'mixed')
       .flatMap(config => config.rows || []);
-    const aggregateConfigs = mixedSectionConfigRows.filter(
-      r => r.type === ChartDataViewFieldType.NUMERIC,
-    );
+
     this.dataColumnWidths = this.calcuteFieldsMaxWidth(
       mixedSectionConfigRows,
       chartDataSet as IChartDataSet<string>,
@@ -534,7 +540,12 @@ class BasicTableChart extends ReactChart {
               { ...fontStyle },
             );
           }
-          return <th {...rest} style={Object.assign(cellCssStyle, style)} />;
+          return (
+            <ResizableTitle
+              {...rest}
+              style={Object.assign(cellCssStyle, style)}
+            />
+          );
         },
       },
       body: {
@@ -581,204 +592,48 @@ class BasicTableChart extends ReactChart {
     };
   }
 
+  private updateTableColumns(e, { size }, index) {
+    const { columns } = this.cachedAntTableOptions;
+    const nextColumns = [...columns];
+    nextColumns[index] = {
+      ...nextColumns[index],
+      width: size.width,
+    };
+    const tableOptions = Object.assign(this.cachedAntTableOptions, {
+      columns: nextColumns,
+    });
+    this.adapter?.updated(tableOptions, this.cacheContext);
+  }
+
   protected getColumns(
     mixedSectionConfigRows,
     styleConfigs,
     chartDataSet,
     context,
   ) {
-    const [
-      enableRowNumber,
-      leftFixedColumns,
-      rightFixedColumns,
-      autoMergeFields,
-    ] = getStyles(
+    const [enableRowNumber, leftFixedColumns, rightFixedColumns] = getStyles(
       styleConfigs,
       ['style'],
-      [
-        'enableRowNumber',
-        'leftFixedColumns',
-        'rightFixedColumns',
-        'autoMergeFields',
-      ],
+      ['enableRowNumber', 'leftFixedColumns', 'rightFixedColumns'],
     );
     const [tableHeaderStyles] = getStyles(
       styleConfigs,
       ['header', 'modal'],
       ['tableHeaders'],
     );
-    const _getFixedColumns = list => {
-      let columnsList = CloneValueDeep(list);
-      leftFixedColumns &&
-        (columnsList = columnsList.map((item, index) => {
-          if (index < Math.min(leftFixedColumns, columnsList.length - 1)) {
-            item.fixed = 'left';
-          }
-          return item;
-        }));
-      rightFixedColumns &&
-        (columnsList = columnsList
-          .reverse()
-          .map((item, index) => {
-            if (index < rightFixedColumns && !item.fixed) {
-              item.fixed = 'right';
-            }
-            return item;
-          })
-          .reverse());
-      return columnsList;
-    };
 
-    const _getFlatColumns = (dataConfigs, chartDataSet) => {
-      const columnList = dataConfigs.map(c => {
-        const colName = c.colName;
-        const columnRowSpans = (autoMergeFields || []).includes(c.uid)
-          ? chartDataSet
-              ?.map(dc => dc.getCell(c))
-              .reverse()
-              .reduce((acc, cur, index, array) => {
-                if (array[index + 1] === cur) {
-                  let prevRowSpan = 0;
-                  if (acc.length === index && index > 0) {
-                    prevRowSpan = acc[index - 1].nextRowSpan;
-                  }
-                  return acc.concat([
-                    { rowSpan: 0, nextRowSpan: prevRowSpan + 1 },
-                  ]);
-                } else {
-                  let prevRowSpan = 0;
-                  if (acc.length === index && index > 0) {
-                    prevRowSpan = acc[index - 1].nextRowSpan;
-                  }
-                  return acc.concat([
-                    { rowSpan: prevRowSpan + 1, nextRowSpan: 0 },
-                  ]);
-                }
-              }, [] as any[])
-              .map(x => x.rowSpan)
-              .reverse()
-          : [];
-        const columnConfig =
-          this.dataColumnWidths?.[chartDataSet.getFieldKey(c)];
-        const colMaxWidth =
-          !this.exceedMaxContent &&
-          Object.values<{ getUseColumnWidth: undefined | boolean }>(
-            this.dataColumnWidths,
-          ).some(item => item.getUseColumnWidth)
-            ? columnConfig?.getUseColumnWidth
-              ? columnConfig?.columnWidthValue
-              : ''
-            : columnConfig?.columnWidthValue;
-        return {
-          sorter: true,
-          title: getColumnRenderName(c),
-          dataIndex: chartDataSet.getFieldKey(c),
-          key: chartDataSet.getFieldKey(c),
-          aggregate: c?.aggregate,
-          colName,
-          width: colMaxWidth,
-          fixed: null,
-          onHeaderCell: record => {
-            return {
-              ...Omit(record, [
-                'dataIndex',
-                'onHeaderCell',
-                'onCell',
-                'colName',
-                'render',
-                'sorter',
-              ]),
-              uid: c.uid,
-            };
-          },
-          onCell: (record, rowIndex) => {
-            const row = chartDataSet[rowIndex];
-            const cellValue = row.getCell(c);
-            return {
-              uid: c.uid,
-              cellValue,
-              dataIndex: row.getFieldKey(c),
-              ...this.registerTableCellEvents(
-                row.getFieldKey(c),
-                cellValue,
-                rowIndex,
-                record,
-              ),
-            };
-          },
-          render: (value, row, rowIndex) => {
-            const formattedValue = toFormattedValue(value, c.format);
-            if (!(autoMergeFields || []).includes(c.uid)) {
-              return formattedValue;
-            }
-            return {
-              children: formattedValue,
-              props: { rowSpan: columnRowSpans[rowIndex], cellValue: value },
-            };
-          },
-        };
-      });
-      return _getFixedColumns(columnList);
-    };
-
-    const _getFlattenedColumns = (tableHeader, mixedSectionConfigRows) => {
-      const list: any = [];
-      const _getFlattenedChildren = tableHeaderStylesConfig => {
-        if (tableHeaderStylesConfig.children?.length) {
-          tableHeaderStylesConfig.children.map(item =>
-            _getFlattenedChildren(item),
-          );
-        } else {
-          const currentConfig = mixedSectionConfigRows?.find(
-            c => c.uid === tableHeaderStylesConfig.uid,
-          );
-          list.push(Object.assign({}, tableHeaderStylesConfig, currentConfig));
-        }
-      };
-      tableHeader.forEach(item => {
-        if (item.children?.length) {
-          item.children.map(items => _getFlattenedChildren(items));
-        } else {
-          const currentConfig = mixedSectionConfigRows?.find(
-            c => c.uid === item.uid,
-          );
-          list.push(Object.assign({}, item, currentConfig));
-        }
-      });
-      return list;
-    };
-
-    const _getGroupColumns = (
-      mixedSectionConfigRows,
-      tableHeader,
-      chartDataSet,
-    ) => {
-      const dataConfigs = _getFlattenedColumns(
-        tableHeader,
-        mixedSectionConfigRows,
-      );
-      const flattenedColumns = _getFlatColumns(dataConfigs, chartDataSet);
-      const groupedHeaderColumns =
-        tableHeader
-          ?.map(style =>
-            this.getHeaderColumnGroup(chartDataSet, style, flattenedColumns),
-          )
-          ?.filter(Boolean) || [];
-
-      const unusedHeaderRows = getUnusedHeaderRows(
-        flattenedColumns,
-        groupedHeaderColumns,
-      );
-
-      return groupedHeaderColumns.concat(unusedHeaderRows);
-    };
     const columnsList =
       !tableHeaderStyles || tableHeaderStyles.length === 0
-        ? _getFlatColumns(mixedSectionConfigRows, chartDataSet)
-        : _getGroupColumns(
+        ? this.getFlatColumns(
+            mixedSectionConfigRows,
+            chartDataSet,
+            styleConfigs,
+          )
+        : this.getGroupColumns(
             mixedSectionConfigRows,
             tableHeaderStyles,
             chartDataSet,
+            styleConfigs,
           );
     const rowNumbers = enableRowNumber
       ? [
@@ -800,6 +655,215 @@ class BasicTableChart extends ReactChart {
         ]
       : [];
     return rowNumbers.concat(columnsList);
+  }
+
+  getFlatColumns(dataConfigs, chartDataSet, styleConfigs) {
+    const [autoMergeFields] = getStyles(
+      styleConfigs,
+      ['style'],
+      ['autoMergeFields'],
+    );
+    const columnList = dataConfigs.map((c, cIndex) => {
+      const colName = c.colName;
+      const columnRowSpans = (autoMergeFields || []).includes(c.uid)
+        ? chartDataSet
+            ?.map(dc => dc.getCell(c))
+            .reverse()
+            .reduce((acc, cur, index, array) => {
+              if (array[index + 1] === cur) {
+                let prevRowSpan = 0;
+                if (acc.length === index && index > 0) {
+                  prevRowSpan = acc[index - 1].nextRowSpan;
+                }
+                return acc.concat([
+                  { rowSpan: 0, nextRowSpan: prevRowSpan + 1 },
+                ]);
+              } else {
+                let prevRowSpan = 0;
+                if (acc.length === index && index > 0) {
+                  prevRowSpan = acc[index - 1].nextRowSpan;
+                }
+                return acc.concat([
+                  { rowSpan: prevRowSpan + 1, nextRowSpan: 0 },
+                ]);
+              }
+            }, [] as any[])
+            .map(x => x.rowSpan)
+            .reverse()
+        : [];
+      const columnConfig = this.dataColumnWidths?.[chartDataSet.getFieldKey(c)];
+      const colMaxWidth =
+        !this.exceedMaxContent &&
+        Object.values<{ getUseColumnWidth: undefined | boolean }>(
+          this.dataColumnWidths,
+        ).some(item => item.getUseColumnWidth)
+          ? columnConfig?.getUseColumnWidth
+            ? columnConfig?.columnWidthValue
+            : ''
+          : columnConfig?.columnWidthValue;
+      return {
+        sorter: true,
+        title: getColumnRenderName(c),
+        dataIndex: chartDataSet.getFieldKey(c),
+        key: chartDataSet.getFieldKey(c),
+        aggregate: c?.aggregate,
+        colName,
+        width: colMaxWidth,
+        fixed: null,
+        ellipsis: {
+          showTitle: false,
+        },
+        onHeaderCell: record => {
+          return {
+            ...Omit(record, [
+              'dataIndex',
+              'onHeaderCell',
+              'onCell',
+              'colName',
+              'render',
+              'sorter',
+            ]),
+            uid: c.uid,
+            onResize: (e, node) => {
+              this.updateTableColumns(e, node, cIndex);
+            },
+          };
+        },
+        onCell: (record, rowIndex) => {
+          const row = chartDataSet[rowIndex];
+          const cellValue = row.getCell(c);
+          return {
+            uid: c.uid,
+            cellValue,
+            dataIndex: row.getFieldKey(c),
+            ...this.registerTableCellEvents(
+              row.getFieldKey(c),
+              cellValue,
+              rowIndex,
+              record,
+            ),
+          };
+        },
+        render: (value, row, rowIndex) => {
+          const formattedValue = toFormattedValue(value, c.format);
+          if (!(autoMergeFields || []).includes(c.uid)) {
+            return formattedValue;
+          }
+          return {
+            children: formattedValue,
+            props: { rowSpan: columnRowSpans[rowIndex], cellValue: value },
+          };
+        },
+      };
+    });
+    return this.getFixedColumns(columnList, styleConfigs);
+  }
+
+  getFixedColumns(list, styleConfigs) {
+    const [leftFixedColumns, rightFixedColumns] = getStyles(
+      styleConfigs,
+      ['style'],
+      ['leftFixedColumns', 'rightFixedColumns'],
+    );
+    let columnsList = CloneValueDeep(list);
+    leftFixedColumns &&
+      (columnsList = columnsList.map((item, index) => {
+        if (index < Math.min(leftFixedColumns, columnsList.length - 1)) {
+          item.fixed = 'left';
+        }
+        return item;
+      }));
+    rightFixedColumns &&
+      (columnsList = columnsList
+        .reverse()
+        .map((item, index) => {
+          if (index < rightFixedColumns && !item.fixed) {
+            item.fixed = 'right';
+          }
+          return item;
+        })
+        .reverse());
+    return columnsList;
+  }
+
+  getGroupColumnsOfFlattenedColumns = (
+    tableHeader,
+    mixedSectionConfigRows,
+    chartDataSet,
+  ) => {
+    const newMixedConfig = mixedSectionConfigRows?.concat();
+    let list: any = [];
+    const _getFlattenedChildren = tableHeaderStylesConfig => {
+      if (tableHeaderStylesConfig.children?.length) {
+        tableHeaderStylesConfig.children.map(item =>
+          _getFlattenedChildren(item),
+        );
+      } else {
+        const currentConfigIndex = newMixedConfig?.findIndex(
+          c =>
+            chartDataSet.getFieldKey(c) ===
+            chartDataSet.getFieldKey(tableHeaderStylesConfig),
+        );
+        if (currentConfigIndex >= 0) {
+          list.push(
+            Object.assign(
+              {},
+              tableHeaderStylesConfig,
+              newMixedConfig?.[currentConfigIndex],
+            ),
+          );
+          newMixedConfig?.splice(currentConfigIndex, 1);
+        }
+      }
+    };
+    tableHeader.forEach(item => {
+      if (item.children?.length) {
+        item.children.map(items => _getFlattenedChildren(items));
+      } else {
+        const currentConfigIndex = newMixedConfig?.findIndex(
+          c => chartDataSet.getFieldKey(c) === chartDataSet.getFieldKey(item),
+        );
+        if (currentConfigIndex >= 0) {
+          list.push(
+            Object.assign({}, item, newMixedConfig?.[currentConfigIndex]),
+          );
+          newMixedConfig?.splice(currentConfigIndex, 1);
+        }
+      }
+    });
+    if (newMixedConfig?.length) {
+      list = list.concat(newMixedConfig);
+    }
+    return list;
+  };
+
+  getGroupColumns(
+    mixedSectionConfigRows,
+    tableHeader,
+    chartDataSet,
+    styleConfigs,
+  ) {
+    const dataConfigs = this.getGroupColumnsOfFlattenedColumns(
+      tableHeader,
+      mixedSectionConfigRows,
+      chartDataSet,
+    );
+    const flattenedColumns = this.getFlatColumns(
+      dataConfigs,
+      chartDataSet,
+      styleConfigs,
+    );
+    const groupedHeaderColumns =
+      tableHeader
+        ?.map(style =>
+          this.getHeaderColumnGroup(chartDataSet, style, flattenedColumns),
+        )
+        ?.filter(Boolean) || [];
+    const unusedHeaderRows = getUnusedHeaderRows(
+      flattenedColumns,
+      groupedHeaderColumns,
+    );
+    return groupedHeaderColumns.concat(unusedHeaderRows);
   }
 
   private getHeaderColumnGroup(chartDataSet, tableHeader, columns) {

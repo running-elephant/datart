@@ -2,6 +2,7 @@ package datart.server.service;
 
 
 import datart.core.data.provider.*;
+import datart.core.entity.Source;
 import datart.server.base.params.ViewExecuteParam;
 import datart.server.base.params.TestExecuteParam;
 
@@ -36,5 +37,7 @@ public interface DataProviderService {
     String decryptValue(String value);
 
     void updateSource(DataProviderSource source);
+
+    DataProviderSource parseDataProviderConfig(Source source);
 
 }

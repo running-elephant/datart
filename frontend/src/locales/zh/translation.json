@@ -448,6 +448,7 @@
         "open": "开启",
         "close": "关闭",
         "cancel": "取消",
+        "downloadList": "下载列表",
         "lang": {
           "zh": "中文",
           "en": "英文"
@@ -544,6 +545,41 @@
           "bottom": "底边距",
           "top": "上边距",
           "containLabel": "包含标题"
+        },
+        "lineStyles": {
+          "solid": "实线",
+          "dashed": "虚线",
+          "dotted": "点"
+        },
+        "nameLocation": {
+          "start": "开始",
+          "center": "中间",
+          "end": "结束"
+        },
+        "legendType": {
+          "plain": "普通",
+          "scroll": "滚动"
+        },
+        "fontFamily": {
+          "default": "默认字体",
+          "microsoftYaHei": "微软雅黑",
+          "simSun": "宋体",
+          "simHei": "黑体",
+          "helveticaNeue": "Helvetica Neue",
+          "helvetica": "Helvetica",
+          "arial": "Arial",
+          "sansSerif": "sans-serif"
+        },
+        "fontWeight": {
+          "normal": "常规字号",
+          "bold": "粗体",
+          "bolder": "特粗体",
+          "lighter": "细体"
+        },
+        "fontStyle": {
+          "normal": "常规体",
+          "italic": "斜体",
+          "oblique": "偏斜体"
         }
       },
       "data": {
@@ -722,6 +758,7 @@
       "share": {
         "link": "链接",
         "password": "密码",
+        "link_password": "链接&密码",
         "expireDate": "截止日期",
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
@@ -752,7 +789,9 @@
         "delete": "删除",
         "copy": "复制",
         "paste": "粘贴",
-        "deviceSwitch": "设备切换"
+        "deviceSwitch": "设备切换",
+        "allowOverlap": "允许组件重叠",
+        "forbidOverlap": "禁止组件重叠"
       },
       "controlTypes": {
         "common": "常规",
@@ -940,8 +979,11 @@
       "description": "描述",
       "boardType": {
         "label": "布局类型",
-        "auto": "自动",
-        "free": "自由"
+        "auto": "自动布局",
+        "free": "自由布局",
+        "autoTips": "自动布局：流式布局，可适配多终端",
+        "freeTips": "自由布局：固定布局，用于制作大屏",
+        "requiredMessage": "请选择一种布局方式"
       },
       "parent": "所属目录",
       "root": "根目录",
@@ -995,6 +1037,7 @@
     "properties": {
       "reference": "数据源信息",
       "variable": "变量配置",
+      "model": "数据模型",
       "columnPermissions": "列权限"
     },
     "resource": {
@@ -1007,6 +1050,13 @@
       "add": "新建变量",
       "prefix": "[公共]",
       "suffix": "重复"
+    },
+    "model": {
+      "category": "分类",
+      "typeAndCategory": "类型与分类",
+      "permission": "列权限",
+      "newHierarchy": "新建层次结构",
+      "addToHierarchy": "添加到层次结构"
     },
     "columnPermission": {
       "title": "列权限",

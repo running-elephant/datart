@@ -94,10 +94,10 @@ export const Board: React.FC<BoardProps> = memo(
     );
     const vizs = useSelector(selectVizs);
     const [folderId, setFolderId] = useState<any[]>([]);
-
     const BoardWidgetMap = useSelector((state: { board: BoardState }) =>
       selectBoardWidgetMapById(state, boardId),
     );
+
     const searchParams = useMemo(() => {
       return filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
@@ -299,7 +299,7 @@ export const Board: React.FC<BoardProps> = memo(
       // 销毁组件 清除该对象缓存
       return () => {
         dispatch(boardActions.clearBoardStateById(boardId));
-        dispatch(clearEditBoardState(boardId));
+        dispatch(clearEditBoardState());
       };
     }, [boardId, dispatch, fetchData, searchParams]);
 

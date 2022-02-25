@@ -2,9 +2,16 @@ spring:
   application:
     name: datart-server
 
+
   flyway:
-    locations: bin/migrations
-    enabled: false
+    enabled: true
+    baseline-on-migrate: true
+    baseline-description: BASE_LINE
+    baseline-version: "2022.02.18"
+    clean-disabled: true
+    clean-on-validation-error: false
+    validate-on-migrate: false
+
 
   main:
     banner-mode: off
@@ -67,7 +74,6 @@ logging:
 shiro:
   web:
     enabled: false
-
 
 datart:
   server:

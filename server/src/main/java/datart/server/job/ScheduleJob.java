@@ -1,4 +1,4 @@
-package datart.server.service;
+package datart.server.job;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -13,6 +13,7 @@ import datart.core.entity.Folder;
 import datart.core.entity.Schedule;
 import datart.core.entity.ScheduleLog;
 import datart.core.entity.User;
+import datart.core.entity.poi.POISettings;
 import datart.core.mappers.ext.ScheduleLogMapperExt;
 import datart.core.mappers.ext.ScheduleMapperExt;
 import datart.core.mappers.ext.UserMapperExt;
@@ -26,6 +27,8 @@ import datart.server.base.params.DownloadCreateParam;
 import datart.server.base.params.ShareCreateParam;
 import datart.server.base.params.ShareToken;
 import datart.server.base.params.ViewExecuteParam;
+import datart.server.service.*;
+import datart.server.service.common.PoiConvertUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -66,6 +69,8 @@ public abstract class ScheduleJob implements Job, Closeable {
 
     protected final ShareService shareService;
 
+    protected final DatachartService datachartService;
+
     protected final DatartSecurityManager securityManager;
 
     protected final List<File> attachments = new LinkedList<>();
@@ -81,6 +86,8 @@ public abstract class ScheduleJob implements Job, Closeable {
         securityManager = Application.getBean(DatartSecurityManager.class);
 
         vizService = Application.getBean(VizService.class);
+
+        datachartService = Application.getBean(DatachartService.class);
 
     }
 
@@ -176,7 +183,10 @@ public abstract class ScheduleJob implements Job, Closeable {
                     .pageSize(Integer.MAX_VALUE).build());
             String vizName = viewExecuteParam.getVizName();
             Dataframe dataframe = dataProviderService.execute(downloadParams.getDownloadParams().get(i));
-            POIUtils.withSheet(workbook, StringUtils.isEmpty(vizName) ? "Sheet" + i : vizName, dataframe);
+            String chartConfigStr = StringUtils.isNotBlank(viewExecuteParam.getVizId()) ?
+                    datachartService.retrieve(viewExecuteParam.getVizId()).getConfig() : "";
+            POISettings poiSettings = PoiConvertUtils.covertToPoiSetting(chartConfigStr, dataframe);
+            POIUtils.withSheet(workbook, StringUtils.isEmpty(vizName) ? "Sheet" + i : vizName, dataframe, poiSettings);
         }
         File tempFile = File.createTempFile(UUIDGenerator.generate(), ".xlsx");
         POIUtils.save(workbook, tempFile.getPath(), true);

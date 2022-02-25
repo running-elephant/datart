@@ -116,6 +116,7 @@ class BasicRichText extends ReactChart {
       ['openQuillMarkdown'],
     );
     return {
+      t: context?.translator,
       dataList,
       openQuillMarkdown,
       initContent,

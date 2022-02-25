@@ -107,7 +107,7 @@ const ChartHeaderPanel: FC<{
             }}
             renderDom={
               <Button type="primary" ghost icon={<DownloadOutlined />}>
-                下载列表
+                {t('downloadList')}
               </Button>
             }
           />

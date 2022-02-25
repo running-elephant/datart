@@ -113,7 +113,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
   const [chart, setChart] = useState<IChart>();
-  const [isNeedRequest, setIsNeedRequest] = useState<boolean>(false);
+  const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
   const addVizFn = useAddViz({
     showSaveForm: saveFormContextValue.showSaveForm,
@@ -267,7 +267,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     if (!expensiveQuery) {
       dispatch(refreshDatasetAction({}));
     } else {
-      setIsNeedRequest(true);
+      setAllowQuery(true);
     }
   };
 
@@ -280,7 +280,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
         }),
       );
       dispatch(workbenchSlice.actions.updateShadowChartConfig(null));
-      setIsNeedRequest(payload.needRefresh);
+      setAllowQuery(payload.needRefresh);
       return true;
     }
 
@@ -439,7 +439,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 
   const handleRefreshDataset = useCallback(async () => {
     await dispatch(refreshDatasetAction({}));
-    setIsNeedRequest(false);
+    setAllowQuery(false);
   }, [dispatch]);
 
   const handleCreateDownloadDataTask = useCallback(async () => {
@@ -511,7 +511,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           chartConfig={chartConfig}
           defaultViewId={defaultViewId}
           expensiveQuery={expensiveQuery}
-          isNeedRequest={isNeedRequest}
+          allowQuery={allowQuery}
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}
           onDataViewChange={handleDataViewChanged}

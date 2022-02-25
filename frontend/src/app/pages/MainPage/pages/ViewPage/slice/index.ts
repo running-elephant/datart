@@ -24,6 +24,7 @@ import { transformQueryResultToModelAndDataSource } from '../utils';
 import {
   deleteView,
   getArchivedViews,
+  getSchemaBySourceId,
   getViewDetail,
   getViews,
   runSql,
@@ -42,6 +43,7 @@ export const initialState: ViewState = {
   editingViews: [],
   currentEditingView: '',
   sourceDatabases: {},
+  sourceDatabaseSchema: {},
   saveViewLoading: false,
   unarchiveLoading: false,
 };
@@ -391,6 +393,17 @@ const slice = createSlice({
         title: name,
         value: [name],
       }));
+    });
+
+    builder.addCase(getSchemaBySourceId.fulfilled, (state, action) => {
+      if (!action.payload?.data) {
+        return;
+      }
+      if (!state.sourceDatabaseSchema) {
+        state.sourceDatabaseSchema = {};
+      }
+      state.sourceDatabaseSchema[action.payload?.sourceId] =
+        action.payload.data;
     });
   },
 });

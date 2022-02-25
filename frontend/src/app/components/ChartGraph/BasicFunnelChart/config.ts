@@ -61,10 +61,17 @@ const config: ChartConfig = {
           comType: 'select',
           default: 'descending',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '降序', value: 'descending' },
-              { label: '升序', value: 'ascending' },
-              { label: '无', value: 'none' },
+              {
+                label: '@global@.funnel.sortType.descending',
+                value: 'descending',
+              },
+              {
+                label: '@global@.funnel.sortType.ascending',
+                value: 'ascending',
+              },
+              { label: '@global@.funnel.sortType.none', value: 'none' },
             ],
           },
         },
@@ -74,10 +81,11 @@ const config: ChartConfig = {
           default: 'center',
           comType: 'select',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '居中', value: 'center' },
-              { label: '居左', value: 'left' },
-              { label: '居右', value: 'right' },
+              { label: '@global@.funnel.alignType.center', value: 'center' },
+              { label: '@global@.funnel.alignType.left', value: 'left' },
+              { label: '@global@.funnel.alignType.right', value: 'right' },
             ],
           },
         },
@@ -162,14 +170,8 @@ const config: ChartConfig = {
         {
           label: 'legend.type',
           key: 'type',
-          comType: 'select',
+          comType: 'legendType',
           default: 'scroll',
-          options: {
-            items: [
-              { label: '普通', value: 'plain' },
-              { label: '滚动', value: 'scroll' },
-            ],
-          },
         },
         {
           label: 'legend.selectAll',
@@ -294,6 +296,16 @@ const config: ChartConfig = {
           sort: '排序',
           align: '对齐',
           gap: '间距',
+          sortType: {
+            descending: '降序',
+            ascending: '升序',
+            none: '无',
+          },
+          alignType: {
+            center: '居中',
+            left: '居左',
+            right: '居右',
+          },
         },
         data: {
           color: '颜色',
@@ -331,6 +343,16 @@ const config: ChartConfig = {
           sort: 'Sort',
           align: 'Alignment',
           gap: 'Gap',
+          sortType: {
+            descending: 'Descending',
+            ascending: 'Ascending',
+            none: 'None',
+          },
+          alignType: {
+            center: 'Center',
+            left: 'Left',
+            right: 'Right',
+          },
         },
         data: {
           color: 'Color',

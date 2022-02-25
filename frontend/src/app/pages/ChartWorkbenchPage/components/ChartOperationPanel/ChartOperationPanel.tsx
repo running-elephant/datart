@@ -35,7 +35,7 @@ const ChartOperationPanel: FC<{
   chart?: IChart;
   chartConfig?: ChartConfig;
   defaultViewId?: string;
-  isNeedRequest: boolean;
+  allowQuery: boolean;
   onChartChange: (chart: IChart) => void;
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
@@ -45,7 +45,7 @@ const ChartOperationPanel: FC<{
     chart,
     chartConfig,
     defaultViewId,
-    isNeedRequest,
+    allowQuery,
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
@@ -92,7 +92,7 @@ const ChartOperationPanel: FC<{
             chart={chart}
             dataset={dataset}
             expensiveQuery={expensiveQuery}
-            isNeedRequest={isNeedRequest}
+            allowQuery={allowQuery}
             chartConfig={chartConfig}
             onChartChange={onChartChange}
             onRefreshDataset={onRefreshDataset}
