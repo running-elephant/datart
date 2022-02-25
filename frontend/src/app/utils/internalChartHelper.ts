@@ -381,11 +381,21 @@ export function transformMeta(model?: string) {
     return undefined;
   }
   const jsonObj = JSON.parse(model);
-  return Object.keys(jsonObj).map(colKey => ({
-    ...jsonObj[colKey],
-    id: colKey,
-    category: ChartDataViewFieldCategory.Field,
-  }));
+  return Object.keys(jsonObj).flatMap(colKey => {
+    const column = jsonObj[colKey];
+    if (!isEmptyArray(column.children)) {
+      return column.children.map(c => ({
+        ...c,
+        id: c.name,
+        category: ChartDataViewFieldCategory.Field,
+      }));
+    }
+    return {
+      ...column,
+      id: colKey,
+      category: ChartDataViewFieldCategory.Field,
+    };
+  });
 }
 
 export function mergeChartStyleConfigs(

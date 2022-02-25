@@ -1050,10 +1050,13 @@
     },
     "model": {
       "category": "分类",
+      "rename": "重命名",
+      "delete": "删除",
       "typeAndCategory": "类型与分类",
       "permission": "列权限",
       "newHierarchy": "新建层次结构",
-      "addToHierarchy": "添加到层次结构"
+      "addToHierarchy": "添加到层次结构",
+      "hierarchyName": "层级名称"
     },
     "columnPermission": {
       "title": "列权限",

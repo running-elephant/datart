@@ -19,7 +19,6 @@
 import {
   BranchesOutlined,
   CalendarOutlined,
-  EyeOutlined,
   FieldStringOutlined,
   NumberOutlined,
   SisternodeOutlined,
@@ -42,8 +41,20 @@ import {
 import { ColumnCategories, ColumnTypes } from '../../../constants';
 import { Column } from '../../../slice/types';
 
-const DataModelNode: FC<{ node: Column; onNodeTypeChange }> = memo(
-  ({ node, onNodeTypeChange }) => {
+const DataModelNode: FC<{
+  node: Column;
+  getPermissionButton: (name) => JSX.Element;
+  onNodeTypeChange: (node: Column) => void;
+  onMoveToHierarchy: (node: Column) => void;
+  onCreateHierarchy?: (node: Column) => void;
+}> = memo(
+  ({
+    node,
+    getPermissionButton,
+    onCreateHierarchy,
+    onMoveToHierarchy,
+    onNodeTypeChange,
+  }) => {
     const t = useI18NPrefix('view.model');
     const tg = useI18NPrefix('global');
     const [isHover, setIsHover] = useState(false);
@@ -89,7 +100,7 @@ const DataModelNode: FC<{ node: Column; onNodeTypeChange }> = memo(
                   <Menu
                     selectedKeys={[node.type, `category-${node.category}`]}
                     className="datart-schema-table-header-menu"
-                    onClick={onNodeTypeChange(node.name, node)}
+                    onClick={() => onNodeTypeChange(node)}
                   >
                     {Object.values(ColumnTypes).map(t => (
                       <Menu.Item key={t}>
@@ -127,22 +138,14 @@ const DataModelNode: FC<{ node: Column; onNodeTypeChange }> = memo(
                 </Tooltip>
               </Dropdown>
             )}
-            {isHover && !isDragging && (
-              <Tooltip title={t('permission')}>
-                <ToolbarButton
-                  size="small"
-                  iconSize={FONT_SIZE_BASE}
-                  className="suffix"
-                  icon={<EyeOutlined style={{ color: INFO }} />}
-                />
-              </Tooltip>
-            )}
-            {isHover && !isDragging && (
+            {isHover && !isDragging && getPermissionButton(node?.name)}
+            {isHover && !isDragging && onCreateHierarchy && (
               <Tooltip title={t('newHierarchy')}>
                 <ToolbarButton
                   size="small"
                   iconSize={FONT_SIZE_BASE}
                   className="suffix"
+                  onClick={() => onCreateHierarchy(node)}
                   icon={<BranchesOutlined style={{ color: INFO }} />}
                 />
               </Tooltip>
@@ -153,6 +156,7 @@ const DataModelNode: FC<{ node: Column; onNodeTypeChange }> = memo(
                   size="small"
                   iconSize={FONT_SIZE_BASE}
                   className="suffix"
+                  onClick={() => onMoveToHierarchy(node)}
                   icon={<SisternodeOutlined style={{ color: INFO }} />}
                 />
               </Tooltip>

@@ -22,7 +22,7 @@ import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams, ChartsEventData } from 'app/types/Chart';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
-import React, { createContext, FC, useCallback, useContext } from 'react';
+import { createContext, FC, useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 import { boardActions } from '../../pages/Board/slice';
@@ -288,7 +288,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     data: ChartsEventData | undefined,
     fieldName: string,
   ) => {
-    let toCaseField = fieldName.toUpperCase();
+    let toCaseField = fieldName;
     return data?.rowData[toCaseField];
   };
   const toLinkingWidgets = useCallback(
