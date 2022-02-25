@@ -22,7 +22,6 @@ import {
   BasicInput,
   BasicInputNumber,
 } from 'app/components/FormGenerator/Basic';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import { MediaWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { TIME_FORMATTER } from 'globalConstants';
@@ -32,6 +31,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { G10, G90 } from 'styles/StyleConstants';
 import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
+import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 
 const FONT_DATA = {
   comType: 'font',

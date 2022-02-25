@@ -18,7 +18,7 @@
 import { Collapse, Form } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
+import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getRGBAColor } from 'app/pages/DashBoardPage/utils';
 import produce from 'immer';

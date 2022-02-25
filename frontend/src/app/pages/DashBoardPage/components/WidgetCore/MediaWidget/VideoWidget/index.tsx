@@ -17,7 +17,6 @@
  */
 
 import { Button, Form, Input } from 'antd';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import { MediaWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
@@ -29,6 +28,7 @@ import { G20 } from 'styles/StyleConstants';
 import { Player } from 'video-react';
 import 'video-react/dist/video-react.css';
 import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
+import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 
 const VideoWidget: React.FC = () => {
   const widget = useContext(WidgetContext);

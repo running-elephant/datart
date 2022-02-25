@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
+
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import { ContainerItem } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useContext, useMemo } from 'react';
@@ -24,6 +24,7 @@ import { INFO, SUCCESS } from 'styles/StyleConstants';
 import { WidgetCore } from '../..';
 import SubMaskLayer from '../../../../pages/BoardEditor/components/SubMaskLayer';
 import { BoardContext } from '../../../BoardProvider/BoardProvider';
+import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 import WidgetToolBar from '../../../WidgetToolBar';
 
 export interface IProps {

@@ -18,11 +18,11 @@
 import { Space } from 'antd';
 import React, { FC, useContext } from 'react';
 import styled from 'styled-components';
-import { WidgetContext } from '../../contexts/WidgetContext';
 import { WidgetInfoContext } from '../../contexts/WidgetInfoContext';
 import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
 import { WidgetType } from '../../pages/Board/slice/types';
 import { BoardContext } from '../BoardProvider/BoardProvider';
+import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import {
   CancelLinkageIcon,
   CanLinkageIcon,

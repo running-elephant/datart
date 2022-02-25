@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { FontConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { darken, getLuminance, lighten } from 'polished';
 import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
 import { BoardActionContext } from '../../BoardProvider/BoardActionProvider';
+import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
 export interface CompProps {}
 export const ResetWidget: React.FC<CompProps> = () => {

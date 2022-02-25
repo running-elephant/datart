@@ -17,7 +17,6 @@
  */
 import { Empty } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import useClientRect from 'app/pages/DashBoardPage/hooks/useClientRect';
 import { MediaWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -26,6 +25,7 @@ import produce from 'immer';
 import React, { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
+import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 
 const widgetSize: React.CSSProperties = {
   width: '100%',

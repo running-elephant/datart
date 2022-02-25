@@ -16,16 +16,18 @@
  * limitations under the License.
  */
 
+import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import produce from 'immer';
-import React, { FC, useContext, useMemo } from 'react';
+import React, { createContext, FC, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { WidgetContext } from '../../contexts/WidgetContext';
 import { selectWidgetBy2Id } from '../../pages/Board/slice/selector';
 import { BoardState } from '../../pages/Board/slice/types';
 import { selectEditWidgetById } from '../../pages/BoardEditor/slice/selectors';
 import { HistoryEditBoard } from '../../pages/BoardEditor/slice/types';
 import { adaptBoardImageUrl } from '../../utils';
 import { BoardContext } from '../BoardProvider/BoardProvider';
+
+export const WidgetContext = createContext<Widget>({} as Widget);
 
 export const WidgetProvider: FC<{ widgetId: string }> = ({
   widgetId,

@@ -17,7 +17,7 @@
  */
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetCore/WidgetName/WidgetName';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
+import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
 import React, { useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';

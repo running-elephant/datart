@@ -17,7 +17,6 @@
  */
 
 import { Form } from 'antd';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import { WidgetDataContext } from 'app/pages/DashBoardPage/contexts/WidgetDataContext';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
@@ -42,6 +41,7 @@ import React, {
 import styled from 'styled-components/macro';
 import { BoardActionContext } from '../../BoardProvider/BoardActionProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { LabelName } from '../WidgetName/WidgetName';
 import { CheckboxGroupControllerForm } from './Controller/CheckboxGroupController';
 import { MultiSelectControllerForm } from './Controller/MultiSelectController';
