@@ -230,7 +230,6 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   );
 
   const customColorChange = color => {
-    console.log(color);
     if (color) {
       quillRef.current!.getEditor().format(customColorType, color);
     }
