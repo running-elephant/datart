@@ -468,5 +468,30 @@ describe('Chart Helper ', () => {
       ).toEqual(1);
       expect(chartDataSet[0].getCellByKey('AVG(age)')).toEqual('r1-c2-v');
     });
+
+    test('should get dataset row data with case sensitive', () => {
+      const columns = [['r1-c1-v', 'r1-c2-v']];
+      const metas = [{ name: 'name' }, { name: 'avg(age)' }];
+      const chartDataSet = transformToDataSet(columns, metas, [
+        {
+          rows: [
+            {
+              colName: 'Name',
+            },
+            {
+              colName: 'Age',
+              aggregate: 'AVG',
+            },
+          ],
+        },
+      ] as any);
+
+      expect(chartDataSet?.length).toEqual(1);
+      expect(chartDataSet[0] instanceof ChartDataSetRow).toBeTruthy();
+      expect(chartDataSet[0].convertToCaseSensitiveObject()).toEqual({
+        Name: 'r1-c1-v',
+        'AVG(Age)': 'r1-c2-v',
+      });
+    });
   });
 });
