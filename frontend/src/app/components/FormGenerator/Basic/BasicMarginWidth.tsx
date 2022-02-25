@@ -49,7 +49,7 @@ const BasicMarginWidth: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         onChange?.(ancestors, newValue);
       }
       if (getMode(mixedValue) === widthModeTypes[1]) {
-        onChange?.(ancestors, newValue + widthModeTypes[1]);
+        onChange?.(ancestors, (newValue || '') + widthModeTypes[1]);
       }
     };
 

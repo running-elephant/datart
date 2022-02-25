@@ -330,6 +330,7 @@ export type ChartStyleSectionRowOption = {
   min?: number | string;
   max?: number | string;
   step?: number | string;
+  dots?: boolean;
   type?: string;
   editable?: boolean;
   modalSize?: string | number;
@@ -340,6 +341,10 @@ export type ChartStyleSectionRowOption = {
   getItems?: (cols) => Array<ChartStyleSelectorItem>;
   needRefresh?: boolean;
   fontFamilies?: string[];
+  showFontSize?: boolean;
+  showLineHeight?: boolean;
+  showFontStyle?: boolean;
+  showFontColor?: boolean;
 
   /**
    * Suppport Components: @see BasicRadio, @see BasicSelector and etc
