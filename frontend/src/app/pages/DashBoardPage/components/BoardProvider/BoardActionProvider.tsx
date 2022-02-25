@@ -27,7 +27,6 @@ import {
   BoardActionContextProps,
 } from '../../contexts/BoardActionContext';
 import { BoardConfigContext } from '../../contexts/BoardConfigContext';
-import { BoardContext } from '../../contexts/BoardContext';
 import { boardActions } from '../../pages/Board/slice';
 import {
   boardDownLoadAction,
@@ -50,6 +49,7 @@ import {
   getCascadeControllers,
   getNeedRefreshWidgetsByController,
 } from '../../utils/widget';
+import { BoardContext } from './BoardProvider';
 
 export const BoardActionProvider: FC<{ id: string }> = ({
   id: boardId,

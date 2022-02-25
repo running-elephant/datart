@@ -18,7 +18,7 @@
 import { Cascader, CascaderProps } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { ViewSimple } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import React, {
   memo,
@@ -29,6 +29,7 @@ import React, {
 } from 'react';
 import { request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
+
 export interface AssistViewFieldsProps
   extends Omit<CascaderProps, 'options' | 'onChange'> {
   onChange?: (value: string[]) => void;

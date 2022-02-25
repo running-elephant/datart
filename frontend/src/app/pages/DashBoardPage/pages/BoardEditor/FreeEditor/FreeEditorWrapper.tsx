@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import React, { useContext } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';

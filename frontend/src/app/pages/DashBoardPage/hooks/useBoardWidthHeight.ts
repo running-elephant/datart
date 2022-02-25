@@ -18,8 +18,9 @@
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import { useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { BoardContext } from '../contexts/BoardContext';
+import { BoardContext } from '../components/BoardProvider/BoardProvider';
 import { boardActions } from '../pages/Board/slice';
+
 export default function useBoardWidthHeight() {
   const { boardId, renderMode } = useContext(BoardContext);
 

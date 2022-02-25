@@ -25,7 +25,6 @@ import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { FC, useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
-import { BoardContext } from '../../contexts/BoardContext';
 import {
   WidgetMethodContext,
   WidgetMethodContextProps,
@@ -58,6 +57,7 @@ import {
   getEditChartWidgetDataAsync,
   getEditWidgetData,
 } from '../../pages/BoardEditor/slice/thunk';
+import { BoardContext } from '../BoardProvider/BoardProvider';
 import { widgetActionType } from '../WidgetToolBar/config';
 
 const { confirm } = Modal;

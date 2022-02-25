@@ -17,8 +17,8 @@
  */
 import { Collapse, Form } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/contexts/BoardInfoContext';
 import {
   DashboardConfig,

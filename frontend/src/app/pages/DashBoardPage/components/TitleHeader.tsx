@@ -46,9 +46,9 @@ import {
   SPACE_SM,
 } from 'styles/StyleConstants';
 import { BoardActionContext } from '../contexts/BoardActionContext';
-import { BoardContext } from '../contexts/BoardContext';
 import { BoardInfoContext } from '../contexts/BoardInfoContext';
 import { BoardOverLay } from './BoardOverLay';
+import { BoardContext } from './BoardProvider/BoardProvider';
 import SaveToStoryBoard from './SaveToStoryBoard';
 
 interface TitleHeaderProps {

@@ -22,9 +22,10 @@ import React, { useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { INFO, SUCCESS } from 'styles/StyleConstants';
 import { WidgetCore } from '../..';
-import { BoardContext } from '../../../../contexts/BoardContext';
 import SubMaskLayer from '../../../../pages/BoardEditor/components/SubMaskLayer';
+import { BoardContext } from '../../../BoardProvider/BoardProvider';
 import WidgetToolBar from '../../../WidgetToolBar';
+
 export interface IProps {
   tabItem: ContainerItem;
 }
