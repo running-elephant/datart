@@ -1,6 +1,7 @@
 import { Modal } from 'antd';
+import { defaultThemes } from 'app/assets/theme/colorsConfig';
 import ChromeColorPicker from 'app/components/ColorPicker/ChromeColorPicker';
-import { FONT_COLORS, FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
+import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
 import { ReactNode } from 'react';
 import ReactQuill from 'react-quill';
 import styled from 'styled-components/macro';
@@ -31,7 +32,7 @@ interface QuillPaletteOptions {
 export class QuillPalette {
   protected quillJS: ReactQuill;
   protected options: QuillPaletteOptions;
-  protected styleNode: HTMLStyleElement;
+  protected styleNode: HTMLStyleElement | null;
 
   static RICH_TEXT_CUSTOM_COLOR = 'custom-color';
   static RICH_TEXT_CUSTOM_COLOR_INIT: RichTextCustomColorType = {
@@ -137,7 +138,7 @@ export class QuillPalette {
 
       <span className="ql-formats">
         <select className="ql-color" key="ql-color">
-          {FONT_COLORS.map(color => (
+          {defaultThemes.map(color => (
             <option value={color} key={color} />
           ))}
           <option
@@ -146,7 +147,7 @@ export class QuillPalette {
           />
         </select>
         <select className="ql-background" key="ql-background">
-          {FONT_COLORS.map(color => (
+          {defaultThemes.map(color => (
             <option value={color} key={color} />
           ))}
           <option
@@ -228,7 +229,7 @@ export function CustomColor({
       onCancel={onCancel}
     >
       <ChromeColorPicker
-        // @TM 该组件无法更新color 暂时用key解决
+        // TODO(TM): 该组件无法更新color 暂时用key解决
         key={color}
         color={color}
         onChange={colorChange}

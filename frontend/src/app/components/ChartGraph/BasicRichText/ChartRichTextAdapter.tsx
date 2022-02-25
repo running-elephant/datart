@@ -124,7 +124,6 @@ const ChartRichTextAdapter: FC<{
               },
             },
           },
-
           calcfield: {},
           imageDrop: true,
         };
@@ -325,7 +324,6 @@ const ChartRichTextAdapter: FC<{
 
     return (
       <TextWrap onClick={ssp}>
-        <div id="editor"></div>
         <QuillBox id="quill-box">
           {quillModules && reactQuillEdit}
           {quillModules && !isEditing && reactQuillView}
@@ -353,6 +351,10 @@ const ChartRichTextAdapter: FC<{
   },
 );
 export default ChartRichTextAdapter;
+
+interface IQuillProp {
+  moreBtnText: string;
+}
 
 const QuillBox = styled.div`
   width: 100%;

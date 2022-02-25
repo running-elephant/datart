@@ -36,6 +36,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -51,6 +52,12 @@ import { Formats } from './Formats';
 // import produce from 'immer';
 Quill.register('modules/imageDrop', ImageDrop);
 Quill.register('formats/tag', TagBlot);
+
+const CUSTOM_COLOR = 'custom-color';
+const CUSTOM_COLOR_INIT = {
+  background: 'transparent',
+  color: '#000',
+};
 
 type RichTextWidgetProps = {
   widgetConfig: Widget;
@@ -149,8 +156,45 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
 
   const quillRef = useRef<ReactQuill>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (quillRef.current) {
+      quillRef.current
+        .getEditor()
+        .on('selection-change', (r: { index: number; length: number }) => {
+          if (!r?.index) return;
+          try {
+            const index = r.length === 0 ? r.index - 1 : r.index;
+            const length = r.length === 0 ? 1 : r.length;
+            const delta = quillRef
+              .current!.getEditor()
+              .getContents(index, length);
+
+            if (delta.ops?.length === 1 && delta.ops[0]?.attributes) {
+              const { background, color } = delta.ops[0].attributes;
+              setCustomColor({
+                background: background || CUSTOM_COLOR_INIT.background,
+                color: color || CUSTOM_COLOR_INIT.color,
+              });
+
+              const colorNode = document.querySelector(
+                '.ql-color .ql-color-label',
+              );
+              const backgroundNode = document.querySelector(
+                '.ql-background .ql-color-label',
+              );
+              if (color && !colorNode?.getAttribute('style')) {
+                colorNode!.setAttribute('style', `stroke: ${color}`);
+              }
+              if (background && !backgroundNode?.getAttribute('style')) {
+                backgroundNode!.setAttribute('style', `fill: ${background}`);
+              }
+            } else {
+              setCustomColor({ ...CUSTOM_COLOR_INIT });
+            }
+          } catch (error) {
+            console.error('selection-change callback | error', error);
+          }
+        });
       new QuillMarkdown(quillRef.current.getEditor(), MarkdownOptions);
     }
   }, [quillModules]);
@@ -186,6 +230,7 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   );
 
   const customColorChange = color => {
+    console.log(color);
     if (color) {
       quillRef.current!.getEditor().format(customColorType, color);
     }
@@ -236,6 +281,7 @@ export default RichTextWidget;
 interface TextWrapProps {
   editing: boolean;
 }
+// todo (tianlei) Need to nationalize
 const TextWrap = styled.div<TextWrapProps>`
   position: relative;
   width: 100%;
@@ -260,5 +306,29 @@ const TextWrap = styled.div<TextWrapProps>`
   }
   & .ql-container.ql-snow {
     border: none;
+  }
+
+  .ql-picker-options [data-value=${CUSTOM_COLOR}] {
+    position: relative;
+    width: calc(100% - 4px);
+    background-color: transparent !important;
+    color: #343a40;
+    font-weight: 400;
+    font-size: 12px;
+    &::after {
+      content: '更多';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      color: #fff;
+      transform: translate(-50%, -50%);
+    }
+    &:hover {
+      border: none;
+    }
+  }
+  .ql-bubble .ql-color .ql-picker-options,
+  .ql-bubble .ql-background .ql-picker-options {
+    width: 232px;
   }
 `;
