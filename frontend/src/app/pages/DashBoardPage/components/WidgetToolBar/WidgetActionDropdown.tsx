@@ -30,9 +30,9 @@ import {
 import { Button, Dropdown, Menu } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
-import { WidgetChartContext } from '../../contexts/WidgetChartContext';
 import { Widget } from '../../pages/Board/slice/types';
 import { BoardContext } from '../BoardProvider/BoardProvider';
+import { WidgetChartContext } from '../WidgetProvider/WidgetChartProvider';
 import { WidgetMethodContext } from '../WidgetProvider/WidgetMethodProvider';
 import {
   getWidgetActionList,

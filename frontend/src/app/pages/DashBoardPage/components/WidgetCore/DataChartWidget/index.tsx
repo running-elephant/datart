@@ -19,7 +19,6 @@ import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
-import { WidgetChartContext } from 'app/pages/DashBoardPage/contexts/WidgetChartContext';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartMouseEventParams, IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
@@ -35,6 +34,7 @@ import React, {
   useRef,
 } from 'react';
 import styled from 'styled-components/macro';
+import { WidgetChartContext } from '../../WidgetProvider/WidgetChartProvider';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetMethodContext } from '../../WidgetProvider/WidgetMethodProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
