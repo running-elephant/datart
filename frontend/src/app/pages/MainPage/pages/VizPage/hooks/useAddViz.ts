@@ -76,7 +76,7 @@ export function useAddViz({ showSaveForm }) {
                 orgId: orgId,
                 index: index,
                 subType: vizType === 'DASHBOARD' ? dataValues.boardType : null,
-                avatar: vizType === 'DASHBOARD' ? null : initialValues.avatar,
+                avatar: vizType === 'DATACHART' ? initialValues.avatar : null,
               },
               type: vizType,
             }),

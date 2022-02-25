@@ -89,9 +89,24 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
           return v.relType === 'DASHBOARD' && AllowManage;
         });
 
-        const FileData = vizData?.filter(v => {
-          return dashboardIds.indexOf(v.id) !== -1;
-        });
+        const folderData: Folder[] = [];
+        const folderIds: string[] = [];
+
+        const FileFn = vizData => {
+          vizData?.forEach(v => {
+            if (dashboardIds.includes(v.id) && !folderIds.includes(v.id)) {
+              dashboardIds.push(v.parentId);
+              folderIds.push(v.id);
+              folderData.push(v);
+
+              if (v.parentId) {
+                FileFn(vizData);
+              }
+            }
+          });
+          return folderData;
+        };
+        const FileData = FileFn(vizData);
 
         return FileData.concat(dashboardData);
       },
