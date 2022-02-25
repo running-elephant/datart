@@ -55,7 +55,6 @@ export const DataChartWidget: React.FC<{}> = memo(() => {
       if (!params) {
         return;
       }
-      console.log(`params ---> `, params);
       widgetChartClick(widgetRef.current, params);
     },
     [widgetChartClick],
