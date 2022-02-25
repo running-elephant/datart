@@ -278,11 +278,12 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       renderMode,
     ],
   );
+
   const getValueByRowData = (
     data: ChartsEventData | undefined,
     fieldName: string,
   ) => {
-    let toCaseField = fieldName.toUpperCase();
+    let toCaseField = fieldName;
     return data?.rowData[toCaseField];
   };
   const toLinkingWidgets = useCallback(
