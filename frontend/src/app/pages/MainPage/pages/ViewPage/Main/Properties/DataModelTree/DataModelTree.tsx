@@ -486,7 +486,7 @@ const DataModelTree: FC = memo(() => {
   return (
     <Container title="model">
       <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="droppable">
+        <Droppable droppableId="droppable" type="Tree" isCombineEnabled>
           {(droppableProvided, droppableSnapshot) => (
             <StyledDroppableContainer
               ref={droppableProvided.innerRef}

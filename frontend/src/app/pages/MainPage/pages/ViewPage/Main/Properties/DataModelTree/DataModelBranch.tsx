@@ -25,7 +25,7 @@ import { Tooltip } from 'antd';
 import { IW, ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo, useState } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+import { Draggable, Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_BASE,
@@ -112,22 +112,40 @@ const DataModelBranch: FC<{
         </>
       );
     };
+    const getListStyle = isDraggingOver => ({
+      background: isDraggingOver ? 'lightblue' : 'grey',
+      padding: 2,
+      width: 250,
+    });
 
     return (
       <Draggable key={node?.name} draggableId={node?.name} index={node?.index}>
-        {(draggableProvided, draggableSnapshot) => {
-          return (
-            <StyledDataModelNode
-              isDragging={draggableSnapshot.isDragging}
-              style={draggableProvided.draggableProps.style}
-              ref={draggableProvided.innerRef}
-              {...draggableProvided.draggableProps}
-              {...draggableProvided.dragHandleProps}
+        {(draggableProvided, draggableSnapshot) => (
+          <StyledDataModelNode
+            isDragging={draggableSnapshot.isDragging}
+            style={draggableProvided.draggableProps.style}
+            ref={draggableProvided.innerRef}
+            {...draggableProvided.draggableProps}
+            {...draggableProvided.dragHandleProps}
+          >
+            <Droppable
+              droppableId={node?.name}
+              type="Branch"
+              isDropDisabled={false}
+              isCombineEnable={true}
             >
-              {renderNode(node, draggableSnapshot.isDragging)}
-            </StyledDataModelNode>
-          );
-        }}
+              {(droppableProvided, droppableSnapshot) => (
+                <div
+                  ref={droppableProvided.innerRef}
+                  style={getListStyle(droppableSnapshot.isDraggingOver)}
+                >
+                  {renderNode(node, draggableSnapshot.isDragging)}
+                  {droppableProvided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </StyledDataModelNode>
+        )}
       </Draggable>
     );
   },
