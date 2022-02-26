@@ -79,8 +79,6 @@ export const StoryPagePreview: React.FC<{
 
   const onPageClick = useCallback(
     (index: number, pageId: string, multiple: boolean) => {
-      console.log('_ onPageClick');
-
       setCurrentPageIndex(index);
       dispatch(
         storyActions.changePageSelected({
@@ -99,7 +97,6 @@ export const StoryPagePreview: React.FC<{
 
   const onCloseStoryEditor = useCallback(() => {
     history.replace(`/organizations/${orgId}/vizs/${storyId}`);
-
     if (!currentPage?.id) return;
     onPageClick(0, currentPage?.id, false);
     if (currentPage.relType === 'DASHBOARD' && currentPage.relId) {
