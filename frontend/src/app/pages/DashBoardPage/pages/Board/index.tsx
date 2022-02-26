@@ -276,7 +276,7 @@ export const Board: React.FC<BoardProps> = memo(
             boardId: v.dashboardId,
             widgetId: v.id,
             errInfo: errInfo,
-            errorType: 'linkJumpError',
+            errorType: 'interaction',
           }),
         );
       });

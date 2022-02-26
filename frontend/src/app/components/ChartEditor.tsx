@@ -68,7 +68,6 @@ export interface ChartEditorBaseProps {
   orgId: string;
   container: 'widget' | 'dataChart';
   chartType: WidgetContentChartType;
-  chartId?: string;
   widgetId?: string;
   defaultViewId?: string;
   originChart?: ChartDTO | DataChart;
@@ -97,7 +96,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   dataChartId,
   chartType,
   defaultViewId,
-  chartId,
+  widgetId,
   onClose,
   onSaveInWidget,
   onSaveInDataChart,
@@ -446,7 +445,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     if (!dataview?.id) {
       return;
     }
-
+    const isWidget = dataChartId.includes('widget');
     const builder = new ChartDataRequestBuilder(
       {
         ...dataview,
@@ -465,8 +464,8 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
             ...{
               analytics: dataChartId ? false : true,
               vizName: backendChart?.name || 'chart',
-              vizId: container === 'widget' ? chartId : dataChartId,
-              vizType: container,
+              vizId: isWidget ? widgetId : dataChartId,
+              vizType: isWidget ? 'widget' : 'dataChart',
             },
           },
         ],
@@ -485,8 +484,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     dataview,
     dispatch,
     mainActions,
-    chartId,
-    container,
+    widgetId,
   ]);
 
   return (

@@ -246,7 +246,7 @@ const widgetInfoRecordSlice = createSlice({
         boardId?: string;
         widgetId: string;
         errInfo?: string;
-        errorType: 'interFaceError' | 'linkJumpError';
+        errorType: 'request' | 'interaction';
       }>,
     ) {
       const { widgetId, errInfo, errorType } = action.payload;

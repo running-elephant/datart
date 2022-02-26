@@ -97,16 +97,8 @@ const StyledErrorIcon = styled(Button)`
   }
 `;
 export const ErrorIcon: React.FC<{ errInfo }> = ({ errInfo }) => {
-  const renderTitle = errInfo => {
-    return (
-      <div
-        style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}
-        dangerouslySetInnerHTML={{ __html: errInfo }}
-      ></div>
-    );
-  };
   return (
-    <Tooltip title={renderTitle(errInfo)}>
+    <Tooltip title={errInfo}>
       <StyledErrorIcon
         icon={<WarningTwoTone twoToneColor={ERROR} />}
         type="link"

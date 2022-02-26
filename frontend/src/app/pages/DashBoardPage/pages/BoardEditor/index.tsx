@@ -83,7 +83,7 @@ export const BoardEditor: React.FC<{
           boardId: v.dashboardId,
           widgetId: v.id,
           errInfo: errInfo,
-          errorType: 'linkJumpError',
+          errorType: 'interaction',
         }),
       );
     });

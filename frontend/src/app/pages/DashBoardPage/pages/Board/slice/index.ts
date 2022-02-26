@@ -242,7 +242,7 @@ const boardSlice = createSlice({
         boardId: string;
         widgetId: string;
         errInfo?: string;
-        errorType: 'interFaceError' | 'linkJumpError';
+        errorType: 'request' | 'interaction';
       }>,
     ) {
       const { boardId, widgetId, errInfo, errorType } = action.payload;

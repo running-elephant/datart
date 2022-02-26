@@ -286,7 +286,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
           boardId,
           widgetId,
           errInfo: undefined,
-          errorType: 'interFaceError',
+          errorType: 'request',
         }),
       );
     } catch (error) {
@@ -295,7 +295,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
           boardId,
           widgetId,
           errInfo: getErrorMessage(error),
-          errorType: 'interFaceError',
+          errorType: 'request',
         }),
       );
 
@@ -391,7 +391,7 @@ export const getControllerOptions = createAsyncThunk<
           boardId,
           widgetId,
           errInfo: undefined,
-          errorType: 'interFaceError',
+          errorType: 'request',
         }),
       );
     } catch (error) {
@@ -400,7 +400,7 @@ export const getControllerOptions = createAsyncThunk<
           boardId,
           widgetId,
           errInfo: getErrorMessage(error),
-          errorType: 'interFaceError',
+          errorType: 'request',
         }),
       );
     }

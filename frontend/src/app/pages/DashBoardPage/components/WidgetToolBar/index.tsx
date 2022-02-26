@@ -88,11 +88,13 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
 
     if (!errInfoValue.length) return null;
 
-    let errHtml = ``;
-
-    errInfoValue.forEach(info => {
-      errHtml += String(info) + '<br/>';
-    });
+    const errHtml = (
+      <div style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}>
+        {errInfoValue.map(v => {
+          return <p>{String(v)}</p>;
+        })}
+      </div>
+    );
     return <ErrorIcon errInfo={errHtml} />;
   };
   const renderWidgetAction = () => {
