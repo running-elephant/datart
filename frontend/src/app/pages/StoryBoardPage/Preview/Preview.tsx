@@ -19,6 +19,7 @@ import { Layout, message } from 'antd';
 import { Split } from 'app/components';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
+import { fetchBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thunk';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import {
   deleteViz,
@@ -69,10 +70,6 @@ export const StoryPagePreview: React.FC<{
     makeSelectStoryPagesById(state, storyId),
   );
 
-  const onCloseEditor = useCallback(() => {
-    history.push(`/organizations/${orgId}/vizs/${storyId}`);
-  }, [history, orgId, storyId]);
-
   const sortedPages = useMemo(() => {
     const sortedPages = Object.values(pageMap).sort(
       (a, b) => a.config.index - b.config.index,
@@ -80,20 +77,10 @@ export const StoryPagePreview: React.FC<{
     return sortedPages;
   }, [pageMap]);
 
-  const curPageId = useMemo(() => {
-    return sortedPages[currentPageIndex]?.id || '';
-  }, [currentPageIndex, sortedPages]);
-
-  const toggleEdit = useCallback(() => {
-    history.push(`/organizations/${orgId}/vizs/${storyId}/storyEditor`);
-  }, [history, orgId, storyId]);
-
-  const playStory = useCallback(() => {
-    window.open(`${storyId}/storyPlay`, '_blank');
-  }, [storyId]);
-
   const onPageClick = useCallback(
     (index: number, pageId: string, multiple: boolean) => {
+      console.log('_ onPageClick');
+
       setCurrentPageIndex(index);
       dispatch(
         storyActions.changePageSelected({
@@ -105,6 +92,28 @@ export const StoryPagePreview: React.FC<{
     },
     [dispatch, storyId],
   );
+  const currentPage = useMemo(() => {
+    const currentPage = sortedPages[currentPageIndex];
+    return currentPage;
+  }, [currentPageIndex, sortedPages]);
+
+  const onCloseStoryEditor = useCallback(() => {
+    history.replace(`/organizations/${orgId}/vizs/${storyId}`);
+
+    if (!currentPage?.id) return;
+    onPageClick(0, currentPage?.id, false);
+    if (currentPage.relType === 'DASHBOARD' && currentPage.relId) {
+      dispatch(fetchBoardDetail({ dashboardRelId: currentPage.relId }));
+    }
+  }, [currentPage, dispatch, history, onPageClick, orgId, storyId]);
+
+  const toggleEdit = useCallback(() => {
+    history.push(`/organizations/${orgId}/vizs/${storyId}/storyEditor`);
+  }, [history, orgId, storyId]);
+
+  const playStory = useCallback(() => {
+    window.open(`${storyId}/storyPlay`, '_blank');
+  }, [storyId]);
 
   const onPublish = useCallback(() => {
     if (storyBoard) {
@@ -240,7 +249,7 @@ export const StoryPagePreview: React.FC<{
             </PageListWrapper>
             <Content>
               {sortedPages.map(page => (
-                <PreviewPage key={page.id} show={page.id === curPageId}>
+                <PreviewPage key={page.id} show={page.id === currentPage.id}>
                   <StoryPageItem
                     key={page.id}
                     page={page}
@@ -255,7 +264,10 @@ export const StoryPagePreview: React.FC<{
             <Route
               path="/organizations/:orgId/vizs/:vizId?/storyEditor"
               render={() => (
-                <StoryEditor storyId={storyId} onCloseEditor={onCloseEditor} />
+                <StoryEditor
+                  storyId={storyId}
+                  onCloseEditor={onCloseStoryEditor}
+                />
               )}
             />
           </Switch>
