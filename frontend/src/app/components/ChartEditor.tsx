@@ -421,13 +421,18 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   ]);
 
   const saveChartToDashBoard = useCallback(
-    dashboardId => {
+    (dashboardId, dashboardType) => {
       const dataChart = buildDataChart();
       try {
         history.push({
           pathname: `/organizations/${orgId}/vizs/${dashboardId}/boardEditor`,
           state: {
-            widgetInfo: JSON.stringify({ chartType, dataChart, dataview }),
+            widgetInfo: JSON.stringify({
+              chartType,
+              dataChart,
+              dataview,
+              dashboardType,
+            }),
           },
         });
       } catch (error) {

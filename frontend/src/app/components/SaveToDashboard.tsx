@@ -41,7 +41,7 @@ import { Tree } from './Tree';
 
 interface SaveToDashboardTypes {
   isModalVisible: boolean;
-  handleOk: (id) => void;
+  handleOk: (id, type) => void;
   handleCancel: () => void;
   title: string;
   orgId: string;
@@ -82,7 +82,11 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
           message.error(t('haveCharts'));
           return false;
         }
-        handleOk(selectId);
+        try {
+          handleOk(selectId, JSON.parse(data?.config)?.type);
+        } catch (error) {
+          console.log(error);
+        }
       },
       [handleOk, backendChartId, t],
     );
