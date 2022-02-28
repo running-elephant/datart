@@ -650,6 +650,7 @@ class BasicTableChart extends ReactChart {
           sorter: true,
           title: getColumnRenderName(c),
           dataIndex: chartDataSet.getFieldIndex(c),
+          key: chartDataSet.getFieldKey(c),
           aggregate: c?.aggregate,
           colName,
           width: colMaxWidth,
