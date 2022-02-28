@@ -1,5 +1,5 @@
 import { Modal } from 'antd';
-import { defaultThemes } from 'app/assets/theme/colorsConfig';
+import { defaultPalette, defaultThemes } from 'app/assets/theme/colorsConfig';
 import ChromeColorPicker from 'app/components/ColorPicker/ChromeColorPicker';
 import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
 import { ReactNode } from 'react';
@@ -104,12 +104,19 @@ export class QuillPalette {
    * @param param0
    * @returns
    */
+  // todo (tianlei) Need to nationalize
   static getToolbar = ({
     id,
     extendNodes = {},
+    t,
   }: {
     id: string;
     extendNodes?: Record<string, ReactNode | ReactNode[]>;
+    t?: (
+      key: string,
+      disablePrefix?: boolean | undefined,
+      options?: any,
+    ) => any;
   }) => (
     <ToolbarStyle id={id}>
       <span className="ql-formats">
@@ -120,7 +127,7 @@ export class QuillPalette {
         >
           {FONT_FAMILIES.map(font => (
             <option value={font.value} key={font.name}>
-              {font.name}
+              {t?.(font.name, true)}
             </option>
           ))}
         </select>
@@ -138,7 +145,7 @@ export class QuillPalette {
 
       <span className="ql-formats">
         <select className="ql-color" key="ql-color">
-          {defaultThemes.map(color => (
+          {defaultThemes.concat(defaultPalette).map(color => (
             <option value={color} key={color} />
           ))}
           <option
@@ -147,7 +154,7 @@ export class QuillPalette {
           />
         </select>
         <select className="ql-background" key="ql-background">
-          {defaultThemes.map(color => (
+          {defaultThemes.concat(defaultPalette).map(color => (
             <option value={color} key={color} />
           ))}
           <option
@@ -220,7 +227,6 @@ export function CustomColor({
 }) {
   return (
     <Modal
-      title="更多配色"
       width={273}
       mask={false}
       visible={visible}
@@ -252,5 +258,9 @@ const ToolbarStyle = styled.div`
       left: 50%;
       transform: translate(-50%, -50%);
     }
+  }
+  .ql-color .ql-picker-options,
+  .ql-background .ql-picker-options {
+    width: 232px !important;
   }
 `;
