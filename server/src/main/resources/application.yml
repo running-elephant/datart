@@ -2,7 +2,6 @@ spring:
   application:
     name: datart-server
 
-
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -12,12 +11,12 @@ spring:
     clean-on-validation-error: false
     validate-on-migrate: false
 
-
   main:
     banner-mode: off
 
   profiles:
-    include: config
+    active: demo,config
+
   servlet:
     multipart:
       max-file-size: 1024MB
@@ -78,3 +77,12 @@ shiro:
 datart:
   server:
     path-prefix: /api/v1
+
+
+server:
+  port: 8080
+  address: 0.0.0.0
+
+  compression:
+    enabled: true
+    mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
