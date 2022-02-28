@@ -45,6 +45,10 @@ class ChartDataSetBase extends Array {
     return this.toCaseInsensitive(getValueByColumnKey(field));
   }
 
+  protected toOriginKey(field: ChartDataSectionField): string {
+    return getValueByColumnKey(field);
+  }
+
   protected createColumnIndexTable(metas?: ChartDatasetMeta[]): {
     [key: string]: number;
   } {
@@ -57,6 +61,10 @@ class ChartDataSetBase extends Array {
   protected toCaseInsensitive(key) {
     return String(key).toUpperCase();
   }
+
+  public getFieldOriginKey(field: ChartDataSectionField) {
+    return this.toOriginKey(field);
+  }
 }
 
 export class ChartDataSet<T>
@@ -64,8 +72,13 @@ export class ChartDataSet<T>
   implements IChartDataSet<T>
 {
   private columnIndexTable: ColumnIndexTable = {};
+  private originalFields?: ChartDataSectionField[];
 
-  constructor(columns: T[][], metas?: ChartDatasetMeta[]) {
+  constructor(
+    columns: T[][],
+    metas?: ChartDatasetMeta[],
+    fields?: ChartDataSectionField[],
+  ) {
     super(
       ...(Array.prototype.map.call(columns, c => {
         if (c?.length === 1) {
@@ -73,9 +86,10 @@ export class ChartDataSet<T>
           row.push(c[0]);
           return row;
         }
-        return new ChartDataSetRow(metas, c);
+        return new ChartDataSetRow(metas, c, fields);
       }) as any),
     );
+    this.originalFields = fields;
     this.columnIndexTable = super.createColumnIndexTable(metas);
   }
 
@@ -87,6 +101,7 @@ export class ChartDataSet<T>
     return this.toIndexBy(this.columnIndexTable, field);
   }
 
+  // TODO(Stephen): should be passed by sorted fields not data configs
   public sortBy(dataConfigs: ChartDataConfig[]): void {
     const orderConfigs = dataConfigs
       .filter(
@@ -121,9 +136,13 @@ export class ChartDataSetRow<T>
   implements IChartDataSetRow<T>
 {
   private columnIndexTable: ColumnIndexTable = {};
+  private metas: Array<{ name: string }> = [];
+  private originalFields?: ChartDataSectionField[];
 
-  constructor(metas, items: T[]) {
+  constructor(metas, items: T[], fields?: ChartDataSectionField[]) {
     super(...(items as any));
+    this.metas = metas;
+    this.originalFields = fields;
     this.columnIndexTable = this.createColumnIndexTable(metas);
   }
 
@@ -146,6 +165,13 @@ export class ChartDataSetRow<T>
   public convertToObject(): object {
     return Object.keys(this.columnIndexTable).reduce((acc, cur) => {
       acc[cur] = this[this.columnIndexTable[cur]];
+      return acc;
+    }, {});
+  }
+
+  public convertToCaseSensitiveObject(): object {
+    return (this.originalFields || []).reduce((acc, cur) => {
+      acc[this.getFieldOriginKey(cur)] = this[this.getFieldIndex(cur)];
       return acc;
     }, {});
   }
