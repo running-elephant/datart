@@ -64,7 +64,7 @@ const ChartRichTextAdapter: FC<{
   initContent: string | undefined;
   onChange: (delta: string | undefined) => void;
   openQuillMarkdown?: boolean;
-  t?: (key: string) => string;
+  t?: (key: string, disablePrefix?: boolean, options?: any) => any;
 }> = memo(
   ({
     dataList,
@@ -283,8 +283,9 @@ const ChartRichTextAdapter: FC<{
               </Dropdown>
             ),
           },
+          t,
         }),
-      [containerId, fieldItems],
+      [containerId, fieldItems, t],
     );
 
     const reactQuillEdit = useMemo(
@@ -351,10 +352,6 @@ const ChartRichTextAdapter: FC<{
   },
 );
 export default ChartRichTextAdapter;
-
-interface IQuillProp {
-  moreBtnText: string;
-}
 
 const QuillBox = styled.div`
   width: 100%;
