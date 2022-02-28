@@ -200,10 +200,10 @@ class BasicGaugeChart extends Chart {
   }
 
   private getAxis(styleConfigs) {
-    const [axisWidth, axisLineColor] = getStyles(
+    const [axisWidth, axisLineColor, axisRoundCap] = getStyles(
       styleConfigs,
       ['axis'],
-      ['axisLineSize', 'axisLineColor'],
+      ['axisLineSize', 'axisLineColor', 'axisRoundCap'],
     );
     const [showAxisTick, lineStyle, distance, splitNumber] = getStyles(
       styleConfigs,
@@ -221,6 +221,7 @@ class BasicGaugeChart extends Chart {
           width: axisWidth,
           color: [[1, axisLineColor]],
         },
+        roundCap: axisRoundCap,
       },
       axisTick: {
         show: showAxisTick,

@@ -126,6 +126,7 @@ function useStateModal({ initState }: { initState?: any }) {
       onCancel: handleClickCancelButton,
       maskClosable: true,
       icon: null,
+      centered: true,
     });
   };
 

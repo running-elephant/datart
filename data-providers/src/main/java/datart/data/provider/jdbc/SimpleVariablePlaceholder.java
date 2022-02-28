@@ -38,10 +38,6 @@ public class SimpleVariablePlaceholder extends VariablePlaceholder {
 
     private SqlIdentifier identifier;
 
-    private SimpleVariablePlaceholder(List<ScriptVariable> variables, SqlDialect sqlDialect, SqlCall sqlCall, String originalSqlFragment) {
-        super(variables, sqlDialect, sqlCall, originalSqlFragment);
-    }
-
     public SimpleVariablePlaceholder(ScriptVariable variable, SqlDialect sqlDialect, String originalSqlFragment) {
         super(null, sqlDialect, null, originalSqlFragment);
         this.variable = variable;

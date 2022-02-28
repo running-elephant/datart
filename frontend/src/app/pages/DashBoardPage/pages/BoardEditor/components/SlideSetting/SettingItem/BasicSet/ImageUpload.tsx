@@ -17,7 +17,7 @@
  */
 import { DeleteOutlined } from '@ant-design/icons';
 import { Form, Upload } from 'antd';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { convertImageUrl } from 'app/pages/DashBoardPage/utils';
 import React, { useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';

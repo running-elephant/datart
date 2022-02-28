@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { prefixI18N } from 'app/hooks/useI18NPrefix';
 import { migrateChartConfig } from 'app/migration';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -37,8 +38,8 @@ import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
 import { getTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
-import produce from 'immer';
 import moment from 'moment';
+import { CloneValueDeep } from 'utils/object';
 import { ChartDataRequestFilter } from '../../../types/ChartDataRequest';
 import { STORAGE_IMAGE_KEY_PREFIX } from '../constants';
 import {
@@ -97,9 +98,13 @@ export const getRGBAColor = color => {
 };
 
 export const getChartDataRequestBuilder = (dataChart: DataChart) => {
-  const migratedChartConfig = produce(dataChart?.config, draft => {
-    migrateChartConfig(draft as ChartDetailConfigDTO);
-  });
+  // const migratedChartConfig = (dataChart?.config, draft => {
+  //   migrateChartConfig(draft as ChartDetailConfigDTO);
+  // });
+  // TODO
+  const migratedChartConfig = migrateChartConfig(
+    CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
+  );
   const { datas, settings } = convertToChartConfigDTO(
     migratedChartConfig as ChartDetailConfigDTO,
   );
@@ -355,15 +360,27 @@ export const getBoardChartRequests = (params: {
 
   const chartRequest = chartWidgetIds
     .map(widgetId => {
-      return getChartWidgetRequestParams({
-        widgetId,
-        widgetMap,
-        viewMap,
-        option: undefined,
-        widgetInfo: undefined,
-        dataChartMap,
-      });
+      const isWidget = widgetMap[widgetId].datachartId.indexOf('widget') !== -1;
+      return {
+        ...getChartWidgetRequestParams({
+          widgetId,
+          widgetMap,
+          viewMap,
+          option: undefined,
+          widgetInfo: undefined,
+          dataChartMap,
+        }),
+        ...{
+          vizName: widgetMap[widgetId].config.name,
+          vizId: isWidget
+            ? widgetMap[widgetId].id
+            : widgetMap[widgetId].datachartId,
+          analytics: false,
+          vizType: isWidget ? 'widget' : 'dataChart',
+        },
+      };
     })
+
     .filter(res => {
       if (res) {
         return true;
@@ -503,4 +520,27 @@ export const getDefaultWidgetName = (widget: Widget, index: number) => {
     default:
       return `xxx${index}`;
   }
+};
+export const checkLinkAndJumpErr = (
+  widgetData: Widget,
+  folderListIds?: string[],
+): string => {
+  let error: string = '';
+
+  if (
+    widgetData?.config?.linkageConfig?.open &&
+    widgetData?.relations.length === 0
+  ) {
+    error = prefixI18N('viz.linkage.linkageError');
+  }
+
+  if (
+    widgetData?.config?.jumpConfig &&
+    widgetData?.config?.jumpConfig.open &&
+    folderListIds?.indexOf(widgetData.config.jumpConfig.target.relId) === -1
+  ) {
+    error = prefixI18N('viz.jump.jumpError');
+  }
+
+  return error;
 };

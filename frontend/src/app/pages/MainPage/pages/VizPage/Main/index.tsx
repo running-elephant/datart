@@ -196,7 +196,7 @@ export function Main({ sliderVisible }: { sliderVisible: boolean }) {
         />
         <Route
           path="/organizations/:orgId/vizs/:vizId?/boardEditor"
-          render={() => <BoardEditor dashboardId={vizId} />}
+          render={() => <BoardEditor boardId={vizId} />}
         />
       </Switch>
     </Wrapper>

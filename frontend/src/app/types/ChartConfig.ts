@@ -190,6 +190,8 @@ export const ChartStyleSectionComponentType = {
   FONTFAMILY: 'fontFamily',
   FONTSIZE: 'fontSize',
   FONTCOLOR: 'fontColor',
+  FONTSTYLE: 'fontStyle',
+  FONTWEIGHT: 'fontWeight',
   INPUTNUMBER: 'inputNumber',
   INPUTPERCENTAGE: 'inputPercentage',
   SLIDER: 'slider',
@@ -206,6 +208,8 @@ export const ChartStyleSectionComponentType = {
 
   // Customize Component
   FontAlignment: 'fontAlignment',
+  NameLocation: 'nameLocation',
+  LegendType: 'legendType',
 };
 
 export type ChartConfigBase = {
@@ -326,6 +330,7 @@ export type ChartStyleSectionRowOption = {
   min?: number | string;
   max?: number | string;
   step?: number | string;
+  dots?: boolean;
   type?: string;
   editable?: boolean;
   modalSize?: string | number;
@@ -336,6 +341,10 @@ export type ChartStyleSectionRowOption = {
   getItems?: (cols) => Array<ChartStyleSelectorItem>;
   needRefresh?: boolean;
   fontFamilies?: string[];
+  showFontSize?: boolean;
+  showLineHeight?: boolean;
+  showFontStyle?: boolean;
+  showFontColor?: boolean;
 
   /**
    * Suppport Components: @see BasicRadio, @see BasicSelector and etc

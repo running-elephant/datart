@@ -17,17 +17,42 @@
  */
 
 import produce from 'immer';
-import React, { FC, memo, useCallback, useMemo } from 'react';
+import React, { createContext, FC, memo, useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { BoardContext, BoardContextProps } from '../../contexts/BoardContext';
 import { renderedWidgetAsync } from '../../pages/Board/slice/thunk';
-import { Dashboard, VizRenderMode } from '../../pages/Board/slice/types';
+import {
+  BoardType,
+  Dashboard,
+  VizRenderMode,
+} from '../../pages/Board/slice/types';
 import { renderedEditWidgetAsync } from '../../pages/BoardEditor/slice/thunk';
 import { adaptBoardImageUrl } from '../../utils';
 import { BoardActionProvider } from './BoardActionProvider';
 import { BoardConfigProvider } from './BoardConfigProvider';
 import { BoardInfoProvider } from './BoardInfoProvider';
 
+export interface BoardContextProps {
+  name: string;
+  renderMode?: VizRenderMode;
+  boardId: string;
+  orgId: string;
+  boardType: BoardType;
+  status: number;
+  editing: boolean;
+  thumbnail?: string;
+  autoFit?: boolean | undefined;
+  hideTitle?: boolean | undefined;
+  allowDownload?: boolean;
+  allowShare?: boolean;
+  allowManage?: boolean;
+  queryVariables: Dashboard['queryVariables'];
+  // methods
+  renderedWidgetById: (wid: string) => void;
+}
+
+export const BoardContext = createContext<BoardContextProps>(
+  {} as BoardContextProps,
+);
 export const BoardProvider: FC<{
   board: Dashboard;
   renderMode: VizRenderMode;

@@ -114,14 +114,14 @@ const config: ChartConfig = {
                         options: {
                           min: 0,
                         },
-                        /*watcher: {
+                        watcher: {
                           deps: ['useColumnWidth'],
                           action: props => {
                             return {
                               disabled: !props.useColumnWidth,
                             };
                           },
-                        },*/
+                        },
                         comType: 'inputNumber',
                       },
                     ],
@@ -232,7 +232,7 @@ const config: ChartConfig = {
       comType: 'group',
       rows: [
         {
-          label: 'style.bgColor',
+          label: 'common.backgroundColor',
           key: 'bgColor',
           default: '#f8f9fa',
           comType: 'fontColor',
@@ -301,38 +301,14 @@ const config: ChartConfig = {
         {
           label: 'style.fontWeight',
           key: 'fontWeight',
-          comType: 'select',
+          comType: 'fontWeight',
           default: 'normal',
-          options: {
-            items: [
-              { label: '常规字号', value: 'normal' },
-              { label: '粗体', value: 'bold' },
-              { label: '特粗体', value: 'bolder' },
-              { label: '细体', value: 'lighter' },
-              { label: '100', value: '100' },
-              { label: '200', value: '200' },
-              { label: '300', value: '300' },
-              { label: '400', value: '400' },
-              { label: '500', value: '500' },
-              { label: '600', value: '600' },
-              { label: '700', value: '700' },
-              { label: '800', value: '800' },
-              { label: '900', value: '900' },
-            ],
-          },
         },
         {
           label: 'style.fontStyle',
           key: 'fontStyle',
-          comType: 'select',
+          comType: 'fontStyle',
           default: 'normal',
-          options: {
-            items: [
-              { label: '常规体', value: 'normal' },
-              { label: '斜体', value: 'italic' },
-              { label: '偏斜体', value: 'oblique' },
-            ],
-          },
         },
         {
           label: 'style.align',
@@ -407,6 +383,24 @@ const config: ChartConfig = {
             },
           },
         },
+        {
+          label: 'common.backgroundColor',
+          key: 'summaryBcColor',
+          default: 'rgba(0, 0, 0, 0)',
+          comType: 'fontColor',
+        },
+        {
+          label: 'viz.palette.style.font',
+          key: 'summaryFont',
+          comType: 'font',
+          default: {
+            fontFamily: FONT_FAMILY,
+            fontSize: '14',
+            fontWeight: 'normal',
+            fontStyle: 'normal',
+            color: 'black',
+          },
+        },
       ],
     },
   ],
@@ -414,6 +408,7 @@ const config: ChartConfig = {
     {
       lang: 'zh-CN',
       translation: {
+        common: { backgroundColor: '背景颜色' },
         header: {
           title: '表头分组',
           open: '打开',
@@ -431,7 +426,6 @@ const config: ChartConfig = {
           columnStylePanel: '列样式配置器',
           conditionStyle: '条件样式',
           conditionStylePanel: '条件样式配置器',
-          backgroundColor: '背景颜色',
           align: '对齐方式',
           enableFixedCol: '开启固定列宽',
           fixedColWidth: '固定列宽度设置',
@@ -479,6 +473,9 @@ const config: ChartConfig = {
     {
       lang: 'en-US',
       translation: {
+        common: {
+          backgroundColor: 'Background Color',
+        },
         header: {
           title: 'Table Header Group',
           open: 'Open',
@@ -496,7 +493,6 @@ const config: ChartConfig = {
           columnStylePanel: 'Column Style Panel',
           conditionStyle: 'Condition Style',
           conditionStylePanel: 'Condition Style Panel',
-          backgroundColor: 'Background Color',
           align: 'Align',
           enableFixedCol: 'Enable Fixed Column',
           fixedColWidth: 'Fixed Column Width',
@@ -513,7 +509,6 @@ const config: ChartConfig = {
           tableSize: 'Table Size',
           tableHeaderStyle: 'Table Header Style',
           tableBodyStyle: 'Table Body Style',
-          bgColor: 'Background Color',
           font: 'Font',
           align: 'Align',
           fontWeight: 'Font Weight',

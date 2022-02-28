@@ -1,12 +1,11 @@
 import { Form, FormInstance, Input, Radio, TreeSelect } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import useMount from 'app/hooks/useMount';
 import { BoardTypeMap } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import debounce from 'debounce-promise';
 import { CommonFormTypes, DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { request } from 'utils/request';
 import { getCascadeAccess } from '../../Access';
@@ -22,7 +21,6 @@ import {
   selectSaveFolderLoading,
   selectSaveStoryboardLoading,
 } from './slice/selectors';
-import { getFolders } from './slice/thunks';
 
 type SaveFormProps = Omit<ModalFormProps, 'type' | 'visible' | 'onSave'>;
 
@@ -45,7 +43,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
   const formRef = useRef<FormInstance>();
   const t = useI18NPrefix('viz.saveForm');
   const tg = useI18NPrefix('global');
-  const dispatch = useDispatch();
+
   const getDisabled = useCallback(
     (_, path: string[]) =>
       !getCascadeAccess(
@@ -62,16 +60,6 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     selectVizFolderTree(state, { id: initialValues?.id, getDisabled }),
   );
 
-  useMount(() => {
-    dispatch(getFolders(orgId));
-  });
-
-  useEffect(() => {
-    if (initialValues) {
-      formRef.current?.setFieldsValue(initialValues);
-    }
-  }, [initialValues]);
-
   const save = useCallback(
     values => {
       onSave(values, onCancel);
@@ -83,6 +71,22 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     formRef.current?.resetFields();
     onAfterClose && onAfterClose();
   }, [onAfterClose]);
+
+  useEffect(() => {
+    if (initialValues) {
+      formRef.current?.setFieldsValue(initialValues);
+    }
+  }, [initialValues]);
+
+  const boardTips = () => {
+    return (
+      <>
+        <span>{t('boardType.autoTips')}</span>
+        <br />
+        <span>{t('boardType.freeTips')}</span>
+      </>
+    );
+  };
 
   return (
     <ModalForm
@@ -139,7 +143,17 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
         </Form.Item>
       )}
       {vizType === 'DASHBOARD' && type === CommonFormTypes.Add && (
-        <Form.Item name="boardType" label={t('boardType.label')}>
+        <Form.Item
+          rules={[
+            {
+              required: true,
+              message: t('boardType.requiredMessage'),
+            },
+          ]}
+          name="boardType"
+          label={t('boardType.label')}
+          tooltip={boardTips()}
+        >
           <Radio.Group>
             <Radio.Button value={BoardTypeMap.auto}>
               {t('boardType.auto')}

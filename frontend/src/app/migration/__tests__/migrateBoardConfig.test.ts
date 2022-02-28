@@ -23,8 +23,7 @@ import {
   migrateBoardConfig,
   parseBoardConfig,
 } from '../BoardConfig/migrateBoardConfig';
-import { VERSION_BETA_0, VERSION_BETA_1 } from '../constants';
-
+import { CURRENT_VERSION, VERSION_BETA_0, VERSION_BETA_1 } from '../constants';
 describe('test migrateBoard ', () => {
   test('parse board.config', () => {
     const config = '{}';
@@ -90,7 +89,7 @@ describe('test migrateBoard ', () => {
     const config = '{}';
     expect(migrateBoardConfig(config)).toMatchObject({
       type: 'auto',
-      version: VERSION_BETA_0,
+      version: CURRENT_VERSION,
     } as DashboardConfig);
   });
 });

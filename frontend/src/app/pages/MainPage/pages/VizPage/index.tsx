@@ -74,8 +74,8 @@ export function VizPage() {
           width={400}
           formProps={{
             labelAlign: 'left',
-            labelCol: { offset: 1, span: 6 },
-            wrapperCol: { span: 15 },
+            labelCol: { offset: 1, span: 7 },
+            wrapperCol: { span: 14 },
           }}
           okText={tg('button.save')}
         />

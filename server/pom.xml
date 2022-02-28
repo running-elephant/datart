@@ -67,6 +67,20 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>datart</groupId>
             <artifactId>datart-core</artifactId>
             <version>${project.version}</version>
@@ -303,7 +317,8 @@
                         </goals>
                         <configuration>
                             <sourceFile>${project.parent.basedir}/frontend/build/task/index.js</sourceFile>
-                            <destinationFile>${project.basedir}/src/main/resources/javascript/parser.js</destinationFile>
+                            <destinationFile>${project.basedir}/src/main/resources/javascript/parser.js
+                            </destinationFile>
                         </configuration>
                     </execution>
                 </executions>

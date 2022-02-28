@@ -174,7 +174,7 @@ const config: ChartConfig = {
           key: 'font',
           comType: 'font',
           default: {
-            fontFamily: 'PingFang SC',
+            fontFamily: 'PingFangSC',
             fontSize: 12,
             fontWeight: 'normal',
             color: '#495057',
@@ -218,7 +218,7 @@ const config: ChartConfig = {
           key: 'font',
           comType: 'font',
           default: {
-            fontFamily: 'PingFang SC',
+            fontFamily: 'PingFangSC',
             fontSize: 12,
             fontWeight: 'normal',
             color: '#495057',
@@ -376,10 +376,6 @@ const config: ChartConfig = {
           totalPosition: 'Total Position',
           subTotalPosition: 'Sub Total Position',
           aggregateFields: 'Summary Fields',
-        },
-        paging: {
-          title: 'Paging',
-          pageSize: 'Page Size',
         },
       },
     },

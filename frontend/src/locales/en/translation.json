@@ -448,6 +448,7 @@
         "open": "Open",
         "close": "Close",
         "cancel": "Cancel",
+        "downloadList": "Download list",
         "lang": {
           "zh": "zh",
           "en": "en"
@@ -544,6 +545,44 @@
           "bottom": "Bottom Margin",
           "top": "Top Margin",
           "containLabel": "Contain Label"
+        },
+        "lineStyles": {
+          "solid": "Solid",
+          "dashed": "Dashed",
+          "dotted": "Dotted"
+        },
+        "nameLocation": {
+          "start": "Start",
+          "center": "Center",
+          "end": "End"
+        },
+        "legendType": {
+          "plain": "Plain",
+          "scroll": "Scroll"
+        },
+        "fontFamily": {
+          "default": "Default",
+          "microsoftYaHei": "Microsoft YaHei",
+          "simSun": "SimSun",
+          "simHei": "SimHei",
+          "helveticaNeue": "Helvetica Neue",
+          "helvetica": "Helvetica",
+          "arial": "Arial",
+          "sansSerif": "sans-serif"
+        },
+        "lineHeight": {
+          "default": "Default Line Height"
+        },
+        "fontWeight": {
+          "normal": "Normal",
+          "bold": "Bold",
+          "bolder": "Bolder",
+          "lighter": "Lighter"
+        },
+        "fontStyle": {
+          "normal": "Normal",
+          "italic": "Italic",
+          "oblique": "Oblique"
         }
       },
       "data": {
@@ -722,6 +761,7 @@
       "share": {
         "link": "Link",
         "password": "Password",
+        "link_password": "Link Password",
         "expireDate": "Expire Date",
         "enablePassword": "Password",
         "generateLink": "Generate Link",
@@ -752,7 +792,9 @@
         "delete": "Delete",
         "copy": "Copy",
         "paste": "Paste",
-        "deviceSwitch": "Device Switch"
+        "deviceSwitch": "Device Switch",
+        "allowOverlap": "Allow Overlap",
+        "forbidOverlap": "Forbid Overlap"
       },
       "controlTypes": {
         "common": "Common",
@@ -849,7 +891,8 @@
       "associatedWidgets": "Associated Widgets",
       "associatedFields": "Associated Fields",
       "selectTriggers": "Select the trigger field",
-      "selectLinker": "Select linkage field"
+      "selectLinker": "Select linkage field",
+      "linkageError": "The linkage chart has been deleted, please reconfigure"
     },
     "jump": {
       "title": "Jump Settings",
@@ -859,7 +902,8 @@
       "URL": "URL",
       "parameters": "Parameters",
       "controller": "Associated Controllers",
-      "associatedFields": "Associated Fields"
+      "associatedFields": "Associated Fields",
+      "jumpError": "The jump target has been invalidated or deleted, please reconfigure"
     },
     "associate": {
       "title": "Please associate fields/variables",
@@ -937,9 +981,12 @@
       "name": "Name",
       "description": "Description",
       "boardType": {
-        "label": "Board type",
+        "label": "Layout",
         "auto": "Auto",
-        "free": "Free"
+        "free": "Free",
+        "autoTips": "Auto: Responsive, fluid layout",
+        "freeTips": "Free: Precise, fixed layout",
+        "requiredMessage": "Select a Layout Type"
       },
       "parent": "Parent",
       "root": "Root",
@@ -993,6 +1040,7 @@
     "properties": {
       "reference": "Source reference",
       "variable": "Variables",
+      "model": "Data Model",
       "columnPermissions": "Column Permissions"
     },
     "resource": {
@@ -1005,6 +1053,16 @@
       "add": "Create variable",
       "prefix": "[Public]",
       "suffix": "duplicate"
+    },
+    "model": {
+      "type": "Type",
+      "rename": "Rename",
+      "delete": "Delete",
+      "typeAndCategory": "Type & Category",
+      "permission": "Column Permissions",
+      "newHierarchy": "New Hierarchy",
+      "addToHierarchy": "Add To Hierarchy",
+      "hierarchyName": "Hierarchy Name"
     },
     "columnPermission": {
       "title": "Column permissions",
@@ -1033,7 +1091,8 @@
       "dirtyread": "Dirty read",
       "fastfailover": "Fast failover",
       "cache": "Cache",
-      "cacheExpires": "Expires(s)"
+      "cacheExpires": "Expires(s)",
+      "expensiveQuery": "This is an expensive query"
     },
     "schemaTable": {
       "category": "Category",

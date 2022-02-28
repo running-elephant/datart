@@ -21,7 +21,7 @@ import { createSlice } from 'utils/@reduxjs/toolkit';
 import { WidgetControllerPanelParams } from './../../Board/slice/types';
 import { editBoardStackSlice } from './childSlice/stackSlice';
 import {
-  getEditBoardDetail,
+  fetchEditBoardDetail,
   getEditChartWidgetDataAsync,
   getEditControllerOptions,
   toUpdateDashboard,
@@ -127,13 +127,13 @@ const editDashBoardInfoSlice = createSlice({
       state.saving = false;
     });
     //loadEditBoardDetail
-    builder.addCase(getEditBoardDetail.pending, state => {
+    builder.addCase(fetchEditBoardDetail.pending, state => {
       state.loading = true;
     });
-    builder.addCase(getEditBoardDetail.fulfilled, (state, action) => {
+    builder.addCase(fetchEditBoardDetail.fulfilled, (state, action) => {
       state.loading = false;
     });
-    builder.addCase(getEditBoardDetail.rejected, state => {
+    builder.addCase(fetchEditBoardDetail.rejected, state => {
       state.loading = false;
     });
   },
@@ -246,35 +246,49 @@ const widgetInfoRecordSlice = createSlice({
         boardId?: string;
         widgetId: string;
         errInfo?: string;
+        errorType: 'request' | 'interaction';
       }>,
     ) {
-      const { widgetId, errInfo } = action.payload;
-      state[widgetId].errInfo = errInfo;
+      const { widgetId, errInfo, errorType } = action.payload;
+      let errorObj = state[widgetId].errInfo || {};
+      if (errInfo) {
+        errorObj[errorType] = errInfo;
+      } else {
+        delete errorObj[errorType];
+      }
+      state[widgetId].errInfo = errorObj;
     },
   },
   extraReducers: builder => {
     builder.addCase(getEditChartWidgetDataAsync.pending, (state, action) => {
       const { widgetId } = action.meta.arg;
+      if (!state?.[widgetId]) return;
       state[widgetId].loading = true;
     });
     builder.addCase(getEditChartWidgetDataAsync.fulfilled, (state, action) => {
       const { widgetId } = action.meta.arg;
+      if (!state?.[widgetId]) return;
+
       state[widgetId].loading = false;
     });
     builder.addCase(getEditChartWidgetDataAsync.rejected, (state, action) => {
       const { widgetId } = action.meta.arg;
+      if (!state?.[widgetId]) return;
       state[widgetId].loading = false;
     });
     builder.addCase(getEditControllerOptions.pending, (state, action) => {
       const widgetId = action.meta.arg;
+      if (!state?.[widgetId]) return;
       state[widgetId].loading = true;
     });
     builder.addCase(getEditControllerOptions.fulfilled, (state, action) => {
       const widgetId = action.meta.arg;
+      if (!state?.[widgetId]) return;
       state[widgetId].loading = false;
     });
     builder.addCase(getEditControllerOptions.rejected, (state, action) => {
       const widgetId = action.meta.arg;
+      if (!state?.[widgetId]) return;
       state[widgetId].loading = false;
     });
   },
@@ -296,6 +310,7 @@ export const { actions: editWidgetDataActions } = editWidgetDataSlice;
 const filterActions = [
   editBoardStackActions.setBoardToEditStack,
   editBoardStackActions.updateBoard,
+  editBoardStackActions.toggleAllowOverlap,
   editBoardStackActions.updateBoardConfig,
   editBoardStackActions.addWidgets,
   editBoardStackActions.deleteWidgets,

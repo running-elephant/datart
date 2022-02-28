@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 import ChartEditor from 'app/components/ChartEditor';
-import React, { memo, useCallback, useEffect, useMemo } from 'react';
+import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,6 +28,7 @@ import { uuidv4 } from 'utils/utils';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
+import { checkLinkAndJumpErr } from '../../utils';
 import { fetchBoardDetail } from '../Board/slice/thunk';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
 import AutoEditor from './AutoEditor/index';
@@ -34,141 +36,176 @@ import ControllerWidgetPanel from './components/ControllerWidgetPanel';
 import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
 import FreeEditor from './FreeEditor/index';
-import { editBoardStackActions, editDashBoardInfoActions } from './slice';
+import {
+  editBoardStackActions,
+  editDashBoardInfoActions,
+  editWidgetInfoActions,
+} from './slice';
 import {
   addVariablesToBoard,
+  clearEditBoardState,
   editHasChartWidget,
 } from './slice/actions/actions';
 import {
   selectBoardChartEditorProps,
   selectEditBoard,
+  selectEditBoardLoading,
+  selectWidgetRecord,
 } from './slice/selectors';
 import { addChartWidget, fetchEditBoardDetail } from './slice/thunk';
-
 export const BoardEditor: React.FC<{
-  dashboardId: string;
-  allowDownload?: boolean;
-  allowShare?: boolean;
+  boardId: string;
   allowManage?: boolean;
-}> = memo(
-  ({ dashboardId: boardId, allowDownload, allowShare, allowManage }) => {
-    const dashboardId = boardId;
-    const dispatch = useDispatch();
-    const history = useHistory();
-    const dashboard = useSelector(selectEditBoard);
-    const boardChartEditorProps = useSelector(selectBoardChartEditorProps);
-    const histState = history.location.state as any;
-    const onCloseChartEditor = useCallback(() => {
-      dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
-    }, [dispatch]);
+}> = memo(({ boardId, allowManage }) => {
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const board = useSelector(selectEditBoard);
+  const boardLoading = useSelector(selectEditBoardLoading);
+  const boardChartEditorProps = useSelector(selectBoardChartEditorProps);
+  const histState = history.location.state as any;
+  const vizs = useSelector(selectVizs);
+  const WidgetRecord = useSelector(selectWidgetRecord);
+  const [folderIds, setFolderIds] = useState<any[]>([]);
 
-    const onSaveToWidget = useCallback(
-      (chartType: WidgetContentChartType, dataChart: DataChart, view) => {
-        const widgetId = boardChartEditorProps?.widgetId!;
-        dispatch(editHasChartWidget({ widgetId, dataChart, view }));
-        onCloseChartEditor();
-        dispatch(addVariablesToBoard(view.variables));
-      },
-      [boardChartEditorProps?.widgetId, dispatch, onCloseChartEditor],
-    );
-    const onCloseBoardEditor = useCallback(
-      (bool: boolean) => {
-        const pathName = history.location.pathname;
-        const prePath = pathName.split('/boardEditor')[0];
-        history.push(`${prePath}`);
-        dispatch(editBoardStackActions.clearEditBoardState());
-        dispatch(ActionCreators.clearHistory());
-        // 更新view界面数据
-        dispatch(fetchBoardDetail({ dashboardRelId: dashboardId }));
-      },
-      [dashboardId, dispatch, history],
-    );
-    const boardEditor = useMemo(() => {
-      if (!dashboard.id) return null;
-      if (dashboard?.id !== dashboardId) {
-        return null;
-      }
-      const boardType = dashboard.config?.type;
+  const propsFolderIds = useMemo(() => {
+    return vizs?.map(folder => {
+      return folder.relId;
+    });
+  }, [vizs]);
 
-      return (
-        <BoardProvider
-          board={dashboard}
-          editing={true}
-          autoFit={false}
-          allowDownload={false}
-          allowShare={false}
-          allowManage={false}
-          renderMode="read"
-        >
-          <TitleHeader toggleBoardEditor={onCloseBoardEditor} />
-          {boardType === 'auto' && <AutoEditor />}
-          {boardType === 'free' && <FreeEditor />}
-          <ControllerWidgetPanel />
-          <LinkagePanel />
-          <SettingJumpModal />
-          {boardChartEditorProps && (
-            <ChartEditor
-              {...boardChartEditorProps}
-              onClose={onCloseChartEditor}
-              onSaveInWidget={onSaveToWidget}
-            />
-          )}
-        </BoardProvider>
+  useEffect(() => {
+    let WidgetMapValue = Object.values(WidgetRecord);
+
+    WidgetMapValue?.forEach(v => {
+      let errInfo = checkLinkAndJumpErr(v, folderIds);
+      dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          boardId: v.dashboardId,
+          widgetId: v.id,
+          errInfo: errInfo,
+          errorType: 'interaction',
+        }),
       );
-    }, [
-      boardChartEditorProps,
-      dashboard,
-      dashboardId,
-      onCloseBoardEditor,
-      onCloseChartEditor,
-      onSaveToWidget,
-    ]);
-    const initialization = useCallback(async () => {
-      await dispatch(fetchEditBoardDetail(dashboardId));
-      if (histState?.widgetInfo) {
-        const widgetInfo = JSON.parse(histState.widgetInfo);
-        const boardType = dashboard.config?.type;
+    });
+  }, [WidgetRecord, dispatch, folderIds]);
 
-        if (widgetInfo) {
-          let subType: 'widgetChart' | 'dataChart' = 'dataChart';
-          if (!widgetInfo.dataChart.id) {
-            widgetInfo.dataChart.id = 'widget_' + uuidv4();
-            subType = 'widgetChart';
-          }
+  useEffect(() => {
+    if (folderIds.length !== propsFolderIds?.length) {
+      setFolderIds(propsFolderIds);
+    }
+  }, [folderIds.length, propsFolderIds]);
 
-          dispatch(
-            addChartWidget({
-              boardId,
-              chartId: widgetInfo.dataChart.id,
-              boardType,
-              dataChart: widgetInfo.dataChart,
-              view: widgetInfo.dataview,
-              subType: subType,
-            }),
-          );
-        }
-      }
-    }, [
-      dashboardId,
-      dispatch,
-      histState?.widgetInfo,
-      boardId,
-      dashboard.config?.type,
-    ]);
+  const onCloseChartEditor = useCallback(() => {
+    dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
+  }, [dispatch]);
 
-    useEffect(() => {
-      initialization();
-    }, [initialization]);
+  const onSaveToWidget = useCallback(
+    (chartType: WidgetContentChartType, dataChart: DataChart, view) => {
+      const widgetId = boardChartEditorProps?.widgetId!;
+      dispatch(editHasChartWidget({ widgetId, dataChart, view }));
+      onCloseChartEditor();
+      dispatch(addVariablesToBoard(view.variables));
+    },
+    [boardChartEditorProps?.widgetId, dispatch, onCloseChartEditor],
+  );
+  const onCloseBoardEditor = useCallback(
+    (bool: boolean) => {
+      const pathName = history.location.pathname;
+      const prePath = pathName.split('/boardEditor')[0];
+      history.push(`${prePath}`);
+      dispatch(editBoardStackActions.clearEditBoardState());
+      dispatch(ActionCreators.clearHistory());
+      // 更新view界面数据
+      dispatch(fetchBoardDetail({ dashboardRelId: boardId }));
+    },
+    [boardId, dispatch, history],
+  );
+  const boardEditor = useMemo(() => {
+    if (!board.id) return null;
+    if (board?.id !== boardId) {
+      return null;
+    }
+    const boardType = board.config?.type;
 
     return (
-      <Wrapper>
-        <DndProvider backend={HTML5Backend}>
-          {boardEditor || <BoardLoading />}
-        </DndProvider>
-      </Wrapper>
+      <BoardProvider
+        board={board}
+        editing={true}
+        autoFit={false}
+        allowDownload={false}
+        allowShare={false}
+        allowManage={false}
+        renderMode="read"
+      >
+        <TitleHeader toggleBoardEditor={onCloseBoardEditor} />
+        {boardType === 'auto' && <AutoEditor />}
+        {boardType === 'free' && <FreeEditor />}
+        <ControllerWidgetPanel />
+        <LinkagePanel />
+        <SettingJumpModal />
+        {boardChartEditorProps && (
+          <ChartEditor
+            {...boardChartEditorProps}
+            onClose={onCloseChartEditor}
+            onSaveInWidget={onSaveToWidget}
+          />
+        )}
+      </BoardProvider>
     );
-  },
-);
+  }, [
+    boardChartEditorProps,
+    board,
+    boardId,
+    onCloseBoardEditor,
+    onCloseChartEditor,
+    onSaveToWidget,
+  ]);
+  const initialization = useCallback(async () => {
+    await dispatch(fetchEditBoardDetail(boardId));
+    if (histState?.widgetInfo) {
+      const widgetInfo = JSON.parse(histState.widgetInfo);
+      const boardType = board.config?.type;
+
+      if (widgetInfo) {
+        let subType: 'widgetChart' | 'dataChart' = 'dataChart';
+        if (!widgetInfo.dataChart.id) {
+          widgetInfo.dataChart.id = 'widget_' + uuidv4();
+          subType = 'widgetChart';
+        }
+
+        dispatch(
+          addChartWidget({
+            boardId,
+            chartId: widgetInfo.dataChart.id,
+            boardType,
+            dataChart: widgetInfo.dataChart,
+            view: widgetInfo.dataview,
+            subType: subType,
+          }),
+        );
+      }
+    }
+  }, [dispatch, histState?.widgetInfo, boardId, board.config?.type]);
+
+  useEffect(() => {
+    initialization();
+    return () => {
+      // fix issue: #800
+      onCloseChartEditor();
+      dispatch(clearEditBoardState());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onCloseChartEditor]);
+
+  return (
+    <Wrapper>
+      <DndProvider backend={HTML5Backend}>
+        {boardEditor}
+        {boardLoading && <BoardLoading />}
+      </DndProvider>
+    </Wrapper>
+  );
+});
 export default BoardEditor;
 const Wrapper = styled.div`
   position: fixed;

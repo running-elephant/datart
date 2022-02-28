@@ -158,11 +158,7 @@ const ChartPreviewBoard: FC<{
     const handleGotoWorkbenchPage = () => {
       history.push({
         pathname: `/organizations/${orgId}/vizs/chartEditor`,
-        state: {
-          dataChartId: backendChartId,
-          chartType: 'dataChart',
-          container: 'dataChart',
-        },
+        search: `dataChartId=${backendChartId}&chartType=dataChart&container=dataChart`,
       });
     };
 
@@ -203,9 +199,20 @@ const ChartPreviewBoard: FC<{
         false,
         chartPreview?.backendChart?.config?.aggregation,
       );
+
       dispatch(
         makeDownloadDataTask({
-          downloadParams: [builder.build()],
+          downloadParams: [
+            {
+              ...builder.build(),
+              ...{
+                vizId: chartPreview?.backendChart?.id,
+                vizName: chartPreview?.backendChart?.name,
+                analytics: false,
+                vizType: 'dataChart',
+              },
+            },
+          ],
           fileName: chartPreview?.backendChart?.name || 'chart',
           resolve: () => {
             dispatch(actions.setDownloadPolling(true));

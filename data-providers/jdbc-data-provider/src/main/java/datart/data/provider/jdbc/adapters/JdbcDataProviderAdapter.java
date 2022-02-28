@@ -141,16 +141,11 @@ public class JdbcDataProviderAdapter implements Closeable {
         try (Connection conn = getConn()) {
             Set<Column> columnSet = new HashSet<>();
             DatabaseMetaData metadata = conn.getMetaData();
-            Map<String, Map<String, String>> importedKeys = getImportedKeys(metadata, database, table);
+            Map<String, List<ForeignKey>> importedKeys = getImportedKeys(metadata, database, table);
             ResultSet columns = metadata.getColumns(database, null, table, null);
             while (columns.next()) {
                 Column column = readTableColumn(columns);
-                Map<String, String> pKeys = importedKeys.get(column.getName());
-                if (pKeys != null) {
-                    column.setPkDatabase(pKeys.get(PKTABLE_CAT));
-                    column.setPkTable(pKeys.get(PKTABLE_NAME));
-                    column.setPkColumn(pKeys.get(PKCOLUMN_NAME));
-                }
+                column.setForeignKeys(importedKeys.get(column.getName()));
                 columnSet.add(column);
             }
             return columnSet;
@@ -167,15 +162,15 @@ public class JdbcDataProviderAdapter implements Closeable {
     /**
      * 获取表的外键关系
      */
-    protected Map<String, Map<String, String>> getImportedKeys(DatabaseMetaData metadata, String database, String table) throws SQLException {
-        HashMap<String, Map<String, String>> keyMap = new HashMap<>();
+    protected Map<String, List<ForeignKey>> getImportedKeys(DatabaseMetaData metadata, String database, String table) throws SQLException {
+        HashMap<String, List<ForeignKey>> keyMap = new HashMap<>();
         ResultSet importedKeys = metadata.getImportedKeys(database, null, table);
         while (importedKeys.next()) {
-            HashMap<String, String> keys = new HashMap<>();
-            keys.put(PKTABLE_CAT, importedKeys.getString(PKTABLE_CAT));
-            keys.put(PKTABLE_NAME, importedKeys.getString(PKTABLE_NAME));
-            keys.put(PKCOLUMN_NAME, importedKeys.getString(PKCOLUMN_NAME));
-            keyMap.put(importedKeys.getString(FKCOLUMN_NAME), keys);
+            ForeignKey foreignKey = new ForeignKey();
+            foreignKey.setDatabase(importedKeys.getString(PKTABLE_CAT));
+            foreignKey.setTable(importedKeys.getString(PKTABLE_NAME));
+            foreignKey.setColumn(importedKeys.getString(PKCOLUMN_NAME));
+            keyMap.computeIfAbsent(importedKeys.getString(FKCOLUMN_NAME), key->new ArrayList<>()).add(foreignKey);
         }
         return keyMap;
     }

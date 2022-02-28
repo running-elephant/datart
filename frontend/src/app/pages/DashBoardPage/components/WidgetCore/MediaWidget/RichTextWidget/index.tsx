@@ -15,20 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Tooltip } from 'antd';
+import {
+  CustomColor,
+  QuillPalette,
+} from 'app/components/ChartGraph/BasicRichText/RichTextPluginLoader/CustomColor';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   MediaWidgetContent,
   Widget,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
+import { editBoardStackActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
+import produce from 'immer';
 import { DeltaStatic } from 'quill';
 import { ImageDrop } from 'quill-image-drop-module'; // 拖动加载图片组件。
 import QuillMarkdown from 'quilljs-markdown';
 import 'quilljs-markdown/dist/quilljs-markdown-common-style.css';
 import React, {
   useCallback,
+  useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -38,13 +45,19 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import { editBoardStackActions } from '../../../../pages/BoardEditor/slice';
+import { BoardContext } from '../../../BoardProvider/BoardProvider';
 import { MarkdownOptions } from './configs/MarkdownOptions';
 import TagBlot from './configs/TagBlot';
 import { Formats } from './Formats';
-
+// import produce from 'immer';
 Quill.register('modules/imageDrop', ImageDrop);
 Quill.register('formats/tag', TagBlot);
+
+const CUSTOM_COLOR = 'custom-color';
+const CUSTOM_COLOR_INIT = {
+  background: 'transparent',
+  color: '#000',
+};
 
 type RichTextWidgetProps = {
   widgetConfig: Widget;
@@ -54,7 +67,9 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   widgetConfig,
   widgetInfo,
 }) => {
+  const t = useI18NPrefix();
   const dispatch = useDispatch();
+  const { editing: boardEditing } = useContext(BoardContext);
   const initContent = useMemo(() => {
     return (widgetConfig.config.content as MediaWidgetContent).richTextConfig
       ?.content;
@@ -65,31 +80,45 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   const [containerId, setContainerId] = useState<string>();
   const [quillModules, setQuillModules] = useState<any>(null);
 
+  const [customColorVisible, setCustomColorVisible] = useState<boolean>(false);
+  const [customColor, setCustomColor] = useState<{
+    background: string;
+    color: string;
+  }>({ ...QuillPalette.RICH_TEXT_CUSTOM_COLOR_INIT });
+  const [customColorType, setCustomColorType] = useState<
+    'color' | 'background'
+  >('color');
+
   useEffect(() => {
     setQuillValue(initContent);
   }, [initContent]);
 
   useEffect(() => {
-    if (widgetInfo.editing === false) {
+    if (widgetInfo.editing === false && boardEditing) {
       if (quillRef.current) {
         let contents = quillRef.current?.getEditor().getContents();
         const strContents = JSON.stringify(contents);
         if (strContents !== JSON.stringify(initContent)) {
+          const nextMediaWidgetContent = produce(
+            widgetConfig.config.content,
+            draft => {
+              (draft as MediaWidgetContent).richTextConfig = {
+                content: JSON.parse(strContents),
+              };
+            },
+          ) as MediaWidgetContent;
+
           dispatch(
             editBoardStackActions.changeMediaWidgetConfig({
               id: widgetConfig.id,
-              mediaWidgetConfig: {
-                ...(widgetConfig.config.content as MediaWidgetContent),
-                richTextConfig: {
-                  content: JSON.parse(strContents),
-                },
-              },
+              mediaWidgetContent: nextMediaWidgetContent,
             }),
           );
         }
       }
     }
   }, [
+    boardEditing,
     dispatch,
     initContent,
     widgetConfig.config.content,
@@ -103,6 +132,22 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
     const modules = {
       toolbar: {
         container: `#${newId}`,
+        handlers: {
+          color: function (value) {
+            if (value === QuillPalette.RICH_TEXT_CUSTOM_COLOR) {
+              setCustomColorType('color');
+              setCustomColorVisible(true);
+            }
+            quillRef.current!.getEditor().format('color', value);
+          },
+          background: function (value) {
+            if (value === QuillPalette.RICH_TEXT_CUSTOM_COLOR) {
+              setCustomColorType('background');
+              setCustomColorVisible(true);
+            }
+            quillRef.current!.getEditor().format('background', value);
+          },
+        },
       },
       imageDrop: true,
     };
@@ -111,11 +156,62 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
 
   const quillRef = useRef<ReactQuill>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (quillRef.current) {
+      quillRef.current
+        .getEditor()
+        .on('selection-change', (r: { index: number; length: number }) => {
+          if (!r?.index) return;
+          try {
+            const index = r.length === 0 ? r.index - 1 : r.index;
+            const length = r.length === 0 ? 1 : r.length;
+            const delta = quillRef
+              .current!.getEditor()
+              .getContents(index, length);
+
+            if (delta.ops?.length === 1 && delta.ops[0]?.attributes) {
+              const { background, color } = delta.ops[0].attributes;
+              setCustomColor({
+                background: background || CUSTOM_COLOR_INIT.background,
+                color: color || CUSTOM_COLOR_INIT.color,
+              });
+
+              const colorNode = document.querySelector(
+                '.ql-color .ql-color-label',
+              );
+              const backgroundNode = document.querySelector(
+                '.ql-background .ql-color-label',
+              );
+              if (color && !colorNode?.getAttribute('style')) {
+                colorNode!.setAttribute('style', `stroke: ${color}`);
+              }
+              if (background && !backgroundNode?.getAttribute('style')) {
+                backgroundNode!.setAttribute('style', `fill: ${background}`);
+              }
+            } else {
+              setCustomColor({ ...CUSTOM_COLOR_INIT });
+            }
+          } catch (error) {
+            console.error('selection-change callback | error', error);
+          }
+        });
       new QuillMarkdown(quillRef.current.getEditor(), MarkdownOptions);
     }
   }, [quillModules]);
+
+  useEffect(() => {
+    let palette: QuillPalette | null = null;
+    if (quillRef.current && containerId) {
+      palette = new QuillPalette(quillRef.current, {
+        toolbarId: containerId,
+        onChange: setCustomColor,
+      });
+    }
+
+    return () => {
+      palette?.destroy();
+    };
+  }, [containerId]);
 
   const ssp = e => {
     e.stopPropagation();
@@ -129,87 +225,16 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   }, []);
 
   const toolbar = useMemo(
-    () => (
-      <div id={containerId}>
-        <span className="ql-formats">
-          <select
-            className="ql-font"
-            key="ql-font"
-            defaultValue={FONT_FAMILIES[0].value}
-          >
-            {FONT_FAMILIES.map(font => (
-              <option value={font.value} key={font.name}>
-                {font.name}
-              </option>
-            ))}
-          </select>
-          <select className="ql-size" key="ql-size" defaultValue="13px">
-            {FONT_SIZES.map(size => (
-              <option value={`${size}px`} key={size}>{`${size}px`}</option>
-            ))}
-          </select>
-          <Tooltip title="加粗" key="ql-bold-tooltip">
-            <button className="ql-bold" key="ql-bold" />
-          </Tooltip>
-          <Tooltip title="斜体" key="ql-italic-tooltip">
-            <button className="ql-italic" key="ql-italic" />
-          </Tooltip>
-          <Tooltip title="下划线" key="ql-underline-tooltip">
-            <button className="ql-underline" key="ql-underline" />
-          </Tooltip>
-          <Tooltip title="删除线" key="ql-strike-tooltip">
-            <button className="ql-strike" key="ql-strike" />
-          </Tooltip>
-        </span>
-
-        <span className="ql-formats">
-          <select className="ql-color" key="ql-color" />
-          <select className="ql-background" key="ql-background" />
-        </span>
-
-        <span className="ql-formats">
-          <select className="ql-align" key="ql-align" />
-          <Tooltip title="减少缩进" key="ql-indent-tooltip">
-            <button className="ql-indent" value="-1" key="ql-indent" />
-          </Tooltip>
-          <Tooltip title="增加缩进" key="ql-indent-tooltip-up">
-            <button className="ql-indent" value="+1" key="ql-indent-up" />
-          </Tooltip>
-        </span>
-
-        <span className="ql-formats">
-          <Tooltip title="有序列表" key="ql-ordered-tooltip">
-            <button className="ql-list" value="ordered" key="ql-ordered" />
-          </Tooltip>
-          <Tooltip title="无序列表" key="ql-bullet-tooltip">
-            <button className="ql-list" value="bullet" key="ql-list" />
-          </Tooltip>
-          <Tooltip title="引用" key="ql-blockquote-tooltip">
-            <button className="ql-blockquote" key="ql-blockquote" />
-          </Tooltip>
-          <Tooltip title="代码" key="ql-code-block-tooltip">
-            <button className="ql-code-block" key="ql-code-block" />
-          </Tooltip>
-        </span>
-
-        <span className="ql-formats">
-          <Tooltip title="超链接" key="ql-link-tooltip">
-            <button className="ql-link" key="ql-link" />
-          </Tooltip>
-          <Tooltip title="图片" key="ql-image-tooltip">
-            <button className="ql-image" key="ql-image" />
-          </Tooltip>
-        </span>
-
-        <span className="ql-formats">
-          <Tooltip title="清除样式" key="ql-clean-tooltip">
-            <button className="ql-clean" key="ql-clean" />
-          </Tooltip>
-        </span>
-      </div>
-    ),
-    [containerId],
+    () => QuillPalette.getToolbar({ id: containerId as string, t }),
+    [containerId, t],
   );
+
+  const customColorChange = color => {
+    if (color) {
+      quillRef.current!.getEditor().format(customColorType, color);
+    }
+    setCustomColorVisible(false);
+  };
 
   return (
     <TextWrap onClick={ssp} editing={widgetInfo.editing}>
@@ -241,6 +266,12 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
           readOnly={true}
         />
       </div>
+      <CustomColor
+        visible={customColorVisible}
+        onCancel={() => setCustomColorVisible(false)}
+        color={customColor?.[customColorType]}
+        colorChange={customColorChange}
+      />
     </TextWrap>
   );
 };
@@ -249,6 +280,7 @@ export default RichTextWidget;
 interface TextWrapProps {
   editing: boolean;
 }
+
 const TextWrap = styled.div<TextWrapProps>`
   position: relative;
   width: 100%;

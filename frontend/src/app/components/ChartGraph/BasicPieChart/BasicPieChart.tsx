@@ -221,17 +221,17 @@ class BasicPieChart extends Chart {
     let positions = {};
     let orient = {};
 
-    const selected = !![].concat(groupConfigs).length
-      ? series[0].data
-      : series?.data
-          .map(d => d.name)
-          .reduce(
-            (obj, name) => ({
-              ...obj,
-              [name]: selectAll,
-            }),
-            {},
-          );
+    const selected = (
+      !![].concat(groupConfigs).length ? series[0].data : series?.data
+    )
+      .map(d => d.name)
+      .reduce(
+        (obj, name) => ({
+          ...obj,
+          [name]: selectAll,
+        }),
+        {},
+      );
 
     switch (legendPos) {
       case 'top':

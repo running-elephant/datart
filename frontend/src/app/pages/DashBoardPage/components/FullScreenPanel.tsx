@@ -18,7 +18,6 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button, Layout, Menu } from 'antd';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   makeSelectBoardFullScreenPanelById,
@@ -30,6 +29,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { G90, WHITE } from 'styles/StyleConstants';
 import { CanFullScreenWidgetTypes } from '../constants';
+import { BoardContext } from './BoardProvider/BoardProvider';
 import { WidgetCore } from './WidgetCore';
 
 const { Header } = Layout;

@@ -19,6 +19,7 @@
 package datart.server.controller;
 
 
+import datart.core.data.provider.SchemaInfo;
 import datart.core.entity.Source;
 import datart.server.base.dto.ResponseData;
 import datart.server.base.params.CheckNameParam;
@@ -96,6 +97,18 @@ public class SourceController extends BaseController {
     @PutMapping(value = "/unarchive/{sourceId}")
     public ResponseData<Boolean> unarchive(@PathVariable String sourceId) {
         return ResponseData.success(sourceService.unarchive(sourceId));
+    }
+
+    @ApiOperation(value = "get source schemas ")
+    @GetMapping(value = "/schemas/{sourceId}")
+    public ResponseData<List<SchemaInfo>> getSourceSchemas(@PathVariable String sourceId) {
+        return ResponseData.success(sourceService.getSourceSchemaInfo(sourceId));
+    }
+
+    @ApiOperation(value = "sync source schemas ")
+    @GetMapping(value = "/sync/schemas/{sourceId}")
+    public ResponseData<List<SchemaInfo>> syncSourceSchemas(@PathVariable String sourceId) throws Exception{
+        return ResponseData.success(sourceService.syncSourceSchema(sourceId));
     }
 
 }

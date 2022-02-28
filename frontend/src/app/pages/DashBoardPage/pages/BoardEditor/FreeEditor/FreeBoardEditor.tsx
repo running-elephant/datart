@@ -17,8 +17,8 @@
  */
 
 import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetCore/WidgetName/WidgetName';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
-import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
+import { WidgetInfoContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetInfoProvider';
+import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
 import produce from 'immer';
 import React, {
@@ -131,7 +131,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
     width: `${curW}px`,
     height: `${curH}px`,
   };
-
+  const lock = widget.config.lock;
   const ssp = e => {
     e.stopPropagation();
   };
@@ -144,19 +144,21 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
       onDrag={drag}
       onStop={dragStop}
       handle=".display-Draggable"
-      disabled={false}
+      disabled={lock}
     >
       <Resizable
         axis={'both'}
         width={curW}
         height={curH}
-        scale={scale[0]}
         onResize={resize}
         onResizeStop={resizeStop}
-        draggableOpts={{ grid: [1, 1], scale: scale[0] }}
+        draggableOpts={{ grid: [1, 1], scale: scale[0], disabled: lock }}
         minConstraints={[50, 50]}
-        handleSize={[20, 20]}
-        resizeHandles={['se']}
+        handleSize={undefined}
+        // handleSize={[20, 20]}
+        resizeHandles={undefined}
+        // resizeHandles={['se']}
+        lockAspectRatio={false}
       >
         <ItemWrap style={style} onClick={ssp}>
           <ItemContainer>

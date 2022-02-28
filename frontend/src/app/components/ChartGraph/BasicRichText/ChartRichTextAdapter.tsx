@@ -17,7 +17,7 @@
  */
 
 import { SelectOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Menu, Modal, Row, Tooltip } from 'antd';
+import { Button, Dropdown, Menu, Modal, Row } from 'antd';
 import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { DeltaStatic } from 'quill';
@@ -38,6 +38,7 @@ import 'react-quill/dist/quill.bubble.css';
 import 'react-quill/dist/quill.core.css';
 import styled from 'styled-components/macro';
 import './RichTextPluginLoader';
+import { CustomColor, QuillPalette } from './RichTextPluginLoader/CustomColor';
 import {
   Formats,
   MarkdownOptions,
@@ -63,6 +64,7 @@ const ChartRichTextAdapter: FC<{
   initContent: string | undefined;
   onChange: (delta: string | undefined) => void;
   openQuillMarkdown?: boolean;
+  t?: (key: string, disablePrefix?: boolean, options?: any) => any;
 }> = memo(
   ({
     dataList,
@@ -71,6 +73,7 @@ const ChartRichTextAdapter: FC<{
     initContent,
     onChange,
     openQuillMarkdown = false,
+    t,
   }) => {
     const [containerId, setContainerId] = useState<string>();
     const [quillModules, setQuillModules] = useState<any>(null);
@@ -81,6 +84,16 @@ const ChartRichTextAdapter: FC<{
     const quillMarkdownConfigRef = useRef<any>(null);
     const quillRef = useRef<ReactQuill>(null);
     const quillEditRef = useRef<ReactQuill>(null);
+
+    const [customColorVisible, setCustomColorVisible] =
+      useState<boolean>(false);
+    const [customColor, setCustomColor] = useState<{
+      background: string;
+      color: string;
+    }>({ ...QuillPalette.RICH_TEXT_CUSTOM_COLOR_INIT });
+    const [customColorType, setCustomColorType] = useState<
+      'color' | 'background'
+    >('color');
 
     useEffect(() => {
       const value = (initContent && JSON.parse(initContent)) || '';
@@ -94,9 +107,23 @@ const ChartRichTextAdapter: FC<{
         const modules = {
           toolbar: {
             container: isEditing ? `#${newId}` : null,
-            handlers: {},
+            handlers: {
+              color: function (value) {
+                if (value === QuillPalette.RICH_TEXT_CUSTOM_COLOR) {
+                  setCustomColorType('color');
+                  setCustomColorVisible(true);
+                }
+                quillEditRef.current!.getEditor().format('color', value);
+              },
+              background: function (value) {
+                if (value === QuillPalette.RICH_TEXT_CUSTOM_COLOR) {
+                  setCustomColorType('background');
+                  setCustomColorVisible(true);
+                }
+                quillEditRef.current!.getEditor().format('background', value);
+              },
+            },
           },
-
           calcfield: {},
           imageDrop: true,
         };
@@ -144,6 +171,20 @@ const ChartRichTextAdapter: FC<{
       }
     }, [quillValue, dataList, setTranslate]);
 
+    useEffect(() => {
+      let palette: QuillPalette | null = null;
+      if (quillEditRef.current && containerId) {
+        palette = new QuillPalette(quillEditRef.current, {
+          toolbarId: containerId,
+          onChange: setCustomColor,
+        });
+      }
+
+      return () => {
+        palette?.destroy();
+      };
+    }, [containerId]);
+
     useLayoutEffect(() => {
       if (quillEditRef.current) {
         if (openQuillMarkdown) {
@@ -158,6 +199,13 @@ const ChartRichTextAdapter: FC<{
         }
       }
     }, [openQuillMarkdown, quillModules]);
+
+    const customColorChange = color => {
+      if (color) {
+        quillEditRef.current!.getEditor().format(customColorType, color);
+      }
+      setCustomColorVisible(false);
+    };
 
     const reactQuillView = useMemo(
       () =>
@@ -219,97 +267,25 @@ const ChartRichTextAdapter: FC<{
     }, [dataList, selectField]);
 
     const toolbar = useMemo(
-      () => (
-        <div id={containerId}>
-          <span className="ql-formats">
-            <select
-              className="ql-font"
-              key="ql-font"
-              defaultValue={FONT_FAMILIES[0].value}
-            >
-              {FONT_FAMILIES.map(font => (
-                <option value={font.value} key={font.name}>
-                  {font.name}
-                </option>
-              ))}
-            </select>
-            <select className="ql-size" key="ql-size" defaultValue="13px">
-              {FONT_SIZES.map(size => (
-                <option value={`${size}px`} key={size}>{`${size}px`}</option>
-              ))}
-            </select>
-            <Tooltip title="加粗" key="ql-bold-tooltip">
-              <button className="ql-bold" key="ql-bold" />
-            </Tooltip>
-            <Tooltip title="斜体" key="ql-italic-tooltip">
-              <button className="ql-italic" key="ql-italic" />
-            </Tooltip>
-            <Tooltip title="下划线" key="ql-underline-tooltip">
-              <button className="ql-underline" key="ql-underline" />
-            </Tooltip>
-            <Tooltip title="删除线" key="ql-strike-tooltip">
-              <button className="ql-strike" key="ql-strike" />
-            </Tooltip>
-          </span>
-
-          <span className="ql-formats">
-            <select className="ql-color" key="ql-color" />
-            <select className="ql-background" key="ql-background" />
-          </span>
-
-          <span className="ql-formats">
-            <select className="ql-align" key="ql-align" />
-            <Tooltip title="减少缩进" key="ql-indent-tooltip">
-              <button className="ql-indent" value="-1" key="ql-indent" />
-            </Tooltip>
-            <Tooltip title="增加缩进" key="ql-indent-tooltip-up">
-              <button className="ql-indent" value="+1" key="ql-indent-up" />
-            </Tooltip>
-          </span>
-
-          <span className="ql-formats">
-            <Tooltip title="有序列表" key="ql-ordered-tooltip">
-              <button className="ql-list" value="ordered" key="ql-ordered" />
-            </Tooltip>
-            <Tooltip title="无序列表" key="ql-bullet-tooltip">
-              <button className="ql-list" value="bullet" key="ql-list" />
-            </Tooltip>
-            <Tooltip title="引用" key="ql-blockquote-tooltip">
-              <button className="ql-blockquote" key="ql-blockquote" />
-            </Tooltip>
-            <Tooltip title="代码" key="ql-code-block-tooltip">
-              <button className="ql-code-block" key="ql-code-block" />
-            </Tooltip>
-          </span>
-
-          <span className="ql-formats">
-            <Tooltip title="超链接" key="ql-link-tooltip">
-              <button className="ql-link" key="ql-link" />
-            </Tooltip>
-            <Tooltip title="图片" key="ql-image-tooltip">
-              <button className="ql-image" key="ql-image" />
-            </Tooltip>
-            <Tooltip title="引用字段" key="ql-selectLink-tooltip">
+      () =>
+        QuillPalette.getToolbar({
+          id: containerId as string,
+          extendNodes: {
+            4: (
               <Dropdown
                 overlay={fieldItems}
                 trigger={['click']}
                 key="ql-selectLink"
               >
-                <a className="selectLink">
+                <a className="selectLink" title="引用字段">
                   <SelectOutlined />
                 </a>
               </Dropdown>
-            </Tooltip>
-          </span>
-
-          <span className="ql-formats">
-            <Tooltip title="清除样式" key="ql-clean-tooltip">
-              <button className="ql-clean" key="ql-clean" />
-            </Tooltip>
-          </span>
-        </div>
-      ),
-      [containerId, fieldItems],
+            ),
+          },
+          t,
+        }),
+      [containerId, fieldItems, t],
     );
 
     const reactQuillEdit = useMemo(
@@ -349,7 +325,6 @@ const ChartRichTextAdapter: FC<{
 
     return (
       <TextWrap onClick={ssp}>
-        <div id="editor"></div>
         <QuillBox id="quill-box">
           {quillModules && reactQuillEdit}
           {quillModules && !isEditing && reactQuillView}
@@ -366,6 +341,12 @@ const ChartRichTextAdapter: FC<{
         >
           {isEditing && reactQuillView}
         </Modal>
+        <CustomColor
+          visible={customColorVisible}
+          onCancel={() => setCustomColorVisible(false)}
+          color={customColor?.[customColorType]}
+          colorChange={customColorChange}
+        />
       </TextWrap>
     );
   },

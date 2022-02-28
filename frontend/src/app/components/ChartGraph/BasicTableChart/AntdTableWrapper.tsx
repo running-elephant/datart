@@ -30,6 +30,14 @@ interface TableStyleConfigProps {
     color: string;
   };
   isFixedColumns?: boolean;
+  summaryStyle?: {
+    backgroundColor?: string;
+    fontFamily?: string;
+    fontSize?: string;
+    fontWeight?: string;
+    fontStyle?: string;
+    color?: string;
+  };
 }
 
 const AntdTableWrapper: FC<{
@@ -82,27 +90,28 @@ const StyledTable = styled(Table)<{ tableStyleConfig?: TableStyleConfigProps }>`
     overflow: ${p =>
       p?.tableStyleConfig?.isFixedColumns ? 'auto scroll' : 'auto !important'};
   }
-  .ant-table-summary {
-    background: #fafafa;
-  }
-  .ant-table-cell-fix-left {
-    background: #fafafa;
-  }
-  .ant-table-cell-fix-right {
-    background: #fafafa;
-  }
 
   .ant-table .ant-table-container .ant-table-body .ant-table-tbody td {
-    background: transparent;
+    background: inherit;
   }
 
-  .odd {
+  .ant-table-summary .ant-table-cell {
+    background-color: ${p =>
+      p?.tableStyleConfig?.summaryStyle?.backgroundColor};
+    font-family: ${p => p?.tableStyleConfig?.summaryStyle?.fontFamily};
+    font-size: ${p => p?.tableStyleConfig?.summaryStyle?.fontSize + 'px'};
+    font-weight: ${p => p?.tableStyleConfig?.summaryStyle?.fontWeight};
+    font-style: ${p => p?.tableStyleConfig?.summaryStyle?.fontStyle};
+    color: ${p => p?.tableStyleConfig?.summaryStyle?.color};
+  }
+
+  .ant-table .ant-table-container .ant-table-body .datart-basic-table-odd {
     background: ${p =>
       p?.tableStyleConfig?.odd?.backgroundColor || 'transparent'};
     color: ${p => p?.tableStyleConfig?.odd?.color || 'auto'};
   }
 
-  .even {
+  .ant-table .ant-table-container .ant-table-body .datart-basic-table-even {
     background: ${p =>
       p?.tableStyleConfig?.even?.backgroundColor || 'transparent'};
     color: ${p => p?.tableStyleConfig?.even?.color || 'auto'};

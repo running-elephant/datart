@@ -27,7 +27,7 @@ import {
   getExtraSeriesRowData,
   getGridStyle,
   getReference2,
-  getSeriesTooltips4Rectangular2,
+  getSeriesTooltips4Polar2,
   getSplitLine,
   getStyles,
   toFormattedValue,
@@ -406,12 +406,12 @@ class BasicDoubleYChart extends Chart {
     chartDataSet: IChartDataSet<string>,
   ) {
     return seriesParams => {
-      return getSeriesTooltips4Rectangular2(
+      return getSeriesTooltips4Polar2(
         chartDataSet,
         seriesParams[0],
         groupConfigs,
-        aggregateConfigs,
         colorConfigs,
+        aggregateConfigs,
         infoConfigs,
       );
     };

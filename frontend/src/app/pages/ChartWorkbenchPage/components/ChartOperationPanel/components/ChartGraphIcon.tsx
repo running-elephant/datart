@@ -101,7 +101,7 @@ const ChartGraphIcon: FC<{
       key={chart?.meta?.id}
       title={
         <>
-          {t(chart?.meta?.name, true)}
+          {t(chart?.meta?.name!, true)}
           {renderChartRequirments(chart?.meta?.requirements)}
         </>
       }

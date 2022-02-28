@@ -16,36 +16,37 @@
  * limitations under the License.
  */
 
-import { Col, Row, Select } from 'antd';
+import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FONT_FAMILIES } from 'globalConstants';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
+import { BORDER_RADIUS } from 'styles/StyleConstants';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
+import { BW } from './components/BasicWrapper';
 
 const BasicFontFamilySelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 
     return (
-      <StyledVizFontFamilySelector align={'middle'}>
-        <Col span={12}>{t(row.label, true)}</Col>
-        <Col span={12}>
-          <Select
-            dropdownMatchSelectWidth
-            {...rest}
-            {...options}
-            placeholder={t('select')}
-            onChange={value => onChange?.(ancestors, value)}
-          >
-            {FONT_FAMILIES.map(o => (
-              <Select.Option key={o.value} value={o.value}>
-                {o.name}
-              </Select.Option>
-            ))}
-          </Select>
-        </Col>
+      <StyledVizFontFamilySelector
+        label={!options?.hideLabel ? t(row.label, true) : ''}
+      >
+        <Select
+          dropdownMatchSelectWidth
+          {...rest}
+          {...options}
+          placeholder={t('select')}
+          onChange={value => onChange?.(ancestors, value)}
+        >
+          {FONT_FAMILIES.map(o => (
+            <Select.Option key={o.value} value={o.value}>
+              {t(o.name, true)}
+            </Select.Option>
+          ))}
+        </Select>
       </StyledVizFontFamilySelector>
     );
   },
@@ -54,6 +55,15 @@ const BasicFontFamilySelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
 
 export default BasicFontFamilySelector;
 
-const StyledVizFontFamilySelector = styled(Row)`
-  line-height: 32px;
+const StyledVizFontFamilySelector = styled(BW)`
+  .ant-select {
+    color: ${p => p.theme.textColorSnd};
+  }
+
+  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    background-color: ${p => p.theme.emphasisBackground};
+    border-color: ${p => p.theme.emphasisBackground} !important;
+    border-radius: ${BORDER_RADIUS};
+    box-shadow: none !important;
+  }
 `;

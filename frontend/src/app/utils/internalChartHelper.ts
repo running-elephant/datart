@@ -381,11 +381,21 @@ export function transformMeta(model?: string) {
     return undefined;
   }
   const jsonObj = JSON.parse(model);
-  return Object.keys(jsonObj).map(colKey => ({
-    ...jsonObj[colKey],
-    id: colKey,
-    category: ChartDataViewFieldCategory.Field,
-  }));
+  return Object.keys(jsonObj).flatMap(colKey => {
+    const column = jsonObj[colKey];
+    if (!isEmptyArray(column.children)) {
+      return column.children.map(c => ({
+        ...c,
+        id: c.name,
+        category: ChartDataViewFieldCategory.Field,
+      }));
+    }
+    return {
+      ...column,
+      id: colKey,
+      category: ChartDataViewFieldCategory.Field,
+    };
+  });
 }
 
 export function mergeChartStyleConfigs(
@@ -413,7 +423,12 @@ export function mergeChartStyleConfigs(
     const sEle =
       'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
 
-    if (!isUndefined(sEle?.['value'])) {
+    if (!isUndefined(sEle?.['value']) && (!sEle?.comType || !tEle.comType)) {
+      tEle['value'] = sEle?.['value'];
+    } else if (
+      !isUndefined(sEle?.['value']) &&
+      sEle?.comType === tEle.comType
+    ) {
       tEle['value'] = sEle?.['value'];
     }
     if (!isEmptyArray(tEle?.rows)) {

@@ -37,6 +37,8 @@ import {
   BasicFont,
   BasicFontFamilySelector,
   BasicFontSizeSelector,
+  BasicFontStyle,
+  BasicFontWeight,
   BasicInput,
   BasicInputNumber,
   BasicInputPercentage,
@@ -53,7 +55,9 @@ import {
   ConditionStylePanel,
   DataReferencePanel,
   FontAlignment,
+  LegendType,
   ListTemplatePanel,
+  NameLocation,
   UnControlledTableHeaderPanel,
 } from '../Customize';
 import { FormGeneratorLayoutProps } from '../types';
@@ -142,6 +146,10 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <BasicFontSizeSelector {...props} />;
         case ChartStyleSectionComponentType.FONTCOLOR:
           return <BasicColorSelector {...props} />;
+        case ChartStyleSectionComponentType.FONTSTYLE:
+          return <BasicFontStyle {...props} />;
+        case ChartStyleSectionComponentType.FONTWEIGHT:
+          return <BasicFontWeight {...props} />;
         case ChartStyleSectionComponentType.INPUTNUMBER:
           return <BasicInputNumber {...props} />;
         case ChartStyleSectionComponentType.INPUTPERCENTAGE:
@@ -168,6 +176,10 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <BasicRadio {...props} />;
         case ChartStyleSectionComponentType.FontAlignment:
           return <FontAlignment {...props} />;
+        case ChartStyleSectionComponentType.NameLocation:
+          return <NameLocation {...props} />;
+        case ChartStyleSectionComponentType.LegendType:
+          return <LegendType {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

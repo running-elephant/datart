@@ -15,13 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { DownloadOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
 import SaveToDashboard from 'app/components/SaveToDashboard';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useMount from 'app/hooks/useMount';
 import { backendChartSelector } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { DownloadListPopup } from 'app/pages/MainPage/Navbar/DownloadListPopup';
+import { loadTasks } from 'app/pages/MainPage/Navbar/service';
+import { selectHasVizFetched } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
+import { getFolders } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
+import { useMainSlice } from 'app/pages/MainPage/slice';
+import { selectDownloadPolling } from 'app/pages/MainPage/slice/selectors';
+import { downloadFile } from 'app/utils/fetch';
 import { FC, memo, useCallback, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
@@ -50,8 +58,12 @@ const ChartHeaderPanel: FC<{
     onSaveChartToDashBoard,
   }) => {
     const t = useI18NPrefix(`viz.workbench.header`);
+    const hasVizFetched = useSelector(selectHasVizFetched);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const backendChart = useSelector(backendChartSelector);
+    const downloadPolling = useSelector(selectDownloadPolling);
+    const dispatch = useDispatch();
+    const { actions } = useMainSlice();
 
     const handleModalOk = useCallback(
       (dashboardId: string) => {
@@ -65,10 +77,40 @@ const ChartHeaderPanel: FC<{
       setIsModalVisible(false);
     }, []);
 
+    const onSetPolling = useCallback(
+      (polling: boolean) => {
+        dispatch(actions.setDownloadPolling(polling));
+      },
+      [dispatch, actions],
+    );
+
+    useMount(() => {
+      if (!hasVizFetched) {
+        // Request data when there is no data
+        dispatch(getFolders(orgId as string));
+      }
+    });
     return (
       <Wrapper>
         <h1>{chartName}</h1>
         <Space>
+          <DownloadListPopup
+            polling={downloadPolling}
+            setPolling={onSetPolling}
+            onLoadTasks={loadTasks}
+            onDownloadFile={item => {
+              if (item.id) {
+                downloadFile(item.id).then(() => {
+                  dispatch(actions.setDownloadPolling(true));
+                });
+              }
+            }}
+            renderDom={
+              <Button type="primary" ghost icon={<DownloadOutlined />}>
+                {t('downloadList')}
+              </Button>
+            }
+          />
           <Button type="primary" ghost onClick={onGoBack}>
             {t('cancel')}
           </Button>

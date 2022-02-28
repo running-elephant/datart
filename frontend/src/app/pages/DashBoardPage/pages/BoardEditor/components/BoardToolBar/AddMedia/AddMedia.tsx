@@ -43,7 +43,11 @@ export const AddMedia: React.FC<{}> = () => {
     },
     [boardId, boardType, dispatch],
   );
-  type TinyWidgetItems = { name: string; icon: string; type: LightWidgetType };
+  type TinyWidgetItems = {
+    name: string;
+    icon: React.ReactNode;
+    type: LightWidgetType;
+  };
   const mediaWidgetTypes: TinyWidgetItems[] = [
     {
       name: t('image'),
@@ -74,7 +78,9 @@ export const AddMedia: React.FC<{}> = () => {
   const mediaWidgetItems = (
     <Menu onClick={onSelectMediaWidget}>
       {mediaWidgetTypes.map(({ name, icon, type }) => (
-        <Menu.Item key={type}>{name}</Menu.Item>
+        <Menu.Item icon={icon} key={type}>
+          {name}
+        </Menu.Item>
       ))}
     </Menu>
   );
