@@ -2,19 +2,20 @@ spring:
   datasource:
     driver-class-name: org.h2.Driver
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:h2:file:./bin/h2/datart.demo;MODE=MYSQL;DATABASE_TO_UPPER=false
+    url: jdbc:h2:file:./bin/h2/datart.demo;MODE=MySQL;DATABASE_TO_LOWER=TRUE;IGNORECASE=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
     username:
     password:
+
+  flyway:
+    enabled: false
 
 server:
   port: 8080
   address: 0.0.0.0
-  
-  # 开启 gzip 压缩，加快请求和响应速度
-  compression:
-    enabled: true 
-    mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
 
+  compression:
+    enabled: true
+    mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
 
 datart:
   server:
