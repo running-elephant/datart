@@ -121,11 +121,11 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 
   const expensiveQuery = useMemo(() => {
     try {
-      return dataview
+      return dataview?.config
         ? Boolean(JSON.parse(dataview.config).expensiveQuery)
         : false;
     } catch (error) {
-      throw error;
+      return false;
     }
   }, [dataview]);
 

@@ -90,8 +90,8 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
 
     const errHtml = (
       <div style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}>
-        {errInfoValue.map(v => {
-          return <p>{String(v)}</p>;
+        {errInfoValue.map((v, i) => {
+          return <p key={i}>{String(v)}</p>;
         })}
       </div>
     );
