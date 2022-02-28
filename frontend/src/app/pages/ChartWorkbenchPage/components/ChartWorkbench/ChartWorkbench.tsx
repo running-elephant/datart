@@ -48,7 +48,7 @@ const ChartWorkbench: FC<{
     orgId?: string;
     container?: string;
     onSaveChart?: () => void;
-    onSaveChartToDashBoard?: (dashboardId) => void;
+    onSaveChartToDashBoard?: (dashboardId, dashboardType) => void;
     onGoBack?: () => void;
     onChangeAggregation?: () => void;
   };

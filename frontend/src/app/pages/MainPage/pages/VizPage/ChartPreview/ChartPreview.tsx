@@ -255,7 +255,7 @@ const ChartPreviewBoard: FC<{
     }, [dispatch, backendChartId]);
 
     const handleAddToDashBoard = useCallback(
-      dashboardId => {
+      (dashboardId, dashboardType) => {
         const currentChartPreview = previewCharts.find(
           c => c.backendChartId === backendChartId,
         );
@@ -268,6 +268,7 @@ const ChartPreviewBoard: FC<{
                 chartType: '',
                 dataChart: currentChartPreview?.backendChart,
                 dataview: currentChartPreview?.backendChart?.view,
+                dashboardType,
               }),
             },
           });

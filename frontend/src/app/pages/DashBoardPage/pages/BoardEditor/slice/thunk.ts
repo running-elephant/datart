@@ -208,6 +208,7 @@ export const addWidgetsToEditBoard = createAsyncThunk<
   const { layouts } = boardInfoState(
     getState() as { editBoard: EditBoardState },
   );
+  console.log(widgets, 'widgets');
   const widgetInfoMap = createWidgetInfoMap(widgets);
   const updatedWidgets = updateWidgetsRect(widgets, dashBoard.config, layouts);
   // widgetInfoRecord

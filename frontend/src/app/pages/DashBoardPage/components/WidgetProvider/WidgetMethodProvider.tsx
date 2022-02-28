@@ -521,11 +521,13 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       }
       // jump
       const jumpConfig = widget.config?.jumpConfig;
-      if (
-        jumpConfig &&
-        jumpConfig.open &&
-        folderIds.indexOf(jumpConfig.target.relId) !== -1
-      ) {
+      if (jumpConfig && jumpConfig.open) {
+        if (
+          jumpConfig.targetType === 'INTERNAL' &&
+          folderIds.indexOf(jumpConfig.target.relId) === -1
+        ) {
+          return;
+        }
         clickJump({ widget, params });
         return;
       }

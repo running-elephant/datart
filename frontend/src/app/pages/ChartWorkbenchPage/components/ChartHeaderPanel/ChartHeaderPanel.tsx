@@ -47,7 +47,7 @@ const ChartHeaderPanel: FC<{
   container?: string;
   onSaveChart?: () => void;
   onGoBack?: () => void;
-  onSaveChartToDashBoard?: (dashboardId) => void;
+  onSaveChartToDashBoard?: (dashboardId, dashboardType) => void;
 }> = memo(
   ({
     chartName,
@@ -66,8 +66,8 @@ const ChartHeaderPanel: FC<{
     const { actions } = useMainSlice();
 
     const handleModalOk = useCallback(
-      (dashboardId: string) => {
-        onSaveChartToDashBoard?.(dashboardId);
+      (dashboardId: string, dashboardType: string) => {
+        onSaveChartToDashBoard?.(dashboardId, dashboardType);
         setIsModalVisible(true);
       },
       [onSaveChartToDashBoard],
