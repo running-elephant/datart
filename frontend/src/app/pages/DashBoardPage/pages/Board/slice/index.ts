@@ -242,11 +242,19 @@ const boardSlice = createSlice({
         boardId: string;
         widgetId: string;
         errInfo?: string;
+        errorType: 'request' | 'interaction';
       }>,
     ) {
-      const { boardId, widgetId, errInfo } = action.payload;
+      const { boardId, widgetId, errInfo, errorType } = action.payload;
       if (!state.widgetInfoRecord?.[boardId]?.[widgetId]) return;
-      state.widgetInfoRecord[boardId][widgetId].errInfo = errInfo;
+      let errorObj = state.widgetInfoRecord[boardId][widgetId].errInfo || {};
+
+      if (errInfo) {
+        errorObj[errorType] = errInfo;
+      } else {
+        delete errorObj[errorType];
+      }
+      state.widgetInfoRecord[boardId][widgetId].errInfo = errorObj;
     },
     resetControlWidgets(
       state,

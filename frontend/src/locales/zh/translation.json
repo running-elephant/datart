@@ -448,6 +448,7 @@
         "open": "开启",
         "close": "关闭",
         "cancel": "取消",
+        "downloadList": "下载列表",
         "lang": {
           "zh": "中文",
           "en": "英文"
@@ -890,7 +891,8 @@
       "associatedWidgets": "关联组件",
       "associatedFields": "关联字段",
       "selectTriggers": "选择触发字段",
-      "selectLinker": "选择联动字段"
+      "selectLinker": "选择联动字段",
+      "linkageError": "联动的图表已经被删除，请重新配置"
     },
     "jump": {
       "title": "跳转设置",
@@ -900,7 +902,8 @@
       "URL": "URL",
       "parameters": "Parameters",
       "controller": "关联控制器",
-      "associatedFields": "关联字段"
+      "associatedFields": "关联字段",
+      "jumpError": "跳转的目标已失效或被删除，请重新配置"
     },
     "associate": {
       "title": "关联字段/变量",

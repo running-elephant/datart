@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 import ChartEditor from 'app/components/ChartEditor';
-import React, { memo, useCallback, useEffect, useMemo } from 'react';
+import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,6 +28,7 @@ import { uuidv4 } from 'utils/utils';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import TitleHeader from '../../components/TitleHeader';
+import { checkLinkAndJumpErr } from '../../utils';
 import { fetchBoardDetail } from '../Board/slice/thunk';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
 import AutoEditor from './AutoEditor/index';
@@ -34,7 +36,11 @@ import ControllerWidgetPanel from './components/ControllerWidgetPanel';
 import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
 import FreeEditor from './FreeEditor/index';
-import { editBoardStackActions, editDashBoardInfoActions } from './slice';
+import {
+  editBoardStackActions,
+  editDashBoardInfoActions,
+  editWidgetInfoActions,
+} from './slice';
 import {
   addVariablesToBoard,
   clearEditBoardState,
@@ -44,9 +50,9 @@ import {
   selectBoardChartEditorProps,
   selectEditBoard,
   selectEditBoardLoading,
+  selectWidgetRecord,
 } from './slice/selectors';
 import { addChartWidget, fetchEditBoardDetail } from './slice/thunk';
-
 export const BoardEditor: React.FC<{
   boardId: string;
   allowManage?: boolean;
@@ -57,6 +63,37 @@ export const BoardEditor: React.FC<{
   const boardLoading = useSelector(selectEditBoardLoading);
   const boardChartEditorProps = useSelector(selectBoardChartEditorProps);
   const histState = history.location.state as any;
+  const vizs = useSelector(selectVizs);
+  const WidgetRecord = useSelector(selectWidgetRecord);
+  const [folderIds, setFolderIds] = useState<any[]>([]);
+
+  const propsFolderIds = useMemo(() => {
+    return vizs?.map(folder => {
+      return folder.relId;
+    });
+  }, [vizs]);
+
+  useEffect(() => {
+    let WidgetMapValue = Object.values(WidgetRecord);
+
+    WidgetMapValue?.forEach(v => {
+      let errInfo = checkLinkAndJumpErr(v, folderIds);
+      dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          boardId: v.dashboardId,
+          widgetId: v.id,
+          errInfo: errInfo,
+          errorType: 'interaction',
+        }),
+      );
+    });
+  }, [WidgetRecord, dispatch, folderIds]);
+
+  useEffect(() => {
+    if (folderIds.length !== propsFolderIds?.length) {
+      setFolderIds(propsFolderIds);
+    }
+  }, [folderIds.length, propsFolderIds]);
 
   const onCloseChartEditor = useCallback(() => {
     dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));

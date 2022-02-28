@@ -51,6 +51,7 @@ const ChartPresentPanel: FC<{
   expensiveQuery: boolean;
   allowQuery: boolean;
   onRefreshDataset?: () => void;
+  onCreateDownloadDataTask?: () => void;
 }> = memo(
   ({
     containerHeight,
@@ -59,8 +60,9 @@ const ChartPresentPanel: FC<{
     dataset,
     chartConfig,
     expensiveQuery,
-    onRefreshDataset,
     allowQuery,
+    onRefreshDataset,
+    onCreateDownloadDataTask,
   }) => {
     const translate = useI18NPrefix(`viz.palette.present`);
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
@@ -135,8 +137,9 @@ const ChartPresentPanel: FC<{
       return (
         <ChartTypeSelector
           type={chartType}
-          onChange={setChartType}
           translate={translate}
+          onChange={setChartType}
+          onCreateDownloadDataTask={onCreateDownloadDataTask}
         />
       );
     };

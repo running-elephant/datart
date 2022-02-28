@@ -20,6 +20,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
+import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import workbenchSlice, {
   aggregationSelector,
   backendChartSelector,
@@ -41,8 +42,10 @@ import {
   SaveFormContext,
   useSaveFormContext,
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
+import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { ChartDTO } from 'app/types/ChartDTO';
+import { makeDownloadDataTask } from 'app/utils/fetch';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import { CommonFormTypes } from 'globalConstants';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -93,12 +96,14 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   dataChartId,
   chartType,
   defaultViewId,
+  widgetId,
   onClose,
   onSaveInWidget,
   onSaveInDataChart,
 }) => {
   const saveFormContextValue = useSaveFormContext();
   const { actions } = useWorkbenchSlice();
+  const { actions: mainActions } = useMainSlice();
   const dispatch = useDispatch();
   const dataset = useSelector(datasetsSelector);
   const dataview = useSelector(currentDataViewSelector);
@@ -357,6 +362,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
                 computedFields: dataview?.computedFields,
               }),
               viewId: dataview?.id,
+              avatar: chart?.meta?.id,
             },
             callback: folder => {
               folder &&
@@ -434,6 +440,53 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     await dispatch(refreshDatasetAction({}));
     setAllowQuery(false);
   }, [dispatch]);
+
+  const handleCreateDownloadDataTask = useCallback(async () => {
+    if (!dataview?.id) {
+      return;
+    }
+    const isWidget = dataChartId.includes('widget');
+    const builder = new ChartDataRequestBuilder(
+      {
+        ...dataview,
+      },
+      chartConfig?.datas,
+      chartConfig?.settings,
+      {},
+      true,
+      aggregation,
+    );
+    dispatch(
+      makeDownloadDataTask({
+        downloadParams: [
+          {
+            ...builder.build(),
+            ...{
+              analytics: dataChartId ? false : true,
+              vizName: backendChart?.name || 'chart',
+              vizId: isWidget ? widgetId : dataChartId,
+              vizType: isWidget ? 'widget' : 'dataChart',
+            },
+          },
+        ],
+        fileName: backendChart?.name || 'chart',
+        resolve: () => {
+          dispatch(mainActions.setDownloadPolling(true));
+        },
+      }),
+    );
+  }, [
+    aggregation,
+    backendChart?.name,
+    chartConfig?.datas,
+    chartConfig?.settings,
+    dataChartId,
+    dataview,
+    dispatch,
+    mainActions,
+    widgetId,
+  ]);
+
   return (
     <StyledChartWorkbenchPage>
       <SaveFormContext.Provider value={saveFormContextValue}>
@@ -461,6 +514,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           onChartConfigChange={handleChartConfigChange}
           onDataViewChange={handleDataViewChanged}
           onRefreshDataset={handleRefreshDataset}
+          onCreateDownloadDataTask={handleCreateDownloadDataTask}
         />
         <SaveForm
           width={400}

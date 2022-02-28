@@ -560,6 +560,7 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
         editWidgetInfoActions.setWidgetErrInfo({
           widgetId,
           errInfo: undefined,
+          errorType: 'request',
         }),
       );
     } catch (error) {
@@ -567,6 +568,7 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
         editWidgetInfoActions.setWidgetErrInfo({
           widgetId,
           errInfo: (error as any)?.message as any,
+          errorType: 'request',
         }),
       );
       dispatch(
