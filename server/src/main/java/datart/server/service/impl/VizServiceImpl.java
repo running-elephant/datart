@@ -17,6 +17,7 @@
  */
 package datart.server.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.VariableTypeEnum;
 import datart.core.base.exception.Exceptions;
@@ -24,9 +25,11 @@ import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.security.base.ResourceType;
 import datart.server.base.dto.*;
+import datart.server.base.dto.chart.WidgetConfig;
 import datart.server.base.params.*;
 import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -235,6 +238,28 @@ public class VizServiceImpl extends BaseService implements VizService {
     @Override
     public StoryboardDetail getStoryboard(String storyboardId) {
         return storyboardService.getStoryboard(storyboardId);
+    }
+
+    @Override
+    public String getChartConfigByVizId(String vizId, String vizType) {
+        String result = "";
+        try {
+            if (StringUtils.isNotBlank(vizId)) {
+                switch (vizType) {
+                    case "dataChart":
+                        return retrieve(vizId, Datachart.class).getConfig();
+                    case "widget":
+                        String config = retrieve(vizId, Widget.class).getConfig();
+                        WidgetConfig widgetConfig = JSON.parseObject(config, WidgetConfig.class);
+                        return  widgetConfig.getChartConfig();
+                    default:
+                        return result;
+                }
+            }
+        } catch (Exception e) {
+            log.warn("query chart("+vizId+") config fail, download with none style.");
+        }
+        return result;
     }
 
     @Override

@@ -18,6 +18,7 @@
 
 import { Slider } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
+import isUndefined from 'lodash/isUndefined';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS } from 'styles/StyleConstants';
@@ -34,10 +35,10 @@ const BasicSlider: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         <Slider
           {...rest}
           {...options}
-          min={1}
-          max={10}
-          step={1}
-          dots={true}
+          min={!isUndefined(options?.min) ? Number(options?.min) : 1}
+          max={!isUndefined(options?.max) ? Number(options?.max) : 10}
+          step={!isUndefined(options?.step) ? Number(options?.step) : 1}
+          dots={isUndefined(options?.dots) ? true : options?.dots}
           defaultValue={rest?.default}
           onChange={value => onChange?.(ancestors, value)}
         />

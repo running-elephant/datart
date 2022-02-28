@@ -570,6 +570,9 @@
           "arial": "Arial",
           "sansSerif": "sans-serif"
         },
+        "lineHeight": {
+          "default": "Default Line Height"
+        },
         "fontWeight": {
           "normal": "Normal",
           "bold": "Bold",
@@ -1053,10 +1056,13 @@
     },
     "model": {
       "type": "Type",
+      "rename": "Rename",
+      "delete": "Delete",
       "typeAndCategory": "Type & Category",
       "permission": "Column Permissions",
       "newHierarchy": "New Hierarchy",
-      "addToHierarchy": "Add To Hierarchy"
+      "addToHierarchy": "Add To Hierarchy",
+      "hierarchyName": "Hierarchy Name"
     },
     "columnPermission": {
       "title": "Column permissions",

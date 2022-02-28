@@ -249,7 +249,9 @@ export const editBoardStackSlice = createSlice({
       }>,
     ) {
       const { id, mediaWidgetContent } = action.payload;
-      state.widgetRecord[id].config.content = mediaWidgetContent;
+      if (state.widgetRecord[id]) {
+        state.widgetRecord[id].config.content = mediaWidgetContent;
+      }
     },
   },
   extraReducers: builder => {

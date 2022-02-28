@@ -45,10 +45,10 @@ import {
   SPACE_LG,
   SPACE_SM,
 } from 'styles/StyleConstants';
-import { BoardActionContext } from '../contexts/BoardActionContext';
-import { BoardContext } from '../contexts/BoardContext';
-import { BoardInfoContext } from '../contexts/BoardInfoContext';
 import { BoardOverLay } from './BoardOverLay';
+import { BoardActionContext } from './BoardProvider/BoardActionProvider';
+import { BoardInfoContext } from './BoardProvider/BoardInfoProvider';
+import { BoardContext } from './BoardProvider/BoardProvider';
 import SaveToStoryBoard from './SaveToStoryBoard';
 
 interface TitleHeaderProps {

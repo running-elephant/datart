@@ -1,7 +1,7 @@
 import { Form, Input, Modal, ModalProps, Select } from 'antd';
 import useGetVizIcon from 'app/hooks/useGetVizIcon';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { selectDataChartById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getChartGroupColumns } from 'app/pages/DashBoardPage/utils';

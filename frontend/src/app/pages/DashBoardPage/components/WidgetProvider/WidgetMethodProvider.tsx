@@ -23,7 +23,8 @@ import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams, ChartsEventData } from 'app/types/Chart';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
-import React, {
+import {
+  createContext,
   FC,
   useCallback,
   useContext,
@@ -33,11 +34,6 @@ import React, {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
-import { BoardContext } from '../../contexts/BoardContext';
-import {
-  WidgetMethodContext,
-  WidgetMethodContextProps,
-} from '../../contexts/WidgetMethodContext';
 import { boardActions } from '../../pages/Board/slice';
 import {
   getChartWidgetDataAsync,
@@ -66,9 +62,19 @@ import {
   getEditChartWidgetDataAsync,
   getEditWidgetData,
 } from '../../pages/BoardEditor/slice/thunk';
+import { BoardContext } from '../BoardProvider/BoardProvider';
 import { widgetActionType } from '../WidgetToolBar/config';
 
 const { confirm } = Modal;
+
+export interface WidgetMethodContextProps {
+  onWidgetAction: (action: widgetActionType, widget: Widget) => void;
+  widgetChartClick: (widget: Widget, params: ChartMouseEventParams) => void;
+  onClearLinkage: (widget: Widget) => void;
+}
+export const WidgetMethodContext = createContext<WidgetMethodContextProps>(
+  {} as WidgetMethodContextProps,
+);
 export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   widgetId,
   children,
@@ -293,7 +299,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     data: ChartsEventData | undefined,
     fieldName: string,
   ) => {
-    let toCaseField = fieldName.toUpperCase();
+    let toCaseField = fieldName;
     return data?.rowData[toCaseField];
   };
   const toLinkingWidgets = useCallback(

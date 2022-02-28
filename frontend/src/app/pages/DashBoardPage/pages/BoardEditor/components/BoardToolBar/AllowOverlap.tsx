@@ -19,8 +19,8 @@ import { BlockOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
+import { BoardActionContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardActionProvider';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import React, { useContext } from 'react';
 import { PRIMARY } from 'styles/StyleConstants';
 
