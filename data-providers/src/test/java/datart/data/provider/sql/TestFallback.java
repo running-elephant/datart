@@ -23,7 +23,6 @@ import datart.data.provider.ParamFactory;
 import datart.data.provider.jdbc.SqlScriptRender;
 import org.apache.calcite.sql.dialect.MysqlSqlDialect;
 import org.apache.calcite.sql.parser.SqlParseException;
-import org.junit.jupiter.api.Test;
 
 public class TestFallback {
 
@@ -34,7 +33,5 @@ public class TestFallback {
             String sql = render.render(false, false, false);
             System.out.println(sql);
         }
-
     }
-
 }
