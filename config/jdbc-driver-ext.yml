@@ -19,3 +19,13 @@ IMPALA:
 
 ORACLE:
   quote-identifiers: false
+
+DORIS:
+  db-type: "doris"
+  name: "doris"
+  driver-class: "com.mysql.cj.jdbc.Driver"
+  literal-quote: "'"
+  identifier-quote: "`"
+  adapter-class: "datart.data.provider.jdbc.adapters.DorisDataProviderAdapter"
+  url-prefix: "jdbc:mysql://"
+
