@@ -125,6 +125,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
         ? Boolean(JSON.parse(dataview.config).expensiveQuery)
         : false;
     } catch (error) {
+      console.log(error);
       return false;
     }
   }, [dataview]);
