@@ -18,7 +18,7 @@
 
 // organize-imports-ignore  polyfill/stable must in the first
 import 'react-app-polyfill/stable';
-
+import 'core-js/features/string/replace-all';
 import { migrateWidgets } from 'app/migration/WidgetConfig/migrateWidgets';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import {
