@@ -29,7 +29,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { FONT_SIZE_BASE, INFO } from 'styles/StyleConstants';
-import { CloneValueDeep, isEmptyArray } from 'utils/object';
+import { CloneValueDeep, isEmpty, isEmptyArray } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { ColumnTypes } from '../../../constants';
 import { useViewSlice } from '../../../slice';
@@ -44,6 +44,7 @@ import {
   Model,
 } from '../../../slice/types';
 import Container from '../Container';
+import { ROOT_CONTAINER_ID, TreeNodeHierarchy } from './constant';
 import DataModelBranch from './DataModelBranch';
 import DataModelNode from './DataModelNode';
 
@@ -165,7 +166,6 @@ const DataModelTree: FC = memo(() => {
       } else {
         newNode = { ...node, type: key };
       }
-
       const targetNode = tableColumns?.find(n => n.name === node?.name);
       if (targetNode) {
         const newModel = updateNode(tableColumns, newNode, targetNode.index);
@@ -207,18 +207,37 @@ const DataModelTree: FC = memo(() => {
   };
 
   const handleDragEnd = result => {
-    if (!result.destination) {
-      return;
+    if (Boolean(result.destination) && isEmpty(result?.combine)) {
+      const newModel = reorderNode(
+        CloneValueDeep(tableColumns),
+        { name: result.draggableId },
+        {
+          name: result.destination.droppableId,
+          index: result.destination.index,
+        },
+      );
+      return handleDataModelChange(newModel);
     }
-    const newModel = reorderNode(
-      tableColumns,
-      result.source.index,
-      result.destination.index,
-    );
-    handleDataModelChange(newModel);
+    if (!Boolean(result.destination) && !isEmpty(result?.combine)) {
+      const clonedTableColumns = CloneValueDeep(tableColumns);
+      const sourceNode = clonedTableColumns?.find(
+        c => c.name === result.draggableId,
+      );
+      const targetNode = clonedTableColumns?.find(
+        c => c.name === result.combine.draggableId,
+      );
+      if (
+        sourceNode &&
+        targetNode &&
+        [ColumnTypes.String, ColumnTypes.Date].includes(sourceNode.type) &&
+        [ColumnTypes.String, ColumnTypes.Date].includes(targetNode.type)
+      ) {
+        openCreateHierarchyModal(sourceNode, targetNode);
+      }
+    }
   };
 
-  const openCreateHierarchyModal = (node: Column) => {
+  const openCreateHierarchyModal = (...nodes: Column[]) => {
     return (openStateModal as Function)({
       title: t('model.newHierarchy'),
       modalSize: StateModalSize.XSMALL,
@@ -230,9 +249,9 @@ const DataModelTree: FC = memo(() => {
           name: hierarchyName,
           type: ColumnTypes.String,
           role: ColumnRole.Hierarchy,
-          children: [node],
+          children: nodes,
         };
-        const newModel = insertNode(tableColumns, hierarchyNode, node.index);
+        const newModel = insertNode(tableColumns, hierarchyNode, nodes);
         handleDataModelChange(newModel);
       },
       content: onChangeEvent => {
@@ -357,16 +376,61 @@ const DataModelTree: FC = memo(() => {
     });
   };
 
-  const reorderNode = (columns: Column[], startIndex, endIndex) => {
-    const [removed] = columns.splice(startIndex, 1);
-    columns.splice(endIndex, 0, removed);
+  const reorderNode = (
+    columns: Column[],
+    source: { name: string },
+    target: { name: string; index: number },
+  ) => {
+    let sourceItem: Column | undefined;
+    const removeIndex = columns.findIndex(c => c.name === source.name);
+    if (removeIndex > -1) {
+      sourceItem = columns.splice(removeIndex, 1)?.[0];
+    } else {
+      const branchNode = columns.filter(
+        c =>
+          c.role === ColumnRole.Hierarchy &&
+          c.children?.find(cc => cc.name === source.name),
+      )?.[0];
+      if (!branchNode) {
+        return toModel(columns);
+      }
+      const removeIndex = branchNode.children!.findIndex(
+        c => c.name === source.name,
+      );
+      if (removeIndex === -1) {
+        return toModel(columns);
+      }
+      sourceItem = branchNode.children?.splice(removeIndex, 1)?.[0];
+    }
+
+    if (!sourceItem) {
+      return toModel(columns);
+    }
+
+    if (target.name === ROOT_CONTAINER_ID) {
+      columns.splice(target.index, 0, sourceItem);
+    } else {
+      const branchNode = columns.filter(
+        c => c.role === ColumnRole.Hierarchy && c.name === target.name,
+      )?.[0];
+      if (!branchNode) {
+        return toModel(columns);
+      }
+      if (target.index === -1) {
+        branchNode.children!.push(sourceItem);
+      } else {
+        branchNode.children!.splice(target.index, 0, sourceItem);
+      }
+    }
     return toModel(columns);
   };
 
-  const insertNode = (columns: Column[], newNode, removeIndex) => {
-    columns.splice(removeIndex, 1);
-    columns.unshift(newNode);
-    return toModel(columns);
+  const insertNode = (columns: Column[], newNode, nodes: Column[]) => {
+    const newColumns = columns.filter(
+      c => !nodes.map(n => n.name).includes(c.name),
+    );
+    newColumns.unshift(newNode);
+    return toModel(newColumns);
   };
 
   const updateNode = (columns: Column[], newNode, updateIndex) => {
@@ -375,11 +439,13 @@ const DataModelTree: FC = memo(() => {
   };
 
   const deleteBranch = (columns: Column[], node: Column) => {
-    const branch = columns[node.index!];
-    const children = branch?.children || [];
-    columns.splice(node.index!, 1);
-
-    return toModel(columns, ...children);
+    const deletedBranchIndex = columns.findIndex(c => c.name === node.name);
+    if (deletedBranchIndex > -1) {
+      const branch = columns[deletedBranchIndex];
+      const children = branch?.children || [];
+      columns.splice(deletedBranchIndex, 1);
+      return toModel(columns, ...children);
+    }
   };
 
   const moveNode = (
@@ -417,7 +483,20 @@ const DataModelTree: FC = memo(() => {
       if (cur?.role === ColumnRole.Hierarchy && isEmptyArray(cur?.children)) {
         return acc;
       }
-      acc[cur.name] = Object.assign({}, cur, { index: newIndex });
+      if (cur?.role === ColumnRole.Hierarchy && !isEmptyArray(cur?.children)) {
+        const orderedChildren = cur.children?.map((child, newIndex) => {
+          return {
+            ...child,
+            index: newIndex,
+          };
+        });
+        acc[cur.name] = Object.assign({}, cur, {
+          index: newIndex,
+          children: orderedChildren,
+        });
+      } else {
+        acc[cur.name] = Object.assign({}, cur, { index: newIndex });
+      }
       return acc;
     }, {});
   };
@@ -486,7 +565,11 @@ const DataModelTree: FC = memo(() => {
   return (
     <Container title="model">
       <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="droppable" type="Tree" isCombineEnabled>
+        <Droppable
+          droppableId={ROOT_CONTAINER_ID}
+          type={TreeNodeHierarchy.Container}
+          isCombineEnabled={true}
+        >
           {(droppableProvided, droppableSnapshot) => (
             <StyledDroppableContainer
               ref={droppableProvided.innerRef}
@@ -496,8 +579,9 @@ const DataModelTree: FC = memo(() => {
                 return col.role === ColumnRole.Hierarchy ? (
                   <DataModelBranch
                     node={col}
+                    key={col.name}
                     getPermissionButton={getPermissionButton}
-                    onNodeTypeChange={handleNodeTypeChange}
+                    onNodeTypeChange={handleNodeTypeChange(col)}
                     onMoveToHierarchy={openMoveToHierarchyModal}
                     onEditBranch={openEditBranchModal}
                     onDelete={handleDeleteBranch}
@@ -505,9 +589,10 @@ const DataModelTree: FC = memo(() => {
                 ) : (
                   <DataModelNode
                     node={col}
+                    key={col.name}
                     getPermissionButton={getPermissionButton}
                     onCreateHierarchy={openCreateHierarchyModal}
-                    onNodeTypeChange={handleNodeTypeChange}
+                    onNodeTypeChange={handleNodeTypeChange(col)}
                     onMoveToHierarchy={openMoveToHierarchyModal}
                   />
                 );

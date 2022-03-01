@@ -44,7 +44,7 @@ import { Column } from '../../../slice/types';
 const DataModelNode: FC<{
   node: Column;
   getPermissionButton: (name) => JSX.Element;
-  onNodeTypeChange: (node: Column) => void;
+  onNodeTypeChange: (item: any) => void;
   onMoveToHierarchy: (node: Column) => void;
   onCreateHierarchy?: (node: Column) => void;
 }> = memo(
@@ -100,7 +100,7 @@ const DataModelNode: FC<{
                   <Menu
                     selectedKeys={[node.type, `category-${node.category}`]}
                     className="datart-schema-table-header-menu"
-                    onClick={() => onNodeTypeChange(node)}
+                    onClick={onNodeTypeChange}
                   >
                     {Object.values(ColumnTypes).map(t => (
                       <Menu.Item key={t}>
@@ -168,19 +168,17 @@ const DataModelNode: FC<{
 
     return (
       <Draggable key={node?.name} draggableId={node?.name} index={node?.index}>
-        {(draggableProvided, draggableSnapshot) => {
-          return (
-            <StyledDataModelNode
-              isDragging={draggableSnapshot.isDragging}
-              style={draggableProvided.draggableProps.style}
-              ref={draggableProvided.innerRef}
-              {...draggableProvided.draggableProps}
-              {...draggableProvided.dragHandleProps}
-            >
-              {renderNode(node, draggableSnapshot.isDragging)}
-            </StyledDataModelNode>
-          );
-        }}
+        {(draggableProvided, draggableSnapshot) => (
+          <StyledDataModelNode
+            isDragging={draggableSnapshot.isDragging}
+            style={draggableProvided.draggableProps.style}
+            ref={draggableProvided.innerRef}
+            {...draggableProvided.draggableProps}
+            {...draggableProvided.dragHandleProps}
+          >
+            {renderNode(node, draggableSnapshot.isDragging)}
+          </StyledDataModelNode>
+        )}
       </Draggable>
     );
   },
