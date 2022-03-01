@@ -145,6 +145,25 @@ const config: ChartConfig = {
           },
         },
         {
+          label: 'legend.height',
+          key: 'height',
+          default: 0,
+          comType: 'inputNumber',
+          options: {
+            step: 40,
+            min: 0,
+          },
+          watcher: {
+            deps: ['type', 'position'],
+            action: ({ type, position }) => ({
+              hide: !(
+                type === 'scroll' &&
+                (position === 'right' || position === 'left')
+              ),
+            }),
+          },
+        },
+        {
           label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
@@ -248,6 +267,7 @@ const config: ChartConfig = {
           type: '图例类型',
           selectAll: '图例全选',
           position: '图例位置',
+          height: '图例高度',
         },
         reference: {
           title: '参考线',
@@ -270,6 +290,7 @@ const config: ChartConfig = {
           showLabel: 'Show Label',
           rotate: 'Rotate',
           position: 'Position',
+          height: 'Height',
         },
         pie: {
           title: 'Pie',
@@ -290,6 +311,7 @@ const config: ChartConfig = {
           type: 'Type',
           selectAll: 'Select All',
           position: 'Position',
+          height: 'Height',
         },
         reference: {
           title: 'Reference',

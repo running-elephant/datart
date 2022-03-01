@@ -32,6 +32,8 @@ import {
   getSeriesTooltips4Rectangular2,
   getSplitLine,
   getStyles,
+  hadAxisOverflowConfig,
+  setOptionsByAxisLabelOverflow,
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
@@ -89,6 +91,7 @@ class BasicLineChart extends Chart {
 
   onResize(opt: any, context): void {
     this.chart?.resize({ width: context?.width, height: context?.height });
+    hadAxisOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
   }
 
   onUnMount(): void {
@@ -137,6 +140,16 @@ class BasicLineChart extends Chart {
     );
     const yAxisNames = aggregateConfigs.map(getColumnRenderName);
 
+    // @TM 溢出自动根据bar长度设置标尺
+    const option = setOptionsByAxisLabelOverflow({
+      chart: this.chart,
+      grid: getGridStyle(styleConfigs),
+      xAxis: this.getXAxis(styleConfigs, xAxisColumns),
+      yAxis: this.getYAxis(styleConfigs, yAxisNames),
+      series,
+      yAxisNames,
+    });
+
     return {
       tooltip: {
         trigger: 'item',
@@ -152,10 +165,7 @@ class BasicLineChart extends Chart {
         styleConfigs,
         series?.map(s => s.name),
       ),
-      grid: getGridStyle(styleConfigs),
-      xAxis: this.getXAxis(styleConfigs, xAxisColumns),
-      yAxis: this.getYAxis(styleConfigs, yAxisNames),
-      series,
+      ...option,
     };
   }
 
@@ -314,6 +324,7 @@ class BasicLineChart extends Chart {
       rotate,
       showInterval,
       interval,
+      overflow,
     ] = getStyles(
       styles,
       ['xAxis'],
@@ -326,6 +337,7 @@ class BasicLineChart extends Chart {
         'rotate',
         'showInterval',
         'interval',
+        'overflow',
       ],
     );
     const [showVerticalLine, verticalLineStyle] = getStyles(
@@ -342,6 +354,7 @@ class BasicLineChart extends Chart {
         font,
         showInterval ? interval : null,
         rotate,
+        overflow,
       ),
       axisLine: getAxisLine(showAxis, lineStyle),
       axisTick: getAxisTick(showLabel, lineStyle),
@@ -350,10 +363,10 @@ class BasicLineChart extends Chart {
   }
 
   private getLegendStyle(styles, seriesNames) {
-    const [show, type, font, legendPos, selectAll] = getStyles(
+    const [show, type, font, legendPos, selectAll, height] = getStyles(
       styles,
       ['legend'],
-      ['showLegend', 'type', 'font', 'position', 'selectAll'],
+      ['showLegend', 'type', 'font', 'position', 'selectAll', 'height'],
     );
     let positions = {};
     let orient = {};
@@ -389,6 +402,7 @@ class BasicLineChart extends Chart {
       show,
       type,
       orient,
+      height: height || null,
       selected,
       data: seriesNames,
       textStyle: font,

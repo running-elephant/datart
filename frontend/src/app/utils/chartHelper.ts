@@ -38,6 +38,8 @@ import {
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
 import ChartMetadata from 'app/types/ChartMetadata';
+import { ECharts } from 'echarts';
+import { ECBasicOption } from 'echarts/types/dist/shared';
 import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
 import moment from 'moment';
 import { Debugger } from 'utils/debugger';
@@ -866,11 +868,13 @@ export function getAxisLabel(
   font: { fontFamily; fontSize; color },
   interval = null,
   rotate = null,
+  overflow = null,
 ) {
   return {
     show,
     interval,
     rotate,
+    overflow,
     ...font,
   };
 }
@@ -1332,3 +1336,220 @@ export function isMatchRequirement(
     );
   });
 }
+
+interface CommonChartConfig {
+  chart: ECharts;
+  // 官方ts定义过于复杂 所以用any
+  // x轴options
+  xAxis: any;
+  // y轴options
+  yAxis: any;
+  // 布局
+  grid: any;
+  // y轴 字段索引名
+  yAxisNames: string[];
+  // 图表系列
+  series: any[];
+  // 水平还是垂直
+  horizon?: boolean;
+}
+
+// 获取是否展示刻度
+export const getIntervalShow = interval =>
+  interval !== 'auto' && interval !== null;
+
+// 判断overflow 条件是否已生效
+export function hadAxisOverflowConfig(
+  options?: ECBasicOption,
+  horizon: boolean = false,
+) {
+  if (!options) return false;
+  const axisName = !horizon ? 'xAxis' : 'yAxis';
+
+  const axisLabelOpts = (options as unknown as any)[axisName]?.[0]?.axisLabel;
+  if (!axisLabelOpts) return false;
+
+  const { overflow, interval, show } = axisLabelOpts;
+
+  return show && overflow && getIntervalShow(interval);
+}
+
+// 获取当前坐标轴区域的宽度
+export function getAxisLengthByConfig(config: CommonChartConfig) {
+  const { chart, xAxis, yAxis, grid, series, yAxisNames, horizon } = config;
+  const axisOpts = !horizon ? xAxis : yAxis;
+  // datart 布局配置分为百分比和像素
+  const getWidthNum = (
+    num: string | number,
+  ): {
+    num: number;
+    type: 'percent' | 'px';
+  } => {
+    if (typeof num === 'string') {
+      const num_ = parseInt(num.replace('%', ''), 10);
+      if (isNaN(num_)) {
+        throw new Error(`${num} is not a number`);
+      }
+      return {
+        num: num_ / 100,
+        type: 'percent',
+      };
+    }
+    return {
+      num,
+      type: 'px',
+    };
+  };
+
+  // 获取坐标轴宽度
+  const getAxisWidth = (YAxisLength: number): number => {
+    return (Array.isArray(axisOpts) ? axisOpts : [axisOpts]).reduce(
+      (prev, item) => {
+        const { fontSize, show } = item.axisLabel;
+        // 预留一个字符长度
+        const axisLabelMaxWidth = show ? (YAxisLength + 1) * fontSize : 0;
+        prev += axisLabelMaxWidth;
+        return prev;
+      },
+      0,
+    );
+  };
+
+  const { containerLabel, left, right } = grid;
+
+  // 找到轴上最大的数字长度
+  let foundMaxAxisLength = 0;
+
+  if (containerLabel && !horizon) {
+    foundMaxAxisLength = series.reduce((prev, sery) => {
+      sery?.data?.forEach(item => {
+        yAxisNames.forEach(name => {
+          if (item.name === name) {
+            const yNumStr = `${item[0]}`;
+            if (yNumStr.length > prev) {
+              prev = yNumStr.length;
+            }
+          }
+        });
+      });
+      return prev;
+    }, 0);
+  }
+
+  const axisLabelMaxWidth = getAxisWidth(foundMaxAxisLength);
+
+  const left_ = getWidthNum(left);
+  const right_ = getWidthNum(right);
+
+  const containerWidth = chart.getWidth();
+
+  // 左右边距
+  const leftWidth =
+    left_.type === 'px' ? left_.num : containerWidth * left_.num;
+  const rightWidth =
+    right_.type === 'px' ? right_.num : containerWidth * right_.num;
+
+  // 坐标轴区域宽度 = 容器宽度 - 最大字符所占长度 - 左右边距
+  return containerWidth - axisLabelMaxWidth - leftWidth - rightWidth;
+}
+
+// 处理溢出情况
+export function setOptionsByAxisLabelOverflow(config: CommonChartConfig) {
+  const { chart, xAxis, yAxis, grid, series, horizon = false } = config;
+
+  const commonOpts = {
+    grid,
+    xAxis,
+    yAxis,
+    series,
+  };
+
+  // 如果是x轴需要截断，则取x轴数据
+  const axisOpts = !horizon ? xAxis : yAxis;
+  const axisName = !horizon ? 'xAxis' : 'yAxis';
+
+  //
+  const data = axisOpts.data || [];
+
+  const dataLength = data.length;
+
+  // 拿到截断配置
+  const overflow = axisOpts.axisLabel?.overflow;
+  const show = axisOpts.axisLabel?.show;
+  // 是否展示刻度，非刻度使用默认样式
+
+  const showInterval = getIntervalShow(axisOpts.axisLabel?.interval);
+
+  // 不展示刻度
+  if (!show) return commonOpts;
+  // 数据为空
+  if (!dataLength) return commonOpts;
+
+  commonOpts[axisName].axisLabel.hideOverlap = true;
+  commonOpts[axisName].axisLabel.overflow = overflow;
+
+  // 如果overflow为截断，则使用每段刻度来响应tooltip
+  // 不破坏原有展示逻辑
+  if (showInterval && overflow === 'truncate') {
+    commonOpts[axisName].axisPointer = {
+      show: true,
+      type: 'shadow',
+    };
+  }
+
+  // 获取x/y轴在model上的信息
+  // @ts-ignore
+  const axisModel = chart.getModel()?.getComponent(axisName);
+
+  // 处理 每个刻度宽度
+  const setWidth = width => {
+    return parseInt(String((width - dataLength * 8) / dataLength));
+  };
+  // model 渲染未完成的兼容性方案，一般只在图表初始化阶段，还没有拿到model。
+  // 一般只会运行一次
+  // 拿到model后就可使用更加精确的坐标轴宽高度等信息，所以处理可以略粗略
+  const handlerWhenChartUnFinished = () => {
+    commonOpts[axisName].axisLabel.width = showInterval
+      ? setWidth(getAxisLengthByConfig(config))
+      : void 0;
+    return commonOpts;
+  };
+
+  // model未获取到，原因： 未渲染完成
+  if (!axisModel) {
+    handlerWhenChartUnFinished();
+    return commonOpts;
+  }
+  // @ts-ignore
+  const axisView = chart.getViewOfComponentModel(axisModel);
+
+  const axisRect = axisView?.group?.getBoundingRect();
+
+  if (!axisRect) {
+    handlerWhenChartUnFinished();
+    return commonOpts;
+  }
+
+  commonOpts[axisName].axisLabel.width = showInterval
+    ? setWidth(axisRect.width)
+    : void 0;
+
+  return commonOpts;
+}
+
+export const getAutoFunnelPosition = (config: {
+  chart: ECharts;
+  height: number;
+  sort: 'ascending' | 'descending' | 'none';
+  legendPos: string;
+}) => {
+  const { chart, height, sort, legendPos } = config;
+  if (legendPos !== 'left' && legendPos !== 'right') return 8;
+  if (!height) return 16;
+  // 升序
+  if (sort === 'ascending') return 16;
+
+  const chartHeight = chart.getHeight();
+  if (!chartHeight) return 16;
+  return chartHeight - 24 - height;
+};

@@ -159,6 +159,25 @@ const config: ChartConfig = {
           },
         },
         {
+          label: 'legend.height',
+          key: 'height',
+          default: 0,
+          comType: 'inputNumber',
+          options: {
+            step: 40,
+            min: 0,
+          },
+          watcher: {
+            deps: ['type', 'position'],
+            action: ({ type, position }) => ({
+              hide: !(
+                type === 'scroll' &&
+                (position === 'right' || position === 'left')
+              ),
+            }),
+          },
+        },
+        {
           label: 'viz.palette.style.font',
           key: 'font',
           comType: 'font',
@@ -228,6 +247,20 @@ const config: ChartConfig = {
           key: 'showInterval',
           default: false,
           comType: 'checkbox',
+        },
+        {
+          label: 'common.overflow',
+          key: 'overflow',
+          comType: 'select',
+          default: 'break',
+          options: {
+            items: [
+              { label: '溢出', value: 'none' },
+              { label: '截断', value: 'truncate' },
+              { label: '换行', value: 'break' },
+              { label: '强制换行', value: 'breakAll' },
+            ],
+          },
         },
         {
           label: 'common.interval',
@@ -460,6 +493,7 @@ const config: ChartConfig = {
           position: '位置',
           showInterval: '显示刻度',
           interval: '刻度间隔',
+          overflow: '文本溢出',
           showTitleAndUnit: '显示标题和刻度',
           nameLocation: '标题位置',
           nameRotate: '标题旋转',
@@ -478,6 +512,7 @@ const config: ChartConfig = {
           type: '图例类型',
           selectAll: '图例全选',
           position: '图例位置',
+          height: '图例高度',
         },
         data: {
           color: '颜色',
@@ -522,6 +557,7 @@ const config: ChartConfig = {
           position: 'Position',
           showInterval: 'Show Interval',
           interval: 'Interval',
+          overflow: 'Overflow',
           showTitleAndUnit: 'Show Title and Unit',
           nameLocation: 'Name Location',
           nameRotate: 'Name Rotate',
@@ -533,6 +569,7 @@ const config: ChartConfig = {
           title: 'Label',
           showLabel: 'Show Label',
           position: 'Position',
+          height: 'Height',
         },
         legend: {
           title: 'Legend',
@@ -540,6 +577,7 @@ const config: ChartConfig = {
           type: 'Type',
           selectAll: 'Select All',
           position: 'Position',
+          height: 'Height',
         },
         data: {
           color: 'Color',

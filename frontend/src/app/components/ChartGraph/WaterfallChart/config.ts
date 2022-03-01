@@ -210,6 +210,20 @@ const config: ChartConfig = {
           comType: 'checkbox',
         },
         {
+          label: 'common.overflow',
+          key: 'overflow',
+          comType: 'select',
+          default: 'break',
+          options: {
+            items: [
+              { label: '溢出', value: 'none' },
+              { label: '截断', value: 'truncate' },
+              { label: '换行', value: 'break' },
+              { label: '强制换行', value: 'breakAll' },
+            ],
+          },
+        },
+        {
           label: 'common.interval',
           key: 'interval',
           default: 0,
@@ -437,6 +451,7 @@ const config: ChartConfig = {
           position: '位置',
           showInterval: '显示刻度',
           interval: '刻度间隔',
+          overflow: '文本溢出',
           showTitleAndUnit: '显示标题和刻度',
           nameLocation: '标题位置',
           nameRotate: '标题旋转',
@@ -493,6 +508,7 @@ const config: ChartConfig = {
           position: 'Position',
           showInterval: 'Show Interval',
           interval: 'Interval',
+          overflow: 'Overflow',
           showTitleAndUnit: 'Show Title and Unit',
           nameLocation: 'Name Location',
           nameRotate: 'Name Rotate',
