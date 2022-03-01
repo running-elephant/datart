@@ -71,8 +71,8 @@ export class ChartDataSet<T>
   extends ChartDataSetBase
   implements IChartDataSet<T>
 {
-  private columnIndexTable: ColumnIndexTable = {};
-  private originalFields?: ChartDataSectionField[];
+  public columnIndexTable: ColumnIndexTable = {};
+  public originalFields?: ChartDataSectionField[];
 
   constructor(
     columns: T[][],
@@ -134,6 +134,18 @@ export class ChartDataSet<T>
         sortValues.indexOf(prev[this.toKey(order)]) -
         sortValues.indexOf(next[this.toKey(order)]),
     );
+  }
+
+  public groupBy(key: string): { [groupKey in string]: IChartDataSetRow<T>[] } {
+    const groupedChartDataSets = this.reduce((acc, row) => {
+      const valueKey = row.getCellByKey(key) || 'defaultGroupKey';
+      if (!acc[valueKey]) {
+        acc[valueKey] = [];
+      }
+      acc[valueKey].push(row);
+      return acc;
+    }, {});
+    return groupedChartDataSets;
   }
 }
 
