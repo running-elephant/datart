@@ -81,9 +81,21 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
       ) : null;
     }
   };
-  const renderErrorInfo = (errInfo?: string) => {
+  const renderErrorInfo = (errInfo?: { [propName: string]: string }) => {
     if (!errInfo) return null;
-    return <ErrorIcon errInfo={errInfo} />;
+
+    const errInfoValue = Object.values(errInfo);
+
+    if (!errInfoValue.length) return null;
+
+    const errHtml = (
+      <div style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}>
+        {errInfoValue.map((v, i) => {
+          return <p key={i}>{String(v)}</p>;
+        })}
+      </div>
+    );
+    return <ErrorIcon errInfo={errHtml} />;
   };
   const renderWidgetAction = () => {
     const widgetType = widget.config.type;

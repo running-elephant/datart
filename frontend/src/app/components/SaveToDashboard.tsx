@@ -25,7 +25,6 @@ import { getCascadeAccess } from 'app/pages/MainPage/Access';
 import {
   PermissionLevels,
   ResourceTypes,
-  VizResourceSubTypes,
 } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
@@ -37,12 +36,12 @@ import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { request2 } from 'utils/request';
-import { getPath, listToTree } from 'utils/utils';
+import { listToTree } from 'utils/utils';
 import { Tree } from './Tree';
 
 interface SaveToDashboardTypes {
   isModalVisible: boolean;
-  handleOk: (id) => void;
+  handleOk: (id, type) => void;
   handleCancel: () => void;
   title: string;
   orgId: string;
@@ -66,38 +65,6 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
     const isOwner = useSelector(selectIsOrgOwner);
     const permissionMap = useSelector(selectPermissionMap);
 
-    const filterDashboardData = useCallback(
-      vizData => {
-        let dashboardIds: any = [];
-        let dashboardData = vizData?.filter(v => {
-          const path = getPath(
-            [v] as Array<{ id: string; parentId: string }>,
-            { id: v.id, parentId: v.parentId },
-            VizResourceSubTypes.Folder,
-          );
-
-          const AllowManage = getCascadeAccess(
-            isOwner,
-            permissionMap,
-            ResourceTypes.Viz,
-            path,
-            PermissionLevels.Manage,
-          );
-          if (v.relType === 'DASHBOARD' && AllowManage) {
-            dashboardIds.push(v.parentId);
-          }
-          return v.relType === 'DASHBOARD' && AllowManage;
-        });
-
-        const FileData = vizData?.filter(v => {
-          return dashboardIds.indexOf(v.id) !== -1;
-        });
-
-        return FileData.concat(dashboardData);
-      },
-      [isOwner, permissionMap],
-    );
-
     const selectDashboard = useCallback((dashboardData, event) => {
       setSelectId(event.node.relId);
     }, []);
@@ -115,14 +82,36 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
           message.error(t('haveCharts'));
           return false;
         }
-        handleOk(selectId);
+        try {
+          handleOk(selectId, JSON.parse(data?.config)?.type);
+        } catch (error) {
+          console.log(error);
+        }
       },
       [handleOk, backendChartId, t],
     );
 
     useEffect(() => {
-      setVizData(filterDashboardData(vizs));
-    }, [filterDashboardData, vizs]);
+      setVizData(vizs?.filter(v => v.relType !== 'DATACHART'));
+    }, [vizs]);
+
+    const filterTreeNode = useCallback(
+      (path, folder): boolean => {
+        const AllowManage = getCascadeAccess(
+          isOwner,
+          permissionMap,
+          ResourceTypes.Viz,
+          path,
+          PermissionLevels.Manage,
+        );
+
+        if (!AllowManage && folder.relType === 'DASHBOARD') {
+          return false;
+        }
+        return true;
+      },
+      [isOwner, permissionMap],
+    );
 
     const treeData = useMemo(() => {
       return listToTree(
@@ -133,9 +122,9 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
         })),
         null,
         [],
-        { getIcon },
+        { getIcon, filter: filterTreeNode },
       );
-    }, [vizData, getIcon]);
+    }, [vizData, getIcon, filterTreeNode]);
 
     const { filteredData: filteredTreeData, debouncedSearch: treeSearch } =
       useDebouncedSearch(treeData, (keywords, d) => {

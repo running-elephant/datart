@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { prefixI18N } from 'app/hooks/useI18NPrefix';
 import { migrateChartConfig } from 'app/migration';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -359,15 +360,27 @@ export const getBoardChartRequests = (params: {
 
   const chartRequest = chartWidgetIds
     .map(widgetId => {
-      return getChartWidgetRequestParams({
-        widgetId,
-        widgetMap,
-        viewMap,
-        option: undefined,
-        widgetInfo: undefined,
-        dataChartMap,
-      });
+      const isWidget = widgetMap[widgetId].datachartId.indexOf('widget') !== -1;
+      return {
+        ...getChartWidgetRequestParams({
+          widgetId,
+          widgetMap,
+          viewMap,
+          option: undefined,
+          widgetInfo: undefined,
+          dataChartMap,
+        }),
+        ...{
+          vizName: widgetMap[widgetId].config.name,
+          vizId: isWidget
+            ? widgetMap[widgetId].id
+            : widgetMap[widgetId].datachartId,
+          analytics: false,
+          vizType: isWidget ? 'widget' : 'dataChart',
+        },
+      };
     })
+
     .filter(res => {
       if (res) {
         return true;
@@ -507,4 +520,28 @@ export const getDefaultWidgetName = (widget: Widget, index: number) => {
     default:
       return `xxx${index}`;
   }
+};
+export const checkLinkAndJumpErr = (
+  widgetData: Widget,
+  folderListIds?: string[],
+): string => {
+  let error: string = '';
+
+  if (
+    widgetData?.config?.linkageConfig?.open &&
+    widgetData?.relations.length === 0
+  ) {
+    error = prefixI18N('viz.linkage.linkageError');
+  }
+
+  if (
+    widgetData?.config?.jumpConfig &&
+    widgetData?.config?.jumpConfig.open &&
+    widgetData?.config?.jumpConfig.targetType === 'INTERNAL' &&
+    !folderListIds?.includes(widgetData.config.jumpConfig.target.relId)
+  ) {
+    error = prefixI18N('viz.jump.jumpError');
+  }
+
+  return error;
 };

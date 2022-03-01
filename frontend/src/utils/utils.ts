@@ -94,6 +94,7 @@ export function listToTree<
     getIcon?: (o: T) => ReactElement | ((props: TreeNodeProps) => ReactElement);
     getDisabled?: (o: T, path: string[]) => boolean;
     getSelectable?: (o: T) => boolean;
+    filter?: (path: string[], o: T) => boolean;
   },
 ): undefined | any[] {
   if (!list) {
@@ -104,8 +105,11 @@ export function listToTree<
   const childrenList: T[] = [];
 
   list.forEach(o => {
+    const path = parentPath.concat(o.id);
+    if (options?.filter && !options.filter(path, o)) {
+      return false;
+    }
     if (o.parentId === parentId) {
-      const path = parentPath.concat(o.id);
       treeNodes.push({
         ...o,
         key: o.id,

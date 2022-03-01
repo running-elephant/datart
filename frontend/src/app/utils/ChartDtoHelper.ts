@@ -22,8 +22,8 @@ import { ChartDTO } from 'app/types/ChartDTO';
 import {
   mergeChartDataConfigs,
   mergeChartStyleConfigs,
+  transformMeta,
 } from 'app/utils/internalChartHelper';
-import { transformMeta } from 'app/utils/internalChartHelper';
 import { Omit } from 'utils/object';
 
 export function convertToChartDTO(data): ChartDTO {
@@ -63,6 +63,7 @@ export function buildUpdateChartRequest({
     viewId: viewId,
     config: stringifyConfig,
     permissions: [],
+    avatar: graphId,
   };
 }
 
