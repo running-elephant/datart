@@ -83,6 +83,7 @@ export interface ViewViewModel<T = object>
   index: number | null;
   isFolder?: boolean;
   model: Model;
+  hierarchy: Model;
   config: object;
   originVariables: VariableHierarchy[];
   variables: VariableHierarchy[];

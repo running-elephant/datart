@@ -218,6 +218,7 @@ export const saveView = createAsyncThunk<
         ...data,
         config: currentEditingView.config,
         model: currentEditingView.model,
+        hierarchy: currentEditingView.hierarchy,
         variables: data.variables.map(v => ({
           ...v,
           relVariableSubjects: data.relVariableSubjects,

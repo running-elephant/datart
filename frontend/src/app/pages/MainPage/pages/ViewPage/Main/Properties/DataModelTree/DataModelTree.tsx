@@ -61,16 +61,16 @@ const DataModelTree: FC = memo(() => {
   const columnPermissions = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'columnPermissions' }),
   ) as ColumnPermission[];
-  const [model, setModel] = useState<Model | undefined>(
+  const [hierarchy, setHierarchy] = useState<Model | undefined>(
     currentEditingView?.model,
   );
 
   useEffect(() => {
-    setModel(currentEditingView?.model);
-  }, [currentEditingView?.model]);
+    setHierarchy(currentEditingView?.hierarchy);
+  }, [currentEditingView?.hierarchy]);
 
   const tableColumns = useMemo<Column[]>(() => {
-    return Object.entries(model || {})
+    return Object.entries(hierarchy || {})
       .map(([name, column], index) => {
         return Object.assign({ index }, column, { name });
       })
@@ -85,7 +85,7 @@ const DataModelTree: FC = memo(() => {
         const nextHierarchyIndex = next.role === ColumnRole.Hierarchy ? 0 : 1;
         return preHierarchyIndex - nextHierarchyIndex;
       });
-  }, [model]);
+  }, [hierarchy]);
 
   const roleDropdownData = useMemo(
     () =>
@@ -100,7 +100,7 @@ const DataModelTree: FC = memo(() => {
 
   const checkRoleColumnPermission = useCallback(
     columnName => checkedKeys => {
-      const fullPermissions = Object.keys(model || {});
+      const fullPermissions = Object.keys(hierarchy || {});
       dispatch(
         actions.changeCurrentEditingView({
           columnPermissions: roleDropdownData.reduce<ColumnPermission[]>(
@@ -148,12 +148,12 @@ const DataModelTree: FC = memo(() => {
         }),
       );
     },
-    [dispatch, actions, viewId, model, columnPermissions, roleDropdownData],
+    [dispatch, actions, viewId, hierarchy, columnPermissions, roleDropdownData],
   );
 
   const handleDeleteBranch = (node: Column) => {
-    const newModel = deleteBranch(tableColumns, node);
-    handleDataModelChange(newModel);
+    const newHierarchy = deleteBranch(tableColumns, node);
+    handleDataModelHierarchyChange(newHierarchy);
   };
 
   const handleNodeTypeChange =
@@ -168,8 +168,12 @@ const DataModelTree: FC = memo(() => {
       }
       const targetNode = tableColumns?.find(n => n.name === node?.name);
       if (targetNode) {
-        const newModel = updateNode(tableColumns, newNode, targetNode.index);
-        handleDataModelChange(newModel);
+        const newHierarchy = updateNode(
+          tableColumns,
+          newNode,
+          targetNode.index,
+        );
+        handleDataModelHierarchyChange(newHierarchy);
         return;
       }
       const targetBranch = tableColumns?.find(b => {
@@ -186,29 +190,29 @@ const DataModelTree: FC = memo(() => {
           const newTargetBranch = CloneValueDeep(targetBranch);
           if (newTargetBranch.children) {
             newTargetBranch.children[newNodeIndex] = newNode;
-            const newModel = updateNode(
+            const newHierarchy = updateNode(
               tableColumns,
               newTargetBranch,
               newTargetBranch.index,
             );
-            handleDataModelChange(newModel);
+            handleDataModelHierarchyChange(newHierarchy);
           }
         }
       }
     };
 
-  const handleDataModelChange = model => {
-    setModel(model);
+  const handleDataModelHierarchyChange = hierarchy => {
+    setHierarchy(hierarchy);
     dispatch(
       actions.changeCurrentEditingView({
-        model: model,
+        hierarchy: hierarchy,
       }),
     );
   };
 
   const handleDragEnd = result => {
     if (Boolean(result.destination) && isEmpty(result?.combine)) {
-      const newModel = reorderNode(
+      const newHierarchy = reorderNode(
         CloneValueDeep(tableColumns),
         { name: result.draggableId },
         {
@@ -216,7 +220,7 @@ const DataModelTree: FC = memo(() => {
           index: result.destination.index,
         },
       );
-      return handleDataModelChange(newModel);
+      return handleDataModelHierarchyChange(newHierarchy);
     }
     if (!Boolean(result.destination) && !isEmpty(result?.combine)) {
       const clonedTableColumns = CloneValueDeep(tableColumns);
@@ -251,8 +255,8 @@ const DataModelTree: FC = memo(() => {
           role: ColumnRole.Hierarchy,
           children: nodes,
         };
-        const newModel = insertNode(tableColumns, hierarchyNode, nodes);
-        handleDataModelChange(newModel);
+        const newHierarchy = insertNode(tableColumns, hierarchyNode, nodes);
+        handleDataModelHierarchyChange(newHierarchy);
       },
       content: onChangeEvent => {
         const allNodeNames = tableColumns?.flatMap(c => {
@@ -296,13 +300,13 @@ const DataModelTree: FC = memo(() => {
       modalSize: StateModalSize.XSMALL,
       onOk: hierarchyName => {
         if (currrentHierarchies?.find(h => h.name === hierarchyName)) {
-          let newModel = moveNode(
+          let newHierarchy = moveNode(
             tableColumns,
             node,
             currrentHierarchies,
             hierarchyName,
           );
-          handleDataModelChange(newModel);
+          handleDataModelHierarchyChange(newHierarchy);
         }
       },
       content: onChangeEvent => {
@@ -340,12 +344,12 @@ const DataModelTree: FC = memo(() => {
         if (!newName) {
           return;
         }
-        const newModel = updateNode(
+        const newHierarchy = updateNode(
           tableColumns,
           { ...node, name: newName },
           node.index,
         );
-        handleDataModelChange(newModel);
+        handleDataModelHierarchyChange(newHierarchy);
       },
       content: onChangeEvent => {
         return (
