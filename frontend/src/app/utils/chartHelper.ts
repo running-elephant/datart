@@ -1235,9 +1235,9 @@ export function getExtraSeriesDataFormat(format?: IFieldFormatConfig) {
 
 export function getColorizeGroupSeriesColumns(
   chartDataSet: IChartDataSet<string>,
-  groupByKey: string,
+  groupConfig: ChartDataSectionField,
 ) {
-  return Object.entries(chartDataSet.groupBy(groupByKey)).map(([k, v]) => {
+  return Object.entries(chartDataSet.groupBy(groupConfig)).map(([k, v]) => {
     let a = {};
     a[k] = v;
     return a;

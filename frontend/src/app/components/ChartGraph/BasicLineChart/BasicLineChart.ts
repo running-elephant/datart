@@ -194,10 +194,9 @@ class BasicLineChart extends Chart {
     }
 
     const xAxisConfig = groupConfigs?.[0];
-    const colorColumnName = chartDataSet.getFieldKey(colorConfigs[0]);
     const secondGroupInfos = getColorizeGroupSeriesColumns(
       chartDataSet,
-      colorColumnName,
+      colorConfigs[0],
     );
 
     return aggregateConfigs.flatMap(aggConfig => {

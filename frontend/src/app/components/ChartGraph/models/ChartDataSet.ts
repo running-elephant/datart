@@ -136,9 +136,11 @@ export class ChartDataSet<T>
     );
   }
 
-  public groupBy(key: string): { [groupKey in string]: IChartDataSetRow<T>[] } {
+  public groupBy(field: ChartDataSectionField): {
+    [groupKey in string]: IChartDataSetRow<T>[];
+  } {
     const groupedChartDataSets = this.reduce((acc, row) => {
-      const valueKey = row.getCellByKey(key) || 'defaultGroupKey';
+      const valueKey = row.getCell(field) || 'defaultGroupKey';
       if (!acc[valueKey]) {
         acc[valueKey] = [];
       }

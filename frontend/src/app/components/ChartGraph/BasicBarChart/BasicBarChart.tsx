@@ -195,7 +195,6 @@ class BasicBarChart extends Chart {
     xAxisColumns,
   ) {
     const xAxisConfig = groupConfigs?.[0];
-    const colorColumnName = chartDataSet.getFieldKey(colorConfigs[0]);
     if (!colorConfigs.length) {
       const flatSeries = aggregateConfigs.map(aggConfig => {
         return {
@@ -219,7 +218,7 @@ class BasicBarChart extends Chart {
 
     const secondGroupInfos = getColorizeGroupSeriesColumns(
       chartDataSet,
-      colorColumnName,
+      colorConfigs[0],
     );
     const colorizeGroupedSeries = aggregateConfigs.flatMap(aggConfig => {
       return secondGroupInfos.map(sgCol => {

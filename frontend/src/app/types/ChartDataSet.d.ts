@@ -46,7 +46,9 @@ export interface IChartDataSet<T> extends Array<IChartDataSetRow<T>> {
 
   sortBy(dataConfigs: ChartDataConfig[]): void;
 
-  groupBy(key: string): { [groupKey in string]: IChartDataSetRow<T>[] };
+  groupBy(field: ChartDataSectionField): {
+    [groupKey in string]: IChartDataSetRow<T>[];
+  };
 }
 
 export type ChartDataSetDTO = {
