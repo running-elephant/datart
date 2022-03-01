@@ -213,10 +213,17 @@ class BasicPieChart extends Chart {
   }
 
   private getLegendStyle(groupConfigs, styles, series) {
-    const [show, type, font, legendPos, selectAll] = getStyles(
+    const [show, type, font, legendPos, selectAll, height] = getStyles(
       styles,
       ['legend'],
-      ['showLegend', 'type', 'font', 'position', 'selectAll'],
+      [
+        'showLegend',
+        'type',
+        'font',
+        'position',
+        'selectAll',
+        'height',
+      ],
     );
     let positions = {};
     let orient = {};
@@ -248,7 +255,7 @@ class BasicPieChart extends Chart {
         break;
       default:
         orient = 'vertical';
-        positions = { right: 8, top: 16, bottom: 24, width: 96 };
+        positions = { right: 8, top: 16, bottom: 24 };
         break;
     }
 
@@ -256,6 +263,7 @@ class BasicPieChart extends Chart {
       ...positions,
       show,
       type,
+      height: height || null,
       orient,
       selected,
       textStyle: font,
