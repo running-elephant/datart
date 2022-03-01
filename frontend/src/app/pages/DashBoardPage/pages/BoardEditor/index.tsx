@@ -162,30 +162,35 @@ export const BoardEditor: React.FC<{
   ]);
   const initialization = useCallback(async () => {
     await dispatch(fetchEditBoardDetail(boardId));
-    if (histState?.widgetInfo) {
-      const widgetInfo = JSON.parse(histState.widgetInfo);
-      const boardType = board.config?.type;
 
-      if (widgetInfo) {
-        let subType: 'widgetChart' | 'dataChart' = 'dataChart';
-        if (!widgetInfo.dataChart.id) {
-          widgetInfo.dataChart.id = 'widget_' + uuidv4();
-          subType = 'widgetChart';
+    try {
+      if (histState?.widgetInfo) {
+        const widgetInfo = JSON.parse(histState.widgetInfo);
+
+        if (widgetInfo) {
+          let subType: 'widgetChart' | 'dataChart' = 'dataChart';
+
+          if (!widgetInfo.dataChart.id) {
+            widgetInfo.dataChart.id = 'widget_' + uuidv4();
+            subType = 'widgetChart';
+          }
+
+          dispatch(
+            addChartWidget({
+              boardId,
+              chartId: widgetInfo.dataChart.id,
+              boardType: widgetInfo.dashboardType,
+              dataChart: widgetInfo.dataChart,
+              view: widgetInfo.dataview,
+              subType: subType,
+            }),
+          );
         }
-
-        dispatch(
-          addChartWidget({
-            boardId,
-            chartId: widgetInfo.dataChart.id,
-            boardType,
-            dataChart: widgetInfo.dataChart,
-            view: widgetInfo.dataview,
-            subType: subType,
-          }),
-        );
       }
+    } catch (error) {
+      console.log(error);
     }
-  }, [dispatch, histState?.widgetInfo, boardId, board.config?.type]);
+  }, [dispatch, histState?.widgetInfo, boardId]);
 
   useEffect(() => {
     initialization();

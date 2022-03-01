@@ -537,7 +537,8 @@ export const checkLinkAndJumpErr = (
   if (
     widgetData?.config?.jumpConfig &&
     widgetData?.config?.jumpConfig.open &&
-    folderListIds?.indexOf(widgetData.config.jumpConfig.target.relId) === -1
+    widgetData?.config?.jumpConfig.targetType === 'INTERNAL' &&
+    !folderListIds?.includes(widgetData.config.jumpConfig.target.relId)
   ) {
     error = prefixI18N('viz.jump.jumpError');
   }
