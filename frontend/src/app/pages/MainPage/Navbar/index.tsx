@@ -18,6 +18,7 @@
 
 import {
   BankFilled,
+  BgColorsOutlined,
   ExportOutlined,
   FormOutlined,
   FunctionOutlined,
@@ -59,6 +60,8 @@ import {
   SPACE_TIMES,
   SPACE_XS,
 } from 'styles/StyleConstants';
+import themeSlice from 'styles/theme/slice';
+import { ThemeKeyType } from 'styles/theme/slice/types';
 import { Access } from '../Access';
 import {
   PermissionLevels,
@@ -190,6 +193,13 @@ export function Navbar() {
     [matchModules?.params.moduleName, subNavs],
   );
 
+  const handleChangeThemeFn = useCallback(
+    (theme: ThemeKeyType) => {
+      dispatch(themeSlice.actions.changeTheme(theme));
+    },
+    [dispatch],
+  );
+
   const userMenuSelect = useCallback(
     ({ key }) => {
       switch (key) {
@@ -210,11 +220,15 @@ export function Navbar() {
         case 'en':
           changeLang(key);
           break;
+        case 'dark':
+        case 'light':
+          handleChangeThemeFn(key);
+          break;
         default:
           break;
       }
     },
-    [dispatch, history],
+    [dispatch, history, handleChangeThemeFn],
   );
 
   const onSetPolling = useCallback(
@@ -298,6 +312,15 @@ export function Navbar() {
                 >
                   <MenuListItem key="zh">中文</MenuListItem>
                   <MenuListItem key="en">English</MenuListItem>
+                </MenuListItem>
+                <MenuListItem
+                  key="theme"
+                  prefix={<BgColorsOutlined className="icon" />}
+                  title={<p>切换主题</p>}
+                  sub
+                >
+                  <MenuListItem key="light">浅色</MenuListItem>
+                  <MenuListItem key="dark">深色</MenuListItem>
                 </MenuListItem>
                 <Menu.Divider />
                 <MenuListItem

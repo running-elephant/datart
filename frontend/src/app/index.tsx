@@ -26,6 +26,7 @@ import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import styled from 'styled-components/macro';
 import { GlobalStyle, OverriddenStyle } from 'styles/globalStyles';
 import { getToken } from 'utils/auth';
 import useI18NPrefix from './hooks/useI18NPrefix';
@@ -63,29 +64,73 @@ export function App() {
   }, [dispatch]);
 
   return (
-    <ConfigProvider locale={antdLocales[i18n.language]}>
-      <BrowserRouter>
-        <Helmet
-          titleTemplate="%s - Datart"
-          defaultTitle="Datart"
-          htmlAttributes={{ lang: i18n.language }}
-        >
-          <meta name="description" content="Data Art" />
-        </Helmet>
-        <Switch>
-          <Route path="/login" component={LazyLoginPage} />
-          <Route path="/register" component={LazyRegisterPage} />
-          <Route path="/active" component={LazyActivePage} />
-          <Route path="/forgetPassword" component={LazyForgetPasswordPage} />
-          <Route
-            path="/authorization/:token"
-            component={LazyAuthorizationPage}
-          />
-          <LoginAuthRoute />
-        </Switch>
-        <GlobalStyle />
-        <OverriddenStyle />
-      </BrowserRouter>
-    </ConfigProvider>
+    <HtmlWrapper>
+      <ConfigProvider locale={antdLocales[i18n.language]}>
+        <BrowserRouter>
+          <Helmet
+            titleTemplate="%s - Datart"
+            defaultTitle="Datart"
+            htmlAttributes={{ lang: i18n.language }}
+          >
+            <meta name="description" content="Data Art" />
+          </Helmet>
+          <Switch>
+            <Route path="/login" component={LazyLoginPage} />
+            <Route path="/register" component={LazyRegisterPage} />
+            <Route path="/active" component={LazyActivePage} />
+            <Route path="/forgetPassword" component={LazyForgetPasswordPage} />
+            <Route
+              path="/authorization/:token"
+              component={LazyAuthorizationPage}
+            />
+            <LoginAuthRoute />
+          </Switch>
+          <GlobalStyle />
+          <OverriddenStyle />
+        </BrowserRouter>
+      </ConfigProvider>
+    </HtmlWrapper>
   );
 }
+const HtmlWrapper = styled.div`
+  --ant-primary-color: #32b1aa;
+  --ant-primary-color-hover: #23547c;
+  --ant-primary-color-active: #292e33;
+  --ant-primary-color-outline: rgba(172, 59, 134, 0.2);
+  --ant-primary-1: #ce0fbe;
+  --ant-primary-2: #ce0fbe;
+  --ant-primary-3: #ce0fbe;
+  --ant-primary-4: #ce0fbe;
+  --ant-primary-5: #ce0fbe;
+  --ant-primary-6: #ce0fbe;
+  --ant-primary-7: #ce0fbe;
+  --ant-primary-color-deprecated-pure: ;
+  --ant-primary-color-deprecated-l-35: #ce0fbe;
+  --ant-primary-color-deprecated-l-20: #ce0fbe;
+  --ant-primary-color-deprecated-t-20: #ce0fbe;
+  --ant-primary-color-deprecated-t-50: #ce0fbe;
+  --ant-primary-color-deprecated-f-12: rgba(40, 201, 179, 0.12);
+  --ant-primary-color-active-deprecated-f-30: rgba(233, 134, 5, 0.3);
+  --ant-primary-color-active-deprecated-d-02: #2d6a86;
+  --ant-success-color: #52c41a;
+  --ant-success-color-hover: #73d13d;
+  --ant-success-color-active: #389e0d;
+  --ant-success-color-outline: rgba(82, 196, 26, 0.2);
+  --ant-success-color-deprecated-bg: #f6ffed;
+  --ant-success-color-deprecated-border: #b7eb8f;
+  --ant-error-color: #ff4d4f;
+  --ant-error-color-hover: #ff7875;
+  --ant-error-color-active: #d9363e;
+  --ant-error-color-outline: rgba(255, 77, 79, 0.2);
+  --ant-error-color-deprecated-bg: #fff2f0;
+  --ant-error-color-deprecated-border: #ffccc7;
+  --ant-warning-color: #faad14;
+  --ant-warning-color-hover: #ffc53d;
+  --ant-warning-color-active: #d48806;
+  --ant-warning-color-outline: rgba(250, 173, 20, 0.2);
+  --ant-warning-color-deprecated-bg: #fffbe6;
+  --ant-warning-color-deprecated-border: #ffe58f;
+  --ant-info-color: #1890ff;
+  --ant-info-color-deprecated-bg: #e6f7ff;
+  --ant-info-color-deprecated-border: #91d5ff;
+`;

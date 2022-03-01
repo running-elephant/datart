@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import 'antd/dist/antd.less';
+import 'antd/dist/antd.variable.min.css';
 import 'app/assets/fonts/iconfont.css';
 import { Share } from 'app/share';
 import 'core-js/features/string/replace-all';

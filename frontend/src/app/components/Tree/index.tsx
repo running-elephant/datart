@@ -24,12 +24,9 @@ export function Tree({ loading, treeData, ...treeProps }: TreeProps) {
       ) : (
         treeData &&
         (treeData.length ? (
-          <StyledDirectoryTree
-            showIcon
-            blockNode
-            treeData={treeData}
-            {...treeProps}
-          />
+          <StyledDirectoryTree>
+            <AntTree showIcon blockNode treeData={treeData} {...treeProps} />
+          </StyledDirectoryTree>
         ) : (
           <Empty />
         ))
@@ -51,11 +48,10 @@ const Wrapper = styled.div`
   }
 `;
 
-const StyledDirectoryTree = styled(AntTree)`
-  &.ant-tree {
+const StyledDirectoryTree = styled.div`
+  .ant-tree {
     font-weight: ${FONT_WEIGHT_MEDIUM};
     color: ${p => p.theme.textColorSnd};
-
     .ant-tree-switcher {
       line-height: 38px;
     }
