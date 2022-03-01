@@ -22,7 +22,7 @@ import {
   getColumnRenderName,
   getGridStyle,
   getStyles,
-  hadAxisOverflowConfig,
+  hadAxisLabelOverflowConfig,
   setOptionsByAxisLabelOverflow,
   toFormattedValue,
   transformToDataSet,
@@ -79,7 +79,7 @@ class WaterfallChart extends Chart {
 
   onResize(opt: any, context): void {
     this.chart?.resize({ width: context?.width, height: context?.height });
-    hadAxisOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
+    hadAxisLabelOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
   }
 
   private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {

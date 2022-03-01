@@ -32,7 +32,7 @@ import {
   getSeriesTooltips4Rectangular2,
   getSplitLine,
   getStyles,
-  hadAxisOverflowConfig,
+  hadAxisLabelOverflowConfig,
   setOptionsByAxisLabelOverflow,
   toFormattedValue,
   transformToDataSet,
@@ -91,7 +91,7 @@ class BasicLineChart extends Chart {
 
   onResize(opt: any, context): void {
     this.chart?.resize({ width: context?.width, height: context?.height });
-    hadAxisOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
+    hadAxisLabelOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
   }
 
   onUnMount(): void {

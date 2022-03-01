@@ -27,7 +27,7 @@ import {
   getReference2,
   getSeriesTooltips4Rectangular2,
   getStyles,
-  hadAxisOverflowConfig,
+  hadAxisLabelOverflowConfig,
   setOptionsByAxisLabelOverflow,
   toFormattedValue,
   transformToDataSet,
@@ -92,7 +92,7 @@ class BasicBarChart extends Chart {
 
   onResize(opt: any, context): void {
     this.chart?.resize({ width: context?.width, height: context?.height });
-    hadAxisOverflowConfig(this.chart?.getOption()) &&
+    hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
       this.onUpdated(opt, context);
   }
 

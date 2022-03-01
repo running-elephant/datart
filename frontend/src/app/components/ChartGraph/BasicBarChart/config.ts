@@ -255,15 +255,6 @@ const config: ChartConfig = {
             step: 40,
             min: 0,
           },
-          watcher: {
-            deps: ['type', 'position'],
-            action: ({ type, position }) => ({
-              hide: !(
-                type === 'scroll' &&
-                (position === 'right' || position === 'left')
-              ),
-            }),
-          },
         },
         {
           label: 'viz.palette.style.font',

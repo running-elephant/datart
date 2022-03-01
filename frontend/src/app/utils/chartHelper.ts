@@ -1359,7 +1359,7 @@ export const getIntervalShow = interval =>
   interval !== 'auto' && interval !== null;
 
 // 判断overflow 条件是否已生效
-export function hadAxisOverflowConfig(
+export function hadAxisLabelOverflowConfig(
   options?: ECBasicOption,
   horizon: boolean = false,
 ) {

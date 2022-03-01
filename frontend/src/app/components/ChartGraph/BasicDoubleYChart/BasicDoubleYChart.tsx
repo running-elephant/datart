@@ -30,7 +30,7 @@ import {
   getSeriesTooltips4Polar2,
   getSplitLine,
   getStyles,
-  hadAxisOverflowConfig,
+  hadAxisLabelOverflowConfig,
   setOptionsByAxisLabelOverflow,
   toFormattedValue,
   transformToDataSet,
@@ -85,7 +85,7 @@ class BasicDoubleYChart extends Chart {
 
   onResize(opt: any, context): void {
     this.chart?.resize(context);
-    hadAxisOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
+    hadAxisLabelOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
   }
 
   private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
