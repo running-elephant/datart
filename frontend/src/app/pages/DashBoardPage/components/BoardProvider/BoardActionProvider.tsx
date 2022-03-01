@@ -34,6 +34,7 @@ import {
 } from '../../pages/Board/slice/thunk';
 import { Widget } from '../../pages/Board/slice/types';
 import { editBoardStackActions } from '../../pages/BoardEditor/slice';
+import { clearActiveWidgets } from '../../pages/BoardEditor/slice/actions/actions';
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
 import {
   getEditChartWidgetDataAsync,
@@ -57,6 +58,7 @@ export interface BoardActionContextProps {
   onWidgetsReset: () => any;
   onSaveAsVizs: () => any;
   boardToggleAllowOverlap: (allow: boolean) => void;
+  onClearActiveWidgets: () => void;
 }
 export const BoardActionContext = createContext<BoardActionContextProps>(
   {} as BoardActionContextProps,
@@ -158,6 +160,9 @@ export const BoardActionProvider: FC<{ id: string }> = ({
     },
     onSaveAsVizs: () => {
       saveAsViz(boardId, 'DASHBOARD');
+    },
+    onClearActiveWidgets: () => {
+      dispatch(clearActiveWidgets());
     },
   };
   return (

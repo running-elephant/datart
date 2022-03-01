@@ -33,23 +33,16 @@
  * limitations under the License.
  */
 
-import React from 'react';
-import { useDispatch } from 'react-redux';
+import { BoardActionContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardActionProvider';
+import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
 import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
-import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
 import { AutoBoardEditor } from './AutoBoardEditor';
 const AutoEditor: React.FC<{}> = () => {
-  const dispatch = useDispatch();
-  const clearSelectedWidgets = e => {
-    e.stopPropagation();
-    dispatch(editWidgetInfoActions.clearSelectedWidgets());
-    dispatch(editDashBoardInfoActions.changeShowBlockMask(true));
-  };
-
+  const { onClearActiveWidgets } = useContext(BoardActionContext);
   return (
-    <Wrapper onClick={clearSelectedWidgets}>
+    <Wrapper onClick={onClearActiveWidgets}>
       <BoardToolBar />
       <Editor>
         <AutoBoardEditor />
