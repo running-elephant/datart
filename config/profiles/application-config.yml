@@ -2,13 +2,12 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://${datasource.ip:localhost}:${datasource.port:3306}/${datasource.database:datart}?&allowMultiQueries=true
+    url: jdbc:mysql://${datasource.ip:null}:${datasource.port:3306}/${datasource.database:datart}?&allowMultiQueries=true&characterEncoding=utf-8
     username: ${datasource.username:root}
     password: ${datasource.password:123456}
 
 # security:
 #   oauth2:
-#     enable: true
 #     client:
 #       registration:
 #         cas:
@@ -61,22 +60,16 @@ spring:
 
 
 server:
-  port: ${datart.port:8080}
-  address: ${datart.ip:127.0.0.1}
-
-  # 开启 gzip 压缩，加快请求和响应速度
-  compression:
-    enabled: true
-    mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
-
+  port: ${server.port:8080}
+  address: ${server.ip:0.0.0.0}
 
 datart:
   server:
-    address: ${datart.address:}
+    address: ${datart.address:http://127.0.0.1:8080}
 
   user:
     active:
-      send-mail: ${datart.send-mail:true}  # 注册用户时是否需要邮件验证激活
+      send-mail: ${datart.send-mail:false}  # 注册用户时是否需要邮件验证激活
 
   security:
     token:
