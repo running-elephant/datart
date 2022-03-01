@@ -1096,7 +1096,7 @@ export function getSeriesTooltips4Rectangular2(
     .concat(sizeConfigs || [])
     .concat(infoConfigs || [])
     .map(config =>
-      valueFormatter(config, row?.[chartDataSet.getFieldKey(config)]),
+      valueFormatter(config, row?.[chartDataSet.getFieldOriginKey(config)]),
     );
   return tooltips.join('<br />');
 }
@@ -1123,7 +1123,7 @@ export function getSeriesTooltips4Polar2(
     .concat(sizeConfigs || [])
     .concat(infoConfigs || [])
     .map(config =>
-      valueFormatter(config, row?.[chartDataSet.getFieldKey(config)]),
+      valueFormatter(config, row?.[chartDataSet.getFieldOriginKey(config)]),
     );
   return tooltips.join('<br />');
 }
