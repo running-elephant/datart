@@ -71,8 +71,8 @@ export class ChartDataSet<T>
   extends ChartDataSetBase
   implements IChartDataSet<T>
 {
-  public columnIndexTable: ColumnIndexTable = {};
-  public originalFields?: ChartDataSectionField[];
+  private columnIndexTable: ColumnIndexTable = {};
+  private originalFields?: ChartDataSectionField[];
 
   constructor(
     columns: T[][],
