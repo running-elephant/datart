@@ -104,6 +104,7 @@ const DataModelBranch: FC<{
             {node?.children?.map(childNode => (
               <DataModelNode
                 node={childNode}
+                key={childNode.name}
                 getPermissionButton={getPermissionButton}
                 onMoveToHierarchy={onMoveToHierarchy}
                 onNodeTypeChange={onNodeTypeChange}
@@ -118,7 +119,12 @@ const DataModelBranch: FC<{
     });
 
     return (
-      <Draggable key={node?.name} draggableId={node?.name} index={node?.index}>
+      <Draggable
+        key={node?.name}
+        draggableId={node?.name}
+        index={node?.index}
+        isDragDisabled={true}
+      >
         {(draggableProvided, draggableSnapshot) => {
           return (
             <StyledDataModelBranch
