@@ -24,6 +24,7 @@ import com.alibaba.fastjson.JSONObject;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
+import datart.core.common.TaskExecutor;
 import datart.core.data.provider.DataProviderConfigTemplate;
 import datart.core.data.provider.DataProviderSource;
 import datart.core.data.provider.SchemaInfo;
@@ -231,6 +232,13 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     private void updateJdbcSourceSyncJob(Source source) {
+        TaskExecutor.submit(() -> {
+            try {
+                new SchemaSyncJob().execute(source.getId());
+            } catch (Exception e) {
+                log.error("source schema sync error", e);
+            }
+        });
         try {
             DataProviderSource dataProviderSource = dataProviderService.parseDataProviderConfig(source);
 
