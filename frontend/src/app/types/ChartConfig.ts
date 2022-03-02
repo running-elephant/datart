@@ -210,6 +210,8 @@ export const ChartStyleSectionComponentType = {
   FontAlignment: 'fontAlignment',
   NameLocation: 'nameLocation',
   LegendType: 'legendType',
+  ScorecardListTemplate: 'scorecardListTemplate',
+  ScorecardConditionStyle: 'scorecardConditionStyle',
 };
 
 export type ChartConfigBase = {

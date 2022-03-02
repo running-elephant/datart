@@ -26,6 +26,10 @@ const config: ChartConfig = {
       key: 'metrics',
       required: true,
       type: 'aggregate',
+      actions: {
+        NUMERIC: ['aggregate', 'alias', 'format', 'sortable'],
+        STRING: ['aggregate', 'alias', 'format', 'sortable'],
+      },
       limit: 1,
     },
     {
@@ -36,6 +40,50 @@ const config: ChartConfig = {
     },
   ],
   styles: [
+    {
+      label: 'common.conditionStyle',
+      key: 'scorecardConditionStyle',
+      comType: 'group',
+      rows: [
+        {
+          label: 'conditionStyle.open',
+          key: 'modal',
+          comType: 'group',
+          options: { type: 'modal', modalSize: 'middle' },
+          rows: [
+            {
+              label: 'column.list',
+              key: 'list',
+              comType: 'scorecardListTemplate',
+              rows: [],
+              options: {
+                getItems: cols => {
+                  const columns = (cols || [])
+                    .filter(col => ['metrics'].includes(col.key))
+                    .reduce((acc, cur) => acc.concat(cur.rows || []), [])
+                    .map(c => ({
+                      key: c.uid,
+                      value: c.uid,
+                      type: c.type,
+                      label:
+                        c.label || c.aggregate
+                          ? `${c.aggregate}(${c.colName})`
+                          : c.colName,
+                    }));
+                  return columns;
+                },
+              },
+              template: {
+                label: 'common.listItem',
+                key: 'listItem',
+                comType: 'group',
+                rows: [],
+              },
+            },
+          ],
+        },
+      ],
+    },
     {
       label: 'data.title',
       key: 'data',
@@ -292,6 +340,7 @@ const config: ChartConfig = {
             right: '右',
             bottom: '下',
           },
+          conditionStyle: '条件样式',
           alignment: '对齐方式',
           alignmentType: {
             start: '头部对齐',
@@ -306,6 +355,9 @@ const config: ChartConfig = {
         data: {
           title: '数据',
         },
+        conditionStyle: {
+          open: '打开样式设置',
+        },
       },
     },
     {
@@ -319,6 +371,7 @@ const config: ChartConfig = {
             right: 'Right',
             bottom: 'Bottom',
           },
+          conditionStyle: 'Condition Style',
           useAutoFontSize: 'Use Auto Font Size',
           autoCoefficient: 'Auto Coefficient',
           fixedFontSize: 'Fixed Font Size',
@@ -335,6 +388,9 @@ const config: ChartConfig = {
         },
         data: {
           title: 'Data',
+        },
+        conditionStyle: {
+          open: 'Open Style Setting',
         },
       },
     },
