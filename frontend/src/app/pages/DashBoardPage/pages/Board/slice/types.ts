@@ -79,6 +79,11 @@ export interface ServerDashboard extends Omit<Dashboard, 'config'> {
   datacharts: ServerDatachart[];
   widgets: ServerWidget[];
 }
+export interface SpecialContainerConfig {
+  controllerGroup: {
+    position: 'top' | 'bottom' | 'left' | 'right';
+  };
+}
 export interface DashboardConfig {
   version: string;
   background: BackgroundConfig;
@@ -104,6 +109,9 @@ export interface DashboardConfig {
   height: number;
   gridStep: [number, number];
   scaleMode: ScaleModeType;
+
+  // Special
+  specialContainerConfig: SpecialContainerConfig;
 }
 export const BoardTypeMap = strEnumType(['auto', 'free']);
 export type BoardType = keyof typeof BoardTypeMap;

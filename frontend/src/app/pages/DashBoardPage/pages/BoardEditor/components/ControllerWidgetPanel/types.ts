@@ -1,5 +1,6 @@
 import { RadioGroupOptionType } from 'antd/lib/radio';
 import {
+  ControllerPositionType,
   ControllerVisibleType,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
@@ -48,6 +49,14 @@ export interface ControllerConfig {
   radioButtonType?: RadioGroupOptionType; //按钮样式
 
   sliderConfig?: SliderConfig;
+
+  positionOptions?: PositionOptionsConfig;
+}
+
+export interface PositionOptionsConfig {
+  type: ControllerPositionType;
+  width: number;
+  rank: number;
 }
 
 export interface ControllerDate {

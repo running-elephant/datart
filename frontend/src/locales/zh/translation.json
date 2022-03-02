@@ -346,6 +346,11 @@
           "left": "左对齐",
           "center": "居中",
           "right": "右对齐"
+        },
+        "controllerPositionTypes": {
+          "fixed": "固定",
+          "normal": "正常",
+          "affix": "固钉"
         }
       },
       "filter": {
@@ -840,6 +845,10 @@
         "rowHeight": "行高",
         "scaleMode": "缩放模式",
         "queryMode": "查询模式",
+        "specialContainer": "特殊模块配置",
+        "controllerGroupPosition": "过滤栏位置",
+        "fixedToTop": "固定在上方",
+        "fixedToBottom": "固定在下方",
         "openInitQuery": "开启初始化查询",
         "cutIn": "切入",
         "cutOut": "切出",
@@ -961,6 +970,11 @@
       "selectDefaultValue": "选择默认值",
       "defaultValue": "默认值",
       "visibility": "是否显示",
+      "position": "控制器位置",
+      "positionPlaceholder": "请选择模式",
+      "widthPlaceholder": "请选择宽度",
+      "widthRatio": "宽度占比",
+      "rankPlaceholder": "数字越小越靠前展示",
       "sqlOperator": "对应关系",
       "dateType": "日期类型",
       "step": "步长",

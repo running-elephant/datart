@@ -24,6 +24,7 @@ import {
   DashboardConfig,
   DataChart,
   DeviceType,
+  RectConfig,
   ServerDashboard,
   ServerDatachart,
   Widget,
@@ -31,6 +32,7 @@ import {
 import { ChartDataView } from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
 import { transformMeta } from 'app/utils/internalChartHelper';
+import { Layouts } from 'react-grid-layout';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
@@ -158,6 +160,11 @@ export const getInitBoardConfig = (boardType?: BoardType) => {
     height: 1080,
     gridStep: [10, 10],
     scaleMode: 'scaleWidth',
+    specialContainerConfig: {
+      controllerGroup: {
+        position: 'top',
+      },
+    },
   };
   return dashboardConfig;
 };
@@ -189,4 +196,35 @@ export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
     viewViews.push(viewView);
   });
   return viewViews;
+};
+export const getBoardLayoutMap = (widgets: Record<string, Widget>): Layouts => {
+  const layoutMap: Layouts = {
+    lg: [],
+    xs: [],
+  };
+
+  Object.values(widgets).forEach(widget => {
+    const lg: RectConfig =
+      widget.config.rect || widget.config.mobileRect || ({} as RectConfig);
+    const xs: RectConfig =
+      widget.config.mobileRect || widget.config.rect || ({} as RectConfig);
+    const lock = widget.config.lock;
+    layoutMap.lg.push({
+      i: widget.id,
+      x: lg.x,
+      y: lg.y,
+      w: lg.width,
+      h: lg.height,
+      static: lock,
+    });
+    layoutMap.xs.push({
+      i: widget.id,
+      x: xs.x,
+      y: xs.y,
+      w: xs.width,
+      h: xs.height,
+      static: lock,
+    });
+  });
+  return layoutMap;
 };

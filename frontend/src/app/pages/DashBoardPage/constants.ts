@@ -78,6 +78,14 @@ export const BackgroundDefault: BackgroundConfig = {
   repeat: 'no-repeat', //'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat',
 };
 
+export const ControllerWidthSize = {
+  '16.67%': 4,
+  '25%': 6,
+  '33.33%': 8,
+  '50%': 12,
+  '100%': 24,
+};
+
 export const AutoBoardWidgetBackgroundDefault: BackgroundConfig = {
   ...BackgroundDefault,
   color: WHITE,
@@ -170,6 +178,16 @@ export const enum ControllerVisibleTypes {
   Hide = 'hide',
   Condition = 'condition',
 }
+
+export const enum ControllerPositionTypes {
+  Fixed = 'fixed',
+  Normal = 'normal',
+  Affix = 'affix',
+}
+
+export type ControllerPositionType = Uncapitalize<
+  keyof typeof ControllerPositionTypes
+>;
 export type ControllerVisibleType = Uncapitalize<
   keyof typeof ControllerVisibleTypes
 >;
@@ -179,6 +197,10 @@ const tfo = (operator: FilterSqlOperator) => {
 };
 const tft = (type: ControllerVisibleTypes) => {
   const preStr = 'viz.common.enum.controllerVisibilityTypes.';
+  return i18next.t(preStr + type);
+};
+const tfp = (type: ControllerPositionTypes) => {
+  const preStr = 'viz.common.enum.controllerPositionTypes.';
   return i18next.t(preStr + type);
 };
 const getVisibleOptionItem = (type: ControllerVisibleTypes) => {
@@ -193,11 +215,28 @@ const getOperatorItem = (value: FilterSqlOperator) => {
     value: value,
   };
 };
+const getPositionTypesItem = (value: ControllerPositionTypes) => {
+  return {
+    name: tfp(value),
+    value: value,
+  };
+};
 export const VISIBILITY_TYPE_OPTION = [
   getVisibleOptionItem(ControllerVisibleTypes.Show),
   getVisibleOptionItem(ControllerVisibleTypes.Hide),
   getVisibleOptionItem(ControllerVisibleTypes.Condition),
 ];
+export const FIXED_TYPE_OPTION = {
+  auto: [
+    getPositionTypesItem(ControllerPositionTypes.Normal),
+    getPositionTypesItem(ControllerPositionTypes.Fixed),
+    getPositionTypesItem(ControllerPositionTypes.Affix),
+  ],
+  free: [
+    getPositionTypesItem(ControllerPositionTypes.Normal),
+    getPositionTypesItem(ControllerPositionTypes.Fixed),
+  ],
+};
 export const ALL_SQL_OPERATOR_OPTIONS = [
   getOperatorItem(FilterSqlOperator.Equal),
   getOperatorItem(FilterSqlOperator.NotEqual),

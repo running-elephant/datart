@@ -39,6 +39,7 @@ import { useDispatch } from 'react-redux';
 import { editBoardStackActions } from '../../slice';
 import BackgroundSet from './SettingItem/BackgroundSet';
 import NumberSet from './SettingItem/BasicSet/NumberSet';
+import ControllerGroupSet from './SettingItem/ControllerGroupSet';
 import InitialQuerySet from './SettingItem/InitialQuerySet';
 import ScaleModeSet from './SettingItem/ScaleModeSet';
 import { Group, SettingPanel } from './SettingPanel';
@@ -78,6 +79,7 @@ export const BoardSetting: FC = memo(() => {
       mobilePaddingLR,
       mobilePaddingTB,
       initialQuery: boardConfig.initialQuery,
+      specialContainerConfig: boardConfig.specialContainerConfig,
     };
     form.setFieldsValue({ ...cacheValue.current });
   }, [boardConfig, form]);
@@ -99,6 +101,7 @@ export const BoardSetting: FC = memo(() => {
           value.mobilePaddingLR,
           value.mobilePaddingTB,
         ];
+        draft.specialContainerConfig = value.specialContainerConfig;
 
         draft.initialQuery = value.initialQuery;
       });
@@ -203,6 +206,15 @@ export const BoardSetting: FC = memo(() => {
                 name="initialQuery"
                 label={t('openInitQuery')}
               ></InitialQuerySet>
+            </Group>
+          </Panel>
+          <Panel
+            header={t('specialContainer')}
+            key="specialContainer"
+            forceRender
+          >
+            <Group>
+              <ControllerGroupSet />
             </Group>
           </Panel>
         </Collapse>

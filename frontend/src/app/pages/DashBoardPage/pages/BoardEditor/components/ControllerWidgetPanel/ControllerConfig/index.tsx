@@ -26,6 +26,7 @@ import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
+import ControllerPosition from './ControllerPosition';
 import ControllerVisibility from './ControllerVisibility';
 import { RadioStyleForm } from './OtherSet.tsx/RadioStyle/RadioStyleForm';
 import { SliderMarks } from './OtherSet.tsx/SliderStyle/SliderMarks';
@@ -71,7 +72,7 @@ export interface RelatedViewFormProps {
 }
 
 export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
-  ({ controllerType, form, viewMap, otherStrFilterWidgets }) => {
+  ({ controllerType, form, viewMap, otherStrFilterWidgets, boardType }) => {
     const tc = useI18NPrefix('viz.control');
     const tgb = useI18NPrefix('global.button');
     const hasRadio = useMemo(() => {
@@ -115,6 +116,13 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
         <ControllerVisibility
           otherStrFilterWidgets={otherStrFilterWidgets}
           form={form}
+        />
+
+        {/* TM 是否固定 */}
+        <ControllerPosition
+          otherStrFilterWidgets={otherStrFilterWidgets}
+          form={form}
+          boardType={boardType}
         />
       </Wrap>
     );

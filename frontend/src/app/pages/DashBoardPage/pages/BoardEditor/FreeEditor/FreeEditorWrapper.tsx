@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
+import BoardLayout from 'app/pages/DashBoardPage/components/BoardLayout';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
-import React, { useContext } from 'react';
+import { splitWidget } from 'app/pages/DashBoardPage/utils/widget';
+import React, { useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import SlideBackground from '../../../components/FreeBoardBackground';
@@ -34,14 +36,21 @@ export const FreeEditorWrapper: React.FC<{}> = () => {
     width: boardWidth,
     height: boardHeight,
     scaleMode,
+    specialContainerConfig,
   } = useContext(BoardConfigContext);
   const { editing, autoFit } = useContext(BoardContext);
 
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
-  const sortedLayoutWidgets = Object.values(layoutWidgetMap).sort(
-    (a, b) => a.config.index - b.config.index,
-  );
+  const [sortedLayoutWidgets, controllerWidgetOfFixed] = useMemo(() => {
+    const { widgets, controllerWidgetOfFixed } = splitWidget(
+      Object.values(layoutWidgetMap).sort(
+        (a, b) => a.config.index - b.config.index,
+      ),
+    );
+    return [widgets, controllerWidgetOfFixed];
+  }, [layoutWidgetMap]);
   const visible = useVisibleHidden();
+
   const [rect, refGridBackground] = useClientRect<HTMLDivElement>();
   const {
     zoomIn,
@@ -55,27 +64,32 @@ export const FreeEditorWrapper: React.FC<{}> = () => {
 
   return (
     <Container>
-      <div
-        className="grid-background"
-        style={{ ...nextBackgroundStyle, visibility: visible }}
-        ref={refGridBackground}
+      <BoardLayout
+        editor={true}
+        config={specialContainerConfig}
+        controllerGroup={controllerWidgetOfFixed}
       >
-        <SlideBackground scale={scale} slideTranslate={slideTranslate}>
-          {sortedLayoutWidgets.map(widgetConfig => (
-            <WidgetAllProvider key={widgetConfig.id} id={widgetConfig.id}>
-              <WidgetOfFreeEdit />
-            </WidgetAllProvider>
-          ))}
-        </SlideBackground>
-      </div>
-
-      <ZoomControl
-        sliderValue={sliderValue}
-        scale={scale}
-        zoomIn={zoomIn}
-        zoomOut={zoomOut}
-        sliderChange={sliderChange}
-      />
+        <div
+          className="grid-background"
+          style={{ ...nextBackgroundStyle, visibility: visible }}
+          ref={refGridBackground}
+        >
+          <SlideBackground scale={scale} slideTranslate={slideTranslate}>
+            {sortedLayoutWidgets.map(widgetConfig => (
+              <WidgetAllProvider key={widgetConfig.id} id={widgetConfig.id}>
+                <WidgetOfFreeEdit />
+              </WidgetAllProvider>
+            ))}
+          </SlideBackground>
+        </div>
+        <ZoomControl
+          sliderValue={sliderValue}
+          scale={scale}
+          zoomIn={zoomIn}
+          zoomOut={zoomOut}
+          sliderChange={sliderChange}
+        />
+      </BoardLayout>
     </Container>
   );
 };

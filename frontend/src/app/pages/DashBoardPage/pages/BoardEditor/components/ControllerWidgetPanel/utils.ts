@@ -190,6 +190,11 @@ export const getInitControllerConfig = () => {
     sqlOperator: FilterSqlOperator.Equal,
     controllerValues: [],
     valueOptions: [],
+    positionOptions: {
+      type: 'normal',
+      width: 4,
+      rank: 0,
+    },
   };
   return config;
 };

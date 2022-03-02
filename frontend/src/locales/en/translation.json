@@ -346,6 +346,11 @@
           "left": "Left",
           "center": "Center",
           "right": "right"
+        },
+        "controllerPositionTypes": {
+          "fixed": "Fixed",
+          "normal": "Normal",
+          "affix": "Affix"
         }
       },
       "filter": {
@@ -840,6 +845,10 @@
         "rowHeight": "rowHeight",
         "scaleMode": "scale Mode",
         "queryMode": "query Mode",
+        "specialContainer": "Special Container",
+        "controllerGroupPosition": "Controller Group Position",
+        "fixedToTop": "Fixed To Top",
+        "fixedToBottom": "Fixed To Bottom",
         "openInitQuery": "open Init Query",
         "cutIn": "Cut In",
         "cutOut": "Cut Out",
@@ -961,6 +970,11 @@
       "selectDefaultValue": "Select DefaultValue",
       "defaultValue": "Default Value",
       "visibility": "Visibility",
+      "position": "Position",
+      "positionPlaceholder": "Please Select Type",
+      "widthPlaceholder": "Please Select Width",
+      "widthRatio": "Width Ratio",
+      "fixedRankPlaceholder": "The smaller the number, the more advanced it is",
       "sqlOperator": "Sql Operator",
       "dateType": "Date Type",
       "step": "Step",

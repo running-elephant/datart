@@ -16,11 +16,13 @@
  * limitations under the License.
  */
 
-import { Empty } from 'antd';
+import { Affix, Empty } from 'antd';
 import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
 import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
+import BoardLayout from 'app/pages/DashBoardPage/components/BoardLayout';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
+import UseCSSPosition from 'app/pages/DashBoardPage/components/UseCSSPosition';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
   BREAK_POINT_MAP,
@@ -35,8 +37,11 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import {
   BoardState,
+  ControllerWidgetContent,
   DeviceType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { getBoardLayoutMap } from 'app/pages/DashBoardPage/utils/board';
+import { splitWidget } from 'app/pages/DashBoardPage/utils/widget';
 import React, {
   memo,
   RefObject,
@@ -69,6 +74,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       mobileMargin,
       mobileContainerPadding,
       allowOverlap,
+      specialContainerConfig,
     } = useContext(BoardConfigContext);
 
     // console.log('_ core allowOverlap ', allowOverlap);
@@ -85,14 +91,14 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       selectLayoutWidgetInfoMapById(state, boardId),
     );
 
-    const sortedLayoutWidgets = useMemo(
-      () =>
+    const [sortedLayoutWidgets, controllerWidgetOfFixed] = useMemo(() => {
+      const { widgets, controllerWidgetOfFixed } = splitWidget(
         Object.values(layoutWidgetMap).sort(
           (a, b) => a.config.index - b.config.index,
         ),
-
-      [layoutWidgetMap],
-    );
+      );
+      return [widgets, controllerWidgetOfFixed];
+    }, [layoutWidgetMap]);
 
     const [deviceType, setDeviceType] = useState<DeviceType>(
       DeviceType.Desktop,
@@ -137,32 +143,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     ]);
     const [layoutMap, setLayoutMap] = useState<Layouts>({});
     useEffect(() => {
-      const layoutMap: Layouts = {
-        lg: [],
-        xs: [],
-      };
-      Object.values(layoutWidgetMap).forEach(widget => {
-        const lg = widget.config.rect || widget.config.mobileRect || {};
-        const xs = widget.config.mobileRect || widget.config.rect || {};
-        const lock = widget.config.lock;
-        layoutMap.lg.push({
-          i: widget.id,
-          x: lg.x,
-          y: lg.y,
-          w: lg.width,
-          h: lg.height,
-          static: lock,
-        });
-        layoutMap.xs.push({
-          i: widget.id,
-          x: xs.x,
-          y: xs.y,
-          w: xs.width,
-          h: xs.height,
-          static: lock,
-        });
-      });
-      setLayoutMap(layoutMap);
+      setLayoutMap(getBoardLayoutMap(layoutWidgetMap));
     }, [layoutWidgetMap]);
 
     useEffect(() => {
@@ -193,6 +174,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
           );
 
           if (waitingItems.length > 0) {
+            if (!gridWrapRef.current) return;
             const { offsetHeight, scrollTop } = gridWrapRef.current! || {};
             waitingItems.forEach(item => {
               const itemTop = calcItemTop(item.id);
@@ -236,11 +218,24 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
 
     const boardChildren = useMemo(() => {
       return sortedLayoutWidgets.map(item => {
+        const children = (
+          <WidgetAllProvider id={item.id}>
+            <WidgetOfAuto />
+          </WidgetAllProvider>
+        );
+        if (
+          (item.config.content as ControllerWidgetContent)?.config
+            ?.positionOptions?.type === 'affix'
+        ) {
+          return (
+            <UseCSSPosition className="block-item" key={item.id}>
+              <Affix target={() => gridWrapRef.current}>{children}</Affix>
+            </UseCSSPosition>
+          );
+        }
         return (
           <div className="block-item" key={item.id}>
-            <WidgetAllProvider id={item.id}>
-              <WidgetOfAuto />
-            </WidgetAllProvider>
+            {children}
           </div>
         );
       });
@@ -253,33 +248,38 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
           ref={ref}
           style={{ visibility: visible }}
         >
-          {sortedLayoutWidgets.length ? (
-            <div className="grid-wrap" ref={gridWrapRef}>
-              <div className="grid-wrap" ref={gridRef}>
-                <ResponsiveGridLayout
-                  layouts={layoutMap}
-                  breakpoints={BREAK_POINT_MAP}
-                  margin={curMargin}
-                  containerPadding={curPadding}
-                  cols={LAYOUT_COLS_MAP}
-                  rowHeight={widgetRowHeight}
-                  onLayoutChange={onLayoutChange}
-                  onBreakpointChange={onBreakpointChange}
-                  isDraggable={false}
-                  isResizable={false}
-                  allowOverlap={allowOverlap}
-                  measureBeforeMount={false}
-                  useCSSTransforms={true}
-                >
-                  {boardChildren}
-                </ResponsiveGridLayout>
+          <BoardLayout
+            config={specialContainerConfig}
+            controllerGroup={controllerWidgetOfFixed}
+          >
+            {sortedLayoutWidgets.length ? (
+              <div className="grid-wrap" ref={gridWrapRef}>
+                <div className="grid-wrap" ref={gridRef}>
+                  <ResponsiveGridLayout
+                    layouts={layoutMap}
+                    breakpoints={BREAK_POINT_MAP}
+                    margin={curMargin}
+                    containerPadding={curPadding}
+                    cols={LAYOUT_COLS_MAP}
+                    rowHeight={widgetRowHeight}
+                    onLayoutChange={onLayoutChange}
+                    onBreakpointChange={onBreakpointChange}
+                    isDraggable={false}
+                    isResizable={false}
+                    allowOverlap={allowOverlap}
+                    measureBeforeMount={false}
+                    useCSSTransforms={true}
+                  >
+                    {boardChildren}
+                  </ResponsiveGridLayout>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="empty">
-              <Empty description="" />
-            </div>
-          )}
+            ) : (
+              <div className="empty">
+                <Empty description="" />
+              </div>
+            )}
+          </BoardLayout>
         </StyledContainer>
       </Wrap>
     );

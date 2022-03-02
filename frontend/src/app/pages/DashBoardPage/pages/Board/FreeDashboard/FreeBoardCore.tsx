@@ -17,12 +17,14 @@
  */
 import { Empty } from 'antd';
 import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
+import BoardLayout from 'app/pages/DashBoardPage/components/BoardLayout';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import { selectLayoutWidgetMapById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { splitWidget } from 'app/pages/DashBoardPage/utils/widget';
 import React, { memo, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -42,6 +44,7 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
       width: slideWidth,
       height: slideHeight,
       scaleMode,
+      specialContainerConfig,
     } = useContext(BoardConfigContext);
     const { editing, autoFit } = useContext(BoardContext);
 
@@ -49,10 +52,13 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
       selectLayoutWidgetMapById()(state, boardId),
     );
     const visible = useVisibleHidden();
-    const widgetConfigs = useMemo(() => {
-      return Object.values(widgetConfigRecords).sort((w1, w2) => {
-        return w1.config.index - w2.config.index;
-      });
+    const [widgetConfigs, controllerWidgetOfFixed] = useMemo(() => {
+      const { widgets, controllerWidgetOfFixed } = splitWidget(
+        Object.values(widgetConfigRecords).sort((w1, w2) => {
+          return w1.config.index - w2.config.index;
+        }),
+      );
+      return [widgets, controllerWidgetOfFixed];
     }, [widgetConfigRecords]);
 
     const [rect, refGridBackground] = useClientRect<HTMLDivElement>();
@@ -89,30 +95,35 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
           ref={gridRef}
           style={{ visibility: visible }}
         >
-          <div
-            className="grid-background"
-            style={nextBackgroundStyle}
-            ref={refGridBackground}
+          <BoardLayout
+            config={specialContainerConfig}
+            controllerGroup={controllerWidgetOfFixed}
           >
-            <SlideBackground scale={scale} slideTranslate={slideTranslate}>
-              {widgetConfigs.length ? (
-                boardChildren
-              ) : (
-                <div className="empty">
-                  <Empty description="" />
-                </div>
-              )}
-            </SlideBackground>
-          </div>
-          {showZoomCtrl && (
-            <ZoomControl
-              sliderValue={sliderValue}
-              scale={scale}
-              zoomIn={zoomIn}
-              zoomOut={zoomOut}
-              sliderChange={sliderChange}
-            />
-          )}
+            <div
+              className="grid-background"
+              style={nextBackgroundStyle}
+              ref={refGridBackground}
+            >
+              <SlideBackground scale={scale} slideTranslate={slideTranslate}>
+                {widgetConfigs.length ? (
+                  boardChildren
+                ) : (
+                  <div className="empty">
+                    <Empty description="" />
+                  </div>
+                )}
+              </SlideBackground>
+            </div>
+            {showZoomCtrl && (
+              <ZoomControl
+                sliderValue={sliderValue}
+                scale={scale}
+                zoomIn={zoomIn}
+                zoomOut={zoomOut}
+                sliderChange={sliderChange}
+              />
+            )}
+          </BoardLayout>
         </div>
       </Wrap>
     );

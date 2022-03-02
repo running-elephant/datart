@@ -888,3 +888,31 @@ export const getWidgetMap = (
     controllerWidgets,
   };
 };
+
+export const splitWidget = (
+  widgets: Widget[],
+): {
+  widgets: Widget[];
+  controllerWidgetOfFixed: Widget[];
+} =>
+  widgets.reduce<{
+    widgets: Widget[];
+    controllerWidgetOfFixed: Widget[];
+  }>(
+    (acc, widget) => {
+      const { config } = widget;
+      if (
+        (config.content as ControllerWidgetContent)?.config?.positionOptions
+          ?.type === 'fixed'
+      ) {
+        acc.controllerWidgetOfFixed.push(widget);
+        return acc;
+      }
+      acc.widgets.push(widget);
+      return acc;
+    },
+    {
+      controllerWidgetOfFixed: [],
+      widgets: [],
+    },
+  );
