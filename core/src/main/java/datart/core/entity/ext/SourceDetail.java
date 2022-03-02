@@ -16,20 +16,21 @@
  * limitations under the License.
  */
 
-package datart.server.service;
+package datart.core.entity.ext;
 
-import datart.core.data.provider.SchemaInfo;
 import datart.core.entity.Source;
-import datart.core.mappers.ext.SourceMapperExt;
+import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
-import java.util.List;
+import java.util.Date;
 
-public interface SourceService extends BaseCRUDService<Source, SourceMapperExt> {
+@Data
+public class SourceDetail extends Source {
 
-    List<Source> listSources(String orgId,boolean active);
+    private Date schemaUpdateDate;
 
-    SchemaInfo getSourceSchemaInfo(String sourceId);
-
-    SchemaInfo syncSourceSchema(String sourceId) throws Exception;
+    public SourceDetail(Source source) {
+        BeanUtils.copyProperties(source, this);
+    }
 
 }
