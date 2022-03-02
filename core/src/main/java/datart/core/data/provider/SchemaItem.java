@@ -20,21 +20,13 @@ package datart.core.data.provider;
 
 import lombok.Data;
 
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 @Data
-public class SchemaInfo {
+public class SchemaItem {
 
-    private List<SchemaItem> schemaItems;
+    private String dbName;
 
-    private Date updateTime;
-
-    public static SchemaInfo empty() {
-        SchemaInfo schemaInfo = new SchemaInfo();
-        schemaInfo.setSchemaItems(Collections.emptyList());
-        return schemaInfo;
-    }
+    private List<TableInfo> tables;
 
 }
