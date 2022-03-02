@@ -44,7 +44,11 @@ import {
   Model,
 } from '../../../slice/types';
 import Container from '../Container';
-import { ALLOW_COMBINE_COLUMN_TYPES, ROOT_CONTAINER_ID, TreeNodeHierarchy } from './constant';
+import {
+  ALLOW_COMBINE_COLUMN_TYPES,
+  ROOT_CONTAINER_ID,
+  TreeNodeHierarchy,
+} from './constant';
 import DataModelBranch from './DataModelBranch';
 import DataModelNode from './DataModelNode';
 
@@ -156,50 +160,51 @@ const DataModelTree: FC = memo(() => {
     handleDataModelHierarchyChange(newHierarchy);
   };
 
-  const handleNodeTypeChange =
-    (node: Column) =>
-    ({ key }) => {
+  const handleNodeTypeChange = (type, name) => {
+    const targetNode = tableColumns?.find(n => n.name === name);
+    if (targetNode) {
       let newNode;
-      if (key.includes('category')) {
-        const category = key.split('-')[1];
-        newNode = { ...node, category };
+      if (type.includes('category')) {
+        const category = type.split('-')[1];
+        newNode = { ...targetNode, category };
       } else {
-        newNode = { ...node, type: key };
+        newNode = { ...targetNode, type: type };
       }
-      const targetNode = tableColumns?.find(n => n.name === node?.name);
-      if (targetNode) {
-        const newHierarchy = updateNode(
-          tableColumns,
-          newNode,
-          targetNode.index,
-        );
-        handleDataModelHierarchyChange(newHierarchy);
-        return;
+      const newHierarchy = updateNode(tableColumns, newNode, targetNode.index);
+      handleDataModelHierarchyChange(newHierarchy);
+      return;
+    }
+    const targetBranch = tableColumns?.find(b => {
+      if (b.children) {
+        return b.children?.find(bn => bn.name === name);
       }
-      const targetBranch = tableColumns?.find(b => {
-        if (b.children) {
-          return b.children?.find(bn => bn.name === node?.name);
-        }
-        return false;
-      });
-      if (!!targetBranch) {
-        const newNodeIndex = targetBranch.children?.findIndex(
-          bn => bn.name === node?.name,
-        );
-        if (newNodeIndex !== undefined && newNodeIndex > -1) {
-          const newTargetBranch = CloneValueDeep(targetBranch);
-          if (newTargetBranch.children) {
-            newTargetBranch.children[newNodeIndex] = newNode;
-            const newHierarchy = updateNode(
-              tableColumns,
-              newTargetBranch,
-              newTargetBranch.index,
-            );
-            handleDataModelHierarchyChange(newHierarchy);
+      return false;
+    });
+    if (!!targetBranch) {
+      const newNodeIndex = targetBranch.children?.findIndex(
+        bn => bn.name === name,
+      );
+      if (newNodeIndex !== undefined && newNodeIndex > -1) {
+        const newTargetBranch = CloneValueDeep(targetBranch);
+        if (newTargetBranch.children) {
+          let newNode = newTargetBranch.children[newNodeIndex];
+          if (type.includes('category')) {
+            const category = type.split('-')[1];
+            newNode = { ...newNode, category };
+          } else {
+            newNode = { ...newNode, type: type };
           }
+          newTargetBranch.children[newNodeIndex] = newNode;
+          const newHierarchy = updateNode(
+            tableColumns,
+            newTargetBranch,
+            newTargetBranch.index,
+          );
+          handleDataModelHierarchyChange(newHierarchy);
         }
       }
-    };
+    }
+  };
 
   const handleDataModelHierarchyChange = hierarchy => {
     setHierarchy(hierarchy);
@@ -211,7 +216,6 @@ const DataModelTree: FC = memo(() => {
   };
 
   const handleDragEnd = result => {
-    console.log(`result ---> `, result);
     if (Boolean(result.destination) && isEmpty(result?.combine)) {
       const newHierarchy = reorderNode(
         CloneValueDeep(tableColumns),
@@ -604,7 +608,7 @@ const DataModelTree: FC = memo(() => {
                     node={col}
                     key={col.name}
                     getPermissionButton={getPermissionButton}
-                    onNodeTypeChange={handleNodeTypeChange(col)}
+                    onNodeTypeChange={handleNodeTypeChange}
                     onMoveToHierarchy={openMoveToHierarchyModal}
                     onEditBranch={openEditBranchModal}
                     onDelete={handleDeleteBranch}
@@ -615,7 +619,7 @@ const DataModelTree: FC = memo(() => {
                     key={col.name}
                     getPermissionButton={getPermissionButton}
                     onCreateHierarchy={openCreateHierarchyModal}
-                    onNodeTypeChange={handleNodeTypeChange(col)}
+                    onNodeTypeChange={handleNodeTypeChange}
                     onMoveToHierarchy={openMoveToHierarchyModal}
                   />
                 );

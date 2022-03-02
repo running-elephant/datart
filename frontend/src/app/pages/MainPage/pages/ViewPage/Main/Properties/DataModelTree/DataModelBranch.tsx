@@ -34,6 +34,7 @@ import {
   SPACE_UNIT,
   YELLOW,
 } from 'styles/StyleConstants';
+import { ColumnTypes } from '../../../constants';
 import { Column } from '../../../slice/types';
 import { TreeNodeHierarchy } from './constant';
 import DataModelNode from './DataModelNode';
@@ -41,7 +42,7 @@ import DataModelNode from './DataModelNode';
 const DataModelBranch: FC<{
   node: Column;
   getPermissionButton: (name) => JSX.Element;
-  onNodeTypeChange;
+  onNodeTypeChange: (type: any, name: string) => void;
   onMoveToHierarchy: (node: Column) => void;
   onEditBranch;
   onDelete: (node: Column) => void;
@@ -107,16 +108,24 @@ const DataModelBranch: FC<{
                 key={childNode.name}
                 getPermissionButton={getPermissionButton}
                 onMoveToHierarchy={onMoveToHierarchy}
-                onNodeTypeChange={onNodeTypeChange}
+                onNodeTypeChange={handleBranchNodeTypeChange}
               />
             ))}
           </div>
         </>
       );
     };
+
     const getListStyle = isDraggingOver => ({
       background: isDraggingOver ? 'lightblue' : 'lightgrey',
     });
+
+    const handleBranchNodeTypeChange = (type: any, name: string) => {
+      if (type === ColumnTypes.Number) {
+        return;
+      }
+      return onNodeTypeChange(type, name);
+    };
 
     return (
       <Draggable

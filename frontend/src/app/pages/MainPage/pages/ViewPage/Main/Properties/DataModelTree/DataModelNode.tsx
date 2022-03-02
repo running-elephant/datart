@@ -45,7 +45,7 @@ import { ALLOW_COMBINE_COLUMN_TYPES } from './constant';
 const DataModelNode: FC<{
   node: Column;
   getPermissionButton: (name) => JSX.Element;
-  onNodeTypeChange: (item: any) => void;
+  onNodeTypeChange: (type: any, name: string) => void;
   onMoveToHierarchy: (node: Column) => void;
   onCreateHierarchy?: (node: Column) => void;
 }> = memo(
@@ -105,7 +105,7 @@ const DataModelNode: FC<{
                   <Menu
                     selectedKeys={[node.type, `category-${node.category}`]}
                     className="datart-schema-table-header-menu"
-                    onClick={onNodeTypeChange}
+                    onClick={({ key }) => onNodeTypeChange(key, node?.name)}
                   >
                     {Object.values(ColumnTypes).map(t => (
                       <Menu.Item key={t}>
