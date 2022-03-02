@@ -16,9 +16,17 @@
  * limitations under the License.
  */
 
-export const ROOT_CONTAINER_ID = 'datart-tree-node-container-id';
+import { DATARTSEPERATOR } from 'globalConstants';
+import { ColumnTypes } from '../../../constants';
+
+export const ROOT_CONTAINER_ID = `${DATARTSEPERATOR}data-model-root-id`;
+
+export const ALLOW_COMBINE_COLUMN_TYPES = [
+  ColumnTypes.String,
+  ColumnTypes.Date,
+];
 
 export enum TreeNodeHierarchy {
-  Container = 'container',
-  Node = 'node',
+  Root = 'root',
+  Branch = 'branch',
 }

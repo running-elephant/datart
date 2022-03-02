@@ -193,29 +193,18 @@ class BasicLineChart extends Chart {
       });
     }
 
-    const xAxisColumnName = chartDataSet.getFieldKey(groupConfigs?.[0]);
-    const yAxisColumnNames = aggregateConfigs.map(config =>
-      chartDataSet.getFieldKey(config),
-    );
-    const colorColumnName = chartDataSet.getFieldKey(colorConfigs[0]);
-    const infoColumnNames = infoConfigs.map(config =>
-      chartDataSet.getFieldKey(config),
-    );
-
+    const xAxisConfig = groupConfigs?.[0];
     const secondGroupInfos = getColorizeGroupSeriesColumns(
       chartDataSet,
-      colorColumnName,
-      xAxisColumnName,
-      yAxisColumnNames,
-      infoColumnNames,
+      colorConfigs[0],
     );
 
     return aggregateConfigs.flatMap(aggConfig => {
       return secondGroupInfos.map(sgCol => {
         const k = Object.keys(sgCol)[0];
-        const v = sgCol[k];
+        const dataSet = sgCol[k];
 
-        const itemStyleColor = colorConfigs[0]?.color?.colors?.find(
+        const itemStyleColor = colorConfigs?.[0]?.color?.colors?.find(
           c => c.key === k,
         );
 
@@ -229,11 +218,12 @@ class BasicLineChart extends Chart {
             normal: { color: itemStyleColor?.value },
           },
           data: xAxisColumns[0].data.map(d => {
-            const target = v.find(col => col[xAxisColumnName] === d);
+            const row = dataSet.find(r => r.getCell(xAxisConfig) === d);
             return {
-              ...getExtraSeriesRowData(target),
+              ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),
-              value: target?.[chartDataSet.getFieldKey(aggConfig)] || 0,
+              name: getColumnRenderName(aggConfig),
+              value: row?.getCell(aggConfig) || 0,
             };
           }),
           ...this.getLabelStyle(styleConfigs),

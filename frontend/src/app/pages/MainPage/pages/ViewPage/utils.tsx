@@ -37,6 +37,7 @@ export function generateEditingView(
     script: '',
     config: {},
     model: {},
+    hierarchy: {},
     originVariables: [],
     variables: [],
     originColumnPermissions: [],

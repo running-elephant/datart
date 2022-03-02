@@ -40,11 +40,12 @@ import {
 } from 'styles/StyleConstants';
 import { ColumnCategories, ColumnTypes } from '../../../constants';
 import { Column } from '../../../slice/types';
+import { ALLOW_COMBINE_COLUMN_TYPES } from './constant';
 
 const DataModelNode: FC<{
   node: Column;
   getPermissionButton: (name) => JSX.Element;
-  onNodeTypeChange: (item: any) => void;
+  onNodeTypeChange: (type: any, name: string) => void;
   onMoveToHierarchy: (node: Column) => void;
   onCreateHierarchy?: (node: Column) => void;
 }> = memo(
@@ -80,6 +81,10 @@ const DataModelNode: FC<{
           break;
       }
 
+      const isAllowCreateHierarchy = node => {
+        return ALLOW_COMBINE_COLUMN_TYPES.includes(node.type);
+      };
+
       return (
         <div
           className="content"
@@ -100,7 +105,7 @@ const DataModelNode: FC<{
                   <Menu
                     selectedKeys={[node.type, `category-${node.category}`]}
                     className="datart-schema-table-header-menu"
-                    onClick={onNodeTypeChange}
+                    onClick={({ key }) => onNodeTypeChange(key, node?.name)}
                   >
                     {Object.values(ColumnTypes).map(t => (
                       <Menu.Item key={t}>
@@ -139,18 +144,21 @@ const DataModelNode: FC<{
               </Dropdown>
             )}
             {isHover && !isDragging && getPermissionButton(node?.name)}
-            {isHover && !isDragging && onCreateHierarchy && (
-              <Tooltip title={t('newHierarchy')}>
-                <ToolbarButton
-                  size="small"
-                  iconSize={FONT_SIZE_BASE}
-                  className="suffix"
-                  onClick={() => onCreateHierarchy(node)}
-                  icon={<BranchesOutlined style={{ color: INFO }} />}
-                />
-              </Tooltip>
-            )}
-            {isHover && !isDragging && (
+            {isHover &&
+              !isDragging &&
+              isAllowCreateHierarchy(node) &&
+              onCreateHierarchy && (
+                <Tooltip title={t('newHierarchy')}>
+                  <ToolbarButton
+                    size="small"
+                    iconSize={FONT_SIZE_BASE}
+                    className="suffix"
+                    onClick={() => onCreateHierarchy(node)}
+                    icon={<BranchesOutlined style={{ color: INFO }} />}
+                  />
+                </Tooltip>
+              )}
+            {isHover && !isDragging && isAllowCreateHierarchy(node) && (
               <Tooltip title={t('addToHierarchy')}>
                 <ToolbarButton
                   size="small"
@@ -193,7 +201,7 @@ const StyledDataModelNode = styled.div<{
   margin: ${SPACE_UNIT};
   user-select: 'none';
   background: ${p =>
-    p.isDragging ? p.theme.emphasisBackground : 'transparent'};
+    p.isDragging ? p.theme.highlightBackground : 'transparent'};
   font-size: ${FONT_SIZE_BASE};
 
   & .content {

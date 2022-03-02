@@ -22,6 +22,7 @@ import {
   IFieldFormatConfig,
 } from '../../types/ChartConfig';
 import {
+  getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getStyles,
   getValue,
@@ -412,6 +413,63 @@ describe('Chart Helper ', () => {
         { name: 'r1-c1-v', age: 'r1-c2-v' },
         { name: 'r2-c1-v', age: 'r2-c2-v' },
       ]);
+    });
+  });
+
+  describe('getColorizeGroupSeriesColumns Test', () => {
+    test('should group dataset', () => {
+      const columns = [
+        ['stephen', 'engineer', '36'],
+        ['jack', 'sales', '28'],
+        ['tom', 'engineer', '30'],
+        ['john', 'sales', '32'],
+      ];
+      const metas = [
+        { name: 'name' },
+        { name: 'current(profession)' },
+        { name: 'age' },
+      ];
+      const chartDataSet = transformToDataSet(columns, metas, [
+        {
+          rows: [
+            {
+              colName: 'name',
+            },
+            {
+              colName: 'profession',
+              aggregate: 'current',
+            },
+
+            {
+              colName: 'age',
+            },
+          ],
+        },
+      ] as any);
+
+      expect(
+        JSON.stringify(
+          getColorizeGroupSeriesColumns(chartDataSet, {
+            colName: 'profession',
+            aggregate: 'current',
+          } as any),
+        ),
+      ).toBe(
+        JSON.stringify([
+          {
+            engineer: [
+              ['stephen', 'engineer', '36'],
+              ['tom', 'engineer', '30'],
+            ],
+          },
+          {
+            sales: [
+              ['jack', 'sales', '28'],
+              ['john', 'sales', '32'],
+            ],
+          },
+        ]),
+      );
     });
   });
 
