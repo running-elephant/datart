@@ -46,19 +46,20 @@ const ScorecardAdapter: FC<{
     label: string;
     value: number | string;
   };
-}> = memo(({ dataConfig, labelConfig, padding, data }) => {
+  background: string;
+}> = memo(({ dataConfig, labelConfig, padding, data, background }) => {
   const ssp = e => {
     e.stopPropagation();
   };
   return (
-    <ScorecardBox padding={padding} onClick={ssp}>
+    <ScorecardBox padding={padding} onClick={ssp} style={{ background }}>
       <AggregateBox
         alignment={labelConfig?.alignment || 'center'}
         position={labelConfig?.position || 'column'}
       >
-        <ValueBox style={dataConfig}>{data?.value}</ValueBox>
+        <ValueBox style={dataConfig?.[0].font}>{data?.[0]?.value}</ValueBox>
         {labelConfig?.show && (
-          <LabelBox style={labelConfig?.font}>{data?.label}</LabelBox>
+          <LabelBox style={labelConfig?.font}>{data?.[0]?.label}</LabelBox>
         )}
       </AggregateBox>
     </ScorecardBox>
