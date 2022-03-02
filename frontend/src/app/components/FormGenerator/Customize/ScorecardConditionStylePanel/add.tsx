@@ -16,25 +16,24 @@
  * limitations under the License.
  */
 
-import { Col, Form, Input, InputNumber, Modal, Radio, Row, Select } from 'antd';
+import { Col, Form, Input, InputNumber, Modal, Row, Select } from 'antd';
 import { ColorPickerPopover } from 'app/components/ColorPicker';
 import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
 import { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   ConditionOperatorTypes,
-  ConditionStyleFormValues,
-  ConditionStyleRange,
   OperatorTypes,
   OperatorTypesLocale,
-} from './types';
+} from '../ConditionStylePanel/types';
+import { ScorecardConditionStyleFormValues } from './types';
 
 interface AddProps {
   context?: any;
   translate?: (title: string, options?: any) => string;
   visible: boolean;
-  values: ConditionStyleFormValues;
-  onOk: (values: ConditionStyleFormValues) => void;
+  values: ScorecardConditionStyleFormValues;
+  onOk: (values: ScorecardConditionStyleFormValues) => void;
   onCancel: () => void;
 }
 
@@ -50,12 +49,12 @@ export default function Add({
     {
       name: 'background',
       label: t('conditionStyleTable.header.color.background'),
-      value: undefined,
+      value: 'transparent',
     },
     {
       name: 'textColor',
       label: t('conditionStyleTable.header.color.text'),
-      value: undefined,
+      value: '#495057',
     },
   ]);
   const [operatorSelect, setOperatorSelect] = useState<
@@ -64,12 +63,12 @@ export default function Add({
   const [operatorValue, setOperatorValue] = useState<OperatorTypes>(
     OperatorTypes.Equal,
   );
-  const [form] = Form.useForm<ConditionStyleFormValues>();
+  const [form] = Form.useForm<ScorecardConditionStyleFormValues>();
 
   useEffect(() => {
     if (type) {
       setOperatorSelect(
-        ConditionOperatorTypes[type]?.map(item => ({
+        ConditionOperatorTypes.NUMERIC?.map(item => ({
           label: `${OperatorTypesLocale[item]} [${item}]`,
           value: item,
         })),
@@ -82,14 +81,16 @@ export default function Add({
   useEffect(() => {
     // !重置form
     if (visible) {
-      const result: Partial<ConditionStyleFormValues> =
+      const result: Partial<ScorecardConditionStyleFormValues> =
         Object.keys(values).length === 0
           ? {
-              range: ConditionStyleRange.Cell,
               operator: OperatorTypes.Equal,
+              color: {
+                background: 'transparent',
+                textColor: '#495057',
+              },
             }
           : values;
-
       form.setFieldsValue(result);
       setOperatorValue(result.operator ?? OperatorTypes.Equal);
     }
@@ -159,21 +160,6 @@ export default function Add({
       >
         <Form.Item label="uid" name="uid" hidden>
           <Input />
-        </Form.Item>
-
-        <Form.Item
-          label={t('conditionStyleTable.header.range.title')}
-          name="range"
-          rules={[{ required: true }]}
-        >
-          <Radio.Group>
-            <Radio.Button value="cell">
-              {t('conditionStyleTable.header.range.cell')}
-            </Radio.Button>
-            <Radio.Button value="row">
-              {t('conditionStyleTable.header.range.row')}
-            </Radio.Button>
-          </Radio.Group>
         </Form.Item>
 
         <Form.Item
