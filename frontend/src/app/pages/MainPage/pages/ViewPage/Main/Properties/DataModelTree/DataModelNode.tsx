@@ -40,6 +40,7 @@ import {
 } from 'styles/StyleConstants';
 import { ColumnCategories, ColumnTypes } from '../../../constants';
 import { Column } from '../../../slice/types';
+import { ALLOW_COMBINE_COLUMN_TYPES } from './constant';
 
 const DataModelNode: FC<{
   node: Column;
@@ -79,6 +80,10 @@ const DataModelNode: FC<{
           );
           break;
       }
+
+      const isAllowCreateHierarchy = node => {
+        return ALLOW_COMBINE_COLUMN_TYPES.includes(node.type);
+      };
 
       return (
         <div
@@ -139,18 +144,21 @@ const DataModelNode: FC<{
               </Dropdown>
             )}
             {isHover && !isDragging && getPermissionButton(node?.name)}
-            {isHover && !isDragging && onCreateHierarchy && (
-              <Tooltip title={t('newHierarchy')}>
-                <ToolbarButton
-                  size="small"
-                  iconSize={FONT_SIZE_BASE}
-                  className="suffix"
-                  onClick={() => onCreateHierarchy(node)}
-                  icon={<BranchesOutlined style={{ color: INFO }} />}
-                />
-              </Tooltip>
-            )}
-            {isHover && !isDragging && (
+            {isHover &&
+              !isDragging &&
+              isAllowCreateHierarchy(node) &&
+              onCreateHierarchy && (
+                <Tooltip title={t('newHierarchy')}>
+                  <ToolbarButton
+                    size="small"
+                    iconSize={FONT_SIZE_BASE}
+                    className="suffix"
+                    onClick={() => onCreateHierarchy(node)}
+                    icon={<BranchesOutlined style={{ color: INFO }} />}
+                  />
+                </Tooltip>
+              )}
+            {isHover && !isDragging && isAllowCreateHierarchy(node) && (
               <Tooltip title={t('addToHierarchy')}>
                 <ToolbarButton
                   size="small"

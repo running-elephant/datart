@@ -135,7 +135,7 @@ const DataModelBranch: FC<{
             >
               <Droppable
                 droppableId={node?.name}
-                type={TreeNodeHierarchy.Container}
+                type={TreeNodeHierarchy.Branch}
                 isCombineEnabled={false}
               >
                 {(droppableProvided, droppableSnapshot) => (

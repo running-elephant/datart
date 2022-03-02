@@ -44,7 +44,7 @@ import {
   Model,
 } from '../../../slice/types';
 import Container from '../Container';
-import { ROOT_CONTAINER_ID, TreeNodeHierarchy } from './constant';
+import { ALLOW_COMBINE_COLUMN_TYPES, ROOT_CONTAINER_ID, TreeNodeHierarchy } from './constant';
 import DataModelBranch from './DataModelBranch';
 import DataModelNode from './DataModelNode';
 
@@ -211,6 +211,7 @@ const DataModelTree: FC = memo(() => {
   };
 
   const handleDragEnd = result => {
+    console.log(`result ---> `, result);
     if (Boolean(result.destination) && isEmpty(result?.combine)) {
       const newHierarchy = reorderNode(
         CloneValueDeep(tableColumns),
@@ -232,11 +233,29 @@ const DataModelTree: FC = memo(() => {
       );
       if (
         sourceNode &&
+        sourceNode.role !== ColumnRole.Hierarchy &&
         targetNode &&
-        [ColumnTypes.String, ColumnTypes.Date].includes(sourceNode.type) &&
-        [ColumnTypes.String, ColumnTypes.Date].includes(targetNode.type)
+        targetNode.role !== ColumnRole.Hierarchy &&
+        ALLOW_COMBINE_COLUMN_TYPES.includes(sourceNode.type) &&
+        ALLOW_COMBINE_COLUMN_TYPES.includes(targetNode.type)
       ) {
-        openCreateHierarchyModal(sourceNode, targetNode);
+        return openCreateHierarchyModal(sourceNode, targetNode);
+      } else if (
+        sourceNode &&
+        sourceNode.role !== ColumnRole.Hierarchy &&
+        targetNode &&
+        targetNode.role === ColumnRole.Hierarchy &&
+        ALLOW_COMBINE_COLUMN_TYPES.includes(sourceNode.type)
+      ) {
+        const newHierarchy = reorderNode(
+          clonedTableColumns,
+          { name: result.draggableId },
+          {
+            name: result.combine.draggableId,
+            index: -1,
+          },
+        );
+        return handleDataModelHierarchyChange(newHierarchy);
       }
     }
   };
@@ -571,7 +590,7 @@ const DataModelTree: FC = memo(() => {
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable
           droppableId={ROOT_CONTAINER_ID}
-          type={TreeNodeHierarchy.Container}
+          type={TreeNodeHierarchy.Root}
           isCombineEnabled={true}
         >
           {(droppableProvided, droppableSnapshot) => (
