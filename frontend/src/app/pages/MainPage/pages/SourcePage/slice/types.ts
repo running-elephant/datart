@@ -40,6 +40,7 @@ export interface Source {
   type: string;
   updateBy: string;
   updateTime: string;
+  schemaUpdateDate: string;
 }
 
 export interface SourceFormModel extends Pick<Source, 'name' | 'type'> {
