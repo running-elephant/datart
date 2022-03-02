@@ -135,7 +135,7 @@ export function SourceDetailPage() {
       const { name, type, config } = editingSource;
       try {
         setProviderType(type);
-        setLastUpdateTime(editingSource?.updateTime); // TODO(Stephen): tobe check schema last udpate time field
+        setLastUpdateTime(editingSource?.schemaUpdateDate);
         form.setFieldsValue({ name, type, config: JSON.parse(config) });
       } catch (error) {
         message.error(tg('operation.parseError'));
