@@ -284,7 +284,7 @@ const DataModelTree: FC = memo(() => {
       content: onChangeEvent => {
         const allNodeNames = tableColumns?.flatMap(c => {
           if (!isEmptyArray(c.children)) {
-            return c.children?.map(cc => cc.name);
+            return [c.name].concat(c.children?.map(cc => cc.name) || []);
           }
           return c.name;
         });
