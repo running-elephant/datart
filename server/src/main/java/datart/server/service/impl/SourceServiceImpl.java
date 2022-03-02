@@ -24,12 +24,15 @@ import com.alibaba.fastjson.JSONObject;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
+import datart.core.common.TaskExecutor;
+import datart.core.data.provider.SchemaInfo;
 import datart.core.data.provider.DataProviderConfigTemplate;
 import datart.core.data.provider.DataProviderSource;
-import datart.core.data.provider.SchemaInfo;
+import datart.core.data.provider.SchemaItem;
 import datart.core.entity.Role;
 import datart.core.entity.Source;
 import datart.core.entity.SourceSchemas;
+import datart.core.entity.ext.SourceDetail;
 import datart.core.mappers.ext.SourceMapperExt;
 import datart.core.mappers.ext.SourceSchemasMapperExt;
 import datart.security.base.PermissionInfo;
@@ -105,21 +108,23 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
-    public List<SchemaInfo> getSourceSchemaInfo(String sourceId) {
+    public SchemaInfo getSourceSchemaInfo(String sourceId) {
         SourceSchemas sourceSchemas = sourceSchemasMapper.selectBySource(sourceId);
         if (sourceSchemas == null || StringUtils.isBlank(sourceSchemas.getSchemas())) {
-            return Collections.emptyList();
+            return SchemaInfo.empty();
         }
+        SchemaInfo schemaInfo = new SchemaInfo();
         try {
-            return OBJECT_MAPPER.readerForListOf(SchemaInfo.class).readValue(sourceSchemas.getSchemas());
+            schemaInfo.setUpdateTime(sourceSchemas.getUpdateTime());
+            schemaInfo.setSchemaItems(OBJECT_MAPPER.readerForListOf(SchemaItem.class).readValue(sourceSchemas.getSchemas()));
         } catch (Exception e) {
             log.error("source schema parse error ", e);
-            return Collections.emptyList();
         }
+        return schemaInfo;
     }
 
     @Override
-    public List<SchemaInfo> syncSourceSchema(String sourceId) throws Exception {
+    public SchemaInfo syncSourceSchema(String sourceId) throws Exception {
         SchemaSyncJob schemaSyncJob = new SchemaSyncJob();
         schemaSyncJob.execute(sourceId);
         return getSourceSchemaInfo(sourceId);
@@ -226,11 +231,25 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
+    public Source retrieve(String id) {
+        SourceDetail sourceDetail = new SourceDetail(SourceService.super.retrieve(id));
+        sourceDetail.setSchemaUpdateDate(sourceSchemasMapper.selectUpdateDateBySource(id));
+        return sourceDetail;
+    }
+
+    @Override
     public void deleteStaticFiles(Source source) {
         fileService.deleteFiles(FileOwner.DATA_SOURCE, source.getId());
     }
 
     private void updateJdbcSourceSyncJob(Source source) {
+        TaskExecutor.submit(() -> {
+            try {
+                new SchemaSyncJob().execute(source.getId());
+            } catch (Exception e) {
+                log.error("source schema sync error", e);
+            }
+        });
         try {
             DataProviderSource dataProviderSource = dataProviderService.parseDataProviderConfig(source);
 

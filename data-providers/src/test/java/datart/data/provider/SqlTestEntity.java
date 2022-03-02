@@ -16,20 +16,28 @@
  * limitations under the License.
  */
 
-package datart.server.service;
+package datart.data.provider;
 
-import datart.core.data.provider.SchemaInfo;
-import datart.core.entity.Source;
-import datart.core.mappers.ext.SourceMapperExt;
+import lombok.Data;
+import org.apache.calcite.sql.SqlDialect;
 
-import java.util.List;
+@Data
+public class SqlTestEntity {
 
-public interface SourceService extends BaseCRUDService<Source, SourceMapperExt> {
+    private String sql;
 
-    List<Source> listSources(String orgId,boolean active);
+    private SqlDialect sqlDialect;
 
-    SchemaInfo getSourceSchemaInfo(String sourceId);
+    private String desiredValue;
 
-    SchemaInfo syncSourceSchema(String sourceId) throws Exception;
 
+    public static SqlTestEntity create(String sql, SqlDialect sqlDialect, String desiredValue) {
+        return new SqlTestEntity(sql, sqlDialect, desiredValue);
+    }
+
+    private SqlTestEntity(String sql, SqlDialect sqlDialect, String desiredValue) {
+        this.sql = sql;
+        this.sqlDialect = sqlDialect;
+        this.desiredValue = desiredValue;
+    }
 }

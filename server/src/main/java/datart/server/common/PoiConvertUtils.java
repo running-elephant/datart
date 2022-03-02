@@ -1,4 +1,4 @@
-package datart.server.service.common;
+package datart.server.common;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONValidator;

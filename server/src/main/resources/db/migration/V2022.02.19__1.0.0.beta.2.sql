@@ -14,3 +14,8 @@ CREATE TABLE `source_schemas`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+ALTER TABLE `folder`
+    ADD COLUMN `sub_type` varchar(255) NULL AFTER `rel_type`,
+    ADD COLUMN `avatar` varchar(255) NULL AFTER `rel_id`;
