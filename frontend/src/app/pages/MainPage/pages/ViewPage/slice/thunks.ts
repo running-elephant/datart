@@ -141,7 +141,7 @@ export const getSchemaBySourceId = createAsyncThunk<any, string>(
     }
 
     const { data } = await request2<any>({
-      url: `/sources/schemas/${sourceId}/`, // TODO(Stephen): remove `/` mark after backend update
+      url: `/sources/schemas/${sourceId}`,
       method: 'GET',
     });
     return {

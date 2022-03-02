@@ -26,6 +26,7 @@ export interface SourceState {
   saveSourceLoading: boolean;
   unarchiveSourceLoading: boolean;
   deleteSourceLoading: boolean;
+  syncSourceSchemaLoading: boolean;
 }
 
 export interface Source {

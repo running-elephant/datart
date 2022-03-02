@@ -67,3 +67,8 @@ export const selectDeleteSourceLoading = createSelector(
   [selectDomain],
   sourceState => sourceState.deleteSourceLoading,
 );
+
+export const selectSyncSourceSchemaLoading = createSelector(
+  [selectDomain],
+  sourceState => sourceState.syncSourceSchemaLoading,
+);

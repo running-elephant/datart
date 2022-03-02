@@ -20,7 +20,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
 import { RootState } from 'types';
-import { request } from 'utils/request';
+import { request, request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import {
   AddSourceParams,
@@ -152,5 +152,16 @@ export const deleteSource = createAsyncThunk<null, DeleteSourceParams>(
       errorHandle(error);
       throw error;
     }
+  },
+);
+
+export const syncSourceSchema = createAsyncThunk<null, { sourceId: string }>(
+  'source/syncSourceSchema',
+  async ({ sourceId }) => {
+    const { data } = await request2<any>({
+      url: `/sources/sync/schemas/${sourceId}`,
+      method: 'GET',
+    });
+    return data;
   },
 );
