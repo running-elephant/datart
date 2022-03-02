@@ -164,7 +164,7 @@ export class ConditionBuilder {
 
   asRecommendTime(name?, sqlType?) {
     this.condition.type = FilterConditionType.RecommendTime;
-    this.condition.operator = FilterSqlOperator.Equal;
+    this.condition.operator = FilterSqlOperator.Between;
     this.condition.name = name || this.condition.name;
     this.condition.visualType = sqlType || this.condition.visualType;
     return this.condition;
