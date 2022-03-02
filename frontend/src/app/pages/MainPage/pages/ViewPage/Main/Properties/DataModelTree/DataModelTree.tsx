@@ -16,38 +16,38 @@
  * limitations under the License.
  */
 
-import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
-import { Form, Input, Select, Tooltip } from 'antd';
-import { Popup, ToolbarButton, Tree } from 'app/components';
+import { EyeInvisibleOutlined,EyeOutlined } from '@ant-design/icons';
+import { Form,Input,Select,Tooltip } from 'antd';
+import { Popup,ToolbarButton,Tree } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
+import useStateModal,{ StateModalSize } from 'app/hooks/useStateModal';
 import { selectRoles } from 'app/pages/MainPage/pages/MemberPage/slice/selectors';
 import { SubjectTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import classnames from 'classnames';
-import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { useDispatch, useSelector } from 'react-redux';
+import { FC,memo,useCallback,useEffect,useMemo,useState } from 'react';
+import { DragDropContext,Droppable } from 'react-beautiful-dnd';
+import { useDispatch,useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { FONT_SIZE_BASE, INFO } from 'styles/StyleConstants';
-import { CloneValueDeep, isEmpty, isEmptyArray } from 'utils/object';
+import { FONT_SIZE_BASE,INFO } from 'styles/StyleConstants';
+import { CloneValueDeep,isEmpty,isEmptyArray } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { ColumnTypes } from '../../../constants';
 import { useViewSlice } from '../../../slice';
 import {
-  selectCurrentEditingView,
-  selectCurrentEditingViewAttr,
+selectCurrentEditingView,
+selectCurrentEditingViewAttr
 } from '../../../slice/selectors';
 import {
-  Column,
-  ColumnPermission,
-  ColumnRole,
-  Model,
+Column,
+ColumnPermission,
+ColumnRole,
+Model
 } from '../../../slice/types';
 import Container from '../Container';
 import {
-  ALLOW_COMBINE_COLUMN_TYPES,
-  ROOT_CONTAINER_ID,
-  TreeNodeHierarchy,
+ALLOW_COMBINE_COLUMN_TYPES,
+ROOT_CONTAINER_ID,
+TreeNodeHierarchy
 } from './constant';
 import DataModelBranch from './DataModelBranch';
 import DataModelNode from './DataModelNode';
@@ -638,5 +638,4 @@ export default DataModelTree;
 
 const StyledDroppableContainer = styled.div<{ isDraggingOver }>`
   user-select: 'none';
-  background: ${p => (p.isDraggingOver ? 'lightblue' : 'transparent')};
 `;

@@ -116,10 +116,6 @@ const DataModelBranch: FC<{
       );
     };
 
-    const getListStyle = isDraggingOver => ({
-      background: isDraggingOver ? 'lightblue' : 'lightgrey',
-    });
-
     const handleBranchNodeTypeChange = (type: any, name: string) => {
       if (type === ColumnTypes.Number) {
         return;
@@ -137,7 +133,6 @@ const DataModelBranch: FC<{
         {(draggableProvided, draggableSnapshot) => {
           return (
             <StyledDataModelBranch
-              style={draggableProvided.draggableProps.style}
               ref={draggableProvided.innerRef}
               {...draggableProvided.draggableProps}
               {...draggableProvided.dragHandleProps}
@@ -148,10 +143,7 @@ const DataModelBranch: FC<{
                 isCombineEnabled={false}
               >
                 {(droppableProvided, droppableSnapshot) => (
-                  <div
-                    ref={droppableProvided.innerRef}
-                    style={getListStyle(droppableSnapshot.isDraggingOver)}
-                  >
+                  <div ref={droppableProvided.innerRef}>
                     {renderNode(node, draggableSnapshot.isDragging)}
                     {droppableProvided.placeholder}
                   </div>

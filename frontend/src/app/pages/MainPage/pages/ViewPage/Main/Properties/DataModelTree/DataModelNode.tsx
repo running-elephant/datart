@@ -201,7 +201,7 @@ const StyledDataModelNode = styled.div<{
   margin: ${SPACE_UNIT};
   user-select: 'none';
   background: ${p =>
-    p.isDragging ? p.theme.emphasisBackground : 'transparent'};
+    p.isDragging ? p.theme.highlightBackground : 'transparent'};
   font-size: ${FONT_SIZE_BASE};
 
   & .content {
