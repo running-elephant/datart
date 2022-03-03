@@ -282,3 +282,8 @@ export const addVariablesToBoard =
     let newVariables = queryVariables.concat(variables);
     dispatch(editBoardStackActions.updateQueryVariables(newVariables));
   };
+
+export const clearActiveWidgets = () => dispatch => {
+  dispatch(editWidgetInfoActions.clearSelectedWidgets());
+  dispatch(editDashBoardInfoActions.changeShowBlockMask(true));
+};

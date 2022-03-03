@@ -847,7 +847,8 @@
         "autoPlay": "自动播放",
         "duration": "停留时间(秒)",
         "delPagesTip": "确认删除所有选中的故事页",
-        "delPageTip": "确认删除此故事页？"
+        "delPageTip": "确认删除此故事页？",
+        "enterHere": "请输入"
       }
     },
     "widget": {

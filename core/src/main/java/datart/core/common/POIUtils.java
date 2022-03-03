@@ -130,11 +130,17 @@ public class POIUtils {
                     columnIndex = setting.getIndex();
                     PoiNumFormat numFormat = setting.getNumFormat();
                     fmt = numFormat.getFormat();
-                    if (val != null) {
-                        setting.setLength(Math.max(val.toString().length(), setting.getLength()));
-                        val = numFormat.parseValue(val);
-                    }
+                    setting.setLength(val==null ? 0 : Math.max(val.toString().length(), setting.getLength()));
+                    val = numFormat.parseValue(val);
                     cellStyle = setting.getCellStyle()==null ? getCellStyle(sheet, val, fmt) : setting.getCellStyle();
+                    setting.setCellStyle(cellStyle);
+                } else {
+                    ColumnSetting setting = new ColumnSetting();
+                    setting.setIndex(i);
+                    setting.setNumFormat(new PoiNumFormat());
+                    setting.setLength(val==null ? 0 : val.toString().length());
+                    setting.setCellStyle(getCellStyle(sheet, val, fmt));
+                    columnSetting.put(i, setting);
                 }
                 Cell cell = row.createCell(columnIndex);
                 cell.setCellStyle(cellStyle);
