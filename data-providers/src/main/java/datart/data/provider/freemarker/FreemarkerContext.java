@@ -48,8 +48,6 @@ public class FreemarkerContext {
             return writer.toString();
         } catch (Exception e) {
             log.error("freemarker parse error", e);
-        } finally {
-            StringTemplateLoader.SCRIPT_MAP.remove(key);
         }
         return content;
     }
