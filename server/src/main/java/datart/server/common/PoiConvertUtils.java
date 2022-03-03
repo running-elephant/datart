@@ -69,6 +69,7 @@ public class PoiConvertUtils {
                 dataColumns.stream().forEach(item -> {
                     putDataIntoListMap(rowMap, 0, item);
                 });
+                rowMap.get(0).stream().forEach(item -> item.setName(aliasMap.getOrDefault(item.getName(), item.getName())));
             }
         }
         poiSettings.setHeaderRows(rowMap);
