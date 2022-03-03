@@ -76,38 +76,38 @@ interface AggregateBoxProp {
 }
 
 const ScorecardBox = styled.div<ScorecardBoxProp>`
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
-  padding: ${p => p.padding};
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  width: 100%;
   min-width: 0;
+  height: 100%;
   min-height: 0;
+  padding: ${p => p.padding};
 `;
 
 const AggregateBox = styled.div<AggregateBoxProp>`
-  max-width: 100%;
-  max-height: 100%;
   display: flex;
+  flex-direction: ${p => p.position};
   align-items: ${p => p.alignment};
   justify-content: center;
-  flex-direction: ${p => p.position};
   min-width: 0;
+  max-width: 100%;
   min-height: 0;
+  max-height: 100%;
 `;
 
 const ValueBox = styled.div`
   max-width: 100%;
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const LabelBox = styled.div`
   max-width: 100%;
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
+  white-space: nowrap;
 `;
