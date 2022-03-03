@@ -23,7 +23,7 @@ import {
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
-  getAutoFunnelPosition,
+  getAutoFunnelTopPosition,
   getColumnRenderName,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
@@ -217,7 +217,7 @@ class BasicFunnelChart extends Chart {
     let positions = {};
     let orient = {};
 
-    const top = getAutoFunnelPosition({
+    const top = getAutoFunnelTopPosition({
       chart: this.chart,
       sort,
       legendPos,

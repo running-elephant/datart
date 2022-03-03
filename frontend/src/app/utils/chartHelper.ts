@@ -1468,7 +1468,6 @@ export function setOptionsByAxisLabelOverflow(config: CommonChartConfig) {
   const axisOpts = !horizon ? xAxis : yAxis;
   const axisName = !horizon ? 'xAxis' : 'yAxis';
 
-  //
   const data = axisOpts.data || [];
 
   const dataLength = data.length;
@@ -1503,6 +1502,8 @@ export function setOptionsByAxisLabelOverflow(config: CommonChartConfig) {
 
   // 处理 每个刻度宽度
   const setWidth = width => {
+    // 水平图表使用默认宽度
+    if (horizon) return 40;
     return parseInt(String((width - dataLength * 8) / dataLength));
   };
   // model 渲染未完成的兼容性方案，一般只在图表初始化阶段，还没有拿到model。
@@ -1537,7 +1538,7 @@ export function setOptionsByAxisLabelOverflow(config: CommonChartConfig) {
   return commonOpts;
 }
 
-export const getAutoFunnelPosition = (config: {
+export const getAutoFunnelTopPosition = (config: {
   chart: ECharts;
   height: number;
   sort: 'ascending' | 'descending' | 'none';
@@ -1551,5 +1552,6 @@ export const getAutoFunnelPosition = (config: {
 
   const chartHeight = chart.getHeight();
   if (!chartHeight) return 16;
+  // 24 marginBottom
   return chartHeight - 24 - height;
 };
