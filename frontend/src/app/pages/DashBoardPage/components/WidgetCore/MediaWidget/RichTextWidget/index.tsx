@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Modal } from 'antd';
 import {
   CustomColor,
   QuillPalette,
@@ -45,6 +46,8 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
+import { SPACE_TIMES } from 'styles/StyleConstants';
+import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
 import { BoardContext } from '../../../BoardProvider/BoardProvider';
 import { MarkdownOptions } from './configs/MarkdownOptions';
 import TagBlot from './configs/TagBlot';
@@ -70,6 +73,7 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   const t = useI18NPrefix();
   const dispatch = useDispatch();
   const { editing: boardEditing } = useContext(BoardContext);
+  const { onClearActiveWidgets } = useContext(BoardActionContext);
   const initContent = useMemo(() => {
     return (widgetConfig.config.content as MediaWidgetContent).richTextConfig
       ?.content;
@@ -88,13 +92,16 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   const [customColorType, setCustomColorType] = useState<
     'color' | 'background'
   >('color');
+  const [contentSavable, setContentSavable] = useState(false);
 
   useEffect(() => {
-    setQuillValue(initContent);
-  }, [initContent]);
+    if (widgetInfo.editing) {
+      setQuillValue(initContent);
+    }
+  }, [initContent, widgetInfo.editing]);
 
   useEffect(() => {
-    if (widgetInfo.editing === false && boardEditing) {
+    if (widgetInfo.editing === false && contentSavable && boardEditing) {
       if (quillRef.current) {
         let contents = quillRef.current?.getEditor().getContents();
         const strContents = JSON.stringify(contents);
@@ -114,6 +121,7 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
               mediaWidgetContent: nextMediaWidgetContent,
             }),
           );
+          setContentSavable(false);
         }
       }
     }
@@ -121,6 +129,7 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
     boardEditing,
     dispatch,
     initContent,
+    contentSavable,
     widgetConfig.config.content,
     widgetConfig.id,
     widgetInfo.editing,
@@ -236,74 +245,90 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
     setCustomColorVisible(false);
   };
 
+  const modalCancel = useCallback(() => {
+    onClearActiveWidgets();
+  }, [onClearActiveWidgets]);
+
+  const modalOk = useCallback(() => {
+    setContentSavable(true);
+    modalCancel();
+  }, [modalCancel]);
+
   return (
-    <TextWrap onClick={ssp} editing={widgetInfo.editing}>
-      <div className="react-quill react-quill-edit">
-        {quillModules && (
-          <>
-            {toolbar}
-            <ReactQuill
-              ref={quillRef}
-              className="react-quill"
-              placeholder="请输入"
-              value={quillValue}
-              onChange={quillChange}
-              modules={quillModules}
-              formats={Formats}
-              readOnly={false}
-              theme={'bubble'}
-            />
-          </>
-        )}
-      </div>
-      <div className="react-quill react-quill-view">
-        <ReactQuill
-          className="react-quill"
-          placeholder=""
-          value={initContent}
-          modules={{ toolbar: null }}
-          formats={Formats}
-          readOnly={true}
-        />
-      </div>
+    <TextWrap onClick={ssp}>
+      <ReactQuill
+        className="react-quill"
+        value={initContent}
+        modules={{ toolbar: null }}
+        formats={Formats}
+        readOnly={true}
+      />
       <CustomColor
         visible={customColorVisible}
         onCancel={() => setCustomColorVisible(false)}
         color={customColor?.[customColorType]}
         colorChange={customColorChange}
       />
+      <Modal
+        width={992}
+        closable={false}
+        visible={widgetInfo.editing}
+        onOk={modalOk}
+        onCancel={modalCancel}
+      >
+        {quillModules && (
+          <ModalBody>
+            {toolbar}
+            <ReactQuill
+              ref={quillRef}
+              className="react-quill"
+              placeholder={t('viz.board.setting.enterHere')}
+              value={quillValue}
+              onChange={quillChange}
+              modules={quillModules}
+              formats={Formats}
+              readOnly={false}
+            />
+          </ModalBody>
+        )}
+      </Modal>
     </TextWrap>
   );
 };
 export default RichTextWidget;
 
-interface TextWrapProps {
-  editing: boolean;
-}
-
-const TextWrap = styled.div<TextWrapProps>`
+const TextWrap = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  overflow: ${p => (p.editing ? '' : 'hidden')};
+  overflow: hidden;
 
-  .react-quill {
+  & .react-quill {
     width: 100%;
     height: 100%;
-  }
-
-  .react-quill-edit {
-    display: ${p => (p.editing ? 'block' : 'none')};
-  }
-
-  .react-quill-view {
-    display: ${p => (p.editing ? 'none' : 'block')};
   }
 
   & .ql-snow {
     border: none;
   }
+
   & .ql-container.ql-snow {
     border: none;
+  }
+
+  & .ql-editor {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    transform: translate(0, -50%);
+  }
+`;
+
+const ModalBody = styled.div`
+  & .ql-editor {
+    min-height: ${SPACE_TIMES(60)};
   }
 `;
