@@ -96,18 +96,23 @@ const deleteUndefinedProps = props => {
   }, {});
 };
 
+const getTheSameRange = (list, key) =>
+  list?.filter(item => item?.metricKey === key);
+
 export const getCustomBodyCellStyle = (
   cellValue: any,
   conditionStyle: ConditionStyleFormValues[],
+  metricKey: string,
 ): CSSProperties => {
-  if (!conditionStyle?.length) {
+  const currentConfigs = getTheSameRange(conditionStyle, metricKey);
+  if (!currentConfigs?.length) {
     return {};
   }
   const text = cellValue;
   let cellStyle: CSSProperties = {};
 
   try {
-    conditionStyle?.forEach(
+    currentConfigs?.forEach(
       ({ operator, value, color: { background, textColor: color } }) => {
         cellStyle = isMatchedTheCondition(text, operator, value)
           ? { backgroundColor: background, color }

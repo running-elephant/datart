@@ -19,7 +19,8 @@
 import { OperatorTypes } from '../ConditionStylePanel/types';
 export interface ScorecardConditionStyleFormValues {
   uid: string;
-  target: { name: string; type: any };
+  target: { name?: string; type?: any };
+  metricKey: string;
   operator: OperatorTypes;
   value: string;
   useMetricsValue?: boolean;

@@ -18,10 +18,13 @@
 
 import { Button, Col, Popconfirm, Row, Space, Table, Tag } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { ChartStyleConfig } from 'app/types/ChartConfig';
+import {
+  ChartStyleConfig,
+  ChartStyleSelectorItem,
+} from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
-import { CloneValueDeep } from 'utils/object';
+import { AssignDeep, CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
@@ -39,10 +42,30 @@ const ScorecardConditionStylePanel: FC<ItemLayoutProps<ChartStyleConfig>> =
       context,
     }) => {
       const [myData] = useState(() => CloneValueDeep(data));
+      const [allItems] = useState(() => {
+        let results: ChartStyleSelectorItem[] = [];
+        try {
+          results =
+            typeof myData?.options?.getItems === 'function'
+              ? myData?.options?.getItems.call(
+                  null,
+                  dataConfigs?.map(col => AssignDeep(col)),
+                ) || []
+              : [];
+        } catch (error) {
+          console.error(`ListTemplatePanel | invoke action error ---> `, error);
+        }
+        return results;
+      });
+
       const [visible, setVisible] = useState<boolean>(false);
       const [dataSource, setDataSource] = useState<
         ScorecardConditionStyleFormValues[]
-      >(myData.value || []);
+      >(
+        myData?.value?.filter(item =>
+          allItems.find(ac => ac.key === item.metricKey),
+        ) || [],
+      );
 
       const [currentItem, setCurrentItem] =
         useState<ScorecardConditionStyleFormValues>(
@@ -67,6 +90,13 @@ const ScorecardConditionStylePanel: FC<ItemLayoutProps<ChartStyleConfig>> =
       const tableColumnsSettings: ColumnsType<ScorecardConditionStyleFormValues> =
         [
           {
+            title: t('viz.palette.data.metrics', true),
+            dataIndex: 'metricKey',
+            render: key => {
+              return allItems.find(v => v.key === key)?.label;
+            },
+          },
+          {
             title: t('conditionStyleTable.header.operator'),
             dataIndex: 'operator',
           },
@@ -80,11 +110,11 @@ const ScorecardConditionStylePanel: FC<ItemLayoutProps<ChartStyleConfig>> =
             dataIndex: 'value',
             render: (_, { color }) => (
               <>
-                <Tag color={color.background}>
-                  {t('conditionStyleTable.header.color.background')}
-                </Tag>
                 <Tag color={color.textColor}>
                   {t('conditionStyleTable.header.color.text')}
+                </Tag>
+                <Tag color={color.background}>
+                  {t('conditionStyleTable.header.color.background')}
                 </Tag>
               </>
             ),
@@ -170,6 +200,7 @@ const ScorecardConditionStylePanel: FC<ItemLayoutProps<ChartStyleConfig>> =
             visible={visible}
             translate={t}
             values={currentItem}
+            allItems={allItems}
             onOk={submitConditionStyleModal}
             onCancel={closeConditionStyleModal}
           />
@@ -182,6 +213,7 @@ const ScorecardConditionStylePanel: FC<ItemLayoutProps<ChartStyleConfig>> =
 const StyledScorecardConditionStylePanel = styled(Space)`
   width: 100%;
   margin-top: 10px;
+  overflow: hidden;
 `;
 
 export default ScorecardConditionStylePanel;

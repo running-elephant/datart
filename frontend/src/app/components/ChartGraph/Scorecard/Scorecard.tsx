@@ -21,10 +21,9 @@ import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getStyles,
-  getValue,
   toFormattedValue,
   transformToDataSet,
-} from '../../../utils/chartHelper';
+} from 'app/utils/chartHelper';
 import ReactChart from '../models/ReactChart';
 import { getCustomBodyCellStyle } from './conditionStyle';
 import Config from './config';
@@ -131,32 +130,18 @@ class Scorecard extends ReactChart {
   }
 
   getColorConfig(style, aggConfig, chartDataSet) {
-    const getAllAggregateInfo = getValue(
+    const [conditionStylePanel] = getStyles(
       style,
-      ['scorecardConditionStyle', 'modal', 'list'],
-      'rows',
-    );
-    let allConditionStyle: any[] = [];
-    getAllAggregateInfo?.forEach(info => {
-      const [conditionStyle] = getStyles(
-        info.rows,
-        ['conditionStyle'],
-        ['conditionStylePanel'],
-      );
-      if (Array.isArray(conditionStyle)) {
-        allConditionStyle = [...allConditionStyle, ...conditionStyle];
-      }
-    });
-    const [conditionStyle] = getStyles(
-      getAllAggregateInfo,
-      [aggConfig[0].uid, 'conditionStyle'],
+      ['scorecardConditionStyle', 'modal'],
       ['conditionStylePanel'],
     );
-    const conditionalCellStyle = getCustomBodyCellStyle(
-      chartDataSet?.[0]?.getCell?.(aggConfig[0]),
-      conditionStyle,
+    return aggConfig.map(ac =>
+      getCustomBodyCellStyle(
+        chartDataSet?.[0]?.getCell?.(ac),
+        conditionStylePanel,
+        ac.uid,
+      ),
     );
-    return [conditionalCellStyle];
   }
 
   getDataConfig(aggColorConfig, style, fontSizeFn) {
