@@ -1082,6 +1082,7 @@
     },
     "saveForm": {
       "title": "View",
+      "view": "View",
       "name": "Name",
       "folder": "Directory",
       "root": "Root",

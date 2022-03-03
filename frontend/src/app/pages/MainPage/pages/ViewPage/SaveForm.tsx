@@ -67,6 +67,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
   const selectViewFolderTree = useMemo(makeSelectViewFolderTree, []);
   const [expensiveQuery, setExpensiveQuery] = useState(false); // beta.2 add expensiveQuery
   const {
+    viewType,
     type,
     visible,
     simple,
@@ -133,6 +134,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     <ModalForm
       formProps={formProps}
       {...modalProps}
+      title={t(viewType || 'view')}
       type={type}
       visible={visible}
       confirmLoading={currentEditingView?.stage === ViewViewModelStages.Saving}

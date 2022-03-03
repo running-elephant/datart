@@ -28,6 +28,7 @@ interface SaveFormModel {
 }
 
 interface SaveFormState {
+  viewType?: 'folder' | 'view';
   type: CommonFormTypes;
   visible: boolean;
   simple?: boolean;
@@ -43,6 +44,7 @@ interface SaveFormContextValue extends SaveFormState {
 }
 
 const saveFormContextValue: SaveFormContextValue = {
+  viewType: 'view',
   type: CommonFormTypes.Add,
   visible: false,
   simple: false,
@@ -57,6 +59,7 @@ export const SaveFormContext = createContext(saveFormContextValue);
 export const useSaveFormContext = (): SaveFormContextValue => {
   const t = useI18NPrefix('view.saveForm');
   const [type, setType] = useState(CommonFormTypes.Add);
+  const [viewType, setViewType] = useState<'folder' | 'view'>('view');
   const [visible, setVisible] = useState(false);
   const [simple, setSimple] = useState<boolean | undefined>(false);
   const [initialValues, setInitialValues] = useState<
@@ -72,6 +75,7 @@ export const useSaveFormContext = (): SaveFormContextValue => {
 
   const showSaveForm = useCallback(
     ({
+      viewType,
       type,
       visible,
       simple,
@@ -80,6 +84,7 @@ export const useSaveFormContext = (): SaveFormContextValue => {
       onSave,
       onAfterClose,
     }: SaveFormState) => {
+      setViewType(viewType || 'view');
       setType(type);
       setVisible(visible);
       setSimple(simple);
@@ -93,6 +98,7 @@ export const useSaveFormContext = (): SaveFormContextValue => {
 
   return useMemo(
     () => ({
+      viewType,
       type,
       visible,
       simple,
@@ -104,6 +110,7 @@ export const useSaveFormContext = (): SaveFormContextValue => {
       showSaveForm,
     }),
     [
+      viewType,
       type,
       visible,
       simple,

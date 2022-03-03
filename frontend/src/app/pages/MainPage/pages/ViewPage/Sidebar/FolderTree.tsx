@@ -119,12 +119,13 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
   );
 
   const moreMenuClick = useCallback(
-    ({ id, name, parentId, index }) =>
+    ({ id, name, parentId, index, isFolder }) =>
       ({ key, domEvent }) => {
         domEvent.stopPropagation();
         switch (key) {
           case 'info':
             showSaveForm({
+              viewType: isFolder ? 'folder' : 'view',
               type: CommonFormTypes.Edit,
               visible: true,
               simple: true,

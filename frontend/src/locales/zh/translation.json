@@ -1083,6 +1083,7 @@
     "saveForm": {
       "title": "数据视图",
       "name": "名称",
+      "view": "数据视图",
       "folder": "目录",
       "root": "根目录",
       "advanced": "高级配置",
