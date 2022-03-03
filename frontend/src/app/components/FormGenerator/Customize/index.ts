@@ -23,5 +23,4 @@ export { default as LegendType } from './LegendType';
 export { default as ListTemplatePanel } from './ListTemplatePanel';
 export { default as NameLocation } from './NameLocation';
 export { default as ScorecardConditionStylePanel } from './ScorecardConditionStylePanel';
-export { default as ScorecardListTemplatePanel } from './ScorecardListTemplatePanel';
 export { default as UnControlledTableHeaderPanel } from './UnControlledTableHeaderPanel';

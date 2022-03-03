@@ -18,6 +18,7 @@
 
 import { ChartConfig } from 'app/types/ChartConfig';
 import { FONT_FAMILY } from 'styles/StyleConstants';
+import { getColumnRenderName } from '../../../utils/chartHelper';
 
 const config: ChartConfig = {
   datas: [
@@ -52,10 +53,9 @@ const config: ChartConfig = {
           options: { type: 'modal', modalSize: 'middle' },
           rows: [
             {
-              label: 'column.list',
-              key: 'list',
-              comType: 'scorecardListTemplate',
-              rows: [],
+              label: 'column.conditionStylePanel',
+              key: 'conditionStylePanel',
+              comType: 'scorecardConditionStyle',
               options: {
                 getItems: cols => {
                   const columns = (cols || [])
@@ -65,19 +65,10 @@ const config: ChartConfig = {
                       key: c.uid,
                       value: c.uid,
                       type: c.type,
-                      label:
-                        c.label || c.aggregate
-                          ? `${c.aggregate}(${c.colName})`
-                          : c.colName,
+                      label: getColumnRenderName(c),
                     }));
                   return columns;
                 },
-              },
-              template: {
-                label: 'common.listItem',
-                key: 'listItem',
-                comType: 'group',
-                rows: [],
               },
             },
           ],

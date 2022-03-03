@@ -59,7 +59,6 @@ import {
   ListTemplatePanel,
   NameLocation,
   ScorecardConditionStylePanel,
-  ScorecardListTemplatePanel,
   UnControlledTableHeaderPanel,
 } from '../Customize';
 import { FormGeneratorLayoutProps } from '../types';
@@ -182,8 +181,6 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <NameLocation {...props} />;
         case ChartStyleSectionComponentType.LegendType:
           return <LegendType {...props} />;
-        case ChartStyleSectionComponentType.ScorecardListTemplate:
-          return <ScorecardListTemplatePanel {...props} />;
         case ChartStyleSectionComponentType.ScorecardConditionStyle:
           return <ScorecardConditionStylePanel {...props} />;
         default:

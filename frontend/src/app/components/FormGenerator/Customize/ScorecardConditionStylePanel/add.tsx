@@ -21,6 +21,7 @@ import { ColorPickerPopover } from 'app/components/ColorPicker';
 import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
 import { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { isEmpty } from 'utils/object';
 import {
   ConditionOperatorTypes,
   OperatorTypes,
@@ -30,6 +31,7 @@ import { ScorecardConditionStyleFormValues } from './types';
 
 interface AddProps {
   context?: any;
+  allItems?: any[];
   translate?: (title: string, options?: any) => string;
   visible: boolean;
   values: ScorecardConditionStyleFormValues;
@@ -43,18 +45,19 @@ export default function Add({
   visible,
   onOk,
   onCancel,
-  context: { label, type },
+  context,
+  allItems,
 }: AddProps) {
   const [colors] = useState([
-    {
-      name: 'background',
-      label: t('conditionStyleTable.header.color.background'),
-      value: 'transparent',
-    },
     {
       name: 'textColor',
       label: t('conditionStyleTable.header.color.text'),
       value: '#495057',
+    },
+    {
+      name: 'background',
+      label: t('conditionStyleTable.header.color.background'),
+      value: 'transparent',
     },
   ]);
   const [operatorSelect, setOperatorSelect] = useState<
@@ -64,11 +67,12 @@ export default function Add({
     OperatorTypes.Equal,
   );
   const [form] = Form.useForm<ScorecardConditionStyleFormValues>();
+  const [type] = useState(ColumnTypes.Number);
 
   useEffect(() => {
     if (type) {
       setOperatorSelect(
-        ConditionOperatorTypes.NUMERIC?.map(item => ({
+        ConditionOperatorTypes[type]?.map(item => ({
           label: `${OperatorTypesLocale[item]} [${item}]`,
           value: item,
         })),
@@ -76,7 +80,7 @@ export default function Add({
     } else {
       setOperatorSelect([]);
     }
-  }, [type]);
+  }, []);
 
   useEffect(() => {
     // !重置form
@@ -89,20 +93,21 @@ export default function Add({
                 background: 'transparent',
                 textColor: '#495057',
               },
+              metricKey: allItems?.[0]?.value,
             }
           : values;
       form.setFieldsValue(result);
       setOperatorValue(result.operator ?? OperatorTypes.Equal);
     }
-  }, [form, visible, values, label]);
+  }, [form, visible, values, allItems]);
 
   const modalOk = () => {
     form.validateFields().then(values => {
       onOk({
         ...values,
         target: {
-          name: label,
-          type,
+          name: context?.label,
+          type: context?.type,
         },
       });
     });
@@ -160,6 +165,25 @@ export default function Add({
       >
         <Form.Item label="uid" name="uid" hidden>
           <Input />
+        </Form.Item>
+
+        <Form.Item
+          label={t('viz.palette.data.metrics', true)}
+          name="metricKey"
+          rules={[{ required: true }]}
+        >
+          <Select>
+            {allItems?.map((o, index) => {
+              const label = isEmpty(o['label']) ? o : o.label;
+              const key = isEmpty(o['key']) ? index : o.key;
+              const value = isEmpty(o['value']) ? o : o.value;
+              return (
+                <Select.Option key={key} value={value}>
+                  {label}
+                </Select.Option>
+              );
+            })}
+          </Select>
         </Form.Item>
 
         <Form.Item
