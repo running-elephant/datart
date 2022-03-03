@@ -220,6 +220,7 @@ const Content = styled.div`
 
   .title {
     flex: 1;
+    color: ${p => p.theme.white};
   }
 
   .action {

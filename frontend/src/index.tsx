@@ -15,8 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import 'antd/dist/antd.variable.css';
-// import 'antd/lib/style/themes/default.less';
+import 'antd/dist/antd.less';
 import { App } from 'app';
 import 'app/assets/fonts/iconfont.css';
 import 'core-js/features/string/replace-all';
@@ -28,7 +27,6 @@ import ReactDOM from 'react-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Provider } from 'react-redux';
 import { configureAppStore } from 'redux/configureStore';
-import 'styles/antdTheme.less';
 import { ThemeProvider } from 'styles/theme/ThemeProvider';
 import { Debugger } from 'utils/debugger';
 import './locales/i18n';

@@ -1,4 +1,5 @@
 import * as slice from '..';
+import { getInitialTheme } from '..';
 import { ThemeState } from '../types';
 
 describe('theme slice', () => {
@@ -46,5 +47,12 @@ describe('theme slice', () => {
       //   state.theme!.selected,
       // );
     });
+  });
+
+  it('check getInitialTheme fn', () => {
+    window.localStorage.setItem('selectedTheme', 'dark');
+    expect(getInitialTheme()).toEqual('dark');
+    window.localStorage.setItem('selectedTheme', 'ligth');
+    expect(getInitialTheme()).toEqual('ligth');
   });
 });

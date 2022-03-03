@@ -60,6 +60,8 @@ import {
   SPACE_TIMES,
   SPACE_XS,
 } from 'styles/StyleConstants';
+import themeDark from 'styles/theme/dark';
+import themeLight from 'styles/theme/light';
 import themeSlice from 'styles/theme/slice';
 import { ThemeKeyType } from 'styles/theme/slice/types';
 import { Access } from '../Access';
@@ -196,6 +198,14 @@ export function Navbar() {
   const handleChangeThemeFn = useCallback(
     (theme: ThemeKeyType) => {
       dispatch(themeSlice.actions.changeTheme(theme));
+      (window as any).less
+        .modifyVars(theme === 'dark' ? themeDark : themeLight)
+        .then((res: any) => {
+          console.log('切换主题成功');
+        })
+        .catch((res: any) => {
+          console.log('切换主题错误');
+        });
     },
     [dispatch],
   );
@@ -316,11 +326,15 @@ export function Navbar() {
                 <MenuListItem
                   key="theme"
                   prefix={<BgColorsOutlined className="icon" />}
-                  title={<p>切换主题</p>}
+                  title={<p>{t('nav.account.switchTheme.title')}</p>}
                   sub
                 >
-                  <MenuListItem key="light">浅色</MenuListItem>
-                  <MenuListItem key="dark">深色</MenuListItem>
+                  <MenuListItem key="light">
+                    {t('nav.account.switchTheme.light')}
+                  </MenuListItem>
+                  <MenuListItem key="dark">
+                    {t('nav.account.switchTheme.dark')}
+                  </MenuListItem>
                 </MenuListItem>
                 <Menu.Divider />
                 <MenuListItem

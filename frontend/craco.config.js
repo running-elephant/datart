@@ -32,7 +32,18 @@ module.exports = {
   babel: {
     plugins: ['babel-plugin-styled-components'],
   },
-  plugins: [],
+  plugins: [
+    {
+      plugin: CracoLessPlugin,
+      options: {
+        lessLoaderOptions: {
+          lessOptions: {
+            javascriptEnabled: true,
+          },
+        },
+      },
+    },
+  ],
   webpack: {
     alias: {},
     plugins: [

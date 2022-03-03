@@ -126,7 +126,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
                           shouldUpdate
                           validateTrigger={['onChange', 'onClick', 'onBlur']}
                           name={[field.name, 'triggerColumn']}
-                          fieldKey={[field.key, 'id']}
+                          fieldKey={[field.fieldKey, 'id']}
                           rules={[
                             { required: true, message: t('selectTriggers') },
                           ]}
@@ -155,7 +155,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
                           rules={[
                             { required: true, message: t('selectLinker') },
                           ]}
-                          fieldKey={[field.key, 'id']}
+                          fieldKey={[field.fieldKey, 'id']}
                         >
                           <Select
                             style={{ width: 200 }}

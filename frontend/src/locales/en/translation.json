@@ -162,7 +162,12 @@
           "confirmPassword": "Confirm password"
         },
         "switchLanguage": {
-          "title": "language"
+          "title": "Language"
+        },
+        "switchTheme": {
+          "title": "Switch themes",
+          "light": "Light",
+          "dark": "Dark"
         },
         "logout": {
           "title": "Logout"

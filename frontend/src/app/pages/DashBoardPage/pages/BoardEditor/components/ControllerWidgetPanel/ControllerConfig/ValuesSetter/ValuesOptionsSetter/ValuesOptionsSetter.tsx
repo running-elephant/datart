@@ -17,6 +17,7 @@
  */
 
 import { Form, FormInstance, Radio, Select, Space } from 'antd';
+import { CascaderOptionType } from 'antd/lib/cascader';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   OPERATOR_TYPE_OPTION,
@@ -32,7 +33,7 @@ import styled from 'styled-components/macro';
 import { G30 } from 'styles/StyleConstants';
 import { request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
-import { CascaderOptionType, ControllerConfig } from '../../../types';
+import { ControllerConfig } from '../../../types';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
 const ValuesOptionsSetter: FC<{

@@ -188,7 +188,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                           {...field}
                           validateTrigger={['onChange', 'onClick', 'onBlur']}
                           name={[field.name, 'relatedCategory']}
-                          fieldKey={[field.key, 'id']}
+                          fieldKey={[field.fieldKey, 'id']}
                         >
                           <RadioGroup
                             value
@@ -215,7 +215,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                       shouldUpdate
                       validateTrigger={['onChange', 'onClick', 'onBlur']}
                       name={[field.name, 'fieldValue']}
-                      fieldKey={[field.key, 'id']}
+                      fieldKey={[field.fieldKey, 'id']}
                       wrapperCol={{ span: 24 }}
                       rules={[{ validator: fieldValueValidator }]}
                     >
