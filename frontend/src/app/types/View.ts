@@ -26,7 +26,6 @@ import {
 } from '../pages/MainPage/pages/ViewPage/slice/types';
 
 export interface View extends ViewSimple {
-  version?: string;
   config: string;
   model: string;
   script: string;

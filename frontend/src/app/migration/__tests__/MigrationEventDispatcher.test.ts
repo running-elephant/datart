@@ -164,4 +164,31 @@ describe('MigrationEventDispatcher Tests', () => {
       version: APP_VERSION_BETA_1,
     });
   });
+
+  test('should migrate change with specific version', () => {
+    const eventInit = new MigrationEvent<any>(APP_VERSION_INIT, m => {
+      m.id = 1;
+      return m;
+    });
+    const event1 = new MigrationEvent<any>(APP_VERSION_BETA_1, m => {
+      m.beta = 3;
+      return m;
+    });
+    const event2 = new MigrationEvent<any>(APP_VERSION_BETA_2, m => {
+      m.id = 999;
+      return m;
+    });
+    const dispatcher = new MigrationEventDispatcher(eventInit, event1, event2);
+    expect(
+      dispatcher.process({
+        id: 0,
+        beta: 2,
+        version: APP_VERSION_BETA_1,
+      } as any),
+    ).toMatchObject({
+      id: 999,
+      beta: 2,
+      version: APP_VERSION_BETA_2,
+    });
+  });
 });

@@ -16,19 +16,19 @@
  * limitations under the License.
  */
 
-import { View } from 'app/types/View';
-import { APP_VERSION_BETA_2, APP_VERSION_INIT } from '../constants';
+import { CloneValueDeep } from 'utils/object';
+import { APP_VERSION_BETA_2 } from '../constants';
 import MigrationEvent from '../MigrationEvent';
 import MigrationEventDispatcher from '../MigrationEventDispatcher';
 
 /**
  * Initialize method to setup version used by @see MigrationEvent
  *
- * @param {View} [view]
- * @return {*}  {(View | undefined)}
+ * @param {object} [model]
+ * @return {*}  {(object | undefined)}
  */
-const init = (view?: View): View | undefined => {
-  return view;
+const init = (model?: object): object | undefined => {
+  return model;
 };
 
 /**
@@ -37,31 +37,35 @@ const init = (view?: View): View | undefined => {
  * - migrate model to ...
  * - ....
  *
- * @param {View} [view]
- * @return {*}  {(View | undefined)}
+ * @param {object} [model]
+ * @return {*}  {(object | undefined)}
  */
-const beta2 = (view?: View): View | undefined => {
-  if (true /* beta.2 */) {
-    // do something...
-    // do something...
-    // do something...
-    // do something...
-    // do something...
+const beta2 = (model?: object): object | undefined => {
+  const clonedModel = CloneValueDeep(model);
+  if (model) {
+    model = {
+      hierarchy: clonedModel,
+      columns: clonedModel,
+    };
   }
-  return view;
+  return model;
 };
 
 /**
  * main entry point of migration
  *
- * @param {View} model
- * @return {View}
+ * @param {string} model
+ * @return {string}
  */
-const beginViewModelMigration = (model: View): View => {
-  const event0 = new MigrationEvent(APP_VERSION_INIT, init);
+const beginViewModelMigration = (model: string): string => {
+  if (!model?.trim().length) {
+    return model;
+  }
+  const modelObj = JSON.parse(model);
   const event2 = new MigrationEvent(APP_VERSION_BETA_2, beta2);
-  const dispatcher = new MigrationEventDispatcher(event0, event2);
-  return dispatcher.process(model);
+  const dispatcher = new MigrationEventDispatcher(event2);
+  const result = dispatcher.process(modelObj);
+  return JSON.stringify(result);
 };
 
 export default beginViewModelMigration;
