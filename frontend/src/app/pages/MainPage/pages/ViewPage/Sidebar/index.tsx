@@ -116,7 +116,6 @@ export const Sidebar = memo(
             break;
           case 'folder':
             showSaveForm({
-              viewType: key,
               type: CommonFormTypes.Add,
               visible: true,
               simple: true,

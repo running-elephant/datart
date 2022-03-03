@@ -125,10 +125,9 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
         switch (key) {
           case 'info':
             showSaveForm({
-              viewType: isFolder ? 'folder' : 'view',
               type: CommonFormTypes.Edit,
               visible: true,
-              simple: true,
+              simple: isFolder,
               initialValues: {
                 id,
                 name,
