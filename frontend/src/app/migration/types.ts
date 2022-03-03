@@ -16,21 +16,9 @@
  * limitations under the License.
  */
 
-import {
-  RowPermissionRaw,
-  Variable,
-} from '../pages/MainPage/pages/VariablePage/slice/types';
-import {
-  ColumnPermissionRaw,
-  ViewSimple,
-} from '../pages/MainPage/pages/ViewPage/slice/types';
+export type Task<T> = (v?: T) => T | undefined;
 
-export interface View extends ViewSimple {
-  version?: string;
-  config: string;
-  model: string;
-  script: string;
-  variables: Variable[];
-  relVariableSubjects: RowPermissionRaw[];
-  relSubjectColumns: ColumnPermissionRaw[];
-}
+export type IDomainEvent<T> = {
+  version: string;
+  run: Task<T>;
+};
