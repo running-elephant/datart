@@ -272,6 +272,8 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
       <Modal
         width={992}
         closable={false}
+        maskClosable={false}
+        keyboard={false}
         visible={widgetInfo.editing}
         onOk={modalOk}
         onCancel={modalCancel}
