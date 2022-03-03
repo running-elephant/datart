@@ -1161,6 +1161,7 @@
       "remove": "Remove"
     },
     "form": {
+      "email": "Email",
       "search": "Search or paste the emails of invited members",
       "needConfirm": "Need email confirmation"
     },
