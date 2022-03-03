@@ -1097,7 +1097,7 @@ export function getSeriesTooltips4Rectangular2(
     .concat(sizeConfigs || [])
     .concat(infoConfigs || [])
     .map(config =>
-      valueFormatter(config, row?.[chartDataSet.getFieldKey(config)]),
+      valueFormatter(config, row?.[chartDataSet.getFieldOriginKey(config)]),
     );
   return tooltips.join('<br />');
 }
@@ -1124,7 +1124,7 @@ export function getSeriesTooltips4Polar2(
     .concat(sizeConfigs || [])
     .concat(infoConfigs || [])
     .map(config =>
-      valueFormatter(config, row?.[chartDataSet.getFieldKey(config)]),
+      valueFormatter(config, row?.[chartDataSet.getFieldOriginKey(config)]),
     );
   return tooltips.join('<br />');
 }
@@ -1222,7 +1222,6 @@ export function getExtraSeriesRowData(data) {
       rowData: data?.convertToCaseSensitiveObject(),
     };
   }
-
   return {
     rowData: data,
   };
@@ -1236,36 +1235,13 @@ export function getExtraSeriesDataFormat(format?: IFieldFormatConfig) {
 
 export function getColorizeGroupSeriesColumns(
   chartDataSet: IChartDataSet<string>,
-  groupByKey: string,
-  xAxisColumnName: string,
-  aggregateKeys: string[],
-  infoColumnNames: string[],
+  groupConfig: ChartDataSectionField,
 ) {
-  const groupedDataColumnObject = chartDataSet?.reduce((acc, cur) => {
-    const colKey = cur.getCellByKey(groupByKey) || 'defaultGroupKey';
-
-    if (!acc[colKey]) {
-      acc[colKey] = [];
-    }
-    const value = aggregateKeys
-      .concat([xAxisColumnName])
-      .concat(infoColumnNames || [])
-      .concat([groupByKey])
-      .reduce((a, k) => {
-        a[k] = cur.getCellByKey(k);
-        return a;
-      }, {});
-    acc[colKey].push(value);
-    return acc;
-  }, {});
-
-  let collection = [] as any;
-  Object.entries(groupedDataColumnObject).forEach(([k, v]) => {
+  return Object.entries(chartDataSet.groupBy(groupConfig)).map(([k, v]) => {
     let a = {};
     a[k] = v;
-    collection.push(a);
+    return a;
   });
-  return collection;
 }
 
 /**

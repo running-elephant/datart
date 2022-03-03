@@ -135,6 +135,20 @@ export class ChartDataSet<T>
         sortValues.indexOf(next[this.toKey(order)]),
     );
   }
+
+  public groupBy(field: ChartDataSectionField): {
+    [groupKey in string]: IChartDataSetRow<T>[];
+  } {
+    const groupedChartDataSets = this.reduce((acc, row) => {
+      const valueKey = row.getCell(field) || 'defaultGroupKey';
+      if (!acc[valueKey]) {
+        acc[valueKey] = [];
+      }
+      acc[valueKey].push(row);
+      return acc;
+    }, {});
+    return groupedChartDataSets;
+  }
 }
 
 export class ChartDataSetRow<T>

@@ -141,7 +141,7 @@ export const getSchemaBySourceId = createAsyncThunk<any, string>(
     }
 
     const { data } = await request2<any>({
-      url: `/sources/schemas/${sourceId}/`, // TODO(Stephen): remove `/` mark after backend update
+      url: `/sources/schemas/${sourceId}`,
       method: 'GET',
     });
     return {
@@ -218,6 +218,7 @@ export const saveView = createAsyncThunk<
         ...data,
         config: currentEditingView.config,
         model: currentEditingView.model,
+        hierarchy: currentEditingView.hierarchy,
         variables: data.variables.map(v => ({
           ...v,
           relVariableSubjects: data.relVariableSubjects,

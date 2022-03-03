@@ -852,7 +852,8 @@
         "autoPlay": "Auto Play",
         "duration": "Duration (s) ",
         "delPagesTip": "Confirm to delete all selected story pages?",
-        "delPageTip": "Confirm to delete this story page?"
+        "delPageTip": "Confirm to delete this story page?",
+        "enterHere": "Enter here"
       }
     },
     "widget": {
@@ -1112,6 +1113,9 @@
     "archived": "Archived ",
     "noPermission": "You do not have permission to access this page",
     "creatView": "Creat View",
+    "syncDatabase": "Sync Database",
+    "syncDatabaseSchemaSuccess": "Sync database schema successfully",
+    "lastUpdateTime": "Last Update Time",
     "sidebar": {
       "title": "Sources",
       "add": "Create source",

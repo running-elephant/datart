@@ -294,7 +294,7 @@ export const Variables = memo(() => {
 
   const titleProps = useMemo(
     () => ({
-      title: t('title'),
+      title: 'variable',
       search: true,
       add: {
         items: [{ key: 'variable', text: t('add') }],
@@ -305,7 +305,7 @@ export const Variables = memo(() => {
   );
 
   return (
-    <Container title="variable">
+    <Container {...titleProps}>
       <ListWrapper>
         <List
           dataSource={listSource}

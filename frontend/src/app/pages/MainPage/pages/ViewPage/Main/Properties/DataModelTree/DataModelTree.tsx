@@ -29,7 +29,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { FONT_SIZE_BASE, INFO } from 'styles/StyleConstants';
-import { CloneValueDeep, isEmptyArray } from 'utils/object';
+import { CloneValueDeep, isEmpty, isEmptyArray } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { ColumnTypes } from '../../../constants';
 import { useViewSlice } from '../../../slice';
@@ -43,7 +43,13 @@ import {
   ColumnRole,
   Model,
 } from '../../../slice/types';
+import { dataModelColumnSorter } from '../../../utils';
 import Container from '../Container';
+import {
+  ALLOW_COMBINE_COLUMN_TYPES,
+  ROOT_CONTAINER_ID,
+  TreeNodeHierarchy,
+} from './constant';
 import DataModelBranch from './DataModelBranch';
 import DataModelNode from './DataModelNode';
 
@@ -60,31 +66,21 @@ const DataModelTree: FC = memo(() => {
   const columnPermissions = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'columnPermissions' }),
   ) as ColumnPermission[];
-  const [model, setModel] = useState<Model | undefined>(
+  const [hierarchy, setHierarchy] = useState<Model | undefined>(
     currentEditingView?.model,
   );
 
   useEffect(() => {
-    setModel(currentEditingView?.model);
-  }, [currentEditingView?.model]);
+    setHierarchy(currentEditingView?.hierarchy);
+  }, [currentEditingView?.hierarchy]);
 
   const tableColumns = useMemo<Column[]>(() => {
-    return Object.entries(model || {})
+    return Object.entries(hierarchy || {})
       .map(([name, column], index) => {
         return Object.assign({ index }, column, { name });
       })
-      .sort((pre, next) => {
-        if (pre.role === next.role) {
-          if (pre.role === ColumnRole.Hierarchy) {
-            return (pre.name || '').localeCompare(next.name);
-          }
-          return pre.index - next.index;
-        }
-        const preHierarchyIndex = pre.role === ColumnRole.Hierarchy ? 0 : 1;
-        const nextHierarchyIndex = next.role === ColumnRole.Hierarchy ? 0 : 1;
-        return preHierarchyIndex - nextHierarchyIndex;
-      });
-  }, [model]);
+      .sort(dataModelColumnSorter);
+  }, [hierarchy]);
 
   const roleDropdownData = useMemo(
     () =>
@@ -99,7 +95,7 @@ const DataModelTree: FC = memo(() => {
 
   const checkRoleColumnPermission = useCallback(
     columnName => checkedKeys => {
-      const fullPermissions = Object.keys(model || {});
+      const fullPermissions = Object.keys(hierarchy || {});
       dispatch(
         actions.changeCurrentEditingView({
           columnPermissions: roleDropdownData.reduce<ColumnPermission[]>(
@@ -147,78 +143,119 @@ const DataModelTree: FC = memo(() => {
         }),
       );
     },
-    [dispatch, actions, viewId, model, columnPermissions, roleDropdownData],
+    [dispatch, actions, viewId, hierarchy, columnPermissions, roleDropdownData],
   );
 
   const handleDeleteBranch = (node: Column) => {
-    const newModel = deleteBranch(tableColumns, node);
-    handleDataModelChange(newModel);
+    const newHierarchy = deleteBranch(tableColumns, node);
+    handleDataModelHierarchyChange(newHierarchy);
   };
 
-  const handleNodeTypeChange =
-    (node: Column) =>
-    ({ key }) => {
+  const handleNodeTypeChange = (type, name) => {
+    const targetNode = tableColumns?.find(n => n.name === name);
+    if (targetNode) {
       let newNode;
-      if (key.includes('category')) {
-        const category = key.split('-')[1];
-        newNode = { ...node, category };
+      if (type.includes('category')) {
+        const category = type.split('-')[1];
+        newNode = { ...targetNode, category };
       } else {
-        newNode = { ...node, type: key };
+        newNode = { ...targetNode, type: type };
       }
-
-      const targetNode = tableColumns?.find(n => n.name === node?.name);
-      if (targetNode) {
-        const newModel = updateNode(tableColumns, newNode, targetNode.index);
-        handleDataModelChange(newModel);
-        return;
+      const newHierarchy = updateNode(tableColumns, newNode, targetNode.index);
+      handleDataModelHierarchyChange(newHierarchy);
+      return;
+    }
+    const targetBranch = tableColumns?.find(b => {
+      if (b.children) {
+        return b.children?.find(bn => bn.name === name);
       }
-      const targetBranch = tableColumns?.find(b => {
-        if (b.children) {
-          return b.children?.find(bn => bn.name === node?.name);
-        }
-        return false;
-      });
-      if (!!targetBranch) {
-        const newNodeIndex = targetBranch.children?.findIndex(
-          bn => bn.name === node?.name,
-        );
-        if (newNodeIndex !== undefined && newNodeIndex > -1) {
-          const newTargetBranch = CloneValueDeep(targetBranch);
-          if (newTargetBranch.children) {
-            newTargetBranch.children[newNodeIndex] = newNode;
-            const newModel = updateNode(
-              tableColumns,
-              newTargetBranch,
-              newTargetBranch.index,
-            );
-            handleDataModelChange(newModel);
+      return false;
+    });
+    if (!!targetBranch) {
+      const newNodeIndex = targetBranch.children?.findIndex(
+        bn => bn.name === name,
+      );
+      if (newNodeIndex !== undefined && newNodeIndex > -1) {
+        const newTargetBranch = CloneValueDeep(targetBranch);
+        if (newTargetBranch.children) {
+          let newNode = newTargetBranch.children[newNodeIndex];
+          if (type.includes('category')) {
+            const category = type.split('-')[1];
+            newNode = { ...newNode, category };
+          } else {
+            newNode = { ...newNode, type: type };
           }
+          newTargetBranch.children[newNodeIndex] = newNode;
+          const newHierarchy = updateNode(
+            tableColumns,
+            newTargetBranch,
+            newTargetBranch.index,
+          );
+          handleDataModelHierarchyChange(newHierarchy);
         }
       }
-    };
+    }
+  };
 
-  const handleDataModelChange = model => {
-    setModel(model);
+  const handleDataModelHierarchyChange = hierarchy => {
+    setHierarchy(hierarchy);
     dispatch(
       actions.changeCurrentEditingView({
-        model: model,
+        hierarchy: hierarchy,
       }),
     );
   };
 
   const handleDragEnd = result => {
-    if (!result.destination) {
-      return;
+    if (Boolean(result.destination) && isEmpty(result?.combine)) {
+      const newHierarchy = reorderNode(
+        CloneValueDeep(tableColumns),
+        { name: result.draggableId },
+        {
+          name: result.destination.droppableId,
+          index: result.destination.index,
+        },
+      );
+      return handleDataModelHierarchyChange(newHierarchy);
     }
-    const newModel = reorderNode(
-      tableColumns,
-      result.source.index,
-      result.destination.index,
-    );
-    handleDataModelChange(newModel);
+    if (!Boolean(result.destination) && !isEmpty(result?.combine)) {
+      const clonedTableColumns = CloneValueDeep(tableColumns);
+      const sourceNode = clonedTableColumns?.find(
+        c => c.name === result.draggableId,
+      );
+      const targetNode = clonedTableColumns?.find(
+        c => c.name === result.combine.draggableId,
+      );
+      if (
+        sourceNode &&
+        sourceNode.role !== ColumnRole.Hierarchy &&
+        targetNode &&
+        targetNode.role !== ColumnRole.Hierarchy &&
+        ALLOW_COMBINE_COLUMN_TYPES.includes(sourceNode.type) &&
+        ALLOW_COMBINE_COLUMN_TYPES.includes(targetNode.type)
+      ) {
+        return openCreateHierarchyModal(sourceNode, targetNode);
+      } else if (
+        sourceNode &&
+        sourceNode.role !== ColumnRole.Hierarchy &&
+        targetNode &&
+        targetNode.role === ColumnRole.Hierarchy &&
+        ALLOW_COMBINE_COLUMN_TYPES.includes(sourceNode.type)
+      ) {
+        const newHierarchy = reorderNode(
+          clonedTableColumns,
+          { name: result.draggableId },
+          {
+            name: result.combine.draggableId,
+            index: -1,
+          },
+        );
+        return handleDataModelHierarchyChange(newHierarchy);
+      }
+    }
   };
 
-  const openCreateHierarchyModal = (node: Column) => {
+  const openCreateHierarchyModal = (...nodes: Column[]) => {
     return (openStateModal as Function)({
       title: t('model.newHierarchy'),
       modalSize: StateModalSize.XSMALL,
@@ -230,15 +267,15 @@ const DataModelTree: FC = memo(() => {
           name: hierarchyName,
           type: ColumnTypes.String,
           role: ColumnRole.Hierarchy,
-          children: [node],
+          children: nodes,
         };
-        const newModel = insertNode(tableColumns, hierarchyNode, node.index);
-        handleDataModelChange(newModel);
+        const newHierarchy = insertNode(tableColumns, hierarchyNode, nodes);
+        handleDataModelHierarchyChange(newHierarchy);
       },
       content: onChangeEvent => {
         const allNodeNames = tableColumns?.flatMap(c => {
           if (!isEmptyArray(c.children)) {
-            return c.children?.map(cc => cc.name);
+            return [c.name].concat(c.children?.map(cc => cc.name) || []);
           }
           return c.name;
         });
@@ -277,13 +314,13 @@ const DataModelTree: FC = memo(() => {
       modalSize: StateModalSize.XSMALL,
       onOk: hierarchyName => {
         if (currrentHierarchies?.find(h => h.name === hierarchyName)) {
-          let newModel = moveNode(
+          let newHierarchy = moveNode(
             tableColumns,
             node,
             currrentHierarchies,
             hierarchyName,
           );
-          handleDataModelChange(newModel);
+          handleDataModelHierarchyChange(newHierarchy);
         }
       },
       content: onChangeEvent => {
@@ -321,12 +358,12 @@ const DataModelTree: FC = memo(() => {
         if (!newName) {
           return;
         }
-        const newModel = updateNode(
+        const newHierarchy = updateNode(
           tableColumns,
           { ...node, name: newName },
           node.index,
         );
-        handleDataModelChange(newModel);
+        handleDataModelHierarchyChange(newHierarchy);
       },
       content: onChangeEvent => {
         return (
@@ -357,16 +394,61 @@ const DataModelTree: FC = memo(() => {
     });
   };
 
-  const reorderNode = (columns: Column[], startIndex, endIndex) => {
-    const [removed] = columns.splice(startIndex, 1);
-    columns.splice(endIndex, 0, removed);
+  const reorderNode = (
+    columns: Column[],
+    source: { name: string },
+    target: { name: string; index: number },
+  ) => {
+    let sourceItem: Column | undefined;
+    const removeIndex = columns.findIndex(c => c.name === source.name);
+    if (removeIndex > -1) {
+      sourceItem = columns.splice(removeIndex, 1)?.[0];
+    } else {
+      const branchNode = columns.filter(
+        c =>
+          c.role === ColumnRole.Hierarchy &&
+          c.children?.find(cc => cc.name === source.name),
+      )?.[0];
+      if (!branchNode) {
+        return toModel(columns);
+      }
+      const removeIndex = branchNode.children!.findIndex(
+        c => c.name === source.name,
+      );
+      if (removeIndex === -1) {
+        return toModel(columns);
+      }
+      sourceItem = branchNode.children?.splice(removeIndex, 1)?.[0];
+    }
+
+    if (!sourceItem) {
+      return toModel(columns);
+    }
+
+    if (target.name === ROOT_CONTAINER_ID) {
+      columns.splice(target.index, 0, sourceItem);
+    } else {
+      const branchNode = columns.filter(
+        c => c.role === ColumnRole.Hierarchy && c.name === target.name,
+      )?.[0];
+      if (!branchNode) {
+        return toModel(columns);
+      }
+      if (target.index === -1) {
+        branchNode.children!.push(sourceItem);
+      } else {
+        branchNode.children!.splice(target.index, 0, sourceItem);
+      }
+    }
     return toModel(columns);
   };
 
-  const insertNode = (columns: Column[], newNode, removeIndex) => {
-    columns.splice(removeIndex, 1);
-    columns.unshift(newNode);
-    return toModel(columns);
+  const insertNode = (columns: Column[], newNode, nodes: Column[]) => {
+    const newColumns = columns.filter(
+      c => !nodes.map(n => n.name).includes(c.name),
+    );
+    newColumns.unshift(newNode);
+    return toModel(newColumns);
   };
 
   const updateNode = (columns: Column[], newNode, updateIndex) => {
@@ -375,11 +457,13 @@ const DataModelTree: FC = memo(() => {
   };
 
   const deleteBranch = (columns: Column[], node: Column) => {
-    const branch = columns[node.index!];
-    const children = branch?.children || [];
-    columns.splice(node.index!, 1);
-
-    return toModel(columns, ...children);
+    const deletedBranchIndex = columns.findIndex(c => c.name === node.name);
+    if (deletedBranchIndex > -1) {
+      const branch = columns[deletedBranchIndex];
+      const children = branch?.children || [];
+      columns.splice(deletedBranchIndex, 1);
+      return toModel(columns, ...children);
+    }
   };
 
   const moveNode = (
@@ -417,7 +501,20 @@ const DataModelTree: FC = memo(() => {
       if (cur?.role === ColumnRole.Hierarchy && isEmptyArray(cur?.children)) {
         return acc;
       }
-      acc[cur.name] = Object.assign({}, cur, { index: newIndex });
+      if (cur?.role === ColumnRole.Hierarchy && !isEmptyArray(cur?.children)) {
+        const orderedChildren = cur.children?.map((child, newIndex) => {
+          return {
+            ...child,
+            index: newIndex,
+          };
+        });
+        acc[cur.name] = Object.assign({}, cur, {
+          index: newIndex,
+          children: orderedChildren,
+        });
+      } else {
+        acc[cur.name] = Object.assign({}, cur, { index: newIndex });
+      }
       return acc;
     }, {});
   };
@@ -486,7 +583,11 @@ const DataModelTree: FC = memo(() => {
   return (
     <Container title="model">
       <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="droppable" type="Tree" isCombineEnabled>
+        <Droppable
+          droppableId={ROOT_CONTAINER_ID}
+          type={TreeNodeHierarchy.Root}
+          isCombineEnabled={true}
+        >
           {(droppableProvided, droppableSnapshot) => (
             <StyledDroppableContainer
               ref={droppableProvided.innerRef}
@@ -496,6 +597,7 @@ const DataModelTree: FC = memo(() => {
                 return col.role === ColumnRole.Hierarchy ? (
                   <DataModelBranch
                     node={col}
+                    key={col.name}
                     getPermissionButton={getPermissionButton}
                     onNodeTypeChange={handleNodeTypeChange}
                     onMoveToHierarchy={openMoveToHierarchyModal}
@@ -505,6 +607,7 @@ const DataModelTree: FC = memo(() => {
                 ) : (
                   <DataModelNode
                     node={col}
+                    key={col.name}
                     getPermissionButton={getPermissionButton}
                     onCreateHierarchy={openCreateHierarchyModal}
                     onNodeTypeChange={handleNodeTypeChange}
@@ -526,5 +629,4 @@ export default DataModelTree;
 
 const StyledDroppableContainer = styled.div<{ isDraggingOver }>`
   user-select: 'none';
-  background: ${p => (p.isDraggingOver ? 'lightblue' : 'transparent')};
 `;

@@ -171,15 +171,14 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
     @Override
     public Dataframe testExecute(TestExecuteParam testExecuteParam) throws Exception {
         Source source = retrieve(testExecuteParam.getSourceId(), Source.class, true);
-
         List<ScriptVariable> variables = getOrgVariables(source.getOrgId());
         if (!CollectionUtils.isEmpty(testExecuteParam.getVariables())) {
-            for (ScriptVariable variable : testExecuteParam.getVariables()) {
-                if (variable.isExpression()) {
-                    variable.setValueType(ValueType.FRAGMENT);
-                }
-            }
             variables.addAll(testExecuteParam.getVariables());
+        }
+        for (ScriptVariable variable : variables) {
+            if (variable.isExpression()) {
+                variable.setValueType(ValueType.FRAGMENT);
+            }
         }
         if (securityManager.isOrgOwner(source.getOrgId())) {
             disablePermissionVariables(variables);

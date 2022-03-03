@@ -22,12 +22,13 @@ import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES } from 'styles/StyleConstants';
 
-const Container: FC<{ title; children }> = memo(({ title, children }) => {
+const Container: FC<any> = memo(props => {
   const t = useI18NPrefix('view.properties');
+  const { title, children, ...rest } = props;
 
   return (
     <StyledContainer>
-      <ListTitle title={t(title)} />
+      <ListTitle title={t(title)} {...rest} />
       {children}
     </StyledContainer>
   );

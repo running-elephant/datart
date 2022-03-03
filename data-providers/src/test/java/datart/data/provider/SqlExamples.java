@@ -18,5 +18,32 @@
 
 package datart.data.provider;
 
+import org.apache.commons.compress.utils.Sets;
+
+import java.util.Set;
+
 public class SqlExamples {
+
+    private final static Set<String> standardSql = Sets.newHashSet(
+            "SELECT * FROM test_table where 部门=$部门$ and `age`>$age$"
+            , "SELECT * FROM test_table where 部门 IN ($部门$)"
+            , "SELECT * FROM test_table where age between $min$ and $max$"
+            , "SELECT * FROM `test_table` where age between $min$ and $max$"
+    );
+
+    private final static Set<String> sqlWithVariables = Sets.newHashSet(
+            "SELECT * FROM test_table where 部门=$部门$ and `age`>$age$"
+            , "SELECT * FROM test_table where 部门 IN ($部门$)"
+            , "SELECT * FROM test_table where age between $min$ and $max$"
+            , "SELECT * FROM `test_table` where age between $min$ and $max$"
+    );
+
+    private final static Set<String> specialSql = Sets.newHashSet(
+            "SELECT * "
+    );
+
+    private final static Set<String> illegalSql = Sets.newHashSet(
+            "DELETE FROM test_table"
+    );
+
 }

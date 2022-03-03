@@ -91,7 +91,9 @@ const slice = createSlice({
         ) {
           currentEditingView.touched = true;
           if (
-            ['model', 'variables', 'columnPermissions'].includes(entries[0][0])
+            ['model', 'hierarchy', 'variables', 'columnPermissions'].includes(
+              entries[0][0],
+            )
           ) {
             currentEditingView.stage = ViewViewModelStages.Saveable;
           } else {
@@ -227,6 +229,7 @@ const slice = createSlice({
           currentEditingView.model,
         );
         currentEditingView.model = model;
+        currentEditingView.hierarchy = model;
         currentEditingView.previewResults = dataSource;
         if (!action.meta.arg.isFragment) {
           currentEditingView.stage = ViewViewModelStages.Saveable;

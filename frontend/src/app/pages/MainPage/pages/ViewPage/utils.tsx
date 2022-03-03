@@ -20,11 +20,18 @@ import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
 import { getDiffParams, getTextWidth } from 'utils/utils';
 import {
   ColumnCategories,
+  ColumnTypes,
   DEFAULT_PREVIEW_SIZE,
   UNPERSISTED_ID_PREFIX,
   ViewViewModelStages,
 } from './constants';
-import { Column, Model, QueryResult, ViewViewModel } from './slice/types';
+import {
+  Column,
+  ColumnRole,
+  Model,
+  QueryResult,
+  ViewViewModel,
+} from './slice/types';
 
 export function generateEditingView(
   attrs?: Partial<ViewViewModel>,
@@ -37,6 +44,7 @@ export function generateEditingView(
     script: '',
     config: {},
     model: {},
+    hierarchy: {},
     originVariables: [],
     variables: [],
     originColumnPermissions: [],
@@ -293,3 +301,25 @@ export function transformModelToViewModel(
     })),
   };
 }
+
+export const dataModelColumnSorter = (prev: Column, next: Column): number => {
+  const columnTypePriority = {
+    [ColumnTypes.Date]: 1,
+    [ColumnTypes.String]: 1,
+    [ColumnTypes.Number]: 2,
+  };
+  const hierarchyPriority = {
+    [ColumnRole.Hierarchy]: 10,
+    [ColumnRole.Role]: 100,
+  };
+  const calcPriority = (column: Column) => {
+    return (
+      columnTypePriority[column?.type || ColumnTypes.String] *
+      hierarchyPriority[column?.role || ColumnRole.Role]
+    );
+  };
+  return (
+    calcPriority(prev) - calcPriority(next) ||
+    (prev?.name || '').localeCompare(next?.name || '')
+  );
+};

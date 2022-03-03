@@ -852,7 +852,8 @@
         "autoPlay": "自动播放",
         "duration": "停留时间(秒)",
         "delPagesTip": "确认删除所有选中的故事页",
-        "delPageTip": "确认删除此故事页？"
+        "delPageTip": "确认删除此故事页？",
+        "enterHere": "请输入"
       }
     },
     "widget": {
@@ -1112,6 +1113,9 @@
     "archived": "已归档",
     "noPermission": "您没有权限访问该页面",
     "creatView": "去新建数据视图",
+    "syncDatabase": "同步数据库模式",
+    "syncDatabaseSchemaSuccess": "已成功获取数据库模式",
+    "lastUpdateTime": "最近同步时间",
     "sidebar": {
       "title": "数据源列表",
       "add": "新建数据源",

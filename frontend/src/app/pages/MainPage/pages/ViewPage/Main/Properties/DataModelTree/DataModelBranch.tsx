@@ -34,13 +34,15 @@ import {
   SPACE_UNIT,
   YELLOW,
 } from 'styles/StyleConstants';
+import { ColumnTypes } from '../../../constants';
 import { Column } from '../../../slice/types';
+import { TreeNodeHierarchy } from './constant';
 import DataModelNode from './DataModelNode';
 
 const DataModelBranch: FC<{
   node: Column;
   getPermissionButton: (name) => JSX.Element;
-  onNodeTypeChange;
+  onNodeTypeChange: (type: any, name: string) => void;
   onMoveToHierarchy: (node: Column) => void;
   onEditBranch;
   onDelete: (node: Column) => void;
@@ -103,49 +105,53 @@ const DataModelBranch: FC<{
             {node?.children?.map(childNode => (
               <DataModelNode
                 node={childNode}
+                key={childNode.name}
                 getPermissionButton={getPermissionButton}
                 onMoveToHierarchy={onMoveToHierarchy}
-                onNodeTypeChange={onNodeTypeChange}
+                onNodeTypeChange={handleBranchNodeTypeChange}
               />
             ))}
           </div>
         </>
       );
     };
-    const getListStyle = isDraggingOver => ({
-      background: isDraggingOver ? 'lightblue' : 'grey',
-      padding: 2,
-      width: 250,
-    });
+
+    const handleBranchNodeTypeChange = (type: any, name: string) => {
+      if (type === ColumnTypes.Number) {
+        return;
+      }
+      return onNodeTypeChange(type, name);
+    };
 
     return (
-      <Draggable key={node?.name} draggableId={node?.name} index={node?.index}>
-        {(draggableProvided, draggableSnapshot) => (
-          <StyledDataModelNode
-            isDragging={draggableSnapshot.isDragging}
-            style={draggableProvided.draggableProps.style}
-            ref={draggableProvided.innerRef}
-            {...draggableProvided.draggableProps}
-            {...draggableProvided.dragHandleProps}
-          >
-            <Droppable
-              droppableId={node?.name}
-              type="Branch"
-              isDropDisabled={false}
-              isCombineEnable={true}
+      <Draggable
+        key={node?.name}
+        draggableId={node?.name}
+        index={node?.index}
+        isDragDisabled={true}
+      >
+        {(draggableProvided, draggableSnapshot) => {
+          return (
+            <StyledDataModelBranch
+              ref={draggableProvided.innerRef}
+              {...draggableProvided.draggableProps}
+              {...draggableProvided.dragHandleProps}
             >
-              {(droppableProvided, droppableSnapshot) => (
-                <div
-                  ref={droppableProvided.innerRef}
-                  style={getListStyle(droppableSnapshot.isDraggingOver)}
-                >
-                  {renderNode(node, draggableSnapshot.isDragging)}
-                  {droppableProvided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </StyledDataModelNode>
-        )}
+              <Droppable
+                droppableId={node?.name}
+                type={TreeNodeHierarchy.Branch}
+                isCombineEnabled={false}
+              >
+                {(droppableProvided, droppableSnapshot) => (
+                  <div ref={droppableProvided.innerRef}>
+                    {renderNode(node, draggableSnapshot.isDragging)}
+                    {droppableProvided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </StyledDataModelBranch>
+          );
+        }}
       </Draggable>
     );
   },
@@ -153,14 +159,10 @@ const DataModelBranch: FC<{
 
 export default DataModelBranch;
 
-const StyledDataModelNode = styled.div<{
-  isDragging: boolean;
-}>`
+const StyledDataModelBranch = styled.div<{}>`
   line-height: 32px;
   margin: ${SPACE_UNIT};
   user-select: 'none';
-  background: ${p =>
-    p.isDragging ? p.theme.emphasisBackground : 'transparent'};
   font-size: ${FONT_SIZE_BASE};
 
   & .content {

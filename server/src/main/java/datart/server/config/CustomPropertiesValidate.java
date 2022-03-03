@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.FileUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
@@ -28,7 +27,6 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 @Order(Integer.MIN_VALUE)
-@Slf4j
 public class CustomPropertiesValidate implements EnvironmentPostProcessor {
 
     private static final String CONFIG_HOME = "config/datart.conf";
@@ -54,7 +52,8 @@ public class CustomPropertiesValidate implements EnvironmentPostProcessor {
         try (InputStream inputStream = new FileInputStream(file)) {
             properties.load(inputStream);
         } catch (Exception e) {
-            Exceptions.msg("Failed to load the datart configuration in the path(config/datart.conf)");
+            System.err.println("Failed to load the datart configuration (config/datart.conf), use application-config.yml");
+            return new Properties();
         }
         List<Object> removeKeys = new ArrayList<>();
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
@@ -114,12 +113,12 @@ public class CustomPropertiesValidate implements EnvironmentPostProcessor {
         try {
             List<PropertySource<?>> propertySources = new YamlPropertySourceLoader().load(DEFAULT_APPLICATION_CONFIG, new FileSystemResource(DEFAULT_APPLICATION_CONFIG));
             if (CollectionUtils.isEmpty(propertySources)) {
-                log.warn("Default config application-config not found ");
+                System.err.println("Default config application-config not found ");
                 return null;
             }
             return (String) propertySources.get(0).getProperty(DATABASE_URL);
         } catch (Exception e) {
-            log.warn("Default config application-config not found ");
+            System.err.println("Default config application-config not found ");
         }
         return null;
     }
