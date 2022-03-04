@@ -67,18 +67,11 @@ const DataModelTree: FC = memo(() => {
   const columnPermissions = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'columnPermissions' }),
   ) as ColumnPermission[];
-  const [hierarchy, setHierarchy] = useState<Nullable<Model>>(
-    currentEditingView?.model?.hierarchy || currentEditingView?.model?.columns,
-  );
+  const [hierarchy, setHierarchy] = useState<Nullable<Model>>();
 
   useEffect(() => {
-    if (!hierarchy) {
-      setHierarchy(
-        currentEditingView?.model?.hierarchy ||
-          currentEditingView?.model?.columns,
-      );
-    }
-  }, [currentEditingView?.model, hierarchy]);
+    setHierarchy(currentEditingView?.model?.hierarchy);
+  }, [currentEditingView?.model?.hierarchy]);
 
   const tableColumns = useMemo<Column[]>(() => {
     return Object.entries(hierarchy || {})

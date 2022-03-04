@@ -29,6 +29,7 @@ import { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { FONT_FAMILY, FONT_SIZE_BASE } from 'styles/StyleConstants';
+import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { selectRoles } from '../../../MemberPage/slice/selectors';
 import { SubjectTypes } from '../../../PermissionPage/constants';
@@ -86,14 +87,16 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
         } else {
           value = { ...column, type: key };
         }
+        const clonedHierarchyModel = CloneValueDeep(model.hierarchy || {});
+        if (columnName in clonedHierarchyModel) {
+          clonedHierarchyModel[columnName] = value;
+        }
+
         dispatch(
           actions.changeCurrentEditingView({
             model: {
               ...model,
-              columns: {
-                ...model.columns,
-                [columnName]: value,
-              },
+              hierarchy: clonedHierarchyModel,
             },
           }),
         );
@@ -238,6 +241,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
         height={height ? height - 96 : 0}
         width={width}
         model={model.columns || {}}
+        hierarchy={model.hierarchy || {}}
         dataSource={dataSource}
         pagination={pagination}
         getExtraHeaderActions={getExtraHeaderActions}

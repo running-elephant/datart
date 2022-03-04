@@ -17,6 +17,8 @@
  */
 
 import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
+import { Nullable } from 'types';
+import { isEmptyArray } from 'utils/object';
 import { getDiffParams, getTextWidth } from 'utils/utils';
 import {
   ColumnCategories,
@@ -29,6 +31,7 @@ import {
   Column,
   ColumnRole,
   HierarchyModel,
+  Model,
   QueryResult,
   ViewViewModel,
 } from './slice/types';
@@ -92,20 +95,21 @@ export function transformQueryResultToModelAndDataSource(
   model: HierarchyModel;
   dataSource: object[];
 } {
-  const originalModel = lastModel?.columns || {};
   const { rows, columns } = data;
-  const newColumns = columns.reduce(
-    (obj, { name, type, primaryKey }) => ({
+  const newColumns = columns.reduce((obj, { name, type, primaryKey }) => {
+    const hierarchyColumn = getHierarchyColumn(
+      name,
+      lastModel?.hierarchy || {},
+    );
+    return {
       ...obj,
       [name]: {
-        type: originalModel[name]?.type || type,
+        type: hierarchyColumn?.type || type,
         primaryKey,
-        category:
-          originalModel[name]?.category || ColumnCategories.Uncategorized, // FIXME: model 重构时一起改
+        category: hierarchyColumn?.category || ColumnCategories.Uncategorized, // FIXME: model 重构时一起改
       },
-    }),
-    {},
-  );
+    };
+  }, {});
   const dataSource = rows.map(arr =>
     arr.reduce(
       (obj, val, index) => ({ ...obj, [columns[index].name]: val }),
@@ -113,6 +117,20 @@ export function transformQueryResultToModelAndDataSource(
     ),
   );
   return { model: { ...lastModel, columns: newColumns }, dataSource };
+}
+
+export function getHierarchyColumn(
+  columnName: string,
+  hierarchyModel: Model,
+): Nullable<Column> {
+  return Object.entries(hierarchyModel)
+    .flatMap(([name, value]) => {
+      if (!isEmptyArray(value.children)) {
+        return value.children;
+      }
+      return value;
+    })
+    ?.find(col => col?.name === columnName);
 }
 
 export function getColumnWidthMap(
