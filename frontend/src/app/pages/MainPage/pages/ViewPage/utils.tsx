@@ -28,7 +28,7 @@ import {
 import {
   Column,
   ColumnRole,
-  Model,
+  HierarchyModel,
   QueryResult,
   ViewViewModel,
 } from './slice/types';
@@ -44,7 +44,6 @@ export function generateEditingView(
     script: '',
     config: {},
     model: {},
-    hierarchy: {},
     originVariables: [],
     variables: [],
     originColumnPermissions: [],
@@ -88,19 +87,21 @@ export function isNewView(id: string | undefined): boolean {
 
 export function transformQueryResultToModelAndDataSource(
   data: QueryResult,
-  lastModel: Model,
+  lastModel: HierarchyModel,
 ): {
-  model: Model;
+  model: HierarchyModel;
   dataSource: object[];
 } {
+  const originalModel = lastModel?.columns || {};
   const { rows, columns } = data;
-  const model = columns.reduce(
+  const newColumns = columns.reduce(
     (obj, { name, type, primaryKey }) => ({
       ...obj,
       [name]: {
-        type: lastModel[name]?.type || type,
+        type: originalModel[name]?.type || type,
         primaryKey,
-        category: lastModel[name]?.category || ColumnCategories.Uncategorized, // FIXME: model 重构时一起改
+        category:
+          originalModel[name]?.category || ColumnCategories.Uncategorized, // FIXME: model 重构时一起改
       },
     }),
     {},
@@ -111,7 +112,7 @@ export function transformQueryResultToModelAndDataSource(
       {},
     ),
   );
-  return { model, dataSource };
+  return { model: { ...lastModel, columns: newColumns }, dataSource };
 }
 
 export function getColumnWidthMap(

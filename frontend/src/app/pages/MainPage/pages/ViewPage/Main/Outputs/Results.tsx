@@ -39,7 +39,7 @@ import { selectCurrentEditingViewAttr } from '../../slice/selectors';
 import {
   Column,
   ColumnPermission,
-  Model,
+  HierarchyModel,
   ViewViewModel,
 } from '../../slice/types';
 
@@ -58,7 +58,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
   ) as string;
   const model = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'model' }),
-  ) as Model;
+  ) as HierarchyModel;
   const columnPermissions = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'columnPermissions' }),
   ) as ColumnPermission[];
@@ -88,7 +88,13 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
         }
         dispatch(
           actions.changeCurrentEditingView({
-            model: { ...model, [columnName]: value },
+            model: {
+              ...model,
+              columns: {
+                ...model.columns,
+                [columnName]: value,
+              },
+            },
           }),
         );
       },
@@ -108,7 +114,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
 
   const checkRoleColumnPermission = useCallback(
     columnName => checkedKeys => {
-      const fullPermissions = Object.keys(model);
+      const fullPermissions = Object.keys(model?.columns || {});
       dispatch(
         actions.changeCurrentEditingView({
           columnPermissions: roleDropdownData.reduce<ColumnPermission[]>(
@@ -231,7 +237,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
       <SchemaTable
         height={height ? height - 96 : 0}
         width={width}
-        model={model}
+        model={model.columns || {}}
         dataSource={dataSource}
         pagination={pagination}
         getExtraHeaderActions={getExtraHeaderActions}

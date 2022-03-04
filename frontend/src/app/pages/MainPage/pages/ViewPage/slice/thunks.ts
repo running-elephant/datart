@@ -19,6 +19,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import sqlReservedWords from 'app/assets/javascripts/sqlReservedWords';
 import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
+import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import i18n from 'i18next';
 import { monaco } from 'react-monaco-editor';
@@ -122,7 +123,8 @@ export const getViewDetail = createAsyncThunk<
 
     try {
       const { data } = await request<View>(`/views/${viewId}`);
-      const migrateData = migrateViewConfig(data);
+      let migrateData = migrateViewConfig(data);
+      migrateData.model = beginViewModelMigration(migrateData?.model);
       return transformModelToViewModel(migrateData, tempViewModel);
     } catch (error) {
       return rejectHandle(error, rejectWithValue);
@@ -218,7 +220,6 @@ export const saveView = createAsyncThunk<
         ...data,
         config: currentEditingView.config,
         model: currentEditingView.model,
-        hierarchy: currentEditingView.hierarchy,
         variables: data.variables.map(v => ({
           ...v,
           relVariableSubjects: data.relVariableSubjects,

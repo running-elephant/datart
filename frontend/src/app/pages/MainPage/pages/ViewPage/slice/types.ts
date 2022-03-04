@@ -82,8 +82,7 @@ export interface ViewViewModel<T = object>
   description?: string;
   index: number | null;
   isFolder?: boolean;
-  model: Model;
-  hierarchy: Model;
+  model: HierarchyModel;
   config: object;
   originVariables: VariableHierarchy[];
   variables: VariableHierarchy[];
@@ -134,8 +133,14 @@ export interface Column extends Schema {
 }
 
 export interface Model {
-  [key: string]: Omit<Column, 'name'>;
+  [key: string]: Column;
 }
+
+export type HierarchyModel = {
+  version?: string;
+  hierarchy?: Model;
+  columns?: Model;
+};
 
 export interface ColumnPermissionRaw {
   id: string;

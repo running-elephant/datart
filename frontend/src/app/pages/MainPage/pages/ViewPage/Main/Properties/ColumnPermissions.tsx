@@ -32,7 +32,7 @@ import { SubjectTypes } from '../../../PermissionPage/constants';
 import { ViewStatus, ViewViewModelStages } from '../../constants';
 import { useViewSlice } from '../../slice';
 import { selectCurrentEditingViewAttr } from '../../slice/selectors';
-import { ColumnPermission, Model } from '../../slice/types';
+import { ColumnPermission, HierarchyModel } from '../../slice/types';
 import Container from './Container';
 
 export const ColumnPermissions = memo(() => {
@@ -49,7 +49,7 @@ export const ColumnPermissions = memo(() => {
   ) as ViewStatus;
   const model = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'model' }),
-  ) as Model;
+  ) as HierarchyModel;
   const columnPermissions = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'columnPermissions' }),
   ) as ColumnPermission[];
@@ -69,7 +69,9 @@ export const ColumnPermissions = memo(() => {
 
       if (index >= 0) {
         if (
-          Object.keys(model).sort().join(',') !== checkedKeys.sort().join(',')
+          Object.keys(model?.columns || {})
+            .sort()
+            .join(',') !== checkedKeys.sort().join(',')
         ) {
           dispatch(
             actions.changeCurrentEditingView({
@@ -111,8 +113,12 @@ export const ColumnPermissions = memo(() => {
 
   const columnDropdownData = useMemo(
     () =>
-      Object.keys(model).map(name => ({ key: name, title: name, value: name })),
-    [model],
+      Object.keys(model?.columns || {}).map(name => ({
+        key: name,
+        title: name,
+        value: name,
+      })),
+    [model?.columns],
   );
 
   const renderItem = useCallback(
