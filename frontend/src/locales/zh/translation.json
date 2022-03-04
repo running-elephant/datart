@@ -164,6 +164,11 @@
         "switchLanguage": {
           "title": "切换语言"
         },
+        "switchTheme": {
+          "title": "切换主题",
+          "light": "浅色",
+          "dark": "深色"
+        },
         "logout": {
           "title": "退出登录"
         }

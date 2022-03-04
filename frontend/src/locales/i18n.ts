@@ -29,6 +29,7 @@ export const changeLang = lang => {
     lang === 'zh' ? 'zh-CN' : 'en-US'; // FIXME locale
   localStorage.setItem(StorageKeys.Locale, lang);
   moment.locale(lang === 'zh' ? 'zh-cn' : 'en-us'); // FIXME locale
+  window.location && window.location.reload();
 };
 
 const initialLocale = getInitialLocale();

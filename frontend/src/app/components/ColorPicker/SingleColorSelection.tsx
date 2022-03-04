@@ -25,9 +25,7 @@ import {
   BORDER_RADIUS,
   FONT_SIZE_BODY,
   G40,
-  G80,
   SPACE_TIMES,
-  WHITE,
 } from 'styles/StyleConstants';
 import ChromeColorPicker from './ChromeColorPicker';
 import { colorSelectionPropTypes } from './slice/types';
@@ -109,7 +107,7 @@ function SingleColorSelection({ color, onChange }: colorSelectionPropTypes) {
 export default SingleColorSelection;
 
 const ColorWrap = styled.div`
-  background-color: ${WHITE};
+  background-color: ${p => p.theme.bodyBackground};
   width: 426px;
   min-width: 426px;
   // max-width: 426px;
@@ -155,7 +153,7 @@ const MoreColor = styled.div`
   cursor: pointer;
   margin-top: ${SPACE_TIMES(2.5)};
   font-size: ${FONT_SIZE_BODY};
-  color: ${G80};
+  color: ${p => p.theme.textColor};
   &:hover {
     color: ${p => p.theme.primary};
   }

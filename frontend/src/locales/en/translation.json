@@ -164,6 +164,11 @@
         "switchLanguage": {
           "title": "language"
         },
+        "switchTheme": {
+          "title": "Switch themes",
+          "light": "Light",
+          "dark": "Dark"
+        },
         "logout": {
           "title": "Logout"
         }

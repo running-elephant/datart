@@ -18,6 +18,7 @@
 
 import {
   BankFilled,
+  BgColorsOutlined,
   ExportOutlined,
   FormOutlined,
   FunctionOutlined,
@@ -29,6 +30,8 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { List, Menu, Tooltip } from 'antd';
+import lightTheme from 'antd/dist/default-theme';
+import { darkThemeSingle } from 'antd/dist/theme';
 import logo from 'app/assets/images/logo.svg';
 import { Avatar, MenuListItem, Popup } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -59,6 +62,8 @@ import {
   SPACE_TIMES,
   SPACE_XS,
 } from 'styles/StyleConstants';
+import themeSlice from 'styles/theme/slice';
+import { ThemeKeyType } from 'styles/theme/slice/types';
 import { Access } from '../Access';
 import {
   PermissionLevels,
@@ -190,6 +195,21 @@ export function Navbar() {
     [matchModules?.params.moduleName, subNavs],
   );
 
+  const handleChangeThemeFn = useCallback(
+    (theme: ThemeKeyType) => {
+      dispatch(themeSlice.actions.changeTheme(theme));
+      (window as any).less
+        .modifyVars(theme === 'dark' ? darkThemeSingle : lightTheme)
+        .then((res: any) => {
+          console.log('切换主题成功');
+        })
+        .catch((res: any) => {
+          console.log('切换主题错误');
+        });
+    },
+    [dispatch],
+  );
+
   const userMenuSelect = useCallback(
     ({ key }) => {
       switch (key) {
@@ -210,11 +230,15 @@ export function Navbar() {
         case 'en':
           changeLang(key);
           break;
+        case 'dark':
+        case 'light':
+          handleChangeThemeFn(key);
+          break;
         default:
           break;
       }
     },
-    [dispatch, history],
+    [dispatch, history, handleChangeThemeFn],
   );
 
   const onSetPolling = useCallback(
@@ -298,6 +322,19 @@ export function Navbar() {
                 >
                   <MenuListItem key="zh">中文</MenuListItem>
                   <MenuListItem key="en">English</MenuListItem>
+                </MenuListItem>
+                <MenuListItem
+                  key="theme"
+                  prefix={<BgColorsOutlined className="icon" />}
+                  title={<p>{t('nav.account.switchTheme.title')}</p>}
+                  sub
+                >
+                  <MenuListItem key="light">
+                    {t('nav.account.switchTheme.light')}
+                  </MenuListItem>
+                  <MenuListItem key="dark">
+                    {t('nav.account.switchTheme.dark')}
+                  </MenuListItem>
                 </MenuListItem>
                 <Menu.Divider />
                 <MenuListItem
