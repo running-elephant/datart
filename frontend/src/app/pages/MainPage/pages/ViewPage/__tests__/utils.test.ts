@@ -18,7 +18,7 @@
 
 import { ColumnTypes } from '../constants';
 import { Column, ColumnRole } from '../slice/types';
-import { dataModelColumnSorter } from '../utils';
+import { dataModelColumnSorter, diffMergeHierarchyModel } from '../utils';
 
 describe('dataModelColumnSorter test', () => {
   test('should sort by alphabet with the STRING column type', () => {
@@ -84,5 +84,150 @@ describe('dataModelColumnSorter test', () => {
     expect(columns.sort(dataModelColumnSorter)[2].name).toEqual('a');
     expect(columns.sort(dataModelColumnSorter)[3].name).toEqual('c');
     expect(columns.sort(dataModelColumnSorter)[4].name).toEqual('b');
+  });
+});
+
+describe('diffMergeHierarchyModel test', () => {
+  test('should append all new column to hierarchy without children', () => {
+    const model = {
+      columns: {
+        id: { name: 'id', type: 'STRING' },
+        age: { name: 'age', type: 'NUMBER' },
+      },
+      hierarchy: {},
+    };
+    expect(diffMergeHierarchyModel(model as any)).toMatchObject({
+      columns: {
+        id: { name: 'id', type: 'STRING' },
+        age: { name: 'age', type: 'NUMBER' },
+      },
+      hierarchy: {
+        id: { name: 'id', type: 'STRING' },
+        age: { name: 'age', type: 'NUMBER' },
+      },
+    });
+  });
+
+  test('should append new column to hierarchy without children', () => {
+    const model = {
+      columns: {
+        id: { name: 'id', type: 'STRING' },
+        age: { name: 'age', type: 'NUMBER' },
+        address: { name: 'address', type: 'STRING' },
+      },
+      hierarchy: {
+        age: { name: 'age', type: 'NUMBER' },
+      },
+    };
+    expect(diffMergeHierarchyModel(model as any)).toMatchObject({
+      columns: model.columns,
+      hierarchy: {
+        id: { name: 'id', type: 'STRING' },
+        age: { name: 'age', type: 'NUMBER' },
+        address: { name: 'address', type: 'STRING' },
+      },
+    });
+  });
+
+  test('should remove column in hierarchy which not exist in columns', () => {
+    const model = {
+      columns: {
+        id: { name: 'id', type: 'STRING' },
+      },
+      hierarchy: {
+        id: { name: 'id', type: 'STRING' },
+        age: { name: 'age', type: 'NUMBER' },
+        address: { name: 'address', type: 'STRING' },
+      },
+    };
+    expect(diffMergeHierarchyModel(model as any)).toMatchObject({
+      columns: model.columns,
+      hierarchy: {
+        id: { name: 'id', type: 'STRING' },
+      },
+    });
+  });
+
+  test('should remove child column in hierarchy', () => {
+    const model = {
+      columns: {
+        id: { name: 'id', type: 'STRING' },
+        age: { name: 'age', type: 'NUMBER' },
+      },
+      hierarchy: {
+        dealers: {
+          name: 'dealers',
+          children: [
+            { name: 'id', type: 'STRING' },
+            { name: 'age', type: 'NUMBER' },
+            { name: 'address', type: 'STRING' },
+          ],
+        },
+      },
+    };
+    expect(diffMergeHierarchyModel(model as any)).toMatchObject({
+      columns: model.columns,
+      hierarchy: {
+        dealers: {
+          name: 'dealers',
+          children: [
+            { name: 'id', type: 'STRING' },
+            { name: 'age', type: 'NUMBER' },
+          ],
+        },
+      },
+    });
+  });
+
+  test('should delete branch node in hierarchy when child is not in columns', () => {
+    const model = {
+      columns: {
+        id: { name: 'id', type: 'STRING' },
+        age: { name: 'age', type: 'NUMBER' },
+        address: { name: 'address', type: 'STRING' },
+      },
+      hierarchy: {
+        dealers: {
+          name: 'dealers',
+          children: [{ name: 'unkown', type: 'STRING' }],
+        },
+      },
+    };
+    expect(diffMergeHierarchyModel(model as any)).toMatchObject({
+      columns: model.columns,
+      hierarchy: {},
+    });
+  });
+
+  test('should delete and add new to hierarchy model', () => {
+    const model = {
+      columns: {
+        id: { name: 'id', type: 'STRING' },
+        age: { name: 'age', type: 'NUMBER' },
+        address: { name: 'address', type: 'STRING' },
+        newId: { name: 'newId', type: 'STRING' },
+      },
+      hierarchy: {
+        age: { name: 'age', type: 'NUMBER' },
+        dealers: {
+          name: 'dealers',
+          children: [
+            { name: 'address', type: 'STRING' },
+            { name: 'post', type: 'STRING' },
+          ],
+        },
+      },
+    };
+    expect(diffMergeHierarchyModel(model as any)).toMatchObject({
+      columns: model.columns,
+      hierarchy: {
+        age: { name: 'age', type: 'NUMBER' },
+        newId: { name: 'newId', type: 'STRING' },
+        dealers: {
+          name: 'dealers',
+          children: [{ name: 'address', type: 'STRING' }],
+        },
+      },
+    });
   });
 });

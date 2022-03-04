@@ -342,3 +342,37 @@ export const dataModelColumnSorter = (prev: Column, next: Column): number => {
     (prev?.name || '').localeCompare(next?.name || '')
   );
 };
+
+export const diffMergeHierarchyModel = (model: HierarchyModel) => {
+  const hierarchy = model?.hierarchy || {};
+  const columns = model?.columns || {};
+  const allHierarchyColumnNames = Object.keys(hierarchy).flatMap(name => {
+    if (!isEmptyArray(hierarchy[name].children)) {
+      return hierarchy[name].children!.map(child => child.name);
+    }
+    return name;
+  });
+  const additionalObjs = Object.keys(columns).reduce((acc, name) => {
+    if (allHierarchyColumnNames.includes(name)) {
+      return acc;
+    }
+    acc[name] = columns[name];
+    return acc;
+  }, {});
+  const newHierarchy = Object.keys(hierarchy).reduce((acc, name) => {
+    if (name in columns) {
+      acc[name] = hierarchy[name];
+    } else if (!isEmptyArray(hierarchy[name]?.children)) {
+      const hierarchyColumn = hierarchy[name];
+      hierarchyColumn.children = hierarchyColumn.children?.filter(child =>
+        Object.keys(columns).includes(child.name),
+      );
+      if (hierarchyColumn.children?.length) {
+        acc[name] = hierarchyColumn;
+      }
+    }
+    return acc;
+  }, additionalObjs);
+  model.hierarchy = newHierarchy;
+  return model;
+};
