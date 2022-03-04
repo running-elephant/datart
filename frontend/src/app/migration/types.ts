@@ -16,19 +16,9 @@
  * limitations under the License.
  */
 
-export const VERSION_BETA_0 = '1.0.0-beta.0';
-export const VERSION_BETA_1 = '1.0.0-beta.1';
-export const VERSION_BETA_2 = '1.0.0-beta.2';
-export const VERSION_LIST = [VERSION_BETA_0, VERSION_BETA_1, VERSION_BETA_2];
-export const CURRENT_VERSION = VERSION_BETA_2;
+export type Task<T> = (v?: T) => T | undefined;
 
-export const APP_VERSION_INIT = '0.0.0';
-export const APP_VERSION_BETA_0 = '1.0.0-beta.0';
-export const APP_VERSION_BETA_1 = '1.0.0-beta.1';
-export const APP_VERSION_BETA_2 = '1.0.0-beta.2';
-export const APP_SEMANTIC_VERSIONS = [
-  APP_VERSION_INIT,
-  APP_VERSION_BETA_0,
-  APP_VERSION_BETA_1,
-  APP_VERSION_BETA_2,
-];
+export type IDomainEvent<T> = {
+  version: string;
+  run: Task<T>;
+};
