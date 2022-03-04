@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
-import ConditionStylePanel from './ConditionalStylePanel';
+export type Task<T> = (v?: T) => T | undefined;
 
-export * from './types';
-export default ConditionStylePanel;
+export type IDomainEvent<T> = {
+  version: string;
+  run: Task<T>;
+};

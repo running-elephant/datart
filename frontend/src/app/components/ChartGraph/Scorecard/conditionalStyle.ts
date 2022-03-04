@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-import { ConditionStyleFormValues } from 'app/components/FormGenerator/Customize/ConditionStylePanel';
-import { OperatorTypes } from 'app/components/FormGenerator/Customize/ConditionStylePanel/types';
+import { OperatorTypes } from 'app/components/FormGenerator/Customize/ConditionalStyle/types';
+import { ScorecardConditionalStyleFormValues } from 'app/components/FormGenerator/Customize/ScorecardConditionalStyle/types';
 import { CSSProperties } from 'react';
 
 const isMatchedTheCondition = (
@@ -87,9 +87,6 @@ const isMatchedTheCondition = (
   return matchTheCondition;
 };
 
-const getTheSameRange = (list, type) =>
-  list?.filter(item => item?.range === type);
-
 const deleteUndefinedProps = props => {
   return Object.keys(props).reduce((acc, cur) => {
     if (props[cur] !== undefined || props[cur] !== null) {
@@ -99,11 +96,15 @@ const deleteUndefinedProps = props => {
   }, {});
 };
 
-export const getCustomBodyCellStyle = (
+const getTheSameRange = (list, key) =>
+  list?.filter(item => item?.metricKey === key);
+
+export const getConditionalStyle = (
   cellValue: any,
-  conditionStyle: ConditionStyleFormValues[],
+  conditionalStyle: ScorecardConditionalStyleFormValues[],
+  metricKey: string,
 ): CSSProperties => {
-  const currentConfigs = getTheSameRange(conditionStyle, 'cell');
+  const currentConfigs = getTheSameRange(conditionalStyle, metricKey);
   if (!currentConfigs?.length) {
     return {};
   }
@@ -119,39 +120,7 @@ export const getCustomBodyCellStyle = (
       },
     );
   } catch (error) {
-    console.error('getCustomBodyCellStyle | error ', error);
+    console.error('getConditionalStyle | error ', error);
   }
   return deleteUndefinedProps(cellStyle);
-};
-
-export const getCustomBodyRowStyle = (
-  rowRecord: { [k in string]: any },
-  conditionStyle: ConditionStyleFormValues[],
-): CSSProperties => {
-  const currentConfigs: ConditionStyleFormValues[] = getTheSameRange(
-    conditionStyle,
-    'row',
-  );
-  if (!currentConfigs?.length) {
-    return {};
-  }
-  let rowStyle: CSSProperties = {};
-
-  try {
-    currentConfigs?.forEach(
-      ({
-        operator,
-        value,
-        color: { background, textColor },
-        target: { name },
-      }) => {
-        rowStyle = isMatchedTheCondition(rowRecord?.[name], operator, value)
-          ? { backgroundColor: background, color: textColor }
-          : rowStyle;
-      },
-    );
-  } catch (error) {
-    console.error('getCustomBodyRowStyle | error ', error);
-  }
-  return deleteUndefinedProps(rowStyle);
 };

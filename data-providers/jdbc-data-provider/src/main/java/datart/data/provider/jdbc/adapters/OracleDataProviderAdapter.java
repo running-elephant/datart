@@ -34,7 +34,7 @@ import java.util.*;
 @Slf4j
 public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
 
-    private static final String PAGE_SQL = "SELECT * FROM (SELECT ROWNUM V_R_N,V_T0.* FROM (%s) V_T0 WHERE ROWNUM < %d) WHERE V_R_N>=%d";
+    private static final String PAGE_SQL = "SELECT * FROM (SELECT ROWNUM V_R_N,V_T0.* FROM (%s) V_T0 WHERE ROWNUM <= %d) WHERE V_R_N>%d";
 
     public Set<String> readAllDatabases() {
         return Collections.singleton(jdbcProperties.getUser());

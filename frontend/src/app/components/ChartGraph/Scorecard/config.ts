@@ -18,6 +18,7 @@
 
 import { ChartConfig } from 'app/types/ChartConfig';
 import { FONT_FAMILY } from 'styles/StyleConstants';
+import { getColumnRenderName } from '../../../utils/chartHelper';
 
 const config: ChartConfig = {
   datas: [
@@ -26,6 +27,10 @@ const config: ChartConfig = {
       key: 'metrics',
       required: true,
       type: 'aggregate',
+      actions: {
+        NUMERIC: ['aggregate', 'alias', 'format', 'sortable'],
+        STRING: ['aggregate', 'alias', 'format', 'sortable'],
+      },
       limit: 1,
     },
     {
@@ -36,6 +41,40 @@ const config: ChartConfig = {
     },
   ],
   styles: [
+    {
+      label: 'common.conditionalStyle',
+      key: 'scorecardConditionalStyle',
+      comType: 'group',
+      rows: [
+        {
+          label: 'conditionalStyle.open',
+          key: 'modal',
+          comType: 'group',
+          options: { type: 'modal', modalSize: 'middle' },
+          rows: [
+            {
+              label: 'column.conditionalStylePanel',
+              key: 'conditionalStylePanel',
+              comType: 'scorecardConditionalStyle',
+              options: {
+                getItems: cols => {
+                  const columns = (cols || [])
+                    .filter(col => ['metrics'].includes(col.key))
+                    .reduce((acc, cur) => acc.concat(cur.rows || []), [])
+                    .map(c => ({
+                      key: c.uid,
+                      value: c.uid,
+                      type: c.type,
+                      label: getColumnRenderName(c),
+                    }));
+                  return columns;
+                },
+              },
+            },
+          ],
+        },
+      ],
+    },
     {
       label: 'data.title',
       key: 'data',
@@ -292,6 +331,7 @@ const config: ChartConfig = {
             right: '右',
             bottom: '下',
           },
+          conditionalStyle: '条件样式',
           alignment: '对齐方式',
           alignmentType: {
             start: '头部对齐',
@@ -306,6 +346,9 @@ const config: ChartConfig = {
         data: {
           title: '数据',
         },
+        conditionalStyle: {
+          open: '打开样式设置',
+        },
       },
     },
     {
@@ -319,6 +362,7 @@ const config: ChartConfig = {
             right: 'Right',
             bottom: 'Bottom',
           },
+          conditionalStyle: 'Conditional Style',
           useAutoFontSize: 'Use Auto Font Size',
           autoCoefficient: 'Auto Coefficient',
           fixedFontSize: 'Fixed Font Size',
@@ -335,6 +379,9 @@ const config: ChartConfig = {
         },
         data: {
           title: 'Data',
+        },
+        conditionalStyle: {
+          open: 'Open Style Setting',
         },
       },
     },
