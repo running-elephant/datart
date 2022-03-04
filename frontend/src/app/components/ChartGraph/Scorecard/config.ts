@@ -81,26 +81,26 @@ const config: ChartConfig = {
       comType: 'group',
       rows: [
         {
-          label: 'common.useAutoFontSize',
-          key: 'useAutoFontSize',
+          label: 'common.autoFontSize',
+          key: 'autoFontSize',
           default: true,
           comType: 'checkbox',
         },
         {
-          label: 'common.autoCoefficient',
-          key: 'autoCoefficient',
-          default: 22,
+          label: 'common.scale',
+          key: 'scale',
+          default: 6,
           comType: 'slider',
           options: {
-            min: 1,
-            max: 30,
+            min: 2,
+            max: 20,
             dots: false,
           },
           watcher: {
-            deps: ['useAutoFontSize'],
+            deps: ['autoFontSize'],
             action: props => {
               return {
-                disabled: !props.useAutoFontSize,
+                disabled: !props.autoFontSize,
               };
             },
           },
@@ -115,10 +115,10 @@ const config: ChartConfig = {
             step: 1,
           },
           watcher: {
-            deps: ['useAutoFontSize'],
+            deps: ['autoFontSize'],
             action: props => {
               return {
-                disabled: props.useAutoFontSize,
+                disabled: props.autoFontSize,
               };
             },
           },
@@ -153,26 +153,26 @@ const config: ChartConfig = {
           comType: 'checkbox',
         },
         {
-          label: 'common.useAutoFontSize',
-          key: 'useAutoFontSize',
+          label: 'common.autoFontSize',
+          key: 'autoFontSize',
           default: true,
           comType: 'checkbox',
         },
         {
-          label: 'common.autoCoefficient',
-          key: 'autoCoefficient',
-          default: 2,
+          label: 'common.scale',
+          key: 'scale',
+          default: 15,
           comType: 'slider',
           options: {
-            min: 1,
-            max: 30,
+            min: 2,
+            max: 20,
             dots: false,
           },
           watcher: {
-            deps: ['useAutoFontSize'],
+            deps: ['autoFontSize'],
             action: props => {
               return {
-                disabled: !props.useAutoFontSize,
+                disabled: !props.autoFontSize,
               };
             },
           },
@@ -187,10 +187,10 @@ const config: ChartConfig = {
             step: 1,
           },
           watcher: {
-            deps: ['useAutoFontSize'],
+            deps: ['autoFontSize'],
             action: props => {
               return {
-                disabled: props.useAutoFontSize,
+                disabled: props.autoFontSize,
               };
             },
           },
@@ -203,8 +203,8 @@ const config: ChartConfig = {
             fontFamily: FONT_FAMILY,
             fontWeight: 'normal',
             fontStyle: 'normal',
-            lineHeight: 1,
-            color: '#495057',
+            lineHeight: 1.5,
+            color: '#adb5bd',
           },
           options: {
             showLineHeight: true,
@@ -321,9 +321,9 @@ const config: ChartConfig = {
       lang: 'zh-CN',
       translation: {
         common: {
-          useAutoFontSize: '自适应文字大小',
-          autoCoefficient: '自适应系数',
-          fixedFontSize: '固定文字大小',
+          autoFontSize: '自动调节文字大小',
+          scale: '比例',
+          fixedFontSize: '文字大小',
           position: '位置',
           positionType: {
             left: '左',
@@ -363,9 +363,9 @@ const config: ChartConfig = {
             bottom: 'Bottom',
           },
           conditionalStyle: 'Conditional Style',
-          useAutoFontSize: 'Use Auto Font Size',
-          autoCoefficient: 'Auto Coefficient',
-          fixedFontSize: 'Fixed Font Size',
+          autoFontSize: 'Automatically adjust font size',
+          scale: 'Scale',
+          fixedFontSize: 'Font Size',
           alignment: 'Alignment',
           alignmentType: {
             start: 'Start',

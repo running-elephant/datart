@@ -159,13 +159,13 @@ class Scorecard extends ReactChart {
 
   getFontSize(width, style) {
     return path => {
-      const [useAutoFontSize, autoCoefficient, fixedFontSize] = getStyles(
-        style,
-        path,
-        ['useAutoFontSize', 'autoCoefficient', 'fixedFontSize'],
-      );
-      if (useAutoFontSize) {
-        return Math.floor(width / (33 - autoCoefficient)) + 'px';
+      const [autoFontSize, scale, fixedFontSize] = getStyles(style, path, [
+        'autoFontSize',
+        'scale',
+        'fixedFontSize',
+      ]);
+      if (autoFontSize) {
+        return Math.floor(width / scale) + 'px';
       }
       return fixedFontSize + 'px';
     };
