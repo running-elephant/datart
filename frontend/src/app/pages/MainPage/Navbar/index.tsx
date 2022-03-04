@@ -30,6 +30,8 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { List, Menu, Tooltip } from 'antd';
+import lightTheme from 'antd/dist/default-theme';
+import { darkThemeSingle } from 'antd/dist/theme';
 import logo from 'app/assets/images/logo.svg';
 import { Avatar, MenuListItem, Popup } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -60,8 +62,6 @@ import {
   SPACE_TIMES,
   SPACE_XS,
 } from 'styles/StyleConstants';
-import themeDark from 'styles/theme/dark';
-import themeLight from 'styles/theme/light';
 import themeSlice from 'styles/theme/slice';
 import { ThemeKeyType } from 'styles/theme/slice/types';
 import { Access } from '../Access';
@@ -75,7 +75,6 @@ import { ModifyPassword } from './ModifyPassword';
 import { OrganizationList } from './OrganizationList';
 import { Profile } from './Profile';
 import { loadTasks } from './service';
-
 export function Navbar() {
   const { actions } = useMainSlice();
   const [profileVisible, setProfileVisible] = useState(false);
@@ -199,7 +198,7 @@ export function Navbar() {
     (theme: ThemeKeyType) => {
       dispatch(themeSlice.actions.changeTheme(theme));
       (window as any).less
-        .modifyVars(theme === 'dark' ? themeDark : themeLight)
+        .modifyVars(theme === 'dark' ? darkThemeSingle : lightTheme)
         .then((res: any) => {
           console.log('切换主题成功');
         })

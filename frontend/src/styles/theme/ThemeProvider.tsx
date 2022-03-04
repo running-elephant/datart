@@ -1,7 +1,7 @@
+import { darkThemeSingle } from 'antd/dist/theme';
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { ThemeProvider as OriginalThemeProvider } from 'styled-components';
-import themeDark from './dark';
 import { useThemeSlice } from './slice';
 import { selectTheme, selectThemeKey } from './slice/selectors';
 export const ThemeProvider = (props: { children: React.ReactChild }) => {
@@ -13,7 +13,7 @@ export const ThemeProvider = (props: { children: React.ReactChild }) => {
   useEffect(() => {
     if (themeKey === 'dark') {
       (window as any).less
-        .modifyVars(themeDark)
+        .modifyVars(darkThemeSingle)
         .then((res: any) => {
           console.log('切换主题成功');
         })

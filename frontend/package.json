@@ -15,8 +15,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "bootstrap": "npm install --legacy-peer-deps",
-    "start": "node theme && craco start",
-    "build": "node theme && cross-env GENERATE_SOURCEMAP=false craco build",
+    "start": "npm run extractAntdTheme && craco start",
+    "build": "npm run extractAntdTheme && cross-env GENERATE_SOURCEMAP=false craco build",
     "build:task": "rollup -c",
     "build:all": "npm run build:task && npm run build",
     "build:analyze": "craco build && source-map-explorer 'build/static/js/*.js'",
@@ -31,7 +31,8 @@
     "prepare": "cd .. && husky install frontend/.husky",
     "eject": "react-scripts eject",
     "doc:types": "tsc --project tsconfig.dHelper.json",
-    "doc:html": "jsdoc -c jsdoc.config.json"
+    "doc:html": "jsdoc -c jsdoc.config.json",
+    "extractAntdTheme": "node scripts/extractAntdTheme"
   },
   "eslintConfig": {
     "extends": [

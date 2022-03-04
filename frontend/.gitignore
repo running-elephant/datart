@@ -36,4 +36,4 @@ yarn-error.log*
 /types
 
 /public/task
-/public/theme.less
+/public/antd/theme.less

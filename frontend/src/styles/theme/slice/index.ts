@@ -5,7 +5,7 @@ import { getThemeFromStorage, saveTheme } from '../utils';
 import { ThemeKeyType, ThemeState } from './types';
 
 export const initialState: ThemeState = {
-  selected: getInitialTheme(),
+  selected: getThemeFromStorage(),
 };
 
 const themeSlice = createSlice({
@@ -27,13 +27,3 @@ export const useThemeSlice = () => {
   useInjectReducer({ key: themeSlice.name, reducer: themeSlice.reducer });
   return { actions: themeSlice.actions };
 };
-
-export function getInitialTheme() {
-  const storedTheme = getThemeFromStorage();
-  if (!storedTheme) {
-    saveTheme('light');
-    return 'light';
-  } else {
-    return storedTheme;
-  }
-}
