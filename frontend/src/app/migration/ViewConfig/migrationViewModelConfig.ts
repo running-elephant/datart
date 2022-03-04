@@ -41,8 +41,11 @@ const init = (model?: object): object | undefined => {
  * @return {*}  {(object | undefined)}
  */
 const beta2 = (model?: object): object | undefined => {
-  const clonedModel = CloneValueDeep(model);
+  const clonedModel = CloneValueDeep(model) || {};
   if (model) {
+    Object.keys(clonedModel).forEach(name => {
+      clonedModel[name] = { ...clonedModel[name], name };
+    });
     model = {
       hierarchy: clonedModel,
       columns: clonedModel,

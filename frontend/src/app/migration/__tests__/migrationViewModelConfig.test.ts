@@ -47,4 +47,23 @@ describe('migrationViewModelConfig Test', () => {
     expect(migrationResultObj.hierarchy).toMatchObject(originalModel);
     expect(migrationResultObj.version).toEqual(APP_VERSION_BETA_2);
   });
+
+  test('should migrate model name to columns', () => {
+    const originalModel = {
+      column1: { role: 'role', type: 'STRING' },
+      column2: { role: 'role', type: 'NUMBER' },
+    };
+    const migrationResultObj = JSON.parse(
+      beginViewModelMigration(JSON.stringify(originalModel)),
+    );
+    expect(migrationResultObj.columns).toMatchObject({
+      column1: { name: 'column1', role: 'role', type: 'STRING' },
+      column2: { name: 'column2', role: 'role', type: 'NUMBER' },
+    });
+    expect(migrationResultObj.hierarchy).toMatchObject({
+      column1: { name: 'column1', role: 'role', type: 'STRING' },
+      column2: { name: 'column2', role: 'role', type: 'NUMBER' },
+    });
+    expect(migrationResultObj.version).toEqual(APP_VERSION_BETA_2);
+  });
 });
