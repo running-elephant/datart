@@ -55,7 +55,7 @@ const config: ChartConfig = {
       ],
     },
     {
-      label: 'column.conditionStyle',
+      label: 'column.conditionalStyle',
       key: 'column',
       comType: 'group',
       rows: [
@@ -95,15 +95,15 @@ const config: ChartConfig = {
                 comType: 'group',
                 rows: [
                   {
-                    label: 'column.conditionStyle',
-                    key: 'conditionStyle',
+                    label: 'column.conditionalStyle',
+                    key: 'conditionalStyle',
                     comType: 'group',
                     options: { expand: true },
                     rows: [
                       {
-                        label: 'column.conditionStylePanel',
-                        key: 'conditionStylePanel',
-                        comType: 'conditionStylePanel',
+                        label: 'column.conditionalStylePanel',
+                        key: 'conditionalStylePanel',
+                        comType: 'conditionalStylePanel',
                       },
                     ],
                   },
@@ -261,8 +261,8 @@ const config: ChartConfig = {
           sortAndFilter: '排序与过滤',
           enableSort: '开启列排序',
           basicStyle: '基础样式',
-          conditionStyle: '条件样式',
-          conditionStylePanel: '条件样式配置器',
+          conditionalStyle: '条件样式',
+          conditionalStylePanel: '条件样式配置器',
           backgroundColor: '背景颜色',
           align: '对齐方式',
           enableFixedCol: '开启固定列宽',
@@ -304,8 +304,8 @@ const config: ChartConfig = {
           sortAndFilter: 'Sort and Filter',
           enableSort: 'Enable Sort',
           basicStyle: 'Baisc Style',
-          conditionStyle: 'Column Condition Style',
-          conditionStylePanel: 'Condition Style Panel',
+          conditionalStyle: 'Column Conditional Style',
+          conditionalStylePanel: 'Conditional Style Panel',
           backgroundColor: 'Background Color',
           align: 'Align',
           enableFixedCol: 'Enable Fixed Column',

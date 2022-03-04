@@ -501,7 +501,7 @@
             }
           }
         },
-        "conditionStyleTable": {
+        "conditionalStyleTable": {
           "btn": {
             "add": "Add",
             "edit": "Edit",
@@ -509,7 +509,7 @@
             "confirm": "Confirm"
           },
           "modal": {
-            "title": "Condition Style",
+            "title": "Conditional Style",
             "notFoundContent": "Multiple values can be added (enter the content and press enter to complete the addition)"
           },
           "header": {

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import ConditionStylePanel from './ConditionalStylePanel';
+import ScorecardConditionalStyle from './ScorecardConditionalStyle';
 
 export * from './types';
-export default ConditionStylePanel;
+export default ScorecardConditionalStyle;

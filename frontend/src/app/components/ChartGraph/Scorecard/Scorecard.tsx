@@ -23,8 +23,9 @@ import {
   getStyles,
   toFormattedValue,
   transformToDataSet,
-} from '../../../utils/chartHelper';
+} from 'app/utils/chartHelper';
 import ReactChart from '../models/ReactChart';
+import { getConditionalStyle } from './conditionalStyle';
 import Config from './config';
 import ScorecardAdapter from './ScorecardAdapter';
 
@@ -86,15 +87,35 @@ class Scorecard extends ReactChart {
       dataset.columns,
       dataConfigs,
     );
-
     const { padding, width } = this.getPaddingConfig(
       styleConfigs,
       context.width,
     );
     const fontSizeFn = this.getFontSize(width, styleConfigs);
-    const labelConfig = this.getLabelConfig(styleConfigs, fontSizeFn);
-    const dataConfig = this.getDataConfig(styleConfigs, fontSizeFn);
-
+    const aggColorConfig = this.getColorConfig(
+      styleConfigs,
+      aggregateConfigs,
+      chartDataSet,
+    );
+    const labelConfig = this.getLabelConfig(
+      aggColorConfig,
+      styleConfigs,
+      fontSizeFn,
+    );
+    const dataConfig = this.getDataConfig(
+      aggColorConfig,
+      styleConfigs,
+      fontSizeFn,
+    );
+    const data = [
+      {
+        label: getColumnRenderName(aggregateConfigs[0]),
+        value: toFormattedValue(
+          chartDataSet?.[0]?.getCell?.(aggregateConfigs[0]),
+          aggregateConfigs[0]?.format,
+        ),
+      },
+    ];
     return {
       context: {
         width: context.width,
@@ -103,22 +124,37 @@ class Scorecard extends ReactChart {
       dataConfig,
       labelConfig,
       padding,
-      data: {
-        label: getColumnRenderName(aggregateConfigs[0]),
-        value: toFormattedValue(
-          chartDataSet?.[0]?.getCell?.(aggregateConfigs[0]),
-          aggregateConfigs[0]?.format,
-        ),
-      },
+      data,
+      background: aggColorConfig?.[0]?.backgroundColor || 'transparent',
     };
   }
 
-  getDataConfig(style, fontSizeFn) {
+  getColorConfig(style, aggConfig, chartDataSet) {
+    const [conditionalStylePanel] = getStyles(
+      style,
+      ['scorecardConditionalStyle', 'modal'],
+      ['conditionalStylePanel'],
+    );
+    return aggConfig.map(ac =>
+      getConditionalStyle(
+        chartDataSet?.[0]?.getCell?.(ac),
+        conditionalStylePanel,
+        ac.uid,
+      ),
+    );
+  }
+
+  getDataConfig(aggColorConfig, style, fontSizeFn) {
     const [font] = getStyles(style, ['data'], ['font']);
-    return {
-      fontSize: fontSizeFn(['data']),
-      ...font,
-    };
+    return [
+      {
+        font: {
+          fontSize: fontSizeFn(['data']),
+          ...font,
+          color: aggColorConfig?.[0]?.color || font.color,
+        },
+      },
+    ];
   }
 
   getFontSize(width, style) {
@@ -135,7 +171,7 @@ class Scorecard extends ReactChart {
     };
   }
 
-  getLabelConfig(style, fontSizeFn) {
+  getLabelConfig(aggColorConfig, style, fontSizeFn) {
     const [show, font, position, alignment] = getStyles(
       style,
       ['label'],
@@ -146,6 +182,7 @@ class Scorecard extends ReactChart {
       font: {
         fontSize: fontSizeFn(['label']),
         ...font,
+        color: aggColorConfig?.[0]?.color || font.color,
       },
       position,
       alignment,
