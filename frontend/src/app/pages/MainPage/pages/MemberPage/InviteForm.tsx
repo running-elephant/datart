@@ -36,6 +36,7 @@ export const InviteForm = memo(
     const [options, setOptions] = useState<ValueType[]>([]);
     const formRef = useRef<FormInstance>();
     const t = useI18NPrefix('member.form');
+    const tgv = useI18NPrefix('global.validation');
 
     const debouncedSearchUser = useMemo(() => {
       const searchUser = async (val: string) => {
@@ -79,7 +80,12 @@ export const InviteForm = memo(
         afterClose={onAfterClose}
         ref={formRef}
       >
-        <Form.Item name="emails">
+        <Form.Item
+          name="emails"
+          rules={[
+            { required: true, message: `${t('email')}${tgv('required')}` },
+          ]}
+        >
           <Select<ValueType>
             mode="tags"
             placeholder={t('search')}
