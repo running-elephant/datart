@@ -13,7 +13,7 @@ public class SqlFragment extends SqlLiteral {
      * @param value String value
      */
     public SqlFragment(String value) {
-        super(value, SqlTypeName.ANY, SqlParserPos.ZERO);
+        super(value, SqlTypeName.MULTISET, SqlParserPos.ZERO);
     }
 
     @Override
