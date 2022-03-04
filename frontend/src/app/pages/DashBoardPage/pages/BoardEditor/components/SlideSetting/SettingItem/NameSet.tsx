@@ -71,7 +71,7 @@ export const NameSet: FC<{
         name={['nameConfig']}
         preserve
       >
-        <BasicFont ancestors={[]} data={fontData} />
+        <BasicFont translate={t} ancestors={[]} data={fontData} />
       </Form.Item>
     </>
   );
