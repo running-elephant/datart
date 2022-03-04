@@ -23,19 +23,19 @@ import { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { isEmpty } from 'utils/object';
 import {
-  ConditionOperatorTypes,
+  ConditionalOperatorTypes,
   OperatorTypes,
   OperatorTypesLocale,
-} from '../ConditionStylePanel/types';
-import { ScorecardConditionStyleFormValues } from './types';
+} from '../ConditionalStyle/types';
+import { ScorecardConditionalStyleFormValues } from './types';
 
 interface AddProps {
   context?: any;
   allItems?: any[];
   translate?: (title: string, options?: any) => string;
   visible: boolean;
-  values: ScorecardConditionStyleFormValues;
-  onOk: (values: ScorecardConditionStyleFormValues) => void;
+  values: ScorecardConditionalStyleFormValues;
+  onOk: (values: ScorecardConditionalStyleFormValues) => void;
   onCancel: () => void;
 }
 
@@ -51,12 +51,12 @@ export default function Add({
   const [colors] = useState([
     {
       name: 'textColor',
-      label: t('conditionStyleTable.header.color.text'),
+      label: t('conditionalStyleTable.header.color.text'),
       value: '#495057',
     },
     {
       name: 'background',
-      label: t('conditionStyleTable.header.color.background'),
+      label: t('conditionalStyleTable.header.color.background'),
       value: 'transparent',
     },
   ]);
@@ -66,13 +66,13 @@ export default function Add({
   const [operatorValue, setOperatorValue] = useState<OperatorTypes>(
     OperatorTypes.Equal,
   );
-  const [form] = Form.useForm<ScorecardConditionStyleFormValues>();
+  const [form] = Form.useForm<ScorecardConditionalStyleFormValues>();
   const [type] = useState(ColumnTypes.Number);
 
   useEffect(() => {
     if (type) {
       setOperatorSelect(
-        ConditionOperatorTypes[type]?.map(item => ({
+        ConditionalOperatorTypes[type]?.map(item => ({
           label: `${OperatorTypesLocale[item]} [${item}]`,
           value: item,
         })),
@@ -85,7 +85,7 @@ export default function Add({
   useEffect(() => {
     // !重置form
     if (visible) {
-      const result: Partial<ScorecardConditionStyleFormValues> =
+      const result: Partial<ScorecardConditionalStyleFormValues> =
         Object.keys(values).length === 0
           ? {
               operator: OperatorTypes.Equal,
@@ -135,7 +135,7 @@ export default function Add({
           <Select
             mode="tags"
             notFoundContent={
-              <>{t('conditionStyleTable.modal.notFoundContent')}</>
+              <>{t('conditionalStyleTable.modal.notFoundContent')}</>
             }
           />
         );
@@ -149,13 +149,13 @@ export default function Add({
   return (
     <Modal
       destroyOnClose
-      title={t('conditionStyleTable.modal.title')}
+      title={t('conditionalStyleTable.modal.title')}
       visible={visible}
       onOk={modalOk}
       onCancel={onCancel}
     >
       <Form
-        name="condition-style-form"
+        name="scorecard-conditional-style-form"
         labelAlign="left"
         labelCol={{ span: 8 }}
         wrapperCol={{ span: 16 }}
@@ -187,7 +187,7 @@ export default function Add({
         </Form.Item>
 
         <Form.Item
-          label={t('conditionStyleTable.header.operator')}
+          label={t('conditionalStyleTable.header.operator')}
           name="operator"
           rules={[{ required: true }]}
         >
@@ -196,7 +196,7 @@ export default function Add({
 
         {operatorValue !== OperatorTypes.IsNull ? (
           <Form.Item
-            label={t('conditionStyleTable.header.value')}
+            label={t('conditionalStyleTable.header.value')}
             name="value"
             rules={[{ required: true }]}
           >
@@ -204,7 +204,7 @@ export default function Add({
           </Form.Item>
         ) : null}
 
-        <Form.Item label={t('conditionStyleTable.header.color.title')}>
+        <Form.Item label={t('conditionalStyleTable.header.color.title')}>
           <Row gutter={24} align="middle">
             {colors.map(({ label, value, name }) => (
               <Form.Item key={label} name={['color', name]} noStyle>

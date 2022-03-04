@@ -16,7 +16,13 @@
  * limitations under the License.
  */
 
-import ConditionStylePanel from './ConditionalStylePanel';
-
-export * from './types';
-export default ConditionStylePanel;
+import { OperatorTypes } from '../ConditionalStyle/types';
+export interface ScorecardConditionalStyleFormValues {
+  uid: string;
+  target: { name?: string; type?: any };
+  metricKey: string;
+  operator: OperatorTypes;
+  value: string;
+  useMetricsValue?: boolean;
+  color: { background: string; textColor: string };
+}

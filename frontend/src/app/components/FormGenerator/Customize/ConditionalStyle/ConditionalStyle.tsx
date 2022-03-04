@@ -26,9 +26,9 @@ import { uuidv4 } from 'utils/utils';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
 import AddModal from './add';
-import { ConditionStyleFormValues } from './types';
+import { ConditionalStyleFormValues } from './types';
 
-const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+const ConditionalStyle: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({
     ancestors,
     translate: t = title => title,
@@ -39,19 +39,19 @@ const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   }) => {
     const [myData] = useState(() => CloneValueDeep(data));
     const [visible, setVisible] = useState<boolean>(false);
-    const [dataSource, setDataSource] = useState<ConditionStyleFormValues[]>(
+    const [dataSource, setDataSource] = useState<ConditionalStyleFormValues[]>(
       myData.value || [],
     );
 
-    const [currentItem, setCurrentItem] = useState<ConditionStyleFormValues>(
-      {} as ConditionStyleFormValues,
+    const [currentItem, setCurrentItem] = useState<ConditionalStyleFormValues>(
+      {} as ConditionalStyleFormValues,
     );
-    const onEditItem = (values: ConditionStyleFormValues) => {
+    const onEditItem = (values: ConditionalStyleFormValues) => {
       setCurrentItem(CloneValueDeep(values));
-      openConditionStyle();
+      openConditionalStyle();
     };
-    const onRemoveItem = (values: ConditionStyleFormValues) => {
-      const result: ConditionStyleFormValues[] = dataSource.filter(
+    const onRemoveItem = (values: ConditionalStyleFormValues) => {
+      const result: ConditionalStyleFormValues[] = dataSource.filter(
         item => item.uid !== values.uid,
       );
 
@@ -62,55 +62,55 @@ const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       });
     };
 
-    const tableColumnsSettings: ColumnsType<ConditionStyleFormValues> = [
+    const tableColumnsSettings: ColumnsType<ConditionalStyleFormValues> = [
       {
-        title: t('conditionStyleTable.header.range.title'),
+        title: t('conditionalStyleTable.header.range.title'),
         dataIndex: 'range',
         width: 100,
         render: (_, { range }) => (
-          <Tag>{t(`conditionStyleTable.header.range.${range}`)}</Tag>
+          <Tag>{t(`conditionalStyleTable.header.range.${range}`)}</Tag>
         ),
       },
       {
-        title: t('conditionStyleTable.header.operator'),
+        title: t('conditionalStyleTable.header.operator'),
         dataIndex: 'operator',
       },
       {
-        title: t('conditionStyleTable.header.value'),
+        title: t('conditionalStyleTable.header.value'),
         dataIndex: 'value',
         render: (_, { value }) => <>{JSON.stringify(value)}</>,
       },
       {
-        title: t('conditionStyleTable.header.color.title'),
+        title: t('conditionalStyleTable.header.color.title'),
         dataIndex: 'value',
         render: (_, { color }) => (
           <>
             <Tag color={color.background}>
-              {t('conditionStyleTable.header.color.background')}
+              {t('conditionalStyleTable.header.color.background')}
             </Tag>
             <Tag color={color.textColor}>
-              {t('conditionStyleTable.header.color.text')}
+              {t('conditionalStyleTable.header.color.text')}
             </Tag>
           </>
         ),
       },
       {
-        title: t('conditionStyleTable.header.action'),
+        title: t('conditionalStyleTable.header.action'),
         dataIndex: 'action',
         width: 140,
         render: (_, record) => {
           return [
             <Button type="link" key="edit" onClick={() => onEditItem(record)}>
-              {t('conditionStyleTable.btn.edit')}
+              {t('conditionalStyleTable.btn.edit')}
             </Button>,
             <Popconfirm
               key="remove"
               placement="topRight"
-              title={t('conditionStyleTable.btn.confirm')}
+              title={t('conditionalStyleTable.btn.confirm')}
               onConfirm={() => onRemoveItem(record)}
             >
               <Button type="link" danger>
-                {t('conditionStyleTable.btn.remove')}
+                {t('conditionalStyleTable.btn.remove')}
               </Button>
             </Popconfirm>,
           ];
@@ -118,15 +118,17 @@ const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       },
     ];
 
-    const openConditionStyle = () => {
+    const openConditionalStyle = () => {
       setVisible(true);
     };
-    const closeConditionStyleModal = () => {
+    const closeConditionalStyleModal = () => {
       setVisible(false);
-      setCurrentItem({} as ConditionStyleFormValues);
+      setCurrentItem({} as ConditionalStyleFormValues);
     };
-    const submitConditionStyleModal = (values: ConditionStyleFormValues) => {
-      let result: ConditionStyleFormValues[] = [];
+    const submitConditionalStyleModal = (
+      values: ConditionalStyleFormValues,
+    ) => {
+      let result: ConditionalStyleFormValues[] = [];
 
       if (values.uid) {
         result = dataSource.map(item => {
@@ -140,7 +142,7 @@ const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       }
 
       setDataSource(result);
-      closeConditionStyleModal();
+      closeConditionalStyleModal();
       onChange?.(ancestors, {
         ...myData,
         value: result,
@@ -148,13 +150,13 @@ const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     };
 
     return (
-      <StyledConditionStylePanel direction="vertical">
-        <Button type="primary" onClick={openConditionStyle}>
-          {t('conditionStyleTable.btn.add')}
+      <StyledConditionalStylePanel direction="vertical">
+        <Button type="primary" onClick={openConditionalStyle}>
+          {t('conditionalStyleTable.btn.add')}
         </Button>
         <Row gutter={24}>
           <Col span={24}>
-            <Table<ConditionStyleFormValues>
+            <Table<ConditionalStyleFormValues>
               bordered={true}
               size="small"
               pagination={false}
@@ -169,18 +171,18 @@ const ConditionStylePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           visible={visible}
           translate={t}
           values={currentItem}
-          onOk={submitConditionStyleModal}
-          onCancel={closeConditionStyleModal}
+          onOk={submitConditionalStyleModal}
+          onCancel={closeConditionalStyleModal}
         />
-      </StyledConditionStylePanel>
+      </StyledConditionalStylePanel>
     );
   },
   itemLayoutComparer,
 );
 
-const StyledConditionStylePanel = styled(Space)`
+const StyledConditionalStylePanel = styled(Space)`
   width: 100%;
   margin-top: 10px;
 `;
 
-export default ConditionStylePanel;
+export default ConditionalStyle;

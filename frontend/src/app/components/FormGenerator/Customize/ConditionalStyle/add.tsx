@@ -22,9 +22,9 @@ import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
 import { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
-  ConditionOperatorTypes,
-  ConditionStyleFormValues,
-  ConditionStyleRange,
+  ConditionalOperatorTypes,
+  ConditionalStyleFormValues,
+  ConditionalStyleRange,
   OperatorTypes,
   OperatorTypesLocale,
 } from './types';
@@ -33,8 +33,8 @@ interface AddProps {
   context?: any;
   translate?: (title: string, options?: any) => string;
   visible: boolean;
-  values: ConditionStyleFormValues;
-  onOk: (values: ConditionStyleFormValues) => void;
+  values: ConditionalStyleFormValues;
+  onOk: (values: ConditionalStyleFormValues) => void;
   onCancel: () => void;
 }
 
@@ -49,12 +49,12 @@ export default function Add({
   const [colors] = useState([
     {
       name: 'background',
-      label: t('conditionStyleTable.header.color.background'),
+      label: t('conditionalStyleTable.header.color.background'),
       value: undefined,
     },
     {
       name: 'textColor',
-      label: t('conditionStyleTable.header.color.text'),
+      label: t('conditionalStyleTable.header.color.text'),
       value: undefined,
     },
   ]);
@@ -64,12 +64,12 @@ export default function Add({
   const [operatorValue, setOperatorValue] = useState<OperatorTypes>(
     OperatorTypes.Equal,
   );
-  const [form] = Form.useForm<ConditionStyleFormValues>();
+  const [form] = Form.useForm<ConditionalStyleFormValues>();
 
   useEffect(() => {
     if (type) {
       setOperatorSelect(
-        ConditionOperatorTypes[type]?.map(item => ({
+        ConditionalOperatorTypes[type]?.map(item => ({
           label: `${OperatorTypesLocale[item]} [${item}]`,
           value: item,
         })),
@@ -82,10 +82,10 @@ export default function Add({
   useEffect(() => {
     // !重置form
     if (visible) {
-      const result: Partial<ConditionStyleFormValues> =
+      const result: Partial<ConditionalStyleFormValues> =
         Object.keys(values).length === 0
           ? {
-              range: ConditionStyleRange.Cell,
+              range: ConditionalStyleRange.Cell,
               operator: OperatorTypes.Equal,
             }
           : values;
@@ -129,7 +129,7 @@ export default function Add({
           <Select
             mode="tags"
             notFoundContent={
-              <>{t('conditionStyleTable.modal.notFoundContent')}</>
+              <>{t('conditionalStyleTable.modal.notFoundContent')}</>
             }
           />
         );
@@ -143,13 +143,13 @@ export default function Add({
   return (
     <Modal
       destroyOnClose
-      title={t('conditionStyleTable.modal.title')}
+      title={t('conditionalStyleTable.modal.title')}
       visible={visible}
       onOk={modalOk}
       onCancel={onCancel}
     >
       <Form
-        name="condition-style-form"
+        name="conditional-style-form"
         labelAlign="left"
         labelCol={{ span: 8 }}
         wrapperCol={{ span: 16 }}
@@ -162,22 +162,22 @@ export default function Add({
         </Form.Item>
 
         <Form.Item
-          label={t('conditionStyleTable.header.range.title')}
+          label={t('conditionalStyleTable.header.range.title')}
           name="range"
           rules={[{ required: true }]}
         >
           <Radio.Group>
             <Radio.Button value="cell">
-              {t('conditionStyleTable.header.range.cell')}
+              {t('conditionalStyleTable.header.range.cell')}
             </Radio.Button>
             <Radio.Button value="row">
-              {t('conditionStyleTable.header.range.row')}
+              {t('conditionalStyleTable.header.range.row')}
             </Radio.Button>
           </Radio.Group>
         </Form.Item>
 
         <Form.Item
-          label={t('conditionStyleTable.header.operator')}
+          label={t('conditionalStyleTable.header.operator')}
           name="operator"
           rules={[{ required: true }]}
         >
@@ -186,7 +186,7 @@ export default function Add({
 
         {operatorValue !== OperatorTypes.IsNull ? (
           <Form.Item
-            label={t('conditionStyleTable.header.value')}
+            label={t('conditionalStyleTable.header.value')}
             name="value"
             rules={[{ required: true }]}
           >
@@ -194,7 +194,7 @@ export default function Add({
           </Form.Item>
         ) : null}
 
-        <Form.Item label={t('conditionStyleTable.header.color.title')}>
+        <Form.Item label={t('conditionalStyleTable.header.color.title')}>
           <Row gutter={24} align="middle">
             {colors.map(({ label, value, name }) => (
               <Form.Item key={label} name={['color', name]} noStyle>

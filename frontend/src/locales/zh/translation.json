@@ -501,7 +501,7 @@
             }
           }
         },
-        "conditionStyleTable": {
+        "conditionalStyleTable": {
           "btn": {
             "add": "新增",
             "edit": "编辑",

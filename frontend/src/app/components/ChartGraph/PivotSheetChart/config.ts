@@ -100,8 +100,8 @@ const config: ChartConfig = {
     //             comType: 'group',
     //             rows: [
     //               {
-    //                 label: 'column.conditionStyle',
-    //                 key: 'conditionStyle',
+    //                 label: 'column.conditionalStyle',
+    //                 key: 'conditionalStyle',
     //                 comType: 'group',
     //                 options: { expand: true },
     //                 rows: [],

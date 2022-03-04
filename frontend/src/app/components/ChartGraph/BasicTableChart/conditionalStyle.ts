@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-import { ConditionStyleFormValues } from 'app/components/FormGenerator/Customize/ConditionStylePanel';
-import { OperatorTypes } from 'app/components/FormGenerator/Customize/ConditionStylePanel/types';
+import { ConditionalStyleFormValues } from 'app/components/FormGenerator/Customize/ConditionalStyle';
+import { OperatorTypes } from 'app/components/FormGenerator/Customize/ConditionalStyle/types';
 import { CSSProperties } from 'react';
 
 const isMatchedTheCondition = (
@@ -87,6 +87,9 @@ const isMatchedTheCondition = (
   return matchTheCondition;
 };
 
+const getTheSameRange = (list, type) =>
+  list?.filter(item => item?.range === type);
+
 const deleteUndefinedProps = props => {
   return Object.keys(props).reduce((acc, cur) => {
     if (props[cur] !== undefined || props[cur] !== null) {
@@ -96,15 +99,11 @@ const deleteUndefinedProps = props => {
   }, {});
 };
 
-const getTheSameRange = (list, key) =>
-  list?.filter(item => item?.metricKey === key);
-
 export const getCustomBodyCellStyle = (
   cellValue: any,
-  conditionStyle: ConditionStyleFormValues[],
-  metricKey: string,
+  conditionalStyle: ConditionalStyleFormValues[],
 ): CSSProperties => {
-  const currentConfigs = getTheSameRange(conditionStyle, metricKey);
+  const currentConfigs = getTheSameRange(conditionalStyle, 'cell');
   if (!currentConfigs?.length) {
     return {};
   }
@@ -123,4 +122,36 @@ export const getCustomBodyCellStyle = (
     console.error('getCustomBodyCellStyle | error ', error);
   }
   return deleteUndefinedProps(cellStyle);
+};
+
+export const getCustomBodyRowStyle = (
+  rowRecord: { [k in string]: any },
+  conditionalStyle: ConditionalStyleFormValues[],
+): CSSProperties => {
+  const currentConfigs: ConditionalStyleFormValues[] = getTheSameRange(
+    conditionalStyle,
+    'row',
+  );
+  if (!currentConfigs?.length) {
+    return {};
+  }
+  let rowStyle: CSSProperties = {};
+
+  try {
+    currentConfigs?.forEach(
+      ({
+        operator,
+        value,
+        color: { background, textColor },
+        target: { name },
+      }) => {
+        rowStyle = isMatchedTheCondition(rowRecord?.[name], operator, value)
+          ? { backgroundColor: background, color: textColor }
+          : rowStyle;
+      },
+    );
+  } catch (error) {
+    console.error('getCustomBodyRowStyle | error ', error);
+  }
+  return deleteUndefinedProps(rowStyle);
 };

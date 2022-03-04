@@ -42,20 +42,20 @@ const config: ChartConfig = {
   ],
   styles: [
     {
-      label: 'common.conditionStyle',
-      key: 'scorecardConditionStyle',
+      label: 'common.conditionalStyle',
+      key: 'scorecardConditionalStyle',
       comType: 'group',
       rows: [
         {
-          label: 'conditionStyle.open',
+          label: 'conditionalStyle.open',
           key: 'modal',
           comType: 'group',
           options: { type: 'modal', modalSize: 'middle' },
           rows: [
             {
-              label: 'column.conditionStylePanel',
-              key: 'conditionStylePanel',
-              comType: 'scorecardConditionStyle',
+              label: 'column.conditionalStylePanel',
+              key: 'conditionalStylePanel',
+              comType: 'scorecardConditionalStyle',
               options: {
                 getItems: cols => {
                   const columns = (cols || [])
@@ -331,7 +331,7 @@ const config: ChartConfig = {
             right: '右',
             bottom: '下',
           },
-          conditionStyle: '条件样式',
+          conditionalStyle: '条件样式',
           alignment: '对齐方式',
           alignmentType: {
             start: '头部对齐',
@@ -346,7 +346,7 @@ const config: ChartConfig = {
         data: {
           title: '数据',
         },
-        conditionStyle: {
+        conditionalStyle: {
           open: '打开样式设置',
         },
       },
@@ -362,7 +362,7 @@ const config: ChartConfig = {
             right: 'Right',
             bottom: 'Bottom',
           },
-          conditionStyle: 'Condition Style',
+          conditionalStyle: 'Conditional Style',
           useAutoFontSize: 'Use Auto Font Size',
           autoCoefficient: 'Auto Coefficient',
           fixedFontSize: 'Fixed Font Size',
@@ -380,7 +380,7 @@ const config: ChartConfig = {
         data: {
           title: 'Data',
         },
-        conditionStyle: {
+        conditionalStyle: {
           open: 'Open Style Setting',
         },
       },

@@ -18,16 +18,16 @@
 
 import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
 
-export interface ConditionStyleFormValues {
+export interface ConditionalStyleFormValues {
   uid: string;
   target: { name: string; type: any };
-  range: ConditionStyleRange;
+  range: ConditionalStyleRange;
   operator: OperatorTypes;
   value: string;
   color: { background: string; textColor: string };
 }
 
-export enum ConditionStyleRange {
+export enum ConditionalStyleRange {
   Cell = 'cell',
   Row = 'row',
 }
@@ -62,7 +62,7 @@ export const OperatorTypesLocale = {
   [OperatorTypes.IsNull]: '空值',
 };
 
-export const ConditionOperatorTypes = {
+export const ConditionalOperatorTypes = {
   [ColumnTypes.String]: [
     OperatorTypes.Equal,
     OperatorTypes.NotEqual,

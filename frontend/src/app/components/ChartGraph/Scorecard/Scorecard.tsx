@@ -25,7 +25,7 @@ import {
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import ReactChart from '../models/ReactChart';
-import { getCustomBodyCellStyle } from './conditionStyle';
+import { getConditionalStyle } from './conditionalStyle';
 import Config from './config';
 import ScorecardAdapter from './ScorecardAdapter';
 
@@ -130,15 +130,15 @@ class Scorecard extends ReactChart {
   }
 
   getColorConfig(style, aggConfig, chartDataSet) {
-    const [conditionStylePanel] = getStyles(
+    const [conditionalStylePanel] = getStyles(
       style,
-      ['scorecardConditionStyle', 'modal'],
-      ['conditionStylePanel'],
+      ['scorecardConditionalStyle', 'modal'],
+      ['conditionalStylePanel'],
     );
     return aggConfig.map(ac =>
-      getCustomBodyCellStyle(
+      getConditionalStyle(
         chartDataSet?.[0]?.getCell?.(ac),
-        conditionStylePanel,
+        conditionalStylePanel,
         ac.uid,
       ),
     );
