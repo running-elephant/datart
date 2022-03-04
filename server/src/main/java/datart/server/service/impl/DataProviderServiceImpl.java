@@ -29,6 +29,7 @@ import datart.core.base.consts.ValueType;
 import datart.core.base.consts.VariableTypeEnum;
 import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
+import datart.core.common.RequestContext;
 import datart.core.data.provider.*;
 import datart.core.entity.RelSubjectColumns;
 import datart.core.entity.Source;
@@ -212,6 +213,14 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         Source source = retrieve(view.getSourceId(), Source.class, false);
         DataProviderSource providerSource = parseDataProviderConfig(source);
 
+        boolean scriptPermission = true;
+        try {
+            viewService.requirePermission(view, Const.MANAGE);
+        } catch (Exception e) {
+            scriptPermission = false;
+        }
+        RequestContext.setScriptPermission(scriptPermission);
+
         //permission and variables
         Set<String> columns = parseColumnPermission(view);
         List<ScriptVariable> variables = parseVariables(view, viewExecuteParam);
@@ -252,13 +261,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
         Dataframe dataframe = dataProviderManager.execute(providerSource, queryScript, queryParam);
 
-        if (viewExecuteParam.isScript()) {
-            try {
-                viewService.requirePermission(view, Const.MANAGE);
-            } catch (Exception e) {
-                dataframe.setScript(null);
-            }
-        } else {
+        if (!viewExecuteParam.isScript() || !scriptPermission) {
             dataframe.setScript(null);
         }
         return dataframe;
