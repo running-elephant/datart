@@ -203,13 +203,15 @@ export const ChartStyleSectionComponentType = {
   LINE: 'line',
   MARGIN_WIDTH: 'marginWidth',
   TEXT: 'text',
-  CONDITIONSTYLE: 'conditionStylePanel',
+  CONDITIONALSTYLE: 'conditionalStylePanel',
   RADIO: 'radio',
 
   // Customize Component
   FontAlignment: 'fontAlignment',
   NameLocation: 'nameLocation',
   LegendType: 'legendType',
+  ScorecardListTemplate: 'scorecardListTemplate',
+  ScorecardConditionalStyle: 'scorecardConditionalStyle',
 };
 
 export type ChartConfigBase = {

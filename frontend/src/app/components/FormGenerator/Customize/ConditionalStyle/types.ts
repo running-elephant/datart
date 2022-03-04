@@ -1,15 +1,33 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
 
-export interface ConditionStyleFormValues {
+export interface ConditionalStyleFormValues {
   uid: string;
   target: { name: string; type: any };
-  range: ConditionStyleRange;
+  range: ConditionalStyleRange;
   operator: OperatorTypes;
   value: string;
   color: { background: string; textColor: string };
 }
 
-export enum ConditionStyleRange {
+export enum ConditionalStyleRange {
   Cell = 'cell',
   Row = 'row',
 }
@@ -44,7 +62,7 @@ export const OperatorTypesLocale = {
   [OperatorTypes.IsNull]: '空值',
 };
 
-export const ConditionOperatorTypes = {
+export const ConditionalOperatorTypes = {
   [ColumnTypes.String]: [
     OperatorTypes.Equal,
     OperatorTypes.NotEqual,
