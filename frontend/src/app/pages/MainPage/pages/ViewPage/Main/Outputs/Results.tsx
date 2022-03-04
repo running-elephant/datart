@@ -29,7 +29,7 @@ import { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { FONT_FAMILY, FONT_SIZE_BASE } from 'styles/StyleConstants';
-import { CloneValueDeep } from 'utils/object';
+import { CloneValueDeep, isEmptyArray } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { selectRoles } from '../../../MemberPage/slice/selectors';
 import { SubjectTypes } from '../../../PermissionPage/constants';
@@ -90,6 +90,17 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
         const clonedHierarchyModel = CloneValueDeep(model.hierarchy || {});
         if (columnName in clonedHierarchyModel) {
           clonedHierarchyModel[columnName] = value;
+        } else {
+          Object.values(clonedHierarchyModel)
+            .filter(col => !isEmptyArray(col.children))
+            .forEach(col => {
+              const targetChildColumnIndex = col.children!.findIndex(
+                child => child.name === columnName,
+              );
+              if (targetChildColumnIndex > -1) {
+                col.children![targetChildColumnIndex] = value;
+              }
+            });
         }
 
         dispatch(
