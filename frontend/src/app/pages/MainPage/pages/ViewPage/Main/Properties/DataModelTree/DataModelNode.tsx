@@ -34,6 +34,7 @@ import {
   FONT_SIZE_BASE,
   FONT_SIZE_HEADING,
   INFO,
+  SPACE,
   SPACE_UNIT,
   SUCCESS,
   WARNING,
@@ -198,7 +199,7 @@ const StyledDataModelNode = styled.div<{
   isDragging: boolean;
 }>`
   line-height: 32px;
-  margin: ${SPACE_UNIT};
+  margin: ${SPACE};
   user-select: 'none';
   background: ${p =>
     p.isDragging ? p.theme.highlightBackground : 'transparent'};
