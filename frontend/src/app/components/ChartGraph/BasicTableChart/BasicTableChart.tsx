@@ -165,6 +165,7 @@ class BasicTableChart extends ReactChart {
     const tableColumns = this.getColumns(
       mixedSectionConfigRows,
       styleConfigs,
+      settingConfigs,
       chartDataSet,
       context,
     );
@@ -235,6 +236,7 @@ class BasicTableChart extends ReactChart {
     return this.getColumns(
       mixedSectionConfigRows,
       styleConfigs,
+      settingConfigs,
       chartDataSet,
       context,
     );
@@ -618,6 +620,7 @@ class BasicTableChart extends ReactChart {
   protected getColumns(
     mixedSectionConfigRows,
     styleConfigs,
+    settingConfigs,
     chartDataSet,
     context,
   ) {
@@ -631,6 +634,7 @@ class BasicTableChart extends ReactChart {
       ['header', 'modal'],
       ['tableHeaders'],
     );
+    const [pageSize] = getStyles(settingConfigs, ['paging'], ['pageSize']);
 
     const columnsList =
       !tableHeaderStyles || tableHeaderStyles.length === 0
@@ -655,11 +659,8 @@ class BasicTableChart extends ReactChart {
                 ?.columnWidthValue || 0,
             fixed: leftFixedColumns || rightFixedColumns ? 'left' : null,
             render: (value, row, rowIndex) => {
-              return (
-                (this.pageInfo.pageNo - 1) * this.pageInfo.pageSize +
-                rowIndex +
-                1
-              );
+              const pageNo = this.pageInfo?.pageNo || 1;
+              return (pageNo - 1) * (pageSize || 100) + rowIndex + 1;
             },
           } as any,
         ]
