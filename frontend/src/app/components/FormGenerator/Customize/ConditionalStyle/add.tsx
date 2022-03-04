@@ -21,6 +21,7 @@ import { ColorPickerPopover } from 'app/components/ColorPicker';
 import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
 import { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { G40 } from 'styles/StyleConstants';
 import {
   ConditionalOperatorTypes,
   ConditionalStyleFormValues,
@@ -293,11 +294,11 @@ const InputNumberScope = memo(
 );
 
 const StyledColor = styled.div`
+  position: relative;
   width: 16px;
   height: 16px;
-  background-color: ${props => props.color};
-  position: relative;
   cursor: pointer;
+  background-color: ${props => props.color};
   ::after {
     position: absolute;
     top: -7px;
@@ -305,8 +306,8 @@ const StyledColor = styled.div`
     display: inline-block;
     width: 30px;
     height: 30px;
-    border-radius: 5px;
-    border: 1px solid #d9d9d9;
     content: '';
+    border: 1px solid ${G40};
+    border-radius: 5px;
   }
 `;

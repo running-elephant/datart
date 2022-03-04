@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { Col, Form, Input, InputNumber, Modal, Row, Select } from 'antd';
 import { ColorPickerPopover } from 'app/components/ColorPicker';
 import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
 import { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { G40, G70 } from 'styles/StyleConstants';
 import { isEmpty } from 'utils/object';
 import {
   ConditionalOperatorTypes,
@@ -52,7 +52,7 @@ export default function Add({
     {
       name: 'textColor',
       label: t('conditionalStyleTable.header.color.text'),
-      value: '#495057',
+      value: G70,
     },
     {
       name: 'background',
@@ -91,7 +91,7 @@ export default function Add({
               operator: OperatorTypes.Equal,
               color: {
                 background: 'transparent',
-                textColor: '#495057',
+                textColor: G70,
               },
               metricKey: allItems?.[0]?.value,
             }
@@ -303,11 +303,11 @@ const InputNumberScope = memo(
 );
 
 const StyledColor = styled.div`
+  position: relative;
   width: 16px;
   height: 16px;
-  background-color: ${props => props.color};
-  position: relative;
   cursor: pointer;
+  background-color: ${props => props.color};
   ::after {
     position: absolute;
     top: -7px;
@@ -315,8 +315,8 @@ const StyledColor = styled.div`
     display: inline-block;
     width: 30px;
     height: 30px;
-    border-radius: 5px;
-    border: 1px solid #d9d9d9;
     content: '';
+    border: 1px solid ${G40};
+    border-radius: 5px;
   }
 `;

@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { Button, Col, Popconfirm, Row, Space, Table, Tag } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
+import { SPACE_SM } from 'styles/StyleConstants';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { ItemLayoutProps } from '../../types';
@@ -182,7 +182,7 @@ const ConditionalStyle: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
 
 const StyledConditionalStylePanel = styled(Space)`
   width: 100%;
-  margin-top: 10px;
+  margin-top: ${SPACE_SM};
 `;
 
 export default ConditionalStyle;
