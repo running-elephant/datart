@@ -362,7 +362,7 @@ export const getEditorProvideCompletionItems = createAsyncThunk<
       const databaseSchemas = selectSourceDatabaseSchemas(getState(), {
         id: sourceId,
       });
-      databaseSchemas?.forEach(db => {
+      databaseSchemas?.schemaItems?.forEach(db => {
         dbKeywords.add(db.dbName);
         db.tables?.forEach(table => {
           tableKeywords.add(table.tableName);

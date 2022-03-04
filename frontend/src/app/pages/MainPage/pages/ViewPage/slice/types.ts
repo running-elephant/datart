@@ -39,7 +39,7 @@ export interface ViewState {
     [name: string]: TreeDataNode[];
   };
   sourceDatabaseSchema: {
-    [name: string]: DatabaseSchema[];
+    schemaItems?: DatabaseSchema[];
   };
   saveViewLoading: boolean;
   unarchiveLoading: boolean;
