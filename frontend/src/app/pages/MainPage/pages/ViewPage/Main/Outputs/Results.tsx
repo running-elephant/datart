@@ -29,6 +29,7 @@ import { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { FONT_FAMILY, FONT_SIZE_BASE } from 'styles/StyleConstants';
+import { CloneValueDeep, isEmptyArray } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { selectRoles } from '../../../MemberPage/slice/selectors';
 import { SubjectTypes } from '../../../PermissionPage/constants';
@@ -39,7 +40,7 @@ import { selectCurrentEditingViewAttr } from '../../slice/selectors';
 import {
   Column,
   ColumnPermission,
-  Model,
+  HierarchyModel,
   ViewViewModel,
 } from '../../slice/types';
 
@@ -58,7 +59,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
   ) as string;
   const model = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'model' }),
-  ) as Model;
+  ) as HierarchyModel;
   const columnPermissions = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'columnPermissions' }),
   ) as ColumnPermission[];
@@ -86,9 +87,28 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
         } else {
           value = { ...column, type: key };
         }
+        const clonedHierarchyModel = CloneValueDeep(model.hierarchy || {});
+        if (columnName in clonedHierarchyModel) {
+          clonedHierarchyModel[columnName] = value;
+        } else {
+          Object.values(clonedHierarchyModel)
+            .filter(col => !isEmptyArray(col.children))
+            .forEach(col => {
+              const targetChildColumnIndex = col.children!.findIndex(
+                child => child.name === columnName,
+              );
+              if (targetChildColumnIndex > -1) {
+                col.children![targetChildColumnIndex] = value;
+              }
+            });
+        }
+
         dispatch(
           actions.changeCurrentEditingView({
-            model: { ...model, [columnName]: value },
+            model: {
+              ...model,
+              hierarchy: clonedHierarchyModel,
+            },
           }),
         );
       },
@@ -108,7 +128,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
 
   const checkRoleColumnPermission = useCallback(
     columnName => checkedKeys => {
-      const fullPermissions = Object.keys(model);
+      const fullPermissions = Object.keys(model?.columns || {});
       dispatch(
         actions.changeCurrentEditingView({
           columnPermissions: roleDropdownData.reduce<ColumnPermission[]>(
@@ -231,7 +251,8 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
       <SchemaTable
         height={height ? height - 96 : 0}
         width={width}
-        model={model}
+        model={model.columns || {}}
+        hierarchy={model.hierarchy || {}}
         dataSource={dataSource}
         pagination={pagination}
         getExtraHeaderActions={getExtraHeaderActions}

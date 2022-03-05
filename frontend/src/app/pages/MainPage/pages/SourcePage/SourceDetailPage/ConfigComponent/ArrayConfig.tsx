@@ -25,8 +25,8 @@ import {
   Table,
   TableColumnProps,
 } from 'antd';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ModalForm } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   Model,
   QueryResult,
@@ -115,9 +115,9 @@ export function ArrayConfig({
           setSchemaDataSource(modelAndDataSource.dataSource);
           formRef.current?.setFieldsValue({
             config: {
-              columns: Object.entries(modelAndDataSource.model).map(
-                ([name, model]) => ({ name, ...model }),
-              ),
+              columns: Object.entries(
+                modelAndDataSource?.model?.columns || {},
+              ).map(([name, model]) => ({ ...model, name: name })),
             },
           });
         });

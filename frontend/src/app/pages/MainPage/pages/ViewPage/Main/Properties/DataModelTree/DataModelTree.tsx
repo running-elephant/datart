@@ -29,6 +29,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { FONT_SIZE_BASE, INFO } from 'styles/StyleConstants';
+import { Nullable } from 'types';
 import { CloneValueDeep, isEmpty, isEmptyArray } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { ColumnTypes } from '../../../constants';
@@ -66,13 +67,11 @@ const DataModelTree: FC = memo(() => {
   const columnPermissions = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'columnPermissions' }),
   ) as ColumnPermission[];
-  const [hierarchy, setHierarchy] = useState<Model | undefined>(
-    currentEditingView?.model,
-  );
+  const [hierarchy, setHierarchy] = useState<Nullable<Model>>();
 
   useEffect(() => {
-    setHierarchy(currentEditingView?.hierarchy);
-  }, [currentEditingView?.hierarchy]);
+    setHierarchy(currentEditingView?.model?.hierarchy);
+  }, [currentEditingView?.model?.hierarchy]);
 
   const tableColumns = useMemo<Column[]>(() => {
     return Object.entries(hierarchy || {})
@@ -201,7 +200,10 @@ const DataModelTree: FC = memo(() => {
     setHierarchy(hierarchy);
     dispatch(
       actions.changeCurrentEditingView({
-        hierarchy: hierarchy,
+        model: {
+          ...currentEditingView?.model,
+          hierarchy,
+        },
       }),
     );
   };

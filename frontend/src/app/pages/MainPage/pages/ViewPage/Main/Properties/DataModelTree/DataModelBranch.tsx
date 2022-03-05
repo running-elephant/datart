@@ -34,7 +34,6 @@ import {
   SPACE_UNIT,
   YELLOW,
 } from 'styles/StyleConstants';
-import { ColumnTypes } from '../../../constants';
 import { Column } from '../../../slice/types';
 import { TreeNodeHierarchy } from './constant';
 import DataModelNode from './DataModelNode';
@@ -108,19 +107,12 @@ const DataModelBranch: FC<{
                 key={childNode.name}
                 getPermissionButton={getPermissionButton}
                 onMoveToHierarchy={onMoveToHierarchy}
-                onNodeTypeChange={handleBranchNodeTypeChange}
+                onNodeTypeChange={onNodeTypeChange}
               />
             ))}
           </div>
         </>
       );
-    };
-
-    const handleBranchNodeTypeChange = (type: any, name: string) => {
-      if (type === ColumnTypes.Number) {
-        return;
-      }
-      return onNodeTypeChange(type, name);
     };
 
     return (
