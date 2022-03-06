@@ -149,6 +149,7 @@ const Wrapper = styled.div`
   align-items: center;
   padding: ${SPACE_SM} ${SPACE_MD} ${SPACE_SM} ${SPACE_SM};
   border-bottom: 1px solid ${p => p.theme.borderColorSplit};
+  background-color: ${p => p.theme.componentBackground};
 
   h1 {
     flex: 1;

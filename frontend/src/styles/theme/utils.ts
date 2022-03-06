@@ -10,8 +10,15 @@ export function saveTheme(theme: ThemeKeyType) {
 }
 
 /* istanbul ignore next line */
-export function getThemeFromStorage(): ThemeKeyType | null {
-  return window.localStorage
-    ? (localStorage.getItem('selectedTheme') as ThemeKeyType) || null
-    : null;
+export function getThemeFromStorage(): ThemeKeyType {
+  const theme = window.localStorage
+    ? (localStorage.getItem('selectedTheme') as ThemeKeyType)
+    : '';
+
+  if (!theme) {
+    saveTheme('light');
+    return 'light';
+  } else {
+    return theme;
+  }
 }

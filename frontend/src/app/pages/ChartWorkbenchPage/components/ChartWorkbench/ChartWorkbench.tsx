@@ -141,10 +141,11 @@ const StyledChartWorkbench = styled.div`
   flex: 1;
   flex-flow: column;
   overflow: hidden;
-  background-color: ${p => p.theme.componentBackground};
+  background-color: ${p => p.theme.bodyBackground};
 
   .flexlayout__tab {
     overflow: hidden;
+    background-color: ${p => p.theme.bodyBackground};
   }
 
   .flexlayout__splitter {
