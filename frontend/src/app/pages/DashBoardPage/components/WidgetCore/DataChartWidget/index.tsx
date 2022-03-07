@@ -171,7 +171,7 @@ const ChartFrameBox = styled.div`
   overflow: hidden;
 `;
 const Wrap = styled.div`
+  position: relative;
   display: flex;
   flex: 1;
-  position: relative;
 `;

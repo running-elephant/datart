@@ -84,10 +84,10 @@ interface WrapProps {
 const Wrap = styled.div<WrapProps>`
   position: relative;
   box-sizing: border-box;
-  width: 100%;
-  height: 100%;
   display: flex;
   flex: 1;
+  width: 100%;
+  height: 100%;
   border: ${p => p.border};
 
   & .widget-tool-bar {
@@ -104,8 +104,8 @@ const Wrap = styled.div<WrapProps>`
 `;
 const ItemContainer = styled.div`
   position: absolute;
-  display: flex;
   z-index: 10;
+  display: flex;
   width: 100%;
   height: 100%;
 `;

@@ -310,7 +310,7 @@ const StyledContainer = styled(StyledBackground)`
   .empty {
     display: flex;
     flex: 1;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
   }
 `;
