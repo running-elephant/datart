@@ -880,6 +880,7 @@
       "action": {
         "refresh": "Refresh",
         "fullScreen": "FullScreen",
+        "lock": "Lock",
         "edit": "Edit",
         "delete": "Delete",
         "confirmDel": "Confirm Delete",
@@ -889,6 +890,12 @@
         "closeLinkage": "Close Linkage",
         "makeJump": "Set Jump",
         "closeJump": "Close Jump"
+      },
+      "tips": {
+        "unlock": "LockIng drag and click to unlock",
+        "waiting": "Waiting for loadData",
+        "cancelLinkage": "Cancel Linkage",
+        "canLinkage": "Click the Widget to link"
       }
     },
     "linkage": {

@@ -87,7 +87,7 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
         },
         {
           key: 'lock',
-          label: 'lock',
+          label: t('lock'),
           icon: <LockOutlined />,
         },
 
