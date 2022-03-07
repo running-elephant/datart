@@ -22,6 +22,7 @@ import { listToTree } from 'utils/utils';
 import { initialState } from '.';
 import { ResourceTypes } from '../../PermissionPage/constants';
 import {
+  DatabaseSchema,
   SelectViewFolderTreeProps,
   SelectViewTreeProps,
   ViewViewModel,

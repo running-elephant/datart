@@ -19,6 +19,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getDataProviderDatabases } from 'app/pages/MainPage/slice/thunks';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
+import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
+import { rejectedActionMessageHandler } from 'utils/notification';
 import { ViewViewModelStages } from '../constants';
 import {
   diffMergeHierarchyModel,
@@ -399,15 +401,17 @@ const slice = createSlice({
     });
 
     builder.addCase(getSchemaBySourceId.fulfilled, (state, action) => {
-      if (!action.payload?.data) {
+      if (!action.payload?.data?.schemaItems) {
         return;
       }
-      if (!state.sourceDatabaseSchema) {
-        state.sourceDatabaseSchema = {};
-      }
       state.sourceDatabaseSchema[action.payload?.sourceId] =
-        action.payload.data;
+        action.payload.data.schemaItems;
     });
+
+    builder.addMatcher(
+      isMySliceRejectedAction(slice.name),
+      rejectedActionMessageHandler,
+    );
   },
 });
 
