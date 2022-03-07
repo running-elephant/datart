@@ -67,6 +67,10 @@ export const convertImageUrl = (urlKey: string = ''): string => {
   }
   return urlKey;
 };
+export const getBackgroundImage = (url: string = ''): string => {
+  return url ? `url(${convertImageUrl(url)})` : 'none';
+};
+
 /**
  * @description '为了server 复制board 副本，原有board资源文件 和新副本资源文件 脱离关系 不受影响'
  * 将当前前端渲染环境 id 替换掉原有的id ，原来的和当前的相等不受影响
