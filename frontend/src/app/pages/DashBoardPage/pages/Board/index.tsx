@@ -52,6 +52,7 @@ import {
 } from './slice/selector';
 import { fetchBoardDetail } from './slice/thunk';
 import { BoardState, VizRenderMode } from './slice/types';
+
 export interface BoardProps {
   id: string;
   renderMode: VizRenderMode;
@@ -83,6 +84,7 @@ export const Board: React.FC<BoardProps> = memo(
     const boardId = id;
     const dispatch = useDispatch();
     const history = useHistory();
+    const t = useI18NPrefix();
     const tg = useI18NPrefix('global');
     const { ref, width, height } = useResizeObserver<HTMLDivElement>({
       refreshMode: 'debounce',
@@ -275,12 +277,12 @@ export const Board: React.FC<BoardProps> = memo(
           boardActions.setWidgetErrInfo({
             boardId: v.dashboardId,
             widgetId: v.id,
-            errInfo: errInfo,
+            errInfo: t(errInfo),
             errorType: 'interaction',
           }),
         );
       });
-    }, [folderId, BoardWidgetMap, dispatch]);
+    }, [folderId, BoardWidgetMap, dispatch, t]);
 
     useEffect(() => {
       dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));

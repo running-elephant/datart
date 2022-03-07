@@ -38,7 +38,7 @@ export const initialState: AppState = {
   registerLoading: false,
   saveProfileLoading: false,
   modifyPasswordLoading: false,
-  oauth2Clients:[],
+  oauth2Clients: [],
 };
 
 const slice = createSlice({
@@ -120,9 +120,9 @@ const slice = createSlice({
     });
 
     builder.addCase(getOauth2Clients.fulfilled, (state, action) => {
-      state.oauth2Clients =action.payload.map(x=>({
-        name:Object.keys(x)[0],
-        value:x[Object.keys(x)[0]]
+      state.oauth2Clients = action.payload.map(x => ({
+        name: Object.keys(x)[0],
+        value: x[Object.keys(x)[0]],
       }));
     });
   },

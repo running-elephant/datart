@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import { prefixI18N } from 'app/hooks/useI18NPrefix';
 import { migrateChartConfig } from 'app/migration';
 import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -531,7 +530,7 @@ export const checkLinkAndJumpErr = (
     widgetData?.config?.linkageConfig?.open &&
     widgetData?.relations.length === 0
   ) {
-    error = prefixI18N('viz.linkage.linkageError');
+    error = 'viz.linkage.linkageError';
   }
 
   if (
@@ -540,7 +539,7 @@ export const checkLinkAndJumpErr = (
     widgetData?.config?.jumpConfig.targetType === 'INTERNAL' &&
     !folderListIds?.includes(widgetData.config.jumpConfig.target.relId)
   ) {
-    error = prefixI18N('viz.jump.jumpError');
+    error = 'viz.jump.jumpError';
   }
 
   return error;

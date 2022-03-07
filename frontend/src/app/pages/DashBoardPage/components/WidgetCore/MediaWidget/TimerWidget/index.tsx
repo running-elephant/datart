@@ -22,6 +22,7 @@ import {
   BasicInput,
   BasicInputNumber,
 } from 'app/components/FormGenerator/Basic';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { MediaWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
@@ -32,7 +33,6 @@ import { G10, G90 } from 'styles/StyleConstants';
 import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
 import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 
 const FONT_DATA = {
   comType: 'font',
@@ -139,7 +139,12 @@ const TimerWidget: React.FC = () => {
         data={durationData}
         onChange={onDurationChange}
       />
-      <BasicFont translate={t} ancestors={[0, 0]} data={fontData} onChange={onFontChange} />
+      <BasicFont
+        translate={t}
+        ancestors={[0, 0]}
+        data={fontData}
+        onChange={onFontChange}
+      />
     </div>
   );
 

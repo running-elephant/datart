@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-import {createAsyncThunk} from '@reduxjs/toolkit';
-import {StorageKeys} from 'globalConstants';
-import {removeToken, setToken, setTokenExpiration} from 'utils/auth';
-import {request} from 'utils/request';
-import {errorHandle} from 'utils/utils';
-import {appActions} from '.';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { StorageKeys } from 'globalConstants';
+import { removeToken, setToken, setTokenExpiration } from 'utils/auth';
+import { request } from 'utils/request';
+import { errorHandle } from 'utils/utils';
+import { appActions } from '.';
 import {
   LoginParams,
   LogoutParams,
@@ -35,9 +35,9 @@ import {
 
 export const login = createAsyncThunk<User, LoginParams>(
   'app/login',
-  async ({params, resolve}) => {
+  async ({ params, resolve }) => {
     try {
-      const {data} = await request<User>({
+      const { data } = await request<User>({
         url: '/users/login',
         method: 'POST',
         data: params,
@@ -54,10 +54,10 @@ export const login = createAsyncThunk<User, LoginParams>(
 
 export const getUserInfoByToken = createAsyncThunk<User, UserInfoByTokenParams>(
   'app/getUserInfoByToken',
-  async ({token, resolve}) => {
+  async ({ token, resolve }) => {
     setToken(token);
     try {
-      const {data} = await request<User>({
+      const { data } = await request<User>({
         url: '/users',
         method: 'GET',
       });
@@ -74,7 +74,7 @@ export const getUserInfoByToken = createAsyncThunk<User, UserInfoByTokenParams>(
 
 export const register = createAsyncThunk<null, RegisterParams>(
   'app/register',
-  async ({data, resolve}) => {
+  async ({ data, resolve }) => {
     try {
       await request<User>({
         url: '/users/register',
@@ -120,7 +120,7 @@ export const logout = createAsyncThunk<undefined, LogoutParams>(
 
 export const updateUser = createAsyncThunk<null, User>(
   'app/updateUser',
-  async (user, {dispatch}) => {
+  async (user, { dispatch }) => {
     try {
       localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(user));
       dispatch(appActions.updateUser(user));
@@ -134,9 +134,9 @@ export const updateUser = createAsyncThunk<null, User>(
 
 export const saveProfile = createAsyncThunk<User, SaveProfileParams>(
   'app/saveProfile',
-  async ({user, resolve}) => {
+  async ({ user, resolve }) => {
     const loggedInUser = localStorage.getItem(StorageKeys.LoggedInUser) || '{}';
-    const merged = {...JSON.parse(loggedInUser), ...user};
+    const merged = { ...JSON.parse(loggedInUser), ...user };
     try {
       await request({
         url: '/users',
@@ -153,8 +153,10 @@ export const saveProfile = createAsyncThunk<User, SaveProfileParams>(
   },
 );
 
-export const modifyAccountPassword = createAsyncThunk<void,
-  ModifyPasswordParams>('app/modifyAccountPassword', async ({params, resolve}) => {
+export const modifyAccountPassword = createAsyncThunk<
+  void,
+  ModifyPasswordParams
+>('app/modifyAccountPassword', async ({ params, resolve }) => {
   try {
     await request({
       url: '/users/change/password',
@@ -172,7 +174,7 @@ export const getSystemInfo = createAsyncThunk<SystemInfo>(
   'app/getSystemInfo',
   async () => {
     try {
-      const {data} = await request<SystemInfo>('/sys/info');
+      const { data } = await request<SystemInfo>('/sys/info');
       // minute -> millisecond
       const tokenTimeout = Number(data.tokenTimeout) * 60 * 1000;
       setTokenExpiration(tokenTimeout);
@@ -188,9 +190,9 @@ export const getOauth2Clients = createAsyncThunk<[]>(
   'app/getOauth2Clients',
   async () => {
     try {
-      const {data} = await request<[]>({
+      const { data } = await request<[]>({
         url: '/tpa/getOauth2Clients',
-        method: 'GET'
+        method: 'GET',
       });
       return data;
     } catch (error) {
@@ -200,22 +202,19 @@ export const getOauth2Clients = createAsyncThunk<[]>(
   },
 );
 
-export const tryOauth = createAsyncThunk<User>(
-  'app/tryOauth',
-  async () => {
-    try {
-      const {data} = await request<User>({
-        url: '/tpa/oauth2login',
-        method: 'POST'
-      });
-      localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(data));
-      setTimeout(() => {
-        window.location.href = '/';
-      });
-      return data;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
-  },
-);
+export const tryOauth = createAsyncThunk<User>('app/tryOauth', async () => {
+  try {
+    const { data } = await request<User>({
+      url: '/tpa/oauth2login',
+      method: 'POST',
+    });
+    localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(data));
+    setTimeout(() => {
+      window.location.href = '/';
+    });
+    return data;
+  } catch (error) {
+    errorHandle(error);
+    throw error;
+  }
+});
