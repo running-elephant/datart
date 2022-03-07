@@ -49,7 +49,7 @@ public class RequestContext {
     }
 
     public static void setSql(String sqlStr) {
-        if (scriptPermission.get()) {
+        if (scriptPermission.get() != null && scriptPermission.get()) {
             sql.set(sqlStr);
         }
     }
