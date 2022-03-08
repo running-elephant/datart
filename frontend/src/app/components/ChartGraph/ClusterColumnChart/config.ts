@@ -259,11 +259,18 @@ const config: ChartConfig = {
           comType: 'select',
           default: 'break',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '溢出', value: 'none' },
-              { label: '截断', value: 'truncate' },
-              { label: '换行', value: 'break' },
-              { label: '强制换行', value: 'breakAll' },
+              { label: '@global@.common.overflowType.none', value: 'none' },
+              {
+                label: '@global@.common.overflowType.truncate',
+                value: 'truncate',
+              },
+              { label: '@global@.common.overflowType.break', value: 'break' },
+              {
+                label: '@global@.common.overflowType.breakAll',
+                value: 'breakAll',
+              },
             ],
           },
         },
@@ -504,6 +511,12 @@ const config: ChartConfig = {
           nameGap: '标题与轴线距离',
           min: '最小值',
           max: '最大值',
+          overflowType: {
+            none: '溢出',
+            truncate: '截断',
+            break: '换行',
+            breakAll: '强制换行',
+          },
         },
         label: {
           title: '标签',
@@ -577,6 +590,12 @@ const config: ChartConfig = {
           nameGap: 'Name Gap',
           min: 'Min',
           max: 'Max',
+          overflowType: {
+            none: 'None',
+            truncate: 'Truncate',
+            break: 'Break',
+            breakAll: 'BreakAll',
+          },
         },
         label: {
           title: 'Label',

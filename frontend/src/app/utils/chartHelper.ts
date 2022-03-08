@@ -31,7 +31,10 @@ import {
   IFieldFormatConfig,
   SortActionType,
 } from 'app/types/ChartConfig';
-import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
+import {
+  ChartCommonConfig,
+  ChartStyleConfigDTO,
+} from 'app/types/ChartConfigDTO';
 import {
   ChartDatasetMeta,
   IChartDataSet,
@@ -46,6 +49,7 @@ import { Debugger } from 'utils/debugger';
 import { isEmpty, isEmptyArray, meanValue, pipe } from 'utils/object';
 import {
   flattenHeaderRowsWithoutGroupRow,
+  getAxisLengthByConfig,
   getColumnRenderOriginName,
   getRequiredAggregatedSections,
   getRequiredGroupedSections,
@@ -1337,23 +1341,6 @@ export function isMatchRequirement(
   });
 }
 
-interface CommonChartConfig {
-  chart: ECharts;
-  // 官方ts定义过于复杂 所以用any
-  // x轴options
-  xAxis: any;
-  // y轴options
-  yAxis: any;
-  // 布局
-  grid: any;
-  // y轴 字段索引名
-  yAxisNames: string[];
-  // 图表系列
-  series: any[];
-  // 水平还是垂直
-  horizon?: boolean;
-}
-
 // 获取是否展示刻度
 export const getIntervalShow = interval =>
   interval !== 'auto' && interval !== null;
@@ -1374,87 +1361,8 @@ export function hadAxisLabelOverflowConfig(
   return show && overflow && getIntervalShow(interval);
 }
 
-// 获取当前坐标轴区域的宽度
-export function getAxisLengthByConfig(config: CommonChartConfig) {
-  const { chart, xAxis, yAxis, grid, series, yAxisNames, horizon } = config;
-  const axisOpts = !horizon ? xAxis : yAxis;
-  // datart 布局配置分为百分比和像素
-  const getWidthNum = (
-    num: string | number,
-  ): {
-    num: number;
-    type: 'percent' | 'px';
-  } => {
-    if (typeof num === 'string') {
-      const num_ = parseInt(num.replace('%', ''), 10);
-      if (isNaN(num_)) {
-        throw new Error(`${num} is not a number`);
-      }
-      return {
-        num: num_ / 100,
-        type: 'percent',
-      };
-    }
-    return {
-      num,
-      type: 'px',
-    };
-  };
-
-  // 获取坐标轴宽度
-  const getAxisWidth = (YAxisLength: number): number => {
-    return (Array.isArray(axisOpts) ? axisOpts : [axisOpts]).reduce(
-      (prev, item) => {
-        const { fontSize, show } = item.axisLabel;
-        // 预留一个字符长度
-        const axisLabelMaxWidth = show ? (YAxisLength + 1) * fontSize : 0;
-        prev += axisLabelMaxWidth;
-        return prev;
-      },
-      0,
-    );
-  };
-
-  const { containerLabel, left, right } = grid;
-
-  // 找到轴上最大的数字长度
-  let foundMaxAxisLength = 0;
-
-  if (containerLabel && !horizon) {
-    foundMaxAxisLength = series.reduce((prev, sery) => {
-      sery?.data?.forEach(item => {
-        yAxisNames.forEach(name => {
-          if (item.name === name) {
-            const yNumStr = `${item[0]}`;
-            if (yNumStr.length > prev) {
-              prev = yNumStr.length;
-            }
-          }
-        });
-      });
-      return prev;
-    }, 0);
-  }
-
-  const axisLabelMaxWidth = getAxisWidth(foundMaxAxisLength);
-
-  const left_ = getWidthNum(left);
-  const right_ = getWidthNum(right);
-
-  const containerWidth = chart.getWidth();
-
-  // 左右边距
-  const leftWidth =
-    left_.type === 'px' ? left_.num : containerWidth * left_.num;
-  const rightWidth =
-    right_.type === 'px' ? right_.num : containerWidth * right_.num;
-
-  // 坐标轴区域宽度 = 容器宽度 - 最大字符所占长度 - 左右边距
-  return containerWidth - axisLabelMaxWidth - leftWidth - rightWidth;
-}
-
 // 处理溢出情况
-export function setOptionsByAxisLabelOverflow(config: CommonChartConfig) {
+export function setOptionsByAxisLabelOverflow(config: ChartCommonConfig) {
   const { chart, xAxis, yAxis, grid, series, horizon = false } = config;
 
   const commonOpts = {
