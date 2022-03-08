@@ -21,6 +21,7 @@ import { Form, Input, Select, Tooltip } from 'antd';
 import { Popup, ToolbarButton, Tree } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
+import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import { selectRoles } from 'app/pages/MainPage/pages/MemberPage/slice/selectors';
 import { SubjectTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import classnames from 'classnames';
@@ -206,6 +207,7 @@ const DataModelTree: FC = memo(() => {
         model: {
           ...currentEditingView?.model,
           hierarchy,
+          version: APP_CURRENT_VERSION,
         },
       }),
     );
