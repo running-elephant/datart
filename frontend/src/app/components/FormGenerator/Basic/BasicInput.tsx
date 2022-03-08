@@ -19,7 +19,7 @@
 import { Input } from 'antd';
 import useDebouncedFormValue from 'app/hooks/useDebouncedFormValue';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { FC, memo } from 'react';
+import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
@@ -38,13 +38,20 @@ const BasicInput: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       onChange,
     );
 
+    const inputOnChange = useCallback(
+      e => {
+        debouncedUpdateValue(e.target.value);
+      },
+      [debouncedUpdateValue],
+    );
+
     return (
       <Wrapper label={t(data?.label, true)}>
         <Input
           {...rest}
           {...options}
           value={formValue}
-          onChange={debouncedUpdateValue}
+          onChange={inputOnChange}
           defaultValue={data?.default}
         />
       </Wrapper>
