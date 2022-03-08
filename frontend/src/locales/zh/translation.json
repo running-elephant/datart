@@ -162,12 +162,12 @@
           "confirmPassword": "确定新密码"
         },
         "switchLanguage": {
-          "title": "切换语言"
+          "title": "语言"
         },
         "switchTheme": {
-          "title": "切换主题",
-          "light": "浅色",
-          "dark": "深色"
+          "title": "主题",
+          "light": "明亮",
+          "dark": "黑暗"
         },
         "logout": {
           "title": "退出登录"

@@ -27,6 +27,7 @@ export enum StorageKeys {
   LoggedInUser = 'LOGGED_IN_USER',
   ShareClientId = 'SHARE_CLIENT_ID',
   Locale = 'LOCALE',
+  Theme = 'THEME',
 }
 export const BASE_API_URL = '/api/v1';
 export const BASE_RESOURCE_URL = '/';

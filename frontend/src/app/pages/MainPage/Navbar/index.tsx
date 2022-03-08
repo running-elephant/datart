@@ -18,7 +18,6 @@
 
 import {
   BankFilled,
-  BgColorsOutlined,
   ExportOutlined,
   FormOutlined,
   FunctionOutlined,
@@ -27,11 +26,10 @@ import {
   SafetyCertificateFilled,
   SettingFilled,
   SettingOutlined,
+  SkinOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { List, Menu, Tooltip } from 'antd';
-import lightTheme from 'antd/dist/default-theme';
-import { darkThemeSingle } from 'antd/dist/theme';
 import logo from 'app/assets/images/logo.svg';
 import { Avatar, MenuListItem, Popup } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -53,6 +51,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import {
+  BLACK,
   BORDER_RADIUS,
   FONT_SIZE_ICON_SM,
   FONT_WEIGHT_MEDIUM,
@@ -61,9 +60,11 @@ import {
   SPACE_MD,
   SPACE_TIMES,
   SPACE_XS,
+  WHITE,
 } from 'styles/StyleConstants';
 import themeSlice from 'styles/theme/slice';
 import { ThemeKeyType } from 'styles/theme/slice/types';
+import { changeAntdTheme, saveTheme } from 'styles/theme/utils';
 import { Access } from '../Access';
 import {
   PermissionLevels,
@@ -198,14 +199,8 @@ export function Navbar() {
   const handleChangeThemeFn = useCallback(
     (theme: ThemeKeyType) => {
       dispatch(themeSlice.actions.changeTheme(theme));
-      (window as any).less
-        .modifyVars(theme === 'dark' ? darkThemeSingle : lightTheme)
-        .then((res: any) => {
-          console.log('切换主题成功');
-        })
-        .catch((res: any) => {
-          console.log('切换主题错误');
-        });
+      changeAntdTheme(theme);
+      saveTheme(theme);
     },
     [dispatch],
   );
@@ -325,14 +320,17 @@ export function Navbar() {
                 </MenuListItem>
                 <MenuListItem
                   key="theme"
-                  prefix={<BgColorsOutlined className="icon" />}
+                  prefix={<SkinOutlined className="icon" />}
                   title={<p>{t('nav.account.switchTheme.title')}</p>}
                   sub
                 >
-                  <MenuListItem key="light">
+                  <MenuListItem key="light" prefix={<ThemeBadge />}>
                     {t('nav.account.switchTheme.light')}
                   </MenuListItem>
-                  <MenuListItem key="dark">
+                  <MenuListItem
+                    key="dark"
+                    prefix={<ThemeBadge background={BLACK} />}
+                  >
                     {t('nav.account.switchTheme.dark')}
                   </MenuListItem>
                 </MenuListItem>
@@ -510,4 +508,12 @@ const SubNavTitle = styled(NavLink)`
       color: ${p => p.theme.primary};
     }
   }
+`;
+
+const ThemeBadge = styled.span<{ background?: string }>`
+  width: ${SPACE_TIMES(4)};
+  height: ${SPACE_TIMES(4)};
+  background-color: ${p => p.background || WHITE};
+  border-radius: 50%;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
 `;
