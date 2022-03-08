@@ -51,15 +51,15 @@ export const Workbench = memo(() => {
   const parentId = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'parentId' }),
   ) as string;
+  const sourceId = useSelector(state =>
+    selectCurrentEditingViewAttr(state, { name: 'sourceId' }),
+  ) as string;
 
   useEffect(() => {
-    if (Boolean(id)) {
-      const sourceId = views?.find(v => v.id === id)?.sourceId;
-      if (sourceId) {
-        dispatch(getSchemaBySourceId(sourceId));
-      }
+    if (sourceId) {
+      dispatch(getSchemaBySourceId(sourceId));
     }
-  }, [dispatch, id, views]);
+  }, [dispatch, sourceId]);
 
   const path = useMemo(
     () =>

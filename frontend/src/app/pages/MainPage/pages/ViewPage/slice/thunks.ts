@@ -141,7 +141,6 @@ export const getSchemaBySourceId = createAsyncThunk<any, string>(
     if (sourceSchemas) {
       return;
     }
-
     const { data } = await request2<any>({
       url: `/sources/schemas/${sourceId}`,
       method: 'GET',
