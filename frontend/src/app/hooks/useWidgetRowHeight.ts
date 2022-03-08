@@ -21,14 +21,14 @@ import {
   BASE_VIEW_WIDTH,
   MIN_ROW_HEIGHT,
 } from 'app/pages/DashBoardPage/constants';
-import { useEffect, useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 import useResizeObserver from './useResizeObserver';
 
 export const useWidgetRowHeight = () => {
   const [cacheW, setCacheW] = useState(0);
   const { ref, width = 0 } = useResizeObserver<HTMLDivElement>();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (width > 0) {
       setCacheW(width);
     }
