@@ -39,6 +39,7 @@ import { ColumnTypes } from '../../constants';
 import { EditorContext } from '../../EditorContext';
 import {
   selectCurrentEditingViewAttr,
+  selectDatabaseSchemaLoading,
   selectSourceDatabaseSchemas,
 } from '../../slice/selectors';
 import { getEditorProvideCompletionItems } from '../../slice/thunks';
@@ -50,6 +51,7 @@ export const Resource = memo(() => {
   const t = useI18NPrefix('view.resource');
   const dispatch = useDispatch();
   const { editorCompletionItemProviderRef } = useContext(EditorContext);
+  const isDatabaseSchemaLoading = useSelector(selectDatabaseSchemaLoading);
   const sourceId = useSelector<RootState>(state =>
     selectCurrentEditingViewAttr(state, { name: 'sourceId' }),
   ) as string;
@@ -145,7 +147,7 @@ export const Resource = memo(() => {
         <Tree
           className="medium"
           treeData={filteredData}
-          loading={false}
+          loading={isDatabaseSchemaLoading}
           icon={renderIcon}
           selectable={false}
           defaultExpandedKeys={expandedRowKeys}

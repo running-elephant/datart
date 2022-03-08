@@ -114,3 +114,8 @@ export const selectArchivedListLoading = createSelector(
   [selectDomain],
   viewState => viewState.archivedListLoading,
 );
+
+export const selectDatabaseSchemaLoading = createSelector(
+  [selectDomain],
+  viewState => viewState.databaseSchemaLoading,
+);

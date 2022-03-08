@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { createSlice, current, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getDataProviderDatabases } from 'app/pages/MainPage/slice/thunks';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
@@ -51,6 +51,7 @@ export const initialState: ViewState = {
   sourceDatabaseSchema: {},
   saveViewLoading: false,
   unarchiveLoading: false,
+  databaseSchemaLoading: false,
 };
 
 const slice = createSlice({
@@ -400,7 +401,15 @@ const slice = createSlice({
       }));
     });
 
+    // getSchemaBySourceId
+    builder.addCase(getSchemaBySourceId.pending, state => {
+      state.databaseSchemaLoading = true;
+    });
+    builder.addCase(getSchemaBySourceId.rejected, state => {
+      state.databaseSchemaLoading = false;
+    });
     builder.addCase(getSchemaBySourceId.fulfilled, (state, action) => {
+      state.databaseSchemaLoading = false;
       if (!action.payload?.data?.schemaItems) {
         return;
       }
