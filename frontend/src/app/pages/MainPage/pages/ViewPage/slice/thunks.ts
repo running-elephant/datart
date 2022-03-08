@@ -206,15 +206,7 @@ export const saveView = createAsyncThunk<
     ? (currentView as ViewViewModel)
     : (selectCurrentEditingView(getState()) as ViewViewModel);
   const orgId = selectOrgId(getState());
-
-  // keep to save view model config version
-  if (currentEditingView?.model && !currentEditingView?.model?.version) {
-    currentEditingView = produce(currentEditingView, draft => {
-      draft.model = Object.assign({}, currentEditingView.model, {
-        version: APP_CURRENT_VERSION,
-      });
-    });
-  }
+ 
   try {
     if (isNewView(currentEditingView.id) || isSaveAs) {
       const { data } = await request<View>({

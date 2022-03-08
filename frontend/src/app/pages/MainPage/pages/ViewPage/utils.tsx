@@ -17,6 +17,7 @@
  */
 
 import { TreeDataNode } from 'antd';
+import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
 import { Nullable } from 'types';
 import { isEmptyArray } from 'utils/object';
@@ -47,7 +48,9 @@ export function generateEditingView(
     index: null,
     script: '',
     config: {},
-    model: {},
+    model: {
+      version: APP_CURRENT_VERSION,
+    },
     originVariables: [],
     variables: [],
     originColumnPermissions: [],
