@@ -117,7 +117,10 @@ export function transformQueryResultToModelAndDataSource(
       {},
     ),
   );
-  return { model: { ...lastModel, columns: newColumns }, dataSource };
+  return {
+    model: { ...lastModel, columns: newColumns },
+    dataSource,
+  };
 }
 
 export function getHierarchyColumn(

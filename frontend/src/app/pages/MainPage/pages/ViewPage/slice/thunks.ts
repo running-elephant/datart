@@ -18,10 +18,12 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import sqlReservedWords from 'app/assets/javascripts/sqlReservedWords';
+import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import i18n from 'i18next';
+import produce from 'immer';
 import { monaco } from 'react-monaco-editor';
 import { RootState } from 'types';
 import { request, request2 } from 'utils/request';
@@ -200,13 +202,20 @@ export const saveView = createAsyncThunk<
   SaveViewParams,
   { state: RootState }
 >('view/saveView', async ({ resolve, isSaveAs, currentView }, { getState }) => {
-  const currentEditingView = isSaveAs
+  let currentEditingView = isSaveAs
     ? (currentView as ViewViewModel)
     : (selectCurrentEditingView(getState()) as ViewViewModel);
   const orgId = selectOrgId(getState());
 
   try {
     if (isNewView(currentEditingView.id) || isSaveAs) {
+      if (currentEditingView?.model && !currentEditingView?.model?.version) {
+        currentEditingView = produce(currentEditingView, draft => {
+          draft.model = Object.assign({}, currentEditingView.model, {
+            version: APP_CURRENT_VERSION,
+          });
+        });
+      }
       const { data } = await request<View>({
         url: '/views',
         method: 'POST',

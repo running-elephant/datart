@@ -24,6 +24,7 @@ import {
 import { Tooltip } from 'antd';
 import { Popup, ToolbarButton, Tree } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import classnames from 'classnames';
 import { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -108,6 +109,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
             model: {
               ...model,
               hierarchy: clonedHierarchyModel,
+              version: APP_CURRENT_VERSION,
             },
           }),
         );
