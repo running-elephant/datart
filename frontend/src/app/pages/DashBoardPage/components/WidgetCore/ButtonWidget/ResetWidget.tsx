@@ -43,15 +43,14 @@ export const ResetWidget: React.FC<CompProps> = () => {
 };
 
 const Wrap = styled.div<FontConfig & { background: string }>`
-  cursor: pointer;
-  flex: 1;
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
   font: ${p =>
     `${p.fontStyle} ${p.fontWeight} ${p.fontSize}px ${p.fontFamily}`};
   color: ${p => p.color};
-
+  cursor: pointer;
   &:hover {
     background: ${p =>
       getLuminance(p.background) > 0.5
