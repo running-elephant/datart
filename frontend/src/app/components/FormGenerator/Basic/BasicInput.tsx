@@ -44,7 +44,9 @@ const BasicInput: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           {...rest}
           {...options}
           value={formValue}
-          onChange={debouncedUpdateValue}
+          onChange={e => {
+            debouncedUpdateValue(e.target.value);
+          }}
           defaultValue={data?.default}
         />
       </Wrapper>
