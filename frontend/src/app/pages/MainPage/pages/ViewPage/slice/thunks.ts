@@ -217,6 +217,13 @@ export const saveView = createAsyncThunk<
   }
   try {
     if (isNewView(currentEditingView.id) || isSaveAs) {
+      if (currentEditingView?.model && !currentEditingView?.model?.version) {
+        currentEditingView = produce(currentEditingView, draft => {
+          draft.model = Object.assign({}, currentEditingView.model, {
+            version: APP_CURRENT_VERSION,
+          });
+        });
+      }
       const { data } = await request<View>({
         url: '/views',
         method: 'POST',
