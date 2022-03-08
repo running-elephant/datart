@@ -141,7 +141,6 @@ export const getSchemaBySourceId = createAsyncThunk<any, string>(
     if (sourceSchemas) {
       return;
     }
-
     const { data } = await request2<any>({
       url: `/sources/schemas/${sourceId}`,
       method: 'GET',
@@ -359,10 +358,10 @@ export const getEditorProvideCompletionItems = createAsyncThunk<
     const variableKeywords = new Set<string>();
 
     if (sourceId) {
-      const databaseSchemas = selectSourceDatabaseSchemas(getState(), {
+      const currentDBSchemas = selectSourceDatabaseSchemas(getState(), {
         id: sourceId,
       });
-      databaseSchemas?.schemaItems?.forEach(db => {
+      currentDBSchemas?.forEach(db => {
         dbKeywords.add(db.dbName);
         db.tables?.forEach(table => {
           tableKeywords.add(table.tableName);

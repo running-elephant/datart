@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { TreeDataNode } from 'antd';
 import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
 import { Nullable } from 'types';
 import { isEmptyArray } from 'utils/object';
@@ -376,3 +377,20 @@ export const diffMergeHierarchyModel = (model: HierarchyModel) => {
   model.hierarchy = newHierarchy;
   return model;
 };
+
+export function buildAntdTreeNodeModel<T extends TreeDataNode & { value: any }>(
+  ancestors: string[] = [],
+  nodeName: string,
+  children?: T[],
+  isLeaf?: boolean,
+): T {
+  const TREE_HIERARCHY_SEPERATOR = String.fromCharCode(0);
+  const fullNames = ancestors.concat(nodeName);
+  return {
+    key: fullNames.join(TREE_HIERARCHY_SEPERATOR),
+    title: nodeName,
+    value: fullNames,
+    children,
+    isLeaf,
+  } as any;
+}

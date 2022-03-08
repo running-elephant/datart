@@ -20,7 +20,7 @@ import { APP_VERSION_INIT } from './constants';
 import { IDomainEvent, Task } from './types';
 
 /**
- * Migrtion Event
+ * Migration Event
  * @class MigrationTaskEvent
  * @template TDomainModel
  */
@@ -48,12 +48,12 @@ class MigrationEvent<TDomainModel extends { version?: string }>
       }
       return result;
     } catch (error) {
-      // TODO(Stephen): beautiful console format
-      console.error(
-        'Migration Event Error | Version: %s | Stack Trace: %o',
+      console.log(
+        '%c Datart Migration Error | Version: %s | Please Contract Administrator! ',
+        'background: red; color: #fafafa',
         this.version,
-        error,
       );
+      console.log('Migration Event Error | Stack Trace: %o', error);
       throw error;
     }
   }
