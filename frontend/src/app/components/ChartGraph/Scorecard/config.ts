@@ -28,8 +28,8 @@ const config: ChartConfig = {
       required: true,
       type: 'aggregate',
       actions: {
-        NUMERIC: ['aggregate', 'alias', 'format', 'sortable'],
-        STRING: ['aggregate', 'alias', 'format', 'sortable'],
+        NUMERIC: ['aggregateLimit', 'alias', 'format', 'sortable'],
+        STRING: ['aggregateLimit', 'alias', 'format', 'sortable'],
       },
       limit: 1,
     },
