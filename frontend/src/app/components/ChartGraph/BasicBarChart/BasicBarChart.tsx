@@ -198,7 +198,7 @@ class BasicBarChart extends Chart {
     if (!colorConfigs.length) {
       const flatSeries = aggregateConfigs.map(aggConfig => {
         return {
-          ...this.getBarSeiesImpl(
+          ...this.getBarSeriesImpl(
             styleConfigs,
             settingConfigs,
             chartDataSet,
@@ -230,7 +230,7 @@ class BasicBarChart extends Chart {
         );
 
         return {
-          ...this.getBarSeiesImpl(
+          ...this.getBarSeriesImpl(
             styleConfigs,
             settingConfigs,
             chartDataSet,
@@ -246,7 +246,7 @@ class BasicBarChart extends Chart {
               value: row?.getCell(aggConfig) || 0,
             };
           }),
-          itemStyle: this.getSerieItemStyle(styleConfigs, {
+          itemStyle: this.getSeriesItemStyle(styleConfigs, {
             color: itemStyleColor?.value,
           }),
         };
@@ -255,7 +255,7 @@ class BasicBarChart extends Chart {
     return colorizeGroupedSeries;
   }
 
-  private getBarSeiesImpl(
+  private getBarSeriesImpl(
     styleConfigs,
     settingConfigs,
     chartDataSet: IChartDataSet<string>,
@@ -264,9 +264,9 @@ class BasicBarChart extends Chart {
     return {
       type: 'bar',
       sampling: 'average',
-      barGap: this.getSerieBarGap(styleConfigs),
-      barWidth: this.getSerieBarWidth(styleConfigs),
-      itemStyle: this.getSerieItemStyle(styleConfigs, {
+      barGap: this.getSeriesBarGap(styleConfigs),
+      barWidth: this.getSeriesBarWidth(styleConfigs),
+      itemStyle: this.getSeriesItemStyle(styleConfigs, {
         color: dataConfig?.color?.start,
       }),
       ...this.getLabelStyle(styleConfigs),
@@ -307,7 +307,7 @@ class BasicBarChart extends Chart {
       });
     };
 
-    const _sereisTotalArrayByDataIndex = (series?.[0]?.data || []).map(
+    const _seriesTotalArrayByDataIndex = (series?.[0]?.data || []).map(
       (_, index) => {
         const sum = series.reduce((acc, cur) => {
           const value = +_getAbsValue(cur.data?.[index] || 0);
@@ -318,12 +318,12 @@ class BasicBarChart extends Chart {
       },
     );
     (series || []).forEach(s => {
-      s.data = _convertToPercentage(s.data, _sereisTotalArrayByDataIndex);
+      s.data = _convertToPercentage(s.data, _seriesTotalArrayByDataIndex);
     });
     return series;
   }
 
-  private getSerieItemStyle(styles, itemStyle?) {
+  private getSeriesItemStyle(styles, itemStyle?) {
     const [borderStyle, borderRadius] = getStyles(
       styles,
       ['bar'],
@@ -339,12 +339,12 @@ class BasicBarChart extends Chart {
     };
   }
 
-  private getSerieBarGap(styles) {
+  private getSeriesBarGap(styles) {
     const [gap] = getStyles(styles, ['bar'], ['gap']);
     return gap;
   }
 
-  private getSerieBarWidth(styles) {
+  private getSeriesBarWidth(styles) {
     const [width] = getStyles(styles, ['bar'], ['width']);
     return width;
   }
