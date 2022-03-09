@@ -184,9 +184,9 @@ const defaultRows = [
                 comType: 'inputNumber',
                 watcher: {
                   deps: ['startValueType'],
-                  action: props => {
+                  action: ({ startValueType }) => {
                     return {
-                      disabled: props.startValueType !== 'constant',
+                      disabled: startValueType !== 'constant',
                     };
                   },
                 },
@@ -197,9 +197,9 @@ const defaultRows = [
                 comType: 'select',
                 watcher: {
                   deps: ['startValueType'],
-                  action: props => {
+                  action: ({ startValueType }) => {
                     return {
-                      disabled: props.valueType === 'constant',
+                      disabled: startValueType === 'constant',
                     };
                   },
                 },
@@ -241,9 +241,9 @@ const defaultRows = [
                 comType: 'inputNumber',
                 watcher: {
                   deps: ['endValueType'],
-                  action: props => {
+                  action: ({ endValueType }) => {
                     return {
-                      disabled: props.endValueType !== 'constant',
+                      disabled: endValueType !== 'constant',
                     };
                   },
                 },
@@ -254,9 +254,9 @@ const defaultRows = [
                 comType: 'select',
                 watcher: {
                   deps: ['endValueType'],
-                  action: props => {
+                  action: ({ endValueType }) => {
                     return {
-                      disabled: props.valueType === 'constant',
+                      disabled: endValueType === 'constant',
                     };
                   },
                 },
