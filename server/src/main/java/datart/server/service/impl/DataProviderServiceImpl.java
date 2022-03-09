@@ -432,7 +432,6 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                 }
             } else {
                 // 兼容1.0.0-beta.1以前的版本
-                jsonObject = jsonObject.getJSONObject("columns");
                 for (String key : jsonObject.keySet()) {
                     ValueType type = ValueType.valueOf(jsonObject.getJSONObject(key).getString("type"));
                     schema.put(key, new Column(key, type));
