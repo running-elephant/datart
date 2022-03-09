@@ -493,16 +493,6 @@ export function getReference2(
     'rows',
   );
 
-  console.log(
-    `getMarkArea2(
-      referenceTabs,
-      dataSetRows,
-      dataConfig,
-      isHorizonDisplay,
-    ), ---> `,
-    getMarkArea2(referenceTabs, dataSetRows, dataConfig, isHorizonDisplay),
-  );
-
   return {
     markLine: getMarkLine2(
       referenceTabs,

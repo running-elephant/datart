@@ -688,11 +688,20 @@
           "endMetric": "结束关联指标",
           "font": "字体",
           "showLabel": "显示标签",
-          "position": "标签位置",
+          "position": {
+            "title": "标签位置",
+            "start": "开始",
+            "middle": "中间",
+            "end": "结尾"
+          },
           "lineStyle": "线条样式",
           "opacity": "透明度",
           "backgroundColor": "背景颜色",
-          "borderStyle": "边框样式"
+          "borderStyle": "边框样式",
+          "constant": "常量",
+          "avg": "平均值",
+          "max": "最大值",
+          "min": "最小值"
         },
         "paging": {
           "title": "常规",

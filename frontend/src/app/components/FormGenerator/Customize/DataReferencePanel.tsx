@@ -55,11 +55,24 @@ const defaultRows = [
                 default: 'constant',
                 comType: 'select',
                 options: {
+                  translateItemLabel: true,
                   items: [
-                    { label: '常量', value: 'constant' },
-                    { label: '平均值', value: 'average' },
-                    { label: '最大值', value: 'max' },
-                    { label: '最小值', value: 'min' },
+                    {
+                      label: 'viz.palette.setting.reference.constant',
+                      value: 'constant',
+                    },
+                    {
+                      label: 'viz.palette.setting.reference.avg',
+                      value: 'average',
+                    },
+                    {
+                      label: 'viz.palette.setting.reference.max',
+                      value: 'max',
+                    },
+                    {
+                      label: 'viz.palette.setting.reference.min',
+                      value: 'min',
+                    },
                   ],
                 },
               },
@@ -116,15 +129,25 @@ const defaultRows = [
                 options: [],
               },
               {
-                label: 'viz.palette.setting.reference.position',
+                label: 'viz.palette.setting.reference.position.title',
                 key: 'position',
                 comType: 'select',
                 default: 'start',
                 options: {
+                  translateItemLabel: true,
                   items: [
-                    { label: '起始', value: 'start' },
-                    { label: '中点', value: 'middle' },
-                    { label: '结束', value: 'end' },
+                    {
+                      label: 'viz.palette.setting.reference.position.start',
+                      value: 'start',
+                    },
+                    {
+                      label: 'viz.palette.setting.reference.position.middle',
+                      value: 'middle',
+                    },
+                    {
+                      label: 'viz.palette.setting.reference.position.end',
+                      value: 'end',
+                    },
                   ],
                 },
               },
@@ -169,11 +192,24 @@ const defaultRows = [
                 default: 'constant',
                 comType: 'select',
                 options: {
+                  translateItemLabel: true,
                   items: [
-                    { label: '常量', value: 'constant' },
-                    { label: '平均值', value: 'average' },
-                    { label: '最大值', value: 'max' },
-                    { label: '最小值', value: 'min' },
+                    {
+                      label: 'viz.palette.setting.reference.constant',
+                      value: 'constant',
+                    },
+                    {
+                      label: 'viz.palette.setting.reference.avg',
+                      value: 'average',
+                    },
+                    {
+                      label: 'viz.palette.setting.reference.max',
+                      value: 'max',
+                    },
+                    {
+                      label: 'viz.palette.setting.reference.min',
+                      value: 'min',
+                    },
                   ],
                 },
               },
@@ -226,11 +262,24 @@ const defaultRows = [
                 default: 'constant',
                 comType: 'select',
                 options: {
+                  translateItemLabel: true,
                   items: [
-                    { label: '常量', value: 'constant' },
-                    { label: '平均值', value: 'average' },
-                    { label: '最大值', value: 'max' },
-                    { label: '最小值', value: 'min' },
+                    {
+                      label: 'viz.palette.setting.reference.constant',
+                      value: 'constant',
+                    },
+                    {
+                      label: 'viz.palette.setting.reference.avg',
+                      value: 'average',
+                    },
+                    {
+                      label: 'viz.palette.setting.reference.max',
+                      value: 'max',
+                    },
+                    {
+                      label: 'viz.palette.setting.reference.min',
+                      value: 'min',
+                    },
                   ],
                 },
               },
@@ -283,15 +332,25 @@ const defaultRows = [
                 comType: 'checkbox',
               },
               {
-                label: 'viz.palette.setting.reference.position',
+                label: 'viz.palette.setting.reference.position.title',
                 key: 'position',
                 comType: 'select',
                 default: 'start',
                 options: {
+                  translateItemLabel: true,
                   items: [
-                    { label: '起始', value: 'start' },
-                    { label: '中点', value: 'middle' },
-                    { label: '结束', value: 'end' },
+                    {
+                      label: 'viz.palette.setting.reference.position.start',
+                      value: 'start',
+                    },
+                    {
+                      label: 'viz.palette.setting.reference.position.middle',
+                      value: 'middle',
+                    },
+                    {
+                      label: 'viz.palette.setting.reference.position.end',
+                      value: 'end',
+                    },
                   ],
                 },
               },
