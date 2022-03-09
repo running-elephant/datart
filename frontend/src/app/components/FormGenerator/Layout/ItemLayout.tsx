@@ -201,4 +201,5 @@ export default ItemLayout;
 
 const StyledItemLayout = styled.div<{ flatten?: boolean }>`
   padding: ${p => (p.flatten ? 0 : SPACE)};
+  user-select: none;
 `;
