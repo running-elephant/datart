@@ -461,7 +461,6 @@ const workbenchSlice = createSlice({
 
         if (index !== undefined) {
           viewData.config = migrateViewConfig(viewData.config);
-          console.log(viewData, 'viewData');
           state.currentDataView = {
             ...viewData,
             meta: transformMeta(viewData.model),
