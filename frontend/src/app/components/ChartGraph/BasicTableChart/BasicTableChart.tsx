@@ -114,7 +114,6 @@ class BasicTableChart extends ReactChart {
       dataConfigs,
     );
     this.cachedAntTableOptions.dataSource = chartDataSet;
-    console.log(`options.dataset ---> `, options.dataset);
 
     const tableOptions = Object.assign(
       this.cachedAntTableOptions,
