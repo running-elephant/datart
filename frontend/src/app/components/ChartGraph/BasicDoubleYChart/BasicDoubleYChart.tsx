@@ -161,13 +161,14 @@ class BasicDoubleYChart extends Chart {
     chartDataSet: IChartDataSet<string>,
   ) {
     const _getSeriesByDemisionPostion =
-      () => (config, styles, settings, data, direction) => {
+      () => (config, styles, settings, data, direction, yAxisIndex) => {
         const [graphType, graphStyle] = getStyles(
           styles,
           [direction],
           ['graphType', 'graphStyle'],
         );
         return {
+          yAxisIndex,
           name: getColumnRenderName(config),
           type: graphType || 'line',
           sampling: 'average',
@@ -194,6 +195,7 @@ class BasicDoubleYChart extends Chart {
             settingConfigs,
             chartDataSet,
             'leftY',
+            0,
           ),
         ),
       )
@@ -205,13 +207,10 @@ class BasicDoubleYChart extends Chart {
             settingConfigs,
             chartDataSet,
             'rightY',
+            1,
           ),
         ),
-      )
-      .map((config, index) => {
-        (config as any).yAxisIndex = index;
-        return config;
-      });
+      );
     return series;
   }
 
@@ -290,7 +289,7 @@ class BasicDoubleYChart extends Chart {
       ['showHorizonLine', 'horizonLineStyle'],
     );
 
-    const _yAxisTemplate = (position, index, name) => {
+    const _yAxisTemplate = (position, name) => {
       const [showAxis, inverse, font, showLabel] = getStyles(
         styles,
         [`${position}Y`],
@@ -300,7 +299,6 @@ class BasicDoubleYChart extends Chart {
       return {
         type: 'value',
         position,
-        offset: index * 20,
         showTitleAndUnit: true,
         name,
         nameLocation: 'middle',
@@ -318,14 +316,17 @@ class BasicDoubleYChart extends Chart {
       };
     };
 
-    const leftYAxis = leftDeminsionConfigs.map((c, index) =>
-      _yAxisTemplate('left', index, getColumnRenderName(c)),
-    );
+    const leftYAxisNames = leftDeminsionConfigs
+      .map(getColumnRenderName)
+      .join('/');
+    const rightYAxisNames = rightDeminsionConfigs
+      .map(getColumnRenderName)
+      .join('/');
 
-    const rightYAxis = rightDeminsionConfigs.map((c, index) =>
-      _yAxisTemplate('right', index, getColumnRenderName(c)),
-    );
-    return leftYAxis.concat(rightYAxis);
+    return [
+      _yAxisTemplate('left', leftYAxisNames),
+      _yAxisTemplate('right', rightYAxisNames),
+    ];
   }
 
   private getLegend(styles, seriesNames) {
@@ -377,7 +378,7 @@ class BasicDoubleYChart extends Chart {
   private getLabelStyle(styles, direction) {
     const [showLabel, position, LabelFont] = getStyles(
       styles,
-      ['label'],
+      [direction + 'Label'],
       ['showLabel', 'position', 'font'],
     );
 
