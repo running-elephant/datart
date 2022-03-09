@@ -46,6 +46,7 @@ import { RootState } from 'types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
 import { rejectedActionMessageHandler } from 'utils/notification';
+import { CloneValueDeep } from 'utils/object';
 import { request2 } from 'utils/request';
 import { listToTree, rejectHandle } from 'utils/utils';
 import { ChartDTO } from '../../../types/ChartDTO';
@@ -208,7 +209,7 @@ export const fetchViewDetailAction = createAsyncThunk(
       method: 'GET',
       url: `views/${arg}`,
     });
-    return migrateViewConfig(response.data);
+    return response.data;
   },
 );
 
@@ -449,18 +450,21 @@ const workbenchSlice = createSlice({
         state.dataviews = payload;
       })
       .addCase(fetchViewDetailAction.fulfilled, (state, { payload }) => {
+        let viewData = CloneValueDeep(payload);
         const index = state.dataviews?.findIndex(
-          view => view.id === payload.id,
+          view => view.id === viewData.id,
         );
         let computedFields: ChartDataViewMeta[] = [];
-        if (payload.id === state?.backendChart?.view?.id) {
+        if (viewData.id === state?.backendChart?.view?.id) {
           computedFields = state?.backendChart?.config?.computedFields || [];
         }
 
         if (index !== undefined) {
+          viewData.config = migrateViewConfig(viewData.config);
+          console.log(viewData, 'viewData');
           state.currentDataView = {
-            ...payload,
-            meta: transformMeta(payload.model),
+            ...viewData,
+            meta: transformMeta(viewData.model),
             computedFields,
           };
         }
