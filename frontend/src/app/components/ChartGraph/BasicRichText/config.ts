@@ -65,7 +65,7 @@ const config: ChartConfig = {
           label: 'delta.richText',
           key: 'richText',
           default: '',
-          comType: 'text',
+          comType: 'input',
         },
       ],
     },

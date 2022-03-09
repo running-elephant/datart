@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import gridSvg from 'assets/svgs/grid.svg';
+import gridSvg from 'app/assets/images/grid.svg';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 function useSlideStyle(
   autoFit: boolean | undefined,

@@ -19,15 +19,16 @@ import {
   BackgroundConfig,
   BorderConfig,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { convertImageUrl } from 'app/pages/DashBoardPage/utils';
+import { getBackgroundImage } from 'app/pages/DashBoardPage/utils';
 import styled from 'styled-components/macro';
 export interface StyledBackgroundProps {
   bg: BackgroundConfig;
   bd?: BorderConfig;
 }
+
 const StyledBackground = styled.div<StyledBackgroundProps>`
   background-color: ${p => p.bg?.color};
-  background-image: ${p => 'url(' + convertImageUrl(p.bg?.image) + ')'};
+  background-image: ${p => getBackgroundImage(p.bg?.image)};
   background-repeat: ${p => p.bg?.repeat};
   background-size: ${p => p.bg?.size};
   border-color: ${p => p?.bd?.color};

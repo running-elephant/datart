@@ -134,11 +134,11 @@ const Wrap = styled.div`
       overflow-y: hidden;
 
       .empty {
-        height: 100%;
         display: flex;
         flex: 1;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
+        height: 100%;
       }
     }
     .grid-background::-webkit-scrollbar {

@@ -18,7 +18,7 @@
 
 import { List } from 'antd';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
-import { FC, memo, useState } from 'react';
+import { FC, memo, useCallback, useState } from 'react';
 import styled from 'styled-components/macro';
 import { stopPPG } from 'utils/utils';
 import { ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
@@ -91,6 +91,14 @@ export const ChartDraggableSourceGroupContainer: FC<{
     }
   };
 
+  const handleEditComputedField = useCallback(
+    fieldName => {
+      onEditComputedField(fieldName);
+      setSelectedItems([]);
+    },
+    [onEditComputedField],
+  );
+
   return (
     <Container onClick={onClearCheckedList}>
       {/* 拖动层组件 */}
@@ -108,7 +116,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
               expression={item.expression}
               type={item.type}
               onDeleteComputedField={onDeleteComputedField}
-              onEditComputedField={onEditComputedField}
+              onEditComputedField={handleEditComputedField}
               onSelectionChange={onDataItemSelectionChange}
               onClearCheckedList={onClearCheckedList}
               isActive={selectedItemsIds.includes(item.id)}

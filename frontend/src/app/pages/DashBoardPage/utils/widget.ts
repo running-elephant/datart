@@ -29,7 +29,7 @@ import { DeltaStatic } from 'quill';
 import { CSSProperties } from 'react';
 import { FONT_FAMILY, G90, WHITE } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
-import { convertImageUrl, fillPx } from '.';
+import { fillPx, getBackgroundImage } from '.';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
@@ -705,7 +705,7 @@ export const getFreeWidgetStyle = (widget: Widget) => {
 export const getBackgroundCss = (bg: BackgroundConfig) => {
   let css: CSSProperties = {
     backgroundColor: bg.color,
-    backgroundImage: `url(${convertImageUrl(bg.image)})`,
+    backgroundImage: getBackgroundImage(bg.image),
     backgroundRepeat: bg.repeat,
     backgroundSize: bg.size,
   };

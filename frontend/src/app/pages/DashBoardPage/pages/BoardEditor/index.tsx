@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import ChartEditor from 'app/components/ChartEditor';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
@@ -53,6 +54,7 @@ import {
   selectWidgetRecord,
 } from './slice/selectors';
 import { addChartWidget, fetchEditBoardDetail } from './slice/thunk';
+
 export const BoardEditor: React.FC<{
   boardId: string;
   allowManage?: boolean;
@@ -66,6 +68,7 @@ export const BoardEditor: React.FC<{
   const vizs = useSelector(selectVizs);
   const WidgetRecord = useSelector(selectWidgetRecord);
   const [folderIds, setFolderIds] = useState<any[]>([]);
+  const t = useI18NPrefix();
 
   const propsFolderIds = useMemo(() => {
     return vizs?.map(folder => {
@@ -82,12 +85,12 @@ export const BoardEditor: React.FC<{
         editWidgetInfoActions.setWidgetErrInfo({
           boardId: v.dashboardId,
           widgetId: v.id,
-          errInfo: errInfo,
+          errInfo: t(errInfo),
           errorType: 'interaction',
         }),
       );
     });
-  }, [WidgetRecord, dispatch, folderIds]);
+  }, [WidgetRecord, dispatch, folderIds, t]);
 
   useEffect(() => {
     if (folderIds.length !== propsFolderIds?.length) {

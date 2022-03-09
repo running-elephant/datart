@@ -162,12 +162,12 @@
           "confirmPassword": "确定新密码"
         },
         "switchLanguage": {
-          "title": "切换语言"
+          "title": "语言"
         },
         "switchTheme": {
-          "title": "切换主题",
-          "light": "浅色",
-          "dark": "深色"
+          "title": "主题",
+          "light": "明亮",
+          "dark": "黑暗"
         },
         "logout": {
           "title": "退出登录"
@@ -880,6 +880,7 @@
       "action": {
         "refresh": "同步数据",
         "fullScreen": "全屏",
+        "lock": "锁定拖拽",
         "edit": "编辑",
         "delete": "删除",
         "confirmDel": "确认删除",
@@ -889,6 +890,12 @@
         "closeLinkage": "关闭联动",
         "makeJump": "跳转设置",
         "closeJump": "关闭跳转"
+      },
+      "tips": {
+        "unlock": "已锁定拖拽,点击解锁",
+        "waiting": "等待加载",
+        "cancelLinkage": "取消联动",
+        "canLinkage": "点击图表可联动"
       }
     },
     "linkage": {
