@@ -19,6 +19,7 @@
 package datart.server.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -412,9 +413,32 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         }
 
         JSONObject jsonObject = JSON.parseObject(model);
-        for (String key : jsonObject.keySet()) {
-            ValueType type = ValueType.valueOf(jsonObject.getJSONObject(key).getString("type"));
-            schema.put(key, new Column(key, type));
+        try {
+            if (jsonObject.containsKey("hierarchy")) {
+                jsonObject = jsonObject.getJSONObject("hierarchy");
+                for (String key : jsonObject.keySet()) {
+                    JSONObject item = jsonObject.getJSONObject(key);
+                    if (item.containsKey("children")) {
+                        JSONArray children = item.getJSONArray("children");
+                        if (children != null && children.size() > 0) {
+                            for (int i = 0; i < children.size(); i++) {
+                                JSONObject child = children.getJSONObject(i);
+                                schema.put(child.getString("name"), new Column(child.getString("name"), ValueType.valueOf(child.getString("type"))));
+                            }
+                        }
+                    } else {
+                        schema.put(key, new Column(item.getString("name"), ValueType.valueOf(item.getString("type"))));
+                    }
+                }
+            } else {
+                // 兼容1.0.0-beta.1以前的版本
+                for (String key : jsonObject.keySet()) {
+                    ValueType type = ValueType.valueOf(jsonObject.getJSONObject(key).getString("type"));
+                    schema.put(key, new Column(key, type));
+                }
+            }
+        } catch (Exception e) {
+            log.error("view model parse error", e);
         }
         return schema;
     }
