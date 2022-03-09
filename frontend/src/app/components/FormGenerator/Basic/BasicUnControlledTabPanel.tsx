@@ -167,7 +167,7 @@ const BasicUnControlledTabPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       >
         {myData.rows?.map((p, index) => {
           return (
-            <TabPane
+            <StyledTabPanel
               key={p.key}
               tab={
                 <EditableTabHeader
@@ -184,7 +184,7 @@ const BasicUnControlledTabPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
               }
             >
               {renderTabPaneContent(p, index)}
-            </TabPane>
+            </StyledTabPanel>
           );
         })}
       </StyledBasicUnControlledTabPanel>
@@ -233,8 +233,14 @@ const EditableTabHeader: FC<{
 
 export default BasicUnControlledTabPanel;
 
+const StyledTabPanel = styled(TabPane)`
+  & .chart-config-group-layout {
+    padding: 0;
+  }
+`;
+
 const StyledBasicUnControlledTabPanel = styled(Tabs)`
-  & .ant-tabs-nav .ant-tabs-tab {
-    margin: 0 !important;
+  & .ant-tabs-nav {
+    margin-bottom: 0;
   }
 `;

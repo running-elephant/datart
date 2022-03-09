@@ -189,7 +189,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
     };
 
     return (
-      <StyledItemLayout flatten={flatten}>
+      <StyledItemLayout className="chart-config-item-layout" flatten={flatten}>
         {renderBasicComponent()}
       </StyledItemLayout>
     );
