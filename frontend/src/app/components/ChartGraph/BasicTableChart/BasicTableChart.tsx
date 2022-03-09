@@ -90,7 +90,8 @@ class BasicTableChart extends ReactChart {
           options.config,
           options.widgetSpecialConfig,
         );
-        this.cachedAntTableOptions = Omit(tableOptions, ['dataSource']);
+        // this.cachedAntTableOptions = Omit(tableOptions, ['dataSource']);
+        this.cachedAntTableOptions = Omit(tableOptions, []);
         this.cachedDatartConfig = options.config;
         this.cacheContext = context;
         this.adapter?.updated(tableOptions, context);
@@ -107,14 +108,6 @@ class BasicTableChart extends ReactChart {
 
   public onResize(options, context?): void {
     const columns = this.getDataColumnWidths(options, context);
-    const dataConfigs = options.config.datas || [];
-    const chartDataSet = transformToDataSet(
-      options.dataset.rows,
-      options.dataset.columns,
-      dataConfigs,
-    );
-    this.cachedAntTableOptions.dataSource = chartDataSet;
-
     const tableOptions = Object.assign(
       this.cachedAntTableOptions,
       {

@@ -84,7 +84,7 @@ class ChartManager {
   }
 
   public getDefaultChart() {
-    return this._charts[0];
+    return CloneValueDeep(this._charts[0]);
   }
 
   private async _loadCustomizeCharts(paths: string[]) {
