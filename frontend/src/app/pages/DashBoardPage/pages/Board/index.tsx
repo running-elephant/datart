@@ -193,6 +193,7 @@ export const Board: React.FC<BoardProps> = memo(
       let boardType = dashboard?.config?.type;
 
       if (dashboard && boardType) {
+        console.log('_has dashboard');
         return (
           <div className="board-provider">
             <BoardProvider

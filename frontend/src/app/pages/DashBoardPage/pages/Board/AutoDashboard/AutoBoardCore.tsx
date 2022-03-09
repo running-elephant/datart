@@ -54,10 +54,9 @@ import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
 import StyledBackground from '../components/StyledBackground';
 import { WidgetOfAuto } from './WidgetOfAuto';
-
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const mobilePoints = Object.keys(BREAK_POINT_MAP).slice(3);
-
+// import throttle from 'lodash/throttle';
 export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
     const visible = useVisibleHidden();
@@ -98,7 +97,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       DeviceType.Desktop,
     );
 
-    let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
+    let waitItemInfos = useRef<{ id: string; rendered: boolean }[]>([]);
 
     const currentLayout = useRef<Layout[]>([]);
 
@@ -107,7 +106,6 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     const { gridRef } = useBoardWidthHeight();
 
     const { ref, widgetRowHeight } = useWidgetRowHeight();
-
     const scrollThrottle = useRef(false);
 
     const onBreakpointChange = pointKey => {
@@ -166,13 +164,15 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     }, [layoutWidgetMap]);
 
     useEffect(() => {
-      const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
-      if (layoutWidgetInfos.length) {
-        layoutInfos.current = layoutWidgetInfos.map(WidgetInfo => ({
-          id: WidgetInfo.id,
-          rendered: WidgetInfo.rendered,
-        }));
-      }
+      const layoutWaitWidgetInfos = Object.values(layoutWidgetInfoMap).filter(
+        widgetInfo => {
+          return !widgetInfo.rendered;
+        },
+      );
+      waitItemInfos.current = layoutWaitWidgetInfos.map(widgetInfo => ({
+        id: widgetInfo.id,
+        rendered: widgetInfo.rendered,
+      }));
     }, [layoutWidgetInfoMap]);
 
     const calcItemTop = useCallback(
@@ -186,29 +186,20 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
 
     const lazyLoad = useCallback(() => {
       if (!gridWrapRef.current) return;
+      if (!waitItemInfos.current.length) {
+        gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
+        return;
+      }
       if (!scrollThrottle.current) {
         requestAnimationFrame(() => {
-          const waitingItems = layoutInfos.current.filter(
-            item => !item.rendered,
-          );
-
-          if (waitingItems.length > 0) {
-            const { offsetHeight, scrollTop } = gridWrapRef.current! || {};
-            waitingItems.forEach(item => {
-              const itemTop = calcItemTop(item.id);
-              if (itemTop - scrollTop < offsetHeight) {
-                renderedWidgetById(item.id);
-              }
-            });
-          } else {
-            if (scrollThrottle.current) {
-              gridWrapRef.current?.removeEventListener(
-                'scroll',
-                lazyLoad,
-                false,
-              );
+          const waitingItems = waitItemInfos.current;
+          const { offsetHeight, scrollTop } = gridWrapRef.current! || {};
+          waitingItems.forEach(item => {
+            const itemTop = calcItemTop(item.id);
+            if (itemTop - scrollTop < offsetHeight) {
+              renderedWidgetById(item.id);
             }
-          }
+          });
           scrollThrottle.current = false;
         });
         scrollThrottle.current = true;
@@ -216,14 +207,15 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     }, [calcItemTop, renderedWidgetById]);
 
     useEffect(() => {
-      if (sortedLayoutWidgets.length && gridWrapRef.current) {
-        lazyLoad();
+      if (waitItemInfos.current.length && gridWrapRef.current) {
+        setImmediate(() => {
+          lazyLoad();
+        }, []);
         gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
         gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
         // issues#339
         window.addEventListener('resize', lazyLoad, false);
       }
-
       return () => {
         gridWrapRef?.current?.removeEventListener('scroll', lazyLoad, false);
         window.removeEventListener('resize', lazyLoad, false);
