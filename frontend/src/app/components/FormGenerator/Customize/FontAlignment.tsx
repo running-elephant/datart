@@ -16,61 +16,68 @@
  * limitations under the License.
  */
 
+import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
-import { ItemLayout } from '../Layout';
+import styled from 'styled-components/macro';
+import { BORDER_RADIUS } from 'styles/StyleConstants';
+import { BW } from '../Basic/components/BasicWrapper';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
-const template = {
-  label: `viz.common.enum.fontAlignment.alignment`,
-  key: 'align',
-  default: 'left',
-  comType: 'select',
-  options: {
-    translateItemLabel: true,
-    items: [
-      {
-        label: `viz.common.enum.fontAlignment.left`,
-        value: 'left',
-      },
-      {
-        label: `viz.common.enum.fontAlignment.center`,
-        value: 'center',
-      },
-      {
-        label: `viz.common.enum.fontAlignment.right`,
-        value: 'right',
-      },
-    ],
+const template = [
+  {
+    name: `viz.common.enum.fontAlignment.left`,
+    value: 'left',
   },
-};
+  {
+    name: `viz.common.enum.fontAlignment.center`,
+    value: 'center',
+  },
+  {
+    name: `viz.common.enum.fontAlignment.right`,
+    value: 'right',
+  },
+];
 
 const FontAlignment: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
-  ({
-    ancestors,
-    translate: t = title => title,
-    data,
-    dataConfigs,
-    onChange,
-  }) => {
-    const props = {
-      ancestors,
-      data: Object.assign({}, data, {
-        label: data?.label || template.label,
-        key: data?.key || template.key,
-        default: data?.default || template.default,
-        options: data?.options || template.options,
-        comType: 'select',
-      }),
-      translate: t,
-      onChange,
-      dataConfigs,
-    };
+  ({ ancestors, translate: t = title => title, data: row, onChange }) => {
+    const { comType, options, ...rest } = row;
 
-    return <ItemLayout {...props} />;
+    return (
+      <StyledVizLegendType
+        label={!options?.hideLabel ? t(row.label, true) : ''}
+      >
+        <Select
+          dropdownMatchSelectWidth
+          {...rest}
+          {...options}
+          placeholder={t('select')}
+          onChange={value => onChange?.(ancestors, value)}
+        >
+          {template.map(o => (
+            <Select.Option key={o.value} value={o.value}>
+              {t(o.name, true)}
+            </Select.Option>
+          ))}
+        </Select>
+      </StyledVizLegendType>
+    );
   },
   itemLayoutComparer,
 );
 
 export default FontAlignment;
+
+const StyledVizLegendType = styled(BW)`
+  .ant-select {
+    color: ${p => p.theme.textColorSnd};
+  }
+
+  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    background-color: ${p => p.theme.emphasisBackground};
+    border-color: ${p => p.theme.emphasisBackground} !important;
+    border-radius: ${BORDER_RADIUS};
+    box-shadow: none !important;
+  }
+`;
