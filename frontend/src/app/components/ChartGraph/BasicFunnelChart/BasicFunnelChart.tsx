@@ -23,6 +23,7 @@ import {
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
+  getAutoFunnelTopPosition,
   getColumnRenderName,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
@@ -137,7 +138,7 @@ class BasicFunnelChart extends Chart {
         aggregateList,
         infoConfigs,
       ),
-      legend: this.getLegendStyle(styleConfigs),
+      legend: this.getLegendStyle(styleConfigs, series.sort),
       series,
     };
   }
@@ -207,19 +208,26 @@ class BasicFunnelChart extends Chart {
     };
   }
 
-  private getLegendStyle(styles) {
-    const [show, type, font, legendPos] = getStyles(
+  private getLegendStyle(styles, sort) {
+    const [show, type, font, legendPos, height] = getStyles(
       styles,
       ['legend'],
-      ['showLegend', 'type', 'font', 'position'],
+      ['showLegend', 'type', 'font', 'position', 'height'],
     );
     let positions = {};
     let orient = {};
 
+    const top = getAutoFunnelTopPosition({
+      chart: this.chart,
+      sort,
+      legendPos,
+      height,
+    });
+
     switch (legendPos) {
       case 'top':
         orient = 'horizontal';
-        positions = { top: 8, left: 8, right: 8, height: 32 };
+        positions = { top, left: 8, right: 8, height: 32 };
         break;
       case 'bottom':
         orient = 'horizontal';
@@ -227,16 +235,17 @@ class BasicFunnelChart extends Chart {
         break;
       case 'left':
         orient = 'vertical';
-        positions = { left: 8, top: 16, bottom: 24, width: 96 };
+        positions = { left: 8, top, bottom: 24, width: 96 };
         break;
       default:
         orient = 'vertical';
-        positions = { right: 8, top: 16, bottom: 24, width: 96 };
+        positions = { right: 8, top, bottom: 24, width: 96 };
         break;
     }
 
     return {
       ...positions,
+      height: height || null,
       show,
       type,
       orient,

@@ -179,6 +179,7 @@ export enum FilterSqlOperator {
   NotSuffixContain = 'SUFFIX_NOT_LIKE',
 
   Between = 'BETWEEN',
+  NotBetween = 'NOT_BETWEEN',
   In = 'IN',
   NotIn = 'NOT_IN',
   LessThan = 'LT',

@@ -51,7 +51,7 @@ const CollectionLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
     }, []);
 
     return (
-      <StyledCollectionLayout>
+      <StyledCollectionLayout className="chart-config-collection-layout">
         {data?.rows
           ?.filter(r => Boolean(!r.hide))
           .map((r, index) => (
