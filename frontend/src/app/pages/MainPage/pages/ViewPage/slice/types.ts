@@ -39,10 +39,11 @@ export interface ViewState {
     [name: string]: TreeDataNode[];
   };
   sourceDatabaseSchema: {
-    schemaItems?: DatabaseSchema[];
+    [name: string]: DatabaseSchema[];
   };
   saveViewLoading: boolean;
   unarchiveLoading: boolean;
+  databaseSchemaLoading: boolean;
 }
 
 export type DatabaseSchema = {

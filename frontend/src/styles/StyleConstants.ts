@@ -19,7 +19,6 @@ export const MODAL_LEVEL = 1000;
 
 // base color
 export const BLUE = '#1B9AEE';
-export const BLUERGB = '27, 154, 238';
 export const GREEN = '#15AD31';
 export const ORANGE = '#FA8C15';
 export const YELLOW = '#FAD414';
@@ -51,7 +50,6 @@ export const BLACK = '#000000';
 
 // theme color
 export const PRIMARY = BLUE;
-export const PRIMARYRGB = BLUERGB;
 export const INFO = PRIMARY;
 export const SUCCESS = GREEN;
 export const PROCESSING = BLUE;

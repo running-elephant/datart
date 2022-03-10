@@ -381,9 +381,10 @@ export function transformMeta(model?: string) {
     return undefined;
   }
   const jsonObj = JSON.parse(model);
-  return Object.keys(jsonObj).flatMap(colKey => {
-    const column = jsonObj[colKey];
-    if (!isEmptyArray(column.children)) {
+  const HierarchyModel = 'hierarchy' in jsonObj ? jsonObj.hierarchy : jsonObj;
+  return Object.keys(HierarchyModel || {}).flatMap(colKey => {
+    const column = HierarchyModel[colKey];
+    if (!isEmptyArray(column?.children)) {
       return column.children.map(c => ({
         ...c,
         id: c.name,

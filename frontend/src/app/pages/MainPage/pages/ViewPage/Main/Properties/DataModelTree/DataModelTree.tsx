@@ -21,6 +21,7 @@ import { Form, Input, Select, Tooltip } from 'antd';
 import { Popup, ToolbarButton, Tree } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
+import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import { selectRoles } from 'app/pages/MainPage/pages/MemberPage/slice/selectors';
 import { SubjectTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import classnames from 'classnames';
@@ -32,7 +33,7 @@ import { FONT_SIZE_BASE, INFO } from 'styles/StyleConstants';
 import { Nullable } from 'types';
 import { CloneValueDeep, isEmpty, isEmptyArray } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
-import { ColumnTypes } from '../../../constants';
+import { ColumnTypes, ViewViewModelStages } from '../../../constants';
 import { useViewSlice } from '../../../slice';
 import {
   selectCurrentEditingView,
@@ -63,6 +64,9 @@ const DataModelTree: FC = memo(() => {
     selectCurrentEditingViewAttr(state, { name: 'id' }),
   ) as string;
   const currentEditingView = useSelector(selectCurrentEditingView);
+  const stage = useSelector(state =>
+    selectCurrentEditingViewAttr(state, { name: 'stage' }),
+  ) as ViewViewModelStages;
   const roles = useSelector(selectRoles);
   const columnPermissions = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'columnPermissions' }),
@@ -203,6 +207,7 @@ const DataModelTree: FC = memo(() => {
         model: {
           ...currentEditingView?.model,
           hierarchy,
+          version: APP_CURRENT_VERSION,
         },
       }),
     );
@@ -305,7 +310,7 @@ const DataModelTree: FC = memo(() => {
   };
 
   const openMoveToHierarchyModal = (node: Column) => {
-    const currrentHierarchies = tableColumns?.filter(
+    const currentHierarchies = tableColumns?.filter(
       c =>
         c.role === ColumnRole.Hierarchy &&
         !c?.children?.find(cn => cn.name === node.name),
@@ -315,11 +320,11 @@ const DataModelTree: FC = memo(() => {
       title: t('model.addToHierarchy'),
       modalSize: StateModalSize.XSMALL,
       onOk: hierarchyName => {
-        if (currrentHierarchies?.find(h => h.name === hierarchyName)) {
+        if (currentHierarchies?.find(h => h.name === hierarchyName)) {
           let newHierarchy = moveNode(
             tableColumns,
             node,
-            currrentHierarchies,
+            currentHierarchies,
             hierarchyName,
           );
           handleDataModelHierarchyChange(newHierarchy);
@@ -333,7 +338,7 @@ const DataModelTree: FC = memo(() => {
             rules={[{ required: true }]}
           >
             <Select defaultActiveFirstOption onChange={onChangeEvent}>
-              {currrentHierarchies?.map(n => (
+              {currentHierarchies?.map(n => (
                 <Select.Option value={n.name}>{n.name}</Select.Option>
               ))}
             </Select>
@@ -471,7 +476,7 @@ const DataModelTree: FC = memo(() => {
   const moveNode = (
     columns: Column[],
     node: Column,
-    currrentHierarchies: Column[],
+    currentHierarchies: Column[],
     hierarchyName,
   ) => {
     const nodeIndex = columns?.findIndex(c => c.name === node.name);
@@ -486,15 +491,15 @@ const DataModelTree: FC = memo(() => {
           branch.children?.filter(bc => bc.name !== node.name) || [];
       }
     }
-    const targetHierarchy = currrentHierarchies?.find(
+    const targetHierarchy = currentHierarchies?.find(
       h => h.name === hierarchyName,
     );
-    const clonedhierarchy = CloneValueDeep(targetHierarchy!);
-    clonedhierarchy.children = (clonedhierarchy.children || []).concat([node]);
+    const clonedHierarchy = CloneValueDeep(targetHierarchy!);
+    clonedHierarchy.children = (clonedHierarchy.children || []).concat([node]);
     return updateNode(
       columns,
-      clonedhierarchy,
-      columns.findIndex(c => c.name === clonedhierarchy.name),
+      clonedHierarchy,
+      columns.findIndex(c => c.name === clonedHierarchy.name),
     );
   };
 
@@ -583,7 +588,7 @@ const DataModelTree: FC = memo(() => {
   );
 
   return (
-    <Container title="model">
+    <Container title="model" isLoading={stage === ViewViewModelStages.Running}>
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable
           droppableId={ROOT_CONTAINER_ID}

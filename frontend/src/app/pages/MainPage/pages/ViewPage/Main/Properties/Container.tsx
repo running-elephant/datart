@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { Skeleton } from 'antd';
 import { ListTitle } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo } from 'react';
@@ -24,12 +25,14 @@ import { SPACE_TIMES } from 'styles/StyleConstants';
 
 const Container: FC<any> = memo(props => {
   const t = useI18NPrefix('view.properties');
-  const { title, children, ...rest } = props;
+  const { title, children, isLoading, ...rest } = props;
 
   return (
     <StyledContainer>
       <ListTitle title={t(title)} {...rest} />
-      {children}
+      <Skeleton active loading={isLoading}>
+        {children}
+      </Skeleton>
     </StyledContainer>
   );
 });
