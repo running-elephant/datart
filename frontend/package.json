@@ -125,7 +125,6 @@
     "react-dnd-html5-backend": "^14.0.0",
     "react-dom": "^17.0.1",
     "react-draggable": "^4.4.3",
-    "react-error-overlay": "^6.0.9",
     "react-grid-layout": "^1.2.4",
     "react-helmet-async": "^1.0.7",
     "react-hotkeys-hook": "^3.4.0",
