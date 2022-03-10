@@ -223,14 +223,15 @@ export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
   'workbench/updateChartConfigAndRefreshDatasetAction',
   async (
     arg: {
-      type: string;
-      payload: ChartConfigPayloadType;
+      action: { type: string; payload: ChartConfigPayloadType }[];
       needRefresh?: boolean;
     },
     thunkAPI,
   ) => {
     try {
-      await thunkAPI.dispatch(workbenchSlice.actions.updateChartConfig(arg));
+      await thunkAPI.dispatch(
+        workbenchSlice.actions.updateChartConfig(arg.action),
+      );
       await thunkAPI.dispatch(
         workbenchSlice.actions.updateShadowChartConfig(null),
       );
@@ -377,10 +378,16 @@ const workbenchSlice = createSlice({
     },
     updateChartConfig: (
       state,
-      action: PayloadAction<{
-        type: string;
-        payload: ChartConfigPayloadType;
-      }>,
+      action: PayloadAction<
+        | {
+            type: string;
+            payload: ChartConfigPayloadType;
+          }
+        | {
+            type: string;
+            payload: ChartConfigPayloadType;
+          }[]
+      >,
     ) => {
       const chartConfigReducer = (
         state: ChartConfig,
@@ -429,10 +436,16 @@ const workbenchSlice = createSlice({
         }
       };
 
-      state.chartConfig = chartConfigReducer(state.chartConfig!, {
-        type: action.payload.type,
-        payload: action.payload.payload,
-      });
+      state.chartConfig = (
+        Array.isArray(action.payload) ? action.payload : [action.payload]
+      ).reduce(
+        (acc, action) =>
+          chartConfigReducer(acc, {
+            type: action.type,
+            payload: action.payload,
+          }),
+        state.chartConfig!,
+      );
     },
     updateCurrentDataViewComputedFields: (
       state,

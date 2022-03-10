@@ -28,6 +28,7 @@ import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
+  ChartConfigPayloadType,
   dateFormatSelector,
   languageSelector,
 } from '../../slice/workbenchSlice';
@@ -53,7 +54,10 @@ const ChartWorkbench: FC<{
     onChangeAggregation?: () => void;
   };
   onChartChange: (c: IChart) => void;
-  onChartConfigChange: (type, payload) => void;
+  onChartConfigChange: {
+    (action: { type: string; payload: ChartConfigPayloadType }[]): void;
+    (type: string, payload: ChartConfigPayloadType): void;
+  };
   onDataViewChange?: () => void;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;

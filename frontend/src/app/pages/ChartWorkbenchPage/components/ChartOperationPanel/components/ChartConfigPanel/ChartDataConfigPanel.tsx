@@ -17,21 +17,25 @@
  */
 
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import {
+  ChartConfigPayloadType,
+  ChartConfigReducerActionType,
+} from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
 import { ChartDataConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
 import ChartAggregationContext from '../../../../contexts/ChartAggregationContext';
 import PaletteDataConfig from '../ChartDataConfigSection';
+import MixedTypeSectionWrapper from '../MixedTypeSectionWrapper';
 
 const ChartDataConfigPanel: FC<{
   dataConfigs?: ChartDataConfig[];
   expensiveQuery?: boolean;
-  onChange: (
-    ancestors: number[],
-    config: ChartDataConfig,
-    needRefresh?: boolean,
-  ) => void;
+  onChange?: {
+    (action: { type: string; payload: ChartConfigPayloadType }[]): void;
+    (type: string, payload: ChartConfigPayloadType): void;
+  };
 }> = memo(
   ({ dataConfigs, expensiveQuery, onChange }) => {
     const translate = useI18NPrefix(`viz.palette.data`);
@@ -46,7 +50,11 @@ const ChartDataConfigPanel: FC<{
         aggregation,
         expensiveQuery,
         onConfigChanged: (ancestors, config, needRefresh?: boolean) => {
-          onChange?.(ancestors, config, needRefresh);
+          onChange?.(ChartConfigReducerActionType.DATA, {
+            ancestors,
+            value: config,
+            needRefresh,
+          });
         },
       };
 
@@ -56,7 +64,12 @@ const ChartDataConfigPanel: FC<{
         case ChartDataSectionType.AGGREGATE:
           return <PaletteDataConfig.AggregateTypeSection {...props} />;
         case ChartDataSectionType.MIXED:
-          return <PaletteDataConfig.MixedTypeSection {...props} />;
+          return (
+            <MixedTypeSectionWrapper
+              {...props}
+              onChange={onChange}
+            ></MixedTypeSectionWrapper>
+          );
         case ChartDataSectionType.FILTER:
           return <PaletteDataConfig.FilterTypeSection {...props} />;
         case ChartDataSectionType.INFO:

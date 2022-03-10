@@ -29,6 +29,7 @@ import {
   ChartStyleConfig,
   FieldFormatType,
   IFieldFormatConfig,
+  RowValue,
   SortActionType,
 } from 'app/types/ChartConfig';
 import {
@@ -1022,6 +1023,32 @@ export function getColumnRenderName(field?: ChartDataSectionField): string {
   }
   return getColumnRenderOriginName(field);
 }
+
+export const rowBubbleMove = (
+  rows: RowValue[],
+  idx: number,
+  targetIdx: number,
+) => {
+  const stepSize = targetIdx > idx ? 1 : -1;
+  for (let i = idx; i !== targetIdx; i += stepSize) {
+    [rows[i], rows[i + stepSize]] = [rows[i + stepSize], rows[i]];
+  }
+};
+
+export const findRowBrothers = (uid: string, rows: RowValue[]) => {
+  let row = rows.find(r => r.uid === uid);
+  if (!!row) {
+    return rows;
+  }
+  let subRows: RowValue[] = [];
+  for (let i = 0; i < rows.length; i++) {
+    subRows = findRowBrothers(uid, rows[i].children || []);
+    if (!!subRows && subRows.length > 0) {
+      break;
+    }
+  }
+  return subRows;
+};
 
 export function getUnusedHeaderRows(
   allRows: Array<{

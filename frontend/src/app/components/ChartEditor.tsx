@@ -24,6 +24,7 @@ import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/Cha
 import workbenchSlice, {
   aggregationSelector,
   backendChartSelector,
+  ChartConfigPayloadType,
   ChartConfigReducerActionType,
   chartConfigSelector,
   currentDataViewSelector,
@@ -269,24 +270,31 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     }
   };
 
-  const handleChartConfigChange = (type, payload) => {
+  const handleChartConfigChange: {
+    (action: { type: string; payload: ChartConfigPayloadType }[]): void;
+    (type: string, payload: ChartConfigPayloadType): void;
+  } = (
+    type: string | { type: string; payload: ChartConfigPayloadType }[],
+    payload?: any,
+  ) => {
+    const needRefresh = Array.isArray(type)
+      ? type.some(({ payload }) => payload.needRefresh)
+      : !!payload?.needRefresh;
     if (expensiveQuery) {
       dispatch(
-        workbenchSlice.actions.updateChartConfig({
-          type,
-          payload: payload,
-        }),
+        workbenchSlice.actions.updateChartConfig(
+          Array.isArray(type) ? type : { type, payload },
+        ),
       );
       dispatch(workbenchSlice.actions.updateShadowChartConfig(null));
-      setAllowQuery(payload.needRefresh);
-      return true;
+      setAllowQuery(needRefresh);
+      return;
     }
 
     dispatch(
       updateChartConfigAndRefreshDatasetAction({
-        type,
-        payload,
-        needRefresh: payload.needRefresh,
+        action: Array.isArray(type) ? type : [{ type, payload }],
+        needRefresh,
       }),
     );
   };

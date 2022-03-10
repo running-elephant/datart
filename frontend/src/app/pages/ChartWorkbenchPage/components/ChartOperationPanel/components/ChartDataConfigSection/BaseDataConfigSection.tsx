@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
@@ -23,7 +24,16 @@ import { SPACE } from 'styles/StyleConstants';
 import { ChartDraggableTargetContainer } from '../ChartDraggable';
 import { dataConfigSectionComparer } from './utils';
 
-const BaseDataConfigSection: FC<ChartDataConfigSectionProps> = memo(
+export interface BaseDataConfigSectionProps
+  extends ChartDataConfigSectionProps {
+  canDraggableItemMove?: (
+    rows: ChartDataSectionField[],
+    dragIndex: number,
+    hoverIndex: number,
+  ) => boolean;
+}
+
+const BaseDataConfigSection: FC<BaseDataConfigSectionProps> = memo(
   ({ modalSize, config, extra, translate = title => title, ...rest }) => {
     return (
       <StyledBaseDataConfigSection>

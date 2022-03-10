@@ -61,12 +61,22 @@ type DragItem = {
   index?: number;
 };
 
-export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
+interface ChartDraggableTargetContainerProps
+  extends ChartDataConfigSectionProps {
+  canDraggableItemMove?: (
+    rows: ChartDataSectionField[],
+    dragIndex: number,
+    hoverIndex: number,
+  ) => boolean;
+}
+
+export const ChartDraggableTargetContainer: FC<ChartDraggableTargetContainerProps> =
   memo(function ChartDraggableTargetContainer({
     ancestors,
     modalSize,
     config,
     translate: t = (...args) => args?.[0],
+    canDraggableItemMove,
     onConfigChanged,
   }) {
     const { dataset } = useContext(ChartDatasetContext);
@@ -84,22 +94,16 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN,
         ],
         drop(item: ChartDataSectionField & DragItem, monitor) {
-          let items = Array.isArray(item) ? item : [item];
+          let items: ChartDataSectionField[] = Array.isArray(item)
+            ? item
+            : [item];
           let needDelete = true;
           if (
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN
           ) {
             const currentColumns: ChartDataSectionField[] = (
               currentConfig.rows || []
-            ).concat(
-              items.map(val => ({
-                uid: uuidv4(),
-                colName: val.colName,
-                category: val.category,
-                type: val.type,
-                aggregate: getDefaultAggregate(val),
-              })),
-            );
+            ).concat(items.map(val => getConfigColumn(val, uuidv4())));
             updateCurrentConfigColumns(currentConfig, currentColumns, true);
           } else if (
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
@@ -113,8 +117,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 currentConfig?.rows || [],
                 draft => {
                   draft.splice(originItemIndex, 1);
-                  item.aggregate = getDefaultAggregate(item);
-                  return draft.splice(item?.index!, 0, item);
+                  return draft.splice(item?.index!, 0, getConfigColumn(item));
                 },
               );
               updateCurrentConfigColumns(currentConfig, currentColumns);
@@ -122,8 +125,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               const currentColumns = updateBy(
                 currentConfig?.rows || [],
                 draft => {
-                  item.aggregate = getDefaultAggregate(item);
-                  return draft.splice(item?.index!, 0, item);
+                  return draft.splice(item?.index!, 0, getConfigColumn(item));
                 },
               );
               updateCurrentConfigColumns(currentConfig, currentColumns);
@@ -221,8 +223,28 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       }
     };
 
-    const onDraggableItemMove = (dragIndex: number, hoverIndex: number) => {
-      const draggedItem = currentConfig.rows?.[dragIndex];
+    const getConfigColumn = (val: ChartDataSectionField, uid?: string) => {
+      return {
+        uid: uid || val.uid,
+        colName: val.colName,
+        category: val.category,
+        type: val.type,
+        aggregate: getDefaultAggregate(val),
+      };
+    };
+
+    const handleDraggableItemMove = (dragIndex: number, hoverIndex: number) => {
+      const rows = currentConfig.rows;
+      if (!rows) {
+        return false;
+      }
+      if (
+        canDraggableItemMove &&
+        !canDraggableItemMove(rows, dragIndex, hoverIndex)
+      ) {
+        return false;
+      }
+      const draggedItem = rows[dragIndex];
       if (draggedItem) {
         const newCurrentConfig = updateBy(currentConfig, draft => {
           const columns = draft.rows || [];
@@ -230,6 +252,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           columns.splice(hoverIndex, 0, draggedItem);
         });
         setCurrentConfig(newCurrentConfig);
+        return true;
       } else {
         // const placeholder = {
         //   uid: CHARTCONFIG_FIELD_PLACEHOLDER_UID,
@@ -246,6 +269,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         // });
         // setCurrentConfig(newCurrentConfig);
       }
+      return false;
     };
 
     const handleOnDeleteItem = uid => () => {
@@ -310,7 +334,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 </Dropdown>
               );
             }}
-            moveCard={onDraggableItemMove}
+            moveCard={handleDraggableItemMove}
             onDelete={handleOnDeleteItem(columnConfig.uid)}
           ></ChartDraggableElement>
         );

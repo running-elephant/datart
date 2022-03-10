@@ -30,6 +30,14 @@ import uniqWith from 'lodash/uniqWith';
 
 type PipeFunction<TA, TO> = (accumulator?: TA, options?: TO) => TA | undefined;
 
+export function isArrayEquals<T1, T2>(
+  a: T1[],
+  b: T2[],
+  compareFn: (a: T1, b: T2) => boolean,
+) {
+  return a.length === b.length && a.every((v, i) => compareFn(v, b[i]));
+}
+
 export function pipe<T1, T2>(...fns: PipeFunction<T1, T2>[]) {
   return (v, o?) => (fns || []).reduce((y, f) => f(y, o), v);
 }

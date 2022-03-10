@@ -58,7 +58,7 @@ interface ChartDraggableElementProps {
     dragIndex: number,
     hoverIndex: number,
     config?: ChartDataSectionField,
-  ) => void;
+  ) => boolean;
   onDelete: () => void;
 }
 
@@ -162,13 +162,13 @@ export default DropTarget(
       }
 
       // Time to actually perform the action
-      props.moveCard(dragIndex, hoverIndex);
-
-      // Note: we're mutating the monitor item here!
-      // Generally it's better to avoid mutations,
-      // but it's good here for the sake of performance
-      // to avoid expensive index searches.
-      monitor.getItem<ChartDraggableElementObject>().index = hoverIndex;
+      if (props.moveCard(dragIndex, hoverIndex)) {
+        // Note: we're mutating the monitor item here!
+        // Generally it's better to avoid mutations,
+        // but it's good here for the sake of performance
+        // to avoid expensive index searches.
+        dragItem.index = hoverIndex;
+      }
     },
   },
   (connect: DropTargetConnector) => ({
@@ -179,9 +179,9 @@ export default DropTarget(
     CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN,
     {
       beginDrag: (props: ChartDraggableElementProps) => ({
+        ...props.config,
         id: props.id,
         index: props.index,
-        ...props.config,
       }),
       endDrag: (props, monitor) => {
         const dropResult = monitor.getDropResult();

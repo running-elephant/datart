@@ -235,6 +235,20 @@ export type ChartDataSectionField = {
   size?: number;
 };
 
+export type RowValue = {
+  uid?: string;
+  colName: string;
+  isGroup?: boolean;
+  label?: string;
+  aggregate?: string;
+  style?: {
+    backgroundColor?: string;
+    font?: {};
+    align?: string;
+  };
+  children?: RowValue[];
+};
+
 export type SortFieldAction = {
   type: SortActionType;
   value?: any;
@@ -308,17 +322,18 @@ export enum ChartDataSectionType {
   SIZE = 'size',
 }
 
-export type ChartStyleConfig = ChartConfigBase & ChartStyleSectionGroup & {};
+export type ChartStyleConfig<T = any> = ChartConfigBase &
+  ChartStyleSectionGroup<T> & {};
 
-export type ChartStyleSectionGroup = ChartStyleSectionRow & {
-  rows?: ChartStyleSectionGroup[];
+export type ChartStyleSectionGroup<T = any> = ChartStyleSectionRow<T> & {
+  rows?: ChartStyleSectionGroup<T>[];
 };
 
-export type ChartStyleSectionRow = {
+export type ChartStyleSectionRow<T = any> = {
   label: string;
   key: string;
   default?: any;
-  value?: any;
+  value?: T;
   disabled?: boolean;
   hide?: boolean;
   options?: ChartStyleSectionRowOption;

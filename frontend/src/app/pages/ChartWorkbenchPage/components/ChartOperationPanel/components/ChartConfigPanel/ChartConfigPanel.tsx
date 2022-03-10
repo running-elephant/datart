@@ -31,11 +31,7 @@ import {
   ChartConfigPayloadType,
   ChartConfigReducerActionType,
 } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
-import {
-  ChartConfig,
-  ChartDataConfig,
-  ChartStyleConfig,
-} from 'app/types/ChartConfig';
+import { ChartConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -61,7 +57,10 @@ const ChartConfigPanel: FC<{
   chartId?: string;
   chartConfig?: ChartConfig;
   expensiveQuery?: boolean;
-  onChange: (type: string, payload: ChartConfigPayloadType) => void;
+  onChange?: {
+    (action: { type: string; payload: ChartConfigPayloadType }[]): void;
+    (type: string, payload: ChartConfigPayloadType): void;
+  };
 }> = memo(
   ({ chartId, chartConfig, expensiveQuery, onChange }) => {
     const t = useI18NPrefix(`viz.palette`);
@@ -79,18 +78,6 @@ const ChartConfigPanel: FC<{
       (prev, next) => prev !== next,
       chartId,
     );
-
-    const onDataConfigChanged = (
-      ancestors,
-      config: ChartDataConfig,
-      needRefresh?: boolean,
-    ) => {
-      onChange?.(ChartConfigReducerActionType.DATA, {
-        ancestors: ancestors,
-        value: config,
-        needRefresh,
-      });
-    };
 
     const onStyleConfigChanged = (
       ancestors: number[],
@@ -118,7 +105,9 @@ const ChartConfigPanel: FC<{
 
     return (
       <ChartI18NContext.Provider value={{ i18NConfigs: chartConfig?.i18ns }}>
-        <ChartPaletteContext.Provider value={{ datas: chartConfig?.datas }}>
+        <ChartPaletteContext.Provider
+          value={{ datas: chartConfig?.datas, styles: chartConfig?.styles }}
+        >
           <StyledChartDataViewPanel>
             <ChartToolbar />
             <ConfigBlock>
@@ -165,7 +154,7 @@ const ChartConfigPanel: FC<{
                 <ChartDataConfigPanel
                   dataConfigs={chartConfig?.datas}
                   expensiveQuery={expensiveQuery}
-                  onChange={onDataConfigChanged}
+                  onChange={onChange}
                 />
               </Pane>
               <Pane selected={tabActiveKey === CONFIG_PANEL_TABS.STYLE}>
@@ -206,11 +195,11 @@ const StyledChartDataViewPanel = styled.div`
 
 const ConfigBlock = styled.div`
   display: flex;
+  flex: 1;
   flex-direction: column;
   min-height: 0;
-  flex: 1;
-  border-radius: ${BORDER_RADIUS};
   background-color: ${p => p.theme.componentBackground};
+  border-radius: ${BORDER_RADIUS};
 
   .tabs {
     flex-shrink: 0;

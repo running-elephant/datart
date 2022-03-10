@@ -26,6 +26,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import styled from 'styled-components/macro';
 import ChartDatasetContext from '../../contexts/ChartDatasetContext';
 import ChartDataViewContext from '../../contexts/ChartDataViewContext';
+import { ChartConfigPayloadType } from '../../slice/workbenchSlice';
 import layoutConfig, { LayoutComponentType } from './ChartOperationPanelLayout';
 import ChartConfigPanel from './components/ChartConfigPanel/ChartConfigPanel';
 import ChartDataViewPanel from './components/ChartDataViewPanel';
@@ -37,7 +38,10 @@ const ChartOperationPanel: FC<{
   defaultViewId?: string;
   allowQuery: boolean;
   onChartChange: (chart: IChart) => void;
-  onChartConfigChange: (type, payload) => void;
+  onChartConfigChange: {
+    (action: { type: string; payload: ChartConfigPayloadType }[]): void;
+    (type: string, payload: ChartConfigPayloadType): void;
+  };
   onDataViewChange?: () => void;
   onCreateDownloadDataTask?: () => void;
 }> = memo(

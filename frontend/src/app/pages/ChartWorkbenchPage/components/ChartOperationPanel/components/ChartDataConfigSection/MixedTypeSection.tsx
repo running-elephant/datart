@@ -17,13 +17,14 @@
  */
 
 import { ChartDataSectionFieldActionType } from 'app/types/ChartConfig';
-import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
-import BaseDataConfigSection from './BaseDataConfigSection';
+import BaseDataConfigSection, {
+  BaseDataConfigSectionProps,
+} from './BaseDataConfigSection';
 import { dataConfigSectionComparer, handleDefaultConfig } from './utils';
 
-const MixedTypeSection: FC<ChartDataConfigSectionProps> = memo(
+const MixedTypeSection: FC<BaseDataConfigSectionProps> = memo(
   ({ config, aggregation, ...rest }) => {
     let defaultConfig = Object.assign(
       {},

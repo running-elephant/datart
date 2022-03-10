@@ -29,11 +29,15 @@ import {
   ChartDataConfig,
   ChartDataSectionType,
   ChartStyleConfig,
+  RowValue,
 } from 'app/types/ChartConfig';
 import {
+  findRowBrothers,
   getColumnRenderName,
   getUnusedHeaderRows,
+  rowBubbleMove,
 } from 'app/utils/chartHelper';
+import { flattenHeaderRowsWithoutGroupRow } from 'app/utils/internalChartHelper';
 import { DATARTSEPERATOR } from 'globalConstants';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components';
@@ -43,21 +47,7 @@ import { itemLayoutComparer } from '../utils';
 
 const { Search } = Input;
 
-interface RowValue {
-  uid?: string;
-  colName: string;
-  isGroup?: boolean;
-  label?: string;
-  aggregate?: string;
-  style?: {
-    backgroundColor?: string;
-    font?: {};
-    align?: string;
-  };
-  children?: RowValue[];
-}
-
-const getFlattenHeaders = (dataConfigs: ChartDataConfig[] = []) => {
+const getFlattenHeaders = (dataConfigs: ChartDataConfig[] = []): RowValue[] => {
   const newDataConfigs = CloneValueDeep(dataConfigs);
   return newDataConfigs
     .filter(
@@ -68,6 +58,17 @@ const getFlattenHeaders = (dataConfigs: ChartDataConfig[] = []) => {
     )
     .flatMap(config => config.rows || []);
 };
+
+const getFlattenHeaderRowUids = (rows: RowValue[]) => {
+  return rows
+    .flatMap(row => flattenHeaderRowsWithoutGroupRow(row))
+    .map(({ uid }) => uid);
+};
+
+const getTableData = (dataSource: RowValue[]) => ({
+  dataSource,
+  uids: getFlattenHeaderRowUids(dataSource),
+});
 
 const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
   memo(
@@ -80,14 +81,14 @@ const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
     }) => {
       const [selectedRowUids, setSelectedRowUids] = useState<string[]>([]);
       const [myData, setMyData] = useState(() => CloneValueDeep(data));
-      const [tableDataSource, setTableDataSource] = useState<RowValue[]>(() => {
+      const [tableData, setTableData] = useState(() => {
         const originalFlattenHeaderRows = getFlattenHeaders(dataConfigs);
         const currentHeaderRows: RowValue[] = myData?.value || [];
         const unusedHeaderRows = getUnusedHeaderRows(
           originalFlattenHeaderRows || [],
           currentHeaderRows,
         );
-        return currentHeaderRows.concat(unusedHeaderRows);
+        return getTableData(currentHeaderRows.concat(unusedHeaderRows));
       });
 
       const mergeRowToGroup = () => {
@@ -95,12 +96,15 @@ const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
           return;
         }
         const lineageRowUids = selectedRowUids.map(uid =>
-          getAncestorRowUids(undefined, uid, tableDataSource),
+          getAncestorRowUids(undefined, uid, tableData.dataSource),
         );
         const noDuplicateLineageRows =
           mergeSameLineageAncesterRows(lineageRowUids);
         const ancestorsRows = makeSameLinageRows(noDuplicateLineageRows);
-        const newDataSource = groupTreeNode(ancestorsRows, tableDataSource);
+        const newDataSource = groupTreeNode(
+          ancestorsRows,
+          tableData.dataSource,
+        );
         setSelectedRowUids([]);
         handleConfigChange([...newDataSource]);
       };
@@ -194,44 +198,42 @@ const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
         return restRows;
       };
 
+      const handleRowMove = (step: number) => {
+        (step < 0 ? selectedRowUids : [...selectedRowUids].reverse()).forEach(
+          rowUid => {
+            const brotherRows = findRowBrothers(rowUid, tableData.dataSource);
+            const idx = brotherRows.findIndex(s => s.uid === rowUid);
+            if (idx < 0) {
+              return;
+            }
+            const targetIdx = idx + step;
+            if (targetIdx < 0 || targetIdx >= brotherRows.length) {
+              return;
+            }
+            rowBubbleMove(brotherRows, idx, targetIdx);
+          },
+        );
+        handleConfigChange([...tableData.dataSource]);
+      };
+
       const handleRowMoveUp = () => {
-        selectedRowUids.forEach(rowUid => {
-          const brotherRows = findRowBrothers(rowUid, tableDataSource);
-          const idx = brotherRows.findIndex(s => s.uid === rowUid);
-          if (idx < 1) {
-            return;
-          }
-          const temp = brotherRows[idx - 1];
-          brotherRows[idx - 1] = brotherRows[idx];
-          brotherRows[idx] = temp;
-        });
-        handleConfigChange([...tableDataSource]);
+        handleRowMove(-1);
       };
 
       const handleRowMoveDown = () => {
-        selectedRowUids.forEach(uid => {
-          const brotherRows = findRowBrothers(uid, tableDataSource);
-          const idx = brotherRows.findIndex(s => s.uid === uid);
-          if (idx >= brotherRows.length - 1) {
-            return;
-          }
-          const temp = brotherRows[idx];
-          brotherRows[idx] = brotherRows[idx + 1];
-          brotherRows[idx + 1] = temp;
-          handleConfigChange([...tableDataSource]);
-        });
+        handleRowMove(1);
       };
 
       const handleRollback = () => {
         const originalFlattenHeaders = getFlattenHeaders(dataConfigs);
         myData.value = [];
-        setTableDataSource(originalFlattenHeaders);
+        setTableData(getTableData(originalFlattenHeaders));
         setMyData(myData);
         onChange?.(ancestors, myData);
       };
 
       const handleTableRowChange = rowUid => style => prop => (_, value) => {
-        const brotherRows = findRowBrothers(rowUid, tableDataSource);
+        const brotherRows = findRowBrothers(rowUid, tableData.dataSource);
         const row = brotherRows.find(r => r.uid === rowUid);
 
         if (!row) {
@@ -245,36 +247,21 @@ const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
         } else {
           row[prop] = value;
         }
-        handleConfigChange([...tableDataSource]);
+        handleConfigChange([...tableData.dataSource]);
       };
 
       const handleDeleteGroupRow = rowUid => {
-        const brotherRows = findRowBrothers(rowUid, tableDataSource);
+        const brotherRows = findRowBrothers(rowUid, tableData.dataSource);
         const idx = brotherRows.findIndex(s => s.uid === rowUid);
         brotherRows.splice(idx, 1, ...(brotherRows[idx].children || []));
-        handleConfigChange([...tableDataSource]);
+        handleConfigChange([...tableData.dataSource]);
       };
 
       const handleConfigChange = (dataSource: RowValue[]) => {
         myData.value = dataSource;
-        setTableDataSource(dataSource);
+        setTableData(getTableData(dataSource));
         setMyData(myData);
         onChange?.(ancestors, myData);
-      };
-
-      const findRowBrothers = (uid, rows) => {
-        let row = rows.find(r => r.uid === uid);
-        if (!!row) {
-          return rows;
-        }
-        let subRows = [];
-        for (let i = 0; i < rows.length; i++) {
-          subRows = findRowBrothers(uid, rows[i].children || []);
-          if (!!subRows && subRows.length > 0) {
-            break;
-          }
-        }
-        return subRows;
       };
 
       const tableColumnsSettings = [
@@ -307,6 +294,8 @@ const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
       const rowSelection = {
         selectedRowKeys: selectedRowUids,
         onChange: (selectedRowKeys: any[]) => {
+          const uids = tableData.uids;
+          selectedRowKeys.sort((a, b) => uids.indexOf(a) - uids.indexOf(b));
           setSelectedRowUids(selectedRowKeys);
         },
       };
@@ -356,7 +345,7 @@ const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
                 {...myData}
                 rowKey={record => record.uid!}
                 columns={tableColumnsSettings}
-                dataSource={tableDataSource}
+                dataSource={tableData.dataSource}
                 rowSelection={rowSelection}
               />
             </Col>
