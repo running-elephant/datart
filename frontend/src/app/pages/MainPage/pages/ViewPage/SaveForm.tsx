@@ -30,6 +30,7 @@ import {
 } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import debounce from 'debounce-promise';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import {
@@ -115,7 +116,13 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
 
   const save = useCallback(
     values => {
-      onSave(values, onCancel);
+      onSave(
+        {
+          ...values,
+          config: { version: APP_CURRENT_VERSION, ...values.config },
+        },
+        onCancel,
+      );
     },
     [onSave, onCancel],
   );
@@ -184,15 +191,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
           }}
         />
       </Form.Item>
-      <Form.Item
-        wrapperCol={{ span: 13, offset: 9 }}
-        name={['config', 'expensiveQuery']}
-        initialValue={expensiveQuery}
-        valuePropName="checked"
-      >
-        <Checkbox>{t('expensiveQuery')}</Checkbox>
-      </Form.Item>
-      {!simple && (
+      {!simple && initialValues?.config && (
         <>
           <AdvancedToggle
             type="link"
@@ -237,6 +236,14 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
               initialValue={0}
             >
               <InputNumber disabled={!cache} />
+            </Form.Item>
+            <Form.Item
+              wrapperCol={{ span: 13, offset: 9 }}
+              name={['config', 'expensiveQuery']}
+              initialValue={expensiveQuery}
+              valuePropName="checked"
+            >
+              <Checkbox>{t('expensiveQuery')}</Checkbox>
             </Form.Item>
           </AdvancedWrapper>
         </>

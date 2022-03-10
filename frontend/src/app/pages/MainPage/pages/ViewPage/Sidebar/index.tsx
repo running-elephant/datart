@@ -228,19 +228,22 @@ const Wrapper = styled.div<{
   isDragging: boolean;
   width: number;
 }>`
-  transition: ${p => (!p.isDragging ? 'width 0.3s ease' : 'none')};
   height: 100%;
+  transition: ${p => (!p.isDragging ? 'width 0.3s ease' : 'none')};
   &.close {
-    width: ${SPACE_TIMES(7.5)} !important;
-    border-right: 1px solid #e9ecef;
     position: absolute;
+    width: ${SPACE_TIMES(7.5)} !important;
     height: 100%;
     background: #fff;
+    border-right: 1px solid #e9ecef;
     .menuUnfoldOutlined {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+    }
+    > div {
+      display: ${p => (p.sliderVisible ? 'none' : 'flex')};
     }
     &:hover {
       width: ${p => p.width + '%'} !important;
@@ -255,18 +258,15 @@ const Wrapper = styled.div<{
       }
     }
   }
-  > div {
-    display: ${p => (p.sliderVisible ? 'none' : 'flex')};
-  }
 `;
 const ListNavWrapper = styled(ListNav)`
+  position: relative;
+  z-index: ${NAV_LEVEL};
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  height: 100%;
   padding: ${SPACE_XS} 0;
   background-color: ${p => p.theme.componentBackground};
   border-right: 1px solid ${p => p.theme.borderColorSplit};
-  height: 100%;
-  position: relative;
-  z-index: ${NAV_LEVEL};
 `;

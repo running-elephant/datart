@@ -39,8 +39,8 @@ export function useSaveAsView() {
   const getViewData = useCallback(async (viewId): Promise<View> => {
     try {
       const { data } = await request<View>(`/views/${viewId}`);
-      const migrateData = migrateViewConfig(data);
-      return migrateData;
+      data.config = migrateViewConfig(data.config);
+      return data;
     } catch (error) {
       errorHandle(error);
       return {} as View;
@@ -61,7 +61,7 @@ export function useSaveAsView() {
         initialValues: {
           name: name + '_' + tg('copy'),
           parentId,
-          config: config,
+          config,
         },
         parentIdLabel: t('folder'),
         onSave: (values, onClose) => {

@@ -27,6 +27,8 @@ import {
   getReference2,
   getSeriesTooltips4Rectangular2,
   getStyles,
+  hadAxisLabelOverflowConfig,
+  setOptionsByAxisLabelOverflow,
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
@@ -90,6 +92,8 @@ class BasicBarChart extends Chart {
 
   onResize(opt: any, context): void {
     this.chart?.resize({ width: context?.width, height: context?.height });
+    hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
+      this.onUpdated(opt, context);
   }
 
   getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
@@ -152,6 +156,17 @@ class BasicBarChart extends Chart {
       this.makeTransposeAxis(axisInfo);
     }
 
+    // @TM 溢出自动根据bar长度设置标尺
+    const option = setOptionsByAxisLabelOverflow({
+      chart: this.chart,
+      xAxis: axisInfo.xAxis,
+      yAxis: axisInfo.yAxis,
+      grid: getGridStyle(styleConfigs),
+      yAxisNames,
+      series,
+      horizon: this.isHorizonDisplay,
+    });
+
     return {
       tooltip: {
         trigger: 'item',
@@ -164,10 +179,7 @@ class BasicBarChart extends Chart {
         ),
       },
       legend: this.getLegendStyle(styleConfigs, series),
-      grid: getGridStyle(styleConfigs),
-      xAxis: axisInfo.xAxis,
-      yAxis: axisInfo.yAxis,
-      series,
+      ...option,
     };
   }
 
@@ -428,6 +440,7 @@ class BasicBarChart extends Chart {
       rotate,
       showInterval,
       interval,
+      overflow,
     ] = getStyles(
       styles,
       ['xAxis'],
@@ -440,6 +453,7 @@ class BasicBarChart extends Chart {
         'rotate',
         'showInterval',
         'interval',
+        'overflow',
       ],
     );
     const [showVerticalLine, verticalLineStyle] = getStyles(
@@ -455,6 +469,7 @@ class BasicBarChart extends Chart {
         show: showLabel,
         rotate,
         interval: showInterval ? interval : 'auto',
+        overflow,
         ...font,
       },
       axisLine: {
@@ -474,10 +489,10 @@ class BasicBarChart extends Chart {
 
   private getLegendStyle(styles, series) {
     const seriesNames = (series || []).map((col: any) => col?.name);
-    const [show, type, font, legendPos, selectAll] = getStyles(
+    const [show, type, font, legendPos, selectAll, height] = getStyles(
       styles,
       ['legend'],
-      ['showLegend', 'type', 'font', 'position', 'selectAll'],
+      ['showLegend', 'type', 'font', 'position', 'selectAll', 'height'],
     );
     let positions = {};
     let orient = {};
@@ -512,6 +527,7 @@ class BasicBarChart extends Chart {
       ...positions,
       show,
       type,
+      height: height || null,
       orient,
       selected,
       data: seriesNames,

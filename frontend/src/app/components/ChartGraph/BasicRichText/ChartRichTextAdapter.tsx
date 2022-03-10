@@ -302,7 +302,7 @@ const ChartRichTextAdapter: FC<{
               modules={quillModules}
               formats={Formats}
               readOnly={false}
-              bounds={'#quill-box'}
+              bounds={`#quill-box-${id}`}
             />
             <Row align="middle" justify="end" style={{ paddingTop: 16 }}>
               <Button
@@ -316,7 +316,7 @@ const ChartRichTextAdapter: FC<{
             </Row>
           </>
         ),
-      [quillModules, quillValue, isEditing, toolbar, quillChange],
+      [quillModules, quillValue, isEditing, toolbar, quillChange, id],
     );
 
     const ssp = e => {
@@ -325,7 +325,7 @@ const ChartRichTextAdapter: FC<{
 
     return (
       <TextWrap onClick={ssp}>
-        <QuillBox id="quill-box">
+        <QuillBox id={`quill-box-${id}`}>
           {quillModules && reactQuillEdit}
           {quillModules && !isEditing && reactQuillView}
         </QuillBox>
