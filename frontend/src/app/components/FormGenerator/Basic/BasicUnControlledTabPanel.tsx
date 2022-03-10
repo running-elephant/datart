@@ -166,19 +166,26 @@ const BasicUnControlledTabPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         onEdit={handleEdit}
       >
         {myData.rows?.map((p, index) => {
+          const rowKey = p.key;
           return (
             <StyledTabPanel
-              key={p.key}
+              key={rowKey}
               tab={
                 <EditableTabHeader
                   editable={editable}
                   label={p.label}
-                  onChange={value => {
-                    const newAncerstors = [index];
-                    handleDataChange(newAncerstors, {
-                      ...p,
-                      ...{ label: value },
-                    });
+                  rowKey={rowKey}
+                  onChange={(key, value) => {
+                    const updatedRowIndex = myData.rows?.findIndex(
+                      r => r.key === key,
+                    );
+                    if (updatedRowIndex !== undefined && updatedRowIndex > -1) {
+                      const newAncestors = [updatedRowIndex];
+                      handleDataChange(newAncestors, {
+                        ...p,
+                        ...{ label: value },
+                      });
+                    }
                   }}
                 />
               }
@@ -195,9 +202,10 @@ const BasicUnControlledTabPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
 
 const EditableTabHeader: FC<{
   label: string;
+  rowKey: string;
   editable?: Boolean;
-  onChange: (value: string) => void;
-}> = memo(({ label, editable = true, onChange }) => {
+  onChange: (key: string, value: string) => void;
+}> = memo(({ label, rowKey, editable = true, onChange }) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const render = () => {
@@ -211,7 +219,7 @@ const EditableTabHeader: FC<{
         onSearch={value => {
           if (!!value) {
             setIsEditing(false);
-            onChange(value);
+            onChange(rowKey, value);
           }
         }}
       />
