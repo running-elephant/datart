@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs');
-const CracoLessPlugin = require('craco-less');
 const WebpackBar = require('webpackbar');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 // const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
@@ -32,18 +31,6 @@ module.exports = {
   babel: {
     plugins: ['babel-plugin-styled-components'],
   },
-  plugins: [
-    {
-      plugin: CracoLessPlugin,
-      options: {
-        lessLoaderOptions: {
-          lessOptions: {
-            javascriptEnabled: true,
-          },
-        },
-      },
-    },
-  ],
   webpack: {
     alias: {},
     plugins: [
@@ -128,6 +115,7 @@ module.exports = {
         setupFiles: ['jest-canvas-mock'],
       });
     },
+    modulePaths: ['../'],
   },
 
   devServer: {

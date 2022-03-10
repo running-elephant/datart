@@ -42,7 +42,9 @@ const SortAction: FC<{
     ? true
     : Boolean(options?.backendSort);
   const t = useI18NPrefix(`viz.palette.data.actions`);
-  const [direction, setDirection] = useState(config?.sort?.type);
+  const [direction, setDirection] = useState(
+    config?.sort?.type || SortActionType.NONE,
+  );
   const [sortValue, setSortValue] = useState(() => {
     const objDataColumns = transformToDataSet(dataset?.rows, dataset?.columns);
     return (

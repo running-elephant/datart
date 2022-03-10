@@ -42,7 +42,6 @@ import {
   SaveFormContext,
   useSaveFormContext,
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
-import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { makeDownloadDataTask } from 'app/utils/fetch';
@@ -103,7 +102,6 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
 }) => {
   const saveFormContextValue = useSaveFormContext();
   const { actions } = useWorkbenchSlice();
-  const { actions: mainActions } = useMainSlice();
   const dispatch = useDispatch();
   const dataset = useSelector(datasetsSelector);
   const dataview = useSelector(currentDataViewSelector);
@@ -477,7 +475,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
         ],
         fileName: backendChart?.name || 'chart',
         resolve: () => {
-          dispatch(mainActions.setDownloadPolling(true));
+          dispatch(actions.setChartEditorDownloadPolling(true));
         },
       }),
     );
@@ -489,7 +487,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     dataChartId,
     dataview,
     dispatch,
-    mainActions,
+    actions,
     widgetId,
   ]);
 

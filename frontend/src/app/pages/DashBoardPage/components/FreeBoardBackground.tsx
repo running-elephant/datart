@@ -75,6 +75,5 @@ export default SlideBackground;
 const Warp = styled(StyledBackground)<{ editing: boolean }>`
   position: relative;
   box-shadow: ${p => (p.editing ? '0px 1px 8px 2px #8cb4be;' : '')};
-  transition: all ease-in 200ms;
   transform-origin: 0 0;
 `;

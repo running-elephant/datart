@@ -310,6 +310,7 @@ const config: ChartConfig = {
           title: 'Label',
           showLabel: 'Show Label',
           position: 'Position',
+          height: 'Height',
         },
         map: {
           title: 'Map',

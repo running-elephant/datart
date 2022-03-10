@@ -18,7 +18,7 @@
 
 import { useEffect, useState } from 'react';
 
-export const useVisibleHidden = (timeNum: number = 500) => {
+export const useVisibleHidden = (timeNum: number = 0) => {
   const [visible, setVisible] = useState<'visible' | 'hidden'>('hidden');
   useEffect(() => {
     setTimeout(() => {

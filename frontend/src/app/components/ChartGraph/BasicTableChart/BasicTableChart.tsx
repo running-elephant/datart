@@ -90,7 +90,8 @@ class BasicTableChart extends ReactChart {
           options.config,
           options.widgetSpecialConfig,
         );
-        this.cachedAntTableOptions = tableOptions;
+        // this.cachedAntTableOptions = Omit(tableOptions, ['dataSource']);
+        this.cachedAntTableOptions = Omit(tableOptions, []);
         this.cachedDatartConfig = options.config;
         this.cacheContext = context;
         this.adapter?.updated(tableOptions, context);

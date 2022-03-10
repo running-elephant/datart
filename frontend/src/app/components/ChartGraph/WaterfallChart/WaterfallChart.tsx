@@ -22,6 +22,8 @@ import {
   getColumnRenderName,
   getGridStyle,
   getStyles,
+  hadAxisLabelOverflowConfig,
+  setOptionsByAxisLabelOverflow,
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
@@ -77,6 +79,7 @@ class WaterfallChart extends Chart {
 
   onResize(opt: any, context): void {
     this.chart?.resize({ width: context?.width, height: context?.height });
+    hadAxisLabelOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
   }
 
   private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
@@ -103,7 +106,6 @@ class WaterfallChart extends Chart {
     );
 
     return {
-      grid: getGridStyle(styleConfigs),
       barWidth: this.getSerieBarWidth(styleConfigs),
       ...series,
     };
@@ -189,6 +191,16 @@ class WaterfallChart extends Chart {
       xAxis: this.getXAxis(styles, xAxisColumns),
       yAxis: this.getYAxis(styles, yAxisNames),
     };
+
+    // @TM 溢出自动根据bar长度设置标尺
+    const option = setOptionsByAxisLabelOverflow({
+      chart: this.chart,
+      xAxis: axisInfo.xAxis,
+      yAxis: axisInfo.yAxis,
+      grid: getGridStyle(styles),
+      series: [baseDataObj, ascendOrderObj, descendOrderObj],
+      yAxisNames,
+    });
     return {
       tooltip: {
         trigger: 'axis',
@@ -215,9 +227,7 @@ class WaterfallChart extends Chart {
           }
         },
       },
-      xAxis: axisInfo.xAxis,
-      yAxis: axisInfo.yAxis,
-      series: [baseDataObj, ascendOrderObj, descendOrderObj],
+      ...option,
     };
   }
 
@@ -335,6 +345,7 @@ class WaterfallChart extends Chart {
       rotate,
       showInterval,
       interval,
+      overflow,
     ] = getStyles(
       styles,
       ['xAxis'],
@@ -347,6 +358,7 @@ class WaterfallChart extends Chart {
         'rotate',
         'showInterval',
         'interval',
+        'overflow',
       ],
     );
     const [showVerticalLine, verticalLineStyle] = getStyles(
@@ -362,6 +374,7 @@ class WaterfallChart extends Chart {
         show: showLabel,
         rotate,
         interval: showInterval ? interval : 'auto',
+        overflow,
         ...font,
       },
       axisLine: {

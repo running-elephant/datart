@@ -27,6 +27,7 @@ import {
 import { Col, Input, Row } from 'antd';
 import { Tree } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useResizeObserver from 'app/hooks/useResizeObserver';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import { memo, useCallback, useContext, useEffect, useMemo } from 'react';
@@ -58,6 +59,11 @@ export const Resource = memo(() => {
   const databaseSchemas = useSelector(state =>
     selectSourceDatabaseSchemas(state, { id: sourceId }),
   );
+
+  const { height, ref: treeWrapperRef } = useResizeObserver({
+    refreshMode: 'debounce',
+    refreshRate: 200,
+  });
 
   const buildTableNode = useCallback((database: DatabaseSchema) => {
     const children =
@@ -143,7 +149,7 @@ export const Resource = memo(() => {
           />
         </Col>
       </Searchbar>
-      <TreeWrapper>
+      <TreeWrapper ref={treeWrapperRef}>
         <Tree
           className="medium"
           treeData={filteredData}
@@ -151,6 +157,7 @@ export const Resource = memo(() => {
           icon={renderIcon}
           selectable={false}
           defaultExpandedKeys={expandedRowKeys}
+          height={height}
           onExpand={onExpand}
         />
       </TreeWrapper>

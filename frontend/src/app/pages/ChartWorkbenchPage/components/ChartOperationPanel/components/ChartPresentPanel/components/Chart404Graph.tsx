@@ -61,8 +61,8 @@ export default Chart404Graph;
 const StyledChart404Graph = styled.div`
   display: flex;
   flex-flow: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   height: 100%;
   opacity: 0.3;
 `;

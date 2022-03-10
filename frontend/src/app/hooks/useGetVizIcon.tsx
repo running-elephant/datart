@@ -5,36 +5,31 @@ import {
   FundFilled,
 } from '@ant-design/icons';
 import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
-import { IChart } from 'app/types/Chart';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { FONT_SIZE_TITLE } from 'styles/StyleConstants';
 
 function useGetVizIcon() {
   const chartManager = ChartManager.instance();
-  const [allCharts] = useState<IChart[]>(chartManager.getAllCharts());
-  const chartsIcon = useMemo(() => {
-    let iconObj = {};
-    allCharts.forEach(v => {
-      iconObj[v.meta.id] = v.meta.icon;
-    });
-    return iconObj;
-  }, [allCharts]);
+  const chartIcons = chartManager.getAllChartIcons();
 
-  return useCallback(({ relType, avatar, subType }) => {
-    switch (relType) {
-      case 'DASHBOARD':
-        return subType !== null ? (
-          renderIcon(subType === 'free' ? 'CombinedShape' : 'kanban')
-        ) : (
-          <FundFilled />
-        );
-      case 'DATACHART':
-        return avatar ? renderIcon(chartsIcon[avatar]) : <BarChartOutlined />;
-      default:
-        return p => (p.expanded ? <FolderOpenFilled /> : <FolderFilled />);
-    }
-  }, []);
+  return useCallback(
+    ({ relType, avatar, subType }) => {
+      switch (relType) {
+        case 'DASHBOARD':
+          return subType !== null ? (
+            renderIcon(subType === 'free' ? 'CombinedShape' : 'kanban')
+          ) : (
+            <FundFilled />
+          );
+        case 'DATACHART':
+          return avatar ? renderIcon(chartIcons[avatar]) : <BarChartOutlined />;
+        default:
+          return p => (p.expanded ? <FolderOpenFilled /> : <FolderFilled />);
+      }
+    },
+    [chartIcons],
+  );
 }
 
 export default useGetVizIcon;
