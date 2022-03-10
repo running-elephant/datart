@@ -1,13 +1,24 @@
 ---
-title: 部署
+部署
 ---
 
-## 0 demo
+### demo
 
 - http://datart-demo.retech.cc
 - 用户名：demo
 - 密码：123456
 
+### docker 部署
+
+```shell
+docker run -p 8080:8080 datart/datart 
+```
+启动后可访问 <http://docker_ip:8080>  
+默认账户:用户名`demo`,密码`123456`
+
+***更多docker配置，访问 <https://hub.docker.com/repository/docker/datart/datart>***
+
+# 本地部署 
 ## 1. 环境准备
 
 - JDK 1.8+
@@ -41,6 +52,7 @@ unzip datart-server-1.0.0-beta.x-install.zip
 ```
 
 ## 2. 以独立模式运行
+
 安装包解压后，即可运行 ./bin/datart-server.sh start 来启动datart,启动后默认访问地址是: <http://127.0.0.1:8080>,默认用户`demo/123456`
 
 ***独立模式使用内置数据库作为应用数据库，数据的安全性和数据迁移无法保证，建议配置外部数据库作为应用数据库***
@@ -52,11 +64,13 @@ unzip datart-server-1.0.0-beta.x-install.zip
 ```bash
 mysql> CREATE DATABASE `datart` CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';
 ```
+
 ***注意：1.0.0-beta.2版本以前，需要手动执行`bin/datart.sql`来初始化数据库。此版本及以上版本，创建好数据库即可，在初次连接时会自动初始化数据库***
 
 ***首次连接数据库(或者版本升级)时,建议使用一个权限较高的数据库账号登录(如root账号)。因为首次连接会执行数据库初始化脚本，如果使用的数据库账号权限太低，会导致数据库初始化失败***
 
 - 基础配置：配置文件位于 config/datart.conf
+
 ```bash
    数据库配置(必填):
     1. datasource.ip(数据库IP地址)
@@ -73,14 +87,14 @@ mysql> CREATE DATABASE `datart` CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';
     5. datart.webdriver-path(截图驱动)
 ```
 
-##4. 高级配置 (可选) : 配置文件位于 config/profiles/application-config.yml 
+## 4. 高级配置 (可选) : 配置文件位于 config/profiles/application-config.yml
 
 ***高级配置文件格式是yml格式,配置错误会导致程序无法启动。配置时一定要严格遵循yml格式。***
 
 ***application-config.yml直接由spring-boot处理,其中的oauth2,redis,mail等配置项完全遵循spring-boot-autoconfigure配置***
 
-
 ### 4.1 配置文件信息
+
 ```yaml
 spring:
   datasource:
@@ -144,16 +158,15 @@ datart:
   env:
     file-path: ${user.dir}/files # 服务端文件保存位置
 
-# 可选配置 如需配置请参照 [3.2 截图配置 [ChromeWebDriver]-可选]
+  # 可选配置 如需配置请参照 [3.2 截图配置 [ChromeWebDriver]-可选]
   screenshot:
     timeout-seconds: 60
     webdriver-type: CHROME
-    webdriver-path: "http://youip:4444/wd/hub"  
+    webdriver-path: "http://youip:4444/wd/hub"
 
 ```
 
 *注意：加密密钥每个服务端部署前应该进行修改，且部署后不能再次修改。如果是集群部署，同一个集群内的secret要保持统一*
-
 
 ### 4.2 截图配置 [ChromeWebDriver]-可选
 
