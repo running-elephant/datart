@@ -76,6 +76,13 @@ class ChartManager {
     return this._charts || [];
   }
 
+  public getAllChartIcons() {
+    return this._charts.reduce((acc, cur) => {
+      acc[cur.meta.id] = cur.meta.icon;
+      return acc;
+    }, {});
+  }
+
   public getById(id?: string) {
     if (id === null || id === undefined) {
       return;
@@ -84,7 +91,7 @@ class ChartManager {
   }
 
   public getDefaultChart() {
-    return this._charts[0];
+    return CloneValueDeep(this._charts[0]);
   }
 
   private async _loadCustomizeCharts(paths: string[]) {

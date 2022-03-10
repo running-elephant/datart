@@ -125,7 +125,10 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
     };
 
     return (
-      <StyledGroupLayout flatten={flatten}>
+      <StyledGroupLayout
+        className="chart-config-group-layout"
+        flatten={flatten}
+      >
         {renderGroupByMode(mode, type, data)}
       </StyledGroupLayout>
     );

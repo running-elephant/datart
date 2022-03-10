@@ -500,7 +500,12 @@ export function getReference2(
       dataConfig,
       isHorizonDisplay,
     ),
-    markArea: getMarkArea2(referenceTabs, dataSetRows, isHorizonDisplay),
+    markArea: getMarkArea2(
+      referenceTabs,
+      dataSetRows,
+      dataConfig,
+      isHorizonDisplay,
+    ),
   };
 }
 
@@ -676,8 +681,10 @@ function getMarkAreaData2(
   valueTypeKey,
   constantValueKey,
   metricKey,
+  dataConfig,
   isHorizonDisplay,
 ) {
+  const metric = getSettingValue(mark.rows, metricKey, 'value');
   const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
   const show = getSettingValue(mark.rows, 'showLabel', 'value');
   const enableMarkArea = getSettingValue(mark.rows, 'enableMarkArea', 'value');
@@ -692,8 +699,10 @@ function getMarkAreaData2(
   );
   const name = mark.value;
   const valueType = getSettingValue(mark.rows, valueTypeKey, 'value');
-  const metric = getSettingValue(mark.rows, metricKey, 'value');
-  const metricDatas = dataSetRows.map(d => +d.getCellByKey(metric));
+  const metricDatas =
+    dataConfig.uid === metric
+      ? dataSetRows.map(d => +d.getCell(dataConfig))
+      : [];
   const constantValue = getSettingValue(mark.rows, constantValueKey, 'value');
   let yAxis = 0;
   switch (valueType) {
@@ -711,8 +720,8 @@ function getMarkAreaData2(
       break;
   }
 
-  if (!enableMarkArea) {
-    return null;
+  if (!enableMarkArea || !Number.isFinite(yAxis) || Number.isNaN(yAxis)) {
+    return;
   }
 
   return {
@@ -826,12 +835,12 @@ function getMarkArea(refTabs, dataColumns, isHorizonDisplay) {
 function getMarkArea2(
   refTabs,
   dataSetRows: IChartDataSetRow<string>[],
+  dataConfig,
   isHorizonDisplay,
 ) {
   const refAreas = refTabs?.reduce((acc, cur) => {
     const markLineConfigs = cur?.rows?.filter(r => r.key === 'markArea');
-    acc.push(...markLineConfigs);
-    return acc;
+    return acc.concat(markLineConfigs);
   }, []);
   return {
     data: refAreas
@@ -844,13 +853,14 @@ function getMarkArea2(
               `${prefix}ValueType`,
               `${prefix}ConstantValue`,
               `${prefix}Metric`,
+              dataConfig,
               isHorizonDisplay,
             );
           })
           .filter(Boolean);
         return markAreaData;
       })
-      .filter(m => Boolean(m?.length)),
+      .filter(m => m?.length === 2),
   };
 }
 
