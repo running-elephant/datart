@@ -186,13 +186,26 @@ export const initWorkbenchAction = createAsyncThunk(
 
 export const fetchDataSetAction = createAsyncThunk(
   'workbench/fetchDataSetAction',
-  async (arg: ChartDataRequest) => {
-    const response = await request2({
-      method: 'POST',
-      url: `data-provider/execute`,
-      data: arg,
-    });
-    return filterSqlOperatorName(arg, response.data);
+  async (arg: ChartDataRequest, thunkAPI) => {
+    let errorData: any = null;
+    const response = await request2(
+      {
+        method: 'POST',
+        url: `data-provider/execute`,
+        data: arg,
+      },
+      {},
+      {
+        onRejected: error => {
+          errorData = error.response;
+        },
+      },
+    );
+    if (errorData) {
+      return thunkAPI.rejectWithValue(errorData?.data);
+    } else {
+      return filterSqlOperatorName(arg, response.data);
+    }
   },
 );
 
@@ -478,6 +491,7 @@ const workbenchSlice = createSlice({
         state.dataset = initState.dataset;
       })
       .addCase(fetchDataSetAction.fulfilled, (state, { payload }) => {
+        console.log(payload, 'fulfilled');
         state.dataset = payload as any;
         state.datasetLoading = false;
       })
@@ -513,9 +527,15 @@ const workbenchSlice = createSlice({
       state.datasetLoading = true;
     });
 
-    builder.addCase(fetchDataSetAction.rejected, (state, action) => {
-      state.datasetLoading = false;
-    });
+    builder.addCase(
+      fetchDataSetAction.rejected,
+      (state, { payload }: { payload: any }) => {
+        state.datasetLoading = false;
+        if (state.dataset) {
+          state.dataset.script = (payload?.data?.script as string) || '';
+        }
+      },
+    );
 
     builder.addMatcher(
       isMySliceRejectedAction(workbenchSlice.name),
