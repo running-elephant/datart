@@ -41,6 +41,7 @@ const SingleFilter: FC<{
     const t = useI18NPrefix('viz.common.enum.filterOperator');
     const operators = [
       FilterSqlOperator.Between,
+      FilterSqlOperator.NotBetween,
       FilterSqlOperator.Equal,
       FilterSqlOperator.NotEqual,
       FilterSqlOperator.GreaterThanOrEqual,
@@ -76,7 +77,7 @@ const SingleFilter: FC<{
       if (op === FilterSqlOperator.Null || op === FilterSqlOperator.NotNull) {
         return null;
       }
-      if (op === FilterSqlOperator.Between) {
+      if (op === FilterSqlOperator.Between || op === FilterSqlOperator.NotBetween) {
         return (
           <>
             <InputNumber
