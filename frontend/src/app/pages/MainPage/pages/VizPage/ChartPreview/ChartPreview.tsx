@@ -357,7 +357,6 @@ const StyledChartPreviewBoard = styled.div`
   flex: 1;
   flex-flow: column;
   height: 100%;
-
   iframe {
     flex-grow: 1000;
   }
@@ -368,16 +367,16 @@ const PreviewBlock = styled.div`
   flex-direction: column;
   height: 100%;
   padding: ${SPACE_LG};
-  box-shadow: ${p => p.theme.shadowBlock};
   overflow: hidden;
+  box-shadow: ${p => p.theme.shadowBlock};
 `;
 
 const ChartWrapper = styled.div`
+  position: relative;
   display: flex;
   flex: 1;
   background-color: ${p => p.theme.componentBackground};
   border-radius: ${BORDER_RADIUS};
-  position: relative;
   .spinWrapper {
     width: 100%;
     height: 100%;
