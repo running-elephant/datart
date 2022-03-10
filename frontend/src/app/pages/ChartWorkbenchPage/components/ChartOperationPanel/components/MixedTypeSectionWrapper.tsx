@@ -36,7 +36,7 @@ import {
 import { flattenHeaderRowsWithoutGroupRow } from 'app/utils/internalChartHelper';
 import { DATARTSEPERATOR } from 'globalConstants';
 import differenceBy from 'lodash/differenceBy';
-import { memo, useContext, useEffect, useState } from 'react';
+import { memo, useCallback, useContext, useEffect, useState } from 'react';
 import { CloneValueDeep, isArrayEquals } from 'utils/object';
 import PaletteDataConfig from './ChartDataConfigSection';
 import { dataConfigSectionComparer } from './ChartDataConfigSection/utils';
@@ -78,9 +78,6 @@ const findHeaderGroup = (uid: string, rows: RowValue[]) => {
 };
 
 const getHeaderRowAncestors = (tableHeaders: RowValue[], colName: string) => {
-  if (!tableHeaders?.length) {
-    return [];
-  }
   const headerRows = [
     ...tableHeaders.map((row, index) => ({ row, ancestors: [index] })),
   ];
@@ -119,11 +116,11 @@ const getRowChildrenStack = (
 };
 
 const removeHeaderRow = (rows: RowValue[], colName: string) => {
-  if (!rows?.length) {
+  if (!rows.length) {
     return;
   }
   const ancestors = getHeaderRowAncestors(rows, colName);
-  if (!ancestors?.length) {
+  if (!ancestors.length) {
     return;
   }
   const stack = getRowChildrenStack(ancestors, rows);
@@ -230,17 +227,16 @@ const canRowMove = (
   for (const { uid } of rowBrothers) {
     const headerUids = uid!.split(DATARTSEPERATOR);
     const length = headerUids.length;
-    total += length;
-    if (length === 1 && headerUids[0] === hoverUid) {
+    if (length === 1 && uid === hoverUid) {
       return true;
-    } else {
-      if (dragIndex >= total - 1) {
-        if (headerUids[0] === hoverUid) {
-          return true;
-        }
-      } else if (headerUids[length - 1] === hoverUid) {
+    }
+    total += length;
+    if (dragIndex >= total - 1) {
+      if (headerUids[0] === hoverUid) {
         return true;
       }
+    } else if (headerUids[length - 1] === hoverUid) {
+      return true;
     }
   }
   return false;
@@ -249,24 +245,20 @@ const canRowMove = (
 const getHeaderGroupStylePayload = (
   configs: ChartStyleConfig<RowValue[]>[],
 ) => {
-  const headerStyleIndex = configs.findIndex(sc => sc.key === 'header');
-  if (headerStyleIndex >= 0) {
-    const headerRows = configs[headerStyleIndex].rows || [];
-    const modalStyleIndex = headerRows.findIndex(sc => sc.key === 'modal');
-    if (modalStyleIndex >= 0) {
-      const modelRows = headerRows[modalStyleIndex].rows || [];
-      const tableHeadersStyleIndex = modelRows.findIndex(
-        sc => sc.key === 'tableHeaders',
-      );
-      if (tableHeadersStyleIndex >= 0) {
-        return {
-          ancestors: [
-            headerStyleIndex,
-            modalStyleIndex,
-            tableHeadersStyleIndex,
-          ],
-          config: CloneValueDeep(modelRows[tableHeadersStyleIndex]),
-        };
+  const stack = ['header', 'modal', 'tableHeaders'];
+  const ancestors: number[] = [];
+  while (stack.length) {
+    const key = stack.shift();
+    const index = configs.findIndex(sc => sc.key === key);
+    if (index >= 0) {
+      ancestors.push(index);
+      const config = configs[index];
+      configs = config.rows || [];
+      if (configs.length === 0) {
+        if (stack.length === 0) {
+          return { ancestors, config: CloneValueDeep(config) };
+        }
+        return {};
       }
     }
   }
@@ -280,33 +272,33 @@ const getDataConfig = (
   if (!styleConfig || !styleConfig.value?.length) {
     return config;
   }
-  let dataConfig;
   const flatTableHeaders: ChartDataSectionField[] = styleConfig.value.flatMap(
     row => flattenHeaderRowsWithoutGroupRow(row),
   );
-  const dataConfigRows = config.rows || [];
-  if (dataConfigRows.length === 0) {
-    dataConfig = CloneValueDeep(config);
+  const dataConfigRows = config.rows;
+  if (!dataConfigRows?.length) {
+    const dataConfig = CloneValueDeep(config);
     dataConfig.rows = flatTableHeaders;
-  } else if (flatTableHeaders.length) {
-    if (
-      isArrayEquals(
-        dataConfigRows,
-        flatTableHeaders,
-        (a, b) => a.colName === b.colName,
-      )
-    ) {
-      return config;
-    }
-    dataConfig = CloneValueDeep(config);
-    const colNameIndex = flatTableHeaders.reduce((acc, { colName }, index) => {
-      acc[colName] = index;
-      return acc;
-    }, {});
-    dataConfig.rows.sort(
-      (a, b) => colNameIndex[a.colName] - colNameIndex[b.colName],
-    );
+    return dataConfig;
   }
+  if (
+    !flatTableHeaders.length ||
+    isArrayEquals(
+      dataConfigRows,
+      flatTableHeaders,
+      (a, b) => a.colName === b.colName,
+    )
+  ) {
+    return config;
+  }
+  const dataConfig = CloneValueDeep(config);
+  const colNameIndex = flatTableHeaders.reduce((acc, { colName }, index) => {
+    acc[colName] = index;
+    return acc;
+  }, {});
+  dataConfig.rows!.sort(
+    (a, b) => colNameIndex[a.colName] - colNameIndex[b.colName],
+  );
   return dataConfig;
 };
 
@@ -361,23 +353,22 @@ const MixedTypeSectionWrapper = memo<
     onChange(action);
   };
 
-  const canDraggableItemMove = (
-    rows: ChartDataSectionField[],
-    dragIndex: number,
-    hoverIndex: number,
-  ) => {
-    const tableHeaders = stylePayload.config?.value;
-    if (!tableHeaders) {
-      return true;
-    }
-    const dragUid = rows[dragIndex].uid;
-    const hoverUid = rows[hoverIndex].uid;
-    if (!dragUid || !hoverUid) {
-      return true;
-    }
-    const rowBrothers = findRowBrothers(dragUid, tableHeaders);
-    return canRowMove(rowBrothers, hoverUid, dragIndex);
-  };
+  const canDraggableItemMove = useCallback(
+    (rows: ChartDataSectionField[], dragIndex: number, hoverIndex: number) => {
+      const tableHeaders = stylePayload.config?.value;
+      if (!tableHeaders) {
+        return true;
+      }
+      const dragUid = rows[dragIndex].uid;
+      const hoverUid = rows[hoverIndex].uid;
+      if (!dragUid || !hoverUid) {
+        return true;
+      }
+      const rowBrothers = findRowBrothers(dragUid, tableHeaders);
+      return canRowMove(rowBrothers, hoverUid, dragIndex);
+    },
+    [stylePayload.config?.value],
+  );
 
   return (
     <PaletteDataConfig.MixedTypeSection
