@@ -22,9 +22,7 @@ import {
   BasicInput,
   BasicInputNumber,
 } from 'app/components/FormGenerator/Basic';
-import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
-import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { MediaWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
@@ -32,6 +30,10 @@ import moment from 'moment';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { G10, G90 } from 'styles/StyleConstants';
+import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
+import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
+import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
+
 const FONT_DATA = {
   comType: 'font',
   default: {
@@ -75,6 +77,9 @@ const TimerWidget: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(
     moment().format(timerConfig?.time?.timeFormat || TIME_FORMATTER),
   );
+
+  const t = useI18NPrefix();
+
   useEffect(() => {
     const timerConfig: TimerConfig = {
       time: preTimerConfig?.time || {
@@ -134,7 +139,12 @@ const TimerWidget: React.FC = () => {
         data={durationData}
         onChange={onDurationChange}
       />
-      <BasicFont ancestors={[0, 0]} data={fontData} onChange={onFontChange} />
+      <BasicFont
+        translate={t}
+        ancestors={[0, 0]}
+        data={fontData}
+        onChange={onFontChange}
+      />
     </div>
   );
 

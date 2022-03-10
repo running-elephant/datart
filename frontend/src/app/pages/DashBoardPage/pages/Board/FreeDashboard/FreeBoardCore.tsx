@@ -17,9 +17,9 @@
  */
 import { Empty } from 'antd';
 import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import { selectLayoutWidgetMapById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -134,11 +134,11 @@ const Wrap = styled.div`
       overflow-y: hidden;
 
       .empty {
-        height: 100%;
         display: flex;
         flex: 1;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
+        height: 100%;
       }
     }
     .grid-background::-webkit-scrollbar {

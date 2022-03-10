@@ -78,6 +78,8 @@ public class RegexVariableResolver {
                     placeholders.add(new SimpleVariablePlaceholder(variable, sqlDialect, variableFragment));
                 }
             }
+        } else {
+            placeholders.add(new SimpleVariablePlaceholder(variable, sqlDialect, variableFragment));
         }
         return placeholders;
     }

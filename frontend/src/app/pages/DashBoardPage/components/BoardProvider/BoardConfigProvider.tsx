@@ -16,9 +16,12 @@
  * limitations under the License.
  */
 
-import React, { FC, memo } from 'react';
-import { BoardConfigContext } from '../../contexts/BoardConfigContext';
+import React, { createContext, FC, memo } from 'react';
 import { DashboardConfig } from '../../pages/Board/slice/types';
+
+export const BoardConfigContext = createContext<DashboardConfig>(
+  {} as DashboardConfig,
+);
 
 export const BoardConfigProvider: FC<{ config: DashboardConfig }> = memo(
   ({ config, children }) => {

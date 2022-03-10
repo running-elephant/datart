@@ -28,8 +28,8 @@ public interface SourceService extends BaseCRUDService<Source, SourceMapperExt> 
 
     List<Source> listSources(String orgId,boolean active);
 
-    List<SchemaInfo> getSourceSchemaInfo(String sourceId);
+    SchemaInfo getSourceSchemaInfo(String sourceId);
 
-    List<SchemaInfo> syncSourceSchema(String sourceId) throws Exception;
+    SchemaInfo syncSourceSchema(String sourceId) throws Exception;
 
 }

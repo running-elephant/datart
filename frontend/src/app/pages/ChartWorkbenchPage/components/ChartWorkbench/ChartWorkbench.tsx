@@ -48,7 +48,7 @@ const ChartWorkbench: FC<{
     orgId?: string;
     container?: string;
     onSaveChart?: () => void;
-    onSaveChartToDashBoard?: (dashboardId) => void;
+    onSaveChartToDashBoard?: (dashboardId, dashboardType) => void;
     onGoBack?: () => void;
     onChangeAggregation?: () => void;
   };
@@ -56,6 +56,7 @@ const ChartWorkbench: FC<{
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
   onRefreshDataset?: () => void;
+  onCreateDownloadDataTask?: () => void;
 }> = memo(
   ({
     dataset,
@@ -71,6 +72,7 @@ const ChartWorkbench: FC<{
     onChartConfigChange,
     onDataViewChange,
     onRefreshDataset,
+    onCreateDownloadDataTask,
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
@@ -113,6 +115,7 @@ const ChartWorkbench: FC<{
                     onChartChange={onChartChange}
                     onChartConfigChange={onChartConfigChange}
                     onDataViewChange={onDataViewChange}
+                    onCreateDownloadDataTask={onCreateDownloadDataTask}
                   />
                 </StyledChartOperationPanel>
               </StyledChartWorkbench>
@@ -138,10 +141,11 @@ const StyledChartWorkbench = styled.div`
   flex: 1;
   flex-flow: column;
   overflow: hidden;
-  background-color: ${p => p.theme.componentBackground};
+  background-color: ${p => p.theme.bodyBackground};
 
   .flexlayout__tab {
     overflow: hidden;
+    background-color: ${p => p.theme.bodyBackground};
   }
 
   .flexlayout__splitter {

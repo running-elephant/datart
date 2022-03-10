@@ -16,15 +16,27 @@
  * limitations under the License.
  */
 
+import { TreeDataNode } from 'antd';
+import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
+import { Nullable } from 'types';
+import { isEmptyArray } from 'utils/object';
 import { getDiffParams, getTextWidth } from 'utils/utils';
 import {
   ColumnCategories,
+  ColumnTypes,
   DEFAULT_PREVIEW_SIZE,
   UNPERSISTED_ID_PREFIX,
   ViewViewModelStages,
 } from './constants';
-import { Column, Model, QueryResult, ViewViewModel } from './slice/types';
+import {
+  Column,
+  ColumnRole,
+  HierarchyModel,
+  Model,
+  QueryResult,
+  ViewViewModel,
+} from './slice/types';
 
 export function generateEditingView(
   attrs?: Partial<ViewViewModel>,
@@ -36,7 +48,9 @@ export function generateEditingView(
     index: null,
     script: '',
     config: {},
-    model: {},
+    model: {
+      version: APP_CURRENT_VERSION,
+    },
     originVariables: [],
     variables: [],
     originColumnPermissions: [],
@@ -80,30 +94,50 @@ export function isNewView(id: string | undefined): boolean {
 
 export function transformQueryResultToModelAndDataSource(
   data: QueryResult,
-  lastModel: Model,
+  lastModel: HierarchyModel,
 ): {
-  model: Model;
+  model: HierarchyModel;
   dataSource: object[];
 } {
   const { rows, columns } = data;
-  const model = columns.reduce(
-    (obj, { name, type, primaryKey }) => ({
+  const newColumns = columns.reduce((obj, { name, type, primaryKey }) => {
+    const hierarchyColumn = getHierarchyColumn(
+      name,
+      lastModel?.hierarchy || {},
+    );
+    return {
       ...obj,
       [name]: {
-        type: lastModel[name]?.type || type,
+        type: hierarchyColumn?.type || type,
         primaryKey,
-        category: lastModel[name]?.category || ColumnCategories.Uncategorized, // FIXME: model 重构时一起改
+        category: hierarchyColumn?.category || ColumnCategories.Uncategorized, // FIXME: model 重构时一起改
       },
-    }),
-    {},
-  );
+    };
+  }, {});
   const dataSource = rows.map(arr =>
     arr.reduce(
       (obj, val, index) => ({ ...obj, [columns[index].name]: val }),
       {},
     ),
   );
-  return { model, dataSource };
+  return {
+    model: { ...lastModel, columns: newColumns },
+    dataSource,
+  };
+}
+
+export function getHierarchyColumn(
+  columnName: string,
+  hierarchyModel: Model,
+): Nullable<Column> {
+  return Object.entries(hierarchyModel)
+    .flatMap(([name, value]) => {
+      if (!isEmptyArray(value.children)) {
+        return value.children;
+      }
+      return value;
+    })
+    ?.find(col => col?.name === columnName);
 }
 
 export function getColumnWidthMap(
@@ -292,4 +326,77 @@ export function transformModelToViewModel(
       columnPermission: JSON.parse(r.columnPermission),
     })),
   };
+}
+
+export const dataModelColumnSorter = (prev: Column, next: Column): number => {
+  const columnTypePriority = {
+    [ColumnTypes.Date]: 1,
+    [ColumnTypes.String]: 1,
+    [ColumnTypes.Number]: 2,
+  };
+  const hierarchyPriority = {
+    [ColumnRole.Hierarchy]: 10,
+    [ColumnRole.Role]: 100,
+  };
+  const calcPriority = (column: Column) => {
+    return (
+      columnTypePriority[column?.type || ColumnTypes.String] *
+      hierarchyPriority[column?.role || ColumnRole.Role]
+    );
+  };
+  return (
+    calcPriority(prev) - calcPriority(next) ||
+    (prev?.name || '').localeCompare(next?.name || '')
+  );
+};
+
+export const diffMergeHierarchyModel = (model: HierarchyModel) => {
+  const hierarchy = model?.hierarchy || {};
+  const columns = model?.columns || {};
+  const allHierarchyColumnNames = Object.keys(hierarchy).flatMap(name => {
+    if (!isEmptyArray(hierarchy[name].children)) {
+      return hierarchy[name].children!.map(child => child.name);
+    }
+    return name;
+  });
+  const additionalObjs = Object.keys(columns).reduce((acc, name) => {
+    if (allHierarchyColumnNames.includes(name)) {
+      return acc;
+    }
+    acc[name] = columns[name];
+    return acc;
+  }, {});
+  const newHierarchy = Object.keys(hierarchy).reduce((acc, name) => {
+    if (name in columns) {
+      acc[name] = hierarchy[name];
+    } else if (!isEmptyArray(hierarchy[name]?.children)) {
+      const hierarchyColumn = hierarchy[name];
+      hierarchyColumn.children = hierarchyColumn.children?.filter(child =>
+        Object.keys(columns).includes(child.name),
+      );
+      if (hierarchyColumn.children?.length) {
+        acc[name] = hierarchyColumn;
+      }
+    }
+    return acc;
+  }, additionalObjs);
+  model.hierarchy = newHierarchy;
+  return model;
+};
+
+export function buildAntdTreeNodeModel<T extends TreeDataNode & { value: any }>(
+  ancestors: string[] = [],
+  nodeName: string,
+  children?: T[],
+  isLeaf?: boolean,
+): T {
+  const TREE_HIERARCHY_SEPERATOR = String.fromCharCode(0);
+  const fullNames = ancestors.concat(nodeName);
+  return {
+    key: fullNames.join(TREE_HIERARCHY_SEPERATOR),
+    title: nodeName,
+    value: fullNames,
+    children,
+    isLeaf,
+  } as any;
 }

@@ -133,6 +133,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     <ModalForm
       formProps={formProps}
       {...modalProps}
+      title={t(simple ? 'folder' : 'title')}
       type={type}
       visible={visible}
       confirmLoading={currentEditingView?.stage === ViewViewModelStages.Saving}

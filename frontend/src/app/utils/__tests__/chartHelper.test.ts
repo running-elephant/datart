@@ -22,6 +22,7 @@ import {
   IFieldFormatConfig,
 } from '../../types/ChartConfig';
 import {
+  getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getStyles,
   getValue,
@@ -415,6 +416,63 @@ describe('Chart Helper ', () => {
     });
   });
 
+  describe('getColorizeGroupSeriesColumns Test', () => {
+    test('should group dataset', () => {
+      const columns = [
+        ['stephen', 'engineer', '36'],
+        ['jack', 'sales', '28'],
+        ['tom', 'engineer', '30'],
+        ['john', 'sales', '32'],
+      ];
+      const metas = [
+        { name: 'name' },
+        { name: 'current(profession)' },
+        { name: 'age' },
+      ];
+      const chartDataSet = transformToDataSet(columns, metas, [
+        {
+          rows: [
+            {
+              colName: 'name',
+            },
+            {
+              colName: 'profession',
+              aggregate: 'current',
+            },
+
+            {
+              colName: 'age',
+            },
+          ],
+        },
+      ] as any);
+
+      expect(
+        JSON.stringify(
+          getColorizeGroupSeriesColumns(chartDataSet, {
+            colName: 'profession',
+            aggregate: 'current',
+          } as any),
+        ),
+      ).toBe(
+        JSON.stringify([
+          {
+            engineer: [
+              ['stephen', 'engineer', '36'],
+              ['tom', 'engineer', '30'],
+            ],
+          },
+          {
+            sales: [
+              ['jack', 'sales', '28'],
+              ['john', 'sales', '32'],
+            ],
+          },
+        ]),
+      );
+    });
+  });
+
   describe('transformToDataSet Test', () => {
     test('should get dataset model with ignore case compare', () => {
       const columns = [
@@ -473,6 +531,31 @@ describe('Chart Helper ', () => {
         } as any),
       ).toEqual(1);
       expect(chartDataSet[0].getCellByKey('AVG(age)')).toEqual('r1-c2-v');
+    });
+
+    test('should get dataset row data with case sensitive', () => {
+      const columns = [['r1-c1-v', 'r1-c2-v']];
+      const metas = [{ name: 'name' }, { name: 'avg(age)' }];
+      const chartDataSet = transformToDataSet(columns, metas, [
+        {
+          rows: [
+            {
+              colName: 'Name',
+            },
+            {
+              colName: 'Age',
+              aggregate: 'AVG',
+            },
+          ],
+        },
+      ] as any);
+
+      expect(chartDataSet?.length).toEqual(1);
+      expect(chartDataSet[0] instanceof ChartDataSetRow).toBeTruthy();
+      expect(chartDataSet[0].convertToCaseSensitiveObject()).toEqual({
+        Name: 'r1-c1-v',
+        'AVG(Age)': 'r1-c2-v',
+      });
     });
   });
 

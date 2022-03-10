@@ -15,11 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
+
 import React, { createContext, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
-import { BoardContext } from '../contexts/BoardContext';
 import StyledBackground from '../pages/Board/components/StyledBackground';
+import { BoardConfigContext } from './BoardProvider/BoardConfigProvider';
+import { BoardContext } from './BoardProvider/BoardProvider';
+
 export const scaleContext = createContext<[number, number]>([1, 1]);
 export interface IProps {
   scale: [number, number];

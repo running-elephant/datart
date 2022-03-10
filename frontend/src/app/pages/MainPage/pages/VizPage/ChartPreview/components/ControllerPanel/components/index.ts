@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-import { ChartDTO } from "app/types/ChartDTO";
 import { FilterCondition } from 'app/types/ChartConfig';
+import { ChartDTO } from 'app/types/ChartDTO';
 import DropdownListFilter from './DropdownListFilter';
 import MultiDropdownListFilter from './MultiDropdownListFilter';
 import RadioGroupFilter from './RadioGroupFilter';

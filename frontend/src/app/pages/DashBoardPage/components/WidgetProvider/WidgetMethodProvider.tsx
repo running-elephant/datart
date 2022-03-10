@@ -19,17 +19,21 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
+import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams, ChartsEventData } from 'app/types/Chart';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
-import React, { FC, useCallback, useContext } from 'react';
-import { useDispatch } from 'react-redux';
-import { useHistory } from 'react-router';
-import { BoardContext } from '../../contexts/BoardContext';
 import {
-  WidgetMethodContext,
-  WidgetMethodContextProps,
-} from '../../contexts/WidgetMethodContext';
+  createContext,
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
 import { boardActions } from '../../pages/Board/slice';
 import {
   getChartWidgetDataAsync,
@@ -58,19 +62,32 @@ import {
   getEditChartWidgetDataAsync,
   getEditWidgetData,
 } from '../../pages/BoardEditor/slice/thunk';
+import { BoardContext } from '../BoardProvider/BoardProvider';
 import { widgetActionType } from '../WidgetToolBar/config';
 
 const { confirm } = Modal;
+
+export interface WidgetMethodContextProps {
+  onWidgetAction: (action: widgetActionType, widget: Widget) => void;
+  widgetChartClick: (widget: Widget, params: ChartMouseEventParams) => void;
+  onClearLinkage: (widget: Widget) => void;
+}
+export const WidgetMethodContext = createContext<WidgetMethodContextProps>(
+  {} as WidgetMethodContextProps,
+);
 export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   widgetId,
   children,
 }) => {
   const t = usePrefixI18N('viz.widget.action');
   const { boardId, editing, renderMode, orgId } = useContext(BoardContext);
-
+  const vizs = useSelector(selectVizs);
+  const propsFolderIds = useMemo(() => {
+    return vizs.map(v => v.relId);
+  }, [vizs]);
   const dispatch = useDispatch();
   const history = useHistory();
-
+  const [folderIds, setFolderIds] = useState<any[]>([]);
   // deleteWidget
   const onWidgetDelete = useCallback(
     (type: WidgetType, wid: string) => {
@@ -235,7 +252,6 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
 
     [editing, dispatch, boardId, widgetId],
   );
-
   const onClearLinkage = useCallback(
     (widget: Widget) => {
       onToggleLinkage(false);
@@ -283,7 +299,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     data: ChartsEventData | undefined,
     fieldName: string,
   ) => {
-    let toCaseField = fieldName.toUpperCase();
+    let toCaseField = fieldName;
     return data?.rowData[toCaseField];
   };
   const toLinkingWidgets = useCallback(
@@ -506,17 +522,23 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       // jump
       const jumpConfig = widget.config?.jumpConfig;
       if (jumpConfig && jumpConfig.open) {
+        if (
+          jumpConfig.targetType === 'INTERNAL' &&
+          !folderIds.includes(jumpConfig.target.relId)
+        ) {
+          return;
+        }
         clickJump({ widget, params });
         return;
       }
       // linkage
       const linkageConfig = widget.config.linkageConfig;
-      if (linkageConfig?.open) {
+      if (linkageConfig?.open && widget.relations.length) {
         toLinkingWidgets(widget, params);
         return;
       }
     },
-    [clickJump, getTableChartData, toLinkingWidgets],
+    [clickJump, getTableChartData, toLinkingWidgets, folderIds],
   );
   const Methods: WidgetMethodContextProps = {
     onWidgetAction: onWidgetAction,
@@ -524,6 +546,11 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     onClearLinkage: onClearLinkage,
   };
 
+  useEffect(() => {
+    if (folderIds.length !== propsFolderIds?.length) {
+      setFolderIds(propsFolderIds);
+    }
+  }, [propsFolderIds, folderIds.length]);
   return (
     <WidgetMethodContext.Provider value={Methods}>
       {children}

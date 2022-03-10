@@ -17,10 +17,6 @@
  */
 
 import { Form } from 'antd';
-import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
-import { WidgetDataContext } from 'app/pages/DashBoardPage/contexts/WidgetDataContext';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ControllerConfig,
@@ -42,6 +38,10 @@ import React, {
   useMemo,
 } from 'react';
 import styled from 'styled-components/macro';
+import { BoardActionContext } from '../../BoardProvider/BoardActionProvider';
+import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
+import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { LabelName } from '../WidgetName/WidgetName';
 import { CheckboxGroupControllerForm } from './Controller/CheckboxGroupController';
 import { MultiSelectControllerForm } from './Controller/MultiSelectController';

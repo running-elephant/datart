@@ -142,6 +142,104 @@ const config: ChartConfig = {
       ],
     },
     {
+      label: 'label.leftYTitle',
+      key: 'leftYLabel',
+      comType: 'group',
+      rows: [
+        {
+          label: 'label.showLabel',
+          key: 'showLabel',
+          default: true,
+          comType: 'checkbox',
+        },
+        {
+          label: 'label.position',
+          key: 'position',
+          comType: 'select',
+          default: 'top',
+          options: {
+            // TODO(Stephen): to be extract customize LabelPosition Component
+            items: [
+              { label: '上', value: 'top' },
+              { label: '左', value: 'left' },
+              { label: '右', value: 'right' },
+              { label: '下', value: 'bottom' },
+              { label: '内', value: 'inside' },
+              { label: '内左', value: 'insideLeft' },
+              { label: '内右', value: 'insideRight' },
+              { label: '内上', value: 'insideTop' },
+              { label: '内下', value: 'insideBottom' },
+              { label: '内左上', value: 'insideTopLeft' },
+              { label: '内左下', value: 'insideBottomLeft' },
+              { label: '内右上', value: 'insideTopRight' },
+              { label: '内右下', value: 'insideBottomRight' },
+            ],
+          },
+        },
+        {
+          label: 'viz.palette.style.font',
+          key: 'font',
+          comType: 'font',
+          default: {
+            fontFamily: 'PingFang SC',
+            fontSize: '12',
+            fontWeight: 'normal',
+            fontStyle: 'normal',
+            color: '#495057',
+          },
+        },
+      ],
+    },
+    {
+      label: 'label.rightYTitle',
+      key: 'rightYLabel',
+      comType: 'group',
+      rows: [
+        {
+          label: 'label.showLabel',
+          key: 'showLabel',
+          default: true,
+          comType: 'checkbox',
+        },
+        {
+          label: 'label.position',
+          key: 'position',
+          comType: 'select',
+          default: 'top',
+          options: {
+            // TODO(Stephen): to be extract customize LabelPosition Component
+            items: [
+              { label: '上', value: 'top' },
+              { label: '左', value: 'left' },
+              { label: '右', value: 'right' },
+              { label: '下', value: 'bottom' },
+              { label: '内', value: 'inside' },
+              { label: '内左', value: 'insideLeft' },
+              { label: '内右', value: 'insideRight' },
+              { label: '内上', value: 'insideTop' },
+              { label: '内下', value: 'insideBottom' },
+              { label: '内左上', value: 'insideTopLeft' },
+              { label: '内左下', value: 'insideBottomLeft' },
+              { label: '内右上', value: 'insideTopRight' },
+              { label: '内右下', value: 'insideBottomRight' },
+            ],
+          },
+        },
+        {
+          label: 'viz.palette.style.font',
+          key: 'font',
+          comType: 'font',
+          default: {
+            fontFamily: 'PingFang SC',
+            fontSize: '12',
+            fontWeight: 'normal',
+            fontStyle: 'normal',
+            color: '#495057',
+          },
+        },
+      ],
+    },
+    {
       label: 'leftY.title',
       key: 'leftY',
       comType: 'group',
@@ -501,6 +599,12 @@ const config: ChartConfig = {
           label: '数值',
           stack: '堆叠',
         },
+        label: {
+          leftYTitle: '左轴标签',
+          rightYTitle: '右轴标签',
+          showLabel: '显示标签',
+          position: '位置',
+        },
         legend: {
           title: '图例',
           showLegend: '显示图例',
@@ -577,6 +681,12 @@ const config: ChartConfig = {
           symbol: 'Symbol',
           label: 'Label',
           stack: 'Stack',
+        },
+        label: {
+          leftYTitle: 'Left Y Axis Label',
+          rightYTitle: 'Right Y Axis Label',
+          showLabel: 'Show Label',
+          position: 'Position',
         },
         legend: {
           title: 'Legend',

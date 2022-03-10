@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { Modal } from 'antd';
-import { useQuillBar } from 'app/components/ChartGraph/BasicRichText/useQuillBar';
-import ChromeColorPicker from 'app/components/ColorPicker/ChromeColorPicker';
+import {
+  CustomColor,
+  QuillPalette,
+} from 'app/components/ChartGraph/BasicRichText/RichTextPluginLoader/CustomColor';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import {
   MediaWidgetContent,
   Widget,
@@ -46,10 +46,12 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
+import { SPACE_TIMES } from 'styles/StyleConstants';
+import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
+import { BoardContext } from '../../../BoardProvider/BoardProvider';
 import { MarkdownOptions } from './configs/MarkdownOptions';
 import TagBlot from './configs/TagBlot';
 import { Formats } from './Formats';
-
 // import produce from 'immer';
 Quill.register('modules/imageDrop', ImageDrop);
 Quill.register('formats/tag', TagBlot);
@@ -71,6 +73,7 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   const t = useI18NPrefix();
   const dispatch = useDispatch();
   const { editing: boardEditing } = useContext(BoardContext);
+  const { onClearActiveWidgets } = useContext(BoardActionContext);
   const initContent = useMemo(() => {
     return (widgetConfig.config.content as MediaWidgetContent).richTextConfig
       ?.content;
@@ -81,22 +84,24 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   const [containerId, setContainerId] = useState<string>();
   const [quillModules, setQuillModules] = useState<any>(null);
 
+  const [customColorVisible, setCustomColorVisible] = useState<boolean>(false);
   const [customColor, setCustomColor] = useState<{
     background: string;
     color: string;
-  }>({ ...CUSTOM_COLOR_INIT });
+  }>({ ...QuillPalette.RICH_TEXT_CUSTOM_COLOR_INIT });
   const [customColorType, setCustomColorType] = useState<
     'color' | 'background'
   >('color');
-
-  const [customColorVisible, setCustomColorVisible] = useState<boolean>(false);
-
-  useEffect(() => {
-    setQuillValue(initContent);
-  }, [initContent]);
+  const [contentSavable, setContentSavable] = useState(false);
 
   useEffect(() => {
-    if (widgetInfo.editing === false && boardEditing) {
+    if (widgetInfo.editing) {
+      setQuillValue(initContent);
+    }
+  }, [initContent, widgetInfo.editing]);
+
+  useEffect(() => {
+    if (widgetInfo.editing === false && contentSavable && boardEditing) {
       if (quillRef.current) {
         let contents = quillRef.current?.getEditor().getContents();
         const strContents = JSON.stringify(contents);
@@ -116,6 +121,7 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
               mediaWidgetContent: nextMediaWidgetContent,
             }),
           );
+          setContentSavable(false);
         }
       }
     }
@@ -123,6 +129,7 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
     boardEditing,
     dispatch,
     initContent,
+    contentSavable,
     widgetConfig.config.content,
     widgetConfig.id,
     widgetInfo.editing,
@@ -136,14 +143,14 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
         container: `#${newId}`,
         handlers: {
           color: function (value) {
-            if (value === CUSTOM_COLOR) {
+            if (value === QuillPalette.RICH_TEXT_CUSTOM_COLOR) {
               setCustomColorType('color');
               setCustomColorVisible(true);
             }
             quillRef.current!.getEditor().format('color', value);
           },
           background: function (value) {
-            if (value === CUSTOM_COLOR) {
+            if (value === QuillPalette.RICH_TEXT_CUSTOM_COLOR) {
               setCustomColorType('background');
               setCustomColorVisible(true);
             }
@@ -201,6 +208,20 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
     }
   }, [quillModules]);
 
+  useEffect(() => {
+    let palette: QuillPalette | null = null;
+    if (quillRef.current && containerId) {
+      palette = new QuillPalette(quillRef.current, {
+        toolbarId: containerId,
+        onChange: setCustomColor,
+      });
+    }
+
+    return () => {
+      palette?.destroy();
+    };
+  }, [containerId]);
+
   const ssp = e => {
     e.stopPropagation();
   };
@@ -211,7 +232,11 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
       setQuillValue(contents);
     }
   }, []);
-  const toolbar = useQuillBar(containerId, t, CUSTOM_COLOR);
+
+  const toolbar = useMemo(
+    () => QuillPalette.getToolbar({ id: containerId as string, t }),
+    [containerId, t],
+  );
 
   const customColorChange = color => {
     if (color) {
@@ -220,106 +245,92 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
     setCustomColorVisible(false);
   };
 
+  const modalCancel = useCallback(() => {
+    onClearActiveWidgets();
+  }, [onClearActiveWidgets]);
+
+  const modalOk = useCallback(() => {
+    setContentSavable(true);
+    modalCancel();
+  }, [modalCancel]);
+
   return (
-    <TextWrap onClick={ssp} editing={widgetInfo.editing}>
-      <div className="react-quill react-quill-edit">
+    <TextWrap onClick={ssp}>
+      <ReactQuill
+        className="react-quill"
+        value={initContent}
+        modules={{ toolbar: null }}
+        formats={Formats}
+        readOnly={true}
+      />
+      <CustomColor
+        visible={customColorVisible}
+        onCancel={() => setCustomColorVisible(false)}
+        color={customColor?.[customColorType]}
+        colorChange={customColorChange}
+      />
+      <Modal
+        width={992}
+        closable={false}
+        maskClosable={false}
+        keyboard={false}
+        visible={widgetInfo.editing}
+        onOk={modalOk}
+        onCancel={modalCancel}
+      >
         {quillModules && (
-          <>
+          <ModalBody>
             {toolbar}
             <ReactQuill
               ref={quillRef}
               className="react-quill"
-              placeholder="请输入"
+              placeholder={t('viz.board.setting.enterHere')}
               value={quillValue}
               onChange={quillChange}
               modules={quillModules}
               formats={Formats}
               readOnly={false}
-              theme={'bubble'}
             />
-          </>
+          </ModalBody>
         )}
-      </div>
-      <div className="react-quill react-quill-view">
-        <ReactQuill
-          className="react-quill"
-          placeholder=""
-          value={initContent}
-          modules={{ toolbar: null }}
-          formats={Formats}
-          readOnly={true}
-        />
-      </div>
-      <Modal
-        width={273}
-        mask={false}
-        visible={customColorVisible}
-        footer={null}
-        closable={false}
-        onCancel={() => setCustomColorVisible(false)}
-      >
-        <ChromeColorPicker
-          key={customColor?.[customColorType]}
-          color={customColor?.[customColorType]}
-          onChange={customColorChange}
-        />
       </Modal>
     </TextWrap>
   );
 };
 export default RichTextWidget;
 
-interface TextWrapProps {
-  editing: boolean;
-}
-// todo (tianlei) Need to nationalize
-const TextWrap = styled.div<TextWrapProps>`
+const TextWrap = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  overflow: ${p => (p.editing ? '' : 'hidden')};
+  overflow: hidden;
 
-  .react-quill {
+  & .react-quill {
     width: 100%;
     height: 100%;
-  }
-
-  .react-quill-edit {
-    display: ${p => (p.editing ? 'block' : 'none')};
-  }
-
-  .react-quill-view {
-    display: ${p => (p.editing ? 'none' : 'block')};
   }
 
   & .ql-snow {
     border: none;
   }
+
   & .ql-container.ql-snow {
     border: none;
   }
 
-  .ql-picker-options [data-value=${CUSTOM_COLOR}] {
-    position: relative;
-    width: calc(100% - 4px);
-    background-color: transparent !important;
-    color: #343a40;
-    font-weight: 400;
-    font-size: 12px;
-    &::after {
-      content: '更多';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      color: #fff;
-      transform: translate(-50%, -50%);
-    }
-    &:hover {
-      border: none;
-    }
+  & .ql-editor {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    transform: translate(0, -50%);
   }
-  .ql-bubble .ql-color .ql-picker-options,
-  .ql-bubble .ql-background .ql-picker-options {
-    width: 232px;
+`;
+
+const ModalBody = styled.div`
+  & .ql-editor {
+    min-height: ${SPACE_TIMES(60)};
   }
 `;

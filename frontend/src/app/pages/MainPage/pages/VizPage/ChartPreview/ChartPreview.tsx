@@ -199,9 +199,20 @@ const ChartPreviewBoard: FC<{
         false,
         chartPreview?.backendChart?.config?.aggregation,
       );
+
       dispatch(
         makeDownloadDataTask({
-          downloadParams: [builder.build()],
+          downloadParams: [
+            {
+              ...builder.build(),
+              ...{
+                vizId: chartPreview?.backendChart?.id,
+                vizName: chartPreview?.backendChart?.name,
+                analytics: false,
+                vizType: 'dataChart',
+              },
+            },
+          ],
           fileName: chartPreview?.backendChart?.name || 'chart',
           resolve: () => {
             dispatch(actions.setDownloadPolling(true));
@@ -244,7 +255,7 @@ const ChartPreviewBoard: FC<{
     }, [dispatch, backendChartId]);
 
     const handleAddToDashBoard = useCallback(
-      dashboardId => {
+      (dashboardId, dashboardType) => {
         const currentChartPreview = previewCharts.find(
           c => c.backendChartId === backendChartId,
         );
@@ -257,6 +268,7 @@ const ChartPreviewBoard: FC<{
                 chartType: '',
                 dataChart: currentChartPreview?.backendChart,
                 dataview: currentChartPreview?.backendChart?.view,
+                dashboardType,
               }),
             },
           });

@@ -16,13 +16,14 @@
  * limitations under the License.
  */
 import { Space } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { FC, useContext } from 'react';
 import styled from 'styled-components';
-import { BoardContext } from '../../contexts/BoardContext';
-import { WidgetContext } from '../../contexts/WidgetContext';
-import { WidgetInfoContext } from '../../contexts/WidgetInfoContext';
-import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
 import { WidgetType } from '../../pages/Board/slice/types';
+import { BoardContext } from '../BoardProvider/BoardProvider';
+import { WidgetInfoContext } from '../WidgetProvider/WidgetInfoProvider';
+import { WidgetMethodContext } from '../WidgetProvider/WidgetMethodProvider';
+import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import {
   CancelLinkageIcon,
   CanLinkageIcon,
@@ -33,9 +34,7 @@ import {
 } from './StatusIcon';
 import { WidgetActionDropdown } from './WidgetActionDropdown';
 
-interface WidgetToolBarProps {}
-
-const WidgetToolBar: FC<WidgetToolBarProps> = () => {
+const WidgetToolBar: FC = () => {
   const { boardType, editing: boardEditing } = useContext(BoardContext);
   const { onWidgetAction } = useContext(WidgetMethodContext);
   const { loading, inLinking, rendered, errInfo } =
@@ -45,12 +44,13 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
   const ssp = e => {
     e.stopPropagation();
   };
+  const t = useI18NPrefix(`viz.widget.tips`);
   const renderLocking = () => {
     if (!boardEditing) return null;
     if (!widget.config?.lock) return null;
     return (
       <LockIcon
-        title="已锁定拖拽,点击解锁"
+        title={t('unlock')}
         onClick={() => onWidgetAction('unlock', widget)}
       />
     );
@@ -60,7 +60,7 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
     const showTypes: WidgetType[] = ['chart'];
     if (!showTypes.includes(widget.config.type)) return null;
     if (rendered) return null;
-    return <WaitingIcon title="等待加载" />;
+    return <WaitingIcon title={t('waiting')} />;
   };
   const renderLoading = () => {
     const showTypes: WidgetType[] = ['chart', 'controller'];
@@ -71,19 +71,31 @@ const WidgetToolBar: FC<WidgetToolBarProps> = () => {
     if (inLinking) {
       return (
         <CancelLinkageIcon
-          title="取消联动"
+          title={t('cancelLinkage')}
           onClick={() => onClearLinkage(widget)}
         />
       );
     } else {
       return widget.config?.linkageConfig?.open ? (
-        <CanLinkageIcon title="点击图表可联动" />
+        <CanLinkageIcon title={t('canLinkage')} />
       ) : null;
     }
   };
-  const renderErrorInfo = (errInfo?: string) => {
+  const renderErrorInfo = (errInfo?: { [propName: string]: string }) => {
     if (!errInfo) return null;
-    return <ErrorIcon errInfo={errInfo} />;
+
+    const errInfoValue = Object.values(errInfo);
+
+    if (!errInfoValue.length) return null;
+
+    const errHtml = (
+      <div style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}>
+        {errInfoValue.map((v, i) => {
+          return <p key={i}>{String(v)}</p>;
+        })}
+      </div>
+    );
+    return <ErrorIcon errInfo={errHtml} />;
   };
   const renderWidgetAction = () => {
     const widgetType = widget.config.type;

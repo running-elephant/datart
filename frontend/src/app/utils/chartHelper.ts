@@ -506,7 +506,12 @@ export function getReference2(
       dataConfig,
       isHorizonDisplay,
     ),
-    markArea: getMarkArea2(referenceTabs, dataSetRows, isHorizonDisplay),
+    markArea: getMarkArea2(
+      referenceTabs,
+      dataSetRows,
+      dataConfig,
+      isHorizonDisplay,
+    ),
   };
 }
 
@@ -682,8 +687,10 @@ function getMarkAreaData2(
   valueTypeKey,
   constantValueKey,
   metricKey,
+  dataConfig,
   isHorizonDisplay,
 ) {
+  const metric = getSettingValue(mark.rows, metricKey, 'value');
   const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
   const show = getSettingValue(mark.rows, 'showLabel', 'value');
   const enableMarkArea = getSettingValue(mark.rows, 'enableMarkArea', 'value');
@@ -698,8 +705,10 @@ function getMarkAreaData2(
   );
   const name = mark.value;
   const valueType = getSettingValue(mark.rows, valueTypeKey, 'value');
-  const metric = getSettingValue(mark.rows, metricKey, 'value');
-  const metricDatas = dataSetRows.map(d => +d.getCellByKey(metric));
+  const metricDatas =
+    dataConfig.uid === metric
+      ? dataSetRows.map(d => +d.getCell(dataConfig))
+      : [];
   const constantValue = getSettingValue(mark.rows, constantValueKey, 'value');
   let yAxis = 0;
   switch (valueType) {
@@ -717,8 +726,8 @@ function getMarkAreaData2(
       break;
   }
 
-  if (!enableMarkArea) {
-    return null;
+  if (!enableMarkArea || !Number.isFinite(yAxis) || Number.isNaN(yAxis)) {
+    return;
   }
 
   return {
@@ -832,12 +841,12 @@ function getMarkArea(refTabs, dataColumns, isHorizonDisplay) {
 function getMarkArea2(
   refTabs,
   dataSetRows: IChartDataSetRow<string>[],
+  dataConfig,
   isHorizonDisplay,
 ) {
   const refAreas = refTabs?.reduce((acc, cur) => {
     const markLineConfigs = cur?.rows?.filter(r => r.key === 'markArea');
-    acc.push(...markLineConfigs);
-    return acc;
+    return acc.concat(markLineConfigs);
   }, []);
   return {
     data: refAreas
@@ -850,13 +859,14 @@ function getMarkArea2(
               `${prefix}ValueType`,
               `${prefix}ConstantValue`,
               `${prefix}Metric`,
+              dataConfig,
               isHorizonDisplay,
             );
           })
           .filter(Boolean);
         return markAreaData;
       })
-      .filter(m => Boolean(m?.length)),
+      .filter(m => m?.length === 2),
   };
 }
 
@@ -914,16 +924,17 @@ export function getNameTextStyle(fontFamily, fontSize, color) {
  * @template T
  * @param {T[][]} [datas]
  * @param {ChartDatasetMeta[]} [metas]
- * @param {ChartDataConfig[]} [sortedConfigs]
+ * @param {ChartDataConfig[]} [dataConfigs]
  * @return {*}  {IChartDataSet<T>}
  */
 export function transformToDataSet<T>(
   datas?: T[][],
   metas?: ChartDatasetMeta[],
-  sortedConfigs?: ChartDataConfig[],
+  dataConfigs?: ChartDataConfig[],
 ): IChartDataSet<T> {
-  const ds = new ChartDataSet(datas || [], metas || []);
-  ds.sortBy(sortedConfigs || []);
+  const fields = (dataConfigs || []).flatMap(config => config.rows || []);
+  const ds = new ChartDataSet(datas || [], metas || [], fields || []);
+  ds.sortBy(dataConfigs || []);
   return ds;
 }
 
@@ -1104,7 +1115,7 @@ export function getSeriesTooltips4Rectangular2(
     .concat(sizeConfigs || [])
     .concat(infoConfigs || [])
     .map(config =>
-      valueFormatter(config, row?.[chartDataSet.getFieldKey(config)]),
+      valueFormatter(config, row?.[chartDataSet.getFieldOriginKey(config)]),
     );
   return tooltips.join('<br />');
 }
@@ -1131,7 +1142,7 @@ export function getSeriesTooltips4Polar2(
     .concat(sizeConfigs || [])
     .concat(infoConfigs || [])
     .map(config =>
-      valueFormatter(config, row?.[chartDataSet.getFieldKey(config)]),
+      valueFormatter(config, row?.[chartDataSet.getFieldOriginKey(config)]),
     );
   return tooltips.join('<br />');
 }
@@ -1225,10 +1236,10 @@ export function getGridStyle(styles) {
 export function getExtraSeriesRowData(data) {
   if (data instanceof ChartDataSetRow) {
     return {
-      rowData: data?.convertToObject(),
+      // NOTE: row data should be case sensitive except for data chart
+      rowData: data?.convertToCaseSensitiveObject(),
     };
   }
-
   return {
     rowData: data,
   };
@@ -1242,36 +1253,13 @@ export function getExtraSeriesDataFormat(format?: IFieldFormatConfig) {
 
 export function getColorizeGroupSeriesColumns(
   chartDataSet: IChartDataSet<string>,
-  groupByKey: string,
-  xAxisColumnName: string,
-  aggregateKeys: string[],
-  infoColumnNames: string[],
+  groupConfig: ChartDataSectionField,
 ) {
-  const groupedDataColumnObject = chartDataSet?.reduce((acc, cur) => {
-    const colKey = cur.getCellByKey(groupByKey) || 'defaultGroupKey';
-
-    if (!acc[colKey]) {
-      acc[colKey] = [];
-    }
-    const value = aggregateKeys
-      .concat([xAxisColumnName])
-      .concat(infoColumnNames || [])
-      .concat([groupByKey])
-      .reduce((a, k) => {
-        a[k] = cur.getCellByKey(k);
-        return a;
-      }, {});
-    acc[colKey].push(value);
-    return acc;
-  }, {});
-
-  let collection = [] as any;
-  Object.entries(groupedDataColumnObject).forEach(([k, v]) => {
+  return Object.entries(chartDataSet.groupBy(groupConfig)).map(([k, v]) => {
     let a = {};
     a[k] = v;
-    collection.push(a);
+    return a;
   });
-  return collection;
 }
 
 /**

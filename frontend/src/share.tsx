@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-import 'antd/dist/antd.less';
+import 'antd/dist/antd.min.css';
 import 'app/assets/fonts/iconfont.css';
 import { Share } from 'app/share';
+import 'core-js/features/string/replace-all';
 import React from 'react';
 import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';

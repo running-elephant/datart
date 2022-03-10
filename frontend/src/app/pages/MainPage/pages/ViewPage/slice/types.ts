@@ -43,6 +43,7 @@ export interface ViewState {
   };
   saveViewLoading: boolean;
   unarchiveLoading: boolean;
+  databaseSchemaLoading: boolean;
 }
 
 export type DatabaseSchema = {
@@ -82,7 +83,7 @@ export interface ViewViewModel<T = object>
   description?: string;
   index: number | null;
   isFolder?: boolean;
-  model: Model;
+  model: HierarchyModel;
   config: object;
   originVariables: VariableHierarchy[];
   variables: VariableHierarchy[];
@@ -119,14 +120,28 @@ export interface Schema {
   type: ColumnTypes;
 }
 
+export enum ColumnRole {
+  Role = 'role',
+  Hierarchy = 'hierachy',
+}
+
 export interface Column extends Schema {
-  category: ColumnCategories;
+  category?: ColumnCategories;
   index?: number;
+
+  role?: ColumnRole;
+  children?: Column[];
 }
 
 export interface Model {
-  [key: string]: Omit<Column, 'name'>;
+  [key: string]: Column;
 }
+
+export type HierarchyModel = {
+  version?: string;
+  hierarchy?: Model;
+  columns?: Model;
+};
 
 export interface ColumnPermissionRaw {
   id: string;

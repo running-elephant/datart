@@ -206,19 +206,11 @@ class BasicBarChart extends Chart {
     infoConfigs,
     xAxisColumns,
   ) {
-    const xAxisColumnName = chartDataSet.getFieldKey(groupConfigs?.[0]);
-    const yAxisColumnNames = aggregateConfigs.map(config =>
-      chartDataSet.getFieldKey(config),
-    );
-    const colorColumnName = chartDataSet.getFieldKey(colorConfigs[0]);
-    const infoColumnNames = infoConfigs.map(config =>
-      chartDataSet.getFieldKey(config),
-    );
-
+    const xAxisConfig = groupConfigs?.[0];
     if (!colorConfigs.length) {
       const flatSeries = aggregateConfigs.map(aggConfig => {
         return {
-          ...this.getBarSeiesImpl(
+          ...this.getBarSeriesImpl(
             styleConfigs,
             settingConfigs,
             chartDataSet,
@@ -238,23 +230,19 @@ class BasicBarChart extends Chart {
 
     const secondGroupInfos = getColorizeGroupSeriesColumns(
       chartDataSet,
-      colorColumnName,
-      xAxisColumnName,
-      yAxisColumnNames,
-      infoColumnNames,
+      colorConfigs[0],
     );
-
     const colorizeGroupedSeries = aggregateConfigs.flatMap(aggConfig => {
       return secondGroupInfos.map(sgCol => {
         const k = Object.keys(sgCol)[0];
-        const v = sgCol[k];
+        const dataSet = sgCol[k];
 
         const itemStyleColor = colorConfigs?.[0]?.color?.colors?.find(
           c => c.key === k,
         );
 
         return {
-          ...this.getBarSeiesImpl(
+          ...this.getBarSeriesImpl(
             styleConfigs,
             settingConfigs,
             chartDataSet,
@@ -262,15 +250,15 @@ class BasicBarChart extends Chart {
           ),
           name: k,
           data: xAxisColumns?.[0]?.data?.map(d => {
-            const dc = v.find(col => col[xAxisColumnName] === d);
+            const row = dataSet.find(r => r.getCell(xAxisConfig) === d);
             return {
-              ...getExtraSeriesRowData(dc),
+              ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),
               name: getColumnRenderName(aggConfig),
-              value: dc?.[chartDataSet.getFieldKey(aggConfig)] || 0,
+              value: row?.getCell(aggConfig) || 0,
             };
           }),
-          itemStyle: this.getSerieItemStyle(styleConfigs, {
+          itemStyle: this.getSeriesItemStyle(styleConfigs, {
             color: itemStyleColor?.value,
           }),
         };
@@ -279,7 +267,7 @@ class BasicBarChart extends Chart {
     return colorizeGroupedSeries;
   }
 
-  private getBarSeiesImpl(
+  private getBarSeriesImpl(
     styleConfigs,
     settingConfigs,
     chartDataSet: IChartDataSet<string>,
@@ -288,9 +276,9 @@ class BasicBarChart extends Chart {
     return {
       type: 'bar',
       sampling: 'average',
-      barGap: this.getSerieBarGap(styleConfigs),
-      barWidth: this.getSerieBarWidth(styleConfigs),
-      itemStyle: this.getSerieItemStyle(styleConfigs, {
+      barGap: this.getSeriesBarGap(styleConfigs),
+      barWidth: this.getSeriesBarWidth(styleConfigs),
+      itemStyle: this.getSeriesItemStyle(styleConfigs, {
         color: dataConfig?.color?.start,
       }),
       ...this.getLabelStyle(styleConfigs),
@@ -331,7 +319,7 @@ class BasicBarChart extends Chart {
       });
     };
 
-    const _sereisTotalArrayByDataIndex = (series?.[0]?.data || []).map(
+    const _seriesTotalArrayByDataIndex = (series?.[0]?.data || []).map(
       (_, index) => {
         const sum = series.reduce((acc, cur) => {
           const value = +_getAbsValue(cur.data?.[index] || 0);
@@ -342,12 +330,12 @@ class BasicBarChart extends Chart {
       },
     );
     (series || []).forEach(s => {
-      s.data = _convertToPercentage(s.data, _sereisTotalArrayByDataIndex);
+      s.data = _convertToPercentage(s.data, _seriesTotalArrayByDataIndex);
     });
     return series;
   }
 
-  private getSerieItemStyle(styles, itemStyle?) {
+  private getSeriesItemStyle(styles, itemStyle?) {
     const [borderStyle, borderRadius] = getStyles(
       styles,
       ['bar'],
@@ -363,12 +351,12 @@ class BasicBarChart extends Chart {
     };
   }
 
-  private getSerieBarGap(styles) {
+  private getSeriesBarGap(styles) {
     const [gap] = getStyles(styles, ['bar'], ['gap']);
     return gap;
   }
 
-  private getSerieBarWidth(styles) {
+  private getSeriesBarWidth(styles) {
     const [width] = getStyles(styles, ['bar'], ['width']);
     return width;
   }

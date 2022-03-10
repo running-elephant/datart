@@ -35,7 +35,7 @@ import AntdTableWrapper from './AntdTableWrapper';
 import {
   getCustomBodyCellStyle,
   getCustomBodyRowStyle,
-} from './conditionStyle';
+} from './conditionalStyle';
 import Config from './config';
 import { ResizableTitle, TableComponentsTd } from './TableComponents';
 
@@ -90,7 +90,8 @@ class BasicTableChart extends ReactChart {
           options.config,
           options.widgetSpecialConfig,
         );
-        this.cachedAntTableOptions = tableOptions;
+        // this.cachedAntTableOptions = Omit(tableOptions, ['dataSource']);
+        this.cachedAntTableOptions = Omit(tableOptions, []);
         this.cachedDatartConfig = options.config;
         this.cacheContext = context;
         this.adapter?.updated(tableOptions, context);
@@ -165,13 +166,14 @@ class BasicTableChart extends ReactChart {
     const tableColumns = this.getColumns(
       mixedSectionConfigRows,
       styleConfigs,
+      settingConfigs,
       chartDataSet,
       context,
     );
     return {
       rowKey: 'id',
       pagination: tablePagination,
-      dataSource: chartDataSet.map(row => row.convertToObject()),
+      dataSource: chartDataSet,
       columns: tableColumns,
       summaryFn: this.getTableSummaryFn(
         settingConfigs,
@@ -180,6 +182,11 @@ class BasicTableChart extends ReactChart {
         aggregateConfigs,
         context,
       ),
+      onRow: (_, index) => {
+        const row = chartDataSet?.[index];
+        const rowData = row?.convertToCaseSensitiveObject();
+        return { index, rowData };
+      },
       components: this.getTableComponents(styleConfigs, widgetSpecialConfig),
       ...this.getAntdTableStyleOptions(styleConfigs, settingConfigs, context),
       onChange: (pagination, filters, sorter, extra) => {
@@ -230,6 +237,7 @@ class BasicTableChart extends ReactChart {
     return this.getColumns(
       mixedSectionConfigRows,
       styleConfigs,
+      settingConfigs,
       chartDataSet,
       context,
     );
@@ -506,15 +514,18 @@ class BasicTableChart extends ReactChart {
       ['column', 'modal', 'list'],
       'rows',
     );
-    let allConditionStyle: any[] = [];
+    let allConditionalStyle: any[] = [];
     getAllColumnListInfo?.forEach(info => {
-      const [getConditionStyleValue] = getStyles(
+      const [getConditionalStyleValue] = getStyles(
         info.rows,
-        ['conditionStyle'],
-        ['conditionStylePanel'],
+        ['conditionalStyle'],
+        ['conditionalStylePanel'],
       );
-      if (Array.isArray(getConditionStyleValue)) {
-        allConditionStyle = [...allConditionStyle, ...getConditionStyleValue];
+      if (Array.isArray(getConditionalStyleValue)) {
+        allConditionalStyle = [
+          ...allConditionalStyle,
+          ...getConditionalStyleValue,
+        ];
       }
     });
     return {
@@ -550,29 +561,34 @@ class BasicTableChart extends ReactChart {
       },
       body: {
         cell: props => {
-          const { style, dataIndex, ...rest } = props;
+          const { style, key, rowData, ...rest } = props;
           const uid = props.uid;
-          const [conditionStyle] = getStyles(
+          const [conditionalStyle] = getStyles(
             getAllColumnListInfo,
-            [uid, 'conditionStyle'],
-            ['conditionStylePanel'],
+            [uid, 'conditionalStyle'],
+            ['conditionalStylePanel'],
           );
           const conditionalCellStyle = getCustomBodyCellStyle(
-            props,
-            conditionStyle,
+            props?.cellValue,
+            conditionalStyle,
           );
+          const sensitiveFieldName = Object.keys(rowData || {})?.[0];
           return (
             <TableComponentsTd
               {...rest}
               style={Object.assign(style || {}, conditionalCellStyle)}
-              isLinkCell={linkFields?.includes(dataIndex)}
-              isJumpCell={jumpField === dataIndex}
+              isLinkCell={linkFields?.includes(sensitiveFieldName)}
+              isJumpCell={jumpField === sensitiveFieldName}
             />
           );
         },
         row: props => {
           const { style, ...rest } = props;
-          const rowStyle = getCustomBodyRowStyle(props, allConditionStyle);
+          // NOTE: rowData is case sensitive row keys object
+          const rowStyle = getCustomBodyRowStyle(
+            props.rowData,
+            allConditionalStyle,
+          );
           return <tr {...rest} style={Object.assign(style || {}, rowStyle)} />;
         },
         wrapper: props => {
@@ -608,6 +624,7 @@ class BasicTableChart extends ReactChart {
   protected getColumns(
     mixedSectionConfigRows,
     styleConfigs,
+    settingConfigs,
     chartDataSet,
     context,
   ) {
@@ -621,6 +638,7 @@ class BasicTableChart extends ReactChart {
       ['header', 'modal'],
       ['tableHeaders'],
     );
+    const [pageSize] = getStyles(settingConfigs, ['paging'], ['pageSize']);
 
     const columnsList =
       !tableHeaderStyles || tableHeaderStyles.length === 0
@@ -645,11 +663,8 @@ class BasicTableChart extends ReactChart {
                 ?.columnWidthValue || 0,
             fixed: leftFixedColumns || rightFixedColumns ? 'left' : null,
             render: (value, row, rowIndex) => {
-              return (
-                (this.pageInfo.pageNo - 1) * this.pageInfo.pageSize +
-                rowIndex +
-                1
-              );
+              const pageNo = this.pageInfo?.pageNo || 1;
+              return (pageNo - 1) * (pageSize || 100) + rowIndex + 1;
             },
           } as any,
         ]
@@ -704,7 +719,7 @@ class BasicTableChart extends ReactChart {
       return {
         sorter: true,
         title: getColumnRenderName(c),
-        dataIndex: chartDataSet.getFieldKey(c),
+        dataIndex: chartDataSet.getFieldIndex(c),
         key: chartDataSet.getFieldKey(c),
         aggregate: c?.aggregate,
         colName,
@@ -732,15 +747,18 @@ class BasicTableChart extends ReactChart {
         onCell: (record, rowIndex) => {
           const row = chartDataSet[rowIndex];
           const cellValue = row.getCell(c);
+          const rowData = { [chartDataSet.getFieldOriginKey(c)]: cellValue };
           return {
             uid: c.uid,
             cellValue,
             dataIndex: row.getFieldKey(c),
+            rowData,
             ...this.registerTableCellEvents(
-              row.getFieldKey(c),
+              colName,
               cellValue,
               rowIndex,
-              record,
+              rowData,
+              c.aggregate,
             ),
           };
         },
@@ -1012,7 +1030,8 @@ class BasicTableChart extends ReactChart {
     seriesName: string,
     value: any,
     dataIndex: number,
-    record: any,
+    rowData: any,
+    aggOperator?: string,
   ) {
     const eventParams = this.createrEventParams({
       seriesType: 'body',
@@ -1020,7 +1039,8 @@ class BasicTableChart extends ReactChart {
       data: {
         format: undefined,
         name: seriesName,
-        rowData: record,
+        aggOperator,
+        rowData,
         value: value,
       },
       seriesName, // column name/index

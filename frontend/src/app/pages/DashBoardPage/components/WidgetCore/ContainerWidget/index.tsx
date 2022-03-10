@@ -15,9 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
+
 import { ContainerWidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { useContext } from 'react';
+import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { TabWidget } from './TabWidget';
 
 export const ContainerWidget: React.FC<{}> = () => {

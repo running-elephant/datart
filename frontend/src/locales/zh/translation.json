@@ -162,7 +162,12 @@
           "confirmPassword": "确定新密码"
         },
         "switchLanguage": {
-          "title": "切换语言"
+          "title": "语言"
+        },
+        "switchTheme": {
+          "title": "主题",
+          "light": "明亮",
+          "dark": "黑暗"
         },
         "logout": {
           "title": "退出登录"
@@ -448,6 +453,7 @@
         "open": "开启",
         "close": "关闭",
         "cancel": "取消",
+        "downloadList": "下载列表",
         "lang": {
           "zh": "中文",
           "en": "英文"
@@ -500,7 +506,7 @@
             }
           }
         },
-        "conditionStyleTable": {
+        "conditionalStyleTable": {
           "btn": {
             "add": "新增",
             "edit": "编辑",
@@ -579,6 +585,9 @@
           "normal": "常规体",
           "italic": "斜体",
           "oblique": "偏斜体"
+        },
+        "lineHeight": {
+          "default": "默认行高"
         }
       },
       "data": {
@@ -679,11 +688,20 @@
           "endMetric": "结束关联指标",
           "font": "字体",
           "showLabel": "显示标签",
-          "position": "标签位置",
+          "position": {
+            "title": "标签位置",
+            "start": "开始",
+            "middle": "中间",
+            "end": "结尾"
+          },
           "lineStyle": "线条样式",
           "opacity": "透明度",
           "backgroundColor": "背景颜色",
-          "borderStyle": "边框样式"
+          "borderStyle": "边框样式",
+          "constant": "常量",
+          "avg": "平均值",
+          "max": "最大值",
+          "min": "最小值"
         },
         "paging": {
           "title": "常规",
@@ -843,7 +861,8 @@
         "autoPlay": "自动播放",
         "duration": "停留时间(秒)",
         "delPagesTip": "确认删除所有选中的故事页",
-        "delPageTip": "确认删除此故事页？"
+        "delPageTip": "确认删除此故事页？",
+        "enterHere": "请输入"
       }
     },
     "widget": {
@@ -870,6 +889,7 @@
       "action": {
         "refresh": "同步数据",
         "fullScreen": "全屏",
+        "lock": "锁定拖拽",
         "edit": "编辑",
         "delete": "删除",
         "confirmDel": "确认删除",
@@ -879,6 +899,12 @@
         "closeLinkage": "关闭联动",
         "makeJump": "跳转设置",
         "closeJump": "关闭跳转"
+      },
+      "tips": {
+        "unlock": "已锁定拖拽,点击解锁",
+        "waiting": "等待加载",
+        "cancelLinkage": "取消联动",
+        "canLinkage": "点击图表可联动"
       }
     },
     "linkage": {
@@ -887,7 +913,8 @@
       "associatedWidgets": "关联组件",
       "associatedFields": "关联字段",
       "selectTriggers": "选择触发字段",
-      "selectLinker": "选择联动字段"
+      "selectLinker": "选择联动字段",
+      "linkageError": "联动的图表已经被删除，请重新配置"
     },
     "jump": {
       "title": "跳转设置",
@@ -897,7 +924,8 @@
       "URL": "URL",
       "parameters": "Parameters",
       "controller": "关联控制器",
-      "associatedFields": "关联字段"
+      "associatedFields": "关联字段",
+      "jumpError": "跳转的目标已失效或被删除，请重新配置"
     },
     "associate": {
       "title": "关联字段/变量",
@@ -1050,10 +1078,13 @@
     },
     "model": {
       "category": "分类",
+      "rename": "重命名",
+      "delete": "删除",
       "typeAndCategory": "类型与分类",
       "permission": "列权限",
       "newHierarchy": "新建层次结构",
-      "addToHierarchy": "添加到层次结构"
+      "addToHierarchy": "添加到层次结构",
+      "hierarchyName": "层级名称"
     },
     "columnPermission": {
       "title": "列权限",
@@ -1098,6 +1129,9 @@
     "archived": "已归档",
     "noPermission": "您没有权限访问该页面",
     "creatView": "去新建数据视图",
+    "syncDatabase": "同步数据库模式",
+    "syncDatabaseSchemaSuccess": "已成功获取数据库模式",
+    "lastUpdateTime": "最近同步时间",
     "sidebar": {
       "title": "数据源列表",
       "add": "新建数据源",
@@ -1148,6 +1182,7 @@
       "remove": "移除"
     },
     "form": {
+      "email": "邮箱",
       "search": "请搜索或粘贴被邀请成员邮箱",
       "needConfirm": "需要被邀请成员邮件确认"
     },

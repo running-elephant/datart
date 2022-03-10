@@ -70,13 +70,8 @@ public class ViewExecuteParam {
 
     public boolean isEmpty() {
         return CollectionUtils.isEmpty(columns)
-                && CollectionUtils.isEmpty(keywords)
-                && CollectionUtils.isEmpty(params)
-                && CollectionUtils.isEmpty(functionColumns)
                 && CollectionUtils.isEmpty(aggregators)
-                && CollectionUtils.isEmpty(filters)
-                && CollectionUtils.isEmpty(groups)
-                && CollectionUtils.isEmpty(orders);
+                && CollectionUtils.isEmpty(groups);
     }
 
 }

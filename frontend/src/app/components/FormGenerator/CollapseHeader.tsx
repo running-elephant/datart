@@ -35,4 +35,5 @@ const StyledCollapseHeader = styled.span`
   font-size: ${FONT_SIZE_BODY};
   font-weight: ${FONT_WEIGHT_REGULAR};
   color: ${p => p.theme.textColorSnd};
+  user-select: none;
 `;

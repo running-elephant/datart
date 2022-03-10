@@ -246,37 +246,49 @@ const widgetInfoRecordSlice = createSlice({
         boardId?: string;
         widgetId: string;
         errInfo?: string;
+        errorType: 'request' | 'interaction';
       }>,
     ) {
-      const { widgetId, errInfo } = action.payload;
-      state[widgetId].errInfo = errInfo;
+      const { widgetId, errInfo, errorType } = action.payload;
+      let errorObj = state[widgetId].errInfo || {};
+      if (errInfo) {
+        errorObj[errorType] = errInfo;
+      } else {
+        delete errorObj[errorType];
+      }
+      state[widgetId].errInfo = errorObj;
     },
   },
   extraReducers: builder => {
     builder.addCase(getEditChartWidgetDataAsync.pending, (state, action) => {
       const { widgetId } = action.meta.arg;
-      if (state[widgetId]) {
-        state[widgetId].loading = true;
-      }
+      if (!state?.[widgetId]) return;
+      state[widgetId].loading = true;
     });
     builder.addCase(getEditChartWidgetDataAsync.fulfilled, (state, action) => {
       const { widgetId } = action.meta.arg;
+      if (!state?.[widgetId]) return;
+
       state[widgetId].loading = false;
     });
     builder.addCase(getEditChartWidgetDataAsync.rejected, (state, action) => {
       const { widgetId } = action.meta.arg;
+      if (!state?.[widgetId]) return;
       state[widgetId].loading = false;
     });
     builder.addCase(getEditControllerOptions.pending, (state, action) => {
       const widgetId = action.meta.arg;
+      if (!state?.[widgetId]) return;
       state[widgetId].loading = true;
     });
     builder.addCase(getEditControllerOptions.fulfilled, (state, action) => {
       const widgetId = action.meta.arg;
+      if (!state?.[widgetId]) return;
       state[widgetId].loading = false;
     });
     builder.addCase(getEditControllerOptions.rejected, (state, action) => {
       const widgetId = action.meta.arg;
+      if (!state?.[widgetId]) return;
       state[widgetId].loading = false;
     });
   },

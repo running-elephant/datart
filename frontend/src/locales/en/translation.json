@@ -162,7 +162,12 @@
           "confirmPassword": "Confirm password"
         },
         "switchLanguage": {
-          "title": "language"
+          "title": "Language"
+        },
+        "switchTheme": {
+          "title": "Theme",
+          "light": "Light",
+          "dark": "Dark"
         },
         "logout": {
           "title": "Logout"
@@ -448,6 +453,7 @@
         "open": "Open",
         "close": "Close",
         "cancel": "Cancel",
+        "downloadList": "Download list",
         "lang": {
           "zh": "zh",
           "en": "en"
@@ -500,7 +506,7 @@
             }
           }
         },
-        "conditionStyleTable": {
+        "conditionalStyleTable": {
           "btn": {
             "add": "Add",
             "edit": "Edit",
@@ -508,7 +514,7 @@
             "confirm": "Confirm"
           },
           "modal": {
-            "title": "Condition Style",
+            "title": "Conditional Style",
             "notFoundContent": "Multiple values can be added (enter the content and press enter to complete the addition)"
           },
           "header": {
@@ -568,6 +574,9 @@
           "helvetica": "Helvetica",
           "arial": "Arial",
           "sansSerif": "sans-serif"
+        },
+        "lineHeight": {
+          "default": "Default Line Height"
         },
         "fontWeight": {
           "normal": "Normal",
@@ -679,11 +688,20 @@
           "endMetric": "End Reference Metric",
           "font": "Font",
           "showLabel": "Show",
-          "position": "Position",
+          "position": {
+            "title": "Position",
+            "start": "Start",
+            "middle": "Middle",
+            "end": "End"
+          },
           "lineStyle": "Line Style",
           "opacity": "Opacity",
           "backgroundColor": "Background Color",
-          "borderStyle": "Border Style"
+          "borderStyle": "Border Style",
+          "constant": "Constant",
+          "avg": "AVG",
+          "max": "Max",
+          "min": "Min"
         },
         "paging": {
           "title": "Common",
@@ -843,7 +861,8 @@
         "autoPlay": "Auto Play",
         "duration": "Duration (s) ",
         "delPagesTip": "Confirm to delete all selected story pages?",
-        "delPageTip": "Confirm to delete this story page?"
+        "delPageTip": "Confirm to delete this story page?",
+        "enterHere": "Enter here"
       }
     },
     "widget": {
@@ -870,6 +889,7 @@
       "action": {
         "refresh": "Refresh",
         "fullScreen": "FullScreen",
+        "lock": "Lock",
         "edit": "Edit",
         "delete": "Delete",
         "confirmDel": "Confirm Delete",
@@ -879,6 +899,12 @@
         "closeLinkage": "Close Linkage",
         "makeJump": "Set Jump",
         "closeJump": "Close Jump"
+      },
+      "tips": {
+        "unlock": "LockIng drag and click to unlock",
+        "waiting": "Waiting for loadData",
+        "cancelLinkage": "Cancel Linkage",
+        "canLinkage": "Click the Widget to link"
       }
     },
     "linkage": {
@@ -887,7 +913,8 @@
       "associatedWidgets": "Associated Widgets",
       "associatedFields": "Associated Fields",
       "selectTriggers": "Select the trigger field",
-      "selectLinker": "Select linkage field"
+      "selectLinker": "Select linkage field",
+      "linkageError": "The linkage chart has been deleted, please reconfigure"
     },
     "jump": {
       "title": "Jump Settings",
@@ -897,7 +924,8 @@
       "URL": "URL",
       "parameters": "Parameters",
       "controller": "Associated Controllers",
-      "associatedFields": "Associated Fields"
+      "associatedFields": "Associated Fields",
+      "jumpError": "The jump target has been invalidated or deleted, please reconfigure"
     },
     "associate": {
       "title": "Please associate fields/variables",
@@ -1050,10 +1078,13 @@
     },
     "model": {
       "type": "Type",
+      "rename": "Rename",
+      "delete": "Delete",
       "typeAndCategory": "Type & Category",
       "permission": "Column Permissions",
       "newHierarchy": "New Hierarchy",
-      "addToHierarchy": "Add To Hierarchy"
+      "addToHierarchy": "Add To Hierarchy",
+      "hierarchyName": "Hierarchy Name"
     },
     "columnPermission": {
       "title": "Column permissions",
@@ -1098,6 +1129,9 @@
     "archived": "Archived ",
     "noPermission": "You do not have permission to access this page",
     "creatView": "Creat View",
+    "syncDatabase": "Sync Database",
+    "syncDatabaseSchemaSuccess": "Sync database schema successfully",
+    "lastUpdateTime": "Last Update Time",
     "sidebar": {
       "title": "Sources",
       "add": "Create source",
@@ -1148,6 +1182,7 @@
       "remove": "Remove"
     },
     "form": {
+      "email": "Email",
       "search": "Search or paste the emails of invited members",
       "needConfirm": "Need email confirmation"
     },

@@ -21,14 +21,15 @@ import { Badge, Tooltip, TooltipProps } from 'antd';
 import { Popup } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, ReactElement, useEffect, useMemo, useState } from 'react';
 import { DownloadTask, DownloadTaskState } from '../../slice/types';
 import { DownloadList } from './DownloadList';
 import { OnLoadTasksType } from './types';
 interface DownloadListPopupProps {
   tooltipProps?: TooltipProps;
-  onLoadTasks: OnLoadTasksType<any>;
   polling: boolean;
+  renderDom?: ReactElement;
+  onLoadTasks: OnLoadTasksType<any>;
   setPolling: (polling: boolean) => void;
   onDownloadFile: (task: DownloadTask) => void;
 }
@@ -36,6 +37,7 @@ const DOWNLOAD_POLLING_INTERVAL = 5000;
 export const DownloadListPopup: FC<DownloadListPopupProps> = ({
   tooltipProps,
   polling,
+  renderDom,
   setPolling,
   onLoadTasks,
   onDownloadFile,
@@ -91,7 +93,7 @@ export const DownloadListPopup: FC<DownloadListPopupProps> = ({
           {...tooltipProps}
         >
           <Badge count={downloadableNum}>
-            <CloudDownloadOutlined style={{ fontSize: 20 }} />
+            {renderDom || <CloudDownloadOutlined style={{ fontSize: 20 }} />}
           </Badge>
         </Tooltip>
       </li>

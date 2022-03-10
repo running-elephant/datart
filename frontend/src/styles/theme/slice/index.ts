@@ -5,10 +5,10 @@ import { getThemeFromStorage } from '../utils';
 import { ThemeKeyType, ThemeState } from './types';
 
 export const initialState: ThemeState = {
-  selected: getThemeFromStorage() || 'light',
+  selected: getThemeFromStorage(),
 };
 
-const slice = createSlice({
+const themeSlice = createSlice({
   name: 'theme',
   initialState,
   reducers: {
@@ -18,9 +18,11 @@ const slice = createSlice({
   },
 });
 
-export const { actions: themeActions, reducer } = slice;
+export default themeSlice;
+
+export const { actions: themeActions, reducer } = themeSlice;
 
 export const useThemeSlice = () => {
-  useInjectReducer({ key: slice.name, reducer: slice.reducer });
-  return { actions: slice.actions };
+  useInjectReducer({ key: themeSlice.name, reducer: themeSlice.reducer });
+  return { actions: themeSlice.actions };
 };

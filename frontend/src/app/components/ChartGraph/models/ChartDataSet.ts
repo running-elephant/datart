@@ -45,6 +45,10 @@ class ChartDataSetBase extends Array {
     return this.toCaseInsensitive(getValueByColumnKey(field));
   }
 
+  protected toOriginKey(field: ChartDataSectionField): string {
+    return getValueByColumnKey(field);
+  }
+
   protected createColumnIndexTable(metas?: ChartDatasetMeta[]): {
     [key: string]: number;
   } {
@@ -57,6 +61,10 @@ class ChartDataSetBase extends Array {
   protected toCaseInsensitive(key) {
     return String(key).toUpperCase();
   }
+
+  public getFieldOriginKey(field: ChartDataSectionField) {
+    return this.toOriginKey(field);
+  }
 }
 
 export class ChartDataSet<T>
@@ -64,20 +72,29 @@ export class ChartDataSet<T>
   implements IChartDataSet<T>
 {
   private columnIndexTable: ColumnIndexTable = {};
+  private originalFields?: ChartDataSectionField[];
 
-  constructor(columns: T[][], metas?: ChartDatasetMeta[]) {
+  constructor(
+    columns: T[][],
+    metas?: ChartDatasetMeta[],
+    fields?: ChartDataSectionField[],
+  ) {
     super();
-
     this.length = columns?.length || 0;
+    this.originalFields = fields;
     this.columnIndexTable = super.createColumnIndexTable(metas);
 
     for (let i = 0; i < this.length; i++) {
       if (columns[i]?.length === 1) {
-        const row = new ChartDataSetRow(this.columnIndexTable, []);
+        const row = new ChartDataSetRow(this.columnIndexTable, [], fields);
         row.push(columns[i][0]);
         this[i] = row;
       } else {
-        this[i] = new ChartDataSetRow(this.columnIndexTable, columns[i]);
+        this[i] = new ChartDataSetRow(
+          this.columnIndexTable,
+          columns[i],
+          fields,
+        );
       }
     }
   }
@@ -90,6 +107,7 @@ export class ChartDataSet<T>
     return this.toIndexBy(this.columnIndexTable, field);
   }
 
+  // TODO(Stephen): should be passed by sorted fields not data configs
   public sortBy(dataConfigs: ChartDataConfig[]): void {
     const orderConfigs = dataConfigs
       .filter(
@@ -117,6 +135,20 @@ export class ChartDataSet<T>
         sortValues.indexOf(next[this.toKey(order)]),
     );
   }
+
+  public groupBy(field: ChartDataSectionField): {
+    [groupKey in string]: IChartDataSetRow<T>[];
+  } {
+    const groupedChartDataSets = this.reduce((acc, row) => {
+      const valueKey = row.getCell(field) || 'defaultGroupKey';
+      if (!acc[valueKey]) {
+        acc[valueKey] = [];
+      }
+      acc[valueKey].push(row);
+      return acc;
+    }, {});
+    return groupedChartDataSets;
+  }
 }
 
 export class ChartDataSetRow<T>
@@ -124,10 +156,12 @@ export class ChartDataSetRow<T>
   implements IChartDataSetRow<T>
 {
   private columnIndexTable: ColumnIndexTable = {};
+  private originalFields?: ChartDataSectionField[];
 
-  constructor(indexes, items: T[]) {
+  constructor(indexes, items: T[], fields?: ChartDataSectionField[]) {
     super(...(items as any));
     this.columnIndexTable = indexes;
+    this.originalFields = fields;
   }
 
   public getCell(field: ChartDataSectionField) {
@@ -149,6 +183,13 @@ export class ChartDataSetRow<T>
   public convertToObject(): object {
     return Object.keys(this.columnIndexTable).reduce((acc, cur) => {
       acc[cur] = this[this.columnIndexTable[cur]];
+      return acc;
+    }, {});
+  }
+
+  public convertToCaseSensitiveObject(): object {
+    return (this.originalFields || []).reduce((acc, cur) => {
+      acc[this.getFieldOriginKey(cur)] = this[this.getFieldIndex(cur)];
       return acc;
     }, {});
   }

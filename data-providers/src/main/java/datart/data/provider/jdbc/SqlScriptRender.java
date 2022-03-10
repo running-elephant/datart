@@ -29,10 +29,9 @@ import datart.core.data.provider.QueryScript;
 import datart.core.data.provider.ScriptVariable;
 import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.SqlBuilder;
-import datart.data.provider.calcite.SqlValidateUtils;
 import datart.data.provider.calcite.SqlParserUtils;
+import datart.data.provider.calcite.SqlValidateUtils;
 import datart.data.provider.freemarker.FreemarkerContext;
-import datart.data.provider.local.LocalDB;
 import datart.data.provider.script.ReplacementPair;
 import datart.data.provider.script.ScriptRender;
 import datart.data.provider.script.VariablePlaceholder;
@@ -135,7 +134,11 @@ public class SqlScriptRender extends ScriptRender {
 
         selectSql = replaceVariables(selectSql);
 
-        return onlySelectStatement ? selectSql : script.replace(selectSql0, selectSql);
+        selectSql = onlySelectStatement ? selectSql : script.replace(selectSql0, selectSql);
+
+        RequestContext.setSql(selectSql);
+
+        return selectSql;
     }
 
 

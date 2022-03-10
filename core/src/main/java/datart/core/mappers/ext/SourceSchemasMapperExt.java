@@ -22,10 +22,15 @@ import datart.core.mappers.SourceSchemasMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Date;
+
 @Mapper
 public interface SourceSchemasMapperExt extends SourceSchemasMapper {
 
     @Select("SELECT * FROM source_schemas where source_id = #{sourceId}")
     SourceSchemas selectBySource(String sourceId);
+
+    @Select("SELECT update_time FROM source_schemas where source_id = #{sourceId}")
+    Date selectUpdateDateBySource(String sourceId);
 
 }

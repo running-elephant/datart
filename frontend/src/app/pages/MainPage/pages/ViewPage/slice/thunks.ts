@@ -18,9 +18,12 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import sqlReservedWords from 'app/assets/javascripts/sqlReservedWords';
+import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
+import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import i18n from 'i18next';
+import produce from 'immer';
 import { monaco } from 'react-monaco-editor';
 import { RootState } from 'types';
 import { request, request2 } from 'utils/request';
@@ -122,7 +125,8 @@ export const getViewDetail = createAsyncThunk<
 
     try {
       const { data } = await request<View>(`/views/${viewId}`);
-      const migrateData = migrateViewConfig(data);
+      let migrateData = migrateViewConfig(data);
+      migrateData.model = beginViewModelMigration(migrateData?.model);
       return transformModelToViewModel(migrateData, tempViewModel);
     } catch (error) {
       return rejectHandle(error, rejectWithValue);
@@ -139,9 +143,8 @@ export const getSchemaBySourceId = createAsyncThunk<any, string>(
     if (sourceSchemas) {
       return;
     }
-
     const { data } = await request2<any>({
-      url: `/sources/schemas/${sourceId}/`, // TODO(Stephen): remove `/` mark after backend update
+      url: `/sources/schemas/${sourceId}`,
       method: 'GET',
     });
     return {
@@ -199,11 +202,11 @@ export const saveView = createAsyncThunk<
   SaveViewParams,
   { state: RootState }
 >('view/saveView', async ({ resolve, isSaveAs, currentView }, { getState }) => {
-  const currentEditingView = isSaveAs
+  let currentEditingView = isSaveAs
     ? (currentView as ViewViewModel)
     : (selectCurrentEditingView(getState()) as ViewViewModel);
   const orgId = selectOrgId(getState());
-
+ 
   try {
     if (isNewView(currentEditingView.id) || isSaveAs) {
       const { data } = await request<View>({
@@ -357,10 +360,10 @@ export const getEditorProvideCompletionItems = createAsyncThunk<
     const variableKeywords = new Set<string>();
 
     if (sourceId) {
-      const databaseSchemas = selectSourceDatabaseSchemas(getState(), {
+      const currentDBSchemas = selectSourceDatabaseSchemas(getState(), {
         id: sourceId,
       });
-      databaseSchemas?.forEach(db => {
+      currentDBSchemas?.forEach(db => {
         dbKeywords.add(db.dbName);
         db.tables?.forEach(table => {
           tableKeywords.add(table.tableName);

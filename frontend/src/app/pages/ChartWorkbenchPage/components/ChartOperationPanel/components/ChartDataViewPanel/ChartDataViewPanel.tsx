@@ -325,6 +325,7 @@ const StyledChartDataViewPanel = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
+  background-color: ${p => p.theme.componentBackground};
 `;
 
 const Header = styled.div`

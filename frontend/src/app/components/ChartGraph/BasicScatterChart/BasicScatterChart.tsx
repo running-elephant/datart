@@ -184,6 +184,7 @@ class BasicScatterChart extends Chart {
     const colors: Array<{ key; value }> =
       colorConfigs?.[0]?.color?.colors || [];
 
+    // TODO(Stephen): should be refactor by ChartDataSet groupBy function
     const groupedObjDataColumns: {
       [key: string]: { color: string; datas: [] };
     } = chartDataSetRows?.reduce((acc, cur) => {

@@ -19,7 +19,6 @@
 import {
   BranchesOutlined,
   CalendarOutlined,
-  EyeOutlined,
   FieldStringOutlined,
   NumberOutlined,
   SisternodeOutlined,
@@ -35,15 +34,29 @@ import {
   FONT_SIZE_BASE,
   FONT_SIZE_HEADING,
   INFO,
+  SPACE,
   SPACE_UNIT,
   SUCCESS,
   WARNING,
 } from 'styles/StyleConstants';
 import { ColumnCategories, ColumnTypes } from '../../../constants';
 import { Column } from '../../../slice/types';
+import { ALLOW_COMBINE_COLUMN_TYPES } from './constant';
 
-const DataModelNode: FC<{ node: Column; onNodeTypeChange }> = memo(
-  ({ node, onNodeTypeChange }) => {
+const DataModelNode: FC<{
+  node: Column;
+  getPermissionButton: (name) => JSX.Element;
+  onNodeTypeChange: (type: any, name: string) => void;
+  onMoveToHierarchy: (node: Column) => void;
+  onCreateHierarchy?: (node: Column) => void;
+}> = memo(
+  ({
+    node,
+    getPermissionButton,
+    onCreateHierarchy,
+    onMoveToHierarchy,
+    onNodeTypeChange,
+  }) => {
     const t = useI18NPrefix('view.model');
     const tg = useI18NPrefix('global');
     const [isHover, setIsHover] = useState(false);
@@ -69,6 +82,10 @@ const DataModelNode: FC<{ node: Column; onNodeTypeChange }> = memo(
           break;
       }
 
+      const isAllowCreateHierarchy = node => {
+        return ALLOW_COMBINE_COLUMN_TYPES.includes(node.type);
+      };
+
       return (
         <div
           className="content"
@@ -89,7 +106,7 @@ const DataModelNode: FC<{ node: Column; onNodeTypeChange }> = memo(
                   <Menu
                     selectedKeys={[node.type, `category-${node.category}`]}
                     className="datart-schema-table-header-menu"
-                    onClick={onNodeTypeChange(node.name, node)}
+                    onClick={({ key }) => onNodeTypeChange(key, node?.name)}
                   >
                     {Object.values(ColumnTypes).map(t => (
                       <Menu.Item key={t}>
@@ -127,32 +144,28 @@ const DataModelNode: FC<{ node: Column; onNodeTypeChange }> = memo(
                 </Tooltip>
               </Dropdown>
             )}
-            {isHover && !isDragging && (
-              <Tooltip title={t('permission')}>
-                <ToolbarButton
-                  size="small"
-                  iconSize={FONT_SIZE_BASE}
-                  className="suffix"
-                  icon={<EyeOutlined style={{ color: INFO }} />}
-                />
-              </Tooltip>
-            )}
-            {isHover && !isDragging && (
-              <Tooltip title={t('newHierarchy')}>
-                <ToolbarButton
-                  size="small"
-                  iconSize={FONT_SIZE_BASE}
-                  className="suffix"
-                  icon={<BranchesOutlined style={{ color: INFO }} />}
-                />
-              </Tooltip>
-            )}
-            {isHover && !isDragging && (
+            {isHover && !isDragging && getPermissionButton(node?.name)}
+            {isHover &&
+              !isDragging &&
+              isAllowCreateHierarchy(node) &&
+              onCreateHierarchy && (
+                <Tooltip title={t('newHierarchy')}>
+                  <ToolbarButton
+                    size="small"
+                    iconSize={FONT_SIZE_BASE}
+                    className="suffix"
+                    onClick={() => onCreateHierarchy(node)}
+                    icon={<BranchesOutlined style={{ color: INFO }} />}
+                  />
+                </Tooltip>
+              )}
+            {isHover && !isDragging && isAllowCreateHierarchy(node) && (
               <Tooltip title={t('addToHierarchy')}>
                 <ToolbarButton
                   size="small"
                   iconSize={FONT_SIZE_BASE}
                   className="suffix"
+                  onClick={() => onMoveToHierarchy(node)}
                   icon={<SisternodeOutlined style={{ color: INFO }} />}
                 />
               </Tooltip>
@@ -164,19 +177,17 @@ const DataModelNode: FC<{ node: Column; onNodeTypeChange }> = memo(
 
     return (
       <Draggable key={node?.name} draggableId={node?.name} index={node?.index}>
-        {(draggableProvided, draggableSnapshot) => {
-          return (
-            <StyledDataModelNode
-              isDragging={draggableSnapshot.isDragging}
-              style={draggableProvided.draggableProps.style}
-              ref={draggableProvided.innerRef}
-              {...draggableProvided.draggableProps}
-              {...draggableProvided.dragHandleProps}
-            >
-              {renderNode(node, draggableSnapshot.isDragging)}
-            </StyledDataModelNode>
-          );
-        }}
+        {(draggableProvided, draggableSnapshot) => (
+          <StyledDataModelNode
+            isDragging={draggableSnapshot.isDragging}
+            style={draggableProvided.draggableProps.style}
+            ref={draggableProvided.innerRef}
+            {...draggableProvided.draggableProps}
+            {...draggableProvided.dragHandleProps}
+          >
+            {renderNode(node, draggableSnapshot.isDragging)}
+          </StyledDataModelNode>
+        )}
       </Draggable>
     );
   },
@@ -188,10 +199,10 @@ const StyledDataModelNode = styled.div<{
   isDragging: boolean;
 }>`
   line-height: 32px;
-  margin: ${SPACE_UNIT};
+  margin: ${SPACE};
   user-select: 'none';
   background: ${p =>
-    p.isDragging ? p.theme.emphasisBackground : 'transparent'};
+    p.isDragging ? p.theme.highlightBackground : 'transparent'};
   font-size: ${FONT_SIZE_BASE};
 
   & .content {

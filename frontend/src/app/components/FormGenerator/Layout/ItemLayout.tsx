@@ -52,12 +52,13 @@ import {
   BasicUnControlledTabPanel,
 } from '../Basic';
 import {
-  ConditionStylePanel,
+  ConditionalStylePanel,
   DataReferencePanel,
   FontAlignment,
   LegendType,
   ListTemplatePanel,
   NameLocation,
+  ScorecardConditionalStylePanel,
   UnControlledTableHeaderPanel,
 } from '../Customize';
 import { FormGeneratorLayoutProps } from '../types';
@@ -166,8 +167,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <DataReferencePanel {...props} />;
         case ChartStyleSectionComponentType.TABLEHEADER:
           return <UnControlledTableHeaderPanel {...props} />;
-        case ChartStyleSectionComponentType.CONDITIONSTYLE:
-          return <ConditionStylePanel {...props} />;
+        case ChartStyleSectionComponentType.CONDITIONALSTYLE:
+          return <ConditionalStylePanel {...props} />;
         case ChartStyleSectionComponentType.GROUP:
           return <GroupLayout {...props} />;
         case ChartStyleSectionComponentType.TEXT:
@@ -180,13 +181,15 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <NameLocation {...props} />;
         case ChartStyleSectionComponentType.LegendType:
           return <LegendType {...props} />;
+        case ChartStyleSectionComponentType.ScorecardConditionalStyle:
+          return <ScorecardConditionalStylePanel {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }
     };
 
     return (
-      <StyledItemLayout flatten={flatten}>
+      <StyledItemLayout className="chart-config-item-layout" flatten={flatten}>
         {renderBasicComponent()}
       </StyledItemLayout>
     );
@@ -198,4 +201,5 @@ export default ItemLayout;
 
 const StyledItemLayout = styled.div<{ flatten?: boolean }>`
   padding: ${p => (p.flatten ? 0 : SPACE)};
+  user-select: none;
 `;

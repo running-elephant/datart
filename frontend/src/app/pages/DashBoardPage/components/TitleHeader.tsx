@@ -45,10 +45,10 @@ import {
   SPACE_LG,
   SPACE_SM,
 } from 'styles/StyleConstants';
-import { BoardActionContext } from '../contexts/BoardActionContext';
-import { BoardContext } from '../contexts/BoardContext';
-import { BoardInfoContext } from '../contexts/BoardInfoContext';
 import { BoardOverLay } from './BoardOverLay';
+import { BoardActionContext } from './BoardProvider/BoardActionProvider';
+import { BoardInfoContext } from './BoardProvider/BoardInfoProvider';
+import { BoardContext } from './BoardProvider/BoardProvider';
 import SaveToStoryBoard from './SaveToStoryBoard';
 
 interface TitleHeaderProps {
@@ -76,6 +76,7 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
     onSyncData,
   }) => {
     const t = useI18NPrefix(`viz.action`);
+    const { onClearActiveWidgets } = useContext(BoardActionContext);
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const {
@@ -98,8 +99,11 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
     }, []);
 
     const onUpdateBoard = useCallback(() => {
-      updateBoard?.(() => toggleBoardEditor?.(false));
-    }, [toggleBoardEditor, updateBoard]);
+      onClearActiveWidgets();
+      setImmediate(() => {
+        updateBoard?.(() => toggleBoardEditor?.(false));
+      });
+    }, [onClearActiveWidgets, toggleBoardEditor, updateBoard]);
 
     const closeBoardEditor = () => {
       toggleBoardEditor?.(false);
