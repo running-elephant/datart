@@ -77,7 +77,7 @@ const BasicUnControlledTabPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
 
     const [activeTabKey, setActiveTabKey] = useState<string | undefined>();
     const [paneTemplate] = useState(() => {
-      const firstRow = (myData?.rows || [])[0];
+      const firstRow = myData?.template;
       return cleanChartConfigValueByDefaultValue([CloneValueDeep(firstRow)])[0];
     });
 

@@ -83,6 +83,7 @@ function getStyleValueModel(styles?: ChartStyleConfig[]) {
       label: s.label,
       key: s.key,
       value: s.value,
+      comType: s.comType,
       rows: s.template ? s.rows : getStyleValueModel(s.rows),
     };
   });
