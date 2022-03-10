@@ -279,3 +279,9 @@ export const WIDGET_TITLE_ALIGN_OPTIONS = [
   { name: '左', value: TEXT_ALIGN_ENUM.left },
   { name: '中', value: TEXT_ALIGN_ENUM.center },
 ];
+
+export const DefaultWidgetData = {
+  id: '',
+  columns: [],
+  rows: [],
+};
