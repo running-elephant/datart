@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { createSelector } from '@reduxjs/toolkit';
+import { DefaultWidgetData } from 'app/pages/DashBoardPage/constants';
 import {
   DeviceType,
   Widget,
-  WidgetData,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
@@ -168,13 +168,8 @@ export const editWidgetDataState = (state: { editBoard: EditBoardState }) =>
 export const selectEditWidgetData = createSelector(
   [editWidgetDataState, (_, widgetId: string) => widgetId],
   (widgetDataMap, wid) => {
-    const data: WidgetData = {
-      id: '',
-      columns: [],
-      rows: [],
-    };
-    if (!widgetDataMap) return data;
-    if (!widgetDataMap[wid]) return data;
+    if (!widgetDataMap) return DefaultWidgetData;
+    if (!widgetDataMap[wid]) return DefaultWidgetData;
     return widgetDataMap[wid];
   },
 );
