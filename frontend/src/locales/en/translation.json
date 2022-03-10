@@ -309,6 +309,7 @@
           "SUFFIX_LIKE": "Suffix Contain",
           "SUFFIX_NOT_LIKE": "Not Suffix Contain",
           "BETWEEN": "Between",
+          "NOT_BETWEEN": "Not Between",
           "IN": "In",
           "NOT_IN": "Not In",
           "LT": "Less Than",
