@@ -469,7 +469,8 @@ const workbenchSlice = createSlice({
 
         if (index !== undefined) {
           state.currentDataView = {
-            ...{ ...payload, config: migrateViewConfig(payload.config) },
+            ...payload,
+            config: migrateViewConfig(payload.config),
             meta: transformMeta(payload.model),
             computedFields,
           };
