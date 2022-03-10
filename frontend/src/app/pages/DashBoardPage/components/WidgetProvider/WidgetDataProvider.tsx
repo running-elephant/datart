@@ -17,7 +17,7 @@
  */
 
 import { WidgetData } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { createContext, FC, useContext } from 'react';
+import React, { createContext, FC, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectWidgetDataById } from '../../pages/Board/slice/selector';
 import { BoardState } from '../../pages/Board/slice/types';
@@ -42,7 +42,9 @@ export const WidgetDataProvider: FC<{ widgetId: string }> = ({
   const editWidgetData = useSelector((state: { editBoard: EditBoardState }) =>
     selectEditWidgetData(state, widgetId),
   );
-  const widgetData = editing ? editWidgetData : viewWidgetData;
+  const widgetData = useMemo(() => {
+    return editing ? editWidgetData : viewWidgetData;
+  }, [editing, viewWidgetData, editWidgetData]);
   return (
     <WidgetDataContext.Provider value={{ data: widgetData }}>
       {boardId ? children : null}

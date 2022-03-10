@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { throttle } from 'echarts';
 import {
@@ -23,7 +22,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
 } from 'react';
@@ -35,9 +33,13 @@ export default function useAutoBoardRenderItem(
   margin: [number, number],
 ) {
   const { ref, widgetRowHeight } = useWidgetRowHeight();
+
   const { renderedWidgetById } = useContext(BoardContext);
+
   const currentLayout = useRef<Layout[]>([]);
+
   let waitItemInfos = useRef<{ id: string; rendered: boolean }[]>([]);
+
   const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
 
   useEffect(() => {
@@ -61,6 +63,7 @@ export default function useAutoBoardRenderItem(
     },
     [margin, widgetRowHeight],
   );
+
   const lazyRender = useCallback(() => {
     if (!gridWrapRef.current) return;
     if (!waitItemInfos.current.length) return;
@@ -75,9 +78,10 @@ export default function useAutoBoardRenderItem(
   }, [calcItemTop, renderedWidgetById]);
 
   const ttRender = useMemo(() => throttle(lazyRender, 50), [lazyRender]);
-  useLayoutEffect(() => {
+
+  useEffect(() => {
     if (gridWrapRef.current) {
-      lazyRender();
+      setImmediate(() => lazyRender());
       gridWrapRef.current.removeEventListener('scroll', ttRender, false);
       gridWrapRef.current.addEventListener('scroll', ttRender, false);
       // issues#339

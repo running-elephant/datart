@@ -46,8 +46,6 @@ export const DataChartWidget: React.FC<{}> = memo(() => {
   const { id: widgetId } = widget;
   const { widgetChartClick } = useContext(WidgetMethodContext);
   const { ref, cacheW, cacheH } = useCacheWidthHeight();
-  // console.log('_cacheW', cacheW);
-  // console.log('cacheH', cacheH);
 
   const widgetRef = useRef<Widget>(widget);
   useEffect(() => {
@@ -121,8 +119,6 @@ export const DataChartWidget: React.FC<{}> = memo(() => {
   );
 
   const chartFrame = useMemo(() => {
-    // console.log('_chartFrame', widgetId);
-
     if (!dataChart) {
       return `not found dataChart`;
     }
