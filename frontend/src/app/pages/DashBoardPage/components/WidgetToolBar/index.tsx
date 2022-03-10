@@ -109,9 +109,9 @@ const WidgetToolBar: FC = () => {
   return (
     <StyleWrap onClick={ssp} className="widget-tool-bar">
       <Space size={0}>
-        {renderErrorInfo(errInfo)}
-        {renderWaiting()}
         {renderLoading()}
+        {renderWaiting()}
+        {renderErrorInfo(errInfo)}
         {renderLocking()}
         {renderLinkage()}
         {renderWidgetAction()}
