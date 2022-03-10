@@ -77,28 +77,38 @@ export default function useAutoBoardRenderItem(
     });
   }, [calcItemTop, renderedWidgetById]);
 
-  // throttle lazyRender
-  const ttRender = useMemo(() => throttle(lazyRender, 50), [lazyRender]);
+  const throttleLazyRender = useMemo(
+    () => throttle(lazyRender, 50),
+    [lazyRender],
+  );
 
   useEffect(() => {
     if (gridWrapRef.current) {
       setImmediate(() => lazyRender());
-      gridWrapRef.current.removeEventListener('scroll', ttRender, false);
-      gridWrapRef.current.addEventListener('scroll', ttRender, false);
+      gridWrapRef.current.removeEventListener(
+        'scroll',
+        throttleLazyRender,
+        false,
+      );
+      gridWrapRef.current.addEventListener('scroll', throttleLazyRender, false);
       // issues#339
-      window.addEventListener('resize', ttRender, false);
+      window.addEventListener('resize', throttleLazyRender, false);
     }
     return () => {
-      gridWrapRef?.current?.removeEventListener('scroll', ttRender, false);
-      window.removeEventListener('resize', ttRender, false);
+      gridWrapRef?.current?.removeEventListener(
+        'scroll',
+        throttleLazyRender,
+        false,
+      );
+      window.removeEventListener('resize', throttleLazyRender, false);
     };
-  }, [ttRender, lazyRender]);
+  }, [throttleLazyRender, lazyRender]);
 
   return {
     ref,
     gridWrapRef,
     currentLayout,
     widgetRowHeight,
-    ttRender,
+    throttleLazyRender,
   };
 }

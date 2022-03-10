@@ -17,7 +17,6 @@
  */
 
 import { Empty } from 'antd';
-import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
@@ -30,6 +29,7 @@ import {
 } from 'app/pages/DashBoardPage/constants';
 import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
+import { useVisibleHidden } from 'app/pages/DashBoardPage/hooks/useVisibleHidden';
 import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import debounce from 'lodash/debounce';
@@ -93,8 +93,13 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     [layoutWidgetMap],
   );
 
-  const { ref, gridWrapRef, currentLayout, widgetRowHeight, ttRender } =
-    useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
+  const {
+    ref,
+    gridWrapRef,
+    currentLayout,
+    widgetRowHeight,
+    throttleLazyRender,
+  } = useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
 
   const onBreakpointChange = value => {};
 
@@ -132,7 +137,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
 
   const onLayoutChange = (layouts: Layout[]) => {
     currentLayout.current = layouts;
-    ttRender();
+    throttleLazyRender();
     // ignore isDraggable item from out
     if (layouts.find(item => item.isDraggable === true)) {
       return;
