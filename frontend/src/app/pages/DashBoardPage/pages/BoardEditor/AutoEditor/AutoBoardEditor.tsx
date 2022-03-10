@@ -18,10 +18,8 @@
 
 import { Empty } from 'antd';
 import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
-import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
-import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
   BREAK_POINT_MAP,
@@ -30,20 +28,17 @@ import {
   MIN_PADDING,
   RGL_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
+import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
 import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import debounce from 'lodash/debounce';
-import throttle from 'lodash/throttle';
 import React, {
   memo,
-  RefObject,
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import { Layout, Responsive, WidthProvider } from 'react-grid-layout';
@@ -67,7 +62,6 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const visible = useVisibleHidden();
-  const { renderedWidgetById } = useContext(BoardContext);
   const {
     margin,
     containerPadding,
@@ -99,11 +93,8 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     [layoutWidgetMap],
   );
 
-  let waitItemInfos = useRef<{ id: string; rendered: boolean }[]>([]);
-
-  const currentLayout = useRef<Layout[]>([]);
-
-  const { ref, widgetRowHeight } = useWidgetRowHeight();
+  const { ref, gridWrapRef, currentLayout, widgetRowHeight } =
+    useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
 
   const onBreakpointChange = value => {};
 
@@ -128,60 +119,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
 
   useEffect(() => {
     currentLayout.current = layoutMap.lg;
-  }, [layoutMap.lg]);
-
-  useEffect(() => {
-    const layoutWaitWidgetInfos = Object.values(layoutWidgetInfoMap).filter(
-      widgetInfo => {
-        return !widgetInfo.rendered;
-      },
-    );
-
-    waitItemInfos.current = layoutWaitWidgetInfos.map(widgetInfo => ({
-      id: widgetInfo.id,
-      rendered: widgetInfo.rendered,
-    }));
-  }, [layoutWidgetInfoMap]);
-
-  const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
-
-  const calcItemTop = useCallback(
-    (id: string) => {
-      const curItem = currentLayout.current.find(ele => ele.i === id);
-      if (!curItem) return Infinity;
-      return Math.round((widgetRowHeight + margin[0]) * curItem.y);
-    },
-    [margin, widgetRowHeight],
-  );
-
-  const lazyRender = useCallback(() => {
-    if (!gridWrapRef.current) return;
-    if (!waitItemInfos.current.length) return;
-    const waitingItems = waitItemInfos.current;
-    const { offsetHeight, scrollTop } = gridWrapRef.current! || {};
-    waitingItems.forEach(item => {
-      const itemTop = calcItemTop(item.id);
-      if (itemTop - scrollTop < offsetHeight) {
-        renderedWidgetById(item.id);
-      }
-    });
-  }, [calcItemTop, renderedWidgetById]);
-
-  const ttRender = useMemo(() => throttle(lazyRender, 50), [lazyRender]);
-
-  useLayoutEffect(() => {
-    if (gridWrapRef.current) {
-      lazyRender();
-      gridWrapRef.current.removeEventListener('scroll', ttRender, false);
-      gridWrapRef.current.addEventListener('scroll', ttRender, false);
-      // issues#339
-      window.addEventListener('resize', ttRender, false);
-    }
-    return () => {
-      gridWrapRef?.current?.removeEventListener('scroll', ttRender, false);
-      window.removeEventListener('resize', ttRender, false);
-    };
-  }, [ttRender, lazyRender]);
+  }, [layoutMap.lg, currentLayout]);
 
   const changeWidgetLayouts = debounce((layouts: Layout[]) => {
     dispatch(

@@ -22,18 +22,37 @@ import {
   RefObject,
   useCallback,
   useContext,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
 } from 'react';
 import { Layout } from 'react-grid-layout';
 import { BoardContext } from '../components/BoardProvider/BoardProvider';
-export default function useAutoBoardRenderItem(margin: [number, number]) {
+import { WidgetInfo } from '../pages/Board/slice/types';
+export default function useAutoBoardRenderItem(
+  layoutWidgetInfoMap: Record<string, WidgetInfo>,
+  margin: [number, number],
+) {
   const { ref, widgetRowHeight } = useWidgetRowHeight();
   const { renderedWidgetById } = useContext(BoardContext);
   const currentLayout = useRef<Layout[]>([]);
   let waitItemInfos = useRef<{ id: string; rendered: boolean }[]>([]);
   const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
+
+  useEffect(() => {
+    const layoutWaitWidgetInfos = Object.values(layoutWidgetInfoMap).filter(
+      widgetInfo => {
+        return !widgetInfo.rendered;
+      },
+    );
+
+    waitItemInfos.current = layoutWaitWidgetInfos.map(widgetInfo => ({
+      id: widgetInfo.id,
+      rendered: widgetInfo.rendered,
+    }));
+  }, [layoutWidgetInfoMap]);
+
   const calcItemTop = useCallback(
     (id: string) => {
       const curItem = currentLayout.current.find(ele => ele.i === id);
@@ -69,4 +88,11 @@ export default function useAutoBoardRenderItem(margin: [number, number]) {
       window.removeEventListener('resize', ttRender, false);
     };
   }, [ttRender, lazyRender]);
+
+  return {
+    ref,
+    gridWrapRef,
+    currentLayout,
+    widgetRowHeight,
+  };
 }

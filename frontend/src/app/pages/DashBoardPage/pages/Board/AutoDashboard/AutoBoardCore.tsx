@@ -18,9 +18,7 @@
 
 import { Empty } from 'antd';
 import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
-import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
-import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
   BREAK_POINT_MAP,
@@ -28,6 +26,7 @@ import {
   MIN_MARGIN,
   MIN_PADDING,
 } from 'app/pages/DashBoardPage/constants';
+import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
 import {
@@ -38,18 +37,7 @@ import {
   BoardState,
   DeviceType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import throttle from 'lodash/throttle';
-import React, {
-  memo,
-  RefObject,
-  useCallback,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
 import { Layout, Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useSelector } from 'react-redux';
@@ -62,7 +50,6 @@ const mobilePoints = Object.keys(BREAK_POINT_MAP).slice(3);
 export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
     const visible = useVisibleHidden();
-    const { renderedWidgetById } = useContext(BoardContext);
     const {
       margin,
       containerPadding,
@@ -71,8 +58,6 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       mobileContainerPadding,
       allowOverlap,
     } = useContext(BoardConfigContext);
-
-    // console.log('_ core allowOverlap ', allowOverlap);
 
     const selectLayoutWidgetsConfigById = useMemo(
       selectLayoutWidgetMapById,
@@ -99,15 +84,10 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       DeviceType.Desktop,
     );
 
-    let waitItemInfos = useRef<{ id: string; rendered: boolean }[]>([]);
-
-    const currentLayout = useRef<Layout[]>([]);
-
-    const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
+    const { ref, gridWrapRef, currentLayout, widgetRowHeight } =
+      useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
 
     const { gridRef } = useBoardWidthHeight();
-
-    const { ref, widgetRowHeight } = useWidgetRowHeight();
 
     const onBreakpointChange = pointKey => {
       if (mobilePoints.includes(pointKey)) {
@@ -136,60 +116,12 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     ]);
     const layoutMap = useGridLayoutMap(layoutWidgetMap);
 
-    useEffect(() => {
-      const layoutWaitWidgetInfos = Object.values(layoutWidgetInfoMap).filter(
-        widgetInfo => {
-          return !widgetInfo.rendered;
-        },
-      );
-
-      waitItemInfos.current = layoutWaitWidgetInfos.map(widgetInfo => ({
-        id: widgetInfo.id,
-        rendered: widgetInfo.rendered,
-      }));
-    }, [layoutWidgetInfoMap]);
-
-    const calcItemTop = useCallback(
-      (id: string) => {
-        const curItem = currentLayout.current.find(ele => ele.i === id);
-        if (!curItem) return Infinity;
-        return Math.round((widgetRowHeight + margin[0]) * curItem.y);
+    const onLayoutChange = useCallback(
+      (layouts: Layout[], all) => {
+        currentLayout.current = layouts;
       },
-      [margin, widgetRowHeight],
+      [currentLayout],
     );
-
-    const lazyRender = useCallback(() => {
-      if (!gridWrapRef.current) return;
-      if (!waitItemInfos.current.length) return;
-      const waitingItems = waitItemInfos.current;
-      const { offsetHeight, scrollTop } = gridWrapRef.current! || {};
-      waitingItems.forEach(item => {
-        const itemTop = calcItemTop(item.id);
-        if (itemTop - scrollTop < offsetHeight) {
-          renderedWidgetById(item.id);
-        }
-      });
-    }, [calcItemTop, renderedWidgetById]);
-
-    const ttRender = useMemo(() => throttle(lazyRender, 50), [lazyRender]);
-
-    useLayoutEffect(() => {
-      if (gridWrapRef.current) {
-        lazyRender();
-        gridWrapRef.current.removeEventListener('scroll', ttRender, false);
-        gridWrapRef.current.addEventListener('scroll', ttRender, false);
-        // issues#339
-        window.addEventListener('resize', ttRender, false);
-      }
-      return () => {
-        gridWrapRef?.current?.removeEventListener('scroll', ttRender, false);
-        window.removeEventListener('resize', ttRender, false);
-      };
-    }, [ttRender, lazyRender]);
-
-    const onLayoutChange = useCallback((layouts: Layout[], all) => {
-      currentLayout.current = layouts;
-    }, []);
 
     const boardChildren = useMemo(() => {
       return sortedLayoutWidgets.map(item => {
