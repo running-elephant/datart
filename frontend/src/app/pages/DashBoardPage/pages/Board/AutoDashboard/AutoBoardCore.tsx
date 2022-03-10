@@ -29,6 +29,7 @@ import {
   MIN_PADDING,
 } from 'app/pages/DashBoardPage/constants';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
+import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
 import {
   selectLayoutWidgetInfoMapById,
   selectLayoutWidgetMapById,
@@ -37,17 +38,19 @@ import {
   BoardState,
   DeviceType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import throttle from 'lodash/throttle';
 import React, {
   memo,
   RefObject,
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import { Layout, Layouts, Responsive, WidthProvider } from 'react-grid-layout';
+import { Layout, Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
@@ -56,7 +59,6 @@ import StyledBackground from '../components/StyledBackground';
 import { WidgetOfAuto } from './WidgetOfAuto';
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const mobilePoints = Object.keys(BREAK_POINT_MAP).slice(3);
-// import throttle from 'lodash/throttle';
 export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
     const visible = useVisibleHidden();
@@ -106,7 +108,6 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     const { gridRef } = useBoardWidthHeight();
 
     const { ref, widgetRowHeight } = useWidgetRowHeight();
-    const scrollThrottle = useRef(false);
 
     const onBreakpointChange = pointKey => {
       if (mobilePoints.includes(pointKey)) {
@@ -133,35 +134,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       margin,
       containerPadding,
     ]);
-    const [layoutMap, setLayoutMap] = useState<Layouts>({});
-    useEffect(() => {
-      const layoutMap: Layouts = {
-        lg: [],
-        xs: [],
-      };
-      Object.values(layoutWidgetMap).forEach(widget => {
-        const lg = widget.config.rect || widget.config.mobileRect || {};
-        const xs = widget.config.mobileRect || widget.config.rect || {};
-        const lock = widget.config.lock;
-        layoutMap.lg.push({
-          i: widget.id,
-          x: lg.x,
-          y: lg.y,
-          w: lg.width,
-          h: lg.height,
-          static: lock,
-        });
-        layoutMap.xs.push({
-          i: widget.id,
-          x: xs.x,
-          y: xs.y,
-          w: xs.width,
-          h: xs.height,
-          static: lock,
-        });
-      });
-      setLayoutMap(layoutMap);
-    }, [layoutWidgetMap]);
+    const layoutMap = useGridLayoutMap(layoutWidgetMap);
 
     useEffect(() => {
       const layoutWaitWidgetInfos = Object.values(layoutWidgetInfoMap).filter(
@@ -169,6 +142,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
           return !widgetInfo.rendered;
         },
       );
+
       waitItemInfos.current = layoutWaitWidgetInfos.map(widgetInfo => ({
         id: widgetInfo.id,
         rendered: widgetInfo.rendered,
@@ -184,43 +158,34 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       [margin, widgetRowHeight],
     );
 
-    const lazyLoad = useCallback(() => {
+    const lazyRender = useCallback(() => {
       if (!gridWrapRef.current) return;
-      if (!waitItemInfos.current.length) {
-        gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
-        return;
-      }
-      if (!scrollThrottle.current) {
-        requestAnimationFrame(() => {
-          const waitingItems = waitItemInfos.current;
-          const { offsetHeight, scrollTop } = gridWrapRef.current! || {};
-          waitingItems.forEach(item => {
-            const itemTop = calcItemTop(item.id);
-            if (itemTop - scrollTop < offsetHeight) {
-              renderedWidgetById(item.id);
-            }
-          });
-          scrollThrottle.current = false;
-        });
-        scrollThrottle.current = true;
-      }
+      if (!waitItemInfos.current.length) return;
+      const waitingItems = waitItemInfos.current;
+      const { offsetHeight, scrollTop } = gridWrapRef.current! || {};
+      waitingItems.forEach(item => {
+        const itemTop = calcItemTop(item.id);
+        if (itemTop - scrollTop < offsetHeight) {
+          renderedWidgetById(item.id);
+        }
+      });
     }, [calcItemTop, renderedWidgetById]);
 
-    useEffect(() => {
-      if (waitItemInfos.current.length && gridWrapRef.current) {
-        setImmediate(() => {
-          lazyLoad();
-        }, []);
-        gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
-        gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
+    const ttRender = useMemo(() => throttle(lazyRender, 50), [lazyRender]);
+
+    useLayoutEffect(() => {
+      if (gridWrapRef.current) {
+        lazyRender();
+        gridWrapRef.current.removeEventListener('scroll', ttRender, false);
+        gridWrapRef.current.addEventListener('scroll', ttRender, false);
         // issues#339
-        window.addEventListener('resize', lazyLoad, false);
+        window.addEventListener('resize', ttRender, false);
       }
       return () => {
-        gridWrapRef?.current?.removeEventListener('scroll', lazyLoad, false);
-        window.removeEventListener('resize', lazyLoad, false);
+        gridWrapRef?.current?.removeEventListener('scroll', ttRender, false);
+        window.removeEventListener('resize', ttRender, false);
       };
-    }, [sortedLayoutWidgets.length, lazyLoad]);
+    }, [ttRender, lazyRender]);
 
     const onLayoutChange = useCallback((layouts: Layout[], all) => {
       currentLayout.current = layouts;
@@ -229,7 +194,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     const boardChildren = useMemo(() => {
       return sortedLayoutWidgets.map(item => {
         return (
-          <div className="block-item" key={item.id}>
+          <div key={item.id}>
             <WidgetAllProvider id={item.id}>
               <WidgetOfAuto />
             </WidgetAllProvider>

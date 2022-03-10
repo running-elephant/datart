@@ -30,20 +30,23 @@ import {
   MIN_PADDING,
   RGL_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
+import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
 import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
 import React, {
   memo,
   RefObject,
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import { Layout, Layouts, Responsive, WidthProvider } from 'react-grid-layout';
+import { Layout, Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
@@ -96,13 +99,11 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     [layoutWidgetMap],
   );
 
-  let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
+  let waitItemInfos = useRef<{ id: string; rendered: boolean }[]>([]);
 
   const currentLayout = useRef<Layout[]>([]);
 
   const { ref, widgetRowHeight } = useWidgetRowHeight();
-
-  let scrollThrottle = useRef(false);
 
   const onBreakpointChange = value => {};
 
@@ -123,48 +124,23 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     margin,
     containerPadding,
   ]);
-
-  const layoutMap = useMemo(() => {
-    const layoutMap: Layouts = {
-      lg: [],
-      xs: [],
-    };
-
-    Object.values(layoutWidgetMap).forEach(widget => {
-      const lg = widget.config.rect || widget.config.mobileRect || {};
-      const xs = widget.config.mobileRect || widget.config.rect || {};
-      const lock = widget.config.lock;
-      layoutMap.lg.push({
-        i: widget.id,
-        x: lg.x,
-        y: lg.y,
-        w: lg.width,
-        h: lg.height,
-        static: lock,
-      });
-      layoutMap.xs.push({
-        i: widget.id,
-        x: xs.x,
-        y: xs.y,
-        w: xs.width,
-        h: xs.height,
-        static: lock,
-      });
-    });
-    return layoutMap;
-  }, [layoutWidgetMap]);
+  const layoutMap = useGridLayoutMap(layoutWidgetMap);
 
   useEffect(() => {
     currentLayout.current = layoutMap.lg;
   }, [layoutMap.lg]);
+
   useEffect(() => {
-    const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
-    if (layoutWidgetInfos.length) {
-      layoutInfos.current = layoutWidgetInfos.map(WidgetInfo => ({
-        id: WidgetInfo.id,
-        rendered: WidgetInfo.rendered,
-      }));
-    }
+    const layoutWaitWidgetInfos = Object.values(layoutWidgetInfoMap).filter(
+      widgetInfo => {
+        return !widgetInfo.rendered;
+      },
+    );
+
+    waitItemInfos.current = layoutWaitWidgetInfos.map(widgetInfo => ({
+      id: widgetInfo.id,
+      rendered: widgetInfo.rendered,
+    }));
   }, [layoutWidgetInfoMap]);
 
   const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
@@ -178,48 +154,34 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     [margin, widgetRowHeight],
   );
 
-  const lazyLoad = useCallback(() => {
+  const lazyRender = useCallback(() => {
     if (!gridWrapRef.current) return;
-    if (!scrollThrottle.current) {
-      requestAnimationFrame(() => {
-        const waitingItems = layoutInfos.current.filter(item => !item.rendered);
-        if (waitingItems.length > 0) {
-          const { offsetHeight, scrollTop } = gridWrapRef.current || {
-            offsetHeight: 0,
-            scrollTop: 0,
-          };
-          waitingItems.forEach(item => {
-            const itemTop = calcItemTop(item.id);
-            if (itemTop - scrollTop < offsetHeight) {
-              renderedWidgetById(item.id);
-            }
-          });
-        } else {
-          if (scrollThrottle.current) {
-            gridWrapRef.current?.removeEventListener('scroll', lazyLoad, false);
-          }
-        }
-        scrollThrottle.current = false;
-      });
-      scrollThrottle.current = true;
-    }
-  }, [calcItemTop, renderedWidgetById]);
-
-  useEffect(() => {
-    setImmediate(() => {
-      if (sortedLayoutWidgets.length && gridWrapRef.current) {
-        lazyLoad();
-        gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
-        gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
-        window.addEventListener('resize', lazyLoad, false);
+    if (!waitItemInfos.current.length) return;
+    const waitingItems = waitItemInfos.current;
+    const { offsetHeight, scrollTop } = gridWrapRef.current! || {};
+    waitingItems.forEach(item => {
+      const itemTop = calcItemTop(item.id);
+      if (itemTop - scrollTop < offsetHeight) {
+        renderedWidgetById(item.id);
       }
     });
+  }, [calcItemTop, renderedWidgetById]);
 
+  const ttRender = useMemo(() => throttle(lazyRender, 50), [lazyRender]);
+
+  useLayoutEffect(() => {
+    if (gridWrapRef.current) {
+      lazyRender();
+      gridWrapRef.current.removeEventListener('scroll', ttRender, false);
+      gridWrapRef.current.addEventListener('scroll', ttRender, false);
+      // issues#339
+      window.addEventListener('resize', ttRender, false);
+    }
     return () => {
-      gridWrapRef.current?.removeEventListener('scroll', lazyLoad, false);
-      window.removeEventListener('resize', lazyLoad, false);
+      gridWrapRef?.current?.removeEventListener('scroll', ttRender, false);
+      window.removeEventListener('resize', ttRender, false);
     };
-  }, [sortedLayoutWidgets.length, lazyLoad]);
+  }, [ttRender, lazyRender]);
 
   const changeWidgetLayouts = debounce((layouts: Layout[]) => {
     dispatch(
@@ -240,18 +202,6 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     dispatch(editDashBoardInfoActions.adjustDashLayouts(layouts));
   };
 
-  const boardChildren = useMemo(() => {
-    return sortedLayoutWidgets.map(item => {
-      return (
-        <div className="block-item" key={item.id}>
-          <WidgetAllProvider id={item.id}>
-            <WidgetOfAutoEditor />
-          </WidgetAllProvider>
-        </div>
-      );
-    });
-  }, [sortedLayoutWidgets]);
-
   const { deviceClassName } = useMemo(() => {
     let deviceClassName: string = 'desktop';
     if (deviceType === DeviceType.Mobile) {
@@ -261,6 +211,18 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
       deviceClassName,
     };
   }, [deviceType]);
+
+  const boardChildren = useMemo(() => {
+    return sortedLayoutWidgets.map(item => {
+      return (
+        <div key={item.id}>
+          <WidgetAllProvider id={item.id}>
+            <WidgetOfAutoEditor />
+          </WidgetAllProvider>
+        </div>
+      );
+    });
+  }, [sortedLayoutWidgets]);
 
   /**
    * https://www.npmjs.com/package/react-grid-layout
