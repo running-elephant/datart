@@ -26,7 +26,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import styled from 'styled-components/macro';
 import ChartDatasetContext from '../../contexts/ChartDatasetContext';
 import ChartDataViewContext from '../../contexts/ChartDataViewContext';
-import layoutCnofig, { LayoutComponentType } from './ChartOperationPanelLayout';
+import layoutConfig, { LayoutComponentType } from './ChartOperationPanelLayout';
 import ChartConfigPanel from './components/ChartConfigPanel/ChartConfigPanel';
 import ChartDataViewPanel from './components/ChartDataViewPanel';
 import ChartPresentWrapper from './components/ChartPresentWrapper';
@@ -54,7 +54,7 @@ const ChartOperationPanel: FC<{
     const { dataset, onRefreshDataset } = useContext(ChartDatasetContext);
     const { dataView, expensiveQuery } = useContext(ChartDataViewContext);
     const [layout, setLayout] = useState<Model>(() =>
-      Model.fromJson(layoutCnofig),
+      Model.fromJson(layoutConfig),
     );
 
     const layoutFactory = node => {

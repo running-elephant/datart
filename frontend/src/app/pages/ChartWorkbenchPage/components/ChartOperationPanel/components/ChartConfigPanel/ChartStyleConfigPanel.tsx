@@ -49,7 +49,7 @@ const ChartStyleConfigPanel: FC<{
                 mode={
                   c.comType === 'group'
                     ? GroupLayoutMode.INNER
-                    : GroupLayoutMode.OUTTER
+                    : GroupLayoutMode.OUTER
                 }
                 data={c}
                 translate={t}

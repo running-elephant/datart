@@ -23,6 +23,6 @@ export interface FunctionDescription {
   syntax: string;
 }
 
-export interface ChartCompoutedFieldHandle {
+export interface ChartComputedFieldHandle {
   insertField: (value, funcDesc?: FunctionDescription) => void;
 }

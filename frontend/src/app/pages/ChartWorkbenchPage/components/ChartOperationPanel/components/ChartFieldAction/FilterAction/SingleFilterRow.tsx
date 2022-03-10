@@ -29,7 +29,7 @@ const SingleFilter: FC<{
   condition: ChartFilterCondition;
   onAddBrotherFilter?: () => void;
   onDeleteSelfFilter?: () => void;
-  onConditionChange: (condtion: ChartFilterCondition) => void;
+  onConditionChange: (condition: ChartFilterCondition) => void;
 }> = memo(
   ({
     rowName,
@@ -77,7 +77,10 @@ const SingleFilter: FC<{
       if (op === FilterSqlOperator.Null || op === FilterSqlOperator.NotNull) {
         return null;
       }
-      if (op === FilterSqlOperator.Between || op === FilterSqlOperator.NotBetween) {
+      if (
+        op === FilterSqlOperator.Between ||
+        op === FilterSqlOperator.NotBetween
+      ) {
         return (
           <>
             <InputNumber

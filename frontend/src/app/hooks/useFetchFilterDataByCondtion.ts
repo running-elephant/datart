@@ -25,7 +25,7 @@ import { ChartDTO } from 'app/types/ChartDTO';
 import { getDistinctFields } from 'app/utils/fetch';
 import useMount from './useMount';
 
-export const useFetchFilterDataByCondtion = (
+export const useFetchFilterDataByCondition = (
   viewId?: string,
   condition?: FilterCondition,
   onFinish?: (datas: RelationFilterValue[]) => void,
@@ -51,4 +51,4 @@ export const useFetchFilterDataByCondtion = (
   });
 };
 
-export default useFetchFilterDataByCondtion;
+export default useFetchFilterDataByCondition;

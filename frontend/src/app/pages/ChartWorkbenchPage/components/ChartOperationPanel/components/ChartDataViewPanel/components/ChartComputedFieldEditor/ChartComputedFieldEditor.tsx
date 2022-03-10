@@ -18,9 +18,9 @@
 
 import { Divider, Row } from 'antd';
 import {
-  ChartCompoutedFieldHandle,
+  ChartComputedFieldHandle,
   FunctionDescription,
-} from 'app/types/CompoutedFieldEditor';
+} from 'app/types/ComputedFieldEditor';
 import debounce from 'lodash/debounce';
 import {
   forwardRef,
@@ -35,7 +35,7 @@ import ChartComputedFieldEditorDarkTheme from './ChartComputedFieldEditorDarkThe
 import DatartQueryLanguageSpecification from './DatartQueryLanguageSpecification';
 
 const ChartComputedFieldEditor: ForwardRefRenderFunction<
-  ChartCompoutedFieldHandle,
+  ChartComputedFieldHandle,
   {
     value?: string;
     functionDescriptions?: FunctionDescription[];

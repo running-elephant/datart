@@ -32,7 +32,7 @@ import TimeSelector from '../../ChartTimeSelector';
 const DateConditionConfiguration: FC<
   {
     condition?: ChartFilterCondition;
-    onChange: (confconditionig: ChartFilterCondition) => void;
+    onChange: (condition: ChartFilterCondition) => void;
   } & I18NComponentProps
 > = memo(({ i18nPrefix, condition, onChange: onConditionChange }) => {
   const t = useI18NPrefix(i18nPrefix);
@@ -78,7 +78,7 @@ const DateConditionConfiguration: FC<
         />
       </Tabs.TabPane>
       <Tabs.TabPane tab={t('manual')} key={FilterConditionType.RangeTime}>
-        <TimeSelector.MannualRangeTimeSelector
+        <TimeSelector.ManualRangeTimeSelector
           i18nPrefix={i18nPrefix}
           condition={condition}
           onConditionChange={onConditionChange}

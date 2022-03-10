@@ -325,7 +325,7 @@ const config: ChartConfig = {
         map: {
           title: 'Map',
           level: 'Level',
-          enableZoom: 'Enabel Zoom',
+          enableZoom: 'Enable Zoom',
           backgroundColor: 'Background Color',
           borderStyle: 'Border Style',
           focusArea: 'Focus Area',

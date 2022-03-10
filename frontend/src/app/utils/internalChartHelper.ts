@@ -300,8 +300,6 @@ const transferMixedToOther = (
   return targetConfig!;
 };
 
-const balanceAssignConfigRows = sources => {};
-
 export function isInRange(limit?: ChartDataConfig['limit'], count: number = 0) {
   return cond(
     [isEmpty, true],
