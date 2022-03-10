@@ -46,7 +46,6 @@ import { RootState } from 'types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
 import { rejectedActionMessageHandler } from 'utils/notification';
-import { CloneValueDeep } from 'utils/object';
 import { request2 } from 'utils/request';
 import { listToTree, rejectHandle } from 'utils/utils';
 import { ChartDTO } from '../../../types/ChartDTO';
@@ -460,20 +459,18 @@ const workbenchSlice = createSlice({
         state.dataviews = payload;
       })
       .addCase(fetchViewDetailAction.fulfilled, (state, { payload }) => {
-        let viewData = CloneValueDeep(payload);
         const index = state.dataviews?.findIndex(
-          view => view.id === viewData.id,
+          view => view.id === payload.id,
         );
         let computedFields: ChartDataViewMeta[] = [];
-        if (viewData.id === state?.backendChart?.view?.id) {
+        if (payload.id === state?.backendChart?.view?.id) {
           computedFields = state?.backendChart?.config?.computedFields || [];
         }
 
         if (index !== undefined) {
-          viewData.config = migrateViewConfig(viewData.config);
           state.currentDataView = {
-            ...viewData,
-            meta: transformMeta(viewData.model),
+            ...{ ...payload, config: migrateViewConfig(payload.config) },
+            meta: transformMeta(payload.model),
             computedFields,
           };
         }
