@@ -104,6 +104,11 @@ export const SQLEditor = memo(() => {
           type: CommonFormTypes.Edit,
           visible: true,
           parentIdLabel: t('folder'),
+          initialValues: {
+            name: '',
+            parentId: '',
+            config: {},
+          },
           onSave: (values, onClose) => {
             let index = getInsertedNodeIndex(values, viewsData);
 
