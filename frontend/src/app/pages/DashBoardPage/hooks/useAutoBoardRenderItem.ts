@@ -77,6 +77,7 @@ export default function useAutoBoardRenderItem(
     });
   }, [calcItemTop, renderedWidgetById]);
 
+  // throttle lazyRender
   const ttRender = useMemo(() => throttle(lazyRender, 50), [lazyRender]);
 
   useEffect(() => {
@@ -98,5 +99,6 @@ export default function useAutoBoardRenderItem(
     gridWrapRef,
     currentLayout,
     widgetRowHeight,
+    ttRender,
   };
 }

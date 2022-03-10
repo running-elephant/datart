@@ -93,7 +93,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     [layoutWidgetMap],
   );
 
-  const { ref, gridWrapRef, currentLayout, widgetRowHeight } =
+  const { ref, gridWrapRef, currentLayout, widgetRowHeight, ttRender } =
     useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
 
   const onBreakpointChange = value => {};
@@ -132,7 +132,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
 
   const onLayoutChange = (layouts: Layout[]) => {
     currentLayout.current = layouts;
-
+    ttRender();
     // ignore isDraggable item from out
     if (layouts.find(item => item.isDraggable === true)) {
       return;

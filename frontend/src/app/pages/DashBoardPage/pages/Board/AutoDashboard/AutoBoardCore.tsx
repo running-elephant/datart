@@ -84,7 +84,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       DeviceType.Desktop,
     );
 
-    const { ref, gridWrapRef, currentLayout, widgetRowHeight } =
+    const { ref, gridWrapRef, currentLayout, widgetRowHeight, ttRender } =
       useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
 
     const { gridRef } = useBoardWidthHeight();
@@ -118,9 +118,10 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
 
     const onLayoutChange = useCallback(
       (layouts: Layout[], all) => {
+        ttRender();
         currentLayout.current = layouts;
       },
-      [currentLayout],
+      [currentLayout, ttRender],
     );
 
     const boardChildren = useMemo(() => {
