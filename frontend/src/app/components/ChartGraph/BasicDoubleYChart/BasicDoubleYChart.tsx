@@ -30,6 +30,8 @@ import {
   getSeriesTooltips4Polar2,
   getSplitLine,
   getStyles,
+  hadAxisLabelOverflowConfig,
+  setOptionsByAxisLabelOverflow,
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
@@ -83,6 +85,7 @@ class BasicDoubleYChart extends Chart {
 
   onResize(opt: any, context): void {
     this.chart?.resize(context);
+    hadAxisLabelOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
   }
 
   private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
@@ -117,6 +120,30 @@ class BasicDoubleYChart extends Chart {
       return {};
     }
 
+    const yAxisNames = leftMetricsConfigs
+      .concat(rightMetricsConfigs)
+      .map(getColumnRenderName);
+
+    // @TM 溢出自动根据bar长度设置标尺
+    const option = setOptionsByAxisLabelOverflow({
+      chart: this.chart,
+      xAxis: this.getXAxis(styleConfigs, groupConfigs, chartDataSet),
+      yAxis: this.getYAxis(
+        styleConfigs,
+        leftMetricsConfigs,
+        rightMetricsConfigs,
+      ),
+      grid: getGridStyle(styleConfigs),
+      series: this.getSeries(
+        styleConfigs,
+        settingConfigs,
+        leftMetricsConfigs,
+        rightMetricsConfigs,
+        chartDataSet,
+      ),
+      yAxisNames,
+    });
+
     return {
       tooltip: {
         trigger: 'axis',
@@ -132,24 +159,8 @@ class BasicDoubleYChart extends Chart {
           chartDataSet,
         ),
       },
-      grid: getGridStyle(styleConfigs),
-      legend: this.getLegend(
-        styleConfigs,
-        leftMetricsConfigs.concat(rightMetricsConfigs).map(getColumnRenderName),
-      ),
-      xAxis: this.getXAxis(styleConfigs, groupConfigs, chartDataSet),
-      yAxis: this.getYAxis(
-        styleConfigs,
-        leftMetricsConfigs,
-        rightMetricsConfigs,
-      ),
-      series: this.getSeries(
-        styleConfigs,
-        settingConfigs,
-        leftMetricsConfigs,
-        rightMetricsConfigs,
-        chartDataSet,
-      ),
+      legend: this.getLegend(styleConfigs, yAxisNames),
+      ...option,
     };
   }
 
@@ -245,6 +256,7 @@ class BasicDoubleYChart extends Chart {
       rotate,
       showInterval,
       interval,
+      overflow,
     ] = getStyles(
       styles,
       ['xAxis'],
@@ -257,6 +269,7 @@ class BasicDoubleYChart extends Chart {
         'rotate',
         'showInterval',
         'interval',
+        'overflow',
       ],
     );
     const [showVerticalLine, verticalLineStyle] = getStyles(
@@ -274,6 +287,7 @@ class BasicDoubleYChart extends Chart {
         font,
         showInterval ? interval : null,
         rotate,
+        overflow,
       ),
       axisLine: getAxisLine(showAxis, lineStyle),
       axisTick: getAxisTick(showLabel, lineStyle),
