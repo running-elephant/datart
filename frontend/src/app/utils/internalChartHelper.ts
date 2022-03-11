@@ -425,12 +425,7 @@ export function mergeChartStyleConfigs(
     const sEle =
       'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
 
-    if (!isUndefined(sEle?.['value']) && (!sEle?.comType || !tEle.comType)) {
-      tEle['value'] = sEle?.['value'];
-    } else if (
-      !isUndefined(sEle?.['value']) &&
-      sEle?.comType === tEle.comType
-    ) {
+    if (!isUndefined(sEle?.['value'])) {
       tEle['value'] = sEle?.['value'];
     }
     if (!isEmptyArray(tEle?.rows)) {
