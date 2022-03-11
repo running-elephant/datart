@@ -28,7 +28,6 @@ import {
 import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
-import { useVisibleHidden } from 'app/pages/DashBoardPage/hooks/useVisibleHidden';
 import {
   selectLayoutWidgetInfoMapById,
   selectLayoutWidgetMapById,
@@ -49,7 +48,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 const mobilePoints = Object.keys(BREAK_POINT_MAP).slice(3);
 export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
-    const visible = useVisibleHidden();
+    // const visible = useVisibleHidden(0);
     const {
       margin,
       containerPadding,
@@ -143,11 +142,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
 
     return (
       <Wrap>
-        <StyledContainer
-          bg={background}
-          ref={ref}
-          style={{ visibility: visible }}
-        >
+        <StyledContainer bg={background} ref={ref}>
           {sortedLayoutWidgets.length ? (
             <div className="grid-wrap" ref={gridWrapRef}>
               <div className="grid-wrap" ref={gridRef}>
