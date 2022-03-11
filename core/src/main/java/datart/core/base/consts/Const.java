@@ -31,6 +31,11 @@ public class Const {
 
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
+    public static final String FILE_SUFFIX_DATE_FORMAT = "yyyy-MM-dd_HH-mm-ss-SSS";
+
+    // 数据库schema最短同步时间间隔
+    public static final Integer MINIMUM_SYNC_INTERVAL = 60;
+
     /**
      * 正则表达式
      */

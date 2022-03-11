@@ -66,7 +66,7 @@ const ChartGraphIcon: FC<{
     return <SVGFontIconRender {...args} />;
   };
 
-  const renderChartRequirments = requirements => {
+  const renderChartRequirements = requirements => {
     const lintMessages = requirements?.flatMap((requirement, index) => {
       return [ChartDataSectionType.GROUP, ChartDataSectionType.AGGREGATE].map(
         type => {
@@ -101,8 +101,8 @@ const ChartGraphIcon: FC<{
       key={chart?.meta?.id}
       title={
         <>
-          {t(chart?.meta?.name, true)}
-          {renderChartRequirments(chart?.meta?.requirements)}
+          {t(chart?.meta?.name!, true)}
+          {renderChartRequirements(chart?.meta?.requirements)}
         </>
       }
     >

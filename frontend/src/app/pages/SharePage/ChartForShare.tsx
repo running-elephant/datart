@@ -132,7 +132,16 @@ const ChartForShare: FC<{
       false,
       chartPreview?.backendChart?.config?.aggregation,
     );
-    const downloadParams = [builder.build()];
+
+    const downloadParams = [
+      {
+        ...builder.build(),
+        analytics: false,
+        vizType: 'dataChart',
+        vizName: chartPreview?.backendChart?.name || 'chart',
+        vizId: chartPreview?.backendChart?.id,
+      },
+    ];
     const fileName = chartPreview?.backendChart?.name || 'chart';
     onCreateDataChartDownloadTask(downloadParams, fileName);
   };

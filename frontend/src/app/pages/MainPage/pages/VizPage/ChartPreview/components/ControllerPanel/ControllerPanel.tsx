@@ -17,13 +17,13 @@
  */
 
 import { Col, Form, Row } from 'antd';
-import { ChartDTO } from "app/types/ChartDTO";
 import {
   ChartConfig,
   ChartDataSectionField,
   ChartDataSectionType,
   FilterFieldAction,
 } from 'app/types/ChartConfig';
+import { ChartDTO } from 'app/types/ChartDTO';
 import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,

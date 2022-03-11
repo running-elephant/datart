@@ -6636,6 +6636,7 @@ String KeywordFunctionNameSupport() :
     |   <INSERT>
     |   <CONVERT>
     |   <ARRAY>
+    |   <DAY>
     )
     {
         return unquotedIdentifier();

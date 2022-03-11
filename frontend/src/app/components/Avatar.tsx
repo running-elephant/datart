@@ -18,13 +18,15 @@ export function Avatar(props: AvatarProps) {
   }
 
   return (
-    <StyledAvatar {...rest} src={safeSrc} style={style}>
+    <StyledAvatar {...rest} src={safeSrc} size={size} style={style}>
       {props.children}
     </StyledAvatar>
   );
 }
 
 const StyledAvatar = styled(AntdAvatar)`
-  color: ${p => p.theme.textColorLight};
-  background-color: ${p => p.theme.emphasisBackground};
+  &.ant-avatar {
+    color: ${p => p.theme.textColorLight};
+    background-color: ${p => p.theme.emphasisBackground};
+  }
 `;

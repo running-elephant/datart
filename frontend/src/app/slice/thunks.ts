@@ -185,3 +185,36 @@ export const getSystemInfo = createAsyncThunk<SystemInfo>(
     }
   },
 );
+
+export const getOauth2Clients = createAsyncThunk<[]>(
+  'app/getOauth2Clients',
+  async () => {
+    try {
+      const { data } = await request<[]>({
+        url: '/tpa/getOauth2Clients',
+        method: 'GET',
+      });
+      return data;
+    } catch (error) {
+      errorHandle(error);
+      throw error;
+    }
+  },
+);
+
+export const tryOauth = createAsyncThunk<User>('app/tryOauth', async () => {
+  try {
+    const { data } = await request<User>({
+      url: '/tpa/oauth2login',
+      method: 'POST',
+    });
+    localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(data));
+    setTimeout(() => {
+      window.location.href = '/';
+    });
+    return data;
+  } catch (error) {
+    errorHandle(error);
+    throw error;
+  }
+});

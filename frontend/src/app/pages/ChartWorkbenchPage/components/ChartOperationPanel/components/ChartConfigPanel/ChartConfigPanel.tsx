@@ -58,11 +58,12 @@ const CONFIG_PANEL_TABS = {
 };
 
 const ChartConfigPanel: FC<{
-  chartId: string;
+  chartId?: string;
   chartConfig?: ChartConfig;
+  expensiveQuery?: boolean;
   onChange: (type: string, payload: ChartConfigPayloadType) => void;
 }> = memo(
-  ({ chartId, chartConfig, onChange }) => {
+  ({ chartId, chartConfig, expensiveQuery, onChange }) => {
     const t = useI18NPrefix(`viz.palette`);
     const [tabActiveKey, setTabActiveKey] = useComputedState(
       () => {
@@ -163,6 +164,7 @@ const ChartConfigPanel: FC<{
               <Pane selected={tabActiveKey === CONFIG_PANEL_TABS.DATA}>
                 <ChartDataConfigPanel
                   dataConfigs={chartConfig?.datas}
+                  expensiveQuery={expensiveQuery}
                   onChange={onDataConfigChanged}
                 />
               </Pane>
@@ -187,7 +189,9 @@ const ChartConfigPanel: FC<{
     );
   },
   (prev, next) =>
-    prev.chartConfig === next.chartConfig && prev.chartId === next.chartId,
+    prev.chartConfig === next.chartConfig &&
+    prev.chartId === next.chartId &&
+    prev.expensiveQuery === next.expensiveQuery,
 );
 
 export default ChartConfigPanel;

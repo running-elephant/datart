@@ -38,9 +38,27 @@ export interface ViewState {
   sourceDatabases: {
     [name: string]: TreeDataNode[];
   };
+  sourceDatabaseSchema: {
+    [name: string]: DatabaseSchema[];
+  };
   saveViewLoading: boolean;
   unarchiveLoading: boolean;
+  databaseSchemaLoading: boolean;
 }
+
+export type DatabaseSchema = {
+  dbName: string;
+  tables: Array<{
+    primaryKeys: string[];
+    tableName: string;
+    columns: Array<{
+      fmt: string;
+      foreignKeys: Array<{ column: string; database: string; table: string }>;
+      name: string;
+      type: string;
+    }>;
+  }>;
+};
 
 export interface ViewBase {
   id: string;
@@ -65,7 +83,7 @@ export interface ViewViewModel<T = object>
   description?: string;
   index: number | null;
   isFolder?: boolean;
-  model: Model;
+  model: HierarchyModel;
   config: object;
   originVariables: VariableHierarchy[];
   variables: VariableHierarchy[];
@@ -102,13 +120,28 @@ export interface Schema {
   type: ColumnTypes;
 }
 
+export enum ColumnRole {
+  Role = 'role',
+  Hierarchy = 'hierachy',
+}
+
 export interface Column extends Schema {
-  category: ColumnCategories;
+  category?: ColumnCategories;
+  index?: number;
+
+  role?: ColumnRole;
+  children?: Column[];
 }
 
 export interface Model {
-  [key: string]: Omit<Column, 'name'>;
+  [key: string]: Column;
 }
+
+export type HierarchyModel = {
+  version?: string;
+  hierarchy?: Model;
+  columns?: Model;
+};
 
 export interface ColumnPermissionRaw {
   id: string;

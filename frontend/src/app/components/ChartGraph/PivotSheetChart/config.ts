@@ -100,8 +100,8 @@ const config: ChartConfig = {
     //             comType: 'group',
     //             rows: [
     //               {
-    //                 label: 'column.conditionStyle',
-    //                 key: 'conditionStyle',
+    //                 label: 'column.conditionalStyle',
+    //                 key: 'conditionalStyle',
     //                 comType: 'group',
     //                 options: { expand: true },
     //                 rows: [],
@@ -174,7 +174,7 @@ const config: ChartConfig = {
           key: 'font',
           comType: 'font',
           default: {
-            fontFamily: 'PingFang SC',
+            fontFamily: 'PingFangSC',
             fontSize: 12,
             fontWeight: 'normal',
             color: '#495057',
@@ -188,6 +188,7 @@ const config: ChartConfig = {
               'Arial',
               'sans-serif',
             ],
+            showFontStyle: false,
           },
         },
         {
@@ -218,7 +219,7 @@ const config: ChartConfig = {
           key: 'font',
           comType: 'font',
           default: {
-            fontFamily: 'PingFang SC',
+            fontFamily: 'PingFangSC',
             fontSize: 12,
             fontWeight: 'normal',
             color: '#495057',
@@ -232,6 +233,7 @@ const config: ChartConfig = {
               'Arial',
               'sans-serif',
             ],
+            showFontStyle: false,
           },
         },
         {

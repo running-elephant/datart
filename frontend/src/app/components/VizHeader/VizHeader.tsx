@@ -88,9 +88,9 @@ const VizHeader: FC<{
     }, []);
 
     const handleModalOk = useCallback(
-      (dashboardId: string) => {
+      (dashboardId: string, dashboardType: string) => {
         setIsModalVisible(false);
-        onAddToDashBoard?.(dashboardId);
+        onAddToDashBoard?.(dashboardId, dashboardType);
       },
       [onAddToDashBoard],
     );

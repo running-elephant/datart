@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { createSelector } from '@reduxjs/toolkit';
+import { DefaultWidgetData } from 'app/pages/DashBoardPage/constants';
 import { RootState } from 'types';
 import { boardInit } from '.';
 import { getLayoutWidgets } from '../../../utils/widget';
@@ -156,12 +157,7 @@ export const selectViewMap = createSelector(
 // dataChartMap
 export const selectWidgetDataById = createSelector(
   [boardState, selectPropsId],
-  (state, wid) =>
-    state.widgetDataMap[wid] || {
-      id: '',
-      columns: [],
-      rows: [],
-    },
+  (state, wid) => state.widgetDataMap[wid] || DefaultWidgetData,
 );
 
 //  share

@@ -39,6 +39,10 @@ public class SqlFunctionRegisterVisitor extends SqlBasicVisitor<Object> {
     private void registerIfNotExists(SqlFunction sqlFunction) {
         SqlStdOperatorTable opTab = SqlStdOperatorTable.instance();
         LinkedList<SqlOperator> list = new LinkedList<>();
+        // built-in functions have no identifier and no registration required
+        if (sqlFunction.getSqlIdentifier() == null) {
+            return;
+        }
         opTab.lookupOperatorOverloads(sqlFunction.getSqlIdentifier(), null, SqlSyntax.FUNCTION, list,
                 SqlNameMatchers.withCaseSensitive(sqlFunction.getSqlIdentifier().isComponentQuoted(0)));
         if (list.size() > 0) {

@@ -26,7 +26,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import styled from 'styled-components/macro';
 import ChartDatasetContext from '../../contexts/ChartDatasetContext';
 import ChartDataViewContext from '../../contexts/ChartDataViewContext';
-import layoutCnofig, { LayoutComponentType } from './ChartOperationPanelLayout';
+import layoutConfig, { LayoutComponentType } from './ChartOperationPanelLayout';
 import ChartConfigPanel from './components/ChartConfigPanel/ChartConfigPanel';
 import ChartDataViewPanel from './components/ChartDataViewPanel';
 import ChartPresentWrapper from './components/ChartPresentWrapper';
@@ -35,23 +35,26 @@ const ChartOperationPanel: FC<{
   chart?: IChart;
   chartConfig?: ChartConfig;
   defaultViewId?: string;
+  allowQuery: boolean;
   onChartChange: (chart: IChart) => void;
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
+  onCreateDownloadDataTask?: () => void;
 }> = memo(
   ({
     chart,
     chartConfig,
     defaultViewId,
+    allowQuery,
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
+    onCreateDownloadDataTask,
   }) => {
-    const { dataset } = useContext(ChartDatasetContext);
-    const { dataView } = useContext(ChartDataViewContext);
-
+    const { dataset, onRefreshDataset } = useContext(ChartDatasetContext);
+    const { dataView, expensiveQuery } = useContext(ChartDataViewContext);
     const [layout, setLayout] = useState<Model>(() =>
-      Model.fromJson(layoutCnofig),
+      Model.fromJson(layoutConfig),
     );
 
     const layoutFactory = node => {
@@ -72,6 +75,7 @@ const ChartOperationPanel: FC<{
           <ChartConfigPanel
             chartId={chart?.meta?.id}
             chartConfig={chartConfig}
+            expensiveQuery={expensiveQuery}
             onChange={onChartConfigChange}
           />
         );
@@ -87,8 +91,12 @@ const ChartOperationPanel: FC<{
             }
             chart={chart}
             dataset={dataset}
+            expensiveQuery={expensiveQuery}
+            allowQuery={allowQuery}
             chartConfig={chartConfig}
             onChartChange={onChartChange}
+            onRefreshDataset={onRefreshDataset}
+            onCreateDownloadDataTask={onCreateDownloadDataTask}
           />
         );
       }

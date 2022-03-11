@@ -52,6 +52,7 @@ export function SchemaComponent({ value, dataSource, onChange }: SchemaProps) {
       width={600}
       height={400}
       model={model}
+      hierarchy={model}
       dataSource={dataSource}
       loading={false}
       hasCategory={false}

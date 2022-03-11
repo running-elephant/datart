@@ -23,11 +23,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
-  FONT_SIZE_BODY,
-  G40,
-  G80,
+  SPACE,
   SPACE_TIMES,
-  WHITE,
+  SPACE_XS,
 } from 'styles/StyleConstants';
 import ChromeColorPicker from './ChromeColorPicker';
 import { colorSelectionPropTypes } from './slice/types';
@@ -109,28 +107,27 @@ function SingleColorSelection({ color, onChange }: colorSelectionPropTypes) {
 export default SingleColorSelection;
 
 const ColorWrap = styled.div`
-  background-color: ${WHITE};
-  width: 426px;
-  min-width: 426px;
-  // max-width: 426px;
+  width: 390px;
+  min-width: 390px;
+  background-color: ${p => p.theme.componentBackground};
 `;
 
 const ThemeColorWrap = styled.div`
-  border-bottom: 1px solid ${G40};
-  padding-bottom: ${SPACE_TIMES(1.5)};
-  margin: ${SPACE_TIMES(2.5)} 0;
+  display: flex;
+  padding-top: ${SPACE};
+  border-bottom: 1px solid ${p => p.theme.borderColorEmphasis};
 `;
 
 const ColorBlock = styled.span<{ color: string }>`
-  display: inline-block;
-  min-width: ${SPACE_TIMES(6)};
-  min-height: ${SPACE_TIMES(6)};
-  background-color: ${p => p.color};
-  border-radius: ${BORDER_RADIUS};
+  min-width: ${SPACE_TIMES(7)};
+  min-height: ${SPACE_TIMES(7)};
+  margin: 0 ${SPACE_XS} ${SPACE_XS} 0;
   cursor: pointer;
+  background-color: ${p => p.color};
+  border: 1px solid ${p => p.theme.borderColorEmphasis};
+  border-radius: ${BORDER_RADIUS};
   transition: all 0.2s;
-  margin-right: ${SPACE_TIMES(4)};
-  border: 1px solid ${G40};
+
   &:last-child {
     margin-right: 0px;
   }
@@ -138,24 +135,24 @@ const ColorBlock = styled.span<{ color: string }>`
     opacity: 0.7;
   }
   &.active {
-    border: 1px solid ${p => p.theme.primary};
+    box-shadow: ${p => p.theme.shadow1};
   }
 `;
 
 const ColorPalette = styled.div`
-  border-bottom: 1px solid ${G40};
-  padding-bottom: ${SPACE_TIMES(1.5)};
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: ${SPACE_XS};
+  border-bottom: 1px solid ${p => p.theme.borderColorEmphasis};
   > span:nth-child(11n) {
     margin-right: 0px;
   }
 `;
 
 const MoreColor = styled.div`
+  margin-top: ${SPACE_XS};
   text-align: center;
   cursor: pointer;
-  margin-top: ${SPACE_TIMES(2.5)};
-  font-size: ${FONT_SIZE_BODY};
-  color: ${G80};
   &:hover {
     color: ${p => p.theme.primary};
   }

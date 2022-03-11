@@ -63,7 +63,7 @@ const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       }
       return [];
     });
-    const [unSelectdItems, setUnSelectedItems] = useState(() => {
+    const [unSelectedItems, setUnSelectedItems] = useState(() => {
       const selectedItemsKeys = selectedItems.map(item => item.key);
       return allItems.filter(item => !selectedItemsKeys.includes(item.key));
     });
@@ -79,7 +79,7 @@ const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
 
     const handleDeleteItem = item => {
       if (item) {
-        setUnSelectedItems(unSelectdItems.concat([item]));
+        setUnSelectedItems(unSelectedItems.concat([item]));
         setSelectedItems(selectedItems.filter(so => so.key !== item.key));
         setCurrentSelectedItem(null);
         const newMyData = updateBy(myDataRef.current, draft => {
@@ -91,9 +91,9 @@ const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     };
 
     const handleColumnChange = key => {
-      const item = unSelectdItems.find(so => so.key === key);
+      const item = unSelectedItems.find(so => so.key === key);
       if (item) {
-        setUnSelectedItems(unSelectdItems.filter(so => so.key !== key));
+        setUnSelectedItems(unSelectedItems.filter(so => so.key !== key));
         setSelectedItems(selectedItems.concat([item]));
         setCurrentSelectedItem(item);
         const newRowSettings = rowSettings?.concat([
@@ -151,7 +151,7 @@ const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
               value={currentSelectedItem?.label}
               onChange={handleColumnChange}
             >
-              {unSelectdItems?.map((o, index) => {
+              {unSelectedItems?.map((o, index) => {
                 const label = isEmpty(o['label']) ? o : o.label;
                 const key = isEmpty(o['key']) ? index : o.key;
                 return (

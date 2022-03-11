@@ -22,11 +22,13 @@ public interface FolderMapper extends CRUDMapper {
     @Insert({
         "insert into folder (id, `name`, ",
         "org_id, rel_type, ",
-        "rel_id, parent_id, ",
+        "sub_type, rel_id, ",
+        "avatar, parent_id, ",
         "`index`)",
         "values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, ",
         "#{orgId,jdbcType=VARCHAR}, #{relType,jdbcType=VARCHAR}, ",
-        "#{relId,jdbcType=VARCHAR}, #{parentId,jdbcType=VARCHAR}, ",
+        "#{subType,jdbcType=VARCHAR}, #{relId,jdbcType=VARCHAR}, ",
+        "#{avatar,jdbcType=VARCHAR}, #{parentId,jdbcType=VARCHAR}, ",
         "#{index,jdbcType=DOUBLE})"
     })
     int insert(Folder record);
@@ -36,7 +38,7 @@ public interface FolderMapper extends CRUDMapper {
 
     @Select({
         "select",
-        "id, `name`, org_id, rel_type, rel_id, parent_id, `index`",
+        "id, `name`, org_id, rel_type, sub_type, rel_id, avatar, parent_id, `index`",
         "from folder",
         "where id = #{id,jdbcType=VARCHAR}"
     })
@@ -45,7 +47,9 @@ public interface FolderMapper extends CRUDMapper {
         @Result(column="name", property="name", jdbcType=JdbcType.VARCHAR),
         @Result(column="org_id", property="orgId", jdbcType=JdbcType.VARCHAR),
         @Result(column="rel_type", property="relType", jdbcType=JdbcType.VARCHAR),
+        @Result(column="sub_type", property="subType", jdbcType=JdbcType.VARCHAR),
         @Result(column="rel_id", property="relId", jdbcType=JdbcType.VARCHAR),
+        @Result(column="avatar", property="avatar", jdbcType=JdbcType.VARCHAR),
         @Result(column="parent_id", property="parentId", jdbcType=JdbcType.VARCHAR),
         @Result(column="index", property="index", jdbcType=JdbcType.DOUBLE)
     })
@@ -59,7 +63,9 @@ public interface FolderMapper extends CRUDMapper {
         "set `name` = #{name,jdbcType=VARCHAR},",
           "org_id = #{orgId,jdbcType=VARCHAR},",
           "rel_type = #{relType,jdbcType=VARCHAR},",
+          "sub_type = #{subType,jdbcType=VARCHAR},",
           "rel_id = #{relId,jdbcType=VARCHAR},",
+          "avatar = #{avatar,jdbcType=VARCHAR},",
           "parent_id = #{parentId,jdbcType=VARCHAR},",
           "`index` = #{index,jdbcType=DOUBLE}",
         "where id = #{id,jdbcType=VARCHAR}"

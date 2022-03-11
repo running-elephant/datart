@@ -27,6 +27,7 @@ export enum StorageKeys {
   LoggedInUser = 'LOGGED_IN_USER',
   ShareClientId = 'SHARE_CLIENT_ID',
   Locale = 'LOCALE',
+  Theme = 'THEME',
 }
 export const BASE_API_URL = '/api/v1';
 export const BASE_RESOURCE_URL = '/';
@@ -46,23 +47,53 @@ export const DEFAULT_DEBOUNCE_WAIT = 300;
 export const FONT_SIZES = [
   12, 13, 14, 15, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 96, 128,
 ];
+export const FONT_LINE_HEIGHT = [
+  {
+    name: 'viz.palette.style.lineHeight.default',
+    value: 1,
+  },
+  1.5,
+  2,
+  2.5,
+  3,
+  3.5,
+  4,
+  4.5,
+  5,
+  5.5,
+  6,
+  6.5,
+  7,
+  7.5,
+  8,
+  8.5,
+  9,
+  9.5,
+  10,
+];
 
 export const FONT_FAMILIES = [
-  { name: '默认字体', value: FONT_FAMILY },
-  { name: '微软雅黑', value: 'Microsoft YaHei' },
-  { name: '宋体', value: 'SimSun' },
-  { name: '黑体', value: 'SimHei' },
-  { name: 'Helvetica Neue', value: '"Helvetica Neue"' },
-  { name: 'Helvetica', value: 'Helvetica' },
-  { name: 'Arial', value: 'Arial' },
-  { name: 'sans-serif', value: 'sans-serif' },
+  { name: 'viz.palette.style.fontFamily.default', value: FONT_FAMILY },
+  {
+    name: 'viz.palette.style.fontFamily.microsoftYaHei',
+    value: 'Microsoft YaHei',
+  },
+  { name: 'viz.palette.style.fontFamily.simSun', value: 'SimSun' },
+  { name: 'viz.palette.style.fontFamily.simHei', value: 'SimHei' },
+  {
+    name: 'viz.palette.style.fontFamily.helveticaNeue',
+    value: 'Helvetica Neue',
+  },
+  { name: 'viz.palette.style.fontFamily.helvetica', value: 'Helvetica' },
+  { name: 'viz.palette.style.fontFamily.arial', value: 'Arial' },
+  { name: 'viz.palette.style.fontFamily.sansSerif', value: 'sans-serif' },
 ];
 
 export const FONT_WEIGHT = [
-  { name: '常规字号', value: 'normal' },
-  { name: '粗体', value: 'bold' },
-  { name: '特粗体', value: 'bolder' },
-  { name: '细体', value: 'lighter' },
+  { name: 'viz.palette.style.fontWeight.normal', value: 'normal' },
+  { name: 'viz.palette.style.fontWeight.bold', value: 'bold' },
+  { name: 'viz.palette.style.fontWeight.bolder', value: 'bolder' },
+  { name: 'viz.palette.style.fontWeight.lighter', value: 'lighter' },
   { name: '100', value: '100' },
   { name: '200', value: '200' },
   { name: '300', value: '300' },
@@ -75,15 +106,26 @@ export const FONT_WEIGHT = [
 ];
 
 export const FONT_STYLE = [
-  { name: '常规体', value: 'normal' },
-  { name: '斜体', value: 'italic' },
-  { name: '偏斜体', value: 'oblique' },
+  { name: 'viz.palette.style.fontStyle.normal', value: 'normal' },
+  { name: 'viz.palette.style.fontStyle.italic', value: 'italic' },
+  { name: 'viz.palette.style.fontStyle.oblique', value: 'oblique' },
 ];
 
 export const CHART_LINE_STYLES = [
-  { name: '实线', value: 'solid' },
-  { name: '虚线', value: 'dashed' },
-  { name: '点', value: 'dotted' },
+  { name: 'viz.palette.style.lineStyles.solid', value: 'solid' },
+  { name: 'viz.palette.style.lineStyles.dashed', value: 'dashed' },
+  { name: 'viz.palette.style.lineStyles.dotted', value: 'dotted' },
+];
+
+export const CHART_NAME_LOCATION = [
+  { name: 'nameLocation.start', value: 'start' },
+  { name: 'nameLocation.center', value: 'center' },
+  { name: 'nameLocation.end', value: 'end' },
+];
+
+export const CHART_LEGEND_TYPE = [
+  { name: 'legendType.plain', value: 'plain' },
+  { name: 'legendType.scroll', value: 'scroll' },
 ];
 
 export const CHART_LINE_WIDTH = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -137,6 +179,7 @@ export enum FilterSqlOperator {
   NotSuffixContain = 'SUFFIX_NOT_LIKE',
 
   Between = 'BETWEEN',
+  NotBetween = 'NOT_BETWEEN',
   In = 'IN',
   NotIn = 'NOT_IN',
   LessThan = 'LT',

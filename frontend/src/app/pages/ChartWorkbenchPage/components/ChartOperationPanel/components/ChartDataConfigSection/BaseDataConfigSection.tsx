@@ -51,4 +51,5 @@ const StyledBaseDataConfigSection = styled.div`
 
 const StyledBaseDataConfigSectionTitle = styled.div`
   color: ${p => p.theme.textColor};
+  user-select: none;
 `;

@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import { migrateStoryConfig } from 'app/migration/StoryConfig/migrateStoryConfig';
+import { migrateStoryPageConfig } from 'app/migration/StoryConfig/migrateStoryPageConfig';
 import { generateShareLinkAsync } from 'app/utils/fetch';
 import {
   ServerStoryBoard,
@@ -28,19 +30,13 @@ import {
 } from './slice/types';
 
 export const formatStory = (data: ServerStoryBoard) => {
-  let story = {} as StoryBoard;
-  delete data.storypages;
-  let config;
-  if (data.config && Object.keys(data.config).length > 0) {
-    config = JSON.parse(data.config);
-  } else {
-    config = getInitStoryConfig();
-  }
-  story = { ...data, config: config };
+  let config = migrateStoryConfig(data.config);
+  let story = { ...data, config: config } as StoryBoard;
   return story;
 };
 export const getInitStoryConfig = (): StoryConfig => {
   return {
+    version: '',
     autoPlay: {
       auto: false,
       delay: 1,
@@ -73,6 +69,7 @@ export const getInitStoryPageInfo = (id?: string): StoryPageInfo => {
 };
 export const getInitStoryPageConfig = (index?: number): StoryPageConfig => {
   return {
+    version: '',
     name: '',
     thumbnail: '',
     index: index || 0,
@@ -86,18 +83,8 @@ export const getInitStoryPageConfig = (index?: number): StoryPageConfig => {
 export const getStoryPage = (pages: StoryPageOfServer[]) => {
   return pages.map(page => ({
     ...page,
-    config: getStoryPageConfig(page.config),
+    config: migrateStoryPageConfig(page.config),
   }));
-};
-export const getStoryPageConfig = (configStr: string | undefined) => {
-  if (!configStr) {
-    return getInitStoryPageConfig(0);
-  }
-  try {
-    return JSON.parse(configStr);
-  } catch (error) {
-    return getInitStoryPageConfig(0);
-  }
 };
 
 export const generateShareLink = async (

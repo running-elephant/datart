@@ -52,4 +52,6 @@ public class JdbcDriverInfo {
 
     private String urlPrefix;
 
+    private Boolean quoteIdentifiers;
+
 }

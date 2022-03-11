@@ -46,21 +46,16 @@ import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from '../thunk';
 import { HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
 const { confirm } = Modal;
-export const clearEditBoardState =
-  (boardId: string) => async (dispatch, getState) => {
-    const editBoard = getState().editBoard as HistoryEditBoard;
-    if (editBoard.boardInfo.id !== boardId) {
-      return;
-    }
-    await dispatch(
-      editBoardStackActions.setBoardToEditStack({
-        dashBoard: {} as Dashboard,
-        widgetRecord: {},
-      }),
-    );
-    await dispatch(editDashBoardInfoActions.clearEditBoardInfo());
-    await dispatch(editWidgetInfoActions.clearWidgetInfo());
-  };
+export const clearEditBoardState = () => async (dispatch, getState) => {
+  await dispatch(
+    editBoardStackActions.setBoardToEditStack({
+      dashBoard: {} as Dashboard,
+      widgetRecord: {},
+    }),
+  );
+  await dispatch(editDashBoardInfoActions.clearEditBoardInfo());
+  await dispatch(editWidgetInfoActions.clearWidgetInfo());
+};
 export const deleteWidgetsAction = () => (dispatch, getState) => {
   const editBoard = getState().editBoard as HistoryEditBoard;
   let selectedIds = Object.values(editBoard.widgetInfoRecord)
@@ -261,6 +256,19 @@ export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
   );
 };
 
+export const toggleLockWidgetAction =
+  (widget: Widget, bool: boolean) => dispatch => {
+    const nextConf = produce(widget.config, draft => {
+      draft.lock = bool;
+    });
+    dispatch(
+      editBoardStackActions.updateWidgetConfig({
+        wid: widget.id,
+        config: nextConf,
+      }),
+    );
+  };
+
 export const addVariablesToBoard =
   (variables: Variable[]) => (dispatch, getState) => {
     if (!variables?.length) return;
@@ -274,3 +282,8 @@ export const addVariablesToBoard =
     let newVariables = queryVariables.concat(variables);
     dispatch(editBoardStackActions.updateQueryVariables(newVariables));
   };
+
+export const clearActiveWidgets = () => dispatch => {
+  dispatch(editWidgetInfoActions.clearSelectedWidgets());
+  dispatch(editDashBoardInfoActions.changeShowBlockMask(true));
+};

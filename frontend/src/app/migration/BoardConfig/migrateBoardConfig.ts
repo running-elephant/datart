@@ -15,14 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { MIN_MARGIN, MIN_PADDING } from 'app/pages/DashBoardPage/constants';
 import {
   BoardTypeMap,
   DashboardConfig,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getInitBoardConfig } from 'app/pages/DashBoardPage/utils/board';
-import { VERSION_BETA_0, VERSION_LIST } from '../constants';
+import { versionCanDo } from '../utils';
+import { VERSION_BETA_0, VERSION_BETA_1, VERSION_BETA_2 } from './../constants';
 
 export const parseBoardConfig = (boardConfig: string) => {
   let borderTypes = Object.values(BoardTypeMap);
@@ -40,11 +40,7 @@ export const parseBoardConfig = (boardConfig: string) => {
 };
 
 export const beta0 = (config: DashboardConfig) => {
-  config.version = config.version || VERSION_BETA_0;
-  const canHandleVersions = VERSION_LIST.slice(0, 1);
-  // 此函数只能处理 beta0以及 beta0之前的版本
-  if (!canHandleVersions.includes(config.version)) return config;
-
+  if (!versionCanDo(VERSION_BETA_0, config.version)) return config;
   // 1. initialQuery 新增属性 检测没有这个属性就设置为 true,如果已经设置为false，则保持false
   if (!config.hasOwnProperty('initialQuery')) {
     config.initialQuery = true;
@@ -62,9 +58,29 @@ export const beta0 = (config: DashboardConfig) => {
   config.hasQueryControl = Boolean(config.hasQueryControl);
   config.hasResetControl = Boolean(config.hasQueryControl);
 
+  // reset config.version
+  config.version = VERSION_BETA_0;
+  return config;
+};
+
+export const beta1 = (config: DashboardConfig) => {
+  if (!versionCanDo(VERSION_BETA_1, config.version)) return config;
+  config.version = VERSION_BETA_1;
+  return config;
+};
+export const beta2 = (config: DashboardConfig) => {
+  if (!versionCanDo(VERSION_BETA_1, config.version)) return config;
+  // allowOverlap in autoBoard
+  if (!config.allowOverlap) {
+    config.allowOverlap = false;
+  }
+  config.version = VERSION_BETA_2;
   return config;
 };
 export const migrateBoardConfig = (boardConfig: string) => {
   let config = parseBoardConfig(boardConfig);
-  return beta0(config);
+  config = beta0(config);
+  config = beta1(config);
+  config = beta2(config);
+  return config;
 };

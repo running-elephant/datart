@@ -15,13 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { DownloadOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
 import SaveToDashboard from 'app/components/SaveToDashboard';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { backendChartSelector } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import useMount from 'app/hooks/useMount';
+import {
+  backendChartSelector,
+  selectChartEditorDownloadPolling,
+  useWorkbenchSlice,
+} from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { DownloadListPopup } from 'app/pages/MainPage/Navbar/DownloadListPopup';
+import { loadTasks } from 'app/pages/MainPage/Navbar/service';
+import { selectHasVizFetched } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
+import { getFolders } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
+import { downloadFile } from 'app/utils/fetch';
 import { FC, memo, useCallback, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
@@ -39,7 +49,7 @@ const ChartHeaderPanel: FC<{
   container?: string;
   onSaveChart?: () => void;
   onGoBack?: () => void;
-  onSaveChartToDashBoard?: (dashboardId) => void;
+  onSaveChartToDashBoard?: (dashboardId, dashboardType) => void;
 }> = memo(
   ({
     chartName,
@@ -50,12 +60,16 @@ const ChartHeaderPanel: FC<{
     onSaveChartToDashBoard,
   }) => {
     const t = useI18NPrefix(`viz.workbench.header`);
+    const hasVizFetched = useSelector(selectHasVizFetched);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const backendChart = useSelector(backendChartSelector);
+    const downloadPolling = useSelector(selectChartEditorDownloadPolling);
+    const dispatch = useDispatch();
+    const { actions } = useWorkbenchSlice();
 
     const handleModalOk = useCallback(
-      (dashboardId: string) => {
-        onSaveChartToDashBoard?.(dashboardId);
+      (dashboardId: string, dashboardType: string) => {
+        onSaveChartToDashBoard?.(dashboardId, dashboardType);
         setIsModalVisible(true);
       },
       [onSaveChartToDashBoard],
@@ -65,13 +79,40 @@ const ChartHeaderPanel: FC<{
       setIsModalVisible(false);
     }, []);
 
+    const onSetPolling = useCallback(
+      (polling: boolean) => {
+        dispatch(actions.setChartEditorDownloadPolling(polling));
+      },
+      [dispatch, actions],
+    );
+
+    useMount(() => {
+      if (!hasVizFetched) {
+        // Request data when there is no data
+        dispatch(getFolders(orgId as string));
+      }
+    });
+
     return (
       <Wrapper>
         <h1>{chartName}</h1>
         <Space>
-          <Button type="primary" ghost onClick={onGoBack}>
-            {t('cancel')}
-          </Button>
+          <DownloadListPopup
+            polling={downloadPolling}
+            setPolling={onSetPolling}
+            onLoadTasks={loadTasks}
+            onDownloadFile={item => {
+              if (item.id) {
+                downloadFile(item.id).then(() => {
+                  dispatch(actions.setChartEditorDownloadPolling(true));
+                });
+              }
+            }}
+            renderDom={
+              <Button icon={<DownloadOutlined />}>{t('downloadList')}</Button>
+            }
+          />
+          <Button onClick={onGoBack}>{t('cancel')}</Button>
           <Button type="primary" onClick={onSaveChart}>
             {t('save')}
           </Button>
@@ -106,6 +147,7 @@ const Wrapper = styled.div`
   flex-shrink: 0;
   align-items: center;
   padding: ${SPACE_SM} ${SPACE_MD} ${SPACE_SM} ${SPACE_SM};
+  background-color: ${p => p.theme.componentBackground};
   border-bottom: 1px solid ${p => p.theme.borderColorSplit};
 
   h1 {

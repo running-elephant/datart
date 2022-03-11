@@ -113,6 +113,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 currentConfig?.rows || [],
                 draft => {
                   draft.splice(originItemIndex, 1);
+                  item.aggregate = getDefaultAggregate(item);
                   return draft.splice(item?.index!, 0, item);
                 },
               );
@@ -121,6 +122,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               const currentColumns = updateBy(
                 currentConfig?.rows || [],
                 draft => {
+                  item.aggregate = getDefaultAggregate(item);
                   return draft.splice(item?.index!, 0, item);
                 },
               );
@@ -297,9 +299,9 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                       <DownOutlined style={{ marginRight: '10px' }} />
                     )}
                     <span>
-                      {aggregation
-                        ? getColumnRenderName(columnConfig)
-                        : columnConfig.colName}
+                      {aggregation === false
+                        ? columnConfig.colName
+                        : getColumnRenderName(columnConfig)}
                     </span>
                     <div style={{ display: 'inline-block', marginLeft: '5px' }}>
                       {enableActionsIcons(columnConfig)}

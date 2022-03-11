@@ -2,7 +2,7 @@ import { ChartDataConfig } from 'app/types/ChartConfig';
 
 export enum GroupLayoutMode {
   INNER = 'inner',
-  OUTTER = 'outter',
+  OUTER = 'outter',
 }
 
 export enum ItemComponentType {
@@ -24,6 +24,6 @@ export interface ItemLayoutProps<T> {
 }
 
 export interface FormGeneratorLayoutProps<T> extends ItemLayoutProps<T> {
-  mode?: GroupLayoutMode; // NOTE: inner means this group panel whether wrap into a panel. Default is outter, no parent panel.
+  mode?: GroupLayoutMode; // NOTE: inner means this group panel whether wrap into a panel. Default is outer, no parent panel.
   dependency?: string;
 }

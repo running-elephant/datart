@@ -19,7 +19,7 @@ import { ControlOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { useContext } from 'react';
@@ -27,6 +27,7 @@ import { useDispatch } from 'react-redux';
 import { G60 } from 'styles/StyleConstants';
 import { addControllerAction } from '../../../slice/actions/controlActions';
 import { BoardToolBarContext } from '../context/BoardToolBarContext';
+
 export interface AddControlBtnProps {}
 export interface ButtonItemType<T> {
   name?: string;
@@ -41,8 +42,8 @@ export const AddController: React.FC<AddControlBtnProps> = () => {
   const tWt = useI18NPrefix(`viz.widget.type`);
   const { boardId, boardType } = useContext(BoardToolBarContext);
   const dispatch = useDispatch();
-  const { config: boardConfig } = useContext(BoardConfigContext);
-  const { hasQueryControl, hasResetControl } = boardConfig;
+  const { hasQueryControl, hasResetControl } = useContext(BoardConfigContext);
+
   const onAddController = (info: { key: any }) => {
     dispatch(
       addControllerAction({

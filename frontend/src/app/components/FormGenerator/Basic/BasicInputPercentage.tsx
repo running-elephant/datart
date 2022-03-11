@@ -19,8 +19,6 @@
 import { InputNumber } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
-import styled from 'styled-components/macro';
-import { BORDER_RADIUS } from 'styles/StyleConstants';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
@@ -31,36 +29,19 @@ const BasicInputPercentage: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
 
     // Note: upgrade to antd v4.17.x with input number `addonAfter`
     return (
-      <Wrapper label={t(row.label, true)}>
+      <BW label={t(row.label, true)}>
         <InputNumber
+          className="datart-ant-input-number"
           {...rest}
           {...options}
           step={0.1}
           onChange={value => onChange?.(ancestors, value)}
           defaultValue={rest?.default}
         />
-      </Wrapper>
+      </BW>
     );
   },
   itemLayoutComparer,
 );
 
 export default BasicInputPercentage;
-
-const Wrapper = styled(BW)`
-  .ant-input-number {
-    width: 100%;
-    background-color: ${p => p.theme.emphasisBackground};
-    border-color: ${p => p.theme.emphasisBackground};
-    border-radius: ${BORDER_RADIUS};
-    box-shadow: none;
-  }
-
-  .ant-input-number-input {
-    color: ${p => p.theme.textColorSnd};
-  }
-
-  .ant-input-number-handler-wrap {
-    background-color: ${p => p.theme.emphasisBackground};
-  }
-`;

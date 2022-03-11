@@ -42,11 +42,11 @@ import {
   FONT_WEIGHT_MEDIUM,
   INFO,
   SPACE,
-  SPACE_SM,
   SPACE_TIMES,
   SUCCESS,
   WARNING,
 } from 'styles/StyleConstants';
+import { stopPPG } from 'utils/utils';
 
 export const ChartDraggableSourceContainer: FC<
   {
@@ -159,18 +159,20 @@ export const ChartDraggableSourceContainer: FC<
       <>
         <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
         <p>{colName}</p>
-        <Dropdown
-          disabled={_isNormalField()}
-          overlay={_getExtraActionMenus()}
-          trigger={['click']}
-        >
-          <ToolbarButton
-            icon={<MoreOutlined />}
-            iconSize={FONT_SIZE_BASE}
-            className="setting"
-            onClick={e => e.preventDefault()}
-          />
-        </Dropdown>
+        <div onClick={stopPPG}>
+          <Dropdown
+            disabled={_isNormalField()}
+            overlay={_getExtraActionMenus()}
+            trigger={['click']}
+          >
+            <ToolbarButton
+              icon={<MoreOutlined />}
+              iconSize={FONT_SIZE_BASE}
+              className="setting"
+              onClick={e => e.preventDefault()}
+            />
+          </Dropdown>
+        </div>
       </>
     );
   }, [type, colName, onDeleteComputedField, onEditComputedField, category, t]);

@@ -52,7 +52,7 @@ export const NameSet: FC<{
   return (
     <>
       <Form.Item label={t('title')} preserve name="name">
-        <Input placeholder="fill a name" />
+        <Input className="datart-ant-input" placeholder="fill a name" />
       </Form.Item>
       <Form.Item valuePropName="checked" name={['nameConfig', 'show']}>
         <Checkbox>{t('showTitle')} </Checkbox>
@@ -71,7 +71,7 @@ export const NameSet: FC<{
         name={['nameConfig']}
         preserve
       >
-        <BasicFont ancestors={[]} data={fontData} />
+        <BasicFont translate={t} ancestors={[]} data={fontData} />
       </Form.Item>
     </>
   );

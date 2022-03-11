@@ -24,9 +24,9 @@ export interface Action<T> {
   value: T;
 }
 
-export function updateBy<T>(base: T, updator: (draft: Draft<T>) => void) {
+export function updateBy<T>(base: T, updater: (draft: Draft<T>) => void) {
   return produce(base, draft => {
-    updator(draft);
+    updater(draft);
   });
 }
 

@@ -25,7 +25,7 @@ import { Button, Space } from 'antd';
 import { Confirm, TabPane, Tabs as TabsComponent } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
-import React, { memo, useCallback, useContext, useState } from 'react';
+import { memo, useCallback, useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled, { css } from 'styled-components/macro';
@@ -137,13 +137,7 @@ export const Tabs = memo(() => {
       <Confirm
         visible={confirmVisible}
         title={t('warning')}
-        icon={
-          <InfoCircleOutlined
-            css={`
-              color: ${ORANGE};
-            `}
-          />
-        }
+        icon={<InfoCircleOutlined style={{ color: ORANGE }} />}
         footer={
           <Space>
             <Button onClick={removeTab}>{t('discard')}</Button>

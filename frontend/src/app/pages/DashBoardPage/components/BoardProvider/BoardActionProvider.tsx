@@ -20,14 +20,8 @@ import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { useSaveAsViz } from 'app/pages/MainPage/pages/VizPage/hooks/useSaveAsViz';
 import { generateShareLinkAsync } from 'app/utils/fetch';
 import debounce from 'lodash/debounce';
-import React, { FC, useContext } from 'react';
+import React, { createContext, FC, useContext } from 'react';
 import { useDispatch } from 'react-redux';
-import {
-  BoardActionContext,
-  BoardActionContextProps,
-} from '../../contexts/BoardActionContext';
-import { BoardConfigContext } from '../../contexts/BoardConfigContext';
-import { BoardContext } from '../../contexts/BoardContext';
 import { boardActions } from '../../pages/Board/slice';
 import {
   boardDownLoadAction,
@@ -40,6 +34,7 @@ import {
 } from '../../pages/Board/slice/thunk';
 import { Widget } from '../../pages/Board/slice/types';
 import { editBoardStackActions } from '../../pages/BoardEditor/slice';
+import { clearActiveWidgets } from '../../pages/BoardEditor/slice/actions/actions';
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
 import {
   getEditChartWidgetDataAsync,
@@ -50,16 +45,33 @@ import {
   getCascadeControllers,
   getNeedRefreshWidgetsByController,
 } from '../../utils/widget';
+import { BoardConfigContext } from './BoardConfigProvider';
+import { BoardContext } from './BoardProvider';
 
+export interface BoardActionContextProps {
+  widgetUpdate: (widget: Widget) => void;
+  refreshWidgetsByController: (widget: Widget) => void;
+  updateBoard?: (callback: () => void) => void;
+  onGenerateShareLink?: (date, usePwd) => any;
+  onBoardToDownLoad: () => any;
+  onWidgetsQuery: () => any;
+  onWidgetsReset: () => any;
+  onSaveAsVizs: () => any;
+  boardToggleAllowOverlap: (allow: boolean) => void;
+  onClearActiveWidgets: () => void;
+}
+export const BoardActionContext = createContext<BoardActionContextProps>(
+  {} as BoardActionContextProps,
+);
 export const BoardActionProvider: FC<{ id: string }> = ({
   id: boardId,
   children,
 }) => {
   const dispatch = useDispatch();
   const { editing, renderMode } = useContext(BoardContext);
-  const { config: boardConfig } = useContext(BoardConfigContext);
+  const { hasQueryControl } = useContext(BoardConfigContext);
   const saveAsViz = useSaveAsViz();
-  const { hasQueryControl } = boardConfig;
+
   const actions: BoardActionContextProps = {
     widgetUpdate: (widget: Widget) => {
       if (editing) {
@@ -68,7 +80,9 @@ export const BoardActionProvider: FC<{ id: string }> = ({
         dispatch(boardActions.updateWidget(widget));
       }
     },
-
+    boardToggleAllowOverlap: (allow: boolean) => {
+      dispatch(editBoardStackActions.toggleAllowOverlap(allow));
+    },
     onWidgetsQuery: debounce(() => {
       if (editing) {
         dispatch(editWidgetsQueryAction({ boardId }));
@@ -146,6 +160,9 @@ export const BoardActionProvider: FC<{ id: string }> = ({
     },
     onSaveAsVizs: () => {
       saveAsViz(boardId, 'DASHBOARD');
+    },
+    onClearActiveWidgets: () => {
+      dispatch(clearActiveWidgets());
     },
   };
   return (

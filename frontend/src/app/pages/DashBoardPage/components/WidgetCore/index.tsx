@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 import { DataChartWidget } from 'app/pages/DashBoardPage/components/WidgetCore/DataChartWidget';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
-import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
 import React, { memo, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components/macro';
-import { BoardContext } from '../../contexts/BoardContext';
-import { BoardInfoContext } from '../../contexts/BoardInfoContext';
-import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
 import { getWidgetSomeStyle } from '../../utils/widget';
+import { BoardInfoContext } from '../BoardProvider/BoardInfoProvider';
+import { BoardContext } from '../BoardProvider/BoardProvider';
+import { WidgetInfoContext } from '../WidgetProvider/WidgetInfoProvider';
+import { WidgetMethodContext } from '../WidgetProvider/WidgetMethodProvider';
+import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import { QueryWidget } from './ButtonWidget/QueryWidget';
 import { ResetWidget } from './ButtonWidget/ResetWidget';
 import { ContainerWidget } from './ContainerWidget';
@@ -117,4 +117,5 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
 const WidgetWrap = styled.div`
   display: flex;
   flex: 1;
+  min-height: 0;
 `;

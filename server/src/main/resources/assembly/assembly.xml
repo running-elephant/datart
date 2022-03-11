@@ -9,6 +9,26 @@
         <fileSet>
             <directory>${project.parent.basedir}/bin</directory>
             <outputDirectory>bin</outputDirectory>
+            <lineEnding>unix</lineEnding>
+            <includes>
+                <include>datart-server.sh</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.parent.basedir}/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <lineEnding>dos</lineEnding>
+            <includes>
+                <include>datart-server.cmd</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.parent.basedir}/bin/h2</directory>
+            <outputDirectory>bin/h2</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.parent.basedir}/bin/migrations</directory>
+            <outputDirectory>bin/migrations</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.parent.basedir}/config</directory>
@@ -19,13 +39,15 @@
             <outputDirectory>static</outputDirectory>
         </fileSet>
         <fileSet>
-        <directory>${project.parent.basedir}</directory>
-        <outputDirectory>./</outputDirectory>
-        <includes>
-            <include>Dockerfile</include>
-<!--            <include>docker-compose.yml.example</include>-->
-        </includes>
-    </fileSet>
+            <directory>${project.parent.basedir}</directory>
+            <outputDirectory>./</outputDirectory>
+            <includes>
+                <include>Dockerfile</include>
+                <include>LICENSE</include>
+                <include>READEME.md</include>
+                <include>Deployment.md</include>
+            </includes>
+        </fileSet>
     </fileSets>
     <dependencySets>
         <dependencySet>

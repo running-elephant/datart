@@ -184,6 +184,7 @@ class BasicScatterChart extends Chart {
     const colors: Array<{ key; value }> =
       colorConfigs?.[0]?.color?.colors || [];
 
+    // TODO(Stephen): should be refactor by ChartDataSet groupBy function
     const groupedObjDataColumns: {
       [key: string]: { color: string; datas: [] };
     } = chartDataSetRows?.reduce((acc, cur) => {
@@ -343,10 +344,10 @@ class BasicScatterChart extends Chart {
   }
 
   private getLegendStyle(styles, seriesNames) {
-    const [show, type, font, legendPos, selectAll] = getStyles(
+    const [show, type, font, legendPos, selectAll, height] = getStyles(
       styles,
       ['legend'],
-      ['showLegend', 'type', 'font', 'position', 'selectAll'],
+      ['showLegend', 'type', 'font', 'position', 'selectAll', 'height'],
     );
     let positions = {};
     let orient = {};
@@ -381,6 +382,7 @@ class BasicScatterChart extends Chart {
       ...positions,
       show,
       type,
+      height: height || null,
       orient,
       selected,
       data: seriesNames,

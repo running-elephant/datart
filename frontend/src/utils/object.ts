@@ -233,7 +233,7 @@ export function mergeDefaultToValue(
 export function cleanChartConfigValueByDefaultValue(
   configs?: ChartStyleConfig[],
 ): ChartStyleConfig[] {
-  return (configs || []).map(c => {
+  return (configs || []).filter(Boolean).map(c => {
     if (c.comType !== 'group') {
       c.value = c.default;
     }

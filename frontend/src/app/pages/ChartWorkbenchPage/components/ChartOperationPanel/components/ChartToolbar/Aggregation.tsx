@@ -54,4 +54,6 @@ const AggregationOperationMenu: FC<{
 
 export default AggregationOperationMenu;
 
-const Aggregation = styled.div``;
+const Aggregation = styled.div`
+  color: ${p => p.theme.textColor};
+`;

@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 import { Empty } from 'antd';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import { selectLayoutWidgetMapById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -37,9 +37,13 @@ export interface FreeBoardCoreProps {
 }
 export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
   ({ boardId, showZoomCtrl }) => {
-    const { config } = useContext(BoardConfigContext);
+    const {
+      width: slideWidth,
+      height: slideHeight,
+      scaleMode,
+    } = useContext(BoardConfigContext);
     const { editing, autoFit } = useContext(BoardContext);
-    const { width: slideWidth, height: slideHeight, scaleMode } = config;
+
     const widgetConfigRecords = useSelector((state: { board: BoardState }) =>
       selectLayoutWidgetMapById()(state, boardId),
     );
@@ -124,11 +128,11 @@ const Wrap = styled.div`
       overflow-y: hidden;
 
       .empty {
-        height: 100%;
         display: flex;
         flex: 1;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
+        height: 100%;
       }
     }
     .grid-background::-webkit-scrollbar {

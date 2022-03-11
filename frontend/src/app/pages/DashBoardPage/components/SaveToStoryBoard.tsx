@@ -53,7 +53,7 @@ const SaveToStoryBoard: FC<SaveToStoryBoardTypes> = memo(
         let dashboardIds: any = [];
         let dashboardData = vizData?.filter(v => {
           const path = getPath(
-            [v] as Array<{ id: string; parentId: string }>,
+            vizData as Array<{ id: string; parentId: string }>,
             { id: v.id, parentId: v.parentId },
             VizResourceSubTypes.Folder,
           );

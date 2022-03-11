@@ -115,7 +115,7 @@ public class SqlValidateUtils {
         if (src == null) {
             return null;
         }
-        return src.trim().split(" ", 2)[0];
+        return src.trim().split("\\s", 2)[0];
     }
 
 }

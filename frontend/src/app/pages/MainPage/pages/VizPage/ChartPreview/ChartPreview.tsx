@@ -158,11 +158,7 @@ const ChartPreviewBoard: FC<{
     const handleGotoWorkbenchPage = () => {
       history.push({
         pathname: `/organizations/${orgId}/vizs/chartEditor`,
-        state: {
-          dataChartId: backendChartId,
-          chartType: 'dataChart',
-          container: 'dataChart',
-        },
+        search: `dataChartId=${backendChartId}&chartType=dataChart&container=dataChart`,
       });
     };
 
@@ -203,9 +199,20 @@ const ChartPreviewBoard: FC<{
         false,
         chartPreview?.backendChart?.config?.aggregation,
       );
+
       dispatch(
         makeDownloadDataTask({
-          downloadParams: [builder.build()],
+          downloadParams: [
+            {
+              ...builder.build(),
+              ...{
+                vizId: chartPreview?.backendChart?.id,
+                vizName: chartPreview?.backendChart?.name,
+                analytics: false,
+                vizType: 'dataChart',
+              },
+            },
+          ],
           fileName: chartPreview?.backendChart?.name || 'chart',
           resolve: () => {
             dispatch(actions.setDownloadPolling(true));
@@ -248,7 +255,7 @@ const ChartPreviewBoard: FC<{
     }, [dispatch, backendChartId]);
 
     const handleAddToDashBoard = useCallback(
-      dashboardId => {
+      (dashboardId, dashboardType) => {
         const currentChartPreview = previewCharts.find(
           c => c.backendChartId === backendChartId,
         );
@@ -261,6 +268,7 @@ const ChartPreviewBoard: FC<{
                 chartType: '',
                 dataChart: currentChartPreview?.backendChart,
                 dataview: currentChartPreview?.backendChart?.view,
+                dashboardType,
               }),
             },
           });
@@ -349,7 +357,6 @@ const StyledChartPreviewBoard = styled.div`
   flex: 1;
   flex-flow: column;
   height: 100%;
-
   iframe {
     flex-grow: 1000;
   }
@@ -360,16 +367,16 @@ const PreviewBlock = styled.div`
   flex-direction: column;
   height: 100%;
   padding: ${SPACE_LG};
-  box-shadow: ${p => p.theme.shadowBlock};
   overflow: hidden;
+  box-shadow: ${p => p.theme.shadowBlock};
 `;
 
 const ChartWrapper = styled.div`
+  position: relative;
   display: flex;
   flex: 1;
   background-color: ${p => p.theme.componentBackground};
   border-radius: ${BORDER_RADIUS};
-  position: relative;
   .spinWrapper {
     width: 100%;
     height: 100%;

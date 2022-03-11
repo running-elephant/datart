@@ -36,6 +36,7 @@ export interface ServerStoryBoard extends Omit<StoryBoard, 'config'> {
   storypages?: StoryPageOfServer[];
 }
 export interface StoryConfig {
+  version: string;
   autoPlay: {
     auto: boolean;
     delay: number;
@@ -53,6 +54,7 @@ export interface StoryPageOfServer extends Omit<StoryPage, 'config'> {
 }
 export type StoryPageRelType = Extract<'DASHBOARD' | 'DATACHART', VizType>;
 export interface StoryPageConfig {
+  version: string;
   name?: string;
   thumbnail?: string;
   index: number;

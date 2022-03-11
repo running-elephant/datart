@@ -16,44 +16,38 @@
  * limitations under the License.
  */
 
-import { Col, Row, Select } from 'antd';
+import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FONT_FAMILIES } from 'globalConstants';
 import { FC, memo } from 'react';
-import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
+import { BW } from './components/BasicWrapper';
 
 const BasicFontFamilySelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 
     return (
-      <StyledVizFontFamilySelector align={'middle'}>
-        <Col span={12}>{t(row.label, true)}</Col>
-        <Col span={12}>
-          <Select
-            dropdownMatchSelectWidth
-            {...rest}
-            {...options}
-            placeholder={t('select')}
-            onChange={value => onChange?.(ancestors, value)}
-          >
-            {FONT_FAMILIES.map(o => (
-              <Select.Option key={o.value} value={o.value}>
-                {o.name}
-              </Select.Option>
-            ))}
-          </Select>
-        </Col>
-      </StyledVizFontFamilySelector>
+      <BW label={!options?.hideLabel ? t(row.label, true) : ''}>
+        <Select
+          className="datart-ant-select"
+          dropdownMatchSelectWidth
+          {...rest}
+          {...options}
+          placeholder={t('select')}
+          onChange={value => onChange?.(ancestors, value)}
+        >
+          {FONT_FAMILIES.map(o => (
+            <Select.Option key={o.value} value={o.value}>
+              {t(o.name, true)}
+            </Select.Option>
+          ))}
+        </Select>
+      </BW>
     );
   },
   itemLayoutComparer,
 );
 
 export default BasicFontFamilySelector;
-
-const StyledVizFontFamilySelector = styled(Row)`
-  line-height: 32px;
-`;

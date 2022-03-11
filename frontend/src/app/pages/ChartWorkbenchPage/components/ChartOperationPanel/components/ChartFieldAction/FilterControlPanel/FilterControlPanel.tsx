@@ -44,7 +44,7 @@ import FilterFacadeConfiguration from './FilterFacadeConfiguration';
 import FilterVisibilityConfiguration from './FilterVisibilityConfiguration';
 import ValueConditionConfiguration from './ValueConditionConfiguration';
 
-const FilterControllPanel: FC<
+const FilterControlPanel: FC<
   {
     config: ChartDataSectionField;
     dataset?: ChartDataSetDTO;
@@ -315,7 +315,7 @@ const FilterControllPanel: FC<
   },
 );
 
-export default FilterControllPanel;
+export default FilterControlPanel;
 
 const StyledFilterController = styled.div`
   & > .ant-row {

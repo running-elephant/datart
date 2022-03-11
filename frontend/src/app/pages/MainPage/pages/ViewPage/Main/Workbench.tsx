@@ -26,7 +26,7 @@ import React, {
   useEffect,
   useMemo,
 } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { getPath } from 'utils/utils';
 import {
@@ -36,11 +36,13 @@ import {
 import { UNPERSISTED_ID_PREFIX } from '../constants';
 import { EditorContext } from '../EditorContext';
 import { selectCurrentEditingViewAttr, selectViews } from '../slice/selectors';
+import { getSchemaBySourceId } from '../slice/thunks';
 import { Editor } from './Editor';
 import { Outputs } from './Outputs';
 import { Properties } from './Properties';
 
 export const Workbench = memo(() => {
+  const dispatch = useDispatch();
   const { editorInstance } = useContext(EditorContext);
   const views = useSelector(selectViews);
   const id = useSelector(state =>
@@ -49,6 +51,15 @@ export const Workbench = memo(() => {
   const parentId = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'parentId' }),
   ) as string;
+  const sourceId = useSelector(state =>
+    selectCurrentEditingViewAttr(state, { name: 'sourceId' }),
+  ) as string;
+
+  useEffect(() => {
+    if (sourceId) {
+      dispatch(getSchemaBySourceId(sourceId));
+    }
+  }, [dispatch, sourceId]);
 
   const path = useMemo(
     () =>

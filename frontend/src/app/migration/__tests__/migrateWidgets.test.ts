@@ -27,7 +27,8 @@ import {
   beta0,
   convertWidgetRelationsToObj,
   migrateWidgets,
-} from '../WidgetConfig/migrateWidgets';
+} from '../BoardConfig/migrateWidgets';
+import { CURRENT_VERSION, VERSION_BETA_0 } from '../constants';
 
 describe('test migrateWidgets ', () => {
   test('should return undefined  when widget.config.type === filter', () => {
@@ -54,7 +55,7 @@ describe('test migrateWidgets ', () => {
     const widget2 = {
       config: {
         nameConfig: fontDefault,
-        version: '1.0.0-beta.0',
+        version: VERSION_BETA_0,
       },
     } as Widget;
     expect(beta0(widget1 as Widget)).toMatchObject(widget2);
@@ -107,7 +108,7 @@ describe('test migrateWidgets ', () => {
       config: '{}',
     } as ServerWidget;
     const widget2 = {
-      config: '{"version":"1.0.0-beta.0"}',
+      config: `{"version":"1.0.0-beta.0"}`,
     } as ServerWidget;
     const widget3 = {
       config: '{"version":"rrr"}',
@@ -117,13 +118,13 @@ describe('test migrateWidgets ', () => {
     } as ServerWidget;
     const resWidget = {
       config: {
-        version: '1.0.0-beta.0',
+        version: CURRENT_VERSION,
       },
       relations: [] as Relation[],
     } as Widget;
     const resWidget2 = {
       config: {
-        version: '1.0.0-beta.1',
+        version: CURRENT_VERSION,
       },
       relations: [] as Relation[],
     } as Widget;

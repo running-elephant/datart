@@ -25,7 +25,7 @@ import {
   TeamOutlined,
 } from '@ant-design/icons';
 import { Button, List, Popconfirm } from 'antd';
-import { ListItem, ListTitle } from 'app/components';
+import { ListItem } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getRoles } from 'app/pages/MainPage/pages/MemberPage/slice/thunks';
 import {
@@ -56,7 +56,7 @@ import {
 import { monaco } from 'react-monaco-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { SPACE_MD, SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
+import { SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
 import { errorHandle, uuidv4 } from 'utils/utils';
 import { selectVariables } from '../../../VariablePage/slice/selectors';
 import { getVariables } from '../../../VariablePage/slice/thunks';
@@ -67,6 +67,7 @@ import { selectCurrentEditingViewAttr } from '../../slice/selectors';
 import { getEditorProvideCompletionItems } from '../../slice/thunks';
 import { VariableHierarchy } from '../../slice/types';
 import { comparePermissionChange } from '../../utils';
+import Container from './Container';
 
 export const Variables = memo(() => {
   const { actions } = useViewSlice();
@@ -293,7 +294,7 @@ export const Variables = memo(() => {
 
   const titleProps = useMemo(
     () => ({
-      title: t('title'),
+      title: 'variable',
       search: true,
       add: {
         items: [{ key: 'variable', text: t('add') }],
@@ -304,8 +305,7 @@ export const Variables = memo(() => {
   );
 
   return (
-    <Container>
-      <ListTitle {...titleProps} />
+    <Container {...titleProps}>
       <ListWrapper>
         <List
           dataSource={listSource}
@@ -395,15 +395,6 @@ export const Variables = memo(() => {
     </Container>
   );
 });
-
-const Container = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: ${SPACE_TIMES(100)};
-  min-height: 0;
-  border-left: 1px solid ${p => p.theme.borderColorSplit};
-`;
 
 const ListWrapper = styled.div`
   flex: 1;

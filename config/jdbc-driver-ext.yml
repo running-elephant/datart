@@ -15,3 +15,17 @@ IMPALA:
   adapter-class: "datart.data.provider.jdbc.adapters.ImpalaDataProviderAdapter"
   url-prefix: "jdbc:impala://"
   sql-dialect: "datart.data.provider.calcite.dialect.ImpalaSqlDialectSupport"
+
+
+ORACLE:
+  quote-identifiers: false
+
+DORIS:
+  db-type: "doris"
+  name: "doris"
+  driver-class: "com.mysql.cj.jdbc.Driver"
+  literal-quote: "'"
+  identifier-quote: "`"
+  adapter-class: "datart.data.provider.jdbc.adapters.DorisDataProviderAdapter"
+  url-prefix: "jdbc:mysql://"
+

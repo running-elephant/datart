@@ -85,7 +85,6 @@ export function Container() {
       />
       <Main sliderVisible={sliderVisible} />
       <SaveForm
-        title={t('title')}
         formProps={{
           labelAlign: 'left',
           labelCol: { offset: 1, span: 8 },

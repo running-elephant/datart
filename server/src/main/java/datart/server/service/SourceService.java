@@ -18,14 +18,18 @@
 
 package datart.server.service;
 
+import datart.core.data.provider.SchemaInfo;
 import datart.core.entity.Source;
 import datart.core.mappers.ext.SourceMapperExt;
-import datart.security.exception.PermissionDeniedException;
 
 import java.util.List;
 
 public interface SourceService extends BaseCRUDService<Source, SourceMapperExt> {
 
     List<Source> listSources(String orgId,boolean active);
+
+    SchemaInfo getSourceSchemaInfo(String sourceId);
+
+    SchemaInfo syncSourceSchema(String sourceId) throws Exception;
 
 }

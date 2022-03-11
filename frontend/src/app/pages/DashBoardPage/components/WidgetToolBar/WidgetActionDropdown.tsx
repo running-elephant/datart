@@ -24,15 +24,16 @@ import {
   FullscreenOutlined,
   InfoOutlined,
   LinkOutlined,
+  LockOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown, Menu } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
-import { BoardContext } from '../../contexts/BoardContext';
-import { WidgetChartContext } from '../../contexts/WidgetChartContext';
-import { WidgetMethodContext } from '../../contexts/WidgetMethodContext';
 import { Widget } from '../../pages/Board/slice/types';
+import { BoardContext } from '../BoardProvider/BoardProvider';
+import { WidgetChartContext } from '../WidgetProvider/WidgetChartProvider';
+import { WidgetMethodContext } from '../WidgetProvider/WidgetMethodProvider';
 import {
   getWidgetActionList,
   WidgetActionListItem,
@@ -84,6 +85,12 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
           label: t('info'),
           icon: <InfoOutlined />,
         },
+        {
+          key: 'lock',
+          label: t('lock'),
+          icon: <LockOutlined />,
+        },
+
         {
           key: 'makeLinkage',
           label: t('makeLinkage'),

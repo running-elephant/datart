@@ -15,9 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetCore/WidgetName/WidgetName';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
+import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
 import React, { useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
@@ -53,4 +53,5 @@ const ItemContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  min-height: 0;
 `;

@@ -104,6 +104,11 @@ export const SQLEditor = memo(() => {
           type: CommonFormTypes.Edit,
           visible: true,
           parentIdLabel: t('folder'),
+          initialValues: {
+            name: '',
+            parentId: '',
+            config: {},
+          },
           onSave: (values, onClose) => {
             let index = getInsertedNodeIndex(values, viewsData);
 
@@ -130,7 +135,6 @@ export const SQLEditor = memo(() => {
       dispatch(
         getEditorProvideCompletionItems({
           resolve: getItems => {
-            editorCompletionItemProviderRef?.current?.dispose();
             const providerRef = editor.languages.registerCompletionItemProvider(
               'sql',
               {
@@ -176,6 +180,7 @@ export const SQLEditor = memo(() => {
     editorInstance?.layout();
     return () => {
       editorInstance?.dispose();
+      editorCompletionItemProviderRef?.current?.dispose();
     };
   }, [editorInstance]);
 
