@@ -37,6 +37,9 @@ export const Hardcoded = createGlobalStyle`
     .ant-popover-inner {
       box-shadow: ${p => p.theme.shadow3};
     }
+    .ant-popover.ant-popconfirm {
+      z-index: 1060;
+    }
 
     /* fix antd bugs #32919 */
     .ant-tabs-dropdown-menu-item {
