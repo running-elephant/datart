@@ -83,13 +83,14 @@ export const fetchBoardDetail = createAsyncThunk<
     `/viz/dashboards/${params?.dashboardRelId}`,
   );
 
-  await dispatch(
+  dispatch(
     handleServerBoardAction({
       data,
       renderMode: 'read',
       filterSearchMap: { params: params?.filterSearchParams },
     }),
   );
+
   return null;
 });
 
