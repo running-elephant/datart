@@ -188,6 +188,7 @@ const config: ChartConfig = {
               'Arial',
               'sans-serif',
             ],
+            showFontStyle: false,
           },
         },
         {
@@ -232,6 +233,7 @@ const config: ChartConfig = {
               'Arial',
               'sans-serif',
             ],
+            showFontStyle: false,
           },
         },
         {
