@@ -39,7 +39,7 @@ import {
   getTime,
   recommendTimeRangeConverter,
 } from 'app/utils/time';
-import { TIME_FORMATTER } from 'globalConstants';
+import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 
 export class ChartDataRequestBuilder {
@@ -158,7 +158,12 @@ export class ChartDataRequestBuilder {
       }, [])
       .filter(col => Boolean(col.filter?.condition))
       .filter(col => {
-        if (Array.isArray(col.filter?.condition?.value)) {
+        if (
+          col.filter?.condition?.operator === FilterSqlOperator.Null ||
+          col.filter?.condition?.operator === FilterSqlOperator.NotNull
+        ) {
+          return true;
+        } else if (Array.isArray(col.filter?.condition?.value)) {
           return Boolean(col.filter?.condition?.value?.length);
         }
         return true;
