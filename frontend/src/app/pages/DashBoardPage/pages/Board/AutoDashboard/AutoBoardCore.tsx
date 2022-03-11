@@ -17,7 +17,6 @@
  */
 
 import { Empty } from 'antd';
-import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
@@ -29,6 +28,7 @@ import {
 import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
+import { useVisibleHidden } from 'app/pages/DashBoardPage/hooks/useVisibleHidden';
 import {
   selectLayoutWidgetInfoMapById,
   selectLayoutWidgetMapById,
@@ -84,8 +84,13 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       DeviceType.Desktop,
     );
 
-    const { ref, gridWrapRef, currentLayout, widgetRowHeight } =
-      useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
+    const {
+      ref,
+      gridWrapRef,
+      currentLayout,
+      widgetRowHeight,
+      throttleLazyRender,
+    } = useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
 
     const { gridRef } = useBoardWidthHeight();
 
@@ -118,9 +123,10 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
 
     const onLayoutChange = useCallback(
       (layouts: Layout[], all) => {
+        throttleLazyRender();
         currentLayout.current = layouts;
       },
-      [currentLayout],
+      [currentLayout, throttleLazyRender],
     );
 
     const boardChildren = useMemo(() => {

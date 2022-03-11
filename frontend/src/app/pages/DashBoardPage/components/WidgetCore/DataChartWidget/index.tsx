@@ -119,6 +119,7 @@ export const DataChartWidget: React.FC<{}> = memo(() => {
   );
 
   const chartFrame = useMemo(() => {
+    if (cacheH <= 1 || cacheW <= 1) return null;
     if (!dataChart) {
       return `not found dataChart`;
     }
