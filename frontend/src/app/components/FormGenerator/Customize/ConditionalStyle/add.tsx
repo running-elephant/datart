@@ -21,7 +21,6 @@ import { ColorPickerPopover } from 'app/components/ColorPicker';
 import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
 import { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { G40 } from 'styles/StyleConstants';
 import {
   ConditionalOperatorTypes,
   ConditionalStyleFormValues,
@@ -307,7 +306,7 @@ const StyledColor = styled.div`
     width: 30px;
     height: 30px;
     content: '';
-    border: 1px solid ${G40};
+    border: 1px solid ${p => p.theme.borderColorBase};
     border-radius: 5px;
   }
 `;

@@ -15,7 +15,7 @@ import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { SPACE_LG, SPACE_MD, SPACE_SM } from 'styles/StyleConstants';
+import { BORDER_RADIUS, SPACE_LG, SPACE_SM } from 'styles/StyleConstants';
 import { DEFAULT_VALUES, FileTypes, JobTypes, TimeModes } from '../constants';
 import { useToScheduleDetails } from '../hooks';
 import { useScheduleSlice } from '../slice';
@@ -353,7 +353,7 @@ const Container = styled.div`
 
 const EditorWrapper = styled.div`
   flex: 1;
-  padding: 0 ${SPACE_LG} ${SPACE_LG} ${SPACE_LG};
+  padding: ${SPACE_LG};
   overflow-y: auto;
 `;
 
@@ -382,7 +382,12 @@ const FormAreaWrapper = styled.div`
 `;
 
 const FormCard = styled(Card)`
-  margin-top: ${SPACE_MD};
+  &.ant-card {
+    margin-top: ${SPACE_LG};
+    background-color: ${p => p.theme.componentBackground};
+    border-radius: ${BORDER_RADIUS};
+    box-shadow: ${p => p.theme.shadowBlock};
+  }
 `;
 const FormWrapper = styled.div`
   width: 860px;

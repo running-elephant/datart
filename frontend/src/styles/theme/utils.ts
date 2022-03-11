@@ -39,8 +39,9 @@ export function getTokenVariableMapping(themeKey: string) {
     '@warning-color': currentTheme.warning,
     '@body-background': currentTheme.bodyBackground,
     '@text-color': currentTheme.textColor,
-    '@text-color-secondary': currentTheme.textColorSnd,
+    '@text-color-secondary': currentTheme.textColorLight,
     '@heading-color': currentTheme.textColor,
+    '@disabled-color': currentTheme.textColorDisabled,
   };
 }
 

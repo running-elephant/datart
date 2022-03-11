@@ -21,7 +21,6 @@ import produce from 'immer';
 import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import { G20 } from 'styles/StyleConstants';
 import { MediaWidgetContent } from '../../../../pages/Board/slice/types';
 import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
 import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
@@ -92,6 +91,6 @@ const Wrap = styled.div`
   .wrap-form {
     padding: 4px;
     margin-bottom: 4px;
-    background-color: ${G20};
+    background-color: ${p => p.theme.emphasisBackground};
   }
 `;

@@ -20,8 +20,6 @@ import { InputNumber } from 'antd';
 import useDebouncedFormValue from 'app/hooks/useDebouncedFormValue';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
-import styled from 'styled-components/macro';
-import { BORDER_RADIUS } from 'styles/StyleConstants';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
@@ -40,40 +38,19 @@ const BasicInputNumber: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     );
 
     return (
-      <Wrapper label={t(data?.label, true)}>
+      <BW label={t(data?.label, true)}>
         <InputNumber
+          className="datart-ant-input-number"
           {...rest}
           {...options}
           value={formValue}
           onChange={debouncedUpdateValue}
           defaultValue={data?.default}
         />
-      </Wrapper>
+      </BW>
     );
   },
   itemLayoutComparer,
 );
 
 export default BasicInputNumber;
-
-const Wrapper = styled(BW)`
-  .ant-input-number {
-    width: 100%;
-    background-color: ${p => p.theme.emphasisBackground};
-    border-color: ${p => p.theme.emphasisBackground};
-    border-radius: ${BORDER_RADIUS};
-    box-shadow: none;
-  }
-
-  .ant-input-number-input {
-    color: ${p => p.theme.textColorSnd};
-  }
-
-  .ant-input-number-handler-wrap {
-    background-color: ${p => p.theme.emphasisBackground};
-  }
-
-  .ant-input-number-disabled {
-    background-color: ${p => p.theme.textColorDisabled};
-  }
-`;

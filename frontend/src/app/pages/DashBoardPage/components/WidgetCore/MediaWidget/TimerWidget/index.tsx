@@ -29,7 +29,7 @@ import produce from 'immer';
 import moment from 'moment';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
-import { G10, G90 } from 'styles/StyleConstants';
+import { G90 } from 'styles/StyleConstants';
 import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
 import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
@@ -184,6 +184,6 @@ const Wrap = styled.div<TimerConfig>`
     padding: 4px;
     margin-bottom: 4px;
     overflow-y: auto;
-    background-color: ${G10};
+    background-color: ${p => p.theme.bodyBackground};
   }
 `;

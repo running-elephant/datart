@@ -109,14 +109,10 @@ const ChartHeaderPanel: FC<{
               }
             }}
             renderDom={
-              <Button type="primary" ghost icon={<DownloadOutlined />}>
-                {t('downloadList')}
-              </Button>
+              <Button icon={<DownloadOutlined />}>{t('downloadList')}</Button>
             }
           />
-          <Button type="primary" ghost onClick={onGoBack}>
-            {t('cancel')}
-          </Button>
+          <Button onClick={onGoBack}>{t('cancel')}</Button>
           <Button type="primary" onClick={onSaveChart}>
             {t('save')}
           </Button>
@@ -151,8 +147,8 @@ const Wrapper = styled.div`
   flex-shrink: 0;
   align-items: center;
   padding: ${SPACE_SM} ${SPACE_MD} ${SPACE_SM} ${SPACE_SM};
-  border-bottom: 1px solid ${p => p.theme.borderColorSplit};
   background-color: ${p => p.theme.componentBackground};
+  border-bottom: 1px solid ${p => p.theme.borderColorSplit};
 
   h1 {
     flex: 1;

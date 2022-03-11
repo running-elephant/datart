@@ -74,7 +74,7 @@ const Container = styled.ul`
     font-size: ${FONT_SIZE_SUBHEADING};
     font-weight: ${FONT_WEIGHT_MEDIUM};
     line-height: ${LINE_HEIGHT_TITLE};
-    color: ${p => p.theme.textColorSub};
+    color: ${p => p.theme.textColor};
     cursor: pointer;
     border-radius: ${BORDER_RADIUS};
 

@@ -26,7 +26,7 @@ import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import { GlobalStyle, OverriddenStyle } from 'styles/globalStyles';
+import { GlobalStyles } from 'styles/globalStyles';
 import { getToken } from 'utils/auth';
 import useI18NPrefix from './hooks/useI18NPrefix';
 import { LoginAuthRoute } from './LoginAuthRoute';
@@ -83,8 +83,7 @@ export function App() {
           />
           <LoginAuthRoute />
         </Switch>
-        <GlobalStyle />
-        <OverriddenStyle />
+        <GlobalStyles />
       </BrowserRouter>
     </ConfigProvider>
   );

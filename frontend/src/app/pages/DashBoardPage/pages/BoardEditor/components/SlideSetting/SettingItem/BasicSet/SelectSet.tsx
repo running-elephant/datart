@@ -26,7 +26,11 @@ export const SelectSet: FC<{
 }> = memo(({ options, value, defaultValue, name }) => {
   return (
     <Form.Item label="" name={name}>
-      <Select defaultValue={defaultValue} value={value}>
+      <Select
+        className="datart-ant-select"
+        defaultValue={defaultValue}
+        value={value}
+      >
         {options.map(o => (
           <Select.Option key={o.value} value={o.value}>
             {o.name}
