@@ -46,6 +46,7 @@ import CategoryConditionRelationSelector from './CategoryConditionRelationSelect
 const CategoryConditionConfiguration: ForwardRefRenderFunction<
   FilterOptionForwardRef,
   {
+    colName: string;
     dataView?: ChartDataView;
     condition?: ChartFilterCondition;
     onChange: (condition: ChartFilterCondition) => void;
@@ -53,6 +54,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
   } & I18NComponentProps
 > = (
   {
+    colName,
     i18nPrefix,
     condition,
     dataView,
@@ -62,7 +64,6 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
   ref,
 ) => {
   const t = useI18NPrefix(i18nPrefix);
-  const [colName] = useState(condition?.name || '');
   const [curTab, setCurTab] = useState<FilterConditionType>(() => {
     if (
       [
