@@ -1,6 +1,7 @@
 package datart.data.provider.calcite;
 
 import datart.data.provider.calcite.parser.impl.SqlParserImpl;
+import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.avatica.util.Quoting;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.SqlNode;
@@ -19,7 +20,10 @@ public class SqlParserUtils {
         String sql = String.format(SELECT_SQL, snippet);
         SqlParser.Config config = SqlParser.config()
                 .withParserFactory(SqlParserImpl.FACTORY)
+                .withQuotedCasing(Casing.UNCHANGED)
+                .withUnquotedCasing(Casing.UNCHANGED)
                 .withConformance(SqlConformanceEnum.LENIENT)
+                .withCaseSensitive(true)
                 .withQuoting(Quoting.BRACKET);
         return SqlParser.create(sql, config).parseQuery();
 

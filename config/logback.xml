@@ -1,7 +1,7 @@
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
 
     <property name="LOG_HOME" value="./logs"/>
-    <property name ="SQL_LEVEL" value="DEBUG"/>
+    <property name ="SQL_LEVEL" value="INFO"/>
 
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -39,10 +39,10 @@
         <appender-ref ref="root" />
     </root>
 
-    <logger name="datart.data.provider.jdbc.adapters" level="${SQL_LEVEL}">
+    <logger name="datart.data.provider.jdbc.adapters" level="${SQL_LEVEL}" addtivity="false">
         <appender-ref ref="sql"/>
     </logger>
-    <logger name="datart.data.provider.local.LocalDB" level="${SQL_LEVEL}">
+    <logger name="datart.data.provider.local.LocalDB" level="${SQL_LEVEL}" addtivity="false">
         <appender-ref ref="sql"/>
     </logger>
 
