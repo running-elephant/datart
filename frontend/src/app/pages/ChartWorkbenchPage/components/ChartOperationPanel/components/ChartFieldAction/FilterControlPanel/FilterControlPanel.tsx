@@ -33,10 +33,10 @@ import ChartDataView, {
 import { ControllerVisibilityTypes } from 'app/types/FilterControlPanel';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
-import { CONTROLLER_WIDTH_OPTIONS, FilterSqlOperator } from 'globalConstants';
-import { FC, memo, useState } from 'react';
+import { CONTROLLER_WIDTH_OPTIONS } from 'globalConstants';
+import { FC, memo, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
-import { isEmptyArray } from 'utils/object';
+import { FilterOptionForwardRef } from '.';
 import CategoryConditionConfiguration from './CategoryConditionConfiguration';
 import DateConditionConfiguration from './DateConditionConfiguration';
 import FilterAggregateConfiguration from './FilterAggregateConfiguration';
@@ -73,6 +73,7 @@ const FilterControlPanel: FC<
       wrapperCol: { span: 20 },
     };
 
+    const filterOptionRef = useRef<FilterOptionForwardRef>(null);
     const customizeI18NPrefix = !!i18nPrefix ? i18nPrefix : 'viz.common.filter';
     const t = useI18NPrefix(customizeI18NPrefix);
     const [alias, setAlias] = useState(config.alias);
@@ -168,6 +169,7 @@ const FilterControlPanel: FC<
 
     const renderConditionConfigurationByModel = () => {
       const filterProps = {
+        ref: filterOptionRef,
         dataset,
         dataView,
         condition: new ConditionBuilder(filter?.condition).asSelf(),
@@ -211,6 +213,11 @@ const FilterControlPanel: FC<
       }
     };
 
+    const filterOptionValidator = args => {
+      // NOTE: should be return null to trigger NOT NULL validation when failed
+      return filterOptionRef.current?.onValidate(args) ? args : null;
+    };
+
     return (
       <StyledFilterController>
         <FormItemEx
@@ -242,21 +249,8 @@ const FilterControlPanel: FC<
           label={t('filterOption')}
           name="filterOption"
           initialValue={filter?.condition?.value}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-          getValueFromEvent={args => {
-            if (
-              args?.operator === FilterSqlOperator.Null ||
-              args?.operator === FilterSqlOperator.NotNull ||
-              isEmptyArray(args.value)
-            ) {
-              return 'some value not important only for empty check';
-            }
-            return args?.value;
-          }}
+          getValueFromEvent={filterOptionValidator}
+          rules={[{ required: true }]}
         >
           {renderConditionConfigurationByModel()}
         </FormItemEx>
