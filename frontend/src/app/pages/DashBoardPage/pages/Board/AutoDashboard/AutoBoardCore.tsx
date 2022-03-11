@@ -17,7 +17,7 @@
  */
 
 import { Empty } from 'antd';
-import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
   BREAK_POINT_MAP,
@@ -25,9 +25,9 @@ import {
   MIN_MARGIN,
   MIN_PADDING,
 } from 'app/pages/DashBoardPage/constants';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
+import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
+import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
 import {
   selectLayoutWidgetInfoMapById,
   selectLayoutWidgetMapById,
@@ -36,40 +36,27 @@ import {
   BoardState,
   DeviceType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, {
-  memo,
-  RefObject,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { Layout, Layouts, Responsive, WidthProvider } from 'react-grid-layout';
+import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
+import { Layout, Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
 import StyledBackground from '../components/StyledBackground';
 import { WidgetOfAuto } from './WidgetOfAuto';
-
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const mobilePoints = Object.keys(BREAK_POINT_MAP).slice(3);
-export interface AutoBoardCoreProps {
-  boardId: string;
-}
-export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
+export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
-    const { renderedWidgetById } = useContext(BoardContext);
-    const { config } = useContext(BoardConfigContext);
+    // const visible = useVisibleHidden(0);
     const {
       margin,
       containerPadding,
       background,
       mobileMargin,
       mobileContainerPadding,
-    } = config;
+      allowOverlap,
+    } = useContext(BoardConfigContext);
 
     const selectLayoutWidgetsConfigById = useMemo(
       selectLayoutWidgetMapById,
@@ -83,27 +70,28 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
       selectLayoutWidgetInfoMapById(state, boardId),
     );
 
-    const layoutWidgets = useMemo(() => {
-      return Object.values(layoutWidgetMap);
-    }, [layoutWidgetMap]);
+    const sortedLayoutWidgets = useMemo(
+      () =>
+        Object.values(layoutWidgetMap).sort(
+          (a, b) => a.config.index - b.config.index,
+        ),
+
+      [layoutWidgetMap],
+    );
 
     const [deviceType, setDeviceType] = useState<DeviceType>(
       DeviceType.Desktop,
     );
 
-    const [layoutMap, setLayoutMap] = useState<Layouts>({});
-
-    let layoutInfos = useRef<{ id: string; rendered: boolean }[]>([]);
-
-    const currentLayout = useRef<Layout[]>([]);
-
-    const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
+    const {
+      ref,
+      gridWrapRef,
+      currentLayout,
+      widgetRowHeight,
+      throttleLazyRender,
+    } = useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
 
     const { gridRef } = useBoardWidthHeight();
-
-    const { ref, widgetRowHeight } = useWidgetRowHeight();
-
-    const scrollThrottle = useRef(false);
 
     const onBreakpointChange = pointKey => {
       if (mobilePoints.includes(pointKey)) {
@@ -130,118 +118,32 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
       margin,
       containerPadding,
     ]);
+    const layoutMap = useGridLayoutMap(layoutWidgetMap);
 
-    useEffect(() => {
-      const layoutMap: Layouts = {
-        lg: [],
-        xs: [],
-      };
-      layoutWidgets.forEach(widget => {
-        const lg = widget.config.rect || widget.config.mobileRect || {};
-        const xs = widget.config.mobileRect || widget.config.rect || {};
-        layoutMap.lg.push({
-          i: widget.id,
-          x: lg.x,
-          y: lg.y,
-          w: lg.width,
-          h: lg.height,
-        });
-        layoutMap.xs.push({
-          i: widget.id,
-          x: xs.x,
-          y: xs.y,
-          w: xs.width,
-          h: xs.height,
-        });
-      });
-      setLayoutMap(layoutMap);
-    }, [layoutWidgets]);
-
-    useEffect(() => {
-      const layoutWidgetInfos = Object.values(layoutWidgetInfoMap);
-      if (layoutWidgetInfos.length) {
-        layoutInfos.current = layoutWidgetInfos.map(WidgetInfo => ({
-          id: WidgetInfo.id,
-          rendered: WidgetInfo.rendered,
-        }));
-      }
-    }, [layoutWidgetInfoMap]);
-
-    const calcItemTop = useCallback(
-      (id: string) => {
-        const curItem = currentLayout.current.find(ele => ele.i === id);
-        if (!curItem) return Infinity;
-        return Math.round((widgetRowHeight + margin[0]) * curItem.y);
+    const onLayoutChange = useCallback(
+      (layouts: Layout[], all) => {
+        throttleLazyRender();
+        currentLayout.current = layouts;
       },
-      [margin, widgetRowHeight],
+      [currentLayout, throttleLazyRender],
     );
 
-    const lazyLoad = useCallback(() => {
-      if (!gridWrapRef.current) return;
-      if (!scrollThrottle.current) {
-        requestAnimationFrame(() => {
-          const waitingItems = layoutInfos.current.filter(
-            item => !item.rendered,
-          );
-
-          if (waitingItems.length > 0) {
-            const { offsetHeight, scrollTop } = gridWrapRef.current!;
-            waitingItems.forEach(item => {
-              const itemTop = calcItemTop(item.id);
-              if (itemTop - scrollTop < offsetHeight) {
-                renderedWidgetById(item.id);
-              }
-            });
-          } else {
-            if (scrollThrottle.current) {
-              gridWrapRef.current?.removeEventListener(
-                'scroll',
-                lazyLoad,
-                false,
-              );
-            }
-          }
-          scrollThrottle.current = false;
-        });
-        scrollThrottle.current = true;
-      }
-    }, [calcItemTop, renderedWidgetById]);
-
-    useEffect(() => {
-      if (layoutWidgets.length && gridWrapRef.current) {
-        lazyLoad();
-        gridWrapRef.current.removeEventListener('scroll', lazyLoad, false);
-        gridWrapRef.current.addEventListener('scroll', lazyLoad, false);
-        // issues#339
-        window.addEventListener('resize', lazyLoad, false);
-      }
-
-      return () => {
-        gridWrapRef?.current?.removeEventListener('scroll', lazyLoad, false);
-        window.removeEventListener('resize', lazyLoad, false);
-      };
-    }, [layoutWidgets.length, lazyLoad]);
-
-    const onLayoutChange = useCallback((layouts: Layout[], all) => {
-      currentLayout.current = layouts;
-    }, []);
-
     const boardChildren = useMemo(() => {
-      return layoutWidgets.map(item => {
+      return sortedLayoutWidgets.map(item => {
         return (
-          <div className="block-item" key={item.id}>
+          <div key={item.id}>
             <WidgetAllProvider id={item.id}>
               <WidgetOfAuto />
             </WidgetAllProvider>
           </div>
         );
       });
-    }, [layoutWidgets]);
+    }, [sortedLayoutWidgets]);
 
     return (
       <Wrap>
         <StyledContainer bg={background} ref={ref}>
-          {layoutWidgets.length ? (
+          {sortedLayoutWidgets.length ? (
             <div className="grid-wrap" ref={gridWrapRef}>
               <div className="grid-wrap" ref={gridRef}>
                 <ResponsiveGridLayout
@@ -255,6 +157,7 @@ export const AutoBoardCore: React.FC<AutoBoardCoreProps> = memo(
                   onBreakpointChange={onBreakpointChange}
                   isDraggable={false}
                   isResizable={false}
+                  allowOverlap={allowOverlap}
                   measureBeforeMount={false}
                   useCSSTransforms={true}
                 >
@@ -297,7 +200,7 @@ const StyledContainer = styled(StyledBackground)`
   .empty {
     display: flex;
     flex: 1;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
   }
 `;

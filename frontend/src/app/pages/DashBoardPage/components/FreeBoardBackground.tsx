@@ -15,11 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
+
 import React, { createContext, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
-import { BoardContext } from '../contexts/BoardContext';
 import StyledBackground from '../pages/Board/components/StyledBackground';
+import { BoardConfigContext } from './BoardProvider/BoardConfigProvider';
+import { BoardContext } from './BoardProvider/BoardProvider';
+
 export const scaleContext = createContext<[number, number]>([1, 1]);
 export interface IProps {
   scale: [number, number];
@@ -27,7 +29,10 @@ export interface IProps {
 }
 const SlideBackground: React.FC<IProps> = props => {
   const {
-    config: { width: slideWidth, height: slideHeight, scaleMode, background },
+    width: slideWidth,
+    height: slideHeight,
+    scaleMode,
+    background,
   } = useContext(BoardConfigContext);
   const { editing } = useContext(BoardContext);
   const { scale, slideTranslate } = props;
@@ -70,6 +75,5 @@ export default SlideBackground;
 const Warp = styled(StyledBackground)<{ editing: boolean }>`
   position: relative;
   box-shadow: ${p => (p.editing ? '0px 1px 8px 2px #8cb4be;' : '')};
-  transition: all ease-in 200ms;
   transform-origin: 0 0;
 `;

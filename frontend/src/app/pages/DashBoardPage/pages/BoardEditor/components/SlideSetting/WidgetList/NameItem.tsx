@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { WidgetActionDropdown } from 'app/pages/DashBoardPage/components/WidgetToolBar/WidgetActionDropdown';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
 import {
   Widget,
   WidgetType,
@@ -30,6 +30,7 @@ import styled from 'styled-components/macro';
 import { PRIMARY } from 'styles/StyleConstants';
 import { editWidgetInfoActions } from '../../../slice';
 import { NameCard } from './WidgetNameList';
+
 export interface NameItemProps {
   index: number;
   zIndex: number;

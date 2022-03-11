@@ -573,6 +573,7 @@ const config: ChartConfig = {
           type: '图例类型',
           selectAll: '图例全选',
           position: '图例位置',
+          height: '图例高度',
         },
         data: {
           color: '颜色',

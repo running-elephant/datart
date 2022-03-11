@@ -33,7 +33,9 @@ import datart.server.base.dto.DatachartDetail;
 import datart.core.base.exception.NotFoundException;
 import datart.core.base.exception.ParamException;
 import datart.server.base.params.BaseCreateParam;
+import datart.server.base.params.BaseUpdateParam;
 import datart.server.base.params.DatachartCreateParam;
+import datart.server.base.params.VizUpdateParam;
 import datart.server.service.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -148,6 +150,9 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
         BeanUtils.copyProperties(createParam, folder);
         folder.setRelType(ResourceType.DATACHART.name());
         folder.setRelId(datachart.getId());
+        folder.setSubType(param.getSubType());
+        folder.setAvatar(param.getAvatar());
+
 
         folderService.requirePermission(folder, Const.CREATE);
         folderMapper.insert(folder);

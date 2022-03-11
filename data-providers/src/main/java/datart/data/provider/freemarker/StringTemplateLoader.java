@@ -18,16 +18,16 @@
 package datart.data.provider.freemarker;
 
 import freemarker.cache.TemplateLoader;
+import org.apache.commons.collections4.map.LRUMap;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class StringTemplateLoader implements TemplateLoader {
 
-    public static final Map<String, String> SCRIPT_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, String> SCRIPT_MAP = new LRUMap<>(1000);
 
     @Override
     public Object findTemplateSource(String name) throws IOException {

@@ -13,7 +13,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Objects;
 
 @ControllerAdvice
 public class ControllerResponseAdvice implements ResponseBodyAdvice<Object> {
@@ -34,9 +33,7 @@ public class ControllerResponseAdvice implements ResponseBodyAdvice<Object> {
                 }
                 ((ResponseData) o).setWarnings(msg);
             }
-            return o;
-        } else {
-            return ResponseData.success(o);
         }
+        return o;
     }
 }

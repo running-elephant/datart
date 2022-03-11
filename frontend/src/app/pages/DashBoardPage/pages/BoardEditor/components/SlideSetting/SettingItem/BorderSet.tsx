@@ -33,10 +33,10 @@ export const BorderSet: FC<{
       </Form.Item>
 
       <Form.Item label={t('width')} name={['border', 'width']}>
-        <InputNumber />
+        <InputNumber className="datart-ant-input-number" />
       </Form.Item>
       <Form.Item label={t('style')} name={['border', 'style']}>
-        <Select>
+        <Select className="datart-ant-select">
           {BORDER_STYLE_OPTIONS.map(item => (
             <Select.Option key={item.value} value={item.value}>
               {tLine(item.value)}
@@ -45,7 +45,7 @@ export const BorderSet: FC<{
         </Select>
       </Form.Item>
       <Form.Item label={t('radius')} name={['border', 'radius']}>
-        <InputNumber />
+        <InputNumber className="datart-ant-input-number" />
       </Form.Item>
     </>
   );

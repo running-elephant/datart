@@ -67,6 +67,10 @@ export const convertImageUrl = (urlKey: string = ''): string => {
   }
   return urlKey;
 };
+export const getBackgroundImage = (url: string = ''): string => {
+  return url ? `url(${convertImageUrl(url)})` : 'none';
+};
+
 /**
  * @description '为了server 复制board 副本，原有board资源文件 和新副本资源文件 脱离关系 不受影响'
  * 将当前前端渲染环境 id 替换掉原有的id ，原来的和当前的相等不受影响
@@ -359,15 +363,27 @@ export const getBoardChartRequests = (params: {
 
   const chartRequest = chartWidgetIds
     .map(widgetId => {
-      return getChartWidgetRequestParams({
-        widgetId,
-        widgetMap,
-        viewMap,
-        option: undefined,
-        widgetInfo: undefined,
-        dataChartMap,
-      });
+      const isWidget = widgetMap[widgetId].datachartId.indexOf('widget') !== -1;
+      return {
+        ...getChartWidgetRequestParams({
+          widgetId,
+          widgetMap,
+          viewMap,
+          option: undefined,
+          widgetInfo: undefined,
+          dataChartMap,
+        }),
+        ...{
+          vizName: widgetMap[widgetId].config.name,
+          vizId: isWidget
+            ? widgetMap[widgetId].id
+            : widgetMap[widgetId].datachartId,
+          analytics: false,
+          vizType: isWidget ? 'widget' : 'dataChart',
+        },
+      };
     })
+
     .filter(res => {
       if (res) {
         return true;
@@ -507,4 +523,28 @@ export const getDefaultWidgetName = (widget: Widget, index: number) => {
     default:
       return `xxx${index}`;
   }
+};
+export const checkLinkAndJumpErr = (
+  widgetData: Widget,
+  folderListIds?: string[],
+): string => {
+  let error: string = '';
+
+  if (
+    widgetData?.config?.linkageConfig?.open &&
+    widgetData?.relations.length === 0
+  ) {
+    error = 'viz.linkage.linkageError';
+  }
+
+  if (
+    widgetData?.config?.jumpConfig &&
+    widgetData?.config?.jumpConfig.open &&
+    widgetData?.config?.jumpConfig.targetType === 'INTERNAL' &&
+    !folderListIds?.includes(widgetData.config.jumpConfig.target.relId)
+  ) {
+    error = 'viz.jump.jumpError';
+  }
+
+  return error;
 };

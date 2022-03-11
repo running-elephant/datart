@@ -29,10 +29,9 @@ import datart.core.data.provider.QueryScript;
 import datart.core.data.provider.ScriptVariable;
 import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.SqlBuilder;
-import datart.data.provider.calcite.SqlValidateUtils;
 import datart.data.provider.calcite.SqlParserUtils;
+import datart.data.provider.calcite.SqlValidateUtils;
 import datart.data.provider.freemarker.FreemarkerContext;
-import datart.data.provider.local.LocalDB;
 import datart.data.provider.script.ReplacementPair;
 import datart.data.provider.script.ScriptRender;
 import datart.data.provider.script.VariablePlaceholder;
@@ -70,21 +69,24 @@ public class SqlScriptRender extends ScriptRender {
     private final SqlDialect sqlDialect;
 
     // special sql execute permission config from datasource
-    private boolean enableSpecialSQL;
+    private final boolean enableSpecialSQL;
 
-    public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam) {
-        super(queryScript, executeParam);
-        this.sqlDialect = LocalDB.SQL_DIALECT;
-    }
+    // default all identifiers
+    private final boolean quoteIdentifiers;
 
     public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, SqlDialect sqlDialect) {
-        super(queryScript, executeParam);
-        this.sqlDialect = sqlDialect;
+        this(queryScript, executeParam, sqlDialect, false);
     }
 
     public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, SqlDialect sqlDialect, boolean enableSpecialSQL) {
-        this(queryScript, executeParam, sqlDialect);
+        this(queryScript, executeParam, sqlDialect, enableSpecialSQL, true);
+    }
+
+    public SqlScriptRender(QueryScript queryScript, ExecuteParam executeParam, SqlDialect sqlDialect, boolean enableSpecialSQL, boolean quoteIdentifiers) {
+        super(queryScript, executeParam);
+        this.sqlDialect = sqlDialect;
         this.enableSpecialSQL = enableSpecialSQL;
+        this.quoteIdentifiers = quoteIdentifiers;
     }
 
 
@@ -122,6 +124,7 @@ public class SqlScriptRender extends ScriptRender {
                     .withDialect(sqlDialect)
                     .withBaseSql(selectSql)
                     .withPage(withPage)
+                    .withQuoteIdentifiers(quoteIdentifiers)
                     .build();
         }
 
@@ -131,7 +134,11 @@ public class SqlScriptRender extends ScriptRender {
 
         selectSql = replaceVariables(selectSql);
 
-        return onlySelectStatement ? selectSql : script.replace(selectSql0, selectSql);
+        selectSql = onlySelectStatement ? selectSql : script.replace(selectSql0, selectSql);
+
+        RequestContext.setSql(selectSql);
+
+        return selectSql;
     }
 
 
@@ -169,7 +176,7 @@ public class SqlScriptRender extends ScriptRender {
         if (CollectionUtils.isNotEmpty(placeholders)) {
             for (VariablePlaceholder placeholder : placeholders) {
                 ReplacementPair replacementPair = placeholder.replacementPair();
-                selectSql = StringUtils.replaceIgnoreCase(selectSql,replacementPair.getPattern(),replacementPair.getReplacement());
+                selectSql = StringUtils.replaceIgnoreCase(selectSql, replacementPair.getPattern(), replacementPair.getReplacement());
             }
         }
 

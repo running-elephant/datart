@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
 import { CommonFormTypes } from 'globalConstants';
 import { useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -38,6 +39,7 @@ export function useSaveAsView() {
   const getViewData = useCallback(async (viewId): Promise<View> => {
     try {
       const { data } = await request<View>(`/views/${viewId}`);
+      data.config = migrateViewConfig(data.config);
       return data;
     } catch (error) {
       errorHandle(error);
@@ -59,7 +61,7 @@ export function useSaveAsView() {
         initialValues: {
           name: name + '_' + tg('copy'),
           parentId,
-          config: config,
+          config,
         },
         parentIdLabel: t('folder'),
         onSave: (values, onClose) => {

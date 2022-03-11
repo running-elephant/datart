@@ -19,6 +19,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import {
+  getOauth2Clients,
   getSystemInfo,
   getUserInfoByToken,
   login,
@@ -37,6 +38,7 @@ export const initialState: AppState = {
   registerLoading: false,
   saveProfileLoading: false,
   modifyPasswordLoading: false,
+  oauth2Clients: [],
 };
 
 const slice = createSlice({
@@ -115,6 +117,13 @@ const slice = createSlice({
     // getSystemInfo
     builder.addCase(getSystemInfo.fulfilled, (state, action) => {
       state.systemInfo = action.payload;
+    });
+
+    builder.addCase(getOauth2Clients.fulfilled, (state, action) => {
+      state.oauth2Clients = action.payload.map(x => ({
+        name: Object.keys(x)[0],
+        value: x[Object.keys(x)[0]],
+      }));
     });
   },
 });

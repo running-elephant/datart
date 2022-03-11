@@ -30,7 +30,6 @@ import { View } from 'app/types/View';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
-import { G30 } from 'styles/StyleConstants';
 import { request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { ControllerConfig } from '../../../types';
@@ -278,7 +277,7 @@ const ValuesOptionsSetter: FC<{
                             }}
                           >
                             <span>{item.label || item.key}</span>
-                            <span style={{ color: G30 }}>{item.key}</span>
+                            <FieldKey>{item.key}</FieldKey>
                           </div>
                         </Select.Option>
                       ))}
@@ -302,8 +301,13 @@ const ValuesOptionsSetter: FC<{
 });
 
 export default ValuesOptionsSetter;
+
 const Wrap = styled.div`
   .transfer {
     padding: 10px 0;
   }
+`;
+
+const FieldKey = styled.span`
+  color: ${p => p.theme.textColorDisabled};
 `;

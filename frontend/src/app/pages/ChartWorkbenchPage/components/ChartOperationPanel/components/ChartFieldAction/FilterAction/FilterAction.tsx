@@ -20,7 +20,7 @@ import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
-import FilterControllPanel from '../FilterControlPanel';
+import FilterControlPanel from '../FilterControlPanel';
 
 const FilterAction: FC<{
   config: ChartDataSectionField;
@@ -35,11 +35,11 @@ const FilterAction: FC<{
 }> = memo(
   ({ config, dataset, dataView, dataConfig, onConfigChange, aggregation }) => {
     const handleFetchDataFromField = async fieldId => {
-      // TODO: tobe implement to get fields
+      // TODO: to be implement to get fields
       return await Promise.resolve(['a', 'b', 'c'].map(f => `${fieldId}-${f}`));
     };
     return (
-      <FilterControllPanel
+      <FilterControlPanel
         aggregation={aggregation}
         config={config}
         dataset={dataset}

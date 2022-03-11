@@ -16,44 +16,38 @@
  * limitations under the License.
  */
 
-import { Col, Row, Select } from 'antd';
+import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FONT_SIZES } from 'globalConstants';
 import { FC, memo } from 'react';
-import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
+import { BW } from './components/BasicWrapper';
 
 const BasicFontSizeSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
     const { comType, options, ...rest } = row;
 
     return (
-      <StyledVizFontSelector align={'middle'}>
-        <Col span={12}>{t(row.label, true)}</Col>
-        <Col span={12}>
-          <Select
-            dropdownMatchSelectWidth
-            {...rest}
-            {...options}
-            placeholder={t('select')}
-            onChange={value => onChange?.(ancestors, value)}
-          >
-            {FONT_SIZES.map(o => (
-              <Select.Option key={o} value={o}>
-                {o}
-              </Select.Option>
-            ))}
-          </Select>
-        </Col>
-      </StyledVizFontSelector>
+      <BW label={!options?.hideLabel ? t(row.label, true) : ''}>
+        <Select
+          className="datart-ant-select"
+          dropdownMatchSelectWidth
+          {...rest}
+          {...options}
+          placeholder={t('select')}
+          onChange={value => onChange?.(ancestors, value)}
+        >
+          {FONT_SIZES.map(o => (
+            <Select.Option key={o} value={o}>
+              {o}
+            </Select.Option>
+          ))}
+        </Select>
+      </BW>
     );
   },
   itemLayoutComparer,
 );
 
 export default BasicFontSizeSelector;
-
-const StyledVizFontSelector = styled(Row)`
-  line-height: 32px;
-`;

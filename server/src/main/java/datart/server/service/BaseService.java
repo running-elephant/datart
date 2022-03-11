@@ -18,6 +18,7 @@
 
 package datart.server.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import datart.core.common.Application;
 import datart.core.common.MessageResolver;
 import datart.core.entity.BaseEntity;
@@ -30,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BaseService extends MessageResolver {
+
+    protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     protected DatartSecurityManager securityManager;
 

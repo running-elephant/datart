@@ -19,7 +19,6 @@ export const MODAL_LEVEL = 1000;
 
 // base color
 export const BLUE = '#1B9AEE';
-export const BLUERGB = '27, 154, 238';
 export const GREEN = '#15AD31';
 export const ORANGE = '#FA8C15';
 export const YELLOW = '#FAD414';
@@ -38,20 +37,29 @@ export const RED = '#E62412';
  * G80 - font
  */
 export const WHITE = '#FFFFFF';
-export const G10 = '#f8f9fa';
-export const G20 = '#e9ecef';
-export const G30 = '#dee2e6';
-export const G40 = '#ced4da';
-export const G50 = '#adb5bd';
-export const G60 = '#6c757d';
-export const G70 = '#495057';
-export const G80 = '#343a40';
-export const G90 = '#212529';
+export const G10 = '#F5F8FA';
+export const G20 = '#EFF2F5';
+export const G30 = '#E4E6EF';
+export const G40 = '#B5B5C3';
+export const G50 = '#A1A5B7';
+export const G60 = '#7E8299';
+export const G70 = '#5E6278';
+export const G80 = '#3F4254';
+export const G90 = '#181C32';
 export const BLACK = '#000000';
+
+export const DG10 = '#1b1b29';
+export const DG20 = '#2B2B40';
+export const DG30 = '#323248';
+export const DG40 = '#474761';
+export const DG50 = '#565674';
+export const DG60 = '#6D6D80';
+export const DG70 = '#92929F';
+export const DG80 = '#CDCDDE';
+export const DG90 = '#FFFFFF';
 
 // theme color
 export const PRIMARY = BLUE;
-export const PRIMARYRGB = BLUERGB;
 export const INFO = PRIMARY;
 export const SUCCESS = GREEN;
 export const PROCESSING = BLUE;

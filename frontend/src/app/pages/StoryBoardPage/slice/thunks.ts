@@ -17,13 +17,14 @@
  */
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { migrateStoryPageConfig } from 'app/migration/StoryConfig/migrateStoryPageConfig';
 import { getBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thunk';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ExecuteToken } from 'app/pages/SharePage/slice/types';
 import { RootState } from 'types';
 import { request2 } from 'utils/request';
 import { storyActions } from '.';
-import { getInitStoryPageConfig, getStoryPageConfig } from '../utils';
+import { getInitStoryPageConfig } from '../utils';
 import { handleServerStoryAction } from './actions';
 import { makeSelectStoryPagesById } from './selectors';
 import {
@@ -139,7 +140,7 @@ export const addStoryPage = createAsyncThunk<
   });
   const page = {
     ...data,
-    config: getStoryPageConfig(data.config),
+    config: migrateStoryPageConfig(data.config),
   } as StoryPage;
   dispatch(storyActions.addStoryPage(page));
   return null;

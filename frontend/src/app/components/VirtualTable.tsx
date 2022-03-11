@@ -27,6 +27,7 @@ import React, {
   useState,
 } from 'react';
 import { VariableSizeGrid as Grid } from 'react-window';
+import styled from 'styled-components/macro';
 import { SPACE_TIMES } from 'styles/StyleConstants';
 
 interface VirtualTableProps extends TableProps<object> {
@@ -130,10 +131,9 @@ export const VirtualTable = memo((props: VirtualTableProps) => {
               padding: `${SPACE_TIMES(2)}`,
               textAlign: mergedColumns[columnIndex].align,
               ...style,
-              borderBottom: '1px solid #f0f0f0',
             };
             return (
-              <div
+              <TableCell
                 className={classNames('virtual-table-cell', {
                   'virtual-table-cell-last':
                     columnIndex === mergedColumns.length - 1,
@@ -142,7 +142,7 @@ export const VirtualTable = memo((props: VirtualTableProps) => {
                 key={columnIndex}
               >
                 {rawData[rowIndex][mergedColumns[columnIndex].dataIndex]}
-              </div>
+              </TableCell>
             );
           }}
         </Grid>
@@ -162,3 +162,7 @@ export const VirtualTable = memo((props: VirtualTableProps) => {
     />
   );
 });
+
+const TableCell = styled.div`
+  border-bottom: 1px solid ${p => p.theme.borderColorSplit};
+`;

@@ -15,12 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BoardActionContext } from 'app/pages/DashBoardPage/contexts/BoardActionContext';
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
+
 import { FontConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { darken, getLuminance, lighten } from 'polished';
 import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
+import { BoardActionContext } from '../../BoardProvider/BoardActionProvider';
+import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
 export interface CompProps {}
 export const ResetWidget: React.FC<CompProps> = () => {
@@ -42,15 +43,14 @@ export const ResetWidget: React.FC<CompProps> = () => {
 };
 
 const Wrap = styled.div<FontConfig & { background: string }>`
-  cursor: pointer;
-  flex: 1;
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
   font: ${p =>
     `${p.fontStyle} ${p.fontWeight} ${p.fontSize}px ${p.fontFamily}`};
   color: ${p => p.color};
-
+  cursor: pointer;
   &:hover {
     background: ${p =>
       getLuminance(p.background) > 0.5

@@ -73,7 +73,7 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
       onConfigChanged(ancestors, config, true);
     };
 
-    const hanldShowExtraFunctionDialog = () => {
+    const handleShowExtraFunctionDialog = () => {
       const props = {
         config: currentConfig,
         onConfigChange: handleExtraConfigChange,
@@ -112,7 +112,7 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
             <Button
               size="small"
               icon={<BarsOutlined />}
-              onClick={hanldShowExtraFunctionDialog}
+              onClick={handleShowExtraFunctionDialog}
             >
               {translate('arrange')}
             </Button>

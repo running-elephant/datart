@@ -15,16 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetContext } from 'app/pages/DashBoardPage/contexts/WidgetContext';
-import { WidgetInfoContext } from 'app/pages/DashBoardPage/contexts/WidgetInfoContext';
+
 import { ContainerItem } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { INFO, SUCCESS } from 'styles/StyleConstants';
 import { WidgetCore } from '../..';
-import { BoardContext } from '../../../../contexts/BoardContext';
 import SubMaskLayer from '../../../../pages/BoardEditor/components/SubMaskLayer';
+import { BoardContext } from '../../../BoardProvider/BoardProvider';
+import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
+import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 import WidgetToolBar from '../../../WidgetToolBar';
+
 export interface IProps {
   tabItem: ContainerItem;
 }
@@ -82,10 +84,10 @@ interface WrapProps {
 const Wrap = styled.div<WrapProps>`
   position: relative;
   box-sizing: border-box;
-  width: 100%;
-  height: 100%;
   display: flex;
   flex: 1;
+  width: 100%;
+  height: 100%;
   border: ${p => p.border};
 
   & .widget-tool-bar {
@@ -102,8 +104,8 @@ const Wrap = styled.div<WrapProps>`
 `;
 const ItemContainer = styled.div`
   position: absolute;
-  display: flex;
   z-index: 10;
+  display: flex;
   width: 100%;
   height: 100%;
 `;

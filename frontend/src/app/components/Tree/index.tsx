@@ -75,7 +75,10 @@ const StyledDirectoryTree = styled(AntTree)`
         }
 
         .ant-tree-iconEle {
+          display: flex;
           flex-shrink: 0;
+          align-items: center;
+          justify-content: center;
           color: ${p => p.theme.textColorDisabled};
         }
 

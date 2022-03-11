@@ -33,15 +33,23 @@ const ChartPresentWrapper: FC<{
   chart?: IChart;
   dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
+  expensiveQuery: boolean;
+  allowQuery: boolean;
   onChartChange: (c: IChart) => void;
+  onRefreshDataset?: () => void;
+  onCreateDownloadDataTask?: () => void;
 }> = memo(
   ({
     containerHeight,
     containerWidth,
     chart,
     dataset,
+    expensiveQuery,
     chartConfig,
+    allowQuery,
     onChartChange,
+    onRefreshDataset,
+    onCreateDownloadDataTask,
   }) => {
     const { ref: ChartGraphPanelRef } = useResizeObserver<any>({
       refreshMode: 'debounce',
@@ -71,7 +79,11 @@ const ChartPresentWrapper: FC<{
             containerWidth={(containerWidth || 0) - borderWidth}
             chart={chart}
             dataset={dataset}
+            expensiveQuery={expensiveQuery}
+            allowQuery={allowQuery}
             chartConfig={chartConfig}
+            onRefreshDataset={onRefreshDataset}
+            onCreateDownloadDataTask={onCreateDownloadDataTask}
           />
         </ChartI18NContext.Provider>
       </StyledChartPresentWrapper>

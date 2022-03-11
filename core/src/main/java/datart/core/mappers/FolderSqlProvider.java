@@ -24,8 +24,16 @@ public class FolderSqlProvider {
             sql.VALUES("rel_type", "#{relType,jdbcType=VARCHAR}");
         }
         
+        if (record.getSubType() != null) {
+            sql.VALUES("sub_type", "#{subType,jdbcType=VARCHAR}");
+        }
+        
         if (record.getRelId() != null) {
             sql.VALUES("rel_id", "#{relId,jdbcType=VARCHAR}");
+        }
+        
+        if (record.getAvatar() != null) {
+            sql.VALUES("avatar", "#{avatar,jdbcType=VARCHAR}");
         }
         
         if (record.getParentId() != null) {
@@ -55,8 +63,16 @@ public class FolderSqlProvider {
             sql.SET("rel_type = #{relType,jdbcType=VARCHAR}");
         }
         
+        if (record.getSubType() != null) {
+            sql.SET("sub_type = #{subType,jdbcType=VARCHAR}");
+        }
+        
         if (record.getRelId() != null) {
             sql.SET("rel_id = #{relId,jdbcType=VARCHAR}");
+        }
+        
+        if (record.getAvatar() != null) {
+            sql.SET("avatar = #{avatar,jdbcType=VARCHAR}");
         }
         
         if (record.getParentId() != null) {

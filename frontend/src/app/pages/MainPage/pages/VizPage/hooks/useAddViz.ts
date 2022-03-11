@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BoardTypeMap } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getInitBoardConfig } from 'app/pages/DashBoardPage/utils/board';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
@@ -50,7 +49,7 @@ export function useAddViz({ showSaveForm }) {
     if (relType === 'DASHBOARD') {
       try {
         dataValues.config = JSON.stringify(
-          getInitBoardConfig(values.boardType || BoardTypeMap.auto),
+          getInitBoardConfig(values.boardType),
         );
       } catch (error) {
         throw error;
@@ -76,6 +75,8 @@ export function useAddViz({ showSaveForm }) {
                 ...dataValues,
                 orgId: orgId,
                 index: index,
+                subType: vizType === 'DASHBOARD' ? dataValues.boardType : null,
+                avatar: vizType === 'DATACHART' ? initialValues.avatar : null,
               },
               type: vizType,
             }),

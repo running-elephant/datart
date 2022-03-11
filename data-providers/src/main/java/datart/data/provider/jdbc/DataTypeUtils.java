@@ -65,25 +65,6 @@ public class DataTypeUtils {
                 return SqlTypeName.VARCHAR;
         }
     }
-//
-//    public static ValueType javaType2DataType(String javaTypeSimpleName) {
-//        JavaType javaType = JavaType.valueOf(javaTypeSimpleName.toUpperCase());
-//        switch (javaType) {
-//            case BYTE:
-//            case SHORT:
-//            case INTEGER:
-//            case LONG:
-//            case FLOAT:
-//            case DOUBLE:
-//                return ValueType.NUMERIC;
-//            case DATE:
-//                return ValueType.DATE;
-//            case BOOLEAN:
-//                return ValueType.BOOLEAN;
-//            default:
-//                return ValueType.STRING;
-//        }
-//    }
 
     public static ValueType javaType2DataType(Object obj) {
         if (obj instanceof Number) {

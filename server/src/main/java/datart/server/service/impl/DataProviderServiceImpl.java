@@ -19,6 +19,7 @@
 package datart.server.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +30,7 @@ import datart.core.base.consts.ValueType;
 import datart.core.base.consts.VariableTypeEnum;
 import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
+import datart.core.common.RequestContext;
 import datart.core.data.provider.*;
 import datart.core.entity.RelSubjectColumns;
 import datart.core.entity.Source;
@@ -121,23 +123,23 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
     @Override
     public Set<String> readAllDatabases(String sourceId) throws SQLException {
         Source source = retrieve(sourceId, Source.class, false);
-        return dataProviderManager.readAllDatabases(toDataProviderConfig(source));
+        return dataProviderManager.readAllDatabases(parseDataProviderConfig(source));
     }
 
     @Override
     public Set<String> readTables(String sourceId, String database) throws SQLException {
         Source source = retrieve(sourceId, Source.class, false);
-        return dataProviderManager.readTables(toDataProviderConfig(source), database);
+        return dataProviderManager.readTables(parseDataProviderConfig(source), database);
     }
 
     @Override
     public Set<Column> readTableColumns(String sourceId, String database, String table) throws SQLException {
         Source source = retrieve(sourceId, Source.class, false);
-        return dataProviderManager.readTableColumns(toDataProviderConfig(source), database, table);
+        return dataProviderManager.readTableColumns(parseDataProviderConfig(source), database, table);
     }
 
 
-    private DataProviderSource toDataProviderConfig(Source source) {
+    public DataProviderSource parseDataProviderConfig(Source source) {
         DataProviderSource providerSource = new DataProviderSource();
         try {
             providerSource.setSourceId(source.getId());
@@ -171,15 +173,14 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
     @Override
     public Dataframe testExecute(TestExecuteParam testExecuteParam) throws Exception {
         Source source = retrieve(testExecuteParam.getSourceId(), Source.class, true);
-
         List<ScriptVariable> variables = getOrgVariables(source.getOrgId());
         if (!CollectionUtils.isEmpty(testExecuteParam.getVariables())) {
-            for (ScriptVariable variable : testExecuteParam.getVariables()) {
-                if (variable.isExpression()) {
-                    variable.setValueType(ValueType.FRAGMENT);
-                }
-            }
             variables.addAll(testExecuteParam.getVariables());
+        }
+        for (ScriptVariable variable : variables) {
+            if (variable.isExpression()) {
+                variable.setValueType(ValueType.FRAGMENT);
+            }
         }
         if (securityManager.isOrgOwner(source.getOrgId())) {
             disablePermissionVariables(variables);
@@ -190,7 +191,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                 .script(testExecuteParam.getScript())
                 .variables(variables)
                 .build();
-        DataProviderSource providerSource = toDataProviderConfig(source);
+        DataProviderSource providerSource = parseDataProviderConfig(source);
 
         ExecuteParam executeParam = ExecuteParam
                 .builder()
@@ -211,7 +212,15 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         //datasource and view
         View view = retrieve(viewExecuteParam.getViewId(), View.class, true);
         Source source = retrieve(view.getSourceId(), Source.class, false);
-        DataProviderSource providerSource = toDataProviderConfig(source);
+        DataProviderSource providerSource = parseDataProviderConfig(source);
+
+        boolean scriptPermission = true;
+        try {
+            viewService.requirePermission(view, Const.MANAGE);
+        } catch (Exception e) {
+            scriptPermission = false;
+        }
+        RequestContext.setScriptPermission(scriptPermission);
 
         //permission and variables
         Set<String> columns = parseColumnPermission(view);
@@ -231,10 +240,6 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
         if (viewExecuteParam.getPageInfo().getPageNo() < 1) {
             viewExecuteParam.getPageInfo().setPageNo(1);
-        }
-
-        if (viewExecuteParam.getPageInfo().getPageSize() == 0) {
-            viewExecuteParam.getPageInfo().setPageSize(10_000);
         }
 
         viewExecuteParam.getPageInfo().setPageSize(Math.min(viewExecuteParam.getPageInfo().getPageSize(), Integer.MAX_VALUE));
@@ -257,13 +262,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
         Dataframe dataframe = dataProviderManager.execute(providerSource, queryScript, queryParam);
 
-        if (viewExecuteParam.isScript()) {
-            try {
-                viewService.requirePermission(view, Const.MANAGE);
-            } catch (Exception e) {
-                dataframe.setScript(null);
-            }
-        } else {
+        if (!viewExecuteParam.isScript() || !scriptPermission) {
             dataframe.setScript(null);
         }
         return dataframe;
@@ -274,7 +273,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
         Source source = retrieve(sourceId, Source.class, false);
 
-        DataProviderSource dataProviderSource = toDataProviderConfig(source);
+        DataProviderSource dataProviderSource = parseDataProviderConfig(source);
 
         return dataProviderManager.supportedStdFunctions(dataProviderSource);
     }
@@ -282,7 +281,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
     @Override
     public boolean validateFunction(String sourceId, String snippet) {
         Source source = retrieve(sourceId, Source.class);
-        DataProviderSource dataProviderSource = toDataProviderConfig(source);
+        DataProviderSource dataProviderSource = parseDataProviderConfig(source);
         return dataProviderManager.validateFunction(dataProviderSource, snippet);
     }
 
@@ -414,9 +413,32 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         }
 
         JSONObject jsonObject = JSON.parseObject(model);
-        for (String key : jsonObject.keySet()) {
-            ValueType type = ValueType.valueOf(jsonObject.getJSONObject(key).getString("type"));
-            schema.put(key, new Column(key, type));
+        try {
+            if (jsonObject.containsKey("hierarchy")) {
+                jsonObject = jsonObject.getJSONObject("hierarchy");
+                for (String key : jsonObject.keySet()) {
+                    JSONObject item = jsonObject.getJSONObject(key);
+                    if (item.containsKey("children")) {
+                        JSONArray children = item.getJSONArray("children");
+                        if (children != null && children.size() > 0) {
+                            for (int i = 0; i < children.size(); i++) {
+                                JSONObject child = children.getJSONObject(i);
+                                schema.put(child.getString("name"), new Column(child.getString("name"), ValueType.valueOf(child.getString("type"))));
+                            }
+                        }
+                    } else {
+                        schema.put(key, new Column(key, ValueType.valueOf(item.getString("type"))));
+                    }
+                }
+            } else {
+                // 兼容1.0.0-beta.1以前的版本
+                for (String key : jsonObject.keySet()) {
+                    ValueType type = ValueType.valueOf(jsonObject.getJSONObject(key).getString("type"));
+                    schema.put(key, new Column(key, type));
+                }
+            }
+        } catch (Exception e) {
+            log.error("view model parse error", e);
         }
         return schema;
     }

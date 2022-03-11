@@ -74,19 +74,23 @@ export const getBoardDetail = createAsyncThunk<
 
 export const fetchBoardDetail = createAsyncThunk<
   null,
-  { dashboardRelId: string; filterSearchParams?: FilterSearchParams }
+  {
+    dashboardRelId: string;
+    filterSearchParams?: FilterSearchParams;
+  }
 >('board/fetchBoardDetail', async (params, { dispatch, rejectWithValue }) => {
   const { data } = await request2<ServerDashboard>(
     `/viz/dashboards/${params?.dashboardRelId}`,
   );
 
-  await dispatch(
+  dispatch(
     handleServerBoardAction({
       data,
       renderMode: 'read',
       filterSearchMap: { params: params?.filterSearchParams },
     }),
   );
+
   return null;
 });
 
@@ -283,6 +287,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
           boardId,
           widgetId,
           errInfo: undefined,
+          errorType: 'request',
         }),
       );
     } catch (error) {
@@ -291,6 +296,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
           boardId,
           widgetId,
           errInfo: getErrorMessage(error),
+          errorType: 'request',
         }),
       );
 
@@ -386,6 +392,7 @@ export const getControllerOptions = createAsyncThunk<
           boardId,
           widgetId,
           errInfo: undefined,
+          errorType: 'request',
         }),
       );
     } catch (error) {
@@ -394,6 +401,7 @@ export const getControllerOptions = createAsyncThunk<
           boardId,
           widgetId,
           errInfo: getErrorMessage(error),
+          errorType: 'request',
         }),
       );
     }

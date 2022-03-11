@@ -79,18 +79,24 @@ export class ChartDataSet<T>
     metas?: ChartDatasetMeta[],
     fields?: ChartDataSectionField[],
   ) {
-    super(
-      ...(Array.prototype.map.call(columns, c => {
-        if (c?.length === 1) {
-          const row = new ChartDataSetRow(metas, []);
-          row.push(c[0]);
-          return row;
-        }
-        return new ChartDataSetRow(metas, c, fields);
-      }) as any),
-    );
+    super();
+    this.length = columns?.length || 0;
     this.originalFields = fields;
     this.columnIndexTable = super.createColumnIndexTable(metas);
+
+    for (let i = 0; i < this.length; i++) {
+      if (columns[i]?.length === 1) {
+        const row = new ChartDataSetRow(this.columnIndexTable, [], fields);
+        row.push(columns[i][0]);
+        this[i] = row;
+      } else {
+        this[i] = new ChartDataSetRow(
+          this.columnIndexTable,
+          columns[i],
+          fields,
+        );
+      }
+    }
   }
 
   public getFieldKey(field: ChartDataSectionField) {
@@ -129,6 +135,20 @@ export class ChartDataSet<T>
         sortValues.indexOf(next[this.toKey(order)]),
     );
   }
+
+  public groupBy(field: ChartDataSectionField): {
+    [groupKey in string]: IChartDataSetRow<T>[];
+  } {
+    const groupedChartDataSets = this.reduce((acc, row) => {
+      const valueKey = row.getCell(field) || 'defaultGroupKey';
+      if (!acc[valueKey]) {
+        acc[valueKey] = [];
+      }
+      acc[valueKey].push(row);
+      return acc;
+    }, {});
+    return groupedChartDataSets;
+  }
 }
 
 export class ChartDataSetRow<T>
@@ -136,14 +156,12 @@ export class ChartDataSetRow<T>
   implements IChartDataSetRow<T>
 {
   private columnIndexTable: ColumnIndexTable = {};
-  private metas: Array<{ name: string }> = [];
   private originalFields?: ChartDataSectionField[];
 
-  constructor(metas, items: T[], fields?: ChartDataSectionField[]) {
+  constructor(indexes, items: T[], fields?: ChartDataSectionField[]) {
     super(...(items as any));
-    this.metas = metas;
+    this.columnIndexTable = indexes;
     this.originalFields = fields;
-    this.columnIndexTable = this.createColumnIndexTable(metas);
   }
 
   public getCell(field: ChartDataSectionField) {

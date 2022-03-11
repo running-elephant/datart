@@ -34,6 +34,8 @@ public class ViewExecuteParam {
 
     private String vizName;
 
+    private String vizType;
+
     private String viewId;
 
     private List<SelectKeyword> keywords;
@@ -64,15 +66,12 @@ public class ViewExecuteParam {
 
     private boolean script;
 
+    private boolean analytics;
+
     public boolean isEmpty() {
         return CollectionUtils.isEmpty(columns)
-                && CollectionUtils.isEmpty(keywords)
-                && CollectionUtils.isEmpty(params)
-                && CollectionUtils.isEmpty(functionColumns)
                 && CollectionUtils.isEmpty(aggregators)
-                && CollectionUtils.isEmpty(filters)
-                && CollectionUtils.isEmpty(groups)
-                && CollectionUtils.isEmpty(orders);
+                && CollectionUtils.isEmpty(groups);
     }
 
 }

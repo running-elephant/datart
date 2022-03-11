@@ -36,13 +36,14 @@ import {
 import { uuidv4 } from 'utils/utils';
 import { ColumnCategories, ColumnTypes } from '../constants';
 import { Column, Model } from '../slice/types';
-import { getColumnWidthMap } from '../utils';
+import { getColumnWidthMap, getHierarchyColumn } from '../utils';
 const ROW_KEY = 'DATART_ROW_KEY';
 
 interface SchemaTableProps extends TableProps<object> {
   height: number;
   width: number;
   model: Model;
+  hierarchy: Model;
   dataSource?: object[];
   hasCategory?: boolean;
   getExtraHeaderActions?: (
@@ -60,6 +61,7 @@ export const SchemaTable = memo(
     height,
     width: propsWidth,
     model,
+    hierarchy,
     dataSource,
     hasCategory,
     getExtraHeaderActions,
@@ -86,11 +88,13 @@ export const SchemaTable = memo(
     } = useMemo(() => {
       let tableWidth = 0;
       const columns = Object.entries(model).map(([name, column]) => {
+        const hierarchyColumn = getHierarchyColumn(name, hierarchy) || column;
+
         const width = columnWidthMap[name];
         tableWidth += width;
 
         let icon;
-        switch (column.type) {
+        switch (hierarchyColumn.type) {
           case ColumnTypes.Number:
             icon = <NumberOutlined />;
             break;
@@ -103,7 +107,7 @@ export const SchemaTable = memo(
         }
 
         const extraActions =
-          getExtraHeaderActions && getExtraHeaderActions(name, column);
+          getExtraHeaderActions && getExtraHeaderActions(name, hierarchyColumn);
 
         const title = (
           <>
@@ -112,9 +116,12 @@ export const SchemaTable = memo(
               trigger={['click']}
               overlay={
                 <Menu
-                  selectedKeys={[column.type, `category-${column.category}`]}
+                  selectedKeys={[
+                    hierarchyColumn.type,
+                    `category-${hierarchyColumn.category}`,
+                  ]}
                   className="datart-schema-table-header-menu"
-                  onClick={onSchemaTypeChange(name, column)}
+                  onClick={onSchemaTypeChange(name, hierarchyColumn)}
                 >
                   {Object.values(ColumnTypes).map(t => (
                     <Menu.Item key={t}>
@@ -166,6 +173,7 @@ export const SchemaTable = memo(
       return { columns, tableWidth };
     }, [
       model,
+      hierarchy,
       columnWidthMap,
       hasCategory,
       getExtraHeaderActions,

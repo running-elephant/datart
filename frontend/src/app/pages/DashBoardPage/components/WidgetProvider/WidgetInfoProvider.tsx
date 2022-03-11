@@ -16,14 +16,16 @@
  * limitations under the License.
  */
 
-import React, { FC, useContext, useMemo } from 'react';
+import { WidgetInfo } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import React, { createContext, FC, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { BoardContext } from '../../contexts/BoardContext';
-import { WidgetInfoContext } from '../../contexts/WidgetInfoContext';
 import { selectWidgetInfoBy2Id } from '../../pages/Board/slice/selector';
 import { BoardState } from '../../pages/Board/slice/types';
 import { selectWidgetInfoById } from '../../pages/BoardEditor/slice/selectors';
 import { EditBoardState } from '../../pages/BoardEditor/slice/types';
+import { BoardContext } from '../BoardProvider/BoardProvider';
+
+export const WidgetInfoContext = createContext<WidgetInfo>({} as WidgetInfo);
 
 export const WidgetInfoProvider: FC<{ widgetId: string }> = ({
   widgetId,

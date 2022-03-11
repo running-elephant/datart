@@ -16,12 +16,13 @@
  * limitations under the License.
  */
 
-import { Col, InputNumber, Row, Select, Space } from 'antd';
+import { InputNumber, Select, Space } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
+import { BW } from './components/BasicWrapper';
 
 const BasicMarginWidth: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
@@ -49,7 +50,7 @@ const BasicMarginWidth: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         onChange?.(ancestors, newValue);
       }
       if (getMode(mixedValue) === widthModeTypes[1]) {
-        onChange?.(ancestors, newValue + widthModeTypes[1]);
+        onChange?.(ancestors, (newValue || '') + widthModeTypes[1]);
       }
     };
 
@@ -63,24 +64,30 @@ const BasicMarginWidth: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     };
 
     return (
-      <StyledBasicMarginWidth align={'middle'}>
-        <Col span={12}>{t(label, true)}</Col>
-        <Col span={12}>
-          <Space>
-            <InputNumber
-              value={getNumber(mixedValue)}
-              onChange={handleValueChange}
-            />
-            <Select value={getMode(mixedValue)} onChange={handleModeChange}>
-              <Select.Option value={widthModeTypes[0]}>
-                {widthModeTypes[0]}
-              </Select.Option>
-              <Select.Option value={widthModeTypes[1]}>
-                {widthModeTypes[1]}
-              </Select.Option>
-            </Select>
-          </Space>
-        </Col>
+      <StyledBasicMarginWidth
+        label={t(label, true)}
+        labelCol={{ span: 8 }}
+        wrapperCol={{ span: 16 }}
+      >
+        <Space>
+          <InputNumber
+            className="datart-ant-input-number"
+            value={getNumber(mixedValue)}
+            onChange={handleValueChange}
+          />
+          <Select
+            className="datart-ant-select"
+            value={getMode(mixedValue)}
+            onChange={handleModeChange}
+          >
+            <Select.Option value={widthModeTypes[0]}>
+              {widthModeTypes[0]}
+            </Select.Option>
+            <Select.Option value={widthModeTypes[1]}>
+              {widthModeTypes[1]}
+            </Select.Option>
+          </Select>
+        </Space>
       </StyledBasicMarginWidth>
     );
   },
@@ -89,14 +96,6 @@ const BasicMarginWidth: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
 
 export default BasicMarginWidth;
 
-const StyledBasicMarginWidth = styled(Row)`
-  line-height: 32px;
-
-  & .ant-select {
-    width: 60px;
-  }
-
-  & .ant-input-number {
-    width: 60px;
-  }
+const StyledBasicMarginWidth = styled(BW)`
+  flex-direction: row;
 `;

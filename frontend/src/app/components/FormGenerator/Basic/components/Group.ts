@@ -1,5 +1,5 @@
 import styled from 'styled-components/macro';
-import { BORDER_RADIUS, SPACE_XS } from 'styles/StyleConstants';
+import { SPACE_XS } from 'styles/StyleConstants';
 
 export const Group = styled.div`
   display: flex;
@@ -13,18 +13,10 @@ export const Group = styled.div`
   .ant-select {
     margin-left: ${SPACE_XS};
     overflow: hidden;
-    color: ${p => p.theme.textColorSnd};
 
     &:first-of-type {
       margin-left: 0;
     }
-  }
-
-  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-    background-color: ${p => p.theme.emphasisBackground};
-    border-color: transparent !important;
-    border-radius: ${BORDER_RADIUS};
-    box-shadow: none !important;
   }
 `;
 

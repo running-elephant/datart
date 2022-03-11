@@ -19,11 +19,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getDataProviderDatabases } from 'app/pages/MainPage/slice/thunks';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
+import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
+import { rejectedActionMessageHandler } from 'utils/notification';
 import { ViewViewModelStages } from '../constants';
-import { transformQueryResultToModelAndDataSource } from '../utils';
+import {
+  diffMergeHierarchyModel,
+  transformQueryResultToModelAndDataSource,
+} from '../utils';
 import {
   deleteView,
   getArchivedViews,
+  getSchemaBySourceId,
   getViewDetail,
   getViews,
   runSql,
@@ -42,8 +48,10 @@ export const initialState: ViewState = {
   editingViews: [],
   currentEditingView: '',
   sourceDatabases: {},
+  sourceDatabaseSchema: {},
   saveViewLoading: false,
   unarchiveLoading: false,
+  databaseSchemaLoading: false,
 };
 
 const slice = createSlice({
@@ -224,7 +232,7 @@ const slice = createSlice({
           action.payload,
           currentEditingView.model,
         );
-        currentEditingView.model = model;
+        currentEditingView.model = diffMergeHierarchyModel(model);
         currentEditingView.previewResults = dataSource;
         if (!action.meta.arg.isFragment) {
           currentEditingView.stage = ViewViewModelStages.Saveable;
@@ -392,6 +400,27 @@ const slice = createSlice({
         value: [name],
       }));
     });
+
+    // getSchemaBySourceId
+    builder.addCase(getSchemaBySourceId.pending, state => {
+      state.databaseSchemaLoading = true;
+    });
+    builder.addCase(getSchemaBySourceId.rejected, state => {
+      state.databaseSchemaLoading = false;
+    });
+    builder.addCase(getSchemaBySourceId.fulfilled, (state, action) => {
+      state.databaseSchemaLoading = false;
+      if (!action.payload?.data?.schemaItems) {
+        return;
+      }
+      state.sourceDatabaseSchema[action.payload?.sourceId] =
+        action.payload.data.schemaItems;
+    });
+
+    builder.addMatcher(
+      isMySliceRejectedAction(slice.name),
+      rejectedActionMessageHandler,
+    );
   },
 });
 

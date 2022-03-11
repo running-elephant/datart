@@ -18,25 +18,89 @@
 
 package datart.data.provider.sql;
 
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.QueryScript;
-import datart.data.provider.ParamFactory;
+import datart.data.provider.DataProviderTestApplication;
+import datart.data.provider.base.DataProviderException;
 import datart.data.provider.jdbc.SqlScriptRender;
-import org.apache.calcite.sql.dialect.MysqlSqlDialect;
+import datart.data.provider.sql.entity.SqlTestEntity;
+import datart.data.provider.sql.common.ParamFactory;
+import datart.data.provider.sql.examples.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
+@SpringBootTest(classes = DataProviderTestApplication.class)
+@Slf4j
 public class SqlScriptRenderTest {
 
+    @Test
+    public void testNormalSqlTest() throws SqlParseException {
+        validateTestSql(NormalSqlExamples.sqlList, false);
+        log.info("NormalSqlScripts validate passed");
+    }
 
     @Test
-    void testParamReplace() throws SqlParseException {
+    public void testSqlWithExecParam() throws SqlParseException {
+        validateTestSql(ExecParamSqlExamples.sqlList, false);
+        log.info("SqlWithExecParamSqlScripts validate passed");
+    }
 
-        for (QueryScript queryScriptExample : ParamFactory.getQueryScriptExamples()) {
-            SqlScriptRender render = new SqlScriptRender(queryScriptExample, null, new MysqlSqlDialect(MysqlSqlDialect.DEFAULT_CONTEXT));
-            String sql = render.render(false, false, false);
-            System.out.println(sql);
+    @Test
+    public void testVariableSql() throws SqlParseException {
+        validateTestSql(VariableSqlExamples.sqlList, false);
+        log.info("VariableSqlScripts validate passed");
+    }
+
+    @Test
+    public void testFallbackSql() throws SqlParseException {
+        validateTestSql(FallbackSqlExamples.sqlList, false);
+        log.info("FallbackSqlScripts validate passed");
+    }
+
+    @Test
+    public void testForbiddenSql() throws SqlParseException {
+        validateForbiddenSql(ForbiddenSqlExamples.sqlList, false);
+        log.info("ForbiddenSqlScripts validate passed");
+    }
+
+    @Test
+    public void testSpecialSql() throws SqlParseException {
+        validateTestSql(SpecialSqlExamples.sqlList, true);
+        log.info("SpecialSqlScripts validate passed");
+    }
+
+    private void validateTestSql(List<SqlTestEntity> list, boolean enableSpecialSql) throws SqlParseException {
+        for (SqlTestEntity sqlTest : list) {
+            QueryScript queryScript = ParamFactory.getQueryScriptExample(sqlTest.getSql());
+            SqlScriptRender render = new SqlScriptRender(queryScript, sqlTest.getExecuteParam(), sqlTest.getSqlDialect(), enableSpecialSql);
+            boolean withExecParam = sqlTest.getExecuteParam()!=null;
+            String parsedSql = render.render(withExecParam, false, false);
+            boolean result = parsedSql.equals(sqlTest.getDesireSql());
+            if (!result){
+                Exceptions.msg("sql validate failed! \n" + sqlTest +
+                        " the parsed sql: "+parsedSql);
+            }
         }
+    }
 
+    private void validateForbiddenSql(List<SqlTestEntity> list, boolean enableSpecialSql) throws SqlParseException {
+        for (SqlTestEntity sqlTest : list) {
+            QueryScript queryScript = ParamFactory.getQueryScriptExample(sqlTest.getSql());
+            SqlScriptRender render = new SqlScriptRender(queryScript, null, sqlTest.getSqlDialect(), enableSpecialSql);
+            try {
+                render.render(false, false, false);
+            } catch (DataProviderException e) {
+                if ("message.sql.op.forbidden".equals(e.getMessage())){
+                    continue;
+                }
+                Exceptions.e(e);
+            }
+            Exceptions.msg("The forbidden sql test passed, should be forbid, enableSpecialSqlState: "+enableSpecialSql+"\n"+sqlTest);
+        }
     }
 
 }

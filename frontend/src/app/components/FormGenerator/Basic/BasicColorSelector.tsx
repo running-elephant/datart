@@ -58,14 +58,13 @@ const BasicColorSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     return (
       <StyledVizBasicColorSelector
         label={!options?.hideLabel ? t(row.label, true) : ''}
-        labelCol={{ span: 12 }}
-        wrapperCol={{ span: 12 }}
+        labelCol={{ span: 20 }}
+        wrapperCol={{ span: 4 }}
       >
         <ColorPickerPopover
           {...rest}
           {...options}
           colors={COLORS}
-          size={6}
           defaultValue={getColor()}
           onSubmit={handlePickerSelect}
         ></ColorPickerPopover>

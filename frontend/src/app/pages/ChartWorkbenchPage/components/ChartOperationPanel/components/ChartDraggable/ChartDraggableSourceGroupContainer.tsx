@@ -18,7 +18,7 @@
 
 import { List } from 'antd';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
-import { FC, memo, useState } from 'react';
+import { FC, memo, useCallback, useState } from 'react';
 import styled from 'styled-components/macro';
 import { stopPPG } from 'utils/utils';
 import { ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
@@ -34,7 +34,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
   onEditComputedField,
 }) {
   const [selectedItems, setSelectedItems] = useState<ChartDataViewMeta[]>([]);
-  const [selectedItemsIds, setselectedItemsIds] = useState<Array<string>>([]);
+  const [selectedItemsIds, setSelectedItemsIds] = useState<Array<string>>([]);
   const [activeItemId, setActiveItemId] = useState<string>('');
 
   const onDataItemSelectionChange = (
@@ -78,18 +78,26 @@ export const ChartDraggableSourceGroupContainer: FC<{
       interimSelectedItemsIds.includes(c.id),
     );
 
-    setselectedItemsIds(interimSelectedItemsIds);
+    setSelectedItemsIds(interimSelectedItemsIds);
     setActiveItemId(interimActiveItemId);
     setSelectedItems(selectedCards);
   };
 
   const onClearCheckedList = () => {
     if (selectedItems?.length > 0) {
-      setselectedItemsIds([]);
+      setSelectedItemsIds([]);
       setActiveItemId('');
       setSelectedItems([]);
     }
   };
+
+  const handleEditComputedField = useCallback(
+    fieldName => {
+      onEditComputedField(fieldName);
+      setSelectedItems([]);
+    },
+    [onEditComputedField],
+  );
 
   return (
     <Container onClick={onClearCheckedList}>
@@ -108,7 +116,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
               expression={item.expression}
               type={item.type}
               onDeleteComputedField={onDeleteComputedField}
-              onEditComputedField={onEditComputedField}
+              onEditComputedField={handleEditComputedField}
               onSelectionChange={onDataItemSelectionChange}
               onClearCheckedList={onClearCheckedList}
               isActive={selectedItemsIds.includes(item.id)}

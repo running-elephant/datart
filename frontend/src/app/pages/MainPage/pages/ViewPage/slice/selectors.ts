@@ -22,6 +22,7 @@ import { listToTree } from 'utils/utils';
 import { initialState } from '.';
 import { ResourceTypes } from '../../PermissionPage/constants';
 import {
+  DatabaseSchema,
   SelectViewFolderTreeProps,
   SelectViewTreeProps,
   ViewViewModel,
@@ -94,6 +95,11 @@ export const selectSourceDatabases = createSelector(
   viewState => viewState.sourceDatabases,
 );
 
+export const selectSourceDatabaseSchemas = createSelector(
+  [selectDomain, (_, props: { id: string }) => props.id],
+  (viewState, id) => viewState.sourceDatabaseSchema?.[id],
+);
+
 export const selectDatabases = createSelector(
   [selectSourceDatabases, (_, props: { name?: string }) => props.name],
   (sourceDatabases, name) => (name ? sourceDatabases[name] : void 0),
@@ -107,4 +113,9 @@ export const selectViewListLoading = createSelector(
 export const selectArchivedListLoading = createSelector(
   [selectDomain],
   viewState => viewState.archivedListLoading,
+);
+
+export const selectDatabaseSchemaLoading = createSelector(
+  [selectDomain],
+  viewState => viewState.databaseSchemaLoading,
 );

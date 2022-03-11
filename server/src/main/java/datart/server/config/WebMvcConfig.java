@@ -49,7 +49,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor).addPathPatterns(getPathPrefix() + "/**");
         //i18n locale interceptor
-//        registry.addInterceptor(new LocaleChangeInterceptor());
         registry.addInterceptor(new BasicValidRequestInterceptor()).addPathPatterns("/**");
     }
 

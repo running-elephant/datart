@@ -22,10 +22,12 @@ import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
 import {
   FONT_FAMILIES,
+  FONT_LINE_HEIGHT,
   FONT_SIZES,
   FONT_STYLE,
   FONT_WEIGHT,
 } from 'globalConstants';
+import isUndefined from 'lodash/isUndefined';
 import { FC, memo } from 'react';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
@@ -50,6 +52,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       <BW label={!options?.hideLabel ? t(data.label, true) : ''}>
         <Group>
           <Select
+            className="datart-ant-select"
             placeholder={t('select')}
             value={data.value?.fontFamily}
             dropdownMatchSelectWidth={false}
@@ -60,54 +63,80 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
                 key={typeof o === 'string' ? o : o.value}
                 value={typeof o === 'string' ? o : o.value}
               >
-                {typeof o === 'string' ? o : o.name}
+                {typeof o === 'string' ? o : t(o.name, true)}
               </Select.Option>
             ))}
           </Select>
           <Select
+            className="datart-ant-select"
             placeholder={t('select')}
             value={data.value?.fontWeight}
             onChange={handleSettingChange('fontWeight')}
           >
             {FONT_WEIGHT.map(o => (
               <Select.Option key={o.value} value={o.value}>
-                {o.name}
+                {t(o.name, true)}
               </Select.Option>
             ))}
           </Select>
         </Group>
         <WithColorPicker>
           <Group>
-            <Select
-              placeholder={t('select')}
-              value={data.value?.fontSize}
-              onChange={handleSettingChange('fontSize')}
-            >
-              {FONT_SIZES.map(o => (
-                <Select.Option key={o} value={o}>
-                  {o}
-                </Select.Option>
-              ))}
-            </Select>
-            <Select
-              placeholder={t('select')}
-              value={data.value?.fontStyle}
-              onChange={handleSettingChange('fontStyle')}
-            >
-              {FONT_STYLE.map(o => (
-                <Select.Option key={o.value} value={o.value}>
-                  {o.name}
-                </Select.Option>
-              ))}
-            </Select>
+            {(isUndefined(options?.showFontSize) || options?.showFontSize) && (
+              <Select
+                className="datart-ant-select"
+                placeholder={t('select')}
+                value={data.value?.fontSize}
+                onChange={handleSettingChange('fontSize')}
+              >
+                {FONT_SIZES.map(o => (
+                  <Select.Option key={o} value={o}>
+                    {o}
+                  </Select.Option>
+                ))}
+              </Select>
+            )}
+            {options?.showLineHeight && (
+              <Select
+                className="datart-ant-select"
+                placeholder={t('select')}
+                value={data.value?.lineHeight}
+                onChange={handleSettingChange('lineHeight')}
+              >
+                {FONT_LINE_HEIGHT.map(o => (
+                  <Select.Option
+                    key={typeof o === 'number' ? o : o.value}
+                    value={typeof o === 'number' ? o : o.value}
+                  >
+                    {typeof o === 'number' ? o : t(o.name, true)}
+                  </Select.Option>
+                ))}
+              </Select>
+            )}
+            {(isUndefined(options?.showFontStyle) ||
+              options?.showFontStyle) && (
+              <Select
+                className="datart-ant-select"
+                placeholder={t('select')}
+                value={data.value?.fontStyle}
+                onChange={handleSettingChange('fontStyle')}
+              >
+                {FONT_STYLE.map(o => (
+                  <Select.Option key={o.value} value={o.value}>
+                    {t(o.name, true)}
+                  </Select.Option>
+                ))}
+              </Select>
+            )}
           </Group>
-          <ColorPickerPopover
-            {...rest}
-            {...options}
-            defaultValue={data.value?.color}
-            size={6}
-            onSubmit={handlePickerSelect}
-          />
+          {(isUndefined(options?.showFontColor) || options?.showFontColor) && (
+            <ColorPickerPopover
+              {...rest}
+              {...options}
+              defaultValue={data.value?.color}
+              onSubmit={handlePickerSelect}
+            />
+          )}
         </WithColorPicker>
       </BW>
     );

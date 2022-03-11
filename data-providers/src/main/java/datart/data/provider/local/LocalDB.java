@@ -43,16 +43,12 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-public class
-LocalDB {
+public class LocalDB {
 
     private static final String MEM_URL = "jdbc:h2:mem:/";
 
     private static final String H2_PARAM = ";LOG=0;DATABASE_TO_UPPER=false;MODE=MySQL;CASE_INSENSITIVE_IDENTIFIERS=TRUE;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0";
 
-    private static String fileUrl;
-
-    private static final String TABLE_CREATE_SQL_TEMPLATE = "CREATE TABLE `%s` ( %s )";
 
     public static final SqlDialect SQL_DIALECT = new H2Dialect();
 
@@ -283,6 +279,8 @@ LocalDB {
 
         String sql = render.render(true, false, false);
 
+        log.debug(sql);
+
         ResultSet resultSet = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY).executeQuery(sql);
         PageInfo pageInfo = executeParam.getPageInfo();
         resultSet.last();
@@ -312,7 +310,7 @@ LocalDB {
         } else {
             database = toDatabase(database);
         }
-        return fileUrl = String.format("jdbc:h2:file:%s/%s" + H2_PARAM, getDbFileBasePath(), database);
+        return String.format("jdbc:h2:file:%s/%s" + H2_PARAM, getDbFileBasePath(), database);
     }
 
     private static String getDbFileBasePath() {

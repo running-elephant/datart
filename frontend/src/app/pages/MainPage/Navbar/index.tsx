@@ -26,6 +26,7 @@ import {
   SafetyCertificateFilled,
   SettingFilled,
   SettingOutlined,
+  SkinOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { List, Menu, Tooltip } from 'antd';
@@ -50,6 +51,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import {
+  BLACK,
   BORDER_RADIUS,
   FONT_SIZE_ICON_SM,
   FONT_WEIGHT_MEDIUM,
@@ -58,7 +60,12 @@ import {
   SPACE_MD,
   SPACE_TIMES,
   SPACE_XS,
+  WHITE,
 } from 'styles/StyleConstants';
+import themeSlice from 'styles/theme/slice';
+import { selectThemeKey } from 'styles/theme/slice/selectors';
+import { ThemeKeyType } from 'styles/theme/slice/types';
+import { changeAntdTheme, saveTheme } from 'styles/theme/utils';
 import { Access } from '../Access';
 import {
   PermissionLevels,
@@ -82,6 +89,7 @@ export function Navbar() {
   const loggedInUser = useSelector(selectLoggedInUser);
   const organizationListLoading = useSelector(selectOrganizationListLoading);
   const downloadPolling = useSelector(selectDownloadPolling);
+  const themeKey = useSelector(selectThemeKey);
   const matchModules = useRouteMatch<{ moduleName: string }>(
     '/organizations/:orgId/:moduleName',
   );
@@ -190,6 +198,17 @@ export function Navbar() {
     [matchModules?.params.moduleName, subNavs],
   );
 
+  const handleChangeThemeFn = useCallback(
+    (theme: ThemeKeyType) => {
+      if (themeKey !== theme) {
+        dispatch(themeSlice.actions.changeTheme(theme));
+        changeAntdTheme(theme);
+        saveTheme(theme);
+      }
+    },
+    [dispatch, themeKey],
+  );
+
   const userMenuSelect = useCallback(
     ({ key }) => {
       switch (key) {
@@ -210,11 +229,15 @@ export function Navbar() {
         case 'en':
           changeLang(key);
           break;
+        case 'dark':
+        case 'light':
+          handleChangeThemeFn(key);
+          break;
         default:
           break;
       }
     },
-    [dispatch, history],
+    [dispatch, history, handleChangeThemeFn],
   );
 
   const onSetPolling = useCallback(
@@ -298,6 +321,22 @@ export function Navbar() {
                 >
                   <MenuListItem key="zh">中文</MenuListItem>
                   <MenuListItem key="en">English</MenuListItem>
+                </MenuListItem>
+                <MenuListItem
+                  key="theme"
+                  prefix={<SkinOutlined className="icon" />}
+                  title={<p>{t('nav.account.switchTheme.title')}</p>}
+                  sub
+                >
+                  <MenuListItem key="light" prefix={<ThemeBadge />}>
+                    {t('nav.account.switchTheme.light')}
+                  </MenuListItem>
+                  <MenuListItem
+                    key="dark"
+                    prefix={<ThemeBadge background={BLACK} />}
+                  >
+                    {t('nav.account.switchTheme.dark')}
+                  </MenuListItem>
                 </MenuListItem>
                 <Menu.Divider />
                 <MenuListItem
@@ -473,4 +512,12 @@ const SubNavTitle = styled(NavLink)`
       color: ${p => p.theme.primary};
     }
   }
+`;
+
+const ThemeBadge = styled.span<{ background?: string }>`
+  width: ${SPACE_TIMES(4)};
+  height: ${SPACE_TIMES(4)};
+  background-color: ${p => p.background || WHITE};
+  border-radius: 50%;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
 `;

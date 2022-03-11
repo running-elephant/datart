@@ -25,6 +25,7 @@ import {
   getArchivedSources,
   getSource,
   getSources,
+  syncSourceSchema,
   unarchiveSource,
 } from './thunks';
 import { SourceState } from './types';
@@ -39,6 +40,7 @@ export const initialState: SourceState = {
   saveSourceLoading: false,
   unarchiveSourceLoading: false,
   deleteSourceLoading: false,
+  syncSourceSchemaLoading: false,
 };
 
 const slice = createSlice({
@@ -143,6 +145,17 @@ const slice = createSlice({
     });
     builder.addCase(deleteSource.rejected, state => {
       state.deleteSourceLoading = false;
+    });
+
+    // syncSourceSchema
+    builder.addCase(syncSourceSchema.pending, state => {
+      state.syncSourceSchemaLoading = true;
+    });
+    builder.addCase(syncSourceSchema.fulfilled, (state, action) => {
+      state.syncSourceSchemaLoading = false;
+    });
+    builder.addCase(syncSourceSchema.rejected, state => {
+      state.syncSourceSchemaLoading = false;
     });
   },
 });

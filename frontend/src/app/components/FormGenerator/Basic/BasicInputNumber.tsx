@@ -17,67 +17,40 @@
  */
 
 import { InputNumber } from 'antd';
+import useDebouncedFormValue from 'app/hooks/useDebouncedFormValue';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import debounce from 'lodash/debounce';
-import { FC, memo, useMemo, useState } from 'react';
-import styled from 'styled-components/macro';
-import { BORDER_RADIUS } from 'styles/StyleConstants';
+import { FC, memo } from 'react';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
 const BasicInputNumber: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
-    const [cache, setCache] = useState(data);
-    const { comType, options, disabled, label, ...rest } = cache;
-
-    const debouncedDataChange = useMemo(
-      () =>
-        debounce(value => {
-          onChange?.(ancestors, value, options?.needRefresh);
-        }, 500),
-      [ancestors, onChange, options?.needRefresh],
+    const { options, ...rest } = data;
+    const [formValue, debouncedUpdateValue] = useDebouncedFormValue(
+      data?.value,
+      {
+        ancestors,
+        needRefresh: options?.needRefresh,
+        delay: 500,
+      },
+      onChange,
     );
 
     return (
-      <Wrapper label={t(data?.label, true)}>
+      <BW label={t(data?.label, true)}>
         <InputNumber
-          disabled={data?.disabled}
+          className="datart-ant-input-number"
           {...rest}
           {...options}
-          onChange={value => {
-            const newCache = Object.assign({}, cache, { value });
-            setCache(newCache);
-            debouncedDataChange(newCache.value);
-          }}
-          defaultValue={cache?.default}
+          value={formValue}
+          onChange={debouncedUpdateValue}
+          defaultValue={data?.default}
         />
-      </Wrapper>
+      </BW>
     );
   },
   itemLayoutComparer,
 );
 
 export default BasicInputNumber;
-
-const Wrapper = styled(BW)`
-  .ant-input-number {
-    width: 100%;
-    background-color: ${p => p.theme.emphasisBackground};
-    border-color: ${p => p.theme.emphasisBackground};
-    border-radius: ${BORDER_RADIUS};
-    box-shadow: none;
-  }
-
-  .ant-input-number-input {
-    color: ${p => p.theme.textColorSnd};
-  }
-
-  .ant-input-number-handler-wrap {
-    background-color: ${p => p.theme.emphasisBackground};
-  }
-
-  .ant-input-number-disabled {
-    background-color: ${p => p.theme.textColorDisabled};
-  }
-`;

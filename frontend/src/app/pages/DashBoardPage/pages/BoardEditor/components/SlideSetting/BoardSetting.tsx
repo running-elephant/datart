@@ -17,9 +17,9 @@
  */
 import { Collapse, Form } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/contexts/BoardConfigContext';
-import { BoardContext } from 'app/pages/DashBoardPage/contexts/BoardContext';
-import { BoardInfoContext } from 'app/pages/DashBoardPage/contexts/BoardInfoContext';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
+import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import {
   DashboardConfig,
   DeviceType,
@@ -49,22 +49,23 @@ export const BoardSetting: FC = memo(() => {
   const dispatch = useDispatch();
   const { boardType } = useContext(BoardContext);
 
-  const { config } = useContext(BoardConfigContext);
+  const boardConfig = useContext(BoardConfigContext);
 
   const { deviceType } = useContext(BoardInfoContext);
 
   const [form] = Form.useForm();
   const cacheValue = useRef<any>({});
   useEffect(() => {
-    const { scaleMode, width: boardWidth, height: boardHeight } = config;
-    const [marginLR, marginTB] = config.margin;
-    const [paddingLR, paddingTB] = config.containerPadding;
-    const [mobileMarginLR, mobileMarginTB] = config.mobileMargin;
-    const [mobilePaddingLR, mobilePaddingTB] = config.mobileContainerPadding;
+    const { scaleMode, width: boardWidth, height: boardHeight } = boardConfig;
+    const [marginLR, marginTB] = boardConfig.margin;
+    const [paddingLR, paddingTB] = boardConfig.containerPadding;
+    const [mobileMarginLR, mobileMarginTB] = boardConfig.mobileMargin;
+    const [mobilePaddingLR, mobilePaddingTB] =
+      boardConfig.mobileContainerPadding;
 
     cacheValue.current = {
-      backgroundColor: config.background.color,
-      backgroundImage: config.background.image,
+      backgroundColor: boardConfig.background.color,
+      backgroundImage: boardConfig.background.image,
       scaleMode,
       boardWidth,
       boardHeight,
@@ -76,10 +77,10 @@ export const BoardSetting: FC = memo(() => {
       mobileMarginTB,
       mobilePaddingLR,
       mobilePaddingTB,
-      initialQuery: config.initialQuery,
+      initialQuery: boardConfig.initialQuery,
     };
     form.setFieldsValue({ ...cacheValue.current });
-  }, [config, form]);
+  }, [boardConfig, form]);
 
   const onUpdate = useCallback(
     (newValues, config: DashboardConfig) => {
@@ -111,9 +112,9 @@ export const BoardSetting: FC = memo(() => {
   );
   const onValuesChange = useCallback(
     (_, allValue) => {
-      throttledUpdate.current(allValue, config);
+      throttledUpdate.current(allValue, boardConfig);
     },
-    [throttledUpdate, config],
+    [throttledUpdate, boardConfig],
   );
 
   return (
@@ -186,14 +187,14 @@ export const BoardSetting: FC = memo(() => {
               </Panel>
               <Panel header={t('scaleMode')} key="scale" forceRender>
                 <Group>
-                  <ScaleModeSet scaleMode={config.scaleMode} />
+                  <ScaleModeSet scaleMode={boardConfig.scaleMode} />
                 </Group>
               </Panel>
             </>
           )}
           <Panel header={t('background')} key="background" forceRender>
             <Group>
-              <BackgroundSet background={config.background} />
+              <BackgroundSet background={boardConfig.background} />
             </Group>
           </Panel>
           <Panel header={t('queryMode')} key="initialQuery" forceRender>

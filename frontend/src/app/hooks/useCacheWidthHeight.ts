@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import useResizeObserver from './useResizeObserver';
 
 export const useCacheWidthHeight = (
@@ -33,7 +33,7 @@ export const useCacheWidthHeight = (
     refreshMode: 'debounce',
     refreshRate: 20,
   });
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (width > 0) {
       setCacheW(width);
       setCacheH(height);

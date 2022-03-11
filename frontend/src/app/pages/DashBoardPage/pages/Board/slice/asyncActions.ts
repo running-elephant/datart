@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { migrateWidgets } from 'app/migration/WidgetConfig/migrateWidgets';
+import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
 import ChartDataRequest from 'app/types/ChartDataRequest';
@@ -42,7 +42,6 @@ export const handleServerBoardAction =
   }) =>
   async (dispatch, getState) => {
     const { data, renderMode, filterSearchMap } = params;
-
     const dashboard = getDashBoardByResBoard(data);
     const { datacharts, views: serverViews, widgets: serverWidgets } = data;
 
@@ -53,30 +52,34 @@ export const handleServerBoardAction =
       dataCharts,
       filterSearchMap,
     );
-
     const widgetIds = Object.values(widgetMap).map(w => w.id);
-    //
     let boardInfo = getInitBoardInfo({
       id: dashboard.id,
       widgetIds,
       controllerWidgets,
     });
-
     if (renderMode === 'schedule') {
       boardInfo = getScheduleBoardInfo(boardInfo, widgetMap);
     }
+    const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
 
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
+
     const viewViews = getChartDataView(serverViews, allDataCharts);
-    const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
-    dispatch(
-      boardActions.setBoardDetailToState({
+
+    await dispatch(
+      boardActions.setBoardState({
         board: dashboard,
         boardInfo: boardInfo,
-        views: viewViews,
+      }),
+    );
+    dispatch(boardActions.setViewMap(viewViews));
+    dispatch(boardActions.setDataChartToMap(allDataCharts));
+    dispatch(
+      boardActions.setWidgetMapState({
+        boardId: dashboard.id,
         widgetMap: widgetMap,
         widgetInfoMap: widgetInfoMap,
-        dataCharts: allDataCharts,
       }),
     );
   };

@@ -19,12 +19,14 @@
 package datart.server.service;
 
 import datart.core.base.consts.UserIdentityType;
+import datart.core.base.exception.ServerException;
 import datart.core.entity.User;
 import datart.core.entity.ext.UserBaseInfo;
 import datart.core.mappers.ext.UserMapperExt;
 import datart.security.base.PasswordToken;
 import datart.server.base.dto.UserProfile;
 import datart.server.base.params.*;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
@@ -54,5 +56,7 @@ public interface UserService extends BaseCRUDService<User, UserMapperExt> {
     String forgetPassword(UserIdentityType type, String principal);
 
     boolean resetPassword(UserResetPasswordParam passwordParam);
+
+    User externalRegist(OAuth2AuthenticationToken oauthAuthToken) throws ServerException;
 
 }

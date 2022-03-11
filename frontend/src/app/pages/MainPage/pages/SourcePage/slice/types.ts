@@ -26,6 +26,7 @@ export interface SourceState {
   saveSourceLoading: boolean;
   unarchiveSourceLoading: boolean;
   deleteSourceLoading: boolean;
+  syncSourceSchemaLoading: boolean;
 }
 
 export interface Source {
@@ -39,6 +40,7 @@ export interface Source {
   type: string;
   updateBy: string;
   updateTime: string;
+  schemaUpdateDate: string;
 }
 
 export interface SourceFormModel extends Pick<Source, 'name' | 'type'> {
