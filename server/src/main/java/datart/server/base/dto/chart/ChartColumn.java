@@ -80,7 +80,7 @@ public class ChartColumn {
 
     public List<ChartColumn> getLeafNodes(){
         List<ChartColumn> leafNodes = new ArrayList<>();
-        if (this.leafNum == 1){
+        if (this.leafNum == 1 && !this.isGroup){
             leafNodes.add(this);
         }
         for (ChartColumn child : children) {
