@@ -169,7 +169,7 @@ export class ChartDataRequestBuilder {
         return true;
       })
       .map(col => col);
-    return this.normalizeFilters(fields);
+    return this.normalizeFilters(fields) as ChartDataRequestFilter[];
   }
 
   private normalizeFilters = (fields: ChartDataSectionField[]) => {
@@ -233,15 +233,27 @@ export class ChartDataRequestBuilder {
       ];
     };
 
-    return fields.map(field => ({
-      aggOperator:
-        field.aggregate === AggregateFieldActionType.NONE
-          ? null
-          : field.aggregate,
-      column: field.colName,
-      sqlOperator: field.filter?.condition?.operator!,
-      values: _transformFieldValues(field) || [],
-    }));
+    return fields
+      .map(field => {
+        if (
+          field.filter?.condition?.operator === FilterSqlOperator.In ||
+          field.filter?.condition?.operator === FilterSqlOperator.NotIn
+        ) {
+          if (isEmptyArray(_transformFieldValues(field))) {
+            return undefined;
+          }
+        }
+        return {
+          aggOperator:
+            field.aggregate === AggregateFieldActionType.NONE
+              ? null
+              : field.aggregate,
+          column: field.colName,
+          sqlOperator: field.filter?.condition?.operator!,
+          values: _transformFieldValues(field) || [],
+        };
+      })
+      .filter(Boolean);
   };
 
   private buildOrders() {
