@@ -23,7 +23,6 @@ import produce from 'immer';
 import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { G20 } from 'styles/StyleConstants';
 import { Player } from 'video-react';
 import 'video-react/dist/video-react.css';
 import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
@@ -93,6 +92,6 @@ const WrapVideo = styled.div`
   .wrap-form {
     padding: 6px;
     margin-bottom: 4px;
-    background-color: ${G20};
+    background-color: ${p => p.theme.emphasisBackground};
   }
 `;

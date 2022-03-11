@@ -22,6 +22,7 @@ import { convertImageUrl } from 'app/pages/DashBoardPage/utils';
 import React, { useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
+import { SPACE_MD } from 'styles/StyleConstants';
 import { uploadBoardImage } from '../../../../slice/thunk';
 
 export interface ImageUploadProps {
@@ -76,7 +77,7 @@ export const UploadDragger: React.FC<{
   return (
     <StyleUpload
       name={'upload-image'}
-      className="imageUpload"
+      className="datart-ant-upload"
       beforeUpload={beforeUpload}
       multiple={false}
     >
@@ -97,13 +98,9 @@ export const UploadDragger: React.FC<{
   );
 };
 const StyleUpload = styled(Upload.Dragger)`
-  .imageUpload {
-    display: block;
-  }
-
   .image-box {
     position: relative;
-    width: 80%;
+    padding: 0 ${SPACE_MD};
     margin: auto;
     overflow: hidden;
   }

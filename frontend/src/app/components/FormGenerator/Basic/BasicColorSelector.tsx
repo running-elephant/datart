@@ -65,7 +65,6 @@ const BasicColorSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           {...rest}
           {...options}
           colors={COLORS}
-          size={6}
           defaultValue={getColor()}
           onSubmit={handlePickerSelect}
         ></ColorPickerPopover>

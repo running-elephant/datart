@@ -46,11 +46,11 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         <WithColorPicker>
           <Group>
             <Select
+              className="datart-ant-select"
               dropdownMatchSelectWidth
               placeholder={t('select')}
               value={data.value?.type}
               onChange={handleSettingChange('type')}
-              bordered={false}
             >
               {CHART_LINE_STYLES.map(o => (
                 <Select.Option key={o.value} value={o.value}>
@@ -59,10 +59,10 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
               ))}
             </Select>
             <Select
+              className="datart-ant-select"
               placeholder={t('select')}
               value={data.value?.width}
               onChange={handleSettingChange('width')}
-              bordered={false}
             >
               {CHART_LINE_WIDTH.map(o => (
                 <Select.Option key={o} value={o}>
@@ -74,7 +74,6 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           <ColorPickerPopover
             {...rest}
             {...options}
-            size={6}
             defaultValue={data.value?.color}
             onSubmit={handlePickerSelect}
           />

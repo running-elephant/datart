@@ -63,6 +63,7 @@ import {
   WHITE,
 } from 'styles/StyleConstants';
 import themeSlice from 'styles/theme/slice';
+import { selectThemeKey } from 'styles/theme/slice/selectors';
 import { ThemeKeyType } from 'styles/theme/slice/types';
 import { changeAntdTheme, saveTheme } from 'styles/theme/utils';
 import { Access } from '../Access';
@@ -88,6 +89,7 @@ export function Navbar() {
   const loggedInUser = useSelector(selectLoggedInUser);
   const organizationListLoading = useSelector(selectOrganizationListLoading);
   const downloadPolling = useSelector(selectDownloadPolling);
+  const themeKey = useSelector(selectThemeKey);
   const matchModules = useRouteMatch<{ moduleName: string }>(
     '/organizations/:orgId/:moduleName',
   );
@@ -198,11 +200,13 @@ export function Navbar() {
 
   const handleChangeThemeFn = useCallback(
     (theme: ThemeKeyType) => {
-      dispatch(themeSlice.actions.changeTheme(theme));
-      changeAntdTheme(theme);
-      saveTheme(theme);
+      if (themeKey !== theme) {
+        dispatch(themeSlice.actions.changeTheme(theme));
+        changeAntdTheme(theme);
+        saveTheme(theme);
+      }
     },
-    [dispatch],
+    [dispatch, themeKey],
   );
 
   const userMenuSelect = useCallback(

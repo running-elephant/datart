@@ -52,6 +52,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       <BW label={!options?.hideLabel ? t(data.label, true) : ''}>
         <Group>
           <Select
+            className="datart-ant-select"
             placeholder={t('select')}
             value={data.value?.fontFamily}
             dropdownMatchSelectWidth={false}
@@ -67,6 +68,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             ))}
           </Select>
           <Select
+            className="datart-ant-select"
             placeholder={t('select')}
             value={data.value?.fontWeight}
             onChange={handleSettingChange('fontWeight')}
@@ -82,6 +84,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           <Group>
             {(isUndefined(options?.showFontSize) || options?.showFontSize) && (
               <Select
+                className="datart-ant-select"
                 placeholder={t('select')}
                 value={data.value?.fontSize}
                 onChange={handleSettingChange('fontSize')}
@@ -95,6 +98,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             )}
             {options?.showLineHeight && (
               <Select
+                className="datart-ant-select"
                 placeholder={t('select')}
                 value={data.value?.lineHeight}
                 onChange={handleSettingChange('lineHeight')}
@@ -112,6 +116,7 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             {(isUndefined(options?.showFontStyle) ||
               options?.showFontStyle) && (
               <Select
+                className="datart-ant-select"
                 placeholder={t('select')}
                 value={data.value?.fontStyle}
                 onChange={handleSettingChange('fontStyle')}
@@ -129,7 +134,6 @@ const BasicFont: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
               {...rest}
               {...options}
               defaultValue={data.value?.color}
-              size={6}
               onSubmit={handlePickerSelect}
             />
           )}

@@ -21,7 +21,7 @@ import { colorThemes } from 'app/assets/theme/colorsConfig';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components/macro';
-import { FONT_SIZE_BODY, G10, SPACE_TIMES } from 'styles/StyleConstants';
+import { FONT_SIZE_BODY, SPACE_TIMES } from 'styles/StyleConstants';
 import { themeColorPropTypes } from './slice/types';
 
 /**
@@ -80,14 +80,14 @@ export default ThemeColorSelection;
 const ChooseTheme = styled.div`
   display: inline-block;
   width: 100%;
-  text-align: right;
   margin-bottom: ${SPACE_TIMES(1)};
+  text-align: right;
 `;
 const ChooseThemeSpan = styled.div`
-  cursor: pointer;
-  font-size: ${FONT_SIZE_BODY};
   display: inline-block;
   width: max-content;
+  font-size: ${FONT_SIZE_BODY};
+  cursor: pointer;
   &:hover {
     color: ${p => p.theme.primary};
   }
@@ -100,10 +100,10 @@ const ColorWrapAlert = styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    cursor: pointer;
     padding: ${SPACE_TIMES(2.5)};
+    cursor: pointer;
     &:hover {
-      background-color: ${G10};
+      background-color: ${p => p.theme.bodyBackground};
     }
   }
 `;
