@@ -124,7 +124,11 @@ const FilterControlPanel: FC<
 
     const handleAggregateTypeChange = aggregate => {
       setAggregate(aggregate);
-      handleConfigChange(alias, aggregate, filter);
+      const newFilter = updateBy(filter || {}, draft => {
+        draft.condition = undefined;
+      });
+      setFilter(newFilter);
+      handleConfigChange(alias, aggregate, newFilter);
     };
 
     const handleWidthOptionChange = width => {

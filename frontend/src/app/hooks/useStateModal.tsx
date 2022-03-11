@@ -111,7 +111,7 @@ function useStateModal({ initState }: { initState?: any }) {
     okCallbackRef.current = props.onOk;
     cancelCallbackRef.current = props.onCancel;
 
-    // Note: should distory old modal and form effects in order to render new content
+    // Note: should destroy old modal and form effects in order to render new content
     Modal.destroyAll();
     form?.resetFields();
 
