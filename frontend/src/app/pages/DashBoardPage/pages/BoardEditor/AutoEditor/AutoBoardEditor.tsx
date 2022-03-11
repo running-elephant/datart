@@ -29,7 +29,6 @@ import {
 } from 'app/pages/DashBoardPage/constants';
 import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
-import { useVisibleHidden } from 'app/pages/DashBoardPage/hooks/useVisibleHidden';
 import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import debounce from 'lodash/debounce';
@@ -61,7 +60,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 
 export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
-  const visible = useVisibleHidden();
+  // const visible = useVisibleHidden(100);
   const {
     margin,
     containerPadding,
@@ -180,7 +179,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
         curWH={curWH}
         className={deviceClassName}
         ref={ref}
-        style={{ visibility: visible }}
+        // style={{ visibility: visible }}
       >
         {sortedLayoutWidgets.length ? (
           <div className="grid-wrap" ref={gridWrapRef}>
