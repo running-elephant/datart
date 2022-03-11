@@ -23,7 +23,6 @@ import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
-import { G20, PRIMARY } from 'styles/StyleConstants';
 const { Option } = Select;
 export interface ViewLinkageItem {
   sameView?: boolean;
@@ -59,7 +58,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
             >
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>{item.colName}</span>
-                <span style={{ color: G20 }}>{item.type}</span>
+                <FieldType>{item.type}</FieldType>
               </div>
             </Option>
           ));
@@ -78,7 +77,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
                   style={{ display: 'flex', justifyContent: 'space-between' }}
                 >
                   <span>{item.id}</span>
-                  <span style={{ color: G20 }}>{item.type}</span>
+                  <FieldType>{item.type}</FieldType>
                 </div>
               </Option>
             ));
@@ -201,20 +200,25 @@ const Wrap = styled.div`
     .form-item-and {
       width: 30px;
       font-size: 1.2rem;
-      color: ${PRIMARY};
+      color: ${p => p.theme.primary};
       text-align: center;
     }
     .form-item-endValue {
-      flex: 1;
       display: flex;
+      flex: 1;
       .ViewName {
         margin: 5px 0 0 5px;
       }
     }
   }
 `;
+
 const FormWrap = styled.div`
   .form-item:nth-child(1) {
     margin-top: 24px;
   }
+`;
+
+const FieldType = styled.span`
+  color: ${p => p.theme.textColorDisabled};
 `;

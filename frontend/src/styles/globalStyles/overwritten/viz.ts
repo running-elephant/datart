@@ -15,17 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Form, InputNumber } from 'antd';
-import { NamePath } from 'rc-field-form/lib/interface';
-import React, { FC, memo } from 'react';
-export const NumberSet: FC<{ label: string; name: NamePath }> = memo(
-  ({ label, name }) => {
-    return (
-      <Form.Item label={label} name={name}>
-        <InputNumber className="datart-ant-input-number" />
-      </Form.Item>
-    );
-  },
-);
 
-export default NumberSet;
+import { createGlobalStyle } from 'styled-components/macro';
+
+export const Viz = createGlobalStyle`
+  /* 覆盖antd 默认样式 */
+  @media (max-width: 575px) {
+    .datart-viz .ant-form .ant-form-item .ant-form-item-label,
+    .datart-viz .ant-form .ant-form-item .ant-form-item-control {
+      flex: 1;
+    }
+  }
+`;

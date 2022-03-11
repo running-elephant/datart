@@ -91,7 +91,7 @@ public class PoiConvertUtils {
     private static void convertGroupHeaderData(List<ChartColumn> dataStyles, Map<Integer, List<Column>> rowMap, int rowNum, List<CellRangeAddress> cellRangeAddresses, Map<String, String> aliasMap){
         for (ChartColumn dataStyle : dataStyles) {
             int columnNum = putDataIntoListMap(rowMap, rowNum, dataStyle);
-            if (dataStyle.getLeafNum()<=1){
+            if (dataStyle.getLeafNum()<=1 && !dataStyle.isGroup()){
                 Column column = rowMap.get(rowNum).get(columnNum);
                 column.setName(aliasMap.getOrDefault(column.getName(), column.getName()));
                 for (int i = rowNum+1; i < rowMap.size(); i++) {
@@ -100,7 +100,7 @@ public class PoiConvertUtils {
                 if (rowMap.size()-1 > rowNum){
                     cellRangeAddresses.add(new CellRangeAddress(rowNum, rowMap.size()-1, columnNum, columnNum));
                 }
-            } else {
+            } else if (dataStyle.getLeafNum()>1){
                 for (int i = 1; i < dataStyle.getLeafNum(); i++) {
                     putDataIntoListMap(rowMap, rowNum, new ChartColumn());
                 }

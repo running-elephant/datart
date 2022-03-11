@@ -137,13 +137,7 @@ export const Tabs = memo(() => {
       <Confirm
         visible={confirmVisible}
         title={t('warning')}
-        icon={
-          <InfoCircleOutlined
-            css={`
-              color: ${ORANGE};
-            `}
-          />
-        }
+        icon={<InfoCircleOutlined style={{ color: ORANGE }} />}
         footer={
           <Space>
             <Button onClick={removeTab}>{t('discard')}</Button>

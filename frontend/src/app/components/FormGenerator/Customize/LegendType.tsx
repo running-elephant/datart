@@ -20,8 +20,6 @@ import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { CHART_LEGEND_TYPE } from 'globalConstants';
 import { FC, memo } from 'react';
-import styled from 'styled-components/macro';
-import { BORDER_RADIUS } from 'styles/StyleConstants';
 import { BW } from '../Basic/components/BasicWrapper';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
@@ -31,10 +29,9 @@ const LegendType: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     const { comType, options, ...rest } = row;
 
     return (
-      <StyledVizLegendType
-        label={!options?.hideLabel ? t(row.label, true) : ''}
-      >
+      <BW label={!options?.hideLabel ? t(row.label, true) : ''}>
         <Select
+          className="datart-ant-select"
           dropdownMatchSelectWidth
           {...rest}
           {...options}
@@ -47,23 +44,10 @@ const LegendType: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             </Select.Option>
           ))}
         </Select>
-      </StyledVizLegendType>
+      </BW>
     );
   },
   itemLayoutComparer,
 );
 
 export default LegendType;
-
-const StyledVizLegendType = styled(BW)`
-  .ant-select {
-    color: ${p => p.theme.textColorSnd};
-  }
-
-  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-    background-color: ${p => p.theme.emphasisBackground};
-    border-color: ${p => p.theme.emphasisBackground} !important;
-    border-radius: ${BORDER_RADIUS};
-    box-shadow: none !important;
-  }
-`;

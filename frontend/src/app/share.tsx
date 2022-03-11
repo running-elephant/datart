@@ -23,7 +23,7 @@ import { antdLocales } from 'locales/i18n';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter } from 'react-router-dom';
-import { GlobalStyle, OverriddenStyle } from 'styles/globalStyles';
+import { GlobalStyles } from 'styles/globalStyles';
 import { LazySharePage } from './pages/SharePage/Loadable';
 
 registerTheme('default', echartsDefaultTheme);
@@ -41,8 +41,7 @@ export function Share() {
           <meta name="description" content="Data Art" />
         </Helmet>
         <LazySharePage />
-        <GlobalStyle />
-        <OverriddenStyle />
+        <GlobalStyles />
       </BrowserRouter>
     </ConfigProvider>
   );

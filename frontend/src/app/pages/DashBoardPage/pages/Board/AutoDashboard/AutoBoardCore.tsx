@@ -17,7 +17,6 @@
  */
 
 import { Empty } from 'antd';
-import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
@@ -49,7 +48,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 const mobilePoints = Object.keys(BREAK_POINT_MAP).slice(3);
 export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
-    const visible = useVisibleHidden();
+    // const visible = useVisibleHidden(0);
     const {
       margin,
       containerPadding,
@@ -84,8 +83,13 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       DeviceType.Desktop,
     );
 
-    const { ref, gridWrapRef, currentLayout, widgetRowHeight } =
-      useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
+    const {
+      ref,
+      gridWrapRef,
+      currentLayout,
+      widgetRowHeight,
+      throttleLazyRender,
+    } = useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
 
     const { gridRef } = useBoardWidthHeight();
 
@@ -118,9 +122,10 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
 
     const onLayoutChange = useCallback(
       (layouts: Layout[], all) => {
+        throttleLazyRender();
         currentLayout.current = layouts;
       },
-      [currentLayout],
+      [currentLayout, throttleLazyRender],
     );
 
     const boardChildren = useMemo(() => {
@@ -137,11 +142,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
 
     return (
       <Wrap>
-        <StyledContainer
-          bg={background}
-          ref={ref}
-          style={{ visibility: visible }}
-        >
+        <StyledContainer bg={background} ref={ref}>
           {sortedLayoutWidgets.length ? (
             <div className="grid-wrap" ref={gridWrapRef}>
               <div className="grid-wrap" ref={gridRef}>

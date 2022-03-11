@@ -427,7 +427,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                             }
                         }
                     } else {
-                        schema.put(key, new Column(item.getString("name"), ValueType.valueOf(item.getString("type"))));
+                        schema.put(key, new Column(key, ValueType.valueOf(item.getString("type"))));
                     }
                 }
             } else {

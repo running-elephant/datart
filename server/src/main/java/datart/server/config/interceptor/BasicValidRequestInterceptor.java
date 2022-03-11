@@ -53,6 +53,7 @@ public class BasicValidRequestInterceptor implements HandlerInterceptor {
                 || requestURI.startsWith("/swagger")
                 || requestURI.startsWith("/webjars")
                 || requestURI.startsWith("/custom-chart-plugins")
+                || requestURI.startsWith("/antd")
                 || requestURI.startsWith("/v2/")
                 || requestURI.startsWith("/share")
                 || requestURI.startsWith(staticPath);
