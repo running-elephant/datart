@@ -16,41 +16,50 @@
  * limitations under the License.
  */
 
-import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
-import { BW } from '../Basic/components/BasicWrapper';
+import { ItemLayout } from '../Layout';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
-export const template = [
-  { name: 'nameLocation.start', value: 'start' },
-  { name: 'nameLocation.center', value: 'center' },
-  { name: 'nameLocation.end', value: 'end' },
-];
+const template = {
+  label: `viz.palette.style.nameLocation.title`,
+  key: 'nameLocation',
+  default: 'center',
+  comType: 'select',
+  options: {
+    translateItemLabel: true,
+    items: [
+      { label: 'viz.palette.style.nameLocation.start', value: 'start' },
+      { label: 'viz.palette.style.nameLocation.center', value: 'center' },
+      { label: 'viz.palette.style.nameLocation.end', value: 'end' },
+    ],
+  },
+};
 
 const NameLocation: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
-  ({ ancestors, translate: t = title => title, data: row, onChange }) => {
-    const { comType, options, ...rest } = row;
+  ({
+    ancestors,
+    translate: t = title => title,
+    data,
+    dataConfigs,
+    onChange,
+  }) => {
+    const props = {
+      ancestors,
+      data: Object.assign({}, data, {
+        label: data?.label || template.label,
+        key: data?.key || template.key,
+        default: data?.default || template.default,
+        options: data?.options || template.options,
+        comType: 'select',
+      }),
+      translate: t,
+      onChange,
+      dataConfigs,
+    };
 
-    return (
-      <BW label={!options?.hideLabel ? t(row.label, true) : ''}>
-        <Select
-          className="datart-ant-select"
-          dropdownMatchSelectWidth
-          {...rest}
-          {...options}
-          placeholder={t('select')}
-          onChange={value => onChange?.(ancestors, value)}
-        >
-          {template.map(o => (
-            <Select.Option key={o.value} value={o.value}>
-              {t(o.name)}
-            </Select.Option>
-          ))}
-        </Select>
-      </BW>
-    );
+    return <ItemLayout {...props} />;
   },
   itemLayoutComparer,
 );

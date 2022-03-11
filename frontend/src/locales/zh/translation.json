@@ -558,11 +558,13 @@
           "dotted": "点"
         },
         "nameLocation": {
+          "title": "标题位置",
           "start": "开始",
           "center": "中间",
           "end": "结束"
         },
         "legendType": {
+          "title": "图例类型",
           "plain": "普通",
           "scroll": "滚动"
         },

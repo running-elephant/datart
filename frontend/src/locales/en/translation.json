@@ -558,11 +558,13 @@
           "dotted": "Dotted"
         },
         "nameLocation": {
+          "title": "Name Location",
           "start": "Start",
           "center": "Center",
           "end": "End"
         },
         "legendType": {
+          "title": "Type",
           "plain": "Plain",
           "scroll": "Scroll"
         },
