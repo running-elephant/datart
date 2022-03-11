@@ -51,7 +51,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
     );
     const [expand] = useState(!!data?.options?.expand);
 
-    const handleConfrimModalDialogOrDataUpdate = (
+    const handleConfirmModalDialogOrDataUpdate = (
       ancestors,
       data,
       needRefresh,
@@ -62,7 +62,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
     const handleOpenStateModal = () => {
       return (openStateModal as Function)({
         modalSize,
-        onOk: handleConfrimModalDialogOrDataUpdate,
+        onOk: handleConfirmModalDialogOrDataUpdate,
         content: onChangeEvent => {
           return renderCollectionComponents(data, onChangeEvent);
         },
@@ -73,7 +73,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
       if (mode === GroupLayoutMode.INNER) {
         return renderCollectionComponents(
           data,
-          handleConfrimModalDialogOrDataUpdate,
+          handleConfirmModalDialogOrDataUpdate,
         );
       }
       if (comType === ItemComponentType.MODAL) {
@@ -103,7 +103,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           >
             {renderCollectionComponents(
               data,
-              handleConfrimModalDialogOrDataUpdate,
+              handleConfirmModalDialogOrDataUpdate,
             )}
           </Panel>
         </Collapse>

@@ -32,7 +32,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
   const t = useI18NPrefix(i18nPrefix);
   const [show, contextHolder] = useStateModal({ initState: {} });
 
-  const getConent = (
+  const getContent = (
     actionType,
     config?: ChartDataSectionField,
     dataset?: ChartDataSetDTO,
@@ -106,7 +106,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
       title: t(actionType),
       modalSize: modalSize || _modalSize,
       content: onChange =>
-        getConent(
+        getContent(
           actionType,
           currentConfig,
           dataset,

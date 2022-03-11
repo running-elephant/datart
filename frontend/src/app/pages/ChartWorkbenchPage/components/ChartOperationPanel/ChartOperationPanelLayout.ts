@@ -25,7 +25,7 @@ export enum LayoutComponentType {
   CONFIG = 'ChartConfigPanel',
 }
 
-const layoutCnofig: IJsonModel = {
+const layoutConfig: IJsonModel = {
   global: {
     tabEnableFloat: true,
     tabEnableClose: false,
@@ -75,4 +75,4 @@ const layoutCnofig: IJsonModel = {
   },
 };
 
-export default layoutCnofig;
+export default layoutConfig;

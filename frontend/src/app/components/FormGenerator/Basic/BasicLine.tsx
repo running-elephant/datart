@@ -31,7 +31,7 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
     const { label, comType, options, ...rest } = data;
 
-    const hanldePickerSelect = value => {
+    const handlePickerSelect = value => {
       handleSettingChange('color')(value);
     };
 
@@ -76,7 +76,7 @@ const BasicLine: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             {...options}
             size={6}
             defaultValue={data.value?.color}
-            onSubmit={hanldePickerSelect}
+            onSubmit={handlePickerSelect}
           />
         </WithColorPicker>
       </BW>

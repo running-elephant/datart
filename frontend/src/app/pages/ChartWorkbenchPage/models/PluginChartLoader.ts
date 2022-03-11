@@ -19,7 +19,6 @@
 import Chart from 'app/components/ChartGraph/models/Chart';
 import * as datartChartHelper from 'app/utils/chartHelper';
 import { fetchPluginChart } from 'app/utils/fetch';
-import * as datartChartNumber from 'app/utils/number';
 import { cond, Omit } from 'utils/object';
 
 const pureFuncLoader = ({ path, result }) => {
@@ -49,7 +48,7 @@ class PluginChartLoader {
           return Promise.resolve(result);
         }
 
-        /* Known Issue: file path only allow in src folder by create-react-app file scope limition by CRA
+        /* Known Issue: file path only allow in src folder by create-react-app file scope limitation by CRA
          * Git Issue: https://github.com/facebook/create-react-app/issues/5563
          * Suggestions: Use es6 `import` api to load file and compatible with ES Modules
          */

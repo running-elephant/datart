@@ -34,7 +34,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
   onEditComputedField,
 }) {
   const [selectedItems, setSelectedItems] = useState<ChartDataViewMeta[]>([]);
-  const [selectedItemsIds, setselectedItemsIds] = useState<Array<string>>([]);
+  const [selectedItemsIds, setSelectedItemsIds] = useState<Array<string>>([]);
   const [activeItemId, setActiveItemId] = useState<string>('');
 
   const onDataItemSelectionChange = (
@@ -78,14 +78,14 @@ export const ChartDraggableSourceGroupContainer: FC<{
       interimSelectedItemsIds.includes(c.id),
     );
 
-    setselectedItemsIds(interimSelectedItemsIds);
+    setSelectedItemsIds(interimSelectedItemsIds);
     setActiveItemId(interimActiveItemId);
     setSelectedItems(selectedCards);
   };
 
   const onClearCheckedList = () => {
     if (selectedItems?.length > 0) {
-      setselectedItemsIds([]);
+      setSelectedItemsIds([]);
       setActiveItemId('');
       setSelectedItems([]);
     }
