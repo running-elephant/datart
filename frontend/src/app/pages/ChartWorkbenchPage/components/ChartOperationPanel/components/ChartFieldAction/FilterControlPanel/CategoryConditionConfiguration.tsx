@@ -363,8 +363,9 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
             onChange={handleGeneralListChange}
             onSelectChange={onSelectChange}
             render={item => item.label}
-            showSearch
             filterOption={filterGeneralListOptions}
+            showSearch
+            pagination
           />
         )}
       </Tabs.TabPane>
@@ -397,8 +398,7 @@ export default forwardRef(CategoryConditionConfiguration);
 
 const StyledTabs = styled(Tabs)`
   & .ant-tabs-content-holder {
-    width: 600px;
-    max-height: 300px;
+    max-height: 600px;
     margin-top: 10px;
     overflow-y: auto;
   }
@@ -416,7 +416,11 @@ const StyledTabs = styled(Tabs)`
      */
     .ant-transfer-list {
       width: ${SPACE_TIMES(56)};
-      height: ${SPACE_TIMES(64)};
+      height: ${SPACE_TIMES(80)};
+
+      .ant-pagination input {
+        width: 48px;
+      }
     }
   }
 

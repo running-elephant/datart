@@ -212,7 +212,6 @@ const CategoryConditionEditableTable: FC<
           bordered
           rowKey={(r: RelationFilterValue) => `${r.key}-${r.label}`}
           columns={columnsWithCell}
-          pagination={false}
           onRow={(_, index) =>
             ({
               index,
