@@ -18,11 +18,16 @@
 
 import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { CHART_NAME_LOCATION } from 'globalConstants';
 import { FC, memo } from 'react';
 import { BW } from '../Basic/components/BasicWrapper';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
+
+export const template = [
+  { name: 'nameLocation.start', value: 'start' },
+  { name: 'nameLocation.center', value: 'center' },
+  { name: 'nameLocation.end', value: 'end' },
+];
 
 const NameLocation: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
@@ -38,7 +43,7 @@ const NameLocation: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           placeholder={t('select')}
           onChange={value => onChange?.(ancestors, value)}
         >
-          {CHART_NAME_LOCATION.map(o => (
+          {template.map(o => (
             <Select.Option key={o.value} value={o.value}>
               {t(o.name)}
             </Select.Option>

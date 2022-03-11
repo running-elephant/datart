@@ -18,11 +18,15 @@
 
 import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { CHART_LEGEND_TYPE } from 'globalConstants';
 import { FC, memo } from 'react';
 import { BW } from '../Basic/components/BasicWrapper';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
+
+export const template = [
+  { name: 'legendType.plain', value: 'plain' },
+  { name: 'legendType.scroll', value: 'scroll' },
+];
 
 const LegendType: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data: row, onChange }) => {
@@ -38,7 +42,7 @@ const LegendType: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           placeholder={t('select')}
           onChange={value => onChange?.(ancestors, value)}
         >
-          {CHART_LEGEND_TYPE.map(o => (
+          {template.map(o => (
             <Select.Option key={o.value} value={o.value}>
               {t(o.name)}
             </Select.Option>

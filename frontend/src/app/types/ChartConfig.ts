@@ -209,7 +209,9 @@ export const ChartStyleSectionComponentType = {
   // Customize Component
   FontAlignment: 'fontAlignment',
   NameLocation: 'nameLocation',
+  LabelPosition: 'labelPosition',
   LegendType: 'legendType',
+  LegendPosition: 'legendPosition',
   ScorecardListTemplate: 'scorecardListTemplate',
   ScorecardConditionalStyle: 'scorecardConditionalStyle',
 };

@@ -55,6 +55,8 @@ import {
   ConditionalStylePanel,
   DataReferencePanel,
   FontAlignment,
+  LabelPosition,
+  LegendPosition,
   LegendType,
   ListTemplatePanel,
   NameLocation,
@@ -179,8 +181,12 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <FontAlignment {...props} />;
         case ChartStyleSectionComponentType.NameLocation:
           return <NameLocation {...props} />;
+        case ChartStyleSectionComponentType.LabelPosition:
+          return <LabelPosition {...props} />;
         case ChartStyleSectionComponentType.LegendType:
           return <LegendType {...props} />;
+        case ChartStyleSectionComponentType.LegendPosition:
+          return <LegendPosition {...props} />;
         case ChartStyleSectionComponentType.ScorecardConditionalStyle:
           return <ScorecardConditionalStylePanel {...props} />;
         default:

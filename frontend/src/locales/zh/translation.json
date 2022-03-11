@@ -589,6 +589,23 @@
         },
         "lineHeight": {
           "default": "默认行高"
+        },
+        "position": {
+          "title": "位置",
+          "auto": "自动",
+          "right": "右",
+          "left": "左",
+          "top": "上",
+          "bottom": "下",
+          "inside": "内",
+          "insideLeft": "内左",
+          "insideRight": "内右",
+          "insideTop": "内上",
+          "insideBottom": "内下",
+          "insideTopLeft": "内左上",
+          "insideBottomLeft": "内左下",
+          "insideTopRight": "内右上",
+          "insideBottomRight": "内右下"
         }
       },
       "data": {

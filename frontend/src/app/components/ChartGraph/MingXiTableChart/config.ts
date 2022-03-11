@@ -218,9 +218,9 @@ const config: ChartConfig = {
           options: {
             translateItemLabel: true,
             items: [
-              { label: 'tableSize.default', value: 'default' },
-              { label: 'tableSize.middle', value: 'middle' },
-              { label: 'tableSize.small', value: 'small' },
+              { label: '@global@.tableSize.default', value: 'default' },
+              { label: '@global@.tableSize.middle', value: 'middle' },
+              { label: '@global@.tableSize.small', value: 'small' },
             ],
           },
         },

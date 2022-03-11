@@ -192,10 +192,11 @@ const config: ChartConfig = {
           default: 'default',
           comType: 'select',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '默认', value: 'default' },
-              { label: '中', value: 'middle' },
-              { label: '小', value: 'small' },
+              { label: '@global@.tableSize.default', value: 'default' },
+              { label: '@global@.tableSize.middle', value: 'middle' },
+              { label: '@global@.tableSize.small', value: 'small' },
             ],
           },
         },
@@ -282,6 +283,11 @@ const config: ChartConfig = {
           autoMerge: '自动合并相同内容',
           enableRaw: '使用原始数据',
         },
+        tableSize: {
+          default: '默认',
+          middle: '中',
+          small: '小',
+        },
         paging: {
           title: '分页设置',
           enablePaging: '启用分页',
@@ -318,6 +324,11 @@ const config: ChartConfig = {
           enableBorder: 'Show Border',
           leftFixedColumns: 'Left Fixed Columns',
           rightFixedColumns: 'Right Fixed Columns',
+        },
+        tableSize: {
+          default: 'Default',
+          middle: 'Middle',
+          small: 'Small',
         },
         data: {
           title: 'Table Data Setting',
