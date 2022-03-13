@@ -19,6 +19,7 @@
 import { Form, FormInstance, Radio, Select, Space } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
@@ -69,13 +70,15 @@ const ValuesOptionsSetter: FC<{
     if (!viewId) return [];
     try {
       const { data } = await request2<View>(`/views/${viewId}`);
-      const model = JSON.parse(data.model);
-      const option: CascaderOptionType[] = Object.keys(model).map(key => {
-        return {
-          value: key,
-          label: key,
-        };
-      });
+      let model = JSON.parse(beginViewModelMigration(data?.model));
+      const option: CascaderOptionType[] = Object.keys(model.columns).map(
+        key => {
+          return {
+            value: key,
+            label: key,
+          };
+        },
+      );
       return option;
     } catch (error) {
       errorHandle(error);
