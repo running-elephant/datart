@@ -19,7 +19,6 @@
 import { Form, FormInstance, Radio, Select, Space } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
@@ -29,6 +28,7 @@ import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { View } from 'app/types/View';
 import { getDistinctFields } from 'app/utils/fetch';
+import { transformMeta } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { request2 } from 'utils/request';
@@ -70,15 +70,14 @@ const ValuesOptionsSetter: FC<{
     if (!viewId) return [];
     try {
       const { data } = await request2<View>(`/views/${viewId}`);
-      let model = JSON.parse(beginViewModelMigration(data?.model));
-      const option: CascaderOptionType[] = Object.keys(model.columns).map(
-        key => {
-          return {
-            value: key,
-            label: key,
-          };
-        },
-      );
+      let meta = transformMeta(data?.model);
+      if (!meta) return [];
+      const option: CascaderOptionType[] = meta.map(item => {
+        return {
+          value: item.id,
+          label: item.id,
+        };
+      });
       return option;
     } catch (error) {
       errorHandle(error);
