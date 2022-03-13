@@ -15,7 +15,7 @@ spring:
     banner-mode: off
 
   profiles:
-    active: demo,config
+    active: config
 
   servlet:
     multipart:
