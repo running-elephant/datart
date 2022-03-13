@@ -420,6 +420,7 @@ export const getChartWidgetRequestParams = (obj: {
     // errorHandle(`can\`t find Chart ${curWidget.datachartId}`);
     return null;
   }
+  if (!dataChart.viewId) return null;
   const chartDataView = viewMap[dataChart?.viewId];
 
   if (!chartDataView) {
