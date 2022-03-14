@@ -22,7 +22,7 @@ export const NumberSet: FC<{ label: string; name: NamePath }> = memo(
   ({ label, name }) => {
     return (
       <Form.Item label={label} name={name}>
-        <InputNumber />
+        <InputNumber className="datart-ant-input-number" />
       </Form.Item>
     );
   },

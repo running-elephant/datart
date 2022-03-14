@@ -3,7 +3,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { SPACE_MD } from 'styles/StyleConstants';
+import { BORDER_RADIUS, SPACE_MD } from 'styles/StyleConstants';
 import { LogStatus, LOG_STATUS_TEXT } from '../../constants';
 import { useScheduleSlice } from '../../slice';
 import {
@@ -78,7 +78,11 @@ export const ScheduleErrorLog: FC<ScheduleErrorLogProps> = ({ scheduleId }) => {
 };
 
 const FormCard = styled(Card)`
-  margin-top: ${SPACE_MD};
+  &.ant-card {
+    background-color: ${p => p.theme.componentBackground};
+    border-radius: ${BORDER_RADIUS};
+    box-shadow: ${p => p.theme.shadowBlock};
+  }
 `;
 const FormWrapper = styled.div`
   width: 860px;

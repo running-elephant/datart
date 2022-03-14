@@ -23,16 +23,16 @@ export const PaddingSet: FC<{}> = memo(() => {
   return (
     <>
       <Form.Item label={t('paddingTop')} name={['padding', 'top']}>
-        <InputNumber />
+        <InputNumber className="datart-ant-input-number" />
       </Form.Item>
       <Form.Item label={t('paddingRight')} name={['padding', 'right']}>
-        <InputNumber />
+        <InputNumber className="datart-ant-input-number" />
       </Form.Item>
       <Form.Item label={t('paddingBottom')} name={['padding', 'bottom']}>
-        <InputNumber />
+        <InputNumber className="datart-ant-input-number" />
       </Form.Item>
       <Form.Item label={t('paddingLeft')} name={['padding', 'left']}>
-        <InputNumber />
+        <InputNumber className="datart-ant-input-number" />
       </Form.Item>
     </>
   );

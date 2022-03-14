@@ -36,9 +36,10 @@ const ColorTagBox = styled.div`
 
 export const ColorPicker = styled.div<{ color?: string; size?: number }>`
   flex-shrink: 0;
-  width: ${p => SPACE_TIMES(p.size || 8)};
-  height: ${p => SPACE_TIMES(p.size || 8)};
+  width: ${p => SPACE_TIMES(p.size || 7)};
+  height: ${p => SPACE_TIMES(p.size || 7)};
   cursor: pointer;
   background-color: ${p => p.color || 'transparent'};
+  border: 1px solid ${p => p.theme.borderColorEmphasis};
   border-radius: ${BORDER_RADIUS};
 `;

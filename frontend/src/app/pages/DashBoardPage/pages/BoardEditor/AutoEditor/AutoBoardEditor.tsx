@@ -17,7 +17,6 @@
  */
 
 import { Empty } from 'antd';
-import { useVisibleHidden } from 'app/hooks/useVisibleHidden';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
@@ -61,7 +60,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 
 export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
-  const visible = useVisibleHidden();
+  // const visible = useVisibleHidden(100);
   const {
     margin,
     containerPadding,
@@ -93,8 +92,13 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     [layoutWidgetMap],
   );
 
-  const { ref, gridWrapRef, currentLayout, widgetRowHeight } =
-    useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
+  const {
+    ref,
+    gridWrapRef,
+    currentLayout,
+    widgetRowHeight,
+    throttleLazyRender,
+  } = useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
 
   const onBreakpointChange = value => {};
 
@@ -132,7 +136,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
 
   const onLayoutChange = (layouts: Layout[]) => {
     currentLayout.current = layouts;
-
+    throttleLazyRender();
     // ignore isDraggable item from out
     if (layouts.find(item => item.isDraggable === true)) {
       return;
@@ -175,7 +179,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
         curWH={curWH}
         className={deviceClassName}
         ref={ref}
-        style={{ visibility: visible }}
+        // style={{ visibility: visible }}
       >
         {sortedLayoutWidgets.length ? (
           <div className="grid-wrap" ref={gridWrapRef}>

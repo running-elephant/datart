@@ -682,7 +682,7 @@ const config: ChartConfig = {
           title: 'Y Axis',
         },
         splitLine: {
-          title: 'Splite Line',
+          title: 'Split Line',
           showHorizonLine: 'Show Horizontal Line',
           showVerticalLine: 'Show Vertical Line',
         },

@@ -250,13 +250,15 @@ const widgetInfoRecordSlice = createSlice({
       }>,
     ) {
       const { widgetId, errInfo, errorType } = action.payload;
-      let errorObj = state[widgetId].errInfo || {};
+      let errorObj = state[widgetId]?.errInfo || {};
       if (errInfo) {
         errorObj[errorType] = errInfo;
       } else {
         delete errorObj[errorType];
       }
-      state[widgetId].errInfo = errorObj;
+      if (state[widgetId]?.errInfo) {
+        state[widgetId].errInfo = errorObj;
+      }
     },
   },
   extraReducers: builder => {

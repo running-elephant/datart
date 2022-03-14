@@ -120,7 +120,7 @@ const AggregationColorizeAction: FC<{
           visible={selColorBoxStatus}
           trigger="click"
           placement="bottomRight"
-          overlayClassName="aggregation-colorpopover"
+          overlayClassName="datart-aggregation-colorpopover"
           content={
             <SingleColorSelection
               color={selectColor.value}

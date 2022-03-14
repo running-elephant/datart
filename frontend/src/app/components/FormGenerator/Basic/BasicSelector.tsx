@@ -19,8 +19,6 @@
 import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
-import styled from 'styled-components/macro';
-import { BORDER_RADIUS } from 'styles/StyleConstants';
 import { AssignDeep, isEmpty } from 'utils/object';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
@@ -68,8 +66,9 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     };
 
     return (
-      <Wrapper label={!hideLabel ? t(row.label, true) : ''}>
+      <BW label={!hideLabel ? t(row.label, true) : ''}>
         <Select
+          className="datart-ant-select"
           dropdownMatchSelectWidth
           {...rest}
           {...options}
@@ -88,23 +87,10 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             );
           })}
         </Select>
-      </Wrapper>
+      </BW>
     );
   },
   itemLayoutComparer,
 );
 
 export default BasicSelector;
-
-const Wrapper = styled(BW)`
-  .ant-select {
-    color: ${p => p.theme.textColorSnd};
-  }
-
-  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-    background-color: ${p => p.theme.emphasisBackground};
-    border-color: ${p => p.theme.emphasisBackground} !important;
-    border-radius: ${BORDER_RADIUS};
-    box-shadow: none !important;
-  }
-`;

@@ -16,13 +16,14 @@
  * limitations under the License.
  */
 
-export interface FunctionDescription {
-  name: string;
-  type: string;
-  description: string;
-  syntax: string;
-}
+import { createGlobalStyle } from 'styled-components/macro';
 
-export interface ChartCompoutedFieldHandle {
-  insertField: (value, funcDesc?: FunctionDescription) => void;
-}
+export const Viz = createGlobalStyle`
+  /* 覆盖antd 默认样式 */
+  @media (max-width: 575px) {
+    .datart-viz .ant-form .ant-form-item .ant-form-item-label,
+    .datart-viz .ant-form .ant-form-item .ant-form-item-control {
+      flex: 1;
+    }
+  }
+`;

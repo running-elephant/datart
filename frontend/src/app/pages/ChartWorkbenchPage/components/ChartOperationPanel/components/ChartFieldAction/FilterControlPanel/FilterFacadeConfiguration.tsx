@@ -30,14 +30,14 @@ import styled from 'styled-components/macro';
 import { IsKeyIn } from 'utils/object';
 
 const isDisableSingleDropdownListFacade = condition => {
-  let isDisableSignleDropdownList = true;
+  let isDisableSingleDropdownList = true;
   if (Array.isArray(condition?.value)) {
     if (IsKeyIn(condition?.value?.[0], 'key')) {
-      isDisableSignleDropdownList =
+      isDisableSingleDropdownList =
         condition?.value?.filter(n => n.isSelected)?.length > 1;
     }
   }
-  return isDisableSignleDropdownList;
+  return isDisableSingleDropdownList;
 };
 
 const getFacadeOptions = (condition, category) => {

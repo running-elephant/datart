@@ -975,7 +975,7 @@ export function transformToObjectArray(
     'transformToObjectArray',
     () => {
       const result: any[] = Array.apply(null, Array(columns.length));
-      for (let j = 0, outterLength = result.length; j < outterLength; j++) {
+      for (let j = 0, outerLength = result.length; j < outerLength; j++) {
         let objCol: any = {};
         for (let i = 0, innerLength = metas.length; i < innerLength; i++) {
           const key = metas?.[i]?.name;

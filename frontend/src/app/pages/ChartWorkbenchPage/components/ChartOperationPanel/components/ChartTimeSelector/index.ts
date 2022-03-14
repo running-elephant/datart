@@ -17,12 +17,12 @@
  */
 
 import CurrentRangeTime from './CurrentRangeTime';
-import MannualRangeTimeSelector from './MannualRangeTimeSelector';
+import ManualRangeTimeSelector from './ManualRangeTimeSelector';
 import ManualSingleTimeSelector from './ManualSingleTimeSelector';
 import RecommendRangeTimeSelector from './RecommendRangeTimeSelector';
 
 const TimeSelector = {
-  MannualRangeTimeSelector,
+  ManualRangeTimeSelector,
   ManualSingleTimeSelector,
   RecommendRangeTimeSelector,
   CurrentRangeTime,

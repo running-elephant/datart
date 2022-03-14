@@ -279,19 +279,20 @@ export const addWrapChartWidget = createAsyncThunk<
     { getState, dispatch },
   ) => {
     const dataCharts = [dataChart];
-    const viewViews = [view];
+    const viewViews = view ? [view] : [];
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
     let widget = widgetToolKit.chart.create({
       dashboardId: boardId,
       boardType: boardType,
       dataChartId: chartId,
-      viewId: view.id,
+      viewId: view?.id || '',
       dataChartConfig: dataChart,
       subType: 'widgetChart',
     });
     dispatch(addWidgetsToEditBoard([widget]));
-    dispatch(addVariablesToBoard(view.variables));
+    dispatch(addVariablesToBoard(view?.variables));
+
     return null;
   },
 );

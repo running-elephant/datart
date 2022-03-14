@@ -22,7 +22,7 @@ import { useEffect, useState } from 'react';
  * Lazy initialized state when dependency object has correct value.
  * @param {*} stateTransformer required, get/transform to new state value
  * @param {*} shouldUpdate required, if update new state compare function
- * with previous and current dependecyvalue
+ * with previous and current dependency value
  * @param {*} dependency required, dependency value
  * @param {*} defaultState optional, default state value
  * @return {*} [state, setState]

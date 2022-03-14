@@ -20,8 +20,6 @@ import { Slider } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import isUndefined from 'lodash/isUndefined';
 import { FC, memo } from 'react';
-import styled from 'styled-components/macro';
-import { BORDER_RADIUS } from 'styles/StyleConstants';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
@@ -31,7 +29,7 @@ const BasicSlider: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     const { comType, options, ...rest } = row;
 
     return (
-      <Wrapper label={t(row.label, true)}>
+      <BW label={t(row.label, true)}>
         <Slider
           {...rest}
           {...options}
@@ -42,20 +40,10 @@ const BasicSlider: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           defaultValue={rest?.default}
           onChange={value => onChange?.(ancestors, value)}
         />
-      </Wrapper>
+      </BW>
     );
   },
   itemLayoutComparer,
 );
 
 export default BasicSlider;
-
-const Wrapper = styled(BW)`
-  .ant-slider {
-    width: 100%;
-    // background-color: ${p => p.theme.emphasisBackground};
-    // border-color: ${p => p.theme.emphasisBackground};
-    // border-radius: ${BORDER_RADIUS};
-    // box-shadow: none;
-  }
-`;

@@ -28,7 +28,7 @@ import ChartFilterCondition, {
 import CurrentRangeTime from './CurrentRangeTime';
 import ManualSingleTimeSelector from './ManualSingleTimeSelector';
 
-const MannualRangeTimeSelector: FC<
+const ManualRangeTimeSelector: FC<
   {
     condition?: FilterCondition;
     onConditionChange: (filter: ChartFilterCondition) => void;
@@ -89,4 +89,4 @@ const MannualRangeTimeSelector: FC<
   );
 });
 
-export default MannualRangeTimeSelector;
+export default ManualRangeTimeSelector;
