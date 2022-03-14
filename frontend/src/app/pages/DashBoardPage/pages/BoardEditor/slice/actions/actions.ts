@@ -37,6 +37,7 @@ import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import i18next from 'i18next';
 import produce from 'immer';
+import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
@@ -46,7 +47,7 @@ import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from '../thunk';
 import { HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
 const { confirm } = Modal;
-export const clearEditBoardState = () => async (dispatch, getState) => {
+export const clearEditBoardState = () => async dispatch => {
   await dispatch(
     editBoardStackActions.setBoardToEditStack({
       dashBoard: {} as Dashboard,
@@ -55,6 +56,7 @@ export const clearEditBoardState = () => async (dispatch, getState) => {
   );
   await dispatch(editDashBoardInfoActions.clearEditBoardInfo());
   await dispatch(editWidgetInfoActions.clearWidgetInfo());
+  dispatch(ActionCreators.clearHistory());
 };
 export const deleteWidgetsAction = () => (dispatch, getState) => {
   const editBoard = getState().editBoard as HistoryEditBoard;
