@@ -46,39 +46,50 @@ const boardSlice = createSlice({
   name: 'board',
   initialState: boardInit as BoardState,
   reducers: {
-    setBoardDetailToState(
+    setBoardState(
       state,
       action: PayloadAction<{
         board: Dashboard;
         boardInfo: BoardInfo;
-        widgetMap: Record<string, Widget>;
-        widgetInfoMap: Record<string, WidgetInfo>;
-        views: ChartDataView[];
-        dataCharts: DataChart[];
       }>,
     ) {
-      const { board, boardInfo, widgetMap, widgetInfoMap, dataCharts, views } =
-        action.payload;
+      const { board, boardInfo } = action.payload;
       state.boardRecord[board.id] = board;
       state.boardInfoRecord[board.id] = boardInfo;
-      // widgetRecord
-      if (!state.widgetRecord[board.id]) {
-        state.widgetRecord[board.id] = {};
+      // can not del :dataCharts、views
+    },
+    setWidgetMapState(
+      state,
+      action: PayloadAction<{
+        boardId: string;
+        widgetMap: Record<string, Widget>;
+        widgetInfoMap: Record<string, WidgetInfo>;
+      }>,
+    ) {
+      const { boardId, widgetMap, widgetInfoMap } = action.payload;
+      if (!state.widgetRecord[boardId]) {
+        state.widgetRecord[boardId] = {};
       }
-      state.widgetRecord[board.id] = widgetMap;
-      // widgetInfoRecord
-      if (!state.widgetInfoRecord[board.id]) {
-        state.widgetInfoRecord[board.id] = {};
+      state.widgetRecord[boardId] = widgetMap;
+      if (!state.widgetInfoRecord[boardId]) {
+        state.widgetInfoRecord[boardId] = {};
       }
-      state.widgetInfoRecord[board.id] = widgetInfoMap;
-
-      dataCharts.forEach(chart => {
-        state.dataChartMap[chart.id] = chart;
+      state.widgetInfoRecord[boardId] = widgetInfoMap;
+    },
+    setDataChartToMap(state, action: PayloadAction<DataChart[]>) {
+      const dataCharts = action.payload;
+      dataCharts.forEach(dc => {
+        state.dataChartMap[dc.id] = dc;
       });
+    },
+
+    setViewMap(state, action: PayloadAction<ChartDataView[]>) {
+      const views = action.payload;
       views.forEach(view => {
         state.viewMap[view.id] = view;
       });
     },
+
     clearBoardStateById(state, action: PayloadAction<string>) {
       const boardId = action.payload;
       delete state.boardRecord[boardId];
@@ -134,19 +145,7 @@ const boardSlice = createSlice({
       const { recordId, itemId } = action.payload;
       state.boardInfoRecord[recordId].fullScreenItemId = itemId;
     },
-    setDataChartToMap(state, action: PayloadAction<DataChart[]>) {
-      const dataCharts = action.payload;
-      dataCharts.forEach(dc => {
-        state.dataChartMap[dc.id] = dc;
-      });
-    },
 
-    setViewMap(state, action: PayloadAction<ChartDataView[]>) {
-      const views = action.payload;
-      views.forEach(view => {
-        state.viewMap[view.id] = view;
-      });
-    },
     setWidgetData(state, action: PayloadAction<WidgetData>) {
       const widgetData = action.payload;
       state.widgetDataMap[widgetData.id] = widgetData;

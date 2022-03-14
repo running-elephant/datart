@@ -37,6 +37,7 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.bubble.css';
 import 'react-quill/dist/quill.core.css';
 import styled from 'styled-components/macro';
+import { BLUE } from 'styles/StyleConstants';
 import './RichTextPluginLoader';
 import { CustomColor, QuillPalette } from './RichTextPluginLoader/CustomColor';
 import {
@@ -302,7 +303,7 @@ const ChartRichTextAdapter: FC<{
               modules={quillModules}
               formats={Formats}
               readOnly={false}
-              bounds={'#quill-box'}
+              bounds={`#quill-box-${id}`}
             />
             <Row align="middle" justify="end" style={{ paddingTop: 16 }}>
               <Button
@@ -316,7 +317,7 @@ const ChartRichTextAdapter: FC<{
             </Row>
           </>
         ),
-      [quillModules, quillValue, isEditing, toolbar, quillChange],
+      [quillModules, quillValue, isEditing, toolbar, quillChange, id],
     );
 
     const ssp = e => {
@@ -325,7 +326,7 @@ const ChartRichTextAdapter: FC<{
 
     return (
       <TextWrap onClick={ssp}>
-        <QuillBox id="quill-box">
+        <QuillBox id={`quill-box-${id}`}>
           {quillModules && reactQuillEdit}
           {quillModules && !isEditing && reactQuillView}
         </QuillBox>
@@ -354,10 +355,10 @@ const ChartRichTextAdapter: FC<{
 export default ChartRichTextAdapter;
 
 const QuillBox = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  flex-direction: column;
-  display: flex;
   .react-quill {
     flex: 1;
     overflow-y: auto;
@@ -380,10 +381,11 @@ const TextWrap = styled.div`
   }
 
   & .selectLink {
-    height: 24px;
-    width: 28px;
-    padding: 0 5px;
     display: inline-block;
+    width: 28px;
+    height: 24px;
+    padding: 0 5px;
+
     color: black;
 
     i {
@@ -392,6 +394,6 @@ const TextWrap = styled.div`
   }
 
   & .selectLink:hover {
-    color: #06c;
+    color: ${BLUE};
   }
 `;

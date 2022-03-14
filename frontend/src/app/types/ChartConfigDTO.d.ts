@@ -18,6 +18,7 @@
 
 import { ChartDataConfig } from 'app/types/ChartConfig';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { ECharts } from 'echarts';
 
 export type ChartStyleConfigDTO = {
   key: string;
@@ -40,3 +41,20 @@ export type ChartDetailConfigDTO = {
   computedFields: ChartDataViewMeta[];
   aggregation: boolean;
 };
+
+export interface ChartCommonConfig {
+  chart: ECharts;
+  // 官方ts定义过于复杂 所以用any
+  // x轴options
+  xAxis: any;
+  // y轴options
+  yAxis: any;
+  // 布局
+  grid: any;
+  // y轴 字段索引名
+  yAxisNames: string[];
+  // 图表系列
+  series: any[];
+  // 水平还是垂直
+  horizon?: boolean;
+}

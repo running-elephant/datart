@@ -23,7 +23,7 @@ import ChartFilterCondition, {
 } from '../../../../../models/ChartFilterCondition';
 import RelationTypeFilter from './RelationTypeFilter';
 
-const ArrangeFilterAcion: FC<{
+const ArrangeFilterAction: FC<{
   config: ChartDataConfig;
   onConfigChange: (config: ChartDataConfig) => void;
 }> = memo(({ config, onConfigChange }) => {
@@ -40,12 +40,12 @@ const ArrangeFilterAcion: FC<{
   });
 
   const handleRelationChange = relation => {
-    const relationConddition = new ConditionBuilder(relation).asRelation(
+    const relationCondition = new ConditionBuilder(relation).asRelation(
       relation.value,
       relation.children,
     );
-    setRelation(relationConddition);
-    config.fieldRelation = relationConddition;
+    setRelation(relationCondition);
+    config.fieldRelation = relationCondition;
     onConfigChange(config);
   };
 
@@ -58,4 +58,4 @@ const ArrangeFilterAcion: FC<{
   );
 });
 
-export default ArrangeFilterAcion;
+export default ArrangeFilterAction;

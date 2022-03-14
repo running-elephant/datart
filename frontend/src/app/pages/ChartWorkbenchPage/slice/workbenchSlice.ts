@@ -78,6 +78,7 @@ export type WorkbenchState = {
   backendChartId?: string;
   aggregation?: boolean;
   datasetLoading: boolean;
+  chartEditorDownloadPolling: boolean;
 };
 
 const initState: WorkbenchState = {
@@ -87,6 +88,7 @@ const initState: WorkbenchState = {
   dataset: {},
   aggregation: true,
   datasetLoading: false,
+  chartEditorDownloadPolling: false,
 };
 
 // Selectors
@@ -141,6 +143,11 @@ export const aggregationSelector = createSelector(
 export const datasetLoadingSelector = createSelector(
   workbenchSelector,
   wb => wb.datasetLoading,
+);
+
+export const selectChartEditorDownloadPolling = createSelector(
+  workbenchSelector,
+  wb => wb.chartEditorDownloadPolling,
 );
 // Effects
 export const initWorkbenchAction = createAsyncThunk(
@@ -208,7 +215,7 @@ export const fetchViewDetailAction = createAsyncThunk(
       method: 'GET',
       url: `views/${arg}`,
     });
-    return migrateViewConfig(response.data);
+    return response.data;
   },
 );
 
@@ -442,6 +449,9 @@ const workbenchSlice = createSlice({
     resetWorkbenchState: (state, action) => {
       return initState;
     },
+    setChartEditorDownloadPolling(state, { payload }: PayloadAction<boolean>) {
+      state.chartEditorDownloadPolling = payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -460,6 +470,7 @@ const workbenchSlice = createSlice({
         if (index !== undefined) {
           state.currentDataView = {
             ...payload,
+            config: migrateViewConfig(payload.config),
             meta: transformMeta(payload.model),
             computedFields,
           };

@@ -60,7 +60,14 @@ const WidgetToolBar: FC = () => {
     const showTypes: WidgetType[] = ['chart'];
     if (!showTypes.includes(widget.config.type)) return null;
     if (rendered) return null;
-    return <WaitingIcon title={t('waiting')} />;
+    const refreshItem = () => onWidgetAction('refresh', widget);
+    return (
+      <WaitingIcon
+        onClick={refreshItem}
+        onMouseEnter={refreshItem}
+        title={t('waiting')}
+      />
+    );
   };
   const renderLoading = () => {
     const showTypes: WidgetType[] = ['chart', 'controller'];
@@ -109,9 +116,9 @@ const WidgetToolBar: FC = () => {
   return (
     <StyleWrap onClick={ssp} className="widget-tool-bar">
       <Space size={0}>
-        {renderErrorInfo(errInfo)}
-        {renderWaiting()}
         {renderLoading()}
+        {renderWaiting()}
+        {renderErrorInfo(errInfo)}
         {renderLocking()}
         {renderLinkage()}
         {renderWidgetAction()}

@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-import { useEffect, useState } from 'react';
+export interface FunctionDescription {
+  name: string;
+  type: string;
+  description: string;
+  syntax: string;
+}
 
-export const useVisibleHidden = (timeNum: number = 500) => {
-  const [visible, setVisible] = useState<'visible' | 'hidden'>('hidden');
-  useEffect(() => {
-    setTimeout(() => {
-      setVisible('visible');
-    }, timeNum);
-  });
-  return visible;
-};
+export interface ChartComputedFieldHandle {
+  insertField: (value, funcDesc?: FunctionDescription) => void;
+}

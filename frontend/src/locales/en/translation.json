@@ -309,6 +309,7 @@
           "SUFFIX_LIKE": "Suffix Contain",
           "SUFFIX_NOT_LIKE": "Not Suffix Contain",
           "BETWEEN": "Between",
+          "NOT_BETWEEN": "Not Between",
           "IN": "In",
           "NOT_IN": "Not In",
           "LT": "Less Than",
@@ -688,11 +689,20 @@
           "endMetric": "End Reference Metric",
           "font": "Font",
           "showLabel": "Show",
-          "position": "Position",
+          "position": {
+            "title": "Position",
+            "start": "Start",
+            "middle": "Middle",
+            "end": "End"
+          },
           "lineStyle": "Line Style",
           "opacity": "Opacity",
           "backgroundColor": "Background Color",
-          "borderStyle": "Border Style"
+          "borderStyle": "Border Style",
+          "constant": "Constant",
+          "avg": "AVG",
+          "max": "Max",
+          "min": "Min"
         },
         "paging": {
           "title": "Common",

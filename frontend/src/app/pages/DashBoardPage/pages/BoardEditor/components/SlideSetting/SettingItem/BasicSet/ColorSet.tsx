@@ -49,7 +49,6 @@ const StyledWrap = styled.div`
 const StyledColorIcon = styled.span<{ color: string }>`
   font-size: 1.4em;
   color: ${p => p.color};
-
   background-color: ${p => p.theme.componentBackground};
-  border: 1px solid ${p => p.theme.emphasisBackground};
+  border: 1px solid ${p => p.theme.borderColorEmphasis};
 `;

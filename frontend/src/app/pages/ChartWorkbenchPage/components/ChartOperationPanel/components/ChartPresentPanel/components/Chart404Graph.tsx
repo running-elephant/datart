@@ -30,7 +30,7 @@ const Chart404Graph: FC<{
 }> = memo(({ chart, chartConfig }) => {
   const t = useI18NPrefix(`viz.palette`);
 
-  const renderChartLimition = () => {
+  const renderChartLimitation = () => {
     const sections = chartConfig?.datas
       ?.filter(s => reachLowerBoundCount(s?.limit, s.rows?.length) > 0)
       .map(s => {
@@ -51,7 +51,7 @@ const Chart404Graph: FC<{
       <StyledChartIcon>
         <i className={chart?.meta?.icon} />
       </StyledChartIcon>
-      {renderChartLimition()}
+      {renderChartLimitation()}
     </StyledChart404Graph>
   );
 });
@@ -61,8 +61,8 @@ export default Chart404Graph;
 const StyledChart404Graph = styled.div`
   display: flex;
   flex-flow: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   height: 100%;
   opacity: 0.3;
 `;

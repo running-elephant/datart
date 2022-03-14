@@ -25,7 +25,7 @@ import {
   ChartDataViewFieldType,
 } from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
-import { ChartCompoutedFieldHandle } from 'app/types/CompoutedFieldEditor';
+import { ChartComputedFieldHandle } from 'app/types/ComputedFieldEditor';
 import { FC, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
 import ChartComputedFieldEditor from './ChartComputedFieldEditor/ChartComputedFieldEditor';
@@ -61,7 +61,7 @@ const ChartComputedFieldSettingPanel: FC<{
 }) => {
   const t = useI18NPrefix(`viz.workbench.dataview`);
   const defaultFunctionCategory = 'all';
-  const editorRef = useRef<ChartCompoutedFieldHandle>(null);
+  const editorRef = useRef<ChartComputedFieldHandle>(null);
   const myComputedFieldRef = useRef(computedField);
   const [selectedFunctionCategory, setSelectedFunctionCategory] = useState(
     defaultFunctionCategory,

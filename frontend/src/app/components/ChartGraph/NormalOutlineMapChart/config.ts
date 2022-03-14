@@ -320,11 +320,12 @@ const config: ChartConfig = {
           title: 'Label',
           showLabel: 'Show Label',
           position: 'Position',
+          height: 'Height',
         },
         map: {
           title: 'Map',
           level: 'Level',
-          enableZoom: 'Enabel Zoom',
+          enableZoom: 'Enable Zoom',
           backgroundColor: 'Background Color',
           borderStyle: 'Border Style',
           focusArea: 'Focus Area',

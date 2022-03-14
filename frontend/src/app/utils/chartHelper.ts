@@ -31,19 +31,25 @@ import {
   IFieldFormatConfig,
   SortActionType,
 } from 'app/types/ChartConfig';
-import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
+import {
+  ChartCommonConfig,
+  ChartStyleConfigDTO,
+} from 'app/types/ChartConfigDTO';
 import {
   ChartDatasetMeta,
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
 import ChartMetadata from 'app/types/ChartMetadata';
+import { ECharts } from 'echarts';
+import { ECBasicOption } from 'echarts/types/dist/shared';
 import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
 import moment from 'moment';
 import { Debugger } from 'utils/debugger';
 import { isEmpty, isEmptyArray, meanValue, pipe } from 'utils/object';
 import {
   flattenHeaderRowsWithoutGroupRow,
+  getAxisLengthByConfig,
   getColumnRenderOriginName,
   getRequiredAggregatedSections,
   getRequiredGroupedSections,
@@ -500,7 +506,12 @@ export function getReference2(
       dataConfig,
       isHorizonDisplay,
     ),
-    markArea: getMarkArea2(referenceTabs, dataSetRows, isHorizonDisplay),
+    markArea: getMarkArea2(
+      referenceTabs,
+      dataSetRows,
+      dataConfig,
+      isHorizonDisplay,
+    ),
   };
 }
 
@@ -676,8 +687,10 @@ function getMarkAreaData2(
   valueTypeKey,
   constantValueKey,
   metricKey,
+  dataConfig,
   isHorizonDisplay,
 ) {
+  const metric = getSettingValue(mark.rows, metricKey, 'value');
   const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
   const show = getSettingValue(mark.rows, 'showLabel', 'value');
   const enableMarkArea = getSettingValue(mark.rows, 'enableMarkArea', 'value');
@@ -692,8 +705,10 @@ function getMarkAreaData2(
   );
   const name = mark.value;
   const valueType = getSettingValue(mark.rows, valueTypeKey, 'value');
-  const metric = getSettingValue(mark.rows, metricKey, 'value');
-  const metricDatas = dataSetRows.map(d => +d.getCellByKey(metric));
+  const metricDatas =
+    dataConfig.uid === metric
+      ? dataSetRows.map(d => +d.getCell(dataConfig))
+      : [];
   const constantValue = getSettingValue(mark.rows, constantValueKey, 'value');
   let yAxis = 0;
   switch (valueType) {
@@ -711,8 +726,8 @@ function getMarkAreaData2(
       break;
   }
 
-  if (!enableMarkArea) {
-    return null;
+  if (!enableMarkArea || !Number.isFinite(yAxis) || Number.isNaN(yAxis)) {
+    return;
   }
 
   return {
@@ -826,12 +841,12 @@ function getMarkArea(refTabs, dataColumns, isHorizonDisplay) {
 function getMarkArea2(
   refTabs,
   dataSetRows: IChartDataSetRow<string>[],
+  dataConfig,
   isHorizonDisplay,
 ) {
   const refAreas = refTabs?.reduce((acc, cur) => {
     const markLineConfigs = cur?.rows?.filter(r => r.key === 'markArea');
-    acc.push(...markLineConfigs);
-    return acc;
+    return acc.concat(markLineConfigs);
   }, []);
   return {
     data: refAreas
@@ -844,13 +859,14 @@ function getMarkArea2(
               `${prefix}ValueType`,
               `${prefix}ConstantValue`,
               `${prefix}Metric`,
+              dataConfig,
               isHorizonDisplay,
             );
           })
           .filter(Boolean);
         return markAreaData;
       })
-      .filter(m => Boolean(m?.length)),
+      .filter(m => m?.length === 2),
   };
 }
 
@@ -866,11 +882,13 @@ export function getAxisLabel(
   font: { fontFamily; fontSize; color },
   interval = null,
   rotate = null,
+  overflow = null,
 ) {
   return {
     show,
     interval,
     rotate,
+    overflow,
     ...font,
   };
 }
@@ -957,7 +975,7 @@ export function transformToObjectArray(
     'transformToObjectArray',
     () => {
       const result: any[] = Array.apply(null, Array(columns.length));
-      for (let j = 0, outterLength = result.length; j < outterLength; j++) {
+      for (let j = 0, outerLength = result.length; j < outerLength; j++) {
         let objCol: any = {};
         for (let i = 0, innerLength = metas.length; i < innerLength; i++) {
           const key = metas?.[i]?.name;
@@ -1310,3 +1328,126 @@ export function isMatchRequirement(
     );
   });
 }
+
+// 获取是否展示刻度
+export const getIntervalShow = interval =>
+  interval !== 'auto' && interval !== null;
+
+// 判断overflow 条件是否已生效
+export function hadAxisLabelOverflowConfig(
+  options?: ECBasicOption,
+  horizon: boolean = false,
+) {
+  if (!options) return false;
+  const axisName = !horizon ? 'xAxis' : 'yAxis';
+
+  const axisLabelOpts = (options as unknown as any)[axisName]?.[0]?.axisLabel;
+  if (!axisLabelOpts) return false;
+
+  const { overflow, interval, show } = axisLabelOpts;
+
+  return show && overflow && getIntervalShow(interval);
+}
+
+// 处理溢出情况
+export function setOptionsByAxisLabelOverflow(config: ChartCommonConfig) {
+  const { chart, xAxis, yAxis, grid, series, horizon = false } = config;
+
+  const commonOpts = {
+    grid,
+    xAxis,
+    yAxis,
+    series,
+  };
+
+  // 如果是x轴需要截断，则取x轴数据
+  const axisOpts = !horizon ? xAxis : yAxis;
+  const axisName = !horizon ? 'xAxis' : 'yAxis';
+
+  const data = axisOpts.data || [];
+
+  const dataLength = data.length;
+
+  // 拿到截断配置
+  const overflow = axisOpts.axisLabel?.overflow;
+  const show = axisOpts.axisLabel?.show;
+  // 是否展示刻度，非刻度使用默认样式
+
+  const showInterval = getIntervalShow(axisOpts.axisLabel?.interval);
+
+  // 不展示刻度
+  if (!show) return commonOpts;
+  // 数据为空
+  if (!dataLength) return commonOpts;
+
+  commonOpts[axisName].axisLabel.hideOverlap = true;
+  commonOpts[axisName].axisLabel.overflow = overflow;
+
+  // 如果overflow为截断，则使用每段刻度来响应tooltip
+  // 不破坏原有展示逻辑
+  if (showInterval && overflow === 'truncate') {
+    commonOpts[axisName].axisPointer = {
+      show: true,
+      type: 'shadow',
+    };
+  }
+
+  // 获取x/y轴在model上的信息
+  // @ts-ignore
+  const axisModel = chart.getModel()?.getComponent(axisName);
+
+  // 处理 每个刻度宽度
+  const setWidth = width => {
+    // 水平图表使用默认宽度
+    if (horizon) return 40;
+    return parseInt(String((width - dataLength * 8) / dataLength));
+  };
+  // model 渲染未完成的兼容性方案，一般只在图表初始化阶段，还没有拿到model。
+  // 一般只会运行一次
+  // 拿到model后就可使用更加精确的坐标轴宽高度等信息，所以处理可以略粗略
+  const handlerWhenChartUnFinished = () => {
+    commonOpts[axisName].axisLabel.width = showInterval
+      ? setWidth(getAxisLengthByConfig(config))
+      : void 0;
+    return commonOpts;
+  };
+
+  // model未获取到，原因： 未渲染完成
+  if (!axisModel) {
+    handlerWhenChartUnFinished();
+    return commonOpts;
+  }
+  // @ts-ignore
+  const axisView = chart.getViewOfComponentModel(axisModel);
+
+  const axisRect = axisView?.group?.getBoundingRect();
+
+  if (!axisRect) {
+    handlerWhenChartUnFinished();
+    return commonOpts;
+  }
+
+  commonOpts[axisName].axisLabel.width = showInterval
+    ? setWidth(axisRect.width)
+    : void 0;
+
+  return commonOpts;
+}
+
+export const getAutoFunnelTopPosition = (config: {
+  chart: ECharts;
+  height: number;
+  sort: 'ascending' | 'descending' | 'none';
+  legendPos: string;
+}) => {
+  const { chart, height, sort, legendPos } = config;
+  if (legendPos !== 'left' && legendPos !== 'right') return 8;
+  if (!height) return 16;
+  // 升序
+  if (sort === 'ascending') return 16;
+
+  const chartHeight = chart.getHeight();
+  if (!chartHeight) return 16;
+  // 24 marginBottom
+  return chartHeight - 24 - height;
+};

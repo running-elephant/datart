@@ -90,7 +90,8 @@ class BasicTableChart extends ReactChart {
           options.config,
           options.widgetSpecialConfig,
         );
-        this.cachedAntTableOptions = tableOptions;
+        // this.cachedAntTableOptions = Omit(tableOptions, ['dataSource']);
+        this.cachedAntTableOptions = Omit(tableOptions, []);
         this.cachedDatartConfig = options.config;
         this.cacheContext = context;
         this.adapter?.updated(tableOptions, context);
@@ -146,7 +147,7 @@ class BasicTableChart extends ReactChart {
     const aggregateConfigs = mixedSectionConfigRows.filter(
       r => r.type === ChartDataViewFieldType.NUMERIC,
     );
-    this.dataColumnWidths = this.calcuteFieldsMaxWidth(
+    this.dataColumnWidths = this.calculateFieldsMaxWidth(
       mixedSectionConfigRows,
       chartDataSet,
       styleConfigs,
@@ -221,7 +222,7 @@ class BasicTableChart extends ReactChart {
       .filter(c => c.key === 'mixed')
       .flatMap(config => config.rows || []);
 
-    this.dataColumnWidths = this.calcuteFieldsMaxWidth(
+    this.dataColumnWidths = this.calculateFieldsMaxWidth(
       mixedSectionConfigRows,
       chartDataSet as IChartDataSet<string>,
       styleConfigs,
@@ -339,7 +340,7 @@ class BasicTableChart extends ReactChart {
     };
   }
 
-  private calcuteFieldsMaxWidth(
+  private calculateFieldsMaxWidth(
     mixedSectionConfigRows,
     chartDataSet: IChartDataSet<string>,
     styleConfigs,
@@ -989,7 +990,7 @@ class BasicTableChart extends ReactChart {
       : false;
   }
 
-  private createrEventParams = params => ({
+  private createEventParams = params => ({
     type: 'click',
     componentType: 'table',
     seriesType: undefined,
@@ -1008,7 +1009,7 @@ class BasicTableChart extends ReactChart {
     pageNo: number,
     aggOperator?: string,
   ) {
-    const eventParams = this.createrEventParams({
+    const eventParams = this.createEventParams({
       seriesType: 'paging-sort-filter',
       seriesName,
       value: {
@@ -1032,7 +1033,7 @@ class BasicTableChart extends ReactChart {
     rowData: any,
     aggOperator?: string,
   ) {
-    const eventParams = this.createrEventParams({
+    const eventParams = this.createEventParams({
       seriesType: 'body',
       name: seriesName,
       data: {

@@ -24,7 +24,10 @@ import {
   ChartDataSectionType,
   ChartStyleConfig,
 } from 'app/types/ChartConfig';
-import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
+import {
+  ChartCommonConfig,
+  ChartStyleConfigDTO,
+} from 'app/types/ChartConfigDTO';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
@@ -297,8 +300,6 @@ const transferMixedToOther = (
   return targetConfig!;
 };
 
-const balanceAssignConfigRows = sources => {};
-
 export function isInRange(limit?: ChartDataConfig['limit'], count: number = 0) {
   return cond(
     [isEmpty, true],
@@ -424,12 +425,7 @@ export function mergeChartStyleConfigs(
     const sEle =
       'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
 
-    if (!isUndefined(sEle?.['value']) && (!sEle?.comType || !tEle.comType)) {
-      tEle['value'] = sEle?.['value'];
-    } else if (
-      !isUndefined(sEle?.['value']) &&
-      sEle?.comType === tEle.comType
-    ) {
+    if (!isUndefined(sEle?.['value'])) {
       tEle['value'] = sEle?.['value'];
     }
     if (!isEmptyArray(tEle?.rows)) {
@@ -497,3 +493,82 @@ export const filterSqlOperatorName = (requestParams, widgetData) => {
   });
   return widgetData;
 };
+
+// 获取当前echart坐标轴区域的宽度
+export function getAxisLengthByConfig(config: ChartCommonConfig) {
+  const { chart, xAxis, yAxis, grid, series, yAxisNames, horizon } = config;
+  const axisOpts = !horizon ? xAxis : yAxis;
+  // datart 布局配置分为百分比和像素
+  const getPositionLengthInfo = (
+    positionConfig: string | number,
+  ): {
+    length: number;
+    type: 'percent' | 'px';
+  } => {
+    if (typeof positionConfig === 'string') {
+      const lengthPercentInt = parseInt(positionConfig.replace('%', ''), 10);
+      if (isNaN(lengthPercentInt)) {
+        throw new Error(`${positionConfig} is not a number`);
+      }
+      return {
+        length: lengthPercentInt / 100,
+        type: 'percent',
+      };
+    }
+    return {
+      length: positionConfig,
+      type: 'px',
+    };
+  };
+
+  // 获取坐标轴宽度
+  const getAxisWidth = (YAxisLength: number): number => {
+    return (Array.isArray(axisOpts) ? axisOpts : [axisOpts]).reduce(
+      (prev, item) => {
+        const { fontSize, show } = item.axisLabel;
+        // 预留一个字符长度
+        const axisLabelMaxWidth = show ? (YAxisLength + 1) * fontSize : 0;
+        prev += axisLabelMaxWidth;
+        return prev;
+      },
+      0,
+    );
+  };
+
+  const { containerLabel, left, right } = grid;
+
+  // 找到轴上最大的数字长度
+  let foundMaxAxisLength = 0;
+
+  if (containerLabel && !horizon) {
+    foundMaxAxisLength = series.reduce((prev, sery) => {
+      sery?.data?.forEach(item => {
+        yAxisNames.forEach(name => {
+          if (item.name === name) {
+            const yNumStr = `${item[0]}`;
+            if (yNumStr.length > prev) {
+              prev = yNumStr.length;
+            }
+          }
+        });
+      });
+      return prev;
+    }, 0);
+  }
+
+  const axisLabelMaxWidth = getAxisWidth(foundMaxAxisLength);
+
+  const left_ = getPositionLengthInfo(left);
+  const right_ = getPositionLengthInfo(right);
+
+  const containerWidth = chart.getWidth();
+
+  // 左右边距
+  const leftWidth =
+    left_.type === 'px' ? left_.length : containerWidth * left_.length;
+  const rightWidth =
+    right_.type === 'px' ? right_.length : containerWidth * right_.length;
+
+  // 坐标轴区域宽度 = 容器宽度 - 最大字符所占长度 - 左右边距
+  return containerWidth - axisLabelMaxWidth - leftWidth - rightWidth;
+}

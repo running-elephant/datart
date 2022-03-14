@@ -349,8 +349,8 @@ export type ChartStyleSectionRowOption = {
   showFontColor?: boolean;
 
   /**
-   * Suppport Components: @see BasicRadio, @see BasicSelector and etc
-   * Default is false for now, will be change in futrue version
+   * Support Components: @see BasicRadio, @see BasicSelector and etc
+   * Default is false for now, will be change in future version
    */
   translateItemLabel?: boolean;
 };

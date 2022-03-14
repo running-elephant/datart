@@ -29,7 +29,7 @@ export const ScaleModeSet: FC<{
   const tScale = useI18NPrefix(`viz.scaleMode`);
   return (
     <Form.Item label={t('scaleMode')} name="scaleMode">
-      <Select style={{ width: '100%' }}>
+      <Select className="datart-ant-select">
         {SCALE_MODE__OPTIONS.map(item => (
           <Select.Option key={item.value} value={item.value}>
             {tScale(item.value)}

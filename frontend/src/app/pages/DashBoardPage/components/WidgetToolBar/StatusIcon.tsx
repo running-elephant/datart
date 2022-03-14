@@ -45,10 +45,14 @@ export const LockIcon: React.FC<{
 
 export const WaitingIcon: React.FC<{
   title: React.ReactNode;
-}> = ({ title }) => {
+  onClick?: React.MouseEventHandler<HTMLSpanElement> | undefined;
+  onMouseEnter?: React.MouseEventHandler<HTMLSpanElement> | undefined;
+}> = ({ title, onClick, onMouseEnter }) => {
   return (
     <Tooltip title={title ?? 'waitingLoad'}>
       <Button
+        onClick={onClick}
+        onMouseEnter={onMouseEnter}
         icon={<ClockCircleOutlined style={{ color: PRIMARY }} />}
         type="link"
       />
