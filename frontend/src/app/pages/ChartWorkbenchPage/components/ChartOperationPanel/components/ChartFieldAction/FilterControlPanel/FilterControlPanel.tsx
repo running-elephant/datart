@@ -56,6 +56,7 @@ const FilterControlPanel: FC<
       needRefresh?: boolean,
     ) => void;
     fetchDataByField?: (fieldId) => Promise<string[]>;
+    form;
   } & I18NComponentProps
 > = memo(
   ({
@@ -67,6 +68,7 @@ const FilterControlPanel: FC<
     aggregation,
     onConfigChange,
     fetchDataByField,
+    form,
   }) => {
     const formItemStyles = {
       labelCol: { span: 4 },
@@ -129,6 +131,12 @@ const FilterControlPanel: FC<
       });
       setFilter(newFilter);
       handleConfigChange(alias, aggregate, newFilter);
+      form?.setFields([
+        {
+          name: 'filterOption',
+          value: undefined,
+        },
+      ]);
     };
 
     const handleWidthOptionChange = width => {
