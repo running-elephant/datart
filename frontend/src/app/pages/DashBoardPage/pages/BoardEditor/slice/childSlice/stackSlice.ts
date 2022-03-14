@@ -48,10 +48,6 @@ export const editBoardStackSlice = createSlice({
   name: 'editBoard',
   initialState: initEditBoardState,
   reducers: {
-    clearEditBoardState(state) {
-      state.dashBoard = {} as Dashboard;
-      state.widgetRecord = {};
-    },
     setBoardToEditStack(state, action: PayloadAction<EditBoardStack>) {
       const record = action.payload;
       Object.keys(record).forEach(key => {
