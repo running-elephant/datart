@@ -18,6 +18,7 @@
 
 import gridSvg from 'app/assets/images/grid.svg';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+
 function useSlideStyle(
   autoFit: boolean | undefined,
   editing: boolean,
@@ -27,6 +28,9 @@ function useSlideStyle(
   scaleMode: string,
 ) {
   // 基础1：1 不缩放
+  const padNum = useMemo(() => {
+    return editing ? 64 : 0;
+  }, [editing]);
   const [scale, setScale] = useState<[number, number]>([1, 1]);
   const [zoomRatio, setZoomRatio] = useState(1);
   const [sliderValue, setSliderValue] = useState(20);
@@ -83,8 +87,9 @@ function useSlideStyle(
       return [0, 0];
     }
 
-    const landscapeScale = (containerWidth / boardWidth) * zoomRatio;
-    const portraitScale = (containerHeight / boardHeight) * zoomRatio;
+    const landscapeScale = ((containerWidth - padNum) / boardWidth) * zoomRatio;
+    const portraitScale =
+      ((containerHeight - padNum) / boardHeight) * zoomRatio;
     const newScale: [number, number] = new Array<number>(2) as [number, number];
 
     if (autoFit) {
@@ -115,6 +120,7 @@ function useSlideStyle(
   }, [
     containerWidth,
     containerHeight,
+    padNum,
     boardWidth,
     zoomRatio,
     boardHeight,
@@ -139,15 +145,18 @@ function useSlideStyle(
       height = rect.height;
     }
     const translateX = Math.max(
-      (Math.max(width - boardWidth * nextScale[0]) / (2 * boardWidth)) * 100,
+      (Math.max(width - boardWidth * nextScale[0], padNum) / (2 * boardWidth)) *
+        100,
       0,
     );
     const translateY = Math.max(
-      (Math.max(height - boardHeight * nextScale[1]) / (2 * boardHeight)) * 100,
+      (Math.max(height - boardHeight * nextScale[1], padNum) /
+        (2 * boardHeight)) *
+        100,
       0,
     );
     return [translateX, translateY];
-  }, [rect, boardWidth, nextScale, boardHeight]);
+  }, [rect, boardWidth, nextScale, padNum, boardHeight]);
   nextTranslate = nextTranslate || slideTranslate;
   slideTranslateChange(nextTranslate);
 
@@ -157,8 +166,8 @@ function useSlideStyle(
       return newBackgroundStyle;
     }
     if (
-      boardWidth * nextScale[0] >= containerWidth ||
-      boardHeight * nextScale[1] >= containerHeight
+      boardWidth * nextScale[0] + padNum >= containerWidth ||
+      boardHeight * nextScale[1] + padNum >= containerHeight
     ) {
       newBackgroundStyle.overflow = 'auto';
     }
@@ -172,6 +181,7 @@ function useSlideStyle(
     containerHeight,
     boardWidth,
     nextScale,
+    padNum,
     boardHeight,
     editing,
   ]);
