@@ -69,7 +69,6 @@ public class WebExceptionHandler {
                 .message(e.getBindingResult().getFieldErrors().stream()
                         .map(error -> error.getField() + ":" + error.getDefaultMessage())
                         .collect(Collectors.toList()).toString())
-                .exception(e)
                 .build();
     }
 
