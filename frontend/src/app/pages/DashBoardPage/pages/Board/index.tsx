@@ -180,7 +180,7 @@ export const Board: React.FC<BoardProps> = memo(
     const handleAddToStory = useCallback(
       storyId => {
         history.push({
-          pathname: `/organizations/${orgId}/vizs/${storyId}/storyEditor`,
+          pathname: `/organizations/${orgId}/vizs/storyEditor/${storyId}`,
           state: {
             addDashboardId: boardId,
           },

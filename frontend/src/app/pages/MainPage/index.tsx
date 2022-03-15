@@ -30,6 +30,7 @@ import {
 import styled from 'styled-components/macro';
 import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
 import { NotFoundPage } from '../NotFoundPage';
+import { StoryEditor } from '../StoryBoardPage/Editor';
 import { StoryPlayer } from '../StoryBoardPage/Player';
 import { AccessRoute } from './AccessRoute';
 import { Background } from './Background';
@@ -145,7 +146,10 @@ export function MainPage() {
             path="/organizations/:orgId/vizs/storyPlayer/:storyId"
             render={() => <StoryPlayer />}
           />
-
+          <Route
+            path="/organizations/:orgId/vizs/storyEditor/:storyId"
+            render={() => <StoryEditor />}
+          />
           <Route
             path="/organizations/:orgId/vizs/:vizId?"
             render={() => (
