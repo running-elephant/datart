@@ -23,7 +23,6 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { ActionCreators } from 'redux-undo';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
 import { BoardLoading } from '../../components/BoardLoading';
@@ -37,11 +36,7 @@ import ControllerWidgetPanel from './components/ControllerWidgetPanel';
 import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
 import FreeEditor from './FreeEditor/index';
-import {
-  editBoardStackActions,
-  editDashBoardInfoActions,
-  editWidgetInfoActions,
-} from './slice';
+import { editDashBoardInfoActions, editWidgetInfoActions } from './slice';
 import {
   addVariablesToBoard,
   clearEditBoardState,
@@ -116,8 +111,7 @@ export const BoardEditor: React.FC<{
       const pathName = history.location.pathname;
       const prePath = pathName.split('/boardEditor')[0];
       history.push(`${prePath}`);
-      dispatch(editBoardStackActions.clearEditBoardState());
-      dispatch(ActionCreators.clearHistory());
+      dispatch(clearEditBoardState());
       // 更新view界面数据
       dispatch(fetchBoardDetail({ dashboardRelId: boardId }));
     },
