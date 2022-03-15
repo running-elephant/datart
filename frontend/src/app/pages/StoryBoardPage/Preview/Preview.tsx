@@ -109,7 +109,7 @@ export const StoryPagePreview: React.FC<{
   }, [history, orgId, storyId]);
 
   const playStory = useCallback(() => {
-    window.open(`${storyId}/storyPlay`, '_blank');
+    window.open(`storyPlayer/${storyId}`, '_blank');
   }, [storyId]);
 
   const onPublish = useCallback(() => {
