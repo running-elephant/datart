@@ -40,7 +40,6 @@ describe('<BasicColorSelector />', () => {
   test('should hide label when options hide label', () => {
     const { container } = render(
       <BasicColorSelector
-        translate={translator}
         data={{
           label: 'Component Label',
           options: { hideLabel: true },

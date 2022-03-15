@@ -47,7 +47,6 @@ describe('<BasicCheckbox />', () => {
       <BasicCheckbox
         ancestors={ancestors}
         onChange={handleOnChangeEvent}
-        translate={translator}
         data={{
           label: 'Component Label',
           value: true,
