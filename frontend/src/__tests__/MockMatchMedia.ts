@@ -16,7 +16,13 @@
  * limitations under the License.
  */
 
-export { default as CollapseHeader } from './CollapseHeader';
-export { default as CollectionLayout } from './CollectionLayout';
-export { default as GroupLayout } from './GroupLayout';
-export { default as ItemLayout } from './ItemLayout';
+global.matchMedia =
+  global.matchMedia ||
+  function () {
+    return {
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+    };
+  };
+
+export {};

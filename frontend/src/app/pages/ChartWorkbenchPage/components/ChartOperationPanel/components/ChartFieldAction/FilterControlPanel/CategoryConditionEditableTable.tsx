@@ -142,7 +142,7 @@ const CategoryConditionEditableTable: FC<
       const newRow: RelationFilterValue = {
         key: String(newKey),
         label: String(newKey),
-        isSelected: false,
+        isSelected: true,
       };
       const currentRows = rows.concat([newRow]);
       handleFilterConditionChange(currentRows);
@@ -212,7 +212,6 @@ const CategoryConditionEditableTable: FC<
           bordered
           rowKey={(r: RelationFilterValue) => `${r.key}-${r.label}`}
           columns={columnsWithCell}
-          pagination={false}
           onRow={(_, index) =>
             ({
               index,

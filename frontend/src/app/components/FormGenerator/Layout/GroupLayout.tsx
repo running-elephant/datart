@@ -22,13 +22,13 @@ import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
-import CollapseHeader from '../CollapseHeader';
 import {
   FormGeneratorLayoutProps,
   GroupLayoutMode,
   ItemComponentType,
 } from '../types';
 import { groupLayoutComparer } from '../utils';
+import CollapseHeader from './CollapseHeader';
 import CollectionLayout from './CollectionLayout';
 
 const { Panel } = Collapse;
