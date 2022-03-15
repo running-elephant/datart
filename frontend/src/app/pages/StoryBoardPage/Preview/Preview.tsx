@@ -19,7 +19,6 @@ import { Layout, message } from 'antd';
 import { Split } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
-import { fetchBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thunk';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import {
   deleteViz,
@@ -33,14 +32,12 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
-import { Route, Switch } from 'react-router-dom';
 import 'reveal.js/dist/reveal.css';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
 import PageThumbnailList from '../components/PageThumbnailList';
 import StoryHeader from '../components/StoryHeader';
 import StoryPageItem from '../components/StoryPageItem';
-import { StoryEditor } from '../Editor';
 import { storyActions } from '../slice';
 import {
   makeSelectStoryBoardById,
@@ -95,17 +92,8 @@ export const StoryPagePreview: React.FC<{
     return currentPage;
   }, [currentPageIndex, sortedPages]);
 
-  const onCloseStoryEditor = useCallback(() => {
-    history.replace(`/organizations/${orgId}/vizs/${storyId}`);
-    if (!currentPage?.id) return;
-    onPageClick(0, currentPage?.id, false);
-    if (currentPage.relType === 'DASHBOARD' && currentPage.relId) {
-      dispatch(fetchBoardDetail({ dashboardRelId: currentPage.relId }));
-    }
-  }, [currentPage, dispatch, history, onPageClick, orgId, storyId]);
-
   const toggleEdit = useCallback(() => {
-    history.push(`/organizations/${orgId}/vizs/${storyId}/storyEditor`);
+    history.push(`/organizations/${orgId}/vizs/storyEditor/${storyId}`);
   }, [history, orgId, storyId]);
 
   const playStory = useCallback(() => {
@@ -263,17 +251,6 @@ export const StoryPagePreview: React.FC<{
               ))}
             </Content>
           </Container>
-          <Switch>
-            <Route
-              path="/organizations/:orgId/vizs/:vizId?/storyEditor"
-              render={() => (
-                <StoryEditor
-                  storyId={storyId}
-                  onCloseEditor={onCloseStoryEditor}
-                />
-              )}
-            />
-          </Switch>
         </Wrapper>
       </StoryContext.Provider>
     </DndProvider>
