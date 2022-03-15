@@ -110,7 +110,7 @@ const TimerWidget: React.FC = () => {
     const nextWidget = produce(widget, draft => {
       (draft.config.content as MediaWidgetContent).timerConfig = newTimerConfig;
     });
-    widgetUpdate(nextWidget);
+    widgetUpdate(nextWidget, true);
   };
 
   const onTimeChange = (ancestors, data, needRefresh) => {
@@ -119,7 +119,7 @@ const TimerWidget: React.FC = () => {
     const nextWidget = produce(widget, draft => {
       (draft.config.content as MediaWidgetContent).timerConfig = newTimerConfig;
     });
-    widgetUpdate(nextWidget);
+    widgetUpdate(nextWidget, true);
   };
   const onFormatChange = (ancestors, data) => {
     onTimeChange([], { timeFormat: data }, false);
