@@ -18,14 +18,15 @@
 
 import { Form, Input, Modal, ModalProps } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { fetchCheckName } from 'app/utils/fetch';
 import debounce from 'debounce-promise';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
-import { request } from 'utils/request';
 import { selectSaveOrganizationLoading } from './slice/selectors';
 import { addOrganization } from './slice/thunks';
+
 const FormItem = Form.Item;
 
 interface OrganizationFormProps extends Omit<ModalProps, 'onCancel'> {
@@ -90,14 +91,13 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
             },
             {
               validator: debounce((_, value) => {
-                return request({
-                  url: `/orgs/check/name`,
-                  method: 'POST',
-                  data: { name: value },
-                }).then(
-                  () => Promise.resolve(),
-                  err => Promise.reject(new Error(err.response.data.message)),
-                );
+                if (!value.trim()) {
+                  return Promise.reject(
+                    `${t('name')}${tg('validation.required')}`,
+                  );
+                }
+                const data = { name: value };
+                return fetchCheckName('orgs', data);
               }, DEFAULT_DEBOUNCE_WAIT),
             },
           ]}
