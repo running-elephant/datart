@@ -24,7 +24,7 @@
     "build:analyze": "craco build && source-map-explorer 'build/static/js/*.js'",
     "test": "craco test",
     "test:coverage": "npm run test -- --watchAll=false --coverage",
-    "test:ci": "npm run test -- --watchAll=false --runInBand",
+    "test:ci": "npm run test -- --watchAll=false --runInBand --silent",
     "checkTs": "tsc --noEmit",
     "eslint": "eslint --ext js,ts,tsx",
     "lint": "npm run eslint src",
