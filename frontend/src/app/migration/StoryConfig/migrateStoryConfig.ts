@@ -18,7 +18,11 @@
 import { StoryConfig } from 'app/pages/StoryBoardPage/slice/types';
 import { getInitStoryConfig } from 'app/pages/StoryBoardPage/utils';
 import { versionCanDo } from '../utils';
-import { VERSION_BETA_0, VERSION_BETA_1, VERSION_BETA_2 } from './../constants';
+import {
+  APP_VERSION_BETA_0,
+  APP_VERSION_BETA_1,
+  APP_VERSION_BETA_2,
+} from './../constants';
 
 export const parseStoryConfig = (storyConfig: string) => {
   if (!storyConfig) {
@@ -34,18 +38,18 @@ export const parseStoryConfig = (storyConfig: string) => {
 };
 
 export const beta0 = (config: StoryConfig) => {
-  if (!versionCanDo(VERSION_BETA_0, config.version)) return config;
-  config.version = VERSION_BETA_0;
+  if (!versionCanDo(APP_VERSION_BETA_0, config.version)) return config;
+  config.version = APP_VERSION_BETA_0;
   return config;
 };
 export const beta1 = (config: StoryConfig) => {
-  if (!versionCanDo(VERSION_BETA_1, config.version)) return config;
-  config.version = VERSION_BETA_1;
+  if (!versionCanDo(APP_VERSION_BETA_1, config.version)) return config;
+  config.version = APP_VERSION_BETA_1;
   return config;
 };
 export const beta2 = (config: StoryConfig) => {
-  if (!versionCanDo(VERSION_BETA_2, config.version)) return config;
-  config.version = VERSION_BETA_2;
+  if (!versionCanDo(APP_VERSION_BETA_2, config.version)) return config;
+  config.version = APP_VERSION_BETA_2;
   return config;
 };
 export const migrateStoryConfig = (boardConfig: string) => {
