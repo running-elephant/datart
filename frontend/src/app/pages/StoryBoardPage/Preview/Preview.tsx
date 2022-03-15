@@ -17,7 +17,7 @@
  */
 import { Layout, message } from 'antd';
 import { Split } from 'app/components';
-import usePrefixI18N from 'app/hooks/useI18NPrefix';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
 import { fetchBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thunk';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
@@ -58,8 +58,8 @@ export const StoryPagePreview: React.FC<{
   allowManage?: boolean;
 }> = memo(({ orgId, storyId, allowShare, allowManage }) => {
   const dispatch = useDispatch();
-  const t = usePrefixI18N('viz.action');
-  const tg = usePrefixI18N('global');
+  const t = useI18NPrefix('viz.main');
+  const tg = useI18NPrefix('global');
   const history = useHistory();
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const publishLoading = useSelector(selectPublishLoading);
@@ -120,7 +120,13 @@ export const StoryPagePreview: React.FC<{
           vizType: 'STORYBOARD',
           publish: storyBoard.status === 1 ? true : false,
           resolve: () => {
-            message.success(`${storyBoard.status === 2 ? '取消' : ''}发布成功`);
+            message.success(
+              `${
+                storyBoard.status === 2
+                  ? t('unpublishSuccess')
+                  : t('publishSuccess')
+              }`,
+            );
             dispatch(
               storyActions.changeBoardPublish({
                 stroyId: storyBoard.id,
@@ -131,7 +137,7 @@ export const StoryPagePreview: React.FC<{
         }),
       );
     }
-  }, [dispatch, storyBoard]);
+  }, [dispatch, storyBoard, t]);
 
   const { sizes, setSizes } = useSplitSizes({
     limitedSide: 0,
