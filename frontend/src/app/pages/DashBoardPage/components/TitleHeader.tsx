@@ -27,6 +27,7 @@ import {
 import { Button, Dropdown, Space } from 'antd';
 import { ShareLinkModal } from 'app/components/VizOperationMenu';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { useSaveAsViz } from 'app/pages/MainPage/pages/VizPage/hooks/useSaveAsViz';
 import classnames from 'classnames';
 import { TITLE_SUFFIX } from 'globalConstants';
 import React, {
@@ -85,15 +86,12 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
       status,
       renderMode,
       allowManage,
+      boardId,
     } = useContext(BoardContext);
-    const {
-      updateBoard,
-      onGenerateShareLink,
-      onBoardToDownLoad,
-      onSaveAsVizs,
-    } = useContext(BoardActionContext);
+    const { updateBoard, onGenerateShareLink, onBoardToDownLoad } =
+      useContext(BoardActionContext);
     const { saving } = useContext(BoardInfoContext);
-
+    const saveAsViz = useSaveAsViz();
     const onOpenShareLink = useCallback(() => {
       setShowShareLinkModal(true);
     }, []);
@@ -127,7 +125,9 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
       },
       [onAddToStory, handleModalVisible],
     );
-
+    const onSaveAsVizs = useCallback(() => {
+      saveAsViz(boardId, 'DASHBOARD');
+    }, [boardId, saveAsViz]);
     return (
       <Wrapper>
         <h1 className={classnames({ disabled: status < 2 })}>
@@ -212,7 +212,7 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
             onGenerateShareLink={onGenerateShareLink}
           />
         )}
-        {!!onSaveAsVizs && (
+        {!!saveAsViz && (
           <SaveToStoryBoard
             title={t('addToStory')}
             orgId={orgId as string}

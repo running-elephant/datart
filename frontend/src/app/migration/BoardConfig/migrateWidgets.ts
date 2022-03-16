@@ -27,7 +27,11 @@ import {
   VALUE_SPLITTER,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { versionCanDo } from '../utils';
-import { VERSION_BETA_0, VERSION_BETA_1, VERSION_BETA_2 } from './../constants';
+import {
+  APP_VERSION_BETA_0,
+  APP_VERSION_BETA_1,
+  APP_VERSION_BETA_2,
+} from './../constants';
 
 /**
  *
@@ -60,7 +64,7 @@ export const convertWidgetRelationsToObj = (
  */
 export const beta0 = (widget?: Widget) => {
   if (!widget) return undefined;
-  if (!versionCanDo(VERSION_BETA_0, widget?.config.version)) return widget;
+  if (!versionCanDo(APP_VERSION_BETA_0, widget?.config.version)) return widget;
 
   // 1.放弃了 filter type 新的是 controller
   if ((widget.config.type as any) === 'filter') {
@@ -81,24 +85,24 @@ export const beta0 = (widget?: Widget) => {
       ).split(VALUE_SPLITTER);
     }
   }
-  widget.config.version = VERSION_BETA_0;
+  widget.config.version = APP_VERSION_BETA_0;
   return widget;
 };
 
 export const beta1 = (widget?: Widget) => {
   if (!widget) return undefined;
-  if (!versionCanDo(VERSION_BETA_1, widget?.config.version)) return widget;
-  widget.config.version = VERSION_BETA_1;
+  if (!versionCanDo(APP_VERSION_BETA_1, widget?.config.version)) return widget;
+  widget.config.version = APP_VERSION_BETA_1;
   return widget;
 };
 export const beta2 = (widget?: Widget) => {
   if (!widget) return undefined;
-  if (!versionCanDo(VERSION_BETA_2, widget?.config.version)) return widget;
+  if (!versionCanDo(APP_VERSION_BETA_2, widget?.config.version)) return widget;
   // widget.lock
   if (!widget.config.lock) {
     widget.config.lock = false;
   }
-  widget.config.version = VERSION_BETA_2;
+  widget.config.version = APP_VERSION_BETA_2;
   return widget;
 };
 /**

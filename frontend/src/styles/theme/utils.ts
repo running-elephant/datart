@@ -57,6 +57,6 @@ export async function changeAntdTheme(themeKey: string) {
   try {
     await (window as any).less.modifyVars(getVarsToBeModified(themeKey));
   } catch (error) {
-    throw error;
+    console.log(error);
   }
 }

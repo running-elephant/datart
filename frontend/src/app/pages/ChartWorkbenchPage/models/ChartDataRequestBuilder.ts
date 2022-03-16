@@ -39,7 +39,7 @@ import {
   getTime,
   recommendTimeRangeConverter,
 } from 'app/utils/time';
-import { TIME_FORMATTER } from 'globalConstants';
+import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 
 export class ChartDataRequestBuilder {
@@ -158,13 +158,18 @@ export class ChartDataRequestBuilder {
       }, [])
       .filter(col => Boolean(col.filter?.condition))
       .filter(col => {
-        if (Array.isArray(col.filter?.condition?.value)) {
+        if (
+          col.filter?.condition?.operator === FilterSqlOperator.Null ||
+          col.filter?.condition?.operator === FilterSqlOperator.NotNull
+        ) {
+          return true;
+        } else if (Array.isArray(col.filter?.condition?.value)) {
           return Boolean(col.filter?.condition?.value?.length);
         }
         return true;
       })
       .map(col => col);
-    return this.normalizeFilters(fields);
+    return this.normalizeFilters(fields) as ChartDataRequestFilter[];
   }
 
   private normalizeFilters = (fields: ChartDataSectionField[]) => {
@@ -228,15 +233,27 @@ export class ChartDataRequestBuilder {
       ];
     };
 
-    return fields.map(field => ({
-      aggOperator:
-        field.aggregate === AggregateFieldActionType.NONE
-          ? null
-          : field.aggregate,
-      column: field.colName,
-      sqlOperator: field.filter?.condition?.operator!,
-      values: _transformFieldValues(field) || [],
-    }));
+    return fields
+      .map(field => {
+        if (
+          field.filter?.condition?.operator === FilterSqlOperator.In ||
+          field.filter?.condition?.operator === FilterSqlOperator.NotIn
+        ) {
+          if (isEmptyArray(_transformFieldValues(field))) {
+            return undefined;
+          }
+        }
+        return {
+          aggOperator:
+            field.aggregate === AggregateFieldActionType.NONE
+              ? null
+              : field.aggregate,
+          column: field.colName,
+          sqlOperator: field.filter?.condition?.operator!,
+          values: _transformFieldValues(field) || [],
+        };
+      })
+      .filter(Boolean);
   };
 
   private buildOrders() {
