@@ -23,7 +23,11 @@ import {
   migrateBoardConfig,
   parseBoardConfig,
 } from '../BoardConfig/migrateBoardConfig';
-import { CURRENT_VERSION, VERSION_BETA_0, VERSION_BETA_1 } from '../constants';
+import {
+  APP_CURRENT_VERSION,
+  APP_VERSION_BETA_0,
+  APP_VERSION_BETA_1,
+} from '../constants';
 describe('test migrateBoard ', () => {
   test('parse board.config', () => {
     const config = '{}';
@@ -31,10 +35,10 @@ describe('test migrateBoard ', () => {
   });
   test('Only versions prior to Beta1 can be processed', () => {
     const config = {
-      version: VERSION_BETA_1,
+      version: APP_VERSION_BETA_1,
     } as DashboardConfig;
     expect(beta0(config)).toMatchObject({
-      version: VERSION_BETA_1,
+      version: APP_VERSION_BETA_1,
     });
   });
   test('add config.initialQuery=true if no initialQuery', () => {
@@ -79,9 +83,9 @@ describe('test migrateBoard ', () => {
   test('test beta0 version', () => {
     const config = {} as DashboardConfig;
     expect(beta0(config)).toMatchObject({
-      version: VERSION_BETA_0,
+      version: APP_VERSION_BETA_0,
     });
-    const config1 = { version: VERSION_BETA_0 } as DashboardConfig;
+    const config1 = { version: APP_VERSION_BETA_0 } as DashboardConfig;
     expect(beta0(config1)).toMatchObject(config1);
   });
 
@@ -89,7 +93,7 @@ describe('test migrateBoard ', () => {
     const config = '{}';
     expect(migrateBoardConfig(config)).toMatchObject({
       type: 'auto',
-      version: CURRENT_VERSION,
+      version: APP_CURRENT_VERSION,
     } as DashboardConfig);
   });
 });

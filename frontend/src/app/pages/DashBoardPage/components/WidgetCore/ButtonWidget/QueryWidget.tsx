@@ -21,16 +21,17 @@ import { darken, getLuminance, lighten } from 'polished';
 import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
 import { BoardActionContext } from '../../BoardProvider/BoardActionProvider';
+import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
-export interface CompProps {}
-export const QueryWidget: React.FC<CompProps> = () => {
+export const QueryWidget: React.FC<{}> = () => {
   const widget = useContext(WidgetContext);
+  const { editing, renderMode } = useContext(BoardContext);
   const { onWidgetsQuery } = useContext(BoardActionContext);
 
   const onQuery = e => {
     e.stopPropagation();
-    onWidgetsQuery();
+    onWidgetsQuery(editing, renderMode);
   };
 
   const { name, nameConfig, background } = widget.config;

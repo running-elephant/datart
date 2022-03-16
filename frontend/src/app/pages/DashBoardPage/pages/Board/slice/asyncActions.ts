@@ -85,23 +85,20 @@ export const handleServerBoardAction =
   };
 
 export const boardDownLoadAction =
-  (params: { boardId: string; renderMode: VizRenderMode }) =>
-  async (dispatch, getState) => {
-    const { boardId, renderMode } = params;
+  (params: { boardId: string }) => async (dispatch, getState) => {
+    const { boardId } = params;
     const { requestParams, fileName } = await dispatch(
       getBoardDownloadParams({ boardId }),
     );
-    if (renderMode === 'read') {
-      dispatch(
-        makeDownloadDataTask({
-          downloadParams: requestParams,
-          fileName,
-          resolve: () => {
-            dispatch(mainActions.setDownloadPolling(true));
-          },
-        }),
-      );
-    }
+    dispatch(
+      makeDownloadDataTask({
+        downloadParams: requestParams,
+        fileName,
+        resolve: () => {
+          dispatch(mainActions.setDownloadPolling(true));
+        },
+      }),
+    );
   };
 export const getBoardDownloadParams =
   (params: { boardId: string }) => (dispatch, getState) => {
