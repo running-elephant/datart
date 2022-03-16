@@ -71,16 +71,6 @@ class Chart implements IChart {
     );
   }
 
-  /**
-   * @deprecated This function is not used
-   *
-   * @return {*}
-   * @memberof Chart
-   */
-  public getStateHistory() {
-    return this._stateHistory.join(' - ');
-  }
-
   public getDependencies(): string[] {
     return this.dependency;
   }
