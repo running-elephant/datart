@@ -135,7 +135,11 @@ export const Board: React.FC<BoardProps> = memo(
             publish: dashboard.status === 1 ? true : false,
             resolve: () => {
               message.success(
-                `${dashboard.status === 2 ? '取消' : ''}发布成功`,
+                `${
+                  dashboard.status === 2
+                    ? t('unpublishSuccess')
+                    : t('publishSuccess')
+                }`,
               );
               dispatch(
                 boardActions.changeBoardPublish({
@@ -147,7 +151,7 @@ export const Board: React.FC<BoardProps> = memo(
           }),
         );
       }
-    }, [dashboard, dispatch, boardId]);
+    }, [dashboard, dispatch, t, boardId]);
 
     const redirect = useCallback(
       tabKey => {
@@ -176,7 +180,7 @@ export const Board: React.FC<BoardProps> = memo(
     const handleAddToStory = useCallback(
       storyId => {
         history.push({
-          pathname: `/organizations/${orgId}/vizs/${storyId}/storyEditor`,
+          pathname: `/organizations/${orgId}/vizs/storyEditor/${storyId}`,
           state: {
             addDashboardId: boardId,
           },

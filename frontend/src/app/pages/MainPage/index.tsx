@@ -30,6 +30,8 @@ import {
 } from 'react-router';
 import styled from 'styled-components/macro';
 import { NotFoundPage } from '../NotFoundPage';
+import { StoryEditor } from '../StoryBoardPage/Editor';
+import { StoryPlayer } from '../StoryBoardPage/Player';
 import { AccessRoute } from './AccessRoute';
 import { Background } from './Background';
 import { Navbar } from './Navbar';
@@ -138,6 +140,15 @@ export function MainPage() {
                 </AccessRoute>
               );
             }}
+          />
+
+          <Route
+            path="/organizations/:orgId/vizs/storyPlayer/:storyId"
+            render={() => <StoryPlayer />}
+          />
+          <Route
+            path="/organizations/:orgId/vizs/storyEditor/:storyId"
+            render={() => <StoryEditor />}
           />
           <Route
             path="/organizations/:orgId/vizs/:vizId?"

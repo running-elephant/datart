@@ -36,7 +36,6 @@ import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
-import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
 import { CloneValueDeep } from 'utils/object';
 import { request2 } from 'utils/request';
@@ -82,7 +81,6 @@ export const getEditBoardDetail = createAsyncThunk<
     if (editDashboard?.id === dashboardId) {
       return null;
     }
-    dispatch(ActionCreators.clearHistory());
     dispatch(fetchEditBoardDetail(dashboardId));
     return null;
   },

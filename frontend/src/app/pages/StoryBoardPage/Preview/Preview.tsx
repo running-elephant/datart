@@ -17,9 +17,8 @@
  */
 import { Layout, message } from 'antd';
 import { Split } from 'app/components';
-import usePrefixI18N from 'app/hooks/useI18NPrefix';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
-import { fetchBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thunk';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import {
   deleteViz,
@@ -33,14 +32,12 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
-import { Route, Switch } from 'react-router-dom';
 import 'reveal.js/dist/reveal.css';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
 import PageThumbnailList from '../components/PageThumbnailList';
 import StoryHeader from '../components/StoryHeader';
 import StoryPageItem from '../components/StoryPageItem';
-import { StoryEditor } from '../Editor';
 import { storyActions } from '../slice';
 import {
   makeSelectStoryBoardById,
@@ -58,8 +55,8 @@ export const StoryPagePreview: React.FC<{
   allowManage?: boolean;
 }> = memo(({ orgId, storyId, allowShare, allowManage }) => {
   const dispatch = useDispatch();
-  const t = usePrefixI18N('viz.action');
-  const tg = usePrefixI18N('global');
+  const t = useI18NPrefix('viz.main');
+  const tg = useI18NPrefix('global');
   const history = useHistory();
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const publishLoading = useSelector(selectPublishLoading);
@@ -95,21 +92,12 @@ export const StoryPagePreview: React.FC<{
     return currentPage;
   }, [currentPageIndex, sortedPages]);
 
-  const onCloseStoryEditor = useCallback(() => {
-    history.replace(`/organizations/${orgId}/vizs/${storyId}`);
-    if (!currentPage?.id) return;
-    onPageClick(0, currentPage?.id, false);
-    if (currentPage.relType === 'DASHBOARD' && currentPage.relId) {
-      dispatch(fetchBoardDetail({ dashboardRelId: currentPage.relId }));
-    }
-  }, [currentPage, dispatch, history, onPageClick, orgId, storyId]);
-
   const toggleEdit = useCallback(() => {
-    history.push(`/organizations/${orgId}/vizs/${storyId}/storyEditor`);
+    history.push(`/organizations/${orgId}/vizs/storyEditor/${storyId}`);
   }, [history, orgId, storyId]);
 
   const playStory = useCallback(() => {
-    window.open(`${storyId}/storyPlay`, '_blank');
+    window.open(`storyPlayer/${storyId}`, '_blank');
   }, [storyId]);
 
   const onPublish = useCallback(() => {
@@ -120,7 +108,13 @@ export const StoryPagePreview: React.FC<{
           vizType: 'STORYBOARD',
           publish: storyBoard.status === 1 ? true : false,
           resolve: () => {
-            message.success(`${storyBoard.status === 2 ? '取消' : ''}发布成功`);
+            message.success(
+              `${
+                storyBoard.status === 2
+                  ? t('unpublishSuccess')
+                  : t('publishSuccess')
+              }`,
+            );
             dispatch(
               storyActions.changeBoardPublish({
                 stroyId: storyBoard.id,
@@ -131,7 +125,7 @@ export const StoryPagePreview: React.FC<{
         }),
       );
     }
-  }, [dispatch, storyBoard]);
+  }, [dispatch, storyBoard, t]);
 
   const { sizes, setSizes } = useSplitSizes({
     limitedSide: 0,
@@ -257,17 +251,6 @@ export const StoryPagePreview: React.FC<{
               ))}
             </Content>
           </Container>
-          <Switch>
-            <Route
-              path="/organizations/:orgId/vizs/:vizId?/storyEditor"
-              render={() => (
-                <StoryEditor
-                  storyId={storyId}
-                  onCloseEditor={onCloseStoryEditor}
-                />
-              )}
-            />
-          </Switch>
         </Wrapper>
       </StoryContext.Provider>
     </DndProvider>
