@@ -17,10 +17,7 @@
  */
 
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
-import {
-  ChartDataSet,
-  ChartDataSetRow,
-} from 'app/components/ChartGraph/models/ChartDataSet';
+import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -301,9 +298,9 @@ export function getDefaultThemeColor() {
 /**
  * [中文] 使用路径语法获取配置信息，此方法已过时，请参考方法getStyles
  * </br>
- * [EN] Get config info by value path, please use getStyles instread
+ * [EN] Get config info by value path, please use getStyles instead
  *
- * @deprecated This function will be removed in next versiion, please use @see {@link getStyles} instread
+ * @deprecated This function will be removed in next version, please use @see {@link getStyles} instread
  * @param {ChartStyleConfig[]} styleConfigs
  * @param {string[]} paths
  * @return {*}  {*}
@@ -318,9 +315,9 @@ export function getStyleValue(
 /**
  * [中文] 使用路径语法获取配置信息，此方法已过时，请参考方法getStyles
  * </br>
- * [EN] Get setting config info by value path, please use getStyles instread
+ * [EN] Get setting config info by value path, please use getStyles instead
  *
- * @deprecated This function will be removed in next versiion, please use @see {@link getStyles} instread
+ * @deprecated This function will be removed in next version, please use @see {@link getStyles} instread
  * @export
  * @param {ChartStyleConfig[]} configs
  * @param {string} path

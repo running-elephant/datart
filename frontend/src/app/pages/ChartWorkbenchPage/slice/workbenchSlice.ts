@@ -24,7 +24,7 @@ import {
 } from '@reduxjs/toolkit';
 import { migrateChartConfig } from 'app/migration';
 import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
-import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
+import ChartManager from 'app/models/ChartManager';
 import { ResourceTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataRequest from 'app/types/ChartDataRequest';
@@ -48,8 +48,8 @@ import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
 import { rejectedActionMessageHandler } from 'utils/notification';
 import { request2 } from 'utils/request';
 import { listToTree, rejectHandle } from 'utils/utils';
+import { ChartDataRequestBuilder } from '../../../models/ChartDataRequestBuilder';
 import { ChartDTO } from '../../../types/ChartDTO';
-import { ChartDataRequestBuilder } from '../models/ChartDataRequestBuilder';
 
 export type ChartConfigPayloadType = {
   init?: ChartConfig;

@@ -18,13 +18,13 @@
 
 import { Radio, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
+import ChartFilterCondition, {
+  ConditionBuilder,
+} from 'app/models/ChartFilterCondition';
 import { FilterCondition } from 'app/types/ChartConfig';
 import { recommendTimeRangeConverter } from 'app/utils/time';
 import { RECOMMEND_TIME } from 'globalConstants';
 import { FC, memo, useMemo, useState } from 'react';
-import ChartFilterCondition, {
-  ConditionBuilder,
-} from '../../../../models/ChartFilterCondition';
 import CurrentRangeTime from './CurrentRangeTime';
 
 const RecommendRangeTimeSelector: FC<

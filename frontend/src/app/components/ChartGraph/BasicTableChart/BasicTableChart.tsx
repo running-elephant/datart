@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import ReactChart from 'app/models/ReactChart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
@@ -30,7 +31,6 @@ import {
 import { DATARTSEPERATOR } from 'globalConstants';
 import { Debugger } from 'utils/debugger';
 import { CloneValueDeep, isEmptyArray, Omit } from 'utils/object';
-import ReactChart from '../models/ReactChart';
 import AntdTableWrapper from './AntdTableWrapper';
 import {
   getCustomBodyCellStyle,

@@ -17,7 +17,7 @@
  */
 
 import { DatePicker } from 'antd';
-import { ConditionBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+import { ConditionBuilder } from 'app/models/ChartFilterCondition';
 import { FilterConditionType } from 'app/types/ChartConfig';
 import {
   formatTime,

@@ -30,7 +30,7 @@ import {
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
-import Chart from '../models/Chart';
+import Chart from '../../../models/Chart';
 import Config from './config';
 
 class BasicScatterChart extends Chart {

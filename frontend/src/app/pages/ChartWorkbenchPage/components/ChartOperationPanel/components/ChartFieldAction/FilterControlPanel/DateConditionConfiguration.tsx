@@ -20,7 +20,7 @@ import { Tabs } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import ChartFilterCondition, {
   ConditionBuilder,
-} from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+} from 'app/models/ChartFilterCondition';
 import { FilterConditionType } from 'app/types/ChartConfig';
 import { formatTime } from 'app/utils/time';
 import {
