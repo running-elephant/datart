@@ -27,7 +27,7 @@ describe('<BasicFont />', () => {
     translator = label => `This is a ${label}`;
   });
 
-  test.skip('should render component correct', async () => {
+  test('should render component correct', async () => {
     const { getByText, container } = render(
       <BasicFont
         ancestors={[]}
@@ -36,15 +36,15 @@ describe('<BasicFont />', () => {
           key: 'font',
           comType: 'font',
           label: 'Component Label',
-          value: true,
+          value: {
+            color: '#ccc',
+          },
         }}
       />,
     );
     const allSelectors = await screen.findAllByRole('combobox');
     expect(getByText('This is a Component Label')).toBeInTheDocument();
-    expect(
-      container.querySelector('[class^="ColorTag__ColorPicker"]'),
-    ).not.toBeNull();
+    expect(container.querySelector('[color*="#ccc"]')).not.toBeNull();
     expect(allSelectors).toHaveLength(4);
   });
 

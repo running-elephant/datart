@@ -26,7 +26,7 @@ describe('<BasicColorSelector />', () => {
     translator = label => `This is a ${label}`;
   });
 
-  test.skip('should render component correct', () => {
+  test('should render component correct', () => {
     const { container, getByText } = render(
       <BasicColorSelector
         translate={translator}
@@ -35,7 +35,7 @@ describe('<BasicColorSelector />', () => {
     );
 
     expect(getByText('This is a Component Label')).toBeInTheDocument();
-    expect(container.querySelector('[class*="ColorPicker"]')).not.toBeNull();
+    expect(container.querySelector('[color*="fafafa"]')).not.toBeNull();
   });
 
   test('should hide label when options hide label', () => {
