@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { strEnumType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { VizType } from './../../MainPage/pages/VizPage/slice/types';
 export interface StoryBoardState {
   storyMap: Record<string, StoryBoard>;
@@ -70,25 +69,25 @@ export interface TransitionEffect {
   speed: EffectSpeedType;
 }
 // "none" | "fade" | "slide" | "convex" | "concave" | "zoom"
-export const EffectInMap = strEnumType([
+export const EFFECT_IN_OPTIONS = [
   'none',
   'fade-in',
   'slide-in',
   'convex-in',
   'concave-in',
   'zoom-in',
-]);
-export type EffectInType = keyof typeof EffectInMap;
+] as const;
+export type EffectInType = typeof EFFECT_IN_OPTIONS[number];
 
-export const EffectOutMap = strEnumType([
+export const EFFECT_OUT_OPTIONS = [
   'none',
   'fade-out',
   'slide-out',
   'convex-out',
   'concave-out',
   'zoom-out',
-]);
-export type EffectOutType = keyof typeof EffectOutMap;
+] as const;
+export type EffectOutType = typeof EFFECT_OUT_OPTIONS[number];
 
-export const EffectSpeedMap = strEnumType(['default', 'slow', 'fast']);
-export type EffectSpeedType = keyof typeof EffectSpeedMap;
+export const EFFECT_SPEED_OPTIONS = ['default', 'slow', 'fast'] as const;
+export type EffectSpeedType = typeof EFFECT_SPEED_OPTIONS[number];
