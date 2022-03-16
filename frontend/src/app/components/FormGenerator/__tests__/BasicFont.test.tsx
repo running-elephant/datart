@@ -27,7 +27,7 @@ describe('<BasicFont />', () => {
     translator = label => `This is a ${label}`;
   });
 
-  test('should render component correct', async () => {
+  test.skip('should render component correct', async () => {
     const { getByText, container } = render(
       <BasicFont
         ancestors={[]}
