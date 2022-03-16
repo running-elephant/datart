@@ -33,8 +33,9 @@ describe('<BasicColorSelector />', () => {
         data={{ label: 'Component Label', value: '#fafafa' }}
       />,
     );
+
     expect(getByText('This is a Component Label')).toBeInTheDocument();
-    expect(container.querySelector('[class*="ColorPicker"]')).not.toBeNull();
+    expect(container.querySelector('[color*="fafafa"]')).not.toBeNull();
   });
 
   test('should hide label when options hide label', () => {

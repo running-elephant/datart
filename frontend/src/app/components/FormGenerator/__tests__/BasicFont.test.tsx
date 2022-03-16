@@ -36,15 +36,15 @@ describe('<BasicFont />', () => {
           key: 'font',
           comType: 'font',
           label: 'Component Label',
-          value: true,
+          value: {
+            color: '#ccc',
+          },
         }}
       />,
     );
     const allSelectors = await screen.findAllByRole('combobox');
     expect(getByText('This is a Component Label')).toBeInTheDocument();
-    expect(
-      container.querySelector('[class^="ColorTag__ColorPicker"]'),
-    ).not.toBeNull();
+    expect(container.querySelector('[color*="#ccc"]')).not.toBeNull();
     expect(allSelectors).toHaveLength(4);
   });
 

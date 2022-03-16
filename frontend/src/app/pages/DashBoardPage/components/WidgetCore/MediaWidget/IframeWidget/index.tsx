@@ -44,7 +44,7 @@ const IframeWidget: React.FC<{}> = () => {
       };
     });
     dispatch(editWidgetInfoActions.closeWidgetEditing(widget.id));
-    widgetUpdate(nextWidget);
+    widgetUpdate(nextWidget, true);
   };
   const setter = (
     <div className="wrap-form">
