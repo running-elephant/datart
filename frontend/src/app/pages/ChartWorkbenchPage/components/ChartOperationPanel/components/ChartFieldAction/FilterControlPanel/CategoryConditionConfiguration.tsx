@@ -21,7 +21,7 @@ import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import ChartFilterCondition, {
   ConditionBuilder,
-} from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+} from 'app/models/ChartFilterCondition';
 import {
   FilterConditionType,
   RelationFilterValue,

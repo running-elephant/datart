@@ -17,6 +17,7 @@
  */
 
 import ChartEditor, { ChartEditorBaseProps } from 'app/components/ChartEditor';
+import ChartManager from 'app/models/ChartManager';
 import { useAppSlice } from 'app/slice';
 import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,7 +29,6 @@ import {
   useRouteMatch,
 } from 'react-router';
 import styled from 'styled-components/macro';
-import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
 import { NotFoundPage } from '../NotFoundPage';
 import { StoryEditor } from '../StoryBoardPage/Editor';
 import { StoryPlayer } from '../StoryBoardPage/Player';

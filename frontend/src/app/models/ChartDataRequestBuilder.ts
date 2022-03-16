@@ -67,14 +67,21 @@ export class ChartDataRequestBuilder {
     this.aggregation = aggregation;
   }
 
+  public addExtraSorters(sorters: ChartDataRequest['orders']) {
+    if (!isEmptyArray(sorters)) {
+      this.extraSorters = this.extraSorters.concat(sorters!);
+    }
+    return this;
+  }
+
   private buildAggregators() {
+    if (this.aggregation === false) {
+      return [];
+    }
+
     const aggColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
       (acc, cur) => {
         if (!cur.rows) {
-          return acc;
-        }
-
-        if (this.aggregation === false) {
           return acc;
         }
         if (
@@ -115,9 +122,6 @@ export class ChartDataRequestBuilder {
         if (!cur.rows) {
           return acc;
         }
-        if (this.aggregation === false) {
-          return acc;
-        }
         if (
           cur.type === ChartDataSectionType.GROUP ||
           cur.type === ChartDataSectionType.COLOR
@@ -126,10 +130,11 @@ export class ChartDataRequestBuilder {
         }
         if (
           cur.type === ChartDataSectionType.MIXED &&
-          !cur.rows?.every(
-            v =>
-              v.type !== ChartDataViewFieldType.DATE &&
-              v.type !== ChartDataViewFieldType.STRING,
+          cur.rows?.find(v =>
+            [
+              ChartDataViewFieldType.DATE,
+              ChartDataViewFieldType.STRING,
+            ].includes(v.type),
           )
         ) {
           //zh: 判断数据中是否含有 DATE 和 STRING 类型 en: Determine whether the data contains DATE and STRING types
@@ -354,13 +359,6 @@ export class ChartDataRequestBuilder {
 
   private buildViewConfigs() {
     return transformToViewConfig(this.dataView?.config);
-  }
-
-  public addExtraSorters(sorters: ChartDataRequest['orders']) {
-    if (!isEmptyArray(sorters)) {
-      this.extraSorters = this.extraSorters.concat(sorters!);
-    }
-    return this;
   }
 
   public build(): ChartDataRequest {

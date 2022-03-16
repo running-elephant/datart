@@ -17,7 +17,7 @@
  */
 
 import { migrateChartConfig } from 'app/migration';
-import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
+import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ChartDataSectionField,

@@ -19,7 +19,7 @@
 import { Input, Select } from 'antd';
 import { FormItemEx } from 'app/components';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import { ConditionBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+import { ConditionBuilder } from 'app/models/ChartFilterCondition';
 import {
   AggregateFieldActionType,
   ChartDataConfig,

@@ -16,14 +16,19 @@
  * limitations under the License.
  */
 
-import ReChartsChart from '../ReChartsChart';
+import { migrateChartConfig } from '..';
+import { alpha3 } from '../alpha3';
+jest.mock('../alpha3');
 
-describe('<ReChartsChart />', () => {
-  let component;
-  beforeEach(() => {
-    component = new ReChartsChart();
+describe('migrateChartConfig Test', () => {
+  test('should not begin migration if config is empty', () => {
+    const config = undefined;
+    expect(migrateChartConfig(config)).toEqual(config);
   });
-  test('It should mount', () => {
-    expect(component).toBeDatartChartModel();
+
+  test('should not begin migration if config is empty', () => {
+    const config = {} as any;
+    migrateChartConfig(config);
+    expect(alpha3).toHaveBeenCalledTimes(1);
   });
 });

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import ReactChart from '../models/ReactChart';
+import ReactChart from 'app/models/ReactChart';
 import Config from './config';
 import ReactXYPlot from './ReactVizXYPlot';
 

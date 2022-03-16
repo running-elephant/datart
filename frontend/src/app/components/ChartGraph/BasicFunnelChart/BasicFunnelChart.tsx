@@ -35,7 +35,7 @@ import {
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import isEmpty from 'lodash/isEmpty';
-import Chart from '../models/Chart';
+import Chart from '../../../models/Chart';
 import Config from './config';
 
 class BasicFunnelChart extends Chart {

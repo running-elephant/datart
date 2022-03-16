@@ -35,7 +35,7 @@ import {
 import { toPrecision } from 'app/utils/number';
 import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
-import Chart from '../models/Chart';
+import Chart from '../../../models/Chart';
 import Config from './config';
 
 class BasicBarChart extends Chart {

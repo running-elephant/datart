@@ -17,8 +17,8 @@
  */
 
 import { Space } from 'antd';
+import { ConditionBuilder } from 'app/models/ChartFilterCondition';
 import TimeSelector from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartTimeSelector';
-import { ConditionBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
 import { FilterConditionType } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import { PresentControllerFilterProps } from '.';
