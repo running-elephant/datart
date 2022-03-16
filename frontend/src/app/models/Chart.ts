@@ -65,12 +65,18 @@ class Chart implements IChart {
     if (!targetConfig) {
       return true;
     }
-    return this.isMatchRequiredSectionLimition(
+    return this.isMatchRequiredSectionLimitation(
       this.config?.datas,
       targetConfig?.datas,
     );
   }
 
+  /**
+   * @deprecated This function is not used
+   *
+   * @return {*}
+   * @memberof Chart
+   */
   public getStateHistory() {
     return this._stateHistory.join(' - ');
   }
@@ -93,7 +99,7 @@ class Chart implements IChart {
 
   public onResize(options, context?): void {}
 
-  private isMatchRequiredSectionLimition(
+  private isMatchRequiredSectionLimitation(
     current?: ChartDataConfig[],
     target?: ChartDataConfig[],
   ) {
@@ -101,8 +107,8 @@ class Chart implements IChart {
       .filter(cc => Boolean(cc?.required))
       .every(cc => {
         // The typed chart config section relation matching logic:
-        // 1. If section type exactly 1:1 match, use it
-        // 2. Else If, section type and key exactly 1:1 match, use it
+        // 1. If section type exactly match, use it
+        // 2. Else If, section type and key exactly match, use it
         // 3. Else, current section will match all target typed sections
         const tc = target?.filter(tc => tc.type === cc.type) || [];
         if (tc?.length > 1) {
