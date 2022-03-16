@@ -259,13 +259,9 @@ export async function downloadShareDataChartFile(
 }
 
 export async function fetchCheckName(url, data: any) {
-  try {
-    await request2({
-      url: `/${url}/check/name`,
-      method: 'POST',
-      data: data,
-    });
-  } catch (err: any) {
-    throw err;
-  }
+  return await request2({
+    url: `/${url}/check/name`,
+    method: 'POST',
+    data: data,
+  });
 }
