@@ -26,6 +26,8 @@ import {
   useRef,
 } from 'react';
 import { Layout } from 'react-grid-layout';
+import { BoardActionContext } from '../components/BoardProvider/BoardActionProvider';
+import { BoardConfigContext } from '../components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../components/BoardProvider/BoardProvider';
 import { WidgetInfo } from '../pages/Board/slice/types';
 export default function useAutoBoardRenderItem(
@@ -33,9 +35,17 @@ export default function useAutoBoardRenderItem(
   margin: [number, number],
 ) {
   const { ref, widgetRowHeight } = useWidgetRowHeight();
+  const { initialQuery } = useContext(BoardConfigContext);
+  const { editing, renderMode } = useContext(BoardContext);
+  const { renderedWidgetById } = useContext(BoardActionContext);
 
-  const { renderedWidgetById } = useContext(BoardContext);
-
+  const toRenderedWidget = useCallback(
+    (wid: string) => {
+      if (!initialQuery) return;
+      renderedWidgetById(wid, editing, renderMode);
+    },
+    [editing, initialQuery, renderMode, renderedWidgetById],
+  );
   const currentLayout = useRef<Layout[]>([]);
 
   let waitItemInfos = useRef<{ id: string; rendered: boolean }[]>([]);
@@ -72,10 +82,10 @@ export default function useAutoBoardRenderItem(
     waitingItems.forEach(item => {
       const itemTop = calcItemTop(item.id);
       if (itemTop - scrollTop < offsetHeight) {
-        renderedWidgetById(item.id);
+        toRenderedWidget(item.id);
       }
     });
-  }, [calcItemTop, renderedWidgetById]);
+  }, [calcItemTop, toRenderedWidget]);
 
   const throttleLazyRender = useMemo(
     () => throttle(lazyRender, 50),
