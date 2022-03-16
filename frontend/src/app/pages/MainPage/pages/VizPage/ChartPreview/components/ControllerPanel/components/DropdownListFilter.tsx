@@ -17,7 +17,7 @@
  */
 
 import { Select } from 'antd';
-import useFetchFilterDataByCondition from 'app/hooks/useFetchFilterDataByCondtion';
+import useFetchFilterDataByCondition from 'app/hooks/useFetchFilterDataByCondition';
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useState } from 'react';
