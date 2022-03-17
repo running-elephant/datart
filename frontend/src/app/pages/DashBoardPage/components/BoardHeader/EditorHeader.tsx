@@ -20,8 +20,7 @@ import { CloseOutlined, LeftOutlined, SaveOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
-import { TITLE_SUFFIX } from 'globalConstants';
-import { FC, memo, useContext, useEffect, useMemo } from 'react';
+import { FC, memo, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
@@ -32,33 +31,26 @@ import {
   SPACE_LG,
   SPACE_SM,
 } from 'styles/StyleConstants';
-import { fetchBoardDetail } from '../../pages/Board/slice/thunk';
+import { useStatusTitle } from '../../hooks/useStatusTitle';
 import { clearEditBoardState } from '../../pages/BoardEditor/slice/actions/actions';
 import { BoardActionContext } from '../BoardProvider/BoardActionProvider';
 import { BoardInfoContext } from '../BoardProvider/BoardInfoProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 
-const EditorHeader: FC<{}> = memo(({ children }) => {
+const EditorHeader: FC = memo(({ children }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const t = useI18NPrefix(`viz.action`);
   const { onClearActiveWidgets, updateBoard } = useContext(BoardActionContext);
-  const { name, status, boardId } = useContext(BoardContext);
+  const { name, status } = useContext(BoardContext);
   const { saving } = useContext(BoardInfoContext);
-
+  const title = useStatusTitle(name, status);
   const onCloseBoardEditor = () => {
     const pathName = history.location.pathname;
     const prePath = pathName.split('/boardEditor')[0];
     history.push(`${prePath}`);
     dispatch(clearEditBoardState());
   };
-
-  useEffect(() => {
-    return () => {
-      //销毁时  更新view界面数据
-      dispatch(fetchBoardDetail({ dashboardRelId: boardId }));
-    };
-  }, [boardId, dispatch]);
   const onUpdateBoard = () => {
     onClearActiveWidgets();
     setImmediate(() => {
@@ -66,14 +58,8 @@ const EditorHeader: FC<{}> = memo(({ children }) => {
     });
   };
 
-  const title = useMemo(() => {
-    const base = name;
-    const suffix = TITLE_SUFFIX[status] ? `[${t(TITLE_SUFFIX[status])}]` : '';
-    return base + suffix;
-  }, [name, status, t]);
-
   return (
-    <Wrapper>
+    <Wrapper onClick={onClearActiveWidgets}>
       <h1 className={classnames({ disabled: status < 2 })}>
         <LeftOutlined onClick={onCloseBoardEditor} />
         {title}

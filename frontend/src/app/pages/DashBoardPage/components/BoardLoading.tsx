@@ -31,6 +31,6 @@ export const BoardLoading: React.FC<{ tip?: string }> = ({
 const Wrap = styled.div`
   display: flex;
   flex: 1;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 `;

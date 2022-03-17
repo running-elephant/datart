@@ -29,6 +29,7 @@ import EditorHeader from '../../components/BoardHeader/EditorHeader';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
 import { checkLinkAndJumpErr } from '../../utils';
+import { fetchBoardDetail } from '../Board/slice/thunk';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
 import AutoEditor from './AutoEditor/index';
 import ControllerWidgetPanel from './components/ControllerWidgetPanel';
@@ -180,6 +181,8 @@ export const BoardEditor: React.FC<{
       // fix issue: #800
       onCloseChartEditor();
       dispatch(clearEditBoardState());
+      //销毁时  更新view界面数据
+      dispatch(fetchBoardDetail({ dashboardRelId: boardId }));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onCloseChartEditor]);

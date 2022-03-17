@@ -20,7 +20,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import { FC, memo, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
@@ -55,7 +55,7 @@ export interface BoardProps {
   showZoomCtrl?: boolean;
 }
 
-export const Board: React.FC<BoardProps> = memo(
+export const Board: FC<BoardProps> = memo(
   ({
     id,
     hideTitle,

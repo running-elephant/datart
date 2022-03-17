@@ -17,27 +17,13 @@
  */
 
 import { EditOutlined, MoreOutlined, SendOutlined } from '@ant-design/icons';
-import { Button, Dropdown, message, Space } from 'antd';
+import { Button, Dropdown, Space } from 'antd';
 import { ShareLinkModal } from 'app/components/VizOperationMenu';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { useSaveAsViz } from 'app/pages/MainPage/pages/VizPage/hooks/useSaveAsViz';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
-import {
-  deleteViz,
-  publishViz,
-  removeTab,
-} from 'app/pages/MainPage/pages/VizPage/slice/thunks';
 import classnames from 'classnames';
-import { TITLE_SUFFIX } from 'globalConstants';
-import React, {
-  FC,
-  memo,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { FC, memo, useCallback, useContext, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import {
@@ -47,90 +33,27 @@ import {
   SPACE_LG,
   SPACE_SM,
 } from 'styles/StyleConstants';
-import { boardActions } from '../../pages/Board/slice';
-import { widgetsQueryAction } from '../../pages/Board/slice/asyncActions';
-import { BoardOverLay } from '../BoardOverLay';
+import { usePublishBoard } from '../../hooks/usePublishBoard';
+import { useStatusTitle } from '../../hooks/useStatusTitle';
+import { BoardDropdownList } from '../BoardDropdownList/BoardDropdownList';
 import { BoardActionContext } from '../BoardProvider/BoardActionProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import SaveToStoryBoard from '../SaveToStoryBoard';
 
 const TitleHeader: FC = memo(() => {
-  const tg = useI18NPrefix('global');
   const t = useI18NPrefix(`viz.action`);
   const publishLoading = useSelector(selectPublishLoading);
   const history = useHistory();
-  const dispatch = useDispatch();
   const [showShareLinkModal, setShowShareLinkModal] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const { name, status, allowManage, boardId, renderMode, orgId } =
+  const [showSaveToStory, setShowSaveToStory] = useState<boolean>(false);
+  const { name, status, allowManage, allowShare, boardId, orgId } =
     useContext(BoardContext);
-
-  const { onGenerateShareLink, onBoardToDownLoad } =
-    useContext(BoardActionContext);
-  const saveAsViz = useSaveAsViz();
-  const onSaveAsVizs = useCallback(() => {
-    saveAsViz(boardId, 'DASHBOARD');
-  }, [boardId, saveAsViz]);
-
-  const handleAddToStory = useCallback(
-    storyId => {
-      history.push({
-        pathname: `/organizations/${orgId}/vizs/storyEditor/${storyId}`,
-        state: {
-          addDashboardId: boardId,
-        },
-      });
-    },
-    [history, orgId, boardId],
-  );
-
-  const handlePublish = useCallback(() => {
-    dispatch(
-      publishViz({
-        id: boardId,
-        vizType: 'DASHBOARD',
-        publish: status === 1 ? true : false,
-        resolve: () => {
-          message.success(
-            `${status === 2 ? t('unpublishSuccess') : t('publishSuccess')}`,
-          );
-          dispatch(
-            boardActions.changeBoardPublish({
-              boardId,
-              publish: status === 1 ? 2 : 1,
-            }),
-          );
-        },
-      }),
-    );
-  }, [boardId, status, dispatch, t]);
-
-  const redirect = useCallback(
-    tabKey => {
-      if (tabKey) {
-        history.push(`/organizations/${orgId}/vizs/${tabKey}`);
-      } else {
-        history.push(`/organizations/${orgId}/vizs`);
-      }
-    },
-    [history, orgId],
-  );
-  const handleRecycleViz = useCallback(() => {
-    dispatch(
-      deleteViz({
-        params: { id: boardId, archive: true },
-        type: 'DASHBOARD',
-        resolve: () => {
-          message.success(tg('operation.archiveSuccess'));
-          dispatch(removeTab({ id: boardId, resolve: redirect }));
-        },
-      }),
-    );
-  }, [boardId, dispatch, redirect, tg]);
+  const title = useStatusTitle(name, status);
+  const { onGenerateShareLink } = useContext(BoardActionContext);
+  const { publishBoard } = usePublishBoard(boardId, 'DASHBOARD', status);
   const onOpenShareLink = useCallback(() => {
     setShowShareLinkModal(true);
   }, []);
-
   const toBoardEditor = () => {
     const pathName = history.location.pathname;
     if (pathName.includes(boardId)) {
@@ -141,59 +64,46 @@ const TitleHeader: FC = memo(() => {
       );
     }
   };
-  const title = useMemo(() => {
-    const base = name;
-    const suffix = TITLE_SUFFIX[status] ? `[${t(TITLE_SUFFIX[status])}]` : '';
-    return base + suffix;
-  }, [name, status, t]);
 
-  const isArchived = status === 0;
-
-  const handleModalVisible = useCallback(() => {
-    setIsModalVisible(!isModalVisible);
-  }, [isModalVisible]);
-
-  const handleModalOk = useCallback(
+  const saveToStoryOk = useCallback(
     (storyId: string) => {
-      handleModalVisible();
-      handleAddToStory?.(storyId);
+      history.push({
+        pathname: `/organizations/${orgId}/vizs/storyEditor/${storyId}`,
+        state: {
+          addDashboardId: boardId,
+        },
+      });
+      setShowSaveToStory(false);
     },
-    [handleAddToStory, handleModalVisible],
+    [boardId, history, orgId],
   );
 
-  const handleSyncData = useCallback(() => {
-    dispatch(widgetsQueryAction({ boardId, renderMode }));
-  }, [dispatch, boardId, renderMode]);
   return (
     <Wrapper>
       <h1 className={classnames({ disabled: status < 2 })}>{title}</h1>
       <Space>
-        {allowManage && !isArchived && Number(status) === 1 && (
-          <Button
-            key="publish"
-            icon={<SendOutlined />}
-            loading={publishLoading}
-            onClick={handlePublish}
-          >
-            {t('publish')}
-          </Button>
-        )}
-        {allowManage && !isArchived && (
-          <Button key="edit" icon={<EditOutlined />} onClick={toBoardEditor}>
-            {t('edit')}
-          </Button>
+        {allowManage && (
+          <>
+            {Number(status) === 1 && (
+              <Button
+                key="publish"
+                icon={<SendOutlined />}
+                loading={publishLoading}
+                onClick={publishBoard}
+              >
+                {t('publish')}
+              </Button>
+            )}
+            <Button key="edit" icon={<EditOutlined />} onClick={toBoardEditor}>
+              {t('edit')}
+            </Button>
+          </>
         )}
         <Dropdown
           overlay={
-            <BoardOverLay
+            <BoardDropdownList
               onOpenShareLink={onOpenShareLink}
-              onBoardToDownLoad={onBoardToDownLoad}
-              onSaveAsVizs={onSaveAsVizs}
-              onSyncData={handleSyncData}
-              onRecycleViz={handleRecycleViz}
-              onAddToStory={handleModalVisible}
-              onPublish={Number(status) === 2 ? handlePublish : undefined}
-              isArchived={isArchived}
+              openStoryList={() => setShowSaveToStory(true)}
             />
           }
           placement="bottomRight"
@@ -202,14 +112,17 @@ const TitleHeader: FC = memo(() => {
           <Button icon={<MoreOutlined />} />
         </Dropdown>
       </Space>
-      <SaveToStoryBoard
-        title={t('addToStory')}
-        orgId={orgId as string}
-        isModalVisible={isModalVisible}
-        handleOk={handleModalOk}
-        handleCancel={handleModalVisible}
-      ></SaveToStoryBoard>
-      {showShareLinkModal && (
+      {allowManage && (
+        <SaveToStoryBoard
+          title={t('addToStory')}
+          orgId={orgId as string}
+          isModalVisible={showSaveToStory}
+          handleOk={saveToStoryOk}
+          handleCancel={() => setShowSaveToStory(false)}
+        ></SaveToStoryBoard>
+      )}
+
+      {allowShare && (
         <ShareLinkModal
           visibility={showShareLinkModal}
           onOk={() => setShowShareLinkModal(false)}
