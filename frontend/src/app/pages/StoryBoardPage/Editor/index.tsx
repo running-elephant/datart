@@ -75,7 +75,7 @@ export const StoryEditor: React.FC<{}> = memo(() => {
   const revealRef = useRef<any>();
 
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const storyBoard = useSelector((state: { storyBoard: StoryBoardState }) =>
+  const story = useSelector((state: { storyBoard: StoryBoardState }) =>
     makeSelectStoryBoardById(state, storyId),
   );
   const pageMap = useSelector((state: { storyBoard: StoryBoardState }) =>
@@ -240,9 +240,11 @@ export const StoryEditor: React.FC<{}> = memo(() => {
     <DndProvider backend={HTML5Backend}>
       <StoryContext.Provider
         value={{
-          stroyBoardId: storyId,
-          editing: true,
-          name: storyBoard?.name,
+          name: story.name,
+          storyId: storyId,
+          editing: false,
+          orgId: orgId,
+          status: 1,
           allowShare: false,
         }}
       >

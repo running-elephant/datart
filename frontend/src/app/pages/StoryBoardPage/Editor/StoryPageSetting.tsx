@@ -43,7 +43,7 @@ import {
 export interface StoryPageSettingProps {}
 export const StoryPageSetting: React.FC<StoryPageSettingProps> = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
-  const { stroyBoardId: storyId } = useContext(StoryContext);
+  const { storyId: storyId } = useContext(StoryContext);
   const dispatch = useDispatch();
   const selectedPageIds = useSelector(
     (state: { storyBoard: StoryBoardState }) =>
