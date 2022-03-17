@@ -43,7 +43,7 @@ class ReactVizXYPlotChart extends ReactChart {
     const { XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries } =
       context.window.reactVis;
     this.adapter.init(ReactXYPlot);
-    this.adapter.registerImportDependenies({
+    this.adapter.registerImportDependencies({
       XYPlot,
       XAxis,
       YAxis,
