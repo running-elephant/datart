@@ -20,6 +20,7 @@ import { message } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { publishViz } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
 import { VizType } from 'app/pages/MainPage/pages/VizPage/slice/types';
+import { storyActions } from 'app/pages/StoryBoardPage/slice';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { boardActions } from '../pages/Board/slice';
@@ -30,27 +31,48 @@ export const usePublishBoard = (
 ) => {
   const dispatch = useDispatch();
   const t = useI18NPrefix('viz.main');
+  const handlePublish = useCallback(
+    callback => {
+      dispatch(
+        publishViz({
+          id: vizId,
+          vizType: type,
+          publish: status === 1 ? true : false,
+          resolve: () => {
+            message.success(
+              `${status === 2 ? t('unpublishSuccess') : t('publishSuccess')}`,
+            );
+            callback();
+          },
+        }),
+      );
+    },
+    [dispatch, status, t, type, vizId],
+  );
   const publishBoard = useCallback(() => {
-    dispatch(
-      publishViz({
-        id: vizId,
-        vizType: type,
-        publish: status === 1 ? true : false,
-        resolve: () => {
-          message.success(
-            `${status === 2 ? t('unpublishSuccess') : t('publishSuccess')}`,
-          );
-          dispatch(
-            boardActions.changeBoardPublish({
-              boardId: vizId,
-              publish: status === 1 ? 2 : 1,
-            }),
-          );
-        },
-      }),
-    );
-  }, [dispatch, vizId, type, status, t]);
+    const cb = () => {
+      dispatch(
+        boardActions.changeBoardPublish({
+          boardId: vizId,
+          publish: status === 1 ? 2 : 1,
+        }),
+      );
+    };
+    handlePublish(cb);
+  }, [handlePublish, dispatch, vizId, status]);
+  const publishStory = useCallback(() => {
+    const cb = () => {
+      dispatch(
+        storyActions.changeBoardPublish({
+          stroyId: vizId,
+          publish: status === 1 ? 2 : 1,
+        }),
+      );
+    };
+    handlePublish(cb);
+  }, [handlePublish, dispatch, vizId, status]);
   return {
     publishBoard,
+    publishStory,
   };
 };
