@@ -17,7 +17,7 @@
  */
 import { MIN_MARGIN, MIN_PADDING } from 'app/pages/DashBoardPage/constants';
 import {
-  BoardTypeMap,
+  BoardTypes,
   DashboardConfig,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getInitBoardConfig } from 'app/pages/DashBoardPage/utils/board';
@@ -29,10 +29,9 @@ import {
 } from './../constants';
 
 export const parseBoardConfig = (boardConfig: string) => {
-  let borderTypes = Object.values(BoardTypeMap);
   try {
     let nextConfig: DashboardConfig = JSON.parse(boardConfig);
-    if (!borderTypes.includes(nextConfig?.type)) {
+    if (!BoardTypes.includes(nextConfig?.type)) {
       return getInitBoardConfig('auto');
     }
     return nextConfig;

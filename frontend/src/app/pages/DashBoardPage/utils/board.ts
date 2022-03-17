@@ -19,7 +19,6 @@ import { migrateBoardConfig } from 'app/migration/BoardConfig/migrateBoardConfig
 import {
   BoardInfo,
   BoardType,
-  BoardTypeMap,
   Dashboard,
   DashboardConfig,
   DataChart,
@@ -134,7 +133,7 @@ export const getInitBoardInfo = (obj: {
 
 export const getInitBoardConfig = (boardType?: BoardType) => {
   const dashboardConfig: DashboardConfig = {
-    type: boardType || BoardTypeMap.auto,
+    type: boardType || 'auto',
     version: '',
     background: BackgroundDefault,
     widgetDefaultSettings: {

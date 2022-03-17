@@ -37,12 +37,6 @@ import {
 } from '../../../constants';
 import { ControllerConfig } from '../../BoardEditor/components/ControllerWidgetPanel/types';
 
-export const strEnumType = <T extends string>(o: Array<T>): { [K in T]: K } => {
-  return o.reduce((res, key) => {
-    res[key] = key;
-    return res;
-  }, Object.create(null));
-};
 export interface BoardState {
   boardRecord: Record<string, Dashboard>;
   boardInfoRecord: Record<string, BoardInfo>;
@@ -105,8 +99,9 @@ export interface DashboardConfig {
   gridStep: [number, number];
   scaleMode: ScaleModeType;
 }
-export const BoardTypeMap = strEnumType(['auto', 'free']);
-export type BoardType = keyof typeof BoardTypeMap;
+export const BoardTypes = ['auto', 'free'] as const;
+BoardTypes.includes('auto');
+export type BoardType = typeof BoardTypes[number];
 
 export interface Chart {}
 export interface Widget {
@@ -206,7 +201,7 @@ export interface WidgetData {
   pageInfo?: Partial<PageInfo>;
 }
 //
-export const RenderTypeMap = strEnumType([
+export const RenderTypes = [
   'rerender',
   'clear',
   'refresh',
@@ -214,8 +209,8 @@ export const RenderTypeMap = strEnumType([
   'loading',
   'select',
   'flush',
-]);
-export type RenderType = keyof typeof RenderTypeMap;
+] as const;
+export type RenderType = typeof RenderTypes[number];
 
 export interface Relation {
   targetId: string;
@@ -328,15 +323,15 @@ export interface ControllerWidgetContent {
   config: ControllerConfig;
 }
 
-export const WidgetTypes = strEnumType([
+export const WidgetTypes = [
   'chart',
   'media',
   'container',
   'controller',
   'query',
   'reset',
-]);
-export type WidgetType = Uncapitalize<keyof typeof WidgetTypes>;
+] as const;
+export type WidgetType = typeof WidgetTypes[number];
 export declare const ContainerWidgetTypes: ['tab', 'carousel'];
 
 export type LightWidgetType =
@@ -350,8 +345,8 @@ export type ContainerWidgetType = typeof ContainerWidgetTypes[number];
  * widgetChart 属于board 内部 配置存在widget 表内,
  * 没有真实的datachartId
  */
-export const ChartWidgetTypesMap = strEnumType(['dataChart', 'widgetChart']);
-export type WidgetContentChartType = keyof typeof ChartWidgetTypesMap;
+export const ChartWidgetTypes = ['dataChart', 'widgetChart'] as const;
+export type WidgetContentChartType = typeof ChartWidgetTypes[number];
 export declare const MediaWidgetTypes: [
   'richText',
   'timer',
