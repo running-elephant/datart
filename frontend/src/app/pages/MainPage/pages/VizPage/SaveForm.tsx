@@ -1,7 +1,7 @@
 import { Form, FormInstance, Input, Radio, TreeSelect } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardTypeMap } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { BoardTypes } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { fetchCheckName } from 'app/utils/fetch';
 import debounce from 'debounce-promise';
 import { CommonFormTypes, DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
@@ -154,10 +154,10 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
           tooltip={boardTips()}
         >
           <Radio.Group>
-            <Radio.Button value={BoardTypeMap.auto}>
+            <Radio.Button value={BoardTypes[0]}>
               {t('boardType.auto')}
             </Radio.Button>
-            <Radio.Button value={BoardTypeMap.free}>
+            <Radio.Button value={BoardTypes[1]}>
               {t('boardType.free')}
             </Radio.Button>
           </Radio.Group>

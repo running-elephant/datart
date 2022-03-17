@@ -32,6 +32,7 @@ import {
   fetchBoardDetail,
   getChartWidgetDataAsync,
   getControllerOptions,
+  renderedWidgetAsync,
 } from '../../pages/Board/slice/thunk';
 import { VizRenderMode, Widget } from '../../pages/Board/slice/types';
 import { editBoardStackActions } from '../../pages/BoardEditor/slice';
@@ -43,6 +44,7 @@ import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/co
 import {
   getEditChartWidgetDataAsync,
   getEditControllerOptions,
+  renderedEditWidgetAsync,
   toUpdateDashboard,
 } from '../../pages/BoardEditor/slice/thunk';
 import {
@@ -66,6 +68,11 @@ export interface BoardActionContextProps {
   boardToggleAllowOverlap: (allow: boolean) => void;
   onClearActiveWidgets: () => void;
   onCloseBoardEditor: (boardId: string) => void;
+  renderedWidgetById: (
+    wid: string,
+    editing: boolean,
+    renderMode: VizRenderMode,
+  ) => void;
 }
 export const BoardActionContext = createContext<BoardActionContextProps>(
   {} as BoardActionContextProps,
@@ -169,6 +176,29 @@ export const BoardActionProvider: FC<{ id: string }> = memo(
         dispatch(clearEditBoardState());
         // 更新view界面数据
         dispatch(fetchBoardDetail({ dashboardRelId: boardId }));
+      },
+      renderedWidgetById: (
+        wid: string,
+        editing: boolean,
+        renderMode: VizRenderMode,
+      ) => {
+        // if (initialQuery === false && renderMode !== 'schedule') {
+        //   //zh:如果 initialQuery=== false renderMode !=='schedule' 则不请求数据 en: If initialQuery=== false renderMode !=='schedule' then no data is requested
+        //   return false;
+        // }
+        if (editing) {
+          dispatch(
+            renderedEditWidgetAsync({ boardId: boardId, widgetId: wid }),
+          );
+        } else {
+          dispatch(
+            renderedWidgetAsync({
+              boardId: boardId,
+              widgetId: wid,
+              renderMode: renderMode,
+            }),
+          );
+        }
       },
     };
     return (
