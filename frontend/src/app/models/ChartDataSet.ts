@@ -129,18 +129,19 @@ export class ChartDataSet<T>
       return;
     }
     const sortValues = order.sort.value || [];
-    this.sort(
-      (prev, next) =>
-        sortValues.indexOf(prev[this.toKey(order)]) -
-        sortValues.indexOf(next[this.toKey(order)]),
-    );
+    this.sort((prev, next) => {
+      return (
+        sortValues.indexOf(prev[this.getFieldIndex(order)]) -
+        sortValues.indexOf(next[this.getFieldIndex(order)])
+      );
+    });
   }
 
   public groupBy(field: ChartDataSectionField): {
     [groupKey in string]: IChartDataSetRow<T>[];
   } {
     const groupedChartDataSets = this.reduce((acc, row) => {
-      const valueKey = row.getCell(field) || 'defaultGroupKey';
+      const valueKey = row.getCell(field);
       if (!acc[valueKey]) {
         acc[valueKey] = [];
       }
