@@ -60,7 +60,7 @@ export interface BoardActionContextProps {
     editing: boolean,
     renderMode: VizRenderMode,
   ) => void;
-  updateBoard?: (callback: () => void) => void;
+  updateBoard?: (callback?: () => void) => void;
   onGenerateShareLink?: (date, usePwd) => any;
   onBoardToDownLoad: () => any;
   onWidgetsQuery: (editing: boolean, renderMode: VizRenderMode) => any;
@@ -148,7 +148,7 @@ export const BoardActionProvider: FC<{ id: string }> = memo(
         500,
       ),
 
-      updateBoard: (callback: () => void) => {
+      updateBoard: (callback?: () => void) => {
         dispatch(toUpdateDashboard({ boardId, callback }));
       },
 
@@ -182,10 +182,6 @@ export const BoardActionProvider: FC<{ id: string }> = memo(
         editing: boolean,
         renderMode: VizRenderMode,
       ) => {
-        // if (initialQuery === false && renderMode !== 'schedule') {
-        //   //zh:如果 initialQuery=== false renderMode !=='schedule' 则不请求数据 en: If initialQuery=== false renderMode !=='schedule' then no data is requested
-        //   return false;
-        // }
         if (editing) {
           dispatch(
             renderedEditWidgetAsync({ boardId: boardId, widgetId: wid }),

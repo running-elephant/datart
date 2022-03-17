@@ -31,7 +31,6 @@ import { BoardContext } from './BoardProvider/BoardProvider';
 export interface BoardOverLayProps {
   onOpenShareLink?: () => void;
   onBoardToDownLoad: () => void;
-  onShareDownloadData?: () => void;
   onSaveAsVizs?: () => void;
   onSyncData?: () => void;
   onRecycleViz?: () => void;
@@ -44,7 +43,6 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
   ({
     onOpenShareLink,
     onBoardToDownLoad,
-    onShareDownloadData,
     onSaveAsVizs,
     onSyncData,
     onRecycleViz,
@@ -109,8 +107,6 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
               onConfirm={() => {
                 if (renderMode === 'read') {
                   onBoardToDownLoad?.();
-                } else {
-                  onShareDownloadData?.();
                 }
               }}
             >
@@ -149,7 +145,6 @@ export const BoardOverLay: React.FC<BoardOverLayProps> = memo(
         isArchived,
         onOpenShareLink,
         onBoardToDownLoad,
-        onShareDownloadData,
         onSaveAsVizs,
         onSyncData,
         onPublish,

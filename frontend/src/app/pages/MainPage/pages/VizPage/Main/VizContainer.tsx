@@ -58,7 +58,6 @@ export const VizContainer = memo(
           <Board
             key={id}
             id={id}
-            orgId={orgId}
             autoFit={true}
             filterSearchUrl={search}
             allowDownload={allowDownload}
