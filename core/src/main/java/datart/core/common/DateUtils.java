@@ -18,6 +18,8 @@
 
 package datart.core.common;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class DateUtils {
 
     private static final String[] FMT = {"y", "M", "d", "H", "m", "s", "S"};
@@ -44,6 +46,14 @@ public class DateUtils {
             }
         }
         return stringBuilder.toString();
+    }
+
+    public static boolean isDateFormat(String format) {
+        return StringUtils.isNotBlank(format) && "yyyy-MM-dd".equalsIgnoreCase(format.trim());
+    }
+
+    public static boolean isDateTimeFormat(String format) {
+        return StringUtils.isNotBlank(format) && "yyyy-MM-dd HH:mm:ss".equalsIgnoreCase(format.trim());
     }
 
 }

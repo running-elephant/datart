@@ -15,32 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package datart.server.base;
 
-package datart.core.data.provider;
+public enum ExternalRegisterType {
 
-import datart.core.base.consts.ValueType;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+    OAUTH2,
 
-@Data
-@NoArgsConstructor
-public class SingleTypedValue extends TypedValue {
+    LDAP,
 
-    private Object value;
-
-    private String format;
-
-    public SingleTypedValue(Object value, ValueType valueType) {
-        this.value = value;
-        this.valueType = valueType;
-    }
-
-    @Override
-    public String toString() {
-        return "TypedValue{" +
-                "value=" + value +
-                ", valueType=" + valueType +
-                '}';
-    }
+    SAML
 
 }

@@ -15,32 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package datart.server.service;
 
-package datart.core.data.provider;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 
-import datart.core.base.consts.ValueType;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 
-@Data
-@NoArgsConstructor
-public class SingleTypedValue extends TypedValue {
+public interface ExternalRegisterService {
 
-    private Object value;
+    String ldapRegister(String filter, String password) throws MessagingException, UnsupportedEncodingException;
 
-    private String format;
-
-    public SingleTypedValue(Object value, ValueType valueType) {
-        this.value = value;
-        this.valueType = valueType;
-    }
-
-    @Override
-    public String toString() {
-        return "TypedValue{" +
-                "value=" + value +
-                ", valueType=" + valueType +
-                '}';
-    }
+    String oauth2Register(OAuth2AuthenticationToken oauthAuthToken) throws MessagingException, UnsupportedEncodingException;
 
 }

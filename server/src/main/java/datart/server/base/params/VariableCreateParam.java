@@ -32,9 +32,13 @@ public class VariableCreateParam extends BaseCreateParam {
 
     private String viewId;
 
+    private String sourceId;
+
     private String name;
 
     private String type;
+
+    private String format;
 
     private String valueType;
 

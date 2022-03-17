@@ -16,31 +16,13 @@
  * limitations under the License.
  */
 
-package datart.core.data.provider;
+package datart.server.base;
 
-import datart.core.base.consts.ValueType;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public class ExternalRegister {
 
-@Data
-@NoArgsConstructor
-public class SingleTypedValue extends TypedValue {
+    private ExternalRegisterType type;
 
-    private Object value;
+    private String name;
 
-    private String format;
-
-    public SingleTypedValue(Object value, ValueType valueType) {
-        this.value = value;
-        this.valueType = valueType;
-    }
-
-    @Override
-    public String toString() {
-        return "TypedValue{" +
-                "value=" + value +
-                ", valueType=" + valueType +
-                '}';
-    }
 
 }
