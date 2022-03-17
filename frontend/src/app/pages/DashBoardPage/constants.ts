@@ -188,6 +188,9 @@ export const ALL_SQL_OPERATOR_OPTIONS = [
   getOperatorItem(FilterSqlOperator.Null),
   getOperatorItem(FilterSqlOperator.NotNull),
 
+  getOperatorItem(FilterSqlOperator.Contain),
+  getOperatorItem(FilterSqlOperator.NotContain),
+
   getOperatorItem(FilterSqlOperator.PrefixContain),
   getOperatorItem(FilterSqlOperator.NotPrefixContain),
 
