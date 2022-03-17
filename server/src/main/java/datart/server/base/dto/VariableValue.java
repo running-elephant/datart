@@ -33,6 +33,10 @@ public class VariableValue {
 
     private String viewId;
 
+    private String sourceId;
+
+    private String format;
+
     private String name;
 
     private String type;

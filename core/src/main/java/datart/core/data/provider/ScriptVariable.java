@@ -44,6 +44,8 @@ public class ScriptVariable extends TypedValue {
     // Permission variable valid flag, which is false when executed by the organization owner
     private boolean disabled;
 
+    private String format;
+
     @Override
     public String toString() {
         if (values == null) {
