@@ -55,7 +55,7 @@ ReactDOM.render(
   MOUNT_NODE,
 );
 
-// Hot reloadable translation json files
+// Hot reLoadable translation json files
 if (module.hot) {
   module.hot.accept(['./locales/i18n'], () => {
     // No need to render the App again because i18next works with the hooks

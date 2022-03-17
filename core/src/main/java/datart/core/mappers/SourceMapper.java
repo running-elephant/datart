@@ -22,14 +22,16 @@ public interface SourceMapper extends CRUDMapper {
     @Insert({
         "insert into source (id, `name`, ",
         "config, `type`, org_id, ",
-        "create_by, create_time, ",
-        "update_by, update_time, ",
-        "`status`)",
+        "parent_id, is_folder, ",
+        "`index`, create_by, ",
+        "create_time, update_by, ",
+        "update_time, `status`)",
         "values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, ",
         "#{config,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{orgId,jdbcType=VARCHAR}, ",
-        "#{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, ",
-        "#{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, ",
-        "#{status,jdbcType=TINYINT})"
+        "#{parentId,jdbcType=VARCHAR}, #{isFolder,jdbcType=TINYINT}, ",
+        "#{index,jdbcType=DOUBLE}, #{createBy,jdbcType=VARCHAR}, ",
+        "#{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, ",
+        "#{updateTime,jdbcType=TIMESTAMP}, #{status,jdbcType=TINYINT})"
     })
     int insert(Source record);
 
@@ -38,8 +40,8 @@ public interface SourceMapper extends CRUDMapper {
 
     @Select({
         "select",
-        "id, `name`, config, `type`, org_id, create_by, create_time, update_by, update_time, ",
-        "`status`",
+        "id, `name`, config, `type`, org_id, parent_id, is_folder, `index`, create_by, ",
+        "create_time, update_by, update_time, `status`",
         "from source",
         "where id = #{id,jdbcType=VARCHAR}"
     })
@@ -49,6 +51,9 @@ public interface SourceMapper extends CRUDMapper {
         @Result(column="config", property="config", jdbcType=JdbcType.VARCHAR),
         @Result(column="type", property="type", jdbcType=JdbcType.VARCHAR),
         @Result(column="org_id", property="orgId", jdbcType=JdbcType.VARCHAR),
+        @Result(column="parent_id", property="parentId", jdbcType=JdbcType.VARCHAR),
+        @Result(column="is_folder", property="isFolder", jdbcType=JdbcType.TINYINT),
+        @Result(column="index", property="index", jdbcType=JdbcType.DOUBLE),
         @Result(column="create_by", property="createBy", jdbcType=JdbcType.VARCHAR),
         @Result(column="create_time", property="createTime", jdbcType=JdbcType.TIMESTAMP),
         @Result(column="update_by", property="updateBy", jdbcType=JdbcType.VARCHAR),
@@ -66,6 +71,9 @@ public interface SourceMapper extends CRUDMapper {
           "config = #{config,jdbcType=VARCHAR},",
           "`type` = #{type,jdbcType=VARCHAR},",
           "org_id = #{orgId,jdbcType=VARCHAR},",
+          "parent_id = #{parentId,jdbcType=VARCHAR},",
+          "is_folder = #{isFolder,jdbcType=TINYINT},",
+          "`index` = #{index,jdbcType=DOUBLE},",
           "create_by = #{createBy,jdbcType=VARCHAR},",
           "create_time = #{createTime,jdbcType=TIMESTAMP},",
           "update_by = #{updateBy,jdbcType=VARCHAR},",

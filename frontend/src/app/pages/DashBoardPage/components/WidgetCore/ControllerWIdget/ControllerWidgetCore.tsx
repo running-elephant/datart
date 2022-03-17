@@ -33,13 +33,7 @@ import {
   TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
 import produce from 'immer';
-import React, {
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-} from 'react';
+import React, { memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { BoardActionContext } from '../../BoardProvider/BoardActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
@@ -60,10 +54,10 @@ import { TimeControllerForm } from './Controller/TimeController';
 
 export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
-  const { hasQueryControl } = useContext(BoardConfigContext);
   const [form] = Form.useForm();
 
-  const { renderedWidgetById, editing, renderMode } = useContext(BoardContext);
+  const { hasQueryControl } = useContext(BoardConfigContext);
+  const { editing, renderMode } = useContext(BoardContext);
 
   const {
     data: { rows },
@@ -129,10 +123,6 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
       return [];
     }
   }, [valueOptions, valueOptionType, rows]);
-
-  useEffect(() => {
-    renderedWidgetById(widget.id);
-  }, [renderedWidgetById, widget.id]);
 
   const onControllerChange = useCallback(() => {
     form.submit();

@@ -327,6 +327,27 @@ describe('ChartDataRequestBuild Test', () => {
             colName: 'name',
             type: ChartDataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
+            aggregate: AggregateFieldActionType.NONE,
+            filter: {
+              condition: {
+                name: 'filter-1',
+                type: FilterConditionType.List,
+                operator: FilterSqlOperator.In,
+                visualType: 'STRING',
+                value: ['a', 'b'],
+              },
+            },
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.FILTER,
+        key: 'filter3',
+        rows: [
+          {
+            colName: 'name',
+            type: ChartDataViewFieldType.STRING,
+            category: ChartDataViewFieldCategory.Field as any,
             aggregate: AggregateFieldActionType.AVG,
             filter: {
               condition: {
@@ -450,6 +471,34 @@ describe('ChartDataRequestBuild Test', () => {
               },
             },
           },
+          {
+            colName: 'birthday',
+            type: ChartDataViewFieldType.DATE,
+            category: ChartDataViewFieldCategory.Field as any,
+            filter: {
+              condition: {
+                name: 'born-recommend',
+                type: FilterConditionType.RangeTime,
+                operator: FilterSqlOperator.In,
+                visualType: 'DATE',
+                value: RECOMMEND_TIME.TODAY,
+              },
+            },
+          },
+          {
+            colName: 'born',
+            type: ChartDataViewFieldType.DATE,
+            category: ChartDataViewFieldCategory.Field as any,
+            filter: {
+              condition: {
+                name: 'born-recommend',
+                type: FilterConditionType.RecommendTime,
+                operator: FilterSqlOperator.In,
+                visualType: 'DATE',
+                value: RECOMMEND_TIME.TODAY,
+              },
+            },
+          },
         ],
       },
     ] as any;
@@ -470,6 +519,15 @@ describe('ChartDataRequestBuild Test', () => {
     const requestParams = builder.build();
 
     expect(requestParams.filters).toEqual([
+      {
+        aggOperator: null,
+        column: 'name',
+        sqlOperator: 'IN',
+        values: [
+          { value: 'a', valueType: 'STRING' },
+          { value: 'b', valueType: 'STRING' },
+        ],
+      },
       {
         aggOperator: 'AVG',
         column: 'name',
@@ -517,6 +575,21 @@ describe('ChartDataRequestBuild Test', () => {
         column: 'born',
         sqlOperator: 'IN',
         values: [{ value: `${today} 00:00:00`, valueType: 'DATE' }],
+      },
+      {
+        aggOperator: undefined,
+        column: 'born',
+        sqlOperator: 'IN',
+        values: [
+          { value: `${today} 00:00:00`, valueType: 'DATE' },
+          { value: `${today} 23:59:59`, valueType: 'DATE' },
+        ],
+      },
+      {
+        aggOperator: undefined,
+        column: 'birthday',
+        sqlOperator: 'IN',
+        values: [{ value: 'Invalid date', valueType: 'DATE' }],
       },
       {
         aggOperator: undefined,
@@ -722,6 +795,21 @@ describe('ChartDataRequestBuild Test', () => {
       },
       { column: 'fore-name', operator: 'ASC', aggOperator: undefined },
     ]);
+
+    const extraSorters2: any = null;
+    builder.addExtraSorters(extraSorters2);
+
+    expect(requestParams.orders).toEqual([
+      { column: 'first-name', operator: 'ASC', aggOperator: undefined },
+      { column: 'last-name', operator: 'DESC', aggOperator: undefined },
+      { column: 'address', operator: 'DESC', aggOperator: undefined },
+      {
+        column: 'age',
+        aggOperator: 'AVG',
+        operator: 'ASC',
+      },
+      { column: 'fore-name', operator: 'ASC', aggOperator: undefined },
+    ]);
   });
 
   test('should get pageInfo from setting config', () => {
@@ -769,6 +857,7 @@ describe('ChartDataRequestBuild Test', () => {
       computedFields: [
         { id: 'f1', expression: '[a' },
         { id: 'f2', expression: '[b]' },
+        { id: 'f3', expression: '' },
       ],
     } as any;
     const chartDataConfigs = [];
@@ -790,6 +879,7 @@ describe('ChartDataRequestBuild Test', () => {
     expect(requestParams.functionColumns).toEqual([
       { alias: 'f1', snippet: 'a' },
       { alias: 'f2', snippet: 'b' },
+      { alias: 'f3', snippet: '' },
     ]);
   });
 
@@ -825,5 +915,111 @@ describe('ChartDataRequestBuild Test', () => {
     expect(requestParams.concurrencyControlMode).toEqual(
       viewConfig.concurrencyControlMode,
     );
+  });
+
+  test('should get select columns', () => {
+    const dataView = { id: 'view-id' } as any;
+    const chartDataConfigs = [
+      {
+        type: ChartDataSectionType.AGGREGATE,
+        key: 'aggregation',
+        rows: [
+          {
+            colName: 'amount',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.SIZE,
+        key: 'size',
+        rows: [
+          {
+            colName: 'total',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.INFO,
+        key: 'info',
+        rows: [
+          {
+            colName: 'sex',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.COLOR,
+        key: 'info',
+        rows: [
+          {
+            colName: 'sex',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.GROUP,
+        key: 'GROUP',
+        rows: [
+          {
+            colName: 'name',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.MIXED,
+        key: 'MIXED',
+        rows: [
+          {
+            colName: 'name',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.FILTER,
+        key: 'filter',
+        rows: [
+          {
+            colName: 'filter',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+    ] as any;
+    const chartSettingConfigs = [];
+    const pageInfo = {};
+    const enableScript = false;
+    const enableAggregation = false;
+
+    const builder = new ChartDataRequestBuilder(
+      dataView,
+      chartDataConfigs,
+      chartSettingConfigs,
+      pageInfo,
+      enableScript,
+      enableAggregation,
+    );
+    const requestParams = builder.build();
+
+    expect(requestParams.columns).toEqual([
+      'amount',
+      'total',
+      'sex',
+      'sex',
+      'name',
+      'name',
+    ]);
   });
 });

@@ -257,3 +257,11 @@ export async function downloadShareDataChartFile(
   })) as any;
   dealFileSave(data, headers);
 }
+
+export async function fetchCheckName(url, data: any) {
+  return await request2({
+    url: `/${url}/check/name`,
+    method: 'POST',
+    data: data,
+  });
+}

@@ -90,11 +90,7 @@ export function SharePage() {
     return urlSearchTransfer.toParams(search);
   }, [search]);
 
-  useMount(() => {
-    ChartManager.instance()
-      .load()
-      .catch(err => console.error('Fail to load customize charts with ', err));
-
+  const loadVizData = () => {
     if (Boolean(usePassword)) {
       const previousPassword = persistence.session.get(shareToken);
       if (previousPassword) {
@@ -105,6 +101,13 @@ export function SharePage() {
     } else {
       fetchShareVizInfoImpl(shareToken, undefined, searchParams);
     }
+  };
+  useMount(() => {
+    ChartManager.instance()
+      .load()
+      .catch(err => console.error('Fail to load customize charts with ', err));
+
+    loadVizData();
   });
 
   const fetchShareVizInfoImpl = (
@@ -211,6 +214,7 @@ export function SharePage() {
         <BoardForShare
           dashboard={shareBoard}
           allowDownload={true}
+          loadVizData={loadVizData}
           onMakeShareDownloadDataTask={onMakeShareDownloadDataTask}
           renderMode={renderMode}
           filterSearchUrl={''}

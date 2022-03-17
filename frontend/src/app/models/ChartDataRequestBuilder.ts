@@ -154,7 +154,7 @@ export class ChartDataRequestBuilder {
   }
 
   private buildFilters(): ChartDataRequestFilter[] {
-    const fields: ChartDataSectionField[] = (this.chartDataConfigs || [])
+    const fields: ChartDataSectionField[] = this.chartDataConfigs
       .reduce<ChartDataSectionField[]>((acc, cur) => {
         if (!cur.rows || cur.type !== ChartDataSectionType.FILTER) {
           return acc;
@@ -222,7 +222,7 @@ export class ChartDataRequestBuilder {
         field?.filter?.condition?.type === FilterConditionType.RecommendTime
       ) {
         const timeRange = recommendTimeRangeConverter(conditionValue);
-        return (timeRange || []).map(t => ({
+        return timeRange.map(t => ({
           value: t,
           valueType: field.type,
         }));

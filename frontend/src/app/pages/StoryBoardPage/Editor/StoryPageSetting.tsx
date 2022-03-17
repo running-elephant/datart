@@ -28,16 +28,18 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 import { StoryContext } from '../contexts/StoryContext';
 import {
-  EFFECT_IN_OPTIONS,
-  EFFECT_OUT_OPTIONS,
-  EFFECT_SPEED_OPTIONS,
-} from '../slice/constants';
-import {
   makeSelectStoryPagesById,
   selectSelectedPageIds,
 } from '../slice/selectors';
 import { updateStoryPage } from '../slice/thunks';
-import { StoryBoardState, TransitionEffect } from '../slice/types';
+import {
+  EFFECT_IN_OPTIONS,
+  EFFECT_OUT_OPTIONS,
+  EFFECT_SPEED_OPTIONS,
+  StoryBoardState,
+  TransitionEffect,
+} from '../slice/types';
+
 export interface StoryPageSettingProps {}
 export const StoryPageSetting: React.FC<StoryPageSettingProps> = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);

@@ -14,5 +14,11 @@ public class Source extends BaseEntity {
 
     private String orgId;
 
+    private String parentId;
+
+    private Byte isFolder;
+
+    private Double index;
+
     private Byte status;
 }

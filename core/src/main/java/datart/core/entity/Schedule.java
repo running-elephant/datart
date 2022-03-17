@@ -1,8 +1,9 @@
 package datart.core.entity;
 
-import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.Date;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -27,7 +28,7 @@ public class Schedule extends BaseEntity {
 
     private Boolean isFolder;
 
-    private Integer index;
+    private Double index;
 
     private Byte status;
 }
