@@ -150,7 +150,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
  */
 export const toUpdateDashboard = createAsyncThunk<
   any,
-  { boardId: string; callback: () => void },
+  { boardId: string; callback?: () => void },
   { state: RootState }
 >(
   'editBoard/toUpdateDashboard',
@@ -186,7 +186,7 @@ export const toUpdateDashboard = createAsyncThunk<
       method: 'put',
       data: updateData,
     });
-    callback();
+    callback?.();
   },
 );
 /**
@@ -310,7 +310,7 @@ export const addChartWidget = createAsyncThunk<
   'editBoard/addChartWidget',
   async (
     { boardId, chartId, boardType, dataChart, view, subType },
-    { getState, dispatch },
+    { dispatch },
   ) => {
     const dataCharts = [dataChart];
     const viewViews = [view];

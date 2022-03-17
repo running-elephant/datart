@@ -15,22 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Spin } from 'antd';
-import React from 'react';
-import styled from 'styled-components/macro';
-export const BoardLoading: React.FC<{ tip?: string }> = ({
-  tip = 'Loading',
-}) => {
-  return (
-    <Wrap>
-      <Spin size="large" tip={tip} />
-    </Wrap>
-  );
-};
 
-const Wrap = styled.div`
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-`;
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { TITLE_SUFFIX } from 'globalConstants';
+import { useMemo } from 'react';
+export const useStatusTitle = (name: string, status: number) => {
+  const t = useI18NPrefix(`viz.action`);
+  const title = useMemo(() => {
+    const base = name;
+    const suffix = TITLE_SUFFIX[status] ? `[${t(TITLE_SUFFIX[status])}]` : '';
+    return base + suffix;
+  }, [name, status, t]);
+  return title;
+};
