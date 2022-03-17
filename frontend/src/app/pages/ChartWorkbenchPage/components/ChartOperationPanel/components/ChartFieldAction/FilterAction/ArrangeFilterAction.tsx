@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-import { ChartDataConfig } from 'app/types/ChartConfig';
-import { FC, memo, useState } from 'react';
 import ChartFilterCondition, {
   ConditionBuilder,
-} from '../../../../../models/ChartFilterCondition';
+} from 'app/models/ChartFilterCondition';
+import { ChartDataConfig } from 'app/types/ChartConfig';
+import { FC, memo, useState } from 'react';
 import RelationTypeFilter from './RelationTypeFilter';
 
 const ArrangeFilterAction: FC<{

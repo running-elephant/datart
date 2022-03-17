@@ -17,7 +17,7 @@
  */
 
 import { Radio } from 'antd';
-import useFetchFilterDataByCondition from 'app/hooks/useFetchFilterDataByCondtion';
+import useFetchFilterDataByCondition from 'app/hooks/useFetchFilterDataByCondition';
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import { ControllerRadioFacadeTypes } from 'app/types/FilterControlPanel';
 import { updateBy } from 'app/utils/mutation';

@@ -19,7 +19,7 @@
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { init } from 'echarts';
-import Chart from '../models/Chart';
+import Chart from '../../../models/Chart';
 import Config from './config';
 
 class BasicRadarChart extends Chart {

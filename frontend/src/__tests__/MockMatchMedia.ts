@@ -16,6 +16,13 @@
  * limitations under the License.
  */
 
-import ReChartsChart from './ReChartsChart';
+global.matchMedia =
+  global.matchMedia ||
+  function () {
+    return {
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+    };
+  };
 
-export default ReChartsChart;
+export {};

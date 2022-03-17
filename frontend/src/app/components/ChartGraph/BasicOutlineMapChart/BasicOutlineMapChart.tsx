@@ -28,7 +28,7 @@ import {
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { init, registerMap } from 'echarts';
-import Chart from '../models/Chart';
+import Chart from '../../../models/Chart';
 import Config from './config';
 import geoChinaCity from './geo-china-city.map.json';
 import geoChina from './geo-china.map.json';

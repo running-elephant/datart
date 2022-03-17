@@ -33,7 +33,7 @@ import { BoardInfoProvider } from './BoardInfoProvider';
 
 export interface BoardContextProps {
   name: string;
-  renderMode?: VizRenderMode;
+  renderMode: VizRenderMode;
   boardId: string;
   orgId: string;
   boardType: BoardType;

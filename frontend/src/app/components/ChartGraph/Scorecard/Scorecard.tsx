@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import ReactChart from 'app/models/ReactChart';
 import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
@@ -24,7 +25,6 @@ import {
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import ReactChart from '../models/ReactChart';
 import { getConditionalStyle } from './conditionalStyle';
 import Config from './config';
 import ScorecardAdapter from './ScorecardAdapter';

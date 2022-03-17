@@ -17,7 +17,7 @@
  */
 
 import { Collapse } from 'antd';
-import CollapseHeader from 'app/components/FormGenerator/CollapseHeader';
+import { CollapseHeader } from 'app/components/FormGenerator';
 import GroupLayout from 'app/components/FormGenerator/Layout/GroupLayout';
 import { GroupLayoutMode } from 'app/components/FormGenerator/types';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';

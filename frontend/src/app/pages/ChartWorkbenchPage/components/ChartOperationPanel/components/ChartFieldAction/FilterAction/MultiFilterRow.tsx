@@ -17,9 +17,9 @@
  */
 
 import { Switch } from 'antd';
+import ChartFilterCondition from 'app/models/ChartFilterCondition';
 import { FilterConditionType, FilterRelationType } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
-import ChartFilterCondition from '../../../../../models/ChartFilterCondition';
 import SingleFilterRow from './SingleFilterRow';
 
 const MultiFilterRow: FC<{

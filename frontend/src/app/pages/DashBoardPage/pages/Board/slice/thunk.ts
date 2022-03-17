@@ -141,8 +141,8 @@ export const renderedWidgetAsync = createAsyncThunk<
   'board/renderedWidgetAsync',
   async ({ boardId, widgetId, renderMode }, { getState, dispatch }) => {
     const widgetMapMap = selectBoardWidgetMap(getState());
-    const widgetMap = widgetMapMap[boardId];
-    const curWidget = widgetMap[widgetId];
+    const widgetMap = widgetMapMap?.[boardId];
+    const curWidget = widgetMap?.[widgetId];
     if (!curWidget) return null;
     // 1 widget render
     dispatch(boardActions.renderedWidgets({ boardId, widgetIds: [widgetId] }));

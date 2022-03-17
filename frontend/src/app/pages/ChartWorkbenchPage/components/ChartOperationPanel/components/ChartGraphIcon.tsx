@@ -19,7 +19,7 @@
 import { Tooltip } from 'antd';
 import { IW } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
+import ChartManager from 'app/models/ChartManager';
 import { IChart } from 'app/types/Chart';
 import { ChartDataSectionType } from 'app/types/ChartConfig';
 import classnames from 'classnames';
