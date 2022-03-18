@@ -136,11 +136,12 @@ const SVGFontIconRender = ({ iconStr, isMatchRequirement }) => {
 };
 
 const SVGImageRender = ({ iconStr, isMatchRequirement, isActive }) => {
+  const encodedStr = window.encodeURIComponent(iconStr);
   return (
     <StyledInlineSVGIcon
       alt="svg icon"
       style={{ height: FONT_SIZE_ICON_MD, width: FONT_SIZE_ICON_MD }}
-      src={`data:image/svg+xml;utf8,${iconStr}`}
+      src={`data:image/svg+xml;utf8,${encodedStr}`}
       isMatchRequirement={isMatchRequirement}
     />
   );
