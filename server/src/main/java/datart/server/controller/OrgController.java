@@ -21,6 +21,7 @@ package datart.server.controller;
 
 import datart.core.base.consts.SystemMode;
 import datart.core.base.exception.Exceptions;
+import datart.core.common.Application;
 import datart.core.entity.Organization;
 import datart.core.entity.ext.RoleBaseInfo;
 import datart.core.entity.ext.UserBaseInfo;
@@ -68,7 +69,7 @@ public class OrgController extends BaseController {
     @ApiOperation(value = "create organization")
     @PostMapping
     public ResponseData<Organization> createOrganization(@Validated @RequestBody OrgCreateParam createParam) {
-        if (SystemMode.getCurrMode().equals(SystemMode.SINGLE)) {
+        if (Application.getCurrMode().equals(SystemMode.SINGLE)) {
             Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.permission.denied");
         }
         return ResponseData.success(orgService.createOrganization(createParam));

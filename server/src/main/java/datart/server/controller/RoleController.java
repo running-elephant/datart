@@ -148,7 +148,7 @@ public class RoleController extends BaseController {
     @DeleteMapping(value = "/permission/revoke/org_owner")
     public ResponseData<Boolean> revokeOrgOwner(@RequestParam String orgId,
                                                 @RequestParam String userId) {
-        if (SystemMode.getCurrMode().equals(SystemMode.SINGLE) && userId.equals(Application.getAdminId())) {
+        if (Application.getCurrMode().equals(SystemMode.SINGLE) && userId.equals(Application.getAdminId())) {
             Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.permission.denied");
         }
         return ResponseData.success(roleService.revokeOrgOwner(orgId, userId));

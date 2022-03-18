@@ -52,7 +52,7 @@ public class AppModeStartConfig implements ApplicationListener<ApplicationStarte
     @Override
     @Transactional
     public void onApplicationEvent(ApplicationStartedEvent applicationStartedEvent) {
-        SystemMode currMode = SystemMode.getCurrMode();
+        SystemMode currMode = Application.getCurrMode();
         if (SystemMode.SINGLE.equals(currMode)) {
             String adminId = Application.getAdminId();
             String username = Application.getProperty("datart.admin.username");

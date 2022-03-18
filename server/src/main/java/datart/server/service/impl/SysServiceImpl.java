@@ -18,7 +18,6 @@
 
 package datart.server.service.impl;
 
-import datart.core.base.consts.SystemMode;
 import datart.core.common.Application;
 import datart.server.base.dto.SystemInfo;
 import datart.server.service.SysService;
@@ -44,7 +43,7 @@ public class SysServiceImpl implements SysService {
         systemInfo.setTokenTimeout(tokenTimeout);
         systemInfo.setMailEnable(sendMail);
         systemInfo.setVersion(getVersion());
-        systemInfo.setMode(SystemMode.getCurrMode().name());
+        systemInfo.setMode(Application.getCurrMode().name());
         systemInfo.setRegisterEnable(Application.canRegister());
         return systemInfo;
     }

@@ -234,7 +234,7 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Transactional(propagation = Propagation.MANDATORY)
     public void initUser(User user) {
-        if (SystemMode.getCurrMode().equals(SystemMode.SINGLE)) {
+        if (Application.getCurrMode().equals(SystemMode.SINGLE)) {
             List<Organization> organizationList = orgMapper.list();
             if (organizationList.size()==1) {
                 Organization organization = organizationList.get(0);
