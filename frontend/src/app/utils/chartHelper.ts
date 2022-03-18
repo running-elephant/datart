@@ -467,9 +467,9 @@ export function getReference(
   dataConfig,
   isHorizonDisplay,
 ) {
-  const referenceTabs = getSettingValue(
+  const referenceTabs = getValue(
     settingConfigs,
-    'reference.panel.configuration',
+    ['reference', 'panel', 'configuration'],
     'rows',
   );
 
@@ -490,9 +490,9 @@ export function getReference2(
   dataConfig,
   isHorizonDisplay,
 ) {
-  const referenceTabs = getSettingValue(
+  const referenceTabs = getValue(
     settingConfigs,
-    'reference.panel.configuration',
+    ['reference', 'panel', 'configuration'],
     'rows',
   );
 
@@ -608,9 +608,9 @@ function getMarkLine2(
       return getMarkLineData2(
         ml,
         dataSetRows,
-        'valueType',
-        'constantValue',
-        'metric',
+        ['valueType'],
+        ['constantValue'],
+        ['metric'],
         dataConfig,
         isHorizonDisplay,
       );
@@ -633,19 +633,19 @@ function getMarkLineData2(
 ) {
   const name = mark.label;
   const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
-  const show = getSettingValue(mark.rows, 'showLabel', 'value');
-  const enableMarkLine = getSettingValue(mark.rows, 'enableMarkLine', 'value');
-  const position = getSettingValue(mark.rows, 'position', 'value');
-  const font = getSettingValue(mark.rows, 'font', 'value');
-  const lineStyle = getSettingValue(mark.rows, 'lineStyle', 'value');
-  const valueType = getSettingValue(mark.rows, valueTypeKey, 'value');
-  const metricUid = getSettingValue(mark.rows, metricKey, 'value');
+  const show = getValue(mark.rows, ['showLabel'], 'value');
+  const enableMarkLine = getValue(mark.rows, ['enableMarkLine'], 'value');
+  const position = getValue(mark.rows, ['position'], 'value');
+  const font = getValue(mark.rows, ['font'], 'value');
+  const lineStyle = getValue(mark.rows, ['lineStyle'], 'value');
+  const valueType = getValue(mark.rows, valueTypeKey, 'value');
+  const metricUid = getValue(mark.rows, metricKey, 'value');
 
   const metricDatas =
     dataConfig.uid === metricUid
       ? dataSetRows.map(d => +d.getCell(dataConfig))
       : [];
-  const constantValue = getSettingValue(mark.rows, constantValueKey, 'value');
+  const constantValue = getValue(mark.rows, constantValueKey, 'value');
   let yAxis = 0;
   switch (valueType) {
     case 'constant':
@@ -687,26 +687,22 @@ function getMarkAreaData2(
   dataConfig,
   isHorizonDisplay,
 ) {
-  const metric = getSettingValue(mark.rows, metricKey, 'value');
+  const metric = getValue(mark.rows, metricKey, 'value');
   const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
-  const show = getSettingValue(mark.rows, 'showLabel', 'value');
-  const enableMarkArea = getSettingValue(mark.rows, 'enableMarkArea', 'value');
-  const position = getSettingValue(mark.rows, 'position', 'value');
-  const font = getSettingValue(mark.rows, 'font', 'value');
-  const borderStyle = getSettingValue(mark.rows, 'borderStyle', 'value');
-  const opacity = getSettingValue(mark.rows, 'opacity', 'value');
-  const backgroundColor = getSettingValue(
-    mark.rows,
-    'backgroundColor',
-    'value',
-  );
+  const show = getValue(mark.rows, ['showLabel'], 'value');
+  const enableMarkArea = getValue(mark.rows, ['enableMarkArea'], 'value');
+  const position = getValue(mark.rows, ['position'], 'value');
+  const font = getValue(mark.rows, ['font'], 'value');
+  const borderStyle = getValue(mark.rows, ['borderStyle'], 'value');
+  const opacity = getValue(mark.rows, ['opacity'], 'value');
+  const backgroundColor = getValue(mark.rows, ['backgroundColor'], 'value');
   const name = mark.value;
-  const valueType = getSettingValue(mark.rows, valueTypeKey, 'value');
+  const valueType = getValue(mark.rows, valueTypeKey, 'value');
   const metricDatas =
     dataConfig.uid === metric
       ? dataSetRows.map(d => +d.getCell(dataConfig))
       : [];
-  const constantValue = getSettingValue(mark.rows, constantValueKey, 'value');
+  const constantValue = getValue(mark.rows, constantValueKey, 'value');
   let yAxis = 0;
   switch (valueType) {
     case 'constant':
@@ -853,9 +849,9 @@ function getMarkArea2(
             return getMarkAreaData2(
               mark,
               dataSetRows,
-              `${prefix}ValueType`,
-              `${prefix}ConstantValue`,
-              `${prefix}Metric`,
+              [`${prefix}ValueType`],
+              [`${prefix}ConstantValue`],
+              [`${prefix}Metric`],
               dataConfig,
               isHorizonDisplay,
             );
