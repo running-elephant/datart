@@ -19,27 +19,30 @@
 package datart.server.base.params;
 
 import datart.core.base.consts.ShareAuthenticationMode;
+import datart.core.base.consts.ShareRowPermissionBy;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
+import java.util.Date;
+import java.util.Set;
 
 @Data
-public class ShareToken {
+@EqualsAndHashCode(callSuper = true)
+public class ShareUpdateParam extends BaseUpdateParam {
 
-    private String id;
+    @Future
+    private Date expiryDate;
 
-    private String authorizedToken;
-
+    @NotNull
     private ShareAuthenticationMode authenticationMode;
 
+    @NotNull
+    private ShareRowPermissionBy rowPermissionBy;
+
+    private Set<String> roles;
+
     private String authenticationCode;
-
-    private String username;
-
-    private String password;
-
-    public static ShareToken create(String token) {
-        ShareToken shareToken = new ShareToken();
-        shareToken.authorizedToken = token;
-        return shareToken;
-    }
 
 }
