@@ -335,9 +335,9 @@ export function getSettingValue(
 /**
  * [中文] 使用路径语法获取配置信息，此方法已过时，请参考方法getStyles
  * </br>
- * [EN] Get setting config info by value path, please use getStyles instread
+ * [EN] Get setting config info by value path, please use getStyles instead
  *
- * @deprecated This function will be removed in next versiion, please use @see {@link getStyles} instread
+ * @deprecated This function will be removed in next version, please use @see {@link getStyles} instead
  * @export
  * @param {ChartStyleConfig[]} styles
  * @param {string} groupPath
@@ -393,7 +393,7 @@ export function getStyles(
 /**
  * [中文] 通过数组路径语法，获取对应的配置信息
  * </br>
- * [EN] Get style config value base funtion with default target key
+ * [EN] Get style config value base function with default target key
  *
  * @example
  *
@@ -940,7 +940,7 @@ export function transformToDataSet<T>(
  * </br>
  * [EN] transform dataset to object array, please use transformToDataSet instead
  *
- * @deprecated shoule use DataSet model, @see {@link transformToDataSet}
+ * @deprecated should use DataSet model, @see {@link transformToDataSet}
  * @description
  * Support:
  *  1. Case Insensitive to get value
@@ -1229,7 +1229,7 @@ export function getGridStyle(styles) {
   return { left, right, bottom, top, containLabel };
 }
 
-// TODO(Stephen): tobe used chart DataSetRow model for all charts
+// TODO(Stephen): to be used chart DataSetRow model for all charts
 export function getExtraSeriesRowData(data) {
   if (data instanceof ChartDataSetRow) {
     return {
@@ -1262,7 +1262,7 @@ export function getColorizeGroupSeriesColumns(
 /**
  * [中文] 是否满足当前meta中标识的限制要求，以满足图表绘制
  * </br>
- * [EN] Check if current config with requried fields match the chart basic requirement of meta info.
+ * [EN] Check if current config with required fields match the chart basic requirement of meta info.
  *
  * @example
  *
