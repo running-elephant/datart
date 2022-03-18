@@ -467,12 +467,19 @@ export const pasteWidgets = createAsyncThunk(
 //
 export const uploadBoardImage = createAsyncThunk<
   null,
-  { boardId: string; formData: FormData; resolve: (url: string) => void }
+  {
+    boardId: string;
+    fileName: string;
+    formData: FormData;
+    resolve: (url: string) => void;
+  }
 >(
   'editBoard/uploadBoardImage',
-  async ({ boardId, formData, resolve }, { getState, dispatch }) => {
+  async ({ boardId, formData, fileName, resolve }, { getState, dispatch }) => {
     const { data } = await request2<string>({
-      url: `files/viz/image?ownerType=${'DASHBOARD'}&ownerId=${boardId}&fileName=${uuidv4()}`,
+      url: `files/viz/image?ownerType=${'DASHBOARD'}&ownerId=${boardId}&fileName=${
+        uuidv4() + '@' + fileName
+      }`,
       method: 'POST',
       data: formData,
     });

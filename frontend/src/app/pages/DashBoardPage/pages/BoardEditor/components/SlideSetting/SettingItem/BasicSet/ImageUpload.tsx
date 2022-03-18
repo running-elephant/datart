@@ -58,7 +58,12 @@ export const UploadDragger: React.FC<{
       const formData = new FormData();
       formData.append('file', info);
       await dispatch(
-        uploadBoardImage({ boardId, formData: formData, resolve: onChange }),
+        uploadBoardImage({
+          boardId,
+          fileName: info.name,
+          formData: formData,
+          resolve: onChange,
+        }),
       );
       return false;
     },
