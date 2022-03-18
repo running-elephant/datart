@@ -601,16 +601,16 @@ function getMarkLine2(
   const markLineData = refTabs
     ?.reduce((acc, cur) => {
       const markLineConfigs = cur?.rows?.filter(r => r.key === 'markLine');
-      acc.push(...markLineConfigs);
+      acc.push(markLineConfigs);
       return acc;
     }, [])
     .map(ml => {
       return getMarkLineData2(
         ml,
         dataSetRows,
-        ['valueType'],
-        ['constantValue'],
-        ['metric'],
+        'valueType',
+        'constantValue',
+        'metric',
         dataConfig,
         isHorizonDisplay,
       );
@@ -631,21 +631,15 @@ function getMarkLineData2(
   dataConfig,
   isHorizonDisplay,
 ) {
-  const name = mark.label;
+  const name = mark[0].label;
   const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
-  const show = getValue(mark.rows, ['showLabel'], 'value');
-  const enableMarkLine = getValue(mark.rows, ['enableMarkLine'], 'value');
-  const position = getValue(mark.rows, ['position'], 'value');
-  const font = getValue(mark.rows, ['font'], 'value');
-  const lineStyle = getValue(mark.rows, ['lineStyle'], 'value');
-  const valueType = getValue(mark.rows, valueTypeKey, 'value');
-  const metricUid = getValue(mark.rows, metricKey, 'value');
+
+  const [show, enableMarkLine, position, font, lineStyle, valueType, metricUid, constantValue] = getStyles(mark, ['markLine'], ['showLabel', 'enableMarkLine', 'position', 'font', 'lineStyle', valueTypeKey, metricKey, constantValueKey]);
 
   const metricDatas =
     dataConfig.uid === metricUid
       ? dataSetRows.map(d => +d.getCell(dataConfig))
       : [];
-  const constantValue = getValue(mark.rows, constantValueKey, 'value');
   let yAxis = 0;
   switch (valueType) {
     case 'constant':
@@ -687,22 +681,16 @@ function getMarkAreaData2(
   dataConfig,
   isHorizonDisplay,
 ) {
-  const metric = getValue(mark.rows, metricKey, 'value');
   const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
-  const show = getValue(mark.rows, ['showLabel'], 'value');
-  const enableMarkArea = getValue(mark.rows, ['enableMarkArea'], 'value');
-  const position = getValue(mark.rows, ['position'], 'value');
-  const font = getValue(mark.rows, ['font'], 'value');
-  const borderStyle = getValue(mark.rows, ['borderStyle'], 'value');
-  const opacity = getValue(mark.rows, ['opacity'], 'value');
-  const backgroundColor = getValue(mark.rows, ['backgroundColor'], 'value');
+  const [metric, show, enableMarkArea, position, font, borderStyle, opacity,backgroundColor, valueType, constantValue ] = getStyles([mark], ['markArea'], [
+    metricKey, 'showLabel', 'enableMarkArea', 'position', 'font', 'borderStyle', 'opacity','backgroundColor', valueTypeKey, constantValueKey
+  ]);
+
   const name = mark.value;
-  const valueType = getValue(mark.rows, valueTypeKey, 'value');
   const metricDatas =
     dataConfig.uid === metric
       ? dataSetRows.map(d => +d.getCell(dataConfig))
       : [];
-  const constantValue = getValue(mark.rows, constantValueKey, 'value');
   let yAxis = 0;
   switch (valueType) {
     case 'constant':
@@ -841,6 +829,7 @@ function getMarkArea2(
     const markLineConfigs = cur?.rows?.filter(r => r.key === 'markArea');
     return acc.concat(markLineConfigs);
   }, []);
+
   return {
     data: refAreas
       ?.map(mark => {
@@ -849,9 +838,9 @@ function getMarkArea2(
             return getMarkAreaData2(
               mark,
               dataSetRows,
-              [`${prefix}ValueType`],
-              [`${prefix}ConstantValue`],
-              [`${prefix}Metric`],
+              `${prefix}ValueType`,
+              `${prefix}ConstantValue`,
+              `${prefix}Metric`,
               dataConfig,
               isHorizonDisplay,
             );
