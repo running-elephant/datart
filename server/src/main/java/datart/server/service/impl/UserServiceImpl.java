@@ -238,7 +238,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             List<Organization> organizationList = orgMapper.list();
             if (organizationList.size()==1) {
                 Organization organization = organizationList.get(0);
-                orgService.addUserToOrg(Application.getAdminId(), organization.getId());
+                orgService.addUserToOrg(user.getId(), organization.getId());
                 log.info("The user({}) is joined the default organization({}).", user.getUsername(), organization.getName());
                 return ;
             } else if (organizationList.size()>1) {
