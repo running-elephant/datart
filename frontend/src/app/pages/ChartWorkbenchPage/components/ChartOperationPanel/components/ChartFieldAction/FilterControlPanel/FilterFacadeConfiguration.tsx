@@ -18,7 +18,7 @@
 
 import { InputNumber, Row, Select, Space } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import ChartFilterCondition from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+import ChartFilterCondition from 'app/models/ChartFilterCondition';
 import { FilterConditionType, FilterFacade } from 'app/types/ChartConfig';
 import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import {

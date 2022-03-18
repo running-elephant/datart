@@ -20,27 +20,55 @@ import { Tabs } from 'antd';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import ChartFilterCondition, {
   ConditionBuilder,
-} from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+} from 'app/models/ChartFilterCondition';
 import { FilterConditionType } from 'app/types/ChartConfig';
 import { formatTime } from 'app/utils/time';
-import { RECOMMEND_TIME, TIME_FORMATTER } from 'globalConstants';
+import {
+  FilterSqlOperator,
+  RECOMMEND_TIME,
+  TIME_FORMATTER,
+} from 'globalConstants';
 import moment from 'moment';
-import { FC, memo, useState } from 'react';
+import {
+  forwardRef,
+  ForwardRefRenderFunction,
+  useImperativeHandle,
+  useState,
+} from 'react';
 import styled from 'styled-components/macro';
+import { isEmpty, isEmptyArray } from 'utils/object';
+import { FilterOptionForwardRef } from '.';
 import TimeSelector from '../../ChartTimeSelector';
 
-const DateConditionConfiguration: FC<
+const DateConditionConfiguration: ForwardRefRenderFunction<
+  FilterOptionForwardRef,
   {
     condition?: ChartFilterCondition;
     onChange: (condition: ChartFilterCondition) => void;
   } & I18NComponentProps
-> = memo(({ i18nPrefix, condition, onChange: onConditionChange }) => {
+> = ({ i18nPrefix, condition, onChange: onConditionChange }, ref) => {
   const t = useI18NPrefix(i18nPrefix);
   const [type, setType] = useState<string>(() =>
     condition?.type === FilterConditionType.RangeTime
       ? String(FilterConditionType.RangeTime)
       : String(FilterConditionType.RecommendTime),
   );
+
+  useImperativeHandle(ref, () => ({
+    onValidate: (args: ChartFilterCondition) => {
+      if (isEmpty(args?.operator)) {
+        return false;
+      }
+      if (
+        [FilterSqlOperator.Between, FilterSqlOperator.NotBetween].includes(
+          args?.operator as FilterSqlOperator,
+        )
+      ) {
+        return !isEmpty(args?.value) && !isEmptyArray(args?.value);
+      }
+      return false;
+    },
+  }));
 
   const clearFilterWhenTypeChange = (type: string) => {
     setType(type);
@@ -86,9 +114,9 @@ const DateConditionConfiguration: FC<
       </Tabs.TabPane>
     </StyledDateConditionConfiguration>
   );
-});
+};
 
-export default DateConditionConfiguration;
+export default forwardRef(DateConditionConfiguration);
 
 const StyledDateConditionConfiguration = styled(Tabs)`
   width: 100%;

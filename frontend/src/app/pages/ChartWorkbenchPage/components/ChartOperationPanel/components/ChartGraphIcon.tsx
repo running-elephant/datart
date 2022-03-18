@@ -19,7 +19,7 @@
 import { Tooltip } from 'antd';
 import { IW } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
+import ChartManager from 'app/models/ChartManager';
 import { IChart } from 'app/types/Chart';
 import { ChartDataSectionType } from 'app/types/ChartConfig';
 import classnames from 'classnames';
@@ -136,11 +136,12 @@ const SVGFontIconRender = ({ iconStr, isMatchRequirement }) => {
 };
 
 const SVGImageRender = ({ iconStr, isMatchRequirement, isActive }) => {
+  const encodedStr = window.encodeURIComponent(iconStr);
   return (
     <StyledInlineSVGIcon
       alt="svg icon"
       style={{ height: FONT_SIZE_ICON_MD, width: FONT_SIZE_ICON_MD }}
-      src={`data:image/svg+xml;utf8,${iconStr}`}
+      src={`data:image/svg+xml;utf8,${encodedStr}`}
       isMatchRequirement={isMatchRequirement}
     />
   );

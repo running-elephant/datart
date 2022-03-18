@@ -25,7 +25,7 @@ import {
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import 'echarts-wordcloud';
-import Chart from '../models/Chart';
+import Chart from '../../../models/Chart';
 import Config from './config';
 
 // NOTE: wordcloud chart is echarts extension, more detail please check https://github.com/ecomfe/echarts-wordcloud

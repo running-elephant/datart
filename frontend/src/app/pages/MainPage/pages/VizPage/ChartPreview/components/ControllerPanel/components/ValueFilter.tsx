@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
+import { ConditionBuilder } from 'app/models/ChartFilterCondition';
 import SingleFilterRow from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterAction/SingleFilterRow';
-import { ConditionBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
 import { FC, memo } from 'react';
 import { PresentControllerFilterProps } from '.';
 

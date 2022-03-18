@@ -19,6 +19,8 @@ import { Layout, Modal } from 'antd';
 import { Split } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
+import { useBoardSlice } from 'app/pages/DashBoardPage/pages/Board/slice';
+import { useEditBoardSlice } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import { StoryContext } from 'app/pages/StoryBoardPage/contexts/StoryContext';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import React, {
@@ -33,6 +35,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
+import { useParams } from 'react-router-dom';
 import Reveal from 'reveal.js';
 import 'reveal.js/dist/reveal.css';
 import RevealZoom from 'reveal.js/plugin/zoom/plugin';
@@ -41,7 +44,7 @@ import { SPACE_MD } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import PageThumbnailList from '../components/PageThumbnailList';
 import StoryPageItem from '../components/StoryPageItem';
-import { storyActions } from '../slice';
+import { storyActions, useStoryBoardSlice } from '../slice';
 import {
   makeSelectStoryBoardById,
   makeSelectStoryPagesById,
@@ -50,23 +53,29 @@ import {
   addStoryPages,
   deleteStoryPage,
   getPageContentDetail,
+  getStoryDetail,
 } from '../slice/thunks';
 import { StoryBoardState } from '../slice/types';
 import { StoryToolBar } from './StoryToolBar';
 
 const { Content } = Layout;
-export const StoryEditor: React.FC<{
-  storyId: string;
-  onCloseEditor?: () => void;
-}> = memo(({ storyId, onCloseEditor }) => {
+export const StoryEditor: React.FC<{}> = memo(() => {
+  useBoardSlice();
+  useEditBoardSlice();
+  useStoryBoardSlice();
+  const dispatch = useDispatch();
+  const { orgId, storyId } = useParams<{ orgId: string; storyId: string }>();
+  useEffect(() => {
+    dispatch(getStoryDetail(storyId));
+  }, [dispatch, storyId]);
   const t = useI18NPrefix(`viz.board.setting`);
   const history = useHistory();
   const histState = history.location.state as any;
   const domId = useMemo(() => uuidv4(), []);
   const revealRef = useRef<any>();
-  const dispatch = useDispatch();
+
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const storyBoard = useSelector((state: { storyBoard: StoryBoardState }) =>
+  const story = useSelector((state: { storyBoard: StoryBoardState }) =>
     makeSelectStoryBoardById(state, storyId),
   );
   const pageMap = useSelector((state: { storyBoard: StoryBoardState }) =>
@@ -158,6 +167,9 @@ export const StoryEditor: React.FC<{
     );
   }, [dispatch, currentPageIndex, sortedPages, storyId]);
 
+  const onCloseEditor = useCallback(() => {
+    history.push(`/organizations/${orgId}/vizs/${storyId}`);
+  }, [history, orgId, storyId]);
   useEffect(() => {
     if (sortedPages.length > 0) {
       revealRef.current = new Reveal(document.getElementById(domId), {
@@ -228,9 +240,11 @@ export const StoryEditor: React.FC<{
     <DndProvider backend={HTML5Backend}>
       <StoryContext.Provider
         value={{
-          stroyBoardId: storyId,
-          editing: true,
-          name: storyBoard?.name,
+          name: story.name,
+          storyId: storyId,
+          editing: false,
+          orgId: orgId,
+          status: 1,
           allowShare: false,
         }}
       >

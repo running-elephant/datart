@@ -540,6 +540,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     },
     [clickJump, getTableChartData, toLinkingWidgets, folderIds],
   );
+
   const Methods: WidgetMethodContextProps = {
     onWidgetAction: onWidgetAction,
     widgetChartClick: widgetChartClick,

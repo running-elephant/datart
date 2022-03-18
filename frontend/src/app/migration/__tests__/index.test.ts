@@ -16,8 +16,19 @@
  * limitations under the License.
  */
 
-import { EffectInMap, EffectOutMap, EffectSpeedMap } from './types';
+import { migrateChartConfig } from '..';
+import { alpha3 } from '../alpha3';
+jest.mock('../alpha3');
 
-export const EFFECT_IN_OPTIONS = Object.values(EffectInMap);
-export const EFFECT_OUT_OPTIONS = Object.values(EffectOutMap);
-export const EFFECT_SPEED_OPTIONS = Object.values(EffectSpeedMap);
+describe('migrateChartConfig Test', () => {
+  test('should not begin migration if config is empty', () => {
+    const config = undefined;
+    expect(migrateChartConfig(config)).toEqual(config);
+  });
+
+  test('should not begin migration if config is empty', () => {
+    const config = {} as any;
+    migrateChartConfig(config);
+    expect(alpha3).toHaveBeenCalledTimes(1);
+  });
+});

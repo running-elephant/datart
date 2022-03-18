@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import ReactChart from '../models/ReactChart';
+import ReactChart from 'app/models/ReactChart';
 import Config from './config';
 import ReactXYPlot from './ReactVizXYPlot';
 
@@ -43,7 +43,7 @@ class ReactVizXYPlotChart extends ReactChart {
     const { XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries } =
       context.window.reactVis;
     this.adapter.init(ReactXYPlot);
-    this.adapter.registerImportDependenies({
+    this.adapter.registerImportDependencies({
       XYPlot,
       XAxis,
       YAxis,

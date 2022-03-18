@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import Chart from 'app/components/ChartGraph/models/Chart';
+import Chart from 'app/models/Chart';
 import * as datartChartHelper from 'app/utils/chartHelper';
 import { fetchPluginChart } from 'app/utils/fetch';
 import { cond, Omit } from 'utils/object';
@@ -41,7 +41,7 @@ const iifeFuncLoader = ({ path, result }) => {
 
 class PluginChartLoader {
   async loadPlugins(paths: string[]) {
-    const loadPluginTasks = (paths || []).map(async (path, index) => {
+    const loadPluginTasks = paths.map(async path => {
       try {
         const result = await fetchPluginChart(path);
         if (!result) {

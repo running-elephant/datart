@@ -20,7 +20,8 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
-import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
+import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
+import ChartManager from 'app/models/ChartManager';
 import workbenchSlice, {
   aggregationSelector,
   backendChartSelector,
@@ -53,7 +54,6 @@ import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { CloneValueDeep } from 'utils/object';
 import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
-import ChartManager from '../pages/ChartWorkbenchPage/models/ChartManager';
 import {
   DataChart,
   DataChartConfig,

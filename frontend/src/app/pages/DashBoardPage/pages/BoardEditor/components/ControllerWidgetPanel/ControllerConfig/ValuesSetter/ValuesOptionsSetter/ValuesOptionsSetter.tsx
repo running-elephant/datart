@@ -28,6 +28,7 @@ import ChartDataView from 'app/types/ChartDataView';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { View } from 'app/types/View';
 import { getDistinctFields } from 'app/utils/fetch';
+import { transformMeta } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { request2 } from 'utils/request';
@@ -69,11 +70,12 @@ const ValuesOptionsSetter: FC<{
     if (!viewId) return [];
     try {
       const { data } = await request2<View>(`/views/${viewId}`);
-      const model = JSON.parse(data.model);
-      const option: CascaderOptionType[] = Object.keys(model).map(key => {
+      let meta = transformMeta(data?.model);
+      if (!meta) return [];
+      const option: CascaderOptionType[] = meta.map(item => {
         return {
-          value: key,
-          label: key,
+          value: item.id,
+          label: item.id,
         };
       });
       return option;

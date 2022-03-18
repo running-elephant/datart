@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { strEnumType, Widget, WidgetType } from '../../pages/Board/slice/types';
+import { Widget, WidgetType } from '../../pages/Board/slice/types';
 export interface WidgetActionListItem<T> {
   key: T;
   label: string;
@@ -27,7 +27,7 @@ export interface WidgetActionListItem<T> {
   divider?: boolean;
 }
 
-export const widgetActionTypeMap = strEnumType([
+export const widgetActionTypes = [
   'refresh',
   'fullScreen',
   'delete',
@@ -40,8 +40,8 @@ export const widgetActionTypeMap = strEnumType([
   'closeJump',
   'lock',
   'unlock',
-]);
-export type widgetActionType = keyof typeof widgetActionTypeMap;
+] as const;
+export type widgetActionType = typeof widgetActionTypes[number];
 
 // 浏览 view
 export const widgetViewActionMap: Record<WidgetType, widgetActionType[]> = {

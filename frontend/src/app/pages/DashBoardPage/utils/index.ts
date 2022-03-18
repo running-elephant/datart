@@ -17,7 +17,7 @@
  */
 
 import { migrateChartConfig } from 'app/migration';
-import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
+import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ChartDataSectionField,
@@ -40,7 +40,7 @@ import i18next from 'i18next';
 import moment from 'moment';
 import { CloneValueDeep } from 'utils/object';
 import { ChartDataRequestFilter } from '../../../types/ChartDataRequest';
-import { STORAGE_IMAGE_KEY_PREFIX } from '../constants';
+import { BOARD_FILE_IMG_PREFIX } from '../constants';
 import {
   BoardLinkFilter,
   ControllerWidgetContent,
@@ -58,11 +58,7 @@ import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPa
 import { getLinkedColumn } from './widget';
 
 export const convertImageUrl = (urlKey: string = ''): string => {
-  if (urlKey.startsWith(STORAGE_IMAGE_KEY_PREFIX)) {
-    return localStorage.getItem(urlKey) || '';
-  }
-
-  if (urlKey.startsWith('resources/image/')) {
+  if (urlKey.startsWith(BOARD_FILE_IMG_PREFIX)) {
     return `${window.location.origin}/${urlKey}`;
   }
   return urlKey;
@@ -76,14 +72,12 @@ export const getBackgroundImage = (url: string = ''): string => {
  * 将当前前端渲染环境 id 替换掉原有的id ，原来的和当前的相等不受影响
  */
 export const adaptBoardImageUrl = (url: string = '', curBoardId: string) => {
-  // // url=resources/image/dashboard/boardIdXXXXXXX/fileIDxxxxxxxxx
-  const splitter = '/image/dashboard/';
-  if (url.includes(splitter)) {
-    const originalBoardId = url.split(splitter)[1].split('/')[0];
-    url.replace(originalBoardId, curBoardId);
-    return url;
-  }
-  return url;
+  const splitter = BOARD_FILE_IMG_PREFIX;
+  if (!url.startsWith(splitter)) return url;
+  if (!curBoardId) return url;
+  const originalBoardId = url.split(splitter)[1].split('/')[0];
+  const nextUrl = url.replace(originalBoardId, curBoardId);
+  return nextUrl;
 };
 export const fillPx = (num: number) => {
   return num ? num + 'px' : num;
@@ -420,6 +414,7 @@ export const getChartWidgetRequestParams = (obj: {
     // errorHandle(`can\`t find Chart ${curWidget.datachartId}`);
     return null;
   }
+  if (!dataChart.viewId) return null;
   const chartDataView = viewMap[dataChart?.viewId];
 
   if (!chartDataView) {

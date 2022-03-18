@@ -17,7 +17,7 @@
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { migrateChartConfig } from 'app/migration';
-import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
+import ChartManager from 'app/models/ChartManager';
 import {
   FilterSearchParams,
   VizType,

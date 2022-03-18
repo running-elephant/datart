@@ -20,7 +20,6 @@ import React from 'react';
 import ReactDom from 'react-dom';
 
 interface ReactLifecycleAdapterProps {
-  init: (component: React.Component | Function) => void;
   mounted: (container, options?, context?) => any;
   updated: (options: any, context?) => any;
   unmount: () => void;
@@ -38,11 +37,7 @@ export default class ReactLifecycleAdapter
     this.reactComponent = componentWrapper;
   }
 
-  public init(component) {
-    this.reactComponent = component;
-  }
-
-  public registerImportDependenies(dependencies) {
+  public registerImportDependencies(dependencies) {
     this.externalLibs = dependencies;
   }
 

@@ -39,7 +39,7 @@ import {
   getTime,
   recommendTimeRangeConverter,
 } from 'app/utils/time';
-import { TIME_FORMATTER } from 'globalConstants';
+import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 
 export class ChartDataRequestBuilder {
@@ -67,14 +67,21 @@ export class ChartDataRequestBuilder {
     this.aggregation = aggregation;
   }
 
+  public addExtraSorters(sorters: ChartDataRequest['orders']) {
+    if (!isEmptyArray(sorters)) {
+      this.extraSorters = this.extraSorters.concat(sorters!);
+    }
+    return this;
+  }
+
   private buildAggregators() {
+    if (this.aggregation === false) {
+      return [];
+    }
+
     const aggColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
       (acc, cur) => {
         if (!cur.rows) {
-          return acc;
-        }
-
-        if (this.aggregation === false) {
           return acc;
         }
         if (
@@ -115,9 +122,6 @@ export class ChartDataRequestBuilder {
         if (!cur.rows) {
           return acc;
         }
-        if (this.aggregation === false) {
-          return acc;
-        }
         if (
           cur.type === ChartDataSectionType.GROUP ||
           cur.type === ChartDataSectionType.COLOR
@@ -126,10 +130,11 @@ export class ChartDataRequestBuilder {
         }
         if (
           cur.type === ChartDataSectionType.MIXED &&
-          !cur.rows?.every(
-            v =>
-              v.type !== ChartDataViewFieldType.DATE &&
-              v.type !== ChartDataViewFieldType.STRING,
+          cur.rows?.find(v =>
+            [
+              ChartDataViewFieldType.DATE,
+              ChartDataViewFieldType.STRING,
+            ].includes(v.type),
           )
         ) {
           //zh: 判断数据中是否含有 DATE 和 STRING 类型 en: Determine whether the data contains DATE and STRING types
@@ -149,7 +154,7 @@ export class ChartDataRequestBuilder {
   }
 
   private buildFilters(): ChartDataRequestFilter[] {
-    const fields: ChartDataSectionField[] = (this.chartDataConfigs || [])
+    const fields: ChartDataSectionField[] = this.chartDataConfigs
       .reduce<ChartDataSectionField[]>((acc, cur) => {
         if (!cur.rows || cur.type !== ChartDataSectionType.FILTER) {
           return acc;
@@ -158,13 +163,18 @@ export class ChartDataRequestBuilder {
       }, [])
       .filter(col => Boolean(col.filter?.condition))
       .filter(col => {
-        if (Array.isArray(col.filter?.condition?.value)) {
+        if (
+          col.filter?.condition?.operator === FilterSqlOperator.Null ||
+          col.filter?.condition?.operator === FilterSqlOperator.NotNull
+        ) {
+          return true;
+        } else if (Array.isArray(col.filter?.condition?.value)) {
           return Boolean(col.filter?.condition?.value?.length);
         }
         return true;
       })
       .map(col => col);
-    return this.normalizeFilters(fields);
+    return this.normalizeFilters(fields) as ChartDataRequestFilter[];
   }
 
   private normalizeFilters = (fields: ChartDataSectionField[]) => {
@@ -212,7 +222,7 @@ export class ChartDataRequestBuilder {
         field?.filter?.condition?.type === FilterConditionType.RecommendTime
       ) {
         const timeRange = recommendTimeRangeConverter(conditionValue);
-        return (timeRange || []).map(t => ({
+        return timeRange.map(t => ({
           value: t,
           valueType: field.type,
         }));
@@ -228,15 +238,27 @@ export class ChartDataRequestBuilder {
       ];
     };
 
-    return fields.map(field => ({
-      aggOperator:
-        field.aggregate === AggregateFieldActionType.NONE
-          ? null
-          : field.aggregate,
-      column: field.colName,
-      sqlOperator: field.filter?.condition?.operator!,
-      values: _transformFieldValues(field) || [],
-    }));
+    return fields
+      .map(field => {
+        if (
+          field.filter?.condition?.operator === FilterSqlOperator.In ||
+          field.filter?.condition?.operator === FilterSqlOperator.NotIn
+        ) {
+          if (isEmptyArray(_transformFieldValues(field))) {
+            return undefined;
+          }
+        }
+        return {
+          aggOperator:
+            field.aggregate === AggregateFieldActionType.NONE
+              ? null
+              : field.aggregate,
+          column: field.colName,
+          sqlOperator: field.filter?.condition?.operator!,
+          values: _transformFieldValues(field) || [],
+        };
+      })
+      .filter(Boolean);
   };
 
   private buildOrders() {
@@ -337,13 +359,6 @@ export class ChartDataRequestBuilder {
 
   private buildViewConfigs() {
     return transformToViewConfig(this.dataView?.config);
-  }
-
-  public addExtraSorters(sorters: ChartDataRequest['orders']) {
-    if (!isEmptyArray(sorters)) {
-      this.extraSorters = this.extraSorters.concat(sorters!);
-    }
-    return this;
   }
 
   public build(): ChartDataRequest {

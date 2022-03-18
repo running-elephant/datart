@@ -18,7 +18,6 @@
 import {
   BackgroundConfig,
   BorderConfig,
-  strEnumType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
@@ -26,8 +25,7 @@ import i18next from 'i18next';
 import { PRIMARY, WHITE } from 'styles/StyleConstants';
 import { WidgetType } from './pages/Board/slice/types';
 export const RGL_DRAG_HANDLE = 'dashboard-draggableHandle';
-export const STORAGE_BOARD_KEY_PREFIX = 'DATART_BOARD_DATA_';
-export const STORAGE_IMAGE_KEY_PREFIX = 'DATART_IMAGE_';
+export const BOARD_FILE_IMG_PREFIX = 'resources/image/dashboard/';
 export const BASE_VIEW_WIDTH = 1024;
 export const BASE_ROW_HEIGHT = 32;
 export const MIN_ROW_HEIGHT = 24;
@@ -110,50 +108,31 @@ export const NeedFetchWidgetTypes: WidgetType[] = ['chart', 'controller'];
 
 // setting
 
-export const TEXT_ALIGN_ENUM = strEnumType(['left', 'center', 'right']);
-export type TextAlignType = keyof typeof TEXT_ALIGN_ENUM;
+export const TEXT_ALIGNS = ['left', 'center', 'right'] as const;
+export type TextAlignType = typeof TEXT_ALIGNS[number];
 
-export const BORDER_STYLE_ENUM = strEnumType([
+export const BORDER_STYLES = [
   'none',
   'solid',
   'dashed',
   'dotted',
   'double',
   'hidden',
-  'ridge',
   'groove',
+  'ridge',
   'inset',
   'outset',
-]);
-export type BorderStyleType = keyof typeof BORDER_STYLE_ENUM;
+] as const;
+export type BorderStyleType = typeof BORDER_STYLES[number];
 
-export const BORDER_STYLE_OPTIONS = [
-  { value: BORDER_STYLE_ENUM.none },
-  { value: BORDER_STYLE_ENUM.solid },
-  { value: BORDER_STYLE_ENUM.dashed },
-  { value: BORDER_STYLE_ENUM.dotted },
-  { value: BORDER_STYLE_ENUM.double },
-  { value: BORDER_STYLE_ENUM.hidden },
-  { value: BORDER_STYLE_ENUM.groove },
-  { value: BORDER_STYLE_ENUM.ridge },
-  { value: BORDER_STYLE_ENUM.inset },
-  { value: BORDER_STYLE_ENUM.outset },
-];
-
-export const SCALE_MODE_ENUM = strEnumType([
+export const SCALE_MODES = [
   'scaleWidth',
   'scaleHeight',
   'scaleFull',
   'noScale',
-]);
+] as const;
 
-export type ScaleModeType = keyof typeof SCALE_MODE_ENUM;
-export const SCALE_MODE__OPTIONS = [
-  { value: SCALE_MODE_ENUM.scaleWidth },
-  { value: SCALE_MODE_ENUM.scaleHeight },
-  { value: SCALE_MODE_ENUM.scaleFull },
-  { value: SCALE_MODE_ENUM.noScale },
-];
+export type ScaleModeType = typeof SCALE_MODES[number];
 
 export const enum ValueOptionTypes {
   Common = 'common',
@@ -207,6 +186,9 @@ export const ALL_SQL_OPERATOR_OPTIONS = [
 
   getOperatorItem(FilterSqlOperator.Null),
   getOperatorItem(FilterSqlOperator.NotNull),
+
+  getOperatorItem(FilterSqlOperator.Contain),
+  getOperatorItem(FilterSqlOperator.NotContain),
 
   getOperatorItem(FilterSqlOperator.PrefixContain),
   getOperatorItem(FilterSqlOperator.NotPrefixContain),
@@ -276,8 +258,8 @@ export const SQL_OPERATOR_OPTIONS_TYPES = {
 };
 
 export const WIDGET_TITLE_ALIGN_OPTIONS = [
-  { name: '左', value: TEXT_ALIGN_ENUM.left },
-  { name: '中', value: TEXT_ALIGN_ENUM.center },
+  { name: '左', value: TEXT_ALIGNS[0] },
+  { name: '中', value: TEXT_ALIGNS[1] },
 ];
 
 export const DefaultWidgetData = {

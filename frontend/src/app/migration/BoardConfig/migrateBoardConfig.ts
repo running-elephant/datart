@@ -17,18 +17,21 @@
  */
 import { MIN_MARGIN, MIN_PADDING } from 'app/pages/DashBoardPage/constants';
 import {
-  BoardTypeMap,
+  BoardTypes,
   DashboardConfig,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getInitBoardConfig } from 'app/pages/DashBoardPage/utils/board';
 import { versionCanDo } from '../utils';
-import { VERSION_BETA_0, VERSION_BETA_1, VERSION_BETA_2 } from './../constants';
+import {
+  APP_VERSION_BETA_0,
+  APP_VERSION_BETA_1,
+  APP_VERSION_BETA_2,
+} from './../constants';
 
 export const parseBoardConfig = (boardConfig: string) => {
-  let borderTypes = Object.values(BoardTypeMap);
   try {
     let nextConfig: DashboardConfig = JSON.parse(boardConfig);
-    if (!borderTypes.includes(nextConfig?.type)) {
+    if (!BoardTypes.includes(nextConfig?.type)) {
       return getInitBoardConfig('auto');
     }
     return nextConfig;
@@ -40,7 +43,7 @@ export const parseBoardConfig = (boardConfig: string) => {
 };
 
 export const beta0 = (config: DashboardConfig) => {
-  if (!versionCanDo(VERSION_BETA_0, config.version)) return config;
+  if (!versionCanDo(APP_VERSION_BETA_0, config.version)) return config;
   // 1. initialQuery 新增属性 检测没有这个属性就设置为 true,如果已经设置为false，则保持false
   if (!config.hasOwnProperty('initialQuery')) {
     config.initialQuery = true;
@@ -59,22 +62,22 @@ export const beta0 = (config: DashboardConfig) => {
   config.hasResetControl = Boolean(config.hasQueryControl);
 
   // reset config.version
-  config.version = VERSION_BETA_0;
+  config.version = APP_VERSION_BETA_0;
   return config;
 };
 
 export const beta1 = (config: DashboardConfig) => {
-  if (!versionCanDo(VERSION_BETA_1, config.version)) return config;
-  config.version = VERSION_BETA_1;
+  if (!versionCanDo(APP_VERSION_BETA_1, config.version)) return config;
+  config.version = APP_VERSION_BETA_1;
   return config;
 };
 export const beta2 = (config: DashboardConfig) => {
-  if (!versionCanDo(VERSION_BETA_1, config.version)) return config;
+  if (!versionCanDo(APP_VERSION_BETA_1, config.version)) return config;
   // allowOverlap in autoBoard
   if (!config.allowOverlap) {
     config.allowOverlap = false;
   }
-  config.version = VERSION_BETA_2;
+  config.version = APP_VERSION_BETA_2;
   return config;
 };
 export const migrateBoardConfig = (boardConfig: string) => {

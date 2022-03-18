@@ -32,11 +32,6 @@ export default class ReactChart extends Chart {
   }
 
   get adapter() {
-    if (!this._adapter) {
-      throw new Error(
-        'should be register component by initAdapter before in used',
-      );
-    }
     return this._adapter;
   }
 

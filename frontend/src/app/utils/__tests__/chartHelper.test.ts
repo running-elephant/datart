@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartDataSetRow } from 'app/components/ChartGraph/models/ChartDataSet';
+import { ChartDataSetRow } from 'app/models/ChartDataSet';
 import {
   ChartDataSectionField,
   IFieldFormatConfig,

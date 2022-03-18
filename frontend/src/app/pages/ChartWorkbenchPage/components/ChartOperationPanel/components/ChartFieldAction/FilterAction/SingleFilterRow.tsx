@@ -20,7 +20,7 @@ import { InputNumber, Select, Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import ChartFilterCondition, {
   ConditionBuilder,
-} from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+} from 'app/models/ChartFilterCondition';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useState } from 'react';
 

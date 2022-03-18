@@ -1,6 +1,7 @@
 import { Button, Card, Form, Input, message, Upload } from 'antd';
 import { Avatar } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { fetchCheckName } from 'app/utils/fetch';
 import debounce from 'debounce-promise';
 import {
   BASE_API_URL,
@@ -18,7 +19,6 @@ import {
 } from 'styles/StyleConstants';
 import { APIResponse } from 'types';
 import { getToken } from 'utils/auth';
-import { request } from 'utils/request';
 import { useMainSlice } from '../../slice';
 import {
   selectCurrentOrganization,
@@ -128,14 +128,8 @@ export function OrgSettingPage() {
                   if (value === currentOrganization?.name) {
                     return Promise.resolve();
                   }
-                  return request({
-                    url: `/orgs/check/name`,
-                    method: 'POST',
-                    data: { name: value },
-                  }).then(
-                    () => Promise.resolve(),
-                    err => Promise.reject(new Error(err.response.data.message)),
-                  );
+                  const data = { name: value };
+                  return fetchCheckName('orgs', data);
                 }, DEFAULT_DEBOUNCE_WAIT),
               },
             ]}

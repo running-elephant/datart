@@ -20,4 +20,8 @@ import FilterControlPanel from './FilterControlPanel';
 
 export { CategoryConditionRelationSelector };
 
+export type FilterOptionForwardRef = {
+  onValidate: (value) => boolean;
+};
+
 export default FilterControlPanel;

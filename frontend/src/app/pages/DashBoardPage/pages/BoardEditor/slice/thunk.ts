@@ -36,7 +36,6 @@ import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
-import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
 import { CloneValueDeep } from 'utils/object';
 import { request2 } from 'utils/request';
@@ -82,7 +81,6 @@ export const getEditBoardDetail = createAsyncThunk<
     if (editDashboard?.id === dashboardId) {
       return null;
     }
-    dispatch(ActionCreators.clearHistory());
     dispatch(fetchEditBoardDetail(dashboardId));
     return null;
   },
@@ -152,7 +150,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
  */
 export const toUpdateDashboard = createAsyncThunk<
   any,
-  { boardId: string; callback: () => void },
+  { boardId: string; callback?: () => void },
   { state: RootState }
 >(
   'editBoard/toUpdateDashboard',
@@ -188,7 +186,7 @@ export const toUpdateDashboard = createAsyncThunk<
       method: 'put',
       data: updateData,
     });
-    callback();
+    callback?.();
   },
 );
 /**
@@ -279,19 +277,20 @@ export const addWrapChartWidget = createAsyncThunk<
     { getState, dispatch },
   ) => {
     const dataCharts = [dataChart];
-    const viewViews = [view];
+    const viewViews = view ? [view] : [];
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
     let widget = widgetToolKit.chart.create({
       dashboardId: boardId,
       boardType: boardType,
       dataChartId: chartId,
-      viewId: view.id,
+      viewId: view?.id || '',
       dataChartConfig: dataChart,
       subType: 'widgetChart',
     });
     dispatch(addWidgetsToEditBoard([widget]));
-    dispatch(addVariablesToBoard(view.variables));
+    dispatch(addVariablesToBoard(view?.variables));
+
     return null;
   },
 );
@@ -311,7 +310,7 @@ export const addChartWidget = createAsyncThunk<
   'editBoard/addChartWidget',
   async (
     { boardId, chartId, boardType, dataChart, view, subType },
-    { getState, dispatch },
+    { dispatch },
   ) => {
     const dataCharts = [dataChart];
     const viewViews = [view];
@@ -468,12 +467,19 @@ export const pasteWidgets = createAsyncThunk(
 //
 export const uploadBoardImage = createAsyncThunk<
   null,
-  { boardId: string; formData: FormData; resolve: (url: string) => void }
+  {
+    boardId: string;
+    fileName: string;
+    formData: FormData;
+    resolve: (url: string) => void;
+  }
 >(
   'editBoard/uploadBoardImage',
-  async ({ boardId, formData, resolve }, { getState, dispatch }) => {
+  async ({ boardId, formData, fileName, resolve }, { getState, dispatch }) => {
     const { data } = await request2<string>({
-      url: `files/viz/image?ownerType=${'DASHBOARD'}&ownerId=${boardId}&fileName=${uuidv4()}`,
+      url: `files/viz/image?ownerType=${'DASHBOARD'}&ownerId=${boardId}&fileName=${
+        uuidv4() + '@' + fileName
+      }`,
       method: 'POST',
       data: formData,
     });

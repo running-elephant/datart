@@ -24,7 +24,7 @@ import {
 } from '@reduxjs/toolkit';
 import { migrateChartConfig } from 'app/migration';
 import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
-import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
+import ChartManager from 'app/models/ChartManager';
 import { ResourceTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataRequest from 'app/types/ChartDataRequest';
@@ -48,8 +48,8 @@ import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
 import { rejectedActionMessageHandler } from 'utils/notification';
 import { request2 } from 'utils/request';
 import { listToTree, rejectHandle } from 'utils/utils';
+import { ChartDataRequestBuilder } from '../../../models/ChartDataRequestBuilder';
 import { ChartDTO } from '../../../types/ChartDTO';
-import { ChartDataRequestBuilder } from '../models/ChartDataRequestBuilder';
 
 export type ChartConfigPayloadType = {
   init?: ChartConfig;
@@ -186,13 +186,26 @@ export const initWorkbenchAction = createAsyncThunk(
 
 export const fetchDataSetAction = createAsyncThunk(
   'workbench/fetchDataSetAction',
-  async (arg: ChartDataRequest) => {
-    const response = await request2({
-      method: 'POST',
-      url: `data-provider/execute`,
-      data: arg,
-    });
-    return filterSqlOperatorName(arg, response.data);
+  async (arg: ChartDataRequest, thunkAPI) => {
+    let errorData: any = null;
+    const response = await request2(
+      {
+        method: 'POST',
+        url: `data-provider/execute`,
+        data: arg,
+      },
+      {},
+      {
+        onRejected: error => {
+          errorData = error.response;
+        },
+      },
+    );
+    if (errorData) {
+      return thunkAPI.rejectWithValue(errorData?.data);
+    } else {
+      return filterSqlOperatorName(arg, response.data);
+    }
   },
 );
 
@@ -513,9 +526,15 @@ const workbenchSlice = createSlice({
       state.datasetLoading = true;
     });
 
-    builder.addCase(fetchDataSetAction.rejected, (state, action) => {
-      state.datasetLoading = false;
-    });
+    builder.addCase(
+      fetchDataSetAction.rejected,
+      (state, { payload }: { payload: any }) => {
+        state.datasetLoading = false;
+        if (state.dataset) {
+          state.dataset.script = (payload?.data?.script as string) || '';
+        }
+      },
+    );
 
     builder.addMatcher(
       isMySliceRejectedAction(workbenchSlice.name),

@@ -19,12 +19,12 @@
 import { Checkbox, Form, FormInstance, Input, Radio } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { fetchCheckName } from 'app/utils/fetch';
 import debounce from 'debounce-promise';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import moment from 'moment';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SPACE_XS } from 'styles/StyleConstants';
-import { request } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { VariableHierarchy } from '../ViewPage/slice/types';
 import { VariableScopes, VariableTypes, VariableValueTypes } from './constants';
@@ -137,16 +137,15 @@ export const VariableForm = memo(
               if (!value || value === editingVariable?.name) {
                 return Promise.resolve();
               }
-              return request({
-                url: `/variables/check/name`,
-                method: 'POST',
-                data: { name: value, orgId },
-              }).then(
-                () => Promise.resolve(),
-                err => Promise.reject(new Error(err.response.data.message)),
-              );
+              if (!value.trim()) {
+                return Promise.reject(
+                  `${t('name')}${tg('validation.required')}`,
+                );
+              }
+              const data = { name: value, orgId };
+              return fetchCheckName('variables', data);
             }, DEFAULT_DEBOUNCE_WAIT),
-      [scope, editingVariable?.name, variables, orgId, t],
+      [scope, editingVariable?.name, variables, orgId, t, tg],
     );
 
     return (

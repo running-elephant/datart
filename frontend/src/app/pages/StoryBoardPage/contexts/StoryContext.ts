@@ -18,10 +18,12 @@
 
 import { createContext } from 'react';
 export interface StoryContextProps {
-  stroyBoardId: string;
+  name: string;
+  orgId: string;
+  storyId: string;
   editing: boolean;
+  status: number;
   allowShare: boolean;
-  name?: string;
 }
 export const StoryContext = createContext<StoryContextProps>(
   {} as StoryContextProps,

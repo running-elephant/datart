@@ -18,7 +18,7 @@
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { migrateChartConfig } from 'app/migration';
-import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
+import ChartManager from 'app/models/ChartManager';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartMouseEventParams, IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';

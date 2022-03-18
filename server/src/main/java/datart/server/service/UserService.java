@@ -61,4 +61,7 @@ public interface UserService extends BaseCRUDService<User, UserMapperExt> {
 
     User externalRegist(OAuth2AuthenticationToken oauthAuthToken) throws ServerException;
 
+    boolean addUserToOrg(UserAddParam userAddParam, String orgId) throws MessagingException, UnsupportedEncodingException;
+
+    boolean deleteUserFromOrg(String orgId, String userId);
 }

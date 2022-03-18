@@ -19,7 +19,9 @@
 import { message } from 'antd';
 
 export function rejectedActionMessageHandler(_, action) {
-  if (action?.error) {
+  if (action?.type === 'workbench/fetchDataSetAction/rejected') {
+    message.error(action?.payload?.message);
+  } else if (action?.error) {
     message.error(action?.error.message);
   }
 }

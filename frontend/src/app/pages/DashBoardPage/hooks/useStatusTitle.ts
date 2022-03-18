@@ -16,6 +16,15 @@
  * limitations under the License.
  */
 
-import ReChartsChart from './ReChartsChart';
-
-export default ReChartsChart;
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { TITLE_SUFFIX } from 'globalConstants';
+import { useMemo } from 'react';
+export const useStatusTitle = (name: string, status: number) => {
+  const t = useI18NPrefix(`viz.action`);
+  const title = useMemo(() => {
+    const base = name;
+    const suffix = TITLE_SUFFIX[status] ? `[${t(TITLE_SUFFIX[status])}]` : '';
+    return base + suffix;
+  }, [name, status, t]);
+  return title;
+};

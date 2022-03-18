@@ -17,15 +17,12 @@
  */
 
 import produce from 'immer';
-import React, { createContext, FC, memo, useCallback, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
-import { renderedWidgetAsync } from '../../pages/Board/slice/thunk';
+import React, { createContext, FC, memo, useMemo } from 'react';
 import {
   BoardType,
   Dashboard,
   VizRenderMode,
 } from '../../pages/Board/slice/types';
-import { renderedEditWidgetAsync } from '../../pages/BoardEditor/slice/thunk';
 import { adaptBoardImageUrl } from '../../utils';
 import { BoardActionProvider } from './BoardActionProvider';
 import { BoardConfigProvider } from './BoardConfigProvider';
@@ -33,7 +30,7 @@ import { BoardInfoProvider } from './BoardInfoProvider';
 
 export interface BoardContextProps {
   name: string;
-  renderMode?: VizRenderMode;
+  renderMode: VizRenderMode;
   boardId: string;
   orgId: string;
   boardType: BoardType;
@@ -46,8 +43,6 @@ export interface BoardContextProps {
   allowShare?: boolean;
   allowManage?: boolean;
   queryVariables: Dashboard['queryVariables'];
-  // methods
-  renderedWidgetById: (wid: string) => void;
 }
 
 export const BoardContext = createContext<BoardContextProps>(
@@ -72,8 +67,6 @@ export const BoardProvider: FC<{
     allowShare,
     allowManage,
   }) => {
-    const dispatch = useDispatch();
-    // const boardInfo=useSelector()
     const boardContextValue: BoardContextProps = {
       name: board.name,
       boardId: board.id,
@@ -87,33 +80,6 @@ export const BoardProvider: FC<{
       allowDownload,
       allowShare,
       allowManage,
-
-      //
-      renderedWidgetById: useCallback(
-        wid => {
-          let initialQuery = board.config.initialQuery;
-
-          if (initialQuery === false && renderMode !== 'schedule') {
-            //zh:如果 initialQuery=== false renderMode !=='schedule' 则不请求数据 en: If initialQuery=== false renderMode !=='schedule' then no data is requested
-            return false;
-          }
-
-          if (editing) {
-            dispatch(
-              renderedEditWidgetAsync({ boardId: board.id, widgetId: wid }),
-            );
-          } else {
-            dispatch(
-              renderedWidgetAsync({
-                boardId: board.id,
-                widgetId: wid,
-                renderMode: renderMode,
-              }),
-            );
-          }
-        },
-        [board.config.initialQuery, board.id, dispatch, editing, renderMode],
-      ),
     };
     const adaptConfig = useMemo(() => {
       if (board.config) {

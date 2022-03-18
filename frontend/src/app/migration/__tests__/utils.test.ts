@@ -15,14 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { VERSION_LIST } from '../constants';
+import { APP_SEMANTIC_VERSIONS } from '../constants';
 import { versionCanDo } from '../utils';
 describe('test versionCanDo ', () => {
   test(`no testVersion `, () => {
     expect(versionCanDo('v1', undefined)).toBe(true);
   });
-  const v1 = VERSION_LIST[0];
-  const v2 = VERSION_LIST[1];
+  const v1 = APP_SEMANTIC_VERSIONS[0];
+  const v2 = APP_SEMANTIC_VERSIONS[1];
   test(`v2 canDo v1 `, () => {
     expect(versionCanDo(v2, v1)).toBe(true);
   });

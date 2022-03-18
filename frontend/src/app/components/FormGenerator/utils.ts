@@ -20,7 +20,7 @@ import { ChartStyleSectionRow } from 'app/types/ChartConfig';
 import { pickValues } from 'utils/object';
 import { FormGeneratorLayoutProps, ItemLayoutProps } from './types';
 
-export const getSafeStyleProps = (
+const getSafeStyleProps = (
   o: Partial<ChartStyleSectionRow>,
   permitProps: string[],
 ) => {

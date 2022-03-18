@@ -100,4 +100,6 @@ public class Const {
 
     public static final String ENCRYPT_FLAG = "_encrypted_";
 
+    public static final String USER_DEFAULT_PSW = "123456";
+
 }

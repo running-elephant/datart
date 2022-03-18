@@ -17,6 +17,7 @@
  */
 
 import ChartEditor, { ChartEditorBaseProps } from 'app/components/ChartEditor';
+import ChartManager from 'app/models/ChartManager';
 import { useAppSlice } from 'app/slice';
 import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,8 +29,9 @@ import {
   useRouteMatch,
 } from 'react-router';
 import styled from 'styled-components/macro';
-import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
 import { NotFoundPage } from '../NotFoundPage';
+import { StoryEditor } from '../StoryBoardPage/Editor';
+import { StoryPlayer } from '../StoryBoardPage/Player';
 import { AccessRoute } from './AccessRoute';
 import { Background } from './Background';
 import { Navbar } from './Navbar';
@@ -138,6 +140,15 @@ export function MainPage() {
                 </AccessRoute>
               );
             }}
+          />
+
+          <Route
+            path="/organizations/:orgId/vizs/storyPlayer/:storyId"
+            render={() => <StoryPlayer />}
+          />
+          <Route
+            path="/organizations/:orgId/vizs/storyEditor/:storyId"
+            render={() => <StoryEditor />}
           />
           <Route
             path="/organizations/:orgId/vizs/:vizId?"

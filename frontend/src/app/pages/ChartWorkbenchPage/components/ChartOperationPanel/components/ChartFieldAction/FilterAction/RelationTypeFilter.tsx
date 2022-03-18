@@ -20,7 +20,7 @@ import { BranchesOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { Col, Row, Select, Switch } from 'antd';
 import ChartFilterCondition, {
   ConditionBuilder,
-} from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+} from 'app/models/ChartFilterCondition';
 import {
   ChartDataSectionField,
   FilterConditionType,
