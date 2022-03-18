@@ -18,6 +18,8 @@
 
 package datart.core.common;
 
+import datart.core.base.consts.SystemMode;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -76,6 +78,17 @@ public class Application implements ApplicationContextAware {
 
     public static String getTokenSecret() {
         return getProperty("datart.security.token.secret", "d@a$t%a^r&a*t");
+    }
+
+    public static boolean canRegister() {
+        return BooleanUtils.toBoolean(getProperty("datart.user.register", "true"));
+    }
+
+    public static String getAdminId() {
+        if (SystemMode.getCurrMode().equals(SystemMode.SINGLE)){
+            return getProperty("datart.admin-id", "datart-admin");
+        }
+        return "";
     }
 
 }

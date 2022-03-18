@@ -20,11 +20,14 @@ package datart.server.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jayway.jsonpath.JsonPath;
+import datart.core.base.consts.Const;
+import datart.core.base.consts.SystemMode;
 import datart.core.base.consts.UserIdentityType;
 import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
 import datart.core.base.exception.ParamException;
 import datart.core.base.exception.ServerException;
+import datart.core.common.Application;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.Organization;
 import datart.core.entity.User;
@@ -37,13 +40,12 @@ import datart.security.util.SecurityUtils;
 import datart.server.base.dto.OrganizationBaseInfo;
 import datart.server.base.dto.UserProfile;
 import datart.server.base.params.ChangeUserPasswordParam;
+import datart.server.base.params.UserAddParam;
 import datart.server.base.params.UserRegisterParam;
 import datart.server.base.params.UserResetPasswordParam;
-import datart.server.service.BaseService;
-import datart.server.service.MailService;
-import datart.server.service.OrgService;
-import datart.server.service.UserService;
+import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,6 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,6 +75,8 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     private final OrgService orgService;
 
+    private final RoleService roleService;
+
     private final MailService mailService;
 
     @Value("${datart.user.active.send-mail:false}")
@@ -80,10 +85,12 @@ public class UserServiceImpl extends BaseService implements UserService {
     public UserServiceImpl(UserMapperExt userMapper,
                            OrganizationMapperExt orgMapper,
                            OrgService orgService,
+                           RoleService roleService,
                            MailService mailService) {
         this.userMapper = userMapper;
         this.orgMapper = orgMapper;
         this.orgService = orgService;
+        this.roleService = roleService;
         this.mailService = mailService;
     }
 
@@ -220,13 +227,26 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     /**
      * 初始化用户:
-     * 1: 创建默认组织
-     * 2: 初始化组织
+     * 1: 单组织模式：默认加入组织
+     * 2: 正常模式：创建默认组织 -> 初始化组织
      *
      * @param user 需要初始化的用户
      */
     @Transactional(propagation = Propagation.MANDATORY)
     public void initUser(User user) {
+        if (SystemMode.getCurrMode().equals(SystemMode.SINGLE)) {
+            List<Organization> organizationList = orgMapper.list();
+            if (organizationList.size()==1) {
+                Organization organization = organizationList.get(0);
+                orgService.addUserToOrg(Application.getAdminId(), organization.getId());
+                log.info("The user({}) is joined the default organization({}).", user.getUsername(), organization.getName());
+                return ;
+            } else if (organizationList.size()>1) {
+                Exceptions.msg("There is more than one organization in single mode.");
+            } else{
+                Exceptions.msg("There is no organization to join.");
+            }
+        }
         //创建默认组织
         log.info("Create default organization for user({})", user.getUsername());
         Organization organization = new Organization();
@@ -341,6 +361,35 @@ public class UserServiceImpl extends BaseService implements UserService {
             log.info("regist fail: {}", oauthUser.getName());
             throw new ServerException("regist fail: unspecified error");
         }
+    }
+
+    @Override
+    @Transactional
+    public boolean addUserToOrg(UserAddParam userAddParam, String orgId) throws MessagingException, UnsupportedEncodingException {
+        securityManager.requireOrgOwner(orgId);
+        if (StringUtils.isBlank(userAddParam.getPassword())) {
+            userAddParam.setPassword(Const.USER_DEFAULT_PSW);
+        }
+        if (StringUtils.isBlank(userAddParam.getEmail())) {
+            String str = userAddParam.getUsername() + LocalDate.now();
+            userAddParam.setEmail(DigestUtils.md5Hex(str) + "@datart.generate");
+        }
+        UserRegisterParam userRegisterParam = new UserRegisterParam();
+        BeanUtils.copyProperties(userAddParam, userRegisterParam);
+        register(userRegisterParam, false);
+        User user = this.userMapper.selectByUsername(userAddParam.getUsername());
+        orgService.addUserToOrg(user.getId(), orgId);
+        roleService.updateRolesForUser(user.getId(), orgId, userAddParam.getRoleIds());
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteUserFromOrg(String orgId, String userId) {
+        securityManager.requireOrgOwner(orgId);
+        orgService.removeUser(orgId, userId);
+        userMapper.deleteByPrimaryKey(userId);
+        return true;
     }
 
     @Override
