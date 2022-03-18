@@ -271,8 +271,22 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
+    public void deleteReference(Source source) {
+        deleteJdbcSourceSyncJob(source);
+    }
+
+    @Override
     public void deleteStaticFiles(Source source) {
         fileService.deleteFiles(FileOwner.DATA_SOURCE, source.getId());
+    }
+
+    private void deleteJdbcSourceSyncJob(Source source) {
+        try {
+            JobKey jobKey = new JobKey(source.getName(), source.getId());
+            scheduler.deleteJob(jobKey);
+        } catch (Exception e) {
+            log.error("schema sync job delete error ", e);
+        }
     }
 
     private void updateJdbcSourceSyncJob(Source source) {
