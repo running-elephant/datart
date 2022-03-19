@@ -192,10 +192,11 @@ const config: ChartConfig = {
           default: 'default',
           comType: 'select',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '默认', value: 'default' },
-              { label: '中', value: 'middle' },
-              { label: '小', value: 'small' },
+              { label: 'data.tableSizeDefault', value: 'default' },
+              { label: 'data.tableSizeMiddle', value: 'middle' },
+              { label: 'data.tableSizeSmall', value: 'small' },
             ],
           },
         },
@@ -279,6 +280,9 @@ const config: ChartConfig = {
         data: {
           title: '表格数据控制',
           tableSize: '表格大小',
+          tableSizeDefault: '默认',
+          tableSizeMiddle: '中',
+          tableSizeSmall: '小',
           autoMerge: '自动合并相同内容',
           enableRaw: '使用原始数据',
         },
@@ -322,6 +326,9 @@ const config: ChartConfig = {
         data: {
           title: 'Table Data Setting',
           tableSize: 'Table Size',
+          tableSizeDefault: 'Default',
+          tableSizeMiddle: 'Medium',
+          tableSizeSmall: 'Small',
           autoMerge: 'Auto Merge',
           enableRaw: 'Enable Raw Data',
         },

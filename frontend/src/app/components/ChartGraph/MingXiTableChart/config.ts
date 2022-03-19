@@ -522,7 +522,7 @@ const config: ChartConfig = {
         },
         tableSize: {
           default: 'Default',
-          middle: 'Middle',
+          middle: 'Medium',
           small: 'Small',
         },
         summary: {
