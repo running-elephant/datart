@@ -82,7 +82,12 @@ export const editBoardStackSlice = createSlice({
         const widget = produce(ele, draft => {
           draft.config.index = maxWidgetIndex;
           draft.config.name =
-            ele.config.name || getDefaultWidgetName(ele, maxWidgetIndex);
+            ele.config.name ||
+            getDefaultWidgetName(
+              ele.config.type,
+              ele.config.content.type,
+              maxWidgetIndex,
+            );
         });
         state.widgetRecord[widget.id] = widget;
       });
