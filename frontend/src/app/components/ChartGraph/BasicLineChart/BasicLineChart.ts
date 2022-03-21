@@ -233,7 +233,7 @@ class BasicLineChart extends Chart {
               ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),
               name: getColumnRenderName(aggConfig),
-              value: row?.getCell(aggConfig) || 0,
+              value: row?.getCell(aggConfig),
             };
           }),
           ...this.getLabelStyle(styleConfigs),
@@ -423,8 +423,12 @@ class BasicLineChart extends Chart {
   }
 
   private getSeriesStyle(styles) {
-    const [smooth, step] = getStyles(styles, ['graph'], ['smooth', 'step']);
-    return { smooth, step };
+    const [smooth, step, connectNulls] = getStyles(
+      styles,
+      ['graph'],
+      ['smooth', 'step', 'connectNulls'],
+    );
+    return { smooth, step, connectNulls };
   }
 
   private getTooltipFormmaterFunc(
