@@ -33,7 +33,8 @@ import {
   ControllerFacadeTypes,
   TimeFilterValueCategory,
 } from 'app/types/FilterControlPanel';
-import { FilterSqlOperator } from 'globalConstants';
+import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
+import moment from 'moment';
 import {
   adaptBoardImageUrl,
   adjustRangeDataEndValue,
@@ -1411,7 +1412,8 @@ describe('getControllerDateValues', () => {
       },
       execute: true,
     } as Params;
-    const res = ['2022-03-18 00:00:00', ''];
+    const time = moment().add('-1', 'd').startOf('d').format(TIME_FORMATTER);
+    const res = [time, ''];
     expect(getControllerDateValues(obj)).toEqual(res);
   });
   it('should endTime.relativeOrExact Exact and relative ', () => {
@@ -1426,7 +1428,7 @@ describe('getControllerDateValues', () => {
         },
         endTime: {
           relativeOrExact: 'exact',
-          exactValue: '2022-03-20 00:00:00',
+          exactValue: '2022-03-18 00:00:00',
           relativeValue: {
             amount: 1,
             unit: 'd',
@@ -1435,7 +1437,7 @@ describe('getControllerDateValues', () => {
         },
       },
     } as Params;
-    const res = ['2022-03-01 00:00:00', '2022-03-20 00:00:00'];
+    const res = ['2022-03-01 00:00:00', '2022-03-18 00:00:00'];
     expect(getControllerDateValues(obj)).toEqual(res);
     // has execute
     const obj2 = {
@@ -1458,7 +1460,12 @@ describe('getControllerDateValues', () => {
       },
       execute: true,
     } as Params;
-    const res2 = ['2022-03-01 00:00:00', '2022-03-19 00:00:00'];
+    const time = moment()
+      .add('-1', 'd')
+      .add(1, 'd')
+      .startOf('d')
+      .format(TIME_FORMATTER);
+    const res2 = ['2022-03-01 00:00:00', time];
 
     expect(getControllerDateValues(obj2)).toEqual(res2);
   });
