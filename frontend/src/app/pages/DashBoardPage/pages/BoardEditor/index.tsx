@@ -25,9 +25,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
+import EditorHeader from '../../components/BoardHeader/EditorHeader';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
-import TitleHeader from '../../components/TitleHeader';
 import { checkLinkAndJumpErr } from '../../utils';
 import { fetchBoardDetail } from '../Board/slice/thunk';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
@@ -52,14 +52,13 @@ import { addChartWidget, fetchEditBoardDetail } from './slice/thunk';
 
 export const BoardEditor: React.FC<{
   boardId: string;
-  allowManage?: boolean;
-}> = memo(({ boardId, allowManage }) => {
+}> = memo(({ boardId }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const board = useSelector(selectEditBoard);
   const boardLoading = useSelector(selectEditBoardLoading);
   const boardChartEditorProps = useSelector(selectBoardChartEditorProps);
-  const histState = history.location.state as any;
+
   const vizs = useSelector(selectVizs);
   const WidgetRecord = useSelector(selectWidgetRecord);
   const [folderIds, setFolderIds] = useState<any[]>([]);
@@ -106,17 +105,7 @@ export const BoardEditor: React.FC<{
     },
     [boardChartEditorProps?.widgetId, dispatch, onCloseChartEditor],
   );
-  const onCloseBoardEditor = useCallback(
-    (bool: boolean) => {
-      const pathName = history.location.pathname;
-      const prePath = pathName.split('/boardEditor')[0];
-      history.push(`${prePath}`);
-      dispatch(clearEditBoardState());
-      // 更新view界面数据
-      dispatch(fetchBoardDetail({ dashboardRelId: boardId }));
-    },
-    [boardId, dispatch, history],
-  );
+
   const boardEditor = useMemo(() => {
     if (!board.id) return null;
     if (board?.id !== boardId) {
@@ -134,7 +123,7 @@ export const BoardEditor: React.FC<{
         allowManage={false}
         renderMode="read"
       >
-        <TitleHeader toggleBoardEditor={onCloseBoardEditor} />
+        <EditorHeader />
         {boardType === 'auto' && <AutoEditor />}
         {boardType === 'free' && <FreeEditor />}
         <ControllerWidgetPanel />
@@ -153,25 +142,22 @@ export const BoardEditor: React.FC<{
     boardChartEditorProps,
     board,
     boardId,
-    onCloseBoardEditor,
     onCloseChartEditor,
     onSaveToWidget,
   ]);
   const initialization = useCallback(async () => {
     await dispatch(fetchEditBoardDetail(boardId));
-
+    const histState = history.location.state as any;
     try {
       if (histState?.widgetInfo) {
         const widgetInfo = JSON.parse(histState.widgetInfo);
 
         if (widgetInfo) {
           let subType: 'widgetChart' | 'dataChart' = 'dataChart';
-
           if (!widgetInfo.dataChart.id) {
             widgetInfo.dataChart.id = 'widget_' + uuidv4();
             subType = 'widgetChart';
           }
-
           dispatch(
             addChartWidget({
               boardId,
@@ -187,7 +173,7 @@ export const BoardEditor: React.FC<{
     } catch (error) {
       console.log(error);
     }
-  }, [dispatch, histState?.widgetInfo, boardId]);
+  }, [dispatch, history.location.state, boardId]);
 
   useEffect(() => {
     initialization();
@@ -195,6 +181,8 @@ export const BoardEditor: React.FC<{
       // fix issue: #800
       onCloseChartEditor();
       dispatch(clearEditBoardState());
+      //销毁时  更新view界面数据
+      dispatch(fetchBoardDetail({ dashboardRelId: boardId }));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onCloseChartEditor]);

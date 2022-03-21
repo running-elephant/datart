@@ -15,22 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package datart.server.service;
 
-package datart.server.base.dto;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 
-import lombok.Data;
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 
-@Data
-public class SystemInfo {
+public interface ExternalRegisterService {
 
-    private String version;
+    String ldapRegister(String filter, String password) throws MessagingException, UnsupportedEncodingException;
 
-    private String tokenTimeout;
-
-    private boolean mailEnable;
-
-    private String mode;
-
-    private boolean registerEnable;
+    String oauth2Register(OAuth2AuthenticationToken oauthAuthToken) throws MessagingException, UnsupportedEncodingException;
 
 }

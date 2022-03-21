@@ -20,6 +20,10 @@ public class VariableSqlProvider {
             sql.VALUES("view_id", "#{viewId,jdbcType=VARCHAR}");
         }
         
+        if (record.getSourceId() != null) {
+            sql.VALUES("source_id", "#{sourceId,jdbcType=VARCHAR}");
+        }
+        
         if (record.getName() != null) {
             sql.VALUES("`name`", "#{name,jdbcType=VARCHAR}");
         }
@@ -30,6 +34,10 @@ public class VariableSqlProvider {
         
         if (record.getValueType() != null) {
             sql.VALUES("value_type", "#{valueType,jdbcType=VARCHAR}");
+        }
+        
+        if (record.getFormat() != null) {
+            sql.VALUES("format", "#{format,jdbcType=VARCHAR}");
         }
         
         if (record.getPermission() != null) {
@@ -83,6 +91,10 @@ public class VariableSqlProvider {
             sql.SET("view_id = #{viewId,jdbcType=VARCHAR}");
         }
         
+        if (record.getSourceId() != null) {
+            sql.SET("source_id = #{sourceId,jdbcType=VARCHAR}");
+        }
+        
         if (record.getName() != null) {
             sql.SET("`name` = #{name,jdbcType=VARCHAR}");
         }
@@ -93,6 +105,10 @@ public class VariableSqlProvider {
         
         if (record.getValueType() != null) {
             sql.SET("value_type = #{valueType,jdbcType=VARCHAR}");
+        }
+        
+        if (record.getFormat() != null) {
+            sql.SET("format = #{format,jdbcType=VARCHAR}");
         }
         
         if (record.getPermission() != null) {

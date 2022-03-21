@@ -15,16 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Layout, message } from 'antd';
+import { Layout } from 'antd';
 import { Split } from 'app/components';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
+import { usePublishBoard } from 'app/pages/DashBoardPage/hooks/usePublishBoard';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
-import {
-  deleteViz,
-  publishViz,
-  removeTab,
-} from 'app/pages/MainPage/pages/VizPage/slice/thunks';
 import { StoryContext } from 'app/pages/StoryBoardPage/contexts/StoryContext';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -55,12 +50,10 @@ export const StoryPagePreview: React.FC<{
   allowManage?: boolean;
 }> = memo(({ orgId, storyId, allowShare, allowManage }) => {
   const dispatch = useDispatch();
-  const t = useI18NPrefix('viz.main');
-  const tg = useI18NPrefix('global');
   const history = useHistory();
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const publishLoading = useSelector(selectPublishLoading);
-  const storyBoard = useSelector((state: { storyBoard: StoryBoardState }) =>
+  const story = useSelector((state: { storyBoard: StoryBoardState }) =>
     makeSelectStoryBoardById(state, storyId),
   );
   const pageMap = useSelector((state: { storyBoard: StoryBoardState }) =>
@@ -99,33 +92,11 @@ export const StoryPagePreview: React.FC<{
   const playStory = useCallback(() => {
     window.open(`storyPlayer/${storyId}`, '_blank');
   }, [storyId]);
-
-  const onPublish = useCallback(() => {
-    if (storyBoard) {
-      dispatch(
-        publishViz({
-          id: storyBoard.id,
-          vizType: 'STORYBOARD',
-          publish: storyBoard.status === 1 ? true : false,
-          resolve: () => {
-            message.success(
-              `${
-                storyBoard.status === 2
-                  ? t('unpublishSuccess')
-                  : t('publishSuccess')
-              }`,
-            );
-            dispatch(
-              storyActions.changeBoardPublish({
-                stroyId: storyBoard.id,
-                publish: storyBoard.status === 1 ? 2 : 1,
-              }),
-            );
-          },
-        }),
-      );
-    }
-  }, [dispatch, storyBoard, t]);
+  const { publishStory } = usePublishBoard(
+    storyId,
+    'STORYBOARD',
+    story?.status || 0,
+  );
 
   const { sizes, setSizes } = useSplitSizes({
     limitedSide: 0,
@@ -140,30 +111,6 @@ export const StoryPagePreview: React.FC<{
 
     [setSizes],
   );
-
-  const redirect = useCallback(
-    tabKey => {
-      if (tabKey) {
-        history.push(`/organizations/${orgId}/vizs/${tabKey}`);
-      } else {
-        history.push(`/organizations/${orgId}/vizs`);
-      }
-    },
-    [history, orgId],
-  );
-
-  const handleRecycleStory = useCallback(() => {
-    dispatch(
-      deleteViz({
-        params: { id: storyId, archive: true },
-        type: 'STORYBOARD',
-        resolve: () => {
-          message.success(tg('operation.archiveSuccess'));
-          dispatch(removeTab({ id: storyId, resolve: redirect }));
-        },
-      }),
-    );
-  }, [dispatch, redirect, storyId, tg]);
 
   // 点击在加载
   useEffect(() => {
@@ -207,22 +154,24 @@ export const StoryPagePreview: React.FC<{
     <DndProvider backend={HTML5Backend}>
       <StoryContext.Provider
         value={{
-          stroyBoardId: storyId,
+          name: story?.name,
+          storyId: storyId,
           editing: false,
+          orgId: orgId,
+          status: 1,
           allowShare: allowShare || false,
         }}
       >
         <Wrapper>
           <StoryHeader
-            name={storyBoard?.name}
+            name={story?.name}
             playStory={playStory}
-            status={storyBoard?.status}
+            status={story?.status}
             toggleEdit={toggleEdit}
             publishLoading={publishLoading}
-            onPublish={onPublish}
+            onPublish={publishStory}
             allowShare={allowShare}
             allowManage={allowManage}
-            onRecycleStory={handleRecycleStory}
           />
           <Container
             sizes={sizes}
