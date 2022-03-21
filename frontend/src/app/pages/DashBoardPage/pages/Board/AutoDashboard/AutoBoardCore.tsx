@@ -36,19 +36,19 @@ import {
   BoardState,
   DeviceType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
-import { Layout, Responsive, WidthProvider } from 'react-grid-layout';
+import { memo, useCallback, useContext, useMemo, useState } from 'react';
+import RGL, { Layout, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
 import StyledBackground from '../components/StyledBackground';
 import { WidgetOfAuto } from './WidgetOfAuto';
-const ResponsiveGridLayout = WidthProvider(Responsive);
+
+const ReactGridLayout = WidthProvider(RGL);
 const mobilePoints = Object.keys(BREAK_POINT_MAP).slice(3);
 export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
-    // const visible = useVisibleHidden(0);
     const {
       margin,
       containerPadding,
@@ -146,7 +146,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
           {sortedLayoutWidgets.length ? (
             <div className="grid-wrap" ref={gridWrapRef}>
               <div className="grid-wrap" ref={gridRef}>
-                <ResponsiveGridLayout
+                <ReactGridLayout
                   layouts={layoutMap}
                   breakpoints={BREAK_POINT_MAP}
                   margin={curMargin}
@@ -162,7 +162,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
                   useCSSTransforms={true}
                 >
                   {boardChildren}
-                </ResponsiveGridLayout>
+                </ReactGridLayout>
               </div>
             </div>
           ) : (
