@@ -28,6 +28,7 @@ import {
   mergeChartStyleConfigs,
   reachLowerBoundCount,
   transferChartConfigs,
+  transformMeta,
 } from '../internalChartHelper';
 
 describe('Internal Chart Helper ', () => {
@@ -1305,6 +1306,53 @@ describe('Internal Chart Helper ', () => {
       expect(results).toEqual([
         { colName: 'a-1', isGroup: false, children: [] },
         { colName: 'a-b-1', isGroup: false, children: [] },
+      ]);
+    });
+  });
+
+  describe('transformMeta Test', () => {
+    test('should not transform meta when config model is empty', () => {
+      const model = undefined;
+      const metas = transformMeta(model);
+      expect(metas).toEqual(undefined);
+    });
+
+    test('should transform meta without hierarchy and no children', () => {
+      const model = JSON.stringify({ a: { type: 'STRING' } });
+      const metas = transformMeta(model);
+      expect(metas).toEqual([{ category: 'field', id: 'a', type: 'STRING' }]);
+    });
+
+    test('should transform meta without hierarchy but have children', () => {
+      const model = JSON.stringify({
+        a: {
+          type: 'STRING',
+          children: [{ name: 1 }, { name: 2 }],
+        },
+      });
+      const metas = transformMeta(model);
+      expect(metas).toEqual([
+        { name: 1, id: 1, category: 'field' },
+        { name: 2, id: 2, category: 'field' },
+      ]);
+    });
+
+    test('should transform meta with hierarchy', () => {
+      const model = JSON.stringify({
+        hierarchy: {
+          someFiled: {
+            name: 'a',
+            children: [
+              { name: 'b', value: 1 },
+              { name: 'c', value: 2 },
+            ],
+          },
+        },
+      });
+      const metas = transformMeta(model);
+      expect(metas).toEqual([
+        { name: 'b', value: 1, id: 'b', category: 'field' },
+        { name: 'c', value: 2, id: 'c', category: 'field' },
       ]);
     });
   });
