@@ -70,6 +70,12 @@ const config: ChartConfig = {
           default: false,
           comType: 'checkbox',
         },
+        {
+          label: 'graph.connectNulls',
+          key: 'connectNulls',
+          default: false,
+          comType: 'checkbox',
+        },
       ],
     },
     {
@@ -526,6 +532,7 @@ const config: ChartConfig = {
           title: '折线图',
           smooth: '平滑',
           step: '阶梯',
+          connectNulls: '连接空数据',
         },
         xAxis: {
           title: 'X轴',
@@ -597,6 +604,7 @@ const config: ChartConfig = {
           title: 'Graph',
           smooth: 'Smooth',
           step: 'Step',
+          connectNulls: 'Connect Nulls',
         },
         xAxis: {
           title: 'X Axis',

@@ -59,6 +59,12 @@ function DemoCustomLineChart({ dHelper }) {
               default: false,
               comType: 'checkbox',
             },
+            {
+              label: 'graph.connectNulls',
+              key: 'connectNulls',
+              default: false,
+              comType: 'checkbox',
+            },
           ],
         },
         {
@@ -464,6 +470,7 @@ function DemoCustomLineChart({ dHelper }) {
               title: '折线图',
               smooth: '平滑',
               step: '阶梯',
+              connectNulls: '连接空数据',
             },
             xAxis: {
               title: 'X轴',
@@ -527,6 +534,7 @@ function DemoCustomLineChart({ dHelper }) {
               title: 'Graph',
               smooth: 'Smooth',
               step: 'Step',
+              connectNulls: 'Connect Nulls',
             },
             xAxis: {
               title: 'X Axis',
@@ -818,12 +826,12 @@ function DemoCustomLineChart({ dHelper }) {
     },
 
     getSeriesStyle(styles) {
-      const [smooth, step] = dHelper.getStyles(
+      const [smooth, step, connectNulls] = dHelper.getStyles(
         styles,
         ['graph'],
-        ['smooth', 'step'],
+        ['smooth', 'step', 'connectNulls'],
       );
-      return { smooth, step };
+      return { smooth, step, connectNulls };
     },
   };
 }
