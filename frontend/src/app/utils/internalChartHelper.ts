@@ -133,18 +133,7 @@ const transferDataConfigImpl = (
           (section?.rows || []).length + 1,
         );
       })
-      .sort((a, b) => {
-        if (
-          reachLowerBoundCount(a?.limit, a?.rows?.length) !==
-          reachLowerBoundCount(b?.limit, b?.rows?.length)
-        ) {
-          return (
-            reachLowerBoundCount(b?.limit, b?.rows?.length) -
-            reachLowerBoundCount(a?.limit, a?.rows?.length)
-          );
-        }
-        return (a?.rows?.length || 0) - (b?.rows?.length || 0);
-      })?.[0];
+      .sort(chartDataSectionRowLimitationComparer)?.[0];
     if (minimalRowConfig && row) {
       minimalRowConfig.rows = (minimalRowConfig.rows || []).concat([row]);
     }
@@ -186,18 +175,7 @@ const transferNonMixedToMixed = (
             (section?.rows || []).length + 1,
           );
         })
-        .sort((a, b) => {
-          if (
-            reachLowerBoundCount(a?.limit, a?.rows?.length) !==
-            reachLowerBoundCount(b?.limit, b?.rows?.length)
-          ) {
-            return (
-              reachLowerBoundCount(b?.limit, b?.rows?.length) -
-              reachLowerBoundCount(a?.limit, a?.rows?.length)
-            );
-          }
-          return (a?.rows?.length || 0) - (b?.rows?.length || 0);
-        })?.[0];
+        .sort(chartDataSectionRowLimitationComparer)?.[0];
       if (minimalRowConfig && row) {
         minimalRowConfig.rows = (minimalRowConfig.rows || []).concat([row]);
       }
@@ -246,18 +224,7 @@ const transferMixedToNonMixed = (
             (section?.rows || []).length + 1,
           );
         })
-        .sort((a, b) => {
-          if (
-            reachLowerBoundCount(a?.limit, a?.rows?.length) !==
-            reachLowerBoundCount(b?.limit, b?.rows?.length)
-          ) {
-            return (
-              reachLowerBoundCount(b?.limit, b?.rows?.length) -
-              reachLowerBoundCount(a?.limit, a?.rows?.length)
-            );
-          }
-          return (a?.rows?.length || 0) - (b?.rows?.length || 0);
-        })?.[0];
+        .sort(chartDataSectionRowLimitationComparer)?.[0];
       if (minimalRowConfig && row) {
         minimalRowConfig.rows = (minimalRowConfig.rows || []).concat([row]);
       }
@@ -276,18 +243,7 @@ const transferMixedToNonMixed = (
             (section?.rows || []).length + 1,
           );
         })
-        .sort((a, b) => {
-          if (
-            reachLowerBoundCount(a?.limit, a?.rows?.length) !==
-            reachLowerBoundCount(b?.limit, b?.rows?.length)
-          ) {
-            return (
-              reachLowerBoundCount(b?.limit, b?.rows?.length) -
-              reachLowerBoundCount(a?.limit, a?.rows?.length)
-            );
-          }
-          return (a?.rows?.length || 0) - (b?.rows?.length || 0);
-        })?.[0];
+        .sort(chartDataSectionRowLimitationComparer)?.[0];
       if (minimalRowConfig && row) {
         minimalRowConfig.rows = (minimalRowConfig.rows || []).concat([row]);
       }
@@ -296,6 +252,19 @@ const transferMixedToNonMixed = (
 
   return targetConfig!;
 };
+
+function chartDataSectionRowLimitationComparer(prev, next) {
+  if (
+    reachLowerBoundCount(prev?.limit, prev?.rows?.length) !==
+    reachLowerBoundCount(next?.limit, next?.rows?.length)
+  ) {
+    return (
+      reachLowerBoundCount(next?.limit, next?.rows?.length) -
+      reachLowerBoundCount(prev?.limit, prev?.rows?.length)
+    );
+  }
+  return (prev?.rows?.length || 0) - (next?.rows?.length || 0);
+}
 
 export function isInRange(limit?: ChartDataConfig['limit'], count: number = 0) {
   return cond(
