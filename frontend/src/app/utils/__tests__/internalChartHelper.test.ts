@@ -20,6 +20,7 @@ import { ChartDataSectionType, ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import {
+  diffHeaderRows,
   isInRange,
   isUnderUpperBound,
   mergeChartDataConfigs,
@@ -1161,6 +1162,29 @@ describe('Internal Chart Helper ', () => {
       };
       const result = transferChartConfigs(targetConfig, sourceConfig);
       expect(result).toEqual(sourceConfig);
+    });
+  });
+
+  describe('diffHeaderRows Test', () => {
+    test('should verify two different rows with different length', () => {
+      const oldRows = [{ colName: 'a' }, { colName: 'b' }];
+      const newRows = [{ colName: 'a' }];
+      const isDifferent = diffHeaderRows(oldRows, newRows);
+      expect(isDifferent).toBeTruthy();
+    });
+
+    test('should be different when have different values', () => {
+      const oldRows = [{ colName: 'a' }, { colName: 'b' }];
+      const newRows = [{ colName: 'a' }, { colName: 'c' }];
+      const isDifferent = diffHeaderRows(oldRows, newRows);
+      expect(isDifferent).toBeTruthy();
+    });
+
+    test('should be same even if order is different', () => {
+      const oldRows = [{ colName: 'a' }, { colName: 'b' }];
+      const newRows = [{ colName: 'b' }, { colName: 'a' }];
+      const isDifferent = diffHeaderRows(oldRows, newRows);
+      expect(isDifferent).toBeFalsy();
     });
   });
 });
