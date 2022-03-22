@@ -21,6 +21,7 @@ import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import {
   diffHeaderRows,
+  flattenHeaderRowsWithoutGroupRow,
   isInRange,
   isUnderUpperBound,
   mergeChartDataConfigs,
@@ -1274,6 +1275,37 @@ describe('Internal Chart Helper ', () => {
       const newRows = [{ colName: 'b' }, { colName: 'a' }];
       const isDifferent = diffHeaderRows(oldRows, newRows);
       expect(isDifferent).toBeFalsy();
+    });
+  });
+
+  describe('flattenHeaderRowsWithoutGroupRow Test', () => {
+    test('should flatten to get all rows without children', () => {
+      const groupHeaderRow = {
+        colName: 'a',
+        isGroup: undefined,
+      };
+      const results = flattenHeaderRowsWithoutGroupRow(groupHeaderRow);
+      expect(results).toEqual([{ colName: 'a', isGroup: undefined }]);
+    });
+
+    test('should flatten to get all rows with children', () => {
+      const groupHeaderRow = {
+        colName: 'a',
+        isGroup: true,
+        children: [
+          { colName: 'a-1', isGroup: false, children: [] },
+          {
+            colName: 'a-b',
+            isGroup: true,
+            children: [{ colName: 'a-b-1', isGroup: false, children: [] }],
+          },
+        ],
+      };
+      const results = flattenHeaderRowsWithoutGroupRow(groupHeaderRow);
+      expect(results).toEqual([
+        { colName: 'a-1', isGroup: false, children: [] },
+        { colName: 'a-b-1', isGroup: false, children: [] },
+      ]);
     });
   });
 });
