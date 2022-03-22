@@ -79,7 +79,10 @@ class WordCloudChart extends Chart {
   }
 
   onResize(opt: any, context): void {
+    this.chart?.clear();
     this.chart?.resize(context);
+    const newOptions = this.getOptions(opt.dataset, opt.config);
+    this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
   getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
