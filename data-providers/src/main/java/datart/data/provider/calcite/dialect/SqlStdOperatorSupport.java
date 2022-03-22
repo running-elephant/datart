@@ -20,9 +20,7 @@ package datart.data.provider.calcite.dialect;
 import com.google.common.collect.ImmutableSet;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.StdSqlOperator;
-import org.apache.calcite.sql.SqlCall;
-import org.apache.calcite.sql.SqlOperator;
-import org.apache.calcite.sql.SqlWriter;
+import org.apache.calcite.sql.*;
 
 import java.lang.reflect.Field;
 import java.util.EnumSet;
@@ -61,9 +59,16 @@ public interface SqlStdOperatorSupport {
 
     default void renameCallOperator(String newName, SqlCall call) {
         try {
+            SqlOperator operator = call.getOperator();
             Field nameField = SqlOperator.class.getDeclaredField("name");
             nameField.setAccessible(true);
-            nameField.set(call.getOperator(), newName);
+            nameField.set(operator, newName);
+            if (operator instanceof SqlFunction) {
+                Field sqlIdentifierField = SqlFunction.class.getDeclaredField("sqlIdentifier");
+                sqlIdentifierField.setAccessible(true);
+                SqlIdentifier sqlIdentifier = (SqlIdentifier)sqlIdentifierField.get(call.getOperator());
+                sqlIdentifierField.set(operator,sqlIdentifier.setName(0, newName));
+            }
         } catch (NoSuchFieldException | IllegalAccessException e) {
             Exceptions.e(e);
         }

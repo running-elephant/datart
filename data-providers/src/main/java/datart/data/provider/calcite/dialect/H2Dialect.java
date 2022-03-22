@@ -17,12 +17,15 @@
  */
 package datart.data.provider.calcite.dialect;
 
+import datart.core.data.provider.StdSqlOperator;
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.dialect.H2SqlDialect;
 import org.apache.calcite.sql.dialect.MysqlSqlDialect;
+
+import static datart.core.data.provider.StdSqlOperator.symbolOf;
 
 public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, FetchAndOffsetSupport {
 
@@ -40,7 +43,36 @@ public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, Fe
     }
 
     @Override
+    public void unparseCall(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
+        if (isStdSqlOperator(call) && unparseStdSqlOperator(writer, call, leftPrec, rightPrec)) {
+            return;
+        }
+        super.unparseCall(writer, call, leftPrec, rightPrec);
+    }
+
+    @Override
     public boolean unparseStdSqlOperator(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
+        StdSqlOperator operator = symbolOf(call.getOperator().getName());
+        switch (operator) {
+            case AGG_DATE_YEAR:
+                writer.print("YEAR(" + call.getOperandList().get(0).toString() + ")");
+                return true;
+            case AGG_DATE_QUARTER:
+                writer.print("FORMATDATETIME("+call.getOperandList().get(0).toString()+",'yyyy-q')");
+                return true;
+            case AGG_DATE_MONTH:
+                writer.print("FORMATDATETIME("+call.getOperandList().get(0).toString()+",'yyyy-MM')");
+                return true;
+            case AGG_DATE_WEEK:
+                String column = call.getOperandList().get(0).toString();
+                writer.print("CONCAT_WS('-',ISO_YEAR("+column+"),RIGHT(100+ISO_WEEK("+column+"),2))");
+                return true;
+            case AGG_DATE_DAY:
+                writer.print("FORMATDATETIME("+call.getOperandList().get(0).toString()+",'yyyy-MM-dd')");
+                return true;
+            default:
+                break;
+        }
         return false;
     }
 
