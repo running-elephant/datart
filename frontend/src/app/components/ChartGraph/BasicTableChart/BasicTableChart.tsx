@@ -37,7 +37,11 @@ import {
   getCustomBodyRowStyle,
 } from './conditionalStyle';
 import Config from './config';
-import { ResizableTitle, TableComponentsTd } from './TableComponents';
+import {
+  ResizableTitle,
+  TableColumnTitle,
+  TableComponentsTd,
+} from './TableComponents';
 
 class BasicTableChart extends ReactChart {
   useIFrame = false;
@@ -453,7 +457,9 @@ class BasicTableChart extends ReactChart {
         const sorterIconWidth = 12;
         return Math.max(
           width,
-          headerWidth + sorterIconWidth,
+          headerWidth +
+            sorterIconWidth +
+            (c?.alias?.desc ? c.alheaderFont?.fontSize : 0),
           summaryWidth + sorterIconWidth,
         );
       });
@@ -718,7 +724,11 @@ class BasicTableChart extends ReactChart {
           : columnConfig?.columnWidthValue;
       return {
         sorter: true,
-        title: getColumnRenderName(c),
+        showSorterTooltip: false,
+        title: TableColumnTitle({
+          title: getColumnRenderName(c),
+          desc: c?.alias?.desc,
+        }),
         dataIndex: chartDataSet.getFieldIndex(c),
         key: chartDataSet.getFieldKey(c),
         aggregate: c?.aggregate,

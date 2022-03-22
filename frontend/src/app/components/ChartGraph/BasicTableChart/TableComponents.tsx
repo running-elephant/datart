@@ -1,3 +1,4 @@
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import React from 'react';
 import { Resizable } from 'react-resizable';
@@ -39,6 +40,33 @@ export const ResizableTitle = props => {
     </Resizable>
   );
 };
+
+export const TableColumnTitle = props => {
+  const { desc, title } = props;
+  return (
+    <TableColumnTitleStyle>
+      <span className="titleStyle">{title}</span>
+      {desc && (
+        <Tooltip placement="top" title={desc} className="infoTooltip">
+          <InfoCircleOutlined />
+        </Tooltip>
+      )}
+    </TableColumnTitleStyle>
+  );
+};
+
+const TableColumnTitleStyle = styled.span`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  .titleStyle {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`;
 
 const ResizableHandleStyle = styled.span`
   position: absolute;
