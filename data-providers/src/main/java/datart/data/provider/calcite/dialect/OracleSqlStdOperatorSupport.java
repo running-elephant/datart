@@ -49,10 +49,8 @@ public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements Sql
 
     @Override
     public void unparseCall(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
-        if (isStdSqlOperator(call)) {
-            if (unparseStdSqlOperator(writer, call, leftPrec, rightPrec)) {
-                return;
-            }
+        if (isStdSqlOperator(call) && unparseStdSqlOperator(writer, call, leftPrec, rightPrec)) {
+            return;
         }
         super.unparseCall(writer, call, leftPrec, rightPrec);
     }
@@ -61,13 +59,28 @@ public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements Sql
     public boolean unparseStdSqlOperator(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
         StdSqlOperator operator = symbolOf(call.getOperator().getName());
         switch (operator) {
-            case NOW: //
-                break;
+            case NOW:
+                writer.print("SYSDATE");
+                return true;
+            case AGG_DATE_YEAR:
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY')");
+                return true;
+            case AGG_DATE_QUARTER:
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY-Q')");
+                return true;
+            case AGG_DATE_MONTH:
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY-MM')");
+                return true;
+            case AGG_DATE_WEEK:
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'IYYY-IW')");
+                return true;
+            case AGG_DATE_DAY:
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY-MM-DD')");
+                return true;
             default:
-                return false;
+                break;
         }
-        super.unparseCall(writer, call, leftPrec, rightPrec);
-        return true;
+        return false;
     }
 
     @Override
