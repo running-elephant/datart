@@ -23,20 +23,46 @@ import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
 const template = {
-  label: `viz.palette.style.legendType.title`,
-  key: 'type',
-  default: 'scroll',
+  label: `viz.palette.style.position.title`,
+  key: 'position',
+  default: 'top',
   comType: 'select',
   options: {
     translateItemLabel: true,
     items: [
-      { label: 'viz.palette.style.legendType.plain', value: 'plain' },
-      { label: 'viz.palette.style.legendType.scroll', value: 'scroll' },
+      { label: 'viz.palette.style.position.top', value: 'top' },
+      { label: 'viz.palette.style.position.bottom', value: 'bottom' },
+      { label: 'viz.palette.style.position.left', value: 'left' },
+      { label: 'viz.palette.style.position.right', value: 'right' },
+      { label: 'viz.palette.style.position.inside', value: 'inside' },
+      { label: 'viz.palette.style.position.insideLeft', value: 'insideLeft' },
+      { label: 'viz.palette.style.position.insideRight', value: 'insideRight' },
+      { label: 'viz.palette.style.position.insideTop', value: 'insideTop' },
+      {
+        label: 'viz.palette.style.position.insideBottom',
+        value: 'insideBottom',
+      },
+      {
+        label: 'viz.palette.style.position.insideTopLeft',
+        value: 'insideTopLeft',
+      },
+      {
+        label: 'viz.palette.style.position.insideBottomLeft',
+        value: 'insideBottomLeft',
+      },
+      {
+        label: 'viz.palette.style.position.insideTopRight',
+        value: 'insideTopRight',
+      },
+      {
+        label: 'viz.palette.style.position.insideBottomRight',
+        value: 'insideBottomRight',
+      },
     ],
   },
 };
 
-const LegendType: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+const LabelPosition: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({
     ancestors,
     translate: t = title => title,
@@ -63,4 +89,4 @@ const LegendType: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   itemLayoutComparer,
 );
 
-export default LegendType;
+export default LabelPosition;

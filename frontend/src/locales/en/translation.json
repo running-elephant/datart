@@ -558,11 +558,13 @@
           "dotted": "Dotted"
         },
         "nameLocation": {
+          "title": "Name Location",
           "start": "Start",
           "center": "Center",
           "end": "End"
         },
         "legendType": {
+          "title": "Type",
           "plain": "Plain",
           "scroll": "Scroll"
         },
@@ -589,6 +591,22 @@
           "normal": "Normal",
           "italic": "Italic",
           "oblique": "Oblique"
+        },
+        "position": {
+          "auto": "Auto",
+          "right": "Right",
+          "left": "Left",
+          "top": "Top",
+          "bottom": "Bottom",
+          "inside": "Inside",
+          "insideLeft": "Inside Left",
+          "insideRight": "Inside Right",
+          "insideTop": "Inside Top",
+          "insideBottom": "Inside Bottom",
+          "insideTopLeft": "Inside Top Left",
+          "insideBottomLeft": "Inside Bottom Left",
+          "insideTopRight": "Inside Top Right",
+          "insideBottomRight": "Inside Bottom Right"
         }
       },
       "data": {
