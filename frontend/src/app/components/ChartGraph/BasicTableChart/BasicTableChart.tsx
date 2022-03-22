@@ -191,7 +191,11 @@ class BasicTableChart extends ReactChart {
         const rowData = row?.convertToCaseSensitiveObject();
         return { index, rowData };
       },
-      components: this.getTableComponents(styleConfigs, widgetSpecialConfig),
+      components: this.getTableComponents(
+        styleConfigs,
+        widgetSpecialConfig,
+        mixedSectionConfigRows,
+      ),
       ...this.getAntdTableStyleOptions(styleConfigs, settingConfigs, context),
       onChange: (pagination, filters, sorter, extra) => {
         if (extra?.action === 'sort' || extra?.action === 'paginate') {
@@ -495,7 +499,11 @@ class BasicTableChart extends ReactChart {
     }, {});
   }
 
-  protected getTableComponents(styleConfigs, widgetSpecialConfig) {
+  protected getTableComponents(
+    styleConfigs,
+    widgetSpecialConfig,
+    mixedSectionConfigRows,
+  ) {
     const linkFields = widgetSpecialConfig?.linkFields;
     const jumpField = widgetSpecialConfig?.jumpField;
 
@@ -574,6 +582,11 @@ class BasicTableChart extends ReactChart {
             [uid, 'conditionalStyle'],
             ['conditionalStylePanel'],
           );
+          const [align] = getStyles(
+            getAllColumnListInfo,
+            [uid, 'columnStyle'],
+            ['align'],
+          );
           const conditionalCellStyle = getCustomBodyCellStyle(
             props?.cellValue,
             conditionalStyle,
@@ -581,10 +594,27 @@ class BasicTableChart extends ReactChart {
           const sensitiveFieldName = Object.keys(rowData || {})?.[0];
           const useColumnWidth =
             this.dataColumnWidths?.[props.dataIndex]?.getUseColumnWidth;
+          const _getBodyTextAlignStyle = alignValue => {
+            if (alignValue && alignValue !== 'default') {
+              return alignValue;
+            }
+            if (bodyTextAlign === 'default') {
+              const type = mixedSectionConfigRows.find(
+                v => v.uid === uid,
+              )?.type;
+              if (type === 'NUMERIC') {
+                return 'right';
+              }
+              return 'left';
+            }
+            return bodyTextAlign;
+          };
           return (
             <TableComponentsTd
               {...rest}
-              style={Object.assign(style || {}, conditionalCellStyle)}
+              style={Object.assign(style || {}, conditionalCellStyle, {
+                textAlign: _getBodyTextAlignStyle(align),
+              })}
               isLinkCell={linkFields?.includes(sensitiveFieldName)}
               isJumpCell={jumpField === sensitiveFieldName}
               useColumnWidth={useColumnWidth}
@@ -603,7 +633,7 @@ class BasicTableChart extends ReactChart {
         wrapper: props => {
           const { style, ...rest } = props;
           const bodyStyle = {
-            textAlign: bodyTextAlign,
+            textAlign: bodyTextAlign === 'default' ? 'left' : bodyTextAlign,
             fontFamily,
             fontWeight,
             fontStyle,
