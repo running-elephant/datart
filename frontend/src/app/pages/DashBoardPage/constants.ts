@@ -31,7 +31,8 @@ export const BASE_ROW_HEIGHT = 32;
 export const MIN_ROW_HEIGHT = 24;
 export const MIN_MARGIN = 8;
 export const MIN_PADDING = 8;
-/** lg: 12,md: 12,sm: 8,xs: 2,xxs: 2 */
+export const LAYOUT_COLS_KEYS = ['lg', 'md', 'sm', 'xs', 'xxs'] as const;
+
 export const LAYOUT_COLS_MAP = {
   lg: 12,
   md: 12,
@@ -48,6 +49,7 @@ export const BREAK_POINT_MAP = {
   xs: 480,
   xxs: 0,
 };
+
 export const INIT_COLS = 12;
 export const DEVICE_LIST = {
   '华为 Mate 30': [360, 780],

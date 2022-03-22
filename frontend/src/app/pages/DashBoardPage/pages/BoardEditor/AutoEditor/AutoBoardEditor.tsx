@@ -21,26 +21,17 @@ import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProv
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
 import {
-  BREAK_POINT_MAP,
   LAYOUT_COLS_MAP,
-  MIN_MARGIN,
-  MIN_PADDING,
   RGL_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
 import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
 import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { getBoardMarginPadding } from 'app/pages/DashBoardPage/utils/board';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import debounce from 'lodash/debounce';
-import React, {
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-import { Layout, Responsive, WidthProvider } from 'react-grid-layout';
+import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
+import RGL, { Layout, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
@@ -55,20 +46,12 @@ import {
 } from '../slice/selectors';
 import { WidgetOfAutoEditor } from './WidgetOfAutoEditor';
 
-// const ReactGridLayout = WidthProvider(RGL);
-const ResponsiveGridLayout = WidthProvider(Responsive);
+const ReactGridLayout = WidthProvider(RGL);
 
 export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
-  // const visible = useVisibleHidden(100);
-  const {
-    margin,
-    containerPadding,
-    background,
-    mobileMargin,
-    mobileContainerPadding,
-    allowOverlap,
-  } = useContext(BoardConfigContext);
+  const boardConfig = useContext(BoardConfigContext);
+  const { margin, background, allowOverlap } = boardConfig;
   const { deviceType } = useContext(BoardInfoContext);
 
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
@@ -98,32 +81,14 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     currentLayout,
     widgetRowHeight,
     throttleLazyRender,
+    colsKey,
   } = useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
 
-  const onBreakpointChange = value => {};
-
   const { curMargin, curPadding } = useMemo(() => {
-    return deviceType === DeviceType.Mobile
-      ? {
-          curMargin: mobileMargin || [MIN_MARGIN, MIN_MARGIN],
-          curPadding: mobileContainerPadding || [MIN_PADDING, MIN_PADDING],
-        }
-      : {
-          curMargin: margin,
-          curPadding: containerPadding,
-        };
-  }, [
-    deviceType,
-    mobileMargin,
-    mobileContainerPadding,
-    margin,
-    containerPadding,
-  ]);
-  const layoutMap = useGridLayoutMap(layoutWidgetMap);
+    return getBoardMarginPadding(boardConfig, colsKey);
+  }, [boardConfig, colsKey]);
 
-  useEffect(() => {
-    currentLayout.current = layoutMap.lg;
-  }, [layoutMap.lg, currentLayout]);
+  const layoutMap = useGridLayoutMap(layoutWidgetMap);
 
   const changeWidgetLayouts = debounce((layouts: Layout[]) => {
     dispatch(
@@ -179,18 +144,12 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
         curWH={curWH}
         className={deviceClassName}
         ref={ref}
-        // style={{ visibility: visible }}
       >
         {sortedLayoutWidgets.length ? (
           <div className="grid-wrap" ref={gridWrapRef}>
-            <ResponsiveGridLayout
-              // layout={currentLayout.current}
-              // cols={curCols}
-
-              layouts={layoutMap}
-              cols={LAYOUT_COLS_MAP}
-              breakpoints={BREAK_POINT_MAP}
-              onBreakpointChange={onBreakpointChange}
+            <ReactGridLayout
+              layout={layoutMap[colsKey]}
+              cols={LAYOUT_COLS_MAP[colsKey]}
               margin={curMargin}
               containerPadding={curPadding}
               rowHeight={widgetRowHeight}
@@ -206,7 +165,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
               draggableHandle={`.${RGL_DRAG_HANDLE}`}
             >
               {boardChildren}
-            </ResponsiveGridLayout>
+            </ReactGridLayout>
           </div>
         ) : (
           <div className="empty">
