@@ -157,6 +157,8 @@ class PivotSheetChart extends ReactChart {
               chartDataSet.getFieldKey,
               chartDataSet,
             )?.[0],
+            label: context.translator('summary.total'),
+            subLabel: context.translator('summary.subTotal'),
           },
         },
       },

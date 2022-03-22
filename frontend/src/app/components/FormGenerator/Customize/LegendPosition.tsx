@@ -23,20 +23,22 @@ import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
 const template = {
-  label: `viz.palette.style.legendType.title`,
-  key: 'type',
-  default: 'scroll',
+  label: `viz.palette.style.position.title`,
+  key: 'position',
+  default: 'right',
   comType: 'select',
   options: {
     translateItemLabel: true,
     items: [
-      { label: 'viz.palette.style.legendType.plain', value: 'plain' },
-      { label: 'viz.palette.style.legendType.scroll', value: 'scroll' },
+      { label: 'viz.palette.style.position.top', value: 'top' },
+      { label: 'viz.palette.style.position.bottom', value: 'bottom' },
+      { label: 'viz.palette.style.position.left', value: 'left' },
+      { label: 'viz.palette.style.position.right', value: 'right' },
     ],
   },
 };
 
-const LegendType: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+const LegendPosition: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({
     ancestors,
     translate: t = title => title,
@@ -63,4 +65,4 @@ const LegendType: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   itemLayoutComparer,
 );
 
-export default LegendType;
+export default LegendPosition;
