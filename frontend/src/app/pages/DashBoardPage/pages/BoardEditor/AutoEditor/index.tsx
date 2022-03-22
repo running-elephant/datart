@@ -37,6 +37,7 @@ import { BoardActionContext } from 'app/pages/DashBoardPage/components/BoardProv
 import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
 import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
+import { LayerList } from '../components/LayerList/LayerList';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { AutoBoardEditor } from './AutoBoardEditor';
 const AutoEditor: React.FC<{}> = () => {
@@ -45,6 +46,7 @@ const AutoEditor: React.FC<{}> = () => {
     <Wrapper onClick={onClearActiveWidgets}>
       <BoardToolBar />
       <Editor>
+        <LayerList />
         <AutoBoardEditor />
         <SlideSetting />
       </Editor>
