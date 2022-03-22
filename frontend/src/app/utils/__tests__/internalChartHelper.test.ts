@@ -783,6 +783,95 @@ describe('Internal Chart Helper ', () => {
       });
     });
 
+    test('should transfer data configs when section from non mixed type to mixed types and target config with multi-mixed type', () => {
+      const targetConfig = {
+        datas: [
+          {
+            key: 'mixed1',
+            type: ChartDataSectionType.MIXED,
+            limit: 1,
+            rows: [],
+          },
+          {
+            key: 'mixed2',
+            type: ChartDataSectionType.MIXED,
+            limit: [0, 2],
+            rows: [],
+          },
+        ],
+      };
+      const sourceConfig = {
+        datas: [
+          {
+            key: 'group',
+            type: ChartDataSectionType.GROUP,
+            rows: [
+              {
+                colName: 'label1',
+                type: ChartDataViewFieldType.STRING,
+                category: 'field' as any,
+              },
+              {
+                colName: 'label2',
+                type: ChartDataViewFieldType.DATE,
+                category: 'field' as any,
+              },
+            ],
+          },
+          {
+            key: 'aggregate',
+            type: ChartDataSectionType.AGGREGATE,
+            rows: [
+              {
+                colName: 'label3',
+                type: ChartDataViewFieldType.NUMERIC,
+                category: 'field' as any,
+              },
+              {
+                colName: 'label4',
+                type: ChartDataViewFieldType.NUMERIC,
+                category: 'field' as any,
+              },
+            ],
+          },
+        ],
+      };
+      const result = transferChartConfigs(targetConfig, sourceConfig);
+      expect(result).toEqual({
+        datas: [
+          {
+            key: 'mixed1',
+            type: ChartDataSectionType.MIXED,
+            limit: 1,
+            rows: [
+              {
+                colName: 'label1',
+                type: ChartDataViewFieldType.STRING,
+                category: 'field' as any,
+              },
+            ],
+          },
+          {
+            key: 'mixed2',
+            type: ChartDataSectionType.MIXED,
+            limit: [0, 2],
+            rows: [
+              {
+                colName: 'label2',
+                type: ChartDataViewFieldType.DATE,
+                category: 'field' as any,
+              },
+              {
+                colName: 'label3',
+                type: ChartDataViewFieldType.NUMERIC,
+                category: 'field' as any,
+              },
+            ],
+          },
+        ],
+      });
+    });
+
     test('should transfer data configs when section from non mixed type to mixed types and target config with other section type', () => {
       const targetConfig = {
         datas: [
