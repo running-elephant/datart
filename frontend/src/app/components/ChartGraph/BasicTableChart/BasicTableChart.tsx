@@ -579,12 +579,15 @@ class BasicTableChart extends ReactChart {
             conditionalStyle,
           );
           const sensitiveFieldName = Object.keys(rowData || {})?.[0];
+          const useColumnWidth =
+            this.dataColumnWidths?.[props.dataIndex]?.getUseColumnWidth;
           return (
             <TableComponentsTd
               {...rest}
               style={Object.assign(style || {}, conditionalCellStyle)}
               isLinkCell={linkFields?.includes(sensitiveFieldName)}
               isJumpCell={jumpField === sensitiveFieldName}
+              useColumnWidth={useColumnWidth}
             />
           );
         },

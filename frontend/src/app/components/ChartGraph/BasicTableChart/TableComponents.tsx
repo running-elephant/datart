@@ -5,8 +5,12 @@ import { Resizable } from 'react-resizable';
 import styled from 'styled-components/macro';
 import { BLUE } from 'styles/StyleConstants';
 
-export const TableComponentsTd = ({ children, ...rest }: any) => {
-  if (rest.className.includes('ellipsis')) {
+export const TableComponentsTd = ({
+  children,
+  useColumnWidth,
+  ...rest
+}: any) => {
+  if (rest.className.includes('ellipsis') && useColumnWidth) {
     return (
       <Tooltip placement="topLeft" title={children}>
         <Td {...rest}>{children}</Td>
@@ -47,7 +51,7 @@ export const TableColumnTitle = props => {
     <TableColumnTitleStyle>
       <span className="titleStyle">{title}</span>
       {desc && (
-        <Tooltip placement="top" title={desc} className="infoTooltip">
+        <Tooltip placement="top" title={desc}>
           <InfoCircleOutlined />
         </Tooltip>
       )}
