@@ -15,14 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { Layouts } from 'react-grid-layout';
 import { Widget } from '../pages/Board/slice/types';
 export default function useGridLayoutMap(
   layoutWidgetMap: Record<string, Widget>,
 ) {
-  const [layoutMap, setLayoutMap] = useState<Layouts>({});
-  useEffect(() => {
+  const layoutMap = useMemo(() => {
     const layoutMap: Layouts = {
       lg: [],
       sm: [],
@@ -48,7 +47,7 @@ export default function useGridLayoutMap(
         static: lock,
       });
     });
-    setLayoutMap(layoutMap);
+    return layoutMap;
   }, [layoutWidgetMap]);
   return layoutMap;
 }
