@@ -31,6 +31,7 @@ import { View } from '../../../../../types/View';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import {
   BorderStyleType,
+  LAYOUT_COLS_KEYS,
   LAYOUT_COLS_MAP,
   ScaleModeType,
   TextAlignType,
@@ -99,6 +100,7 @@ export interface DashboardConfig {
   gridStep: [number, number];
   scaleMode: ScaleModeType;
 }
+export type ColsKeyType = typeof LAYOUT_COLS_KEYS[number];
 export const BoardTypes = ['auto', 'free'] as const;
 BoardTypes.includes('auto');
 export type BoardType = typeof BoardTypes[number];

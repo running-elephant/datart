@@ -25,11 +25,11 @@ export default function useGridLayoutMap(
   useEffect(() => {
     const layoutMap: Layouts = {
       lg: [],
-      xs: [],
+      sm: [],
     };
     Object.values(layoutWidgetMap).forEach(widget => {
       const lg = widget.config.rect || widget.config.mobileRect || {};
-      const xs = widget.config.mobileRect || widget.config.rect || {};
+      const sm = widget.config.mobileRect || widget.config.rect || {};
       const lock = widget.config.lock;
       layoutMap.lg.push({
         i: widget.id,
@@ -39,12 +39,12 @@ export default function useGridLayoutMap(
         h: lg.height,
         static: lock,
       });
-      layoutMap.xs.push({
+      layoutMap.sm.push({
         i: widget.id,
-        x: xs.x,
-        y: xs.y,
-        w: xs.width,
-        h: xs.height,
+        x: sm.x,
+        y: sm.y,
+        w: sm.width,
+        h: sm.height,
         static: lock,
       });
     });

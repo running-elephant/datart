@@ -19,24 +19,16 @@
 import { Empty } from 'antd';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
-import {
-  BREAK_POINT_MAP,
-  LAYOUT_COLS_MAP,
-  MIN_MARGIN,
-  MIN_PADDING,
-} from 'app/pages/DashBoardPage/constants';
+import { LAYOUT_COLS_MAP } from 'app/pages/DashBoardPage/constants';
 import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
-import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
 import {
   selectLayoutWidgetInfoMapById,
   selectLayoutWidgetMapById,
 } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
-import {
-  BoardState,
-  DeviceType,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { memo, useCallback, useContext, useMemo, useState } from 'react';
+import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { getBoardMarginPadding } from 'app/pages/DashBoardPage/utils/board';
+import { memo, useCallback, useContext, useMemo } from 'react';
 import RGL, { Layout, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useSelector } from 'react-redux';
@@ -46,18 +38,10 @@ import StyledBackground from '../components/StyledBackground';
 import { WidgetOfAuto } from './WidgetOfAuto';
 
 const ReactGridLayout = WidthProvider(RGL);
-const mobilePoints = Object.keys(BREAK_POINT_MAP).slice(3);
 export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
-    const {
-      margin,
-      containerPadding,
-      background,
-      mobileMargin,
-      mobileContainerPadding,
-      allowOverlap,
-    } = useContext(BoardConfigContext);
-
+    const boardConfig = useContext(BoardConfigContext);
+    const { margin, background, allowOverlap } = boardConfig;
     const selectLayoutWidgetsConfigById = useMemo(
       selectLayoutWidgetMapById,
       [],
@@ -79,49 +63,22 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       [layoutWidgetMap],
     );
 
-    const [deviceType, setDeviceType] = useState<DeviceType>(
-      DeviceType.Desktop,
-    );
-
     const {
       ref,
       gridWrapRef,
       currentLayout,
       widgetRowHeight,
       throttleLazyRender,
+      colsKey,
     } = useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
 
-    const { gridRef } = useBoardWidthHeight();
-
-    const onBreakpointChange = pointKey => {
-      if (mobilePoints.includes(pointKey)) {
-        setDeviceType(DeviceType.Mobile);
-      } else {
-        setDeviceType(DeviceType.Desktop);
-      }
-    };
-
     const { curMargin, curPadding } = useMemo(() => {
-      return deviceType === DeviceType.Mobile
-        ? {
-            curMargin: mobileMargin || [MIN_MARGIN, MIN_MARGIN],
-            curPadding: mobileContainerPadding || [MIN_PADDING, MIN_PADDING],
-          }
-        : {
-            curMargin: margin,
-            curPadding: containerPadding,
-          };
-    }, [
-      deviceType,
-      mobileMargin,
-      mobileContainerPadding,
-      margin,
-      containerPadding,
-    ]);
+      return getBoardMarginPadding(boardConfig, colsKey);
+    }, [boardConfig, colsKey]);
     const layoutMap = useGridLayoutMap(layoutWidgetMap);
 
     const onLayoutChange = useCallback(
-      (layouts: Layout[], all) => {
+      (layouts: Layout[]) => {
         throttleLazyRender();
         currentLayout.current = layouts;
       },
@@ -139,31 +96,26 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
         );
       });
     }, [sortedLayoutWidgets]);
-
     return (
       <Wrap>
         <StyledContainer bg={background} ref={ref}>
           {sortedLayoutWidgets.length ? (
             <div className="grid-wrap" ref={gridWrapRef}>
-              <div className="grid-wrap" ref={gridRef}>
-                <ReactGridLayout
-                  layouts={layoutMap}
-                  breakpoints={BREAK_POINT_MAP}
-                  margin={curMargin}
-                  containerPadding={curPadding}
-                  cols={LAYOUT_COLS_MAP}
-                  rowHeight={widgetRowHeight}
-                  onLayoutChange={onLayoutChange}
-                  onBreakpointChange={onBreakpointChange}
-                  isDraggable={false}
-                  isResizable={false}
-                  allowOverlap={allowOverlap}
-                  measureBeforeMount={false}
-                  useCSSTransforms={true}
-                >
-                  {boardChildren}
-                </ReactGridLayout>
-              </div>
+              <ReactGridLayout
+                layout={layoutMap[colsKey]}
+                margin={curMargin}
+                containerPadding={curPadding}
+                cols={LAYOUT_COLS_MAP[colsKey]}
+                rowHeight={widgetRowHeight}
+                onLayoutChange={onLayoutChange}
+                isDraggable={false}
+                isResizable={false}
+                allowOverlap={allowOverlap}
+                measureBeforeMount={false}
+                useCSSTransforms={true}
+              >
+                {boardChildren}
+              </ReactGridLayout>
             </div>
           ) : (
             <div className="empty">
