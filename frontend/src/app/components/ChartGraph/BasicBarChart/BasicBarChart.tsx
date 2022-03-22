@@ -255,7 +255,7 @@ class BasicBarChart extends Chart {
               ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),
               name: getColumnRenderName(aggConfig),
-              value: row?.getCell(aggConfig) || 0,
+              value: row?.getCell(aggConfig),
             };
           }),
           itemStyle: this.getSeriesItemStyle(styleConfigs, {
@@ -549,6 +549,9 @@ class BasicBarChart extends Chart {
         ...font,
         formatter: params => {
           const { value, data } = params;
+          if (!value || !Number(value)) {
+            return '';
+          }
           const formattedValue = toFormattedValue(value, data.format);
           const labels: string[] = [];
           labels.push(formattedValue);
