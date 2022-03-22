@@ -27,8 +27,6 @@ import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
-import { rejectedActionMessageHandler } from 'utils/notification';
 import { fetchShareDataSetByPreviewChartAction } from './thunks';
 // import { fetchShareDataSetByPreviewChartAction } from './thunk';
 import { ExecuteToken, SharePageState, ShareVizInfo } from './types';
@@ -157,11 +155,7 @@ export const slice = createSlice({
       )
       .addCase(fetchShareDataSetByPreviewChartAction.rejected, state => {
         state.headlessBrowserRenderSign = true;
-      })
-      .addMatcher(
-        isMySliceRejectedAction(slice.name),
-        rejectedActionMessageHandler,
-      );
+      });
   },
 });
 

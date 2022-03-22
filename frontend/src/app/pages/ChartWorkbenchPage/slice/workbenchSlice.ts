@@ -44,8 +44,6 @@ import {
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { RootState } from 'types';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
-import { rejectedActionMessageHandler } from 'utils/notification';
 import { request2 } from 'utils/request';
 import { listToTree, rejectHandle } from 'utils/utils';
 import { ChartDataRequestBuilder } from '../../../models/ChartDataRequestBuilder';
@@ -534,11 +532,6 @@ const workbenchSlice = createSlice({
           state.dataset.script = (payload?.data?.script as string) || '';
         }
       },
-    );
-
-    builder.addMatcher(
-      isMySliceRejectedAction(workbenchSlice.name),
-      rejectedActionMessageHandler,
     );
   },
 });
