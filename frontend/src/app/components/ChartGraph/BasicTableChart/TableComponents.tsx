@@ -1,11 +1,16 @@
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import React from 'react';
 import { Resizable } from 'react-resizable';
 import styled from 'styled-components/macro';
 import { BLUE } from 'styles/StyleConstants';
 
-export const TableComponentsTd = ({ children, ...rest }: any) => {
-  if (rest.className.includes('ellipsis')) {
+export const TableComponentsTd = ({
+  children,
+  useColumnWidth,
+  ...rest
+}: any) => {
+  if (rest.className.includes('ellipsis') && useColumnWidth) {
     return (
       <Tooltip placement="topLeft" title={children}>
         <Td {...rest}>{children}</Td>
@@ -39,6 +44,33 @@ export const ResizableTitle = props => {
     </Resizable>
   );
 };
+
+export const TableColumnTitle = props => {
+  const { desc, title } = props;
+  return (
+    <TableColumnTitleStyle>
+      <span className="titleStyle">{title}</span>
+      {desc && (
+        <Tooltip placement="top" title={desc}>
+          <InfoCircleOutlined />
+        </Tooltip>
+      )}
+    </TableColumnTitleStyle>
+  );
+};
+
+const TableColumnTitleStyle = styled.span`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  .titleStyle {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`;
 
 const ResizableHandleStyle = styled.span`
   position: absolute;
