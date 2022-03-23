@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartDataSectionType } from 'app/constants';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import produce from 'immer';
 export function dataConfigSectionComparer(

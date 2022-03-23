@@ -15,11 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ControllerFacadeTypes } from 'app/constants';
 import {
   BackgroundConfig,
   BorderConfig,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
 import { PRIMARY, WHITE } from 'styles/StyleConstants';

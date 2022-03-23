@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
+import { ChartDataViewFieldType } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import {
   getColumnRenderName,
   getStyles,

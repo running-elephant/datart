@@ -16,12 +16,9 @@
  * limitations under the License.
  */
 
+import { ChartDataSectionType, SortActionType } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
-import {
-  ChartConfig,
-  ChartDataSectionType,
-  SortActionType,
-} from 'app/types/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO, {
   IChartDataSet,
   IChartDataSetRow,

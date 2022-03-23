@@ -18,22 +18,25 @@
 
 import {
   AggregateFieldActionType,
+  ChartDataSectionType,
+  ChartDataViewFieldType,
+  FilterConditionType,
+  SortActionType,
+} from 'app/constants';
+import {
   ChartDataConfig,
   ChartDataSectionField,
-  ChartDataSectionType,
-  FilterConditionType,
   RelationFilterValue,
-  SortActionType,
 } from 'app/types/ChartConfig';
 import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import {
   ChartDataRequest,
   ChartDataRequestFilter,
-  transformToViewConfig,
 } from 'app/types/ChartDataRequest';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
-import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
+import ChartDataView from 'app/types/ChartDataView';
 import { getValue } from 'app/utils/chartHelper';
+import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import {
   formatTime,
   getTime,

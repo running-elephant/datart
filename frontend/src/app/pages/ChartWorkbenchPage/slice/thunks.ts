@@ -18,7 +18,7 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
-import ChartDataRequest from 'app/types/ChartDataRequest';
+import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { View } from 'app/types/View';
 import {

@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ChartDataSectionType } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/models/ChartManager';
-import { ChartDataSectionType } from 'app/types/ChartConfig';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { CloneValueDeep } from 'utils/object';

@@ -18,12 +18,12 @@
 
 import { Col, Input, Row, Select, Space, Tabs } from 'antd';
 import { FormItemEx } from 'app/components';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { AggregateFieldActionType } from 'app/types/ChartConfig';
 import {
+  AggregateFieldActionType,
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
+} from 'app/constants';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ChartComputedFieldHandle } from 'app/types/ComputedFieldEditor';
 import { FC, useRef, useState } from 'react';

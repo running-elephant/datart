@@ -19,12 +19,10 @@
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
-  FilterConditionType,
-} from 'app/types/ChartConfig';
-import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
+  FilterConditionType,
+} from 'app/constants';
 import { FilterSqlOperator, RECOMMEND_TIME } from 'globalConstants';
 import moment from 'moment';
 import { ChartDataRequestBuilder } from '../ChartDataRequestBuilder';

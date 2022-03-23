@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType, SortActionType } from 'app/types/ChartConfig';
+import { ChartDataSectionType, SortActionType } from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from '../ChartDataSet';
 
 describe('ChartDataSet Tests', () => {

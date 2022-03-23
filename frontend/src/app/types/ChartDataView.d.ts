@@ -19,19 +19,6 @@
 import { View } from 'app/types/View';
 import { ChartDataViewMeta } from './ChartDataViewMeta';
 
-export enum ChartDataViewFieldType {
-  STRING = 'STRING',
-  NUMERIC = 'NUMERIC',
-  DATE = 'DATE',
-}
-
-export enum ChartDataViewFieldCategory {
-  Field = 'field',
-  Variable = 'variable',
-  ComputedField = 'computedField',
-  AggregateComputedField = 'aggregateComputedField',
-}
-
 export type ChartDataView = Omit<View, 'model'> & {
   meta?: ChartDataViewMeta[];
   computedFields?: ChartDataViewMeta[];

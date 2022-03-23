@@ -15,6 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+  ControllerFacadeTypes,
+  TimeFilterValueCategory,
+} from 'app/constants';
 import {
   DataChart,
   RelatedView,
@@ -25,14 +32,6 @@ import {
   ControllerDate,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { ChartDataConfig } from 'app/types/ChartConfig';
-import {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
-import {
-  ControllerFacadeTypes,
-  TimeFilterValueCategory,
-} from 'app/types/FilterControlPanel';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import {
@@ -52,6 +51,7 @@ import {
   getWidgetControlValues,
 } from '..';
 import { BOARD_FILE_IMG_PREFIX } from '../../constants';
+
 const oldBoardId = 'xxxBoardIdXxx555';
 const boardId = 'xxxBoardIdXxx666';
 describe('dashboard.utils.index', () => {

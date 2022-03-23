@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
+import { FilterConditionType } from 'app/constants';
 import { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import ChartFilterCondition, {
   ConditionBuilder,
 } from 'app/models/ChartFilterCondition';
 import MultiFilterRow from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterAction/MultiFilterRow';
 import SingleFilterRow from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterAction/SingleFilterRow';
-import { FilterConditionType } from 'app/types/ChartConfig';
 import { FilterSqlOperator } from 'globalConstants';
 import {
   forwardRef,

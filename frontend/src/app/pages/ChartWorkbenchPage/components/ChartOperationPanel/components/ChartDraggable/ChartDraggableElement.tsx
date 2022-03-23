@@ -17,8 +17,8 @@
  */
 
 import { DeleteOutlined } from '@ant-design/icons';
+import { ChartDataViewFieldType } from 'app/constants';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { XYCoord } from 'dnd-core';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { forwardRef, useImperativeHandle, useRef } from 'react';

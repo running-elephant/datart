@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ControllerFacadeTypes } from 'app/constants';
 import {
   BoardType,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { PageInfo } from './../../../../../MainPage/pages/ViewPage/slice/types';
 import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from './../thunk';
