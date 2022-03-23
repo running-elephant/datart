@@ -31,7 +31,11 @@ public class DataTypeUtils {
         SqlTypeName sqlTypeName = SqlTypeName.get(sqlType);
         SqlTypeFamily family;
         if (sqlTypeName == null) {
-            family = SqlTypeFamily.ANY;
+            if(SqlTypeFamily.DATETIME.name().equals(sqlType)){
+                family = SqlTypeFamily.DATETIME;
+            }else{
+                family = SqlTypeFamily.ANY;
+            }
         } else {
             family = sqlTypeName.getFamily();
         }
@@ -40,6 +44,7 @@ public class DataTypeUtils {
                 return ValueType.NUMERIC;
             case DATE:
             case TIME:
+            case DATETIME:
             case TIMESTAMP:
                 return ValueType.DATE;
             default:
