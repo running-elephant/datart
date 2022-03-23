@@ -348,7 +348,7 @@ class BasicOutlineMapChart extends Chart {
       ['visualMap'],
       ['show', 'orient', 'align', 'itemWidth', 'itemHeight', 'font'],
     );
-    if (!show || !aggregateConfigs?.length) {
+    if (!aggregateConfigs?.length) {
       return [];
     }
 

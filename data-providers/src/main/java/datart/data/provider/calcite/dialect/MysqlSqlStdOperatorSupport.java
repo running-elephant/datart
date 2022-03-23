@@ -21,7 +21,6 @@ import datart.core.data.provider.StdSqlOperator;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.dialect.MysqlSqlDialect;
-import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
 
@@ -46,10 +45,8 @@ public class MysqlSqlStdOperatorSupport extends MysqlSqlDialect implements SqlSt
 
     @Override
     public void unparseCall(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
-        if (isStdSqlOperator(call)) {
-            if (unparseStdSqlOperator(writer, call, leftPrec, rightPrec)) {
-                return;
-            }
+        if (isStdSqlOperator(call) && unparseStdSqlOperator(writer, call, leftPrec, rightPrec)) {
+            return;
         }
         super.unparseCall(writer, call, leftPrec, rightPrec);
     }
@@ -64,11 +61,26 @@ public class MysqlSqlStdOperatorSupport extends MysqlSqlDialect implements SqlSt
             case DAY_OF_MONTH:
                 renameCallOperator("DAYOFMONTH", call);
                 break;
+            case AGG_DATE_YEAR:
+                writer.print("YEAR(" + call.getOperandList().get(0).toString() + ")");
+                return true;
+            case AGG_DATE_QUARTER:
+                String column = call.getOperandList().get(0).toString();
+                writer.print("CONCAT(DATE_FORMAT("+column+",'%Y-'),QUARTER("+column+"))");
+                return true;
+            case AGG_DATE_MONTH:
+                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toString() + ",'%Y-%m')");
+                return true;
+            case AGG_DATE_WEEK:
+                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toString() + ",'%x-%v')");
+                return true;
+            case AGG_DATE_DAY:
+                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toString() + ",'%Y-%m-%d')");
+                return true;
             default:
-                return false;
+                break;
         }
-        super.unparseCall(writer, call, leftPrec, rightPrec);
-        return true;
+        return false;
     }
 
     @Override
