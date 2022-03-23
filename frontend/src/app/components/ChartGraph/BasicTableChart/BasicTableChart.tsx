@@ -463,7 +463,7 @@ class BasicTableChart extends ReactChart {
           width,
           headerWidth +
             sorterIconWidth +
-            (c?.alias?.desc ? c.alheaderFont?.fontSize : 0),
+            (c?.alias?.desc ? c.alheaderFont?.fontSize || 12 : 0),
           summaryWidth + sorterIconWidth,
         );
       });
