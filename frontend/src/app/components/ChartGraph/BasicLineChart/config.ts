@@ -70,6 +70,12 @@ const config: ChartConfig = {
           default: false,
           comType: 'checkbox',
         },
+        {
+          label: 'graph.connectNulls',
+          key: 'connectNulls',
+          default: false,
+          comType: 'checkbox',
+        },
       ],
     },
     {
@@ -86,27 +92,9 @@ const config: ChartConfig = {
         {
           label: 'label.position',
           key: 'position',
-          comType: 'select',
+          comType: 'labelPosition',
           default: 'top',
-          options: {
-            items: [
-              { label: '上', value: 'top' },
-              { label: '左', value: 'left' },
-              { label: '右', value: 'right' },
-              { label: '下', value: 'bottom' },
-              { label: '内', value: 'inside' },
-              { label: '内左', value: 'insideLeft' },
-              { label: '内右', value: 'insideRight' },
-              { label: '内上', value: 'insideTop' },
-              { label: '内下', value: 'insideBottom' },
-              { label: '内左上', value: 'insideTopLeft' },
-              { label: '内左下', value: 'insideBottomLeft' },
-              { label: '内右上', value: 'insideTopRight' },
-              { label: '内右下', value: 'insideBottomRight' },
-            ],
-          },
         },
-
         {
           label: 'viz.palette.style.font',
           key: 'font',
@@ -147,16 +135,8 @@ const config: ChartConfig = {
         {
           label: 'legend.position',
           key: 'position',
-          comType: 'select',
+          comType: 'legendPosition',
           default: 'right',
-          options: {
-            items: [
-              { label: '右', value: 'right' },
-              { label: '上', value: 'top' },
-              { label: '下', value: 'bottom' },
-              { label: '左', value: 'left' },
-            ],
-          },
         },
         {
           label: 'legend.height',
@@ -526,6 +506,7 @@ const config: ChartConfig = {
           title: '折线图',
           smooth: '平滑',
           step: '阶梯',
+          connectNulls: '连接空数据',
         },
         xAxis: {
           title: 'X轴',
@@ -597,6 +578,7 @@ const config: ChartConfig = {
           title: 'Graph',
           smooth: 'Smooth',
           step: 'Step',
+          connectNulls: 'Connect Nulls',
         },
         xAxis: {
           title: 'X Axis',

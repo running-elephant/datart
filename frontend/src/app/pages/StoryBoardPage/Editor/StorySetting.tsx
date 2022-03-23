@@ -30,7 +30,7 @@ export interface StorySettingProps {}
 export const StorySetting: React.FC<StorySettingProps> = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
   const dispatch = useDispatch();
-  const { stroyBoardId: storyId } = useContext(StoryContext);
+  const { storyId: storyId } = useContext(StoryContext);
   const storyBoard = useSelector((state: { storyBoard: StoryBoardState }) =>
     makeSelectStoryBoardById(state, storyId),
   );

@@ -30,11 +30,15 @@ public class VariableUpdateParam extends BaseUpdateParam {
 
     private String viewId;
 
+    private String sourceId;
+
     private String name;
 
     private String type;
 
     private String valueType;
+
+    private String format;
 
     private String label;
 

@@ -15,7 +15,7 @@ spring:
     banner-mode: off
 
   profiles:
-    active: demo,config
+    active: config
 
   servlet:
     multipart:
@@ -77,6 +77,8 @@ shiro:
 datart:
   server:
     path-prefix: /api/v1
+
+  admin-id: datart-admin
 
 
 server:

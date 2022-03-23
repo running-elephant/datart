@@ -16,12 +16,9 @@
  * limitations under the License.
  */
 
+import { ChartDataSectionType, SortActionType } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
-import {
-  ChartConfig,
-  ChartDataSectionType,
-  SortActionType,
-} from 'app/types/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO, {
   IChartDataSet,
   IChartDataSetRow,
@@ -157,6 +154,8 @@ class PivotSheetChart extends ReactChart {
               chartDataSet.getFieldKey,
               chartDataSet,
             )?.[0],
+            label: context.translator('summary.total'),
+            subLabel: context.translator('summary.subTotal'),
           },
         },
       },

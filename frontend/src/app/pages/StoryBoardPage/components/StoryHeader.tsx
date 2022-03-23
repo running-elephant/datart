@@ -21,29 +21,21 @@ import { Button, Dropdown } from 'antd';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
 import { ShareLinkModal } from 'app/components/VizOperationMenu';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { useStatusTitle } from 'app/pages/DashBoardPage/hooks/useStatusTitle';
 import { generateShareLinkAsync } from 'app/utils/fetch';
-import { TITLE_SUFFIX } from 'globalConstants';
-import React, {
-  FC,
-  memo,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
+import React, { FC, memo, useCallback, useContext, useState } from 'react';
 import { StoryContext } from '../contexts/StoryContext';
 import { StoryOverLay } from './StoryOverLay';
 
 interface StoryHeaderProps {
-  name?: string;
-  status?: number;
+  name: string;
+  status: number;
   publishLoading?: boolean;
-  onPublish?: () => void;
+  onPublish: () => void;
   toggleEdit: () => void;
   playStory: () => void;
   allowShare?: boolean;
   allowManage?: boolean;
-  onRecycleStory?: () => void;
 }
 export const StoryHeader: FC<StoryHeaderProps> = memo(
   ({
@@ -55,19 +47,14 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
     onPublish,
     allowShare,
     allowManage,
-    onRecycleStory,
   }) => {
     const t = useI18NPrefix(`viz.action`);
-    const title = useMemo(() => {
-      const base = name || '';
-      const suffix = TITLE_SUFFIX[Number(status)]
-        ? `[${t(TITLE_SUFFIX[Number(status)])}]`
-        : '';
-      return base + suffix;
-    }, [name, status, t]);
+
+    const title = useStatusTitle(name, status);
+
     const isArchived = Number(status) === 0;
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
-    const { stroyBoardId } = useContext(StoryContext);
+    const { storyId: stroyBoardId } = useContext(StoryContext);
     const onOpenShareLink = useCallback(() => {
       setShowShareLinkModal(true);
     }, []);
@@ -117,7 +104,6 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
                     onOpenShareLink={onOpenShareLink}
                     isArchived={isArchived}
                     onPublish={Number(status) === 2 ? onPublish : ''}
-                    onRecycleStory={onRecycleStory}
                   />
                 }
                 arrow

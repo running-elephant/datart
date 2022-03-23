@@ -25,8 +25,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { createSlice, isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
-import { rejectedActionMessageHandler } from 'utils/notification';
+import { createSlice } from 'utils/@reduxjs/toolkit';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import { createWidgetInfo } from '../../../utils/widget';
 import { getChartWidgetDataAsync, getControllerOptions } from './thunk';
@@ -309,10 +308,6 @@ const boardSlice = createSlice({
         state.widgetInfoRecord[boardId][widgetId].loading = false;
       } catch (error) {}
     });
-    builder.addMatcher(
-      isMySliceRejectedAction(boardSlice.name),
-      rejectedActionMessageHandler,
-    );
   },
 });
 export const { actions: boardActions } = boardSlice;

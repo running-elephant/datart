@@ -28,8 +28,8 @@ import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { PRIMARY } from 'styles/StyleConstants';
-import { editWidgetInfoActions } from '../../../slice';
-import { NameCard } from './WidgetNameList';
+import { editWidgetInfoActions } from '../../slice';
+import { NameCard } from './LayerList';
 
 export interface NameItemProps {
   index: number;
@@ -171,7 +171,10 @@ const NameItem: React.FC<NameItemProps> = ({
         data-handler-id={handlerId}
         style={{ opacity }}
       >
-        {card.name || 'untitled-widget'}
+        <span className="name" title={card.name || 'untitled-widget'}>
+          {card.name || 'untitled-widget'}
+        </span>
+
         <WidgetActionDropdown widget={widget} />
       </div>
     </ItemWrap>
@@ -190,6 +193,12 @@ const ItemWrap = styled.div<{ selected: boolean }>`
     white-space: nowrap;
     cursor: move;
     background-color: ${p => p.theme.componentBackground};
+
+    .name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
   .selected-Item {
     background-color: ${p => p.theme.emphasisBackground};

@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartDataSectionType } from 'app/constants';
+import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getDataColumnMaxAndMin2,
@@ -348,7 +349,7 @@ class BasicOutlineMapChart extends Chart {
       ['visualMap'],
       ['show', 'orient', 'align', 'itemWidth', 'itemHeight', 'font'],
     );
-    if (!show || !aggregateConfigs?.length) {
+    if (!aggregateConfigs?.length) {
       return [];
     }
 

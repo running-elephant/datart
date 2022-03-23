@@ -17,6 +17,7 @@
  */
 import { Modal } from 'antd';
 import { ChartEditorBaseProps } from 'app/components/ChartEditor';
+import { ChartDataViewFieldType, ControllerFacadeTypes } from 'app/constants';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   ContainerWidgetContent,
@@ -33,8 +34,7 @@ import {
   createWidget,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
-import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+import ChartDataView from 'app/types/ChartDataView';
 import i18next from 'i18next';
 import produce from 'immer';
 import { ActionCreators } from 'redux-undo';

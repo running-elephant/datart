@@ -22,7 +22,7 @@ import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProv
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import { selectLayoutWidgetMapById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { memo, useContext, useMemo } from 'react';
+import { memo, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import SlideBackground from '../../../components/FreeBoardBackground';
@@ -80,6 +80,7 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
       });
     }, [widgetConfigs]);
     const { gridRef } = useBoardWidthHeight();
+
     return (
       <Wrap>
         <div className="container" ref={gridRef}>

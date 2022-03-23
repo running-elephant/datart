@@ -51,7 +51,7 @@ export const NameSet: FC<{
 
   return (
     <>
-      <Form.Item label={t('title')} preserve name="name">
+      <Form.Item preserve name="name">
         <Input className="datart-ant-input" placeholder="fill a name" />
       </Form.Item>
       <Form.Item valuePropName="checked" name={['nameConfig', 'show']}>

@@ -28,6 +28,8 @@ public class SingleTypedValue extends TypedValue {
 
     private Object value;
 
+    private String format;
+
     public SingleTypedValue(Object value, ValueType valueType) {
         this.value = value;
         this.valueType = valueType;

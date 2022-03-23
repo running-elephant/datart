@@ -16,11 +16,8 @@
  * limitations under the License.
  */
 
-import {
-  ChartConfig,
-  ChartDataSectionField,
-  ChartDataSectionType,
-} from 'app/types/ChartConfig';
+import { ChartDataSectionType } from 'app/constants';
+import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO, {
   IChartDataSet,
   IChartDataSetRow,
@@ -216,14 +213,7 @@ class BasicPieChart extends Chart {
     const [show, type, font, legendPos, selectAll, height] = getStyles(
       styles,
       ['legend'],
-      [
-        'showLegend',
-        'type',
-        'font',
-        'position',
-        'selectAll',
-        'height',
-      ],
+      ['showLegend', 'type', 'font', 'position', 'selectAll', 'height'],
     );
     let positions = {};
     let orient = {};

@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-import { useEffect, useState } from 'react';
+import { View } from 'app/types/View';
+import { ChartDataViewMeta } from './ChartDataViewMeta';
 
-export const useVisibleHidden = (timeNum: number = 0) => {
-  const [visible, setVisible] = useState<'visible' | 'hidden'>('hidden');
-  useEffect(() => {
-    setTimeout(() => {
-      setVisible('visible');
-    }, timeNum);
-  });
-  return visible;
+export type ChartDataView = Omit<View, 'model'> & {
+  meta?: ChartDataViewMeta[];
+  computedFields?: ChartDataViewMeta[];
+  orgId?: string;
 };
+
+export default ChartDataView;

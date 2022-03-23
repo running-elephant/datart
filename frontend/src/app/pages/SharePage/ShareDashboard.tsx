@@ -19,6 +19,7 @@
 import useMount from 'app/hooks/useMount';
 import useRouteQuery from 'app/hooks/useRouteQuery';
 import ChartManager from 'app/models/ChartManager';
+import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import {
   downloadShareDataChartFile,
   loadShareTask,
@@ -31,7 +32,6 @@ import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import persistence from 'utils/persistence';
 import { uuidv4 } from 'utils/utils';
-import ChartDataRequest from '../../types/ChartDataRequest';
 import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
 import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';
 import { selectShareBoard } from '../DashBoardPage/pages/Board/slice/selector';

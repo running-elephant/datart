@@ -19,7 +19,7 @@
 import { Checkbox, Col, Row } from 'antd';
 import { ColorPickerPopover } from 'app/components/ColorPicker';
 import { ColorPicker } from 'app/components/ColorPicker/ColorTag';
-import { FormItemEx } from 'app/components/From';
+import { FormItemEx } from 'app/components/Form';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';

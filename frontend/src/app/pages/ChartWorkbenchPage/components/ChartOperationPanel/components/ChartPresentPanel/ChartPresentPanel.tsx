@@ -21,6 +21,7 @@ import { Table } from 'antd';
 import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContainer';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
+import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
@@ -34,7 +35,6 @@ import {
   SPACE_MD,
 } from 'styles/StyleConstants';
 import { Debugger } from 'utils/debugger';
-import { datasetLoadingSelector } from '../../../../slice/workbenchSlice';
 import Chart404Graph from './components/Chart404Graph';
 import ChartTypeSelector, {
   ChartPresentType,

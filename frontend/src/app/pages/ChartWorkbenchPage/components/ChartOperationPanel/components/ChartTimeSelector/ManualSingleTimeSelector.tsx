@@ -17,9 +17,9 @@
  */
 
 import { Select, Space } from 'antd';
+import { TimeFilterValueCategory } from 'app/constants';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { TimeFilterConditionValue } from 'app/types/ChartConfig';
-import { TimeFilterValueCategory } from 'app/types/FilterControlPanel';
 import { formatTime } from 'app/utils/time';
 import { TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';

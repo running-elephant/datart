@@ -16,12 +16,8 @@
  * limitations under the License.
  */
 
-import {
-  ChartDataConfig,
-  ChartDataSectionField,
-  ChartDataSectionType,
-  SortActionType,
-} from 'app/types/ChartConfig';
+import { ChartDataSectionType, SortActionType } from 'app/constants';
+import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import {
   ChartDatasetMeta,
   IChartDataSet,
@@ -129,18 +125,19 @@ export class ChartDataSet<T>
       return;
     }
     const sortValues = order.sort.value || [];
-    this.sort(
-      (prev, next) =>
-        sortValues.indexOf(prev[this.toKey(order)]) -
-        sortValues.indexOf(next[this.toKey(order)]),
-    );
+    this.sort((prev, next) => {
+      return (
+        sortValues.indexOf(prev[this.getFieldIndex(order)]) -
+        sortValues.indexOf(next[this.getFieldIndex(order)])
+      );
+    });
   }
 
   public groupBy(field: ChartDataSectionField): {
     [groupKey in string]: IChartDataSetRow<T>[];
   } {
     const groupedChartDataSets = this.reduce((acc, row) => {
-      const valueKey = row.getCell(field) || 'defaultGroupKey';
+      const valueKey = row.getCell(field);
       if (!acc[valueKey]) {
         acc[valueKey] = [];
       }

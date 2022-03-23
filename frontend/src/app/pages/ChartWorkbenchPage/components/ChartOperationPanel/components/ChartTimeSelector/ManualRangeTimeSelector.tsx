@@ -17,11 +17,12 @@
  */
 
 import { Row, Space } from 'antd';
+import { FilterConditionType } from 'app/constants';
 import { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import ChartFilterCondition, {
   ConditionBuilder,
 } from 'app/models/ChartFilterCondition';
-import { FilterCondition, FilterConditionType } from 'app/types/ChartConfig';
+import { FilterCondition } from 'app/types/ChartConfig';
 import { formatTime, getTime } from 'app/utils/time';
 import { TIME_FORMATTER } from 'globalConstants';
 import { FC, memo, useState } from 'react';

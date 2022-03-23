@@ -41,7 +41,7 @@ const iifeFuncLoader = ({ path, result }) => {
 
 class PluginChartLoader {
   async loadPlugins(paths: string[]) {
-    const loadPluginTasks = (paths || []).map(async (path, index) => {
+    const loadPluginTasks = paths.map(async path => {
       try {
         const result = await fetchPluginChart(path);
         if (!result) {

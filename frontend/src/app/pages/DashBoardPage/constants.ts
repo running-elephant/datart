@@ -15,24 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ControllerFacadeTypes } from 'app/constants';
 import {
   BackgroundConfig,
   BorderConfig,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
 import { PRIMARY, WHITE } from 'styles/StyleConstants';
 import { WidgetType } from './pages/Board/slice/types';
 export const RGL_DRAG_HANDLE = 'dashboard-draggableHandle';
-export const STORAGE_BOARD_KEY_PREFIX = 'DATART_BOARD_DATA_';
-export const STORAGE_IMAGE_KEY_PREFIX = 'DATART_IMAGE_';
+export const BOARD_FILE_IMG_PREFIX = 'resources/image/dashboard/';
 export const BASE_VIEW_WIDTH = 1024;
 export const BASE_ROW_HEIGHT = 32;
 export const MIN_ROW_HEIGHT = 24;
 export const MIN_MARGIN = 8;
 export const MIN_PADDING = 8;
-/** lg: 12,md: 12,sm: 8,xs: 2,xxs: 2 */
+export const LAYOUT_COLS_KEYS = ['lg', 'md', 'sm', 'xs', 'xxs'] as const;
+
 export const LAYOUT_COLS_MAP = {
   lg: 12,
   md: 12,
@@ -49,6 +49,7 @@ export const BREAK_POINT_MAP = {
   xs: 480,
   xxs: 0,
 };
+
 export const INIT_COLS = 12;
 export const DEVICE_LIST = {
   '华为 Mate 30': [360, 780],
@@ -187,6 +188,9 @@ export const ALL_SQL_OPERATOR_OPTIONS = [
 
   getOperatorItem(FilterSqlOperator.Null),
   getOperatorItem(FilterSqlOperator.NotNull),
+
+  getOperatorItem(FilterSqlOperator.Contain),
+  getOperatorItem(FilterSqlOperator.NotContain),
 
   getOperatorItem(FilterSqlOperator.PrefixContain),
   getOperatorItem(FilterSqlOperator.NotPrefixContain),

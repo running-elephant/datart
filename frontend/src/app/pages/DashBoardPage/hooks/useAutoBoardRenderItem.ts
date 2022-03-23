@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useWidgetRowHeight } from 'app/hooks/useWidgetRowHeight';
+import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
 import { throttle } from 'echarts';
 import {
   RefObject,
@@ -34,7 +34,7 @@ export default function useAutoBoardRenderItem(
   layoutWidgetInfoMap: Record<string, WidgetInfo>,
   margin: [number, number],
 ) {
-  const { ref, widgetRowHeight } = useWidgetRowHeight();
+  const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
   const { initialQuery } = useContext(BoardConfigContext);
   const { editing, renderMode } = useContext(BoardContext);
   const { renderedWidgetById } = useContext(BoardActionContext);
@@ -120,5 +120,6 @@ export default function useAutoBoardRenderItem(
     currentLayout,
     widgetRowHeight,
     throttleLazyRender,
+    colsKey,
   };
 }

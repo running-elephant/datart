@@ -17,8 +17,7 @@
  */
 import { PayloadAction } from '@reduxjs/toolkit';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { createSlice, isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
-import { rejectedActionMessageHandler } from 'utils/notification';
+import { createSlice } from 'utils/@reduxjs/toolkit';
 import { getInitStoryPageInfo } from './../utils';
 import { StoryBoard, StoryBoardState, StoryPage, StoryPageInfo } from './types';
 
@@ -150,12 +149,7 @@ const storyBoardSlice = createSlice({
       state.storyMap[stroyId].status = publish;
     },
   },
-  extraReducers: builder => {
-    builder.addMatcher(
-      isMySliceRejectedAction(storyBoardSlice.name),
-      rejectedActionMessageHandler,
-    );
-  },
+  extraReducers: builder => {},
 });
 export const { actions: storyActions } = storyBoardSlice;
 export const useStoryBoardSlice = () => {

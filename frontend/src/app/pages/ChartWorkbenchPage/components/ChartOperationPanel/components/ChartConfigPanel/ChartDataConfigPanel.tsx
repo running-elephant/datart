@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
+import { ChartDataSectionType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { ChartDataConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartDataConfig } from 'app/types/ChartConfig';
 import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';

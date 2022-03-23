@@ -27,18 +27,18 @@ import {
   SortAscendingOutlined,
 } from '@ant-design/icons';
 import { Dropdown } from 'antd';
+import {
+  AggregateFieldSubAggregateType,
+  ChartDataSectionFieldActionType,
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+} from 'app/constants';
 import useFieldActionModal from 'app/hooks/useFieldActionModal';
 import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/ChartAggregationContext';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
-import {
-  AggregateFieldSubAggregateType,
-  ChartDataSectionField,
-  ChartDataSectionFieldActionType,
-  ChartDataSectionType,
-} from 'app/types/ChartConfig';
+import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
-import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { reachLowerBoundCount } from 'app/utils/internalChartHelper';
 import { updateBy, updateByKey } from 'app/utils/mutation';

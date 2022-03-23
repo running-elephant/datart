@@ -17,12 +17,9 @@
  */
 
 import { FormInstance } from 'antd';
+import { ChartDataSectionFieldActionType } from 'app/constants';
 import FieldActions from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction';
-import {
-  ChartDataConfig,
-  ChartDataSectionField,
-  ChartDataSectionFieldActionType,
-} from 'app/types/ChartConfig';
+import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { ValueOf } from 'types';

@@ -17,11 +17,11 @@
  */
 
 import { Tabs } from 'antd';
+import { FilterConditionType } from 'app/constants';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import ChartFilterCondition, {
   ConditionBuilder,
 } from 'app/models/ChartFilterCondition';
-import { FilterConditionType } from 'app/types/ChartConfig';
 import { formatTime } from 'app/utils/time';
 import {
   FilterSqlOperator,

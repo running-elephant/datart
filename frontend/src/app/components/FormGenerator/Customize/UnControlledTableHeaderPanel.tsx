@@ -25,11 +25,8 @@ import {
   RedoOutlined,
 } from '@ant-design/icons';
 import { Button, Col, Input, Row, Space, Table } from 'antd';
-import {
-  ChartDataConfig,
-  ChartDataSectionType,
-  ChartStyleConfig,
-} from 'app/types/ChartConfig';
+import { ChartDataSectionType } from 'app/constants';
+import { ChartDataConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import {
   getColumnRenderName,
   getUnusedHeaderRows,

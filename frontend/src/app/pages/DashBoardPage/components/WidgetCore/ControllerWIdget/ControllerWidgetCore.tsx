@@ -17,6 +17,7 @@
  */
 
 import { Form } from 'antd';
+import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
 import {
   ControllerWidgetContent,
   Widget,
@@ -28,10 +29,6 @@ import {
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getControllerDateValues } from 'app/pages/DashBoardPage/utils';
 import { RelationFilterValue } from 'app/types/ChartConfig';
-import {
-  ControllerFacadeTypes,
-  TimeFilterValueCategory,
-} from 'app/types/FilterControlPanel';
 import produce from 'immer';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';

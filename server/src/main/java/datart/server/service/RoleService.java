@@ -29,7 +29,7 @@ public interface RoleService extends BaseCRUDService<Role, RoleMapperExt> {
 
     boolean grantPermission(List<PermissionInfo> permissionInfo);
 
-    boolean grantOrgOwner(String orgId, String userId);
+    boolean grantOrgOwner(String orgId, String userId, boolean checkPermission);
 
     boolean revokeOrgOwner(String orgId, String userId);
 

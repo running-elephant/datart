@@ -19,6 +19,8 @@
 export { default as ConditionalStylePanel } from './ConditionalStyle';
 export { default as DataReferencePanel } from './DataReferencePanel';
 export { default as FontAlignment } from './FontAlignment';
+export { default as LabelPosition } from './LabelPosition';
+export { default as LegendPosition } from './LegendPosition';
 export { default as LegendType } from './LegendType';
 export { default as ListTemplatePanel } from './ListTemplatePanel';
 export { default as NameLocation } from './NameLocation';

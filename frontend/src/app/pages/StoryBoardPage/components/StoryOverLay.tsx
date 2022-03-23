@@ -22,30 +22,25 @@ import {
 } from '@ant-design/icons';
 import { Menu, Popconfirm } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React, { memo, useMemo } from 'react';
+import { useRecycleViz } from 'app/hooks/useRecycleViz';
+import { memo, useContext, useMemo } from 'react';
+import { StoryContext } from '../contexts/StoryContext';
 
 export interface BoardOverLayProps {
   onOpenShareLink?: () => void;
   onBoardToDownLoad?: () => void;
   onShareDownloadData?: () => void;
-  onRecycleStory?: () => void;
   onPublish?;
   allowShare?: boolean;
   allowManage?: boolean;
   isArchived?: boolean;
 }
 export const StoryOverLay: React.FC<BoardOverLayProps> = memo(
-  ({
-    onOpenShareLink,
-    allowShare,
-    allowManage,
-    onPublish,
-    isArchived,
-    onRecycleStory,
-  }) => {
+  ({ onOpenShareLink, allowShare, allowManage, onPublish, isArchived }) => {
     const t = useI18NPrefix(`viz.action`);
     const tg = useI18NPrefix(`global`);
-
+    const { storyId: stroyId, orgId } = useContext(StoryContext);
+    const recycleViz = useRecycleViz(orgId, stroyId, 'STORYBOARD');
     const renderList = useMemo(
       () => [
         {
@@ -73,7 +68,7 @@ export const StoryOverLay: React.FC<BoardOverLayProps> = memo(
           content: (
             <Popconfirm
               title={tg('operation.archiveConfirm')}
-              onConfirm={onRecycleStory}
+              onConfirm={recycleViz}
             >
               {tg('button.archive')}
             </Popconfirm>
@@ -81,14 +76,14 @@ export const StoryOverLay: React.FC<BoardOverLayProps> = memo(
         },
       ],
       [
-        t,
-        tg,
         onOpenShareLink,
-        onRecycleStory,
         allowShare,
+        t,
+        onPublish,
         allowManage,
         isArchived,
-        onPublish,
+        tg,
+        recycleViz,
       ],
     );
     const actionItems = useMemo(

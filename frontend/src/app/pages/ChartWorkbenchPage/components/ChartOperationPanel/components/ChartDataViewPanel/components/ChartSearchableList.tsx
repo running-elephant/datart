@@ -17,7 +17,6 @@
  */
 
 import { Divider, Input, List, Space } from 'antd';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import debounce from 'lodash/debounce';
 import { FC, memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -28,7 +27,6 @@ const ChartSearchableList: FC<{
 }> = memo(({ source, onItemSelected }) => {
   const [listItems, setListItems] = useState(source);
   const [searchValue, setSearchValue] = useState<string>();
-  const t = useI18NPrefix(`viz.workbench.dataview`);
 
   useEffect(() => {
     setSearchValue('');

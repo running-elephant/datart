@@ -150,7 +150,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
  */
 export const toUpdateDashboard = createAsyncThunk<
   any,
-  { boardId: string; callback: () => void },
+  { boardId: string; callback?: () => void },
   { state: RootState }
 >(
   'editBoard/toUpdateDashboard',
@@ -186,7 +186,7 @@ export const toUpdateDashboard = createAsyncThunk<
       method: 'put',
       data: updateData,
     });
-    callback();
+    callback?.();
   },
 );
 /**
@@ -310,7 +310,7 @@ export const addChartWidget = createAsyncThunk<
   'editBoard/addChartWidget',
   async (
     { boardId, chartId, boardType, dataChart, view, subType },
-    { getState, dispatch },
+    { dispatch },
   ) => {
     const dataCharts = [dataChart];
     const viewViews = [view];
@@ -467,12 +467,19 @@ export const pasteWidgets = createAsyncThunk(
 //
 export const uploadBoardImage = createAsyncThunk<
   null,
-  { boardId: string; formData: FormData; resolve: (url: string) => void }
+  {
+    boardId: string;
+    fileName: string;
+    formData: FormData;
+    resolve: (url: string) => void;
+  }
 >(
   'editBoard/uploadBoardImage',
-  async ({ boardId, formData, resolve }, { getState, dispatch }) => {
+  async ({ boardId, formData, fileName, resolve }, { getState, dispatch }) => {
     const { data } = await request2<string>({
-      url: `files/viz/image?ownerType=${'DASHBOARD'}&ownerId=${boardId}&fileName=${uuidv4()}`,
+      url: `files/viz/image?ownerType=${'DASHBOARD'}&ownerId=${boardId}&fileName=${
+        uuidv4() + '@' + fileName
+      }`,
       method: 'POST',
       data: formData,
     });

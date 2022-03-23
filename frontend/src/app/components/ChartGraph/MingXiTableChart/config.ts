@@ -124,6 +124,33 @@ const config: ChartConfig = {
                         },
                         comType: 'inputNumber',
                       },
+                      {
+                        label: 'style.align',
+                        key: 'align',
+                        default: 'default',
+                        comType: 'fontAlignment',
+                        options: {
+                          translateItemLabel: true,
+                          items: [
+                            {
+                              label: `@global@.style.alignDefault`,
+                              value: 'default',
+                            },
+                            {
+                              label: `viz.common.enum.fontAlignment.left`,
+                              value: 'left',
+                            },
+                            {
+                              label: `viz.common.enum.fontAlignment.center`,
+                              value: 'center',
+                            },
+                            {
+                              label: `viz.common.enum.fontAlignment.right`,
+                              value: 'right',
+                            },
+                          ],
+                        },
+                      },
                     ],
                   },
                   {
@@ -218,9 +245,9 @@ const config: ChartConfig = {
           options: {
             translateItemLabel: true,
             items: [
-              { label: 'tableSize.default', value: 'default' },
-              { label: 'tableSize.middle', value: 'middle' },
-              { label: 'tableSize.small', value: 'small' },
+              { label: '@global@.tableSize.default', value: 'default' },
+              { label: '@global@.tableSize.middle', value: 'middle' },
+              { label: '@global@.tableSize.small', value: 'small' },
             ],
           },
         },
@@ -313,8 +340,29 @@ const config: ChartConfig = {
         {
           label: 'style.align',
           key: 'align',
-          default: 'left',
+          default: 'default',
           comType: 'fontAlignment',
+          options: {
+            translateItemLabel: true,
+            items: [
+              {
+                label: `@global@.style.alignDefault`,
+                value: 'default',
+              },
+              {
+                label: `viz.common.enum.fontAlignment.left`,
+                value: 'left',
+              },
+              {
+                label: `viz.common.enum.fontAlignment.center`,
+                value: 'center',
+              },
+              {
+                label: `viz.common.enum.fontAlignment.right`,
+                value: 'right',
+              },
+            ],
+          },
         },
       ],
     },
@@ -445,6 +493,7 @@ const config: ChartConfig = {
           bgColor: '背景颜色',
           font: '字体',
           align: '对齐方式',
+          alignDefault: '默认',
           fontWeight: '字体粗细',
           fontFamily: '字体',
           oddBgColor: '奇行背景色',
@@ -511,6 +560,7 @@ const config: ChartConfig = {
           tableBodyStyle: 'Table Body Style',
           font: 'Font',
           align: 'Align',
+          alignDefault: 'Default',
           fontWeight: 'Font Weight',
           fontFamily: 'Font Family',
           oddBgColor: 'Odd Row Background Color',

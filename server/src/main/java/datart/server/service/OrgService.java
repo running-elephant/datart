@@ -5,6 +5,7 @@ import datart.core.entity.User;
 import datart.core.entity.ext.RoleBaseInfo;
 import datart.core.entity.ext.UserBaseInfo;
 import datart.core.mappers.ext.OrganizationMapperExt;
+import datart.security.base.RoleType;
 import datart.server.base.dto.InviteMemberResponse;
 import datart.server.base.dto.OrganizationBaseInfo;
 import datart.server.base.params.OrgCreateParam;
@@ -25,6 +26,8 @@ public interface OrgService extends BaseCRUDService<Organization, OrganizationMa
     Organization createOrganization(OrgCreateParam createParam);
 
     void initOrganization(Organization organization, User creator);
+
+    void createDefaultRole(RoleType roleType, User creator, Organization org);
 
     boolean deleteOrganization(String orgId);
 

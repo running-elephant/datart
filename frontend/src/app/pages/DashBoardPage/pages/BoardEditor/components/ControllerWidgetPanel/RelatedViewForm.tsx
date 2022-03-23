@@ -23,16 +23,14 @@ import {
   RadioChangeEvent,
   Select,
 } from 'antd';
+import { ChartDataViewFieldCategory, ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ControllerWidgetContent,
   RelatedView,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
-import ChartDataView, {
-  ChartDataViewFieldCategory,
-} from 'app/types/ChartDataView';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+import ChartDataView from 'app/types/ChartDataView';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { filterValueTypeByControl, isRangeTypeController } from './utils';

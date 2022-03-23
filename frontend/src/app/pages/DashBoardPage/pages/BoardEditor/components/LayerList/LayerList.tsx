@@ -16,31 +16,20 @@
  * limitations under the License.
  */
 import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
-import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import produce from 'immer';
-import React, { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { editBoardStackActions, editWidgetInfoActions } from '../../../slice';
-import { updateWidgetConf } from '../../../slice/childSlice/stackSlice';
+import { WidgetType } from '../../../Board/slice/types';
+import { editBoardStackActions, editWidgetInfoActions } from '../../slice';
+import { updateWidgetConf } from '../../slice/childSlice/stackSlice';
 import {
   selectAllWidgetInfoMap,
   selectSortAllWidgets,
-} from '../../../slice/selectors';
+} from '../../slice/selectors';
 import NameItem from './NameItem';
-
-export interface IProps {}
-const withDnd: React.FC<IProps> = props => {
-  return (
-    <DndProvider backend={HTML5Backend}>
-      <WidgetNameList />
-    </DndProvider>
-  );
-};
-
-export default withDnd;
 
 export type NameCard = {
   index: number;
@@ -50,7 +39,7 @@ export type NameCard = {
   editing: boolean;
   selected: boolean;
 };
-export const WidgetNameList: React.FC<IProps> = () => {
+export const LayerList: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const allWidgetsInfo = useSelector(selectAllWidgetInfoMap);
   const sortLayoutWidgets = useSelector(selectSortAllWidgets);
@@ -109,7 +98,6 @@ export const WidgetNameList: React.FC<IProps> = () => {
   const clearSelectedWidgets = () => {
     dispatch(editWidgetInfoActions.clearSelectedWidgets());
   };
-  //
 
   const nameList = cards
     .sort((a, b) => b.index - a.index)
@@ -127,12 +115,35 @@ export const WidgetNameList: React.FC<IProps> = () => {
       </WidgetAllProvider>
     ));
   return (
-    <NamesWrap onClick={clearSelectedWidgets}>
-      <div>{nameList}</div>
-    </NamesWrap>
+    <DndProvider backend={HTML5Backend}>
+      <Wrap onClick={clearSelectedWidgets}>
+        <h3 className="title">组件</h3>
+        <div className="nameList">{nameList}</div>
+        <div className="bottom"></div>
+      </Wrap>
+    </DndProvider>
   );
-};
-const NamesWrap = styled.div`
-  width: 100%;
-  height: 400px;
+});
+const Wrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 190px;
+  min-width: 190px;
+  overflow-y: auto;
+  background-color: ${p => p.theme.componentBackground};
+  box-shadow: ${p => p.theme.shadowSider};
+
+  & .title {
+    padding: 5px;
+    text-align: center;
+  }
+  & .nameList {
+    min-height: 0;
+    padding: 0 10px;
+    overflow-y: auto;
+  }
+  & .bottom {
+    padding: 5px;
+    text-align: center;
+  }
 `;

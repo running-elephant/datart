@@ -35,7 +35,7 @@ public interface ScheduleMapper extends CRUDMapper {
         "#{createTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR}, ",
         "#{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, ",
         "#{parentId,jdbcType=VARCHAR}, #{isFolder,jdbcType=TINYINT}, ",
-        "#{index,jdbcType=INTEGER}, #{status,jdbcType=TINYINT})"
+        "#{index,jdbcType=DOUBLE}, #{status,jdbcType=TINYINT})"
     })
     int insert(Schedule record);
 
@@ -66,7 +66,7 @@ public interface ScheduleMapper extends CRUDMapper {
         @Result(column="update_time", property="updateTime", jdbcType=JdbcType.TIMESTAMP),
         @Result(column="parent_id", property="parentId", jdbcType=JdbcType.VARCHAR),
         @Result(column="is_folder", property="isFolder", jdbcType=JdbcType.TINYINT),
-        @Result(column="index", property="index", jdbcType=JdbcType.INTEGER),
+        @Result(column="index", property="index", jdbcType=JdbcType.DOUBLE),
         @Result(column="status", property="status", jdbcType=JdbcType.TINYINT)
     })
     Schedule selectByPrimaryKey(String id);
@@ -90,7 +90,7 @@ public interface ScheduleMapper extends CRUDMapper {
           "update_time = #{updateTime,jdbcType=TIMESTAMP},",
           "parent_id = #{parentId,jdbcType=VARCHAR},",
           "is_folder = #{isFolder,jdbcType=TINYINT},",
-          "`index` = #{index,jdbcType=INTEGER},",
+          "`index` = #{index,jdbcType=DOUBLE},",
           "`status` = #{status,jdbcType=TINYINT}",
         "where id = #{id,jdbcType=VARCHAR}"
     })
