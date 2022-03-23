@@ -43,14 +43,13 @@ const BlockMaskLayer: React.FC<BlockMaskLayerProps> = ({
   const selectWidget = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
-
       let newSelected = !widgetInfo.selected;
       if (widgetInfo.selected) {
         newSelected = widgetInfo.selected;
       }
       dispatch(
         editWidgetInfoActions.selectWidget({
-          multipleKey: false,
+          multipleKey: e.shiftKey,
           id: widgetConfig.id,
           selected: newSelected,
         }),
@@ -59,7 +58,6 @@ const BlockMaskLayer: React.FC<BlockMaskLayerProps> = ({
     [dispatch, widgetConfig.id, widgetInfo.selected],
   );
   const doubleClick = useCallback(() => {
-    // if (widgetConfig.config.type === 'chart') return;
     if (widgetConfig.config.type === 'container') {
       dispatch(editDashBoardInfoActions.changeShowBlockMask(false));
     }
@@ -82,17 +80,15 @@ const BlockMaskLayer: React.FC<BlockMaskLayerProps> = ({
   }, [widgetInfo.editing, widgetInfo.selected]);
 
   return (
-    <>
-      <MaskLayer
-        cursor={cursor}
-        front={showBlockMask && !widgetInfo.editing}
-        border={border}
-        selected={widgetInfo.selected}
-        className={showBlockMask ? handleClassName : 'mask-layer'}
-        onDoubleClick={doubleClick}
-        onClick={selectWidget}
-      ></MaskLayer>
-    </>
+    <MaskLayer
+      cursor={cursor}
+      front={showBlockMask && !widgetInfo.editing}
+      border={border}
+      selected={widgetInfo.selected}
+      className={showBlockMask ? handleClassName : 'mask-layer'}
+      onDoubleClick={doubleClick}
+      onClick={selectWidget}
+    ></MaskLayer>
   );
 };
 export default BlockMaskLayer;

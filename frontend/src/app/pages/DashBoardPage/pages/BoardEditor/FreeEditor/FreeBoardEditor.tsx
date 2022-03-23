@@ -32,6 +32,7 @@ import { DraggableCore, DraggableEventHandler } from 'react-draggable';
 import { useDispatch } from 'react-redux';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components/macro';
+import { BoardActionContext } from '../../../components/BoardProvider/BoardActionProvider';
 import { scaleContext } from '../../../components/FreeBoardBackground';
 import { WidgetCore } from '../../../components/WidgetCore';
 import WidgetToolBar from '../../../components/WidgetToolBar';
@@ -47,9 +48,10 @@ export enum DragTriggerTypes {
 export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const widget = useContext(WidgetContext);
   const widgetInfo = useContext(WidgetInfoContext);
+  const { updateWidgetConfig } = useContext(BoardActionContext);
   const dispatch = useDispatch();
   const scale = useContext(scaleContext);
-
+  const { x, y, width, height } = widget.config.rect;
   const [curXY, setCurXY] = useState<[number, number]>([
     widget.config.rect.x,
     widget.config.rect.y,
@@ -58,12 +60,11 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const [curW, setCurW] = useState(widget.config.rect.width);
   const [curH, setCurH] = useState(widget.config.rect.height);
   useEffect(() => {
-    const { x, y, width, height } = widget.config.rect;
     setCurXY([x, y]);
     curXYRef.current = [x, y];
     setCurW(width);
     setCurH(height);
-  }, [widget.config.rect]);
+  }, [height, width, x, y]);
 
   const dragStart: DraggableEventHandler = useCallback((e, data) => {
     e.stopPropagation();
@@ -80,7 +81,9 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
 
   const drag: DraggableEventHandler = useCallback((e, data) => {
     e.stopPropagation();
+
     const { deltaX, deltaY } = data;
+
     setCurXY(c => [c[0] + deltaX, c[1] + deltaY]);
   }, []);
   const dragStop: DraggableEventHandler = (e, data) => {
@@ -92,13 +95,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
       draft.rect.x = curXY[0];
       draft.rect.y = curXY[1];
     });
-
-    dispatch(
-      editBoardStackActions.updateWidgetConfig({
-        wid: widget.id,
-        config: nextConf,
-      }),
-    );
+    updateWidgetConfig(nextConf, widget.id);
 
     e.stopPropagation();
   };
