@@ -31,7 +31,7 @@ import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import persistence from 'utils/persistence';
 import { uuidv4 } from 'utils/utils';
-import ChartDataRequest from '../../types/ChartDataRequest';
+import { ChartDataRequest } from '../../types/ChartDataRequest';
 import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
 import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
