@@ -60,7 +60,9 @@ public class DataSourceFactoryDruidImpl implements DataSourceFactory<DruidDataSo
         System.setProperty("druid.mysql.usePingMethod", "false");
 
         //opt config
-        pro.putAll(properties.getProperties());
+        if (properties.getProperties() != null) {
+            pro.putAll(properties.getProperties());
+        }
         return pro;
     }
 }
