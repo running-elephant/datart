@@ -106,7 +106,7 @@ const ChartComputedFieldSettingPanel: FC<{
     handleChange(newField);
   };
 
-  const getFunctionCategroies = (): Array<{ label; value }> => {
+  const getFunctionCategories = (): Array<{ label; value }> => {
     const functionCategories = ComputedFunctionDescriptions.reduce<string[]>(
       (acc, cur) => {
         if (acc.find(x => x === cur.type)) {
@@ -244,7 +244,7 @@ const ChartComputedFieldSettingPanel: FC<{
             <span>{`${t('functions')}`}</span>
             <Select
               value={selectedFunctionCategory}
-              options={getFunctionCategroies()}
+              options={getFunctionCategories()}
               onChange={handleFunctionCategoryChange}
             />
             <ChartSearchableList
