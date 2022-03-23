@@ -53,11 +53,12 @@ const SVGFontIconRender = ({ iconStr }) => {
 };
 
 const SVGImageRender = ({ iconStr }) => {
+  const encodedStr = window.encodeURIComponent(iconStr);
   return (
     <StyledInlineSVGIcon
       alt="svg icon"
       style={{ height: FONT_SIZE_TITLE, width: FONT_SIZE_TITLE }}
-      src={`data:image/svg+xml;utf8,${iconStr}`}
+      src={`data:image/svg+xml;utf8,${encodedStr}`}
     />
   );
 };
