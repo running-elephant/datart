@@ -17,8 +17,8 @@
  */
 
 import { Switch } from 'antd';
+import { FilterConditionType, FilterRelationType } from 'app/constants';
 import ChartFilterCondition from 'app/models/ChartFilterCondition';
-import { FilterConditionType, FilterRelationType } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 import SingleFilterRow from './SingleFilterRow';
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { GroupLayoutMode } from '../types';
+import { FormGroupLayoutMode } from '../constants';
 import * as utils from '../utils';
 
 describe('itemLayoutComparer Tests', () => {
@@ -107,12 +107,12 @@ describe('groupLayoutComparer Tests', () => {
     const mockDatas = [1, 2];
     const result = utils.groupLayoutComparer(
       {
-        mode: GroupLayoutMode.INNER,
+        mode: FormGroupLayoutMode.INNER,
         ancestors: [],
         data: mockDatas,
       },
       {
-        mode: GroupLayoutMode.OUTER,
+        mode: FormGroupLayoutMode.OUTER,
         ancestors: [],
         data: mockDatas,
       },
@@ -124,13 +124,13 @@ describe('groupLayoutComparer Tests', () => {
     const mockDatas = [1, 2];
     const result = utils.groupLayoutComparer(
       {
-        mode: GroupLayoutMode.INNER,
+        mode: FormGroupLayoutMode.INNER,
         dependency: 'a',
         ancestors: [],
         data: mockDatas,
       },
       {
-        mode: GroupLayoutMode.INNER,
+        mode: FormGroupLayoutMode.INNER,
         dependency: 'b',
         ancestors: [],
         data: mockDatas,
@@ -142,13 +142,13 @@ describe('groupLayoutComparer Tests', () => {
   test('should be call itemLayoutComparer when mode and dependency not changed', () => {
     const result = utils.groupLayoutComparer(
       {
-        mode: GroupLayoutMode.INNER,
+        mode: FormGroupLayoutMode.INNER,
         dependency: 'a',
         ancestors: [],
         data: [1],
       },
       {
-        mode: GroupLayoutMode.INNER,
+        mode: FormGroupLayoutMode.INNER,
         dependency: 'a',
         ancestors: [],
         data: [2],

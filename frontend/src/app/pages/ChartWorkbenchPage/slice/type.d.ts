@@ -16,26 +16,26 @@
  * limitations under the License.
  */
 
-import { View } from 'app/types/View';
-import { ChartDataViewMeta } from './ChartDataViewMeta';
+import { ChartConfig } from 'app/types/ChartConfig';
 
-export enum ChartDataViewFieldType {
-  STRING = 'STRING',
-  NUMERIC = 'NUMERIC',
-  DATE = 'DATE',
-}
-
-export enum ChartDataViewFieldCategory {
-  Field = 'field',
-  Variable = 'variable',
-  ComputedField = 'computedField',
-  AggregateComputedField = 'aggregateComputedField',
-}
-
-export type ChartDataView = Omit<View, 'model'> & {
-  meta?: ChartDataViewMeta[];
-  computedFields?: ChartDataViewMeta[];
-  orgId?: string;
+export type ChartConfigPayloadType = {
+  init?: ChartConfig;
+  ancestors?: number[];
+  value?: any;
+  needRefresh?: boolean;
 };
 
-export default ChartDataView;
+export type WorkbenchState = {
+  lang: string;
+  dateFormat: string;
+  dataviews?: ChartDataView[];
+  currentDataView?: ChartDataView;
+  dataset?: ChartDataSetDTO;
+  chartConfig?: ChartConfig;
+  shadowChartConfig?: ChartConfig;
+  backendChart?: ChartDTO;
+  backendChartId?: string;
+  aggregation?: boolean;
+  datasetLoading: boolean;
+  chartEditorDownloadPolling: boolean;
+};

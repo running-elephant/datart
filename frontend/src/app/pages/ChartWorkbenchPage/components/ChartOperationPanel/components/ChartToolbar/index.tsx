@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import React, { FC, memo, useContext } from 'react';
+import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_MD } from 'styles/StyleConstants';
 import ChartAggregationContext from '../../../../contexts/ChartAggregationContext';

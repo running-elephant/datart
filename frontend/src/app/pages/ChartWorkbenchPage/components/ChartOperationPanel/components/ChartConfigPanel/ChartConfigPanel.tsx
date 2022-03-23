@@ -27,10 +27,8 @@ import useComputedState from 'app/hooks/useComputedState';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import ChartPaletteContext from 'app/pages/ChartWorkbenchPage/contexts/ChartPaletteContext';
-import {
-  ChartConfigPayloadType,
-  ChartConfigReducerActionType,
-} from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { ChartConfigReducerActionType } from 'app/pages/ChartWorkbenchPage/slice/constant';
+import { ChartConfigPayloadType } from 'app/pages/ChartWorkbenchPage/slice/type';
 import {
   ChartConfig,
   ChartDataConfig,

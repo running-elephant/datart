@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
+import { ChartLifecycle } from 'app/constants';
 import { IChart } from 'app/types/Chart';
-import { ChartLifecycle } from 'app/types/ChartLifecycle';
 import { ValueOf } from 'types';
 import { Debugger } from 'utils/debugger';
 

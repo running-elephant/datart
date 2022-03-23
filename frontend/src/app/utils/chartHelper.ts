@@ -17,16 +17,18 @@
  */
 
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
+import {
+  ChartDataSectionType,
+  FieldFormatType,
+  SortActionType,
+} from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
 import {
   ChartConfig,
   ChartDataConfig,
   ChartDataSectionField,
-  ChartDataSectionType,
   ChartStyleConfig,
-  FieldFormatType,
   IFieldFormatConfig,
-  SortActionType,
 } from 'app/types/ChartConfig';
 import {
   ChartCommonConfig,

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Form, FormInstance, Input } from 'antd';
+import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   BoardType,
@@ -23,7 +24,6 @@ import {
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import ControllerVisibility from './ControllerVisibility';

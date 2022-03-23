@@ -16,28 +16,24 @@
  * limitations under the License.
  */
 
+import {
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+  ControllerFacadeTypes,
+  TimeFilterValueCategory,
+} from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import {
   RelatedView,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import {
-  ChartDataConfig,
-  ChartDataSectionField,
-  ChartDataSectionType,
-} from 'app/types/ChartConfig';
+import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
-import { transformToViewConfig } from 'app/types/ChartDataRequest';
-import ChartDataView, {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
-import {
-  ControllerFacadeTypes,
-  TimeFilterValueCategory,
-} from 'app/types/FilterControlPanel';
+import ChartDataView from 'app/types/ChartDataView';
 import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
+import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import { getTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';

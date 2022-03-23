@@ -16,11 +16,8 @@
  * limitations under the License.
  */
 
-import {
-  FilterCondition,
-  FilterConditionType,
-  FilterRelationType,
-} from 'app/types/ChartConfig';
+import { FilterConditionType, FilterRelationType } from 'app/constants';
+import { FilterCondition } from 'app/types/ChartConfig';
 import { FilterSqlOperator } from 'globalConstants';
 
 class ChartFilterCondition implements FilterCondition {
@@ -28,7 +25,7 @@ class ChartFilterCondition implements FilterCondition {
   type = FilterConditionType.Filter;
   value?;
   visualType = '';
-  operator?: string;
+  operator?: any;
   children?: ChartFilterCondition[];
 
   constructor(condition?: FilterCondition) {

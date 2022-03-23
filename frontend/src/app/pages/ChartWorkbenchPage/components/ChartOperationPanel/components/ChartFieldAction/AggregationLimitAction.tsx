@@ -17,12 +17,12 @@
  */
 
 import { Menu, Radio, Space } from 'antd';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   AggregateFieldSubAggregateType,
-  ChartDataSectionField,
   ChartDataSectionFieldActionType,
-} from 'app/types/ChartConfig';
+} from 'app/constants';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 

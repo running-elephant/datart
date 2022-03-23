@@ -18,20 +18,20 @@
 
 import {
   AggregateFieldActionType,
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+} from 'app/constants';
+import {
   ChartConfig,
   ChartDataConfig,
   ChartDataSectionField,
-  ChartDataSectionType,
   ChartStyleConfig,
 } from 'app/types/ChartConfig';
 import {
   ChartCommonConfig,
   ChartStyleConfigDTO,
 } from 'app/types/ChartConfigDTO';
-import {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
 import {
   cond,
   curry,
@@ -538,3 +538,20 @@ export function getAxisLengthByConfig(config: ChartCommonConfig) {
   // 坐标轴区域宽度 = 容器宽度 - 最大字符所占长度 - 左右边距
   return containerWidth - axisLabelMaxWidth - leftWidth - rightWidth;
 }
+
+export const transformToViewConfig = (viewConfig?: string) => {
+  const viewConfigMap = viewConfig ? JSON.parse(viewConfig) : {};
+  const obj = {};
+  if (viewConfig) {
+    const fields = [
+      'cache',
+      'cacheExpires',
+      'concurrencyControl',
+      'concurrencyControlMode',
+    ];
+    fields.forEach(v => {
+      obj[v] = viewConfigMap?.[v];
+    });
+  }
+  return obj;
+};

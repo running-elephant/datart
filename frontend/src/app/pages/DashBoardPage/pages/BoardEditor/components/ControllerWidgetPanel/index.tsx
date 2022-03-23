@@ -18,6 +18,10 @@
 
 import { Form, Modal } from 'antd';
 import { Split } from 'app/components';
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+} from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardActionContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardActionProvider';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
@@ -33,10 +37,6 @@ import {
   getOtherStringControlWidgets,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
-import {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
 import produce from 'immer';
 import React, {
   memo,

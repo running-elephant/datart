@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { FilterConditionType, FilterRelationType } from 'app/types/ChartConfig';
+import { FilterConditionType, FilterRelationType } from 'app/constants';
 import { FilterSqlOperator } from 'globalConstants';
 import ChartFilterCondition, {
   ConditionBuilder,

@@ -60,22 +60,3 @@ export type ChartDataRequestFilter = {
     valueType: string;
   }>;
 };
-
-export const transformToViewConfig = (viewConfig?: string) => {
-  const viewConfigMap = viewConfig ? JSON.parse(viewConfig) : {};
-  const obj = {};
-  if (viewConfig) {
-    const fields = [
-      'cache',
-      'cacheExpires',
-      'concurrencyControl',
-      'concurrencyControlMode',
-    ];
-    fields.forEach(v => {
-      obj[v] = viewConfigMap?.[v];
-    });
-  }
-  return obj;
-};
-
-export default ChartDataRequest;

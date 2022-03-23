@@ -16,15 +16,10 @@
  * limitations under the License.
  */
 
-import { ChartDataViewFieldType } from 'app/constants';
-
-export interface ControlOptionItem {
-  label: string;
-  value: string;
-  filterType?: ChartDataViewFieldType;
-}
-export interface TargetValueType {
-  relId: string;
-  relType: string;
-  id: string;
-}
+export const ChartConfigReducerActionType = {
+  INIT: 'init',
+  STYLE: 'style',
+  DATA: 'data',
+  SETTING: 'setting',
+  I18N: 'i18n',
+};

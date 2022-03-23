@@ -18,10 +18,10 @@
 
 import { Tooltip } from 'antd';
 import { IW } from 'app/components';
+import { ChartDataSectionType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import ChartManager from 'app/models/ChartManager';
 import { IChart } from 'app/types/Chart';
-import { ChartDataSectionType } from 'app/types/ChartConfig';
 import classnames from 'classnames';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';

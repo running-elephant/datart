@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType, ChartStyleConfig } from 'app/types/ChartConfig';
+import { ChartDataSectionType, ChartDataViewFieldType } from 'app/constants';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import {
   diffHeaderRows,
   flattenHeaderRowsWithoutGroupRow,

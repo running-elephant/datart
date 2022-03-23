@@ -27,10 +27,10 @@ import {
   Space,
 } from 'antd';
 import { FormItemEx } from 'app/components';
+import { FieldFormatType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartDataSectionField,
-  FieldFormatType,
   IFieldFormatConfig,
 } from 'app/types/ChartConfig';
 import { CURRENCIES } from 'app/utils/currency';

@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 
-import { message } from 'antd';
+export enum FormGroupLayoutMode {
+  INNER = 'inner',
+  OUTER = 'outter',
+}
 
-export function rejectedActionMessageHandler(_, action) {
-  if (action?.type === 'workbench/fetchDataSetAction/rejected') {
-    message.error(action?.payload?.message);
-  } else if (action?.error) {
-    message.error(action?.error.message);
-  }
+export enum FormItemComponentType {
+  MODAL = 'modal',
 }

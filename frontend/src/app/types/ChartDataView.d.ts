@@ -16,9 +16,13 @@
  * limitations under the License.
  */
 
-export enum ChartLifecycle {
-  MOUNTED = 'mounted',
-  UPDATED = 'updated',
-  RESIZE = 'resize',
-  UNMOUNTED = 'unmount',
-}
+import { View } from 'app/types/View';
+import { ChartDataViewMeta } from './ChartDataViewMeta';
+
+export type ChartDataView = Omit<View, 'model'> & {
+  meta?: ChartDataViewMeta[];
+  computedFields?: ChartDataViewMeta[];
+  orgId?: string;
+};
+
+export default ChartDataView;

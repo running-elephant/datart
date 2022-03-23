@@ -16,14 +16,15 @@
  * limitations under the License.
  */
 import { ChartEditorProps } from 'app/components/ChartEditor';
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+  ControllerFacadeTypes,
+} from 'app/constants';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDatasetMeta } from 'app/types/ChartDataSet';
-import ChartDataView, {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+import ChartDataView from 'app/types/ChartDataView';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
 import { ChartDataSectionField } from '../../../../../types/ChartConfig';
