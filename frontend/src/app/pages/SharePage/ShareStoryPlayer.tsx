@@ -19,58 +19,36 @@
 import useMount from 'app/hooks/useMount';
 import useRouteQuery from 'app/hooks/useRouteQuery';
 import ChartManager from 'app/models/ChartManager';
-import {
-  downloadShareDataChartFile,
-  loadShareTask,
-  makeShareDownloadDataTask,
-} from 'app/utils/fetch';
-import { StorageKeys } from 'globalConstants';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import persistence from 'utils/persistence';
-import { uuidv4 } from 'utils/utils';
-import ChartDataRequest from '../../types/ChartDataRequest';
 import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
 import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';
-import { selectShareBoard } from '../DashBoardPage/pages/Board/slice/selector';
 import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
 import { useEditBoardSlice } from '../DashBoardPage/pages/BoardEditor/slice';
 import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
 import { urlSearchTransfer } from '../MainPage/pages/VizPage/utils';
 import { useStoryBoardSlice } from '../StoryBoardPage/slice';
 import { selectShareStoryBoard } from '../StoryBoardPage/slice/selectors';
-import BoardForShare from './BoardForShare';
-import ChartForShare from './ChartForShare';
-import { DownloadTaskContainer } from './DownloadTaskContainer';
 import PasswordModal from './PasswordModal';
 import { useShareSlice } from './slice';
-import {
-  selectChartPreview,
-  selectNeedPassword,
-  selectShareExecuteTokenMap,
-  selectSharePassword,
-  selectShareVizType,
-} from './slice/selectors';
+import { selectNeedPassword, selectShareVizType } from './slice/selectors';
 import { fetchShareVizInfo } from './slice/thunks';
 import { StoryPlayerForShare } from './StoryPlayerForShare';
-export function SharePage() {
+
+function ShareStoryPlayer() {
   const { shareActions: actions } = useShareSlice();
-  useEditBoardSlice();
-  useBoardSlice();
   useStoryBoardSlice();
+  useBoardSlice();
+  useEditBoardSlice();
 
   const dispatch = useDispatch();
   const location = useLocation();
   const search = location.search;
 
-  const [shareClientId, setShareClientId] = useState('');
-  const executeTokenMap = useSelector(selectShareExecuteTokenMap);
   const needPassword = useSelector(selectNeedPassword);
-  const sharePassword = useSelector(selectSharePassword);
-  const chartPreview = useSelector(selectChartPreview);
-  const shareBoard = useSelector(selectShareBoard);
   const shareStory = useSelector(selectShareStoryBoard);
   const vizType = useSelector(selectShareVizType);
 
@@ -125,64 +103,6 @@ export function SharePage() {
     );
   };
 
-  const onLoadShareTask = useMemo(() => {
-    const clientId = localStorage.getItem(StorageKeys.ShareClientId);
-    if (clientId) {
-      setShareClientId(clientId);
-    } else {
-      const id = uuidv4();
-      setShareClientId(id);
-      localStorage.setItem(StorageKeys.ShareClientId, uuidv4());
-    }
-    return () =>
-      loadShareTask({
-        shareToken,
-        password: sharePassword,
-        clientId: shareClientId,
-      });
-  }, [shareToken, sharePassword, shareClientId]);
-
-  const onMakeShareDownloadDataTask = useCallback(
-    (downloadParams: ChartDataRequest[], fileName: string) => {
-      if (shareClientId && executeTokenMap) {
-        dispatch(
-          makeShareDownloadDataTask({
-            clientId: shareClientId,
-            executeToken: executeTokenMap,
-            downloadParams: downloadParams,
-            shareToken,
-            fileName: fileName,
-            resolve: () => {
-              dispatch(actions.setShareDownloadPolling(true));
-            },
-            password: sharePassword,
-          }),
-        );
-      }
-    },
-    [
-      shareClientId,
-      shareToken,
-      sharePassword,
-      executeTokenMap,
-      dispatch,
-      actions,
-    ],
-  );
-
-  const onDownloadFile = useCallback(
-    task => {
-      downloadShareDataChartFile({
-        downloadId: task.id,
-        shareToken,
-        password: sharePassword,
-      }).then(() => {
-        dispatch(actions.setShareDownloadPolling(true));
-      });
-    },
-    [shareToken, sharePassword, dispatch, actions],
-  );
-
   return (
     <StyledWrapper className="datart-viz">
       <PasswordModal
@@ -196,38 +116,14 @@ export function SharePage() {
           <BoardLoading />
         </div>
       )}
-      {!Boolean(needPassword) &&
-        vizType === 'DATACHART' &&
-        chartPreview &&
-        chartPreview?.backendChart && (
-          <DownloadTaskContainer
-            onLoadTasks={onLoadShareTask}
-            onDownloadFile={onDownloadFile}
-          >
-            <ChartForShare
-              chartPreview={chartPreview}
-              onCreateDataChartDownloadTask={onMakeShareDownloadDataTask}
-            />
-          </DownloadTaskContainer>
-        )}
-      {!Boolean(needPassword) && vizType === 'DASHBOARD' && shareBoard && (
-        <BoardForShare
-          dashboard={shareBoard}
-          allowDownload={true}
-          loadVizData={loadVizData}
-          onMakeShareDownloadDataTask={onMakeShareDownloadDataTask}
-          renderMode={renderMode}
-          filterSearchUrl={''}
-          onLoadShareTask={onLoadShareTask}
-          onDownloadFile={onDownloadFile}
-        />
-      )}
+
       {!Boolean(needPassword) && vizType === 'STORYBOARD' && shareStory && (
         <StoryPlayerForShare storyBoard={shareStory} />
       )}
     </StyledWrapper>
   );
 }
+export default ShareStoryPlayer;
 const StyledWrapper = styled.div`
   width: 100%;
   height: 100vh;

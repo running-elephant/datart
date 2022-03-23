@@ -206,6 +206,7 @@ const TitleHeader: FC<TitleHeaderProps> = memo(
         </Space>
         {showShareLinkModal && (
           <ShareLinkModal
+            vizType="DASHBOARD"
             visibility={showShareLinkModal}
             onOk={() => setShowShareLinkModal(false)}
             onCancel={() => setShowShareLinkModal(false)}

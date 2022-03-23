@@ -35,6 +35,7 @@ import { SPACE } from 'styles/StyleConstants';
 import { getServerDomain } from 'utils/request';
 
 const ShareLinkModal: FC<{
+  vizType: string;
   visibility: boolean;
   onGenerateShareLink?: (
     date,
@@ -42,7 +43,7 @@ const ShareLinkModal: FC<{
   ) => { password?: string; token?: string; usePassword?: boolean };
   onOk?;
   onCancel?;
-}> = memo(({ visibility, onGenerateShareLink, onOk, onCancel }) => {
+}> = memo(({ visibility, onGenerateShareLink, onOk, onCancel, vizType }) => {
   const t = useI18NPrefix(`viz.action`);
   const [expireDate, setExpireDate] = useState<string>();
   const [enablePassword, setEnablePassword] = useState(false);
@@ -66,7 +67,12 @@ const ShareLinkModal: FC<{
       return '';
     }
     const encodeToken = encodeURIComponent(shareLink?.token);
-    return `${getServerDomain()}/share?token=${encodeToken}${
+    const urlRouter = {
+      DASHBOARD: 'shareDashboard',
+      DATACHART: 'shareChart',
+      STORYBOARD: 'shareStoryPlayer',
+    };
+    return `${getServerDomain()}/${urlRouter[vizType]}?token=${encodeToken}${
       shareLink?.usePassword ? '&usePassword=1' : ''
     }`;
   };
