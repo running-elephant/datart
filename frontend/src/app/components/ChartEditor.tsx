@@ -22,21 +22,11 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import ChartManager from 'app/models/ChartManager';
-import workbenchSlice, {
-  aggregationSelector,
-  backendChartSelector,
-  ChartConfigReducerActionType,
-  chartConfigSelector,
-  currentDataViewSelector,
-  datasetsSelector,
-  initWorkbenchAction,
-  refreshDatasetAction,
-  shadowChartConfigSelector,
-  updateChartAction,
-  updateChartConfigAndRefreshDatasetAction,
-  updateRichTextAction,
-  useWorkbenchSlice,
-} from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import workbenchSlice, { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
+import { ChartConfigReducerActionType } from 'app/pages/ChartWorkbenchPage/slice/constant';
+import { aggregationSelector, backendChartSelector, chartConfigSelector, currentDataViewSelector, datasetsSelector, shadowChartConfigSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
+import { initWorkbenchAction, refreshDatasetAction, updateChartAction, updateChartConfigAndRefreshDatasetAction, updateRichTextAction } from 'app/pages/ChartWorkbenchPage/slice/thunks';
+
 import { useAddViz } from 'app/pages/MainPage/pages/VizPage/hooks/useAddViz';
 import { SaveForm } from 'app/pages/MainPage/pages/VizPage/SaveForm';
 import {

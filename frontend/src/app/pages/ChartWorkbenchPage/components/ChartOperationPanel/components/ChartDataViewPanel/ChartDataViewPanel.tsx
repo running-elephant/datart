@@ -23,11 +23,12 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import useToggle from 'app/hooks/useToggle';
-import workbenchSlice, {
+import workbenchSlice from 'app/pages/ChartWorkbenchPage/slice';
+import {
   dataviewsSelector,
-  fetchViewDetailAction,
   makeDataviewTreeSelector,
-} from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+} from 'app/pages/ChartWorkbenchPage/slice/selectors';
+import { fetchViewDetailAction } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useAccess, useCascadeAccess } from 'app/pages/MainPage/Access';
 import {
   PermissionLevels,

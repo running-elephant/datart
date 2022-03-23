@@ -18,7 +18,7 @@
 
 import { Modal, Switch } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
 import { FC, memo, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
