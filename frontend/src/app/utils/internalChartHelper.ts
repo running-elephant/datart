@@ -49,9 +49,6 @@ export const transferChartConfigs = (
   targetConfig?: ChartConfig,
   sourceConfig?: ChartConfig,
 ) => {
-  if (!sourceConfig || !targetConfig) {
-    return targetConfig || sourceConfig;
-  }
   return pipe(
     transferChartDataConfig,
     transferChartStyleConfig,
@@ -102,10 +99,10 @@ export const transferChartDataConfig = (
       ChartDataSectionType.FILTER,
     ].map(type => curry(transferDataConfigImpl)(type)),
     ...[ChartDataSectionType.MIXED].map(type =>
-      curry(transferMixedToOther)(type),
+      curry(transferMixedToNonMixed)(type),
     ),
     ...[ChartDataSectionType.MIXED].map(type =>
-      curry(transferOtherToMixed)(type),
+      curry(transferNonMixedToMixed)(type),
     ),
   )(targetConfig, sourceConfig);
 };
@@ -136,18 +133,7 @@ const transferDataConfigImpl = (
           (section?.rows || []).length + 1,
         );
       })
-      .sort((a, b) => {
-        if (
-          reachLowerBoundCount(a?.limit, a?.rows?.length) !==
-          reachLowerBoundCount(b?.limit, b?.rows?.length)
-        ) {
-          return (
-            reachLowerBoundCount(b?.limit, b?.rows?.length) -
-            reachLowerBoundCount(a?.limit, a?.rows?.length)
-          );
-        }
-        return (a?.rows?.length || 0) - (b?.rows?.length || 0);
-      })?.[0];
+      .sort(chartDataSectionRowLimitationComparer)?.[0];
     if (minimalRowConfig && row) {
       minimalRowConfig.rows = (minimalRowConfig.rows || []).concat([row]);
     }
@@ -155,7 +141,7 @@ const transferDataConfigImpl = (
   return targetConfig!;
 };
 
-const transferOtherToMixed = (
+const transferNonMixedToMixed = (
   sectionType: ChartDataSectionType,
   targetConfig?: ChartConfig,
   sourceConfig?: ChartConfig,
@@ -189,18 +175,7 @@ const transferOtherToMixed = (
             (section?.rows || []).length + 1,
           );
         })
-        .sort((a, b) => {
-          if (
-            reachLowerBoundCount(a?.limit, a?.rows?.length) !==
-            reachLowerBoundCount(b?.limit, b?.rows?.length)
-          ) {
-            return (
-              reachLowerBoundCount(b?.limit, b?.rows?.length) -
-              reachLowerBoundCount(a?.limit, a?.rows?.length)
-            );
-          }
-          return (a?.rows?.length || 0) - (b?.rows?.length || 0);
-        })?.[0];
+        .sort(chartDataSectionRowLimitationComparer)?.[0];
       if (minimalRowConfig && row) {
         minimalRowConfig.rows = (minimalRowConfig.rows || []).concat([row]);
       }
@@ -210,7 +185,7 @@ const transferOtherToMixed = (
   return targetConfig!;
 };
 
-const transferMixedToOther = (
+const transferMixedToNonMixed = (
   sectionType: ChartDataSectionType,
   targetConfig?: ChartConfig,
   sourceConfig?: ChartConfig,
@@ -249,18 +224,7 @@ const transferMixedToOther = (
             (section?.rows || []).length + 1,
           );
         })
-        .sort((a, b) => {
-          if (
-            reachLowerBoundCount(a?.limit, a?.rows?.length) !==
-            reachLowerBoundCount(b?.limit, b?.rows?.length)
-          ) {
-            return (
-              reachLowerBoundCount(b?.limit, b?.rows?.length) -
-              reachLowerBoundCount(a?.limit, a?.rows?.length)
-            );
-          }
-          return (a?.rows?.length || 0) - (b?.rows?.length || 0);
-        })?.[0];
+        .sort(chartDataSectionRowLimitationComparer)?.[0];
       if (minimalRowConfig && row) {
         minimalRowConfig.rows = (minimalRowConfig.rows || []).concat([row]);
       }
@@ -279,18 +243,7 @@ const transferMixedToOther = (
             (section?.rows || []).length + 1,
           );
         })
-        .sort((a, b) => {
-          if (
-            reachLowerBoundCount(a?.limit, a?.rows?.length) !==
-            reachLowerBoundCount(b?.limit, b?.rows?.length)
-          ) {
-            return (
-              reachLowerBoundCount(b?.limit, b?.rows?.length) -
-              reachLowerBoundCount(a?.limit, a?.rows?.length)
-            );
-          }
-          return (a?.rows?.length || 0) - (b?.rows?.length || 0);
-        })?.[0];
+        .sort(chartDataSectionRowLimitationComparer)?.[0];
       if (minimalRowConfig && row) {
         minimalRowConfig.rows = (minimalRowConfig.rows || []).concat([row]);
       }
@@ -299,6 +252,19 @@ const transferMixedToOther = (
 
   return targetConfig!;
 };
+
+function chartDataSectionRowLimitationComparer(prev, next) {
+  if (
+    reachLowerBoundCount(prev?.limit, prev?.rows?.length) !==
+    reachLowerBoundCount(next?.limit, next?.rows?.length)
+  ) {
+    return (
+      reachLowerBoundCount(next?.limit, next?.rows?.length) -
+      reachLowerBoundCount(prev?.limit, prev?.rows?.length)
+    );
+  }
+  return (prev?.rows?.length || 0) - (next?.rows?.length || 0);
+}
 
 export function isInRange(limit?: ChartDataConfig['limit'], count: number = 0) {
   return cond(
@@ -431,7 +397,7 @@ export function mergeChartStyleConfigs(
     if (!isEmptyArray(tEle?.rows)) {
       tEle['rows'] = mergeChartStyleConfigs(tEle.rows, sEle?.rows, options);
     } else if (sEle && !isEmptyArray(sEle?.rows)) {
-      // Note: we merge all rows data when target rows is emtpy
+      // Note: we merge all rows data when target rows is empty
       tEle['rows'] = sEle?.rows;
     }
   }
@@ -477,7 +443,7 @@ export function getRequiredAggregatedSections(dataConfigs?) {
   );
 }
 
-// TODO(Stephen): tobe delete after use ChartDataSet Model in charts
+// TODO(Stephen): to be delete after use ChartDataSet Model in charts
 // 兼容 impala 聚合函数小写问题
 export const filterSqlOperatorName = (requestParams, widgetData) => {
   const sqlOperatorNameList = requestParams.aggregators.map(aggConfig =>
