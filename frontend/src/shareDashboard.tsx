@@ -18,7 +18,7 @@
 
 import 'antd/dist/antd.min.css';
 import 'app/assets/fonts/iconfont.css';
-import { Share } from 'app/share';
+import { ShareDashboard } from 'app/shareDashboard';
 import 'core-js/features/string/replace-all';
 import React from 'react';
 import 'react-app-polyfill/ie11';
@@ -46,7 +46,7 @@ ReactDOM.render(
       <ThemeProvider>
         <HelmetProvider>
           <React.StrictMode>
-            <Share />
+            <ShareDashboard />
           </React.StrictMode>
         </HelmetProvider>
       </ThemeProvider>

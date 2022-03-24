@@ -18,7 +18,7 @@
 
 import { defaultLazyLoad } from 'utils/loadable';
 
-export const LazySharePage = defaultLazyLoad(
-  () => import('./index'),
+export const LazyShareStoryPlayer = defaultLazyLoad(
+  () => import('./ShareStoryPlayer'),
   module => module.default,
 );

@@ -39,27 +39,20 @@ import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
 import { useEditBoardSlice } from '../DashBoardPage/pages/BoardEditor/slice';
 import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
 import { urlSearchTransfer } from '../MainPage/pages/VizPage/utils';
-import { useStoryBoardSlice } from '../StoryBoardPage/slice';
-import { selectShareStoryBoard } from '../StoryBoardPage/slice/selectors';
 import BoardForShare from './BoardForShare';
-import ChartForShare from './ChartForShare';
-import { DownloadTaskContainer } from './DownloadTaskContainer';
 import PasswordModal from './PasswordModal';
 import { useShareSlice } from './slice';
 import {
-  selectChartPreview,
   selectNeedPassword,
   selectShareExecuteTokenMap,
   selectSharePassword,
   selectShareVizType,
 } from './slice/selectors';
 import { fetchShareVizInfo } from './slice/thunks';
-import { StoryPlayerForShare } from './StoryPlayerForShare';
-export function SharePage() {
+function ShareDashboard() {
   const { shareActions: actions } = useShareSlice();
   useEditBoardSlice();
   useBoardSlice();
-  useStoryBoardSlice();
 
   const dispatch = useDispatch();
   const location = useLocation();
@@ -69,9 +62,7 @@ export function SharePage() {
   const executeTokenMap = useSelector(selectShareExecuteTokenMap);
   const needPassword = useSelector(selectNeedPassword);
   const sharePassword = useSelector(selectSharePassword);
-  const chartPreview = useSelector(selectChartPreview);
   const shareBoard = useSelector(selectShareBoard);
-  const shareStory = useSelector(selectShareStoryBoard);
   const vizType = useSelector(selectShareVizType);
 
   const shareToken = useRouteQuery({
@@ -196,20 +187,7 @@ export function SharePage() {
           <BoardLoading />
         </div>
       )}
-      {!Boolean(needPassword) &&
-        vizType === 'DATACHART' &&
-        chartPreview &&
-        chartPreview?.backendChart && (
-          <DownloadTaskContainer
-            onLoadTasks={onLoadShareTask}
-            onDownloadFile={onDownloadFile}
-          >
-            <ChartForShare
-              chartPreview={chartPreview}
-              onCreateDataChartDownloadTask={onMakeShareDownloadDataTask}
-            />
-          </DownloadTaskContainer>
-        )}
+
       {!Boolean(needPassword) && vizType === 'DASHBOARD' && shareBoard && (
         <BoardForShare
           dashboard={shareBoard}
@@ -222,12 +200,10 @@ export function SharePage() {
           onDownloadFile={onDownloadFile}
         />
       )}
-      {!Boolean(needPassword) && vizType === 'STORYBOARD' && shareStory && (
-        <StoryPlayerForShare storyBoard={shareStory} />
-      )}
     </StyledWrapper>
   );
 }
+export default ShareDashboard;
 const StyledWrapper = styled.div`
   width: 100%;
   height: 100vh;

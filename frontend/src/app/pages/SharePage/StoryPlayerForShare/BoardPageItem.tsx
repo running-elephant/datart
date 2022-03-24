@@ -34,6 +34,7 @@ export const BoardPageItem: React.FC<BoardPageItemProps> = memo(
     const dashboard = useSelector((state: { board: BoardState }) =>
       makeSelectBoardConfigById()(state, boardId),
     );
+
     if (!dashboard)
       return (
         <div>
