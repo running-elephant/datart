@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import injectReducerEnhancer from 'utils/@reduxjs/injectReducer/enhancer';
+import rejectedErrorHandlerMiddleware from '../utils/@reduxjs/rejectedErrorHandlerMiddleware';
 import { createReducer } from './reducers';
 
 export function configureAppStore() {
@@ -11,7 +12,7 @@ export function configureAppStore() {
       getDefaultMiddleware({
         serializableCheck: false,
         // immutableCheck: false,
-      }),
+      }).prepend(rejectedErrorHandlerMiddleware.middleware),
     devTools:
       /* istanbul ignore next line */
       process.env.NODE_ENV !== 'production' ||

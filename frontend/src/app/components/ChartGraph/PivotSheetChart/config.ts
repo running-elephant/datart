@@ -146,12 +146,12 @@ const config: ChartConfig = {
             items: [
               {
                 key: 'inCol',
-                label: 'style.metricNameShowIn.inCol',
+                label: '@global@.style.metricNameShowIn.inCol',
                 value: true,
               },
               {
                 key: 'inRow',
-                label: 'style.metricNameShowIn.inRow',
+                label: '@global@.style.metricNameShowIn.inRow',
                 value: false,
               },
             ],
@@ -283,12 +283,9 @@ const config: ChartConfig = {
           options: {
             translateItemLabel: true,
             items: [
+              { label: '@global@.summary.totalPositionType.top', value: true },
               {
-                label: 'summary.totalPositionTop',
-                value: true,
-              },
-              {
-                label: 'summary.totalPositionBottom',
+                label: '@global@.summary.totalPositionType.bottom',
                 value: false,
               },
             ],
@@ -308,12 +305,9 @@ const config: ChartConfig = {
           options: {
             translateItemLabel: true,
             items: [
+              { label: '@global@.summary.totalPositionType.top', value: true },
               {
-                label: 'summary.subTotalPositionTop',
-                value: true,
-              },
-              {
-                label: 'summary.subTotalPositionBottom',
+                label: '@global@.summary.totalPositionType.bottom',
                 value: false,
               },
             ],
@@ -360,6 +354,12 @@ const config: ChartConfig = {
           subTotalPositionTop: '顶部',
           subTotalPositionBottom: '底部',
           aggregateFields: '汇总列',
+          totalPositionType: {
+            top: '顶部',
+            bottom: '底部',
+          },
+          subTotal: '小记',
+          total: '总计',
         },
       },
     },
@@ -400,6 +400,12 @@ const config: ChartConfig = {
           subTotalPositionTop: 'Top',
           subTotalPositionBottom: 'Bottom',
           aggregateFields: 'Summary Fields',
+          totalPositionType: {
+            top: 'Top',
+            bottom: 'Bottom',
+          },
+          subTotal: 'Sub Total',
+          total: 'Total',
         },
       },
     },

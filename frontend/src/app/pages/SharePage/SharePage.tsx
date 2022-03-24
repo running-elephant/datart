@@ -18,6 +18,8 @@
 
 import useMount from 'app/hooks/useMount';
 import useRouteQuery from 'app/hooks/useRouteQuery';
+import ChartManager from 'app/models/ChartManager';
+import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import {
   downloadShareDataChartFile,
   loadShareTask,
@@ -30,8 +32,6 @@ import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import persistence from 'utils/persistence';
 import { uuidv4 } from 'utils/utils';
-import ChartDataRequest from '../../types/ChartDataRequest';
-import ChartManager from '../ChartWorkbenchPage/models/ChartManager';
 import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
 import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';
 import { selectShareBoard } from '../DashBoardPage/pages/Board/slice/selector';
@@ -90,11 +90,7 @@ export function SharePage() {
     return urlSearchTransfer.toParams(search);
   }, [search]);
 
-  useMount(() => {
-    ChartManager.instance()
-      .load()
-      .catch(err => console.error('Fail to load customize charts with ', err));
-
+  const loadVizData = () => {
     if (Boolean(usePassword)) {
       const previousPassword = persistence.session.get(shareToken);
       if (previousPassword) {
@@ -105,6 +101,13 @@ export function SharePage() {
     } else {
       fetchShareVizInfoImpl(shareToken, undefined, searchParams);
     }
+  };
+  useMount(() => {
+    ChartManager.instance()
+      .load()
+      .catch(err => console.error('Fail to load customize charts with ', err));
+
+    loadVizData();
   });
 
   const fetchShareVizInfoImpl = (
@@ -211,6 +214,7 @@ export function SharePage() {
         <BoardForShare
           dashboard={shareBoard}
           allowDownload={true}
+          loadVizData={loadVizData}
           onMakeShareDownloadDataTask={onMakeShareDownloadDataTask}
           renderMode={renderMode}
           filterSearchUrl={''}

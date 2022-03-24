@@ -31,8 +31,7 @@ import { getDefaultWidgetName } from 'app/pages/DashBoardPage/utils';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import produce from 'immer';
 import { Layout } from 'react-grid-layout';
-import { createSlice, isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
-import { rejectedActionMessageHandler } from 'utils/notification';
+import { createSlice } from 'utils/@reduxjs/toolkit';
 import { EditBoardStack } from '../types';
 
 export type updateWidgetConf = {
@@ -48,10 +47,6 @@ export const editBoardStackSlice = createSlice({
   name: 'editBoard',
   initialState: initEditBoardState,
   reducers: {
-    clearEditBoardState(state) {
-      state.dashBoard = {} as Dashboard;
-      state.widgetRecord = {};
-    },
     setBoardToEditStack(state, action: PayloadAction<EditBoardStack>) {
       const record = action.payload;
       Object.keys(record).forEach(key => {
@@ -86,7 +81,12 @@ export const editBoardStackSlice = createSlice({
         const widget = produce(ele, draft => {
           draft.config.index = maxWidgetIndex;
           draft.config.name =
-            ele.config.name || getDefaultWidgetName(ele, maxWidgetIndex);
+            ele.config.name ||
+            getDefaultWidgetName(
+              ele.config.type,
+              ele.config.content.type,
+              maxWidgetIndex,
+            );
         });
         state.widgetRecord[widget.id] = widget;
       });
@@ -254,10 +254,5 @@ export const editBoardStackSlice = createSlice({
       }
     },
   },
-  extraReducers: builder => {
-    builder.addMatcher(
-      isMySliceRejectedAction(editBoardStackSlice.name),
-      rejectedActionMessageHandler,
-    );
-  },
+  extraReducers: builder => {},
 });

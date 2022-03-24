@@ -19,7 +19,6 @@
 package datart.data.provider.jdbc.adapters;
 
 import datart.core.base.PageInfo;
-import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.BeanUtils;
@@ -27,10 +26,10 @@ import datart.core.common.ReflectUtils;
 import datart.core.data.provider.*;
 import datart.data.provider.JdbcDataProvider;
 import datart.data.provider.calcite.dialect.CustomSqlDialect;
-import datart.data.provider.jdbc.JdbcDriverInfo;
-import datart.data.provider.jdbc.JdbcProperties;
 import datart.data.provider.calcite.dialect.FetchAndOffsetSupport;
 import datart.data.provider.jdbc.DataTypeUtils;
+import datart.data.provider.jdbc.JdbcDriverInfo;
+import datart.data.provider.jdbc.JdbcProperties;
 import datart.data.provider.jdbc.SqlScriptRender;
 import datart.data.provider.local.LocalDB;
 import lombok.Getter;
@@ -142,11 +141,12 @@ public class JdbcDataProviderAdapter implements Closeable {
             Set<Column> columnSet = new HashSet<>();
             DatabaseMetaData metadata = conn.getMetaData();
             Map<String, List<ForeignKey>> importedKeys = getImportedKeys(metadata, database, table);
-            ResultSet columns = metadata.getColumns(database, null, table, null);
-            while (columns.next()) {
-                Column column = readTableColumn(columns);
-                column.setForeignKeys(importedKeys.get(column.getName()));
-                columnSet.add(column);
+            try (ResultSet columns = metadata.getColumns(database, null, table, null)) {
+                while (columns.next()) {
+                    Column column = readTableColumn(columns);
+                    column.setForeignKeys(importedKeys.get(column.getName()));
+                    columnSet.add(column);
+                }
             }
             return columnSet;
         }
@@ -164,13 +164,14 @@ public class JdbcDataProviderAdapter implements Closeable {
      */
     protected Map<String, List<ForeignKey>> getImportedKeys(DatabaseMetaData metadata, String database, String table) throws SQLException {
         HashMap<String, List<ForeignKey>> keyMap = new HashMap<>();
-        ResultSet importedKeys = metadata.getImportedKeys(database, null, table);
-        while (importedKeys.next()) {
-            ForeignKey foreignKey = new ForeignKey();
-            foreignKey.setDatabase(importedKeys.getString(PKTABLE_CAT));
-            foreignKey.setTable(importedKeys.getString(PKTABLE_NAME));
-            foreignKey.setColumn(importedKeys.getString(PKCOLUMN_NAME));
-            keyMap.computeIfAbsent(importedKeys.getString(FKCOLUMN_NAME), key->new ArrayList<>()).add(foreignKey);
+        try (ResultSet importedKeys = metadata.getImportedKeys(database, null, table)) {
+            while (importedKeys.next()) {
+                ForeignKey foreignKey = new ForeignKey();
+                foreignKey.setDatabase(importedKeys.getString(PKTABLE_CAT));
+                foreignKey.setTable(importedKeys.getString(PKTABLE_NAME));
+                foreignKey.setColumn(importedKeys.getString(PKCOLUMN_NAME));
+                keyMap.computeIfAbsent(importedKeys.getString(FKCOLUMN_NAME), key -> new ArrayList<>()).add(foreignKey);
+            }
         }
         return keyMap;
     }

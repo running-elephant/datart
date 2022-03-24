@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartDataSectionType } from 'app/constants';
+import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
@@ -29,7 +30,7 @@ import {
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
-import Chart from '../models/Chart';
+import Chart from '../../../models/Chart';
 import Config from './config';
 
 class WaterfallChart extends Chart {

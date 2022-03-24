@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+import { ControllerFacadeTypes } from 'app/constants';
+
 export const FixedSqlOperatorTypes = [
   ControllerFacadeTypes.RangeTime,
   ControllerFacadeTypes.RangeSlider,

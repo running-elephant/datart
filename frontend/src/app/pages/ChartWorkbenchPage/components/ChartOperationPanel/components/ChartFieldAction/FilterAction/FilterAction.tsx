@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { FormInstance } from 'antd';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
@@ -32,8 +33,17 @@ const FilterAction: FC<{
     config: ChartDataSectionField,
     needRefresh?: boolean,
   ) => void;
+  form?: FormInstance;
 }> = memo(
-  ({ config, dataset, dataView, dataConfig, onConfigChange, aggregation }) => {
+  ({
+    config,
+    dataset,
+    dataView,
+    dataConfig,
+    onConfigChange,
+    aggregation,
+    form,
+  }) => {
     const handleFetchDataFromField = async fieldId => {
       // TODO: to be implement to get fields
       return await Promise.resolve(['a', 'b', 'c'].map(f => `${fieldId}-${f}`));
@@ -47,6 +57,7 @@ const FilterAction: FC<{
         dataView={dataView}
         onConfigChange={onConfigChange}
         fetchDataByField={handleFetchDataFromField}
+        form={form}
       />
     );
   },

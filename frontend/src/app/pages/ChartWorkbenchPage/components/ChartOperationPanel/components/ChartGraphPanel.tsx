@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
+import ChartManager from 'app/models/ChartManager';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
-import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { transferChartDataConfig } from 'app/utils/internalChartHelper';
@@ -39,7 +39,7 @@ const ChartGraphPanel: FC<{
   useLayoutEffect(() => {
     const dict = allCharts?.reduce((acc, cur) => {
       const transferedChartConfig = transferChartDataConfig(
-        CloneValueDeep(cur?.config),
+        CloneValueDeep(cur?.config), // TODO(Stephen): should be make transfer login immutable to avoid targetConfig unexpected changed
         chartConfig,
       ) as ChartConfig;
       acc[cur.meta.id] = cur?.isMatchRequirement(transferedChartConfig);

@@ -59,7 +59,7 @@ const ImageWidget: React.FC<{}> = () => {
       const nextWidget = produce(widget, draft => {
         draft.config.background.image = value;
       });
-      widgetUpdate(nextWidget);
+      widgetUpdate(nextWidget, true);
     },
     [widget, widgetUpdate],
   );

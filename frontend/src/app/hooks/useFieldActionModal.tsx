@@ -16,12 +16,10 @@
  * limitations under the License.
  */
 
+import { FormInstance } from 'antd';
+import { ChartDataSectionFieldActionType } from 'app/constants';
 import FieldActions from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction';
-import {
-  ChartDataConfig,
-  ChartDataSectionField,
-  ChartDataSectionFieldActionType,
-} from 'app/types/ChartConfig';
+import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { ValueOf } from 'types';
@@ -40,6 +38,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
     dataConfig?: ChartDataConfig,
     onChange?,
     aggregation?: boolean,
+    form?: FormInstance,
   ) => {
     if (!config) {
       return null;
@@ -53,7 +52,9 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
       onConfigChange: onChange,
       aggregation,
       i18nPrefix,
+      form,
     };
+
     switch (actionType) {
       case ChartDataSectionFieldActionType.Sortable:
         return <FieldActions.SortAction {...props} />;
@@ -105,7 +106,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
     return (show as Function)({
       title: t(actionType),
       modalSize: modalSize || _modalSize,
-      content: onChange =>
+      content: (onChange, from) =>
         getContent(
           actionType,
           currentConfig,
@@ -114,6 +115,7 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
           dataConfig,
           onChange,
           aggregation,
+          from,
         ),
       onOk: handleOk(onConfigChange, columnUid),
       maskClosable: true,

@@ -288,8 +288,10 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
     @Override
     @Transactional
-    public boolean grantOrgOwner(String orgId, String userId) {
-        securityManager.requireOrgOwner(orgId);
+    public boolean grantOrgOwner(String orgId, String userId, boolean checkPermission) {
+        if (checkPermission) {
+            securityManager.requireOrgOwner(orgId);
+        }
         requireExists(orgId, Organization.class);
         requireExists(userId, User.class);
         Role role = roleMapper.selectOrgOwnerRole(orgId);

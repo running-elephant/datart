@@ -25,14 +25,15 @@ import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.TaskExecutor;
-import datart.core.data.provider.SchemaInfo;
 import datart.core.data.provider.DataProviderConfigTemplate;
 import datart.core.data.provider.DataProviderSource;
+import datart.core.data.provider.SchemaInfo;
 import datart.core.data.provider.SchemaItem;
 import datart.core.entity.Role;
 import datart.core.entity.Source;
 import datart.core.entity.SourceSchemas;
 import datart.core.entity.ext.SourceDetail;
+import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.SourceMapperExt;
 import datart.core.mappers.ext.SourceSchemasMapperExt;
 import datart.security.base.PermissionInfo;
@@ -57,7 +58,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -80,31 +83,56 @@ public class SourceServiceImpl extends BaseService implements SourceService {
 
     private final SourceSchemasMapperExt sourceSchemasMapper;
 
+    private final RelRoleResourceMapperExt rrrMapper;
+
     public SourceServiceImpl(SourceMapperExt sourceMapper,
                              DataProviderService dataProviderService,
                              RoleService roleService,
                              FileService fileService,
-                             Scheduler scheduler, SourceSchemasMapperExt sourceSchemasMapper) {
+                             Scheduler scheduler,
+                             SourceSchemasMapperExt sourceSchemasMapper,
+                             RelRoleResourceMapperExt rrrMapper) {
         this.sourceMapper = sourceMapper;
         this.dataProviderService = dataProviderService;
         this.roleService = roleService;
         this.fileService = fileService;
         this.scheduler = scheduler;
         this.sourceSchemasMapper = sourceSchemasMapper;
+        this.rrrMapper = rrrMapper;
     }
 
     @Override
     public List<Source> listSources(String orgId, boolean active) throws PermissionDeniedException {
-        return sourceMapper.listByOrg(orgId, active)
-                .stream()
-                .filter(source -> {
-                    try {
-                        requirePermission(source, Const.READ);
-                    } catch (Exception e) {
-                        return false;
-                    }
-                    return true;
-                }).collect(Collectors.toList());
+
+        List<Source> sources = sourceMapper.listByOrg(orgId, active);
+
+        Map<String, Source> filtered = new HashMap<>();
+
+        List<Source> permitted = sources.stream().filter(source -> {
+            try {
+                requirePermission(source, Const.READ);
+                return true;
+            } catch (Exception e) {
+                filtered.put(source.getId(), source);
+                return false;
+            }
+        }).collect(Collectors.toList());
+
+        while (!filtered.isEmpty()) {
+            boolean updated = false;
+            for (Source source : permitted) {
+                Source parent = filtered.remove(source.getParentId());
+                if (parent != null) {
+                    permitted.add(parent);
+                    updated = true;
+                    break;
+                }
+            }
+            if (!updated) {
+                break;
+            }
+        }
+        return permitted;
     }
 
     @Override
@@ -144,10 +172,15 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     private boolean hasPermission(Role role, Source source, int permission) {
-        if (source.getId() == null || (permission & Const.CREATE) == Const.CREATE) {
-            return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), ResourceType.SOURCE.name(), permission));
+        if (source.getId() == null || rrrMapper.countRolePermission(source.getId(), role.getId()) == 0) {
+            Source parent = sourceMapper.selectByPrimaryKey(source.getParentId());
+            if (parent == null) {
+                return securityManager.hasPermission(PermissionHelper.viewPermission(source.getOrgId(), role.getId(), ResourceType.SOURCE.name(), permission));
+            } else {
+                return hasPermission(role, parent, permission);
+            }
         } else {
-            return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), source.getId(), permission));
+            return securityManager.hasPermission(PermissionHelper.viewPermission(source.getOrgId(), role.getId(), source.getId(), permission));
         }
     }
 

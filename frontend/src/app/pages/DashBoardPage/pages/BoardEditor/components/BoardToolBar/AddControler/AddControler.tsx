@@ -18,10 +18,10 @@
 import { ControlOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
+import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { G60 } from 'styles/StyleConstants';

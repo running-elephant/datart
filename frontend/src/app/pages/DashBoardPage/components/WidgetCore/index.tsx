@@ -19,6 +19,8 @@ import { DataChartWidget } from 'app/pages/DashBoardPage/components/WidgetCore/D
 import React, { memo, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { getWidgetSomeStyle } from '../../utils/widget';
+import { BoardActionContext } from '../BoardProvider/BoardActionProvider';
+import { BoardConfigContext } from '../BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from '../BoardProvider/BoardInfoProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import { WidgetInfoContext } from '../WidgetProvider/WidgetInfoProvider';
@@ -38,23 +40,31 @@ export interface WidgetCoreProps {
 export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
   const widget = useContext(WidgetContext);
   const { onWidgetAction } = useContext(WidgetMethodContext);
+  const { initialQuery } = useContext(BoardConfigContext);
+  const { editing, renderMode, boardType } = useContext(BoardContext);
   const widgetInfo = useContext(WidgetInfoContext);
   const { visible: boardVisible } = useContext(BoardInfoContext);
-  const { boardType, renderedWidgetById, renderMode } =
-    useContext(BoardContext);
+
+  const { renderedWidgetById } = useContext(BoardActionContext);
   const { background, padding, border } = props;
   /**
    * @param ''
-   * @description '如果是 free 类型直接加载 如果是 autoBoard在定时任务的模式 直接加载不做懒加载'
+   * @description '在定时任务的模式 直接加载不做懒加载 ,其他模式下 如果是 free 类型直接加载 如果是 autoBoard 则由 autoBoard自己控制'
    */
   useEffect(() => {
-    // renderedWidgetById(widget.id);
-    if (boardType === 'free') {
-      renderedWidgetById(widget.id);
-    } else if (renderMode === 'schedule') {
-      renderedWidgetById(widget.id);
+    if (renderMode === 'schedule') {
+      renderedWidgetById(widget.id, editing, renderMode);
+    } else if (boardType === 'free' && initialQuery) {
+      renderedWidgetById(widget.id, editing, renderMode);
     }
-  }, [boardType, renderMode, renderedWidgetById, widget.id]);
+  }, [
+    boardType,
+    editing,
+    initialQuery,
+    renderMode,
+    renderedWidgetById,
+    widget.id,
+  ]);
   // 自动更新
   useEffect(() => {
     // TODO 优化 组件更新规则

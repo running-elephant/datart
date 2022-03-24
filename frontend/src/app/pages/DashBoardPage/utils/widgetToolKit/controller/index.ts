@@ -15,6 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { ControllerFacadeTypes } from 'app/constants';
 import {
   BoardType,
   ControllerWidgetContent,
@@ -26,7 +28,6 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { RelatedWidgetItem } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/RelatedWidgets';
 import { ControllerConfig } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { uuidv4 } from 'utils/utils';
 import { createInitWidgetConfig, createWidget } from '../../widget';
 export const createControllerWidget = (opt: {

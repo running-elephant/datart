@@ -62,9 +62,10 @@ const config: ChartConfig = {
           comType: 'select',
           default: 'china',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '中国-省级地图', value: 'china' },
-              { label: '中国-地市级地图', value: 'china-city' },
+              { label: '@global@.levelType.china', value: 'china' },
+              { label: '@global@.levelType.chinaCity', value: 'china-city' },
             ],
           },
         },
@@ -118,25 +119,8 @@ const config: ChartConfig = {
         {
           label: 'label.position',
           key: 'position',
-          comType: 'select',
+          comType: 'labelPosition',
           default: 'top',
-          options: {
-            items: [
-              { label: '上', value: 'top' },
-              { label: '左', value: 'left' },
-              { label: '右', value: 'right' },
-              { label: '下', value: 'bottom' },
-              { label: '内', value: 'inside' },
-              { label: '内左', value: 'insideLeft' },
-              { label: '内右', value: 'insideRight' },
-              { label: '内上', value: 'insideTop' },
-              { label: '内下', value: 'insideBottom' },
-              { label: '内左上', value: 'insideTopLeft' },
-              { label: '内左下', value: 'insideBottomLeft' },
-              { label: '内右上', value: 'insideTopRight' },
-              { label: '内右下', value: 'insideBottomRight' },
-            ],
-          },
         },
         {
           label: 'viz.palette.style.font',
@@ -169,9 +153,10 @@ const config: ChartConfig = {
           comType: 'select',
           default: 'vertical',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '竖直', value: 'vertical' },
-              { label: '水平', value: 'horizontal' },
+              { label: '@global@.orientType.vertical', value: 'vertical' },
+              { label: '@global@.orientType.horizontal', value: 'horizontal' },
             ],
           },
         },
@@ -181,12 +166,13 @@ const config: ChartConfig = {
           comType: 'select',
           default: 'auto',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '自动', value: 'auto' },
-              { label: '右', value: 'right' },
-              { label: '上', value: 'top' },
-              { label: '下', value: 'bottom' },
-              { label: '左', value: 'left' },
+              { label: 'viz.palette.style.position.auto', value: 'auto' },
+              { label: 'viz.palette.style.position.right', value: 'right' },
+              { label: 'viz.palette.style.position.top', value: 'top' },
+              { label: 'viz.palette.style.position.bottom', value: 'bottom' },
+              { label: 'viz.palette.style.position.left', value: 'left' },
             ],
           },
         },
@@ -268,6 +254,14 @@ const config: ChartConfig = {
           showLabel: '显示标签',
           position: '位置',
         },
+        levelType: {
+          china: '中国-省级地图',
+          chinaCity: '中国-地市级地图',
+        },
+        orientType: {
+          horizontal: '水平',
+          vertical: '竖直',
+        },
         map: {
           title: '地图设置',
           level: '默认地图等级',
@@ -311,6 +305,14 @@ const config: ChartConfig = {
           showLabel: 'Show Label',
           position: 'Position',
           height: 'Height',
+        },
+        levelType: {
+          china: 'China',
+          chinaCity: 'China City',
+        },
+        orientType: {
+          horizontal: 'Horizontal',
+          vertical: 'Vertical',
         },
         map: {
           title: 'Map',

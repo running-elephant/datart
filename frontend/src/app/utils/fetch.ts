@@ -21,12 +21,13 @@ import {
   DownloadTaskState,
 } from 'app/pages/MainPage/slice/types';
 import { ExecuteToken } from 'app/pages/SharePage/slice/types';
-import ChartDataRequest, {
-  transformToViewConfig,
-} from 'app/types/ChartDataRequest';
+import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { ChartDTO } from 'app/types/ChartDTO';
-import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
+import {
+  filterSqlOperatorName,
+  transformToViewConfig,
+} from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
 import { request, request2, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';
@@ -256,4 +257,12 @@ export async function downloadShareDataChartFile(
     params,
   })) as any;
   dealFileSave(data, headers);
+}
+
+export async function fetchCheckName(url, data: any) {
+  return await request2({
+    url: `/${url}/check/name`,
+    method: 'POST',
+    data: data,
+  });
 }

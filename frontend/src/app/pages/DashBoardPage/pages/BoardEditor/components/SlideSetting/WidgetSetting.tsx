@@ -40,7 +40,6 @@ import BorderSet from './SettingItem/BorderSet';
 import NameSet from './SettingItem/NameSet';
 import PaddingSet from './SettingItem/PaddingSet';
 import { Group, SettingPanel } from './SettingPanel';
-import { WidgetNameList } from './WidgetList/WidgetNameList';
 
 const { Panel } = Collapse;
 export const WidgetSetting: FC = memo(() => {
@@ -117,7 +116,7 @@ export const WidgetSetting: FC = memo(() => {
         preserve
       >
         <Collapse
-          defaultActiveKey={['widgetList']}
+          defaultActiveKey={['name', 'background']}
           className="datart-config-panel"
           ghost
         >
@@ -172,11 +171,6 @@ export const WidgetSetting: FC = memo(() => {
           <Panel header={t('autoUpdate')} key="autoUpdate" forceRender>
             <Group>
               <AutoUpdateSet />
-            </Group>
-          </Panel>
-          <Panel header={t('widgetList')} key="widgetList">
-            <Group>
-              <WidgetNameList />
             </Group>
           </Panel>
         </Collapse>

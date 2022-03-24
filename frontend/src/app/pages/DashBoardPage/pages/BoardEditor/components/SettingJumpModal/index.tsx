@@ -95,7 +95,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   );
   const [targetType, setTargetType] = useState(jumpTypes[0].value);
   const chartGroupColumns = useMemo(
-    () => getChartGroupColumns(dataChart),
+    () => getChartGroupColumns(dataChart?.config?.chartConfig?.datas),
     [dataChart],
   );
   const onTargetChange = useCallback(

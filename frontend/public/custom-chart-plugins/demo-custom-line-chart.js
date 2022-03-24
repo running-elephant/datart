@@ -17,7 +17,7 @@
  */
 
 function DemoCustomLineChart({ dHelper }) {
-  const svgIcon = `<svg t="1639279486808" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4028" width="16" height="16"><path d="M25.6 537.1392a25.6 25.6 0 1 1 0-51.2h141.1072a25.6 25.6 0 0 0 24.5248-18.2272l118.1184-393.7792a51.2 51.2 0 0 1 98.0992 0L665.6 934.4l118.1184-393.728a76.8 76.8 0 0 1 73.5744-54.784H998.4a25.6 25.6 0 1 1 0 51.2h-141.1072a25.6 25.6 0 0 0-24.5248 18.2272l-118.1184 393.7792a51.2 51.2 0 0 1-98.0992 0L358.4 88.6272 240.2816 482.4064a76.8 76.8 0 0 1-73.5744 54.784H25.6z"  p-id="4029"></path></svg>`;
+  const svgIcon = `<svg t="1639279486808" fill="#333333" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4028" width="16" height="16"><path d="M25.6 537.1392a25.6 25.6 0 1 1 0-51.2h141.1072a25.6 25.6 0 0 0 24.5248-18.2272l118.1184-393.7792a51.2 51.2 0 0 1 98.0992 0L665.6 934.4l118.1184-393.728a76.8 76.8 0 0 1 73.5744-54.784H998.4a25.6 25.6 0 1 1 0 51.2h-141.1072a25.6 25.6 0 0 0-24.5248 18.2272l-118.1184 393.7792a51.2 51.2 0 0 1-98.0992 0L358.4 88.6272 240.2816 482.4064a76.8 76.8 0 0 1-73.5744 54.784H25.6z"  p-id="4029"></path></svg>`;
 
   return {
     config: {
@@ -59,6 +59,12 @@ function DemoCustomLineChart({ dHelper }) {
               default: false,
               comType: 'checkbox',
             },
+            {
+              label: 'graph.connectNulls',
+              key: 'connectNulls',
+              default: false,
+              comType: 'checkbox',
+            },
           ],
         },
         {
@@ -75,27 +81,9 @@ function DemoCustomLineChart({ dHelper }) {
             {
               label: 'label.position',
               key: 'position',
-              comType: 'select',
+              comType: 'labelPosition',
               default: 'top',
-              options: {
-                items: [
-                  { label: '上', value: 'top' },
-                  { label: '左', value: 'left' },
-                  { label: '右', value: 'right' },
-                  { label: '下', value: 'bottom' },
-                  { label: '内', value: 'inside' },
-                  { label: '内左', value: 'insideLeft' },
-                  { label: '内右', value: 'insideRight' },
-                  { label: '内上', value: 'insideTop' },
-                  { label: '内下', value: 'insideBottom' },
-                  { label: '内左上', value: 'insideTopLeft' },
-                  { label: '内左下', value: 'insideBottomLeft' },
-                  { label: '内右上', value: 'insideTopRight' },
-                  { label: '内右下', value: 'insideBottomRight' },
-                ],
-              },
             },
-
             {
               label: 'viz.palette.style.font',
               key: 'font',
@@ -136,16 +124,8 @@ function DemoCustomLineChart({ dHelper }) {
             {
               label: 'legend.position',
               key: 'position',
-              comType: 'select',
+              comType: 'legendPosition',
               default: 'right',
-              options: {
-                items: [
-                  { label: '右', value: 'right' },
-                  { label: '上', value: 'top' },
-                  { label: '下', value: 'bottom' },
-                  { label: '左', value: 'left' },
-                ],
-              },
             },
             {
               label: 'viz.palette.style.font',
@@ -464,6 +444,7 @@ function DemoCustomLineChart({ dHelper }) {
               title: '折线图',
               smooth: '平滑',
               step: '阶梯',
+              connectNulls: '连接空数据',
             },
             xAxis: {
               title: 'X轴',
@@ -527,6 +508,7 @@ function DemoCustomLineChart({ dHelper }) {
               title: 'Graph',
               smooth: 'Smooth',
               step: 'Step',
+              connectNulls: 'Connect Nulls',
             },
             xAxis: {
               title: 'X Axis',
@@ -818,12 +800,12 @@ function DemoCustomLineChart({ dHelper }) {
     },
 
     getSeriesStyle(styles) {
-      const [smooth, step] = dHelper.getStyles(
+      const [smooth, step, connectNulls] = dHelper.getStyles(
         styles,
         ['graph'],
-        ['smooth', 'step'],
+        ['smooth', 'step', 'connectNulls'],
       );
-      return { smooth, step };
+      return { smooth, step, connectNulls };
     },
   };
 }

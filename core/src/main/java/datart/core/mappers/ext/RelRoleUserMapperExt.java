@@ -13,7 +13,7 @@ public interface RelRoleUserMapperExt extends RelRoleUserMapper {
 
     @Insert({
             "<script>",
-            "	insert ignore rel_role_user" +
+            "	insert ignore into rel_role_user" +
                     "		<trim prefix='(' suffix=')' suffixOverrides=','>" +
                     "			`id`," +
                     "			`user_id`," +

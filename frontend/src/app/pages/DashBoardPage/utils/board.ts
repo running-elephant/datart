@@ -19,7 +19,7 @@ import { migrateBoardConfig } from 'app/migration/BoardConfig/migrateBoardConfig
 import {
   BoardInfo,
   BoardType,
-  BoardTypeMap,
+  ColsKeyType,
   Dashboard,
   DashboardConfig,
   DataChart,
@@ -134,7 +134,7 @@ export const getInitBoardInfo = (obj: {
 
 export const getInitBoardConfig = (boardType?: BoardType) => {
   const dashboardConfig: DashboardConfig = {
-    type: boardType || BoardTypeMap.auto,
+    type: boardType || 'auto',
     version: '',
     background: BackgroundDefault,
     widgetDefaultSettings: {
@@ -189,4 +189,22 @@ export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
     viewViews.push(viewView);
   });
   return viewViews;
+};
+
+export const getBoardMarginPadding = (
+  boardConfig: DashboardConfig,
+  colsKey: ColsKeyType,
+) => {
+  const { margin, containerPadding, mobileMargin, mobileContainerPadding } =
+    boardConfig;
+  const isMobile = colsKey === 'sm';
+  return isMobile
+    ? {
+        curMargin: mobileMargin || [MIN_MARGIN, MIN_MARGIN],
+        curPadding: mobileContainerPadding || [MIN_PADDING, MIN_PADDING],
+      }
+    : {
+        curMargin: margin,
+        curPadding: containerPadding,
+      };
 };

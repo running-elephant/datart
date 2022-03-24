@@ -1,11 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ChartDataSectionType } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
-import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
-import { ChartDataSectionType } from 'app/types/ChartConfig';
+import ChartManager from 'app/models/ChartManager';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
-import { rejectedActionMessageHandler } from 'utils/notification';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import {
@@ -558,10 +556,6 @@ const slice = createSlice({
         version: uuidv4(),
       };
     });
-    builder.addMatcher(
-      isMySliceRejectedAction(slice.name),
-      rejectedActionMessageHandler,
-    );
   },
 });
 

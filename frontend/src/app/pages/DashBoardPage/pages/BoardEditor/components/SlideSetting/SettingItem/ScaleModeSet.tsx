@@ -17,10 +17,7 @@
  */
 import { Form, Select } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import {
-  ScaleModeType,
-  SCALE_MODE__OPTIONS,
-} from 'app/pages/DashBoardPage/constants';
+import { ScaleModeType, SCALE_MODES } from 'app/pages/DashBoardPage/constants';
 import React, { FC, memo } from 'react';
 export const ScaleModeSet: FC<{
   scaleMode: ScaleModeType;
@@ -30,9 +27,9 @@ export const ScaleModeSet: FC<{
   return (
     <Form.Item label={t('scaleMode')} name="scaleMode">
       <Select className="datart-ant-select">
-        {SCALE_MODE__OPTIONS.map(item => (
-          <Select.Option key={item.value} value={item.value}>
-            {tScale(item.value)}
+        {SCALE_MODES.map(item => (
+          <Select.Option key={item} value={item}>
+            {tScale(item)}
           </Select.Option>
         ))}
       </Select>

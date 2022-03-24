@@ -18,11 +18,11 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
+import { ControllerFacadeTypes } from 'app/constants';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams, ChartsEventData } from 'app/types/Chart';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import {
   createContext,
   FC,
@@ -540,6 +540,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     },
     [clickJump, getTableChartData, toLinkingWidgets, folderIds],
   );
+
   const Methods: WidgetMethodContextProps = {
     onWidgetAction: onWidgetAction,
     widgetChartClick: widgetChartClick,

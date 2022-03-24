@@ -69,7 +69,7 @@ public class ScheduleSqlProvider {
         }
         
         if (record.getIndex() != null) {
-            sql.VALUES("`index`", "#{index,jdbcType=INTEGER}");
+            sql.VALUES("`index`", "#{index,jdbcType=DOUBLE}");
         }
         
         if (record.getStatus() != null) {
@@ -140,7 +140,7 @@ public class ScheduleSqlProvider {
         }
         
         if (record.getIndex() != null) {
-            sql.SET("`index` = #{index,jdbcType=INTEGER}");
+            sql.SET("`index` = #{index,jdbcType=DOUBLE}");
         }
         
         if (record.getStatus() != null) {

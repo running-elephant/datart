@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
+import { ChartDataViewFieldType } from 'app/constants';
+import ReactChart from 'app/models/ReactChart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import {
   getColumnRenderName,
   getStyles,
@@ -30,14 +31,17 @@ import {
 import { DATARTSEPERATOR } from 'globalConstants';
 import { Debugger } from 'utils/debugger';
 import { CloneValueDeep, isEmptyArray, Omit } from 'utils/object';
-import ReactChart from '../models/ReactChart';
 import AntdTableWrapper from './AntdTableWrapper';
 import {
   getCustomBodyCellStyle,
   getCustomBodyRowStyle,
 } from './conditionalStyle';
 import Config from './config';
-import { ResizableTitle, TableComponentsTd } from './TableComponents';
+import {
+  ResizableTitle,
+  TableColumnTitle,
+  TableComponentsTd,
+} from './TableComponents';
 
 class BasicTableChart extends ReactChart {
   useIFrame = false;
@@ -187,7 +191,11 @@ class BasicTableChart extends ReactChart {
         const rowData = row?.convertToCaseSensitiveObject();
         return { index, rowData };
       },
-      components: this.getTableComponents(styleConfigs, widgetSpecialConfig),
+      components: this.getTableComponents(
+        styleConfigs,
+        widgetSpecialConfig,
+        mixedSectionConfigRows,
+      ),
       ...this.getAntdTableStyleOptions(styleConfigs, settingConfigs, context),
       onChange: (pagination, filters, sorter, extra) => {
         if (extra?.action === 'sort' || extra?.action === 'paginate') {
@@ -453,7 +461,9 @@ class BasicTableChart extends ReactChart {
         const sorterIconWidth = 12;
         return Math.max(
           width,
-          headerWidth + sorterIconWidth,
+          headerWidth +
+            sorterIconWidth +
+            (c?.alias?.desc ? c.alheaderFont?.fontSize || 12 : 0),
           summaryWidth + sorterIconWidth,
         );
       });
@@ -489,7 +499,11 @@ class BasicTableChart extends ReactChart {
     }, {});
   }
 
-  protected getTableComponents(styleConfigs, widgetSpecialConfig) {
+  protected getTableComponents(
+    styleConfigs,
+    widgetSpecialConfig,
+    mixedSectionConfigRows,
+  ) {
     const linkFields = widgetSpecialConfig?.linkFields;
     const jumpField = widgetSpecialConfig?.jumpField;
 
@@ -568,17 +582,42 @@ class BasicTableChart extends ReactChart {
             [uid, 'conditionalStyle'],
             ['conditionalStylePanel'],
           );
+          const [align] = getStyles(
+            getAllColumnListInfo,
+            [uid, 'columnStyle'],
+            ['align'],
+          );
           const conditionalCellStyle = getCustomBodyCellStyle(
             props?.cellValue,
             conditionalStyle,
           );
           const sensitiveFieldName = Object.keys(rowData || {})?.[0];
+          const useColumnWidth =
+            this.dataColumnWidths?.[props.dataIndex]?.getUseColumnWidth;
+          const _getBodyTextAlignStyle = alignValue => {
+            if (alignValue && alignValue !== 'default') {
+              return alignValue;
+            }
+            if (bodyTextAlign === 'default') {
+              const type = mixedSectionConfigRows.find(
+                v => v.uid === uid,
+              )?.type;
+              if (type === 'NUMERIC') {
+                return 'right';
+              }
+              return 'left';
+            }
+            return bodyTextAlign;
+          };
           return (
             <TableComponentsTd
               {...rest}
-              style={Object.assign(style || {}, conditionalCellStyle)}
+              style={Object.assign(style || {}, conditionalCellStyle, {
+                textAlign: _getBodyTextAlignStyle(align),
+              })}
               isLinkCell={linkFields?.includes(sensitiveFieldName)}
               isJumpCell={jumpField === sensitiveFieldName}
+              useColumnWidth={useColumnWidth}
             />
           );
         },
@@ -594,7 +633,7 @@ class BasicTableChart extends ReactChart {
         wrapper: props => {
           const { style, ...rest } = props;
           const bodyStyle = {
-            textAlign: bodyTextAlign,
+            textAlign: bodyTextAlign === 'default' ? 'left' : bodyTextAlign,
             fontFamily,
             fontWeight,
             fontStyle,
@@ -718,7 +757,11 @@ class BasicTableChart extends ReactChart {
           : columnConfig?.columnWidthValue;
       return {
         sorter: true,
-        title: getColumnRenderName(c),
+        showSorterTooltip: false,
+        title: TableColumnTitle({
+          title: getColumnRenderName(c),
+          desc: c?.alias?.desc,
+        }),
         dataIndex: chartDataSet.getFieldIndex(c),
         key: chartDataSet.getFieldKey(c),
         aggregate: c?.aggregate,

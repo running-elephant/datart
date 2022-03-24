@@ -17,12 +17,12 @@
  */
 
 import { Select } from 'antd';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   AggregateFieldActionType,
-  ChartDataSectionField,
-} from 'app/types/ChartConfig';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
+  ChartDataViewFieldType,
+} from 'app/constants';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
 
 const FilterAggregateConfiguration: FC<{

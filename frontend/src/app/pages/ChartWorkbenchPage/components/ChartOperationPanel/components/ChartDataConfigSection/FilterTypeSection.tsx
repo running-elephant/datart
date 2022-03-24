@@ -18,14 +18,14 @@
 
 import { BarsOutlined } from '@ant-design/icons';
 import { Button, Modal } from 'antd';
+import {
+  ChartDataSectionFieldActionType,
+  ChartDataViewFieldType,
+} from 'app/constants';
 import { StateModalSize } from 'app/hooks/useStateModal';
 import FilterActions from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterAction';
-import {
-  ChartDataConfig,
-  ChartDataSectionFieldActionType,
-} from 'app/types/ChartConfig';
+import { ChartDataConfig } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FC, memo, useState } from 'react';
 import { CloneValueDeep } from 'utils/object';
 import BaseDataConfigSection from './BaseDataConfigSection';

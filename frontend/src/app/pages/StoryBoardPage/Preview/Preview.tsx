@@ -15,17 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Layout, message } from 'antd';
+import { Layout } from 'antd';
 import { Split } from 'app/components';
-import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { useSplitSizes } from 'app/hooks/useSplitSizes';
-import { fetchBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thunk';
+import { usePublishBoard } from 'app/pages/DashBoardPage/hooks/usePublishBoard';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
-import {
-  deleteViz,
-  publishViz,
-  removeTab,
-} from 'app/pages/MainPage/pages/VizPage/slice/thunks';
 import { StoryContext } from 'app/pages/StoryBoardPage/contexts/StoryContext';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -33,14 +27,12 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
-import { Route, Switch } from 'react-router-dom';
 import 'reveal.js/dist/reveal.css';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
 import PageThumbnailList from '../components/PageThumbnailList';
 import StoryHeader from '../components/StoryHeader';
 import StoryPageItem from '../components/StoryPageItem';
-import { StoryEditor } from '../Editor';
 import { storyActions } from '../slice';
 import {
   makeSelectStoryBoardById,
@@ -58,12 +50,10 @@ export const StoryPagePreview: React.FC<{
   allowManage?: boolean;
 }> = memo(({ orgId, storyId, allowShare, allowManage }) => {
   const dispatch = useDispatch();
-  const t = usePrefixI18N('viz.action');
-  const tg = usePrefixI18N('global');
   const history = useHistory();
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const publishLoading = useSelector(selectPublishLoading);
-  const storyBoard = useSelector((state: { storyBoard: StoryBoardState }) =>
+  const story = useSelector((state: { storyBoard: StoryBoardState }) =>
     makeSelectStoryBoardById(state, storyId),
   );
   const pageMap = useSelector((state: { storyBoard: StoryBoardState }) =>
@@ -95,43 +85,18 @@ export const StoryPagePreview: React.FC<{
     return currentPage;
   }, [currentPageIndex, sortedPages]);
 
-  const onCloseStoryEditor = useCallback(() => {
-    history.replace(`/organizations/${orgId}/vizs/${storyId}`);
-    if (!currentPage?.id) return;
-    onPageClick(0, currentPage?.id, false);
-    if (currentPage.relType === 'DASHBOARD' && currentPage.relId) {
-      dispatch(fetchBoardDetail({ dashboardRelId: currentPage.relId }));
-    }
-  }, [currentPage, dispatch, history, onPageClick, orgId, storyId]);
-
   const toggleEdit = useCallback(() => {
-    history.push(`/organizations/${orgId}/vizs/${storyId}/storyEditor`);
+    history.push(`/organizations/${orgId}/vizs/storyEditor/${storyId}`);
   }, [history, orgId, storyId]);
 
   const playStory = useCallback(() => {
-    window.open(`${storyId}/storyPlay`, '_blank');
+    window.open(`storyPlayer/${storyId}`, '_blank');
   }, [storyId]);
-
-  const onPublish = useCallback(() => {
-    if (storyBoard) {
-      dispatch(
-        publishViz({
-          id: storyBoard.id,
-          vizType: 'STORYBOARD',
-          publish: storyBoard.status === 1 ? true : false,
-          resolve: () => {
-            message.success(`${storyBoard.status === 2 ? '取消' : ''}发布成功`);
-            dispatch(
-              storyActions.changeBoardPublish({
-                stroyId: storyBoard.id,
-                publish: storyBoard.status === 1 ? 2 : 1,
-              }),
-            );
-          },
-        }),
-      );
-    }
-  }, [dispatch, storyBoard]);
+  const { publishStory } = usePublishBoard(
+    storyId,
+    'STORYBOARD',
+    story?.status || 0,
+  );
 
   const { sizes, setSizes } = useSplitSizes({
     limitedSide: 0,
@@ -146,30 +111,6 @@ export const StoryPagePreview: React.FC<{
 
     [setSizes],
   );
-
-  const redirect = useCallback(
-    tabKey => {
-      if (tabKey) {
-        history.push(`/organizations/${orgId}/vizs/${tabKey}`);
-      } else {
-        history.push(`/organizations/${orgId}/vizs`);
-      }
-    },
-    [history, orgId],
-  );
-
-  const handleRecycleStory = useCallback(() => {
-    dispatch(
-      deleteViz({
-        params: { id: storyId, archive: true },
-        type: 'STORYBOARD',
-        resolve: () => {
-          message.success(tg('operation.archiveSuccess'));
-          dispatch(removeTab({ id: storyId, resolve: redirect }));
-        },
-      }),
-    );
-  }, [dispatch, redirect, storyId, tg]);
 
   // 点击在加载
   useEffect(() => {
@@ -213,22 +154,24 @@ export const StoryPagePreview: React.FC<{
     <DndProvider backend={HTML5Backend}>
       <StoryContext.Provider
         value={{
-          stroyBoardId: storyId,
+          name: story?.name,
+          storyId: storyId,
           editing: false,
+          orgId: orgId,
+          status: 1,
           allowShare: allowShare || false,
         }}
       >
         <Wrapper>
           <StoryHeader
-            name={storyBoard?.name}
+            name={story?.name}
             playStory={playStory}
-            status={storyBoard?.status}
+            status={story?.status}
             toggleEdit={toggleEdit}
             publishLoading={publishLoading}
-            onPublish={onPublish}
+            onPublish={publishStory}
             allowShare={allowShare}
             allowManage={allowManage}
-            onRecycleStory={handleRecycleStory}
           />
           <Container
             sizes={sizes}
@@ -257,17 +200,6 @@ export const StoryPagePreview: React.FC<{
               ))}
             </Content>
           </Container>
-          <Switch>
-            <Route
-              path="/organizations/:orgId/vizs/:vizId?/storyEditor"
-              render={() => (
-                <StoryEditor
-                  storyId={storyId}
-                  onCloseEditor={onCloseStoryEditor}
-                />
-              )}
-            />
-          </Switch>
         </Wrapper>
       </StoryContext.Provider>
     </DndProvider>

@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
+import { ChartLifecycle } from 'app/constants';
 import { IChart } from 'app/types/Chart';
-import { ChartLifecycle } from 'app/types/ChartLifecycle';
 import { ValueOf } from 'types';
 import { Debugger } from 'utils/debugger';
 
@@ -37,7 +37,7 @@ class ChartIFrameEventBroker {
 
   register(c: IChart) {
     this._chart = c;
-    this.registeListener(c);
+    this.registerListener(c);
   }
 
   subscribe(event: HooksEvent, callback?: Function) {
@@ -102,7 +102,7 @@ class ChartIFrameEventBroker {
     }
   }
 
-  private registeListener(c: IChart): void {
+  private registerListener(c: IChart): void {
     this.subscribe(ChartLifecycle.MOUNTED, c?.onMount);
     this.subscribe(ChartLifecycle.UPDATED, c?.onUpdated);
     this.subscribe(ChartLifecycle.RESIZE, c?.onResize);

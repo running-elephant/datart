@@ -17,15 +17,14 @@
  */
 
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
+import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartDataRequest from '../../types/ChartDataRequest';
 import { BoardProvider } from '../DashBoardPage/components/BoardProvider/BoardProvider';
 import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel';
-import TitleHeader from '../DashBoardPage/components/TitleHeader';
 import { AutoBoardCore } from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
 import { FreeBoardCore } from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
 import { getBoardDownloadParams } from '../DashBoardPage/pages/Board/slice/asyncActions';
@@ -38,12 +37,14 @@ import { OnLoadTasksType } from '../MainPage/Navbar/DownloadListPopup';
 import { DownloadTask } from '../MainPage/slice/types';
 import { DownloadTaskContainer } from './DownloadTaskContainer';
 import { HeadlessBrowserIdentifier } from './HeadlessBrowserIdentifier';
+import TitleForShare from './TitleForShare';
 const TitleHeight = 60;
 export interface ShareBoardProps {
   dashboard: Dashboard;
   renderMode: VizRenderMode;
   filterSearchUrl: string;
   allowDownload: boolean;
+  loadVizData: () => void;
   onLoadShareTask: OnLoadTasksType;
   onDownloadFile: (item: DownloadTask) => void;
   onMakeShareDownloadDataTask: (
@@ -58,6 +59,7 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
     renderMode,
     filterSearchUrl,
     allowDownload,
+    loadVizData,
     onMakeShareDownloadDataTask,
     onLoadShareTask,
     onDownloadFile,
@@ -123,12 +125,16 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
           allowDownload={allowDownload}
         >
           <Wrapper>
-            <TitleHeader onShareDownloadData={onShareDownloadData}>
+            <TitleForShare
+              name={dashboard.name}
+              onShareDownloadData={onShareDownloadData}
+              loadVizData={loadVizData}
+            >
               <DownloadTaskContainer
                 onLoadTasks={onLoadShareTask}
                 onDownloadFile={onDownloadFile}
               ></DownloadTaskContainer>
-            </TitleHeader>
+            </TitleForShare>
             {boardType === 'auto' && <AutoBoardCore boardId={dashboard.id} />}
             {boardType === 'free' && <FreeBoardCore boardId={dashboard.id} />}
             <FullScreenPanel />
@@ -138,6 +144,7 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
     }, [
       allowDownload,
       dashboard,
+      loadVizData,
       onDownloadFile,
       onLoadShareTask,
       onShareDownloadData,

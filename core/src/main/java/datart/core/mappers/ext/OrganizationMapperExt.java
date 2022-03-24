@@ -11,6 +11,9 @@ import java.util.List;
 @Mapper
 public interface OrganizationMapperExt extends OrganizationMapper {
 
+    @Select({"SELECT * FROM organization "})
+    List<Organization> list();
+
     @Select({
             "SELECT " +
                     "org.* " +

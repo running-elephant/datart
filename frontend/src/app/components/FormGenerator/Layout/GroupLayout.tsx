@@ -22,13 +22,10 @@ import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
-import CollapseHeader from '../CollapseHeader';
-import {
-  FormGeneratorLayoutProps,
-  GroupLayoutMode,
-  ItemComponentType,
-} from '../types';
+import { FormGroupLayoutMode, FormItemComponentType } from '../constants';
+import { FormGeneratorLayoutProps } from '../types';
 import { groupLayoutComparer } from '../utils';
+import CollapseHeader from './CollapseHeader';
 import CollectionLayout from './CollectionLayout';
 
 const { Panel } = Collapse;
@@ -37,7 +34,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
   ({
     ancestors,
     data,
-    mode = 'outter',
+    mode = FormGroupLayoutMode.OUTER,
     translate: t = title => title,
     dataConfigs,
     flatten,
@@ -70,13 +67,13 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
     };
 
     const renderGroupByMode = (mode, comType, data) => {
-      if (mode === GroupLayoutMode.INNER) {
+      if (mode === FormGroupLayoutMode.INNER) {
         return renderCollectionComponents(
           data,
           handleConfirmModalDialogOrDataUpdate,
         );
       }
-      if (comType === ItemComponentType.MODAL) {
+      if (comType === FormItemComponentType.MODAL) {
         return (
           <>
             <Button

@@ -255,7 +255,7 @@ public class OrgServiceImpl extends BaseService implements OrgService {
         }
         RelUserOrganization relUserOrganization = new RelUserOrganization();
         relUserOrganization.setId(UUIDGenerator.generate());
-        relUserOrganization.setCreateBy(getCurrentUser().getId());
+        relUserOrganization.setCreateBy(getCurrentUser()==null?userId:getCurrentUser().getId());
         relUserOrganization.setCreateTime(new Date());
         relUserOrganization.setUserId(userId);
         relUserOrganization.setOrgId(orgId);

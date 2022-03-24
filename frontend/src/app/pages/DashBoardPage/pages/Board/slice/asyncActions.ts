@@ -18,7 +18,7 @@
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
-import ChartDataRequest from 'app/types/ChartDataRequest';
+import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { boardActions } from '.';
 import { getBoardChartRequests } from '../../../utils';
@@ -85,23 +85,20 @@ export const handleServerBoardAction =
   };
 
 export const boardDownLoadAction =
-  (params: { boardId: string; renderMode: VizRenderMode }) =>
-  async (dispatch, getState) => {
-    const { boardId, renderMode } = params;
+  (params: { boardId: string }) => async (dispatch, getState) => {
+    const { boardId } = params;
     const { requestParams, fileName } = await dispatch(
       getBoardDownloadParams({ boardId }),
     );
-    if (renderMode === 'read') {
-      dispatch(
-        makeDownloadDataTask({
-          downloadParams: requestParams,
-          fileName,
-          resolve: () => {
-            dispatch(mainActions.setDownloadPolling(true));
-          },
-        }),
-      );
-    }
+    dispatch(
+      makeDownloadDataTask({
+        downloadParams: requestParams,
+        fileName,
+        resolve: () => {
+          dispatch(mainActions.setDownloadPolling(true));
+        },
+      }),
+    );
   };
 export const getBoardDownloadParams =
   (params: { boardId: string }) => (dispatch, getState) => {

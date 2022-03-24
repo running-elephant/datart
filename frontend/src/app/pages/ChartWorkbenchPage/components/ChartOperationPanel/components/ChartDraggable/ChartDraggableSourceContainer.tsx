@@ -25,11 +25,11 @@ import {
 } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
 import { IW, ToolbarButton } from 'app/components';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
+} from 'app/constants';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { FC, memo, useMemo } from 'react';

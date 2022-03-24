@@ -220,20 +220,19 @@ const config: ChartConfig = {
             translateItemLabel: true,
             items: [
               {
-                label: 'common.positionType.top',
+                label: 'viz.palette.style.position.top',
                 value: 'column-reverse',
               },
               {
-                label: 'common.positionType.bottom',
+                label: 'viz.palette.style.position.bottom',
                 value: 'column',
               },
               {
-                label: 'common.positionType.left',
+                label: 'viz.palette.style.position.left',
                 value: 'row-reverse',
               },
-
               {
-                label: 'common.positionType.right',
+                label: 'viz.palette.style.position.right',
                 value: 'row',
               },
             ],
@@ -325,12 +324,6 @@ const config: ChartConfig = {
           scale: '比例',
           fixedFontSize: '文字大小',
           position: '位置',
-          positionType: {
-            left: '左',
-            top: '上',
-            right: '右',
-            bottom: '下',
-          },
           conditionalStyle: '条件样式',
           alignment: '对齐方式',
           alignmentType: {
@@ -356,12 +349,6 @@ const config: ChartConfig = {
       translation: {
         common: {
           position: 'Position',
-          positionType: {
-            left: 'Left',
-            top: 'Top',
-            right: 'Right',
-            bottom: 'Bottom',
-          },
           conditionalStyle: 'Conditional Style',
           autoFontSize: 'Automatically adjust font size',
           scale: 'Scale',

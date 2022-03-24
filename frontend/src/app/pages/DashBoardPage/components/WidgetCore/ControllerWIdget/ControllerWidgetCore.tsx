@@ -17,7 +17,11 @@
  */
 
 import { Form } from 'antd';
-import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
+import {
+  ControllerWidgetContent,
+  Widget,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ControllerConfig,
   ControllerDate,
@@ -25,20 +29,11 @@ import {
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getControllerDateValues } from 'app/pages/DashBoardPage/utils';
 import { RelationFilterValue } from 'app/types/ChartConfig';
-import {
-  ControllerFacadeTypes,
-  TimeFilterValueCategory,
-} from 'app/types/FilterControlPanel';
 import produce from 'immer';
-import React, {
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-} from 'react';
+import React, { memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { BoardActionContext } from '../../BoardProvider/BoardActionProvider';
+import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
@@ -58,7 +53,8 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const [form] = Form.useForm();
 
-  const { renderedWidgetById } = useContext(BoardContext);
+  const { hasQueryControl } = useContext(BoardConfigContext);
+  const { editing, renderMode } = useContext(BoardContext);
 
   const {
     data: { rows },
@@ -66,7 +62,13 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
 
   const { widgetUpdate, refreshWidgetsByController } =
     useContext(BoardActionContext);
-
+  const refreshLinkedWidgets = useCallback(
+    (widget: Widget) => {
+      if (hasQueryControl) return;
+      refreshWidgetsByController(widget, editing, renderMode);
+    },
+    [editing, refreshWidgetsByController, hasQueryControl, renderMode],
+  );
   const { config, type: facadeType } = useMemo(
     () => widget.config.content as ControllerWidgetContent,
     [widget],
@@ -77,7 +79,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     controllerValues,
     valueOptions,
     valueOptionType,
-    sqlOperator,
+    // sqlOperator,
   } = useMemo(() => config as ControllerConfig, [config]);
   const leftControlLabel = useMemo(() => {
     if (!widget.config.nameConfig.show) {
@@ -119,10 +121,6 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     }
   }, [valueOptions, valueOptionType, rows]);
 
-  useEffect(() => {
-    renderedWidgetById(widget.id);
-  }, [renderedWidgetById, widget.id]);
-
   const onControllerChange = useCallback(() => {
     form.submit();
   }, [form]);
@@ -138,8 +136,8 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         draft.config.content as ControllerWidgetContent
       ).config.controllerValues = _values;
     });
-    widgetUpdate(nextWidget);
-    refreshWidgetsByController(nextWidget);
+    widgetUpdate(nextWidget, editing);
+    refreshLinkedWidgets(nextWidget);
   };
   // const onSqlOperatorAndValues = useCallback(
   //   (sql: FilterSqlOperator, values: any[]) => {
@@ -173,10 +171,10 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           draft.config.content as ControllerWidgetContent
         ).config.controllerDate = nextFilterDate;
       });
-      widgetUpdate(nextWidget);
-      refreshWidgetsByController(nextWidget);
+      widgetUpdate(nextWidget, editing);
+      refreshLinkedWidgets(nextWidget);
     },
-    [controllerDate, refreshWidgetsByController, widget, widgetUpdate],
+    [controllerDate, editing, refreshLinkedWidgets, widget, widgetUpdate],
   );
 
   const onTimeChange = useCallback(
@@ -193,10 +191,10 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           draft.config.content as ControllerWidgetContent
         ).config.controllerDate = nextFilterDate;
       });
-      widgetUpdate(nextWidget);
-      refreshWidgetsByController(nextWidget);
+      widgetUpdate(nextWidget, editing);
+      refreshLinkedWidgets(nextWidget);
     },
-    [controllerDate, refreshWidgetsByController, widget, widgetUpdate],
+    [controllerDate, editing, refreshLinkedWidgets, widget, widgetUpdate],
   );
 
   const control = useMemo(() => {
@@ -357,18 +355,15 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   );
 });
 const Wrap = styled.div`
-  flex: 1;
   display: flex;
+  flex: 1;
   align-items: center;
-
   .control-form {
     flex: 1;
   }
-
   .ant-form-item {
     margin-bottom: 0;
   }
-
   .ant-input-number-handler {
     border-left: 0;
   }

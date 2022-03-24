@@ -18,6 +18,9 @@
 
 package datart.core.common;
 
+import datart.core.base.consts.SystemMode;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -25,10 +28,15 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+import static datart.core.base.consts.SystemMode.NORMAL;
+
 @Component
+@Slf4j
 public class Application implements ApplicationContextAware {
 
     private static ApplicationContext context;
+
+    private static SystemMode currMode;
 
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
@@ -76,6 +84,30 @@ public class Application implements ApplicationContextAware {
 
     public static String getTokenSecret() {
         return getProperty("datart.security.token.secret", "d@a$t%a^r&a*t");
+    }
+
+    public static boolean canRegister() {
+        return BooleanUtils.toBoolean(getProperty("datart.user.register", "true"));
+    }
+
+    public static String getAdminId() {
+        if (getCurrMode().equals(SystemMode.SINGLE)){
+            return getProperty("datart.admin-id", "datart-admin");
+        }
+        return "";
+    }
+
+    public static SystemMode getCurrMode() {
+        if (currMode == null) {
+            String mode = Application.getProperty("datart.mode");
+            try {
+                return SystemMode.valueOf(mode.toUpperCase());
+            } catch (Exception e) {
+                log.warn("Unrecognized mode: '{}', and this will run in normal mode", mode);
+            }
+            currMode = NORMAL;
+        }
+        return currMode;
     }
 
 }
