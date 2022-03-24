@@ -11,6 +11,8 @@ public interface DatartSecurityManager {
 
     void login(PasswordToken token) throws AuthException;
 
+    boolean validateUser(String username,String password) throws AuthException;
+
     String login(String jwtToken) throws AuthException;
 
     void logoutCurrent();

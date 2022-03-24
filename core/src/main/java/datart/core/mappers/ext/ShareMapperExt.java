@@ -15,14 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package datart.core.mappers.ext;
 
-package datart.core.base.consts;
+import datart.core.entity.Share;
+import datart.core.mappers.ShareMapper;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
-public enum ShareType {
+import java.util.List;
 
-    TOKEN_SHARE,
+@Mapper
+public interface ShareMapperExt extends ShareMapper {
 
-    PASSWORD_SHARE,
+    @Select("SELECT * FROM `share` where org_id = #{orgId} ")
+    List<Share> listByOrg(String orgId);
 
-    AUTH_SHARE
+    @Select("SELECT * FROM `share` where create_by = #{userId} ")
+    List<Share> listByUser(String userId);
+
 }

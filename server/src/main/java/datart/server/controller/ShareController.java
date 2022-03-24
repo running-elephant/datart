@@ -22,10 +22,12 @@ import datart.core.base.annotations.SkipLogin;
 import datart.core.common.FileUtils;
 import datart.core.data.provider.Dataframe;
 import datart.core.entity.Download;
+import datart.core.entity.Share;
 import datart.server.base.dto.ResponseData;
 import datart.server.base.params.*;
 import datart.server.service.ShareService;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.tomcat.util.http.fileupload.util.Streams;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +41,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 @RestController
-@RequestMapping("/share")
+@RequestMapping("/shares")
 public class ShareController extends BaseController {
 
     private final ShareService shareService;
@@ -56,29 +58,49 @@ public class ShareController extends BaseController {
         return ResponseData.success(shareService.createShare(createParam));
     }
 
-
-    @ApiOperation(value = "explain share detail")
-    @GetMapping(value = "/explain")
-    @SkipLogin
-    public ResponseData<ShareToken> explainShare(@RequestParam String shareToken) {
-        return ResponseData.success(shareService.explainShare(ShareToken.create(shareToken)));
+    @ApiOperation(value = "update a share")
+    @PutMapping(value = "{shareId}")
+    public ResponseData<Boolean> update(
+            @PathVariable String shareId,
+            @Validated @RequestBody ShareUpdateParam updateParam) {
+        updateParam.setId(shareId);
+        return ResponseData.success(shareService.update(updateParam));
     }
 
-    @ApiOperation(value = "get viz detail ")
-    @GetMapping("/viz")
+    @ApiOperation(value = "delete a share")
+    @Delete(value = "{shareId}")
+    public ResponseData<Boolean> delete(@PathVariable String shareId) {
+        return ResponseData.success(shareService.delete(shareId, false));
+    }
+
+    @ApiOperation(value = "list share")
+    @GetMapping(value = "{orgId}")
+    public ResponseData<List<Share>> list(@PathVariable String orgId) {
+        return ResponseData.success(shareService.listShare(orgId));
+    }
+
+//    @ApiOperation(value = "explain share detail")
+//    @GetMapping(value = "{shareId}/explain")
+//    @SkipLogin
+//    public ResponseData<ShareToken> explainShare(@PathVariable String shareId) {
+//        return ResponseData.success(shareService.explainShare(ShareToken.create(shareId)));
+//    }
+
+    @ApiOperation(value = "get viz detail")
+    @PostMapping("{shareId}/viz")
     @SkipLogin
-    public ResponseData<ShareVizDetail> vizDetail(@RequestParam String shareToken,
-                                                  @RequestParam(required = false) String password) {
-        return ResponseData.success(shareService.getShareViz(ShareToken.create(shareToken, password)));
+    public ResponseData<ShareVizDetail> vizDetail(@PathVariable String shareId,
+                                                  @RequestBody ShareToken shareToken) {
+        shareToken.setId(shareId);
+        return ResponseData.success(shareService.getShareViz(shareToken));
     }
 
     @ApiOperation(value = "execute with share token")
     @PostMapping("/execute")
     @SkipLogin
     public ResponseData<Dataframe> execute(@RequestParam String executeToken,
-                                           @RequestParam(required = false) String password,
                                            @RequestBody ViewExecuteParam executeParam) throws Exception {
-        return ResponseData.success(shareService.execute(ShareToken.create(executeToken, password), executeParam));
+        return ResponseData.success(shareService.execute(ShareToken.create(executeToken), executeParam));
     }
 
     @ApiOperation(value = "create a download task")
@@ -94,19 +116,17 @@ public class ShareController extends BaseController {
     @GetMapping("/download/task")
     @SkipLogin
     public ResponseData<List<Download>> downloadList(@RequestParam String shareToken,
-                                                     @RequestParam(required = false) String password,
                                                      @RequestParam String clientId) {
-        return ResponseData.success(shareService.listDownloadTask(ShareToken.create(shareToken, password), clientId));
+        return ResponseData.success(shareService.listDownloadTask(ShareToken.create(shareToken), clientId));
     }
 
     @ApiOperation(value = "download file")
     @GetMapping("/download")
     @SkipLogin
     public void downloadFile(@RequestParam String shareToken,
-                             @RequestParam(required = false) String password,
                              @RequestParam String downloadId,
                              HttpServletResponse response) throws IOException {
-        Download download = shareService.download(ShareToken.create(shareToken, password), downloadId);
+        Download download = shareService.download(ShareToken.create(shareToken), downloadId);
 
         response.setHeader("Content-Type", "application/octet-stream");
         File file = new File(FileUtils.withBasePath(download.getPath()));

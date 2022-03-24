@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 
-import { SharePage } from './SharePage';
+import { defaultLazyLoad } from 'utils/loadable';
 
-export default SharePage;
+export const LazyShareStoryPlayer = defaultLazyLoad(
+  () => import('./ShareStoryPlayer'),
+  module => module.default,
+);

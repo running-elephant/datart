@@ -114,6 +114,7 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
 
             {showShareLinkModal && (
               <ShareLinkModal
+                vizType="STORYBOARD"
                 visibility={showShareLinkModal}
                 onOk={() => setShowShareLinkModal(false)}
                 onCancel={() => setShowShareLinkModal(false)}

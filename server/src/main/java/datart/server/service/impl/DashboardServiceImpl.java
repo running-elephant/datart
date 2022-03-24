@@ -250,7 +250,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
 
         // copy static files
         String basePath = fileService.getBasePath(FileOwner.DASHBOARD, dashboard.getId());
-        String distPath = fileService.getBasePath(FileOwner.DASHBOARD, copy.getId());
+        String distPath = fileService.getBasePath(FileOwner.DASHBOARD, folder.getRelId());
         File src = new File(basePath);
         if (src.exists()) {
             FileSystemUtils.copyRecursively(src, new File(distPath));

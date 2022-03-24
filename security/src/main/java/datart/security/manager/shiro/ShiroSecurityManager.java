@@ -38,13 +38,11 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 
 
 @Slf4j
@@ -87,6 +85,15 @@ public class ShiroSecurityManager implements DatartSecurityManager {
             log.error("Login error ({} {})", token.getSubject(), token.getPassword());
             Exceptions.msg("login.fail");
         }
+    }
+
+    @Override
+    public boolean validateUser(String username, String password) throws AuthException {
+        User user = userMapper.selectByNameOrEmail(username);
+        if (user == null) {
+            return false;
+        }
+        return BCrypt.checkpw(password, user.getPassword()) || Objects.equals(password, user.getPassword());
     }
 
     @Override
