@@ -9,6 +9,7 @@ import datart.core.entity.poi.ColumnSetting;
 import datart.core.entity.poi.POISettings;
 import datart.server.base.dto.chart.ChartColumn;
 import datart.server.base.dto.chart.ChartConfigDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.util.CollectionUtils;
@@ -16,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class PoiConvertUtils {
 
     public static POISettings covertToPoiSetting(String chartConfigStr, Dataframe dataframe){
@@ -25,14 +27,19 @@ public class PoiConvertUtils {
         List<ChartColumn> dataStyles = chartConfigDTO.getDataHeaders();
         POISettings poiSettings = new POISettings();
         Map<String, String> aliasMap = getAliasMap(dataColumns);
-        dealHeaderDataSetting(poiSettings, dataStyles, dataframe, dataColumns, aliasMap);
         List<ChartColumn> realColumnSortList = getRealColumnSortList(dataColumns, dataStyles);
-        Map<Integer, ColumnSetting> columnSettingMap = dealColumnSetting(dataframe.getColumns(), realColumnSortList);
+        dealHeaderDataSetting(poiSettings, dataStyles, dataframe, dataColumns, aliasMap);
+        Map<Integer, ColumnSetting> columnSettingMap = dealColumnSetting(dataframe.getColumns(), realColumnSortList, aliasMap);
         poiSettings.setColumnSetting(columnSettingMap);
+        // 若解析可能异常则下载不使用样式
+        if (!columnSettingMap.isEmpty() && columnSettingMap.size()!=dataframe.getColumns().size()){
+            log.warn("Analysis of chart style may have problems, and this will download with no style.");
+            poiSettings = new POISettings();
+        }
         return poiSettings;
     }
 
-    private static Map<Integer, ColumnSetting> dealColumnSetting(List<Column> columns, List<ChartColumn> dataColumns) {
+    private static Map<Integer, ColumnSetting> dealColumnSetting(List<Column> columns, List<ChartColumn> dataColumns, Map<String, String> aliasMap) {
         Map<Integer, ColumnSetting> resultMap = new HashMap<>(columns.size());
         Map<String, Integer> oriSort = new HashMap<>(columns.size());
         for (int i = 0; i < columns.size(); i++) {
@@ -40,11 +47,17 @@ public class PoiConvertUtils {
         }
         for (int i = 0; i < dataColumns.size(); i++) {
             ChartColumn dataColumn = dataColumns.get(i);
-            Integer index = oriSort.get(dataColumn.getColName());
+            String columnName = dataColumn.getDisplayName();
+            Integer index = oriSort.get(columnName);
+            // 兼容impala 聚合函数小写
+            if (index==null && StringUtils.isNotBlank(dataColumn.getAggregate())) {
+                String name = dataColumn.getAggregate().toLowerCase()+"("+dataColumn.getColName()+")";
+                index = oriSort.get(name);
+            }
             ColumnSetting res = new ColumnSetting();
             res.setIndex(i);
             res.setNumFormat(dataColumn.getNumFormat());
-            res.setLength(dataColumn.getColName().length());
+            res.setLength(aliasMap.getOrDefault(columnName, columnName).length());
             resultMap.put(index, res);
         }
         return resultMap;
@@ -82,8 +95,8 @@ public class PoiConvertUtils {
     private static Map<String, String> getAliasMap(List<ChartColumn> dataColumns){
         Map<String, String> aliasMap = new HashMap<>();
         dataColumns.stream().forEach(item -> {
-            String aliasName = StringUtils.isNotBlank(item.getAlias().getName()) ? item.getAlias().getName() : item.getColName();
-            aliasMap.put(item.getColName(), aliasName);
+            String aliasName = StringUtils.isNotBlank(item.getAlias().getName()) ? item.getAlias().getName() : item.getDisplayName();
+            aliasMap.put(item.getDisplayName(), aliasName);
         });
         return aliasMap;
     }
@@ -127,6 +140,16 @@ public class PoiConvertUtils {
                 chartColumn.setFormat(columnMap.get(chartColumn.getUid()).getFormat());
             }
         }
+        //处理页面分组后添加列的情况
+        if (list.size()!=dataColumns.size()) {
+            Set<String> columnIds = list.stream().map(ChartColumn::getUid).collect(Collectors.toSet());
+            for (ChartColumn dataColumn : dataColumns) {
+                if (!columnIds.contains(dataColumn.getUid())) {
+                    list.add(dataColumn);
+                    dataHeaders.add(dataColumn);
+                }
+            }
+        }
         return list;
     }
 
@@ -135,7 +158,7 @@ public class PoiConvertUtils {
             rowMap.put(key, new ArrayList<>());
         }
         Column column = new Column();
-        column.setName(val.getColName());
+        column.setName(val.getDisplayName());
         column.setType(ValueType.STRING);
         rowMap.get(key).add(column);
         return rowMap.get(key).size()-1;

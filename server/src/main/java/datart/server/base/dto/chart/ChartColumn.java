@@ -48,7 +48,7 @@ public class ChartColumn {
         this.deepNum = calDeepNum();
     }
 
-    public String getColName() {
+    public String getDisplayName() {
         return isGroup ? label :
                 StringUtils.isNotBlank(aggregate) ? aggregate+"("+colName+")" : colName;
     }
