@@ -313,9 +313,6 @@ export function diffHeaderRows(
   oldRows: Array<{ colName: string }>,
   newRows: Array<{ colName: string }>,
 ) {
-  if (!oldRows?.length) {
-    return true;
-  }
   if (oldRows?.length !== newRows?.length) {
     return true;
   }
