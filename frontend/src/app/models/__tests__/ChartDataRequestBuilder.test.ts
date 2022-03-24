@@ -915,6 +915,44 @@ describe('ChartDataRequestBuild Test', () => {
     );
   });
 
+  test('should get view config when config is a object', () => {
+    const viewConfig = {
+      cache: false,
+      cacheExpires: '',
+      concurrencyControl: false,
+      concurrencyControlMode: 'a',
+    };
+    const dataView = {
+      computedFields: [],
+      id: '1',
+      config: viewConfig,
+    };
+    const chartDataConfigs = [];
+    const chartSettingConfigs = [];
+    const pageInfo = {};
+    const enableScript = false;
+    const enableAggregation = true;
+
+    const builder = new ChartDataRequestBuilder(
+      dataView,
+      chartDataConfigs,
+      chartSettingConfigs,
+      pageInfo,
+      enableScript,
+      enableAggregation,
+    );
+    const requestParams = builder.build();
+
+    expect(requestParams.cache).toEqual(viewConfig.cache);
+    expect(requestParams.cacheExpires).toEqual(viewConfig.cacheExpires);
+    expect(requestParams.concurrencyControl).toEqual(
+      viewConfig.concurrencyControl,
+    );
+    expect(requestParams.concurrencyControlMode).toEqual(
+      viewConfig.concurrencyControlMode,
+    );
+  });
+
   test('should get select columns', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
