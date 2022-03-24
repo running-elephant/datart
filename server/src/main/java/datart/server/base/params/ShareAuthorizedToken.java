@@ -21,14 +21,13 @@ package datart.server.base.params;
 import datart.security.base.ResourceType;
 import lombok.Data;
 
-import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
-public class Share {
+public class ShareAuthorizedToken {
 
-    private String shareUser;
+    private String permissionBy;
 
     @NotNull
     private ResourceType vizType;
@@ -36,20 +35,6 @@ public class Share {
     @NotNull
     private String vizId;
 
-//    @NotNull
-//    private ShareType shareType;
-
-    private boolean usePassword;
-
-    private String password;
-
-//    private SharePermission sharePermission;
-
-    @Future
     private Date expiryDate;
-
-//    private Set<String> roles;
-//
-//    private Set<String> users;
 
 }

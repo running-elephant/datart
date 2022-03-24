@@ -18,11 +18,12 @@
 
 package datart.core.base.consts;
 
-public enum ShareType {
+public enum ShareAuthenticationMode {
 
-    TOKEN_SHARE,
+    NONE,
 
-    PASSWORD_SHARE,
+    CODE,
 
-    AUTH_SHARE
+    LOGIN
+
 }
