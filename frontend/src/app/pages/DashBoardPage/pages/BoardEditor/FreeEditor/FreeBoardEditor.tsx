@@ -27,22 +27,24 @@ import React, {
   useState,
 } from 'react';
 import { DraggableCore, DraggableEventHandler } from 'react-draggable';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components/macro';
 import { BoardActionContext } from '../../../components/BoardProvider/BoardActionProvider';
 import { scaleContext } from '../../../components/FreeBoardBackground';
 import { editBoardStackActions } from '../slice';
+import { eventBus } from '../slice/events';
+import { selectSelectedIds } from '../slice/selectors';
 import { WidgetItem } from './WidgetItem';
-
 export enum DragTriggerTypes {
   MouseMove = 'mousemove',
   KeyDown = 'keydown',
 }
-
 export const WidgetOfFreeEdit: React.FC<{}> = () => {
+  const selectedIds = useSelector(selectSelectedIds);
   const widget = useContext(WidgetContext);
   const { updateWidgetConfig } = useContext(BoardActionContext);
+
   const dispatch = useDispatch();
   const scale = useContext(scaleContext);
   const { x, y, width, height } = widget.config.rect;
@@ -60,6 +62,20 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
     setCurH(height);
   }, [height, width, x, y]);
 
+  const move = useCallback(
+    (selectedIds: string[], deltaX: number, deltaY: number) => {
+      if (!selectedIds.includes(widget.id)) return;
+      setCurXY(c => [c[0] + deltaX, c[1] + deltaY]);
+    },
+    [widget.id],
+  );
+  useEffect(() => {
+    eventBus.addListener('moveWidget', move);
+    return () => {
+      eventBus.removeListener('moveWidget', move);
+    };
+  }, [move]);
+
   const dragStart: DraggableEventHandler = useCallback((e, data) => {
     e.stopPropagation();
     if (e.target === data.node.lastElementChild) {
@@ -72,14 +88,21 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
       return false;
     }
   }, []);
+  const drag: DraggableEventHandler = useCallback(
+    (e, data) => {
+      e.stopPropagation();
 
-  const drag: DraggableEventHandler = useCallback((e, data) => {
-    e.stopPropagation();
+      const { deltaX, deltaY } = data;
 
-    const { deltaX, deltaY } = data;
-
-    setCurXY(c => [c[0] + deltaX, c[1] + deltaY]);
-  }, []);
+      eventBus.emit(
+        'moveWidget',
+        selectedIds.concat(widget.id),
+        deltaX,
+        deltaY,
+      );
+    },
+    [selectedIds, widget.id],
+  );
   const dragStop: DraggableEventHandler = (e, data) => {
     if (curXYRef.current[0] === curXY[0] && curXYRef.current[1] === curXY[1]) {
       // no change

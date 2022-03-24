@@ -36,9 +36,8 @@ const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
   ({ widgetConfig, widgetInfo, handleClassName, cursor }) => {
     const dispatch = useDispatch();
     const showBlockMask = useSelector(selectShowBlockMask);
-    const selectWidget = useCallback(
+    const onMouseDown = useCallback(
       (e: React.MouseEvent<HTMLDivElement>) => {
-        e.stopPropagation();
         let newSelected = !widgetInfo.selected;
         if (widgetInfo.selected) {
           newSelected = widgetInfo.selected;
@@ -53,6 +52,7 @@ const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
       },
       [dispatch, widgetConfig.id, widgetInfo.selected],
     );
+
     const doubleClick = useCallback(() => {
       if (widgetConfig.config.type === 'container') {
         dispatch(editDashBoardInfoActions.changeShowBlockMask(false));
@@ -83,7 +83,7 @@ const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
         selected={widgetInfo.selected}
         className={showBlockMask ? handleClassName : 'mask-layer'}
         onDoubleClick={doubleClick}
-        onClick={selectWidget}
+        onMouseDown={onMouseDown}
       ></MaskLayer>
     );
   },
