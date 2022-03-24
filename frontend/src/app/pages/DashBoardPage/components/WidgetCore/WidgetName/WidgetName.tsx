@@ -16,14 +16,18 @@
  * limitations under the License.
  */
 
-import React, { FC, memo } from 'react';
+import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import {
   WidgetConf,
   WidgetNameConfig,
   WidgetType,
 } from '../../../pages/Board/slice/types';
-export const HideTitleTypes: WidgetType[] = ['query', 'reset', 'controller'];
+export const HideTitleTypes: Readonly<WidgetType[]> = [
+  'query',
+  'reset',
+  'controller',
+];
 
 export const LabelName: FC<{ config: WidgetConf }> = ({ config }) => {
   return (
