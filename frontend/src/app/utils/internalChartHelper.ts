@@ -313,9 +313,6 @@ export function diffHeaderRows(
   oldRows: Array<{ colName: string }>,
   newRows: Array<{ colName: string }>,
 ) {
-  if (!oldRows?.length) {
-    return true;
-  }
   if (oldRows?.length !== newRows?.length) {
     return true;
   }
@@ -539,19 +536,26 @@ export function getAxisLengthByConfig(config: ChartCommonConfig) {
   return containerWidth - axisLabelMaxWidth - leftWidth - rightWidth;
 }
 
-export const transformToViewConfig = (viewConfig?: string) => {
-  const viewConfigMap = viewConfig ? JSON.parse(viewConfig) : {};
-  const obj = {};
-  if (viewConfig) {
-    const fields = [
-      'cache',
-      'cacheExpires',
-      'concurrencyControl',
-      'concurrencyControlMode',
-    ];
-    fields.forEach(v => {
-      obj[v] = viewConfigMap?.[v];
-    });
+export const transformToViewConfig = (
+  viewConfig?: string | object,
+): {
+  cache?: boolean;
+  cacheExpires?: number;
+  concurrencyControl?: boolean;
+  concurrencyControlMode?: string;
+} => {
+  let viewConfigMap = viewConfig;
+  if (typeof viewConfig === 'string') {
+    viewConfigMap = JSON.parse(viewConfig);
   }
-  return obj;
+  const fields = [
+    'cache',
+    'cacheExpires',
+    'concurrencyControl',
+    'concurrencyControlMode',
+  ];
+  return fields.reduce((acc, cur) => {
+    acc[cur] = viewConfigMap?.[cur];
+    return acc;
+  }, {});
 };

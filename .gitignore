@@ -1,4 +1,7 @@
+
+# IDE
 .idea
+.DS_Store
 
 /static
 

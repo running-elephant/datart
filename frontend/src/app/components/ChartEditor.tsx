@@ -457,9 +457,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     }
     const isWidget = dataChartId.includes('widget');
     const builder = new ChartDataRequestBuilder(
-      {
-        ...dataview,
-      },
+      dataview,
       chartConfig?.datas,
       chartConfig?.settings,
       {},
