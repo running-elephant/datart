@@ -32,7 +32,10 @@ import {
   getScatterSymbolSizeFn,
   getSeriesTooltips4Polar2,
   getSeriesTooltips4Rectangular2,
+  getSettingValue,
   getStyles,
+  getStyleValue,
+  getStyleValueByGroup,
   getUnusedHeaderRows,
   getValue,
   getValueByColumnKey,
@@ -2026,6 +2029,41 @@ describe('Chart Helper ', () => {
           JSON.stringify(expected),
         );
       });
+    });
+  });
+
+  describe('getStyleValue Test', () => {
+    test('should get value', () => {
+      expect(
+        getStyleValue([{ key: 'a', rows: [{ key: 'a-1', value: 1 }] }] as any, [
+          'a',
+          'a-1',
+        ]),
+      ).toEqual(1);
+    });
+  });
+
+  describe('getSettingValue Test', () => {
+    test('should get value', () => {
+      expect(
+        getSettingValue(
+          [{ key: 'a', rows: [{ key: 'a-1', value: 1 }] }] as any,
+          'a.a-1',
+          'value',
+        ),
+      ).toEqual(1);
+    });
+  });
+
+  describe('getStyleValueByGroup Test', () => {
+    test('should get value', () => {
+      expect(
+        getStyleValueByGroup(
+          [{ key: 'a', rows: [{ key: 'a-1', value: 1 }] }] as any,
+          'a',
+          'a-1',
+        ),
+      ).toEqual(1);
     });
   });
 });
