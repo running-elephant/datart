@@ -284,7 +284,8 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
     );
     const builder = new ChartDataRequestBuilder(
       {
-        ...currentChartPreview?.backendChart?.view,
+        id: currentChartPreview?.backendChart?.view.id || '',
+        config: currentChartPreview?.backendChart?.view.config || {},
         computedFields:
           currentChartPreview?.backendChart?.config?.computedFields || [],
       },

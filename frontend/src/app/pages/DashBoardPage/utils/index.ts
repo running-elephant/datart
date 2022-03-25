@@ -93,7 +93,11 @@ export const getRGBAColor = color => {
   }
 };
 
-export const getDataChartRequestParams = (dataChart: DataChart, option) => {
+export const getDataChartRequestParams = (
+  dataChart: DataChart,
+  view: ChartDataView,
+  option,
+) => {
   const migratedChartConfig = migrateChartConfig(
     CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
   );
@@ -102,7 +106,7 @@ export const getDataChartRequestParams = (dataChart: DataChart, option) => {
   );
   const builder = new ChartDataRequestBuilder(
     {
-      ...dataChart.view,
+      ...view,
       computedFields: dataChart.config.computedFields || [],
     },
     datas,
@@ -373,8 +377,16 @@ export const getChartWidgetRequestParams = (obj: {
     // errorHandle(`can\`t find Chart ${curWidget.datachartId}`);
     return null;
   }
+  // 有可能有的chart 没有viewId 例如富文本chart,有时候没有 viewId，不用取相关请求参数
   if (!dataChart.viewId) return null;
-  let requestParams = getDataChartRequestParams(dataChart, option);
+
+  const chartDataView = viewMap[dataChart?.viewId];
+
+  let requestParams = getDataChartRequestParams(
+    dataChart,
+    chartDataView,
+    option,
+  );
 
   const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
     chartWidget: curWidget,

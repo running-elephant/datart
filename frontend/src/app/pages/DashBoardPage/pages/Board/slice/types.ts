@@ -401,8 +401,8 @@ export interface DataChart {
   name: string;
   orgId?: string;
   projectId?: string;
-  publish?: boolean; //有用吗？
-  type?: string; //待修改
+  publish?: boolean; //？
+  type?: string; //?
   viewId: string;
   view?: any;
   status: any;
