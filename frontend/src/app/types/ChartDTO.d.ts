@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import ChartDataView from 'app/types/ChartDataView';
 import { ChartDetailConfigDTO } from './ChartConfigDTO';
 
 export type ChartDTO = {

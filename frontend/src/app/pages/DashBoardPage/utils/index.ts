@@ -31,6 +31,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
@@ -39,7 +40,6 @@ import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
 import moment from 'moment';
 import { CloneValueDeep } from 'utils/object';
-import { ChartDataRequestFilter } from '../../../types/ChartDataRequest';
 import { BOARD_FILE_IMG_PREFIX } from '../constants';
 import {
   BoardLinkFilter,
