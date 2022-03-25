@@ -309,10 +309,16 @@ describe('should getDataChartRequestParams', () => {
       status: 1,
       description: '',
     };
-
+    const viewConfig = JSON.parse(view.config);
     const res = getDataChartRequestParams(dataChart as any, view as any, opt);
     expect(res.viewId).toBe(dataChart.viewId);
     expect(res.filters).toEqual([]);
+    expect(res.cache).toEqual(viewConfig.cache);
+    expect(res.cacheExpires).toEqual(viewConfig.cacheExpires);
+    expect(res.concurrencyControl).toEqual(viewConfig.concurrencyControl);
+    expect(res.concurrencyControlMode).toEqual(
+      viewConfig.concurrencyControlMode,
+    );
   });
   it('should chart has filter', () => {
     const dataChart = {
