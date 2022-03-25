@@ -17,6 +17,9 @@
  */
 
 import { ChartConfig } from 'app/types/ChartConfig';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
+import ChartDataView from 'app/types/ChartDataView';
+import { ChartDTO } from 'app/types/ChartDTO';
 
 export type ChartConfigPayloadType = {
   init?: ChartConfig;
