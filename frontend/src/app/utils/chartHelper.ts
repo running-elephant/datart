@@ -636,7 +636,29 @@ function getMarkLineData2(
   const name = mark[0].label;
   const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
 
-  const [show, enableMarkLine, position, font, lineStyle, valueType, metricUid, constantValue] = getStyles(mark, ['markLine'], ['showLabel', 'enableMarkLine', 'position', 'font', 'lineStyle', valueTypeKey, metricKey, constantValueKey]);
+  const [
+    show,
+    enableMarkLine,
+    position,
+    font,
+    lineStyle,
+    valueType,
+    metricUid,
+    constantValue,
+  ] = getStyles(
+    mark,
+    ['markLine'],
+    [
+      'showLabel',
+      'enableMarkLine',
+      'position',
+      'font',
+      'lineStyle',
+      valueTypeKey,
+      metricKey,
+      constantValueKey,
+    ],
+  );
 
   const metricDatas =
     dataConfig.uid === metricUid
@@ -684,9 +706,33 @@ function getMarkAreaData2(
   isHorizonDisplay,
 ) {
   const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
-  const [metric, show, enableMarkArea, position, font, borderStyle, opacity,backgroundColor, valueType, constantValue ] = getStyles([mark], ['markArea'], [
-    metricKey, 'showLabel', 'enableMarkArea', 'position', 'font', 'borderStyle', 'opacity','backgroundColor', valueTypeKey, constantValueKey
-  ]);
+  const [
+    metric,
+    show,
+    enableMarkArea,
+    position,
+    font,
+    borderStyle,
+    opacity,
+    backgroundColor,
+    valueType,
+    constantValue,
+  ] = getStyles(
+    [mark],
+    ['markArea'],
+    [
+      metricKey,
+      'showLabel',
+      'enableMarkArea',
+      'position',
+      'font',
+      'borderStyle',
+      'opacity',
+      'backgroundColor',
+      valueTypeKey,
+      constantValueKey,
+    ],
+  );
 
   const name = mark.value;
   const metricDatas =

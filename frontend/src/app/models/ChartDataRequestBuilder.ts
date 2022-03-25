@@ -120,6 +120,12 @@ export class ChartDataRequestBuilder {
   }
 
   private buildGroups() {
+    /**
+     * If aggregation is off, do not add values to gruop
+     */
+    if (this.aggregation === false) {
+      return [];
+    }
     const groupColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
       (acc, cur) => {
         if (!cur.rows) {
