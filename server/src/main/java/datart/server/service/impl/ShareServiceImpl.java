@@ -18,20 +18,20 @@
 
 package datart.server.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Sets;
+import datart.core.base.consts.ShareAuthenticationMode;
+import datart.core.base.consts.ShareRowPermissionBy;
 import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
+import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.Dataframe;
-import datart.core.entity.Download;
-import datart.core.entity.Storypage;
-import datart.core.entity.User;
-import datart.core.entity.View;
-import datart.core.mappers.ext.UserMapperExt;
-import datart.security.base.PasswordToken;
+import datart.core.entity.*;
+import datart.core.mappers.ext.ShareMapperExt;
 import datart.security.base.ResourceType;
 import datart.security.exception.PermissionDeniedException;
 import datart.security.util.AESUtil;
-import datart.security.util.SecurityUtils;
 import datart.server.base.dto.DashboardDetail;
 import datart.server.base.dto.DatachartDetail;
 import datart.server.base.dto.StoryboardDetail;
@@ -43,10 +43,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -59,12 +56,20 @@ public class ShareServiceImpl extends BaseService implements ShareService {
 
     private final DownloadService downloadService;
 
+    private final ShareMapperExt shareMapper;
+
+    private final RoleService roleService;
+
     public ShareServiceImpl(DataProviderService dataProviderService,
                             VizService vizService,
-                            DownloadService downloadService) {
+                            DownloadService downloadService,
+                            ShareMapperExt shareMapper,
+                            RoleService roleService) {
         this.dataProviderService = dataProviderService;
         this.vizService = vizService;
         this.downloadService = downloadService;
+        this.shareMapper = shareMapper;
+        this.roleService = roleService;
     }
 
     @Override
@@ -74,49 +79,99 @@ public class ShareServiceImpl extends BaseService implements ShareService {
 
     @Override
     public ShareToken createShare(String shareUser, ShareCreateParam createParam) {
+        validateShareParam(createParam);
+        String orgId = null;
+        switch (createParam.getVizType()) {
+            case STORYBOARD:
+                Storyboard storyboard = retrieve(createParam.getVizId(), Storyboard.class, true);
+                if (storyboard != null) {
+                    orgId = storyboard.getOrgId();
+                }
+                break;
+            case DASHBOARD:
+                Dashboard dashboard = retrieve(createParam.getVizId(), Dashboard.class, true);
+                if (dashboard != null) {
+                    orgId = dashboard.getOrgId();
+                }
+                break;
+            case DATACHART:
+                Datachart datachart = retrieve(createParam.getVizId(), Datachart.class, true);
+                if (datachart != null) {
+                    orgId = datachart.getOrgId();
+                }
+                break;
+            default:
+                Exceptions.tr(BaseException.class, "message.share.unsupported", createParam.getVizType().name());
+        }
+
         Share share = new Share();
         BeanUtils.copyProperties(createParam, share);
-        share.setShareUser(getCurrentUser().getId());
-        ShareToken shareToken = new ShareToken();
-        if (createParam.isUsePassword()) {
-            shareToken.setPassword(SecurityUtils.randomPassword());
-            share.setPassword(shareToken.getPassword());
-            shareToken.setUsePassword(createParam.isUsePassword());
+        share.setCreateBy(shareUser);
+        if (!CollectionUtils.isEmpty(createParam.getRoles())) {
+            share.setRoles(JSON.toJSONString(share));
         }
-        shareToken.setToken(AESUtil.encrypt(share, Application.getTokenSecret()));
+        share.setVizType(createParam.getVizType().name());
+        share.setAuthenticationMode(createParam.getAuthenticationMode().name());
+        share.setRowPermissionBy(createParam.getRowPermissionBy().name());
+        share.setOrgId(orgId);
+        share.setVizType(createParam.getVizType().name());
+        share.setId(UUIDGenerator.generate());
+        share.setCreateTime(new Date());
+        shareMapper.insert(share);
+
+        ShareToken shareToken = new ShareToken();
+        BeanUtils.copyProperties(createParam, shareToken);
+        shareToken.setId(share.getId());
+        shareToken.setAuthenticationCode(createParam.getAuthenticationCode());
+        shareToken.setAuthenticationMode(createParam.getAuthenticationMode());
+
         return shareToken;
     }
 
+
     @Override
-    public ShareToken explainShare(ShareToken shareToken) {
-        Share share = AESUtil.decrypt(shareToken.getToken(), Application.getTokenSecret(), Share.class);
-        ShareToken shareInfo = new ShareToken();
-        shareInfo.setUsePassword(share.isUsePassword());
-        shareInfo.setToken(shareToken.getToken());
-        return shareInfo;
+    public List<Share> listShare(String orgId) {
+        if (getSecurityManager().isOrgOwner(orgId)) {
+            return shareMapper.listByOrg(orgId);
+        } else {
+            return shareMapper.listByUser(getCurrentUser().getId());
+        }
     }
+
+//    @Override
+//    public ShareToken explainShare(ShareToken shareToken) {
+////        ShareParam share = AESUtil.decrypt(shareToken.getToken(), Application.getTokenSecret(), ShareParam.class);
+//        ShareToken shareInfo = new ShareToken();
+////        shareInfo.setUsePassword(share.isUsePassword());
+////        shareInfo.setToken(shareToken.getToken());
+//        return shareInfo;
+//    }
 
     @Override
     public ShareVizDetail getShareViz(ShareToken shareToken) {
-        Share share = validateBase(shareToken);
-        return getVizDetail(share);
+        ShareAuthorizedToken authorizedToken = parseToken(shareToken);
+        validateExpiration(authorizedToken);
+        return getVizDetail(authorizedToken);
     }
 
     @Override
     public Dataframe execute(ShareToken shareToken, ViewExecuteParam executeParam) throws Exception {
-        validateExecutePermission(shareToken, executeParam);
-        return dataProviderService.execute(executeParam);
+        validateExecutePermission(shareToken.getAuthorizedToken(), executeParam);
+        return dataProviderService.execute(executeParam, false);
     }
 
     @Override
     public Download createDownload(String clientId, ShareDownloadParam downloadParam) {
-
         if (CollectionUtils.isEmpty(downloadParam.getDownloadParams()) || CollectionUtils.isEmpty(downloadParam.getExecuteToken())) {
             return null;
         }
-
         for (ViewExecuteParam param : downloadParam.getDownloadParams()) {
-            validateExecutePermission(downloadParam.getExecuteToken().get(param.getViewId()), param);
+            Map<String, ShareToken> tokeMap = downloadParam.getExecuteToken();
+            if (CollectionUtils.isEmpty(tokeMap)) {
+                validateExecutePermission(null, param);
+            } else {
+                validateExecutePermission(downloadParam.getExecuteToken().getOrDefault(param.getViewId(), null).getAuthorizedToken(), param);
+            }
         }
 
         List<ViewExecuteParam> viewExecuteParams = downloadParam.getDownloadParams();
@@ -129,21 +184,25 @@ public class ShareServiceImpl extends BaseService implements ShareService {
 
     @Override
     public List<Download> listDownloadTask(ShareToken shareToken, String clientId) {
-        validateBase(shareToken);
+        ShareAuthorizedToken authorizedToken = parseToken(shareToken);
+        validateExpiration(authorizedToken);
         return downloadService.listDownloadTasks(clientId);
     }
 
     @Override
     public Download download(ShareToken shareToken, String downloadId) {
-        validateBase(shareToken);
+        ShareAuthorizedToken authorizedToken = parseToken(shareToken);
+        validateExpiration(authorizedToken);
         return downloadService.downloadFile(downloadId);
     }
 
-    private ShareVizDetail getVizDetail(Share share) {
+    private ShareVizDetail getVizDetail(ShareAuthorizedToken authorizedToken) {
+
+        getSecurityManager().runAs(authorizedToken.getPermissionBy());
 
         ShareVizDetail shareVizDetail = new ShareVizDetail();
 
-        shareVizDetail.setVizType(share.getVizType());
+        shareVizDetail.setVizType(authorizedToken.getVizType());
 
         Object vizDetail = null;
 
@@ -151,44 +210,44 @@ public class ShareServiceImpl extends BaseService implements ShareService {
 
         Map<String, ShareToken> executeToken = null;
 
-        switch (share.getVizType()) {
+        switch (shareVizDetail.getVizType()) {
             case STORYBOARD:
-                StoryboardDetail storyboard = vizService.getStoryboard(share.getVizId());
+                StoryboardDetail storyboard = vizService.getStoryboard(authorizedToken.getVizId());
                 vizDetail = storyboard;
                 subVizToken = storyboard.getStorypages().stream().collect(Collectors.toMap(Storypage::getId, storypage -> {
-                    Share subShare = new Share();
-                    BeanUtils.copyProperties(share, subShare);
+                    ShareAuthorizedToken subShare = new ShareAuthorizedToken();
+                    BeanUtils.copyProperties(authorizedToken, subShare);
                     subShare.setVizId(storypage.getRelId());
                     subShare.setVizType(ResourceType.valueOf(storypage.getRelType()));
-                    return ShareToken.create(AESUtil.encrypt(subShare, Application.getTokenSecret()), subShare.getPassword());
+                    return ShareToken.create(AESUtil.encrypt(subShare, Application.getTokenSecret()));
                 }));
                 break;
             case DASHBOARD:
-                DashboardDetail dashboard = vizService.getDashboard(share.getVizId());
+                DashboardDetail dashboard = vizService.getDashboard(authorizedToken.getVizId());
                 vizDetail = dashboard;
                 executeToken = dashboard.getViews().stream().collect(Collectors.toMap(View::getId, view -> {
-                    Share subShare = new Share();
-                    BeanUtils.copyProperties(share, subShare);
+                    ShareAuthorizedToken subShare = new ShareAuthorizedToken();
+                    BeanUtils.copyProperties(authorizedToken, subShare);
                     subShare.setVizType(ResourceType.VIEW);
                     subShare.setVizId(view.getId());
-                    return ShareToken.create(AESUtil.encrypt(subShare, Application.getTokenSecret()), subShare.getPassword());
+                    return ShareToken.create(AESUtil.encrypt(subShare, Application.getTokenSecret()));
                 }));
                 break;
             case DATACHART:
-                DatachartDetail datachart = vizService.getDatachart(share.getVizId());
+                DatachartDetail datachart = vizService.getDatachart(authorizedToken.getVizId());
                 vizDetail = datachart;
                 shareVizDetail.setVizDetail(datachart);
-                Share subShare = new Share();
-                BeanUtils.copyProperties(share, subShare);
+                ShareAuthorizedToken subShare = new ShareAuthorizedToken();
+                BeanUtils.copyProperties(authorizedToken, subShare);
                 subShare.setVizType(ResourceType.VIEW);
                 subShare.setVizId(datachart.getViewId());
                 if (datachart.getViewId() != null) {
                     executeToken = new HashMap<>();
-                    executeToken.put(datachart.getViewId(), ShareToken.create(AESUtil.encrypt(subShare, Application.getTokenSecret()), subShare.getPassword()));
+                    executeToken.put(datachart.getViewId(), ShareToken.create(AESUtil.encrypt(subShare, Application.getTokenSecret())));
                 }
                 break;
             default:
-                Exceptions.tr(BaseException.class, "message.share.unsupported", share.getVizType().name());
+                Exceptions.tr(BaseException.class, "message.share.unsupported", shareVizDetail.getVizType().name());
 
         }
         shareVizDetail.setVizDetail(vizDetail);
@@ -197,41 +256,100 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         return shareVizDetail;
     }
 
-    private Share validateBase(ShareToken shareToken) {
-        Share share = AESUtil.decrypt(shareToken.getToken(), Application.getTokenSecret(), Share.class);
-        validateExpiration(share);
-        validatePassword(share, shareToken.getPassword());
-        User shareUser = retrieve(share.getShareUser(), User.class);
-        securityManager.login(new PasswordToken(shareUser.getUsername(), shareUser.getPassword(), System.currentTimeMillis()));
-        return share;
-    }
-
-    private void validateExecutePermission(ShareToken token, ViewExecuteParam executeParam) {
-        Share share = validateBase(token);
-        if (!ResourceType.VIEW.equals(share.getVizType()) || !share.getVizId().equals(executeParam.getViewId())) {
+    private void validateExecutePermission(String authorizedToken, ViewExecuteParam executeParam) {
+        if (StringUtils.isBlank(authorizedToken)) {
+            Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.permission.denied");
+        }
+        ShareAuthorizedToken shareAuthorizedToken = AESUtil.decrypt(authorizedToken, Application.getTokenSecret(), ShareAuthorizedToken.class);
+        if (!ResourceType.VIEW.equals(shareAuthorizedToken.getVizType()) || !shareAuthorizedToken.getVizId().equals(executeParam.getViewId())) {
             Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.permission.denied");
         }
     }
 
-    private void validateVizPermission(ShareToken token, ResourceType vizType, String vizId) {
-        Share share = validateBase(token);
-        if (!share.getVizType().equals(vizType) || !share.getVizId().equals(vizId)) {
-            Exceptions.tr(PermissionDeniedException.class, "message.security.permission-denied", "viz");
-        }
-    }
-
-    private void validateExpiration(Share share) {
-        if (new Date().after(share.getExpiryDate())) {
+    private void validateExpiration(ShareAuthorizedToken share) {
+        if (share == null || new Date().after(share.getExpiryDate())) {
             Exceptions.tr(BaseException.class, "message.share.expired");
         }
     }
 
-    private void validatePassword(Share share, String password) {
-        if (share.isUsePassword()) {
-            if (StringUtils.isEmpty(password) || !password.equals(share.getPassword())) {
+    private void authenticationShare(Share share, ShareToken shareToken) {
+        ShareAuthenticationMode authenticationMode = ShareAuthenticationMode.valueOf(share.getAuthenticationMode());
+        switch (authenticationMode) {
+            case NONE:
+                return;
+            case CODE:
+                if (StringUtils.isEmpty(shareToken.getAuthenticationCode()) || !shareToken.getAuthenticationCode().equals(share.getAuthenticationCode())) {
+                    Exceptions.tr(BaseException.class, "message.share.pwd");
+                }
+                break;
+            case LOGIN:
+                if (!getSecurityManager().validateUser(shareToken.getUsername(), shareToken.getPassword())) {
+                    Exceptions.tr(BaseException.class, "message.share.pwd");
+                }
+                if (StringUtils.isBlank(shareToken.getUsername())
+                        || StringUtils.isBlank(shareToken.getUsername())
+                        || StringUtils.isBlank(share.getRoles())) {
+                    Exceptions.tr(BaseException.class, "message.share.pwd");
+                }
+                List<Role> roles = roleService.listUserRoles(share.getOrgId(), shareToken.getUsername());
+                if (CollectionUtils.isEmpty(roles)) {
+                    Exceptions.tr(BaseException.class, "message.share.pwd");
+                }
+                Set<String> roleIdList = roles.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+                List<String> permittedRoles = JSON.parseArray(share.getRoles(), String.class);
+                if (Sets.intersection(roleIdList, new HashSet<>(permittedRoles)).isEmpty()) {
+                    Exceptions.tr(BaseException.class, "message.share.pwd");
+                }
+                break;
+            default:
                 Exceptions.tr(BaseException.class, "message.share.pwd");
+        }
+    }
+
+    @Override
+    public void requirePermission(Share entity, int permission) {
+
+    }
+
+    private void validateShareParam(ShareCreateParam createParam) {
+        if (ShareRowPermissionBy.VISITOR.equals(createParam.getRowPermissionBy())) {
+            if (CollectionUtils.isEmpty(createParam.getRoles())) {
+                Exceptions.msg("authentication code can not be blank");
+            }
+            if (!ShareAuthenticationMode.LOGIN.equals(createParam.getAuthenticationMode())) {
+                Exceptions.msg("The authentication mode must be LOGIN");
             }
         }
+
+        switch (createParam.getAuthenticationMode()) {
+            case CODE:
+                if (StringUtils.isBlank(createParam.getAuthenticationCode())) {
+                    Exceptions.msg("authentication code can not be blank");
+                }
+                break;
+            case LOGIN:
+                if (CollectionUtils.isEmpty(createParam.getRoles())) {
+                    Exceptions.msg("authentication code can not be blank");
+                }
+                break;
+            default:
+        }
+    }
+
+    private ShareAuthorizedToken parseToken(ShareToken shareToken) {
+        ShareAuthorizedToken authorizedToken = null;
+        if (StringUtils.isBlank(shareToken.getAuthorizedToken())) {
+            Share share = retrieve(shareToken.getId());
+            authenticationShare(share, shareToken);
+            authorizedToken = new ShareAuthorizedToken();
+            BeanUtils.copyProperties(share, authorizedToken);
+            authorizedToken.setVizType(ResourceType.valueOf(share.getVizType()));
+            User user = retrieve(share.getCreateBy(), User.class, false);
+            authorizedToken.setPermissionBy(user.getUsername());
+        } else {
+            authorizedToken = AESUtil.decrypt(shareToken.getAuthorizedToken(), Application.getTokenSecret(), ShareAuthorizedToken.class);
+        }
+        return authorizedToken;
     }
 
 }

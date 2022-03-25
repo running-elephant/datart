@@ -22,6 +22,16 @@ import {
 } from 'app/types/ChartConfig';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 
+export type ChartDataRequestFilter = {
+  aggOperator?: AggregateFieldActionType | null;
+  column: string;
+  sqlOperator: string;
+  values?: Array<{
+    value: string;
+    valueType: string;
+  }>;
+};
+
 export type ChartDataRequest = {
   viewId: string;
   aggregators: Array<{ column: string; sqlOperator: string }>;
@@ -49,14 +59,4 @@ export type ChartDataRequest = {
   vizId?: string;
   vizName?: string;
   analytics?: Boolean;
-};
-
-export type ChartDataRequestFilter = {
-  aggOperator?: AggregateFieldActionType | null;
-  column: string;
-  sqlOperator: string;
-  values?: Array<{
-    value: string;
-    valueType: string;
-  }>;
 };

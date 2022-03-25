@@ -18,12 +18,15 @@
 
 package datart.server.base.params;
 
+import datart.core.base.consts.ShareAuthenticationMode;
+import datart.core.base.consts.ShareRowPermissionBy;
 import datart.security.base.ResourceType;
 import lombok.Data;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.Set;
 
 @Data
 public class ShareCreateParam {
@@ -34,9 +37,20 @@ public class ShareCreateParam {
     @NotNull
     private String vizId;
 
-    private boolean usePassword;
-
     @Future
     private Date expiryDate;
+
+//    @NotNull
+//    private String orgId;
+
+    @NotNull
+    private ShareAuthenticationMode authenticationMode;
+
+    @NotNull
+    private ShareRowPermissionBy rowPermissionBy;
+
+    private Set<String> roles;
+
+    private String authenticationCode;
 
 }

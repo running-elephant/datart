@@ -17,11 +17,7 @@
  */
 
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
-import {
-  ChartDataSectionType,
-  FieldFormatType,
-  SortActionType,
-} from 'app/constants';
+import { ChartDataSectionType, FieldFormatType } from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
 import {
   ChartConfig,
@@ -435,34 +431,16 @@ export function getValue(
   }
 }
 
-export function getCustomSortableColumns(columns, dataConfigs) {
-  const sortConfigs = dataConfigs
-    .filter(
-      c =>
-        c.type === ChartDataSectionType.AGGREGATE ||
-        c.type === ChartDataSectionType.GROUP,
-    )
-    .flatMap(config => config.rows || []);
-
-  if (!sortConfigs || sortConfigs.length === 0) {
-    return columns;
-  }
-  const sortConfig = sortConfigs[0];
-  if (!sortConfig.colName || !sortConfig.sort) {
-    return columns;
-  }
-  const sort = sortConfig.sort;
-  if (!sort || sort.type !== SortActionType.CUSTOMIZE) {
-    return columns;
-  }
-  const sortValues = sortConfig.sort.value || [];
-  return columns.sort(
-    (prev, next) =>
-      sortValues.indexOf(prev[sortConfig.colName]) -
-      sortValues.indexOf(next[sortConfig.colName]),
-  );
-}
-
+/**
+ * @deprecated to be remove in next release
+ *
+ * @export
+ * @param {*} settingConfigs
+ * @param {*} dataColumns
+ * @param {*} dataConfig
+ * @param {*} isHorizonDisplay
+ * @return {*}
+ */
 export function getReference(
   settingConfigs,
   dataColumns,
@@ -514,6 +492,16 @@ export function getReference2(
   };
 }
 
+/**
+ * @deprecated to be remove in next release
+ *
+ * @export
+ * @param {*} settingConfigs
+ * @param {*} dataColumns
+ * @param {*} dataConfig
+ * @param {*} isHorizonDisplay
+ * @return {*}
+ */
 function getMarkLine(refTabs, dataColumns, dataConfig, isHorizonDisplay) {
   const markLineData = refTabs
     ?.reduce((acc, cur) => {
@@ -539,6 +527,16 @@ function getMarkLine(refTabs, dataColumns, dataConfig, isHorizonDisplay) {
   };
 }
 
+/**
+ * @deprecated to be remove in next release
+ *
+ * @export
+ * @param {*} settingConfigs
+ * @param {*} dataColumns
+ * @param {*} dataConfig
+ * @param {*} isHorizonDisplay
+ * @return {*}
+ */
 function getMarkLineData(
   mark,
   dataColumns,
@@ -777,6 +775,16 @@ function getMarkAreaData2(
   };
 }
 
+/**
+ * @deprecated to be remove in next release
+ *
+ * @export
+ * @param {*} settingConfigs
+ * @param {*} dataColumns
+ * @param {*} dataConfig
+ * @param {*} isHorizonDisplay
+ * @return {*}
+ */
 function getMarkAreaData(
   mark,
   dataColumns,
@@ -840,6 +848,16 @@ function getMarkAreaData(
   };
 }
 
+/**
+ * @deprecated to be remove in next release
+ *
+ * @export
+ * @param {*} settingConfigs
+ * @param {*} dataColumns
+ * @param {*} dataConfig
+ * @param {*} isHorizonDisplay
+ * @return {*}
+ */
 function getMarkArea(refTabs, dataColumns, isHorizonDisplay) {
   const refAreas = refTabs?.reduce((acc, cur) => {
     const markLineConfigs = cur?.rows?.filter(r => r.key === 'markArea');
@@ -1074,6 +1092,14 @@ export function getUnusedHeaderRows(
   }, []);
 }
 
+/**
+ * @deprecated to be remove in next release
+ *
+ * @export
+ * @param {[]} dataset
+ * @param {ChartDataSectionField} [config]
+ * @return {*}
+ */
 export function getDataColumnMaxAndMin(
   dataset: [],
   config?: ChartDataSectionField,

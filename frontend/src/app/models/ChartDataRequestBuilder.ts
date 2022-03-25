@@ -46,16 +46,18 @@ import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 
 export class ChartDataRequestBuilder {
+  extraSorters: ChartDataRequest['orders'] = [];
   chartDataConfigs: ChartDataConfig[];
-  charSettingConfigs: ChartStyleConfigDTO[];
-  pageInfo: ChartDatasetPageInfo;
-  dataView: ChartDataView;
+  charSettingConfigs;
+  pageInfo;
+  dataView;
   script: boolean;
   aggregation?: boolean;
-  private extraSorters: ChartDataRequest['orders'] = [];
 
   constructor(
-    dataView: ChartDataView,
+    dataView: Pick<ChartDataView, 'id' | 'computedFields'> & {
+      config: string | object;
+    },
     dataConfigs?: ChartDataConfig[],
     settingConfigs?: ChartStyleConfigDTO[],
     pageInfo?: ChartDatasetPageInfo,

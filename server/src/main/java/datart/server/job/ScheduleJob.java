@@ -27,8 +27,11 @@ import datart.server.base.params.DownloadCreateParam;
 import datart.server.base.params.ShareCreateParam;
 import datart.server.base.params.ShareToken;
 import datart.server.base.params.ViewExecuteParam;
-import datart.server.service.*;
 import datart.server.common.PoiConvertUtils;
+import datart.server.service.DataProviderService;
+import datart.server.service.FolderService;
+import datart.server.service.ShareService;
+import datart.server.service.VizService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -42,8 +45,6 @@ import javax.script.ScriptException;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -193,11 +194,10 @@ public abstract class ScheduleJob implements Job, Closeable {
         ShareCreateParam shareCreateParam = new ShareCreateParam();
         shareCreateParam.setVizId(vizId);
         shareCreateParam.setVizType(vizType);
-        shareCreateParam.setUsePassword(false);
         shareCreateParam.setExpiryDate(DateUtils.addHours(new Date(), 1));
         ShareToken share = shareService.createShare(schedule.getCreateBy(), shareCreateParam);
 
-        String url = Application.getWebRootURL() + "/share?eager=true&token=" + URLEncoder.encode(share.getToken(), StandardCharsets.UTF_8.name());
+        String url = Application.getWebRootURL() + "/share?eager=true&token=";
 
         log.info("image url {} ", url);
 

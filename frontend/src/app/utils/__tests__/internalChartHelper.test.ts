@@ -17,11 +17,12 @@
  */
 
 import { ChartDataSectionType, ChartDataViewFieldType } from 'app/constants';
-import { ChartStyleConfig } from 'app/types/ChartConfig';
+import { ChartDataSectionField, ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import {
   diffHeaderRows,
   flattenHeaderRowsWithoutGroupRow,
+  getColumnRenderOriginName,
   isInRange,
   isUnderUpperBound,
   mergeChartDataConfigs,
@@ -1354,6 +1355,31 @@ describe('Internal Chart Helper ', () => {
         { name: 'b', value: 1, id: 'b', category: 'field' },
         { name: 'c', value: 2, id: 'c', category: 'field' },
       ]);
+    });
+  });
+
+  describe('getColumnRenderOriginName Test', () => {
+    test('should get unknown name when config is empty', () => {
+      const config = undefined;
+      const result = getColumnRenderOriginName(config);
+      expect(result).toEqual('[unknown]');
+    });
+
+    test('should get name without aggregate', () => {
+      const config = {
+        colName: 'a',
+      };
+      const result = getColumnRenderOriginName(config as ChartDataSectionField);
+      expect(result).toEqual('a');
+    });
+
+    test('should get name with aggregate', () => {
+      const config = {
+        colName: 'a',
+        aggregate: 'AVG',
+      };
+      const result = getColumnRenderOriginName(config as ChartDataSectionField);
+      expect(result).toEqual('AVG(a)');
     });
   });
 });

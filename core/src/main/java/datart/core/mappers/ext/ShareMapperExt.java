@@ -15,31 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package datart.core.mappers.ext;
 
-package datart.server.base.params;
+import datart.core.entity.Share;
+import datart.core.mappers.ShareMapper;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
-import datart.core.base.consts.ShareAuthenticationMode;
-import lombok.Data;
+import java.util.List;
 
-@Data
-public class ShareToken {
+@Mapper
+public interface ShareMapperExt extends ShareMapper {
 
-    private String id;
+    @Select("SELECT * FROM `share` where org_id = #{orgId} ")
+    List<Share> listByOrg(String orgId);
 
-    private String authorizedToken;
-
-    private ShareAuthenticationMode authenticationMode;
-
-    private String authenticationCode;
-
-    private String username;
-
-    private String password;
-
-    public static ShareToken create(String token) {
-        ShareToken shareToken = new ShareToken();
-        shareToken.authorizedToken = token;
-        return shareToken;
-    }
+    @Select("SELECT * FROM `share` where create_by = #{userId} ")
+    List<Share> listByUser(String userId);
 
 }
