@@ -122,10 +122,11 @@ const ChartForShare: FC<{
   const handleCreateDownloadDataTask = async () => {
     const builder = new ChartDataRequestBuilder(
       {
-        id: chartPreview?.backendChart?.viewId,
+        id: chartPreview?.backendChart?.view.id || '',
+        config: chartPreview?.backendChart?.view.config || {},
         computedFields:
           chartPreview?.backendChart?.config?.computedFields || [],
-      } as any,
+      },
       chartPreview?.chartConfig?.datas,
       chartPreview?.chartConfig?.settings,
       {},

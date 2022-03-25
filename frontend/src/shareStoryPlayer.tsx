@@ -18,7 +18,7 @@
 
 import 'antd/dist/antd.min.css';
 import 'app/assets/fonts/iconfont.css';
-import { ShareStoryPlayer } from 'app/shareStoryPlayer';
+import { ShareStoryPlayerPage } from 'app/shareStoryPlayerPage';
 import 'core-js/features/string/replace-all';
 import React from 'react';
 import 'react-app-polyfill/ie11';
@@ -46,7 +46,7 @@ ReactDOM.render(
       <ThemeProvider>
         <HelmetProvider>
           <React.StrictMode>
-            <ShareStoryPlayer />
+            <ShareStoryPlayerPage />
           </React.StrictMode>
         </HelmetProvider>
       </ThemeProvider>
