@@ -43,6 +43,7 @@ import {
   getBoardChartRequests,
   getChartGroupColumns,
   getControllerDateValues,
+  getDataChartRequestParams,
   getDefaultWidgetName,
   getRGBAColor,
   getTheWidgetFiltersAndParams,
@@ -100,145 +101,141 @@ describe('dashboard.utils.index', () => {
   });
 });
 describe('should getDataChartRequestParams', () => {
-  it.skip('stack-area-chart', () => {
+  const opt = {
+    pageInfo: {
+      countTotal: true,
+      pageNo: 2,
+      pageSize: 100,
+    },
+  };
+  const view = {
+    config:
+      '{"concurrencyControl":true,"concurrencyControlMode":"DIRTYREAD","cache":false,"cacheExpires":0}',
+    createBy: '96f0c5013921456b9937ba528ba5b266',
+    createTime: '2022-02-18 18:34:31',
+    description: null,
+    id: 'viewId123',
+    index: 2,
+    isFolder: false,
+    model: '',
+    name: 'aiqiyi',
+    orgId: '90fa5a6c58fc45d9bf684e2177690d5b',
+    parentId: null,
+    permission: null,
+    script: 'SELECT * from aiqiyi',
+    sourceId: 'f7c09ac922ba4e75866c22fcfed5884d',
+    status: 1,
+    updateBy: null,
+    updateTime: null,
+    meta: [
+      {
+        type: 'NUMERIC',
+        category: 'field',
+        id: 'good_comment',
+      },
+      {
+        type: 'STRING',
+        category: 'field',
+        id: 'director',
+      },
+      {
+        type: 'STRING',
+        category: 'field',
+        id: 'actor',
+      },
+      {
+        type: 'STRING',
+        category: 'field',
+        id: 'type',
+      },
+      {
+        type: 'NUMERIC',
+        category: 'field',
+        id: 'total',
+      },
+      {
+        type: 'NUMERIC',
+        category: 'field',
+        id: 'bad_commet',
+      },
+      {
+        type: 'STRING',
+        category: 'field',
+        id: 'ID',
+      },
+      {
+        type: 'NUMERIC',
+        category: 'field',
+        id: 'amt_play',
+      },
+      {
+        type: 'STRING',
+        category: 'field',
+        id: 'release_year',
+      },
+      {
+        type: 'NUMERIC',
+        category: 'field',
+        id: 'section',
+      },
+      {
+        type: 'STRING',
+        category: 'field',
+        id: 'year',
+      },
+      {
+        type: 'STRING',
+        category: 'field',
+        id: 'name',
+      },
+      {
+        type: 'NUMERIC',
+        category: 'field',
+        id: 'num_score',
+      },
+      {
+        type: 'STRING',
+        category: 'field',
+        id: 'release_time',
+      },
+      {
+        type: 'STRING',
+        category: 'field',
+        id: 'area',
+      },
+      {
+        type: 'STRING',
+        category: 'field',
+        id: 'status',
+      },
+      {
+        type: 'STRING',
+        category: 'field',
+        id: 'month',
+      },
+      {
+        type: 'NUMERIC',
+        category: 'field',
+        id: 'score',
+      },
+      {
+        type: 'STRING',
+        category: 'field',
+        id: 'day',
+      },
+      {
+        type: 'STRING',
+        category: 'field',
+        id: 'language',
+      },
+    ],
+    computedFields: [],
+  };
+  it('should chart no filter', () => {
     const dataChart = {
-      id: 'widget_b3f707ebc67643fb8e56c853f302d836_11411a8ff5694719963d97ccad99b9bc',
-      name: '',
-      viewId: '3ca2a12f09c84c8ca1a5714fc6fa44d8',
-      orgId: '90fa5a6c58fc45d9bf684e2177690d5b',
-      config: {
-        chartConfig: {
-          datas: [
-            {
-              label: 'dimension',
-              key: 'dimension',
-              required: true,
-              type: 'group',
-              limit: 1,
-              rows: [
-                {
-                  uid: 'e1630ee5-ba5d-441d-9cd1-7e6bfac54781',
-                  colName: '城市',
-                  category: 'field',
-                  type: 'STRING',
-                },
-              ],
-            },
-            {
-              label: 'metrics',
-              key: 'metrics',
-              required: true,
-              type: 'aggregate',
-              limit: [1, 999],
-              rows: [
-                {
-                  uid: '76696cb5-b286-4441-aa94-5023f616c790',
-                  colName: 'GDP（亿元）',
-                  category: 'field',
-                  type: 'NUMERIC',
-                  aggregate: 'SUM',
-                },
-              ],
-            },
-            {
-              label: 'filter',
-              key: 'filter',
-              type: 'filter',
-              allowSameField: true,
-            },
-            {
-              label: 'colorize',
-              key: 'color',
-              type: 'color',
-              limit: [0, 1],
-            },
-            {
-              label: 'info',
-              key: 'info',
-              type: 'info',
-            },
-          ],
-          settings: [
-            {
-              label: 'viz.palette.setting.paging.title',
-              key: 'paging',
-              comType: 'group',
-              rows: [
-                {
-                  label: 'viz.palette.setting.paging.pageSize',
-                  key: 'pageSize',
-                  default: 1000,
-                  comType: 'inputNumber',
-                  options: {
-                    needRefresh: true,
-                    step: 1,
-                    min: 0,
-                  },
-                  value: 100,
-                },
-              ],
-            },
-            {
-              label: 'reference.title',
-              key: 'reference',
-              comType: 'group',
-              rows: [
-                {
-                  label: 'reference.open',
-                  key: 'panel',
-                  comType: 'reference',
-                  options: {
-                    type: 'modal',
-                  },
-                },
-              ],
-            },
-          ],
-          i18ns: [],
-        },
-        chartGraphId: 'stack-area-chart',
-        computedFields: [],
-        aggregation: true,
-      },
-      status: 1,
-      description: '',
-    };
-    const opt = {
-      pageInfo: {
-        pageNo: 1,
-      },
-    };
-    const res = {
-      viewId: '3ca2a12f09c84c8ca1a5714fc6fa44d8',
-      aggregators: [
-        {
-          column: 'GDP（亿元）',
-          sqlOperator: 'SUM',
-        },
-      ],
-      groups: [
-        {
-          column: '城市',
-        },
-      ],
-      filters: [],
-      orders: [],
-      pageInfo: {
-        countTotal: false,
-        pageNo: undefined,
-        pageSize: 100,
-      },
-      functionColumns: [],
-      columns: [],
-      script: false,
-    };
-    // expect(getDataChartRequestParams(dataChart as DataChart, opt)).toEqual(res);
-  });
-  it.skip('mingxi-table', () => {
-    const dataChart = {
-      id: 'widget_b3f707ebc67643fb8e56c853f302d836_8ad4845fe5724acfa27a8e910da90fb4',
-      name: '',
-      viewId: '64f14c71b487424eb165f0304e77a28e',
+      id: 'dataChartId123',
+      name: 'mingxi-table',
+      viewId: 'viewId123',
       orgId: '90fa5a6c58fc45d9bf684e2177690d5b',
       config: {
         chartConfig: {
@@ -255,58 +252,27 @@ describe('should getDataChartRequestParams', () => {
               type: 'mixed',
               rows: [
                 {
-                  uid: 'a2b004cb-dc90-4766-bdb7-d31817f87549',
-                  colName: 'name_level2',
-                  category: 'field',
-                  type: 'STRING',
-                },
-                {
-                  uid: '8d5d6af1-22a1-46b8-b64d-9030bc54a59d',
-                  colName: 'name_level1',
-                  category: 'field',
-                  type: 'STRING',
-                },
-                {
-                  uid: 'dec8e9de-1dc2-4d7f-b76a-068a081909dd',
-                  colName: '总访问次数',
+                  id: '665bc9f0-355c-442b-87be-efb39b0d47b5',
+                  index: 0,
+                  uid: '665bc9f0-355c-442b-87be-efb39b0d47b5',
+                  colName: 'total',
                   category: 'field',
                   type: 'NUMERIC',
                   aggregate: 'SUM',
                 },
+                {
+                  uid: 'e4a13a2f-3984-4eea-ba38-34b80b83c63c',
+                  colName: 'actor',
+                  category: 'field',
+                  type: 'STRING',
+                },
               ],
             },
             {
-              allowSameField: true,
-              disableAggregate: true,
-              actions: {
-                NUMERIC: ['filter'],
-                STRING: ['filter'],
-                DATE: ['filter'],
-              },
               label: 'filter',
               key: 'filter',
               type: 'filter',
-              rows: [
-                {
-                  uid: '7ab1f6b3-15be-4348-8869-b9cd79c1a336',
-                  colName: 'name_level3',
-                  category: 'field',
-                  type: 'STRING',
-                  aggregate: 'NONE',
-                  filter: {
-                    visibility: 'show',
-                    condition: {
-                      name: 'name_level3',
-                      type: 8,
-                      value: 'abc',
-                      visualType: 'STRING',
-                      operator: 'PREFIX_NOT_LIKE',
-                    },
-                    facade: 'text',
-                    width: 'auto',
-                  },
-                },
-              ],
+              disableAggregate: true,
             },
           ],
           styles: [],
@@ -316,16 +282,6 @@ describe('should getDataChartRequestParams', () => {
               key: 'paging',
               comType: 'group',
               rows: [
-                {
-                  label: 'paging.enablePaging',
-                  key: 'enablePaging',
-                  default: true,
-                  comType: 'checkbox',
-                  options: {
-                    needRefresh: true,
-                  },
-                  value: true,
-                },
                 {
                   label: 'paging.pageSize',
                   key: 'pageSize',
@@ -343,18 +299,114 @@ describe('should getDataChartRequestParams', () => {
                 },
               ],
             },
+          ],
+          i18ns: [],
+        },
+        chartGraphId: 'mingxi-table',
+        computedFields: [],
+        aggregation: true,
+      },
+      status: 1,
+      description: '',
+    };
+
+    const res = getDataChartRequestParams(dataChart as any, view as any, opt);
+    expect(res.viewId).toBe(dataChart.viewId);
+    expect(res.filters).toEqual([]);
+  });
+  it('should chart has filter', () => {
+    const dataChart = {
+      id: 'dataChartId123',
+      name: 'mingxi-table',
+      viewId: 'viewId123',
+      orgId: '90fa5a6c58fc45d9bf684e2177690d5b',
+      config: {
+        chartConfig: {
+          datas: [
             {
-              label: 'summary.title',
-              key: 'summary',
+              label: 'mixed',
+              key: 'mixed',
+              required: true,
+              type: 'mixed',
+              rows: [
+                {
+                  id: '665bc9f0-355c-442b-87be-efb39b0d47b5',
+                  index: 0,
+                  uid: '665bc9f0-355c-442b-87be-efb39b0d47b5',
+                  colName: 'total',
+                  category: 'field',
+                  type: 'NUMERIC',
+                  aggregate: 'SUM',
+                },
+                {
+                  uid: 'e4a13a2f-3984-4eea-ba38-34b80b83c63c',
+                  colName: 'actor',
+                  category: 'field',
+                  type: 'STRING',
+                },
+              ],
+            },
+            {
+              allowSameField: true,
+              disableAggregate: true,
+              actions: {
+                NUMERIC: ['filter'],
+                STRING: ['filter'],
+                DATE: ['filter'],
+              },
+              label: 'filter',
+              key: 'filter',
+              type: 'filter',
+              rows: [
+                {
+                  uid: 'fd58a4af-cc81-42c9-9255-fd9a7865f03e',
+                  colName: 'actor',
+                  category: 'field',
+                  type: 'STRING',
+                  aggregate: 'NONE',
+                  filter: {
+                    visibility: 'show',
+                    condition: {
+                      name: 'actor',
+                      type: 2,
+                      value: [
+                        {
+                          key: '丁勇岱',
+                          label: '丁勇岱',
+                          isSelected: true,
+                        },
+                      ],
+                      visualType: 'STRING',
+                      operator: 'IN',
+                    },
+                    facade: 'multiDropdownList',
+                    width: 'auto',
+                  },
+                },
+              ],
+            },
+          ],
+          styles: [],
+          settings: [
+            {
+              label: 'paging.title',
+              key: 'paging',
               comType: 'group',
               rows: [
                 {
-                  label: 'summary.aggregateFields',
-                  key: 'aggregateFields',
-                  comType: 'select',
+                  label: 'paging.pageSize',
+                  key: 'pageSize',
+                  default: 100,
+                  comType: 'inputNumber',
                   options: {
-                    mode: 'multiple',
+                    needRefresh: true,
+                    step: 1,
+                    min: 0,
                   },
+                  watcher: {
+                    deps: ['enablePaging'],
+                  },
+                  value: 100,
                 },
               ],
             },
@@ -368,62 +420,22 @@ describe('should getDataChartRequestParams', () => {
       status: 1,
       description: '',
     };
-    const opt = {
-      pageInfo: {
-        pageNo: 1,
+    const targetFilter = [
+      {
+        aggOperator: null,
+        column: 'actor',
+        sqlOperator: 'IN',
+        values: [
+          {
+            value: '丁勇岱',
+            valueType: 'STRING',
+          },
+        ],
       },
-      sorters: [
-        {
-          column: 'name_level1',
-          operator: 'ASC',
-        },
-      ],
-    };
-    const res = {
-      viewId: '64f14c71b487424eb165f0304e77a28e',
-      aggregators: [
-        {
-          column: '总访问次数',
-          sqlOperator: 'SUM',
-        },
-      ],
-      groups: [
-        {
-          column: 'name_level2',
-        },
-        {
-          column: 'name_level1',
-        },
-      ],
-      filters: [
-        {
-          aggOperator: null,
-          column: 'name_level3',
-          sqlOperator: 'PREFIX_NOT_LIKE',
-          values: [
-            {
-              value: 'abc',
-              valueType: 'STRING',
-            },
-          ],
-        },
-      ],
-      orders: [
-        {
-          column: 'name_level1',
-          operator: 'ASC',
-        },
-      ],
-      pageInfo: {
-        countTotal: true,
-        pageNo: undefined,
-        pageSize: 100,
-      },
-      functionColumns: [],
-      columns: [],
-      script: false,
-    };
-    // expect(getDataChartRequestParams(dataChart as DataChart, opt)).toEqual(res);
+    ];
+    const res = getDataChartRequestParams(dataChart as any, view as any, opt);
+    expect(res.viewId).toBe(dataChart.viewId);
+    expect(res.filters).toEqual(targetFilter);
   });
 });
 describe('getChartGroupColumns', () => {
