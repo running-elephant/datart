@@ -85,7 +85,7 @@ class BasicScatterChart extends Chart {
   }
 
   private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
-    const styleConfigs = config.styles;
+    const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const settingConfigs = config.settings;
     const groupConfigs = dataConfigs

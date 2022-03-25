@@ -108,7 +108,10 @@ class BasicGaugeChart extends Chart {
     };
   }
 
-  private getTooltip(style, aggConfigs) {
+  private getTooltip(
+    style,
+    aggConfigs,
+  ): { formatter: ({ data }: { data: any }) => string } {
     const [prefix, suffix] = getStyles(style, ['gauge'], ['prefix', 'suffix']);
     return {
       formatter: ({ data }) => {

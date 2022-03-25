@@ -553,7 +553,7 @@ export function getAxisLengthByConfig(config: ChartCommonConfig) {
   const left_ = getPositionLengthInfo(left);
   const right_ = getPositionLengthInfo(right);
 
-  const containerWidth = chart.getWidth();
+  const containerWidth = chart?.getWidth() || 0;
 
   // 左右边距
   const leftWidth =

@@ -20,10 +20,13 @@ import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import { ChartDataSectionType, FieldFormatType } from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
 import {
+  AxisLabel,
+  AxisLineStyle,
   ChartConfig,
   ChartDataConfig,
   ChartDataSectionField,
   ChartStyleConfig,
+  FontStyle,
   IFieldFormatConfig,
 } from 'app/types/ChartConfig';
 import {
@@ -42,6 +45,7 @@ import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
 import moment from 'moment';
 import { Debugger } from 'utils/debugger';
 import { isEmpty, isEmptyArray, meanValue, pipe } from 'utils/object';
+import { XAxis } from '../components/ChartGraph/BasicBarChart/types';
 import {
   flattenHeaderRowsWithoutGroupRow,
   getAxisLengthByConfig,
@@ -918,7 +922,7 @@ function getMarkArea2(
   };
 }
 
-export function getAxisLine(show, lineStyle) {
+export function getAxisLine(show: boolean, lineStyle?): AxisLineStyle {
   return {
     show,
     lineStyle,
@@ -927,11 +931,11 @@ export function getAxisLine(show, lineStyle) {
 
 export function getAxisLabel(
   show,
-  font: { fontFamily; fontSize; color },
+  font: FontStyle,
   interval = null,
   rotate = null,
   overflow = null,
-) {
+): AxisLabel {
   return {
     show,
     interval,
@@ -941,21 +945,25 @@ export function getAxisLabel(
   };
 }
 
-export function getSplitLine(show, lineStyle) {
+export function getSplitLine(show, lineStyle): AxisLineStyle {
   return {
     show,
     lineStyle,
   };
 }
 
-export function getAxisTick(show, lineStyle) {
+export function getAxisTick(show, lineStyle): AxisLineStyle {
   return {
     show,
     lineStyle,
   };
 }
 
-export function getNameTextStyle(fontFamily, fontSize, color) {
+export function getNameTextStyle(
+  fontFamily,
+  fontSize,
+  color,
+): { fontFamily: string; fontSize: number; color: string } {
   return {
     fontFamily,
     fontSize,
@@ -1279,7 +1287,13 @@ export function getScatterSymbolSizeFn(
   };
 }
 
-export function getGridStyle(styles) {
+export function getGridStyle(styles: ChartStyleConfig[]): {
+  left: string;
+  right: string;
+  bottom: string;
+  top: string;
+  containLabel: boolean;
+} {
   const [containLabel, left, right, bottom, top] = getStyles(
     styles,
     ['margin'],
@@ -1301,7 +1315,9 @@ export function getExtraSeriesRowData(data) {
   };
 }
 
-export function getExtraSeriesDataFormat(format?: IFieldFormatConfig) {
+export function getExtraSeriesDataFormat(format?: IFieldFormatConfig): {
+  format: IFieldFormatConfig | undefined;
+} {
   return {
     format,
   };
@@ -1417,7 +1433,7 @@ export function setOptionsByAxisLabelOverflow(config: ChartCommonConfig) {
   };
 
   // 如果是x轴需要截断，则取x轴数据
-  const axisOpts = !horizon ? xAxis : yAxis;
+  const axisOpts = (!horizon ? xAxis : yAxis) as XAxis;
   const axisName = !horizon ? 'xAxis' : 'yAxis';
 
   const data = axisOpts.data || [];
@@ -1495,7 +1511,7 @@ export const getAutoFunnelTopPosition = (config: {
   height: number;
   sort: 'ascending' | 'descending' | 'none';
   legendPos: string;
-}) => {
+}): number => {
   const { chart, height, sort, legendPos } = config;
   if (legendPos !== 'left' && legendPos !== 'right') return 8;
   if (!height) return 16;

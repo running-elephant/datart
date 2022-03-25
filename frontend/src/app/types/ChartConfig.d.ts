@@ -246,5 +246,69 @@ export type ChartConfig = {
   styles?: ChartStyleConfig[];
   settings?: ChartStyleConfig[];
   i18ns?: ChartI18NSectionConfig[];
-  env?: string;
 };
+
+export interface LineStyle {
+  color: string;
+  type: string;
+  width?: number;
+}
+
+export interface AxisLineStyle {
+  show: boolean;
+  lineStyle?: LineStyle;
+}
+
+export interface FontStyle {
+  color?: string;
+  fontFamily?: string;
+  fontSize?: number | string;
+  fontStyle?: string;
+  fontWeight?: string;
+  lineHeight?: number;
+}
+
+export type AxisLabel = {
+  hideOverlap?: boolean;
+  interval?: string | null;
+  overflow?: string | null;
+  rotate?: number | null;
+  show: boolean;
+  width?: string | number;
+  font?: FontStyle;
+} & FontStyle;
+
+export type LabelStyle = {
+  label: {
+    position?: string;
+    show: boolean;
+    font?: FontStyle;
+    formatter?: (params) => string;
+  } & FontStyle;
+  labelLayout?: { hideOverlap: boolean };
+};
+
+export interface LegendStyle {
+  bottom?: number;
+  right?: number;
+  top?: number;
+  left?: number;
+  width?: number;
+  height?: number | null;
+  type: string;
+  orient: string;
+  show: boolean;
+  textStyle: FontStyle;
+  selected?: {
+    [x: string]: boolean;
+  };
+  data?: string[];
+}
+
+export interface MarkLine {
+  data: any;
+}
+
+export interface MarkArea {
+  data: any;
+}
