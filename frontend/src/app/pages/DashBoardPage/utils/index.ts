@@ -34,7 +34,6 @@ import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
-import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import { getTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
@@ -94,19 +93,22 @@ export const getRGBAColor = color => {
   }
 };
 
-export const getDataChartRequestParams = (dataChart: DataChart, option) => {
+export const getDataChartRequestParams = (
+  dataChart: DataChart,
+  view: ChartDataView,
+  option,
+) => {
   const migratedChartConfig = migrateChartConfig(
     CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
   );
   const { datas, settings } = convertToChartConfigDTO(
     migratedChartConfig as ChartDetailConfigDTO,
   );
-
   const builder = new ChartDataRequestBuilder(
     {
-      id: dataChart?.viewId,
-      computedFields: dataChart?.config?.computedFields || [],
-    } as any,
+      ...view,
+      computedFields: dataChart.config.computedFields || [],
+    },
     datas,
     settings,
     {},
@@ -375,16 +377,17 @@ export const getChartWidgetRequestParams = (obj: {
     // errorHandle(`can\`t find Chart ${curWidget.datachartId}`);
     return null;
   }
+  // 有可能有的chart 没有viewId 例如富文本chart,有时候没有 viewId，不用取相关请求参数
   if (!dataChart.viewId) return null;
+
   const chartDataView = viewMap[dataChart?.viewId];
 
-  if (!chartDataView) {
-    // errorHandle(`can\`t find View ${dataChart?.viewId}`);
-    return null;
-  }
-  let requestParams = getDataChartRequestParams(dataChart, option);
-  const viewConfig = transformToViewConfig(chartDataView?.config);
-  requestParams = { ...requestParams, ...viewConfig };
+  let requestParams = getDataChartRequestParams(
+    dataChart,
+    chartDataView,
+    option,
+  );
+
   const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
     chartWidget: curWidget,
     widgetMap,
