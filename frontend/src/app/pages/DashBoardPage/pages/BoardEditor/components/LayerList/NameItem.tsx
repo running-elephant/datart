@@ -142,17 +142,14 @@ const NameItem: React.FC<NameItemProps> = ({
   const selectWidget = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
-
-      const { altKey, metaKey } = e;
-      const multipleKey = altKey || metaKey;
-
-      let newSelected = card.selected;
-      if (multipleKey || card.selected === false) {
-        newSelected = !newSelected;
+      let newSelected = !card.selected;
+      if (card.selected) {
+        newSelected = card.selected;
       }
+
       dispatch(
         editWidgetInfoActions.selectWidget({
-          multipleKey,
+          multipleKey: e.shiftKey,
           id: card.id,
           selected: newSelected,
         }),
@@ -162,7 +159,11 @@ const NameItem: React.FC<NameItemProps> = ({
   );
 
   return (
-    <ItemWrap selected={card.selected} onClick={selectWidget}>
+    <ItemWrap
+      selected={card.selected}
+      onMouseDown={selectWidget}
+      onClick={e => e.stopPropagation()}
+    >
       <div
         className={classNames('name-item', {
           'selected-Item': card.selected,

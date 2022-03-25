@@ -34,7 +34,11 @@ import {
   getControllerOptions,
   renderedWidgetAsync,
 } from '../../pages/Board/slice/thunk';
-import { VizRenderMode, Widget } from '../../pages/Board/slice/types';
+import {
+  VizRenderMode,
+  Widget,
+  WidgetConf,
+} from '../../pages/Board/slice/types';
 import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 import {
   clearActiveWidgets,
@@ -54,7 +58,7 @@ import {
 
 export interface BoardActionContextProps {
   widgetUpdate: (widget: Widget, editing: boolean) => void;
-
+  updateWidgetConfig: (config: WidgetConf, wid: string) => void;
   refreshWidgetsByController: (
     widget: Widget,
     editing: boolean,
@@ -89,6 +93,9 @@ export const BoardActionProvider: FC<{ id: string }> = memo(
         } else {
           dispatch(boardActions.updateWidget(widget));
         }
+      },
+      updateWidgetConfig: (config: WidgetConf, wid: string) => {
+        dispatch(editBoardStackActions.updateWidgetConfig({ wid, config }));
       },
       boardToggleAllowOverlap: (allow: boolean) => {
         dispatch(editBoardStackActions.toggleAllowOverlap(allow));

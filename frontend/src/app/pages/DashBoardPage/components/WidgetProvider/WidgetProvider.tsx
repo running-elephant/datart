@@ -18,7 +18,7 @@
 
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import produce from 'immer';
-import React, { createContext, FC, useContext, useMemo } from 'react';
+import React, { createContext, FC, memo, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectWidgetBy2Id } from '../../pages/Board/slice/selector';
 import { BoardState } from '../../pages/Board/slice/types';
@@ -29,6 +29,11 @@ import { BoardContext } from '../BoardProvider/BoardProvider';
 
 export const WidgetContext = createContext<Widget>({} as Widget);
 
+const WProvider: FC<{ val: Widget }> = memo(({ val, children }) => {
+  return (
+    <WidgetContext.Provider value={val}>{children}</WidgetContext.Provider>
+  );
+});
 export const WidgetProvider: FC<{ widgetId: string }> = ({
   widgetId,
   children,
@@ -58,7 +63,5 @@ export const WidgetProvider: FC<{ widgetId: string }> = ({
     }
     return widget;
   }, [editing, editWidget, boardWidget, boardId]);
-  return widget ? (
-    <WidgetContext.Provider value={widget}>{children}</WidgetContext.Provider>
-  ) : null;
+  return widget ? <WProvider val={widget}>{children}</WProvider> : null;
 };

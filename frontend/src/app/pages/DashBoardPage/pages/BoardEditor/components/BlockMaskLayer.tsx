@@ -19,7 +19,7 @@ import {
   Widget,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { INFO, SUCCESS } from 'styles/StyleConstants';
@@ -32,57 +32,50 @@ export interface BlockMaskLayerProps {
   handleClassName: string;
   cursor?: string;
 }
-const BlockMaskLayer: React.FC<BlockMaskLayerProps> = ({
-  widgetConfig,
-  widgetInfo,
-  handleClassName,
-  cursor,
-}) => {
-  const dispatch = useDispatch();
-  const showBlockMask = useSelector(selectShowBlockMask);
-  const selectWidget = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      e.stopPropagation();
+const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
+  ({ widgetConfig, widgetInfo, handleClassName, cursor }) => {
+    const dispatch = useDispatch();
+    const showBlockMask = useSelector(selectShowBlockMask);
+    const onMouseDown = useCallback(
+      (e: React.MouseEvent<HTMLDivElement>) => {
+        let newSelected = !widgetInfo.selected;
+        if (widgetInfo.selected) {
+          newSelected = widgetInfo.selected;
+        }
+        dispatch(
+          editWidgetInfoActions.selectWidget({
+            multipleKey: e.shiftKey,
+            id: widgetConfig.id,
+            selected: newSelected,
+          }),
+        );
+      },
+      [dispatch, widgetConfig.id, widgetInfo.selected],
+    );
 
-      let newSelected = !widgetInfo.selected;
-      if (widgetInfo.selected) {
-        newSelected = widgetInfo.selected;
+    const doubleClick = useCallback(() => {
+      if (widgetConfig.config.type === 'container') {
+        dispatch(editDashBoardInfoActions.changeShowBlockMask(false));
       }
+
       dispatch(
-        editWidgetInfoActions.selectWidget({
-          multipleKey: false,
+        editWidgetInfoActions.openWidgetEditing({
           id: widgetConfig.id,
-          selected: newSelected,
         }),
       );
-    },
-    [dispatch, widgetConfig.id, widgetInfo.selected],
-  );
-  const doubleClick = useCallback(() => {
-    // if (widgetConfig.config.type === 'chart') return;
-    if (widgetConfig.config.type === 'container') {
-      dispatch(editDashBoardInfoActions.changeShowBlockMask(false));
-    }
+    }, [dispatch, widgetConfig.id, widgetConfig.config.type]);
+    const border = useMemo(() => {
+      let border = '';
+      if (widgetInfo.selected) {
+        border = `2px solid ${INFO}`;
+      }
+      if (widgetInfo.editing) {
+        border = `2px solid ${SUCCESS}`;
+      }
+      return border;
+    }, [widgetInfo.editing, widgetInfo.selected]);
 
-    dispatch(
-      editWidgetInfoActions.openWidgetEditing({
-        id: widgetConfig.id,
-      }),
-    );
-  }, [dispatch, widgetConfig.id, widgetConfig.config.type]);
-  const border = useMemo(() => {
-    let border = '';
-    if (widgetInfo.selected) {
-      border = `2px solid ${INFO}`;
-    }
-    if (widgetInfo.editing) {
-      border = `2px solid ${SUCCESS}`;
-    }
-    return border;
-  }, [widgetInfo.editing, widgetInfo.selected]);
-
-  return (
-    <>
+    return (
       <MaskLayer
         cursor={cursor}
         front={showBlockMask && !widgetInfo.editing}
@@ -90,11 +83,11 @@ const BlockMaskLayer: React.FC<BlockMaskLayerProps> = ({
         selected={widgetInfo.selected}
         className={showBlockMask ? handleClassName : 'mask-layer'}
         onDoubleClick={doubleClick}
-        onClick={selectWidget}
+        onMouseDown={onMouseDown}
       ></MaskLayer>
-    </>
-  );
-};
+    );
+  },
+);
 export default BlockMaskLayer;
 interface MaskLayerProps {
   front: boolean;
