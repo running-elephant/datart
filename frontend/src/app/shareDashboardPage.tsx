@@ -24,11 +24,11 @@ import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter } from 'react-router-dom';
 import { GlobalStyles } from 'styles/globalStyles';
-import { LazyShareStoryPlayer } from './pages/SharePage/LoadableStoryPlayer';
+import { LazyShareDashboard } from './pages/SharePage/LoadableDashbaord';
 
 registerTheme('default', echartsDefaultTheme);
 
-export function ShareStoryPlayer() {
+export function ShareDashboardPage() {
   const { i18n } = useTranslation();
 
   return (
@@ -40,7 +40,7 @@ export function ShareStoryPlayer() {
         >
           <meta name="description" content="Data Art" />
         </Helmet>
-        <LazyShareStoryPlayer />
+        <LazyShareDashboard />
         <GlobalStyles />
       </BrowserRouter>
     </ConfigProvider>

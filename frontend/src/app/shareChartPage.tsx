@@ -28,7 +28,7 @@ import { LazyShareChart } from './pages/SharePage/LoadableChart';
 
 registerTheme('default', echartsDefaultTheme);
 
-export function ShareChart() {
+export function ShareChartPage() {
   const { i18n } = useTranslation();
 
   return (
