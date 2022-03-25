@@ -10,6 +10,7 @@ import datart.core.entity.poi.POISettings;
 import datart.server.base.dto.chart.ChartColumn;
 import datart.server.base.dto.chart.ChartConfigDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.util.CollectionUtils;
@@ -41,19 +42,17 @@ public class PoiConvertUtils {
 
     private static Map<Integer, ColumnSetting> dealColumnSetting(List<Column> columns, List<ChartColumn> dataColumns, Map<String, String> aliasMap) {
         Map<Integer, ColumnSetting> resultMap = new HashMap<>(columns.size());
-        Map<String, Integer> oriSort = new HashMap<>(columns.size());
+        Map<String, Integer> oriSort = new CaseInsensitiveMap(columns.size());
         for (int i = 0; i < columns.size(); i++) {
-            oriSort.put(columns.get(i).getName(), i);
+            Integer put = oriSort.put(columns.get(i).getName(), i);
+            if (put!=null){
+                log.warn("CaseInsensitive column may have conflicts: {}.", columns.get(i).getName());
+            }
         }
         for (int i = 0; i < dataColumns.size(); i++) {
             ChartColumn dataColumn = dataColumns.get(i);
             String columnName = dataColumn.getDisplayName();
             Integer index = oriSort.get(columnName);
-            // 兼容impala 聚合函数小写
-            if (index==null && StringUtils.isNotBlank(dataColumn.getAggregate())) {
-                String name = dataColumn.getAggregate().toLowerCase()+"("+dataColumn.getColName()+")";
-                index = oriSort.get(name);
-            }
             ColumnSetting res = new ColumnSetting();
             res.setIndex(i);
             res.setNumFormat(dataColumn.getNumFormat());
