@@ -140,10 +140,9 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
     const shareState = state.share;
     const builder = new ChartDataRequestBuilder(
       {
-        id: args.preview?.backendChart?.viewId,
-        computedFields:
-          args.preview?.backendChart?.config?.computedFields || [],
-      } as any,
+        ...args.preview?.backendChart?.view,
+        computedFields: args.preview?.backendChart?.config.computedFields || [],
+      },
       args.preview?.chartConfig?.datas,
       args.preview?.chartConfig?.settings,
       args.pageInfo,

@@ -189,10 +189,10 @@ const ChartPreviewBoard: FC<{
 
       const builder = new ChartDataRequestBuilder(
         {
-          id: chartPreview?.backendChart?.viewId,
+          ...chartPreview?.backendChart?.view,
           computedFields:
-            chartPreview?.backendChart?.config?.computedFields || [],
-        } as any,
+            chartPreview?.backendChart?.config.computedFields || [],
+        },
         chartPreview?.chartConfig?.datas,
         chartPreview?.chartConfig?.settings,
         {},
