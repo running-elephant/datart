@@ -800,7 +800,8 @@
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
         "shareLink": "分享",
-        "downloadData": "下载为 Excel"
+        "downloadData": "下载为 Excel",
+        "downloadPDF": "下载为 PDF"
       }
     },
     "board": {

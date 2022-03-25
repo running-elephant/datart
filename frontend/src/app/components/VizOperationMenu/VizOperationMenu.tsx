@@ -110,11 +110,7 @@ const VizOperationMenu: FC<{
 
       if (allowDownload && onDownloadDataLinkClick) {
         menus.push(
-          <Menu.Item
-            className="line"
-            key="downloadData"
-            icon={<CloudDownloadOutlined />}
-          >
+          <Menu.Item key="downloadData" icon={<CloudDownloadOutlined />}>
             <Popconfirm
               placement="left"
               title={t('common.confirm')}
@@ -125,6 +121,17 @@ const VizOperationMenu: FC<{
               {t('share.downloadData')}
             </Popconfirm>
           </Menu.Item>,
+          <Menu.Item key="downloadPDF" icon={<CloudDownloadOutlined />}>
+            <Popconfirm
+              placement="left"
+              title={t('common.confirm')}
+              onConfirm={onDownloadDataLinkClick}
+              okText={t('common.ok')}
+              cancelText={t('common.cancel')}
+            >
+              {t('share.downloadPDF')}
+            </Popconfirm>
+          </Menu.Item>,
           <Menu.Divider />,
         );
       }
@@ -132,7 +139,6 @@ const VizOperationMenu: FC<{
       if (allowManage && !isArchived && onPublish) {
         menus.push(
           <Menu.Item
-            className="line"
             key="publish"
             icon={<VerticalAlignBottomOutlined />}
             onClick={onPublish}
