@@ -22,39 +22,21 @@ import {
 import { Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { widgetToPositionAction } from '../../../slice/actions/actions';
-import { selectSelectedIds } from '../../../slice/selectors';
-export const ToTopBtn = () => {
+export const ToTopBtn = (props: { fn: () => void }) => {
   const t = useI18NPrefix(`viz.board.action`);
-  const selectedIds = useSelector(selectSelectedIds);
-  const dispatch = useDispatch();
-  const toTop = () => {
-    dispatch(widgetToPositionAction('top'));
-  };
   return (
     <Tooltip title={t('toTop')}>
-      <ToolbarButton
-        disabled={selectedIds.length !== 1}
-        onClick={toTop}
-        icon={<VerticalAlignTopOutlined />}
-      />
+      <ToolbarButton onClick={props.fn} icon={<VerticalAlignTopOutlined />} />
     </Tooltip>
   );
 };
-export const ToBottomBtn = () => {
+export const ToBottomBtn = (props: { fn: () => void }) => {
   const t = useI18NPrefix(`viz.board.action`);
-  const selectedIds = useSelector(selectSelectedIds);
-  const dispatch = useDispatch();
-  const toBottom = () => {
-    dispatch(widgetToPositionAction('bottom'));
-  };
+
   return (
     <Tooltip title={t('toBottom')}>
       <ToolbarButton
-        disabled={selectedIds.length !== 1}
-        onClick={toBottom}
+        onClick={props.fn}
         icon={<VerticalAlignBottomOutlined />}
       />
     </Tooltip>
