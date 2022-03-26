@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 import { Divider, Space } from 'antd';
+import { BoardActionContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardActionProvider';
+import useBoardEditorHotkeys from 'app/pages/DashBoardPage/hooks/useBoardEditorHotkeys';
 import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
 import { AddChart } from './AddChart/AddChart';
@@ -25,7 +27,6 @@ import { AddMedia } from './AddMedia/AddMedia';
 import { AllowOverlapBtn } from './AllowOverlap';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
 import { CopyBtn, PasteBtn } from './CopyPaste/CopyPaste';
-import { DeleteWidgetsBtn } from './DeleteWidgetsBtn';
 import { DeviceSwitcher } from './DeviceSwitch/DeviceSwitcher';
 import { ToBottomBtn, ToTopBtn } from './ToTopToBottom/ToTopToBottom';
 import { RedoBtn, UndoBtn } from './UndoRedo/UndoRedo';
@@ -35,7 +36,8 @@ export const ToolBar = () => {
     e.stopPropagation();
   };
   const { boardType } = useContext(BoardToolBarContext);
-
+  const { layerToTop, layerToBottom } = useContext(BoardActionContext);
+  useBoardEditorHotkeys();
   return (
     <Wrapper onClick={ssp}>
       <Space>
@@ -46,13 +48,11 @@ export const ToolBar = () => {
           <AddContainer />
           <Divider type="vertical" />
           <AddController />
-          <ToTopBtn />
-          <ToBottomBtn />
+          <ToTopBtn fn={layerToTop} />
+          <ToBottomBtn fn={layerToBottom} />
           <Divider type="vertical" />
           <UndoBtn />
           <RedoBtn />
-          <Divider type="vertical" />
-          <DeleteWidgetsBtn />
           <Divider type="vertical" />
           <CopyBtn />
           <PasteBtn />

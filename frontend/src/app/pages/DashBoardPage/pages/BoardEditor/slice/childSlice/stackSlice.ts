@@ -165,17 +165,17 @@ export const editBoardStackSlice = createSlice({
       const { rect } = state.widgetRecord[id].config;
       state.widgetRecord[id].config.rect = { ...rect, width, height };
     },
-
-    changeTwoWidgetIndex(
+    changeWidgetsIndex(
       state,
-      action: PayloadAction<{ curId: string; targetId: string }>,
+      action: PayloadAction<{ id: string; index: number }[]>,
     ) {
-      const { curId, targetId } = action.payload;
-      let temp = state.widgetRecord[curId].config.index;
-      state.widgetRecord[curId].config.index =
-        state.widgetRecord[targetId].config.index;
-      state.widgetRecord[targetId].config.index = temp;
+      const opts = action.payload;
+      opts.forEach(it => {
+        const { id, index } = it;
+        state.widgetRecord[id].config.index = index;
+      });
     },
+
     addWidgetToContainerWidget(
       state,
       action: PayloadAction<{

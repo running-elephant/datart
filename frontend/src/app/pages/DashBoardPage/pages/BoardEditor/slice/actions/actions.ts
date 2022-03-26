@@ -104,28 +104,34 @@ export const deleteWidgetsAction = () => (dispatch, getState) => {
 };
 
 /* widgetToPositionAsync */
-export const widgetToPositionAction =
+export const widgetsToPositionAction =
   (position: 'top' | 'bottom') => async (dispatch, getState) => {
     const editBoard = getState().editBoard as HistoryEditBoard;
     const widgetMap = editBoard.stack.present.widgetRecord;
 
-    let curId = Object.values(editBoard.widgetInfoRecord).find(
-      WidgetInfo => WidgetInfo.selected,
-    )?.id;
+    let curIds = Object.values(editBoard.widgetInfoRecord)
+      .filter(WidgetInfo => WidgetInfo.selected)
+      .map(item => item.id);
 
-    const sortedWidgets = Object.values(widgetMap)
-      .filter(item => !item.parentId)
+    if (curIds.length === 0) return;
+    const sortedWidgetsIndex = Object.values(widgetMap)
       .sort((w1, w2) => {
         return w1.config.index - w2.config.index;
-      });
-    let targetId: string = '';
-    if (position === 'top') {
-      targetId = sortedWidgets[sortedWidgets.length - 1].id;
-    } else {
-      targetId = sortedWidgets[0].id;
-    }
-    if (!curId || targetId === curId) return;
-    dispatch(editBoardStackActions.changeTwoWidgetIndex({ curId, targetId }));
+      })
+      .map(item => item.config.index);
+    const baseIndex =
+      position === 'top'
+        ? sortedWidgetsIndex[sortedWidgetsIndex.length - 1]
+        : sortedWidgetsIndex[0];
+    const opts = curIds.map((id, index) => {
+      const diff = index + 1;
+      const newIndex = position === 'top' ? baseIndex + diff : baseIndex - diff;
+      return {
+        id: id,
+        index: newIndex,
+      };
+    });
+    dispatch(editBoardStackActions.changeWidgetsIndex(opts));
   };
 
 export const updateWidgetControllerAction =
