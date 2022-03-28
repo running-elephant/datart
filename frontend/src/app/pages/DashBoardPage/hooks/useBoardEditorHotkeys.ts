@@ -22,16 +22,37 @@ import { BoardActionContext } from '../components/BoardProvider/BoardActionProvi
 export default function useBoardEditorHotkeys() {
   const { undo, redo, deleteActiveWidgets, layerToTop, layerToBottom } =
     useContext(BoardActionContext);
-  useHotkeys(
-    'ctrl+delete,command+delete,ctrl+backspace,command+backspace',
-    () => deleteActiveWidgets(),
-    [],
-  );
+  useHotkeys('delete,backspace', () => deleteActiveWidgets(), []);
   useHotkeys('ctrl+z,command+z', () => undo());
   useHotkeys('ctrl+shift+z,command+shift+z', () => redo());
-  useHotkeys('ctrl+e,command+e', e => {
-    layerToTop();
-    e.stopPropagation();
+  useHotkeys('ctrl+shift+up,command+shift+up', () => layerToTop());
+  useHotkeys('ctrl+shift+down,command+shift+down', () => layerToBottom());
+  //
+  useHotkeys('up', () => {
+    console.log('__ widgets up1');
   });
-  useHotkeys('ctrl+shift+B,command+shift+B', () => layerToBottom());
+  useHotkeys('shift+up', () => {
+    console.log('__ widgets up10');
+  });
+  //
+  useHotkeys('down', () => {
+    console.log('__ widgets down1');
+  });
+  useHotkeys('shift+down', () => {
+    console.log('__ widgets down10');
+  });
+  //
+  useHotkeys('left', () => {
+    console.log('__ widgets left1');
+  });
+  useHotkeys('shift+left', () => {
+    console.log('__ widgets left10');
+  });
+  //
+  useHotkeys('right', () => {
+    console.log('__ widgets right1');
+  });
+  useHotkeys('shift+right', () => {
+    console.log('__ widgets right10');
+  });
 }
