@@ -54,6 +54,7 @@ import {
 } from './constant';
 import DataModelBranch from './DataModelBranch';
 import DataModelNode from './DataModelNode';
+import { toModel } from './utils';
 
 const DataModelTree: FC = memo(() => {
   const t = useI18NPrefix('view');
@@ -502,29 +503,6 @@ const DataModelTree: FC = memo(() => {
       clonedHierarchy,
       columns.findIndex(c => c.name === clonedHierarchy.name),
     );
-  };
-
-  const toModel = (columns: Column[], ...additional) => {
-    return columns.concat(...additional)?.reduce((acc, cur, newIndex) => {
-      if (cur?.role === ColumnRole.Hierarchy && isEmptyArray(cur?.children)) {
-        return acc;
-      }
-      if (cur?.role === ColumnRole.Hierarchy && !isEmptyArray(cur?.children)) {
-        const orderedChildren = cur.children?.map((child, newIndex) => {
-          return {
-            ...child,
-            index: newIndex,
-          };
-        });
-        acc[cur.name] = Object.assign({}, cur, {
-          index: newIndex,
-          children: orderedChildren,
-        });
-      } else {
-        acc[cur.name] = Object.assign({}, cur, { index: newIndex });
-      }
-      return acc;
-    }, {});
   };
 
   const getPermissionButton = useCallback(
