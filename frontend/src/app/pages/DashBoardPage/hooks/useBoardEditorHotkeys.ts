@@ -20,13 +20,27 @@ import { useContext } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { BoardActionContext } from '../components/BoardProvider/BoardActionProvider';
 export default function useBoardEditorHotkeys() {
-  const { undo, redo, deleteActiveWidgets, layerToTop, layerToBottom } =
-    useContext(BoardActionContext);
+  const {
+    undo,
+    redo,
+    deleteActiveWidgets,
+    layerToTop,
+    layerToBottom,
+    copyWidgets,
+    pasteWidgets,
+  } = useContext(BoardActionContext);
+
   useHotkeys('delete,backspace', () => deleteActiveWidgets(), []);
+
   useHotkeys('ctrl+z,command+z', () => undo());
   useHotkeys('ctrl+shift+z,command+shift+z', () => redo());
+
   useHotkeys('ctrl+shift+up,command+shift+up', () => layerToTop());
   useHotkeys('ctrl+shift+down,command+shift+down', () => layerToBottom());
+
+  useHotkeys('ctrl+c,command+c', () => copyWidgets());
+  useHotkeys('ctrl+v,command+v', () => pasteWidgets());
+
   //
   useHotkeys('up', () => {
     console.log('__ widgets up1');
