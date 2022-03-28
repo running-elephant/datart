@@ -21,6 +21,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
+import { LayerList } from '../components/LayerList/LayerList';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
 import { FreeEditorWrapper } from './FreeEditorWrapper';
@@ -38,6 +39,7 @@ const FreeEditor: React.FC = () => {
       <Wrapper>
         <BoardToolBar />
         <Editor>
+          <LayerList />
           <FreeEditorWrapper />
           <SlideSetting />
         </Editor>

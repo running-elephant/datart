@@ -18,16 +18,16 @@
 
 import { Col, Form, Row } from 'antd';
 import {
+  ChartDataSectionType,
+  ControllerFacadeTypes,
+  ControllerVisibilityTypes,
+} from 'app/constants';
+import {
   ChartConfig,
   ChartDataSectionField,
-  ChartDataSectionType,
   FilterFieldAction,
 } from 'app/types/ChartConfig';
 import { ChartDTO } from 'app/types/ChartDTO';
-import {
-  ControllerFacadeTypes,
-  ControllerVisibilityTypes,
-} from 'app/types/FilterControlPanel';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { updateByKey } from 'app/utils/mutation';
 import { FilterSqlOperator } from 'globalConstants';

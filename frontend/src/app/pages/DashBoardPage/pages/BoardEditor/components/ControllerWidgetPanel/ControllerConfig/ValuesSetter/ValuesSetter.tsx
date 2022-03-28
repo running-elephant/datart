@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { Form, FormInstance, Select } from 'antd';
+import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { useCallback, useMemo } from 'react';
 import { ControllerValuesName, ValueOptionsName } from '..';
 import { DateControllerTypes, HasOptionsControlTypes } from '../../constants';

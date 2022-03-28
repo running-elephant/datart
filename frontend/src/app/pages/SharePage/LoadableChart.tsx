@@ -16,14 +16,9 @@
  * limitations under the License.
  */
 
-import { useEffect, useState } from 'react';
+import { defaultLazyLoad } from 'utils/loadable';
 
-export const useVisibleHidden = (timeNum: number = 0) => {
-  const [visible, setVisible] = useState<'visible' | 'hidden'>('hidden');
-  useEffect(() => {
-    setTimeout(() => {
-      setVisible('visible');
-    }, timeNum);
-  });
-  return visible;
-};
+export const LazyShareChart = defaultLazyLoad(
+  () => import('./ShareChart'),
+  module => module.default,
+);

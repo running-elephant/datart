@@ -28,8 +28,8 @@ import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { PRIMARY } from 'styles/StyleConstants';
-import { editWidgetInfoActions } from '../../../slice';
-import { NameCard } from './WidgetNameList';
+import { editWidgetInfoActions } from '../../slice';
+import { NameCard } from './LayerList';
 
 export interface NameItemProps {
   index: number;
@@ -142,17 +142,14 @@ const NameItem: React.FC<NameItemProps> = ({
   const selectWidget = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
-
-      const { altKey, metaKey } = e;
-      const multipleKey = altKey || metaKey;
-
-      let newSelected = card.selected;
-      if (multipleKey || card.selected === false) {
-        newSelected = !newSelected;
+      let newSelected = !card.selected;
+      if (card.selected) {
+        newSelected = card.selected;
       }
+
       dispatch(
         editWidgetInfoActions.selectWidget({
-          multipleKey,
+          multipleKey: e.shiftKey,
           id: card.id,
           selected: newSelected,
         }),
@@ -162,7 +159,11 @@ const NameItem: React.FC<NameItemProps> = ({
   );
 
   return (
-    <ItemWrap selected={card.selected} onClick={selectWidget}>
+    <ItemWrap
+      selected={card.selected}
+      onMouseDown={selectWidget}
+      onClick={e => e.stopPropagation()}
+    >
       <div
         className={classNames('name-item', {
           'selected-Item': card.selected,
@@ -171,7 +172,10 @@ const NameItem: React.FC<NameItemProps> = ({
         data-handler-id={handlerId}
         style={{ opacity }}
       >
-        {card.name || 'untitled-widget'}
+        <span className="name" title={card.name || 'untitled-widget'}>
+          {card.name || 'untitled-widget'}
+        </span>
+
         <WidgetActionDropdown widget={widget} />
       </div>
     </ItemWrap>
@@ -190,6 +194,12 @@ const ItemWrap = styled.div<{ selected: boolean }>`
     white-space: nowrap;
     cursor: move;
     background-color: ${p => p.theme.componentBackground};
+
+    .name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
   .selected-Item {
     background-color: ${p => p.theme.emphasisBackground};

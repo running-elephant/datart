@@ -59,6 +59,12 @@ function DemoCustomLineChart({ dHelper }) {
               default: false,
               comType: 'checkbox',
             },
+            {
+              label: 'graph.connectNulls',
+              key: 'connectNulls',
+              default: false,
+              comType: 'checkbox',
+            },
           ],
         },
         {
@@ -75,27 +81,9 @@ function DemoCustomLineChart({ dHelper }) {
             {
               label: 'label.position',
               key: 'position',
-              comType: 'select',
+              comType: 'labelPosition',
               default: 'top',
-              options: {
-                items: [
-                  { label: '上', value: 'top' },
-                  { label: '左', value: 'left' },
-                  { label: '右', value: 'right' },
-                  { label: '下', value: 'bottom' },
-                  { label: '内', value: 'inside' },
-                  { label: '内左', value: 'insideLeft' },
-                  { label: '内右', value: 'insideRight' },
-                  { label: '内上', value: 'insideTop' },
-                  { label: '内下', value: 'insideBottom' },
-                  { label: '内左上', value: 'insideTopLeft' },
-                  { label: '内左下', value: 'insideBottomLeft' },
-                  { label: '内右上', value: 'insideTopRight' },
-                  { label: '内右下', value: 'insideBottomRight' },
-                ],
-              },
             },
-
             {
               label: 'viz.palette.style.font',
               key: 'font',
@@ -136,16 +124,8 @@ function DemoCustomLineChart({ dHelper }) {
             {
               label: 'legend.position',
               key: 'position',
-              comType: 'select',
+              comType: 'legendPosition',
               default: 'right',
-              options: {
-                items: [
-                  { label: '右', value: 'right' },
-                  { label: '上', value: 'top' },
-                  { label: '下', value: 'bottom' },
-                  { label: '左', value: 'left' },
-                ],
-              },
             },
             {
               label: 'viz.palette.style.font',
@@ -464,6 +444,7 @@ function DemoCustomLineChart({ dHelper }) {
               title: '折线图',
               smooth: '平滑',
               step: '阶梯',
+              connectNulls: '连接空数据',
             },
             xAxis: {
               title: 'X轴',
@@ -527,6 +508,7 @@ function DemoCustomLineChart({ dHelper }) {
               title: 'Graph',
               smooth: 'Smooth',
               step: 'Step',
+              connectNulls: 'Connect Nulls',
             },
             xAxis: {
               title: 'X Axis',
@@ -818,12 +800,12 @@ function DemoCustomLineChart({ dHelper }) {
     },
 
     getSeriesStyle(styles) {
-      const [smooth, step] = dHelper.getStyles(
+      const [smooth, step, connectNulls] = dHelper.getStyles(
         styles,
         ['graph'],
-        ['smooth', 'step'],
+        ['smooth', 'step', 'connectNulls'],
       );
-      return { smooth, step };
+      return { smooth, step, connectNulls };
     },
   };
 }

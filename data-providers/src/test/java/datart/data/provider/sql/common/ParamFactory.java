@@ -40,14 +40,14 @@ import java.util.List;
 public class ParamFactory {
 
     private final static List<ScriptVariable> variables = Lists.newArrayList(
-            variable("部门", ValueType.STRING, VariableTypeEnum.PERMISSION, false, "销售部")
-            , variable("age", ValueType.NUMERIC, VariableTypeEnum.QUERY, false, "20")
-            , variable("max", ValueType.NUMERIC, VariableTypeEnum.QUERY, false, "100")
-            , variable("min", ValueType.NUMERIC, VariableTypeEnum.QUERY, false, "0")
-            , variable("str", ValueType.STRING, VariableTypeEnum.QUERY, false, "content")
-            , variable("datetime", ValueType.STRING, VariableTypeEnum.QUERY, false, "2020-01-01 00:00:00")
-            , variable("date", ValueType.DATE, VariableTypeEnum.QUERY, false, "2020-01-01 00:00:00")
-            , variable("where", ValueType.FRAGMENT, VariableTypeEnum.QUERY, false, "1=1")
+            variable("部门", ValueType.STRING, VariableTypeEnum.PERMISSION, false, "", "销售部")
+            , variable("age", ValueType.NUMERIC, VariableTypeEnum.QUERY, false, "", "20")
+            , variable("max", ValueType.NUMERIC, VariableTypeEnum.QUERY, false, "", "100")
+            , variable("min", ValueType.NUMERIC, VariableTypeEnum.QUERY, false, "", "0")
+            , variable("str", ValueType.STRING, VariableTypeEnum.QUERY, false, "", "content")
+            , variable("datetime", ValueType.STRING, VariableTypeEnum.QUERY, false, "","2020-01-01 00:00:00")
+            , variable("date", ValueType.DATE, VariableTypeEnum.QUERY, false,  "yyyy-MM-dd HH:mm:ss", "2020-01-01 00:00:00")
+            , variable("where", ValueType.FRAGMENT, VariableTypeEnum.QUERY, false, "", "1=1")
     );
 
     public static QueryScript getQueryScriptExample(String script) {
@@ -107,12 +107,13 @@ public class ParamFactory {
                 .build();
     }
 
-    private static ScriptVariable variable(String name, ValueType type, VariableTypeEnum variableType, boolean expression, String... values) {
+    private static ScriptVariable variable(String name, ValueType type, VariableTypeEnum variableType, boolean expression, String fmt, String... values) {
         ScriptVariable scriptVariable = new ScriptVariable();
         scriptVariable.setName(name);
         scriptVariable.setValueType(type);
         scriptVariable.setType(variableType);
         scriptVariable.setExpression(expression);
+        scriptVariable.setFormat(fmt);
         scriptVariable.setValues(Sets.newHashSet(values));
         return scriptVariable;
     }

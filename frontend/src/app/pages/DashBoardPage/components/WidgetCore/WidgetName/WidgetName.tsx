@@ -16,14 +16,18 @@
  * limitations under the License.
  */
 
-import React, { FC } from 'react';
+import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import {
   WidgetConf,
   WidgetNameConfig,
   WidgetType,
 } from '../../../pages/Board/slice/types';
-export const HideTitleTypes: WidgetType[] = ['query', 'reset', 'controller'];
+export const HideTitleTypes: Readonly<WidgetType[]> = [
+  'query',
+  'reset',
+  'controller',
+];
 
 export const LabelName: FC<{ config: WidgetConf }> = ({ config }) => {
   return (
@@ -36,7 +40,7 @@ export const LabelName: FC<{ config: WidgetConf }> = ({ config }) => {
 export const WidgetName: FC<{
   config: WidgetConf;
   zIndex?: number;
-}> = ({ config, zIndex }) => {
+}> = memo(({ config, zIndex }) => {
   if (HideTitleTypes.includes(config.type)) {
     return null;
   }
@@ -49,19 +53,19 @@ export const WidgetName: FC<{
       <LabelName config={config} />
     </StyledWrap>
   );
-};
+});
 
 const StyledWrap = styled.div<{ conf: WidgetNameConfig; zIndex?: number }>`
   width: 100%;
   line-height: 24px;
-  cursor: pointer;
   text-align: ${p => p.conf.textAlign};
+  cursor: pointer;
 `;
 const NameWrap = styled.span<{ conf: WidgetNameConfig }>`
+  font-family: ${p => p.conf.fontFamily};
   font-size: ${p => p.conf.fontSize}px;
+  font-style: ${p => p.conf.fontStyle};
+  font-weight: ${p => p.conf.fontWeight};
   color: ${p => p.conf.color};
   text-align: ${p => p.conf.textAlign};
-  font-family: ${p => p.conf.fontFamily};
-  font-weight: ${p => p.conf.fontWeight};
-  font-style: ${p => p.conf.fontStyle};
 `;

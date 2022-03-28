@@ -558,11 +558,13 @@
           "dotted": "点"
         },
         "nameLocation": {
+          "title": "标题位置",
           "start": "开始",
           "center": "中间",
           "end": "结束"
         },
         "legendType": {
+          "title": "图例类型",
           "plain": "普通",
           "scroll": "滚动"
         },
@@ -589,6 +591,23 @@
         },
         "lineHeight": {
           "default": "默认行高"
+        },
+        "position": {
+          "title": "位置",
+          "auto": "自动",
+          "right": "右",
+          "left": "左",
+          "top": "上",
+          "bottom": "下",
+          "inside": "内",
+          "insideLeft": "内左",
+          "insideRight": "内右",
+          "insideTop": "内上",
+          "insideBottom": "内下",
+          "insideTopLeft": "内左上",
+          "insideBottomLeft": "内左下",
+          "insideTopRight": "内右上",
+          "insideBottomRight": "内右下"
         }
       },
       "data": {

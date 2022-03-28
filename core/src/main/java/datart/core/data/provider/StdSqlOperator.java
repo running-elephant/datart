@@ -68,6 +68,13 @@ public enum StdSqlOperator {
     DAY_OF_MONTH("DAY_OF_MONTH"),
     DAY_OF_YEAR("DAY_OF_YEAR"),
 
+    // date aggregate
+    AGG_DATE_YEAR("AGG_DATE_YEAR"),
+    AGG_DATE_QUARTER("AGG_DATE_QUARTER"),
+    AGG_DATE_MONTH("AGG_DATE_MONTH"),
+    AGG_DATE_WEEK("AGG_DATE_WEEK"),
+    AGG_DATE_DAY("AGG_DATE_DAY"),
+
     // operator
     ADD("+"),
     SUBTRACT("/"),

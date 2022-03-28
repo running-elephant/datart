@@ -1,11 +1,10 @@
 import { RadioGroupOptionType } from 'antd/lib/radio';
+import { ChartDataViewFieldType, TimeFilterValueCategory } from 'app/constants';
 import {
   ControllerVisibleType,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
 import { RelationFilterValue } from 'app/types/ChartConfig';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
-import { TimeFilterValueCategory } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
 import { Moment, unitOfTime } from 'moment';

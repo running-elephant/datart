@@ -22,6 +22,16 @@ import {
 } from 'app/types/ChartConfig';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 
+export type ChartDataRequestFilter = {
+  aggOperator?: AggregateFieldActionType | null;
+  column: string;
+  sqlOperator: string;
+  values?: Array<{
+    value: string;
+    valueType: string;
+  }>;
+};
+
 export type ChartDataRequest = {
   viewId: string;
   aggregators: Array<{ column: string; sqlOperator: string }>;
@@ -50,32 +60,3 @@ export type ChartDataRequest = {
   vizName?: string;
   analytics?: Boolean;
 };
-
-export type ChartDataRequestFilter = {
-  aggOperator?: AggregateFieldActionType | null;
-  column: string;
-  sqlOperator: string;
-  values?: Array<{
-    value: string;
-    valueType: string;
-  }>;
-};
-
-export const transformToViewConfig = (viewConfig?: string) => {
-  const viewConfigMap = viewConfig ? JSON.parse(viewConfig) : {};
-  const obj = {};
-  if (viewConfig) {
-    const fields = [
-      'cache',
-      'cacheExpires',
-      'concurrencyControl',
-      'concurrencyControlMode',
-    ];
-    fields.forEach(v => {
-      obj[v] = viewConfigMap?.[v];
-    });
-  }
-  return obj;
-};
-
-export default ChartDataRequest;

@@ -124,6 +124,7 @@ const TitleHeader: FC = memo(() => {
 
       {allowShare && (
         <ShareLinkModal
+          vizType="DASHBOARD"
           visibility={showShareLinkModal}
           onOk={() => setShowShareLinkModal(false)}
           onCancel={() => setShowShareLinkModal(false)}

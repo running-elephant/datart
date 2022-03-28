@@ -16,26 +16,11 @@
  * limitations under the License.
  */
 
-import { View } from 'app/types/View';
-import { ChartDataViewMeta } from './ChartDataViewMeta';
-
-export enum ChartDataViewFieldType {
-  STRING = 'STRING',
-  NUMERIC = 'NUMERIC',
-  DATE = 'DATE',
+export enum FormGroupLayoutMode {
+  INNER = 'inner',
+  OUTER = 'outter',
 }
 
-export enum ChartDataViewFieldCategory {
-  Field = 'field',
-  Variable = 'variable',
-  ComputedField = 'computedField',
-  AggregateComputedField = 'aggregateComputedField',
+export enum FormItemComponentType {
+  MODAL = 'modal',
 }
-
-export type ChartDataView = Omit<View, 'model'> & {
-  meta?: ChartDataViewMeta[];
-  computedFields?: ChartDataViewMeta[];
-  orgId?: string;
-};
-
-export default ChartDataView;

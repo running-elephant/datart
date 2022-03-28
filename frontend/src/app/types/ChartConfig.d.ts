@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { AggregateFieldActionType, FieldFormatType } from 'app/constants';
 import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
@@ -30,33 +31,6 @@ import {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
 } from './ChartDataView';
-
-export enum SortActionType {
-  NONE = 'NONE',
-  ASC = 'ASC',
-  DESC = 'DESC',
-  CUSTOMIZE = 'CUSTOMIZE',
-}
-
-export enum FieldFormatType {
-  DEFAULT = 'default',
-  NUMERIC = 'numeric',
-  CURRENCY = 'currency',
-  PERCENTAGE = 'percentage',
-  SCIENTIFIC = 'scientificNotation',
-  DATE = 'date',
-  CUSTOM = 'custom',
-}
-
-export enum AggregateFieldActionType {
-  NONE = 'NONE',
-  SUM = 'SUM',
-  AVG = 'AVG',
-  COUNT = 'COUNT',
-  COUNT_DISTINCT = 'COUNT_DISTINCT',
-  MAX = 'MAX',
-  MIN = 'MIN',
-}
 
 export type FilterFieldAction = {
   condition?: FilterCondition;
@@ -118,101 +92,7 @@ export type RelationFilterValue = {
   children?: RelationFilterValue[];
 };
 
-export const FilterRelationType = {
-  AND: 'and',
-  OR: 'or',
-  BETWEEN: 'between',
-  IN: 'in',
-};
-
-export enum FilterConditionType {
-  // Real Filters
-  List = 1 << 1,
-  Customize = 1 << 2,
-  Condition = 1 << 3,
-  RangeValue = 1 << 4,
-  Value = 1 << 5,
-  RangeTime = 1 << 6,
-  RecommendTime = 1 << 7,
-  Time = 1 << 8,
-  Tree = 1 << 9,
-
-  // Logic Filters, and type of `Filter` includes all Real Filters
-  Filter = List |
-    Condition |
-    Customize |
-    RangeValue |
-    Value |
-    RangeTime |
-    RecommendTime |
-    Time |
-    Tree,
-  Relation = 1 << 50,
-}
-
 export type AggregateLimit = Pick<typeof AggregateFieldActionType, 'COUNT'>;
-
-export const ChartDataSectionFieldActionType = {
-  Sortable: 'sortable',
-  Alias: 'alias',
-  Format: 'format',
-  Aggregate: 'aggregate',
-  AggregateLimit: 'aggregateLimit',
-  Filter: 'filter',
-  CategoryFilter: 'categoryFilter',
-  Colorize: 'colorize',
-  ColorRange: 'colorRange',
-  ColorizeSingle: 'colorSingle',
-  Size: 'size',
-};
-
-export const AggregateFieldSubAggregateType = {
-  [ChartDataSectionFieldActionType.Aggregate]: [
-    AggregateFieldActionType.SUM,
-    AggregateFieldActionType.AVG,
-    AggregateFieldActionType.COUNT,
-    AggregateFieldActionType.COUNT_DISTINCT,
-    AggregateFieldActionType.MAX,
-    AggregateFieldActionType.MIN,
-  ],
-  [ChartDataSectionFieldActionType.AggregateLimit]: [
-    AggregateFieldActionType.COUNT,
-    AggregateFieldActionType.COUNT_DISTINCT,
-  ],
-};
-
-export const ChartStyleSectionComponentType = {
-  CHECKBOX: 'checkbox',
-  INPUT: 'input',
-  SWITCH: 'switch',
-  SELECT: 'select',
-  FONT: 'font',
-  FONTFAMILY: 'fontFamily',
-  FONTSIZE: 'fontSize',
-  FONTCOLOR: 'fontColor',
-  FONTSTYLE: 'fontStyle',
-  FONTWEIGHT: 'fontWeight',
-  INPUTNUMBER: 'inputNumber',
-  INPUTPERCENTAGE: 'inputPercentage',
-  SLIDER: 'slider',
-  GROUP: 'group',
-  REFERENCE: 'reference',
-  TABS: 'tabs',
-  LISTTEMPLATE: 'listTemplate',
-  TABLEHEADER: 'tableHeader',
-  LINE: 'line',
-  MARGIN_WIDTH: 'marginWidth',
-  TEXT: 'text',
-  CONDITIONALSTYLE: 'conditionalStylePanel',
-  RADIO: 'radio',
-
-  // Customize Component
-  FontAlignment: 'fontAlignment',
-  NameLocation: 'nameLocation',
-  LegendType: 'legendType',
-  ScorecardListTemplate: 'scorecardListTemplate',
-  ScorecardConditionalStyle: 'scorecardConditionalStyle',
-};
 
 export type ChartConfigBase = {
   label?: string;
@@ -297,16 +177,6 @@ export type ChartDataConfig = ChartConfigBase & {
   // NOTE: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
 };
-
-export enum ChartDataSectionType {
-  GROUP = 'group',
-  AGGREGATE = 'aggregate',
-  MIXED = 'mixed',
-  FILTER = 'filter',
-  COLOR = 'color',
-  INFO = 'info',
-  SIZE = 'size',
-}
 
 export type ChartStyleConfig = ChartConfigBase & ChartStyleSectionGroup & {};
 

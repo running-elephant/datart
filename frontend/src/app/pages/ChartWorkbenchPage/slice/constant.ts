@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 
-import { SharePage } from './SharePage';
-
-export default SharePage;
+export const ChartConfigReducerActionType = {
+  INIT: 'init',
+  STYLE: 'style',
+  DATA: 'data',
+  SETTING: 'setting',
+  I18N: 'i18n',
+};

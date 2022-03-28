@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartDataSectionType } from 'app/constants';
+import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getDefaultThemeColor,
@@ -79,7 +80,10 @@ class WordCloudChart extends Chart {
   }
 
   onResize(opt: any, context): void {
+    this.chart?.clear();
     this.chart?.resize(context);
+    const newOptions = this.getOptions(opt.dataset, opt.config);
+    this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
   getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {

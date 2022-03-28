@@ -16,14 +16,15 @@
  * limitations under the License.
  */
 import { ChartEditorProps } from 'app/components/ChartEditor';
+import {
+  ChartDataViewFieldCategory,
+  ChartDataViewFieldType,
+  ControllerFacadeTypes,
+} from 'app/constants';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDatasetMeta } from 'app/types/ChartDataSet';
-import ChartDataView, {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+import ChartDataView from 'app/types/ChartDataView';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
 import { ChartDataSectionField } from '../../../../../types/ChartConfig';
@@ -31,6 +32,7 @@ import { View } from '../../../../../types/View';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import {
   BorderStyleType,
+  LAYOUT_COLS_KEYS,
   LAYOUT_COLS_MAP,
   ScaleModeType,
   TextAlignType,
@@ -99,6 +101,7 @@ export interface DashboardConfig {
   gridStep: [number, number];
   scaleMode: ScaleModeType;
 }
+export type ColsKeyType = typeof LAYOUT_COLS_KEYS[number];
 export const BoardTypes = ['auto', 'free'] as const;
 BoardTypes.includes('auto');
 export type BoardType = typeof BoardTypes[number];
@@ -398,8 +401,8 @@ export interface DataChart {
   name: string;
   orgId?: string;
   projectId?: string;
-  publish?: boolean; //有用吗？
-  type?: string; //待修改
+  publish?: boolean; //？
+  type?: string; //?
   viewId: string;
   view?: any;
   status: any;

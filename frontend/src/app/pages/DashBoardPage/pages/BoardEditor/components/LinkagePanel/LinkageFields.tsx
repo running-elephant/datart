@@ -17,10 +17,11 @@
  */
 import { LinkOutlined } from '@ant-design/icons';
 import { Divider, Empty, Form, FormInstance, Select } from 'antd';
+import { ChartDataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
-import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
+import ChartDataView from 'app/types/ChartDataView';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 const { Option } = Select;

@@ -65,8 +65,9 @@ FIREBIRD:
 H2:
   db-type: H2
   name: H2
-  driver-class:
-  url-prefix:
+  driver-class: org.h2.Driver
+  url-prefix: jdbc:h2
+  sql-dialect: datart.data.provider.calcite.dialect.H2Dialect
 HIVE:
   db-type: HIVE
   name: HIVE

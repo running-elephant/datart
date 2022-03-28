@@ -17,6 +17,7 @@
  */
 package datart.data.provider.calcite.dialect;
 
+import datart.core.data.provider.StdSqlOperator;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.dialect.MssqlSqlDialect;
@@ -44,7 +45,41 @@ public class MsSqlStdOperatorSupport extends MssqlSqlDialect implements SqlStdOp
     }
 
     @Override
+    public void unparseCall(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
+        if (isStdSqlOperator(call) && unparseStdSqlOperator(writer, call, leftPrec, rightPrec)) {
+            return;
+        }
+        super.unparseCall(writer, call, leftPrec, rightPrec);
+    }
+
+    @Override
     public boolean unparseStdSqlOperator(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
+        StdSqlOperator operator = symbolOf(call.getOperator().getName());
+        String column = "";
+        switch (operator) {
+            case AGG_DATE_YEAR:
+                column = call.getOperandList().get(0).toString();
+                writer.print("YEAR(" + column + ")");
+                return true;
+            case AGG_DATE_QUARTER:
+                column = call.getOperandList().get(0).toString();
+                writer.print("CONCAT_WS('-',YEAR("+column+"),(month("+column+")+2)/3)");
+                return true;
+            case AGG_DATE_MONTH:
+                column = call.getOperandList().get(0).toString();
+                writer.print("FORMAT(" + column + ",'yyyy-MM')");
+                return true;
+            case AGG_DATE_WEEK:
+                column = call.getOperandList().get(0).toString();
+                writer.print("CONCAT_WS('-', YEAR("+column+"), RIGHT(100+DATEPART(ww,"+column+"),2))");
+                return true;
+            case AGG_DATE_DAY:
+                column = call.getOperandList().get(0).toString();
+                writer.print("FORMAT(" + column + ",'yyyy-MM-dd')");
+                return true;
+            default:
+                break;
+        }
         return false;
     }
 }

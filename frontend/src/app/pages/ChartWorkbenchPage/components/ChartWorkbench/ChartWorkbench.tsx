@@ -27,10 +27,7 @@ import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import {
-  dateFormatSelector,
-  languageSelector,
-} from '../../slice/workbenchSlice';
+import { dateFormatSelector, languageSelector } from '../../slice/selectors';
 import ChartHeaderPanel from '../ChartHeaderPanel';
 import ChartOperationPanel from '../ChartOperationPanel';
 

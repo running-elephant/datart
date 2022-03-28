@@ -25,8 +25,9 @@ import {
 import { updateBy, updateByAction } from 'app/utils/mutation';
 import { FC, memo, useRef, useState } from 'react';
 import { AssignDeep, CloneValueDeep, isEmpty } from 'utils/object';
+import { FormGroupLayoutMode } from '../constants';
 import GroupLayout from '../Layout/GroupLayout';
-import { GroupLayoutMode, ItemLayoutProps } from '../types';
+import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
 const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
@@ -132,7 +133,7 @@ const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         <GroupLayout
           ancestors={[]}
           key={r.key}
-          mode={GroupLayoutMode.INNER}
+          mode={FormGroupLayoutMode.INNER}
           data={r}
           translate={t}
           onChange={handleChildComponentUpdate(r.key)}

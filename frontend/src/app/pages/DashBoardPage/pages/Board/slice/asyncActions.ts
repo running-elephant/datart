@@ -18,7 +18,7 @@
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
-import ChartDataRequest from 'app/types/ChartDataRequest';
+import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { boardActions } from '.';
 import { getBoardChartRequests } from '../../../utils';

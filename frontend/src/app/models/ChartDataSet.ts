@@ -16,12 +16,8 @@
  * limitations under the License.
  */
 
-import {
-  ChartDataConfig,
-  ChartDataSectionField,
-  ChartDataSectionType,
-  SortActionType,
-} from 'app/types/ChartConfig';
+import { ChartDataSectionType, SortActionType } from 'app/constants';
+import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import {
   ChartDatasetMeta,
   IChartDataSet,

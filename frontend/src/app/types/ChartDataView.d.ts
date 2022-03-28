@@ -16,12 +16,13 @@
  * limitations under the License.
  */
 
-import { message } from 'antd';
+import { View } from 'app/types/View';
+import { ChartDataViewMeta } from './ChartDataViewMeta';
 
-export function rejectedActionMessageHandler(_, action) {
-  if (action?.type === 'workbench/fetchDataSetAction/rejected') {
-    message.error(action?.payload?.message);
-  } else if (action?.error) {
-    message.error(action?.error.message);
-  }
-}
+export type ChartDataView = Omit<View, 'model'> & {
+  meta?: ChartDataViewMeta[];
+  computedFields?: ChartDataViewMeta[];
+  orgId?: string;
+};
+
+export default ChartDataView;

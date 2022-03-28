@@ -73,7 +73,9 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
   const dataChart = useSelector((state: { board: BoardState }) =>
     selectDataChartById(state, curWidget?.datachartId),
   );
-  const chartGroupColumns = getChartGroupColumns(dataChart);
+  const chartGroupColumns = getChartGroupColumns(
+    dataChart?.config?.chartConfig?.datas,
+  );
 
   const formItemStyles = {
     labelCol: { span: 4 },

@@ -18,7 +18,7 @@
 
 import { Collapse } from 'antd';
 import { GroupLayout } from 'app/components';
-import { GroupLayoutMode } from 'app/components/FormGenerator/types';
+import { FormGroupLayoutMode } from 'app/components/FormGenerator/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';
@@ -43,8 +43,8 @@ const ChartSettingConfigPanel: FC<{
               ancestors={[index]}
               mode={
                 c.comType === 'group'
-                  ? GroupLayoutMode.INNER
-                  : GroupLayoutMode.OUTER
+                  ? FormGroupLayoutMode.INNER
+                  : FormGroupLayoutMode.OUTER
               }
               data={c}
               translate={t}

@@ -1,4 +1,4 @@
-import { WorkbenchState } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { WorkbenchState } from 'app/pages/ChartWorkbenchPage/slice/type';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import { MemberState } from 'app/pages/MainPage/pages/MemberPage/slice/types';

@@ -16,11 +16,8 @@
  * limitations under the License.
  */
 
-import {
-  ChartStyleConfig,
-  ChartStyleSectionComponentType,
-  ChartStyleSectionRow,
-} from 'app/types/ChartConfig';
+import { ChartStyleSectionComponentType } from 'app/constants';
+import { ChartStyleConfig, ChartStyleSectionRow } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useEffect } from 'react';
 import styled from 'styled-components/macro';
@@ -55,6 +52,8 @@ import {
   ConditionalStylePanel,
   DataReferencePanel,
   FontAlignment,
+  LabelPosition,
+  LegendPosition,
   LegendType,
   ListTemplatePanel,
   NameLocation,
@@ -179,8 +178,12 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <FontAlignment {...props} />;
         case ChartStyleSectionComponentType.NameLocation:
           return <NameLocation {...props} />;
+        case ChartStyleSectionComponentType.LabelPosition:
+          return <LabelPosition {...props} />;
         case ChartStyleSectionComponentType.LegendType:
           return <LegendType {...props} />;
+        case ChartStyleSectionComponentType.LegendPosition:
+          return <LegendPosition {...props} />;
         case ChartStyleSectionComponentType.ScorecardConditionalStyle:
           return <ScorecardConditionalStylePanel {...props} />;
         default:

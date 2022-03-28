@@ -18,9 +18,10 @@
 
 import { CheckOutlined } from '@ant-design/icons';
 import { Col, Menu, Radio, Row, Space } from 'antd';
+import { SortActionType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import DraggableList from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/SortAction/DraggableList';
-import { ChartDataSectionField, SortActionType } from 'app/types/ChartConfig';
+import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { transformToDataSet } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';

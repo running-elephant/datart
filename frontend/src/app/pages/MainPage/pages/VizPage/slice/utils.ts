@@ -1,5 +1,5 @@
-import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+import { ChartDataSectionType, ControllerFacadeTypes } from 'app/constants';
+import { ChartConfig } from 'app/types/ChartConfig';
 import { FilterSearchParams } from './types';
 
 const valueTransder = {
@@ -33,6 +33,7 @@ const valueTransder = {
     }
   },
 };
+
 export const transferChartConfig = (
   chartConfig?: ChartConfig,
   params?: FilterSearchParams,

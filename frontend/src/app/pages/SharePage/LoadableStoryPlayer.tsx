@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-export enum ChartLifecycle {
-  MOUNTED = 'mounted',
-  UPDATED = 'updated',
-  RESIZE = 'resize',
-  UNMOUNTED = 'unmount',
-}
+import { defaultLazyLoad } from 'utils/loadable';
+
+export const LazyShareStoryPlayer = defaultLazyLoad(
+  () => import('./ShareStoryPlayer'),
+  module => module.default,
+);

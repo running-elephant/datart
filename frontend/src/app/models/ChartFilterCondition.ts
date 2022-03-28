@@ -16,11 +16,8 @@
  * limitations under the License.
  */
 
-import {
-  FilterCondition,
-  FilterConditionType,
-  FilterRelationType,
-} from 'app/types/ChartConfig';
+import { FilterConditionType, FilterRelationType } from 'app/constants';
+import { FilterCondition } from 'app/types/ChartConfig';
 import { FilterSqlOperator } from 'globalConstants';
 
 class ChartFilterCondition implements FilterCondition {
@@ -28,7 +25,7 @@ class ChartFilterCondition implements FilterCondition {
   type = FilterConditionType.Filter;
   value?;
   visualType = '';
-  operator?: string;
+  operator?: any;
   children?: ChartFilterCondition[];
 
   constructor(condition?: FilterCondition) {
@@ -38,6 +35,7 @@ class ChartFilterCondition implements FilterCondition {
       this.value = condition.value;
       this.visualType = condition.visualType;
       this.operator = condition.operator;
+      // TODO(Stephen): really need this? to be avoid recursive constructor
       this.children = (condition.children || []).map(
         child => new ChartFilterCondition(child),
       );
@@ -75,7 +73,7 @@ class ChartFilterCondition implements FilterCondition {
     }
   }
 
-  appendChild(index?: number, type?: FilterConditionType) {
+  appendChild(index?: number) {
     if (this.type === FilterConditionType.Relation) {
       if (index === null || index === undefined) {
         this.children = (this.children || []).concat(
@@ -86,10 +84,7 @@ class ChartFilterCondition implements FilterCondition {
       }
     } else {
       this.children = [
-        new ConditionBuilder(this)
-          .setOperator(this.operator)
-          .setValue(this.value)
-          .asFilter(),
+        new ConditionBuilder(this).asFilter(),
         new ConditionBuilder(this).asFilter(),
       ];
       this.type = FilterConditionType.Relation;
@@ -192,11 +187,12 @@ export class ConditionBuilder {
   }
 
   asSingleOrRangeValue(name?, sqlType?) {
-    const type =
-      this.condition.operator === FilterSqlOperator.Between
-        ? FilterConditionType.RangeValue
-        : FilterConditionType.Value;
-    this.condition.type = type;
+    this.condition.type = [
+      FilterSqlOperator.Between,
+      FilterSqlOperator.NotBetween,
+    ].includes(this.condition.operator as FilterSqlOperator)
+      ? FilterConditionType.RangeValue
+      : FilterConditionType.Value;
     this.condition.name = name || this.condition.name;
     this.condition.visualType = sqlType || this.condition.visualType;
     return this.condition;

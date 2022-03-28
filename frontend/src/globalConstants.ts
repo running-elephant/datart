@@ -117,17 +117,6 @@ export const CHART_LINE_STYLES = [
   { name: 'viz.palette.style.lineStyles.dotted', value: 'dotted' },
 ];
 
-export const CHART_NAME_LOCATION = [
-  { name: 'nameLocation.start', value: 'start' },
-  { name: 'nameLocation.center', value: 'center' },
-  { name: 'nameLocation.end', value: 'end' },
-];
-
-export const CHART_LEGEND_TYPE = [
-  { name: 'legendType.plain', value: 'plain' },
-  { name: 'legendType.scroll', value: 'scroll' },
-];
-
 export const CHART_LINE_WIDTH = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 export const CHART_DRAG_ELEMENT_TYPE = {

@@ -34,8 +34,9 @@ import {
   resetValue,
 } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
+import { FormGroupLayoutMode } from '../constants';
 import GroupLayout from '../Layout/GroupLayout';
-import { GroupLayoutMode, ItemLayoutProps } from '../types';
+import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
 const { TabPane } = Tabs;
@@ -149,7 +150,7 @@ const BasicUnControlledTabPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         <GroupLayout
           ancestors={[index]}
           key={r.key}
-          mode={GroupLayoutMode.INNER}
+          mode={FormGroupLayoutMode.INNER}
           data={r}
           translate={t}
           dataConfigs={dataConfigs}

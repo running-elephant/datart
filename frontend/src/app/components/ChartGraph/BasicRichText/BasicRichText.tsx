@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
+import { ChartDataSectionType } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
-import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,

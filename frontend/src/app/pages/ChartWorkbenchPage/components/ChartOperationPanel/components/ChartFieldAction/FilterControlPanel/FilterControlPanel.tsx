@@ -18,19 +18,17 @@
 
 import { Input, Select } from 'antd';
 import { FormItemEx } from 'app/components';
-import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import { ConditionBuilder } from 'app/models/ChartFilterCondition';
 import {
   AggregateFieldActionType,
-  ChartDataConfig,
-  ChartDataSectionField,
-} from 'app/types/ChartConfig';
-import ChartDataSetDTO from 'app/types/ChartDataSet';
-import ChartDataView, {
   ChartDataViewFieldCategory,
   ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
-import { ControllerVisibilityTypes } from 'app/types/FilterControlPanel';
+  ControllerVisibilityTypes,
+} from 'app/constants';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
+import { ConditionBuilder } from 'app/models/ChartFilterCondition';
+import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
+import ChartDataView from 'app/types/ChartDataView';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { CONTROLLER_WIDTH_OPTIONS } from 'globalConstants';
@@ -294,7 +292,7 @@ const FilterControlPanel: FC<
             >
               <FilterFacadeConfiguration
                 i18nPrefix={customizeI18NPrefix}
-                category={config.category}
+                category={config.category as string}
                 condition={new ConditionBuilder(filter?.condition).asSelf()}
                 facade={filter?.facade}
                 onChange={handleFacadeChange}

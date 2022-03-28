@@ -17,7 +17,7 @@
  */
 
 import produce from 'immer';
-import React, { createContext, FC, memo, useMemo } from 'react';
+import { createContext, FC, memo, useMemo } from 'react';
 import {
   BoardType,
   Dashboard,
@@ -67,20 +67,36 @@ export const BoardProvider: FC<{
     allowShare,
     allowManage,
   }) => {
-    const boardContextValue: BoardContextProps = {
-      name: board.name,
-      boardId: board.id,
-      status: board.status,
-      queryVariables: board.queryVariables,
+    const boardContextValue: BoardContextProps = useMemo(() => {
+      return {
+        name: board.name,
+        boardId: board.id,
+        status: board.status,
+        queryVariables: board.queryVariables,
+        renderMode,
+        orgId: board.orgId,
+        boardType: board.config.type,
+        editing: editing,
+        autoFit: autoFit,
+        allowDownload,
+        allowShare,
+        allowManage,
+      };
+    }, [
+      board.name,
+      board.id,
+      board.status,
+      board.queryVariables,
+      board.orgId,
+      board.config.type,
       renderMode,
-      orgId: board.orgId,
-      boardType: board.config.type,
-      editing: editing,
-      autoFit: autoFit,
+      editing,
+      autoFit,
       allowDownload,
       allowShare,
       allowManage,
-    };
+    ]);
+
     const adaptConfig = useMemo(() => {
       if (board.config) {
         const nextConfig = produce(board.config, draft => {

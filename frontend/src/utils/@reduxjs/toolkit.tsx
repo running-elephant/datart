@@ -21,7 +21,8 @@ export function isMySliceAction(action, targetSliceName) {
   return action?.type?.startsWith(targetSliceName);
 }
 
-export function isMySliceRejectedAction(sliceName) {
-  return rejectedAction =>
-    isRejected(rejectedAction) && isMySliceAction(rejectedAction, sliceName);
+export function isRejectedScopedSlice(sliceNames: string[]) {
+  return action =>
+    isRejected(action) &&
+    sliceNames.some(sliceName => isMySliceAction(action, sliceName));
 }

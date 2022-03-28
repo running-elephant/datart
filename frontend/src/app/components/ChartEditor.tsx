@@ -23,20 +23,24 @@ import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import ChartManager from 'app/models/ChartManager';
 import workbenchSlice, {
+  useWorkbenchSlice,
+} from 'app/pages/ChartWorkbenchPage/slice';
+import { ChartConfigReducerActionType } from 'app/pages/ChartWorkbenchPage/slice/constant';
+import {
   aggregationSelector,
   backendChartSelector,
-  ChartConfigReducerActionType,
   chartConfigSelector,
   currentDataViewSelector,
   datasetsSelector,
+  shadowChartConfigSelector,
+} from 'app/pages/ChartWorkbenchPage/slice/selectors';
+import {
   initWorkbenchAction,
   refreshDatasetAction,
-  shadowChartConfigSelector,
   updateChartAction,
   updateChartConfigAndRefreshDatasetAction,
   updateRichTextAction,
-  useWorkbenchSlice,
-} from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+} from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useAddViz } from 'app/pages/MainPage/pages/VizPage/hooks/useAddViz';
 import { SaveForm } from 'app/pages/MainPage/pages/VizPage/SaveForm';
 import {
@@ -48,7 +52,7 @@ import { ChartDTO } from 'app/types/ChartDTO';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import { CommonFormTypes } from 'globalConstants';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
@@ -71,12 +75,14 @@ export interface ChartEditorBaseProps {
   defaultViewId?: string;
   originChart?: ChartDTO | DataChart;
 }
+
 export interface HistoryState {
   dataChartId: string;
   orgId: string;
   container: 'widget' | 'dataChart';
   chartType: WidgetContentChartType;
 }
+
 export interface ChartEditorMethodsProps {
   onClose?: () => void;
   onSaveInWidget?: (
@@ -88,7 +94,7 @@ export interface ChartEditorMethodsProps {
 }
 export type ChartEditorProps = ChartEditorBaseProps & ChartEditorMethodsProps;
 
-export const ChartEditor: React.FC<ChartEditorProps> = ({
+export const ChartEditor: FC<ChartEditorProps> = ({
   originChart,
   orgId,
   container,
@@ -451,9 +457,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     }
     const isWidget = dataChartId.includes('widget');
     const builder = new ChartDataRequestBuilder(
-      {
-        ...dataview,
-      },
+      dataview,
       chartConfig?.datas,
       chartConfig?.settings,
       {},

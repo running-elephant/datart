@@ -68,10 +68,14 @@ const config: ChartConfig = {
           comType: 'select',
           default: 'outside',
           options: {
+            translateItemLabel: true,
             items: [
-              { label: '外侧', value: 'outside' },
-              { label: '内部', value: 'inside' },
-              { label: '中心', value: 'center' },
+              {
+                label: '@global@.label.positionType.outside',
+                value: 'outside',
+              },
+              { label: '@global@.label.positionType.inside', value: 'inside' },
+              { label: '@global@.label.positionType.center', value: 'center' },
             ],
           },
         },
@@ -133,16 +137,8 @@ const config: ChartConfig = {
         {
           label: 'legend.position',
           key: 'position',
-          comType: 'select',
+          comType: 'legendPosition',
           default: 'right',
-          options: {
-            items: [
-              { label: '右', value: 'right' },
-              { label: '上', value: 'top' },
-              { label: '下', value: 'bottom' },
-              { label: '左', value: 'left' },
-            ],
-          },
         },
         {
           label: 'legend.height',
@@ -248,6 +244,11 @@ const config: ChartConfig = {
           title: '标签',
           showLabel: '显示标签',
           position: '位置',
+          positionType: {
+            outside: '外侧',
+            inside: '内部',
+            center: '中心',
+          },
           showName: '维度值',
           showPercent: '百分比',
           showValue: '指标值',
@@ -292,6 +293,11 @@ const config: ChartConfig = {
           title: 'Label',
           showLabel: 'Show Label',
           position: 'Position',
+          positionType: {
+            outside: 'Outside',
+            inside: 'Inside',
+            center: 'Center',
+          },
           showName: 'Show Name',
           showPercent: 'Show Percentage',
           showValue: 'Show Value',
