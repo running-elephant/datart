@@ -5,13 +5,13 @@ import datart.core.entity.Folder;
 import datart.core.mappers.ext.DashboardMapperExt;
 import datart.server.base.dto.DashboardBaseInfo;
 import datart.server.base.dto.DashboardDetail;
-import datart.server.base.params.BaseCreateParam;
 import datart.server.base.params.DashboardCreateParam;
+import datart.server.base.transfer.model.DashboardTransferModel;
 
 import java.io.IOException;
 import java.util.List;
 
-public interface DashboardService extends VizCRUDService<Dashboard, DashboardMapperExt> {
+public interface DashboardService extends VizCRUDService<Dashboard, DashboardMapperExt>, ResourceTransferService<Folder, DashboardTransferModel> {
 
     List<DashboardBaseInfo> listDashboard(String orgId);
 

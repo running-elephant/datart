@@ -14,7 +14,9 @@ public enum FileOwner {
 
     SCHEDULE("schedule/files/"),
 
-    DOWNLOAD("download/");
+    DOWNLOAD("download/"),
+
+    EXPORT("export/");
 
     private final String path;
 

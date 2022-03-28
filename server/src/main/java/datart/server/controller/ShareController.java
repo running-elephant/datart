@@ -27,7 +27,6 @@ import datart.server.base.dto.ResponseData;
 import datart.server.base.params.*;
 import datart.server.service.ShareService;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.annotations.Delete;
 import org.apache.tomcat.util.http.fileupload.util.Streams;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -68,7 +67,7 @@ public class ShareController extends BaseController {
     }
 
     @ApiOperation(value = "delete a share")
-    @Delete(value = "{shareId}")
+    @DeleteMapping(value = "{shareId}")
     public ResponseData<Boolean> delete(@PathVariable String shareId) {
         return ResponseData.success(shareService.delete(shareId, false));
     }

@@ -32,6 +32,7 @@ import datart.core.mappers.ext.ShareMapperExt;
 import datart.security.base.ResourceType;
 import datart.security.exception.PermissionDeniedException;
 import datart.security.util.AESUtil;
+import datart.security.util.SecurityUtils;
 import datart.server.base.dto.DashboardDetail;
 import datart.server.base.dto.DatachartDetail;
 import datart.server.base.dto.StoryboardDetail;
@@ -122,7 +123,11 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         ShareToken shareToken = new ShareToken();
         BeanUtils.copyProperties(createParam, shareToken);
         shareToken.setId(share.getId());
-        shareToken.setAuthenticationCode(createParam.getAuthenticationCode());
+
+        if (createParam.getAuthenticationMode().equals(ShareAuthenticationMode.CODE)) {
+            shareToken.setAuthenticationCode(SecurityUtils.randomPassword());
+        }
+
         shareToken.setAuthenticationMode(createParam.getAuthenticationMode());
 
         return shareToken;

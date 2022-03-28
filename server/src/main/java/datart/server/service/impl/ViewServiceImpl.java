@@ -20,22 +20,21 @@ package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
 import datart.core.base.exception.Exceptions;
+import datart.core.common.DateUtils;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
-import datart.core.mappers.ext.RelRoleResourceMapperExt;
-import datart.core.mappers.ext.RelSubjectColumnsMapperExt;
-import datart.core.mappers.ext.RelVariableSubjectMapperExt;
-import datart.core.mappers.ext.ViewMapperExt;
+import datart.core.mappers.ext.*;
 import datart.security.base.ResourceType;
 import datart.security.exception.PermissionDeniedException;
 import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.PermissionHelper;
 import datart.server.base.dto.ViewDetailDTO;
 import datart.server.base.params.*;
-import datart.server.service.BaseService;
-import datart.server.service.RoleService;
-import datart.server.service.VariableService;
-import datart.server.service.ViewService;
+import datart.server.base.transfer.ImportStrategy;
+import datart.server.base.transfer.TransferConfig;
+import datart.server.base.transfer.model.ViewTransferModel;
+import datart.server.service.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -48,6 +47,8 @@ public class ViewServiceImpl extends BaseService implements ViewService {
 
     private final ViewMapperExt viewMapper;
 
+    private final SourceService sourceService;
+
     private final RelSubjectColumnsMapperExt rscMapper;
 
     private final RelRoleResourceMapperExt rrrMapper;
@@ -56,18 +57,25 @@ public class ViewServiceImpl extends BaseService implements ViewService {
 
     private final VariableService variableService;
 
+    private final VariableMapperExt variableMapper;
+
     private final RelVariableSubjectMapperExt rvsMapper;
 
     public ViewServiceImpl(ViewMapperExt viewMapper,
+                           SourceService sourceService,
                            RelSubjectColumnsMapperExt rscMapper,
                            RelRoleResourceMapperExt rrrMapper,
                            RoleService roleService,
-                           VariableService variableService, RelVariableSubjectMapperExt rvsMapper) {
+                           VariableService variableService,
+                           VariableMapperExt variableMapper,
+                           RelVariableSubjectMapperExt rvsMapper) {
         this.viewMapper = viewMapper;
+        this.sourceService = sourceService;
         this.rscMapper = rscMapper;
         this.rrrMapper = rrrMapper;
         this.roleService = roleService;
         this.variableService = variableService;
+        this.variableMapper = variableMapper;
         this.rvsMapper = rvsMapper;
     }
 
@@ -211,6 +219,62 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         return 1 == viewMapper.updateByPrimaryKey(view);
     }
 
+    @Override
+    public ViewTransferModel exportResource(TransferConfig transferConfig, String... ids) {
+
+        if (ids == null || ids.length == 0) {
+            return null;
+        }
+
+        ViewTransferModel viewTransferModel = new ViewTransferModel();
+        List<ViewTransferModel.MainModel> mainModels = new LinkedList<>();
+        viewTransferModel.setMainModels(mainModels);
+        Map<String, View> parentMap = new HashMap<>();
+        Set<String> sourceIds = new HashSet<>();
+
+        for (String viewId : ids) {
+            ViewTransferModel.MainModel mainModel = new ViewTransferModel.MainModel();
+            View view = retrieve(viewId);
+            mainModel.setView(view);
+            // variables
+            mainModel.setVariables(variableService.listByView(viewId));
+            mainModels.add(mainModel);
+            sourceIds.add(view.getSourceId());
+            if (transferConfig.isWithParents()) {
+                List<View> allParents = getAllParents(view.getParentId());
+                if (!CollectionUtils.isEmpty(allParents)) {
+                    for (View parent : allParents) {
+                        parentMap.put(parent.getId(), parent);
+                    }
+                }
+            }
+        }
+        viewTransferModel.setParents(new LinkedList<>(parentMap.values()));
+        // source
+        viewTransferModel.setSourceExportModel(sourceService.exportResource(transferConfig, sourceIds.toArray(new String[0])));
+
+        return viewTransferModel;
+    }
+
+    @Override
+    public boolean importResource(ViewTransferModel model, ImportStrategy strategy, String orgId, Set<String> requireTransfer) {
+        if (model == null) {
+            return true;
+        }
+        Set<String> requiredSources = new HashSet<>();
+        switch (strategy) {
+            case OVERWRITE:
+                importView(model, orgId, true, true, requireTransfer, requiredSources);
+                break;
+            case IGNORE:
+                importView(model, orgId, false, true, requireTransfer, requiredSources);
+                break;
+            default:
+                importView(model, orgId, false, false, requireTransfer, requiredSources);
+        }
+        return sourceService.importResource(model.getSourceExportModel(), strategy, orgId, requiredSources);
+    }
+
 
     @Override
     public boolean checkUnique(BaseEntity entity) {
@@ -299,6 +363,96 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         RelWidgetElement relWidgetElement = new RelWidgetElement();
         relWidgetElement.setRelId(viewId);
         return viewMapper.checkUnique(datachart) && viewMapper.checkUnique(relWidgetElement);
+    }
+
+    private void importView(ViewTransferModel model,
+                            String orgId,
+                            boolean deleteFirst,
+                            boolean skipExists,
+                            Set<String> requireTransfer,
+                            Set<String> requiredSources) {
+        if (model == null || CollectionUtils.isEmpty(model.getMainModels())) {
+            return;
+        }
+        for (ViewTransferModel.MainModel mainModel : model.getMainModels()) {
+            View view = mainModel.getView();
+            if (view == null) {
+                continue;
+            }
+            if (requireTransfer != null && !requireTransfer.contains(view.getId())) {
+                continue;
+            }
+            if (deleteFirst) {
+                try {
+                    delete(view.getId());
+                } catch (Exception ignore) {
+                }
+            } else if (skipExists) {
+                try {
+                    if (retrieve(view.getId()) != null) {
+                        continue;
+                    }
+                } catch (Exception ignore) {
+                }
+            }
+
+            if (StringUtils.isNotBlank(view.getSourceId())) {
+                requiredSources.add(view.getSourceId());
+            }
+            // check name
+            try {
+                View check = new View();
+                check.setOrgId(orgId);
+                check.setParentId(view.getParentId());
+                check.setName(view.getName());
+                checkUnique(check);
+            } catch (Exception e) {
+                view.setName(DateUtils.withTimeString(view.getName()));
+            }
+            // insert view
+            view.setOrgId(orgId);
+            view.setOrgId(orgId);
+            view.setUpdateBy(getCurrentUser().getId());
+            view.setUpdateTime(new Date());
+            viewMapper.insert(view);
+
+            // insert variables
+            if (!CollectionUtils.isEmpty(mainModel.getVariables())) {
+                for (Variable variable : mainModel.getVariables()) {
+                    variable.setOrgId(orgId);
+                }
+                variableMapper.batchInsert(mainModel.getVariables());
+            }
+
+            // insert parents
+            if (!CollectionUtils.isEmpty(model.getParents())) {
+                for (View parent : model.getParents()) {
+                    try {
+                        parent.setOrgId(orgId);
+                        viewMapper.insert(parent);
+                    } catch (Exception ignore) {
+                    }
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public List<View> getAllParents(String viewId) {
+        List<View> parents = new LinkedList<>();
+        getParent(parents, viewId);
+        return parents;
+    }
+
+    private void getParent(List<View> list, String parentId) {
+        View view = viewMapper.selectByPrimaryKey(parentId);
+        if (view != null) {
+            if (view.getParentId() != null) {
+                getParent(list, view.getParentId());
+            }
+            list.add(view);
+        }
     }
 
 }
