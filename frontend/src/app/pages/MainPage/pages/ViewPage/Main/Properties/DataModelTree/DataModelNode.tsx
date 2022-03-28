@@ -35,7 +35,6 @@ import {
   FONT_SIZE_HEADING,
   INFO,
   SPACE,
-  SPACE_UNIT,
   SUCCESS,
   WARNING,
 } from 'styles/StyleConstants';
