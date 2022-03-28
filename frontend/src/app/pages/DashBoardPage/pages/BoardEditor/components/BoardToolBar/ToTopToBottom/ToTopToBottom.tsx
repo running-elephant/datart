@@ -21,24 +21,24 @@ import {
 } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
-export const ToTopBtn = (props: { fn: () => void }) => {
-  const t = useI18NPrefix(`viz.board.action`);
+import { FC, MouseEventHandler } from 'react';
+export const ToTopBtn: FC<{
+  fn: MouseEventHandler<HTMLElement> | undefined;
+  title: string;
+}> = ({ fn, title }) => {
   return (
-    <Tooltip title={t('toTop')}>
-      <ToolbarButton onClick={props.fn} icon={<VerticalAlignTopOutlined />} />
+    <Tooltip title={title}>
+      <ToolbarButton onClick={fn} icon={<VerticalAlignTopOutlined />} />
     </Tooltip>
   );
 };
-export const ToBottomBtn = (props: { fn: () => void }) => {
-  const t = useI18NPrefix(`viz.board.action`);
-
+export const ToBottomBtn: FC<{
+  fn: MouseEventHandler<HTMLElement> | undefined;
+  title: string;
+}> = ({ fn, title }) => {
   return (
-    <Tooltip title={t('toBottom')}>
-      <ToolbarButton
-        onClick={props.fn}
-        icon={<VerticalAlignBottomOutlined />}
-      />
+    <Tooltip title={title}>
+      <ToolbarButton onClick={fn} icon={<VerticalAlignBottomOutlined />} />
     </Tooltip>
   );
 };

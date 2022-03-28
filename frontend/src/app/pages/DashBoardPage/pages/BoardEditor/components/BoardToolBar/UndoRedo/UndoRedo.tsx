@@ -18,48 +18,32 @@
 import { RedoOutlined, UndoOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React, { useContext, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { ActionCreators } from 'redux-undo';
-import { BoardActionContext } from '../../../../../components/BoardProvider/BoardActionProvider';
+import { FC, MouseEventHandler, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { selectFutureState, selectPastState } from '../../../slice/selectors';
 
-export const UndoBtn = () => {
-  const t = useI18NPrefix(`viz.board.action`);
-  const { undo } = useContext(BoardActionContext);
+export const UndoBtn: FC<{
+  fn: MouseEventHandler<HTMLElement> | undefined;
+  title: string;
+}> = ({ fn, title }) => {
   const pastState = useSelector(selectPastState);
-  const dispatch = useDispatch();
   const canUndo = useMemo(() => !!pastState.length, [pastState.length]);
-  useEffect(() => {
-    if (pastState.length === 1) {
-      if (Object.keys(pastState[0]).length === 0) {
-        dispatch(ActionCreators.clearHistory());
-      }
-    }
-  }, [dispatch, pastState]);
   return (
-    <Tooltip title={t('undo')}>
-      <ToolbarButton
-        disabled={!canUndo}
-        onClick={undo}
-        icon={<UndoOutlined />}
-      />
+    <Tooltip title={title}>
+      <ToolbarButton disabled={!canUndo} onClick={fn} icon={<UndoOutlined />} />
     </Tooltip>
   );
 };
-export const RedoBtn = () => {
-  const t = useI18NPrefix(`viz.board.action`);
+export const RedoBtn: FC<{
+  fn: MouseEventHandler<HTMLElement> | undefined;
+  title: string;
+}> = ({ fn, title }) => {
   const futureState = useSelector(selectFutureState);
-  const { redo } = useContext(BoardActionContext);
+
   const canRedo = useMemo(() => !!futureState.length, [futureState.length]);
   return (
-    <Tooltip title={t('redo')}>
-      <ToolbarButton
-        disabled={!canRedo}
-        onClick={redo}
-        icon={<RedoOutlined />}
-      />
+    <Tooltip title={title}>
+      <ToolbarButton disabled={!canRedo} onClick={fn} icon={<RedoOutlined />} />
     </Tooltip>
   );
 };

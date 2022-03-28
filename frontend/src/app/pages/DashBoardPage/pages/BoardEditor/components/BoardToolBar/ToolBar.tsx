@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Divider, Space } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardActionContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardActionProvider';
 import useBoardEditorHotkeys from 'app/pages/DashBoardPage/hooks/useBoardEditorHotkeys';
 import React, { useContext } from 'react';
@@ -36,8 +37,10 @@ export const ToolBar = () => {
     e.stopPropagation();
   };
   const { boardType } = useContext(BoardToolBarContext);
-  const { layerToTop, layerToBottom } = useContext(BoardActionContext);
+  const { layerToTop, layerToBottom, undo, redo } =
+    useContext(BoardActionContext);
   useBoardEditorHotkeys();
+  const t = useI18NPrefix(`viz.board.action`);
   return (
     <Wrapper onClick={ssp}>
       <Space>
@@ -48,11 +51,11 @@ export const ToolBar = () => {
           <AddContainer />
           <Divider type="vertical" />
           <AddController />
-          <ToTopBtn fn={layerToTop} />
-          <ToBottomBtn fn={layerToBottom} />
+          <ToTopBtn fn={layerToTop} title={t('toTop')} />
+          <ToBottomBtn fn={layerToBottom} title={t('toBottom')} />
           <Divider type="vertical" />
-          <UndoBtn />
-          <RedoBtn />
+          <UndoBtn fn={undo} title={t('undo')} />
+          <RedoBtn fn={redo} title={t('redo')} />
           <Divider type="vertical" />
           <CopyBtn />
           <PasteBtn />
@@ -69,7 +72,6 @@ export const ToolBar = () => {
     </Wrapper>
   );
 };
-const Wrapper = styled.span`
+const Wrapper = styled.div`
   z-index: 0;
-  display: inline-block;
 `;
