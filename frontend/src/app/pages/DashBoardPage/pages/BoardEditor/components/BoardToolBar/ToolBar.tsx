@@ -37,7 +37,7 @@ export const ToolBar = () => {
     e.stopPropagation();
   };
   const { boardType } = useContext(BoardToolBarContext);
-  const { layerToTop, layerToBottom, undo, redo } =
+  const { layerToTop, layerToBottom, undo, redo, copyWidgets, pasteWidgets } =
     useContext(BoardActionContext);
   useBoardEditorHotkeys();
   const t = useI18NPrefix(`viz.board.action`);
@@ -47,23 +47,37 @@ export const ToolBar = () => {
         <>
           <AddChart />
           <Divider type="vertical" />
+
           <AddMedia />
+
           <AddContainer />
           <Divider type="vertical" />
+
           <AddController />
+
           <ToTopBtn fn={layerToTop} title={t('toTop')} />
+
           <ToBottomBtn fn={layerToBottom} title={t('toBottom')} />
+
           <Divider type="vertical" />
+
           <UndoBtn fn={undo} title={t('undo')} />
+
           <RedoBtn fn={redo} title={t('redo')} />
           <Divider type="vertical" />
-          <CopyBtn />
-          <PasteBtn />
+
+          <CopyBtn fn={copyWidgets} title={t('copy')} />
+
+          <PasteBtn fn={pasteWidgets} title={t('paste')} />
+
           {boardType === 'auto' && (
             <>
               <Divider type="vertical" />
+
               <DeviceSwitcher />
+
               <Divider type="vertical" />
+
               <AllowOverlapBtn />
             </>
           )}

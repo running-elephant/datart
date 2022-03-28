@@ -44,7 +44,9 @@ import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 import {
   clearActiveWidgets,
   clearEditBoardState,
+  copyWidgetsAction,
   deleteWidgetsAction,
+  pasteWidgetsAction,
   widgetsToPositionAction,
 } from '../../pages/BoardEditor/slice/actions/actions';
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
@@ -85,6 +87,8 @@ export interface BoardActionContextProps {
   deleteActiveWidgets: () => void;
   layerToTop: () => void;
   layerToBottom: () => void;
+  copyWidgets: (ids?: string[]) => void;
+  pasteWidgets: () => void;
 }
 export const BoardActionContext = createContext<BoardActionContextProps>(
   {} as BoardActionContextProps,
@@ -225,6 +229,12 @@ export const BoardActionProvider: FC<{ id: string }> = memo(
       },
       layerToBottom: () => {
         dispatch(widgetsToPositionAction('bottom'));
+      },
+      copyWidgets: (ids?: string[]) => {
+        dispatch(copyWidgetsAction());
+      },
+      pasteWidgets: () => {
+        dispatch(pasteWidgetsAction());
       },
     };
     return (
