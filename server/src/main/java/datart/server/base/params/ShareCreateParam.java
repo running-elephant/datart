@@ -40,16 +40,14 @@ public class ShareCreateParam {
     @Future
     private Date expiryDate;
 
-//    @NotNull
-//    private String orgId;
-
     @NotNull
     private ShareAuthenticationMode authenticationMode;
 
-    @NotNull
     private ShareRowPermissionBy rowPermissionBy;
 
     private Set<String> roles;
+
+    private Set<String> users;
 
     private String authenticationCode;
 

@@ -16,35 +16,36 @@
  * limitations under the License.
  */
 
-package datart.server.base.params;
+package datart.server.base.dto;
 
 import datart.core.base.consts.ShareAuthenticationMode;
 import datart.core.base.consts.ShareRowPermissionBy;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class ShareUpdateParam extends BaseUpdateParam {
+public class ShareInfo {
 
-    @Future
-    private Date expiryDate;
+    private String id;
 
-    @NotNull
+    private String orgId;
+
+    private String vizType;
+
+    private String vizId;
+
     private ShareAuthenticationMode authenticationMode;
 
-    @NotNull
     private ShareRowPermissionBy rowPermissionBy;
+
+    private String authenticationCode;
+
+    private Date expiryDate;
 
     private Set<String> roles;
 
     private Set<String> users;
-
-    private String authenticationCode;
 
 }

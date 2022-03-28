@@ -22,8 +22,8 @@ import datart.core.base.annotations.SkipLogin;
 import datart.core.common.FileUtils;
 import datart.core.data.provider.Dataframe;
 import datart.core.entity.Download;
-import datart.core.entity.Share;
 import datart.server.base.dto.ResponseData;
+import datart.server.base.dto.ShareInfo;
 import datart.server.base.params.*;
 import datart.server.service.ShareService;
 import io.swagger.annotations.ApiOperation;
@@ -50,7 +50,6 @@ public class ShareController extends BaseController {
         this.shareService = shareService;
     }
 
-
     @ApiOperation(value = "create a share")
     @PostMapping
     public ResponseData<ShareToken> create(@Validated @RequestBody ShareCreateParam createParam) {
@@ -73,17 +72,11 @@ public class ShareController extends BaseController {
     }
 
     @ApiOperation(value = "list share")
-    @GetMapping(value = "{orgId}")
-    public ResponseData<List<Share>> list(@PathVariable String orgId) {
-        return ResponseData.success(shareService.listShare(orgId));
+    @GetMapping(value = "{vizId}")
+    public ResponseData<List<ShareInfo>> list(@PathVariable String vizId) {
+        return ResponseData.success(shareService.listShare(vizId));
     }
 
-//    @ApiOperation(value = "explain share detail")
-//    @GetMapping(value = "{shareId}/explain")
-//    @SkipLogin
-//    public ResponseData<ShareToken> explainShare(@PathVariable String shareId) {
-//        return ResponseData.success(shareService.explainShare(ShareToken.create(shareId)));
-//    }
 
     @ApiOperation(value = "get viz detail")
     @PostMapping("{shareId}/viz")

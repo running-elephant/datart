@@ -24,4 +24,5 @@ public class Share extends BaseEntity {
     private Date expiryDate;
 
     private String roles;
+
 }
