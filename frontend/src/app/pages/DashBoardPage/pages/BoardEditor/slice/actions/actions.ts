@@ -76,6 +76,7 @@ export const deleteWidgetsAction = () => (dispatch, getState) => {
   let childWidgetIds: string[] = [];
   const widgetMap = editBoard.stack.present.widgetRecord;
   selectedIds.forEach(id => {
+    if (!widgetMap[id]) return;
     const widgetType = widgetMap[id].config.type;
     if (widgetType === 'container') {
       const content = widgetMap[id].config.content as ContainerWidgetContent;
