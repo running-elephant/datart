@@ -407,6 +407,8 @@ public class ShareServiceImpl extends BaseService implements ShareService {
             if (!ShareAuthenticationMode.LOGIN.equals(createParam.getAuthenticationMode())) {
                 Exceptions.msg("The authentication mode must be LOGIN");
             }
+        } else {
+            createParam.setRowPermissionBy(ShareRowPermissionBy.CREATOR);
         }
     }
 
