@@ -19,6 +19,7 @@
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { Form, Input, Select, Tooltip } from 'antd';
 import { Popup, ToolbarButton, Tree } from 'app/components';
+import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
@@ -33,7 +34,7 @@ import { FONT_SIZE_BASE, INFO } from 'styles/StyleConstants';
 import { Nullable } from 'types';
 import { CloneValueDeep, isEmpty, isEmptyArray } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
-import { ColumnTypes, ViewViewModelStages } from '../../../constants';
+import { ViewViewModelStages } from '../../../constants';
 import { useViewSlice } from '../../../slice';
 import {
   selectCurrentEditingView,
@@ -274,7 +275,7 @@ const DataModelTree: FC = memo(() => {
         }
         const hierarchyNode: Column = {
           name: hierarchyName,
-          type: ColumnTypes.String,
+          type: DataViewFieldType.STRING,
           role: ColumnRole.Hierarchy,
           children: nodes,
         };

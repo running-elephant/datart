@@ -20,7 +20,7 @@ import { Form, Modal } from 'antd';
 import { Split } from 'app/components';
 import {
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
+  DataViewFieldType,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardActionContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardActionProvider';
@@ -139,7 +139,7 @@ const ControllerWidgetPanel: React.FC = memo(props => {
               viewId: view.id,
               relatedCategory: ChartDataViewFieldCategory.Field,
               fieldValue: '',
-              fieldValueType: ChartDataViewFieldType.STRING,
+              fieldValueType: DataViewFieldType.STRING,
             };
             nextRelatedViews.push(relatedView);
           }

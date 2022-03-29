@@ -21,7 +21,7 @@ import { FormItemEx } from 'app/components';
 import {
   AggregateFieldActionType,
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
+  DataViewFieldType,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
@@ -196,10 +196,10 @@ const ChartComputedFieldSettingPanel: FC<{
             >
               <Select
                 value={myComputedFieldRef.current?.type}
-                options={Object.keys(ChartDataViewFieldType).map(type => {
+                options={Object.keys(DataViewFieldType).map(type => {
                   return {
                     label: type,
-                    value: ChartDataViewFieldType[type],
+                    value: DataViewFieldType[type],
                   };
                 })}
                 onChange={handleFieldTypeChange}

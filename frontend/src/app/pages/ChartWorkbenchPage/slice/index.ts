@@ -163,6 +163,7 @@ const workbenchSlice = createSlice({
             ...payload,
             config: migrateViewConfig(payload.config),
             meta: transformMeta(payload.model),
+            hierarchyMetas: [],
             computedFields,
           };
         }

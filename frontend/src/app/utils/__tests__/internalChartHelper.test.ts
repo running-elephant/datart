@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType, ChartDataViewFieldType } from 'app/constants';
+import { ChartDataSectionType, DataViewFieldType } from 'app/constants';
 import { ChartDataSectionField, ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import {
@@ -384,7 +384,7 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
             ],
@@ -415,12 +415,12 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
               {
                 colName: 'label2',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
             ],
@@ -431,7 +431,7 @@ describe('Internal Chart Helper ', () => {
       expect(result?.datas?.[0]?.rows).toEqual([
         {
           colName: 'label',
-          type: ChartDataViewFieldType.STRING,
+          type: DataViewFieldType.STRING,
           category: 'field' as any,
         },
       ]);
@@ -462,27 +462,27 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label1',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
               {
                 colName: 'label2',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
               {
                 colName: 'label3',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
               {
                 colName: 'label4',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
               {
                 colName: 'label5',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
             ],
@@ -494,7 +494,7 @@ describe('Internal Chart Helper ', () => {
       expect(result?.datas?.[0]?.rows).toEqual([
         {
           colName: 'label2',
-          type: ChartDataViewFieldType.STRING,
+          type: DataViewFieldType.STRING,
           category: 'field' as any,
         },
       ]);
@@ -502,12 +502,12 @@ describe('Internal Chart Helper ', () => {
       expect(result?.datas?.[1]?.rows).toEqual([
         {
           colName: 'label1',
-          type: ChartDataViewFieldType.STRING,
+          type: DataViewFieldType.STRING,
           category: 'field' as any,
         },
         {
           colName: 'label3',
-          type: ChartDataViewFieldType.STRING,
+          type: DataViewFieldType.STRING,
           category: 'field' as any,
         },
       ]);
@@ -556,7 +556,7 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label1',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],
@@ -567,7 +567,7 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label2',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],
@@ -578,7 +578,7 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label3',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],
@@ -589,7 +589,7 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label4',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],
@@ -600,7 +600,7 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label5',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],
@@ -611,7 +611,7 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label6',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],
@@ -647,27 +647,27 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label1',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
               {
                 colName: 'label2',
-                type: ChartDataViewFieldType.DATE,
+                type: DataViewFieldType.DATE,
                 category: 'field' as any,
               },
               {
                 colName: 'label3',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
               {
                 colName: 'label4',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
               {
                 colName: 'label5',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
             ],
@@ -684,12 +684,12 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label1',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
               {
                 colName: 'label2',
-                type: ChartDataViewFieldType.DATE,
+                type: DataViewFieldType.DATE,
                 category: 'field' as any,
               },
             ],
@@ -701,7 +701,7 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label3',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],
@@ -729,12 +729,12 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label1',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
               {
                 colName: 'label2',
-                type: ChartDataViewFieldType.DATE,
+                type: DataViewFieldType.DATE,
                 category: 'field' as any,
               },
             ],
@@ -745,12 +745,12 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label3',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
               {
                 colName: 'label4',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],
@@ -767,17 +767,17 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label1',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
               {
                 colName: 'label2',
-                type: ChartDataViewFieldType.DATE,
+                type: DataViewFieldType.DATE,
                 category: 'field' as any,
               },
               {
                 colName: 'label3',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],
@@ -811,12 +811,12 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label1',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
               {
                 colName: 'label2',
-                type: ChartDataViewFieldType.DATE,
+                type: DataViewFieldType.DATE,
                 category: 'field' as any,
               },
             ],
@@ -827,12 +827,12 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label3',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
               {
                 colName: 'label4',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],
@@ -849,7 +849,7 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label1',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
             ],
@@ -861,12 +861,12 @@ describe('Internal Chart Helper ', () => {
             rows: [
               {
                 colName: 'label2',
-                type: ChartDataViewFieldType.DATE,
+                type: DataViewFieldType.DATE,
                 category: 'field' as any,
               },
               {
                 colName: 'label3',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],
@@ -908,13 +908,13 @@ describe('Internal Chart Helper ', () => {
               {
                 uid: '1',
                 colName: 'label1',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
               {
                 uid: '2',
                 colName: 'label2',
-                type: ChartDataViewFieldType.DATE,
+                type: DataViewFieldType.DATE,
                 category: 'field' as any,
               },
             ],
@@ -926,13 +926,13 @@ describe('Internal Chart Helper ', () => {
               {
                 uid: '3',
                 colName: 'label3',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
               {
                 uid: '4',
                 colName: 'label4',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],
@@ -951,7 +951,7 @@ describe('Internal Chart Helper ', () => {
               {
                 uid: '1',
                 colName: 'label1',
-                type: ChartDataViewFieldType.STRING,
+                type: DataViewFieldType.STRING,
                 category: 'field' as any,
               },
             ],
@@ -964,7 +964,7 @@ describe('Internal Chart Helper ', () => {
               {
                 uid: '3',
                 colName: 'label3',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],
@@ -977,13 +977,13 @@ describe('Internal Chart Helper ', () => {
               {
                 uid: '2',
                 colName: 'label2',
-                type: ChartDataViewFieldType.DATE,
+                type: DataViewFieldType.DATE,
                 category: 'field' as any,
               },
               {
                 uid: '4',
                 colName: 'label4',
-                type: ChartDataViewFieldType.NUMERIC,
+                type: DataViewFieldType.NUMERIC,
                 category: 'field' as any,
               },
             ],

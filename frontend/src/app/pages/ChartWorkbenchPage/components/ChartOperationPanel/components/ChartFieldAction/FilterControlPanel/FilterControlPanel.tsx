@@ -21,7 +21,7 @@ import { FormItemEx } from 'app/components';
 import {
   AggregateFieldActionType,
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
+  DataViewFieldType,
   ControllerVisibilityTypes,
 } from 'app/constants';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
@@ -84,11 +84,11 @@ const FilterControlPanel: FC<
       if (config.aggregate) {
         return config.aggregate;
       } else if (
-        config.type === ChartDataViewFieldType.STRING ||
-        config.type === ChartDataViewFieldType.DATE
+        config.type === DataViewFieldType.STRING ||
+        config.type === DataViewFieldType.DATE
       ) {
         return AggregateFieldActionType.NONE;
-      } else if (config.type === ChartDataViewFieldType.NUMERIC) {
+      } else if (config.type === DataViewFieldType.NUMERIC) {
         return AggregateFieldActionType.SUM;
       }
     });
@@ -172,7 +172,7 @@ const FilterControlPanel: FC<
     const getVisibilityOtherFilters = () => {
       return (
         dataConfig?.rows?.filter(
-          c => c.uid !== config.uid && c.type === ChartDataViewFieldType.STRING,
+          c => c.uid !== config.uid && c.type === DataViewFieldType.STRING,
         ) || []
       );
     };
@@ -187,7 +187,7 @@ const FilterControlPanel: FC<
         onChange: handleConditionFilterChange,
       };
       if (
-        config.type === ChartDataViewFieldType.STRING &&
+        config.type === DataViewFieldType.STRING &&
         aggregate === AggregateFieldActionType.NONE
       ) {
         return (
@@ -198,7 +198,7 @@ const FilterControlPanel: FC<
           />
         );
       } else if (
-        config.type === ChartDataViewFieldType.STRING &&
+        config.type === DataViewFieldType.STRING &&
         aggregate !== AggregateFieldActionType.NONE
       ) {
         return (
@@ -207,14 +207,14 @@ const FilterControlPanel: FC<
             i18nPrefix={customizeI18NPrefix + '.value'}
           />
         );
-      } else if (config.type === ChartDataViewFieldType.NUMERIC) {
+      } else if (config.type === DataViewFieldType.NUMERIC) {
         return (
           <ValueConditionConfiguration
             {...filterProps}
             i18nPrefix={customizeI18NPrefix + '.value'}
           />
         );
-      } else if (config.type === ChartDataViewFieldType.DATE) {
+      } else if (config.type === DataViewFieldType.DATE) {
         return (
           <DateConditionConfiguration
             {...filterProps}

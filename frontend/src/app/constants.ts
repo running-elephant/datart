@@ -56,7 +56,7 @@ export enum ChartLifecycle {
   UNMOUNTED = 'unmount',
 }
 
-export enum ChartDataViewFieldType {
+export enum DataViewFieldType {
   STRING = 'STRING',
   NUMERIC = 'NUMERIC',
   DATE = 'DATE',

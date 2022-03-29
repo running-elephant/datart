@@ -27,7 +27,7 @@ import { Dropdown, Menu } from 'antd';
 import { IW, ToolbarButton } from 'app/components';
 import {
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
+  DataViewFieldType,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
@@ -117,7 +117,7 @@ export const ChartDraggableSourceContainer: FC<
         return WARNING;
       } else {
         switch (type) {
-          case ChartDataViewFieldType.NUMERIC:
+          case DataViewFieldType.NUMERIC:
             return SUCCESS;
           default:
             return INFO;
@@ -142,13 +142,13 @@ export const ChartDraggableSourceContainer: FC<
       },
     };
     switch (type) {
-      case ChartDataViewFieldType.STRING:
+      case DataViewFieldType.STRING:
         icon = <FieldStringOutlined {...props} />;
         break;
-      case ChartDataViewFieldType.NUMERIC:
+      case DataViewFieldType.NUMERIC:
         icon = <NumberOutlined {...props} />;
         break;
-      case ChartDataViewFieldType.DATE:
+      case DataViewFieldType.DATE:
         icon = <CalendarOutlined {...props} />;
         break;
       default:

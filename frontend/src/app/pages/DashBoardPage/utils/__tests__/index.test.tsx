@@ -18,7 +18,7 @@
 
 import {
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
+  DataViewFieldType,
   ControllerFacadeTypes,
   TimeFilterValueCategory,
 } from 'app/constants';
@@ -947,7 +947,7 @@ describe('getWidgetControlValues', () => {
       viewId: '3ca2a12f09c84c8ca1a5714fc6fa44d8',
       relatedCategory: ChartDataViewFieldCategory.Field,
       fieldValue: '地区',
-      fieldValueType: ChartDataViewFieldType.STRING,
+      fieldValueType: DataViewFieldType.STRING,
     };
     const config: ControllerConfig = {
       required: false,
@@ -975,7 +975,7 @@ describe('getWidgetControlValues', () => {
       viewId: '3ca2a12f09c84c8ca1a5714fc6fa44d8',
       relatedCategory: ChartDataViewFieldCategory.Field,
       fieldValue: 'GDP第一产业（亿元）',
-      fieldValueType: ChartDataViewFieldType.NUMERIC,
+      fieldValueType: DataViewFieldType.NUMERIC,
     };
 
     const config: ControllerConfig = {
@@ -1009,7 +1009,7 @@ describe('getWidgetControlValues', () => {
       viewId: '3ca2a12f09c84c8ca1a5714fc6fa44d8',
       relatedCategory: ChartDataViewFieldCategory.Field,
       fieldValue: '日期',
-      fieldValueType: ChartDataViewFieldType.DATE,
+      fieldValueType: DataViewFieldType.DATE,
     };
 
     const config: ControllerConfig = {

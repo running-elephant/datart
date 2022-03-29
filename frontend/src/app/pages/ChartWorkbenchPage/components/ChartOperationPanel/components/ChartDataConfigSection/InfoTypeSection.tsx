@@ -18,7 +18,7 @@
 
 import {
   ChartDataSectionFieldActionType,
-  ChartDataViewFieldType,
+  DataViewFieldType,
 } from 'app/constants';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { FC, memo } from 'react';
@@ -33,7 +33,7 @@ const InfoTypeSection: FC<ChartDataConfigSectionProps> = memo(
       },
       {
         actions: {
-          [ChartDataViewFieldType.NUMERIC]: [
+          [DataViewFieldType.NUMERIC]: [
             ChartDataSectionFieldActionType.Alias,
             ChartDataSectionFieldActionType.Format,
             ChartDataSectionFieldActionType.Aggregate,

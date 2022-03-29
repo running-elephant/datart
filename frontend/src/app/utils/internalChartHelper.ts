@@ -20,7 +20,7 @@ import {
   AggregateFieldActionType,
   ChartDataSectionType,
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
+  DataViewFieldType,
 } from 'app/constants';
 import {
   ChartConfig,
@@ -204,11 +204,11 @@ const transferMixedToNonMixed = (
   ) {
     const dimensions = sourceSectionConfigRows?.filter(
       r =>
-        r.type === ChartDataViewFieldType.DATE ||
-        r.type === ChartDataViewFieldType.STRING,
+        r.type === DataViewFieldType.DATE ||
+        r.type === DataViewFieldType.STRING,
     );
     const metrics = sourceSectionConfigRows?.filter(
-      r => r.type === ChartDataViewFieldType.NUMERIC,
+      r => r.type === DataViewFieldType.NUMERIC,
     );
 
     while (Boolean(dimensions?.length)) {
