@@ -20,18 +20,19 @@ package datart.server.service.impl;
 
 import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.ServerException;
+import datart.core.common.Application;
 import datart.core.entity.Organization;
 import datart.core.entity.User;
-import datart.core.common.Application;
 import datart.security.base.InviteToken;
 import datart.security.base.PasswordToken;
 import datart.security.util.JwtUtils;
 import datart.security.util.SecurityUtils;
-import datart.core.base.exception.ServerException;
 import datart.server.service.BaseService;
 import datart.server.service.MailService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -47,6 +48,7 @@ import org.thymeleaf.spring5.messageresolver.SpringMessageResolver;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 
 @Slf4j
 @Component
@@ -93,6 +95,9 @@ public class MailServiceImpl extends BaseService implements MailService {
 
     @Value("${spring.mail.senderName:Datart}")
     private String senderName;
+
+    @Value("${spring.invite.duration:3}")
+    private Integer inviteDays;
 
     public MailServiceImpl(TemplateEngine templateEngine,MessageSource messageSource) {
         SpringMessageResolver springMessageResolver = new SpringMessageResolver();
@@ -159,6 +164,7 @@ public class MailServiceImpl extends BaseService implements MailService {
         inviteToken.setUserId(user.getId());
         inviteToken.setCreateTime(System.currentTimeMillis());
         inviteToken.setInviter(getCurrentUser().getUsername());
+        inviteToken.setExp(DateUtils.addDays(new Date(), inviteDays));
         String tokenString = JwtUtils.toJwtString(inviteToken);
 
         Context context = new Context(LocaleContextHolder.getLocale());
