@@ -28,6 +28,7 @@ import { AddMedia } from './AddMedia/AddMedia';
 import { AllowOverlapBtn } from './AllowOverlap';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
 import { CopyBtn, PasteBtn } from './CopyPaste/CopyPaste';
+import { DelWidgetsBtn } from './DelWidgetsBtn';
 import { DeviceSwitcher } from './DeviceSwitch/DeviceSwitcher';
 import { ToBottomBtn, ToTopBtn } from './ToTopToBottom/ToTopToBottom';
 import { RedoBtn, UndoBtn } from './UndoRedo/UndoRedo';
@@ -37,51 +38,51 @@ export const ToolBar = () => {
     e.stopPropagation();
   };
   const { boardType } = useContext(BoardToolBarContext);
-  const { layerToTop, layerToBottom, undo, redo, copyWidgets, pasteWidgets } =
-    useContext(BoardActionContext);
+  const {
+    layerToTop,
+    layerToBottom,
+    undo,
+    redo,
+    copyWidgets,
+    pasteWidgets,
+    deleteActiveWidgets,
+  } = useContext(BoardActionContext);
   useBoardEditorHotkeys();
   const t = useI18NPrefix(`viz.board.action`);
   return (
     <Wrapper onClick={ssp}>
       <Space>
-        <>
-          <AddChart />
-          <Divider type="vertical" />
+        <AddChart />
 
-          <AddMedia />
+        <AddMedia />
 
-          <AddContainer />
-          <Divider type="vertical" />
+        <AddContainer />
 
-          <AddController />
+        <AddController />
+        <Divider type="vertical" />
 
-          <ToTopBtn fn={layerToTop} title={t('toTop')} />
+        <UndoBtn fn={undo} title={t('undo')} />
+        <RedoBtn fn={redo} title={t('redo')} />
 
-          <ToBottomBtn fn={layerToBottom} title={t('toBottom')} />
+        <Divider type="vertical" />
 
-          <Divider type="vertical" />
+        <DelWidgetsBtn fn={deleteActiveWidgets} title={t('delete')} />
+        <Divider type="vertical" />
 
-          <UndoBtn fn={undo} title={t('undo')} />
+        <ToTopBtn fn={layerToTop} title={t('toTop')} />
+        <ToBottomBtn fn={layerToBottom} title={t('toBottom')} />
 
-          <RedoBtn fn={redo} title={t('redo')} />
-          <Divider type="vertical" />
+        <CopyBtn fn={copyWidgets} title={t('copy')} />
+        <PasteBtn fn={pasteWidgets} title={t('paste')} />
 
-          <CopyBtn fn={copyWidgets} title={t('copy')} />
+        {boardType === 'auto' && (
+          <>
+            <Divider type="vertical" />
 
-          <PasteBtn fn={pasteWidgets} title={t('paste')} />
-
-          {boardType === 'auto' && (
-            <>
-              <Divider type="vertical" />
-
-              <DeviceSwitcher />
-
-              <Divider type="vertical" />
-
-              <AllowOverlapBtn />
-            </>
-          )}
-        </>
+            <DeviceSwitcher />
+            <AllowOverlapBtn />
+          </>
+        )}
       </Space>
     </Wrapper>
   );

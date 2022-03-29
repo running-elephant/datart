@@ -94,7 +94,9 @@ export const editBoardStackSlice = createSlice({
     },
     deleteWidgets(state, action: PayloadAction<string[]>) {
       const ids = action.payload;
+      if (!ids?.length) return;
       ids.forEach(id => {
+        if (!state.widgetRecord[id]) return;
         if (state.widgetRecord[id].config.type !== 'container') {
           delete state.widgetRecord[id];
         } else {
