@@ -8,13 +8,13 @@ export interface TableStyle {
   summaryStyle: { backgroundColor: string } & FontStyle;
 }
 
-export interface ColumnsList {
+export interface TableColumnsList {
   uid?: string | undefined;
-  children?: Array<ColumnsList>;
+  children?: Array<TableColumnsList>;
   isGroup?: boolean;
   sorter?: boolean;
   showSorterTooltip?: boolean;
-  title: JSX.Element | string | undefined;
+  title?: JSX.Element | string | undefined;
   dataIndex?: number;
   key?: string;
   aggregate?: AggregateFieldActionType | undefined;
@@ -73,18 +73,6 @@ export interface TableStyleOptions {
   bordered: boolean;
   size: string;
 }
-
-export type HeaderColumnGroup =
-  | {
-      uid?: string | undefined;
-      colName?: string;
-      title?: string | undefined;
-      onHeaderCell?: (record) => { [x: string]: any };
-      children?: HeaderColumnGroup[];
-      isGroup?: boolean;
-    }
-  | ColumnsList
-  | undefined;
 
 export type TableCellEvents =
   | {

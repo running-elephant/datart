@@ -50,9 +50,9 @@ import {
   TableComponentsTd,
 } from './TableComponents';
 import {
-  ColumnsList,
   PageOptions,
   TableCellEvents,
+  TableColumnsList,
   TableComponentConfig,
   TableHeaderConfig,
   TableStyle,
@@ -240,7 +240,7 @@ class BasicTableChart extends ReactChart {
     config: ChartConfig,
     dataset: ChartDataSetDTO,
     context,
-  ): ColumnsList[] {
+  ): TableColumnsList[] {
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
@@ -311,7 +311,7 @@ class BasicTableChart extends ReactChart {
   private getTableSummaryFn(
     settingConfigs: ChartStyleConfig[],
     chartDataSet: IChartDataSet<string>,
-    tableColumns: ColumnsList[],
+    tableColumns: TableColumnsList[],
     aggregateConfigs: ChartDataSectionField[],
     context: ChartContext,
   ): ((value) => { summarys: Array<string | null> }) | undefined {
@@ -340,7 +340,7 @@ class BasicTableChart extends ReactChart {
       }
       return [node];
     };
-    const flatHeaderColumns: ColumnsList[] = (tableColumns || []).reduce(
+    const flatHeaderColumns: TableColumnsList[] = (tableColumns || []).reduce(
       (acc, cur) => {
         return acc.concat(..._flatChildren(cur));
       },
@@ -707,7 +707,7 @@ class BasicTableChart extends ReactChart {
     settingConfigs: ChartStyleConfig[],
     chartDataSet: IChartDataSet<string>,
     context: ChartContext,
-  ): ColumnsList[] {
+  ): TableColumnsList[] {
     const [enableRowNumber, leftFixedColumns, rightFixedColumns] = getStyles(
       styleConfigs,
       ['style'],
@@ -732,7 +732,7 @@ class BasicTableChart extends ReactChart {
             chartDataSet,
             styleConfigs,
           );
-    const rowNumbers: ColumnsList[] = enableRowNumber
+    const rowNumbers: TableColumnsList[] = enableRowNumber
       ? [
           {
             key: `${DATARTSEPERATOR}id`,
@@ -755,13 +755,13 @@ class BasicTableChart extends ReactChart {
     dataConfigs: TableHeaderConfig[],
     chartDataSet: IChartDataSet<string>,
     styleConfigs: ChartStyleConfig[],
-  ): ColumnsList[] {
+  ): TableColumnsList[] {
     const [autoMergeFields] = getStyles(
       styleConfigs,
       ['style'],
       ['autoMergeFields'],
     );
-    const columnList: ColumnsList[] = dataConfigs.map((c, cIndex) => {
+    const columnList: TableColumnsList[] = dataConfigs.map((c, cIndex) => {
       const colName = c.colName;
       const columnRowSpans = (autoMergeFields || []).includes(c.uid)
         ? chartDataSet
@@ -866,9 +866,9 @@ class BasicTableChart extends ReactChart {
   }
 
   getFixedColumns(
-    list: ColumnsList[],
+    list: TableColumnsList[],
     styleConfigs: ChartStyleConfig[],
-  ): ColumnsList[] {
+  ): TableColumnsList[] {
     const [leftFixedColumns, rightFixedColumns] = getStyles(
       styleConfigs,
       ['style'],
@@ -951,7 +951,7 @@ class BasicTableChart extends ReactChart {
     tableHeader: TableHeaderConfig[],
     chartDataSet: IChartDataSet<string>,
     styleConfigs: ChartStyleConfig[],
-  ): ColumnsList[] {
+  ): TableColumnsList[] {
     const dataConfigs = this.getGroupColumnsOfFlattenedColumns(
       tableHeader,
       mixedSectionConfigRows,
@@ -962,7 +962,7 @@ class BasicTableChart extends ReactChart {
       chartDataSet,
       styleConfigs,
     );
-    const groupedHeaderColumns: ColumnsList[] =
+    const groupedHeaderColumns: TableColumnsList[] =
       tableHeader
         ?.map(
           style =>
@@ -970,7 +970,7 @@ class BasicTableChart extends ReactChart {
             [],
         )
         ?.filter(Boolean) || [];
-    const unusedHeaderRows: ColumnsList[] = getUnusedHeaderRows(
+    const unusedHeaderRows: TableColumnsList[] = getUnusedHeaderRows(
       flattenedColumns,
       groupedHeaderColumns,
     );
@@ -980,8 +980,8 @@ class BasicTableChart extends ReactChart {
   private getHeaderColumnGroup(
     chartDataSet: IChartDataSet<string>,
     tableHeader: TableHeaderConfig,
-    columns: ColumnsList[],
-  ): ColumnsList {
+    columns: TableColumnsList[],
+  ): TableColumnsList {
     if (!tableHeader.isGroup) {
       const column = columns.find(
         c => c.key === chartDataSet.getFieldKey(tableHeader),

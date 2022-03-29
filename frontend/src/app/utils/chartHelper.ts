@@ -47,7 +47,7 @@ import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
 import moment from 'moment';
 import { Debugger } from 'utils/debugger';
 import { isEmpty, isEmptyArray, meanValue, pipe } from 'utils/object';
-import { ColumnsList } from '../components/ChartGraph/BasicTableChart/types';
+import { TableColumnsList } from '../components/ChartGraph/BasicTableChart/types';
 import {
   flattenHeaderRowsWithoutGroupRow,
   getAxisLengthByConfig,
@@ -1085,8 +1085,8 @@ export function getUnusedHeaderRows(
   allRows: Array<{
     colName?: string;
   }>,
-  originalRows: Array<ColumnsList>,
-): ColumnsList[] {
+  originalRows: Array<TableColumnsList>,
+): TableColumnsList[] {
   const oldFlattenedColNames = originalRows
     .flatMap(row => flattenHeaderRowsWithoutGroupRow(row))
     .map(r => r.colName);
