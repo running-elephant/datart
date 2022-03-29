@@ -2,6 +2,7 @@
   "global": {
     "copy": "copy",
     "tokenExpired": "Token expired, please log in",
+    "401": "Not logged in or token expired, please log in again",
     "title": {
       "action": "Action"
     },
@@ -1051,6 +1052,7 @@
     "resultEmpty1": "Click ",
     "resultEmpty2": " button to execute, the results will be displayed here",
     "errorTitle": "Error occurred",
+    "sqlRequired": "SQL statement cannot be empty",
     "sqlRunWraning": "SQL parsing failed, welcome to submit an issue to help us improve. ",
     "detail": "Click here for details",
     "warningDescription": "Datart uses calcite to parse SQL statements by default; calcite has a awesome parser, but it still can't parse all the grammars of all databases. When a parsing exception occurs, datart will still send the SQL statement to the database for execution after necessary processing. If the execution is successful, we will think that the parser needs to be improved for the syntax of the SQL statement. In this case, datart will show this warning message, which is convenient for users to submit the exceptional parsing statements to github or gitee issue, and help us improve the parser.",
