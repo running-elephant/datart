@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartDataViewFieldType } from 'app/constants';
+import { DataViewFieldType } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
@@ -149,7 +149,7 @@ class BasicTableChart extends ReactChart {
       .filter(c => c.key === 'mixed')
       .flatMap(config => config.rows || []);
     const aggregateConfigs = mixedSectionConfigRows.filter(
-      r => r.type === ChartDataViewFieldType.NUMERIC,
+      r => r.type === DataViewFieldType.NUMERIC,
     );
     this.dataColumnWidths = this.calculateFieldsMaxWidth(
       mixedSectionConfigRows,
@@ -417,7 +417,7 @@ class BasicTableChart extends ReactChart {
       summaryFont?.fontFamily,
     );
     const aggregateConfigs = mixedSectionConfigRows.filter(
-      r => r.type === ChartDataViewFieldType.NUMERIC,
+      r => r.type === DataViewFieldType.NUMERIC,
     );
     const maxContentByFields = mixedSectionConfigRows.map(c => {
       const header = this.findHeader(c.uid, tableHeaders);

@@ -56,10 +56,18 @@ export enum ChartLifecycle {
   UNMOUNTED = 'unmount',
 }
 
-export enum ChartDataViewFieldType {
+export enum DataViewFieldType {
   STRING = 'STRING',
   NUMERIC = 'NUMERIC',
   DATE = 'DATE',
+}
+
+export enum ChartDataViewSubType {
+  UnCategorized = 'UNCATEGORIZED',
+  Country = 'COUNTRY',
+  ProvinceOrState = 'PROVINCEORSTATE',
+  City = 'CITY',
+  County = 'COUNTY',
 }
 
 export enum ChartDataViewFieldCategory {

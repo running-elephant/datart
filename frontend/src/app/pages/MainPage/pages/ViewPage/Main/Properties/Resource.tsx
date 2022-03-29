@@ -26,6 +26,7 @@ import {
 } from '@ant-design/icons';
 import { Col, Input, Row } from 'antd';
 import { Tree } from 'app/components';
+import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
@@ -36,7 +37,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
 import { RootState } from 'types';
-import { ColumnTypes } from '../../constants';
 import { EditorContext } from '../../EditorContext';
 import {
   selectCurrentEditingViewAttr,
@@ -125,12 +125,12 @@ export const Resource = memo(() => {
           return <TableOutlined />;
       }
     } else {
-      switch (value.type as ColumnTypes) {
-        case ColumnTypes.String:
+      switch (value.type as DataViewFieldType) {
+        case DataViewFieldType.STRING:
           return <FieldStringOutlined />;
-        case ColumnTypes.Number:
+        case DataViewFieldType.NUMERIC:
           return <FieldNumberOutlined />;
-        case ColumnTypes.Date:
+        case DataViewFieldType.DATE:
           return <CalendarOutlined />;
       }
     }

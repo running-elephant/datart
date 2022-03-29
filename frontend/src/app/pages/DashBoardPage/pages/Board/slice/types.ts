@@ -18,7 +18,7 @@
 import { ChartEditorProps } from 'app/components/ChartEditor';
 import {
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
+  DataViewFieldType,
   ControllerFacadeTypes,
 } from 'app/constants';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
@@ -249,7 +249,7 @@ export interface RelatedView {
   viewId: string;
   relatedCategory: ChartDataViewFieldCategory;
   fieldValue: string | number | Date | undefined | string[] | number[] | Date[];
-  fieldValueType: ChartDataViewFieldType | undefined;
+  fieldValueType: DataViewFieldType | undefined;
 }
 export interface ServerRelation extends Omit<Relation, 'config'> {
   config: string;

@@ -17,7 +17,7 @@
  */
 import { Modal } from 'antd';
 import { ChartEditorBaseProps } from 'app/components/ChartEditor';
-import { ChartDataViewFieldType, ControllerFacadeTypes } from 'app/constants';
+import { DataViewFieldType, ControllerFacadeTypes } from 'app/constants';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
@@ -247,7 +247,7 @@ export const updateWidgetControllerAction =
     boardType: BoardType;
     relations: Relation[];
     name?: string;
-    fieldValueType: ChartDataViewFieldType;
+    fieldValueType: DataViewFieldType;
     controllerFacadeType: ControllerFacadeTypes;
     views: RelatedView[];
     config: ControllerConfig;

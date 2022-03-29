@@ -19,7 +19,7 @@
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
-  ChartDataViewFieldType,
+  DataViewFieldType,
   FilterConditionType,
   SortActionType,
 } from 'app/constants';
@@ -100,11 +100,11 @@ export class ChartDataRequestBuilder {
         if (
           cur.type === ChartDataSectionType.MIXED &&
           cur.rows?.findIndex(
-            v => v.type === ChartDataViewFieldType.NUMERIC,
+            v => v.type === DataViewFieldType.NUMERIC,
           ) !== -1
         ) {
           return acc.concat(
-            cur.rows.filter(v => v.type === ChartDataViewFieldType.NUMERIC),
+            cur.rows.filter(v => v.type === DataViewFieldType.NUMERIC),
           );
         }
         return acc;
@@ -143,8 +143,8 @@ export class ChartDataRequestBuilder {
           cur.type === ChartDataSectionType.MIXED &&
           cur.rows?.find(v =>
             [
-              ChartDataViewFieldType.DATE,
-              ChartDataViewFieldType.STRING,
+              DataViewFieldType.DATE,
+              DataViewFieldType.STRING,
             ].includes(v.type),
           )
         ) {
@@ -152,8 +152,8 @@ export class ChartDataRequestBuilder {
           return acc.concat(
             cur.rows.filter(
               v =>
-                v.type === ChartDataViewFieldType.DATE ||
-                v.type === ChartDataViewFieldType.STRING,
+                v.type === DataViewFieldType.DATE ||
+                v.type === DataViewFieldType.STRING,
             ),
           );
         }

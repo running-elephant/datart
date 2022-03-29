@@ -17,7 +17,7 @@
  */
 import { Col, Form, Input, InputNumber, Modal, Row, Select } from 'antd';
 import { ColorPickerPopover } from 'app/components/ColorPicker';
-import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
+import { DataViewFieldType } from 'app/constants';
 import { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { G70 } from 'styles/StyleConstants';
@@ -67,7 +67,7 @@ export default function Add({
     OperatorTypes.Equal,
   );
   const [form] = Form.useForm<ScorecardConditionalStyleFormValues>();
-  const [type] = useState(ColumnTypes.Number);
+  const [type] = useState(DataViewFieldType.NUMERIC);
 
   useEffect(() => {
     if (type) {
@@ -120,7 +120,7 @@ export default function Add({
   const renderValueNode = () => {
     let DefaultNode = <></>;
     switch (type) {
-      case ColumnTypes.Number:
+      case DataViewFieldType.NUMERIC:
         DefaultNode = <InputNumber />;
         break;
       default:

@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
-import { ColumnTypes } from '../constants';
+import { DataViewFieldType } from 'app/constants';
 import { Column, ColumnRole } from '../slice/types';
 import { dataModelColumnSorter, diffMergeHierarchyModel } from '../utils';
 
 describe('dataModelColumnSorter test', () => {
   test('should sort by alphabet with the STRING column type', () => {
     const columns: Column[] = [
-      { name: 'c', type: ColumnTypes.String },
-      { name: 'b', type: ColumnTypes.String },
-      { name: 'a', type: ColumnTypes.String },
+      { name: 'c', type: DataViewFieldType.STRING },
+      { name: 'b', type: DataViewFieldType.STRING },
+      { name: 'a', type: DataViewFieldType.STRING },
     ];
     expect(columns.sort(dataModelColumnSorter)[0].name).toEqual('a');
     expect(columns.sort(dataModelColumnSorter)[1].name).toEqual('b');
@@ -34,9 +34,9 @@ describe('dataModelColumnSorter test', () => {
 
   test('should sort by alphabet with the Numeric column type', () => {
     const columns: Column[] = [
-      { name: 'c', type: ColumnTypes.Number },
-      { name: 'b', type: ColumnTypes.Number },
-      { name: 'a', type: ColumnTypes.Number },
+      { name: 'c', type: DataViewFieldType.NUMERIC },
+      { name: 'b', type: DataViewFieldType.NUMERIC },
+      { name: 'a', type: DataViewFieldType.NUMERIC },
     ];
     expect(columns.sort(dataModelColumnSorter)[0].name).toEqual('a');
     expect(columns.sort(dataModelColumnSorter)[1].name).toEqual('b');
@@ -45,9 +45,9 @@ describe('dataModelColumnSorter test', () => {
 
   test('should sort by alphabet with string and date column type', () => {
     const columns: Column[] = [
-      { name: 'c', type: ColumnTypes.String },
-      { name: 'b', type: ColumnTypes.Date },
-      { name: 'a', type: ColumnTypes.Date },
+      { name: 'c', type: DataViewFieldType.STRING },
+      { name: 'b', type: DataViewFieldType.DATE },
+      { name: 'a', type: DataViewFieldType.DATE },
     ];
     expect(columns.sort(dataModelColumnSorter)[0].name).toEqual('a');
     expect(columns.sort(dataModelColumnSorter)[1].name).toEqual('b');
@@ -56,12 +56,12 @@ describe('dataModelColumnSorter test', () => {
 
   test('should sort by column type when column type with STRING, Numeric, DATE', () => {
     const columns: Column[] = [
-      { name: 'c', type: ColumnTypes.String },
-      { name: 'b', type: ColumnTypes.Number },
-      { name: 'a', type: ColumnTypes.Date },
-      { name: 'd', type: ColumnTypes.Date },
-      { name: 'e', type: ColumnTypes.Number },
-      { name: 'f', type: ColumnTypes.String },
+      { name: 'c', type: DataViewFieldType.STRING },
+      { name: 'b', type: DataViewFieldType.NUMERIC },
+      { name: 'a', type: DataViewFieldType.DATE },
+      { name: 'd', type: DataViewFieldType.DATE },
+      { name: 'e', type: DataViewFieldType.NUMERIC },
+      { name: 'f', type: DataViewFieldType.STRING },
     ];
     expect(columns.sort(dataModelColumnSorter)[0].name).toEqual('a');
     expect(columns.sort(dataModelColumnSorter)[1].name).toEqual('c');
@@ -73,11 +73,19 @@ describe('dataModelColumnSorter test', () => {
 
   test('should sort by column type with multiple column types and hierarchy columns', () => {
     const columns: Column[] = [
-      { name: 'e', type: ColumnTypes.String, role: ColumnRole.Hierarchy },
-      { name: 'c', type: ColumnTypes.String },
-      { name: 'b', type: ColumnTypes.Number },
-      { name: 'a', type: ColumnTypes.Date },
-      { name: 'f', type: ColumnTypes.Date, role: ColumnRole.Hierarchy },
+      {
+        name: 'e',
+        type: DataViewFieldType.STRING,
+        role: ColumnRole.Hierarchy,
+      },
+      { name: 'c', type: DataViewFieldType.STRING },
+      { name: 'b', type: DataViewFieldType.NUMERIC },
+      { name: 'a', type: DataViewFieldType.DATE },
+      {
+        name: 'f',
+        type: DataViewFieldType.DATE,
+        role: ColumnRole.Hierarchy,
+      },
     ];
     expect(columns.sort(dataModelColumnSorter)[0].name).toEqual('e');
     expect(columns.sort(dataModelColumnSorter)[1].name).toEqual('f');

@@ -20,7 +20,7 @@ import { BarsOutlined } from '@ant-design/icons';
 import { Button, Modal } from 'antd';
 import {
   ChartDataSectionFieldActionType,
-  ChartDataViewFieldType,
+  DataViewFieldType,
 } from 'app/constants';
 import { StateModalSize } from 'app/hooks/useStateModal';
 import FilterActions from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterAction';
@@ -49,13 +49,13 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
       },
       {
         actions: {
-          [ChartDataViewFieldType.NUMERIC]: [
+          [DataViewFieldType.NUMERIC]: [
             ChartDataSectionFieldActionType.Filter,
           ],
-          [ChartDataViewFieldType.STRING]: [
+          [DataViewFieldType.STRING]: [
             ChartDataSectionFieldActionType.Filter,
           ],
-          [ChartDataViewFieldType.DATE]: [
+          [DataViewFieldType.DATE]: [
             ChartDataSectionFieldActionType.Filter,
           ],
         },

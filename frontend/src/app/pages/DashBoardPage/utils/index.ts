@@ -19,7 +19,7 @@
 import {
   ChartDataSectionType,
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
+  DataViewFieldType,
   ControllerFacadeTypes,
   TimeFilterValueCategory,
 } from 'app/constants';
@@ -135,7 +135,7 @@ export const getChartGroupColumns = (datas: ChartDataConfig[] | undefined) => {
       }
       if (cur.type === ChartDataSectionType.MIXED) {
         return acc.concat(
-          cur.rows.filter(({ type }) => type === ChartDataViewFieldType.STRING),
+          cur.rows.filter(({ type }) => type === DataViewFieldType.STRING),
         );
       }
       return acc;
@@ -413,7 +413,7 @@ export const getChartWidgetRequestParams = (obj: {
         column: getLinkedColumn(link.linkerWidgetId, triggerWidget),
         sqlOperator: FilterSqlOperator.In,
         values: [
-          { value: triggerValue, valueType: ChartDataViewFieldType.STRING },
+          { value: triggerValue, valueType: DataViewFieldType.STRING },
         ],
       };
       linkFilters.push(filter);
