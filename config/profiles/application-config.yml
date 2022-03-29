@@ -79,6 +79,9 @@ datart:
     active:
       send-mail: ${datart.send-mail:false}  # 注册用户时是否需要邮件验证激活
 
+  invite:
+    duration: ${datart.invite.duration:3} #邀请有效期/天
+
   security:
     token:
       secret: "d@a$t%a^r&a*t" #加密密钥

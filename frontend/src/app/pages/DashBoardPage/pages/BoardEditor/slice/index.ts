@@ -323,7 +323,7 @@ const filterActions = [
   editBoardStackActions.tabsWidgetRemoveTab,
   editBoardStackActions.updateWidgetConfig,
   editBoardStackActions.updateWidgetsConfig,
-
+  editBoardStackActions.changeWidgetsIndex,
   editBoardStackActions.changeBoardHasQueryControl,
   editBoardStackActions.changeBoardHasResetControl,
 ].map(ele => ele.toString());
