@@ -30,7 +30,7 @@ import { DraggableCore, DraggableEventHandler } from 'react-draggable';
 import { useDispatch, useSelector } from 'react-redux';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components/macro';
-import { BoardActionContext } from '../../../components/BoardProvider/BoardActionProvider';
+import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
 import { scaleContext } from '../../../components/FreeBoardBackground';
 import { editBoardStackActions } from '../slice';
 import { widgetMove, widgetMoveEnd } from '../slice/events';
@@ -43,7 +43,7 @@ export enum DragTriggerTypes {
 export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const selectedIds = useSelector(selectSelectedIds);
   const widget = useContext(WidgetContext);
-  const { updateWidgetConfig } = useContext(BoardActionContext);
+  const { onUpdateWidgetConfig } = useContext(WidgetActionContext);
 
   const dispatch = useDispatch();
   const scale = useContext(scaleContext);
@@ -74,8 +74,8 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
       draft.rect.x = curXY[0];
       draft.rect.y = curXY[1];
     });
-    updateWidgetConfig(nextConf, widget.id);
-  }, [curXY, updateWidgetConfig, widget.config, widget.id]);
+    onUpdateWidgetConfig(nextConf, widget.id);
+  }, [curXY, onUpdateWidgetConfig, widget.config, widget.id]);
   useEffect(() => {
     widgetMove.on(move);
     widgetMoveEnd.on(moveEnd);

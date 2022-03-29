@@ -18,29 +18,29 @@
 
 import { useContext } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { BoardActionContext } from '../components/BoardProvider/BoardActionProvider';
+import { BoardActionContext } from '../components/ActionProvider/BoardActionProvider';
+import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
 
 export default function useBoardEditorHotkeys() {
+  const { undo, redo } = useContext(BoardActionContext);
   const {
-    undo,
-    redo,
-    deleteActiveWidgets,
-    layerToTop,
-    layerToBottom,
-    copyWidgets,
-    pasteWidgets,
-  } = useContext(BoardActionContext);
+    onEditDeleteActiveWidgets,
+    onEditLayerToTop,
+    onEditLayerToBottom,
+    onEditCopyWidgets,
+    onEditPasteWidgets,
+  } = useContext(WidgetActionContext);
 
-  useHotkeys('delete,backspace', () => deleteActiveWidgets(), []);
+  useHotkeys('delete,backspace', () => onEditDeleteActiveWidgets(), []);
 
   useHotkeys('ctrl+z,command+z', () => undo());
   useHotkeys('ctrl+shift+z,command+shift+z', () => redo());
 
-  useHotkeys('ctrl+shift+up,command+shift+up', () => layerToTop());
-  useHotkeys('ctrl+shift+down,command+shift+down', () => layerToBottom());
+  useHotkeys('ctrl+shift+up,command+shift+up', () => onEditLayerToTop());
+  useHotkeys('ctrl+shift+down,command+shift+down', () => onEditLayerToBottom());
 
-  useHotkeys('ctrl+c,command+c', () => copyWidgets());
-  useHotkeys('ctrl+v,command+v', () => pasteWidgets());
+  useHotkeys('ctrl+c,command+c', () => onEditCopyWidgets());
+  useHotkeys('ctrl+v,command+v', () => onEditPasteWidgets());
 
   //
   useHotkeys('up', () => {

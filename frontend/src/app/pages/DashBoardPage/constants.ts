@@ -19,6 +19,7 @@ import { ControllerFacadeTypes } from 'app/constants';
 import {
   BackgroundConfig,
   BorderConfig,
+  JumpTargetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
@@ -269,3 +270,8 @@ export const DefaultWidgetData = {
   columns: [],
   rows: [],
 };
+
+export const jumpTypes: { name: string; value: JumpTargetType }[] = [
+  { value: 'INTERNAL', name: '' },
+  { value: 'URL', name: '' },
+];

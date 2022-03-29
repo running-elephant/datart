@@ -23,7 +23,7 @@ import { UploadDragger } from 'app/pages/DashBoardPage/pages/BoardEditor/compone
 import produce from 'immer';
 import React, { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
-import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
+import { WidgetActionContext } from '../../../ActionProvider/WidgetActionProvider';
 import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 
@@ -34,7 +34,7 @@ const widgetSize: React.CSSProperties = {
 const ImageWidget: React.FC<{}> = () => {
   const widget = useContext(WidgetContext);
   const { editing } = useContext(WidgetInfoContext);
-  const { widgetUpdate } = useContext(BoardActionContext);
+  const { onWidgetUpdate } = useContext(WidgetActionContext);
   const { imageConfig } = widget.config.content as MediaWidgetContent;
   const widgetBgImage = widget.config.background.image;
   const [rect, refDom] = useClientRect<HTMLDivElement>(32);
@@ -59,9 +59,9 @@ const ImageWidget: React.FC<{}> = () => {
       const nextWidget = produce(widget, draft => {
         draft.config.background.image = value;
       });
-      widgetUpdate(nextWidget, true);
+      onWidgetUpdate(nextWidget);
     },
-    [widget, widgetUpdate],
+    [widget, onWidgetUpdate],
   );
   const imageSize = useMemo(() => {
     return imageConfig?.type === 'IMAGE_RATIO' ? imageRatioCss : widgetSize;

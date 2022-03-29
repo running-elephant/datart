@@ -38,8 +38,8 @@ export interface NameItemProps {
   moveCard: (
     dragIndex: number,
     hoverIndex: number,
-    dragZindex: number,
-    hoverZindex: number,
+    dragZIndex: number,
+    hoverZIndex: number,
   ) => void;
   moveEnd: () => void;
   card: NameCard;
@@ -75,8 +75,8 @@ const NameItem: React.FC<NameItemProps> = ({
       const dragIndex = item.index;
       const hoverIndex = index;
 
-      const dragZindex = item.zIndex;
-      const hoverZindex = card.index;
+      const dragZIndex = item.zIndex;
+      const hoverZIndex = card.index;
       const hoverSelected = card.selected;
       // Don't replace items with themselves
       if (dragIndex === hoverIndex) {
@@ -111,14 +111,14 @@ const NameItem: React.FC<NameItemProps> = ({
       }
 
       // Time to actually perform the action
-      moveCard(dragIndex, hoverIndex, dragZindex, hoverZindex);
+      moveCard(dragIndex, hoverIndex, dragZIndex, hoverZIndex);
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
       item.index = hoverIndex;
-      item.zIndex = hoverZindex;
+      item.zIndex = hoverZIndex;
       item.selected = hoverSelected;
     },
   });

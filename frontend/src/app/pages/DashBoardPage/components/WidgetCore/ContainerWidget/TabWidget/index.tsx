@@ -24,7 +24,7 @@ import { PRIMARY } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions } from '../../../../pages/BoardEditor/slice';
 import { BoardContext } from '../../../BoardProvider/BoardProvider';
-import { WidgetAllProvider } from '../../../WidgetProvider/WidgetAllProvider';
+import { WidgetConfAndInfoProvider } from '../../../WidgetProvider/WidgetConfAndInfoProvider';
 import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 import DropHolder from './DropHolder';
@@ -37,7 +37,11 @@ export const TabWidget: React.FC<TabsBoxProps> = () => {
   const dispatch = useDispatch();
   const widget = useContext(WidgetContext);
   const { editing } = useContext(WidgetInfoContext);
-  const { boardType: mode } = useContext(BoardContext);
+  const {
+    boardType: mode,
+    editing: boardEditing,
+    boardId,
+  } = useContext(BoardContext);
   const { itemMap } = widget.config.content as ContainerWidgetContent;
   const tabsCons = Object.values(itemMap);
   const [activeKey, SetActiveKey] = useState(tabsCons[0]?.tabId || '');
@@ -103,9 +107,13 @@ export const TabWidget: React.FC<TabsBoxProps> = () => {
             forceRender
           >
             {tab.childWidgetId ? (
-              <WidgetAllProvider id={tab.childWidgetId}>
+              <WidgetConfAndInfoProvider
+                id={tab.childWidgetId}
+                boardEditing={boardEditing}
+                boardId={boardId}
+              >
                 <TabWidgetContainer tabItem={tab} />
-              </WidgetAllProvider>
+              </WidgetConfAndInfoProvider>
             ) : (
               <DropHolder tabItem={tab} parentId={widget.id} />
             )}

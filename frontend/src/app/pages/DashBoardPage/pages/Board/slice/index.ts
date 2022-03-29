@@ -139,10 +139,10 @@ const boardSlice = createSlice({
     },
     updateFullScreenPanel(
       state,
-      action: PayloadAction<{ recordId: string; itemId: string }>,
+      action: PayloadAction<{ boardId: string; itemId: string }>,
     ) {
-      const { recordId, itemId } = action.payload;
-      state.boardInfoRecord[recordId].fullScreenItemId = itemId;
+      const { boardId, itemId } = action.payload;
+      state.boardInfoRecord[boardId].fullScreenItemId = itemId;
     },
 
     setWidgetData(state, action: PayloadAction<WidgetData>) {

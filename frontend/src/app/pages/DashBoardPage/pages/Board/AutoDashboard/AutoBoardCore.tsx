@@ -18,7 +18,8 @@
 
 import { Empty } from 'antd';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
+import { WidgetConfAndInfoProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetConfAndInfoProvider';
 import { LAYOUT_COLS_MAP } from 'app/pages/DashBoardPage/constants';
 import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
@@ -40,6 +41,7 @@ import { WidgetOfAuto } from './WidgetOfAuto';
 const ReactGridLayout = WidthProvider(RGL);
 export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
+    const { editing } = useContext(BoardContext);
     const boardConfig = useContext(BoardConfigContext);
     const { margin, background, allowOverlap } = boardConfig;
     const selectLayoutWidgetsConfigById = useMemo(
@@ -89,13 +91,17 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       return sortedLayoutWidgets.map(item => {
         return (
           <div key={item.id}>
-            <WidgetAllProvider id={item.id}>
+            <WidgetConfAndInfoProvider
+              id={item.id}
+              boardEditing={editing}
+              boardId={boardId}
+            >
               <WidgetOfAuto />
-            </WidgetAllProvider>
+            </WidgetConfAndInfoProvider>
           </div>
         );
       });
-    }, [sortedLayoutWidgets]);
+    }, [boardId, editing, sortedLayoutWidgets]);
     return (
       <Wrap>
         <StyledContainer bg={background} ref={ref}>

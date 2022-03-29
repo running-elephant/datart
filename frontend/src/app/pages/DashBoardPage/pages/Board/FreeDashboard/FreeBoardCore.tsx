@@ -18,7 +18,7 @@
 import { Empty } from 'antd';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
+import { WidgetConfAndInfoProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetConfAndInfoProvider';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import { selectLayoutWidgetMapById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -73,12 +73,17 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
     const boardChildren = useMemo(() => {
       return widgetConfigs.map(item => {
         return (
-          <WidgetAllProvider key={item.id} id={item.id}>
+          <WidgetConfAndInfoProvider
+            key={item.id}
+            id={item.id}
+            boardEditing={editing}
+            boardId={boardId}
+          >
             <WidgetOfFree />
-          </WidgetAllProvider>
+          </WidgetConfAndInfoProvider>
         );
       });
-    }, [widgetConfigs]);
+    }, [widgetConfigs, editing, boardId]);
     const { gridRef } = useBoardWidthHeight();
 
     return (
