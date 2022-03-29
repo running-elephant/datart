@@ -16,9 +16,7 @@
  * limitations under the License.
  */
 
-import { Modal } from 'antd';
 import { ControllerFacadeTypes } from 'app/constants';
-import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams, ChartsEventData } from 'app/types/Chart';
@@ -61,21 +59,10 @@ import {
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import { widgetActionType } from '../WidgetToolBar/config';
 
-const { confirm } = Modal;
-
-export interface WidgetMethodContextProps {
-  onWidgetAction: (action: widgetActionType, widget: Widget) => void;
-  widgetChartClick: (widget: Widget, params: ChartMouseEventParams) => void;
-  onClearLinkage: (widget: Widget) => void;
-}
-export const WidgetMethodContext = createContext<WidgetMethodContextProps>(
-  {} as WidgetMethodContextProps,
-);
 export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   widgetId,
   children,
 }) => {
-  const t = usePrefixI18N('viz.widget.action');
   const { boardId, editing, renderMode, orgId } = useContext(BoardContext);
   const vizs = useSelector(selectVizs);
   const propsFolderIds = useMemo(() => {
@@ -133,30 +120,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
 
     [dispatch, orgId],
   );
-  const onWidgetFullScreen = useCallback(
-    (editing: boolean, recordId: string, itemId: string) => {
-      if (editing) {
-      } else {
-        dispatch(
-          boardActions.updateFullScreenPanel({
-            recordId,
-            itemId,
-          }),
-        );
-      }
-    },
-    [dispatch],
-  );
-  const onWidgetGetData = useCallback(
-    (boardId: string, widget: Widget) => {
-      if (editing) {
-        dispatch(getEditWidgetData({ widget }));
-      } else {
-        dispatch(getWidgetData({ boardId, widget, renderMode }));
-      }
-    },
-    [dispatch, editing, renderMode],
-  );
+
   const onMakeLinkage = useCallback(
     (widgetId: string) => {
       dispatch(
@@ -417,14 +381,9 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   const onWidgetAction = useCallback(
     (action: widgetActionType, widget: Widget) => {
       switch (action) {
-        case 'fullScreen':
-          onWidgetFullScreen(editing, boardId, widgetId);
-          break;
         case 'info':
           break;
-        case 'refresh':
-          onWidgetGetData(boardId, widget);
-          break;
+
         case 'edit':
           onWidgetEdit(widget, widgetId);
           break;
@@ -450,17 +409,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
           break;
       }
     },
-    [
-      onWidgetFullScreen,
-      editing,
-      boardId,
-      widgetId,
-      onWidgetGetData,
-      onWidgetEdit,
-      onMakeLinkage,
-      onMakeJump,
-      dispatch,
-    ],
+    [onWidgetEdit, widgetId, onMakeLinkage, onMakeJump, dispatch],
   );
 
   const widgetChartClick = useCallback(
@@ -505,11 +454,39 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     },
     [clickJump, getTableChartData, toLinkingWidgets, folderIds],
   );
+  const onWidgetFullScreen = useCallback(
+    (boardId: string, itemId: string) => {
+      dispatch(
+        boardActions.updateFullScreenPanel({
+          boardId,
+          itemId,
+        }),
+      );
+    },
+    [dispatch],
+  );
+  const onEditWidgetGetData = useCallback(
+    (widget: Widget) => {
+      dispatch(getEditWidgetData({ widget }));
+    },
+    [dispatch],
+  );
+  const onWidgetGetData = useCallback(
+    (widget: Widget) => {
+      dispatch(
+        getWidgetData({ boardId: widget.dashboardId, widget, renderMode }),
+      );
+    },
+    [dispatch, renderMode],
+  );
 
   const Methods: WidgetMethodContextProps = {
-    onWidgetAction: onWidgetAction,
-    widgetChartClick: widgetChartClick,
-    onClearLinkage: onClearLinkage,
+    onWidgetAction,
+    widgetChartClick,
+    onClearLinkage,
+    onWidgetFullScreen,
+    onWidgetGetData,
+    onEditWidgetGetData,
   };
 
   useEffect(() => {
@@ -523,3 +500,15 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     </WidgetMethodContext.Provider>
   );
 };
+export interface WidgetMethodContextProps {
+  onWidgetAction: (action: widgetActionType, widget: Widget) => void;
+  widgetChartClick: (widget: Widget, params: ChartMouseEventParams) => void;
+  onClearLinkage: (widget: Widget) => void;
+  onWidgetFullScreen: (boardId: string, itemId: string) => void;
+  onWidgetGetData: (widget: Widget) => void;
+
+  onEditWidgetGetData: (widget: Widget) => void;
+}
+export const WidgetMethodContext = createContext<WidgetMethodContextProps>(
+  {} as WidgetMethodContextProps,
+);

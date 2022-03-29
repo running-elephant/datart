@@ -17,25 +17,41 @@
  */
 import { useCallback, useContext } from 'react';
 import { BoardActionContext } from '../components/BoardProvider/BoardActionProvider';
+import { BoardContext } from '../components/BoardProvider/BoardProvider';
 import { WidgetMethodContext } from '../components/WidgetProvider/WidgetMethodProvider';
 import { widgetActionType } from '../components/WidgetToolBar/config';
 import { Widget } from '../pages/Board/slice/types';
 
 export default function useWidgetAction() {
-  const { onWidgetAction } = useContext(WidgetMethodContext);
+  const {
+    onWidgetAction,
+    onWidgetFullScreen,
+    onWidgetGetData,
+    onEditWidgetGetData,
+  } = useContext(WidgetMethodContext);
+  const { editing } = useContext(BoardContext);
   const { deleteActiveWidgets } = useContext(BoardActionContext);
-  const widgetAction = useCallback(
-    (key: widgetActionType, widget: Widget) => {
-      switch (key) {
-        case 'delete':
-          deleteActiveWidgets([widget.id]);
-          break;
-        default:
-          onWidgetAction(key, widget);
-          break;
-      }
-    },
-    [deleteActiveWidgets, onWidgetAction],
-  );
+  const widgetAction = useCallback((key: widgetActionType, widget: Widget) => {
+    switch (key) {
+      case 'delete':
+        deleteActiveWidgets([widget.id]);
+        break;
+      case 'fullScreen':
+        onWidgetFullScreen(widget.dashboardId, widget.id);
+        break;
+      case 'refresh':
+        if (editing) {
+          onEditWidgetGetData(widget);
+        } else {
+          onWidgetGetData(widget);
+        }
+
+        break;
+      default:
+        onWidgetAction(key, widget);
+        break;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return widgetAction;
 }

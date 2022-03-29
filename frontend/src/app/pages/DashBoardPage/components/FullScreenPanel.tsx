@@ -60,15 +60,13 @@ export const FullScreenPanel: React.FC<FullScreenPanelProps> = () => {
   }, []);
   const closeFullScreen = useCallback(() => {
     setCollapsed(c => false);
-    dispatch(
-      boardActions.updateFullScreenPanel({ recordId: boardId, itemId: '' }),
-    );
+    dispatch(boardActions.updateFullScreenPanel({ boardId, itemId: '' }));
   }, [boardId, dispatch]);
   const changeItem = useCallback(
     e => {
       dispatch(
         boardActions.updateFullScreenPanel({
-          recordId: boardId,
+          boardId,
           itemId: e.key,
         }),
       );
@@ -131,10 +129,11 @@ const FullScreenWrap = styled.div<{ show: boolean }>`
   bottom: 0;
   left: 0;
   z-index: 100;
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
+
   background-color: ${WHITE};
   transition: all 3s ease-out;
 
@@ -148,8 +147,8 @@ const FullScreenWrap = styled.div<{ show: boolean }>`
     color: ${G90};
   }
   .full-container {
-    flex: 1;
     display: flex;
+    flex: 1;
   }
 
   .full-menu {
