@@ -54,6 +54,7 @@ import {
 } from './constant';
 import DataModelBranch from './DataModelBranch';
 import DataModelNode from './DataModelNode';
+import { toModel } from './utils';
 
 const DataModelTree: FC = memo(() => {
   const t = useI18NPrefix('view');
@@ -164,16 +165,17 @@ const DataModelTree: FC = memo(() => {
       } else {
         newNode = { ...targetNode, type: type };
       }
-      const newHierarchy = updateNode(tableColumns, newNode, targetNode.index);
+      const newHierarchy = updateNode(
+        tableColumns,
+        newNode,
+        tableColumns?.findIndex(n => n.name === name),
+      );
       handleDataModelHierarchyChange(newHierarchy);
       return;
     }
-    const targetBranch = tableColumns?.find(b => {
-      if (b.children) {
-        return b.children?.find(bn => bn.name === name);
-      }
-      return false;
-    });
+    const targetBranch = tableColumns?.find(b =>
+      b?.children?.find(bn => bn.name === name),
+    );
     if (!!targetBranch) {
       const newNodeIndex = targetBranch.children?.findIndex(
         bn => bn.name === name,
@@ -192,7 +194,7 @@ const DataModelTree: FC = memo(() => {
           const newHierarchy = updateNode(
             tableColumns,
             newTargetBranch,
-            newTargetBranch.index,
+            tableColumns.findIndex(n => n.name === newTargetBranch.name),
           );
           handleDataModelHierarchyChange(newHierarchy);
         }
@@ -368,7 +370,7 @@ const DataModelTree: FC = memo(() => {
         const newHierarchy = updateNode(
           tableColumns,
           { ...node, name: newName },
-          node.index,
+          tableColumns.findIndex(n => n.name === node.name),
         );
         handleDataModelHierarchyChange(newHierarchy);
       },
@@ -458,8 +460,8 @@ const DataModelTree: FC = memo(() => {
     return toModel(newColumns);
   };
 
-  const updateNode = (columns: Column[], newNode, updateIndex) => {
-    columns[updateIndex] = newNode;
+  const updateNode = (columns: Column[], newNode, columnIndexes) => {
+    columns[columnIndexes] = newNode;
     return toModel(columns);
   };
 
@@ -501,29 +503,6 @@ const DataModelTree: FC = memo(() => {
       clonedHierarchy,
       columns.findIndex(c => c.name === clonedHierarchy.name),
     );
-  };
-
-  const toModel = (columns: Column[], ...additional) => {
-    return columns.concat(...additional)?.reduce((acc, cur, newIndex) => {
-      if (cur?.role === ColumnRole.Hierarchy && isEmptyArray(cur?.children)) {
-        return acc;
-      }
-      if (cur?.role === ColumnRole.Hierarchy && !isEmptyArray(cur?.children)) {
-        const orderedChildren = cur.children?.map((child, newIndex) => {
-          return {
-            ...child,
-            index: newIndex,
-          };
-        });
-        acc[cur.name] = Object.assign({}, cur, {
-          index: newIndex,
-          children: orderedChildren,
-        });
-      } else {
-        acc[cur.name] = Object.assign({}, cur, { index: newIndex });
-      }
-      return acc;
-    }, {});
   };
 
   const getPermissionButton = useCallback(
