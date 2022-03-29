@@ -225,7 +225,7 @@ const slice = createSlice({
         v => v.id === action.meta.arg.id,
       );
 
-      if (currentEditingView) {
+      if (currentEditingView && action.payload) {
         const { model, dataSource } = transformQueryResultToModelAndDataSource(
           action.payload,
           currentEditingView.model,
@@ -241,15 +241,6 @@ const slice = createSlice({
         if (action.payload.warnings) {
           currentEditingView.warnings = action.payload.warnings;
         }
-      }
-    });
-    builder.addCase(runSql.rejected, (state, action) => {
-      const currentEditingView = state.editingViews.find(
-        v => v.id === action.meta.arg.id,
-      );
-      if (currentEditingView) {
-        currentEditingView.stage = ViewViewModelStages.Initialized;
-        currentEditingView.error = action.payload as string;
       }
     });
 
