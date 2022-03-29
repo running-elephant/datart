@@ -84,7 +84,7 @@ export interface BoardActionContextProps {
   ) => void;
   undo: () => void;
   redo: () => void;
-  deleteActiveWidgets: () => void;
+  deleteActiveWidgets: (ids?: string[]) => void;
   layerToTop: () => void;
   layerToBottom: () => void;
   copyWidgets: (ids?: string[]) => void;
@@ -115,7 +115,7 @@ export const BoardActionProvider: FC<{ id: string }> = memo(
       onWidgetsQuery: debounce(
         (editing: boolean, renderMode: VizRenderMode) => {
           if (editing) {
-            dispatch(editWidgetsQueryAction({ boardId }));
+            dispatch(editWidgetsQueryAction());
           } else {
             dispatch(widgetsQueryAction({ boardId, renderMode }));
           }
@@ -221,8 +221,8 @@ export const BoardActionProvider: FC<{ id: string }> = memo(
       redo: () => {
         dispatch({ type: BOARD_UNDO.redo });
       },
-      deleteActiveWidgets: debounce(() => {
-        dispatch(deleteWidgetsAction());
+      deleteActiveWidgets: debounce((ids?: string[]) => {
+        dispatch(deleteWidgetsAction(ids));
       }, 200),
       layerToTop: () => {
         dispatch(widgetsToPositionAction('top'));

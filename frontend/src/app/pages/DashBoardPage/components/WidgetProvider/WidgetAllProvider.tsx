@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { WidgetChartProvider } from './WidgetChartProvider';
 import { WidgetDataProvider } from './WidgetDataProvider';
 import { WidgetInfoProvider } from './WidgetInfoProvider';

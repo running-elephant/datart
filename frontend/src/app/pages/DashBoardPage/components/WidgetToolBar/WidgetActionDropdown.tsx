@@ -30,10 +30,10 @@ import {
 import { Button, Dropdown, Menu } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
+import useWidgetAction from '../../hooks/useWidgetAction';
 import { Widget } from '../../pages/Board/slice/types';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import { WidgetChartContext } from '../WidgetProvider/WidgetChartProvider';
-import { WidgetMethodContext } from '../WidgetProvider/WidgetMethodProvider';
 import {
   getWidgetActionList,
   WidgetActionListItem,
@@ -47,14 +47,15 @@ export interface WidgetActionDropdownProps {
 export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
   ({ widget }) => {
     const { editing: boardEditing } = useContext(BoardContext);
-    const { onWidgetAction } = useContext(WidgetMethodContext);
+
+    const widgetAction = useWidgetAction();
     const dataChart = useContext(WidgetChartContext)!;
     const t = useI18NPrefix(`viz.widget.action`);
     const menuClick = useCallback(
       ({ key }) => {
-        onWidgetAction(key, widget);
+        widgetAction(key, widget);
       },
-      [onWidgetAction, widget],
+      [widgetAction, widget],
     );
     const getAllList = useCallback(() => {
       const allWidgetActionList: WidgetActionListItem<widgetActionType>[] = [

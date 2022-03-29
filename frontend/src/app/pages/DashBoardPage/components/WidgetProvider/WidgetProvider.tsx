@@ -38,7 +38,7 @@ export const WidgetProvider: FC<{ widgetId: string }> = ({
   widgetId,
   children,
 }) => {
-  const { boardId, boardType, editing } = useContext(BoardContext);
+  const { boardId, editing } = useContext(BoardContext);
   // 浏览模式
   const boardWidget = useSelector((state: { board: BoardState }) =>
     selectWidgetBy2Id(state, boardId, widgetId),
