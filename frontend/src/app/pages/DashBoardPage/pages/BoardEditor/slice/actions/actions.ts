@@ -69,6 +69,9 @@ export const deleteWidgetsAction = () => (dispatch, getState) => {
   let selectedIds = Object.values(editBoard.widgetInfoRecord)
     .filter(WidgetInfo => WidgetInfo.selected)
     .map(WidgetInfo => WidgetInfo.id);
+  if (selectedIds.length === 0) {
+    return;
+  }
   dispatch(editBoardStackActions.deleteWidgets(selectedIds));
   let childWidgetIds: string[] = [];
   const widgetMap = editBoard.stack.present.widgetRecord;

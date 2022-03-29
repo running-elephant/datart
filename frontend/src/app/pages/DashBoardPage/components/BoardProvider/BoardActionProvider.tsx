@@ -19,7 +19,7 @@
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { generateShareLinkAsync } from 'app/utils/fetch';
 import debounce from 'lodash/debounce';
-import React, { createContext, FC, memo } from 'react';
+import { createContext, FC, memo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 import { BOARD_UNDO } from '../../constants';
@@ -221,9 +221,9 @@ export const BoardActionProvider: FC<{ id: string }> = memo(
       redo: () => {
         dispatch({ type: BOARD_UNDO.redo });
       },
-      deleteActiveWidgets: () => {
+      deleteActiveWidgets: debounce(() => {
         dispatch(deleteWidgetsAction());
-      },
+      }, 200),
       layerToTop: () => {
         dispatch(widgetsToPositionAction('top'));
       },

@@ -19,6 +19,7 @@
 import { useContext } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { BoardActionContext } from '../components/BoardProvider/BoardActionProvider';
+
 export default function useBoardEditorHotkeys() {
   const {
     undo,
@@ -68,5 +69,12 @@ export default function useBoardEditorHotkeys() {
   });
   useHotkeys('shift+right', () => {
     console.log('__ widgets right10');
+  });
+
+  useHotkeys('', () => {
+    console.log('__ widgets lock');
+  });
+  useHotkeys('', () => {
+    console.log('__ widgets unlock');
   });
 }

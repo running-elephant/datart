@@ -44,44 +44,42 @@ export const ToolBar = () => {
   return (
     <Wrapper onClick={ssp}>
       <Space>
-        <>
-          <AddChart />
-          <Divider type="vertical" />
+        <AddChart />
+        <Divider type="vertical" />
 
-          <AddMedia />
+        <AddMedia />
 
-          <AddContainer />
-          <Divider type="vertical" />
+        <AddContainer />
+        <Divider type="vertical" />
 
-          <AddController />
+        <AddController />
 
-          <ToTopBtn fn={layerToTop} title={t('toTop')} />
+        <ToTopBtn fn={layerToTop} title={t('toTop')} />
 
-          <ToBottomBtn fn={layerToBottom} title={t('toBottom')} />
+        <ToBottomBtn fn={layerToBottom} title={t('toBottom')} />
 
-          <Divider type="vertical" />
+        <Divider type="vertical" />
 
-          <UndoBtn fn={undo} title={t('undo')} />
+        <UndoBtn fn={undo} title={t('undo')} />
 
-          <RedoBtn fn={redo} title={t('redo')} />
-          <Divider type="vertical" />
+        <RedoBtn fn={redo} title={t('redo')} />
+        <Divider type="vertical" />
 
-          <CopyBtn fn={copyWidgets} title={t('copy')} />
+        <CopyBtn fn={copyWidgets} title={t('copy')} />
 
-          <PasteBtn fn={pasteWidgets} title={t('paste')} />
+        <PasteBtn fn={pasteWidgets} title={t('paste')} />
 
-          {boardType === 'auto' && (
-            <>
-              <Divider type="vertical" />
+        {boardType === 'auto' && (
+          <>
+            <Divider type="vertical" />
 
-              <DeviceSwitcher />
+            <DeviceSwitcher />
 
-              <Divider type="vertical" />
+            <Divider type="vertical" />
 
-              <AllowOverlapBtn />
-            </>
-          )}
-        </>
+            <AllowOverlapBtn />
+          </>
+        )}
       </Space>
     </Wrapper>
   );

@@ -17,7 +17,8 @@
       "close": "Close",
       "saveAs": "Save as",
       "cancel": "Cancel",
-      "ok": "OK"
+      "ok": "OK",
+      "shortcuts": "Shortcuts"
     },
     "operation": {
       "archiveConfirm": "Archive confirm",
@@ -827,7 +828,8 @@
         "paste": "Paste",
         "deviceSwitch": "Device Switch",
         "allowOverlap": "Allow Overlap",
-        "forbidOverlap": "Forbid Overlap"
+        "forbidOverlap": "Forbid Overlap",
+        "multiSelect": "MultiSelect"
       },
       "controlTypes": {
         "common": "Common",
