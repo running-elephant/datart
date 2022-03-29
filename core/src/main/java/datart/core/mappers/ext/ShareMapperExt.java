@@ -27,10 +27,9 @@ import java.util.List;
 @Mapper
 public interface ShareMapperExt extends ShareMapper {
 
-    @Select("SELECT * FROM `share` where org_id = #{orgId} ")
-    List<Share> listByOrg(String orgId);
-
-    @Select("SELECT * FROM `share` where create_by = #{userId} ")
-    List<Share> listByUser(String userId);
+    @Select({"<script>",
+            "SELECT * FROM `share` where viz_id = #{vizId} ",
+            "</script>"})
+    List<Share> selectByViz(String vizId);
 
 }

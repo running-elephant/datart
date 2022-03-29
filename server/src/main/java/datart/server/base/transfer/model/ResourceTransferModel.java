@@ -16,21 +16,25 @@
  * limitations under the License.
  */
 
-package datart.server.service;
+package datart.server.base.transfer.model;
 
-import datart.core.data.provider.SchemaInfo;
-import datart.core.entity.Source;
-import datart.core.mappers.ext.SourceMapperExt;
-import datart.server.base.transfer.model.SourceTransferModel;
+import datart.core.base.consts.FileOwner;
+import datart.core.common.Application;
+import datart.server.service.FileService;
+import lombok.Data;
 
-import java.util.List;
+import java.io.Serializable;
 
-public interface SourceService extends BaseCRUDService<Source, SourceMapperExt>, ResourceTransferService<Source, SourceTransferModel> {
+@Data
+public abstract class ResourceTransferModel implements Serializable {
 
-    List<Source> listSources(String orgId, boolean active);
+    private String orgId;
 
-    SchemaInfo getSourceSchemaInfo(String sourceId);
+    public String getFileName() {
+        return Application.getBean(FileService.class).getBasePath(FileOwner.EXPORT, null) + "/" + getVizName() + "-" + System.currentTimeMillis() + ".viz";
 
-    SchemaInfo syncSourceSchema(String sourceId) throws Exception;
+    }
+
+    public abstract String getVizName();
 
 }

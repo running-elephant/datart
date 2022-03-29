@@ -3,7 +3,10 @@ package datart.server.service;
 import datart.core.entity.*;
 import datart.security.base.ResourceType;
 import datart.server.base.dto.*;
+import datart.server.base.transfer.ImportStrategy;
+import datart.server.base.transfer.model.ResourceTransferModel;
 import datart.server.base.params.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -74,5 +77,9 @@ public interface VizService {
     boolean unpublish(ResourceType resourceType, String vizId);
 
     String getChartConfigByVizId(String vizId, String vizType);
+
+    ResourceTransferModel exportViz(ResourceType vizType, boolean onlyViz, String... vizIds) throws IOException;
+
+    boolean importViz(MultipartFile file, ImportStrategy importStrategy, String orgId) throws IOException;
 
 }

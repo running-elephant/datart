@@ -15,25 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package datart.server.service;
 
-import datart.core.entity.View;
-import datart.core.mappers.ext.ViewMapperExt;
-import datart.server.base.dto.ViewDetailDTO;
-import datart.server.base.transfer.model.ViewTransferModel;
-import datart.server.base.params.ViewBaseUpdateParam;
+import datart.server.base.transfer.ImportStrategy;
+import datart.server.base.transfer.TransferConfig;
+import datart.server.base.transfer.model.ResourceTransferModel;
 
 import java.util.List;
+import java.util.Set;
 
-public interface ViewService extends VizCRUDService<View, ViewMapperExt>,ResourceTransferService<View,ViewTransferModel> {
+public interface ResourceTransferService<T, R extends ResourceTransferModel> {
 
-    ViewDetailDTO getViewDetail(String viewId);
+    List<T> getAllParents(String id);
 
-    List<View> getViews(String orgId);
+    R exportResource(TransferConfig transferConfig, String... ids);
 
-    boolean unarchive(String id, String newName, String parentId, double index);
-
-    boolean updateBase(ViewBaseUpdateParam updateParam);
-
+    boolean importResource(R model, ImportStrategy strategy, String orgId, Set<String> requireTransfer);
 }

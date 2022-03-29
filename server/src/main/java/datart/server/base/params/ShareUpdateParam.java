@@ -43,6 +43,8 @@ public class ShareUpdateParam extends BaseUpdateParam {
 
     private Set<String> roles;
 
+    private Set<String> users;
+
     private String authenticationCode;
 
 }

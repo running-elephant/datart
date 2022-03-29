@@ -16,21 +16,36 @@
  * limitations under the License.
  */
 
-package datart.server.service;
+package datart.server.base.dto;
 
-import datart.core.data.provider.SchemaInfo;
-import datart.core.entity.Source;
-import datart.core.mappers.ext.SourceMapperExt;
-import datart.server.base.transfer.model.SourceTransferModel;
+import datart.core.base.consts.ShareAuthenticationMode;
+import datart.core.base.consts.ShareRowPermissionBy;
+import lombok.Data;
 
-import java.util.List;
+import java.util.Date;
+import java.util.Set;
 
-public interface SourceService extends BaseCRUDService<Source, SourceMapperExt>, ResourceTransferService<Source, SourceTransferModel> {
+@Data
+public class ShareInfo {
 
-    List<Source> listSources(String orgId, boolean active);
+    private String id;
 
-    SchemaInfo getSourceSchemaInfo(String sourceId);
+    private String orgId;
 
-    SchemaInfo syncSourceSchema(String sourceId) throws Exception;
+    private String vizType;
+
+    private String vizId;
+
+    private ShareAuthenticationMode authenticationMode;
+
+    private ShareRowPermissionBy rowPermissionBy;
+
+    private String authenticationCode;
+
+    private Date expiryDate;
+
+    private Set<String> roles;
+
+    private Set<String> users;
 
 }

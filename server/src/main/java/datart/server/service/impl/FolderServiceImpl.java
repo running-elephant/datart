@@ -169,6 +169,23 @@ public class FolderServiceImpl extends BaseService implements FolderService {
     }
 
     @Override
+    public List<Folder> getAllParents(String folderId) {
+        List<Folder> parents = new LinkedList<>();
+        getParent(parents, folderId);
+        return parents;
+    }
+
+    private void getParent(List<Folder> list, String parentId) {
+        Folder folder = folderMapper.selectByPrimaryKey(parentId);
+        if (folder != null) {
+            if (folder.getParentId() != null) {
+                getParent(list, folder.getParentId());
+            }
+            list.add(folder);
+        }
+    }
+
+    @Override
     @Transactional
     public boolean update(BaseUpdateParam baseUpdateParam) {
 

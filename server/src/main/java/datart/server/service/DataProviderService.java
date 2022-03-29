@@ -38,7 +38,7 @@ public interface DataProviderService {
 
     String decryptValue(String value);
 
-    void updateSource(DataProviderSource source);
+    void updateSource(Source source);
 
     DataProviderSource parseDataProviderConfig(Source source);
 

@@ -60,6 +60,9 @@ public class SchemaSyncJob implements Job, Closeable {
     public boolean execute(String sourceId) throws Exception {
         List<SchemaItem> schemaItems = new LinkedList<>();
         DataProviderService dataProviderService = Application.getBean(DataProviderService.class);
+
+        // TODO remove job if source not exists
+
         Set<String> databases = dataProviderService.readAllDatabases(sourceId);
         if (CollectionUtils.isNotEmpty(databases)) {
             for (String database : databases) {

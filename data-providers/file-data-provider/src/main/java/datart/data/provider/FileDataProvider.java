@@ -27,14 +27,14 @@ import datart.core.data.provider.DataProviderSource;
 import datart.core.data.provider.Dataframe;
 import datart.data.provider.jdbc.DataTypeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class FileDataProvider extends DefaultDataProvider {
@@ -121,6 +121,37 @@ public class FileDataProvider extends DefaultDataProvider {
         return dataframe;
     }
 
+    @Override
+    public void resetSource(DataProviderSource config) {
+        super.resetSource(config);
+        Map<String, Object> properties = config.getProperties();
+        List<Map<String, Object>> schemas;
+        if (properties.containsKey(SCHEMAS)) {
+            schemas = (List<Map<String, Object>>) properties.get(SCHEMAS);
+        } else {
+            schemas = Collections.singletonList(properties);
+        }
+        Set<String> refFiles = new HashSet<>();
+        for (Map<String, Object> schema : schemas) {
+            String path = schema.get(FILE_PATH).toString();
+            refFiles.add(FileUtils.withBasePath(path));
+        }
+        if (refFiles.size() > 0) {
+            Set<String> refFilenames = refFiles.stream().map(FilenameUtils::getName).collect(Collectors.toSet());
+
+            String basePath = FilenameUtils.getFullPath(refFiles.stream().findFirst().get());
+            Set<String> fileNames = FileUtils.walkDir(new File(basePath), null, false);
+            if (!CollectionUtils.isEmpty(fileNames)) {
+                for (String fileName : fileNames) {
+                    if (!refFilenames.contains(fileName)) {
+                        String fileToDelete = FileUtils.concatPath(basePath, fileName);
+                        log.info("delete unused file " + fileToDelete);
+                        FileUtils.delete(fileToDelete);
+                    }
+                }
+            }
+        }
+    }
 
     private List<Column> inferHeader(List<List<Object>> values) {
         List<Object> typedValues = values.get(0);

@@ -2,10 +2,7 @@ package datart.core.mappers.ext;
 
 import datart.core.entity.Dashboard;
 import datart.core.mappers.DashboardMapper;
-import org.apache.ibatis.annotations.CacheNamespaceRef;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -33,5 +30,14 @@ public interface DashboardMapperExt extends DashboardMapper {
             "SELECT id,`name`,org_id,`status` FROM dashboard WHERE org_id=#{orgId} AND `status`=0"
     })
     List<Dashboard> listArchived(String orgId);
+
+    @Delete({
+            "DELETE FROM dashboard WHERE id = #{dashboardId};",
+            "DELETE FROM rel_widget_widget WHERE source_id in (SELECT DISTINCT id FROM widget WHERE dashboard_id=#{dashboardId});",
+            "DELETE FROM rel_widget_widget WHERE target_id in (SELECT DISTINCT id FROM widget WHERE dashboard_id=#{dashboardId});",
+            "DELETE FROM rel_widget_element WHERE widget_id in (SELECT DISTINCT id FROM widget WHERE dashboard_id=#{dashboardId});",
+            "DELETE FROM widget WHERE dashboard_id=#{dashboardId};",
+    })
+    int deleteDashboard(String dashboardId);
 
 }
