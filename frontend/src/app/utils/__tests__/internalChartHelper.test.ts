@@ -29,6 +29,7 @@ import {
   mergeChartStyleConfigs,
   reachLowerBoundCount,
   transferChartConfigs,
+  transformHierarchyMeta,
   transformMeta,
 } from '../internalChartHelper';
 
@@ -1380,6 +1381,183 @@ describe('Internal Chart Helper ', () => {
       };
       const result = getColumnRenderOriginName(config as ChartDataSectionField);
       expect(result).toEqual('AVG(a)');
+    });
+  });
+
+  describe('transformHierarchyMeta Test', () => {
+    test('should get empty array when metas is null', () => {
+      const metas = transformHierarchyMeta(undefined);
+      expect(metas).toEqual([]);
+    });
+
+    test('should get columns when hierarchy is null or empty', () => {
+      const model = {
+        hierarchy: {},
+        columns: {
+          a: {
+            name: 'a',
+            primaryKey: true,
+            type: 'STRING',
+            category: 'UNCATEGORIZED',
+            role: 'role',
+          },
+          b: {
+            name: 'b',
+            primaryKey: false,
+            type: 'NUMERIC',
+            category: 'UNCATEGORIZED',
+            role: 'role',
+          },
+        },
+      };
+      const metas = transformHierarchyMeta(JSON.stringify(model));
+      expect(metas).toEqual([
+        {
+          name: 'a',
+          primaryKey: true,
+          type: 'STRING',
+          category: 'field',
+          role: 'role',
+          id: 'a',
+          subType: 'UNCATEGORIZED',
+        },
+        {
+          name: 'b',
+          primaryKey: false,
+          type: 'NUMERIC',
+          category: 'field',
+          role: 'role',
+          id: 'b',
+          subType: 'UNCATEGORIZED',
+        },
+      ]);
+    });
+
+    test('should get hierarchy metas', () => {
+      const model = {
+        hierarchy: {
+          a: {
+            name: 'a',
+            primaryKey: true,
+            type: 'STRING',
+            category: 'UNCATEGORIZED',
+            role: 'hierarchy',
+            children: [
+              {
+                name: 'a-1',
+                primaryKey: true,
+                type: 'STRING',
+                category: 'UNCATEGORIZED',
+                role: 'role',
+              },
+              {
+                name: 'a-2',
+                primaryKey: true,
+                type: 'NUMERIC',
+                category: 'UNCATEGORIZED',
+                role: 'role',
+              },
+            ],
+          },
+          b: {
+            name: 'b',
+            primaryKey: true,
+            type: 'STRING',
+            category: 'UNCATEGORIZED',
+            role: 'hierarchy',
+            children: [
+              {
+                name: 'b-1',
+                primaryKey: true,
+                type: 'DATE',
+                category: 'UNCATEGORIZED',
+                role: 'role',
+              },
+            ],
+          },
+          c: {
+            name: 'c',
+            primaryKey: true,
+            type: 'NUMERIC',
+            category: 'UNCATEGORIZED',
+            role: 'role',
+          },
+        },
+        columns: {
+          x: {
+            name: 'x',
+            primaryKey: true,
+            type: 'STRING',
+            category: 'UNCATEGORIZED',
+            role: 'role',
+          },
+        },
+      };
+      const metas = transformHierarchyMeta(JSON.stringify(model));
+      expect(metas).toEqual([
+        {
+          name: 'a',
+          primaryKey: true,
+          type: 'STRING',
+          category: 'field',
+          role: 'hierarchy',
+          children: [
+            {
+              name: 'a-1',
+              primaryKey: true,
+              type: 'STRING',
+              category: 'field',
+              role: 'role',
+              id: 'a-1',
+              subType: 'UNCATEGORIZED',
+              children: undefined,
+            },
+            {
+              name: 'a-2',
+              primaryKey: true,
+              type: 'NUMERIC',
+              category: 'field',
+              role: 'role',
+              id: 'a-2',
+              subType: 'UNCATEGORIZED',
+              children: undefined,
+            },
+          ],
+          id: 'a',
+          subType: 'UNCATEGORIZED',
+        },
+        {
+          name: 'b',
+          primaryKey: true,
+          type: 'STRING',
+          category: 'field',
+          role: 'hierarchy',
+          children: [
+            {
+              name: 'b-1',
+              primaryKey: true,
+              type: 'DATE',
+              category: 'field',
+              role: 'role',
+              id: 'b-1',
+              subType: 'UNCATEGORIZED',
+              children: undefined,
+            },
+          ],
+          id: 'b',
+          subType: 'UNCATEGORIZED',
+        },
+        {
+          name: 'c',
+          primaryKey: true,
+          type: 'NUMERIC',
+          category: 'field',
+          role: 'role',
+          id: 'c',
+          subType: 'UNCATEGORIZED',
+          children: undefined,
+        },
+      ]);
     });
   });
 });

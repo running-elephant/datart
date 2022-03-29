@@ -32,6 +32,7 @@ import {
   ChartCommonConfig,
   ChartStyleConfigDTO,
 } from 'app/types/ChartConfigDTO';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import {
   cond,
   curry,
@@ -361,6 +362,34 @@ export function transformMeta(model?: string) {
       category: ChartDataViewFieldCategory.Field,
     };
   });
+}
+
+export function transformHierarchyMeta(model?: string): ChartDataViewMeta[] {
+  if (!model) {
+    return [];
+  }
+  const modelObj = JSON.parse(model);
+  const hierarchyMeta = !Object.keys(modelObj?.hierarchy || {}).length
+    ? modelObj.columns
+    : modelObj.hierarchy;
+  return Object.keys(hierarchyMeta || {}).map(key => {
+    return getMeta(key, hierarchyMeta?.[key]);
+  });
+}
+
+function getMeta(key, column) {
+  let children;
+  if (!isEmptyArray(column?.children)) {
+    children = column?.children.map(child => getMeta(child?.name, child));
+  }
+
+  return {
+    ...column,
+    id: key,
+    subType: column?.category,
+    category: ChartDataViewFieldCategory.Field,
+    children: children,
+  };
 }
 
 export function mergeChartStyleConfigs(

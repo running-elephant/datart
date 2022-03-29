@@ -62,6 +62,14 @@ export enum DataViewFieldType {
   DATE = 'DATE',
 }
 
+export enum ChartDataViewSubType {
+  UnCategorized = 'UNCATEGORIZED',
+  Country = 'COUNTRY',
+  ProvinceOrState = 'PROVINCEORSTATE',
+  City = 'CITY',
+  County = 'COUNTY',
+}
+
 export enum ChartDataViewFieldCategory {
   Field = 'field',
   Variable = 'variable',

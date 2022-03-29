@@ -18,6 +18,7 @@
 
 import {
   ChartDataViewFieldCategory,
+  ChartDataViewSubType,
   DataViewFieldType,
 } from 'app/constants';
 
@@ -29,6 +30,7 @@ export type ChartDataViewMeta = {
   primaryKey?: boolean;
   category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
   type?: DataViewFieldType;
+  subType?: ChartDataViewSubType;
   expression?: string;
   role?: string;
   children?: ChartDataViewMeta[];

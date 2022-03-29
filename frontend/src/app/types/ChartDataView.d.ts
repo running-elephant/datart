@@ -20,7 +20,6 @@ import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { View } from 'app/types/View';
 
 export type ChartDataView = Omit<View, 'model'> & {
-  hierarchyMetas?: ChartDataViewMeta[];
   meta?: ChartDataViewMeta[];
   computedFields?: ChartDataViewMeta[];
   orgId?: string;

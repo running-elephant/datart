@@ -24,7 +24,7 @@ import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
-import { transformMeta } from 'app/utils/internalChartHelper';
+import { transformHierarchyMeta } from 'app/utils/internalChartHelper';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { ChartConfigReducerActionType } from './constant';
@@ -162,8 +162,7 @@ const workbenchSlice = createSlice({
           state.currentDataView = {
             ...payload,
             config: migrateViewConfig(payload.config),
-            meta: transformMeta(payload.model),
-            hierarchyMetas: [],
+            meta: transformHierarchyMeta(payload.model),
             computedFields,
           };
         }
