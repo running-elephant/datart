@@ -22,6 +22,7 @@ import { FONT_FAMILIES, FONT_SIZES } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { DeltaStatic } from 'quill';
 import { ImageDrop } from 'quill-image-drop-module'; // 拖动加载图片组件。
+// NOTE: source from: https://github.com/cloverhearts/quilljs-markdown
 import QuillMarkdown from 'quilljs-markdown';
 import {
   FC,
@@ -59,7 +60,7 @@ Quill.register(font, true);
 const MenuItem = Menu.Item;
 
 const ChartRichTextAdapter: FC<{
-  dataList: any[];
+  dataList: Array<{ id: string | undefined; name: string; value: string }>;
   id: string;
   isEditing?: boolean;
   initContent: string | undefined;
@@ -159,9 +160,7 @@ const ChartRichTextAdapter: FC<{
               const config = name
                 ? dataList.find(items => items.name === name)
                 : null;
-              if (typeof config.value === 'number')
-                insert = String(config.value);
-              else insert = config?.value || '';
+              insert = config?.value;
             }
           }
           return { ...item, insert };

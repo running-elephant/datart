@@ -27,7 +27,9 @@ import {
   ChartDataSectionField,
   ChartStyleConfig,
   FontStyle,
+  GridStyle,
   IFieldFormatConfig,
+  XAxis,
 } from 'app/types/ChartConfig';
 import {
   ChartCommonConfig,
@@ -45,7 +47,7 @@ import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
 import moment from 'moment';
 import { Debugger } from 'utils/debugger';
 import { isEmpty, isEmptyArray, meanValue, pipe } from 'utils/object';
-import { XAxis } from '../components/ChartGraph/BasicBarChart/types';
+import { ColumnsList } from '../components/ChartGraph/BasicTableChart/types';
 import {
   flattenHeaderRowsWithoutGroupRow,
   getAxisLengthByConfig,
@@ -1083,12 +1085,8 @@ export function getUnusedHeaderRows(
   allRows: Array<{
     colName?: string;
   }>,
-  originalRows: Array<{
-    colName?: string;
-    isGroup?: boolean;
-    children?: any[];
-  }>,
-): any[] {
+  originalRows: Array<ColumnsList>,
+): ColumnsList[] {
   const oldFlattenedColNames = originalRows
     .flatMap(row => flattenHeaderRowsWithoutGroupRow(row))
     .map(r => r.colName);
@@ -1287,13 +1285,7 @@ export function getScatterSymbolSizeFn(
   };
 }
 
-export function getGridStyle(styles: ChartStyleConfig[]): {
-  left: string;
-  right: string;
-  bottom: string;
-  top: string;
-  containLabel: boolean;
-} {
+export function getGridStyle(styles: ChartStyleConfig[]): GridStyle {
   const [containLabel, left, right, bottom, top] = getStyles(
     styles,
     ['margin'],
@@ -1303,7 +1295,9 @@ export function getGridStyle(styles: ChartStyleConfig[]): {
 }
 
 // TODO(Stephen): to be used chart DataSetRow model for all charts
-export function getExtraSeriesRowData(data) {
+export function getExtraSeriesRowData(
+  data: IChartDataSetRow<string> | { [key: string]: any },
+): { rowData: { [key: string]: any } } {
   if (data instanceof ChartDataSetRow) {
     return {
       // NOTE: row data should be case sensitive except for data chart

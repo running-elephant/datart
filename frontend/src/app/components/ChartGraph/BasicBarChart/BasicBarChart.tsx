@@ -24,6 +24,9 @@ import {
   ChartStyleConfig,
   LabelStyle,
   LegendStyle,
+  XAxis,
+  XAxisColumns,
+  YAxis,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
@@ -46,14 +49,7 @@ import { UniqArray } from 'utils/object';
 import Chart from '../../../models/Chart';
 import { ChartRequirement } from '../../../types/ChartMetadata';
 import Config from './config';
-import {
-  BarSeriesImpl,
-  BorderStyle,
-  Series,
-  XAxis,
-  XAxisColumns,
-  YAxis,
-} from './types';
+import { BarBorderStyle, BarSeriesImpl, Series } from './types';
 
 class BasicBarChart extends Chart {
   config = Config;
@@ -365,7 +361,7 @@ class BasicBarChart extends Chart {
   private getSeriesItemStyle(
     styles: ChartStyleConfig[],
     itemStyle?: { color: string | undefined },
-  ): BorderStyle {
+  ): BarBorderStyle {
     const [borderStyle, borderRadius] = getStyles(
       styles,
       ['bar'],

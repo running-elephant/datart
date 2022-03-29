@@ -17,7 +17,11 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
-import { ChartConfig } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataSectionField,
+  ChartStyleConfig,
+} from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
@@ -29,6 +33,17 @@ import {
 import { init } from 'echarts';
 import Chart from '../../../models/Chart';
 import Config from './config';
+import {
+  DataConfig,
+  GaugeAxisStyle,
+  GaugeDetailStyle,
+  GaugePointerStyle,
+  GaugeProgressStyle,
+  GaugeSplitLineStyle,
+  GaugeStyle,
+  GaugeTitleStyle,
+  SeriesConfig,
+} from './types';
 
 class BasicGaugeChart extends Chart {
   config = Config;
@@ -86,7 +101,7 @@ class BasicGaugeChart extends Chart {
   }
 
   getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
-    const styleConfigs = config.styles;
+    const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
@@ -109,8 +124,8 @@ class BasicGaugeChart extends Chart {
   }
 
   private getTooltip(
-    style,
-    aggConfigs,
+    style: ChartStyleConfig[],
+    aggConfigs: ChartDataSectionField[],
   ): { formatter: ({ data }: { data: any }) => string } {
     const [prefix, suffix] = getStyles(style, ['gauge'], ['prefix', 'suffix']);
     return {
@@ -124,25 +139,24 @@ class BasicGaugeChart extends Chart {
   }
 
   private getSeries(
-    styleConfigs,
-    chartDataSet: IChartDataSet<string | number>,
-    aggConfig,
-  ) {
+    styleConfigs: ChartStyleConfig[],
+    chartDataSet: IChartDataSet<string>,
+    aggConfig: ChartDataSectionField,
+  ): SeriesConfig {
     const detail = this.getDetail(styleConfigs, aggConfig);
     const title = this.getTitle(styleConfigs);
     const pointer = this.getPointer(styleConfigs);
     const axis = this.getAxis(styleConfigs);
     const splitLine = this.getSplitLine(styleConfigs);
     const progress = this.getProgress(styleConfigs);
-    const pointerColor = getValue(styleConfigs, ['pointer', 'pointerColor']);
-    const dataConfig: { name: string; value: string | number; itemStyle: any } =
-      {
-        name: getColumnRenderName(aggConfig),
-        value: chartDataSet?.[0]?.getCell(aggConfig) || 0,
-        itemStyle: {
-          color: pointerColor,
-        },
-      };
+    const pointerColor = getStyles(styleConfigs, ['pointer'], ['pointerColor']);
+    const dataConfig: DataConfig = {
+      name: getColumnRenderName(aggConfig),
+      value: chartDataSet?.[0]?.getCell(aggConfig) || 0,
+      itemStyle: {
+        color: pointerColor,
+      },
+    };
     if (aggConfig?.color?.start) {
       dataConfig.itemStyle.color = aggConfig.color.start;
     }
@@ -159,7 +173,7 @@ class BasicGaugeChart extends Chart {
     };
   }
 
-  private getProgress(styleConfigs) {
+  private getProgress(styleConfigs: ChartStyleConfig[]): GaugeProgressStyle {
     const [show, roundCap] = getStyles(
       styleConfigs,
       ['progress'],
@@ -173,7 +187,7 @@ class BasicGaugeChart extends Chart {
     };
   }
 
-  private getSplitLine(styleConfigs) {
+  private getSplitLine(styleConfigs: ChartStyleConfig[]): GaugeSplitLineStyle {
     const [show, lineStyle, distance, length] = getStyles(
       styleConfigs,
       ['splitLine'],
@@ -187,7 +201,7 @@ class BasicGaugeChart extends Chart {
     };
   }
 
-  private getGauge(styleConfigs) {
+  private getGauge(styleConfigs: ChartStyleConfig[]): GaugeStyle {
     const [max, radius, startAngle, endAngle, splitNumber] = getStyles(
       styleConfigs,
       ['gauge'],
@@ -203,7 +217,7 @@ class BasicGaugeChart extends Chart {
     };
   }
 
-  private getAxis(styleConfigs) {
+  private getAxis(styleConfigs: ChartStyleConfig[]): GaugeAxisStyle {
     const [axisWidth, axisLineColor, axisRoundCap] = getStyles(
       styleConfigs,
       ['axis'],
@@ -241,7 +255,7 @@ class BasicGaugeChart extends Chart {
     };
   }
 
-  private getPointer(styleConfigs) {
+  private getPointer(styleConfigs: ChartStyleConfig[]): GaugePointerStyle {
     const [
       show,
       pointerLength,
@@ -275,7 +289,10 @@ class BasicGaugeChart extends Chart {
     };
   }
 
-  private getDetail(styleConfigs, aggConfig) {
+  private getDetail(
+    styleConfigs: ChartStyleConfig[],
+    aggConfig: ChartDataSectionField,
+  ): GaugeDetailStyle {
     const [show, font, detailOffsetLeft, detailOffsetTop] = getStyles(
       styleConfigs,
       ['data'],
@@ -299,7 +316,7 @@ class BasicGaugeChart extends Chart {
     };
   }
 
-  private getTitle(styleConfigs) {
+  private getTitle(styleConfigs: ChartStyleConfig[]): GaugeTitleStyle {
     const [show, font, detailOffsetLeft, detailOffsetTop] = getStyles(
       styleConfigs,
       ['label'],

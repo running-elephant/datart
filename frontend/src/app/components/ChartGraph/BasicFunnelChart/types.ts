@@ -5,7 +5,7 @@ export type SeriesData = {
     color?: string | undefined;
   };
   name: string;
-  rowData: any[];
+  rowData: { [key: string]: any };
   select: boolean;
   value: string[];
 } & ChartDataSectionField;

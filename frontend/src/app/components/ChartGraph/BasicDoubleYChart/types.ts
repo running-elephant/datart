@@ -58,29 +58,22 @@ export type DoubleYChartYAxis = {
   type: string;
 };
 
-export interface SeriesStyle {
-  smooth: boolean;
-  step: boolean;
-  symbol: string;
-  stack: boolean;
-}
-
 export type Series = {
   yAxisIndex: number;
   name: string;
   data: Array<
     {
-      rowData?: any;
+      rowData: { [key: string]: any };
       value: number | string;
       total?: number;
       format: IFieldFormatConfig | undefined;
     } & ChartDataSectionField
   >;
   color?: string;
-  smooth: boolean;
-  stack: boolean;
-  step: boolean;
-  symbol: string;
+  smooth?: boolean | undefined;
+  stack?: boolean | undefined;
+  step?: boolean | undefined;
+  symbol?: string | undefined;
   itemStyle: { color: string | undefined };
   type: string;
   sampling: string;

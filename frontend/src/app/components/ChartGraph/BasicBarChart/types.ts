@@ -17,59 +17,17 @@
  */
 
 import {
-  AxisLabel,
-  AxisLineStyle,
-  FontStyle,
+  BorderStyle,
   IFieldFormatConfig,
   LabelStyle,
   MarkArea,
   MarkLine,
 } from 'app/types/ChartConfig';
 
-export interface XAxisColumns {
-  type: string;
-  tooltip: { show: boolean };
-  data: string[];
-}
-
-export interface YAxis {
-  type: string;
-  name: string | null;
-  nameLocation: string;
-  nameGap: string;
-  nameRotate: string;
-  inverse: boolean;
-  min: number;
-  max: number;
-  axisLabel: AxisLabel;
-  axisLine: AxisLineStyle;
-  axisTick: AxisLineStyle;
-  nameTextStyle: FontStyle;
-  splitLine: AxisLineStyle;
-}
-
-export type XAxis = {
-  axisPointer?: {
-    show: boolean;
-    type: string;
-  };
-  axisLabel: AxisLabel;
-  axisLine: AxisLineStyle;
-  axisTick: AxisLineStyle;
-  data: string[];
-  inverse: boolean;
-  splitLine: AxisLineStyle;
-  tooltip: { show: boolean };
-  type: string;
-};
-
-export interface BorderStyle {
+export type BarBorderStyle = {
   color?: string;
   borderRadius?: number;
-  borderType: string;
-  borderWidth: number;
-  borderColor: string;
-}
+} & BorderStyle;
 
 export type BarSeriesImpl = {
   type: string;
@@ -84,7 +42,7 @@ export type BarSeriesImpl = {
 export type Series = {
   name: string;
   data: Array<{
-    rowData?: any;
+    rowData: { [key: string]: any };
     name: string;
     value: number | string;
     total?: number;

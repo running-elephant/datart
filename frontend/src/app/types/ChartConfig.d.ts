@@ -248,6 +248,20 @@ export type ChartConfig = {
   i18ns?: ChartI18NSectionConfig[];
 };
 
+export interface ChartOptions {
+  config: ChartConfig;
+  dataset: ChartDataSetDTO;
+  widgetSpecialConfig: { env: string | undefined; [x: string]: any };
+}
+
+export interface ChartContext {
+  document: Document;
+  height: number;
+  width: number;
+  translator: (key: string, disablePrefix?: boolean, options?: any) => any;
+  window: Window;
+}
+
 export interface LineStyle {
   color: string;
   type: string;
@@ -283,7 +297,7 @@ export type LabelStyle = {
     position?: string;
     show: boolean;
     font?: FontStyle;
-    formatter?: (params) => string;
+    formatter?: string | ((params) => string);
   } & FontStyle;
   labelLayout?: { hideOverlap: boolean };
 };
@@ -311,4 +325,63 @@ export interface MarkLine {
 
 export interface MarkArea {
   data: any;
+}
+
+export interface XAxisColumns {
+  type: string;
+  tooltip: { show: boolean };
+  data: string[];
+}
+
+export interface SeriesStyle {
+  smooth?: boolean;
+  step?: boolean;
+  symbol?: string;
+  stack?: boolean;
+  connectNulls?: boolean;
+}
+
+export interface YAxis {
+  type: string;
+  name: string | null;
+  nameLocation: string;
+  nameGap: string;
+  nameRotate: string;
+  inverse: boolean;
+  min: number;
+  max: number;
+  axisLabel: AxisLabel;
+  axisLine: AxisLineStyle;
+  axisTick: AxisLineStyle;
+  nameTextStyle: FontStyle;
+  splitLine: AxisLineStyle;
+}
+
+export type XAxis = {
+  axisPointer?: {
+    show: boolean;
+    type: string;
+  };
+  axisLabel: AxisLabel;
+  axisLine: AxisLineStyle;
+  axisTick: AxisLineStyle;
+  data: string[];
+  inverse: boolean;
+  splitLine: AxisLineStyle;
+  tooltip: { show: boolean };
+  type: string;
+};
+
+export interface BorderStyle {
+  borderType: string;
+  borderWidth: number;
+  borderColor: string;
+}
+
+export interface GridStyle {
+  left: string;
+  right: string;
+  bottom: string;
+  top: string;
+  containLabel: boolean;
 }

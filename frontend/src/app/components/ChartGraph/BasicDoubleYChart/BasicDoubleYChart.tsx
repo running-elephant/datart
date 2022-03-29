@@ -24,6 +24,7 @@ import {
   LabelStyle,
   LegendStyle,
   LineStyle,
+  SeriesStyle,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
@@ -46,12 +47,7 @@ import {
 import { init } from 'echarts';
 import Chart from '../../../models/Chart';
 import Config from './config';
-import {
-  DoubleYChartXAxis,
-  DoubleYChartYAxis,
-  Series,
-  SeriesStyle,
-} from './types';
+import { DoubleYChartXAxis, DoubleYChartYAxis, Series } from './types';
 
 class BasicDoubleYChart extends Chart {
   dependency = [];
