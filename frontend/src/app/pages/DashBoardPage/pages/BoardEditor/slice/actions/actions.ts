@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Modal } from 'antd';
 import { ChartEditorBaseProps } from 'app/components/ChartEditor';
 import { DataViewFieldType, ControllerFacadeTypes } from 'app/constants';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
@@ -31,6 +30,8 @@ import {
   Widget,
   WidgetInfo,
   WidgetOfCopy,
+  WidgetType,
+  WidgetTypes,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import {
@@ -40,7 +41,6 @@ import {
 } from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
-import i18next from 'i18next';
 import produce from 'immer';
 import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
@@ -52,7 +52,7 @@ import { ControllerConfig } from '../../components/ControllerWidgetPanel/types';
 import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from '../thunk';
 import { EditBoardState, HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
-const { confirm } = Modal;
+
 export const clearEditBoardState = () => async dispatch => {
   await dispatch(
     editBoardStackActions.setBoardToEditStack({
@@ -64,53 +64,66 @@ export const clearEditBoardState = () => async dispatch => {
   await dispatch(editWidgetInfoActions.clearWidgetInfo());
   dispatch(ActionCreators.clearHistory());
 };
-export const deleteWidgetsAction = () => (dispatch, getState) => {
+export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
   const editBoard = getState().editBoard as HistoryEditBoard;
-  let selectedIds = Object.values(editBoard.widgetInfoRecord)
-    .filter(WidgetInfo => WidgetInfo.selected)
-    .map(WidgetInfo => WidgetInfo.id);
-  if (selectedIds.length === 0) {
-    return;
+  let selectedIds: string[] = [];
+  let shouldDeleteIds: string[] = [];
+  let effectTypes: WidgetType[] = [];
+  if (ids?.length) {
+    selectedIds = ids;
+  } else {
+    selectedIds = Object.values(editBoard.widgetInfoRecord)
+      .filter(WidgetInfo => WidgetInfo.selected)
+      .map(WidgetInfo => WidgetInfo.id);
   }
-  dispatch(editBoardStackActions.deleteWidgets(selectedIds));
-  let childWidgetIds: string[] = [];
+  if (selectedIds.length === 0) return;
+
   const widgetMap = editBoard.stack.present.widgetRecord;
-  selectedIds.forEach(id => {
-    if (!widgetMap[id]) return;
-    const widgetType = widgetMap[id].config.type;
+
+  while (selectedIds.length > 0) {
+    const id = selectedIds.pop();
+
+    if (!id) return;
+    const curWidget = widgetMap[id];
+    if (!curWidget) return;
+
+    const widgetType = curWidget.config.type;
+
+    shouldDeleteIds.push(id);
+    effectTypes.push(widgetType);
+
+    // delete 递归删除所子节点;
     if (widgetType === 'container') {
-      const content = widgetMap[id].config.content as ContainerWidgetContent;
+      const content = curWidget.config.content as ContainerWidgetContent;
       Object.values(content.itemMap).forEach(item => {
         if (item.childWidgetId) {
-          childWidgetIds.push(item.childWidgetId);
+          selectedIds.push(item.childWidgetId);
         }
       });
     }
-    if (widgetType === 'query') {
-      dispatch(editBoardStackActions.changeBoardHasQueryControl(false));
-    }
-    if (widgetType === 'reset') {
-      dispatch(editBoardStackActions.changeBoardHasResetControl(false));
-    }
-    if (widgetType === 'controller') {
-      dispatch(editWidgetsQueryAction({ boardId: editBoard.boardInfo.id }));
+    // TODO groupWidget need recursively delete 递归删除所子节点
+    // if (curWidget.children.length > 0) {}
+  }
+
+  dispatch(editBoardStackActions.deleteWidgets(shouldDeleteIds));
+
+  WidgetTypes.forEach(widgetType => {
+    if (effectTypes.includes(widgetType)) {
+      switch (widgetType) {
+        case 'query':
+          dispatch(editBoardStackActions.changeBoardHasQueryControl(false));
+          break;
+        case 'reset':
+          dispatch(editBoardStackActions.changeBoardHasResetControl(false));
+          break;
+        case 'controller':
+          dispatch(editWidgetsQueryAction());
+          break;
+        default:
+          break;
+      }
     }
   });
-
-  if (childWidgetIds.length > 0) {
-    const perStr = 'viz.widget.action.';
-    confirm({
-      title: i18next.t(perStr + 'confirmDel'),
-      content: i18next.t(perStr + 'confirmDel1'),
-      onOk() {
-        dispatch(editBoardStackActions.deleteWidgets(selectedIds));
-      },
-      onCancel() {
-        childWidgetIds = [];
-        return;
-      },
-    });
-  }
 };
 
 /* widgetToPositionAsync */

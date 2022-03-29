@@ -96,17 +96,7 @@ export const editBoardStackSlice = createSlice({
       const ids = action.payload;
       if (!ids?.length) return;
       ids.forEach(id => {
-        if (!state.widgetRecord[id]) return;
-        if (state.widgetRecord[id].config.type !== 'container') {
-          delete state.widgetRecord[id];
-        } else {
-          const containerConfig = state.widgetRecord[id].config
-            .content as ContainerWidgetContent;
-          Object.values(containerConfig.itemMap).forEach(item => {
-            delete state.widgetRecord[item.childWidgetId];
-          });
-          delete state.widgetRecord[id];
-        }
+        delete state.widgetRecord[id];
       });
     },
     updateWidget(state, action: PayloadAction<Widget>) {

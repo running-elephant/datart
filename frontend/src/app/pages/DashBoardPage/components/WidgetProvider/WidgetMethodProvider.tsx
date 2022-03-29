@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import { ControllerFacadeTypes } from 'app/constants';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
@@ -43,11 +42,9 @@ import {
   BoardLinkFilter,
   Widget,
   WidgetContentChartType,
-  WidgetType,
 } from '../../pages/Board/slice/types';
 import { jumpTypes } from '../../pages/BoardEditor/components/SettingJumpModal/config';
 import {
-  editBoardStackActions,
   editDashBoardInfoActions,
   editWidgetInfoActions,
 } from '../../pages/BoardEditor/slice';
@@ -57,7 +54,6 @@ import {
   editChartInWidgetAction,
   toggleLockWidgetAction,
 } from '../../pages/BoardEditor/slice/actions/actions';
-import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
 import {
   getEditChartWidgetDataAsync,
   getEditWidgetData,
@@ -88,34 +84,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   const dispatch = useDispatch();
   const history = useHistory();
   const [folderIds, setFolderIds] = useState<any[]>([]);
-  // deleteWidget
-  const onWidgetDelete = useCallback(
-    (type: WidgetType, wid: string) => {
-      if (type === 'container') {
-        confirm({
-          title: t('confirmDel'),
-          icon: <ExclamationCircleOutlined />,
-          content: t('ContainerConfirmDel'),
-          onOk() {
-            dispatch(editBoardStackActions.deleteWidgets([wid]));
-          },
-          onCancel() {},
-        });
-        return;
-      }
-      if (type === 'query') {
-        dispatch(editBoardStackActions.changeBoardHasQueryControl(false));
-      }
-      if (type === 'reset') {
-        dispatch(editBoardStackActions.changeBoardHasResetControl(false));
-      }
-      if (type === 'controller') {
-        dispatch(editWidgetsQueryAction({ boardId }));
-      }
-      dispatch(editBoardStackActions.deleteWidgets([wid]));
-    },
-    [dispatch, t, boardId],
-  );
+
   const onWidgetEdit = useCallback(
     (widget: Widget, wid: string) => {
       const type = widget.config.type;
@@ -456,9 +425,6 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
         case 'refresh':
           onWidgetGetData(boardId, widget);
           break;
-        case 'delete':
-          onWidgetDelete(widget.config.type, widgetId);
-          break;
         case 'edit':
           onWidgetEdit(widget, widgetId);
           break;
@@ -490,7 +456,6 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
       boardId,
       widgetId,
       onWidgetGetData,
-      onWidgetDelete,
       onWidgetEdit,
       onMakeLinkage,
       onMakeJump,
