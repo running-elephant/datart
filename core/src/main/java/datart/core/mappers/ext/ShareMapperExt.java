@@ -28,7 +28,7 @@ import java.util.List;
 public interface ShareMapperExt extends ShareMapper {
 
     @Select({"<script>",
-            "SELECT * FROM `share` where viz_id = #{vizId} ",
+            "SELECT * FROM `share` where viz_id = #{vizId} ORDER BY create_time",
             "</script>"})
     List<Share> selectByViz(String vizId);
 

@@ -107,6 +107,10 @@ public class ShareServiceImpl extends BaseService implements ShareService {
                 Exceptions.tr(BaseException.class, "message.share.unsupported", createParam.getVizType().name());
         }
 
+        if (createParam.getAuthenticationMode().equals(ShareAuthenticationMode.CODE)) {
+            createParam.setAuthenticationCode(SecurityUtils.randomPassword());
+        }
+
         Share share = new Share();
         BeanUtils.copyProperties(createParam, share);
         share.setCreateBy(shareUser);
@@ -136,13 +140,6 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         ShareToken shareToken = new ShareToken();
         BeanUtils.copyProperties(createParam, shareToken);
         shareToken.setId(share.getId());
-
-        if (createParam.getAuthenticationMode().equals(ShareAuthenticationMode.CODE)) {
-            shareToken.setAuthenticationCode(SecurityUtils.randomPassword());
-        }
-
-        shareToken.setAuthenticationMode(createParam.getAuthenticationMode());
-
         return shareToken;
     }
 
