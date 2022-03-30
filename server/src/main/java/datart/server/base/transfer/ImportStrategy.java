@@ -15,22 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package datart.server.base.transfer;
 
-package datart.server.service;
+public enum ImportStrategy {
 
-import datart.core.data.provider.SchemaInfo;
-import datart.core.entity.Source;
-import datart.core.mappers.ext.SourceMapperExt;
-import datart.server.base.transfer.model.SourceTransferModel;
+    NEW,
 
-import java.util.List;
+    IGNORE,
 
-public interface SourceService extends BaseCRUDService<Source, SourceMapperExt>, ResourceTransferService<Source, SourceTransferModel> {
+    OVERWRITE,
 
-    List<Source> listSources(String orgId, boolean active);
-
-    SchemaInfo getSourceSchemaInfo(String sourceId);
-
-    SchemaInfo syncSourceSchema(String sourceId) throws Exception;
+    ROLLBACK,
 
 }

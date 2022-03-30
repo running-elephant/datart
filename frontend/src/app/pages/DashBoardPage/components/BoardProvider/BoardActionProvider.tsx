@@ -19,9 +19,10 @@
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { generateShareLinkAsync } from 'app/utils/fetch';
 import debounce from 'lodash/debounce';
-import React, { createContext, FC, memo } from 'react';
+import { createContext, FC, memo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
+import { BOARD_UNDO } from '../../constants';
 import { boardActions } from '../../pages/Board/slice';
 import {
   boardDownLoadAction,
@@ -43,6 +44,10 @@ import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 import {
   clearActiveWidgets,
   clearEditBoardState,
+  copyWidgetsAction,
+  deleteWidgetsAction,
+  pasteWidgetsAction,
+  widgetsToPositionAction,
 } from '../../pages/BoardEditor/slice/actions/actions';
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
 import {
@@ -77,6 +82,13 @@ export interface BoardActionContextProps {
     editing: boolean,
     renderMode: VizRenderMode,
   ) => void;
+  undo: () => void;
+  redo: () => void;
+  deleteActiveWidgets: () => void;
+  layerToTop: () => void;
+  layerToBottom: () => void;
+  copyWidgets: (ids?: string[]) => void;
+  pasteWidgets: () => void;
 }
 export const BoardActionContext = createContext<BoardActionContextProps>(
   {} as BoardActionContextProps,
@@ -202,6 +214,27 @@ export const BoardActionProvider: FC<{ id: string }> = memo(
             }),
           );
         }
+      },
+      undo: () => {
+        dispatch({ type: BOARD_UNDO.undo });
+      },
+      redo: () => {
+        dispatch({ type: BOARD_UNDO.redo });
+      },
+      deleteActiveWidgets: debounce(() => {
+        dispatch(deleteWidgetsAction());
+      }, 200),
+      layerToTop: () => {
+        dispatch(widgetsToPositionAction('top'));
+      },
+      layerToBottom: () => {
+        dispatch(widgetsToPositionAction('bottom'));
+      },
+      copyWidgets: (ids?: string[]) => {
+        dispatch(copyWidgetsAction());
+      },
+      pasteWidgets: () => {
+        dispatch(pasteWidgetsAction());
       },
     };
     return (

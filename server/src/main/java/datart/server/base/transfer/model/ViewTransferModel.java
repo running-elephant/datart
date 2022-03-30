@@ -16,24 +16,35 @@
  * limitations under the License.
  */
 
-package datart.server.service;
+package datart.server.base.transfer.model;
 
+import datart.core.entity.Variable;
 import datart.core.entity.View;
-import datart.core.mappers.ext.ViewMapperExt;
-import datart.server.base.dto.ViewDetailDTO;
-import datart.server.base.transfer.model.ViewTransferModel;
-import datart.server.base.params.ViewBaseUpdateParam;
+import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
-public interface ViewService extends VizCRUDService<View, ViewMapperExt>,ResourceTransferService<View,ViewTransferModel> {
+@Data
+public class ViewTransferModel extends ResourceTransferModel {
 
-    ViewDetailDTO getViewDetail(String viewId);
+    private List<MainModel> mainModels;
 
-    List<View> getViews(String orgId);
+    private List<View> parents;
 
-    boolean unarchive(String id, String newName, String parentId, double index);
+    private SourceTransferModel sourceExportModel;
 
-    boolean updateBase(ViewBaseUpdateParam updateParam);
+    @Override
+    public String getVizName() {
+        return mainModels.get(0).view.getName();
+    }
 
+    @Data
+    public static class MainModel implements Serializable {
+
+        private View view;
+
+        private List<Variable> variables;
+
+    }
 }

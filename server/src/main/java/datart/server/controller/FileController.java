@@ -56,12 +56,24 @@ public class FileController extends BaseController {
         return ResponseData.success(fileService.uploadFile(FileOwner.ORG_AVATAR, orgId, file, fileName));
     }
 
+    @ApiOperation(value = "delete org avatar")
+    @DeleteMapping(value = "/org/avatar/{orgId}")
+    public ResponseData<Boolean> deleteOrgAvatar(@PathVariable String orgId) {
+        return ResponseData.success(fileService.deleteFiles(FileOwner.ORG_AVATAR, orgId));
+    }
+
     @ApiOperation(value = "upload user avatar")
     @PostMapping(value = "/user/avatar")
     public ResponseData<String> uploadUserAvatar(@RequestParam String userId,
                                                  @RequestParam(required = false) String fileName,
                                                  @RequestParam("file") MultipartFile file) throws IOException {
         return ResponseData.success(fileService.uploadFile(FileOwner.USER_AVATAR, userId, file, fileName));
+    }
+
+    @ApiOperation(value = "delete user avatar")
+    @DeleteMapping(value = "/user/avatar/{userId}")
+    public ResponseData<Boolean> deleteUserAvatar(@PathVariable String userId) {
+        return ResponseData.success(fileService.deleteFiles(FileOwner.USER_AVATAR, userId));
     }
 
     @ApiOperation(value = "upload user avatar")

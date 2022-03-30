@@ -18,24 +18,20 @@
 import { DeleteOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { deleteWidgetsAction } from '../../slice/actions/actions';
+import { FC } from 'react';
+import { useSelector } from 'react-redux';
 import { selectSelectedIds } from '../../slice/selectors';
 
-export const DeleteWidgetsBtn = () => {
+export const DelWidgetsBtn: FC<{
+  fn: () => void;
+  title: string;
+}> = ({ fn, title }) => {
   const selectedIds = useSelector(selectSelectedIds);
-  const t = useI18NPrefix(`viz.board.action`);
-  const dispatch = useDispatch();
-  const onDelete = () => {
-    dispatch(deleteWidgetsAction());
-  };
   return (
-    <Tooltip title={t('delete')}>
+    <Tooltip title={title}>
       <ToolbarButton
         disabled={!selectedIds.length}
-        onClick={onDelete}
+        onClick={fn}
         icon={<DeleteOutlined />}
       />
     </Tooltip>

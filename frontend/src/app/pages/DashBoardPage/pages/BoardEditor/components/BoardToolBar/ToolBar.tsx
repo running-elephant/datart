@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 import { Divider, Space } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { BoardActionContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardActionProvider';
+import useBoardEditorHotkeys from 'app/pages/DashBoardPage/hooks/useBoardEditorHotkeys';
 import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
 import { AddChart } from './AddChart/AddChart';
@@ -25,7 +28,7 @@ import { AddMedia } from './AddMedia/AddMedia';
 import { AllowOverlapBtn } from './AllowOverlap';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
 import { CopyBtn, PasteBtn } from './CopyPaste/CopyPaste';
-import { DeleteWidgetsBtn } from './DeleteWidgetsBtn';
+import { DelWidgetsBtn } from './DelWidgetsBtn';
 import { DeviceSwitcher } from './DeviceSwitch/DeviceSwitcher';
 import { ToBottomBtn, ToTopBtn } from './ToTopToBottom/ToTopToBottom';
 import { RedoBtn, UndoBtn } from './UndoRedo/UndoRedo';
@@ -35,41 +38,55 @@ export const ToolBar = () => {
     e.stopPropagation();
   };
   const { boardType } = useContext(BoardToolBarContext);
-
+  const {
+    layerToTop,
+    layerToBottom,
+    undo,
+    redo,
+    copyWidgets,
+    pasteWidgets,
+    deleteActiveWidgets,
+  } = useContext(BoardActionContext);
+  useBoardEditorHotkeys();
+  const t = useI18NPrefix(`viz.board.action`);
   return (
     <Wrapper onClick={ssp}>
       <Space>
-        <>
-          <AddChart />
-          <Divider type="vertical" />
-          <AddMedia />
-          <AddContainer />
-          <Divider type="vertical" />
-          <AddController />
-          <ToTopBtn />
-          <ToBottomBtn />
-          <Divider type="vertical" />
-          <UndoBtn />
-          <RedoBtn />
-          <Divider type="vertical" />
-          <DeleteWidgetsBtn />
-          <Divider type="vertical" />
-          <CopyBtn />
-          <PasteBtn />
-          {boardType === 'auto' && (
-            <>
-              <Divider type="vertical" />
-              <DeviceSwitcher />
-              <Divider type="vertical" />
-              <AllowOverlapBtn />
-            </>
-          )}
-        </>
+        <AddChart />
+
+        <AddMedia />
+
+        <AddContainer />
+
+        <AddController />
+        <Divider type="vertical" />
+
+        <UndoBtn fn={undo} title={t('undo')} />
+        <RedoBtn fn={redo} title={t('redo')} />
+
+        <Divider type="vertical" />
+
+        <DelWidgetsBtn fn={deleteActiveWidgets} title={t('delete')} />
+        <Divider type="vertical" />
+
+        <ToTopBtn fn={layerToTop} title={t('toTop')} />
+        <ToBottomBtn fn={layerToBottom} title={t('toBottom')} />
+
+        <CopyBtn fn={copyWidgets} title={t('copy')} />
+        <PasteBtn fn={pasteWidgets} title={t('paste')} />
+
+        {boardType === 'auto' && (
+          <>
+            <Divider type="vertical" />
+
+            <DeviceSwitcher />
+            <AllowOverlapBtn />
+          </>
+        )}
       </Space>
     </Wrapper>
   );
 };
-const Wrapper = styled.span`
+const Wrapper = styled.div`
   z-index: 0;
-  display: inline-block;
 `;
