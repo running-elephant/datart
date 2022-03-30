@@ -24,13 +24,45 @@ import { Widget } from '../pages/Board/slice/types';
 
 export default function useWidgetAction() {
   const {
-    onWidgetAction,
     onWidgetFullScreen,
     onWidgetGetData,
+
     onEditWidgetGetData,
+    onEditChartWidget,
+    onEditMediaWidget,
+    onEditContainerWidget,
+    onEditWidgetLinkage,
+    onEditWidgetJump,
+    onEditControllerWidget,
+    onEditWidgetCloseLinkage,
+    onEditWidgetCloseJump,
+    onEditWidgetToggleLock,
   } = useContext(WidgetMethodContext);
-  const { editing } = useContext(BoardContext);
+  const { editing, orgId } = useContext(BoardContext);
   const { deleteActiveWidgets } = useContext(BoardActionContext);
+  const onWidgetEdit = useCallback(
+    (widget: Widget) => {
+      const type = widget.config.type;
+      switch (type) {
+        case 'chart':
+          onEditChartWidget(widget, orgId);
+          break;
+        case 'controller':
+          onEditContainerWidget(widget.id);
+          break;
+        case 'container':
+          onEditControllerWidget(widget);
+          break;
+        case 'media':
+          onEditMediaWidget(widget.id);
+          break;
+        default:
+          break;
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
   const widgetAction = useCallback((key: widgetActionType, widget: Widget) => {
     switch (key) {
       case 'delete':
@@ -45,11 +77,30 @@ export default function useWidgetAction() {
         } else {
           onWidgetGetData(widget);
         }
-
+        break;
+      case 'edit':
+        onWidgetEdit(widget);
+        break;
+      case 'makeLinkage':
+        onEditWidgetLinkage(widget.id);
+        break;
+      case 'closeLinkage':
+        onEditWidgetCloseLinkage(widget);
+        break;
+      case 'makeJump':
+        onEditWidgetJump(widget.id);
+        break;
+      case 'closeJump':
+        onEditWidgetCloseJump(widget);
+        break;
+      case 'lock':
+        onEditWidgetToggleLock(widget, true);
+        break;
+      case 'unlock':
+        onEditWidgetToggleLock(widget, false);
         break;
       default:
-        onWidgetAction(key, widget);
-        break;
+        console.log('__ not found __ action', key);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

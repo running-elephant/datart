@@ -38,6 +38,7 @@ import {
 } from '../../pages/Board/slice/thunk';
 import {
   BoardLinkFilter,
+  VizRenderMode,
   Widget,
   WidgetContentChartType,
 } from '../../pages/Board/slice/types';
@@ -50,14 +51,15 @@ import {
   closeJumpAction,
   closeLinkageAction,
   editChartInWidgetAction,
+  editorWidgetClearLinkageAction,
   toggleLockWidgetAction,
+  widgetClearLinkageAction,
 } from '../../pages/BoardEditor/slice/actions/actions';
 import {
   getEditChartWidgetDataAsync,
   getEditWidgetData,
 } from '../../pages/BoardEditor/slice/thunk';
 import { BoardContext } from '../BoardProvider/BoardProvider';
-import { widgetActionType } from '../WidgetToolBar/config';
 
 export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   widgetId,
@@ -72,74 +74,6 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   const history = useHistory();
   const [folderIds, setFolderIds] = useState<any[]>([]);
 
-  const onWidgetEdit = useCallback(
-    (widget: Widget, wid: string) => {
-      const type = widget.config.type;
-      switch (type) {
-        case 'chart':
-          const chartType = widget.config.content.type;
-          dispatch(
-            editChartInWidgetAction({
-              orgId,
-              widgetId: wid,
-              chartName: widget.config.name,
-              dataChartId: widget.datachartId,
-              chartType: chartType as WidgetContentChartType,
-            }),
-          );
-          break;
-        case 'controller':
-          dispatch(
-            editDashBoardInfoActions.changeControllerPanel({
-              type: 'edit',
-              widgetId: wid,
-              controllerType: widget.config.content
-                .type as ControllerFacadeTypes,
-            }),
-          );
-          break;
-        case 'container':
-          dispatch(
-            editWidgetInfoActions.openWidgetEditing({
-              id: wid,
-            }),
-          );
-          dispatch(editDashBoardInfoActions.changeShowBlockMask(false));
-          break;
-        case 'media':
-          dispatch(
-            editWidgetInfoActions.openWidgetEditing({
-              id: wid,
-            }),
-          );
-          break;
-        default:
-          break;
-      }
-    },
-
-    [dispatch, orgId],
-  );
-
-  const onMakeLinkage = useCallback(
-    (widgetId: string) => {
-      dispatch(
-        editDashBoardInfoActions.changeLinkagePanel({
-          type: 'add',
-          widgetId,
-        }),
-      );
-    },
-    [dispatch],
-  );
-  const onMakeJump = useCallback(
-    (widgetId: string) => {
-      dispatch(
-        editDashBoardInfoActions.changeJumpPanel({ visible: true, widgetId }),
-      );
-    },
-    [dispatch],
-  );
   const onToggleLinkage = useCallback(
     (toggle: boolean) => {
       if (editing) {
@@ -162,72 +96,7 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     },
     [boardId, dispatch, editing, widgetId],
   );
-  const onChangeBoardFilter = useCallback(
-    (filters?: BoardLinkFilter[]) => {
-      if (editing) {
-        dispatch(
-          editDashBoardInfoActions.changeBoardLinkFilter({
-            boardId: boardId,
-            triggerId: widgetId,
-            linkFilters: filters,
-          }),
-        );
-      } else {
-        dispatch(
-          boardActions.changeBoardLinkFilter({
-            boardId: boardId,
-            triggerId: widgetId,
-            linkFilters: filters,
-          }),
-        );
-      }
-    },
 
-    [editing, dispatch, boardId, widgetId],
-  );
-  const onClearLinkage = useCallback(
-    (widget: Widget) => {
-      onToggleLinkage(false);
-      onChangeBoardFilter();
-
-      const linkRelations = widget.relations.filter(
-        re => re.config.type === 'widgetToWidget',
-      );
-      setTimeout(() => {
-        linkRelations.forEach(link => {
-          if (editing) {
-            dispatch(
-              getEditChartWidgetDataAsync({
-                widgetId: link.targetId,
-                option: {
-                  pageInfo: { pageNo: 1 },
-                },
-              }),
-            );
-          } else {
-            dispatch(
-              getChartWidgetDataAsync({
-                boardId,
-                widgetId: link.targetId,
-                renderMode,
-                option: {
-                  pageInfo: { pageNo: 1 },
-                },
-              }),
-            );
-          }
-        });
-      }, 60);
-    },
-    [
-      onToggleLinkage,
-      onChangeBoardFilter,
-      editing,
-      dispatch,
-      boardId,
-      renderMode,
-    ],
-  );
   const getValueByRowData = (
     data: ChartsEventData | undefined,
     fieldName: string,
@@ -378,39 +247,6 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     },
     [boardId, dispatch, editing, renderMode, widgetId],
   );
-  const onWidgetAction = useCallback(
-    (action: widgetActionType, widget: Widget) => {
-      switch (action) {
-        case 'info':
-          break;
-
-        case 'edit':
-          onWidgetEdit(widget, widgetId);
-          break;
-        case 'makeLinkage':
-          onMakeLinkage(widgetId);
-          break;
-        case 'makeJump':
-          onMakeJump(widgetId);
-          break;
-        case 'closeJump':
-          dispatch(closeJumpAction(widget));
-          break;
-        case 'lock':
-          dispatch(toggleLockWidgetAction(widget, true));
-          break;
-        case 'unlock':
-          dispatch(toggleLockWidgetAction(widget, false));
-          break;
-        case 'closeLinkage':
-          dispatch(closeLinkageAction(widget));
-          break;
-        default:
-          break;
-      }
-    },
-    [onWidgetEdit, widgetId, onMakeLinkage, onMakeJump, dispatch],
-  );
 
   const widgetChartClick = useCallback(
     (widget: Widget, params: ChartMouseEventParams) => {
@@ -454,6 +290,61 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
     },
     [clickJump, getTableChartData, toLinkingWidgets, folderIds],
   );
+  // --------------------------------------------------
+
+  const onWidgetClearLinkage = useCallback(
+    (widget: Widget, renderMode: VizRenderMode) => {
+      dispatch(widgetClearLinkageAction(widget, renderMode));
+    },
+    [dispatch],
+  );
+  const onEditWidgetClearLinkage = useCallback(
+    (widget: Widget) => {
+      dispatch(editorWidgetClearLinkageAction(widget));
+    },
+    [dispatch],
+  );
+  const onEditChartWidget = useCallback(
+    (widget: Widget, orgId: string) => {
+      const chartType = widget.config.content.type;
+      dispatch(
+        editChartInWidgetAction({
+          orgId,
+          widgetId: widget.id,
+          chartName: widget.config.name,
+          dataChartId: widget.datachartId,
+          chartType: chartType as WidgetContentChartType,
+        }),
+      );
+    },
+    [dispatch],
+  );
+  const onEditControllerWidget = useCallback(
+    (widget: Widget) => {
+      dispatch(
+        editDashBoardInfoActions.changeControllerPanel({
+          type: 'edit',
+          widgetId: widget.id,
+          controllerType: widget.config.content.type as ControllerFacadeTypes,
+        }),
+      );
+    },
+    [dispatch],
+  );
+  const onEditContainerWidget = useCallback(
+    (id: string) => {
+      dispatch(editWidgetInfoActions.openWidgetEditing({ id }));
+      dispatch(editDashBoardInfoActions.changeShowBlockMask(false));
+    },
+    [dispatch],
+  );
+  const onEditMediaWidget = useCallback(
+    (id: string) => {
+      dispatch(editWidgetInfoActions.openWidgetEditing({ id }));
+    },
+    [dispatch],
+  );
+
   const onWidgetFullScreen = useCallback(
     (boardId: string, itemId: string) => {
       dispatch(
@@ -473,20 +364,65 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   );
   const onWidgetGetData = useCallback(
     (widget: Widget) => {
-      dispatch(
-        getWidgetData({ boardId: widget.dashboardId, widget, renderMode }),
-      );
+      const boardId = widget.dashboardId;
+      dispatch(getWidgetData({ boardId, widget, renderMode }));
     },
     [dispatch, renderMode],
   );
-
+  const onEditWidgetLinkage = useCallback(
+    (widgetId: string) => {
+      dispatch(
+        editDashBoardInfoActions.changeLinkagePanel({
+          type: 'add',
+          widgetId,
+        }),
+      );
+    },
+    [dispatch],
+  );
+  const onEditWidgetJump = useCallback(
+    (widgetId: string) => {
+      dispatch(
+        editDashBoardInfoActions.changeJumpPanel({ visible: true, widgetId }),
+      );
+    },
+    [dispatch],
+  );
+  const onEditWidgetCloseLinkage = useCallback(
+    (widget: Widget) => {
+      dispatch(closeLinkageAction(widget));
+    },
+    [dispatch],
+  );
+  const onEditWidgetCloseJump = useCallback(
+    (widget: Widget) => {
+      dispatch(closeJumpAction(widget));
+    },
+    [dispatch],
+  );
+  const onEditWidgetToggleLock = useCallback(
+    (widget: Widget, bool: boolean) => {
+      dispatch(toggleLockWidgetAction(widget, bool));
+    },
+    [dispatch],
+  );
   const Methods: WidgetMethodContextProps = {
-    onWidgetAction,
     widgetChartClick,
-    onClearLinkage,
+    onWidgetClearLinkage,
     onWidgetFullScreen,
     onWidgetGetData,
+
+    onEditChartWidget,
+    onEditMediaWidget,
+    onEditContainerWidget,
+    onEditControllerWidget,
+    onEditWidgetLinkage,
+    onEditWidgetJump,
+    onEditWidgetCloseLinkage,
     onEditWidgetGetData,
+    onEditWidgetToggleLock,
+    onEditWidgetCloseJump,
+    onEditWidgetClearLinkage,
   };
 
   useEffect(() => {
@@ -501,12 +437,23 @@ export const WidgetMethodProvider: FC<{ widgetId: string }> = ({
   );
 };
 export interface WidgetMethodContextProps {
-  onWidgetAction: (action: widgetActionType, widget: Widget) => void;
+  // all
+  // read
   widgetChartClick: (widget: Widget, params: ChartMouseEventParams) => void;
-  onClearLinkage: (widget: Widget) => void;
+  onWidgetClearLinkage: (widget: Widget, renderMode: VizRenderMode) => void;
   onWidgetFullScreen: (boardId: string, itemId: string) => void;
   onWidgetGetData: (widget: Widget) => void;
-
+  // editor
+  onEditChartWidget: (widget: Widget, orgId: string) => void;
+  onEditWidgetClearLinkage: (widget: Widget) => void;
+  onEditContainerWidget: (wid: string) => void;
+  onEditMediaWidget: (wid: string) => void;
+  onEditControllerWidget: (widget: Widget) => void;
+  onEditWidgetLinkage: (wid: string) => void;
+  onEditWidgetJump: (wid: string) => void;
+  onEditWidgetCloseLinkage: (widget: Widget) => void;
+  onEditWidgetCloseJump: (widget: Widget) => void;
+  onEditWidgetToggleLock: (widget: Widget, bool: boolean) => void;
   onEditWidgetGetData: (widget: Widget) => void;
 }
 export const WidgetMethodContext = createContext<WidgetMethodContextProps>(

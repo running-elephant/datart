@@ -27,6 +27,7 @@ import {
   DataChart,
   RelatedView,
   Relation,
+  VizRenderMode,
   Widget,
   WidgetInfo,
   WidgetOfCopy,
@@ -47,6 +48,7 @@ import { RootState } from 'types';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
+import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
 import { BoardType } from '../../../Board/slice/types';
 import { ControllerConfig } from '../../components/ControllerWidgetPanel/types';
 import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from '../thunk';
@@ -414,4 +416,67 @@ export const addVariablesToBoard =
 export const clearActiveWidgets = () => dispatch => {
   dispatch(editWidgetInfoActions.clearSelectedWidgets());
   dispatch(editDashBoardInfoActions.changeShowBlockMask(true));
+};
+export const widgetClearLinkageAction =
+  (widget: Widget, renderMode: VizRenderMode) => dispatch => {
+    const { id, dashboardId } = widget;
+    dispatch(
+      boardActions.changeWidgetInLinking({
+        boardId: dashboardId,
+        widgetId: id,
+        toggle: false,
+      }),
+    );
+    dispatch(
+      boardActions.changeBoardLinkFilter({
+        boardId: dashboardId,
+        triggerId: id,
+        linkFilters: [],
+      }),
+    );
+    const linkRelations = widget.relations.filter(
+      re => re.config.type === 'widgetToWidget',
+    );
+    linkRelations.forEach(link => {
+      dispatch(
+        getChartWidgetDataAsync({
+          boardId: dashboardId,
+          widgetId: link.targetId,
+          renderMode,
+          option: {
+            pageInfo: { pageNo: 1 },
+          },
+        }),
+      );
+    });
+  };
+export const editorWidgetClearLinkageAction = (widget: Widget) => dispatch => {
+  const { id, dashboardId } = widget;
+  dispatch(
+    editWidgetInfoActions.changeWidgetInLinking({
+      boardId: dashboardId,
+      widgetId: id,
+      toggle: false,
+    }),
+  );
+  dispatch(
+    editDashBoardInfoActions.changeBoardLinkFilter({
+      boardId: dashboardId,
+      triggerId: id,
+      linkFilters: [],
+    }),
+  );
+  const linkRelations = widget.relations.filter(
+    re => re.config.type === 'widgetToWidget',
+  );
+  linkRelations.forEach(link => {
+    dispatch(
+      getEditChartWidgetDataAsync({
+        widgetId: link.targetId,
+        option: {
+          pageInfo: { pageNo: 1 },
+        },
+      }),
+    );
+  });
 };

@@ -39,7 +39,8 @@ export interface WidgetCoreProps {
 }
 export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
   const widget = useContext(WidgetContext);
-  const { onWidgetAction } = useContext(WidgetMethodContext);
+  const { onEditWidgetGetData, onWidgetGetData } =
+    useContext(WidgetMethodContext);
   const { initialQuery } = useContext(BoardConfigContext);
   const { editing, renderMode, boardType } = useContext(BoardContext);
   const widgetInfo = useContext(WidgetInfoContext);
@@ -77,7 +78,11 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
       widget.config.autoUpdate
     ) {
       timer = setInterval(() => {
-        onWidgetAction('refresh', widget);
+        if (editing) {
+          onEditWidgetGetData(widget);
+        } else {
+          onWidgetGetData(widget);
+        }
       }, +widget.config.frequency * 1000);
     }
     return () => {
@@ -86,14 +91,16 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
       }
     };
   }, [
+    editing,
     boardVisible,
-    onWidgetAction,
     widget,
     widget.config.autoUpdate,
     widget.config.frequency,
     widget.config.type,
     widgetInfo.loading,
     widgetInfo.rendered,
+    onEditWidgetGetData,
+    onWidgetGetData,
   ]);
 
   const element = useMemo(() => {
