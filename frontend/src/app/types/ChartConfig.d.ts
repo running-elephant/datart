@@ -16,7 +16,12 @@
  * limitations under the License.
  */
 
-import { AggregateFieldActionType, FieldFormatType } from 'app/constants';
+import {
+  AggregateFieldActionType,
+  ChartDataViewFieldCategory,
+  DataViewFieldType,
+  FieldFormatType,
+} from 'app/constants';
 import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
@@ -27,10 +32,6 @@ import {
   RECOMMEND_TIME,
 } from 'globalConstants';
 import { ValueOf } from 'types';
-import {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from './ChartDataView';
 
 export type FilterFieldAction = {
   condition?: FilterCondition;
@@ -103,8 +104,8 @@ export type ChartDataSectionField = {
   uid?: string;
   colName: string;
   desc?: string;
-  type: ChartDataViewFieldType;
-  category: Lowercase<keyof typeof ChartDataViewFieldCategory>;
+  type: DataViewFieldType;
+  category: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
 
   sort?: SortFieldAction;
   alias?: AliasFieldAction;
@@ -113,6 +114,8 @@ export type ChartDataSectionField = {
   filter?: FilterFieldAction;
   color?: ColorFieldAction;
   size?: number;
+
+  children?: [];
 };
 
 export type SortFieldAction = {

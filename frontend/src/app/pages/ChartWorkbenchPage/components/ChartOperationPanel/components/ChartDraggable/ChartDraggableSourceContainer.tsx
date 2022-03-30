@@ -32,6 +32,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useToggle from 'app/hooks/useToggle';
 import { ColumnRole } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { buildDragItem } from 'app/utils/internalChartHelper';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { FC, memo, useMemo } from 'react';
 import { useDrag } from 'react-dnd';
@@ -60,6 +61,7 @@ export const ChartDraggableSourceContainer: FC<
   id,
   name: colName,
   type,
+  subType,
   category,
   expression,
   role,
@@ -73,17 +75,16 @@ export const ChartDraggableSourceContainer: FC<
 }) {
   const t = useI18NPrefix(`viz.workbench.dataview`);
   const [showChild, setShowChild] = useToggle(false);
+  const isHierarchyField = role === ColumnRole.Hierarchy;
   const [, drag] = useDrag(
     () => ({
-      type: CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
+      type: isHierarchyField
+        ? CHART_DRAG_ELEMENT_TYPE.DATASET_HIERARCHY_COLUMN
+        : CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
       canDrag: true,
       item: selectedItems?.length
-        ? selectedItems.map(item => ({
-            colName: item.id,
-            type: item.type,
-            category: item.category,
-          }))
-        : { colName, type, category },
+        ? selectedItems.map(item => buildDragItem(item))
+        : buildDragItem({ id: colName, type, subType, category }, children),
       collect: monitor => ({
         isDragging: monitor.isDragging(),
       }),
@@ -109,8 +110,11 @@ export const ChartDraggableSourceContainer: FC<
       }
     };
 
-    const _isNormalField = () => {
-      return ChartDataViewFieldCategory.Field === category;
+    const _isAllowMoreAction = () => {
+      return (
+        ChartDataViewFieldCategory.Field === category ||
+        ChartDataViewFieldCategory.Hierarchy === category
+      );
     };
 
     const _getIconStyle = () => {
@@ -190,7 +194,7 @@ export const ChartDraggableSourceContainer: FC<
         <StyledFieldContent>{colName}</StyledFieldContent>
         <div onClick={stopPPG}>
           <Dropdown
-            disabled={_isNormalField()}
+            disabled={_isAllowMoreAction()}
             overlay={_getExtraActionMenus()}
             trigger={['click']}
           >

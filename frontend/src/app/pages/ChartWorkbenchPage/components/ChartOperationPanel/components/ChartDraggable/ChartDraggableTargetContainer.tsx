@@ -17,17 +17,6 @@
  */
 
 import {
-  BgColorsOutlined,
-  DiffOutlined,
-  DownOutlined,
-  FilterOutlined,
-  FontSizeOutlined,
-  FormatPainterOutlined,
-  GroupOutlined,
-  SortAscendingOutlined,
-} from '@ant-design/icons';
-import { Dropdown } from 'antd';
-import {
   AggregateFieldSubAggregateType,
   ChartDataSectionFieldActionType,
   ChartDataSectionType,
@@ -39,7 +28,6 @@ import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartData
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
-import { getColumnRenderName } from 'app/utils/chartHelper';
 import { reachLowerBoundCount } from 'app/utils/internalChartHelper';
 import { updateBy, updateByKey } from 'app/utils/mutation';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
@@ -54,8 +42,9 @@ import {
 } from 'styles/StyleConstants';
 import { ValueOf } from 'types';
 import { uuidv4 } from 'utils/utils';
-import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
 import ChartDraggableElement from './ChartDraggableElement';
+import ChartDraggableElementField from './ChartDraggableElementField';
+import ChartDraggableElementHierarchy from './ChartDraggableElementHierarchy';
 
 type DragItem = {
   index?: number;
@@ -81,22 +70,23 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       () => ({
         accept: [
           CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
+          CHART_DRAG_ELEMENT_TYPE.DATASET_HIERARCHY_COLUMN,
           CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN,
         ],
         drop(item: ChartDataSectionField & DragItem, monitor) {
           let items = Array.isArray(item) ? item : [item];
           let needDelete = true;
           if (
-            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN
+            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN ||
+            monitor.getItemType() ===
+              CHART_DRAG_ELEMENT_TYPE.DATASET_HIERARCHY_COLUMN
           ) {
             const currentColumns: ChartDataSectionField[] = (
               currentConfig.rows || []
             ).concat(
               items.map(val => ({
                 uid: uuidv4(),
-                colName: val.colName,
-                category: val.category,
-                type: val.type,
+                ...val,
                 aggregate: getDefaultAggregate(val),
               })),
             );
@@ -281,33 +271,20 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             index={index}
             config={columnConfig}
             content={() => {
-              return (
-                <Dropdown
-                  key={columnConfig.uid}
-                  disabled={!config?.actions}
-                  destroyPopupOnHide={true}
-                  overlay={renderActionExtensionMenu(
-                    columnConfig.uid!,
-                    columnConfig.type,
-                    columnConfig.category,
-                  )}
-                  overlayClassName="datart-data-section-dropdown"
-                  trigger={['click']}
-                >
-                  <div>
-                    {currentConfig?.actions && (
-                      <DownOutlined style={{ marginRight: '10px' }} />
-                    )}
-                    <span>
-                      {aggregation === false
-                        ? columnConfig.colName
-                        : getColumnRenderName(columnConfig)}
-                    </span>
-                    <div style={{ display: 'inline-block', marginLeft: '5px' }}>
-                      {enableActionsIcons(columnConfig)}
-                    </div>
-                  </div>
-                </Dropdown>
+              const contentProps = {
+                modalSize: modalSize,
+                config: currentConfig,
+                columnConfig: columnConfig,
+                ancestors: ancestors,
+                aggregation: aggregation,
+                onConfigChanged: onConfigChanged,
+                handleOpenActionModal: handleOpenActionModal,
+              };
+              return columnConfig.category ===
+                ChartDataViewFieldCategory.Hierarchy ? (
+                <ChartDraggableElementHierarchy {...contentProps} />
+              ) : (
+                <ChartDraggableElementField {...contentProps} />
               );
             }}
             moveCard={onDraggableItemMove}
@@ -325,7 +302,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       if (!fieldConfig) {
         return;
       }
-      const newConfig = updateBy(config, draft => {
+      const newConfig = updateBy(currentConfig, draft => {
         const index = (draft.rows || []).findIndex(r => r.uid === columnUid);
         if (index !== -1 && fieldConfig) {
           (draft.rows || [])[index] = fieldConfig;
@@ -340,7 +317,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         (showModal as Function)(
           uid,
           actionType,
-          config,
+          currentConfig,
           handleFieldConfigChanged,
           dataset,
           dataView,
@@ -348,47 +325,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           aggregation,
         );
       };
-
-    const renderActionExtensionMenu = (uid: string, type: string, category) => {
-      return (
-        <ChartDataConfigSectionActionMenu
-          uid={uid}
-          type={type}
-          category={category}
-          ancestors={ancestors}
-          config={currentConfig}
-          modalSize={modalSize}
-          onConfigChanged={onConfigChanged}
-          onOpenModal={handleOpenActionModal}
-        />
-      );
-    };
-
-    const enableActionsIcons = col => {
-      const icons = [] as any;
-      if (col.alias) {
-        icons.push(<DiffOutlined key="alias" />);
-      }
-      if (col.sort) {
-        icons.push(<SortAscendingOutlined key="sort" />);
-      }
-      if (col.format) {
-        icons.push(<FormatPainterOutlined key="format" />);
-      }
-      if (col.aggregate) {
-        icons.push(<GroupOutlined key="aggregate" />);
-      }
-      if (col.filter) {
-        icons.push(<FilterOutlined key="filter" />);
-      }
-      if (col.color) {
-        icons.push(<BgColorsOutlined key="color" />);
-      }
-      if (col.size) {
-        icons.push(<FontSizeOutlined key="size" />);
-      }
-      return icons;
-    };
 
     return (
       <StyledContainer ref={drop} isOver={isOver} canDrop={canDrop}>
