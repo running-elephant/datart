@@ -25,10 +25,7 @@ import {
   LegendStyle,
   YAxis,
 } from 'app/types/ChartConfig';
-import ChartDataSetDTO, {
-  IChartDataSet,
-  IChartDataSetRow,
-} from 'app/types/ChartDataSet';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getDataColumnMaxAndMin2,
@@ -162,7 +159,7 @@ class BasicScatterChart extends Chart {
   }
 
   protected getSeriesGroupByColorConfig(
-    chartDataSetRows: IChartDataSetRow<string>[],
+    chartDataSetRows: IChartDataSet<string>,
     groupConfigs: ChartDataSectionField[],
     aggregateConfigs: ChartDataSectionField[],
     sizeConfigs: ChartDataSectionField[],
@@ -198,7 +195,7 @@ class BasicScatterChart extends Chart {
 
     // TODO(Stephen): should be refactor by ChartDataSet groupBy function
     const groupedObjDataColumns: {
-      [key: string]: { color: string; datas: [] };
+      [key: string]: { color: string; datas: IChartDataSet<string> };
     } = chartDataSetRows?.reduce((acc, cur) => {
       const key = cur.getCell(colorConfigs?.[0]);
       if (acc?.[key]) {
@@ -233,7 +230,7 @@ class BasicScatterChart extends Chart {
 
   protected getMetricAndSizeSerie(
     { max, min }: { max: number; min: number },
-    dataSetRows: IChartDataSetRow<string>[],
+    dataSetRows: IChartDataSet<string>,
     groupConfigs: ChartDataSectionField[],
     aggregateConfigs: ChartDataSectionField[],
     sizeConfigs: ChartDataSectionField[],

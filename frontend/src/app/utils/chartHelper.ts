@@ -26,9 +26,13 @@ import {
   ChartDataConfig,
   ChartDataSectionField,
   ChartStyleConfig,
+  ChartStyleSectionGroup,
   FontStyle,
   GridStyle,
   IFieldFormatConfig,
+  MarkArea,
+  MarkDataConfig,
+  MarkLine,
   XAxis,
 } from 'app/types/ChartConfig';
 import {
@@ -471,12 +475,12 @@ export function getReference(
 }
 
 export function getReference2(
-  settingConfigs,
-  dataSetRows: IChartDataSetRow<string>[],
-  dataConfig,
-  isHorizonDisplay,
-) {
-  const referenceTabs = getValue(
+  settingConfigs: ChartStyleConfig[],
+  dataSetRows: IChartDataSet<string>,
+  dataConfig: ChartDataSectionField,
+  isHorizonDisplay: boolean,
+): { markLine: MarkLine; markArea: MarkArea } {
+  const referenceTabs: ChartStyleSectionGroup[] = getValue(
     settingConfigs,
     ['reference', 'panel', 'configuration'],
     'rows',
@@ -599,17 +603,16 @@ function getMarkLineData(
 }
 
 function getMarkLine2(
-  refTabs,
+  refTabs: ChartStyleSectionGroup[],
   dataSetRows: IChartDataSetRow<string>[],
-  dataConfig,
-  isHorizonDisplay,
-) {
+  dataConfig: ChartDataSectionField,
+  isHorizonDisplay: boolean,
+): MarkLine {
   const markLineData = refTabs
     ?.reduce((acc, cur) => {
       const markLineConfigs = cur?.rows?.filter(r => r.key === 'markLine');
-      acc.push(markLineConfigs);
-      return acc;
-    }, [])
+      return acc.concat(markLineConfigs);
+    }, [] as Array<ChartStyleSectionGroup | undefined>)
     .map(ml => {
       return getMarkLineData2(
         ml,
@@ -624,21 +627,22 @@ function getMarkLine2(
     .filter(Boolean);
 
   return {
-    data: markLineData,
+    data: markLineData as MarkDataConfig[],
   };
 }
 
 function getMarkLineData2(
-  mark,
+  mark: ChartStyleSectionGroup | undefined,
   dataSetRows: IChartDataSetRow<string>[],
-  valueTypeKey,
-  constantValueKey,
-  metricKey,
-  dataConfig,
-  isHorizonDisplay,
-) {
-  const name = mark[0].label;
-  const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
+  valueTypeKey: string,
+  constantValueKey: string,
+  metricKey: string,
+  dataConfig: ChartDataSectionField,
+  isHorizonDisplay: boolean,
+): MarkDataConfig | null {
+  if (!mark) return null;
+  const name: string = mark.label;
+  const valueKey: 'xAxis' | 'yAxis' = isHorizonDisplay ? 'xAxis' : 'yAxis';
 
   const [
     show,
@@ -650,7 +654,7 @@ function getMarkLineData2(
     metricUid,
     constantValue,
   ] = getStyles(
-    mark,
+    [mark],
     ['markLine'],
     [
       'showLabel',
@@ -664,11 +668,15 @@ function getMarkLineData2(
     ],
   );
 
+  if (!enableMarkLine) {
+    return null;
+  }
+
   const metricDatas =
     dataConfig.uid === metricUid
       ? dataSetRows.map(d => +d.getCell(dataConfig))
       : [];
-  let yAxis = 0;
+  let yAxis: number = 0;
   switch (valueType) {
     case 'constant':
       yAxis = constantValue;
@@ -683,11 +691,6 @@ function getMarkLineData2(
       yAxis = Math.min(...metricDatas);
       break;
   }
-
-  if (!enableMarkLine) {
-    return null;
-  }
-
   return {
     [valueKey]: yAxis,
     name,
@@ -701,15 +704,16 @@ function getMarkLineData2(
 }
 
 function getMarkAreaData2(
-  mark,
+  mark: ChartStyleSectionGroup | undefined,
   dataSetRows: IChartDataSetRow<string>[],
-  valueTypeKey,
-  constantValueKey,
-  metricKey,
-  dataConfig,
-  isHorizonDisplay,
-) {
-  const valueKey = isHorizonDisplay ? 'xAxis' : 'yAxis';
+  valueTypeKey: string,
+  constantValueKey: string,
+  metricKey: string,
+  dataConfig: ChartDataSectionField,
+  isHorizonDisplay: boolean,
+): MarkDataConfig | null {
+  if (!mark) return null;
+  const valueKey: 'xAxis' | 'yAxis' = isHorizonDisplay ? 'xAxis' : 'yAxis';
   const [
     metric,
     show,
@@ -738,12 +742,12 @@ function getMarkAreaData2(
     ],
   );
 
-  const name = mark.value;
+  const name: string = mark.value;
   const metricDatas =
     dataConfig.uid === metric
       ? dataSetRows.map(d => +d.getCell(dataConfig))
       : [];
-  let yAxis = 0;
+  let yAxis: number = 0;
   switch (valueType) {
     case 'constant':
       yAxis = constantValue;
@@ -760,7 +764,7 @@ function getMarkAreaData2(
   }
 
   if (!enableMarkArea || !Number.isFinite(yAxis) || Number.isNaN(yAxis)) {
-    return;
+    return null;
   }
 
   return {
@@ -892,15 +896,15 @@ function getMarkArea(refTabs, dataColumns, isHorizonDisplay) {
 }
 
 function getMarkArea2(
-  refTabs,
+  refTabs: ChartStyleSectionGroup[],
   dataSetRows: IChartDataSetRow<string>[],
-  dataConfig,
-  isHorizonDisplay,
-) {
+  dataConfig: ChartDataSectionField,
+  isHorizonDisplay: boolean,
+): MarkArea {
   const refAreas = refTabs?.reduce((acc, cur) => {
     const markLineConfigs = cur?.rows?.filter(r => r.key === 'markArea');
     return acc.concat(markLineConfigs);
-  }, []);
+  }, [] as Array<ChartStyleSectionGroup | undefined>);
 
   return {
     data: refAreas
@@ -918,7 +922,7 @@ function getMarkArea2(
             );
           })
           .filter(Boolean);
-        return markAreaData;
+        return markAreaData as MarkDataConfig[];
       })
       .filter(m => m?.length === 2),
   };

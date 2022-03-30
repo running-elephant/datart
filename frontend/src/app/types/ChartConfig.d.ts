@@ -319,12 +319,23 @@ export interface LegendStyle {
   data?: string[];
 }
 
+export type MarkDataConfig = {
+  yAxis?: number;
+  xAxis?: number;
+  name: string;
+  lineStyle?: LineStyle;
+  itemStyle?: {
+    opacity: number;
+    color: string;
+  } & BorderStyle;
+} & LabelStyle;
+
 export interface MarkLine {
-  data: any;
+  data: MarkDataConfig[];
 }
 
 export interface MarkArea {
-  data: any;
+  data: MarkDataConfig[][];
 }
 
 export interface XAxisColumns {
