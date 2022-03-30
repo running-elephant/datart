@@ -25,6 +25,7 @@ import {
   ChartDataSectionField,
   ChartOptions,
   ChartStyleConfig,
+  ChartStyleSectionGroup,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
@@ -38,6 +39,7 @@ import {
 import { DATARTSEPERATOR } from 'globalConstants';
 import { Debugger } from 'utils/debugger';
 import { CloneValueDeep, isEmptyArray, Omit } from 'utils/object';
+import { ConditionalStyleFormValues } from '../../FormGenerator/Customize/ConditionalStyle';
 import AntdTableWrapper from './AntdTableWrapper';
 import {
   getCustomBodyCellStyle,
@@ -410,7 +412,7 @@ class BasicTableChart extends ReactChart {
       ['style'],
       ['enableRowNumber'],
     );
-    const getAllColumnListInfo = getValue(
+    const getAllColumnListInfo: ChartStyleSectionGroup[] = getValue(
       styleConfigs,
       ['column', 'modal', 'list'],
       'rows',
@@ -563,16 +565,17 @@ class BasicTableChart extends ReactChart {
         ['tableBodyStyle'],
         ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'align'],
       );
-    // todo (tianlei) need types
-    const getAllColumnListInfo = getValue(
+    const getAllColumnListInfo: ChartStyleSectionGroup[] = getValue(
       styleConfigs,
       ['column', 'modal', 'list'],
       'rows',
     );
-    let allConditionalStyle: any[] = [];
+    let allConditionalStyle: ConditionalStyleFormValues[] = [];
     getAllColumnListInfo?.forEach(info => {
-      const [getConditionalStyleValue] = getStyles(
-        info.rows,
+      const [getConditionalStyleValue]: Array<
+        ConditionalStyleFormValues[] | undefined
+      > = getStyles(
+        info.rows!,
         ['conditionalStyle'],
         ['conditionalStylePanel'],
       );
