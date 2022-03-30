@@ -20,6 +20,7 @@ import {
   CalendarOutlined,
   FieldStringOutlined,
   FileUnknownOutlined,
+  FolderAddOutlined,
   FolderOpenOutlined,
   MoreOutlined,
   NumberOutlined,
@@ -28,6 +29,7 @@ import { Dropdown, Menu, Row } from 'antd';
 import { IW, ToolbarButton } from 'app/components';
 import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useToggle from 'app/hooks/useToggle';
 import { ColumnRole } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
@@ -70,6 +72,7 @@ export const ChartDraggableSourceContainer: FC<
   onClearCheckedList,
 }) {
   const t = useI18NPrefix(`viz.workbench.dataview`);
+  const [showChild, setShowChild] = useToggle(false);
   const [, drag] = useDrag(
     () => ({
       type: CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
@@ -146,7 +149,25 @@ export const ChartDraggableSourceContainer: FC<
       },
     };
     if (role === ColumnRole.Hierarchy) {
-      icon = <FolderOpenOutlined {...props} />;
+      if (!showChild) {
+        icon = (
+          <FolderAddOutlined
+            {...props}
+            onClick={() => {
+              setShowChild(!showChild);
+            }}
+          />
+        );
+      } else {
+        icon = (
+          <FolderOpenOutlined
+            {...props}
+            onClick={() => {
+              setShowChild(!showChild);
+            }}
+          />
+        );
+      }
     } else {
       switch (type) {
         case DataViewFieldType.STRING:
@@ -164,9 +185,9 @@ export const ChartDraggableSourceContainer: FC<
     }
 
     return (
-      <Row align="middle">
+      <Row align="middle" style={{ width: '100%' }}>
         <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
-        <p>{colName}</p>
+        <StyledFieldContent>{colName}</StyledFieldContent>
         <div onClick={stopPPG}>
           <Dropdown
             disabled={_isNormalField()}
@@ -187,6 +208,8 @@ export const ChartDraggableSourceContainer: FC<
     type,
     role,
     colName,
+    showChild,
+    setShowChild,
     onDeleteComputedField,
     onEditComputedField,
     category,
@@ -221,7 +244,7 @@ export const ChartDraggableSourceContainer: FC<
       className={styleClasses.join(' ')}
     >
       {renderContent}
-      {renderChildren}
+      {showChild && renderChildren}
     </Container>
   );
 });
@@ -238,7 +261,7 @@ const Container = styled.div<{ flexDirection?: string }>`
   color: ${p => p.theme.textColorSnd};
   cursor: pointer;
   &.container-active {
-    background-color: #f8f9fa;
+    background-color: ${p => p.theme.bodyBackground};
   }
   > p {
     flex: 1;
@@ -255,4 +278,11 @@ const Container = styled.div<{ flexDirection?: string }>`
       visibility: visible;
     }
   }
+`;
+
+const StyledFieldContent = styled.p`
+  flex: 1;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
