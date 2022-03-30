@@ -223,6 +223,7 @@ function currencyFormater(
     style: 'currency',
     currency: config?.currency || 'CNY',
     minimumFractionDigits: config?.decimalPlaces,
+    maximumFractionDigits: config?.decimalPlaces,
     useGrouping: config?.useThousandSeparator,
   }).format(value / realUnit)} ${
     NumericUnitDescriptions.get(config?.unitKey || NumberUnitKey.None)?.[1]
