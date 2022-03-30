@@ -340,7 +340,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
     }
 
     private void validateExpiration(ShareAuthorizedToken share) {
-        if (share == null || new Date().after(share.getExpiryDate())) {
+        if (share == null || (share.getExpiryDate() != null && new Date().after(share.getExpiryDate()))) {
             Exceptions.tr(BaseException.class, "message.share.expired");
         }
     }
