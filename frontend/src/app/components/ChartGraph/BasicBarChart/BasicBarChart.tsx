@@ -270,7 +270,7 @@ class BasicBarChart extends Chart {
           ),
           name: k,
           data: xAxisColumns?.[0]?.data?.map(d => {
-            const row = dataSet.find(r => r.getCell(xAxisConfig) === d);
+            const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
             return {
               ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),

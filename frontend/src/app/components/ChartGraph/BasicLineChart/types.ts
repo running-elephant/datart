@@ -7,8 +7,8 @@ import {
 export type Series = {
   data: Array<{
     rowData: { [key: string]: any };
-    value: number | string;
-    name?: string;
+    value: number | string | undefined;
+    name?: string | undefined;
     format: IFieldFormatConfig | undefined;
   }>;
   smooth?: boolean;

@@ -30,6 +30,7 @@ import {
   FontStyle,
   GridStyle,
   IFieldFormatConfig,
+  LineStyle,
   MarkArea,
   MarkDataConfig,
   MarkLine,
@@ -297,9 +298,9 @@ function dateFormater(
  * console.log(colorList); // ["#298ffe","#dae9ff","#fe705a","#ffdcdc","#751adb","#8663d7","#15AD31","#FAD414","#E62412"]
  *
  * @export
- * @return {*} default color array
+ * @return {string[]} default color array
  */
-export function getDefaultThemeColor() {
+export function getDefaultThemeColor(): string[] {
   return echartsDefaultTheme.color;
 }
 
@@ -936,11 +937,11 @@ export function getAxisLine(show: boolean, lineStyle?): AxisLineStyle {
 }
 
 export function getAxisLabel(
-  show,
+  show: boolean,
   font: FontStyle,
-  interval = null,
-  rotate = null,
-  overflow = null,
+  interval: string | null = null,
+  rotate: number | null = null,
+  overflow: string | null = null,
 ): AxisLabel {
   return {
     show,
@@ -951,14 +952,20 @@ export function getAxisLabel(
   };
 }
 
-export function getSplitLine(show, lineStyle): AxisLineStyle {
+export function getSplitLine(
+  show: boolean,
+  lineStyle: LineStyle,
+): AxisLineStyle {
   return {
     show,
     lineStyle,
   };
 }
 
-export function getAxisTick(show, lineStyle): AxisLineStyle {
+export function getAxisTick(
+  show: boolean,
+  lineStyle: LineStyle,
+): AxisLineStyle {
   return {
     show,
     lineStyle,
@@ -966,9 +973,9 @@ export function getAxisTick(show, lineStyle): AxisLineStyle {
 }
 
 export function getNameTextStyle(
-  fontFamily,
-  fontSize,
-  color,
+  fontFamily: string,
+  fontSize: number,
+  color: string,
 ): { fontFamily: string; fontSize: number; color: string } {
   return {
     fontFamily,
@@ -1126,7 +1133,7 @@ export function getDataColumnMaxAndMin(
 export function getDataColumnMaxAndMin2(
   chartDataSetRows: IChartDataSetRow<string>[],
   config?: ChartDataSectionField,
-) {
+): { min: number; max: number } {
   if (!config || !chartDataSetRows?.length) {
     return { min: 0, max: 100 };
   }
@@ -1139,10 +1146,10 @@ export function getDataColumnMaxAndMin2(
 }
 
 export function getSeriesTooltips4Scatter(
-  params,
-  tooltipItemConfigs,
+  params: Array<{ value: string | number }>,
+  tooltipItemConfigs: ChartDataSectionField[],
   start?: number,
-) {
+): string[] {
   const dataValues = params?.[0]?.value;
   return tooltipItemConfigs.map((config, index) =>
     valueFormatter(config, dataValues?.[!!start ? start + index : index]),
@@ -1269,10 +1276,10 @@ export function valueFormatter(
 
 export function getScatterSymbolSizeFn(
   valueIndex: number,
-  max,
-  min,
+  max: number,
+  min: number,
   cycleRatio?: number,
-) {
+): (val) => number {
   min = Math.min(0, min);
   const scaleRatio = cycleRatio || 1;
   const defaultScatterPointPixelSize = 10;
@@ -1324,7 +1331,7 @@ export function getExtraSeriesDataFormat(format?: IFieldFormatConfig): {
 export function getColorizeGroupSeriesColumns(
   chartDataSet: IChartDataSet<string>,
   groupConfig: ChartDataSectionField,
-) {
+): { [x: string]: IChartDataSet<string> }[] {
   return Object.entries(chartDataSet.groupBy(groupConfig)).map(([k, v]) => {
     let a = {};
     a[k] = v;
@@ -1400,14 +1407,14 @@ export function isMatchRequirement(
 }
 
 // 获取是否展示刻度
-export const getIntervalShow = interval =>
+export const getIntervalShow = (interval): boolean =>
   interval !== 'auto' && interval !== null;
 
 // 判断overflow 条件是否已生效
 export function hadAxisLabelOverflowConfig(
   options?: ECBasicOption,
   horizon: boolean = false,
-) {
+): boolean {
   if (!options) return false;
   const axisName = !horizon ? 'xAxis' : 'yAxis';
 
@@ -1416,7 +1423,7 @@ export function hadAxisLabelOverflowConfig(
 
   const { overflow, interval, show } = axisLabelOpts;
 
-  return show && overflow && getIntervalShow(interval);
+  return !!(show && overflow && getIntervalShow(interval));
 }
 
 // 处理溢出情况

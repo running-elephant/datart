@@ -239,7 +239,7 @@ class BasicLineChart extends Chart {
             normal: { color: itemStyleColor?.value },
           },
           data: xAxisColumns[0].data.map(d => {
-            const row = dataSet.find(r => r.getCell(xAxisConfig) === d);
+            const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
             return {
               ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),

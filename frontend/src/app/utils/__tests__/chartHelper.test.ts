@@ -716,6 +716,20 @@ describe('Chart Helper ', () => {
         '13',
       ],
       [
+        0,
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: 0,
+            unitKey: 'none',
+            useThousandSeparator: false,
+            prefix: '',
+            suffix: '',
+          },
+        },
+        '0',
+      ],
+      [
         NaN,
         {
           type: 'numeric',
