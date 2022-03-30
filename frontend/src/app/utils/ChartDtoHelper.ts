@@ -22,6 +22,7 @@ import { ChartDTO } from 'app/types/ChartDTO';
 import {
   mergeChartDataConfigs,
   mergeChartStyleConfigs,
+  transformHierarchyMeta,
   transformMeta,
 } from 'app/utils/internalChartHelper';
 import { Omit } from 'utils/object';
@@ -32,6 +33,16 @@ export function convertToChartDTO(data): ChartDTO {
     view: {
       ...Omit(data?.view, ['model']),
       meta: transformMeta(data?.view?.model),
+    },
+  });
+}
+
+export function convertToChartDTO2(data): ChartDTO {
+  return Object.assign({}, data, {
+    config: JSON.parse(data?.config),
+    view: {
+      ...Omit(data?.view, ['model']),
+      meta: transformHierarchyMeta(data?.view?.model),
     },
   });
 }

@@ -20,16 +20,15 @@ import {
   CalendarOutlined,
   FieldStringOutlined,
   FileUnknownOutlined,
+  FolderOpenOutlined,
   MoreOutlined,
   NumberOutlined,
 } from '@ant-design/icons';
-import { Dropdown, Menu } from 'antd';
+import { Dropdown, Menu, Row } from 'antd';
 import { IW, ToolbarButton } from 'app/components';
-import {
-  ChartDataViewFieldCategory,
-  DataViewFieldType,
-} from 'app/constants';
+import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { ColumnRole } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { FC, memo, useMemo } from 'react';
@@ -61,6 +60,8 @@ export const ChartDraggableSourceContainer: FC<
   type,
   category,
   expression,
+  role,
+  children,
   onDeleteComputedField,
   onEditComputedField,
   onSelectionChange,
@@ -110,6 +111,9 @@ export const ChartDraggableSourceContainer: FC<
     };
 
     const _getIconStyle = () => {
+      if (role === ColumnRole.Hierarchy) {
+        return WARNING;
+      }
       if (
         ChartDataViewFieldCategory.ComputedField === category ||
         ChartDataViewFieldCategory.AggregateComputedField === category
@@ -141,22 +145,26 @@ export const ChartDraggableSourceContainer: FC<
         color: _getIconStyle(),
       },
     };
-    switch (type) {
-      case DataViewFieldType.STRING:
-        icon = <FieldStringOutlined {...props} />;
-        break;
-      case DataViewFieldType.NUMERIC:
-        icon = <NumberOutlined {...props} />;
-        break;
-      case DataViewFieldType.DATE:
-        icon = <CalendarOutlined {...props} />;
-        break;
-      default:
-        icon = <FileUnknownOutlined {...props} />;
+    if (role === ColumnRole.Hierarchy) {
+      icon = <FolderOpenOutlined {...props} />;
+    } else {
+      switch (type) {
+        case DataViewFieldType.STRING:
+          icon = <FieldStringOutlined {...props} />;
+          break;
+        case DataViewFieldType.NUMERIC:
+          icon = <NumberOutlined {...props} />;
+          break;
+        case DataViewFieldType.DATE:
+          icon = <CalendarOutlined {...props} />;
+          break;
+        default:
+          icon = <FileUnknownOutlined {...props} />;
+      }
     }
 
     return (
-      <>
+      <Row align="middle">
         <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
         <p>{colName}</p>
         <div onClick={stopPPG}>
@@ -173,12 +181,39 @@ export const ChartDraggableSourceContainer: FC<
             />
           </Dropdown>
         </div>
-      </>
+      </Row>
     );
-  }, [type, colName, onDeleteComputedField, onEditComputedField, category, t]);
+  }, [
+    type,
+    role,
+    colName,
+    onDeleteComputedField,
+    onEditComputedField,
+    category,
+    t,
+  ]);
+
+  const renderChildren = useMemo(() => {
+    return (children || []).map(item => (
+      <ChartDraggableSourceContainer
+        key={item.id}
+        id={item.id}
+        name={item.id}
+        category={item.category}
+        expression={item.expression}
+        type={item.type}
+        role={item.role}
+        children={item.children}
+        onDeleteComputedField={onDeleteComputedField}
+        onClearCheckedList={onClearCheckedList}
+        selectedItems={selectedItems}
+      />
+    ));
+  }, [children, onDeleteComputedField, onClearCheckedList, selectedItems]);
 
   return (
     <Container
+      flexDirection={children ? 'column' : 'row'}
       onClick={e => {
         onSelectionChange?.(colName, e.metaKey || e.ctrlKey, e.shiftKey);
       }}
@@ -186,16 +221,17 @@ export const ChartDraggableSourceContainer: FC<
       className={styleClasses.join(' ')}
     >
       {renderContent}
+      {renderChildren}
     </Container>
   );
 });
 
 export default ChartDraggableSourceContainer;
 
-const Container = styled.div`
+const Container = styled.div<{ flexDirection?: string }>`
   display: flex;
+  flex-direction: ${p => p.flexDirection || 'row'};
   flex: 1;
-  align-items: center;
   padding: ${SPACE_TIMES(0.5)} ${SPACE} ${SPACE_TIMES(0.5)} ${SPACE_TIMES(2)};
   font-size: ${FONT_SIZE_SUBTITLE};
   font-weight: ${FONT_WEIGHT_MEDIUM};
