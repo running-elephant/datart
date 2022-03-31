@@ -203,7 +203,8 @@ public class ShareServiceImpl extends BaseService implements ShareService {
 
     @Override
     public Dataframe execute(ShareToken shareToken, ViewExecuteParam executeParam) throws Exception {
-        validateExecutePermission(shareToken.getAuthorizedToken(), executeParam);
+        ShareAuthorizedToken shareAuthorizedToken = validateExecutePermission(shareToken.getAuthorizedToken(), executeParam);
+        getSecurityManager().runAs(shareAuthorizedToken.getPermissionBy());
         return dataProviderService.execute(executeParam, false);
     }
 
@@ -332,7 +333,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         return 1 == shareMapper.updateByPrimaryKey(update);
     }
 
-    private void validateExecutePermission(String authorizedToken, ViewExecuteParam executeParam) {
+    private ShareAuthorizedToken validateExecutePermission(String authorizedToken, ViewExecuteParam executeParam) {
         if (StringUtils.isBlank(authorizedToken)) {
             Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.permission.denied");
         }
@@ -340,6 +341,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         if (!ResourceType.VIEW.equals(shareAuthorizedToken.getVizType()) || !shareAuthorizedToken.getVizId().equals(executeParam.getViewId())) {
             Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.permission.denied");
         }
+        return shareAuthorizedToken;
     }
 
     private void validateExpiration(ShareAuthorizedToken share) {
