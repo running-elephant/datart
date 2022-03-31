@@ -115,7 +115,7 @@ export type ChartDataSectionField = {
   color?: ColorFieldAction;
   size?: number;
 
-  children?: [];
+  children?: ChartDataSectionField[];
 };
 
 export type SortFieldAction = {

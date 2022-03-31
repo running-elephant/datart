@@ -45,6 +45,7 @@ import { uuidv4 } from 'utils/utils';
 import ChartDraggableElement from './ChartDraggableElement';
 import ChartDraggableElementField from './ChartDraggableElementField';
 import ChartDraggableElementHierarchy from './ChartDraggableElementHierarchy';
+import { updateDataConfigByField } from './utils';
 
 type DragItem = {
   index?: number;
@@ -104,6 +105,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 items.map(val => ({
                   uid: uuidv4(),
                   ...val,
+                  children: val?.children?.map(c => ({ ...c, uid: uuidv4() })),
                   aggregate: getDefaultAggregate(val),
                 })),
               );
@@ -339,12 +341,11 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       if (!fieldConfig) {
         return;
       }
-      const newConfig = updateBy(currentConfig, draft => {
-        const index = (draft.rows || []).findIndex(r => r.uid === columnUid);
-        if (index !== -1 && fieldConfig) {
-          (draft.rows || [])[index] = fieldConfig;
-        }
-      });
+      const newConfig = updateDataConfigByField(
+        columnUid,
+        currentConfig,
+        fieldConfig,
+      );
       onConfigChanged?.(ancestors, newConfig, needRefresh);
     };
 

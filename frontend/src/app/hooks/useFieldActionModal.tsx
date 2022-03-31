@@ -17,7 +17,10 @@
  */
 
 import { FormInstance } from 'antd';
-import { ChartDataSectionFieldActionType } from 'app/constants';
+import {
+  ChartDataSectionFieldActionType,
+  ChartDataViewFieldCategory,
+} from 'app/constants';
 import FieldActions from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
@@ -96,7 +99,15 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
     modalSize?: string,
     aggregation?: boolean,
   ) => {
-    const currentConfig = dataConfig.rows?.find(c => c.uid === columnUid);
+    const currentConfig = dataConfig.rows
+      ?.flatMap(r => {
+        if (r.category !== ChartDataViewFieldCategory.Hierarchy) {
+          return r;
+        }
+        return r.children || [];
+      })
+      .find(c => c.uid === columnUid);
+
     let _modalSize = StateModalSize.MIDDLE;
     if (actionType === ChartDataSectionFieldActionType.Colorize) {
       _modalSize = StateModalSize.XSMALL;
