@@ -6,6 +6,7 @@ public enum ResourceType {
     VIEW,
 
     DATACHART,
+    WIDGET,
     DASHBOARD,
     FOLDER,
     STORYBOARD,

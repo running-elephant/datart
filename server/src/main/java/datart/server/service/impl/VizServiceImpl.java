@@ -27,23 +27,26 @@ import datart.core.entity.*;
 import datart.security.base.ResourceType;
 import datart.server.base.dto.*;
 import datart.server.base.dto.chart.WidgetConfig;
+import datart.server.base.params.*;
 import datart.server.base.transfer.ImportStrategy;
 import datart.server.base.transfer.TransferConfig;
 import datart.server.base.transfer.model.DashboardTransferModel;
 import datart.server.base.transfer.model.DatachartTransferModel;
 import datart.server.base.transfer.model.ResourceTransferModel;
-import datart.server.base.params.*;
 import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -250,20 +253,18 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
-    public String getChartConfigByVizId(String vizId, String vizType) {
+    public String getChartConfigByVizId(ResourceType resourceType, String vizId) {
         String result = "";
         try {
-            if (StringUtils.isNotBlank(vizId)) {
-                switch (vizType) {
-                    case "dataChart":
-                        return retrieve(vizId, Datachart.class).getConfig();
-                    case "widget":
-                        String config = retrieve(vizId, Widget.class).getConfig();
-                        WidgetConfig widgetConfig = JSON.parseObject(config, WidgetConfig.class);
-                        return widgetConfig.getChartConfig();
-                    default:
-                        return result;
-                }
+            switch (resourceType) {
+                case DATACHART:
+                    return retrieve(vizId, Datachart.class).getConfig();
+                case WIDGET:
+                    String config = retrieve(vizId, Widget.class).getConfig();
+                    WidgetConfig widgetConfig = JSON.parseObject(config, WidgetConfig.class);
+                    return widgetConfig.getChartConfig();
+                default:
+                    return result;
             }
         } catch (Exception e) {
             log.warn("query chart(" + vizId + ") config fail, download with none style.");
