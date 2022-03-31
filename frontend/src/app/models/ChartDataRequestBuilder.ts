@@ -19,6 +19,7 @@
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
+  ChartDataViewFieldCategory,
   DataViewFieldType,
   FilterConditionType,
   SortActionType,
@@ -99,9 +100,7 @@ export class ChartDataRequestBuilder {
 
         if (
           cur.type === ChartDataSectionType.MIXED &&
-          cur.rows?.findIndex(
-            v => v.type === DataViewFieldType.NUMERIC,
-          ) !== -1
+          cur.rows?.findIndex(v => v.type === DataViewFieldType.NUMERIC) !== -1
         ) {
           return acc.concat(
             cur.rows.filter(v => v.type === DataViewFieldType.NUMERIC),
@@ -130,32 +129,28 @@ export class ChartDataRequestBuilder {
     }
     const groupColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
       (acc, cur) => {
-        if (!cur.rows) {
+        if (isEmptyArray(cur.rows)) {
           return acc;
         }
         if (
           cur.type === ChartDataSectionType.GROUP ||
           cur.type === ChartDataSectionType.COLOR
         ) {
-          return acc.concat(cur.rows);
-        }
-        if (
-          cur.type === ChartDataSectionType.MIXED &&
-          cur.rows?.find(v =>
-            [
-              DataViewFieldType.DATE,
-              DataViewFieldType.STRING,
-            ].includes(v.type),
-          )
-        ) {
-          //zh: 判断数据中是否含有 DATE 和 STRING 类型 en: Determine whether the data contains DATE and STRING types
           return acc.concat(
-            cur.rows.filter(
-              v =>
-                v.type === DataViewFieldType.DATE ||
-                v.type === DataViewFieldType.STRING,
-            ),
+            cur.rows?.flatMap(r => {
+              if (r.category === ChartDataViewFieldCategory.Hierarchy) {
+                return r?.children?.slice(0, 1) || [];
+              }
+              return r;
+            }) || [],
           );
+        }
+        if (cur.type === ChartDataSectionType.MIXED) {
+          const dateAndStringFields = cur.rows?.filter(v =>
+            [DataViewFieldType.DATE, DataViewFieldType.STRING].includes(v.type),
+          );
+          //zh: 判断数据中是否含有 DATE 和 STRING 类型 en: Determine whether the data contains DATE and STRING types
+          return acc.concat(dateAndStringFields || []);
         }
         return acc;
       },

@@ -26,6 +26,7 @@ const config: ChartConfig = {
       required: true,
       type: 'group',
       limit: [0, 1],
+      drillable: true,
     },
     {
       label: 'metrics',

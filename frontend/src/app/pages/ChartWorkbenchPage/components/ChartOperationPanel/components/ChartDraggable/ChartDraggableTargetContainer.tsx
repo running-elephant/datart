@@ -66,6 +66,10 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     });
     const { aggregation } = useContext(ChartAggregationContext);
 
+    useEffect(() => {
+      setCurrentConfig(config);
+    }, [config]);
+
     const [{ isOver, canDrop }, drop] = useDrop(
       () => ({
         accept: [
@@ -77,9 +81,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           let items = Array.isArray(item) ? item : [item];
           let needDelete = true;
           if (
-            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN ||
-            monitor.getItemType() ===
-              CHART_DRAG_ELEMENT_TYPE.DATASET_HIERARCHY_COLUMN
+            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN
           ) {
             const currentColumns: ChartDataSectionField[] = (
               currentConfig.rows || []
@@ -91,6 +93,34 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               })),
             );
             updateCurrentConfigColumns(currentConfig, currentColumns, true);
+          } else if (
+            monitor.getItemType() ===
+            CHART_DRAG_ELEMENT_TYPE.DATASET_HIERARCHY_COLUMN
+          ) {
+            if (Boolean(currentConfig?.drillable)) {
+              const currentColumns: ChartDataSectionField[] = (
+                currentConfig.rows || []
+              ).concat(
+                items.map(val => ({
+                  uid: uuidv4(),
+                  ...val,
+                  aggregate: getDefaultAggregate(val),
+                })),
+              );
+              updateCurrentConfigColumns(currentConfig, currentColumns, true);
+            } else {
+              const hierarchyChildFields = items?.[0]?.children || [];
+              const currentColumns: ChartDataSectionField[] = (
+                currentConfig.rows || []
+              ).concat(
+                hierarchyChildFields.map(val => ({
+                  uid: uuidv4(),
+                  ...val,
+                  aggregate: getDefaultAggregate(val),
+                })),
+              );
+              updateCurrentConfigColumns(currentConfig, currentColumns, true);
+            }
           } else if (
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
           ) {
@@ -170,10 +200,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       }),
       [onConfigChanged, currentConfig, dataView, dataset],
     );
-
-    useEffect(() => {
-      setCurrentConfig(config);
-    }, [config]);
 
     const updateCurrentConfigColumns = (
       currentConfig,

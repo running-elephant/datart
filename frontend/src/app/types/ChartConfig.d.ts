@@ -171,6 +171,7 @@ export type ChartDataConfig = ChartConfigBase & {
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
   limit?: null | number | string | number[] | string[];
   disableAggregate?: boolean;
+  drillable?: boolean;
   options?: {
     [key in ValueOf<typeof ChartDataSectionFieldActionType>]: {
       backendSort?: boolean;
