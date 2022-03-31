@@ -17,7 +17,11 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
-import { ChartConfig } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataSectionField,
+  ChartStyleConfig,
+} from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getDataColumnMaxAndMin2,
@@ -33,6 +37,12 @@ import Chart from '../../../models/Chart';
 import Config from './config';
 import geoChinaCity from './geo-china-city.map.json';
 import geoChina from './geo-china.map.json';
+import {
+  GeoInfo,
+  GeoSeries,
+  GeoVisualMapStyle,
+  MetricAndSizeSeriesStyle,
+} from './types';
 
 // NOTE: source from: http://datav.aliyun.com/tools/atlas/index.html#&lat=31.39115752282472&lng=103.7548828125&zoom=4
 registerMap('china', geoChina as any);
@@ -94,7 +104,7 @@ class BasicOutlineMapChart extends Chart {
   }
 
   private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
-    const styleConfigs = config.styles;
+    const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.GROUP)
@@ -143,7 +153,6 @@ class BasicOutlineMapChart extends Chart {
       ),
       tooltip: this.getTooltip(
         chartDataSet,
-        styleConfigs,
         groupConfigs,
         aggregateConfigs,
         sizeConfigs,
@@ -152,12 +161,12 @@ class BasicOutlineMapChart extends Chart {
     };
   }
 
-  private registerGeoMap(styleConfigs) {
+  private registerGeoMap(styleConfigs: ChartStyleConfig[]) {
     const [mapLevelName] = getStyles(styleConfigs, ['map'], ['level']);
     this.geoMap = mapLevelName === 'china' ? geoChina : geoChinaCity;
   }
 
-  private getGeoInfo(styleConfigs) {
+  private getGeoInfo(styleConfigs: ChartStyleConfig[]): GeoInfo {
     const [show, position, font] = getStyles(
       styleConfigs,
       ['label'],
@@ -209,11 +218,11 @@ class BasicOutlineMapChart extends Chart {
 
   protected getGeoSeries(
     chartDataSet: IChartDataSet<string>,
-    groupConfigs,
-    aggregateConfigs,
-    sizeConfigs,
-    styleConfigs,
-  ): any[] {
+    groupConfigs: ChartDataSectionField[],
+    aggregateConfigs: ChartDataSectionField[],
+    sizeConfigs: ChartDataSectionField[],
+    styleConfigs: ChartStyleConfig[],
+  ): GeoSeries[] {
     const [show] = getStyles(styleConfigs, ['visualMap'], ['show']);
     const [mapLevelName, enableZoom] = getStyles(
       styleConfigs,
@@ -246,12 +255,12 @@ class BasicOutlineMapChart extends Chart {
   }
 
   protected getMetricAndSizeSeries(
-    chartDataSet,
-    groupConfigs,
-    aggregateConfigs,
-    sizeConfigs,
-    styleConfigs,
-  ): any[] {
+    chartDataSet: IChartDataSet<string>,
+    groupConfigs: ChartDataSectionField[],
+    aggregateConfigs: ChartDataSectionField[],
+    sizeConfigs: ChartDataSectionField[],
+    styleConfigs: ChartStyleConfig[],
+  ): MetricAndSizeSeriesStyle[] {
     if (this.isNormalGeoMap) {
       return [];
     }
@@ -298,12 +307,14 @@ class BasicOutlineMapChart extends Chart {
 
   protected getTooltip(
     chartDataSet: IChartDataSet<string>,
-    styleConfigs,
-    groupConfigs,
-    aggregateConfigs,
-    sizeConfigs,
-    infoConfigs,
-  ) {
+    groupConfigs: ChartDataSectionField[],
+    aggregateConfigs: ChartDataSectionField[],
+    sizeConfigs: ChartDataSectionField[],
+    infoConfigs: ChartDataSectionField[],
+  ): {
+    trigger: string;
+    formatter: (params) => string;
+  } {
     return {
       trigger: 'item',
       formatter: function (seriesParams) {
@@ -322,14 +333,17 @@ class BasicOutlineMapChart extends Chart {
     };
   }
 
-  protected mappingGeoName(sourceName) {
+  protected mappingGeoName(sourceName: string): string {
     const targetName = this.geoMap.features.find(f =>
       f.properties.name.includes(sourceName),
     )?.properties.name;
     return targetName;
   }
 
-  protected mappingGeoCoordination(sourceName, ...values) {
+  protected mappingGeoCoordination(
+    sourceName: string,
+    ...values: Array<number | string>
+  ): Array<number[] | number | string> {
     const properties = this.geoMap.features.find(f =>
       f.properties.name.includes(sourceName),
     )?.properties;
@@ -339,11 +353,11 @@ class BasicOutlineMapChart extends Chart {
 
   protected getVisualMap(
     chartDataSet: IChartDataSet<string>,
-    groupConfigs,
-    aggregateConfigs,
-    sizeConfigs,
-    styleConfigs,
-  ) {
+    groupConfigs: ChartDataSectionField[],
+    aggregateConfigs: ChartDataSectionField[],
+    sizeConfigs: ChartDataSectionField[],
+    styleConfigs: ChartStyleConfig[],
+  ): GeoVisualMapStyle[] {
     const [show, orient, align, itemWidth, itemHeight, font] = getStyles(
       styleConfigs,
       ['visualMap'],
@@ -381,9 +395,7 @@ class BasicOutlineMapChart extends Chart {
         textStyle: {
           ...font,
         },
-        formatter: value => {
-          return toFormattedValue(value, format);
-        },
+        formatter: value => toFormattedValue(value, format),
       },
     ];
   }
