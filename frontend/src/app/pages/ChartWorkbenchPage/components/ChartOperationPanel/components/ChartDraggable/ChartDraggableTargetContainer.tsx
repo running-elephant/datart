@@ -96,32 +96,54 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             updateCurrentConfigColumns(currentConfig, currentColumns, true);
           } else if (
             monitor.getItemType() ===
-            CHART_DRAG_ELEMENT_TYPE.DATASET_HIERARCHY_COLUMN
+              CHART_DRAG_ELEMENT_TYPE.DATASET_HIERARCHY_COLUMN ||
+            (monitor.getItemType() ===
+              CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN &&
+              item.category === ChartDataViewFieldCategory.Hierarchy)
           ) {
-            if (Boolean(currentConfig?.drillable)) {
-              const currentColumns: ChartDataSectionField[] = (
-                currentConfig.rows || []
-              ).concat(
-                items.map(val => ({
-                  uid: uuidv4(),
-                  ...val,
-                  children: val?.children?.map(c => ({ ...c, uid: uuidv4() })),
-                  aggregate: getDefaultAggregate(val),
-                })),
+            const originItemIndex = (currentConfig.rows || []).findIndex(
+              r => r.uid === item.uid,
+            );
+            if (originItemIndex > -1) {
+              needDelete = false;
+              const currentColumns = updateBy(
+                currentConfig?.rows || [],
+                draft => {
+                  draft.splice(originItemIndex, 1);
+                  item.aggregate = getDefaultAggregate(item);
+                  return draft.splice(item?.index!, 0, item);
+                },
               );
-              updateCurrentConfigColumns(currentConfig, currentColumns, true);
+              updateCurrentConfigColumns(currentConfig, currentColumns);
             } else {
-              const hierarchyChildFields = items?.[0]?.children || [];
-              const currentColumns: ChartDataSectionField[] = (
-                currentConfig.rows || []
-              ).concat(
-                hierarchyChildFields.map(val => ({
-                  uid: uuidv4(),
-                  ...val,
-                  aggregate: getDefaultAggregate(val),
-                })),
-              );
-              updateCurrentConfigColumns(currentConfig, currentColumns, true);
+              if (Boolean(currentConfig?.drillable)) {
+                const currentColumns: ChartDataSectionField[] = (
+                  currentConfig.rows || []
+                ).concat(
+                  items.map(val => ({
+                    uid: uuidv4(),
+                    ...val,
+                    children: val?.children?.map(c => ({
+                      ...c,
+                      uid: uuidv4(),
+                    })),
+                    aggregate: getDefaultAggregate(val),
+                  })),
+                );
+                updateCurrentConfigColumns(currentConfig, currentColumns, true);
+              } else {
+                const hierarchyChildFields = items?.[0]?.children || [];
+                const currentColumns: ChartDataSectionField[] = (
+                  currentConfig.rows || []
+                ).concat(
+                  hierarchyChildFields.map(val => ({
+                    uid: uuidv4(),
+                    ...val,
+                    aggregate: getDefaultAggregate(val),
+                  })),
+                );
+                updateCurrentConfigColumns(currentConfig, currentColumns, true);
+              }
             }
           } else if (
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
@@ -157,8 +179,10 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         canDrop: (item: ChartDataSectionField, monitor) => {
           let items = Array.isArray(item) ? item : [item];
           if (
-            monitor.getItemType() ===
-              CHART_DRAG_ELEMENT_TYPE.DATASET_HIERARCHY_COLUMN &&
+            [CHART_DRAG_ELEMENT_TYPE.DATASET_HIERARCHY_COLUMN].includes(
+              monitor.getItemType() as any,
+            ) &&
+            item.category === ChartDataViewFieldCategory.Hierarchy &&
             ![
               ChartDataSectionType.GROUP,
               ChartDataSectionType.COLOR,
@@ -328,7 +352,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             }}
             moveCard={onDraggableItemMove}
             onDelete={handleOnDeleteItem(columnConfig.uid)}
-          ></ChartDraggableElement>
+          />
         );
       });
     };
