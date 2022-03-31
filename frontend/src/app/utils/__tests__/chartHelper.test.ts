@@ -17,10 +17,11 @@
  */
 
 import { ChartDataSetRow } from 'app/models/ChartDataSet';
-import { IChartDataSetRow } from 'app/types/ChartDataSet';
+import { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   ChartDataConfig,
   ChartDataSectionField,
+  ChartStyleConfig,
   IFieldFormatConfig,
 } from '../../types/ChartConfig';
 import {
@@ -713,6 +714,20 @@ describe('Chart Helper ', () => {
           },
         },
         '13',
+      ],
+      [
+        0,
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: 0,
+            unitKey: 'none',
+            useThousandSeparator: false,
+            prefix: '',
+            suffix: '',
+          },
+        },
+        '0',
       ],
       [
         NaN,
@@ -1577,9 +1592,9 @@ describe('Chart Helper ', () => {
       expect(
         JSON.stringify(
           getReference2(
-            style,
-            chartDataSet as IChartDataSetRow<string>[],
-            config[1]!.rows![0],
+            style as ChartStyleConfig[],
+            chartDataSet as IChartDataSet<string>,
+            config[1]!.rows![0] as ChartDataSectionField,
             isHorizonDisplay,
           ),
         ),
@@ -1756,7 +1771,7 @@ describe('Chart Helper ', () => {
       expect(
         JSON.stringify(
           getDataColumnMaxAndMin2(
-            chartDataSet as IChartDataSetRow<string>[],
+            chartDataSet as IChartDataSet<string>,
             config as ChartDataSectionField,
           ),
         ),
@@ -2025,9 +2040,9 @@ describe('Chart Helper ', () => {
       ],
     ])('getGridStyle Test - ', (data, expected) => {
       test(`Get grid margin config`, () => {
-        expect(JSON.stringify(getGridStyle(data))).toEqual(
-          JSON.stringify(expected),
-        );
+        expect(
+          JSON.stringify(getGridStyle(data as ChartStyleConfig[])),
+        ).toEqual(JSON.stringify(expected));
       });
     });
   });

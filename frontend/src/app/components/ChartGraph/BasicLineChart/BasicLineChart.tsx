@@ -17,7 +17,17 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
-import { ChartConfig } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataSectionField,
+  ChartStyleConfig,
+  LabelStyle,
+  LegendStyle,
+  SeriesStyle,
+  XAxis,
+  XAxisColumns,
+  YAxis,
+} from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getAxisLabel,
@@ -42,6 +52,7 @@ import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
 import Chart from '../../../models/Chart';
 import Config from './config';
+import { Series } from './types';
 
 class BasicLineChart extends Chart {
   config = Config;
@@ -100,9 +111,9 @@ class BasicLineChart extends Chart {
   }
 
   private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
-    const styleConfigs = config.styles;
+    const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
-    const settingConfigs = config.settings;
+    const settingConfigs = config.settings || [];
     const groupConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.GROUP)
       .flatMap(config => config.rows || []);
@@ -122,7 +133,7 @@ class BasicLineChart extends Chart {
       dataConfigs,
     );
 
-    const xAxisColumns = (groupConfigs || []).map(config => {
+    const xAxisColumns: XAxisColumns[] = (groupConfigs || []).map(config => {
       return {
         type: 'category',
         tooltip: { show: true },
@@ -139,7 +150,7 @@ class BasicLineChart extends Chart {
       infoConfigs,
       xAxisColumns,
     );
-    const yAxisNames = aggregateConfigs.map(getColumnRenderName);
+    const yAxisNames: string[] = aggregateConfigs.map(getColumnRenderName);
 
     // @TM 溢出自动根据bar长度设置标尺
     const option = setOptionsByAxisLabelOverflow({
@@ -171,15 +182,15 @@ class BasicLineChart extends Chart {
   }
 
   private getSeries(
-    settingConfigs,
-    styleConfigs,
-    colorConfigs,
+    settingConfigs: ChartStyleConfig[],
+    styleConfigs: ChartStyleConfig[],
+    colorConfigs: ChartDataSectionField[],
     chartDataSet: IChartDataSet<string>,
-    groupConfigs,
-    aggregateConfigs,
-    infoConfigs,
-    xAxisColumns,
-  ) {
+    groupConfigs: ChartDataSectionField[],
+    aggregateConfigs: ChartDataSectionField[],
+    infoConfigs: ChartDataSectionField[],
+    xAxisColumns: XAxisColumns[],
+  ): Series[] {
     if (!colorConfigs?.length) {
       return aggregateConfigs.map(aggConfig => {
         const color = aggConfig?.color?.start;
@@ -189,7 +200,7 @@ class BasicLineChart extends Chart {
           sampling: 'average',
           areaStyle: this.isArea ? { color } : undefined,
           stack: this.isStack ? 'total' : undefined,
-          data: chartDataSet?.map(dc => ({
+          data: chartDataSet.map(dc => ({
             ...getExtraSeriesRowData(dc),
             ...getExtraSeriesDataFormat(aggConfig?.format),
             value: dc.getCell(aggConfig),
@@ -218,7 +229,6 @@ class BasicLineChart extends Chart {
         const itemStyleColor = colorConfigs?.[0]?.color?.colors?.find(
           c => c.key === k,
         );
-
         return {
           name: k,
           type: 'line',
@@ -229,7 +239,7 @@ class BasicLineChart extends Chart {
             normal: { color: itemStyleColor?.value },
           },
           data: xAxisColumns[0].data.map(d => {
-            const row = dataSet.find(r => r.getCell(xAxisConfig) === d);
+            const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
             return {
               ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),
@@ -244,7 +254,7 @@ class BasicLineChart extends Chart {
     });
   }
 
-  private getYAxis(styles, yAxisNames) {
+  private getYAxis(styles, yAxisNames): YAxis {
     const [
       showAxis,
       inverse,
@@ -304,7 +314,7 @@ class BasicLineChart extends Chart {
     };
   }
 
-  private getXAxis(styles, xAxisColumns) {
+  private getXAxis(styles, xAxisColumns): XAxis {
     const axisColumnInfo = xAxisColumns[0];
     const [
       showAxis,
@@ -353,14 +363,14 @@ class BasicLineChart extends Chart {
     };
   }
 
-  private getLegendStyle(styles, seriesNames) {
+  private getLegendStyle(styles, seriesNames): LegendStyle {
     const [show, type, font, legendPos, selectAll, height] = getStyles(
       styles,
       ['legend'],
       ['showLegend', 'type', 'font', 'position', 'selectAll', 'height'],
     );
     let positions = {};
-    let orient = {};
+    let orient = '';
 
     switch (legendPos) {
       case 'top':
@@ -400,7 +410,7 @@ class BasicLineChart extends Chart {
     };
   }
 
-  private getLabelStyle(styles) {
+  private getLabelStyle(styles): LabelStyle {
     const [show, position, font] = getStyles(
       styles,
       ['label'],
@@ -423,7 +433,7 @@ class BasicLineChart extends Chart {
     };
   }
 
-  private getSeriesStyle(styles) {
+  private getSeriesStyle(styles): SeriesStyle {
     const [smooth, step, connectNulls] = getStyles(
       styles,
       ['graph'],
@@ -438,7 +448,7 @@ class BasicLineChart extends Chart {
     aggregateConfigs,
     colorConfigs,
     infoConfigs,
-  ) {
+  ): (params) => string {
     return seriesParams => {
       const params = Array.isArray(seriesParams)
         ? seriesParams

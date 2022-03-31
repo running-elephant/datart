@@ -30,6 +30,8 @@ import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.Dataframe;
 import datart.core.entity.*;
 import datart.core.mappers.ext.ShareMapperExt;
+import datart.core.mappers.ext.UserMapperExt;
+import datart.security.base.PasswordToken;
 import datart.security.base.ResourceType;
 import datart.security.exception.PermissionDeniedException;
 import datart.security.util.AESUtil;
@@ -63,16 +65,20 @@ public class ShareServiceImpl extends BaseService implements ShareService {
 
     private final RoleService roleService;
 
+    private final UserMapperExt userMapperExt;
+
     public ShareServiceImpl(DataProviderService dataProviderService,
                             VizService vizService,
                             DownloadService downloadService,
                             ShareMapperExt shareMapper,
-                            RoleService roleService) {
+                            RoleService roleService,
+                            UserMapperExt userMapperExt) {
         this.dataProviderService = dataProviderService;
         this.vizService = vizService;
         this.downloadService = downloadService;
         this.shareMapper = shareMapper;
         this.roleService = roleService;
+        this.userMapperExt = userMapperExt;
     }
 
     @Override
@@ -107,6 +113,10 @@ public class ShareServiceImpl extends BaseService implements ShareService {
                 Exceptions.tr(BaseException.class, "message.share.unsupported", createParam.getVizType().name());
         }
 
+        if (createParam.getAuthenticationMode().equals(ShareAuthenticationMode.CODE)) {
+            createParam.setAuthenticationCode(SecurityUtils.randomPassword());
+        }
+
         Share share = new Share();
         BeanUtils.copyProperties(createParam, share);
         share.setCreateBy(shareUser);
@@ -136,13 +146,6 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         ShareToken shareToken = new ShareToken();
         BeanUtils.copyProperties(createParam, shareToken);
         shareToken.setId(share.getId());
-
-        if (createParam.getAuthenticationMode().equals(ShareAuthenticationMode.CODE)) {
-            shareToken.setAuthenticationCode(SecurityUtils.randomPassword());
-        }
-
-        shareToken.setAuthenticationMode(createParam.getAuthenticationMode());
-
         return shareToken;
     }
 
@@ -200,7 +203,8 @@ public class ShareServiceImpl extends BaseService implements ShareService {
 
     @Override
     public Dataframe execute(ShareToken shareToken, ViewExecuteParam executeParam) throws Exception {
-        validateExecutePermission(shareToken.getAuthorizedToken(), executeParam);
+        ShareAuthorizedToken shareAuthorizedToken = validateExecutePermission(shareToken.getAuthorizedToken(), executeParam);
+        getSecurityManager().runAs(shareAuthorizedToken.getPermissionBy());
         return dataProviderService.execute(executeParam, false);
     }
 
@@ -310,13 +314,13 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         BeanUtils.copyProperties(shareUpdateParam, update);
         update.setRowPermissionBy(shareUpdateParam.getRowPermissionBy().name());
         update.setAuthenticationMode(shareUpdateParam.getAuthenticationMode().name());
+
         Set<String> roleIds = new HashSet<>();
         if (!CollectionUtils.isEmpty(shareUpdateParam.getRoles())) {
             for (String role : shareUpdateParam.getRoles()) {
                 roleIds.add('r' + role);
             }
         }
-
         if (!CollectionUtils.isEmpty(shareUpdateParam.getUsers())) {
             for (String user : shareUpdateParam.getUsers()) {
                 Role role = roleService.getPerUserRole(retrieve.getOrgId(), user);
@@ -326,10 +330,10 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         update.setRoles(JSON.toJSONString(roleIds));
         update.setUpdateBy(getCurrentUser().getId());
         update.setUpdateTime(new Date());
-        return 1 == shareMapper.updateByPrimaryKey(update);
+        return 1 == shareMapper.updateByPrimaryKeySelective(update);
     }
 
-    private void validateExecutePermission(String authorizedToken, ViewExecuteParam executeParam) {
+    private ShareAuthorizedToken validateExecutePermission(String authorizedToken, ViewExecuteParam executeParam) {
         if (StringUtils.isBlank(authorizedToken)) {
             Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.permission.denied");
         }
@@ -337,10 +341,11 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         if (!ResourceType.VIEW.equals(shareAuthorizedToken.getVizType()) || !shareAuthorizedToken.getVizId().equals(executeParam.getViewId())) {
             Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.permission.denied");
         }
+        return shareAuthorizedToken;
     }
 
     private void validateExpiration(ShareAuthorizedToken share) {
-        if (share == null || new Date().after(share.getExpiryDate())) {
+        if (share == null || (share.getExpiryDate() != null && new Date().after(share.getExpiryDate()))) {
             Exceptions.tr(BaseException.class, "message.share.expired");
         }
     }
@@ -356,20 +361,39 @@ public class ShareServiceImpl extends BaseService implements ShareService {
                 }
                 break;
             case LOGIN:
+
+                // 验证用户是否存在
+                User user = null;
                 if (StringUtils.isBlank(shareToken.getUsername())) {
                     try {
-                        User currentUser = getSecurityManager().getCurrentUser();
-                        if (currentUser != null) {
-                            shareToken.setUsername(currentUser.getUsername());
-                            return;
+                        user = getSecurityManager().getCurrentUser();
+                        if (user != null) {
+                            shareToken.setUsername(user.getUsername());
+                            shareToken.setPassword(user.getPassword());
                         } else {
                             Exceptions.tr(BaseException.class, "message.share.permission.denied");
                         }
                     } catch (Exception ignored) {
                         Exceptions.tr(BaseException.class, "message.share.permission.denied");
                     }
+                } else {
+                    user = userMapperExt.selectByNameOrEmail(shareToken.getUsername());
                 }
-                if (!getSecurityManager().validateUser(shareToken.getUsername(), shareToken.getPassword())) {
+                if (user == null) {
+                    Exceptions.tr(BaseException.class, "message.user.not.exists");
+                }
+                // 验证用户是否具有访问权限
+                if (ShareRowPermissionBy.CREATOR.name().equals(share.getRowPermissionBy())) {
+                    return;
+                }
+                getSecurityManager().login(new PasswordToken(shareToken.getUsername(), shareToken.getPassword(), System.currentTimeMillis()));
+                if (getSecurityManager().isOrgOwner(share.getOrgId())) {
+                    return;
+                }
+                try {
+                    checkVizReadPermission(ResourceType.valueOf(share.getVizType()), share.getVizId());
+                    return;
+                } catch (PermissionDeniedException e) {
                     Exceptions.tr(BaseException.class, "message.share.permission.denied");
                 }
                 if (StringUtils.isBlank(shareToken.getUsername())
@@ -377,7 +401,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
                         || StringUtils.isBlank(share.getRoles())) {
                     Exceptions.tr(BaseException.class, "message.share.permission.denied");
                 }
-                List<Role> roles = roleService.listUserRoles(share.getOrgId(), shareToken.getUsername());
+                List<Role> roles = roleService.listUserRoles(share.getOrgId(), user.getId());
                 if (CollectionUtils.isEmpty(roles)) {
                     Exceptions.tr(BaseException.class, "message.share.permission.denied");
                 }
@@ -407,6 +431,23 @@ public class ShareServiceImpl extends BaseService implements ShareService {
             if (!ShareAuthenticationMode.LOGIN.equals(createParam.getAuthenticationMode())) {
                 Exceptions.msg("The authentication mode must be LOGIN");
             }
+        } else {
+            createParam.setRowPermissionBy(ShareRowPermissionBy.CREATOR);
+        }
+    }
+
+    private void checkVizReadPermission(ResourceType vizType, String vizId) {
+        switch (vizType) {
+            case DASHBOARD:
+                retrieve(vizId, Dashboard.class, true);
+                break;
+            case DATACHART:
+                retrieve(vizId, Datachart.class, true);
+                break;
+            case STORYBOARD:
+                retrieve(vizId, Storyboard.class, true);
+            default:
+                Exceptions.tr(BaseException.class, "message.share.unsupported", vizType.name());
         }
     }
 

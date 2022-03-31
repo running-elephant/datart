@@ -250,5 +250,153 @@ export type ChartConfig = {
   styles?: ChartStyleConfig[];
   settings?: ChartStyleConfig[];
   i18ns?: ChartI18NSectionConfig[];
-  env?: string;
 };
+
+export interface ChartOptions {
+  config: ChartConfig;
+  dataset: ChartDataSetDTO;
+  widgetSpecialConfig: { env: string | undefined; [x: string]: any };
+}
+
+export interface ChartContext {
+  document: Document;
+  height: number;
+  width: number;
+  translator: (key: string, disablePrefix?: boolean, options?: any) => any;
+  window: Window;
+}
+
+export interface LineStyle {
+  color: string;
+  type: string;
+  width?: number;
+}
+
+export interface AxisLineStyle {
+  show: boolean;
+  lineStyle?: LineStyle;
+}
+
+export interface FontStyle {
+  color?: string;
+  fontFamily?: string;
+  fontSize?: number | string;
+  fontStyle?: string;
+  fontWeight?: string;
+  lineHeight?: number;
+}
+
+export type AxisLabel = {
+  hideOverlap?: boolean;
+  interval?: string | null;
+  overflow?: string | null;
+  rotate?: number | null;
+  show: boolean;
+  width?: string | number;
+  font?: FontStyle;
+} & FontStyle;
+
+export type LabelStyle = {
+  label: {
+    position?: string;
+    show: boolean;
+    font?: FontStyle;
+    formatter?: string | ((params) => string);
+  } & FontStyle;
+  labelLayout?: { hideOverlap: boolean };
+};
+
+export interface LegendStyle {
+  bottom?: number;
+  right?: number;
+  top?: number;
+  left?: number;
+  width?: number;
+  height?: number | null;
+  type: string;
+  orient: string;
+  show: boolean;
+  textStyle: FontStyle;
+  selected?: {
+    [x: string]: boolean;
+  };
+  data?: string[];
+}
+
+export type MarkDataConfig = {
+  yAxis?: number;
+  xAxis?: number;
+  name: string;
+  lineStyle?: LineStyle;
+  itemStyle?: {
+    opacity: number;
+    color: string;
+  } & BorderStyle;
+} & LabelStyle;
+
+export interface MarkLine {
+  data: MarkDataConfig[];
+}
+
+export interface MarkArea {
+  data: MarkDataConfig[][];
+}
+
+export interface XAxisColumns {
+  type: string;
+  tooltip: { show: boolean };
+  data: string[];
+}
+
+export interface SeriesStyle {
+  smooth?: boolean;
+  step?: boolean;
+  symbol?: string;
+  stack?: boolean;
+  connectNulls?: boolean;
+}
+
+export interface YAxis {
+  type: string;
+  name: string | null;
+  nameLocation: string;
+  nameGap: string;
+  nameRotate: string;
+  inverse: boolean;
+  min: number;
+  max: number;
+  axisLabel: AxisLabel;
+  axisLine: AxisLineStyle;
+  axisTick: AxisLineStyle;
+  nameTextStyle: FontStyle;
+  splitLine: AxisLineStyle;
+}
+
+export type XAxis = {
+  axisPointer?: {
+    show: boolean;
+    type: string;
+  };
+  axisLabel: AxisLabel;
+  axisLine: AxisLineStyle;
+  axisTick: AxisLineStyle;
+  data: string[];
+  inverse: boolean;
+  splitLine: AxisLineStyle;
+  tooltip: { show: boolean };
+  type: string;
+};
+
+export interface BorderStyle {
+  borderType: string;
+  borderWidth: number;
+  borderColor: string;
+}
+
+export interface GridStyle {
+  left: string;
+  right: string;
+  bottom: string;
+  top: string;
+  containLabel: boolean;
+}
