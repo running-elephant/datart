@@ -242,6 +242,9 @@ export const ChartDraggableSourceContainer: FC<
     <Container
       flexDirection={children ? 'column' : 'row'}
       onClick={e => {
+        if (isHierarchyField) {
+          return;
+        }
         onSelectionChange?.(colName, e.metaKey || e.ctrlKey, e.shiftKey);
       }}
       ref={drag}

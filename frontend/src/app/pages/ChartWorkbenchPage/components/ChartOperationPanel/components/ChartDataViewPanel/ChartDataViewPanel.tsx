@@ -67,6 +67,12 @@ const ChartDataViewPanel: FC<{
   const [isDisplayAddNewModal, setIsDisplayAddNewModal] = useToggle();
   const views = useSelector(dataviewsSelector);
 
+  useMount(() => {
+    if (defaultViewId) {
+      handleDataViewChange(defaultViewId);
+    }
+  });
+
   const path = useMemo(() => {
     return views?.length && dataView
       ? getPath(
@@ -260,12 +266,6 @@ const ChartDataViewPanel: FC<{
     let viewId = dataView?.id as string;
     history.push(`/organizations/${orgId}/views/${viewId}`);
   }, [dataView?.id, dataView?.orgId, history]);
-
-  useMount(() => {
-    if (defaultViewId) {
-      handleDataViewChange(defaultViewId);
-    }
-  });
 
   const handleConfirmVisible = useCallback(() => {
     (showModal as Function)({
