@@ -17,23 +17,22 @@
  */
 
 import { WidgetInfo } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { createContext, FC, useContext, useMemo } from 'react';
+import { createContext, FC, memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectWidgetInfoBy2Id } from '../../pages/Board/slice/selector';
 import { BoardState } from '../../pages/Board/slice/types';
 import { selectWidgetInfoById } from '../../pages/BoardEditor/slice/selectors';
 import { EditBoardState } from '../../pages/BoardEditor/slice/types';
-import { BoardContext } from '../BoardProvider/BoardProvider';
 
 export const WidgetInfoContext = createContext<WidgetInfo>({} as WidgetInfo);
 
-export const WidgetInfoProvider: FC<{ widgetId: string }> = ({
-  widgetId,
-  children,
-}) => {
-  const { boardId, boardType, editing } = useContext(BoardContext);
+export const WidgetInfoProvider: FC<{
+  boardId: string;
+  boardEditing: boolean;
+  widgetId: string;
+}> = memo(({ widgetId, boardId, boardEditing, children }) => {
   // 浏览模式
-  const boardWidgetInfo = useSelector((state: { board: BoardState }) =>
+  const readWidgetInfo = useSelector((state: { board: BoardState }) =>
     selectWidgetInfoBy2Id(state, boardId, widgetId),
   );
   // 编辑模式
@@ -41,12 +40,12 @@ export const WidgetInfoProvider: FC<{ widgetId: string }> = ({
     selectWidgetInfoById(state, widgetId),
   );
   const widgetInfo = useMemo(
-    () => (editing ? editWidgetInfo : boardWidgetInfo),
-    [editing, editWidgetInfo, boardWidgetInfo],
+    () => (boardEditing ? editWidgetInfo : readWidgetInfo),
+    [boardEditing, editWidgetInfo, readWidgetInfo],
   );
   return widgetInfo ? (
     <WidgetInfoContext.Provider value={widgetInfo}>
       {children}
     </WidgetInfoContext.Provider>
   ) : null;
-};
+});

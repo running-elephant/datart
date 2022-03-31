@@ -27,7 +27,7 @@ import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
 import EditorHeader from '../../components/BoardHeader/EditorHeader';
 import { BoardLoading } from '../../components/BoardLoading';
-import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
+import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvider';
 import { checkLinkAndJumpErr } from '../../utils';
 import { fetchBoardDetail } from '../Board/slice/thunk';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
@@ -114,7 +114,7 @@ export const BoardEditor: React.FC<{
     const boardType = board.config?.type;
 
     return (
-      <BoardProvider
+      <BoardInitProvider
         board={board}
         editing={true}
         autoFit={false}
@@ -136,7 +136,7 @@ export const BoardEditor: React.FC<{
             onSaveInWidget={onSaveToWidget}
           />
         )}
-      </BoardProvider>
+      </BoardInitProvider>
     );
   }, [
     boardChartEditorProps,

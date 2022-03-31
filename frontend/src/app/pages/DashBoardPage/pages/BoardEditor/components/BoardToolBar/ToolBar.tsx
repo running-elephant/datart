@@ -17,10 +17,11 @@
  */
 import { Divider, Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardActionContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardActionProvider';
+import { BoardActionContext } from 'app/pages/DashBoardPage/components/ActionProvider/BoardActionProvider';
 import useBoardEditorHotkeys from 'app/pages/DashBoardPage/hooks/useBoardEditorHotkeys';
 import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
+import { WidgetActionContext } from '../../../../components/ActionProvider/WidgetActionProvider';
 import { AddChart } from './AddChart/AddChart';
 import { AddContainer } from './AddContainer/AddContainer';
 import { AddController } from './AddControler/AddControler';
@@ -39,14 +40,14 @@ export const ToolBar = () => {
   };
   const { boardType } = useContext(BoardToolBarContext);
   const {
-    layerToTop,
-    layerToBottom,
-    undo,
-    redo,
-    copyWidgets,
-    pasteWidgets,
-    deleteActiveWidgets,
-  } = useContext(BoardActionContext);
+    onEditLayerToTop,
+    onEditLayerToBottom,
+    onEditCopyWidgets,
+    onEditPasteWidgets,
+    onEditDeleteActiveWidgets,
+  } = useContext(WidgetActionContext);
+  const { undo, redo } = useContext(BoardActionContext);
+  //
   useBoardEditorHotkeys();
   const t = useI18NPrefix(`viz.board.action`);
   return (
@@ -66,14 +67,14 @@ export const ToolBar = () => {
 
         <Divider type="vertical" />
 
-        <DelWidgetsBtn fn={deleteActiveWidgets} title={t('delete')} />
+        <DelWidgetsBtn fn={onEditDeleteActiveWidgets} title={t('delete')} />
         <Divider type="vertical" />
 
-        <ToTopBtn fn={layerToTop} title={t('toTop')} />
-        <ToBottomBtn fn={layerToBottom} title={t('toBottom')} />
+        <ToTopBtn fn={onEditLayerToTop} title={t('toTop')} />
+        <ToBottomBtn fn={onEditLayerToBottom} title={t('toBottom')} />
 
-        <CopyBtn fn={copyWidgets} title={t('copy')} />
-        <PasteBtn fn={pasteWidgets} title={t('paste')} />
+        <CopyBtn fn={onEditCopyWidgets} title={t('copy')} />
+        <PasteBtn fn={onEditPasteWidgets} title={t('paste')} />
 
         {boardType === 'auto' && (
           <>

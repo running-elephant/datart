@@ -47,7 +47,7 @@ import 'react-quill/dist/quill.snow.css';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES } from 'styles/StyleConstants';
-import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
+import { WidgetActionContext } from '../../../ActionProvider/WidgetActionProvider';
 import { BoardContext } from '../../../BoardProvider/BoardProvider';
 import { MarkdownOptions } from './configs/MarkdownOptions';
 import TagBlot from './configs/TagBlot';
@@ -56,7 +56,6 @@ import { Formats } from './Formats';
 Quill.register('modules/imageDrop', ImageDrop);
 Quill.register('formats/tag', TagBlot);
 
-const CUSTOM_COLOR = 'custom-color';
 const CUSTOM_COLOR_INIT = {
   background: 'transparent',
   color: '#000',
@@ -73,7 +72,7 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   const t = useI18NPrefix();
   const dispatch = useDispatch();
   const { editing: boardEditing } = useContext(BoardContext);
-  const { onClearActiveWidgets } = useContext(BoardActionContext);
+  const { onEditClearActiveWidgets } = useContext(WidgetActionContext);
   const initContent = useMemo(() => {
     return (widgetConfig.config.content as MediaWidgetContent).richTextConfig
       ?.content;
@@ -246,8 +245,8 @@ export const RichTextWidget: React.FC<RichTextWidgetProps> = ({
   };
 
   const modalCancel = useCallback(() => {
-    onClearActiveWidgets();
-  }, [onClearActiveWidgets]);
+    onEditClearActiveWidgets();
+  }, [onEditClearActiveWidgets]);
 
   const modalOk = useCallback(() => {
     setContentSavable(true);

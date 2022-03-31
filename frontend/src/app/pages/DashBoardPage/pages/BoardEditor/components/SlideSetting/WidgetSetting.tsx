@@ -32,8 +32,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import { useDispatch } from 'react-redux';
-import { BoardActionContext } from '../../../../components/BoardProvider/BoardActionProvider';
+import { WidgetActionContext } from '../../../../components/ActionProvider/WidgetActionProvider';
 import AutoUpdateSet from './SettingItem/AutoUpdateSet';
 import BackgroundSet from './SettingItem/BackgroundSet';
 import NumberSet from './SettingItem/BasicSet/NumberSet';
@@ -45,9 +44,8 @@ import { Group, SettingPanel } from './SettingPanel';
 const { Panel } = Collapse;
 export const WidgetSetting: FC = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
-  const dispatch = useDispatch();
   const { boardType } = useContext(BoardContext);
-  const { updateWidgetConfig } = useContext(BoardActionContext);
+  const { onUpdateWidgetConfig } = useContext(WidgetActionContext);
   const widget = useContext(WidgetContext);
   const [form] = Form.useForm();
   const { config } = widget;
@@ -89,9 +87,9 @@ export const WidgetSetting: FC = memo(() => {
         draft.autoUpdate = value.autoUpdate;
         draft.frequency = value.frequency;
       });
-      updateWidgetConfig(nextConf, widget.id);
+      onUpdateWidgetConfig(nextConf, widget.id);
     },
-    [updateWidgetConfig],
+    [onUpdateWidgetConfig],
   );
   const throttledUpdate = useMemo(() => throttle(onUpdate, 1000), [onUpdate]);
   const onValuesChange = useCallback(

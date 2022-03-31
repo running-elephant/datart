@@ -16,7 +16,24 @@
  * limitations under the License.
  */
 
-export const jumpTypes: { name: string; value: string }[] = [
-  { value: 'INTERNAL', name: '' },
-  { value: 'URL', name: '' },
-];
+import { FC, memo } from 'react';
+import { WidgetInfoProvider } from './WidgetInfoProvider';
+import { WidgetProvider } from './WidgetProvider';
+
+export const WidgetConfAndInfoProvider: FC<{
+  id: string;
+  boardId: string;
+  boardEditing: boolean;
+}> = memo(({ id, boardEditing, boardId, children }) => {
+  return (
+    <WidgetProvider boardId={boardId} boardEditing={boardEditing} widgetId={id}>
+      <WidgetInfoProvider
+        boardId={boardId}
+        boardEditing={boardEditing}
+        widgetId={id}
+      >
+        {children}
+      </WidgetInfoProvider>
+    </WidgetProvider>
+  );
+});

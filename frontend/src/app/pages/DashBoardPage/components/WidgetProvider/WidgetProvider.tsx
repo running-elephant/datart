@@ -18,14 +18,13 @@
 
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import produce from 'immer';
-import React, { createContext, FC, memo, useContext, useMemo } from 'react';
+import { createContext, FC, memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectWidgetBy2Id } from '../../pages/Board/slice/selector';
 import { BoardState } from '../../pages/Board/slice/types';
 import { selectEditWidgetById } from '../../pages/BoardEditor/slice/selectors';
 import { HistoryEditBoard } from '../../pages/BoardEditor/slice/types';
 import { adaptBoardImageUrl } from '../../utils';
-import { BoardContext } from '../BoardProvider/BoardProvider';
 
 export const WidgetContext = createContext<Widget>({} as Widget);
 
@@ -34,13 +33,14 @@ const WProvider: FC<{ val: Widget }> = memo(({ val, children }) => {
     <WidgetContext.Provider value={val}>{children}</WidgetContext.Provider>
   );
 });
-export const WidgetProvider: FC<{ widgetId: string }> = ({
-  widgetId,
-  children,
-}) => {
-  const { boardId, boardType, editing } = useContext(BoardContext);
+
+export const WidgetProvider: FC<{
+  boardId: string;
+  boardEditing: boolean;
+  widgetId: string;
+}> = memo(({ boardId, boardEditing, widgetId, children }) => {
   // 浏览模式
-  const boardWidget = useSelector((state: { board: BoardState }) =>
+  const readWidget = useSelector((state: { board: BoardState }) =>
     selectWidgetBy2Id(state, boardId, widgetId),
   );
   // 编辑模式
@@ -48,7 +48,7 @@ export const WidgetProvider: FC<{ widgetId: string }> = ({
     selectEditWidgetById(state, widgetId),
   );
   const widget = useMemo(() => {
-    const widget = editing ? editWidget : boardWidget;
+    const widget = boardEditing ? editWidget : readWidget;
     if (widget) {
       // 为了board可以被整体复制，服务端拷贝文件图片文件 副本到新的boardId文件夹下，前端替换掉原来的boardId 使用当前boardId
       //这样副本 图片引用可以不受原来 board 资源删除影响
@@ -62,6 +62,6 @@ export const WidgetProvider: FC<{ widgetId: string }> = ({
       return adaptBoardImageWidget;
     }
     return widget;
-  }, [editing, editWidget, boardWidget, boardId]);
+  }, [boardEditing, editWidget, readWidget, boardId]);
   return widget ? <WProvider val={widget}>{children}</WProvider> : null;
-};
+});
