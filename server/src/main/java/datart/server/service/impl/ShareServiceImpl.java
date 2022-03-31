@@ -314,13 +314,13 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         BeanUtils.copyProperties(shareUpdateParam, update);
         update.setRowPermissionBy(shareUpdateParam.getRowPermissionBy().name());
         update.setAuthenticationMode(shareUpdateParam.getAuthenticationMode().name());
+
         Set<String> roleIds = new HashSet<>();
         if (!CollectionUtils.isEmpty(shareUpdateParam.getRoles())) {
             for (String role : shareUpdateParam.getRoles()) {
                 roleIds.add('r' + role);
             }
         }
-
         if (!CollectionUtils.isEmpty(shareUpdateParam.getUsers())) {
             for (String user : shareUpdateParam.getUsers()) {
                 Role role = roleService.getPerUserRole(retrieve.getOrgId(), user);
@@ -330,7 +330,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         update.setRoles(JSON.toJSONString(roleIds));
         update.setUpdateBy(getCurrentUser().getId());
         update.setUpdateTime(new Date());
-        return 1 == shareMapper.updateByPrimaryKey(update);
+        return 1 == shareMapper.updateByPrimaryKeySelective(update);
     }
 
     private ShareAuthorizedToken validateExecutePermission(String authorizedToken, ViewExecuteParam executeParam) {
