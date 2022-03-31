@@ -185,9 +185,18 @@ export class ChartDataSetRow<T>
   }
 
   public convertToCaseSensitiveObject(): object {
-    return (this.originalFields || []).reduce((acc, cur) => {
-      acc[this.getFieldOriginKey(cur)] = this[this.getFieldIndex(cur)];
-      return acc;
-    }, {});
+    return (
+      (this.originalFields || [])
+        // .flatMap(f => {
+        //   if (f.category === ChartDataViewFieldCategory.Hierarchy) {
+        //     return f.children || [];
+        //   }
+        //   return f;
+        // })
+        .reduce((acc, cur) => {
+          acc[this.getFieldOriginKey(cur)] = this[this.getFieldIndex(cur)];
+          return acc;
+        }, {})
+    );
   }
 }

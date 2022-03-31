@@ -16,7 +16,10 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType } from 'app/constants';
+import {
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+} from 'app/constants';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
@@ -103,7 +106,12 @@ class BasicBarChart extends Chart {
     const settingConfigs = config.settings;
     const groupConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.GROUP)
-      .flatMap(config => config.rows || []);
+      .flatMap(config => config.rows || [])
+      .map(r =>
+        r.category === ChartDataViewFieldCategory.Hierarchy
+          ? r.children?.[0]!
+          : r,
+      );
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
