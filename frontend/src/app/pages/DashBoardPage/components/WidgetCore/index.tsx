@@ -115,7 +115,7 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
             boardId={widget.dashboardId}
             boardEditing={editing}
           >
-            <ControllerWidgetCore />;
+            <ControllerWidgetCore />
           </WidgetDataProvider>
         );
       case 'query':
