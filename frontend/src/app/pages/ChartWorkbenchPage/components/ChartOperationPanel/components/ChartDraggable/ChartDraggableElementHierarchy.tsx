@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
+import { Space } from 'antd';
 import { FC, memo } from 'react';
+import styled from 'styled-components/macro';
 import ChartDraggableElementField from './ChartDraggableElementField';
 
 const ChartDraggableElementHierarchy: FC<{
@@ -54,12 +56,17 @@ const ChartDraggableElementHierarchy: FC<{
 
     return (
       <div key={columnConfig.uid}>
-        <span>{columnConfig.colName}</span>
-        <div style={{ display: 'inline-block', marginLeft: '5px' }} />
-        {renderChildren()}
+        <StyledGroupName>{columnConfig.colName}</StyledGroupName>
+        <Space direction="vertical" size="small">
+          {renderChildren()}
+        </Space>
       </div>
     );
   },
 );
 
 export default ChartDraggableElementHierarchy;
+
+const StyledGroupName = styled.div`
+  text-align: left;
+`;
