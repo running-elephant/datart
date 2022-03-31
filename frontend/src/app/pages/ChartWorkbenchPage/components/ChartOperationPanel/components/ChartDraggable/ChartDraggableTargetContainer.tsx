@@ -124,6 +124,17 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         },
         canDrop: (item: ChartDataSectionField, monitor) => {
           let items = Array.isArray(item) ? item : [item];
+          if (
+            monitor.getItemType() ===
+              CHART_DRAG_ELEMENT_TYPE.DATASET_HIERARCHY_COLUMN &&
+            ![
+              ChartDataSectionType.GROUP,
+              ChartDataSectionType.COLOR,
+              ChartDataSectionType.MIXED,
+            ].includes(currentConfig.type as ChartDataSectionType)
+          ) {
+            return false;
+          }
 
           if (
             typeof currentConfig.actions === 'object' &&
