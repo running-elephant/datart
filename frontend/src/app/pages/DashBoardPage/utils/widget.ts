@@ -22,6 +22,7 @@ import {
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
+import { ChartsEventData } from 'app/types/Chart';
 import ChartDataView from 'app/types/ChartDataView';
 import { FilterSqlOperator } from 'globalConstants';
 import produce from 'immer';
@@ -888,4 +889,12 @@ export const getWidgetMap = (
     wrappedDataCharts,
     controllerWidgets,
   };
+};
+
+export const getValueByRowData = (
+  data: ChartsEventData | undefined,
+  fieldName: string,
+) => {
+  let toCaseField = fieldName;
+  return data?.rowData[toCaseField];
 };

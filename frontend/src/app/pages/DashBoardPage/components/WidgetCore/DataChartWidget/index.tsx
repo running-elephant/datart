@@ -34,9 +34,9 @@ import React, {
   useRef,
 } from 'react';
 import styled from 'styled-components/macro';
+import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { WidgetChartContext } from '../../WidgetProvider/WidgetChartProvider';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
-import { WidgetMethodContext } from '../../WidgetProvider/WidgetMethodProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
 export const DataChartWidget: React.FC<{}> = memo(() => {
@@ -44,7 +44,7 @@ export const DataChartWidget: React.FC<{}> = memo(() => {
   const { data } = useContext(WidgetDataContext);
   const widget = useContext(WidgetContext);
   const { id: widgetId } = widget;
-  const { widgetChartClick } = useContext(WidgetMethodContext);
+  const { onWidgetChartClick } = useContext(WidgetActionContext);
   const { ref, cacheW, cacheH } = useCacheWidthHeight();
 
   const widgetRef = useRef<Widget>(widget);
@@ -57,9 +57,9 @@ export const DataChartWidget: React.FC<{}> = memo(() => {
       if (!params) {
         return;
       }
-      widgetChartClick(widgetRef.current, params);
+      onWidgetChartClick(widgetRef.current, params);
     },
-    [widgetChartClick],
+    [onWidgetChartClick],
   );
 
   const chart = useMemo(() => {

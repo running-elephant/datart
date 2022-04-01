@@ -27,9 +27,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import TitleHeader from '../../components/BoardHeader/ViewHeader';
 import { BoardLoading } from '../../components/BoardLoading';
-import { BoardProvider } from '../../components/BoardProvider/BoardProvider';
+import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvider';
 import { FullScreenPanel } from '../../components/FullScreenPanel';
-import { checkLinkAndJumpErr } from '../../utils/index';
+import { checkLinkAndJumpErr } from '../../utils';
 import { editDashBoardInfoActions } from '../BoardEditor/slice';
 import { clearEditBoardState } from '../BoardEditor/slice/actions/actions';
 import { AutoBoardCore } from './AutoDashboard/AutoBoardCore';
@@ -103,7 +103,7 @@ export const Board: FC<BoardProps> = memo(
       if (dashboard && boardType) {
         return (
           <div className="board-provider">
-            <BoardProvider
+            <BoardInitProvider
               board={dashboard}
               editing={false}
               autoFit={autoFit}
@@ -121,7 +121,7 @@ export const Board: FC<BoardProps> = memo(
                 />
               )}
               <FullScreenPanel />
-            </BoardProvider>
+            </BoardInitProvider>
           </div>
         );
       } else {

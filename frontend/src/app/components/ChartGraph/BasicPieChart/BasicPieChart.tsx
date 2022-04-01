@@ -17,7 +17,13 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
-import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataSectionField,
+  ChartStyleConfig,
+  LabelStyle,
+  LegendStyle,
+} from 'app/types/ChartConfig';
 import ChartDataSetDTO, {
   IChartDataSet,
   IChartDataSetRow,
@@ -35,6 +41,7 @@ import {
 import { init } from 'echarts';
 import Chart from '../../../models/Chart';
 import Config from './config';
+import { PieSeries, PieSeriesImpl, PieSeriesStyle } from './types';
 
 class BasicPieChart extends Chart {
   config = Config;
@@ -89,7 +96,7 @@ class BasicPieChart extends Chart {
   }
 
   private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
-    const styleConfigs = config.styles;
+    const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.GROUP)
@@ -117,7 +124,6 @@ class BasicPieChart extends Chart {
     return {
       tooltip: {
         formatter: this.getTooltipFormatterFunc(
-          styleConfigs,
           groupConfigs,
           aggregateConfigs,
           infoConfigs,
@@ -130,16 +136,16 @@ class BasicPieChart extends Chart {
   }
 
   private getSeries(
-    styleConfigs,
+    styleConfigs: ChartStyleConfig[],
     chartDataSet: IChartDataSet<string>,
-    groupConfigs,
-    aggregateConfigs,
-    infoConfigs,
-  ) {
+    groupConfigs: ChartDataSectionField[],
+    aggregateConfigs: ChartDataSectionField[],
+    infoConfigs: ChartDataSectionField[],
+  ): PieSeriesStyle[] | PieSeriesStyle {
     if (!groupConfigs?.length) {
       const row = chartDataSet?.[0];
       return {
-        ...this.getBarSeiesImpl(styleConfigs),
+        ...this.getPieSeriesImpl(styleConfigs),
         data: aggregateConfigs.map(config => {
           return {
             ...config,
@@ -157,7 +163,7 @@ class BasicPieChart extends Chart {
 
     const flatSeries = aggregateConfigs.map(config => {
       return {
-        ...this.getBarSeiesImpl(styleConfigs),
+        ...this.getPieSeriesImpl(styleConfigs),
         name: getColumnRenderName(config),
         data: chartDataSet?.map(row => {
           return {
@@ -175,10 +181,10 @@ class BasicPieChart extends Chart {
   }
 
   private getDataItemStyle(
-    config,
+    config: ChartDataSectionField,
     colorConfigs: ChartDataSectionField[],
     row: IChartDataSetRow<string>,
-  ) {
+  ): { color: string | undefined } | undefined {
     const colorConfig = colorConfigs?.[0];
     const columnColor = config?.color?.start;
     if (colorConfig) {
@@ -197,29 +203,32 @@ class BasicPieChart extends Chart {
     }
   }
 
-  private getBarSeiesImpl(styleConfigs) {
+  private getPieSeriesImpl(styleConfigs: ChartStyleConfig[]): PieSeriesImpl {
     return {
       type: 'pie',
       sampling: 'average',
       avoidLabelOverlap: false,
-      label: this.getLabelStyle(styleConfigs),
-      labelLayout: { hideOverlap: true },
+      ...this.getLabelStyle(styleConfigs),
       ...this.getSeriesStyle(styleConfigs),
       ...getGridStyle(styleConfigs),
     };
   }
 
-  private getLegendStyle(groupConfigs, styles, series) {
+  private getLegendStyle(
+    groupConfigs: ChartDataSectionField[],
+    styles: ChartStyleConfig[],
+    series: PieSeriesStyle | PieSeriesStyle[],
+  ): LegendStyle {
     const [show, type, font, legendPos, selectAll, height] = getStyles(
       styles,
       ['legend'],
       ['showLegend', 'type', 'font', 'position', 'selectAll', 'height'],
     );
     let positions = {};
-    let orient = {};
+    let orient = '';
 
     const selected = (
-      !![].concat(groupConfigs).length ? series[0].data : series?.data
+      !!groupConfigs.length ? series[0].data : (series as PieSeriesStyle)?.data
     )
       .map(d => d.name)
       .reduce(
@@ -260,7 +269,7 @@ class BasicPieChart extends Chart {
     };
   }
 
-  private getLabelStyle(styles) {
+  private getLabelStyle(styles: ChartStyleConfig[]): LabelStyle {
     const [show, position, font] = getStyles(
       styles,
       ['label'],
@@ -268,14 +277,17 @@ class BasicPieChart extends Chart {
     );
     const formatter = this.getLabelFormatter(styles);
     return {
-      show: position === 'center' ? false : show,
-      position,
-      ...font,
-      formatter,
+      label: {
+        show: position === 'center' ? false : show,
+        position,
+        ...font,
+        formatter,
+      },
+      labelLayout: { hideOverlap: true },
     };
   }
 
-  private getLabelFormatter(styles) {
+  private getLabelFormatter(styles: ChartStyleConfig[]): (params) => string {
     const [showValue, showPercent, showName] = getStyles(
       styles,
       ['label'],
@@ -308,7 +320,7 @@ class BasicPieChart extends Chart {
     };
   }
 
-  private getSeriesStyle(styles) {
+  private getSeriesStyle(styles: ChartStyleConfig[]): PieSeries {
     const radiusValue =
       (!this.isCircle && !this.isRose) || (!this.isCircle && this.isRose)
         ? `70%`
@@ -317,12 +329,11 @@ class BasicPieChart extends Chart {
   }
 
   private getTooltipFormatterFunc(
-    styleConfigs,
-    groupConfigs,
-    aggregateConfigs,
-    infoConfigs,
-    chartDataSet,
-  ) {
+    groupConfigs: ChartDataSectionField[],
+    aggregateConfigs: ChartDataSectionField[],
+    infoConfigs: ChartDataSectionField[],
+    chartDataSet: IChartDataSet<string>,
+  ): (params) => string {
     return seriesParams => {
       if (seriesParams.componentType !== 'series') {
         return seriesParams.name;

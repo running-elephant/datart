@@ -55,7 +55,7 @@ export const getDistinctFields = async (
     ...viewConfigs,
   };
   if (executeToken) {
-    const { data } = await request<ChartDataSetDTO>({
+    const { data } = await request2<ChartDataSetDTO>({
       method: 'POST',
       url: `shares/execute`,
       params: {
@@ -65,7 +65,7 @@ export const getDistinctFields = async (
     });
     return filterSqlOperatorName(requestParams, data);
   } else {
-    const { data } = await request<ChartDataSetDTO>({
+    const { data } = await request2<ChartDataSetDTO>({
       method: 'POST',
       url: `data-provider/execute`,
       data: requestParams,
@@ -143,7 +143,7 @@ export async function checkComputedFieldAsync(sourceId, expression) {
     }
     return expression.replaceAll('[', '').replaceAll(']', '');
   };
-  const response = await request<boolean>({
+  const response = await request2<boolean>({
     method: 'POST',
     url: `data-provider/function/validate`,
     params: {
@@ -171,7 +171,7 @@ export async function generateShareLinkAsync({
   users,
   rowPermissionBy,
 }) {
-  const response = await request<{
+  const response = await request2<{
     data: any;
     errCode: number;
     message: string;
@@ -211,7 +211,7 @@ export async function downloadFile(id) {
 }
 
 export async function fetchPluginChart(path) {
-  const result = await request(path, {
+  const result = await request2(path, {
     baseURL: '/',
     headers: { Accept: 'application/javascript' },
   }).catch(error => {
@@ -221,7 +221,7 @@ export async function fetchPluginChart(path) {
 }
 
 export async function getChartPluginPaths() {
-  const response = await request<string[]>({
+  const response = await request2<string[]>({
     method: 'GET',
     url: `plugins/custom/charts`,
   });

@@ -21,6 +21,7 @@ export const Formats = [
   'code-block',
 ];
 
+// NOTE: source from: https://github.com/cloverhearts/quilljs-markdown
 export const MarkdownOptions = {
   /*ignoreTags: ['pre', 'strikethrough'], // @option - if you need to ignore some tags.
   tags: { // @option if you need to change for trigger pattern for some tags.

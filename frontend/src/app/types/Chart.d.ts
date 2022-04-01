@@ -17,7 +17,7 @@
  */
 
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import ChartConfig from './ChartConfig';
+import { ChartConfig } from './ChartConfig';
 import ChartMetadata from './ChartMetadata';
 
 export type ChartStatus =

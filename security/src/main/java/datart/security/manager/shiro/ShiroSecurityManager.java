@@ -69,7 +69,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
 
     @Override
     public void login(PasswordToken token) throws RuntimeException {
-
+        logoutCurrent();
         User user = userMapper.selectByNameOrEmail(token.getSubject());
         if (user == null) {
             Exceptions.tr(BaseException.class, "login.fail");
@@ -98,6 +98,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
 
     @Override
     public String login(String jwtToken) throws AuthException {
+        logoutCurrent();
         PasswordToken passwordToken = JwtUtils.toPasswordToken(jwtToken);
         if (!JwtUtils.validTimeout(passwordToken)) {
             Exceptions.tr(AuthException.class, "login.session.timeout");
@@ -118,7 +119,9 @@ public class ShiroSecurityManager implements DatartSecurityManager {
     public void logoutCurrent() {
         permissionDataCache.clear();
         Subject subject = SecurityUtils.getSubject();
-        subject.logout();
+        if (subject != null) {
+            subject.logout();
+        }
     }
 
     @Override
@@ -256,7 +259,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
 
     @Override
     public void releaseRunAs() {
-        SecurityUtils.getSubject().releaseRunAs();
+        logoutCurrent();
     }
 
 

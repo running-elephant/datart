@@ -21,7 +21,6 @@ import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartManager from 'app/models/ChartManager';
 import { IChart } from 'app/types/Chart';
-import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import { FC, memo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';

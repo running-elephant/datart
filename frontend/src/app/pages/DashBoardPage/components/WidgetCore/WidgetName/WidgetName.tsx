@@ -41,8 +41,6 @@ export const WidgetName: FC<{
   config: WidgetConf;
   zIndex?: number;
 }> = memo(({ config, zIndex }) => {
-  console.log('- WidgetName');
-
   if (HideTitleTypes.includes(config.type)) {
     return null;
   }

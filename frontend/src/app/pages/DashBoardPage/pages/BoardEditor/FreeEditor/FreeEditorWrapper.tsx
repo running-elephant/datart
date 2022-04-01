@@ -18,7 +18,7 @@
 
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
+import { WidgetConfAndInfoProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetConfAndInfoProvider';
 import React, { useContext } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -35,7 +35,7 @@ export const FreeEditorWrapper: React.FC<{}> = () => {
     height: boardHeight,
     scaleMode,
   } = useContext(BoardConfigContext);
-  const { editing, autoFit } = useContext(BoardContext);
+  const { autoFit, boardId } = useContext(BoardContext);
 
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
   const sortedLayoutWidgets = Object.values(layoutWidgetMap).sort(
@@ -51,7 +51,7 @@ export const FreeEditorWrapper: React.FC<{}> = () => {
     scale,
     nextBackgroundStyle,
     slideTranslate,
-  } = useSlideStyle(autoFit, editing, rect, boardWidth, boardHeight, scaleMode);
+  } = useSlideStyle(autoFit, true, rect, boardWidth, boardHeight, scaleMode);
 
   return (
     <Container>
@@ -62,9 +62,14 @@ export const FreeEditorWrapper: React.FC<{}> = () => {
       >
         <SlideBackground scale={scale} slideTranslate={slideTranslate}>
           {sortedLayoutWidgets.map(widgetConfig => (
-            <WidgetAllProvider key={widgetConfig.id} id={widgetConfig.id}>
+            <WidgetConfAndInfoProvider
+              key={widgetConfig.id}
+              id={widgetConfig.id}
+              boardEditing={true}
+              boardId={boardId}
+            >
               <WidgetOfFreeEdit />
-            </WidgetAllProvider>
+            </WidgetConfAndInfoProvider>
           ))}
         </SlideBackground>
       </div>

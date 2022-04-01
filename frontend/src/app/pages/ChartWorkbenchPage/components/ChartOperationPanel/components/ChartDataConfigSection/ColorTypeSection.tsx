@@ -18,7 +18,7 @@
 
 import {
   ChartDataSectionFieldActionType,
-  ChartDataViewFieldType,
+  DataViewFieldType,
 } from 'app/constants';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { FC, memo } from 'react';
@@ -31,7 +31,7 @@ const ColorTypeSection: FC<ChartDataConfigSectionProps> = memo(
       {},
       {
         actions: {
-          [ChartDataViewFieldType.STRING]: [
+          [DataViewFieldType.STRING]: [
             ChartDataSectionFieldActionType.Alias,
             ChartDataSectionFieldActionType.Colorize,
           ],

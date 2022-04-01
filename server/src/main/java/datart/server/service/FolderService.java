@@ -14,4 +14,6 @@ public interface FolderService extends BaseCRUDService<Folder, FolderMapper> {
 
     Folder getVizFolder(String vizId,String relType);
 
+    List<Folder> getAllParents(String folderId);
+
 }

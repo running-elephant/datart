@@ -22,7 +22,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { MediaWidgetContent } from '../../../../pages/Board/slice/types';
-import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
+import { WidgetActionContext } from '../../../ActionProvider/WidgetActionProvider';
 import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 
@@ -30,7 +30,7 @@ const IframeWidget: React.FC<{}> = () => {
   const widget = useContext(WidgetContext);
   const dispatch = useDispatch();
   const { editing } = useContext(WidgetInfoContext);
-  const { widgetUpdate } = useContext(BoardActionContext);
+  const { onWidgetUpdate } = useContext(WidgetActionContext);
   const src = (widget.config.content as MediaWidgetContent).iframeConfig?.src;
   const [curSrc, setCurSrc] = useState<string | undefined>('');
   useEffect(() => {
@@ -44,7 +44,7 @@ const IframeWidget: React.FC<{}> = () => {
       };
     });
     dispatch(editWidgetInfoActions.closeWidgetEditing(widget.id));
-    widgetUpdate(nextWidget, true);
+    onWidgetUpdate(nextWidget);
   };
   const setter = (
     <div className="wrap-form">

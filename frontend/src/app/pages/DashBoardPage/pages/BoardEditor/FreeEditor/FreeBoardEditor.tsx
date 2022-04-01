@@ -30,10 +30,10 @@ import { DraggableCore, DraggableEventHandler } from 'react-draggable';
 import { useDispatch, useSelector } from 'react-redux';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components/macro';
-import { BoardActionContext } from '../../../components/BoardProvider/BoardActionProvider';
+import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
 import { scaleContext } from '../../../components/FreeBoardBackground';
 import { editBoardStackActions } from '../slice';
-import { eventBus } from '../slice/events';
+import { widgetMove, widgetMoveEnd } from '../slice/events';
 import { selectSelectedIds } from '../slice/selectors';
 import { WidgetItem } from './WidgetItem';
 export enum DragTriggerTypes {
@@ -43,7 +43,7 @@ export enum DragTriggerTypes {
 export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const selectedIds = useSelector(selectSelectedIds);
   const widget = useContext(WidgetContext);
-  const { updateWidgetConfig } = useContext(BoardActionContext);
+  const { onUpdateWidgetConfig } = useContext(WidgetActionContext);
 
   const dispatch = useDispatch();
   const scale = useContext(scaleContext);
@@ -69,12 +69,21 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
     },
     [widget.id],
   );
+  const moveEnd = useCallback(() => {
+    const nextConf = produce(widget.config, draft => {
+      draft.rect.x = curXY[0];
+      draft.rect.y = curXY[1];
+    });
+    onUpdateWidgetConfig(nextConf, widget.id);
+  }, [curXY, onUpdateWidgetConfig, widget.config, widget.id]);
   useEffect(() => {
-    eventBus.addListener('moveWidget', move);
+    widgetMove.on(move);
+    widgetMoveEnd.on(moveEnd);
     return () => {
-      eventBus.removeListener('moveWidget', move);
+      widgetMove.off(move);
+      widgetMoveEnd.off(moveEnd);
     };
-  }, [move]);
+  }, [move, moveEnd]);
 
   const dragStart: DraggableEventHandler = useCallback((e, data) => {
     e.stopPropagation();
@@ -91,15 +100,8 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const drag: DraggableEventHandler = useCallback(
     (e, data) => {
       e.stopPropagation();
-
       const { deltaX, deltaY } = data;
-
-      eventBus.emit(
-        'moveWidget',
-        selectedIds.concat(widget.id),
-        deltaX,
-        deltaY,
-      );
+      widgetMove.emit(selectedIds.concat(widget.id), deltaX, deltaY);
     },
     [selectedIds, widget.id],
   );
@@ -108,12 +110,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
       // no change
       return;
     }
-    const nextConf = produce(widget.config, draft => {
-      draft.rect.x = curXY[0];
-      draft.rect.y = curXY[1];
-    });
-    updateWidgetConfig(nextConf, widget.id);
-
+    widgetMoveEnd.emit();
     e.stopPropagation();
   };
 

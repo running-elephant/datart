@@ -16,23 +16,18 @@
  * limitations under the License.
  */
 
-import produce from 'immer';
 import { createContext, FC, memo, useMemo } from 'react';
 import {
   BoardType,
   Dashboard,
   VizRenderMode,
 } from '../../pages/Board/slice/types';
-import { adaptBoardImageUrl } from '../../utils';
-import { BoardActionProvider } from './BoardActionProvider';
-import { BoardConfigProvider } from './BoardConfigProvider';
-import { BoardInfoProvider } from './BoardInfoProvider';
 
 export interface BoardContextProps {
+  orgId: string;
+  boardId: string;
   name: string;
   renderMode: VizRenderMode;
-  boardId: string;
-  orgId: string;
   boardType: BoardType;
   status: number;
   editing: boolean;
@@ -48,75 +43,55 @@ export interface BoardContextProps {
 export const BoardContext = createContext<BoardContextProps>(
   {} as BoardContextProps,
 );
-export const BoardProvider: FC<{
-  board: Dashboard;
-  renderMode: VizRenderMode;
-  editing: boolean;
-  autoFit?: boolean;
-  allowDownload?: boolean;
-  allowShare?: boolean;
-  allowManage?: boolean;
-}> = memo(
+export const BoardProvider: FC<BoardContextProps> = memo(
   ({
-    board,
-    editing,
-    children,
+    orgId,
+    boardId,
+    name,
     renderMode,
+    editing,
+    boardType,
+    status,
     autoFit,
     allowDownload,
     allowShare,
     allowManage,
+    queryVariables,
+    children,
   }) => {
     const boardContextValue: BoardContextProps = useMemo(() => {
       return {
-        name: board.name,
-        boardId: board.id,
-        status: board.status,
-        queryVariables: board.queryVariables,
+        orgId,
+        boardId,
+        name,
+        boardType,
+        status,
+        queryVariables,
         renderMode,
-        orgId: board.orgId,
-        boardType: board.config.type,
-        editing: editing,
-        autoFit: autoFit,
+        editing,
+        autoFit,
         allowDownload,
         allowShare,
         allowManage,
       };
     }, [
-      board.name,
-      board.id,
-      board.status,
-      board.queryVariables,
-      board.orgId,
-      board.config.type,
-      renderMode,
-      editing,
-      autoFit,
       allowDownload,
-      allowShare,
       allowManage,
+      allowShare,
+      autoFit,
+      boardId,
+      boardType,
+      editing,
+      name,
+      orgId,
+      queryVariables,
+      renderMode,
+      status,
     ]);
-
-    const adaptConfig = useMemo(() => {
-      if (board.config) {
-        const nextConfig = produce(board.config, draft => {
-          draft.background.image = adaptBoardImageUrl(
-            board.config.background.image,
-            board.id,
-          );
-        });
-        return nextConfig;
-      }
-      return board.config;
-    }, [board.config, board.id]);
 
     return (
       <BoardContext.Provider value={boardContextValue}>
-        <BoardConfigProvider config={adaptConfig}>
-          <BoardInfoProvider id={board.id} editing={editing}>
-            <BoardActionProvider id={board.id}>{children}</BoardActionProvider>
-          </BoardInfoProvider>
-        </BoardConfigProvider>
+        {children}
       </BoardContext.Provider>
     );
   },

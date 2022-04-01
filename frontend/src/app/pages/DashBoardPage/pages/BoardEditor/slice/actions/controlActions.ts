@@ -63,28 +63,22 @@ export const addControllerAction =
     }
   };
 
-export const editWidgetsQueryAction =
-  ({ boardId }) =>
-  async (dispatch, getState) => {
-    const pageInfo: Partial<PageInfo> = {
-      pageNo: 1,
-    };
-
-    const editBoard = getState().editBoard as HistoryEditBoard;
-    const widgetMap = editBoard.stack.present.widgetRecord;
-
-    if (editBoard.boardInfo.id !== boardId) {
-      return;
-    }
-
-    Object.values(widgetMap)
-      .filter(it => it.config.type === 'chart')
-      .forEach(it => {
-        dispatch(
-          getEditChartWidgetDataAsync({
-            widgetId: it.id,
-            option: { pageInfo },
-          }),
-        );
-      });
+export const editWidgetsQueryAction = () => async (dispatch, getState) => {
+  const pageInfo: Partial<PageInfo> = {
+    pageNo: 1,
   };
+
+  const editBoard = getState().editBoard as HistoryEditBoard;
+  const widgetMap = editBoard.stack.present.widgetRecord;
+
+  Object.values(widgetMap)
+    .filter(it => it.config.type === 'chart')
+    .forEach(it => {
+      dispatch(
+        getEditChartWidgetDataAsync({
+          widgetId: it.id,
+          option: { pageInfo },
+        }),
+      );
+    });
+};

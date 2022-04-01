@@ -20,7 +20,6 @@ import { InputNumber, Select, Space } from 'antd';
 import { DEVICE_LIST } from 'app/pages/DashBoardPage/constants';
 import React, { memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import { WHITE } from 'styles/StyleConstants';
 const { Option } = Select;
 
 const ListKeys = Object.keys(DEVICE_LIST);
@@ -99,11 +98,11 @@ export const DeviceList: React.FC<{
 
 const StyledWrap = styled.div`
   display: flex;
-  background-color: ${WHITE};
-  width: 100%;
-  height: 36px;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: 36px;
+  background-color: ${p => p.theme.componentBackground};
 `;
 
 export default DeviceList;

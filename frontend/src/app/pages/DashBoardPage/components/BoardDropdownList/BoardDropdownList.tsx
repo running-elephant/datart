@@ -31,7 +31,7 @@ import { useDispatch } from 'react-redux';
 import { useRecycleViz } from '../../../../hooks/useRecycleViz';
 import { usePublishBoard } from '../../hooks/usePublishBoard';
 import { widgetsQueryAction } from '../../pages/Board/slice/asyncActions';
-import { BoardActionContext } from '../BoardProvider/BoardActionProvider';
+import { BoardActionContext } from '../ActionProvider/BoardActionProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 interface Props {
   onOpenShareLink: () => void;

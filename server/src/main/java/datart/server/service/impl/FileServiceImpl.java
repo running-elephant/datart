@@ -61,6 +61,20 @@ public class FileServiceImpl extends BaseService implements FileService {
     @Override
     public boolean deleteFiles(FileOwner fileOwner, String ownerId) {
         try {
+            switch (fileOwner) {
+                case ORG_AVATAR:
+                    securityManager.requireOrgOwner(ownerId);
+                    OrgService orgService = Application.getBean(OrgService.class);
+                    orgService.updateAvatar(ownerId, "");
+                    break;
+                case USER_AVATAR:
+                    requireExists(ownerId, User.class);
+                    UserService userService = Application.getBean(UserService.class);
+                    userService.updateAvatar("");
+                    break;
+                default:
+                    break;
+            }
             String path = FileUtils.concatPath(Application.getFileBasePath(), fileOwner.getPath(), ownerId);
             return FileSystemUtils.deleteRecursively(new File(path));
         } catch (Exception e) {

@@ -19,7 +19,7 @@
 import { Select } from 'antd';
 import {
   AggregateFieldActionType,
-  ChartDataViewFieldType,
+  DataViewFieldType,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
@@ -34,10 +34,10 @@ const FilterAggregateConfiguration: FC<{
 
   const getAggregateByModelType = () => {
     switch (config?.type) {
-      case ChartDataViewFieldType.STRING:
-      case ChartDataViewFieldType.DATE:
+      case DataViewFieldType.STRING:
+      case DataViewFieldType.DATE:
         return [AggregateFieldActionType.NONE, AggregateFieldActionType.COUNT];
-      case ChartDataViewFieldType.NUMERIC:
+      case DataViewFieldType.NUMERIC:
         return Object.values(AggregateFieldActionType);
       default:
         return [AggregateFieldActionType.NONE];

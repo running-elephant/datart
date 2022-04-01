@@ -17,7 +17,7 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   getDefaultThemeColor,
@@ -28,6 +28,7 @@ import { init } from 'echarts';
 import 'echarts-wordcloud';
 import Chart from '../../../models/Chart';
 import Config from './config';
+import { WordCloudConfig, WordCloudLabelConfig } from './types';
 
 // NOTE: wordcloud chart is echarts extension, more detail please check https://github.com/ecomfe/echarts-wordcloud
 class WordCloudChart extends Chart {
@@ -87,7 +88,7 @@ class WordCloudChart extends Chart {
   }
 
   getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
-    const styleConfigs = config.styles;
+    const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.GROUP)
@@ -102,14 +103,14 @@ class WordCloudChart extends Chart {
       dataConfigs,
     );
     const wordCloud = this.getWordCloud(styleConfigs);
-    const laber = this.getLaber(styleConfigs);
+    const label = this.getLabel(styleConfigs);
     return {
       series: [
         {
           type: 'wordCloud',
           layoutAnimation: true,
           ...wordCloud,
-          ...laber,
+          ...label,
           data: chartDataSet?.map(dc => {
             return {
               name: dc.getCell(groupConfigs[0]),
@@ -120,7 +121,8 @@ class WordCloudChart extends Chart {
       ],
     };
   }
-  getWordCloud(style) {
+
+  getWordCloud(style: ChartStyleConfig[]): WordCloudConfig {
     const [drawOutOfBound, shape, width, height] = getStyles(
       style,
       ['wordCloud'],
@@ -143,7 +145,7 @@ class WordCloudChart extends Chart {
     };
   }
 
-  getLaber(style) {
+  getLabel(style: ChartStyleConfig[]): WordCloudLabelConfig {
     const [
       fontFamily,
       fontWeight,

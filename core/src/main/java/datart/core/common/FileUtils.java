@@ -18,12 +18,12 @@
 
 package datart.core.common;
 
+import datart.core.base.exception.Exceptions;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 public class FileUtils {
 
@@ -32,6 +32,9 @@ public class FileUtils {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < paths.length; i++) {
             String path = paths[i];
+            if (StringUtils.isBlank(path)) {
+                continue;
+            }
             path = StringUtils.appendIfMissing(path, "/");
             if (i != 0) {
                 path = StringUtils.removeStart(path, "/");
@@ -52,7 +55,11 @@ public class FileUtils {
     }
 
     public static String withBasePath(String path) {
-        return concatPath(Application.getFileBasePath(), path);
+        String fileBasePath = Application.getFileBasePath();
+        if (path.startsWith(fileBasePath)) {
+            return path;
+        }
+        return concatPath(fileBasePath, path);
     }
 
     public static void delete(String path) {
@@ -88,6 +95,40 @@ public class FileUtils {
                 }
             }
             return names;
+        }
+    }
+
+    public static Map<String, byte[]> walkDirAsStream(File baseDir, String extension, boolean recursion) {
+        Map<String, byte[]> bytes = new HashMap<>();
+        Set<String> files = walkDir(baseDir, extension, recursion);
+        if (CollectionUtils.isEmpty(files)) {
+            return Collections.emptyMap();
+        }
+        for (String name : files) {
+            File file = new File(FileUtils.concatPath(baseDir.getAbsolutePath(), name));
+            if (file.exists() && file.isFile()) {
+                try {
+                    FileInputStream inputStream = new FileInputStream(file);
+                    byte[] buffer = new byte[inputStream.available()];
+                    inputStream.read(buffer);
+                    bytes.put(name, buffer);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return bytes;
+    }
+
+
+    public static void save(String path, byte[] content, boolean cover) throws IOException {
+        File file = new File(path);
+        if (!cover && file.exists()) {
+            Exceptions.msg("file already exists : " + path);
+        }
+        mkdirParentIfNotExist(path);
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            outputStream.write(content);
         }
     }
 }

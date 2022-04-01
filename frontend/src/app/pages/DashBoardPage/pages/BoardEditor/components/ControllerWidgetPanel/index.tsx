@@ -18,12 +18,8 @@
 
 import { Form, Modal } from 'antd';
 import { Split } from 'app/components';
-import {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/constants';
+import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardActionContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardActionProvider';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { selectViewMap } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
@@ -49,6 +45,7 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
+import { WidgetActionContext } from '../../../../components/ActionProvider/WidgetActionProvider';
 import { editBoardStackActions, editDashBoardInfoActions } from '../../slice';
 import {
   selectControllerPanel,
@@ -75,8 +72,8 @@ const ControllerWidgetPanel: React.FC = memo(props => {
   const { boardId, boardType, queryVariables } = useContext(BoardContext);
   const { hasQueryControl } = useContext(BoardConfigContext);
 
-  const { refreshWidgetsByController } = useContext(BoardActionContext);
-  const { editing, renderMode } = useContext(BoardContext);
+  const { onRefreshWidgetsByController } = useContext(WidgetActionContext);
+
   const allWidgets = useSelector(selectSortAllWidgets);
   const widgets = useMemo(
     () =>
@@ -110,9 +107,9 @@ const ControllerWidgetPanel: React.FC = memo(props => {
   const refreshLinkedWidgets = useCallback(
     (widget: Widget) => {
       if (hasQueryControl) return;
-      refreshWidgetsByController(widget, editing, renderMode);
+      onRefreshWidgetsByController(widget);
     },
-    [editing, refreshWidgetsByController, hasQueryControl, renderMode],
+    [onRefreshWidgetsByController, hasQueryControl],
   );
   const getFormRelatedViews = useCallback(() => {
     return form?.getFieldValue('relatedViews') as RelatedView[];
@@ -139,7 +136,7 @@ const ControllerWidgetPanel: React.FC = memo(props => {
               viewId: view.id,
               relatedCategory: ChartDataViewFieldCategory.Field,
               fieldValue: '',
-              fieldValueType: ChartDataViewFieldType.STRING,
+              fieldValueType: DataViewFieldType.STRING,
             };
             nextRelatedViews.push(relatedView);
           }

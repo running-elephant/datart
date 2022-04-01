@@ -19,6 +19,9 @@
 package datart.core.common;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+
+import java.util.Date;
 
 public class DateUtils {
 
@@ -54,6 +57,10 @@ public class DateUtils {
 
     public static boolean isDateTimeFormat(String format) {
         return StringUtils.isNotBlank(format) && "yyyy-MM-dd HH:mm:ss".equalsIgnoreCase(format.trim());
+    }
+
+    public static String withTimeString(String name) {
+        return name + DateFormatUtils.format(new Date(), DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"));
     }
 
 }

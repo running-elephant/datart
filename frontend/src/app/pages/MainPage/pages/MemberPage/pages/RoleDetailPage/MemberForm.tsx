@@ -71,6 +71,14 @@ export const MemberForm = memo(
       [],
     );
 
+    const filterMemberListOptions = useCallback(
+      (inputValue, option: User) =>
+        [option.email, option.name, option.username].some(text =>
+          text?.includes(inputValue.trim()),
+        ),
+      [],
+    );
+
     return (
       <ModalForm
         {...modalProps}
@@ -85,6 +93,7 @@ export const MemberForm = memo(
               targetKeys={targetKeys}
               render={renderTitle}
               onChange={setTargetKeys}
+              filterOption={filterMemberListOptions}
               showSearch
             />
           </LoadingMask>

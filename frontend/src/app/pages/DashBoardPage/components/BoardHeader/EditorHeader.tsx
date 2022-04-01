@@ -33,7 +33,8 @@ import {
 } from 'styles/StyleConstants';
 import { useStatusTitle } from '../../hooks/useStatusTitle';
 import { clearEditBoardState } from '../../pages/BoardEditor/slice/actions/actions';
-import { BoardActionContext } from '../BoardProvider/BoardActionProvider';
+import { BoardActionContext } from '../ActionProvider/BoardActionProvider';
+import { WidgetActionContext } from '../ActionProvider/WidgetActionProvider';
 import { BoardInfoContext } from '../BoardProvider/BoardInfoProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 
@@ -41,7 +42,8 @@ const EditorHeader: FC = memo(({ children }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const t = useI18NPrefix(`viz.action`);
-  const { onClearActiveWidgets, updateBoard } = useContext(BoardActionContext);
+  const { updateBoard } = useContext(BoardActionContext);
+  const { onEditClearActiveWidgets } = useContext(WidgetActionContext);
   const { name, status } = useContext(BoardContext);
   const { saving } = useContext(BoardInfoContext);
   const title = useStatusTitle(name, status);
@@ -52,14 +54,14 @@ const EditorHeader: FC = memo(({ children }) => {
     dispatch(clearEditBoardState());
   };
   const onUpdateBoard = () => {
-    onClearActiveWidgets();
+    onEditClearActiveWidgets();
     setImmediate(() => {
       updateBoard?.(onCloseBoardEditor);
     });
   };
 
   return (
-    <Wrapper onClick={onClearActiveWidgets}>
+    <Wrapper onClick={onEditClearActiveWidgets}>
       <h1 className={classnames({ disabled: status < 2 })}>
         <LeftOutlined onClick={onCloseBoardEditor} />
         {title}

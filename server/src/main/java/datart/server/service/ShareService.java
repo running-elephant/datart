@@ -4,6 +4,7 @@ import datart.core.data.provider.Dataframe;
 import datart.core.entity.Download;
 import datart.core.entity.Share;
 import datart.core.mappers.ext.ShareMapperExt;
+import datart.server.base.dto.ShareInfo;
 import datart.server.base.params.*;
 
 import java.util.List;
@@ -14,9 +15,9 @@ public interface ShareService extends BaseCRUDService<Share, ShareMapperExt> {
 
     ShareToken createShare(String shareUser, ShareCreateParam createParam);
 
-    List<Share> listShare(String orgId);
+    ShareInfo updateShare(ShareUpdateParam updateParam);
 
-//    ShareToken explainShare(ShareToken shareToken);
+    List<ShareInfo> listShare(String vizId);
 
     ShareVizDetail getShareViz(ShareToken shareToken);
 

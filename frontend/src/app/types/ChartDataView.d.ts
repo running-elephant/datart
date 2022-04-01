@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { View } from 'app/types/View';
-import { ChartDataViewMeta } from './ChartDataViewMeta';
 
 export type ChartDataView = Omit<View, 'model'> & {
   meta?: ChartDataViewMeta[];

@@ -184,21 +184,21 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       onConfigChanged?.(ancestors, newCurrentConfig, refreshDataset);
     };
 
-    const getDefaultAggregate = item => {
+    const getDefaultAggregate = (item: ChartDataSectionField) => {
       if (
         currentConfig?.type === ChartDataSectionType.AGGREGATE ||
         currentConfig?.type === ChartDataSectionType.SIZE ||
         currentConfig?.type === ChartDataSectionType.INFO ||
         currentConfig?.type === ChartDataSectionType.MIXED
       ) {
-        if (currentConfig.disableAggregate) {
-          return;
-        }
         if (
-          item.category ===
-          (ChartDataViewFieldCategory.AggregateComputedField as string)
+          currentConfig.disableAggregate ||
+          item.category === ChartDataViewFieldCategory.AggregateComputedField
         ) {
           return;
+        }
+        if (item.aggregate) {
+          return item.aggregate;
         }
 
         let aggType: string = '';

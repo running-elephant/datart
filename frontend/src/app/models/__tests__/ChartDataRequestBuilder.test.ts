@@ -20,7 +20,7 @@ import {
   AggregateFieldActionType,
   ChartDataSectionType,
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
+  DataViewFieldType,
   FilterConditionType,
 } from 'app/constants';
 import { FilterSqlOperator, RECOMMEND_TIME } from 'globalConstants';
@@ -70,13 +70,13 @@ describe('ChartDataRequestBuild Test', () => {
           {
             colName: 'amount',
             aggregate: AggregateFieldActionType.AVG,
-            type: ChartDataViewFieldType.NUMERIC,
+            type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
           },
           {
             colName: 'sub-amount',
             aggregate: AggregateFieldActionType.SUM,
-            type: ChartDataViewFieldType.NUMERIC,
+            type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.ComputedField as any,
           },
         ],
@@ -92,7 +92,7 @@ describe('ChartDataRequestBuild Test', () => {
           {
             colName: 'total',
             aggregate: AggregateFieldActionType.COUNT,
-            type: ChartDataViewFieldType.NUMERIC,
+            type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.ComputedField as any,
           },
         ],
@@ -103,7 +103,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'sex',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Variable as any,
           },
         ],
@@ -114,12 +114,12 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'sex',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Variable as any,
           },
           {
             colName: 'age',
-            type: ChartDataViewFieldType.NUMERIC,
+            type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Variable as any,
           },
         ],
@@ -130,7 +130,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'name',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Variable as any,
           },
         ],
@@ -170,7 +170,7 @@ describe('ChartDataRequestBuild Test', () => {
           {
             colName: 'amount',
             aggregate: AggregateFieldActionType.AVG,
-            type: ChartDataViewFieldType.NUMERIC,
+            type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
           },
         ],
@@ -204,7 +204,7 @@ describe('ChartDataRequestBuild Test', () => {
           {
             colName: 'amount',
             aggregate: AggregateFieldActionType.AVG,
-            type: ChartDataViewFieldType.NUMERIC,
+            type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
           },
         ],
@@ -216,7 +216,7 @@ describe('ChartDataRequestBuild Test', () => {
           {
             colName: 'amount',
             aggregate: AggregateFieldActionType.AVG,
-            type: ChartDataViewFieldType.NUMERIC,
+            type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
           },
         ],
@@ -255,7 +255,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'name',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
           },
         ],
@@ -266,7 +266,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'age',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
           },
         ],
@@ -277,12 +277,12 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'address',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
           },
           {
             colName: 'post',
-            type: ChartDataViewFieldType.NUMERIC,
+            type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
           },
         ],
@@ -337,7 +337,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'name',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             aggregate: AggregateFieldActionType.NONE,
             filter: {
@@ -358,7 +358,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'name',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             aggregate: AggregateFieldActionType.AVG,
             filter: {
@@ -373,7 +373,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'name',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
               condition: {
@@ -386,7 +386,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'name',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
               condition: {
@@ -399,7 +399,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'address',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
               condition: {
@@ -413,7 +413,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'address',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
               condition: {
@@ -426,7 +426,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'family',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
               condition: {
@@ -443,7 +443,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'born',
-            type: ChartDataViewFieldType.DATE,
+            type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
               condition: {
@@ -457,7 +457,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'born',
-            type: ChartDataViewFieldType.DATE,
+            type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
               condition: {
@@ -471,7 +471,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'born',
-            type: ChartDataViewFieldType.DATE,
+            type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
               condition: {
@@ -485,7 +485,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'birthday',
-            type: ChartDataViewFieldType.DATE,
+            type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
               condition: {
@@ -499,7 +499,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'born',
-            type: ChartDataViewFieldType.DATE,
+            type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
               condition: {
@@ -629,7 +629,7 @@ describe('ChartDataRequestBuild Test', () => {
           {
             colName: 'age',
             aggregate: AggregateFieldActionType.AVG,
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             sort: {
               type: 'ASC',
@@ -643,7 +643,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'first-name',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             sort: {
               type: 'ASC',
@@ -651,7 +651,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'last-name',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.ComputedField as any,
             sort: {
               type: 'DESC',
@@ -659,7 +659,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'middle-name',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.ComputedField as any,
             sort: {
               type: 'CUSTOMIZE',
@@ -673,7 +673,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'address',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.ComputedField as any,
             sort: {
               type: 'DESC',
@@ -719,7 +719,7 @@ describe('ChartDataRequestBuild Test', () => {
           {
             colName: 'age',
             aggregate: AggregateFieldActionType.AVG,
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             sort: {
               type: 'ASC',
@@ -733,7 +733,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'first-name',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             sort: {
               type: 'ASC',
@@ -741,7 +741,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'last-name',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.ComputedField as any,
             sort: {
               type: 'DESC',
@@ -749,7 +749,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'middle-name',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.ComputedField as any,
             sort: {
               type: 'CUSTOMIZE',
@@ -763,7 +763,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'address',
-            type: ChartDataViewFieldType.STRING,
+            type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.ComputedField as any,
             sort: {
               type: 'DESC',
