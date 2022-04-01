@@ -18,25 +18,18 @@
 
 package datart.server.base.params;
 
-import datart.security.base.ResourceType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class ShareAuthorizedToken {
+public class UserUpdateByIdParam extends UserUpdateParam {
 
-    private String createBy;
+    private String password;
 
-    private String permissionBy;
-
-    @NotNull
-    private ResourceType vizType;
-
-    @NotNull
-    private String vizId;
-
-    private Date expiryDate;
+    private Set<String> roleIds = new HashSet<>();
 
 }
