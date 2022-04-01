@@ -18,6 +18,7 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
+import { ChartDataSectionType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
@@ -48,6 +49,7 @@ import {
   useSaveFormContext,
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { IChart } from 'app/types/Chart';
+import { DrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
@@ -116,6 +118,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
   const [chart, setChart] = useState<IChart>();
+  const [drillOption, setDrillOption] = useState<DrillOption>();
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
   const addVizFn = useAddViz({
@@ -191,6 +194,23 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backendChart?.config?.chartGraphId]);
+
+  useEffect(() => {
+    const drillPaths =
+      chartConfig?.datas
+        ?.filter(d => d.type === ChartDataSectionType.GROUP)
+        ?.flatMap(d => {
+          return (d.rows || [])
+            .filter(r => r.category === 'hierarchy')
+            .flatMap(hr => hr.children || []);
+        }) || [];
+    if (drillOption?.paths?.length !== drillPaths.length) {
+      setDrillOption({
+        paths: drillPaths,
+        current: 0,
+      });
+    }
+  }, [chartConfig?.datas, drillOption?.paths?.length]);
 
   const registerChartEvents = useCallback(
     chart => {
@@ -510,6 +530,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             },
             onChangeAggregation: handleAggregationState,
           }}
+          drillOption={drillOption}
           aggregation={aggregation}
           chart={chart}
           dataset={dataset}

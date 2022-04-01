@@ -18,6 +18,7 @@
 
 import {
   AggregateFieldActionType,
+  ChartDataSectionType,
   ChartDataViewFieldCategory,
   DataViewFieldType,
   FieldFormatType,

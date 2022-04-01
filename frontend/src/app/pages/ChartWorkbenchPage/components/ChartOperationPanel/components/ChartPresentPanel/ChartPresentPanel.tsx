@@ -17,15 +17,17 @@
  */
 
 import { ReloadOutlined } from '@ant-design/icons';
-import { Table } from 'antd';
+import { Col, Dropdown, Menu, Row, Table } from 'antd';
 import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContainer';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
+import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { FC, memo, useState } from 'react';
+import { getColumnRenderName } from 'app/utils/chartHelper';
+import { FC, memo, useContext, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
@@ -36,6 +38,7 @@ import {
 } from 'styles/StyleConstants';
 import { Debugger } from 'utils/debugger';
 import Chart404Graph from './components/Chart404Graph';
+import ChartDrillPath from './components/ChartDrillPath';
 import ChartTypeSelector, {
   ChartPresentType,
 } from './components/ChartTypeSelector';
@@ -68,6 +71,7 @@ const ChartPresentPanel: FC<{
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
     const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
     const datasetLoadingStatus = useSelector(datasetLoadingSelector);
+    const { drillOption } = useContext(ChartDatasetContext);
 
     useMount(undefined, () => {
       Debugger.instance.measure(`ChartPresentPanel | Dispose Event`, () => {
@@ -87,9 +91,20 @@ const ChartPresentPanel: FC<{
           dataset,
           chartConfig!,
           style,
+          drillOption,
         )
       );
     };
+
+    const menu = useMemo(() => {
+      return (
+        <Menu style={{ width: 200 }}>
+          {drillOption?.paths?.map(p => {
+            return <Menu.Item key={p.uid}>{getColumnRenderName(p)}</Menu.Item>;
+          })}
+        </Menu>
+      );
+    }, [drillOption?.paths]);
 
     const renderReusableChartContainer = () => {
       const style = {
@@ -104,11 +119,24 @@ const ChartPresentPanel: FC<{
         : 'container-1';
 
       return (
-        <>
+        <StyledReusableChartContainer>
           {ChartPresentType.GRAPH === chartType && (
-            <div style={{ height: '100%' }}>
-              {renderGraph(containerId, chart, chartConfig, style)}
-            </div>
+            <Dropdown
+              overlay={menu}
+              destroyPopupOnHide={true}
+              trigger={['contextMenu']}
+              getPopupContainer={() =>
+                document.getElementById('reusable-container')!
+              }
+            >
+              <div
+                id="reusable-container"
+                style={{ height: '100%' }}
+                onContextMenu={props => console.log('Click ----> ', props)}
+              >
+                {renderGraph(containerId, chart, chartConfig, style)}
+              </div>
+            </Dropdown>
           )}
           {ChartPresentType.RAW === chartType && (
             <TableWrapper>
@@ -129,7 +157,7 @@ const ChartPresentPanel: FC<{
               <code>{dataset?.script}</code>
             </SqlWrapper>
           )}
-        </>
+        </StyledReusableChartContainer>
       );
     };
 
@@ -155,8 +183,12 @@ const ChartPresentPanel: FC<{
             />
           </ReloadMask>
         )}
-
-        {renderChartTypeSelector()}
+        <Row justify="space-between">
+          <Col>
+            <ChartDrillPath drillOption={drillOption} />
+          </Col>
+          <Col>{renderChartTypeSelector()}</Col>
+        </Row>
         {renderReusableChartContainer()}
       </StyledChartPresentPanel>
     );
@@ -173,6 +205,8 @@ const StyledChartPresentPanel = styled.div`
   border-radius: ${BORDER_RADIUS};
   position: relative;
 `;
+
+const StyledReusableChartContainer = styled.div``;
 
 const TableWrapper = styled.div`
   padding: ${SPACE_LG};
