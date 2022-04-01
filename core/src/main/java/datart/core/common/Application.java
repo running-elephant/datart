@@ -51,6 +51,10 @@ public class Application implements ApplicationContextAware {
         return context.getBean(t);
     }
 
+    public static <T> T getBean(String beanName, Class<T> t) {
+        return context.getBean(beanName, t);
+    }
+
     public static String getProperty(String key) {
         return context.getEnvironment().getProperty(key);
     }

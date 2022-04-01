@@ -18,23 +18,18 @@
 
 package datart.server.base.params;
 
-import datart.core.base.consts.AttachmentType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class DownloadCreateParam extends BaseCreateParam {
+public class UserUpdateByIdParam extends UserUpdateParam {
 
-    private String fileName;
+    private String password;
 
-    private List<ViewExecuteParam> downloadParams;
-
-    private AttachmentType downloadType;
-
-    private int imageWidth;
+    private Set<String> roleIds = new HashSet<>();
 
 }
-

@@ -5,15 +5,28 @@ public enum ResourceType {
     SOURCE,
     VIEW,
 
-    DATACHART,
-    DASHBOARD,
+    DATACHART("shareChart"),
+    WIDGET,
+    DASHBOARD("shareDashboard"),
     FOLDER,
-    STORYBOARD,
+    STORYBOARD("shareStoryPlayer"),
     VIZ,
 
     SCHEDULE,
 
     ROLE,
-    USER,
+    USER;
 
+    private String shareRoute;
+
+    ResourceType() {
+    }
+
+    ResourceType(String shareRoute) {
+        this.shareRoute = shareRoute;
+    }
+
+    public String getShareRoute() {
+        return shareRoute;
+    }
 }
