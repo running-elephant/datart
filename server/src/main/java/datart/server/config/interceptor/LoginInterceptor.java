@@ -21,7 +21,6 @@ package datart.server.config.interceptor;
 import datart.core.base.annotations.SkipLogin;
 import datart.core.base.consts.Const;
 import datart.core.base.exception.Exceptions;
-import datart.core.common.MessageResolver;
 import datart.core.common.RequestContext;
 import datart.security.exception.AuthException;
 import datart.security.manager.DatartSecurityManager;
@@ -48,17 +47,26 @@ public class LoginInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
+        Exception loginException = null;
+        String token = request.getHeader(Const.TOKEN);
+        if (token != null) {
+            try {
+                token = securityManager.login(token);
+                response.setHeader(Const.TOKEN, token);
+                return securityManager.isAuthenticated();
+            } catch (Exception e) {
+                loginException = e;
+            }
+        }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         if (handlerMethod.getMethodAnnotation(SkipLogin.class) != null) {
             return true;
         }
-        String token = request.getHeader(Const.TOKEN);
-        if (token == null) {
-            Exceptions.tr(AuthException.class, "login.not-login");
+        if (loginException != null) {
+            throw loginException;
         }
-        token = securityManager.login(token);
-        response.setHeader(Const.TOKEN, token);
-        return securityManager.isAuthenticated();
+        Exceptions.tr(AuthException.class, "login.not-login");
+        return false;
     }
 
     @Override

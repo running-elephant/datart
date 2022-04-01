@@ -48,4 +48,11 @@ public class RequestScopePermissionDataCache {
     public void setPermissionCache(Permission permission, Boolean permitted) {
         permissionCache.put(permission, permitted);
     }
+
+    public void clear() {
+        authorizationInfo = null;
+        authenticationInfo = null;
+        currentOrg = null;
+        permissionCache.clear();
+    }
 }
