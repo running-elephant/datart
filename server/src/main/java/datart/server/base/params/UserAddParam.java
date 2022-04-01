@@ -16,6 +16,10 @@ public class UserAddParam {
 
     private String email;
 
+    private String name;
+
+    private String description;
+
     private Set<String> roleIds = new HashSet<>();
 
 }
