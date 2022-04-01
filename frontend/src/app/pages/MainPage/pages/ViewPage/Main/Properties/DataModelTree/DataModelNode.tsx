@@ -20,12 +20,14 @@ import {
   BranchesOutlined,
   CalendarOutlined,
   FieldStringOutlined,
+  FileUnknownOutlined,
   NumberOutlined,
   SisternodeOutlined,
   SwapOutlined,
 } from '@ant-design/icons';
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { IW, ToolbarButton } from 'app/components';
+import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo, useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
@@ -38,7 +40,7 @@ import {
   SUCCESS,
   WARNING,
 } from 'styles/StyleConstants';
-import { ColumnCategories, ColumnTypes } from '../../../constants';
+import { ColumnCategories } from '../../../constants';
 import { Column } from '../../../slice/types';
 import { ALLOW_COMBINE_COLUMN_TYPES } from './constant';
 
@@ -64,19 +66,26 @@ const DataModelNode: FC<{
     const renderNode = (node, isDragging) => {
       let icon;
       switch (node.type) {
-        case ColumnTypes.Number:
+        case DataViewFieldType.NUMERIC:
           icon = (
             <NumberOutlined style={{ alignSelf: 'center', color: SUCCESS }} />
           );
           break;
-        case ColumnTypes.String:
+        case DataViewFieldType.STRING:
           icon = (
             <FieldStringOutlined style={{ alignSelf: 'center', color: INFO }} />
           );
           break;
+        case DataViewFieldType.DATE:
+          icon = (
+            <CalendarOutlined style={{ alignSelf: 'center', color: INFO }} />
+          );
+          break;
         default:
           icon = (
-            <CalendarOutlined style={{ alignSelf: 'center', color: WARNING }} />
+            <FileUnknownOutlined
+              style={{ alignSelf: 'center', color: WARNING }}
+            />
           );
           break;
       }
@@ -107,7 +116,7 @@ const DataModelNode: FC<{
                     className="datart-schema-table-header-menu"
                     onClick={({ key }) => onNodeTypeChange(key, node?.name)}
                   >
-                    {Object.values(ColumnTypes).map(t => (
+                    {Object.values(DataViewFieldType).map(t => (
                       <Menu.Item key={t}>
                         {tg(`columnType.${t.toLowerCase()}`)}
                       </Menu.Item>

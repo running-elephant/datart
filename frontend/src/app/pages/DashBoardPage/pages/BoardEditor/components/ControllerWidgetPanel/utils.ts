@@ -18,7 +18,7 @@
 
 import {
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
+  DataViewFieldType,
   ControllerFacadeTypes,
   TimeFilterValueCategory,
 } from 'app/constants';
@@ -278,12 +278,12 @@ export const filterValueTypeByControl = (
   valueType: any,
 ) => {
   if (NumericalControllerTypes.includes(controlType)) {
-    return [VariableValueTypes.Number, ChartDataViewFieldType.NUMERIC].includes(
+    return [VariableValueTypes.Number, DataViewFieldType.NUMERIC].includes(
       valueType,
     );
   }
   if (DateControllerTypes.includes(controlType)) {
-    return [VariableValueTypes.Date, ChartDataViewFieldType.DATE].includes(
+    return [VariableValueTypes.Date, DataViewFieldType.DATE].includes(
       valueType,
     );
   }

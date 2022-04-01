@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-import { ChartDataViewFieldType } from 'app/constants';
+import { DataViewFieldType } from 'app/constants';
 
 export interface ControlOptionItem {
   label: string;
   value: string;
-  filterType?: ChartDataViewFieldType;
+  filterType?: DataViewFieldType;
 }
 export interface TargetValueType {
   relId: string;

@@ -43,7 +43,7 @@ export type ChartDetailConfigDTO = {
 };
 
 export interface ChartCommonConfig {
-  chart: ECharts;
+  chart: ECharts | null;
   // 官方ts定义过于复杂 所以用any
   // x轴options
   xAxis: any;

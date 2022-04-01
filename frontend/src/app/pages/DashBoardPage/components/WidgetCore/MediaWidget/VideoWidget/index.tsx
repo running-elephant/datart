@@ -25,7 +25,7 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { Player } from 'video-react';
 import 'video-react/dist/video-react.css';
-import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
+import { WidgetActionContext } from '../../../ActionProvider/WidgetActionProvider';
 import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 
@@ -33,7 +33,7 @@ const VideoWidget: React.FC = () => {
   const widget = useContext(WidgetContext);
   const dispatch = useDispatch();
   const { editing } = useContext(WidgetInfoContext);
-  const { widgetUpdate } = useContext(BoardActionContext);
+  const { onWidgetUpdate } = useContext(WidgetActionContext);
   const src = (widget.config.content as MediaWidgetContent).videoConfig?.src;
   const [curSrc, setCurSrc] = useState<string | undefined>('');
   useEffect(() => {
@@ -47,7 +47,7 @@ const VideoWidget: React.FC = () => {
       };
     });
     dispatch(editWidgetInfoActions.closeWidgetEditing(widget.id));
-    widgetUpdate(nextWidget, true);
+    onWidgetUpdate(nextWidget);
   };
   const setter = (
     <div className="wrap-form">

@@ -19,12 +19,13 @@ import { DataChartWidget } from 'app/pages/DashBoardPage/components/WidgetCore/D
 import React, { memo, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { getWidgetSomeStyle } from '../../utils/widget';
-import { BoardActionContext } from '../BoardProvider/BoardActionProvider';
+import { WidgetActionContext } from '../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from '../BoardProvider/BoardInfoProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
+import { WidgetChartProvider } from '../WidgetProvider/WidgetChartProvider';
+import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetInfoContext } from '../WidgetProvider/WidgetInfoProvider';
-import { WidgetMethodContext } from '../WidgetProvider/WidgetMethodProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import { QueryWidget } from './ButtonWidget/QueryWidget';
 import { ResetWidget } from './ButtonWidget/ResetWidget';
@@ -39,13 +40,12 @@ export interface WidgetCoreProps {
 }
 export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
   const widget = useContext(WidgetContext);
-  const { onWidgetAction } = useContext(WidgetMethodContext);
+  const { onWidgetGetData } = useContext(WidgetActionContext);
   const { initialQuery } = useContext(BoardConfigContext);
-  const { editing, renderMode, boardType } = useContext(BoardContext);
+  const { renderMode, boardType, editing } = useContext(BoardContext);
   const widgetInfo = useContext(WidgetInfoContext);
   const { visible: boardVisible } = useContext(BoardInfoContext);
-
-  const { renderedWidgetById } = useContext(BoardActionContext);
+  const { onRenderedWidgetById } = useContext(WidgetActionContext);
   const { background, padding, border } = props;
   /**
    * @param ''
@@ -53,18 +53,11 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
    */
   useEffect(() => {
     if (renderMode === 'schedule') {
-      renderedWidgetById(widget.id, editing, renderMode);
+      onRenderedWidgetById(widget.id);
     } else if (boardType === 'free' && initialQuery) {
-      renderedWidgetById(widget.id, editing, renderMode);
+      onRenderedWidgetById(widget.id);
     }
-  }, [
-    boardType,
-    editing,
-    initialQuery,
-    renderMode,
-    renderedWidgetById,
-    widget.id,
-  ]);
+  }, [boardType, initialQuery, renderMode, onRenderedWidgetById, widget.id]);
   // 自动更新
   useEffect(() => {
     // TODO 优化 组件更新规则
@@ -77,7 +70,7 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
       widget.config.autoUpdate
     ) {
       timer = setInterval(() => {
-        onWidgetAction('refresh', widget);
+        onWidgetGetData(widget);
       }, +widget.config.frequency * 1000);
     }
     return () => {
@@ -87,25 +80,44 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
     };
   }, [
     boardVisible,
-    onWidgetAction,
     widget,
     widget.config.autoUpdate,
     widget.config.frequency,
     widget.config.type,
     widgetInfo.loading,
     widgetInfo.rendered,
+    onWidgetGetData,
+    renderMode,
   ]);
 
   const element = useMemo(() => {
     switch (widget.config.type) {
       case 'chart':
-        return <DataChartWidget />;
+        return (
+          <WidgetChartProvider>
+            <WidgetDataProvider
+              widgetId={widget.id}
+              boardId={widget.dashboardId}
+              boardEditing={editing}
+            >
+              <DataChartWidget />
+            </WidgetDataProvider>
+          </WidgetChartProvider>
+        );
       case 'media':
         return <MediaWidget />;
       case 'container':
         return <ContainerWidget />;
       case 'controller':
-        return <ControllerWidgetCore />;
+        return (
+          <WidgetDataProvider
+            widgetId={widget.id}
+            boardId={widget.dashboardId}
+            boardEditing={editing}
+          >
+            <ControllerWidgetCore />
+          </WidgetDataProvider>
+        );
       case 'query':
         return <QueryWidget />;
       case 'reset':
@@ -113,7 +125,7 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
       default:
         return <div>default widget</div>;
     }
-  }, [widget]);
+  }, [editing, widget.config.type, widget.dashboardId, widget.id]);
   const widgetCoreStyle = useMemo(() => {
     return getWidgetSomeStyle({
       config: widget.config,

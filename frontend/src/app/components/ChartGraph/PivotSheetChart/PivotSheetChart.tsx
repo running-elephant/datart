@@ -18,7 +18,11 @@
 
 import { ChartDataSectionType, SortActionType } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataSectionField,
+  ChartStyleConfig,
+} from 'app/types/ChartConfig';
 import ChartDataSetDTO, {
   IChartDataSet,
   IChartDataSetRow,
@@ -33,6 +37,7 @@ import { isNumber } from 'app/utils/number';
 import groupBy from 'lodash/groupBy';
 import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
+import { TableSorters, TextStyle } from './types';
 
 class PivotSheetChart extends ReactChart {
   static icon = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z" fill="gray"/></svg>`;
@@ -217,7 +222,10 @@ class PivotSheetChart extends ReactChart {
     };
   }
 
-  private getTableSorters(sectionConfigRows, chartDataSet) {
+  private getTableSorters(
+    sectionConfigRows: ChartDataSectionField[],
+    chartDataSet: IChartDataSet<string>,
+  ): TableSorters[] {
     return sectionConfigRows
       .map(config => {
         if (!config?.sort?.type || config?.sort?.type === SortActionType.NONE) {
@@ -237,7 +245,7 @@ class PivotSheetChart extends ReactChart {
       .filter(Boolean);
   }
 
-  private getBodyStyle(styleConfigs) {
+  private getBodyStyle(styleConfigs: ChartStyleConfig[]): TextStyle {
     const [bodyFont, oddBgColor, evenBgColor, bodyTextAlign] = getStyles(
       styleConfigs,
       ['tableBodyStyle'],
@@ -258,7 +266,7 @@ class PivotSheetChart extends ReactChart {
     };
   }
 
-  private getHeaderStyle(styleConfigs) {
+  private getHeaderStyle(styleConfigs: ChartStyleConfig[]): TextStyle {
     const [headerFont, headerBgColor, headerTextAlign] = getStyles(
       styleConfigs,
       ['tableHeaderStyle'],
@@ -287,13 +295,13 @@ class PivotSheetChart extends ReactChart {
 
   private getCalcSummaryValues(
     chartDataSet: IChartDataSet<string>,
-    rowSectionConfigRows,
-    columnSectionConfigRows,
-    metricsSectionConfigRows,
-    enableTotal,
-    enableSubTotal,
-  ) {
-    let summarys: any[] = [];
+    rowSectionConfigRows: ChartDataSectionField[],
+    columnSectionConfigRows: ChartDataSectionField[],
+    metricsSectionConfigRows: ChartDataSectionField[],
+    enableTotal: boolean,
+    enableSubTotal: boolean,
+  ): { [key: string]: number }[] {
+    let summarys: { [key: string]: number }[] = [];
     if (enableTotal) {
       if (!columnSectionConfigRows.length) {
         const rowTotals = metricsSectionConfigRows.map(c => {
@@ -333,12 +341,12 @@ class PivotSheetChart extends ReactChart {
 
   private calculateGroupedColumnTotal(
     preObj,
-    groupKeys,
-    metrics: any[],
+    groupKeys: string[],
+    metrics: ChartDataSectionField[],
     datas: Array<IChartDataSetRow<string>>,
-  ) {
+  ): { [key: string]: number }[] {
     const _groupKeys = [...(groupKeys || [])];
-    const groupKey = _groupKeys.shift();
+    const groupKey: string = _groupKeys.shift()!;
     const groupDataSet = groupBy(datas, row => row.getCellByKey(groupKey));
 
     return Object.entries(groupDataSet).flatMap(([k, v]) => {

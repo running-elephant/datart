@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
+import { DataViewFieldType } from 'app/constants';
 
 export interface ConditionalStyleFormValues {
   uid: string;
@@ -63,7 +63,7 @@ export const OperatorTypesLocale = {
 };
 
 export const ConditionalOperatorTypes = {
-  [ColumnTypes.String]: [
+  [DataViewFieldType.STRING]: [
     OperatorTypes.Equal,
     OperatorTypes.NotEqual,
     OperatorTypes.Contain,
@@ -72,7 +72,7 @@ export const ConditionalOperatorTypes = {
     OperatorTypes.NotIn,
     OperatorTypes.IsNull,
   ],
-  [ColumnTypes.Number]: [
+  [DataViewFieldType.NUMERIC]: [
     OperatorTypes.Equal,
     OperatorTypes.NotEqual,
     OperatorTypes.Between,
@@ -82,7 +82,7 @@ export const ConditionalOperatorTypes = {
     OperatorTypes.GreaterThanOrEqual,
     OperatorTypes.IsNull,
   ],
-  [ColumnTypes.Date]: [
+  [DataViewFieldType.DATE]: [
     OperatorTypes.Equal,
     OperatorTypes.NotEqual,
     OperatorTypes.In,

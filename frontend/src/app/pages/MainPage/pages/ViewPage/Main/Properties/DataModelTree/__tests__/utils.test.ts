@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import { ColumnCategories, ColumnTypes } from '../../../../constants';
+import { DataViewFieldType } from 'app/constants';
+import { ColumnCategories } from '../../../../constants';
 import { ColumnRole } from '../../../../slice/types';
 import { toModel } from '../utils';
 
@@ -32,13 +33,13 @@ describe('DataModelTree Util Tests', () => {
       const columns = [
         {
           name: 'age',
-          type: ColumnTypes.Number,
+          type: DataViewFieldType.NUMERIC,
           category: ColumnCategories.Uncategorized,
           index: 0,
         },
         {
           name: 'address',
-          type: ColumnTypes.String,
+          type: DataViewFieldType.STRING,
           category: ColumnCategories.Uncategorized,
           index: 0,
         },
@@ -67,14 +68,14 @@ describe('DataModelTree Util Tests', () => {
         {
           name: 'name',
           role: ColumnRole.Role,
-          type: ColumnTypes.String,
+          type: DataViewFieldType.STRING,
           category: ColumnCategories.Uncategorized,
           index: 0,
           children: [
             {
               name: 'first-name',
               role: ColumnRole.Role,
-              type: ColumnTypes.String,
+              type: DataViewFieldType.STRING,
               category: ColumnCategories.Uncategorized,
               index: 0,
             },
@@ -83,7 +84,7 @@ describe('DataModelTree Util Tests', () => {
         {
           name: 'age',
           role: ColumnRole.Hierarchy,
-          type: ColumnTypes.Number,
+          type: DataViewFieldType.NUMERIC,
           category: ColumnCategories.Uncategorized,
           index: 0,
           children: [],
@@ -91,21 +92,21 @@ describe('DataModelTree Util Tests', () => {
         {
           name: 'address',
           role: ColumnRole.Hierarchy,
-          type: ColumnTypes.String,
+          type: DataViewFieldType.STRING,
           category: ColumnCategories.Uncategorized,
           index: 0,
           children: [
             {
               name: 'address1',
               role: ColumnRole.Role,
-              type: ColumnTypes.String,
+              type: DataViewFieldType.STRING,
               category: ColumnCategories.Uncategorized,
               index: 0,
             },
             {
               name: 'address2',
               role: ColumnRole.Role,
-              type: ColumnTypes.String,
+              type: DataViewFieldType.STRING,
               category: ColumnCategories.Uncategorized,
               index: 0,
             },
@@ -148,7 +149,7 @@ describe('DataModelTree Util Tests', () => {
       const columns = [
         {
           name: 'age',
-          type: ColumnTypes.Number,
+          type: DataViewFieldType.NUMERIC,
           category: ColumnCategories.Uncategorized,
           index: 0,
         },
@@ -156,7 +157,7 @@ describe('DataModelTree Util Tests', () => {
       const additionalColumns = [
         {
           name: 'address',
-          type: ColumnTypes.String,
+          type: DataViewFieldType.STRING,
           category: ColumnCategories.Uncategorized,
           index: 0,
         },

@@ -1,5 +1,5 @@
 import { RadioGroupOptionType } from 'antd/lib/radio';
-import { ChartDataViewFieldType, TimeFilterValueCategory } from 'app/constants';
+import { DataViewFieldType, TimeFilterValueCategory } from 'app/constants';
 import {
   ControllerVisibleType,
   ValueOptionType,
@@ -14,7 +14,7 @@ export interface ControllerVisibility {
   visibilityType: ControllerVisibleType;
   condition?: VisibilityCondition;
 }
-export type ValueTypes = ChartDataViewFieldType | VariableValueTypes;
+export type ValueTypes = DataViewFieldType | VariableValueTypes;
 export interface ControlOption {
   label: string;
   value: string;

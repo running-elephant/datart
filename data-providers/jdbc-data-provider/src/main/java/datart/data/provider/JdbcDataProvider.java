@@ -299,7 +299,7 @@ public class JdbcDataProvider extends DataProvider {
                     log.error("DbType " + entry.getKey() + " driver read Exception", e);
                 }
                 return null;
-            }).filter(Objects::nonNull).collect(Collectors.toList());
+            }).filter(Objects::nonNull).sorted(Comparator.comparing(JdbcDriverInfo::getDbType)).collect(Collectors.toList());
         }
 
         private static Map<String, Map<String, String>> loadYml(String file) {

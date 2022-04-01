@@ -20,18 +20,16 @@ import { FontConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { darken, getLuminance, lighten } from 'polished';
 import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
-import { BoardActionContext } from '../../BoardProvider/BoardActionProvider';
-import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
 export const ResetWidget: React.FC<{}> = () => {
   const widget = useContext(WidgetContext);
-  const { onWidgetsReset } = useContext(BoardActionContext);
-  const { editing, renderMode } = useContext(BoardContext);
+  const { onWidgetsReset } = useContext(WidgetActionContext);
+
   const onQuery = e => {
     e.stopPropagation();
-    if (editing) return;
-    onWidgetsReset(renderMode);
+    onWidgetsReset();
   };
 
   const { name, nameConfig, background } = widget.config;

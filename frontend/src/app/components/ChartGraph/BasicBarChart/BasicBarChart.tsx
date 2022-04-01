@@ -17,7 +17,17 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
-import { ChartConfig } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataConfig,
+  ChartDataSectionField,
+  ChartStyleConfig,
+  LabelStyle,
+  LegendStyle,
+  XAxis,
+  XAxisColumns,
+  YAxis,
+} from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColorizeGroupSeriesColumns,
@@ -37,7 +47,9 @@ import { toPrecision } from 'app/utils/number';
 import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
 import Chart from '../../../models/Chart';
+import { ChartRequirement } from '../../../types/ChartMetadata';
 import Config from './config';
+import { BarBorderStyle, BarSeriesImpl, Series } from './types';
 
 class BasicBarChart extends Chart {
   config = Config;
@@ -47,7 +59,12 @@ class BasicBarChart extends Chart {
   protected isStackMode = false;
   protected isPercentageYAxis = false;
 
-  constructor(props?) {
+  constructor(props?: {
+    id: string;
+    name: string;
+    icon: string;
+    requirements?: ChartRequirement[];
+  }) {
     super(
       props?.id || 'bar',
       props?.name || 'viz.palette.graph.names.barChart',
@@ -98,19 +115,19 @@ class BasicBarChart extends Chart {
   }
 
   getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
-    const styleConfigs = config.styles;
-    const dataConfigs = config.datas || [];
-    const settingConfigs = config.settings;
-    const groupConfigs = dataConfigs
+    const styleConfigs: ChartStyleConfig[] = config.styles || [];
+    const dataConfigs: ChartDataConfig[] = config.datas || [];
+    const settingConfigs: ChartStyleConfig[] = config.settings || [];
+    const groupConfigs: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.GROUP)
       .flatMap(config => config.rows || []);
-    const aggregateConfigs = dataConfigs
+    const aggregateConfigs: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
-    const colorConfigs = dataConfigs
+    const colorConfigs: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.COLOR)
       .flatMap(config => config.rows || []);
-    const infoConfigs = dataConfigs
+    const infoConfigs: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
@@ -123,14 +140,14 @@ class BasicBarChart extends Chart {
     if (this.isHorizonDisplay) {
       chartDataSet.reverse();
     }
-    const xAxisColumns = (groupConfigs || []).map(config => {
+    const xAxisColumns: XAxisColumns[] = (groupConfigs || []).map(config => {
       return {
         type: 'category',
         tooltip: { show: true },
         data: UniqArray(chartDataSet.map(row => row.getCell(config))),
       };
     });
-    const yAxisNames = aggregateConfigs.map(getColumnRenderName);
+    const yAxisNames: string[] = aggregateConfigs.map(getColumnRenderName);
     const series = this.getSeries(
       settingConfigs,
       styleConfigs,
@@ -146,6 +163,7 @@ class BasicBarChart extends Chart {
       xAxis: this.getXAxis(styleConfigs, xAxisColumns),
       yAxis: this.getYAxis(styleConfigs, yAxisNames),
     };
+
     if (this.isStackMode) {
       this.makeStackSeries(styleConfigs, series);
     }
@@ -184,7 +202,7 @@ class BasicBarChart extends Chart {
     };
   }
 
-  private makePercentageYAxis(axisInfo) {
+  private makePercentageYAxis(axisInfo: { xAxis: XAxis; yAxis: YAxis }) {
     if (axisInfo.yAxis) {
       axisInfo.yAxis.min = 0;
       axisInfo.yAxis.max = 100;
@@ -198,15 +216,15 @@ class BasicBarChart extends Chart {
   }
 
   private getSeries(
-    settingConfigs,
-    styleConfigs,
-    colorConfigs,
+    settingConfigs: ChartStyleConfig[],
+    styleConfigs: ChartStyleConfig[],
+    colorConfigs: ChartDataSectionField[],
     chartDataSet: IChartDataSet<string>,
-    groupConfigs,
-    aggregateConfigs,
-    infoConfigs,
-    xAxisColumns,
-  ) {
+    groupConfigs: ChartDataSectionField[],
+    aggregateConfigs: ChartDataSectionField[],
+    infoConfigs: ChartDataSectionField[],
+    xAxisColumns: XAxisColumns[],
+  ): Series[] {
     const xAxisConfig = groupConfigs?.[0];
     if (!colorConfigs.length) {
       const flatSeries = aggregateConfigs.map(aggConfig => {
@@ -233,6 +251,7 @@ class BasicBarChart extends Chart {
       chartDataSet,
       colorConfigs[0],
     );
+
     const colorizeGroupedSeries = aggregateConfigs.flatMap(aggConfig => {
       return secondGroupInfos.map(sgCol => {
         const k = Object.keys(sgCol)[0];
@@ -247,11 +266,11 @@ class BasicBarChart extends Chart {
             styleConfigs,
             settingConfigs,
             chartDataSet,
-            sgCol,
+            aggConfig,
           ),
           name: k,
           data: xAxisColumns?.[0]?.data?.map(d => {
-            const row = dataSet.find(r => r.getCell(xAxisConfig) === d);
+            const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
             return {
               ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),
@@ -269,11 +288,11 @@ class BasicBarChart extends Chart {
   }
 
   private getBarSeriesImpl(
-    styleConfigs,
-    settingConfigs,
+    styleConfigs: ChartStyleConfig[],
+    settingConfigs: ChartStyleConfig[],
     chartDataSet: IChartDataSet<string>,
-    dataConfig,
-  ) {
+    dataConfig: ChartDataSectionField,
+  ): BarSeriesImpl {
     return {
       type: 'bar',
       sampling: 'average',
@@ -293,14 +312,17 @@ class BasicBarChart extends Chart {
     };
   }
 
-  private makeStackSeries(_, series) {
+  private makeStackSeries(_: ChartStyleConfig[], series: Series[]): Series[] {
     (series || []).forEach(s => {
       s['stack'] = this.isStackMode ? this.getStackName(1) : undefined;
     });
     return series;
   }
 
-  private makePercentageSeries(styles, series) {
+  private makePercentageSeries(
+    styles: ChartStyleConfig[],
+    series: Series[],
+  ): Series[] {
     const _getAbsValue = data => {
       if (typeof data === 'object' && data !== null && 'value' in data) {
         return Math.abs(data.value || 0);
@@ -308,7 +330,7 @@ class BasicBarChart extends Chart {
       return data;
     };
 
-    const _convertToPercentage = (data: [{ value: any }], totalArray: []) => {
+    const _convertToPercentage = (data, totalArray: number[]) => {
       return (data || []).map((d, dataIndex) => {
         const sum = totalArray[dataIndex];
         const percentageValue = toPrecision((_getAbsValue(d) / sum) * 100, 2);
@@ -336,7 +358,10 @@ class BasicBarChart extends Chart {
     return series;
   }
 
-  private getSeriesItemStyle(styles, itemStyle?) {
+  private getSeriesItemStyle(
+    styles: ChartStyleConfig[],
+    itemStyle?: { color: string | undefined },
+  ): BarBorderStyle {
     const [borderStyle, borderRadius] = getStyles(
       styles,
       ['bar'],
@@ -352,17 +377,17 @@ class BasicBarChart extends Chart {
     };
   }
 
-  private getSeriesBarGap(styles) {
+  private getSeriesBarGap(styles: ChartStyleConfig[]): number {
     const [gap] = getStyles(styles, ['bar'], ['gap']);
     return gap;
   }
 
-  private getSeriesBarWidth(styles) {
+  private getSeriesBarWidth(styles: ChartStyleConfig[]): number {
     const [width] = getStyles(styles, ['bar'], ['width']);
     return width;
   }
 
-  private getYAxis(styles, yAxisNames) {
+  private getYAxis(styles: ChartStyleConfig[], yAxisNames: string[]): YAxis {
     const [
       showAxis,
       inverse,
@@ -430,7 +455,10 @@ class BasicBarChart extends Chart {
     };
   }
 
-  private getXAxis(styles, xAxisColumns) {
+  private getXAxis(
+    styles: ChartStyleConfig[],
+    xAxisColumns: XAxisColumns[],
+  ): XAxis {
     const axisColumnInfo = xAxisColumns[0];
     const [
       showAxis,
@@ -488,15 +516,22 @@ class BasicBarChart extends Chart {
     };
   }
 
-  private getLegendStyle(styles, series) {
-    const seriesNames = (series || []).map((col: any) => col?.name);
+  private getLegendStyle(styles, series): LegendStyle {
+    const seriesNames: string[] = (series || []).map((col: any) => col?.name);
     const [show, type, font, legendPos, selectAll, height] = getStyles(
       styles,
       ['legend'],
       ['showLegend', 'type', 'font', 'position', 'selectAll', 'height'],
     );
-    let positions = {};
-    let orient = {};
+    let positions: {
+      width?: number;
+      height?: number;
+      top?: number;
+      left?: number;
+      right?: number;
+      bottom?: number;
+    } = {};
+    let orient = '';
 
     switch (legendPos) {
       case 'top':
@@ -516,7 +551,7 @@ class BasicBarChart extends Chart {
         positions = { right: 8, top: 16, bottom: 24, width: 96 };
         break;
     }
-    const selected = seriesNames.reduce(
+    const selected: { [x: string]: boolean } = seriesNames.reduce(
       (obj, name) => ({
         ...obj,
         [name]: selectAll,
@@ -536,7 +571,7 @@ class BasicBarChart extends Chart {
     };
   }
 
-  private getLabelStyle(styles) {
+  private getLabelStyle(styles): LabelStyle {
     const [show, position, font] = getStyles(
       styles,
       ['label'],
@@ -563,22 +598,22 @@ class BasicBarChart extends Chart {
     };
   }
 
-  private getSeriesStyle(styles) {
+  private getSeriesStyle(styles): { smooth: boolean; step: boolean } {
     const [smooth, step] = getStyles(styles, ['graph'], ['smooth', 'step']);
     return { smooth, step };
   }
 
-  private getStackName(index) {
+  private getStackName(index): string {
     return `total`;
   }
 
   private getTooltipFormatterFunc(
     chartDataSet: IChartDataSet<string>,
-    groupConfigs,
-    aggregateConfigs,
-    colorConfigs,
-    infoConfigs,
-  ) {
+    groupConfigs: ChartDataSectionField[],
+    aggregateConfigs: ChartDataSectionField[],
+    colorConfigs: ChartDataSectionField[],
+    infoConfigs: ChartDataSectionField[],
+  ): (params) => string {
     return seriesParams => {
       const params = Array.isArray(seriesParams)
         ? seriesParams
