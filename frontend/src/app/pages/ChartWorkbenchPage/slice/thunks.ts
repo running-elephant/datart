@@ -19,6 +19,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
+import { DrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { View } from 'app/types/View';
 import {
@@ -141,6 +142,7 @@ export const refreshDatasetAction = createAsyncThunk(
   'workbench/refreshDatasetAction',
   async (
     arg: {
+      drillOption?: DrillOption;
       pageInfo?;
       sorter?: { column: string; operator: string; aggOperator?: string };
     },
@@ -163,6 +165,7 @@ export const refreshDatasetAction = createAsyncThunk(
     );
     const requestParams = builder
       .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
+      .addDrillOption(arg?.drillOption)
       .build();
     return thunkAPI.dispatch(fetchDataSetAction(requestParams));
   },

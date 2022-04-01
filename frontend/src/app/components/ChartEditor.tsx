@@ -516,11 +516,12 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   ]);
 
   const handleDrillOptionChange = currentIndex => {
-    console.log(`currentIndex ---> `, currentIndex);
-    setDrillOption({
+    const newDrillOption = {
       paths: drillOption?.paths || [],
       current: currentIndex,
-    });
+    };
+    setDrillOption(newDrillOption);
+    dispatch(refreshDatasetAction({ drillOption: newDrillOption }));
   };
 
   return (

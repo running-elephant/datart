@@ -32,6 +32,7 @@ import {
   YAxis,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { DrillOption } from 'app/types/ChartDrillOption';
 import {
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
@@ -103,7 +104,11 @@ class BasicBarChart extends Chart {
       this.chart?.clear();
       return;
     }
-    const newOptions = this.getOptions(options.dataset, options.config);
+    const newOptions = this.getOptions(
+      options.dataset,
+      options.config,
+      options.drillOption,
+    );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
@@ -117,7 +122,11 @@ class BasicBarChart extends Chart {
       this.onUpdated(opt, context);
   }
 
-  getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
+  getOptions(
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    drillOption: DrillOption,
+  ) {
     const styleConfigs: ChartStyleConfig[] = config.styles || [];
     const dataConfigs: ChartDataConfig[] = config.datas || [];
     const settingConfigs: ChartStyleConfig[] = config.settings || [];
@@ -126,7 +135,7 @@ class BasicBarChart extends Chart {
       .flatMap(config => config.rows || [])
       .map(r =>
         r.category === ChartDataViewFieldCategory.Hierarchy
-          ? r.children?.[0]!
+          ? r.children?.[drillOption?.current || 0]!
           : r,
       );
     const aggregateConfigs: ChartDataSectionField[] = dataConfigs

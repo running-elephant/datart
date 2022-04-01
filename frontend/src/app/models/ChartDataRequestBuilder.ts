@@ -36,6 +36,7 @@ import {
 } from 'app/types/ChartDataRequest';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
+import { DrillOption } from 'app/types/ChartDrillOption';
 import { getValue } from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import {
@@ -54,6 +55,7 @@ export class ChartDataRequestBuilder {
   dataView;
   script: boolean;
   aggregation?: boolean;
+  drillOption?: DrillOption;
 
   constructor(
     dataView: Pick<ChartDataView, 'id' | 'computedFields'> & {
@@ -77,6 +79,11 @@ export class ChartDataRequestBuilder {
     if (!isEmptyArray(sorters)) {
       this.extraSorters = this.extraSorters.concat(sorters!);
     }
+    return this;
+  }
+
+  public addDrillOption(drillOption?: DrillOption) {
+    this.drillOption = drillOption;
     return this;
   }
 
@@ -139,7 +146,12 @@ export class ChartDataRequestBuilder {
           return acc.concat(
             cur.rows?.flatMap(r => {
               if (r.category === ChartDataViewFieldCategory.Hierarchy) {
-                return r?.children?.slice(0, 1) || [];
+                return (
+                  r?.children?.slice(
+                    this.drillOption?.current || 0,
+                    (this.drillOption?.current || 0) + 1,
+                  ) || []
+                );
               }
               return r;
             }) || [],
