@@ -58,11 +58,11 @@ public class ShareController extends BaseController {
 
     @ApiOperation(value = "update a share")
     @PutMapping(value = "{shareId}")
-    public ResponseData<Boolean> update(
+    public ResponseData<ShareInfo> update(
             @PathVariable String shareId,
             @Validated @RequestBody ShareUpdateParam updateParam) {
         updateParam.setId(shareId);
-        return ResponseData.success(shareService.update(updateParam));
+        return ResponseData.success(shareService.updateShare(updateParam));
     }
 
     @ApiOperation(value = "delete a share")
