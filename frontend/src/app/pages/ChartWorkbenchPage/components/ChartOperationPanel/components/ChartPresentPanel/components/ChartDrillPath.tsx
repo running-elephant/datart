@@ -23,30 +23,34 @@ import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 
-const ChartDrillPath: FC<{ drillOption?: DrillOption }> = memo(
-  ({ drillOption }) => {
-    if (!drillOption) return <div></div>;
+const ChartDrillPath: FC<{
+  drillOption?: DrillOption;
+  onChartDrillOptionChange?: (index: number) => void;
+}> = memo(({ drillOption, onChartDrillOptionChange }) => {
+  if (!drillOption) return <div></div>;
 
-    return (
-      <StyledChartDrillPath>
-        {drillOption?.paths?.map((p, index) => {
-          return (
-            <>
-              <StyledDrillNode isActive={drillOption?.current === index}>
-                {getColumnRenderName(p)}
-              </StyledDrillNode>
-              {index !== drillOption?.paths?.length - 1 ? (
-                <StyledIndicatorIcon />
-              ) : (
-                ''
-              )}
-            </>
-          );
-        })}
-      </StyledChartDrillPath>
-    );
-  },
-);
+  return (
+    <StyledChartDrillPath>
+      {drillOption?.paths?.map((p, index) => {
+        return (
+          <>
+            <StyledDrillNode
+              isActive={drillOption?.current === index}
+              onClick={() => onChartDrillOptionChange?.(index)}
+            >
+              {getColumnRenderName(p)}
+            </StyledDrillNode>
+            {index !== drillOption?.paths?.length - 1 ? (
+              <StyledIndicatorIcon />
+            ) : (
+              ''
+            )}
+          </>
+        );
+      })}
+    </StyledChartDrillPath>
+  );
+});
 
 export default ChartDrillPath;
 

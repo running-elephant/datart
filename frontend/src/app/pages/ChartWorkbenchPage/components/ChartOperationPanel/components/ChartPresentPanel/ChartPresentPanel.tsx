@@ -71,7 +71,8 @@ const ChartPresentPanel: FC<{
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
     const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
     const datasetLoadingStatus = useSelector(datasetLoadingSelector);
-    const { drillOption } = useContext(ChartDatasetContext);
+    const { drillOption, onChartDrillOptionChange } =
+      useContext(ChartDatasetContext);
 
     useMount(undefined, () => {
       Debugger.instance.measure(`ChartPresentPanel | Dispose Event`, () => {
@@ -99,12 +100,19 @@ const ChartPresentPanel: FC<{
     const menu = useMemo(() => {
       return (
         <Menu style={{ width: 200 }}>
-          {drillOption?.paths?.map(p => {
-            return <Menu.Item key={p.uid}>{getColumnRenderName(p)}</Menu.Item>;
+          {drillOption?.paths?.map((p, index) => {
+            return (
+              <Menu.Item
+                key={p.uid}
+                onClick={() => onChartDrillOptionChange?.(index)}
+              >
+                {getColumnRenderName(p)}
+              </Menu.Item>
+            );
           })}
         </Menu>
       );
-    }, [drillOption?.paths]);
+    }, [drillOption?.paths, onChartDrillOptionChange]);
 
     const renderReusableChartContainer = () => {
       const style = {
@@ -129,11 +137,7 @@ const ChartPresentPanel: FC<{
                 document.getElementById('reusable-container')!
               }
             >
-              <div
-                id="reusable-container"
-                style={{ height: '100%' }}
-                onContextMenu={props => console.log('Click ----> ', props)}
-              >
+              <div id="reusable-container" style={{ height: '100%' }}>
                 {renderGraph(containerId, chart, chartConfig, style)}
               </div>
             </Dropdown>
@@ -185,7 +189,10 @@ const ChartPresentPanel: FC<{
         )}
         <Row justify="space-between">
           <Col>
-            <ChartDrillPath drillOption={drillOption} />
+            <ChartDrillPath
+              drillOption={drillOption}
+              onChartDrillOptionChange={onChartDrillOptionChange}
+            />
           </Col>
           <Col>{renderChartTypeSelector()}</Col>
         </Row>

@@ -56,6 +56,7 @@ const ChartWorkbench: FC<{
   onDataViewChange?: () => void;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
+  onChartDrillOptionChange?: (index: number) => void;
 }> = memo(
   ({
     dataset,
@@ -73,6 +74,7 @@ const ChartWorkbench: FC<{
     onDataViewChange,
     onRefreshDataset,
     onCreateDownloadDataTask,
+    onChartDrillOptionChange,
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
@@ -88,6 +90,7 @@ const ChartWorkbench: FC<{
             dataset: dataset,
             drillOption: drillOption,
             onRefreshDataset: onRefreshDataset,
+            onChartDrillOptionChange,
           }}
         >
           <ChartDataViewContext.Provider

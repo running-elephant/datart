@@ -515,6 +515,14 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     widgetId,
   ]);
 
+  const handleDrillOptionChange = currentIndex => {
+    console.log(`currentIndex ---> `, currentIndex);
+    setDrillOption({
+      paths: drillOption?.paths || [],
+      current: currentIndex,
+    });
+  };
+
   return (
     <StyledChartWorkbenchPage>
       <SaveFormContext.Provider value={saveFormContextValue}>
@@ -541,6 +549,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           allowQuery={allowQuery}
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}
+          onChartDrillOptionChange={handleDrillOptionChange}
           onDataViewChange={handleDataViewChanged}
           onRefreshDataset={handleRefreshDataset}
           onCreateDownloadDataTask={handleCreateDownloadDataTask}

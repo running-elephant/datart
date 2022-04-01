@@ -24,6 +24,7 @@ const ChartDatasetContext = createContext<{
   dataset?: ChartDataSetDTO;
   drillOption?: DrillOption;
   onRefreshDataset?: () => void;
+  onChartDrillOptionChange?: (index: number) => void;
 }>({
   dataset: {},
   onRefreshDataset: undefined,
