@@ -21,8 +21,9 @@ import useRouteQuery from 'app/hooks/useRouteQuery';
 import ChartManager from 'app/models/ChartManager';
 import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
+import { getToken } from 'utils/auth';
 import persistence from 'utils/persistence';
 import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
 import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';
@@ -33,8 +34,9 @@ import { urlSearchTransfer } from '../MainPage/pages/VizPage/utils';
 import { useStoryBoardSlice } from '../StoryBoardPage/slice';
 import { selectShareStoryBoard } from '../StoryBoardPage/slice/selectors';
 import PasswordModal from './PasswordModal';
+import ShareLoginModal from './ShareLoginModal';
 import { useShareSlice } from './slice';
-import { selectNeedPassword, selectShareVizType } from './slice/selectors';
+import { selectNeedVerify, selectShareVizType } from './slice/selectors';
 import { fetchShareVizInfo } from './slice/thunks';
 import { StoryPlayerForShare } from './StoryPlayerForShare';
 
@@ -46,17 +48,17 @@ function ShareStoryPlayer() {
 
   const dispatch = useDispatch();
   const location = useLocation();
+  const { params }: { params: { token: string } } = useRouteMatch();
   const search = location.search;
+  const shareToken = params.token;
+  const logged = !!getToken();
 
-  const needPassword = useSelector(selectNeedPassword);
+  const needVerify = useSelector(selectNeedVerify);
   const shareStory = useSelector(selectShareStoryBoard);
   const vizType = useSelector(selectShareVizType);
 
-  const shareToken = useRouteQuery({
-    key: 'token',
-  }) as string;
-  const usePassword = useRouteQuery({
-    key: 'usePassword',
+  const shareType = useRouteQuery({
+    key: 'type',
   });
   // in timed task eager=true for disable board lazyLoad
   const eager = useRouteQuery({
@@ -69,13 +71,18 @@ function ShareStoryPlayer() {
   }, [search]);
 
   const loadVizData = () => {
-    if (Boolean(usePassword)) {
+    if (shareType === 'CODE') {
       const previousPassword = persistence.session.get(shareToken);
+
       if (previousPassword) {
-        fetchShareVizInfoImpl(shareToken, previousPassword, searchParams);
+        if (shareType === 'CODE') {
+          fetchShareVizInfoImpl(shareToken, previousPassword, searchParams);
+        }
       } else {
-        dispatch(actions.saveNeedPassword(true));
+        dispatch(actions.saveNeedVerify(true));
       }
+    } else if (shareType === 'LOGIN' && !logged) {
+      fetchShareVizInfoImpl(shareToken, undefined, searchParams);
     } else {
       fetchShareVizInfoImpl(shareToken, undefined, searchParams);
     }
@@ -92,6 +99,8 @@ function ShareStoryPlayer() {
     token?: string,
     pwd?: string,
     params?: FilterSearchParams,
+    loginUser?: string,
+    loginPwd?: string,
   ) => {
     dispatch(
       fetchShareVizInfo({
@@ -99,26 +108,40 @@ function ShareStoryPlayer() {
         sharePassword: pwd,
         filterSearchParams: params,
         renderMode,
+        userName: loginUser,
+        passWord: loginPwd,
       }),
     );
   };
 
   return (
     <StyledWrapper className="datart-viz">
+      <ShareLoginModal
+        visible={Boolean(needVerify) && shareType === 'LOGIN'}
+        onChange={({ username, password }) => {
+          fetchShareVizInfoImpl(
+            shareToken,
+            undefined,
+            searchParams,
+            username,
+            password,
+          );
+        }}
+      />
       <PasswordModal
-        visible={Boolean(needPassword) && Boolean(usePassword)}
+        visible={Boolean(needVerify) && shareType === 'CODE'}
         onChange={sharePassword => {
           fetchShareVizInfoImpl(shareToken, sharePassword);
         }}
       />
-      {!vizType && !needPassword && (
+      {!vizType && !needVerify && (
         <div className="loading-container">
           <BoardLoading />
         </div>
       )}
 
-      {!Boolean(needPassword) && vizType === 'STORYBOARD' && shareStory && (
-        <StoryPlayerForShare storyBoard={shareStory} />
+      {!Boolean(needVerify) && vizType === 'STORYBOARD' && shareStory && (
+        <StoryPlayerForShare storyBoard={shareStory} shareToken={shareToken} />
       )}
     </StyledWrapper>
   );

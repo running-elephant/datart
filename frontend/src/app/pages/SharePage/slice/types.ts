@@ -24,7 +24,7 @@ import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { ChartDTO } from 'app/types/ChartDTO';
 
 export interface SharePageState {
-  needPassword?: boolean;
+  needVerify?: boolean;
   vizType?: VizType;
   shareToken: string;
   executeToken?: string;
@@ -49,7 +49,5 @@ export interface ShareExecuteParams {
   password: string | undefined;
 }
 export interface ExecuteToken {
-  password: string | undefined;
-  token: string;
-  usePassword: boolean;
+  authorizedToken: string;
 }

@@ -65,7 +65,19 @@ export interface BoardActionContextProps {
     renderMode: VizRenderMode,
   ) => void;
   updateBoard?: (callback?: () => void) => void;
-  onGenerateShareLink?: (date, usePwd) => any;
+  onGenerateShareLink?: ({
+    expiryDate,
+    authenticationMode,
+    roles,
+    users,
+    rowPermissionBy,
+  }: {
+    expiryDate: string;
+    authenticationMode: string;
+    roles: string[];
+    users: string[];
+    rowPermissionBy: string;
+  }) => any;
   onBoardToDownLoad: () => any;
   onWidgetsQuery: (editing: boolean, renderMode: VizRenderMode) => any;
   onWidgetsReset: (renderMode: VizRenderMode) => any;
@@ -159,13 +171,22 @@ export const BoardActionProvider: FC<{ id: string }> = memo(
         dispatch(toUpdateDashboard({ boardId, callback }));
       },
 
-      onGenerateShareLink: async (expireDate, enablePassword) => {
-        const result = await generateShareLinkAsync(
-          expireDate,
-          enablePassword,
-          boardId,
-          'DASHBOARD',
-        );
+      onGenerateShareLink: async ({
+        expiryDate,
+        authenticationMode,
+        roles,
+        users,
+        rowPermissionBy,
+      }) => {
+        const result = await generateShareLinkAsync({
+          expiryDate,
+          authenticationMode,
+          roles,
+          users,
+          rowPermissionBy,
+          vizId: boardId,
+          vizType: 'DASHBOARD',
+        });
         return result;
       },
 

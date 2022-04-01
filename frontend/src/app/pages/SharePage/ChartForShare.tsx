@@ -17,7 +17,6 @@
  */
 
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
-import { VizHeader } from 'app/components/VizHeader';
 import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartManager from 'app/models/ChartManager';
@@ -26,7 +25,6 @@ import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import { FC, memo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { ChartDataRequestBuilder } from '../../models/ChartDataRequestBuilder';
 import ControllerPanel from '../MainPage/pages/VizPage/ChartPreview/components/ControllerPanel';
 import {
   ChartPreview,
@@ -44,11 +42,7 @@ const TitleHeight = 100;
 const ChartForShare: FC<{
   chartPreview?: ChartPreview;
   filterSearchParams?: FilterSearchParams;
-  onCreateDataChartDownloadTask: (
-    downloadParams: ChartDataRequest[],
-    fileName: string,
-  ) => void;
-}> = memo(({ chartPreview, onCreateDataChartDownloadTask }) => {
+}> = memo(({ chartPreview }) => {
   const dispatch = useDispatch();
   const [chart] = useState<IChart | undefined>(() => {
     const currentChart = ChartManager.instance().getById(
@@ -119,41 +113,8 @@ const ChartForShare: FC<{
     );
   };
 
-  const handleCreateDownloadDataTask = async () => {
-    const builder = new ChartDataRequestBuilder(
-      {
-        id: chartPreview?.backendChart?.viewId,
-        computedFields:
-          chartPreview?.backendChart?.config?.computedFields || [],
-      } as any,
-      chartPreview?.chartConfig?.datas,
-      chartPreview?.chartConfig?.settings,
-      {},
-      false,
-      chartPreview?.backendChart?.config?.aggregation,
-    );
-
-    const downloadParams = [
-      {
-        ...builder.build(),
-        analytics: false,
-        vizType: 'dataChart',
-        vizName: chartPreview?.backendChart?.name || 'chart',
-        vizId: chartPreview?.backendChart?.id,
-      },
-    ];
-    const fileName = chartPreview?.backendChart?.name || 'chart';
-    onCreateDataChartDownloadTask(downloadParams, fileName);
-  };
-
   return (
     <StyledChartPreviewBoard>
-      <VizHeader
-        chartName={chartPreview?.backendChart?.name}
-        onDownloadData={handleCreateDownloadDataTask}
-        allowShare
-        allowDownload
-      />
       <div ref={controlRef}>
         <ControllerPanel
           viewId={chartPreview?.backendChart?.viewId}

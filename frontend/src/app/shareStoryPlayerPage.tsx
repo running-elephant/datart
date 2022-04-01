@@ -22,7 +22,7 @@ import { registerTheme } from 'echarts';
 import { antdLocales } from 'locales/i18n';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { GlobalStyles } from 'styles/globalStyles';
 import { LazyShareStoryPlayer } from './pages/SharePage/LoadableStoryPlayer';
 
@@ -40,7 +40,12 @@ export function ShareStoryPlayerPage() {
         >
           <meta name="description" content="Data Art" />
         </Helmet>
-        <LazyShareStoryPlayer />
+        <Switch>
+          <Route
+            path="/shareStoryPlayer/:token"
+            component={LazyShareStoryPlayer}
+          />
+        </Switch>
         <GlobalStyles />
       </BrowserRouter>
     </ConfigProvider>

@@ -36,7 +36,17 @@ import {
 } from 'styles/StyleConstants';
 import { getToken } from 'utils/auth';
 
-export function LoginForm() {
+export function LoginForm({
+  noSwithUser = false,
+  noForget = false,
+  noRegister = false,
+  onPropsLogin,
+}: {
+  noSwithUser?: boolean;
+  noForget?: boolean;
+  noRegister?: boolean;
+  onPropsLogin?: () => {};
+}) {
   const [switchUser, setSwitchUser] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
@@ -88,7 +98,7 @@ export function LoginForm() {
 
   return (
     <AuthForm>
-      {logged && !switchUser ? (
+      {logged && !switchUser && !noSwithUser ? (
         <>
           <h2>{t('alreadyLoggedIn')}</h2>
           <UserPanel onClick={toApp}>
@@ -100,7 +110,7 @@ export function LoginForm() {
           </Button>
         </>
       ) : (
-        <Form form={form} onFinish={onLogin}>
+        <Form form={form} onFinish={onPropsLogin || onLogin}>
           <Form.Item
             name="username"
             rules={[
@@ -142,10 +152,19 @@ export function LoginForm() {
               </Button>
             )}
           </Form.Item>
-          <Links>
-            <LinkButton to="/forgetPassword">{t('forgotPassword')}</LinkButton>
-            <LinkButton to="/register">{t('register')}</LinkButton>
-          </Links>
+          {(!noForget || !noRegister) && (
+            <Links>
+              {!noForget && (
+                <LinkButton to="/forgetPassword">
+                  {t('forgotPassword')}
+                </LinkButton>
+              )}
+              {!noRegister && (
+                <LinkButton to="/register">{t('register')}</LinkButton>
+              )}
+            </Links>
+          )}
+
           {Oauth2BtnList}
         </Form>
       )}
@@ -159,12 +178,12 @@ const Links = styled.div`
 
 const Oauth2Button = styled.a`
   display: block;
-  background-color: blue;
-  text-align: center;
-  color: #fff;
+  height: 36px;
   font-weight: bold;
   line-height: 36px;
-  height: 36px;
+  color: #fff;
+  text-align: center;
+  background-color: blue;
 `;
 
 const LinkButton = styled(Link)`

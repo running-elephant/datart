@@ -16,6 +16,30 @@
  * limitations under the License.
  */
 
-export { default as ShareLinkModal } from './components/ShareLinkModal';
-export { default as ShareManageModal } from './components/ShareManageModal';
-export { default as VizOperationMenu } from './VizOperationMenu';
+export enum authEnticationModeType {
+  none = 'NONE',
+  code = 'CODE',
+  login = 'LOGIN',
+}
+
+export enum rowPermissionByType {
+  creator = 'CREATOR',
+  visitor = 'VISITOR',
+}
+
+export interface shareDetailType {
+  authenticationMode: authEnticationModeType;
+  createBy: string;
+  createTime: string | Date;
+  expiryDate: string | Date;
+  id: string;
+  orgId: string;
+  permission: null;
+  roles: null | string[];
+  users: null | string[];
+  rowPermissionBy: rowPermissionByType;
+  updateBy: null;
+  updateTime: null | Date;
+  vizId: string;
+  vizType: 'DATACHART' | 'DASHBOARD' | 'STORYBOARD';
+}
