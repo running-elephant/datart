@@ -64,4 +64,8 @@ public interface UserService extends BaseCRUDService<User, UserMapperExt> {
     boolean addUserToOrg(UserAddParam userAddParam, String orgId) throws MessagingException, UnsupportedEncodingException;
 
     boolean deleteUserFromOrg(String orgId, String userId);
+
+    boolean updateUserFromOrg(UserUpdateByIdParam userUpdateParam, String orgId);
+
+    UserUpdateByIdParam selectUserById(String userId, String orgId);
 }

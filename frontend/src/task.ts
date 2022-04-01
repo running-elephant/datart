@@ -85,9 +85,9 @@ const getChartQueryData = (dataStr: string) => {
   const chartConfig: ChartConfig = dataConfig.chartConfig as ChartConfig;
   const builder = new ChartDataRequestBuilder(
     {
-      id: data.viewId,
+      ...data.view,
       computedFields: dataConfig.computedFields || [],
-    } as any,
+    },
     chartConfig?.datas,
     chartConfig?.settings,
     {},

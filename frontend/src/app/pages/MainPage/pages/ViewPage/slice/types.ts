@@ -17,13 +17,13 @@
  */
 
 import { TreeDataNode, TreeNodeProps } from 'antd';
+import { DataViewFieldType } from 'app/constants';
 import { ReactElement } from 'react';
 import { View } from '../../../../../types/View';
 import { SubjectTypes } from '../../PermissionPage/constants';
 import { RowPermissionRaw, Variable } from '../../VariablePage/slice/types';
 import {
   ColumnCategories,
-  ColumnTypes,
   ViewStatus,
   ViewViewModelStages,
 } from '../constants';
@@ -117,7 +117,7 @@ export interface PageInfo {
 export interface Schema {
   name: string;
   primaryKey?: boolean;
-  type: ColumnTypes;
+  type: DataViewFieldType;
 }
 
 export enum ColumnRole {

@@ -161,6 +161,7 @@ const VizHeader: FC<{
         />
         {showShareLinkModal && (
           <ShareLinkModal
+            vizType="DATACHART"
             visibility={showShareLinkModal}
             onOk={handleCloseShareLinkModal}
             onCancel={handleCloseShareLinkModal}

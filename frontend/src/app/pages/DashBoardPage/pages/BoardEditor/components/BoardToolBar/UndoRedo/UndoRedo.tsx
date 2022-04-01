@@ -18,54 +18,32 @@
 import { RedoOutlined, UndoOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BOARD_UNDO } from 'app/pages/DashBoardPage/constants';
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { ActionCreators } from 'redux-undo';
+import { FC, MouseEventHandler, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { selectFutureState, selectPastState } from '../../../slice/selectors';
 
-export const UndoBtn = () => {
-  const t = useI18NPrefix(`viz.board.action`);
-
+export const UndoBtn: FC<{
+  fn: MouseEventHandler<HTMLElement> | undefined;
+  title: string;
+}> = ({ fn, title }) => {
   const pastState = useSelector(selectPastState);
-  const dispatch = useDispatch();
-  const Undo = useCallback(() => {
-    dispatch({ type: BOARD_UNDO.undo });
-  }, [dispatch]);
   const canUndo = useMemo(() => !!pastState.length, [pastState.length]);
-  useEffect(() => {
-    if (pastState.length === 1) {
-      if (Object.keys(pastState[0]).length === 0) {
-        dispatch(ActionCreators.clearHistory());
-      }
-    }
-  }, [dispatch, pastState]);
   return (
-    <Tooltip title={t('undo')}>
-      <ToolbarButton
-        disabled={!canUndo}
-        onClick={Undo}
-        icon={<UndoOutlined />}
-      />
+    <Tooltip title={title}>
+      <ToolbarButton disabled={!canUndo} onClick={fn} icon={<UndoOutlined />} />
     </Tooltip>
   );
 };
-export const RedoBtn = () => {
-  const t = useI18NPrefix(`viz.board.action`);
+export const RedoBtn: FC<{
+  fn: MouseEventHandler<HTMLElement> | undefined;
+  title: string;
+}> = ({ fn, title }) => {
   const futureState = useSelector(selectFutureState);
-  const dispatch = useDispatch();
-  const Redo = useCallback(() => {
-    dispatch({ type: BOARD_UNDO.redo });
-  }, [dispatch]);
+
   const canRedo = useMemo(() => !!futureState.length, [futureState.length]);
   return (
-    <Tooltip title={t('redo')}>
-      <ToolbarButton
-        disabled={!canRedo}
-        onClick={Redo}
-        icon={<RedoOutlined />}
-      />
+    <Tooltip title={title}>
+      <ToolbarButton disabled={!canRedo} onClick={fn} icon={<RedoOutlined />} />
     </Tooltip>
   );
 };

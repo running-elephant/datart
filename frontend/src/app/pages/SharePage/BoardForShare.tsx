@@ -23,7 +23,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { BoardProvider } from '../DashBoardPage/components/BoardProvider/BoardProvider';
+import { BoardInitProvider } from '../DashBoardPage/components/BoardProvider/BoardInitProvider';
 import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel';
 import { AutoBoardCore } from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
 import { FreeBoardCore } from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
@@ -117,7 +117,7 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
       let boardType = dashboard?.config?.type;
       if (!dashboard || !boardType) return null;
       return (
-        <BoardProvider
+        <BoardInitProvider
           board={dashboard}
           editing={false}
           autoFit={false}
@@ -139,7 +139,7 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
             {boardType === 'free' && <FreeBoardCore boardId={dashboard.id} />}
             <FullScreenPanel />
           </Wrapper>
-        </BoardProvider>
+        </BoardInitProvider>
       );
     }, [
       allowDownload,

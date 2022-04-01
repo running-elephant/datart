@@ -2,6 +2,7 @@
   "global": {
     "copy": "副本",
     "tokenExpired": "会话过期，请重新登录",
+    "401": "未登录或会话过期，请重新登录",
     "title": {
       "action": "操作"
     },
@@ -17,7 +18,8 @@
       "close": "关闭",
       "saveAs": "另存为",
       "cancel": "取消",
-      "ok": "确定"
+      "ok": "确定",
+      "shortcuts": "快捷键"
     },
     "operation": {
       "archiveConfirm": "确定移至回收站？",
@@ -829,7 +831,8 @@
         "paste": "粘贴",
         "deviceSwitch": "设备切换",
         "allowOverlap": "允许组件重叠",
-        "forbidOverlap": "禁止组件重叠"
+        "forbidOverlap": "禁止组件重叠",
+        "multiSelect": "多选"
       },
       "controlTypes": {
         "common": "常规",
@@ -1053,6 +1056,7 @@
     "resultEmpty1": "请点击 ",
     "resultEmpty2": " 按钮执行，运行结果将在此处展示",
     "errorTitle": "执行错误",
+    "sqlRequired": "SQL 语句不能为空",
     "sqlRunWraning": "SQL 解析失败，欢迎一键提交 issue 帮助我们优化。",
     "detail": "查看详情",
     "warningDescription": "Datart 默认使用 calcite 解析 SQL 语句；calcite 拥有的非常棒的语法解析器，但依然做不到解析所有数据库的所有语法。当发生解析异常时，datart 对 SQL 语句进行必要的处理之后仍然会发送到数据库执行，如果可以执行成功，我们会认为解析器需要针对该条 SQL 语句的语法进行优化。在这种情况下，datart 会显示该警告信息，方便用户将解析异常的语句提交到 github 或 gitee issue，帮助我们优化解析器。",

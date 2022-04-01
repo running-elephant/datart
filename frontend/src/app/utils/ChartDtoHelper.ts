@@ -67,9 +67,7 @@ export function buildUpdateChartRequest({
   };
 }
 
-export function extractChartConfigValueModel(
-  config: ChartConfig,
-): ChartConfigDTO {
+function extractChartConfigValueModel(config: ChartConfig): ChartConfigDTO {
   return {
     datas: config?.datas,
     styles: getStyleValueModel(config?.styles),
@@ -92,9 +90,9 @@ function getStyleValueModel(styles?: ChartStyleConfig[]) {
 export function mergeToChartConfig(
   target?: ChartConfig,
   source?: ChartDetailConfigDTO,
-): ChartConfig {
+): ChartConfig | undefined {
   if (!target) {
-    return source! as any;
+    return undefined;
   }
   if (!source) {
     return target;

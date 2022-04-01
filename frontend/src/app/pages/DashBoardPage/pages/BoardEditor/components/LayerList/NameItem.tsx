@@ -38,8 +38,8 @@ export interface NameItemProps {
   moveCard: (
     dragIndex: number,
     hoverIndex: number,
-    dragZindex: number,
-    hoverZindex: number,
+    dragZIndex: number,
+    hoverZIndex: number,
   ) => void;
   moveEnd: () => void;
   card: NameCard;
@@ -75,8 +75,8 @@ const NameItem: React.FC<NameItemProps> = ({
       const dragIndex = item.index;
       const hoverIndex = index;
 
-      const dragZindex = item.zIndex;
-      const hoverZindex = card.index;
+      const dragZIndex = item.zIndex;
+      const hoverZIndex = card.index;
       const hoverSelected = card.selected;
       // Don't replace items with themselves
       if (dragIndex === hoverIndex) {
@@ -111,14 +111,14 @@ const NameItem: React.FC<NameItemProps> = ({
       }
 
       // Time to actually perform the action
-      moveCard(dragIndex, hoverIndex, dragZindex, hoverZindex);
+      moveCard(dragIndex, hoverIndex, dragZIndex, hoverZIndex);
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
       item.index = hoverIndex;
-      item.zIndex = hoverZindex;
+      item.zIndex = hoverZIndex;
       item.selected = hoverSelected;
     },
   });
@@ -142,17 +142,14 @@ const NameItem: React.FC<NameItemProps> = ({
   const selectWidget = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
-
-      const { altKey, metaKey } = e;
-      const multipleKey = altKey || metaKey;
-
-      let newSelected = card.selected;
-      if (multipleKey || card.selected === false) {
-        newSelected = !newSelected;
+      let newSelected = !card.selected;
+      if (card.selected) {
+        newSelected = card.selected;
       }
+
       dispatch(
         editWidgetInfoActions.selectWidget({
-          multipleKey,
+          multipleKey: e.shiftKey,
           id: card.id,
           selected: newSelected,
         }),
@@ -162,7 +159,11 @@ const NameItem: React.FC<NameItemProps> = ({
   );
 
   return (
-    <ItemWrap selected={card.selected} onClick={selectWidget}>
+    <ItemWrap
+      selected={card.selected}
+      onMouseDown={selectWidget}
+      onClick={e => e.stopPropagation()}
+    >
       <div
         className={classNames('name-item', {
           'selected-Item': card.selected,

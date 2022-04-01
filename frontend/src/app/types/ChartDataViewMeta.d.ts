@@ -18,8 +18,9 @@
 
 import {
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from './ChartDataView';
+  ChartDataViewSubType,
+  DataViewFieldType,
+} from 'app/constants';
 
 export type ChartDataViewMeta = {
   id: string;
@@ -28,6 +29,9 @@ export type ChartDataViewMeta = {
   selectedItems?: Array<ChartDataViewMeta>;
   primaryKey?: boolean;
   category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
-  type?: ChartDataViewFieldType;
+  type?: DataViewFieldType;
+  subType?: ChartDataViewSubType;
   expression?: string;
+  role?: string;
+  children?: ChartDataViewMeta[];
 };

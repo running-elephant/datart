@@ -19,7 +19,8 @@
 import { Empty } from 'antd';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
+import { WidgetConfAndInfoProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetConfAndInfoProvider';
 import {
   LAYOUT_COLS_MAP,
   RGL_DRAG_HANDLE,
@@ -50,6 +51,7 @@ const ReactGridLayout = WidthProvider(RGL);
 
 export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
+  const { boardId } = useContext(BoardContext);
   const boardConfig = useContext(BoardConfigContext);
   const { margin, background, allowOverlap } = boardConfig;
   const { deviceType } = useContext(BoardInfoContext);
@@ -123,13 +125,17 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     return sortedLayoutWidgets.map(item => {
       return (
         <div key={item.id}>
-          <WidgetAllProvider id={item.id}>
+          <WidgetConfAndInfoProvider
+            id={item.id}
+            boardEditing={true}
+            boardId={boardId}
+          >
             <WidgetOfAutoEditor />
-          </WidgetAllProvider>
+          </WidgetConfAndInfoProvider>
         </div>
       );
     });
-  }, [sortedLayoutWidgets]);
+  }, [boardId, sortedLayoutWidgets]);
 
   /**
    * https://www.npmjs.com/package/react-grid-layout

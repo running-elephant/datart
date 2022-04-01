@@ -21,7 +21,7 @@ import { message, Popover, Tooltip, TreeSelect } from 'antd';
 import { ToolbarButton } from 'app/components';
 import {
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
+  DataViewFieldType,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
@@ -234,15 +234,15 @@ const ChartDataViewPanel: FC<{
     const stringFields =
       (dataView?.meta || [])
         .concat(dataView?.computedFields || [])
-        ?.filter(f => f.type === ChartDataViewFieldType.STRING) || [];
+        ?.filter(f => f.type === DataViewFieldType.STRING) || [];
     const numericFields =
       (dataView?.meta || [])
         .concat(dataView?.computedFields || [])
-        ?.filter(f => f.type === ChartDataViewFieldType.NUMERIC) || [];
+        ?.filter(f => f.type === DataViewFieldType.NUMERIC) || [];
     const dateFields =
       (dataView?.meta || [])
         .concat(dataView?.computedFields || [])
-        ?.filter(f => f.type === ChartDataViewFieldType.DATE) || [];
+        ?.filter(f => f.type === DataViewFieldType.DATE) || [];
     return [...dateFields, ...stringFields, ...numericFields];
   };
 

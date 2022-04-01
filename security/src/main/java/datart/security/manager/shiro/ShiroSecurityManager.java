@@ -38,13 +38,11 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 
 
 @Slf4j
@@ -71,7 +69,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
 
     @Override
     public void login(PasswordToken token) throws RuntimeException {
-
+        logoutCurrent();
         User user = userMapper.selectByNameOrEmail(token.getSubject());
         if (user == null) {
             Exceptions.tr(BaseException.class, "login.fail");
@@ -90,7 +88,17 @@ public class ShiroSecurityManager implements DatartSecurityManager {
     }
 
     @Override
+    public boolean validateUser(String username, String password) throws AuthException {
+        User user = userMapper.selectByNameOrEmail(username);
+        if (user == null) {
+            return false;
+        }
+        return BCrypt.checkpw(password, user.getPassword()) || Objects.equals(password, user.getPassword());
+    }
+
+    @Override
     public String login(String jwtToken) throws AuthException {
+        logoutCurrent();
         PasswordToken passwordToken = JwtUtils.toPasswordToken(jwtToken);
         if (!JwtUtils.validTimeout(passwordToken)) {
             Exceptions.tr(AuthException.class, "login.session.timeout");
@@ -111,7 +119,9 @@ public class ShiroSecurityManager implements DatartSecurityManager {
     public void logoutCurrent() {
         permissionDataCache.clear();
         Subject subject = SecurityUtils.getSubject();
-        subject.logout();
+        if (subject != null) {
+            subject.logout();
+        }
     }
 
     @Override
@@ -249,7 +259,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
 
     @Override
     public void releaseRunAs() {
-        SecurityUtils.getSubject().releaseRunAs();
+        logoutCurrent();
     }
 
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { LoadingOutlined } from '@ant-design/icons';
-import { BoardProvider } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
+import { BoardInitProvider } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInitProvider';
 import { FullScreenPanel } from 'app/pages/DashBoardPage/components/FullScreenPanel';
 import { AutoBoardCore } from 'app/pages/DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
 import { FreeBoardCore } from 'app/pages/DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
@@ -34,6 +34,7 @@ export const BoardPageItem: React.FC<BoardPageItemProps> = memo(
     const dashboard = useSelector((state: { board: BoardState }) =>
       makeSelectBoardConfigById()(state, boardId),
     );
+
     if (!dashboard)
       return (
         <div>
@@ -42,7 +43,7 @@ export const BoardPageItem: React.FC<BoardPageItemProps> = memo(
       );
     let boardType = dashboard?.config?.type;
     return (
-      <BoardProvider
+      <BoardInitProvider
         board={dashboard}
         editing={false}
         autoFit={false}
@@ -53,7 +54,7 @@ export const BoardPageItem: React.FC<BoardPageItemProps> = memo(
           {boardType === 'free' && <FreeBoardCore boardId={dashboard.id} />}
           <FullScreenPanel />
         </Wrapper>
-      </BoardProvider>
+      </BoardInitProvider>
     );
   },
 );

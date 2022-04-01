@@ -37,15 +37,17 @@ const ChartGraphPanel: FC<{
   const [requirementsStates, setRequirementStates] = useState<object>({});
 
   useLayoutEffect(() => {
-    const dict = allCharts?.reduce((acc, cur) => {
-      const transferedChartConfig = transferChartDataConfig(
-        CloneValueDeep(cur?.config), // TODO(Stephen): should be make transfer login immutable to avoid targetConfig unexpected changed
-        chartConfig,
-      ) as ChartConfig;
-      acc[cur.meta.id] = cur?.isMatchRequirement(transferedChartConfig);
-      return acc;
-    }, {});
-    setRequirementStates(dict);
+    if (allCharts) {
+      const dict = allCharts?.reduce((acc, cur) => {
+        const transferedChartConfig = transferChartDataConfig(
+          { datas: CloneValueDeep(cur?.config?.datas || []) },
+          { datas: chartConfig?.datas },
+        );
+        acc[cur.meta.id] = cur?.isMatchRequirement(transferedChartConfig);
+        return acc;
+      }, {});
+      setRequirementStates(dict);
+    }
   }, [allCharts, chartConfig]);
 
   return (

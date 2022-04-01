@@ -19,7 +19,7 @@
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
-  ChartDataViewFieldType,
+  DataViewFieldType,
   FilterConditionType,
   SortActionType,
 } from 'app/constants';
@@ -46,16 +46,18 @@ import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 
 export class ChartDataRequestBuilder {
+  extraSorters: ChartDataRequest['orders'] = [];
   chartDataConfigs: ChartDataConfig[];
-  charSettingConfigs: ChartStyleConfigDTO[];
-  pageInfo: ChartDatasetPageInfo;
-  dataView: ChartDataView;
+  charSettingConfigs;
+  pageInfo;
+  dataView;
   script: boolean;
   aggregation?: boolean;
-  private extraSorters: ChartDataRequest['orders'] = [];
 
   constructor(
-    dataView: ChartDataView,
+    dataView: Pick<ChartDataView, 'id' | 'computedFields'> & {
+      config: string | object;
+    },
     dataConfigs?: ChartDataConfig[],
     settingConfigs?: ChartStyleConfigDTO[],
     pageInfo?: ChartDatasetPageInfo,
@@ -98,11 +100,11 @@ export class ChartDataRequestBuilder {
         if (
           cur.type === ChartDataSectionType.MIXED &&
           cur.rows?.findIndex(
-            v => v.type === ChartDataViewFieldType.NUMERIC,
+            v => v.type === DataViewFieldType.NUMERIC,
           ) !== -1
         ) {
           return acc.concat(
-            cur.rows.filter(v => v.type === ChartDataViewFieldType.NUMERIC),
+            cur.rows.filter(v => v.type === DataViewFieldType.NUMERIC),
           );
         }
         return acc;
@@ -120,6 +122,12 @@ export class ChartDataRequestBuilder {
   }
 
   private buildGroups() {
+    /**
+     * If aggregation is off, do not add values to gruop
+     */
+    if (this.aggregation === false) {
+      return [];
+    }
     const groupColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
       (acc, cur) => {
         if (!cur.rows) {
@@ -135,8 +143,8 @@ export class ChartDataRequestBuilder {
           cur.type === ChartDataSectionType.MIXED &&
           cur.rows?.find(v =>
             [
-              ChartDataViewFieldType.DATE,
-              ChartDataViewFieldType.STRING,
+              DataViewFieldType.DATE,
+              DataViewFieldType.STRING,
             ].includes(v.type),
           )
         ) {
@@ -144,8 +152,8 @@ export class ChartDataRequestBuilder {
           return acc.concat(
             cur.rows.filter(
               v =>
-                v.type === ChartDataViewFieldType.DATE ||
-                v.type === ChartDataViewFieldType.STRING,
+                v.type === DataViewFieldType.DATE ||
+                v.type === DataViewFieldType.STRING,
             ),
           );
         }

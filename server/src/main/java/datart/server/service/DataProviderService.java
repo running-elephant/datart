@@ -30,13 +30,15 @@ public interface DataProviderService {
 
     Dataframe execute(ViewExecuteParam viewExecuteParam) throws Exception;
 
+    Dataframe execute(ViewExecuteParam viewExecuteParam, boolean checkViewPermission) throws Exception;
+
     Set<StdSqlOperator> supportedStdFunctions(String sourceId);
 
     boolean validateFunction(String sourceId, String snippet);
 
     String decryptValue(String value);
 
-    void updateSource(DataProviderSource source);
+    void updateSource(Source source);
 
     DataProviderSource parseDataProviderConfig(Source source);
 

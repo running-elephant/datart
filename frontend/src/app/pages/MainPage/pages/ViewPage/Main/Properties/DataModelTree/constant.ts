@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
+import { DataViewFieldType } from 'app/constants';
 import { DATARTSEPERATOR } from 'globalConstants';
-import { ColumnTypes } from '../../../constants';
 
 export const ROOT_CONTAINER_ID = `${DATARTSEPERATOR}data-model-root-id`;
 
 export const ALLOW_COMBINE_COLUMN_TYPES = [
-  ColumnTypes.String,
-  ColumnTypes.Date,
+  DataViewFieldType.STRING,
+  DataViewFieldType.DATE,
 ];
 
 export enum TreeNodeHierarchy {

@@ -35,8 +35,8 @@ import {
 } from 'styles/StyleConstants';
 import { usePublishBoard } from '../../hooks/usePublishBoard';
 import { useStatusTitle } from '../../hooks/useStatusTitle';
+import { BoardActionContext } from '../ActionProvider/BoardActionProvider';
 import { BoardDropdownList } from '../BoardDropdownList/BoardDropdownList';
-import { BoardActionContext } from '../BoardProvider/BoardActionProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import SaveToStoryBoard from '../SaveToStoryBoard';
 
@@ -124,6 +124,7 @@ const TitleHeader: FC = memo(() => {
 
       {allowShare && (
         <ShareLinkModal
+          vizType="DASHBOARD"
           visibility={showShareLinkModal}
           onOk={() => setShowShareLinkModal(false)}
           onCancel={() => setShowShareLinkModal(false)}

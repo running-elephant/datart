@@ -14,10 +14,19 @@ const {
 
 const rewireEntries = [
   {
-    name: 'share',
-    entry: path.resolve(__dirname, './src/share.tsx'),
-    // template: path.resolve(__dirname, './src/app/share.html'),
-    outPath: 'share.html',
+    name: 'shareChart',
+    entry: path.resolve(__dirname, './src/shareChart.tsx'),
+    outPath: 'shareChart.html',
+  },
+  {
+    name: 'shareDashboard',
+    entry: path.resolve(__dirname, './src/shareDashboard.tsx'),
+    outPath: 'shareDashboard.html',
+  },
+  {
+    name: 'shareStoryPlayer',
+    entry: path.resolve(__dirname, './src/shareStoryPlayer.tsx'),
+    outPath: 'shareStoryPlayer.html',
   },
 ];
 
@@ -62,6 +71,68 @@ module.exports = {
         ...{
           chunks: 'all',
           name: true,
+          cacheGroups: {
+            chartGraph: {
+              name: 'ChartGraph',
+              test: /[\\/]app[\\/]components[\\/]ChartGraph[\\/]/,
+              priority: 100,
+              enforce: true,
+            },
+            antdDesign: {
+              name: 'antdDesign',
+              test: /[\\/]node_modules[\\/](@ant-design|antd)[\\/]/,
+              priority: 100,
+              enforce: true,
+            },
+            videoReact: {
+              name: 'videoReact',
+              test: /[\\/]node_modules[\\/](video-react)[\\/]/,
+              priority: 100,
+              enforce: true,
+            },
+            reactGridLayout: {
+              name: 'reactGridLayout',
+              test: /[\\/]node_modules[\\/]react-grid-layout[\\/]/,
+              priority: 100,
+              enforce: true,
+            },
+            rc: {
+              name: 'rc',
+              test: /[\\/]node_modules[\\/](rc-tree|react-color|rc-menu|rc-slider|rc-table|rc-util|rc-picker|rc-select|rc-field-form|rc-motion|@babel|@emotion|react-i18next|redux|react-draggable|lodash-es|dnd-core|rc-virtual-list|rc-tabs|rc-trigger|react-dnd|echarts-wordcloud|tinycolor|rc-pagination|rc-drawer|react-quill|rc-input-number|gl-matrix|react-resizable|redux-undo|rc-cascader|rc-image|rc-upload|resize-obserer-polyfill|d3-color|rc-dialog|rc-textarea|rc-overflow)[\\/]/,
+              priority: 100,
+              enforce: true,
+            },
+            echarts: {
+              name: 'echarts',
+              test: /[\\/]node_modules[\\/](echarts|zrender)[\\/]/,
+              priority: 100,
+              enforce: true,
+            },
+            quill: {
+              name: 'quill',
+              test: /[\\/]node_modules[\\/]quill[\\/]/,
+              priority: 100,
+              enforce: true,
+            },
+            lodash: {
+              name: 'lodash',
+              test: /[\\/]node_modules[\\/](lodash|lodash-es)[\\/]/,
+              priority: 100,
+              enforce: true,
+            },
+            reactdnd: {
+              name: 'react',
+              test: /[\\/]node_modules[\\/](react-beautiful-dnd|react-dnd)[\\/]/,
+              priority: 100,
+              enforce: true,
+            },
+            version: {
+              name: 'version',
+              test: /[\\/]node_modules[\\/](moment|react-dom|core-js|i18next|rc-field-form|buffer|axios|react-redux)[\\/]/,
+              priority: 100,
+              enforce: true,
+            },
+          },
         },
       };
 
@@ -105,6 +176,7 @@ module.exports = {
         names[0] = '[name].' + names[0];
         webpackConfig.output.filename = names.reverse().join('/');
       }
+
       // 返回重写后的新配置
       return webpackConfig;
     },
@@ -144,7 +216,9 @@ module.exports = {
     historyApiFallback: {
       rewrites: [
         { from: /^\/$/, to: '/index.html' },
-        { from: /^\/share/, to: '/share.html' },
+        { from: /^\/shareChart$/, to: '/shareChart.html' },
+        { from: /^\/shareDashboard$/, to: '/shareDashboard.html' },
+        { from: /^\/shareStoryPlayer$/, to: '/shareStoryPlayer.html' },
       ],
     },
   },

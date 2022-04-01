@@ -67,11 +67,10 @@ public class DownloadController extends BaseController {
     public void downloadFile(@PathVariable String id,
                              HttpServletResponse response) throws IOException {
         Download download = downloadService.downloadFile(id);
-//        response.setHeader("Content-Type", "application/force-download");
         response.setHeader("Content-Type", "application/octet-stream");
         File file = new File(FileUtils.withBasePath(download.getPath()));
+        response.setHeader("Content-Disposition", String.format("attachment;filename=\"%s\"", URLEncoder.encode(file.getName(), "utf-8")));
         try (InputStream inputStream = new FileInputStream(file)) {
-            response.setHeader("Content-Disposition", String.format("attachment;filename=\"%s\"", URLEncoder.encode(file.getName(), "utf-8")));
             Streams.copy(inputStream, response.getOutputStream(), true);
         }
     }

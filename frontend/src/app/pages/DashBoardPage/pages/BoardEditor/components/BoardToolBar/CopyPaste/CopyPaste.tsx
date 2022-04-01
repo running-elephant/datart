@@ -18,23 +18,24 @@
 import { CopyOutlined, SnippetsOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { FC } from 'react';
+import { useSelector } from 'react-redux';
 import {
   selectClipboardWidgets,
   selectSelectedIds,
 } from '../../../slice/selectors';
-import { copyWidgetByIds, pasteWidgets } from '../../../slice/thunk';
-export const CopyBtn = () => {
+
+export const CopyBtn: FC<{
+  fn: (ids?: string[]) => void;
+  title: string;
+}> = ({ fn, title }) => {
   const selectedIds = useSelector(selectSelectedIds);
-  const t = useI18NPrefix(`viz.board.action`);
-  const dispatch = useDispatch();
+
   const onCopy = () => {
-    dispatch(copyWidgetByIds(selectedIds));
+    fn(selectedIds);
   };
   return (
-    <Tooltip title={t('copy')}>
+    <Tooltip title={title}>
       <ToolbarButton
         disabled={!selectedIds.length}
         onClick={onCopy}
@@ -43,18 +44,16 @@ export const CopyBtn = () => {
     </Tooltip>
   );
 };
-export const PasteBtn = () => {
-  const t = useI18NPrefix(`viz.board.action`);
+export const PasteBtn: FC<{
+  fn: () => void;
+  title: string;
+}> = ({ fn, title }) => {
   const clipboardWidgets = useSelector(selectClipboardWidgets);
-  const dispatch = useDispatch();
-  const onPaste = () => {
-    dispatch(pasteWidgets());
-  };
   return (
-    <Tooltip title={t('paste')}>
+    <Tooltip title={title}>
       <ToolbarButton
         disabled={!Object.keys(clipboardWidgets).length}
-        onClick={onPaste}
+        onClick={fn}
         icon={<SnippetsOutlined />}
       />
     </Tooltip>

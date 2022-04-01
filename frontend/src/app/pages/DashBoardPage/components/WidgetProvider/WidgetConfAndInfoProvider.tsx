@@ -16,23 +16,24 @@
  * limitations under the License.
  */
 
-import React, { FC } from 'react';
-import { WidgetChartProvider } from './WidgetChartProvider';
-import { WidgetDataProvider } from './WidgetDataProvider';
+import { FC, memo } from 'react';
 import { WidgetInfoProvider } from './WidgetInfoProvider';
-import { WidgetMethodProvider } from './WidgetMethodProvider';
 import { WidgetProvider } from './WidgetProvider';
 
-export const WidgetAllProvider: FC<{ id: string }> = ({ id, children }) => {
+export const WidgetConfAndInfoProvider: FC<{
+  id: string;
+  boardId: string;
+  boardEditing: boolean;
+}> = memo(({ id, boardEditing, boardId, children }) => {
   return (
-    <WidgetProvider widgetId={id}>
-      <WidgetInfoProvider widgetId={id}>
-        <WidgetMethodProvider widgetId={id}>
-          <WidgetChartProvider>
-            <WidgetDataProvider widgetId={id}>{children}</WidgetDataProvider>
-          </WidgetChartProvider>
-        </WidgetMethodProvider>
+    <WidgetProvider boardId={boardId} boardEditing={boardEditing} widgetId={id}>
+      <WidgetInfoProvider
+        boardId={boardId}
+        boardEditing={boardEditing}
+        widgetId={id}
+      >
+        {children}
       </WidgetInfoProvider>
     </WidgetProvider>
   );
-};
+});

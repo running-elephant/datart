@@ -17,12 +17,12 @@
  */
 import { Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React, { FC, useContext } from 'react';
-import styled from 'styled-components';
+import { FC, useCallback, useContext } from 'react';
+import styled from 'styled-components/macro';
 import { WidgetType } from '../../pages/Board/slice/types';
+import { WidgetActionContext } from '../ActionProvider/WidgetActionProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import { WidgetInfoContext } from '../WidgetProvider/WidgetInfoProvider';
-import { WidgetMethodContext } from '../WidgetProvider/WidgetMethodProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import {
   CancelLinkageIcon,
@@ -36,11 +36,24 @@ import { WidgetActionDropdown } from './WidgetActionDropdown';
 
 const WidgetToolBar: FC = () => {
   const { boardType, editing: boardEditing } = useContext(BoardContext);
-  const { onWidgetAction } = useContext(WidgetMethodContext);
+  const { onWidgetClearLinkage, onWidgetGetData, onEditWidgetUnLock } =
+    useContext(WidgetActionContext);
   const { loading, inLinking, rendered, errInfo } =
     useContext(WidgetInfoContext);
   const widget = useContext(WidgetContext);
-  const { onClearLinkage } = useContext(WidgetMethodContext);
+
+  const onRefreshWidget = useCallback(() => {
+    onWidgetGetData(widget);
+  }, [onWidgetGetData, widget]);
+
+  const onClearLinkage = useCallback(() => {
+    onWidgetClearLinkage(widget);
+  }, [onWidgetClearLinkage, widget]);
+
+  const onUnLockWidget = useCallback(() => {
+    onEditWidgetUnLock(widget);
+  }, [onEditWidgetUnLock, widget]);
+
   const ssp = e => {
     e.stopPropagation();
   };
@@ -48,23 +61,17 @@ const WidgetToolBar: FC = () => {
   const renderLocking = () => {
     if (!boardEditing) return null;
     if (!widget.config?.lock) return null;
-    return (
-      <LockIcon
-        title={t('unlock')}
-        onClick={() => onWidgetAction('unlock', widget)}
-      />
-    );
+    return <LockIcon title={t('unlock')} onClick={onUnLockWidget} />;
   };
   const renderWaiting = () => {
     if (boardType === 'free') return null;
     const showTypes: WidgetType[] = ['chart'];
     if (!showTypes.includes(widget.config.type)) return null;
     if (rendered) return null;
-    const refreshItem = () => onWidgetAction('refresh', widget);
     return (
       <WaitingIcon
-        onClick={refreshItem}
-        onMouseEnter={refreshItem}
+        onClick={onRefreshWidget}
+        onMouseEnter={onRefreshWidget}
         title={t('waiting')}
       />
     );
@@ -79,7 +86,7 @@ const WidgetToolBar: FC = () => {
       return (
         <CancelLinkageIcon
           title={t('cancelLinkage')}
-          onClick={() => onClearLinkage(widget)}
+          onClick={onClearLinkage}
         />
       );
     } else {

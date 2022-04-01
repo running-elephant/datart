@@ -32,9 +32,8 @@ import { RelationFilterValue } from 'app/types/ChartConfig';
 import produce from 'immer';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
-import { BoardActionContext } from '../../BoardProvider/BoardActionProvider';
+import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
-import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { LabelName } from '../WidgetName/WidgetName';
@@ -51,23 +50,21 @@ import { TimeControllerForm } from './Controller/TimeController';
 
 export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
-  const [form] = Form.useForm();
-
+  const { onWidgetUpdate, onRefreshWidgetsByController } =
+    useContext(WidgetActionContext);
   const { hasQueryControl } = useContext(BoardConfigContext);
-  const { editing, renderMode } = useContext(BoardContext);
+  const [form] = Form.useForm();
 
   const {
     data: { rows },
   } = useContext(WidgetDataContext);
 
-  const { widgetUpdate, refreshWidgetsByController } =
-    useContext(BoardActionContext);
   const refreshLinkedWidgets = useCallback(
     (widget: Widget) => {
       if (hasQueryControl) return;
-      refreshWidgetsByController(widget, editing, renderMode);
+      onRefreshWidgetsByController(widget);
     },
-    [editing, refreshWidgetsByController, hasQueryControl, renderMode],
+    [onRefreshWidgetsByController, hasQueryControl],
   );
   const { config, type: facadeType } = useMemo(
     () => widget.config.content as ControllerWidgetContent,
@@ -136,7 +133,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         draft.config.content as ControllerWidgetContent
       ).config.controllerValues = _values;
     });
-    widgetUpdate(nextWidget, editing);
+    onWidgetUpdate(nextWidget);
     refreshLinkedWidgets(nextWidget);
   };
   // const onSqlOperatorAndValues = useCallback(
@@ -171,10 +168,10 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           draft.config.content as ControllerWidgetContent
         ).config.controllerDate = nextFilterDate;
       });
-      widgetUpdate(nextWidget, editing);
+      onWidgetUpdate(nextWidget);
       refreshLinkedWidgets(nextWidget);
     },
-    [controllerDate, editing, refreshLinkedWidgets, widget, widgetUpdate],
+    [controllerDate, refreshLinkedWidgets, widget, onWidgetUpdate],
   );
 
   const onTimeChange = useCallback(
@@ -191,10 +188,10 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           draft.config.content as ControllerWidgetContent
         ).config.controllerDate = nextFilterDate;
       });
-      widgetUpdate(nextWidget, editing);
+      onWidgetUpdate(nextWidget);
       refreshLinkedWidgets(nextWidget);
     },
-    [controllerDate, editing, refreshLinkedWidgets, widget, widgetUpdate],
+    [controllerDate, refreshLinkedWidgets, widget, onWidgetUpdate],
   );
 
   const control = useMemo(() => {

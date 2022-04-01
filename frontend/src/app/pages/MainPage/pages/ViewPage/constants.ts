@@ -16,12 +16,6 @@
  * limitations under the License.
  */
 
-export enum ColumnTypes {
-  String = 'STRING',
-  Number = 'NUMERIC',
-  Date = 'DATE',
-}
-
 export enum ColumnCategories {
   Uncategorized = 'UNCATEGORIZED',
   Country = 'COUNTRY',

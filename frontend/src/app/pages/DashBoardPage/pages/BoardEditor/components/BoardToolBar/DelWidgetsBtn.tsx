@@ -15,8 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { DeleteOutlined } from '@ant-design/icons';
+import { Tooltip } from 'antd';
+import { ToolbarButton } from 'app/components';
+import { FC } from 'react';
+import { useSelector } from 'react-redux';
+import { selectSelectedIds } from '../../slice/selectors';
 
-export const jumpTypes: { name: string; value: string }[] = [
-  { value: 'INTERNAL', name: '' },
-  { value: 'URL', name: '' },
-];
+export const DelWidgetsBtn: FC<{
+  fn: () => void;
+  title: string;
+}> = ({ fn, title }) => {
+  const selectedIds = useSelector(selectSelectedIds);
+  return (
+    <Tooltip title={title}>
+      <ToolbarButton
+        disabled={!selectedIds.length}
+        onClick={fn}
+        icon={<DeleteOutlined />}
+      />
+    </Tooltip>
+  );
+};

@@ -20,7 +20,7 @@ import {
   AggregateFieldActionType,
   ChartDataSectionType,
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
+  DataViewFieldType,
 } from 'app/constants';
 import {
   ChartConfig,
@@ -32,6 +32,7 @@ import {
   ChartCommonConfig,
   ChartStyleConfigDTO,
 } from 'app/types/ChartConfigDTO';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import {
   cond,
   curry,
@@ -204,11 +205,11 @@ const transferMixedToNonMixed = (
   ) {
     const dimensions = sourceSectionConfigRows?.filter(
       r =>
-        r.type === ChartDataViewFieldType.DATE ||
-        r.type === ChartDataViewFieldType.STRING,
+        r.type === DataViewFieldType.DATE ||
+        r.type === DataViewFieldType.STRING,
     );
     const metrics = sourceSectionConfigRows?.filter(
-      r => r.type === ChartDataViewFieldType.NUMERIC,
+      r => r.type === DataViewFieldType.NUMERIC,
     );
 
     while (Boolean(dimensions?.length)) {
@@ -313,9 +314,6 @@ export function diffHeaderRows(
   oldRows: Array<{ colName: string }>,
   newRows: Array<{ colName: string }>,
 ) {
-  if (!oldRows?.length) {
-    return true;
-  }
   if (oldRows?.length !== newRows?.length) {
     return true;
   }
@@ -364,6 +362,34 @@ export function transformMeta(model?: string) {
       category: ChartDataViewFieldCategory.Field,
     };
   });
+}
+
+export function transformHierarchyMeta(model?: string): ChartDataViewMeta[] {
+  if (!model) {
+    return [];
+  }
+  const modelObj = JSON.parse(model);
+  const hierarchyMeta = !Object.keys(modelObj?.hierarchy || {}).length
+    ? modelObj.columns
+    : modelObj.hierarchy;
+  return Object.keys(hierarchyMeta || {}).map(key => {
+    return getMeta(key, hierarchyMeta?.[key]);
+  });
+}
+
+function getMeta(key, column) {
+  let children;
+  if (!isEmptyArray(column?.children)) {
+    children = column?.children.map(child => getMeta(child?.name, child));
+  }
+
+  return {
+    ...column,
+    id: key,
+    subType: column?.category,
+    category: ChartDataViewFieldCategory.Field,
+    children: children,
+  };
 }
 
 export function mergeChartStyleConfigs(
@@ -527,7 +553,7 @@ export function getAxisLengthByConfig(config: ChartCommonConfig) {
   const left_ = getPositionLengthInfo(left);
   const right_ = getPositionLengthInfo(right);
 
-  const containerWidth = chart.getWidth();
+  const containerWidth = chart?.getWidth() || 0;
 
   // 左右边距
   const leftWidth =
@@ -539,19 +565,26 @@ export function getAxisLengthByConfig(config: ChartCommonConfig) {
   return containerWidth - axisLabelMaxWidth - leftWidth - rightWidth;
 }
 
-export const transformToViewConfig = (viewConfig?: string) => {
-  const viewConfigMap = viewConfig ? JSON.parse(viewConfig) : {};
-  const obj = {};
-  if (viewConfig) {
-    const fields = [
-      'cache',
-      'cacheExpires',
-      'concurrencyControl',
-      'concurrencyControlMode',
-    ];
-    fields.forEach(v => {
-      obj[v] = viewConfigMap?.[v];
-    });
+export const transformToViewConfig = (
+  viewConfig?: string | object,
+): {
+  cache?: boolean;
+  cacheExpires?: number;
+  concurrencyControl?: boolean;
+  concurrencyControlMode?: string;
+} => {
+  let viewConfigMap = viewConfig;
+  if (typeof viewConfig === 'string') {
+    viewConfigMap = JSON.parse(viewConfig);
   }
-  return obj;
+  const fields = [
+    'cache',
+    'cacheExpires',
+    'concurrencyControl',
+    'concurrencyControlMode',
+  ];
+  return fields.reduce((acc, cur) => {
+    acc[cur] = viewConfigMap?.[cur];
+    return acc;
+  }, {});
 };

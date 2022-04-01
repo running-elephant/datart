@@ -18,7 +18,7 @@
 
 import {
   ChartDataSectionFieldActionType,
-  ChartDataViewFieldType,
+  DataViewFieldType,
 } from 'app/constants';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { FC, memo } from 'react';
@@ -31,15 +31,15 @@ const GroupTypeSection: FC<ChartDataConfigSectionProps> = memo(
       {},
       {
         actions: {
-          [ChartDataViewFieldType.NUMERIC]: [
+          [DataViewFieldType.NUMERIC]: [
             ChartDataSectionFieldActionType.Alias,
             ChartDataSectionFieldActionType.Sortable,
           ],
-          [ChartDataViewFieldType.STRING]: [
+          [DataViewFieldType.STRING]: [
             ChartDataSectionFieldActionType.Alias,
             ChartDataSectionFieldActionType.Sortable,
           ],
-          [ChartDataViewFieldType.DATE]: [
+          [DataViewFieldType.DATE]: [
             ChartDataSectionFieldActionType.Alias,
             ChartDataSectionFieldActionType.Sortable,
           ],

@@ -140,6 +140,18 @@ public class UserController extends BaseController {
         return ResponseData.success(userService.addUserToOrg(userAddParam, orgId));
     }
 
+    @ApiOperation(value = "add User to organization")
+    @GetMapping("/{orgId}/getUser/{userId}")
+    public ResponseData<UserUpdateByIdParam> selectUserByIdFromOrg(@PathVariable String orgId, @PathVariable String userId) throws MessagingException, UnsupportedEncodingException {
+        return ResponseData.success(userService.selectUserById(userId, orgId));
+    }
+
+    @ApiOperation(value = "update user from organization")
+    @PutMapping(value = "/{orgId}/updateUser")
+    public ResponseData<Boolean> updateUserFromOrg(@PathVariable String orgId, @Validated @RequestBody UserUpdateByIdParam userUpdateParam) {
+        return ResponseData.success(userService.updateUserFromOrg(userUpdateParam, orgId));
+    }
+
     @ApiOperation(value = "User Delete from organization")
     @DeleteMapping(value = "/{orgId}/deleteUser")
     public ResponseData<Boolean> deleteUserFromOrg(@PathVariable String orgId, @RequestParam String userId) {

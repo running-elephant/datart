@@ -18,38 +18,27 @@
 
 package datart.server.base.params;
 
+import datart.core.base.consts.ShareAuthenticationMode;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 
 @Data
 public class ShareToken {
 
-    private String token;
+    private String id;
+
+    private String authorizedToken;
+
+    private ShareAuthenticationMode authenticationMode;
+
+    private String authenticationCode;
+
+    private String username;
 
     private String password;
 
-    private Boolean usePassword;
-
-    public static ShareToken create(String token, String password, Boolean usePassword) {
-        ShareToken shareToken = new ShareToken();
-        shareToken.setToken(token);
-        shareToken.setPassword(password);
-        shareToken.setUsePassword(usePassword);
-        return shareToken;
-    }
-
-    public static ShareToken create(String token, String password) {
-        ShareToken shareToken = new ShareToken();
-        shareToken.setToken(token);
-        shareToken.setPassword(password);
-        shareToken.setUsePassword(StringUtils.isNoneEmpty(password));
-        return shareToken;
-    }
-
     public static ShareToken create(String token) {
         ShareToken shareToken = new ShareToken();
-        shareToken.setToken(token);
-        shareToken.setUsePassword(false);
+        shareToken.authorizedToken = token;
         return shareToken;
     }
 

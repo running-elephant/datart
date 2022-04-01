@@ -30,7 +30,7 @@ import moment from 'moment';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { G90 } from 'styles/StyleConstants';
-import { BoardActionContext } from '../../../BoardProvider/BoardActionProvider';
+import { WidgetActionContext } from '../../../ActionProvider/WidgetActionProvider';
 import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 
@@ -66,7 +66,7 @@ const TimerWidget: React.FC = () => {
   const widget = useContext(WidgetContext);
 
   const { editing } = useContext(WidgetInfoContext);
-  const { widgetUpdate } = useContext(BoardActionContext);
+  const { onWidgetUpdate } = useContext(WidgetActionContext);
   const [form] = Form.useForm();
   const preTimerConfig = (widget.config.content as MediaWidgetContent)
     .timerConfig;
@@ -110,7 +110,7 @@ const TimerWidget: React.FC = () => {
     const nextWidget = produce(widget, draft => {
       (draft.config.content as MediaWidgetContent).timerConfig = newTimerConfig;
     });
-    widgetUpdate(nextWidget, true);
+    onWidgetUpdate(nextWidget);
   };
 
   const onTimeChange = (ancestors, data, needRefresh) => {
@@ -119,7 +119,7 @@ const TimerWidget: React.FC = () => {
     const nextWidget = produce(widget, draft => {
       (draft.config.content as MediaWidgetContent).timerConfig = newTimerConfig;
     });
-    widgetUpdate(nextWidget, true);
+    onWidgetUpdate(nextWidget);
   };
   const onFormatChange = (ancestors, data) => {
     onTimeChange([], { timeFormat: data }, false);
