@@ -17,7 +17,7 @@
  */
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button, Layout, Menu } from 'antd';
-import { WidgetConfAndInfoProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetConfAndInfoProvider';
+import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   makeSelectBoardFullScreenPanelById,
@@ -78,13 +78,13 @@ export const FullScreenPanel: React.FC<{}> = () => {
     const widget = widgetMap[itemId];
     if (widget) {
       return (
-        <WidgetConfAndInfoProvider
+        <WidgetWrapProvider
           id={widget.id}
           boardEditing={false}
           boardId={boardId}
         >
           <WidgetCore background padding border />
-        </WidgetConfAndInfoProvider>
+        </WidgetWrapProvider>
       );
     }
   }, [boardId, itemId, widgetMap]);
