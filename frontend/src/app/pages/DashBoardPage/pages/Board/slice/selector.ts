@@ -146,7 +146,7 @@ export const selectDataChartMap = createSelector(
 
 export const selectDataChartById = createSelector(
   [selectDataChartMap, (_, chartId: string) => chartId],
-  (dataChartMap, id) => dataChartMap[id],
+  (dataChartMap, id) => dataChartMap[id] || undefined,
 );
 
 export const selectViewMap = createSelector(

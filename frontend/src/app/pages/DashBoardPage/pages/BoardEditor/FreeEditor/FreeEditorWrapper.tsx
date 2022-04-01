@@ -18,7 +18,7 @@
 
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { WidgetConfAndInfoProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetConfAndInfoProvider';
+import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import React, { useContext } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -62,14 +62,14 @@ export const FreeEditorWrapper: React.FC<{}> = () => {
       >
         <SlideBackground scale={scale} slideTranslate={slideTranslate}>
           {sortedLayoutWidgets.map(widgetConfig => (
-            <WidgetConfAndInfoProvider
+            <WidgetWrapProvider
               key={widgetConfig.id}
               id={widgetConfig.id}
               boardEditing={true}
               boardId={boardId}
             >
               <WidgetOfFreeEdit />
-            </WidgetConfAndInfoProvider>
+            </WidgetWrapProvider>
           ))}
         </SlideBackground>
       </div>

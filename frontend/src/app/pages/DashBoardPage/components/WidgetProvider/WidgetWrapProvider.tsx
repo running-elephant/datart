@@ -17,10 +17,11 @@
  */
 
 import { FC, memo } from 'react';
+import { WidgetChartProvider } from './WidgetChartProvider';
 import { WidgetInfoProvider } from './WidgetInfoProvider';
 import { WidgetProvider } from './WidgetProvider';
 
-export const WidgetConfAndInfoProvider: FC<{
+export const WidgetWrapProvider: FC<{
   id: string;
   boardId: string;
   boardEditing: boolean;
@@ -32,7 +33,7 @@ export const WidgetConfAndInfoProvider: FC<{
         boardEditing={boardEditing}
         widgetId={id}
       >
-        {children}
+        <WidgetChartProvider>{children}</WidgetChartProvider>
       </WidgetInfoProvider>
     </WidgetProvider>
   );
