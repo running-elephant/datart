@@ -1,6 +1,8 @@
 package datart.server.service.impl;
 
 import datart.core.base.consts.AttachmentType;
+import datart.core.base.consts.ShareAuthenticationMode;
+import datart.core.base.consts.ShareRowPermissionBy;
 import datart.core.common.Application;
 import datart.core.common.WebUtils;
 import datart.core.entity.Folder;
@@ -9,6 +11,7 @@ import datart.security.manager.DatartSecurityManager;
 import datart.server.base.params.DownloadCreateParam;
 import datart.server.base.params.ShareCreateParam;
 import datart.server.base.params.ShareToken;
+import datart.server.base.params.ViewExecuteParam;
 import datart.server.service.AttachmentService;
 import datart.server.service.FolderService;
 import datart.server.service.ShareService;
@@ -44,15 +47,19 @@ public class AttachmentPdfServiceImpl implements AttachmentService {
 
     @Override
     public File getFile(DownloadCreateParam downloadCreateParam, String path, String fileName) throws Exception {
-        String folderId = downloadCreateParam.getDownloadParams().size()>0 ? downloadCreateParam.getDownloadParams().get(0).getVizId() : "";
+        ViewExecuteParam viewExecuteParam = downloadCreateParam.getDownloadParams().size() > 0 ? downloadCreateParam.getDownloadParams().get(0) : new ViewExecuteParam();
+        String folderId = viewExecuteParam.getVizId();
+        ResourceType vizType = viewExecuteParam.getVizType();
         Folder folder = folderService.retrieve(folderId);
         ShareCreateParam shareCreateParam = new ShareCreateParam();
         shareCreateParam.setVizId(folder.getRelId());
         shareCreateParam.setVizType(ResourceType.valueOf(folder.getRelType()));
         shareCreateParam.setExpiryDate(DateUtils.addHours(new Date(), 1));
+        shareCreateParam.setAuthenticationMode(ShareAuthenticationMode.NONE);
+        shareCreateParam.setRowPermissionBy(ShareRowPermissionBy.CREATOR);
         ShareToken share = shareService.createShare(securityManager.getCurrentUser().getId(), shareCreateParam);
 
-        String url = Application.getWebRootURL() + "/share/"+share.getId()+"?type="+share.getAuthenticationMode();
+        String url = Application.getWebRootURL()+"/"+vizType.getShareRoute()+"/"+share.getId()+"?type="+share.getAuthenticationMode();
         log.info("share url {} ", url);
 
         downloadCreateParam.setImageWidth(600);

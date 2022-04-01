@@ -11,6 +11,7 @@ import datart.security.manager.DatartSecurityManager;
 import datart.server.base.params.DownloadCreateParam;
 import datart.server.base.params.ShareCreateParam;
 import datart.server.base.params.ShareToken;
+import datart.server.base.params.ViewExecuteParam;
 import datart.server.service.AttachmentService;
 import datart.server.service.FolderService;
 import datart.server.service.ShareService;
@@ -41,7 +42,9 @@ public class AttachmentImageServiceImpl implements AttachmentService {
 
     @Override
     public File getFile(DownloadCreateParam downloadCreateParam, String path, String fileName) throws Exception {
-        String folderId = downloadCreateParam.getDownloadParams().size()>0 ? downloadCreateParam.getDownloadParams().get(0).getVizId() : "";
+        ViewExecuteParam viewExecuteParam = downloadCreateParam.getDownloadParams().size() > 0 ? downloadCreateParam.getDownloadParams().get(0) : new ViewExecuteParam();
+        String folderId = viewExecuteParam.getVizId();
+        ResourceType vizType = viewExecuteParam.getVizType();
         Folder folder = folderService.retrieve(folderId);
         ShareCreateParam shareCreateParam = new ShareCreateParam();
         shareCreateParam.setVizId(folder.getRelId());
@@ -51,7 +54,7 @@ public class AttachmentImageServiceImpl implements AttachmentService {
         shareCreateParam.setRowPermissionBy(ShareRowPermissionBy.CREATOR);
         ShareToken share = shareService.createShare(securityManager.getCurrentUser().getId(), shareCreateParam);
 
-        String url = Application.getWebRootURL() + "/share/"+share.getId()+"?type="+share.getAuthenticationMode();
+        String url = Application.getWebRootURL()+"/"+vizType.getShareRoute()+"/"+share.getId()+"?type="+share.getAuthenticationMode();
         log.info("created share url: {} ", url);
         int width = downloadCreateParam.getImageWidth()<=0 ? 1920 : downloadCreateParam.getImageWidth();
         File target = WebUtils.screenShot2File(url, path, width);
