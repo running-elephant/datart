@@ -280,7 +280,7 @@ export const widgetGetDataAction =
   (editing: boolean, widget: Widget, renderMode: VizRenderMode) => dispatch => {
     const boardId = widget.dashboardId;
     if (editing) {
-      getEditWidgetData({ widget });
+      dispatch(getEditWidgetData({ widget }));
     } else {
       dispatch(getWidgetData({ boardId, widget, renderMode }));
     }
