@@ -101,7 +101,7 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
                 return hasPermission(role, parent, permission);
             }
         } else {
-            return securityManager.hasPermission(PermissionHelper.viewPermission(schedule.getOrgId(), role.getId(), schedule.getId(), permission));
+            return securityManager.hasPermission(PermissionHelper.schedulePermission(schedule.getOrgId(), role.getId(), schedule.getId(), permission));
         }
     }
 
