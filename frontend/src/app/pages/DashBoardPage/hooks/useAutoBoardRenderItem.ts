@@ -110,7 +110,7 @@ export default function useAutoBoardRenderItem(
       );
       window.removeEventListener('resize', throttleLazyRender, false);
     };
-  }, [throttleLazyRender, lazyRender]);
+  }, [throttleLazyRender, lazyRender, layoutWidgetInfoMap]);
 
   return {
     ref,
