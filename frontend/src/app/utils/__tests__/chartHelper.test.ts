@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { ChartDataSectionType } from 'app/constants';
 import { ChartDataSetRow } from 'app/models/ChartDataSet';
 import { IChartDataSet } from 'app/types/ChartDataSet';
 import {
@@ -28,6 +29,7 @@ import {
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getDataColumnMaxAndMin2,
+  getDrillableRows,
   getGridStyle,
   getReference2,
   getScatterSymbolSizeFn,
@@ -2079,6 +2081,74 @@ describe('Chart Helper ', () => {
           'a-1',
         ),
       ).toEqual(1);
+    });
+  });
+
+  describe('getDrillableRows Test', () => {
+    test('should get group section rows when drill option is null', () => {
+      const config = [
+        {
+          type: ChartDataSectionType.GROUP,
+          rows: [1, 2],
+        },
+      ] as any[];
+      const drillOption = {};
+      const drillRows = getDrillableRows(config, undefined);
+      expect(drillRows).toEqual([1, 2]);
+    });
+
+    test('should not get group section rows when is not group section', () => {
+      const config = [
+        {
+          type: ChartDataSectionType.AGGREGATE,
+          rows: [1, 2],
+        },
+      ] as any[];
+      const drillOption = {};
+      const drillRows = getDrillableRows(config, undefined);
+      expect(drillRows).toEqual([]);
+    });
+
+    test('should get group section rows when drillale is false and drillOption is not empty', () => {
+      const config = [
+        {
+          type: ChartDataSectionType.GROUP,
+          rows: [1, 2],
+        },
+      ] as any[];
+      const drillOption = { paths: [], current: 0 };
+      const drillRows = getDrillableRows(config, drillOption);
+      expect(drillRows).toEqual([1, 2]);
+    });
+
+    test('should get drillable group section rows with drillOption', () => {
+      const config = [
+        {
+          type: ChartDataSectionType.GROUP,
+          rows: [1, 2],
+          drillable: true,
+        },
+      ] as any[];
+      const drillOption = { paths: [], current: 0 };
+      const drillRows = getDrillableRows(config, drillOption);
+      expect(drillRows).toEqual([1]);
+    });
+
+    test('should only get drillable group section rows with drillOption', () => {
+      const config = [
+        {
+          type: ChartDataSectionType.GROUP,
+          rows: [1, 2],
+          drillable: true,
+        },
+        {
+          type: ChartDataSectionType.AGGREGATE,
+          rows: [3, 4],
+        },
+      ] as any[];
+      const drillOption = { paths: [], current: 1 };
+      const drillRows = getDrillableRows(config, drillOption);
+      expect(drillRows).toEqual([2]);
     });
   });
 });

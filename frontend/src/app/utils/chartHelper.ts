@@ -1540,7 +1540,7 @@ export const getAutoFunnelTopPosition = (config: {
  */
 export const getDrillableRows = (
   configs: ChartDataConfig[],
-  option: DrillOption,
+  option?: DrillOption,
 ): ChartDataSectionField[] => {
   return configs
     ?.filter(c => c.type === ChartDataSectionType.GROUP)
