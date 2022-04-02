@@ -16,9 +16,6 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionField } from 'app/types/ChartConfig';
-
 export type DrillOption = {
-  paths: ChartDataSectionField[];
   current: number;
 };

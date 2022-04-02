@@ -18,7 +18,6 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
-import { ChartDataSectionType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
@@ -51,10 +50,11 @@ import {
 import { IChart } from 'app/types/Chart';
 import { DrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
+import { getDrillPaths } from 'app/utils/chartHelper';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import { CommonFormTypes } from 'globalConstants';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
@@ -118,7 +118,8 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
   const [chart, setChart] = useState<IChart>();
-  const [drillOption, setDrillOption] = useState<DrillOption>();
+  const drillOptionRef = useRef<DrillOption>({ current: 0 });
+
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
   const addVizFn = useAddViz({
@@ -196,17 +197,16 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   }, [backendChart?.config?.chartGraphId]);
 
   useEffect(() => {
-    const drillPaths = (chartConfig?.datas || [])
-      .filter(d => d.type === ChartDataSectionType.GROUP)
-      .filter(d => Boolean(d.drillable))
-      .flatMap(d => d.rows?.filter(Boolean) || []);
-    if (drillOption?.paths?.length !== drillPaths.length) {
-      setDrillOption({
-        paths: drillPaths,
-        current: 0,
-      });
-    }
-  }, [chartConfig?.datas, drillOption?.paths?.length]);
+    const drillPaths = getDrillPaths(chartConfig?.datas);
+    const needDrillPositionRevert = () => {
+      return (drillOptionRef.current?.current || 0) > drillPaths.length;
+    };
+    drillOptionRef.current = {
+      current: needDrillPositionRevert()
+        ? 0
+        : drillOptionRef.current?.current || 0,
+    };
+  }, [chartConfig?.datas, drillOptionRef]);
 
   const registerChartEvents = useCallback(
     chart => {
@@ -285,33 +285,37 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       }),
     );
     if (!expensiveQuery) {
-      dispatch(refreshDatasetAction({}));
+      dispatch(refreshDatasetAction({ drillOption: drillOptionRef?.current }));
     } else {
       setAllowQuery(true);
     }
   };
 
-  const handleChartConfigChange = (type, payload) => {
-    if (expensiveQuery) {
+  const handleChartConfigChange = useCallback(
+    (type, payload) => {
+      if (expensiveQuery) {
+        dispatch(
+          workbenchSlice.actions.updateChartConfig({
+            type,
+            payload: payload,
+          }),
+        );
+        dispatch(workbenchSlice.actions.updateShadowChartConfig(null));
+        setAllowQuery(payload.needRefresh);
+        return true;
+      }
+
       dispatch(
-        workbenchSlice.actions.updateChartConfig({
+        updateChartConfigAndRefreshDatasetAction({
           type,
-          payload: payload,
+          payload,
+          needRefresh: payload.needRefresh,
+          drillOption: drillOptionRef?.current,
         }),
       );
-      dispatch(workbenchSlice.actions.updateShadowChartConfig(null));
-      setAllowQuery(payload.needRefresh);
-      return true;
-    }
-
-    dispatch(
-      updateChartConfigAndRefreshDatasetAction({
-        type,
-        payload,
-        needRefresh: payload.needRefresh,
-      }),
-    );
-  };
+    },
+    [dispatch, drillOptionRef, expensiveQuery],
+  );
 
   const handleDataViewChanged = useCallback(() => {
     clearDataConfig();
@@ -463,9 +467,11 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   );
 
   const handleRefreshDataset = useCallback(async () => {
-    await dispatch(refreshDatasetAction({}));
+    await dispatch(
+      refreshDatasetAction({ drillOption: drillOptionRef?.current }),
+    );
     setAllowQuery(false);
-  }, [dispatch]);
+  }, [dispatch, drillOptionRef]);
 
   const handleCreateDownloadDataTask = useCallback(async () => {
     if (!dataview?.id) {
@@ -513,10 +519,9 @@ export const ChartEditor: FC<ChartEditorProps> = ({
 
   const handleDrillOptionChange = currentIndex => {
     const newDrillOption = {
-      paths: drillOption?.paths || [],
       current: currentIndex,
     };
-    setDrillOption(newDrillOption);
+    drillOptionRef.current = newDrillOption;
     dispatch(refreshDatasetAction({ drillOption: newDrillOption }));
   };
 
@@ -535,7 +540,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             },
             onChangeAggregation: handleAggregationState,
           }}
-          drillOption={drillOption}
+          drillOption={drillOptionRef?.current}
           aggregation={aggregation}
           chart={chart}
           dataset={dataset}

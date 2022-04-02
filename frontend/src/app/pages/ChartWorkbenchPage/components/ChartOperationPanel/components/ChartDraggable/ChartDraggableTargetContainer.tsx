@@ -116,6 +116,8 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               r => r.uid === item.uid,
             );
             if (originItemIndex > -1) {
+              const needRefreshData =
+                currentConfig?.type === ChartDataSectionType.GROUP;
               needDelete = false;
               const currentColumns = updateBy(
                 currentConfig?.rows || [],
@@ -125,7 +127,11 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                   return draft.splice(item?.index!, 0, item);
                 },
               );
-              updateCurrentConfigColumns(currentConfig, currentColumns);
+              updateCurrentConfigColumns(
+                currentConfig,
+                currentColumns,
+                needRefreshData,
+              );
             } else {
               const currentColumns = updateBy(
                 currentConfig?.rows || [],

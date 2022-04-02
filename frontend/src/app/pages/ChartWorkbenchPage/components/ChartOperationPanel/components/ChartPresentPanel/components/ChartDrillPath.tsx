@@ -18,20 +18,23 @@
 
 import { RightOutlined } from '@ant-design/icons';
 import { Tag } from 'antd';
+import { ChartConfig } from 'app/types/ChartConfig';
 import { DrillOption } from 'app/types/ChartDrillOption';
-import { getColumnRenderName } from 'app/utils/chartHelper';
+import { getColumnRenderName, getDrillPaths } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 
 const ChartDrillPath: FC<{
+  chartConfig?: ChartConfig;
   drillOption?: DrillOption;
   onChartDrillOptionChange?: (index: number) => void;
-}> = memo(({ drillOption, onChartDrillOptionChange }) => {
+}> = memo(({ chartConfig, drillOption, onChartDrillOptionChange }) => {
   if (!drillOption) return <div></div>;
 
+  const drillPaths = getDrillPaths(chartConfig?.datas);
   return (
     <StyledChartDrillPath>
-      {drillOption?.paths?.map((p, index) => {
+      {drillPaths.map((p, index) => {
         return (
           <>
             <StyledDrillNode
@@ -40,11 +43,7 @@ const ChartDrillPath: FC<{
             >
               {getColumnRenderName(p)}
             </StyledDrillNode>
-            {index !== drillOption?.paths?.length - 1 ? (
-              <StyledIndicatorIcon />
-            ) : (
-              ''
-            )}
+            {index !== drillPaths?.length - 1 ? <StyledIndicatorIcon /> : ''}
           </>
         );
       })}

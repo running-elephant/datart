@@ -135,7 +135,9 @@ const ChartWorkbench: FC<{
     prev.chart === next.chart &&
     prev.chartConfig === next.chartConfig &&
     prev.dataset === next.dataset &&
-    prev.defaultViewId === next.defaultViewId,
+    prev.defaultViewId === next.defaultViewId &&
+    prev.drillOption === next.drillOption &&
+    prev.onChartConfigChange === next.onChartConfigChange,
 );
 
 export default ChartWorkbench;

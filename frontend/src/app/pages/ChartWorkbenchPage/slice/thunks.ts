@@ -121,6 +121,7 @@ export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
       type: string;
       payload: ChartConfigPayloadType;
       needRefresh?: boolean;
+      drillOption?: DrillOption;
     },
     thunkAPI,
   ) => {
@@ -130,7 +131,9 @@ export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
         workbenchSlice.actions.updateShadowChartConfig(null),
       );
       if (arg.needRefresh) {
-        thunkAPI.dispatch(refreshDatasetAction({}));
+        thunkAPI.dispatch(
+          refreshDatasetAction({ drillOption: arg.drillOption }),
+        );
       }
     } catch (error) {
       return rejectHandle(error, thunkAPI.rejectWithValue);

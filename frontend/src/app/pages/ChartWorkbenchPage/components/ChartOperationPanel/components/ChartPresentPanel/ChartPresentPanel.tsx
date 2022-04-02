@@ -26,7 +26,7 @@ import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selec
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { getColumnRenderName } from 'app/utils/chartHelper';
+import { getColumnRenderName, getDrillPaths } from 'app/utils/chartHelper';
 import { FC, memo, useContext, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -98,9 +98,10 @@ const ChartPresentPanel: FC<{
     };
 
     const menu = useMemo(() => {
+      const drillPaths = getDrillPaths(chartConfig?.datas);
       return (
         <Menu style={{ width: 200 }}>
-          {drillOption?.paths?.map((p, index) => {
+          {drillPaths.map((p, index) => {
             return (
               <Menu.Item
                 key={p.uid}
@@ -112,7 +113,7 @@ const ChartPresentPanel: FC<{
           })}
         </Menu>
       );
-    }, [drillOption?.paths, onChartDrillOptionChange]);
+    }, [chartConfig, onChartDrillOptionChange]);
 
     const renderReusableChartContainer = () => {
       const style = {
@@ -190,6 +191,7 @@ const ChartPresentPanel: FC<{
         <Row justify="space-between">
           <Col>
             <ChartDrillPath
+              chartConfig={chartConfig}
               drillOption={drillOption}
               onChartDrillOptionChange={onChartDrillOptionChange}
             />
