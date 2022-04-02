@@ -98,14 +98,7 @@ const ChartDataConfigSectionActionMenu: FC<
   };
 
   const getSubMenuActionComponent = (actionName, uid) => {
-    const fieldConfig = config.rows
-      ?.flatMap(r => {
-        if (r.category !== ChartDataViewFieldCategory.Hierarchy) {
-          return r;
-        }
-        return r.children || [];
-      })
-      .find(c => c.uid === uid);
+    const fieldConfig = config.rows?.find(c => c.uid === uid);
     if (!fieldConfig) {
       return;
     }

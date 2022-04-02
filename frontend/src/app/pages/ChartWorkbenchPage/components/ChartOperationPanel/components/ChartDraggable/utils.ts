@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import { ChartDataViewFieldCategory } from 'app/constants';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 
@@ -29,12 +28,6 @@ export const updateDataConfigByField = (
     draft.rows = (draft.rows || []).map(r => {
       if (r.uid === uid) {
         return field;
-      }
-      if (r.category === ChartDataViewFieldCategory.Hierarchy) {
-        const index = (r.children || []).findIndex(c => c.uid === uid);
-        if (index > -1 && r.children) {
-          r.children[index] = field;
-        }
       }
       return r;
     });
