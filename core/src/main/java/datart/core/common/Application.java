@@ -86,6 +86,10 @@ public class Application implements ApplicationContextAware {
         return getProperty("datart.server.path-prefix");
     }
 
+    public static String getServerPrefix() {
+        return getProperty("server.servlet.context-path","/");
+    }
+
     public static String getTokenSecret() {
         return getProperty("datart.security.token.secret", "d@a$t%a^r&a*t");
     }
