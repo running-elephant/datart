@@ -20,6 +20,7 @@ package datart.core.data.provider;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -33,5 +34,7 @@ public class DataProviderSource {
     private String name;
 
     private Map<String, Object> properties;
+
+    private List<ScriptVariable> variables;
 
 }
