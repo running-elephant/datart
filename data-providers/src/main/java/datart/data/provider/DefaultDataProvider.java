@@ -116,31 +116,28 @@ public abstract class DefaultDataProvider extends DataProvider {
     @Override
     public Dataframe execute(DataProviderSource config, QueryScript queryScript, ExecuteParam executeParam) throws Exception {
 
-        List<Dataframe> fullData = null;
-        if (!cacheExists(config)) {
-            fullData = loadFullDataFromSource(config);
-        }
+        Dataframes dataframes = loadDataFromSource(config);
 
         boolean persistent = isCacheEnabled(config);
         Date expire = null;
         if (persistent) {
             expire = getExpireTime(config);
         }
-
         // 如果自定义了schema,执行分两部完成。1、执行view sql，取得中间结果。2、使用中间结果，修改schema，加入执行参数，完成执行。
         if (queryScript != null && !CollectionUtils.isEmpty(queryScript.getSchema())) {
-            Dataframe temp = LocalDB.executeLocalQuery(queryScript, ExecuteParam.empty(), fullData, persistent, expire);
+            Dataframe temp = LocalDB.executeLocalQuery(queryScript, ExecuteParam.empty(), dataframes, persistent, expire);
             for (Column column : temp.getColumns()) {
                 column.setType(queryScript.getSchema().getOrDefault(column.getName(), column).getType());
             }
             temp.setRows(parseValues(temp.getRows(), temp.getColumns()));
             temp.setName(queryScript.toQueryKey());
-            fullData = Collections.singletonList(temp);
+            dataframes = Dataframes.of(temp.getName(), temp);
             queryScript = null;
             persistent = false;
         }
-        return LocalDB.executeLocalQuery(queryScript, executeParam, fullData, persistent, expire);
+        return LocalDB.executeLocalQuery(queryScript, executeParam, dataframes, persistent, expire);
     }
+
 
     protected List<Column> parseColumns(Map<String, Object> schema) {
         List<Column> columns = null;
@@ -157,12 +154,17 @@ public abstract class DefaultDataProvider extends DataProvider {
         return columns;
     }
 
-    public abstract List<Dataframe> loadFullDataFromSource(DataProviderSource config) throws Exception;
+    /**
+     * 从数据源加载全量数据
+     *
+     * @param config 数据源配置
+     */
+    public abstract Dataframes loadDataFromSource(DataProviderSource config) throws Exception;
 
     /**
      * 检查该数据源缓存中数据是否存在
      */
-    public boolean cacheExists(DataProviderSource config) throws SQLException {
+    public boolean cacheExists(DataProviderSource config,String cacheKey) throws SQLException {
         Object cacheEnable = config.getProperties().get("cacheEnable");
         if (cacheEnable == null) {
             return false;
@@ -170,7 +172,7 @@ public abstract class DefaultDataProvider extends DataProvider {
         if (!Boolean.parseBoolean(cacheEnable.toString())) {
             return false;
         }
-        return !LocalDB.checkCacheExpired(config.getSourceId());
+        return !LocalDB.checkCacheExpired(cacheKey);
     }
 
     @Override
@@ -226,7 +228,7 @@ public abstract class DefaultDataProvider extends DataProvider {
                         }
                         break;
                     case DATE:
-                        if (val instanceof Date){
+                        if (val instanceof Date) {
                             break;
                         }
                         String fmt = columns.get(i).getFmt();
