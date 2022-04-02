@@ -25,8 +25,10 @@ import {
   FormatPainterOutlined,
   GroupOutlined,
   SortAscendingOutlined,
+  SortDescendingOutlined,
 } from '@ant-design/icons';
 import Dropdown from 'antd/lib/dropdown';
+import { SortActionType } from 'app/constants';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
@@ -70,7 +72,12 @@ const ChartDraggableElementField: FC<{
         icons.push(<DiffOutlined key="alias" />);
       }
       if (col.sort) {
-        icons.push(<SortAscendingOutlined key="sort" />);
+        if (col.sort.type === SortActionType.ASC) {
+          icons.push(<SortAscendingOutlined key="sort" />);
+        }
+        if (col.sort.type === SortActionType.DESC) {
+          icons.push(<SortDescendingOutlined key="sort" />);
+        }
       }
       if (col.format) {
         icons.push(<FormatPainterOutlined key="format" />);
