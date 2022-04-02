@@ -24,9 +24,9 @@ import { PRIMARY } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions } from '../../../../pages/BoardEditor/slice';
 import { BoardContext } from '../../../BoardProvider/BoardProvider';
-import { WidgetConfAndInfoProvider } from '../../../WidgetProvider/WidgetConfAndInfoProvider';
 import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
+import { WidgetWrapProvider } from '../../../WidgetProvider/WidgetWrapProvider';
 import DropHolder from './DropHolder';
 import TabWidgetContainer from './WidgetOfTab';
 
@@ -107,13 +107,13 @@ export const TabWidget: React.FC<TabsBoxProps> = () => {
             forceRender
           >
             {tab.childWidgetId ? (
-              <WidgetConfAndInfoProvider
+              <WidgetWrapProvider
                 id={tab.childWidgetId}
                 boardEditing={boardEditing}
                 boardId={boardId}
               >
                 <TabWidgetContainer tabItem={tab} />
-              </WidgetConfAndInfoProvider>
+              </WidgetWrapProvider>
             ) : (
               <DropHolder tabItem={tab} parentId={widget.id} />
             )}

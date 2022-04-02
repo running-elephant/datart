@@ -17,6 +17,7 @@
  */
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import { ChartDTO } from 'app/types/ChartDTO';
@@ -109,6 +110,9 @@ export const fetchViewDetailAction = createAsyncThunk(
       method: 'GET',
       url: `views/${arg}`,
     });
+    if (response?.data?.model) {
+      response.data.model = beginViewModelMigration(response.data?.model);
+    }
     return response.data;
   },
 );

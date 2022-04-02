@@ -23,7 +23,6 @@ import { WidgetActionContext } from '../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from '../BoardProvider/BoardInfoProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
-import { WidgetChartProvider } from '../WidgetProvider/WidgetChartProvider';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetInfoContext } from '../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
@@ -94,15 +93,13 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
     switch (widget.config.type) {
       case 'chart':
         return (
-          <WidgetChartProvider>
-            <WidgetDataProvider
-              widgetId={widget.id}
-              boardId={widget.dashboardId}
-              boardEditing={editing}
-            >
-              <DataChartWidget />
-            </WidgetDataProvider>
-          </WidgetChartProvider>
+          <WidgetDataProvider
+            widgetId={widget.id}
+            boardId={widget.dashboardId}
+            boardEditing={editing}
+          >
+            <DataChartWidget />
+          </WidgetDataProvider>
         );
       case 'media':
         return <MediaWidget />;

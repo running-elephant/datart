@@ -37,6 +37,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.sql.SqlDialect;
+import org.apache.calcite.sql.parser.SqlParseException;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -152,6 +154,11 @@ public class JdbcDataProviderAdapter implements Closeable {
         }
     }
 
+    public String getQueryKey(QueryScript script, ExecuteParam executeParam) throws SqlParseException {
+        SqlScriptRender render = new SqlScriptRender(script, executeParam, getSqlDialect());
+        return "Q" + DigestUtils.md5Hex(render.render(true, true, true));
+    }
+
     protected Column readTableColumn(ResultSet columnMetadata) throws SQLException {
         Column column = new Column();
         column.setName(columnMetadata.getString(4));
@@ -222,15 +229,6 @@ public class JdbcDataProviderAdapter implements Closeable {
         }
     }
 
-    public Dataframe execute(QueryScript script, ExecuteParam executeParam) throws Exception {
-        //If server aggregation is enabled, query the full data before performing server aggregation
-        if (executeParam.isServerAggregate()) {
-            return executeInLocal(script, executeParam);
-        } else {
-            return executeOnSource(script, executeParam);
-        }
-    }
-
     /**
      * 单独执行一次查询获取总数据量，用于分页
      *
@@ -288,15 +286,31 @@ public class JdbcDataProviderAdapter implements Closeable {
                 sqlDialect = new CustomSqlDialect(driverInfo);
             }
         }
-        // set case not change
+        configSqlDialect(sqlDialect, driverInfo);
+        return sqlDialect;
+    }
+
+    protected void configSqlDialect(SqlDialect sqlDialect, JdbcDriverInfo driverInfo) {
         try {
-            ReflectUtils.setFiledValue(sqlDialect, "unquotedCasing", Casing.UNCHANGED);
-            ReflectUtils.setFiledValue(sqlDialect, "quotedCasing", Casing.UNCHANGED);
+            Map<String, Object> fieldValues = new HashMap<>();
+            // set identifierQuote
+            if (StringUtils.isNotBlank(driverInfo.getIdentifierEndQuote())) {
+                fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierEndQuote());
+            }
+            if (StringUtils.isNotBlank(driverInfo.getIdentifierQuote())) {
+                fieldValues.put("identifierQuoteString", driverInfo.getIdentifierQuote());
+            }
+            // set default casing UNCHANGED
+            fieldValues.put("unquotedCasing", Casing.UNCHANGED);
+            fieldValues.put("quotedCasing", Casing.UNCHANGED);
+
+            //set values
+            for (Map.Entry<String, Object> entry : fieldValues.entrySet()) {
+                ReflectUtils.setFiledValue(sqlDialect, entry.getKey(), entry.getValue());
+            }
         } catch (Exception e) {
             log.warn("sql dialect config error for " + driverInfo.getSqlDialect());
         }
-
-        return sqlDialect;
     }
 
     protected Dataframe parseResultSet(ResultSet rs) throws SQLException {
@@ -338,11 +352,10 @@ public class JdbcDataProviderAdapter implements Closeable {
     /**
      * 本地执行，从数据源拉取全量数据，在本地执行聚合操作
      */
-    protected Dataframe executeInLocal(QueryScript script, ExecuteParam executeParam) throws Exception {
+    public Dataframe executeInLocal(QueryScript script, ExecuteParam executeParam) throws Exception {
         SqlScriptRender render = new SqlScriptRender(script
                 , executeParam
                 , getSqlDialect());
-
         String sql = render.render(false, false, false);
         Dataframe data = execute(sql);
         if (!CollectionUtils.isEmpty(script.getSchema())) {
@@ -351,13 +364,13 @@ public class JdbcDataProviderAdapter implements Closeable {
             }
         }
         data.setName(script.toQueryKey());
-        return LocalDB.executeLocalQuery(null, executeParam, Collections.singletonList(data));
+        return LocalDB.executeLocalQuery(null, executeParam, Dataframes.of(script.getSourceId(), data));
     }
 
     /**
      * 在数据源执行，组装完整SQL，提交至数据源执行
      */
-    protected Dataframe executeOnSource(QueryScript script, ExecuteParam executeParam) throws Exception {
+    public Dataframe executeOnSource(QueryScript script, ExecuteParam executeParam) throws Exception {
 
         Dataframe dataframe;
         String sql;

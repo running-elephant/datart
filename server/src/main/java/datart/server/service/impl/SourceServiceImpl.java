@@ -245,7 +245,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
                 return hasPermission(role, parent, permission);
             }
         } else {
-            return securityManager.hasPermission(PermissionHelper.viewPermission(source.getOrgId(), role.getId(), source.getId(), permission));
+            return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), source.getId(), permission));
         }
     }
 

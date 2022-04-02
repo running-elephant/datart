@@ -2,10 +2,7 @@ package datart.data.provider.jdbc.adapters;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,6 +26,16 @@ public class MsSqlDataProviderAdapter extends JdbcDataProviderAdapter {
             }
         }
         return super.readAllDatabases();
+    }
+
+    @Override
+    public int executeCountSql(String sql) throws SQLException {
+        try (Connection connection = getConn()) {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            ResultSet resultSet = statement.executeQuery(sql);
+            resultSet.last();
+            return resultSet.getRow();
+        }
     }
 
 }
