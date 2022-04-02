@@ -53,6 +53,8 @@ HIVE:
   name: HIVE
   driver-class: org.apache.hive.jdbc.HiveDriver
   url-prefix: jdbc:hive2://
+  identifier-quote: "`"
+  identifier-end-quote: "`"
 
 HSQLDB:
   db-type: HSQLDB

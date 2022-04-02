@@ -286,15 +286,31 @@ public class JdbcDataProviderAdapter implements Closeable {
                 sqlDialect = new CustomSqlDialect(driverInfo);
             }
         }
-        // set case not change
+        configSqlDialect(sqlDialect, driverInfo);
+        return sqlDialect;
+    }
+
+    protected void configSqlDialect(SqlDialect sqlDialect, JdbcDriverInfo driverInfo) {
         try {
-            ReflectUtils.setFiledValue(sqlDialect, "unquotedCasing", Casing.UNCHANGED);
-            ReflectUtils.setFiledValue(sqlDialect, "quotedCasing", Casing.UNCHANGED);
+            Map<String, Object> fieldValues = new HashMap<>();
+            // set identifierQuote
+            if (StringUtils.isNotBlank(driverInfo.getIdentifierEndQuote())) {
+                fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierEndQuote());
+            }
+            if (StringUtils.isNotBlank(driverInfo.getIdentifierQuote())) {
+                fieldValues.put("identifierQuoteString", driverInfo.getIdentifierQuote());
+            }
+            // set default casing UNCHANGED
+            fieldValues.put("unquotedCasing", Casing.UNCHANGED);
+            fieldValues.put("quotedCasing", Casing.UNCHANGED);
+
+            //set values
+            for (Map.Entry<String, Object> entry : fieldValues.entrySet()) {
+                ReflectUtils.setFiledValue(sqlDialect, entry.getKey(), entry.getValue());
+            }
         } catch (Exception e) {
             log.warn("sql dialect config error for " + driverInfo.getSqlDialect());
         }
-
-        return sqlDialect;
     }
 
     protected Dataframe parseResultSet(ResultSet rs) throws SQLException {
