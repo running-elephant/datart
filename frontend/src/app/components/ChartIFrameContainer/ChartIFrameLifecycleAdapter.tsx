@@ -114,7 +114,8 @@ const ChartIFrameLifecycleAdapter: FC<{
 
   /**
    * Chart Update Event
-   * Dependency: 'config', 'dataset', 'widgetSpecialConfig', 'containerStatus', 'document', 'window', 'isShown'
+   * Dependency: 'config', 'dataset', 'widgetSpecialConfig',
+   * 'containerStatus', 'document', 'window', 'isShown', 'drillOption'
    */
   useEffect(() => {
     if (

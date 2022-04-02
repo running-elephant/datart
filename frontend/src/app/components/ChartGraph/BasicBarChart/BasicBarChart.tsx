@@ -16,10 +16,7 @@
  * limitations under the License.
  */
 
-import {
-  ChartDataSectionType,
-  ChartDataViewFieldCategory,
-} from 'app/constants';
+import { ChartDataSectionType } from 'app/constants';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -36,6 +33,7 @@ import { DrillOption } from 'app/types/ChartDrillOption';
 import {
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
+  getDrillableRows,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
@@ -130,14 +128,10 @@ class BasicBarChart extends Chart {
     const styleConfigs: ChartStyleConfig[] = config.styles || [];
     const dataConfigs: ChartDataConfig[] = config.datas || [];
     const settingConfigs: ChartStyleConfig[] = config.settings || [];
-    const groupConfigs: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
-      .flatMap(config => config.rows || [])
-      .map(r =>
-        r.category === ChartDataViewFieldCategory.Hierarchy
-          ? r.children?.[drillOption?.current || 0]!
-          : r,
-      );
+    const groupConfigs: ChartDataSectionField[] = getDrillableRows(
+      dataConfigs,
+      drillOption,
+    );
     const aggregateConfigs: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);

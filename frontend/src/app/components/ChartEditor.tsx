@@ -196,14 +196,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   }, [backendChart?.config?.chartGraphId]);
 
   useEffect(() => {
-    const drillPaths =
-      chartConfig?.datas
-        ?.filter(d => d.type === ChartDataSectionType.GROUP)
-        ?.flatMap(d => {
-          return (d.rows || [])
-            .filter(r => r.category === 'hierarchy')
-            .flatMap(hr => hr.children || []);
-        }) || [];
+    const drillPaths = (chartConfig?.datas || [])
+      .filter(d => d.type === ChartDataSectionType.GROUP)
+      .filter(d => Boolean(d.drillable))
+      .flatMap(d => d.rows?.filter(Boolean) || []);
     if (drillOption?.paths?.length !== drillPaths.length) {
       setDrillOption({
         paths: drillPaths,

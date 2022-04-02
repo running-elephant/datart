@@ -19,7 +19,6 @@
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
-  ChartDataViewFieldCategory,
   DataViewFieldType,
   FilterConditionType,
   SortActionType,
@@ -139,23 +138,18 @@ export class ChartDataRequestBuilder {
         if (isEmptyArray(cur.rows)) {
           return acc;
         }
-        if (
-          cur.type === ChartDataSectionType.GROUP ||
-          cur.type === ChartDataSectionType.COLOR
-        ) {
-          return acc.concat(
-            cur.rows?.flatMap(r => {
-              if (r.category === ChartDataViewFieldCategory.Hierarchy) {
-                return (
-                  r?.children?.slice(
-                    this.drillOption?.current || 0,
-                    (this.drillOption?.current || 0) + 1,
-                  ) || []
-                );
-              }
-              return r;
-            }) || [],
-          );
+        if (cur.type === ChartDataSectionType.COLOR) {
+          return acc.concat(cur.rows || []);
+        }
+        if (cur.type === ChartDataSectionType.GROUP) {
+          if (cur.drillable) {
+            return acc.concat(
+              cur.rows?.filter((_, index) => {
+                return index === (this.drillOption?.current || 0);
+              }) || [],
+            );
+          }
+          return acc.concat(cur.rows || []);
         }
         if (cur.type === ChartDataSectionType.MIXED) {
           const dateAndStringFields = cur.rows?.filter(v =>
@@ -168,7 +162,9 @@ export class ChartDataRequestBuilder {
       },
       [],
     );
-    return groupColumns.map(groupCol => ({ column: groupCol.colName }));
+    return Array.from(
+      new Set(groupColumns.map(groupCol => ({ column: groupCol.colName }))),
+    );
   }
 
   private buildFilters(): ChartDataRequestFilter[] {

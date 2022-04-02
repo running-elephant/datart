@@ -626,6 +626,7 @@
         "size": "大小",
         "drop": "请拖拽数据字段到这里",
         "dropCount": "请至少拖拽{{count}}个数据字段到这里",
+        "drillable": "可钻取",
         "actions": {
           "sort": {
             "title": "排序",

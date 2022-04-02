@@ -33,6 +33,7 @@ import {
   ChartStyleConfigDTO,
 } from 'app/types/ChartConfigDTO';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { DrillOption } from 'app/types/ChartDrillOption';
 import {
   cond,
   curry,

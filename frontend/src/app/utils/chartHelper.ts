@@ -45,6 +45,7 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { DrillOption } from 'app/types/ChartDrillOption';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { ECharts } from 'echarts';
 import { ECBasicOption } from 'echarts/types/dist/shared';
@@ -1528,4 +1529,28 @@ export const getAutoFunnelTopPosition = (config: {
   if (!chartHeight) return 16;
   // 24 marginBottom
   return chartHeight - 24 - height;
+};
+
+/**
+ * Get Fields when data section is drillable
+ *
+ * @param {ChartDataConfig[]} configs
+ * @param {DrillOption} option
+ * @return {*}  {ChartDataSectionField[]}
+ */
+export const getDrillableRows = (
+  configs: ChartDataConfig[],
+  option: DrillOption,
+): ChartDataSectionField[] => {
+  return configs
+    ?.filter(c => c.type === ChartDataSectionType.GROUP)
+    .flatMap(config => {
+      if (Boolean(config.drillable)) {
+        return (
+          config.rows?.filter((_, index) => index === (option?.current || 0)) ||
+          []
+        );
+      }
+      return config.rows || [];
+    });
 };

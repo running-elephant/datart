@@ -79,7 +79,7 @@ export const ChartDraggableSourceContainer: FC<
   const [, drag] = useDrag(
     () => ({
       type: isHierarchyField
-        ? CHART_DRAG_ELEMENT_TYPE.DATASET_HIERARCHY_COLUMN
+        ? CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN_GROUP
         : CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
       canDrag: true,
       item: selectedItems?.length

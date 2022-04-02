@@ -625,6 +625,7 @@
         "size": "Size",
         "drop": "Drag some data fields here",
         "dropCount": "Drag {{count}} fields here at least",
+        "drillable": "Drillable",
         "actions": {
           "sort": {
             "title": "Sort",
