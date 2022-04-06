@@ -17,7 +17,12 @@
  */
 import { memo } from 'react';
 import { MediaWidgetType } from '../../pages/Board/slice/types';
+import { IframeWidget } from '../Widget/IframeWidget/IframeWidget';
+import { ImageWidget } from '../Widget/ImageWidget/ImageWidget';
 import { RichTextWidget } from '../Widget/RichTextWidget/RichTextWidget';
+import { TimerWidget } from '../Widget/TimerWidget/TimerWidget';
+import { VideoWidget } from '../Widget/VideoWidget/VideoWidget';
+
 export const MediaWidgetMapper: React.FC<{
   subType: MediaWidgetType;
 }> = memo(({ subType }) => {
@@ -25,13 +30,13 @@ export const MediaWidgetMapper: React.FC<{
     case 'richText':
       return <RichTextWidget />;
     case 'image':
-      return <div />;
+      return <ImageWidget />;
     case 'video':
-      return <div />;
+      return <VideoWidget />;
     case 'iframe':
-      return <div />;
+      return <IframeWidget />;
     case 'timer':
-      return <div />;
+      return <TimerWidget />;
     default:
       return <div>default media</div>;
   }

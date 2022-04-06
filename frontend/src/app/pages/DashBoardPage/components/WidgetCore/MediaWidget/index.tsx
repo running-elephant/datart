@@ -18,21 +18,17 @@
 
 import { MediaWidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useContext } from 'react';
-import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import IframeWidget from './IframeWidget';
 import ImageWidget from './ImageWidget';
-import RichTextWidget from './RichTextWidget';
 import TimerWidget from './TimerWidget';
 import VideoWidget from './VideoWidget';
 
 export const MediaWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
-  const widgetInfo = useContext(WidgetInfoContext);
+
   let type: MediaWidgetType = widget.config.content.type;
   switch (type) {
-    case 'richText':
-      return <RichTextWidget widgetConfig={widget} widgetInfo={widgetInfo} />;
     case 'image':
       return <ImageWidget />;
     case 'video':
