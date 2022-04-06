@@ -15,17 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetCore/WidgetName/WidgetName';
+import { WidgetMapper } from 'app/pages/DashBoardPage/components/WidgetMapper/WidgetMapper';
 import { WidgetInfoContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { RGL_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
 import React, { memo, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetCore } from '../../../components/WidgetCore';
-import WidgetToolBar from '../../../components/WidgetToolBar';
-import BlockMaskLayer from '../components/BlockMaskLayer';
-import WidgetDndHandleMask from '../components/WidgetDndHandleMask';
 
 export const WidgetOfAutoEditor: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
@@ -36,7 +31,7 @@ export const WidgetOfAutoEditor: React.FC<{}> = memo(() => {
   const widgetStyle = useMemo(() => getWidgetStyle('auto', widget), [widget]);
   return (
     <Warp style={widgetStyle} onClick={ssp}>
-      <ItemContainer className="ItemContainer">
+      {/* <ItemContainer className="ItemContainer">
         <WidgetName config={widget.config} />
         <WidgetCore />
       </ItemContainer>
@@ -47,13 +42,10 @@ export const WidgetOfAutoEditor: React.FC<{}> = memo(() => {
           widgetType={widget.config.type}
         />
       )}
-      <BlockMaskLayer
-        widgetConfig={widget}
-        widgetInfo={widgetInfo}
-        handleClassName={RGL_DRAG_HANDLE}
-      />
+      <BlockMaskLayer widgetConfig={widget} widgetInfo={widgetInfo} />
 
-      <WidgetToolBar />
+      <WidgetToolBar /> */}
+      <WidgetMapper boardType={'auto'} boardEditing={true} />
     </Warp>
   );
 });

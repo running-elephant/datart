@@ -17,6 +17,7 @@
  */
 
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
+import { WIDGET_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
 import produce from 'immer';
 import React, {
@@ -154,7 +155,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
       onStart={dragStart}
       onDrag={drag}
       onStop={dragStop}
-      handle=".display-Draggable"
+      handle={`.${WIDGET_DRAG_HANDLE}`}
       disabled={lock}
     >
       <Resizable

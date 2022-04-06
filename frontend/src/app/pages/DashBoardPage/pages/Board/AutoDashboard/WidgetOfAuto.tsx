@@ -16,13 +16,11 @@
  * limitations under the License.
  */
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetCore/WidgetName/WidgetName';
+import { WidgetMapper } from 'app/pages/DashBoardPage/components/WidgetMapper/WidgetMapper';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
 import React, { useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetCore } from '../../../components/WidgetCore';
-import WidgetToolBar from '../../../components/WidgetToolBar';
 
 export const WidgetOfAuto: React.FC = React.memo(() => {
   const widget = useContext(WidgetContext);
@@ -33,11 +31,7 @@ export const WidgetOfAuto: React.FC = React.memo(() => {
   );
   return (
     <Warp className="widget" style={widgetStyle}>
-      <ItemContainer>
-        <WidgetName config={widget.config} />
-        <WidgetCore />
-      </ItemContainer>
-      <WidgetToolBar />
+      <WidgetMapper boardType={'auto'} boardEditing={false} />
     </Warp>
   );
 });
@@ -47,11 +41,4 @@ const Warp = styled.div<{}>`
   &:hover .widget-tool-dropdown {
     visibility: visible;
   }
-`;
-const ItemContainer = styled.div`
-  z-index: 10;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-height: 0;
 `;

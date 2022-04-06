@@ -40,11 +40,7 @@ export const WidgetItem: React.FC<{}> = memo(() => {
           widgetType={widget.config.type}
         />
       )}
-      <BlockMaskLayer
-        widgetConfig={widget}
-        widgetInfo={widgetInfo}
-        handleClassName={'display-Draggable'}
-      />
+      <BlockMaskLayer widgetConfig={widget} widgetInfo={widgetInfo} />
 
       <WidgetToolBar />
     </>

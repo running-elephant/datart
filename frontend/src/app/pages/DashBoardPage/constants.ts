@@ -25,7 +25,7 @@ import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
 import { PRIMARY, WHITE } from 'styles/StyleConstants';
 import { WidgetType } from './pages/Board/slice/types';
-export const RGL_DRAG_HANDLE = 'dashboard-draggableHandle';
+export const WIDGET_DRAG_HANDLE = 'widget-draggableHandle';
 export const BOARD_FILE_IMG_PREFIX = 'resources/image/dashboard/';
 export const BASE_VIEW_WIDTH = 1024;
 export const BASE_ROW_HEIGHT = 32;
