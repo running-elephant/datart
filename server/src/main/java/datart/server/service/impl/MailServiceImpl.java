@@ -96,10 +96,10 @@ public class MailServiceImpl extends BaseService implements MailService {
     @Value("${spring.mail.senderName:Datart}")
     private String senderName;
 
-    @Value("${datart.user.active.expiry-hours:48}")
+    @Value("${datart.user.active.expire-hours:48}")
     private int activeExpireHours;
 
-    @Value("${datart.user.invite.expiry-hours:48}")
+    @Value("${datart.user.invite.expire-hours:48}")
     private int inviteExpireHours;
 
     public MailServiceImpl(TemplateEngine templateEngine,MessageSource messageSource) {
