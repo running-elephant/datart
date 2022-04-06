@@ -18,32 +18,33 @@
 
 import { RightOutlined } from '@ant-design/icons';
 import { Tag } from 'antd';
-import { ChartConfig } from 'app/types/ChartConfig';
-import { DrillOption } from 'app/types/ChartDrillOption';
-import { getColumnRenderName, getDrillPaths } from 'app/utils/chartHelper';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 
 const ChartDrillPath: FC<{
-  chartConfig?: ChartConfig;
-  drillOption?: DrillOption;
-  onChartDrillOptionChange?: (index: number) => void;
-}> = memo(({ chartConfig, drillOption, onChartDrillOptionChange }) => {
+  drillOption?: ChartDrillOption;
+  onChartDrillOptionChange?: (option: ChartDrillOption) => void;
+}> = memo(({ drillOption, onChartDrillOptionChange }) => {
   if (!drillOption) return <div></div>;
 
-  const drillPaths = getDrillPaths(chartConfig?.datas);
+  const drillFields = drillOption.getAllDrillFields();
   return (
     <StyledChartDrillPath>
-      {drillPaths.map((p, index) => {
+      {drillFields.map((f, index) => {
         return (
           <>
             <StyledDrillNode
-              isActive={drillOption?.current === index}
-              onClick={() => onChartDrillOptionChange?.(index)}
+              isActive={drillOption?.getCurDrillField().uid === f.uid}
+              onClick={() => {
+                drillOption.drillDown(f);
+                onChartDrillOptionChange?.(drillOption);
+              }}
             >
-              {getColumnRenderName(p)}
+              {getColumnRenderName(f)}
             </StyledDrillNode>
-            {index !== drillPaths?.length - 1 ? <StyledIndicatorIcon /> : ''}
+            {index !== drillFields?.length - 1 ? <StyledIndicatorIcon /> : ''}
           </>
         );
       })}

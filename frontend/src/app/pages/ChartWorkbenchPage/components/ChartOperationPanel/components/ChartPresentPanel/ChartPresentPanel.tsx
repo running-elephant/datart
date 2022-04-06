@@ -21,12 +21,13 @@ import { Col, Dropdown, Menu, Row, Table } from 'antd';
 import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContainer';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
+import { DrillMode } from 'app/models/ChartDrillOption';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { getColumnRenderName, getDrillPaths } from 'app/utils/chartHelper';
+import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, memo, useContext, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -99,29 +100,36 @@ const ChartPresentPanel: FC<{
     };
 
     const menu = useMemo(() => {
-      const drillPaths = getDrillPaths(chartConfig?.datas);
-      const restDrillPaths = drillPaths.slice((drillOption?.current || 0) + 1);
+      const drillFields = drillOption?.getAllDrillFields();
       return (
         <Menu style={{ width: 200 }}>
           <Menu.SubMenu
+            disabled={drillOption?.getMode() === DrillMode.Expand}
             key="showNextLevel"
             title={drillTranslator('showNextLevel')}
           >
-            {drillPaths.map((p, index) => {
-              if (!restDrillPaths.includes(p)) {
-                return null;
-              }
+            {(drillFields || []).map((f, index) => {
+              // if (!restDrillPaths.includes(p)) {
+              //   return null;
+              // }
               return (
                 <Menu.Item
-                  key={p.uid}
-                  onClick={() => onChartDrillOptionChange?.(index)}
+                  key={f.uid}
+                  onClick={() => {
+                    if (!drillOption) {
+                      return;
+                    }
+                    drillOption?.drillDown(f);
+                    onChartDrillOptionChange?.(drillOption);
+                  }}
                 >
-                  {getColumnRenderName(p)}
+                  {getColumnRenderName(f)}
                 </Menu.Item>
               );
             })}
           </Menu.SubMenu>
           <Menu.SubMenu
+            disabled={drillOption?.getMode() === DrillMode.Drill}
             key="expandNextLevel"
             title={drillTranslator('expandNextLevel')}
           >
@@ -130,7 +138,7 @@ const ChartPresentPanel: FC<{
           </Menu.SubMenu>
         </Menu>
       );
-    }, [chartConfig, onChartDrillOptionChange]);
+    }, [drillOption, drillTranslator, onChartDrillOptionChange]);
 
     const renderReusableChartContainer = () => {
       const style = {
@@ -208,7 +216,6 @@ const ChartPresentPanel: FC<{
         <Row justify="space-between">
           <Col>
             <ChartDrillPath
-              chartConfig={chartConfig}
               drillOption={drillOption}
               onChartDrillOptionChange={onChartDrillOptionChange}
             />

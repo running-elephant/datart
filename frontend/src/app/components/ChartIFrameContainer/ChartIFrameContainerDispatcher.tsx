@@ -17,10 +17,10 @@
  */
 
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { DrillOption } from 'app/types/ChartDrillOption';
 import { CSSProperties } from 'react';
 
 const DEFAULT_CONTAINER_ID = 'frame-container-1';
@@ -31,7 +31,7 @@ class ChartIFrameContainerDispatcher {
   private chartContainerMap = new Map<string, Function>();
   private chartMetadataMap = new Map<
     string,
-    [IChart, any, any, DrillOption | undefined]
+    [IChart, any, any, ChartDrillOption | undefined]
   >();
   private editorEnv = { env: 'workbench' };
 
@@ -54,7 +54,7 @@ class ChartIFrameContainerDispatcher {
     dataset: any,
     config: ChartConfig,
     style?: CSSProperties,
-    drillOption?: DrillOption,
+    drillOption?: ChartDrillOption,
   ): Function[] {
     this.switchContainer(containerId, chart, dataset, config, drillOption);
     const renders: Function[] = [];
@@ -78,7 +78,7 @@ class ChartIFrameContainerDispatcher {
     chart: IChart,
     dataset: ChartDataSetDTO,
     config: ChartConfig,
-    drillOption?: DrillOption,
+    drillOption?: ChartDrillOption,
   ) {
     this.chartMetadataMap.set(containerId, [
       chart,

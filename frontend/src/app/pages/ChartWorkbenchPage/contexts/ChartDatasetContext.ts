@@ -16,15 +16,15 @@
  * limitations under the License.
  */
 
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { DrillOption } from 'app/types/ChartDrillOption';
 import { createContext } from 'react';
 
 const ChartDatasetContext = createContext<{
   dataset?: ChartDataSetDTO;
-  drillOption?: DrillOption;
+  drillOption?: ChartDrillOption;
   onRefreshDataset?: () => void;
-  onChartDrillOptionChange?: (index: number) => void;
+  onChartDrillOptionChange?: (option: ChartDrillOption) => void;
 }>({
   dataset: {},
   onRefreshDataset: undefined,

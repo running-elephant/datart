@@ -21,6 +21,7 @@ import { Modal } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import workbenchSlice, {
   useWorkbenchSlice,
@@ -48,7 +49,6 @@ import {
   useSaveFormContext,
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { IChart } from 'app/types/Chart';
-import { DrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { getDrillPaths } from 'app/utils/chartHelper';
 import { makeDownloadDataTask } from 'app/utils/fetch';
@@ -58,7 +58,7 @@ import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
-import { CloneValueDeep } from 'utils/object';
+import { CloneValueDeep, isEmptyArray } from 'utils/object';
 import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
 import {
   DataChart,
@@ -118,7 +118,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
   const [chart, setChart] = useState<IChart>();
-  const drillOptionRef = useRef<DrillOption>({ current: 0 });
+  const drillOptionRef = useRef<ChartDrillOption>();
 
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
@@ -198,14 +198,15 @@ export const ChartEditor: FC<ChartEditorProps> = ({
 
   useEffect(() => {
     const drillPaths = getDrillPaths(chartConfig?.datas);
-    const needDrillPositionRevert = () => {
-      return (drillOptionRef.current?.current || 0) > drillPaths.length;
-    };
-    drillOptionRef.current = {
-      current: needDrillPositionRevert()
-        ? 0
-        : drillOptionRef.current?.current || 0,
-    };
+    if (
+      !isEmptyArray(drillPaths) &&
+      drillOptionRef.current
+        ?.getAllDrillFields()
+        ?.map(p => p.uid)
+        .join('-') !== drillPaths.map(p => p.uid).join('-')
+    ) {
+      drillOptionRef.current = new ChartDrillOption(drillPaths);
+    }
   }, [chartConfig?.datas, drillOptionRef]);
 
   const registerChartEvents = useCallback(
@@ -517,12 +518,9 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     widgetId,
   ]);
 
-  const handleDrillOptionChange = currentIndex => {
-    const newDrillOption = {
-      current: currentIndex,
-    };
-    drillOptionRef.current = newDrillOption;
-    dispatch(refreshDatasetAction({ drillOption: newDrillOption }));
+  const handleDrillOptionChange = (option: ChartDrillOption) => {
+    drillOptionRef.current = option;
+    dispatch(refreshDatasetAction({ drillOption: option }));
   };
 
   return (

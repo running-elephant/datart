@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/ChartAggregationContext';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
@@ -24,7 +25,6 @@ import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
-import { DrillOption } from 'app/types/ChartDrillOption';
 import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -38,7 +38,7 @@ const ChartWorkbench: FC<{
   chartConfig?: ChartConfig;
   chart?: IChart;
   aggregation?: boolean;
-  drillOption?: DrillOption;
+  drillOption?: ChartDrillOption;
   defaultViewId?: string;
   expensiveQuery: boolean;
   allowQuery: boolean;
@@ -56,7 +56,7 @@ const ChartWorkbench: FC<{
   onDataViewChange?: () => void;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
-  onChartDrillOptionChange?: (index: number) => void;
+  onChartDrillOptionChange?: (option: ChartDrillOption) => void;
 }> = memo(
   ({
     dataset,

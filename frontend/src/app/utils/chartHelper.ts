@@ -19,6 +19,7 @@
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import { ChartDataSectionType, FieldFormatType } from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import {
   AxisLabel,
   AxisLineStyle,
@@ -45,7 +46,6 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
-import { DrillOption } from 'app/types/ChartDrillOption';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { ECharts } from 'echarts';
 import { ECBasicOption } from 'echarts/types/dist/shared';
@@ -1535,19 +1535,19 @@ export const getAutoFunnelTopPosition = (config: {
  * Get Fields when data section is drillable
  *
  * @param {ChartDataConfig[]} configs
- * @param {DrillOption} option
+ * @param {ChartDrillOption} option
  * @return {*}  {ChartDataSectionField[]}
  */
 export const getDrillableRows = (
   configs: ChartDataConfig[],
-  option?: DrillOption,
+  option?: ChartDrillOption,
 ): ChartDataSectionField[] => {
   return configs
     ?.filter(c => c.type === ChartDataSectionType.GROUP)
     .flatMap(config => {
       if (Boolean(config.drillable)) {
         return (
-          config.rows?.filter((_, index) => index === (option?.current || 0)) ||
+          config.rows?.filter(f => f.uid === option?.getCurDrillField().uid) ||
           []
         );
       }

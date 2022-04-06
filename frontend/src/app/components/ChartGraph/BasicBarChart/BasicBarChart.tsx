@@ -17,6 +17,7 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -29,7 +30,6 @@ import {
   YAxis,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
-import { DrillOption } from 'app/types/ChartDrillOption';
 import {
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
@@ -123,7 +123,7 @@ class BasicBarChart extends Chart {
   getOptions(
     dataset: ChartDataSetDTO,
     config: ChartConfig,
-    drillOption: DrillOption,
+    drillOption: ChartDrillOption,
   ) {
     const styleConfigs: ChartStyleConfig[] = config.styles || [];
     const dataConfigs: ChartDataConfig[] = config.datas || [];

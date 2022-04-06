@@ -35,7 +35,6 @@ import {
 } from 'app/types/ChartDataRequest';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
-import { DrillOption } from 'app/types/ChartDrillOption';
 import { getValue } from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import {
@@ -45,6 +44,7 @@ import {
 } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
+import { ChartDrillOption } from './ChartDrillOption';
 
 export class ChartDataRequestBuilder {
   extraSorters: ChartDataRequest['orders'] = [];
@@ -54,7 +54,7 @@ export class ChartDataRequestBuilder {
   dataView;
   script: boolean;
   aggregation?: boolean;
-  drillOption?: DrillOption;
+  drillOption?: ChartDrillOption;
 
   constructor(
     dataView: Pick<ChartDataView, 'id' | 'computedFields'> & {
@@ -81,7 +81,7 @@ export class ChartDataRequestBuilder {
     return this;
   }
 
-  public addDrillOption(drillOption?: DrillOption) {
+  public addDrillOption(drillOption?: ChartDrillOption) {
     this.drillOption = drillOption;
     return this;
   }
@@ -144,8 +144,11 @@ export class ChartDataRequestBuilder {
         if (cur.type === ChartDataSectionType.GROUP) {
           if (cur.drillable) {
             return acc.concat(
-              cur.rows?.filter((_, index) => {
-                return index === (this.drillOption?.current || 0);
+              cur.rows?.filter(field => {
+                return (
+                  !this.drillOption ||
+                  field.uid === this.drillOption?.getCurDrillField().uid
+                );
               }) || [],
             );
           }
