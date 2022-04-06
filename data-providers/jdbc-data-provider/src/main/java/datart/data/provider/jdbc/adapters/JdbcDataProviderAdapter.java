@@ -294,11 +294,12 @@ public class JdbcDataProviderAdapter implements Closeable {
         try {
             Map<String, Object> fieldValues = new HashMap<>();
             // set identifierQuote
-            if (StringUtils.isNotBlank(driverInfo.getIdentifierEndQuote())) {
-                fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierEndQuote());
-            }
             if (StringUtils.isNotBlank(driverInfo.getIdentifierQuote())) {
                 fieldValues.put("identifierQuoteString", driverInfo.getIdentifierQuote());
+                fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierEndQuote());
+            }
+            if (StringUtils.isNotBlank(driverInfo.getIdentifierEndQuote())) {
+                fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierEndQuote());
             }
             // set default casing UNCHANGED
             fieldValues.put("unquotedCasing", Casing.UNCHANGED);

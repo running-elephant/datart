@@ -20,6 +20,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.openqa.selenium.OutputType;
 import org.springframework.stereotype.Service;
@@ -62,8 +63,8 @@ public class AttachmentPdfServiceImpl implements AttachmentService {
         String url = Application.getWebRootURL()+"/"+vizType.getShareRoute()+"/"+share.getId()+"?type="+share.getAuthenticationMode();
         log.info("share url {} ", url);
 
-        downloadCreateParam.setImageWidth(600);
-        File imageFile = WebUtils.screenShot(url, OutputType.FILE, downloadCreateParam.getImageWidth());
+        int width = downloadCreateParam.getImageWidth()<=0 ? 1920 : downloadCreateParam.getImageWidth();
+        File imageFile = WebUtils.screenShot(url, OutputType.FILE, width);
         File file = new File(generateFileName(path,fileName,attachmentType));
         createPDFFromImage(file.getPath(), imageFile.getPath());
 
@@ -80,11 +81,13 @@ public class AttachmentPdfServiceImpl implements AttachmentService {
      */
     public void createPDFFromImage(String pdfPath, String imagePath) throws Exception {
         PDDocument doc = new PDDocument();
-        PDPage page = new PDPage();
-        doc.addPage(page);
         PDImageXObject pdImage = PDImageXObject.createFromFile(imagePath, doc);
+        float width = pdImage.getWidth();
+        float height = pdImage.getHeight();
+        PDPage page = new PDPage(new PDRectangle(width, height));
+        doc.addPage(page);
         PDPageContentStream contents = new PDPageContentStream(doc, page);
-        contents.drawImage(pdImage, 20, 20);
+        contents.drawImage(pdImage, 0, 0, width, height);
         contents.close();
         doc.save(pdfPath);
         doc.close();
