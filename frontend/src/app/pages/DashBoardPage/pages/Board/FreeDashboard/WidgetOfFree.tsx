@@ -16,27 +16,20 @@
  * limitations under the License.
  */
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { WidgetName } from 'app/pages/DashBoardPage/components/WidgetCore/WidgetName/WidgetName';
+import { WidgetMapper } from 'app/pages/DashBoardPage/components/WidgetMapper/WidgetMapper';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
 import React, { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetCore } from '../../../components/WidgetCore';
-import WidgetToolBar from '../../../components/WidgetToolBar';
 
-interface BlockItemIProps {}
-export const WidgetOfFree: React.FC<BlockItemIProps> = memo(() => {
+export const WidgetOfFree: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const { boardType } = useContext(BoardContext);
   const widgetStyle = getWidgetStyle(boardType, widget);
 
   return (
     <Wrap style={widgetStyle}>
-      <ItemContainer>
-        <WidgetName config={widget.config} />
-        <WidgetCore />
-      </ItemContainer>
-      <WidgetToolBar />
+      <WidgetMapper boardType="free" boardEditing={true} />
     </Wrap>
   );
 });
@@ -50,9 +43,4 @@ const Wrap = styled.div`
   & > span:last-child {
     z-index: 999999;
   }
-`;
-const ItemContainer = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
 `;

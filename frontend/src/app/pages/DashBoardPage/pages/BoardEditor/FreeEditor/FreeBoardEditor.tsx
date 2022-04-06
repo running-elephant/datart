@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { WidgetMapper } from 'app/pages/DashBoardPage/components/WidgetMapper/WidgetMapper';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { WIDGET_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
@@ -36,7 +37,6 @@ import { scaleContext } from '../../../components/FreeBoardBackground';
 import { editBoardStackActions } from '../slice';
 import { widgetMove, widgetMoveEnd } from '../slice/events';
 import { selectSelectedIds } from '../slice/selectors';
-import { WidgetItem } from './WidgetItem';
 export enum DragTriggerTypes {
   MouseMove = 'mousemove',
   KeyDown = 'keydown',
@@ -173,7 +173,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
         lockAspectRatio={false}
       >
         <ItemWrap style={style} onClick={ssp}>
-          <WidgetItem />
+          <WidgetMapper boardType="free" boardEditing={true} />
         </ItemWrap>
       </Resizable>
     </DraggableCore>
