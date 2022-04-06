@@ -115,9 +115,6 @@ export type ChartDataSectionField = {
   filter?: FilterFieldAction;
   color?: ColorFieldAction;
   size?: number;
-
-  // TODO(Stephen): to be remove for hierarchy child fields
-  children?: ChartDataSectionField[];
 };
 
 export type SortFieldAction = {

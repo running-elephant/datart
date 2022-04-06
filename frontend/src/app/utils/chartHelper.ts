@@ -1547,8 +1547,9 @@ export const getDrillableRows = (
     .flatMap(config => {
       if (Boolean(config.drillable)) {
         return (
-          config.rows?.filter(f => f.uid === option?.getCurDrillField().uid) ||
-          []
+          config.rows?.filter(
+            f => !option || f.uid === option?.getCurDrillField().uid,
+          ) || []
         );
       }
       return config.rows || [];

@@ -16,8 +16,13 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType } from 'app/constants';
+import {
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+  DataViewFieldType,
+} from 'app/constants';
 import { ChartDataSetRow } from 'app/models/ChartDataSet';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   ChartDataConfig,
@@ -2092,7 +2097,6 @@ describe('Chart Helper ', () => {
           rows: [1, 2],
         },
       ] as any[];
-      const drillOption = {};
       const drillRows = getDrillableRows(config, undefined);
       expect(drillRows).toEqual([1, 2]);
     });
@@ -2104,7 +2108,6 @@ describe('Chart Helper ', () => {
           rows: [1, 2],
         },
       ] as any[];
-      const drillOption = {};
       const drillRows = getDrillableRows(config, undefined);
       expect(drillRows).toEqual([]);
     });
@@ -2113,42 +2116,58 @@ describe('Chart Helper ', () => {
       const config = [
         {
           type: ChartDataSectionType.GROUP,
-          rows: [1, 2],
+          key: 'col1',
+          rows: [
+            {
+              uid: '1',
+              colName: 'col1',
+              type: DataViewFieldType.STRING,
+              category: ChartDataViewFieldCategory.Field,
+            },
+            {
+              uid: '2',
+              colName: 'col2',
+              type: DataViewFieldType.STRING,
+              category: ChartDataViewFieldCategory.Field,
+            },
+          ],
         },
-      ] as any[];
-      const drillOption = { paths: [], current: 0 };
+      ];
+      const drillOption = new ChartDrillOption(config[0].rows);
       const drillRows = getDrillableRows(config, drillOption);
-      expect(drillRows).toEqual([1, 2]);
+      expect(drillRows).toEqual([
+        { uid: '1', colName: 'col1', type: 'STRING', category: 'field' },
+        { uid: '2', colName: 'col2', type: 'STRING', category: 'field' },
+      ]);
     });
 
     test('should get drillable group section rows with drillOption', () => {
       const config = [
         {
           type: ChartDataSectionType.GROUP,
-          rows: [1, 2],
+          key: 'col1',
           drillable: true,
+          rows: [
+            {
+              uid: '1',
+              colName: 'col1',
+              type: DataViewFieldType.STRING,
+              category: ChartDataViewFieldCategory.Field,
+            },
+            {
+              uid: '2',
+              colName: 'col2',
+              type: DataViewFieldType.STRING,
+              category: ChartDataViewFieldCategory.Field,
+            },
+          ],
         },
-      ] as any[];
-      const drillOption = { paths: [], current: 0 };
+      ];
+      const drillOption = new ChartDrillOption(config[0].rows);
       const drillRows = getDrillableRows(config, drillOption);
-      expect(drillRows).toEqual([1]);
-    });
-
-    test('should only get drillable group section rows with drillOption', () => {
-      const config = [
-        {
-          type: ChartDataSectionType.GROUP,
-          rows: [1, 2],
-          drillable: true,
-        },
-        {
-          type: ChartDataSectionType.AGGREGATE,
-          rows: [3, 4],
-        },
-      ] as any[];
-      const drillOption = { paths: [], current: 1 };
-      const drillRows = getDrillableRows(config, drillOption);
-      expect(drillRows).toEqual([2]);
+      expect(drillRows).toEqual([
+        { uid: '1', colName: 'col1', type: 'STRING', category: 'field' },
+      ]);
     });
   });
 });
