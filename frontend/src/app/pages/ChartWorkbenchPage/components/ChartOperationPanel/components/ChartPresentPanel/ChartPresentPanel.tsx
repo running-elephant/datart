@@ -68,6 +68,7 @@ const ChartPresentPanel: FC<{
     onCreateDownloadDataTask,
   }) => {
     const translate = useI18NPrefix(`viz.palette.present`);
+    const drillTranslator = useI18NPrefix(`viz.palette.drill`);
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
     const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
     const datasetLoadingStatus = useSelector(datasetLoadingSelector);
@@ -99,18 +100,34 @@ const ChartPresentPanel: FC<{
 
     const menu = useMemo(() => {
       const drillPaths = getDrillPaths(chartConfig?.datas);
+      const restDrillPaths = drillPaths.slice((drillOption?.current || 0) + 1);
       return (
         <Menu style={{ width: 200 }}>
-          {drillPaths.map((p, index) => {
-            return (
-              <Menu.Item
-                key={p.uid}
-                onClick={() => onChartDrillOptionChange?.(index)}
-              >
-                {getColumnRenderName(p)}
-              </Menu.Item>
-            );
-          })}
+          <Menu.SubMenu
+            key="showNextLevel"
+            title={drillTranslator('showNextLevel')}
+          >
+            {drillPaths.map((p, index) => {
+              if (!restDrillPaths.includes(p)) {
+                return null;
+              }
+              return (
+                <Menu.Item
+                  key={p.uid}
+                  onClick={() => onChartDrillOptionChange?.(index)}
+                >
+                  {getColumnRenderName(p)}
+                </Menu.Item>
+              );
+            })}
+          </Menu.SubMenu>
+          <Menu.SubMenu
+            key="expandNextLevel"
+            title={drillTranslator('expandNextLevel')}
+          >
+            <Menu.Item>5d menu item</Menu.Item>
+            <Menu.Item>6th menu item</Menu.Item>
+          </Menu.SubMenu>
         </Menu>
       );
     }, [chartConfig, onChartDrillOptionChange]);

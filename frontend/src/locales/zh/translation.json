@@ -775,6 +775,10 @@
         "cancel": "取消",
         "number": "序号",
         "summary": "汇总"
+      },
+      "drill": {
+        "showNextLevel": "显示下一层级",
+        "expandNextLevel":"展开下一层级"
       }
     },
     "action": {

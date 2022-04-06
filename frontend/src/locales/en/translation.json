@@ -774,6 +774,10 @@
         "cancel": "Cancel",
         "number": "No.",
         "summary": "Summary"
+      },
+      "drill": {
+        "showNextLevel": "Show Next Level",
+        "expandNextLevel":"Expand Next Level"
       }
     },
     "action": {
