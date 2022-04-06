@@ -24,7 +24,7 @@ import styled from 'styled-components/macro';
 import { SPACE_TIMES } from 'styles/StyleConstants';
 import { getServerDomain, request2 } from 'utils/request';
 import ShareLinkModal from './ShareLinkModal';
-import { shareDetailType } from './slice/type';
+import { ShareDetail } from './slice/type';
 
 const ShareManageModal: FC<{
   vizId: string;
@@ -57,13 +57,14 @@ const ShareManageModal: FC<{
     orgId,
   }) => {
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
-    const [listData, setListData] = useState<shareDetailType[]>([]);
-    const [manipulatedData, setManipulatedData] =
-      useState<shareDetailType | null>(null);
+    const [listData, setListData] = useState<ShareDetail[]>([]);
+    const [manipulatedData, setManipulatedData] = useState<ShareDetail | null>(
+      null,
+    );
     const t = useI18NPrefix(`viz.action`);
 
     const fetchShareListFn = useCallback(async () => {
-      const { data } = await request2<shareDetailType[]>({
+      const { data } = await request2<ShareDetail[]>({
         url: `/shares/${vizId}`,
         method: 'GET',
       });
@@ -169,7 +170,7 @@ const ShareManageModal: FC<{
       setShowShareLinkModal(false);
     }, []);
 
-    const handleOperateFn = useCallback((share: shareDetailType) => {
+    const handleOperateFn = useCallback((share: ShareDetail) => {
       setManipulatedData(share);
       setShowShareLinkModal(true);
     }, []);

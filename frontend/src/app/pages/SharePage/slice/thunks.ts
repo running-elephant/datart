@@ -45,6 +45,7 @@ export const fetchShareVizInfo = createAsyncThunk(
       renderMode,
       userName,
       passWord,
+      authorizedToken,
     }: {
       shareToken?: string;
       sharePassword?: string;
@@ -52,11 +53,12 @@ export const fetchShareVizInfo = createAsyncThunk(
       renderMode?: VizRenderMode;
       userName?: string;
       passWord?: string;
+      authorizedToken?: string;
     },
     thunkAPI,
   ) => {
-    let data = {} as any;
-    let authenticationMode = filterSearchParams?.type.join();
+    const authenticationMode = filterSearchParams?.type.join();
+    let data = {} as ShareVizInfo;
     try {
       const response = await request2<ShareVizInfo>({
         url: `/shares/${shareToken}/viz`,
@@ -67,6 +69,7 @@ export const fetchShareVizInfo = createAsyncThunk(
           id: shareToken,
           username: userName,
           password: passWord,
+          authorizedToken,
         },
       });
       data = response.data;
@@ -74,7 +77,12 @@ export const fetchShareVizInfo = createAsyncThunk(
       throw error;
     }
     await thunkAPI.dispatch(shareActions.setVizType(data.vizType));
-    persistence.session.save(shareToken, sharePassword);
+    if (authenticationMode === 'CODE') {
+      persistence.session.save(shareToken, sharePassword);
+    }
+    if (authenticationMode === 'LOGIN' && data?.shareToken) {
+      persistence.session.save(shareToken, data.shareToken.authorizedToken);
+    }
     await thunkAPI.dispatch(shareActions.saveNeedVerify(false));
     await thunkAPI.dispatch(
       shareActions.saveShareInfo({

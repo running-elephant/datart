@@ -71,14 +71,25 @@ export function ShareChart() {
       const previousPassword = persistence.session.get(shareToken);
 
       if (previousPassword) {
-        if (shareType === 'CODE') {
-          fetchShareVizInfoImpl(shareToken, previousPassword, searchParams);
-        }
+        fetchShareVizInfoImpl(shareToken, previousPassword, searchParams);
       } else {
         dispatch(actions.saveNeedVerify(true));
       }
     } else if (shareType === 'LOGIN' && !logged) {
-      fetchShareVizInfoImpl(shareToken, undefined, searchParams);
+      const authorizedToken = persistence.session.get(shareToken);
+
+      if (authorizedToken) {
+        fetchShareVizInfoImpl(
+          shareToken,
+          undefined,
+          searchParams,
+          undefined,
+          undefined,
+          authorizedToken,
+        );
+      } else {
+        dispatch(actions.saveNeedVerify(true));
+      }
     } else {
       fetchShareVizInfoImpl(shareToken, undefined, searchParams);
     }
@@ -97,6 +108,7 @@ export function ShareChart() {
     params?: FilterSearchParams,
     loginUser?: string,
     loginPwd?: string,
+    authorizedToken?: string,
   ) => {
     dispatch(
       fetchShareVizInfo({
@@ -106,6 +118,7 @@ export function ShareChart() {
         renderMode,
         userName: loginUser,
         passWord: loginPwd,
+        authorizedToken,
       }),
     );
   };
@@ -113,7 +126,7 @@ export function ShareChart() {
   return (
     <StyledWrapper className="datart-viz">
       <ShareLoginModal
-        visible={Boolean(needVerify) && shareType === 'LOGIN' && !logged}
+        visible={shareType === 'LOGIN' && Boolean(needVerify)}
         onChange={({ username, password }) => {
           fetchShareVizInfoImpl(
             shareToken,
@@ -135,12 +148,9 @@ export function ShareChart() {
           <BoardLoading />
         </div>
       )}
-      {!Boolean(needVerify) &&
-        vizType === 'DATACHART' &&
-        chartPreview &&
-        chartPreview?.backendChart && (
-          <ChartForShare chartPreview={chartPreview} />
-        )}
+      {!Boolean(needVerify) && chartPreview && chartPreview?.backendChart && (
+        <ChartForShare chartPreview={chartPreview} />
+      )}
     </StyledWrapper>
   );
 }

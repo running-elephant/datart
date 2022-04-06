@@ -19,109 +19,96 @@
 import { DatePicker, Form, Modal, Radio, Select, Space } from 'antd';
 import { FormItemEx } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { Role } from 'app/pages/MainPage/pages/MemberPage/slice/types';
-import { User } from 'app/slice/types';
+import { useMemberSlice } from 'app/pages/MainPage/pages/MemberPage/slice';
+import {
+  selectMembers,
+  selectRoles as rdxSelectRoles,
+} from 'app/pages/MainPage/pages/MemberPage/slice/selectors';
+import {
+  getMembers,
+  getRoles,
+} from 'app/pages/MainPage/pages/MemberPage/slice/thunks';
 import { TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE } from 'styles/StyleConstants';
-import { request2 } from 'utils/request';
-import {
-  authEnticationModeType,
-  rowPermissionByType,
-  shareDetailType,
-} from './slice/type';
+import { AuthenticationModeType, RowPermissionByType } from './slice/constants';
+import { ShareDetail } from './slice/type';
+
 const ShareLinkModal: FC<{
   orgId: string;
   vizType: string;
   visibility: boolean;
-  shareData?: shareDetailType | null;
+  shareData?: ShareDetail | null;
   onOk?;
   onCancel?;
 }> = memo(({ visibility, onOk, onCancel, shareData, orgId }) => {
+  useMemberSlice();
+
   const t = useI18NPrefix(`viz.action`);
+  const dispatch = useDispatch();
   const [expiryDate, setExpiryDate] = useState<string | Date>('');
-  const [authenticationMode, setAuthEnticationMode] = useState(
-    authEnticationModeType.none,
+  const [authenticationMode, setAuthenticationMode] = useState(
+    AuthenticationModeType.none,
   );
   const [rowPermissionBy, setRowPermissionBy] = useState('');
-  const [usersList, setUsersList] = useState<User[] | null>(null);
-  const [rolesList, setRolesList] = useState<Role[] | null>(null);
   const [selectUsers, setSelectUsers] = useState<string[] | null>([]);
   const [selectRoles, setSelectRoles] = useState<string[] | null>([]);
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
+  const usersList = useSelector(selectMembers);
+  const rolesList = useSelector(rdxSelectRoles);
 
-  const handleOkFn = async ({
-    expiryDate,
-    authenticationMode,
-    roles,
-    users,
-    rowPermissionBy,
-  }) => {
-    setBtnLoading(true);
+  const handleOkFn = useCallback(
+    async ({
+      expiryDate,
+      authenticationMode,
+      roles,
+      users,
+      rowPermissionBy,
+    }) => {
+      setBtnLoading(true);
 
-    try {
-      let paramsData = {
-        expiryDate,
-        authenticationMode,
-        roles,
-        users,
-        rowPermissionBy,
-      };
-      if (shareData) {
-        paramsData = Object.assign({}, shareData, paramsData);
+      try {
+        let paramsData = {
+          expiryDate,
+          authenticationMode,
+          roles,
+          users,
+          rowPermissionBy,
+        };
+        if (shareData) {
+          paramsData = Object.assign({}, shareData, paramsData);
+        }
+
+        await onOk(paramsData);
+        setBtnLoading(false);
+      } catch (err) {
+        setBtnLoading(false);
+        throw err;
       }
+    },
+    [onOk, shareData],
+  );
 
-      await onOk(paramsData);
-      setBtnLoading(false);
-    } catch (err) {
-      setBtnLoading(false);
-      throw err;
-    }
-  };
-
-  const handleAuthEnticationMode = useCallback(async e => {
+  const handleAuthenticationMode = useCallback(async e => {
     const value = e.target.value;
 
     setSelectRoles([]);
     setSelectUsers([]);
     setRowPermissionBy('');
 
-    if (value === authEnticationModeType.login) {
-      setRowPermissionBy(rowPermissionByType.visitor);
+    if (value === AuthenticationModeType.login) {
+      setRowPermissionBy(RowPermissionByType.visitor);
     }
 
-    setAuthEnticationMode(e.target.value);
+    setAuthenticationMode(e.target.value);
   }, []);
 
   const handleRowPermissionBy = useCallback(e => {
     setRowPermissionBy(e.target.value);
   }, []);
-
-  const fetchRolesData = useCallback(async () => {
-    try {
-      const { data } = await request2<Role[]>({
-        url: `/orgs/${orgId}/roles`,
-        method: 'GET',
-      });
-      setRolesList(data);
-    } catch (error) {
-      throw error;
-    }
-  }, [orgId]);
-
-  const fetchMembersData = useCallback(async () => {
-    try {
-      const { data } = await request2<User[]>({
-        url: `/orgs/${orgId}/members`,
-        method: 'GET',
-      });
-      setUsersList(data);
-    } catch (error) {
-      throw error;
-    }
-  }, [orgId]);
 
   const handleChangeMembers = useCallback(users => {
     setSelectUsers(users);
@@ -131,18 +118,18 @@ const ShareLinkModal: FC<{
     setSelectRoles(roles);
   }, []);
 
-  const handleDefauleValue = useCallback((shareData: shareDetailType) => {
+  const handleDefauleValue = useCallback((shareData: ShareDetail) => {
     setExpiryDate(shareData.expiryDate);
-    setAuthEnticationMode(shareData.authenticationMode);
+    setAuthenticationMode(shareData.authenticationMode);
     setRowPermissionBy(shareData.rowPermissionBy);
     setSelectUsers(shareData.users);
     setSelectRoles(shareData.roles);
   }, []);
 
   useEffect(() => {
-    fetchMembersData();
-    fetchRolesData();
-  }, [fetchRolesData, fetchMembersData]);
+    dispatch(getRoles(orgId));
+    dispatch(getMembers(orgId));
+  }, [orgId, dispatch]);
 
   useEffect(() => {
     shareData && handleDefauleValue(shareData);
@@ -187,27 +174,27 @@ const ShareLinkModal: FC<{
         </FormItemEx>
         <FormItemEx label={t('share.verificationMethod')}>
           <Radio.Group
-            onChange={handleAuthEnticationMode}
+            onChange={handleAuthenticationMode}
             value={authenticationMode}
           >
-            <Radio value={authEnticationModeType.none}>{t('share.NONE')}</Radio>
-            <Radio value={authEnticationModeType.code}>{t('share.CODE')}</Radio>
-            <Radio value={authEnticationModeType.login}>
+            <Radio value={AuthenticationModeType.none}>{t('share.NONE')}</Radio>
+            <Radio value={AuthenticationModeType.code}>{t('share.CODE')}</Radio>
+            <Radio value={AuthenticationModeType.login}>
               {t('share.LOGIN')}
             </Radio>
           </Radio.Group>
         </FormItemEx>
-        {authenticationMode === authEnticationModeType.login && (
+        {authenticationMode === AuthenticationModeType.login && (
           <>
             <FormItemEx label={t('share.dataPermission')}>
               <Radio.Group
                 onChange={handleRowPermissionBy}
                 value={rowPermissionBy}
               >
-                <Radio value={rowPermissionByType.visitor}>
+                <Radio value={RowPermissionByType.visitor}>
                   {t('share.loginUser')}
                 </Radio>
-                <Radio value={rowPermissionByType.creator}>
+                <Radio value={RowPermissionByType.creator}>
                   {t('share.shareUser')}
                 </Radio>
               </Radio.Group>

@@ -24,7 +24,7 @@ import {
   selectLoginLoading,
   selectOauth2Clients,
 } from 'app/slice/selectors';
-import { getOauth2Clients, login, tryOauth } from 'app/slice/thunks';
+import { getOauth2Clients, tryOauth } from 'app/slice/thunks';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
@@ -37,15 +37,11 @@ import {
 import { getToken } from 'utils/auth';
 
 export function LoginForm({
-  noSwithUser = false,
-  noForget = false,
-  noRegister = false,
-  onPropsLogin,
+  modal = false,
+  onLogin,
 }: {
-  noSwithUser?: boolean;
-  noForget?: boolean;
-  noRegister?: boolean;
-  onPropsLogin?: () => {};
+  modal?: boolean;
+  onLogin?: (value) => void;
 }) {
   const [switchUser, setSwitchUser] = useState(false);
   const dispatch = useDispatch();
@@ -70,20 +66,6 @@ export function LoginForm({
     dispatch(tryOauth());
   }, [dispatch]);
 
-  const onLogin = useCallback(
-    values => {
-      dispatch(
-        login({
-          params: values,
-          resolve: () => {
-            toApp();
-          },
-        }),
-      );
-    },
-    [dispatch, toApp],
-  );
-
   const onSwitch = useCallback(() => {
     setSwitchUser(true);
   }, []);
@@ -98,7 +80,7 @@ export function LoginForm({
 
   return (
     <AuthForm>
-      {logged && !switchUser && !noSwithUser ? (
+      {logged && !switchUser && !modal ? (
         <>
           <h2>{t('alreadyLoggedIn')}</h2>
           <UserPanel onClick={toApp}>
@@ -110,7 +92,7 @@ export function LoginForm({
           </Button>
         </>
       ) : (
-        <Form form={form} onFinish={onPropsLogin || onLogin}>
+        <Form form={form} onFinish={onLogin}>
           <Form.Item
             name="username"
             rules={[
@@ -152,16 +134,12 @@ export function LoginForm({
               </Button>
             )}
           </Form.Item>
-          {(!noForget || !noRegister) && (
+          {!modal && (
             <Links>
-              {!noForget && (
-                <LinkButton to="/forgetPassword">
-                  {t('forgotPassword')}
-                </LinkButton>
-              )}
-              {!noRegister && (
-                <LinkButton to="/register">{t('register')}</LinkButton>
-              )}
+              <LinkButton to="/forgetPassword">
+                {t('forgotPassword')}
+              </LinkButton>
+              <LinkButton to="/register">{t('register')}</LinkButton>
             </Links>
           )}
 

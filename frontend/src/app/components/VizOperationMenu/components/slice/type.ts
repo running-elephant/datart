@@ -15,20 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { AuthenticationModeType, RowPermissionByType } from './constants';
 
-export enum authEnticationModeType {
-  none = 'NONE',
-  code = 'CODE',
-  login = 'LOGIN',
-}
-
-export enum rowPermissionByType {
-  creator = 'CREATOR',
-  visitor = 'VISITOR',
-}
-
-export interface shareDetailType {
-  authenticationMode: authEnticationModeType;
+export interface ShareDetail {
+  authenticationMode: AuthenticationModeType;
   createBy: string;
   createTime: string | Date;
   expiryDate: string | Date;
@@ -37,7 +27,7 @@ export interface shareDetailType {
   permission: null;
   roles: null | string[];
   users: null | string[];
-  rowPermissionBy: rowPermissionByType;
+  rowPermissionBy: RowPermissionByType;
   updateBy: null;
   updateTime: null | Date;
   vizId: string;

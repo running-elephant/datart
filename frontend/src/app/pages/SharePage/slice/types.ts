@@ -42,6 +42,7 @@ export interface ShareVizInfo {
   download: boolean;
   executeToken: Record<string, ExecuteToken>;
   subVizToken: null | Record<string, ExecuteToken>;
+  shareToken: Record<string, ExecuteToken>;
 }
 
 export interface ShareExecuteParams {

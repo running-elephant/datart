@@ -16,32 +16,13 @@
  * limitations under the License.
  */
 
-import { LoginForm } from 'app/pages/LoginPage/LoginForm';
-import styled from 'styled-components';
-
-function ShareLoginModal({ visible, onChange }) {
-  return (
-    visible && (
-      <LoginWrapper>
-        <LoginForm modal={true} onLogin={onChange} />
-      </LoginWrapper>
-    )
-  );
+export enum AuthenticationModeType {
+  none = 'NONE',
+  code = 'CODE',
+  login = 'LOGIN',
 }
 
-export default ShareLoginModal;
-
-const LoginWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  width: 100%;
-  height: 100%;
-  background: ${p => p.theme.bodyBackground};
-`;
+export enum RowPermissionByType {
+  creator = 'CREATOR',
+  visitor = 'VISITOR',
+}

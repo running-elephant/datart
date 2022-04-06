@@ -75,14 +75,25 @@ function ShareStoryPlayer() {
       const previousPassword = persistence.session.get(shareToken);
 
       if (previousPassword) {
-        if (shareType === 'CODE') {
-          fetchShareVizInfoImpl(shareToken, previousPassword, searchParams);
-        }
+        fetchShareVizInfoImpl(shareToken, previousPassword, searchParams);
       } else {
         dispatch(actions.saveNeedVerify(true));
       }
     } else if (shareType === 'LOGIN' && !logged) {
-      fetchShareVizInfoImpl(shareToken, undefined, searchParams);
+      const authorizedToken = persistence.session.get(shareToken);
+
+      if (authorizedToken) {
+        fetchShareVizInfoImpl(
+          shareToken,
+          undefined,
+          searchParams,
+          undefined,
+          undefined,
+          authorizedToken,
+        );
+      } else {
+        dispatch(actions.saveNeedVerify(true));
+      }
     } else {
       fetchShareVizInfoImpl(shareToken, undefined, searchParams);
     }
@@ -101,6 +112,7 @@ function ShareStoryPlayer() {
     params?: FilterSearchParams,
     loginUser?: string,
     loginPwd?: string,
+    authorizedToken?: string,
   ) => {
     dispatch(
       fetchShareVizInfo({
@@ -110,6 +122,7 @@ function ShareStoryPlayer() {
         renderMode,
         userName: loginUser,
         passWord: loginPwd,
+        authorizedToken,
       }),
     );
   };
@@ -140,7 +153,7 @@ function ShareStoryPlayer() {
         </div>
       )}
 
-      {!Boolean(needVerify) && vizType === 'STORYBOARD' && shareStory && (
+      {!Boolean(needVerify) && shareStory && (
         <StoryPlayerForShare storyBoard={shareStory} shareToken={shareToken} />
       )}
     </StyledWrapper>
