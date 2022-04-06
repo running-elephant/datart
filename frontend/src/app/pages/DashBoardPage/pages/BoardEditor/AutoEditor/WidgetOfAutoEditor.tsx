@@ -16,25 +16,26 @@
  * limitations under the License.
  */
 import { WidgetMapper } from 'app/pages/DashBoardPage/components/WidgetMapper/WidgetMapper';
-import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
-import React, { memo, useContext, useMemo } from 'react';
+import { memo } from 'react';
 import styled from 'styled-components/macro';
 
 export const WidgetOfAutoEditor: React.FC<{}> = memo(() => {
-  const widget = useContext(WidgetContext);
-
   const ssp = e => {
     e.stopPropagation();
   };
-  const widgetStyle = useMemo(() => getWidgetStyle('auto', widget), [widget]);
+
   return (
-    <Warp style={widgetStyle} onClick={ssp}>
+    <Wrapper onClick={ssp}>
       <WidgetMapper boardType={'auto'} boardEditing={true} />
-    </Warp>
+    </Wrapper>
   );
 });
-const Warp = styled.div<{}>`
+const Wrapper = styled.div<{}>`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
   & .widget-tool-bar {
     z-index: 30;
   }

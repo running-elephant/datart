@@ -17,16 +17,17 @@
  */
 import { memo, useContext } from 'react';
 import { BoardType, MediaWidgetType } from '../../pages/Board/slice/types';
-import { ControllerWIdget } from '../Widget/ControllerWIdget/ControllerWIdget';
 import { DataChartWidget } from '../Widget/DataChartWidget/DataChartWidget';
-import { QueryBtnWidget } from '../Widget/QueryBtnWidget/QueryBtnWidget';
-import { ResetBtnWidget } from '../Widget/ResetBtnWidget/ResetBtnWidget';
+import { IframeWidget } from '../Widget/IframeWidget/IframeWidget';
+import { ImageWidget } from '../Widget/ImageWidget/ImageWidget';
+import { RichTextWidget } from '../Widget/RichTextWidget/RichTextWidget';
 import { TabWidget } from '../Widget/TabWidget/TabWidget';
+import { TimerWidget } from '../Widget/TimerWidget/TimerWidget';
+import { VideoWidget } from '../Widget/VideoWidget/VideoWidget';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
-import { MediaWidgetMapper } from './MediaWidgetMapper';
 
-export const WidgetMapper: React.FC<{
+export const FullScreenWidgetMapper: React.FC<{
   boardType: BoardType;
   boardEditing: boolean;
 }> = memo(({ boardEditing }) => {
@@ -41,30 +42,32 @@ export const WidgetMapper: React.FC<{
           boardId={widget.dashboardId}
           boardEditing={boardEditing}
         >
-          <DataChartWidget hideTitle={false} />
+          <DataChartWidget hideTitle={true} />
         </WidgetDataProvider>
       );
     case 'media':
       const mediaSubType: MediaWidgetType = widget.config.content.type;
-      return <MediaWidgetMapper subType={mediaSubType} />;
+      return MediaMapper(mediaSubType);
     case 'container':
-      // const containerSubType: MediaWidgetType = widget.config.content.type;
-      return <TabWidget hideTitle={false} />;
-    case 'controller':
-      return (
-        <WidgetDataProvider
-          widgetId={widget.id}
-          boardId={widget.dashboardId}
-          boardEditing={boardEditing}
-        >
-          <ControllerWIdget />
-        </WidgetDataProvider>
-      );
-    case 'query':
-      return <QueryBtnWidget />;
-    case 'reset':
-      return <ResetBtnWidget />;
+      return <TabWidget hideTitle={true} />;
     default:
       return <div>default widget</div>;
   }
 });
+
+export const MediaMapper = (subType: MediaWidgetType) => {
+  switch (subType) {
+    case 'richText':
+      return <RichTextWidget hideTitle={true} />;
+    case 'image':
+      return <ImageWidget hideTitle={true} />;
+    case 'video':
+      return <VideoWidget hideTitle={true} />;
+    case 'iframe':
+      return <IframeWidget hideTitle={true} />;
+    case 'timer':
+      return <TimerWidget hideTitle={true} />;
+    default:
+      return <div>default media</div>;
+  }
+};

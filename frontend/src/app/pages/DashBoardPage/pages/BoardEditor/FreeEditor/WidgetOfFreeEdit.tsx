@@ -19,7 +19,7 @@
 import { WidgetMapper } from 'app/pages/DashBoardPage/components/WidgetMapper/WidgetMapper';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { WIDGET_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
-import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
+import { getFreeWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
 import produce from 'immer';
 import React, {
   useCallback,
@@ -136,7 +136,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
     },
     [dispatch, widget.id],
   );
-  const widgetStyle = getWidgetStyle('free', widget);
+  const widgetStyle = getFreeWidgetStyle(widget);
   const style: React.CSSProperties = {
     ...widgetStyle,
     transform: `translate(${curXY[0]}px, ${curXY[1]}px)`,

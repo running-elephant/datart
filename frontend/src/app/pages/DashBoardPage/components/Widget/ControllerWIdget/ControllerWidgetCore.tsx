@@ -34,9 +34,9 @@ import React, { memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
-import { LabelName } from '../../WidgetCore/WidgetName/WidgetName';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
+import { WidgetTitle } from '../../WidgetTitle';
 import { CheckboxGroupControllerForm } from './Controller/CheckboxGroupController';
 import { MultiSelectControllerForm } from './Controller/MultiSelectController';
 import { NumberControllerForm } from './Controller/NumberController';
@@ -85,7 +85,12 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     if (widget.config.nameConfig?.textAlign === 'center') {
       return null;
     }
-    return <LabelName config={widget.config} />;
+    return (
+      <WidgetTitle
+        name={widget.config.name}
+        config={widget.config.nameConfig}
+      />
+    );
   }, [widget.config]);
   const centerControlLabel = useMemo(() => {
     if (!widget.config.nameConfig.show) {
@@ -94,7 +99,10 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     if (widget.config.nameConfig?.textAlign === 'center') {
       return (
         <div style={{ width: '100%', textAlign: 'center' }}>
-          <LabelName config={widget.config} />
+          <WidgetTitle
+            name={widget.config.name}
+            config={widget.config.nameConfig}
+          />
         </div>
       );
     }
@@ -343,15 +351,15 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     onTimeChange,
   ]);
   return (
-    <Wrap>
+    <Wrapper>
       <Form form={form} className="control-form" onFinish={onFinish}>
         {centerControlLabel}
         {control}
       </Form>
-    </Wrap>
+    </Wrapper>
   );
 });
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex: 1;
   align-items: center;

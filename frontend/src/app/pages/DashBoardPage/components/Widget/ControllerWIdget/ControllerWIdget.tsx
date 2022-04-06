@@ -87,15 +87,15 @@ export const ControllerWIdget: React.FC<{}> = memo(() => {
     });
   }, [widget.config]);
   return (
-    <>
+    <WidgetWrapper style={widgetCoreStyle}>
       <ItemContainer>
-        <WidgetWrap style={widgetCoreStyle}>
+        <WidgetWrap>
           <ControllerWidgetCore />
         </WidgetWrap>
       </ItemContainer>
       {editing && <EditMask />}
       <WidgetToolBar />
-    </>
+    </WidgetWrapper>
   );
 });
 const ItemContainer = styled.div`
@@ -107,6 +107,11 @@ const ItemContainer = styled.div`
 `;
 
 const WidgetWrap = styled.div`
+  display: flex;
+  flex: 1;
+  min-height: 0;
+`;
+const WidgetWrapper = styled.div`
   display: flex;
   flex: 1;
   min-height: 0;

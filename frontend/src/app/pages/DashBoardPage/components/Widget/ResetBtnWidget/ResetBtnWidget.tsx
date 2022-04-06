@@ -18,16 +18,15 @@
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import WidgetToolBar from 'app/pages/DashBoardPage/components/WidgetToolBar';
 import { getWidgetSomeStyle } from 'app/pages/DashBoardPage/utils/widget';
-import React, { memo, useContext, useEffect, useMemo } from 'react';
+import { memo, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../EditMask';
-import { WidgetTitle } from '../../WidgetTitle';
-import ImageWidgetCore from '../ImageWidget/ImageWidgetCore';
+import { ResetBtnWidgetCore } from './ResetBtnWidgetCore';
 
-export const ImageWidget: React.FC<{}> = memo(() => {
+export const ResetBtnWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const { initialQuery } = useContext(BoardConfigContext);
   const { renderMode, boardType, editing } = useContext(BoardContext);
@@ -53,19 +52,15 @@ export const ImageWidget: React.FC<{}> = memo(() => {
     });
   }, [widget.config]);
   return (
-    <>
+    <WidgetWrapper style={widgetCoreStyle}>
       <ItemContainer>
-        <WidgetTitle
-          name={widget.config.name}
-          config={widget.config.nameConfig}
-        />
-        <WidgetWrap style={widgetCoreStyle}>
-          <ImageWidgetCore />
+        <WidgetWrap>
+          <ResetBtnWidgetCore />
         </WidgetWrap>
       </ItemContainer>
       {editing && <EditMask />}
       <WidgetToolBar />
-    </>
+    </WidgetWrapper>
   );
 });
 const ItemContainer = styled.div`
@@ -77,6 +72,11 @@ const ItemContainer = styled.div`
 `;
 
 const WidgetWrap = styled.div`
+  display: flex;
+  flex: 1;
+  min-height: 0;
+`;
+const WidgetWrapper = styled.div`
   display: flex;
   flex: 1;
   min-height: 0;

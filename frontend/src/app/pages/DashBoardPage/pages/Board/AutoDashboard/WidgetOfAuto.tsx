@@ -15,29 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetMapper } from 'app/pages/DashBoardPage/components/WidgetMapper/WidgetMapper';
-import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
-import React, { useContext, useMemo } from 'react';
+import React from 'react';
 import styled from 'styled-components/macro';
 
 export const WidgetOfAuto: React.FC = React.memo(() => {
-  const widget = useContext(WidgetContext);
-  const { boardType } = useContext(BoardContext);
-  const widgetStyle = useMemo(
-    () => getWidgetStyle(boardType, widget),
-    [boardType, widget],
-  );
   return (
-    <Warp className="widget" style={widgetStyle}>
+    <Wrapper className="widget">
       <WidgetMapper boardType={'auto'} boardEditing={false} />
-    </Warp>
+    </Wrapper>
   );
 });
 export default WidgetOfAuto;
 
-const Warp = styled.div<{}>`
+const Wrapper = styled.div<{}>`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+
   &:hover .widget-tool-dropdown {
     visibility: visible;
   }

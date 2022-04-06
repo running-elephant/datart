@@ -15,17 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetMapper } from 'app/pages/DashBoardPage/components/WidgetMapper/WidgetMapper';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
+import { getFreeWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
 import React, { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 
 export const WidgetOfFree: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
-  const { boardType } = useContext(BoardContext);
-  const widgetStyle = getWidgetStyle(boardType, widget);
+
+  const widgetStyle = getFreeWidgetStyle(widget);
 
   return (
     <Wrap style={widgetStyle}>

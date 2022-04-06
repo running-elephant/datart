@@ -660,29 +660,6 @@ export const getCascadeControllers = (controller: Widget) => {
     .map(ele => ele.targetId);
   return ids;
 };
-// getWidgetStyle start
-export const getWidgetStyle = (boardType: BoardType, widget: Widget) => {
-  return boardType === 'auto'
-    ? getAutoWidgetStyle(widget)
-    : getFreeWidgetStyle(widget);
-};
-
-export const getAutoWidgetStyle = (widget: Widget) => {
-  const widgetConf = widget.config;
-  let widgetStyle: CSSProperties = {
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-    height: '100%',
-    ...getBackgroundCss(widgetConf.background),
-    ...getBorderCss(widgetConf.border as BorderConfig),
-    ...getPaddingCss(widgetConf.padding as WidgetPadding),
-
-    transition: 'all 350ms ease',
-  };
-  return widgetStyle;
-};
 
 export const getFreeWidgetStyle = (widget: Widget) => {
   const widgetConf = widget.config;
@@ -691,9 +668,6 @@ export const getFreeWidgetStyle = (widget: Widget) => {
     position: 'absolute',
     display: 'flex',
     flexDirection: 'column',
-    ...getBackgroundCss(widgetConf.background),
-    ...getBorderCss(widgetConf.border as BorderConfig),
-    ...getPaddingCss(widgetConf.padding as WidgetPadding),
     width: `${rect.width}px`,
     height: `${rect.height}px`,
     transform: `translate(${rect.x}px, ${rect.y}px)`,

@@ -22,16 +22,16 @@ import styled from 'styled-components/macro';
 import { INFO, SUCCESS } from 'styles/StyleConstants';
 import SubMaskLayer from '../../../pages/BoardEditor/components/SubMaskLayer';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
-import { WidgetCore } from '../../WidgetCore';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import WidgetToolBar from '../../WidgetToolBar';
+import { TabWidgetMapper } from './TabWidgetMapper';
 
 export interface IProps {
   tabItem: ContainerItem;
 }
 const TabWidgetContainer: React.FC<IProps> = ({ tabItem }) => {
-  const { editing: boardEditing } = useContext(BoardContext);
+  const { editing: boardEditing, boardType } = useContext(BoardContext);
   const widget = useContext(WidgetContext);
   const widgetInfo = useContext(WidgetInfoContext);
   const border = useMemo(() => {
@@ -68,7 +68,7 @@ const TabWidgetContainer: React.FC<IProps> = ({ tabItem }) => {
   return (
     <Wrap border={border}>
       <ItemContainer className="ItemContainer">
-        <WidgetCore background padding border />
+        <TabWidgetMapper boardEditing={boardEditing} boardType={boardType} />
       </ItemContainer>
       {subMask}
       <div className="sub-hoverBar" onClick={ssp}>

@@ -18,18 +18,19 @@
 
 import { FontConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { darken, getLuminance, lighten } from 'polished';
-import React, { useContext } from 'react';
+import { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
-export const ResetWidget: React.FC<{}> = () => {
+export const QueryBtnWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
-  const { onWidgetsReset } = useContext(WidgetActionContext);
+
+  const { onWidgetsQuery } = useContext(WidgetActionContext);
 
   const onQuery = e => {
     e.stopPropagation();
-    onWidgetsReset();
+    onWidgetsQuery();
   };
 
   const { name, nameConfig, background } = widget.config;
@@ -39,7 +40,7 @@ export const ResetWidget: React.FC<{}> = () => {
       <span>{name}</span>
     </Wrap>
   );
-};
+});
 
 const Wrap = styled.div<FontConfig & { background: string }>`
   display: flex;

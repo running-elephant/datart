@@ -28,14 +28,14 @@ import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { G90, WHITE } from 'styles/StyleConstants';
-import { CanFullScreenWidgetTypes } from '../constants';
-import { BoardContext } from './BoardProvider/BoardProvider';
-import { WidgetCore } from './WidgetCore';
+import { CanFullScreenWidgetTypes } from '../../constants';
+import { BoardContext } from '../BoardProvider/BoardProvider';
+import { FullScreenWidgetMapper } from './FullScreenWidgetMapper';
 
 const { Header } = Layout;
 
 export const FullScreenPanel: React.FC<{}> = () => {
-  const { boardId } = useContext(BoardContext);
+  const { boardId, boardType } = useContext(BoardContext);
   const dispatch = useDispatch();
 
   const itemId = useSelector((state: { board: BoardState }) =>
@@ -83,11 +83,11 @@ export const FullScreenPanel: React.FC<{}> = () => {
           boardEditing={false}
           boardId={boardId}
         >
-          <WidgetCore background padding border />
+          <FullScreenWidgetMapper boardEditing={false} boardType={boardType} />
         </WidgetWrapProvider>
       );
     }
-  }, [boardId, itemId, widgetMap]);
+  }, [boardId, boardType, itemId, widgetMap]);
 
   return (
     <>

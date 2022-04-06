@@ -162,9 +162,9 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     widgetId,
   ]);
   return (
-    <Wrap className="widget-chart" ref={ref}>
+    <Wrapper className="widget-chart" ref={ref}>
       <ChartFrameBox>{chartFrame}</ChartFrameBox>
-    </Wrap>
+    </Wrapper>
   );
 });
 const ChartFrameBox = styled.div`
@@ -173,7 +173,7 @@ const ChartFrameBox = styled.div`
   height: 100%;
   overflow: hidden;
 `;
-const Wrap = styled.div`
+const Wrapper = styled.div`
   position: relative;
   display: flex;
   flex: 1;

@@ -23,14 +23,13 @@ import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
-export const QueryWidget: React.FC<{}> = () => {
+export const ResetBtnWidgetCore: React.FC<{}> = () => {
   const widget = useContext(WidgetContext);
-
-  const { onWidgetsQuery } = useContext(WidgetActionContext);
+  const { onWidgetsReset } = useContext(WidgetActionContext);
 
   const onQuery = e => {
     e.stopPropagation();
-    onWidgetsQuery();
+    onWidgetsReset();
   };
 
   const { name, nameConfig, background } = widget.config;

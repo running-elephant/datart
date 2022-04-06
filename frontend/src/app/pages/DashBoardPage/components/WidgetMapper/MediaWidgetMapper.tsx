@@ -28,15 +28,15 @@ export const MediaWidgetMapper: React.FC<{
 }> = memo(({ subType }) => {
   switch (subType) {
     case 'richText':
-      return <RichTextWidget />;
+      return <RichTextWidget hideTitle={false} />;
     case 'image':
-      return <ImageWidget />;
+      return <ImageWidget hideTitle={false} />;
     case 'video':
-      return <VideoWidget />;
+      return <VideoWidget hideTitle={false} />;
     case 'iframe':
-      return <IframeWidget />;
+      return <IframeWidget hideTitle={false} />;
     case 'timer':
-      return <TimerWidget />;
+      return <TimerWidget hideTitle={false} />;
     default:
       return <div>default media</div>;
   }

@@ -101,13 +101,20 @@ export const ButtonBorderDefault: BorderConfig = {
   width: 0,
 };
 
-export const CanDropToWidgetTypes: WidgetType[] = ['chart', 'media'];
-export const CanFullScreenWidgetTypes: WidgetType[] = ['chart', 'media'];
+export const CanDropToWidgetTypes: readonly WidgetType[] = ['chart', 'media'];
+export const CanFullScreenWidgetTypes: readonly Partial<WidgetType>[] = [
+  'chart',
+  'media',
+  'container',
+];
 
 export const CONTAINER_TAB = 'containerTab';
 
 //
-export const NeedFetchWidgetTypes: WidgetType[] = ['chart', 'controller'];
+export const NeedFetchWidgetTypes: readonly WidgetType[] = [
+  'chart',
+  'controller',
+];
 
 // setting
 

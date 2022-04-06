@@ -27,47 +27,51 @@ import { EditMask } from '../../EditMask';
 import { WidgetTitle } from '../../WidgetTitle';
 import { IframeWidgetCore } from './IframeWidgetCore';
 
-export const IframeWidget: React.FC<{}> = memo(() => {
-  const widget = useContext(WidgetContext);
-  const { initialQuery } = useContext(BoardConfigContext);
-  const { renderMode, boardType, editing } = useContext(BoardContext);
-  const { onRenderedWidgetById } = useContext(WidgetActionContext);
-  /**
-   * @param ''
-   * @description '在定时任务的模式 直接加载不做懒加载 ,其他模式下 如果是 free 类型直接加载 如果是 autoBoard 则由 autoBoard自己控制'
-   */
-  useEffect(() => {
-    if (renderMode === 'schedule') {
-      onRenderedWidgetById(widget.id);
-    } else if (boardType === 'free' && initialQuery) {
-      onRenderedWidgetById(widget.id);
-    }
-  }, [boardType, initialQuery, renderMode, onRenderedWidgetById, widget.id]);
-  // 自动更新
-  const widgetCoreStyle = useMemo(() => {
-    return getWidgetSomeStyle({
-      config: widget.config,
-      background: true,
-      padding: true,
-      border: true,
-    });
-  }, [widget.config]);
-  return (
-    <>
-      <ItemContainer>
-        <WidgetTitle
-          name={widget.config.name}
-          config={widget.config.nameConfig}
-        />
-        <WidgetWrap style={widgetCoreStyle}>
-          <IframeWidgetCore />
-        </WidgetWrap>
-      </ItemContainer>
-      {editing && <EditMask />}
-      <WidgetToolBar />
-    </>
-  );
-});
+export const IframeWidget: React.FC<{ hideTitle: boolean }> = memo(
+  ({ hideTitle }) => {
+    const widget = useContext(WidgetContext);
+    const { initialQuery } = useContext(BoardConfigContext);
+    const { renderMode, boardType, editing } = useContext(BoardContext);
+    const { onRenderedWidgetById } = useContext(WidgetActionContext);
+    /**
+     * @param ''
+     * @description '在定时任务的模式 直接加载不做懒加载 ,其他模式下 如果是 free 类型直接加载 如果是 autoBoard 则由 autoBoard自己控制'
+     */
+    useEffect(() => {
+      if (renderMode === 'schedule') {
+        onRenderedWidgetById(widget.id);
+      } else if (boardType === 'free' && initialQuery) {
+        onRenderedWidgetById(widget.id);
+      }
+    }, [boardType, initialQuery, renderMode, onRenderedWidgetById, widget.id]);
+    // 自动更新
+    const widgetCoreStyle = useMemo(() => {
+      return getWidgetSomeStyle({
+        config: widget.config,
+        background: true,
+        padding: true,
+        border: true,
+      });
+    }, [widget.config]);
+    return (
+      <WidgetWrapper style={widgetCoreStyle}>
+        <ItemContainer>
+          {hideTitle ? null : (
+            <WidgetTitle
+              name={widget.config.name}
+              config={widget.config.nameConfig}
+            />
+          )}
+          <WidgetWrap>
+            <IframeWidgetCore />
+          </WidgetWrap>
+        </ItemContainer>
+        {editing && <EditMask />}
+        <WidgetToolBar />
+      </WidgetWrapper>
+    );
+  },
+);
 const ItemContainer = styled.div`
   z-index: 10;
   display: flex;
@@ -77,6 +81,11 @@ const ItemContainer = styled.div`
 `;
 
 const WidgetWrap = styled.div`
+  display: flex;
+  flex: 1;
+  min-height: 0;
+`;
+const WidgetWrapper = styled.div`
   display: flex;
   flex: 1;
   min-height: 0;
