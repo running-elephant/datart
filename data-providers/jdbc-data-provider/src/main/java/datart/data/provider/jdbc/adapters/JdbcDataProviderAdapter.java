@@ -296,7 +296,7 @@ public class JdbcDataProviderAdapter implements Closeable {
             // set identifierQuote
             if (StringUtils.isNotBlank(driverInfo.getIdentifierQuote())) {
                 fieldValues.put("identifierQuoteString", driverInfo.getIdentifierQuote());
-                fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierEndQuote());
+                fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierQuote());
             }
             if (StringUtils.isNotBlank(driverInfo.getIdentifierEndQuote())) {
                 fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierEndQuote());

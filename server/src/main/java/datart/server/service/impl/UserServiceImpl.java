@@ -43,6 +43,7 @@ import datart.server.base.dto.OrganizationBaseInfo;
 import datart.server.base.dto.UserProfile;
 import datart.server.base.params.*;
 import datart.server.service.*;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -166,7 +167,12 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Override
     @Transactional
     public String activeUser(String activeString) {
-        PasswordToken passwordToken = JwtUtils.toPasswordToken(activeString);
+        PasswordToken passwordToken = null;
+        try {
+            passwordToken = JwtUtils.toPasswordToken(activeString);
+        } catch (ExpiredJwtException e) {
+            Exceptions.msg("message.user.confirm.mail.timeout");
+        }
         User user = userMapper.selectByUsername(passwordToken.getSubject());
         if (user == null) {
             Exceptions.notFound("resource.not-exist", "resource.user");
