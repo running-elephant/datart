@@ -34,6 +34,7 @@ import datart.core.entity.Role;
 import datart.core.entity.User;
 import datart.core.entity.ext.UserBaseInfo;
 import datart.core.mappers.ext.OrganizationMapperExt;
+import datart.core.mappers.ext.RelRoleUserMapperExt;
 import datart.core.mappers.ext.UserMapperExt;
 import datart.security.base.PasswordToken;
 import datart.security.util.JwtUtils;
@@ -42,6 +43,7 @@ import datart.server.base.dto.OrganizationBaseInfo;
 import datart.server.base.dto.UserProfile;
 import datart.server.base.params.*;
 import datart.server.service.*;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -165,7 +167,12 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Override
     @Transactional
     public String activeUser(String activeString) {
-        PasswordToken passwordToken = JwtUtils.toPasswordToken(activeString);
+        PasswordToken passwordToken = null;
+        try {
+            passwordToken = JwtUtils.toPasswordToken(activeString);
+        } catch (ExpiredJwtException e) {
+            Exceptions.msg("message.user.confirm.mail.timeout");
+        }
         User user = userMapper.selectByUsername(passwordToken.getSubject());
         if (user == null) {
             Exceptions.notFound("resource.not-exist", "resource.user");
@@ -364,7 +371,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     @Override
     @Transactional
-    public boolean addUserToOrg(UserAddParam userAddParam, String orgId) throws MessagingException, UnsupportedEncodingException {
+    public User addUserToOrg(UserAddParam userAddParam, String orgId) throws MessagingException, UnsupportedEncodingException {
         securityManager.requireOrgOwner(orgId);
         if (StringUtils.isBlank(userAddParam.getPassword())) {
             userAddParam.setPassword(Const.USER_DEFAULT_PSW);
@@ -382,14 +389,26 @@ public class UserServiceImpl extends BaseService implements UserService {
         this.userMapper.updateByPrimaryKeySelective(user);
         orgService.addUserToOrg(user.getId(), orgId);
         roleService.updateRolesForUser(user.getId(), orgId, userAddParam.getRoleIds());
-        return true;
+        return user;
     }
 
     @Override
     @Transactional
     public boolean deleteUserFromOrg(String orgId, String userId) {
         securityManager.requireOrgOwner(orgId);
+        //删除组织关联
         orgService.removeUser(orgId, userId);
+        //删除角色关联
+        RelRoleUserMapperExt rruMapper = Application.getBean(RelRoleUserMapperExt.class);
+        List<String> roleIds = rruMapper.listByUserId(userId).stream().map(Role::getId).collect(Collectors.toList());
+        rruMapper.deleteByUserAndRoles(userId, roleIds);
+        Role role = roleService.getPerUserRole(orgId, userId);
+        if (role != null) {
+            roleService.delete(role.getId());
+        }
+        //删除用户信息
+        UserSettingService orgSettingService = Application.getBean(UserSettingService.class);
+        orgSettingService.deleteByUserId(userId);
         userMapper.deleteByPrimaryKey(userId);
         return true;
     }
