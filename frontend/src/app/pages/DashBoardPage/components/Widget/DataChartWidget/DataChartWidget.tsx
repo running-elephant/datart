@@ -24,9 +24,9 @@ import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from '../../BoardProvider/BoardInfoProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { EditMask } from '../../EditMask';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
-import { EditMask } from '../EditMask';
-import { WidgetTitle } from '../WidgetTitle';
+import { WidgetTitle } from '../../WidgetTitle';
 import { DataChartWidgetCore } from './DataChartWidgetCore';
 
 export const DataChartWidget: React.FC<{}> = memo(() => {

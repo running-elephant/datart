@@ -17,23 +17,22 @@
  */
 import { Tabs } from 'antd';
 import { ContainerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { useCallback, useContext, useState } from 'react';
+import { memo, useCallback, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { PRIMARY } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
-import { editBoardStackActions } from '../../../../pages/BoardEditor/slice';
-import { BoardContext } from '../../../BoardProvider/BoardProvider';
-import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
-import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
-import { WidgetWrapProvider } from '../../../WidgetProvider/WidgetWrapProvider';
+import { editBoardStackActions } from '../../../pages/BoardEditor/slice';
+import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
+import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
+import { WidgetWrapProvider } from '../../WidgetProvider/WidgetWrapProvider';
 import DropHolder from './DropHolder';
 import TabWidgetContainer from './WidgetOfTab';
 
 const { TabPane } = Tabs;
 
-interface TabsBoxProps {}
-export const TabWidget: React.FC<TabsBoxProps> = () => {
+export const TabWidgetCore: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const widget = useContext(WidgetContext);
   const { editing } = useContext(WidgetInfoContext);
@@ -122,7 +121,7 @@ export const TabWidget: React.FC<TabsBoxProps> = () => {
       </Tabs>
     </TabsBoxWrap>
   );
-};
+});
 
 const TabsBoxWrap = styled.div<{}>`
   width: 100%;

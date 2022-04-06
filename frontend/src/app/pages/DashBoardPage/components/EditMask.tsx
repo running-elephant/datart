@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { memo, useContext } from 'react';
-import BlockMaskLayer from '../../pages/BoardEditor/components/BlockMaskLayer';
-import WidgetDndHandleMask from '../../pages/BoardEditor/components/WidgetDndHandleMask';
-import { WidgetInfoContext } from '../WidgetProvider/WidgetInfoProvider';
-import { WidgetContext } from '../WidgetProvider/WidgetProvider';
+import BlockMaskLayer from '../pages/BoardEditor/components/BlockMaskLayer';
+import WidgetDndHandleMask from '../pages/BoardEditor/components/WidgetDndHandleMask';
+import { WidgetInfoContext } from './WidgetProvider/WidgetInfoProvider';
+import { WidgetContext } from './WidgetProvider/WidgetProvider';
 export const EditMask: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const widgetInfo = useContext(WidgetInfoContext);

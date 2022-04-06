@@ -17,11 +17,11 @@
  */
 import { memo, useContext } from 'react';
 import { BoardType, MediaWidgetType } from '../../pages/Board/slice/types';
+import { ControllerWIdget } from '../Widget/ControllerWIdget/ControllerWIdget';
 import { DataChartWidget } from '../Widget/DataChartWidget/DataChartWidget';
+import { TabWidget } from '../Widget/TabWidget/TabWidget';
 import { QueryWidget } from '../WidgetCore/ButtonWidget/QueryWidget';
 import { ResetWidget } from '../WidgetCore/ButtonWidget/ResetWidget';
-import { ContainerWidget } from '../WidgetCore/ContainerWidget';
-import { ControllerWidgetCore } from '../WidgetCore/ControllerWIdget';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import { MediaWidgetMapper } from './MediaWidgetMapper';
@@ -45,10 +45,11 @@ export const WidgetMapper: React.FC<{
         </WidgetDataProvider>
       );
     case 'media':
-      const subType: MediaWidgetType = widget.config.content.type;
-      return <MediaWidgetMapper subType={subType} />;
+      const mediaSubType: MediaWidgetType = widget.config.content.type;
+      return <MediaWidgetMapper subType={mediaSubType} />;
     case 'container':
-      return <ContainerWidget />;
+      // const containerSubType: MediaWidgetType = widget.config.content.type;
+      return <TabWidget />;
     case 'controller':
       return (
         <WidgetDataProvider
@@ -56,7 +57,7 @@ export const WidgetMapper: React.FC<{
           boardId={widget.dashboardId}
           boardEditing={boardEditing}
         >
-          <ControllerWidgetCore />
+          <ControllerWIdget />
         </WidgetDataProvider>
       );
     case 'query':

@@ -25,7 +25,7 @@ import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../EditMask';
 import { WidgetTitle } from '../../WidgetTitle';
-import ImageWidgetCore from './ImageWidgetCore';
+import ImageWidgetCore from '../ImageWidget/ImageWidgetCore';
 
 export const ImageWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);

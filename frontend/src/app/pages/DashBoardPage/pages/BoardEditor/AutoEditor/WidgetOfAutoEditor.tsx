@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 import { WidgetMapper } from 'app/pages/DashBoardPage/components/WidgetMapper/WidgetMapper';
-import { WidgetInfoContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
 import React, { memo, useContext, useMemo } from 'react';
@@ -24,27 +23,13 @@ import styled from 'styled-components/macro';
 
 export const WidgetOfAutoEditor: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
-  const widgetInfo = useContext(WidgetInfoContext);
+
   const ssp = e => {
     e.stopPropagation();
   };
   const widgetStyle = useMemo(() => getWidgetStyle('auto', widget), [widget]);
   return (
     <Warp style={widgetStyle} onClick={ssp}>
-      {/* <ItemContainer className="ItemContainer">
-        <WidgetName config={widget.config} />
-        <WidgetCore />
-      </ItemContainer>
-
-      {!widgetInfo.editing && (
-        <WidgetDndHandleMask
-          widgetId={widget.id}
-          widgetType={widget.config.type}
-        />
-      )}
-      <BlockMaskLayer widgetConfig={widget} widgetInfo={widgetInfo} />
-
-      <WidgetToolBar /> */}
       <WidgetMapper boardType={'auto'} boardEditing={true} />
     </Warp>
   );
@@ -56,12 +41,4 @@ const Warp = styled.div<{}>`
   &:hover .widget-tool-dropdown {
     visibility: visible;
   }
-`;
-
-const ItemContainer = styled.div`
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
 `;

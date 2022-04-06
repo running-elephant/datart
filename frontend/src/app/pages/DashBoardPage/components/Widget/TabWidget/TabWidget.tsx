@@ -18,16 +18,16 @@
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import WidgetToolBar from 'app/pages/DashBoardPage/components/WidgetToolBar';
 import { getWidgetSomeStyle } from 'app/pages/DashBoardPage/utils/widget';
-import React, { memo, useContext, useEffect, useMemo } from 'react';
+import { memo, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../EditMask';
 import { WidgetTitle } from '../../WidgetTitle';
-import ImageWidgetCore from './ImageWidgetCore';
+import { TabWidgetCore } from './TabWidgetCore';
 
-export const ImageWidget: React.FC<{}> = memo(() => {
+export const TabWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const { initialQuery } = useContext(BoardConfigContext);
   const { renderMode, boardType, editing } = useContext(BoardContext);
@@ -60,7 +60,7 @@ export const ImageWidget: React.FC<{}> = memo(() => {
           config={widget.config.nameConfig}
         />
         <WidgetWrap style={widgetCoreStyle}>
-          <ImageWidgetCore />
+          <TabWidgetCore />
         </WidgetWrap>
       </ItemContainer>
       {editing && <EditMask />}

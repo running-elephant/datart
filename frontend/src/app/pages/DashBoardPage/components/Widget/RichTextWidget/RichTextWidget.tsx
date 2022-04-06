@@ -23,9 +23,9 @@ import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { EditMask } from '../../EditMask';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
-import { EditMask } from '../EditMask';
-import { WidgetTitle } from '../WidgetTitle';
+import { WidgetTitle } from '../../WidgetTitle';
 import { RichTextWidgetCore } from './RichTextWidgetCore';
 
 export const RichTextWidget: React.FC<{}> = memo(() => {

@@ -18,7 +18,7 @@
 
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetNameConfig } from '../../pages/Board/slice/types';
+import { WidgetNameConfig } from '../pages/Board/slice/types';
 
 export const WidgetTitle: FC<{
   name: string;

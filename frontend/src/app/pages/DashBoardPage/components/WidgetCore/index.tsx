@@ -15,22 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { DataChartWidget } from 'app/pages/DashBoardPage/components/WidgetCore/DataChartWidget';
-import React, { memo, useContext, useEffect, useMemo } from 'react';
+import { memo, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { getWidgetSomeStyle } from '../../utils/widget';
 import { WidgetActionContext } from '../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from '../BoardProvider/BoardInfoProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
-import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetInfoContext } from '../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import { QueryWidget } from './ButtonWidget/QueryWidget';
 import { ResetWidget } from './ButtonWidget/ResetWidget';
-import { ContainerWidget } from './ContainerWidget';
-import { ControllerWidgetCore } from './ControllerWIdget';
-import { MediaWidget } from './MediaWidget';
 
 export interface WidgetCoreProps {
   background?: boolean;
@@ -91,30 +86,6 @@ export const WidgetCore: React.FC<WidgetCoreProps> = memo(props => {
 
   const element = useMemo(() => {
     switch (widget.config.type) {
-      case 'chart':
-        return (
-          <WidgetDataProvider
-            widgetId={widget.id}
-            boardId={widget.dashboardId}
-            boardEditing={editing}
-          >
-            <DataChartWidget />
-          </WidgetDataProvider>
-        );
-      case 'media':
-        return <MediaWidget />;
-      case 'container':
-        return <ContainerWidget />;
-      case 'controller':
-        return (
-          <WidgetDataProvider
-            widgetId={widget.id}
-            boardId={widget.dashboardId}
-            boardEditing={editing}
-          >
-            <ControllerWidgetCore />
-          </WidgetDataProvider>
-        );
       case 'query':
         return <QueryWidget />;
       case 'reset':

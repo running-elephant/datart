@@ -23,8 +23,8 @@ import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
-import { EditMask } from '../EditMask';
-import { WidgetTitle } from '../WidgetTitle';
+import { EditMask } from '../../EditMask';
+import { WidgetTitle } from '../../WidgetTitle';
 import { VideoWidgetCore } from './VideoWidgetCore';
 
 export const VideoWidget: React.FC<{}> = memo(() => {
