@@ -346,6 +346,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         shareVizDetail.setVizDetail(vizDetail);
         shareVizDetail.setSubVizToken(subVizToken);
         shareVizDetail.setExecuteToken(executeToken);
+        shareVizDetail.setShareToken(ShareToken.create(AESUtil.encrypt(authorizedToken, Application.getTokenSecret())));
         return shareVizDetail;
     }
 
