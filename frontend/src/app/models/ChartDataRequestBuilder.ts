@@ -146,8 +146,8 @@ export class ChartDataRequestBuilder {
             return acc.concat(
               cur.rows?.filter(field => {
                 return (
-                  !this.drillOption ||
-                  field.uid === this.drillOption?.getCurDrillField().uid
+                  !this.drillOption?.getCurDrillField() ||
+                  field.uid === this.drillOption?.getCurDrillField()?.uid
                 );
               }) || [],
             );

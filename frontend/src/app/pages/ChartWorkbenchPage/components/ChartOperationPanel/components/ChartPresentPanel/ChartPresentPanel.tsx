@@ -27,7 +27,6 @@ import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selec
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, memo, useContext, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -100,34 +99,19 @@ const ChartPresentPanel: FC<{
     };
 
     const menu = useMemo(() => {
-      const drillFields = drillOption?.getAllDrillFields();
       return (
         <Menu style={{ width: 200 }}>
           <Menu.SubMenu
             disabled={drillOption?.getMode() === DrillMode.Expand}
             key="showNextLevel"
             title={drillTranslator('showNextLevel')}
-          >
-            {(drillFields || []).map((f, index) => {
-              // if (!restDrillPaths.includes(p)) {
-              //   return null;
-              // }
-              return (
-                <Menu.Item
-                  key={f.uid}
-                  onClick={() => {
-                    if (!drillOption) {
-                      return;
-                    }
-                    drillOption?.drillDown(f);
-                    onChartDrillOptionChange?.(drillOption);
-                  }}
-                >
-                  {getColumnRenderName(f)}
-                </Menu.Item>
-              );
-            })}
-          </Menu.SubMenu>
+            onTitleClick={() => {
+              if (drillOption) {
+                drillOption?.drillDown();
+                onChartDrillOptionChange?.(drillOption);
+              }
+            }}
+          ></Menu.SubMenu>
           <Menu.SubMenu
             disabled={drillOption?.getMode() === DrillMode.Drill}
             key="expandNextLevel"

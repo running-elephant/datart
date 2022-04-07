@@ -1548,7 +1548,9 @@ export const getDrillableRows = (
       if (Boolean(config.drillable)) {
         return (
           config.rows?.filter(
-            f => !option || f.uid === option?.getCurDrillField().uid,
+            f =>
+              !option?.getCurDrillField() ||
+              f.uid === option?.getCurDrillField()?.uid,
           ) || []
         );
       }

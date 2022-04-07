@@ -26,7 +26,7 @@ export enum DrillMode {
 }
 
 export class ChartDrillOption {
-  private cursor: number = 0;
+  private cursor: number;
   private drillFields: ChartDataSectionField[] = [];
   private drillDownFields: Array<{
     field: ChartDataSectionField;
@@ -36,7 +36,7 @@ export class ChartDrillOption {
 
   constructor(fields: ChartDataSectionField[]) {
     this.drillFields = fields;
-    this.cursor = 0;
+    this.cursor = -1;
     this.drillDownFields = [];
     this.expandDownFields = [];
   }
@@ -55,21 +55,29 @@ export class ChartDrillOption {
   }
 
   public getCurDrillField() {
-    return this.cursor === 0
-      ? this.drillFields[this.cursor]
-      : this.drillDownFields.slice(-1)[0].field;
+    return this.cursor === -1 ? undefined : this.drillFields?.[this.cursor + 1];
   }
 
-  public drillDown(field: ChartDataSectionField, condition?: FilterCondition) {
+  public drillDown(field?: ChartDataSectionField, condition?: FilterCondition) {
+    if (this.drillFields.length === this.cursor + 2) {
+      return;
+    }
+    this.cursor++;
+    const currentField = field || this.drillFields[this.cursor];
     this.drillDownFields.push({
-      field,
+      field: currentField,
       condition,
     });
-    this.cursor++;
   }
 
   public drillUp() {
-    this.drillDownFields.pop();
     this.cursor--;
+    this.drillDownFields.pop();
+  }
+
+  public clearDrill() {
+    this.cursor = -1;
+    this.drillDownFields = [];
+    this.expandDownFields = [];
   }
 }
