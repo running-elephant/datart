@@ -34,7 +34,9 @@ import {
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
+  getSelectItemStyle,
   getStyles,
+  initSelectEvent,
   toFormattedValue,
   transformToDataSet,
   valueFormatter,
@@ -51,6 +53,15 @@ class BasicPieChart extends Chart {
 
   protected isCircle = false;
   protected isRose = false;
+
+  // todo(tianlei) 临时储存数据更新chart start
+  protected selectDataIndexList: Array<{
+    index: string;
+    data: any;
+  }> = [];
+  protected linshiOption = null;
+  protected linshiContext = null;
+  // todo(tianlei) 临时储存数据更新chart end
 
   constructor(props?) {
     super(
@@ -73,14 +84,27 @@ class BasicPieChart extends Chart {
       'default',
     );
     this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
+      if (event.name === 'click') {
+        this.chart.on(event.name, params => {
+          initSelectEvent(params, this);
+          event.callback(params);
+        });
+      } else {
+        this.chart.on(event.name, event.callback);
+      }
     });
   }
 
-  onUpdated(props): void {
+  onUpdated(props, context): void {
     if (!props.dataset || !props.dataset.columns || !props.config) {
       return;
     }
+
+    // todo(tianlei) 临时储存数据更新chart start
+    this.linshiOption = props;
+    this.linshiContext = context;
+    // todo(tianlei) 临时储存数据更新chart end
+
     if (!this.isMatchRequirement(props.config)) {
       this.chart?.clear();
       return;
@@ -94,6 +118,7 @@ class BasicPieChart extends Chart {
   }
 
   onUnMount(): void {
+    this.selectDataIndexList = [];
     this.chart?.dispose();
   }
 
@@ -157,14 +182,19 @@ class BasicPieChart extends Chart {
       const row = chartDataSet?.[0];
       return {
         ...this.getPieSeriesImpl(styleConfigs),
-        data: aggregateConfigs.map(config => {
+        data: aggregateConfigs.map((config, dcIndex) => {
           return {
             ...config,
             name: getColumnRenderName(config),
             value: [config]
               .concat(infoConfigs)
               .map(config => row?.getCell(config)),
-            itemStyle: this.getDataItemStyle(config, groupConfigs, row),
+            ...getSelectItemStyle(
+              0,
+              dcIndex,
+              this.selectDataIndexList,
+              this.getDataItemStyle(config, groupConfigs, row),
+            ),
             ...getExtraSeriesRowData(row),
             ...getExtraSeriesDataFormat(config?.format),
           };
@@ -172,16 +202,21 @@ class BasicPieChart extends Chart {
       };
     }
 
-    const flatSeries = aggregateConfigs.map(config => {
+    const flatSeries = aggregateConfigs.map((config, acIndex) => {
       return {
         ...this.getPieSeriesImpl(styleConfigs),
         name: getColumnRenderName(config),
-        data: chartDataSet?.map(row => {
+        data: chartDataSet?.map((row, dcIndex) => {
           return {
             ...config,
             name: groupConfigs.map(row.getCell, row).join('-'),
             value: aggregateConfigs.concat(infoConfigs).map(row.getCell, row),
-            itemStyle: this.getDataItemStyle(config, groupConfigs, row),
+            ...getSelectItemStyle(
+              acIndex,
+              dcIndex,
+              this.selectDataIndexList,
+              this.getDataItemStyle(config, groupConfigs, row),
+            ),
             ...getExtraSeriesRowData(row),
             ...getExtraSeriesDataFormat(config?.format),
           };
@@ -249,7 +284,6 @@ class BasicPieChart extends Chart {
         }),
         {},
       );
-
     switch (legendPos) {
       case 'top':
         orient = 'horizontal';
@@ -277,6 +311,9 @@ class BasicPieChart extends Chart {
       orient,
       selected,
       textStyle: font,
+      itemStyle: {
+        opacity: 1,
+      },
     };
   }
 
@@ -312,7 +349,14 @@ class BasicPieChart extends Chart {
 
       //处理 label 旧数据中没有 showValue, showPercent, showName 数据  alpha.3版本之后是 boolean 类型 后续版本稳定之后 可以移除此逻辑
       // TODO migration start
-      if (showName === null || showPercent === null || showValue === null) {
+      if (
+        showName === null ||
+        showPercent === null ||
+        showValue === null ||
+        showName === void 0 ||
+        showPercent === void 0 ||
+        showValue === void 0
+      ) {
         return `${seriesParams?.name}: ${seriesParams?.percent + '%'}`;
       }
       // TODO migration end --tl

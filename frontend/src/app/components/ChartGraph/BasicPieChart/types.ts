@@ -25,7 +25,7 @@ export type PieSeriesStyle = {
       format: FormatFieldAction | undefined;
       name: string;
       value: any[];
-      itemStyle: { color: string | undefined } | undefined;
+      itemStyle: { [x: string]: any } | undefined;
       rowData: { [key: string]: any };
     } & ChartDataSectionField
   >;

@@ -65,6 +65,7 @@ import {
   meanValue,
   pipe,
 } from 'utils/object';
+import { Series } from '../components/ChartGraph/BasicBarChart/types';
 import { TableColumnsList } from '../components/ChartGraph/BasicTableChart/types';
 import {
   flattenHeaderRowsWithoutGroupRow,
@@ -1298,7 +1299,6 @@ export function getScatterSymbolSizeFn(
   const scaleRatio = cycleRatio || 1;
   const defaultScatterPointPixelSize = 10;
   const distance = max - min === 0 ? 100 : max - min;
-
   return function (val) {
     return Math.max(
       3,
@@ -1685,4 +1685,49 @@ export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
       });
     }
   });
+};
+
+// todo(tianlei) 临时处理方案
+export const initSelectEvent = (params, self, chart?) => {
+  const {
+    dataIndex,
+    componentIndex,
+  }: { dataIndex: number; componentIndex: number } = params;
+  const { series }: { series: Series[] } = CloneValueDeep(
+    chart?.getOption() || self.chart.getOption(),
+  );
+  // 回调给的可能只是 select 的  index 和data结构
+  // selectCallback({ index: componentIndex + ',' + dataIndex, data: series[componentIndex].data[dataIndex]});
+
+  // todo(tianlei) 此处临时更新数据，存在问题 start
+  const findDataIndex = self.selectDataIndexList.findIndex(
+    v => v.index === componentIndex + ',' + dataIndex,
+  );
+  if (findDataIndex >= 0) {
+    self.selectDataIndexList.splice(findDataIndex, 1);
+  } else {
+    self.selectDataIndexList.push({
+      index: componentIndex + ',' + dataIndex,
+      data: series[componentIndex].data[dataIndex],
+    });
+  }
+  self.onUpdated(self.linshiOption, self.linshiContext);
+  // todo(tianlei) 此处临时更新数据，存在问题 end
+};
+
+export const getSelectItemStyle = (
+  comIndex: string | number,
+  dcIndex: string | number,
+  selectList: { index: string; data: any }[],
+  itemStyle: { [x: string]: any } = {},
+): { itemStyle: { opacity?: number; [x: string]: any } } => {
+  const findIndex = selectList.findIndex(
+    v => v.index === comIndex + ',' + dcIndex,
+  );
+  return {
+    itemStyle: Object.assign(
+      itemStyle,
+      findIndex < 0 && selectList.length ? { opacity: 0.5 } : {},
+    ),
+  };
 };

@@ -45,6 +45,7 @@ import {
   getSplitLine,
   getStyles,
   hadAxisLabelOverflowConfig,
+  initSelectEvent,
   setOptionsByAxisLabelOverflow,
   toFormattedValue,
   transformToDataSet,
@@ -62,6 +63,15 @@ class BasicLineChart extends Chart {
 
   protected isArea = false;
   protected isStack = false;
+
+  // todo(tianlei) 临时储存数据更新chart start
+  protected selectDataIndexList: Array<{
+    index: string;
+    data: any;
+  }> = [];
+  protected linshiOption = null;
+  protected linshiContext = null;
+  // todo(tianlei) 临时储存数据更新chart end
 
   constructor(props?) {
     super(
@@ -87,14 +97,27 @@ class BasicLineChart extends Chart {
       'default',
     );
     this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
+      if (event.name === 'click') {
+        this.chart.on(event.name, params => {
+          initSelectEvent(params, this);
+          event.callback(params);
+        });
+      } else {
+        this.chart.on(event.name, event.callback);
+      }
     });
   }
 
-  onUpdated(props): void {
+  onUpdated(props, context): void {
     if (!props.dataset || !props.dataset.columns || !props.config) {
       return;
     }
+
+    // todo(tianlei) 临时储存数据更新chart start
+    this.linshiOption = props;
+    this.linshiContext = context;
+    // todo(tianlei) 临时储存数据更新chart end
+
     if (!this.isMatchRequirement(props.config)) {
       this.chart?.clear();
       return;
@@ -109,10 +132,12 @@ class BasicLineChart extends Chart {
 
   onResize(opt: any, context): void {
     this.chart?.resize({ width: context?.width, height: context?.height });
-    hadAxisLabelOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
+    hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
+      this.onUpdated(opt, context);
   }
 
   onUnMount(): void {
+    this.selectDataIndexList = [];
     this.chart?.dispose();
   }
 
@@ -207,21 +232,34 @@ class BasicLineChart extends Chart {
     xAxisColumns: XAxisColumns[],
   ): Series[] {
     if (!colorConfigs?.length) {
-      return aggregateConfigs.map(aggConfig => {
+      return aggregateConfigs.map((aggConfig, acIndex) => {
         const color = aggConfig?.color?.start;
         return {
           name: getColumnRenderName(aggConfig),
           type: 'line',
           sampling: 'average',
-          areaStyle: this.isArea ? { color } : undefined,
+          areaStyle: this.isArea
+            ? {
+                color,
+                opacity: this.selectDataIndexList.length ? 0.4 : undefined,
+              }
+            : undefined,
           stack: this.isStack ? 'total' : undefined,
-          data: chartDataSet.map(dc => ({
+          data: chartDataSet.map((dc, dcIndex) => ({
             ...getExtraSeriesRowData(dc),
             ...getExtraSeriesDataFormat(aggConfig?.format),
+            ...this.getLineSelectItemStyle(
+              acIndex,
+              dcIndex,
+              this.selectDataIndexList,
+            ),
             value: dc.getCell(aggConfig),
           })),
           itemStyle: {
             color,
+          },
+          lineStyle: {
+            opacity: this.selectDataIndexList.length ? 0.5 : 1,
           },
           ...this.getLabelStyle(styleConfigs),
           ...this.getSeriesStyle(styleConfigs),
@@ -234,9 +272,9 @@ class BasicLineChart extends Chart {
       chartDataSet,
       colorConfigs[0],
     );
-
-    return aggregateConfigs.flatMap(aggConfig => {
-      return secondGroupInfos.map(sgCol => {
+    const xAxisConfig = groupConfigs?.[0];
+    return aggregateConfigs.flatMap((aggConfig, acIndex) => {
+      return secondGroupInfos.map((sgCol, sgcIndex) => {
         const k = Object.keys(sgCol)[0];
         const dataSet = sgCol[k];
 
@@ -252,13 +290,16 @@ class BasicLineChart extends Chart {
           itemStyle: {
             normal: { color: itemStyleColor?.value },
           },
-          data: xAxisColumns[0].data.map(d => {
-            const row = dataSet.find(
-              r => r.getMultiCell(...groupConfigs) === d,
-            )!;
+          data: xAxisColumns[0].data.map((d, dcIndex) => {
+            const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
             return {
               ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),
+              ...this.getLineSelectItemStyle(
+                sgcIndex,
+                acIndex * secondGroupInfos.length + dcIndex,
+                this.selectDataIndexList,
+              ),
               name: getColumnRenderName(aggConfig),
               value: row?.getCell(aggConfig),
             };
@@ -268,6 +309,17 @@ class BasicLineChart extends Chart {
         };
       });
     });
+  }
+
+  getLineSelectItemStyle(
+    comIndex: string | number,
+    dcIndex: string | number,
+    selectList: { index: string; data: any }[],
+  ) {
+    const findIndex = selectList.findIndex(
+      v => v.index === comIndex + ',' + dcIndex,
+    );
+    return findIndex >= 0 ? { symbol: 'circle', symbolSize: 10 } : {};
   }
 
   private getYAxis(styles, yAxisNames): YAxis {
@@ -423,6 +475,12 @@ class BasicLineChart extends Chart {
       selected,
       data: seriesNames,
       textStyle: font,
+      itemStyle: {
+        opacity: 1,
+      },
+      lineStyle: {
+        opacity: 1,
+      },
     };
   }
 

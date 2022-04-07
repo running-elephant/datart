@@ -34,8 +34,10 @@ import {
   getGridStyle,
   getReference2,
   getScatterSymbolSizeFn,
+  getSelectItemStyle,
   getSeriesTooltips4Polar2,
   getStyles,
+  initSelectEvent,
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
@@ -48,6 +50,15 @@ class BasicScatterChart extends Chart {
   dependency = [];
   config = Config;
   chart: any = null;
+
+  // todo(tianlei) 临时储存数据更新chart start
+  protected selectDataIndexList: Array<{
+    index: string;
+    data: any;
+  }> = [];
+  protected linshiOption = null;
+  protected linshiContext = null;
+  // todo(tianlei) 临时储存数据更新chart end
 
   constructor() {
     super('scatter', 'viz.palette.graph.names.scatterChart', 'sandiantu');
@@ -69,14 +80,26 @@ class BasicScatterChart extends Chart {
       'default',
     );
     this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
+      if (event.name === 'click') {
+        this.chart.on(event.name, params => {
+          initSelectEvent(params, this);
+          event.callback(params);
+        });
+      } else {
+        this.chart.on(event.name, event.callback);
+      }
     });
   }
 
-  onUpdated(props): void {
+  onUpdated(props, context): void {
     if (!props.dataset || !props.dataset.columns || !props.config) {
       return;
     }
+
+    // todo(tianlei) 临时储存数据更新chart start
+    this.linshiOption = props;
+    this.linshiContext = context;
+    // todo(tianlei) 临时储存数据更新chart end
 
     if (!this.isMatchRequirement(props.config)) {
       this.chart?.clear();
@@ -91,6 +114,7 @@ class BasicScatterChart extends Chart {
   }
 
   onUnMount(): void {
+    this.selectDataIndexList = [];
     this.chart?.dispose();
   }
 
@@ -220,7 +244,7 @@ class BasicScatterChart extends Chart {
       return acc;
     }, {});
 
-    return Object.keys(groupedObjDataColumns).map(k => {
+    return Object.keys(groupedObjDataColumns).map((k, gcIndex) => {
       return this.getMetricAndSizeSerie(
         {
           max,
@@ -235,6 +259,7 @@ class BasicScatterChart extends Chart {
         settingConfigs,
         k,
         groupedObjDataColumns?.[k]?.color,
+        gcIndex,
       );
     });
   }
@@ -250,6 +275,7 @@ class BasicScatterChart extends Chart {
     settingConfigs: ChartStyleConfig[],
     colorSeriesName?: string,
     color?: string,
+    comIndex: number = 0,
   ): ScatterMetricAndSizeSerie {
     const [cycleRatio] = getStyles(styleConfigs, ['scatter'], ['cycleRatio']);
     const seriesName = groupConfigs
@@ -262,6 +288,7 @@ class BasicScatterChart extends Chart {
         : defaultSizeValue;
       return {
         ...getExtraSeriesRowData(row),
+        ...getSelectItemStyle(comIndex, dcIndex, this.selectDataIndexList),
         name: groupConfigs?.map(row.getCell, row).join('-'),
         value: aggregateConfigs
           .map(row.getCell, row)

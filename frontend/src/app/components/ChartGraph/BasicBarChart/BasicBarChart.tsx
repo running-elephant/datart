@@ -38,9 +38,11 @@ import {
   getExtraSeriesRowData,
   getGridStyle,
   getReference2,
+  getSelectItemStyle,
   getSeriesTooltips4Rectangular2,
   getStyles,
   hadAxisLabelOverflowConfig,
+  initSelectEvent,
   setOptionsByAxisLabelOverflow,
   toFormattedValue,
   transformToDataSet,
@@ -60,6 +62,15 @@ class BasicBarChart extends Chart {
   protected isHorizonDisplay = false;
   protected isStackMode = false;
   protected isPercentageYAxis = false;
+
+  // todo(tianlei) 临时储存数据更新chart start
+  protected selectDataIndexList: Array<{
+    index: string;
+    data: any;
+  }> = [];
+  protected linshiOption = null;
+  protected linshiContext = null;
+  // todo(tianlei) 临时储存数据更新chart end
 
   constructor(props?: {
     id: string;
@@ -90,7 +101,14 @@ class BasicBarChart extends Chart {
       'default',
     );
     this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
+      if (event.name === 'click') {
+        this.chart.on(event.name, params => {
+          initSelectEvent(params, this);
+          event.callback(params);
+        });
+      } else {
+        this.chart.on(event.name, event.callback);
+      }
     });
   }
 
@@ -98,6 +116,12 @@ class BasicBarChart extends Chart {
     if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
+
+    // todo(tianlei) 临时储存数据更新chart start
+    this.linshiOption = options;
+    this.linshiContext = context;
+    // todo(tianlei) 临时储存数据更新chart end
+
     if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();
       return;
@@ -111,6 +135,7 @@ class BasicBarChart extends Chart {
   }
 
   onUnMount(): void {
+    this.selectDataIndexList = [];
     this.chart?.dispose();
   }
 
@@ -243,7 +268,7 @@ class BasicBarChart extends Chart {
     xAxisColumns: XAxisColumns[],
   ): Series[] {
     if (!colorConfigs.length) {
-      return aggregateConfigs.map(aggConfig => {
+      return aggregateConfigs.map((aggConfig, sIndex) => {
         return {
           ...this.getBarSeriesImpl(
             styleConfigs,
@@ -252,12 +277,15 @@ class BasicBarChart extends Chart {
             aggConfig,
           ),
           name: getColumnRenderName(aggConfig),
-          data: chartDataSet?.map(dc => ({
-            ...getExtraSeriesRowData(dc),
-            ...getExtraSeriesDataFormat(aggConfig?.format),
-            name: getColumnRenderName(aggConfig),
-            value: dc.getCell(aggConfig),
-          })),
+          data: chartDataSet?.map((dc, dIndex) => {
+            return {
+              ...getExtraSeriesRowData(dc),
+              ...getExtraSeriesDataFormat(aggConfig?.format),
+              ...getSelectItemStyle(sIndex, dIndex, this.selectDataIndexList),
+              name: getColumnRenderName(aggConfig),
+              value: dc.getCell(aggConfig),
+            };
+          }),
         };
       });
     }
@@ -267,40 +295,46 @@ class BasicBarChart extends Chart {
       colorConfigs[0],
     );
 
-    const colorizeGroupedSeries = aggregateConfigs.flatMap(aggConfig => {
-      return secondGroupInfos.map(sgCol => {
-        const k = Object.keys(sgCol)[0];
-        const dataSet = sgCol[k];
+    const xAxisConfig = groupConfigs?.[0];
+    const colorizeGroupedSeries = aggregateConfigs.flatMap(
+      (aggConfig, acIndex) => {
+        return secondGroupInfos.map((sgCol, sgIndex) => {
+          const k = Object.keys(sgCol)[0];
+          const dataSet = sgCol[k];
 
-        const itemStyleColor = colorConfigs?.[0]?.color?.colors?.find(
-          c => c.key === k,
-        );
+          const itemStyleColor = colorConfigs?.[0]?.color?.colors?.find(
+            c => c.key === k,
+          );
 
-        return {
-          ...this.getBarSeriesImpl(
-            styleConfigs,
-            settingConfigs,
-            chartDataSet,
-            aggConfig,
-          ),
-          name: k,
-          data: xAxisColumns?.[0]?.data?.map(d => {
-            const row = dataSet.find(
-              r => r.getMultiCell(...groupConfigs) === d,
-            )!;
-            return {
-              ...getExtraSeriesRowData(row),
-              ...getExtraSeriesDataFormat(aggConfig?.format),
-              name: getColumnRenderName(aggConfig),
-              value: row?.getCell(aggConfig),
-            };
-          }),
-          itemStyle: this.getSeriesItemStyle(styleConfigs, {
-            color: itemStyleColor?.value,
-          }),
-        };
-      });
-    });
+          return {
+            ...this.getBarSeriesImpl(
+              styleConfigs,
+              settingConfigs,
+              chartDataSet,
+              aggConfig,
+            ),
+            name: k,
+            data: xAxisColumns?.[0]?.data?.map((d, dIndex) => {
+              const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
+              return {
+                ...getExtraSeriesRowData(row),
+                ...getExtraSeriesDataFormat(aggConfig?.format),
+                name: getColumnRenderName(aggConfig),
+                value: row?.getCell(aggConfig),
+                ...getSelectItemStyle(
+                  acIndex * secondGroupInfos.length + sgIndex,
+                  dIndex,
+                  this.selectDataIndexList,
+                ),
+              };
+            }),
+            itemStyle: this.getSeriesItemStyle(styleConfigs, {
+              color: itemStyleColor?.value,
+            }),
+          };
+        });
+      },
+    );
     return colorizeGroupedSeries;
   }
 
