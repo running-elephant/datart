@@ -161,7 +161,6 @@ class BasicBarChart extends Chart {
       },
     ];
 
-    console.log(`xAxisColumns ---> `, xAxisColumns);
     const yAxisNames: string[] = aggregateConfigs.map(getColumnRenderName);
     const series = this.getSeries(
       settingConfigs,
@@ -173,7 +172,6 @@ class BasicBarChart extends Chart {
       infoConfigs,
       xAxisColumns,
     );
-    console.log(`series ---> `, series);
 
     const axisInfo = {
       xAxis: this.getXAxis(styleConfigs, xAxisColumns),

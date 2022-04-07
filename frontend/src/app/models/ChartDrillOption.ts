@@ -17,7 +17,9 @@
  */
 
 import { ChartDataSectionField, FilterCondition } from 'app/types/ChartConfig';
+import { FilterSqlOperator } from 'globalConstants';
 import { isEmptyArray } from 'utils/object';
+import { ConditionBuilder } from './ChartFilterCondition';
 
 export enum DrillMode {
   Normal = 'normal',
@@ -36,6 +38,7 @@ export class ChartDrillOption {
     field: ChartDataSectionField;
     condition?: FilterCondition;
   }> = [];
+  private tempFilterData: any;
 
   constructor(fields: ChartDataSectionField[]) {
     this.drillFields = fields;
@@ -71,10 +74,19 @@ export class ChartDrillOption {
     }
     this.cursor++;
     const currentField = this.drillFields[this.cursor];
+    let cond;
+    if (this.tempFilterData) {
+      cond = new ConditionBuilder()
+        .setName(currentField.colName)
+        .setOperator(FilterSqlOperator.Equal)
+        .setValue(this.tempFilterData[currentField.colName])
+        .asFilter();
+    }
     this.drillDownFields.push({
       field: currentField,
-      condition,
+      condition: cond,
     });
+    this.setTempFilterField(null);
   }
 
   public expandDown() {
@@ -120,6 +132,14 @@ export class ChartDrillOption {
       this.cursor--;
       this.expandDownFields.pop();
     }
+  }
+
+  public setTempFilterField(data) {
+    this.tempFilterData = data;
+  }
+
+  public getDrillFields() {
+    return this.drillDownFields;
   }
 
   private clearAll() {

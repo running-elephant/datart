@@ -195,7 +195,7 @@ export class ChartDataRequestBuilder {
         return true;
       })
       .map(col => col);
-    return this.normalizeFilters(fields) as ChartDataRequestFilter[];
+    return this.normalizeFilters(fields).concat(this.normalizeDrillFilters());
   }
 
   private normalizeFilters = (fields: ChartDataSectionField[]) => {
@@ -266,7 +266,7 @@ export class ChartDataRequestBuilder {
           field.filter?.condition?.operator === FilterSqlOperator.NotIn
         ) {
           if (isEmptyArray(_transformFieldValues(field))) {
-            return undefined;
+            return null;
           }
         }
         return {
@@ -279,8 +279,19 @@ export class ChartDataRequestBuilder {
           values: _transformFieldValues(field) || [],
         };
       })
-      .filter(Boolean);
+      .filter(Boolean) as ChartDataRequestFilter[];
   };
+
+  private normalizeDrillFilters(): ChartDataRequestFilter[] {
+    return (this.drillOption?.getDrillFields().map(f => {
+      return {
+        aggOperator: null,
+        column: f.condition?.name!,
+        sqlOperator: f.condition?.operator! as FilterSqlOperator,
+        values: [{ value: f.condition?.value as string, valueType: 'STRING' }],
+      };
+    }) || []) as ChartDataRequestFilter[];
+  }
 
   private buildOrders() {
     const sortColumns = this.chartDataConfigs
