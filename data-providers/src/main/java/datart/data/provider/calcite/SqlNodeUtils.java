@@ -28,6 +28,7 @@ import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.util.DateString;
 import org.apache.calcite.util.TimestampString;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -128,7 +129,9 @@ public class SqlNodeUtils {
     }
 
     private static SqlNode createDateSqlNode(String value, String format) {
-        if (DateUtils.isDateFormat(format)) {
+        if (StringUtils.isBlank(format)) {
+            return SqlLiteral.createTimestamp(new TimestampString(value), 0, SqlParserPos.ZERO);
+        } else if (DateUtils.isDateFormat(format)) {
             return SqlLiteral.createDate(new DateString(value), SqlParserPos.ZERO);
         } else if (DateUtils.isDateTimeFormat(format)) {
             return SqlLiteral.createTimestamp(new TimestampString(value), 0, SqlParserPos.ZERO);
