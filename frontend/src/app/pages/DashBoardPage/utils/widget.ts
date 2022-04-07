@@ -666,11 +666,14 @@ export const getFreeWidgetStyle = (widget: Widget) => {
   const rect = widgetConf.rect;
   let widgetStyle: CSSProperties = {
     position: 'absolute',
+    left: fillPx(rect.x),
+    top: fillPx(rect.y),
     display: 'flex',
     flexDirection: 'column',
-    width: `${rect.width}px`,
-    height: `${rect.height}px`,
-    transform: `translate(${rect.x}px, ${rect.y}px)`,
+    width: fillPx(rect.width),
+    height: fillPx(rect.height),
+    zIndex: widgetConf.index,
+    // transform: `translate(${rect.x}px, ${rect.y}px)`,
     transformOrigin: ' 0 0',
   };
   return widgetStyle;
