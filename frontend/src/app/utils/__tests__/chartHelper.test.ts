@@ -2164,9 +2164,10 @@ describe('Chart Helper ', () => {
         },
       ];
       const drillOption = new ChartDrillOption(config[0].rows);
+      drillOption.drillDown();
       const drillRows = getDrillableRows(config, drillOption);
       expect(drillRows).toEqual([
-        { uid: '1', colName: 'col1', type: 'STRING', category: 'field' },
+        { uid: '2', colName: 'col2', type: 'STRING', category: 'field' },
       ]);
     });
   });

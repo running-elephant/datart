@@ -146,8 +146,12 @@ export class ChartDataRequestBuilder {
             return acc.concat(
               cur.rows?.filter(field => {
                 return (
-                  !this.drillOption?.getCurDrillField() ||
-                  field.uid === this.drillOption?.getCurDrillField()?.uid
+                  !this.drillOption?.getFields() ||
+                  Boolean(
+                    this.drillOption
+                      ?.getFields()
+                      ?.some(df => df.uid === field.uid),
+                  )
                 );
               }) || [],
             );

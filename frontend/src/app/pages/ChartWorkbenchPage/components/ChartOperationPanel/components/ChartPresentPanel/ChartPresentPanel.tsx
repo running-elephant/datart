@@ -116,10 +116,13 @@ const ChartPresentPanel: FC<{
             disabled={drillOption?.getMode() === DrillMode.Drill}
             key="expandNextLevel"
             title={drillTranslator('expandNextLevel')}
-          >
-            <Menu.Item>5d menu item</Menu.Item>
-            <Menu.Item>6th menu item</Menu.Item>
-          </Menu.SubMenu>
+            onTitleClick={() => {
+              if (drillOption) {
+                drillOption?.expandDown();
+                onChartDrillOptionChange?.(drillOption);
+              }
+            }}
+          ></Menu.SubMenu>
         </Menu>
       );
     }, [drillOption, drillTranslator, onChartDrillOptionChange]);

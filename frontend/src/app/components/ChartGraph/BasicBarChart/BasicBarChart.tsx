@@ -47,7 +47,6 @@ import {
 } from 'app/utils/chartHelper';
 import { toPrecision } from 'app/utils/number';
 import { init } from 'echarts';
-import { UniqArray } from 'utils/object';
 import Chart from '../../../models/Chart';
 import { ChartRequirement } from '../../../types/ChartMetadata';
 import Config from './config';
@@ -151,13 +150,18 @@ class BasicBarChart extends Chart {
     if (this.isHorizonDisplay) {
       chartDataSet.reverse();
     }
-    const xAxisColumns: XAxisColumns[] = (groupConfigs || []).map(config => {
-      return {
+
+    const xAxisColumns: XAxisColumns[] = [
+      {
         type: 'category',
         tooltip: { show: true },
-        data: UniqArray(chartDataSet.map(row => row.getCell(config))),
-      };
-    });
+        data: chartDataSet?.map(row => {
+          return groupConfigs.map(g => row.getCell(g)).join('-');
+        }),
+      },
+    ];
+
+    console.log(`xAxisColumns ---> `, xAxisColumns);
     const yAxisNames: string[] = aggregateConfigs.map(getColumnRenderName);
     const series = this.getSeries(
       settingConfigs,
@@ -169,6 +173,7 @@ class BasicBarChart extends Chart {
       infoConfigs,
       xAxisColumns,
     );
+    console.log(`series ---> `, series);
 
     const axisInfo = {
       xAxis: this.getXAxis(styleConfigs, xAxisColumns),
@@ -236,9 +241,8 @@ class BasicBarChart extends Chart {
     infoConfigs: ChartDataSectionField[],
     xAxisColumns: XAxisColumns[],
   ): Series[] {
-    const xAxisConfig = groupConfigs?.[0];
     if (!colorConfigs.length) {
-      const flatSeries = aggregateConfigs.map(aggConfig => {
+      return aggregateConfigs.map(aggConfig => {
         return {
           ...this.getBarSeriesImpl(
             styleConfigs,
@@ -255,9 +259,9 @@ class BasicBarChart extends Chart {
           })),
         };
       });
-      return flatSeries;
     }
 
+    const xAxisConfig = groupConfigs?.[0];
     const secondGroupInfos = getColorizeGroupSeriesColumns(
       chartDataSet,
       colorConfigs[0],

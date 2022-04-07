@@ -32,7 +32,10 @@ export class ChartDrillOption {
     field: ChartDataSectionField;
     condition?: FilterCondition;
   }> = [];
-  private expandDownFields: ChartDataSectionField[] = [];
+  private expandDownFields: Array<{
+    field: ChartDataSectionField;
+    condition?: FilterCondition;
+  }> = [];
 
   constructor(fields: ChartDataSectionField[]) {
     this.drillFields = fields;
@@ -54,8 +57,12 @@ export class ChartDrillOption {
     return this.drillFields;
   }
 
-  public getCurDrillField() {
-    return this.cursor === -1 ? undefined : this.drillFields?.[this.cursor + 1];
+  public getFields(): ChartDataSectionField[] | undefined {
+    return this.cursor === -1
+      ? undefined
+      : this.getMode() === DrillMode.Drill
+      ? [this.drillFields?.[this.cursor + 1]]
+      : this.drillFields.slice(0, this.cursor + 2);
   }
 
   public drillDown(condition?: FilterCondition) {
@@ -70,13 +77,24 @@ export class ChartDrillOption {
     });
   }
 
+  public expandDown() {
+    if (this.drillFields.length === this.cursor + 2) {
+      return;
+    }
+    this.cursor++;
+    const currentField = this.drillFields[this.cursor];
+    this.expandDownFields.push({
+      field: currentField,
+    });
+  }
+
   public drillUp(field?: ChartDataSectionField) {
     if (field) {
       const fieldIndex = this.drillDownFields.findIndex(
         d => d.field.uid === field.uid,
       );
       if (fieldIndex === 0) {
-        this.clearDrill();
+        this.clearAll();
       } else if (fieldIndex >= 1) {
         this.drillDownFields = this.drillDownFields.slice(0, fieldIndex);
         this.cursor = fieldIndex - 1;
@@ -87,7 +105,24 @@ export class ChartDrillOption {
     }
   }
 
-  private clearDrill() {
+  public expandUp(field?: ChartDataSectionField) {
+    if (field) {
+      const fieldIndex = this.expandDownFields.findIndex(
+        d => d.field.uid === field.uid,
+      );
+      if (fieldIndex === 0) {
+        this.clearAll();
+      } else if (fieldIndex >= 1) {
+        this.expandDownFields = this.expandDownFields.slice(0, fieldIndex);
+        this.cursor = fieldIndex - 1;
+      }
+    } else {
+      this.cursor--;
+      this.expandDownFields.pop();
+    }
+  }
+
+  private clearAll() {
     this.cursor = -1;
     this.drillDownFields = [];
     this.expandDownFields = [];

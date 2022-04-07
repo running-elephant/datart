@@ -17,7 +17,7 @@
  */
 
 import { Breadcrumb } from 'antd';
-import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { ChartDrillOption, DrillMode } from 'app/models/ChartDrillOption';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
@@ -32,12 +32,18 @@ const ChartDrillPath: FC<{
   return (
     <StyledChartDrillPath>
       <Breadcrumb>
-        {drillFields.map((f, index) => {
+        {drillFields.map(f => {
           return (
             <StyledDrillNode
-              isActive={drillOption?.getCurDrillField()?.uid === f.uid}
+              isActive={Boolean(
+                drillOption?.getFields()?.some(df => df.uid === f.uid),
+              )}
               onClick={() => {
-                drillOption.drillUp(f);
+                if (drillOption.getMode() === DrillMode.Drill) {
+                  drillOption.drillUp(f);
+                } else if (drillOption.getMode() === DrillMode.Expand) {
+                  drillOption.expandUp(f);
+                }
                 onChartDrillOptionChange?.(drillOption);
               }}
             >
