@@ -625,7 +625,11 @@
           "insideTopLeft": "内左上",
           "insideBottomLeft": "内左下",
           "insideTopRight": "内右上",
-          "insideBottomRight": "内右下"
+          "insideBottomRight": "内右下",
+          "leftTop": "左上",
+          "leftBottom": "左下",
+          "rightTop": "右上",
+          "rightBottom": "右下"
         }
       },
       "data": {
