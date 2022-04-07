@@ -58,12 +58,12 @@ export class ChartDrillOption {
     return this.cursor === -1 ? undefined : this.drillFields?.[this.cursor + 1];
   }
 
-  public drillDown(field?: ChartDataSectionField, condition?: FilterCondition) {
+  public drillDown(condition?: FilterCondition) {
     if (this.drillFields.length === this.cursor + 2) {
       return;
     }
     this.cursor++;
-    const currentField = field || this.drillFields[this.cursor];
+    const currentField = this.drillFields[this.cursor];
     this.drillDownFields.push({
       field: currentField,
       condition,

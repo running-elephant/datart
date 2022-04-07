@@ -16,8 +16,7 @@
  * limitations under the License.
  */
 
-import { RightOutlined } from '@ant-design/icons';
-import { Tag } from 'antd';
+import { Breadcrumb } from 'antd';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
@@ -32,48 +31,33 @@ const ChartDrillPath: FC<{
   const drillFields = drillOption.getAllDrillFields();
   return (
     <StyledChartDrillPath>
-      {drillFields.map((f, index) => {
-        return (
-          <>
+      <Breadcrumb>
+        {drillFields.map((f, index) => {
+          return (
             <StyledDrillNode
               isActive={drillOption?.getCurDrillField()?.uid === f.uid}
               onClick={() => {
                 if (index === 0) {
                   drillOption.clearDrill();
-                } else {
-                  drillOption.drillDown(f);
+                  onChartDrillOptionChange?.(drillOption);
                 }
-                onChartDrillOptionChange?.(drillOption);
               }}
             >
               {getColumnRenderName(f)}
             </StyledDrillNode>
-            {index !== drillFields?.length - 1 ? <StyledIndicatorIcon /> : ''}
-          </>
-        );
-      })}
+          );
+        })}
+      </Breadcrumb>
     </StyledChartDrillPath>
   );
 });
 
 export default ChartDrillPath;
 
-const StyledChartDrillPath = styled.div`
-  display: flex;
-  flex: 1;
-  height: 100%;
-  align-items: center;
-  padding-left: 8px;
-`;
+const StyledChartDrillPath = styled.div``;
 
-const StyledDrillNode = styled(Tag)<{ isActive: boolean }>`
+const StyledDrillNode = styled(Breadcrumb.Item)<{ isActive: boolean }>`
   cursor: pointer;
   user-select: none;
   color: ${p => (p.isActive ? p.theme.primary : p.theme.normal)} !important;
-`;
-
-const StyledIndicatorIcon = styled(RightOutlined)`
-  width: 24px;
-  font-size: 12px;
-  color: ${p => p.theme.normal} !important;
 `;

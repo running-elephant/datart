@@ -197,16 +197,16 @@ const ChartPresentPanel: FC<{
             />
           </ReloadMask>
         )}
-        <Row justify="space-between">
-          <Col>
-            <ChartDrillPath
-              drillOption={drillOption}
-              onChartDrillOptionChange={onChartDrillOptionChange}
-            />
-          </Col>
+        <Row justify="end">
           <Col>{renderChartTypeSelector()}</Col>
         </Row>
         {renderReusableChartContainer()}
+        <StyledChartDillPath>
+          <ChartDrillPath
+            drillOption={drillOption}
+            onChartDrillOptionChange={onChartDrillOptionChange}
+          />
+        </StyledChartDillPath>
       </StyledChartPresentPanel>
     );
   },
@@ -224,6 +224,12 @@ const StyledChartPresentPanel = styled.div`
 `;
 
 const StyledReusableChartContainer = styled.div``;
+
+const StyledChartDillPath = styled.div`
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+`;
 
 const TableWrapper = styled.div`
   padding: ${SPACE_LG};
