@@ -66,8 +66,8 @@ const BasicMarginWidth: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     return (
       <StyledBasicMarginWidth
         label={t(label, true)}
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 16 }}
+        labelCol={{ span: 10 }}
+        wrapperCol={{ span: 14 }}
       >
         <Space>
           <InputNumber
