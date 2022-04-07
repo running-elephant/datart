@@ -28,7 +28,7 @@ export const WidgetOfFree: React.FC<{}> = memo(() => {
 
   return (
     <Wrap style={widgetStyle}>
-      <WidgetMapper boardType="free" boardEditing={true} />
+      <WidgetMapper boardType="free" boardEditing={false} />
     </Wrap>
   );
 });
