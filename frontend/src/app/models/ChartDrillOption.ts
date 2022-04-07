@@ -70,12 +70,24 @@ export class ChartDrillOption {
     });
   }
 
-  public drillUp() {
-    this.cursor--;
-    this.drillDownFields.pop();
+  public drillUp(field?: ChartDataSectionField) {
+    if (field) {
+      const fieldIndex = this.drillDownFields.findIndex(
+        d => d.field.uid === field.uid,
+      );
+      if (fieldIndex === 0) {
+        this.clearDrill();
+      } else if (fieldIndex >= 1) {
+        this.drillDownFields = this.drillDownFields.slice(0, fieldIndex);
+        this.cursor = fieldIndex - 1;
+      }
+    } else {
+      this.cursor--;
+      this.drillDownFields.pop();
+    }
   }
 
-  public clearDrill() {
+  private clearDrill() {
     this.cursor = -1;
     this.drillDownFields = [];
     this.expandDownFields = [];

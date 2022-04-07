@@ -37,10 +37,8 @@ const ChartDrillPath: FC<{
             <StyledDrillNode
               isActive={drillOption?.getCurDrillField()?.uid === f.uid}
               onClick={() => {
-                if (index === 0) {
-                  drillOption.clearDrill();
-                  onChartDrillOptionChange?.(drillOption);
-                }
+                drillOption.drillUp(f);
+                onChartDrillOptionChange?.(drillOption);
               }}
             >
               {getColumnRenderName(f)}
