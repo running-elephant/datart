@@ -20,6 +20,7 @@ import Chart from 'app/components/ChartGraph/models/Chart';
 import * as datartChartHelper from 'app/utils/chartHelper';
 import { fetchPluginChart } from 'app/utils/fetch';
 import { cond, Omit } from 'utils/object';
+import { request } from 'utils/request';
 
 const pureFuncLoader = ({ path, result }) => {
   if (/.js$/.test(path)) {
@@ -41,6 +42,34 @@ const iifeFuncLoader = ({ path, result }) => {
 
 class PluginChartLoader {
   async loadPlugins(paths: string[]) {
+    let plugins: Chart[] = [];
+    try {
+      // 加载扩展ui组件
+      let pluginFiles = require.context(
+        'app/components/ChartGraph/competition/michael',
+        false,
+        /.js$/,
+      );
+      pluginFiles.keys().forEach(pluginFileName => {
+        // 加载组件文件
+        const pluginConfig = pluginFiles(pluginFileName);
+        if (!pluginConfig) {
+          return;
+        }
+        // 获取组件信息
+        const customPlugin = pluginConfig.default({
+          dHelper: { ...datartChartHelper, request, tranform: () => 1 },
+        });
+
+        // 转换组件对象
+        const customPluginChar = this.convertToDatartChartModel(customPlugin);
+        plugins.push(customPluginChar);
+      });
+    } catch (e) {
+      console.error('ChartPluginLoader | plugin chart error: ', e);
+      return null;
+    }
+
     const loadPluginTasks = (paths || []).map(async (path, index) => {
       try {
         const result = await fetchPluginChart(path);
@@ -62,7 +91,8 @@ class PluginChartLoader {
         return null;
       }
     });
-    return Promise.all(loadPluginTasks);
+    const fromServer = await Promise.all(loadPluginTasks);
+    return Promise.resolve(plugins.concat(fromServer as any));
   }
 
   convertToDatartChartModel(customPlugin) {

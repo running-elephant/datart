@@ -43,6 +43,15 @@ import {
   WaterfallChart,
   WordCloudChart,
 } from 'app/components/ChartGraph';
+import {
+  MapBarChart,
+  SankeyChart,
+} from 'app/components/ChartGraph/competition/labixiaoxin';
+import {
+  BasicCalendarChart,
+  BasicCalendarScheduler,
+  BasicFlowAnalysis,
+} from 'app/components/ChartGraph/competition/nil';
 import { IChart } from 'app/types/Chart';
 import { getChartPluginPaths } from 'app/utils/fetch';
 import { Debugger } from 'utils/debugger';
@@ -134,6 +143,11 @@ class ChartManager {
       new ScatterOutlineMapChart(),
       new BasicGaugeChart(),
       new BasicRichText(),
+      new BasicCalendarChart(),
+      new BasicCalendarScheduler(),
+      new BasicFlowAnalysis(),
+      new MapBarChart(),
+      new SankeyChart(),
     ];
   }
 }
