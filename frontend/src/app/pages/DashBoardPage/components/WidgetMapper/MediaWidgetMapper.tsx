@@ -17,11 +17,11 @@
  */
 import { memo } from 'react';
 import { MediaWidgetType } from '../../pages/Board/slice/types';
-import { IframeWidget } from '../Widget/IframeWidget/IframeWidget';
-import { ImageWidget } from '../Widget/ImageWidget/ImageWidget';
-import { RichTextWidget } from '../Widget/RichTextWidget/RichTextWidget';
-import { TimerWidget } from '../Widget/TimerWidget/TimerWidget';
-import { VideoWidget } from '../Widget/VideoWidget/VideoWidget';
+import { IframeWidget } from '../Widgets/IframeWidget/IframeWidget';
+import { ImageWidget } from '../Widgets/ImageWidget/ImageWidget';
+import { RichTextWidget } from '../Widgets/RichTextWidget/RichTextWidget';
+import { TimerWidget } from '../Widgets/TimerWidget/TimerWidget';
+import { VideoWidget } from '../Widgets/VideoWidget/VideoWidget';
 
 export const MediaWidgetMapper: React.FC<{
   subType: MediaWidgetType;

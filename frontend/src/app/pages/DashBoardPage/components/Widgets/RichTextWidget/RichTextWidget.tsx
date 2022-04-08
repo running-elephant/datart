@@ -17,21 +17,23 @@
  */
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import WidgetToolBar from 'app/pages/DashBoardPage/components/WidgetToolBar';
-import { getWidgetSomeStyle } from 'app/pages/DashBoardPage/utils/widget';
-import React, { memo, useContext, useEffect, useMemo } from 'react';
+import React, { memo, useContext, useEffect } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../EditMask';
+import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetTitle } from '../../WidgetTitle';
-import { IframeWidgetCore } from './IframeWidgetCore';
+import { WidgetWrapper } from '../../WidgetWrapper';
+import { RichTextWidgetCore } from './RichTextWidgetCore';
 
-export const IframeWidget: React.FC<{ hideTitle: boolean }> = memo(
+export const RichTextWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
     const widget = useContext(WidgetContext);
     const { initialQuery } = useContext(BoardConfigContext);
     const { renderMode, boardType, editing } = useContext(BoardContext);
+    const widgetInfo = useContext(WidgetInfoContext);
     const { onRenderedWidgetById } = useContext(WidgetActionContext);
     /**
      * @param ''
@@ -45,16 +47,9 @@ export const IframeWidget: React.FC<{ hideTitle: boolean }> = memo(
       }
     }, [boardType, initialQuery, renderMode, onRenderedWidgetById, widget.id]);
     // 自动更新
-    const widgetCoreStyle = useMemo(() => {
-      return getWidgetSomeStyle({
-        config: widget.config,
-        background: true,
-        padding: true,
-        border: true,
-      });
-    }, [widget.config]);
+    const { background, border, padding } = widget.config;
     return (
-      <WidgetWrapper style={widgetCoreStyle}>
+      <WidgetWrapper background={background} border={border} padding={padding}>
         <ItemContainer>
           {hideTitle ? null : (
             <WidgetTitle
@@ -62,8 +57,13 @@ export const IframeWidget: React.FC<{ hideTitle: boolean }> = memo(
               config={widget.config.nameConfig}
             />
           )}
+
           <WidgetWrap>
-            <IframeWidgetCore />
+            <RichTextWidgetCore
+              widget={widget}
+              widgetInfo={widgetInfo}
+              boardEditing={editing}
+            />
           </WidgetWrap>
         </ItemContainer>
         {editing && <EditMask />}
@@ -81,11 +81,6 @@ const ItemContainer = styled.div`
 `;
 
 const WidgetWrap = styled.div`
-  display: flex;
-  flex: 1;
-  min-height: 0;
-`;
-const WidgetWrapper = styled.div`
   display: flex;
   flex: 1;
   min-height: 0;

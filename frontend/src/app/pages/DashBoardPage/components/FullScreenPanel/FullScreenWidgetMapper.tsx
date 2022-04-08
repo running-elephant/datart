@@ -17,15 +17,15 @@
  */
 import { memo, useContext } from 'react';
 import { BoardType, MediaWidgetType } from '../../pages/Board/slice/types';
-import { DataChartWidget } from '../Widget/DataChartWidget/DataChartWidget';
-import { IframeWidget } from '../Widget/IframeWidget/IframeWidget';
-import { ImageWidget } from '../Widget/ImageWidget/ImageWidget';
-import { RichTextWidget } from '../Widget/RichTextWidget/RichTextWidget';
-import { TabWidget } from '../Widget/TabWidget/TabWidget';
-import { TimerWidget } from '../Widget/TimerWidget/TimerWidget';
-import { VideoWidget } from '../Widget/VideoWidget/VideoWidget';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
+import { DataChartWidget } from '../Widgets/DataChartWidget/DataChartWidget';
+import { IframeWidget } from '../Widgets/IframeWidget/IframeWidget';
+import { ImageWidget } from '../Widgets/ImageWidget/ImageWidget';
+import { RichTextWidget } from '../Widgets/RichTextWidget/RichTextWidget';
+import { TabWidget } from '../Widgets/TabWidget/TabWidget';
+import { TimerWidget } from '../Widgets/TimerWidget/TimerWidget';
+import { VideoWidget } from '../Widgets/VideoWidget/VideoWidget';
 
 export const FullScreenWidgetMapper: React.FC<{
   boardType: BoardType;

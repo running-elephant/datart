@@ -17,13 +17,13 @@
  */
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import WidgetToolBar from 'app/pages/DashBoardPage/components/WidgetToolBar';
-import { getWidgetSomeStyle } from 'app/pages/DashBoardPage/utils/widget';
-import { memo, useContext, useEffect, useMemo } from 'react';
+import { memo, useContext, useEffect } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../EditMask';
+import { WidgetWrapper } from '../../WidgetWrapper';
 import { ResetBtnWidgetCore } from './ResetBtnWidgetCore';
 
 export const ResetBtnWidget: React.FC<{}> = memo(() => {
@@ -43,16 +43,9 @@ export const ResetBtnWidget: React.FC<{}> = memo(() => {
     }
   }, [boardType, initialQuery, renderMode, onRenderedWidgetById, widget.id]);
   // 自动更新
-  const widgetCoreStyle = useMemo(() => {
-    return getWidgetSomeStyle({
-      config: widget.config,
-      background: true,
-      padding: true,
-      border: true,
-    });
-  }, [widget.config]);
+  const { background, border, padding } = widget.config;
   return (
-    <WidgetWrapper style={widgetCoreStyle}>
+    <WidgetWrapper background={background} border={border} padding={padding}>
       <ItemContainer>
         <WidgetWrap>
           <ResetBtnWidgetCore />
@@ -72,11 +65,6 @@ const ItemContainer = styled.div`
 `;
 
 const WidgetWrap = styled.div`
-  display: flex;
-  flex: 1;
-  min-height: 0;
-`;
-const WidgetWrapper = styled.div`
   display: flex;
   flex: 1;
   min-height: 0;

@@ -17,13 +17,13 @@
  */
 import { memo, useContext } from 'react';
 import { BoardType, MediaWidgetType } from '../../pages/Board/slice/types';
-import { ControllerWIdget } from '../Widget/ControllerWIdget/ControllerWIdget';
-import { DataChartWidget } from '../Widget/DataChartWidget/DataChartWidget';
-import { QueryBtnWidget } from '../Widget/QueryBtnWidget/QueryBtnWidget';
-import { ResetBtnWidget } from '../Widget/ResetBtnWidget/ResetBtnWidget';
-import { TabWidget } from '../Widget/TabWidget/TabWidget';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
+import { ControllerWIdget } from '../Widgets/ControllerWIdget/ControllerWIdget';
+import { DataChartWidget } from '../Widgets/DataChartWidget/DataChartWidget';
+import { QueryBtnWidget } from '../Widgets/QueryBtnWidget/QueryBtnWidget';
+import { ResetBtnWidget } from '../Widgets/ResetBtnWidget/ResetBtnWidget';
+import { TabWidget } from '../Widgets/TabWidget/TabWidget';
 import { MediaWidgetMapper } from './MediaWidgetMapper';
 
 export const WidgetMapper: React.FC<{

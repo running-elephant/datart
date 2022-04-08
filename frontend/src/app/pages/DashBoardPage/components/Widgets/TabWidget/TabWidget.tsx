@@ -17,17 +17,17 @@
  */
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import WidgetToolBar from 'app/pages/DashBoardPage/components/WidgetToolBar';
-import { getWidgetSomeStyle } from 'app/pages/DashBoardPage/utils/widget';
-import { memo, useContext, useEffect, useMemo } from 'react';
+import { memo, useContext, useEffect } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../EditMask';
 import { WidgetTitle } from '../../WidgetTitle';
-import { VideoWidgetCore } from './VideoWidgetCore';
+import { WidgetWrapper } from '../../WidgetWrapper';
+import { TabWidgetCore } from './TabWidgetCore';
 
-export const VideoWidget: React.FC<{ hideTitle: boolean }> = memo(
+export const TabWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
     const widget = useContext(WidgetContext);
     const { initialQuery } = useContext(BoardConfigContext);
@@ -45,16 +45,10 @@ export const VideoWidget: React.FC<{ hideTitle: boolean }> = memo(
       }
     }, [boardType, initialQuery, renderMode, onRenderedWidgetById, widget.id]);
     // 自动更新
-    const widgetCoreStyle = useMemo(() => {
-      return getWidgetSomeStyle({
-        config: widget.config,
-        background: true,
-        padding: true,
-        border: true,
-      });
-    }, [widget.config]);
+    const { background, border, padding } = widget.config;
+
     return (
-      <WidgetWrapper style={widgetCoreStyle}>
+      <WidgetWrapper background={background} border={border} padding={padding}>
         <ItemContainer>
           {hideTitle ? null : (
             <WidgetTitle
@@ -62,8 +56,9 @@ export const VideoWidget: React.FC<{ hideTitle: boolean }> = memo(
               config={widget.config.nameConfig}
             />
           )}
+
           <WidgetWrap>
-            <VideoWidgetCore />
+            <TabWidgetCore />
           </WidgetWrap>
         </ItemContainer>
         {editing && <EditMask />}
@@ -81,11 +76,6 @@ const ItemContainer = styled.div`
 `;
 
 const WidgetWrap = styled.div`
-  display: flex;
-  flex: 1;
-  min-height: 0;
-`;
-const WidgetWrapper = styled.div`
   display: flex;
   flex: 1;
   min-height: 0;

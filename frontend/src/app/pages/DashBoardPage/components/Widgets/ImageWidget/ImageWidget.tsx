@@ -17,26 +17,21 @@
  */
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import WidgetToolBar from 'app/pages/DashBoardPage/components/WidgetToolBar';
-import { getWidgetSomeStyle } from 'app/pages/DashBoardPage/utils/widget';
-import React, { memo, useContext, useEffect, useMemo } from 'react';
+import React, { memo, useContext, useEffect } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
-import { BoardInfoContext } from '../../BoardProvider/BoardInfoProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../EditMask';
-import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetTitle } from '../../WidgetTitle';
-import { DataChartWidgetCore } from './DataChartWidgetCore';
+import { WidgetWrapper } from '../../WidgetWrapper';
+import ImageWidgetCore from './ImageWidgetCore';
 
-export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
+export const ImageWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
     const widget = useContext(WidgetContext);
-    const { onWidgetGetData } = useContext(WidgetActionContext);
     const { initialQuery } = useContext(BoardConfigContext);
     const { renderMode, boardType, editing } = useContext(BoardContext);
-    const widgetInfo = useContext(WidgetInfoContext);
-    const { visible: boardVisible } = useContext(BoardInfoContext);
     const { onRenderedWidgetById } = useContext(WidgetActionContext);
     /**
      * @param ''
@@ -50,55 +45,16 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
       }
     }, [boardType, initialQuery, renderMode, onRenderedWidgetById, widget.id]);
     // 自动更新
-    useEffect(() => {
-      // TODO 优化 组件更新规则
-      let timer: NodeJS.Timeout;
-      if (
-        !widgetInfo.loading &&
-        widgetInfo.rendered &&
-        boardVisible &&
-        widget.config.frequency > 0 &&
-        widget.config.autoUpdate
-      ) {
-        timer = setInterval(() => {
-          onWidgetGetData(widget);
-        }, +widget.config.frequency * 1000);
-      }
-      return () => {
-        if (timer) {
-          clearInterval(timer);
-        }
-      };
-    }, [
-      boardVisible,
-      widget,
-      widget.config.autoUpdate,
-      widget.config.frequency,
-      widget.config.type,
-      widgetInfo.loading,
-      widgetInfo.rendered,
-      onWidgetGetData,
-      renderMode,
-    ]);
-    const widgetCoreStyle = useMemo(() => {
-      return getWidgetSomeStyle({
-        config: widget.config,
-        background: true,
-        padding: true,
-        border: true,
-      });
-    }, [widget.config]);
+    const { background, border, padding } = widget.config;
     return (
-      <WidgetWrapper style={widgetCoreStyle}>
+      <WidgetWrapper background={background} border={border} padding={padding}>
         <ItemContainer>
-          {hideTitle ? null : (
-            <WidgetTitle
-              name={widget.config.name}
-              config={widget.config.nameConfig}
-            />
-          )}
+          <WidgetTitle
+            name={widget.config.name}
+            config={widget.config.nameConfig}
+          />
           <WidgetWrap>
-            <DataChartWidgetCore />
+            <ImageWidgetCore />
           </WidgetWrap>
         </ItemContainer>
         {editing && <EditMask />}
@@ -116,11 +72,6 @@ const ItemContainer = styled.div`
 `;
 
 const WidgetWrap = styled.div`
-  display: flex;
-  flex: 1;
-  min-height: 0;
-`;
-const WidgetWrapper = styled.div`
   display: flex;
   flex: 1;
   min-height: 0;
