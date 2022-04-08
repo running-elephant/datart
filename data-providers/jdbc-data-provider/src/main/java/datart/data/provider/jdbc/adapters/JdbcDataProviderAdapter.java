@@ -327,7 +327,7 @@ public class JdbcDataProviderAdapter implements Closeable {
             ArrayList<Object> row = new ArrayList<>();
             rows.add(row);
             for (int i = 1; i < columns.size() + 1; i++) {
-                row.add(rs.getObject(i));
+                row.add(getObjFromResultSet(rs, i));
             }
             c++;
             if (c >= count) {
@@ -398,6 +398,14 @@ public class JdbcDataProviderAdapter implements Closeable {
         }
         dataframe.setScript(sql);
         return dataframe;
+    }
+
+    protected Object getObjFromResultSet(ResultSet rs, int columnIndex) throws SQLException {
+        Object obj = rs.getObject(columnIndex);
+        if (obj instanceof Boolean) {
+            obj = rs.getInt(columnIndex);
+        }
+        return obj;
     }
 
 }
