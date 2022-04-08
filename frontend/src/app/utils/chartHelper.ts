@@ -44,6 +44,8 @@ import ChartMetadata from 'app/types/ChartMetadata';
 import { ECharts } from 'echarts';
 import { ECBasicOption } from 'echarts/types/dist/shared';
 import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
+import head from 'lodash/head';
+import last from 'lodash/last';
 import moment from 'moment';
 import { Debugger } from 'utils/debugger';
 import { isEmpty, isEmptyArray, meanValue, pipe } from 'utils/object';
@@ -1451,3 +1453,18 @@ export const getAutoFunnelTopPosition = (config: {
   // 24 marginBottom
   return chartHeight - 24 - height;
 };
+
+/**
+ * 日期处理函数
+ */
+export function formatDate(dataset: any[], format = 'YYYY') {
+  return [...new Set(dataset.map(r => moment(r).format(format)))];
+}
+
+export function maxNumber(array = []) {
+  return last(array.sort((a, b) => a - b));
+}
+
+export function minNumber(array = []) {
+  return head(array.sort((a, b) => a - b));
+}
