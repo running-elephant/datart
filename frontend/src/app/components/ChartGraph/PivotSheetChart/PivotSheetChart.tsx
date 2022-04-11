@@ -23,18 +23,13 @@ import {
   ChartDataSectionField,
   ChartStyleConfig,
 } from 'app/types/ChartConfig';
-import ChartDataSetDTO, {
-  IChartDataSet,
-  IChartDataSetRow,
-} from 'app/types/ChartDataSet';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getStyles,
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { isNumber } from 'app/utils/number';
-import groupBy from 'lodash/groupBy';
 import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
 import { TableSorters, TextStyle } from './types';
@@ -320,85 +315,6 @@ class PivotSheetChart extends ReactChart {
         textAlign: headerTextAlign,
       },
     };
-  }
-
-  private getCalcSummaryValues(
-    chartDataSet: IChartDataSet<string>,
-    rowSectionConfigRows: ChartDataSectionField[],
-    columnSectionConfigRows: ChartDataSectionField[],
-    metricsSectionConfigRows: ChartDataSectionField[],
-    enableTotal: boolean,
-    enableSubTotal: boolean,
-  ): { [key: string]: number }[] {
-    let summarys: { [key: string]: number }[] = [];
-    if (enableTotal) {
-      if (!columnSectionConfigRows.length) {
-        const rowTotals = metricsSectionConfigRows.map(c => {
-          const values = chartDataSet
-            .map(row => +row.getCell(c))
-            .filter(isNumber);
-          return {
-            [chartDataSet.getFieldKey(c)]: values?.reduce((a, b) => a + b, 0),
-          };
-        });
-        summarys.push(...rowTotals);
-      } else {
-        const rowTotals = this.calculateGroupedColumnTotal(
-          {},
-          columnSectionConfigRows.map(config =>
-            chartDataSet.getFieldKey(config),
-          ),
-          metricsSectionConfigRows,
-          chartDataSet,
-        );
-        summarys.push(...rowTotals);
-      }
-    }
-    if (enableSubTotal) {
-      const rowTotals = this.calculateGroupedColumnTotal(
-        {},
-        [rowSectionConfigRows[0]]
-          .concat(columnSectionConfigRows)
-          .map(chartDataSet.getFieldKey, chartDataSet),
-        metricsSectionConfigRows,
-        chartDataSet,
-      );
-      summarys.push(...rowTotals);
-    }
-    return summarys;
-  }
-
-  private calculateGroupedColumnTotal(
-    preObj,
-    groupKeys: string[],
-    metrics: ChartDataSectionField[],
-    datas: Array<IChartDataSetRow<string>>,
-  ): { [key: string]: number }[] {
-    const _groupKeys = [...(groupKeys || [])];
-    const groupKey: string = _groupKeys.shift()!;
-    const groupDataSet = groupBy(datas, row => row.getCellByKey(groupKey));
-
-    return Object.entries(groupDataSet).flatMap(([k, v]) => {
-      if (_groupKeys.length) {
-        return this.calculateGroupedColumnTotal(
-          Object.assign({}, preObj, { [groupKey]: k }),
-          _groupKeys,
-          metrics,
-          v,
-        );
-      }
-      return metrics.map(metric => {
-        const values = (v as any[])
-          .map(dc => +dc.getCell(metric))
-          .filter(isNumber);
-
-        return {
-          ...preObj,
-          [groupKey]: k,
-          [v?.[0]?.getFieldKey(metric)]: values?.reduce((a, b) => a + b, 0),
-        };
-      });
-    });
   }
 }
 
