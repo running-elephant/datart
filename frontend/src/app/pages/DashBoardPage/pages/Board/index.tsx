@@ -160,7 +160,7 @@ export const Board: FC<BoardProps> = memo(
 
     useEffect(() => {
       dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
-      if (boardId && fetchData) {
+      if (boardId && fetchData && !ReadBoardHide) {
         dispatch(
           fetchBoardDetail({
             dashboardRelId: boardId,
@@ -174,7 +174,7 @@ export const Board: FC<BoardProps> = memo(
         dispatch(boardActions.clearBoardStateById(boardId));
         dispatch(clearEditBoardState());
       };
-    }, [boardId, dispatch, fetchData, searchParams]);
+    }, [ReadBoardHide, boardId, dispatch, fetchData, searchParams]);
 
     useEffect(() => {
       if (folderId.length !== propsFolderIds?.length) {
