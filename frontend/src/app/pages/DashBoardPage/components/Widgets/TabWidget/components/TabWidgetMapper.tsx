@@ -20,14 +20,14 @@ import {
   MediaWidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { memo, useContext } from 'react';
-import { WidgetDataProvider } from '../../WidgetProvider/WidgetDataProvider';
-import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
-import { DataChartWidget } from '../DataChartWidget/DataChartWidget';
-import { IframeWidget } from '../IframeWidget/IframeWidget';
-import { ImageWidget } from '../ImageWidget/ImageWidget';
-import { RichTextWidget } from '../RichTextWidget/RichTextWidget';
-import { TimerWidget } from '../TimerWidget/TimerWidget';
-import { VideoWidget } from '../VideoWidget/VideoWidget';
+import { WidgetDataProvider } from '../../../WidgetProvider/WidgetDataProvider';
+import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
+import { DataChartWidget } from '../../DataChartWidget/DataChartWidget';
+import { IframeWidget } from '../../IframeWidget/IframeWidget';
+import { ImageWidget } from '../../ImageWidget/ImageWidget';
+import { RichTextWidget } from '../../RichTextWidget/RichTextWidget';
+import { TimerWidget } from '../../TimerWidget/TimerWidget';
+import { VideoWidget } from '../../VideoWidget/VideoWidget';
 
 export const TabWidgetMapper: React.FC<{
   boardType: BoardType;

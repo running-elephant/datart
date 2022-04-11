@@ -22,53 +22,52 @@ import {
 import { memo, useMemo } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
 import styled from 'styled-components/macro';
-import { ContainerItem } from '../../../pages/Board/slice/types';
+import { ContainerItem } from '../../../../pages/Board/slice/types';
 
 export interface DropHolderProps {
   tabItem: ContainerItem;
   parentId: string;
 }
-const DropHolder: React.FC<DropHolderProps> = memo(({ tabItem, parentId }) => {
-  const [{ isOver, canDrop }, refDrop] = useDrop(
-    () => ({
-      accept: CONTAINER_TAB,
-      item: { tabItem, parentId },
-      drop: () => ({ tabItem, parentId }),
-      canDrop: (item: any) => {
-        if (CanDropToWidgetTypes.includes(item.type)) {
-          return true;
-        }
-        return false;
-      },
-      collect: (monitor: DropTargetMonitor) => ({
-        isOver: monitor.isOver(),
-        canDrop: monitor.canDrop(),
+export const DropHolder: React.FC<DropHolderProps> = memo(
+  ({ tabItem, parentId }) => {
+    const [{ isOver, canDrop }, refDrop] = useDrop(
+      () => ({
+        accept: CONTAINER_TAB,
+        item: { tabItem, parentId },
+        drop: () => ({ tabItem, parentId }),
+        canDrop: (item: any) => {
+          if (CanDropToWidgetTypes.includes(item.type)) {
+            return true;
+          }
+          return false;
+        },
+        collect: (monitor: DropTargetMonitor) => ({
+          isOver: monitor.isOver(),
+          canDrop: monitor.canDrop(),
+        }),
       }),
-    }),
-    [],
-  );
-  const bgColor = useMemo(() => {
-    let color = 'transparent';
-    if (canDrop) {
-      color = '#f1e648c7';
-      if (isOver) {
-        color = '#1bcf81d3';
+      [],
+    );
+    const bgColor = useMemo(() => {
+      let color = 'transparent';
+      if (canDrop) {
+        color = '#f1e648c7';
+        if (isOver) {
+          color = '#1bcf81d3';
+        }
       }
-    }
 
-    return color;
-  }, [isOver, canDrop]);
-  return (
-    <DropWrap ref={refDrop} bgColor={bgColor}>
-      <div className="center">将组件拖入该区域</div>
-    </DropWrap>
-  );
-});
-export default DropHolder;
-interface DropWrapProps {
-  bgColor: string;
-}
-const DropWrap = styled.div<DropWrapProps>`
+      return color;
+    }, [isOver, canDrop]);
+    return (
+      <DropWrap ref={refDrop} bgColor={bgColor}>
+        <div className="center">将组件拖入该区域</div>
+      </DropWrap>
+    );
+  },
+);
+
+const DropWrap = styled.div<{ bgColor: string }>`
   display: flex;
   align-items: center;
   justify-content: center;

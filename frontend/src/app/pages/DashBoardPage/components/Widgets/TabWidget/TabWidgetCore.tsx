@@ -27,8 +27,8 @@ import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { WidgetWrapProvider } from '../../WidgetProvider/WidgetWrapProvider';
-import DropHolder from './DropHolder';
-import TabWidgetContainer from './WidgetOfTab';
+import { DropHolder } from './components/DropHolder';
+import { TabWidgetMapper } from './components/TabWidgetMapper';
 
 const { TabPane } = Tabs;
 
@@ -37,7 +37,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const { editing } = useContext(WidgetInfoContext);
   const {
-    boardType: mode,
+    boardType,
     editing: boardEditing,
     boardId,
   } = useContext(BoardContext);
@@ -71,7 +71,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
         editBoardStackActions.tabsWidgetRemoveTab({
           parentId: widget.id,
           sourceTabId: targetKey,
-          mode: mode,
+          mode: boardType,
         }),
       );
       setImmediate(() => {
@@ -79,7 +79,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
       });
     },
 
-    [dispatch, widget.id, mode, tabsCons],
+    [dispatch, widget.id, boardType, tabsCons],
   );
   const tabEdit = useCallback(
     (targetKey, action: 'add' | 'remove') => {
@@ -111,7 +111,12 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
                 boardEditing={boardEditing}
                 boardId={boardId}
               >
-                <TabWidgetContainer />
+                <MapWrapper>
+                  <TabWidgetMapper
+                    boardEditing={boardEditing}
+                    boardType={boardType}
+                  />
+                </MapWrapper>
               </WidgetWrapProvider>
             ) : (
               boardEditing && <DropHolder tabItem={tab} parentId={widget.id} />
@@ -122,7 +127,22 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
     </TabsBoxWrap>
   );
 });
+const MapWrapper = styled.div`
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: 100%;
 
+  & .widget-tool-bar {
+    z-index: 30;
+  }
+
+  &:hover .widget-tool-dropdown {
+    visibility: visible;
+  }
+`;
 const TabsBoxWrap = styled.div<{}>`
   width: 100%;
   height: 100%;

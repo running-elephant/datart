@@ -141,6 +141,7 @@ export const editBoardStackSlice = createSlice({
       const { layouts, deviceType } = action.payload;
       layouts.forEach(it => {
         const { i, x, y, w, h } = it;
+        if (!state.widgetRecord?.[i]?.config) return;
         const rectItem = { x, y, width: w, height: h };
         if (deviceType === DeviceType.Desktop) {
           state.widgetRecord[i].config.rect = rectItem;

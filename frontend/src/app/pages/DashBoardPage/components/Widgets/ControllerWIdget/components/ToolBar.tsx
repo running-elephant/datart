@@ -21,8 +21,6 @@ import { FC, memo, useCallback, useContext } from 'react';
 import { WidgetActionContext } from '../../../ActionProvider/WidgetActionProvider';
 import { BoardContext } from '../../../BoardProvider/BoardProvider';
 import {
-  CancelLinkageIcon,
-  CanLinkageIcon,
   ErrorIcon,
   LoadingIcon,
   LockFnIcon,
@@ -35,19 +33,13 @@ import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 
 export const ToolBar: FC = memo(() => {
   const { editing: boardEditing } = useContext(BoardContext);
-  const { onWidgetClearLinkage, onWidgetGetData } =
-    useContext(WidgetActionContext);
-  const { loading, inLinking, rendered, errInfo } =
-    useContext(WidgetInfoContext);
+  const { onWidgetGetData } = useContext(WidgetActionContext);
+  const { loading, rendered, errInfo } = useContext(WidgetInfoContext);
   const widget = useContext(WidgetContext);
 
   const onRefreshWidget = useCallback(() => {
     onWidgetGetData(widget);
   }, [onWidgetGetData, widget]);
-
-  const onClearLinkage = useCallback(() => {
-    onWidgetClearLinkage(widget);
-  }, [onWidgetClearLinkage, widget]);
 
   const t = useI18NPrefix(`viz.widget.tips`);
 
@@ -62,20 +54,6 @@ export const ToolBar: FC = memo(() => {
     );
   };
 
-  const renderLinkage = () => {
-    if (inLinking) {
-      return (
-        <CancelLinkageIcon
-          title={t('cancelLinkage')}
-          onClick={onClearLinkage}
-        />
-      );
-    } else {
-      return widget.config?.linkageConfig?.open ? (
-        <CanLinkageIcon title={t('canLinkage')} />
-      ) : null;
-    }
-  };
   const renderErrorInfo = (errInfo?: { [propName: string]: string }) => {
     if (!errInfo) return null;
 
@@ -103,7 +81,6 @@ export const ToolBar: FC = memo(() => {
           lock={widget.config.lock}
           wid={widget.id}
         />
-        {renderLinkage()}
         <WidgetActionDropdown widget={widget} />
       </Space>
     </StyledWidgetToolBar>
