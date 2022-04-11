@@ -114,7 +114,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
                 <TabWidgetContainer />
               </WidgetWrapProvider>
             ) : (
-              <DropHolder tabItem={tab} parentId={widget.id} />
+              boardEditing && <DropHolder tabItem={tab} parentId={widget.id} />
             )}
           </TabPane>
         ))}

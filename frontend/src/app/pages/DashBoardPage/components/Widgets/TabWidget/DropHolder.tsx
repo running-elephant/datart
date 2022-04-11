@@ -19,7 +19,7 @@ import {
   CanDropToWidgetTypes,
   CONTAINER_TAB,
 } from 'app/pages/DashBoardPage/constants';
-import React, { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
 import styled from 'styled-components/macro';
 import { ContainerItem } from '../../../pages/Board/slice/types';
@@ -28,7 +28,7 @@ export interface DropHolderProps {
   tabItem: ContainerItem;
   parentId: string;
 }
-const DropHolder: React.FC<DropHolderProps> = ({ tabItem, parentId }) => {
+const DropHolder: React.FC<DropHolderProps> = memo(({ tabItem, parentId }) => {
   const [{ isOver, canDrop }, refDrop] = useDrop(
     () => ({
       accept: CONTAINER_TAB,
@@ -59,14 +59,14 @@ const DropHolder: React.FC<DropHolderProps> = ({ tabItem, parentId }) => {
     return color;
   }, [isOver, canDrop]);
   return (
-    <DropWrap ref={refDrop} bgcolor={bgColor}>
+    <DropWrap ref={refDrop} bgColor={bgColor}>
       <div className="center">将组件拖入该区域</div>
     </DropWrap>
   );
-};
+});
 export default DropHolder;
 interface DropWrapProps {
-  bgcolor: string;
+  bgColor: string;
 }
 const DropWrap = styled.div<DropWrapProps>`
   display: flex;
@@ -74,7 +74,7 @@ const DropWrap = styled.div<DropWrapProps>`
   justify-content: center;
   width: 100%;
   height: 100%;
-  background-color: ${p => p.bgcolor};
+  background-color: ${p => p.bgColor};
 
   .center {
     text-align: center;
