@@ -19,7 +19,7 @@
 import { Empty } from 'antd';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { WidgetConfAndInfoProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetConfAndInfoProvider';
+import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import { LAYOUT_COLS_MAP } from 'app/pages/DashBoardPage/constants';
 import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
@@ -91,13 +91,13 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       return sortedLayoutWidgets.map(item => {
         return (
           <div key={item.id}>
-            <WidgetConfAndInfoProvider
+            <WidgetWrapProvider
               id={item.id}
               boardEditing={editing}
               boardId={boardId}
             >
               <WidgetOfAuto />
-            </WidgetConfAndInfoProvider>
+            </WidgetWrapProvider>
           </div>
         );
       });

@@ -286,15 +286,32 @@ public class JdbcDataProviderAdapter implements Closeable {
                 sqlDialect = new CustomSqlDialect(driverInfo);
             }
         }
-        // set case not change
+        configSqlDialect(sqlDialect, driverInfo);
+        return sqlDialect;
+    }
+
+    protected void configSqlDialect(SqlDialect sqlDialect, JdbcDriverInfo driverInfo) {
         try {
-            ReflectUtils.setFiledValue(sqlDialect, "unquotedCasing", Casing.UNCHANGED);
-            ReflectUtils.setFiledValue(sqlDialect, "quotedCasing", Casing.UNCHANGED);
+            Map<String, Object> fieldValues = new HashMap<>();
+            // set identifierQuote
+            if (StringUtils.isNotBlank(driverInfo.getIdentifierQuote())) {
+                fieldValues.put("identifierQuoteString", driverInfo.getIdentifierQuote());
+                fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierQuote());
+            }
+            if (StringUtils.isNotBlank(driverInfo.getIdentifierEndQuote())) {
+                fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierEndQuote());
+            }
+            // set default casing UNCHANGED
+            fieldValues.put("unquotedCasing", Casing.UNCHANGED);
+            fieldValues.put("quotedCasing", Casing.UNCHANGED);
+
+            //set values
+            for (Map.Entry<String, Object> entry : fieldValues.entrySet()) {
+                ReflectUtils.setFiledValue(sqlDialect, entry.getKey(), entry.getValue());
+            }
         } catch (Exception e) {
             log.warn("sql dialect config error for " + driverInfo.getSqlDialect());
         }
-
-        return sqlDialect;
     }
 
     protected Dataframe parseResultSet(ResultSet rs) throws SQLException {
@@ -310,7 +327,7 @@ public class JdbcDataProviderAdapter implements Closeable {
             ArrayList<Object> row = new ArrayList<>();
             rows.add(row);
             for (int i = 1; i < columns.size() + 1; i++) {
-                row.add(rs.getObject(i));
+                row.add(getObjFromResultSet(rs, i));
             }
             c++;
             if (c >= count) {
@@ -381,6 +398,14 @@ public class JdbcDataProviderAdapter implements Closeable {
         }
         dataframe.setScript(sql);
         return dataframe;
+    }
+
+    protected Object getObjFromResultSet(ResultSet rs, int columnIndex) throws SQLException {
+        Object obj = rs.getObject(columnIndex);
+        if (obj instanceof Boolean) {
+            obj = rs.getInt(columnIndex);
+        }
+        return obj;
     }
 
 }

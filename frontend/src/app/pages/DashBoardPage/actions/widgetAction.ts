@@ -17,7 +17,7 @@
  */
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams } from 'app/types/Chart';
-import { createBrowserHistory } from 'history';
+import history from 'app/utils/history';
 import { RootState } from 'types';
 import { jumpTypes } from '../constants';
 import { boardActions } from '../pages/Board/slice';
@@ -43,7 +43,6 @@ import {
   getEditWidgetData,
 } from '../pages/BoardEditor/slice/thunk';
 import { getValueByRowData } from '../utils/widget';
-const history = createBrowserHistory();
 export const toggleLinkageAction =
   (boardEditing: boolean, boardId: string, widgetId: string, toggle: boolean) =>
   dispatch => {
@@ -280,7 +279,7 @@ export const widgetGetDataAction =
   (editing: boolean, widget: Widget, renderMode: VizRenderMode) => dispatch => {
     const boardId = widget.dashboardId;
     if (editing) {
-      getEditWidgetData({ widget });
+      dispatch(getEditWidgetData({ widget }));
     } else {
       dispatch(getWidgetData({ boardId, widget, renderMode }));
     }
@@ -293,6 +292,4 @@ export const widgetToClearLinkageAction =
     } else {
       dispatch(widgetClearLinkageAction(widget, renderMode));
     }
-    //  dispatch(widgetClearLinkageAction(widget, renderMode));
-    //  dispatch(editorWidgetClearLinkageAction(widget));
   };

@@ -20,7 +20,7 @@ import { Empty } from 'antd';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { WidgetConfAndInfoProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetConfAndInfoProvider';
+import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import {
   LAYOUT_COLS_MAP,
   RGL_DRAG_HANDLE,
@@ -125,13 +125,13 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     return sortedLayoutWidgets.map(item => {
       return (
         <div key={item.id}>
-          <WidgetConfAndInfoProvider
+          <WidgetWrapProvider
             id={item.id}
             boardEditing={true}
             boardId={boardId}
           >
             <WidgetOfAutoEditor />
-          </WidgetConfAndInfoProvider>
+          </WidgetWrapProvider>
         </div>
       );
     });
