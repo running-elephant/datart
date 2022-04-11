@@ -21,6 +21,7 @@ import {
   ChartDataSectionFieldActionType,
   ChartDataSectionType,
   ChartDataViewFieldCategory,
+  DataViewFieldType,
 } from 'app/constants';
 import useFieldActionModal from 'app/hooks/useFieldActionModal';
 import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/ChartAggregationContext';
@@ -28,6 +29,7 @@ import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartData
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
+import { getColumnRenderName } from 'app/utils/chartHelper';
 import { reachLowerBoundCount } from 'app/utils/internalChartHelper';
 import { updateBy, updateByKey } from 'app/utils/mutation';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
@@ -37,8 +39,12 @@ import { DropTargetMonitor, useDrop } from 'react-dnd';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
+  FONT_SIZE_SUBTITLE,
   LINE_HEIGHT_HEADING,
+  SPACE,
+  SPACE_MD,
   SPACE_SM,
+  SPACE_XS,
 } from 'styles/StyleConstants';
 import { ValueOf } from 'types';
 import { uuidv4 } from 'utils/utils';
@@ -59,7 +65,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     translate: t = (...args) => args?.[0],
     onConfigChanged,
   }) {
-    const { dataset } = useContext(ChartDatasetContext);
+    const { dataset, drillOption } = useContext(ChartDatasetContext);
     const { dataView } = useContext(VizDataViewContext);
     const [currentConfig, setCurrentConfig] = useState(config);
     const [showModal, contextHolder] = useFieldActionModal({
@@ -326,6 +332,28 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       });
     };
 
+    const renderDrillFilters = () => {
+      if (currentConfig?.type !== ChartDataSectionType.FILTER) {
+        return;
+      }
+
+      return getDillConditions()?.map(drill => {
+        const field = drill.field;
+        const condition = drill.condition;
+        return (
+          <StyledDillFilter type={field.type}>
+            {getColumnRenderName(field)}
+          </StyledDillFilter>
+        );
+      });
+    };
+
+    const getDillConditions = () => {
+      return drillOption
+        ?.getDrillFields()
+        ?.filter(drill => Boolean(drill?.condition));
+    };
+
     const handleFieldConfigChanged = (
       columnUid: string,
       fieldConfig: ChartDataSectionField,
@@ -360,6 +388,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     return (
       <StyledContainer ref={drop} isOver={isOver} canDrop={canDrop}>
         {renderDropItems()}
+        {renderDrillFilters()}
         {contextHolder}
       </StyledContainer>
     );
@@ -385,6 +414,19 @@ const StyledContainer = styled.div<{
   .draggable-element:last-child {
     margin-bottom: 0;
   }
+`;
+
+const StyledDillFilter = styled.div<{
+  type: DataViewFieldType;
+}>`
+  padding: ${SPACE_XS} ${SPACE_MD};
+  margin-bottom: ${SPACE};
+  font-size: ${FONT_SIZE_SUBTITLE};
+  color: ${p => p.theme.componentBackground};
+  cursor: move;
+  background: ${p =>
+    p.type === DataViewFieldType.NUMERIC ? p.theme.success : p.theme.info};
+  border-radius: ${BORDER_RADIUS};
 `;
 
 const DropPlaceholder = styled.p`
