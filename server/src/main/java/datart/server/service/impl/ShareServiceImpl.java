@@ -409,8 +409,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
                 try {
                     checkVizReadPermission(ResourceType.valueOf(share.getVizType()), share.getVizId());
                     return;
-                } catch (PermissionDeniedException e) {
-                    Exceptions.tr(BaseException.class, "message.share.permission.denied");
+                } catch (PermissionDeniedException ignored) {
                 }
                 if (StringUtils.isBlank(shareToken.getUsername())
                         || StringUtils.isBlank(shareToken.getUsername())
