@@ -18,12 +18,13 @@
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import WidgetToolBar from 'app/pages/DashBoardPage/components/WidgetToolBar';
 import { memo, useContext, useEffect } from 'react';
-import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
-import { EditMask } from '../../EditMask';
-import { WidgetWrapper } from '../../WidgetWrapper';
+import { EditMask } from '../../WidgetComponents/EditMask';
+import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
+import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
+import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
 import { ResetBtnWidgetCore } from './ResetBtnWidgetCore';
 
 export const ResetBtnWidget: React.FC<{}> = memo(() => {
@@ -46,26 +47,13 @@ export const ResetBtnWidget: React.FC<{}> = memo(() => {
   const { background, border, padding } = widget.config;
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
-      <ItemContainer>
-        <WidgetWrap>
+      <ZIdexWrapper>
+        <FlexWrapper>
           <ResetBtnWidgetCore />
-        </WidgetWrap>
-      </ItemContainer>
+        </FlexWrapper>
+      </ZIdexWrapper>
       {editing && <EditMask />}
       <WidgetToolBar />
     </WidgetWrapper>
   );
 });
-const ItemContainer = styled.div`
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-`;
-
-const WidgetWrap = styled.div`
-  display: flex;
-  flex: 1;
-  min-height: 0;
-`;

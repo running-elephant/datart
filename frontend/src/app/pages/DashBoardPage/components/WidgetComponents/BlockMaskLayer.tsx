@@ -24,8 +24,11 @@ import React, { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { INFO, SUCCESS } from 'styles/StyleConstants';
-import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
-import { selectShowBlockMask } from '../slice/selectors';
+import {
+  editDashBoardInfoActions,
+  editWidgetInfoActions,
+} from '../../pages/BoardEditor/slice';
+import { selectShowBlockMask } from '../../pages/BoardEditor/slice/selectors';
 
 export interface BlockMaskLayerProps {
   widgetConfig: Widget;

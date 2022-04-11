@@ -17,15 +17,16 @@
  */
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import React, { memo, useContext, useEffect } from 'react';
-import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from '../../BoardProvider/BoardInfoProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
-import { EditMask } from '../../EditMask';
+import { EditMask } from '../../WidgetComponents/EditMask';
+import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
+import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
+import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
+import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
-import { WidgetTitle } from '../../WidgetTitle';
-import { WidgetWrapper } from '../../WidgetWrapper';
 import { WidgetToolBar } from './components/ToolBar';
 import { DataChartWidgetCore } from './DataChartWidgetCore';
 
@@ -83,33 +84,20 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
     const { background, border, padding } = widget.config;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
-        <ItemContainer>
+        <ZIdexWrapper>
           {!hideTitle && (
             <WidgetTitle
               name={widget.config.name}
               config={widget.config.nameConfig}
             />
           )}
-          <WidgetWrap>
+          <FlexWrapper>
             <DataChartWidgetCore />
-          </WidgetWrap>
-        </ItemContainer>
+          </FlexWrapper>
+        </ZIdexWrapper>
         {editing && <EditMask />}
         <WidgetToolBar />
       </WidgetWrapper>
     );
   },
 );
-const ItemContainer = styled.div`
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-`;
-
-const WidgetWrap = styled.div`
-  display: flex;
-  flex: 1;
-  min-height: 0;
-`;

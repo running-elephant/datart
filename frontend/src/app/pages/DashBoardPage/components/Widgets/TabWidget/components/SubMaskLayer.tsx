@@ -18,7 +18,7 @@
 import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { editWidgetInfoActions } from '../slice';
+import { editWidgetInfoActions } from '../../../../pages/BoardEditor/slice';
 
 // export type SubMaskLayerProps = Pick<WidgetInfo, 'id' | 'selected'> &
 //   Pick<Widget, 'type'>;

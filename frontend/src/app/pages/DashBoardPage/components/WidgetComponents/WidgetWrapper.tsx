@@ -15,7 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {
+  BackgroundConfig,
+  BorderConfig,
+  WidgetPadding,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { memo } from 'react';
-export const Comp: React.FC<{}> = memo(() => {
-  return <>init Comp </>;
+import styled from 'styled-components/macro';
+import { getWidgetSomeStyle } from '../../utils/widget';
+
+export const WidgetWrapper: React.FC<{
+  background: BackgroundConfig;
+  padding: WidgetPadding;
+  border: BorderConfig;
+}> = memo(props => {
+  const { children, ...rest } = props;
+  const style = getWidgetSomeStyle(rest);
+  return <Wrapper style={style}>{children}</Wrapper>;
 });
+const Wrapper = styled.div`
+  display: flex;
+  flex: 1;
+  min-height: 0;
+`;

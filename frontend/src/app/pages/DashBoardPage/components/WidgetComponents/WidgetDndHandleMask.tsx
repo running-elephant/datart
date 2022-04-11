@@ -23,7 +23,7 @@ import {
 import React, { memo } from 'react';
 import { useDrag } from 'react-dnd';
 import { useDispatch } from 'react-redux';
-import { editBoardStackActions } from '../slice';
+import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 export interface WidgetDndHandleMaskProps {
   widgetId: string;
   widgetType: WidgetType;
