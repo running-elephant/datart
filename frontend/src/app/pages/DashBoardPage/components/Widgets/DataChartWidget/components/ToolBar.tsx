@@ -19,10 +19,10 @@ import { Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo, useCallback, useContext } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
-import { BoardContext } from '../../BoardProvider/BoardProvider';
-import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
-import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
+import { WidgetActionContext } from '../../../ActionProvider/WidgetActionProvider';
+import { BoardContext } from '../../../BoardProvider/BoardProvider';
+import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
+import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 import {
   CancelLinkageIcon,
   CanLinkageIcon,
@@ -30,8 +30,8 @@ import {
   LoadingIcon,
   LockIcon,
   WaitingIcon,
-} from '../../WidgetToolBar/StatusIcon';
-import { WidgetActionDropdown } from '../../WidgetToolBar/WidgetActionDropdown';
+} from '../../../WidgetToolBar/StatusIcon';
+import { WidgetActionDropdown } from '../../../WidgetToolBar/WidgetActionDropdown';
 
 export const WidgetToolBar: FC = memo(() => {
   const { editing: boardEditing } = useContext(BoardContext);

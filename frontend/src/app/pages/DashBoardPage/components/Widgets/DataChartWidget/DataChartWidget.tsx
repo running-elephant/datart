@@ -26,8 +26,8 @@ import { EditMask } from '../../EditMask';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetTitle } from '../../WidgetTitle';
 import { WidgetWrapper } from '../../WidgetWrapper';
+import { WidgetToolBar } from './components/ToolBar';
 import { DataChartWidgetCore } from './DataChartWidgetCore';
-import { WidgetToolBar } from './ToolBar';
 
 export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
@@ -84,7 +84,7 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
         <ItemContainer>
-          {hideTitle ? null : (
+          {!hideTitle && (
             <WidgetTitle
               name={widget.config.name}
               config={widget.config.nameConfig}

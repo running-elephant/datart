@@ -24,6 +24,7 @@ import { FC, memo, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import TitleHeader from '../../components/BoardHeader/ViewHeader';
 import { BoardLoading } from '../../components/BoardLoading';
@@ -68,9 +69,12 @@ export const Board: FC<BoardProps> = memo(
     autoFit,
     showZoomCtrl,
   }) => {
+    const history = useHistory();
     const boardId = id;
     const dispatch = useDispatch();
     const t = useI18NPrefix();
+
+    const ReadBoardHide = history.location.pathname.includes('boardEditor');
     const { ref, width, height } = useResizeObserver<HTMLDivElement>({
       refreshMode: 'debounce',
       refreshRate: 2000,
@@ -98,8 +102,8 @@ export const Board: FC<BoardProps> = memo(
     }, [vizs]);
 
     const viewBoard = useMemo(() => {
+      if (ReadBoardHide) return null;
       let boardType = dashboard?.config?.type;
-
       if (dashboard && boardType) {
         return (
           <div className="board-provider">
@@ -128,6 +132,7 @@ export const Board: FC<BoardProps> = memo(
         return <BoardLoading />;
       }
     }, [
+      ReadBoardHide,
       dashboard,
       autoFit,
       renderMode,
