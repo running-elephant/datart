@@ -17,7 +17,6 @@
  */
 package datart.core.common;
 
-import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -86,7 +85,9 @@ public class WebUtils {
         Thread.sleep(1000);
 
         TakesScreenshot screenshot = (TakesScreenshot) webDriver;
-        return screenshot.getScreenshotAs(outputType);
+        T output = screenshot.getScreenshotAs(outputType);
+        webDriver.quit();
+        return output;
     }
 
     public static File screenShot2File(String url, String path, int imageWidth) throws Exception {

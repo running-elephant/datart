@@ -63,6 +63,7 @@ public class AttachmentImageServiceImpl implements AttachmentService {
         File file = new File(path);
         target.renameTo(file);
         log.info("create image file complete.");
+        shareService.delete(share.getId(), false);
         return file;
     }
 
