@@ -19,13 +19,13 @@ import { Empty } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { UploadDragger } from 'app/pages/DashBoardPage/pages/BoardEditor/components/SlideSetting/SettingItem/BasicSet/ImageUpload';
 import produce from 'immer';
-import React, { useCallback, useContext, useMemo } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
-const ImageWidgetCore: React.FC<{}> = () => {
+export const ImageWidgetCore: React.FC<{}> = () => {
   const widget = useContext(WidgetContext);
   const { editing } = useContext(WidgetInfoContext);
   const { onWidgetUpdate } = useContext(WidgetActionContext);
@@ -57,7 +57,6 @@ const ImageWidgetCore: React.FC<{}> = () => {
   }, [editing, onChange, t, widgetBgImage]);
   return <Wrap>{renderImage}</Wrap>;
 };
-export default ImageWidgetCore;
 
 const Wrap = styled.div`
   display: flex;

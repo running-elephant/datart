@@ -17,18 +17,18 @@
  */
 import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import React, { memo, useContext, useEffect } from 'react';
+import { memo, useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
+import { LockFnIcon } from '../../WidgetComponents/StatusIcon';
+import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
+import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
-import { LockFnIcon } from '../../WidgetToolBar/StatusIcon';
-import { StyledWidgetToolBar } from '../../WidgetToolBar/StyledWidgetToolBar';
-import { WidgetActionDropdown } from '../../WidgetToolBar/WidgetActionDropdown';
 import { TimerWidgetCore } from './TimerWidgetCore';
 
 export const TimerWidget: React.FC<{ hideTitle: boolean }> = memo(

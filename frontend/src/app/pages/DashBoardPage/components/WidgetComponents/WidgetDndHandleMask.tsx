@@ -94,4 +94,3 @@ export const WidgetDndHandleMask: React.FC<WidgetDndHandleMaskProps> = memo(
     );
   },
 );
-export default WidgetDndHandleMask;

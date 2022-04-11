@@ -21,15 +21,15 @@ import { memo, useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
-import BlockMaskLayer from '../../WidgetComponents/BlockMaskLayer';
+import { BlockMaskLayer } from '../../WidgetComponents/BlockMaskLayer';
 import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
+import { LockFnIcon } from '../../WidgetComponents/StatusIcon';
+import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
+import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
-import { LockFnIcon } from '../../WidgetToolBar/StatusIcon';
-import { StyledWidgetToolBar } from '../../WidgetToolBar/StyledWidgetToolBar';
-import { WidgetActionDropdown } from '../../WidgetToolBar/WidgetActionDropdown';
 import { TabWidgetCore } from './TabWidgetCore';
 
 export const TabWidget: React.FC<{ hideTitle: boolean }> = memo(

@@ -34,7 +34,7 @@ export interface BlockMaskLayerProps {
   widgetConfig: Widget;
   widgetInfo: WidgetInfo;
 }
-const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
+export const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
   ({ widgetConfig, widgetInfo }) => {
     const dispatch = useDispatch();
     const showBlockMask = useSelector(selectShowBlockMask);
@@ -89,7 +89,7 @@ const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
     );
   },
 );
-export default BlockMaskLayer;
+
 interface MaskLayerProps {
   front: boolean;
   selected: boolean;

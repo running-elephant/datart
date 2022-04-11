@@ -23,13 +23,13 @@ import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
+import { LockFnIcon } from '../../WidgetComponents/StatusIcon';
+import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
+import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
-import { LockFnIcon } from '../../WidgetToolBar/StatusIcon';
-import { StyledWidgetToolBar } from '../../WidgetToolBar/StyledWidgetToolBar';
-import { WidgetActionDropdown } from '../../WidgetToolBar/WidgetActionDropdown';
-import ImageWidgetCore from './ImageWidgetCore';
+import { ImageWidgetCore } from './ImageWidgetCore';
 
 export const ImageWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {

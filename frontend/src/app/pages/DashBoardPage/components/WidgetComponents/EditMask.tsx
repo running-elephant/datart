@@ -18,8 +18,8 @@
 import { memo, useContext } from 'react';
 import { WidgetInfoContext } from '../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
-import BlockMaskLayer from './BlockMaskLayer';
-import WidgetDndHandleMask from './WidgetDndHandleMask';
+import { BlockMaskLayer } from './BlockMaskLayer';
+import { WidgetDndHandleMask } from './WidgetDndHandleMask';
 export const EditMask: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const widgetInfo = useContext(WidgetInfoContext);
