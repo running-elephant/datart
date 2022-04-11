@@ -255,16 +255,18 @@ const ChartRichTextAdapter: FC<{
         <Menu>
           {dataList.map(fieldName => (
             <MenuItem key={fieldName.name}>
-              <a onClick={selectField(fieldName)}>{fieldName.name}</a>
+              <a onClick={selectField(fieldName)} href="#javascript;">
+                {fieldName.name}
+              </a>
             </MenuItem>
           ))}
         </Menu>
       ) : (
         <Menu>
-          <MenuItem key="nodata">暂无可用字段</MenuItem>
+          <MenuItem key="nodata">{t?.('common.noData')}</MenuItem>
         </Menu>
       );
-    }, [dataList, selectField]);
+    }, [dataList, selectField, t]);
 
     const toolbar = useMemo(
       () =>
@@ -277,7 +279,11 @@ const ChartRichTextAdapter: FC<{
                 trigger={['click']}
                 key="ql-selectLink"
               >
-                <a className="selectLink" title="引用字段">
+                <a
+                  className="selectLink"
+                  href="#javascript;"
+                  title={t?.('common.referenceFields')}
+                >
                   <SelectOutlined />
                 </a>
               </Dropdown>
@@ -296,7 +302,7 @@ const ChartRichTextAdapter: FC<{
             <ReactQuill
               ref={quillEditRef}
               className="react-quill"
-              placeholder="请输入"
+              placeholder={t?.('viz.board.setting.enterHere')}
               defaultValue={quillValue}
               onChange={quillChange}
               modules={quillModules}
@@ -311,12 +317,12 @@ const ChartRichTextAdapter: FC<{
                 }}
                 type="primary"
               >
-                预览
+                {t?.('common.preview')}
               </Button>
             </Row>
           </>
         ),
-      [quillModules, quillValue, isEditing, toolbar, quillChange, id],
+      [quillModules, quillValue, isEditing, toolbar, quillChange, id, t],
     );
 
     const ssp = e => {
@@ -330,7 +336,7 @@ const ChartRichTextAdapter: FC<{
           {quillModules && !isEditing && reactQuillView}
         </QuillBox>
         <Modal
-          title="富文本预览"
+          title={t?.('common.richTextPreview')}
           visible={visible}
           footer={null}
           width="80%"
