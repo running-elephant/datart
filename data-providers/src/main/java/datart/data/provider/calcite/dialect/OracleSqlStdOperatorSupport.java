@@ -23,15 +23,20 @@ import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.dialect.OracleSqlDialect;
 
 import java.util.EnumSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import static datart.core.data.provider.StdSqlOperator.*;
 
 public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements SqlStdOperatorSupport {
 
+    static ConcurrentSkipListSet<StdSqlOperator> OWN_SUPPORTED = new ConcurrentSkipListSet<>(
+            EnumSet.of(STDDEV, ABS, CEILING, FLOOR, POWER, ROUND, SQRT, EXP, LOG10, RAND, DEGREES, RADIANS,
+            SIGN, ACOS, ASIN, ATAN, ATAN2, SIN, COS, TAN, COT, LENGTH, CONCAT, REPLACE, SUBSTRING, LOWER, UPPER, LTRIM, RTRIM, TRIM,
+            NOW, AGG_DATE_YEAR, AGG_DATE_QUARTER, AGG_DATE_MONTH, AGG_DATE_WEEK, AGG_DATE_DAY));
+
     static {
-        SUPPORTED.addAll(EnumSet.of(STDDEV, ABS, CEILING, FLOOR, POWER, ROUND, SQRT, EXP, LOG10, RAND, DEGREES, RADIANS,
-                SIGN, ACOS, ASIN, ATAN, ATAN2, SIN, COS, TAN, COT, LENGTH, CONCAT, REPLACE, SUBSTRING, LOWER, UPPER, LTRIM, RTRIM, TRIM,
-                NOW));
+        OWN_SUPPORTED.addAll(SUPPORTED);
     }
 
     public OracleSqlStdOperatorSupport() {
@@ -88,6 +93,11 @@ public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements Sql
         buf.append(literalQuoteString);
         buf.append(val.replace(literalEndQuoteString, literalEscapedQuote));
         buf.append(literalEndQuoteString);
+    }
+
+    @Override
+    public Set<StdSqlOperator> supportedOperators() {
+        return OWN_SUPPORTED;
     }
 
 }
