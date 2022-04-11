@@ -26,7 +26,8 @@ const ChartDrillPath: FC<{
   drillOption?: ChartDrillOption;
   onChartDrillOptionChange?: (option: ChartDrillOption) => void;
 }> = memo(({ drillOption, onChartDrillOptionChange }) => {
-  if (!drillOption) return <div></div>;
+  if (!drillOption || drillOption.getMode() === DrillMode.Normal)
+    return <div></div>;
 
   const drillFields = drillOption.getAllDrillFields();
   return (

@@ -140,7 +140,7 @@ class BasicBarChart extends Chart {
     const infoConfigs: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
-    console.log(`drillOption ---> `, groupConfigs, drillOption.getMode());
+
     const chartDataSet = transformToDataSet(
       dataset.rows,
       dataset.columns,
