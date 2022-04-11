@@ -1546,7 +1546,11 @@ export const getDrillableRows = (
     ?.filter(c => c.type === ChartDataSectionType.GROUP)
     .flatMap(config => {
       if (Boolean(config.drillable)) {
-        if (!option || option?.getMode() === DrillMode.Normal) {
+        if (
+          !option ||
+          option?.getMode() === DrillMode.Normal ||
+          !option?.getFields()
+        ) {
           return config.rows?.[0] || [];
         }
         return (

@@ -21,7 +21,7 @@ import { Modal } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
-import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { ChartDrillOption, DrillMode } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import workbenchSlice, {
   useWorkbenchSlice,
@@ -212,17 +212,16 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const registerChartEvents = useCallback(
     chart => {
       chart?.registerMouseEvents([
-        // {
-        //   name: 'contextmenu',
-        //   callback: param => {
-        //     const option = drillOptionRef.current;
-        //     option?.setTempFilterField(param.data.rowData);
-        //     drillOptionRef.current = option;
-        //   },
-        // },
         {
           name: 'click',
           callback: param => {
+            if (drillOptionRef.current?.isSelectedDrill()) {
+              const option = drillOptionRef.current;
+              option.drillDown(param.data.rowData);
+              drillOptionRef.current = option;
+              handleDrillOptionChange(option);
+              return;
+            }
             if (
               param.componentType === 'table' &&
               param.seriesType === 'paging-sort-filter'

@@ -182,9 +182,11 @@ const ChartPresentPanel: FC<{
       return (
         <ChartTypeSelector
           type={chartType}
+          drillOption={drillOption}
           translate={translate}
           onChange={setChartType}
           onCreateDownloadDataTask={onCreateDownloadDataTask}
+          onChartDrillOptionChange={onChartDrillOptionChange}
         />
       );
     };

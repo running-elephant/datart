@@ -24,15 +24,14 @@ import { ConditionBuilder } from './ChartFilterCondition';
 export enum DrillMode {
   Normal = 'normal',
   Drill = 'drill',
-  SelectDrill = 'select_drill',
   Expand = 'expand',
 }
 
 export class ChartDrillOption {
   private cursor: number = -1;
   private mode: DrillMode = DrillMode.Normal;
+  private isSelected = false;
   private drillFields: ChartDataSectionField[] = [];
-  private tempFilterData: any;
   private drillDownFields: Array<{
     field: ChartDataSectionField;
     condition?: FilterCondition;
@@ -52,11 +51,23 @@ export class ChartDrillOption {
     } else if (!isEmptyArray(this.expandDownFields)) {
       return DrillMode.Expand;
     }
-    return DrillMode.Normal;
+    return this.mode;
+  }
+
+  public toggleSelectedDrill() {
+    this.isSelected = !this.isSelected;
+  }
+
+  public isSelectedDrill() {
+    return this.isSelected;
   }
 
   public getAllDrillFields() {
     return this.drillFields;
+  }
+
+  public getDrillFields() {
+    return this.drillDownFields;
   }
 
   public getFields(): ChartDataSectionField[] | undefined {
@@ -67,25 +78,24 @@ export class ChartDrillOption {
       : this.drillFields.slice(0, this.cursor + 2);
   }
 
-  public drillDown(condition?: FilterCondition) {
+  public drillDown(filterData?: { [key in string]: any }) {
     if (this.drillFields.length === this.cursor + 2) {
       return;
     }
     this.cursor++;
     const currentField = this.drillFields[this.cursor];
     let cond;
-    if (this.tempFilterData) {
+    if (currentField && filterData) {
       cond = new ConditionBuilder()
         .setName(currentField.colName)
         .setOperator(FilterSqlOperator.Equal)
-        .setValue(this.tempFilterData[currentField.colName])
+        .setValue(filterData[currentField.colName])
         .asFilter();
     }
     this.drillDownFields.push({
       field: currentField,
       condition: cond,
     });
-    this.setTempFilterField(null);
   }
 
   public expandDown() {
@@ -131,15 +141,6 @@ export class ChartDrillOption {
       this.cursor--;
       this.expandDownFields.pop();
     }
-  }
-
-  // TODO(Stephen): to be remove
-  public setTempFilterField(data) {
-    this.tempFilterData = data;
-  }
-
-  public getDrillFields() {
-    return this.drillDownFields;
   }
 
   private clearAll() {

@@ -145,19 +145,17 @@ export class ChartDataRequestBuilder {
           if (cur.drillable) {
             if (
               !this.drillOption ||
-              this.drillOption?.getMode() === DrillMode.Normal
+              this.drillOption?.getMode() === DrillMode.Normal ||
+              !this.drillOption?.getFields()
             ) {
               return acc.concat(cur.rows?.[0] || []);
             }
             return acc.concat(
               cur.rows?.filter(field => {
-                return (
-                  !this.drillOption?.getFields() ||
-                  Boolean(
-                    this.drillOption
-                      ?.getFields()
-                      ?.some(df => df.uid === field.uid),
-                  )
+                return Boolean(
+                  this.drillOption
+                    ?.getFields()
+                    ?.some(df => df.uid === field.uid),
                 );
               }) || [],
             );

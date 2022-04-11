@@ -18,6 +18,7 @@
 
 import {
   AreaChartOutlined,
+  ArrowDownOutlined,
   CloudDownloadOutlined,
   ConsoleSqlOutlined,
   TableOutlined,
@@ -25,6 +26,7 @@ import {
 import { Popconfirm } from 'antd';
 import { IW } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import classnames from 'classnames';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
@@ -39,15 +41,19 @@ export enum ChartPresentType {
 
 const ChartTypeSelector: FC<{
   type;
+  drillOption?: ChartDrillOption;
   translate: (title: string) => string;
   onChange: (value) => void;
   onCreateDownloadDataTask?: () => void;
+  onChartDrillOptionChange?: (option: ChartDrillOption) => void;
 }> = memo(
   ({
     type,
+    drillOption,
     onChange,
     translate = title => title,
     onCreateDownloadDataTask,
+    onChartDrillOptionChange,
   }) => {
     const t = useI18NPrefix(`viz.action.common`);
     const typeChange = useCallback(
@@ -59,6 +65,20 @@ const ChartTypeSelector: FC<{
 
     return (
       <StyledChartTypeSelector>
+        {drillOption && (
+          <TypeSelector
+            fontSize={FONT_SIZE_HEADING}
+            className={classnames({
+              active: drillOption?.isSelectedDrill(),
+            })}
+            onClick={() => {
+              drillOption?.toggleSelectedDrill();
+              onChartDrillOptionChange?.(drillOption);
+            }}
+          >
+            <ArrowDownOutlined />
+          </TypeSelector>
+        )}
         <TypeSelector
           fontSize={FONT_SIZE_HEADING}
           className={classnames({ active: type === ChartPresentType.GRAPH })}
