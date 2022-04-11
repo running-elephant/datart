@@ -778,7 +778,8 @@
       },
       "drill": {
         "showNextLevel": "显示下一层级",
-        "expandNextLevel":"展开下一层级"
+        "expandNextLevel": "展开下一层级",
+        "rollUp": "上卷"
       }
     },
     "action": {
@@ -831,9 +832,9 @@
         "delete": "删除",
         "addLink": "添加链接",
         "deleteError": "删除失败",
-        "sureDelete":"确定要删除吗？",
-        "noDataTip":"暂无链接，点击右上角添加",
-        "Permanent":"永久"
+        "sureDelete": "确定要删除吗？",
+        "noDataTip": "暂无链接，点击右上角添加",
+        "Permanent": "永久"
       }
     },
     "board": {

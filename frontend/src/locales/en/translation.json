@@ -777,7 +777,8 @@
       },
       "drill": {
         "showNextLevel": "Show Next Level",
-        "expandNextLevel":"Expand Next Level"
+        "expandNextLevel": "Expand Next Level",
+        "rollUp": "Roll Up"
       }
     },
     "action": {
@@ -832,7 +833,7 @@
         "deleteError": "Failed to delete",
         "sureDelete": "sure you want to delete?",
         "noDataTip": "No link yet, click on the top right corner to add",
-        "Permanent":"Permanent"
+        "Permanent": "Permanent"
       }
     },
     "board": {

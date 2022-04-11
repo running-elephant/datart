@@ -26,7 +26,7 @@ const ChartDrillPath: FC<{
   drillOption?: ChartDrillOption;
   onChartDrillOptionChange?: (option: ChartDrillOption) => void;
 }> = memo(({ drillOption, onChartDrillOptionChange }) => {
-  if (!drillOption || drillOption.getMode() === DrillMode.Normal)
+  if (!drillOption || drillOption.mode === DrillMode.Normal)
     return <div></div>;
 
   const drillFields = drillOption.getAllDrillFields();
@@ -40,9 +40,9 @@ const ChartDrillPath: FC<{
                 drillOption?.getFields()?.some(df => df.uid === f.uid),
               )}
               onClick={() => {
-                if (drillOption.getMode() === DrillMode.Drill) {
+                if (drillOption.mode === DrillMode.Drill) {
                   drillOption.drillUp(f);
-                } else if (drillOption.getMode() === DrillMode.Expand) {
+                } else if (drillOption.mode === DrillMode.Expand) {
                   drillOption.expandUp(f);
                 }
                 onChartDrillOptionChange?.(drillOption);

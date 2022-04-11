@@ -145,7 +145,7 @@ export class ChartDataRequestBuilder {
           if (cur.drillable) {
             if (
               !this.drillOption ||
-              this.drillOption?.getMode() === DrillMode.Normal ||
+              this.drillOption?.mode === DrillMode.Normal ||
               !this.drillOption?.getFields()
             ) {
               return acc.concat(cur.rows?.[0] || []);

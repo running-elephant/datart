@@ -98,31 +98,39 @@ const ChartPresentPanel: FC<{
       );
     };
 
-    const menu = useMemo(() => {
+    const drillMenus = useMemo(() => {
       return (
-        <Menu style={{ width: 200 }}>
-          <Menu.SubMenu
-            disabled={drillOption?.getMode() === DrillMode.Expand}
-            key="showNextLevel"
-            title={drillTranslator('showNextLevel')}
-            onTitleClick={() => {
-              if (drillOption) {
-                drillOption?.drillDown();
-                onChartDrillOptionChange?.(drillOption);
-              }
-            }}
-          ></Menu.SubMenu>
-          <Menu.SubMenu
-            disabled={drillOption?.getMode() === DrillMode.Drill}
-            key="expandNextLevel"
-            title={drillTranslator('expandNextLevel')}
-            onTitleClick={() => {
-              if (drillOption) {
-                drillOption?.expandDown();
-                onChartDrillOptionChange?.(drillOption);
-              }
-            }}
-          ></Menu.SubMenu>
+        <Menu
+          style={{ width: 200 }}
+          onClick={({ key }) => {
+            if (!drillOption) {
+              return;
+            }
+            if (key === DrillMode.Drill) {
+              drillOption?.drillDown();
+              onChartDrillOptionChange?.(drillOption);
+            } else if (key === DrillMode.Expand) {
+              drillOption?.expandDown();
+              onChartDrillOptionChange?.(drillOption);
+            } else {
+              drillOption?.rollUp();
+              onChartDrillOptionChange?.(drillOption);
+            }
+          }}
+        >
+          <Menu.Item key={'rollUp'}>{drillTranslator('rollUp')}</Menu.Item>
+          <Menu.Item
+            disabled={drillOption?.mode === DrillMode.Expand}
+            key={DrillMode.Drill}
+          >
+            {drillTranslator('showNextLevel')}
+          </Menu.Item>
+          <Menu.Item
+            disabled={drillOption?.mode === DrillMode.Drill}
+            key={DrillMode.Expand}
+          >
+            {drillTranslator('expandNextLevel')}
+          </Menu.Item>
         </Menu>
       );
     }, [drillOption, drillTranslator, onChartDrillOptionChange]);
@@ -143,7 +151,7 @@ const ChartPresentPanel: FC<{
         <StyledReusableChartContainer>
           {ChartPresentType.GRAPH === chartType && (
             <Dropdown
-              overlay={menu}
+              overlay={drillMenus}
               destroyPopupOnHide={true}
               trigger={['contextMenu']}
               getPopupContainer={() =>

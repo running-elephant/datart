@@ -29,7 +29,6 @@ export enum DrillMode {
 
 export class ChartDrillOption {
   private cursor: number = -1;
-  private mode: DrillMode = DrillMode.Normal;
   private isSelected = false;
   private drillFields: ChartDataSectionField[] = [];
   private drillDownFields: Array<{
@@ -45,13 +44,13 @@ export class ChartDrillOption {
     this.drillFields = fields;
   }
 
-  public getMode() {
+  public get mode() {
     if (!isEmptyArray(this.drillDownFields)) {
       return DrillMode.Drill;
     } else if (!isEmptyArray(this.expandDownFields)) {
       return DrillMode.Expand;
     }
-    return this.mode;
+    return DrillMode.Normal;
   }
 
   public toggleSelectedDrill() {
@@ -73,7 +72,7 @@ export class ChartDrillOption {
   public getFields(): ChartDataSectionField[] | undefined {
     return this.cursor === -1
       ? undefined
-      : this.getMode() === DrillMode.Drill
+      : this.mode === DrillMode.Drill
       ? [this.drillFields?.[this.cursor + 1]]
       : this.drillFields.slice(0, this.cursor + 2);
   }
@@ -110,6 +109,9 @@ export class ChartDrillOption {
   }
 
   public drillUp(field?: ChartDataSectionField) {
+    if (this.cursor === -1) {
+      return;
+    }
     if (field) {
       const fieldIndex = this.drillDownFields.findIndex(
         d => d.field.uid === field.uid,
@@ -127,6 +129,9 @@ export class ChartDrillOption {
   }
 
   public expandUp(field?: ChartDataSectionField) {
+    if (this.cursor === -1) {
+      return;
+    }
     if (field) {
       const fieldIndex = this.expandDownFields.findIndex(
         d => d.field.uid === field.uid,
@@ -143,9 +148,16 @@ export class ChartDrillOption {
     }
   }
 
+  public rollUp(field?: ChartDataSectionField) {
+    if (this.mode === DrillMode.Drill) {
+      return this.drillUp(field);
+    } else if (this.mode === DrillMode.Expand) {
+      return this.expandUp(field);
+    }
+  }
+
   private clearAll() {
     this.cursor = -1;
-    this.mode = DrillMode.Normal;
     this.drillDownFields = [];
     this.expandDownFields = [];
   }

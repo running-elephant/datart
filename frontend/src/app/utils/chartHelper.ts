@@ -1548,7 +1548,7 @@ export const getDrillableRows = (
       if (Boolean(config.drillable)) {
         if (
           !option ||
-          option?.getMode() === DrillMode.Normal ||
+          option?.mode === DrillMode.Normal ||
           !option?.getFields()
         ) {
           return config.rows?.[0] || [];
