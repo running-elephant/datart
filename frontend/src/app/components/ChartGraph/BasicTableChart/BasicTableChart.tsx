@@ -666,12 +666,9 @@ class BasicTableChart extends ReactChart {
           );
         },
         row: props => {
-          const { style, ...rest } = props;
+          const { style, rowData, ...rest } = props;
           // NOTE: rowData is case sensitive row keys object
-          const rowStyle = getCustomBodyRowStyle(
-            props.rowData,
-            allConditionalStyle,
-          );
+          const rowStyle = getCustomBodyRowStyle(rowData, allConditionalStyle);
           return <tr {...rest} style={Object.assign(style || {}, rowStyle)} />;
         },
         wrapper: props => {
@@ -808,6 +805,7 @@ class BasicTableChart extends ReactChart {
         title: TableColumnTitle({
           title: getColumnRenderName(c),
           desc: c?.alias?.desc,
+          uid: chartDataSet.getFieldKey(c),
         }),
         dataIndex: chartDataSet.getFieldIndex(c),
         key: chartDataSet.getFieldKey(c),
