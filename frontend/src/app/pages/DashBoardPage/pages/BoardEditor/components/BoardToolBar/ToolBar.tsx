@@ -55,11 +55,12 @@ export const ToolBar = () => {
       <Space>
         <AddChart />
 
+        <AddController />
+
         <AddMedia />
 
         <AddContainer />
 
-        <AddController />
         <Divider type="vertical" />
 
         <UndoBtn fn={undo} title={t('undo')} />

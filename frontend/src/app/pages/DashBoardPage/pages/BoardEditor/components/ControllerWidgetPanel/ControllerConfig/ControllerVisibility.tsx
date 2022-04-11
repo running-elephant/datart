@@ -71,7 +71,7 @@ const ControllerVisibility: FC<{
             </Form.Item>
             {showVisibilityCondition() && (
               <Form.Item noStyle>
-                <StyledWarp>
+                <StyledWrapper>
                   <Form.Item
                     name={[
                       'config',
@@ -124,7 +124,7 @@ const ControllerVisibility: FC<{
                   >
                     <Input style={{ width: '140px' }} />
                   </Form.Item>
-                </StyledWarp>
+                </StyledWrapper>
               </Form.Item>
             )}
           </>
@@ -135,7 +135,7 @@ const ControllerVisibility: FC<{
 });
 
 export default ControllerVisibility;
-const StyledWarp = styled(Form.Item)`
+const StyledWrapper = styled(Form.Item)`
   display: block;
   margin-top: 6px;
   &.ant-form-item {

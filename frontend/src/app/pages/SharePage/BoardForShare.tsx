@@ -23,7 +23,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { BoardInitProvider } from '../DashBoardPage/components/BoardProvider/BoardInitProvider';
-import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel';
+import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel/FullScreenPanel';
 import { AutoBoardCore } from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
 import { FreeBoardCore } from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
 import { getBoardDownloadParams } from '../DashBoardPage/pages/Board/slice/asyncActions';

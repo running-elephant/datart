@@ -17,7 +17,7 @@
  */
 import { LoadingOutlined } from '@ant-design/icons';
 import { BoardInitProvider } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInitProvider';
-import { FullScreenPanel } from 'app/pages/DashBoardPage/components/FullScreenPanel';
+import { FullScreenPanel } from 'app/pages/DashBoardPage/components/FullScreenPanel/FullScreenPanel';
 import { AutoBoardCore } from 'app/pages/DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
 import { FreeBoardCore } from 'app/pages/DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
 import { makeSelectBoardConfigById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
