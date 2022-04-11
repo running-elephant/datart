@@ -69,6 +69,7 @@ export const IframeWidgetCore: React.FC<{}> = memo(() => {
       </Form>
     </div>
   );
+
   return (
     <Wrap>
       {editing && setter}

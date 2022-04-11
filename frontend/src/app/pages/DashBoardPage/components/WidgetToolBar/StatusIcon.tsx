@@ -24,10 +24,25 @@ import {
   WarningTwoTone,
 } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
-import React from 'react';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import React, { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { ERROR, PRIMARY } from 'styles/StyleConstants';
+import { WidgetActionContext } from '../ActionProvider/WidgetActionProvider';
 
+export const LockFnIcon: React.FC<{
+  boardEditing: boolean;
+  wid: string;
+  lock: boolean;
+}> = memo(({ boardEditing, wid, lock }) => {
+  const { onEditWidgetUnLock } = useContext(WidgetActionContext);
+  const t = useI18NPrefix(`viz.widget.tips`);
+  if (!boardEditing) return null;
+  if (!lock) return null;
+  return (
+    <LockIcon title={t('unlock')} onClick={() => onEditWidgetUnLock(wid)} />
+  );
+});
 export const LockIcon: React.FC<{
   title: React.ReactNode;
   onClick?: React.MouseEventHandler<HTMLElement> | undefined;

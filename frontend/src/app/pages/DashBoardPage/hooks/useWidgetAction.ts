@@ -87,10 +87,10 @@ export default function useWidgetAction() {
         onEditWidgetCloseJump(widget);
         break;
       case 'lock':
-        onEditWidgetLock(widget);
+        onEditWidgetLock(widget.id);
         break;
       case 'unlock':
-        onEditWidgetUnLock(widget);
+        onEditWidgetUnLock(widget.id);
         break;
       default:
         console.log('__ not found __ action', key);

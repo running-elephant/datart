@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import WidgetToolBar from 'app/pages/DashBoardPage/components/WidgetToolBar';
 import React, { memo, useContext, useEffect } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
@@ -24,6 +24,9 @@ import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../EditMask';
 import { WidgetTitle } from '../../WidgetTitle';
+import { LockFnIcon } from '../../WidgetToolBar/StatusIcon';
+import { StyledWidgetToolBar } from '../../WidgetToolBar/StyledWidgetToolBar';
+import { WidgetActionDropdown } from '../../WidgetToolBar/WidgetActionDropdown';
 import { WidgetWrapper } from '../../WidgetWrapper';
 import { IframeWidgetCore } from './IframeWidgetCore';
 
@@ -60,7 +63,16 @@ export const IframeWidget: React.FC<{ hideTitle: boolean }> = memo(
           </WidgetWrap>
         </ItemContainer>
         {editing && <EditMask />}
-        <WidgetToolBar />
+        <StyledWidgetToolBar>
+          <Space size={0}>
+            <LockFnIcon
+              boardEditing={editing}
+              wid={widget.id}
+              lock={widget.config?.lock}
+            />
+            <WidgetActionDropdown widget={widget} />
+          </Space>
+        </StyledWidgetToolBar>
       </WidgetWrapper>
     );
   },

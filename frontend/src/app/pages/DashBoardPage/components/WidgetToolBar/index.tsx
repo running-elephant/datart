@@ -51,7 +51,7 @@ const WidgetToolBar: FC = () => {
   }, [onWidgetClearLinkage, widget]);
 
   const onUnLockWidget = useCallback(() => {
-    onEditWidgetUnLock(widget);
+    onEditWidgetUnLock(widget.id);
   }, [onEditWidgetUnLock, widget]);
 
   const ssp = e => {

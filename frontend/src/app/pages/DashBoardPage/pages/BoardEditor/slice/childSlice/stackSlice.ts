@@ -92,6 +92,16 @@ export const editBoardStackSlice = createSlice({
       });
       state.dashBoard.config.maxWidgetIndex = maxWidgetIndex;
     },
+    //
+    toggleLockWidget(
+      state,
+      action: PayloadAction<{ id: string; lock: boolean }>,
+    ) {
+      const { id, lock } = action.payload;
+      if (state.widgetRecord?.[id]?.config) {
+        state.widgetRecord[id].config.lock = lock;
+      }
+    },
     deleteWidgets(state, action: PayloadAction<string[]>) {
       const ids = action.payload;
       if (!ids?.length) return;
