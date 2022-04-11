@@ -107,12 +107,6 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
     }
 
     @Override
-    @Transactional
-    public void deletePermissions(Datachart datachart) {
-        rrrMapper.deleteByResource(ResourceType.DATACHART.name(), datachart.getId());
-    }
-
-    @Override
     public void requirePermission(Datachart datachart, int permission) {
         Folder folder = folderMapper.selectByRelTypeAndId(ResourceType.DATACHART.name(), datachart.getId());
         if (folder == null) {

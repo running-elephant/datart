@@ -240,7 +240,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         if (source.getId() == null || rrrMapper.countRolePermission(source.getId(), role.getId()) == 0) {
             Source parent = sourceMapper.selectByPrimaryKey(source.getParentId());
             if (parent == null) {
-                return securityManager.hasPermission(PermissionHelper.viewPermission(source.getOrgId(), role.getId(), ResourceType.SOURCE.name(), permission));
+                return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), ResourceType.SOURCE.name(), permission));
             } else {
                 return hasPermission(role, parent, permission);
             }
