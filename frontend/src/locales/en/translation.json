@@ -595,6 +595,7 @@
           "oblique": "Oblique"
         },
         "position": {
+          "title": "Position",
           "auto": "Auto",
           "right": "Right",
           "left": "Left",
@@ -772,7 +773,28 @@
         "ok": "OK",
         "cancel": "Cancel",
         "number": "No.",
-        "summary": "Summary"
+        "summary": "Summary",
+        "richText": {
+          "bold": "Bold",
+          "italic": "Italic",
+          "underline": "Underline",
+          "strike": "Strike",
+          "indent": "Indent",
+          "indentUp": "Indent Up",
+          "ordered": "Ordered",
+          "list": "List",
+          "blockquote": "Blockquote",
+          "codeBlock": "Code Block",
+          "link": "Link",
+          "image": "Image",
+          "clean": "Clean",
+          "more": "More",
+          "families": "Families",
+          "fontSize": "Font Size",
+          "background": "Background",
+          "color": "Color",
+          "align": "Align"
+        }
       }
     },
     "action": {
@@ -827,7 +849,7 @@
         "deleteError": "Failed to delete",
         "sureDelete": "sure you want to delete?",
         "noDataTip": "No link yet, click on the top right corner to add",
-        "Permanent":"Permanent"
+        "Permanent": "Permanent"
       }
     },
     "board": {
