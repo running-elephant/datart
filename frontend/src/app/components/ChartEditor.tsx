@@ -212,14 +212,14 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const registerChartEvents = useCallback(
     chart => {
       chart?.registerMouseEvents([
-        {
-          name: 'contextmenu',
-          callback: param => {
-            const option = drillOptionRef.current;
-            option?.setTempFilterField(param.data.rowData);
-            drillOptionRef.current = option;
-          },
-        },
+        // {
+        //   name: 'contextmenu',
+        //   callback: param => {
+        //     const option = drillOptionRef.current;
+        //     option?.setTempFilterField(param.data.rowData);
+        //     drillOptionRef.current = option;
+        //   },
+        // },
         {
           name: 'click',
           callback: param => {

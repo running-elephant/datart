@@ -19,7 +19,7 @@
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import { ChartDataSectionType, FieldFormatType } from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
-import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { ChartDrillOption, DrillMode } from 'app/models/ChartDrillOption';
 import {
   AxisLabel,
   AxisLineStyle,
@@ -1546,6 +1546,9 @@ export const getDrillableRows = (
     ?.filter(c => c.type === ChartDataSectionType.GROUP)
     .flatMap(config => {
       if (Boolean(config.drillable)) {
+        if (!option || option?.getMode() === DrillMode.Normal) {
+          return config.rows?.[0] || [];
+        }
         return (
           config.rows?.filter(
             f =>

@@ -2170,5 +2170,34 @@ describe('Chart Helper ', () => {
         { uid: '2', colName: 'col2', type: 'STRING', category: 'field' },
       ]);
     });
+
+    test('should get drillable group section first row without drillOption', () => {
+      const config = [
+        {
+          type: ChartDataSectionType.GROUP,
+          key: 'col1',
+          drillable: true,
+          rows: [
+            {
+              uid: '1',
+              colName: 'col1',
+              type: DataViewFieldType.STRING,
+              category: ChartDataViewFieldCategory.Field,
+            },
+            {
+              uid: '2',
+              colName: 'col2',
+              type: DataViewFieldType.STRING,
+              category: ChartDataViewFieldCategory.Field,
+            },
+          ],
+        },
+      ];
+      const drillOption = new ChartDrillOption(config[0].rows);
+      const drillRows = getDrillableRows(config, drillOption);
+      expect(drillRows).toEqual([
+        { uid: '1', colName: 'col1', type: 'STRING', category: 'field' },
+      ]);
+    });
   });
 });

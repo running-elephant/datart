@@ -24,12 +24,15 @@ import { ConditionBuilder } from './ChartFilterCondition';
 export enum DrillMode {
   Normal = 'normal',
   Drill = 'drill',
+  SelectDrill = 'select_drill',
   Expand = 'expand',
 }
 
 export class ChartDrillOption {
-  private cursor: number;
+  private cursor: number = -1;
+  private mode: DrillMode = DrillMode.Normal;
   private drillFields: ChartDataSectionField[] = [];
+  private tempFilterData: any;
   private drillDownFields: Array<{
     field: ChartDataSectionField;
     condition?: FilterCondition;
@@ -38,13 +41,9 @@ export class ChartDrillOption {
     field: ChartDataSectionField;
     condition?: FilterCondition;
   }> = [];
-  private tempFilterData: any;
 
   constructor(fields: ChartDataSectionField[]) {
     this.drillFields = fields;
-    this.cursor = -1;
-    this.drillDownFields = [];
-    this.expandDownFields = [];
   }
 
   public getMode() {
@@ -134,6 +133,7 @@ export class ChartDrillOption {
     }
   }
 
+  // TODO(Stephen): to be remove
   public setTempFilterField(data) {
     this.tempFilterData = data;
   }
@@ -144,6 +144,7 @@ export class ChartDrillOption {
 
   private clearAll() {
     this.cursor = -1;
+    this.mode = DrillMode.Normal;
     this.drillDownFields = [];
     this.expandDownFields = [];
   }

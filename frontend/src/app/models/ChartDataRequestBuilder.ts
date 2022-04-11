@@ -44,7 +44,7 @@ import {
 } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
-import { ChartDrillOption } from './ChartDrillOption';
+import { ChartDrillOption, DrillMode } from './ChartDrillOption';
 
 export class ChartDataRequestBuilder {
   extraSorters: ChartDataRequest['orders'] = [];
@@ -143,6 +143,12 @@ export class ChartDataRequestBuilder {
         }
         if (cur.type === ChartDataSectionType.GROUP) {
           if (cur.drillable) {
+            if (
+              !this.drillOption ||
+              this.drillOption?.getMode() === DrillMode.Normal
+            ) {
+              return acc.concat(cur.rows?.[0] || []);
+            }
             return acc.concat(
               cur.rows?.filter(field => {
                 return (
@@ -283,14 +289,19 @@ export class ChartDataRequestBuilder {
   };
 
   private normalizeDrillFilters(): ChartDataRequestFilter[] {
-    return (this.drillOption?.getDrillFields().map(f => {
-      return {
-        aggOperator: null,
-        column: f.condition?.name!,
-        sqlOperator: f.condition?.operator! as FilterSqlOperator,
-        values: [{ value: f.condition?.value as string, valueType: 'STRING' }],
-      };
-    }) || []) as ChartDataRequestFilter[];
+    return (this.drillOption
+      ?.getDrillFields()
+      .filter(field => Boolean(field.condition))
+      .map(f => {
+        return {
+          aggOperator: null,
+          column: f.condition?.name!,
+          sqlOperator: f.condition?.operator! as FilterSqlOperator,
+          values: [
+            { value: f.condition?.value as string, valueType: 'STRING' },
+          ],
+        };
+      }) || []) as ChartDataRequestFilter[];
   }
 
   private buildOrders() {
