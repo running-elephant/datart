@@ -24,12 +24,12 @@ import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
+import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { ToolBar } from './components/ToolBar';
 import { ControllerWidgetCore } from './ControllerWidgetCore';
 
-export const ControllerWIdget: React.FC<{}> = memo(() => {
+export const ControllerWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const { onWidgetGetData } = useContext(WidgetActionContext);
   const { initialQuery } = useContext(BoardConfigContext);
@@ -82,11 +82,11 @@ export const ControllerWIdget: React.FC<{}> = memo(() => {
   const { background, border, padding } = widget.config;
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
-      <ZIdexWrapper>
+      <ZIndexWrapper>
         <FlexWrapper>
           <ControllerWidgetCore />
         </FlexWrapper>
-      </ZIdexWrapper>
+      </ZIndexWrapper>
       {editing && <EditMask />}
       <ToolBar />
     </WidgetWrapper>

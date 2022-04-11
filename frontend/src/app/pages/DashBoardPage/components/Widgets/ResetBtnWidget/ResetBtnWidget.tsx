@@ -27,7 +27,7 @@ import { LockFnIcon } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
+import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
 import { ResetBtnWidgetCore } from './ResetBtnWidgetCore';
 
 export const ResetBtnWidget: React.FC<{}> = memo(() => {
@@ -50,11 +50,11 @@ export const ResetBtnWidget: React.FC<{}> = memo(() => {
   const { background, border, padding } = widget.config;
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
-      <ZIdexWrapper>
+      <ZIndexWrapper>
         <FlexWrapper>
           <ResetBtnWidgetCore />
         </FlexWrapper>
-      </ZIdexWrapper>
+      </ZIndexWrapper>
       {editing && <EditMask />}
       <StyledWidgetToolBar>
         <Space size={0}>

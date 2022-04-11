@@ -28,7 +28,7 @@ import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar'
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
+import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
 import { IframeWidgetCore } from './IframeWidgetCore';
 
 export const IframeWidget: React.FC<{ hideTitle: boolean }> = memo(
@@ -52,7 +52,7 @@ export const IframeWidget: React.FC<{ hideTitle: boolean }> = memo(
     const { background, border, padding } = widget.config;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
-        <ZIdexWrapper>
+        <ZIndexWrapper>
           {hideTitle ? null : (
             <WidgetTitle
               name={widget.config.name}
@@ -62,7 +62,7 @@ export const IframeWidget: React.FC<{ hideTitle: boolean }> = memo(
           <FlexWrapper>
             <IframeWidgetCore />
           </FlexWrapper>
-        </ZIdexWrapper>
+        </ZIndexWrapper>
         {editing && <EditMask />}
         <StyledWidgetToolBar>
           <Space size={0}>

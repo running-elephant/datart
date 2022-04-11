@@ -25,7 +25,7 @@ import { EditMask } from '../../WidgetComponents/EditMask';
 import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
+import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { ToolBar } from './components/ToolBar';
 import { DataChartWidgetCore } from './DataChartWidgetCore';
@@ -84,7 +84,7 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
     const { background, border, padding } = widget.config;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
-        <ZIdexWrapper>
+        <ZIndexWrapper>
           {!hideTitle && (
             <WidgetTitle
               name={widget.config.name}
@@ -94,7 +94,7 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
           <FlexWrapper>
             <DataChartWidgetCore />
           </FlexWrapper>
-        </ZIdexWrapper>
+        </ZIndexWrapper>
         {editing && <EditMask />}
         <ToolBar />
       </WidgetWrapper>

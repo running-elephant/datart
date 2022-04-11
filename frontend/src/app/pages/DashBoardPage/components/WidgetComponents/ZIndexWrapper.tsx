@@ -17,7 +17,7 @@
  */
 import { memo } from 'react';
 import styled from 'styled-components/macro';
-export const ZIdexWrapper: React.FC<{}> = memo(props => {
+export const ZIndexWrapper: React.FC<{}> = memo(props => {
   return <Wrapper>{props.children} </Wrapper>;
 });
 const Wrapper = styled.div`

@@ -28,7 +28,7 @@ import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar'
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
+import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { TabWidgetCore } from './TabWidgetCore';
 
@@ -55,7 +55,7 @@ export const TabWidget: React.FC<{ hideTitle: boolean }> = memo(
 
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
-        <ZIdexWrapper>
+        <ZIndexWrapper>
           {hideTitle ? null : (
             <WidgetTitle
               name={widget.config.name}
@@ -66,7 +66,7 @@ export const TabWidget: React.FC<{ hideTitle: boolean }> = memo(
           <FlexWrapper>
             <TabWidgetCore />
           </FlexWrapper>
-        </ZIdexWrapper>
+        </ZIndexWrapper>
         {editing && (
           <BlockMaskLayer widgetConfig={widget} widgetInfo={widgetInfo} />
         )}
