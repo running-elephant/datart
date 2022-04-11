@@ -130,12 +130,31 @@ class PivotSheetChart extends ReactChart {
         'metricNameShowIn',
       ],
     );
-    const [enableTotal, totalPosition, enableSubTotal, subTotalPosition] =
-      getStyles(
-        settingConfigs,
-        ['rowSummary'],
-        ['enableTotal', 'totalPosition', 'enableSubTotal', 'subTotalPosition'],
-      );
+    const [summaryAggregation] = getStyles(
+      settingConfigs,
+      ['summaryAggregation'],
+      ['aggregation'],
+    );
+    const [
+      enableRowTotal,
+      rowTotalPosition,
+      enableRowSubTotal,
+      rowSubTotalPosition,
+    ] = getStyles(
+      settingConfigs,
+      ['rowSummary'],
+      ['enableTotal', 'totalPosition', 'enableSubTotal', 'subTotalPosition'],
+    );
+    const [
+      enableColTotal,
+      colTotalPosition,
+      enableColSubTotal,
+      colSubTotalPosition,
+    ] = getStyles(
+      settingConfigs,
+      ['colSummary'],
+      ['enableTotal', 'totalPosition', 'enableSubTotal', 'subTotalPosition'],
+    );
 
     return {
       options: {
@@ -151,16 +170,34 @@ class PivotSheetChart extends ReactChart {
         },
         totals: {
           row: {
-            showGrandTotals: Boolean(enableTotal),
-            reverseLayout: Boolean(totalPosition),
-            showSubTotals: Boolean(enableSubTotal),
-            reverseSubLayout: Boolean(subTotalPosition),
+            showGrandTotals: Boolean(enableRowTotal),
+            reverseLayout: Boolean(rowTotalPosition),
+            showSubTotals: Boolean(enableRowSubTotal),
+            reverseSubLayout: Boolean(rowSubTotalPosition),
             subTotalsDimensions: rowSectionConfigRows.map(
               chartDataSet.getFieldKey,
               chartDataSet,
             )?.[0],
             label: context.translator('summary.total'),
             subLabel: context.translator('summary.subTotal'),
+            calcTotals: {
+              aggregation: summaryAggregation,
+            },
+          },
+          col: {
+            showGrandTotals: Boolean(enableColTotal),
+            reverseLayout: Boolean(colTotalPosition),
+            showSubTotals: Boolean(enableColSubTotal),
+            reverseSubLayout: Boolean(colSubTotalPosition),
+            subTotalsDimensions: columnSectionConfigRows.map(
+              chartDataSet.getFieldKey,
+              chartDataSet,
+            )?.[0],
+            label: context.translator('summary.total'),
+            subLabel: context.translator('summary.subTotal'),
+            calcTotals: {
+              aggregation: summaryAggregation,
+            },
           },
         },
         supportCSSTransform: true,
@@ -190,14 +227,6 @@ class PivotSheetChart extends ReactChart {
             };
           }),
         data: chartDataSet?.map(row => row.convertToObject()),
-        totalData: this.getCalcSummaryValues(
-          chartDataSet,
-          rowSectionConfigRows,
-          columnSectionConfigRows,
-          metricsSectionConfigRows,
-          enableTotal,
-          enableSubTotal,
-        ),
         sortParams: this.getTableSorters(
           rowSectionConfigRows
             .concat(columnSectionConfigRows)
