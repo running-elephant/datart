@@ -28,8 +28,9 @@ import {
 import { StorageKeys } from 'globalConstants';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
+import { getToken } from 'utils/auth';
 import persistence from 'utils/persistence';
 import { uuidv4 } from 'utils/utils';
 import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
@@ -41,14 +42,16 @@ import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
 import { urlSearchTransfer } from '../MainPage/pages/VizPage/utils';
 import BoardForShare from './BoardForShare';
 import PasswordModal from './PasswordModal';
+import ShareLoginModal from './ShareLoginModal';
 import { useShareSlice } from './slice';
 import {
-  selectNeedPassword,
+  selectNeedVerify,
   selectShareExecuteTokenMap,
   selectSharePassword,
   selectShareVizType,
 } from './slice/selectors';
 import { fetchShareVizInfo } from './slice/thunks';
+
 function ShareDashboard() {
   const { shareActions: actions } = useShareSlice();
   useEditBoardSlice();
@@ -56,38 +59,53 @@ function ShareDashboard() {
 
   const dispatch = useDispatch();
   const location = useLocation();
+  const { params }: { params: { token: string } } = useRouteMatch();
   const search = location.search;
+  const shareToken = params.token;
 
   const [shareClientId, setShareClientId] = useState('');
   const executeTokenMap = useSelector(selectShareExecuteTokenMap);
-  const needPassword = useSelector(selectNeedPassword);
+  const needVerify = useSelector(selectNeedVerify);
   const sharePassword = useSelector(selectSharePassword);
   const shareBoard = useSelector(selectShareBoard);
   const vizType = useSelector(selectShareVizType);
+  const logged = !!getToken();
 
-  const shareToken = useRouteQuery({
-    key: 'token',
-  }) as string;
-  const usePassword = useRouteQuery({
-    key: 'usePassword',
+  const shareType = useRouteQuery({
+    key: 'type',
   });
   // in timed task eager=true for disable board lazyLoad
   const eager = useRouteQuery({
     key: 'eager',
   });
   const renderMode: VizRenderMode = eager ? 'schedule' : 'share';
-
   const searchParams = useMemo(() => {
     return urlSearchTransfer.toParams(search);
   }, [search]);
 
   const loadVizData = () => {
-    if (Boolean(usePassword)) {
+    if (shareType === 'CODE') {
       const previousPassword = persistence.session.get(shareToken);
+
       if (previousPassword) {
         fetchShareVizInfoImpl(shareToken, previousPassword, searchParams);
       } else {
-        dispatch(actions.saveNeedPassword(true));
+        dispatch(actions.saveNeedVerify(true));
+      }
+    } else if (shareType === 'LOGIN' && !logged) {
+      const authorizedToken = persistence.session.get(shareToken);
+
+      if (authorizedToken) {
+        fetchShareVizInfoImpl(
+          shareToken,
+          undefined,
+          searchParams,
+          undefined,
+          undefined,
+          authorizedToken,
+        );
+      } else {
+        dispatch(actions.saveNeedVerify(true));
       }
     } else {
       fetchShareVizInfoImpl(shareToken, undefined, searchParams);
@@ -105,6 +123,9 @@ function ShareDashboard() {
     token?: string,
     pwd?: string,
     params?: FilterSearchParams,
+    loginUser?: string,
+    loginPwd?: string,
+    authorizedToken?: string,
   ) => {
     dispatch(
       fetchShareVizInfo({
@@ -112,6 +133,9 @@ function ShareDashboard() {
         sharePassword: pwd,
         filterSearchParams: params,
         renderMode,
+        userName: loginUser,
+        passWord: loginPwd,
+        authorizedToken,
       }),
     );
   };
@@ -125,13 +149,13 @@ function ShareDashboard() {
       setShareClientId(id);
       localStorage.setItem(StorageKeys.ShareClientId, uuidv4());
     }
+    const executeToken = Object.values(executeTokenMap)[0]?.authorizedToken;
     return () =>
       loadShareTask({
-        shareToken,
-        password: sharePassword,
+        shareToken: executeToken,
         clientId: shareClientId,
       });
-  }, [shareToken, sharePassword, shareClientId]);
+  }, [executeTokenMap, shareClientId]);
 
   const onMakeShareDownloadDataTask = useCallback(
     (downloadParams: ChartDataRequest[], fileName: string) => {
@@ -163,32 +187,44 @@ function ShareDashboard() {
 
   const onDownloadFile = useCallback(
     task => {
+      const executeToken = Object.values(executeTokenMap)[0]?.authorizedToken;
       downloadShareDataChartFile({
         downloadId: task.id,
-        shareToken,
-        password: sharePassword,
+        shareToken: executeToken,
       }).then(() => {
         dispatch(actions.setShareDownloadPolling(true));
       });
     },
-    [shareToken, sharePassword, dispatch, actions],
+    [executeTokenMap, dispatch, actions],
   );
 
   return (
     <StyledWrapper className="datart-viz">
-      <PasswordModal
-        visible={Boolean(needPassword) && Boolean(usePassword)}
-        onChange={sharePassword => {
-          fetchShareVizInfoImpl(shareToken, sharePassword);
+      <ShareLoginModal
+        visible={Boolean(needVerify) && shareType === 'LOGIN'}
+        onChange={({ username, password }) => {
+          fetchShareVizInfoImpl(
+            shareToken,
+            undefined,
+            searchParams,
+            username,
+            password,
+          );
         }}
       />
-      {!vizType && !needPassword && (
+      <PasswordModal
+        visible={Boolean(needVerify) && shareType === 'CODE'}
+        onChange={sharePassword => {
+          fetchShareVizInfoImpl(shareToken, sharePassword, searchParams);
+        }}
+      />
+      {!vizType && !needVerify && (
         <div className="loading-container">
           <BoardLoading />
         </div>
       )}
 
-      {!Boolean(needPassword) && vizType === 'DASHBOARD' && shareBoard && (
+      {!Boolean(needVerify)  && shareBoard && (
         <BoardForShare
           dashboard={shareBoard}
           allowDownload={true}

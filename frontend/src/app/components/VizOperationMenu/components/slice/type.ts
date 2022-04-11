@@ -15,7 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { AuthenticationModeType, RowPermissionByType } from './constants';
 
-export { default as ShareLinkModal } from './components/ShareLinkModal';
-export { default as ShareManageModal } from './components/ShareManageModal';
-export { default as VizOperationMenu } from './VizOperationMenu';
+export interface ShareDetail {
+  authenticationMode: AuthenticationModeType;
+  createBy: string;
+  createTime: string | Date;
+  expiryDate: string | Date;
+  id: string;
+  orgId: string;
+  permission: null;
+  roles: null | string[];
+  users: null | string[];
+  rowPermissionBy: RowPermissionByType;
+  updateBy: null;
+  updateTime: null | Date;
+  vizId: string;
+  vizType: 'DATACHART' | 'DASHBOARD' | 'STORYBOARD';
+}

@@ -16,6 +16,13 @@
  * limitations under the License.
  */
 
-export { default as ShareLinkModal } from './components/ShareLinkModal';
-export { default as ShareManageModal } from './components/ShareManageModal';
-export { default as VizOperationMenu } from './VizOperationMenu';
+export enum AuthenticationModeType {
+  none = 'NONE',
+  code = 'CODE',
+  login = 'LOGIN',
+}
+
+export enum RowPermissionByType {
+  creator = 'CREATOR',
+  visitor = 'VISITOR',
+}

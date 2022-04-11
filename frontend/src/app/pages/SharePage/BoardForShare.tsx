@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
@@ -70,6 +69,7 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
     const { needFetchItems, hasFetchItems, boardWidthHeight } = shareBoardInfo;
 
     const [allItemFetched, setAllItemFetched] = useState(false);
+
     useEffect(() => {
       if (needFetchItems.length === hasFetchItems.length) {
         setAllItemFetched(true);
@@ -92,6 +92,7 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
       }
       return taskWH;
     }, [boardWidthHeight, dashboard]);
+
     const boardDownLoadAction = useCallback(
       (params: { boardId: string }) => async dispatch => {
         const { boardId } = params;
@@ -102,12 +103,6 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
       },
       [onMakeShareDownloadDataTask],
     );
-
-    const searchParams = useMemo(() => {
-      return filterSearchUrl
-        ? urlSearchTransfer.toParams(filterSearchUrl)
-        : undefined;
-    }, [filterSearchUrl]);
 
     const onShareDownloadData = useCallback(() => {
       dispatch(boardDownLoadAction({ boardId: dashboard.id }));
@@ -126,7 +121,6 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
         >
           <Wrapper>
             <TitleForShare
-              name={dashboard.name}
               onShareDownloadData={onShareDownloadData}
               loadVizData={loadVizData}
             >

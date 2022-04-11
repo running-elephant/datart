@@ -19,7 +19,7 @@
 import { MoreOutlined, SendOutlined } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
-import { ShareLinkModal } from 'app/components/VizOperationMenu';
+import { ShareManageModal } from 'app/components/VizOperationMenu';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useStatusTitle } from 'app/pages/DashBoardPage/hooks/useStatusTitle';
 import { generateShareLinkAsync } from 'app/utils/fetch';
@@ -28,6 +28,7 @@ import { StoryContext } from '../contexts/StoryContext';
 import { StoryOverLay } from './StoryOverLay';
 
 interface StoryHeaderProps {
+  orgId: string;
   name: string;
   status: number;
   publishLoading?: boolean;
@@ -39,6 +40,7 @@ interface StoryHeaderProps {
 }
 export const StoryHeader: FC<StoryHeaderProps> = memo(
   ({
+    orgId,
     name,
     toggleEdit,
     status,
@@ -60,13 +62,28 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
     }, []);
 
     const onGenerateShareLink = useCallback(
-      async (expireDate, enablePassword) => {
-        const result = await generateShareLinkAsync(
-          expireDate,
-          enablePassword,
-          stroyBoardId,
-          'STORYBOARD',
-        );
+      async ({
+        expiryDate,
+        authenticationMode,
+        roles,
+        users,
+        rowPermissionBy,
+      }: {
+        expiryDate: string;
+        authenticationMode: string;
+        roles: string[];
+        users: string[];
+        rowPermissionBy: string;
+      }) => {
+        const result: any = await generateShareLinkAsync({
+          expiryDate,
+          authenticationMode,
+          roles,
+          users,
+          rowPermissionBy,
+          vizId: stroyBoardId,
+          vizType: 'STORYBOARD',
+        });
         return result;
       },
       [stroyBoardId],
@@ -113,12 +130,14 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
             )}
 
             {showShareLinkModal && (
-              <ShareLinkModal
+              <ShareManageModal
+                vizId={stroyBoardId as string}
+                orgId={orgId as string}
                 vizType="STORYBOARD"
                 visibility={showShareLinkModal}
                 onOk={() => setShowShareLinkModal(false)}
                 onCancel={() => setShowShareLinkModal(false)}
-                onGenerateShareLink={onGenerateShareLink as (any) => any}
+                onGenerateShareLink={onGenerateShareLink}
               />
             )}
           </>

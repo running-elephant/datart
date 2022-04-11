@@ -29,7 +29,19 @@ import { toUpdateDashboard } from '../../pages/BoardEditor/slice/thunk';
 
 export interface BoardActionContextProps {
   // read
-  onGenerateShareLink?: (date, usePwd) => any;
+  onGenerateShareLink?: ({
+    expiryDate,
+    authenticationMode,
+    roles,
+    users,
+    rowPermissionBy,
+  }: {
+    expiryDate: string;
+    authenticationMode: string;
+    roles: string[];
+    users: string[];
+    rowPermissionBy: string;
+  }) => any;
   onBoardToDownLoad: () => any;
   // edit
   updateBoard?: (callback?: () => void) => void;
@@ -55,13 +67,22 @@ export const BoardActionProvider: FC<{
       boardToggleAllowOverlap: (allow: boolean) => {
         dispatch(editBoardStackActions.toggleAllowOverlap(allow));
       },
-      onGenerateShareLink: async (expireDate, enablePassword) => {
-        const result = await generateShareLinkAsync(
-          expireDate,
-          enablePassword,
-          boardId,
-          'DASHBOARD',
-        );
+      onGenerateShareLink: async ({
+        expiryDate,
+        authenticationMode,
+        roles,
+        users,
+        rowPermissionBy,
+      }) => {
+        const result = await generateShareLinkAsync({
+          expiryDate,
+          authenticationMode,
+          roles,
+          users,
+          rowPermissionBy,
+          vizId: boardId,
+          vizType: 'DASHBOARD',
+        });
         return result;
       },
       onBoardToDownLoad: () => {

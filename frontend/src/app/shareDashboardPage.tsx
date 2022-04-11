@@ -22,7 +22,7 @@ import { registerTheme } from 'echarts';
 import { antdLocales } from 'locales/i18n';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { GlobalStyles } from 'styles/globalStyles';
 import { LazyShareDashboard } from './pages/SharePage/LoadableDashbaord';
 
@@ -40,7 +40,9 @@ export function ShareDashboardPage() {
         >
           <meta name="description" content="Data Art" />
         </Helmet>
-        <LazyShareDashboard />
+        <Switch>
+          <Route path="/shareDashboard/:token" component={LazyShareDashboard} />
+        </Switch>
         <GlobalStyles />
       </BrowserRouter>
     </ConfigProvider>
